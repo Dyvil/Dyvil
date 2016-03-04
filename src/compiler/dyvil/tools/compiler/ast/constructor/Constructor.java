@@ -8,13 +8,12 @@ import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.member.Member;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -24,7 +23,6 @@ import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -48,7 +46,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.annotation.ElementType;
 
-public class Constructor extends Member implements IConstructor
+public class Constructor extends Member implements IConstructor, IDefaultContext
 {
 	protected IParameter[] parameters = new IParameter[3];
 	protected int parameterCount;
@@ -240,36 +238,34 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.resolveTypes(markers, context, this);
-		}
-		
-		for (int i = 0; i < this.exceptionCount; i++)
-		{
-			this.exceptions[i] = this.exceptions[i].resolveType(markers, this);
-		}
-		
+		context = context.push(this);
+
+		super.resolveTypes(markers, context);
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].resolveTypes(markers, this);
+			this.parameters[i].resolveTypes(markers, context);
 		}
-		
+
+		for (int i = 0; i < this.exceptionCount; i++)
+		{
+			this.exceptions[i] = this.exceptions[i].resolveType(markers, context);
+		}
+
 		if (this.value != null)
 		{
-			this.value.resolveTypes(markers, this);
+			this.value.resolveTypes(markers, context);
 		}
-		
-		this.type = this.enclosingClass.getType();
+
+		context.pop();
 	}
 	
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.resolve(markers, context);
-		}
+		super.resolve(markers, context);
+
+		context = context.push(this);
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
@@ -278,16 +274,16 @@ public class Constructor extends Member implements IConstructor
 		
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			this.exceptions[i].resolve(markers, this);
+			this.exceptions[i].resolve(markers, context);
 		}
 		
 		this.resolveSuperConstructors(markers);
 		
 		if (this.value != null)
 		{
-			this.value = this.value.resolve(markers, this);
+			this.value = this.value.resolve(markers, context);
 			
-			final IValue typedValue = this.value.withType(Types.VOID, null, markers, context);
+			final IValue typedValue = this.value.withType(Types.VOID, Types.VOID, markers, context);
 			if (typedValue == null)
 			{
 				Marker marker = Markers.semantic(this.position, "constructor.return.type");
@@ -299,6 +295,8 @@ public class Constructor extends Member implements IConstructor
 				this.value = typedValue;
 			}
 		}
+
+		context.pop();
 	}
 	
 	private void resolveSuperConstructors(MarkerList markers)
@@ -336,11 +334,10 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.checkTypes(markers, context);
-		}
-		
+		context = context.push(this);
+
+		super.checkTypes(markers, context);
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].checkTypes(markers, context);
@@ -348,27 +345,28 @@ public class Constructor extends Member implements IConstructor
 		
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			this.exceptions[i].checkType(markers, this, TypePosition.RETURN_TYPE);
+			this.exceptions[i].checkType(markers, context, TypePosition.RETURN_TYPE);
 		}
 		
 		if (this.value != null)
 		{
-			this.value.checkTypes(markers, this);
+			this.value.checkTypes(markers, context);
 		}
 		else
 		{
 			markers.add(Markers.semanticError(this.position, "constructor.abstract"));
 		}
+
+		context.pop();
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.check(markers, context, ElementType.CONSTRUCTOR);
-		}
-		
+		context = context.push(this);
+
+		super.check(markers, context);
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].check(markers, context);
@@ -376,12 +374,7 @@ public class Constructor extends Member implements IConstructor
 		
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			this.exceptions[i].check(markers, this);
-		}
-		
-		for (int i = 0; i < this.exceptionCount; i++)
-		{
-			IType exceptionType = this.exceptions[i];
+			final IType exceptionType = this.exceptions[i];
 			exceptionType.check(markers, context);
 
 			if (!Types.THROWABLE.isSuperTypeOf(exceptionType))
@@ -405,6 +398,8 @@ public class Constructor extends Member implements IConstructor
 		{
 			markers.add(Markers.semantic(this.position, "constructor.static", this.name));
 		}
+
+		context.pop();
 	}
 	
 	@Override
@@ -434,25 +429,26 @@ public class Constructor extends Member implements IConstructor
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.cleanup(context, compilableList);
-		}
-		
+		context = context.push(this);
+
+		super.cleanup(context, compilableList);
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].cleanup(this, compilableList);
+			this.parameters[i].cleanup(context, compilableList);
 		}
 		
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			this.exceptions[i].cleanup(this, compilableList);
+			this.exceptions[i].cleanup(context, compilableList);
 		}
 		
 		if (this.value != null)
 		{
-			this.value = this.value.cleanup(this, compilableList);
+			this.value = this.value.cleanup(context, compilableList);
 		}
+
+		context.pop();
 	}
 	
 	@Override
@@ -480,30 +476,6 @@ public class Constructor extends Member implements IConstructor
 	}
 
 	@Override
-	public Package resolvePackage(Name name)
-	{
-		return this.enclosingClass.resolvePackage(name);
-	}
-	
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		return this.enclosingClass.resolveClass(name);
-	}
-	
-	@Override
-	public IType resolveType(Name name)
-	{
-		return this.enclosingClass.resolveType(name);
-	}
-	
-	@Override
-	public ITypeParameter resolveTypeVariable(Name name)
-	{
-		return this.enclosingClass.resolveTypeVariable(name);
-	}
-	
-	@Override
 	public IDataMember resolveField(Name name)
 	{
 		for (int i = 0; i < this.parameterCount; i++)
@@ -514,20 +486,13 @@ public class Constructor extends Member implements IConstructor
 				return param;
 			}
 		}
-		
-		return this.enclosingClass.resolveField(name);
-	}
-	
-	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
-	{
-		this.enclosingClass.getMethodMatches(list, instance, name, arguments);
+
+		return null;
 	}
 	
 	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
-		this.enclosingClass.getConstructorMatches(list, arguments);
 	}
 	
 	@Override
@@ -547,18 +512,6 @@ public class Constructor extends Member implements IConstructor
 	public IType getReturnType()
 	{
 		return Types.VOID;
-	}
-
-	@Override
-	public IAccessible getAccessibleThis(IClass type)
-	{
-		return this.enclosingClass.getAccessibleThis(type);
-	}
-	
-	@Override
-	public IValue getImplicit()
-	{
-		return null;
 	}
 	
 	@Override
@@ -581,7 +534,7 @@ public class Constructor extends Member implements IConstructor
 		{
 			return variable;
 		}
-		return this.enclosingClass.capture(variable);
+		return null;
 	}
 	
 	@Override

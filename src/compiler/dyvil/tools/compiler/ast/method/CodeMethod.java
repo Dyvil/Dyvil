@@ -70,7 +70,9 @@ public class CodeMethod extends AbstractMethod
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		super.resolveTypes(markers, this);
+		context = context.push(this);
+
+		super.resolveTypes(markers, context);
 
 		if (this.receiverType != null)
 		{
@@ -95,22 +97,22 @@ public class CodeMethod extends AbstractMethod
 
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.typeParameters[i].resolveTypes(markers, this);
+			this.typeParameters[i].resolveTypes(markers, context);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].resolveTypes(markers, this);
+			this.parameters[i].resolveTypes(markers, context);
 		}
 		
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			this.exceptions[i] = this.exceptions[i].resolveType(markers, this);
+			this.exceptions[i] = this.exceptions[i].resolveType(markers, context);
 		}
 		
 		if (this.value != null)
 		{
-			this.value.resolveTypes(markers, this);
+			this.value.resolveTypes(markers, context);
 		}
 		else if (this.enclosingClass.hasModifier(Modifiers.INTERFACE_CLASS))
 		{
@@ -120,16 +122,20 @@ public class CodeMethod extends AbstractMethod
 		{
 			this.modifiers.addIntModifier(Modifiers.ABSTRACT);
 		}
+
+		context.pop();
 	}
 	
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		super.resolve(markers, this);
-		
+		context = context.push(this);
+
+		super.resolve(markers, context);
+
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.typeParameters[i].resolve(markers, this);
+			this.typeParameters[i].resolve(markers, context);
 		}
 
 		if (this.receiverType != null)
@@ -139,17 +145,17 @@ public class CodeMethod extends AbstractMethod
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].resolve(markers, this);
+			this.parameters[i].resolve(markers, context);
 		}
 		
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			this.exceptions[i].resolve(markers, this);
+			this.exceptions[i].resolve(markers, context);
 		}
 		
 		if (this.value != null)
 		{
-			this.value = this.value.resolve(markers, this);
+			this.value = this.value.resolve(markers, context);
 			
 			boolean inferType = false;
 			if (this.type == Types.UNKNOWN)
@@ -163,35 +169,38 @@ public class CodeMethod extends AbstractMethod
 				}
 			}
 			
-			IValue value1 = this.type.convertValue(this.value, this.type, markers, this);
-			if (value1 == null)
+			final IValue typedValue = this.type.convertValue(this.value, this.type, markers, context);
+			if (typedValue != null)
 			{
-				Marker marker = Markers.semantic(this.position, "method.type.incompatible", this.name.unqualified);
+				this.value = typedValue;
+				if (inferType)
+				{
+					this.type = typedValue.getType();
+				}
+			}
+			else if (this.value.isResolved())
+			{
+				final Marker marker = Markers.semantic(this.position, "method.type.incompatible", this.name.unqualified);
 				marker.addInfo(Markers.getSemantic("method.type", this.type));
 				marker.addInfo(Markers.getSemantic("value.type", this.value.getType()));
 				markers.add(marker);
 			}
-			else
-			{
-				this.value = value1;
-				if (inferType)
-				{
-					this.type = value1.getType();
-				}
-			}
-			return;
 		}
-		if (this.type == Types.UNKNOWN)
+		else if (this.type == Types.UNKNOWN)
 		{
 			markers.add(Markers.semantic(this.position, "method.type.abstract", this.name.unqualified));
 			this.type = Types.ANY;
 		}
+
+		context.pop();
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		super.checkTypes(markers, this);
+		context = context.push(this);
+
+		super.checkTypes(markers, context);
 
 		if (this.receiverType != null)
 		{
@@ -200,30 +209,34 @@ public class CodeMethod extends AbstractMethod
 		
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.typeParameters[i].checkTypes(markers, this);
+			this.typeParameters[i].checkTypes(markers, context);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].checkTypes(markers, this);
+			this.parameters[i].checkTypes(markers, context);
 		}
 		
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			this.exceptions[i].checkType(markers, this, TypePosition.RETURN_TYPE);
+			this.exceptions[i].checkType(markers, context, TypePosition.RETURN_TYPE);
 		}
 		
 		if (this.value != null)
 		{
 			this.value.resolveStatement(this, markers);
-			this.value.checkTypes(markers, this);
+			this.value.checkTypes(markers, context);
 		}
+
+		context.pop();
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		super.check(markers, this);
+		context = context.push(this);
+
+		super.check(markers, context);
 
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
@@ -271,6 +284,8 @@ public class CodeMethod extends AbstractMethod
 		
 		// Check for duplicate methods
 		this.checkDuplicates(markers);
+
+		context.pop();
 	}
 	
 	private void checkDuplicates(MarkerList markers)
@@ -375,8 +390,10 @@ public class CodeMethod extends AbstractMethod
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		super.cleanup(this, compilableList);
-		
+		context = context.push(this);
+
+		super.cleanup(context, compilableList);
+
 		if (this.annotations != null)
 		{
 			IAnnotation intrinsic = this.annotations.getAnnotation(Types.INTRINSIC_CLASS);
@@ -393,23 +410,25 @@ public class CodeMethod extends AbstractMethod
 		
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.typeParameters[i].cleanup(this, compilableList);
+			this.typeParameters[i].cleanup(context, compilableList);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].cleanup(this, compilableList);
+			this.parameters[i].cleanup(context, compilableList);
 		}
 		
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			this.exceptions[i].cleanup(this, compilableList);
+			this.exceptions[i].cleanup(context, compilableList);
 		}
 		
 		if (this.value != null)
 		{
-			this.value = this.value.cleanup(this, compilableList);
+			this.value = this.value.cleanup(context, compilableList);
 		}
+
+		context.pop();
 	}
 	
 	@Override

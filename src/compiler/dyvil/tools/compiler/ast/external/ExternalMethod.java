@@ -7,6 +7,7 @@ import dyvil.tools.asm.TypeReference;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
@@ -35,59 +36,70 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	private boolean genericsResolved;
 	private boolean parametersResolved;
 	private boolean exceptionsResolved;
-	
+
 	public ExternalMethod(IClass iclass, Name name, String desc, ModifierSet modifiers)
 	{
 		super(iclass, name, null, modifiers);
 		this.name = name;
 		this.descriptor = desc;
 	}
-	
+
 	public void setVarargsParameter()
 	{
 		this.parameters[this.parameterCount - 1].setVarargs(true);
 	}
-	
+
 	@Override
 	public IParameter getParameter_(int index)
 	{
 		return this.parameters[index];
 	}
-	
+
+	private CombiningContext getCombiningContext()
+	{
+		return new CombiningContext(this, new CombiningContext(this.enclosingClass, Package.rootPackage));
+	}
+
 	private void resolveAnnotations()
 	{
 		this.annotationsResolved = true;
 		if (this.annotations != null)
 		{
-			this.annotations.resolveTypes(null, Package.rootPackage, this);
+			this.annotations.resolveTypes(null, this.getCombiningContext(), this);
 		}
 	}
-	
+
 	private void resolveReturnType()
 	{
 		if (!this.genericsResolved)
 		{
 			this.resolveGenerics();
 		}
+
 		this.returnTypeResolved = true;
-		this.type = this.type.resolveType(null, this);
+		this.type = this.type.resolveType(null, this.getCombiningContext());
 	}
-	
+
 	private void resolveGenerics()
 	{
+		final IContext context = this.getCombiningContext();
+
 		this.genericsResolved = true;
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.typeParameters[i].resolveTypes(null, Package.rootPackage);
+			this.typeParameters[i].resolveTypes(null, context);
 		}
 	}
-	
+
 	private void resolveParameters()
 	{
 		if (!this.genericsResolved)
 		{
 			this.resolveGenerics();
 		}
+
+		final IContext context = getCombiningContext();
+
 		this.parametersResolved = true;
 
 		if (this.receiverType == null)
@@ -105,31 +117,33 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		}
 
 		this.parameterCount -= parametersToRemove;
-		
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].resolveTypes(null, this);
+			this.parameters[i].resolveTypes(null, context);
 		}
 
 		if (this.receiverType != null)
 		{
-			this.receiverType = this.receiverType.resolveType(null, this);
+			this.receiverType = this.receiverType.resolveType(null, context);
 		}
 		else if (!this.isStatic())
 		{
 			this.receiverType = this.enclosingClass.getType();
 		}
 	}
-	
+
 	private void resolveExceptions()
 	{
+		final IContext context = this.getCombiningContext();
+
 		this.exceptionsResolved = true;
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			this.exceptions[i] = this.exceptions[i].resolveType(null, this);
+			this.exceptions[i] = this.exceptions[i].resolveType(null, context);
 		}
 	}
-	
+
 	@Override
 	public IType getType()
 	{
@@ -139,7 +153,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		}
 		return this.type;
 	}
-	
+
 	@Override
 	public boolean isIntrinsic()
 	{
@@ -149,7 +163,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		}
 		return this.intrinsicData != null;
 	}
-	
+
 	@Override
 	protected boolean isObjectMethod()
 	{
@@ -159,7 +173,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		}
 		return super.isObjectMethod();
 	}
-	
+
 	@Override
 	public IParameter getParameter(int index)
 	{
@@ -169,7 +183,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		}
 		return this.parameters[index];
 	}
-	
+
 	@Override
 	public float getSignatureMatch(Name name, IValue receiver, IArguments arguments)
 	{
@@ -208,7 +222,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		}
 		return super.checkArguments(markers, position, context, receiver, arguments, typeContext);
 	}
-	
+
 	@Override
 	public GenericData getGenericData(GenericData genericData, IValue instance, IArguments arguments)
 	{
@@ -222,7 +236,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		}
 		return super.getGenericData(genericData, instance, arguments);
 	}
-	
+
 	@Override
 	public IType getException(int index)
 	{
@@ -232,7 +246,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		}
 		return this.exceptions[index];
 	}
-	
+
 	@Override
 	public IAnnotation getAnnotation(IClass type)
 	{
@@ -240,53 +254,53 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		{
 			return null;
 		}
-		
+
 		if (!this.annotationsResolved)
 		{
 			this.resolveAnnotations();
 		}
 		return this.annotations.getAnnotation(type);
 	}
-	
+
 	@Override
 	public IClass resolveClass(Name name)
 	{
 		return Package.rootPackage.resolveClass(name);
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 	}
-	
+
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 	}
-	
+
 	@Override
 	public void foldConstants()
 	{
 	}
-	
+
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 	}
-	
+
 	@Override
 	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, IType targetType, int lineNumber)
-			throws BytecodeException
+		throws BytecodeException
 	{
 		if (!this.annotationsResolved)
 		{
@@ -294,10 +308,10 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		}
 		super.writeCall(writer, instance, arguments, typeContext, targetType, lineNumber);
 	}
-	
+
 	@Override
 	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
-			throws BytecodeException
+		throws BytecodeException
 	{
 		if (!this.annotationsResolved)
 		{
@@ -305,10 +319,10 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		}
 		super.writeJump(writer, dest, instance, arguments, typeContext, lineNumber);
 	}
-	
+
 	@Override
 	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
-			throws BytecodeException
+		throws BytecodeException
 	{
 		if (!this.annotationsResolved)
 		{
@@ -316,7 +330,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		}
 		super.writeInvJump(writer, dest, instance, arguments, typeContext, lineNumber);
 	}
-	
+
 	@Override
 	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible)
 	{
@@ -338,7 +352,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 			{
 				return null;
 			}
-			
+
 			typeVar.addAnnotation(annotation);
 			break;
 		}
@@ -351,8 +365,8 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		case TypeReference.EXCEPTION_PARAMETER:
 		{
 			int index = TypeReference.getExceptionIndex(typeRef);
-			this.exceptions[index] = IType
-					.withAnnotation(this.exceptions[index], annotation, typePath, 0, typePath.getLength());
+			this.exceptions[index] = IType.withAnnotation(this.exceptions[index], annotation, typePath, 0,
+			                                              typePath.getLength());
 			break;
 		}
 		case TypeReference.METHOD_FORMAL_PARAMETER:

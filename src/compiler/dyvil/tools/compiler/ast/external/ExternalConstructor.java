@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.Constructor;
+import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.method.IExternalCallableMember;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -36,13 +37,18 @@ public final class ExternalConstructor extends Constructor implements IExternalC
 	{
 		return this.parameters[index];
 	}
+
+	private CombiningContext getCombiningContext()
+	{
+		return new CombiningContext(this, new CombiningContext(this.enclosingClass, Package.rootPackage));
+	}
 	
 	private void resolveAnnotations()
 	{
 		this.annotationsResolved = true;
 		if (this.annotations != null)
 		{
-			this.annotations.resolveTypes(null, Package.rootPackage, this);
+			this.annotations.resolveTypes(null, this.getCombiningContext(), this);
 		}
 	}
 	
@@ -54,19 +60,23 @@ public final class ExternalConstructor extends Constructor implements IExternalC
 	
 	private void resolveParameters()
 	{
+		final IContext context = this.getCombiningContext();
+
 		this.parametersResolved = true;
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].resolveTypes(null, this.enclosingClass);
+			this.parameters[i].resolveTypes(null, context);
 		}
 	}
 	
 	private void resolveExceptions()
 	{
+		final IContext context = this.getCombiningContext();
+
 		this.exceptionsResolved = true;
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			this.exceptions[i] = this.exceptions[i].resolveType(null, Package.rootPackage);
+			this.exceptions[i] = this.exceptions[i].resolveType(null, context);
 		}
 	}
 	

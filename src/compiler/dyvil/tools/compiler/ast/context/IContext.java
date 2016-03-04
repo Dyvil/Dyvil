@@ -32,6 +32,16 @@ public interface IContext extends IMemberContext
 
 	boolean isStatic();
 
+	default IContext push(IContext context)
+	{
+		return new CombiningContext(context, this);
+	}
+
+	default IContext pop()
+	{
+		return null;
+	}
+
 	default DyvilCompiler getCompilationContext()
 	{
 		return this.getHeader().getCompilationContext();

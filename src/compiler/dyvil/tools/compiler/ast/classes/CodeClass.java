@@ -133,6 +133,8 @@ public class CodeClass extends AbstractClass
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
+		context = context.push(this);
+
 		if (this.metadata == null)
 		{
 			this.metadata = IClass.getClassMetadata(this, this.modifiers.toFlags());
@@ -163,34 +165,38 @@ public class CodeClass extends AbstractClass
 
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].resolveTypes(markers, this);
+			this.parameters[i].resolveTypes(markers, context);
 		}
 		
 		if (this.superType != null)
 		{
-			this.superType = this.superType.resolveType(markers, this);
+			this.superType = this.superType.resolveType(markers, context);
 		}
 		
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			this.interfaces[i] = this.interfaces[i].resolveType(markers, this);
+			this.interfaces[i] = this.interfaces[i].resolveType(markers, context);
 		}
 		
 		this.metadata.resolveTypesHeader(markers, context);
 		
 		if (this.body != null)
 		{
-			this.body.resolveTypes(markers);
+			this.body.resolveTypes(markers, context);
 		}
 		
 		this.metadata.resolveTypesBody(markers, context);
 
 		this.metadata.resolveTypesGenerate(markers, context);
+
+		context.pop();
 	}
 	
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
+		context = context.push(this);
+
 		if (this.annotations != null)
 		{
 			this.annotations.resolve(markers, context);
@@ -198,35 +204,39 @@ public class CodeClass extends AbstractClass
 		
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.typeParameters[i].resolve(markers, this);
+			this.typeParameters[i].resolve(markers, context);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].resolve(markers, this);
+			this.parameters[i].resolve(markers, context);
 		}
 		
 		if (this.superType != null)
 		{
-			this.superType.resolve(markers, this);
+			this.superType.resolve(markers, context);
 		}
 		
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			this.interfaces[i].resolve(markers, this);
+			this.interfaces[i].resolve(markers, context);
 		}
 		
-		this.metadata.resolve(markers, this);
+		this.metadata.resolve(markers, context);
 		
 		if (this.body != null)
 		{
-			this.body.resolve(markers);
+			this.body.resolve(markers, context);
 		}
+
+		context.pop();
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		context = context.push(this);
+
 		if (this.annotations != null)
 		{
 			this.annotations.checkTypes(markers, context);
@@ -234,37 +244,41 @@ public class CodeClass extends AbstractClass
 
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.typeParameters[i].checkTypes(markers, this);
+			this.typeParameters[i].checkTypes(markers, context);
 		}
 
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].checkTypes(markers, this);
+			this.parameters[i].checkTypes(markers, context);
 		}
 
 		if (this.superType != null)
 		{
-			this.superType.checkType(markers, this, TypePosition.SUPER_TYPE);
+			this.superType.checkType(markers, context, TypePosition.SUPER_TYPE);
 		}
 
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			this.interfaces[i].checkType(markers, this, TypePosition.SUPER_TYPE);
+			this.interfaces[i].checkType(markers, context, TypePosition.SUPER_TYPE);
 		}
 
 		this.metadata.checkTypes(markers, context);
 
 		if (this.body != null)
 		{
-			this.body.checkTypes(markers);
+			this.body.checkTypes(markers, context);
 		}
 		
 		this.checkSuperMethods(markers, this, this.getType(), new IdentityHashSet<>());
+
+		context.pop();
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		context = context.push(this);
+
 		ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.CLASS_MODIFIERS);
 
 		if (this.annotations != null)
@@ -274,22 +288,22 @@ public class CodeClass extends AbstractClass
 
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.typeParameters[i].check(markers, this);
+			this.typeParameters[i].check(markers, context);
 		}
 
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].check(markers, this);
+			this.parameters[i].check(markers, context);
 		}
 
 		if (this.superType != null)
 		{
 			this.superType.check(markers, context);
 
-			IClass superClass = this.superType.getTheClass();
+			final IClass superClass = this.superType.getTheClass();
 			if (superClass != null)
 			{
-				int modifiers = superClass.getModifiers().toFlags();
+				final int modifiers = superClass.getModifiers().toFlags();
 				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != 0)
 				{
 					markers.add(Markers.semantic(this.position, "class.extend.type",
@@ -304,16 +318,16 @@ public class CodeClass extends AbstractClass
 
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			IType type = this.interfaces[i];
+			final IType type = this.interfaces[i];
 			type.check(markers, context);
 
-			IClass iclass = type.getTheClass();
+			final IClass iclass = type.getTheClass();
 			if (iclass == null)
 			{
 				continue;
 			}
 
-			int modifiers = iclass.getModifiers().toFlags();
+			final int modifiers = iclass.getModifiers().toFlags();
 			if ((modifiers & Modifiers.INTERFACE_CLASS) != Modifiers.INTERFACE_CLASS)
 			{
 				markers.add(Markers.semantic(this.position, "class.implement.type",
@@ -325,8 +339,10 @@ public class CodeClass extends AbstractClass
 
 		if (this.body != null)
 		{
-			this.body.check(markers);
+			this.body.check(markers, context);
 		}
+
+		context.pop();
 	}
 	
 	@Override
@@ -368,6 +384,8 @@ public class CodeClass extends AbstractClass
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
+		context = context.push(this);
+
 		if (this.annotations != null)
 		{
 			this.annotations.cleanup(context, this);
@@ -375,30 +393,32 @@ public class CodeClass extends AbstractClass
 		
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.typeParameters[i].cleanup(this, this);
+			this.typeParameters[i].cleanup(context, this);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].cleanup(this, this);
+			this.parameters[i].cleanup(context, this);
 		}
 		
 		if (this.superType != null)
 		{
-			this.superType.cleanup(this, this);
+			this.superType.cleanup(context, this);
 		}
 		
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			this.interfaces[i].cleanup(this, this);
+			this.interfaces[i].cleanup(context, this);
 		}
 
-		this.metadata.cleanup(this, this);
+		this.metadata.cleanup(context, this);
 		
 		if (this.body != null)
 		{
-			this.body.cleanup();
+			this.body.cleanup(context);
 		}
+
+		context.pop();
 	}
 	
 	@Override

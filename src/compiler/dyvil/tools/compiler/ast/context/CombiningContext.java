@@ -19,17 +19,23 @@ public class CombiningContext implements IContext
 {
 	private final IContext inner;
 	private final IContext outer;
-	
+
 	public CombiningContext(IContext context1, IContext context2)
 	{
 		this.inner = context1;
 		this.outer = context2;
 	}
-	
+
 	@Override
 	public boolean isStatic()
 	{
 		return this.inner.isStatic() && this.outer.isStatic();
+	}
+
+	@Override
+	public IContext pop()
+	{
+		return this.inner;
 	}
 
 	@Override
@@ -44,7 +50,7 @@ public class CombiningContext implements IContext
 		IDyvilHeader header = this.inner.getHeader();
 		return header == null ? this.outer.getHeader() : header;
 	}
-	
+
 	@Override
 	public IClass getThisClass()
 	{
@@ -65,49 +71,57 @@ public class CombiningContext implements IContext
 		Package pack = this.inner.resolvePackage(name);
 		return pack == null ? this.outer.resolvePackage(name) : pack;
 	}
-	
+
 	@Override
 	public IClass resolveClass(Name name)
 	{
 		IClass iclass = this.inner.resolveClass(name);
 		return iclass == null ? this.outer.resolveClass(name) : iclass;
 	}
-	
+
 	@Override
 	public IType resolveType(Name name)
 	{
 		IType type = this.inner.resolveType(name);
 		return type == null ? this.outer.resolveType(name) : type;
 	}
-	
+
 	@Override
 	public ITypeParameter resolveTypeVariable(Name name)
 	{
 		ITypeParameter typeVar = this.inner.resolveTypeVariable(name);
 		return typeVar == null ? this.outer.resolveTypeVariable(name) : typeVar;
 	}
-	
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
 		IDataMember field = this.inner.resolveField(name);
 		return field == null ? this.outer.resolveField(name) : field;
 	}
-	
+
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		this.inner.getMethodMatches(list, instance, name, arguments);
-		this.outer.getMethodMatches(list, instance, name, arguments);
+
+		if (list.isEmpty())
+		{
+			this.outer.getMethodMatches(list, instance, name, arguments);
+		}
 	}
-	
+
 	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 		this.inner.getConstructorMatches(list, arguments);
-		this.outer.getConstructorMatches(list, arguments);
+
+		if (list.isEmpty())
+		{
+			this.outer.getConstructorMatches(list, arguments);
+		}
 	}
-	
+
 	@Override
 	public byte handleException(IType type)
 	{
@@ -133,20 +147,20 @@ public class CombiningContext implements IContext
 		IAccessible i = this.inner.getAccessibleThis(type);
 		return i == null ? this.outer.getAccessibleThis(type) : i;
 	}
-	
+
 	@Override
 	public IValue getImplicit()
 	{
 		final IValue innerImplicit = this.inner.getImplicit();
 		return innerImplicit == null ? this.outer.getImplicit() : innerImplicit;
 	}
-	
+
 	@Override
 	public boolean isMember(IVariable variable)
 	{
 		return this.inner.isMember(variable);
 	}
-	
+
 	@Override
 	public IDataMember capture(IVariable variable)
 	{
@@ -158,7 +172,7 @@ public class CombiningContext implements IContext
 		{
 			return this.inner.capture(variable);
 		}
-		
+
 		IDataMember dm = this.outer.capture(variable);
 		return dm.capture(this.inner);
 	}

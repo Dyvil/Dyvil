@@ -11,13 +11,12 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisExpr;
 import dyvil.tools.compiler.ast.external.ExternalMethod;
-import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.GenericData;
@@ -32,7 +31,6 @@ import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.statement.loop.ILoop;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Mutability;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -56,7 +54,7 @@ import java.lang.annotation.ElementType;
 import static dyvil.reflect.Opcodes.IFEQ;
 import static dyvil.reflect.Opcodes.IFNE;
 
-public abstract class AbstractMethod extends Member implements IMethod, ILabelContext
+public abstract class AbstractMethod extends Member implements IMethod, ILabelContext, IDefaultContext
 {
 	static final Handle EXTENSION_BSM = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/DynamicLinker",
 	                                               "linkExtension",
@@ -415,18 +413,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		return this.receiverType;
 	}
-
-	@Override
-	public Package resolvePackage(Name name)
-	{
-		return this.enclosingClass.resolvePackage(name);
-	}
-	
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		return this.enclosingClass.resolveClass(name);
-	}
 	
 	@Override
 	public IType resolveType(Name name)
@@ -439,8 +425,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				return new TypeVarType(var);
 			}
 		}
-		
-		return this.enclosingClass.resolveType(name);
+
+		return null;
 	}
 	
 	@Override
@@ -454,8 +440,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				return var;
 			}
 		}
-		
-		return this.enclosingClass.resolveTypeVariable(name);
+
+		return null;
 	}
 	
 	@Override
@@ -469,8 +455,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				return param;
 			}
 		}
-		
-		return this.enclosingClass.resolveField(name);
+
+		return null;
 	}
 	
 	@Override
@@ -478,29 +464,21 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		return null;
 	}
-	
+
 	@Override
 	public ILoop getEnclosingLoop()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
-		float selfMatch = this.getSignatureMatch(name, instance, arguments);
+		final float selfMatch = this.getSignatureMatch(name, instance, arguments);
 		if (selfMatch > 0)
 		{
 			list.add(this, selfMatch);
 		}
-		
-		this.enclosingClass.getMethodMatches(list, instance, name, arguments);
-	}
-	
-	@Override
-	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
-	{
-		this.enclosingClass.getConstructorMatches(list, arguments);
 	}
 	
 	@Override
@@ -520,18 +498,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public IType getReturnType()
 	{
 		return this.type;
-	}
-
-	@Override
-	public IAccessible getAccessibleThis(IClass type)
-	{
-		return this.enclosingClass.getAccessibleThis(type);
-	}
-	
-	@Override
-	public IValue getImplicit()
-	{
-		return null;
 	}
 	
 	@Override
@@ -554,7 +520,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			return variable;
 		}
-		return this.enclosingClass.capture(variable);
+		return null;
 	}
 	
 	@Override
