@@ -68,4 +68,10 @@ public class PackageParser extends Parser
 			return;
 		}
 	}
+
+	@Override
+	public boolean reportErrors()
+	{
+		return true;
+	}
 }

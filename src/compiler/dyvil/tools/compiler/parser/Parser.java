@@ -74,6 +74,6 @@ public abstract class Parser
 
 	public boolean reportErrors()
 	{
-		return true;
+		return false;
 	}
 }
