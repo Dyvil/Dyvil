@@ -1,85 +1,47 @@
 package dyvil.tools.compiler.ast.statement.loop;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Variable;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.operator.RangeOperator;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.marker.Marker;
-import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public class RangeForStatement extends ForEachStatement
 {
-	private static final int INT = 0, LONG = 1, FLOAT = 2, DOUBLE = 3;
+	private static final int INT       = 0;
+	private static final int LONG      = 1;
+	private static final int FLOAT     = 2;
+	private static final int DOUBLE    = 3;
 	private static final int RANGEABLE = 4;
-	
-	protected IValue  startValue;
-	protected IValue  endValue;
-	protected boolean halfOpen;
-	
-	public RangeForStatement(ICodePosition position, Variable var, IValue startValue, IValue endValue, boolean halfOpen)
+
+	public RangeForStatement(ICodePosition position, Variable var)
 	{
 		super(position, var);
-		
-		this.startValue = startValue;
-		this.endValue = endValue;
-		this.halfOpen = halfOpen;
 	}
-	
-	@Override
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
-	{
-		final IType elementType = this.variable.getType();
 
-		final IValue typedStartValue = this.startValue.withType(elementType, typeContext, markers, context);
-		if (typedStartValue != null)
-		{
-			this.startValue = typedStartValue;
-		}
-		else if (this.endValue.isResolved())
-		{
-			final Marker marker = Markers.semantic(this.startValue.getPosition(), "for.range.type");
-			marker.addInfo(Markers.getSemantic("value.type", this.startValue.getType()));
-			marker.addInfo(Markers.getSemantic("variable.type", elementType));
-			markers.add(marker);
-		}
-		
-		final IValue typedEndValue = this.endValue.withType(elementType, typeContext, markers, context);
-		if (typedEndValue != null)
-		{
-			this.endValue = typedEndValue;
-		}
-		else if (this.endValue.isResolved())
-		{
-			final Marker marker = Markers.semantic(this.endValue.getPosition(), "for.range.type");
-			marker.addInfo(Markers.getSemantic("value.type", this.endValue.getType()));
-			marker.addInfo(Markers.getSemantic("variable.type", elementType));
-			markers.add(marker);
-		}
-		
-		return super.withType(type, typeContext, markers, context);
-	}
-	
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		// Determine the 'type' of the range to fasten up compilation.
-		byte type = RANGEABLE;
+		// Determine the kind (int, long, float, double, Rangeable) of the range to fasten up compilation.
+		byte kind = RANGEABLE;
 		boolean boxed = false;
 
-		final Variable var = this.variable;
 		final int lineNumber = this.getLineNumber();
 
+		final Variable var = this.variable;
 		final IType varType = var.getType();
-		final IType elementType = PrimitiveType.getPrimitiveType(varType);
+
+		final RangeOperator rangeOperator = (RangeOperator) var.getValue();
+		final IValue startValue = rangeOperator.getStartValue();
+		final IValue endValue = rangeOperator.getEndValue();
+		final IType elementType = rangeOperator.getElementType();
+		final boolean halfOpen = rangeOperator.isHalfOpen();
+
 		if (elementType.isPrimitive())
 		{
 			switch (elementType.getTypecode())
@@ -88,16 +50,16 @@ public class RangeForStatement extends ForEachStatement
 			case PrimitiveType.SHORT_CODE:
 			case PrimitiveType.CHAR_CODE:
 			case PrimitiveType.INT_CODE:
-				type = INT;
+				kind = INT;
 				break;
 			case PrimitiveType.LONG_CODE:
-				type = LONG;
+				kind = LONG;
 				break;
 			case PrimitiveType.FLOAT_CODE:
-				type = FLOAT;
+				kind = FLOAT;
 				break;
 			case PrimitiveType.DOUBLE_CODE:
-				type = DOUBLE;
+				kind = DOUBLE;
 				break;
 			}
 
@@ -106,7 +68,7 @@ public class RangeForStatement extends ForEachStatement
 				boxed = true;
 			}
 		}
-		
+
 		dyvil.tools.asm.Label startLabel = this.startLabel.target = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label updateLabel = this.updateLabel.target = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
@@ -114,7 +76,7 @@ public class RangeForStatement extends ForEachStatement
 		writer.writeLabel(scopeLabel);
 
 		// Write the start value and store it in the variable.
-		this.startValue.writeExpression(writer, elementType);
+		startValue.writeExpression(writer, elementType);
 		writer.writeInsn(Opcodes.AUTO_DUP);
 
 		final int counterVarIndex, varIndex;
@@ -141,7 +103,7 @@ public class RangeForStatement extends ForEachStatement
 			varIndex = counterVarIndex = var.getLocalIndex();
 		}
 
-		this.endValue.writeExpression(writer, elementType);
+		endValue.writeExpression(writer, elementType);
 
 		final int endVarIndex = writer.localCount();
 		writer.writeVarInsn(elementType.getStoreOpcode(), endVarIndex);
@@ -149,27 +111,27 @@ public class RangeForStatement extends ForEachStatement
 		writer.writeTargetLabel(startLabel);
 
 		// Check the condition
-		switch (type)
+		switch (kind)
 		{
 		case INT:
 			writer.writeVarInsn(Opcodes.ILOAD, counterVarIndex);
 			writer.writeVarInsn(Opcodes.ILOAD, endVarIndex);
-			writer.writeJumpInsn(this.halfOpen ? Opcodes.IF_ICMPGE : Opcodes.IF_ICMPGT, endLabel);
+			writer.writeJumpInsn(halfOpen ? Opcodes.IF_ICMPGE : Opcodes.IF_ICMPGT, endLabel);
 			break;
 		case LONG:
 			writer.writeVarInsn(Opcodes.LLOAD, counterVarIndex);
 			writer.writeVarInsn(Opcodes.LLOAD, endVarIndex);
-			writer.writeJumpInsn(this.halfOpen ? Opcodes.IF_LCMPGE : Opcodes.IF_LCMPGT, endLabel);
+			writer.writeJumpInsn(halfOpen ? Opcodes.IF_LCMPGE : Opcodes.IF_LCMPGT, endLabel);
 			break;
 		case FLOAT:
 			writer.writeVarInsn(Opcodes.FLOAD, counterVarIndex);
 			writer.writeVarInsn(Opcodes.FLOAD, endVarIndex);
-			writer.writeJumpInsn(this.halfOpen ? Opcodes.IF_FCMPGE : Opcodes.IF_FCMPGT, endLabel);
+			writer.writeJumpInsn(halfOpen ? Opcodes.IF_FCMPGE : Opcodes.IF_FCMPGT, endLabel);
 			break;
 		case DOUBLE:
 			writer.writeVarInsn(Opcodes.DLOAD, counterVarIndex);
 			writer.writeVarInsn(Opcodes.DLOAD, endVarIndex);
-			writer.writeJumpInsn(this.halfOpen ? Opcodes.IF_DCMPGE : Opcodes.IF_DCMPGT, endLabel);
+			writer.writeJumpInsn(halfOpen ? Opcodes.IF_DCMPGE : Opcodes.IF_DCMPGT, endLabel);
 			break;
 		case RANGEABLE:
 			writer.writeVarInsn(Opcodes.ALOAD, counterVarIndex);
@@ -177,19 +139,19 @@ public class RangeForStatement extends ForEachStatement
 			writer.writeLineNumber(lineNumber);
 			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "dyvil/collection/range/Rangeable", "compareTo",
 			                       "(Ldyvil/collection/range/Rangeable;)I", true);
-			writer.writeJumpInsn(this.halfOpen ? Opcodes.IFGE : Opcodes.IFGT, endLabel);
+			writer.writeJumpInsn(halfOpen ? Opcodes.IFGE : Opcodes.IFGT, endLabel);
 			break;
 		}
-		
+
 		// Action
 		if (this.action != null)
 		{
 			this.action.writeExpression(writer, Types.VOID);
 		}
-		
+
 		// Increment
 		writer.writeLabel(updateLabel);
-		switch (type)
+		switch (kind)
 		{
 		case INT:
 			writer.writeIINC(counterVarIndex, 1);
@@ -248,24 +210,24 @@ public class RangeForStatement extends ForEachStatement
 			writer.writeLineNumber(lineNumber);
 			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "dyvil/collection/range/Rangeable", "next",
 			                       "()Ldyvil/collection/range/Rangeable;", true);
-			
+
 			if (elementType.getTheClass() != RangeOperator.LazyFields.RANGEABLE_CLASS)
 			{
 				RangeOperator.LazyFields.RANGEABLE.writeCast(writer, elementType, lineNumber);
 			}
 
 			assert !boxed;
-			
+
 			writer.writeVarInsn(Opcodes.ASTORE, counterVarIndex);
 			break;
 		}
-		
+
 		writer.writeJumpInsn(Opcodes.GOTO, startLabel);
-		
+
 		// Local Variables
 		writer.resetLocals(counterVarIndex);
 		writer.writeLabel(endLabel);
-		
+
 		var.writeLocal(writer, scopeLabel, endLabel);
 	}
 }

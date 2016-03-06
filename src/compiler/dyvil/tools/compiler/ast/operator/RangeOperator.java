@@ -260,6 +260,11 @@ public class RangeOperator implements IValue
 		this.endValue.check(markers, context);
 
 		final IType elementType = this.getElementType();
+		if (!elementType.isResolved())
+		{
+			return;
+		}
+
 		if (elementType.isPrimitive())
 		{
 			switch (elementType.getTypecode())
