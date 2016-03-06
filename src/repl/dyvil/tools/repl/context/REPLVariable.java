@@ -22,7 +22,7 @@ public class REPLVariable extends Field
 	protected String bytecodeName;
 	protected String className;
 	private   Class  theClass;
-	
+
 	public REPLVariable(REPLContext context, ICodePosition position, Name name, IType type, IValue value, String className, ModifierSet modifiers)
 	{
 		super(null, name, type);
@@ -34,13 +34,13 @@ public class REPLVariable extends Field
 
 		REPLContext.updateModifiers(modifiers);
 	}
-	
+
 	@Override
 	public boolean hasModifier(int mod)
 	{
 		return mod == Modifiers.STATIC || this.modifiers.hasIntModifier(mod);
 	}
-	
+
 	private static void filterStackTrace(Throwable throwable)
 	{
 		StackTraceElement[] traceElements = throwable.getStackTrace();
@@ -146,86 +146,78 @@ public class REPLVariable extends Field
 
 	private Class generateClass(String className, List<IClassCompilable> compilableList) throws Throwable
 	{
-		String name = this.bytecodeName = this.name.qualified;
+		final String name = this.bytecodeName = this.name.qualified;
+		final String extendedType = this.type.getExtendedName();
+		final String methodType = "()" + extendedType;
 
-		String extendedType = this.type.getExtendedName();
-		ClassWriter cw = new ClassWriter();
+		final ClassWriter classWriter = new ClassWriter();
 		// Generate Class Header
-		cw.visit(ClassFormat.CLASS_VERSION, Modifiers.PUBLIC | Modifiers.FINAL | ClassFormat.ACC_SUPER, className, null,
-		         "java/lang/Object", null);
-		
-		cw.visitSource(className, null);
-		
+		classWriter
+			.visit(ClassFormat.CLASS_VERSION, Modifiers.PUBLIC | Modifiers.FINAL | ClassFormat.ACC_SUPER, className,
+			       null, "java/lang/Object", null);
+
+		classWriter.visitSource(className, null);
+
 		if (this.type != Types.VOID)
 		{
 			// Generate the field holding the value
-			cw.visitField(this.modifiers.toFlags(), name, extendedType, null, null);
+			classWriter.visitField(this.modifiers.toFlags(), name, extendedType, null, null);
 		}
-		
+
 		// Compilables
-		for (IClassCompilable c : compilableList)
+		for (IClassCompilable compilable : compilableList)
 		{
-			c.write(cw);
+			compilable.write(classWriter);
 		}
-		
+
 		// Generate <clinit> static initializer
-		MethodWriter mw = new MethodWriterImpl(cw,
-		                                       cw.visitMethod(Modifiers.STATIC | Modifiers.SYNTHETIC, "<clinit>", "()V",
-		                                                      null, null));
-		mw.begin();
-		
+		final MethodWriter clinitWriter = new MethodWriterImpl(classWriter, classWriter.visitMethod(
+			Modifiers.STATIC | Modifiers.SYNTHETIC, "<clinit>", "()V", null, null));
+		clinitWriter.begin();
+
 		for (IClassCompilable c : compilableList)
 		{
-			c.writeStaticInit(mw);
+			c.writeStaticInit(clinitWriter);
 		}
-		
-		// Write the value
-		
+
+		// Write a call to the computeResult method
+		clinitWriter.writeInvokeInsn(Opcodes.INVOKESTATIC, className, "computeResult", methodType, false);
+		if (this.type != Types.VOID)
+		{
+			// Store the value to the field
+			clinitWriter.writeFieldInsn(Opcodes.PUTSTATIC, className, name, extendedType);
+		}
+
+		// Finish the <clinit> static initializer
+		clinitWriter.writeInsn(Opcodes.RETURN);
+		clinitWriter.end();
+
+		// Writer the computeResult method
 		if (this.value != null)
 		{
-			this.writeValue(className, name, extendedType, cw, mw);
+			final MethodWriter computeWriter = new MethodWriterImpl(classWriter, classWriter.visitMethod(
+				Modifiers.PRIVATE | Modifiers.STATIC, "computeResult", methodType, null, null));
+			computeWriter.begin();
+			this.value.writeExpression(computeWriter, this.type);
+			computeWriter.end(this.type);
 		}
-		
-		// Finish Method compilation
-		mw.writeInsn(Opcodes.RETURN);
-		mw.end();
-		
+
 		// Finish Class compilation
-		cw.visitEnd();
-		
-		byte[] bytes = cw.toByteArray();
-		
+		classWriter.visitEnd();
+
+		final byte[] bytes = classWriter.toByteArray();
+
 		if (this.type != Types.VOID || !compilableList.isEmpty())
 		{
 			// The type contains the value, so we have to keep the class loaded.
 			return REPLMemberClass.loadClass(this.context.repl, className, bytes);
 		}
+
 		// We don't have any variables, so we can throw the Class away after
 		// it has been loaded.
 		return REPLMemberClass.loadAnonymousClass(this.context.repl, className, bytes);
 	}
-	
-	private void writeValue(String className, String name, String extendedType, ClassWriter cw, MethodWriter mw)
-			throws BytecodeException
-	{
-		if (this.type == Types.VOID)
-		{
-			this.value.writeExpression(mw, Types.VOID);
-			return;
-		}
-		
-		String methodType = "()" + extendedType;
-		MethodWriter initWriter = new MethodWriterImpl(cw, cw.visitMethod(Modifiers.PRIVATE | Modifiers.STATIC,
-		                                                                  "computeValue", methodType, null, null));
-		initWriter.begin();
-		this.value.writeExpression(initWriter, this.type);
-		initWriter.end(this.type);
-		
-		mw.writeInvokeInsn(Opcodes.INVOKESTATIC, className, "computeValue", methodType, false);
-		// Store the value to the field
-		mw.writeFieldInsn(Opcodes.PUTSTATIC, className, name, extendedType);
-	}
-	
+
 	@Override
 	public void writeGet(MethodWriter writer, IValue receiver, int lineNumber) throws BytecodeException
 	{
@@ -234,17 +226,17 @@ public class REPLVariable extends Field
 			this.value.writeExpression(writer, this.type);
 			return;
 		}
-		
+
 		if (this.className == null)
 		{
 			this.type.writeDefaultValue(writer);
 			return;
 		}
-		
+
 		String extended = this.type.getExtendedName();
 		writer.writeFieldInsn(Opcodes.GETSTATIC, this.className, this.bytecodeName, extended);
 	}
-	
+
 	@Override
 	public void writeSet(MethodWriter writer, IValue receiver, IValue value, int lineNumber) throws BytecodeException
 	{
@@ -252,13 +244,13 @@ public class REPLVariable extends Field
 		{
 			value.writeExpression(writer, this.type);
 		}
-		
+
 		if (this.className == null)
 		{
 			writer.writeInsn(Opcodes.AUTO_POP);
 			return;
 		}
-		
+
 		String extended = this.type.getExtendedName();
 		writer.writeFieldInsn(Opcodes.PUTSTATIC, this.className, this.bytecodeName, extended);
 	}
