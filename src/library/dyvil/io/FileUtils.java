@@ -49,7 +49,7 @@ public final class FileUtils
 		}
 
 		final File parent = file.getParentFile();
-		if (parent != null && !parent.mkdirs())
+		if (parent != null && !parent.exists() && !parent.mkdirs())
 		{
 			return false;
 		}

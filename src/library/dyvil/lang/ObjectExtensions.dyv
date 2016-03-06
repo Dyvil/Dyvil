@@ -58,4 +58,14 @@ public final class ObjectExtensions
 	}
 
 	public infix int ##(Object o) = if (o == null) 0 else o.hashCode
+
+	// Comparable
+
+	public infix boolean operator <[T](Comparable[T] c1, T c2) = (c1 compareTo c2) < 0
+
+	public infix boolean operator <=[T](Comparable[T] c1, T c2) = (c1 compareTo c2) < 0
+
+	public infix boolean operator >[T](Comparable[T] c1, T c2) = (c1 compareTo c2) < 0
+
+	public infix boolean operator >=[T](Comparable[T] c1, T c2) = (c1 compareTo c2) < 0
 }
