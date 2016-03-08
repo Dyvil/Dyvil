@@ -29,7 +29,7 @@ public class CombiningContext implements IContext
 	@Override
 	public IContext pop()
 	{
-		return this.inner;
+		return this.outer;
 	}
 
 	@Override
