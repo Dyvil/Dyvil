@@ -93,7 +93,7 @@ public final class ThrowStatement extends AbstractValue implements IValueConsume
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		this.value.resolve(markers, context);
+		this.value = this.value.resolve(markers, context);
 		return this;
 	}
 	
