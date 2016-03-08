@@ -145,6 +145,16 @@ public final class ClassParameter extends Parameter implements IField
 			return new ThisExpr(position, this.enclosingClass.getType(), context, markers);
 		}
 
+		switch (IContext.getVisibility(context, this))
+		{
+		case IContext.INTERNAL:
+			markers.add(Markers.semantic(position, "classparameter.access.internal", this.name));
+			break;
+		case IContext.INVISIBLE:
+			markers.add(Markers.semantic(position, "classparameter.access.invisible", this.name));
+			break;
+		}
+
 		return receiver;
 	}
 
