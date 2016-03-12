@@ -60,7 +60,7 @@ public final class SemicolonInference
 			{
 				switch (prevType)
 				{
-				case DyvilSymbols.WILDCARD:
+				case DyvilSymbols.UNDERSCORE:
 				case DyvilSymbols.ELLIPSIS:
 					break; // continue inference checking
 				default:

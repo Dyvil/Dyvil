@@ -167,7 +167,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				this.value = new DoubleValue(token.raw(), token.doubleValue());
 				this.mode = ACCESS;
 				return;
-			case DyvilSymbols.WILDCARD:
+			case DyvilSymbols.UNDERSCORE:
 				// _ ...
 				this.value = new WildcardValue(token.raw());
 				this.mode = ACCESS;
@@ -185,7 +185,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				}
 
 				final IToken next2 = next.next();
-				if (next2.type() == DyvilSymbols.ARROW_OPERATOR)
+				if (next2.type() == DyvilSymbols.DOUBLE_ARROW_RIGHT)
 				{
 					// () => ...
 					final LambdaExpr lambda = new LambdaExpr(next2.raw());
@@ -218,7 +218,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				this.value = new AnnotationValue(a);
 				this.mode = END;
 				return;
-			case DyvilSymbols.ARROW_OPERATOR:
+			case DyvilSymbols.DOUBLE_ARROW_RIGHT:
 			{
 				// => ...
 				LambdaExpr lambda = new LambdaExpr(token.raw());
@@ -804,7 +804,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				pm.pushParser(new ExpressionListParser((IValueList) subscriptAccess.getArguments()));
 				return;
 			}
-			case DyvilSymbols.ARROW_OPERATOR:
+			case DyvilSymbols.DOUBLE_ARROW_RIGHT:
 				// IDENTIFIER => ...
 				// Lambda Expression with one untyped parameter
 

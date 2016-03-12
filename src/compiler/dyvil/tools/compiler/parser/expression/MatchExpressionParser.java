@@ -86,7 +86,7 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 				return;
 			}
 			pm.pushParser(pm.newExpressionParser(this));
-			if (type != BaseSymbols.COLON && type != DyvilSymbols.ARROW_OPERATOR)
+			if (type != BaseSymbols.COLON && type != DyvilSymbols.DOUBLE_ARROW_RIGHT)
 			{
 				pm.reparse();
 				pm.report(token, "match.case.action");

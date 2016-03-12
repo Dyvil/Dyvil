@@ -129,7 +129,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					pm.pushParser(pm.newTypeParser(arrayType));
 					return;
 				}
-				case DyvilSymbols.ARROW_OPERATOR:
+				case DyvilSymbols.DOUBLE_ARROW_RIGHT:
 				{
 					final LambdaType lambdaType = new LambdaType(token.raw());
 					pm.pushParser(pm.newTypeParser(lambdaType));
@@ -141,7 +141,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					this.consumer.setType(Types.NULL);
 					pm.popParser();
 					return;
-				case DyvilSymbols.WILDCARD:
+				case DyvilSymbols.UNDERSCORE:
 					this.type = new WildcardType(token.raw());
 					this.mode = WILDCARD_TYPE;
 					return;
@@ -156,7 +156,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					this.type = new NamedGenericType(token.raw(), token.nameValue(), this.parentType);
 					this.mode = GENERICS;
 					return;
-				case DyvilSymbols.ARROW_OPERATOR:
+				case DyvilSymbols.DOUBLE_ARROW_RIGHT:
 					if (this.parentType == null && !this.namedOnly)
 					{
 						LambdaType lt = new LambdaType(new NamedType(token.raw(), token.nameValue()));
@@ -199,7 +199,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			}
 
 			final IToken nextToken = token.next();
-			if (nextToken.type() == DyvilSymbols.ARROW_OPERATOR)
+			if (nextToken.type() == DyvilSymbols.DOUBLE_ARROW_RIGHT)
 			{
 				final LambdaType lambdaType = new LambdaType(nextToken.raw(), this.parentType, (TupleType) this.type);
 				this.type = lambdaType;

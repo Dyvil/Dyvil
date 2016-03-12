@@ -98,7 +98,7 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterCon
 				this.mode = PARAMETER_NAME;
 				return;
 			}
-			if (type == BaseSymbols.CLOSE_PARENTHESIS && token.next().type() == DyvilSymbols.ARROW_OPERATOR)
+			if (type == BaseSymbols.CLOSE_PARENTHESIS && token.next().type() == DyvilSymbols.DOUBLE_ARROW_RIGHT)
 			{
 				this.mode = ARROW;
 				return;
@@ -130,7 +130,7 @@ public class LambdaOrTupleParser extends EmulatorParser implements IParameterCon
 			pm.report(token, "tuple.close_paren");
 			return;
 		case ARROW:
-			if (token.type() != DyvilSymbols.ARROW_OPERATOR)
+			if (token.type() != DyvilSymbols.DOUBLE_ARROW_RIGHT)
 			{
 				pm.jump(this.firstToken);
 				this.mode = TUPLE;

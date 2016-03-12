@@ -272,6 +272,7 @@ public class IfStatement implements IValue
 				{
 					// Condition is true -> Return the action
 					return this.then.cleanup(context, compilableList);
+
 				}
 				else if (this.elseThen != null)
 				{
