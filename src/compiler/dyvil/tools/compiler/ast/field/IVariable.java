@@ -1,8 +1,12 @@
 package dyvil.tools.compiler.ast.field;
 
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 
 public interface IVariable extends IDataMember
 {
@@ -71,4 +75,13 @@ public interface IVariable extends IDataMember
 	{
 		buf.append(this.getSignature());
 	}
+
+	void writeLocal(MethodWriter writer, Label start, Label end);
+
+	default void writeInit(MethodWriter writer) throws BytecodeException
+	{
+		this.writeInit(writer, this.getValue());
+	}
+
+	void writeInit(MethodWriter writer, IValue value) throws BytecodeException;
 }

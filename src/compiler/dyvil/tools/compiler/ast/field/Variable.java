@@ -257,23 +257,20 @@ public final class Variable extends Member implements IVariable
 		return this.type.getSignature();
 	}
 
+	@Override
 	public void writeLocal(MethodWriter writer, Label start, Label end)
 	{
-		IType type = this.refType != null ? this.refType : this.type;
+		final IType type = this.refType != null ? this.refType : this.type;
 		writer
 			.writeLocal(this.localIndex, this.name.qualified, type.getExtendedName(), type.getSignature(), start, end);
 	}
 
-	public void writeInit(MethodWriter writer) throws BytecodeException
-	{
-		this.writeInit(writer, this.value);
-	}
-
+	@Override
 	public void writeInit(MethodWriter writer, IValue value) throws BytecodeException
 	{
 		if (this.refType != null)
 		{
-			IConstructor c = this.refType.getTheClass().getBody().getConstructor(0);
+			final IConstructor constructor = this.refType.getTheClass().getBody().getConstructor(0);
 			writer.writeTypeInsn(Opcodes.NEW, this.refType.getInternalName());
 			writer.writeInsn(Opcodes.DUP);
 
@@ -285,7 +282,7 @@ public final class Variable extends Member implements IVariable
 			{
 				writer.writeInsn(Opcodes.AUTO_DUP_X1);
 			}
-			c.writeInvoke(writer, this.getLineNumber());
+			constructor.writeInvoke(writer, this.getLineNumber());
 
 			this.localIndex = writer.localCount();
 
@@ -298,6 +295,7 @@ public final class Variable extends Member implements IVariable
 		{
 			value.writeExpression(writer, this.type);
 		}
+
 		this.localIndex = writer.localCount();
 		writer.writeVarInsn(this.type.getStoreOpcode(), this.localIndex);
 		writer.setLocalType(this.localIndex, this.type.getFrameType());

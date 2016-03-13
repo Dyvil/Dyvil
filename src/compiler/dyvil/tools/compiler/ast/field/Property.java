@@ -377,7 +377,7 @@ public class Property extends Member implements IProperty
 			}
 			
 			this.writeAnnotations(mw, modifiers);
-			this.setter.getParameter(0).write(mw);
+			this.setter.getParameter(0).writeInit(mw);
 			
 			if (setterValue != null)
 			{

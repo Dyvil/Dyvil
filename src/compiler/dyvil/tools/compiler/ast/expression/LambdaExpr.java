@@ -789,7 +789,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].write(methodWriter);
+			this.parameters[i].writeInit(methodWriter);
 		}
 
 		// Write the Value

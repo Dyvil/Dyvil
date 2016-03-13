@@ -754,7 +754,7 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].write(mw);
+			this.parameters[i].writeInit(mw);
 		}
 		
 		Label start = new Label();

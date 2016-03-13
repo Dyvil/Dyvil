@@ -448,25 +448,25 @@ public class CodeMethod extends AbstractMethod
 
 		final String internalThisClassName = this.enclosingClass.getInternalName();
 		final String[] exceptionTypes = this.getInternalExceptions();
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers & ModifierUtil.JAVA_MODIFIER_MASK,
+		MethodWriter methodWriter = new MethodWriterImpl(writer, writer.visitMethod(modifiers & ModifierUtil.JAVA_MODIFIER_MASK,
 		                                                                  this.name.qualified, this.getDescriptor(),
 		                                                                  this.getSignature(), exceptionTypes));
 
 		if ((modifiers & Modifiers.STATIC) == 0)
 		{
-			mw.setThisType(internalThisClassName);
+			methodWriter.setThisType(internalThisClassName);
 		}
 		
-		this.writeAnnotations(mw, modifiers);
+		this.writeAnnotations(methodWriter, modifiers);
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].write(mw);
+			this.parameters[i].writeInit(methodWriter);
 		}
 
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.typeParameters[i].writeParameter(mw);
+			this.typeParameters[i].writeParameter(methodWriter);
 		}
 		
 		final Label start = new Label();
@@ -474,18 +474,16 @@ public class CodeMethod extends AbstractMethod
 		
 		if (this.value != null)
 		{
-			mw.begin();
-			mw.writeLabel(start);
-			this.value.writeExpression(mw, this.type);
-			mw.writeLabel(end);
-			mw.end(this.type);
+			methodWriter.begin();
+			methodWriter.writeLabel(start);
+			this.value.writeExpression(methodWriter, this.type);
+			methodWriter.writeLabel(end);
+			methodWriter.end(this.type);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			final IParameter parameter = this.parameters[i];
-			mw.writeLocal(parameter.getLocalIndex(), parameter.getName().qualified, parameter.getDescription(),
-			              parameter.getSignature(), start, end);
+			this.parameters[i].writeLocal(methodWriter, start, end);
 		}
 		
 		if ((modifiers & Modifiers.STATIC) != 0)
@@ -493,7 +491,7 @@ public class CodeMethod extends AbstractMethod
 			return;
 		}
 		
-		mw.writeLocal(0, "this", 'L' + internalThisClassName + ';', null, start, end);
+		methodWriter.writeLocal(0, "this", 'L' + internalThisClassName + ';', null, start, end);
 		
 		if (this.overrideMethods == null)
 		{
@@ -519,14 +517,14 @@ public class CodeMethod extends AbstractMethod
 			descriptors.add(desc);
 
 			// Generate a bridge method
-			mw = new MethodWriterImpl(writer,
+			methodWriter = new MethodWriterImpl(writer,
 			                          writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC | Modifiers.BRIDGE,
 			                                             this.name.qualified, desc, null, exceptionTypes));
 
-			mw.begin();
-			mw.setThisType(internalThisClassName);
+			methodWriter.begin();
+			methodWriter.setThisType(internalThisClassName);
 
-			mw.writeVarInsn(Opcodes.ALOAD, 0);
+			methodWriter.writeVarInsn(Opcodes.ALOAD, 0);
 
 			for (int p = 0; p < this.parameterCount; p++)
 			{
@@ -534,20 +532,20 @@ public class CodeMethod extends AbstractMethod
 				final IType parameterType = this.parameters[p].getInternalType();
 				final IType overrideParameterType = overrideParameter.getInternalType();
 
-				overrideParameter.write(mw);
-				mw.writeVarInsn(overrideParameterType.getLoadOpcode(), overrideParameter.getLocalIndex());
-				overrideParameterType.writeCast(mw, parameterType, lineNumber);
+				overrideParameter.writeInit(methodWriter);
+				methodWriter.writeVarInsn(overrideParameterType.getLoadOpcode(), overrideParameter.getLocalIndex());
+				overrideParameterType.writeCast(methodWriter, parameterType, lineNumber);
 			}
 
 			IType overrideReturnType = overrideMethod.getType();
 
-			mw.writeLineNumber(lineNumber);
-			mw.writeInvokeInsn((modifiers & Modifiers.ABSTRACT) != 0 && interfaceClass ?
+			methodWriter.writeLineNumber(lineNumber);
+			methodWriter.writeInvokeInsn((modifiers & Modifiers.ABSTRACT) != 0 && interfaceClass ?
 					                   Opcodes.INVOKEINTERFACE :
 					                   Opcodes.INVOKEVIRTUAL, internalThisClassName, this.name.qualified, this.getDescriptor(), interfaceClass);
-			this.type.writeCast(mw, overrideReturnType, lineNumber);
-			mw.writeInsn(overrideReturnType.getReturnOpcode());
-			mw.end();
+			this.type.writeCast(methodWriter, overrideReturnType, lineNumber);
+			methodWriter.writeInsn(overrideReturnType.getReturnOpcode());
+			methodWriter.end();
 		}
 	}
 	

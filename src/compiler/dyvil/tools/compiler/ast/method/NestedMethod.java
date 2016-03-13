@@ -11,7 +11,6 @@ import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -113,7 +112,7 @@ public class NestedMethod extends CodeMethod
 
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].write(methodWriter);
+			this.parameters[i].writeInit(methodWriter);
 		}
 
 		this.captureHelper.writeCaptureParameters(methodWriter, methodWriter.localCount());
@@ -132,10 +131,7 @@ public class NestedMethod extends CodeMethod
 
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			final IParameter parameter = this.parameters[i];
-			methodWriter
-				.writeLocal(parameter.getLocalIndex(), parameter.getName().qualified, parameter.getDescription(),
-				            parameter.getSignature(), start, end);
+			this.parameters[i].writeLocal(methodWriter, start, end);
 		}
 	}
 
