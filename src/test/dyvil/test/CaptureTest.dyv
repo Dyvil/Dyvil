@@ -12,9 +12,9 @@ public class CaptureTest
 	
 	private static void lambdaCapture()
 	{
-		int abc = -1
-		auto fun = (int i) => (int j) => (int k) => (i, j, k, abc)
-		auto res = fun(1)(2)(3)
+		var abc = -1
+		var fun = (int i) => (int j) => (int k) => (i, j, k, abc)
+		var res = fun(1)(2)(3)
 
 		Main.test("Lambda Capture", (1, 2, 3, -1), res)
 	}
@@ -32,17 +32,17 @@ public class CaptureTest
 	
 	private static void lambdaThisCapture()
 	{
-		auto instance = new ThisCapture
-		auto lambda = instance.lambda
-		auto res = lambda()
+		var instance = new ThisCapture
+		var lambda = instance.lambda
+		var res = lambda()
 
 		Main.test("Lambda This Capture", instance, res)
 	}
 	
 	private static void anonClassCapture()
 	{
-		int abc = 123
-		auto obj = new Object {
+		var abc = 123
+		var obj = new Object {
 			public override String toString() = abc.toString
 		}
 		
@@ -51,8 +51,8 @@ public class CaptureTest
 	
 	private static void anonClassThisCapture()
 	{
-		auto instance = new ThisCapture
-		auto obj = instance.anonymous
+		var instance = new ThisCapture
+		var obj = instance.anonymous
 
 		Main.test("Anonymous Class This Capture", instance, obj, instance.toString == obj.toString)
 	}

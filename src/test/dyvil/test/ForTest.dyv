@@ -28,7 +28,7 @@ public class ForTest
 		[int] ints = [ 1, 2, 3 ]
 		[int] array = []
 
-		for (auto i : ints) {
+		for (var i : ints) {
 			array += i
 		}
 
@@ -41,7 +41,7 @@ public class ForTest
 		Iterable[int] iterable = ints.toIterable
 		[int] array = []
 
-		for (auto i : iterable) {
+		for (var i : iterable) {
 			array += i
 		}
 
@@ -50,10 +50,10 @@ public class ForTest
 	
 	private static void testString()
 	{
-		String testString = "abc"
-		String string = ""
+		var testString = "abc"
+		var string = ""
 
-		for (auto c : testString)
+		for (var c : testString)
 		{
 			string += c
 		}

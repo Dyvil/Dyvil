@@ -24,8 +24,8 @@ public class InheritanceTest
 	
 	public static void main([String] args)
 	{
-		auto ff = new FooFoo().foo
-		auto fb = new FooBar().foo
+		var ff = new FooFoo().foo
+		var fb = new FooBar().foo
 
 		Main.test("Simple Interface Test", ff, "FooFoo.foo")
 		Main.test("Double-Layer Interface Test", fb, "FooBar.foo")

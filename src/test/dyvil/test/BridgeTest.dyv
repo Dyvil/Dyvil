@@ -31,14 +31,14 @@ public class BridgeTest
 	
 	public static void main([String] args)
 	{
-		IntContainer ic = IntContainer(1)
+		var ic = IntContainer(1)
 		Main.test("IntContainer", 1, ic.get)
 
 		Container[int] intContainer = ic
 		ic.set(3)
 		Main.test("Container[int]", 3, intContainer.get)
 		
-		LongContainer lc = LongContainer(2L)
+		var lc = LongContainer(2L)
 		Main.test("LongContainer", 2L, lc.get)
 
 		Container[long] longContainer = lc

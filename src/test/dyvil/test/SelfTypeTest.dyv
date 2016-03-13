@@ -17,11 +17,11 @@ public class SelfTypeTest
 
 	public static void main([String] args)
 	{
-		auto list = MyList(1D, 2D, 3D)
-		auto result = list.sum
+		var list = MyList(1D, 2D, 3D)
+		var result = list.sum
 
-		// auto error1 = MyList(1, 2, 3).sum
-		// auto error2 = MyList("a", "b", "c").sum
+		// var error1 = MyList(1, 2, 3).sum
+		// var error2 = MyList("a", "b", "c").sum
 
 		Main.test("Self Type Test", result, 6D, result == 6D)
 	}
