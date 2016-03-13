@@ -17,6 +17,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.marker.Warning;
 import dyvil.tools.parsing.position.ICodePosition;
 
 import java.io.DataInput;
@@ -45,7 +46,7 @@ public class NamedType implements IRawType, ITypeConsumer
 		this.name = name;
 		this.parent = parent;
 	}
-	
+
 	@Override
 	public int typeTag()
 	{
@@ -109,7 +110,7 @@ public class NamedType implements IRawType, ITypeConsumer
 	{
 		return false;
 	}
-	
+
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
@@ -135,13 +136,13 @@ public class NamedType implements IRawType, ITypeConsumer
 				return this;
 			}
 
-			IType type = this.parent.resolveType(this.name);
+			final IType type = this.parent.resolveType(this.name);
 			if (type != null)
 			{
 				return type;
 			}
 
-			Package thePackage = this.parent.resolvePackage(this.name);
+			final Package thePackage = this.parent.resolvePackage(this.name);
 			if (thePackage != null)
 			{
 				return new PackageType(thePackage);
@@ -151,19 +152,24 @@ public class NamedType implements IRawType, ITypeConsumer
 			return this;
 		}
 
-		IType primitive = Types.resolvePrimitive(this.name);
+		final IType primitive = Types.resolvePrimitive(this.name);
 		if (primitive != null)
 		{
+			if (primitive == Types.UNKNOWN)
+			{
+				markers.add(new Warning(this.position, Markers.getSemantic("type.auto.deprecated")));
+			}
+
 			return primitive.atPosition(this.position);
 		}
 
-		IType type = IContext.resolveType(context, this.name);
+		final IType type = IContext.resolveType(context, this.name);
 		if (type != null)
 		{
 			return type.atPosition(this.position);
 		}
 
-		Package thePackage = Package.rootPackage.resolvePackage(this.name);
+		final Package thePackage = Package.rootPackage.resolvePackage(this.name);
 		if (thePackage != null)
 		{
 			return new PackageType(thePackage);
@@ -172,69 +178,69 @@ public class NamedType implements IRawType, ITypeConsumer
 		markers.add(Markers.semanticError(this.position, "resolve.type", this.name));
 		return this;
 	}
-	
+
 	@Override
 	public void checkType(MarkerList markers, IContext context, TypePosition position)
 	{
 	}
-	
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
 		return null;
 	}
-	
+
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 	}
-	
+
 	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}
-	
+
 	@Override
 	public IMethod getFunctionalMethod()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public String getInternalName()
 	{
 		return this.name.qualified;
 	}
-	
+
 	@Override
 	public void appendExtendedName(StringBuilder buffer)
 	{
 		buffer.append(this.name.qualified);
 	}
-	
+
 	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
 		buffer.append(this.name.qualified);
 	}
-	
+
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 	}
-	
+
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
 		out.writeUTF(this.name.qualified);
 	}
-	
+
 	@Override
 	public void read(DataInput in) throws IOException
 	{
 		this.name = Name.getQualified(in.readUTF());
 	}
-	
+
 	@Override
 	public String toString()
 	{
@@ -244,7 +250,7 @@ public class NamedType implements IRawType, ITypeConsumer
 		}
 		return this.name.toString();
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
@@ -255,7 +261,7 @@ public class NamedType implements IRawType, ITypeConsumer
 		}
 		buffer.append(this.name);
 	}
-	
+
 	@Override
 	public IType clone()
 	{

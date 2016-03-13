@@ -28,7 +28,7 @@ public final class Variable extends Member implements IVariable
 {
 	protected int    localIndex;
 	protected IValue value;
-	
+
 	// Metadata
 	private IType refType;
 
@@ -36,53 +36,53 @@ public final class Variable extends Member implements IVariable
 	 * Marks if this variable is assigned anywhere. This is used to check if it is effectively final.
 	 */
 	private boolean assigned;
-	
+
 	public Variable()
 	{
 	}
-	
+
 	public Variable(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
 	public Variable(ICodePosition position, IType type)
 	{
 		this.position = position;
 		this.type = type;
 	}
-	
+
 	public Variable(ICodePosition position, Name name, IType type)
 	{
 		this.position = position;
 		this.name = name;
 		this.type = type;
 	}
-	
+
 	public Variable(Name name, IType type)
 	{
 		this.name = name;
 		this.type = type;
 	}
-	
+
 	@Override
 	public void setValue(IValue value)
 	{
 		this.value = value;
 	}
-	
+
 	@Override
 	public IValue getValue()
 	{
 		return this.value;
 	}
-	
+
 	@Override
 	public void setLocalIndex(int index)
 	{
 		this.localIndex = index;
 	}
-	
+
 	@Override
 	public int getLocalIndex()
 	{
@@ -100,38 +100,38 @@ public final class Variable extends Member implements IVariable
 	{
 		return true;
 	}
-	
+
 	@Override
 	public ElementType getElementType()
 	{
 		return ElementType.LOCAL_VARIABLE;
 	}
-	
+
 	@Override
 	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context)
 	{
 		return instance;
 	}
-	
+
 	@Override
 	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue receiver, IValue newValue)
 	{
 		this.assigned = true;
 		return IVariable.super.checkAssign(markers, context, position, receiver, newValue);
 	}
-	
+
 	@Override
 	public boolean isReferenceCapturable()
 	{
 		return true;
 	}
-	
+
 	@Override
 	public boolean isReferenceType()
 	{
 		return this.refType != null;
 	}
-	
+
 	@Override
 	public void setReferenceType()
 	{
@@ -140,18 +140,18 @@ public final class Variable extends Member implements IVariable
 			this.refType = this.type.getSimpleRefType();
 		}
 	}
-	
+
 	@Override
 	public IType getInternalType()
 	{
 		return this.refType == null ? this.type : this.refType;
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		super.resolveTypes(markers, context);
-		
+
 		if (this.value != null)
 		{
 			this.value.resolveTypes(markers, context);
@@ -162,7 +162,7 @@ public final class Variable extends Member implements IVariable
 			markers.add(Markers.semanticError(this.position, "variable.value"));
 		}
 	}
-	
+
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
@@ -181,7 +181,7 @@ public final class Variable extends Member implements IVariable
 				this.type = Types.ANY;
 			}
 		}
-		
+
 		IValue value1 = this.type.convertValue(this.value, this.type, markers, context);
 		if (value1 == null)
 		{
@@ -202,20 +202,20 @@ public final class Variable extends Member implements IVariable
 			}
 		}
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		super.checkTypes(markers, context);
-		
+
 		this.value.checkTypes(markers, context);
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		super.check(markers, context);
-		
+
 		this.value.check(markers, context);
 
 		if (this.modifiers != null)
@@ -228,47 +228,47 @@ public final class Variable extends Member implements IVariable
 			markers.add(Markers.semantic(this.position, "variable.type.void"));
 		}
 	}
-	
+
 	@Override
 	public void foldConstants()
 	{
 		super.foldConstants();
-		
+
 		this.value = this.value.foldConstants();
 	}
-	
+
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		super.cleanup(context, compilableList);
-		
+
 		this.value = this.value.cleanup(context, compilableList);
 	}
-	
+
 	@Override
 	public String getDescription()
 	{
 		return this.type.getExtendedName();
 	}
-	
+
 	@Override
 	public String getSignature()
 	{
 		return this.type.getSignature();
 	}
-	
+
 	public void writeLocal(MethodWriter writer, Label start, Label end)
 	{
 		IType type = this.refType != null ? this.refType : this.type;
-		writer.writeLocal(this.localIndex, this.name.qualified, type.getExtendedName(), type.getSignature(), start,
-		                  end);
+		writer
+			.writeLocal(this.localIndex, this.name.qualified, type.getExtendedName(), type.getSignature(), start, end);
 	}
-	
+
 	public void writeInit(MethodWriter writer) throws BytecodeException
 	{
 		this.writeInit(writer, this.value);
 	}
-	
+
 	public void writeInit(MethodWriter writer, IValue value) throws BytecodeException
 	{
 		if (this.refType != null)
@@ -276,7 +276,7 @@ public final class Variable extends Member implements IVariable
 			IConstructor c = this.refType.getTheClass().getBody().getConstructor(0);
 			writer.writeTypeInsn(Opcodes.NEW, this.refType.getInternalName());
 			writer.writeInsn(Opcodes.DUP);
-			
+
 			if (value != null)
 			{
 				value.writeExpression(writer, this.type);
@@ -286,14 +286,14 @@ public final class Variable extends Member implements IVariable
 				writer.writeInsn(Opcodes.AUTO_DUP_X1);
 			}
 			c.writeInvoke(writer, this.getLineNumber());
-			
+
 			this.localIndex = writer.localCount();
-			
+
 			writer.setLocalType(this.localIndex, this.refType.getInternalName());
 			writer.writeVarInsn(Opcodes.ASTORE, this.localIndex);
 			return;
 		}
-		
+
 		if (value != null)
 		{
 			value.writeExpression(writer, this.type);
@@ -363,9 +363,17 @@ public final class Variable extends Member implements IVariable
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		this.type.toString("", buffer);
+		if (this.type != Types.UNKNOWN)
+		{
+			this.type.toString("", buffer);
+		}
+		else
+		{
+			buffer.append(this.hasModifier(Modifiers.FINAL) ? "const" : "var");
+		}
+
 		buffer.append(' ').append(this.name);
-		
+
 		if (this.value != null)
 		{
 			Formatting.appendSeparator(buffer, "field.assignment", '=');

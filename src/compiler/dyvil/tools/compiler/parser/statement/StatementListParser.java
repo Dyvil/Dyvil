@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.parser.statement;
 
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.access.FieldAssignment;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
@@ -16,6 +17,7 @@ import dyvil.tools.compiler.ast.statement.MethodStatement;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.statement.control.Label;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.EmulatorParser;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.ParserUtil;
@@ -37,54 +39,54 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 	private static final int METHOD_PARAMETERS_END = 16;
 	private static final int METHOD_VALUE          = 32;
 	private static final int SEPARATOR             = 64;
-	
+
 	protected IValueConsumer consumer;
-	
+
 	private boolean       applied;
 	private StatementList statementList;
-	
+
 	private Name           label;
 	private IType          type;
 	private ModifierSet    modifiers;
 	private AnnotationList annotations;
 
 	private IMethod method;
-	
+
 	public StatementListParser(IValueConsumer consumer)
 	{
 		this.consumer = consumer;
 		this.mode = OPEN_BRACKET;
 	}
-	
+
 	public void setApplied(boolean applied)
 	{
 		this.applied = applied;
 	}
-	
+
 	@Override
 	protected void reset()
 	{
 		super.reset();
-		
+
 		this.mode = EXPRESSION;
 		this.label = null;
 		this.type = null;
-		
+
 		this.modifiers = null;
 		this.annotations = null;
 	}
-	
+
 	@Override
 	public void report(IToken token, String message)
 	{
 		this.revertExpression(this.pm);
 	}
-	
+
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
 		final int type = token.type();
-		
+
 		if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
 		{
 			if (this.firstToken != null)
@@ -95,12 +97,12 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 				this.mode = 0;
 				return;
 			}
-			
+
 			this.consumer.setValue(this.statementList);
 			pm.popParser();
 			return;
 		}
-		
+
 		switch (this.mode)
 		{
 		case OPEN_BRACKET:
@@ -136,6 +138,25 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 					return;
 				}
 			}
+			if (type == DyvilKeywords.VAR)
+			{
+				this.mode = VARIABLE_NAME;
+				this.type = Types.UNKNOWN;
+				return;
+			}
+			if (type == DyvilKeywords.CONST)
+			{
+				this.mode = VARIABLE_NAME;
+				this.type = Types.UNKNOWN;
+
+				if (this.modifiers == null)
+				{
+					this.modifiers = new ModifierList();
+				}
+				this.modifiers.addIntModifier(Modifiers.FINAL);
+				return;
+			}
+
 			Modifier modifier;
 			if ((modifier = BaseModifiers.parseModifier(token, pm)) != null)
 			{
@@ -153,13 +174,13 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 				{
 					this.annotations = new AnnotationList();
 				}
-				
+
 				Annotation a = new Annotation(token.raw());
 				pm.pushParser(pm.newAnnotationParser(a));
 				this.annotations.addAnnotation(a);
 				return;
 			}
-			
+
 			this.tryParser(pm, token, pm.newTypeParser(this));
 			this.mode = TYPE;
 			// Fallthrough
@@ -174,9 +195,9 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 			return;
 		case VARIABLE_NAME:
 		{
-			final int nextType = token.next().type();
 			if (ParserUtil.isIdentifier(type))
 			{
+				final int nextType = token.next().type();
 				if (nextType == BaseSymbols.EQUALS)
 				{
 					final Variable variable = new Variable(token.raw(), token.nameValue(), this.type);
@@ -195,7 +216,6 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 				}
 				else if (nextType == BaseSymbols.OPEN_PARENTHESIS)
 				{
-
 					final ModifierSet modifiers = this.modifiers == null ? new ModifierList() : this.modifiers;
 					final NestedMethod nestedMethod = new NestedMethod(token.raw(), token.nameValue(), this.type,
 					                                                   modifiers, this.annotations);
@@ -211,6 +231,11 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 					this.mode = METHOD_PARAMETERS_END;
 					return;
 				}
+			}
+			if (this.firstToken == null)
+			{
+				pm.report(token, "variable.identifier");
+				return;
 			}
 
 			this.revertExpression(pm);
@@ -256,7 +281,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 				pm.reparse();
 				return;
 			}
-			
+
 			if (type == Tokens.EOF)
 			{
 				this.consumer.setValue(this.statementList);
@@ -276,7 +301,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 		pm.pushParser(pm.newExpressionParser(this));
 		this.mode = SEPARATOR;
 	}
-	
+
 	@Override
 	public void setValue(IValue value)
 	{
@@ -290,7 +315,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 			this.statementList.addValue(value);
 		}
 	}
-	
+
 	@Override
 	public void setType(IType type)
 	{

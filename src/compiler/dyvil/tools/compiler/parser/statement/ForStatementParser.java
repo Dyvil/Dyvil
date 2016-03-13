@@ -1,10 +1,13 @@
 package dyvil.tools.compiler.parser.statement;
 
+import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.statement.loop.ForEachStatement;
 import dyvil.tools.compiler.ast.statement.loop.ForStatement;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
@@ -13,55 +16,56 @@ import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;
 
-public class ForStatementParser extends Parser implements IValueConsumer
+public class ForStatementParser extends Parser implements IValueConsumer, ITypeConsumer
 {
 	private static final int FOR           = 1;
 	private static final int FOR_START     = 2;
 	private static final int TYPE          = 4;
-	private static final int VARIABLE      = 8;
-	private static final int SEPERATOR     = 16;
+	private static final int VARIABLE_NAME = 8;
+	private static final int SEPARATOR     = 16;
 	private static final int VARIABLE_END  = 32;
 	private static final int CONDITION_END = 64;
 	private static final int FOR_END       = 128;
 	private static final int STATEMENT     = 256;
 	private static final int STATEMENT_END = 512;
-	
+
 	protected IValueConsumer field;
-	
+
 	private ICodePosition position;
+	private IType         type;
 	private Variable      variable;
 	private IValue        update;
 	private IValue        condition;
 	private IValue        action;
 	private boolean       forEach;
-	
+
 	public ForStatementParser(IValueConsumer field)
 	{
 		this.field = field;
 		this.mode = FOR;
 	}
-	
+
 	public ForStatementParser(IValueConsumer field, ICodePosition position)
 	{
 		this.field = field;
 		this.position = position;
 		this.mode = FOR_START;
 	}
-	
+
 	private IValue makeForStatement()
 	{
 		if (this.variable != null && this.variable.getType() == null)
 		{
 			this.variable = null;
 		}
-		
+
 		if (this.forEach)
 		{
 			return new ForEachStatement(this.position, this.variable, this.action);
 		}
 		return new ForStatement(this.position, this.variable, this.condition, this.update, this.action);
 	}
-	
+
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
@@ -92,22 +96,27 @@ public class ForStatementParser extends Parser implements IValueConsumer
 				this.mode = CONDITION_END;
 				return;
 			}
-			this.variable = new Variable();
-			pm.pushParser(pm.newTypeParser(this.variable), true);
-			this.mode = VARIABLE;
+			if (type == DyvilKeywords.VAR)
+			{
+				this.mode = VARIABLE_NAME;
+				this.type = Types.UNKNOWN;
+				return;
+			}
+
+			pm.pushParser(pm.newTypeParser(this), true);
+			this.mode = VARIABLE_NAME;
 			return;
-		case VARIABLE:
-			this.mode = SEPERATOR;
+		case VARIABLE_NAME:
+			this.mode = SEPARATOR;
 			if (ParserUtil.isIdentifier(type))
 			{
-				this.variable.setName(token.nameValue());
-				this.variable.setPosition(token.raw());
+				this.variable = new Variable(token.raw(), token.nameValue(), this.type);
 				return;
 			}
 			pm.reparse();
 			pm.report(token, "for.variable.identifier");
 			return;
-		case SEPERATOR:
+		case SEPARATOR:
 			if (type == BaseSymbols.COLON)
 			{
 				this.mode = FOR_END;
@@ -132,7 +141,7 @@ public class ForStatementParser extends Parser implements IValueConsumer
 				{
 					return;
 				}
-				
+
 				pm.pushParser(pm.newExpressionParser(this));
 				return;
 			}
@@ -147,12 +156,12 @@ public class ForStatementParser extends Parser implements IValueConsumer
 				pm.report(token, "for.condition.semicolon");
 				return;
 			}
-			
+
 			if (token.next().type() != BaseSymbols.SEMICOLON)
 			{
 				pm.pushParser(pm.newExpressionParser(this));
 			}
-			
+
 			return;
 		case FOR_END:
 			this.mode = STATEMENT;
@@ -178,7 +187,7 @@ public class ForStatementParser extends Parser implements IValueConsumer
 			return;
 		}
 	}
-	
+
 	@Override
 	public void setValue(IValue value)
 	{
@@ -204,5 +213,11 @@ public class ForStatementParser extends Parser implements IValueConsumer
 			this.action = value;
 			return;
 		}
+	}
+
+	@Override
+	public void setType(IType type)
+	{
+		this.type = type;
 	}
 }
