@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.statement.loop;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.operator.RangeOperator;
 import dyvil.tools.compiler.ast.type.IType;
@@ -19,7 +20,7 @@ public class RangeForStatement extends ForEachStatement
 	private static final int DOUBLE    = 3;
 	private static final int RANGEABLE = 4;
 
-	public RangeForStatement(ICodePosition position, Variable var)
+	public RangeForStatement(ICodePosition position, IVariable var)
 	{
 		super(position, var);
 	}
@@ -33,7 +34,7 @@ public class RangeForStatement extends ForEachStatement
 
 		final int lineNumber = this.getLineNumber();
 
-		final Variable var = this.variable;
+		final IVariable var = this.variable;
 		final IType varType = var.getType();
 
 		final RangeOperator rangeOperator = (RangeOperator) var.getValue();

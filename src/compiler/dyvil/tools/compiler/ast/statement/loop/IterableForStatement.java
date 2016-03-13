@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.statement.loop;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -19,7 +20,7 @@ public class IterableForStatement extends ForEachStatement
 	
 	protected IMethod boxMethod;
 	
-	public IterableForStatement(ICodePosition position, Variable variable)
+	public IterableForStatement(ICodePosition position, IVariable variable)
 	{
 		super(position, variable);
 	}
@@ -31,7 +32,7 @@ public class IterableForStatement extends ForEachStatement
 		dyvil.tools.asm.Label updateLabel = this.updateLabel.target = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
 		
-		final Variable var = this.variable;
+		final IVariable var = this.variable;
 		final IType varType = var.getType();
 		final int lineNumber = this.getLineNumber();
 

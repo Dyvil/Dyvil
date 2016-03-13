@@ -6,10 +6,9 @@ import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.operator.RangeOperator;
-import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.statement.control.Label;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -28,11 +27,11 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 import static dyvil.tools.compiler.ast.statement.loop.ForStatement.*;
 
-public class ForEachStatement implements IStatement, IDefaultContext, ILoop
+public class ForEachStatement implements IForStatement, IDefaultContext
 {
 	protected ICodePosition position;
 
-	protected Variable variable;
+	protected IVariable variable;
 	protected IValue   action;
 
 	// Metadata
@@ -40,7 +39,7 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 	protected Label updateLabel;
 	protected Label endLabel;
 
-	public ForEachStatement(ICodePosition position, Variable var)
+	public ForEachStatement(ICodePosition position, IVariable var)
 	{
 		this.position = position;
 		this.variable = var;
@@ -50,7 +49,7 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 		this.endLabel = new Label($forEnd);
 	}
 
-	public ForEachStatement(ICodePosition position, Variable var, IValue action)
+	public ForEachStatement(ICodePosition position, IVariable var, IValue action)
 	{
 		this(position, var);
 		this.action = action;
@@ -74,14 +73,16 @@ public class ForEachStatement implements IStatement, IDefaultContext, ILoop
 		this.position = position;
 	}
 
-	public void setVariable(Variable variable)
-	{
-		this.variable = variable;
-	}
-
-	public Variable getVariable()
+	@Override
+	public IVariable getVariable()
 	{
 		return this.variable;
+	}
+
+	@Override
+	public void setVariable(IVariable variable)
+	{
+		this.variable = variable;
 	}
 
 	@Override

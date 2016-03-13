@@ -1,9 +1,13 @@
 package dyvil.tools.compiler.ast.statement.loop;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.context.*;
+import dyvil.tools.compiler.ast.context.CombiningLabelContext;
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
+import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.statement.control.Label;
@@ -17,14 +21,14 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class ForStatement implements IStatement, IDefaultContext, ILoop
+public class ForStatement implements IForStatement, IDefaultContext
 {
 	public static final Name $forStart  = Name.getQualified("$forStart");
 	public static final Name $forUpdate = Name.getQualified("$forCondition");
 	public static final Name $forEnd    = Name.getQualified("$forEnd");
 
 	protected ICodePosition position;
-	protected Variable      variable;
+	protected IVariable     variable;
 
 	protected IValue condition;
 	protected IValue update;
@@ -36,16 +40,28 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 	protected Label updateLabel;
 	protected Label endLabel;
 
-	public ForStatement(ICodePosition position, Variable variable, IValue condition, IValue update, IValue action)
+	public ForStatement(ICodePosition position, Variable variable, IValue condition, IValue update)
 	{
 		this.startLabel = new Label($forStart);
 		this.updateLabel = new Label($forUpdate);
 		this.endLabel = new Label($forEnd);
 
+		this.position = position;
 		this.variable = variable;
 		this.condition = condition;
 		this.update = update;
+	}
+
+	public ForStatement(ICodePosition position, Variable variable, IValue condition, IValue update, IValue action)
+	{
+		this(position, variable, condition, update);
 		this.action = action;
+	}
+
+	@Override
+	public int valueTag()
+	{
+		return FOR;
 	}
 
 	@Override
@@ -61,9 +77,15 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 	}
 
 	@Override
-	public int valueTag()
+	public IVariable getVariable()
 	{
-		return FOR;
+		return this.variable;
+	}
+
+	@Override
+	public void setVariable(IVariable variable)
+	{
+		this.variable = variable;
 	}
 
 	@Override
@@ -286,7 +308,7 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 		dyvil.tools.asm.Label updateLabel = this.updateLabel.target = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
 
-		Variable var = this.variable;
+		IVariable var = this.variable;
 
 		int locals = writer.localCount();
 		// Variable
