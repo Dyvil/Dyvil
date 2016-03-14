@@ -6,11 +6,18 @@ public final class LanguageCommons
 {
 	private init() {}
 
+	// Blackhole
+
+	@Intrinsic([ LOAD_0, AUTO_POP ])
+	public static void consume(any value) = ()
+
 	// Assertions
 
 	public static void assert(boolean condition) = if (!condition) throw new AssertionError()
 
 	public static void assert(boolean condition, => any message) = if (!condition) throw new AssertionError(message())
+
+	public static void assert((boolean, => any) tuple) = if (!tuple._1) throw new AssertionError(tuple._2())
 
 	// Errors
 

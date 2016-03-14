@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.ast.IASTNode;
@@ -120,44 +121,26 @@ public class IfStatement implements IValue
 		}
 		
 		this.commonType = type;
-		IValue value = IType.convertValue(this.then, type, typeContext, markers, context);
-		if (value == null)
+
+		this.then = TypeChecker.convertValue(this.then, type, typeContext, markers, context,
+		                                     TypeChecker.markerSupplier("if.then.type"));
+
+		if (this.elseThen == null)
 		{
-			Util.createTypeError(markers, this.then, type, typeContext, "if.then.type");
+			return this;
 		}
-		else
-		{
-			this.then = value;
-		}
-		
-		if (this.elseThen != null)
-		{
-			value = IType.convertValue(this.elseThen, type, typeContext, markers, context);
-			if (value == null)
-			{
-				Util.createTypeError(markers, this.elseThen, type, typeContext, "if.else.type");
-			}
-			else
-			{
-				this.elseThen = value;
-			}
-		}
-		
+
+		this.elseThen = TypeChecker.convertValue(this.elseThen, type, typeContext, markers, context,
+		                                         TypeChecker.markerSupplier("if.else.type"));
+
 		return this;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		if (type == Types.VOID)
-		{
-			return true;
-		}
-		if (this.then != null && !this.then.isType(type))
-		{
-			return false;
-		}
-		return this.elseThen == null || this.elseThen.isType(type);
+		return type == Types.VOID || !(this.then != null && !this.then.isType(type)) && (this.elseThen == null
+				|| this.elseThen.isType(type));
 	}
 	
 	@Override
@@ -289,6 +272,7 @@ public class IfStatement implements IValue
 				{
 					// Condition is true -> Return the action
 					return this.then.cleanup(context, compilableList);
+
 				}
 				else if (this.elseThen != null)
 				{

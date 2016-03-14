@@ -231,7 +231,7 @@ public class PatternParser extends Parser implements ITypeConsumer
 			return new BooleanPattern(token.raw(), true);
 		case DyvilKeywords.FALSE:
 			return new BooleanPattern(token.raw(), false);
-		case DyvilSymbols.WILDCARD:
+		case DyvilSymbols.UNDERSCORE:
 			return new WildcardPattern(token.raw());
 		case DyvilKeywords.NULL:
 			return new NullPattern(token.raw());

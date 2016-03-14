@@ -149,6 +149,16 @@ public final class Markers
 		return new SemanticError(position, getSemantic(key, args));
 	}
 
+	public static Marker semanticWarning(ICodePosition position, String key)
+	{
+		return new Warning(position, getSemantic(key));
+	}
+
+	public static Marker semanticWarning(ICodePosition position, String key, Object... args)
+	{
+		return new Warning(position, getSemantic(key, args));
+	}
+
 	public static Marker syntaxWarning(ICodePosition position, String key)
 	{
 		return new Warning(position, getSyntax(key));

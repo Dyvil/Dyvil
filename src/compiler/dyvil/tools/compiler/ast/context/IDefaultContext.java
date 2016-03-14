@@ -14,6 +14,12 @@ import dyvil.tools.parsing.Name;
 public interface IDefaultContext extends IStaticContext
 {
 	@Override
+	default byte checkStatic()
+	{
+		return PASS;
+	}
+
+	@Override
 	default DyvilCompiler getCompilationContext()
 	{
 		return null;
@@ -48,7 +54,19 @@ public interface IDefaultContext extends IStaticContext
 	{
 		return null;
 	}
-	
+
+	@Override
+	default IType getReturnType()
+	{
+		return null;
+	}
+
+	@Override
+	default byte checkException(IType type)
+	{
+		return PASS;
+	}
+
 	@Override
 	default void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{

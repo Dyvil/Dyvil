@@ -21,6 +21,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.backend.ClassFormat;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -37,7 +38,7 @@ import java.lang.annotation.RetentionPolicy;
 
 public final class Annotation implements IAnnotation
 {
-	public static final class Types
+	public static final class LazyFields
 	{
 		public static final IClass RETENTION_CLASS = Package.javaLangAnnotation.resolveClass("Retention");
 		public static final IClass TARGET_CLASS    = Package.javaLangAnnotation.resolveClass("Target");
@@ -45,7 +46,7 @@ public final class Annotation implements IAnnotation
 		public static final IClass    ANNOTATION_CLASS = Package.javaLangAnnotation.resolveClass("Annotation");
 		public static final ClassType ANNOTATION       = new ClassType(ANNOTATION_CLASS);
 		
-		private Types()
+		private LazyFields()
 		{
 			// no instances
 		}
@@ -144,7 +145,7 @@ public final class Annotation implements IAnnotation
 			{
 				if (parameter.getValue() == null)
 				{
-					markers.add(Markers.semantic(this.position, "annotation.parameter.missing", this.type,
+					markers.add(Markers.semanticError(this.position, "annotation.parameter.missing", this.type,
 					                             parameter.getName()));
 				}
 				continue;
@@ -153,8 +154,8 @@ public final class Annotation implements IAnnotation
 			IValue typedValue = value.withType(parameterType, parameterType, markers, context);
 			if (typedValue == null)
 			{
-				Util.createTypeError(markers, value, parameterType, parameterType, "annotation.parameter.type",
-				                     parameter.getName());
+				markers.add(TypeChecker.typeError(value, parameterType, parameterType, "annotation.parameter.type",
+				                                  parameter.getName()));
 				continue;
 			}
 			

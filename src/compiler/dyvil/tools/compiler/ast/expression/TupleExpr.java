@@ -15,9 +15,8 @@ import dyvil.tools.compiler.ast.type.compound.TupleType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Util;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -25,16 +24,20 @@ import java.util.Iterator;
 
 public final class TupleExpr implements IValue, IValueList
 {
-	public static final class Types
+	public static final class LazyFields
 	{
 		public static final IClass TUPLE_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("TupleConvertible");
 		
-		private Types()
+		private static final TypeChecker.MarkerSupplier ELEMENT_MARKER_SUPPLIER = TypeChecker
+				.markerSupplier("tuple.element.type.incompatible", "tuple.element.type.expected",
+				                "tuple.element.type.actual");
+		private LazyFields()
 		{
 			// no instances
 		}
+
 	}
-	
+
 	protected ICodePosition position;
 	
 	protected IValue[] values;
@@ -153,7 +156,7 @@ public final class TupleExpr implements IValue, IValueList
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		final IAnnotation annotation = type.getTheClass().getAnnotation(Types.TUPLE_CONVERTIBLE);
+		final IAnnotation annotation = type.getTheClass().getAnnotation(LazyFields.TUPLE_CONVERTIBLE);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation, new ArgumentList(this.values, this.valueCount))
@@ -172,20 +175,9 @@ public final class TupleExpr implements IValue, IValueList
 					dyvil.tools.compiler.ast.type.builtin.Types.ANY :
 					type.resolveTypeSafely(iclass.getTypeParameter(i));
 			
-			final IValue value = this.values[i];
-			final IValue typedValue = IType.convertValue(value, elementType, typeContext, markers, context);
-			
-			if (typedValue != null)
-			{
-				this.values[i] = typedValue;
-			}
-			else if (value.isResolved())
-			{
-				final Marker marker = Markers.semantic(value.getPosition(), "tuple.element.type.incompatible");
-				marker.addInfo(Markers.getSemantic("value.type", value.getType()));
-				marker.addInfo(Markers.getSemantic("tuple.element.type", elementType.getConcreteType(typeContext)));
-				markers.add(marker);
-			}
+
+			this.values[i] = TypeChecker.convertValue(this.values[i], elementType, typeContext, markers, context,
+			                                          LazyFields.ELEMENT_MARKER_SUPPLIER);
 		}
 
 		return this;
@@ -200,7 +192,7 @@ public final class TupleExpr implements IValue, IValueList
 		}
 		
 		return TupleType.isSuperType(type, this.values, this.valueCount)
-				|| type.getTheClass().getAnnotation(Types.TUPLE_CONVERTIBLE) != null;
+				|| type.getTheClass().getAnnotation(LazyFields.TUPLE_CONVERTIBLE) != null;
 	}
 	
 	@Override

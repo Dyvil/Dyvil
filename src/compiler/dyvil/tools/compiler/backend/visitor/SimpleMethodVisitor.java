@@ -3,7 +3,7 @@ package dyvil.tools.compiler.backend.visitor;
 import dyvil.tools.asm.*;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
-import dyvil.tools.compiler.ast.method.IExternalMethod;
+import dyvil.tools.compiler.ast.method.IExternalCallableMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.raw.InternalType;
@@ -12,9 +12,9 @@ import dyvil.tools.parsing.Name;
 
 public final class SimpleMethodVisitor implements MethodVisitor
 {
-	private final IExternalMethod method;
+	private final IExternalCallableMember method;
 	
-	public SimpleMethodVisitor(IExternalMethod method)
+	public SimpleMethodVisitor(IExternalCallableMember method)
 	{
 		this.method = method;
 	}

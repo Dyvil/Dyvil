@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
@@ -393,9 +394,8 @@ public class ClassBody implements IClassBody
 	// Phases
 	
 	@Override
-	public void resolveTypes(MarkerList markers)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		final IContext context = this.theClass;
 		final IDyvilHeader header = this.theClass.getHeader();
 
 		for (int i = 0; i < this.classCount; i++)
@@ -427,10 +427,8 @@ public class ClassBody implements IClassBody
 	}
 	
 	@Override
-	public void resolve(MarkerList markers)
+	public void resolve(MarkerList markers, IContext context)
 	{
-		final IContext context = this.theClass;
-
 		for (int i = 0; i < this.classCount; i++)
 		{
 			this.classes[i].resolve(markers, context);
@@ -458,9 +456,8 @@ public class ClassBody implements IClassBody
 	}
 	
 	@Override
-	public void checkTypes(MarkerList markers)
+	public void checkTypes(MarkerList markers, IContext context)
 	{
-		IContext context = this.theClass;
 		for (int i = 0; i < this.classCount; i++)
 		{
 			this.classes[i].checkTypes(markers, context);
@@ -574,9 +571,8 @@ public class ClassBody implements IClassBody
 	}
 	
 	@Override
-	public void check(MarkerList markers)
+	public void check(MarkerList markers, IContext context)
 	{
-		IContext context = this.theClass;
 		for (int i = 0; i < this.classCount; i++)
 		{
 			this.classes[i].check(markers, context);
@@ -633,32 +629,33 @@ public class ClassBody implements IClassBody
 	}
 	
 	@Override
-	public void cleanup()
+	public void cleanup( IContext context)
 	{
-		final IClass iclass = this.theClass;
+		final IClassCompilableList compilableList = this.theClass;
+
 		for (int i = 0; i < this.classCount; i++)
 		{
-			this.classes[i].cleanup(iclass, iclass);
+			this.classes[i].cleanup(context, compilableList);
 		}
 		for (int i = 0; i < this.fieldCount; i++)
 		{
-			this.fields[i].cleanup(iclass, iclass);
+			this.fields[i].cleanup(context, compilableList);
 		}
 		for (int i = 0; i < this.propertyCount; i++)
 		{
-			this.properties[i].cleanup(iclass, iclass);
+			this.properties[i].cleanup(context, compilableList);
 		}
 		for (int i = 0; i < this.methodCount; i++)
 		{
-			this.methods[i].cleanup(iclass, iclass);
+			this.methods[i].cleanup(context, compilableList);
 		}
 		for (int i = 0; i < this.constructorCount; i++)
 		{
-			this.constructors[i].cleanup(iclass, iclass);
+			this.constructors[i].cleanup(context, compilableList);
 		}
 		for (int i = 0; i < this.initializerCount; i++)
 		{
-			this.initializers[i].cleanup(iclass, iclass);
+			this.initializers[i].cleanup(context, compilableList);
 		}
 	}
 	

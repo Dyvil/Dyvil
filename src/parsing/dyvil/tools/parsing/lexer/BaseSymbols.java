@@ -5,8 +5,8 @@ import java.util.Map;
 
 public class BaseSymbols implements Symbols
 {
-	public static Map<Character, String> symbolMap      = new HashMap();
-	public static Map<String, Character> replacementMap = new HashMap();
+	public static Map<Character, String> symbolMap      = new HashMap<>();
+	public static Map<String, Character> replacementMap = new HashMap<>();
 	
 	static
 	{

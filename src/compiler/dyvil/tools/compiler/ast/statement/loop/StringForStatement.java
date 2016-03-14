@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.statement.loop;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -9,7 +9,7 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class StringForStatement extends ForEachStatement
 {
-	public StringForStatement(ICodePosition position, Variable var)
+	public StringForStatement(ICodePosition position, IVariable var)
 	{
 		super(position, var);
 	}
@@ -21,7 +21,7 @@ public class StringForStatement extends ForEachStatement
 		dyvil.tools.asm.Label updateLabel = this.updateLabel.target = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
 		
-		final Variable var = this.variable;
+		final IVariable var = this.variable;
 		final int lineNumber = this.getLineNumber();
 
 		// Scope

@@ -17,7 +17,10 @@ import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.CodeMethod;
 import dyvil.tools.compiler.ast.method.IExceptionList;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.modifiers.*;
+import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
+import dyvil.tools.compiler.ast.modifiers.Modifier;
+import dyvil.tools.compiler.ast.modifiers.ModifierList;
+import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -29,7 +32,6 @@ import dyvil.tools.compiler.parser.statement.StatementListParser;
 import dyvil.tools.compiler.parser.type.TypeParameterListParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
@@ -55,20 +57,20 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 	private static final byte INITIALIZER = 5;
 
 	protected IMemberConsumer consumer;
-	
+
 	private IType type;
-	private ModifierSet modifiers = new ModifierList();
+	private ModifierList modifiers = new ModifierList();
 	private AnnotationList annotations;
 
 	private IMember member;
 	private byte    memberKind;
-	
+
 	public ClassBodyParser(IMemberConsumer consumer)
 	{
 		this.consumer = consumer;
 		// this.mode = TYPE;
 	}
-	
+
 	private void reset()
 	{
 		this.modifiers = new ModifierList();
@@ -76,22 +78,27 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 		this.type = null;
 		this.member = null;
 	}
-	
+
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
 		final int type = token.type();
-		
+
 		switch (this.mode)
 		{
 		case TYPE:
 			switch (type)
 			{
-			case Tokens.EOF:
-				pm.popParser();
-				return;
 			case BaseSymbols.CLOSE_CURLY_BRACKET:
-				pm.popParser(true);
+				pm.reparse();
+				// Fallthrough
+			case Tokens.EOF:
+				if (DyvilHeaderParser.hasModifiers(this.modifiers, this.annotations))
+				{
+					pm.report(token, "member.type");
+				}
+
+				pm.popParser();
 				return;
 			case BaseSymbols.SEMICOLON:
 				if (token.isInferred())
@@ -104,8 +111,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 			case DyvilKeywords.INIT: // constructor declaration or initializer
 				if (token.next().type() == BaseSymbols.OPEN_CURLY_BRACKET) // initializer
 				{
-					final Initializer initializer = new Initializer(token.raw(), this.modifiers);
-					initializer.setAnnotations(this.annotations);
+					final Initializer initializer = new Initializer(token.raw(), this.modifiers, this.annotations);
 					this.member = initializer;
 					this.memberKind = INITIALIZER;
 
@@ -114,11 +120,9 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 					return;
 				}
 
-				this.parseConstructorDeclaration(token);
-				return;
-			case DyvilKeywords.NEW: // legacy, TODO drop 'new' support
-				pm.report(Markers.syntaxWarning(token, "constructor.declaration.new"));
-				this.parseConstructorDeclaration(token);
+				this.member = new Constructor(token.raw(), this.modifiers, this.annotations);
+				this.memberKind = CONSTRUCTOR;
+				this.mode = PARAMETERS;
 				return;
 			}
 
@@ -233,7 +237,7 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 				return;
 			}
 			}
-			
+
 			this.mode = END;
 			pm.report(token, "class.body.declaration.invalid");
 			return;
@@ -338,13 +342,6 @@ public final class ClassBodyParser extends Parser implements ITypeConsumer
 		}
 	}
 
-	public void parseConstructorDeclaration(IToken token)
-	{
-		this.member = new Constructor(token.raw(), this.modifiers, this.annotations);
-		this.memberKind = CONSTRUCTOR;
-		this.mode = PARAMETERS;
-	}
-	
 	@Override
 	public void setType(IType type)
 	{

@@ -135,19 +135,26 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		final IType returnType = context.getReturnType();
 
 		if (this.value != null)
 		{
 			this.value.checkTypes(markers, context);
-			final IType type = this.value.getType();
-			if (!context.canReturn(type))
+
+			if (returnType == null) {
+				return;
+			}
+
+			final IType valueType = this.value.getType();
+			if (!returnType.isSuperTypeOf(valueType))
 			{
 				final Marker marker = Markers.semanticError(this.position, "return.type.incompatible");
-				marker.addInfo(Markers.getSemantic("return.type", type));
+				marker.addInfo(Markers.getSemantic("return.type", returnType));
+				marker.addInfo(Markers.getSemantic("value.type", valueType));
 				markers.add(marker);
 			}
 		}
-		else if (!context.canReturn(Types.VOID))
+		else if (returnType != null && returnType != Types.VOID)
 		{
 			markers.add(Markers.semanticError(this.position, "return.void.invalid"));
 		}

@@ -108,7 +108,7 @@ public final class CaseClassMetadata extends ClassMetadata
 			for (int i = 0; i < len; i++)
 			{
 				IParameter param = this.theClass.getParameter(i);
-				param.write(mw);
+				param.writeInit(mw);
 				mw.writeVarInsn(param.getType().getLoadOpcode(), param.getLocalIndex());
 			}
 			this.constructor.writeInvoke(mw, 0);

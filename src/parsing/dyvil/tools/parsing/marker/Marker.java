@@ -76,6 +76,12 @@ public abstract class Marker implements Comparable<Marker>
 			buf.append('\n');
 		}
 
+		if (code == null)
+		{
+			buf.append('\n');
+			return;
+		}
+
 		// Compute newline locations
 		int startIndex = this.position.startIndex();
 		int endIndex = this.position.endIndex();

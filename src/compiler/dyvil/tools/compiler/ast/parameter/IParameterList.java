@@ -1,11 +1,14 @@
 package dyvil.tools.compiler.ast.parameter;
 
-public interface IParameterList
+import dyvil.tools.compiler.ast.consumer.IParameterConsumer;
+
+public interface IParameterList extends IParameterConsumer
 {
 	int parameterCount();
 	
 	void setParameter(int index, IParameter parameter);
 	
+	@Override
 	void addParameter(IParameter parameter);
 	
 	IParameter getParameter(int index);

@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.field;
 
+import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -69,5 +71,15 @@ public class CaptureVariable extends CaptureDataMember implements IVariable
 		{
 			writer.writeVarInsn(this.variable.getInternalType().getStoreOpcode(), this.localIndex);
 		}
+	}
+
+	@Override
+	public void writeLocal(MethodWriter writer, Label start, Label end)
+	{
+	}
+
+	@Override
+	public void writeInit(MethodWriter writer, IValue value) throws BytecodeException
+	{
 	}
 }

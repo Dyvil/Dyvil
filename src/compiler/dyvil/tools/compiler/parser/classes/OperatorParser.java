@@ -247,4 +247,10 @@ public final class OperatorParser extends Parser
 		
 		this.operator.type = associativity;
 	}
+
+	@Override
+	public boolean reportErrors()
+	{
+		return this.mode > OPERATOR;
+	}
 }

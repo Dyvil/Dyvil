@@ -13,6 +13,7 @@ import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
+import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
@@ -23,23 +24,23 @@ public final class TypeParameterParser extends Parser implements ITyped
 	public static final int ANNOTATIONS = 0;
 	public static final int NAME        = 1;
 	public static final int TYPE_BOUNDS = 2;
-	
+
 	public static final int UPPER = 1;
 	public static final int LOWER = 2;
-	
+
 	protected ITypeParametric typeParameterized;
-	
+
 	private byte boundMode;
 	private Variance variance = Variance.INVARIANT;
 	private ITypeParameter typeParameter;
 	private AnnotationList annotationList;
-	
+
 	public TypeParameterParser(ITypeParametric typeParameterized)
 	{
 		this.typeParameterized = typeParameterized;
 		// this.mode = ANNOTATIONS; // pointless assignment to 0
 	}
-	
+
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
@@ -96,32 +97,44 @@ public final class TypeParameterParser extends Parser implements ITyped
 				pm.popParser(true);
 				return;
 			}
-			
+
+			if (this.boundMode == 0)
+			{
+				if (type == DyvilKeywords.EXTENDS)
+				{
+					pm.pushParser(pm.newTypeParser(this));
+					this.boundMode = UPPER;
+					return;
+				}
+				if (type == DyvilKeywords.SUPER)
+				{
+					pm.pushParser(pm.newTypeParser(this));
+					this.boundMode = LOWER;
+					return;
+				}
+			}
 			if (ParserUtil.isIdentifier(type))
 			{
-				Name name = token.nameValue();
+				final Name name = token.nameValue();
 				if (this.boundMode == 0)
 				{
-					if (name == Names.gtcolon) // >: - Lower Bound
-					{
-						pm.pushParser(pm.newTypeParser(this));
-						this.boundMode = LOWER;
-						return;
-					}
 					if (name == Names.ltcolon) // <: - Upper Bounds
 					{
 						pm.pushParser(pm.newTypeParser(this));
 						this.boundMode = UPPER;
 						return;
 					}
-				}
-				else if (this.boundMode == UPPER)
-				{
-					if (name == Names.amp)
+					if (name == Names.gtcolon) // >: - Lower Bound
 					{
 						pm.pushParser(pm.newTypeParser(this));
+						this.boundMode = LOWER;
 						return;
 					}
+				}
+				else if (this.boundMode == UPPER && name == Names.amp)
+				{
+					pm.pushParser(pm.newTypeParser(this));
+					return;
 				}
 			}
 
@@ -150,7 +163,7 @@ public final class TypeParameterParser extends Parser implements ITyped
 		}
 		this.annotationList.addAnnotation(annotion);
 	}
-	
+
 	@Override
 	public void setType(IType type)
 	{
@@ -163,7 +176,7 @@ public final class TypeParameterParser extends Parser implements ITyped
 			this.typeParameter.setLowerBound(type);
 		}
 	}
-	
+
 	@Override
 	public IType getType()
 	{

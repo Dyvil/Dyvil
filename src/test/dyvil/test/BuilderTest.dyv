@@ -9,7 +9,7 @@ public class BuilderTest
 
 		public static Buildable apply(extension Buildable => void configure)
 		{
-			auto b = new Buildable(0, 0D, null)
+			var b = new Buildable(0, 0D, null)
 			configure(b)
 			b
 		}
@@ -35,7 +35,7 @@ public class BuilderTest
 
 	public static void main([String] args)
 	{
-		auto buildable = Buildable {
+		var buildable = Buildable {
 			myInt = 10
 			myString = "Hello World"
 			myDouble = 1.1D

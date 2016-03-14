@@ -25,7 +25,7 @@ public abstract class AbstractBitSet implements Set[int]
 		this.init(elements.length)
 		this.size = elements.length
 
-		for (int i : elements)
+		for (int i <- elements)
 		{
 			final int wordIndex = wordIndex(i)
 			this.words[wordIndex] |= mask(bitIndex(i))
@@ -38,7 +38,7 @@ public abstract class AbstractBitSet implements Set[int]
 		this.init(elements.size)
 		this.size = elements.size
 
-		for (int i : elements)
+		for (int i <- elements)
 		{
 			final int wordIndex = wordIndex(i)
             this.words[wordIndex] |= mask(bitIndex(i))
@@ -82,7 +82,7 @@ public abstract class AbstractBitSet implements Set[int]
 
 	protected int nextSetBit(int start)
 	{
-		for (int i : (start + 1) ..< (this.words.length * 64))
+		for (int i <- (start + 1) ..< (this.words.length * 64))
 		{
 			if (this.bitSet(i))
 			{
@@ -171,10 +171,10 @@ public abstract class AbstractBitSet implements Set[int]
 
 	public override void toArray(int index, [Object] store)
 	{
-		for (int wordIndex : 0 ..< this.words.length)
+		for (int wordIndex <- 0 ..< this.words.length)
 		{
 			final long word = this.words[wordIndex]
-			for (int bit : 0 ..< 64)
+			for (int bit <- 0 ..< 64)
 			{
 				if (bitSet(word, bit))
 				{
@@ -195,10 +195,10 @@ public abstract class AbstractBitSet implements Set[int]
 
 	public void toIntArray(int index, [int] store)
 	{
-		for (int wordIndex : 0 ..< this.words.length)
+		for (int wordIndex <- 0 ..< this.words.length)
 		{
 			final long word = this.words[wordIndex]
-			for (int bit : 0 ..< 64)
+			for (int bit <- 0 ..< 64)
 			{
 				if (bitSet(word, bit))
 				{
@@ -223,7 +223,7 @@ public abstract class AbstractBitSet implements Set[int]
 	public override java.util.Set[int] toJava()
 	{
 		final java.util.Set[int] hashSet = new java.util.HashSet[int]
-		for (Int element : this)
+		for (Int element <- this)
 		{
 			hashSet.add(element)
 		}
@@ -243,7 +243,7 @@ public abstract class AbstractBitSet implements Set[int]
 		out.writeInt(this.size)
 
 		out.writeInt(this.words.length)
-		for (long word : this.words)
+		for (long word <- this.words)
 		{
 			out.writeLong(word)
 		}
@@ -257,7 +257,7 @@ public abstract class AbstractBitSet implements Set[int]
 
 		final int wordCount = in.readInt()
 		this.words = new [long](wordCount)
-		for (int i : 0 ..< wordCount)
+		for (int i <- 0 ..< wordCount)
 		{
 			this.words[i] = in.readLong()
 		}

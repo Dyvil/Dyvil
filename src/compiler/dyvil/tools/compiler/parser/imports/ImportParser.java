@@ -70,7 +70,7 @@ public final class ImportParser extends Parser
 				pm.skip();
 				return;
 			}
-			case DyvilSymbols.WILDCARD:
+			case DyvilSymbols.UNDERSCORE:
 			{
 				final WildcardImport wildcardImport = new WildcardImport(token.raw());
 				wildcardImport.setParent(this.theImport);
@@ -99,7 +99,7 @@ public final class ImportParser extends Parser
 			case BaseSymbols.DOT:
 				this.mode = IMPORT;
 				return;
-			case DyvilSymbols.ARROW_OPERATOR:
+			case DyvilSymbols.DOUBLE_ARROW_RIGHT:
 			case DyvilKeywords.AS:
 				this.mode = END;
 				final IToken next = token.next();
@@ -130,5 +130,11 @@ public final class ImportParser extends Parser
 			}
 			return;
 		}
+	}
+
+	@Override
+	public boolean reportErrors()
+	{
+		return true;
 	}
 }

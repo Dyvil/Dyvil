@@ -15,7 +15,6 @@ import dyvil.tools.compiler.sources.DyvilFileType;
 import dyvil.tools.compiler.sources.FileFinder;
 import dyvil.tools.compiler.util.TestThread;
 import dyvil.tools.compiler.util.Util;
-import dyvil.tools.parsing.CodeFile;
 
 import javax.lang.model.SourceVersion;
 import javax.tools.Tool;
@@ -199,7 +198,7 @@ public final class DyvilCompiler implements Tool
 	{
 		this.log("Loading Configuration File from '" + source + "'");
 
-		final CodeFile file = new CodeFile(source);
+		final File file = new File(source);
 		this.config.setConfigFile(file);
 		if (!file.exists())
 		{
@@ -207,7 +206,15 @@ public final class DyvilCompiler implements Tool
 			return;
 		}
 
-		ConfigParser.parse(file.getCode(), this.config);
+		try
+		{
+			final String code = FileUtils.read(file);
+			ConfigParser.parse(code, this.config);
+		}
+		catch (IOException ex)
+		{
+			this.error("Failed to load configuration file '" + source + "'", ex);
+		}
 	}
 
 	public void loadLibraries()

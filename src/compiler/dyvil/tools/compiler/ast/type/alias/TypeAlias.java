@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.type.alias;
 
-import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
@@ -175,7 +174,7 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		IContext combinedContext = new CombiningContext(this, context);
+		context = context.push(this);
 
 		if (this.type == null)
 		{
@@ -183,51 +182,59 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 			markers.add(Markers.semanticError(this.position, "typealias.invalid"));
 		}
 
-		this.type = this.type.resolveType(markers, combinedContext);
+		this.type = this.type.resolveType(markers, context);
 
 		for (int i = 0; i < this.typeVariableCount; i++)
 		{
-			this.typeVariables[i].resolveTypes(markers, combinedContext);
+			this.typeVariables[i].resolveTypes(markers, context);
 		}
+
+		context.pop();
 	}
 	
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		IContext combinedContext = new CombiningContext(this, context);
+		context = context.push(this);
 
-		this.type.resolve(markers, combinedContext);
+		this.type.resolve(markers, context);
 
 		for (int i = 0; i < this.typeVariableCount; i++)
 		{
-			this.typeVariables[i].resolve(markers, combinedContext);
+			this.typeVariables[i].resolve(markers, context);
 		}
+
+		context.pop();
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		IContext combinedContext = new CombiningContext(this, context);
+		context = context.push(this);
 
-		this.type.checkType(markers, combinedContext, TypePosition.GENERIC_ARGUMENT);
+		this.type.checkType(markers, context, TypePosition.GENERIC_ARGUMENT);
 
 		for (int i = 0; i < this.typeVariableCount; i++)
 		{
-			this.typeVariables[i].checkTypes(markers, combinedContext);
+			this.typeVariables[i].checkTypes(markers, context);
 		}
+
+		context.pop();
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		IContext combinedContext = new CombiningContext(this, context);
+		context = context.push(this);
 
-		this.type.check(markers, combinedContext);
+		this.type.check(markers, context);
 
 		for (int i = 0; i < this.typeVariableCount; i++)
 		{
 			this.typeVariables[i].check(markers, context);
 		}
+
+		context.pop();
 	}
 	
 	@Override
@@ -244,14 +251,16 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		IContext combinedContext = new CombiningContext(this, context);
+		context = context.push(this);
 
-		this.type.cleanup(combinedContext, compilableList);
+		this.type.cleanup(context, compilableList);
 
 		for (int i = 0; i < this.typeVariableCount; i++)
 		{
-			this.typeVariables[i].cleanup(combinedContext, compilableList);
+			this.typeVariables[i].cleanup(context, compilableList);
 		}
+
+		context.pop();
 	}
 	
 	@Override

@@ -178,7 +178,8 @@ public class ClassMetadata implements IClassMetadata
 		{
 			final IParameter classParameter = this.theClass.getParameter(i);
 			parameters[i] = new MethodParameter(classParameter.getPosition(), classParameter.getName(),
-			                                    classParameter.getType(), classParameter.getModifiers());
+			                                    classParameter.getType(), classParameter.getModifiers(),
+			                                    classParameter.getAnnotations());
 			parameters[i].setIndex(i);
 		}
 

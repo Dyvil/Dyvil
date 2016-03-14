@@ -21,7 +21,13 @@ public interface IStaticContext extends IContext
 	{
 		return true;
 	}
-	
+
+	@Override
+	default byte checkStatic()
+	{
+		return TRUE;
+	}
+
 	@Override
 	IDyvilHeader getHeader();
 	
@@ -65,15 +71,15 @@ public interface IStaticContext extends IContext
 	}
 	
 	@Override
-	default boolean handleException(IType type)
+	default byte checkException(IType type)
 	{
-		return false;
+		return FALSE;
 	}
 
 	@Override
-	default boolean canReturn(IType type)
+	default IType getReturnType()
 	{
-		return false;
+		return null;
 	}
 
 	@Override

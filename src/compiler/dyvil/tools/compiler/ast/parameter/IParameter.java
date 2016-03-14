@@ -65,5 +65,5 @@ public interface IParameter extends IVariable, IClassMember
 		return new AnnotationReader(this, annotation);
 	}
 	
-	void write(MethodWriter mw);
+	void writeInit(MethodWriter mw);
 }

@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.expression;
 
-import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
@@ -71,14 +70,16 @@ public class MatchCase implements ICase, IDefaultContext
 	
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
+		context = context.push(this);
 		if (this.condition != null)
 		{
 			this.condition.resolveTypes(markers, context);
 		}
 		if (this.action != null)
 		{
-			this.action.resolveTypes(markers, new CombiningContext(this, context));
+			this.action.resolveTypes(markers, context);
 		}
+		context.pop();
 	}
 	
 	public void resolve(MarkerList markers, IType type, IContext context)
@@ -86,7 +87,7 @@ public class MatchCase implements ICase, IDefaultContext
 		if (this.pattern != null)
 		{
 			this.pattern = this.pattern.resolve(markers, context);
-			
+
 			final IPattern typedPattern = this.pattern.withType(type, markers);
 			if (typedPattern == null)
 			{
@@ -100,44 +101,50 @@ public class MatchCase implements ICase, IDefaultContext
 				this.pattern = typedPattern;
 			}
 		}
-		
-		final IContext combinedContext = new CombiningContext(this, context);
+
+		context = context.push(this);
+
 		if (this.condition != null)
 		{
-			this.condition = this.condition.resolve(markers, combinedContext);
+			this.condition = this.condition.resolve(markers, context);
 			this.condition = IStatement.checkCondition(markers, context, this.condition, "match.condition.type");
 		}
 		
 		if (this.action != null)
 		{
-			this.action = this.action.resolve(markers, combinedContext);
+			this.action = this.action.resolve(markers, context);
 		}
+
+		context.pop();
 	}
 	
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		IContext context1 = new CombiningContext(this, context);
+		context = context.push(this);
 		if (this.condition != null)
 		{
-			this.condition.checkTypes(markers, context1);
+			this.condition.checkTypes(markers, context
+			);
 		}
 		if (this.action != null)
 		{
-			this.action.checkTypes(markers, context1);
+			this.action.checkTypes(markers, context);
 		}
+		context.pop();
 	}
 	
 	public void check(MarkerList markers, IContext context)
 	{
-		IContext context1 = new CombiningContext(this, context);
+		context = context.push(this);
 		if (this.condition != null)
 		{
-			this.condition.check(markers, context1);
+			this.condition.check(markers, context);
 		}
 		if (this.action != null)
 		{
-			this.action.check(markers, context1);
+			this.action.check(markers, context);
 		}
+		context.pop();
 	}
 	
 	public void foldConstants()
@@ -154,15 +161,16 @@ public class MatchCase implements ICase, IDefaultContext
 	
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		IContext context1 = new CombiningContext(this, context);
+		context = context.push(this);
 		if (this.condition != null)
 		{
-			this.condition = this.condition.cleanup(context1, compilableList);
+			this.condition = this.condition.cleanup(context, compilableList);
 		}
 		if (this.action != null)
 		{
-			this.action = this.action.cleanup(context1, compilableList);
+			this.action = this.action.cleanup(context, compilableList);
 		}
+		context.pop();
 	}
 
 	@Override

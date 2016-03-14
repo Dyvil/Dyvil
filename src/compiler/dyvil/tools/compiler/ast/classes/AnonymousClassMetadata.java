@@ -89,7 +89,7 @@ public class AnonymousClassMetadata implements IClassMetadata
 
 		for (int i = 0; i < params; i++)
 		{
-			this.constructor.getParameter(i).write(mw);
+			this.constructor.getParameter(i).writeInit(mw);
 		}
 
 		int index = mw.localCount();

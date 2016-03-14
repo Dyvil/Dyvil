@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.statement.exception;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
@@ -10,11 +9,11 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.marker.Marker;
@@ -26,19 +25,24 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 {
 	private static final boolean DISALLOW_EXPRESSIONS = true;
 
+	public static final TypeChecker.MarkerSupplier CATCH_MARKER_SUPPLIER = TypeChecker.markerSupplier(
+		"try.catch.type.incompatible", "type.expected", "try.catch.type");
+	public static final TypeChecker.MarkerSupplier TRY_MARKER_SUPPLIER   = TypeChecker.markerSupplier(
+		"try.action.type.incompatible", "type.expected", "try.action.type");
+
 	protected IValue action;
 	protected CatchBlock[] catchBlocks = new CatchBlock[1];
 	protected int    catchBlockCount;
 	protected IValue finallyBlock;
-	
+
 	// Metadata
 	private IType commonType;
-	
+
 	public TryStatement(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
 	@Override
 	public int valueTag()
 	{
@@ -67,27 +71,27 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		}
 		return true;
 	}
-	
+
 	public void setAction(IValue action)
 	{
 		this.action = action;
 	}
-	
+
 	public IValue getAction()
 	{
 		return this.action;
 	}
-	
+
 	public void setFinallyBlock(IValue finallyBlock)
 	{
 		this.finallyBlock = finallyBlock;
 	}
-	
+
 	public IValue getFinallyBlock()
 	{
 		return this.finallyBlock;
 	}
-	
+
 	@Override
 	public IType getType()
 	{
@@ -118,49 +122,27 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		}
 		return this.commonType = combinedType;
 	}
-	
+
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (this.action != null)
 		{
-			final IValue typedAction = this.action.withType(type, typeContext, markers, context);
-			if (typedAction == null)
-			{
-				final Marker marker = Markers.semanticError(this.action.getPosition(), "try.action.type.incompatible");
-				marker.addInfo(Markers.getSemantic("action.type", this.action.getType().toString()));
-				marker.addInfo(Markers.getSemantic("type.expected", type));
-				markers.add(marker);
-			}
-			else
-			{
-				this.action = typedAction;
-			}
+			this.action = TypeChecker
+				              .convertValue(this.action, type, typeContext, markers, context, TRY_MARKER_SUPPLIER);
 		}
 
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			final CatchBlock block = this.catchBlocks[i];
-			final IValue action = block.action;
-			final IValue typedAction = action.withType(type, typeContext, markers, context);
-
-			if (typedAction == null)
-			{
-				final Marker marker = Markers.semanticError(action.getPosition(), "try.catch.type.incompatible");
-				marker.addInfo(Markers.getSemantic("try.catchblock.type", action.getType().toString()));
-				marker.addInfo(Markers.getSemantic("type.expected", type));
-				markers.add(marker);
-			}
-			else
-			{
-				block.action = typedAction;
-			}
+			block.action = TypeChecker
+				               .convertValue(block.action, type, typeContext, markers, context, CATCH_MARKER_SUPPLIER);
 		}
 
 		this.commonType = type;
 		return this;
 	}
-	
+
 	@Override
 	public boolean isType(IType type)
 	{
@@ -181,7 +163,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		}
 		return true;
 	}
-	
+
 	@Override
 	public float getTypeMatch(IType type)
 	{
@@ -207,7 +189,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 
 		return total / (1 + this.catchBlockCount);
 	}
-	
+
 	public void addCatchBlock(CatchBlock block)
 	{
 		int index = this.catchBlockCount++;
@@ -217,31 +199,31 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			System.arraycopy(this.catchBlocks, 0, temp, 0, this.catchBlocks.length);
 			this.catchBlocks = temp;
 		}
-		
+
 		this.catchBlocks[index] = block;
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.action != null)
 		{
+			context = context.push(this);
 			this.action.resolveTypes(markers, context);
+			context = context.pop();
 		}
-		
+
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
-			CatchBlock block = this.catchBlocks[i];
-			block.type = block.type.resolveType(markers, context);
-			block.action.resolveTypes(markers, context);
+			this.catchBlocks[i].resolveTypes(markers, context);
 		}
-		
+
 		if (this.finallyBlock != null)
 		{
 			this.finallyBlock.resolveTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void resolveStatement(ILabelContext context, MarkerList markers)
 	{
@@ -253,43 +235,43 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		{
 			this.catchBlocks[i].action.resolveStatement(context, markers);
 		}
-		
+
 		if (this.finallyBlock != null)
 		{
 			this.finallyBlock.resolveStatement(context, markers);
 		}
 	}
-	
+
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
 		if (this.action != null)
 		{
+			context = context.push(this);
 			this.action = this.action.resolve(markers, context);
+			context = context.pop();
 		}
-		
+
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
-			final CatchBlock block = this.catchBlocks[i];
-			block.type.resolve(markers, context);
-			block.action = block.action.resolve(markers, new CombiningContext(block, context));
+			this.catchBlocks[i].resolve(markers, context);
 		}
-		
+
 		if (this.finallyBlock != null)
 		{
 			this.finallyBlock = this.finallyBlock.resolve(markers, context);
 
 			final IValue typedFinally = this.finallyBlock.withType(Types.VOID, Types.VOID, markers, context);
-			if (typedFinally == null || !typedFinally.isUsableAsStatement())
-			{
-				final Marker marker = Markers
-						.semanticError(this.finallyBlock.getPosition(), "try.finally.type.invalid");
-				marker.addInfo(Markers.getSemantic("try.finally.type", this.finallyBlock.getType().toString()));
-				markers.add(marker);
-			}
-			else
+			if (typedFinally != null && typedFinally.isUsableAsStatement())
 			{
 				this.finallyBlock = typedFinally;
+			}
+			else if (this.finallyBlock.isResolved())
+			{
+				final Marker marker = Markers
+					                      .semanticError(this.finallyBlock.getPosition(), "try.finally.type.invalid");
+				marker.addInfo(Markers.getSemantic("try.finally.type", this.finallyBlock.getType().toString()));
+				markers.add(marker);
 			}
 		}
 
@@ -299,57 +281,49 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		}
 		return this;
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		if (this.action != null)
 		{
-			this.action.checkTypes(markers, new CombiningContext(this, context));
+			context = context.push(this);
+			this.action.checkTypes(markers, context);
+			context = context.pop();
 		}
-		
+
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
-			CatchBlock block = this.catchBlocks[i];
-			block.type.checkType(markers, context, TypePosition.RETURN_TYPE);
-			block.action.checkTypes(markers, new CombiningContext(block, context));
+			this.catchBlocks[i].checkTypes(markers, context);
 		}
-		
+
 		if (this.finallyBlock != null)
 		{
 			this.finallyBlock.checkTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		if (this.action != null)
 		{
-			this.action.check(markers, new CombiningContext(this, context));
+			context = context.push(this);
+			this.action.check(markers, context);
+			context = context.pop();
 		}
-		
+
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
-			CatchBlock block = this.catchBlocks[i];
-			block.type.check(markers, context);
-			
-			if (!Types.THROWABLE.isSuperTypeOf(block.type))
-			{
-				Marker marker = Markers.semantic(block.position, "try.catch.type.not_throwable");
-				marker.addInfo(Markers.getSemantic("exception.type", block.type));
-				markers.add(marker);
-			}
-			
-			block.action.check(markers, context);
+			this.catchBlocks[i].check(markers, context);
 		}
-		
+
 		if (this.finallyBlock != null)
 		{
 			this.finallyBlock.check(markers, context);
 		}
 	}
-	
+
 	@Override
 	public IValue foldConstants()
 	{
@@ -357,54 +331,52 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		{
 			this.action = this.action.foldConstants();
 		}
-		
+
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
-			CatchBlock block = this.catchBlocks[i];
-			block.type.foldConstants();
-			block.action = block.action.foldConstants();
+			this.catchBlocks[i].foldConstants();
 		}
-		
+
 		if (this.finallyBlock != null)
 		{
 			this.finallyBlock = this.finallyBlock.foldConstants();
 		}
 		return this;
 	}
-	
+
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		if (this.action != null)
 		{
+			context = context.push(this);
 			this.action = this.action.cleanup(context, compilableList);
+			context = context.pop();
 		}
-		
+
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
-			CatchBlock block = this.catchBlocks[i];
-			block.type.cleanup(context, compilableList);
-			block.action = block.action.cleanup(new CombiningContext(block, context), compilableList);
+			this.catchBlocks[i].cleanup(context, compilableList);
 		}
-		
+
 		if (this.finallyBlock != null)
 		{
 			this.finallyBlock = this.finallyBlock.cleanup(context, compilableList);
 		}
 		return this;
 	}
-	
+
 	@Override
-	public boolean handleException(IType type)
+	public byte checkException(IType type)
 	{
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			if (this.catchBlocks[i].type.isSuperTypeOf(type))
 			{
-				return true;
+				return TRUE;
 			}
 		}
-		return false;
+		return PASS;
 	}
 
 	@Override
@@ -435,7 +407,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		final dyvil.tools.asm.Label tryStart = new dyvil.tools.asm.Label();
 		final dyvil.tools.asm.Label tryEnd = new dyvil.tools.asm.Label();
 		final dyvil.tools.asm.Label endLabel = new dyvil.tools.asm.Label();
-		
+
 		writer.writeTargetLabel(tryStart);
 		if (this.action != null)
 		{
@@ -449,16 +421,16 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
 		}
 		writer.writeLabel(tryEnd);
-		
+
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			final CatchBlock block = this.catchBlocks[i];
 			final dyvil.tools.asm.Label handlerLabel = new dyvil.tools.asm.Label();
 			final String handlerType = block.type.getInternalName();
-			
+
 			writer.writeTargetLabel(handlerLabel);
 			writer.startCatchBlock(handlerType);
-			
+
 			// Check if the block's variable is actually used
 			if (block.variable != null)
 			{
@@ -481,15 +453,15 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 				writer.writeVarInsn(storeInsn, localIndex);
 				writer.resetLocals(localIndex);
 			}
-			
+
 			writer.writeCatchBlock(tryStart, tryEnd, handlerLabel, handlerType);
 			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
 		}
-		
+
 		if (this.finallyBlock != null)
 		{
 			final dyvil.tools.asm.Label finallyLabel = new dyvil.tools.asm.Label();
-			
+
 			writer.writeLabel(finallyLabel);
 			writer.startCatchBlock("java/lang/Throwable");
 			writer.writeInsn(Opcodes.POP);
@@ -511,7 +483,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			writer.resetLocals(localIndex);
 		}
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

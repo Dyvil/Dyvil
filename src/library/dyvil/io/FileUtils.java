@@ -49,7 +49,7 @@ public final class FileUtils
 		}
 
 		final File parent = file.getParentFile();
-		if (parent != null && !parent.mkdirs())
+		if (parent != null && !parent.exists() && !parent.mkdirs())
 		{
 			return false;
 		}
@@ -140,7 +140,8 @@ public final class FileUtils
 		}
 	}
 
-	private static String read(File file) throws IOException
+	@DyvilModifiers(Modifiers.INFIX)
+	public static String read(File file) throws IOException
 	{
 		byte[] bytes = Files.readAllBytes(file.toPath());
 		return new String(bytes);

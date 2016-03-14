@@ -586,11 +586,11 @@ public final class TypeParameter implements ITypeParameter
 		final IType type;
 		if (this.reifiedKind == ReifiedKind.REIFIED_ERASURE)
 		{
-			type = ClassOperator.Types.CLASS;
+			type = ClassOperator.LazyFields.CLASS;
 		}
 		else if (this.reifiedKind == ReifiedKind.REIFIED_TYPE)
 		{
-			type = TypeOperator.Types.TYPE;
+			type = TypeOperator.LazyFields.TYPE;
 		}
 		else
 		{

@@ -1,9 +1,13 @@
 package dyvil.tools.compiler.ast.statement.loop;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.context.*;
+import dyvil.tools.compiler.ast.context.CombiningLabelContext;
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
+import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.statement.control.Label;
@@ -12,58 +16,77 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class ForStatement implements IStatement, IDefaultContext, ILoop
+public class ForStatement implements IForStatement, IDefaultContext
 {
 	public static final Name $forStart  = Name.getQualified("$forStart");
 	public static final Name $forUpdate = Name.getQualified("$forCondition");
 	public static final Name $forEnd    = Name.getQualified("$forEnd");
-	
+
 	protected ICodePosition position;
-	protected Variable      variable;
-	
+	protected IVariable     variable;
+
 	protected IValue condition;
 	protected IValue update;
-	
+
 	protected IValue action;
-	
+
 	// Metadata
 	protected Label startLabel;
 	protected Label updateLabel;
 	protected Label endLabel;
-	
-	public ForStatement(ICodePosition position, Variable variable, IValue condition, IValue update, IValue action)
+
+	public ForStatement(ICodePosition position, Variable variable, IValue condition, IValue update)
 	{
 		this.startLabel = new Label($forStart);
 		this.updateLabel = new Label($forUpdate);
 		this.endLabel = new Label($forEnd);
-		
+
+		this.position = position;
 		this.variable = variable;
 		this.condition = condition;
 		this.update = update;
+	}
+
+	public ForStatement(ICodePosition position, Variable variable, IValue condition, IValue update, IValue action)
+	{
+		this(position, variable, condition, update);
 		this.action = action;
 	}
-	
+
+	@Override
+	public int valueTag()
+	{
+		return FOR;
+	}
+
 	@Override
 	public ICodePosition getPosition()
 	{
 		return this.position;
 	}
-	
+
 	@Override
 	public void setPosition(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
 	@Override
-	public int valueTag()
+	public IVariable getVariable()
 	{
-		return FOR;
+		return this.variable;
+	}
+
+	@Override
+	public void setVariable(IVariable variable)
+	{
+		this.variable = variable;
 	}
 
 	@Override
@@ -83,13 +106,13 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 	{
 		return this.updateLabel;
 	}
-	
+
 	@Override
 	public Label getBreakLabel()
 	{
 		return this.endLabel;
 	}
-	
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
@@ -97,10 +120,10 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 		{
 			return this.variable;
 		}
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public Label resolveLabel(Name name)
 	{
@@ -116,10 +139,10 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 		{
 			return this.endLabel;
 		}
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -135,13 +158,13 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 		{
 			this.update.resolveTypes(markers, context);
 		}
-		
+
 		if (this.action != null)
 		{
 			this.action.resolveTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void resolveStatement(ILabelContext context, MarkerList markers)
 	{
@@ -150,37 +173,37 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 			this.action.resolveStatement(new CombiningLabelContext(this, context), markers);
 		}
 	}
-	
+
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		final IContext combinedContext = new CombiningContext(this, context);
-
 		if (this.variable != null)
 		{
 			this.variable.resolve(markers, context);
 		}
 
+		context = context.push(this);
 		if (this.condition != null)
 		{
-			this.condition = this.condition.resolve(markers, combinedContext);
+			this.condition = this.condition.resolve(markers, context);
 			this.condition = IStatement.checkCondition(markers, context, this.condition, "for.condition.type");
 		}
 		if (this.update != null)
 		{
-			this.update = this.update.resolve(markers, combinedContext);
+			this.update = this.update.resolve(markers, context);
 			this.update = IStatement.checkStatement(markers, context, this.update, "for.update.type");
 		}
-		
+
 		if (this.action != null)
 		{
-			this.action = this.action.resolve(markers, combinedContext);
+			this.action = this.action.resolve(markers, context);
 			this.action = IStatement.checkStatement(markers, context, this.action, "for.action.type");
 		}
-		
+		context.pop();
+
 		return this;
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -189,44 +212,48 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 			this.variable.checkTypes(markers, context);
 		}
 
-		final IContext combinedContext = new CombiningContext(this, context);
+		context = context.push(this);
 		if (this.update != null)
 		{
-			this.update.checkTypes(markers, combinedContext);
+			this.update.checkTypes(markers, context);
 		}
 		if (this.condition != null)
 		{
-			this.condition.checkTypes(markers, combinedContext);
+			this.condition.checkTypes(markers, context);
 		}
 		if (this.action != null)
 		{
-			this.action.checkTypes(markers, combinedContext);
+			this.action.checkTypes(markers, context);
 		}
+		context.pop();
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		IContext context1 = new CombiningContext(this, context);
-		
 		if (this.variable != null)
 		{
 			this.variable.check(markers, context);
 		}
+
+		markers.add(Markers.semanticWarning(this.position, "for.deprecated"));
+
+		context = context.push(this);
 		if (this.update != null)
 		{
-			this.update.check(markers, context1);
+			this.update.check(markers, context);
 		}
 		if (this.condition != null)
 		{
-			this.condition.check(markers, context1);
+			this.condition.check(markers, context);
 		}
 		if (this.action != null)
 		{
-			this.action.check(markers, context1);
+			this.action.check(markers, context);
 		}
+		context.pop();
 	}
-	
+
 	@Override
 	public IValue foldConstants()
 	{
@@ -248,41 +275,44 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 		}
 		return this;
 	}
-	
+
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		IContext context1 = new CombiningContext(this, context);
-		
 		if (this.variable != null)
 		{
-			this.variable.cleanup(context1, compilableList);
+			this.variable.cleanup(context, compilableList);
 		}
+
+		context = context.push(this);
+
 		if (this.update != null)
 		{
-			this.update.cleanup(context1, compilableList);
+			this.update.cleanup(context, compilableList);
 		}
 		if (this.condition != null)
 		{
-			this.condition.cleanup(context1, compilableList);
+			this.condition.cleanup(context, compilableList);
 		}
 		if (this.action != null)
 		{
-			this.action.cleanup(context1, compilableList);
+			this.action.cleanup(context, compilableList);
 		}
-		
+
+		context.pop();
+
 		return this;
 	}
-	
+
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		dyvil.tools.asm.Label startLabel = this.startLabel.target = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label updateLabel = this.updateLabel.target = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
-		
-		Variable var = this.variable;
-		
+
+		IVariable var = this.variable;
+
 		int locals = writer.localCount();
 		// Variable
 		if (var != null)
@@ -316,7 +346,7 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 			var.writeLocal(writer, startLabel, endLabel);
 		}
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
@@ -366,7 +396,7 @@ public class ForStatement implements IStatement, IDefaultContext, ILoop
 			buffer.append(' ');
 		}
 		buffer.append(')');
-		
+
 		if (this.action != null && !Util.formatStatementList(prefix, buffer, this.action))
 		{
 			String actionPrefix = Formatting.getIndent("for.indent", prefix);

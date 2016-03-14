@@ -22,6 +22,7 @@ import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Deprecation;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -118,7 +119,7 @@ public class Property extends Member implements IProperty
 
 		final Name name = Name.get(this.name.unqualified + "_=", this.name.qualified + "_$eq");
 		this.setter = new CodeMethod(this.enclosingClass, name, Types.VOID, this.modifiers);
-		this.setterParameter = new MethodParameter(this.position, this.name, this.type, EmptyModifiers.INSTANCE);
+		this.setterParameter = new MethodParameter(this.position, this.name, this.type, EmptyModifiers.INSTANCE, null);
 		this.setter.addParameter(this.setterParameter);
 
 		return this.setter;
@@ -198,17 +199,10 @@ public class Property extends Member implements IProperty
 		}
 		if (this.initializer != null)
 		{
-			this.initializer = this.initializer.resolve(markers, context);
+			final IValue resolved = this.initializer.resolve(markers, context);
 
-			final IValue typed = IType.convertValue(this.initializer, Types.VOID, Types.VOID, markers, context);
-			if (typed == null)
-			{
-				Util.createTypeError(markers, this.initializer, Types.VOID, Types.VOID, "property.initializer.type");
-			}
-			else
-			{
-				this.initializer = typed;
-			}
+			this.initializer = TypeChecker.convertValue(resolved, Types.VOID, Types.VOID, markers, context,
+			                                            TypeChecker.markerSupplier("property.initializer.type"));
 		}
 	}
 	
@@ -383,7 +377,7 @@ public class Property extends Member implements IProperty
 			}
 			
 			this.writeAnnotations(mw, modifiers);
-			this.setter.getParameter(0).write(mw);
+			this.setter.getParameter(0).writeInit(mw);
 			
 			if (setterValue != null)
 			{

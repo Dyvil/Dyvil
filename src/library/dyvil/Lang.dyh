@@ -3,7 +3,7 @@ package dyvil
 // Base imports for language features
 import	dyvil.lang._
 
-// Useful classes
+// Import useful utility classes
 import	dyvil.collection._
 import	dyvil.io.Console
 import	dyvil.random.Random
@@ -11,32 +11,33 @@ import	dyvil.function.PartialFunction
 import	dyvil.util.{ Option, None, Some }
 import	dyvil.util.Version
 
-// Import Tuple2 and Tuple3 with more user-friendly names
-import	dyvil.tuple.{ Tuple2 => Pair, Tuple3 => Triple }
+// Import Tuple types with more useful names
+import	dyvil.tuple.{ Tuple2 => Pair, Tuple3 => Triple, Tuple4 => Quad}
 
 // Import useful annotation classes
 import	dyvil.annotation.Intrinsic
 import	dyvil.annotation.{ Deprecated, Experimental, UsageInfo }
+
 import	dyvil.annotation.{
-							Native		=> native,
-							Transient	=> transient,
-							Volatile	=> volatile,
-							Immutable	=> immutable,
-							Mutating	=> mutating,
-							Reified		=> reified
-						 }
+	Native		=> native,
+	Transient	=> transient,
+	Volatile	=> volatile,
+	Immutable	=> immutable,
+	Mutating	=> mutating,
+	Reified		=> reified
+}
 
 import	java.lang._
 
 // Import the methods from former Predef classes
 using	dyvil.lang.{
-					Primitives._
-					LanguageCommons._
-					LanguageFeatures._
-					ObjectExtensions._
-					StringExtensions._
-					FunctionConversions._
-				   }
+	Primitives._
+	LanguageCommons._
+	LanguageFeatures._
+	ObjectExtensions._
+	StringExtensions._
+	FunctionConversions._
+}
 
 // Primitive type aliases
 type	Void	= dyvil.lang.Void
@@ -61,12 +62,20 @@ type	Map[K, V]			= [K:V]
 type	MutableMap[K, V]	= [var K : V]
 type	ImmutableMap[K, V]	= [final K : V]
 
+// Tuple Type Aliases
+type	Pair[A, B]			= (A, B)
+type	Triple[A, B, C]		= (A, B, C)
+type	Quad[A, B, C, D]	= (A, B, C, D)
+
 // Print Operators
 prefix	operator print		{ precedence 1 }
 prefix	operator println	{ precedence 1 }
 
 // Assert Operator
 prefix	operator assert		{ precedence 1 }
+
+// Consume Operator
+prefix	operator consume	{ precedence 1 }
 
 // Postfix Operators
 postfix	operator ++
@@ -112,12 +121,8 @@ infix	operator <<		{ none, 1000 }
 infix	operator >>		{ none, 1000 }
 infix	operator >>>	{ none, 1000 }
 
-// Arrow Operators
-infix	operator ->		{ left, 2000 }
-infix	operator <-		{ right, 2000 }
-
 // Range Operator
-infix	operator .. 	{ none, 3000 }
-infix	operator ..<	{ none, 3000 }
+infix	operator .. 	{ none, 2000 }
+infix	operator ..<	{ none, 2000 }
 // infix operator >.. { none, 3000 }
 // infix operator >.< { none, 3000 }

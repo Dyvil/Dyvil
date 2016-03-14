@@ -26,7 +26,26 @@ public interface IContext extends IMemberContext
 	byte INVISIBLE = 1;
 	byte INTERNAL  = 2;
 
-	boolean isStatic();
+	byte TRUE  = 0;
+	byte FALSE = 1;
+	byte PASS  = 2;
+
+	default boolean isStatic()
+	{
+		return this.checkStatic() != FALSE;
+	}
+
+	byte checkStatic();
+
+	default IContext push(IContext context)
+	{
+		return new CombiningContext(context, this);
+	}
+
+	default IContext pop()
+	{
+		return null;
+	}
 
 	default DyvilCompiler getCompilationContext()
 	{
@@ -59,10 +78,15 @@ public interface IContext extends IMemberContext
 	
 	@Override
 	void getConstructorMatches(ConstructorMatchList list, IArguments arguments);
-	
-	boolean handleException(IType type);
 
-	boolean canReturn(IType type);
+	default boolean handleException(IType type)
+	{
+		return this.checkException(type) != FALSE;
+	}
+
+	byte checkException(IType type);
+
+	IType getReturnType();
 	
 	boolean isMember(IVariable variable);
 	
@@ -144,6 +168,6 @@ public interface IContext extends IMemberContext
 	static boolean isUnhandled(IContext context, IType exceptionType)
 	{
 		return Types.EXCEPTION.isSuperTypeOf(exceptionType) && !Types.RUNTIME_EXCEPTION.isSuperTypeOf(exceptionType)
-				&& !context.handleException(exceptionType);
+				&& context.handleException(exceptionType);
 	}
 }

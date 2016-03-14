@@ -57,7 +57,7 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 		if (collection.isEmpty || this.isEmpty) return this
 
 		final BitSet copy = new BitSet(this)
-		for (Object element : collection)
+		for (Object element <- collection)
 		{
 			if (element is Int)
 			{
@@ -72,7 +72,7 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 		if (collection.isEmpty || this.isEmpty) return this
 
 		final BitSet copy = new BitSet(this.size)
-		for (int element : collection)
+		for (int element <- collection)
 		{
 			if (this.bitSet(element))
 			{
@@ -87,7 +87,7 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 		if (collection.isEmpty) return this
 
 		final BitSet copy = new BitSet(this)
-		for (int element : collection)
+		for (int element <- collection)
 		{
 			copy.setBit(element)
 		}
@@ -100,7 +100,7 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 		if (this.isEmpty) return new BitSet(collection)
 
 		final BitSet copy = new BitSet
-		for (int element : collection)
+		for (int element <- collection)
 		{
 			if (!this.bitSet(element))
 			{
@@ -108,7 +108,7 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 			}
 		}
 
-		for (int element : this)
+		for (int element <- this)
 		{
 			if (!collection.contains(element))
 			{
@@ -121,7 +121,7 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 	public override ImmutableSet[R] mapped[R](java.util.function.Function[_ >: int, _ <: R] mapper)
 	{
 		final ImmutableSet.Builder[R] builder = ImmutableSet.[R]builder
-		for (int element : this)
+		for (int element <- this)
 		{
 			builder.add(mapper.apply(element))
 		}
@@ -131,9 +131,9 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 	public override ImmutableSet[R] flatMapped[R](java.util.function.Function[_ >: int, _ <: Iterable[_ <: R]] mapper)
 	{
 		final ImmutableSet.Builder[R] builder = ImmutableSet.[R]builder
-		for (int element : this)
+		for (int element <- this)
 		{
-			for (R result : mapper.apply(element))
+			for (R result <- mapper.apply(element))
 			{
 				builder.add(result)
 			}
@@ -144,7 +144,7 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 	public override BitSet filtered(java.util.function.Predicate[_ >: int] condition)
 	{
 		final BitSet copy = new BitSet(this.size)
-		for (int element : this)
+		for (int element <- this)
 		{
 			if (condition.test(element))
 			{

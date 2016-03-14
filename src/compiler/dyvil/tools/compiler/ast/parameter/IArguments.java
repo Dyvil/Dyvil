@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -13,9 +14,14 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IArguments extends IASTNode, Iterable<IValue>
 {
+	static TypeChecker.MarkerSupplier argumentMarkerSupplier(IParameter parameter)
+	{
+		return TypeChecker.markerSupplier("method.access.argument_type", parameter.getName());
+	}
+
 	float DEFAULT_MATCH = 1000;
 	float VARARGS_MATCH = 100;
-	
+
 	@Override
 	default ICodePosition getPosition()
 	{

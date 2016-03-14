@@ -21,5 +21,5 @@ public final class StringExtensions
 	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKEVIRTUAL, 0, 1, 2 ], strings: [ "java/lang/String", "charAt", "(I)C" ])
 	public infix char subscript(String s, int index) = s charAt index
 
-	public infix String subscript(String s, Range[int] range) = s.substring(range.first, range.last + 1)
+	public infix String subscript(String s, Range[int] range) = s.substring(range.first, range.last)
 }

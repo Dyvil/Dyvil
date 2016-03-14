@@ -70,25 +70,25 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		 */
 		GENERIC_ARGUMENT
 	}
-	
+
 	// Basic Types
 	int UNKNOWN   = 0;
 	int NULL      = 1;
 	int ANY       = 2;
 	int DYNAMIC   = 3;
 	int PRIMITIVE = 4;
-	
+
 	// Class Types
 	int CLASS    = 16;
 	int NAMED    = 17;
 	int INTERNAL = 18;
 	int PACKAGE  = 19;
-	
+
 	// Generic Types
 	int GENERIC          = 24;
 	int GENERIC_NAMED    = 25;
 	int GENERIC_INTERNAL = 26;
-	
+
 	// Compound Types
 	int TUPLE  = 32;
 	int LAMBDA = 33;
@@ -99,24 +99,24 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	int OPTIONAL  = 48;
 	int REFERENCE = 50;
-	
+
 	// Type Variable Types
 	int TYPE_VAR_TYPE     = 64;
 	int INTERNAL_TYPE_VAR = 65;
-	
+
 	int WILDCARD_TYPE = 80;
-	
+
 	// Other Types
 	int ANNOTATED = 192;
 
 	int MISSING_TAG = 255;
-	
+
 	@Override
 	default ICodePosition getPosition()
 	{
 		return null;
 	}
-	
+
 	@Override
 	default void setPosition(ICodePosition position)
 	{
@@ -128,32 +128,32 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		copy.setPosition(position);
 		return copy;
 	}
-	
+
 	int typeTag();
-	
+
 	boolean isPrimitive();
-	
+
 	int getTypecode();
-	
+
 	boolean isGenericType();
-	
+
 	ITypeParameter getTypeVariable();
-	
+
 	Name getName();
-	
+
 	// Container Class
-	
+
 	IClass getTheClass();
-	
+
 	// Type Conversions
-	
+
 	IType getObjectType();
-	
+
 	default IType getReturnType()
 	{
 		return this;
 	}
-	
+
 	default IType getParameterType()
 	{
 		return this;
@@ -167,17 +167,17 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	{
 		return new ReferenceType(this.getRefClass(), this);
 	}
-	
+
 	IType getSimpleRefType();
-	
+
 	// Arrays
-	
+
 	boolean isArrayType();
-	
+
 	int getArrayDimensions();
-	
+
 	IType getElementType();
-	
+
 	IClass getArrayClass();
 
 	default Mutability getMutability()
@@ -196,13 +196,13 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	void setExtension(boolean extension);
 
 	// Super Type
-	
+
 	default int getSuperTypeDistance(IType superType)
 	{
 		IClass iClass = this.getTheClass();
 		return iClass == null ? 0 : iClass.getSuperTypeDistance(superType);
 	}
-	
+
 	default float getSubTypeDistance(IType subtype)
 	{
 		if (subtype.isArrayType() && this.getTheClass() == Types.OBJECT_CLASS)
@@ -211,12 +211,12 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		}
 		return subtype.getSuperTypeDistance(this);
 	}
-	
+
 	default int getSubClassDistance(IType subtype)
 	{
 		return subtype.getSuperTypeDistance(this);
 	}
-	
+
 	default IType getSuperType()
 	{
 		IClass iclass = this.getTheClass();
@@ -226,17 +226,17 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		}
 		return Types.OBJECT;
 	}
-	
+
 	default IType combine(IType type)
 	{
 		return this;
 	}
-	
+
 	/**
 	 * Returns {@code true} iff this type is a super type of the given {@code type}, {@code false otherwise}.
 	 *
 	 * @param type
-	 * 		the potential sub-type of this type
+	 * 	the potential sub-type of this type
 	 *
 	 * @return {@code true} iff this type is a super type of the given type, {@code false} otherwise
 	 */
@@ -246,8 +246,12 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		{
 			return true;
 		}
-		
+
 		IClass thisClass = this.getTheClass();
+		if (thisClass == null)
+		{
+			return false;
+		}
 		if (thisClass == Types.OBJECT_CLASS)
 		{
 			return true;
@@ -260,7 +264,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		{
 			return false;
 		}
-		
+
 		final IClass thatClass = type.getTheClass();
 		return thatClass != null && (thatClass == thisClass || thatClass.isSubTypeOf(this));
 	}
@@ -269,36 +273,27 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	{
 		return this.isSuperTypeOf(type);
 	}
-	
+
 	default boolean isSuperClassOf(IType type)
 	{
 		final IClass thisClass = this.getTheClass();
 		final IClass thatClass = type.getTheClass();
-		return thatClass != null && (thatClass == thisClass || thatClass.isSubTypeOf(this));
+		return thatClass != null && thisClass != null && (thatClass == thisClass || thatClass.isSubTypeOf(this));
 	}
-	
+
 	default boolean isSameType(IType type)
 	{
 		return this == type || this.getTheClass() == type.getTheClass();
 	}
-	
+
 	boolean classEquals(IType type);
-	
+
 	// Resolve
-	
+
 	IMethod getBoxMethod();
-	
+
 	IMethod getUnboxMethod();
-	
-	static IValue convertValue(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
-	{
-		if (type.hasTypeVariables())
-		{
-			type = type.getConcreteType(typeContext);
-		}
-		return type.convertValue(value, typeContext, markers, context);
-	}
-	
+
 	default IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (!this.isResolved())
@@ -307,9 +302,9 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		}
 		return value.withType(this, typeContext, markers, context);
 	}
-	
+
 	// Generics
-	
+
 	/**
 	 * Returns the type argument in this generic type for the given type variable.
 	 * <p>
@@ -323,40 +318,40 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	 */
 	@Override
 	IType resolveType(ITypeParameter typeParameter);
-	
+
 	default IType resolveTypeSafely(ITypeParameter typeVar)
 	{
 		IType t = this.resolveType(typeVar);
 		return t == null ? Types.ANY : t;
 	}
-	
+
 	/**
 	 * Returns true if this is or contains any type variables.
 	 */
 	boolean hasTypeVariables();
 
 	IType getConcreteType(ITypeContext context);
-	
+
 	void inferTypes(IType concrete, ITypeContext typeContext);
-	
+
 	// Phases
-	
+
 	boolean isResolved();
-	
+
 	IType resolveType(MarkerList markers, IContext context);
-	
+
 	default void resolve(MarkerList markers, IContext context)
 	{
 	}
-	
+
 	void checkType(MarkerList markers, IContext context, TypePosition position);
-	
+
 	void check(MarkerList markers, IContext context);
-	
+
 	void foldConstants();
-	
+
 	void cleanup(IContext context, IClassCompilableList compilableList);
-	
+
 	// IContext
 
 	default IAnnotation getAnnotation(IClass type)
@@ -364,20 +359,20 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		final IClass theClass = this.getTheClass();
 		return theClass == null ? null : theClass.getAnnotation(type);
 	}
-	
+
 	@Override
 	default Package resolvePackage(Name name)
 	{
 		return null;
 	}
-	
+
 	@Override
 	default IClass resolveClass(Name name)
 	{
 		final IClass theClass = this.getTheClass();
 		return theClass == null ? null : theClass.resolveClass(name);
 	}
-	
+
 	@Override
 	default IType resolveType(Name name)
 	{
@@ -394,28 +389,28 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	@Override
 	IDataMember resolveField(Name name);
-	
+
 	@Override
 	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
-	
+
 	@Override
 	void getConstructorMatches(ConstructorMatchList list, IArguments arguments);
-	
+
 	IMethod getFunctionalMethod();
-	
+
 	// Compilation
-	
+
 	String getInternalName();
-	
+
 	default String getExtendedName()
 	{
 		StringBuilder buffer = new StringBuilder();
 		this.appendExtendedName(buffer);
 		return buffer.toString();
 	}
-	
+
 	void appendExtendedName(StringBuilder buffer);
-	
+
 	String getSignature();
 
 	static String getSignature(IType type)
@@ -424,46 +419,46 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		type.appendSignature(builder);
 		return builder.toString();
 	}
-	
+
 	void appendSignature(StringBuilder buffer);
-	
+
 	int getLoadOpcode();
-	
+
 	int getArrayLoadOpcode();
-	
+
 	int getStoreOpcode();
-	
+
 	int getArrayStoreOpcode();
-	
+
 	int getReturnOpcode();
-	
+
 	Object getFrameType();
-	
+
 	void writeCast(MethodWriter writer, IType target, int lineNumber) throws BytecodeException;
 
 	void writeClassExpression(MethodWriter writer) throws BytecodeException;
 
 	void writeTypeExpression(MethodWriter writer) throws BytecodeException;
-	
+
 	void writeDefaultValue(MethodWriter writer) throws BytecodeException;
-	
+
 	static IType withAnnotation(IType type, IAnnotation annotation, TypePath typePath, int step, int steps)
 	{
 		if (typePath == null || step > steps)
 		{
 			return new AnnotatedType(type, annotation);
 		}
-		
+
 		type.addAnnotation(annotation, typePath, step, steps);
 		return type;
 	}
-	
+
 	void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps);
-	
+
 	void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath);
-	
+
 	IConstantValue getDefaultValue();
-	
+
 	static void writeType(IType type, DataOutput dos) throws IOException
 	{
 		if (type == null)
@@ -471,11 +466,11 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 			dos.writeByte(MISSING_TAG);
 			return;
 		}
-		
+
 		dos.writeByte(type.typeTag());
 		type.write(dos);
 	}
-	
+
 	static IType readType(DataInput dis) throws IOException
 	{
 		int tag = dis.readUnsignedByte();
@@ -510,7 +505,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		case ARRAY:
 			type = new ArrayType();
 			break;
-		case LIST :
+		case LIST:
 			type = new ListType();
 			break;
 		case MAP:
@@ -536,28 +531,28 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		default:
 			throw new Error("Cannot decode TypeTag " + tag);
 		}
-		
+
 		type.read(dis);
 		return type;
 	}
-	
+
 	void write(DataOutput out) throws IOException;
-	
+
 	void read(DataInput in) throws IOException;
-	
+
 	@Override
 	void toString(String prefix, StringBuilder buffer);
-	
+
 	// Misc
-	
+
 	IType clone();
-	
+
 	@Override
 	boolean equals(Object obj);
-	
+
 	@Override
 	int hashCode();
-	
+
 	static boolean equals(IType type, Object obj)
 	{
 		return type.classEquals((IType) obj);

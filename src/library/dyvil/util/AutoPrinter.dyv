@@ -1,0 +1,8 @@
+package dyvil.util
+
+public class AutoPrinter
+{
+	public static void apply(AutoPrinter.() => void closure) = closure(new AutoPrinter)
+
+	public void applyStatement(any value) = println value
+}

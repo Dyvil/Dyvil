@@ -6,7 +6,7 @@ public class FibonacciTest
 	{
 		List[int] sequence = fibonacciSequence(20)
 
-		for (int i : 0 ..< sequence.size)
+		for (int i <- 0 ..< sequence.size)
 		{
 			Main.test("Fibonacci #\(i + 1)", sequence[i], fibonacci(i))
 		}
@@ -16,7 +16,7 @@ public class FibonacciTest
 	{
 		MutableList[int] list = [ 1, 1 ]
 
-		for (int i : 2 ..< n)
+		for (int i <- 2 ..< n)
 		{
 			list += list[i - 1] + list[i - 2]
 		}

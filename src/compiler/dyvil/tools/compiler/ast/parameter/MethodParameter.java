@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.external.ExternalMethod;
@@ -15,9 +16,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -27,14 +26,14 @@ public final class MethodParameter extends Parameter
 {
 	// Metadata
 	protected ICallableMember method;
-	
+
 	protected ReferenceType refType;
 	protected boolean       assigned;
-	
+
 	public MethodParameter()
 	{
 	}
-	
+
 	public MethodParameter(Name name)
 	{
 		super(name);
@@ -50,9 +49,14 @@ public final class MethodParameter extends Parameter
 		super(name, type, modifierSet);
 	}
 
-	public MethodParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers)
+	public MethodParameter(ICodePosition position, Name name, IType type)
 	{
-		super(position, name, type, modifiers);
+		super(position, name, type);
+	}
+
+	public MethodParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	{
+		super(position, name, type, modifiers, annotations);
 	}
 
 	@Override
@@ -84,7 +88,7 @@ public final class MethodParameter extends Parameter
 	{
 		return ElementType.PARAMETER;
 	}
-	
+
 	@Override
 	public void setMethod(ICallableMember method)
 	{
@@ -102,58 +106,42 @@ public final class MethodParameter extends Parameter
 	{
 		return this.refType != null ? this.refType : this.type;
 	}
-	
+
 	@Override
 	public boolean isReferenceCapturable()
 	{
 		return this.refType != null;
 	}
-	
+
 	@Override
 	public boolean isReferenceType()
 	{
 		return this.refType != null;
 	}
-	
+
 	@Override
-	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context)
+	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue receiver, IContext context)
 	{
-		return instance;
+		return receiver;
 	}
-	
+
 	@Override
-	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue instance, IValue newValue)
+	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue receiver, IValue newValue)
 	{
-		if (this.modifiers.hasIntModifier(Modifiers.FINAL))
-		{
-			markers.add(Markers.semantic(position, "parameter.assign.final", this.name.unqualified));
-		}
-		else
-		{
-			this.assigned = true;
-		}
-		
-		IValue value1 = newValue.withType(this.type, null, markers, context);
-		if (value1 == null)
-		{
-			Marker marker = Markers.semantic(newValue.getPosition(), "parameter.assign.type", this.name.unqualified);
-			marker.addInfo(Markers.getSemantic("parameter.type", this.type));
-			marker.addInfo(Markers.getSemantic("value.type", newValue.getType()));
-			markers.add(marker);
-		}
-		else
-		{
-			newValue = value1;
-		}
-		
-		return newValue;
+		this.assigned = true;
+		return super.checkAssign(markers, context, position, receiver, newValue);
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		super.resolveTypes(markers, context);
-		
+
+		if (this.type != null && this.type.isExtension())
+		{
+			this.getModifiers().addIntModifier(Modifiers.INFIX_FLAG);
+		}
+
 		if (this.modifiers != null)
 		{
 			if (this.modifiers.hasIntModifier(Modifiers.VAR))
@@ -164,7 +152,7 @@ public final class MethodParameter extends Parameter
 				}
 				this.refType = new ImplicitReferenceType(this.type.getRefClass(), this.type);
 			}
-			else if (this.modifiers.hasIntModifier(Modifiers.INFIX & ~Modifiers.STATIC))
+			else if (this.modifiers.hasIntModifier(Modifiers.INFIX_FLAG))
 			{
 				this.type.setExtension(true);
 			}
@@ -176,16 +164,10 @@ public final class MethodParameter extends Parameter
 	{
 		super.check(markers, context);
 
-		ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.PARAMETER_MODIFIERS);
-	}
-
-	@Override
-	public void write(MethodWriter writer)
-	{
-		this.localIndex = writer.localCount();
-		writer.registerParameter(this.localIndex, this.name.qualified, this.getInternalType(), 0);
-
-		this.writeAnnotations(writer);
+		if (this.modifiers != null)
+		{
+			ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.PARAMETER_MODIFIERS);
+		}
 	}
 
 	@Override

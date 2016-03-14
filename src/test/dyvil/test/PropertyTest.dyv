@@ -37,7 +37,7 @@ public class PropertyTest
 	
 	public static void main([String] args)
 	{
-		auto c = new ConcreteProperty
+		var c = new ConcreteProperty
 
 		Main.test("Property Initializer", 1, c[])
 

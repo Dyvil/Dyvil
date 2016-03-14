@@ -16,7 +16,9 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.Util;
+import dyvil.tools.compiler.transform.TypeChecker;
+import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -34,82 +36,82 @@ public class RangeOperator implements IValue
 		public static final IClass FLOAT_RANGE_CLASS  = Package.dyvilCollectionRange.resolveClass("FloatRange");
 		public static final IClass DOUBLE_RANGE_CLASS = Package.dyvilCollectionRange.resolveClass("DoubleRange");
 	}
-	
+
 	protected ICodePosition position;
 	protected IValue        startValue;
 	protected IValue        endValue;
-	
+
 	// Metadata
 	private boolean halfOpen;
 	private IType elementType = Types.UNKNOWN;
 	private IType type;
-	
+
 	public RangeOperator(IValue value1, IValue value2)
 	{
 		this.startValue = value1;
 		this.endValue = value2;
 	}
-	
+
 	public RangeOperator(IValue value1, IValue value2, IType type)
 	{
 		this.startValue = value1;
 		this.endValue = value2;
 		this.elementType = type;
 	}
-	
+
 	public void setHalfOpen(boolean halfOpen)
 	{
 		this.halfOpen = halfOpen;
 	}
-	
+
 	public boolean isHalfOpen()
 	{
 		return this.halfOpen;
 	}
-	
+
 	@Override
 	public ICodePosition getPosition()
 	{
 		return this.position;
 	}
-	
+
 	@Override
 	public void setPosition(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
 	@Override
 	public int valueTag()
 	{
 		return RANGE_OPERATOR;
 	}
-	
+
 	public void setStartValue(IValue startValue)
 	{
 		this.startValue = startValue;
 	}
-	
+
 	public IValue getStartValue()
 	{
 		return this.startValue;
 	}
-	
+
 	public void setEndValue(IValue endValue)
 	{
 		this.endValue = endValue;
 	}
-	
+
 	public IValue getEndValue()
 	{
 		return this.endValue;
 	}
-	
+
 	public IType getElementType()
 	{
 		return this.elementType;
 	}
-	
+
 	@Override
 	public boolean isResolved()
 	{
@@ -162,30 +164,30 @@ public class RangeOperator implements IValue
 		this.type = genericType;
 		return this.type;
 	}
-	
+
 	private boolean isElementType(IType elementType)
 	{
 		if (this.elementType != Types.UNKNOWN)
 		{
 			return elementType.isSuperTypeOf(this.elementType);
 		}
-		
+
 		return this.startValue.isType(elementType) && this.endValue.isType(elementType);
 	}
-	
+
 	private static IType getElementType(IType type)
 	{
 		if (type.isArrayType())
 		{
 			return type.getElementType();
 		}
-		if (Types.ITERABLE.isSuperClassOf(type))
+		if (IterableForStatement.LazyFields.ITERABLE.isSuperClassOf(type))
 		{
-			return type.resolveTypeSafely(IterableForStatement.ITERABLE_TYPE);
+			return type.resolveTypeSafely(IterableForStatement.LazyFields.ITERABLE_TYPE);
 		}
 		return null;
 	}
-	
+
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
@@ -195,39 +197,26 @@ public class RangeOperator implements IValue
 			return null;
 		}
 		elementType = PrimitiveType.getPrimitiveType(elementType);
-		
+
 		this.type = type;
 		this.elementType = elementType;
-		
-		final IValue typedStartValue = this.startValue.withType(elementType, elementType, markers, context);
-		if (typedStartValue != null)
-		{
-			this.startValue = typedStartValue;
-		}
-		else if (this.startValue.isResolved())
-		{
-			Util.createTypeError(markers, this.startValue, elementType, typeContext, "range.start.type");
-		}
-		
-		final IValue typedEndValue = this.endValue.withType(elementType, elementType, markers, context);
-		if (typedEndValue != null)
-		{
-			this.endValue = typedEndValue;
-		}
-		else if (this.endValue.isResolved())
-		{
-			Util.createTypeError(markers, this.endValue, elementType, typeContext, "range.end.type");
-		}
+
+		this.startValue = TypeChecker.convertValue(this.startValue, elementType, typeContext, markers, context,
+		                                           TypeChecker.markerSupplier("range.start.type"));
+
+		this.endValue = TypeChecker.convertValue(this.endValue, elementType, typeContext, markers, context,
+		                                         TypeChecker.markerSupplier("range.end.type"));
+
 		return this;
 	}
-	
+
 	@Override
 	public boolean isType(IType type)
 	{
 		IType elementType = type.getElementType();
 		return elementType != null && this.isElementType(elementType);
 	}
-	
+
 	@Override
 	public float getTypeMatch(IType type)
 	{
@@ -236,19 +225,19 @@ public class RangeOperator implements IValue
 		{
 			return 0;
 		}
-		
+
 		float f1 = this.startValue.getTypeMatch(elementType);
 		float f2 = this.endValue.getTypeMatch(elementType);
 		return f1 == 0 || f2 == 0 ? 0 : (f1 + f2) / 2F;
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.startValue.resolveTypes(markers, context);
 		this.endValue.resolveTypes(markers, context);
 	}
-	
+
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
@@ -256,21 +245,48 @@ public class RangeOperator implements IValue
 		this.endValue.resolve(markers, context);
 		return this;
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		this.startValue.checkTypes(markers, context);
 		this.endValue.checkTypes(markers, context);
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		this.startValue.check(markers, context);
 		this.endValue.check(markers, context);
+
+		final IType elementType = this.getElementType();
+		if (!elementType.isResolved())
+		{
+			return;
+		}
+
+		if (elementType.isPrimitive())
+		{
+			switch (elementType.getTypecode())
+			{
+			case PrimitiveType.BOOLEAN_CODE:
+			case PrimitiveType.VOID_CODE:
+				break;
+			default:
+				return;
+			}
+		}
+
+		if (LazyFields.RANGEABLE.isSuperClassOf(elementType))
+		{
+			return;
+		}
+
+		final Marker marker = Markers.semanticError(this.position, "range.element.type.incompatible");
+		marker.addInfo(Markers.getSemantic("range.element.type", elementType));
+		markers.add(marker);
 	}
-	
+
 	@Override
 	public IValue foldConstants()
 	{
@@ -278,7 +294,7 @@ public class RangeOperator implements IValue
 		this.endValue = this.endValue.foldConstants();
 		return this;
 	}
-	
+
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
@@ -286,7 +302,7 @@ public class RangeOperator implements IValue
 		this.endValue = this.endValue.cleanup(context, compilableList);
 		return this;
 	}
-	
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
@@ -296,7 +312,7 @@ public class RangeOperator implements IValue
 			this.writeRangeExpression(writer);
 			return;
 		}
-		
+
 		// -- Array --
 		this.writeArrayExpression(writer);
 	}
@@ -396,7 +412,7 @@ public class RangeOperator implements IValue
 			return;
 		}
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

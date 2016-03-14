@@ -1,5 +1,7 @@
 package dyvil.test
 
+import java.util.Iterator
+
 public class ForTest
 {
 	public static void main([String] args)
@@ -7,6 +9,7 @@ public class ForTest
 		testIterative()
 		testArray()
 		testIterable()
+		testIterator()
 		testString()
 	}
 	
@@ -28,7 +31,8 @@ public class ForTest
 		[int] ints = [ 1, 2, 3 ]
 		[int] array = []
 
-		for (auto i : ints) {
+		for (var i <- ints)
+		{
 			array += i
 		}
 
@@ -41,19 +45,34 @@ public class ForTest
 		Iterable[int] iterable = ints.toIterable
 		[int] array = []
 
-		for (auto i : iterable) {
+		for (var i <- iterable)
+		{
 			array += i
 		}
 
 		Main.test("Iterable For Test", ints, array, ints == array)
 	}
+
+	private static void testIterator()
+	{
+		[int] ints = [ 1, 2, 3 ]
+		Iterator[int] iterator = ints.toIterable.iterator
+		[int] array = []
+
+		for (var i <- iterator)
+		{
+			array += i
+		}
+
+		Main.test("Iterator For Test", ints, array, ints == array)
+	}
 	
 	private static void testString()
 	{
-		String testString = "abc"
-		String string = ""
+		var testString = "abc"
+		var string = ""
 
-		for (auto c : testString)
+		for (var c <- testString)
 		{
 			string += c
 		}

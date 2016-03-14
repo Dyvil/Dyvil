@@ -7,18 +7,20 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.statement.loop.IterableForStatement;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -26,16 +28,18 @@ import java.util.Iterator;
 
 public final class ArrayExpr implements IValue, IValueList
 {
-	public static final class Types
+	public static final class LazyFields
 	{
 		public static final IClass ARRAY_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("ArrayConvertible");
-		
-		private Types()
+
+		private static final TypeChecker.MarkerSupplier ELEMENT_MARKER_SUPPLIER = TypeChecker
+				                                                                          .markerSupplier("array.element.type.incompatible", "array.element.type.expected", "array.element.type.actual");
+		private LazyFields()
 		{
 			// no instances
 		}
 	}
-	
+
 	protected ICodePosition position;
 	
 	protected IValue[] values;
@@ -163,12 +167,7 @@ public final class ArrayExpr implements IValue, IValueList
 		{
 			return this.arrayType.isResolved();
 		}
-		if (this.elementType != null)
-		{
-			return this.elementType.isResolved();
-		}
-		
-		return false;
+		return this.elementType != null && this.elementType.isResolved();
 	}
 	
 	@Override
@@ -190,16 +189,16 @@ public final class ArrayExpr implements IValue, IValueList
 		{
 			IClass iclass = arrayType.getTheClass();
 			IAnnotation annotation;
-			if ((annotation = iclass.getAnnotation(Types.ARRAY_CONVERTIBLE)) != null)
+			if ((annotation = iclass.getAnnotation(LazyFields.ARRAY_CONVERTIBLE)) != null)
 			{
 				return new LiteralConversion(this, annotation).withType(arrayType, typeContext, markers, context);
 			}
-			if (arrayType.classEquals(dyvil.tools.compiler.ast.type.builtin.Types.ITERABLE))
+			if (arrayType.classEquals(IterableForStatement.LazyFields.ITERABLE))
 			{
 				return new LiteralConversion(this, getArrayToIterable())
 						.withType(arrayType, typeContext, markers, context);
 			}
-			if (iclass != dyvil.tools.compiler.ast.type.builtin.Types.OBJECT_CLASS)
+			if (iclass != Types.OBJECT_CLASS)
 			{
 				return null;
 			}
@@ -215,21 +214,7 @@ public final class ArrayExpr implements IValue, IValueList
 		
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			IValue value = this.values[i];
-			IValue typedValue = IType.convertValue(value, elementType, typeContext, markers, context);
-			
-			if (typedValue == null)
-			{
-				Marker marker = Markers.semantic(value.getPosition(), "array.element.type.incompatible");
-				marker.addInfo(Markers.getSemantic("array.type", arrayType.getConcreteType(typeContext)));
-				marker.addInfo(Markers.getSemantic("array.element.type", value.getType()));
-				markers.add(marker);
-			}
-			else
-			{
-				value = typedValue;
-				this.values[i] = typedValue;
-			}
+			this.values[i] = TypeChecker.convertValue(this.values[i], elementType, typeContext, markers, context, LazyFields.ELEMENT_MARKER_SUPPLIER);
 		}
 		
 		return this;
@@ -251,8 +236,8 @@ public final class ArrayExpr implements IValue, IValueList
 	{
 		IClass iclass = type.getTheClass();
 		return iclass == dyvil.tools.compiler.ast.type.builtin.Types.OBJECT_CLASS
-				|| iclass.getAnnotation(Types.ARRAY_CONVERTIBLE) != null
-				|| dyvil.tools.compiler.ast.type.builtin.Types.ITERABLE.isSuperClassOf(type);
+				|| iclass.getAnnotation(LazyFields.ARRAY_CONVERTIBLE) != null
+				|| IterableForStatement.LazyFields.ITERABLE.isSuperClassOf(type);
 	}
 	
 	@Override
@@ -324,7 +309,7 @@ public final class ArrayExpr implements IValue, IValueList
 	@Override
 	public Iterator<IValue> iterator()
 	{
-		return new ArrayIterator(this.values);
+		return new ArrayIterator<>(this.values, this.valueCount);
 	}
 	
 	@Override

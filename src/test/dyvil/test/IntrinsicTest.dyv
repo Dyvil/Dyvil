@@ -12,10 +12,10 @@ public class IntrinsicTest
 
 	public static void main([String] args)
 	{
-		auto i1 = 1 +- 2
-		auto i2 = 2 +- 4
-		auto i3 = -1 +- 3
-		auto i4 = -7 +- 5
+		var i1 = 1 +- 2
+		var i2 = 2 +- 4
+		var i3 = -1 +- 3
+		var i4 = -7 +- 5
 
 		Main.test("Intrinsic Test 1", -1, i1)
 		Main.test("Intrinsic Test 2", -2, i2)

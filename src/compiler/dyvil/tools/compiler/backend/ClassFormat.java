@@ -8,7 +8,8 @@ import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.ast.generic.TypeParameter;
 import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.method.IExceptionList;
-import dyvil.tools.compiler.ast.method.IMethodSignature;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.ICallableSignature;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
@@ -159,8 +160,13 @@ public final class ClassFormat
 			i = readTyped(desc, i, iclass::addInterface);
 		}
 	}
+
+	private static ITypeConsumer addParameterType(ICallableSignature methodSignature)
+	{
+		return methodSignature::addParameterType;
+	}
 	
-	public static void readMethodType(String desc, IMethodSignature method)
+	public static void readMethodType(String desc, IMethod method)
 	{
 		int i = 1;
 		if (desc.charAt(0) == '<')
@@ -173,7 +179,7 @@ public final class ClassFormat
 		}
 		while (desc.charAt(i) != ')')
 		{
-			i = readTyped(desc, i, method::addParameterType);
+			i = readTyped(desc, i, addParameterType(method));
 		}
 		i++;
 		i = readTyped(desc, i, method);
@@ -191,7 +197,7 @@ public final class ClassFormat
 		int i = 1;
 		while (desc.charAt(i) != ')')
 		{
-			i = readTyped(desc, i, constructor::addType);
+			i = readTyped(desc, i, addParameterType(constructor));
 		}
 		i += 2;
 		

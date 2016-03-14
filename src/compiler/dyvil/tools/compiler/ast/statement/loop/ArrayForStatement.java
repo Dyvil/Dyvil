@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.statement.loop;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -12,12 +13,12 @@ public class ArrayForStatement extends ForEachStatement
 {
 	protected IType arrayType;
 	
-	public ArrayForStatement(ICodePosition position, Variable var)
+	public ArrayForStatement(ICodePosition position, IVariable var)
 	{
 		this(position, var, var.getValue().getType());
 	}
 	
-	public ArrayForStatement(ICodePosition position, Variable var, IType arrayType)
+	public ArrayForStatement(ICodePosition position, IVariable var, IType arrayType)
 	{
 		super(position, var);
 
@@ -31,7 +32,7 @@ public class ArrayForStatement extends ForEachStatement
 		dyvil.tools.asm.Label updateLabel = this.updateLabel.target = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
 
-		final Variable var = this.variable;
+		final IVariable var = this.variable;
 		final IType elementType = this.arrayType.getElementType();
 		final int lineNumber = this.getLineNumber();
 

@@ -33,17 +33,16 @@ public final class TypeParser extends Parser implements ITypeConsumer
 	public static final int ARRAY_END      = 8;
 	public static final int WILDCARD_TYPE  = 16;
 	public static final int TUPLE_END      = 32;
-	public static final int LAMBDA_TYPE    = 64;
-	public static final int LAMBDA_END     = 128;
-	public static final int ANNOTATION_END = 256;
-	
+	public static final int LAMBDA_END     = 64;
+	public static final int ANNOTATION_END = 128;
+
 	protected ITypeConsumer consumer;
 
 	private IType parentType;
 	private IType type;
 
 	private boolean namedOnly;
-	
+
 	public TypeParser(ITypeConsumer consumer)
 	{
 		this.consumer = consumer;
@@ -83,7 +82,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					return;
 				}
 			}
-			
+
 			if (this.type != null)
 			{
 				this.consumer.setType(this.type);
@@ -130,7 +129,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					pm.pushParser(pm.newTypeParser(arrayType));
 					return;
 				}
-				case DyvilSymbols.ARROW_OPERATOR:
+				case DyvilSymbols.DOUBLE_ARROW_RIGHT:
 				{
 					final LambdaType lambdaType = new LambdaType(token.raw());
 					pm.pushParser(pm.newTypeParser(lambdaType));
@@ -142,7 +141,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					this.consumer.setType(Types.NULL);
 					pm.popParser();
 					return;
-				case DyvilSymbols.WILDCARD:
+				case DyvilSymbols.UNDERSCORE:
 					this.type = new WildcardType(token.raw());
 					this.mode = WILDCARD_TYPE;
 					return;
@@ -157,7 +156,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					this.type = new NamedGenericType(token.raw(), token.nameValue(), this.parentType);
 					this.mode = GENERICS;
 					return;
-				case DyvilSymbols.ARROW_OPERATOR:
+				case DyvilSymbols.DOUBLE_ARROW_RIGHT:
 					if (this.parentType == null && !this.namedOnly)
 					{
 						LambdaType lt = new LambdaType(new NamedType(token.raw(), token.nameValue()));
@@ -179,7 +178,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					this.mode = END;
 					return;
 				}
-				
+
 				this.type = new NamedType(token.raw(), token.nameValue(), this.parentType);
 				this.mode = END;
 				return;
@@ -200,23 +199,25 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			}
 
 			final IToken nextToken = token.next();
-			if (nextToken.type() == DyvilSymbols.ARROW_OPERATOR && !this.namedOnly)
+			if (nextToken.type() == DyvilSymbols.DOUBLE_ARROW_RIGHT)
 			{
-				TupleType tupleType = (TupleType) this.type;
-				this.type = new LambdaType(tupleType);
-				this.type.setPosition(nextToken.raw());
-				this.mode = LAMBDA_TYPE;
+				final LambdaType lambdaType = new LambdaType(nextToken.raw(), this.parentType, (TupleType) this.type);
+				this.type = lambdaType;
+				this.mode = LAMBDA_END;
+
+				pm.skip();
+				pm.pushParser(pm.newTypeParser(lambdaType));
 				return;
 			}
-			
+			else if (this.parentType != null)
+			{
+				pm.report(nextToken, "type.tuple.lambda_arrow");
+			}
+
 			this.type.expandPosition(token);
 			this.mode = END;
 			return;
 		}
-		case LAMBDA_TYPE:
-			pm.pushParser(pm.newTypeParser((LambdaType) this.type));
-			this.mode = LAMBDA_END;
-			return;
 		case LAMBDA_END:
 			this.type.expandPosition(token.prev());
 			this.consumer.setType(this.type);

@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.external;
 
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -14,27 +15,32 @@ public final class ExternalField extends Field
 {
 	private boolean annotationsResolved;
 	private boolean returnTypeResolved;
-	
+
 	public ExternalField(IClass iclass, Name name, IType type, ModifierSet modifierSet)
 	{
 		super(iclass, name, type, modifierSet);
 	}
-	
+
+	private IContext getCombiningContext()
+	{
+		return new CombiningContext(this.enclosingClass, Package.rootPackage);
+	}
+
 	private void resolveAnnotations()
 	{
 		this.annotationsResolved = true;
 		if (this.annotations != null)
 		{
-			this.annotations.resolveTypes(null, Package.rootPackage, this);
+			this.annotations.resolveTypes(null, this.getCombiningContext(), this);
 		}
 	}
-	
+
 	private void resolveReturnType()
 	{
 		this.returnTypeResolved = true;
-		this.type = this.type.resolveType(null, this.enclosingClass);
+		this.type = this.type.resolveType(null, this.getCombiningContext());
 	}
-	
+
 	@Override
 	public IType getType()
 	{
@@ -44,7 +50,7 @@ public final class ExternalField extends Field
 		}
 		return this.type;
 	}
-	
+
 	@Override
 	public IAnnotation getAnnotation(IClass type)
 	{
@@ -52,34 +58,34 @@ public final class ExternalField extends Field
 		{
 			return null;
 		}
-		
+
 		if (!this.annotationsResolved)
 		{
 			this.resolveAnnotations();
 		}
 		return this.annotations.getAnnotation(type);
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 	}
-	
+
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 	}
-	
+
 	@Override
 	public void foldConstants()
 	{
