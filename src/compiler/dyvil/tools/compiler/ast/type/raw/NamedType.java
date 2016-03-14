@@ -17,7 +17,6 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.marker.Warning;
 import dyvil.tools.parsing.position.ICodePosition;
 
 import java.io.DataInput;
@@ -157,7 +156,7 @@ public class NamedType implements IRawType, ITypeConsumer
 		{
 			if (primitive == Types.UNKNOWN)
 			{
-				markers.add(new Warning(this.position, Markers.getSemantic("type.auto.deprecated")));
+				markers.add(Markers.semanticWarning(this.position, "type.auto.deprecated"));
 			}
 
 			return primitive.atPosition(this.position);
