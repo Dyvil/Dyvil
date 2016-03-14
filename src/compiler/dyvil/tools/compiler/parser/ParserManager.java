@@ -104,15 +104,8 @@ public class ParserManager implements IParserManager
 				}
 				continue;
 			}
-			
-			try
-			{
-				this.parser.parse(this, token);
-			}
-			catch (Exception ex)
-			{
-				this.report(Markers.parserError(token, ex));
-			}
+
+			this.tryParse(token, this.parser);
 		}
 		
 		this.parseRemaining(token);
@@ -131,16 +124,28 @@ public class ParserManager implements IParserManager
 			
 			Parser prevParser = this.parser;
 			int mode = prevParser.getMode();
-			
-			prevParser.parse(this, token);
-			
+
+			this.tryParse(token, prevParser);
+
 			if (this.parser == prevParser && this.parser.getMode() == mode)
 			{
 				break;
 			}
 		}
 	}
-	
+
+	private void tryParse(IToken token, Parser prevParser)
+	{
+		try
+		{
+			prevParser.parse(this, token);
+		}
+		catch (Exception ex)
+		{
+			this.report(Markers.parserError(token, ex));
+		}
+	}
+
 	@Override
 	public void stop()
 	{
