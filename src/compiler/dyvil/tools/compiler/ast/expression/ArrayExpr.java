@@ -7,9 +7,11 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.statement.loop.IterableForStatement;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -191,12 +193,12 @@ public final class ArrayExpr implements IValue, IValueList
 			{
 				return new LiteralConversion(this, annotation).withType(arrayType, typeContext, markers, context);
 			}
-			if (arrayType.classEquals(dyvil.tools.compiler.ast.type.builtin.Types.ITERABLE))
+			if (arrayType.classEquals(IterableForStatement.LazyFields.ITERABLE))
 			{
 				return new LiteralConversion(this, getArrayToIterable())
 						.withType(arrayType, typeContext, markers, context);
 			}
-			if (iclass != dyvil.tools.compiler.ast.type.builtin.Types.OBJECT_CLASS)
+			if (iclass != Types.OBJECT_CLASS)
 			{
 				return null;
 			}
@@ -235,7 +237,7 @@ public final class ArrayExpr implements IValue, IValueList
 		IClass iclass = type.getTheClass();
 		return iclass == dyvil.tools.compiler.ast.type.builtin.Types.OBJECT_CLASS
 				|| iclass.getAnnotation(LazyFields.ARRAY_CONVERTIBLE) != null
-				|| dyvil.tools.compiler.ast.type.builtin.Types.ITERABLE.isSuperClassOf(type);
+				|| IterableForStatement.LazyFields.ITERABLE.isSuperClassOf(type);
 	}
 	
 	@Override

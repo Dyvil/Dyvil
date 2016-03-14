@@ -51,7 +51,7 @@ public final class Types
 	
 	public static final ClassType OBJECT            = new ClassType();
 	public static final ClassType STRING            = new ClassType();
-	public static final ClassType ITERABLE          = new ClassType();
+
 	public static final ClassType THROWABLE         = new ClassType();
 	public static final ClassType EXCEPTION         = new ClassType();
 	public static final ClassType RUNTIME_EXCEPTION = new ClassType();
@@ -72,7 +72,7 @@ public final class Types
 	public static IClass OBJECT_CLASS;
 	public static IClass STRING_CLASS;
 	public static IClass NULL_CLASS;
-	public static IClass ITERABLE_CLASS;
+
 	public static IClass THROWABLE_CLASS;
 	public static IClass EXCEPTION_CLASS;
 	public static IClass RUNTIME_EXCEPTION_CLASS;
@@ -119,7 +119,6 @@ public final class Types
 		NULL_CLASS = Package.dyvilLang.resolveClass("Null");
 		OBJECT.theClass = OBJECT_CLASS = Package.javaLang.resolveClass("Object");
 		STRING.theClass = STRING_CLASS = Package.javaLang.resolveClass("String");
-		ITERABLE.theClass = ITERABLE_CLASS = Package.javaLang.resolveClass("Iterable");
 		THROWABLE.theClass = THROWABLE_CLASS = Package.javaLang.resolveClass("Throwable");
 		EXCEPTION.theClass = EXCEPTION_CLASS = Package.javaLang.resolveClass("Exception");
 		RUNTIME_EXCEPTION.theClass = RUNTIME_EXCEPTION_CLASS = Package.javaLang.resolveClass("RuntimeException");

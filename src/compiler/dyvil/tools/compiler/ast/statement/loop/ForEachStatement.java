@@ -32,7 +32,7 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 	protected ICodePosition position;
 
 	protected IVariable variable;
-	protected IValue   action;
+	protected IValue    action;
 
 	// Metadata
 	protected Label startLabel;
@@ -205,11 +205,7 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 
 			if (varType == Types.UNKNOWN)
 			{
-				this.variable.setType(varType = rangeOperator.getElementType());
-				if (varType == Types.UNKNOWN)
-				{
-					markers.add(Markers.semantic(this.variable.getPosition(), "for.variable.infer", this.variable.getName()));
-				}
+				this.inferVariableType(markers, rangeOperator.getElementType());
 			}
 			else if (!varType.isSuperTypeOf(rangeOperator.getElementType()))
 			{
@@ -227,11 +223,7 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 		{
 			if (varType == Types.UNKNOWN)
 			{
-				this.variable.setType(varType = valueType.getElementType());
-				if (varType == Types.UNKNOWN)
-				{
-					markers.add(Markers.semantic(this.variable.getPosition(), "for.variable.infer", this.variable.getName()));
-				}
+				this.inferVariableType(markers, valueType.getElementType());
 			}
 			else if (!varType.isSuperTypeOf(valueType.getElementType()))
 			{
@@ -245,17 +237,34 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 			arrayForStatement.resolveAction(this.action, markers, context);
 			return arrayForStatement;
 		}
-		if (Types.ITERABLE.isSuperTypeOf(valueType))
+		if (IterableForStatement.LazyFields.ITERATOR.isSuperClassOf(valueType))
 		{
-			final IType iterableType = valueType.resolveTypeSafely(IterableForStatement.ITERABLE_TYPE).getReturnType();
+			final IType iteratorType = valueType.resolveTypeSafely(IterableForStatement.LazyFields.ITERATOR_TYPE)
+			                                    .getReturnType();
 			if (varType == Types.UNKNOWN)
 			{
-				this.variable.setType(varType = iterableType);
-				if (varType == Types.UNKNOWN)
-				{
-					markers.add(
-						Markers.semantic(this.variable.getPosition(), "for.variable.infer", this.variable.getName()));
-				}
+				this.inferVariableType(markers, iteratorType);
+			}
+			else if (!varType.isSuperTypeOf(iteratorType))
+			{
+				final Marker marker = Markers.semantic(value.getPosition(), "for.iterator.type");
+				marker.addInfo(Markers.getSemantic("iterator.type", iteratorType));
+				marker.addInfo(Markers.getSemantic("variable.type", varType));
+				markers.add(marker);
+			}
+
+			final IterableForStatement iterableForStatement = new IterableForStatement(this.position, this.variable,
+			                                                                           true);
+			iterableForStatement.resolveAction(this.action, markers, context);
+			return iterableForStatement;
+		}
+		if (IterableForStatement.LazyFields.ITERABLE.isSuperClassOf(valueType))
+		{
+			final IType iterableType = valueType.resolveTypeSafely(IterableForStatement.LazyFields.ITERABLE_TYPE)
+			                                    .getReturnType();
+			if (varType == Types.UNKNOWN)
+			{
+				this.inferVariableType(markers, iterableType);
 			}
 			else if (!varType.isSuperTypeOf(iterableType))
 			{
@@ -265,7 +274,8 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 				markers.add(marker);
 			}
 
-			final IterableForStatement iterableForStatement = new IterableForStatement(this.position, this.variable);
+			final IterableForStatement iterableForStatement = new IterableForStatement(this.position, this.variable,
+			                                                                           false);
 			iterableForStatement.resolveAction(this.action, markers, context);
 			return iterableForStatement;
 		}
@@ -295,6 +305,16 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 		this.resolveAction(this.action, markers, context);
 
 		return this;
+	}
+
+	public void inferVariableType(MarkerList markers, IType type)
+	{
+		if (type != Types.UNKNOWN)
+		{
+			this.variable.setType(type);
+			return;
+		}
+		markers.add(Markers.semantic(this.variable.getPosition(), "for.variable.infer", this.variable.getName()));
 	}
 
 	protected void resolveAction(IValue action, MarkerList markers, IContext context)

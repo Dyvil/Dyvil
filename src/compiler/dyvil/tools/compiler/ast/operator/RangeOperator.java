@@ -181,9 +181,9 @@ public class RangeOperator implements IValue
 		{
 			return type.getElementType();
 		}
-		if (Types.ITERABLE.isSuperClassOf(type))
+		if (IterableForStatement.LazyFields.ITERABLE.isSuperClassOf(type))
 		{
-			return type.resolveTypeSafely(IterableForStatement.ITERABLE_TYPE);
+			return type.resolveTypeSafely(IterableForStatement.LazyFields.ITERABLE_TYPE);
 		}
 		return null;
 	}
