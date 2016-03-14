@@ -50,7 +50,7 @@ public final class ObjectExtensions
 		if (args == null) return 0
 
 		var result = 1
-		for (var element : args)
+		for (var element <- args)
 		{
 			result = 31 * result + if (element == null) 0 else element.hashCode
 		}

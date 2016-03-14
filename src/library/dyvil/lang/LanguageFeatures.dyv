@@ -56,7 +56,7 @@ public final class LanguageFeatures
 
 	public static void repeat(int n, => void f)
 	{
-		for (int i : 0 ..< n)
+		for (int i <- 0 ..< n)
 		{
 			f()
 		}

@@ -7,10 +7,11 @@ public class SelfTypeTest
 		public double sum(MyList[double] this)
 		{
 			double result = 0D
-			for (Object d : this.elements)
+			for (Object d <- this.elements)
 			{
 				result += d as double
 			}
+
 			return result
 		}
 	}
