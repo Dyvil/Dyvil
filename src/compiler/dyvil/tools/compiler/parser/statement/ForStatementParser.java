@@ -13,7 +13,10 @@ import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;
 
@@ -106,10 +109,19 @@ public class ForStatementParser extends Parser implements IValueConsumer, ITypeC
 		case SEPARATOR:
 			if (type == BaseSymbols.COLON)
 			{
+				pm.report(Markers.syntaxWarning(token, "for.each.colon.deprecated"));
 				this.mode = FOR_EACH_END;
 				pm.pushParser(pm.newExpressionParser(this.variable));
 				return;
 			}
+
+			if (type == DyvilSymbols.ARROW_LEFT || type == Tokens.LETTER_IDENTIFIER)
+			{
+				this.mode = FOR_EACH_END;
+				pm.pushParser(pm.newExpressionParser(this.variable));
+				return;
+			}
+
 			this.mode = VARIABLE_END;
 			if (type == BaseSymbols.EQUALS)
 			{
@@ -164,7 +176,7 @@ public class ForStatementParser extends Parser implements IValueConsumer, ITypeC
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();
-				pm.report(token, "for.close_paren");
+				pm.report(token, "for.each.close_paren");
 			}
 			return;
 		case STATEMENT:
