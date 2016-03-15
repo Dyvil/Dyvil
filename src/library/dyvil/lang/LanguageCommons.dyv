@@ -11,6 +11,10 @@ public final class LanguageCommons
 	@Intrinsic([ LOAD_0, AUTO_POP ])
 	public static void consume(any value) = ()
 
+	// Ternary Operator
+
+	public infix T operator ?[T](boolean condition, (=> T, => T) branches) = if (condition) branches._1() else branches._2()
+
 	// Assertions
 
 	public static void assert(boolean condition) = if (!condition) throw new AssertionError()

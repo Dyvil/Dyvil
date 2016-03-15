@@ -32,7 +32,14 @@ public class IfStatement implements IValue
 	{
 		this.position = position;
 	}
-	
+
+	public IfStatement(IValue condition, IValue then, IValue elseThen)
+	{
+		this.condition = condition;
+		this.then = then;
+		this.elseThen = elseThen;
+	}
+
 	@Override
 	public int valueTag()
 	{

@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.constant.IntValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.StringConcatExpr;
 import dyvil.tools.compiler.ast.reference.ReferenceOperator;
+import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
@@ -15,7 +16,7 @@ import static dyvil.tools.compiler.ast.operator.Operator.INFIX_LEFT;
 public interface Operators
 {
 	Operator DEFAULT = new Operator(null, 100000, INFIX_LEFT);
-	
+
 	static IValue getPrefix(Name name, IValue arg1)
 	{
 		if (name == Names.bang)
@@ -53,7 +54,7 @@ public interface Operators
 	{
 		return getIncOperator(name, arg1, false);
 	}
-	
+
 	static IValue getInfix_Priority(IValue arg1, Name name, IValue arg2)
 	{
 		if (name == Names.eqeq || name == Names.eqeqeq)
@@ -79,9 +80,17 @@ public interface Operators
 				return new NullCheckOperator(arg2, false);
 			}
 		}
+		if (name == Names.qmark)
+		{
+			if (arg1.isType(Types.BOOLEAN) && arg2.valueTag() == IValue.COLON)
+			{
+				final ColonOperator colonOperator = (ColonOperator) arg2;
+				return new IfStatement(arg1, colonOperator.getLeft(), colonOperator.getRight());
+			}
+		}
 		return null;
 	}
-	
+
 	static IValue getInfix(IValue arg1, Name name, IValue arg2)
 	{
 		if (name == Names.plus)
@@ -118,7 +127,7 @@ public interface Operators
 				sbe.addValue(arg2);
 				arg2 = sbe;
 			}
-			
+
 			FieldAccess fa = (FieldAccess) arg1;
 			return new FieldAssignment(null, fa.getInstance(), fa.getField(), arg2);
 		}
