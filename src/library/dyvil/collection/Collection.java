@@ -264,6 +264,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return a collection mapped by the mapping function
 	 */
+	@Override
 	<R> Collection<R> mapped(Function<? super E, ? extends R> mapper);
 	
 	/**
@@ -276,6 +277,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return a collection flat-mapped by the mapping function
 	 */
+	@Override
 	<R> Collection<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper);
 	
 	/**
@@ -287,6 +289,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return a collection filtered by the filter condition predicate
 	 */
+	@Override
 	Collection<E> filtered(Predicate<? super E> condition);
 	
 	// Mutating Operations
@@ -690,7 +693,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 		return false;
 	}
 	
-	static <E> String collectionToString(Collection<E> collection)
+	static <E> String collectionToString(Queryable<E> collection)
 	{
 		if (collection.isEmpty())
 		{
@@ -716,7 +719,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 		return builder.append(']').toString();
 	}
 	
-	static <E> boolean orderedEquals(Collection<E> c1, Collection<E> c2)
+	static <E> boolean orderedEquals(Queryable<E> c1, Queryable<E> c2)
 	{
 		if (c1.size() != c2.size())
 		{
@@ -737,7 +740,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 		return true;
 	}
 	
-	static <E> boolean unorderedEquals(Collection<E> c1, Collection<E> c2)
+	static <E> boolean unorderedEquals(Queryable<E> c1, Queryable<E> c2)
 	{
 		if (c1.size() != c2.size())
 		{
@@ -755,7 +758,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 		return true;
 	}
 
-	static <E> int unorderedHashCode(Collection<E> collection)
+	static <E> int unorderedHashCode(Iterable<E> collection)
 	{
 		int sum = 0;
 		int product = 1;

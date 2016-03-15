@@ -1,5 +1,7 @@
 package dyvil.collection;
 
+import dyvil.collection.impl.MapKeys;
+import dyvil.collection.impl.MapValues;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.ColonConvertible;
 import dyvil.lang.literal.MapConvertible;
@@ -12,10 +14,7 @@ import dyvil.util.Some;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.BiPredicate;
-import java.util.function.Consumer;
+import java.util.function.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -117,28 +116,9 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		return StreamSupport.stream(this.spliterator(), true);
 	}
 	
-	default Iterable<K> keys()
+	default Queryable<K> keys()
 	{
-		return new Iterable<K>()
-		{
-			@Override
-			public Iterator<K> iterator()
-			{
-				return Map.this.keyIterator();
-			}
-			
-			@Override
-			public void forEach(Consumer<? super K> action)
-			{
-				Map.this.forEachKey(action);
-			}
-			
-			@Override
-			public Spliterator<K> spliterator()
-			{
-				return Map.this.keySpliterator();
-			}
-		};
+		return new MapKeys<>(this);
 	}
 	
 	Iterator<K> keyIterator();
@@ -158,28 +138,9 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		return StreamSupport.stream(this.keySpliterator(), true);
 	}
 	
-	default Iterable<V> values()
+	default Queryable<V> values()
 	{
-		return new Iterable<V>()
-		{
-			@Override
-			public Iterator<V> iterator()
-			{
-				return Map.this.valueIterator();
-			}
-			
-			@Override
-			public void forEach(Consumer<? super V> action)
-			{
-				Map.this.forEachValue(action);
-			}
-			
-			@Override
-			public Spliterator<V> spliterator()
-			{
-				return Map.this.valueSpliterator();
-			}
-		};
+		return new MapValues<>(this);
 	}
 	
 	Iterator<V> valueIterator();
@@ -527,16 +488,24 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	Map<K, V> $minus$minus(Map<?, ?> map);
 	
 	Map<K, V> $minus$minus(Collection<?> keys);
-	
+
+	<NK> Map<NK, V> keyMapped(Function<? super K, ? extends NK> mapper);
+
 	<NK> Map<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper);
+
+	<NV> Map<K, NV> valueMapped(Function<? super V, ? extends NV> mapper);
 	
 	<NV> Map<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper);
 	
 	<NK, NV> Map<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper);
 	
 	<NK, NV> Map<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper);
-	
+
 	Map<K, V> filtered(BiPredicate<? super K, ? super V> condition);
+
+	Map<K, V> filteredByKey(Predicate<? super K> condition);
+
+	Map<K, V> filteredByValue(Predicate<? super V> condition);
 	
 	Map<V, K> inverted();
 	
@@ -644,17 +613,25 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	boolean removeKeys(Collection<?> keys);
 	
 	boolean removeAll(Map<?, ?> map);
+
+	void mapKeys(Function<? super K, ? extends K> mapper);
 	
 	void mapKeys(BiFunction<? super K, ? super V, ? extends K> mapper);
+
+	void mapValues(Function<? super V, ? extends V> mapper);
 	
 	void mapValues(BiFunction<? super K, ? super V, ? extends V> mapper);
 	
 	void mapEntries(BiFunction<? super K, ? super V, ? extends Entry<? extends K, ? extends V>> mapper);
-	
+
 	void flatMap(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends K, ? extends V>>> mapper);
-	
+
 	void filter(BiPredicate<? super K, ? super V> condition);
-	
+
+	void filterByKey(Predicate<? super K> condition);
+
+	void filterByValue(Predicate<? super V> condition);
+
 	// Arrays
 	
 	default Entry<K, V>[] toArray()

@@ -17,6 +17,8 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 @NilConvertible
 @ArrayConvertible
@@ -167,10 +169,22 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 	
 	@Override
 	ImmutableMap<K, V> $minus$minus(Collection<?> keys);
-	
+
+	@Override
+	default <NK> ImmutableMap<NK, V> keyMapped(Function<? super K, ? extends NK> mapper)
+	{
+		return this.keyMapped((k, v) -> mapper.apply(k));
+	}
+
 	@Override
 	<NK> ImmutableMap<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper);
-	
+
+	@Override
+	default <NV> Map<K, NV> valueMapped(Function<? super V, ? extends NV> mapper)
+	{
+		return this.valueMapped((k, v) -> mapper.apply(v));
+	}
+
 	@Override
 	<NV> ImmutableMap<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper);
 	
@@ -182,7 +196,19 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 	
 	@Override
 	ImmutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition);
-	
+
+	@Override
+	default ImmutableMap<K, V> filteredByKey(Predicate<? super K> condition)
+	{
+		return this.filtered(((k, v) -> condition.test(k)));
+	}
+
+	@Override
+	default ImmutableMap<K, V> filteredByValue(Predicate<? super V> condition)
+	{
+		return this.filtered(((k, v) -> condition.test(v)));
+	}
+
 	@Override
 	ImmutableMap<V, K> inverted();
 	
@@ -348,14 +374,28 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 	{
 		throw new ImmutableException("removeAll() on Immutable Map");
 	}
-	
+
+	@Override
+	@Mutating
+	default void mapKeys(Function<? super K, ? extends K> mapper)
+	{
+		throw new ImmutableException("mapKeys() on Immutable Map");
+	}
+
 	@Override
 	@Mutating
 	default void mapKeys(BiFunction<? super K, ? super V, ? extends K> mapper)
 	{
 		throw new ImmutableException("mapKeys() on Immutable Map");
 	}
-	
+
+	@Override
+	@Mutating
+	default void mapValues(Function<? super V, ? extends V> mapper)
+	{
+		throw new ImmutableException("mapValues() on Immutable Map");
+	}
+
 	@Override
 	@Mutating
 	default void mapValues(BiFunction<? super K, ? super V, ? extends V> mapper)
@@ -383,7 +423,21 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 	{
 		throw new ImmutableException("filter() on Immutable Map");
 	}
-	
+
+	@Override
+	@Mutating
+	default void filterByKey(Predicate<? super K> condition)
+	{
+		throw new ImmutableException("filterByKey() on Immutable Map");
+	}
+
+	@Override
+	@Mutating
+	default void filterByValue(Predicate<? super V> condition)
+	{
+		throw new ImmutableException("filterByValue() on Immutable Map");
+	}
+
 	// Copying
 	
 	@Override
