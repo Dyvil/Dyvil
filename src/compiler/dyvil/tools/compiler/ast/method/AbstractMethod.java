@@ -669,7 +669,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			if (mod == Modifiers.INFIX && receiver.valueTag() != IValue.CLASS_ACCESS)
 			{
 				final IParameter parameter = this.parameters[0];
-				final IType paramType = parameter.getInternalType().getParameterType();
+				final IType paramType = parameter.getInternalParameterType();
 
 				receiver = TypeChecker.convertValue(receiver, paramType, typeContext, markers, context,
 				                                    TypeChecker.markerSupplier("method.access.infix_type"));

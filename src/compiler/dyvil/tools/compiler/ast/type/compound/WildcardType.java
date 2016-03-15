@@ -111,7 +111,7 @@ public final class WildcardType implements IRawType, ITyped
 		{
 			return Types.ANY;
 		}
-		return this.bound;
+		return this.bound.getParameterType();
 	}
 	
 	@Override

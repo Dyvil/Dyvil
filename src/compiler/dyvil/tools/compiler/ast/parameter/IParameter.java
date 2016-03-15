@@ -17,6 +17,8 @@ public interface IParameter extends IVariable, IClassMember
 	default void setEnclosingClass(IClass enclosingClass)
 	{
 	}
+
+	IType getInternalParameterType();
 	
 	@Override
 	default IClass getEnclosingClass()
@@ -65,5 +67,6 @@ public interface IParameter extends IVariable, IClassMember
 		return new AnnotationReader(this, annotation);
 	}
 	
+	@Override
 	void writeInit(MethodWriter mw);
 }

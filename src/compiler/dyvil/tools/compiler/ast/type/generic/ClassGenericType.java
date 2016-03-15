@@ -73,49 +73,19 @@ public class ClassGenericType extends GenericType
 	@Override
 	public IType getParameterType()
 	{
-		if (!this.hasTypeVariables())
-		{
-			return this;
-		}
-
-		final IType[] types = new IType[this.typeArgumentCount];
-		for (int i = 0; i < this.typeArgumentCount; i++)
-		{
-			types[i] = this.typeArguments[i].getParameterType();
-		}
-		return new ClassGenericType(this.theClass, types, this.typeArgumentCount);
+		return this;
 	}
 
 	@Override
 	public boolean isSameType(IType type)
 	{
-		if (this == type)
-		{
-			return true;
-		}
-
-		if (!super.isSameType(type))
-		{
-			return false;
-		}
-
-		return this.argumentsMatch(type);
+		return this == type || super.isSameType(type) && this.argumentsMatch(type);
 	}
 
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
-		if (this == type)
-		{
-			return true;
-		}
-
-		if (!super.isSuperTypeOf(type))
-		{
-			return false;
-		}
-
-		return !type.isGenericType() || this.argumentsMatch(type);
+		return this == type || super.isSuperTypeOf(type) && (!type.isGenericType() || this.argumentsMatch(type));
 	}
 
 	protected boolean argumentsMatch(IType type)
@@ -151,7 +121,7 @@ public class ClassGenericType extends GenericType
 	{
 		int index = typeParameter.getIndex();
 
-		if (this.theClass.getTypeParameter(index) != typeParameter)
+		if (typeParameter.getGeneric() != this.theClass)
 		{
 			return this.theClass.resolveType(typeParameter, this);
 		}

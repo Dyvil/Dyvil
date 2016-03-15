@@ -30,10 +30,10 @@ public class LambdaTest
 	
 	private static void basicTest()
 	{
-		var expected = [ 1 : "A", 10 : "a", 2 : "B", 20 : "b" ]
-		var map = [ 1 : "a", 2 : "b" ].flatMapped((i, s) => [ (i, s.toUpperCase), (i * 10, s) ])
+		var expected = [ 1 : "A" ]
+		var actual = expected.flatMapped((i, s) => [ (i, s) ])
 
-		Main.test("Basic Lambda", map, expected)
+		Main.test("Basic Lambda", expected, actual)
 	}
 	
 	private static void chainTest()

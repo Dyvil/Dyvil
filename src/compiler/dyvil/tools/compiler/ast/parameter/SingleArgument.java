@@ -156,7 +156,7 @@ public final class SingleArgument implements IArguments, IValueConsumer
 			return;
 		}
 		
-		IType type = param.getInternalType().getParameterType();
+		IType type = param.getInternalParameterType();
 		this.value = TypeChecker.convertValue(this.value, type, typeContext, markers, context,
 		                                      IArguments.argumentMarkerSupplier(param));
 	}
@@ -169,7 +169,7 @@ public final class SingleArgument implements IArguments, IValueConsumer
 			return;
 		}
 		
-		final IType arrayType = param.getInternalType().getParameterType();
+		final IType arrayType = param.getInternalParameterType();
 		if (this.value.isType(arrayType.getConcreteType(typeContext)))
 		{
 			this.value = TypeChecker.convertValue(this.value, arrayType, typeContext, markers, context,

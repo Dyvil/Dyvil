@@ -234,7 +234,7 @@ public final class ArgumentList implements IArguments, IValueList
 			return;
 		}
 		
-		final IType type = param.getInternalType().getParameterType();
+		final IType type = param.getInternalParameterType();
 
 		this.values[index] = TypeChecker.convertValue(this.values[index], type, typeContext, markers, context,
 		                                              IArguments.argumentMarkerSupplier(param));
@@ -248,7 +248,7 @@ public final class ArgumentList implements IArguments, IValueList
 			return;
 		}
 		
-		final IType arrayType = param.getInternalType().getParameterType();
+		final IType arrayType = param.getInternalParameterType();
 		
 		final IValue value = this.values[index];
 		if (value.isType(arrayType))

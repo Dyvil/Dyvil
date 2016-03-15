@@ -187,7 +187,7 @@ public final class ArgumentMap implements IArguments, IValueMap
 				continue;
 			}
 			
-			final IType type = param.getInternalType().getParameterType();
+			final IType type = param.getInternalParameterType();
 			this.values[i] = TypeChecker.convertValue(this.values[i], type, typeContext, markers, context,
 			                                          IArguments.argumentMarkerSupplier(param));
 			return;

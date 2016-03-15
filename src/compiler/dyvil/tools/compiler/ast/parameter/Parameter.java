@@ -39,6 +39,7 @@ public abstract class Parameter extends Member implements IParameter
 	protected int     index;
 	protected int     localIndex;
 	protected boolean varargs;
+	protected IType   internalType;
 
 	public Parameter()
 	{
@@ -78,6 +79,17 @@ public abstract class Parameter extends Member implements IParameter
 		}
 
 		return this.modifiers;
+	}
+
+	@Override
+	public IType getInternalParameterType()
+	{
+		if (this.internalType != null)
+		{
+			return this.internalType;
+		}
+
+		return this.internalType = this.getInternalType().getParameterType();
 	}
 
 	@Override
@@ -245,6 +257,8 @@ public abstract class Parameter extends Member implements IParameter
 			markers.add(Markers.semantic(this.position, this.getKind().getName() + ".type.infer", this.name));
 			this.type = Types.ANY;
 		}
+
+		this.internalType = null;
 	}
 
 	@Override
