@@ -12,20 +12,20 @@ import dyvil.tools.parsing.token.IToken;
 
 public class IfStatementParser extends Parser implements IValueConsumer
 {
-	private static final   int END           = -1;
 	protected static final int IF            = 0;
-	protected static final int CONDITION_END = 1;
-	protected static final int THEN          = 2;
-	protected static final int ELSE          = 4;
-	
+	protected static final int CONDITION     = 1;
+	protected static final int CONDITION_END = 2;
+	protected static final int THEN          = 4;
+	protected static final int ELSE          = 8;
+
 	protected IfStatement statement;
-	
+
 	public IfStatementParser(IfStatement statement)
 	{
 		this.statement = statement;
-		this.mode = IF;
+		this.mode = CONDITION;
 	}
-	
+
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
@@ -36,6 +36,14 @@ public class IfStatementParser extends Parser implements IValueConsumer
 			pm.popParser(true);
 			return;
 		case IF:
+			this.mode = CONDITION;
+			if (type != DyvilKeywords.IF)
+			{
+				pm.reparse();
+				pm.report(token, "if.if");
+			}
+			return;
+		case CONDITION:
 			this.mode = CONDITION_END;
 			pm.pushParser(pm.newExpressionParser(this));
 			if (type != BaseSymbols.OPEN_PARENTHESIS)
@@ -72,19 +80,19 @@ public class IfStatementParser extends Parser implements IValueConsumer
 				pm.popParser(true);
 				return;
 			}
-			
+
 			if (type == DyvilKeywords.ELSE)
 			{
 				pm.pushParser(pm.newExpressionParser(this));
 				this.mode = END;
 				return;
 			}
-			
+
 			pm.popParser(true);
 			return;
 		}
 	}
-	
+
 	@Override
 	public void setValue(IValue value)
 	{
@@ -96,7 +104,7 @@ public class IfStatementParser extends Parser implements IValueConsumer
 		case ELSE:
 			this.statement.setThen(value);
 			return;
-		case -1:
+		case END:
 			this.statement.setElse(value);
 			return;
 		}
