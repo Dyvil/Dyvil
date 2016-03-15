@@ -111,7 +111,7 @@ public class ColonOperator implements IValue
 					       .withType(type, typeContext, markers, context);
 		}
 
-		if (!type.isSuperTypeOf(this.getType()))
+		if (!type.isSuperClassOf(TupleType.getTupleClass(2).getClassType()))
 		{
 			return null;
 		}

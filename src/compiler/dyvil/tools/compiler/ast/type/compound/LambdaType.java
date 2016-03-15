@@ -205,20 +205,20 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	@Override
 	public IType getParameterType()
 	{
-		if (this.hasTypeVariables())
+		if (!this.hasTypeVariables())
 		{
-			final IType[] parameterTypes = new IType[this.parameterCount];
-			for (int i = 0; i < this.parameterCount; i++)
-			{
-				parameterTypes[i] = this.parameterTypes[i].getParameterType();
-			}
-			final IType returnType = this.returnType.getParameterType();
-			final LambdaType lambdaType = new LambdaType(parameterTypes, this.parameterCount, returnType);
-			lambdaType.setExtension(this.extension);
-			return lambdaType;
+			return this;
 		}
 
-		return this;
+		final IType[] parameterTypes = new IType[this.parameterCount];
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			parameterTypes[i] = this.parameterTypes[i].getParameterType();
+		}
+		final IType returnType = this.returnType.getParameterType();
+		final LambdaType lambdaType = new LambdaType(parameterTypes, this.parameterCount, returnType);
+		lambdaType.setExtension(this.extension);
+		return lambdaType;
 	}
 
 	@Override
@@ -584,8 +584,9 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		int index = typePath.getStepArgument(step);
 		if (index < this.parameterCount)
 		{
-			this.parameterTypes[index] = IType.withAnnotation(this.parameterTypes[index], annotation, typePath,
-			                                                  step + 1, steps);
+			this.parameterTypes[index] = IType
+				                             .withAnnotation(this.parameterTypes[index], annotation, typePath, step + 1,
+				                                             steps);
 			return;
 		}
 		this.returnType = IType.withAnnotation(this.returnType, annotation, typePath, step + 1, steps);
@@ -648,7 +649,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		if (this.parameterCount == 1 && this.parameterTypes[0].typeTag() != TUPLE && !Formatting.getBoolean(
-				"lambda.single.wrap"))
+			"lambda.single.wrap"))
 		{
 			this.parameterTypes[0].toString(prefix, buffer);
 
