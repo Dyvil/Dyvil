@@ -7,12 +7,12 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.dynamic.DynamicType;
-import dyvil.tools.compiler.ast.generic.CombiningTypeContext;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
+import dyvil.tools.compiler.ast.type.compound.UnionType;
 import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.ast.type.raw.InternalType;
@@ -23,7 +23,7 @@ import dyvil.tools.parsing.Name;
 public final class Types
 {
 	public static IDyvilHeader LANG_HEADER;
-	
+
 	public static final PrimitiveType VOID    = new PrimitiveType(Names._void, PrimitiveType.VOID_CODE, 'V',
 	                                                              Opcodes.ILOAD + Opcodes.RETURN - Opcodes.IRETURN,
 	                                                              Opcodes.IALOAD, null);
@@ -48,15 +48,15 @@ public final class Types
 	public static final UnknownType UNKNOWN = new UnknownType();
 	public static final NullType    NULL    = new NullType();
 	public static final AnyType     ANY     = new AnyType();
-	
-	public static final ClassType OBJECT            = new ClassType();
-	public static final ClassType STRING            = new ClassType();
+
+	public static final ClassType OBJECT = new ClassType();
+	public static final ClassType STRING = new ClassType();
 
 	public static final ClassType THROWABLE         = new ClassType();
 	public static final ClassType EXCEPTION         = new ClassType();
 	public static final ClassType RUNTIME_EXCEPTION = new ClassType();
 	public static final ClassType SERIALIZABLE      = new ClassType();
-	
+
 	public static IClass VOID_CLASS;
 	public static IClass BOOLEAN_CLASS;
 	public static IClass BYTE_CLASS;
@@ -68,7 +68,7 @@ public final class Types
 	public static IClass DOUBLE_CLASS;
 
 	public static IClass PRIMITIVES_CLASS;
-	
+
 	public static IClass OBJECT_CLASS;
 	public static IClass STRING_CLASS;
 	public static IClass NULL_CLASS;
@@ -92,16 +92,16 @@ public final class Types
 	public static IClass FLOAT_CONVERTIBLE_CLASS;
 	public static IClass DOUBLE_CONVERTIBLE_CLASS;
 	public static IClass STRING_CONVERTIBLE_CLASS;
-	
+
 	private static IClass OBJECT_ARRAY_CLASS;
 	private static IClass OBJECT_SIMPLE_REF_CLASS;
 	private static IClass OBJECT_REF_CLASS;
-	
+
 	public static void initHeaders()
 	{
 		LANG_HEADER = Package.dyvil.resolveHeader("Lang");
 	}
-	
+
 	public static void initTypes()
 	{
 		VOID.theClass = VOID_CLASS = Package.dyvilLang.resolveClass("Void");
@@ -138,7 +138,7 @@ public final class Types
 		FLOAT_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("FloatConvertible");
 		DOUBLE_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("DoubleConvertible");
 		STRING_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("StringConvertible");
-		
+
 		final IClassBody primitivesBody = PRIMITIVES_CLASS.getBody();
 
 		VOID.boxMethod = primitivesBody.getMethod(Name.getQualified("Void"));
@@ -160,7 +160,7 @@ public final class Types
 		DOUBLE.boxMethod = primitivesBody.getMethod(Name.getQualified("Double"));
 		DOUBLE.unboxMethod = primitivesBody.getMethod(Name.getQualified("toDouble"));
 	}
-	
+
 	public static IType fromASMType(dyvil.tools.asm.Type type)
 	{
 		switch (type.getSort())
@@ -190,7 +190,7 @@ public final class Types
 		}
 		return null;
 	}
-	
+
 	public static IClass getObjectArray()
 	{
 		if (OBJECT_ARRAY_CLASS == null)
@@ -208,7 +208,7 @@ public final class Types
 		}
 		return OBJECT_REF_CLASS;
 	}
-	
+
 	public static ReferenceType getObjectRef(IType type)
 	{
 		return new ReferenceType(getObjectRefClass(), type);
@@ -222,7 +222,7 @@ public final class Types
 		}
 		return OBJECT_SIMPLE_REF_CLASS;
 	}
-	
+
 	public static IType getObjectSimpleRef(IType type)
 	{
 		ClassGenericType gt = new ClassGenericType(getObjectSimpleRefClass());
@@ -240,137 +240,69 @@ public final class Types
 		return "new" + prefix + type.getTypePrefix() + "Ref";
 	}
 
-	private static IType arrayElementCombine(IType type1, IType type2)
-	{
-		if (type1.getTypecode() != type2.getTypecode())
-		{
-			return Types.ANY;
-		}
-		return new ArrayType(combine(type1, type2));
-	}
-
 	public static IType combine(IType type1, IType type2)
 	{
-		if (type1 == Types.VOID || type2 == Types.VOID)
-		{
-			// either type is void -> result void
-			return Types.VOID;
-		}
-		if (type1.isArrayType())
-		{
-			if (!type2.isArrayType())
-			{
-				return Types.ANY;
-			}
-			return arrayElementCombine(type1.getElementType(), type2.getElementType());
-		}
-		if (type2.isArrayType())
-		{
-			if (!type1.isArrayType())
-			{
-				return Types.ANY;
-			}
-			return arrayElementCombine(type1.getElementType(), type2.getElementType());
-		}
+		return UnionType.combine(type1, type2, null);
+	}
 
-		IClass class1 = type1.getTheClass();
-		if (class1 == null)
-		{
-			// type 1 unresolved -> result type 2
-			return type2;
-		}
-		if (class1 == Types.NULL_CLASS)
-		{
-			// type 1 is null -> result reference type 2
-			return type2.getObjectType();
-		}
-		if (class1 == Types.OBJECT_CLASS)
-		{
-			// type 1 is Object -> result Object
-			return Types.ANY;
-		}
+	public static Set<IClass> commonClasses(IType type1, IType type2)
+	{
+		final Set<IClass> superTypes1 = superClasses(type1);
+		final Set<IClass> superTypes2 = superClasses(type2);
+		superTypes1.intersect(superTypes2);
+		return superTypes1;
+	}
 
-		final IClass class2 = type2.getTheClass();
-		if (class2 == null)
-		{
-			// type 2 unresolved -> result type 1
-			return type1;
-		}
-		if (class2 == Types.NULL_CLASS)
-		{
-			// type 2 is Object or null -> result reference type 1
-			return type1.getObjectType();
-		}
-		if (class2 == Types.OBJECT_CLASS)
-		{
-			// type 2 is Object -> result Object
-			return Types.ANY;
-		}
+	public static IClass commonClass(IType type1, IType type2)
+	{
+		final Set<IClass> superTypes1 = superClasses(type1);
+		final Set<IClass> superTypes2 = superClasses(type2);
 
-		if (type1.isSameType(type2) || type1.isSuperTypeOf(type2))
+		for (IClass superClass1 : superTypes1)
 		{
-			// same type, or type 1 is a super type of type 2 -> result type 1
-			return type1;
-		}
-		if (type2.isSuperTypeOf(type1))
-		{
-			// type 2 is a super type of type 1 -> result type 2
-			return type2;
-		}
-		if (class1 == class2)
-		{
-			return class1.getType().getConcreteType(new CombiningTypeContext(type1, type2));
-		}
-
-		final Set<IType> superTypes1 = superTypes(type1);
-		final Set<IType> superTypes2 = superTypes(type2);
-		
-		for (IType t1 : superTypes1)
-		{
-			class1 = t1.getTheClass();
-			if (class1 == Types.OBJECT_CLASS)
+			if (superClass1 == Types.OBJECT_CLASS)
 			{
 				continue;
 			}
-			
-			for (IType t2 : superTypes2)
+
+			for (IClass superClass2 : superTypes2)
 			{
-				if (class1 == t2.getTheClass())
+				if (superClass1 == superClass2)
 				{
-					return class1.getType().getConcreteType(new CombiningTypeContext(type1, type2));
+					return superClass1;
 				}
 			}
 		}
-		
-		return Types.ANY;
+
+		return Types.OBJECT_CLASS;
 	}
-	
-	private static Set<IType> superTypes(IType type)
+
+	private static Set<IClass> superClasses(IType type)
 	{
-		Set<IType> types = new IdentityHashSet<>();
-		addSuperTypes(type, types);
+		Set<IClass> types = new IdentityHashSet<>();
+		addSuperClasses(type, types);
 		return types;
 	}
-	
-	private static void addSuperTypes(IType type, Collection<IType> types)
-	{
-		types.add(type);
 
+	private static void addSuperClasses(IType type, Collection<IClass> types)
+	{
 		final IClass theClass = type.getTheClass();
 		if (theClass == null)
 		{
 			return;
 		}
 
+		types.add(theClass);
+
 		final IType superType = theClass.getSuperType();
 		if (superType != null)
 		{
-			addSuperTypes(superType, types);
+			addSuperClasses(superType, types);
 		}
 
 		for (int i = 0, count = theClass.interfaceCount(); i < count; i++)
 		{
-			addSuperTypes(theClass.getInterface(i), types);
+			addSuperClasses(theClass.getInterface(i), types);
 		}
 	}
 

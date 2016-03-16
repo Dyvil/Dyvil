@@ -100,6 +100,9 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	int OPTIONAL  = 48;
 	int REFERENCE = 50;
 
+	int UNION        = 51;
+	int INTERSECTION = 52;
+
 	// Type Variable Types
 	int TYPE_VAR_TYPE     = 64;
 	int INTERNAL_TYPE_VAR = 65;

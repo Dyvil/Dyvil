@@ -379,7 +379,7 @@ public final class PrimitiveType implements IType
 	@Override
 	public IType resolveType(ITypeParameter typeParameter)
 	{
-		return null;
+		return this.theClass.resolveType(typeParameter, this);
 	}
 	
 	@Override
