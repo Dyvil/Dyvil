@@ -102,6 +102,11 @@ public class REPLVariable extends Field
 
 	protected void updateValue(DyvilREPL repl)
 	{
+		if (this.theClass == null)
+		{
+			return;
+		}
+
 		try
 		{
 			if (this.type == Types.VOID)
