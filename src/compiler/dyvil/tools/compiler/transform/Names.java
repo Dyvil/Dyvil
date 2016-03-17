@@ -20,6 +20,7 @@ public final class Names
 	public static final Name equals         = Name.getQualified("equals");
 	public static final Name hashCode       = Name.getQualified("hashCode");
 	public static final Name toString       = Name.getQualified("toString");
+	public static final Name $0             = Name.getQualified("$0");
 
 	public static final Name writeReplace = Name.getQualified("writeReplace");
 	public static final Name readResolve  = Name.getQualified("readResolve");

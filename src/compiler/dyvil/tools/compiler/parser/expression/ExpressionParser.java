@@ -54,7 +54,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 	protected static final int ANONYMOUS_CLASS_END        = 0x80;
 	protected static final int SUBSCRIPT_END              = 0x100;
 	protected static final int TYPE_ARGUMENTS_END         = 0x200;
-	
+
 	protected static final int PARAMETRIC_THIS_END  = 0x400;
 	protected static final int PARAMETRIC_SUPER_END = 0x800;
 
@@ -62,20 +62,20 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 	public static final int EXPLICIT_DOT = 1;
 	public static final int IGNORE_COLON = 2;
-	
+
 	protected IValueConsumer valueConsumer;
-	
+
 	private IValue value;
-	
-	private int flags;
+
+	private int      flags;
 	private Operator operator;
-	
+
 	public ExpressionParser(IValueConsumer valueConsumer)
 	{
 		this.mode = VALUE;
 		this.valueConsumer = valueConsumer;
 	}
-	
+
 	public ExpressionParser withOperator(Operator operator)
 	{
 		this.operator = operator;
@@ -126,7 +126,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			this.end(pm);
 			return;
 		}
-		
+
 		switch (this.mode)
 		{
 		case END:
@@ -240,7 +240,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				// keyword ...
 				return;
 			}
-			
+
 			this.mode = ACCESS;
 			// Leave the big switch and jump right over to the ACCESS
 			// section
@@ -250,39 +250,39 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			//               ^
 			this.value.expandPosition(token);
 			this.mode = ACCESS;
-			
+
 			if (type != BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
 				pm.reparse();
 				pm.report(token, "class.anonymous.body.end");
 			}
-			
+
 			return;
 		case PARAMETERS_END:
 			// ... ( ... )
 			//           ^
 			this.mode = ACCESS;
 			this.value.expandPosition(token);
-			
+
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();
 				pm.report(token, "method.call.close_paren");
 			}
-			
+
 			return;
 		case SUBSCRIPT_END:
 			// ... [ ... ]
 			//           ^
 			this.mode = ACCESS;
 			this.value.expandPosition(token);
-			
+
 			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{
 				pm.reparse();
 				pm.report(token, "method.subscript.close_bracket");
 			}
-			
+
 			return;
 		case CONSTRUCTOR_PARAMETERS:
 		{
@@ -317,7 +317,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				pm.reparse();
 				return;
 			}
-			
+
 			final SingleArgument argument = new SingleArgument();
 			call.setArguments(argument);
 
@@ -354,13 +354,13 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			{
 				pm.report(token, "method.call.generic.close_bracket");
 			}
-			
+
 			final MethodCall mc = (MethodCall) this.value;
 			final GenericData genericData = mc.getGenericData();
-			
+
 			final IToken next = token.next();
 			final int nextType = next.type();
-			
+
 			if (nextType == BaseSymbols.OPEN_PARENTHESIS)
 			{
 				// ... .[ ... ] ( ...
@@ -369,7 +369,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				IArguments arguments = parseArguments(pm, next.next());
 				ApplyMethodCall amc = new ApplyMethodCall(mc.getPosition(), mc.getReceiver(), arguments);
 				amc.setGenericData(genericData);
-				
+
 				this.value = amc;
 				this.mode = PARAMETERS_END;
 				return;
@@ -380,7 +380,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				pm.skip();
 				this.value = mc.getReceiver();
 				this.parseIdentifierAccess(pm, token.next(), token.next().nameValue(), null);
-				
+
 				if (this.value instanceof AbstractCall)
 				{
 					((AbstractCall) this.value).setGenericData(genericData);
@@ -410,10 +410,10 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			final ApplyMethodCall applyCall = new ApplyMethodCall(mc.getPosition(), mc.getReceiver(), argument);
 			applyCall.setGenericData(genericData);
 			this.value = applyCall;
-			
+
 			this.parseApply(pm, next, argument, Operators.DEFAULT);
 			this.mode = ACCESS;
-			
+
 			return;
 		}
 		case PARAMETRIC_THIS_END:
@@ -437,7 +437,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			}
 			return;
 		}
-		
+
 		if (ParserUtil.isCloseBracket(type) || type == BaseSymbols.COLON && this.hasFlag(IGNORE_COLON))
 		{
 			// ... ]
@@ -450,7 +450,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			pm.popParser(true);
 			return;
 		}
-		
+
 		if (this.mode == ACCESS)
 		{
 			if (type == BaseSymbols.DOT)
@@ -461,9 +461,9 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				this.addFlag(EXPLICIT_DOT);
 				return;
 			}
-			
+
 			this.removeFlag(EXPLICIT_DOT);
-			
+
 			switch (type)
 			{
 			case DyvilKeywords.ELSE:
@@ -530,14 +530,14 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				this.mode = END;
 				return;
 			}
-			
+
 			if (ParserUtil.isIdentifier(type))
 			{
 				// EXPRESSION IDENTIFIER
 				this.parseAccess(pm, token);
 				return;
 			}
-			
+
 			if (this.value != null)
 			{
 				// EXPRESSION EXPRESSION -> ... ( EXPRESSION )
@@ -547,7 +547,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 					this.end(pm);
 					return;
 				}
-				
+
 				final SingleArgument argument = new SingleArgument();
 				final ApplyMethodCall applyCall = new ApplyMethodCall(this.value.getPosition(), this.value, argument);
 
@@ -559,7 +559,16 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		}
 		if (this.mode == DOT_ACCESS)
 		{
-			// ... .
+			// EXPRESSION .
+
+			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
+			{
+				final BraceAccessExpr braceAccessExpr = new BraceAccessExpr(token.raw(), this.value);
+				pm.pushParser(new StatementListParser(braceAccessExpr::setStatement), true);
+				this.value = braceAccessExpr;
+				this.mode = ACCESS;
+				return;
+			}
 
 			if (ParserUtil.isIdentifier(type))
 			{
@@ -581,18 +590,18 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			pm.report(Markers.syntaxError(token, "expression.dot.invalid", token.toString()));
 			return;
 		}
-		
+
 		pm.report(Markers.syntaxError(token, "expression.invalid", token.toString()));
 		return;
 	}
-	
+
 	/**
 	 * Creates the body and initializes parsing for anonymous classes.
 	 *
 	 * @param pm
-	 * 		the current parsing context manager.
+	 * 	the current parsing context manager.
 	 * @param classConstructor
-	 * 		the anonymous class AST node.
+	 * 	the anonymous class AST node.
 	 */
 	private void parseBody(IParserManager pm, ClassConstructor classConstructor)
 	{
@@ -604,7 +613,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		this.value = classConstructor;
 		return;
 	}
-	
+
 	/**
 	 * Parses an argument list and creates the appropriate AST representation. The following instances can be created by
 	 * this method:
@@ -614,9 +623,9 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 	 * ArgumentMap} - For named argument lists / maps:<br> <code> this.call(index: 1, string: "abc") </code> </ul>
 	 *
 	 * @param pm
-	 * 		the current parsing context manager.
+	 * 	the current parsing context manager.
 	 * @param next
-	 * 		the next token. The current token is assumed to be the opening parenthesis of the argument list.
+	 * 	the next token. The current token is assumed to be the opening parenthesis of the argument list.
 	 *
 	 * @return the appropriate AST representation for the type of argument list.
 	 */
@@ -634,7 +643,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			pm.pushParser(new ExpressionMapParser(map));
 			return map;
 		}
-		
+
 		final ArgumentList list = new ArgumentList();
 		pm.pushParser(new ExpressionListParser(list));
 		return list;
@@ -645,18 +654,18 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		final Name name = token.nameValue();
 		this.parseAccess(pm, token, name, pm.getOperator(name));
 	}
-	
+
 	/**
 	 * Checks for operator precedence and associativity, and POPs if necessary.
 	 *
 	 * @param pm
-	 * 		the current parsing context manager.
+	 * 	the current parsing context manager.
 	 * @param token
-	 * 		the current token, has to be any {@code IDENTIFIER} token.
+	 * 	the current token, has to be any {@code IDENTIFIER} token.
 	 * @param name
-	 * 		the {@code nameValue} of the {@code token}.
+	 * 	the {@code nameValue} of the {@code token}.
 	 * @param operator
-	 * 		the operator corresponding to the {@code name}, or {@code null}
+	 * 	the operator corresponding to the {@code name}, or {@code null}
 	 */
 	private void parseAccess(IParserManager pm, IToken token, Name name, Operator operator)
 	{
@@ -706,13 +715,13 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 	 * Parses an ACCESS sequence.
 	 *
 	 * @param pm
-	 * 		the current parsing context manager.
+	 * 	the current parsing context manager.
 	 * @param token
-	 * 		the current token, has to be any {@code IDENTIFIER} token.
+	 * 	the current token, has to be any {@code IDENTIFIER} token.
 	 * @param name
-	 * 		the {@code nameValue} of the {@code token}.
+	 * 	the {@code nameValue} of the {@code token}.
 	 * @param operator
-	 * 		the operator corresponding to the {@code name}, or {@code null}
+	 * 	the operator corresponding to the {@code name}, or {@code null}
 	 */
 	private void parseIdentifierAccess(IParserManager pm, IToken token, Name name, Operator operator)
 	{
@@ -875,13 +884,13 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 	 * </pre>
 	 *
 	 * @param pm
-	 * 		the current parsing context manager
+	 * 	the current parsing context manager
 	 * @param token
-	 * 		the first token of the expression that is a parameter to the APPLY method
+	 * 	the first token of the expression that is a parameter to the APPLY method
 	 * @param argument
-	 * 		the argument container
+	 * 	the argument container
 	 * @param operator
-	 * 		the operator that precedes this call. Can be null.
+	 * 	the operator that precedes this call. Can be null.
 	 */
 	private void parseApply(IParserManager pm, IToken token, SingleArgument argument, Operator operator)
 	{
@@ -892,17 +901,17 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			pm.pushParser(statementListParser);
 			return;
 		}
-		
+
 		pm.pushParser(pm.newExpressionParser(argument).withOperator(operator));
 	}
-	
+
 	/**
 	 * Parses an assignment based on the current {@code value}.
 	 *
 	 * @param pm
-	 * 		the current parsing context manager
+	 * 	the current parsing context manager
 	 * @param token
-	 * 		the current token, i.e. the '=' sign
+	 * 	the current token, i.e. the '=' sign
 	 */
 	private void parseAssignment(IParserManager pm, IToken token)
 	{
@@ -969,7 +978,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		this.value = null;
 		return;
 	}
-	
+
 	private boolean parseKeyword(IParserManager pm, IToken token, int type)
 	{
 		switch (type)
@@ -1250,11 +1259,11 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 	 * Parses a {@code this} or {@code super} initializer.
 	 *
 	 * @param pm
-	 * 		the current parsing context manager
+	 * 	the current parsing context manager
 	 * @param next
-	 * 		the token after the {@code this} or {@code super} token. Usually a {@code DOT .}.
+	 * 	the token after the {@code this} or {@code super} token. Usually a {@code DOT .}.
 	 * @param isSuper
-	 * 		{@code true} if the previous token was {@code super}, {@code false} for {@code this}.
+	 * 	{@code true} if the previous token was {@code super}, {@code false} for {@code this}.
 	 *
 	 * @return {@code true}, iff an initializer could be parsed successfully
 	 */
@@ -1271,7 +1280,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		}
 		return false;
 	}
-	
+
 	@Override
 	public void setValue(IValue value)
 	{
