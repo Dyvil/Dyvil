@@ -282,8 +282,9 @@ class MethodWriter implements MethodVisitor
 	}
 	
 	@Override
-	public void visitCode()
+	public boolean visitCode()
 	{
+		return true;
 	}
 	
 	@Override

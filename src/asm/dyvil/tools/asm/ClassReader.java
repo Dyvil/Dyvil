@@ -879,9 +879,8 @@ public class ClassReader
 		}
 		
 		// visits the method code
-		if (code != 0)
+		if (code != 0 && mv.visitCode())
 		{
-			mv.visitCode();
 			this.readCode(mv, context, code);
 		}
 		

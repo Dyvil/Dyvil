@@ -35,7 +35,7 @@ public interface MethodVisitor extends AnnotatableVisitor, TypeAnnotatableVisito
 	
 	void visitAttribute(Attribute attr);
 	
-	void visitCode();
+	boolean visitCode();
 	
 	void visitFrame(int type, int nLocal, Object[] local, int nStack, Object[] stack);
 	

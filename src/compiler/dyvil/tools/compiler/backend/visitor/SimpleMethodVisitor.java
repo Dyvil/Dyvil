@@ -96,8 +96,9 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	}
 	
 	@Override
-	public void visitCode()
+	public boolean visitCode()
 	{
+		return true;
 	}
 	
 	@Override
