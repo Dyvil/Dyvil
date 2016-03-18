@@ -6,20 +6,18 @@ public final class StringExtensions
 {
 	private init() {}
 
-	@Deprecated(description: "Support for the '$' Operator will be dropped in Dyvil v0.18.0, use the 'char(char)' method instead")
-	@Intrinsic([ LOAD_0 ])
-	public static char $(char c) = c
+	public static inline char char(char c) = c
 
-	@Intrinsic([ LOAD_0 ])
-	public static char char(char c) = c
-
+	/**
+	 * This method only exists to provide the user with a useful warning message when trying to pass an double-quoted
+	 * String or a single-quoted String with zero or more than one character to the `char` method.
+	 */
 	@UsageInfo(value: "Multi-character Literal or String passed to 'char' method", level: dyvil.util.MarkerLevel.WARNING)
 	public static char char(String c) = c charAt 0
 
-	public infix void toString(Object o, StringBuilder builder) = builder.append(if (o == null) "null" else o.toString)
+	public extension void toString(Object o, StringBuilder builder) = builder.append(o)
 
-	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKEVIRTUAL, 0, 1, 2 ], strings: [ "java/lang/String", "charAt", "(I)C" ])
-	public infix char subscript(String s, int index) = s charAt index
+	public infix inline char subscript(String s, int index) = s charAt index
 
-	public infix String subscript(String s, Range[int] range) = s.substring(range.first, range.last)
+	public infix inline String subscript(String s, Range[int] range) = s.substring(range.first, range.last)
 }

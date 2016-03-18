@@ -21,11 +21,9 @@ public final class LanguageFeatures
 
 	// Lists
 
-	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKEINTERFACE, 0, 1, 2 ], strings: [ "dyvil/collection/ImmutableList", "$plus", "(Ljava/lang/Object;)Ldyvil/collection/ImmutableList;" ])
-	public infix ImmutableList[E] ::[E](ImmutableList[E] list, E element) = list + element
+	public infix inline ImmutableList[E] ::[E](ImmutableList[E] list, E element) = list + element
 
-	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2 ], strings: [ "dyvil/collection/ImmutableList", "apply", "(Ljava/lang/Object;Ljava/lang/Object;)Ldyvil/collection/ImmutableList;" ])
-	public infix ImmutableList[E] ::[E](E element1, E element2) = ImmutableList(element1, element2)
+	public infix inline ImmutableList[E] ::[E](E element1, E element2) = ImmutableList(element1, element2)
 
 	// Increments
 
@@ -39,21 +37,17 @@ public final class LanguageFeatures
 
 	// Useful Globals
 
-	@Intrinsic(value: [ LOAD_0, INVOKEINTERFACE, 0, 1, 2 ], strings: [ "dyvil/function/Function0", "apply", "()Ljava/lang/Object;" ])
-	public static R run[R](=> R f) = f()
+	public static inline R run[R](=> R f) = f()
 
-	@Intrinsic(value: [ LOAD_0, LOAD_1, SWAP, INVOKEINTERFACE, 0, 1, 2 ], strings: [ "dyvil/function/Function1", "apply", "(Ljava/lang/Object;)Ljava/lang/Object;" ])
-	public static infix R run[T, R](T self, T.() => R f) = f(self)
+	public static infix inline R run[T, R](T self, T.() => R f) = f(self)
 
-	@Intrinsic(value: [ LOAD_0, DUP, LOAD_1, SWAP, INVOKEINTERFACE, 0, 1, 2, POP ], strings: [ "dyvil/function/Function1", "apply", "(Ljava/lang/Object;)Ljava/lang/Object;" ])
-	public static infix T use[T](T self, T.() => void f)
+	public static infix inline T use[T](T self, T.() => void f)
 	{
 		f(self)
 		return self
 	}
 
-	@Intrinsic(value: [ LOAD_0, LOAD_1, SWAP, INVOKEINTERFACE, 0, 1, 2 ], strings: [ "dyvil/function/Function1", "apply", "(Ljava/lang/Object;)Ljava/lang/Object;" ])
-	public static R with[T, R](T receiver, T => R f) = f(receiver)
+	public static inline R with[T, R](T receiver, T => R f) = f(receiver)
 
 	public static void repeat(int n, => void f)
 	{
@@ -67,7 +61,7 @@ public final class LanguageFeatures
 
 	public const String ENDL = System.lineSeparator
 
-	public infix PrintStream <<(PrintStream stream, any value)
+	public infix inline PrintStream <<(PrintStream stream, any value)
 	{
 		stream.print(value)
 		return stream
@@ -75,16 +69,14 @@ public final class LanguageFeatures
 
 	// Timing
 
-	@Intrinsic(value: [ INVOKESTATIC, 0, 1, 2, LOAD_0, INVOKEINTERFACE, 3, 4, 5, POP, INVOKESTATIC, 0, 1, 2, SWAP2, LSUB ], strings: [ "java/lang/System", "currentTimeMillis", "()J", "dyvil/function/Function0", "apply", "()Ljava/lang/Object;" ])
-	public static long measureMillis(=> void f)
+	public static inline long measureMillis(=> void f)
 	{
 		long millis = System.currentTimeMillis
 		f()
 		return System.currentTimeMillis - millis
 	}
 
-	@Intrinsic(value: [ INVOKESTATIC, 0, 1, 2, LOAD_0, INVOKEINTERFACE, 3, 4, 5, POP, INVOKESTATIC, 0, 1, 2, SWAP2, LSUB ], strings: [ "java/lang/System", "nanoTime", "()J", "dyvil/function/Function0", "apply", "()Ljava/lang/Object;" ])
-	public static long measureNanos(=> void f)
+	public static inline long measureNanos(=> void f)
 	{
 		long nanos = System.nanoTime
 		f()

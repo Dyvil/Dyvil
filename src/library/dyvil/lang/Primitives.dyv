@@ -279,10 +279,7 @@ public final class Primitives
 	public postfix boolean equals(long l1, long l2) = l1 == l2
 
 	@Intrinsic([ LOAD_0, DUP2, BIPUSH, 32, LUSHR, LXOR, L2I ])
-	public postfix int hashCode(long value)
-	{
-		return (value >>> 32 ^ value) as int;
-	}
+	public postfix int hashCode(long value) = value.hashCode
 
 	// Float Operators
 
