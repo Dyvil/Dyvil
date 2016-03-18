@@ -106,20 +106,20 @@ infix	operator <=		{ left, 700 }
 infix	operator >		{ left, 700 }
 infix	operator >=		{ left, 700 }
 
+// Shift Operators
+infix	operator <<		{ left, 800 }
+infix	operator >>		{ left, 800 }
+infix	operator >>>	{ left, 800 }
+
 // Additive Operators
-infix	operator +		{ left, 800 }
-infix	operator -		{ left, 800 }
+infix	operator +		{ left, 900 }
+infix	operator -		{ left, 900 }
 
 // Multiplicative Operators
-infix	operator *		{ left, 900 }
-infix	operator /		{ left, 900 }
-infix	operator \		{ left, 900 }
-infix	operator %		{ left, 900 }
-
-// Shift Operators
-infix	operator <<		{ none, 1000 }
-infix	operator >>		{ none, 1000 }
-infix	operator >>>	{ none, 1000 }
+infix	operator *		{ left, 1000 }
+infix	operator /		{ left, 1000 }
+infix	operator \		{ left, 1000 }
+infix	operator %		{ left, 1000 }
 
 // Range Operator
 infix	operator .. 	{ none, 2000 }

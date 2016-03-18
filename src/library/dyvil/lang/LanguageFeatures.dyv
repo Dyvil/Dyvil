@@ -1,5 +1,6 @@
 package dyvil.lang
 
+import	java.io.PrintStream
 import	dyvilx.lang.model.`type`.Type
 import	dyvil.annotation.Reified
 using	dyvil.reflect.Opcodes._
@@ -60,6 +61,16 @@ public final class LanguageFeatures
 		{
 			f()
 		}
+	}
+
+	// I/O
+
+	public const String ENDL = System.lineSeparator
+
+	public infix PrintStream <<(PrintStream stream, any value)
+	{
+		stream.print(value)
+		return stream
 	}
 
 	// Timing
