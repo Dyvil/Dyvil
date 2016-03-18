@@ -21,6 +21,16 @@ public final class VarInstruction implements IInstruction
 		return this.opcode;
 	}
 
+	public int getIndex()
+	{
+		return this.index;
+	}
+
+	public void setIndex(int index)
+	{
+		this.index = index;
+	}
+
 	@Override
 	public void write(MethodVisitor writer) throws BytecodeException
 	{

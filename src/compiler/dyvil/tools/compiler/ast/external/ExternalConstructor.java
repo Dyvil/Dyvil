@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.constructor.Constructor;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.method.IExternalCallableMember;
+import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -36,6 +37,11 @@ public final class ExternalConstructor extends Constructor implements IExternalC
 	public IParameter getParameter_(int index)
 	{
 		return this.parameters[index];
+	}
+
+	@Override
+	public void setIntrinsicData(IntrinsicData intrinsicData)
+	{
 	}
 
 	private IContext getCombiningContext()
