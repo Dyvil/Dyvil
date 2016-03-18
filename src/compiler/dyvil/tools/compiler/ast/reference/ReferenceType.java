@@ -269,7 +269,7 @@ public class ReferenceType implements IObjectType
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.type.writeTypeExpression(writer);
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/ReferenceType", "apply",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/ReferenceType", "apply",
 		                       "(Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/ReferenceType;", false);
 	}
 
@@ -310,18 +310,18 @@ public class ReferenceType implements IObjectType
 		final String internal = this.theClass.getInternalName();
 		if (this.theClass == Types.getObjectRefClass())
 		{
-			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, internal, "get", "()Ljava/lang/Object;", true);
+			writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, internal, "get", "()Ljava/lang/Object;", true);
 			
 			if (this.type.getTheClass() != Types.OBJECT_CLASS)
 			{
-				writer.writeTypeInsn(Opcodes.CHECKCAST, this.type.getInternalName());
+				writer.visitTypeInsn(Opcodes.CHECKCAST, this.type.getInternalName());
 			}
 			return;
 		}
 		
 		final StringBuilder stringBuilder = new StringBuilder("()");
 		this.type.appendExtendedName(stringBuilder);
-		writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, internal, "get", stringBuilder.toString(), true);
+		writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, internal, "get", stringBuilder.toString(), true);
 	}
 	
 	public void writeWrap(MethodWriter writer) throws BytecodeException
@@ -329,14 +329,14 @@ public class ReferenceType implements IObjectType
 		final String internal = this.theClass.getInternalName();
 		if (this.theClass == Types.getObjectRefClass())
 		{
-			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, internal, "set", "(Ljava/lang/Object;)V", true);
+			writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, internal, "set", "(Ljava/lang/Object;)V", true);
 			return;
 		}
 		
 		final StringBuilder stringBuilder = new StringBuilder().append('(');
 		this.type.appendExtendedName(stringBuilder);
 		stringBuilder.append(")V");
-		writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, internal, "set", stringBuilder.toString(), true);
+		writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, internal, "set", stringBuilder.toString(), true);
 	}
 
 	@Override

@@ -30,6 +30,6 @@ public class VariableThis implements IAccessible
 	@Override
 	public void writeGet(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeVarInsn(Opcodes.ALOAD, this.index);
+		writer.visitVarInsn(Opcodes.ALOAD, this.index);
 	}
 }

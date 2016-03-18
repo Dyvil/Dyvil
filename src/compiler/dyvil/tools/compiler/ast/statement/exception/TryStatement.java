@@ -408,19 +408,19 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		final dyvil.tools.asm.Label tryEnd = new dyvil.tools.asm.Label();
 		final dyvil.tools.asm.Label endLabel = new dyvil.tools.asm.Label();
 
-		writer.writeTargetLabel(tryStart);
+		writer.visitTargetLabel(tryStart);
 		if (this.action != null)
 		{
 			this.action.writeExpression(writer, type);
 			if (expression)
 			{
-				writer.writeVarInsn(storeInsn, localIndex);
+				writer.visitVarInsn(storeInsn, localIndex);
 				writer.resetLocals(localIndex);
 			}
 
-			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
+			writer.visitJumpInsn(Opcodes.GOTO, endLabel);
 		}
-		writer.writeLabel(tryEnd);
+		writer.visitLabel(tryEnd);
 
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
@@ -428,7 +428,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			final dyvil.tools.asm.Label handlerLabel = new dyvil.tools.asm.Label();
 			final String handlerType = block.type.getInternalName();
 
-			writer.writeTargetLabel(handlerLabel);
+			writer.visitTargetLabel(handlerLabel);
 			writer.startCatchBlock(handlerType);
 
 			// Check if the block's variable is actually used
@@ -444,42 +444,42 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			// Otherwise pop the exception from the stack
 			else
 			{
-				writer.writeInsn(Opcodes.POP);
+				writer.visitInsn(Opcodes.POP);
 				block.action.writeExpression(writer, type);
 			}
 
 			if (expression)
 			{
-				writer.writeVarInsn(storeInsn, localIndex);
+				writer.visitVarInsn(storeInsn, localIndex);
 				writer.resetLocals(localIndex);
 			}
 
-			writer.writeCatchBlock(tryStart, tryEnd, handlerLabel, handlerType);
-			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
+			writer.visitTryCatchBlock(tryStart, tryEnd, handlerLabel, handlerType);
+			writer.visitJumpInsn(Opcodes.GOTO, endLabel);
 		}
 
 		if (this.finallyBlock != null)
 		{
 			final dyvil.tools.asm.Label finallyLabel = new dyvil.tools.asm.Label();
 
-			writer.writeLabel(finallyLabel);
+			writer.visitLabel(finallyLabel);
 			writer.startCatchBlock("java/lang/Throwable");
-			writer.writeInsn(Opcodes.POP);
+			writer.visitInsn(Opcodes.POP);
 
-			writer.writeLabel(endLabel);
+			writer.visitLabel(endLabel);
 			this.finallyBlock.writeExpression(writer, Types.VOID);
-			writer.writeFinallyBlock(tryStart, tryEnd, finallyLabel);
+			writer.visitFinallyBlock(tryStart, tryEnd, finallyLabel);
 		}
 		else
 		{
-			writer.writeLabel(endLabel);
+			writer.visitLabel(endLabel);
 		}
 
 		if (expression)
 		{
 			writer.setLocalType(localIndex, type.getFrameType());
 
-			writer.writeVarInsn(type.getLoadOpcode(), localIndex);
+			writer.visitVarInsn(type.getLoadOpcode(), localIndex);
 			writer.resetLocals(localIndex);
 		}
 	}

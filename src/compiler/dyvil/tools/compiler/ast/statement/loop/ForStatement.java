@@ -319,7 +319,7 @@ public class ForStatement implements IForStatement, IDefaultContext
 		{
 			var.writeInit(writer, var.getValue());
 		}
-		writer.writeTargetLabel(startLabel);
+		writer.visitTargetLabel(startLabel);
 		// Condition
 		if (this.condition != null)
 		{
@@ -331,15 +331,15 @@ public class ForStatement implements IForStatement, IDefaultContext
 			this.action.writeExpression(writer, Types.VOID);
 		}
 		// Update
-		writer.writeLabel(updateLabel);
+		writer.visitLabel(updateLabel);
 		if (this.update != null)
 		{
 			this.update.writeExpression(writer, Types.VOID);
 		}
 		// Go back to Condition
-		writer.writeJumpInsn(Opcodes.GOTO, startLabel);
+		writer.visitJumpInsn(Opcodes.GOTO, startLabel);
 		writer.resetLocals(locals);
-		writer.writeLabel(endLabel);
+		writer.visitLabel(endLabel);
 		// Variable
 		if (var != null)
 		{

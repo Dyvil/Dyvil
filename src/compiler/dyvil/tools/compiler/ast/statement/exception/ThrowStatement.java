@@ -145,7 +145,7 @@ public final class ThrowStatement extends AbstractValue implements IValueConsume
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		this.value.writeExpression(writer, null);
-		writer.writeInsn(Opcodes.ATHROW);
+		writer.visitInsn(Opcodes.ATHROW);
 	}
 	
 	@Override

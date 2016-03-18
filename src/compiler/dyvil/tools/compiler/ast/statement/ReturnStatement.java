@@ -196,7 +196,7 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 		{
 			if (type == Types.VOID || type == null)
 			{
-				writer.writeInsn(Opcodes.RETURN);
+				writer.visitInsn(Opcodes.RETURN);
 				return;
 			}
 
@@ -207,7 +207,7 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 		if (type == Types.VOID)
 		{
 			this.value.writeExpression(writer, null);
-			writer.writeInsn(this.value.getType().getReturnOpcode());
+			writer.visitInsn(this.value.getType().getReturnOpcode());
 			return;
 		}
 

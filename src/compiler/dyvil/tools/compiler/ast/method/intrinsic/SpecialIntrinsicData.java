@@ -40,7 +40,7 @@ public class SpecialIntrinsicData implements IntrinsicData
 			Label label = this.targets[insn++];
 			if (label != null)
 			{
-				writer.writeTargetLabel(label);
+				writer.visitTargetLabel(label);
 			}
 			
 			final int opcode = ints[i];
@@ -49,7 +49,7 @@ public class SpecialIntrinsicData implements IntrinsicData
 				final String owner = this.strings[ints[i + 1]];
 				final String name = this.strings[ints[i + 2]];
 				final String desc = this.strings[ints[i + 3]];
-				writer.writeFieldInsn(opcode, owner, name, desc);
+				writer.visitFieldInsn(opcode, owner, name, desc);
 				i += 3;
 				continue;
 			}
@@ -61,14 +61,14 @@ public class SpecialIntrinsicData implements IntrinsicData
 				
 				final IClass iclass = Package.rootPackage.resolveInternalClass(owner);
 				final boolean isInterface = iclass != null && iclass.isInterface();
-				writer.writeInvokeInsn(opcode, owner, name, desc, isInterface);
+				writer.visitMethodInsn(opcode, owner, name, desc, isInterface);
 
 				i += 3;
 				continue;
 			}
 			if (Opcodes.isJumpOpcode(opcode))
 			{
-				writer.writeJumpInsn(opcode, this.targets[ints[i + 1]]);
+				writer.visitJumpInsn(opcode, this.targets[ints[i + 1]]);
 
 				i += 1;
 				continue;
@@ -87,7 +87,7 @@ public class SpecialIntrinsicData implements IntrinsicData
 				continue;
 			case Opcodes.BIPUSH:
 			case Opcodes.SIPUSH:
-				writer.writeLDC(ints[i + 1]);
+				writer.visitLdcInsn(ints[i + 1]);
 				i++;
 				continue;
 			case Opcodes.LDC:
@@ -97,7 +97,7 @@ public class SpecialIntrinsicData implements IntrinsicData
 				continue;
 			}
 			
-			writer.writeInsnAtLine(opcode, lineNumber);
+			writer.visitInsnAtLine(opcode, lineNumber);
 		}
 	}
 	
@@ -106,7 +106,7 @@ public class SpecialIntrinsicData implements IntrinsicData
 			throws BytecodeException
 	{
 		this.writeIntrinsic(writer, instance, arguments, lineNumber);
-		writer.writeJumpInsn(Opcodes.IFNE, dest);
+		writer.visitJumpInsn(Opcodes.IFNE, dest);
 	}
 	
 	@Override
@@ -114,7 +114,7 @@ public class SpecialIntrinsicData implements IntrinsicData
 			throws BytecodeException
 	{
 		this.writeIntrinsic(writer, instance, arguments, lineNumber);
-		writer.writeJumpInsn(Opcodes.IFEQ, dest);
+		writer.visitJumpInsn(Opcodes.IFEQ, dest);
 	}
 	
 	private static void writeLDC(MethodWriter writer, String constant)
@@ -122,24 +122,24 @@ public class SpecialIntrinsicData implements IntrinsicData
 		switch (constant.charAt(0))
 		{
 		case 'I':
-			writer.writeLDC(Integer.parseInt(constant.substring(1)));
+			writer.visitLdcInsn(Integer.parseInt(constant.substring(1)));
 			return;
 		case 'L':
-			writer.writeLDC(Long.parseLong(constant.substring(1)));
+			writer.visitLdcInsn(Long.parseLong(constant.substring(1)));
 			return;
 		case 'F':
-			writer.writeLDC(Float.parseFloat(constant.substring(1)));
+			writer.visitLdcInsn(Float.parseFloat(constant.substring(1)));
 			return;
 		case 'D':
-			writer.writeLDC(Double.parseDouble(constant.substring(1)));
+			writer.visitLdcInsn(Double.parseDouble(constant.substring(1)));
 			return;
 		case 'S':
 		case '"':
 		case '\'':
-			writer.writeLDC(constant.substring(1));
+			writer.visitLdcInsn(constant.substring(1));
 			return;
 		case 'C':
-			writer.writeLDC(Type.getType(constant.substring(1)));
+			writer.visitLdcInsn(Type.getType(constant.substring(1)));
 			return;
 		}
 	}

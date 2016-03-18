@@ -262,7 +262,8 @@ public final class Variable extends Member implements IVariable
 	{
 		final IType type = this.refType != null ? this.refType : this.type;
 		writer
-			.writeLocal(this.localIndex, this.name.qualified, type.getExtendedName(), type.getSignature(), start, end);
+			.visitLocalVariable(this.name.qualified, type.getExtendedName(), type.getSignature(), start, end,
+			                    this.localIndex);
 	}
 
 	@Override
@@ -271,8 +272,8 @@ public final class Variable extends Member implements IVariable
 		if (this.refType != null)
 		{
 			final IConstructor constructor = this.refType.getTheClass().getBody().getConstructor(0);
-			writer.writeTypeInsn(Opcodes.NEW, this.refType.getInternalName());
-			writer.writeInsn(Opcodes.DUP);
+			writer.visitTypeInsn(Opcodes.NEW, this.refType.getInternalName());
+			writer.visitInsn(Opcodes.DUP);
 
 			if (value != null)
 			{
@@ -280,14 +281,14 @@ public final class Variable extends Member implements IVariable
 			}
 			else
 			{
-				writer.writeInsn(Opcodes.AUTO_DUP_X1);
+				writer.visitInsn(Opcodes.AUTO_DUP_X1);
 			}
 			constructor.writeInvoke(writer, this.getLineNumber());
 
 			this.localIndex = writer.localCount();
 
 			writer.setLocalType(this.localIndex, this.refType.getInternalName());
-			writer.writeVarInsn(Opcodes.ASTORE, this.localIndex);
+			writer.visitVarInsn(Opcodes.ASTORE, this.localIndex);
 			return;
 		}
 
@@ -297,7 +298,7 @@ public final class Variable extends Member implements IVariable
 		}
 
 		this.localIndex = writer.localCount();
-		writer.writeVarInsn(this.type.getStoreOpcode(), this.localIndex);
+		writer.visitVarInsn(this.type.getStoreOpcode(), this.localIndex);
 		writer.setLocalType(this.localIndex, this.type.getFrameType());
 	}
 
@@ -306,10 +307,10 @@ public final class Variable extends Member implements IVariable
 	{
 		if (this.refType != null)
 		{
-			writer.writeVarInsn(Opcodes.ALOAD, this.localIndex);
+			writer.visitVarInsn(Opcodes.ALOAD, this.localIndex);
 			return;
 		}
-		writer.writeVarInsn(this.type.getLoadOpcode(), this.localIndex);
+		writer.visitVarInsn(this.type.getLoadOpcode(), this.localIndex);
 	}
 
 	@Override
@@ -333,7 +334,7 @@ public final class Variable extends Member implements IVariable
 	{
 		if (this.refType != null)
 		{
-			writer.writeVarInsn(Opcodes.ALOAD, this.localIndex);
+			writer.visitVarInsn(Opcodes.ALOAD, this.localIndex);
 			return true;
 		}
 		return false;
@@ -354,7 +355,7 @@ public final class Variable extends Member implements IVariable
 	{
 		if (this.refType == null)
 		{
-			writer.writeVarInsn(this.type.getStoreOpcode(), this.localIndex);
+			writer.visitVarInsn(this.type.getStoreOpcode(), this.localIndex);
 		}
 	}
 

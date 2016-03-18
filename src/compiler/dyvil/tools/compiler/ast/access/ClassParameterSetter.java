@@ -66,9 +66,9 @@ public final class ClassParameterSetter implements IValue
 	{
 		assert type == Types.VOID;
 
-		writer.writeVarInsn(Opcodes.ALOAD, 0);
-		writer.writeVarInsn(this.parameter.getType().getLoadOpcode(), this.parameter.getLocalIndex());
-		writer.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), this.parameter.getName().qualified,
+		writer.visitVarInsn(Opcodes.ALOAD, 0);
+		writer.visitVarInsn(this.parameter.getType().getLoadOpcode(), this.parameter.getLocalIndex());
+		writer.visitFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), this.parameter.getName().qualified,
 		                      this.parameter.getDescription());
 	}
 

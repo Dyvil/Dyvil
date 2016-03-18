@@ -152,16 +152,16 @@ public class StaticFieldReference implements IReference, IClassCompilable
 		final String factoryMethodType = "(Ljava/lang/Class;Ljava/lang/String;)" + refFieldType;
 
 		// Load the field class
-		writer.writeLDC(Type.getObjectType(fieldOriginClassName));
+		writer.visitLdcInsn(Type.getObjectType(fieldOriginClassName));
 		// Load the field name
-		writer.writeLDC(fieldName);
+		writer.visitLdcInsn(fieldName);
 
 		// Invoke the factory method
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/ref/ReferenceFactory", factoryMethodName, factoryMethodType,
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/ref/ReferenceFactory", factoryMethodName, factoryMethodType,
 		                       false);
 		
 		// Assign the reference field
-		writer.writeFieldInsn(Opcodes.PUTSTATIC, this.className, refFieldName, refFieldType);
+		writer.visitFieldInsn(Opcodes.PUTSTATIC, this.className, refFieldName, refFieldType);
 	}
 
 	// Reference getter implementation
@@ -171,7 +171,7 @@ public class StaticFieldReference implements IReference, IClassCompilable
 	{
 		if (this.field.hasModifier(Modifiers.STATIC))
 		{
-			writer.writeFieldInsn(Opcodes.GETSTATIC, this.className, this.getRefFieldName(), this.getRefFieldType());
+			writer.visitFieldInsn(Opcodes.GETSTATIC, this.className, this.getRefFieldName(), this.getRefFieldType());
 		}
 	}
 }

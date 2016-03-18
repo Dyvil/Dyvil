@@ -194,21 +194,21 @@ public final class NilExpr implements IValue
 			{
 				// Write a Field Access to the EMPTY fields in the Primitive
 				// Array Classes
-				writer.writeFieldInsn(Opcodes.GETSTATIC, this.requiredType.getTheClass().getInternalName(), "EMPTY",
+				writer.visitFieldInsn(Opcodes.GETSTATIC, this.requiredType.getTheClass().getInternalName(), "EMPTY",
 				                      this.requiredType.getExtendedName());
 				return;
 			}
 			
-			writer.writeLDC(0);
+			writer.visitLdcInsn(0);
 			int dims = 1;
 			while (elementType.isArrayType())
 			{
 				elementType = elementType.getElementType();
 				dims++;
-				writer.writeLDC(0);
+				writer.visitLdcInsn(0);
 			}
 			
-			writer.writeNewArray(elementType, dims);
+			writer.visitMultiANewArrayInsn(elementType, dims);
 		}
 		else
 		{

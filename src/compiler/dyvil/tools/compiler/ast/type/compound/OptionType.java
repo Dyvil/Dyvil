@@ -207,7 +207,7 @@ public class OptionType implements IObjectType
 	@Override
 	public void writeDefaultValue(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeFieldInsn(Opcodes.INVOKESTATIC, "dyvil/util/Option", "apply", "()Ldyvil/util/Option;");
+		writer.visitFieldInsn(Opcodes.INVOKESTATIC, "dyvil/util/Option", "apply", "()Ldyvil/util/Option;");
 	}
 	
 	@Override

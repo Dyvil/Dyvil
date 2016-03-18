@@ -160,8 +160,8 @@ public class ClassType implements IRawType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeLDC(this.theClass.getFullName());
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/Type", "apply",
+		writer.visitLdcInsn(this.theClass.getFullName());
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/Type", "apply",
 		                       "(Ljava/lang/String;)Ldyvilx/lang/model/type/Type;", true);
 	}
 	

@@ -86,7 +86,7 @@ public final class CaptureField extends CaptureDataMember implements IField
 		String owner = this.enclosingClass.getInternalName();
 		String name = this.name;
 		String desc = this.getDescription();
-		writer.writeFieldInsn(Opcodes.GETFIELD, owner, name, desc);
+		writer.visitFieldInsn(Opcodes.GETFIELD, owner, name, desc);
 	}
 
 	@Override
@@ -97,7 +97,7 @@ public final class CaptureField extends CaptureDataMember implements IField
 			String owner = this.enclosingClass.getInternalName();
 			String name = this.name;
 			String desc = this.variable.getInternalType().getExtendedName();
-			writer.writeFieldInsn(Opcodes.PUTFIELD, owner, name, desc);
+			writer.visitFieldInsn(Opcodes.PUTFIELD, owner, name, desc);
 		}
 	}
 	

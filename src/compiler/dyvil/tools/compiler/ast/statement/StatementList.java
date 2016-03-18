@@ -515,7 +515,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		dyvil.tools.asm.Label start = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label end = new dyvil.tools.asm.Label();
 
-		writer.writeLabel(start);
+		writer.visitLabel(start);
 		int localCount = writer.localCount();
 
 		if (this.labels == null)
@@ -537,7 +537,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 				Label label = this.labels[i];
 				if (label != null)
 				{
-					writer.writeLabel(label.target);
+					writer.visitLabel(label.target);
 				}
 
 				this.values[i].writeExpression(writer, Types.VOID);
@@ -547,14 +547,14 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 			Label label = this.labels[statementCount];
 			if (label != null)
 			{
-				writer.writeLabel(label.target);
+				writer.visitLabel(label.target);
 			}
 
 			this.values[statementCount].writeExpression(writer, type);
 		}
 
 		writer.resetLocals(localCount);
-		writer.writeLabel(end);
+		writer.visitLabel(end);
 
 		if (this.variables == null)
 		{

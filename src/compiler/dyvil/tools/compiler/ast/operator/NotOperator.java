@@ -108,11 +108,11 @@ public final class NotOperator extends AbstractValue
 		Label label = new Label();
 		Label label2 = new Label();
 		this.value.writeInvJump(writer, label);
-		writer.writeLDC(0);
-		writer.writeJumpInsn(Opcodes.GOTO, label2);
-		writer.writeLabel(label);
-		writer.writeLDC(1);
-		writer.writeLabel(label2);
+		writer.visitLdcInsn(0);
+		writer.visitJumpInsn(Opcodes.GOTO, label2);
+		writer.visitLabel(label);
+		writer.visitLdcInsn(1);
+		writer.visitLabel(label2);
 
 		if (type != null)
 		{

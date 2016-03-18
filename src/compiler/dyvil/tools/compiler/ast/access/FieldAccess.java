@@ -491,7 +491,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 
 		if (type == Types.VOID)
 		{
-			writer.writeInsn(this.type.getReturnOpcode());
+			writer.visitInsn(this.type.getReturnOpcode());
 		}
 	}
 	

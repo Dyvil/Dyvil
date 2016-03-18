@@ -169,7 +169,7 @@ public class IncOperator extends AbstractValue
 
 			if (this.canUseIINC(typecode))
 			{
-				writer.writeIINC(((IVariable) this.field).getLocalIndex(), this.value);
+				writer.visitIincInsn(((IVariable) this.field).getLocalIndex(), this.value);
 				return;
 			}
 
@@ -178,7 +178,7 @@ public class IncOperator extends AbstractValue
 			if (receiver)
 			{
 				this.receiver.writeExpression(writer, null);
-				writer.writeInsn(Opcodes.DUP);
+				writer.visitInsn(Opcodes.DUP);
 			}
 
 			this.field.writeGet_Get(writer, lineNumber);
@@ -195,13 +195,13 @@ public class IncOperator extends AbstractValue
 			int localIndex = ((IVariable) this.field).getLocalIndex();
 			if (this.prefix)
 			{
-				writer.writeIINC(localIndex, this.value);
-				writer.writeVarInsn(this.field.getType().getLoadOpcode(), localIndex);
+				writer.visitIincInsn(localIndex, this.value);
+				writer.visitVarInsn(this.field.getType().getLoadOpcode(), localIndex);
 			}
 			else
 			{
-				writer.writeVarInsn(this.field.getType().getLoadOpcode(), localIndex);
-				writer.writeIINC(localIndex, this.value);
+				writer.visitVarInsn(this.field.getType().getLoadOpcode(), localIndex);
+				writer.visitIincInsn(localIndex, this.value);
 			}
 		}
 		else
@@ -214,9 +214,9 @@ public class IncOperator extends AbstractValue
 
 				this.receiver.writeExpression(writer, null);
 				// Copy the receiver
-				writer.writeInsn(Opcodes.DUP);
+				writer.visitInsn(Opcodes.DUP);
 				// Store the receiver in a local variable
-				writer.writeVarInsn(Opcodes.ASTORE, receiverIndex);
+				writer.visitVarInsn(Opcodes.ASTORE, receiverIndex);
 			}
 
 			final boolean tempValue = this.field.writeSet_PreValue(writer, lineNumber);
@@ -227,7 +227,7 @@ public class IncOperator extends AbstractValue
 				if (receiver)
 				{
 					// Load the receiver again
-					writer.writeVarInsn(Opcodes.ALOAD, receiverIndex);
+					writer.visitVarInsn(Opcodes.ALOAD, receiverIndex);
 				}
 
 				// Load the old value
@@ -240,12 +240,12 @@ public class IncOperator extends AbstractValue
 				// Compute the new value
 				this.writeAdd1(writer, typecode);
 				// Copy the new value
-				writer.writeInsn(dupOpcode);
+				writer.visitInsn(dupOpcode);
 			}
 			else
 			{
 				// Copy the old value
-				writer.writeInsn(dupOpcode);
+				writer.visitInsn(dupOpcode);
 				// Compute the new value
 				this.writeAdd1(writer, typecode);
 			}
@@ -300,20 +300,20 @@ public class IncOperator extends AbstractValue
 		case PrimitiveType.SHORT_CODE:
 		case PrimitiveType.CHAR_CODE:
 		case PrimitiveType.INT_CODE:
-			writer.writeLDC(this.value);
-			writer.writeInsn(Opcodes.IADD);
+			writer.visitLdcInsn(this.value);
+			writer.visitInsn(Opcodes.IADD);
 			return;
 		case PrimitiveType.LONG_CODE:
-			writer.writeLDC((long) this.value);
-			writer.writeInsn(Opcodes.LADD);
+			writer.visitLdcInsn((long) this.value);
+			writer.visitInsn(Opcodes.LADD);
 			return;
 		case PrimitiveType.FLOAT_CODE:
-			writer.writeLDC((float) this.value);
-			writer.writeInsn(Opcodes.FADD);
+			writer.visitLdcInsn((float) this.value);
+			writer.visitInsn(Opcodes.FADD);
 			return;
 		case PrimitiveType.DOUBLE_CODE:
-			writer.writeLDC((double) this.value);
-			writer.writeInsn(Opcodes.DADD);
+			writer.visitLdcInsn((double) this.value);
+			writer.visitInsn(Opcodes.DADD);
 			return;
 		default:
 		}

@@ -232,7 +232,7 @@ public final class CharValue implements IConstantValue
 	{
 		if (this.type == CHAR)
 		{
-			writer.writeLDC(this.value.charAt(0));
+			writer.visitLdcInsn(this.value.charAt(0));
 
 			if (type != null)
 			{
@@ -241,10 +241,10 @@ public final class CharValue implements IConstantValue
 			return;
 		}
 
-		writer.writeLDC(this.value);
+		writer.visitLdcInsn(this.value);
 		if (type == Types.VOID)
 		{
-			writer.writeInsn(Opcodes.ARETURN);
+			writer.visitInsn(Opcodes.ARETURN);
 		}
 		else if (type != null)
 		{

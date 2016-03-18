@@ -171,8 +171,8 @@ public interface IObjectType extends IType
 		
 		if (!target.isSuperClassOf(this))
 		{
-			writer.writeLineNumber(lineNumber);
-			writer.writeTypeInsn(Opcodes.CHECKCAST, target.getInternalName());
+			writer.visitLineNumber(lineNumber);
+			writer.visitTypeInsn(Opcodes.CHECKCAST, target.getInternalName());
 		}
 		if (target.isPrimitive())
 		{
@@ -184,13 +184,13 @@ public interface IObjectType extends IType
 	@Override
 	default void writeClassExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeLDC(Type.getObjectType(this.getInternalName()));
+		writer.visitLdcInsn(Type.getObjectType(this.getInternalName()));
 	}
 
 	@Override
 	default void writeDefaultValue(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeInsn(Opcodes.ACONST_NULL);
+		writer.visitInsn(Opcodes.ACONST_NULL);
 	}
 	
 	@Override

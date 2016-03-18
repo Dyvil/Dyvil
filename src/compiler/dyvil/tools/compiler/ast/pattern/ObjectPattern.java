@@ -112,7 +112,7 @@ public class ObjectPattern extends Pattern implements IPattern
 		IPattern.loadVar(writer, varIndex, matchedType);
 		// No need to cast - Reference Equality Comparison (ACMP) handles it
 		this.instanceField.writeGet(writer, null, this.getLineNumber());
-		writer.writeJumpInsn(Opcodes.IF_ACMPNE, elseLabel);
+		writer.visitJumpInsn(Opcodes.IF_ACMPNE, elseLabel);
 	}
 
 	@Override

@@ -112,7 +112,7 @@ public class ContinueStatement extends AbstractValue implements IStatement
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeJumpInsn(Opcodes.GOTO, this.label.target);
+		writer.visitJumpInsn(Opcodes.GOTO, this.label.target);
 	}
 	
 	@Override

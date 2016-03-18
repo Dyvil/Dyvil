@@ -130,11 +130,11 @@ public final class BooleanValue implements IConstantValue
 	{
 		if (this.value)
 		{
-			writer.writeLDC(1);
+			writer.visitLdcInsn(1);
 		}
 		else
 		{
-			writer.writeLDC(0);
+			writer.visitLdcInsn(0);
 		}
 
 		if (type != null)
@@ -148,7 +148,7 @@ public final class BooleanValue implements IConstantValue
 	{
 		if (this.value)
 		{
-			writer.writeJumpInsn(Opcodes.GOTO, dest);
+			writer.visitJumpInsn(Opcodes.GOTO, dest);
 		}
 	}
 	
@@ -157,7 +157,7 @@ public final class BooleanValue implements IConstantValue
 	{
 		if (!this.value)
 		{
-			writer.writeJumpInsn(Opcodes.GOTO, dest);
+			writer.visitJumpInsn(Opcodes.GOTO, dest);
 		}
 	}
 	

@@ -116,14 +116,14 @@ public class TypeCheckPattern implements IPattern
 
 		if (!this.fromType.isPrimitive())
 		{
-			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-			writer.writeTypeInsn(Opcodes.INSTANCEOF, this.type.getInternalName());
-			writer.writeJumpInsn(Opcodes.IFEQ, elseLabel);
+			writer.visitVarInsn(Opcodes.ALOAD, varIndex);
+			writer.visitTypeInsn(Opcodes.INSTANCEOF, this.type.getInternalName());
+			writer.visitJumpInsn(Opcodes.IFEQ, elseLabel);
 		}
 
 		if (this.pattern.getPatternType() != WILDCARD)
 		{
-			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
+			writer.visitVarInsn(Opcodes.ALOAD, varIndex);
 			this.fromType.writeCast(writer, this.type, this.getLineNumber());
 			this.pattern.writeInvJump(writer, -1, this.type, elseLabel);
 		}

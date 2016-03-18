@@ -225,12 +225,12 @@ public class TypeVarType implements IRawType
 		{
 			// Get the parameter
 			final int parameterIndex = this.typeParameter.getParameterIndex();
-			writer.writeVarInsn(Opcodes.ALOAD, parameterIndex);
+			writer.visitVarInsn(Opcodes.ALOAD, parameterIndex);
 
 			// The generic Type is reified -> extract erasure class
 			if (reifiedKind == ITypeParameter.ReifiedKind.REIFIED_TYPE)
 			{
-				writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "dyvilx/lang/model/type/Type", "erasure",
+				writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, "dyvilx/lang/model/type/Type", "erasure",
 				                       "()Ljava/lang/Class;", true);
 			}
 			return;
@@ -245,7 +245,7 @@ public class TypeVarType implements IRawType
 		if (this.typeParameter.getReifiedKind() == ITypeParameter.ReifiedKind.REIFIED_TYPE)
 		{
 			final int parameterIndex = this.typeParameter.getParameterIndex();
-			writer.writeVarInsn(Opcodes.ALOAD, parameterIndex);
+			writer.visitVarInsn(Opcodes.ALOAD, parameterIndex);
 			return;
 		}
 

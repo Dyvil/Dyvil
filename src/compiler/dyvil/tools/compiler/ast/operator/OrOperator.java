@@ -144,11 +144,11 @@ public final class OrOperator extends AbstractValue
 		Label label2 = new Label();
 		this.left.writeJump(writer, label);
 		this.right.writeJump(writer, label);
-		writer.writeLDC(0);
-		writer.writeJumpInsn(Opcodes.GOTO, label2);
-		writer.writeLabel(label);
-		writer.writeLDC(1);
-		writer.writeLabel(label2);
+		writer.visitLdcInsn(0);
+		writer.visitJumpInsn(Opcodes.GOTO, label2);
+		writer.visitLabel(label);
+		writer.visitLdcInsn(1);
+		writer.visitLabel(label2);
 
 		if (type != null)
 		{
@@ -162,7 +162,7 @@ public final class OrOperator extends AbstractValue
 		Label label = new Label();
 		this.left.writeInvJump(writer, label);
 		this.right.writeJump(writer, dest);
-		writer.writeLabel(label);
+		writer.visitLabel(label);
 	}
 	
 	@Override
@@ -171,7 +171,7 @@ public final class OrOperator extends AbstractValue
 		Label label = new Label();
 		this.left.writeJump(writer, label);
 		this.right.writeInvJump(writer, dest);
-		writer.writeLabel(label);
+		writer.visitLabel(label);
 	}
 	
 	@Override

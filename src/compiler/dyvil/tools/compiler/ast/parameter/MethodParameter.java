@@ -175,10 +175,10 @@ public final class MethodParameter extends Parameter
 	{
 		if (this.refType != null)
 		{
-			writer.writeVarInsn(Opcodes.ALOAD, this.localIndex);
+			writer.visitVarInsn(Opcodes.ALOAD, this.localIndex);
 			return;
 		}
-		writer.writeVarInsn(this.type.getLoadOpcode(), this.localIndex);
+		writer.visitVarInsn(this.type.getLoadOpcode(), this.localIndex);
 	}
 
 	@Override
@@ -195,7 +195,7 @@ public final class MethodParameter extends Parameter
 	{
 		if (this.refType != null)
 		{
-			writer.writeVarInsn(Opcodes.ALOAD, this.localIndex);
+			writer.visitVarInsn(Opcodes.ALOAD, this.localIndex);
 			return true;
 		}
 		return false;
@@ -215,7 +215,7 @@ public final class MethodParameter extends Parameter
 	{
 		if (this.refType == null)
 		{
-			writer.writeVarInsn(this.type.getStoreOpcode(), this.localIndex);
+			writer.visitVarInsn(this.type.getStoreOpcode(), this.localIndex);
 		}
 	}
 

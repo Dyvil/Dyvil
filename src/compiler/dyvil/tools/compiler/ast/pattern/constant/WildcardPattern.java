@@ -60,7 +60,7 @@ public final class WildcardPattern extends Pattern
 	{
 		if (varIndex < 0)
 		{
-			writer.writeInsn(Opcodes.AUTO_POP);
+			writer.visitInsn(Opcodes.AUTO_POP);
 		}
 	}
 	

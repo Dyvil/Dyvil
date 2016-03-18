@@ -398,7 +398,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 
 			this.value.writeExpression(writer, fieldType);
 
-			writer.writeInsn(tempVar ? Opcodes.AUTO_DUP_X1 : Opcodes.AUTO_DUP);
+			writer.visitInsn(tempVar ? Opcodes.AUTO_DUP_X1 : Opcodes.AUTO_DUP);
 		}
 		else
 		{
@@ -406,7 +406,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 
 			this.value.writeExpression(writer, fieldType);
 
-			writer.writeInsn(Opcodes.AUTO_DUP_X1);
+			writer.visitInsn(Opcodes.AUTO_DUP_X1);
 		}
 
 		this.field.writeSet_Wrap(writer, lineNumber);

@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.backend.exception;
 
-public class BytecodeException extends Exception
+public class BytecodeException extends RuntimeException
 {
 	private static final long serialVersionUID = 1678495524827729085L;
 	

@@ -114,7 +114,7 @@ public class EnumValue implements IConstantValue, INamed
 		String owner = this.type.getInternalName();
 		String name = this.name.qualified;
 		String desc = this.type.getExtendedName();
-		writer.writeFieldInsn(Opcodes.GETSTATIC, owner, name, desc);
+		writer.visitFieldInsn(Opcodes.GETSTATIC, owner, name, desc);
 
 		if (type != null)
 		{

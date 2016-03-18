@@ -167,7 +167,7 @@ public class AnnotationValue implements IValue, IAnnotationConsumer
 		descBuilder.append(')');
 		descBuilder.append('L').append(iclass.getInternalName()).append(';');
 		
-		writer.writeInvokeDynamic("_", descBuilder.toString(), ANNOTATION_METAFACTORY, (Object[]) parameterNames);
+		writer.visitInvokeDynamicInsn("_", descBuilder.toString(), ANNOTATION_METAFACTORY, (Object[]) parameterNames);
 
 		if (type != null)
 		{

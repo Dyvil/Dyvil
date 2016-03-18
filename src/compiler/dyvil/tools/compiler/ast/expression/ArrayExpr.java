@@ -458,15 +458,15 @@ public final class ArrayExpr implements IValue, IValueList
 		IType elementType = this.elementType;
 		int opcode = elementType.getArrayStoreOpcode();
 		
-		writer.writeLDC(this.valueCount);
-		writer.writeNewArray(elementType, 1);
+		writer.visitLdcInsn(this.valueCount);
+		writer.visitMultiANewArrayInsn(elementType, 1);
 		
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			writer.writeInsn(Opcodes.DUP);
-			writer.writeLDC(i);
+			writer.visitInsn(Opcodes.DUP);
+			writer.visitLdcInsn(i);
 			this.values[i].writeExpression(writer, elementType);
-			writer.writeInsn(opcode);
+			writer.visitInsn(opcode);
 		}
 	}
 

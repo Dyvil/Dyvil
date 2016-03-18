@@ -121,11 +121,11 @@ public final class ObjectClassMetadata extends ClassMetadata
 			// object type.
 			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC, "toString",
 			                                                                      "()Ljava/lang/String;", null, null));
-			mw.begin();
+			mw.visitCode();
 			mw.setThisType(internalName);
-			mw.writeLDC(this.theClass.getName().unqualified);
-			mw.writeInsn(Opcodes.ARETURN);
-			mw.end(Types.STRING);
+			mw.visitLdcInsn(this.theClass.getName().unqualified);
+			mw.visitInsn(Opcodes.ARETURN);
+			mw.visitEnd(Types.STRING);
 		}
 		
 		if ((this.members & EQUALS) == 0)
@@ -134,19 +134,19 @@ public final class ObjectClassMetadata extends ClassMetadata
 			// identity
 			MethodWriterImpl mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC, "equals",
 			                                                                      "(Ljava/lang/Object;)Z", null, null));
-			mw.begin();
+			mw.visitCode();
 			mw.setThisType(internalName);
-			mw.registerParameter(1, "obj", Types.ANY, 0);
-			mw.writeVarInsn(Opcodes.ALOAD, 0);
-			mw.writeVarInsn(Opcodes.ALOAD, 1);
+			mw.visitParameter(1, "obj", Types.ANY, 0);
+			mw.visitVarInsn(Opcodes.ALOAD, 0);
+			mw.visitVarInsn(Opcodes.ALOAD, 1);
 			Label label = new Label();
-			mw.writeJumpInsn(Opcodes.IF_ACMPNE, label);
-			mw.writeLDC(1);
-			mw.writeInsn(Opcodes.IRETURN);
-			mw.writeLabel(label);
-			mw.writeLDC(0);
-			mw.writeInsn(Opcodes.IRETURN);
-			mw.end();
+			mw.visitJumpInsn(Opcodes.IF_ACMPNE, label);
+			mw.visitLdcInsn(1);
+			mw.visitInsn(Opcodes.IRETURN);
+			mw.visitLabel(label);
+			mw.visitLdcInsn(0);
+			mw.visitInsn(Opcodes.IRETURN);
+			mw.visitEnd();
 		}
 		
 		if ((this.members & HASHCODE) == 0)
@@ -154,11 +154,11 @@ public final class ObjectClassMetadata extends ClassMetadata
 			MethodWriterImpl mw = new MethodWriterImpl(writer,
 			                                           writer.visitMethod(Modifiers.PUBLIC, "hashCode", "()I", null,
 			                                                              null));
-			mw.begin();
+			mw.visitCode();
 			mw.setThisType(internalName);
-			mw.writeLDC(internalName.hashCode());
-			mw.writeInsn(Opcodes.IRETURN);
-			mw.end();
+			mw.visitLdcInsn(internalName.hashCode());
+			mw.visitInsn(Opcodes.IRETURN);
+			mw.visitEnd();
 		}
 		
 		if ((this.members & READ_RESOLVE) == 0)
@@ -183,9 +183,9 @@ public final class ObjectClassMetadata extends ClassMetadata
 	private static void writeResolveMethod(MethodWriter mw, String internal) throws BytecodeException
 	{
 		mw.setThisType(internal);
-		mw.begin();
-		mw.writeFieldInsn(Opcodes.GETSTATIC, internal, "instance", 'L' + internal + ';');
-		mw.writeInsn(Opcodes.ARETURN);
-		mw.end();
+		mw.visitCode();
+		mw.visitFieldInsn(Opcodes.GETSTATIC, internal, "instance", 'L' + internal + ';');
+		mw.visitInsn(Opcodes.ARETURN);
+		mw.visitEnd();
 	}
 }

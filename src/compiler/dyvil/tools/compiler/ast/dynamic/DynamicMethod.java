@@ -400,7 +400,7 @@ public class DynamicMethod implements IMethod, IDefaultContext
 		desc.append(')');
 		desc.append("Ljava/lang/Object;");
 		
-		writer.writeInvokeDynamic(this.name.qualified, desc.toString(), BOOTSTRAP, ObjectArray.EMPTY);
+		writer.visitInvokeDynamicInsn(this.name.qualified, desc.toString(), BOOTSTRAP, ObjectArray.EMPTY);
 	}
 	
 	@Override

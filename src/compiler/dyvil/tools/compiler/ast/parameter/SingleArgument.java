@@ -239,12 +239,12 @@ public final class SingleArgument implements IArguments, IValueConsumer
 		
 		// Write an array with one element
 		IType type = param.getType().getElementType();
-		writer.writeLDC(1);
-		writer.writeNewArray(type, 1);
-		writer.writeInsn(Opcodes.DUP);
-		writer.writeLDC(0);
+		writer.visitLdcInsn(1);
+		writer.visitMultiANewArrayInsn(type, 1);
+		writer.visitInsn(Opcodes.DUP);
+		writer.visitLdcInsn(0);
 		this.value.writeExpression(writer, type);
-		writer.writeInsn(type.getArrayStoreOpcode());
+		writer.visitInsn(type.getArrayStoreOpcode());
 	}
 	
 	@Override

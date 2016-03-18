@@ -194,7 +194,7 @@ public class StringConcatExpr implements IValue
 		{
 			this.values[0].writeExpression(writer, Types.STRING);
 			this.values[1].writeExpression(writer, Types.STRING);
-			writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "concat",
+			writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "concat",
 			                       "(Ljava/lang/String;)Ljava/lang/String;", false);
 			return;
 		}
@@ -205,10 +205,10 @@ public class StringConcatExpr implements IValue
 			estSize += this.values[i].stringSize();
 		}
 
-		writer.writeTypeInsn(Opcodes.NEW, "java/lang/StringBuilder");
-		writer.writeInsn(Opcodes.DUP);
-		writer.writeLDC(estSize);
-		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(I)V", false);
+		writer.visitTypeInsn(Opcodes.NEW, "java/lang/StringBuilder");
+		writer.visitInsn(Opcodes.DUP);
+		writer.visitLdcInsn(estSize);
+		writer.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(I)V", false);
 
 		for (int i = 0; i < this.valueCount; i++)
 		{
@@ -224,7 +224,7 @@ public class StringConcatExpr implements IValue
 			CaseClasses.writeStringAppend(writer, value.getType());
 		}
 
-		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;",
+		writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;",
 		                       false);
 
 		if (type != null)

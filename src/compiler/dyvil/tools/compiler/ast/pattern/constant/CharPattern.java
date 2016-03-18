@@ -123,8 +123,8 @@ public final class CharPattern extends Pattern
 
 		IPattern.loadVar(writer, varIndex, matchedType);
 		matchedType.writeCast(writer, Types.CHAR, this.getLineNumber());
-		writer.writeLDC(this.value.charAt(0));
-		writer.writeJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
+		writer.visitLdcInsn(this.value.charAt(0));
+		writer.visitJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
 	}
 	
 	@Override

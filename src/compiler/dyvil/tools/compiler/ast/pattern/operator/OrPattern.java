@@ -104,7 +104,7 @@ public class OrPattern extends BinaryPattern
 		this.left.writeJump(writer, varIndex, matchedType, targetLabel);
 		this.right.writeInvJump(writer, varIndex, matchedType, elseLabel);
 
-		writer.writeLabel(targetLabel);
+		writer.visitLabel(targetLabel);
 	}
 
 	@Override

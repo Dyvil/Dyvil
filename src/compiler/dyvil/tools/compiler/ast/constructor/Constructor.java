@@ -760,8 +760,8 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 		Label start = new Label();
 		Label end = new Label();
 
-		mw.begin();
-		mw.writeLabel(start);
+		mw.visitCode();
+		mw.visitLabel(start);
 
 		if (this.value != null)
 		{
@@ -769,19 +769,19 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 		}
 		this.enclosingClass.writeInit(mw);
 
-		mw.writeLabel(end);
-		mw.end(Types.VOID);
+		mw.visitLabel(end);
+		mw.visitEnd(Types.VOID);
 
 		if ((modifiers & Modifiers.STATIC) == 0)
 		{
-			mw.writeLocal(0, "this", 'L' + this.enclosingClass.getInternalName() + ';', null, start, end);
+			mw.visitLocalVariable("this", 'L' + this.enclosingClass.getInternalName() + ';', null, start, end, 0);
 		}
 		
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
-			mw.writeLocal(param.getLocalIndex(), param.getName().qualified, param.getDescription(),
-			              param.getSignature(), start, end);
+			mw.visitLocalVariable(param.getName().qualified, param.getDescription(), param.getSignature(), start, end,
+			                      param.getLocalIndex());
 		}
 	}
 	
@@ -789,10 +789,10 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 	public void writeCall(MethodWriter writer, IArguments arguments, IType type, int lineNumber)
 			throws BytecodeException
 	{
-		writer.writeTypeInsn(Opcodes.NEW, this.enclosingClass.getInternalName());
+		writer.visitTypeInsn(Opcodes.NEW, this.enclosingClass.getInternalName());
 		if (type != Types.VOID)
 		{
-			writer.writeInsn(Opcodes.DUP);
+			writer.visitInsn(Opcodes.DUP);
 		}
 		
 		this.writeArguments(writer, arguments);
@@ -802,12 +802,12 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 	@Override
 	public void writeInvoke(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
-		writer.writeLineNumber(lineNumber);
+		writer.visitLineNumber(lineNumber);
 		
 		String owner = this.enclosingClass.getInternalName();
 		String name = "<init>";
 		String desc = this.getDescriptor();
-		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, owner, name, desc, false);
+		writer.visitMethodInsn(Opcodes.INVOKESPECIAL, owner, name, desc, false);
 	}
 	
 	@Override

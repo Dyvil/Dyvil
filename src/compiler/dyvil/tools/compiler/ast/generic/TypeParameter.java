@@ -598,7 +598,7 @@ public final class TypeParameter implements ITypeParameter
 		}
 
 		this.parameterIndex = writer.localCount();
-		writer.registerParameter(this.parameterIndex, "reify$" + this.getName().qualified, type, Modifiers.MANDATED);
+		writer.visitParameter(this.parameterIndex, "reify$" + this.getName().qualified, type, Modifiers.MANDATED);
 	}
 
 	@Override

@@ -526,17 +526,17 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	{
 		this.returnType.writeTypeExpression(writer);
 
-		writer.writeLDC(this.parameterCount);
-		writer.writeNewArray("dyvilx/lang/model/type/Type", 1);
+		writer.visitLdcInsn(this.parameterCount);
+		writer.visitMultiANewArrayInsn("dyvilx/lang/model/type/Type", 1);
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			writer.writeInsn(Opcodes.DUP);
-			writer.writeLDC(i);
+			writer.visitInsn(Opcodes.DUP);
+			writer.visitLdcInsn(i);
 			this.parameterTypes[i].writeTypeExpression(writer);
-			writer.writeInsn(Opcodes.AASTORE);
+			writer.visitInsn(Opcodes.AASTORE);
 		}
 
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/FunctionType", "apply",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/FunctionType", "apply",
 		                       "(Ldyvilx/lang/model/type/Type;[Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/FunctionType;",
 		                       false);
 	}

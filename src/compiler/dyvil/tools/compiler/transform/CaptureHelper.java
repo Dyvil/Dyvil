@@ -107,7 +107,7 @@ public class CaptureHelper
 	{
 		if (this.thisClass != null)
 		{
-			writer.writeVarInsn(Opcodes.ALOAD, 0);
+			writer.visitVarInsn(Opcodes.ALOAD, 0);
 		}
 
 		for (int i = 0; i < this.capturedFieldCount; i++)
@@ -124,7 +124,7 @@ public class CaptureHelper
 			final CaptureDataMember capture = this.capturedFields[i];
 			capture.setLocalIndex(index);
 			index = writer
-					.registerParameter(index, capture.getName().qualified, capture.getVariable().getInternalType(), 0);
+					.visitParameter(index, capture.getName().qualified, capture.getVariable().getInternalType(), 0);
 		}
 
 		return index;
@@ -144,9 +144,9 @@ public class CaptureHelper
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
 			final CaptureField field = (CaptureField) this.capturedFields[i];
-			writer.writeVarInsn(Opcodes.ALOAD, 0);
-			writer.writeVarInsn(field.getInternalType().getLoadOpcode(), field.getLocalIndex());
-			writer.writeFieldInsn(Opcodes.PUTFIELD, field.enclosingClass.getInternalName(), field.name,
+			writer.visitVarInsn(Opcodes.ALOAD, 0);
+			writer.visitVarInsn(field.getInternalType().getLoadOpcode(), field.getLocalIndex());
+			writer.visitFieldInsn(Opcodes.PUTFIELD, field.enclosingClass.getInternalName(), field.name,
 			                      field.getInternalType().getExtendedName());
 		}
 	}

@@ -526,8 +526,8 @@ public final class PrimitiveType implements IType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeLDC(this.typecode);
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/PrimitiveType", "apply",
+		writer.visitLdcInsn(this.typecode);
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/PrimitiveType", "apply",
 		                       "(I)Ldyvilx/lang/model/type/PrimitiveType;", false);
 	}
 	
@@ -541,16 +541,16 @@ public final class PrimitiveType implements IType
 		case SHORT_CODE:
 		case CHAR_CODE:
 		case INT_CODE:
-			writer.writeLDC(0);
+			writer.visitLdcInsn(0);
 			break;
 		case LONG_CODE:
-			writer.writeLDC(0L);
+			writer.visitLdcInsn(0L);
 			break;
 		case FLOAT_CODE:
-			writer.writeLDC(0F);
+			writer.visitLdcInsn(0F);
 			break;
 		case DOUBLE_CODE:
-			writer.writeLDC(0D);
+			writer.visitLdcInsn(0D);
 			break;
 		}
 	}
@@ -638,7 +638,7 @@ public final class PrimitiveType implements IType
 			break;
 		}
 
-		writer.writeFieldInsn(Opcodes.GETSTATIC, owner, "TYPE", "Ljava/lang/Class;");
+		writer.visitFieldInsn(Opcodes.GETSTATIC, owner, "TYPE", "Ljava/lang/Class;");
 	}
 
 	private static void writeIntCast(IType cast, MethodWriter writer) throws BytecodeException
@@ -652,13 +652,13 @@ public final class PrimitiveType implements IType
 		case INT_CODE:
 			break;
 		case LONG_CODE:
-			writer.writeInsn(I2L);
+			writer.visitInsn(I2L);
 			break;
 		case FLOAT_CODE:
-			writer.writeInsn(I2F);
+			writer.visitInsn(I2F);
 			break;
 		case DOUBLE_CODE:
-			writer.writeInsn(I2D);
+			writer.visitInsn(I2D);
 			break;
 		}
 	}
@@ -668,27 +668,27 @@ public final class PrimitiveType implements IType
 		switch (cast.getTypecode())
 		{
 		case BOOLEAN_CODE:
-			writer.writeInsn(L2I);
+			writer.visitInsn(L2I);
 			break;
 		case BYTE_CODE:
-			writer.writeInsn(L2B);
+			writer.visitInsn(L2B);
 			break;
 		case SHORT_CODE:
-			writer.writeInsn(L2S);
+			writer.visitInsn(L2S);
 			break;
 		case CHAR_CODE:
-			writer.writeInsn(L2C);
+			writer.visitInsn(L2C);
 			break;
 		case INT_CODE:
-			writer.writeInsn(L2I);
+			writer.visitInsn(L2I);
 			break;
 		case LONG_CODE:
 			break;
 		case FLOAT_CODE:
-			writer.writeInsn(L2F);
+			writer.visitInsn(L2F);
 			break;
 		case DOUBLE_CODE:
-			writer.writeInsn(L2D);
+			writer.visitInsn(L2D);
 			break;
 		}
 	}
@@ -698,27 +698,27 @@ public final class PrimitiveType implements IType
 		switch (cast.getTypecode())
 		{
 		case BOOLEAN_CODE:
-			writer.writeInsn(F2I);
+			writer.visitInsn(F2I);
 			break;
 		case BYTE_CODE:
-			writer.writeInsn(F2B);
+			writer.visitInsn(F2B);
 			break;
 		case SHORT_CODE:
-			writer.writeInsn(F2S);
+			writer.visitInsn(F2S);
 			break;
 		case CHAR_CODE:
-			writer.writeInsn(F2C);
+			writer.visitInsn(F2C);
 			break;
 		case INT_CODE:
-			writer.writeInsn(F2I);
+			writer.visitInsn(F2I);
 			break;
 		case LONG_CODE:
-			writer.writeInsn(F2L);
+			writer.visitInsn(F2L);
 			break;
 		case FLOAT_CODE:
 			break;
 		case DOUBLE_CODE:
-			writer.writeInsn(F2D);
+			writer.visitInsn(F2D);
 			break;
 		}
 	}
@@ -728,25 +728,25 @@ public final class PrimitiveType implements IType
 		switch (cast.getTypecode())
 		{
 		case BOOLEAN_CODE:
-			writer.writeInsn(D2I);
+			writer.visitInsn(D2I);
 			break;
 		case BYTE_CODE:
-			writer.writeInsn(D2B);
+			writer.visitInsn(D2B);
 			break;
 		case SHORT_CODE:
-			writer.writeInsn(D2S);
+			writer.visitInsn(D2S);
 			break;
 		case CHAR_CODE:
-			writer.writeInsn(D2C);
+			writer.visitInsn(D2C);
 			break;
 		case INT_CODE:
-			writer.writeInsn(D2I);
+			writer.visitInsn(D2I);
 			break;
 		case LONG_CODE:
-			writer.writeInsn(D2L);
+			writer.visitInsn(D2L);
 			break;
 		case FLOAT_CODE:
-			writer.writeInsn(D2F);
+			writer.visitInsn(D2F);
 			break;
 		case DOUBLE_CODE:
 			break;
