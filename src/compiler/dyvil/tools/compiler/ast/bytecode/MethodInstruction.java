@@ -25,17 +25,43 @@ public final class MethodInstruction implements IInstruction
 		this.desc = desc;
 		this.isInterface = isInterface;
 	}
-	
+
+	@Override
+	public int getOpcode()
+	{
+		return this.opcode;
+	}
+
+	public String getOwner()
+	{
+		return this.owner;
+	}
+
 	public void setOwner(String owner)
 	{
 		this.owner = owner;
 	}
-	
-	public void setMethodName(String name)
+
+	public String getName()
+	{
+		return this.name;
+	}
+
+	public void setName(String name)
 	{
 		this.name = name;
 	}
-	
+
+	public String getDesc()
+	{
+		return this.desc;
+	}
+
+	public void setDesc(String desc)
+	{
+		this.desc = desc;
+	}
+
 	@Override
 	public void write(MethodVisitor writer) throws BytecodeException
 	{
