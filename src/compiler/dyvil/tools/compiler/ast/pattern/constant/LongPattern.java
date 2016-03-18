@@ -51,8 +51,8 @@ public final class LongPattern extends Pattern
 	{
 		IPattern.loadVar(writer, varIndex, matchedType);
 		matchedType.writeCast(writer, Types.LONG, this.getLineNumber());
-		writer.writeLDC(this.value);
-		writer.writeJumpInsn(Opcodes.IF_LCMPNE, elseLabel);
+		writer.visitLdcInsn(this.value);
+		writer.visitJumpInsn(Opcodes.IF_LCMPNE, elseLabel);
 	}
 	
 	@Override

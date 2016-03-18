@@ -160,7 +160,7 @@ public class FloatValue implements IConstantValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		writer.writeLDC(this.value);
+		writer.visitLdcInsn(this.value);
 
 		if (type != null)
 		{

@@ -202,7 +202,7 @@ public final class CastOperator extends AbstractValue
 
 		if (type == Types.VOID)
 		{
-			writer.writeInsn(Opcodes.AUTO_POP);
+			writer.visitInsn(Opcodes.AUTO_POP);
 			return;
 		}
 

@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.bytecode;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Handle;
 import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.asm.util.Printer;
@@ -19,7 +20,13 @@ public class InvokeDynamicInstruction implements IInstruction
 		this.bsm = bsm;
 		this.bsmArguments = bsmArguments;
 	}
-	
+
+	@Override
+	public int getOpcode()
+	{
+		return Opcodes.INVOKEDYNAMIC;
+	}
+
 	@Override
 	public void write(MethodVisitor writer) throws BytecodeException
 	{

@@ -5,9 +5,8 @@ import dyvil.tools.asm.*;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 
-public interface MethodWriter extends AnnotatableVisitor, TypeAnnotatableVisitor
+public interface MethodWriter extends AnnotatableVisitor, TypeAnnotatableVisitor, MethodVisitor
 {
-	
 	Frame getFrame();
 	
 	void setThisType(String type);
@@ -23,83 +22,133 @@ public interface MethodWriter extends AnnotatableVisitor, TypeAnnotatableVisitor
 	@Override
 	AnnotationVisitor visitAnnotation(String type, boolean visible);
 	
+	@Override
 	AnnotationVisitor visitParameterAnnotation(int index, String type, boolean visible);
 	
 	@Override
 	AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible);
-	
+
+	@Override
+	AnnotationVisitor visitInsnAnnotation(int typeRef, TypePath typePath, String desc, boolean visible);
+
+	@Override
+	AnnotationVisitor visitTryCatchAnnotation(int typeRef, TypePath typePath, String desc, boolean visible);
+
+	@Override
+	AnnotationVisitor visitLocalVariableAnnotation(int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index, String desc, boolean visible);
+
+	@Override
+	AnnotationVisitor visitAnnotationDefault();
+
+	@Override
+	void visitAttribute(Attribute attr);
+
 	// Code
-	
-	void begin();
-	
+
+	@Override
+	default void visitFrame(int type, int nLocal, Object[] local, int nStack, Object[] stack)
+	{
+	}
+
+	@Override
+	default void visitMaxs(int maxStack, int maxLocals)
+	{
+	}
+
+	@Override
+	boolean visitCode();
+
 	// Parameters
-	
-	int registerParameter(int index, String name, IType type, int access);
-	
-	void registerParameter(String name, int access);
-	
+
+	int visitParameter(int index, String name, IType type, int access);
+
+	@Override
+	void visitParameter(String name, int access);
+
 	// Local Variables
-	
+
 	int localCount();
-	
+
 	void resetLocals(int count);
-	
-	void writeLocal(int index, String name, String desc, String signature, Label start, Label end);
-	
+
+	@Override
+	void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index);
+
 	// Constants
-	
-	void writeLDC(int value);
-	
-	void writeLDC(long value);
-	
-	void writeLDC(float value);
-	
-	void writeLDC(double value);
-	
-	void writeLDC(String value);
-	
-	void writeLDC(Type value);
-	
+
+	void visitLdcInsn(int value);
+
+	void visitLdcInsn(long value);
+
+	void visitLdcInsn(float value);
+
+	void visitLdcInsn(double value);
+
+	void visitLdcInsn(String value);
+
+	void visitLdcInsn(Type value);
+
+	@Override
+	void visitLdcInsn(Object cst);
+
 	// Labels
-	
-	void writeLabel(Label label);
-	
-	void writeTargetLabel(Label label);
-	
-	void writeLineNumber(int lineNumber);
-	
+
+	@Override
+	void visitLabel(Label label);
+
+	void visitTargetLabel(Label label);
+
+	default void visitLineNumber(int lineNumber)
+	{
+		Label label = new Label();
+		this.visitLabel(label);
+		this.visitLineNumber(lineNumber, label);
+	}
+
+	@Override
+	void visitLineNumber(int line, Label start);
+
 	// Instructions
 	
-	void writeInsn(int opcode) throws BytecodeException;
+	@Override
+	void visitInsn(int opcode) throws BytecodeException;
 	
-	void writeInsnAtLine(int opcode, int lineNumber) throws BytecodeException;
+	void visitInsnAtLine(int opcode, int lineNumber) throws BytecodeException;
 	
-	void writeIntInsn(int opcode, int operand) throws BytecodeException;
+	@Override
+	void visitIntInsn(int opcode, int operand) throws BytecodeException;
 	
-	void writeJumpInsn(int opcode, Label label) throws BytecodeException;
+	@Override
+	void visitJumpInsn(int opcode, Label label) throws BytecodeException;
 	
-	void writeTypeInsn(int opcode, String type) throws BytecodeException;
+	@Override
+	void visitTypeInsn(int opcode, String type) throws BytecodeException;
+
+	@Override
+	void visitMultiANewArrayInsn(String type, int dims) throws BytecodeException;
 	
-	void writeNewArray(String type, int dims) throws BytecodeException;
+	void visitMultiANewArrayInsn(IType type, int dims) throws BytecodeException;
 	
-	void writeNewArray(IType type, int dims) throws BytecodeException;
+	@Override
+	void visitVarInsn(int opcode, int var) throws BytecodeException;
 	
-	void writeVarInsn(int opcode, int var) throws BytecodeException;
-	
-	void writeIINC(int index, int value) throws BytecodeException;
+	@Override
+	void visitIincInsn(int index, int value) throws BytecodeException;
 	
 	// Field Instructions
 	
-	default void writeFieldInsn(int opcode, String owner, String name, String desc) throws BytecodeException
+	@Override
+	default void visitFieldInsn(int opcode, String owner, String name, String desc) throws BytecodeException
 	{
-		this.writeFieldInsn(opcode, owner, name, desc, Frame.fieldType(desc));
+		this.visitFieldInsn(opcode, owner, name, desc, Frame.fieldType(desc));
 	}
 	
-	void writeFieldInsn(int opcode, String owner, String name, String desc, Object fieldType) throws BytecodeException;
+	void visitFieldInsn(int opcode, String owner, String name, String desc, Object fieldType) throws BytecodeException;
 	
 	// Invoke Instructions
 	
-	default void writeInvokeInsn(int opcode, String owner, String name, String desc, boolean isInterface)
+	@Override
+	default void visitMethodInsn(int opcode, String owner, String name, String desc, boolean isInterface)
 			throws BytecodeException
 	{
 		int args = Frame.getArgumentCount(desc);
@@ -107,25 +156,28 @@ public interface MethodWriter extends AnnotatableVisitor, TypeAnnotatableVisitor
 		{
 			args++;
 		}
-		this.writeInvokeInsn(opcode, owner, name, desc, args, Frame.returnType(desc), isInterface);
+		this.visitMethodInsn(opcode, owner, name, desc, args, Frame.returnType(desc), isInterface);
 	}
 	
-	void writeInvokeInsn(int opcode, String owner, String name, String desc, int args, Object returnType, boolean isInterface)
+	void visitMethodInsn(int opcode, String owner, String name, String desc, int args, Object returnType, boolean isInterface)
 			throws BytecodeException;
 	
-	default void writeInvokeDynamic(String name, String desc, Handle bsm, Object... bsmArgs) throws BytecodeException
+	@Override
+	default void visitInvokeDynamicInsn(String name, String desc, Handle bsm, Object... bsmArgs) throws BytecodeException
 	{
-		this.writeInvokeDynamic(name, desc, Frame.getArgumentCount(desc), Frame.returnType(desc), bsm, bsmArgs);
+		this.visitInvokeDynamicInsn(name, desc, Frame.getArgumentCount(desc), Frame.returnType(desc), bsm, bsmArgs);
 	}
 	
-	void writeInvokeDynamic(String name, String desc, int args, Object returnType, Handle bsm, Object... bsmArgs)
+	void visitInvokeDynamicInsn(String name, String desc, int args, Object returnType, Handle bsm, Object... bsmArgs)
 			throws BytecodeException;
 	
 	// Switch Instructions
+
+	@Override
+	void visitTableSwitchInsn(int start, int end, Label defaultHandler, Label... handlers) throws BytecodeException;
 	
-	void writeTableSwitch(Label defaultHandler, int start, int end, Label[] handlers) throws BytecodeException;
-	
-	void writeLookupSwitch(Label defaultHandler, int[] keys, Label[] handlers) throws BytecodeException;
+	@Override
+	void visitLookupSwitchInsn(Label defaultHandler, int[] keys, Label[] handlers) throws BytecodeException;
 	
 	// Blocks
 	
@@ -135,13 +187,15 @@ public interface MethodWriter extends AnnotatableVisitor, TypeAnnotatableVisitor
 	
 	void startCatchBlock(String type);
 	
-	void writeFinallyBlock(Label start, Label end, Label handler);
+	void visitFinallyBlock(Label start, Label end, Label handler);
 	
-	void writeCatchBlock(Label start, Label end, Label handler, String type);
+	@Override
+	void visitTryCatchBlock(Label start, Label end, Label handler, String type);
 	
 	// End
 	
-	void end();
+	@Override
+	void visitEnd();
 	
-	void end(IType type);
+	void visitEnd(IType type);
 }

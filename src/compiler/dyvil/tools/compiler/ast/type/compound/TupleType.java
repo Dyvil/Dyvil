@@ -428,17 +428,17 @@ public final class TupleType implements IObjectType, ITypeList
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeLDC(this.typeCount);
-		writer.writeNewArray("dyvilx/lang/model/type/Type", 1);
+		writer.visitLdcInsn(this.typeCount);
+		writer.visitMultiANewArrayInsn("dyvilx/lang/model/type/Type", 1);
 		for (int i = 0; i < this.typeCount; i++)
 		{
-			writer.writeInsn(Opcodes.DUP);
-			writer.writeLDC(i);
+			writer.visitInsn(Opcodes.DUP);
+			writer.visitLdcInsn(i);
 			this.types[i].writeTypeExpression(writer);
-			writer.writeInsn(Opcodes.AASTORE);
+			writer.visitInsn(Opcodes.AASTORE);
 		}
 
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/TupleType", "apply",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/TupleType", "apply",
 		                       "([Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/TupleType;", false);
 	}
 

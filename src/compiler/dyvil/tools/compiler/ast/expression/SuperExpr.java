@@ -155,7 +155,7 @@ public final class SuperExpr implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		writer.writeVarInsn(Opcodes.ALOAD, 0);
+		writer.visitVarInsn(Opcodes.ALOAD, 0);
 
 		if (type != null)
 		{

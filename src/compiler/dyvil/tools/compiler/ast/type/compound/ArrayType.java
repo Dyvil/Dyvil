@@ -437,7 +437,7 @@ public class ArrayType implements IObjectType, ITyped
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.type.writeTypeExpression(writer);
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/ArrayType", "apply",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/ArrayType", "apply",
 		                       "(Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/ArrayType;", false);
 	}
 	

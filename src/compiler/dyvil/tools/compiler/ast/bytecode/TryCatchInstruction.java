@@ -18,7 +18,13 @@ public class TryCatchInstruction implements IInstruction
 		this.handler = handler;
 		this.type = type;
 	}
-	
+
+	@Override
+	public int getOpcode()
+	{
+		return -1;
+	}
+
 	@Override
 	public void write(MethodVisitor writer) throws BytecodeException
 	{

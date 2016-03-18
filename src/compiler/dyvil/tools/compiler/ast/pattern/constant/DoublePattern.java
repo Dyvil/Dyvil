@@ -51,8 +51,8 @@ public final class DoublePattern extends Pattern
 	{
 		IPattern.loadVar(writer, varIndex, matchedType);
 		matchedType.writeCast(writer, Types.DOUBLE, this.getLineNumber());
-		writer.writeLDC(this.value);
-		writer.writeJumpInsn(Opcodes.IF_DCMPNE, elseLabel);
+		writer.visitLdcInsn(this.value);
+		writer.visitJumpInsn(Opcodes.IF_DCMPNE, elseLabel);
 	}
 	
 	@Override

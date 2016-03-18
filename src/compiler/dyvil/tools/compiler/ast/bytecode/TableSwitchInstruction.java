@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.bytecode;
 
 import dyvil.tools.asm.Label;
 import dyvil.tools.asm.MethodVisitor;
+import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 
@@ -19,7 +20,13 @@ public class TableSwitchInstruction implements IInstruction
 		this.defaultHandler = defaultHandler;
 		this.handlers = handlers;
 	}
-	
+
+	@Override
+	public int getOpcode()
+	{
+		return Opcodes.TABLESWITCH;
+	}
+
 	@Override
 	public void write(MethodVisitor writer) throws BytecodeException
 	{

@@ -51,8 +51,8 @@ public final class FloatPattern extends Pattern
 	{
 		IPattern.loadVar(writer, varIndex, matchedType);
 		matchedType.writeCast(writer, Types.FLOAT, this.getLineNumber());
-		writer.writeLDC(this.value);
-		writer.writeJumpInsn(Opcodes.IF_FCMPNE, elseLabel);
+		writer.visitLdcInsn(this.value);
+		writer.visitJumpInsn(Opcodes.IF_FCMPNE, elseLabel);
 	}
 	
 	@Override

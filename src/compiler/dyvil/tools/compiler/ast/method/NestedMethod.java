@@ -122,11 +122,11 @@ public class NestedMethod extends CodeMethod
 
 		if (this.value != null)
 		{
-			methodWriter.begin();
-			methodWriter.writeLabel(start);
+			methodWriter.visitCode();
+			methodWriter.visitLabel(start);
 			this.value.writeExpression(methodWriter, this.type);
-			methodWriter.writeLabel(end);
-			methodWriter.end(this.type);
+			methodWriter.visitLabel(end);
+			methodWriter.visitEnd(this.type);
 		}
 
 		for (int i = 0; i < this.parameterCount; i++)

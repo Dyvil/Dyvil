@@ -5,6 +5,8 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 
 public interface IInstruction
 {
+	int getOpcode();
+
 	void write(MethodVisitor visitor) throws BytecodeException;
 
 	void toString(String prefix, StringBuilder buffer);

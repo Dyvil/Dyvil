@@ -131,7 +131,7 @@ public final class BindingPattern extends Pattern
 		}
 		else if (varIndex < 0)
 		{
-			writer.writeInsn(Opcodes.AUTO_POP);
+			writer.visitInsn(Opcodes.AUTO_POP);
 		}
 	}
 	

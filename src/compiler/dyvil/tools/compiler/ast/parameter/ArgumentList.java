@@ -325,23 +325,23 @@ public final class ArgumentList implements IArguments, IValueList
 		int len = this.size - index;
 		if (len < 0)
 		{
-			writer.writeLDC(0);
-			writer.writeNewArray(type, 1);
+			writer.visitLdcInsn(0);
+			writer.visitMultiANewArrayInsn(type, 1);
 			return;
 		}
 		
 		int opcode = type.getArrayStoreOpcode();
 		
-		writer.writeLDC(len);
-		writer.writeNewArray(type, 1);
+		writer.visitLdcInsn(len);
+		writer.visitMultiANewArrayInsn(type, 1);
 		
 		for (int i = 0; i < len; i++)
 		{
-			writer.writeInsn(Opcodes.DUP);
+			writer.visitInsn(Opcodes.DUP);
 			IValue value = this.values[index + i];
-			writer.writeLDC(i);
+			writer.visitLdcInsn(i);
 			value.writeExpression(writer, type);
-			writer.writeInsn(opcode);
+			writer.visitInsn(opcode);
 		}
 	}
 

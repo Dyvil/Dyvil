@@ -26,7 +26,7 @@ public class StringForStatement extends ForEachStatement
 
 		// Scope
 		dyvil.tools.asm.Label scopeLabel = new dyvil.tools.asm.Label();
-		writer.writeLabel(scopeLabel);
+		writer.visitLabel(scopeLabel);
 
 		final int localCount = writer.localCount();
 		
@@ -38,28 +38,28 @@ public class StringForStatement extends ForEachStatement
 		final int lengthVarIndex = stringVarIndex + 1;
 		final int indexVarIndex = stringVarIndex + 2;
 
-		writer.writeInsn(Opcodes.DUP);
-		writer.writeVarInsn(Opcodes.ASTORE, stringVarIndex);
+		writer.visitInsn(Opcodes.DUP);
+		writer.visitVarInsn(Opcodes.ASTORE, stringVarIndex);
 		// Get the length
-		writer.writeLineNumber(lineNumber);
-		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "length", "()I", false);
-		writer.writeInsn(Opcodes.DUP);
-		writer.writeVarInsn(Opcodes.ISTORE, lengthVarIndex);
+		writer.visitLineNumber(lineNumber);
+		writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "length", "()I", false);
+		writer.visitInsn(Opcodes.DUP);
+		writer.visitVarInsn(Opcodes.ISTORE, lengthVarIndex);
 		
 		// Initial Boundary Check - if the length is 0, skip the loop.
-		writer.writeJumpInsn(Opcodes.IFEQ, endLabel);
+		writer.visitJumpInsn(Opcodes.IFEQ, endLabel);
 		
 		// Set index to 0
-		writer.writeLDC(0);
-		writer.writeVarInsn(Opcodes.ISTORE, indexVarIndex);
+		writer.visitLdcInsn(0);
+		writer.visitVarInsn(Opcodes.ISTORE, indexVarIndex);
 		
-		writer.writeTargetLabel(startLabel);
+		writer.visitTargetLabel(startLabel);
 		
 		// Get the char at the index
-		writer.writeVarInsn(Opcodes.ALOAD, stringVarIndex);
-		writer.writeVarInsn(Opcodes.ILOAD, indexVarIndex);
-		writer.writeLineNumber(lineNumber);
-		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "charAt", "(I)C", false);
+		writer.visitVarInsn(Opcodes.ALOAD, stringVarIndex);
+		writer.visitVarInsn(Opcodes.ILOAD, indexVarIndex);
+		writer.visitLineNumber(lineNumber);
+		writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "charAt", "(I)C", false);
 		// Autocasting
 		Types.CHAR.writeCast(writer, var.getType(), lineNumber);
 		var.writeInit(writer, null);
@@ -70,17 +70,17 @@ public class StringForStatement extends ForEachStatement
 			this.action.writeExpression(writer, Types.VOID);
 		}
 		
-		writer.writeLabel(updateLabel);
+		writer.visitLabel(updateLabel);
 		// Increment index
-		writer.writeIINC(indexVarIndex, 1);
+		writer.visitIincInsn(indexVarIndex, 1);
 		// Boundary Check
-		writer.writeVarInsn(Opcodes.ILOAD, indexVarIndex);
-		writer.writeVarInsn(Opcodes.ILOAD, lengthVarIndex);
-		writer.writeJumpInsn(Opcodes.IF_ICMPLT, startLabel);
+		writer.visitVarInsn(Opcodes.ILOAD, indexVarIndex);
+		writer.visitVarInsn(Opcodes.ILOAD, lengthVarIndex);
+		writer.visitJumpInsn(Opcodes.IF_ICMPLT, startLabel);
 		
 		// Local Variables
 		writer.resetLocals(localCount);
-		writer.writeLabel(endLabel);
+		writer.visitLabel(endLabel);
 		
 		var.writeLocal(writer, scopeLabel, endLabel);
 	}

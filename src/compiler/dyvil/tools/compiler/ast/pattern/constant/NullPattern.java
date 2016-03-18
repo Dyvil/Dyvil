@@ -46,8 +46,8 @@ public final class NullPattern extends Pattern
 	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
 			throws BytecodeException
 	{
-		writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-		writer.writeJumpInsn(Opcodes.IFNONNULL, elseLabel);
+		writer.visitVarInsn(Opcodes.ALOAD, varIndex);
+		writer.visitJumpInsn(Opcodes.IFNONNULL, elseLabel);
 	}
 	
 	@Override

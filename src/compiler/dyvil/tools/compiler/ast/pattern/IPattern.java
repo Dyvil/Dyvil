@@ -125,7 +125,7 @@ public interface IPattern extends IASTNode, ITyped
 	{
 		if (varIndex >= 0)
 		{
-			writer.writeVarInsn(matchedType.getLoadOpcode(), varIndex);
+			writer.visitVarInsn(matchedType.getLoadOpcode(), varIndex);
 		}
 	}
 
@@ -134,7 +134,7 @@ public interface IPattern extends IASTNode, ITyped
 		if (varIndex < 0)
 		{
 			varIndex = writer.localCount();
-			writer.writeVarInsn(matchedType.getStoreOpcode(), varIndex);
+			writer.visitVarInsn(matchedType.getStoreOpcode(), varIndex);
 		}
 		return varIndex;
 	}
@@ -144,8 +144,8 @@ public interface IPattern extends IASTNode, ITyped
 	{
 		final Label rightLabel = new Label();
 		this.writeInvJump(writer, varIndex, matchedType, rightLabel);
-		writer.writeJumpInsn(Opcodes.GOTO, targetLabel);
-		writer.writeLabel(rightLabel);
+		writer.visitJumpInsn(Opcodes.GOTO, targetLabel);
+		writer.visitLabel(rightLabel);
 	}
 	
 	void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel) throws BytecodeException;

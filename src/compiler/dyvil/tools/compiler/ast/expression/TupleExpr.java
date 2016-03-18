@@ -277,8 +277,8 @@ public final class TupleExpr implements IValue, IValueList
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		String internal = this.tupleType.getInternalName();
-		writer.writeTypeInsn(Opcodes.NEW, internal);
-		writer.writeInsn(Opcodes.DUP);
+		writer.visitTypeInsn(Opcodes.NEW, internal);
+		writer.visitInsn(Opcodes.DUP);
 		
 		for (int i = 0; i < this.valueCount; i++)
 		{
@@ -288,7 +288,7 @@ public final class TupleExpr implements IValue, IValueList
 		
 		String owner = internal;
 		String desc = TupleType.getConstructorDescriptor(this.valueCount);
-		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, owner, "<init>", desc, false);
+		writer.visitMethodInsn(Opcodes.INVOKESPECIAL, owner, "<init>", desc, false);
 
 		if (type != null)
 		{

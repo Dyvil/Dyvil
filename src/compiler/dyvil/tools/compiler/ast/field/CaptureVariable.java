@@ -61,7 +61,7 @@ public class CaptureVariable extends CaptureDataMember implements IVariable
 	@Override
 	public void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
-		writer.writeVarInsn(this.variable.getInternalType().getLoadOpcode(), this.localIndex);
+		writer.visitVarInsn(this.variable.getInternalType().getLoadOpcode(), this.localIndex);
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class CaptureVariable extends CaptureDataMember implements IVariable
 	{
 		if (!this.variable.isReferenceType())
 		{
-			writer.writeVarInsn(this.variable.getInternalType().getStoreOpcode(), this.localIndex);
+			writer.visitVarInsn(this.variable.getInternalType().getStoreOpcode(), this.localIndex);
 		}
 	}
 

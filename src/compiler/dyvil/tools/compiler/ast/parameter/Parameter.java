@@ -354,14 +354,15 @@ public abstract class Parameter extends Member implements IParameter
 				                      & ModifierUtil.JAVA_MODIFIER_MASK;
 
 		this.localIndex = writer.localCount();
-		writer.registerParameter(this.localIndex, this.name.qualified, this.getInternalType(), modifiers);
+		writer.visitParameter(this.localIndex, this.name.qualified, this.getInternalType(), modifiers);
 		this.writeAnnotations(writer);
 	}
 
 	@Override
 	public void writeLocal(MethodWriter writer, Label start, Label end)
 	{
-		writer.writeLocal(this.localIndex, this.name.qualified, this.getDescription(), this.getSignature(), start, end);
+		writer.visitLocalVariable(this.name.qualified, this.getDescription(), this.getSignature(), start, end,
+		                          this.localIndex);
 	}
 
 	protected void writeAnnotations(MethodWriter writer)

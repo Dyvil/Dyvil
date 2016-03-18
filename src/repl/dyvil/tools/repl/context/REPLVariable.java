@@ -178,7 +178,7 @@ public class REPLVariable extends Field
 		// Generate <clinit> static initializer
 		final MethodWriter clinitWriter = new MethodWriterImpl(classWriter, classWriter.visitMethod(
 			Modifiers.STATIC | Modifiers.SYNTHETIC, "<clinit>", "()V", null, null));
-		clinitWriter.begin();
+		clinitWriter.visitCode();
 
 		for (IClassCompilable c : compilableList)
 		{
@@ -186,25 +186,25 @@ public class REPLVariable extends Field
 		}
 
 		// Write a call to the computeResult method
-		clinitWriter.writeInvokeInsn(Opcodes.INVOKESTATIC, className, "computeResult", methodType, false);
+		clinitWriter.visitMethodInsn(Opcodes.INVOKESTATIC, className, "computeResult", methodType, false);
 		if (this.type != Types.VOID)
 		{
 			// Store the value to the field
-			clinitWriter.writeFieldInsn(Opcodes.PUTSTATIC, className, name, extendedType);
+			clinitWriter.visitFieldInsn(Opcodes.PUTSTATIC, className, name, extendedType);
 		}
 
 		// Finish the <clinit> static initializer
-		clinitWriter.writeInsn(Opcodes.RETURN);
-		clinitWriter.end();
+		clinitWriter.visitInsn(Opcodes.RETURN);
+		clinitWriter.visitEnd();
 
 		// Writer the computeResult method
 		if (this.value != null)
 		{
 			final MethodWriter computeWriter = new MethodWriterImpl(classWriter, classWriter.visitMethod(
 				Modifiers.PRIVATE | Modifiers.STATIC, "computeResult", methodType, null, null));
-			computeWriter.begin();
+			computeWriter.visitCode();
 			this.value.writeExpression(computeWriter, this.type);
-			computeWriter.end(this.type);
+			computeWriter.visitEnd(this.type);
 		}
 
 		// Finish Class compilation
@@ -239,7 +239,7 @@ public class REPLVariable extends Field
 		}
 
 		String extended = this.type.getExtendedName();
-		writer.writeFieldInsn(Opcodes.GETSTATIC, this.className, this.bytecodeName, extended);
+		writer.visitFieldInsn(Opcodes.GETSTATIC, this.className, this.bytecodeName, extended);
 	}
 
 	@Override
@@ -252,11 +252,11 @@ public class REPLVariable extends Field
 
 		if (this.className == null)
 		{
-			writer.writeInsn(Opcodes.AUTO_POP);
+			writer.visitInsn(Opcodes.AUTO_POP);
 			return;
 		}
 
 		String extended = this.type.getExtendedName();
-		writer.writeFieldInsn(Opcodes.PUTSTATIC, this.className, this.bytecodeName, extended);
+		writer.visitFieldInsn(Opcodes.PUTSTATIC, this.className, this.bytecodeName, extended);
 	}
 }

@@ -61,7 +61,7 @@ public class FieldThis implements IAccessible
 	@Override
 	public void writeGet(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeVarInsn(Opcodes.ALOAD, 0);
-		writer.writeFieldInsn(Opcodes.GETFIELD, this.owner.getInternalName(), this.name, this.desc);
+		writer.visitVarInsn(Opcodes.ALOAD, 0);
+		writer.visitFieldInsn(Opcodes.GETFIELD, this.owner.getInternalName(), this.name, this.desc);
 	}
 }

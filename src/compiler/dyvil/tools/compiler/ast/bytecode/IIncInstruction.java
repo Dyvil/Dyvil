@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.bytecode;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 
@@ -13,7 +14,13 @@ public final class IIncInstruction implements IInstruction
 		this.index = index;
 		this.value = value;
 	}
-	
+
+	@Override
+	public int getOpcode()
+	{
+		return Opcodes.IINC;
+	}
+
 	@Override
 	public void write(MethodVisitor writer) throws BytecodeException
 	{

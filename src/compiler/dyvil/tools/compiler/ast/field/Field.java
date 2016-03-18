@@ -308,9 +308,9 @@ public class Field extends Member implements IField
 			                                                                  this.name.qualified, desc, signature,
 			                                                                  null));
 
-			mw.begin();
+			mw.visitCode();
 			this.value.writeExpression(mw, this.type);
-			mw.end(this.type);
+			mw.visitEnd(this.type);
 
 			return;
 		}
@@ -326,9 +326,9 @@ public class Field extends Member implements IField
 	{
 		if (this.value != null && !this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{
-			writer.writeVarInsn(Opcodes.ALOAD, 0);
+			writer.visitVarInsn(Opcodes.ALOAD, 0);
 			this.value.writeExpression(writer, this.type);
-			writer.writeFieldInsn(Opcodes.PUTFIELD, this.enclosingClass.getInternalName(), this.name.qualified,
+			writer.visitFieldInsn(Opcodes.PUTFIELD, this.enclosingClass.getInternalName(), this.name.qualified,
 			                      this.getDescription());
 		}
 	}
@@ -339,7 +339,7 @@ public class Field extends Member implements IField
 		if (this.value != null && this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{
 			this.value.writeExpression(writer, this.type);
-			writer.writeFieldInsn(Opcodes.PUTSTATIC, this.enclosingClass.getInternalName(), this.name.qualified,
+			writer.visitFieldInsn(Opcodes.PUTSTATIC, this.enclosingClass.getInternalName(), this.name.qualified,
 			                      this.getDescription());
 		}
 	}
@@ -352,12 +352,12 @@ public class Field extends Member implements IField
 		String desc = this.type.getExtendedName();
 		if (this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{
-			writer.writeFieldInsn(Opcodes.GETSTATIC, owner, name, desc);
+			writer.visitFieldInsn(Opcodes.GETSTATIC, owner, name, desc);
 		}
 		else
 		{
-			writer.writeLineNumber(lineNumber);
-			writer.writeFieldInsn(Opcodes.GETFIELD, owner, name, desc);
+			writer.visitLineNumber(lineNumber);
+			writer.visitFieldInsn(Opcodes.GETFIELD, owner, name, desc);
 		}
 	}
 
@@ -369,12 +369,12 @@ public class Field extends Member implements IField
 		String desc = this.type.getExtendedName();
 		if (this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{
-			writer.writeFieldInsn(Opcodes.PUTSTATIC, owner, name, desc);
+			writer.visitFieldInsn(Opcodes.PUTSTATIC, owner, name, desc);
 		}
 		else
 		{
-			writer.writeLineNumber(lineNumber);
-			writer.writeFieldInsn(Opcodes.PUTFIELD, owner, name, desc);
+			writer.visitLineNumber(lineNumber);
+			writer.visitFieldInsn(Opcodes.PUTFIELD, owner, name, desc);
 		}
 	}
 

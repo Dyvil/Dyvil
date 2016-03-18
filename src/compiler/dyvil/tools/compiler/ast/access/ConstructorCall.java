@@ -326,7 +326,7 @@ public class ConstructorCall implements ICall
 			if (len == 1)
 			{
 				this.arguments.getFirstValue().writeExpression(writer, Types.INT);
-				writer.writeNewArray(this.type.getElementType(), 1);
+				writer.visitMultiANewArrayInsn(this.type.getElementType(), 1);
 				return;
 			}
 			
@@ -339,7 +339,7 @@ public class ConstructorCall implements ICall
 				arrayType = arrayType.getElementType();
 			}
 			
-			writer.writeNewArray(arrayType, len);
+			writer.visitMultiANewArrayInsn(arrayType, len);
 			return;
 		}
 		

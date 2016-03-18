@@ -167,9 +167,9 @@ public final class TuplePattern extends Pattern implements IPatternList
 				continue;
 			}
 
-			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
+			writer.visitVarInsn(Opcodes.ALOAD, varIndex);
 			matchedType.writeCast(writer, this.tupleType, lineNumber);
-			writer.writeFieldInsn(Opcodes.GETFIELD, internalTupleClassName, "_" + (i + 1), "Ljava/lang/Object;");
+			writer.visitFieldInsn(Opcodes.GETFIELD, internalTupleClassName, "_" + (i + 1), "Ljava/lang/Object;");
 			final IType targetType = this.tupleType.resolveTypeSafely(tupleClass.getTypeParameter(i));
 
 			Types.OBJECT.writeCast(writer, targetType, lineNumber);

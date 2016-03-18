@@ -326,7 +326,7 @@ public class RangeOperator implements IValue
 			this.startValue.writeExpression(writer, LazyFields.RANGEABLE_CLASS.getClassType());
 			this.endValue.writeExpression(writer, LazyFields.RANGEABLE_CLASS.getClassType());
 
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/Range", method,
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/collection/Range", method,
 			                       "(Ldyvil/collection/range/Rangeable;Ldyvil/collection/range/Rangeable;)Ldyvil/collection/Range;",
 			                       false);
 			return;
@@ -341,19 +341,19 @@ public class RangeOperator implements IValue
 		case PrimitiveType.SHORT_CODE:
 		case PrimitiveType.CHAR_CODE:
 		case PrimitiveType.INT_CODE:
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/range/IntRange", method,
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/collection/range/IntRange", method,
 			                       "(II)Ldyvil/collection/range/IntRange;", false);
 			return;
 		case PrimitiveType.LONG_CODE:
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/range/LongRange", method,
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/collection/range/LongRange", method,
 			                       "(JJ)Ldyvil/collection/range/LongRange;", false);
 			return;
 		case PrimitiveType.FLOAT_CODE:
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/range/FloatRange", method,
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/collection/range/FloatRange", method,
 			                       "(FF)Ldyvil/collection/range/FloatRange;", false);
 			return;
 		case PrimitiveType.DOUBLE_CODE:
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/range/DoubleRange", method,
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/collection/range/DoubleRange", method,
 			                       "(DD)Ldyvil/collection/range/DoubleRange;", false);
 			return;
 		}
@@ -372,14 +372,14 @@ public class RangeOperator implements IValue
 			// Write the class instance to be able to reify the type in the
 			// method
 			String extended = this.elementType.getExtendedName();
-			writer.writeLDC(Type.getType(extended));
+			writer.visitLdcInsn(Type.getType(extended));
 
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", method,
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", method,
 			                       "(Ldyvil/collection/range/Rangeable;Ldyvil/collection/range/Rangeable;Ljava/lang/Class;)[Ldyvil/collection/range/Rangeable;",
 			                       false);
 
 			// CheckCast so the verifier doesn't complain about mismatching types
-			writer.writeTypeInsn(Opcodes.CHECKCAST, '[' + extended);
+			writer.visitTypeInsn(Opcodes.CHECKCAST, '[' + extended);
 			return;
 		}
 
@@ -387,28 +387,28 @@ public class RangeOperator implements IValue
 		switch (this.elementType.getTypecode())
 		{
 		case PrimitiveType.BOOLEAN_CODE:
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/BooleanArray", method, "(ZZ)[Z", false);
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/BooleanArray", method, "(ZZ)[Z", false);
 			return;
 		case PrimitiveType.BYTE_CODE:
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ByteArray", method, "(BB)[B", false);
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/ByteArray", method, "(BB)[B", false);
 			return;
 		case PrimitiveType.SHORT_CODE:
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ShortArray", method, "(SS)[S", false);
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/ShortArray", method, "(SS)[S", false);
 			return;
 		case PrimitiveType.CHAR_CODE:
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/CharArray", method, "(CC)[C", false);
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/CharArray", method, "(CC)[C", false);
 			return;
 		case PrimitiveType.INT_CODE:
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/IntArray", method, "(II)[I", false);
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/IntArray", method, "(II)[I", false);
 			return;
 		case PrimitiveType.LONG_CODE:
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/LongArray", method, "(LL)[L", false);
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/LongArray", method, "(LL)[L", false);
 			return;
 		case PrimitiveType.FLOAT_CODE:
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/FloatArray", method, "(FF)[F", false);
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/FloatArray", method, "(FF)[F", false);
 			return;
 		case PrimitiveType.DOUBLE_CODE:
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/DoubleArray", method, "(DD)[D", false);
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/DoubleArray", method, "(DD)[D", false);
 			return;
 		}
 	}

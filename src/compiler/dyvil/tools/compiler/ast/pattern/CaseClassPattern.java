@@ -224,7 +224,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 			}
 
 			// Load the instance
-			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
+			writer.visitVarInsn(Opcodes.ALOAD, varIndex);
 			matchedType.writeCast(writer, this.type, lineNumber);
 
 			final IMethod method = this.getterMethods[i];

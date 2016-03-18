@@ -682,9 +682,9 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			                                                  .getMethodType(this.getSpecialDescriptor());
 		final Handle handle = new Handle(handleType, this.owner, this.name, desc);
 
-		writer.writeLineNumber(this.getLineNumber());
-		writer.writeInvokeDynamic(invokedName, invokedType, BOOTSTRAP, methodDescriptorType, handle,
-		                          lambdaDescriptorType);
+		writer.visitLineNumber(this.getLineNumber());
+		writer.visitInvokeDynamicInsn(invokedName, invokedType, BOOTSTRAP, methodDescriptorType, handle,
+		                              lambdaDescriptorType);
 
 		if (type != null)
 		{
@@ -794,9 +794,9 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 		// Write the Value
 
-		methodWriter.begin();
+		methodWriter.visitCode();
 		this.value.writeExpression(methodWriter, this.returnType);
-		methodWriter.end(this.returnType);
+		methodWriter.visitEnd(this.returnType);
 	}
 
 	@Override

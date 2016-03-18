@@ -4,10 +4,10 @@ import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 
-public final class InstructionList
+public class InstructionList
 {
-	private IInstruction[] instructions = new IInstruction[3];
-	private int instructionCount;
+	protected IInstruction[] instructions = new IInstruction[3];
+	protected int instructionCount;
 
 	public InstructionList()
 	{

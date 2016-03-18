@@ -350,9 +350,9 @@ public class Property extends Member implements IProperty
 
 			if (getterValue != null)
 			{
-				mw.begin();
+				mw.visitCode();
 				getterValue.writeExpression(mw, this.type);
-				mw.end(this.type);
+				mw.visitEnd(this.type);
 			}
 		}
 		if (this.setter != null)
@@ -381,9 +381,9 @@ public class Property extends Member implements IProperty
 			
 			if (setterValue != null)
 			{
-				mw.begin();
+				mw.visitCode();
 				setterValue.writeExpression(mw, Types.VOID);
-				mw.end(Types.VOID);
+				mw.visitEnd(Types.VOID);
 			}
 		}
 	}

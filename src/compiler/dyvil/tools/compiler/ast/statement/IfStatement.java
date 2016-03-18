@@ -330,10 +330,10 @@ public class IfStatement implements IValue
 		if (!writer.hasReturn())
 		{
 			writer.getFrame().set(commonFrameType);
-			writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
+			writer.visitJumpInsn(Opcodes.GOTO, elseEnd);
 		}
 		
-		writer.writeTargetLabel(elseStart);
+		writer.visitTargetLabel(elseStart);
 		
 		// Else Block
 		if (this.elseThen == null)
@@ -350,7 +350,7 @@ public class IfStatement implements IValue
 			writer.getFrame().set(commonFrameType);
 		}
 		
-		writer.writeTargetLabel(elseEnd);
+		writer.visitTargetLabel(elseEnd);
 	}
 
 	public void writeStatement(MethodWriter writer) throws BytecodeException
@@ -358,7 +358,7 @@ public class IfStatement implements IValue
 		if (this.then == null)
 		{
 			this.condition.writeExpression(writer, Types.BOOLEAN);
-			writer.writeInsn(Opcodes.POP);
+			writer.visitInsn(Opcodes.POP);
 			return;
 		}
 		
@@ -371,11 +371,11 @@ public class IfStatement implements IValue
 			this.condition.writeInvJump(writer, elseStart);
 			// If Block
 			this.then.writeExpression(writer, Types.VOID);
-			writer.writeJumpInsn(Opcodes.GOTO, elseEnd);
-			writer.writeTargetLabel(elseStart);
+			writer.visitJumpInsn(Opcodes.GOTO, elseEnd);
+			writer.visitTargetLabel(elseStart);
 			// Else Block
 			this.elseThen.writeExpression(writer, Types.VOID);
-			writer.writeTargetLabel(elseEnd);
+			writer.visitTargetLabel(elseEnd);
 		}
 		else
 		{
@@ -383,7 +383,7 @@ public class IfStatement implements IValue
 			this.condition.writeInvJump(writer, elseStart);
 			// If Block
 			this.then.writeExpression(writer, Types.VOID);
-			writer.writeTargetLabel(elseStart);
+			writer.visitTargetLabel(elseStart);
 		}
 	}
 	

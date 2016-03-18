@@ -364,7 +364,7 @@ public interface IValue extends IASTNode, ITyped
 	default void writeJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
 		this.writeExpression(writer, Types.BOOLEAN);
-		writer.writeJumpInsn(Opcodes.IFNE, dest);
+		writer.visitJumpInsn(Opcodes.IFNE, dest);
 	}
 
 	/**
@@ -381,7 +381,7 @@ public interface IValue extends IASTNode, ITyped
 	default void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
 		this.writeExpression(writer, Types.BOOLEAN);
-		writer.writeJumpInsn(Opcodes.IFEQ, dest);
+		writer.visitJumpInsn(Opcodes.IFEQ, dest);
 	}
 
 	default void writeAnnotationValue(AnnotationVisitor visitor, String key)

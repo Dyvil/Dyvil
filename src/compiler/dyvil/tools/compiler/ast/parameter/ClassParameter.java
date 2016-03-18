@@ -196,12 +196,12 @@ public final class ClassParameter extends Parameter implements IField
 		{
 			StringBuilder desc = new StringBuilder("()");
 			this.type.appendExtendedName(desc);
-			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, this.enclosingClass.getInternalName(), this.name.qualified,
+			writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, this.enclosingClass.getInternalName(), this.name.qualified,
 			                       desc.toString(), true);
 		}
 		else
 		{
-			writer.writeFieldInsn(Opcodes.GETFIELD, this.enclosingClass.getInternalName(), this.name.qualified,
+			writer.visitFieldInsn(Opcodes.GETFIELD, this.enclosingClass.getInternalName(), this.name.qualified,
 			                      this.getDescription());
 		}
 	}
@@ -209,7 +209,7 @@ public final class ClassParameter extends Parameter implements IField
 	@Override
 	public void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
-		writer.writeFieldInsn(Opcodes.PUTFIELD, this.enclosingClass.getInternalName(), this.name.qualified,
+		writer.visitFieldInsn(Opcodes.PUTFIELD, this.enclosingClass.getInternalName(), this.name.qualified,
 		                      this.getDescription());
 	}
 }

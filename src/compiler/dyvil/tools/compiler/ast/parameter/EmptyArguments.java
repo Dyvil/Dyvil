@@ -100,8 +100,8 @@ public final class EmptyArguments implements IArguments
 	@Override
 	public void writeVarargsValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
 	{
-		writer.writeLDC(0);
-		writer.writeNewArray(param.getType().getElementType(), 1);
+		writer.visitLdcInsn(0);
+		writer.visitMultiANewArrayInsn(param.getType().getElementType(), 1);
 	}
 	
 	@Override

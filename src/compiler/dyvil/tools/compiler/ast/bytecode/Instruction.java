@@ -12,7 +12,13 @@ public class Instruction implements IInstruction
 	{
 		this.opcode = opcode;
 	}
-	
+
+	@Override
+	public int getOpcode()
+	{
+		return this.opcode;
+	}
+
 	@Override
 	public void write(MethodVisitor writer) throws BytecodeException
 	{

@@ -14,7 +14,18 @@ public class IntInstruction implements IInstruction
 		this.opcode = opcode;
 		this.operand = operand;
 	}
-	
+
+	@Override
+	public int getOpcode()
+	{
+		return this.opcode;
+	}
+
+	public int getOperand()
+	{
+		return this.operand;
+	}
+
 	@Override
 	public void write(MethodVisitor writer) throws BytecodeException
 	{

@@ -153,11 +153,11 @@ public final class AndOperator extends AbstractValue
 		Label label2 = new Label();
 		this.left.writeInvJump(writer, label);
 		this.right.writeInvJump(writer, label);
-		writer.writeLDC(1);
-		writer.writeJumpInsn(Opcodes.GOTO, label2);
-		writer.writeLabel(label);
-		writer.writeLDC(0);
-		writer.writeLabel(label2);
+		writer.visitLdcInsn(1);
+		writer.visitJumpInsn(Opcodes.GOTO, label2);
+		writer.visitLabel(label);
+		writer.visitLdcInsn(0);
+		writer.visitLabel(label2);
 
 		if (type != null)
 		{

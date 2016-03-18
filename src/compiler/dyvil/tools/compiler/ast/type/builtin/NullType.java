@@ -109,7 +109,7 @@ public class NullType implements IRawType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvilx/lang/model/type/NullType", "instance",
+		writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvilx/lang/model/type/NullType", "instance",
 		                      "Ldyvilx/lang/model/type/NullType;");
 	}
 	

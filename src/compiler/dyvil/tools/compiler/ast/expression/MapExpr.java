@@ -275,7 +275,7 @@ public class MapExpr implements IValue
 	{
 		if (this.count == 0)
 		{
-			writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/collection/immutable/EmptyMap", "instance",
+			writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvil/collection/immutable/EmptyMap", "instance",
 			                      "Ldyvil/collection/immutable/EmptyMap;");
 			return;
 		}
@@ -283,29 +283,29 @@ public class MapExpr implements IValue
 		IType keyObject = this.keyType.getObjectType();
 		IType valueObject = this.valueType.getObjectType();
 		
-		writer.writeLDC(this.count);
-		writer.writeNewArray("java/lang/Object", 1);
+		writer.visitLdcInsn(this.count);
+		writer.visitMultiANewArrayInsn("java/lang/Object", 1);
 		
 		for (int i = 0; i < this.count; i++)
 		{
-			writer.writeInsn(Opcodes.DUP);
-			writer.writeLDC(i);
+			writer.visitInsn(Opcodes.DUP);
+			writer.visitLdcInsn(i);
 			this.keys[i].writeExpression(writer, keyObject);
-			writer.writeInsn(Opcodes.AASTORE);
+			writer.visitInsn(Opcodes.AASTORE);
 		}
 		
-		writer.writeLDC(this.count);
-		writer.writeNewArray("java/lang/Object", 1);
+		writer.visitLdcInsn(this.count);
+		writer.visitMultiANewArrayInsn("java/lang/Object", 1);
 		
 		for (int i = 0; i < this.count; i++)
 		{
-			writer.writeInsn(Opcodes.DUP);
-			writer.writeLDC(i);
+			writer.visitInsn(Opcodes.DUP);
+			writer.visitLdcInsn(i);
 			this.values[i].writeExpression(writer, valueObject);
-			writer.writeInsn(Opcodes.AASTORE);
+			writer.visitInsn(Opcodes.AASTORE);
 		}
 		
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/ImmutableMap", "apply",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/collection/ImmutableMap", "apply",
 		                       "([Ljava/lang/Object;[Ljava/lang/Object;)Ldyvil/collection/ImmutableMap;", true);
 
 		if (type != null)

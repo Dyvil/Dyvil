@@ -209,8 +209,8 @@ public class ColonOperator implements IValue
 
 		final int lineNumber = this.getLineNumber();
 
-		writer.writeLineNumber(lineNumber);
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/tuple/Tuple2", "apply",
+		writer.visitLineNumber(lineNumber);
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/tuple/Tuple2", "apply",
 		                       "(Ljava/lang/Object;Ljava/lang/Object;)Ldyvil/tuple/Tuple2;", false);
 
 		if (type != null)

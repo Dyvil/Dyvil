@@ -345,7 +345,7 @@ public final class WildcardType implements IRawType, ITyped
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/Variance", this.variance.name(),
+		writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/Variance", this.variance.name(),
 		                      "Ldyvil/reflect/Variance;");
 		
 		if (this.bound != null)
@@ -354,10 +354,10 @@ public final class WildcardType implements IRawType, ITyped
 		}
 		else
 		{
-			writer.writeInsn(Opcodes.ACONST_NULL);
+			writer.visitInsn(Opcodes.ACONST_NULL);
 		}
 		
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/WildcardType", "apply",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/WildcardType", "apply",
 		                       "(Ldyvil/reflect/Variance;Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/WildcardType;",
 		                       false);
 	}

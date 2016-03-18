@@ -275,7 +275,7 @@ public class MapType implements IObjectType
 	{
 		this.keyType.writeTypeExpression(writer);
 		this.valueType.writeTypeExpression(writer);
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/MapType", "apply",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/MapType", "apply",
 		                       "(Ldyvilx/lang/model/type/Type;Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/MapType;",
 		                       false);
 	}

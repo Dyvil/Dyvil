@@ -102,17 +102,17 @@ public final class StringPattern extends Pattern
 	protected static void writeStringInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel, String value)
 			throws BytecodeException
 	{
-		writer.writeLDC(value);
+		writer.visitLdcInsn(value);
 		if (varIndex >= 0)
 		{
-			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
+			writer.visitVarInsn(Opcodes.ALOAD, varIndex);
 		}
 		else
 		{
-			writer.writeInsn(Opcodes.SWAP);
+			writer.visitInsn(Opcodes.SWAP);
 		}
-		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "equals", "(Ljava/lang/Object;)Z", false);
-		writer.writeJumpInsn(Opcodes.IFEQ, elseLabel);
+		writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "equals", "(Ljava/lang/Object;)Z", false);
+		writer.visitJumpInsn(Opcodes.IFEQ, elseLabel);
 	}
 
 	@Override

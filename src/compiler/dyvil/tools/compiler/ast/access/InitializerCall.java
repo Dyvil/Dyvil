@@ -194,7 +194,7 @@ public class InitializerCall implements ICall
 			throw new BytecodeException();
 		}
 
-		writer.writeVarInsn(Opcodes.ALOAD, 0);
+		writer.visitVarInsn(Opcodes.ALOAD, 0);
 		this.constructor.writeArguments(writer, this.arguments);
 		this.constructor.writeInvoke(writer, this.getLineNumber());
 	}

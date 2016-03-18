@@ -81,7 +81,7 @@ public final class BooleanPattern extends Pattern
 	{
 		IPattern.loadVar(writer, varIndex, matchedType);
 		matchedType.writeCast(writer, Types.BOOLEAN, this.getLineNumber());
-		writer.writeJumpInsn(this.value ? Opcodes.IFEQ : Opcodes.IFNE, elseLabel);
+		writer.visitJumpInsn(this.value ? Opcodes.IFEQ : Opcodes.IFNE, elseLabel);
 	}
 	
 	@Override

@@ -243,10 +243,10 @@ public final class StringInterpolationExpr implements IValue
 			estSize += this.strings[i + 1].length();
 		}
 
-		writer.writeTypeInsn(Opcodes.NEW, "java/lang/StringBuilder");
-		writer.writeInsn(Opcodes.DUP);
-		writer.writeLDC(estSize);
-		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(I)V", false);
+		writer.visitTypeInsn(Opcodes.NEW, "java/lang/StringBuilder");
+		writer.visitInsn(Opcodes.DUP);
+		writer.visitLdcInsn(estSize);
+		writer.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(I)V", false);
 
 		CaseClasses.writeStringAppend(writer, string);
 
@@ -260,7 +260,7 @@ public final class StringInterpolationExpr implements IValue
 			CaseClasses.writeStringAppend(writer, string);
 		}
 
-		writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;",
+		writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;",
 		                       false);
 
 		if (type != null)

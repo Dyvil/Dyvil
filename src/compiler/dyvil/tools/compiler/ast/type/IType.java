@@ -437,6 +437,8 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	Object getFrameType();
 
+	int getLocalSlots();
+
 	void writeCast(MethodWriter writer, IType target, int lineNumber) throws BytecodeException;
 
 	void writeClassExpression(MethodWriter writer) throws BytecodeException;

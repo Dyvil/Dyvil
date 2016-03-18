@@ -194,20 +194,20 @@ public final class DoStatement extends AbstractValue implements IStatement, ILoo
 		
 		// Do Block
 		
-		writer.writeTargetLabel(startLabel);
+		writer.visitTargetLabel(startLabel);
 		this.action.writeExpression(writer, Types.VOID);
 		// Condition
-		writer.writeLabel(conditionLabel);
+		writer.visitLabel(conditionLabel);
 		if (this.condition != null)
 		{
 			this.condition.writeJump(writer, startLabel);
 		}
 		else
 		{
-			writer.writeJumpInsn(Opcodes.GOTO, startLabel);
+			writer.visitJumpInsn(Opcodes.GOTO, startLabel);
 		}
 		
-		writer.writeLabel(endLabel);
+		writer.visitLabel(endLabel);
 	}
 	
 	@Override

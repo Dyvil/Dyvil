@@ -53,11 +53,11 @@ public class InstanceFieldReference implements IReference
 		final String factoryMethodType =
 				"(Ljava/lang/Object;Ljava/lang/Class;Ljava/lang/String;)L" + Types.getInternalRef(fieldType, "") + ';';
 
-		writer.writeLDC(Type.getObjectType(fieldClassName));
-		writer.writeLDC(fieldName);
+		writer.visitLdcInsn(Type.getObjectType(fieldClassName));
+		writer.visitLdcInsn(fieldName);
 
 		// Write a call to the access factory method
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/ref/ReferenceFactory", factoryMethodName, factoryMethodType,
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/ref/ReferenceFactory", factoryMethodName, factoryMethodType,
 		                       false);
 	}
 }

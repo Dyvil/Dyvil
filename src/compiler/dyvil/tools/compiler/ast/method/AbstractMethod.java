@@ -1054,7 +1054,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			if (this.type != Types.VOID)
 			{
-				writer.writeInsn(Opcodes.AUTO_POP);
+				writer.visitInsn(Opcodes.AUTO_POP);
 			}
 			return;
 		}
@@ -1076,7 +1076,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 
 		this.writeArgumentsAndInvoke(writer, instance, arguments, typeContext, lineNumber);
-		writer.writeJumpInsn(IFNE, dest);
+		writer.visitJumpInsn(IFNE, dest);
 	}
 
 	@Override
@@ -1090,7 +1090,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 
 		this.writeArgumentsAndInvoke(writer, instance, arguments, typeContext, lineNumber);
-		writer.writeJumpInsn(IFEQ, dest);
+		writer.visitJumpInsn(IFEQ, dest);
 	}
 
 	protected void writeReceiver(MethodWriter writer, IValue receiver) throws BytecodeException
@@ -1168,7 +1168,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			typeParameter.writeArgument(writer, typeContext.resolveType(typeParameter));
 		}
 
-		writer.writeLineNumber(lineNumber);
+		writer.visitLineNumber(lineNumber);
 
 		int opcode;
 		int modifiers = this.modifiers.toFlags();
@@ -1176,8 +1176,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		String owner = this.enclosingClass.getInternalName();
 		if ((modifiers & Modifiers.EXTENSION) == Modifiers.EXTENSION)
 		{
-			writer.writeInvokeDynamic(this.name.qualified, this.getDescriptor(), EXTENSION_BSM,
-			                          new Handle(ClassFormat.H_INVOKESTATIC, owner, this.name.qualified,
+			writer.visitInvokeDynamicInsn(this.name.qualified, this.getDescriptor(), EXTENSION_BSM,
+			                              new Handle(ClassFormat.H_INVOKESTATIC, owner, this.name.qualified,
 			                                     this.getDescriptor()));
 			return;
 		}
@@ -1193,7 +1193,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 		String name = this.name.qualified;
 		String desc = this.getDescriptor();
-		writer.writeInvokeInsn(opcode, owner, name, desc, this.enclosingClass.isInterface());
+		writer.visitMethodInsn(opcode, owner, name, desc, this.enclosingClass.isInterface());
 	}
 
 	@Override
