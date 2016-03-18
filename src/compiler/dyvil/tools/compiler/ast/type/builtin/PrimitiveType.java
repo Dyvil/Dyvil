@@ -44,9 +44,9 @@ public final class PrimitiveType implements IType
 	public static final int LONG_CODE    = 6;
 	public static final int FLOAT_CODE   = 7;
 	public static final int DOUBLE_CODE  = 8;
-	
+
 	private static final long PROMOTION_BITS;
-	
+
 	static
 	{
 		// Code to generate the value of PROMOTION_BITS. Uncomment as needed.
@@ -71,24 +71,24 @@ public final class PrimitiveType implements IType
 		//*/
 		// @formatter:on
 	}
-	
+
 	protected final Name   name;
 	protected       IClass theClass;
-	
+
 	private final int  typecode;
 	private final char typeChar;
-	
+
 	private final int    opcodeOffset1;
 	private final int    opcodeOffset2;
 	private final Object frameType;
-	
+
 	protected IMethod boxMethod;
 	protected IMethod unboxMethod;
-	
+
 	private IClass arrayClass;
 	private IClass refClass;
 	private IType  simpleRefType;
-	
+
 	public PrimitiveType(Name name, int typecode, char typeChar, int loadOpcode, int aloadOpcode, Object frameType)
 	{
 		this.name = name;
@@ -98,7 +98,7 @@ public final class PrimitiveType implements IType
 		this.opcodeOffset2 = aloadOpcode - Opcodes.IALOAD;
 		this.frameType = frameType;
 	}
-	
+
 	public static IType getPrimitiveType(IType type)
 	{
 		if (type.isArrayType())
@@ -145,7 +145,7 @@ public final class PrimitiveType implements IType
 		}
 		return type;
 	}
-	
+
 	public static PrimitiveType fromTypecode(int typecode)
 	{
 		switch (typecode)
@@ -170,37 +170,37 @@ public final class PrimitiveType implements IType
 			return Types.VOID;
 		}
 	}
-	
+
 	@Override
 	public int typeTag()
 	{
 		return PRIMITIVE;
 	}
-	
+
 	@Override
 	public boolean isPrimitive()
 	{
 		return true;
 	}
-	
+
 	@Override
 	public int getTypecode()
 	{
 		return this.typecode;
 	}
-	
+
 	@Override
 	public boolean isGenericType()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public ITypeParameter getTypeVariable()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public final IType getObjectType()
 	{
@@ -244,31 +244,31 @@ public final class PrimitiveType implements IType
 		final String className = "Simple" + this.getTypePrefix() + "Ref";
 		return this.simpleRefType = new ClassType(Package.dyvilRefSimple.resolveClass(className));
 	}
-	
+
 	@Override
 	public IMethod getBoxMethod()
 	{
 		return this.boxMethod;
 	}
-	
+
 	@Override
 	public IMethod getUnboxMethod()
 	{
 		return this.unboxMethod;
 	}
-	
+
 	@Override
 	public boolean isArrayType()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public int getArrayDimensions()
 	{
 		return 0;
 	}
-	
+
 	@Override
 	public IType getElementType()
 	{
@@ -303,19 +303,19 @@ public final class PrimitiveType implements IType
 	{
 		return Mutability.IMMUTABLE;
 	}
-	
+
 	@Override
 	public Name getName()
 	{
 		return this.name;
 	}
-	
+
 	@Override
 	public IClass getTheClass()
 	{
 		return this.theClass;
 	}
-	
+
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
@@ -329,14 +329,14 @@ public final class PrimitiveType implements IType
 		}
 		return !type.isArrayType() && this.isSuperClassOf(type);
 	}
-	
+
 	@Override
 	public boolean isSuperClassOf(IType that)
 	{
 		return this.theClass == that.getTheClass() || that.isPrimitive() && isPromotable(that.getTypecode(),
 		                                                                                 this.typecode);
 	}
-	
+
 	@Override
 	public int getSuperTypeDistance(IType superType)
 	{
@@ -359,89 +359,89 @@ public final class PrimitiveType implements IType
 		}
 		return m + 1;
 	}
-	
+
 	private static long bitMask(int from, int to)
 	{
 		return 1L << ((from - 1) | ((to - 1) << 3));
 	}
-	
+
 	private static boolean isPromotable(int from, int to)
 	{
 		return to != 0 && (PROMOTION_BITS & bitMask(from, to)) != 0L;
 	}
-	
+
 	@Override
 	public boolean classEquals(IType type)
 	{
 		return type == this;
 	}
-	
+
 	@Override
 	public IType resolveType(ITypeParameter typeParameter)
 	{
 		return this.theClass.resolveType(typeParameter, this);
 	}
-	
+
 	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
 	}
-	
+
 	@Override
 	public boolean isResolved()
 	{
 		return true;
 	}
-	
+
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
 		return this;
 	}
-	
+
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
 	}
-	
+
 	@Override
 	public void checkType(MarkerList markers, IContext context, TypePosition position)
 	{
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 	}
-	
+
 	@Override
 	public void foldConstants()
 	{
 	}
-	
+
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
 	}
-	
+
 	@Override
 	public boolean hasTypeVariables()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
 		return this;
 	}
-	
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
 		return null;
 	}
-	
+
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
@@ -451,78 +451,90 @@ public final class PrimitiveType implements IType
 			this.theClass.getMethodMatches(list, instance, name, arguments);
 		}
 	}
-	
+
 	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}
-	
+
 	@Override
 	public IMethod getFunctionalMethod()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public String getInternalName()
 	{
 		return this.theClass.getInternalName();
 	}
-	
+
 	@Override
 	public void appendExtendedName(StringBuilder buf)
 	{
 		buf.append(this.typeChar);
 	}
-	
+
 	@Override
 	public String getSignature()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public void appendSignature(StringBuilder buf)
 	{
 		buf.append(this.typeChar);
 	}
-	
+
 	@Override
 	public int getLoadOpcode()
 	{
 		return Opcodes.ILOAD + this.opcodeOffset1;
 	}
-	
+
 	@Override
 	public int getArrayLoadOpcode()
 	{
 		return Opcodes.IALOAD + this.opcodeOffset2;
 	}
-	
+
 	@Override
 	public int getStoreOpcode()
 	{
 		return Opcodes.ISTORE + this.opcodeOffset1;
 	}
-	
+
 	@Override
 	public int getArrayStoreOpcode()
 	{
 		return Opcodes.IASTORE + this.opcodeOffset2;
 	}
-	
+
 	@Override
 	public int getReturnOpcode()
 	{
 		return Opcodes.IRETURN + this.opcodeOffset1;
 	}
-	
+
 	@Override
 	public Object getFrameType()
 	{
 		return this.frameType;
 	}
-	
+
+	@Override
+	public int getLocalSlots()
+	{
+		switch (this.typecode)
+		{
+		case LONG_CODE:
+		case DOUBLE_CODE:
+			return 2;
+		}
+		return 1;
+	}
+
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
@@ -530,7 +542,7 @@ public final class PrimitiveType implements IType
 		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/PrimitiveType", "apply",
 		                       "(I)Ldyvilx/lang/model/type/PrimitiveType;", false);
 	}
-	
+
 	@Override
 	public void writeDefaultValue(MethodWriter writer)
 	{
@@ -554,7 +566,7 @@ public final class PrimitiveType implements IType
 			break;
 		}
 	}
-	
+
 	@Override
 	public void writeCast(MethodWriter writer, IType target, int lineNumber) throws BytecodeException
 	{
@@ -571,7 +583,7 @@ public final class PrimitiveType implements IType
 				return;
 			}
 		}
-		
+
 		switch (this.typecode)
 		{
 		case BOOLEAN_CODE:
@@ -662,7 +674,7 @@ public final class PrimitiveType implements IType
 			break;
 		}
 	}
-	
+
 	private static void writeLongCast(IType cast, MethodWriter writer) throws BytecodeException
 	{
 		switch (cast.getTypecode())
@@ -692,7 +704,7 @@ public final class PrimitiveType implements IType
 			break;
 		}
 	}
-	
+
 	private static void writeFloatCast(IType cast, MethodWriter writer) throws BytecodeException
 	{
 		switch (cast.getTypecode())
@@ -722,7 +734,7 @@ public final class PrimitiveType implements IType
 			break;
 		}
 	}
-	
+
 	private static void writeDoubleCast(IType cast, MethodWriter writer) throws BytecodeException
 	{
 		switch (cast.getTypecode())
@@ -752,7 +764,7 @@ public final class PrimitiveType implements IType
 			break;
 		}
 	}
-	
+
 	@Override
 	public IConstantValue getDefaultValue()
 	{
@@ -774,52 +786,52 @@ public final class PrimitiveType implements IType
 		}
 		return null;
 	}
-	
+
 	@Override
 	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
 	{
 	}
-	
+
 	@Override
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
 	}
-	
+
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
 		out.writeByte(this.typecode);
 	}
-	
+
 	@Override
 	public void read(DataInput in) throws IOException
 	{
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return this.name.qualified;
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(this.name);
 	}
-	
+
 	@Override
 	public PrimitiveType clone()
 	{
 		return this; // no clones
 	}
-	
+
 	@Override
 	public boolean equals(Object obj)
 	{
 		return this == obj;
 	}
-	
+
 	@Override
 	public int hashCode()
 	{

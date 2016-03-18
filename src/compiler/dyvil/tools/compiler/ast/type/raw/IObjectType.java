@@ -148,6 +148,12 @@ public interface IObjectType extends IType
 	}
 
 	@Override
+	default int getLocalSlots()
+	{
+		return 1;
+	}
+
+	@Override
 	default String getExtendedName()
 	{
 		final StringBuilder stringBuilder = new StringBuilder();

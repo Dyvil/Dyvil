@@ -337,6 +337,12 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
+	public int getLocalSlots()
+	{
+		return this.type.getLocalSlots();
+	}
+
+	@Override
 	public void writeCast(MethodWriter writer, IType target, int lineNumber) throws BytecodeException
 	{
 		this.type.writeCast(writer, target, lineNumber);
