@@ -20,70 +20,71 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public final class NilExpr implements IValue
+public class NilExpr implements IValue
 {
 	public static final class LazyFields
 	{
 		public static final IClass NIL_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("NilConvertible");
-		
+
 		private LazyFields()
 		{
 			// no instances
 		}
 	}
-	
+
 	protected ICodePosition position;
-	
+
 	// Metadata
-	private IType   requiredType;
+	private IType requiredType;
+
 	private Name    methodName;
 	private IMethod method;
-	
+
 	public NilExpr()
 	{
 	}
-	
+
 	public NilExpr(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
 	@Override
 	public ICodePosition getPosition()
 	{
 		return this.position;
 	}
-	
+
 	@Override
 	public void setPosition(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
 	@Override
 	public int valueTag()
 	{
 		return NIL;
 	}
-	
+
 	@Override
 	public boolean isPrimitive()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public boolean isResolved()
 	{
 		return this.requiredType != null && this.requiredType.isResolved();
 	}
-	
+
 	@Override
 	public IType getType()
 	{
 		return this.requiredType == null ? dyvil.tools.compiler.ast.type.builtin.Types.UNKNOWN : this.requiredType;
 	}
-	
+
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
@@ -93,7 +94,7 @@ public final class NilExpr implements IValue
 			this.methodName = Names.apply;
 			return this;
 		}
-		
+
 		final IAnnotation annotation = type.getTheClass().getAnnotation(LazyFields.NIL_CONVERTIBLE_CLASS);
 		if (annotation != null)
 		{
@@ -109,36 +110,36 @@ public final class NilExpr implements IValue
 		}
 		return this;
 	}
-	
+
 	@Override
 	public boolean isType(IType type)
 	{
 		return type.isArrayType() || type.getTheClass().getAnnotation(LazyFields.NIL_CONVERTIBLE_CLASS) != null;
 	}
-	
+
 	@Override
 	public float getTypeMatch(IType type)
 	{
 		return this.isType(type) ? 1 : 0;
 	}
-	
+
 	@Override
 	public Object toObject()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 	}
-	
+
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
 		return this;
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -147,12 +148,12 @@ public final class NilExpr implements IValue
 			markers.add(Markers.semantic(this.position, "nil.untyped"));
 			return;
 		}
-		
+
 		if (this.requiredType == Types.UNKNOWN || this.requiredType.isArrayType())
 		{
 			return;
 		}
-		
+
 		IMethod match = IContext.resolveMethod(this.requiredType, null, this.methodName, EmptyArguments.INSTANCE);
 		if (match == null)
 		{
@@ -165,24 +166,24 @@ public final class NilExpr implements IValue
 			this.requiredType = match.getType().getConcreteType(data);
 		}
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 	}
-	
+
 	@Override
 	public IValue foldConstants()
 	{
 		return this;
 	}
-	
+
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		return this;
 	}
-	
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
@@ -198,7 +199,7 @@ public final class NilExpr implements IValue
 				                      this.requiredType.getExtendedName());
 				return;
 			}
-			
+
 			writer.visitLdcInsn(0);
 			int dims = 1;
 			while (elementType.isArrayType())
@@ -207,7 +208,7 @@ public final class NilExpr implements IValue
 				dims++;
 				writer.visitLdcInsn(0);
 			}
-			
+
 			writer.visitMultiANewArrayInsn(elementType, dims);
 		}
 		else
@@ -221,13 +222,13 @@ public final class NilExpr implements IValue
 			this.requiredType.writeCast(writer, type, this.getLineNumber());
 		}
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return "nil";
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

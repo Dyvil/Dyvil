@@ -27,6 +27,13 @@ public final class GenericData implements ITypeList, ITypeContext
 		this.method = method;
 		this.generics = new IType[count];
 	}
+
+	public GenericData(IMethod method, IType... generics)
+	{
+		this.method = method;
+		this.genericCount = generics.length;
+		this.generics = generics;
+	}
 	
 	@Override
 	public int typeCount()
