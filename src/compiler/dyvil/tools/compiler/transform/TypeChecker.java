@@ -33,6 +33,23 @@ public final class TypeChecker
 		                                                         expectedError, actualError);
 	}
 
+	public static MarkerSupplier markerSupplier(String error, String expectedError, String actualError, Object arg)
+	{
+		return (position, expectedType, actualType) -> typeError(position, expectedType, actualType, error,
+		                                                         expectedError, actualError, arg);
+	}
+
+	public static MarkerSupplier markerSupplier(String error, String expectedError, String actualError, Object... args)
+	{
+		return (position, expectedType, actualType) -> typeError(position, expectedType, actualType, error,
+		                                                         expectedError, actualError, args);
+	}
+
+	public static MarkerSupplier markerSupplier(String error, Object arg)
+	{
+		return (position, expected, actual) -> typeError(position, expected, actual, error, arg);
+	}
+
 	public static MarkerSupplier markerSupplier(String error, Object... args)
 	{
 		return (position, expected, actual) -> typeError(position, expected, actual, error, args);
@@ -62,9 +79,14 @@ public final class TypeChecker
 
 	public static Marker typeError(ICodePosition position, IType expected, IType actual, String key, Object... args)
 	{
+		return typeError(position, expected, actual, "type.expected", "value.type", key, args);
+	}
+
+	public static Marker typeError(ICodePosition position, IType expected, IType actual, String key, String expectedError, String actualError, Object... args)
+	{
 		final Marker marker = Markers.semanticError(position, key, args);
-		marker.addInfo(Markers.getSemantic("type.expected", expected));
-		marker.addInfo(Markers.getSemantic("value.type", actual));
+		marker.addInfo(Markers.getSemantic(expectedError, expected));
+		marker.addInfo(Markers.getSemantic(actualError, actual));
 		return marker;
 	}
 

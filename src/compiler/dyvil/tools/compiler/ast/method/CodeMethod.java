@@ -13,7 +13,6 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -29,6 +28,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Deprecation;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -46,27 +46,27 @@ public class CodeMethod extends AbstractMethod
 	{
 		super(iclass);
 	}
-	
+
 	public CodeMethod(IClass iclass, Name name)
 	{
 		super(iclass, name);
 	}
-	
+
 	public CodeMethod(IClass iclass, Name name, IType type)
 	{
 		super(iclass, name, type);
 	}
-	
+
 	public CodeMethod(IClass iclass, Name name, IType type, ModifierSet modifiers)
 	{
 		super(iclass, name, type, modifiers);
 	}
-	
+
 	public CodeMethod(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -82,9 +82,8 @@ public class CodeMethod extends AbstractMethod
 			final IClass selfTypeClass = this.receiverType.getTheClass();
 			if (selfTypeClass != null && selfTypeClass != this.enclosingClass)
 			{
-				final Marker marker = Markers
-						.semanticError(this.receiverType.getPosition(), "method.receivertype.incompatible",
-						               this.getName());
+				final Marker marker = Markers.semanticError(this.receiverType.getPosition(),
+				                                            "method.receivertype.incompatible", this.getName());
 				marker.addInfo(Markers.getSemantic("method.receivertype", this.receiverType));
 				marker.addInfo(Markers.getSemantic("method.classtype", this.enclosingClass.getFullName()));
 				markers.add(marker);
@@ -99,17 +98,17 @@ public class CodeMethod extends AbstractMethod
 		{
 			this.typeParameters[i].resolveTypes(markers, context);
 		}
-		
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].resolveTypes(markers, context);
 		}
-		
+
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
 			this.exceptions[i] = this.exceptions[i].resolveType(markers, context);
 		}
-		
+
 		if (this.value != null)
 		{
 			this.value.resolveTypes(markers, context);
@@ -125,7 +124,7 @@ public class CodeMethod extends AbstractMethod
 
 		context.pop();
 	}
-	
+
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
@@ -142,21 +141,21 @@ public class CodeMethod extends AbstractMethod
 		{
 			this.receiverType.resolve(markers, context);
 		}
-		
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].resolve(markers, context);
 		}
-		
+
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
 			this.exceptions[i].resolve(markers, context);
 		}
-		
+
 		if (this.value != null)
 		{
 			this.value = this.value.resolve(markers, context);
-			
+
 			boolean inferType = false;
 			if (this.type == Types.UNKNOWN)
 			{
@@ -168,22 +167,15 @@ public class CodeMethod extends AbstractMethod
 					this.type = Types.ANY;
 				}
 			}
-			
-			final IValue typedValue = this.type.convertValue(this.value, this.type, markers, context);
-			if (typedValue != null)
+
+			final TypeChecker.MarkerSupplier markerSupplier = TypeChecker.markerSupplier("method.type.incompatible",
+			                                                                             "method.type", "value.type",
+			                                                                             this.name);
+			this.value = TypeChecker.convertValue(this.value, this.type, this.type, markers, context, markerSupplier);
+
+			if (inferType)
 			{
-				this.value = typedValue;
-				if (inferType)
-				{
-					this.type = typedValue.getType();
-				}
-			}
-			else if (this.value.isResolved())
-			{
-				final Marker marker = Markers.semantic(this.position, "method.type.incompatible", this.name.unqualified);
-				marker.addInfo(Markers.getSemantic("method.type", this.type));
-				marker.addInfo(Markers.getSemantic("value.type", this.value.getType()));
-				markers.add(marker);
+				this.type = this.value.getType();
 			}
 		}
 		else if (this.type == Types.UNKNOWN)
@@ -194,7 +186,7 @@ public class CodeMethod extends AbstractMethod
 
 		context.pop();
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -206,22 +198,22 @@ public class CodeMethod extends AbstractMethod
 		{
 			this.receiverType.checkType(markers, context, TypePosition.PARAMETER_TYPE);
 		}
-		
+
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
 			this.typeParameters[i].checkTypes(markers, context);
 		}
-		
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].checkTypes(markers, context);
 		}
-		
+
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
 			this.exceptions[i].checkType(markers, context, TypePosition.RETURN_TYPE);
 		}
-		
+
 		if (this.value != null)
 		{
 			this.value.resolveStatement(this, markers);
@@ -230,7 +222,7 @@ public class CodeMethod extends AbstractMethod
 
 		context.pop();
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
@@ -252,12 +244,12 @@ public class CodeMethod extends AbstractMethod
 		{
 			this.parameters[i].check(markers, this);
 		}
-		
+
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
 			IType exceptionType = this.exceptions[i];
 			exceptionType.check(markers, this);
-			
+
 			if (!Types.THROWABLE.isSuperTypeOf(exceptionType))
 			{
 				Marker marker = Markers.semantic(exceptionType.getPosition(), "method.exception.type");
@@ -265,29 +257,29 @@ public class CodeMethod extends AbstractMethod
 				markers.add(marker);
 			}
 		}
-		
+
 		if (this.value != null)
 		{
 			this.value.check(markers, this);
 		}
-		
+
 		// Check for illegal modifiers
 		ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.METHOD_MODIFIERS);
-		
+
 		// Check illegal modifier combinations
 		ModifierUtil.checkMethodModifiers(markers, this, this.modifiers.toFlags(), this.value != null);
-		
+
 		if (!this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{
 			this.checkOverride(markers);
 		}
-		
+
 		// Check for duplicate methods
 		this.checkDuplicates(markers);
 
 		context.pop();
 	}
-	
+
 	private void checkDuplicates(MarkerList markers)
 	{
 		String desc = this.getDescriptor();
@@ -296,7 +288,7 @@ public class CodeMethod extends AbstractMethod
 		{
 			return;
 		}
-		
+
 		for (int i = body.methodCount() - 1; i >= 0; i--)
 		{
 			IMethod m = body.getMethod(i);
@@ -304,14 +296,14 @@ public class CodeMethod extends AbstractMethod
 			{
 				continue;
 			}
-			
+
 			if (m.getDescriptor().equals(desc))
 			{
 				markers.add(Markers.semantic(this.position, "method.duplicate", this.name, desc));
 			}
 		}
 	}
-	
+
 	private void checkOverride(MarkerList markers)
 	{
 		if (this.overrideMethods == null)
@@ -322,7 +314,7 @@ public class CodeMethod extends AbstractMethod
 			}
 			return;
 		}
-		
+
 		if (!this.modifiers.hasIntModifier(Modifiers.OVERRIDE))
 		{
 			markers.add(Markers.semantic(this.position, "method.overrides", this.name));
@@ -355,7 +347,7 @@ public class CodeMethod extends AbstractMethod
 			}
 		}
 	}
-	
+
 	@Override
 	public void foldConstants()
 	{
@@ -375,18 +367,18 @@ public class CodeMethod extends AbstractMethod
 		{
 			this.parameters[i].foldConstants();
 		}
-		
+
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
 			this.exceptions[i].foldConstants();
 		}
-		
+
 		if (this.value != null)
 		{
 			this.value = this.value.foldConstants();
 		}
 	}
-	
+
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
@@ -407,22 +399,22 @@ public class CodeMethod extends AbstractMethod
 		{
 			this.receiverType.cleanup(context, compilableList);
 		}
-		
+
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
 			this.typeParameters[i].cleanup(context, compilableList);
 		}
-		
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].cleanup(context, compilableList);
 		}
-		
+
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
 			this.exceptions[i].cleanup(context, compilableList);
 		}
-		
+
 		if (this.value != null)
 		{
 			this.value = this.value.cleanup(context, compilableList);
@@ -430,7 +422,7 @@ public class CodeMethod extends AbstractMethod
 
 		context.pop();
 	}
-	
+
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
@@ -448,17 +440,17 @@ public class CodeMethod extends AbstractMethod
 
 		final String internalThisClassName = this.enclosingClass.getInternalName();
 		final String[] exceptionTypes = this.getInternalExceptions();
-		MethodWriter methodWriter = new MethodWriterImpl(writer, writer.visitMethod(modifiers & ModifierUtil.JAVA_MODIFIER_MASK,
-		                                                                  this.name.qualified, this.getDescriptor(),
-		                                                                  this.getSignature(), exceptionTypes));
+		MethodWriter methodWriter = new MethodWriterImpl(writer, writer.visitMethod(
+			modifiers & ModifierUtil.JAVA_MODIFIER_MASK, this.name.qualified, this.getDescriptor(), this.getSignature(),
+			exceptionTypes));
 
 		if ((modifiers & Modifiers.STATIC) == 0)
 		{
 			methodWriter.setThisType(internalThisClassName);
 		}
-		
+
 		this.writeAnnotations(methodWriter, modifiers);
-		
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].writeInit(methodWriter);
@@ -468,10 +460,10 @@ public class CodeMethod extends AbstractMethod
 		{
 			this.typeParameters[i].writeParameter(methodWriter);
 		}
-		
+
 		final Label start = new Label();
 		final Label end = new Label();
-		
+
 		if (this.value != null)
 		{
 			methodWriter.visitCode();
@@ -480,24 +472,24 @@ public class CodeMethod extends AbstractMethod
 			methodWriter.visitLabel(end);
 			methodWriter.visitEnd(this.type);
 		}
-		
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].writeLocal(methodWriter, start, end);
 		}
-		
+
 		if ((modifiers & Modifiers.STATIC) != 0)
 		{
 			return;
 		}
-		
+
 		methodWriter.visitLocalVariable("this", 'L' + internalThisClassName + ';', null, start, end, 0);
-		
+
 		if (this.overrideMethods == null)
 		{
 			return;
 		}
-		
+
 		final int lineNumber = this.getLineNumber();
 
 		final Set<String> descriptors = new HashSet<>(1 + this.overrideMethods.size());
@@ -517,9 +509,9 @@ public class CodeMethod extends AbstractMethod
 			descriptors.add(desc);
 
 			// Generate a bridge method
-			methodWriter = new MethodWriterImpl(writer,
-			                          writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC | Modifiers.BRIDGE,
-			                                             this.name.qualified, desc, null, exceptionTypes));
+			methodWriter = new MethodWriterImpl(writer, writer.visitMethod(
+				Modifiers.PUBLIC | Modifiers.SYNTHETIC | Modifiers.BRIDGE, this.name.qualified, desc, null,
+				exceptionTypes));
 
 			methodWriter.visitCode();
 			methodWriter.setThisType(internalThisClassName);
@@ -541,14 +533,14 @@ public class CodeMethod extends AbstractMethod
 
 			methodWriter.visitLineNumber(lineNumber);
 			methodWriter.visitMethodInsn((modifiers & Modifiers.ABSTRACT) != 0 && interfaceClass ?
-					                   Opcodes.INVOKEINTERFACE :
-					                   Opcodes.INVOKEVIRTUAL, internalThisClassName, this.name.qualified, this.getDescriptor(), interfaceClass);
+				                             Opcodes.INVOKEINTERFACE :
+				                             Opcodes.INVOKEVIRTUAL, internalThisClassName, this.name.qualified, this.getDescriptor(), interfaceClass);
 			this.type.writeCast(methodWriter, overrideReturnType, lineNumber);
 			methodWriter.visitInsn(overrideReturnType.getReturnOpcode());
 			methodWriter.visitEnd();
 		}
 	}
-	
+
 	protected void writeAnnotations(MethodWriter writer, int modifiers)
 	{
 		if (this.annotations != null)
@@ -592,34 +584,34 @@ public class CodeMethod extends AbstractMethod
 	{
 		out.writeUTF(this.name.qualified);
 		IType.writeType(this.type, out);
-		
+
 		out.writeByte(this.parameterCount);
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IType.writeType(this.parameters[i].getType(), out);
 		}
 	}
-	
+
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
 		this.writeAnnotations(out);
-		
+
 		out.writeUTF(this.name.qualified);
 		IType.writeType(this.type, out);
-		
+
 		out.writeByte(this.parameterCount);
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].write(out);
 		}
 	}
-	
+
 	@Override
 	public void readSignature(DataInput in) throws IOException
 	{
 		this.type = IType.readType(in);
-		
+
 		int parameterCount = in.readByte();
 		if (this.parameterCount != 0)
 		{
@@ -631,22 +623,22 @@ public class CodeMethod extends AbstractMethod
 			this.parameterCount = parameterCount;
 			return;
 		}
-		
+
 		this.parameters = new IParameter[parameterCount];
 		for (int i = 0; i < parameterCount; i++)
 		{
 			this.parameters[i] = new MethodParameter(Name.getQualified("par" + i), IType.readType(in));
 		}
 	}
-	
+
 	@Override
 	public void read(DataInput in) throws IOException
 	{
 		this.readAnnotations(in);
-		
+
 		this.name = Name.get(in.readUTF());
 		this.type = IType.readType(in);
-		
+
 		int parameterCount = in.readByte();
 		this.parameters = new IParameter[parameterCount];
 		for (int i = 0; i < parameterCount; i++)

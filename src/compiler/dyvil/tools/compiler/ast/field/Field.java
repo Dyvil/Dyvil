@@ -31,8 +31,6 @@ import java.lang.annotation.ElementType;
 
 public class Field extends Member implements IField
 {
-	public static final TypeChecker.MarkerSupplier FIELD_MARKER_SUPPLIER = TypeChecker
-			.markerSupplier("field.type.incompatible", "field.type", "value.type");
 
 	protected IClass enclosingClass;
 	protected IValue value;
@@ -160,8 +158,8 @@ public class Field extends Member implements IField
 			else
 			{
 				IType type = this.enclosingClass.getClassType();
-				receiver = TypeChecker.convertValue(receiver, type, type, markers, context,
-				                                    TypeChecker.markerSupplier("field.access.receiver_type"));
+				receiver = TypeChecker.convertValue(receiver, type, type, markers, context, TypeChecker.markerSupplier(
+					"field.access.receiver_type", this.name));
 			}
 		}
 		else if (!this.modifiers.hasIntModifier(Modifiers.STATIC))
@@ -219,8 +217,10 @@ public class Field extends Member implements IField
 				this.type = this.value.getType();
 			}
 
-			this.value = TypeChecker
-					.convertValue(this.value, this.type, this.type, markers, context, FIELD_MARKER_SUPPLIER);
+			final TypeChecker.MarkerSupplier markerSupplier = TypeChecker.markerSupplier("field.type.incompatible",
+			                                                                             "field.type", "value.type",
+			                                                                             this.name);
+			this.value = TypeChecker.convertValue(this.value, this.type, this.type, markers, context, markerSupplier);
 
 			if (inferType)
 			{

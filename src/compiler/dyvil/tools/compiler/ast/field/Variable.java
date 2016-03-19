@@ -16,9 +16,9 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -182,24 +182,14 @@ public final class Variable extends Member implements IVariable
 			}
 		}
 
-		IValue value1 = this.type.convertValue(this.value, this.type, markers, context);
-		if (value1 == null)
+		final TypeChecker.MarkerSupplier markerSupplier = TypeChecker.markerSupplier("variable.type.incompatible",
+		                                                                             "variable.type", "value.type",
+		                                                                             this.name);
+		this.value = TypeChecker.convertValue(this.value, this.type, this.type, markers, context, markerSupplier);
+
+		if (inferType)
 		{
-			if (this.value.isResolved())
-			{
-				Marker marker = Markers.semantic(this.position, "variable.type.incompatible", this.name.unqualified);
-				marker.addInfo(Markers.getSemantic("variable.type", this.type));
-				marker.addInfo(Markers.getSemantic("value.type", this.value.getType()));
-				markers.add(marker);
-			}
-		}
-		else
-		{
-			this.value = value1;
-			if (inferType)
-			{
-				this.type = value1.getType();
-			}
+			this.type = this.value.getType();
 		}
 	}
 
@@ -261,9 +251,8 @@ public final class Variable extends Member implements IVariable
 	public void writeLocal(MethodWriter writer, Label start, Label end)
 	{
 		final IType type = this.refType != null ? this.refType : this.type;
-		writer
-			.visitLocalVariable(this.name.qualified, type.getExtendedName(), type.getSignature(), start, end,
-			                    this.localIndex);
+		writer.visitLocalVariable(this.name.qualified, type.getExtendedName(), type.getSignature(), start, end,
+		                          this.localIndex);
 	}
 
 	@Override
