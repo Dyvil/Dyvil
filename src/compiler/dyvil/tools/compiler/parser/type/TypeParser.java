@@ -76,6 +76,11 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					this.type = new OptionType(this.type);
 					return;
 				}
+				if (name == Names.bang)
+				{
+					this.type = new ImplicitOptionType(this.type);
+					return;
+				}
 				if (name == Names.times)
 				{
 					this.type = new ReferenceType(this.type);

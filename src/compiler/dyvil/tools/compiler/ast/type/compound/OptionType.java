@@ -43,7 +43,9 @@ public class OptionType implements IObjectType
 
 		public static final IClass SOME_CLASS = Package.dyvilUtil.resolveClass("Some");
 
-		public static final IMethod WRAPPER_METHOD = SOME_CLASS.getBody().getMethod(Names.apply);
+		public static final IMethod APPLY_METHOD = SOME_CLASS.getBody().getMethod(Names.apply);
+
+		public static final IMethod GET_METHOD = OPTION_CLASS.getBody().getMethod(Names.get);
 
 		private LazyFields()
 		{
@@ -74,7 +76,7 @@ public class OptionType implements IObjectType
 		}
 	}
 
-	private IType type;
+	protected IType type;
 
 	public OptionType()
 	{
@@ -131,9 +133,9 @@ public class OptionType implements IObjectType
 		}
 
 		// Wrap the argument in a call to Some.[T]apply(x)
-		final MethodCall methodCall = new MethodCall(value.getPosition(), null, LazyFields.WRAPPER_METHOD,
+		final MethodCall methodCall = new MethodCall(value.getPosition(), null, LazyFields.APPLY_METHOD,
 		                                             new SingleArgument(value));
-		methodCall.setGenericData(new GenericData(LazyFields.WRAPPER_METHOD, this.type));
+		methodCall.setGenericData(new GenericData(LazyFields.APPLY_METHOD, this.type));
 		return methodCall;
 	}
 
