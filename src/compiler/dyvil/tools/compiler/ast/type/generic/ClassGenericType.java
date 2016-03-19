@@ -71,7 +71,7 @@ public class ClassGenericType extends GenericType
 	}
 
 	@Override
-	public IType getParameterType()
+	public IType asParameterType()
 	{
 		return this;
 	}

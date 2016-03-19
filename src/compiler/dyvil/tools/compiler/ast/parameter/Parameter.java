@@ -89,7 +89,7 @@ public abstract class Parameter extends Member implements IParameter
 			return this.internalType;
 		}
 
-		return this.internalType = this.getInternalType().getParameterType();
+		return this.internalType = this.getInternalType().asParameterType();
 	}
 
 	@Override

@@ -66,13 +66,13 @@ public class TypeVarType implements IRawType
 	}
 
 	@Override
-	public IType getParameterType()
+	public IType asParameterType()
 	{
 		return this.typeParameter.getCovariantType();
 	}
 
 	@Override
-	public IType getReturnType()
+	public IType asReturnType()
 	{
 		return this.typeParameter.getCovariantType();
 	}
@@ -104,7 +104,7 @@ public class TypeVarType implements IRawType
 	@Override
 	public boolean isSameType(IType type)
 	{
-		return this.typeParameter == type.getReturnType().getTypeVariable();
+		return this.typeParameter == type.asReturnType().getTypeVariable();
 	}
 	
 	@Override

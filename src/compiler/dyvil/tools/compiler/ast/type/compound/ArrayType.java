@@ -344,14 +344,7 @@ public class ArrayType implements IObjectType, ITyped
 			}
 			if (concrete != null && concrete != this.type)
 			{
-				return new ArrayType(concrete, this.mutability)
-				{
-					@Override
-					public IType getReturnType()
-					{
-						return new ArrayType(typeParameter.getDefaultType(), this.mutability);
-					}
-				};
+				return new ArrayType(concrete, this.mutability);
 			}
 			return this;
 		}

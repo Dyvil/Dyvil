@@ -307,7 +307,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			}
 
 			final IType methodParamType = this.method.getParameter(i).getType();
-			final IType concreteType = methodParamType.getConcreteType(this.type).getParameterType();
+			final IType concreteType = methodParamType.getConcreteType(this.type).asParameterType();
 
 			// Can't infer parameter type
 			if (concreteType == Types.UNKNOWN)
@@ -317,7 +317,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			parameter.setType(concreteType);
 		}
 
-		this.returnType = this.method.getType().getConcreteType(this.type).getReturnType().getParameterType();
+		this.returnType = this.method.getType().getConcreteType(this.type).asParameterType();
 	}
 
 	@Override
@@ -360,7 +360,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			}
 
 			final IParameter methodParameter = method.getParameter(i);
-			final IType methodParameterType = methodParameter.getType().getParameterType();
+			final IType methodParameterType = methodParameter.getType().asParameterType();
 			if (!methodParameterType.isSuperTypeOf(lambdaParameterType))
 			{
 				return false;

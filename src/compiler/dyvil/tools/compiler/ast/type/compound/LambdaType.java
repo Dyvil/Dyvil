@@ -203,7 +203,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	// IType Overrides
 
 	@Override
-	public IType getParameterType()
+	public IType asParameterType()
 	{
 		if (!this.hasTypeVariables())
 		{
@@ -213,9 +213,9 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		final IType[] parameterTypes = new IType[this.parameterCount];
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			parameterTypes[i] = this.parameterTypes[i].getParameterType();
+			parameterTypes[i] = this.parameterTypes[i].asParameterType();
 		}
-		final IType returnType = this.returnType.getParameterType();
+		final IType returnType = this.returnType.asParameterType();
 		final LambdaType lambdaType = new LambdaType(parameterTypes, this.parameterCount, returnType);
 		lambdaType.setExtension(this.extension);
 		return lambdaType;
@@ -428,7 +428,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameterTypes[i] = this.parameterTypes[i].resolveType(markers, context).getParameterType();
+			this.parameterTypes[i] = this.parameterTypes[i].resolveType(markers, context).asParameterType();
 		}
 		if (this.returnType == null)
 		{
@@ -437,7 +437,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		}
 		else
 		{
-			this.returnType = this.returnType.resolveType(markers, context).getReturnType();
+			this.returnType = this.returnType.resolveType(markers, context).asReturnType();
 		}
 
 		return this;

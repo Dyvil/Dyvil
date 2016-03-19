@@ -108,7 +108,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 			}
 
 			final ITypeContext typeContext = this.receiver == null ? ITypeContext.NULL : this.receiver.getType();
-			return this.type = this.field.getType().getConcreteType(typeContext).getReturnType();
+			return this.type = this.field.getType().getConcreteType(typeContext).asReturnType();
 		}
 		return this.type;
 	}

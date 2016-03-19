@@ -95,7 +95,7 @@ public final class WildcardType implements IRawType, ITyped
 	}
 	
 	@Override
-	public IType getReturnType()
+	public IType asReturnType()
 	{
 		if (this.bound == null || this.variance == Variance.CONTRAVARIANT)
 		{
@@ -105,13 +105,13 @@ public final class WildcardType implements IRawType, ITyped
 	}
 	
 	@Override
-	public IType getParameterType()
+	public IType asParameterType()
 	{
 		if (this.bound == null || this.variance == Variance.COVARIANT)
 		{
 			return Types.ANY;
 		}
-		return this.bound.getParameterType();
+		return this.bound.asParameterType();
 	}
 	
 	@Override

@@ -152,7 +152,7 @@ public final class TupleType implements IObjectType, ITypeList
 	}
 
 	@Override
-	public IType getParameterType()
+	public IType asParameterType()
 	{
 		if (!this.hasTypeVariables())
 		{
@@ -162,7 +162,7 @@ public final class TupleType implements IObjectType, ITypeList
 		final IType[] types = new IType[this.typeCount];
 		for (int i = 0; i < this.typeCount; i++)
 		{
-			types[i] = this.types[i].getParameterType();
+			types[i] = this.types[i].asParameterType();
 		}
 		return new TupleType(types, this.typeCount);
 	}

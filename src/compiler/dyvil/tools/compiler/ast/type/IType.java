@@ -152,12 +152,12 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	IType getObjectType();
 
-	default IType getReturnType()
+	default IType asReturnType()
 	{
 		return this;
 	}
 
-	default IType getParameterType()
+	default IType asParameterType()
 	{
 		return this;
 	}
