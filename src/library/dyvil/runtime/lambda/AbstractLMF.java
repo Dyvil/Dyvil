@@ -6,7 +6,7 @@ import java.lang.invoke.*;
 
 public abstract class AbstractLMF
 {
-	
+
 	/**
 	 * For context, the comments for the following fields are marked in quotes
 	 * with their values, given this program:
@@ -39,7 +39,7 @@ public abstract class AbstractLMF
 	 * }
 	 * </pre>
 	 */
-	
+
 	/**
 	 * The class calling the meta-factory via invokedynamic "class X"
 	 */
@@ -89,9 +89,9 @@ public abstract class AbstractLMF
 	 * Instantiated erased functional interface method type "(Integer)Object"
 	 */
 	protected final MethodType       instantiatedMethodType;
-	
+
 	protected AbstractLMF(MethodHandles.Lookup caller, MethodType invokedType, String samMethodName, MethodType samMethodType, MethodHandle implMethod, MethodType instantiatedMethodType)
-			throws LambdaConversionException
+		throws LambdaConversionException
 	{
 		if ((caller.lookupModes() & MethodHandles.Lookup.PRIVATE) == 0)
 		{
@@ -99,32 +99,32 @@ public abstract class AbstractLMF
 		}
 		this.targetClass = caller.lookupClass();
 		this.invokedType = invokedType;
-		
+
 		this.samBase = invokedType.returnType();
 		this.parameterCount = invokedType.parameterCount();
-		
+
 		this.samMethodName = samMethodName;
 		this.samMethodType = samMethodType;
-		
+
 		this.implMethod = implMethod;
 		this.implInfo = caller.revealDirect(implMethod);
 		this.implKind = this.implInfo.getReferenceKind();
-		this.implIsInstanceMethod = this.implKind == MethodHandleInfo.REF_invokeVirtual
-				|| this.implKind == MethodHandleInfo.REF_invokeSpecial
+		this.implIsInstanceMethod =
+			this.implKind == MethodHandleInfo.REF_invokeVirtual || this.implKind == MethodHandleInfo.REF_invokeSpecial
 				|| this.implKind == MethodHandleInfo.REF_invokeInterface;
 		this.implDefiningClass = this.implInfo.getDeclaringClass();
 		this.implMethodType = this.implInfo.getMethodType();
 		this.instantiatedMethodType = instantiatedMethodType;
-		
+
 		if (!this.samBase.isInterface())
 		{
-			throw new LambdaConversionException(
-					String.format("Functional interface %s is not an interface", this.samBase.getName()));
+			throw new LambdaConversionException(String.format("Functional interface %s is not an interface",
+			                                                  this.samBase.getName()));
 		}
 	}
-	
+
 	public abstract CallSite buildCallSite() throws LambdaConversionException;
-	
+
 	public void validateMetafactoryArgs() throws LambdaConversionException
 	{
 		switch (this.implKind)
@@ -138,7 +138,7 @@ public abstract class AbstractLMF
 		default:
 			throw new LambdaConversionException(String.format("Unsupported MethodHandle kind: %s", this.implInfo));
 		}
-		
+
 		// Check arity: optional-receiver + captured + SAM == impl
 		final int implArity = this.implMethodType.parameterCount();
 		final int receiverArity = this.implIsInstanceMethod ? 1 : 0;
@@ -148,17 +148,16 @@ public abstract class AbstractLMF
 		if (implArity + receiverArity != capturedArity + samArity)
 		{
 			throw new LambdaConversionException(String.format(
-					"Incorrect number of parameters for %s method %s; %d captured parameters, %d functional interface method parameters, %d implementation parameters",
-					this.implIsInstanceMethod ? "instance" : "static", this.implInfo, capturedArity, samArity,
-					implArity));
+				"Incorrect number of parameters for %s method %s; %d captured parameters, %d functional interface method parameters, %d implementation parameters",
+				this.implIsInstanceMethod ? "instance" : "static", this.implInfo, capturedArity, samArity, implArity));
 		}
 		if (instantiatedArity != samArity)
 		{
 			throw new LambdaConversionException(String.format(
-					"Incorrect number of parameters for %s method %s; %d instantiated parameters, %d functional interface method parameters",
-					this.implIsInstanceMethod ? "instance" : "static", this.implInfo, instantiatedArity, samArity));
+				"Incorrect number of parameters for %s method %s; %d instantiated parameters, %d functional interface method parameters",
+				this.implIsInstanceMethod ? "instance" : "static", this.implInfo, instantiatedArity, samArity));
 		}
-		
+
 		// If instance: first captured arg (receiver) must be subtype of class
 		// where impl method is defined
 		final int capturedStart;
@@ -166,7 +165,7 @@ public abstract class AbstractLMF
 		if (this.implIsInstanceMethod)
 		{
 			final Class<?> receiverClass;
-			
+
 			// implementation is an instance method, adjust for receiver in
 			// captured variables / SAM arguments
 			if (capturedArity == 0)
@@ -183,21 +182,21 @@ public abstract class AbstractLMF
 				samStart = 0;
 				receiverClass = this.invokedType.parameterType(0);
 			}
-			
+
 			// check receiver type
-			if (!this.implDefiningClass.isAssignableFrom(receiverClass))
+			if (!isAdaptableTo(receiverClass, this.implDefiningClass, false))
 			{
-				throw new LambdaConversionException(
-						String.format("Invalid receiver type %s; not a subtype of implementation type %s",
-						              receiverClass, this.implDefiningClass));
+				throw new LambdaConversionException(String.format(
+					"Invalid receiver type %s; not a subtype of implementation type %s", receiverClass,
+					this.implDefiningClass));
 			}
-			
+
 			Class<?> implReceiverClass = this.implMethod.type().parameterType(0);
 			if (implReceiverClass != this.implDefiningClass && !implReceiverClass.isAssignableFrom(receiverClass))
 			{
-				throw new LambdaConversionException(
-						String.format("Invalid receiver type %s; not a subtype of implementation receiver type %s",
-						              receiverClass, implReceiverClass));
+				throw new LambdaConversionException(String.format(
+					"Invalid receiver type %s; not a subtype of implementation receiver type %s", receiverClass,
+					implReceiverClass));
 			}
 		}
 		else
@@ -206,7 +205,7 @@ public abstract class AbstractLMF
 			capturedStart = 0;
 			samStart = 0;
 		}
-		
+
 		// Check for exact match on non-receiver captured arguments
 		final int implFromCaptured = capturedArity - capturedStart;
 		for (int i = 0; i < implFromCaptured; i++)
@@ -215,9 +214,9 @@ public abstract class AbstractLMF
 			Class<?> capturedParamType = this.invokedType.parameterType(i + capturedStart);
 			if (!capturedParamType.equals(implParamType))
 			{
-				throw new LambdaConversionException(
-						String.format("Type mismatch in captured lambda parameter %d: expecting %s, found %s", i,
-						              capturedParamType, implParamType));
+				throw new LambdaConversionException(String.format(
+					"Type mismatch in captured lambda parameter %d: expecting %s, found %s", i, capturedParamType,
+					implParamType));
 			}
 		}
 		// Check for adaptation match on SAM arguments
@@ -228,32 +227,30 @@ public abstract class AbstractLMF
 			Class<?> instantiatedParamType = this.instantiatedMethodType.parameterType(i + samOffset);
 			if (!isAdaptableTo(instantiatedParamType, implParamType, true))
 			{
-				throw new LambdaConversionException(
-						String.format("Type mismatch for lambda argument %d: %s is not convertible to %s", i,
-						              instantiatedParamType, implParamType));
+				throw new LambdaConversionException(String.format(
+					"Type mismatch for lambda argument %d: %s is not convertible to %s", i, instantiatedParamType,
+					implParamType));
 			}
 		}
-		
+
 		// Adaptation match: return type
 		Class<?> expectedType = this.instantiatedMethodType.returnType();
 		Class<?> actualReturnType = this.implKind == MethodHandleInfo.REF_newInvokeSpecial ?
-				this.implDefiningClass :
-				this.implMethodType.returnType();
+			                            this.implDefiningClass :
+			                            this.implMethodType.returnType();
 		Class<?> samReturnType = this.samMethodType.returnType();
 		if (!isAdaptableToAsReturn(actualReturnType, expectedType))
 		{
-			throw new LambdaConversionException(
-					String.format("Type mismatch for lambda return: %s is not convertible to %s", actualReturnType,
-					              expectedType));
+			throw new LambdaConversionException(String.format(
+				"Type mismatch for lambda return: %s is not convertible to %s", actualReturnType, expectedType));
 		}
 		if (!isAdaptableToAsReturnStrict(expectedType, samReturnType))
 		{
-			throw new LambdaConversionException(
-					String.format("Type mismatch for lambda expected return: %s is not convertible to %s", expectedType,
-					              samReturnType));
+			throw new LambdaConversionException(String.format(
+				"Type mismatch for lambda expected return: %s is not convertible to %s", expectedType, samReturnType));
 		}
 	}
-	
+
 	private static boolean isAdaptableTo(Class<?> fromType, Class<?> toType, boolean strict)
 	{
 		if (fromType.equals(toType))
@@ -289,12 +286,12 @@ public abstract class AbstractLMF
 		// both are reference types: fromType should be a superclass of toType.
 		return !strict || toType.isAssignableFrom(fromType);
 	}
-	
+
 	private static boolean isAdaptableToAsReturn(Class<?> fromType, Class<?> toType)
 	{
 		return toType.equals(void.class) || isAdaptableTo(fromType, toType, false);
 	}
-	
+
 	private static boolean isAdaptableToAsReturnStrict(Class<?> fromType, Class<?> toType)
 	{
 		return isAdaptableTo(fromType, toType, true);
