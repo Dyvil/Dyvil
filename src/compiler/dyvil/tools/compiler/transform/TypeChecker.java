@@ -68,6 +68,12 @@ public final class TypeChecker
 			return typedValue;
 		}
 
+		final IValue convertedValue = value.getType().convertValueTo(value, type, typeContext, markers, context);
+		if (convertedValue != null)
+		{
+			return convertedValue;
+		}
+
 		markers.add(markerSupplier.createMarker(value.getPosition(), type, value.getType()));
 		return value;
 	}

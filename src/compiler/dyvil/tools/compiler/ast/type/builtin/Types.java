@@ -253,7 +253,7 @@ public final class Types
 
 	public static boolean isConvertible(IType fromType, IType toType)
 	{
-		return toType.isConvertibleFrom(fromType);
+		return toType.isConvertibleFrom(fromType) || fromType.isConvertibleTo(toType);
 	}
 
 	public static Set<IClass> commonClasses(IType type1, IType type2)

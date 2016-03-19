@@ -256,6 +256,11 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		return false;
 	}
 
+	default boolean isConvertibleTo(IType type)
+	{
+		return false;
+	}
+
 	// Resolve
 
 	IMethod getBoxMethod();
@@ -269,6 +274,11 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 			return value;
 		}
 		return value.withType(this, typeContext, markers, context);
+	}
+
+	default IValue convertValueTo(IValue value, IType targetType, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		return null;
 	}
 
 	// Generics
