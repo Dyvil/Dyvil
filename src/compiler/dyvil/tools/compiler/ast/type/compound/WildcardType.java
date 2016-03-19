@@ -107,7 +107,7 @@ public final class WildcardType implements IRawType, ITyped
 	@Override
 	public IType asParameterType()
 	{
-		if (this.bound == null || this.variance == Variance.COVARIANT)
+		if (this.bound == null)
 		{
 			return Types.ANY;
 		}
