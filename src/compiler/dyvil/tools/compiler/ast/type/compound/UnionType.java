@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.type.compound;
 
 import dyvil.collection.Set;
+import dyvil.tools.asm.Opcodes;
+import dyvil.tools.asm.Type;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -281,6 +283,7 @@ public class UnionType implements IObjectType
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
+		this.getTheClass();
 		for (IClass commonClass : this.commonClasses)
 		{
 			commonClass.getMethodMatches(list, instance, name, arguments);
@@ -321,7 +324,11 @@ public class UnionType implements IObjectType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		// TODO
+		writer.visitLdcInsn(Type.getObjectType(this.getTheClass().getInternalName()));
+		this.left.writeTypeExpression(writer);
+		this.right.writeTypeExpression(writer);
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/UnionType", "apply",
+		                       "(Ljava/lang/Class;Ldyvilx/lang/model/type/Type;Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/UnionType;", false);
 	}
 
 	@Override

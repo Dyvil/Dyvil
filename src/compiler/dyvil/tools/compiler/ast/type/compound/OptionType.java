@@ -260,7 +260,9 @@ public class OptionType implements IObjectType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		// FIXME
+		this.type.writeTypeExpression(writer);
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/OptionType", "apply",
+		                       "(Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/OptionType;", false);
 	}
 
 	@Override
