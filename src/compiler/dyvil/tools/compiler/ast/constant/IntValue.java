@@ -115,7 +115,7 @@ public final class IntValue implements IConstantValue
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		if (type == Types.INT)
 		{
@@ -125,7 +125,7 @@ public final class IntValue implements IConstantValue
 		{
 			return CONVERSION_MATCH;
 		}
-		return type.getSubTypeDistance(Types.INT);
+		return Types.getDistance(type, Types.INT);
 	}
 	
 	@Override

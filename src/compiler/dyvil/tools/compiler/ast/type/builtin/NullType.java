@@ -42,13 +42,7 @@ public class NullType implements IRawType
 	{
 		return Types.NULL_CLASS;
 	}
-	
-	@Override
-	public IType getSuperType()
-	{
-		return null;
-	}
-	
+
 	@Override
 	public boolean isResolved()
 	{

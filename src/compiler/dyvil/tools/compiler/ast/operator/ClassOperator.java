@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -99,14 +100,14 @@ public final class ClassOperator extends AbstractValue implements IConstantValue
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
-		if (type.getTheClass().getAnnotation(LazyFields.CLASS_CONVERTIBLE) != null)
+		if (type.getAnnotation(LazyFields.CLASS_CONVERTIBLE) != null)
 		{
-			return 2;
+			return CONVERSION_MATCH;
 		}
 		
-		return type.getSubTypeDistance(this.genericType);
+		return Types.getDistance(type, this.getType());
 	}
 	
 	@Override

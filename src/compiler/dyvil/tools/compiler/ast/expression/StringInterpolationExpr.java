@@ -158,9 +158,9 @@ public final class StringInterpolationExpr implements IValue
 	}
 
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
-		final float distance = type.getSubTypeDistance(Types.STRING);
+		final int distance = Types.getDistance(type, Types.STRING);
 		if (distance != 0)
 		{
 			return distance;

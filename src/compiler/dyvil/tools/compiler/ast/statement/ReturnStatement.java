@@ -103,7 +103,7 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		if (this.value == null)
 		{

@@ -58,9 +58,9 @@ public class VoidValue implements IConstantValue
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
-		return type.getSubTypeDistance(Types.VOID);
+		return Types.getDistance(type, Types.VOID);
 	}
 	
 	@Override

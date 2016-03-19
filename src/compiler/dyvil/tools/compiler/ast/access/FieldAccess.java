@@ -180,14 +180,14 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		if (this.field == null)
 		{
 			return 0;
 		}
 
-		return type.getSubTypeDistance(this.getType());
+		return Types.getDistance(type, this.getType());
 	}
 
 	@Override

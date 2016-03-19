@@ -118,7 +118,7 @@ public class NilExpr implements IValue
 	}
 
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		return this.isType(type) ? 1 : 0;
 	}

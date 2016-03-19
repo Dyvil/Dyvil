@@ -108,7 +108,7 @@ public final class SuperExpr implements IValue
 			return;
 		}
 
-		final int distance = this.type.getSubClassDistance(enclosingType);
+		int distance = enclosingType.getSuperTypeDistance(this.type);
 		if (distance == 1)
 		{
 			return;

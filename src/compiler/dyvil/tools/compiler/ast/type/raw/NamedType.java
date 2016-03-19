@@ -93,7 +93,7 @@ public class NamedType implements IRawType, ITypeConsumer
 	}
 
 	@Override
-	public boolean isSuperClassOf(IType type)
+	public boolean isSuperClassOf(IType subType)
 	{
 		return false;
 	}

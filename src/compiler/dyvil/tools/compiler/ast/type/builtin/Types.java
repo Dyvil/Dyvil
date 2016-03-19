@@ -7,6 +7,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.dynamic.DynamicType;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -234,9 +235,25 @@ public final class Types
 		return "new" + prefix + type.getTypePrefix() + "Ref";
 	}
 
-	public static IType combine(IType type1, IType type2)
+	public static boolean isAssignable(IType fromType, IType toType)
 	{
-		return UnionType.combine(type1, type2, null);
+		return fromType.isSuperTypeOf(toType) || isConvertible(fromType, toType);
+	}
+
+	public static int getDistance(IType superType, IType subType)
+	{
+		final int distance = subType.getSuperTypeDistance(superType);
+		if (distance != 0)
+		{
+			return distance;
+		}
+
+		return isConvertible(subType, superType) ? IValue.CONVERSION_MATCH : 0;
+	}
+
+	public static boolean isConvertible(IType fromType, IType toType)
+	{
+		return toType.isConvertibleFrom(fromType);
 	}
 
 	public static Set<IClass> commonClasses(IType type1, IType type2)
@@ -245,6 +262,11 @@ public final class Types
 		final Set<IClass> superTypes2 = superClasses(type2);
 		superTypes1.intersect(superTypes2);
 		return superTypes1;
+	}
+
+	public static IType combine(IType type1, IType type2)
+	{
+		return UnionType.combine(type1, type2, null);
 	}
 
 	private static Set<IClass> superClasses(IType type)

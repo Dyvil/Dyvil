@@ -77,7 +77,7 @@ public final class SyncStatement extends AbstractValue implements IStatement
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		return this.action.getTypeMatch(type);
 	}

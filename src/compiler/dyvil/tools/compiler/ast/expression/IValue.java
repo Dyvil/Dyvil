@@ -114,7 +114,7 @@ public interface IValue extends IASTNode, ITyped
 
 	// --- Other Constants ---
 
-	float CONVERSION_MATCH = 1000F;
+	int CONVERSION_MATCH = 1000;
 
 	int valueTag();
 
@@ -178,7 +178,7 @@ public interface IValue extends IASTNode, ITyped
 	@Override
 	default boolean isType(IType type)
 	{
-		return type.isSuperTypeOf(this.getType());
+		return Types.isAssignable(this.getType(), type);
 	}
 
 	/**
@@ -190,9 +190,9 @@ public interface IValue extends IASTNode, ITyped
 	 *
 	 * @return the subtyping distance
 	 */
-	default float getTypeMatch(IType type)
+	default int getTypeMatch(IType type)
 	{
-		return type.getSubTypeDistance(this.getType());
+		return Types.getDistance(type, this.getType());
 	}
 
 	void resolveTypes(MarkerList markers, IContext context);

@@ -331,10 +331,16 @@ public final class PrimitiveType implements IType
 	}
 
 	@Override
-	public boolean isSuperClassOf(IType that)
+	public boolean isSuperClassOf(IType subType)
 	{
-		return this.theClass == that.getTheClass() || that.isPrimitive() && isPromotable(that.getTypecode(),
-		                                                                                 this.typecode);
+		return this.theClass == subType.getTheClass() || subType.isPrimitive() && isPromotable(subType.getTypecode(),
+		                                                                                       this.typecode);
+	}
+
+	@Override
+	public boolean isSameType(IType type)
+	{
+		return this.theClass == type.getTheClass();
 	}
 
 	@Override
@@ -371,7 +377,7 @@ public final class PrimitiveType implements IType
 	}
 
 	@Override
-	public boolean classEquals(IType type)
+	public boolean isSameClass(IType type)
 	{
 		return type == this;
 	}

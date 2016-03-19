@@ -174,15 +174,9 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
-	public boolean classEquals(IType type)
+	public boolean isSameClass(IType type)
 	{
-		return this.type.classEquals(type);
-	}
-
-	@Override
-	public IType getSuperType()
-	{
-		return this.type.getSuperType();
+		return this.type.isSameClass(type);
 	}
 
 	@Override
@@ -192,27 +186,9 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
-	public boolean isSuperClassOf(IType type)
+	public boolean isSuperClassOf(IType subType)
 	{
-		return this.type.isSuperClassOf(type);
-	}
-
-	@Override
-	public int getSubClassDistance(IType subtype)
-	{
-		return this.type.getSubClassDistance(subtype);
-	}
-
-	@Override
-	public float getSubTypeDistance(IType subtype)
-	{
-		return this.type.getSubTypeDistance(subtype);
-	}
-
-	@Override
-	public IType combine(IType type)
-	{
-		return this.type.combine(type);
+		return this.type.isSuperClassOf(subType);
 	}
 
 	@Override

@@ -230,12 +230,6 @@ public final class TupleType implements IObjectType, ITypeList
 	}
 
 	@Override
-	public IType getSuperType()
-	{
-		return Types.OBJECT;
-	}
-
-	@Override
 	public IType resolveType(ITypeParameter typeParameter)
 	{
 		int index = typeParameter.getIndex();

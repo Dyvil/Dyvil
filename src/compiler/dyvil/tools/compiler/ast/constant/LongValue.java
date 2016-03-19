@@ -105,7 +105,7 @@ public class LongValue implements IConstantValue
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		if (type == Types.LONG)
 		{
@@ -115,7 +115,7 @@ public class LongValue implements IConstantValue
 		{
 			return CONVERSION_MATCH;
 		}
-		return type.getSubTypeDistance(Types.LONG);
+		return Types.getDistance(type, Types.LONG);
 	}
 	
 	@Override

@@ -171,7 +171,7 @@ public class MapExpr implements IValue
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		if (!MapType.MapTypes.MAP_CLASS.isSubTypeOf(type))
 		{
@@ -183,28 +183,28 @@ public class MapExpr implements IValue
 			return 1;
 		}
 		
-		IType keyType = type.resolveTypeSafely(MapType.MapTypes.KEY_VARIABLE);
-		IType valueType = type.resolveTypeSafely(MapType.MapTypes.VALUE_VARIABLE);
+		final IType keyType = type.resolveTypeSafely(MapType.MapTypes.KEY_VARIABLE);
+		final IType valueType = type.resolveTypeSafely(MapType.MapTypes.VALUE_VARIABLE);
 		
-		float total = 0;
+		int total = 0;
 		for (int i = 0; i < this.count; i++)
 		{
-			float f = this.keys[i].getTypeMatch(keyType);
-			if (f <= 0F)
+			float match = this.keys[i].getTypeMatch(keyType);
+			if (match <= 0F)
 			{
-				return 0F;
+				return 0;
 			}
-			
-			total += f;
-			f = this.values[i].getTypeMatch(valueType);
-			if (f <= 0F)
+			total += match;
+
+			match = this.values[i].getTypeMatch(valueType);
+			if (match <= 0)
 			{
-				return 0F;
+				return 0;
 			}
-			total += f;
+			total += match;
 		}
 		
-		return 1F + total / (this.count * 2F);
+		return 1 + total / (this.count * 2);
 	}
 	
 	@Override

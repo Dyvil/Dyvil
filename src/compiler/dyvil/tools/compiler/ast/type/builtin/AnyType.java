@@ -48,7 +48,7 @@ public class AnyType implements IRawType
 	}
 	
 	@Override
-	public boolean isSuperClassOf(IType type)
+	public boolean isSuperClassOf(IType subType)
 	{
 		return true;
 	}

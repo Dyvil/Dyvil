@@ -110,9 +110,9 @@ public class OptionType implements IObjectType
 	}
 
 	@Override
-	public boolean isAssignableFrom(IType type)
+	public boolean isConvertibleFrom(IType type)
 	{
-		return this.isSuperTypeOf(type) || this.type.isSuperTypeOf(type);
+		return this.type.isSuperTypeOf(type);
 	}
 
 	@Override

@@ -192,28 +192,28 @@ public final class MatchExpr implements IValue
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		if (this.caseCount == 0)
 		{
 			return 0;
 		}
 		
-		float total = 0F;
+		int total = 0;
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			IValue v = this.cases[i].action;
-			if (v == null)
+			final IValue action = this.cases[i].action;
+			if (action == null)
 			{
 				continue;
 			}
 			
-			float f = v.getTypeMatch(type);
-			if (f == 0)
+			final int match = action.getTypeMatch(type);
+			if (match == 0)
 			{
 				return 0;
 			}
-			total += f;
+			total += match;
 		}
 		return 1 + total / this.caseCount;
 	}

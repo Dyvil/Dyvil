@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.TupleType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -196,14 +197,14 @@ public final class TupleExpr implements IValue, IValueList
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		if (this.valueCount == 1)
 		{
 			return this.values[0].getTypeMatch(type);
 		}
 		
-		return type.getSubTypeDistance(this.getType());
+		return Types.getDistance(type, this.getType());
 	}
 	
 	@Override

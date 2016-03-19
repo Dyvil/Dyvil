@@ -113,13 +113,7 @@ public final class WildcardType implements IRawType, ITyped
 		}
 		return this.bound.asParameterType();
 	}
-	
-	@Override
-	public IType getSuperType()
-	{
-		return this.bound == null ? Types.UNKNOWN : this.bound;
-	}
-	
+
 	@Override
 	public boolean isSameType(IType type)
 	{
@@ -130,20 +124,6 @@ public final class WildcardType implements IRawType, ITyped
 	public boolean isSuperTypeOf(IType type)
 	{
 		return this.isSameType(type);
-	}
-	
-	@Override
-	public int getSubClassDistance(IType subtype)
-	{
-		int i = subtype.getTheClass().getSuperTypeDistance(this);
-		return i == 0 ? 0 : i + 100;
-	}
-	
-	@Override
-	public float getSubTypeDistance(IType subtype)
-	{
-		int i = subtype.getTheClass().getSuperTypeDistance(this);
-		return i == 0 ? 0 : i + 100;
 	}
 	
 	@Override

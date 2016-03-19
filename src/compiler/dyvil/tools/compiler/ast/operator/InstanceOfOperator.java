@@ -153,7 +153,7 @@ public final class InstanceOfOperator extends AbstractValue
 		}
 		
 		final IType valueType = this.value.getType();
-		if (valueType.classEquals(this.type))
+		if (valueType.isSameClass(this.type))
 		{
 			markers.add(Markers.semantic(this.position, "instanceof.type.equal", valueType));
 			return;

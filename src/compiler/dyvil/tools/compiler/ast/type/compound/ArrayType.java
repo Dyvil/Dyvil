@@ -147,13 +147,7 @@ public class ArrayType implements IObjectType, ITyped
 	{
 		return null;
 	}
-	
-	@Override
-	public IType getSuperType()
-	{
-		return Types.OBJECT;
-	}
-	
+
 	@Override
 	public boolean isSameType(IType type)
 	{
@@ -162,7 +156,7 @@ public class ArrayType implements IObjectType, ITyped
 	}
 	
 	@Override
-	public boolean classEquals(IType type)
+	public boolean isSameClass(IType type)
 	{
 		if (!type.isArrayType())
 		{
@@ -170,7 +164,7 @@ public class ArrayType implements IObjectType, ITyped
 		}
 
 		final IType elementType = type.getElementType();
-		return this.checkPrimitiveType(elementType) && this.type.classEquals(elementType);
+		return this.checkPrimitiveType(elementType) && this.type.isSameClass(elementType);
 	}
 
 	@Override
@@ -190,14 +184,14 @@ public class ArrayType implements IObjectType, ITyped
 	}
 
 	@Override
-	public boolean isSuperClassOf(IType type)
+	public boolean isSuperClassOf(IType subType)
 	{
-		if (!type.isArrayType())
+		if (!subType.isArrayType())
 		{
 			return false;
 		}
 
-		final IType elementType = type.getElementType();
+		final IType elementType = subType.getElementType();
 		return this.checkPrimitiveType(elementType) && this.type.isSuperClassOf(elementType);
 	}
 
@@ -219,46 +213,6 @@ public class ArrayType implements IObjectType, ITyped
 			return 0;
 		}
 		return this.type.getSuperTypeDistance(elementType);
-	}
-
-	@Override
-	public float getSubTypeDistance(IType subtype)
-	{
-		if (!subtype.isArrayType())
-		{
-			return 0F;
-		}
-		if (!checkImmutable(this, subtype))
-		{
-			return 0F;
-		}
-
-		final IType elementType = subtype.getElementType();
-		if (!this.checkPrimitiveType(elementType))
-		{
-			return 0F;
-		}
-		return this.type.getSubTypeDistance(elementType);
-	}
-
-	@Override
-	public int getSubClassDistance(IType subtype)
-	{
-		if (!subtype.isArrayType())
-		{
-			return 0;
-		}
-		if (checkImmutable(this, subtype))
-		{
-			return 0;
-		}
-
-		final IType elementType = subtype.getElementType();
-		if (!this.checkPrimitiveType(elementType))
-		{
-			return 0;
-		}
-		return this.type.getSubClassDistance(subtype.getElementType());
 	}
 
 	private static boolean checkImmutable(IType superType, IType subtype)

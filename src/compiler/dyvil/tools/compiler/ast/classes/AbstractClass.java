@@ -409,14 +409,14 @@ public abstract class AbstractClass implements IClass
 			return 1;
 		}
 
-		int max = this.superType != null ? superType.getSubClassDistance(this.superType) : 0;
+		int max = this.superType != null ? this.superType.getSuperTypeDistance(superType) : 0;
 		if (!iclass.isInterface())
 		{
 			return max;
 		}
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			int m = superType.getSubClassDistance(this.interfaces[i]);
+			int m = this.interfaces[i].getSuperTypeDistance(superType);
 			if (m > max)
 			{
 				max = m;

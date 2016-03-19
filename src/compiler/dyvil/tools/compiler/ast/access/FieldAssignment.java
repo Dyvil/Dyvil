@@ -137,7 +137,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		return this.value.getTypeMatch(type);
 	}

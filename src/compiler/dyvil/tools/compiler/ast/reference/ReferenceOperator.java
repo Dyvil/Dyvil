@@ -87,18 +87,6 @@ public class ReferenceOperator implements IValue
 	}
 	
 	@Override
-	public boolean isType(IType type)
-	{
-		return type.isSuperTypeOf(this.getType());
-	}
-	
-	@Override
-	public float getTypeMatch(IType type)
-	{
-		return type.getSubTypeDistance(this.getType());
-	}
-	
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.value.resolveTypes(markers, context);

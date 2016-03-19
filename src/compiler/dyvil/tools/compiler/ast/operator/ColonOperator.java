@@ -146,14 +146,14 @@ public class ColonOperator implements IValue
 	}
 
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		if (type.getAnnotation(LazyFields.COLON_CONVERTIBLE) != null)
 		{
 			return IValue.CONVERSION_MATCH;
 		}
 
-		return type.getSubClassDistance(this.getType());
+		return Types.getDistance(type, this.getType());
 	}
 
 	@Override

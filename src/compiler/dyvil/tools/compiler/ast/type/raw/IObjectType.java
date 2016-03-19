@@ -21,19 +21,19 @@ public interface IObjectType extends IType
 	{
 		return false;
 	}
-	
+
 	@Override
 	default int getTypecode()
 	{
 		return -1;
 	}
-	
+
 	@Override
 	default ITypeParameter getTypeVariable()
 	{
 		return null;
 	}
-	
+
 	@Override
 	default IType getObjectType()
 	{
@@ -63,13 +63,13 @@ public interface IObjectType extends IType
 	{
 		return false;
 	}
-	
+
 	@Override
 	default int getArrayDimensions()
 	{
 		return 0;
 	}
-	
+
 	@Override
 	default IType getElementType()
 	{
@@ -92,55 +92,61 @@ public interface IObjectType extends IType
 	{
 		return Types.getObjectArrayClass();
 	}
-	
+
 	@Override
 	default IMethod getBoxMethod()
 	{
 		return null;
 	}
-	
+
 	@Override
 	default IMethod getUnboxMethod()
 	{
 		return null;
 	}
-	
+
 	@Override
-	default boolean classEquals(IType type)
+	default boolean isSameType(IType type)
 	{
-		return this.getTheClass() == type.getTheClass() && !type.isPrimitive();
+		return this == type || this.getTheClass() == type.getTheClass();
 	}
-	
+
+	@Override
+	default boolean isSameClass(IType type)
+	{
+		return this == type || this.getTheClass() == type.getTheClass() && !type.isPrimitive();
+	}
+
 	@Override
 	default int getLoadOpcode()
 	{
 		return Opcodes.ALOAD;
 	}
-	
+
 	@Override
 	default int getArrayLoadOpcode()
 	{
 		return Opcodes.AALOAD;
 	}
-	
+
 	@Override
 	default int getStoreOpcode()
 	{
 		return Opcodes.ASTORE;
 	}
-	
+
 	@Override
 	default int getArrayStoreOpcode()
 	{
 		return Opcodes.AASTORE;
 	}
-	
+
 	@Override
 	default int getReturnOpcode()
 	{
 		return Opcodes.ARETURN;
 	}
-	
+
 	@Override
 	default Object getFrameType()
 	{
@@ -174,7 +180,7 @@ public interface IObjectType extends IType
 		{
 			return;
 		}
-		
+
 		if (!target.isSuperClassOf(this))
 		{
 			writer.visitLineNumber(lineNumber);
@@ -198,7 +204,7 @@ public interface IObjectType extends IType
 	{
 		writer.visitInsn(Opcodes.ACONST_NULL);
 	}
-	
+
 	@Override
 	default IConstantValue getDefaultValue()
 	{

@@ -12,7 +12,6 @@ import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
@@ -103,17 +102,6 @@ public class ClassGenericType extends GenericType
 		}
 
 		return true;
-	}
-
-	@Override
-	public IType combine(IType type)
-	{
-		if (this.argumentsMatch(type))
-		{
-			return this;
-		}
-
-		return new ClassType(this.theClass);
 	}
 
 	@Override

@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -98,14 +99,14 @@ public final class TypeOperator extends AbstractValue
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
-		if (type.getTheClass().getAnnotation(LazyFields.TYPE_CONVERTIBLE) != null)
+		if (type.getAnnotation(LazyFields.TYPE_CONVERTIBLE) != null)
 		{
 			return CONVERSION_MATCH;
 		}
 		
-		return type.getSubTypeDistance(this.getType());
+		return Types.getDistance(type, this.getType());
 	}
 	
 	@Override

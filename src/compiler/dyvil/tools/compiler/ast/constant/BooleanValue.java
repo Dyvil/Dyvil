@@ -93,7 +93,7 @@ public final class BooleanValue implements IConstantValue
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		if (type == Types.BOOLEAN)
 		{
@@ -103,7 +103,7 @@ public final class BooleanValue implements IConstantValue
 		{
 			return CONVERSION_MATCH;
 		}
-		return type.getSubTypeDistance(Types.BOOLEAN);
+		return Types.getDistance(type, Types.BOOLEAN);
 	}
 	
 	@Override

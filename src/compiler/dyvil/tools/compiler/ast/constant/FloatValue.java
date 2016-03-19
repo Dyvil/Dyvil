@@ -101,17 +101,17 @@ public class FloatValue implements IConstantValue
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		if (type == Types.FLOAT)
 		{
 			return 1;
 		}
-		if (type.getTheClass().getAnnotation(Types.FLOAT_CONVERTIBLE_CLASS) != null)
+		if (type.getAnnotation(Types.FLOAT_CONVERTIBLE_CLASS) != null)
 		{
 			return CONVERSION_MATCH;
 		}
-		return type.getSubTypeDistance(Types.FLOAT);
+		return Types.getDistance(type, Types.FLOAT);
 	}
 	
 	@Override

@@ -92,17 +92,17 @@ public class DoubleValue implements IConstantValue
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		if (type == Types.DOUBLE)
 		{
 			return 1;
 		}
-		if (type.getTheClass().getAnnotation(Types.DOUBLE_CONVERTIBLE_CLASS) != null)
+		if (type.getAnnotation(Types.DOUBLE_CONVERTIBLE_CLASS) != null)
 		{
 			return CONVERSION_MATCH;
 		}
-		return type.getSubTypeDistance(Types.DOUBLE);
+		return Types.getDistance(type, Types.DOUBLE);
 	}
 	
 	@Override
@@ -132,7 +132,7 @@ public class DoubleValue implements IConstantValue
 	@Override
 	public Double toObject()
 	{
-		return Double.valueOf(this.value);
+		return this.value;
 	}
 	
 	@Override

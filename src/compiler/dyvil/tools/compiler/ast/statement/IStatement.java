@@ -50,7 +50,7 @@ public interface IStatement extends IValue
 	}
 
 	@Override
-	default float getTypeMatch(IType type)
+	default int getTypeMatch(IType type)
 	{
 		return 0;
 	}

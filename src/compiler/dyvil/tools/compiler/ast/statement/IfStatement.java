@@ -151,16 +151,16 @@ public class IfStatement implements IValue
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		if (this.elseThen == null)
 		{
 			return this.then.getTypeMatch(type);
 		}
 		
-		final float thenMatch = this.then.getTypeMatch(type);
-		final float elseMatch = this.elseThen.getTypeMatch(type);
-		return thenMatch == 0 || elseMatch == 0 ? 0 : (thenMatch + elseMatch) / 2F;
+		final int thenMatch = this.then.getTypeMatch(type);
+		final int elseMatch = this.elseThen.getTypeMatch(type);
+		return thenMatch == 0 || elseMatch == 0 ? 0 : (thenMatch + elseMatch) / 2;
 	}
 	
 	@Override

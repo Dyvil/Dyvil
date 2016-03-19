@@ -218,7 +218,7 @@ public class RangeOperator implements IValue
 	}
 
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		IType elementType = getElementType(type);
 		if (elementType == null)
@@ -226,9 +226,9 @@ public class RangeOperator implements IValue
 			return 0;
 		}
 
-		float f1 = this.startValue.getTypeMatch(elementType);
-		float f2 = this.endValue.getTypeMatch(elementType);
-		return f1 == 0 || f2 == 0 ? 0 : (f1 + f2) / 2F;
+		int f1 = this.startValue.getTypeMatch(elementType);
+		int f2 = this.endValue.getTypeMatch(elementType);
+		return f1 == 0 || f2 == 0 ? 0 : (f1 + f2) / 2;
 	}
 
 	@Override

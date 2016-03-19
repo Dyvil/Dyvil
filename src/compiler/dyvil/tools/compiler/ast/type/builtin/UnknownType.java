@@ -43,13 +43,7 @@ public class UnknownType implements IRawType
 	{
 		return Types.OBJECT_CLASS;
 	}
-	
-	@Override
-	public IType getSuperType()
-	{
-		return null;
-	}
-	
+
 	@Override
 	public boolean hasTypeVariables()
 	{

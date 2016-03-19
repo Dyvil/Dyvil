@@ -79,7 +79,7 @@ public final class ThrowStatement extends AbstractValue implements IValueConsume
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		return 1;
 	}

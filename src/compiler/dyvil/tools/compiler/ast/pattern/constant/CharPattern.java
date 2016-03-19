@@ -53,7 +53,7 @@ public final class CharPattern extends Pattern
 			return null;
 		}
 		
-		if (type == Types.STRING || type.classEquals(Types.STRING))
+		if (type == Types.STRING || type.isSameClass(Types.STRING))
 		{
 			return this;
 		}

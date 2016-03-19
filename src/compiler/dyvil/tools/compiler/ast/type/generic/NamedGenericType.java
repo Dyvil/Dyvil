@@ -75,7 +75,7 @@ public class NamedGenericType extends GenericType
 	}
 
 	@Override
-	public boolean isSuperClassOf(IType type)
+	public boolean isSuperClassOf(IType subType)
 	{
 		return false;
 	}

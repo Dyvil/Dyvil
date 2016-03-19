@@ -228,36 +228,6 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	}
 
 	@Override
-	public int getSubClassDistance(IType subtype)
-	{
-		if (this.parameterCount == 0)
-		{
-			final int returnDistance = this.returnType.getSubClassDistance(subtype);
-			if (returnDistance != 0)
-			{
-				return returnDistance;
-			}
-		}
-
-		return IObjectType.super.getSubClassDistance(subtype);
-	}
-
-	@Override
-	public float getSubTypeDistance(IType subtype)
-	{
-		if (this.parameterCount == 0)
-		{
-			final float returnDistance = this.returnType.getSubTypeDistance(subtype);
-			if (returnDistance != 0)
-			{
-				return returnDistance;
-			}
-		}
-
-		return IObjectType.super.getSubTypeDistance(subtype);
-	}
-
-	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
 		if (!IObjectType.super.isSuperTypeOf(type))
@@ -292,9 +262,9 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	}
 
 	@Override
-	public boolean isAssignableFrom(IType type)
+	public boolean isConvertibleFrom(IType type)
 	{
-		return this.parameterCount == 0 && this.returnType.isSuperTypeOf(type) || this.isSuperTypeOf(type);
+		return this.parameterCount == 0 && this.returnType.isSuperTypeOf(type);
 	}
 
 	@Override

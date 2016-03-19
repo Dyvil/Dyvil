@@ -79,13 +79,13 @@ public final class StringValue implements IConstantValue
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
-		if (type.getTheClass().getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null)
+		if (type.getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null)
 		{
 			return CONVERSION_MATCH;
 		}
-		return type.getSubTypeDistance(Types.STRING);
+		return Types.getDistance(type, Types.STRING);
 	}
 	
 	@Override

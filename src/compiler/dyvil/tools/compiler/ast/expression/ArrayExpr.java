@@ -193,7 +193,7 @@ public final class ArrayExpr implements IValue, IValueList
 			{
 				return new LiteralConversion(this, annotation).withType(arrayType, typeContext, markers, context);
 			}
-			if (arrayType.classEquals(IterableForStatement.LazyFields.ITERABLE))
+			if (arrayType.isSameClass(IterableForStatement.LazyFields.ITERABLE))
 			{
 				return new LiteralConversion(this, getArrayToIterable())
 						.withType(arrayType, typeContext, markers, context);
@@ -271,7 +271,7 @@ public final class ArrayExpr implements IValue, IValueList
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		if (!type.isArrayType())
 		{
@@ -287,23 +287,23 @@ public final class ArrayExpr implements IValue, IValueList
 		}
 		
 		// If the type is an array type, get it's element type
-		IType type1 = type.getElementType();
-		float total = 0;
-		
+		final IType elementType = type.getElementType();
+
+		int total = 0;
 		// Get the type match for every value in the array
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			float m = this.values[i].getTypeMatch(type1);
-			if (m <= 0F)
+			final int match = this.values[i].getTypeMatch(elementType);
+			if (match <= 0)
 			{
 				// If the type match for one value is zero, return 0
-				return 0F;
+				return 0;
 			}
-			total += m;
+			total += match;
 		}
 		
 		// Divide by the count
-		return 1F + total / this.valueCount;
+		return 1 + total / this.valueCount;
 	}
 	
 	@Override

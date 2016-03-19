@@ -338,7 +338,7 @@ public final class TypeParameter implements ITypeParameter
 	{
 		for (int i = 0; i < this.upperBoundCount; i++)
 		{
-			int m = superType.getSubClassDistance(this.upperBounds[i]);
+			int m = this.upperBounds[i].getSuperTypeDistance(superType);
 			if (m > 0)
 			{
 				return m;

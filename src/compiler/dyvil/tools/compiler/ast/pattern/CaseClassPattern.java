@@ -114,7 +114,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 			}
 		}
 
-		if (type.classEquals(this.type))
+		if (type.isSameClass(this.type))
 		{
 			// No additional type check required
 			return this;

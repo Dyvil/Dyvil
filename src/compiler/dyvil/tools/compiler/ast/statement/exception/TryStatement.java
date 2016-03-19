@@ -165,24 +165,24 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	}
 
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		if (DISALLOW_EXPRESSIONS)
 		{
-			return 0F;
+			return 0;
 		}
 
-		float total = this.action.getTypeMatch(type);
+		int total = this.action.getTypeMatch(type);
 		if (total <= 0F)
 		{
-			return 0F;
+			return 0;
 		}
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
-			final float blockMatch = this.catchBlocks[i].action.getTypeMatch(type);
+			final int blockMatch = this.catchBlocks[i].action.getTypeMatch(type);
 			if (blockMatch <= 0F)
 			{
-				return 0F;
+				return 0;
 			}
 			total += blockMatch;
 		}
