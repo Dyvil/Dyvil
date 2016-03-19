@@ -12,23 +12,23 @@ public final class DyvilLexer
 {
 	private MarkerList markers;
 	private Symbols    symbols;
-	
+
 	public DyvilLexer(MarkerList markers, Symbols symbols)
 	{
 		this.markers = markers;
 		this.symbols = symbols;
 	}
-	
+
 	public TokenIterator tokenize(String code)
 	{
 		int len = code.length();
-		
+
 		StringBuilder buf = new StringBuilder(20);
 		IToken first = new StartToken();
 		IToken prev = first;
 		int start = 0;
 		int lineNumber = 1;
-		
+
 		char prevChar = 0;
 		char currentChar;
 		int type = 0;
@@ -39,11 +39,11 @@ public final class DyvilLexer
 		for (int i = 0; i < len; ++i, prevChar = currentChar)
 		{
 			currentChar = code.charAt(i);
-			
+
 			if (type == 0)
 			{
 				start = i;
-				
+
 				if (currentChar == '\n')
 				{
 					lineNumber++;
@@ -53,19 +53,19 @@ public final class DyvilLexer
 				{
 					continue;
 				}
-				
+
 				if (string && currentChar == ')')
 				{
 					type = STRING;
 					subtype = STRING_PART;
 					continue;
 				}
-				
+
 				int m = getMode(currentChar, code, i);
 				type = m & 0xFFFF;
 				subtype = m & 0xFFFF0000;
 			}
-			
+
 			typeswitch:
 			switch (type)
 			{
@@ -86,6 +86,13 @@ public final class DyvilLexer
 					}
 					addToken = true;
 					break typeswitch;
+				case MOD_DOT:
+					if (currentChar == '.')
+					{
+						buf.append(currentChar);
+						continue;
+					}
+					// Fallthrough
 				case MOD_SYMBOL:
 					if (currentChar == '_' || currentChar == '$')
 					{
@@ -95,6 +102,7 @@ public final class DyvilLexer
 					}
 					if (LexerUtil.isIdentifierSymbol(currentChar))
 					{
+						subtype = MOD_SYMBOL;
 						buf.append(currentChar);
 						continue;
 					}
@@ -134,7 +142,7 @@ public final class DyvilLexer
 					{
 						continue;
 					}
-					
+
 					addToken = true;
 					reparse = false;
 					break typeswitch;
@@ -407,13 +415,13 @@ public final class DyvilLexer
 				}
 				break;
 			}
-			
+
 			if (addToken)
 			{
 				prev = this.addToken(prev, buf, type | subtype, lineNumber, start);
 				addToken = false;
 				type = 0;
-				
+
 				if (reparse)
 				{
 					i--;
@@ -424,21 +432,21 @@ public final class DyvilLexer
 				}
 			}
 		}
-		
+
 		if (buf.length() > 0)
 		{
 			prev = this.addToken(prev, buf, type | subtype, lineNumber, start);
 		}
-		
+
 		EndToken end = new EndToken(len, lineNumber);
 		prev.setNext(end);
 		end.setPrev(prev);
-		
+
 		first.next().setPrev(first);
-		
+
 		return new TokenIterator(first.next());
 	}
-	
+
 	private static int getMode(char c, String code, int i)
 	{
 		switch (c)
@@ -492,9 +500,9 @@ public final class DyvilLexer
 			return BaseSymbols.CLOSE_CURLY_BRACKET;
 		case '.':
 			n = code.charAt(i + 1);
-			if (LexerUtil.isIdentifierSymbol(n))
+			if (LexerUtil.isIdentifierSymbol(n) || n == '.')
 			{
-				return IDENTIFIER | MOD_SYMBOL;
+				return DOT_IDENTIFIER;
 			}
 			return BaseSymbols.DOT;
 		case ';':
@@ -525,7 +533,7 @@ public final class DyvilLexer
 		}
 		return 0;
 	}
-	
+
 	private static boolean appendEscape(StringBuilder buf, char n)
 	{
 		switch (n)
@@ -553,7 +561,7 @@ public final class DyvilLexer
 		}
 		return false;
 	}
-	
+
 	private IToken addToken(IToken prev, String s, int type, int line, int start, int len)
 	{
 		switch (type)
@@ -561,22 +569,23 @@ public final class DyvilLexer
 		case IDENTIFIER:
 		case LETTER_IDENTIFIER:
 		{
-			int i = this.symbols.getKeywordType(s);
-			if (i == 0)
+			final int keywordType = this.symbols.getKeywordType(s);
+			if (keywordType == 0)
 			{
 				return new IdentifierToken(prev, Name.get(s), type, line, start, start + len);
 			}
-			return new SymbolToken(this.symbols, prev, i, line, start);
+			return new SymbolToken(this.symbols, prev, keywordType, line, start);
 		}
+		case DOT_IDENTIFIER:
 		case SYMBOL_IDENTIFIER:
 		case SYMBOL_IDENTIFIER | LETTER_IDENTIFIER:
 		{
-			int i = this.symbols.getSymbolType(s);
-			if (i == 0)
+			final int symbolType = this.symbols.getSymbolType(s);
+			if (symbolType == 0)
 			{
 				return new IdentifierToken(prev, Name.get(s), type, line, start, start + len);
 			}
-			return new SymbolToken(this.symbols, prev, i, line, start);
+			return new SymbolToken(this.symbols, prev, symbolType, line, start);
 		}
 		case SPECIAL_IDENTIFIER:
 			return new IdentifierToken(prev, Name.getSpecial(s), type, line, start, start + len + 2);
@@ -635,16 +644,16 @@ public final class DyvilLexer
 		}
 		return null;
 	}
-	
+
 	private IToken intToken(IToken prev, String s, int line, int start, int len, int radix, boolean isLong)
 	{
 		IToken token = isLong ?
-				new LongToken(prev, line, start, start + len) :
-				new IntToken(prev, line, start, start + len);
+			               new LongToken(prev, line, start, start + len) :
+			               new IntToken(prev, line, start, start + len);
 		this.parseInteger(token, s, radix, isLong);
 		return token;
 	}
-	
+
 	private void parseInteger(IToken token, String str, int radix, boolean isLong)
 	{
 		long result = 0;
@@ -653,7 +662,7 @@ public final class DyvilLexer
 		long limit = isLong ? -Long.MAX_VALUE : -Integer.MAX_VALUE;
 		long multmin;
 		int digit;
-		
+
 		multmin = limit / radix;
 		while (from < to)
 		{
@@ -669,7 +678,7 @@ public final class DyvilLexer
 
 		token.setLong(-result);
 	}
-	
+
 	private IToken addToken(IToken prev, StringBuilder buf, int type, int line, int start)
 	{
 		String s = buf.toString();

@@ -121,7 +121,6 @@ public class LexerUtil
 		{
 			switch (c)
 			{
-			case '.':
 			case '=':
 			case '>':
 			case '<':
