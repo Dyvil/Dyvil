@@ -7,7 +7,6 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.dynamic.DynamicType;
-import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -191,7 +190,7 @@ public final class Types
 		return null;
 	}
 
-	public static IClass getObjectArray()
+	public static IClass getObjectArrayClass()
 	{
 		if (OBJECT_ARRAY_CLASS == null)
 		{
@@ -207,11 +206,6 @@ public final class Types
 			return OBJECT_REF_CLASS = Package.dyvilRef.resolveClass("ObjectRef");
 		}
 		return OBJECT_REF_CLASS;
-	}
-
-	public static ReferenceType getObjectRef(IType type)
-	{
-		return new ReferenceType(getObjectRefClass(), type);
 	}
 
 	public static IClass getObjectSimpleRefClass()
@@ -251,30 +245,6 @@ public final class Types
 		final Set<IClass> superTypes2 = superClasses(type2);
 		superTypes1.intersect(superTypes2);
 		return superTypes1;
-	}
-
-	public static IClass commonClass(IType type1, IType type2)
-	{
-		final Set<IClass> superTypes1 = superClasses(type1);
-		final Set<IClass> superTypes2 = superClasses(type2);
-
-		for (IClass superClass1 : superTypes1)
-		{
-			if (superClass1 == Types.OBJECT_CLASS)
-			{
-				continue;
-			}
-
-			for (IClass superClass2 : superTypes2)
-			{
-				if (superClass1 == superClass2)
-				{
-					return superClass1;
-				}
-			}
-		}
-
-		return Types.OBJECT_CLASS;
 	}
 
 	private static Set<IClass> superClasses(IType type)

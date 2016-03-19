@@ -228,7 +228,7 @@ public final class ArrayExpr implements IValue, IValueList
 		{
 			return ARRAY_TO_ITERABLE;
 		}
-		return ARRAY_TO_ITERABLE = dyvil.tools.compiler.ast.type.builtin.Types.getObjectArray().getBody().getMethod(
+		return ARRAY_TO_ITERABLE = dyvil.tools.compiler.ast.type.builtin.Types.getObjectArrayClass().getBody().getMethod(
 				Name.getQualified("toIterable"));
 	}
 	

@@ -90,7 +90,7 @@ public interface IObjectType extends IType
 	@Override
 	default IClass getArrayClass()
 	{
-		return Types.getObjectArray();
+		return Types.getObjectArrayClass();
 	}
 	
 	@Override
