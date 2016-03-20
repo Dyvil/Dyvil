@@ -8,7 +8,6 @@ import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.parsing.Name;
 
 public class ExternalHeader extends DyvilHeader
@@ -32,7 +31,7 @@ public class ExternalHeader extends DyvilHeader
 		this.importsResolved = true;
 		for (int i = 0; i < this.importCount; i++)
 		{
-			this.imports[i].resolveTypes(null, this, false);
+			this.importDeclarations[i].resolveTypes(null, this, false);
 		}
 	}
 	
@@ -41,7 +40,7 @@ public class ExternalHeader extends DyvilHeader
 		this.staticImportsResolved = true;
 		for (int i = 0; i < this.usingCount; i++)
 		{
-			this.usings[i].resolveTypes(null, this, true);
+			this.usingDeclarations[i].resolveTypes(null, this, true);
 		}
 	}
 
@@ -49,9 +48,9 @@ public class ExternalHeader extends DyvilHeader
 	{
 		this.typeAliasesResolved = true;
 
-		for (ITypeAlias typeAlias : this.typeAliases.values())
+		for (int i = 0; i < this.typeAliasCount; i++)
 		{
-			typeAlias.resolveTypes(null, this);
+			this.typeAliases[i].resolveTypes(null, this);
 		}
 	}
 	

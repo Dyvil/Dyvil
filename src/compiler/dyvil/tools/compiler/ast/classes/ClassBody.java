@@ -136,10 +136,10 @@ public class ClassBody implements IClassBody
 	{
 		field.setEnclosingClass(this.theClass);
 
-		int index = this.fieldCount++;
+		final int index = this.fieldCount++;
 		if (index >= this.fields.length)
 		{
-			IField[] temp = new IField[this.fieldCount];
+			IField[] temp = new IField[index * 2];
 			System.arraycopy(this.fields, 0, temp, 0, index);
 			this.fields = temp;
 		}
@@ -222,10 +222,10 @@ public class ClassBody implements IClassBody
 	{
 		method.setEnclosingClass(this.theClass);
 
-		int index = this.methodCount++;
+		final int index = this.methodCount++;
 		if (index >= this.methods.length)
 		{
-			IMethod[] temp = new IMethod[this.methodCount];
+			final IMethod[] temp = new IMethod[index * 2];
 			System.arraycopy(this.methods, 0, temp, 0, index);
 			this.methods = temp;
 		}

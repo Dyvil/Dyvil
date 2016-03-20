@@ -311,16 +311,16 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 	}
 	
 	@Override
-	public void addOperator(Operator op)
+	public void addOperator(Operator operator)
 	{
-		this.operators.put(op.name, op);
-		this.compiler.getOutput().println("Defined " + op);
+		this.operatorMap.put(operator.name, operator);
+		this.compiler.getOutput().println("Defined " + operator);
 	}
 	
 	@Override
 	public Operator getOperator(Name name)
 	{
-		return this.operators.get(name);
+		return this.operatorMap.get(name);
 	}
 	
 	@Override
@@ -338,32 +338,31 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 	}
 	
 	@Override
-	public void addUsing(ImportDeclaration declaration)
+	public void addUsing(ImportDeclaration usingDeclaration)
 	{
-		declaration.resolveTypes(this.markers, this, true);
+		usingDeclaration.resolveTypes(this.markers, this, true);
 		
 		if (this.hasErrors())
 		{
 			return;
 		}
 		
-		super.addUsing(declaration);
-		this.compiler.getOutput().println(declaration);
+		super.addUsing(usingDeclaration);
+		this.compiler.getOutput().println(usingDeclaration);
 	}
 	
 	@Override
-	public void addInclude(IncludeDeclaration component)
+	public void addInclude(IncludeDeclaration includeDeclaration)
 	{
-		component.resolve(this.markers, this);
+		includeDeclaration.resolve(this.markers, this);
 		
 		if (this.hasErrors())
 		{
 			return;
 		}
 		
-		super.addInclude(component);
-		this.operators.putAll(component.getHeader().getOperators());
-		this.compiler.getOutput().println(component);
+		super.addInclude(includeDeclaration);
+		this.compiler.getOutput().println(includeDeclaration);
 	}
 	
 	@Override
