@@ -1,5 +1,7 @@
 package dyvil
 
+// ---------------------------------------- Import Declarations ----------------------------------------
+
 // Base imports for language features
 import	dyvil.lang._
 
@@ -12,7 +14,7 @@ import	dyvil.util.{ Option, None, Some }
 import	dyvil.util.Version
 
 // Import Tuple types with more useful names
-import	dyvil.tuple.{ Tuple2 => Pair, Tuple3 => Triple, Tuple4 => Quad}
+import	dyvil.tuple.{ Tuple2 => Pair, Tuple3 => Triple }
 
 // Import useful annotation classes
 import	dyvil.annotation.Intrinsic
@@ -29,6 +31,8 @@ import	dyvil.annotation.{
 
 import	java.lang._
 
+// ---------------------------------------- Using Declarations ----------------------------------------
+
 // Import the methods from former Predef classes
 using	dyvil.lang.{
 	Primitives._
@@ -39,7 +43,9 @@ using	dyvil.lang.{
 	FunctionConversions._
 }
 
-// Primitive type aliases
+// ---------------------------------------- Type Aliases ----------------------------------------
+
+// Primitive Type Aliases
 type	Void	= dyvil.lang.Void
 type	Byte	= java.lang.Byte
 type	Short	= java.lang.Short
@@ -65,16 +71,13 @@ type	ImmutableMap[K, V]	= [final K : V]
 // Tuple Type Aliases
 type	Pair[A, B]			= (A, B)
 type	Triple[A, B, C]		= (A, B, C)
-type	Quad[A, B, C, D]	= (A, B, C, D)
 
-// Print Operators
+// ---------------------------------------- Operator Definitions Declarations ----------------------------------------
+
+// Top-Level Statements
 prefix	operator print		{ precedence 1 }
 prefix	operator println	{ precedence 1 }
-
-// Assert Operator
 prefix	operator assert		{ precedence 1 }
-
-// Consume Operator
 prefix	operator consume	{ precedence 1 }
 
 // Postfix Operators
