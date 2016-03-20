@@ -756,10 +756,10 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 			if (operator.type != Operator.POSTFIX && !ParserUtil.isExpressionTerminator(nextType))
 			{
-				SingleArgument sa = new SingleArgument();
-				call.setArguments(sa);
+				final SingleArgument argument = new SingleArgument();
+				call.setArguments(argument);
 
-				this.parseApply(pm, token, sa, operator);
+				this.parseApply(pm, token, argument, operator);
 			}
 			return;
 		}

@@ -164,87 +164,87 @@ public class UnionType implements IObjectType
 		return combine(this.left, this.right, this);
 	}
 
-	public static IType combine(IType type1, IType type2, UnionType unionType)
+	public static IType combine(IType left, IType right, UnionType unionType)
 	{
 		// TODO rename type1, type2 to left and right
 
-		if (type1 == Types.VOID || type2 == Types.VOID)
+		if (left == Types.VOID || right == Types.VOID)
 		{
 			// either type is void -> result void
 			return Types.VOID;
 		}
-		if (type1.isArrayType())
+		if (left.isArrayType())
 		{
-			if (!type2.isArrayType())
+			if (!right.isArrayType())
 			{
 				return Types.ANY;
 			}
-			return arrayElementCombine(type1.getElementType(), type2.getElementType());
+			return arrayElementCombine(left.getElementType(), right.getElementType());
 		}
-		if (type2.isArrayType())
+		if (right.isArrayType())
 		{
-			if (!type1.isArrayType())
+			if (!left.isArrayType())
 			{
 				return Types.ANY;
 			}
-			return arrayElementCombine(type1.getElementType(), type2.getElementType());
+			return arrayElementCombine(left.getElementType(), right.getElementType());
 		}
 
-		IClass class1 = type1.getTheClass();
-		if (class1 == null)
+		IClass leftClass = left.getTheClass();
+		if (leftClass == null)
 		{
-			// type 1 unresolved -> result type 2
-			return type2;
+			// left type unresolved -> result right type
+			return right;
 		}
-		if (class1 == Types.NULL_CLASS)
+		if (leftClass == Types.NULL_CLASS)
 		{
-			// type 1 is null -> result reference type 2
-			return type2.getObjectType();
+			// left type is null -> result reference right type
+			return right.getObjectType();
 		}
-		if (class1 == Types.OBJECT_CLASS)
+		if (leftClass == Types.OBJECT_CLASS)
 		{
-			// type 1 is Object -> result Object
+			// left type is Object -> result Object
 			return Types.ANY;
 		}
 
-		final IClass class2 = type2.getTheClass();
-		if (class2 == null)
+		final IClass rightClass = right.getTheClass();
+		if (rightClass == null)
 		{
-			// type 2 unresolved -> result type 1
-			return type1;
+			// right type unresolved -> result left type
+			return left;
 		}
-		if (class2 == Types.NULL_CLASS)
+		if (rightClass == Types.NULL_CLASS)
 		{
-			// type 2 is Object or null -> result reference type 1
-			return type1.getObjectType();
+			// right type is null -> result reference left type
+			return left.getObjectType();
 		}
-		if (class2 == Types.OBJECT_CLASS)
+		if (rightClass == Types.OBJECT_CLASS)
 		{
-			// type 2 is Object -> result Object
+			// right type is Object -> result Object
 			return Types.ANY;
 		}
 
-		if (Types.isSameType(type1, type2) || Types.isSuperType(type1, type2))
+		if (Types.isSameType(left, right) || Types.isSuperType(left, right))
 		{
-			// same type, or type 1 is a super type of type 2 -> result type 1
-			return type1;
+			// same type, or left type is a super type of right type -> result left type
+			return left;
 		}
-		if (Types.isSuperType(type2, type1))
+		if (Types.isSuperType(right, left))
 		{
-			// type 2 is a super type of type 1 -> result type 2
-			return type2;
+			// right type is a super type of left type -> result right type
+			return right;
 		}
 
-		return unionType != null ? unionType : new UnionType(type1, type2);
+		return unionType != null ? unionType : new UnionType(left, right);
 	}
 
-	private static IType arrayElementCombine(IType type1, IType type2)
+	private static IType arrayElementCombine(IType left, IType right)
 	{
-		if (type1.getTypecode() != type2.getTypecode())
+		if (left.getTypecode() != right.getTypecode())
 		{
 			return Types.ANY;
 		}
-		return new ArrayType(combine(type1, type2, null));
+		return new ArrayType(combine(left, right, null));
 	}
 
 	@Override
