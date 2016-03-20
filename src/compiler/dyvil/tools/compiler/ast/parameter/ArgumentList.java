@@ -21,7 +21,7 @@ public final class ArgumentList implements IArguments, IValueList
 	private IValue[] values;
 	private int      size;
 	
-	private boolean varargs;
+	private boolean varArgsArray;
 	
 	public ArgumentList()
 	{
@@ -253,6 +253,7 @@ public final class ArgumentList implements IArguments, IValueList
 		final IValue value = this.values[index];
 		if (value.isType(arrayType))
 		{
+			this.varArgsArray = true;
 			this.values[index] = TypeChecker.convertValue(value, arrayType, typeContext, markers, context,
 			                                              IArguments.argumentMarkerSupplier(param));
 			return;
@@ -315,7 +316,7 @@ public final class ArgumentList implements IArguments, IValueList
 	@Override
 	public void writeVarargsValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
 	{
-		if (this.varargs)
+		if (this.varArgsArray)
 		{
 			this.values[index].writeExpression(writer, param.getType());
 			return;

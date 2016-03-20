@@ -21,7 +21,7 @@ import java.util.Iterator;
 public final class SingleArgument implements IArguments, IValueConsumer
 {
 	private IValue  value;
-	private boolean varargs;
+	private boolean varArgsArray;
 	
 	public SingleArgument()
 	{
@@ -174,14 +174,13 @@ public final class SingleArgument implements IArguments, IValueConsumer
 		{
 			this.value = TypeChecker.convertValue(this.value, arrayType, typeContext, markers, context,
 			                                      IArguments.argumentMarkerSupplier(param));
-			this.varargs = true;
+			this.varArgsArray = true;
 			return;
 		}
 
 		final IType elementType = arrayType.getElementType();
 		this.value = TypeChecker.convertValue(this.value, elementType, typeContext, markers, context,
 		                                      IArguments.argumentMarkerSupplier(param));
-		return;
 	}
 	
 	@Override
@@ -230,7 +229,7 @@ public final class SingleArgument implements IArguments, IValueConsumer
 		{
 			return;
 		}
-		if (this.varargs)
+		if (this.varArgsArray)
 		{
 			// Write the value as is (it is an array)
 			this.value.writeExpression(writer, param.getType());
@@ -250,7 +249,7 @@ public final class SingleArgument implements IArguments, IValueConsumer
 	@Override
 	public Iterator<IValue> iterator()
 	{
-		return this.value == null ? EmptyIterator.instance : new SingletonIterator<IValue>(this.value);
+		return this.value == null ? EmptyIterator.instance : new SingletonIterator<>(this.value);
 	}
 
 	@Override
