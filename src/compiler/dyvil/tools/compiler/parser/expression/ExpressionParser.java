@@ -592,7 +592,6 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		}
 
 		pm.report(Markers.syntaxError(token, "expression.invalid", token.toString()));
-		return;
 	}
 
 	/**
@@ -611,7 +610,6 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		pm.pushParser(new ClassBodyParser(body), true);
 		this.mode = ANONYMOUS_CLASS_END;
 		this.value = classConstructor;
-		return;
 	}
 
 	/**
@@ -702,7 +700,6 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		}
 
 		this.parseIdentifierAccess(pm, token, name, operator);
-		return;
 	}
 
 	private void parseIdentifierAccess(IParserManager pm, IToken token)
@@ -839,15 +836,14 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				return;
 			}
 
-			// ... IDENTIFIER IDENTIFIER ...
-			// e.g. this call ...
 			if (ParserUtil.isIdentifier(nextType))
 			{
-				// ... OPERATOR ...
-				// e.g. this + that
+				// ... IDENTIFIER IDENTIFIER ...
+				// e.g. this call ...
+				if (nextType == Tokens.SYMBOL_IDENTIFIER // ... SYMBOL-IDENTIFIER ... // this ++<>++ that
+					    || pm.getOperator(next.nameValue()) != null // ... OPERATOR ... // this + that
+					    || !ParserUtil.isExpressionTerminator(next.next().type()))
 				// ... IDENTIFIER NON-EXPRESSION-TERMINATOR
-				// e.g. this.plus that
-				if (ParserUtil.isOperator(pm, next, nextType) || !ParserUtil.isExpressionTerminator(next.next().type()))
 				{
 					final FieldAccess access = new FieldAccess(token, this.value, name);
 					access.setDotless(!this.hasFlag(EXPLICIT_DOT));
@@ -869,7 +865,6 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		this.mode = ACCESS;
 
 		this.parseApply(pm, token.next(), argument, operator == null ? Operators.DEFAULT : operator);
-		return;
 	}
 
 	/**
@@ -976,7 +971,6 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		pm.report(Markers.syntaxError(token, "assignment.invalid", token));
 		this.mode = VALUE;
 		this.value = null;
-		return;
 	}
 
 	private boolean parseKeyword(IParserManager pm, IToken token, int type)

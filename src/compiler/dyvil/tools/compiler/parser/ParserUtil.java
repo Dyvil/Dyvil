@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.parser;
 
-import dyvil.tools.compiler.ast.constant.*;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
@@ -60,45 +58,7 @@ public class ParserUtil
 		return false;
 	}
 
-	public static boolean isSeperator(int type)
-	{
-		return type == BaseSymbols.COMMA || type == BaseSymbols.SEMICOLON;
-	}
-
-	public static boolean isOperator(IParserManager pm, IToken token, int type)
-	{
-		if (type == Tokens.SYMBOL_IDENTIFIER)
-		{
-			return true;
-		}
-		return pm.getOperator(token.nameValue()) != null;
-	}
-
 	// endregion
-
-	public static IValue parsePrimitive(IToken token, int type)
-	{
-		switch (type)
-		{
-		case DyvilKeywords.TRUE:
-			return new BooleanValue(token.raw(), true);
-		case DyvilKeywords.FALSE:
-			return new BooleanValue(token.raw(), false);
-		case Tokens.STRING:
-			return new StringValue(token.raw(), token.stringValue());
-		case Tokens.SINGLE_QUOTED_STRING:
-			return new CharValue(token.raw(), token.stringValue());
-		case Tokens.INT:
-			return new IntValue(token.raw(), token.intValue());
-		case Tokens.LONG:
-			return new LongValue(token.raw(), token.longValue());
-		case Tokens.FLOAT:
-			return new FloatValue(token.raw(), token.floatValue());
-		case Tokens.DOUBLE:
-			return new DoubleValue(token.raw(), token.doubleValue());
-		}
-		return null;
-	}
 
 	/**
 	 * Finds the next matching parenthesis, brace or bracket.
