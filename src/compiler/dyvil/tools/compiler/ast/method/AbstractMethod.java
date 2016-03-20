@@ -894,7 +894,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public boolean checkOverride(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext)
+	public boolean checkOverride(IMethod candidate, ITypeContext typeContext)
 	{
 		// Check Name
 		if (candidate.getName() != this.name)
@@ -928,7 +928,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 		}
 
-		// Store the method in the cache, if it originates from a
+		return true;
+	}
+
+	public void addOverride(IMethod candidate)
+	{
 		if (this.enclosingClass.isSubTypeOf(candidate.getEnclosingClass().getClassType()))
 		{
 			if (this.overrideMethods == null)
@@ -937,7 +941,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 			this.overrideMethods.add(candidate);
 		}
-		return true;
 	}
 
 	protected void checkOverride_external()

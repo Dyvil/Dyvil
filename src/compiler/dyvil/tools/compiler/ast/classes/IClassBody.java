@@ -70,7 +70,7 @@ public interface IClassBody extends IASTNode, IClassList, IMemberConsumer
 		return null;
 	}
 
-	boolean checkImplements(MarkerList markers, IClass checkedClass, IMethod candidate, ITypeContext typeContext);
+	boolean checkImplements(IMethod candidate, ITypeContext typeContext);
 
 	void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext);
 	

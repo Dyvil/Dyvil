@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.method;
 
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
@@ -45,10 +44,6 @@ public interface IMethod extends IClassMember, ICallableMember, ICallableSignatu
 	/**
 	 * Checks if this method overrides the given {@code candidate} method.
 	 *
-	 * @param markers
-	 * 		the marker list for error reporting
-	 * @param iclass
-	 * 		the class that is being checked
 	 * @param candidate
 	 * 		the potential super-method
 	 * @param typeContext
@@ -56,7 +51,9 @@ public interface IMethod extends IClassMember, ICallableMember, ICallableSignatu
 	 *
 	 * @return {@code true}, if this method overrides the given candidate
 	 */
-	boolean checkOverride(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext);
+	boolean checkOverride(IMethod candidate, ITypeContext typeContext);
+
+	void addOverride(IMethod method);
 	
 	// Generics
 	

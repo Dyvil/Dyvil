@@ -295,11 +295,16 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 	
 	@Override
-	public boolean checkOverride(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext)
+	public boolean checkOverride(IMethod candidate, ITypeContext typeContext)
 	{
 		return false;
 	}
-	
+
+	@Override
+	public void addOverride(IMethod method)
+	{
+	}
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{

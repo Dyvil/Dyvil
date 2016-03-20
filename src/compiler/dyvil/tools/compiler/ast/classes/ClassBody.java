@@ -486,11 +486,11 @@ public class ClassBody implements IClassBody
 	}
 
 	@Override
-	public boolean checkImplements(MarkerList markers, IClass checkedClass, IMethod candidate, ITypeContext typeContext)
+	public boolean checkImplements(IMethod candidate, ITypeContext typeContext)
 	{
 		for (int i = 0; i < this.methodCount; i++)
 		{
-			if (checkOverride(this.methods[i], markers, checkedClass, candidate, typeContext))
+			if (checkOverride(this.methods[i], candidate, typeContext))
 			{
 				return true;
 			}
@@ -500,13 +500,13 @@ public class ClassBody implements IClassBody
 			final IProperty property = this.properties[i];
 
 			final IMethod getter = property.getGetter();
-			if (getter != null && checkOverride(getter, markers, checkedClass, candidate, typeContext))
+			if (getter != null && checkOverride(getter, candidate, typeContext))
 			{
 				return true;
 			}
 
 			final IMethod setter = property.getSetter();
-			if (setter != null && checkOverride(setter, markers, checkedClass, candidate, typeContext))
+			if (setter != null && checkOverride(setter, candidate, typeContext))
 			{
 				return true;
 			}
@@ -514,10 +514,14 @@ public class ClassBody implements IClassBody
 		return false;
 	}
 
-	private static boolean checkOverride(IMethod method, MarkerList markers, IClass checkedClass, IMethod candidate, ITypeContext typeContext)
+	private static boolean checkOverride(IMethod method, IMethod candidate, ITypeContext typeContext)
 	{
-		return method.checkOverride(markers, checkedClass, candidate, typeContext) && !method
-				.hasModifier(Modifiers.ABSTRACT);
+		if (method.checkOverride(candidate, typeContext))
+		{
+			method.addOverride(method);
+			return !method.hasModifier(Modifiers.ABSTRACT);
+		}
+		return false;
 	}
 
 	@Override
@@ -557,7 +561,7 @@ public class ClassBody implements IClassBody
 		// Check if the super class implements the method
 		// We cannot do the modifier checks beforehand, because methods need to know which methods they implement to
 		// generate bridges.
-		if (checkedClass.checkImplements(markers, checkedClass, candidate, typeContext))
+		if (checkedClass.checkImplements(candidate, typeContext))
 		{
 			return;
 		}

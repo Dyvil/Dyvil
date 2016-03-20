@@ -282,22 +282,22 @@ public class CodeMethod extends AbstractMethod
 
 	private void checkDuplicates(MarkerList markers)
 	{
-		String desc = this.getDescriptor();
-		IClassBody body = this.enclosingClass.getBody();
+		final IClassBody body = this.enclosingClass.getBody();
 		if (body == null)
 		{
 			return;
 		}
 
+		final String desc = this.getDescriptor();
 		for (int i = body.methodCount() - 1; i >= 0; i--)
 		{
-			IMethod m = body.getMethod(i);
-			if (m == this || m.getName() != this.name || m.parameterCount() != this.parameterCount)
+			final IMethod method = body.getMethod(i);
+			if (method == this || method.getName() != this.name || method.parameterCount() != this.parameterCount)
 			{
 				continue;
 			}
 
-			if (m.getDescriptor().equals(desc))
+			if (method.getDescriptor().equals(desc))
 			{
 				markers.add(Markers.semantic(this.position, "method.duplicate", this.name, desc));
 			}

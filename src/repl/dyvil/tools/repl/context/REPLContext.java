@@ -557,7 +557,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 		int methods = this.methods.size();
 		for (int i = 0; i < methods; i++)
 		{
-			if (this.methods.get(i).checkOverride(this.markers, iclass, method, null))
+			if (this.methods.get(i).checkOverride(method, null))
 			{
 				this.methods.set(i, method);
 				replaced = true;

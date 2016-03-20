@@ -360,7 +360,7 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public boolean checkImplements(MarkerList markers, IClass checkedClass, IMethod candidate, ITypeContext typeContext)
+	public boolean checkImplements(IMethod candidate, ITypeContext typeContext)
 	{
 		if (!this.genericsResolved)
 		{
@@ -370,7 +370,7 @@ public final class ExternalClass extends AbstractClass
 		{
 			this.resolveSuperTypes();
 		}
-		return super.checkImplements(markers, checkedClass, candidate, typeContext);
+		return super.checkImplements(candidate, typeContext);
 	}
 
 	@Override

@@ -376,7 +376,7 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
-	public boolean checkImplements(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext)
+	public boolean checkImplements(IMethod candidate, ITypeContext typeContext)
 	{
 		return false;
 	}
