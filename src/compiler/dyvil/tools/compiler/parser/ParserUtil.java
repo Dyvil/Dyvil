@@ -53,7 +53,6 @@ public class ParserUtil
 		case DyvilKeywords.ELSE:
 		case DyvilKeywords.FINALLY:
 		case DyvilKeywords.CATCH:
-		case BaseSymbols.OPEN_SQUARE_BRACKET:
 		case Tokens.STRING_PART:
 		case Tokens.STRING_END:
 			return true;
