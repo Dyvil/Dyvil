@@ -31,6 +31,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.transform.TypeChecker;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -352,21 +353,26 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		context = context.push(this);
 
 		// Resolve and check all values except the last one
-		int len = this.valueCount - 1;
-		for (int i = 0; i < len; i++)
+		int lastIndex = this.valueCount - 1;
+		for (int i = 0; i < this.valueCount; i++)
 		{
 			final IValue resolvedValue = this.values[i] = this.values[i].resolve(markers, context);
 			final int valueTag = resolvedValue.valueTag();
 
 			if (valueTag == IValue.VARIABLE)
 			{
-				this.addVariable((FieldInitializer) resolvedValue);
+				this.addVariable((FieldInitializer) resolvedValue, markers, context);
 				continue;
 			}
 			if (valueTag == IValue.NESTED_METHOD)
 			{
-				this.addMethod((MethodStatement) resolvedValue);
+				this.addMethod((MethodStatement) resolvedValue, markers);
 				continue;
+			}
+
+			if (i == lastIndex)
+			{
+				break;
 			}
 
 			// Try to resolve an applyStatement method
@@ -381,12 +387,8 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 				}
 			}
 
-			this.values[i] = IStatement
-				                 .checkStatement(markers, context, resolvedValue, "statementlist.statement");
+			this.values[i] = IStatement.checkStatement(markers, context, resolvedValue, "statementlist.statement");
 		}
-
-		// Resolved the last value
-		this.values[len] = this.values[len].resolve(markers, context);
 
 		context.pop();
 
@@ -422,7 +424,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		return null;
 	}
 
-	protected void addVariable(FieldInitializer initializer)
+	protected void addVariable(FieldInitializer initializer, MarkerList markers, IContext context)
 	{
 		if (this.variables == null)
 		{
@@ -430,14 +432,38 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		}
 
 		final Variable variable = initializer.variable;
-		this.variables.put(variable.getName(), variable);
+		final Name variableName = variable.getName();
+
+		final IDataMember dataMember = context.resolveField(variableName);
+		if (dataMember != null && dataMember.isVariable())
+		{
+			markers.add(Markers.semantic(initializer.getPosition(), "variable.shadow", variableName));
+		}
+
+		this.variables.put(variableName, variable);
 	}
 
-	protected void addMethod(MethodStatement methodStatement)
+	protected void addMethod(MethodStatement methodStatement, MarkerList markers)
 	{
+		final IMethod method = methodStatement.method;
+
 		if (this.methods == null)
 		{
 			this.methods = new ArrayList<>();
+			this.methods.add(method);
+			return;
+		}
+
+		final Name methodName = method.getName();
+		final int parameterCount = method.parameterCount();
+		final String desc = method.getDescriptor();
+		for (IMethod candidate : this.methods)
+		{
+			if (candidate.getName() == methodName // same name
+				    && candidate.parameterCount() == parameterCount && candidate.getDescriptor().equals(desc))
+			{
+				markers.add(Markers.semanticError(methodStatement.getPosition(), "method.duplicate", methodName, desc));
+			}
 		}
 
 		this.methods.add(methodStatement.method);
