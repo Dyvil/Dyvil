@@ -77,7 +77,6 @@ public class RangeForStatement extends ForEachStatement
 
 		// Write the start value and store it in the variable.
 		startValue.writeExpression(writer, elementType);
-		writer.visitInsn(Opcodes.AUTO_DUP);
 
 		final int counterVarIndex, varIndex;
 
