@@ -10,17 +10,17 @@ import dyvil.tools.parsing.token.IToken;
 public class ParserUtil
 {
 	// region Token Type Utilities
-	
+
 	public static boolean isIdentifier(int type)
 	{
 		return (type & Tokens.IDENTIFIER) != 0;
 	}
-	
+
 	public static boolean isCloseBracket(int type)
 	{
 		return (type & BaseSymbols.CLOSE_BRACKET) == BaseSymbols.CLOSE_BRACKET;
 	}
-	
+
 	public static boolean isTerminator(int type)
 	{
 		switch (type)
@@ -36,7 +36,7 @@ public class ParserUtil
 		}
 		return false;
 	}
-	
+
 	public static boolean isExpressionTerminator(int type)
 	{
 		if (isTerminator(type))
@@ -59,12 +59,12 @@ public class ParserUtil
 		}
 		return false;
 	}
-	
+
 	public static boolean isSeperator(int type)
 	{
 		return type == BaseSymbols.COMMA || type == BaseSymbols.SEMICOLON;
 	}
-	
+
 	public static boolean isOperator(IParserManager pm, IToken token, int type)
 	{
 		if (type == Tokens.SYMBOL_IDENTIFIER)
@@ -75,7 +75,7 @@ public class ParserUtil
 	}
 
 	// endregion
-	
+
 	public static IValue parsePrimitive(IToken token, int type)
 	{
 		switch (type)
@@ -98,5 +98,64 @@ public class ParserUtil
 			return new DoubleValue(token.raw(), token.doubleValue());
 		}
 		return null;
+	}
+
+	/**
+	 * Finds the next matching parenthesis, brace or bracket.
+	 *
+	 * @param token
+	 * 	the opening parenthesis, brace or bracket token
+	 *
+	 * @return the closing parenthesis, brace or bracket token or {@code null}
+	 */
+	public static IToken findMatch(IToken token)
+	{
+		int parenDepth = 0;
+		int bracketDepth = 0;
+		int braceDepth = 0;
+
+		for (; ; token = token.next())
+		{
+			switch (token.type())
+			{
+			case Tokens.EOF:
+				return null;
+			case BaseSymbols.OPEN_PARENTHESIS:
+				parenDepth++;
+				continue;
+			case BaseSymbols.CLOSE_PARENTHESIS:
+				if (parenDepth < 0)
+				{
+					return null;
+				}
+				parenDepth--;
+				break;
+			case BaseSymbols.OPEN_SQUARE_BRACKET:
+				bracketDepth++;
+				continue;
+			case BaseSymbols.CLOSE_SQUARE_BRACKET:
+				if (bracketDepth < 0)
+				{
+					return null;
+				}
+				bracketDepth--;
+				break;
+			case BaseSymbols.OPEN_CURLY_BRACKET:
+				braceDepth++;
+				continue;
+			case BaseSymbols.CLOSE_CURLY_BRACKET:
+				if (braceDepth < 0)
+				{
+					return null;
+				}
+				braceDepth--;
+				continue;
+			}
+
+			if (parenDepth == 0 && bracketDepth == 0 && braceDepth == 0)
+			{
+				return token;
+			}
+		}
 	}
 }

@@ -18,6 +18,7 @@ import dyvil.tools.compiler.ast.generic.MapTypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.IParametric;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -35,7 +36,7 @@ import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public final class LambdaExpr implements IValue, IClassCompilable, IDefaultContext, IValueConsumer
+public final class LambdaExpr implements IValue, IClassCompilable, IDefaultContext, IValueConsumer, IParameterList
 {
 	public static final Handle BOOTSTRAP = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/LambdaMetafactory",
 	                                                  "metafactory",
@@ -141,19 +142,6 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	}
 
 	@Override
-	public void setInnerIndex(String internalName, int index)
-	{
-		this.owner = internalName;
-		this.name = "lambda$" + index;
-	}
-
-	@Override
-	public boolean isPrimitive()
-	{
-		return false;
-	}
-
-	@Override
 	public void setValue(IValue value)
 	{
 		this.value = value;
@@ -162,6 +150,43 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	public IValue getValue()
 	{
 		return this.value;
+	}
+
+	@Override
+	public int parameterCount()
+	{
+		return this.parameterCount;
+	}
+
+	@Override
+	public void addParameter(IParameter parameter)
+	{
+		int index = this.parameterCount++;
+		if (index >= this.parameters.length)
+		{
+			IParameter[] temp = new IParameter[index + 1];
+			System.arraycopy(this.parameters, 0, temp, 0, index);
+			this.parameters = temp;
+		}
+		this.parameters[index] = parameter;
+	}
+
+	@Override
+	public void setParameter(int index, IParameter parameter)
+	{
+		this.parameters[index] = parameter;
+	}
+
+	@Override
+	public IParameter getParameter(int index)
+	{
+		return this.parameters[index];
+	}
+
+	@Override
+	public IParameter[] getParameters()
+	{
+		return this.parameters;
 	}
 
 	public void setMethod(IMethod method)
@@ -183,6 +208,19 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	public void setReturnType(IType returnType)
 	{
 		this.returnType = returnType;
+	}
+
+	@Override
+	public void setInnerIndex(String internalName, int index)
+	{
+		this.owner = internalName;
+		this.name = "lambda$" + index;
+	}
+
+	@Override
+	public boolean isPrimitive()
+	{
+		return false;
 	}
 
 	@Override

@@ -4,9 +4,13 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.consumer.IParameterConsumer;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
-import dyvil.tools.compiler.ast.modifiers.*;
-import dyvil.tools.compiler.ast.parameter.*;
+import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
+import dyvil.tools.compiler.ast.modifiers.Modifier;
+import dyvil.tools.compiler.ast.modifiers.ModifierList;
+import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.IParametric;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -24,6 +28,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	public static final int SEPARATOR = 4;
 	
 	protected IParameterConsumer consumer;
+	protected boolean untyped;
 
 	// Metadata
 	private ModifierList   modifiers;
@@ -36,6 +41,13 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	{
 		this.consumer = consumer;
 		this.mode = TYPE;
+	}
+
+	public ParameterListParser(IParameterConsumer consumer, boolean untyped)
+	{
+		this.consumer = consumer;
+		this.mode = TYPE;
+		this.untyped = untyped;
 	}
 	
 	private void reset()
@@ -68,6 +80,15 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				}
 
 				this.modifiers.addModifier(modifier);
+				return;
+			}
+
+			if (this.untyped && ParserUtil.isIdentifier(type) && ParserUtil.isTerminator(token.next().type()))
+			{
+				// ... , IDENTIFIER , ...
+				this.type = Types.UNKNOWN;
+				this.mode = NAME;
+				pm.reparse();
 				return;
 			}
 
