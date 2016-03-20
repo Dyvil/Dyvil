@@ -26,14 +26,14 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	public static final int TYPE      = 1;
 	public static final int NAME      = 2;
 	public static final int SEPARATOR = 4;
-	
+
 	protected IParameterConsumer consumer;
-	protected boolean untyped;
+	protected boolean            untyped;
 
 	// Metadata
 	private ModifierList   modifiers;
 	private AnnotationList annotations;
-	
+
 	private IType   type;
 	private boolean varargs;
 
@@ -49,7 +49,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 		this.mode = TYPE;
 		this.untyped = untyped;
 	}
-	
+
 	private void reset()
 	{
 		this.modifiers = null;
@@ -57,7 +57,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 		this.type = null;
 		this.varargs = false;
 	}
-	
+
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
@@ -83,8 +83,13 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				return;
 			}
 
-			if (this.untyped && ParserUtil.isIdentifier(type) && ParserUtil.isTerminator(token.next().type()))
+			if (ParserUtil.isIdentifier(type) && ParserUtil.isTerminator(token.next().type()))
 			{
+				if (!this.untyped)
+				{
+					pm.report(token, "parameter.type");
+				}
+
 				// ... , IDENTIFIER , ...
 				this.type = Types.UNKNOWN;
 				this.mode = NAME;
@@ -98,7 +103,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				{
 					this.annotations = new AnnotationList();
 				}
-				
+
 				final Annotation annotation = new Annotation(token.raw());
 				this.annotations.addAnnotation(annotation);
 				pm.pushParser(pm.newAnnotationParser(annotation));
@@ -189,11 +194,12 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	public IParameter createParameter(IToken token)
 	{
 		final IParameter parameter = this.consumer
-				.createParameter(token.raw(), token.nameValue(), this.type, this.modifiers, this.annotations);
+			                             .createParameter(token.raw(), token.nameValue(), this.type, this.modifiers,
+			                                              this.annotations);
 		parameter.setVarargs(this.varargs);
 		return parameter;
 	}
-	
+
 	@Override
 	public void setType(IType type)
 	{
