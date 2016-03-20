@@ -13,11 +13,16 @@ import dyvil.tools.parsing.Name;
 
 import static dyvil.tools.compiler.ast.operator.Operator.INFIX_LEFT;
 
-public interface Operators
+public final class Operators
 {
-	Operator DEFAULT = new Operator(null, 100000, INFIX_LEFT);
+	public static final Operator DEFAULT = new Operator(null, 100000, INFIX_LEFT);
 
-	static IValue getPrefix(Name name, IValue arg1)
+	private Operators()
+	{
+		// no instances
+	}
+
+	public static IValue getPrefix(Name name, IValue arg1)
 	{
 		if (name == Names.bang)
 		{
@@ -33,7 +38,7 @@ public interface Operators
 		return getIncOperator(name, arg1, true);
 	}
 
-	static IncOperator getIncOperator(Name name, IValue arg1, boolean prefix)
+	private static IncOperator getIncOperator(Name name, IValue arg1, boolean prefix)
 	{
 		if (arg1.valueTag() == IValue.FIELD_ACCESS && IncOperator.isIncConvertible(arg1.getType()))
 		{
@@ -50,12 +55,12 @@ public interface Operators
 		return null;
 	}
 
-	static IValue getPostfix(IValue arg1, Name name)
+	public static IValue getPostfix(IValue arg1, Name name)
 	{
 		return getIncOperator(name, arg1, false);
 	}
 
-	static IValue getInfix_Priority(IValue arg1, Name name, IValue arg2)
+	public static IValue getInfix_Priority(IValue arg1, Name name, IValue arg2)
 	{
 		if (name == Names.eqeq || name == Names.eqeqeq)
 		{
@@ -91,7 +96,7 @@ public interface Operators
 		return null;
 	}
 
-	static IValue getInfix(IValue arg1, Name name, IValue arg2)
+	public static IValue getInfix(IValue arg1, Name name, IValue arg2)
 	{
 		if (name == Names.plus)
 		{
@@ -157,7 +162,7 @@ public interface Operators
 		return null;
 	}
 
-	static boolean isStringBuilderElement(IValue arg1)
+	private static boolean isStringBuilderElement(IValue arg1)
 	{
 		if (!arg1.isType(Types.STRING))
 		{
