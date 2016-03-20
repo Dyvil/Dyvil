@@ -371,7 +371,7 @@ public final class ModifierUtil
 				}
 			}
 		}
-		if (!hasValue && !isAbstract && !isNative)
+		if (!hasValue && !isAbstract && !isNative && !isStatic)
 		{
 			markers.add(
 					Markers.semanticError(member.getPosition(), "modifiers.unimplemented", Util.memberNamed(member)));
