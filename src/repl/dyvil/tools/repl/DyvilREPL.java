@@ -5,8 +5,8 @@ import dyvil.collection.mutable.TreeMap;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.parser.classes.ClassBodyParser;
 import dyvil.tools.compiler.parser.classes.DyvilHeaderParser;
+import dyvil.tools.compiler.parser.classes.MemberParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.transform.Names;
@@ -169,7 +169,7 @@ public final class DyvilREPL
 			this.context.reportErrors();
 			return;
 		}
-		if (this.parser.parse(markers, tokens, new ClassBodyParser(this.context), false))
+		if (this.parser.parse(markers, tokens, new MemberParser(this.context), false))
 		{
 			this.context.reportErrors();
 			return;

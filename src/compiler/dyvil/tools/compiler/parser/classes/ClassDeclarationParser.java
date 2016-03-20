@@ -140,7 +140,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			{
 				IClassBody body = new ClassBody(this.theClass);
 				this.theClass.setBody(body);
-				pm.pushParser(new ClassBodyParser(body));
+				pm.pushParser(new ClassBodyParser(body), true);
 				this.mode = BODY_END;
 				return;
 			}
@@ -179,7 +179,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			if (type != BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
 				pm.reparse();
-				pm.report(token, "class.body.end");
+				pm.report(token, "class.body.close_brace");
 			}
 			return;
 		case EXTENDS_PARAMETERS_END:
