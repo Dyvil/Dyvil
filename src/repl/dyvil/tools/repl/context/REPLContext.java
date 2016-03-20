@@ -313,14 +313,8 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 	@Override
 	public void addOperator(Operator operator)
 	{
-		this.operatorMap.put(operator.name, operator);
+		super.addOperator(operator);
 		this.compiler.getOutput().println("Defined " + operator);
-	}
-	
-	@Override
-	public Operator getOperator(Name name)
-	{
-		return this.operatorMap.get(name);
 	}
 	
 	@Override
