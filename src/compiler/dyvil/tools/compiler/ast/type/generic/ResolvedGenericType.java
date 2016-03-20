@@ -57,7 +57,7 @@ public class ResolvedGenericType extends ClassGenericType
 						.semantic(type.getPosition(), "generic.type.incompatible", typeVariable.getName().qualified,
 						          this.theClass.getFullName());
 				marker.addInfo(Markers.getSemantic("generic.type", type));
-				marker.addInfo(Markers.getSemantic("typevariable", typeVariable));
+				marker.addInfo(Markers.getSemantic("typeparameter.declaration", typeVariable));
 				markers.add(marker);
 			}
 		}

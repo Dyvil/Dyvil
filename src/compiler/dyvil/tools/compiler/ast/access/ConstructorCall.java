@@ -168,7 +168,7 @@ public class ConstructorCall implements ICall
 			{
 				Marker marker = Markers
 						.semanticError(this.position, "constructor.access.array.typevar", typeVar.getName());
-				marker.addInfo(Markers.getSemantic("typevariable", typeVar));
+				marker.addInfo(Markers.getSemantic("typeparameter.declaration", typeVar));
 				markers.add(marker);
 			}
 			

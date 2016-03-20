@@ -45,6 +45,7 @@ import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SemanticError;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -808,12 +809,23 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			ITypeParameter typeVar = this.typeParameters[i];
-			IType type = typeContext.resolveType(typeVar);
-			if (type == null || type.typeTag() == IType.TYPE_VAR_TYPE && type.getTypeVariable() == typeVar)
+			final ITypeParameter typeParameter = this.typeParameters[i];
+			final IType typeArgument = typeContext.resolveType(typeParameter);
+
+			if (typeArgument == null || typeArgument.getTypeVariable() == typeParameter)
 			{
-				markers.add(Markers.semantic(position, "method.typevar.infer", this.name, typeVar.getName()));
-				typeContext.addMapping(typeVar, Types.ANY);
+				final IType inferredType = typeParameter.getDefaultType();
+				markers.add(Markers.semantic(position, "method.typevar.infer", this.name, typeParameter.getName(),
+				                             inferredType));
+				typeContext.addMapping(typeParameter, inferredType);
+			}
+			else if (!typeParameter.isAssignableFrom(typeArgument))
+			{
+				final Marker marker = Markers.semanticError(position, "method.typevar.incompatible", this.name,
+				                                            typeParameter.getName());
+				marker.addInfo(Markers.getSemantic("generic.type", typeArgument));
+				marker.addInfo(Markers.getSemantic("typeparameter.declaration", typeParameter));
+				markers.add(marker);
 			}
 		}
 	}
@@ -1178,7 +1190,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			writer.visitInvokeDynamicInsn(this.name.qualified, this.getDescriptor(), EXTENSION_BSM,
 			                              new Handle(ClassFormat.H_INVOKESTATIC, owner, this.name.qualified,
-			                                     this.getDescriptor()));
+			                                         this.getDescriptor()));
 			return;
 		}
 

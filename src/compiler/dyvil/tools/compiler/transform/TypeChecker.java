@@ -96,7 +96,7 @@ public final class TypeChecker
 
 	public static Marker typeError(ICodePosition position, IType expected, IType actual, String key, Object... args)
 	{
-		return typeError(position, expected, actual, "type.expected", "value.type", key, args);
+		return typeError(position, expected, actual, key, "type.expected", "value.type", args);
 	}
 
 	public static Marker typeError(ICodePosition position, IType expected, IType actual, String key, String expectedError, String actualError, Object... args)
