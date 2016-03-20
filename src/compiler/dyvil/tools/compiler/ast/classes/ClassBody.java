@@ -518,7 +518,7 @@ public class ClassBody implements IClassBody
 	{
 		if (method.checkOverride(candidate, typeContext))
 		{
-			method.addOverride(method);
+			method.addOverride(candidate);
 			return !method.hasModifier(Modifiers.ABSTRACT);
 		}
 		return false;
