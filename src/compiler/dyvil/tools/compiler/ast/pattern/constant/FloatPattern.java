@@ -40,12 +40,6 @@ public final class FloatPattern extends Pattern
 	}
 	
 	@Override
-	public boolean isType(IType type)
-	{
-		return type == Types.FLOAT || type.isSuperTypeOf(Types.FLOAT);
-	}
-	
-	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
 			throws BytecodeException
 	{

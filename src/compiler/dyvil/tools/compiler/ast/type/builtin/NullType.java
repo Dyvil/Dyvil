@@ -134,16 +134,4 @@ public class NullType implements IRawType
 	{
 		return this;
 	}
-	
-	@Override
-	public boolean equals(Object obj)
-	{
-		return this.isSameType((IType) obj);
-	}
-	
-	@Override
-	public int hashCode()
-	{
-		return NULL;
-	}
 }

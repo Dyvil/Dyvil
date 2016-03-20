@@ -167,16 +167,16 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	{
 		if (this.field == null)
 		{
-			return this; // dont create an extra type error
+			return this; // don't create an extra type error
 		}
 		
-		return type.isSuperTypeOf(this.getType()) ? this : null;
+		return Types.isSuperType(type, this.getType()) ? this : null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return this.field != null && type.isSuperTypeOf(this.getType());
+		return this.field != null && Types.isSuperType(type, this.getType());
 	}
 	
 	@Override

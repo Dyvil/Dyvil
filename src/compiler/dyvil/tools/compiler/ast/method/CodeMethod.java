@@ -250,7 +250,7 @@ public class CodeMethod extends AbstractMethod
 			IType exceptionType = this.exceptions[i];
 			exceptionType.check(markers, this);
 
-			if (!Types.THROWABLE.isSuperTypeOf(exceptionType))
+			if (!Types.isSuperType(Types.THROWABLE, exceptionType))
 			{
 				Marker marker = Markers.semantic(exceptionType.getPosition(), "method.exception.type");
 				marker.addInfo(Markers.getSemantic("exception.type", exceptionType));
@@ -332,13 +332,14 @@ public class CodeMethod extends AbstractMethod
 
 			if (thisTypeResolved)
 			{
-				final IType type = overrideMethod.getType().getConcreteType(typeContext);
-				if (type != this.type && type.isResolved() && !type.isSuperTypeOf(this.type))
+				final IType superReturnType = overrideMethod.getType().getConcreteType(typeContext);
+				if (superReturnType != this.type && superReturnType.isResolved() // avoid extra error
+					    && !Types.isSuperType(superReturnType, this.type))
 				{
 					overrideMethod.getType().getConcreteType(typeContext);
 					Marker marker = Markers.semantic(this.position, "method.override.type.incompatible", this.name);
 					marker.addInfo(Markers.getSemantic("method.type", this.type));
-					marker.addInfo(Markers.getSemantic("method.override.type", type));
+					marker.addInfo(Markers.getSemantic("method.override.type", superReturnType));
 
 					marker.addInfo(Markers.getSemantic("method.override", Util.methodSignatureToString(overrideMethod),
 					                                   overrideMethod.getEnclosingClass().getFullName()));

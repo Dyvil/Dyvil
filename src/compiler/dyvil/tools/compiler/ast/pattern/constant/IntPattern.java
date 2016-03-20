@@ -34,12 +34,6 @@ public final class IntPattern extends Pattern
 	}
 	
 	@Override
-	public boolean isType(IType type)
-	{
-		return type == Types.INT || type.isSuperTypeOf(Types.INT);
-	}
-	
-	@Override
 	public IPattern withType(IType type, MarkerList markers)
 	{
 		return IPattern.primitiveWithType(this, type, Types.INT);

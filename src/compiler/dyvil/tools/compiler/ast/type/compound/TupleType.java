@@ -217,11 +217,11 @@ public final class TupleType implements IObjectType, ITypeList
 
 		for (int i = 0; i < this.typeCount; i++)
 		{
-			ITypeParameter typeVar = iclass.getTypeParameter(i);
-			IType type1 = type.resolveTypeSafely(typeVar);
+			final ITypeParameter typeVar = iclass.getTypeParameter(i);
+			final IType otherElementType = type.resolveTypeSafely(typeVar);
 
-			// Covariance
-			if (!this.types[i].isSuperTypeOf(type1))
+			// Tuple Element Types are Covariant
+			if (!Types.isSuperType(this.types[i], otherElementType))
 			{
 				return false;
 			}

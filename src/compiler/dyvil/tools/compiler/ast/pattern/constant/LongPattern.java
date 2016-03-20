@@ -40,12 +40,6 @@ public final class LongPattern extends Pattern
 	}
 	
 	@Override
-	public boolean isType(IType type)
-	{
-		return type == Types.LONG || type.isSuperTypeOf(Types.LONG);
-	}
-	
-	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
 			throws BytecodeException
 	{

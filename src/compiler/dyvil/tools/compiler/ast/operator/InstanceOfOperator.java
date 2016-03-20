@@ -5,7 +5,6 @@ import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
@@ -61,12 +60,6 @@ public final class InstanceOfOperator extends AbstractValue
 	public void setType(IType type)
 	{
 		this.type = type;
-	}
-	
-	@Override
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
-	{
-		return type == Types.BOOLEAN || type.isSuperTypeOf(Types.BOOLEAN) ? this : null;
 	}
 	
 	@Override
@@ -153,17 +146,17 @@ public final class InstanceOfOperator extends AbstractValue
 		}
 		
 		final IType valueType = this.value.getType();
-		if (valueType.isSameClass(this.type))
+		if (Types.isSameType(this.type, valueType))
 		{
 			markers.add(Markers.semantic(this.position, "instanceof.type.equal", valueType));
 			return;
 		}
-		if (this.type.isSuperClassOf(valueType))
+		if (Types.isSuperType(this.type, valueType))
 		{
 			markers.add(Markers.semantic(this.position, "instanceof.type.subtype", valueType, this.type));
 			return;
 		}
-		if (!valueType.isSuperClassOf(this.type))
+		if (!Types.isSuperType(valueType, this.type))
 		{
 			markers.add(Markers.semanticError(this.position, "instanceof.type.incompatible", valueType, this.type));
 		}

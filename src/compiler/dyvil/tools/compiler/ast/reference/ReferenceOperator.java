@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.reference;
 
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -73,17 +72,6 @@ public class ReferenceOperator implements IValue
 			this.type = new ReferenceType(valueType.getRefClass(), valueType);
 		}
 		return this.type;
-	}
-	
-	@Override
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
-	{
-		if (type.isSuperTypeOf(this.getType()))
-		{
-			return this;
-		}
-
-		return null;
 	}
 	
 	@Override

@@ -16,6 +16,7 @@ import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
@@ -336,7 +337,7 @@ public class ClassBody implements IClassBody
 			{
 				IType classParamType = parameters[p].getType();
 				IType constructorParamType = c.getParameter(p).getType();
-				if (!classParamType.isSameType(constructorParamType))
+				if (!Types.isSameType(classParamType, constructorParamType))
 				{
 					continue outer;
 				}

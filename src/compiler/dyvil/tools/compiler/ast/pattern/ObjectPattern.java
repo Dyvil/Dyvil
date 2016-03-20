@@ -43,18 +43,12 @@ public class ObjectPattern extends Pattern implements IPattern
 	@Override
 	public IPattern withType(IType type, MarkerList markers)
 	{
-		if (type.isSuperTypeOf(this.type))
+		if (this.isType(type))
 		{
 			return this;
 		}
 		// Type Check Patterns are not required
 		return null;
-	}
-
-	@Override
-	public boolean isType(IType type)
-	{
-		return type.isSuperTypeOf(this.type);
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
@@ -33,56 +34,60 @@ public class TypeCheckPattern implements IPattern
 		this.fromType = fromType;
 		this.type = toType;
 	}
-	
+
 	@Override
 	public ICodePosition getPosition()
 	{
 		return this.position;
 	}
-	
+
 	@Override
 	public void setPosition(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
 	@Override
 	public int getPatternType()
 	{
 		return TYPECHECK;
 	}
-	
+
 	@Override
 	public void setType(IType type)
 	{
 		this.type = type;
 	}
-	
+
 	@Override
 	public IType getType()
 	{
 		return this.type;
 	}
-	
+
 	@Override
 	public IPattern withType(IType type, MarkerList markers)
 	{
-		this.fromType = type;
-		return type.isSuperTypeOf(this.type) ? this : null;
+		if (Types.isSuperType(type, this.type))
+		{
+			this.fromType = type;
+			return this;
+		}
+		return null;
 	}
-	
+
 	@Override
 	public boolean isType(IType type)
 	{
 		return !type.isPrimitive();
 	}
-	
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
 		return this.pattern == null ? null : this.pattern.resolveField(name);
 	}
-	
+
 	@Override
 	public IPattern resolve(MarkerList markers, IContext context)
 	{
@@ -90,11 +95,11 @@ public class TypeCheckPattern implements IPattern
 		{
 			this.pattern = this.pattern.resolve(markers, context);
 		}
-		
+
 		if (this.type != null)
 		{
 			this.type = this.type.resolveType(markers, context);
-			
+
 			if (this.pattern != null && this.pattern.getPatternType() != WILDCARD)
 			{
 				this.pattern = this.pattern.withType(this.type, markers);
@@ -104,13 +109,13 @@ public class TypeCheckPattern implements IPattern
 		{
 			markers.add(Markers.semantic(this.position, "pattern.typecheck.invalid"));
 		}
-		
+
 		return this;
 	}
-	
+
 	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-			throws BytecodeException
+		throws BytecodeException
 	{
 		varIndex = IPattern.ensureVar(writer, varIndex, matchedType);
 
@@ -128,7 +133,7 @@ public class TypeCheckPattern implements IPattern
 			this.pattern.writeInvJump(writer, -1, this.type, elseLabel);
 		}
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

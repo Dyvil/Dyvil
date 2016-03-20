@@ -492,7 +492,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			if (this.exceptions[i].isSuperTypeOf(type))
+			if (Types.isSuperType(this.exceptions[i], type))
 			{
 				return TRUE;
 			}
@@ -910,7 +910,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			final IType parType = this.parameters[i].getType().getConcreteType(typeContext);
 			final IType candidateParType = candidate.getParameter(i).getType().getConcreteType(typeContext);
-			if (!parType.isSameType(candidateParType))
+			if (!Types.isSameType(parType, candidateParType))
 			{
 				return false;
 			}

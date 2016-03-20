@@ -199,10 +199,4 @@ public class ClassType implements IRawType
 		t.theClass = this.theClass;
 		return t;
 	}
-	
-	@Override
-	public boolean equals(Object obj)
-	{
-		return this.isSameType((IType) obj);
-	}
 }

@@ -19,65 +19,64 @@ public final class StringValue implements IConstantValue
 {
 	protected ICodePosition position;
 	protected String        value;
-	
+
 	public StringValue(String value)
 	{
 		this.value = value;
 	}
-	
+
 	public StringValue(ICodePosition position, String value)
 	{
 		this.position = position;
 		this.value = value;
 	}
-	
+
 	@Override
 	public ICodePosition getPosition()
 	{
 		return this.position;
 	}
-	
+
 	@Override
 	public void setPosition(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
 	@Override
 	public int valueTag()
 	{
 		return STRING;
 	}
-	
+
 	@Override
 	public ClassType getType()
 	{
 		return Types.STRING;
 	}
-	
+
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type == Types.STRING || type.isSuperTypeOf(Types.STRING))
+		if (Types.isSuperType(type, Types.STRING))
 		{
 			return this;
 		}
-		
-		IAnnotation annotation = type.getTheClass().getAnnotation(Types.STRING_CONVERTIBLE_CLASS);
+
+		final IAnnotation annotation = type.getAnnotation(Types.STRING_CONVERTIBLE_CLASS);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
 		}
 		return null;
 	}
-	
+
 	@Override
 	public boolean isType(IType type)
 	{
-		return type.isSuperTypeOf(Types.STRING)
-				|| type.getTheClass().getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null;
+		return Types.isSuperType(type, Types.STRING) || type.getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null;
 	}
-	
+
 	@Override
 	public int getTypeMatch(IType type)
 	{
@@ -87,32 +86,32 @@ public final class StringValue implements IConstantValue
 		}
 		return Types.getDistance(type, Types.STRING);
 	}
-	
+
 	@Override
 	public Object toObject()
 	{
 		return this.value;
 	}
-	
+
 	@Override
 	public String stringValue()
 	{
 		return this.value;
 	}
-	
+
 	@Override
 	public int stringSize()
 	{
 		return this.value.length();
 	}
-	
+
 	@Override
 	public boolean toStringBuilder(StringBuilder builder)
 	{
 		builder.append(this.value);
 		return true;
 	}
-	
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
@@ -123,13 +122,13 @@ public final class StringValue implements IConstantValue
 			Types.STRING.writeCast(writer, type, this.getLineNumber());
 		}
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return IASTNode.toString(this);
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

@@ -371,7 +371,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	{
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
-			if (this.catchBlocks[i].type.isSuperTypeOf(type))
+			if (Types.isSuperType(this.catchBlocks[i].type, type))
 			{
 				return TRUE;
 			}

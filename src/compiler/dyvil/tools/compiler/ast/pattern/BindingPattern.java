@@ -66,11 +66,11 @@ public final class BindingPattern extends Pattern
 			this.type = type;
 			return this;
 		}
-		if (type.isSameType(this.type))
+		if (Types.isSameType(type, this.type))
 		{
 			return this;
 		}
-		if (type.isSuperTypeOf(this.type))
+		if (Types.isSuperType(type, this.type))
 		{
 			return new TypeCheckPattern(this, type, this.type);
 		}
@@ -81,7 +81,7 @@ public final class BindingPattern extends Pattern
 	@Override
 	public boolean isType(IType type)
 	{
-		return true;
+		return this.type == Types.UNKNOWN || Types.isSuperType(type, this.type);
 	}
 
 	@Override

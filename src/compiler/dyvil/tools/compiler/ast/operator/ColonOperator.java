@@ -142,7 +142,7 @@ public class ColonOperator implements IValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type.getAnnotation(LazyFields.COLON_CONVERTIBLE) != null || type.isSuperTypeOf(this.getType());
+		return Types.isSuperType(type, this.getType()) || type.getAnnotation(LazyFields.COLON_CONVERTIBLE) != null;
 	}
 
 	@Override

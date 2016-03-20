@@ -173,12 +173,15 @@ public interface IValue extends IASTNode, ITyped
 	{
 	}
 
-	IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context);
+	default IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		return this.isType(type) ? this : null;
+	}
 
 	@Override
 	default boolean isType(IType type)
 	{
-		return Types.isAssignable(this.getType(), type);
+		return Types.isSuperType(type, this.getType());
 	}
 
 	/**

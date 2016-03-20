@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -35,7 +36,7 @@ public class ImplicitReferenceType extends ReferenceType
 			return null;
 		}
 
-		if (!typedValue.getType().isSameType(this.type))
+		if (!Types.isSameType(typedValue.getType(), this.type))
 		{
 			return null;
 		}

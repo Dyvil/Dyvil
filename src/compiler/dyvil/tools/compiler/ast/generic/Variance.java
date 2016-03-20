@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.generic;
 
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -13,7 +14,7 @@ public enum Variance
 				@Override
 				public boolean checkCompatible(IType a, IType b)
 				{
-					return a.isSameType(b);
+					return Types.isSameType(a, b);
 				}
 			},
 	COVARIANT
@@ -21,7 +22,7 @@ public enum Variance
 				@Override
 				public boolean checkCompatible(IType a, IType b)
 				{
-					return a.isSuperTypeOf(b);
+					return Types.isSuperType(a, b);
 				}
 
 				@Override
@@ -41,7 +42,7 @@ public enum Variance
 				@Override
 				public boolean checkCompatible(IType a, IType b)
 				{
-					return b.isSuperTypeOf(a);
+					return Types.isSuperType(b, a);
 				}
 
 				@Override

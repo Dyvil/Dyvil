@@ -6,7 +6,6 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.statement.loop.IterableForStatement;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -29,7 +28,6 @@ public class RangeOperator implements IValue
 		public static final IClass         RANGE_CLASS     = Package.dyvilCollection.resolveClass("Range");
 		public static final IClass         RANGEABLE_CLASS = Package.dyvilCollectionRange.resolveClass("Rangeable");
 		public static final IType          RANGEABLE       = RANGEABLE_CLASS.getClassType();
-		public static final ITypeParameter RANGEABLE_TYPE  = RANGEABLE_CLASS.getTypeParameter(0);
 
 		public static final IClass INT_RANGE_CLASS    = Package.dyvilCollectionRange.resolveClass("IntRange");
 		public static final IClass LONG_RANGE_CLASS   = Package.dyvilCollectionRange.resolveClass("LongRange");
@@ -169,7 +167,7 @@ public class RangeOperator implements IValue
 	{
 		if (this.elementType != Types.UNKNOWN)
 		{
-			return elementType.isSuperTypeOf(this.elementType);
+			return Types.isSuperType(elementType, this.elementType);
 		}
 
 		return this.startValue.isType(elementType) && this.endValue.isType(elementType);
@@ -181,7 +179,7 @@ public class RangeOperator implements IValue
 		{
 			return type.getElementType();
 		}
-		if (IterableForStatement.LazyFields.ITERABLE.isSuperClassOf(type))
+		if (Types.isSuperType(IterableForStatement.LazyFields.ITERABLE, type))
 		{
 			return type.resolveTypeSafely(IterableForStatement.LazyFields.ITERABLE_TYPE);
 		}
@@ -277,7 +275,7 @@ public class RangeOperator implements IValue
 			}
 		}
 
-		if (LazyFields.RANGEABLE.isSuperClassOf(elementType))
+		if (Types.isSuperType(LazyFields.RANGEABLE, elementType))
 		{
 			return;
 		}
@@ -321,7 +319,7 @@ public class RangeOperator implements IValue
 	{
 		final String method = this.halfOpen ? "halfOpen" : "apply";
 
-		if (LazyFields.RANGEABLE.isSuperTypeOf(this.elementType))
+		if (Types.isSuperType(LazyFields.RANGEABLE, this.getElementType()))
 		{
 			this.startValue.writeExpression(writer, LazyFields.RANGEABLE_CLASS.getClassType());
 			this.endValue.writeExpression(writer, LazyFields.RANGEABLE_CLASS.getClassType());

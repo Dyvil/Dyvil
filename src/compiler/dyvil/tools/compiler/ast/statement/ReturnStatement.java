@@ -95,11 +95,7 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 	@Override
 	public boolean isType(IType type)
 	{
-		if (type == Types.VOID)
-		{
-			return true;
-		}
-		return this.value != null && this.value.isType(type);
+		return type == Types.VOID || this.value != null && this.value.isType(type);
 	}
 	
 	@Override
@@ -146,7 +142,7 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 			}
 
 			final IType valueType = this.value.getType();
-			if (!returnType.isSuperTypeOf(valueType))
+			if (!Types.isSuperType(returnType, valueType))
 			{
 				final Marker marker = Markers.semanticError(this.position, "return.type.incompatible");
 				marker.addInfo(Markers.getSemantic("return.type", returnType));

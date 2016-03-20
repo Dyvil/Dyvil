@@ -67,7 +67,7 @@ public class FieldPattern implements IPattern
 	@Override
 	public boolean isType(IType type)
 	{
-		return this.dataMember == null || type.isSuperTypeOf(this.dataMember.getType());
+		return this.dataMember == null || Types.isSuperType(type, this.dataMember.getType());
 	}
 
 	@Override
@@ -136,7 +136,7 @@ public class FieldPattern implements IPattern
 		{
 			commonType = fieldType;
 
-			if (matchedType != fieldType && matchedType.isSuperTypeOf(fieldType))
+			if (matchedType != fieldType && Types.isSuperType(matchedType, fieldType))
 			{
 				varIndex = IPattern.ensureVar(writer, varIndex, matchedType);
 				IPattern.loadVar(writer, varIndex, matchedType);

@@ -55,7 +55,7 @@ public final class TypeChecker
 		return (position, expected, actual) -> typeError(position, expected, actual, error, args);
 	}
 
-	public static IValue convertValue(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context, MarkerSupplier markerSupplier)
+	public static IValue convertValue(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (type.hasTypeVariables())
 		{
@@ -72,6 +72,17 @@ public final class TypeChecker
 		if (convertedValue != null)
 		{
 			return convertedValue;
+		}
+
+		return null;
+	}
+
+	public static IValue convertValue(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context, MarkerSupplier markerSupplier)
+	{
+		final IValue newValue = convertValue(value, type, typeContext, markers, context);
+		if (newValue != null)
+		{
+			return newValue;
 		}
 
 		markers.add(markerSupplier.createMarker(value.getPosition(), type, value.getType()));

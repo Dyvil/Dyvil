@@ -39,21 +39,15 @@ public final class StringPattern extends Pattern
 	@Override
 	public IPattern withType(IType type, MarkerList markers)
 	{
-		if (type == Types.STRING || type.isSameType(Types.STRING))
+		if (Types.isSameType(type, Types.STRING))
 		{
 			return this;
 		}
-		if (type.isSuperTypeOf(Types.STRING))
+		if (Types.isSuperType(type, Types.STRING))
 		{
 			return new TypeCheckPattern(this, type, Types.STRING);
 		}
 		return null;
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return type == Types.STRING || type.isSuperTypeOf(Types.STRING);
 	}
 	
 	@Override
@@ -96,10 +90,10 @@ public final class StringPattern extends Pattern
 	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
 			throws BytecodeException
 	{
-		writeStringInvJump(writer, varIndex, matchedType, elseLabel, this.value);
+		writeStringInvJump(writer, varIndex, elseLabel, this.value);
 	}
 	
-	protected static void writeStringInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel, String value)
+	protected static void writeStringInvJump(MethodWriter writer, int varIndex, Label elseLabel, String value)
 			throws BytecodeException
 	{
 		writer.visitLdcInsn(value);

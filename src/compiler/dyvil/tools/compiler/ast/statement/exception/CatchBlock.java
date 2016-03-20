@@ -103,7 +103,7 @@ public class CatchBlock implements ITyped, IDefaultContext, IValueConsumer
 	{
 		this.type.check(markers, context);
 
-		if (!Types.THROWABLE.isSuperTypeOf(this.type))
+		if (!Types.isSuperType(Types.THROWABLE, this.type))
 		{
 			final Marker marker = Markers.semanticError(this.position, "try.catch.type.not_throwable");
 			marker.addInfo(Markers.getSemantic("exception.type", this.type));

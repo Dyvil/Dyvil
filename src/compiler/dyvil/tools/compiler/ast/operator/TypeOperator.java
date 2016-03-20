@@ -26,48 +26,48 @@ public final class TypeOperator extends AbstractValue
 	{
 		public static final IClass    TYPE_CLASS = Package.dyvilxLangModelType.resolveClass("Type");
 		public static final ClassType TYPE       = new ClassType(TYPE_CLASS);
-		
+
 		public static final IClass TYPE_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("TypeConvertible");
-		
+
 		private LazyFields()
 		{
 			// no instances
 		}
 	}
-	
+
 	protected IType type;
-	
+
 	// Metadata
 	private IType genericType;
-	
+
 	public TypeOperator(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
 	public TypeOperator(IType type)
 	{
 		this.setType(type);
 	}
-	
+
 	@Override
 	public int valueTag()
 	{
 		return TYPE_OPERATOR;
 	}
-	
+
 	@Override
 	public void setType(IType type)
 	{
 		this.type = type;
 	}
-	
+
 	@Override
 	public boolean isResolved()
 	{
 		return true;
 	}
-	
+
 	@Override
 	public IType getType()
 	{
@@ -79,25 +79,25 @@ public final class TypeOperator extends AbstractValue
 		}
 		return this.genericType;
 	}
-	
+
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		final IAnnotation annotation = type.getTheClass().getAnnotation(LazyFields.TYPE_CONVERTIBLE);
+		final IAnnotation annotation = type.getAnnotation(LazyFields.TYPE_CONVERTIBLE);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
 		}
-		
-		return type.isSuperTypeOf(this.getType()) ? this : null;
+
+		return Types.isSuperType(type, this.getType()) ? this : null;
 	}
-	
+
 	@Override
 	public boolean isType(IType type)
 	{
-		return type.getTheClass().getAnnotation(LazyFields.TYPE_CONVERTIBLE) != null || type.isSuperTypeOf(this.getType());
+		return Types.isSuperType(type, this.getType()) || type.getAnnotation(LazyFields.TYPE_CONVERTIBLE) != null;
 	}
-	
+
 	@Override
 	public int getTypeMatch(IType type)
 	{
@@ -105,10 +105,10 @@ public final class TypeOperator extends AbstractValue
 		{
 			return CONVERSION_MATCH;
 		}
-		
+
 		return Types.getDistance(type, this.getType());
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -118,46 +118,46 @@ public final class TypeOperator extends AbstractValue
 			markers.add(Markers.semantic(this.position, "typeoperator.invalid"));
 			return;
 		}
-		
+
 		this.type = this.type.resolveType(markers, context);
 		ClassGenericType generic = new ClassGenericType(LazyFields.TYPE_CLASS);
 		generic.addType(this.type);
 		this.genericType = generic;
 	}
-	
+
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
 		this.type.resolve(markers, context);
 		return this;
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		this.type.checkType(markers, context, TypePosition.TYPE);
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		this.type.check(markers, context);
 	}
-	
+
 	@Override
 	public IValue foldConstants()
 	{
 		this.type.foldConstants();
 		return this;
 	}
-	
+
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		this.type.cleanup(context, compilableList);
 		return this;
 	}
-	
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
@@ -168,13 +168,13 @@ public final class TypeOperator extends AbstractValue
 			this.genericType.writeCast(writer, type, this.getLineNumber());
 		}
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return "type(" + this.type + ")";
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

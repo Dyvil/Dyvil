@@ -39,23 +39,23 @@ public class ClassMetadata implements IClassMetadata
 	protected static final int INSTANCE_FIELD = 0x2001;
 
 	protected final IClass theClass;
-	
+
 	protected IConstructor constructor;
 	protected IValue       superInitializer;
-	
+
 	protected int members;
-	
+
 	public ClassMetadata(IClass iclass)
 	{
 		this.theClass = iclass;
 	}
-	
+
 	@Override
 	public IConstructor getConstructor()
 	{
 		return this.constructor;
 	}
-	
+
 	protected void checkMethods()
 	{
 		IClassBody body = this.theClass.getBody();
@@ -68,13 +68,13 @@ public class ClassMetadata implements IClassMetadata
 			}
 		}
 	}
-	
+
 	private void checkMethod(IMethod method)
 	{
 		Name name = method.getName();
 		if (name == Names.equals)
 		{
-			if (method.parameterCount() == 1 && method.getParameter(0).getType().isSameType(Types.OBJECT))
+			if (method.parameterCount() == 1 && Types.isSameType(Types.ANY, method.getParameter(0).getType()))
 			{
 				this.members |= EQUALS;
 			}
@@ -105,12 +105,12 @@ public class ClassMetadata implements IClassMetadata
 				{
 					final IType methodParameterType = method.getParameter(i).getType();
 					final IType classParameterType = this.theClass.getParameter(i).getType();
-					if (!methodParameterType.isSameType(classParameterType))
+					if (!Types.isSameType(methodParameterType, classParameterType))
 					{
 						return;
 					}
 				}
-				
+
 				this.members |= APPLY;
 			}
 			return;
@@ -125,7 +125,7 @@ public class ClassMetadata implements IClassMetadata
 			return;
 		}
 	}
-	
+
 	@Override
 	public void resolveTypesHeader(MarkerList markers, IContext context)
 	{
@@ -135,7 +135,7 @@ public class ClassMetadata implements IClassMetadata
 			superConstructorArguments.resolveTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void resolveTypesBody(MarkerList markers, IContext context)
 	{
@@ -144,14 +144,14 @@ public class ClassMetadata implements IClassMetadata
 		final IClassBody body = this.theClass.getBody();
 		if (body != null && body.constructorCount() > 0)
 		{
-			final IConstructor constructor = body
-					.getConstructor(this.theClass.getParameters(), this.theClass.parameterCount());
+			final IConstructor constructor = body.getConstructor(this.theClass.getParameters(),
+			                                                     this.theClass.parameterCount());
 			if (constructor != null)
 			{
 				this.constructor = constructor;
 				this.members |= CONSTRUCTOR;
 			}
-			
+
 			if (this.theClass.parameterCount() == 0)
 			{
 				this.members |= CONSTRUCTOR;
@@ -184,16 +184,16 @@ public class ClassMetadata implements IClassMetadata
 		}
 
 		constructor.setParameters(parameters, parameterCount);
-		
+
 		if (parameterCount > 0 && parameters[parameterCount - 1].isVarargs())
 		{
 			constructor.setVariadic();
 		}
-		
+
 		constructor.resolveTypes(markers, context);
 		this.constructor = constructor;
 	}
-	
+
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
@@ -225,7 +225,7 @@ public class ClassMetadata implements IClassMetadata
 
 		this.constructor.setValue(constructorBody);
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -269,14 +269,14 @@ public class ClassMetadata implements IClassMetadata
 		{
 			return;
 		}
-		
+
 		float match = this.constructor.getSignatureMatch(arguments);
 		if (match > 0)
 		{
 			list.add(this.constructor, match);
 		}
 	}
-	
+
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{

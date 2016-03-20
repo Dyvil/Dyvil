@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
@@ -66,16 +67,19 @@ public interface IPattern extends IASTNode, ITyped
 			return pattern;
 		}
 
-		if (type.isSuperTypeOf(primitiveType))
+		if (Types.isSuperType(type, primitiveType))
 		{
 			return new TypeCheckPattern(pattern, type, primitiveType);
 		}
 		return null;
 	}
-	
+
 	@Override
-	boolean isType(IType type);
-	
+	default boolean isType(IType type)
+	{
+		return Types.isSuperType(type, this.getType());
+	}
+
 	default IDataMember resolveField(Name name)
 	{
 		return null;

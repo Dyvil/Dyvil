@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.expression;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.constant.StringValue;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -80,16 +79,6 @@ public class StringConcatExpr implements IValue
 	public IType getType()
 	{
 		return Types.STRING;
-	}
-
-	@Override
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
-	{
-		if (type.isSuperTypeOf(Types.STRING))
-		{
-			return this;
-		}
-		return null;
 	}
 
 	@Override

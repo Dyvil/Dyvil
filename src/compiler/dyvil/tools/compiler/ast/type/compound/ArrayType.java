@@ -159,15 +159,14 @@ public class ArrayType implements IObjectType, ITyped
 		}
 
 		final IMethod toIterableMethod = this.getTheClass().getBody().getMethod(Name.getQualified("toIterable"));
-		return new LiteralConversion(value, toIterableMethod)
-			       .withType(targetType, typeContext, markers, context);
+		return new LiteralConversion(value, toIterableMethod).withType(targetType, typeContext, markers, context);
 	}
 
 	@Override
 	public boolean isSameType(IType type)
 	{
-		return type.isArrayType() && this.mutability == type.getMutability() && this.type
-			                                                                        .isSameType(type.getElementType());
+		return type.isArrayType() && this.mutability == type.getMutability() && Types.isSameType(this.type,
+		                                                                                         type.getElementType());
 	}
 
 	@Override
@@ -185,7 +184,7 @@ public class ArrayType implements IObjectType, ITyped
 	@Override
 	public boolean isConvertibleTo(IType type)
 	{
-		return type.isSuperTypeOf(IterableForStatement.LazyFields.ITERABLE);
+		return Types.isSuperType(type, IterableForStatement.LazyFields.ITERABLE);
 	}
 
 	@Override
@@ -201,7 +200,7 @@ public class ArrayType implements IObjectType, ITyped
 		}
 
 		final IType elementType = type.getElementType();
-		return this.checkPrimitiveType(elementType) && this.type.isSuperTypeOf(elementType);
+		return this.checkPrimitiveType(elementType) && Types.isSuperType(this.type, elementType);
 	}
 
 	@Override

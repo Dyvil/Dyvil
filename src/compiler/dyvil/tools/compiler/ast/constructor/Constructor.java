@@ -377,9 +377,9 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 			final IType exceptionType = this.exceptions[i];
 			exceptionType.check(markers, context);
 
-			if (!Types.THROWABLE.isSuperTypeOf(exceptionType))
+			if (!Types.isSuperType(Types.THROWABLE, exceptionType))
 			{
-				Marker marker = Markers.semantic(exceptionType.getPosition(), "method.exception.type");
+				final Marker marker = Markers.semantic(exceptionType.getPosition(), "method.exception.type");
 				marker.addInfo(Markers.getSemantic("exception.type", exceptionType));
 				markers.add(marker);
 			}
@@ -500,7 +500,7 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 	{
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			if (this.exceptions[i].isSuperTypeOf(type))
+			if (Types.isSuperType(this.exceptions[i], type))
 			{
 				return TRUE;
 			}

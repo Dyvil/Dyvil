@@ -17,8 +17,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class CharValue implements IConstantValue
 {
-	private static final byte CHAR      = 1;
-	private static final byte STRING    = 2;
+	private static final byte CHAR   = 1;
+	private static final byte STRING = 2;
 
 	protected ICodePosition position;
 	protected String        value;
@@ -71,7 +71,7 @@ public final class CharValue implements IConstantValue
 	{
 		if (this.value.length() == 1 && this.type != STRING)
 		{
-			if (type == Types.CHAR || type.isSuperTypeOf(Types.CHAR))
+			if (Types.isSuperType(type, Types.CHAR))
 			{
 				this.type = CHAR;
 				return this;
@@ -80,6 +80,7 @@ public final class CharValue implements IConstantValue
 			final IAnnotation annotation = type.getAnnotation(Types.CHAR_CONVERTIBLE_CLASS);
 			if (annotation != null)
 			{
+				this.type = CHAR;
 				return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
 			}
 		}
@@ -89,7 +90,7 @@ public final class CharValue implements IConstantValue
 			return null;
 		}
 
-		if (type == Types.STRING || type.isSuperTypeOf(Types.STRING))
+		if (Types.isSuperType(type, Types.STRING))
 		{
 			this.type = STRING;
 			return this;
@@ -98,6 +99,7 @@ public final class CharValue implements IConstantValue
 		final IAnnotation annotation = type.getAnnotation(Types.STRING_CONVERTIBLE_CLASS);
 		if (annotation != null)
 		{
+			this.type = STRING;
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
 		}
 
@@ -109,8 +111,7 @@ public final class CharValue implements IConstantValue
 	{
 		if (this.value.length() == 1 && this.type != STRING)
 		{
-			if (type == Types.CHAR || type.isSuperTypeOf(Types.CHAR)
-				    || type.getAnnotation(Types.CHAR_CONVERTIBLE_CLASS) != null)
+			if (Types.isSuperType(type, Types.CHAR) || type.getAnnotation(Types.CHAR_CONVERTIBLE_CLASS) != null)
 			{
 				return true;
 			}
@@ -120,8 +121,7 @@ public final class CharValue implements IConstantValue
 			return false;
 		}
 
-		return type == Types.STRING || type.isSuperTypeOf(Types.STRING)
-			       || type.getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null;
+		return Types.isSuperType(type, Types.STRING) || (type.getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null);
 	}
 
 	@Override

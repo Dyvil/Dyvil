@@ -91,15 +91,14 @@ public class UnionType implements IObjectType
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
-		if (type.typeTag() == UNION)
+		if (type.typeTag() != UNION)
 		{
-			final UnionType unionType = (UnionType) type;
-			return this.left.isSuperTypeOf(unionType.left) && this.right.isSuperTypeOf(unionType.right) // normal order
-				       || this.left.isSuperTypeOf(unionType.right) && this.right.isSuperTypeOf(unionType.left);
-			// reverse order
+			return Types.isSuperType(this.left, type) || Types.isSuperType(this.right, type);
 		}
 
-		return this.left.isSuperTypeOf(type) || this.right.isSuperTypeOf(type);
+		final UnionType unionType = (UnionType) type;
+		return Types.isSuperType(this.left, unionType.right) && Types.isSuperType(this.right, unionType.right)
+			       || Types.isSuperType(this.left, unionType.right) && Types.isSuperType(this.right, unionType.left);
 	}
 
 	@Override
@@ -167,6 +166,8 @@ public class UnionType implements IObjectType
 
 	public static IType combine(IType type1, IType type2, UnionType unionType)
 	{
+		// TODO rename type1, type2 to left and right
+
 		if (type1 == Types.VOID || type2 == Types.VOID)
 		{
 			// either type is void -> result void
@@ -223,12 +224,12 @@ public class UnionType implements IObjectType
 			return Types.ANY;
 		}
 
-		if (type1.isSameType(type2) || type1.isSuperTypeOf(type2))
+		if (Types.isSameType(type1, type2) || Types.isSuperType(type1, type2))
 		{
 			// same type, or type 1 is a super type of type 2 -> result type 1
 			return type1;
 		}
-		if (type2.isSuperTypeOf(type1))
+		if (Types.isSuperType(type2, type1))
 		{
 			// type 2 is a super type of type 1 -> result type 2
 			return type2;
@@ -328,7 +329,8 @@ public class UnionType implements IObjectType
 		this.left.writeTypeExpression(writer);
 		this.right.writeTypeExpression(writer);
 		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/UnionType", "apply",
-		                       "(Ljava/lang/Class;Ldyvilx/lang/model/type/Type;Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/UnionType;", false);
+		                       "(Ljava/lang/Class;Ldyvilx/lang/model/type/Type;Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/UnionType;",
+		                       false);
 	}
 
 	@Override

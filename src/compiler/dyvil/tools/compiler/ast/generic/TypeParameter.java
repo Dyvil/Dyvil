@@ -294,7 +294,7 @@ public final class TypeParameter implements ITypeParameter
 		{
 			for (int i = 0; i < this.upperBoundCount; i++)
 			{
-				if (!this.upperBounds[i].isSuperTypeOf(type))
+				if (!Types.isSuperType(this.upperBounds[i], type))
 				{
 					return false;
 				}
@@ -302,7 +302,7 @@ public final class TypeParameter implements ITypeParameter
 		}
 		if (this.lowerBound != null)
 		{
-			if (!type.isSuperTypeOf(this.lowerBound))
+			if (!Types.isSuperType(type, this.lowerBound))
 			{
 				return false;
 			}

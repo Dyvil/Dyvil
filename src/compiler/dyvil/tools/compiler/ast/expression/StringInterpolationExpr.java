@@ -101,7 +101,7 @@ public final class StringInterpolationExpr implements IValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type.isSuperTypeOf(Types.STRING))
+		if (Types.isSuperType(type, Types.STRING))
 		{
 			return this;
 		}
@@ -147,14 +147,13 @@ public final class StringInterpolationExpr implements IValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type.isSuperTypeOf(Types.STRING) || this.isConvertible(type);
+		return Types.isSuperType(type, Types.STRING) || this.isConvertible(type);
 	}
 
 	private boolean isConvertible(IType type)
 	{
-		final IClass theClass = type.getTheClass();
-		return theClass.getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null
-			       || theClass.getAnnotation(LazyFields.STRING_INTERPOLATION_CONVERTIBLE) != null;
+		return type.getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null
+			       || type.getAnnotation(LazyFields.STRING_INTERPOLATION_CONVERTIBLE) != null;
 	}
 
 	@Override

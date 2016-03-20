@@ -15,21 +15,21 @@ import dyvil.tools.parsing.position.ICodePosition;
 public class DoubleValue implements IConstantValue
 {
 	private static DoubleValue NULL;
-	
+
 	protected ICodePosition position;
 	protected double        value;
-	
+
 	public DoubleValue(double value)
 	{
 		this.value = value;
 	}
-	
+
 	public DoubleValue(ICodePosition position, double value)
 	{
 		this.position = position;
 		this.value = value;
 	}
-	
+
 	public static DoubleValue getNull()
 	{
 		if (NULL == null)
@@ -38,59 +38,59 @@ public class DoubleValue implements IConstantValue
 		}
 		return NULL;
 	}
-	
+
 	@Override
 	public ICodePosition getPosition()
 	{
 		return this.position;
 	}
-	
+
 	@Override
 	public void setPosition(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
 	@Override
 	public int valueTag()
 	{
 		return DOUBLE;
 	}
-	
+
 	@Override
 	public boolean isPrimitive()
 	{
 		return true;
 	}
-	
+
 	@Override
 	public IType getType()
 	{
 		return Types.DOUBLE;
 	}
-	
+
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type == Types.DOUBLE || type.isSuperTypeOf(Types.DOUBLE))
+		if (Types.isSuperType(type, Types.DOUBLE))
 		{
 			return this;
 		}
-		IAnnotation annotation = type.getTheClass().getAnnotation(Types.DOUBLE_CONVERTIBLE_CLASS);
+
+		final IAnnotation annotation = type.getAnnotation(Types.DOUBLE_CONVERTIBLE_CLASS);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
 		}
 		return null;
 	}
-	
+
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Types.DOUBLE || type.isSuperTypeOf(Types.DOUBLE)
-				|| type.getTheClass().getAnnotation(Types.DOUBLE_CONVERTIBLE_CLASS) != null;
+		return Types.isSuperType(type, Types.DOUBLE) || type.getAnnotation(Types.DOUBLE_CONVERTIBLE_CLASS) != null;
 	}
-	
+
 	@Override
 	public int getTypeMatch(IType type)
 	{
@@ -104,50 +104,50 @@ public class DoubleValue implements IConstantValue
 		}
 		return Types.getDistance(type, Types.DOUBLE);
 	}
-	
+
 	@Override
 	public int intValue()
 	{
 		return (int) this.value;
 	}
-	
+
 	@Override
 	public long longValue()
 	{
 		return (long) this.value;
 	}
-	
+
 	@Override
 	public float floatValue()
 	{
 		return (float) this.value;
 	}
-	
+
 	@Override
 	public double doubleValue()
 	{
 		return this.value;
 	}
-	
+
 	@Override
 	public Double toObject()
 	{
 		return this.value;
 	}
-	
+
 	@Override
 	public int stringSize()
 	{
 		return Double.toString(this.value).length();
 	}
-	
+
 	@Override
 	public boolean toStringBuilder(StringBuilder builder)
 	{
 		builder.append(this.value);
 		return true;
 	}
-	
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
@@ -158,13 +158,13 @@ public class DoubleValue implements IConstantValue
 			Types.DOUBLE.writeCast(writer, type, this.getLineNumber());
 		}
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return this.value + "D";
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

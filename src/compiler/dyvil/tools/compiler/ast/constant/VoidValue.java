@@ -1,15 +1,11 @@
 package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.ast.IASTNode;
-import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public class VoidValue implements IConstantValue
@@ -43,24 +39,6 @@ public class VoidValue implements IConstantValue
 	public IType getType()
 	{
 		return Types.VOID;
-	}
-	
-	@Override
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
-	{
-		return type == Types.VOID || type.isSuperTypeOf(Types.VOID) ? this : null;
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return type == Types.VOID || type.isSuperTypeOf(Types.VOID);
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		return Types.getDistance(type, Types.VOID);
 	}
 	
 	@Override

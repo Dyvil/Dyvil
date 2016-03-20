@@ -235,9 +235,19 @@ public final class Types
 		return "new" + prefix + type.getTypePrefix() + "Ref";
 	}
 
+	public static boolean isSameType(IType type1, IType type2)
+	{
+		return type1 == type2 || type1.isSameType(type2);
+	}
+
+	public static boolean isSuperType(IType superType, IType subType)
+	{
+		return superType == subType || superType.isSuperTypeOf(subType);
+	}
+
 	public static boolean isAssignable(IType fromType, IType toType)
 	{
-		return fromType.isSuperTypeOf(toType) || isConvertible(fromType, toType);
+		return isSuperType(toType, fromType) || isConvertible(fromType, toType);
 	}
 
 	public static int getDistance(IType superType, IType subType)

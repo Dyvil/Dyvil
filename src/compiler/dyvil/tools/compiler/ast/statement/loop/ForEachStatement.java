@@ -207,7 +207,7 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 			{
 				this.inferVariableType(markers, rangeOperator.getElementType());
 			}
-			else if (!varType.isSuperTypeOf(rangeOperator.getElementType()))
+			else if (!Types.isSuperType(varType, rangeOperator.getElementType()))
 			{
 				final Marker marker = Markers.semantic(value.getPosition(), "for.range.type");
 				marker.addInfo(Markers.getSemantic("range.type", valueType));
@@ -225,7 +225,7 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 			{
 				this.inferVariableType(markers, valueType.getElementType());
 			}
-			else if (!varType.isSuperTypeOf(valueType.getElementType()))
+			else if (!Types.isSuperType(varType, valueType.getElementType()))
 			{
 				final Marker marker = Markers.semantic(value.getPosition(), "for.array.type");
 				marker.addInfo(Markers.getSemantic("array.type", valueType));
@@ -237,7 +237,7 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 			arrayForStatement.resolveAction(this.action, markers, context);
 			return arrayForStatement;
 		}
-		if (IterableForStatement.LazyFields.ITERATOR.isSuperClassOf(valueType))
+		if (Types.isSuperType(IterableForStatement.LazyFields.ITERATOR, valueType))
 		{
 			final IType iteratorType = valueType.resolveTypeSafely(IterableForStatement.LazyFields.ITERATOR_TYPE)
 			                                    .asReturnType();
@@ -245,7 +245,7 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 			{
 				this.inferVariableType(markers, iteratorType);
 			}
-			else if (!varType.isSuperTypeOf(iteratorType))
+			else if (!Types.isSuperType(varType, iteratorType))
 			{
 				final Marker marker = Markers.semantic(value.getPosition(), "for.iterator.type");
 				marker.addInfo(Markers.getSemantic("iterator.type", iteratorType));
@@ -258,7 +258,7 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 			iterableForStatement.resolveAction(this.action, markers, context);
 			return iterableForStatement;
 		}
-		if (IterableForStatement.LazyFields.ITERABLE.isSuperClassOf(valueType))
+		if (Types.isSuperType(IterableForStatement.LazyFields.ITERABLE, valueType))
 		{
 			final IType iterableType = valueType.resolveTypeSafely(IterableForStatement.LazyFields.ITERABLE_TYPE)
 			                                    .asReturnType();
@@ -266,7 +266,7 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 			{
 				this.inferVariableType(markers, iterableType);
 			}
-			else if (!varType.isSuperTypeOf(iterableType))
+			else if (!Types.isSuperType(varType, iterableType))
 			{
 				final Marker marker = Markers.semantic(value.getPosition(), "for.iterable.type");
 				marker.addInfo(Markers.getSemantic("iterable.type", iterableType));
@@ -279,13 +279,13 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 			iterableForStatement.resolveAction(this.action, markers, context);
 			return iterableForStatement;
 		}
-		if (Types.STRING.isSuperTypeOf(valueType))
+		if (Types.isSuperType(Types.STRING, valueType))
 		{
 			if (varType == Types.UNKNOWN)
 			{
 				this.variable.setType(Types.CHAR);
 			}
-			else if (!varType.isSuperTypeOf(Types.CHAR))
+			else if (!Types.isSuperType(varType, Types.CHAR))
 			{
 				final Marker marker = Markers.semantic(value.getPosition(), "for.string.type");
 				marker.addInfo(Markers.getSemantic("variable.type", varType));

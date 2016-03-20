@@ -240,8 +240,8 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		ITypeParameter typeVar = functionClass.getTypeParameter(this.parameterCount);
 		IType resolvedType = type.resolveTypeSafely(typeVar);
 
-		// Return type is Covariant
-		if (!this.returnType.isSuperTypeOf(resolvedType))
+		// Return Type is Covariant
+		if (!Types.isSuperType(this.returnType, resolvedType))
 		{
 			return false;
 		}
@@ -251,8 +251,8 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 			typeVar = functionClass.getTypeParameter(i);
 			resolvedType = type.resolveType(typeVar);
 
-			// Contravariance
-			if (!resolvedType.isSuperTypeOf(this.parameterTypes[i]))
+			// Parameter Types are Contravariant
+			if (!Types.isSuperType(resolvedType, this.parameterTypes[i]))
 			{
 				return false;
 			}
@@ -264,7 +264,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	@Override
 	public boolean isConvertibleFrom(IType type)
 	{
-		return this.parameterCount == 0 && this.returnType.isSuperTypeOf(type);
+		return this.parameterCount == 0 && Types.isSuperType(this.returnType, type);
 	}
 
 	@Override
@@ -360,28 +360,28 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		boolean found = false;
 
 		ITypeParameter typeVar;
-		IType concreteType;
-		IClass iclass = this.getTheClass();
+		IType elementType;
+		final IClass thisClass = this.getTheClass();
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			typeVar = iclass.getTypeParameter(i);
-			concreteType = concrete.resolveType(typeVar);
-			if (concreteType != null)
+			typeVar = thisClass.getTypeParameter(i);
+			elementType = concrete.resolveType(typeVar);
+			if (elementType != null)
 			{
-				this.parameterTypes[i].inferTypes(concreteType, typeContext);
+				this.parameterTypes[i].inferTypes(elementType, typeContext);
 				found = true;
 			}
 		}
 
-		typeVar = iclass.getTypeParameter(this.parameterCount);
-		concreteType = concrete.resolveType(typeVar);
-		if (concreteType != null)
+		typeVar = thisClass.getTypeParameter(this.parameterCount);
+		elementType = concrete.resolveType(typeVar);
+		if (elementType != null)
 		{
-			this.returnType.inferTypes(concreteType, typeContext);
+			this.returnType.inferTypes(elementType, typeContext);
 			found = true;
 		}
 
-		if (!found && this.parameterCount == 0 && this.returnType.isSuperTypeOf(concrete))
+		if (!found && this.parameterCount == 0 && Types.isSuperType(this.returnType, concrete))
 		{
 			this.returnType.inferTypes(concrete, typeContext);
 		}

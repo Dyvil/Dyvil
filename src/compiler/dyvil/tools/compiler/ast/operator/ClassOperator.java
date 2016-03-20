@@ -84,19 +84,19 @@ public final class ClassOperator extends AbstractValue implements IConstantValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		IAnnotation annotation = type.getTheClass().getAnnotation(LazyFields.CLASS_CONVERTIBLE);
+		final IAnnotation annotation = type.getAnnotation(LazyFields.CLASS_CONVERTIBLE);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
 		}
 		
-		return type.isSuperTypeOf(this.getType()) ? this : null;
+		return Types.isSuperType(type, this.getType()) ? this : null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return type.getTheClass().getAnnotation(LazyFields.CLASS_CONVERTIBLE) != null || type.isSuperTypeOf(this.getType());
+		return Types.isSuperType(type, this.getType()) || type.getAnnotation(LazyFields.CLASS_CONVERTIBLE) != null;
 	}
 	
 	@Override

@@ -114,7 +114,7 @@ public class OptionType implements IObjectType
 	@Override
 	public boolean isConvertibleFrom(IType type)
 	{
-		return this.type.isSuperTypeOf(type);
+		return Types.isSuperType(type, this.type);
 	}
 
 	@Override

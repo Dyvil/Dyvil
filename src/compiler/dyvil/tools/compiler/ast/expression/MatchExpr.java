@@ -157,8 +157,8 @@ public final class MatchExpr implements IValue
 	{
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			MatchCase matchCase = this.cases[i];
-			IValue action = matchCase.action;
+			final MatchCase matchCase = this.cases[i];
+			final IValue action = matchCase.action;
 			
 			if (action == null)
 			{
@@ -169,7 +169,7 @@ public final class MatchExpr implements IValue
 			                                            TypeChecker.markerSupplier("match.value.type.incompatible"));
 		}
 		
-		return type == Types.VOID || type.isSuperTypeOf(this.getType()) ? this : null;
+		return type == Types.VOID || Types.isSuperType(type, this.getType()) ? this : null;
 	}
 	
 	@Override
@@ -182,8 +182,8 @@ public final class MatchExpr implements IValue
 		
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			IValue v = this.cases[i].action;
-			if (v != null && !v.isType(type))
+			final IValue action = this.cases[i].action;
+			if (action != null && !action.isType(type))
 			{
 				return false;
 			}

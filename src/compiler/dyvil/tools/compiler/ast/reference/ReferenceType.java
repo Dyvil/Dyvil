@@ -79,7 +79,7 @@ public class ReferenceType implements IObjectType
 		{
 			return 2;
 		}
-		return this.isSameType(superType) ? 1 : 0;
+		return Types.isSameType(superType, this) ? 1 : 0;
 	}
 
 	@Override
@@ -93,7 +93,7 @@ public class ReferenceType implements IObjectType
 		if (this.theClass == Types.getObjectRefClass())
 		{
 			final IType otherType = type.resolveType(this.theClass.getTypeParameter(0));
-			return otherType == null || this.type.isSameType(otherType);
+			return otherType == null || Types.isSameType(this.type, otherType);
 		}
 		return true;
 	}

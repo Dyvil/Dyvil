@@ -145,16 +145,4 @@ public class AnyType implements IRawType
 	{
 		return this;
 	}
-	
-	@Override
-	public boolean equals(Object obj)
-	{
-		return this.isSameType((IType) obj);
-	}
-	
-	@Override
-	public int hashCode()
-	{
-		return ANY;
-	}
 }

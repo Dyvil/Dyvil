@@ -40,12 +40,6 @@ public final class BooleanPattern extends Pattern
 	}
 	
 	@Override
-	public boolean isType(IType type)
-	{
-		return type == Types.BOOLEAN || type.isSuperTypeOf(Types.BOOLEAN);
-	}
-	
-	@Override
 	public boolean isSwitchable()
 	{
 		return true;

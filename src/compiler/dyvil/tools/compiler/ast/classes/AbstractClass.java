@@ -913,7 +913,7 @@ public abstract class AbstractClass implements IClass
 	@Override
 	public IAccessible getAccessibleThis(IClass type)
 	{
-		if (type == this || type.getClassType().isSuperTypeOf(this.classType))
+		if (type == this || type.getClassType().isSuperClassOf(this.classType))
 		{
 			return VariableThis.DEFAULT;
 		}

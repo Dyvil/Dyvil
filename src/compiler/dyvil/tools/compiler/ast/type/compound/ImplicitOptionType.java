@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -22,7 +23,7 @@ public class ImplicitOptionType extends OptionType
 	@Override
 	public boolean isConvertibleTo(IType type)
 	{
-		return type.isSuperTypeOf(this.type);
+		return Types.isSuperType(type, this.type);
 	}
 
 	@Override

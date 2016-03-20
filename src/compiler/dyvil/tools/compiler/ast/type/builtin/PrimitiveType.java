@@ -319,15 +319,7 @@ public final class PrimitiveType implements IType
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
-		if (type == this)
-		{
-			return true;
-		}
-		if (type.typeTag() == WILDCARD_TYPE)
-		{
-			return type.isSameType(this);
-		}
-		return !type.isArrayType() && this.isSuperClassOf(type);
+		return type == this || this.isSuperClassOf(type);
 	}
 
 	@Override

@@ -100,8 +100,8 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	int OPTIONAL  = 48;
 	int REFERENCE = 50;
 
-	int UNION        = 51;
-	int INTERSECTION = 52;
+	int UNION = 51;
+	// int INTERSECTION = 52;
 
 	// Type Variable Types
 	int TYPE_VAR_TYPE     = 64;
@@ -221,12 +221,12 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	 */
 	default boolean isSuperTypeOf(IType subType)
 	{
-		if (this == subType)
-		{
-			return true;
-		}
+		return this == subType || this.isSuperClassOf(subType);
+	}
 
-		IClass superClass = this.getTheClass();
+	default boolean isSuperClassOf(IType subType)
+	{
+		final IClass superClass = this.getTheClass();
 		if (superClass == null)
 		{
 			return false;
@@ -238,13 +238,6 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 		final IClass subClass = subType.getTheClass();
 		return subClass != null && (subClass == superClass || subClass.isSubTypeOf(this));
-	}
-
-	default boolean isSuperClassOf(IType subType)
-	{
-		final IClass thisClass = this.getTheClass();
-		final IClass thatClass = subType.getTheClass();
-		return thatClass != null && thisClass != null && (thatClass == thisClass || thatClass.isSubTypeOf(this));
 	}
 
 	boolean isSameType(IType type);

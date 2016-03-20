@@ -323,7 +323,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	@Override
 	public boolean isType(IType type)
 	{
-		if (this.type != null && type.isSuperTypeOf(this.type))
+		if (this.type != null && Types.isSuperType(type, this.type))
 		{
 			return true;
 		}
@@ -361,7 +361,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 			final IParameter methodParameter = method.getParameter(i);
 			final IType methodParameterType = methodParameter.getType().asParameterType();
-			if (!methodParameterType.isSuperTypeOf(lambdaParameterType))
+			if (!Types.isSuperType(methodParameterType, lambdaParameterType))
 			{
 				return false;
 			}
