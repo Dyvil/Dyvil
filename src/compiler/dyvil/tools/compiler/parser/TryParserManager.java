@@ -17,6 +17,11 @@ public class TryParserManager extends ParserManager
 		super(operatorMap);
 	}
 
+	public TryParserManager(TokenIterator tokens, MarkerList markers, IOperatorMap operators)
+	{
+		super(tokens, markers, operators);
+	}
+
 	@Override
 	public void report(Marker error)
 	{
@@ -30,14 +35,6 @@ public class TryParserManager extends ParserManager
 		{
 			super.report(error);
 		}
-	}
-
-	public boolean parse(MarkerList markers, TokenIterator tokens, Parser parser, boolean reportErrors)
-	{
-		tokens.reset();
-		markers.clear();
-		this.reset(markers, tokens);
-		return this.parse(parser, reportErrors);
 	}
 
 	public boolean parse(Parser parser, boolean reportErrors)

@@ -5,6 +5,7 @@ import dyvil.collection.mutable.TreeMap;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.TryParserManager;
 import dyvil.tools.compiler.parser.classes.DyvilHeaderParser;
 import dyvil.tools.compiler.parser.classes.MemberParser;
@@ -164,20 +165,28 @@ public final class DyvilREPL
 
 		SemicolonInference.inferSemicolons(tokens.first());
 
-		if (this.parser.parse(markers, tokens, new DyvilHeaderParser(this.context, false), false))
+		if (this.tryParse(markers, tokens, new DyvilHeaderParser(this.context, false), false))
 		{
 			this.context.reportErrors();
 			return;
 		}
 
-		if (this.parser.parse(markers, tokens, new MemberParser(this.context), false))
+		if (this.tryParse(markers, tokens, new MemberParser(this.context), false))
 		{
 			this.context.reportErrors();
 			return;
 		}
 
-		this.parser.parse(markers, tokens, new ExpressionParser(this.context), true);
+		this.tryParse(markers, tokens, new ExpressionParser(this.context), true);
 		this.context.reportErrors();
+	}
+
+	private boolean tryParse(MarkerList markers, TokenIterator tokens, Parser parser, boolean reportErrors)
+	{
+		tokens.reset();
+		markers.clear();
+		this.parser.reset(markers, tokens);
+		return this.parser.parse(parser, reportErrors);
 	}
 	
 	private void runCommand(String line)
