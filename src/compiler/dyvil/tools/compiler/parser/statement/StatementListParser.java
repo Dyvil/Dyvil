@@ -41,8 +41,8 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 	private static final int SEPARATOR             = 64;
 
 	protected IValueConsumer consumer;
+	protected boolean        closure;
 
-	private boolean       applied;
 	private StatementList statementList;
 
 	private Name           label;
@@ -58,9 +58,11 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 		this.mode = OPEN_BRACKET;
 	}
 
-	public void setApplied(boolean applied)
+	public StatementListParser(IValueConsumer consumer, boolean closure)
 	{
-		this.applied = applied;
+		this.consumer = consumer;
+		this.closure = closure;
+		this.mode = OPEN_BRACKET;
 	}
 
 	@Override
@@ -107,7 +109,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 		{
 		case OPEN_BRACKET:
 			this.mode = EXPRESSION;
-			this.statementList = this.applied ? new Closure(token) : new StatementList(token);
+			this.statementList = this.closure ? new Closure(token) : new StatementList(token);
 			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
 			{
 				pm.report(token, "statementlist.close_brace");
@@ -119,6 +121,7 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 			{
 				return;
 			}
+
 			if (ParserUtil.isIdentifier(type))
 			{
 				int nextType = token.next().type();
@@ -290,7 +293,6 @@ public final class StatementListParser extends EmulatorParser implements IValueC
 				return;
 			}
 			pm.report(token, "statementlist.semicolon");
-			return;
 		}
 	}
 

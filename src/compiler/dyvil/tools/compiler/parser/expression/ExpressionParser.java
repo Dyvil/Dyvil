@@ -891,9 +891,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 	{
 		if (token.type() == BaseSymbols.OPEN_CURLY_BRACKET)
 		{
-			final StatementListParser statementListParser = new StatementListParser(argument);
-			statementListParser.setApplied(true);
-			pm.pushParser(statementListParser);
+			pm.pushParser(new StatementListParser(argument, true));
 			return;
 		}
 
