@@ -2,7 +2,7 @@ package dyvil.tools.compiler.parser.classes;
 
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.Property;
+import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
 import dyvil.tools.compiler.ast.modifiers.Modifier;
@@ -35,13 +35,13 @@ public class PropertyParser extends Parser implements IValueConsumer
 
 	// --------------------------------------------------
 
-	protected Property property;
+	protected IProperty property;
 
 	// Metadata
 	private ModifierSet modifiers;
 	private byte        target;
 
-	public PropertyParser(Property property)
+	public PropertyParser(IProperty property)
 	{
 		this.property = property;
 		// this.mode = TAG; // pointless assignment to 0
@@ -148,7 +148,6 @@ public class PropertyParser extends Parser implements IValueConsumer
 			{
 				pm.report(token, "property.setter.close_paren");
 			}
-			return;
 		}
 	}
 
@@ -175,7 +174,6 @@ public class PropertyParser extends Parser implements IValueConsumer
 			return;
 		case INITIALIZER:
 			this.property.setInitializer(value);
-			return;
 		}
 	}
 }

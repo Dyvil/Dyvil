@@ -3,7 +3,7 @@ package dyvil.tools.compiler.parser.classes;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.ClassBody;
-import dyvil.tools.compiler.ast.classes.CodeClass;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.consumer.IClassConsumer;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
@@ -41,7 +41,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 	protected ModifierSet    modifiers;
 	protected AnnotationList annotations;
 	
-	private CodeClass theClass;
+	private IClass theClass;
 	
 	public ClassDeclarationParser(IClassConsumer consumer)
 	{
@@ -67,7 +67,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 		case NAME:
 			if (ParserUtil.isIdentifier(type))
 			{
-				this.theClass = new CodeClass(token.raw(), token.nameValue(), this.modifiers, this.annotations);
+				this.theClass = this.consumer.createClass(token.raw(), token.nameValue(), this.modifiers, this.annotations);
 				this.mode = GENERICS;
 				return;
 			}
@@ -200,7 +200,6 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			}
 			this.mode = IMPLEMENTS;
 			pm.reparse();
-			return;
 		}
 	}
 	
@@ -216,7 +215,6 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			return;
 		case BODY: // implements
 			this.theClass.addInterface(type);
-			return;
 		}
 	}
 

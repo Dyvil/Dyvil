@@ -2,21 +2,14 @@ package dyvil.tools.compiler.parser.classes;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
-import dyvil.tools.compiler.ast.constructor.Constructor;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.constructor.IInitializer;
-import dyvil.tools.compiler.ast.constructor.Initializer;
 import dyvil.tools.compiler.ast.consumer.IMemberConsumer;
-import dyvil.tools.compiler.ast.consumer.IParameterConsumer;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
-import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
-import dyvil.tools.compiler.ast.field.Property;
-import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.ast.member.IMember;
-import dyvil.tools.compiler.ast.method.CodeMethod;
 import dyvil.tools.compiler.ast.method.IExceptionList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
@@ -111,7 +104,7 @@ public final class MemberParser extends Parser implements ITypeConsumer
 			case DyvilKeywords.INIT: // constructor declaration or initializer
 				if (token.next().type() == BaseSymbols.OPEN_CURLY_BRACKET) // initializer
 				{
-					final Initializer initializer = new Initializer(token.raw(), this.modifiers, this.annotations);
+					final IInitializer initializer = this.consumer.createInitializer(token.raw(), this.modifiers, this.annotations);
 					this.member = initializer;
 					this.memberKind = INITIALIZER;
 
@@ -120,7 +113,7 @@ public final class MemberParser extends Parser implements ITypeConsumer
 					return;
 				}
 
-				this.member = new Constructor(token.raw(), this.modifiers, this.annotations);
+				this.member = this.consumer.createConstructor(token.raw(), this.modifiers, this.annotations);
 				this.memberKind = CONSTRUCTOR;
 				this.mode = CONSTRUCTOR_PARAMETERS;
 				return;
@@ -238,7 +231,7 @@ public final class MemberParser extends Parser implements ITypeConsumer
 			case BaseSymbols.CLOSE_CURLY_BRACKET:
 			case BaseSymbols.SEMICOLON:
 			{
-				final IField field = new Field(nameToken.raw(), nameToken.nameValue(), this.type, this.modifiers,
+				final IField field = this.consumer.createField(nameToken.raw(), nameToken.nameValue(), this.type, this.modifiers,
 				                               this.annotations);
 				this.consumer.addField(field);
 				this.mode = END;
@@ -247,7 +240,7 @@ public final class MemberParser extends Parser implements ITypeConsumer
 			}
 			case BaseSymbols.EQUALS:
 			{
-				final IField field = new Field(nameToken.raw(), nameToken.nameValue(), this.type, this.modifiers,
+				final IField field = this.consumer.createField(nameToken.raw(), nameToken.nameValue(), this.type, this.modifiers,
 				                               this.annotations);
 				this.member = field;
 				this.memberKind = FIELD;
@@ -258,7 +251,7 @@ public final class MemberParser extends Parser implements ITypeConsumer
 			}
 			case BaseSymbols.OPEN_CURLY_BRACKET:
 			{
-				final Property property = new Property(nameToken.raw(), nameToken.nameValue(), this.type,
+				final IProperty property = this.consumer.createProperty(nameToken.raw(), nameToken.nameValue(), this.type,
 				                                       this.modifiers, this.annotations);
 				this.member = property;
 				this.memberKind = PROPERTY;
@@ -281,7 +274,7 @@ public final class MemberParser extends Parser implements ITypeConsumer
 				return;
 			}
 
-			final IMethod method = new CodeMethod(token.raw(), token.nameValue(), this.type, this.modifiers,
+			final IMethod method = this.consumer.createMethod(token.raw(), token.nameValue(), this.type, this.modifiers,
 			                                      this.annotations);
 			this.memberKind = METHOD;
 			this.member = method;
@@ -293,7 +286,7 @@ public final class MemberParser extends Parser implements ITypeConsumer
 		{
 			final IToken nameToken = token.prev();
 
-			final IMethod method = new CodeMethod(nameToken.raw(), nameToken.nameValue(), this.type, this.modifiers,
+			final IMethod method = this.consumer.createMethod(nameToken.raw(), nameToken.nameValue(), this.type, this.modifiers,
 			                                      this.annotations);
 			this.memberKind = METHOD;
 			this.member = method;
@@ -303,7 +296,7 @@ public final class MemberParser extends Parser implements ITypeConsumer
 			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
 			{
 				this.mode = GENERICS_END;
-				pm.pushParser(new TypeParameterListParser((ITypeParametric) this.member));
+				pm.pushParser(new TypeParameterListParser((IMethod) this.member));
 				return;
 			}
 			// Fallthrough
@@ -311,7 +304,7 @@ public final class MemberParser extends Parser implements ITypeConsumer
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
 				this.mode = PARAMETERS_END;
-				pm.pushParser(new ParameterListParser((IParameterConsumer) this.member));
+				pm.pushParser(new ParameterListParser((IMethod) this.member));
 				return;
 			}
 			// Fallthrough
