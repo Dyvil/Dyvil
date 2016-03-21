@@ -4,11 +4,16 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.generic.ITypeParametric;
+import dyvil.tools.compiler.ast.operator.IOperatorMap;
+import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.type.TypeParameterParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.token.IToken;
 
 public abstract class EmulatorParser extends Parser implements IParserManager
@@ -31,6 +36,36 @@ public abstract class EmulatorParser extends Parser implements IParserManager
 		this.pm = pm;
 		this.firstToken = token;
 		this.parser = this.tryParser = parser;
+	}
+
+	@Override
+	public TokenIterator getTokens()
+	{
+		return this.pm.getTokens();
+	}
+
+	@Override
+	public MarkerList getMarkers()
+	{
+		return this.pm.getMarkers();
+	}
+
+	@Override
+	public IOperatorMap getOperatorMap()
+	{
+		return this.pm.getOperatorMap();
+	}
+
+	@Override
+	public void setOperatorMap(IOperatorMap operators)
+	{
+		this.pm.setOperatorMap(operators);
+	}
+
+	@Override
+	public Operator getOperator(Name name)
+	{
+		return this.pm.getOperator(name);
 	}
 
 	@Override

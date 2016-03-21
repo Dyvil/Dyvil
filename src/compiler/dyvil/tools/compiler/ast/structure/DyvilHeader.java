@@ -497,8 +497,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	{
 		if (this.tokens != null)
 		{
-			ParserManager manager = new ParserManager(new DyvilHeaderParser(this), this.markers, this);
-			manager.parse(this.tokens);
+			new ParserManager(this.tokens, this.markers, this).parse(new DyvilHeaderParser(this));
 		}
 	}
 

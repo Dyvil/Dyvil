@@ -76,6 +76,6 @@ public final class MarkerList implements Iterable<Marker>
 	@Override
 	public Iterator<Marker> iterator()
 	{
-		return new ArrayIterator<Marker>(this.markers, this.markerCount);
+		return new ArrayIterator<>(this.markers, this.markerCount);
 	}
 }

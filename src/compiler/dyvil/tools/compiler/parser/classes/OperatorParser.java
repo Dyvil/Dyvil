@@ -229,7 +229,6 @@ public final class OperatorParser extends Parser
 			
 			pm.reparse();
 			pm.report(token, "operator.property.associativity");
-			return;
 		}
 	}
 	

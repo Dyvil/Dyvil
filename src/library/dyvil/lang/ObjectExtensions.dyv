@@ -57,7 +57,7 @@ public final class ObjectExtensions
 		return result;
 	}
 
-	public infix int ##(Object o) = if (o == null) 0 else o.hashCode
+	public infix int operator ##(Object o) = if (o == null) 0 else o.hashCode
 
 	// Comparable
 

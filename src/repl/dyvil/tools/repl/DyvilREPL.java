@@ -5,6 +5,7 @@ import dyvil.collection.mutable.TreeMap;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.parser.TryParserManager;
 import dyvil.tools.compiler.parser.classes.DyvilHeaderParser;
 import dyvil.tools.compiler.parser.classes.MemberParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
@@ -18,7 +19,6 @@ import dyvil.tools.parsing.lexer.LexerUtil;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.repl.command.*;
 import dyvil.tools.repl.context.REPLContext;
-import dyvil.tools.repl.input.REPLParser;
 
 import java.io.File;
 import java.io.PrintStream;
@@ -29,8 +29,8 @@ public final class DyvilREPL
 	
 	protected DyvilCompiler compiler = new DyvilCompiler();
 	
-	protected REPLContext context = new REPLContext(this);
-	protected REPLParser  parser  = new REPLParser(this.context);
+	protected REPLContext      context = new REPLContext(this);
+	protected TryParserManager parser  = new TryParserManager(this.context);
 	
 	protected File dumpDir;
 	
@@ -72,7 +72,7 @@ public final class DyvilREPL
 		return this.context;
 	}
 
-	public REPLParser getParser()
+	public TryParserManager getParser()
 	{
 		return this.parser;
 	}
@@ -163,12 +163,13 @@ public final class DyvilREPL
 		final TokenIterator tokens = new DyvilLexer(markers, DyvilSymbols.INSTANCE).tokenize(code);
 
 		SemicolonInference.inferSemicolons(tokens.first());
-		
+
 		if (this.parser.parse(markers, tokens, new DyvilHeaderParser(this.context, false), false))
 		{
 			this.context.reportErrors();
 			return;
 		}
+
 		if (this.parser.parse(markers, tokens, new MemberParser(this.context), false))
 		{
 			this.context.reportErrors();

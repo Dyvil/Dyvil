@@ -65,7 +65,13 @@ public final class CastOperator extends AbstractValue
 	{
 		this.type = type;
 	}
-	
+
+	@Override
+	public boolean isUsableAsStatement()
+	{
+		return this.type == Types.VOID;
+	}
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -100,11 +106,6 @@ public final class CastOperator extends AbstractValue
 		}
 
 		this.value = this.value.resolve(markers, context);
-		if (this.type == Types.VOID)
-		{
-			markers.add(Markers.semantic(this.position, "cast.void"));
-			return this;
-		}
 		
 		if (!this.type.isResolved())
 		{
@@ -194,15 +195,15 @@ public final class CastOperator extends AbstractValue
 	{
 		this.value.writeExpression(writer, null);
 
+		if (type == null)
+		{
+			type = this.type;
+		}
+
 		if (type == Types.VOID)
 		{
 			writer.visitInsn(Opcodes.AUTO_POP);
 			return;
-		}
-
-		if (type == null)
-		{
-			type = this.type;
 		}
 		this.value.getType().writeCast(writer, type, this.getLineNumber());
 	}

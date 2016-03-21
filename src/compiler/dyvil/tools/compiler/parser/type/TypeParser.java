@@ -297,7 +297,6 @@ public final class TypeParser extends Parser implements ITypeConsumer
 		case ANNOTATION_END:
 			this.mode = END;
 			pm.pushParser(pm.newTypeParser((ITyped) this.type), true);
-			return;
 		}
 	}
 
@@ -305,11 +304,5 @@ public final class TypeParser extends Parser implements ITypeConsumer
 	public void setType(IType type)
 	{
 		this.type = type;
-	}
-
-	@Override
-	public boolean reportErrors()
-	{
-		return false;
 	}
 }

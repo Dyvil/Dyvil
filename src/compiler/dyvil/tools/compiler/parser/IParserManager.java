@@ -11,28 +11,26 @@ import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.type.TypeParameterParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.token.IToken;
 
 public interface IParserManager
 {
+	TokenIterator getTokens();
+
+	MarkerList getMarkers();
+
 	void report(IToken token, String message);
 
 	void report(Marker error);
+
+	void setOperatorMap(IOperatorMap operators);
 	
-	default void setOperatorMap(IOperatorMap operators)
-	{
-	}
+	IOperatorMap getOperatorMap();
 	
-	default IOperatorMap getOperatorMap()
-	{
-		return null;
-	}
-	
-	default Operator getOperator(Name name)
-	{
-		return null;
-	}
+	Operator getOperator(Name name);
 	
 	void stop();
 	

@@ -21,9 +21,9 @@ public final class LanguageFeatures
 
 	// Lists
 
-	public infix inline ImmutableList[E] ::[E](ImmutableList[E] list, E element) = list + element
+	public infix inline ImmutableList[E] operator ::[E](ImmutableList[E] list, E element) = list + element
 
-	public infix inline ImmutableList[E] ::[E](E element1, E element2) = ImmutableList(element1, element2)
+	public infix inline ImmutableList[E] operator ::[E](E element1, E element2) = ImmutableList(element1, element2)
 
 	// Increments
 
@@ -61,7 +61,7 @@ public final class LanguageFeatures
 
 	public const String ENDL = System.lineSeparator
 
-	public infix inline PrintStream <<(PrintStream stream, any value)
+	public infix inline PrintStream operator <<(PrintStream stream, any value)
 	{
 		stream.print(value)
 		return stream

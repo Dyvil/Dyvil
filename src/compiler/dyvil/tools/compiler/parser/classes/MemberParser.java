@@ -7,12 +7,14 @@ import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.constructor.Initializer;
 import dyvil.tools.compiler.ast.consumer.IMemberConsumer;
+import dyvil.tools.compiler.ast.consumer.IParameterConsumer;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.field.Property;
+import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.CodeMethod;
 import dyvil.tools.compiler.ast.method.IExceptionList;
@@ -23,6 +25,7 @@ import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
@@ -32,23 +35,31 @@ import dyvil.tools.compiler.parser.statement.StatementListParser;
 import dyvil.tools.compiler.parser.type.TypeParameterListParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 
 public final class MemberParser extends Parser implements ITypeConsumer
 {
-	protected static final int TYPE           = 0;
-	protected static final int NAME_OPERATOR  = 1;
-	protected static final int NAME           = 2;
-	protected static final int GENERICS_END   = 4;
-	protected static final int PARAMETERS     = 8;
-	protected static final int PARAMETERS_END = 16;
-	protected static final int METHOD_VALUE   = 32;
+	protected static final int TYPE                       = 0;
+	protected static final int NAME_OPERATOR              = 1;
+	protected static final int NAME                       = 1 << 1;
+	protected static final int FIELD_NAME                 = 1 << 2;
+	protected static final int FIELD_SEPARATOR            = 1 << 3;
+	protected static final int METHOD_NAME                = 1 << 4;
+	protected static final int METHOD_SEPARATOR           = 1 << 5;
+	protected static final int GENERICS                   = 1 << 6;
+	protected static final int GENERICS_END               = 1 << 7;
+	protected static final int PARAMETERS                 = 1 << 8;
+	protected static final int PARAMETERS_END             = 1 << 9;
+	protected static final int METHOD_VALUE               = 1 << 10;
+	protected static final int CONSTRUCTOR_PARAMETERS     = 1 << 11;
+	protected static final int CONSTRUCTOR_PARAMETERS_END = 1 << 12;
 
 	// Member Kinds
 
-	private static final byte IGNORE      = 0;
+	// private static final byte IGNORE   = 0;
 	private static final byte FIELD       = 1;
 	private static final byte PROPERTY    = 2;
 	private static final byte METHOD      = 3;
@@ -111,7 +122,15 @@ public final class MemberParser extends Parser implements ITypeConsumer
 
 				this.member = new Constructor(token.raw(), this.modifiers, this.annotations);
 				this.memberKind = CONSTRUCTOR;
-				this.mode = PARAMETERS;
+				this.mode = CONSTRUCTOR_PARAMETERS;
+				return;
+			case DyvilKeywords.VAR:
+				this.mode = FIELD_NAME;
+				this.type = Types.UNKNOWN;
+				return;
+			case DyvilKeywords.FUNC:
+				this.mode = METHOD_NAME;
+				this.type = Types.UNKNOWN;
 				return;
 			}
 
@@ -158,10 +177,26 @@ public final class MemberParser extends Parser implements ITypeConsumer
 			}
 			// Fallthrough
 		case NAME:
-			if (!ParserUtil.isIdentifier(type))
+			switch (type)
 			{
+			default:
 				pm.report(token, "member.identifier");
 				return;
+			case Tokens.SYMBOL_IDENTIFIER:
+			case Tokens.DOT_IDENTIFIER:
+				if (token.prev().type() != DyvilKeywords.OPERATOR)
+				{
+					pm.report(Markers.syntaxWarning(token, "member.symbol.operator"));
+				}
+				break;
+			case Tokens.IDENTIFIER:
+			case Tokens.LETTER_IDENTIFIER:
+			case Tokens.SPECIAL_IDENTIFIER:
+				if (token.prev().type() == DyvilKeywords.OPERATOR)
+				{
+					pm.report(Markers.syntaxWarning(token, "member.identifier.operator"));
+				}
+				// Fallthrough
 			}
 
 			final IToken nextToken = token.next();
@@ -171,91 +206,115 @@ public final class MemberParser extends Parser implements ITypeConsumer
 			{
 			case Tokens.EOF:
 			case BaseSymbols.SEMICOLON:
-			case BaseSymbols.CLOSE_CURLY_BRACKET:
-			{
-				final IField field = new Field(token.raw(), token.nameValue(), this.type, this.modifiers,
-				                               this.annotations);
-				this.consumer.addField(field);
-				this.mode = END;
-				// no need to reparse(), since we are checking the *next*Type
-				return;
-			}
-			case BaseSymbols.OPEN_PARENTHESIS:
-			{
-				final IMethod method = new CodeMethod(token.raw(), token.nameValue(), this.type, this.modifiers,
-				                                      this.annotations);
-				this.memberKind = METHOD;
-				this.member = method;
-				this.mode = PARAMETERS;
-				return;
-			}
 			case BaseSymbols.OPEN_CURLY_BRACKET:
-			{
-				final Property property = new Property(token.raw(), token.nameValue(), this.type, this.modifiers,
-				                                       this.annotations);
-				this.member = property;
-				this.memberKind = PROPERTY;
-				this.mode = END;
-
-				pm.skip();
-				pm.pushParser(new PropertyParser(property));
-				return;
-			}
+			case BaseSymbols.CLOSE_CURLY_BRACKET:
 			case BaseSymbols.EQUALS:
-			{
-				final IField field = new Field(token.raw(), token.nameValue(), this.type, this.modifiers,
-				                               this.annotations);
-				this.member = field;
-				this.memberKind = FIELD;
-				this.mode = END;
-
-				pm.skip();
-				pm.pushParser(pm.newExpressionParser(field));
+				this.mode = FIELD_SEPARATOR;
 				return;
-			}
 			case BaseSymbols.OPEN_SQUARE_BRACKET:
-			{
-				final CodeMethod method = new CodeMethod(token.raw(), token.nameValue(), this.type, this.modifiers,
-				                                         this.annotations);
-				this.memberKind = METHOD;
-				this.member = method;
-				this.mode = GENERICS_END;
-				pm.skip();
-				pm.pushParser(new TypeParameterListParser(method));
+			case BaseSymbols.OPEN_PARENTHESIS:
+				this.mode = METHOD_SEPARATOR;
 				return;
-			}
 			}
 
 			this.mode = END;
 			pm.report(token, "class.body.declaration.invalid");
 			return;
-		case GENERICS_END:
-			this.mode = PARAMETERS;
-			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
+		case FIELD_NAME:
+			if (!ParserUtil.isIdentifier(type))
 			{
-				pm.reparse();
-				pm.report(token, "method.generic.close_bracket");
-			}
-			return;
-		case PARAMETERS:
-			this.mode = PARAMETERS_END;
-			if (type == BaseSymbols.OPEN_PARENTHESIS)
-			{
-				pm.pushParser(new ParameterListParser((IParameterList) this.member));
+				pm.report(token, "member.field.identifier");
 				return;
 			}
-			pm.reparse();
-			pm.report(token, "method.parameters.open_paren");
+			this.mode = FIELD_SEPARATOR;
 			return;
-		case PARAMETERS_END:
-			this.mode = METHOD_VALUE;
-			if (type != BaseSymbols.CLOSE_PARENTHESIS)
+		case FIELD_SEPARATOR:
+		{
+			final IToken nameToken = token.prev();
+
+			switch (token.type())
 			{
-				pm.reparse();
-				pm.report(token, "method.parameters.close_paren");
+			case Tokens.EOF:
+			case BaseSymbols.CLOSE_CURLY_BRACKET:
+			case BaseSymbols.SEMICOLON:
+			{
+				final IField field = new Field(nameToken.raw(), nameToken.nameValue(), this.type, this.modifiers,
+				                               this.annotations);
+				this.consumer.addField(field);
+				this.mode = END;
+				pm.popParser(true);
+				return;
+			}
+			case BaseSymbols.EQUALS:
+			{
+				final IField field = new Field(nameToken.raw(), nameToken.nameValue(), this.type, this.modifiers,
+				                               this.annotations);
+				this.member = field;
+				this.memberKind = FIELD;
+				this.mode = END;
+
+				pm.pushParser(pm.newExpressionParser(field));
+				return;
+			}
+			case BaseSymbols.OPEN_CURLY_BRACKET:
+			{
+				final Property property = new Property(nameToken.raw(), nameToken.nameValue(), this.type,
+				                                       this.modifiers, this.annotations);
+				this.member = property;
+				this.memberKind = PROPERTY;
+				this.mode = END;
+
+				pm.pushParser(new PropertyParser(property));
+				return;
+			}
 			}
 
+			pm.popParser(true);
+			pm.report(token, "member.field.separator");
 			return;
+		}
+		case METHOD_NAME:
+		{
+			if (!ParserUtil.isIdentifier(type))
+			{
+				pm.report(token, "member.method.identifier");
+				return;
+			}
+
+			final IMethod method = new CodeMethod(token.raw(), token.nameValue(), this.type, this.modifiers,
+			                                      this.annotations);
+			this.memberKind = METHOD;
+			this.member = method;
+
+			this.mode = GENERICS;
+			return;
+		}
+		case METHOD_SEPARATOR:
+		{
+			final IToken nameToken = token.prev();
+
+			final IMethod method = new CodeMethod(nameToken.raw(), nameToken.nameValue(), this.type, this.modifiers,
+			                                      this.annotations);
+			this.memberKind = METHOD;
+			this.member = method;
+			// Fallthrough
+		}
+		case GENERICS:
+			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
+			{
+				this.mode = GENERICS_END;
+				pm.pushParser(new TypeParameterListParser((ITypeParametric) this.member));
+				return;
+			}
+			// Fallthrough
+		case PARAMETERS:
+			if (type == BaseSymbols.OPEN_PARENTHESIS)
+			{
+				this.mode = PARAMETERS_END;
+				pm.pushParser(new ParameterListParser((IParameterConsumer) this.member));
+				return;
+			}
+			// Fallthrough
 		case METHOD_VALUE:
 			switch (type)
 			{
@@ -281,8 +340,42 @@ public final class MemberParser extends Parser implements ITypeConsumer
 				return;
 			}
 
-			pm.report(token, "method.body.separator");
+			pm.report(token, this.mode != METHOD_VALUE ? "method.declaration.separator" : "method.body.separator");
 			pm.popParser(true);
+			return;
+		case GENERICS_END:
+			this.mode = PARAMETERS;
+			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
+			{
+				pm.reparse();
+				pm.report(token, "method.generic.close_bracket");
+			}
+			return;
+		case PARAMETERS_END:
+			this.mode = METHOD_VALUE;
+			if (type != BaseSymbols.CLOSE_PARENTHESIS)
+			{
+				pm.reparse();
+				pm.report(token, "method.parameters.close_paren");
+			}
+			return;
+		case CONSTRUCTOR_PARAMETERS:
+			this.mode = CONSTRUCTOR_PARAMETERS_END;
+			if (type == BaseSymbols.OPEN_PARENTHESIS)
+			{
+				pm.pushParser(new ParameterListParser((IParameterList) this.member));
+				return;
+			}
+			pm.reparse();
+			pm.report(token, "constructor.parameters.open_paren");
+			return;
+		case CONSTRUCTOR_PARAMETERS_END:
+			this.mode = METHOD_VALUE;
+			if (type != BaseSymbols.CLOSE_PARENTHESIS)
+			{
+				pm.reparse();
+				pm.report(token, "constructor.parameters.close_paren");
+			}
 			return;
 		case END:
 			switch (this.memberKind)
@@ -324,6 +417,7 @@ public final class MemberParser extends Parser implements ITypeConsumer
 	@Override
 	public boolean reportErrors()
 	{
-		return !(this.mode == PARAMETERS && this.memberKind == CONSTRUCTOR) && (this.mode > NAME || this.mode == END);
+		return (this.mode > NAME || this.mode == END) && !(this.mode == CONSTRUCTOR_PARAMETERS
+			                                                   && this.memberKind == CONSTRUCTOR);
 	}
 }

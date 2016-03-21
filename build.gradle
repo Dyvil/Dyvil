@@ -18,8 +18,8 @@ String dpfVersion = '0.4.1'
 
 boolean nightly = false
 
-String replMainClass = 'dyvil.tools.repl.DyvilREPL'
-String compilerMainClass = 'dyvil.tools.compiler.DyvilCompiler'
+String replMainClass = 'dyvil.tools.repl.Main'
+String compilerMainClass = 'dyvil.tools.compiler.Main'
 
 List<String> dyvilFilters = [ '**/*.dyv', '**/*.dyh', '**/*.dyvil', '**/*.dyvilh' ]
 List<String> javaFilters = [ '**/*.java' ]

@@ -4,74 +4,66 @@ import dyvil.tools.parsing.token.IToken;
 
 public abstract class Parser
 {
-	public static final Parser rootParser = new Parser()
-	{
-		@Override
-		public void parse(IParserManager pm, IToken token)
-		{
-			if (!ParserUtil.isTerminator(token.type()))
-			{
-				pm.report(token, "Root Parser");
-				return;
-			}
-		}
-	};
-	
+	/**
+	 * The END state, shared by all Parser subclasses for convenience.
+	 */
 	protected static final int END = -1;
-	
+
+	/**
+	 * The current Parser state.
+	 */
 	protected int mode;
-	
+
+	/**
+	 * The parent Parser, which will be used be used when this Parser {@code POP}s from the Parser stack.
+	 */
 	protected Parser parent;
-	
+
 	public Parser()
 	{
 	}
-	
+
 	public Parser(Parser parent)
 	{
 		this.parent = parent;
 	}
-	
-	protected String computeName()
-	{
-		String s = this.getClass().getSimpleName();
-		int index = s.indexOf("Parser");
-		if (index != -1)
-		{
-			s = s.substring(0, index);
-		}
-		return s.toLowerCase();
-	}
-	
+
 	public int getMode()
 	{
 		return this.mode;
 	}
-	
-	public final boolean isInMode(int mode)
+
+	public void setMode(int mode)
 	{
-		if (mode == 0)
-		{
-			return this.mode == 0;
-		}
-		return (this.mode & mode) == mode;
+		this.mode = mode;
 	}
-	
-	public void setParent(Parser parent)
-	{
-		if (parent != null)
-		{
-			this.parent = parent;
-		}
-	}
-	
+
 	public Parser getParent()
 	{
 		return this.parent;
 	}
-	
+
+	public void setParent(Parser parent)
+	{
+		this.parent = parent;
+	}
+
+	/**
+	 * Parses the given {@code token} according to this Parser's rules and state.
+	 *
+	 * @param pm
+	 * 	the current parsing context manager
+	 * @param token
+	 * 	the token to parser
+	 */
 	public abstract void parse(IParserManager pm, IToken token);
 
+	/**
+	 * Returns {@code true} if errors should be reported for this Parser, {@code false} if they should be ignored. This
+	 * is used by the REPL parser to determine how to parse a certain input.
+	 *
+	 * @return {@code true} if errors should be reported for this Parser, {@code false} if they should be ignored.
+	 */
 	public boolean reportErrors()
 	{
 		return false;
