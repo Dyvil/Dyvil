@@ -502,8 +502,6 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 		StringBuilder buf = new StringBuilder("Defined Property '");
 		Util.memberSignatureToString(property, buf);
 		this.compiler.getOutput().println(buf.append('\'').toString());
-
-		this.cleanup();
 	}
 
 	@Override
@@ -538,8 +536,6 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 		this.compileClass(iclass);
 
 		this.registerMethod(method, iclass);
-
-		this.cleanup();
 	}
 
 	public static void updateModifiers(ModifierSet modifiers)

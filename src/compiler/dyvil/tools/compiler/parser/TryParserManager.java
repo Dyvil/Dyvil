@@ -20,12 +20,13 @@ public class TryParserManager extends ParserManager
 	@Override
 	public void report(Marker error)
 	{
+		final boolean isError = error.isError();
 		if (!this.hasSyntaxErrors)
 		{
-			this.hasSyntaxErrors = error.isError();
+			this.hasSyntaxErrors = isError;
 		}
 
-		if (this.reportErrors)
+		if (this.reportErrors || !isError)
 		{
 			super.report(error);
 		}
@@ -34,6 +35,7 @@ public class TryParserManager extends ParserManager
 	public boolean parse(MarkerList markers, TokenIterator tokens, Parser parser, boolean reportErrors)
 	{
 		tokens.reset();
+		markers.clear();
 		this.reset(markers, tokens);
 		return this.parse(parser, reportErrors);
 	}
