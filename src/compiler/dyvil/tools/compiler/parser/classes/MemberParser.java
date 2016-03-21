@@ -48,7 +48,7 @@ public final class MemberParser extends Parser implements ITypeConsumer
 
 	// Member Kinds
 
-	private static final byte IGNORE      = 0;
+	// private static final byte IGNORE   = 0;
 	private static final byte FIELD       = 1;
 	private static final byte PROPERTY    = 2;
 	private static final byte METHOD      = 3;
@@ -324,6 +324,6 @@ public final class MemberParser extends Parser implements ITypeConsumer
 	@Override
 	public boolean reportErrors()
 	{
-		return !(this.mode == PARAMETERS && this.memberKind == CONSTRUCTOR) && (this.mode > NAME || this.mode == END);
+		return (this.mode > NAME || this.mode == END) && !(this.mode == PARAMETERS && this.memberKind == CONSTRUCTOR);
 	}
 }

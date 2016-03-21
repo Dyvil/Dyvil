@@ -9,9 +9,9 @@ import dyvil.tools.parsing.token.IToken;
 
 public class TryParserManager extends ParserManager
 {
-	private boolean     hasSyntaxErrors;
-	private boolean     reportErrors;
-	
+	private boolean hasSyntaxErrors;
+	private boolean reportErrors;
+
 	public TryParserManager(IOperatorMap operatorMap)
 	{
 		super(operatorMap);
@@ -43,9 +43,9 @@ public class TryParserManager extends ParserManager
 		this.parser = parser;
 		this.hasSyntaxErrors = false;
 		this.reportErrors = reportErrors;
-		
+
 		IToken token = null;
-		
+
 		while (true)
 		{
 			if (this.reparse)
@@ -58,16 +58,16 @@ public class TryParserManager extends ParserManager
 				{
 					break;
 				}
-				
+
 				token = this.tokens.next();
 			}
-			
+
 			if (this.skip > 0)
 			{
 				this.skip--;
 				continue;
 			}
-			
+
 			if (this.parser == null)
 			{
 				if (token != null && !token.isInferred())
@@ -76,7 +76,7 @@ public class TryParserManager extends ParserManager
 				}
 				continue;
 			}
-			
+
 			try
 			{
 				this.parser.parse(this, token);
@@ -96,15 +96,15 @@ public class TryParserManager extends ParserManager
 				this.report(Markers.parserError(token, ex));
 				return false;
 			}
-			
+
 			if (this.hasSyntaxErrors && !this.reportErrors)
 			{
 				return false;
 			}
 		}
-		
+
 		this.parseRemaining(token);
-		
+
 		return !this.hasSyntaxErrors || this.reportErrors;
 	}
 }
