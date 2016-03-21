@@ -31,7 +31,7 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 
 	protected override void removeAt(int bit) = throw new dyvil.util.ImmutableException("Iterator.remove() on Immutable Set")
 
-	public override BitSet +(int element)
+	public override BitSet operator +(int element)
 	{
 		if (this.bitSet(element)) return this
 
@@ -40,7 +40,7 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 		return copy
 	}
 
-	public override BitSet -(Object element)
+	public override BitSet operator -(Object element)
 	{
 		if (!(element is Int)) return this
 
@@ -52,7 +52,7 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 		return copy
 	}
 
-	public override BitSet --(Collection[_] collection)
+	public override BitSet operator --(Collection[_] collection)
 	{
 		if (collection.isEmpty || this.isEmpty) return this
 

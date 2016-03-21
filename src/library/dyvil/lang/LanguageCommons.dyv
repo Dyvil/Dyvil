@@ -27,7 +27,7 @@ public final class LanguageCommons
 
 	public static inline void error(String message) = throw new Error(message)
 
-	public static inline void ???() = throw new UnsupportedOperationException("Not Implemented!")
+	public static inline void operator ???() = throw new UnsupportedOperationException("Not Implemented!")
 
 	// Output
 

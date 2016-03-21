@@ -25,13 +25,13 @@ import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.method.ExceptionListParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.parser.statement.StatementListParser;
 import dyvil.tools.compiler.parser.type.TypeParameterListParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
@@ -158,10 +158,26 @@ public final class MemberParser extends Parser implements ITypeConsumer
 			}
 			// Fallthrough
 		case NAME:
-			if (!ParserUtil.isIdentifier(type))
+			switch (type)
 			{
+			default:
 				pm.report(token, "member.identifier");
 				return;
+			case Tokens.SYMBOL_IDENTIFIER:
+			case Tokens.DOT_IDENTIFIER:
+				if (token.prev().type() != DyvilKeywords.OPERATOR)
+				{
+					pm.report(Markers.syntaxWarning(token, "member.symbol.operator"));
+				}
+				break;
+			case Tokens.IDENTIFIER:
+			case Tokens.LETTER_IDENTIFIER:
+			case Tokens.SPECIAL_IDENTIFIER:
+				if (token.prev().type() == DyvilKeywords.OPERATOR)
+				{
+					pm.report(Markers.syntaxWarning(token, "member.identifier.operator"));
+				}
+				// Fallthrough
 			}
 
 			final IToken nextToken = token.next();
