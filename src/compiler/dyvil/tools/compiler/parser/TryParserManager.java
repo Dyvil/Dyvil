@@ -12,6 +12,9 @@ public class TryParserManager extends ParserManager
 	private boolean hasSyntaxErrors;
 	private boolean reportErrors;
 
+	public static final int REPORT_ERRORS = 1;
+	public static final int EXIT_ON_ROOT  = 2;
+
 	public TryParserManager(IOperatorMap operatorMap)
 	{
 		super(operatorMap);
@@ -39,9 +42,14 @@ public class TryParserManager extends ParserManager
 
 	public boolean parse(Parser parser, boolean reportErrors)
 	{
+		return this.parse(parser, reportErrors ? REPORT_ERRORS : 0);
+	}
+
+	public boolean parse(Parser parser, int flags)
+	{
 		this.parser = parser;
 		this.hasSyntaxErrors = false;
-		this.reportErrors = reportErrors;
+		this.reportErrors = (flags & REPORT_ERRORS) != 0;
 
 		IToken token = null;
 
@@ -69,6 +77,10 @@ public class TryParserManager extends ParserManager
 
 			if (this.parser == null)
 			{
+				if ((flags & EXIT_ON_ROOT) != 0)
+				{
+					return this.success();
+				}
 				if (token != null && !token.isInferred())
 				{
 					this.report(Markers.syntaxError(token, "parser.unexpected", token));
@@ -96,7 +108,7 @@ public class TryParserManager extends ParserManager
 				return false;
 			}
 
-			if (this.hasSyntaxErrors && !this.reportErrors)
+			if (!this.success())
 			{
 				return false;
 			}
@@ -104,6 +116,11 @@ public class TryParserManager extends ParserManager
 
 		this.parseRemaining(token);
 
+		return this.success();
+	}
+
+	private boolean success()
+	{
 		return !this.hasSyntaxErrors || this.reportErrors;
 	}
 }
