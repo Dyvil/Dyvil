@@ -1,26 +1,20 @@
-package dyvil.tools.repl.input;
+package dyvil.tools.compiler.parser;
 
-import dyvil.tools.compiler.ast.operator.Operator;
-import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.parser.Parser;
-import dyvil.tools.compiler.parser.ParserManager;
+import dyvil.tools.compiler.ast.operator.IOperatorMap;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.token.IToken;
-import dyvil.tools.repl.context.REPLContext;
 
-public class REPLParser extends ParserManager
+public class TryParserManager extends ParserManager
 {
-	private REPLContext context;
 	private boolean     hasSyntaxErrors;
 	private boolean     reportErrors;
 	
-	public REPLParser(REPLContext context)
+	public TryParserManager(IOperatorMap operatorMap)
 	{
-		this.context = context;
+		super(operatorMap);
 	}
 
 	@Override
@@ -39,17 +33,18 @@ public class REPLParser extends ParserManager
 
 	public boolean parse(MarkerList markers, TokenIterator tokens, Parser parser, boolean reportErrors)
 	{
-		this.tokens = tokens;
+		tokens.reset();
+		this.reset(markers, tokens);
+		return this.parse(parser, reportErrors);
+	}
+
+	public boolean parse(Parser parser, boolean reportErrors)
+	{
 		this.parser = parser;
-		this.skip = 0;
-		this.reparse = false;
-		this.markers = markers;
 		this.hasSyntaxErrors = false;
 		this.reportErrors = reportErrors;
 		
 		IToken token = null;
-		
-		tokens.reset();
 		
 		while (true)
 		{
@@ -64,7 +59,7 @@ public class REPLParser extends ParserManager
 					break;
 				}
 				
-				token = tokens.next();
+				token = this.tokens.next();
 			}
 			
 			if (this.skip > 0)
@@ -111,21 +106,5 @@ public class REPLParser extends ParserManager
 		this.parseRemaining(token);
 		
 		return !this.hasSyntaxErrors || this.reportErrors;
-	}
-	
-	@Override
-	public Operator getOperator(Name name)
-	{
-		Operator op = this.context.getOperator(name);
-		if (op != null)
-		{
-			return op;
-		}
-		return Types.LANG_HEADER.getOperator(name);
-	}
-	
-	protected boolean isRoot()
-	{
-		return this.parser == Parser.rootParser;
 	}
 }
