@@ -31,6 +31,10 @@ import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;
 
+import static dyvil.tools.compiler.parser.TryParserManager.EXIT_ON_ROOT;
+import static dyvil.tools.compiler.parser.classes.MemberParser.NO_UNINITIALIZED_VARIABLES;
+import static dyvil.tools.compiler.parser.classes.MemberParser.OPERATOR_ERROR;
+
 public final class StatementListParser extends Parser implements IValueConsumer, IMemberConsumer
 {
 	private static final int OPEN_BRACKET = 1;
@@ -107,8 +111,8 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 			// Have to rewind one token because the TryParserManager assumes the TokenIterator is at the beginning (i.e.
 			// no tokens have been returned by next() yet)
 			tokens.jump(token);
-			if (new TryParserManager(tokens, pm.getMarkers(), pm.getOperatorMap()) // create the TryParserManager inline
-				    .parse(new MemberParser(this), TryParserManager.EXIT_ON_ROOT))
+			final MemberParser parser = new MemberParser(this).withFlag(NO_UNINITIALIZED_VARIABLES | OPERATOR_ERROR);
+			if (new TryParserManager(tokens, pm.getMarkers(), pm.getOperatorMap()).parse(parser, EXIT_ON_ROOT))
 			{
 				tokens.jump(tokens.lastReturned());
 				this.mode = SEPARATOR;
