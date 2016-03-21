@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.consumer.IMemberConsumer;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
-import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IExceptionList;
@@ -104,7 +104,8 @@ public final class MemberParser extends Parser implements ITypeConsumer
 			case DyvilKeywords.INIT: // constructor declaration or initializer
 				if (token.next().type() == BaseSymbols.OPEN_CURLY_BRACKET) // initializer
 				{
-					final IInitializer initializer = this.consumer.createInitializer(token.raw(), this.modifiers, this.annotations);
+					final IInitializer initializer = this.consumer.createInitializer(token.raw(), this.modifiers,
+					                                                                 this.annotations);
 					this.member = initializer;
 					this.memberKind = INITIALIZER;
 
@@ -231,8 +232,8 @@ public final class MemberParser extends Parser implements ITypeConsumer
 			case BaseSymbols.CLOSE_CURLY_BRACKET:
 			case BaseSymbols.SEMICOLON:
 			{
-				final IField field = this.consumer.createField(nameToken.raw(), nameToken.nameValue(), this.type, this.modifiers,
-				                               this.annotations);
+				final IDataMember field = this.consumer.createField(nameToken.raw(), nameToken.nameValue(), this.type,
+				                                                    this.modifiers, this.annotations);
 				this.consumer.addField(field);
 				this.mode = END;
 				pm.popParser(true);
@@ -240,8 +241,8 @@ public final class MemberParser extends Parser implements ITypeConsumer
 			}
 			case BaseSymbols.EQUALS:
 			{
-				final IField field = this.consumer.createField(nameToken.raw(), nameToken.nameValue(), this.type, this.modifiers,
-				                               this.annotations);
+				final IDataMember field = this.consumer.createField(nameToken.raw(), nameToken.nameValue(), this.type,
+				                                                    this.modifiers, this.annotations);
 				this.member = field;
 				this.memberKind = FIELD;
 				this.mode = END;
@@ -251,8 +252,9 @@ public final class MemberParser extends Parser implements ITypeConsumer
 			}
 			case BaseSymbols.OPEN_CURLY_BRACKET:
 			{
-				final IProperty property = this.consumer.createProperty(nameToken.raw(), nameToken.nameValue(), this.type,
-				                                       this.modifiers, this.annotations);
+				final IProperty property = this.consumer
+					                           .createProperty(nameToken.raw(), nameToken.nameValue(), this.type,
+					                                           this.modifiers, this.annotations);
 				this.member = property;
 				this.memberKind = PROPERTY;
 				this.mode = END;
@@ -275,7 +277,7 @@ public final class MemberParser extends Parser implements ITypeConsumer
 			}
 
 			final IMethod method = this.consumer.createMethod(token.raw(), token.nameValue(), this.type, this.modifiers,
-			                                      this.annotations);
+			                                                  this.annotations);
 			this.memberKind = METHOD;
 			this.member = method;
 
@@ -286,8 +288,9 @@ public final class MemberParser extends Parser implements ITypeConsumer
 		{
 			final IToken nameToken = token.prev();
 
-			final IMethod method = this.consumer.createMethod(nameToken.raw(), nameToken.nameValue(), this.type, this.modifiers,
-			                                      this.annotations);
+			final IMethod method = this.consumer
+				                       .createMethod(nameToken.raw(), nameToken.nameValue(), this.type, this.modifiers,
+				                                     this.annotations);
 			this.memberKind = METHOD;
 			this.member = method;
 			// Fallthrough
@@ -384,7 +387,7 @@ public final class MemberParser extends Parser implements ITypeConsumer
 				this.consumer.addInitializer((IInitializer) this.member);
 				break;
 			case FIELD:
-				this.consumer.addField((IField) this.member);
+				this.consumer.addField((IDataMember) this.member);
 				break;
 			case PROPERTY:
 				this.consumer.addProperty((IProperty) this.member);

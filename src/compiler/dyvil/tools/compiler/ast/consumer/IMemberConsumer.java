@@ -5,10 +5,7 @@ import dyvil.tools.compiler.ast.constructor.Constructor;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.constructor.Initializer;
-import dyvil.tools.compiler.ast.field.Field;
-import dyvil.tools.compiler.ast.field.IField;
-import dyvil.tools.compiler.ast.field.IProperty;
-import dyvil.tools.compiler.ast.field.Property;
+import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.method.CodeMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -18,9 +15,9 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IMemberConsumer extends IClassConsumer
 {
-	void addField(IField field);
+	void addField(IDataMember field);
 
-	default IField createField(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	default IDataMember createField(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
 		return new Field(position, name, type, modifiers, annotations);
 	}

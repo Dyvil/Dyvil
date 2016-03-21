@@ -3,12 +3,14 @@ package dyvil.tools.compiler.ast.field;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -41,6 +43,12 @@ public final class Variable extends Member implements IVariable
 	{
 	}
 
+	public Variable(Name name, IType type)
+	{
+		this.name = name;
+		this.type = type;
+	}
+
 	public Variable(ICodePosition position)
 	{
 		this.position = position;
@@ -59,10 +67,9 @@ public final class Variable extends Member implements IVariable
 		this.type = type;
 	}
 
-	public Variable(Name name, IType type)
+	public Variable(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
-		this.name = name;
-		this.type = type;
+		super(position, name, type, modifiers, annotations);
 	}
 
 	@Override

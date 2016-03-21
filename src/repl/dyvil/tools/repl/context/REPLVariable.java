@@ -4,6 +4,7 @@ import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.reflect.ReflectUtils;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -23,14 +24,11 @@ public class REPLVariable extends Field
 	protected String className;
 	private   Class  theClass;
 
-	public REPLVariable(REPLContext context, ICodePosition position, Name name, IType type, IValue value, String className, ModifierSet modifiers)
+	public REPLVariable(REPLContext context, ICodePosition position, Name name, IType type, String className, ModifierSet modifiers, AnnotationList annotations)
 	{
-		super(null, name, type);
+		super(position, name, type, modifiers, annotations);
 		this.context = context;
 		this.className = className;
-		this.modifiers = modifiers;
-		this.position = position;
-		this.value = value;
 
 		REPLContext.updateModifiers(modifiers);
 	}
