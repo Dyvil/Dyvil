@@ -371,7 +371,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	{
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
-			if (Types.isSuperType(this.catchBlocks[i].type, type))
+			if (Types.isSuperType(this.catchBlocks[i].getType(), type))
 			{
 				return TRUE;
 			}
@@ -426,7 +426,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		{
 			final CatchBlock block = this.catchBlocks[i];
 			final dyvil.tools.asm.Label handlerLabel = new dyvil.tools.asm.Label();
-			final String handlerType = block.type.getInternalName();
+			final String handlerType = block.getType().getInternalName();
 
 			writer.visitTargetLabel(handlerLabel);
 			writer.startCatchBlock(handlerType);
@@ -517,8 +517,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 
 			Formatting.appendSeparator(buffer, "try.catch.open_paren", '(');
 
-			block.type.toString(prefix, buffer);
-			buffer.append(' ').append(block.varName);
+			block.variable.toString(prefix, buffer);
 
 			if (Formatting.getBoolean("try.catch.close_paren.space_before"))
 			{

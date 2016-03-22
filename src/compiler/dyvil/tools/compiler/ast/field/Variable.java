@@ -163,17 +163,17 @@ public final class Variable extends Member implements IVariable
 		{
 			this.value.resolveTypes(markers, context);
 		}
-		else
-		{
-			this.value = this.type.getDefaultValue();
-			markers.add(Markers.semanticError(this.position, "variable.value"));
-		}
 	}
 
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
 		super.resolve(markers, context);
+
+		if (this.value == null)
+		{
+			return;
+		}
 
 		this.value = this.value.resolve(markers, context);
 
@@ -205,7 +205,10 @@ public final class Variable extends Member implements IVariable
 	{
 		super.checkTypes(markers, context);
 
-		this.value.checkTypes(markers, context);
+		if (this.value != null)
+		{
+			this.value.checkTypes(markers, context);
+		}
 	}
 
 	@Override
@@ -213,7 +216,10 @@ public final class Variable extends Member implements IVariable
 	{
 		super.check(markers, context);
 
-		this.value.check(markers, context);
+		if (this.value != null)
+		{
+			this.value.check(markers, context);
+		}
 
 		if (this.modifiers != null)
 		{
@@ -231,7 +237,10 @@ public final class Variable extends Member implements IVariable
 	{
 		super.foldConstants();
 
-		this.value = this.value.foldConstants();
+		if (this.value != null)
+		{
+			this.value = this.value.foldConstants();
+		}
 	}
 
 	@Override
@@ -239,7 +248,10 @@ public final class Variable extends Member implements IVariable
 	{
 		super.cleanup(context, compilableList);
 
-		this.value = this.value.cleanup(context, compilableList);
+		if (this.value != null)
+		{
+			this.value = this.value.cleanup(context, compilableList);
+		}
 	}
 
 	@Override
