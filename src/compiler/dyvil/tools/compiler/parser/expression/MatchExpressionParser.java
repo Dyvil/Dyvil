@@ -13,6 +13,8 @@ import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
+import static dyvil.tools.compiler.parser.expression.ExpressionParser.*;
+
 public class MatchExpressionParser extends Parser implements IValueConsumer
 {
 	private static final int OPEN_BRACKET = 1;
@@ -74,7 +76,7 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 			if (type == DyvilKeywords.IF)
 			{
 				this.mode = ACTION;
-				pm.pushParser(pm.newExpressionParser(this).withFlag(ExpressionParser.IGNORE_COLON));
+				pm.pushParser(pm.newExpressionParser(this).withFlag(IGNORE_COLON | IGNORE_CLOSURE | IGNORE_LAMBDA));
 				return;
 			}
 			// Fallthrough
@@ -112,7 +114,6 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 				pm.reparse();
 				pm.report(token, "match.case.end");
 			}
-			return;
 		}
 	}
 	
@@ -126,7 +127,6 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 			return;
 		case SEPARATOR:
 			this.currentCase.setAction(value);
-			return;
 		}
 	}
 }

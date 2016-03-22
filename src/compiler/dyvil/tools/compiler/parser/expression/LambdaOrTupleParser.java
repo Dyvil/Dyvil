@@ -15,9 +15,10 @@ import dyvil.tools.parsing.token.IToken;
 public class LambdaOrTupleParser extends Parser
 {
 	protected static final int OPEN_PARENTHESIS = 1;
-	protected static final int PARAMETERS_END   = 2;
-	protected static final int ARROW            = 7;
-	protected static final int TUPLE_END        = 4;
+	protected static final int TUPLE            = 2;
+	protected static final int PARAMETERS_END   = 4;
+	protected static final int ARROW            = 8;
+	protected static final int TUPLE_END        = 16;
 
 	protected IValueConsumer consumer;
 
@@ -26,6 +27,12 @@ public class LambdaOrTupleParser extends Parser
 	public LambdaOrTupleParser(IValueConsumer consumer)
 	{
 		this.mode = OPEN_PARENTHESIS;
+		this.consumer = consumer;
+	}
+
+	public LambdaOrTupleParser(IValueConsumer consumer, boolean tupleOnly)
+	{
+		this.mode = tupleOnly ? TUPLE : OPEN_PARENTHESIS;
 		this.consumer = consumer;
 	}
 
@@ -56,7 +63,8 @@ public class LambdaOrTupleParser extends Parser
 				this.mode = PARAMETERS_END;
 				return;
 			}
-
+			// Fallthrough
+		case TUPLE:
 			// ( ... )
 			final TupleExpr tupleExpr = new TupleExpr(token);
 			pm.pushParser(new ExpressionListParser(tupleExpr));
@@ -94,7 +102,6 @@ public class LambdaOrTupleParser extends Parser
 		case END:
 			pm.popParser(true);
 			this.consumer.setValue(this.value);
-			return;
 		}
 	}
 }

@@ -60,8 +60,10 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 	// Flags
 
-	public static final int EXPLICIT_DOT = 1;
-	public static final int IGNORE_COLON = 2;
+	public static final int EXPLICIT_DOT   = 1;
+	public static final int IGNORE_COLON   = 2;
+	public static final int IGNORE_LAMBDA  = 4;
+	public static final int IGNORE_CLOSURE = 8;
 
 	protected IValueConsumer valueConsumer;
 
@@ -103,13 +105,19 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		this.flags &= ~flag;
 	}
 
-	private void end(IParserManager pm)
+	private void end(IParserManager pm, boolean reparse)
 	{
 		if (this.value != null)
 		{
 			this.valueConsumer.setValue(this.value);
 		}
-		pm.popParser(true);
+		pm.popParser(reparse);
+	}
+
+	private ExpressionParser subParser(IParserManager pm, IValueConsumer valueConsumer)
+	{
+		return pm.newExpressionParser(valueConsumer)
+		         .withFlag(this.flags & (IGNORE_COLON | IGNORE_LAMBDA | IGNORE_CLOSURE));
 	}
 
 	@Override
@@ -123,14 +131,14 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		case BaseSymbols.COMMA:
 		case Tokens.STRING_PART:
 		case Tokens.STRING_END:
-			this.end(pm);
+			this.end(pm, true);
 			return;
 		}
 
 		switch (this.mode)
 		{
 		case END:
-			this.end(pm);
+			this.end(pm, true);
 			return;
 		case VALUE:
 			switch (type)
@@ -176,22 +184,31 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				// ( ...
 				final IToken next = token.next();
 
-				if (next.type() != BaseSymbols.CLOSE_PARENTHESIS)
+				if (!this.hasFlag(IGNORE_LAMBDA))
 				{
-					// ( ...
-					pm.pushParser(new LambdaOrTupleParser(this), true);
-					this.mode = ACCESS;
-					return;
-				}
+					if (next.type() != BaseSymbols.CLOSE_PARENTHESIS)
+					{
+						// ( ...
+						pm.pushParser(new LambdaOrTupleParser(this), true);
+						this.mode = ACCESS;
+						return;
+					}
 
-				final IToken next2 = next.next();
-				if (next2.type() == DyvilSymbols.DOUBLE_ARROW_RIGHT)
+					final IToken next2 = next.next();
+					if (next2.type() == DyvilSymbols.DOUBLE_ARROW_RIGHT)
+					{
+						// () => ...
+						final LambdaExpr lambda = new LambdaExpr(next2.raw());
+						this.value = lambda;
+						pm.skip(2);
+						pm.pushParser(pm.newExpressionParser(lambda));
+						this.mode = ACCESS;
+						return;
+					}
+				}
+				else if (next.type() != BaseSymbols.CLOSE_PARENTHESIS)
 				{
-					// () => ...
-					final LambdaExpr lambda = new LambdaExpr(next2.raw());
-					this.value = lambda;
-					pm.skip(2);
-					pm.pushParser(pm.newExpressionParser(lambda));
+					pm.pushParser(new LambdaOrTupleParser(this, true), true);
 					this.mode = ACCESS;
 					return;
 				}
@@ -220,6 +237,12 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				return;
 			case DyvilSymbols.DOUBLE_ARROW_RIGHT:
 			{
+				if (this.hasFlag(IGNORE_LAMBDA))
+				{
+					pm.popParser(true);
+					return;
+				}
+
 				// => ...
 				LambdaExpr lambda = new LambdaExpr(token.raw());
 				this.value = lambda;
@@ -321,7 +344,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			final SingleArgument argument = new SingleArgument();
 			call.setArguments(argument);
 
-			pm.pushParser(pm.newExpressionParser(argument).withOperator(Operators.DEFAULT), true);
+			pm.pushParser(this.subParser(pm, argument).withOperator(Operators.DEFAULT), true);
 			this.mode = END;
 			return;
 		}
@@ -466,10 +489,16 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 			switch (type)
 			{
+			case DyvilSymbols.DOUBLE_ARROW_RIGHT:
+				if (!this.hasFlag(IGNORE_LAMBDA))
+				{
+					break;
+				}
+				// Fallthrough
 			case DyvilKeywords.ELSE:
 			case DyvilKeywords.CATCH:
 			case DyvilKeywords.FINALLY:
-				this.end(pm);
+				this.end(pm, true);
 				return;
 			case BaseSymbols.EQUALS:
 				// EXPRESSION =
@@ -525,7 +554,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			case BaseSymbols.COLON:
 				final ColonOperator colonOperator = new ColonOperator(token.raw(), this.value, null);
 
-				pm.pushParser(new ExpressionParser(colonOperator::setRight));
+				pm.pushParser(this.subParser(pm, colonOperator::setRight));
 				this.value = colonOperator;
 				this.mode = END;
 				return;
@@ -544,7 +573,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 				if (this.operator != null)
 				{
-					this.end(pm);
+					this.end(pm, true);
 					return;
 				}
 
@@ -811,6 +840,11 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				return;
 			}
 			case DyvilSymbols.DOUBLE_ARROW_RIGHT:
+				if (this.hasFlag(IGNORE_LAMBDA))
+				{
+					break;
+				}
+
 				// IDENTIFIER => ...
 				// Lambda Expression with one untyped parameter
 
@@ -825,7 +859,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				return;
 			}
 
-			if (ParserUtil.isExpressionTerminator(nextType))
+			if (ParserUtil.isExpressionTerminator(nextType) || nextType == DyvilSymbols.DOUBLE_ARROW_RIGHT)
 			{
 				// ... IDENTIFIER EXPRESSION-TERMINATOR
 				// e.g. this.someField ;
@@ -889,13 +923,19 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 	 */
 	private void parseApply(IParserManager pm, IToken token, SingleArgument argument, Operator operator)
 	{
-		if (token.type() == BaseSymbols.OPEN_CURLY_BRACKET)
+		if (token.type() != BaseSymbols.OPEN_CURLY_BRACKET)
 		{
-			pm.pushParser(new StatementListParser(argument, true));
+			pm.pushParser(pm.newExpressionParser(argument).withOperator(operator));
 			return;
 		}
 
-		pm.pushParser(pm.newExpressionParser(argument).withOperator(operator));
+		if (this.hasFlag(IGNORE_CLOSURE))
+		{
+			this.end(pm, false);
+			return;
+		}
+
+		pm.pushParser(new StatementListParser(argument, true));
 	}
 
 	/**
@@ -1112,7 +1152,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				return true;
 			}
 
-			this.end(pm);
+			this.end(pm, true);
 			return true;
 		}
 		case DyvilKeywords.WHILE:
@@ -1212,7 +1252,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				return true;
 			}
 
-			this.end(pm);
+			this.end(pm, true);
 			return true;
 		}
 		case DyvilKeywords.FINALLY:
@@ -1225,7 +1265,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				return true;
 			}
 
-			this.end(pm);
+			this.end(pm, true);
 			return true;
 		}
 		case DyvilKeywords.THROW:
