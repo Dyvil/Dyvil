@@ -6,17 +6,23 @@ import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
+import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
+
+import static dyvil.tools.compiler.parser.expression.ExpressionParser.IGNORE_CLOSURE;
+import static dyvil.tools.compiler.parser.expression.ExpressionParser.IGNORE_COLON;
 
 public class IfStatementParser extends Parser implements IValueConsumer
 {
 	protected static final int IF            = 0;
 	protected static final int CONDITION     = 1;
 	protected static final int CONDITION_END = 2;
-	protected static final int THEN          = 4;
-	protected static final int ELSE          = 8;
+	protected static final int SEPARATOR     = 4;
+	protected static final int THEN          = 8;
+	protected static final int ELSE          = 16;
 
 	protected IfStatement statement;
 
@@ -37,19 +43,23 @@ public class IfStatementParser extends Parser implements IValueConsumer
 			return;
 		case IF:
 			this.mode = CONDITION;
-			if (type != DyvilKeywords.IF)
+			if (type == DyvilKeywords.IF)
 			{
-				pm.reparse();
-				pm.report(token, "if.if");
+				return;
 			}
-			return;
+
+			pm.report(token, "if.if");
+			// Fallthrough
 		case CONDITION:
-			this.mode = CONDITION_END;
-			pm.pushParser(pm.newExpressionParser(this));
-			if (type != BaseSymbols.OPEN_PARENTHESIS)
+			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
-				pm.reparse();
-				pm.report(token, "if.open_paren");
+				this.mode = CONDITION_END;
+				pm.pushParser(pm.newExpressionParser(this));
+			}
+			else
+			{
+				this.mode = SEPARATOR;
+				pm.pushParser(pm.newExpressionParser(this).withFlag(IGNORE_CLOSURE | IGNORE_COLON), true);
 			}
 			return;
 		case CONDITION_END:
@@ -59,6 +69,27 @@ public class IfStatementParser extends Parser implements IValueConsumer
 				pm.reparse();
 				pm.report(token, "if.close_paren");
 			}
+			return;
+		case SEPARATOR:
+			switch (type)
+			{
+			case Tokens.EOF:
+				pm.popParser();
+				return;
+			case BaseSymbols.SEMICOLON:
+				pm.popParser(true);
+				return;
+			case BaseSymbols.COLON:
+				this.mode = ELSE;
+				pm.pushParser(new ExpressionParser(this));
+				return;
+			case BaseSymbols.OPEN_CURLY_BRACKET:
+				this.mode = ELSE;
+				pm.pushParser(new StatementListParser(this), true);
+				return;
+			}
+
+			pm.report(token, "if.separator");
 			return;
 		case THEN:
 			if (ParserUtil.isTerminator(type))
@@ -89,7 +120,6 @@ public class IfStatementParser extends Parser implements IValueConsumer
 			}
 
 			pm.popParser(true);
-			return;
 		}
 	}
 
@@ -98,6 +128,7 @@ public class IfStatementParser extends Parser implements IValueConsumer
 	{
 		switch (this.mode)
 		{
+		case SEPARATOR:
 		case CONDITION_END:
 			this.statement.setCondition(value);
 			return;
@@ -106,7 +137,6 @@ public class IfStatementParser extends Parser implements IValueConsumer
 			return;
 		case END:
 			this.statement.setElse(value);
-			return;
 		}
 	}
 }
