@@ -105,8 +105,8 @@ public interface IValue extends IASTNode, ITyped
 	int GOTO     = 216;
 
 	// Pseudo-Expressions
-	int VARIABLE      = 232;
-	int NESTED_METHOD = 233;
+	int VARIABLE         = 232;
+	int MEMBER_STATEMENT = 233;
 
 	// Special Types only used by the compiler
 	int REFERENCE          = 240;

@@ -15,7 +15,7 @@ import dyvil.tools.compiler.ast.method.NestedMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.statement.Closure;
 import dyvil.tools.compiler.ast.statement.FieldInitializer;
-import dyvil.tools.compiler.ast.statement.MethodStatement;
+import dyvil.tools.compiler.ast.statement.MemberStatement;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.statement.control.Label;
 import dyvil.tools.compiler.ast.type.IType;
@@ -167,7 +167,7 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 	@Override
 	public void addMethod(IMethod method)
 	{
-		this.setValue(new MethodStatement((NestedMethod) method));
+		this.setValue(new MemberStatement(method));
 	}
 
 	@Override
@@ -176,25 +176,27 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 		return new NestedMethod(position, name, type, modifiers, annotations);
 	}
 
-	// TODO Create errors for these types of members
-
 	@Override
 	public void addProperty(IProperty property)
 	{
+		this.setValue(new MemberStatement(property));
 	}
 
 	@Override
 	public void addConstructor(IConstructor constructor)
 	{
+		this.setValue(new MemberStatement(constructor));
 	}
 
 	@Override
 	public void addInitializer(IInitializer initializer)
 	{
+		this.setValue(new MemberStatement(initializer));
 	}
 
 	@Override
 	public void addClass(IClass theClass)
 	{
+		this.setValue(new MemberStatement(theClass));
 	}
 }
