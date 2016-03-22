@@ -275,7 +275,7 @@ public final class MemberParser extends Parser implements ITypeConsumer
 					pm.report(token, "field.type.duplicate");
 				}
 
-				pm.pushParser(new TypeParser(this.member));
+				pm.pushParser(new TypeParser(this.member != null ? this.member : this));
 				this.mode = FIELD_SEPARATOR;
 				return;
 			}
@@ -483,7 +483,6 @@ public final class MemberParser extends Parser implements ITypeConsumer
 	@Override
 	public boolean reportErrors()
 	{
-		return (this.mode > NAME || this.mode == END) && !(this.mode == CONSTRUCTOR_PARAMETERS
-			                                                   && (this.flags & MEMBER_KIND_MASK) == CONSTRUCTOR);
+		return (this.mode > NAME || this.mode == END) && this.mode != CONSTRUCTOR_PARAMETERS;
 	}
 }
