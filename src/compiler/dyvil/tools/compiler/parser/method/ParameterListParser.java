@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
+import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -83,18 +84,22 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				return;
 			}
 
-			if (ParserUtil.isIdentifier(type) && ParserUtil.isTerminator(token.next().type()))
+			if (ParserUtil.isIdentifier(type))
 			{
-				if (!this.untyped)
+				final int nextType = token.next().type();
+				if (ParserUtil.isTerminator(nextType))
 				{
-					pm.report(token, "parameter.type");
-				}
+					if (!this.untyped && nextType != BaseSymbols.COLON)
+					{
+						pm.report(token, "parameter.type");
+					}
 
-				// ... , IDENTIFIER , ...
-				this.type = Types.UNKNOWN;
-				this.mode = NAME;
-				pm.reparse();
-				return;
+					// ... , IDENTIFIER , ...
+					this.type = Types.UNKNOWN;
+					this.mode = NAME;
+					pm.reparse();
+					return;
+				}
 			}
 
 			if (type == DyvilSymbols.AT)
@@ -158,11 +163,24 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			final IParameter parameter = this.createParameter(token);
 			this.consumer.addParameter(parameter);
 
-			if (token.next().type() == BaseSymbols.EQUALS)
+			final IToken next = token.next();
+			switch (next.type())
 			{
-				pm.skip(1);
-				pm.pushParser(pm.newExpressionParser(parameter));
+			case BaseSymbols.EQUALS:
+				// ... IDENTIFIER = EXPRESSION ...
 
+				pm.skip();
+				pm.pushParser(pm.newExpressionParser(parameter));
+				return;
+			case BaseSymbols.COLON:
+				// ... IDENTIFIER : TYPE ...
+				if (this.type != Types.UNKNOWN)
+				{
+					pm.report(next, "parameter.type.duplicate");
+				}
+
+				pm.skip();
+				pm.pushParser(new TypeParser(parameter));
 				return;
 			}
 
@@ -186,8 +204,6 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 					pm.popParser();
 				}
 			}
-
-			return;
 		}
 	}
 
