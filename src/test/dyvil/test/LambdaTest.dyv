@@ -72,7 +72,7 @@ public class LambdaTest
 		() => void function1 = function { result += "a" }
 		() => String function2 = function { "b" }
 
-		repeat(3) { result += function2() }
+		`repeat`(3) { result += function2() }
 
 		with ("c") { result += $0 }
 

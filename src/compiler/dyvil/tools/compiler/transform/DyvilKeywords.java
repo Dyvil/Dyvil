@@ -2,6 +2,8 @@ package dyvil.tools.compiler.transform;
 
 import dyvil.tools.parsing.lexer.Tokens;
 
+import static javax.swing.text.html.HTML.Tag.HEAD;
+
 public class DyvilKeywords
 {
 	public static final int ABSTRACT     = Tokens.KEYWORD | 0x00010000;
@@ -51,6 +53,7 @@ public class DyvilKeywords
 	public static final int PRIVATE      = Tokens.KEYWORD | 0x002D0000;
 	public static final int PROTECTED    = Tokens.KEYWORD | 0x002E0000;
 	public static final int PUBLIC       = Tokens.KEYWORD | 0x002F0000;
+	public static final int REPEAT       = Tokens.KEYWORD | 0x00400000;
 	public static final int RETURN       = Tokens.KEYWORD | 0x00300000;
 	public static final int SEALED       = Tokens.KEYWORD | 0x00310000;
 	public static final int STATIC       = Tokens.KEYWORD | 0x00320000;
@@ -120,6 +123,7 @@ public class DyvilKeywords
 		case "private": return PRIVATE;
 		case "protected": return PROTECTED;
 		case "public": return PUBLIC;
+		case "repeat": return REPEAT;
 		case "return": return RETURN;
 		case "sealed": return SEALED;
 		case "static": return STATIC;
@@ -193,6 +197,7 @@ public class DyvilKeywords
 		case PRIVATE: return "private";
 		case PROTECTED: return "protected";
 		case PUBLIC: return "public";
+		case REPEAT: return "repeat";
 		case RETURN: return "return";
 		case SEALED: return "sealed";
 		case STATIC: return "static";

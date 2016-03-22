@@ -2,52 +2,58 @@ package dyvil.tools.compiler.parser.statement;
 
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.statement.loop.DoStatement;
+import dyvil.tools.compiler.ast.statement.loop.RepeatStatement;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
-public class DoStatementParser extends Parser implements IValueConsumer
+public class RepeatStatementParser extends Parser implements IValueConsumer
 {
-	public static final int DO    = 1;
-	public static final int WHILE = 2;
+	protected static final int REPEAT = 1;
+	protected static final int ACTION = 2;
+	protected static final int WHILE  = 4;
 	
-	public DoStatement statement;
+	protected final RepeatStatement statement;
 	
-	public DoStatementParser(DoStatement statement)
+	public RepeatStatementParser(RepeatStatement statement)
 	{
 		this.statement = statement;
-		this.mode = DO;
+		this.mode = ACTION;
 	}
 	
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
+		final int type = token.type();
 		switch (this.mode)
 		{
-		case DO:
+		case REPEAT:
+			this.mode = ACTION;
+			if (type != DyvilKeywords.DO)
+			{
+				pm.reparse();
+				pm.report(token, "repeat.repeat");
+			}
+			return;
+		case ACTION:
 			pm.pushParser(pm.newExpressionParser(this), true);
 			this.mode = WHILE;
 			return;
 		case WHILE:
-			int type = token.type();
 			if (type == DyvilKeywords.WHILE)
 			{
 				this.mode = END;
 				pm.pushParser(pm.newExpressionParser(this));
 				return;
 			}
-			if (type == BaseSymbols.SEMICOLON)
+			if (type == BaseSymbols.SEMICOLON && token.isInferred() && token.next().type() == DyvilKeywords.WHILE)
 			{
-				if (token.next().type() == DyvilKeywords.WHILE)
-				{
-					this.mode = END;
-					pm.skip(1);
-					pm.pushParser(pm.newExpressionParser(this));
-					return;
-				}
+				this.mode = END;
+				pm.skip(1);
+				pm.pushParser(pm.newExpressionParser(this));
+				return;
 			}
 			// fallthrough
 		case END:

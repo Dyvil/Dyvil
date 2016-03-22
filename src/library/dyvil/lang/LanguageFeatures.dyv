@@ -49,7 +49,8 @@ public final class LanguageFeatures
 
 	public static inline R with[T, R](T receiver, T => R f) = f(receiver)
 
-	public static void repeat(int n, => void f)
+	@Deprecated
+	public static void `repeat`(int n, => void f)
 	{
 		for (int i <- 0 ..< n)
 		{

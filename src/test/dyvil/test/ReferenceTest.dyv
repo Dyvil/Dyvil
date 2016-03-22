@@ -42,7 +42,7 @@ public class ReferenceTest
 		Main.test("Variable Reference", 1, variable)
 
 		int capturedVariable = 0
-		repeat(3) { inc capturedVariable }
+		`repeat`(3) { inc capturedVariable }
 		Main.test("Captured Variable Reference", 3, capturedVariable)
 	}
 

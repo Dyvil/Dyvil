@@ -20,7 +20,7 @@ import dyvil.tools.compiler.ast.statement.control.ContinueStatement;
 import dyvil.tools.compiler.ast.statement.control.GoToStatement;
 import dyvil.tools.compiler.ast.statement.exception.ThrowStatement;
 import dyvil.tools.compiler.ast.statement.exception.TryStatement;
-import dyvil.tools.compiler.ast.statement.loop.DoStatement;
+import dyvil.tools.compiler.ast.statement.loop.RepeatStatement;
 import dyvil.tools.compiler.ast.statement.loop.WhileStatement;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -1127,13 +1127,16 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			return true;
 		}
 		case DyvilKeywords.DO:
+			pm.report(Markers.semanticError(token, "do.deprecated"));
+			// fallthrough
+		case DyvilKeywords.REPEAT:
 		{
-			// do ...
+			// repeat ...
 
-			final DoStatement doStatement = new DoStatement(token);
-			this.value = doStatement;
+			final RepeatStatement repeatStatement = new RepeatStatement(token);
+			this.value = repeatStatement;
 
-			pm.pushParser(new DoStatementParser(doStatement));
+			pm.pushParser(new RepeatStatementParser(repeatStatement));
 			this.mode = END;
 			return true;
 		}

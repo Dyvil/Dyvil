@@ -17,27 +17,25 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public final class DoStatement extends AbstractValue implements IStatement, ILoop
+public final class RepeatStatement extends AbstractValue implements IStatement, ILoop
 {
-	private static final Name $doStart     = Name.getQualified("$doStart");
-	private static final Name $doCondition = Name.getQualified("$doCondition");
-	private static final Name $doEnd       = Name.getQualified("$doEnd");
+	private static final Name $repeatStart     = Name.getQualified("$repeatStart");
+	private static final Name $repeatCondition = Name.getQualified("$repeatCondition");
+	private static final Name $repeatEnd       = Name.getQualified("$repeatEnd");
 	
 	protected IValue action;
 	protected IValue condition;
-	
-	// Metadata
-	private Label startLabel;
+
 	private Label conditionLabel;
 	private Label endLabel;
 	
-	public DoStatement(ICodePosition position)
+	public RepeatStatement(ICodePosition position)
 	{
 		this.position = position;
-		
-		this.startLabel = new Label($doStart);
-		this.conditionLabel = new Label($doCondition);
-		this.endLabel = new Label($doEnd);
+
+		Label startLabel = new Label($repeatStart);
+		this.conditionLabel = new Label($repeatCondition);
+		this.endLabel = new Label($repeatEnd);
 	}
 	
 	@Override
@@ -56,11 +54,13 @@ public final class DoStatement extends AbstractValue implements IStatement, ILoo
 		return this.condition;
 	}
 	
+	@Override
 	public void setAction(IValue then)
 	{
 		this.action = then;
 	}
 	
+	@Override
 	public IValue getAction()
 	{
 		return this.action;
@@ -81,11 +81,11 @@ public final class DoStatement extends AbstractValue implements IStatement, ILoo
 	@Override
 	public Label resolveLabel(Name name)
 	{
-		if (name == $doCondition)
+		if (name == $repeatCondition)
 		{
 			return this.conditionLabel;
 		}
-		if (name == $doEnd)
+		if (name == $repeatEnd)
 		{
 			return this.endLabel;
 		}
@@ -112,12 +112,12 @@ public final class DoStatement extends AbstractValue implements IStatement, ILoo
 		if (this.action != null)
 		{
 			this.action = this.action.resolve(markers, context);
-			this.action = IStatement.checkStatement(markers, context, this.action, "do.action.type");
+			this.action = IStatement.checkStatement(markers, context, this.action, "repeat.action.type");
 		}
 		if (this.condition != null)
 		{
 			this.condition = this.condition.resolve(markers, context);
-			this.condition = IStatement.checkCondition(markers, context, this.condition, "do.condition.type");
+			this.condition = IStatement.checkCondition(markers, context, this.condition, "repeat.condition.type");
 		}
 		return this;
 	}
@@ -187,12 +187,12 @@ public final class DoStatement extends AbstractValue implements IStatement, ILoo
 		{
 			this.condition.writeExpression(writer, Types.VOID);
 		}
-		
-		dyvil.tools.asm.Label startLabel = this.startLabel.target = new dyvil.tools.asm.Label();
+
+		dyvil.tools.asm.Label startLabel = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label conditionLabel = this.conditionLabel.target = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
 		
-		// Do Block
+		// Repeat Block
 		
 		writer.visitTargetLabel(startLabel);
 		this.action.writeExpression(writer, Types.VOID);
@@ -213,12 +213,12 @@ public final class DoStatement extends AbstractValue implements IStatement, ILoo
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append("do");
+		buffer.append("repeat");
 
 		if (this.action != null && !Util.formatStatementList(prefix, buffer, this.action))
 		{
-			String actionPrefix = Formatting.getIndent("do.indent", prefix);
-			if (Formatting.getBoolean("do.newline_after"))
+			String actionPrefix = Formatting.getIndent("repeat.indent", prefix);
+			if (Formatting.getBoolean("repeat.newline_after"))
 			{
 				buffer.append('\n').append(actionPrefix);
 			}
@@ -232,11 +232,11 @@ public final class DoStatement extends AbstractValue implements IStatement, ILoo
 		
 		if (this.condition != null)
 		{
-			if (Formatting.getBoolean("do.while.newline_before"))
+			if (Formatting.getBoolean("repeat.while.newline_before"))
 			{
 				buffer.append('\n').append(prefix);
 			}
-			else if (Formatting.getBoolean("do.while.space_before"))
+			else if (Formatting.getBoolean("repeat.while.space_before"))
 			{
 				buffer.append(' ');
 			}
