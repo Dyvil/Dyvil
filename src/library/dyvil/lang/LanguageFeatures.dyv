@@ -21,9 +21,9 @@ public final class LanguageFeatures
 
 	// Lists
 
-	public infix inline ImmutableList[E] operator ::[E](ImmutableList[E] list, E element) = list + element
+	public infix inline func ::[E](ImmutableList[E] list, E element): ImmutableList[E] = list + element
 
-	public infix inline ImmutableList[E] operator ::[E](E element1, E element2) = ImmutableList(element1, element2)
+	public infix inline func ::[E](E element1, E element2): ImmutableList[E] = ImmutableList(element1, element2)
 
 	// Increments
 
@@ -52,17 +52,14 @@ public final class LanguageFeatures
 	@Deprecated
 	public static void `repeat`(int n, => void f)
 	{
-		for (int i <- 0 ..< n)
-		{
-			f()
-		}
+		for (var i <- 0 ..< n) f()
 	}
 
 	// I/O
 
 	public const String ENDL = System.lineSeparator
 
-	public infix inline PrintStream operator <<(PrintStream stream, any value)
+	public infix inline func <<(PrintStream stream, any value): PrintStream
 	{
 		stream.print(value)
 		return stream

@@ -9,11 +9,11 @@ public final class LanguageCommons
 	// Blackhole
 
 	@Intrinsic([ LOAD_0, AUTO_POP ])
-	public static void consume(any value) = ()
+	public static func consume(any value): void {}
 
 	// Ternary Operator
 
-	public infix T operator ?[T](boolean condition, (=> T, => T) branches) = if (condition) branches._1() else branches._2()
+	public infix func ?[T](boolean condition, (=> T, => T) branches): T = if (condition) branches._1() else branches._2()
 
 	// Assertions
 
@@ -27,7 +27,7 @@ public final class LanguageCommons
 
 	public static inline void error(String message) = throw new Error(message)
 
-	public static inline void operator ???() = throw new UnsupportedOperationException("Not Implemented!")
+	public static inline func ???(): void = throw new UnsupportedOperationException("Not Implemented!")
 
 	// Output
 
