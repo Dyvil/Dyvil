@@ -1,33 +1,28 @@
 package dyvil.tools.compiler.ast.statement.exception;
 
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
+import dyvil.tools.compiler.ast.consumer.IVariableConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
-public class CatchBlock implements ITyped, IDefaultContext, IValueConsumer
+public class CatchBlock implements IDefaultContext, IValueConsumer, IVariableConsumer
 {
-	public ICodePosition position;
-	public IType         type;
-	public Name          varName;
 	public IValue        action;
 
-	protected Variable variable;
+	protected IVariable variable;
 
-	public CatchBlock(ICodePosition position)
+	public CatchBlock()
 	{
-		this.position = position;
 	}
 
 	public void setAction(IValue value)
@@ -46,27 +41,27 @@ public class CatchBlock implements ITyped, IDefaultContext, IValueConsumer
 		this.action = value;
 	}
 
-	@Override
-	public void setType(IType type)
+	public IVariable getVariable()
 	{
-		this.type = type;
+		return this.variable;
 	}
 
 	@Override
+	public void setVariable(IVariable variable)
+	{
+		this.variable = variable;
+	}
+
 	public IType getType()
 	{
-		return this.type;
+		return this.variable.getType();
 	}
 
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		if (this.varName == name)
+		if (this.variable.getName() == name)
 		{
-			if (this.variable == null)
-			{
-				this.variable = new Variable(this.type.getPosition(), this.varName, this.type);
-			}
 			return this.variable;
 		}
 
@@ -75,13 +70,13 @@ public class CatchBlock implements ITyped, IDefaultContext, IValueConsumer
 
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.type = this.type.resolveType(markers, context);
+		this.variable.resolveTypes(markers, context);
 		this.action.resolveTypes(markers, context);
 	}
 
 	public void resolve(MarkerList markers, IContext context)
 	{
-		this.type.resolve(markers, context);
+		this.variable.resolve(markers, context);
 
 		context = context.push(this);
 
@@ -92,7 +87,7 @@ public class CatchBlock implements ITyped, IDefaultContext, IValueConsumer
 
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.type.checkType(markers, context, IType.TypePosition.RETURN_TYPE);
+		this.variable.checkTypes(markers, context);
 
 		context = context.push(this);
 		this.action.checkTypes(markers, context);
@@ -101,12 +96,13 @@ public class CatchBlock implements ITyped, IDefaultContext, IValueConsumer
 
 	public void check(MarkerList markers, IContext context)
 	{
-		this.type.check(markers, context);
+		this.variable.check(markers, context);
 
-		if (!Types.isSuperType(Types.THROWABLE, this.type))
+		final IType type = this.variable.getType();
+		if (!Types.isSuperType(Types.THROWABLE, type))
 		{
-			final Marker marker = Markers.semanticError(this.position, "try.catch.type.not_throwable");
-			marker.addInfo(Markers.getSemantic("exception.type", this.type));
+			final Marker marker = Markers.semanticError(this.variable.getPosition(), "try.catch.type.not_throwable");
+			marker.addInfo(Markers.getSemantic("exception.type", type));
 			markers.add(marker);
 		}
 
@@ -117,13 +113,13 @@ public class CatchBlock implements ITyped, IDefaultContext, IValueConsumer
 
 	public void foldConstants()
 	{
-		this.type.foldConstants();
+		this.variable.foldConstants();
 		this.action = this.action.foldConstants();
 	}
 
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		this.type.cleanup(context, compilableList);
+		this.variable.cleanup(context, compilableList);
 
 		context = context.push(this);
 		this.action = this.action.cleanup(context, compilableList);

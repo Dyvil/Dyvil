@@ -105,7 +105,7 @@ public class TryParserManager extends ParserManager
 			catch (Exception ex)
 			{
 				this.report(Markers.parserError(token, ex));
-				return false;
+				return this.success();
 			}
 
 			if (!this.success())

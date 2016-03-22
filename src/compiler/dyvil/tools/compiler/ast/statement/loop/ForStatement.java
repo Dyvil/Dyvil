@@ -41,7 +41,7 @@ public class ForStatement implements IForStatement, IDefaultContext
 	protected Label updateLabel;
 	protected Label endLabel;
 
-	public ForStatement(ICodePosition position, Variable variable, IValue condition, IValue update)
+	public ForStatement(ICodePosition position, IVariable variable, IValue condition, IValue update)
 	{
 		this.startLabel = new Label($forStart);
 		this.updateLabel = new Label($forUpdate);
@@ -53,7 +53,7 @@ public class ForStatement implements IForStatement, IDefaultContext
 		this.update = update;
 	}
 
-	public ForStatement(ICodePosition position, Variable variable, IValue condition, IValue update, IValue action)
+	public ForStatement(ICodePosition position, IVariable variable, IValue condition, IValue update, IValue action)
 	{
 		this(position, variable, condition, update);
 		this.action = action;

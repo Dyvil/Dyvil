@@ -429,20 +429,31 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 
 	protected void addVariable(FieldInitializer initializer, MarkerList markers, IContext context)
 	{
-		if (this.variables == null)
-		{
-			this.variables = new ArrayList<>();
-		}
-
 		final IVariable variable = initializer.variable;
 		final Name variableName = variable.getName();
 
+		// Additional Semantic Analysis
+
+		// Uninitialized Variables
+		if (variable.getValue() == null)
+		{
+			variable.setValue(variable.getType().getDefaultValue());
+			markers.add(Markers.semanticError(this.position, "variable.value", variableName));
+		}
+
+		// Variable Name Shadowing
 		final IDataMember dataMember = context.resolveField(variableName);
 		if (dataMember != null && dataMember.isVariable())
 		{
 			markers.add(Markers.semantic(initializer.getPosition(), "variable.shadow", variableName));
 		}
 
+		// Actually add the Variable to the List (this has to happen after checking for shadowed variables)
+
+		if (this.variables == null)
+		{
+			this.variables = new ArrayList<>();
+		}
 		this.variables.add(variable);
 	}
 

@@ -45,7 +45,7 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 		case CATCH:
 			if (type == DyvilKeywords.CATCH)
 			{
-				this.statement.addCatchBlock(this.catchBlock = new CatchBlock(token.raw()));
+				this.statement.addCatchBlock(this.catchBlock = new CatchBlock());
 				this.mode = CATCH_OPEN;
 				return;
 			}
@@ -72,22 +72,12 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 			return;
 		case CATCH_OPEN:
 			this.mode = CATCH_VAR;
-			pm.pushParser(pm.newTypeParser(this.catchBlock));
+			pm.pushParser(new VariableParser(this.catchBlock));
 			if (type != BaseSymbols.OPEN_PARENTHESIS)
 			{
 				pm.reparse();
 				pm.report(token, "try.catch.open_paren");
 			}
-			return;
-		case CATCH_VAR:
-			this.mode = CATCH_CLOSE;
-			if (ParserUtil.isIdentifier(type))
-			{
-				this.catchBlock.varName = token.nameValue();
-				return;
-			}
-			pm.reparse();
-			pm.report(token, "try.catch.identifier");
 			return;
 		case CATCH_CLOSE:
 			this.mode = CATCH;
@@ -97,7 +87,6 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 				pm.reparse();
 				pm.report(token, "try.catch.close_paren");
 			}
-			return;
 		}
 	}
 	
@@ -111,7 +100,6 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 			return;
 		case END:
 			this.statement.setFinallyBlock(value);
-			return;
 		}
 	}
 }
