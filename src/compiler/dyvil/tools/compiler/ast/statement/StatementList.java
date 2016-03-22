@@ -93,6 +93,12 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	}
 
 	@Override
+	public boolean isStatement()
+	{
+		return true;
+	}
+
+	@Override
 	public boolean isUsableAsStatement()
 	{
 		return true;
@@ -382,7 +388,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 
 			if (!resolvedValue.isStatement())
 			{
-				IValue applyStatementCall = resolveApplyStatement(markers, context, resolvedValue);
+				final IValue applyStatementCall = resolveApplyStatement(markers, context, resolvedValue);
 				if (applyStatementCall != null)
 				{
 					this.values[i] = applyStatementCall;

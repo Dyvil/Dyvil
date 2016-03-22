@@ -74,9 +74,9 @@ public interface IValue extends IASTNode, ITyped
 
 	// Assignments
 	int FIELD_ASSIGN = 120;
+	int METHOD_ASSIGN = 121;
 
 	// Special Operators and Intrinsics
-	int SWAP_OPERATOR  = 128;
 	int BOOLEAN_AND    = 129;
 	int BOOLEAN_OR     = 130;
 	int BOOLEAN_NOT    = 131;

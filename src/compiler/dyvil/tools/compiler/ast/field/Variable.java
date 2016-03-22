@@ -49,6 +49,13 @@ public final class Variable extends Member implements IVariable
 		this.type = type;
 	}
 
+	public Variable(Name name, IType type, IValue value)
+	{
+		this.name = name;
+		this.type = type;
+		this.value = value;
+	}
+
 	public Variable(ICodePosition position)
 	{
 		this.position = position;
