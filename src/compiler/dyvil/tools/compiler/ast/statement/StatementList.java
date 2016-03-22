@@ -1,11 +1,8 @@
 package dyvil.tools.compiler.ast.statement;
 
-import dyvil.collection.Entry;
 import dyvil.collection.List;
-import dyvil.collection.Map;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.collection.mutable.ArrayList;
-import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.tools.compiler.ast.access.ICall;
 import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -15,8 +12,9 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.member.IClassMember;
+import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -32,6 +30,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -48,9 +47,9 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	protected Label[]  labels;
 
 	// Metadata
-	protected Map<Name, Variable> variables;
-	protected List<IMethod>       methods;
-	protected IType               returnType;
+	protected List<IVariable> variables;
+	protected List<IMethod>   methods;
+	protected IType           returnType;
 
 	public StatementList()
 	{
@@ -265,10 +264,14 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	{
 		if (this.variables != null)
 		{
-			final IDataMember field = this.variables.get(name);
-			if (field != null)
+			// Intentionally start at the last variable
+			for (int i = this.variables.size() - 1; i >= 0; i--)
 			{
-				return field;
+				final IVariable variable = this.variables.get(i);
+				if (variable.getName() == name)
+				{
+					return variable;
+				}
 			}
 		}
 
@@ -319,7 +322,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	@Override
 	public boolean isMember(IVariable variable)
 	{
-		return this.variables != null && this.variables.containsValue(variable);
+		return this.variables != null && this.variables.contains(variable);
 	}
 
 	@Override
@@ -352,8 +355,8 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 
 		context = context.push(this);
 
-		// Resolve and check all values except the last one
-		int lastIndex = this.valueCount - 1;
+		// Resolve and check all values
+		final int lastIndex = this.valueCount - 1;
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			final IValue resolvedValue = this.values[i] = this.values[i].resolve(markers, context);
@@ -364,9 +367,9 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 				this.addVariable((FieldInitializer) resolvedValue, markers, context);
 				continue;
 			}
-			if (valueTag == IValue.NESTED_METHOD)
+			if (valueTag == IValue.MEMBER_STATEMENT)
 			{
-				this.addMethod((MethodStatement) resolvedValue, markers);
+				this.addMethod((MemberStatement) resolvedValue, markers);
 				continue;
 			}
 
@@ -428,10 +431,10 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	{
 		if (this.variables == null)
 		{
-			this.variables = new IdentityHashMap<>();
+			this.variables = new ArrayList<>();
 		}
 
-		final Variable variable = initializer.variable;
+		final IVariable variable = initializer.variable;
 		final Name variableName = variable.getName();
 
 		final IDataMember dataMember = context.resolveField(variableName);
@@ -440,12 +443,22 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 			markers.add(Markers.semantic(initializer.getPosition(), "variable.shadow", variableName));
 		}
 
-		this.variables.put(variableName, variable);
+		this.variables.add(variable);
 	}
 
-	protected void addMethod(MethodStatement methodStatement, MarkerList markers)
+	protected void addMethod(MemberStatement memberStatement, MarkerList markers)
 	{
-		final IMethod method = methodStatement.method;
+		final IClassMember member = memberStatement.member;
+		final MemberKind memberKind = member.getKind();
+		if (memberKind != MemberKind.METHOD)
+		{
+			markers.add(
+				Markers.semantic(member.getPosition(), "statementlist.declaration.invalid", Util.memberNamed(member)));
+
+			return;
+		}
+
+		final IMethod method = (IMethod) member;
 
 		if (this.methods == null)
 		{
@@ -462,11 +475,11 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 			if (candidate.getName() == methodName // same name
 				    && candidate.parameterCount() == parameterCount && candidate.getDescriptor().equals(desc))
 			{
-				markers.add(Markers.semanticError(methodStatement.getPosition(), "method.duplicate", methodName, desc));
+				markers.add(Markers.semanticError(memberStatement.getPosition(), "method.duplicate", methodName, desc));
 			}
 		}
 
-		this.methods.add(methodStatement.method);
+		this.methods.add(method);
 	}
 
 	@Override
@@ -587,10 +600,9 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 			return;
 		}
 
-		for (Entry<Name, Variable> entry : this.variables)
+		for (IVariable variable : this.variables)
 		{
-			Variable var = entry.getValue();
-			var.writeLocal(writer, start, end);
+			variable.writeLocal(writer, start, end);
 		}
 	}
 

@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.statement;
 
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -11,18 +11,23 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class FieldInitializer implements IStatement
 {
-	protected Variable variable;
+	protected IVariable variable;
 	
-	public FieldInitializer(Variable variable)
+	public FieldInitializer(IVariable variable)
 	{
 		this.variable = variable;
 	}
 	
-	public Variable getVariable()
+	public IVariable getVariable()
 	{
 		return this.variable;
 	}
-	
+
+	public void setVariable(IVariable variable)
+	{
+		this.variable = variable;
+	}
+
 	@Override
 	public ICodePosition getPosition()
 	{
@@ -39,12 +44,6 @@ public final class FieldInitializer implements IStatement
 	public int valueTag()
 	{
 		return VARIABLE;
-	}
-	
-	@Override
-	public boolean isPrimitive()
-	{
-		return this.variable.getType().isPrimitive();
 	}
 	
 	@Override

@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -132,8 +133,11 @@ public class ClassBody implements IClassBody
 	}
 	
 	@Override
-	public void addField(IField field)
+	public void addField(IDataMember dataMember)
 	{
+		// We can be sure the DataMember is a Field
+		final IField field = (IField) dataMember;
+
 		field.setEnclosingClass(this.theClass);
 
 		final int index = this.fieldCount++;
