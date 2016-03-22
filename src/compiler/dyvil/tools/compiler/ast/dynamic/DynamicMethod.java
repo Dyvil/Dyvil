@@ -180,17 +180,6 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 
 	@Override
-	public boolean hasSideEffects()
-	{
-		return true;
-	}
-
-	@Override
-	public void setHasSideEffects(boolean sideEffects)
-	{
-	}
-
-	@Override
 	public int getAccessLevel()
 	{
 		return 0;

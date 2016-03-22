@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.method;
 
 import dyvil.collection.Set;
 import dyvil.collection.mutable.HashSet;
+import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.AnnotationVisitor;
@@ -13,6 +14,7 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -42,6 +44,11 @@ import java.io.IOException;
 
 public class CodeMethod extends AbstractMethod
 {
+	protected IValue value;
+
+	// Metadata
+	protected Set<IMethod> overrideMethods;
+
 	public CodeMethod(IClass iclass)
 	{
 		super(iclass);
@@ -65,6 +72,18 @@ public class CodeMethod extends AbstractMethod
 	public CodeMethod(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
+	}
+
+	@Override
+	public IValue getValue()
+	{
+		return this.value;
+	}
+
+	@Override
+	public void setValue(IValue value)
+	{
+		this.value = value;
 	}
 
 	@Override
@@ -302,6 +321,25 @@ public class CodeMethod extends AbstractMethod
 				markers.add(Markers.semantic(this.position, "method.duplicate", this.name, desc));
 			}
 		}
+	}
+
+	@Override
+	public void addOverride(IMethod candidate)
+	{
+		if (this.enclosingClass.isSubTypeOf(candidate.getEnclosingClass().getClassType()))
+		{
+			if (this.overrideMethods == null)
+			{
+				this.overrideMethods = new IdentityHashSet<>();
+			}
+			this.overrideMethods.add(candidate);
+		}
+	}
+
+	@Override
+	protected boolean checkOverride0(IMethod candidate)
+	{
+		return this.overrideMethods != null && this.overrideMethods.contains(candidate);
 	}
 
 	private void checkOverride(MarkerList markers)

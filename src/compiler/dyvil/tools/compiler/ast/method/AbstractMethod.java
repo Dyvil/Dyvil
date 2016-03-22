@@ -1,8 +1,6 @@
 package dyvil.tools.compiler.ast.method;
 
 import dyvil.annotation.Mutating;
-import dyvil.collection.Set;
-import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Handle;
@@ -72,15 +70,10 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	protected IType[] exceptions;
 	protected int     exceptionCount;
 
-	protected IValue value;
-
 	// Metadata
 	protected IClass        enclosingClass;
 	protected String        descriptor;
 	protected IntrinsicData intrinsicData;
-	protected Set<IMethod>  overrideMethods;
-
-	protected boolean sideEffects = true;
 
 	public AbstractMethod(IClass enclosingClass)
 	{
@@ -294,9 +287,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				return this.getClass() != ExternalMethod.class;
 			}
 			return true;
-		case "dyvil/annotation/pure":
-			this.sideEffects = false;
-			return true;
 		}
 		return true;
 	}
@@ -347,18 +337,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void setValue(IValue statement)
-	{
-		this.value = statement;
-	}
-
-	@Override
-	public IValue getValue()
-	{
-		return this.value;
-	}
-
-	@Override
 	public boolean isStatic()
 	{
 		return this.modifiers.hasIntModifier(Modifiers.STATIC);
@@ -374,18 +352,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public boolean isAbstract()
 	{
 		return this.modifiers.hasIntModifier(Modifiers.ABSTRACT) && !this.isObjectMethod();
-	}
-
-	@Override
-	public boolean hasSideEffects()
-	{
-		return this.sideEffects;
-	}
-
-	@Override
-	public void setHasSideEffects(boolean sideEffects)
-	{
-		this.sideEffects = sideEffects;
 	}
 
 	protected boolean isObjectMethod()
@@ -908,14 +874,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return false;
 		}
 
-		// The above checks are faster than searching in the override-cache, so we perform them first
-		if (this.overrideMethods != null && this.overrideMethods.contains(candidate))
+		// The above checks can be made without checking the cache (CodeMethod) or resolving parameter types (ExternalMethod)
+		if (this.checkOverride0(candidate))
 		{
 			return true;
 		}
-
-		// External Methods might need to resolve their parameters and type parameters
-		this.checkOverride_external();
 
 		// Check Parameter Types
 		for (int i = 0; i < this.parameterCount; i++)
@@ -931,19 +894,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		return true;
 	}
 
-	public void addOverride(IMethod candidate)
+	protected boolean checkOverride0(IMethod candidate)
 	{
-		if (this.enclosingClass.isSubTypeOf(candidate.getEnclosingClass().getClassType()))
-		{
-			if (this.overrideMethods == null)
-			{
-				this.overrideMethods = new IdentityHashSet<>();
-			}
-			this.overrideMethods.add(candidate);
-		}
+		return false;
 	}
 
-	protected void checkOverride_external()
+	@Override
+	public void addOverride(IMethod candidate)
 	{
 	}
 
@@ -1273,9 +1230,10 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			                 Formatting.getSeparator("method.throws", ','), buffer);
 		}
 
-		if (this.value != null)
+		final IValue value = this.getValue();
+		if (value != null)
 		{
-			if (Util.formatStatementList(prefix, buffer, this.value))
+			if (Util.formatStatementList(prefix, buffer, value))
 			{
 				return;
 			}
@@ -1297,7 +1255,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				buffer.append(' ');
 			}
 
-			this.value.toString(prefix, buffer);
+			value.toString(prefix, buffer);
 		}
 
 		if (Formatting.getBoolean("method.semicolon"))

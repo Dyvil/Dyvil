@@ -64,7 +64,6 @@ public class Intrinsics
 			return readComplex(method, count, ints, strings);
 		}
 
-		method.setHasSideEffects(false);
 		return new SimpleIntrinsicData(method, ints);
 	}
 	

@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.AbstractMethod;
 import dyvil.tools.compiler.ast.method.IExternalCallableMember;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -105,7 +106,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 			this.resolveGenerics();
 		}
 
-		final IContext context = getCombiningContext();
+		final IContext context = this.getCombiningContext();
 
 		this.parametersResolved = true;
 
@@ -192,6 +193,17 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
+	public void setValue(IValue value)
+	{
+	}
+
+	@Override
+	public IValue getValue()
+	{
+		return null;
+	}
+
+	@Override
 	public float getSignatureMatch(Name name, IValue receiver, IArguments arguments)
 	{
 		// Fail fast
@@ -208,12 +220,13 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	protected void checkOverride_external()
+	protected boolean checkOverride0(IMethod candidate)
 	{
 		if (!this.parametersResolved)
 		{
 			this.resolveParameters();
 		}
+		return false;
 	}
 
 	@Override
