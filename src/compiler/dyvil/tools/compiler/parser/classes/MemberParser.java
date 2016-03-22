@@ -42,13 +42,14 @@ public final class MemberParser extends Parser implements ITypeConsumer
 	protected static final int FIELD_SEPARATOR            = 1 << 3;
 	protected static final int METHOD_NAME                = 1 << 4;
 	protected static final int METHOD_SEPARATOR           = 1 << 5;
-	protected static final int GENERICS                   = 1 << 6;
-	protected static final int GENERICS_END               = 1 << 7;
-	protected static final int PARAMETERS                 = 1 << 8;
-	protected static final int PARAMETERS_END             = 1 << 9;
-	protected static final int METHOD_VALUE               = 1 << 10;
-	protected static final int CONSTRUCTOR_PARAMETERS     = 1 << 11;
-	protected static final int CONSTRUCTOR_PARAMETERS_END = 1 << 12;
+	protected static final int PARAMETERS                 = 1 << 6;
+	protected static final int PARAMETERS_END             = 1 << 7;
+	protected static final int GENERICS                   = 1 << 8;
+	protected static final int GENERICS_END               = 1 << 9;
+	protected static final int METHOD_THROWS              = 1 << 10;
+	protected static final int METHOD_VALUE               = 1 << 12;
+	protected static final int CONSTRUCTOR_PARAMETERS     = 1 << 13;
+	protected static final int CONSTRUCTOR_PARAMETERS_END = 1 << 14;
 
 	// Member Kinds
 
@@ -343,6 +344,14 @@ public final class MemberParser extends Parser implements ITypeConsumer
 				return;
 			}
 			// Fallthrough
+		case METHOD_THROWS:
+			if (type == DyvilKeywords.THROWS)
+			{
+				pm.pushParser(new ExceptionListParser((IExceptionList) this.member));
+				this.mode = METHOD_VALUE;
+				return;
+			}
+			// Fallthrough
 		case METHOD_VALUE:
 			switch (type)
 			{
@@ -361,10 +370,6 @@ public final class MemberParser extends Parser implements ITypeConsumer
 			case BaseSymbols.EQUALS:
 				pm.pushParser(pm.newExpressionParser((IValueConsumer) this.member));
 				this.mode = END;
-				return;
-			case DyvilKeywords.THROWS:
-				pm.pushParser(new ExceptionListParser((IExceptionList) this.member));
-				// mode stays METHOD_VALUE
 				return;
 			}
 
