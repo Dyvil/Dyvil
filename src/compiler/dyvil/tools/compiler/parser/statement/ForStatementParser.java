@@ -12,11 +12,10 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
+import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.lexer.BaseSymbols;
-import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;
 
@@ -92,6 +91,20 @@ public class ForStatementParser extends Parser implements IValueConsumer, ITypeC
 				this.type = Types.UNKNOWN;
 				return;
 			}
+			if (ParserUtil.isIdentifier(type))
+			{
+				switch (token.next().type())
+				{
+				case BaseSymbols.COLON:
+					// for ( i : ...
+				case DyvilSymbols.ARROW_LEFT:
+					// for ( i <- ...
+					this.mode = VARIABLE_NAME;
+					this.type = Types.UNKNOWN;
+					pm.reparse();
+					return;
+				}
+			}
 
 			pm.pushParser(pm.newTypeParser(this), true);
 			this.mode = VARIABLE_NAME;
@@ -109,13 +122,17 @@ public class ForStatementParser extends Parser implements IValueConsumer, ITypeC
 		case SEPARATOR:
 			if (type == BaseSymbols.COLON)
 			{
-				pm.report(Markers.syntaxWarning(token, "for.each.colon.deprecated"));
-				this.mode = FOR_EACH_END;
-				pm.pushParser(pm.newExpressionParser(this.variable));
+				// ... IDENTIFIER : TYPE ...
+				if (this.variable.getType() != Types.UNKNOWN)
+				{
+					pm.report(token, "for.variable.type.duplicate");
+				}
+				pm.pushParser(new TypeParser(this.variable));
+				// mode stays SEPARATOR
 				return;
 			}
 
-			if (type == DyvilSymbols.ARROW_LEFT || type == Tokens.LETTER_IDENTIFIER)
+			if (type == DyvilSymbols.ARROW_LEFT)
 			{
 				this.mode = FOR_EACH_END;
 				pm.pushParser(pm.newExpressionParser(this.variable));
