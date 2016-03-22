@@ -12,24 +12,28 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
+import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;
 
+import static dyvil.tools.compiler.parser.expression.ExpressionParser.IGNORE_CLOSURE;
+import static dyvil.tools.compiler.parser.expression.ExpressionParser.IGNORE_COLON;
+
 public class ForStatementParser extends Parser implements IValueConsumer, IVariableConsumer
 {
-	private static final int FOR           = 0;
-	private static final int FOR_START     = 1;
-	private static final int VARIABLE      = 1 << 1;
-	private static final int SEPARATOR     = 1 << 2;
-	private static final int VARIABLE_END  = 1 << 3;
-	private static final int CONDITION_END = 1 << 4;
-	private static final int FOR_END       = 1 << 5;
-	private static final int FOR_EACH_END  = 1 << 6;
-	private static final int STATEMENT     = 1 << 7;
-	private static final int STATEMENT_END = 1 << 8;
+	private static final int FOR                = 0;
+	private static final int FOR_START          = 1;
+	private static final int VARIABLE           = 1 << 1;
+	private static final int VARIABLE_SEPARATOR = 1 << 2;
+	private static final int VARIABLE_END       = 1 << 3;
+	private static final int CONDITION_END      = 1 << 4;
+	private static final int FOR_END            = 1 << 5;
+	private static final int FOR_EACH_END       = 1 << 6;
+	private static final int STATEMENT          = 1 << 7;
 
 	protected IValueConsumer field;
 
@@ -38,6 +42,8 @@ public class ForStatementParser extends Parser implements IValueConsumer, IVaria
 	private   IValue        update;
 	private   IValue        condition;
 	protected IForStatement forStatement;
+
+	private boolean parenthesis;
 
 	public ForStatementParser(IValueConsumer field)
 	{
@@ -68,12 +74,12 @@ public class ForStatementParser extends Parser implements IValueConsumer, IVaria
 			return;
 		case FOR_START:
 			this.mode = VARIABLE;
-			if (type != BaseSymbols.OPEN_PARENTHESIS)
+			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
-				pm.reparse();
-				pm.report(token, "for.open_paren");
+				this.parenthesis = true;
+				return;
 			}
-			return;
+			// Fallthrough
 		case VARIABLE:
 			if (type == BaseSymbols.SEMICOLON)
 			{
@@ -86,18 +92,23 @@ public class ForStatementParser extends Parser implements IValueConsumer, IVaria
 			{
 				// for ( i <- ...
 				this.variable = new Variable(token.raw(), token.nameValue(), Types.UNKNOWN);
-				this.mode = SEPARATOR;
+				this.mode = VARIABLE_SEPARATOR;
 				return;
 			}
 
 			pm.pushParser(new VariableParser(this), true);
-			this.mode = SEPARATOR;
+			this.mode = VARIABLE_SEPARATOR;
 			return;
-		case SEPARATOR:
+		case VARIABLE_SEPARATOR:
 			if (type == DyvilSymbols.ARROW_LEFT)
 			{
 				this.mode = FOR_EACH_END;
-				pm.pushParser(pm.newExpressionParser(this.variable));
+				final ExpressionParser parser = pm.newExpressionParser(this.variable);
+				if (!this.parenthesis)
+				{
+					parser.addFlag(IGNORE_COLON | IGNORE_CLOSURE);
+				}
+				pm.pushParser(parser);
 				return;
 			}
 
@@ -136,27 +147,22 @@ public class ForStatementParser extends Parser implements IValueConsumer, IVaria
 
 			if (token.next().type() != BaseSymbols.SEMICOLON)
 			{
-				pm.pushParser(pm.newExpressionParser(this));
+				final ExpressionParser parser = pm.newExpressionParser(this);
+				if (!this.parenthesis)
+				{
+					parser.addFlag(IGNORE_COLON | IGNORE_CLOSURE);
+				}
+				pm.pushParser(parser);
 			}
 
 			return;
 		case FOR_END:
-			this.mode = STATEMENT;
 			this.forStatement = new ForStatement(this.position, this.variable, this.condition, this.update);
-			if (type != BaseSymbols.CLOSE_PARENTHESIS)
-			{
-				pm.reparse();
-				pm.report(token, "for.close_paren");
-			}
+			this.parseEnd(pm, token, type);
 			return;
 		case FOR_EACH_END:
-			this.mode = STATEMENT;
 			this.forStatement = new ForEachStatement(this.position, this.variable);
-			if (type != BaseSymbols.CLOSE_PARENTHESIS)
-			{
-				pm.reparse();
-				pm.report(token, "for.each.close_paren");
-			}
+			this.parseEnd(pm, token, type);
 			return;
 		case STATEMENT:
 			if (ParserUtil.isTerminator(type) && !token.isInferred())
@@ -166,11 +172,47 @@ public class ForStatementParser extends Parser implements IValueConsumer, IVaria
 				return;
 			}
 			pm.pushParser(pm.newExpressionParser(this), true);
-			this.mode = STATEMENT_END;
+			this.mode = END;
 			return;
-		case STATEMENT_END:
+		case END:
 			pm.popParser(true);
 			this.field.setValue(this.forStatement);
+		}
+	}
+
+	public void parseEnd(IParserManager pm, IToken token, int type)
+	{
+		if (!this.parenthesis)
+		{
+			switch (type)
+			{
+			case BaseSymbols.SEMICOLON:
+			case BaseSymbols.CLOSE_CURLY_BRACKET:
+				pm.reparse();
+				// Fallthrough
+			case Tokens.EOF:
+				pm.popParser();
+				this.field.setValue(this.forStatement);
+				return;
+			case BaseSymbols.COLON:
+				this.mode = END;
+				pm.pushParser(new ExpressionParser(this));
+				return;
+			case BaseSymbols.OPEN_CURLY_BRACKET:
+				pm.pushParser(new StatementListParser(this), true);
+				this.mode = END;
+				return;
+			}
+
+			pm.report(token, "for.separator");
+			return;
+		}
+
+		this.mode = STATEMENT;
+		if (type != BaseSymbols.CLOSE_PARENTHESIS)
+		{
+			pm.reparse();
+			pm.report(token, "for.close_paren");
 		}
 	}
 
@@ -191,7 +233,7 @@ public class ForStatementParser extends Parser implements IValueConsumer, IVaria
 		case FOR_END:
 			this.update = value;
 			return;
-		case STATEMENT_END:
+		case END:
 			this.forStatement.setAction(value);
 		}
 	}
