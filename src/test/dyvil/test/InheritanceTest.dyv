@@ -2,14 +2,22 @@ package dyvil.test
 
 public class InheritanceTest
 {
-	interface IFoo[T]
+	trait IFoo[T]
 	{
 		T foo()
+
+		void onFooInit()
+
+		init { this.onFooInit }
 	}
 	
-	interface IBar[T]
+	trait IBar[T]
 	{
 		T bar()
+
+		void onBarInit()
+
+		init { this.onBarInit }
 	}
 	
 	interface IFooBar[T] extends IFoo[T], IBar[T]
@@ -18,19 +26,27 @@ public class InheritanceTest
 	{
 		public override String foo() = "FooBar.foo"
 		public override String bar() = "FooBar.bar"
+
+		public override void onFooInit() {}
+		public override void onBarInit() {}
 	}
 	
 	class FooFoo implements IFoo[Object]
 	{
+		public boolean fooInit
+
 		public override Object foo() = "FooFoo.foo"
+
+		public override void onFooInit() = this.fooInit = true
 	}
 	
 	public static void main([String] args)
 	{
-		var ff = new FooFoo().foo
-		var fb = new FooBar().foo
+		var ff = new FooFoo()
+		var fb = new FooBar()
 
-		Main.test("Simple Interface Test", ff, "FooFoo.foo")
-		Main.test("Double-Layer Interface Test", fb, "FooBar.foo")
+		Main.test("Simple Interface Test", ff.foo, "FooFoo.foo")
+		Main.test("Double-Layer Interface Test", fb.foo, "FooBar.foo")
+		Main.test("Trait Initialization Test", ff.fooInit)
 	}
 }

@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.classes;
 
+import dyvil.collection.Set;
+import dyvil.collection.mutable.ArraySet;
 import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotationVisitor;
@@ -41,10 +43,13 @@ import java.io.IOException;
 
 public class CodeClass extends AbstractClass
 {
+	protected IArguments superConstructorArguments = EmptyArguments.INSTANCE;
+
+	// Metadata
 	protected IDyvilHeader  unit;
 	protected ICodePosition position;
 
-	protected IArguments superConstructorArguments = EmptyArguments.INSTANCE;
+	protected Set<IClass> traitClasses;
 
 	public CodeClass()
 	{
@@ -636,6 +641,15 @@ public class CodeClass extends AbstractClass
 	@Override
 	public void writeInit(MethodWriter writer) throws BytecodeException
 	{
+		for (IClass trait : this.getTraitClasses())
+		{
+			final String internal = trait.getInternalName();
+			writer.visitVarInsn(Opcodes.ALOAD, 0); // Load 'this'
+			writer
+				.visitMethodInsn(Opcodes.INVOKESTATIC, internal, TraitMetadata.INIT_NAME, "(L" + internal + ";)V", true);
+			// Invoke the <traitinit> method
+		}
+
 		this.metadata.writeInit(writer);
 
 		if (this.body != null)
@@ -657,6 +671,50 @@ public class CodeClass extends AbstractClass
 		for (int i = 0; i < this.compilableCount; i++)
 		{
 			this.compilables[i].writeInit(writer);
+		}
+	}
+
+	private Set<IClass> getTraitClasses()
+	{
+		if (this.traitClasses != null)
+		{
+			return this.traitClasses;
+		}
+
+		this.traitClasses = new ArraySet<>();
+		fillTraitClasses(this, this.traitClasses);
+		return this.traitClasses;
+	}
+
+	private static void fillTraitClasses(IClass iClass, Set<IClass> traitClasses)
+	{
+		for (int i = 0, count = iClass.interfaceCount(); i < count; i++)
+		{
+			final IType interfaceType = iClass.getInterface(i);
+			final IClass interfaceClass = interfaceType.getTheClass();
+			if (interfaceClass == null)
+			{
+				continue;
+			}
+
+			if (interfaceClass.hasModifier(Modifiers.TRAIT_CLASS))
+			{
+				traitClasses.add(interfaceClass);
+			}
+
+			fillTraitClasses(interfaceClass, traitClasses);
+		}
+
+		final IType superType = iClass.getSuperType();
+		if (superType == null)
+		{
+			return;
+		}
+
+		final IClass superClass = superType.getTheClass();
+		if (superClass != null)
+		{
+			fillTraitClasses(superClass, traitClasses);
 		}
 	}
 

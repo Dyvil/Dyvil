@@ -13,6 +13,8 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public class TraitMetadata extends InterfaceMetadata
 {
+	public static final String INIT_NAME = "trait$init";
+
 	public TraitMetadata(IClass theClass)
 	{
 		super(theClass);
@@ -41,7 +43,7 @@ public class TraitMetadata extends InterfaceMetadata
 	{
 		final String internalName = this.theClass.getInternalName();
 		final MethodWriter initWriter = new MethodWriterImpl(writer, writer.visitMethod(
-			Modifiers.PUBLIC | Modifiers.STATIC, "<traitinit>", "(L" + internalName + ";)V", null, null));
+			Modifiers.PUBLIC | Modifiers.STATIC, INIT_NAME, "(L" + internalName + ";)V", null, null));
 
 		initWriter.visitCode();
 		initWriter.setLocalType(0, internalName);
