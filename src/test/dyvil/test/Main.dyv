@@ -44,4 +44,12 @@ public class Main
 			throw new AssertionError(text as Object)
 		}
 	}
+
+	public static void test(String testName, boolean condition)
+	{
+		if (!condition)
+		{
+			throw new AssertionError(testName as Object)
+		}
+	}
 }

@@ -21,19 +21,19 @@ import dyvil.tools.parsing.position.ICodePosition;
 public class InitializerCall implements ICall
 {
 	protected ICodePosition position;
-	
+
 	protected boolean isSuper;
 	protected IArguments arguments = EmptyArguments.INSTANCE;
-	
+
 	// Metadata
 	protected IConstructor constructor;
-	
+
 	public InitializerCall(ICodePosition position, boolean isSuper)
 	{
 		this.position = position;
 		this.isSuper = isSuper;
 	}
-	
+
 	public InitializerCall(ICodePosition position, IConstructor constructor, IArguments arguments, boolean isSuper)
 	{
 		this.position = position;
@@ -41,72 +41,77 @@ public class InitializerCall implements ICall
 		this.arguments = arguments;
 		this.isSuper = isSuper;
 	}
-	
+
 	@Override
 	public ICodePosition getPosition()
 	{
 		return this.position;
 	}
-	
+
 	@Override
 	public void setPosition(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
 	@Override
 	public int valueTag()
 	{
 		return INITIALIZER_CALL;
 	}
-	
+
 	@Override
 	public IArguments getArguments()
 	{
 		return this.arguments;
 	}
-	
+
 	@Override
 	public void setArguments(IArguments arguments)
 	{
 		this.arguments = arguments;
 	}
-	
+
+	public boolean isSuper()
+	{
+		return this.isSuper;
+	}
+
 	@Override
 	public boolean isResolved()
 	{
 		return true;
 	}
-	
+
 	@Override
 	public IType getType()
 	{
 		return Types.VOID;
 	}
-	
+
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		return type == Types.VOID ? this : null;
 	}
-	
+
 	@Override
 	public boolean isType(IType type)
 	{
 		return type == Types.VOID;
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.arguments.resolveTypes(markers, context);
 	}
-	
+
 	@Override
 	public void checkArguments(MarkerList markers, IContext context)
 	{
-		this.constructor
-				.checkArguments(markers, this.position, context, this.constructor.getEnclosingClass().getType(), arguments);
+		this.constructor.checkArguments(markers, this.position, context, this.constructor.getEnclosingClass().getType(),
+		                                this.arguments);
 	}
 
 	@Override
@@ -132,13 +137,13 @@ public class InitializerCall implements ICall
 		if (match != null)
 		{
 			this.constructor = match;
-			this.checkArguments(markers, context);
+			this.checkArguments((MarkerList) markers, (IContext) context);
 			return this;
 		}
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public void reportResolve(MarkerList markers, IContext context)
 	{
@@ -150,7 +155,7 @@ public class InitializerCall implements ICall
 			this.arguments.typesToString(builder);
 			marker.addInfo(builder.toString());
 		}
-		
+
 		markers.add(marker);
 	}
 
@@ -159,33 +164,39 @@ public class InitializerCall implements ICall
 	{
 		this.arguments.resolve(markers, context);
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		this.arguments.checkTypes(markers, context);
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		markers.add(Markers.semanticError(this.position, "initializercall.invalid"));
+		this.checkNoError(markers, context);
+	}
+
+	public void checkNoError(MarkerList markers, IContext context)
+	{
 		this.arguments.check(markers, context);
 	}
-	
+
 	@Override
 	public IValue foldConstants()
 	{
 		this.arguments.foldConstants();
 		return this;
 	}
-	
+
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		this.arguments.foldConstants();
 		return this;
 	}
-	
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
@@ -198,7 +209,7 @@ public class InitializerCall implements ICall
 		this.constructor.writeArguments(writer, this.arguments);
 		this.constructor.writeInvoke(writer, this.getLineNumber());
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

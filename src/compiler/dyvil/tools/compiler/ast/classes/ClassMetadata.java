@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.constructor.Constructor;
 import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -40,8 +39,8 @@ public class ClassMetadata implements IClassMetadata
 
 	protected final IClass theClass;
 
-	protected IConstructor constructor;
-	protected IValue       superInitializer;
+	protected IConstructor    constructor;
+	protected InitializerCall superInitializer;
 
 	protected int members;
 
@@ -210,17 +209,15 @@ public class ClassMetadata implements IClassMetadata
 			return;
 		}
 
+		this.superInitializer = (InitializerCall) new InitializerCall(this.theClass.getPosition(), null,
+		                                                              this.theClass.getSuperConstructorArguments(),
+		                                                              true).resolve(markers, this.constructor);
+		this.constructor.setInitializer(this.superInitializer);
+
 		final StatementList constructorBody = new StatementList();
-		final InitializerCall initializerCall = new InitializerCall(this.theClass.getPosition(), null,
-		                                                            this.theClass.getSuperConstructorArguments(), true);
-
-		this.superInitializer = initializerCall.resolve(markers, this.constructor);
-		constructorBody.addValue(this.superInitializer);
-
 		for (int i = 0, count = this.theClass.parameterCount(); i < count; i++)
 		{
-			IParameter param = this.constructor.getParameter(i);
-			constructorBody.addValue(new ClassParameterSetter(this.theClass, param));
+			constructorBody.addValue(new ClassParameterSetter(this.theClass, this.constructor.getParameter(i)));
 		}
 
 		this.constructor.setValue(constructorBody);
@@ -240,7 +237,7 @@ public class ClassMetadata implements IClassMetadata
 	{
 		if ((this.members & CONSTRUCTOR) == 0)
 		{
-			this.superInitializer.check(markers, this.constructor);
+			this.superInitializer.checkNoError(markers, this.constructor);
 		}
 	}
 

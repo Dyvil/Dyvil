@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.classes;
 
+import dyvil.collection.Set;
+import dyvil.collection.mutable.ArraySet;
 import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotationVisitor;
@@ -41,10 +43,13 @@ import java.io.IOException;
 
 public class CodeClass extends AbstractClass
 {
+	protected IArguments superConstructorArguments = EmptyArguments.INSTANCE;
+
+	// Metadata
 	protected IDyvilHeader  unit;
 	protected ICodePosition position;
 
-	protected IArguments superConstructorArguments = EmptyArguments.INSTANCE;
+	protected boolean traitInit;
 
 	public CodeClass()
 	{
@@ -560,6 +565,18 @@ public class CodeClass extends AbstractClass
 			}
 		}
 
+		// Compute Trait Classes
+		final Set<IClass> traitClasses;
+		if ((modifiers & Modifiers.INTERFACE_CLASS) == 0)
+		{
+			traitClasses = new ArraySet<>();
+			this.traitInit = !fillTraitClasses(this, traitClasses, true) && !traitClasses.isEmpty();
+		}
+		else
+		{
+			traitClasses = null;
+		}
+
 		// Class Body
 
 		this.metadata.write(writer);
@@ -609,12 +626,83 @@ public class CodeClass extends AbstractClass
 		}
 
 		// Create the static <clinit> method
+		MethodWriter initWriter = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.STATIC, "<clinit>", "()V",
+		                                                                          null, null));
+		initWriter.visitCode();
+		this.writeStaticInit(initWriter);
+		initWriter.visitEnd(Types.VOID);
 
-		MethodWriter mw = new MethodWriterImpl(writer,
-		                                       writer.visitMethod(Modifiers.STATIC, "<clinit>", "()V", null, null));
-		mw.visitCode();
-		this.writeStaticInit(mw);
-		mw.visitEnd(Types.VOID);
+		if (traitClasses == null || traitClasses.isEmpty())
+		{
+			return;
+		}
+
+		// Create the virtual <traitinit> method
+
+		initWriter = new MethodWriterImpl(writer, writer
+			                                          .visitMethod(Modifiers.PROTECTED, TraitMetadata.INIT_NAME, "()V",
+			                                                       null, null));
+		initWriter.visitCode();
+		initWriter.setLocalType(0, this.getInternalName());
+
+		for (IClass traitClass : traitClasses)
+		{
+			final String internal = traitClass.getInternalName();
+
+			// Load 'this'
+			initWriter.visitVarInsn(Opcodes.ALOAD, 0);
+
+			// Invoke the static <traitinit> method of the trait class
+			initWriter.visitMethodInsn(Opcodes.INVOKESTATIC, internal, TraitMetadata.INIT_NAME, "(L" + internal + ";)V",
+			                           true);
+		}
+
+		initWriter.visitInsn(Opcodes.RETURN);
+		initWriter.visitEnd();
+	}
+
+	/**
+	 * Fills the list of traits and returns a status. If {@code top} is true, the returned value represents whether or
+	 * not the super type of the given class has traits
+	 *
+	 * @param currentClass
+	 * 	the current class to process
+	 * @param traitClasses
+	 * 	the list of trait classes
+	 * @param top
+	 * 	{@code true} if this is the top call
+	 */
+	private static boolean fillTraitClasses(IClass currentClass, Set<IClass> traitClasses, boolean top)
+	{
+		boolean traits = false;
+		for (int i = 0, count = currentClass.interfaceCount(); i < count; i++)
+		{
+			final IType interfaceType = currentClass.getInterface(i);
+			final IClass interfaceClass = interfaceType.getTheClass();
+			if (interfaceClass == null)
+			{
+				continue;
+			}
+
+			if (interfaceClass.hasModifier(Modifiers.TRAIT_CLASS))
+			{
+				traitClasses.add(interfaceClass);
+				traits = true;
+			}
+
+			fillTraitClasses(interfaceClass, traitClasses, false);
+		}
+
+		final IType superType = currentClass.getSuperType();
+		final IClass superClass;
+		if (superType == null || (superClass = superType.getTheClass()) == null)
+		{
+			return traits && !top;
+		}
+
+		return top ?
+			       fillTraitClasses(superClass, traitClasses, false) :
+			       traits || fillTraitClasses(superClass, traitClasses, false);
 	}
 
 	private void writeClassParameters(ClassWriter writer) throws BytecodeException
@@ -636,6 +724,14 @@ public class CodeClass extends AbstractClass
 	@Override
 	public void writeInit(MethodWriter writer) throws BytecodeException
 	{
+		if (this.traitInit)
+		{
+			writer.visitVarInsn(Opcodes.ALOAD, 0); // Load 'this'
+			writer
+				.visitMethodInsn(Opcodes.INVOKEVIRTUAL, this.getInternalName(), TraitMetadata.INIT_NAME, "()V", false);
+			// Invoke the virtual <traitinit> method of this class
+		}
+
 		this.metadata.writeInit(writer);
 
 		if (this.body != null)

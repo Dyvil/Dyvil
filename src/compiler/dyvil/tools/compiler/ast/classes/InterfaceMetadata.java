@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.classes;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
+import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.IField;
@@ -16,7 +18,7 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class InterfaceMetadata implements IClassMetadata
 {
-	private final IClass theClass;
+	protected final IClass theClass;
 
 	public InterfaceMetadata(IClass theClass)
 	{
@@ -31,10 +33,25 @@ public class InterfaceMetadata implements IClassMetadata
 			return;
 		}
 
+		if (this.theClass.parameterCount() > 0)
+		{
+			markers.add(Markers.semanticError(this.theClass.getPosition(), "interface.classparameters"));
+		}
+
 		final IClassBody classBody = this.theClass.getBody();
 		if (classBody == null)
 		{
 			return;
+		}
+
+		for (int i = 0, count = classBody.constructorCount(); i < count; i++)
+		{
+			this.processConstructor(classBody.getConstructor(i), markers);
+		}
+
+		for (int i = 0, count = classBody.initializerCount(); i < count; i++)
+		{
+			this.processInitializer(classBody.getInitializer(i), markers);
 		}
 
 		for (int i = 0, count = classBody.fieldCount(); i < count; i++)
@@ -64,6 +81,16 @@ public class InterfaceMetadata implements IClassMetadata
 		{
 			markers.add(Markers.semantic(member.getPosition(), "interface.member.public", member.getName()));
 		}
+	}
+
+	protected void processInitializer(IInitializer initializer, MarkerList markers)
+	{
+		markers.add(Markers.semanticError(initializer.getPosition(), "interface.initializer"));
+	}
+
+	protected void processConstructor(IConstructor constructor, MarkerList markers)
+	{
+		markers.add(Markers.semanticError(constructor.getPosition(), "interface.constructor"));
 	}
 
 	protected void processMethod(IMethod method, MarkerList markers)

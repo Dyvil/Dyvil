@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.access.InitializerCall;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -54,7 +55,8 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 	protected IType[] exceptions;
 	protected int     exceptionCount;
 
-	protected IValue value;
+	protected IValue          value;
+	protected InitializerCall initializerCall;
 
 	// Metadata
 	protected IClass enclosingClass;
@@ -224,15 +226,27 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 	}
 
 	@Override
-	public void setValue(IValue statement)
+	public InitializerCall getInitializer()
 	{
-		this.value = statement;
+		return this.initializerCall;
+	}
+
+	@Override
+	public void setInitializer(InitializerCall initializer)
+	{
+		this.initializerCall = initializer;
 	}
 
 	@Override
 	public IValue getValue()
 	{
 		return this.value;
+	}
+
+	@Override
+	public void setValue(IValue statement)
+	{
+		this.value = statement;
 	}
 
 	@Override
@@ -277,8 +291,6 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 			this.exceptions[i].resolve(markers, context);
 		}
 
-		this.resolveSuperConstructors(markers);
-
 		if (this.value != null)
 		{
 			this.value = this.value.resolve(markers, context);
@@ -296,6 +308,8 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 			}
 		}
 
+		this.resolveSuperConstructors(markers);
+
 		context.pop();
 	}
 
@@ -303,16 +317,22 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 	{
 		if (this.value.valueTag() == IValue.INITIALIZER_CALL)
 		{
+			this.initializerCall = (InitializerCall) this.value;
+			this.value = null;
 			return;
 		}
 		if (this.value.valueTag() == IValue.STATEMENT_LIST)
 		{
-			StatementList sl = (StatementList) this.value;
-			int count = sl.valueCount();
-			for (int i = 0; i < count; i++)
+			final StatementList statementList = (StatementList) this.value;
+			if (statementList.valueCount() > 0)
 			{
-				if (sl.getValue(i).valueTag() == IValue.INITIALIZER_CALL)
+				final IValue firstValue = statementList.getValue(0);
+				if (firstValue.valueTag() == IValue.INITIALIZER_CALL)
 				{
+					// We can't simply remove the value from the Statement List, so we replace it with a void statement
+					statementList.setValue(0, new VoidValue(firstValue.getPosition()));
+
+					this.initializerCall = (InitializerCall) firstValue;
 					return;
 				}
 			}
@@ -333,8 +353,7 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 			return;
 		}
 
-		this.value = Util.prependValue(new InitializerCall(this.position, match, EmptyArguments.INSTANCE, true),
-		                               this.value);
+		this.initializerCall = new InitializerCall(this.position, match, EmptyArguments.INSTANCE, true);
 	}
 
 	@Override
@@ -354,13 +373,14 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 			this.exceptions[i].checkType(markers, context, TypePosition.RETURN_TYPE);
 		}
 
+		if (this.initializerCall != null)
+		{
+			this.initializerCall.checkTypes(markers, context);
+		}
+
 		if (this.value != null)
 		{
 			this.value.checkTypes(markers, context);
-		}
-		else
-		{
-			markers.add(Markers.semanticError(this.position, "constructor.abstract"));
 		}
 
 		context.pop();
@@ -391,13 +411,18 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 			}
 		}
 
+		if (this.initializerCall != null)
+		{
+			this.initializerCall.checkNoError(markers, context);
+		}
+
 		if (this.value != null)
 		{
 			this.value.check(markers, this);
 		}
-		else if (!this.modifiers.hasIntModifier(Modifiers.ABSTRACT) && !this.enclosingClass.isAbstract())
+		else if (this.initializerCall != null)
 		{
-			markers.add(Markers.semantic(this.position, "constructor.unimplemented", this.name));
+			markers.add(Markers.semanticError(this.position, "constructor.abstract"));
 		}
 
 		if (this.isStatic())
@@ -426,6 +451,10 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 			this.exceptions[i].foldConstants();
 		}
 
+		if (this.initializerCall != null)
+		{
+			this.initializerCall.foldConstants();
+		}
 		if (this.value != null)
 		{
 			this.value = this.value.foldConstants();
@@ -449,6 +478,10 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 			this.exceptions[i].cleanup(context, compilableList);
 		}
 
+		if (this.initializerCall != null)
+		{
+			this.initializerCall.cleanup(context, compilableList);
+		}
 		if (this.value != null)
 		{
 			this.value = this.value.cleanup(context, compilableList);
@@ -738,56 +771,63 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		int modifiers = this.modifiers.toFlags() & ModifierUtil.JAVA_MODIFIER_MASK;
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, "<init>", this.getDescriptor(),
-		                                                                  this.getSignature(), this.getExceptions()));
+		final int modifiers = this.modifiers.toFlags() & ModifierUtil.JAVA_MODIFIER_MASK;
+		final MethodWriter methodWriter = new MethodWriterImpl(writer, writer.visitMethod(modifiers, "<init>",
+		                                                                                  this.getDescriptor(),
+		                                                                                  this.getSignature(),
+		                                                                                  this.getExceptions()));
 
-		mw.setThisType(this.enclosingClass.getInternalName());
+		// Write Modifiers and Annotations
+		ModifierUtil.writeModifiers(methodWriter, this.modifiers);
 
 		if (this.annotations != null)
 		{
-			int count = this.annotations.annotationCount();
-			for (int i = 0; i < count; i++)
-			{
-				this.annotations.getAnnotation(i).write(mw);
-			}
+			this.annotations.write(methodWriter);
 		}
 
 		if ((modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{
-			mw.visitAnnotation(Deprecation.DYVIL_EXTENDED, true);
+			methodWriter.visitAnnotation(Deprecation.DYVIL_EXTENDED, true);
 		}
 
+		// Write Parameters
+		methodWriter.setThisType(this.enclosingClass.getInternalName());
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].writeInit(mw);
+			this.parameters[i].writeInit(methodWriter);
 		}
 
-		Label start = new Label();
-		Label end = new Label();
+		// Write Code
+		final Label start = new Label();
+		final Label end = new Label();
 
-		mw.visitCode();
-		mw.visitLabel(start);
+		methodWriter.visitCode();
+		methodWriter.visitLabel(start);
+
+		if (this.initializerCall != null)
+		{
+			this.initializerCall.writeExpression(methodWriter, Types.VOID);
+		}
+
+		if (this.initializerCall == null || this.initializerCall.isSuper())
+		{
+			this.enclosingClass.writeInit(methodWriter);
+		}
 
 		if (this.value != null)
 		{
-			this.value.writeExpression(mw, Types.VOID);
+			this.value.writeExpression(methodWriter, Types.VOID);
 		}
-		this.enclosingClass.writeInit(mw);
 
-		mw.visitLabel(end);
-		mw.visitEnd(Types.VOID);
+		methodWriter.visitLabel(end);
+		methodWriter.visitEnd(Types.VOID);
 
-		if ((modifiers & Modifiers.STATIC) == 0)
-		{
-			mw.visitLocalVariable("this", 'L' + this.enclosingClass.getInternalName() + ';', null, start, end, 0);
-		}
+		// Write Local Variable Data
+		methodWriter.visitLocalVariable("this", 'L' + this.enclosingClass.getInternalName() + ';', null, start, end, 0);
 
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			IParameter param = this.parameters[i];
-			mw.visitLocalVariable(param.getName().qualified, param.getDescription(), param.getSignature(), start, end,
-			                      param.getLocalIndex());
+			this.parameters[i].writeLocal(methodWriter, start, end);
 		}
 	}
 

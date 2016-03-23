@@ -11,7 +11,11 @@ import dyvil.tools.parsing.position.ICodePosition;
 public class VoidValue implements IConstantValue
 {
 	protected ICodePosition position;
-	
+
+	public VoidValue()
+	{
+	}
+
 	public VoidValue(ICodePosition position)
 	{
 		this.position = position;
@@ -34,13 +38,25 @@ public class VoidValue implements IConstantValue
 	{
 		this.position = position;
 	}
-	
+
+	@Override
+	public boolean isStatement()
+	{
+		return true;
+	}
+
+	@Override
+	public boolean isUsableAsStatement()
+	{
+		return true;
+	}
+
 	@Override
 	public IType getType()
 	{
 		return Types.VOID;
 	}
-	
+
 	@Override
 	public int stringSize()
 	{
