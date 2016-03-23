@@ -8,26 +8,23 @@ public class InheritanceTest
 
 		init { this.onFooInit }
 	}
-	
+
 	trait IBar[T]
 	{
 		T bar()
-
-		void onBarInit()
-
-		init { this.onBarInit }
 	}
-	
+
 	interface IFooBar[T] extends IFoo, IBar[T]
-	
+
 	class FooBar implements IFooBar[String]
 	{
 		public override String bar() = "FooBar.bar"
 
 		public override void onFooInit() {}
-		public override void onBarInit() {}
 	}
-	
+
+	// Double-Layer Trait Initialization
+
 	class Foo1 implements IFoo
 	{
 		public boolean fooInit
@@ -41,7 +38,32 @@ public class InheritanceTest
 
 		public override void onFooInit() = this.foo2Init++
 	}
-	
+
+	// Trait Constructor Test
+
+	trait WithName
+	{
+		String name
+		{
+			abstract get
+			abstract set
+
+			init
+			{
+				this.name = ""
+			}
+		}
+	}
+
+	class Person(String name) implements WithName
+	{
+		public override String name
+		{
+			get: return this.name
+			set: this.name = newValue
+		}
+	}
+
 	public static void main([String] args)
 	{
 		var foo1 = new Foo1
@@ -53,5 +75,8 @@ public class InheritanceTest
 
 		// Check that Foo2.onFooInit has only been called once
 		Main.test("Double-Layer Trait Initialization Test", 1, foo2.foo2Init)
+
+		var person = new Person("Test Subject")
+		Main.test("Trait Constructor Test", "Test Subject", person.name)
 	}
 }

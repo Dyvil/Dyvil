@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.constructor;
 
+import dyvil.tools.compiler.ast.access.InitializerCall;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.MemberKind;
@@ -20,6 +21,10 @@ public interface IConstructor extends IClassMember, ICallableMember, ICallableSi
 	{
 		return MemberKind.CONSTRUCTOR;
 	}
+
+	InitializerCall getInitializer();
+
+	void setInitializer(InitializerCall initializer);
 
 	float getSignatureMatch(IArguments arguments);
 	

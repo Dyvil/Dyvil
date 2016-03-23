@@ -29,6 +29,30 @@ public class ConstructorTest
 
 	case object O extends A(1, 1)
 
+	class InitOrder
+	{
+		List[String] order = MutableList.[String]
+
+		String s = { this.order += "init s" ; null }
+		int i
+
+		init
+		{
+			this.order += "init block"
+		}
+
+		public init()
+		{
+			this.init(1)
+			this.order += "init() body"
+		}
+
+		public init(int value)
+		{
+			this.order += "init(int) body"
+		}
+	}
+
 	public init()
 	{
 	}
@@ -64,5 +88,8 @@ public class ConstructorTest
 		Main.test("O", o, O)
 		Main.test("O.i", oa.i, 1)
 		Main.test("O.j", oa.j, 1)
+
+		var initOrder = new InitOrder
+		Main.test("Initialization Order", [ "init s", "init block", "init(int) body", "init() body" ] as List, initOrder.order)
 	}
 }
