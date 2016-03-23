@@ -13,10 +13,9 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.transform.Deprecation;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -35,13 +34,19 @@ public class ClassType implements IRawType
 	{
 		this.theClass = iclass;
 	}
-	
+
 	@Override
 	public int typeTag()
 	{
 		return CLASS;
 	}
-	
+
+	@Override
+	public IType atPosition(ICodePosition position)
+	{
+		return new ResolvedClassType(this.theClass, position);
+	}
+
 	// Names
 	
 	@Override
@@ -82,21 +87,6 @@ public class ClassType implements IRawType
 	public IType resolveType(MarkerList markers, IContext context)
 	{
 		return this;
-	}
-	
-	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
-	{
-		IClass iclass = this.theClass;
-		if (iclass != null)
-		{
-			Deprecation.checkAnnotations(markers, this.getPosition(), iclass);
-
-			if (IContext.getVisibility(context, iclass) == IContext.INTERNAL)
-			{
-				markers.add(Markers.semantic(this.getPosition(), "type.access.internal", iclass.getName()));
-			}
-		}
 	}
 	
 	// IContext

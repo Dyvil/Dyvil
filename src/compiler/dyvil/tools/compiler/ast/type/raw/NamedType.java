@@ -113,7 +113,7 @@ public class NamedType implements IRawType, ITypeConsumer
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
-		IType resolved = resolveType0(markers, context);
+		final IType resolved = this.resolveType0(markers, context);
 		// If the type is not a Type Variable Reference
 		if (resolved.getTypeVariable() == null && resolved != Types.UNKNOWN)
 		{

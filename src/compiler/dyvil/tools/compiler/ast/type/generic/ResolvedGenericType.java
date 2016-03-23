@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.type.generic;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.Marker;
@@ -46,6 +47,12 @@ public class ResolvedGenericType extends ClassGenericType
 	@Override
 	public void checkType(MarkerList markers, IContext context, TypePosition position)
 	{
+		final IClass theClass = this.theClass;
+		if (theClass != null)
+		{
+			ModifierUtil.checkVisibility(theClass, this.position, markers, context);
+		}
+
 		// Check if the Type Variable Bounds accept the supplied Type Arguments
 		for (int i = 0; i < this.typeArgumentCount; i++)
 		{

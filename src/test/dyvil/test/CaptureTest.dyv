@@ -19,7 +19,7 @@ public class CaptureTest
 		Main.test("Lambda Capture", (1, 2, 3, -1), res)
 	}
 	
-	private class ThisCapture
+	class ThisCapture
 	{
 		public Object anonymous() = new Object {
 			public override String toString() = this[ThisCapture].toString

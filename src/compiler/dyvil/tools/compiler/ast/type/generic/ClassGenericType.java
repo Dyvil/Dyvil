@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.type.generic;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
-import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -12,10 +11,8 @@ import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.transform.Deprecation;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -45,6 +42,12 @@ public class ClassGenericType extends GenericType
 	public int typeTag()
 	{
 		return GENERIC;
+	}
+
+	@Override
+	public IType atPosition(ICodePosition position)
+	{
+		return new ResolvedGenericType(position, this.theClass, this.typeArguments, this.typeArgumentCount);
 	}
 
 	// ITypeList Overrides
@@ -138,23 +141,6 @@ public class ClassGenericType extends GenericType
 	public boolean isResolved()
 	{
 		return true;
-	}
-
-	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
-	{
-		IClass iclass = this.theClass;
-		if (iclass != null)
-		{
-			Deprecation.checkAnnotations(markers, this.getPosition(), iclass);
-
-			if (IContext.getVisibility(context, iclass) == IContext.INTERNAL)
-			{
-				markers.add(Markers.semantic(this.getPosition(), "type.access.internal", iclass.getName()));
-			}
-		}
-
-		super.checkType(markers, context, position);
 	}
 
 	@Override
