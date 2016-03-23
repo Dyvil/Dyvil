@@ -10,6 +10,7 @@ import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public class TraitMetadata extends InterfaceMetadata
 {
@@ -22,6 +23,12 @@ public class TraitMetadata extends InterfaceMetadata
 
 	@Override
 	protected void processInitializer(IInitializer initializer, MarkerList markers)
+	{
+		// No error
+	}
+
+	@Override
+	protected void processPropertyInitializer(ICodePosition position, MarkerList markers)
 	{
 		// No error
 	}

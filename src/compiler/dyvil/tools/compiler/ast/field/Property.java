@@ -274,11 +274,6 @@ public class Property extends Member implements IProperty
 		if (this.initializer != null)
 		{
 			this.initializer.check(markers, context);
-
-			if (this.enclosingClass.hasModifier(Modifiers.INTERFACE_CLASS))
-			{
-				markers.add(Markers.semantic(this.initializerPosition, "property.initializer.interface"));
-			}
 		}
 	}
 
