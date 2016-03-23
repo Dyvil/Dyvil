@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.modifiers;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.token.IToken;
 
 public enum BaseModifiers implements Modifier
@@ -104,6 +105,7 @@ public enum BaseModifiers implements Modifier
 		case DyvilKeywords.SYNCHRONIZED:
 			return SYNCHRONIZED;
 		case DyvilKeywords.FUNCTIONAL:
+			parserManager.report(Markers.syntaxWarning(token, "modifier.functional.deprecated"));
 			return FUNCTIONAL;
 		case DyvilKeywords.CONST:
 			return CONST;

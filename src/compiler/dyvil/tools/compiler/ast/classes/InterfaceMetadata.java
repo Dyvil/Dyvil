@@ -97,7 +97,7 @@ public class InterfaceMetadata implements IClassMetadata
 			this.processMethod(getter, markers);
 		}
 
-		final IMethod setter = property.getGetter();
+		final IMethod setter = property.getSetter();
 		if (setter != null)
 		{
 			this.processMethod(setter, markers);
