@@ -52,7 +52,7 @@ public final class DyvilUnitParser extends DyvilHeaderParser
 			// Fallthrough
 		case CLASS:
 			final int classType;
-			if ((classType = ModifierUtil.readClassTypeModifier(token, pm)) >= 0)
+			if ((classType = ModifierUtil.parseClassTypeModifier(token, pm)) >= 0)
 			{
 				if (this.modifiers == null)
 				{

@@ -4,10 +4,10 @@ import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
 import dyvil.tools.compiler.ast.modifiers.Modifier;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
+import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
@@ -66,7 +66,7 @@ public class PropertyParser extends Parser implements IValueConsumer
 			}
 			
 			final Modifier modifier;
-			if ((modifier = BaseModifiers.parseModifier(token, pm)) != null)
+			if ((modifier = ModifierUtil.parseModifier(token, pm)) != null)
 			{
 				if (this.modifiers == null)
 				{

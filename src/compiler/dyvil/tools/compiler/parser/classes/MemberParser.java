@@ -12,7 +12,6 @@ import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IExceptionList;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
 import dyvil.tools.compiler.ast.modifiers.Modifier;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
@@ -157,14 +156,14 @@ public final class MemberParser extends Parser implements ITypeConsumer
 			}
 
 			Modifier modifier;
-			if ((modifier = BaseModifiers.parseModifier(token, pm)) != null)
+			if ((modifier = ModifierUtil.parseModifier(token, pm)) != null)
 			{
 				this.modifiers.addModifier(modifier);
 				return;
 			}
 
 			int classType;
-			if ((classType = ModifierUtil.readClassTypeModifier(token, pm)) >= 0)
+			if ((classType = ModifierUtil.parseClassTypeModifier(token, pm)) >= 0)
 			{
 				this.modifiers.addIntModifier(classType);
 				ClassDeclarationParser parser = new ClassDeclarationParser(this.consumer, this.modifiers,

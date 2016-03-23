@@ -23,7 +23,7 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 	@Override
 	void setValue(IValue value);
 	
-	IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context);
+	IValue checkAccess(MarkerList markers, ICodePosition position, IValue receiver, IContext context);
 	
 	default IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue receiver, IValue newValue)
 	{

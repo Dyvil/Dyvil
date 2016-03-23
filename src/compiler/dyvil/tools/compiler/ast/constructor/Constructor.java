@@ -699,17 +699,7 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 	@Override
 	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IArguments arguments)
 	{
-		Deprecation.checkAnnotations(markers, position, this);
-
-		switch (IContext.getVisibility(context, this))
-		{
-		case INTERNAL:
-			markers.add(Markers.semantic(position, "constructor.access.internal", this.enclosingClass.getName()));
-			break;
-		case INVISIBLE:
-			markers.add(Markers.semantic(position, "constructor.access.invisible", this.enclosingClass.getName()));
-			break;
-		}
+		ModifierUtil.checkVisibility(this, position, markers, context);
 
 		for (int i = 0; i < this.exceptionCount; i++)
 		{

@@ -175,18 +175,7 @@ public class Field extends Member implements IField
 			}
 		}
 
-		Deprecation.checkAnnotations(markers, position, this);
-
-		switch (IContext.getVisibility(context, this))
-		{
-		case IContext.INTERNAL:
-			markers.add(Markers.semantic(position, "field.access.internal", this.name));
-			break;
-		case IContext.INVISIBLE:
-			markers.add(Markers.semantic(position, "field.access.invisible", this.name));
-			break;
-		}
-
+		ModifierUtil.checkVisibility(this, position, markers, context);
 		return receiver;
 	}
 

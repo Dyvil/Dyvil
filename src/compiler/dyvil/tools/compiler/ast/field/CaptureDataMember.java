@@ -142,14 +142,14 @@ public abstract class CaptureDataMember implements IDataMember
 	}
 
 	@Override
-	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context)
+	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue receiver, IContext context)
 	{
 		if (this.accessPosition == null)
 		{
 			this.accessPosition = position;
 		}
 
-		return this.variable.checkAccess(markers, position, instance, context);
+		return this.variable.checkAccess(markers, position, receiver, context);
 	}
 
 	@Override

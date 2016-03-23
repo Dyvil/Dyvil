@@ -27,17 +27,17 @@ public final class Deprecation
 	public static final Name Deprecated   = Name.getQualified("Deprecated");
 	public static final Name Experimental = Name.getQualified("Experimental");
 	public static final Name UsageInfo    = Name.getQualified("UsageInfo");
-	
+
 	public static final String JAVA_INTERNAL  = "java/lang/Deprecated";
 	public static final String DYVIL_INTERNAL = "dyvil/annotation/Deprecated";
 	public static final String DYVIL_EXTENDED = 'L' + DYVIL_INTERNAL + ';';
-	
+
 	public static final IClass DEPRECATED_CLASS   = Package.dyvilAnnotation.resolveClass(Deprecated);
 	public static final IClass EXPERIMENTAL_CLASS = Package.dyvilAnnotation.resolveClass(Experimental);
 	public static final IClass USAGE_INFO_CLASS   = Package.dyvilAnnotation.resolveClass(UsageInfo);
 
 	public static final IType DEPRECATED = new ClassType(DEPRECATED_CLASS);
-	
+
 	private static final IParameter DEP_VALUE_PARAM        = DEPRECATED_CLASS.getParameter(0);
 	private static final IParameter DEP_DESCRIPTION_PARAM  = DEPRECATED_CLASS.getParameter(1);
 	private static final IParameter DEP_SINCE_PARAM        = DEPRECATED_CLASS.getParameter(2);
@@ -57,28 +57,29 @@ public final class Deprecation
 	public static final String MEMBER_KIND = "{member.kind}";
 	public static final String MEMBER_NAME = "{member.name}";
 	public static final String STAGE       = "{stage}";
+	public static final String SINCE       = "{stage}";
 
-	public static void checkAnnotations(MarkerList markers, ICodePosition position, IMember member)
+	public static void checkAnnotations(IMember member, ICodePosition position, MarkerList markers)
 	{
 		if (member.hasModifier(Modifiers.DEPRECATED))
 		{
-			checkDeprecation(markers, position, member);
+			checkDeprecation(member, position, markers);
 		}
 
 		IAnnotation annotation = member.getAnnotation(EXPERIMENTAL_CLASS);
 		if (annotation != null)
 		{
-			checkExperimental(markers, position, member, annotation);
+			checkExperimental(member, position, markers, annotation);
 		}
 
 		annotation = member.getAnnotation(USAGE_INFO_CLASS);
 		if (annotation != null)
 		{
-			checkUsageInfo(markers, position, member, annotation);
+			checkUsageInfo(member, position, markers, annotation);
 		}
 	}
 
-	private static void checkDeprecation(MarkerList markers, ICodePosition position, IMember member)
+	private static void checkDeprecation(IMember member, ICodePosition position, MarkerList markers)
 	{
 		IAnnotation annotation = member.getAnnotation(DEPRECATED_CLASS);
 		if (annotation == null)
@@ -99,9 +100,7 @@ public final class Deprecation
 		String description = getStringValue(arguments, DEP_DESCRIPTION_PARAM);
 		String since = getStringValue(arguments, DEP_SINCE_PARAM);
 
-		value = value.replace(MEMBER_KIND, Markers.getSemantic("member." + member.getKind().getName()))
-		             .replace(MEMBER_NAME, member.getName().toString()) //
-		             .replace("{since}", since);
+		value = replaceMember(member, value).replace(SINCE, since);
 
 		Marker marker = Markers.withText(position, markerLevel, value);
 		assert marker != null;
@@ -158,7 +157,13 @@ public final class Deprecation
 		markers.add(marker);
 	}
 
-	private static void checkExperimental(MarkerList markers, ICodePosition position, IMember member, IAnnotation annotation)
+	private static String replaceMember(IMember member, String value)
+	{
+		return value.replace(MEMBER_KIND, Markers.getSemantic("member." + member.getKind().getName()))
+		            .replace(MEMBER_NAME, member.getName().toString());
+	}
+
+	private static void checkExperimental(IMember member, ICodePosition position, MarkerList markers, IAnnotation annotation)
 	{
 		IArguments arguments = annotation.getArguments();
 
@@ -173,8 +178,7 @@ public final class Deprecation
 		Stage stage = getEnumValue(arguments, EXP_STAGE_PARAM, Stage.class);
 		assert stage != null;
 
-		value = value.replace(MEMBER_KIND, Markers.getSemantic("member." + member.getKind().getName()))
-		             .replace(MEMBER_NAME, member.getName().toString()).replace(STAGE, stage.toString());
+		value = replaceMember(member, value).replace(STAGE, stage.toString());
 
 		Marker marker = Markers.withText(position, markerLevel, value);
 		assert marker != null;
@@ -191,7 +195,7 @@ public final class Deprecation
 		markers.add(marker);
 	}
 
-	private static void checkUsageInfo(MarkerList markers, ICodePosition position, IMember member, IAnnotation annotation)
+	private static void checkUsageInfo(IMember member, ICodePosition position, MarkerList markers, IAnnotation annotation)
 	{
 		IArguments arguments = annotation.getArguments();
 
@@ -204,8 +208,7 @@ public final class Deprecation
 		String value = getStringValue(arguments, INF_VALUE_PARAM);
 		String description = getStringValue(arguments, INF_DESCRIPTION_PARAM);
 
-		value = value.replace(MEMBER_KIND, Markers.getSemantic("member." + member.getKind().getName()))
-		             .replace(MEMBER_NAME, member.getName().toString());
+		value = replaceMember(member, value);
 
 		Marker marker = Markers.withText(position, markerLevel, value);
 		assert marker != null;
@@ -218,7 +221,7 @@ public final class Deprecation
 
 		markers.add(marker);
 	}
-	
+
 	private static <T extends Enum<T>> T getEnumValue(IArguments arguments, IParameter parameter, Class<T> type)
 	{
 		IValue value = arguments.getValue(parameter.getIndex(), parameter);
@@ -226,7 +229,7 @@ public final class Deprecation
 		{
 			value = parameter.getValue();
 		}
-		
+
 		if (value.valueTag() == IValue.ENUM_ACCESS)
 		{
 			EnumValue enumValue = (EnumValue) value;
@@ -234,7 +237,7 @@ public final class Deprecation
 		}
 		return null;
 	}
-	
+
 	private static String getStringValue(IArguments arguments, IParameter parameter)
 	{
 		IValue value = arguments.getValue(parameter.getIndex(), parameter);
@@ -242,11 +245,11 @@ public final class Deprecation
 		{
 			value = parameter.getValue();
 		}
-		
+
 		assert value.valueTag() == IValue.STRING;
 		return value.stringValue();
 	}
-	
+
 	private static Reason[] getReasons(IArguments arguments)
 	{
 		IValue value = arguments.getValue(DEP_REASONS_PARAM.getIndex(), DEP_REASONS_PARAM);
@@ -254,16 +257,16 @@ public final class Deprecation
 		{
 			return null;
 		}
-		
+
 		assert value.valueTag() == IValue.ARRAY;
 		ArrayExpr array = (ArrayExpr) value;
 		int size = array.valueCount();
-		
+
 		if (size <= 0)
 		{
 			return null;
 		}
-		
+
 		Reason[] reasons = new Reason[size];
 		for (int i = 0; i < size; i++)
 		{
@@ -272,10 +275,10 @@ public final class Deprecation
 			EnumValue enumValue = (EnumValue) element;
 			reasons[i] = Reason.valueOf(enumValue.name.qualified);
 		}
-		
+
 		return reasons;
 	}
-	
+
 	private static String[] getReplacements(IArguments arguments)
 	{
 		IValue value = arguments.getValue(DEP_REPLACEMENTS_PARAM.getIndex(), DEP_REPLACEMENTS_PARAM);
@@ -283,16 +286,16 @@ public final class Deprecation
 		{
 			return null;
 		}
-		
+
 		assert value.valueTag() == IValue.ARRAY;
 		ArrayExpr array = (ArrayExpr) value;
 		int size = array.valueCount();
-		
+
 		if (size <= 0)
 		{
 			return null;
 		}
-		
+
 		String[] replacements = new String[size];
 		for (int i = 0; i < size; i++)
 		{
@@ -300,7 +303,7 @@ public final class Deprecation
 			assert element.valueTag() == IValue.STRING;
 			replacements[i] = element.stringValue();
 		}
-		
+
 		return replacements;
 	}
 }

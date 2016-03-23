@@ -24,6 +24,7 @@ import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
+import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
@@ -800,17 +801,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext)
 	{
-		Deprecation.checkAnnotations(markers, position, this);
-
-		switch (IContext.getVisibility(context, this))
-		{
-		case IContext.INTERNAL:
-			markers.add(Markers.semantic(position, "method.access.internal", this.name));
-			break;
-		case IContext.INVISIBLE:
-			markers.add(Markers.semantic(position, "method.access.invisible", this.name));
-			break;
-		}
+		ModifierUtil.checkVisibility(this, position, markers, context);
 
 		if (instance != null)
 		{

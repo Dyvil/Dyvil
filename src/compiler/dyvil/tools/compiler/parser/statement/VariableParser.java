@@ -6,10 +6,7 @@ import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.consumer.IVariableConsumer;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.field.Variable;
-import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
-import dyvil.tools.compiler.ast.modifiers.Modifier;
-import dyvil.tools.compiler.ast.modifiers.ModifierList;
-import dyvil.tools.compiler.ast.modifiers.ModifierSet;
+import dyvil.tools.compiler.ast.modifiers.*;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -53,7 +50,7 @@ public class VariableParser extends Parser implements ITypeConsumer
 			}
 
 			Modifier modifier;
-			if ((modifier = BaseModifiers.parseModifier(token, pm)) != null)
+			if ((modifier = ModifierUtil.parseModifier(token, pm)) != null)
 			{
 				if (this.modifiers == null)
 				{

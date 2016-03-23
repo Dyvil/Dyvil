@@ -4,9 +4,9 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.consumer.IParameterConsumer;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
-import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
 import dyvil.tools.compiler.ast.modifiers.Modifier;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
+import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParametric;
 import dyvil.tools.compiler.ast.type.IType;
@@ -73,7 +73,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			}
 
 			final Modifier modifier;
-			if ((modifier = BaseModifiers.parseModifier(token, pm)) != null)
+			if ((modifier = ModifierUtil.parseModifier(token, pm)) != null)
 			{
 				if (this.modifiers == null)
 				{
