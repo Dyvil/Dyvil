@@ -18,7 +18,7 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class InterfaceMetadata implements IClassMetadata
 {
-	private final IClass theClass;
+	protected final IClass theClass;
 
 	public InterfaceMetadata(IClass theClass)
 	{
@@ -83,12 +83,12 @@ public class InterfaceMetadata implements IClassMetadata
 		}
 	}
 
-	private void processInitializer(IInitializer initializer, MarkerList markers)
+	protected void processInitializer(IInitializer initializer, MarkerList markers)
 	{
 		markers.add(Markers.semanticError(initializer.getPosition(), "interface.initializer"));
 	}
 
-	private void processConstructor(IConstructor constructor, MarkerList markers)
+	protected void processConstructor(IConstructor constructor, MarkerList markers)
 	{
 		markers.add(Markers.semanticError(constructor.getPosition(), "interface.constructor"));
 	}

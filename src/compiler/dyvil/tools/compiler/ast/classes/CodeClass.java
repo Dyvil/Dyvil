@@ -610,11 +610,11 @@ public class CodeClass extends AbstractClass
 
 		// Create the static <clinit> method
 
-		MethodWriter mw = new MethodWriterImpl(writer,
-		                                       writer.visitMethod(Modifiers.STATIC, "<clinit>", "()V", null, null));
-		mw.visitCode();
-		this.writeStaticInit(mw);
-		mw.visitEnd(Types.VOID);
+		final MethodWriter initWriter = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.STATIC, "<clinit>",
+		                                                                                "()V", null, null));
+		initWriter.visitCode();
+		this.writeStaticInit(initWriter);
+		initWriter.visitEnd(Types.VOID);
 	}
 
 	private void writeClassParameters(ClassWriter writer) throws BytecodeException
