@@ -359,30 +359,59 @@ public class CodeMethod extends AbstractMethod
 		}
 
 		final boolean thisTypeResolved = this.type.isResolved();
+		final int accessLevel = this.getAccessLevel() & ~Modifiers.INTERNAL;
 		final ITypeContext typeContext = this.enclosingClass.getType();
 
 		for (IMethod overrideMethod : this.overrideMethods)
 		{
-			if (overrideMethod.hasModifier(Modifiers.FINAL))
+			final ModifierSet modifiers = overrideMethod.getModifiers();
+
+			// Final Modifier Check
+			if (modifiers.hasIntModifier(Modifiers.FINAL))
 			{
-				markers.add(Markers.semantic(this.position, "method.override.final", this.name));
+				markers.add(Markers.semanticError(this.position, "method.override.final", this.name));
 			}
 
-			if (thisTypeResolved)
-			{
-				final IType superReturnType = overrideMethod.getType().getConcreteType(typeContext);
-				if (superReturnType != this.type && superReturnType.isResolved() // avoid extra error
-					    && !Types.isSuperType(superReturnType, this.type))
-				{
-					overrideMethod.getType().getConcreteType(typeContext);
-					Marker marker = Markers.semantic(this.position, "method.override.type.incompatible", this.name);
-					marker.addInfo(Markers.getSemantic("method.type", this.type));
-					marker.addInfo(Markers.getSemantic("method.override.type", superReturnType));
+			// Visibility Check
 
-					marker.addInfo(Markers.getSemantic("method.override", Util.methodSignatureToString(overrideMethod),
-					                                   overrideMethod.getEnclosingClass().getFullName()));
-					markers.add(marker);
+			switch (modifiers.toFlags() & Modifiers.VISIBILITY_MODIFIERS)
+			{
+			case Modifiers.PRIVATE:
+				markers.add(Markers.semanticError(this.position, "method.override.private", this.name));
+				break;
+			case Modifiers.PROTECTED:
+				if (accessLevel != Modifiers.PUBLIC && accessLevel != Modifiers.PROTECTED)
+				{
+					markers.add(Markers.semanticError(this.position, "method.override.protected", this.name));
 				}
+				break;
+			case Modifiers.PUBLIC:
+				if (modifiers.hasIntModifier(Modifiers.PUBLIC) && accessLevel != Modifiers.PUBLIC)
+				{
+					markers.add(Markers.semanticError(this.position, "method.override.public", this.name));
+				}
+				break;
+			}
+
+			// Type Compatibility Check
+
+			if (!thisTypeResolved)
+			{
+				continue;
+			}
+
+			final IType superReturnType = overrideMethod.getType().getConcreteType(typeContext);
+			if (superReturnType != this.type && superReturnType.isResolved() // avoid extra error
+				    && !Types.isSuperType(superReturnType, this.type))
+			{
+				final Marker marker = Markers
+					                      .semanticError(this.position, "method.override.type.incompatible", this.name);
+				marker.addInfo(Markers.getSemantic("method.type", this.type));
+				marker.addInfo(Markers.getSemantic("method.override.type", superReturnType));
+
+				marker.addInfo(Markers.getSemantic("method.override", Util.methodSignatureToString(overrideMethod),
+				                                   overrideMethod.getEnclosingClass().getFullName()));
+				markers.add(marker);
 			}
 		}
 	}

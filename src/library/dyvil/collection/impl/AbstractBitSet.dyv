@@ -162,7 +162,7 @@ public abstract class AbstractBitSet implements Set[int]
 		}
 	}
 
-	public abstract void removeAt(int bit)
+	protected abstract void removeAt(int bit)
 
 	public override boolean contains(Object o) = o match {
 		case int i : this.bitSet(i)
