@@ -4,9 +4,9 @@ public class BridgeTest
 {
 	public interface Container[T]
 	{
-		public T get()
+		T get()
 		
-		public void set(T value)
+		void set(T value)
 	}
 	
 	public case class IntContainer(int value) implements Container[int]

@@ -2,12 +2,14 @@ package dyvil.test
 
 public class InheritanceTest
 {
-	interface IFoo[T] {
-		public T foo()
+	interface IFoo[T]
+	{
+		T foo()
 	}
 	
-	interface IBar[T] {
-		public T bar()
+	interface IBar[T]
+	{
+		T bar()
 	}
 	
 	interface IFooBar[T] extends IFoo[T], IBar[T]
@@ -18,7 +20,8 @@ public class InheritanceTest
 		public override String bar() = "FooBar.bar"
 	}
 	
-	class FooFoo implements IFoo[Object] {
+	class FooFoo implements IFoo[Object]
+	{
 		public override Object foo() = "FooFoo.foo"
 	}
 	

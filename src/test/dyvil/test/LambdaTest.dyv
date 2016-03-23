@@ -1,17 +1,19 @@
 package dyvil.test
 
 public class LambdaTest
-{	
-	functional trait Function[P, R]
+{
+	@FunctionalInterface
+	public interface MyFunction[P, R]
 	{
-		public R apply(P par1)
+		func apply(P par1): R
 		
-		public Function[P, A] andThen[A](Function[R, A] other) = x => other(this(x))
+		func andThen[A](MyFunction[R, A] other): MyFunction[P, A] = x => other(this(x))
 	}
-	
-	functional interface IntFunction extends Function[int, int]
+
+	@FunctionalInterface
+	public interface IntFunction extends MyFunction[int, int]
 	{
-		public override int apply(int value)
+		override func apply(int value): int
 	}
 	
 	private static int staticSum = 0
