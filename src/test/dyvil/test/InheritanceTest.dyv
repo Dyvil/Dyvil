@@ -4,8 +4,6 @@ public class InheritanceTest
 {
 	trait IFoo[T]
 	{
-		T foo()
-
 		void onFooInit()
 
 		init { this.onFooInit }
@@ -20,33 +18,40 @@ public class InheritanceTest
 		init { this.onBarInit }
 	}
 	
-	interface IFooBar[T] extends IFoo[T], IBar[T]
+	interface IFooBar[T] extends IFoo, IBar[T]
 	
 	class FooBar implements IFooBar[String]
 	{
-		public override String foo() = "FooBar.foo"
 		public override String bar() = "FooBar.bar"
 
 		public override void onFooInit() {}
 		public override void onBarInit() {}
 	}
 	
-	class FooFoo implements IFoo[Object]
+	class Foo1 implements IFoo
 	{
 		public boolean fooInit
 
-		public override Object foo() = "FooFoo.foo"
-
 		public override void onFooInit() = this.fooInit = true
+	}
+
+	class Foo2 extends Foo1 implements IFoo
+	{
+		public int foo2Init
+
+		public override void onFooInit() = this.foo2Init++
 	}
 	
 	public static void main([String] args)
 	{
-		var ff = new FooFoo()
-		var fb = new FooBar()
+		var foo1 = new Foo1
+		var foo2 = new Foo2
+		var fooBar = new FooBar
 
-		Main.test("Simple Interface Test", ff.foo, "FooFoo.foo")
-		Main.test("Double-Layer Interface Test", fb.foo, "FooBar.foo")
-		Main.test("Trait Initialization Test", ff.fooInit)
+		Main.test("Double-Layer Interface Test", fooBar.bar, "FooBar.bar")
+		Main.test("Trait Initialization Test", foo1.fooInit)
+
+		// Check that Foo2.onFooInit has only been called once
+		Main.test("Double-Layer Trait Initialization Test", 1, foo2.foo2Init)
 	}
 }

@@ -49,7 +49,7 @@ public class CodeClass extends AbstractClass
 	protected IDyvilHeader  unit;
 	protected ICodePosition position;
 
-	protected Set<IClass> traitClasses;
+	protected boolean traitInit;
 
 	public CodeClass()
 	{
@@ -565,6 +565,18 @@ public class CodeClass extends AbstractClass
 			}
 		}
 
+		// Compute Trait Classes
+		final Set<IClass> traitClasses;
+		if ((modifiers & Modifiers.INTERFACE_CLASS) == 0)
+		{
+			traitClasses = new ArraySet<>();
+			this.traitInit = !fillTraitClasses(this, traitClasses, true) && !traitClasses.isEmpty();
+		}
+		else
+		{
+			traitClasses = null;
+		}
+
 		// Class Body
 
 		this.metadata.write(writer);
@@ -614,12 +626,83 @@ public class CodeClass extends AbstractClass
 		}
 
 		// Create the static <clinit> method
-
-		final MethodWriter initWriter = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.STATIC, "<clinit>",
-		                                                                                "()V", null, null));
+		MethodWriter initWriter = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.STATIC, "<clinit>", "()V",
+		                                                                          null, null));
 		initWriter.visitCode();
 		this.writeStaticInit(initWriter);
 		initWriter.visitEnd(Types.VOID);
+
+		if (traitClasses == null || traitClasses.isEmpty())
+		{
+			return;
+		}
+
+		// Create the virtual <traitinit> method
+
+		initWriter = new MethodWriterImpl(writer, writer
+			                                          .visitMethod(Modifiers.PROTECTED, TraitMetadata.INIT_NAME, "()V",
+			                                                       null, null));
+		initWriter.visitCode();
+		initWriter.setLocalType(0, this.getInternalName());
+
+		for (IClass traitClass : traitClasses)
+		{
+			final String internal = traitClass.getInternalName();
+
+			// Load 'this'
+			initWriter.visitVarInsn(Opcodes.ALOAD, 0);
+
+			// Invoke the static <traitinit> method of the trait class
+			initWriter.visitMethodInsn(Opcodes.INVOKESTATIC, internal, TraitMetadata.INIT_NAME, "(L" + internal + ";)V",
+			                           true);
+		}
+
+		initWriter.visitInsn(Opcodes.RETURN);
+		initWriter.visitEnd();
+	}
+
+	/**
+	 * Fills the list of traits and returns a status. If {@code top} is true, the returned value represents whether or
+	 * not the super type of the given class has traits
+	 *
+	 * @param currentClass
+	 * 	the current class to process
+	 * @param traitClasses
+	 * 	the list of trait classes
+	 * @param top
+	 * 	{@code true} if this is the top call
+	 */
+	private static boolean fillTraitClasses(IClass currentClass, Set<IClass> traitClasses, boolean top)
+	{
+		boolean traits = false;
+		for (int i = 0, count = currentClass.interfaceCount(); i < count; i++)
+		{
+			final IType interfaceType = currentClass.getInterface(i);
+			final IClass interfaceClass = interfaceType.getTheClass();
+			if (interfaceClass == null)
+			{
+				continue;
+			}
+
+			if (interfaceClass.hasModifier(Modifiers.TRAIT_CLASS))
+			{
+				traitClasses.add(interfaceClass);
+				traits = true;
+			}
+
+			fillTraitClasses(interfaceClass, traitClasses, false);
+		}
+
+		final IType superType = currentClass.getSuperType();
+		final IClass superClass;
+		if (superType == null || (superClass = superType.getTheClass()) == null)
+		{
+			return traits && !top;
+		}
+
+		return top ?
+			       fillTraitClasses(superClass, traitClasses, false) :
+			       traits || fillTraitClasses(superClass, traitClasses, false);
 	}
 
 	private void writeClassParameters(ClassWriter writer) throws BytecodeException
@@ -641,13 +724,12 @@ public class CodeClass extends AbstractClass
 	@Override
 	public void writeInit(MethodWriter writer) throws BytecodeException
 	{
-		for (IClass trait : this.getTraitClasses())
+		if (this.traitInit)
 		{
-			final String internal = trait.getInternalName();
 			writer.visitVarInsn(Opcodes.ALOAD, 0); // Load 'this'
 			writer
-				.visitMethodInsn(Opcodes.INVOKESTATIC, internal, TraitMetadata.INIT_NAME, "(L" + internal + ";)V", true);
-			// Invoke the <traitinit> method
+				.visitMethodInsn(Opcodes.INVOKEVIRTUAL, this.getInternalName(), TraitMetadata.INIT_NAME, "()V", false);
+			// Invoke the virtual <traitinit> method of this class
 		}
 
 		this.metadata.writeInit(writer);
@@ -671,50 +753,6 @@ public class CodeClass extends AbstractClass
 		for (int i = 0; i < this.compilableCount; i++)
 		{
 			this.compilables[i].writeInit(writer);
-		}
-	}
-
-	private Set<IClass> getTraitClasses()
-	{
-		if (this.traitClasses != null)
-		{
-			return this.traitClasses;
-		}
-
-		this.traitClasses = new ArraySet<>();
-		fillTraitClasses(this, this.traitClasses);
-		return this.traitClasses;
-	}
-
-	private static void fillTraitClasses(IClass iClass, Set<IClass> traitClasses)
-	{
-		for (int i = 0, count = iClass.interfaceCount(); i < count; i++)
-		{
-			final IType interfaceType = iClass.getInterface(i);
-			final IClass interfaceClass = interfaceType.getTheClass();
-			if (interfaceClass == null)
-			{
-				continue;
-			}
-
-			if (interfaceClass.hasModifier(Modifiers.TRAIT_CLASS))
-			{
-				traitClasses.add(interfaceClass);
-			}
-
-			fillTraitClasses(interfaceClass, traitClasses);
-		}
-
-		final IType superType = iClass.getSuperType();
-		if (superType == null)
-		{
-			return;
-		}
-
-		final IClass superClass = superType.getTheClass();
-		if (superClass != null)
-		{
-			fillTraitClasses(superClass, traitClasses);
 		}
 	}
 
