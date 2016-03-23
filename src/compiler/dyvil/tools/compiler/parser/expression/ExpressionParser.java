@@ -378,8 +378,8 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				pm.report(token, "method.call.generic.close_bracket");
 			}
 
-			final MethodCall mc = (MethodCall) this.value;
-			final GenericData genericData = mc.getGenericData();
+			final MethodCall methodCall = (MethodCall) this.value;
+			final GenericData genericData = methodCall.getGenericData();
 
 			final IToken next = token.next();
 			final int nextType = next.type();
@@ -390,7 +390,8 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 				pm.skip();
 				IArguments arguments = parseArguments(pm, next.next());
-				ApplyMethodCall amc = new ApplyMethodCall(mc.getPosition(), mc.getReceiver(), arguments);
+				ApplyMethodCall amc = new ApplyMethodCall(methodCall.getPosition(), methodCall.getReceiver(),
+				                                          arguments);
 				amc.setGenericData(genericData);
 
 				this.value = amc;
@@ -401,7 +402,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			{
 				// ... .[ ... ] IDENTIFIER ...
 				pm.skip();
-				this.value = mc.getReceiver();
+				this.value = methodCall.getReceiver();
 				this.parseIdentifierAccess(pm, token.next(), token.next().nameValue(), null);
 
 				if (this.value instanceof AbstractCall)
@@ -411,8 +412,8 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				if (this.value instanceof FieldAccess)
 				{
 					FieldAccess fieldAccess = (FieldAccess) this.value;
-					mc.setName(fieldAccess.getName());
-					this.value = mc;
+					methodCall.setName(fieldAccess.getName());
+					this.value = methodCall;
 				}
 				return;
 			}
@@ -420,21 +421,23 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			{
 				// ... .[ ... ] ;
 
-				ApplyMethodCall amc = new ApplyMethodCall(mc.getPosition(), mc.getReceiver(), EmptyArguments.INSTANCE);
+				ApplyMethodCall amc = new ApplyMethodCall(methodCall.getPosition(), methodCall.getReceiver(),
+				                                          EmptyArguments.INSTANCE);
 				amc.setGenericData(genericData);
 				this.value = amc;
 				this.mode = ACCESS;
 				return;
 			}
 
-			// ... .[ ... ] ...
-			final SingleArgument argument = new SingleArgument();
+			// EXPRESSION .[ ... ] ...
+			//                     ^
 
-			final ApplyMethodCall applyCall = new ApplyMethodCall(mc.getPosition(), mc.getReceiver(), argument);
+			final ApplyMethodCall applyCall = new ApplyMethodCall(methodCall.getPosition(), methodCall.getReceiver(),
+			                                                      EmptyArguments.VISIBLE);
 			applyCall.setGenericData(genericData);
 			this.value = applyCall;
 
-			this.parseApply(pm, next, argument, Operators.DEFAULT);
+			this.parseApply(pm, next, applyCall, Operators.DEFAULT);
 			this.mode = ACCESS;
 
 			return;
@@ -569,20 +572,20 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 			if (this.value != null)
 			{
-				// EXPRESSION EXPRESSION -> ... ( EXPRESSION )
+				// EXPRESSION EXPRESSION -> EXPRESSION ( EXPRESSION )
 
-				if (this.operator != null)
+				if (this.operator != null || this.ignoreClosure(token))
 				{
 					this.end(pm, true);
 					return;
 				}
 
-				final SingleArgument argument = new SingleArgument();
-				final ApplyMethodCall applyCall = new ApplyMethodCall(this.value.getPosition(), this.value, argument);
+				final ApplyMethodCall applyCall = new ApplyMethodCall(this.value.getPosition(), this.value,
+				                                                      EmptyArguments.VISIBLE);
 
-				this.parseApply(pm, token, argument, Operators.DEFAULT);
-				pm.reparse();
 				this.value = applyCall;
+				this.parseApply(pm, token, applyCall, Operators.DEFAULT);
+				pm.reparse();
 				return;
 			}
 		}
@@ -592,6 +595,8 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
 			{
+				// EXPRESSION . {
+
 				final BraceAccessExpr braceAccessExpr = new BraceAccessExpr(token.raw(), this.value);
 				pm.pushParser(new StatementListParser(braceAccessExpr::setStatement), true);
 				this.value = braceAccessExpr;
@@ -621,6 +626,11 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		}
 
 		pm.report(Markers.syntaxError(token, "expression.invalid", token.toString()));
+	}
+
+	public boolean ignoreClosure(IToken token)
+	{
+		return token.type() == BaseSymbols.OPEN_CURLY_BRACKET && this.hasFlag(IGNORE_CLOSURE);
 	}
 
 	/**
@@ -761,14 +771,13 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				// OPERATOR EXPRESSION
 				// token    next
 
-				final SingleArgument argument = new SingleArgument();
-				final MethodCall call = new MethodCall(token, null, name, argument);
+				final MethodCall call = new MethodCall(token, null, name, EmptyArguments.VISIBLE);
 
 				call.setDotless(true);
 				this.value = call;
 				this.mode = ACCESS;
 
-				this.parseApply(pm, token.next(), argument, operator);
+				this.parseApply(pm, token.next(), call, operator);
 				return;
 			}
 
@@ -782,10 +791,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 			if (operator.type != Operator.POSTFIX && !ParserUtil.isExpressionTerminator(nextType))
 			{
-				final SingleArgument argument = new SingleArgument();
-				call.setArguments(argument);
-
-				this.parseApply(pm, token, argument, operator);
+				this.parseApply(pm, token, call, operator);
 			}
 			return;
 		}
@@ -859,7 +865,8 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				return;
 			}
 
-			if (ParserUtil.isExpressionTerminator(nextType) || nextType == DyvilSymbols.DOUBLE_ARROW_RIGHT)
+			if (ParserUtil.isExpressionTerminator(nextType) || nextType == DyvilSymbols.DOUBLE_ARROW_RIGHT
+				    || this.ignoreClosure(next))
 			{
 				// ... IDENTIFIER EXPRESSION-TERMINATOR
 				// e.g. this.someField ;
@@ -891,14 +898,13 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			// e.g. this.call 10;
 		}
 
-		final SingleArgument argument = new SingleArgument();
-		final MethodCall call = new MethodCall(token, this.value, name, argument);
+		final MethodCall call = new MethodCall(token, this.value, name, EmptyArguments.INSTANCE);
 		call.setDotless(!this.hasFlag(EXPLICIT_DOT));
 
 		this.value = call;
 		this.mode = ACCESS;
 
-		this.parseApply(pm, token.next(), argument, operator == null ? Operators.DEFAULT : operator);
+		this.parseApply(pm, token.next(), call, operator == null ? Operators.DEFAULT : operator);
 	}
 
 	/**
@@ -916,16 +922,18 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 	 * 	the current parsing context manager
 	 * @param token
 	 * 	the first token of the expression that is a parameter to the APPLY method
-	 * @param argument
-	 * 	the argument container
+	 * @param call
+	 * 	the method or apply call
 	 * @param operator
 	 * 	the operator that precedes this call. Can be null.
 	 */
-	private void parseApply(IParserManager pm, IToken token, SingleArgument argument, Operator operator)
+	private void parseApply(IParserManager pm, IToken token, ICall call, Operator operator)
 	{
 		if (token.type() != BaseSymbols.OPEN_CURLY_BRACKET)
 		{
-			pm.pushParser(pm.newExpressionParser(argument).withOperator(operator));
+			final SingleArgument argument = new SingleArgument();
+			call.setArguments(argument);
+			pm.pushParser(this.subParser(pm, argument).withOperator(operator));
 			return;
 		}
 
@@ -935,6 +943,8 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			return;
 		}
 
+		final SingleArgument argument = new SingleArgument();
+		call.setArguments(argument);
 		pm.pushParser(new StatementListParser(argument, true));
 	}
 
@@ -963,7 +973,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				final FieldAssignment assignment = new FieldAssignment(position, access.getInstance(),
 				                                                       access.getName());
 				this.value = assignment;
-				pm.pushParser(pm.newExpressionParser(assignment));
+				pm.pushParser(this.subParser(pm, assignment));
 				return;
 			}
 			case IValue.APPLY_CALL:
@@ -975,7 +985,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				                                                         applyCall.getArguments());
 
 				this.value = updateCall;
-				pm.pushParser(pm.newExpressionParser(updateCall));
+				pm.pushParser(this.subParser(pm, updateCall));
 				return;
 			}
 			case IValue.METHOD_CALL:
@@ -987,7 +997,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				final UpdateMethodCall updateCall = new UpdateMethodCall(position, access, call.getArguments());
 
 				this.value = updateCall;
-				pm.pushParser(pm.newExpressionParser(updateCall));
+				pm.pushParser(this.subParser(pm, updateCall));
 				return;
 			}
 			case IValue.SUBSCRIPT_GET:
@@ -1000,7 +1010,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				                                                                        subscriptAccess.getArguments());
 
 				this.value = subscriptAssignment;
-				pm.pushParser(pm.newExpressionParser(subscriptAssignment));
+				pm.pushParser(this.subParser(pm, subscriptAssignment));
 				return;
 			}
 			}
