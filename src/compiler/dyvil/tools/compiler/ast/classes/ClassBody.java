@@ -272,30 +272,15 @@ public class ClassBody implements IClassBody
 	@Override
 	public IMethod getFunctionalMethod()
 	{
-		if (this.functionalMethod != null)
-		{
-			return this.functionalMethod;
-		}
-
-		boolean found = false;
-		IMethod match = null;
-		for (int i = 0; i < this.methodCount; i++)
-		{
-			IMethod m = this.methods[i];
-			if (m.isAbstract())
-			{
-				if (found)
-				{
-					return null;
-				}
-
-				found = true;
-				match = m;
-			}
-		}
-		return this.functionalMethod = match;
+		return this.functionalMethod;
 	}
-	
+
+	@Override
+	public void setFunctionalMethod(IMethod functionalMethod)
+	{
+		this.functionalMethod = functionalMethod;
+	}
+
 	// Constructors
 	
 	@Override

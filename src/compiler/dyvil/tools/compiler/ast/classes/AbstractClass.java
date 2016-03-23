@@ -604,10 +604,10 @@ public abstract class AbstractClass implements IClass
 
 		if (this.body != null)
 		{
-			IMethod m = this.body.getFunctionalMethod();
-			if (m != null)
+			final IMethod method = this.body.getFunctionalMethod();
+			if (method != null)
 			{
-				return m;
+				return method;
 			}
 		}
 

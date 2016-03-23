@@ -173,16 +173,6 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	protected boolean isObjectMethod()
-	{
-		if (!this.parametersResolved)
-		{
-			this.resolveParameters();
-		}
-		return super.isObjectMethod();
-	}
-
-	@Override
 	public IParameter getParameter(int index)
 	{
 		if (!this.parametersResolved)
@@ -193,14 +183,14 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	public void setValue(IValue value)
-	{
-	}
-
-	@Override
 	public IValue getValue()
 	{
 		return null;
+	}
+
+	@Override
+	public void setValue(IValue value)
+	{
 	}
 
 	@Override

@@ -180,6 +180,12 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 
 	@Override
+	public boolean isObjectMethod()
+	{
+		return false;
+	}
+
+	@Override
 	public int getAccessLevel()
 	{
 		return 0;

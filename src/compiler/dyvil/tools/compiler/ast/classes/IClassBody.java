@@ -71,6 +71,10 @@ public interface IClassBody extends IASTNode, IClassList, IMemberConsumer
 		return null;
 	}
 
+	default void setFunctionalMethod(IMethod method)
+	{
+	}
+
 	boolean checkImplements(IMethod candidate, ITypeContext typeContext);
 
 	void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext);

@@ -354,14 +354,15 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		return this.modifiers.hasIntModifier(Modifiers.ABSTRACT) && !this.isObjectMethod();
 	}
 
-	protected boolean isObjectMethod()
+	@Override
+	public boolean isObjectMethod()
 	{
 		switch (this.parameterCount)
 		{
 		case 0:
 			return this.name == Names.toString || this.name == Names.hashCode;
 		case 1:
-			if (this.name == Names.equals && this.parameters[0].getType().getTheClass() == Types.OBJECT_CLASS)
+			if (this.name == Names.equals && this.getParameter(0).getInternalType().getTheClass() == Types.OBJECT_CLASS)
 			{
 				return true;
 			}

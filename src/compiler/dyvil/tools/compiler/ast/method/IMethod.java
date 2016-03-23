@@ -34,6 +34,8 @@ public interface IMethod extends IClassMember, ICallableMember, ICallableSignatu
 	// Misc
 	
 	boolean isAbstract();
+
+	boolean isObjectMethod();
 	
 	void setParameters(IParameter[] parameters, int parameterCount);
 
