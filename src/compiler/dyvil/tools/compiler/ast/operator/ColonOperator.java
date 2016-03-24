@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.operator;
 import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constant.WildcardValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralConversion;
@@ -17,6 +18,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.TypeChecker;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -108,7 +110,7 @@ public class ColonOperator implements IValue
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation, new ArgumentList(this.left, this.right))
-					       .withType(type, typeContext, markers, context);
+				       .withType(type, typeContext, markers, context);
 		}
 
 		if (!type.isSuperClassOf(TupleType.getTupleClass(2).getClassType()))
@@ -132,9 +134,9 @@ public class ColonOperator implements IValue
 		}
 
 		this.left = TypeChecker.convertValue(this.left, leftType, typeContext, markers, context,
-		                                     TypeChecker.markerSupplier("colon.type.left"));
+		                                     TypeChecker.markerSupplier("colon_operator.left.type"));
 		this.right = TypeChecker.convertValue(this.right, rightType, typeContext, markers, context,
-		                                      TypeChecker.markerSupplier("colon.type.right"));
+		                                      TypeChecker.markerSupplier("colon_operator.right.type"));
 
 		return this;
 	}
@@ -159,15 +161,38 @@ public class ColonOperator implements IValue
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.left.resolveTypes(markers, context);
-		this.right.resolveTypes(markers, context);
+		if (this.left != null)
+		{
+			this.left.resolveTypes(markers, context);
+		}
+		if (this.right != null)
+		{
+			this.right.resolveTypes(markers, context);
+		}
 	}
 
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		this.left = this.left.resolve(markers, context);
-		this.right = this.right.resolve(markers, context);
+		if (this.left != null)
+		{
+			this.left = this.left.resolve(markers, context);
+		}
+		else
+		{
+			markers.add(Markers.semanticError(this.position, "colon_operator.left.invalid"));
+			this.left = new WildcardValue(this.position);
+		}
+
+		if (this.right != null)
+		{
+			this.right = this.right.resolve(markers, context);
+		}
+		else
+		{
+			markers.add(Markers.semanticError(this.position, "colon_operator.right.invalid"));
+			this.right = new WildcardValue(this.position);
+		}
 		return this;
 	}
 
