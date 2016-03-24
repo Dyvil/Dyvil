@@ -31,7 +31,7 @@ public class RepeatStatementParser extends Parser implements IValueConsumer
 		{
 		case REPEAT:
 			this.mode = ACTION;
-			if (type != DyvilKeywords.DO)
+			if (type != DyvilKeywords.REPEAT)
 			{
 				pm.reparse();
 				pm.report(token, "repeat.repeat");
@@ -58,7 +58,6 @@ public class RepeatStatementParser extends Parser implements IValueConsumer
 			// fallthrough
 		case END:
 			pm.popParser(true);
-			return;
 		}
 	}
 	

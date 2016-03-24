@@ -501,6 +501,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			case DyvilKeywords.ELSE:
 			case DyvilKeywords.CATCH:
 			case DyvilKeywords.FINALLY:
+			case DyvilKeywords.WHILE:
 				this.end(pm, true);
 				return;
 			case BaseSymbols.EQUALS:
@@ -1169,6 +1170,14 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		{
 			// while ...
 
+			if (this.parent instanceof RepeatStatementParser // repeat parent
+				    || this.parent instanceof ExpressionParser // repeat grandparent
+					       && this.parent.getParent() instanceof RepeatStatementParser)
+			{
+				this.end(pm, true);
+				return true;
+			}
+
 			final WhileStatement whileStatement = new WhileStatement(token);
 			this.value = whileStatement;
 
@@ -1177,7 +1186,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			return true;
 		}
 		case DyvilKeywords.DO:
-			pm.report(Markers.semanticError(token, "do.deprecated"));
+			pm.report(Markers.semanticWarning(token, "do.deprecated"));
 			// fallthrough
 		case DyvilKeywords.REPEAT:
 		{

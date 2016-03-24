@@ -22,65 +22,69 @@ public final class RepeatStatement extends AbstractValue implements IStatement, 
 	private static final Name $repeatStart     = Name.getQualified("$repeatStart");
 	private static final Name $repeatCondition = Name.getQualified("$repeatCondition");
 	private static final Name $repeatEnd       = Name.getQualified("$repeatEnd");
-	
+
 	protected IValue action;
 	protected IValue condition;
 
+	private Label startLabel;
 	private Label conditionLabel;
 	private Label endLabel;
-	
+
 	public RepeatStatement(ICodePosition position)
 	{
 		this.position = position;
 
-		Label startLabel = new Label($repeatStart);
+		this.startLabel = new Label($repeatStart);
 		this.conditionLabel = new Label($repeatCondition);
 		this.endLabel = new Label($repeatEnd);
 	}
-	
+
 	@Override
 	public int valueTag()
 	{
 		return DO_WHILE;
 	}
-	
+
 	public void setCondition(IValue condition)
 	{
 		this.condition = condition;
 	}
-	
+
 	public IValue getCondition()
 	{
 		return this.condition;
 	}
-	
+
 	@Override
 	public void setAction(IValue then)
 	{
 		this.action = then;
 	}
-	
+
 	@Override
 	public IValue getAction()
 	{
 		return this.action;
 	}
-	
+
 	@Override
 	public Label getContinueLabel()
 	{
 		return this.conditionLabel;
 	}
-	
+
 	@Override
 	public Label getBreakLabel()
 	{
 		return this.endLabel;
 	}
-	
+
 	@Override
 	public Label resolveLabel(Name name)
 	{
+		if (name == $repeatStart) {
+			return this.startLabel;
+		}
 		if (name == $repeatCondition)
 		{
 			return this.conditionLabel;
@@ -89,10 +93,10 @@ public final class RepeatStatement extends AbstractValue implements IStatement, 
 		{
 			return this.endLabel;
 		}
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -105,7 +109,7 @@ public final class RepeatStatement extends AbstractValue implements IStatement, 
 			this.condition.resolveTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
@@ -121,7 +125,7 @@ public final class RepeatStatement extends AbstractValue implements IStatement, 
 		}
 		return this;
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -134,7 +138,7 @@ public final class RepeatStatement extends AbstractValue implements IStatement, 
 			this.condition.checkTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
@@ -147,7 +151,7 @@ public final class RepeatStatement extends AbstractValue implements IStatement, 
 			this.condition.check(markers, context);
 		}
 	}
-	
+
 	@Override
 	public IValue foldConstants()
 	{
@@ -165,7 +169,7 @@ public final class RepeatStatement extends AbstractValue implements IStatement, 
 		}
 		return this;
 	}
-	
+
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
@@ -179,23 +183,21 @@ public final class RepeatStatement extends AbstractValue implements IStatement, 
 		}
 		return this;
 	}
-	
+
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		if (this.action == null)
-		{
-			this.condition.writeExpression(writer, Types.VOID);
-		}
-
-		dyvil.tools.asm.Label startLabel = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label startLabel = this.startLabel.target = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label conditionLabel = this.conditionLabel.target = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
-		
+
 		// Repeat Block
-		
+
 		writer.visitTargetLabel(startLabel);
-		this.action.writeExpression(writer, Types.VOID);
+		if (this.action != null)
+		{
+			this.action.writeExpression(writer, Types.VOID);
+		}
 		// Condition
 		writer.visitLabel(conditionLabel);
 		if (this.condition != null)
@@ -206,10 +208,10 @@ public final class RepeatStatement extends AbstractValue implements IStatement, 
 		{
 			writer.visitJumpInsn(Opcodes.GOTO, startLabel);
 		}
-		
+
 		writer.visitLabel(endLabel);
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
@@ -229,7 +231,7 @@ public final class RepeatStatement extends AbstractValue implements IStatement, 
 
 			this.action.toString(prefix, buffer);
 		}
-		
+
 		if (this.condition != null)
 		{
 			if (Formatting.getBoolean("repeat.while.newline_before"))
