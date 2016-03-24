@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Mutability;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -49,13 +50,7 @@ public final class ArrayExpr implements IValue, IValueList
 
 	public ArrayExpr()
 	{
-		this.values = new IValue[3];
-	}
-
-	public ArrayExpr(ICodePosition position)
-	{
-		this.position = position;
-		this.values = new IValue[3];
+		this.values = new IValue[4];
 	}
 
 	public ArrayExpr(IValue[] values, int valueCount)
@@ -64,10 +59,16 @@ public final class ArrayExpr implements IValue, IValueList
 		this.valueCount = valueCount;
 	}
 
-	public ArrayExpr(ICodePosition position, int valueCount)
+	public ArrayExpr(ICodePosition position)
 	{
 		this.position = position;
-		this.values = new IValue[valueCount];
+		this.values = new IValue[3];
+	}
+
+	public ArrayExpr(ICodePosition position, int capacity)
+	{
+		this.position = position;
+		this.values = new IValue[capacity];
 	}
 
 	public ArrayExpr(ICodePosition position, IValue[] values, int valueCount)
@@ -141,21 +142,22 @@ public final class ArrayExpr implements IValue, IValueList
 	{
 		if (valueCount == 0)
 		{
-			return dyvil.tools.compiler.ast.type.builtin.Types.ANY;
+			return Types.ANY;
 		}
 
-		IType t = values[0].getType();
+		IType type = values[0].getType();
 		for (int i = 1; i < valueCount; i++)
 		{
-			IType t1 = values[i].getType();
-			t = dyvil.tools.compiler.ast.type.builtin.Types.combine(t, t1);
-			if (t == null)
+			final IType valueType = values[i].getType();
+			type = Types.combine(type, valueType);
+
+			if (type == null)
 			{
-				return dyvil.tools.compiler.ast.type.builtin.Types.ANY;
+				return Types.ANY;
 			}
 		}
 
-		return t;
+		return type;
 	}
 
 	@Override
@@ -176,7 +178,7 @@ public final class ArrayExpr implements IValue, IValueList
 			return this.arrayType;
 		}
 
-		return this.arrayType = new ArrayType(this.getElementType());
+		return this.arrayType = new ArrayType(this.getElementType(), Mutability.IMMUTABLE);
 	}
 
 	@Override
@@ -185,13 +187,12 @@ public final class ArrayExpr implements IValue, IValueList
 		IType elementType;
 		if (!arrayType.isArrayType())
 		{
-			IClass iclass = arrayType.getTheClass();
-			IAnnotation annotation;
-			if ((annotation = iclass.getAnnotation(LazyFields.ARRAY_CONVERTIBLE)) != null)
+			final IAnnotation annotation;
+			if ((annotation = arrayType.getAnnotation(LazyFields.ARRAY_CONVERTIBLE)) != null)
 			{
 				return new LiteralConversion(this, annotation).withType(arrayType, typeContext, markers, context);
 			}
-			if (iclass != Types.OBJECT_CLASS)
+			if (arrayType.getTheClass() != Types.OBJECT_CLASS)
 			{
 				return null;
 			}
@@ -234,12 +235,12 @@ public final class ArrayExpr implements IValue, IValueList
 		}
 
 		// If the type is an array type, get it's element type
-		IType type1 = type.getElementType();
+		final IType elementType = type.getElementType();
 
 		// Check for every value if it is the element type
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			if (!this.values[i].isType(type1))
+			if (!this.values[i].isType(elementType))
 			{
 				// If not, this is not the type
 				return false;
@@ -380,22 +381,6 @@ public final class ArrayExpr implements IValue, IValueList
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.elementType == null)
-		{
-			if (this.valueCount == 0)
-			{
-				markers.add(Markers.semantic(this.position, "array.empty"));
-				return;
-			}
-
-			this.getType();
-
-			for (int i = 0; i < this.valueCount; i++)
-			{
-				this.values[i].checkTypes(markers, context);
-			}
-		}
-
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			this.values[i].checkTypes(markers, context);
@@ -434,8 +419,8 @@ public final class ArrayExpr implements IValue, IValueList
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		IType elementType = this.elementType;
-		int opcode = elementType.getArrayStoreOpcode();
+		final IType elementType = this.getElementType();
+		final int arrayStoreOpcode = elementType.getArrayStoreOpcode();
 
 		writer.visitLdcInsn(this.valueCount);
 		writer.visitMultiANewArrayInsn(elementType, 1);
@@ -445,7 +430,7 @@ public final class ArrayExpr implements IValue, IValueList
 			writer.visitInsn(Opcodes.DUP);
 			writer.visitLdcInsn(i);
 			this.values[i].writeExpression(writer, elementType);
-			writer.visitInsn(opcode);
+			writer.visitInsn(arrayStoreOpcode);
 		}
 	}
 
