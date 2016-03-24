@@ -250,6 +250,11 @@ public class Property extends Member implements IProperty
 	{
 		super.check(markers, context);
 
+		if (this.type == Types.VOID)
+		{
+			markers.add(Markers.semanticError(this.position, "property.type.void"));
+		}
+
 		if (this.getter != null)
 		{
 			this.getter.check(markers, context);
@@ -259,10 +264,6 @@ public class Property extends Member implements IProperty
 		{
 			this.setter.check(markers, context);
 
-			if (this.type == Types.VOID)
-			{
-				markers.add(Markers.semantic(this.position, "property.type.void"));
-			}
 		}
 
 		// No setter and no getter
