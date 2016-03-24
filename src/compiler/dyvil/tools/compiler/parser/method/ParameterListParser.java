@@ -29,7 +29,6 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	public static final int SEPARATOR = 4;
 
 	protected IParameterConsumer consumer;
-	protected boolean            untyped;
 
 	// Metadata
 	private ModifierList   modifiers;
@@ -42,13 +41,6 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	{
 		this.consumer = consumer;
 		this.mode = TYPE;
-	}
-
-	public ParameterListParser(IParameterConsumer consumer, boolean untyped)
-	{
-		this.consumer = consumer;
-		this.mode = TYPE;
-		this.untyped = untyped;
 	}
 
 	private void reset()
@@ -84,22 +76,13 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				return;
 			}
 
-			if (ParserUtil.isIdentifier(type))
+			if (ParserUtil.isIdentifier(type) && ParserUtil.isTerminator(token.next().type()))
 			{
-				final int nextType = token.next().type();
-				if (ParserUtil.isTerminator(nextType))
-				{
-					if (!this.untyped && nextType != BaseSymbols.COLON)
-					{
-						pm.report(token, "parameter.type");
-					}
-
-					// ... , IDENTIFIER , ...
-					this.type = Types.UNKNOWN;
-					this.mode = NAME;
-					pm.reparse();
-					return;
-				}
+				// ... , IDENTIFIER , ...
+				this.type = Types.UNKNOWN;
+				this.mode = NAME;
+				pm.reparse();
+				return;
 			}
 
 			if (type == DyvilSymbols.AT)

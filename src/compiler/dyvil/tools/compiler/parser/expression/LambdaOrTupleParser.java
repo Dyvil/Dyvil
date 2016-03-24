@@ -58,7 +58,7 @@ public class LambdaOrTupleParser extends Parser
 				// ( ... ) =>
 
 				final LambdaExpr lambdaExpr = new LambdaExpr(closeParenthesis.next());
-				pm.pushParser(new ParameterListParser(lambdaExpr, true));
+				pm.pushParser(new ParameterListParser(lambdaExpr));
 				this.value = lambdaExpr;
 				this.mode = PARAMETERS_END;
 				return;
