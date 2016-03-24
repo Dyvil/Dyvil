@@ -1183,15 +1183,35 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		super.toString(prefix, buffer);
-
 		this.modifiers.toString(buffer);
-		if (this.type != null)
-		{
-			this.type.toString("", buffer);
-			buffer.append(' ');
-		}
-		buffer.append(this.name);
 
+		// Type
+		boolean typeAscription = false;
+		boolean parameters = true;
+		if (this.type != null && this.type != Types.UNKNOWN)
+		{
+			typeAscription = Formatting.typeAscription("method.type_ascription", this);
+
+			if (!typeAscription)
+			{
+				this.type.toString("", buffer);
+			}
+			else
+			{
+				buffer.append("func");
+				parameters = this.parameterCount > 0 || Formatting.getBoolean("method.parameters.visible");
+			}
+		}
+		else
+		{
+			buffer.append("func");
+			parameters = this.parameterCount > 0 || Formatting.getBoolean("method.parameters.visible");
+		}
+
+		// Name
+		buffer.append(' ').append(this.name);
+
+		// Type Parameters
 		if (this.typeParameterCount > 0)
 		{
 			Formatting.appendSeparator(buffer, "generics.open_bracket", '[');
@@ -1200,11 +1220,16 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			Formatting.appendSeparator(buffer, "generics.close_bracket", ']');
 		}
 
-		Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
-		Util.astToString(prefix, this.parameters, this.parameterCount,
-		                 Formatting.getSeparator("parameters.separator", ','), buffer);
-		Formatting.appendSeparator(buffer, "parameters.close_paren", ')');
+		// Parameters
+		if (parameters)
+		{
+			Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
+			Util.astToString(prefix, this.parameters, this.parameterCount,
+			                 Formatting.getSeparator("parameters.separator", ','), buffer);
+			Formatting.appendSeparator(buffer, "parameters.close_paren", ')');
+		}
 
+		// Exceptions
 		if (this.exceptionCount > 0)
 		{
 			String throwsPrefix = prefix;
@@ -1222,6 +1247,14 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			                 Formatting.getSeparator("method.throws", ','), buffer);
 		}
 
+		// Type Ascription
+		if (typeAscription)
+		{
+			Formatting.appendSeparator(buffer, "method.type_ascription", ':');
+			this.type.toString(prefix, buffer);
+		}
+
+		// Implementation
 		final IValue value = this.getValue();
 		if (value != null)
 		{

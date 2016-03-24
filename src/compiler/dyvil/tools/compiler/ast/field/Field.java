@@ -371,11 +371,9 @@ public class Field extends Member implements IField
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		super.toString(prefix, buffer);
-
 		this.modifiers.toString(buffer);
-		this.type.toString("", buffer);
-		buffer.append(' ');
-		buffer.append(this.name);
+
+		IDataMember.toString(prefix, buffer, this, "field.type_ascription");
 
 		if (this.value != null)
 		{

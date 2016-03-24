@@ -15,4 +15,14 @@ public interface ICodePosition
 	ICodePosition raw();
 	
 	ICodePosition to(ICodePosition end);
+
+	default boolean before(ICodePosition position)
+	{
+		return position != null && this.endIndex() < position.startIndex();
+	}
+
+	default boolean after(ICodePosition position)
+	{
+		return position != null && this.startIndex() > position.endIndex();
+	}
 }

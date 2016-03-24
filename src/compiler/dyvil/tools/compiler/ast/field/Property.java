@@ -439,11 +439,9 @@ public class Property extends Member implements IProperty
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		super.toString(prefix, buffer);
-
 		this.modifiers.toString(buffer);
-		this.type.toString("", buffer);
-		buffer.append(' ');
-		buffer.append(this.name);
+
+		IDataMember.toString(prefix, buffer, this, "property.type_ascription");
 
 		// Block Start
 		if (Formatting.getBoolean("property.block.newline"))
@@ -582,7 +580,7 @@ public class Property extends Member implements IProperty
 		}
 		buffer.append("set");
 
-		if (setterParameterName != this.name)
+		if (setterParameterName != Names.newValue)
 		{
 			Formatting.appendSeparator(buffer, "property.setter.parameter.open_paren", '(');
 			buffer.append(setterParameterName);

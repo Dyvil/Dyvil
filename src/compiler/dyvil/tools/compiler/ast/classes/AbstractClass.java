@@ -1010,8 +1010,6 @@ public abstract class AbstractClass implements IClass
 			this.annotations.toString(prefix, buffer);
 		}
 
-		buffer.append(prefix);
-
 		this.modifiers.toString(buffer);
 		ModifierUtil.writeClassType(this.modifiers.toFlags(), buffer);
 		buffer.append(this.name);

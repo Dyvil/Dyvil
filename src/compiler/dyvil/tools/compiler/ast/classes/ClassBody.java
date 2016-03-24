@@ -28,10 +28,10 @@ import dyvil.tools.parsing.position.ICodePosition;
 public class ClassBody implements IClassBody
 {
 	public IClass theClass;
-	
+
 	public IClass[] classes;
 	public int      classCount;
-	
+
 	private IField[] fields = new IField[3];
 	private int fieldCount;
 	private IProperty[] properties = new IProperty[3];
@@ -44,43 +44,43 @@ public class ClassBody implements IClassBody
 	private int initializerCount;
 
 	protected IMethod functionalMethod;
-	
+
 	public ClassBody(IClass iclass)
 	{
 		this.theClass = iclass;
 	}
-	
+
 	@Override
 	public ICodePosition getPosition()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public void setPosition(ICodePosition position)
 	{
 	}
-	
+
 	@Override
 	public void setTheClass(IClass theClass)
 	{
 		this.theClass = theClass;
 	}
-	
+
 	@Override
 	public IClass getTheClass()
 	{
 		return this.theClass;
 	}
-	
+
 	// Nested Classes
-	
+
 	@Override
 	public int classCount()
 	{
 		return this.classCount;
 	}
-	
+
 	@Override
 	public void addClass(IClass iclass)
 	{
@@ -93,7 +93,7 @@ public class ClassBody implements IClassBody
 			this.classCount = 1;
 			return;
 		}
-		
+
 		int index = this.classCount++;
 		if (index >= this.classes.length)
 		{
@@ -103,13 +103,13 @@ public class ClassBody implements IClassBody
 		}
 		this.classes[index] = iclass;
 	}
-	
+
 	@Override
 	public IClass getClass(int index)
 	{
 		return this.classes[index];
 	}
-	
+
 	@Override
 	public IClass getClass(Name name)
 	{
@@ -123,15 +123,15 @@ public class ClassBody implements IClassBody
 		}
 		return null;
 	}
-	
+
 	// Fields
-	
+
 	@Override
 	public int fieldCount()
 	{
 		return this.fieldCount;
 	}
-	
+
 	@Override
 	public void addField(IDataMember dataMember)
 	{
@@ -149,13 +149,13 @@ public class ClassBody implements IClassBody
 		}
 		this.fields[index] = field;
 	}
-	
+
 	@Override
 	public IField getField(int index)
 	{
 		return this.fields[index];
 	}
-	
+
 	@Override
 	public IField getField(Name name)
 	{
@@ -169,15 +169,15 @@ public class ClassBody implements IClassBody
 		}
 		return null;
 	}
-	
+
 	// Properties
-	
+
 	@Override
 	public int propertyCount()
 	{
 		return this.propertyCount;
 	}
-	
+
 	@Override
 	public void addProperty(IProperty property)
 	{
@@ -192,13 +192,13 @@ public class ClassBody implements IClassBody
 		}
 		this.properties[index] = property;
 	}
-	
+
 	@Override
 	public IProperty getProperty(int index)
 	{
 		return this.properties[index];
 	}
-	
+
 	@Override
 	public IProperty getProperty(Name name)
 	{
@@ -282,13 +282,13 @@ public class ClassBody implements IClassBody
 	}
 
 	// Constructors
-	
+
 	@Override
 	public int constructorCount()
 	{
 		return this.constructorCount;
 	}
-	
+
 	@Override
 	public void addConstructor(IConstructor constructor)
 	{
@@ -303,13 +303,13 @@ public class ClassBody implements IClassBody
 		}
 		this.constructors[index] = constructor;
 	}
-	
+
 	@Override
 	public IConstructor getConstructor(int index)
 	{
 		return this.constructors[index];
 	}
-	
+
 	@Override
 	public IConstructor getConstructor(IParameter[] parameters, int parameterCount)
 	{
@@ -321,7 +321,7 @@ public class ClassBody implements IClassBody
 			{
 				continue;
 			}
-			
+
 			for (int p = 0; p < parameterCount; p++)
 			{
 				IType classParamType = parameters[p].getType();
@@ -331,13 +331,13 @@ public class ClassBody implements IClassBody
 					continue outer;
 				}
 			}
-			
+
 			return c;
 		}
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
@@ -382,7 +382,7 @@ public class ClassBody implements IClassBody
 	}
 
 	// Phases
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -415,7 +415,7 @@ public class ClassBody implements IClassBody
 			this.initializers[i].resolveTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
@@ -444,7 +444,7 @@ public class ClassBody implements IClassBody
 			this.initializers[i].resolve(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -563,7 +563,7 @@ public class ClassBody implements IClassBody
 			                             candidate.getName(), this.theClass.getName()));
 		}
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
@@ -592,7 +592,7 @@ public class ClassBody implements IClassBody
 			this.initializers[i].check(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void foldConstants()
 	{
@@ -621,9 +621,9 @@ public class ClassBody implements IClassBody
 			this.initializers[i].foldConstants();
 		}
 	}
-	
+
 	@Override
-	public void cleanup( IContext context)
+	public void cleanup(IContext context)
 	{
 		final IClassCompilableList compilableList = this.theClass;
 
@@ -652,11 +652,11 @@ public class ClassBody implements IClassBody
 			this.initializers[i].cleanup(context, compilableList);
 		}
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		String bodyPrefix = Formatting.getIndent("class.body.indent", prefix);
+		final String bodyPrefix = Formatting.getIndent("class.body.indent", prefix);
 		if (Formatting.getBoolean("class.body.open_bracket.newline"))
 		{
 			buffer.append('\n').append(prefix);
@@ -666,14 +666,20 @@ public class ClassBody implements IClassBody
 			buffer.append(' ');
 		}
 
-		buffer.append('{').append('\n');
+		buffer.append('{').append('\n').append(bodyPrefix);
 		this.bodyToString(bodyPrefix, buffer);
-		buffer.append(prefix).append('}');
 
-		if (Formatting.getBoolean("class.body.close_bracket.newline_after"))
+		// Trim extra lines
+
+		final int length = buffer.length();
+		final int index = length - bodyPrefix.length();
+		if (buffer.indexOf(bodyPrefix, index) == index)
 		{
-			buffer.append('\n');
+			buffer.delete(index - 1, length);
+			buffer.append(prefix);
 		}
+
+		buffer.append('}');
 	}
 
 	private void bodyToString(String prefix, StringBuilder buffer)
@@ -694,9 +700,9 @@ public class ClassBody implements IClassBody
 					buffer.append(';');
 				}
 
-				buffer.append('\n');
+				buffer.append('\n').append(prefix);
 			}
-			buffer.append('\n');
+			buffer.append('\n').append(prefix);
 		}
 
 		if (this.constructorCount > 0)
@@ -716,24 +722,16 @@ public class ClassBody implements IClassBody
 
 		if (this.methodCount > 0)
 		{
-			for (int i = 0; i < this.methodCount; i++)
-			{
-				this.methods[i].toString(prefix, buffer);
-				buffer.append('\n');
-				if (i + 1 < this.methodCount)
-				{
-					buffer.append('\n');
-				}
-			}
+			this.membersToString(prefix, this.methods, this.methodCount, buffer);
 		}
 	}
 
-	private void membersToString(String prefix, IASTNode[] constructors, int count, StringBuilder buffer)
+	private void membersToString(String prefix, IASTNode[] members, int count, StringBuilder buffer)
 	{
 		for (int i = 0; i < count; i++)
 		{
-			constructors[i].toString(prefix, buffer);
-			buffer.append('\n');
+			members[i].toString(prefix, buffer);
+			buffer.append('\n').append('\n').append(prefix);
 		}
 	}
 }

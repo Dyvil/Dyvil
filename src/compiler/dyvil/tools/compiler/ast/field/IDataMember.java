@@ -8,8 +8,10 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.Marker;
@@ -19,12 +21,12 @@ import dyvil.tools.parsing.position.ICodePosition;
 public interface IDataMember extends IMember, IAccessible, IValueConsumer
 {
 	IValue getValue();
-	
+
 	@Override
 	void setValue(IValue value);
-	
+
 	IValue checkAccess(MarkerList markers, ICodePosition position, IValue receiver, IContext context);
-	
+
 	default IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue receiver, IValue newValue)
 	{
 		if (this.hasModifier(Modifiers.FINAL))
@@ -45,23 +47,23 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 
 		return TypeChecker.convertValue(newValue, type, typeContext, markers, context, markerSupplier);
 	}
-	
+
 	default boolean isEnumConstant()
 	{
 		return this.hasModifier(Modifiers.ENUM);
 	}
-	
+
 	default IClass getEnclosingClass()
 	{
 		return null;
 	}
-	
+
 	boolean isField();
-	
+
 	boolean isVariable();
-	
+
 	// Compilation
-	
+
 	@Override
 	default void writeGet(MethodWriter writer) throws BytecodeException
 	{
@@ -85,7 +87,7 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 	}
 
 	void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException;
-	
+
 	default void writeGet(MethodWriter writer, IValue receiver, int lineNumber) throws BytecodeException
 	{
 		if (receiver != null)
@@ -96,7 +98,7 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 		this.writeGet_Get(writer, lineNumber);
 		this.writeGet_Unwrap(writer, lineNumber);
 	}
-	
+
 	default void writeSet(MethodWriter writer, IValue receiver, IValue value, int lineNumber) throws BytecodeException
 	{
 		if (receiver != null)
@@ -110,18 +112,50 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 		this.writeSet_Wrap(writer, lineNumber);
 		this.writeSet_Set(writer, lineNumber);
 	}
-	
+
 	String getDescription();
-	
+
 	String getSignature();
-	
+
 	default IDataMember capture(IContext context)
 	{
 		return this;
 	}
-	
+
 	default IDataMember capture(IContext context, IVariable variable)
 	{
 		return this;
+	}
+
+	static void toString(String prefix, StringBuilder buffer, IMember field, String key)
+	{
+		final IType type = field.getType();
+		boolean typeAscription = false;
+
+		if (type != null && type != Types.UNKNOWN)
+		{
+			typeAscription = Formatting.typeAscription(key, field);
+
+			if (typeAscription)
+			{
+				buffer.append("var");
+			}
+			else
+			{
+				type.toString(prefix, buffer);
+			}
+		}
+		else
+		{
+			buffer.append("var");
+		}
+
+		buffer.append(' ').append(field.getName());
+
+		if (typeAscription)
+		{
+			Formatting.appendSeparator(buffer, key, ':');
+			type.toString(prefix, buffer);
+		}
 	}
 }

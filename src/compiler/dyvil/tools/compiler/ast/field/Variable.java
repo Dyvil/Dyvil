@@ -377,16 +377,13 @@ public final class Variable extends Member implements IVariable
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.type != Types.UNKNOWN)
+		super.toString("", buffer);
+		if (this.modifiers != null)
 		{
-			this.type.toString("", buffer);
-		}
-		else
-		{
-			buffer.append(this.hasModifier(Modifiers.FINAL) ? "const" : "var");
+			this.modifiers.toString(buffer);
 		}
 
-		buffer.append(' ').append(this.name);
+		IDataMember.toString(prefix, buffer, this, "variable.type_ascription");
 
 		if (this.value != null)
 		{

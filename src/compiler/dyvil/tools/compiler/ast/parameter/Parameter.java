@@ -266,28 +266,30 @@ public abstract class Parameter extends Member implements IParameter
 	{
 		super.resolve(markers, context);
 
-		if (this.defaultValue != null)
+		if (this.defaultValue == null)
 		{
-			this.defaultValue = this.defaultValue.resolve(markers, context);
-
-			final IValue typed = this.defaultValue.withType(this.type, null, markers, context);
-			if (typed == null)
-			{
-				final Marker marker = Markers.semantic(this.defaultValue.getPosition(),
-				                                       this.getKind().getName() + ".type.incompatible",
-				                                       this.name.unqualified);
-				marker.addInfo(Markers.getSemantic(this.getKind().getName() + ".type", this.type));
-				marker.addInfo(Markers.getSemantic("value.type", this.defaultValue.getType()));
-				markers.add(marker);
-			}
-			else
-			{
-				this.defaultValue = typed;
-			}
-
-			this.defaultValue = Util.constant(this.defaultValue, markers, context);
 			return;
 		}
+
+		this.defaultValue = this.defaultValue.resolve(markers, context);
+
+		// TODO Use TypeChecker
+		final IValue typed = this.defaultValue.withType(this.type, null, markers, context);
+		if (typed == null)
+		{
+			final Marker marker = Markers.semantic(this.defaultValue.getPosition(),
+			                                       this.getKind().getName() + ".type.incompatible",
+			                                       this.name.unqualified);
+			marker.addInfo(Markers.getSemantic(this.getKind().getName() + ".type", this.type));
+			marker.addInfo(Markers.getSemantic("value.type", this.defaultValue.getType()));
+			markers.add(marker);
+		}
+		else
+		{
+			this.defaultValue = typed;
+		}
+
+		this.defaultValue = Util.constant(this.defaultValue, markers, context);
 	}
 
 	@Override
@@ -408,22 +410,42 @@ public abstract class Parameter extends Member implements IParameter
 			this.modifiers.toString(buffer);
 		}
 
-		if (this.varargs)
+		boolean typeAscription = false;
+		if (this.type != null)
 		{
-			this.type.getElementType().toString(prefix, buffer);
-			buffer.append("... ");
+			typeAscription = Formatting.typeAscription("parameter.type_ascription", this);
+
+			if (!typeAscription)
+			{
+				this.appendType(prefix, buffer);
+			}
 		}
-		else
+
+		buffer.append(' ').append(this.name);
+
+		if (typeAscription)
 		{
-			this.type.toString(prefix, buffer);
-			buffer.append(' ');
+			Formatting.appendSeparator(buffer, "parameter.type_ascription", ':');
+			this.appendType(prefix, buffer);
 		}
-		buffer.append(this.name);
 
 		if (this.defaultValue != null)
 		{
 			Formatting.appendSeparator(buffer, "field.assignment", '=');
 			this.defaultValue.toString(prefix, buffer);
+		}
+	}
+
+	public void appendType(String prefix, StringBuilder buffer)
+	{
+		if (this.varargs)
+		{
+			this.type.getElementType().toString(prefix, buffer);
+			buffer.append("...");
+		}
+		else
+		{
+			this.type.toString(prefix, buffer);
 		}
 	}
 }

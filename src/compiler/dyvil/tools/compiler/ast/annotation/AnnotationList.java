@@ -208,9 +208,8 @@ public class AnnotationList
 	{
 		for (int i = 0; i < this.annotationCount; i++)
 		{
-			buffer.append(prefix);
 			this.annotations[i].toString(prefix, buffer);
-			buffer.append('\n');
+			buffer.append('\n').append(prefix);
 		}
 	}
 }
