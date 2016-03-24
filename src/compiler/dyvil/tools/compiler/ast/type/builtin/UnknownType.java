@@ -53,7 +53,7 @@ public class UnknownType implements IRawType
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
-		return Types.ANY;
+		return this;
 	}
 	
 	@Override
@@ -179,17 +179,5 @@ public class UnknownType implements IRawType
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append("auto");
-	}
-	
-	@Override
-	public boolean equals(Object obj)
-	{
-		return this == obj;
-	}
-	
-	@Override
-	public int hashCode()
-	{
-		return UNKNOWN;
 	}
 }
