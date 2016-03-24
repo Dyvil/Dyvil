@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.classes;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.access.ClassParameterSetter;
 import dyvil.tools.compiler.ast.access.InitializerCall;
-import dyvil.tools.compiler.ast.constructor.Constructor;
+import dyvil.tools.compiler.ast.constructor.CodeConstructor;
 import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -168,7 +168,7 @@ public class ClassMetadata implements IClassMetadata
 
 		// Generate the constructor signature
 
-		Constructor constructor = new Constructor(this.theClass, new FlagModifierSet(Modifiers.PUBLIC));
+		CodeConstructor constructor = new CodeConstructor(this.theClass, new FlagModifierSet(Modifiers.PUBLIC));
 		int parameterCount = this.theClass.parameterCount();
 
 		IParameter[] parameters = new IParameter[parameterCount];

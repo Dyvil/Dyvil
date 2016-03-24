@@ -3,12 +3,14 @@ package dyvil.tools.compiler.ast.external;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.asm.TypeReference;
+import dyvil.tools.compiler.ast.access.InitializerCall;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.constructor.Constructor;
+import dyvil.tools.compiler.ast.constructor.AbstractConstructor;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IExternalCallableMember;
 import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -16,11 +18,13 @@ import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
+import dyvil.tools.compiler.backend.ClassWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.backend.visitor.AnnotationReader;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public final class ExternalConstructor extends Constructor implements IExternalCallableMember
+public final class ExternalConstructor extends AbstractConstructor implements IExternalCallableMember
 {
 	private boolean annotationsResolved;
 	private boolean returnTypeResolved;
@@ -41,6 +45,28 @@ public final class ExternalConstructor extends Constructor implements IExternalC
 
 	@Override
 	public void setIntrinsicData(IntrinsicData intrinsicData)
+	{
+	}
+
+	@Override
+	public InitializerCall getInitializer()
+	{
+		return null;
+	}
+
+	@Override
+	public void setInitializer(InitializerCall initializer)
+	{
+	}
+
+	@Override
+	public IValue getValue()
+	{
+		return null;
+	}
+
+	@Override
+	public void setValue(IValue value)
 	{
 	}
 
@@ -140,32 +166,7 @@ public final class ExternalConstructor extends Constructor implements IExternalC
 		}
 		return this.annotations.getAnnotation(type);
 	}
-	
-	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
-	{
-	}
-	
-	@Override
-	public void resolve(MarkerList markers, IContext context)
-	{
-	}
-	
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-	}
-	
-	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-	}
-	
-	@Override
-	public void foldConstants()
-	{
-	}
-	
+
 	@Override
 	public void checkArguments(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments)
 	{
@@ -179,7 +180,37 @@ public final class ExternalConstructor extends Constructor implements IExternalC
 		}
 		super.checkArguments(markers, position, context, type, arguments);
 	}
-	
+
+	@Override
+	public void resolveTypes(MarkerList markers, IContext context)
+	{
+	}
+
+	@Override
+	public void resolve(MarkerList markers, IContext context)
+	{
+	}
+
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+	}
+
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+	}
+
+	@Override
+	public void foldConstants()
+	{
+	}
+
+	@Override
+	public void write(ClassWriter writer) throws BytecodeException
+	{
+	}
+
 	@Override
 	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible)
 	{

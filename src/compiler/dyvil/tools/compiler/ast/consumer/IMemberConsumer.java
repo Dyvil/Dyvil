@@ -1,10 +1,7 @@
 package dyvil.tools.compiler.ast.consumer;
 
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
-import dyvil.tools.compiler.ast.constructor.Constructor;
-import dyvil.tools.compiler.ast.constructor.IConstructor;
-import dyvil.tools.compiler.ast.constructor.IInitializer;
-import dyvil.tools.compiler.ast.constructor.Initializer;
+import dyvil.tools.compiler.ast.constructor.*;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.method.CodeMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -33,7 +30,7 @@ public interface IMemberConsumer extends IClassConsumer
 
 	default IConstructor createConstructor(ICodePosition position, ModifierSet modifiers, AnnotationList annotations)
 	{
-		return new Constructor(position, modifiers, annotations);
+		return new CodeConstructor(position, modifiers, annotations);
 	}
 
 	void addInitializer(IInitializer initializer);
