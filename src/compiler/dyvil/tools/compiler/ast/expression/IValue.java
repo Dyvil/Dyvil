@@ -16,6 +16,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -73,7 +74,7 @@ public interface IValue extends IASTNode, ITyped
 	int INITIALIZER_CALL = 113;
 
 	// Assignments
-	int FIELD_ASSIGN = 120;
+	int FIELD_ASSIGN  = 120;
 	int METHOD_ASSIGN = 121;
 
 	// Special Operators and Intrinsics
@@ -126,6 +127,11 @@ public interface IValue extends IASTNode, ITyped
 	default boolean isConstant()
 	{
 		return false;
+	}
+
+	default boolean isAnnotationConstant()
+	{
+		return this.isConstant();
 	}
 
 	default boolean isConstantOrField()
@@ -220,9 +226,22 @@ public interface IValue extends IASTNode, ITyped
 
 	IValue cleanup(IContext context, IClassCompilableList compilableList);
 
-	default IValue toConstant(MarkerList markers, IContext context)
+	default IValue toAnnotationConstant(MarkerList markers, IContext context)
 	{
 		return null;
+	}
+
+	static IValue toAnnotationConstant(IValue value, MarkerList markers, IContext context)
+	{
+		final IValue constant = value.toAnnotationConstant(markers, context);
+		if (constant == null)
+		{
+			markers.add(Markers.semantic(value.getPosition(), "value.constant",
+			                             context.getCompilationContext().config.getMaxConstantDepth()));
+			return value.getType().getDefaultValue();
+		}
+
+		return constant;
 	}
 
 	default int stringSize()

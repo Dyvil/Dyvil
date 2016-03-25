@@ -25,7 +25,6 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.backend.visitor.AnnotationValueReader;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -289,7 +288,7 @@ public abstract class Parameter extends Member implements IParameter
 			this.defaultValue = typed;
 		}
 
-		this.defaultValue = Util.constant(this.defaultValue, markers, context);
+		this.defaultValue = IValue.toAnnotationConstant(this.defaultValue, markers, context);
 	}
 
 	@Override

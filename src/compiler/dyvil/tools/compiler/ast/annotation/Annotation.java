@@ -23,7 +23,6 @@ import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.Marker;
@@ -166,7 +165,7 @@ public final class Annotation implements IAnnotation
 				continue;
 			}
 
-			typedValue = Util.constant(typedValue, markers, context);
+			typedValue = IValue.toAnnotationConstant(typedValue, markers, context);
 			if (typedValue != value)
 			{
 				this.arguments.setValue(i, parameter, typedValue);
@@ -297,7 +296,7 @@ public final class Annotation implements IAnnotation
 			AnnotationVisitor av = visitor.visitAnnotation(key, annotation.getType().getExtendedName());
 			annotation.write(av);
 		}
-		else if (value.isConstant())
+		else if (value.isAnnotationConstant())
 		{
 			visitor.visit(key, value.toObject());
 		}

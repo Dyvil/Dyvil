@@ -2,20 +2,16 @@ package dyvil.tools.compiler.util;
 
 import dyvil.string.CharUtils;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IParametric;
-import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.lexer.LexerUtil;
-import dyvil.tools.parsing.marker.MarkerList;
 
 public final class Util
 {
@@ -213,37 +209,6 @@ public final class Util
 	// endregion
 
 	// region Value transformations
-
-	public static IValue prependValue(IValue prepend, IValue value)
-	{
-		if (value instanceof IValueList)
-		{
-			((IValueList) value).addValue(0, prepend);
-			return value;
-		}
-		else if (value != null)
-		{
-			StatementList list = new StatementList(null);
-			list.addValue(prepend);
-			list.addValue(value);
-			return list;
-		}
-
-		return prepend;
-	}
-
-	public static IValue constant(IValue value, MarkerList markers, IContext context)
-	{
-		final IValue constant = value.toConstant(markers, context);
-		if (constant == null)
-		{
-			markers.add(Markers.semantic(value.getPosition(), "value.constant",
-			                             context.getCompilationContext().config.getMaxConstantDepth()));
-			return value.getType().getDefaultValue();
-		}
-
-		return constant;
-	}
 
 	// endregion
 

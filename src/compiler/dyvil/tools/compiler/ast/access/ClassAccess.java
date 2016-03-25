@@ -49,12 +49,6 @@ public final class ClassAccess implements IValue
 	}
 
 	@Override
-	public boolean isConstant()
-	{
-		return true;
-	}
-
-	@Override
 	public int valueTag()
 	{
 		return CLASS_ACCESS;

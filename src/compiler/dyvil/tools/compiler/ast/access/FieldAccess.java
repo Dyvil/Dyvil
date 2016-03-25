@@ -242,7 +242,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	}
 	
 	@Override
-	public IValue toConstant(MarkerList markers, IContext context)
+	public IValue toAnnotationConstant(MarkerList markers, IContext context)
 	{
 		if (this.field == null)
 		{
@@ -264,7 +264,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		}
 		while (!value.isConstantOrField() || value == this);
 
-		return value.toConstant(markers, context);
+		return value.toAnnotationConstant(markers, context);
 	}
 	
 	@Override

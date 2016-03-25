@@ -97,11 +97,11 @@ public final class ArrayExpr implements IValue, IValueList
 	}
 
 	@Override
-	public boolean isConstant()
+	public boolean isAnnotationConstant()
 	{
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			if (!this.values[i].isConstant())
+			if (!this.values[i].isAnnotationConstant())
 			{
 				return false;
 			}
@@ -340,12 +340,12 @@ public final class ArrayExpr implements IValue, IValueList
 	}
 
 	@Override
-	public IValue toConstant(MarkerList markers, IContext context)
+	public IValue toAnnotationConstant(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			final IValue value = this.values[i];
-			final IValue constant = value.toConstant(markers, context);
+			final IValue constant = value.toAnnotationConstant(markers, context);
 			if (constant == null)
 			{
 				markers.add(Markers.semantic(value.getPosition(), "annotation.array.not_constant"));
