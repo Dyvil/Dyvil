@@ -28,7 +28,7 @@ public class TypeParameterListParser extends Parser
 		{
 		case TYPE_VARIABLE:
 			this.mode = COMMA;
-			pm.pushParser(pm.newTypeParameterParser(this.typeParameterized), true);
+			pm.pushParser(new TypeParameterParser(this.typeParameterized), true);
 			return;
 		case COMMA:
 			if (ParserUtil.isCloseBracket(type))

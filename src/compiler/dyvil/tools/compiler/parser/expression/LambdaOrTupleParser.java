@@ -91,7 +91,7 @@ public class LambdaOrTupleParser extends Parser
 			}
 			return;
 		case ARROW:
-			pm.pushParser(pm.newExpressionParser(((LambdaExpr) this.value)));
+			pm.pushParser(new ExpressionParser(((LambdaExpr) this.value)));
 			this.mode = END;
 			if (token.type() != DyvilSymbols.DOUBLE_ARROW_RIGHT)
 			{

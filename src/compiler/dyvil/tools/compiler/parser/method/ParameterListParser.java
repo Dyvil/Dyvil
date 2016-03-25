@@ -15,6 +15,8 @@ import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
+import dyvil.tools.compiler.parser.annotation.AnnotationParser;
+import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
@@ -94,7 +96,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 
 				final Annotation annotation = new Annotation(token.raw());
 				this.annotations.addAnnotation(annotation);
-				pm.pushParser(pm.newAnnotationParser(annotation));
+				pm.pushParser(new AnnotationParser(annotation));
 				return;
 			}
 			if (ParserUtil.isCloseBracket(type))
@@ -103,7 +105,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				return;
 			}
 			this.mode = NAME;
-			pm.pushParser(pm.newTypeParser(this), true);
+			pm.pushParser(new TypeParser(this), true);
 			return;
 		case NAME:
 			switch (type)
@@ -153,7 +155,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				// ... IDENTIFIER = EXPRESSION ...
 
 				pm.skip();
-				pm.pushParser(pm.newExpressionParser(parameter));
+				pm.pushParser(new ExpressionParser(parameter));
 				return;
 			case BaseSymbols.COLON:
 				// ... IDENTIFIER : TYPE ...

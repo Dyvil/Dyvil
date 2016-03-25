@@ -17,6 +17,7 @@ import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParameterListParser;
+import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
@@ -115,8 +116,8 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 					this.mode = BODY;
 					return;
 				}
-				
-				pm.pushParser(pm.newTypeParser(this));
+
+				pm.pushParser(new TypeParser(this));
 				this.mode = EXTENDS_PARAMETERS;
 				return;
 			}

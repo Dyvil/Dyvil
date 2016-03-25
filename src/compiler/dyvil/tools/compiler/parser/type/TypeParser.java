@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.type.raw.NamedType;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
+import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.transform.Names;
@@ -103,7 +104,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				{
 				case DyvilSymbols.AT:
 					Annotation a = new Annotation();
-					pm.pushParser(pm.newAnnotationParser(a));
+					pm.pushParser(new AnnotationParser(a));
 					this.type = new AnnotatedType(a);
 					this.mode = ANNOTATION_END;
 					return;
@@ -131,13 +132,13 @@ public final class TypeParser extends Parser implements ITypeConsumer
 
 					this.mode = ARRAY_COLON;
 					this.type = arrayType;
-					pm.pushParser(pm.newTypeParser(arrayType));
+					pm.pushParser(new TypeParser(arrayType));
 					return;
 				}
 				case DyvilSymbols.DOUBLE_ARROW_RIGHT:
 				{
 					final LambdaType lambdaType = new LambdaType(token.raw());
-					pm.pushParser(pm.newTypeParser(lambdaType));
+					pm.pushParser(new TypeParser(lambdaType));
 					this.type = lambdaType;
 					this.mode = LAMBDA_END;
 					return;
@@ -169,7 +170,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 						this.type = lt;
 						this.mode = LAMBDA_END;
 						pm.skip();
-						pm.pushParser(pm.newTypeParser(lt));
+						pm.pushParser(new TypeParser(lt));
 						return;
 					}
 					break; // intentional
@@ -211,7 +212,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				this.mode = LAMBDA_END;
 
 				pm.skip();
-				pm.pushParser(pm.newTypeParser(lambdaType));
+				pm.pushParser(new TypeParser(lambdaType));
 				return;
 			}
 			else if (this.parentType != null)
@@ -271,14 +272,14 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			if (name == Names.ltcolon) // <: - Upper Bound
 			{
 				wildcardType.setVariance(Variance.COVARIANT);
-				pm.pushParser(pm.newTypeParser(wildcardType));
+				pm.pushParser(new TypeParser(wildcardType));
 				this.mode = END;
 				return;
 			}
 			if (name == Names.gtcolon) // >: - Lower Bound
 			{
 				wildcardType.setVariance(Variance.CONTRAVARIANT);
-				pm.pushParser(pm.newTypeParser(wildcardType));
+				pm.pushParser(new TypeParser(wildcardType));
 				this.mode = END;
 				return;
 			}
@@ -296,7 +297,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			return;
 		case ANNOTATION_END:
 			this.mode = END;
-			pm.pushParser(pm.newTypeParser((ITyped) this.type), true);
+			pm.pushParser(new TypeParser((ITyped) this.type), true);
 		}
 	}
 

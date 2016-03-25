@@ -88,7 +88,7 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 			if (type == BaseSymbols.SEMICOLON)
 			{
 				// Condition
-				pm.pushParser(pm.newExpressionParser(this));
+				pm.pushParser(new ExpressionParser(this));
 				this.mode = CONDITION_END;
 				return;
 			}
@@ -107,7 +107,7 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 			if (type == DyvilSymbols.ARROW_LEFT)
 			{
 				this.mode = FOR_EACH_END;
-				final ExpressionParser parser = pm.newExpressionParser(this.variable);
+				final ExpressionParser parser = new ExpressionParser(this.variable);
 				if (!this.parenthesis)
 				{
 					parser.addFlag(IGNORE_COLON | IGNORE_CLOSURE);
@@ -119,7 +119,7 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 			this.mode = VARIABLE_END;
 			if (type == BaseSymbols.EQUALS)
 			{
-				pm.pushParser(pm.newExpressionParser(this.variable));
+				pm.pushParser(new ExpressionParser(this.variable));
 				return;
 			}
 			pm.reparse();
@@ -134,7 +134,7 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 					return;
 				}
 
-				pm.pushParser(pm.newExpressionParser(this));
+				pm.pushParser(new ExpressionParser(this));
 				return;
 			}
 			pm.reparse();
@@ -151,7 +151,7 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 
 			if (token.next().type() != BaseSymbols.SEMICOLON)
 			{
-				final ExpressionParser parser = pm.newExpressionParser(this);
+				final ExpressionParser parser = new ExpressionParser(this);
 				if (!this.parenthesis)
 				{
 					parser.addFlag(IGNORE_COLON | IGNORE_CLOSURE);
@@ -175,7 +175,7 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 				this.field.setValue(this.forStatement);
 				return;
 			}
-			pm.pushParser(pm.newExpressionParser(this), true);
+			pm.pushParser(new ExpressionParser(this), true);
 			this.mode = END;
 			return;
 		case END:

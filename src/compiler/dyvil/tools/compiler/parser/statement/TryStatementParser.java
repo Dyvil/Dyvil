@@ -48,7 +48,7 @@ public final class TryStatementParser extends Parser implements IValueConsumer, 
 			pm.popParser(true);
 			return;
 		case ACTION:
-			pm.pushParser(pm.newExpressionParser(this), true);
+			pm.pushParser(new ExpressionParser(this), true);
 			this.mode = CATCH;
 			return;
 		case CATCH:
@@ -60,7 +60,7 @@ public final class TryStatementParser extends Parser implements IValueConsumer, 
 			}
 			if (type == DyvilKeywords.FINALLY)
 			{
-				pm.pushParser(pm.newExpressionParser(this));
+				pm.pushParser(new ExpressionParser(this));
 				this.mode = END;
 				return;
 			}
@@ -93,7 +93,7 @@ public final class TryStatementParser extends Parser implements IValueConsumer, 
 			return;
 		case CATCH_CLOSE:
 			this.mode = CATCH;
-			pm.pushParser(pm.newExpressionParser(this.catchBlock));
+			pm.pushParser(new ExpressionParser(this.catchBlock));
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();

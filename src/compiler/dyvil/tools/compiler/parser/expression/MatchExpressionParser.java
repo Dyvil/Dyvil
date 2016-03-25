@@ -76,7 +76,7 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 			if (type == DyvilKeywords.IF)
 			{
 				this.mode = ACTION;
-				pm.pushParser(pm.newExpressionParser(this).withFlag(IGNORE_COLON | IGNORE_CLOSURE | IGNORE_LAMBDA));
+				pm.pushParser(new ExpressionParser(this).withFlag(IGNORE_COLON | IGNORE_CLOSURE | IGNORE_LAMBDA));
 				return;
 			}
 			// Fallthrough
@@ -87,7 +87,7 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 				pm.pushParser(new StatementListParser(this), true);
 				return;
 			}
-			pm.pushParser(pm.newExpressionParser(this));
+			pm.pushParser(new ExpressionParser(this));
 			if (type != BaseSymbols.COLON && type != DyvilSymbols.DOUBLE_ARROW_RIGHT)
 			{
 				pm.reparse();

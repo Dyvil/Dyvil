@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
+import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.imports.ImportParser;
 import dyvil.tools.compiler.parser.imports.IncludeParser;
 import dyvil.tools.compiler.parser.imports.PackageParser;
@@ -238,7 +239,7 @@ public class DyvilHeaderParser extends Parser
 
 		final Annotation annotation = new Annotation(token.raw());
 		this.annotations.addAnnotation(annotation);
-		pm.pushParser(pm.newAnnotationParser(annotation));
+		pm.pushParser(new AnnotationParser(annotation));
 		return;
 	}
 

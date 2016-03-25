@@ -24,6 +24,7 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.TryParserManager;
 import dyvil.tools.compiler.parser.classes.MemberParser;
+import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -121,7 +122,7 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 
 			// Reset to the current token
 			tokens.jump(token);
-			pm.pushParser(pm.newExpressionParser(this));
+			pm.pushParser(new ExpressionParser(this));
 			return;
 		case SEPARATOR:
 			this.mode = EXPRESSION;

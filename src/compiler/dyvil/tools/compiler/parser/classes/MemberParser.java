@@ -21,6 +21,8 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
+import dyvil.tools.compiler.parser.annotation.AnnotationParser;
+import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.method.ExceptionListParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.parser.statement.StatementListParser;
@@ -183,11 +185,11 @@ public final class MemberParser extends Parser implements ITypeConsumer
 
 				final Annotation annotation = new Annotation(token.raw());
 				this.annotations.addAnnotation(annotation);
-				pm.pushParser(pm.newAnnotationParser(annotation));
+				pm.pushParser(new AnnotationParser(annotation));
 				return;
 			}
 
-			pm.pushParser(pm.newTypeParser(this), true);
+			pm.pushParser(new TypeParser(this), true);
 			this.mode = NAME_OPERATOR;
 			return;
 		case NAME_OPERATOR:
@@ -302,7 +304,7 @@ public final class MemberParser extends Parser implements ITypeConsumer
 				this.setMemberKind(FIELD);
 				this.mode = END;
 
-				pm.pushParser(pm.newExpressionParser(field));
+				pm.pushParser(new ExpressionParser(field));
 				return;
 			}
 			case BaseSymbols.OPEN_CURLY_BRACKET:
@@ -400,7 +402,7 @@ public final class MemberParser extends Parser implements ITypeConsumer
 				this.mode = END;
 				return;
 			case BaseSymbols.EQUALS:
-				pm.pushParser(pm.newExpressionParser((IValueConsumer) this.member));
+				pm.pushParser(new ExpressionParser((IValueConsumer) this.member));
 				this.mode = END;
 				return;
 			}

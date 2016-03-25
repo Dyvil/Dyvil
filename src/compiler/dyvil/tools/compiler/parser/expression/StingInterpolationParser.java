@@ -33,7 +33,7 @@ public final class StingInterpolationParser extends Parser implements IValueCons
 				return;
 			}
 			this.value.addString(token.stringValue());
-			pm.pushParser(pm.newExpressionParser(this));
+			pm.pushParser(new ExpressionParser(this));
 			return;
 		}
 		case Tokens.STRING_END:

@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
+import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
@@ -71,7 +72,7 @@ public class DataMemberParser<T extends IDataMember> extends Parser implements I
 
 				final Annotation annotation = new Annotation(token.raw());
 				this.annotations.addAnnotation(annotation);
-				pm.pushParser(pm.newAnnotationParser(annotation));
+				pm.pushParser(new AnnotationParser(annotation));
 				return;
 			}
 			if (ParserUtil.isIdentifier(type) && token.next().type() == BaseSymbols.COLON)
@@ -84,7 +85,7 @@ public class DataMemberParser<T extends IDataMember> extends Parser implements I
 				return;
 			}
 
-			pm.pushParser(pm.newTypeParser(this), true);
+			pm.pushParser(new TypeParser(this), true);
 			this.mode = NAME;
 			return;
 		case NAME:

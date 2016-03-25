@@ -50,12 +50,12 @@ public class SyncStatementParser extends Parser implements IValueConsumer
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
 				this.mode = LOCK_END;
-				pm.pushParser(pm.newExpressionParser(this));
+				pm.pushParser(new ExpressionParser(this));
 			}
 			else
 			{
 				this.mode = SEPARATOR;
-				pm.pushParser(pm.newExpressionParser(this).withFlag(IGNORE_CLOSURE | IGNORE_COLON));
+				pm.pushParser(new ExpressionParser(this).withFlag(IGNORE_CLOSURE | IGNORE_COLON));
 			}
 			return;
 		case LOCK_END:
@@ -94,7 +94,7 @@ public class SyncStatementParser extends Parser implements IValueConsumer
 				return;
 			}
 
-			pm.pushParser(pm.newExpressionParser(this), true);
+			pm.pushParser(new ExpressionParser(this), true);
 			this.mode = END;
 			return;
 		case END:

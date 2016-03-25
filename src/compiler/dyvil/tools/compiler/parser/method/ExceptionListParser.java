@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.method.IExceptionList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
@@ -37,7 +38,7 @@ public class ExceptionListParser extends Parser implements ITypeConsumer
 		switch (this.mode)
 		{
 		case TYPE:
-			pm.pushParser(pm.newTypeParser(this), true);
+			pm.pushParser(new TypeParser(this), true);
 			this.mode = SEPARATOR;
 			return;
 		case SEPARATOR:

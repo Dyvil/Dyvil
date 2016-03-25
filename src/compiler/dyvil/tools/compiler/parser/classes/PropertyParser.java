@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
+import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.statement.StatementListParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.Names;
@@ -117,7 +118,7 @@ public class PropertyParser extends Parser implements IValueConsumer
 			switch (type)
 			{
 			case BaseSymbols.COLON:
-				pm.pushParser(pm.newExpressionParser(this));
+				pm.pushParser(new ExpressionParser(this));
 				return;
 			case BaseSymbols.OPEN_CURLY_BRACKET:
 				pm.pushParser(new StatementListParser(this), true);

@@ -50,12 +50,12 @@ public final class WhileStatementParser extends Parser implements IValueConsumer
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
 				this.mode = CONDITION_END;
-				pm.pushParser(pm.newExpressionParser(this));
+				pm.pushParser(new ExpressionParser(this));
 			}
 			else
 			{
 				this.mode = SEPARATOR;
-				pm.pushParser(pm.newExpressionParser(this).withFlag(IGNORE_CLOSURE | IGNORE_COLON), true);
+				pm.pushParser(new ExpressionParser(this).withFlag(IGNORE_CLOSURE | IGNORE_COLON), true);
 			}
 			return;
 		case CONDITION_END:
@@ -93,7 +93,7 @@ public final class WhileStatementParser extends Parser implements IValueConsumer
 				pm.popParser(true);
 				return;
 			}
-			pm.pushParser(pm.newExpressionParser(this), true);
+			pm.pushParser(new ExpressionParser(this), true);
 			this.mode = END;
 			return;
 		case END:
