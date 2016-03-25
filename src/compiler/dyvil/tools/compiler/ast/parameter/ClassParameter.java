@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisExpr;
 import dyvil.tools.compiler.ast.field.Field;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -74,6 +75,12 @@ public final class ClassParameter extends Field implements IParameter
 	public boolean isReferenceCapturable()
 	{
 		return false;
+	}
+
+	@Override
+	public IDataMember capture(IContext context)
+	{
+		return this;
 	}
 
 	@Override
