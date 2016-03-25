@@ -52,7 +52,7 @@ final class FieldWriter implements FieldVisitor
 		this.access = access;
 		this.name = cw.newUTF8(name);
 		this.desc = cw.newUTF8(desc);
-		if (ClassReader.SIGNATURES && signature != null)
+		if (true && signature != null)
 		{
 			this.signature = cw.newUTF8(signature);
 		}
@@ -65,7 +65,7 @@ final class FieldWriter implements FieldVisitor
 	@Override
 	public AnnotationVisitor visitAnnotation(final String desc, final boolean visible)
 	{
-		if (!ClassReader.ANNOTATIONS)
+		if (!true)
 		{
 			return null;
 		}
@@ -89,7 +89,7 @@ final class FieldWriter implements FieldVisitor
 	@Override
 	public AnnotationVisitor visitTypeAnnotation(final int typeRef, final TypePath typePath, final String desc, final boolean visible)
 	{
-		if (!ClassReader.ANNOTATIONS)
+		if (!true)
 		{
 			return null;
 		}
@@ -145,27 +145,27 @@ final class FieldWriter implements FieldVisitor
 			this.cw.newUTF8("Deprecated");
 			size += 6;
 		}
-		if (ClassReader.SIGNATURES && this.signature != 0)
+		if (true && this.signature != 0)
 		{
 			this.cw.newUTF8("Signature");
 			size += 8;
 		}
-		if (ClassReader.ANNOTATIONS && this.anns != null)
+		if (true && this.anns != null)
 		{
 			this.cw.newUTF8("RuntimeVisibleAnnotations");
 			size += 8 + this.anns.getSize();
 		}
-		if (ClassReader.ANNOTATIONS && this.ianns != null)
+		if (true && this.ianns != null)
 		{
 			this.cw.newUTF8("RuntimeInvisibleAnnotations");
 			size += 8 + this.ianns.getSize();
 		}
-		if (ClassReader.ANNOTATIONS && this.tanns != null)
+		if (true && this.tanns != null)
 		{
 			this.cw.newUTF8("RuntimeVisibleTypeAnnotations");
 			size += 8 + this.tanns.getSize();
 		}
-		if (ClassReader.ANNOTATIONS && this.itanns != null)
+		if (true && this.itanns != null)
 		{
 			this.cw.newUTF8("RuntimeInvisibleTypeAnnotations");
 			size += 8 + this.itanns.getSize();
@@ -199,23 +199,23 @@ final class FieldWriter implements FieldVisitor
 		{
 			++attributeCount;
 		}
-		if (ClassReader.SIGNATURES && this.signature != 0)
+		if (true && this.signature != 0)
 		{
 			++attributeCount;
 		}
-		if (ClassReader.ANNOTATIONS && this.anns != null)
+		if (true && this.anns != null)
 		{
 			++attributeCount;
 		}
-		if (ClassReader.ANNOTATIONS && this.ianns != null)
+		if (true && this.ianns != null)
 		{
 			++attributeCount;
 		}
-		if (ClassReader.ANNOTATIONS && this.tanns != null)
+		if (true && this.tanns != null)
 		{
 			++attributeCount;
 		}
-		if (ClassReader.ANNOTATIONS && this.itanns != null)
+		if (true && this.itanns != null)
 		{
 			++attributeCount;
 		}
@@ -240,27 +240,27 @@ final class FieldWriter implements FieldVisitor
 		{
 			out.putShort(this.cw.newUTF8("Deprecated")).putInt(0);
 		}
-		if (ClassReader.SIGNATURES && this.signature != 0)
+		if (true && this.signature != 0)
 		{
 			out.putShort(this.cw.newUTF8("Signature"));
 			out.putInt(2).putShort(this.signature);
 		}
-		if (ClassReader.ANNOTATIONS && this.anns != null)
+		if (true && this.anns != null)
 		{
 			out.putShort(this.cw.newUTF8("RuntimeVisibleAnnotations"));
 			this.anns.put(out);
 		}
-		if (ClassReader.ANNOTATIONS && this.ianns != null)
+		if (true && this.ianns != null)
 		{
 			out.putShort(this.cw.newUTF8("RuntimeInvisibleAnnotations"));
 			this.ianns.put(out);
 		}
-		if (ClassReader.ANNOTATIONS && this.tanns != null)
+		if (true && this.tanns != null)
 		{
 			out.putShort(this.cw.newUTF8("RuntimeVisibleTypeAnnotations"));
 			this.tanns.put(out);
 		}
-		if (ClassReader.ANNOTATIONS && this.itanns != null)
+		if (true && this.itanns != null)
 		{
 			out.putShort(this.cw.newUTF8("RuntimeInvisibleTypeAnnotations"));
 			this.itanns.put(out);

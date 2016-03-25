@@ -18,11 +18,11 @@ public interface ICodePosition
 
 	default boolean before(ICodePosition position)
 	{
-		return position != null && this.endIndex() < position.startIndex();
+		return this.endIndex() < position.startIndex();
 	}
 
 	default boolean after(ICodePosition position)
 	{
-		return position != null && this.startIndex() > position.endIndex();
+		return this.startIndex() > position.endIndex();
 	}
 }

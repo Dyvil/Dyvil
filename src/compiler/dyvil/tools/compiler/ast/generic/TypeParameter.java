@@ -626,7 +626,7 @@ public final class TypeParameter implements ITypeParameter
 			String type = this.variance == Variance.CONTRAVARIANT ?
 					              "Ldyvil/annotation/_internal/Contravariant;" :
 					              "Ldyvil/annotation/_internal/Covariant;";
-			visitor.visitTypeAnnotation(typeRef, null, type, true);
+			visitor.visitTypeAnnotation(typeRef, null, type, true).visitEnd();
 		}
 
 		for (int i = 0; i < this.upperBoundCount; i++)

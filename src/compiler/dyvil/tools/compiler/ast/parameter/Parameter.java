@@ -32,6 +32,9 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public abstract class Parameter extends Member implements IParameter
 {
+	public static final String DEFAULT_VALUE       = "Ldyvil/annotation/_internal/DefaultValue;";
+	public static final String DEFAULT_ARRAY_VALUE = "Ldyvil/annotation/_internal/DefaultArrayValue;";
+
 	protected IValue defaultValue;
 
 	// Metadata
@@ -323,9 +326,9 @@ public abstract class Parameter extends Member implements IParameter
 
 		if (type.isArrayType())
 		{
-			final AnnotationVisitor annotationVisitor = writer.visitParameterAnnotation(index,
-			                                                                            "Ldyvil/annotation/_internal/DefaultArrayValue;",
-			                                                                            false).visitArray("value");
+			final AnnotationVisitor annotationVisitor = writer
+				                                            .visitParameterAnnotation(index, DEFAULT_ARRAY_VALUE, false)
+				                                            .visitArray("value");
 
 			ArrayExpr arrayExpr = (ArrayExpr) defaultValue;
 			int count = arrayExpr.valueCount();
@@ -341,10 +344,10 @@ public abstract class Parameter extends Member implements IParameter
 			return;
 		}
 
-		final AnnotationVisitor annotationVisitor = writer.visitParameterAnnotation(index,
-		                                                                            "Ldyvil/annotation/_internal/DefaultValue;",
-		                                                                            false);
+		final AnnotationVisitor annotationVisitor = writer.visitParameterAnnotation(index, DEFAULT_VALUE, false);
 		writeDefaultAnnotation(annotationVisitor, type, defaultValue);
+
+		annotationVisitor.visitEnd();
 	}
 
 	private static void writeDefaultAnnotation(AnnotationVisitor visitor, IType type, IValue value)

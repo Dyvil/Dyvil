@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.modifiers;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotatableVisitor;
+import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -473,7 +474,9 @@ public final class ModifierUtil
 		final int dyvilModifiers = modifiers.toFlags() & MODIFIERS_MASK;
 		if (dyvilModifiers != 0)
 		{
-			mw.visitAnnotation(AnnotationUtil.DYVIL_MODIFIERS, true).visit("value", dyvilModifiers);
+			final AnnotationVisitor annotationVisitor = mw.visitAnnotation(AnnotationUtil.DYVIL_MODIFIERS, true);
+			annotationVisitor.visit("value", dyvilModifiers);
+			annotationVisitor.visitEnd();
 		}
 	}
 }

@@ -336,7 +336,7 @@ public class CodeConstructor extends AbstractConstructor
 
 		if ((modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{
-			methodWriter.visitAnnotation(Deprecation.DYVIL_EXTENDED, true);
+			methodWriter.visitAnnotation(Deprecation.DYVIL_EXTENDED, true).visitEnd();
 		}
 
 		// Write Parameters

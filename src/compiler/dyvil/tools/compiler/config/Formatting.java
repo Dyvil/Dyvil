@@ -3,6 +3,7 @@ package dyvil.tools.compiler.config;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.HashMap;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.parsing.position.ICodePosition;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -76,7 +77,10 @@ public final class Formatting
 		switch (Formatting.getString(key))
 		{
 		case "auto":
-			return member.getPosition().before(member.getType().getPosition());
+			final ICodePosition memberPosition = member.getPosition();
+			final ICodePosition typePosition = member.getType().getPosition();
+			return memberPosition == null || typePosition == null || member.getPosition()
+			                                                               .before(member.getType().getPosition());
 		case "true":
 			return true;
 		}

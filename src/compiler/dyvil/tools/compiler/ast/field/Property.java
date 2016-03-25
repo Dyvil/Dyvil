@@ -331,7 +331,7 @@ public class Property extends Member implements IProperty
 
 		if ((modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{
-			mw.visitAnnotation(Deprecation.DYVIL_EXTENDED, true);
+			mw.visitAnnotation(Deprecation.DYVIL_EXTENDED, true).visitEnd();
 		}
 	}
 

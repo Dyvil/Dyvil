@@ -8,6 +8,7 @@ import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.Opcodes;
 import dyvil.tools.asm.TypeReference;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -707,18 +708,18 @@ public class CodeClass extends AbstractClass
 
 	private void writeClassParameters(ClassWriter writer) throws BytecodeException
 	{
-		AnnotationVisitor av = writer.visitAnnotation("Ldyvil/annotation/_internal/ClassParameters;", false);
-		assert av != null;
-		AnnotationVisitor array = av.visitArray("names");
+		final AnnotationVisitor annotationVisitor = writer.visitAnnotation(AnnotationUtil.CLASS_PARAMETERS, false);
+		final AnnotationVisitor arrayVisitor = annotationVisitor.visitArray("names");
 
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IParameter param = this.parameters[i];
 			param.write(writer);
-			array.visit("", param.getName().qualified);
+			arrayVisitor.visit("", param.getName().qualified);
 		}
 
-		array.visitEnd();
+		arrayVisitor.visitEnd();
+		annotationVisitor.visitEnd();
 	}
 
 	@Override
@@ -787,11 +788,11 @@ public class CodeClass extends AbstractClass
 	{
 		if ((modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{
-			writer.visitAnnotation(Deprecation.DYVIL_EXTENDED, true);
+			writer.visitAnnotation(Deprecation.DYVIL_EXTENDED, true).visitEnd();
 		}
 		if ((modifiers & Modifiers.FUNCTIONAL) != 0)
 		{
-			writer.visitAnnotation("Ljava/lang/FunctionalInterface;", true);
+			writer.visitAnnotation("Ljava/lang/FunctionalInterface;", true).visitEnd();
 		}
 
 		if (this.annotations != null)

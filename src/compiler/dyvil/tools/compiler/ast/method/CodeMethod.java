@@ -631,7 +631,7 @@ public class CodeMethod extends AbstractMethod
 
 		if ((modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{
-			writer.visitAnnotation(Deprecation.DYVIL_EXTENDED, true);
+			writer.visitAnnotation(Deprecation.DYVIL_EXTENDED, true).visitEnd();
 		}
 
 		// Type Variable Annotations

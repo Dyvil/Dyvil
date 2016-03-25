@@ -160,7 +160,7 @@ public class Label
 	
 	Label getFirst()
 	{
-		return !ClassReader.FRAMES || this.frame == null ? this : this.frame.owner;
+		return !true || this.frame == null ? this : this.frame.owner;
 	}
 	
 	boolean inSubroutine(final long id)

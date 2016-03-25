@@ -30,10 +30,10 @@ public class ClassMetadata implements IClassMetadata
 	protected static final int HASHCODE    = 0x8;
 	protected static final int TOSTRING    = 0x10;
 
-	protected static final int WRITE_OBJECT  = 0x1001;
-	protected static final int READ_OBJECT   = 0x1004;
-	protected static final int READ_RESOLVE  = 0x1008;
+	protected static final int READ_RESOLVE  = 0x1001;
 	protected static final int WRITE_REPLACE = 0x1002;
+	// protected static final int WRITE_OBJECT  = 0x1004;
+	// protected static final int READ_OBJECT   = 0x1008;
 
 	protected static final int INSTANCE_FIELD = 0x2001;
 
@@ -73,7 +73,7 @@ public class ClassMetadata implements IClassMetadata
 		Name name = method.getName();
 		if (name == Names.equals)
 		{
-			if (method.parameterCount() == 1 && Types.isSameType(Types.ANY, method.getParameter(0).getType()))
+			if (method.parameterCount() == 1 && method.getParameter(0).getInternalType().getTheClass() == Types.OBJECT_CLASS)
 			{
 				this.members |= EQUALS;
 			}
@@ -116,12 +116,10 @@ public class ClassMetadata implements IClassMetadata
 		}
 		if (name == Names.readResolve || name == Names.writeReplace)
 		{
-			if (method.parameterCount() == 0 && method.getType().isSameType(Types.OBJECT))
+			if (method.parameterCount() == 0 && method.getType().getTheClass() == Types.OBJECT_CLASS)
 			{
 				this.members |= name == Names.writeReplace ? WRITE_REPLACE : READ_RESOLVE;
-				return;
 			}
-			return;
 		}
 	}
 

@@ -51,7 +51,7 @@ public enum Mutability
 	{
 		if (this != UNDEFINED)
 		{
-			visitor.visitTypeAnnotation(typeRef, TypePath.fromString(typePath), this.extendedAnnotationType, true);
+			visitor.visitTypeAnnotation(typeRef, TypePath.fromString(typePath), this.extendedAnnotationType, true).visitEnd();
 		}
 	}
 
@@ -97,7 +97,6 @@ public enum Mutability
 			return;
 		case IMMUTABLE:
 			builder.append("final ");
-			return;
 		}
 	}
 }

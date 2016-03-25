@@ -124,10 +124,7 @@ class MethodWriter implements MethodVisitor
 		this.name = cw.newUTF8(name);
 		this.desc = cw.newUTF8(desc);
 		this.descriptor = desc;
-		if (ClassReader.SIGNATURES)
-		{
-			this.signature = signature;
-		}
+		this.signature = signature;
 		if (exceptions != null && exceptions.length > 0)
 		{
 			this.exceptionCount = exceptions.length;
@@ -169,10 +166,6 @@ class MethodWriter implements MethodVisitor
 	@Override
 	public AnnotationVisitor visitAnnotationDefault()
 	{
-		if (!ClassReader.ANNOTATIONS)
-		{
-			return null;
-		}
 		this.annd = new ByteVector();
 		return new AnnotationWriter(this.cw, false, this.annd, null, 0);
 	}
@@ -180,10 +173,6 @@ class MethodWriter implements MethodVisitor
 	@Override
 	public AnnotationVisitor visitAnnotation(final String desc, final boolean visible)
 	{
-		if (!ClassReader.ANNOTATIONS)
-		{
-			return null;
-		}
 		ByteVector bv = new ByteVector();
 		// write type, and reserve space for values count
 		bv.putShort(this.cw.newUTF8(desc)).putShort(0);
@@ -204,10 +193,6 @@ class MethodWriter implements MethodVisitor
 	@Override
 	public AnnotationVisitor visitTypeAnnotation(final int typeRef, final TypePath typePath, final String desc, final boolean visible)
 	{
-		if (!ClassReader.ANNOTATIONS)
-		{
-			return null;
-		}
 		ByteVector bv = new ByteVector();
 		// write target_type and target_info
 		AnnotationWriter.putTarget(typeRef, typePath, bv);
@@ -230,10 +215,6 @@ class MethodWriter implements MethodVisitor
 	@Override
 	public AnnotationVisitor visitParameterAnnotation(final int parameter, final String desc, final boolean visible)
 	{
-		if (!ClassReader.ANNOTATIONS)
-		{
-			return null;
-		}
 		ByteVector bv = new ByteVector();
 		if ("Ljava/lang/Synthetic;".equals(desc))
 		{
@@ -290,7 +271,7 @@ class MethodWriter implements MethodVisitor
 	@Override
 	public void visitFrame(final int type, final int nLocal, final Object[] local, final int nStack, final Object[] stack)
 	{
-		if (!ClassReader.FRAMES || this.compute == FRAMES)
+		if (this.compute == FRAMES)
 		{
 			return;
 		}
@@ -311,7 +292,7 @@ class MethodWriter implements MethodVisitor
 				}
 				else if (local[i] instanceof Integer)
 				{
-					this.frame[frameIndex++] = ((Integer) local[i]).intValue();
+					this.frame[frameIndex++] = (Integer) local[i];
 				}
 				else
 				{
@@ -327,7 +308,7 @@ class MethodWriter implements MethodVisitor
 				}
 				else if (stack[i] instanceof Integer)
 				{
-					this.frame[frameIndex++] = ((Integer) stack[i]).intValue();
+					this.frame[frameIndex++] = (Integer) stack[i];
 				}
 				else
 				{
@@ -1054,10 +1035,10 @@ class MethodWriter implements MethodVisitor
 				// adds current block successors
 				this.addSuccessor(Edge.NORMAL, dflt);
 				dflt.getFirst().status |= Label.TARGET;
-				for (int i = 0; i < labels.length; ++i)
+				for (Label label : labels)
 				{
-					this.addSuccessor(Edge.NORMAL, labels[i]);
-					labels[i].getFirst().status |= Label.TARGET;
+					this.addSuccessor(Edge.NORMAL, label);
+					label.getFirst().status |= Label.TARGET;
 				}
 			}
 			else
@@ -1102,10 +1083,6 @@ class MethodWriter implements MethodVisitor
 	@Override
 	public AnnotationVisitor visitInsnAnnotation(int typeRef, TypePath typePath, String desc, boolean visible)
 	{
-		if (!ClassReader.ANNOTATIONS)
-		{
-			return null;
-		}
 		ByteVector bv = new ByteVector();
 		// write target_type and target_info
 		typeRef = typeRef & 0xFF0000FF | this.lastCodeOffset << 8;
@@ -1150,10 +1127,6 @@ class MethodWriter implements MethodVisitor
 	@Override
 	public AnnotationVisitor visitTryCatchAnnotation(int typeRef, TypePath typePath, String desc, boolean visible)
 	{
-		if (!ClassReader.ANNOTATIONS)
-		{
-			return null;
-		}
 		ByteVector bv = new ByteVector();
 		// write target_type and target_info
 		AnnotationWriter.putTarget(typeRef, typePath, bv);
@@ -1208,10 +1181,6 @@ class MethodWriter implements MethodVisitor
 	@Override
 	public AnnotationVisitor visitLocalVariableAnnotation(int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index, String desc, boolean visible)
 	{
-		if (!ClassReader.ANNOTATIONS)
-		{
-			return null;
-		}
 		ByteVector bv = new ByteVector();
 		// write target_type and target_info
 		bv.putByte(typeRef >>> 24).putShort(start.length);
@@ -1262,16 +1231,9 @@ class MethodWriter implements MethodVisitor
 		if (this.resize)
 		{
 			// replaces the temporary jump opcodes introduced by Label.resolve.
-			if (ClassReader.RESIZE)
-			{
-				this.resizeInstructions();
-			}
-			else
-			{
-				throw new RuntimeException("Method code too large!");
-			}
+			this.resizeInstructions();
 		}
-		if (ClassReader.FRAMES && this.compute == FRAMES)
+		if (this.compute == FRAMES)
 		{
 			// completes the control flow graph with exception handler blocks
 			Handler handler = this.firstHandler;
@@ -1903,7 +1865,7 @@ class MethodWriter implements MethodVisitor
 		}
 		else if (type instanceof Integer)
 		{
-			this.stackMap.putByte(((Integer) type).intValue());
+			this.stackMap.putByte((Integer) type);
 		}
 		else
 		{
@@ -1947,12 +1909,12 @@ class MethodWriter implements MethodVisitor
 				this.cw.newUTF8(zip ? "StackMapTable" : "StackMap");
 				size += 8 + this.stackMap.length;
 			}
-			if (ClassReader.ANNOTATIONS && this.ctanns != null)
+			if (this.ctanns != null)
 			{
 				this.cw.newUTF8("RuntimeVisibleTypeAnnotations");
 				size += 8 + this.ctanns.getSize();
 			}
-			if (ClassReader.ANNOTATIONS && this.ictanns != null)
+			if (this.ictanns != null)
 			{
 				this.cw.newUTF8("RuntimeInvisibleTypeAnnotations");
 				size += 8 + this.ictanns.getSize();
@@ -1980,7 +1942,7 @@ class MethodWriter implements MethodVisitor
 			this.cw.newUTF8("Deprecated");
 			size += 6;
 		}
-		if (ClassReader.SIGNATURES && this.signature != null)
+		if (this.signature != null)
 		{
 			this.cw.newUTF8("Signature");
 			this.cw.newUTF8(this.signature);
@@ -1991,32 +1953,32 @@ class MethodWriter implements MethodVisitor
 			this.cw.newUTF8("MethodParameters");
 			size += 7 + this.methodParameters.length;
 		}
-		if (ClassReader.ANNOTATIONS && this.annd != null)
+		if (this.annd != null)
 		{
 			this.cw.newUTF8("AnnotationDefault");
 			size += 6 + this.annd.length;
 		}
-		if (ClassReader.ANNOTATIONS && this.anns != null)
+		if (this.anns != null)
 		{
 			this.cw.newUTF8("RuntimeVisibleAnnotations");
 			size += 8 + this.anns.getSize();
 		}
-		if (ClassReader.ANNOTATIONS && this.ianns != null)
+		if (this.ianns != null)
 		{
 			this.cw.newUTF8("RuntimeInvisibleAnnotations");
 			size += 8 + this.ianns.getSize();
 		}
-		if (ClassReader.ANNOTATIONS && this.tanns != null)
+		if (this.tanns != null)
 		{
 			this.cw.newUTF8("RuntimeVisibleTypeAnnotations");
 			size += 8 + this.tanns.getSize();
 		}
-		if (ClassReader.ANNOTATIONS && this.itanns != null)
+		if (this.itanns != null)
 		{
 			this.cw.newUTF8("RuntimeInvisibleTypeAnnotations");
 			size += 8 + this.itanns.getSize();
 		}
-		if (ClassReader.ANNOTATIONS && this.panns != null)
+		if (this.panns != null)
 		{
 			this.cw.newUTF8("RuntimeVisibleParameterAnnotations");
 			size += 7 + 2 * (this.panns.length - this.synthetics);
@@ -2025,7 +1987,7 @@ class MethodWriter implements MethodVisitor
 				size += this.panns[i] == null ? 0 : this.panns[i].getSize();
 			}
 		}
-		if (ClassReader.ANNOTATIONS && this.ipanns != null)
+		if (this.ipanns != null)
 		{
 			this.cw.newUTF8("RuntimeInvisibleParameterAnnotations");
 			size += 7 + 2 * (this.ipanns.length - this.synthetics);
@@ -2072,7 +2034,7 @@ class MethodWriter implements MethodVisitor
 		{
 			++attributeCount;
 		}
-		if (ClassReader.SIGNATURES && this.signature != null)
+		if (this.signature != null)
 		{
 			++attributeCount;
 		}
@@ -2080,31 +2042,31 @@ class MethodWriter implements MethodVisitor
 		{
 			++attributeCount;
 		}
-		if (ClassReader.ANNOTATIONS && this.annd != null)
+		if (this.annd != null)
 		{
 			++attributeCount;
 		}
-		if (ClassReader.ANNOTATIONS && this.anns != null)
+		if (this.anns != null)
 		{
 			++attributeCount;
 		}
-		if (ClassReader.ANNOTATIONS && this.ianns != null)
+		if (this.ianns != null)
 		{
 			++attributeCount;
 		}
-		if (ClassReader.ANNOTATIONS && this.tanns != null)
+		if (this.tanns != null)
 		{
 			++attributeCount;
 		}
-		if (ClassReader.ANNOTATIONS && this.itanns != null)
+		if (this.itanns != null)
 		{
 			++attributeCount;
 		}
-		if (ClassReader.ANNOTATIONS && this.panns != null)
+		if (this.panns != null)
 		{
 			++attributeCount;
 		}
-		if (ClassReader.ANNOTATIONS && this.ipanns != null)
+		if (this.ipanns != null)
 		{
 			++attributeCount;
 		}
@@ -2132,11 +2094,11 @@ class MethodWriter implements MethodVisitor
 			{
 				size += 8 + this.stackMap.length;
 			}
-			if (ClassReader.ANNOTATIONS && this.ctanns != null)
+			if (this.ctanns != null)
 			{
 				size += 8 + this.ctanns.getSize();
 			}
-			if (ClassReader.ANNOTATIONS && this.ictanns != null)
+			if (this.ictanns != null)
 			{
 				size += 8 + this.ictanns.getSize();
 			}
@@ -2175,11 +2137,11 @@ class MethodWriter implements MethodVisitor
 			{
 				++attributeCount;
 			}
-			if (ClassReader.ANNOTATIONS && this.ctanns != null)
+			if (this.ctanns != null)
 			{
 				++attributeCount;
 			}
-			if (ClassReader.ANNOTATIONS && this.ictanns != null)
+			if (this.ictanns != null)
 			{
 				++attributeCount;
 			}
@@ -2213,12 +2175,12 @@ class MethodWriter implements MethodVisitor
 				out.putInt(this.stackMap.length + 2).putShort(this.frameCount);
 				out.putByteArray(this.stackMap.data, 0, this.stackMap.length);
 			}
-			if (ClassReader.ANNOTATIONS && this.ctanns != null)
+			if (this.ctanns != null)
 			{
 				out.putShort(this.cw.newUTF8("RuntimeVisibleTypeAnnotations"));
 				this.ctanns.put(out);
 			}
-			if (ClassReader.ANNOTATIONS && this.ictanns != null)
+			if (this.ictanns != null)
 			{
 				out.putShort(this.cw.newUTF8("RuntimeInvisibleTypeAnnotations"));
 				this.ictanns.put(out);
@@ -2248,7 +2210,7 @@ class MethodWriter implements MethodVisitor
 		{
 			out.putShort(this.cw.newUTF8("Deprecated")).putInt(0);
 		}
-		if (ClassReader.SIGNATURES && this.signature != null)
+		if (this.signature != null)
 		{
 			out.putShort(this.cw.newUTF8("Signature")).putInt(2).putShort(this.cw.newUTF8(this.signature));
 		}
@@ -2258,38 +2220,38 @@ class MethodWriter implements MethodVisitor
 			out.putInt(this.methodParameters.length + 1).putByte(this.methodParametersCount);
 			out.putByteArray(this.methodParameters.data, 0, this.methodParameters.length);
 		}
-		if (ClassReader.ANNOTATIONS && this.annd != null)
+		if (this.annd != null)
 		{
 			out.putShort(this.cw.newUTF8("AnnotationDefault"));
 			out.putInt(this.annd.length);
 			out.putByteArray(this.annd.data, 0, this.annd.length);
 		}
-		if (ClassReader.ANNOTATIONS && this.anns != null)
+		if (this.anns != null)
 		{
 			out.putShort(this.cw.newUTF8("RuntimeVisibleAnnotations"));
 			this.anns.put(out);
 		}
-		if (ClassReader.ANNOTATIONS && this.ianns != null)
+		if (this.ianns != null)
 		{
 			out.putShort(this.cw.newUTF8("RuntimeInvisibleAnnotations"));
 			this.ianns.put(out);
 		}
-		if (ClassReader.ANNOTATIONS && this.tanns != null)
+		if (this.tanns != null)
 		{
 			out.putShort(this.cw.newUTF8("RuntimeVisibleTypeAnnotations"));
 			this.tanns.put(out);
 		}
-		if (ClassReader.ANNOTATIONS && this.itanns != null)
+		if (this.itanns != null)
 		{
 			out.putShort(this.cw.newUTF8("RuntimeInvisibleTypeAnnotations"));
 			this.itanns.put(out);
 		}
-		if (ClassReader.ANNOTATIONS && this.panns != null)
+		if (this.panns != null)
 		{
 			out.putShort(this.cw.newUTF8("RuntimeVisibleParameterAnnotations"));
 			AnnotationWriter.put(this.panns, this.synthetics, out);
 		}
-		if (ClassReader.ANNOTATIONS && this.ipanns != null)
+		if (this.ipanns != null)
 		{
 			out.putShort(this.cw.newUTF8("RuntimeInvisibleParameterAnnotations"));
 			AnnotationWriter.put(this.ipanns, this.synthetics, out);
