@@ -1,17 +1,19 @@
 package dyvil.tools.compiler.ast.classes;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -133,11 +135,8 @@ public class ClassBody implements IClassBody
 	}
 
 	@Override
-	public void addField(IDataMember dataMember)
+	public void addDataMember(IField field)
 	{
-		// We can be sure the DataMember is a Field
-		final IField field = (IField) dataMember;
-
 		field.setEnclosingClass(this.theClass);
 
 		final int index = this.fieldCount++;
@@ -148,6 +147,12 @@ public class ClassBody implements IClassBody
 			this.fields = temp;
 		}
 		this.fields[index] = field;
+	}
+
+	@Override
+	public IField createDataMember(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	{
+		return new Field(position, name, type, modifiers, annotations);
 	}
 
 	@Override

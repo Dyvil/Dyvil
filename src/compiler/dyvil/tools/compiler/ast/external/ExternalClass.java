@@ -682,7 +682,7 @@ public final class ExternalClass extends AbstractClass
 			field.setValue(IValue.fromObject(value));
 		}
 
-		this.body.addField(field);
+		this.body.addDataMember(field);
 
 		return new SimpleFieldVisitor(field);
 	}

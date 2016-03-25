@@ -287,17 +287,17 @@ public final class MemberParser extends Parser implements ITypeConsumer
 			case Tokens.EOF:
 			case BaseSymbols.CLOSE_CURLY_BRACKET:
 			{
-				final IDataMember field = this.consumer.createField(this.position, this.name, this.type, this.modifiers,
-				                                                    this.annotations);
-				this.consumer.addField(field);
+				final IDataMember field = this.consumer.createDataMember(this.position, this.name, this.type, this.modifiers,
+				                                                         this.annotations);
+				this.consumer.addDataMember(field);
 				this.mode = END;
 				pm.popParser(true);
 				return;
 			}
 			case BaseSymbols.EQUALS:
 			{
-				final IDataMember field = this.consumer.createField(this.position, this.name, this.type, this.modifiers,
-				                                                    this.annotations);
+				final IDataMember field = this.consumer.createDataMember(this.position, this.name, this.type, this.modifiers,
+				                                                         this.annotations);
 				this.member = field;
 				this.setMemberKind(FIELD);
 				this.mode = END;
@@ -456,7 +456,7 @@ public final class MemberParser extends Parser implements ITypeConsumer
 				this.consumer.addInitializer((IInitializer) this.member);
 				break;
 			case FIELD:
-				this.consumer.addField((IDataMember) this.member);
+				this.consumer.addDataMember((IDataMember) this.member);
 				break;
 			case PROPERTY:
 				this.consumer.addProperty((IProperty) this.member);

@@ -7,8 +7,8 @@ import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.consumer.IMemberConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IProperty;
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.NestedMethod;
@@ -35,7 +35,7 @@ import static dyvil.tools.compiler.parser.TryParserManager.EXIT_ON_ROOT;
 import static dyvil.tools.compiler.parser.classes.MemberParser.NO_UNINITIALIZED_VARIABLES;
 import static dyvil.tools.compiler.parser.classes.MemberParser.OPERATOR_ERROR;
 
-public final class StatementListParser extends Parser implements IValueConsumer, IMemberConsumer
+public final class StatementListParser extends Parser implements IValueConsumer, IMemberConsumer<IVariable>
 {
 	private static final int OPEN_BRACKET = 1;
 	private static final int EXPRESSION   = 2;
@@ -153,13 +153,13 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 	}
 
 	@Override
-	public void addField(IDataMember field)
+	public void addDataMember(IVariable field)
 	{
-		this.setValue(new FieldInitializer((Variable) field));
+		this.setValue(new FieldInitializer(field));
 	}
 
 	@Override
-	public IDataMember createField(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public IVariable createDataMember(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
 		return new Variable(position, name, type, modifiers, annotations);
 	}

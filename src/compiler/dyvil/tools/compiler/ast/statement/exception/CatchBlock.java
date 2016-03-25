@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.statement.exception;
 
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
-import dyvil.tools.compiler.ast.consumer.IVariableConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -15,7 +14,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public class CatchBlock implements IDefaultContext, IValueConsumer, IVariableConsumer
+public class CatchBlock implements IDefaultContext, IValueConsumer
 {
 	public IValue        action;
 
@@ -46,7 +45,6 @@ public class CatchBlock implements IDefaultContext, IValueConsumer, IVariableCon
 		return this.variable;
 	}
 
-	@Override
 	public void setVariable(IVariable variable)
 	{
 		this.variable = variable;

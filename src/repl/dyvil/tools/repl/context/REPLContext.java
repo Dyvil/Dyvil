@@ -44,7 +44,7 @@ import dyvil.tools.repl.DyvilREPL;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberConsumer, IClassCompilableList
+public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberConsumer<REPLVariable>, IClassCompilableList
 {
 	private static final String REPL$CLASSES     = "repl$classes/";
 	public static final  int    ACCESS_MODIFIERS = Modifiers.PUBLIC | Modifiers.PRIVATE | Modifiers.PROTECTED;
@@ -461,21 +461,19 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 	}
 
 	@Override
-	public void addField(IDataMember field)
+	public void addDataMember(REPLVariable variable)
 	{
-		final REPLVariable var = (REPLVariable) field;
+		this.memberClass = this.getREPLClass(variable);
 
-		this.memberClass = this.getREPLClass(var);
-
-		if (this.computeVariable(var))
+		if (this.computeVariable(variable))
 		{
-			this.fields.put(var.getName(), var);
-			this.compiler.getOutput().println(var.toString());
+			this.fields.put(variable.getName(), variable);
+			this.compiler.getOutput().println(variable.toString());
 		}
 	}
 
 	@Override
-	public IDataMember createField(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public REPLVariable createDataMember(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
 		return new REPLVariable(this, position, name, type, this.className, modifiers, annotations);
 	}
@@ -543,7 +541,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 
 		this.compileClass(iclass);
 
-		this.registerMethod(method, iclass);
+		this.registerMethod(method);
 	}
 
 	public static void updateModifiers(ModifierSet modifiers)
@@ -555,7 +553,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 		modifiers.addIntModifier(Modifiers.STATIC);
 	}
 
-	private void registerMethod(IMethod method, REPLMemberClass iclass)
+	private void registerMethod(IMethod method)
 	{
 		boolean replaced = false;
 		int methods = this.methods.size();

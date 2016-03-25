@@ -1,13 +1,16 @@
 package dyvil.tools.compiler.parser.statement;
 
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
+import dyvil.tools.compiler.ast.consumer.IDataMemberConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
-import dyvil.tools.compiler.ast.consumer.IVariableConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.statement.loop.ForEachStatement;
 import dyvil.tools.compiler.ast.statement.loop.ForStatement;
 import dyvil.tools.compiler.ast.statement.loop.IForStatement;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -15,6 +18,7 @@ import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -23,7 +27,7 @@ import dyvil.tools.parsing.token.IToken;
 import static dyvil.tools.compiler.parser.expression.ExpressionParser.IGNORE_CLOSURE;
 import static dyvil.tools.compiler.parser.expression.ExpressionParser.IGNORE_COLON;
 
-public class ForStatementParser extends Parser implements IValueConsumer, IVariableConsumer
+public class ForStatementParser extends Parser implements IValueConsumer, IDataMemberConsumer<IVariable>
 {
 	private static final int FOR                = 0;
 	private static final int FOR_START          = 1;
@@ -96,7 +100,7 @@ public class ForStatementParser extends Parser implements IValueConsumer, IVaria
 				return;
 			}
 
-			pm.pushParser(new VariableParser(this), true);
+			pm.pushParser(new DataMemberParser<>(this), true);
 			this.mode = VARIABLE_SEPARATOR;
 			return;
 		case VARIABLE_SEPARATOR:
@@ -239,8 +243,14 @@ public class ForStatementParser extends Parser implements IValueConsumer, IVaria
 	}
 
 	@Override
-	public void setVariable(IVariable variable)
+	public void addDataMember(IVariable dataMember)
 	{
-		this.variable = variable;
+		this.variable = dataMember;
+	}
+
+	@Override
+	public IVariable createDataMember(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	{
+		return new Variable(position, name, type, modifiers, annotations);
 	}
 }

@@ -2,11 +2,13 @@ package dyvil.tools.compiler.parser.statement;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
+import dyvil.tools.compiler.ast.consumer.IDataMemberConsumer;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
-import dyvil.tools.compiler.ast.consumer.IVariableConsumer;
-import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.field.Variable;
-import dyvil.tools.compiler.ast.modifiers.*;
+import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.modifiers.Modifier;
+import dyvil.tools.compiler.ast.modifiers.ModifierList;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
+import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -18,19 +20,19 @@ import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
-public class VariableParser extends Parser implements ITypeConsumer
+public class DataMemberParser<T extends IDataMember> extends Parser implements ITypeConsumer
 {
 	protected static final int TYPE = 0;
 	protected static final int NAME = 1;
 
-	protected IVariableConsumer consumer;
+	protected IDataMemberConsumer<T> consumer;
 
 	private ModifierSet    modifiers;
 	private AnnotationList annotations;
 	private IType          type;
-	private IVariable      variable;
+	private T              dataMember;
 
-	public VariableParser(IVariableConsumer consumer)
+	public DataMemberParser(IDataMemberConsumer<T> consumer)
 	{
 		this.consumer = consumer;
 	}
@@ -75,7 +77,9 @@ public class VariableParser extends Parser implements ITypeConsumer
 			if (ParserUtil.isIdentifier(type) && token.next().type() == BaseSymbols.COLON)
 			{
 				// IDENTIFIER : TYPE
-				this.variable = new Variable(token.raw(), token.nameValue(), Types.UNKNOWN);
+				this.dataMember = this.consumer
+					                  .createDataMember(token.raw(), token.nameValue(), Types.UNKNOWN, this.modifiers,
+					                                    this.annotations);
 				this.mode = END;
 				return;
 			}
@@ -90,8 +94,8 @@ public class VariableParser extends Parser implements ITypeConsumer
 				return;
 			}
 
-			this.variable = this.consumer.createVariable(token.raw(), token.nameValue(), this.type, this.modifiers,
-			                                             this.annotations);
+			this.dataMember = this.consumer.createDataMember(token.raw(), token.nameValue(), this.type, this.modifiers,
+			                                                 this.annotations);
 
 			this.mode = END;
 			return;
@@ -99,17 +103,17 @@ public class VariableParser extends Parser implements ITypeConsumer
 			if (type == BaseSymbols.COLON)
 			{
 				// ... IDENTIFIER : TYPE ...
-				if (this.variable.getType() != Types.UNKNOWN)
+				if (this.dataMember.getType() != Types.UNKNOWN)
 				{
 					pm.report(token, "variable.type.duplicate");
 				}
-				pm.pushParser(new TypeParser(this.variable));
+				pm.pushParser(new TypeParser(this.dataMember));
 
 				// mode stays END
 				return;
 			}
 
-			this.consumer.setVariable(this.variable);
+			this.consumer.addDataMember(this.dataMember);
 			pm.popParser(true);
 		}
 	}

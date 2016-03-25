@@ -1,19 +1,27 @@
 package dyvil.tools.compiler.parser.statement;
 
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
+import dyvil.tools.compiler.ast.consumer.IDataMemberConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.field.IVariable;
+import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.statement.exception.CatchBlock;
 import dyvil.tools.compiler.ast.statement.exception.TryStatement;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
+import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;
 
-public final class TryStatementParser extends Parser implements IValueConsumer
+public final class TryStatementParser extends Parser implements IValueConsumer, IDataMemberConsumer<IVariable>
 {
 	private static final int ACTION          = 1;
 	private static final int CATCH           = 2;
@@ -75,12 +83,12 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
 				this.mode = CATCH_CLOSE;
-				pm.pushParser(new VariableParser(this.catchBlock));
+				pm.pushParser(new DataMemberParser<>(this));
 			}
 			else
 			{
 				this.mode = CATCH_SEPARATOR;
-				pm.pushParser(new VariableParser(this.catchBlock), true);
+				pm.pushParser(new DataMemberParser<>(this), true);
 			}
 			return;
 		case CATCH_CLOSE:
@@ -126,5 +134,17 @@ public final class TryStatementParser extends Parser implements IValueConsumer
 		case END:
 			this.statement.setFinallyBlock(value);
 		}
+	}
+
+	@Override
+	public void addDataMember(IVariable variable)
+	{
+		this.catchBlock.setVariable(variable);
+	}
+
+	@Override
+	public IVariable createDataMember(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	{
+		return new Variable(position, name, type, modifiers, annotations);
 	}
 }

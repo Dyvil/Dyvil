@@ -6,7 +6,6 @@ import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.consumer.IMemberConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -18,7 +17,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public interface IClassBody extends IASTNode, IClassList, IMemberConsumer
+public interface IClassBody extends IASTNode, IClassList, IMemberConsumer<IField>
 {
 	// Associated Class
 	
@@ -31,7 +30,7 @@ public interface IClassBody extends IASTNode, IClassList, IMemberConsumer
 	int fieldCount();
 	
 	@Override
-	void addField(IDataMember field);
+	void addDataMember(IField field);
 	
 	IField getField(int index);
 	
