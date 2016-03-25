@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.parser.classes;
+package dyvil.tools.compiler.parser.header;
 
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.alias.ITypeAliasMap;
@@ -95,7 +95,6 @@ public class TypeAliasParser extends Parser
 				pm.reparse();
 				pm.report(token, "typealias.generic.close_bracket");
 			}
-			return;
 		}
 	}
 

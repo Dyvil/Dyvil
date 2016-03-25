@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.parser.classes;
+package dyvil.tools.compiler.parser.header;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
@@ -14,9 +14,6 @@ import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
-import dyvil.tools.compiler.parser.imports.ImportParser;
-import dyvil.tools.compiler.parser.imports.IncludeParser;
-import dyvil.tools.compiler.parser.imports.PackageParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.Markers;
@@ -240,7 +237,6 @@ public class DyvilHeaderParser extends Parser
 		final Annotation annotation = new Annotation(token.raw());
 		this.annotations.addAnnotation(annotation);
 		pm.pushParser(new AnnotationParser(annotation));
-		return;
 	}
 
 	@Override

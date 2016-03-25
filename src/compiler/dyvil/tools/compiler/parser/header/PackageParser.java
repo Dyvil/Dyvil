@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.parser.imports;
+package dyvil.tools.compiler.parser.header;
 
 import dyvil.tools.compiler.ast.header.PackageDeclaration;
 import dyvil.tools.compiler.parser.IParserManager;
@@ -65,7 +65,6 @@ public class PackageParser extends Parser
 				pm.report(token, "package.dot");
 				pm.reparse();
 			}
-			return;
 		}
 	}
 

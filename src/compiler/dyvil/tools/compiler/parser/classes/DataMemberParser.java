@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.parser.statement;
+package dyvil.tools.compiler.parser.classes;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
