@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.reference;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
@@ -18,6 +19,7 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.AnnotatedType;
 import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvil.tools.compiler.ast.type.raw.IObjectType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -35,7 +37,7 @@ public class ReferenceType implements IObjectType
 	public static final class LazyFields
 	{
 		public static IClass OBJECT_SIMPLE_REF_CLASS = Package.dyvilRefSimple.resolveClass("SimpleObjectRef");
-		public static IClass OBJECT_REF_CLASS = Package.dyvilRef.resolveClass("ObjectRef");
+		public static IClass OBJECT_REF_CLASS        = Package.dyvilRef.resolveClass("ObjectRef");
 
 		public static IType getObjectSimpleRef(IType type)
 		{
@@ -299,6 +301,16 @@ public class ReferenceType implements IObjectType
 	}
 
 	@Override
+	public IType withAnnotation(IAnnotation annotation)
+	{
+		if (AnnotationUtil.IMPLICITLY_UNWRAPPED_INTERNAL.equals(annotation.getType().getInternalName()))
+		{
+			return new ImplicitReferenceType(this.theClass, this.type);
+		}
+		return new AnnotatedType(this, annotation);
+	}
+
+	@Override
 	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
 	{
 		if (typePath.getStep(step) != TypePath.TYPE_ARGUMENT)
@@ -329,26 +341,26 @@ public class ReferenceType implements IObjectType
 	{
 		this.type = IType.readType(in);
 	}
-	
+
 	public void writeUnwrap(MethodWriter writer) throws BytecodeException
 	{
 		final String internal = this.theClass.getInternalName();
 		if (this.theClass == LazyFields.OBJECT_REF_CLASS)
 		{
 			writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, internal, "get", "()Ljava/lang/Object;", true);
-			
+
 			if (this.type.getTheClass() != Types.OBJECT_CLASS)
 			{
 				writer.visitTypeInsn(Opcodes.CHECKCAST, this.type.getInternalName());
 			}
 			return;
 		}
-		
+
 		final StringBuilder stringBuilder = new StringBuilder("()");
 		this.type.appendExtendedName(stringBuilder);
 		writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, internal, "get", stringBuilder.toString(), true);
 	}
-	
+
 	public void writeWrap(MethodWriter writer) throws BytecodeException
 	{
 		final String internal = this.theClass.getInternalName();
@@ -357,7 +369,7 @@ public class ReferenceType implements IObjectType
 			writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, internal, "set", "(Ljava/lang/Object;)V", true);
 			return;
 		}
-		
+
 		final StringBuilder stringBuilder = new StringBuilder().append('(');
 		this.type.appendExtendedName(stringBuilder);
 		stringBuilder.append(")V");

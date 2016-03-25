@@ -1,6 +1,9 @@
 package dyvil.tools.compiler.ast.reference;
 
+import dyvil.tools.asm.TypeAnnotatableVisitor;
+import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.access.MethodCall;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -105,6 +108,13 @@ public class ImplicitReferenceType extends ReferenceType
 	{
 		this.type.getMethodMatches(list, instance, name, arguments);
 		super.getMethodMatches(list, instance, name, arguments);
+	}
+
+	@Override
+	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
+	{
+		visitor.visitTypeAnnotation(typeRef, TypePath.fromString(typePath), AnnotationUtil.IMPLICITLY_UNWRAPPED, false)
+		       .visitEnd();
 	}
 
 	@Override

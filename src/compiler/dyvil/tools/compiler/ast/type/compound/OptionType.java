@@ -4,6 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.access.MethodCall;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
@@ -19,6 +20,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
+import dyvil.tools.compiler.ast.reference.ImplicitReferenceType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -269,6 +271,16 @@ public class OptionType implements IObjectType
 	public void writeDefaultValue(MethodWriter writer) throws BytecodeException
 	{
 		writer.visitFieldInsn(Opcodes.INVOKESTATIC, "dyvil/util/Option", "apply", "()Ldyvil/util/Option;");
+	}
+
+	@Override
+	public IType withAnnotation(IAnnotation annotation)
+	{
+		if (AnnotationUtil.IMPLICITLY_UNWRAPPED_INTERNAL.equals(annotation.getType().getInternalName()))
+		{
+			return new ImplicitOptionType(this.type);
+		}
+		return new AnnotatedType(this, annotation);
 	}
 
 	@Override

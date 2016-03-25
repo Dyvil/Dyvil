@@ -417,13 +417,18 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	static IType withAnnotation(IType type, IAnnotation annotation, TypePath typePath, int step, int steps)
 	{
-		if (typePath == null || step > steps)
+		if (typePath == null || step >= steps)
 		{
-			return new AnnotatedType(type, annotation);
+			return type.withAnnotation(annotation);
 		}
 
 		type.addAnnotation(annotation, typePath, step, steps);
 		return type;
+	}
+
+	default IType withAnnotation(IAnnotation annotation)
+	{
+		return new AnnotatedType(this, annotation);
 	}
 
 	void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps);
