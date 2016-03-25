@@ -126,7 +126,7 @@ public class AnonymousClassMetadata implements IClassMetadata
 		
 		captureHelper.writeFieldAssignments(mw);
 
-		this.theClass.writeInit(mw);
+		this.theClass.writeClassInit(mw);
 		
 		mw.visitEnd(Types.VOID);
 	}

@@ -172,13 +172,13 @@ public final class ClassParameter extends Parameter implements IField
 	}
 
 	@Override
-	public void write(ClassWriter writer) throws BytecodeException
+	public void writeClassInit(MethodWriter writer)
 	{
-		String desc = this.getDescriptor();
-		FieldVisitor fv = writer.visitField(this.modifiers.toFlags() & ModifierUtil.JAVA_MODIFIER_MASK,
-		                                    this.name.qualified, desc, this.getSignature(), null);
+	}
 
-		IField.writeAnnotations(fv, this.modifiers, this.annotations, this.type);
+	@Override
+	public void writeInit(MethodWriter writer) throws BytecodeException
+	{
 	}
 
 	@Override

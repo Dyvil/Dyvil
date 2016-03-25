@@ -55,7 +55,7 @@ public class TraitMetadata extends InterfaceMetadata
 		initWriter.visitCode();
 		initWriter.setLocalType(0, internalName);
 
-		this.theClass.writeInit(initWriter);
+		this.theClass.writeClassInit(initWriter);
 
 		initWriter.visitInsn(Opcodes.RETURN);
 		initWriter.visitEnd();

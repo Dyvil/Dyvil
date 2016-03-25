@@ -655,7 +655,7 @@ public class REPLMemberClass implements IClass
 	}
 
 	@Override
-	public void writeInit(MethodWriter writer) throws BytecodeException
+	public void writeClassInit(MethodWriter writer) throws BytecodeException
 	{
 
 	}

@@ -784,7 +784,7 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public void writeInit(MethodWriter writer) throws BytecodeException
+	public void writeClassInit(MethodWriter writer) throws BytecodeException
 	{
 
 	}
