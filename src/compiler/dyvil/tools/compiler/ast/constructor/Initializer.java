@@ -138,7 +138,7 @@ public class Initializer extends Member implements IInitializer
 	}
 
 	@Override
-	public void writeInit(MethodWriter writer) throws BytecodeException
+	public void writeClassInit(MethodWriter writer) throws BytecodeException
 	{
 		if (!this.modifiers.hasIntModifier(Modifiers.STATIC))
 		//  ^ not

@@ -300,7 +300,7 @@ public class Field extends Member implements IField
 	}
 
 	@Override
-	public void writeInit(MethodWriter writer) throws BytecodeException
+	public void writeClassInit(MethodWriter writer) throws BytecodeException
 	{
 		if (this.value != null && !this.modifiers.hasIntModifier(Modifiers.STATIC) && !this.value.isConstant())
 		{

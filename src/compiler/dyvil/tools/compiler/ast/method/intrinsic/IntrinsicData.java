@@ -28,14 +28,14 @@ public interface IntrinsicData
 		{
 			final IParameter parameter = method.getParameter(index);
 			arguments.writeValue(index, parameter, writer);
-			return parameter.getInternalParameterType();
+			return parameter.getInternalType();
 		}
 		
 		if (index == 0)
 		{
 			if (method.hasModifier(Modifiers.INFIX))
 			{
-				final IType internalParameterType = method.getParameter(0).getInternalParameterType();
+				final IType internalParameterType = method.getParameter(0).getInternalType();
 				instance.writeExpression(writer, internalParameterType);
 				return internalParameterType;
 			}
@@ -49,11 +49,11 @@ public interface IntrinsicData
 		{
 			final IParameter parameter = method.getParameter(index);
 			arguments.writeValue(index - 1, parameter, writer);
-			return parameter.getInternalParameterType();
+			return parameter.getInternalType();
 		}
 
 		final IParameter parameter = method.getParameter(index - 1);
 		arguments.writeValue(index - 1, parameter, writer);
-		return parameter.getInternalParameterType();
+		return parameter.getInternalType();
 	}
 }

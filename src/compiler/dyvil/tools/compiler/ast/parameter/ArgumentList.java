@@ -190,7 +190,7 @@ public final class ArgumentList implements IArguments, IValueList
 			return param.getValue() != null ? DEFAULT_MATCH : 0;
 		}
 		
-		return this.values[index].getTypeMatch(param.getType());
+		return this.values[index].getTypeMatch(param.getInternalType());
 	}
 	
 	@Override
@@ -206,7 +206,7 @@ public final class ArgumentList implements IArguments, IValueList
 		}
 		
 		IValue argument = this.values[index];
-		IType type = param.getType();
+		IType type = param.getInternalType();
 		float totalMatch = argument.getTypeMatch(type);
 		if (totalMatch > 0F)
 		{
@@ -234,7 +234,7 @@ public final class ArgumentList implements IArguments, IValueList
 			return;
 		}
 		
-		final IType type = param.getInternalParameterType();
+		final IType type = param.getInternalType();
 
 		this.values[index] = TypeChecker.convertValue(this.values[index], type, typeContext, markers, context,
 		                                              IArguments.argumentMarkerSupplier(param));
@@ -248,7 +248,7 @@ public final class ArgumentList implements IArguments, IValueList
 			return;
 		}
 		
-		final IType arrayType = param.getInternalParameterType();
+		final IType arrayType = param.getInternalType();
 		
 		final IValue value = this.values[index];
 		if (value.isType(arrayType))
@@ -276,7 +276,7 @@ public final class ArgumentList implements IArguments, IValueList
 		{
 			return;
 		}
-		param.getType().inferTypes(this.values[index].getType(), typeContext);
+		param.getInternalType().inferTypes(this.values[index].getType(), typeContext);
 	}
 	
 	@Override
@@ -290,7 +290,7 @@ public final class ArgumentList implements IArguments, IValueList
 		IType type = this.values[index].getType();
 		if (index + 1 == this.size && type.isArrayType())
 		{
-			param.getType().inferTypes(type, typeContext);
+			param.getInternalType().inferTypes(type, typeContext);
 			return;
 		}
 		
@@ -299,7 +299,7 @@ public final class ArgumentList implements IArguments, IValueList
 			type = Types.combine(type, this.values[i].getType());
 		}
 		
-		param.getType().getElementType().inferTypes(type, typeContext);
+		param.getInternalType().getElementType().inferTypes(type, typeContext);
 	}
 	
 	@Override
@@ -307,10 +307,10 @@ public final class ArgumentList implements IArguments, IValueList
 	{
 		if (index < this.size)
 		{
-			this.values[index].writeExpression(writer, param.getType());
+			this.values[index].writeExpression(writer, param.getInternalType());
 			return;
 		}
-		param.getValue().writeExpression(writer, param.getType());
+		param.getValue().writeExpression(writer, param.getInternalType());
 	}
 	
 	@Override
@@ -318,13 +318,13 @@ public final class ArgumentList implements IArguments, IValueList
 	{
 		if (this.varArgsArray)
 		{
-			this.values[index].writeExpression(writer, param.getType());
+			this.values[index].writeExpression(writer, param.getInternalType());
 			return;
 		}
 		
-		IType type = param.getType().getElementType();
+		IType type = param.getInternalType().getElementType();
 		int len = this.size - index;
-		if (len < 0)
+		if (len <= 0)
 		{
 			writer.visitLdcInsn(0);
 			writer.visitMultiANewArrayInsn(type, 1);

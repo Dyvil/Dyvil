@@ -8,7 +8,6 @@ import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.raw.InternalType;
-import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.visitor.AnnotationReader;
 
 public interface IParameter extends IVariable, IClassMember
@@ -18,8 +17,9 @@ public interface IParameter extends IVariable, IClassMember
 	{
 	}
 
-	IType getInternalParameterType();
-	
+	@Override
+	IType getInternalType();
+
 	@Override
 	default IClass getEnclosingClass()
 	{
@@ -47,7 +47,6 @@ public interface IParameter extends IVariable, IClassMember
 	
 	default void setVarargs(boolean varargs)
 	{
-
 	}
 	
 	default boolean isVarargs()
@@ -66,7 +65,4 @@ public interface IParameter extends IVariable, IClassMember
 		Annotation annotation = new Annotation(type);
 		return new AnnotationReader(this, annotation);
 	}
-	
-	@Override
-	void writeInit(MethodWriter mw);
 }

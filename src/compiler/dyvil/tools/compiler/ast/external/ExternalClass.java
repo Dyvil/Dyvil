@@ -668,7 +668,7 @@ public final class ExternalClass extends AbstractClass
 			{
 				if (s.equals(name))
 				{
-					ClassParameter param = new ClassParameter(Name.get(name), type, new FlagModifierSet(access));
+					ClassParameter param = new ClassParameter(this, Name.get(name), type, new FlagModifierSet(access));
 					this.addParameter(param);
 					return new SimpleFieldVisitor(param);
 				}
@@ -693,7 +693,7 @@ public final class ExternalClass extends AbstractClass
 
 		if (this.isAnnotation())
 		{
-			ClassParameter param = new ClassParameter(name1, ClassFormat.readReturnType(desc),
+			ClassParameter param = new ClassParameter(this, name1, ClassFormat.readReturnType(desc),
 			                                          new FlagModifierSet(access));
 			this.addParameter(param);
 			return new AnnotationClassVisitor(param);
@@ -784,7 +784,7 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public void writeInit(MethodWriter writer) throws BytecodeException
+	public void writeClassInit(MethodWriter writer) throws BytecodeException
 	{
 
 	}

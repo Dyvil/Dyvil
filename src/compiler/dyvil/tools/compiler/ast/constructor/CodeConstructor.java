@@ -360,7 +360,7 @@ public class CodeConstructor extends AbstractConstructor
 
 		if (this.initializerCall == null || this.initializerCall.isSuper())
 		{
-			this.enclosingClass.writeInit(methodWriter);
+			this.enclosingClass.writeClassInit(methodWriter);
 		}
 
 		if (this.value != null)

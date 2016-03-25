@@ -147,7 +147,7 @@ public interface IClass extends IClassMember, ITypeParametric, IContext, IParame
 	void write(ClassWriter writer) throws BytecodeException;
 
 	@Override
-	void writeInit(MethodWriter writer) throws BytecodeException;
+	void writeClassInit(MethodWriter writer) throws BytecodeException;
 
 	@Override
 	void writeStaticInit(MethodWriter writer) throws BytecodeException;

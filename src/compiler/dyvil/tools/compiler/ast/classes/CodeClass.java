@@ -722,7 +722,7 @@ public class CodeClass extends AbstractClass
 	}
 
 	@Override
-	public void writeInit(MethodWriter writer) throws BytecodeException
+	public void writeClassInit(MethodWriter writer) throws BytecodeException
 	{
 		if (this.traitInit)
 		{
@@ -732,27 +732,27 @@ public class CodeClass extends AbstractClass
 			// Invoke the virtual <traitinit> method of this class
 		}
 
-		this.metadata.writeInit(writer);
+		this.metadata.writeClassInit(writer);
 
 		if (this.body != null)
 		{
 			for (int i = 0, count = this.body.fieldCount(); i < count; i++)
 			{
-				this.body.getField(i).writeInit(writer);
+				this.body.getField(i).writeClassInit(writer);
 			}
 			for (int i = 0, count = this.body.propertyCount(); i < count; i++)
 			{
-				this.body.getProperty(i).writeInit(writer);
+				this.body.getProperty(i).writeClassInit(writer);
 			}
 			for (int i = 0, count = this.body.initializerCount(); i < count; i++)
 			{
-				this.body.getInitializer(i).writeInit(writer);
+				this.body.getInitializer(i).writeClassInit(writer);
 			}
 		}
 
 		for (int i = 0; i < this.compilableCount; i++)
 		{
-			this.compilables[i].writeInit(writer);
+			this.compilables[i].writeClassInit(writer);
 		}
 	}
 
@@ -915,7 +915,7 @@ public class CodeClass extends AbstractClass
 		this.parameters = new IParameter[params];
 		for (int i = 0; i < params; i++)
 		{
-			this.parameters[i] = new ClassParameter(Name.getQualified("par" + i), IType.readType(in));
+			this.parameters[i] = new ClassParameter(this, Name.getQualified("par" + i), IType.readType(in));
 		}
 	}
 
@@ -934,7 +934,7 @@ public class CodeClass extends AbstractClass
 		this.parameterCount = params;
 		for (int i = 0; i < params; i++)
 		{
-			ClassParameter param = new ClassParameter();
+			ClassParameter param = new ClassParameter(this);
 			param.read(in);
 			this.parameters[i] = param;
 		}
