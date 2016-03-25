@@ -93,7 +93,7 @@ public class InternalGenericType extends GenericType
 		switch (this.internalName)
 		{
 		case "dyvil/ref/ObjectRef":
-			return new ReferenceType(Types.getObjectRefClass(), this.typeArguments[0]);
+			return new ReferenceType(ReferenceType.LazyFields.OBJECT_REF_CLASS, this.typeArguments[0]);
 		case "dyvil/util/Option":
 			return new OptionType(this.typeArguments[0]);
 		case "dyvil/collection/Map":

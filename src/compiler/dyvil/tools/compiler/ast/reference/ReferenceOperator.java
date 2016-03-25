@@ -174,7 +174,7 @@ public class ReferenceOperator implements IValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append('*');
+		buffer.append('&');
 		this.value.toString(prefix, buffer);
 	}
 }

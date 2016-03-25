@@ -31,7 +31,7 @@ public final class Operators
 				return new NotOperator(arg1);
 			}
 		}
-		if (name == Names.times)
+		if (name == Names.amp || name == Names.times) // TODO remove '*' (times)
 		{
 			return new ReferenceOperator(arg1);
 		}

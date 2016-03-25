@@ -172,23 +172,25 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			this.reset();
 			return;
 		case SEPARATOR:
-			if (ParserUtil.isCloseBracket(type))
+			this.mode = TYPE;
+			this.reset();
+
+			switch (type)
 			{
-				pm.popParser(true);
+			case BaseSymbols.CLOSE_PARENTHESIS:
+			case BaseSymbols.CLOSE_CURLY_BRACKET:
+			case BaseSymbols.CLOSE_SQUARE_BRACKET:
+				pm.reparse();
+				// Fallthrough
+			case Tokens.EOF:
+				pm.popParser();
+				return;
+			case BaseSymbols.COMMA:
+			case BaseSymbols.SEMICOLON:
 				return;
 			}
 
-			this.mode = TYPE;
-			this.reset();
-			if (type != BaseSymbols.COMMA && type != BaseSymbols.SEMICOLON)
-			{
-				pm.report(token, "parameter.comma");
-
-				if (type == Tokens.EOF)
-				{
-					pm.popParser();
-				}
-			}
+			pm.report(token, "parameter.separator");
 		}
 	}
 

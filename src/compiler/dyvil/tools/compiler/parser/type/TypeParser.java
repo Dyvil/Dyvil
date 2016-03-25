@@ -3,6 +3,7 @@ package dyvil.tools.compiler.parser.type;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.generic.Variance;
+import dyvil.tools.compiler.ast.reference.ImplicitReferenceType;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
@@ -85,6 +86,11 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				if (name == Names.times)
 				{
 					this.type = new ReferenceType(this.type);
+					return;
+				}
+				if (name == Names.up)
+				{
+					this.type = new ImplicitReferenceType(this.type);
 					return;
 				}
 			}

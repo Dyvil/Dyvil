@@ -16,6 +16,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -146,6 +147,7 @@ public final class MethodParameter extends Parameter
 		{
 			if (this.modifiers.hasIntModifier(Modifiers.VAR))
 			{
+				markers.add(Markers.semanticWarning(this.position, "parameter.var.deprecated"));
 				if (this.method instanceof ExternalMethod)
 				{
 					this.type = this.type.getElementType();
