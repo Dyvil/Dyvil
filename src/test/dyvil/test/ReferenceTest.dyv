@@ -2,7 +2,7 @@ package dyvil.test
 
 public class ReferenceTest
 {
-	static void inc(var int i) { i++ }
+	static void inc(int^ i) = i.set(i.get + 1)
 
 	static int staticField = 0
 
@@ -13,9 +13,9 @@ public class ReferenceTest
 
 	static case class ImmutableHolder(public final int value)
 	{
-		public ImmutableHolder operator +(int value) = ImmutableHolder(this.value + value)
+		public func +(int value): ImmutableHolder = apply(this.value + value)
 
-		public postfix void operator +=(var ImmutableHolder holder, int value) = holder = holder + value
+		public postfix func +=(ImmutableHolder^ holder, int value): void = holder.set(holder.get + value)
 	}
 
 	public static void main([String] args)
