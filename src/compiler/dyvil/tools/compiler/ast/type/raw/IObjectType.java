@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
+import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -49,13 +50,13 @@ public interface IObjectType extends IType
 	@Override
 	default IType getSimpleRefType()
 	{
-		return Types.getObjectSimpleRef(this);
+		return ReferenceType.LazyFields.getObjectSimpleRef(this);
 	}
 
 	@Override
 	default IClass getRefClass()
 	{
-		return Types.getObjectRefClass();
+		return ReferenceType.LazyFields.OBJECT_REF_CLASS;
 	}
 
 	@Override

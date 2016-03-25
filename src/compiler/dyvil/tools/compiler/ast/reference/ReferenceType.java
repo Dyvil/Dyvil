@@ -15,8 +15,10 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvil.tools.compiler.ast.type.raw.IObjectType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -30,6 +32,29 @@ import java.io.IOException;
 
 public class ReferenceType implements IObjectType
 {
+	public static final class LazyFields
+	{
+		public static IClass OBJECT_SIMPLE_REF_CLASS = Package.dyvilRefSimple.resolveClass("SimpleObjectRef");
+		public static IClass OBJECT_REF_CLASS = Package.dyvilRef.resolveClass("ObjectRef");
+
+		public static IType getObjectSimpleRef(IType type)
+		{
+			ClassGenericType gt = new ClassGenericType(OBJECT_SIMPLE_REF_CLASS);
+			gt.addType(type);
+			return gt;
+		}
+
+		public static String getInternalRef(IType type, String prefix)
+		{
+			return "dyvil/ref/" + prefix + type.getTypePrefix() + "Ref";
+		}
+
+		public static String getReferenceFactoryName(IType type, String prefix)
+		{
+			return "new" + prefix + type.getTypePrefix() + "Ref";
+		}
+	}
+
 	protected IClass theClass;
 	protected IType  type;
 
@@ -90,7 +115,7 @@ public class ReferenceType implements IObjectType
 
 	private boolean isSameBaseType(IType type)
 	{
-		if (this.theClass == Types.getObjectRefClass())
+		if (this.theClass == LazyFields.OBJECT_REF_CLASS)
 		{
 			final IType otherType = type.resolveType(this.theClass.getTypeParameter(0));
 			return otherType == null || Types.isSameType(this.type, otherType);
@@ -242,7 +267,7 @@ public class ReferenceType implements IObjectType
 	@Override
 	public String getSignature()
 	{
-		if (this.theClass != Types.getObjectRefClass())
+		if (this.theClass != LazyFields.OBJECT_REF_CLASS)
 		{
 			return null;
 		}
@@ -256,7 +281,7 @@ public class ReferenceType implements IObjectType
 	public void appendSignature(StringBuilder buffer)
 	{
 		buffer.append('L').append(this.getInternalName());
-		if (this.theClass == Types.getObjectRefClass())
+		if (this.theClass == LazyFields.OBJECT_REF_CLASS)
 		{
 			buffer.append('<');
 			this.type.appendSignature(buffer);
@@ -308,7 +333,7 @@ public class ReferenceType implements IObjectType
 	public void writeUnwrap(MethodWriter writer) throws BytecodeException
 	{
 		final String internal = this.theClass.getInternalName();
-		if (this.theClass == Types.getObjectRefClass())
+		if (this.theClass == LazyFields.OBJECT_REF_CLASS)
 		{
 			writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, internal, "get", "()Ljava/lang/Object;", true);
 			
@@ -327,7 +352,7 @@ public class ReferenceType implements IObjectType
 	public void writeWrap(MethodWriter writer) throws BytecodeException
 	{
 		final String internal = this.theClass.getInternalName();
-		if (this.theClass == Types.getObjectRefClass())
+		if (this.theClass == LazyFields.OBJECT_REF_CLASS)
 		{
 			writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, internal, "set", "(Ljava/lang/Object;)V", true);
 			return;

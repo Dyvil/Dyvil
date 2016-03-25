@@ -13,7 +13,6 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.ast.type.compound.UnionType;
-import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.ast.type.raw.InternalType;
 import dyvil.tools.compiler.backend.ClassFormat;
@@ -94,8 +93,6 @@ public final class Types
 	public static IClass STRING_CONVERTIBLE_CLASS;
 
 	private static IClass OBJECT_ARRAY_CLASS;
-	private static IClass OBJECT_SIMPLE_REF_CLASS;
-	private static IClass OBJECT_REF_CLASS;
 
 	public static void initHeaders()
 	{
@@ -198,41 +195,6 @@ public final class Types
 			return OBJECT_ARRAY_CLASS = Package.dyvilArray.resolveClass("ObjectArray");
 		}
 		return OBJECT_ARRAY_CLASS;
-	}
-
-	public static IClass getObjectRefClass()
-	{
-		if (OBJECT_REF_CLASS == null)
-		{
-			return OBJECT_REF_CLASS = Package.dyvilRef.resolveClass("ObjectRef");
-		}
-		return OBJECT_REF_CLASS;
-	}
-
-	public static IClass getObjectSimpleRefClass()
-	{
-		if (OBJECT_SIMPLE_REF_CLASS == null)
-		{
-			return OBJECT_SIMPLE_REF_CLASS = Package.dyvilRefSimple.resolveClass("SimpleObjectRef");
-		}
-		return OBJECT_SIMPLE_REF_CLASS;
-	}
-
-	public static IType getObjectSimpleRef(IType type)
-	{
-		ClassGenericType gt = new ClassGenericType(getObjectSimpleRefClass());
-		gt.addType(type);
-		return gt;
-	}
-
-	public static String getInternalRef(IType type, String prefix)
-	{
-		return "dyvil/ref/" + prefix + type.getTypePrefix() + "Ref";
-	}
-
-	public static String getReferenceFactoryName(IType type, String prefix)
-	{
-		return "new" + prefix + type.getTypePrefix() + "Ref";
 	}
 
 	public static boolean isSameType(IType type1, IType type2)

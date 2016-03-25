@@ -108,7 +108,7 @@ public class StaticFieldReference implements IReference, IClassCompilable
 			return this.refFieldType;
 		}
 		
-		return this.refFieldType = 'L' + Types.getInternalRef(this.field.getType(), "") + ';';
+		return this.refFieldType = 'L' + ReferenceType.LazyFields.getInternalRef(this.field.getType(), "") + ';';
 	}
 
 	// IClassCompilable callback implementations
@@ -148,7 +148,7 @@ public class StaticFieldReference implements IReference, IClassCompilable
 		final String refFieldName = this.getRefFieldName();
 		final String refFieldType = this.getRefFieldType();
 
-		final String factoryMethodName = Types.getReferenceFactoryName(this.field.getType(), "Static");
+		final String factoryMethodName = ReferenceType.LazyFields.getReferenceFactoryName(this.field.getType(), "Static");
 		final String factoryMethodType = "(Ljava/lang/Class;Ljava/lang/String;)" + refFieldType;
 
 		// Load the field class

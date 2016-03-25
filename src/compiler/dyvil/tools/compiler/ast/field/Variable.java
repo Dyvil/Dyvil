@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
+import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -337,7 +338,7 @@ public final class Variable extends Member implements IVariable
 			final IDataMember refField = refClass.getBody().getField(0);
 			refField.writeGet_Get(writer, lineNumber);
 
-			if (refClass == Types.getObjectSimpleRefClass())
+			if (refClass == ReferenceType.LazyFields.OBJECT_SIMPLE_REF_CLASS)
 			{
 				Types.OBJECT.writeCast(writer, this.type, lineNumber);
 			}
