@@ -164,7 +164,7 @@ public final class ArgumentMap implements IArguments, IValueMap
 		{
 			if (this.keys[i] == key)
 			{
-				return this.values[i].getTypeMatch(param.getType());
+				return this.values[i].getTypeMatch(param.getInternalType());
 			}
 		}
 		return param.getValue() != null ? DEFAULT_MATCH : 0;
@@ -187,7 +187,7 @@ public final class ArgumentMap implements IArguments, IValueMap
 				continue;
 			}
 			
-			final IType type = param.getInternalParameterType();
+			final IType type = param.getInternalType();
 			this.values[i] = TypeChecker.convertValue(this.values[i], type, typeContext, markers, context,
 			                                          IArguments.argumentMarkerSupplier(param));
 			return;
@@ -203,7 +203,7 @@ public final class ArgumentMap implements IArguments, IValueMap
 	@Override
 	public void inferType(int index, IParameter param, ITypeContext typeContext)
 	{
-		IType type = param.getType();
+		IType type = param.getInternalType();
 		Name name = param.getName();
 		for (int i = 0; i < this.size; i++)
 		{
@@ -228,12 +228,12 @@ public final class ArgumentMap implements IArguments, IValueMap
 		{
 			if (this.keys[i] == name)
 			{
-				this.values[i].writeExpression(writer, param.getType());
+				this.values[i].writeExpression(writer, param.getInternalType());
 				return;
 			}
 		}
 		
-		param.getValue().writeExpression(writer, param.getType());
+		param.getValue().writeExpression(writer, param.getInternalType());
 	}
 	
 	@Override

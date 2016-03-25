@@ -17,8 +17,9 @@ public interface IParameter extends IVariable, IClassMember
 	{
 	}
 
-	IType getInternalParameterType();
-	
+	@Override
+	IType getInternalType();
+
 	@Override
 	default IClass getEnclosingClass()
 	{
@@ -46,7 +47,6 @@ public interface IParameter extends IVariable, IClassMember
 	
 	default void setVarargs(boolean varargs)
 	{
-
 	}
 	
 	default boolean isVarargs()

@@ -35,10 +35,9 @@ public abstract class Parameter extends Member implements IParameter
 	protected IValue defaultValue;
 
 	// Metadata
-	protected int     index;
-	protected int     localIndex;
-	protected boolean varargs;
-	protected IType   internalType;
+	protected int   index;
+	protected int   localIndex;
+	protected IType internalType;
 
 	public Parameter()
 	{
@@ -81,7 +80,7 @@ public abstract class Parameter extends Member implements IParameter
 	}
 
 	@Override
-	public IType getInternalParameterType()
+	public IType getInternalType()
 	{
 		if (this.internalType != null)
 		{
@@ -130,13 +129,16 @@ public abstract class Parameter extends Member implements IParameter
 	@Override
 	public void setVarargs(boolean varargs)
 	{
-		this.varargs = varargs;
+		if (varargs)
+		{
+			this.getModifiers().addIntModifier(Modifiers.VARARGS);
+		}
 	}
 
 	@Override
 	public boolean isVarargs()
 	{
-		return this.varargs;
+		return this.hasModifier(Modifiers.VARARGS);
 	}
 
 	@Override
@@ -437,7 +439,7 @@ public abstract class Parameter extends Member implements IParameter
 
 	public void appendType(String prefix, StringBuilder buffer)
 	{
-		if (this.varargs)
+		if (this.isVarargs())
 		{
 			this.type.getElementType().toString(prefix, buffer);
 			buffer.append("...");

@@ -288,11 +288,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	@Override
 	public IDataMember capture(IVariable variable)
 	{
-		if (this.isMember(variable))
-		{
-			return variable;
-		}
-		return null;
+		return variable;
 	}
 
 	@Override

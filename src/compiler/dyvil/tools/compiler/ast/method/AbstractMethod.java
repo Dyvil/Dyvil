@@ -491,11 +491,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public IDataMember capture(IVariable variable)
 	{
-		if (this.isMember(variable))
-		{
-			return variable;
-		}
-		return null;
+		return variable;
 	}
 
 	@Override
@@ -638,7 +634,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			if (mod == Modifiers.INFIX && receiver.valueTag() != IValue.CLASS_ACCESS)
 			{
 				final IParameter parameter = this.parameters[0];
-				final IType paramType = parameter.getInternalParameterType();
+				final IType paramType = parameter.getInternalType();
 
 				receiver = TypeChecker.convertValue(receiver, paramType, typeContext, markers, context,
 				                                    TypeChecker.markerSupplier("method.access.infix_type", this.name));

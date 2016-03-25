@@ -120,7 +120,7 @@ public final class IntValue implements IConstantValue
 		{
 			return 1;
 		}
-		if (type.getTheClass().getAnnotation(Types.INT_CONVERTIBLE_CLASS) != null)
+		if (type.getAnnotation(Types.INT_CONVERTIBLE_CLASS) != null)
 		{
 			return CONVERSION_MATCH;
 		}
