@@ -915,7 +915,7 @@ public class CodeClass extends AbstractClass
 		this.parameters = new IParameter[params];
 		for (int i = 0; i < params; i++)
 		{
-			this.parameters[i] = new ClassParameter(Name.getQualified("par" + i), IType.readType(in));
+			this.parameters[i] = new ClassParameter(this, Name.getQualified("par" + i), IType.readType(in));
 		}
 	}
 
@@ -934,7 +934,7 @@ public class CodeClass extends AbstractClass
 		this.parameterCount = params;
 		for (int i = 0; i < params; i++)
 		{
-			ClassParameter param = new ClassParameter();
+			ClassParameter param = new ClassParameter(this);
 			param.read(in);
 			this.parameters[i] = param;
 		}

@@ -174,75 +174,6 @@ public abstract class Parameter extends Member implements IParameter
 		return IParameter.super.visitAnnotation(internalType);
 	}
 
-	protected void writeDefaultAnnotation(MethodWriter writer)
-	{
-		if (this.type.isArrayType())
-		{
-			AnnotationVisitor visitor = writer.visitParameterAnnotation(this.index,
-			                                                            "Ldyvil/annotation/_internal/DefaultArrayValue;",
-			                                                            false);
-			visitor = visitor.visitArray("value");
-
-			ArrayExpr arrayExpr = (ArrayExpr) this.defaultValue;
-			int count = arrayExpr.valueCount();
-			IType elementType = this.type.getElementType();
-
-			for (int i = 0; i < count; i++)
-			{
-				writeDefaultAnnotation(visitor, elementType, arrayExpr.getValue(i));
-			}
-
-			visitor.visitEnd();
-
-			return;
-		}
-
-		AnnotationVisitor visitor = writer.visitParameterAnnotation(this.index,
-		                                                            "Ldyvil/annotation/_internal/DefaultValue;", false);
-		writeDefaultAnnotation(visitor, this.type, this.defaultValue);
-	}
-
-	private static void writeDefaultAnnotation(AnnotationVisitor visitor, IType type, IValue value)
-	{
-		if (type.isPrimitive())
-		{
-			switch (type.getTypecode())
-			{
-			case PrimitiveType.BOOLEAN_CODE:
-				visitor.visit("booleanValue", value.booleanValue());
-				return;
-			case PrimitiveType.BYTE_CODE:
-			case PrimitiveType.SHORT_CODE:
-			case PrimitiveType.CHAR_CODE:
-			case PrimitiveType.INT_CODE:
-				visitor.visit("intValue", value.intValue());
-				return;
-			case PrimitiveType.LONG_CODE:
-				visitor.visit("longValue", value.longValue());
-				return;
-			case PrimitiveType.FLOAT_CODE:
-				visitor.visit("floatValue", value.floatValue());
-				return;
-			case PrimitiveType.DOUBLE_CODE:
-				visitor.visit("doubleValue", value.doubleValue());
-				return;
-			}
-
-			return;
-		}
-
-		IClass iClass = type.getTheClass();
-		if (iClass == Types.STRING_CLASS)
-		{
-			visitor.visit("stringValue", value.stringValue());
-			return;
-		}
-		if (iClass == ClassOperator.LazyFields.CLASS_CLASS)
-		{
-			visitor.visit("classValue", value.toObject());
-		}
-	}
-
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -351,14 +282,110 @@ public abstract class Parameter extends Member implements IParameter
 	@Override
 	public void writeInit(MethodWriter writer)
 	{
-		final int modifiers = this.modifiers == null ?
-			                      0 :
-			                      this.modifiers.toFlags() & Modifiers.PARAMETER_MODIFIERS
-				                      & ModifierUtil.JAVA_MODIFIER_MASK;
+		writeInitImpl(this, writer);
+	}
 
-		this.localIndex = writer.localCount();
-		writer.visitParameter(this.localIndex, this.name.qualified, this.getInternalType(), modifiers);
-		this.writeAnnotations(writer);
+	public static void writeInitImpl(IParameter parameter, MethodWriter writer)
+	{
+		final ModifierSet modifiers = parameter.getModifiers();
+		final AnnotationList annotations = parameter.getAnnotations();
+		final IType type = parameter.getType();
+		final IValue defaultValue = parameter.getValue();
+
+		final int intModifiers = modifiers == null ?
+			                         0 :
+			                         modifiers.toFlags() & Modifiers.PARAMETER_MODIFIERS
+				                         & ModifierUtil.JAVA_MODIFIER_MASK;
+
+		final int index = writer.localCount();
+
+		parameter.setLocalIndex(index);
+		writer.visitParameter(parameter.getLocalIndex(), parameter.getName().qualified, parameter.getInternalType(),
+		                      intModifiers);
+
+		// Annotations
+		final AnnotatableVisitor visitor = (desc, visible) -> writer.visitParameterAnnotation(index, desc, visible);
+
+		if (annotations != null)
+		{
+			annotations.write(visitor);
+		}
+
+		ModifierUtil.writeModifiers(visitor, modifiers);
+
+		type.writeAnnotations(writer, TypeReference.newFormalParameterReference(index), "");
+
+		// Default Value
+		if (defaultValue == null)
+		{
+			return;
+		}
+
+		if (type.isArrayType())
+		{
+			final AnnotationVisitor annotationVisitor = writer.visitParameterAnnotation(index,
+			                                                                            "Ldyvil/annotation/_internal/DefaultArrayValue;",
+			                                                                            false).visitArray("value");
+
+			ArrayExpr arrayExpr = (ArrayExpr) defaultValue;
+			int count = arrayExpr.valueCount();
+			IType elementType = type.getElementType();
+
+			for (int i = 0; i < count; i++)
+			{
+				writeDefaultAnnotation(annotationVisitor, elementType, arrayExpr.getValue(i));
+			}
+
+			annotationVisitor.visitEnd();
+
+			return;
+		}
+
+		final AnnotationVisitor annotationVisitor = writer.visitParameterAnnotation(index,
+		                                                                            "Ldyvil/annotation/_internal/DefaultValue;",
+		                                                                            false);
+		writeDefaultAnnotation(annotationVisitor, type, defaultValue);
+	}
+
+	private static void writeDefaultAnnotation(AnnotationVisitor visitor, IType type, IValue value)
+	{
+		if (type.isPrimitive())
+		{
+			switch (type.getTypecode())
+			{
+			case PrimitiveType.BOOLEAN_CODE:
+				visitor.visit("booleanValue", value.booleanValue());
+				return;
+			case PrimitiveType.BYTE_CODE:
+			case PrimitiveType.SHORT_CODE:
+			case PrimitiveType.CHAR_CODE:
+			case PrimitiveType.INT_CODE:
+				visitor.visit("intValue", value.intValue());
+				return;
+			case PrimitiveType.LONG_CODE:
+				visitor.visit("longValue", value.longValue());
+				return;
+			case PrimitiveType.FLOAT_CODE:
+				visitor.visit("floatValue", value.floatValue());
+				return;
+			case PrimitiveType.DOUBLE_CODE:
+				visitor.visit("doubleValue", value.doubleValue());
+				return;
+			}
+
+			return;
+		}
+
+		IClass iClass = type.getTheClass();
+		if (iClass == Types.STRING_CLASS)
+		{
+			visitor.visit("stringValue", value.stringValue());
+			return;
+		}
+		if (iClass == ClassOperator.LazyFields.CLASS_CLASS)
+		{
+			visitor.visit("classValue", value.toObject());
+		}
 	}
 
 	@Override
@@ -366,31 +393,6 @@ public abstract class Parameter extends Member implements IParameter
 	{
 		writer.visitLocalVariable(this.name.qualified, this.getDescriptor(), this.getSignature(), start, end,
 		                          this.localIndex);
-	}
-
-	protected void writeAnnotations(MethodWriter writer)
-	{
-		final AnnotatableVisitor visitor = (desc, visible) -> writer
-			                                                      .visitParameterAnnotation(Parameter.this.index, desc,
-			                                                                                visible);
-
-		if (this.annotations != null)
-		{
-			final int count = this.annotations.annotationCount();
-			for (int i = 0; i < count; i++)
-			{
-				this.annotations.getAnnotation(i).write(visitor);
-			}
-		}
-
-		ModifierUtil.writeModifiers(visitor, this.modifiers);
-
-		this.type.writeAnnotations(writer, TypeReference.newFormalParameterReference(this.index), "");
-
-		if (this.defaultValue != null)
-		{
-			this.writeDefaultAnnotation(writer);
-		}
 	}
 
 	@Override
