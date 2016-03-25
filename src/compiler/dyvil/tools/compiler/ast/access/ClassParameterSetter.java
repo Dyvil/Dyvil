@@ -69,7 +69,7 @@ public final class ClassParameterSetter implements IValue
 		writer.visitVarInsn(Opcodes.ALOAD, 0);
 		writer.visitVarInsn(this.parameter.getType().getLoadOpcode(), this.parameter.getLocalIndex());
 		writer.visitFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), this.parameter.getName().qualified,
-		                      this.parameter.getDescription());
+		                      this.parameter.getDescriptor());
 	}
 
 	@Override

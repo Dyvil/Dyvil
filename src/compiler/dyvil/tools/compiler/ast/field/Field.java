@@ -17,7 +17,6 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Deprecation;
@@ -31,9 +30,11 @@ import java.lang.annotation.ElementType;
 
 public class Field extends Member implements IField
 {
-
-	protected IClass enclosingClass;
 	protected IValue value;
+
+	// Metadata
+	protected IClass enclosingClass;
+	protected String descriptor;
 
 	public Field(IClass enclosingClass)
 	{
@@ -94,9 +95,14 @@ public class Field extends Member implements IField
 	}
 
 	@Override
-	public String getDescription()
+	public String getDescriptor()
 	{
-		return this.type.getExtendedName();
+		if (this.descriptor != null)
+		{
+			return this.descriptor;
+		}
+
+		return this.descriptor = this.type.getExtendedName();
 	}
 
 	@Override
@@ -284,52 +290,35 @@ public class Field extends Member implements IField
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		int modifiers = this.modifiers.toFlags();
-		if ((modifiers & Modifiers.LAZY) == Modifiers.LAZY)
-		{
-			String desc = "()" + this.getDescription();
-			String signature = this.getSignature();
-			if (signature != null)
-			{
-				signature = "()" + signature;
-			}
-			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers & Modifiers.METHOD_MODIFIERS,
-			                                                                  this.name.qualified, desc, signature,
-			                                                                  null));
+		final int modifiers = this.modifiers.toFlags() & ModifierUtil.JAVA_MODIFIER_MASK;
+		final Object value = this.value != null && this.value.isConstant() ? this.value.toObject() : null;
+		final FieldVisitor fieldVisitor = writer.visitField(modifiers, this.name.qualified, this.getDescriptor(),
+		                                                    this.getSignature(), value);
 
-			mw.visitCode();
-			this.value.writeExpression(mw, this.type);
-			mw.visitEnd(this.type);
-
-			return;
-		}
-
-		FieldVisitor fv = writer.visitField(modifiers & 0xFFFF, this.name.qualified, this.type.getExtendedName(),
-		                                    this.type.getSignature(), null);
-
-		IField.writeAnnotations(fv, this.modifiers, this.annotations, this.type);
+		IField.writeAnnotations(fieldVisitor, this.modifiers, this.annotations, this.type);
+		fieldVisitor.visitEnd();
 	}
 
 	@Override
 	public void writeInit(MethodWriter writer) throws BytecodeException
 	{
-		if (this.value != null && !this.modifiers.hasIntModifier(Modifiers.STATIC))
+		if (this.value != null && !this.modifiers.hasIntModifier(Modifiers.STATIC) && !this.value.isConstant())
 		{
 			writer.visitVarInsn(Opcodes.ALOAD, 0);
 			this.value.writeExpression(writer, this.type);
 			writer.visitFieldInsn(Opcodes.PUTFIELD, this.enclosingClass.getInternalName(), this.name.qualified,
-			                      this.getDescription());
+			                      this.getDescriptor());
 		}
 	}
 
 	@Override
 	public void writeStaticInit(MethodWriter writer) throws BytecodeException
 	{
-		if (this.value != null && this.modifiers.hasIntModifier(Modifiers.STATIC))
+		if (this.value != null && this.modifiers.hasIntModifier(Modifiers.STATIC) && !this.value.isConstant())
 		{
 			this.value.writeExpression(writer, this.type);
 			writer.visitFieldInsn(Opcodes.PUTSTATIC, this.enclosingClass.getInternalName(), this.name.qualified,
-			                      this.getDescription());
+			                      this.getDescriptor());
 		}
 	}
 

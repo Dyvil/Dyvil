@@ -174,7 +174,7 @@ public final class ClassParameter extends Parameter implements IField
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		String desc = this.getDescription();
+		String desc = this.getDescriptor();
 		FieldVisitor fv = writer.visitField(this.modifiers.toFlags() & ModifierUtil.JAVA_MODIFIER_MASK,
 		                                    this.name.qualified, desc, this.getSignature(), null);
 
@@ -194,7 +194,7 @@ public final class ClassParameter extends Parameter implements IField
 		else
 		{
 			writer.visitFieldInsn(Opcodes.GETFIELD, this.enclosingClass.getInternalName(), this.name.qualified,
-			                      this.getDescription());
+			                      this.getDescriptor());
 		}
 	}
 
@@ -202,6 +202,6 @@ public final class ClassParameter extends Parameter implements IField
 	public void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
 		writer.visitFieldInsn(Opcodes.PUTFIELD, this.enclosingClass.getInternalName(), this.name.qualified,
-		                      this.getDescription());
+		                      this.getDescriptor());
 	}
 }

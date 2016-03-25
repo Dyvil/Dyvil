@@ -675,7 +675,7 @@ public final class ExternalClass extends AbstractClass
 			}
 		}
 
-		ExternalField field = new ExternalField(this, Name.get(name), type, new FlagModifierSet(access));
+		ExternalField field = new ExternalField(this, Name.get(name), desc, type, new FlagModifierSet(access));
 
 		if (value != null)
 		{

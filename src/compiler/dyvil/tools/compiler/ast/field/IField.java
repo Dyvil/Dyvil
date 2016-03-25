@@ -26,26 +26,26 @@ public interface IField extends IClassMember, IDataMember
 	{
 		return true;
 	}
-	
+
 	@Override
 	default boolean isVariable()
 	{
 		return false;
 	}
-	
-	static void writeAnnotations(FieldVisitor fv, ModifierSet modifierSet, AnnotationList annotations, IType type)
+
+	static void writeAnnotations(FieldVisitor fieldVisitor, ModifierSet modifiers, AnnotationList annotations, IType type)
 	{
-		ModifierUtil.writeModifiers(fv, modifierSet);
+		ModifierUtil.writeModifiers(fieldVisitor, modifiers);
 
 		if (annotations != null)
 		{
 			int count = annotations.annotationCount();
 			for (int i = 0; i < count; i++)
 			{
-				annotations.getAnnotation(i).write(fv);
+				annotations.getAnnotation(i).write(fieldVisitor);
 			}
 		}
-		
-		type.writeAnnotations(fv, TypeReference.newTypeReference(TypeReference.FIELD), "");
+
+		type.writeAnnotations(fieldVisitor, TypeReference.newTypeReference(TypeReference.FIELD), "");
 	}
 }

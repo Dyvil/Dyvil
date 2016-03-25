@@ -113,7 +113,7 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 		this.writeSet_Set(writer, lineNumber);
 	}
 
-	String getDescription();
+	String getDescriptor();
 
 	String getSignature();
 

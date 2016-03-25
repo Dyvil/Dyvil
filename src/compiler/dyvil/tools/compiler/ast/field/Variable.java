@@ -262,7 +262,7 @@ public final class Variable extends Member implements IVariable
 	}
 
 	@Override
-	public String getDescription()
+	public String getDescriptor()
 	{
 		return this.type.getExtendedName();
 	}

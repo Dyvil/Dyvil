@@ -212,7 +212,7 @@ public abstract class CaptureDataMember implements IDataMember
 	}
 
 	@Override
-	public String getDescription()
+	public String getDescriptor()
 	{
 		return this.variable.getInternalType().getExtendedName();
 	}

@@ -140,7 +140,7 @@ public abstract class Parameter extends Member implements IParameter
 	}
 
 	@Override
-	public String getDescription()
+	public String getDescriptor()
 	{
 		return this.getInternalType().getExtendedName();
 	}
@@ -362,7 +362,7 @@ public abstract class Parameter extends Member implements IParameter
 	@Override
 	public void writeLocal(MethodWriter writer, Label start, Label end)
 	{
-		writer.visitLocalVariable(this.name.qualified, this.getDescription(), this.getSignature(), start, end,
+		writer.visitLocalVariable(this.name.qualified, this.getDescriptor(), this.getSignature(), start, end,
 		                          this.localIndex);
 	}
 

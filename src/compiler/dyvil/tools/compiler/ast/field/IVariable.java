@@ -68,7 +68,7 @@ public interface IVariable extends IDataMember
 	
 	default void appendDescription(StringBuilder buf)
 	{
-		buf.append(this.getDescription());
+		buf.append(this.getDescriptor());
 	}
 	
 	default void appendSignature(StringBuilder buf)

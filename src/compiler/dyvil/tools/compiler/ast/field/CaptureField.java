@@ -75,7 +75,7 @@ public final class CaptureField extends CaptureDataMember implements IField
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		writer.visitField(Modifiers.PRIVATE | Modifiers.MANDATED | Modifiers.SYNTHETIC, this.name,
-		                  this.getDescription(), this.getSignature(), null).visitEnd();
+		                  this.getDescriptor(), this.getSignature(), null).visitEnd();
 	}
 	
 	@Override
@@ -85,7 +85,7 @@ public final class CaptureField extends CaptureDataMember implements IField
 
 		String owner = this.enclosingClass.getInternalName();
 		String name = this.name;
-		String desc = this.getDescription();
+		String desc = this.getDescriptor();
 		writer.visitFieldInsn(Opcodes.GETFIELD, owner, name, desc);
 	}
 
