@@ -401,24 +401,31 @@ public class DynamicMethod implements IMethod, IDefaultContext
 		desc.append("Ljava/lang/Object;");
 		
 		writer.visitInvokeDynamicInsn(this.name.qualified, desc.toString(), BOOTSTRAP, ObjectArray.EMPTY);
+
+		Types.OBJECT.writeCast(writer, targetType, lineNumber);
 	}
 	
 	@Override
 	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException
 	{
+		throw new BytecodeException();
 	}
 	
 	@Override
 	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException
 	{
+		this.writeCall(writer, instance, arguments, typeContext, Types.BOOLEAN, lineNumber);
+		writer.visitJumpInsn(Opcodes.IFNE, dest);
 	}
 	
 	@Override
 	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException
 	{
+		this.writeCall(writer, instance, arguments, typeContext, Types.BOOLEAN, lineNumber);
+		writer.visitJumpInsn(Opcodes.IFEQ, dest);
 	}
 	
 	@Override
