@@ -5,7 +5,6 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -90,18 +89,6 @@ public class InitializerCall implements ICall
 	}
 
 	@Override
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
-	{
-		return type == Types.VOID ? this : null;
-	}
-
-	@Override
-	public boolean isType(IType type)
-	{
-		return type == Types.VOID;
-	}
-
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.arguments.resolveTypes(markers, context);
@@ -137,7 +124,7 @@ public class InitializerCall implements ICall
 		if (match != null)
 		{
 			this.constructor = match;
-			this.checkArguments((MarkerList) markers, (IContext) context);
+			this.checkArguments(markers, context);
 			return this;
 		}
 
@@ -200,11 +187,6 @@ public class InitializerCall implements ICall
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		if (type != Types.VOID)
-		{
-			throw new BytecodeException();
-		}
-
 		writer.visitVarInsn(Opcodes.ALOAD, 0);
 		this.constructor.writeArguments(writer, this.arguments);
 		this.constructor.writeInvoke(writer, this.getLineNumber());

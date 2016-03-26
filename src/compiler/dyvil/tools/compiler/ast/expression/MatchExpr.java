@@ -169,13 +169,13 @@ public final class MatchExpr implements IValue
 			                                            TypeChecker.markerSupplier("match.value.type.incompatible"));
 		}
 		
-		return type == Types.VOID || Types.isSuperType(type, this.getType()) ? this : null;
+		return Types.isSameType(type, Types.VOID) || Types.isSuperType(type, this.getType()) ? this : null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		if (type == Types.VOID)
+		if (Types.isSameType(type, Types.VOID))
 		{
 			return true;
 		}

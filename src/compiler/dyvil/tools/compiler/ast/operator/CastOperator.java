@@ -67,12 +67,6 @@ public final class CastOperator extends AbstractValue
 	}
 
 	@Override
-	public boolean isUsableAsStatement()
-	{
-		return this.type == Types.VOID;
-	}
-
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.type != null)
@@ -200,7 +194,7 @@ public final class CastOperator extends AbstractValue
 			type = this.type;
 		}
 
-		if (type == Types.VOID)
+		if (Types.isSameType(type, Types.VOID))
 		{
 			writer.visitInsn(Opcodes.AUTO_POP);
 			return;

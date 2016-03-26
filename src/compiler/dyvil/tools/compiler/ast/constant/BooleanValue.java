@@ -108,7 +108,7 @@ public final class BooleanValue implements IConstantValue
 	@Override
 	public Boolean toObject()
 	{
-		return Boolean.valueOf(this.value);
+		return this.value;
 	}
 
 	@Override

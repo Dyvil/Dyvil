@@ -168,7 +168,7 @@ public class UnionType implements IObjectType
 	{
 		// TODO rename type1, type2 to left and right
 
-		if (left == Types.VOID || right == Types.VOID)
+		if (Types.isSameType(left, Types.VOID) || Types.isSameType(right, Types.VOID))
 		{
 			// either type is void -> result void
 			return Types.VOID;

@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralConversion;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -76,13 +77,15 @@ public class LongValue implements IConstantValue
 		{
 			return this;
 		}
-		if (type == Types.FLOAT)
+		if (type.isPrimitive())
 		{
-			return new FloatValue(this.position, this.value);
-		}
-		if (type == Types.DOUBLE)
-		{
-			return new DoubleValue(this.position, this.value);
+			switch (type.getTypecode())
+			{
+			case PrimitiveType.FLOAT_CODE:
+				return new FloatValue(this.position, this.value);
+			case PrimitiveType.DOUBLE_CODE:
+				return new DoubleValue(this.position, this.value);
+			}
 		}
 		if (Types.isSuperType(type, Types.LONG))
 		{
@@ -110,7 +113,7 @@ public class LongValue implements IConstantValue
 		{
 			return 1;
 		}
-		if (type.getTheClass().getAnnotation(Types.LONG_CONVERTIBLE_CLASS) != null)
+		if (type.getAnnotation(Types.LONG_CONVERTIBLE_CLASS) != null)
 		{
 			return CONVERSION_MATCH;
 		}

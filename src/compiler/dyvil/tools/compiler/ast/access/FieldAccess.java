@@ -489,7 +489,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		}
 		this.field.getType().writeCast(writer, type, lineNumber);
 
-		if (type == Types.VOID)
+		if (Types.isSameType(type, Types.VOID))
 		{
 			writer.visitInsn(this.type.getReturnOpcode());
 		}

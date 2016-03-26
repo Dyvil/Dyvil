@@ -114,10 +114,10 @@ public class StringConcatExpr implements IValue
 	{
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			IValue value = this.values[i];
+			final IValue value = this.values[i];
 			value.check(markers, context);
 
-			if (value.getType() == Types.VOID)
+			if (Types.isSameType(value.getType(), Types.VOID))
 			{
 				markers.add(Markers.semantic(value.getPosition(), "string.concat.void"));
 			}

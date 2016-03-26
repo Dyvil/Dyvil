@@ -234,7 +234,7 @@ public final class Variable extends Member implements IVariable
 			ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.VARIABLE_MODIFIERS);
 		}
 
-		if (this.type == Types.VOID)
+		if (Types.isSameType(this.type, Types.VOID))
 		{
 			markers.add(Markers.semantic(this.position, "variable.type.void"));
 		}

@@ -203,7 +203,7 @@ public final class StringInterpolationExpr implements IValue
 			final IValue value = this.values[i];
 			value.check(markers, context);
 
-			if (value.getType() == Types.VOID)
+			if (Types.isSameType(value.getType(), Types.VOID))
 			{
 				markers.add(Markers.semantic(value.getPosition(), "string.interpolation.void"));
 			}

@@ -248,7 +248,7 @@ public abstract class Parameter extends Member implements IParameter
 			this.defaultValue.check(markers, context);
 		}
 
-		if (this.type == Types.VOID)
+		if (Types.isSameType(this.type, Types.VOID))
 		{
 			markers.add(Markers.semantic(this.position, this.getKind().getName() + ".type.void"));
 		}

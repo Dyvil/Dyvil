@@ -1010,9 +1010,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			this.writeArgumentsAndInvoke(writer, instance, arguments, typeContext, lineNumber);
 		}
 
-		if (targetType == Types.VOID)
+		if (Types.isSameType(targetType, Types.VOID))
 		{
-			if (this.type != Types.VOID)
+			if (!Types.isSameType(this.type, Types.VOID))
 			{
 				writer.visitInsn(Opcodes.AUTO_POP);
 			}

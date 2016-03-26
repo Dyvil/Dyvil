@@ -80,7 +80,7 @@ public final class NullValue implements IConstantValue
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		if (type == Types.NULL)
+		if (Types.isSameType(type, Types.NULL))
 		{
 			return 1;
 		}
