@@ -44,6 +44,8 @@ public abstract class Marker implements Comparable<Marker>
 
 	public abstract String getMarkerType();
 
+	public abstract String getColor();
+
 	public abstract boolean isError();
 
 	public abstract boolean isWarning();
@@ -51,9 +53,36 @@ public abstract class Marker implements Comparable<Marker>
 	@Override
 	public int compareTo(Marker o)
 	{
-		int start1 = this.position.startIndex();
-		int start2 = o.position.startIndex();
+		final int start1 = this.position.startIndex();
+		final int start2 = o.position.startIndex();
 		return start1 == start2 ? 0 : start1 < start2 ? -1 : 0;
+	}
+
+	@Override
+	@SuppressWarnings("SimplifiableIfStatement")
+	public boolean equals(Object o)
+	{
+		if (this == o)
+			return true;
+		if (!(o instanceof Marker))
+			return false;
+
+		Marker marker = (Marker) o;
+
+		if (this.position != null ? !this.position.equals(marker.position) : marker.position != null)
+			return false;
+		if (this.message != null ? !this.message.equals(marker.message) : marker.message != null)
+			return false;
+		return this.info != null ? this.info.equals(marker.info) : marker.info == null;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		int result = this.position != null ? this.position.hashCode() : 0;
+		result = 31 * result + (this.message != null ? this.message.hashCode() : 0);
+		result = 31 * result + (this.info != null ? this.info.hashCode() : 0);
+		return result;
 	}
 
 	public void log(String code, StringBuilder buf, boolean colors)
@@ -63,20 +92,15 @@ public abstract class Marker implements Comparable<Marker>
 
 		buf.append("line ").append(this.position.startLine()).append(": ");
 
+		final String colorString;
 		if (colors)
 		{
-			if (this.isError())
-			{
-				buf.append(Console.ANSI_RED);
-			}
-			else if (this.isWarning())
-			{
-				buf.append(Console.ANSI_YELLOW);
-			}
-			else
-			{
-				buf.append(Console.ANSI_BLUE);
-			}
+			colorString = this.getColor();
+			buf.append(colorString);
+		}
+		else
+		{
+			colorString = null;
 		}
 
 		buf.append(type);
@@ -153,7 +177,7 @@ public abstract class Marker implements Comparable<Marker>
 
 		if (colors)
 		{
-			buf.append(Console.ANSI_RED);
+			buf.append(colorString);
 		}
 		for (int i = startIndex; i < endIndex; i++)
 		{

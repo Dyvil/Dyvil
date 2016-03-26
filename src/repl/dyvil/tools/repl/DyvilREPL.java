@@ -148,7 +148,7 @@ public final class DyvilREPL
 	{
 		if (arg.startsWith("dumpDir"))
 		{
-			this.dumpDir = new File(arg.substring(arg.indexOf('=')).trim());
+			this.dumpDir = new File(arg.substring(arg.indexOf('=') + 1).trim());
 			return true;
 		}
 

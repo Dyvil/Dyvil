@@ -1,11 +1,10 @@
 package dyvil.tools.parsing.marker;
 
+import dyvil.io.Console;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public class SemanticError extends Marker
 {
-	private static final long serialVersionUID = -2234451954260010124L;
-	
 	public SemanticError(ICodePosition position, String message)
 	{
 		super(position, message);
@@ -16,7 +15,13 @@ public class SemanticError extends Marker
 	{
 		return "error";
 	}
-	
+
+	@Override
+	public String getColor()
+	{
+		return Console.ANSI_RED;
+	}
+
 	@Override
 	public boolean isError()
 	{
