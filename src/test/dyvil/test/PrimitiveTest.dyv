@@ -22,7 +22,7 @@ public class PrimitiveTest
 		b = l
 		b = f
 		b = d
-		//*/
+		// */
 
 		// Short
 
@@ -33,7 +33,7 @@ public class PrimitiveTest
 		s = l
 		s = f
 		s = d
-		//*/
+		// */
 
 		// Char
 
@@ -44,7 +44,7 @@ public class PrimitiveTest
 		c = l
 		c = f
 		c = d
-		//*/
+		// */
 
 		// Int
 
@@ -55,7 +55,7 @@ public class PrimitiveTest
 		i = l
 		i = f
 		i = d
-		//*/
+		// */
 
 		// Long
 
@@ -66,7 +66,7 @@ public class PrimitiveTest
 		/*
 		l = f
 		l = d
-		//*/
+		// */
 
 		// Float
 
@@ -77,7 +77,7 @@ public class PrimitiveTest
 		/*
 		f = l
 		f = d
-		//*/
+		// */
 
 		// Double
 

@@ -160,27 +160,27 @@ public final class DyvilLexer
 				addToken = true;
 				reparse = false;
 				break;
-			case COMMENT:
-				if (subtype == MOD_LINE)
+			case LINE_COMMENT:
+				if (currentChar == '\n')
 				{
-					if (currentChar == '\n')
-					{
-						type = 0;
-						lineNumber++;
-						continue;
-					}
+					type = 0;
+					lineNumber++;
+					continue;
 				}
-				else if (subtype == MOD_BLOCK)
+				break;
+			case BLOCK_COMMENT:
+				if (currentChar == '\n')
 				{
-					if (currentChar == '\n')
-					{
-						lineNumber++;
-					}
-					else if (prevChar == '*' && currentChar == '/')
-					{
-						type = 0;
-						continue;
-					}
+					lineNumber++;
+				}
+				else if (prevChar == '/' && currentChar == '*')
+				{
+					subtype++;
+				}
+				else if (prevChar == '*' && currentChar == '/' && --subtype == 0)
+				{
+					type = 0;
+					continue;
 				}
 				break;
 			case INT:
@@ -215,7 +215,6 @@ public final class DyvilLexer
 					case '.':
 						if (!LexerUtil.isDigit(code.charAt(i + 1)))
 						{
-							addToken = true;
 							reparse = true;
 							break;
 						}
