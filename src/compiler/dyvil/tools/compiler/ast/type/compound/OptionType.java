@@ -20,7 +20,6 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
-import dyvil.tools.compiler.ast.reference.ImplicitReferenceType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -280,7 +279,7 @@ public class OptionType implements IObjectType
 		{
 			return new ImplicitOptionType(this.type);
 		}
-		return new AnnotatedType(this, annotation);
+		return null;
 	}
 
 	@Override

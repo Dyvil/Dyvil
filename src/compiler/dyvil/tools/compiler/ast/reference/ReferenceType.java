@@ -19,7 +19,6 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.ast.type.compound.AnnotatedType;
 import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvil.tools.compiler.ast.type.raw.IObjectType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -307,7 +306,7 @@ public class ReferenceType implements IObjectType
 		{
 			return new ImplicitReferenceType(this.theClass, this.type);
 		}
-		return new AnnotatedType(this, annotation);
+		return null;
 	}
 
 	@Override

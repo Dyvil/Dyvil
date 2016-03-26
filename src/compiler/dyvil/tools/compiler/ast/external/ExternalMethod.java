@@ -353,20 +353,10 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		switch (TypeReference.getSort(typeRef))
 		{
 		case TypeReference.METHOD_RETURN:
-			if (!this.returnTypeResolved)
-			{
-				this.resolveReturnType();
-			}
-
 			this.type = IType.withAnnotation(this.type, annotation, typePath, 0, typePath.getLength());
 			break;
 		case TypeReference.METHOD_TYPE_PARAMETER:
 		{
-			if (!this.genericsResolved)
-			{
-				this.resolveGenerics();
-			}
-
 			ITypeParameter typeVar = this.typeParameters[TypeReference.getTypeParameterIndex(typeRef)];
 			if (!typeVar.addRawAnnotation(desc, annotation))
 			{
@@ -378,22 +368,12 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		}
 		case TypeReference.METHOD_TYPE_PARAMETER_BOUND:
 		{
-			if (!this.genericsResolved)
-			{
-				this.resolveGenerics();
-			}
-
 			ITypeParameter typeVar = this.typeParameters[TypeReference.getTypeParameterIndex(typeRef)];
 			typeVar.addBoundAnnotation(annotation, TypeReference.getTypeParameterBoundIndex(typeRef), typePath);
 			break;
 		}
 		case TypeReference.EXCEPTION_PARAMETER:
 		{
-			if (!this.exceptionsResolved)
-			{
-				this.resolveExceptions();
-			}
-
 			int index = TypeReference.getExceptionIndex(typeRef);
 			this.exceptions[index] = IType.withAnnotation(this.exceptions[index], annotation, typePath, 0,
 			                                              typePath.getLength());
@@ -401,11 +381,6 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		}
 		case TypeReference.METHOD_FORMAL_PARAMETER:
 		{
-			if (!this.parametersResolved)
-			{
-				this.resolveParameters();
-			}
-
 			int index = TypeReference.getFormalParameterIndex(typeRef);
 			IParameter param = this.parameters[index];
 			param.setType(IType.withAnnotation(param.getType(), annotation, typePath, 0, typePath.getLength()));

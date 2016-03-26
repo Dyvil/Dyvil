@@ -428,7 +428,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	default IType withAnnotation(IAnnotation annotation)
 	{
-		return new AnnotatedType(this, annotation);
+		return null;
 	}
 
 	void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps);
