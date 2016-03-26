@@ -1,5 +1,6 @@
 package dyvil.tools.compiler;
 
+import dyvil.io.Console;
 import dyvil.tools.compiler.util.Util;
 
 public final class Main
@@ -15,16 +16,34 @@ public final class Main
 		final int exitCode = compiler.run(System.in, System.out, System.err, args);
 
 		final long endTime = System.nanoTime();
+		final boolean colors = compiler.config.useAnsiColors();
+
+		final StringBuilder builder = new StringBuilder();
 
 		if (exitCode != 0)
 		{
-			System.err.println("Compilation FAILED (" + Util.toTime(endTime - startTime) + ")");
+			if (colors)
+			{
+				builder.append(Console.ANSI_RED);
+			}
+			builder.append("Compilation FAILED");
 		}
 		else
 		{
-			System.out.println("Compilation completed (" + Util.toTime(endTime - startTime) + ")");
+			if (colors)
+			{
+				builder.append(Console.ANSI_GREEN);
+			}
+			builder.append("Compilation successful");
+		}
+		if (colors)
+		{
+			builder.append(Console.ANSI_RESET);
 		}
 
+		builder.append(" (").append(Util.toTime(endTime - startTime)).append(')');
+
+		System.out.println(builder);
 		System.exit(exitCode);
 	}
 }

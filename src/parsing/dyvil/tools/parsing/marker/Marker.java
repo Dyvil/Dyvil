@@ -2,6 +2,7 @@ package dyvil.tools.parsing.marker;
 
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
+import dyvil.io.Console;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public abstract class Marker implements Comparable<Marker>
@@ -55,15 +56,38 @@ public abstract class Marker implements Comparable<Marker>
 		return start1 == start2 ? 0 : start1 < start2 ? -1 : 0;
 	}
 
-	public void log(String code, StringBuilder buf)
+	public void log(String code, StringBuilder buf, boolean colors)
 	{
 		final String type = this.getMarkerType();
 		final String message = this.message;
 
-		buf.append("line ").append(this.position.startLine()).append(": ").append(type);
+		buf.append("line ").append(this.position.startLine()).append(": ");
+
+		if (colors)
+		{
+			if (this.isError())
+			{
+				buf.append(Console.ANSI_RED);
+			}
+			else if (this.isWarning())
+			{
+				buf.append(Console.ANSI_YELLOW);
+			}
+			else
+			{
+				buf.append(Console.ANSI_BLUE);
+			}
+		}
+
+		buf.append(type);
 		if (message != null)
 		{
 			buf.append(": ").append(message);
+		}
+
+		if (colors)
+		{
+			buf.append(Console.ANSI_RESET);
 		}
 
 		// Append Info (if any)
@@ -126,9 +150,18 @@ public abstract class Marker implements Comparable<Marker>
 				buf.append(' ');
 			}
 		}
+
+		if (colors)
+		{
+			buf.append(Console.ANSI_RED);
+		}
 		for (int i = startIndex; i < endIndex; i++)
 		{
 			buf.append('¯');
+		}
+		if (colors)
+		{
+			buf.append(Console.ANSI_RESET);
 		}
 
 		buf.append('\n');

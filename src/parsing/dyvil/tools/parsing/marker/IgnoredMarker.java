@@ -37,7 +37,7 @@ public class IgnoredMarker extends Marker
 	}
 	
 	@Override
-	public void log(String code, StringBuilder buf)
+	public void log(String code, StringBuilder buf, boolean colors)
 	{
 	}
 }

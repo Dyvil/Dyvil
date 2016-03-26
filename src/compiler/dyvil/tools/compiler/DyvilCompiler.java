@@ -1,8 +1,7 @@
 package dyvil.tools.compiler;
 
-import dyvil.io.AppendablePrintStream;
-import dyvil.io.BasicPrintStream;
-import dyvil.io.FileUtils;
+import dyvil.io.*;
+import dyvil.io.Console;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -32,7 +31,7 @@ public final class DyvilCompiler implements Tool
 	public static final String VERSION         = "$$compilerVersion$$";
 	public static final String DYVIL_VERSION   = "$$version$$";
 	public static final String LIBRARY_VERSION = "$$libraryVersion$$";
-	
+
 	private static final DateFormat DATE_FORMAT               = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	public static final  int        OPTIMIZE_CONSTANT_FOLDING = 5;
 
@@ -103,15 +102,15 @@ public final class DyvilCompiler implements Tool
 		return true;
 	}
 
-	public void processArguments(String[] arguments)
+	public void processArguments(String[] args)
 	{
-		for (String arg : arguments)
+		for (String arg : args)
 		{
 			this.processArgument(arg);
 		}
 	}
 
-	private void processArgument(String arg)
+	public void processArgument(String arg)
 	{
 		switch (arg)
 		{
@@ -153,6 +152,9 @@ public final class DyvilCompiler implements Tool
 			this.phases.add(ICompilerPhase.PRINT);
 			this.phases.add(ICompilerPhase.TEST);
 			this.config.setDebug(true);
+			return;
+		case "--ansi":
+			this.config.setAnsiColors(true);
 			return;
 		}
 
@@ -231,8 +233,8 @@ public final class DyvilCompiler implements Tool
 		Package.initRoot(this);
 
 		final long endTime = System.nanoTime();
-		this.log("Loaded " + libs + (libs == 1 ? " Library (" : " Libraries (") + Util.toTime(endTime - startTime)
-				         + ")");
+		this.log(
+			"Loaded " + libs + (libs == 1 ? " Library (" : " Libraries (") + Util.toTime(endTime - startTime) + ")");
 	}
 
 	private void initLogger()
@@ -310,8 +312,9 @@ public final class DyvilCompiler implements Tool
 		final long endTime = System.nanoTime();
 
 		this.log("Found " + fileCount + (fileCount == 1 ? " File (" : " Files (") + unitCount + (unitCount == 1 ?
-				" Compilation Unit)" :
-				" Compilation Units)") + " (" + Util.toTime(endTime - startTime) + ")");
+			                                                                                         " Compilation Unit)" :
+			                                                                                         " Compilation Units)")
+			         + " (" + Util.toTime(endTime - startTime) + ")");
 		this.log("");
 	}
 
@@ -383,7 +386,7 @@ public final class DyvilCompiler implements Tool
 			return false;
 		}
 	}
-	
+
 	public void test()
 	{
 		String mainType = this.config.getMainType();
@@ -391,15 +394,15 @@ public final class DyvilCompiler implements Tool
 		{
 			return;
 		}
-		
+
 		File file = new File(this.config.getOutputDir(), this.config.getMainType().replace('.', '/') + ".class");
 		if (!file.exists())
 		{
-			this.log("The Main Type '" + this.config.getMainType()
-					         + "' does not exist or was not compiled, skipping test.");
+			this.log(
+				"The Main Type '" + this.config.getMainType() + "' does not exist or was not compiled, skipping test.");
 			return;
 		}
-		
+
 		final TestThread testThread = new TestThread(this);
 		testThread.start();
 		try
@@ -410,7 +413,7 @@ public final class DyvilCompiler implements Tool
 		{
 		}
 	}
-	
+
 	public void clean()
 	{
 		File[] files = this.config.getOutputDir().listFiles();
@@ -418,7 +421,7 @@ public final class DyvilCompiler implements Tool
 		{
 			return;
 		}
-		
+
 		for (File s : files)
 		{
 			FileUtils.delete(s);
@@ -505,7 +508,16 @@ public final class DyvilCompiler implements Tool
 
 	public void warn(String message)
 	{
-		this.errorOutput.println(message);
+		if (this.config.useAnsiColors())
+		{
+			this.output.print(Console.ANSI_YELLOW);
+			this.output.print(message);
+			this.output.println(Console.ANSI_RESET);
+		}
+		else
+		{
+			this.output.println(message);
+		}
 
 		if (this.logger != null)
 		{

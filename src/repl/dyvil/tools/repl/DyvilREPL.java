@@ -36,7 +36,7 @@ public final class DyvilREPL
 	protected REPLContext      context = new REPLContext(this);
 	protected TryParserManager parser  = new TryParserManager(this.context);
 
-	protected File dumpDir;
+	protected File    dumpDir;
 
 	private static final Map<String, ICommand> commands = new TreeMap<>();
 
@@ -107,7 +107,7 @@ public final class DyvilREPL
 
 		Names.init();
 
-		this.compiler.processArguments(args);
+		this.processArguments(args);
 
 		if (this.compiler.config.isDebug())
 		{
@@ -131,6 +131,28 @@ public final class DyvilREPL
 
 			this.compiler.log("Loaded REPL (" + Util.toTime(endTime - startTime) + ")");
 		}
+	}
+
+	private void processArguments(String[] args)
+	{
+		for (String arg : args)
+		{
+			if (!this.processArgument(arg))
+			{
+				this.compiler.processArgument(arg);
+			}
+		}
+	}
+
+	private boolean processArgument(String arg)
+	{
+		if (arg.startsWith("dumpDir"))
+		{
+			this.dumpDir = new File(arg.substring(arg.indexOf('=')).trim());
+			return true;
+		}
+
+		return false;
 	}
 
 	public void shutdown()
@@ -175,7 +197,8 @@ public final class DyvilREPL
 		}
 
 		if (this.tryParse(markers, tokens,
-		                  new MemberParser<>(this.context).withFlag(NO_UNINITIALIZED_VARIABLES | OPERATOR_ERROR), false))
+		                  new MemberParser<>(this.context).withFlag(NO_UNINITIALIZED_VARIABLES | OPERATOR_ERROR),
+		                  false))
 		{
 			this.context.reportErrors();
 			return;

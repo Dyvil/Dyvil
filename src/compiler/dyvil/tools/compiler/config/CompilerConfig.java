@@ -33,6 +33,7 @@ public class CompilerConfig
 	public final List<String> mainArgs = new ArrayList<>();
 
 	private boolean debug;
+	private boolean ansiColors;
 
 	private int constantFolding = 2;
 
@@ -166,6 +167,16 @@ public class CompilerConfig
 	public void setDebug(boolean debug)
 	{
 		this.debug = debug;
+	}
+
+	public boolean useAnsiColors()
+	{
+		return this.ansiColors;
+	}
+
+	public void setAnsiColors(boolean ansiColors)
+	{
+		this.ansiColors = ansiColors;
 	}
 
 	public int getConstantFolding()

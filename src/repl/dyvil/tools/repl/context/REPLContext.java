@@ -124,14 +124,15 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 			return;
 		}
 
+		boolean colors = this.compiler.config.useAnsiColors();
 		StringBuilder buf = new StringBuilder();
 		this.markers.sort();
 		for (Marker m : this.markers)
 		{
-			m.log(this.currentCode, buf);
+			m.log(this.currentCode, buf, colors);
 		}
 
-		this.compiler.getErrorOutput().println(buf.toString());
+		this.compiler.getOutput().println(buf.toString());
 	}
 
 	private void compileInnerClasses()

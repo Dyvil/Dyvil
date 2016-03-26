@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.structure;
 
+import dyvil.io.Console;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
@@ -10,6 +11,37 @@ import java.io.File;
 
 public interface ICompilationUnit extends IASTNode
 {
+	default boolean isHeader()
+	{
+		return false;
+	}
+
+	File getInputFile();
+
+	File getOutputFile();
+
+	void tokenize();
+
+	void parseHeader();
+
+	void resolveHeader();
+
+	void parse();
+
+	void resolveTypes();
+
+	void resolve();
+
+	void checkTypes();
+
+	void check();
+
+	void foldConstants();
+
+	void cleanup();
+
+	void compile();
+
 	static boolean printMarkers(DyvilCompiler compiler, MarkerList markers, String fileType, Name name, File inputFile, String source)
 	{
 		final int size = markers.size();
@@ -23,15 +55,46 @@ public interface ICompilationUnit extends IASTNode
 
 		final int warnings = markers.getWarnings();
 		final int errors = markers.getErrors();
+		final boolean colors = compiler.config.useAnsiColors();
 
 		markers.sort();
 		for (Marker marker : markers)
 		{
-			marker.log(source, builder);
+			marker.log(source, builder, colors);
 		}
 
-		builder.append(errors).append(errors == 1 ? " Error, " : " Errors, ").append(warnings)
-		       .append(warnings == 1 ? " Warning" : " Warnings");
+		if (errors > 0)
+		{
+			if (colors)
+			{
+				builder.append(Console.ANSI_RED);
+			}
+
+			builder.append(errors).append(errors == 1 ? " Error" : " Errors");
+
+			if (colors)
+			{
+				builder.append(Console.ANSI_RESET);
+			}
+		}
+		if (warnings > 0)
+		{
+			if (errors > 0)
+			{
+				builder.append(", ");
+			}
+
+			if (colors)
+			{
+				builder.append(Console.ANSI_YELLOW);
+			}
+			builder.append(warnings).append(warnings == 1 ? " Warning" : " Warnings");
+
+			if (colors)
+			{
+				builder.append(Console.ANSI_RESET);
+			}
+		}
 
 		compiler.log(builder.toString());
 		if (errors > 0)
@@ -42,35 +105,4 @@ public interface ICompilationUnit extends IASTNode
 		}
 		return false;
 	}
-	
-	default boolean isHeader()
-	{
-		return false;
-	}
-	
-	File getInputFile();
-	
-	File getOutputFile();
-	
-	void tokenize();
-	
-	void parseHeader();
-	
-	void resolveHeader();
-	
-	void parse();
-	
-	void resolveTypes();
-	
-	void resolve();
-	
-	void checkTypes();
-	
-	void check();
-	
-	void foldConstants();
-	
-	void cleanup();
-	
-	void compile();
 }
