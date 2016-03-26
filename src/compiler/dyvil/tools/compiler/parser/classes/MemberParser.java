@@ -39,7 +39,7 @@ import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;
 
-public final class MemberParser extends Parser implements ITypeConsumer
+public final class MemberParser<T extends IDataMember> extends Parser implements ITypeConsumer
 {
 	protected static final int TYPE                       = 0;
 	protected static final int NAME_OPERATOR              = 1;
@@ -77,7 +77,7 @@ public final class MemberParser extends Parser implements ITypeConsumer
 
 	// ----------
 
-	protected IMemberConsumer consumer;
+	protected IMemberConsumer<T> consumer;
 
 	private IType type;
 	private ModifierList modifiers = new ModifierList();
@@ -88,13 +88,13 @@ public final class MemberParser extends Parser implements ITypeConsumer
 	private IMember member;
 	private int     flags;
 
-	public MemberParser(IMemberConsumer consumer)
+	public MemberParser(IMemberConsumer<T> consumer)
 	{
 		this.consumer = consumer;
 		// this.mode = TYPE;
 	}
 
-	public MemberParser withFlag(int flag)
+	public MemberParser<T> withFlag(int flag)
 	{
 		this.flags |= flag;
 		return this;
@@ -291,7 +291,7 @@ public final class MemberParser extends Parser implements ITypeConsumer
 			case Tokens.EOF:
 			case BaseSymbols.CLOSE_CURLY_BRACKET:
 			{
-				final IDataMember field = this.consumer.createDataMember(this.position, this.name, this.type, this.modifiers,
+				final T field = this.consumer.createDataMember(this.position, this.name, this.type, this.modifiers,
 				                                                         this.annotations);
 				this.consumer.addDataMember(field);
 				this.mode = END;
@@ -460,7 +460,7 @@ public final class MemberParser extends Parser implements ITypeConsumer
 				this.consumer.addInitializer((IInitializer) this.member);
 				break;
 			case FIELD:
-				this.consumer.addDataMember((IDataMember) this.member);
+				this.consumer.addDataMember((T) this.member);
 				break;
 			case PROPERTY:
 				this.consumer.addProperty((IProperty) this.member);

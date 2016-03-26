@@ -112,7 +112,7 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 			// Have to rewind one token because the TryParserManager assumes the TokenIterator is at the beginning (i.e.
 			// no tokens have been returned by next() yet)
 			tokens.jump(token);
-			final MemberParser parser = new MemberParser(this).withFlag(NO_UNINITIALIZED_VARIABLES | OPERATOR_ERROR);
+			final MemberParser parser = new MemberParser<>(this).withFlag(NO_UNINITIALIZED_VARIABLES | OPERATOR_ERROR);
 			if (new TryParserManager(tokens, pm.getMarkers(), pm.getOperatorMap()).parse(parser, EXIT_ON_ROOT))
 			{
 				tokens.jump(tokens.lastReturned());

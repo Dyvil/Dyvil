@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.parser.classes;
 
 import dyvil.tools.compiler.ast.consumer.IMemberConsumer;
+import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -12,9 +13,9 @@ public class ClassBodyParser extends Parser
 	protected static final int OPEN_BRACE = 0;
 	protected static final int SEPARATOR  = 1;
 
-	protected IMemberConsumer consumer;
+	protected IMemberConsumer<IField> consumer;
 
-	public ClassBodyParser(IMemberConsumer consumer)
+	public ClassBodyParser(IMemberConsumer<IField> consumer)
 	{
 		this.consumer = consumer;
 		// this.mode = OPEN_BRACE
@@ -27,7 +28,7 @@ public class ClassBodyParser extends Parser
 		switch (this.mode)
 		{
 		case OPEN_BRACE:
-			pm.pushParser(new MemberParser(this.consumer));
+			pm.pushParser(new MemberParser<>(this.consumer));
 			this.mode = SEPARATOR;
 			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
 			{
@@ -46,11 +47,11 @@ public class ClassBodyParser extends Parser
 				pm.popParser(true);
 				return;
 			case BaseSymbols.SEMICOLON:
-				pm.pushParser(new MemberParser(this.consumer));
+				pm.pushParser(new MemberParser<>(this.consumer));
 				return;
 			}
 
-			pm.pushParser(new MemberParser(this.consumer), true);
+			pm.pushParser(new MemberParser<>(this.consumer), true);
 			pm.report(token, "class.body.declaration.end");
 		}
 	}
