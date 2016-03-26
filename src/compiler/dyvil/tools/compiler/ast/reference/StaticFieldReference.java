@@ -1,16 +1,11 @@
 package dyvil.tools.compiler.ast.reference;
 
-import dyvil.collection.Map;
-import dyvil.collection.Set;
-import dyvil.collection.mutable.IdentityHashMap;
-import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Type;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -20,8 +15,6 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class StaticFieldReference implements IReference, IClassCompilable
 {
-	private static Map<String, Set<IField>> map = new IdentityHashMap<>();
-	
 	protected IField field;
 
 	// Metadata
@@ -36,35 +29,37 @@ public class StaticFieldReference implements IReference, IClassCompilable
 	{
 		this.field = field;
 	}
-	
-	private static boolean addToMap(String className, IField field)
-	{
-		Set<IField> set = map.get(className);
-		if (set == null)
-		{
-			set = new IdentityHashSet<>();
-			map.put(className, set);
-		}
-		
-		return set.add(field);
-	}
-	
+
 	@Override
 	public void check(ICodePosition position, MarkerList markers, IContext context)
 	{
-		map.clear();
-
 		InstanceFieldReference.checkFinalAccess(this.field, position, markers);
 	}
 
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		compilableList.addCompilable(this);
-		if (addToMap(this.className, this.field))
+		final String fieldClassName = this.getFieldOriginClassName();
+		final String fieldName = this.getFieldName();
+
+		this.isUnique = true;
+		for (int i = 0, count = compilableList.compilableCount(); i < count; i++)
 		{
-			this.isUnique = true;
+			final IClassCompilable compilable = compilableList.getCompilable(i);
+			if (!(compilable instanceof StaticFieldReference))
+			{
+				continue;
+			}
+
+			final StaticFieldReference staticFieldReference = (StaticFieldReference) compilable;
+			if (fieldClassName.equals(staticFieldReference.getFieldOriginClassName()) // same owner class
+				    && fieldName.equals(staticFieldReference.getFieldName())) // same field name
+			{
+				this.isUnique = false;
+				break;
+			}
 		}
+		compilableList.addCompilable(this);
 	}
 
 	// Lazy Field Getters
@@ -88,7 +83,7 @@ public class StaticFieldReference implements IReference, IClassCompilable
 
 		return this.fieldOriginClassName = this.field.getEnclosingClass().getInternalName();
 	}
-	
+
 	private String getRefFieldName()
 	{
 		if (this.refFieldName != null)
@@ -98,16 +93,16 @@ public class StaticFieldReference implements IReference, IClassCompilable
 
 		// Format: $staticRef$[originClassName]$[fieldName]
 		return this.refFieldName =
-				"$staticRef$" + this.getFieldOriginClassName().replace('/', '$') + '$' + this.getFieldName();
+			       "$staticRef$" + this.getFieldOriginClassName().replace('/', '$') + '$' + this.getFieldName();
 	}
-	
+
 	private String getRefFieldType()
 	{
 		if (this.refFieldType != null)
 		{
 			return this.refFieldType;
 		}
-		
+
 		return this.refFieldType = 'L' + ReferenceType.LazyFields.getInternalRef(this.field.getType(), "") + ';';
 	}
 
@@ -118,7 +113,7 @@ public class StaticFieldReference implements IReference, IClassCompilable
 	{
 		this.className = internalName;
 	}
-	
+
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
@@ -126,14 +121,14 @@ public class StaticFieldReference implements IReference, IClassCompilable
 		{
 			return;
 		}
-		
+
 		String refFieldName = this.getRefFieldName();
 		String refFieldType = this.getRefFieldType();
-		
+
 		final int modifiers = Modifiers.PRIVATE | Modifiers.STATIC | Modifiers.SYNTHETIC;
 		writer.visitField(modifiers, refFieldName, refFieldType, null, null);
 	}
-	
+
 	@Override
 	public void writeStaticInit(MethodWriter writer) throws BytecodeException
 	{
@@ -144,11 +139,12 @@ public class StaticFieldReference implements IReference, IClassCompilable
 
 		final String fieldName = this.getFieldName();
 		final String fieldOriginClassName = this.getFieldOriginClassName();
-		
+
 		final String refFieldName = this.getRefFieldName();
 		final String refFieldType = this.getRefFieldType();
 
-		final String factoryMethodName = ReferenceType.LazyFields.getReferenceFactoryName(this.field.getType(), "Static");
+		final String factoryMethodName = ReferenceType.LazyFields
+			                                 .getReferenceFactoryName(this.field.getType(), "Static");
 		final String factoryMethodType = "(Ljava/lang/Class;Ljava/lang/String;)" + refFieldType;
 
 		// Load the field class
@@ -159,13 +155,13 @@ public class StaticFieldReference implements IReference, IClassCompilable
 		// Invoke the factory method
 		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/ref/ReferenceFactory", factoryMethodName, factoryMethodType,
 		                       false);
-		
+
 		// Assign the reference field
 		writer.visitFieldInsn(Opcodes.PUTSTATIC, this.className, refFieldName, refFieldType);
 	}
 
 	// Reference getter implementation
-	
+
 	@Override
 	public void writeReference(MethodWriter writer) throws BytecodeException
 	{
