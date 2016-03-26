@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.parser.classes;
 
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
@@ -100,9 +101,9 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 		return this;
 	}
 
-	private void setMemberKind(byte field)
+	private void setMemberKind(byte kind)
 	{
-		this.flags = this.flags & ~MEMBER_KIND_MASK | field;
+		this.flags = this.flags & ~MEMBER_KIND_MASK | kind;
 	}
 
 	@Override
@@ -149,6 +150,10 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 				this.setMemberKind(CONSTRUCTOR);
 				this.mode = CONSTRUCTOR_PARAMETERS;
 				return;
+			case DyvilKeywords.LET:
+				this.modifiers.addIntModifier(Modifiers.FINAL);
+				this.setMemberKind(FIELD);
+				// Fallthrough
 			case DyvilKeywords.VAR:
 				this.mode = FIELD_NAME;
 				this.type = Types.UNKNOWN;
@@ -292,7 +297,7 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 			case BaseSymbols.CLOSE_CURLY_BRACKET:
 			{
 				final T field = this.consumer.createDataMember(this.position, this.name, this.type, this.modifiers,
-				                                                         this.annotations);
+				                                               this.annotations);
 				this.consumer.addDataMember(field);
 				this.mode = END;
 				pm.popParser(true);
@@ -300,8 +305,9 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 			}
 			case BaseSymbols.EQUALS:
 			{
-				final IDataMember field = this.consumer.createDataMember(this.position, this.name, this.type, this.modifiers,
-				                                                         this.annotations);
+				final IDataMember field = this.consumer
+					                          .createDataMember(this.position, this.name, this.type, this.modifiers,
+					                                            this.annotations);
 				this.member = field;
 				this.setMemberKind(FIELD);
 				this.mode = END;
@@ -311,6 +317,11 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 			}
 			case BaseSymbols.OPEN_CURLY_BRACKET:
 			{
+				if ((this.flags & MEMBER_KIND_MASK) == FIELD)
+				{
+					break;
+				}
+
 				final IProperty property = this.consumer
 					                           .createProperty(this.position, this.name, this.type, this.modifiers,
 					                                           this.annotations);

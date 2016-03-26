@@ -2,8 +2,6 @@ package dyvil.tools.compiler.transform;
 
 import dyvil.tools.parsing.lexer.Tokens;
 
-import static javax.swing.text.html.HTML.Tag.HEAD;
-
 public class DyvilKeywords
 {
 	public static final int ABSTRACT     = Tokens.KEYWORD | 0x00010000;
@@ -39,6 +37,7 @@ public class DyvilKeywords
 	public static final int INTERNAL     = Tokens.KEYWORD | 0x001F0000;
 	public static final int IS           = Tokens.KEYWORD | 0x00200000;
 	public static final int LAZY         = Tokens.KEYWORD | 0x00210000;
+	public static final int LET          = Tokens.KEYWORD | 0x00410000;
 	public static final int MACRO        = Tokens.KEYWORD | 0x00220000;
 	public static final int MATCH        = Tokens.KEYWORD | 0x00230000;
 	public static final int NEW          = Tokens.KEYWORD | 0x00240000;
@@ -109,6 +108,7 @@ public class DyvilKeywords
 		case "internal": return INTERNAL;
 		case "is": return IS;
 		case "lazy": return LAZY;
+		case "let": return LET;
 		case "macro": return MACRO;
 		case "match": return MATCH;
 		case "new": return NEW;
@@ -183,6 +183,7 @@ public class DyvilKeywords
 		case INTERNAL: return "internal";
 		case IS: return "is";
 		case LAZY: return "lazy";
+		case LET :  return "let";
 		case MACRO: return "macro";
 		case MATCH: return "match";
 		case NEW: return "new";

@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -133,7 +134,7 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 
 			if (typeAscription)
 			{
-				buffer.append("var");
+				appendKeyword(buffer, field);
 			}
 			else
 			{
@@ -142,7 +143,7 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 		}
 		else
 		{
-			buffer.append("var");
+			appendKeyword(buffer, field);
 		}
 
 		buffer.append(' ').append(field.getName());
@@ -152,5 +153,16 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 			Formatting.appendSeparator(buffer, key, ':');
 			type.toString(prefix, buffer);
 		}
+	}
+
+	static void appendKeyword(StringBuilder buffer, IMember member)
+	{
+		if (member.hasModifier(Modifiers.FINAL) && (member.getKind() != MemberKind.PROPERTY))
+		{
+			buffer.append("let");
+			return;
+		}
+
+		buffer.append("var");
 	}
 }

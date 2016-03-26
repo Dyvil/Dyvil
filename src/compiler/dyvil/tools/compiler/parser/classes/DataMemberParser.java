@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.parser.classes;
 
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.consumer.IDataMemberConsumer;
@@ -49,6 +50,19 @@ public class DataMemberParser<T extends IDataMember> extends Parser implements I
 			{
 				this.mode = NAME;
 				this.type = Types.UNKNOWN;
+				return;
+			}
+			if (type == DyvilKeywords.LET)
+			{
+				this.mode = NAME;
+				this.type = Types.UNKNOWN;
+
+				if (this.modifiers == null)
+				{
+					this.modifiers = new ModifierList();
+				}
+
+				this.modifiers.addIntModifier(Modifiers.FINAL);
 				return;
 			}
 
