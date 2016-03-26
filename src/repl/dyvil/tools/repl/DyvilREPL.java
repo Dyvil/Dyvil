@@ -24,17 +24,20 @@ import dyvil.tools.repl.context.REPLContext;
 import java.io.File;
 import java.io.PrintStream;
 
+import static dyvil.tools.compiler.parser.classes.MemberParser.NO_UNINITIALIZED_VARIABLES;
+import static dyvil.tools.compiler.parser.classes.MemberParser.OPERATOR_ERROR;
+
 public final class DyvilREPL
 {
 	public static final String VERSION = "$$replVersion$$";
-	
+
 	protected DyvilCompiler compiler = new DyvilCompiler();
-	
+
 	protected REPLContext      context = new REPLContext(this);
 	protected TryParserManager parser  = new TryParserManager(this.context);
-	
+
 	protected File dumpDir;
-	
+
 	private static final Map<String, ICommand> commands = new TreeMap<>();
 
 	static
@@ -51,7 +54,7 @@ public final class DyvilREPL
 		registerCommand(new VariablesCommand());
 		registerCommand(new VersionCommand());
 	}
-	
+
 	public DyvilREPL(PrintStream output)
 	{
 		this(output, output);
@@ -134,20 +137,20 @@ public final class DyvilREPL
 	{
 		this.compiler.shutdown();
 	}
-	
+
 	public void processInput(String input)
 	{
 		try
 		{
 			final String trim = input.trim();
 			if (trim.length() > 1 // not a single colon
-					&& trim.charAt(0) == ':' // first character must be a colon
-					&& LexerUtil.isIdentifierPart(trim.charAt(1))) // next character must be a letter
+				    && trim.charAt(0) == ':' // first character must be a colon
+				    && LexerUtil.isIdentifierPart(trim.charAt(1))) // next character must be a letter
 			{
 				this.runCommand(trim);
 				return;
 			}
-			
+
 			this.evaluate(input);
 		}
 		catch (Throwable t)
@@ -155,7 +158,7 @@ public final class DyvilREPL
 			t.printStackTrace(this.compiler.getErrorOutput());
 		}
 	}
-	
+
 	public void evaluate(String code)
 	{
 		this.context.startEvaluation(code);
@@ -171,7 +174,8 @@ public final class DyvilREPL
 			return;
 		}
 
-		if (this.tryParse(markers, tokens, new MemberParser(this.context), false))
+		if (this.tryParse(markers, tokens,
+		                  new MemberParser<>(this.context).withFlag(NO_UNINITIALIZED_VARIABLES | OPERATOR_ERROR), false))
 		{
 			this.context.reportErrors();
 			return;
@@ -188,7 +192,7 @@ public final class DyvilREPL
 		this.parser.reset(markers, tokens);
 		return this.parser.parse(parser, reportErrors);
 	}
-	
+
 	private void runCommand(String line)
 	{
 		final int spaceIndex = line.indexOf(' ', 1);
@@ -197,10 +201,10 @@ public final class DyvilREPL
 			this.runCommand(line.substring(1), null);
 			return;
 		}
-		
+
 		this.runCommand(line.substring(1, spaceIndex), line.substring(spaceIndex + 1));
 	}
-	
+
 	public void runCommand(String name, String argument)
 	{
 		ICommand command = commands.get(name);
@@ -209,10 +213,10 @@ public final class DyvilREPL
 			this.compiler.error("Unknown Command: " + name);
 			return;
 		}
-		
+
 		command.execute(this, argument);
 	}
-	
+
 	public static void registerCommand(ICommand command)
 	{
 		commands.put(command.getName(), command);
@@ -226,7 +230,7 @@ public final class DyvilREPL
 			}
 		}
 	}
-	
+
 	public static Map<String, ICommand> getCommands()
 	{
 		return commands;
