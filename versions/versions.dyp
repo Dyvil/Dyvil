@@ -27,5 +27,6 @@ versionFiles = {
 	"v0.16.1"				: "\(baseLink)/pre/v0.16.1.dyp",
 	"v0.17.0"				: "\(baseLink)/pre/v0.17.0.dyp",
 	"v0.17.1"				: "\(baseLink)/pre/v0.17.1.dyp",
-	"v0.18.0"				: "\(baseLink)/pre/v0.18.0.dyp"
+	"v0.18.0"				: "\(baseLink)/pre/v0.18.0.dyp",
+	"v0.19.0"				: "\(baseLink)/pre/v0.19.0.dyp"
 }
