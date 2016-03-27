@@ -23,7 +23,7 @@ public class ClassReader implements ClassVisitor
 			final dyvil.tools.asm.ClassReader reader = new dyvil.tools.asm.ClassReader(inputStream);
 			final ClassReader visitor = new ClassReader(externalClass);
 
-			reader.accept(visitor, dyvil.tools.asm.ClassReader.SKIP_CODE | dyvil.tools.asm.ClassReader.SKIP_FRAMES);
+			reader.accept(visitor, dyvil.tools.asm.ClassReader.SKIP_FRAMES);
 			
 			return externalClass;
 		}

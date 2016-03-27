@@ -152,7 +152,7 @@ public class ClassWriter implements ClassVisitor
 		this.access = access;
 		this.name = this.newClass(name);
 		this.thisName = name;
-		if (ClassReader.SIGNATURES && signature != null)
+		if (signature != null)
 		{
 			this.signature = this.newUTF8(signature);
 		}
@@ -194,10 +194,6 @@ public class ClassWriter implements ClassVisitor
 	@Override
 	public final AnnotationVisitor visitAnnotation(final String desc, final boolean visible)
 	{
-		if (!ClassReader.ANNOTATIONS)
-		{
-			return null;
-		}
 		ByteVector bv = new ByteVector();
 		// write type, and reserve space for values count
 		bv.putShort(this.newUTF8(desc)).putShort(0);
@@ -218,10 +214,6 @@ public class ClassWriter implements ClassVisitor
 	@Override
 	public final AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, final String desc, final boolean visible)
 	{
-		if (!ClassReader.ANNOTATIONS)
-		{
-			return null;
-		}
 		ByteVector bv = new ByteVector();
 		// write target_type and target_info
 		AnnotationWriter.putTarget(typeRef, typePath, bv);
@@ -317,7 +309,7 @@ public class ClassWriter implements ClassVisitor
 			size += 8 + this.bootstrapMethods.length;
 			this.newUTF8("BootstrapMethods");
 		}
-		if (ClassReader.SIGNATURES && this.signature != 0)
+		if (this.signature != 0)
 		{
 			++attributeCount;
 			size += 8;
@@ -362,25 +354,25 @@ public class ClassWriter implements ClassVisitor
 			size += 8 + this.innerClasses.length;
 			this.newUTF8("InnerClasses");
 		}
-		if (ClassReader.ANNOTATIONS && this.anns != null)
+		if (this.anns != null)
 		{
 			++attributeCount;
 			size += 8 + this.anns.getSize();
 			this.newUTF8("RuntimeVisibleAnnotations");
 		}
-		if (ClassReader.ANNOTATIONS && this.ianns != null)
+		if (this.ianns != null)
 		{
 			++attributeCount;
 			size += 8 + this.ianns.getSize();
 			this.newUTF8("RuntimeInvisibleAnnotations");
 		}
-		if (ClassReader.ANNOTATIONS && this.tanns != null)
+		if (this.tanns != null)
 		{
 			++attributeCount;
 			size += 8 + this.tanns.getSize();
 			this.newUTF8("RuntimeVisibleTypeAnnotations");
 		}
-		if (ClassReader.ANNOTATIONS && this.itanns != null)
+		if (this.itanns != null)
 		{
 			++attributeCount;
 			size += 8 + this.itanns.getSize();
@@ -426,7 +418,7 @@ public class ClassWriter implements ClassVisitor
 			out.putInt(this.bootstrapMethods.length + 2).putShort(this.bootstrapMethodsCount);
 			out.putByteArray(this.bootstrapMethods.data, 0, this.bootstrapMethods.length);
 		}
-		if (ClassReader.SIGNATURES && this.signature != 0)
+		if (this.signature != 0)
 		{
 			out.putShort(this.newUTF8("Signature")).putInt(2).putShort(this.signature);
 		}
@@ -462,22 +454,22 @@ public class ClassWriter implements ClassVisitor
 			out.putInt(this.innerClasses.length + 2).putShort(this.innerClassesCount);
 			out.putByteArray(this.innerClasses.data, 0, this.innerClasses.length);
 		}
-		if (ClassReader.ANNOTATIONS && this.anns != null)
+		if (this.anns != null)
 		{
 			out.putShort(this.newUTF8("RuntimeVisibleAnnotations"));
 			this.anns.put(out);
 		}
-		if (ClassReader.ANNOTATIONS && this.ianns != null)
+		if (this.ianns != null)
 		{
 			out.putShort(this.newUTF8("RuntimeInvisibleAnnotations"));
 			this.ianns.put(out);
 		}
-		if (ClassReader.ANNOTATIONS && this.tanns != null)
+		if (this.tanns != null)
 		{
 			out.putShort(this.newUTF8("RuntimeVisibleTypeAnnotations"));
 			this.tanns.put(out);
 		}
-		if (ClassReader.ANNOTATIONS && this.itanns != null)
+		if (this.itanns != null)
 		{
 			out.putShort(this.newUTF8("RuntimeInvisibleTypeAnnotations"));
 			this.itanns.put(out);
@@ -512,7 +504,7 @@ public class ClassWriter implements ClassVisitor
 	{
 		if (cst instanceof Integer)
 		{
-			int val = ((Integer) cst).intValue();
+			int val = (Integer) cst;
 			return this.newInteger(val);
 		}
 		else if (cst instanceof Byte)
@@ -522,7 +514,7 @@ public class ClassWriter implements ClassVisitor
 		}
 		else if (cst instanceof Character)
 		{
-			int val = ((Character) cst).charValue();
+			int val = (Character) cst;
 			return this.newInteger(val);
 		}
 		else if (cst instanceof Short)
@@ -532,22 +524,22 @@ public class ClassWriter implements ClassVisitor
 		}
 		else if (cst instanceof Boolean)
 		{
-			int val = ((Boolean) cst).booleanValue() ? 1 : 0;
+			int val = (Boolean) cst ? 1 : 0;
 			return this.newInteger(val);
 		}
 		else if (cst instanceof Float)
 		{
-			float val = ((Float) cst).floatValue();
+			float val = (Float) cst;
 			return this.newFloat(val);
 		}
 		else if (cst instanceof Long)
 		{
-			long val = ((Long) cst).longValue();
+			long val = (Long) cst;
 			return this.newLong(val);
 		}
 		else if (cst instanceof Double)
 		{
-			double val = ((Double) cst).doubleValue();
+			double val = (Double) cst;
 			return this.newDouble(val);
 		}
 		else if (cst instanceof String)
@@ -677,10 +669,9 @@ public class ClassWriter implements ClassVisitor
 		
 		int argsLength = bsmArgs.length;
 		bootstrapMethods.putShort(argsLength);
-		
-		for (int i = 0; i < argsLength; i++)
+
+		for (Object bsmArg : bsmArgs)
 		{
-			Object bsmArg = bsmArgs[i];
 			hashCode ^= bsmArg.hashCode();
 			bootstrapMethods.putShort(this.newConst(bsmArg));
 		}
@@ -893,7 +884,7 @@ public class ClassWriter implements ClassVisitor
 	private Item addType(final Item item)
 	{
 		++this.typeCount;
-		Item result = new Item(this.typeCount, this.key);
+		Item result = new Item(this.typeCount, item);
 		this.put(result);
 		if (this.typeTable == null)
 		{

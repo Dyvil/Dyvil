@@ -17,6 +17,11 @@ public final class TypeChecker
 		Marker createMarker(ICodePosition position, IType expected, IType actual);
 	}
 
+	private TypeChecker()
+	{
+		// no instances
+	}
+
 	public static MarkerSupplier markerSupplier(String error)
 	{
 		return markerSupplier(error, ObjectArray.EMPTY);
@@ -28,27 +33,29 @@ public final class TypeChecker
 		                                                         expectedError, actualError);
 	}
 
+	public static MarkerSupplier markerSupplier(String error, String expectedError, String actualError, Object arg)
+	{
+		return (position, expectedType, actualType) -> typeError(position, expectedType, actualType, error,
+		                                                         expectedError, actualError, arg);
+	}
+
+	public static MarkerSupplier markerSupplier(String error, String expectedError, String actualError, Object... args)
+	{
+		return (position, expectedType, actualType) -> typeError(position, expectedType, actualType, error,
+		                                                         expectedError, actualError, args);
+	}
+
+	public static MarkerSupplier markerSupplier(String error, Object arg)
+	{
+		return (position, expected, actual) -> typeError(position, expected, actual, error, arg);
+	}
+
 	public static MarkerSupplier markerSupplier(String error, Object... args)
 	{
 		return (position, expected, actual) -> typeError(position, expected, actual, error, args);
 	}
 
-	private TypeChecker()
-	{
-		// no instances
-	}
-
-	@Deprecated
 	public static IValue convertValue(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
-	{
-		if (type.hasTypeVariables())
-		{
-			type = type.getConcreteType(typeContext);
-		}
-		return type.convertValue(value, typeContext, markers, context);
-	}
-
-	public static IValue convertValue(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context, MarkerSupplier markerSupplier)
 	{
 		if (type.hasTypeVariables())
 		{
@@ -61,14 +68,25 @@ public final class TypeChecker
 			return typedValue;
 		}
 
-		markers.add(markerSupplier.createMarker(value.getPosition(), type, value.getType()));
-		return value;
+		final IValue convertedValue = value.getType().convertValueTo(value, type, typeContext, markers, context);
+		if (convertedValue != null)
+		{
+			return convertedValue;
+		}
+
+		return null;
 	}
 
-	@Deprecated
-	public static Marker typeError(IValue value, IType type, String key, Object... args)
+	public static IValue convertValue(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context, MarkerSupplier markerSupplier)
 	{
-		return typeError(value.getPosition(), type, value.getType(), key, args);
+		final IValue newValue = convertValue(value, type, typeContext, markers, context);
+		if (newValue != null)
+		{
+			return newValue;
+		}
+
+		markers.add(markerSupplier.createMarker(value.getPosition(), type, value.getType()));
+		return value;
 	}
 
 	public static Marker typeError(IValue value, IType type, ITypeContext typeContext, String key, Object... args)
@@ -78,9 +96,14 @@ public final class TypeChecker
 
 	public static Marker typeError(ICodePosition position, IType expected, IType actual, String key, Object... args)
 	{
+		return typeError(position, expected, actual, key, "type.expected", "value.type", args);
+	}
+
+	public static Marker typeError(ICodePosition position, IType expected, IType actual, String key, String expectedError, String actualError, Object... args)
+	{
 		final Marker marker = Markers.semanticError(position, key, args);
-		marker.addInfo(Markers.getSemantic("type.expected", expected));
-		marker.addInfo(Markers.getSemantic("value.type", actual));
+		marker.addInfo(Markers.getSemantic(expectedError, expected));
+		marker.addInfo(Markers.getSemantic(actualError, actual));
 		return marker;
 	}
 

@@ -40,19 +40,13 @@ public final class FloatPattern extends Pattern
 	}
 	
 	@Override
-	public boolean isType(IType type)
-	{
-		return type == Types.FLOAT || type.isSuperTypeOf(Types.FLOAT);
-	}
-	
-	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
 			throws BytecodeException
 	{
 		IPattern.loadVar(writer, varIndex, matchedType);
 		matchedType.writeCast(writer, Types.FLOAT, this.getLineNumber());
-		writer.writeLDC(this.value);
-		writer.writeJumpInsn(Opcodes.IF_FCMPNE, elseLabel);
+		writer.visitLdcInsn(this.value);
+		writer.visitJumpInsn(Opcodes.IF_FCMPNE, elseLabel);
 	}
 	
 	@Override

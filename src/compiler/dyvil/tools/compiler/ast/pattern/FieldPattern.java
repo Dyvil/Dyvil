@@ -67,7 +67,7 @@ public class FieldPattern implements IPattern
 	@Override
 	public boolean isType(IType type)
 	{
-		return this.dataMember == null || type.isSuperTypeOf(this.dataMember.getType());
+		return this.dataMember == null || Types.isSuperType(type, this.dataMember.getType());
 	}
 
 	@Override
@@ -136,13 +136,13 @@ public class FieldPattern implements IPattern
 		{
 			commonType = fieldType;
 
-			if (matchedType != fieldType && matchedType.isSuperTypeOf(fieldType))
+			if (matchedType != fieldType && Types.isSuperType(matchedType, fieldType))
 			{
 				varIndex = IPattern.ensureVar(writer, varIndex, matchedType);
 				IPattern.loadVar(writer, varIndex, matchedType);
 
-				writer.writeTypeInsn(Opcodes.INSTANCEOF, fieldType.getInternalName());
-				writer.writeJumpInsn(Opcodes.IFEQ, elseLabel);
+				writer.visitTypeInsn(Opcodes.INSTANCEOF, fieldType.getInternalName());
+				writer.visitJumpInsn(Opcodes.IFEQ, elseLabel);
 			}
 		}
 
@@ -161,25 +161,25 @@ public class FieldPattern implements IPattern
 			case PrimitiveType.SHORT_CODE:
 			case PrimitiveType.CHAR_CODE:
 			case PrimitiveType.INT_CODE:
-				writer.writeJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
+				writer.visitJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
 				return;
 			case PrimitiveType.LONG_CODE:
-				writer.writeJumpInsn(Opcodes.IF_LCMPNE, elseLabel);
+				writer.visitJumpInsn(Opcodes.IF_LCMPNE, elseLabel);
 				return;
 			case PrimitiveType.FLOAT_CODE:
-				writer.writeJumpInsn(Opcodes.IF_FCMPNE, elseLabel);
+				writer.visitJumpInsn(Opcodes.IF_FCMPNE, elseLabel);
 				return;
 			case PrimitiveType.DOUBLE_CODE:
-				writer.writeJumpInsn(Opcodes.IF_DCMPNE, elseLabel);
+				writer.visitJumpInsn(Opcodes.IF_DCMPNE, elseLabel);
 				return;
 			}
 
 			return;
 		}
 
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/lang/Predef", "$eq$eq",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/lang/Predef", "$eq$eq",
 		                       "(Ljava/lang/Object;Ljava/lang/Object;)Z", false);
-		writer.writeJumpInsn(Opcodes.IFEQ, elseLabel);
+		writer.visitJumpInsn(Opcodes.IFEQ, elseLabel);
 	}
 
 	@Override

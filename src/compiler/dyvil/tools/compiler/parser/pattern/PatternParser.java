@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
+import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.transform.Names;
@@ -61,7 +62,7 @@ public class PatternParser extends Parser implements ITypeConsumer
 			{
 				final TypeCheckPattern typeCheck = new TypeCheckPattern(token.raw(), this.pattern);
 				this.pattern = typeCheck;
-				pm.pushParser(pm.newTypeParser(typeCheck));
+				pm.pushParser(new TypeParser(typeCheck));
 				return;
 			}
 
@@ -109,7 +110,7 @@ public class PatternParser extends Parser implements ITypeConsumer
 				}
 
 				this.mode = TYPE_END;
-				pm.pushParser(pm.newTypeParser(this).namedOnly(), true);
+				pm.pushParser(new TypeParser(this).namedOnly(), true);
 				return;
 			}
 			if (type == DyvilKeywords.VAR)

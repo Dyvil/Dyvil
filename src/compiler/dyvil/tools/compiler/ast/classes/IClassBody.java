@@ -17,7 +17,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public interface IClassBody extends IASTNode, IClassList, IMemberConsumer
+public interface IClassBody extends IASTNode, IClassList, IMemberConsumer<IField>
 {
 	// Associated Class
 	
@@ -30,7 +30,7 @@ public interface IClassBody extends IASTNode, IClassList, IMemberConsumer
 	int fieldCount();
 	
 	@Override
-	void addField(IField field);
+	void addDataMember(IField field);
 	
 	IField getField(int index);
 	
@@ -70,7 +70,11 @@ public interface IClassBody extends IASTNode, IClassList, IMemberConsumer
 		return null;
 	}
 
-	boolean checkImplements(MarkerList markers, IClass checkedClass, IMethod candidate, ITypeContext typeContext);
+	default void setFunctionalMethod(IMethod method)
+	{
+	}
+
+	boolean checkImplements(IMethod candidate, ITypeContext typeContext);
 
 	void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext);
 	

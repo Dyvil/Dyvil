@@ -78,9 +78,9 @@ public final class NullValue implements IConstantValue
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
-		if (type == Types.NULL)
+		if (Types.isSameType(type, Types.NULL))
 		{
 			return 1;
 		}
@@ -109,7 +109,7 @@ public final class NullValue implements IConstantValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		writer.writeInsn(Opcodes.ACONST_NULL);
+		writer.visitInsn(Opcodes.ACONST_NULL);
 	}
 	
 	@Override

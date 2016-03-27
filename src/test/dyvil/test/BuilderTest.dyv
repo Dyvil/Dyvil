@@ -6,34 +6,54 @@ public class BuilderTest
                                 private double _double
                                 private String _string)
     {
+		public static Buildable apply() = new Buildable(0, 0D, null)
 
 		public static Buildable apply(extension Buildable => void configure)
 		{
-			var b = new Buildable(0, 0D, null)
-			configure(b)
-			b
+			return Buildable().{
+				configure $0
+				$0
+			}
 		}
 
 		public int myInt
 		{
 			get: return this._int
-			set: this._int = myInt
+			set: this._int = newValue
 		}
 
 		public double myDouble
 		{
 			get: return this._double
-			set: this._double = myDouble
+			set: this._double = newValue
 		}
 
 		public String myString
 		{
 			get: return this._string
-			set: this._string = myString
+			set: this._string = newValue
 		}
     }
 
 	public static void main([String] args)
+	{
+		testInline()
+		testClosure()
+	}
+
+	private static void testInline()
+	{
+		var buildable = Buildable().{
+			myInt = -42
+			myDouble = 2.5D
+			myString = "Test"
+			$0
+		}
+
+		Main.test("Builder Inline Test", buildable, Buildable(-42, 2.5D, "Test"))
+	}
+
+	private static void testClosure()
 	{
 		var buildable = Buildable {
 			myInt = 10
@@ -41,6 +61,6 @@ public class BuilderTest
 			myDouble = 1.1D
 		}
 
-		Main.test("Builder Test", buildable, Buildable(10, 1.1D, "Hello World"))
+		Main.test("Builder Closure Test", buildable, Buildable(10, 1.1D, "Hello World"))
 	}
 }

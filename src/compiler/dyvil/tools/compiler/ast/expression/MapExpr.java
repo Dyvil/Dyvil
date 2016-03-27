@@ -171,7 +171,7 @@ public class MapExpr implements IValue
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		if (!MapType.MapTypes.MAP_CLASS.isSubTypeOf(type))
 		{
@@ -183,28 +183,28 @@ public class MapExpr implements IValue
 			return 1;
 		}
 		
-		IType keyType = type.resolveTypeSafely(MapType.MapTypes.KEY_VARIABLE);
-		IType valueType = type.resolveTypeSafely(MapType.MapTypes.VALUE_VARIABLE);
+		final IType keyType = type.resolveTypeSafely(MapType.MapTypes.KEY_VARIABLE);
+		final IType valueType = type.resolveTypeSafely(MapType.MapTypes.VALUE_VARIABLE);
 		
-		float total = 0;
+		int total = 0;
 		for (int i = 0; i < this.count; i++)
 		{
-			float f = this.keys[i].getTypeMatch(keyType);
-			if (f <= 0F)
+			float match = this.keys[i].getTypeMatch(keyType);
+			if (match <= 0F)
 			{
-				return 0F;
+				return 0;
 			}
-			
-			total += f;
-			f = this.values[i].getTypeMatch(valueType);
-			if (f <= 0F)
+			total += match;
+
+			match = this.values[i].getTypeMatch(valueType);
+			if (match <= 0)
 			{
-				return 0F;
+				return 0;
 			}
-			total += f;
+			total += match;
 		}
 		
-		return 1F + total / (this.count * 2F);
+		return 1 + total / (this.count * 2);
 	}
 	
 	@Override
@@ -275,7 +275,7 @@ public class MapExpr implements IValue
 	{
 		if (this.count == 0)
 		{
-			writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/collection/immutable/EmptyMap", "instance",
+			writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvil/collection/immutable/EmptyMap", "instance",
 			                      "Ldyvil/collection/immutable/EmptyMap;");
 			return;
 		}
@@ -283,29 +283,29 @@ public class MapExpr implements IValue
 		IType keyObject = this.keyType.getObjectType();
 		IType valueObject = this.valueType.getObjectType();
 		
-		writer.writeLDC(this.count);
-		writer.writeNewArray("java/lang/Object", 1);
+		writer.visitLdcInsn(this.count);
+		writer.visitMultiANewArrayInsn("java/lang/Object", 1);
 		
 		for (int i = 0; i < this.count; i++)
 		{
-			writer.writeInsn(Opcodes.DUP);
-			writer.writeLDC(i);
+			writer.visitInsn(Opcodes.DUP);
+			writer.visitLdcInsn(i);
 			this.keys[i].writeExpression(writer, keyObject);
-			writer.writeInsn(Opcodes.AASTORE);
+			writer.visitInsn(Opcodes.AASTORE);
 		}
 		
-		writer.writeLDC(this.count);
-		writer.writeNewArray("java/lang/Object", 1);
+		writer.visitLdcInsn(this.count);
+		writer.visitMultiANewArrayInsn("java/lang/Object", 1);
 		
 		for (int i = 0; i < this.count; i++)
 		{
-			writer.writeInsn(Opcodes.DUP);
-			writer.writeLDC(i);
+			writer.visitInsn(Opcodes.DUP);
+			writer.visitLdcInsn(i);
 			this.values[i].writeExpression(writer, valueObject);
-			writer.writeInsn(Opcodes.AASTORE);
+			writer.visitInsn(Opcodes.AASTORE);
 		}
 		
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/ImmutableMap", "apply",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/collection/ImmutableMap", "apply",
 		                       "([Ljava/lang/Object;[Ljava/lang/Object;)Ldyvil/collection/ImmutableMap;", true);
 
 		if (type != null)

@@ -22,6 +22,7 @@ import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Deprecation;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
@@ -67,13 +68,13 @@ public class Property extends Member implements IProperty
 			this.setter.setEnclosingClass(enclosingClass);
 		}
 	}
-	
+
 	@Override
 	public IClass getEnclosingClass()
 	{
 		return this.enclosingClass;
 	}
-	
+
 	@Override
 	public ElementType getElementType()
 	{
@@ -119,7 +120,8 @@ public class Property extends Member implements IProperty
 
 		final Name name = Name.get(this.name.unqualified + "_=", this.name.qualified + "_$eq");
 		this.setter = new CodeMethod(this.enclosingClass, name, Types.VOID, this.modifiers);
-		this.setterParameter = new MethodParameter(this.position, this.name, this.type, EmptyModifiers.INSTANCE, null);
+		this.setterParameter = new MethodParameter(this.position, Names.newValue, this.type, EmptyModifiers.INSTANCE,
+		                                           null);
 		this.setter.addParameter(this.setterParameter);
 
 		return this.setter;
@@ -162,12 +164,12 @@ public class Property extends Member implements IProperty
 			IContext.getMethodMatch(list, receiver, name, arguments, this.setter);
 		}
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		super.resolveTypes(markers, context);
-		
+
 		if (this.getter != null)
 		{
 			this.getter.getModifiers().addIntModifier(this.modifiers.toFlags());
@@ -176,6 +178,7 @@ public class Property extends Member implements IProperty
 		if (this.setter != null)
 		{
 			this.setter.getModifiers().addIntModifier(this.modifiers.toFlags());
+			this.setterParameter.setPosition(this.setter.getPosition());
 			this.setter.resolveTypes(markers, context);
 		}
 		if (this.initializer != null)
@@ -183,19 +186,36 @@ public class Property extends Member implements IProperty
 			this.initializer.resolveTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
 		super.resolve(markers, context);
 
-		if (this.setter != null)
-		{
-			this.setter.resolve(markers, context);
-		}
 		if (this.getter != null)
 		{
 			this.getter.resolve(markers, context);
+
+			// Infer Type if necessary
+			if (this.type == Types.UNKNOWN)
+			{
+				this.type = this.getter.getType();
+
+				if (this.setterParameter != null)
+				{
+					this.setterParameter.setType(this.type);
+				}
+			}
+		}
+
+		if (this.type == Types.UNKNOWN)
+		{
+			markers.add(Markers.semanticError(this.position, "property.type.infer", this.name));
+		}
+
+		if (this.setter != null)
+		{
+			this.setter.resolve(markers, context);
 		}
 		if (this.initializer != null)
 		{
@@ -205,7 +225,7 @@ public class Property extends Member implements IProperty
 			                                            TypeChecker.markerSupplier("property.initializer.type"));
 		}
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -224,12 +244,17 @@ public class Property extends Member implements IProperty
 			this.initializer.checkTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		super.check(markers, context);
-		
+
+		if (Types.isSameType(this.type, Types.VOID))
+		{
+			markers.add(Markers.semanticError(this.position, "property.type.void"));
+		}
+
 		if (this.getter != null)
 		{
 			this.getter.check(markers, context);
@@ -239,12 +264,8 @@ public class Property extends Member implements IProperty
 		{
 			this.setter.check(markers, context);
 
-			if (this.type == Types.VOID)
-			{
-				markers.add(Markers.semantic(this.position, "property.type.void"));
-			}
 		}
-		
+
 		// No setter and no getter
 		if (this.getter == null && this.setter == null)
 		{
@@ -254,19 +275,14 @@ public class Property extends Member implements IProperty
 		if (this.initializer != null)
 		{
 			this.initializer.check(markers, context);
-
-			if (this.enclosingClass.hasModifier(Modifiers.INTERFACE_CLASS))
-			{
-				markers.add(Markers.semantic(this.initializerPosition, "property.initializer.interface"));
-			}
 		}
 	}
-	
+
 	@Override
 	public void foldConstants()
 	{
 		super.foldConstants();
-		
+
 		if (this.getter != null)
 		{
 			this.getter.foldConstants();
@@ -280,12 +296,12 @@ public class Property extends Member implements IProperty
 			this.initializer = this.initializer.foldConstants();
 		}
 	}
-	
+
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		super.cleanup(context, compilableList);
-		
+
 		if (this.getter != null)
 		{
 			this.getter.cleanup(context, compilableList);
@@ -299,9 +315,9 @@ public class Property extends Member implements IProperty
 			this.initializer = this.initializer.cleanup(context, compilableList);
 		}
 	}
-	
+
 	// Compilation
-	
+
 	protected void writeAnnotations(MethodWriter mw, int modifiers)
 	{
 		if (this.annotations != null)
@@ -312,13 +328,13 @@ public class Property extends Member implements IProperty
 				this.annotations.getAnnotation(i).write(mw);
 			}
 		}
-		
+
 		if ((modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{
-			mw.visitAnnotation(Deprecation.DYVIL_EXTENDED, true);
+			mw.visitAnnotation(Deprecation.DYVIL_EXTENDED, true).visitEnd();
 		}
 	}
-	
+
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
@@ -336,10 +352,11 @@ public class Property extends Member implements IProperty
 				modifiers |= getterModifiers.toFlags();
 			}
 
-			MethodWriter mw = new MethodWriterImpl(writer,
-			                                       writer.visitMethod(modifiers, this.name.qualified, "()" + extended,
-			                                                          signature == null ? null : "()" + signature,
-			                                                          null));
+			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name.qualified,
+			                                                                  "()" + extended, signature == null ?
+				                                                                                   null :
+				                                                                                   "()" + signature,
+			                                                                  null));
 
 			if ((modifiers & Modifiers.STATIC) == 0)
 			{
@@ -350,9 +367,9 @@ public class Property extends Member implements IProperty
 
 			if (getterValue != null)
 			{
-				mw.begin();
+				mw.visitCode();
 				getterValue.writeExpression(mw, this.type);
-				mw.end(this.type);
+				mw.visitEnd(this.type);
 			}
 		}
 		if (this.setter != null)
@@ -365,31 +382,33 @@ public class Property extends Member implements IProperty
 			{
 				modifiers |= setterModifiers.toFlags();
 			}
-			
+
 			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name.qualified + "_$eq",
 			                                                                  "(" + extended + ")V", signature == null ?
-					                                                                  null :
-					                                                                  "(" + signature + ")V", null));
+				                                                                                         null :
+				                                                                                         "(" + signature
+					                                                                                         + ")V",
+			                                                                  null));
 
 			if ((modifiers & Modifiers.STATIC) == 0)
 			{
 				mw.setThisType(this.enclosingClass.getInternalName());
 			}
-			
+
 			this.writeAnnotations(mw, modifiers);
 			this.setter.getParameter(0).writeInit(mw);
-			
+
 			if (setterValue != null)
 			{
-				mw.begin();
+				mw.visitCode();
 				setterValue.writeExpression(mw, Types.VOID);
-				mw.end(Types.VOID);
+				mw.visitEnd(Types.VOID);
 			}
 		}
 	}
 
 	@Override
-	public void writeInit(MethodWriter writer) throws BytecodeException
+	public void writeClassInit(MethodWriter writer) throws BytecodeException
 	{
 		if (this.initializer != null && !this.hasModifier(Modifiers.STATIC))
 		{
@@ -410,21 +429,19 @@ public class Property extends Member implements IProperty
 	public void writeSignature(DataOutput out) throws IOException
 	{
 	}
-	
+
 	@Override
 	public void readSignature(DataInput in) throws IOException
 	{
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		super.toString(prefix, buffer);
-
 		this.modifiers.toString(buffer);
-		this.type.toString("", buffer);
-		buffer.append(' ');
-		buffer.append(this.name);
+
+		IDataMember.toString(prefix, buffer, this, "property.type_ascription");
 
 		// Block Start
 		if (Formatting.getBoolean("property.block.newline"))
@@ -563,7 +580,7 @@ public class Property extends Member implements IProperty
 		}
 		buffer.append("set");
 
-		if (setterParameterName != this.name)
+		if (setterParameterName != Names.newValue)
 		{
 			Formatting.appendSeparator(buffer, "property.setter.parameter.open_paren", '(');
 			buffer.append(setterParameterName);

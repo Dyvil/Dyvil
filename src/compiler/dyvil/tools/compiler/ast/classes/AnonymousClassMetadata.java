@@ -56,8 +56,8 @@ public class AnonymousClassMetadata implements IClassMetadata
 	{
 		String owner = this.theClass.getInternalName();
 		String name = "<init>";
-		writer.writeTypeInsn(Opcodes.NEW, owner);
-		writer.writeInsn(Opcodes.DUP);
+		writer.visitTypeInsn(Opcodes.NEW, owner);
+		writer.visitInsn(Opcodes.DUP);
 		
 		this.constructor.writeArguments(writer, arguments);
 		
@@ -69,7 +69,7 @@ public class AnonymousClassMetadata implements IClassMetadata
 		
 		this.theClass.captureHelper.writeCaptures(writer);
 		
-		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, owner, name, this.getDesc(), false);
+		writer.visitMethodInsn(Opcodes.INVOKESPECIAL, owner, name, this.getDesc(), false);
 	}
 	
 	@Override
@@ -99,16 +99,16 @@ public class AnonymousClassMetadata implements IClassMetadata
 		if (thisField != null)
 		{
 			thisField.writeField(writer);
-			index = mw.registerParameter(index, thisField.getName(), thisField.getTheClass().getType(),
-			                             Modifiers.MANDATED);
+			index = mw.visitParameter(index, thisField.getName(), thisField.getTheClass().getType(),
+			                          Modifiers.MANDATED);
 		}
 
 		captureHelper.writeCaptureParameters(mw, index);
 
 		// Constructor Body
 		
-		mw.begin();
-		mw.writeVarInsn(Opcodes.ALOAD, 0);
+		mw.visitCode();
+		mw.visitVarInsn(Opcodes.ALOAD, 0);
 		for (int i = 0; i < params; i++)
 		{
 			IParameter param = this.constructor.getParameter(i);
@@ -118,16 +118,16 @@ public class AnonymousClassMetadata implements IClassMetadata
 		
 		if (thisField != null)
 		{
-			mw.writeVarInsn(Opcodes.ALOAD, 0);
-			mw.writeVarInsn(Opcodes.ALOAD, thisIndex);
-			mw.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), thisField.getName(),
+			mw.visitVarInsn(Opcodes.ALOAD, 0);
+			mw.visitVarInsn(Opcodes.ALOAD, thisIndex);
+			mw.visitFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), thisField.getName(),
 			                  thisField.getDescription());
 		}
 		
 		captureHelper.writeFieldAssignments(mw);
 
-		this.theClass.writeInit(mw);
+		this.theClass.writeClassInit(mw);
 		
-		mw.end(Types.VOID);
+		mw.visitEnd(Types.VOID);
 	}
 }

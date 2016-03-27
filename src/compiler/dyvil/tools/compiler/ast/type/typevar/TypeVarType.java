@@ -66,23 +66,17 @@ public class TypeVarType implements IRawType
 	}
 
 	@Override
-	public IType getParameterType()
+	public IType asParameterType()
 	{
 		return this.typeParameter.getCovariantType();
 	}
 
 	@Override
-	public IType getReturnType()
+	public IType asReturnType()
 	{
 		return this.typeParameter.getCovariantType();
 	}
 
-	@Override
-	public IType getSuperType()
-	{
-		return null;
-	}
-	
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
@@ -90,9 +84,9 @@ public class TypeVarType implements IRawType
 	}
 	
 	@Override
-	public boolean isSuperClassOf(IType type)
+	public boolean isSuperClassOf(IType subType)
 	{
-		return this.typeParameter.isSuperClassOf(type);
+		return this.typeParameter.isSuperClassOf(subType);
 	}
 	
 	@Override
@@ -104,11 +98,11 @@ public class TypeVarType implements IRawType
 	@Override
 	public boolean isSameType(IType type)
 	{
-		return this.typeParameter == type.getReturnType().getTypeVariable();
+		return this.typeParameter == type.asReturnType().getTypeVariable();
 	}
 	
 	@Override
-	public boolean classEquals(IType type)
+	public boolean isSameClass(IType type)
 	{
 		return this.isSameType(type);
 	}
@@ -225,12 +219,12 @@ public class TypeVarType implements IRawType
 		{
 			// Get the parameter
 			final int parameterIndex = this.typeParameter.getParameterIndex();
-			writer.writeVarInsn(Opcodes.ALOAD, parameterIndex);
+			writer.visitVarInsn(Opcodes.ALOAD, parameterIndex);
 
 			// The generic Type is reified -> extract erasure class
 			if (reifiedKind == ITypeParameter.ReifiedKind.REIFIED_TYPE)
 			{
-				writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "dyvilx/lang/model/type/Type", "erasure",
+				writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, "dyvilx/lang/model/type/Type", "erasure",
 				                       "()Ljava/lang/Class;", true);
 			}
 			return;
@@ -245,7 +239,7 @@ public class TypeVarType implements IRawType
 		if (this.typeParameter.getReifiedKind() == ITypeParameter.ReifiedKind.REIFIED_TYPE)
 		{
 			final int parameterIndex = this.typeParameter.getParameterIndex();
-			writer.writeVarInsn(Opcodes.ALOAD, parameterIndex);
+			writer.visitVarInsn(Opcodes.ALOAD, parameterIndex);
 			return;
 		}
 

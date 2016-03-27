@@ -15,7 +15,13 @@ public final class JumpInstruction implements IInstruction
 		this.opcode = opcode;
 		this.target = target;
 	}
-	
+
+	@Override
+	public int getOpcode()
+	{
+		return this.opcode;
+	}
+
 	@Override
 	public void write(MethodVisitor writer) throws BytecodeException
 	{

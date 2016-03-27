@@ -1,10 +1,11 @@
 package dyvil.function
 
-public functional trait Function2[-P1, -P2, +R]
+@FunctionalInterface
+public interface Function2[-P1, -P2, +R]
 {
-	public R apply(P1 par1, P2 par2)
+	func apply(P1 par1, P2 par2): R
 	
-	public P1 => P2 => R curried() = p1 => p2 => this(p1, p2)
+	postfix func curried[A, B, C]((A, B) => C function): A => B => C = p1 => p2 => function(p1, p2)
 	
-	public ((P1, P2)) => R tupled() = tuple => this(tuple._1, tuple._2)
+	postfix func tupled[A, B, C]((A, B) => C function): ((A, B)) => C = tuple => function(tuple._1, tuple._2)
 }

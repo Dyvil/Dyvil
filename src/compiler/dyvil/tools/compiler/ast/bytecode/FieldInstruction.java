@@ -10,7 +10,6 @@ public final class FieldInstruction implements IInstruction
 	private int    opcode;
 	private String owner;
 	private String fieldName;
-	
 	private String desc;
 	
 	public FieldInstruction(int opcode)
@@ -25,17 +24,38 @@ public final class FieldInstruction implements IInstruction
 		this.fieldName = name;
 		this.desc = desc;
 	}
-	
+
+	@Override
+	public int getOpcode()
+	{
+		return this.opcode;
+	}
+
+	public String getOwner()
+	{
+		return this.owner;
+	}
+
 	public void setOwner(String owner)
 	{
 		this.owner = owner;
 	}
-	
+
+	public String getFieldName()
+	{
+		return this.fieldName;
+	}
+
 	public void setFieldName(String fieldName)
 	{
 		this.fieldName = fieldName;
 	}
-	
+
+	public String getDesc()
+	{
+		return this.desc;
+	}
+
 	public void setDesc(String desc)
 	{
 		this.desc = ClassFormat.userToExtended(desc);

@@ -3,7 +3,7 @@ package dyvil.tools.compiler.parser.classes;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.ClassBody;
-import dyvil.tools.compiler.ast.classes.CodeClass;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.consumer.IClassConsumer;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
@@ -17,6 +17,7 @@ import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParameterListParser;
+import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
@@ -41,7 +42,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 	protected ModifierSet    modifiers;
 	protected AnnotationList annotations;
 	
-	private CodeClass theClass;
+	private IClass theClass;
 	
 	public ClassDeclarationParser(IClassConsumer consumer)
 	{
@@ -67,7 +68,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 		case NAME:
 			if (ParserUtil.isIdentifier(type))
 			{
-				this.theClass = new CodeClass(token.raw(), token.nameValue(), this.modifiers, this.annotations);
+				this.theClass = this.consumer.createClass(token.raw(), token.nameValue(), this.modifiers, this.annotations);
 				this.mode = GENERICS;
 				return;
 			}
@@ -115,8 +116,8 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 					this.mode = BODY;
 					return;
 				}
-				
-				pm.pushParser(pm.newTypeParser(this));
+
+				pm.pushParser(new TypeParser(this));
 				this.mode = EXTENDS_PARAMETERS;
 				return;
 			}
@@ -140,7 +141,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			{
 				IClassBody body = new ClassBody(this.theClass);
 				this.theClass.setBody(body);
-				pm.pushParser(new ClassBodyParser(body));
+				pm.pushParser(new ClassBodyParser(body), true);
 				this.mode = BODY_END;
 				return;
 			}
@@ -179,7 +180,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			if (type != BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
 				pm.reparse();
-				pm.report(token, "class.body.end");
+				pm.report(token, "class.body.close_brace");
 			}
 			return;
 		case EXTENDS_PARAMETERS_END:
@@ -200,7 +201,6 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			}
 			this.mode = IMPLEMENTS;
 			pm.reparse();
-			return;
 		}
 	}
 	
@@ -216,7 +216,6 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			return;
 		case BODY: // implements
 			this.theClass.addInterface(type);
-			return;
 		}
 	}
 

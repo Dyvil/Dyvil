@@ -157,8 +157,8 @@ public final class MatchExpr implements IValue
 	{
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			MatchCase matchCase = this.cases[i];
-			IValue action = matchCase.action;
+			final MatchCase matchCase = this.cases[i];
+			final IValue action = matchCase.action;
 			
 			if (action == null)
 			{
@@ -169,21 +169,21 @@ public final class MatchExpr implements IValue
 			                                            TypeChecker.markerSupplier("match.value.type.incompatible"));
 		}
 		
-		return type == Types.VOID || type.isSuperTypeOf(this.getType()) ? this : null;
+		return Types.isSameType(type, Types.VOID) || Types.isSuperType(type, this.getType()) ? this : null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		if (type == Types.VOID)
+		if (Types.isSameType(type, Types.VOID))
 		{
 			return true;
 		}
 		
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			IValue v = this.cases[i].action;
-			if (v != null && !v.isType(type))
+			final IValue action = this.cases[i].action;
+			if (action != null && !action.isType(type))
 			{
 				return false;
 			}
@@ -192,28 +192,28 @@ public final class MatchExpr implements IValue
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		if (this.caseCount == 0)
 		{
 			return 0;
 		}
 		
-		float total = 0F;
+		int total = 0;
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			IValue v = this.cases[i].action;
-			if (v == null)
+			final IValue action = this.cases[i].action;
+			if (action == null)
 			{
 				continue;
 			}
 			
-			float f = v.getTypeMatch(type);
-			if (f == 0)
+			final int match = action.getTypeMatch(type);
+			if (match == 0)
 			{
 				return 0;
 			}
-			total += f;
+			total += match;
 		}
 		return 1 + total / this.caseCount;
 	}
@@ -377,7 +377,7 @@ public final class MatchExpr implements IValue
 		final IType matchedType = this.matchedValue.getType();
 
 		this.matchedValue.writeExpression(writer, null);
-		writer.writeVarInsn(matchedType.getStoreOpcode(), varIndex);
+		writer.visitVarInsn(matchedType.getStoreOpcode(), varIndex);
 
 		final int localCount = writer.localCount();
 		
@@ -397,8 +397,8 @@ public final class MatchExpr implements IValue
 			this.writeAction(writer, expr, frameType, c.action);
 			
 			writer.resetLocals(localCount);
-			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
-			writer.writeLabel(elseLabel);
+			writer.visitJumpInsn(Opcodes.GOTO, endLabel);
+			writer.visitLabel(elseLabel);
 			if (++i < this.caseCount)
 			{
 				elseLabel = new Label();
@@ -410,13 +410,13 @@ public final class MatchExpr implements IValue
 		}
 		
 		// MatchError
-		writer.writeLabel(elseLabel);
+		writer.visitLabel(elseLabel);
 		if (!this.exhaustive)
 		{
 			this.writeMatchError(writer, varIndex, matchedType);
 		}
 
-		writer.writeLabel(endLabel);
+		writer.visitLabel(endLabel);
 		writer.resetLocals(varIndex);
 	}
 	
@@ -424,16 +424,16 @@ public final class MatchExpr implements IValue
 	{
 		final int lineNumber = this.getLineNumber();
 
-		writer.writeTypeInsn(Opcodes.NEW, "dyvil/util/MatchError");
+		writer.visitTypeInsn(Opcodes.NEW, "dyvil/util/MatchError");
 
-		writer.writeInsn(Opcodes.DUP);
-		writer.writeVarInsn(matchedType.getLoadOpcode(), varIndex);
+		writer.visitInsn(Opcodes.DUP);
+		writer.visitVarInsn(matchedType.getLoadOpcode(), varIndex);
 		matchedType.writeCast(writer, Types.OBJECT, lineNumber);
 
-		writer.writeLineNumber(lineNumber);
-		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, "dyvil/util/MatchError", "<init>", "(Ljava/lang/Object;)V",
+		writer.visitLineNumber(lineNumber);
+		writer.visitMethodInsn(Opcodes.INVOKESPECIAL, "dyvil/util/MatchError", "<init>", "(Ljava/lang/Object;)V",
 		                       false);
-		writer.writeInsn(Opcodes.ATHROW);
+		writer.visitInsn(Opcodes.ATHROW);
 		writer.setHasReturn(false);
 	}
 	
@@ -534,14 +534,14 @@ public final class MatchExpr implements IValue
 		{
 			varIndex = writer.localCount();
 			// Need a variable - store and load the value
-			writer.writeVarInsn(matchedType.getStoreOpcode(), varIndex);
-			writer.writeVarInsn(matchedType.getLoadOpcode(), varIndex);
+			writer.visitVarInsn(matchedType.getStoreOpcode(), varIndex);
+			writer.visitVarInsn(matchedType.getLoadOpcode(), varIndex);
 		}
 		
 		// Not a primitive type (String) - we need the hashCode
 		if (!matchedType.isPrimitive())
 		{
-			writer.writeInvokeInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "hashCode", "()I", false);
+			writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "hashCode", "()I", false);
 		}
 		
 		final int localCount = writer.localCount();
@@ -615,7 +615,7 @@ public final class MatchExpr implements IValue
 					elseLabel = defaultLabel;
 				}
 
-				writer.writeTargetLabel(entry.switchLabel);
+				writer.visitTargetLabel(entry.switchLabel);
 
 				if (pattern.switchCheck())
 				{
@@ -630,7 +630,7 @@ public final class MatchExpr implements IValue
 				this.writeAction(writer, expr, frameType, matchCase.action);
 
 				writer.resetLocals(localCount);
-				writer.writeJumpInsn(Opcodes.GOTO, endLabel);
+				writer.visitJumpInsn(Opcodes.GOTO, endLabel);
 
 				entry = next;
 			}
@@ -640,7 +640,7 @@ public final class MatchExpr implements IValue
 		// Default Case
 		if (defaultCase != null)
 		{
-			writer.writeTargetLabel(defaultLabel);
+			writer.visitTargetLabel(defaultLabel);
 
 			if (defaultCase.condition != null)
 			{
@@ -651,17 +651,17 @@ public final class MatchExpr implements IValue
 			this.writeAction(writer, expr, frameType, defaultCase.action);
 
 			writer.resetLocals(localCount);
-			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
+			writer.visitJumpInsn(Opcodes.GOTO, endLabel);
 		}
 		
 		// Generate Match Error
 		if (matchErrorLabel != null)
 		{
-			writer.writeLabel(matchErrorLabel);
+			writer.visitLabel(matchErrorLabel);
 			this.writeMatchError(writer, varIndex, matchedType);
 		}
 		
-		writer.writeLabel(endLabel);
+		writer.visitLabel(endLabel);
 		
 		if (switchVar)
 		{
@@ -716,7 +716,7 @@ public final class MatchExpr implements IValue
 			index++;
 		}
 
-		writer.writeLookupSwitch(defaultLabel, keys, handlers);
+		writer.visitLookupSwitchInsn(defaultLabel, keys, handlers);
 	}
 	
 	/**
@@ -735,7 +735,7 @@ public final class MatchExpr implements IValue
 			handlers[entry.key - low] = entry.switchLabel;
 		}
 		
-		writer.writeTableSwitch(defaultLabel, low, high, handlers);
+		writer.visitTableSwitchInsn(low, high, defaultLabel, handlers);
 	}
 	
 	@Override

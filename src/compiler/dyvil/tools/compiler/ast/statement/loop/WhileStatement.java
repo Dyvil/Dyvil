@@ -203,16 +203,16 @@ public final class WhileStatement extends AbstractValue implements IStatement, I
 		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
 		
 		// Condition
-		writer.writeTargetLabel(startLabel);
+		writer.visitTargetLabel(startLabel);
 		this.condition.writeInvJump(writer, endLabel);
 		// While Block
 		if (this.action != null)
 		{
 			this.action.writeExpression(writer, Types.VOID);
 		}
-		writer.writeJumpInsn(Opcodes.GOTO, startLabel);
+		writer.visitJumpInsn(Opcodes.GOTO, startLabel);
 		
-		writer.writeLabel(endLabel);
+		writer.visitLabel(endLabel);
 	}
 	
 	@Override

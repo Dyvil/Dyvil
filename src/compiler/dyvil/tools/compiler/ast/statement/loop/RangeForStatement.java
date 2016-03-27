@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.statement.loop;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.operator.RangeOperator;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
@@ -74,11 +73,10 @@ public class RangeForStatement extends ForEachStatement
 		dyvil.tools.asm.Label updateLabel = this.updateLabel.target = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label scopeLabel = new dyvil.tools.asm.Label();
-		writer.writeLabel(scopeLabel);
+		writer.visitLabel(scopeLabel);
 
 		// Write the start value and store it in the variable.
 		startValue.writeExpression(writer, elementType);
-		writer.writeInsn(Opcodes.AUTO_DUP);
 
 		final int counterVarIndex, varIndex;
 
@@ -86,9 +84,9 @@ public class RangeForStatement extends ForEachStatement
 		{
 			// Create two variables, the counter variable and the user-visible loop variable
 
-			writer.writeInsn(Opcodes.AUTO_DUP);
+			writer.visitInsn(Opcodes.AUTO_DUP);
 			counterVarIndex = writer.localCount();
-			writer.writeVarInsn(elementType.getStoreOpcode(), counterVarIndex);
+			writer.visitVarInsn(elementType.getStoreOpcode(), counterVarIndex);
 
 			elementType.writeCast(writer, varType, lineNumber);
 			var.writeInit(writer, null);
@@ -107,40 +105,40 @@ public class RangeForStatement extends ForEachStatement
 		endValue.writeExpression(writer, elementType);
 
 		final int endVarIndex = writer.localCount();
-		writer.writeVarInsn(elementType.getStoreOpcode(), endVarIndex);
+		writer.visitVarInsn(elementType.getStoreOpcode(), endVarIndex);
 
-		writer.writeTargetLabel(startLabel);
+		writer.visitTargetLabel(startLabel);
 
 		// Check the condition
 		switch (kind)
 		{
 		case INT:
-			writer.writeVarInsn(Opcodes.ILOAD, counterVarIndex);
-			writer.writeVarInsn(Opcodes.ILOAD, endVarIndex);
-			writer.writeJumpInsn(halfOpen ? Opcodes.IF_ICMPGE : Opcodes.IF_ICMPGT, endLabel);
+			writer.visitVarInsn(Opcodes.ILOAD, counterVarIndex);
+			writer.visitVarInsn(Opcodes.ILOAD, endVarIndex);
+			writer.visitJumpInsn(halfOpen ? Opcodes.IF_ICMPGE : Opcodes.IF_ICMPGT, endLabel);
 			break;
 		case LONG:
-			writer.writeVarInsn(Opcodes.LLOAD, counterVarIndex);
-			writer.writeVarInsn(Opcodes.LLOAD, endVarIndex);
-			writer.writeJumpInsn(halfOpen ? Opcodes.IF_LCMPGE : Opcodes.IF_LCMPGT, endLabel);
+			writer.visitVarInsn(Opcodes.LLOAD, counterVarIndex);
+			writer.visitVarInsn(Opcodes.LLOAD, endVarIndex);
+			writer.visitJumpInsn(halfOpen ? Opcodes.IF_LCMPGE : Opcodes.IF_LCMPGT, endLabel);
 			break;
 		case FLOAT:
-			writer.writeVarInsn(Opcodes.FLOAD, counterVarIndex);
-			writer.writeVarInsn(Opcodes.FLOAD, endVarIndex);
-			writer.writeJumpInsn(halfOpen ? Opcodes.IF_FCMPGE : Opcodes.IF_FCMPGT, endLabel);
+			writer.visitVarInsn(Opcodes.FLOAD, counterVarIndex);
+			writer.visitVarInsn(Opcodes.FLOAD, endVarIndex);
+			writer.visitJumpInsn(halfOpen ? Opcodes.IF_FCMPGE : Opcodes.IF_FCMPGT, endLabel);
 			break;
 		case DOUBLE:
-			writer.writeVarInsn(Opcodes.DLOAD, counterVarIndex);
-			writer.writeVarInsn(Opcodes.DLOAD, endVarIndex);
-			writer.writeJumpInsn(halfOpen ? Opcodes.IF_DCMPGE : Opcodes.IF_DCMPGT, endLabel);
+			writer.visitVarInsn(Opcodes.DLOAD, counterVarIndex);
+			writer.visitVarInsn(Opcodes.DLOAD, endVarIndex);
+			writer.visitJumpInsn(halfOpen ? Opcodes.IF_DCMPGE : Opcodes.IF_DCMPGT, endLabel);
 			break;
 		case RANGEABLE:
-			writer.writeVarInsn(Opcodes.ALOAD, counterVarIndex);
-			writer.writeVarInsn(Opcodes.ALOAD, endVarIndex);
-			writer.writeLineNumber(lineNumber);
-			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "dyvil/collection/range/Rangeable", "compareTo",
+			writer.visitVarInsn(Opcodes.ALOAD, counterVarIndex);
+			writer.visitVarInsn(Opcodes.ALOAD, endVarIndex);
+			writer.visitLineNumber(lineNumber);
+			writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, "dyvil/collection/range/Rangeable", "compareTo",
 			                       "(Ldyvil/collection/range/Rangeable;)I", true);
-			writer.writeJumpInsn(halfOpen ? Opcodes.IFGE : Opcodes.IFGT, endLabel);
+			writer.visitJumpInsn(halfOpen ? Opcodes.IFGE : Opcodes.IFGT, endLabel);
 			break;
 		}
 
@@ -151,65 +149,65 @@ public class RangeForStatement extends ForEachStatement
 		}
 
 		// Increment
-		writer.writeLabel(updateLabel);
+		writer.visitLabel(updateLabel);
 		switch (kind)
 		{
 		case INT:
-			writer.writeIINC(counterVarIndex, 1);
+			writer.visitIincInsn(counterVarIndex, 1);
 
 			if (boxed)
 			{
-				writer.writeVarInsn(Opcodes.ILOAD, counterVarIndex);
+				writer.visitVarInsn(Opcodes.ILOAD, counterVarIndex);
 				elementType.writeCast(writer, varType, lineNumber);
-				writer.writeVarInsn(varType.getStoreOpcode(), varIndex);
+				writer.visitVarInsn(varType.getStoreOpcode(), varIndex);
 			}
 			break;
 		case LONG:
-			writer.writeVarInsn(Opcodes.LLOAD, counterVarIndex);
-			writer.writeInsn(Opcodes.LCONST_1);
-			writer.writeInsn(Opcodes.LADD);
+			writer.visitVarInsn(Opcodes.LLOAD, counterVarIndex);
+			writer.visitInsn(Opcodes.LCONST_1);
+			writer.visitInsn(Opcodes.LADD);
 
 			if (boxed)
 			{
-				writer.writeInsn(Opcodes.DUP2);
+				writer.visitInsn(Opcodes.DUP2);
 				elementType.writeCast(writer, varType, lineNumber);
-				writer.writeVarInsn(varType.getStoreOpcode(), varIndex);
+				writer.visitVarInsn(varType.getStoreOpcode(), varIndex);
 			}
 
-			writer.writeVarInsn(Opcodes.LSTORE, counterVarIndex);
+			writer.visitVarInsn(Opcodes.LSTORE, counterVarIndex);
 			break;
 		case FLOAT:
-			writer.writeVarInsn(Opcodes.FLOAD, counterVarIndex);
-			writer.writeInsn(Opcodes.FCONST_1);
-			writer.writeInsn(Opcodes.FADD);
+			writer.visitVarInsn(Opcodes.FLOAD, counterVarIndex);
+			writer.visitInsn(Opcodes.FCONST_1);
+			writer.visitInsn(Opcodes.FADD);
 
 			if (boxed)
 			{
-				writer.writeInsn(Opcodes.DUP);
+				writer.visitInsn(Opcodes.DUP);
 				elementType.writeCast(writer, varType, lineNumber);
-				writer.writeVarInsn(varType.getStoreOpcode(), varIndex);
+				writer.visitVarInsn(varType.getStoreOpcode(), varIndex);
 			}
 
-			writer.writeVarInsn(Opcodes.FSTORE, counterVarIndex);
+			writer.visitVarInsn(Opcodes.FSTORE, counterVarIndex);
 			break;
 		case DOUBLE:
-			writer.writeVarInsn(Opcodes.DLOAD, counterVarIndex);
-			writer.writeInsn(Opcodes.DCONST_1);
-			writer.writeInsn(Opcodes.DADD);
+			writer.visitVarInsn(Opcodes.DLOAD, counterVarIndex);
+			writer.visitInsn(Opcodes.DCONST_1);
+			writer.visitInsn(Opcodes.DADD);
 
 			if (boxed)
 			{
-				writer.writeInsn(Opcodes.DUP2);
+				writer.visitInsn(Opcodes.DUP2);
 				elementType.writeCast(writer, varType, lineNumber);
-				writer.writeVarInsn(varType.getStoreOpcode(), varIndex);
+				writer.visitVarInsn(varType.getStoreOpcode(), varIndex);
 			}
 
-			writer.writeVarInsn(Opcodes.DSTORE, counterVarIndex);
+			writer.visitVarInsn(Opcodes.DSTORE, counterVarIndex);
 			break;
 		case RANGEABLE:
-			writer.writeVarInsn(Opcodes.ALOAD, counterVarIndex);
-			writer.writeLineNumber(lineNumber);
-			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "dyvil/collection/range/Rangeable", "next",
+			writer.visitVarInsn(Opcodes.ALOAD, counterVarIndex);
+			writer.visitLineNumber(lineNumber);
+			writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, "dyvil/collection/range/Rangeable", "next",
 			                       "()Ldyvil/collection/range/Rangeable;", true);
 
 			if (elementType.getTheClass() != RangeOperator.LazyFields.RANGEABLE_CLASS)
@@ -219,15 +217,15 @@ public class RangeForStatement extends ForEachStatement
 
 			assert !boxed;
 
-			writer.writeVarInsn(Opcodes.ASTORE, counterVarIndex);
+			writer.visitVarInsn(Opcodes.ASTORE, counterVarIndex);
 			break;
 		}
 
-		writer.writeJumpInsn(Opcodes.GOTO, startLabel);
+		writer.visitJumpInsn(Opcodes.GOTO, startLabel);
 
 		// Local Variables
 		writer.resetLocals(counterVarIndex);
-		writer.writeLabel(endLabel);
+		writer.visitLabel(endLabel);
 
 		var.writeLocal(writer, scopeLabel, endLabel);
 	}

@@ -2,6 +2,8 @@ package dyvil.tools.compiler.config;
 
 import dyvil.collection.Map;
 import dyvil.collection.mutable.HashMap;
+import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.parsing.position.ICodePosition;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -16,6 +18,18 @@ public final class Formatting
 	private Formatting()
 	{
 		// no instances
+	}
+
+	public static String getString(String key)
+	{
+		try
+		{
+			return BUNDLE.getString(key);
+		}
+		catch (Exception ex)
+		{
+			return "";
+		}
 	}
 
 	public static boolean getBoolean(String key)
@@ -34,7 +48,6 @@ public final class Formatting
 		}
 		catch (MissingResourceException ex)
 		{
-			booleanMap.put(key, null);
 			return false;
 		}
 	}
@@ -55,9 +68,23 @@ public final class Formatting
 		}
 		catch (NumberFormatException | MissingResourceException ex)
 		{
-			integerMap.put(key, null);
 			return 0;
 		}
+	}
+
+	public static boolean typeAscription(String key, IMember member)
+	{
+		switch (Formatting.getString(key))
+		{
+		case "auto":
+			final ICodePosition memberPosition = member.getPosition();
+			final ICodePosition typePosition = member.getType().getPosition();
+			return memberPosition == null || typePosition == null || member.getPosition()
+			                                                               .before(member.getType().getPosition());
+		case "true":
+			return true;
+		}
+		return false;
 	}
 
 	public static void appendSeparator(StringBuilder stringBuilder, String key, String separator)
@@ -92,7 +119,7 @@ public final class Formatting
 		appendSeparator(stringBuilder, key, character);
 		return stringBuilder.toString();
 	}
-	
+
 	public static String getIndent(String key, String prefix)
 	{
 		int level = getInt(key);

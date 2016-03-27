@@ -1,22 +1,19 @@
 package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.reflect.Modifiers;
-import dyvil.reflect.Opcodes;
-import dyvil.tools.asm.FieldVisitor;
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
-import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisExpr;
+import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.field.IField;
-import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.member.MemberKind;
+import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
@@ -24,47 +21,42 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-import java.lang.annotation.ElementType;
-
-public final class ClassParameter extends Parameter implements IField
+public final class ClassParameter extends Field implements IParameter
 {
 	// Metadata
-	protected IClass enclosingClass;
+	protected int   index;
+	protected int   localIndex;
+	protected IType internalType;
 
-	public ClassParameter()
+	public ClassParameter(IClass enclosingClass)
 	{
+		super(enclosingClass);
 	}
 
-	public ClassParameter(Name name)
+	public ClassParameter(IClass enclosingClass, Name name)
 	{
-		super(name);
+		super(enclosingClass, name);
 	}
 
-	public ClassParameter(Name name, IType type)
+	public ClassParameter(IClass enclosingClass, Name name, IType type)
 	{
-		super(name, type);
+		super(enclosingClass, name, type);
 	}
 
-	public ClassParameter(Name name, IType type, ModifierSet modifiers)
+	public ClassParameter(IClass enclosingClass, Name name, IType type, ModifierSet modifiers)
 	{
-		super(name, type, modifiers);
+		super(enclosingClass, name, type, modifiers == null ? new ModifierList() : modifiers);
 	}
 
 	public ClassParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
-		super(position, name, type, modifiers, annotations);
+		super(position, name, type, modifiers == null ? new ModifierList() : modifiers, annotations);
 	}
 
 	@Override
 	public MemberKind getKind()
 	{
 		return MemberKind.CLASS_PARAMETER;
-	}
-
-	@Override
-	public boolean isField()
-	{
-		return true;
 	}
 
 	@Override
@@ -92,33 +84,53 @@ public final class ClassParameter extends Parameter implements IField
 	}
 
 	@Override
-	public IDataMember capture(IContext context, IVariable variable)
+	public IType getInternalType()
 	{
-		return this;
+		if (this.internalType != null)
+		{
+			return this.internalType;
+		}
+
+		return this.internalType = this.type.asParameterType();
 	}
 
 	@Override
-	public void setEnclosingClass(IClass enclosingClass)
+	public void setVarargs(boolean varargs)
 	{
-		this.enclosingClass = enclosingClass;
+		if (varargs)
+		{
+			this.modifiers.addIntModifier(Modifiers.VARARGS);
+		}
 	}
 
 	@Override
-	public IClass getEnclosingClass()
+	public boolean isVarargs()
 	{
-		return this.enclosingClass;
+		return this.modifiers.hasIntModifier(Modifiers.VARARGS);
 	}
 
 	@Override
-	public boolean addRawAnnotation(String type, IAnnotation annotation)
+	public int getIndex()
 	{
-		return true;
+		return this.index;
 	}
 
 	@Override
-	public ElementType getElementType()
+	public void setIndex(int index)
 	{
-		return ElementType.FIELD;
+		this.index = index;
+	}
+
+	@Override
+	public int getLocalIndex()
+	{
+		return this.localIndex;
+	}
+
+	@Override
+	public void setLocalIndex(int index)
+	{
+		this.localIndex = index;
 	}
 
 	@Override
@@ -145,15 +157,7 @@ public final class ClassParameter extends Parameter implements IField
 			return new ThisExpr(position, this.enclosingClass.getType(), context, markers);
 		}
 
-		switch (IContext.getVisibility(context, this))
-		{
-		case IContext.INTERNAL:
-			markers.add(Markers.semantic(position, "classparameter.access.internal", this.name));
-			break;
-		case IContext.INVISIBLE:
-			markers.add(Markers.semantic(position, "classparameter.access.invisible", this.name));
-			break;
-		}
+		ModifierUtil.checkVisibility(this, position, markers, context);
 
 		return receiver;
 	}
@@ -180,36 +184,21 @@ public final class ClassParameter extends Parameter implements IField
 	}
 
 	@Override
-	public void write(ClassWriter writer) throws BytecodeException
+	public void writeInit(MethodWriter writer, IValue value) throws BytecodeException
 	{
-		String desc = this.getDescription();
-		FieldVisitor fv = writer.visitField(this.modifiers.toFlags() & ModifierUtil.JAVA_MODIFIER_MASK,
-		                                    this.name.qualified, desc, this.getSignature(), null);
-
-		IField.writeAnnotations(fv, this.modifiers, this.annotations, this.type);
+		this.writeInit(writer);
 	}
 
 	@Override
-	public void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException
+	public void writeInit(MethodWriter writer) throws BytecodeException
 	{
-		if (this.enclosingClass.hasModifier(Modifiers.ANNOTATION))
-		{
-			StringBuilder desc = new StringBuilder("()");
-			this.type.appendExtendedName(desc);
-			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, this.enclosingClass.getInternalName(), this.name.qualified,
-			                       desc.toString(), true);
-		}
-		else
-		{
-			writer.writeFieldInsn(Opcodes.GETFIELD, this.enclosingClass.getInternalName(), this.name.qualified,
-			                      this.getDescription());
-		}
+		Parameter.writeInitImpl(this, writer);
 	}
 
 	@Override
-	public void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException
+	public void writeLocal(MethodWriter writer, Label start, Label end)
 	{
-		writer.writeFieldInsn(Opcodes.PUTFIELD, this.enclosingClass.getInternalName(), this.name.qualified,
-		                      this.getDescription());
+		writer.visitLocalVariable(this.name.qualified, this.getDescriptor(), this.getSignature(), start, end,
+		                          this.localIndex);
 	}
 }

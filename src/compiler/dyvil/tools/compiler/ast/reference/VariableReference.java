@@ -50,6 +50,6 @@ public class VariableReference implements IReference
 	public void writeReference(MethodWriter writer) throws BytecodeException
 	{
 		// Assumes that the variable was properly converted to a Reference Variable
-		writer.writeVarInsn(Opcodes.ALOAD, this.getVariable().getLocalIndex());
+		writer.visitVarInsn(Opcodes.ALOAD, this.getVariable().getLocalIndex());
 	}
 }

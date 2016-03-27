@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.structure;
 
-import dyvil.collection.Map;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassList;
@@ -78,24 +77,32 @@ public interface IDyvilHeader extends IObjectCompilable, IStaticContext, IClassL
 	
 	// Operators
 	
-	Map<Name, Operator> getOperators();
-	
+	int operatorCount();
+
 	@Override
 	Operator getOperator(Name name);
 	
+	Operator getOperator(int index);
+
+	void setOperator(int index, Operator operator);
+
 	@Override
 	void addOperator(Operator op);
-	
+
 	// Type Aliases
-	
-	Map<Name, ITypeAlias> getTypeAliases();
-	
-	@Override
-	void addTypeAlias(ITypeAlias typeAlias);
+
+	int typeAliasCount();
 	
 	@Override
 	ITypeAlias getTypeAlias(Name name);
-	
+
+	ITypeAlias getTypeAlias(int index);
+
+	void setTypeAlias(int index, ITypeAlias typeAlias);
+
+	@Override
+	void addTypeAlias(ITypeAlias typeAlias);
+
 	// Classes
 	
 	@Override

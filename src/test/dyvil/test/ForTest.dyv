@@ -11,6 +11,7 @@ public class ForTest
 		testIterable()
 		testIterator()
 		testString()
+		testNested()
 	}
 	
 	private static void testIterative()
@@ -78,5 +79,20 @@ public class ForTest
 		}
 
 		Main.test("String For Test", testString, string)
+	}
+
+	private static void testNested()
+	{
+		var results = List.[(int, int)]()
+
+		for (var i <- 0 .. 1)
+		{
+			for (var j <- 0 .. 1)
+			{
+				results.add((i, j))
+			}
+		}
+
+		Main.test("Nested Range For Test", [ (0, 0), (0, 1), (1, 0), (1, 1) ] as List, results)
 	}
 }

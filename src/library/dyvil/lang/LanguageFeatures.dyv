@@ -1,5 +1,6 @@
 package dyvil.lang
 
+import	java.io.PrintStream
 import	dyvilx.lang.model.`type`.Type
 import	dyvil.annotation.Reified
 using	dyvil.reflect.Opcodes._
@@ -20,60 +21,60 @@ public final class LanguageFeatures
 
 	// Lists
 
-	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKEINTERFACE, 0, 1, 2 ], strings: [ "dyvil/collection/ImmutableList", "$plus", "(Ljava/lang/Object;)Ldyvil/collection/ImmutableList;" ])
-	public infix ImmutableList[E] ::[E](ImmutableList[E] list, E element) = list + element
+	public infix inline func ::[E](ImmutableList[E] list, E element): ImmutableList[E] = list + element
 
-	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2 ], strings: [ "dyvil/collection/ImmutableList", "apply", "(Ljava/lang/Object;Ljava/lang/Object;)Ldyvil/collection/ImmutableList;" ])
-	public infix ImmutableList[E] ::[E](E element1, E element2) = ImmutableList(element1, element2)
+	public infix inline func ::[E](E element1, E element2): ImmutableList[E] = ImmutableList(element1, element2)
 
 	// Increments
 
-	public static void inc(var int i, int n = 1) = i += n
+	public static void inc(int^ i, int n = 1) = i.set(i.get + n)
 
-	public static void inc(var long l, long n = 1L) = l += n
+	public static void inc(long^ l, long n = 1L) = l.set(l.get + n)
 
-	public static void inc(var float f, float n = 1F) = f += n
+	public static void inc(float^ f, float n = 1F) = f.set(f.get + n)
 
-	public static void inc(var double d, double n = 1D) = d += n
+	public static void inc(double^ d, double n = 1D) = d.set(d.get + n)
 
 	// Useful Globals
 
-	@Intrinsic(value: [ LOAD_0, INVOKEINTERFACE, 0, 1, 2 ], strings: [ "dyvil/function/Function0", "apply", "()Ljava/lang/Object;" ])
-	public static R run[R](=> R f) = f()
+	public static inline R run[R](=> R f) = f()
 
-	@Intrinsic(value: [ LOAD_0, LOAD_1, SWAP, INVOKEINTERFACE, 0, 1, 2 ], strings: [ "dyvil/function/Function1", "apply", "(Ljava/lang/Object;)Ljava/lang/Object;" ])
-	public static infix R run[T, R](T self, T.() => R f) = f(self)
+	public static infix inline R run[T, R](T self, T.() => R f) = f(self)
 
-	@Intrinsic(value: [ LOAD_0, DUP, LOAD_1, SWAP, INVOKEINTERFACE, 0, 1, 2, POP ], strings: [ "dyvil/function/Function1", "apply", "(Ljava/lang/Object;)Ljava/lang/Object;" ])
-	public static infix T use[T](T self, T.() => void f)
+	public static infix inline T use[T](T self, T.() => void f)
 	{
 		f(self)
 		return self
 	}
 
-	@Intrinsic(value: [ LOAD_0, LOAD_1, SWAP, INVOKEINTERFACE, 0, 1, 2 ], strings: [ "dyvil/function/Function1", "apply", "(Ljava/lang/Object;)Ljava/lang/Object;" ])
-	public static R with[T, R](T receiver, T => R f) = f(receiver)
+	public static inline R with[T, R](T receiver, T => R f) = f(receiver)
 
-	public static void repeat(int n, => void f)
+	@Deprecated
+	public static void `repeat`(int n, => void f)
 	{
-		for (int i <- 0 ..< n)
-		{
-			f()
-		}
+		for (var i <- 0 ..< n) f()
+	}
+
+	// I/O
+
+	public const String ENDL = System.lineSeparator
+
+	public infix inline func <<(PrintStream stream, any value): PrintStream
+	{
+		stream.print(value)
+		return stream
 	}
 
 	// Timing
 
-	@Intrinsic(value: [ INVOKESTATIC, 0, 1, 2, LOAD_0, INVOKEINTERFACE, 3, 4, 5, POP, INVOKESTATIC, 0, 1, 2, SWAP2, LSUB ], strings: [ "java/lang/System", "currentTimeMillis", "()J", "dyvil/function/Function0", "apply", "()Ljava/lang/Object;" ])
-	public static long measureMillis(=> void f)
+	public static inline long measureMillis(=> void f)
 	{
 		long millis = System.currentTimeMillis
 		f()
 		return System.currentTimeMillis - millis
 	}
 
-	@Intrinsic(value: [ INVOKESTATIC, 0, 1, 2, LOAD_0, INVOKEINTERFACE, 3, 4, 5, POP, INVOKESTATIC, 0, 1, 2, SWAP2, LSUB ], strings: [ "java/lang/System", "nanoTime", "()J", "dyvil/function/Function0", "apply", "()Ljava/lang/Object;" ])
-	public static long measureNanos(=> void f)
+	public static inline long measureNanos(=> void f)
 	{
 		long nanos = System.nanoTime
 		f()

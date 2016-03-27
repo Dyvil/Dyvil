@@ -8,6 +8,7 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.expression.ExpressionListParser;
 import dyvil.tools.compiler.parser.expression.ExpressionMapParser;
+import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
@@ -39,7 +40,7 @@ public class AnnotationParser extends Parser
 		case NAME:
 			this.annotation.setPosition(token.prev());
 
-			pm.pushParser(pm.newTypeParser(this.annotation), true);
+			pm.pushParser(new TypeParser(this.annotation), true);
 			this.mode = PARAMETERS_START;
 			return;
 		case PARAMETERS_START:
@@ -76,11 +77,5 @@ public class AnnotationParser extends Parser
 			pm.report(token, "annotation.parenthesis");
 			return;
 		}
-	}
-
-	@Override
-	public boolean reportErrors()
-	{
-		return false;
 	}
 }

@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -83,30 +84,30 @@ public final class ClassOperator extends AbstractValue implements IConstantValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		IAnnotation annotation = type.getTheClass().getAnnotation(LazyFields.CLASS_CONVERTIBLE);
+		final IAnnotation annotation = type.getAnnotation(LazyFields.CLASS_CONVERTIBLE);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
 		}
 		
-		return type.isSuperTypeOf(this.getType()) ? this : null;
+		return Types.isSuperType(type, this.getType()) ? this : null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return type.getTheClass().getAnnotation(LazyFields.CLASS_CONVERTIBLE) != null || type.isSuperTypeOf(this.getType());
+		return Types.isSuperType(type, this.getType()) || type.getAnnotation(LazyFields.CLASS_CONVERTIBLE) != null;
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
-		if (type.getTheClass().getAnnotation(LazyFields.CLASS_CONVERTIBLE) != null)
+		if (type.getAnnotation(LazyFields.CLASS_CONVERTIBLE) != null)
 		{
-			return 2;
+			return CONVERSION_MATCH;
 		}
 		
-		return type.getSubTypeDistance(this.genericType);
+		return Types.getDistance(type, this.getType());
 	}
 	
 	@Override

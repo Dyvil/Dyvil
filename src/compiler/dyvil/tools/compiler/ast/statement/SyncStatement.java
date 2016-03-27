@@ -77,7 +77,7 @@ public final class SyncStatement extends AbstractValue implements IStatement
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		return this.action.getTypeMatch(type);
 	}
@@ -152,37 +152,37 @@ public final class SyncStatement extends AbstractValue implements IStatement
 		dyvil.tools.asm.Label handlerEnd = new dyvil.tools.asm.Label();
 		
 		this.lock.writeExpression(writer, Types.OBJECT);
-		writer.writeInsn(Opcodes.DUP);
+		writer.visitInsn(Opcodes.DUP);
 		
 		int varIndex = writer.startSync();
-		writer.writeVarInsn(Opcodes.ASTORE, varIndex);
-		writer.writeInsn(Opcodes.MONITORENTER);
+		writer.visitVarInsn(Opcodes.ASTORE, varIndex);
+		writer.visitInsn(Opcodes.MONITORENTER);
 		
-		writer.writeLabel(start);
+		writer.visitLabel(start);
 		this.action.writeExpression(writer, type);
 		writer.endSync();
 		
-		writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-		writer.writeInsn(Opcodes.MONITOREXIT);
-		writer.writeLabel(end);
+		writer.visitVarInsn(Opcodes.ALOAD, varIndex);
+		writer.visitInsn(Opcodes.MONITOREXIT);
+		writer.visitLabel(end);
 		
-		writer.writeJumpInsn(Opcodes.GOTO, handlerEnd);
+		writer.visitJumpInsn(Opcodes.GOTO, handlerEnd);
 		
-		writer.writeLabel(handlerStart);
-		writer.writeVarInsn(Opcodes.ALOAD, varIndex);
-		writer.writeInsn(Opcodes.MONITOREXIT);
-		writer.writeLabel(throwLabel);
-		writer.writeInsn(Opcodes.ATHROW);
+		writer.visitLabel(handlerStart);
+		writer.visitVarInsn(Opcodes.ALOAD, varIndex);
+		writer.visitInsn(Opcodes.MONITOREXIT);
+		writer.visitLabel(throwLabel);
+		writer.visitInsn(Opcodes.ATHROW);
 		if (type != Types.VOID)
 		{
 			this.action.getType().writeDefaultValue(writer);
 		}
 		
 		writer.resetLocals(varIndex);
-		writer.writeLabel(handlerEnd);
+		writer.visitLabel(handlerEnd);
 		
-		writer.writeFinallyBlock(start, end, handlerStart);
-		writer.writeFinallyBlock(handlerStart, throwLabel, handlerStart);
+		writer.visitFinallyBlock(start, end, handlerStart);
+		writer.visitFinallyBlock(handlerStart, throwLabel, handlerStart);
 	}
 
 	@Override

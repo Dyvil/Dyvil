@@ -26,9 +26,9 @@ public class NestedMethod extends CodeMethod
 {
 	private CaptureHelper captureHelper = new CaptureHelper(CaptureVariable.FACTORY);
 
-	public NestedMethod(ICodePosition position, Name name, IType type, ModifierSet modifierSet, AnnotationList annotations)
+	public NestedMethod(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
-		super(position, name, type, modifierSet, annotations);
+		super(position, name, type, modifiers, annotations);
 	}
 
 	@Override
@@ -122,11 +122,11 @@ public class NestedMethod extends CodeMethod
 
 		if (this.value != null)
 		{
-			methodWriter.begin();
-			methodWriter.writeLabel(start);
+			methodWriter.visitCode();
+			methodWriter.visitLabel(start);
 			this.value.writeExpression(methodWriter, this.type);
-			methodWriter.writeLabel(end);
-			methodWriter.end(this.type);
+			methodWriter.visitLabel(end);
+			methodWriter.visitEnd(this.type);
 		}
 
 		for (int i = 0; i < this.parameterCount; i++)

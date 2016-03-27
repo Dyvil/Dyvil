@@ -57,34 +57,34 @@ public final class Primitives
 	// Boolean Operators
 	
 	@Intrinsic([ LOAD_0, BNOT ])
-	public static boolean operator !(boolean v) = !v
+	public static func !(boolean v): boolean = !v
 	
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
-	public infix boolean operator ==(boolean v1, boolean v2) = v1 == v2
-	
+	public infix func ==(boolean v1, boolean v2): boolean = v1 == v2
+
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPNE ])
-	public infix boolean operator !=(boolean v1, boolean v2) = v1 != v2
-	
+	public infix func !=(boolean v1, boolean v2): boolean = v1 != v2
+
 	@Intrinsic([ LOAD_0, LOAD_1, IAND ])
-	public infix boolean operator &(boolean v1, boolean v2) = v1 && v2
-	
+	public infix func &(boolean v1, boolean v2): boolean = v1 && v2
+
 	@Intrinsic([ LOAD_0, LOAD_1, IOR ])
-	public infix boolean operator |(boolean v1, boolean v2) = v1 || v2
-	
+	public infix func |(boolean v1, boolean v2): boolean = v1 || v2
+
 	@Intrinsic([ LOAD_0, LOAD_1, IXOR ])
-	public infix boolean operator ^(boolean v1, boolean v2) = v1 ^ v2
-	
+	public infix func ^(boolean v1, boolean v2): boolean = v1 ^ v2
+
 	@Intrinsic([ LOAD_0, BNOT, LOAD_1, IOR ])
-	public infix boolean operator ==>(boolean v1, boolean v2) = !v1 || v2
-	
+	public infix func ==>(boolean v1, boolean v2): boolean = !v1 || v2
+
 	@Intrinsic([ LOAD_0, LOAD_1, BNOT, IOR ])
-	public infix boolean operator <==(boolean v1, boolean v2) = v1 || !v2
-	
+	public infix func <==(boolean v1, boolean v2): boolean = v1 || !v2
+
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
-	public infix boolean operator <=>(boolean v1, boolean v2) = v1 == v2
+	public infix func <=>(boolean v1, boolean v2): boolean = v1 == v2
 
 	// Boolean Methods
-	
+
 	public infix int compareTo(boolean b1, boolean b2) = if (b1 == b2) 0 else if (b1) 1 else -1
 
 	public postfix String toString(boolean value) = if (value) "true" else "false"
@@ -96,64 +96,64 @@ public final class Primitives
 	// Int Operators
 
 	@Intrinsic([ LOAD_0, INEG ])
-	public static int operator -(int value) = -value
+	public static func -(int value): int = -value
 
 	@Intrinsic([ LOAD_0, INOT ])
-    public static int operator ~(int value) = ~value
+    public static func ~(int value): int = ~value
 
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
-	public infix boolean operator ==(int v1, int v2) = v1 == v2
+	public infix func ==(int v1, int v2): boolean = v1 == v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPNE ])
-	public infix boolean operator !=(int v1, int v2) = v1 != v2
+	public infix func !=(int v1, int v2): boolean = v1 != v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPLT ])
-	public infix boolean operator <(int v1, int v2) = v1 < v2
+	public infix func <(int v1, int v2): boolean = v1 < v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPLE ])
-	public infix boolean operator <=(int v1, int v2) = v1 <= v2
+	public infix func <=(int v1, int v2): boolean = v1 <= v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPGT ])
-	public infix boolean operator >(int v1, int v2) = v1 > v2
+	public infix func >(int v1, int v2): boolean = v1 > v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPGE ])
-	public infix boolean operator >=(int v1, int v2) = v1 >= v2
+	public infix func >=(int v1, int v2): boolean = v1 >= v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, IADD ])
-	public infix int operator +(int v1, int v2) = v1 + v2
+	public infix func +(int v1, int v2): int = v1 + v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, ISUB ])
-	public infix int operator -(int v1, int v2) = v1 - v2
+	public infix func -(int v1, int v2): int = v1 - v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, IMUL ])
-	public infix int operator *(int v1, int v2) = v1 * v2
+	public infix func *(int v1, int v2): int = v1 * v2
 
 	@Intrinsic([ LOAD_0, I2F, LOAD_1, I2F, FDIV ])
-	public infix float operator /(int v1, int v2) = v1 / v2
+	public infix func /(int v1, int v2): float = v1 / v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, IREM ])
-	public infix int operator %(int v1, int v2) = v1 % v2
+	public infix func %(int v1, int v2): int = v1 % v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, IDIV ])
-	public infix int operator \(int v1, int v2) = v1 \ v2
+	public infix func \(int v1, int v2): int = v1 \ v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, IAND ])
-	public infix int operator &(int v1, int v2) = v1 & v2
+	public infix func &(int v1, int v2): int = v1 & v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, IOR ])
-	public infix int operator |(int v1, int v2) = v1 | v2
+	public infix func |(int v1, int v2): int = v1 | v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, IXOR ])
-	public infix int operator ^(int v1, int v2) = v1 ^ v2
+	public infix func ^(int v1, int v2): int = v1 ^ v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, ISHL ])
-	public infix int operator <<(int v1, int v2) = v1 << v2
+	public infix func <<(int v1, int v2): int = v1 << v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, ISHR ])
-	public infix int operator >>(int v1, int v2) = v1 >> v2
+	public infix func >>(int v1, int v2): int = v1 >> v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, IUSHR ])
-	public infix int operator >>>(int v1, int v2) = v1 >>> v2
+	public infix func >>>(int v1, int v2): int = v1 >>> v2
 
 	// Int Methods
 
@@ -195,64 +195,64 @@ public final class Primitives
 	// Long Operators
 
 	@Intrinsic([ LOAD_0, LNEG ])
-	public static long operator -(long value) = -value
+	public static func -(long value): long = -value
 
 	@Intrinsic([ LOAD_0, LNOT ])
-	public static long operator ~(long value) = ~value
+	public static func ~(long value): long = ~value
 
 	@Intrinsic([ LOAD_0, LOAD_1, LCMPEQ ])
-	public infix boolean operator ==(long v1, long v2) = v1 == v2
+	public infix func ==(long v1, long v2): boolean = v1 == v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, LCMPNE ])
-	public infix boolean operator !=(long v1, long v2) = v1 != v2
+	public infix func !=(long v1, long v2): boolean = v1 != v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, LCMPLT ])
-	public infix boolean operator <(long v1, long v2) = v1 < v2
+	public infix func <(long v1, long v2): boolean = v1 < v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, LCMPLE ])
-	public infix boolean operator <=(long v1, long v2) = v1 <= v2
+	public infix func <=(long v1, long v2): boolean = v1 <= v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, LCMPGT ])
-	public infix boolean operator >(long v1, long v2) = v1 > v2
+	public infix func >(long v1, long v2): boolean = v1 > v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, LCMPGE ])
-	public infix boolean operator >=(long v1, long v2) = v1 >= v2
+	public infix func >=(long v1, long v2): boolean = v1 >= v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, LADD ])
-	public infix long operator +(long v1, long v2) = v1 + v2
+	public infix func +(long v1, long v2): long = v1 + v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, LSUB ])
-	public infix long operator -(long v1, long v2) = v1 - v2
+	public infix func -(long v1, long v2): long = v1 - v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, LMUL ])
-	public infix long operator *(long v1, long v2) = v1 * v2
+	public infix func *(long v1, long v2): long = v1 * v2
 
 	@Intrinsic([ LOAD_0, L2D, LOAD_1, L2D, DDIV ])
-	public infix double operator /(long v1, long v2) = v1 / v2
+	public infix func /(long v1, long v2): double = v1 / v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, LREM ])
-	public infix long operator %(long v1, long v2) = v1 % v2
+	public infix func %(long v1, long v2): long = v1 % v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, LDIV ])
-	public infix long operator \(long v1, long v2) = v1 \ v2
+	public infix func \(long v1, long v2): long = v1 \ v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, LAND ])
-	public infix long operator &(long v1, long v2) = v1 & v2
+	public infix func &(long v1, long v2): long = v1 & v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, LOR ])
-	public infix long operator |(long v1, long v2) = v1 | v2
+	public infix func |(long v1, long v2): long = v1 | v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, LXOR ])
-	public infix long operator ^(long v1, long v2) = v1 ^ v2
+	public infix func ^(long v1, long v2): long = v1 ^ v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, L2I, LSHL ])
-	public infix long operator <<(long v1, long v2) = v1 << v2
+	public infix func <<(long v1, long v2): long = v1 << v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, L2I, LSHR ])
-	public infix long operator >>(long v1, long v2) = v1 >> v2
+	public infix func >>(long v1, long v2): long = v1 >> v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, L2I, LUSHR ])
-	public infix long operator >>>(long v1, long v2) = v1 >>> v2
+	public infix func >>>(long v1, long v2): long = v1 >>> v2
 
 	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Long", "toString", "(J)Ljava/lang/String;" ])
 	public infix String toString(long value) = value.toString
@@ -279,48 +279,45 @@ public final class Primitives
 	public postfix boolean equals(long l1, long l2) = l1 == l2
 
 	@Intrinsic([ LOAD_0, DUP2, BIPUSH, 32, LUSHR, LXOR, L2I ])
-	public postfix int hashCode(long value)
-	{
-		return (value >>> 32 ^ value) as int;
-	}
+	public postfix int hashCode(long value) = value.hashCode
 
 	// Float Operators
 
 	@Intrinsic([ LOAD_0, FNEG ])
-	public static float operator -(float value) = -value
+	public static func -(float value): float = -value
 
 	@Intrinsic([ LOAD_0, LOAD_1, FCMPEQ ])
-	public infix boolean operator ==(float v1, float v2) = v1 == v2
+	public infix func ==(float v1, float v2): boolean = v1 == v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, FCMPNE ])
-	public infix boolean operator !=(float v1, float v2) = v1 != v2
+	public infix func !=(float v1, float v2): boolean = v1 != v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, FCMPLT ])
-	public infix boolean operator <(float v1, float v2) = v1 < v2
+	public infix func <(float v1, float v2): boolean = v1 < v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, FCMPLE ])
-	public infix boolean operator <=(float v1, float v2) = v1 <= v2
+	public infix func <=(float v1, float v2): boolean = v1 <= v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, FCMPGT ])
-	public infix boolean operator >(float v1, float v2) = v1 > v2
+	public infix func >(float v1, float v2): boolean = v1 > v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, FCMPGE ])
-	public infix boolean operator >=(float v1, float v2) = v1 >= v2
+	public infix func >=(float v1, float v2): boolean = v1 >= v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, FADD ])
-	public infix float operator +(float v1, float v2) = v1 + v2
+	public infix func +(float v1, float v2): float = v1 + v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, FSUB ])
-	public infix float operator -(float v1, float v2) = v1 - v2
+	public infix func -(float v1, float v2): float = v1 - v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, FMUL ])
-	public infix float operator *(float v1, float v2) = v1 * v2
+	public infix func *(float v1, float v2): float = v1 * v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, FDIV ])
-	public infix float operator /(float v1, float v2) = v1 / v2
+	public infix func /(float v1, float v2): float = v1 / v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, FREM ])
-	public infix float operator %(float v1, float v2) = v1 % v2
+	public infix func %(float v1, float v2): float = v1 % v2
 
 	// Float Methods
 
@@ -339,40 +336,40 @@ public final class Primitives
 	// Double Operators
 
 	@Intrinsic([ LOAD_0, DNEG ])
-	public static double operator -(double value) = -value
-	
+	public static func -(double value): double = -value
+
 	@Intrinsic([ LOAD_0, LOAD_1, DCMPEQ ])
-	public infix boolean operator ==(double v1, double v2) = v1 == v2
+	public infix func ==(double v1, double v2): boolean = v1 == v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, DCMPNE ])
-	public infix boolean operator !=(double v1, double v2) = v1 != v2
+	public infix func !=(double v1, double v2): boolean = v1 != v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, DCMPLT ])
-	public infix boolean operator <(double v1, double v2) = v1 < v2
+	public infix func <(double v1, double v2): boolean = v1 < v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, DCMPLE ])
-	public infix boolean operator <=(double v1, double v2) = v1 <= v2
+	public infix func <=(double v1, double v2): boolean = v1 <= v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, DCMPGT ])
-	public infix boolean operator >(double v1, double v2) = v1 > v2
+	public infix func >(double v1, double v2): boolean = v1 > v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, DCMPGE ])
-	public infix boolean operator >=(double v1, double v2) = v1 >= v2
+	public infix func >=(double v1, double v2): boolean = v1 >= v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, DADD ])
-	public infix double operator +(double v1, double v2) = v1 + v2
+	public infix func +(double v1, double v2): double = v1 + v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, DSUB ])
-	public infix double operator -(double v1, double v2) = v1 - v2
+	public infix func -(double v1, double v2): double = v1 - v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, DMUL ])
-	public infix double operator *(double v1, double v2) = v1 * v2
+	public infix func *(double v1, double v2): double = v1 * v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, DDIV ])
-	public infix double operator /(double v1, double v2) = v1 / v2
+	public infix func /(double v1, double v2): double = v1 / v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, DREM ])
-	public infix double operator %(double v1, double v2) = v1 % v2
+	public infix func %(double v1, double v2): double = v1 % v2
 
 	// Double Methods
 

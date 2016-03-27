@@ -52,7 +52,7 @@ public class ExpressionMapParser extends Parser implements IValueConsumer
 			// Fallthrough
 		case VALUE:
 			this.mode = SEPERATOR;
-			pm.pushParser(pm.newExpressionParser(this), true);
+			pm.pushParser(new ExpressionParser(this), true);
 			return;
 		case SEPERATOR:
 			this.mode = NAME;

@@ -76,7 +76,7 @@ public final class MethodCall extends AbstractCall implements INamed
 	}
 	
 	@Override
-	public IValue toConstant(MarkerList markers, IContext context)
+	public IValue toAnnotationConstant(MarkerList markers, IContext context)
 	{
 		int depth = context.getCompilationContext().config.getMaxConstantDepth();
 		IValue v = this;
@@ -90,9 +90,9 @@ public final class MethodCall extends AbstractCall implements INamed
 			
 			v = v.foldConstants();
 		}
-		while (!v.isConstant());
+		while (!v.isAnnotationConstant());
 		
-		return v.toConstant(markers, context);
+		return v.toAnnotationConstant(markers, context);
 	}
 	
 	@Override

@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
@@ -48,12 +49,6 @@ public final class ClassAccess implements IValue
 	}
 
 	@Override
-	public boolean isConstant()
-	{
-		return true;
-	}
-
-	@Override
 	public int valueTag()
 	{
 		return CLASS_ACCESS;
@@ -80,18 +75,12 @@ public final class ClassAccess implements IValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type.isSuperTypeOf(this.type))
+		if (Types.isSuperType(type, this.type))
 		{
 			this.withTyped = true;
 			return this;
 		}
 		return null;
-	}
-
-	@Override
-	public boolean isType(IType type)
-	{
-		return type.isSuperTypeOf(this.type);
 	}
 
 	@Override

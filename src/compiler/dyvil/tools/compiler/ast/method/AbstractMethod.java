@@ -1,8 +1,6 @@
 package dyvil.tools.compiler.ast.method;
 
 import dyvil.annotation.Mutating;
-import dyvil.collection.Set;
-import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Handle;
@@ -26,6 +24,7 @@ import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
+import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
@@ -45,6 +44,7 @@ import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SemanticError;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -71,15 +71,10 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	protected IType[] exceptions;
 	protected int     exceptionCount;
 
-	protected IValue value;
-
 	// Metadata
 	protected IClass        enclosingClass;
 	protected String        descriptor;
 	protected IntrinsicData intrinsicData;
-	protected Set<IMethod>  overrideMethods;
-
-	protected boolean sideEffects = true;
 
 	public AbstractMethod(IClass enclosingClass)
 	{
@@ -293,9 +288,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				return this.getClass() != ExternalMethod.class;
 			}
 			return true;
-		case "dyvil/annotation/pure":
-			this.sideEffects = false;
-			return true;
 		}
 		return true;
 	}
@@ -346,18 +338,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void setValue(IValue statement)
-	{
-		this.value = statement;
-	}
-
-	@Override
-	public IValue getValue()
-	{
-		return this.value;
-	}
-
-	@Override
 	public boolean isStatic()
 	{
 		return this.modifiers.hasIntModifier(Modifiers.STATIC);
@@ -376,25 +356,14 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public boolean hasSideEffects()
-	{
-		return this.sideEffects;
-	}
-
-	@Override
-	public void setHasSideEffects(boolean sideEffects)
-	{
-		this.sideEffects = sideEffects;
-	}
-
-	protected boolean isObjectMethod()
+	public boolean isObjectMethod()
 	{
 		switch (this.parameterCount)
 		{
 		case 0:
 			return this.name == Names.toString || this.name == Names.hashCode;
 		case 1:
-			if (this.name == Names.equals && this.parameters[0].getType().getTheClass() == Types.OBJECT_CLASS)
+			if (this.name == Names.equals && this.getParameter(0).getInternalType().getTheClass() == Types.OBJECT_CLASS)
 			{
 				return true;
 			}
@@ -492,7 +461,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			if (this.exceptions[i].isSuperTypeOf(type))
+			if (Types.isSuperType(this.exceptions[i], type))
 			{
 				return TRUE;
 			}
@@ -522,11 +491,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public IDataMember capture(IVariable variable)
 	{
-		if (this.isMember(variable))
-		{
-			return variable;
-		}
-		return null;
+		return variable;
 	}
 
 	@Override
@@ -669,10 +634,10 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			if (mod == Modifiers.INFIX && receiver.valueTag() != IValue.CLASS_ACCESS)
 			{
 				final IParameter parameter = this.parameters[0];
-				final IType paramType = parameter.getInternalType().getParameterType();
+				final IType paramType = parameter.getInternalType();
 
 				receiver = TypeChecker.convertValue(receiver, paramType, typeContext, markers, context,
-				                                    TypeChecker.markerSupplier("method.access.infix_type"));
+				                                    TypeChecker.markerSupplier("method.access.infix_type", this.name));
 
 				if (this.isVariadic())
 				{
@@ -808,12 +773,23 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			ITypeParameter typeVar = this.typeParameters[i];
-			IType type = typeContext.resolveType(typeVar);
-			if (type == null || type.typeTag() == IType.TYPE_VAR_TYPE && type.getTypeVariable() == typeVar)
+			final ITypeParameter typeParameter = this.typeParameters[i];
+			final IType typeArgument = typeContext.resolveType(typeParameter);
+
+			if (typeArgument == null || typeArgument.getTypeVariable() == typeParameter)
 			{
-				markers.add(Markers.semantic(position, "method.typevar.infer", this.name, typeVar.getName()));
-				typeContext.addMapping(typeVar, Types.ANY);
+				final IType inferredType = typeParameter.getDefaultType();
+				markers.add(Markers.semantic(position, "method.typevar.infer", this.name, typeParameter.getName(),
+				                             inferredType));
+				typeContext.addMapping(typeParameter, inferredType);
+			}
+			else if (!typeParameter.isAssignableFrom(typeArgument))
+			{
+				final Marker marker = Markers.semanticError(position, "method.typevar.incompatible", this.name,
+				                                            typeParameter.getName());
+				marker.addInfo(Markers.getSemantic("generic.type", typeArgument));
+				marker.addInfo(Markers.getSemantic("typeparameter.declaration", typeParameter));
+				markers.add(marker);
 			}
 		}
 	}
@@ -821,17 +797,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext)
 	{
-		Deprecation.checkAnnotations(markers, position, this);
-
-		switch (IContext.getVisibility(context, this))
-		{
-		case IContext.INTERNAL:
-			markers.add(Markers.semantic(position, "method.access.internal", this.name));
-			break;
-		case IContext.INVISIBLE:
-			markers.add(Markers.semantic(position, "method.access.invisible", this.name));
-			break;
-		}
+		ModifierUtil.checkVisibility(this, position, markers, context);
 
 		if (instance != null)
 		{
@@ -882,7 +848,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public boolean checkOverride(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext)
+	public boolean checkOverride(IMethod candidate, ITypeContext typeContext)
 	{
 		// Check Name
 		if (candidate.getName() != this.name)
@@ -896,39 +862,33 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return false;
 		}
 
-		// The above checks are faster than searching in the override-cache, so we perform them first
-		if (this.overrideMethods != null && this.overrideMethods.contains(candidate))
+		// The above checks can be made without checking the cache (CodeMethod) or resolving parameter types (ExternalMethod)
+		if (this.checkOverride0(candidate))
 		{
 			return true;
 		}
-
-		// External Methods might need to resolve their parameters and type parameters
-		this.checkOverride_external();
 
 		// Check Parameter Types
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			final IType parType = this.parameters[i].getType().getConcreteType(typeContext);
 			final IType candidateParType = candidate.getParameter(i).getType().getConcreteType(typeContext);
-			if (!parType.isSameType(candidateParType))
+			if (!Types.isSameType(parType, candidateParType))
 			{
 				return false;
 			}
 		}
 
-		// Store the method in the cache, if it originates from a
-		if (this.enclosingClass.isSubTypeOf(candidate.getEnclosingClass().getClassType()))
-		{
-			if (this.overrideMethods == null)
-			{
-				this.overrideMethods = new IdentityHashSet<>();
-			}
-			this.overrideMethods.add(candidate);
-		}
 		return true;
 	}
 
-	protected void checkOverride_external()
+	protected boolean checkOverride0(IMethod candidate)
+	{
+		return false;
+	}
+
+	@Override
+	public void addOverride(IMethod candidate)
 	{
 	}
 
@@ -1050,11 +1010,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			this.writeArgumentsAndInvoke(writer, instance, arguments, typeContext, lineNumber);
 		}
 
-		if (targetType == Types.VOID)
+		if (Types.isSameType(targetType, Types.VOID))
 		{
-			if (this.type != Types.VOID)
+			if (!Types.isSameType(this.type, Types.VOID))
 			{
-				writer.writeInsn(Opcodes.AUTO_POP);
+				writer.visitInsn(Opcodes.AUTO_POP);
 			}
 			return;
 		}
@@ -1076,7 +1036,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 
 		this.writeArgumentsAndInvoke(writer, instance, arguments, typeContext, lineNumber);
-		writer.writeJumpInsn(IFNE, dest);
+		writer.visitJumpInsn(IFNE, dest);
 	}
 
 	@Override
@@ -1090,7 +1050,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 
 		this.writeArgumentsAndInvoke(writer, instance, arguments, typeContext, lineNumber);
-		writer.writeJumpInsn(IFEQ, dest);
+		writer.visitJumpInsn(IFEQ, dest);
 	}
 
 	protected void writeReceiver(MethodWriter writer, IValue receiver) throws BytecodeException
@@ -1168,7 +1128,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			typeParameter.writeArgument(writer, typeContext.resolveType(typeParameter));
 		}
 
-		writer.writeLineNumber(lineNumber);
+		writer.visitLineNumber(lineNumber);
 
 		int opcode;
 		int modifiers = this.modifiers.toFlags();
@@ -1176,9 +1136,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		String owner = this.enclosingClass.getInternalName();
 		if ((modifiers & Modifiers.EXTENSION) == Modifiers.EXTENSION)
 		{
-			writer.writeInvokeDynamic(this.name.qualified, this.getDescriptor(), EXTENSION_BSM,
-			                          new Handle(ClassFormat.H_INVOKESTATIC, owner, this.name.qualified,
-			                                     this.getDescriptor()));
+			writer.visitInvokeDynamicInsn(this.name.qualified, this.getDescriptor(), EXTENSION_BSM,
+			                              new Handle(ClassFormat.H_INVOKESTATIC, owner, this.name.qualified,
+			                                         this.getDescriptor()));
 			return;
 		}
 
@@ -1193,7 +1153,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 		String name = this.name.qualified;
 		String desc = this.getDescriptor();
-		writer.writeInvokeInsn(opcode, owner, name, desc, this.enclosingClass.isInterface());
+		writer.visitMethodInsn(opcode, owner, name, desc, this.enclosingClass.isInterface());
 	}
 
 	@Override
@@ -1219,15 +1179,35 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		super.toString(prefix, buffer);
-
 		this.modifiers.toString(buffer);
-		if (this.type != null)
-		{
-			this.type.toString("", buffer);
-			buffer.append(' ');
-		}
-		buffer.append(this.name);
 
+		// Type
+		boolean typeAscription = false;
+		boolean parameters = true;
+		if (this.type != null && this.type != Types.UNKNOWN)
+		{
+			typeAscription = Formatting.typeAscription("method.type_ascription", this);
+
+			if (!typeAscription)
+			{
+				this.type.toString("", buffer);
+			}
+			else
+			{
+				buffer.append("func");
+				parameters = this.parameterCount > 0 || Formatting.getBoolean("method.parameters.visible");
+			}
+		}
+		else
+		{
+			buffer.append("func");
+			parameters = this.parameterCount > 0 || Formatting.getBoolean("method.parameters.visible");
+		}
+
+		// Name
+		buffer.append(' ').append(this.name);
+
+		// Type Parameters
 		if (this.typeParameterCount > 0)
 		{
 			Formatting.appendSeparator(buffer, "generics.open_bracket", '[');
@@ -1236,11 +1216,16 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			Formatting.appendSeparator(buffer, "generics.close_bracket", ']');
 		}
 
-		Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
-		Util.astToString(prefix, this.parameters, this.parameterCount,
-		                 Formatting.getSeparator("parameters.separator", ','), buffer);
-		Formatting.appendSeparator(buffer, "parameters.close_paren", ')');
+		// Parameters
+		if (parameters)
+		{
+			Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
+			Util.astToString(prefix, this.parameters, this.parameterCount,
+			                 Formatting.getSeparator("parameters.separator", ','), buffer);
+			Formatting.appendSeparator(buffer, "parameters.close_paren", ')');
+		}
 
+		// Exceptions
 		if (this.exceptionCount > 0)
 		{
 			String throwsPrefix = prefix;
@@ -1258,9 +1243,18 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			                 Formatting.getSeparator("method.throws", ','), buffer);
 		}
 
-		if (this.value != null)
+		// Type Ascription
+		if (typeAscription)
 		{
-			if (Util.formatStatementList(prefix, buffer, this.value))
+			Formatting.appendSeparator(buffer, "method.type_ascription", ':');
+			this.type.toString(prefix, buffer);
+		}
+
+		// Implementation
+		final IValue value = this.getValue();
+		if (value != null)
+		{
+			if (Util.formatStatementList(prefix, buffer, value))
 			{
 				return;
 			}
@@ -1282,7 +1276,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				buffer.append(' ');
 			}
 
-			this.value.toString(prefix, buffer);
+			value.toString(prefix, buffer);
 		}
 
 		if (Formatting.getBoolean("method.semicolon"))

@@ -26,14 +26,68 @@ public class ParserManager implements IParserManager
 	public ParserManager()
 	{
 	}
-	
-	public ParserManager(Parser parser, MarkerList markers, IOperatorMap operators)
+
+	public ParserManager(IOperatorMap operators)
 	{
-		this.parser = parser;
+		this.operators = operators;
+	}
+
+	public ParserManager(TokenIterator tokens, MarkerList markers, IOperatorMap operators)
+	{
+		this.tokens = tokens;
 		this.markers = markers;
 		this.operators = operators;
 	}
-	
+
+	@Override
+	public MarkerList getMarkers()
+	{
+		return this.markers;
+	}
+
+	@Override
+	public TokenIterator getTokens()
+	{
+		return this.tokens;
+	}
+
+	@Override
+	public IOperatorMap getOperatorMap()
+	{
+		return this.operators;
+	}
+
+	@Override
+	public void setOperatorMap(IOperatorMap operators)
+	{
+		this.operators = operators;
+	}
+
+	@Override
+	public Operator getOperator(Name name)
+	{
+		Operator op = this.operators.getOperator(name);
+		if (op != null)
+		{
+			return op;
+		}
+		return Types.LANG_HEADER.getOperator(name);
+	}
+
+	public void reset()
+	{
+		this.skip = 0;
+		this.reparse = false;
+		this.hasStopped = false;
+	}
+
+	public void reset(MarkerList markers, TokenIterator tokens)
+	{
+		this.reset();
+		this.markers = markers;
+		this.tokens = tokens;
+	}
+
 	@Override
 	public void report(IToken token, String message)
 	{
@@ -46,32 +100,10 @@ public class ParserManager implements IParserManager
 		this.markers.add(error);
 	}
 
-	@Override
-	public void setOperatorMap(IOperatorMap operators)
+	public final void parse(Parser parser)
 	{
-		this.operators = operators;
-	}
-	
-	@Override
-	public IOperatorMap getOperatorMap()
-	{
-		return this.operators;
-	}
-	
-	@Override
-	public Operator getOperator(Name name)
-	{
-		Operator op = this.operators.getOperator(name);
-		if (op != null)
-		{
-			return op;
-		}
-		return Types.LANG_HEADER.getOperator(name);
-	}
-	
-	public final void parse(TokenIterator tokens)
-	{
-		this.tokens = tokens;
+		this.parser = parser;
+
 		IToken token = null;
 		
 		while (!this.hasStopped)
@@ -87,7 +119,7 @@ public class ParserManager implements IParserManager
 					break;
 				}
 				
-				token = tokens.next();
+				token = this.tokens.next();
 			}
 			
 			if (this.skip > 0)

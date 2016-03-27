@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.parser.classes;
+package dyvil.tools.compiler.parser.header;
 
 import dyvil.tools.compiler.ast.operator.IOperatorMap;
 import dyvil.tools.compiler.ast.operator.Operator;
@@ -229,7 +229,6 @@ public final class OperatorParser extends Parser
 			
 			pm.reparse();
 			pm.report(token, "operator.property.associativity");
-			return;
 		}
 	}
 	

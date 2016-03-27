@@ -284,6 +284,5 @@ public abstract class Member implements IMember
 		{
 			this.annotations.toString(prefix, buffer);
 		}
-		buffer.append(prefix);
 	}
 }

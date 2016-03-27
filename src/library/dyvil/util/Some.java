@@ -85,7 +85,7 @@ public final class Some<T> implements Option<T>
 	@Override
 	public String toString()
 	{
-		return this.value == null ? "null" : this.value.toString();
+		return this.value == null ? "Some(null)" : "Some(" + this.value.toString() + ')';
 	}
 
 	@Override

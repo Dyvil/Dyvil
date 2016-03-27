@@ -42,13 +42,7 @@ public class NullType implements IRawType
 	{
 		return Types.NULL_CLASS;
 	}
-	
-	@Override
-	public IType getSuperType()
-	{
-		return null;
-	}
-	
+
 	@Override
 	public boolean isResolved()
 	{
@@ -109,7 +103,7 @@ public class NullType implements IRawType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvilx/lang/model/type/NullType", "instance",
+		writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvilx/lang/model/type/NullType", "instance",
 		                      "Ldyvilx/lang/model/type/NullType;");
 	}
 	
@@ -139,17 +133,5 @@ public class NullType implements IRawType
 	public IType clone()
 	{
 		return this;
-	}
-	
-	@Override
-	public boolean equals(Object obj)
-	{
-		return this.isSameType((IType) obj);
-	}
-	
-	@Override
-	public int hashCode()
-	{
-		return NULL;
 	}
 }

@@ -4,7 +4,6 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -50,26 +49,12 @@ public final class ClassParameterSetter implements IValue
 	}
 
 	@Override
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
-	{
-		return type == Types.VOID ? this : null;
-	}
-
-	@Override
-	public boolean isType(IType type)
-	{
-		return type == Types.VOID;
-	}
-
-	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		assert type == Types.VOID;
-
-		writer.writeVarInsn(Opcodes.ALOAD, 0);
-		writer.writeVarInsn(this.parameter.getType().getLoadOpcode(), this.parameter.getLocalIndex());
-		writer.writeFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), this.parameter.getName().qualified,
-		                      this.parameter.getDescription());
+		writer.visitVarInsn(Opcodes.ALOAD, 0);
+		writer.visitVarInsn(this.parameter.getType().getLoadOpcode(), this.parameter.getLocalIndex());
+		writer.visitFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), this.parameter.getName().qualified,
+		                      this.parameter.getDescriptor());
 	}
 
 	@Override

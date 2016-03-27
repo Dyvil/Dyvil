@@ -294,7 +294,7 @@ public final class TypeParameter implements ITypeParameter
 		{
 			for (int i = 0; i < this.upperBoundCount; i++)
 			{
-				if (!this.upperBounds[i].isSuperTypeOf(type))
+				if (!Types.isSuperType(this.upperBounds[i], type))
 				{
 					return false;
 				}
@@ -302,7 +302,7 @@ public final class TypeParameter implements ITypeParameter
 		}
 		if (this.lowerBound != null)
 		{
-			if (!type.isSuperTypeOf(this.lowerBound))
+			if (!Types.isSuperType(type, this.lowerBound))
 			{
 				return false;
 			}
@@ -338,7 +338,7 @@ public final class TypeParameter implements ITypeParameter
 	{
 		for (int i = 0; i < this.upperBoundCount; i++)
 		{
-			int m = superType.getSubClassDistance(this.upperBounds[i]);
+			int m = this.upperBounds[i].getSuperTypeDistance(superType);
 			if (m > 0)
 			{
 				return m;
@@ -598,7 +598,7 @@ public final class TypeParameter implements ITypeParameter
 		}
 
 		this.parameterIndex = writer.localCount();
-		writer.registerParameter(this.parameterIndex, "reify$" + this.getName().qualified, type, Modifiers.MANDATED);
+		writer.visitParameter(this.parameterIndex, "reify$" + this.getName().qualified, type, Modifiers.MANDATED);
 	}
 
 	@Override
@@ -619,22 +619,14 @@ public final class TypeParameter implements ITypeParameter
 	{
 		boolean method = this.generic instanceof IMethod;
 		int typeRef = TypeReference.newTypeParameterReference(
-				method ? TypeReference.METHOD_TYPE_PARAMETER : TypeReference.CLASS_TYPE_PARAMETER, this.index);
+			method ? TypeReference.METHOD_TYPE_PARAMETER : TypeReference.CLASS_TYPE_PARAMETER, this.index);
 
 		if (this.variance != Variance.INVARIANT)
 		{
 			String type = this.variance == Variance.CONTRAVARIANT ?
-					              "Ldyvil/annotation/_internal/Contravariant;" :
-					              "Ldyvil/annotation/_internal/Covariant;";
-			visitor.visitTypeAnnotation(typeRef, null, type, true);
-		}
-
-		for (int i = 0; i < this.upperBoundCount; i++)
-		{
-			typeRef = TypeReference.newTypeParameterBoundReference(
-					method ? TypeReference.METHOD_TYPE_PARAMETER_BOUND : TypeReference.CLASS_TYPE_PARAMETER_BOUND,
-					this.index, i);
-			this.upperBounds[i].writeAnnotations(visitor, typeRef, "");
+				              "Ldyvil/annotation/_internal/Contravariant;" :
+				              "Ldyvil/annotation/_internal/Covariant;";
+			visitor.visitTypeAnnotation(typeRef, null, type, true).visitEnd();
 		}
 
 		if (this.annotations != null)
@@ -643,6 +635,14 @@ public final class TypeParameter implements ITypeParameter
 			{
 				this.annotations.getAnnotation(i).write(visitor, typeRef, null);
 			}
+		}
+
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			final int boundTypeRef = TypeReference.newTypeParameterBoundReference(
+				method ? TypeReference.METHOD_TYPE_PARAMETER_BOUND : TypeReference.CLASS_TYPE_PARAMETER_BOUND,
+				this.index, i);
+			this.upperBounds[i].writeAnnotations(visitor, boundTypeRef, "");
 		}
 	}
 

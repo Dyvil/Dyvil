@@ -1,21 +1,21 @@
 package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.ast.IASTNode;
-import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public class VoidValue implements IConstantValue
 {
 	protected ICodePosition position;
-	
+
+	public VoidValue()
+	{
+	}
+
 	public VoidValue(ICodePosition position)
 	{
 		this.position = position;
@@ -38,31 +38,25 @@ public class VoidValue implements IConstantValue
 	{
 		this.position = position;
 	}
-	
+
+	@Override
+	public boolean isStatement()
+	{
+		return true;
+	}
+
+	@Override
+	public boolean isUsableAsStatement()
+	{
+		return true;
+	}
+
 	@Override
 	public IType getType()
 	{
 		return Types.VOID;
 	}
-	
-	@Override
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
-	{
-		return type == Types.VOID || type.isSuperTypeOf(Types.VOID) ? this : null;
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return type == Types.VOID || type.isSuperTypeOf(Types.VOID);
-	}
-	
-	@Override
-	public float getTypeMatch(IType type)
-	{
-		return type.getSubTypeDistance(Types.VOID);
-	}
-	
+
 	@Override
 	public int stringSize()
 	{
@@ -78,12 +72,12 @@ public class VoidValue implements IConstantValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		if (type == Types.VOID)
+		if (type == null || Types.isSameType(type, Types.VOID))
 		{
 			return;
 		}
 
-		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/lang/Void", "instance", "Ldyvil/lang/Void;");
+		writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvil/lang/Void", "instance", "Ldyvil/lang/Void;");
 	}
 
 	@Override

@@ -47,7 +47,7 @@ public class IterableForStatement extends ForEachStatement
 
 		// Scope
 		dyvil.tools.asm.Label scopeLabel = new dyvil.tools.asm.Label();
-		writer.writeLabel(scopeLabel);
+		writer.visitLabel(scopeLabel);
 		int localCount = writer.localCount();
 
 		// Get the iterator
@@ -55,8 +55,8 @@ public class IterableForStatement extends ForEachStatement
 
 		if (!this.iterator)
 		{
-			writer.writeLineNumber(lineNumber);
-			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "java/lang/Iterable", "iterator", "()Ljava/util/Iterator;",
+			writer.visitLineNumber(lineNumber);
+			writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/lang/Iterable", "iterator", "()Ljava/util/Iterator;",
 			                       true);
 		}
 
@@ -65,21 +65,21 @@ public class IterableForStatement extends ForEachStatement
 		var.setLocalIndex(iteratorVarIndex + 1);
 
 		// Store Iterator
-		writer.writeVarInsn(Opcodes.ASTORE, iteratorVarIndex);
+		writer.visitVarInsn(Opcodes.ASTORE, iteratorVarIndex);
 
 		// Jump to hasNext check
-		writer.writeJumpInsn(Opcodes.GOTO, updateLabel);
-		writer.writeTargetLabel(startLabel);
+		writer.visitJumpInsn(Opcodes.GOTO, updateLabel);
+		writer.visitTargetLabel(startLabel);
 
 		// Invoke Iterator.next()
-		writer.writeVarInsn(Opcodes.ALOAD, iteratorVarIndex);
-		writer.writeLineNumber(lineNumber);
-		writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "java/util/Iterator", "next", "()Ljava/lang/Object;", true);
+		writer.visitVarInsn(Opcodes.ALOAD, iteratorVarIndex);
+		writer.visitLineNumber(lineNumber);
+		writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/Iterator", "next", "()Ljava/lang/Object;", true);
 		// Auocasting
 		Types.OBJECT.writeCast(writer, varType, lineNumber);
 
 		// Store the next element
-		writer.writeVarInsn(varType.getStoreOpcode(), iteratorVarIndex + 1);
+		writer.visitVarInsn(varType.getStoreOpcode(), iteratorVarIndex + 1);
 
 		// Action
 		if (this.action != null)
@@ -87,18 +87,18 @@ public class IterableForStatement extends ForEachStatement
 			this.action.writeExpression(writer, Types.VOID);
 		}
 
-		writer.writeLabel(updateLabel);
+		writer.visitLabel(updateLabel);
 		// Load Iterator
-		writer.writeVarInsn(Opcodes.ALOAD, iteratorVarIndex);
+		writer.visitVarInsn(Opcodes.ALOAD, iteratorVarIndex);
 		// Check hasNext
-		writer.writeLineNumber(lineNumber);
-		writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, "java/util/Iterator", "hasNext", "()Z", true);
+		writer.visitLineNumber(lineNumber);
+		writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/Iterator", "hasNext", "()Z", true);
 		// Go back to start if Iterator.hasNext() returned true
-		writer.writeJumpInsn(Opcodes.IFNE, startLabel);
+		writer.visitJumpInsn(Opcodes.IFNE, startLabel);
 
 		// Local Variables
 		writer.resetLocals(localCount);
-		writer.writeLabel(endLabel);
+		writer.visitLabel(endLabel);
 
 		var.writeLocal(writer, scopeLabel, endLabel);
 	}

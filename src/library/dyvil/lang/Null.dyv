@@ -2,5 +2,5 @@ package dyvil.lang
 
 public final object Null
 {
-	public static Null apply() = instance
+	public static inline Null apply() = instance
 }

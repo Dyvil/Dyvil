@@ -10,17 +10,17 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class TypeListParser extends Parser
 {
-	private static final int TYPE  = 0;
-	private static final int COMMA = 1;
+	private static final int TYPE      = 0;
+	private static final int SEPARATOR = 1;
 
 	protected ITypeConsumer consumer;
-	
+
 	public TypeListParser(ITypeConsumer consumer)
 	{
 		this.consumer = consumer;
-		this.mode = TYPE;
+		// this.mode = TYPE;
 	}
-	
+
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
@@ -28,23 +28,21 @@ public final class TypeListParser extends Parser
 		switch (this.mode)
 		{
 		case TYPE:
-			this.mode = 1;
-			pm.pushParser(pm.newTypeParser(this.consumer), true);
+			this.mode = SEPARATOR;
+			pm.pushParser(new TypeParser(this.consumer), true);
 			return;
-		case COMMA:
+		case SEPARATOR:
 			if (ParserUtil.isCloseBracket(type) || type == BaseSymbols.OPEN_CURLY_BRACKET
-					|| type == BaseSymbols.SEMICOLON || type == Tokens.EOF)
+				    || type == BaseSymbols.SEMICOLON || type == Tokens.EOF)
 			{
 				pm.popParser(true);
 				return;
 			}
 			this.mode = TYPE;
-			if (type == BaseSymbols.COMMA)
+			if (type != BaseSymbols.COMMA)
 			{
-				return;
+				pm.report(token, "type.list.comma");
 			}
-			pm.report(token, "type.list.comma");
-			return;
 		}
 	}
 }

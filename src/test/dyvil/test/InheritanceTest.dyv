@@ -2,32 +2,81 @@ package dyvil.test
 
 public class InheritanceTest
 {
-	interface IFoo[T] {
-		public T foo()
+	trait IFoo[T]
+	{
+		void onFooInit()
+
+		init { this.onFooInit }
 	}
-	
-	interface IBar[T] {
-		public T bar()
+
+	trait IBar[T]
+	{
+		T bar()
 	}
-	
-	interface IFooBar[T] extends IFoo[T], IBar[T]
-	
+
+	interface IFooBar[T] extends IFoo, IBar[T]
+
 	class FooBar implements IFooBar[String]
 	{
-		public override String foo() = "FooBar.foo"
 		public override String bar() = "FooBar.bar"
+
+		public override void onFooInit() {}
 	}
-	
-	class FooFoo implements IFoo[Object] {
-		public override Object foo() = "FooFoo.foo"
+
+	// Double-Layer Trait Initialization
+
+	class Foo1 implements IFoo
+	{
+		public boolean fooInit
+
+		public override void onFooInit() = this.fooInit = true
 	}
-	
+
+	class Foo2 extends Foo1 implements IFoo
+	{
+		public int foo2Init
+
+		public override void onFooInit() = this.foo2Init++
+	}
+
+	// Trait Constructor Test
+
+	trait WithName
+	{
+		String name
+		{
+			abstract get
+			abstract set
+
+			init
+			{
+				this.name = ""
+			}
+		}
+	}
+
+	class Person(String name) implements WithName
+	{
+		public override String name
+		{
+			get: return this.name
+			set: this.name = newValue
+		}
+	}
+
 	public static void main([String] args)
 	{
-		var ff = new FooFoo().foo
-		var fb = new FooBar().foo
+		var foo1 = new Foo1
+		var foo2 = new Foo2
+		var fooBar = new FooBar
 
-		Main.test("Simple Interface Test", ff, "FooFoo.foo")
-		Main.test("Double-Layer Interface Test", fb, "FooBar.foo")
+		Main.test("Double-Layer Interface Test", fooBar.bar, "FooBar.bar")
+		Main.test("Trait Initialization Test", foo1.fooInit)
+
+		// Check that Foo2.onFooInit has only been called once
+		Main.test("Double-Layer Trait Initialization Test", 1, foo2.foo2Init)
+
+		var person = new Person("Test Subject")
+		Main.test("Trait Constructor Test", "Test Subject", person.name)
 	}
 }

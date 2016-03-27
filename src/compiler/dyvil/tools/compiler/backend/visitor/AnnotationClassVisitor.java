@@ -56,8 +56,9 @@ public class AnnotationClassVisitor implements MethodVisitor
 	}
 	
 	@Override
-	public void visitCode()
+	public boolean visitCode()
 	{
+		return false;
 	}
 	
 	@Override

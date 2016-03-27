@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
@@ -66,16 +67,19 @@ public interface IPattern extends IASTNode, ITyped
 			return pattern;
 		}
 
-		if (type.isSuperTypeOf(primitiveType))
+		if (Types.isSuperType(type, primitiveType))
 		{
 			return new TypeCheckPattern(pattern, type, primitiveType);
 		}
 		return null;
 	}
-	
+
 	@Override
-	boolean isType(IType type);
-	
+	default boolean isType(IType type)
+	{
+		return Types.isSuperType(type, this.getType());
+	}
+
 	default IDataMember resolveField(Name name)
 	{
 		return null;
@@ -125,7 +129,7 @@ public interface IPattern extends IASTNode, ITyped
 	{
 		if (varIndex >= 0)
 		{
-			writer.writeVarInsn(matchedType.getLoadOpcode(), varIndex);
+			writer.visitVarInsn(matchedType.getLoadOpcode(), varIndex);
 		}
 	}
 
@@ -134,7 +138,7 @@ public interface IPattern extends IASTNode, ITyped
 		if (varIndex < 0)
 		{
 			varIndex = writer.localCount();
-			writer.writeVarInsn(matchedType.getStoreOpcode(), varIndex);
+			writer.visitVarInsn(matchedType.getStoreOpcode(), varIndex);
 		}
 		return varIndex;
 	}
@@ -144,8 +148,8 @@ public interface IPattern extends IASTNode, ITyped
 	{
 		final Label rightLabel = new Label();
 		this.writeInvJump(writer, varIndex, matchedType, rightLabel);
-		writer.writeJumpInsn(Opcodes.GOTO, targetLabel);
-		writer.writeLabel(rightLabel);
+		writer.visitJumpInsn(Opcodes.GOTO, targetLabel);
+		writer.visitLabel(rightLabel);
 	}
 	
 	void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel) throws BytecodeException;

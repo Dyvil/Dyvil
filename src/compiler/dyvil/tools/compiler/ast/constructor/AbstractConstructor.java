@@ -2,8 +2,6 @@ package dyvil.tools.compiler.ast.constructor;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.access.InitializerCall;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -16,20 +14,14 @@ import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
-import dyvil.tools.compiler.ast.statement.StatementList;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
-import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Deprecation;
@@ -37,16 +29,12 @@ import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
 import java.lang.annotation.ElementType;
 
-public class Constructor extends Member implements IConstructor, IDefaultContext
+public abstract class AbstractConstructor extends Member implements IConstructor, IDefaultContext
 {
 	protected IParameter[] parameters = new IParameter[3];
 	protected int parameterCount;
@@ -54,24 +42,22 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 	protected IType[] exceptions;
 	protected int     exceptionCount;
 
-	protected IValue value;
-
 	// Metadata
 	protected IClass enclosingClass;
 
-	public Constructor(IClass enclosingClass)
+	public AbstractConstructor(IClass enclosingClass)
 	{
 		super(Names.init, Types.VOID);
 		this.enclosingClass = enclosingClass;
 	}
 
-	public Constructor(IClass enclosingClass, ModifierSet modifiers)
+	public AbstractConstructor(IClass enclosingClass, ModifierSet modifiers)
 	{
 		super(Names.init, Types.VOID, modifiers);
 		this.enclosingClass = enclosingClass;
 	}
 
-	public Constructor(ICodePosition position, ModifierSet modifiers, AnnotationList annotations)
+	public AbstractConstructor(ICodePosition position, ModifierSet modifiers, AnnotationList annotations)
 	{
 		super(position, Names.init, Types.VOID, modifiers, annotations);
 	}
@@ -224,240 +210,6 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 	}
 
 	@Override
-	public void setValue(IValue statement)
-	{
-		this.value = statement;
-	}
-
-	@Override
-	public IValue getValue()
-	{
-		return this.value;
-	}
-
-	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
-	{
-		context = context.push(this);
-
-		super.resolveTypes(markers, context);
-
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].resolveTypes(markers, context);
-		}
-
-		for (int i = 0; i < this.exceptionCount; i++)
-		{
-			this.exceptions[i] = this.exceptions[i].resolveType(markers, context);
-		}
-
-		if (this.value != null)
-		{
-			this.value.resolveTypes(markers, context);
-		}
-
-		context.pop();
-	}
-
-	@Override
-	public void resolve(MarkerList markers, IContext context)
-	{
-		super.resolve(markers, context);
-
-		context = context.push(this);
-
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].resolve(markers, context);
-		}
-
-		for (int i = 0; i < this.exceptionCount; i++)
-		{
-			this.exceptions[i].resolve(markers, context);
-		}
-
-		this.resolveSuperConstructors(markers);
-
-		if (this.value != null)
-		{
-			this.value = this.value.resolve(markers, context);
-
-			final IValue typedValue = this.value.withType(Types.VOID, Types.VOID, markers, context);
-			if (typedValue == null)
-			{
-				Marker marker = Markers.semantic(this.position, "constructor.return.type");
-				marker.addInfo(Markers.getSemantic("return.type", this.value.getType()));
-				markers.add(marker);
-			}
-			else
-			{
-				this.value = typedValue;
-			}
-		}
-
-		context.pop();
-	}
-
-	private void resolveSuperConstructors(MarkerList markers)
-	{
-		if (this.value.valueTag() == IValue.INITIALIZER_CALL)
-		{
-			return;
-		}
-		if (this.value.valueTag() == IValue.STATEMENT_LIST)
-		{
-			StatementList sl = (StatementList) this.value;
-			int count = sl.valueCount();
-			for (int i = 0; i < count; i++)
-			{
-				if (sl.getValue(i).valueTag() == IValue.INITIALIZER_CALL)
-				{
-					return;
-				}
-			}
-		}
-
-		// No Super Type -> don't try to resolve a Super Constructor
-		final IType superType = this.enclosingClass.getSuperType();
-		if (superType == null)
-		{
-			return;
-		}
-
-		// Implicit Super Constructor
-		final IConstructor match = IContext.resolveConstructor(superType, EmptyArguments.INSTANCE);
-		if (match == null)
-		{
-			markers.add(Markers.semantic(this.position, "constructor.super"));
-			return;
-		}
-
-		this.value = Util.prependValue(new InitializerCall(this.position, match, EmptyArguments.INSTANCE, true),
-		                               this.value);
-	}
-
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		context = context.push(this);
-
-		super.checkTypes(markers, context);
-
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].checkTypes(markers, context);
-		}
-
-		for (int i = 0; i < this.exceptionCount; i++)
-		{
-			this.exceptions[i].checkType(markers, context, TypePosition.RETURN_TYPE);
-		}
-
-		if (this.value != null)
-		{
-			this.value.checkTypes(markers, context);
-		}
-		else
-		{
-			markers.add(Markers.semanticError(this.position, "constructor.abstract"));
-		}
-
-		context.pop();
-	}
-
-	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-		context = context.push(this);
-
-		super.check(markers, context);
-
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].check(markers, context);
-		}
-
-		for (int i = 0; i < this.exceptionCount; i++)
-		{
-			final IType exceptionType = this.exceptions[i];
-			exceptionType.check(markers, context);
-
-			if (!Types.THROWABLE.isSuperTypeOf(exceptionType))
-			{
-				Marker marker = Markers.semantic(exceptionType.getPosition(), "method.exception.type");
-				marker.addInfo(Markers.getSemantic("exception.type", exceptionType));
-				markers.add(marker);
-			}
-		}
-
-		if (this.value != null)
-		{
-			this.value.check(markers, this);
-		}
-		else if (!this.modifiers.hasIntModifier(Modifiers.ABSTRACT) && !this.enclosingClass.isAbstract())
-		{
-			markers.add(Markers.semantic(this.position, "constructor.unimplemented", this.name));
-		}
-
-		if (this.isStatic())
-		{
-			markers.add(Markers.semantic(this.position, "constructor.static", this.name));
-		}
-
-		context.pop();
-	}
-
-	@Override
-	public void foldConstants()
-	{
-		if (this.annotations != null)
-		{
-			this.annotations.foldConstants();
-		}
-
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].foldConstants();
-		}
-
-		for (int i = 0; i < this.exceptionCount; i++)
-		{
-			this.exceptions[i].foldConstants();
-		}
-
-		if (this.value != null)
-		{
-			this.value = this.value.foldConstants();
-		}
-	}
-
-	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
-	{
-		context = context.push(this);
-
-		super.cleanup(context, compilableList);
-
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].cleanup(context, compilableList);
-		}
-
-		for (int i = 0; i < this.exceptionCount; i++)
-		{
-			this.exceptions[i].cleanup(context, compilableList);
-		}
-
-		if (this.value != null)
-		{
-			this.value = this.value.cleanup(context, compilableList);
-		}
-
-		context.pop();
-	}
-
-	@Override
 	public boolean isStatic()
 	{
 		return false;
@@ -506,7 +258,7 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 	{
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			if (this.exceptions[i].isSuperTypeOf(type))
+			if (Types.isSuperType(this.exceptions[i], type))
 			{
 				return TRUE;
 			}
@@ -536,11 +288,7 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 	@Override
 	public IDataMember capture(IVariable variable)
 	{
-		if (this.isMember(variable))
-		{
-			return variable;
-		}
-		return null;
+		return variable;
 	}
 
 	@Override
@@ -666,17 +414,7 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 	@Override
 	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IArguments arguments)
 	{
-		Deprecation.checkAnnotations(markers, position, this);
-
-		switch (IContext.getVisibility(context, this))
-		{
-		case INTERNAL:
-			markers.add(Markers.semantic(position, "constructor.access.internal", this.enclosingClass.getName()));
-			break;
-		case INVISIBLE:
-			markers.add(Markers.semantic(position, "constructor.access.invisible", this.enclosingClass.getName()));
-			break;
-		}
+		ModifierUtil.checkVisibility(this, position, markers, context);
 
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
@@ -736,69 +474,13 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 	}
 
 	@Override
-	public void write(ClassWriter writer) throws BytecodeException
-	{
-		int modifiers = this.modifiers.toFlags() & ModifierUtil.JAVA_MODIFIER_MASK;
-		MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, "<init>", this.getDescriptor(),
-		                                                                  this.getSignature(), this.getExceptions()));
-
-		mw.setThisType(this.enclosingClass.getInternalName());
-
-		if (this.annotations != null)
-		{
-			int count = this.annotations.annotationCount();
-			for (int i = 0; i < count; i++)
-			{
-				this.annotations.getAnnotation(i).write(mw);
-			}
-		}
-
-		if ((modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
-		{
-			mw.visitAnnotation(Deprecation.DYVIL_EXTENDED, true);
-		}
-
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].writeInit(mw);
-		}
-
-		Label start = new Label();
-		Label end = new Label();
-
-		mw.begin();
-		mw.writeLabel(start);
-
-		if (this.value != null)
-		{
-			this.value.writeExpression(mw, Types.VOID);
-		}
-		this.enclosingClass.writeInit(mw);
-
-		mw.writeLabel(end);
-		mw.end(Types.VOID);
-
-		if ((modifiers & Modifiers.STATIC) == 0)
-		{
-			mw.writeLocal(0, "this", 'L' + this.enclosingClass.getInternalName() + ';', null, start, end);
-		}
-
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			IParameter param = this.parameters[i];
-			mw.writeLocal(param.getLocalIndex(), param.getName().qualified, param.getDescription(),
-			              param.getSignature(), start, end);
-		}
-	}
-
-	@Override
 	public void writeCall(MethodWriter writer, IArguments arguments, IType type, int lineNumber)
 		throws BytecodeException
 	{
-		writer.writeTypeInsn(Opcodes.NEW, this.enclosingClass.getInternalName());
+		writer.visitTypeInsn(Opcodes.NEW, this.enclosingClass.getInternalName());
 		if (type != Types.VOID)
 		{
-			writer.writeInsn(Opcodes.DUP);
+			writer.visitInsn(Opcodes.DUP);
 		}
 
 		this.writeArguments(writer, arguments);
@@ -808,12 +490,12 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 	@Override
 	public void writeInvoke(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
-		writer.writeLineNumber(lineNumber);
+		writer.visitLineNumber(lineNumber);
 
 		String owner = this.enclosingClass.getInternalName();
 		String name = "<init>";
 		String desc = this.getDescriptor();
-		writer.writeInvokeInsn(Opcodes.INVOKESPECIAL, owner, name, desc, false);
+		writer.visitMethodInsn(Opcodes.INVOKESPECIAL, owner, name, desc, false);
 	}
 
 	@Override
@@ -837,64 +519,6 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 		{
 			IParameter param = this.parameters[i];
 			arguments.writeValue(i, param, writer);
-		}
-	}
-
-	@Override
-	public void writeSignature(DataOutput out) throws IOException
-	{
-		out.writeByte(this.parameterCount);
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			IType.writeType(this.parameters[i].getType(), out);
-		}
-	}
-
-	@Override
-	public void write(DataOutput out) throws IOException
-	{
-		this.writeAnnotations(out);
-
-		out.writeByte(this.parameterCount);
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].write(out);
-		}
-	}
-
-	@Override
-	public void readSignature(DataInput in) throws IOException
-	{
-		int parameterCount = in.readByte();
-		if (this.parameterCount != 0)
-		{
-			for (int i = 0; i < parameterCount; i++)
-			{
-				this.parameters[i].setType(IType.readType(in));
-			}
-			this.parameterCount = parameterCount;
-			return;
-		}
-
-		this.parameters = new IParameter[parameterCount];
-		for (int i = 0; i < parameterCount; i++)
-		{
-			this.parameters[i] = new MethodParameter(Name.getQualified("par" + i), IType.readType(in));
-		}
-	}
-
-	@Override
-	public void read(DataInput in) throws IOException
-	{
-		this.readAnnotations(in);
-
-		int parameterCount = in.readByte();
-		this.parameters = new IParameter[parameterCount];
-		for (int i = 0; i < parameterCount; i++)
-		{
-			MethodParameter param = new MethodParameter();
-			param.read(in);
-			this.parameters[i] = param;
 		}
 	}
 
@@ -928,9 +552,14 @@ public class Constructor extends Member implements IConstructor, IDefaultContext
 			                 Formatting.getSeparator("constructor.throws", ','), buffer);
 		}
 
-		if (this.value != null)
+		final IValue value = this.getValue();
+		if (value != null)
 		{
-			Util.formatStatementList(prefix, buffer, this.value);
+			if (!Util.formatStatementList(prefix, buffer, value))
+			{
+				buffer.append(" = ");
+				value.toString(prefix, buffer);
+			}
 		}
 
 		if (Formatting.getBoolean("constructor.semicolon"))

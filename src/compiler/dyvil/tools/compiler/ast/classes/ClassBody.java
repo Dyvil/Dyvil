@@ -1,21 +1,25 @@
 package dyvil.tools.compiler.ast.classes;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
@@ -26,10 +30,10 @@ import dyvil.tools.parsing.position.ICodePosition;
 public class ClassBody implements IClassBody
 {
 	public IClass theClass;
-	
+
 	public IClass[] classes;
 	public int      classCount;
-	
+
 	private IField[] fields = new IField[3];
 	private int fieldCount;
 	private IProperty[] properties = new IProperty[3];
@@ -42,43 +46,43 @@ public class ClassBody implements IClassBody
 	private int initializerCount;
 
 	protected IMethod functionalMethod;
-	
+
 	public ClassBody(IClass iclass)
 	{
 		this.theClass = iclass;
 	}
-	
+
 	@Override
 	public ICodePosition getPosition()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public void setPosition(ICodePosition position)
 	{
 	}
-	
+
 	@Override
 	public void setTheClass(IClass theClass)
 	{
 		this.theClass = theClass;
 	}
-	
+
 	@Override
 	public IClass getTheClass()
 	{
 		return this.theClass;
 	}
-	
+
 	// Nested Classes
-	
+
 	@Override
 	public int classCount()
 	{
 		return this.classCount;
 	}
-	
+
 	@Override
 	public void addClass(IClass iclass)
 	{
@@ -91,7 +95,7 @@ public class ClassBody implements IClassBody
 			this.classCount = 1;
 			return;
 		}
-		
+
 		int index = this.classCount++;
 		if (index >= this.classes.length)
 		{
@@ -101,13 +105,13 @@ public class ClassBody implements IClassBody
 		}
 		this.classes[index] = iclass;
 	}
-	
+
 	@Override
 	public IClass getClass(int index)
 	{
 		return this.classes[index];
 	}
-	
+
 	@Override
 	public IClass getClass(Name name)
 	{
@@ -121,36 +125,42 @@ public class ClassBody implements IClassBody
 		}
 		return null;
 	}
-	
+
 	// Fields
-	
+
 	@Override
 	public int fieldCount()
 	{
 		return this.fieldCount;
 	}
-	
+
 	@Override
-	public void addField(IField field)
+	public void addDataMember(IField field)
 	{
 		field.setEnclosingClass(this.theClass);
 
-		int index = this.fieldCount++;
+		final int index = this.fieldCount++;
 		if (index >= this.fields.length)
 		{
-			IField[] temp = new IField[this.fieldCount];
+			IField[] temp = new IField[index * 2];
 			System.arraycopy(this.fields, 0, temp, 0, index);
 			this.fields = temp;
 		}
 		this.fields[index] = field;
 	}
-	
+
+	@Override
+	public IField createDataMember(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	{
+		return new Field(position, name, type, modifiers, annotations);
+	}
+
 	@Override
 	public IField getField(int index)
 	{
 		return this.fields[index];
 	}
-	
+
 	@Override
 	public IField getField(Name name)
 	{
@@ -164,15 +174,15 @@ public class ClassBody implements IClassBody
 		}
 		return null;
 	}
-	
+
 	// Properties
-	
+
 	@Override
 	public int propertyCount()
 	{
 		return this.propertyCount;
 	}
-	
+
 	@Override
 	public void addProperty(IProperty property)
 	{
@@ -187,13 +197,13 @@ public class ClassBody implements IClassBody
 		}
 		this.properties[index] = property;
 	}
-	
+
 	@Override
 	public IProperty getProperty(int index)
 	{
 		return this.properties[index];
 	}
-	
+
 	@Override
 	public IProperty getProperty(Name name)
 	{
@@ -221,10 +231,10 @@ public class ClassBody implements IClassBody
 	{
 		method.setEnclosingClass(this.theClass);
 
-		int index = this.methodCount++;
+		final int index = this.methodCount++;
 		if (index >= this.methods.length)
 		{
-			IMethod[] temp = new IMethod[this.methodCount];
+			final IMethod[] temp = new IMethod[index * 2];
 			System.arraycopy(this.methods, 0, temp, 0, index);
 			this.methods = temp;
 		}
@@ -267,38 +277,23 @@ public class ClassBody implements IClassBody
 	@Override
 	public IMethod getFunctionalMethod()
 	{
-		if (this.functionalMethod != null)
-		{
-			return this.functionalMethod;
-		}
-
-		boolean found = false;
-		IMethod match = null;
-		for (int i = 0; i < this.methodCount; i++)
-		{
-			IMethod m = this.methods[i];
-			if (m.isAbstract())
-			{
-				if (found)
-				{
-					return null;
-				}
-
-				found = true;
-				match = m;
-			}
-		}
-		return this.functionalMethod = match;
+		return this.functionalMethod;
 	}
-	
+
+	@Override
+	public void setFunctionalMethod(IMethod functionalMethod)
+	{
+		this.functionalMethod = functionalMethod;
+	}
+
 	// Constructors
-	
+
 	@Override
 	public int constructorCount()
 	{
 		return this.constructorCount;
 	}
-	
+
 	@Override
 	public void addConstructor(IConstructor constructor)
 	{
@@ -313,13 +308,13 @@ public class ClassBody implements IClassBody
 		}
 		this.constructors[index] = constructor;
 	}
-	
+
 	@Override
 	public IConstructor getConstructor(int index)
 	{
 		return this.constructors[index];
 	}
-	
+
 	@Override
 	public IConstructor getConstructor(IParameter[] parameters, int parameterCount)
 	{
@@ -331,23 +326,23 @@ public class ClassBody implements IClassBody
 			{
 				continue;
 			}
-			
+
 			for (int p = 0; p < parameterCount; p++)
 			{
 				IType classParamType = parameters[p].getType();
 				IType constructorParamType = c.getParameter(p).getType();
-				if (!classParamType.isSameType(constructorParamType))
+				if (!Types.isSameType(classParamType, constructorParamType))
 				{
 					continue outer;
 				}
 			}
-			
+
 			return c;
 		}
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
@@ -392,7 +387,7 @@ public class ClassBody implements IClassBody
 	}
 
 	// Phases
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -425,7 +420,7 @@ public class ClassBody implements IClassBody
 			this.initializers[i].resolveTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
@@ -454,7 +449,7 @@ public class ClassBody implements IClassBody
 			this.initializers[i].resolve(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -485,11 +480,11 @@ public class ClassBody implements IClassBody
 	}
 
 	@Override
-	public boolean checkImplements(MarkerList markers, IClass checkedClass, IMethod candidate, ITypeContext typeContext)
+	public boolean checkImplements(IMethod candidate, ITypeContext typeContext)
 	{
 		for (int i = 0; i < this.methodCount; i++)
 		{
-			if (checkOverride(this.methods[i], markers, checkedClass, candidate, typeContext))
+			if (checkOverride(this.methods[i], candidate, typeContext))
 			{
 				return true;
 			}
@@ -499,13 +494,13 @@ public class ClassBody implements IClassBody
 			final IProperty property = this.properties[i];
 
 			final IMethod getter = property.getGetter();
-			if (getter != null && checkOverride(getter, markers, checkedClass, candidate, typeContext))
+			if (getter != null && checkOverride(getter, candidate, typeContext))
 			{
 				return true;
 			}
 
 			final IMethod setter = property.getSetter();
-			if (setter != null && checkOverride(setter, markers, checkedClass, candidate, typeContext))
+			if (setter != null && checkOverride(setter, candidate, typeContext))
 			{
 				return true;
 			}
@@ -513,10 +508,14 @@ public class ClassBody implements IClassBody
 		return false;
 	}
 
-	private static boolean checkOverride(IMethod method, MarkerList markers, IClass checkedClass, IMethod candidate, ITypeContext typeContext)
+	private static boolean checkOverride(IMethod method, IMethod candidate, ITypeContext typeContext)
 	{
-		return method.checkOverride(markers, checkedClass, candidate, typeContext) && !method
-				.hasModifier(Modifiers.ABSTRACT);
+		if (method.checkOverride(candidate, typeContext))
+		{
+			method.addOverride(candidate);
+			return !method.hasModifier(Modifiers.ABSTRACT);
+		}
+		return false;
 	}
 
 	@Override
@@ -556,7 +555,7 @@ public class ClassBody implements IClassBody
 		// Check if the super class implements the method
 		// We cannot do the modifier checks beforehand, because methods need to know which methods they implement to
 		// generate bridges.
-		if (checkedClass.checkImplements(markers, checkedClass, candidate, typeContext))
+		if (checkedClass.checkImplements(candidate, typeContext))
 		{
 			return;
 		}
@@ -569,7 +568,7 @@ public class ClassBody implements IClassBody
 			                             candidate.getName(), this.theClass.getName()));
 		}
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
@@ -598,7 +597,7 @@ public class ClassBody implements IClassBody
 			this.initializers[i].check(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void foldConstants()
 	{
@@ -627,9 +626,9 @@ public class ClassBody implements IClassBody
 			this.initializers[i].foldConstants();
 		}
 	}
-	
+
 	@Override
-	public void cleanup( IContext context)
+	public void cleanup(IContext context)
 	{
 		final IClassCompilableList compilableList = this.theClass;
 
@@ -658,11 +657,11 @@ public class ClassBody implements IClassBody
 			this.initializers[i].cleanup(context, compilableList);
 		}
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		String bodyPrefix = Formatting.getIndent("class.body.indent", prefix);
+		final String bodyPrefix = Formatting.getIndent("class.body.indent", prefix);
 		if (Formatting.getBoolean("class.body.open_bracket.newline"))
 		{
 			buffer.append('\n').append(prefix);
@@ -672,14 +671,20 @@ public class ClassBody implements IClassBody
 			buffer.append(' ');
 		}
 
-		buffer.append('{').append('\n');
+		buffer.append('{').append('\n').append(bodyPrefix);
 		this.bodyToString(bodyPrefix, buffer);
-		buffer.append(prefix).append('}');
 
-		if (Formatting.getBoolean("class.body.close_bracket.newline_after"))
+		// Trim extra lines
+
+		final int length = buffer.length();
+		final int index = length - bodyPrefix.length();
+		if (buffer.indexOf(bodyPrefix, index) == index)
 		{
-			buffer.append('\n');
+			buffer.delete(index - 1, length);
+			buffer.append(prefix);
 		}
+
+		buffer.append('}');
 	}
 
 	private void bodyToString(String prefix, StringBuilder buffer)
@@ -700,9 +705,9 @@ public class ClassBody implements IClassBody
 					buffer.append(';');
 				}
 
-				buffer.append('\n');
+				buffer.append('\n').append(prefix);
 			}
-			buffer.append('\n');
+			buffer.append('\n').append(prefix);
 		}
 
 		if (this.constructorCount > 0)
@@ -722,24 +727,16 @@ public class ClassBody implements IClassBody
 
 		if (this.methodCount > 0)
 		{
-			for (int i = 0; i < this.methodCount; i++)
-			{
-				this.methods[i].toString(prefix, buffer);
-				buffer.append('\n');
-				if (i + 1 < this.methodCount)
-				{
-					buffer.append('\n');
-				}
-			}
+			this.membersToString(prefix, this.methods, this.methodCount, buffer);
 		}
 	}
 
-	private void membersToString(String prefix, IASTNode[] constructors, int count, StringBuilder buffer)
+	private void membersToString(String prefix, IASTNode[] members, int count, StringBuilder buffer)
 	{
 		for (int i = 0; i < count; i++)
 		{
-			constructors[i].toString(prefix, buffer);
-			buffer.append('\n');
+			members[i].toString(prefix, buffer);
+			buffer.append('\n').append('\n').append(prefix);
 		}
 	}
 }

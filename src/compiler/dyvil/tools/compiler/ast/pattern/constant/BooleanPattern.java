@@ -40,12 +40,6 @@ public final class BooleanPattern extends Pattern
 	}
 	
 	@Override
-	public boolean isType(IType type)
-	{
-		return type == Types.BOOLEAN || type.isSuperTypeOf(Types.BOOLEAN);
-	}
-	
-	@Override
 	public boolean isSwitchable()
 	{
 		return true;
@@ -81,7 +75,7 @@ public final class BooleanPattern extends Pattern
 	{
 		IPattern.loadVar(writer, varIndex, matchedType);
 		matchedType.writeCast(writer, Types.BOOLEAN, this.getLineNumber());
-		writer.writeJumpInsn(this.value ? Opcodes.IFEQ : Opcodes.IFNE, elseLabel);
+		writer.visitJumpInsn(this.value ? Opcodes.IFEQ : Opcodes.IFNE, elseLabel);
 	}
 	
 	@Override

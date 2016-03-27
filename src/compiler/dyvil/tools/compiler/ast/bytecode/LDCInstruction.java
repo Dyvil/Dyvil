@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.bytecode;
 
 import dyvil.tools.asm.MethodVisitor;
+import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 
 public class LDCInstruction implements IInstruction
@@ -11,7 +12,13 @@ public class LDCInstruction implements IInstruction
 	{
 		this.argument = value;
 	}
-	
+
+	@Override
+	public int getOpcode()
+	{
+		return Opcodes.LDC;
+	}
+
 	@Override
 	public void write(MethodVisitor writer) throws BytecodeException
 	{

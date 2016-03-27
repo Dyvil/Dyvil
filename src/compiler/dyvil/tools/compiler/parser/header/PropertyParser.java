@@ -1,16 +1,17 @@
-package dyvil.tools.compiler.parser.classes;
+package dyvil.tools.compiler.parser.header;
 
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.Property;
+import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
 import dyvil.tools.compiler.ast.modifiers.Modifier;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
+import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
+import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.statement.StatementListParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.Names;
@@ -35,13 +36,13 @@ public class PropertyParser extends Parser implements IValueConsumer
 
 	// --------------------------------------------------
 
-	protected Property property;
+	protected IProperty property;
 
 	// Metadata
 	private ModifierSet modifiers;
 	private byte        target;
 
-	public PropertyParser(Property property)
+	public PropertyParser(IProperty property)
 	{
 		this.property = property;
 		// this.mode = TAG; // pointless assignment to 0
@@ -66,7 +67,7 @@ public class PropertyParser extends Parser implements IValueConsumer
 			}
 			
 			final Modifier modifier;
-			if ((modifier = BaseModifiers.parseModifier(token, pm)) != null)
+			if ((modifier = ModifierUtil.parseModifier(token, pm)) != null)
 			{
 				if (this.modifiers == null)
 				{
@@ -117,7 +118,7 @@ public class PropertyParser extends Parser implements IValueConsumer
 			switch (type)
 			{
 			case BaseSymbols.COLON:
-				pm.pushParser(pm.newExpressionParser(this));
+				pm.pushParser(new ExpressionParser(this));
 				return;
 			case BaseSymbols.OPEN_CURLY_BRACKET:
 				pm.pushParser(new StatementListParser(this), true);
@@ -148,7 +149,6 @@ public class PropertyParser extends Parser implements IValueConsumer
 			{
 				pm.report(token, "property.setter.close_paren");
 			}
-			return;
 		}
 	}
 
@@ -175,7 +175,6 @@ public class PropertyParser extends Parser implements IValueConsumer
 			return;
 		case INITIALIZER:
 			this.property.setInitializer(value);
-			return;
 		}
 	}
 }

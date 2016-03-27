@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
+import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -21,19 +22,19 @@ public interface IObjectType extends IType
 	{
 		return false;
 	}
-	
+
 	@Override
 	default int getTypecode()
 	{
 		return -1;
 	}
-	
+
 	@Override
 	default ITypeParameter getTypeVariable()
 	{
 		return null;
 	}
-	
+
 	@Override
 	default IType getObjectType()
 	{
@@ -49,13 +50,13 @@ public interface IObjectType extends IType
 	@Override
 	default IType getSimpleRefType()
 	{
-		return Types.getObjectSimpleRef(this);
+		return ReferenceType.LazyFields.getObjectSimpleRef(this);
 	}
 
 	@Override
 	default IClass getRefClass()
 	{
-		return Types.getObjectRefClass();
+		return ReferenceType.LazyFields.OBJECT_REF_CLASS;
 	}
 
 	@Override
@@ -63,13 +64,13 @@ public interface IObjectType extends IType
 	{
 		return false;
 	}
-	
+
 	@Override
 	default int getArrayDimensions()
 	{
 		return 0;
 	}
-	
+
 	@Override
 	default IType getElementType()
 	{
@@ -90,61 +91,73 @@ public interface IObjectType extends IType
 	@Override
 	default IClass getArrayClass()
 	{
-		return Types.getObjectArray();
+		return Types.getObjectArrayClass();
 	}
-	
+
 	@Override
 	default IMethod getBoxMethod()
 	{
 		return null;
 	}
-	
+
 	@Override
 	default IMethod getUnboxMethod()
 	{
 		return null;
 	}
-	
+
 	@Override
-	default boolean classEquals(IType type)
+	default boolean isSameType(IType type)
 	{
-		return this.getTheClass() == type.getTheClass() && !type.isPrimitive();
+		return this == type || this.getTheClass() == type.getTheClass();
 	}
-	
+
+	@Override
+	default boolean isSameClass(IType type)
+	{
+		return this == type || this.getTheClass() == type.getTheClass() && !type.isPrimitive();
+	}
+
 	@Override
 	default int getLoadOpcode()
 	{
 		return Opcodes.ALOAD;
 	}
-	
+
 	@Override
 	default int getArrayLoadOpcode()
 	{
 		return Opcodes.AALOAD;
 	}
-	
+
 	@Override
 	default int getStoreOpcode()
 	{
 		return Opcodes.ASTORE;
 	}
-	
+
 	@Override
 	default int getArrayStoreOpcode()
 	{
 		return Opcodes.AASTORE;
 	}
-	
+
 	@Override
 	default int getReturnOpcode()
 	{
 		return Opcodes.ARETURN;
 	}
-	
+
 	@Override
 	default Object getFrameType()
 	{
 		return this.getInternalName();
+	}
+
+	@Override
+	default int getLocalSlots()
+	{
+		return 1;
 	}
 
 	@Override
@@ -168,11 +181,11 @@ public interface IObjectType extends IType
 		{
 			return;
 		}
-		
+
 		if (!target.isSuperClassOf(this))
 		{
-			writer.writeLineNumber(lineNumber);
-			writer.writeTypeInsn(Opcodes.CHECKCAST, target.getInternalName());
+			writer.visitLineNumber(lineNumber);
+			writer.visitTypeInsn(Opcodes.CHECKCAST, target.getInternalName());
 		}
 		if (target.isPrimitive())
 		{
@@ -184,15 +197,15 @@ public interface IObjectType extends IType
 	@Override
 	default void writeClassExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeLDC(Type.getObjectType(this.getInternalName()));
+		writer.visitLdcInsn(Type.getObjectType(this.getInternalName()));
 	}
 
 	@Override
 	default void writeDefaultValue(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeInsn(Opcodes.ACONST_NULL);
+		writer.visitInsn(Opcodes.ACONST_NULL);
 	}
-	
+
 	@Override
 	default IConstantValue getDefaultValue()
 	{

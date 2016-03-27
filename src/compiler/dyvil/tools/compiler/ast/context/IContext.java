@@ -51,31 +51,31 @@ public interface IContext extends IMemberContext
 	{
 		return this.getHeader().getCompilationContext();
 	}
-	
+
 	IDyvilHeader getHeader();
-	
+
 	IClass getThisClass();
 
 	IType getThisType();
-	
+
 	@Override
 	Package resolvePackage(Name name);
-	
+
 	@Override
 	IClass resolveClass(Name name);
-	
+
 	@Override
 	IType resolveType(Name name);
-	
+
 	@Override
 	ITypeParameter resolveTypeVariable(Name name);
-	
+
 	@Override
 	IDataMember resolveField(Name name);
-	
+
 	@Override
 	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
-	
+
 	@Override
 	void getConstructorMatches(ConstructorMatchList list, IArguments arguments);
 
@@ -87,15 +87,15 @@ public interface IContext extends IMemberContext
 	byte checkException(IType type);
 
 	IType getReturnType();
-	
+
 	boolean isMember(IVariable variable);
-	
+
 	IDataMember capture(IVariable capture);
-	
+
 	IAccessible getAccessibleThis(IClass type);
-	
+
 	IValue getImplicit();
-	
+
 	static void addCompilable(IContext context, IClassCompilable compilable)
 	{
 		IClass iclass = context.getThisClass();
@@ -104,11 +104,11 @@ public interface IContext extends IMemberContext
 			iclass.addCompilable(compilable);
 			return;
 		}
-		
+
 		IDyvilHeader header = context.getHeader();
 		header.addInnerClass(compilable);
 	}
-	
+
 	static IClass resolveClass(IMemberContext context, Name name)
 	{
 		final IClass theClass = context.resolveClass(name);
@@ -116,10 +116,10 @@ public interface IContext extends IMemberContext
 		{
 			return theClass;
 		}
-		
+
 		return Types.LANG_HEADER.resolveClass(name);
 	}
-	
+
 	static IType resolveType(IMemberContext context, Name name)
 	{
 		IType itype = context.resolveType(name);
@@ -130,14 +130,14 @@ public interface IContext extends IMemberContext
 
 		return Types.LANG_HEADER.resolveType(name);
 	}
-	
+
 	static IConstructor resolveConstructor(IMemberContext context, IArguments arguments)
 	{
 		ConstructorMatchList matches = new ConstructorMatchList();
 		context.getConstructorMatches(matches, arguments);
 		return matches.getBestConstructor();
 	}
-	
+
 	static IMethod resolveMethod(IMemberContext context, IValue instance, Name name, IArguments arguments)
 	{
 		MethodMatchList matches = new MethodMatchList();
@@ -161,13 +161,14 @@ public interface IContext extends IMemberContext
 		{
 			return thisClass.getVisibility(member);
 		}
-		
+
 		return context.getHeader().getVisibility(member);
 	}
 
 	static boolean isUnhandled(IContext context, IType exceptionType)
 	{
-		return Types.EXCEPTION.isSuperTypeOf(exceptionType) && !Types.RUNTIME_EXCEPTION.isSuperTypeOf(exceptionType)
-				&& context.handleException(exceptionType);
+		return Types.isSuperType(Types.EXCEPTION, exceptionType) // Exception type is sub-type of java.lang.Exception
+			       && !Types.isSuperType(Types.RUNTIME_EXCEPTION, exceptionType) // but not java.lang.RuntimeException
+			       && context.handleException(exceptionType);
 	}
 }

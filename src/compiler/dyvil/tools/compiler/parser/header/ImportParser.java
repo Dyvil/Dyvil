@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.parser.imports;
+package dyvil.tools.compiler.parser.header;
 
 import dyvil.tools.compiler.ast.consumer.IImportConsumer;
 import dyvil.tools.compiler.ast.header.IImport;

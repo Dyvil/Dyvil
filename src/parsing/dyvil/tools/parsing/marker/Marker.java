@@ -2,6 +2,7 @@ package dyvil.tools.parsing.marker;
 
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
+import dyvil.io.Console;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public abstract class Marker implements Comparable<Marker>
@@ -43,6 +44,8 @@ public abstract class Marker implements Comparable<Marker>
 
 	public abstract String getMarkerType();
 
+	public abstract String getColor();
+
 	public abstract boolean isError();
 
 	public abstract boolean isWarning();
@@ -50,20 +53,65 @@ public abstract class Marker implements Comparable<Marker>
 	@Override
 	public int compareTo(Marker o)
 	{
-		int start1 = this.position.startIndex();
-		int start2 = o.position.startIndex();
+		final int start1 = this.position.startIndex();
+		final int start2 = o.position.startIndex();
 		return start1 == start2 ? 0 : start1 < start2 ? -1 : 0;
 	}
 
-	public void log(String code, StringBuilder buf)
+	@Override
+	@SuppressWarnings("SimplifiableIfStatement")
+	public boolean equals(Object o)
+	{
+		if (this == o)
+			return true;
+		if (!(o instanceof Marker))
+			return false;
+
+		Marker marker = (Marker) o;
+
+		if (this.position != null ? !this.position.equals(marker.position) : marker.position != null)
+			return false;
+		if (this.message != null ? !this.message.equals(marker.message) : marker.message != null)
+			return false;
+		return this.info != null ? this.info.equals(marker.info) : marker.info == null;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		int result = this.position != null ? this.position.hashCode() : 0;
+		result = 31 * result + (this.message != null ? this.message.hashCode() : 0);
+		result = 31 * result + (this.info != null ? this.info.hashCode() : 0);
+		return result;
+	}
+
+	public void log(String code, StringBuilder buf, boolean colors)
 	{
 		final String type = this.getMarkerType();
 		final String message = this.message;
 
-		buf.append("line ").append(this.position.startLine()).append(": ").append(type);
+		buf.append("line ").append(this.position.startLine()).append(": ");
+
+		final String colorString;
+		if (colors)
+		{
+			colorString = this.getColor();
+			buf.append(colorString);
+		}
+		else
+		{
+			colorString = null;
+		}
+
+		buf.append(type);
 		if (message != null)
 		{
 			buf.append(": ").append(message);
+		}
+
+		if (colors)
+		{
+			buf.append(Console.ANSI_RESET);
 		}
 
 		// Append Info (if any)
@@ -126,9 +174,18 @@ public abstract class Marker implements Comparable<Marker>
 				buf.append(' ');
 			}
 		}
+
+		if (colors)
+		{
+			buf.append(colorString);
+		}
 		for (int i = startIndex; i < endIndex; i++)
 		{
 			buf.append('¯');
+		}
+		if (colors)
+		{
+			buf.append(Console.ANSI_RESET);
 		}
 
 		buf.append('\n');

@@ -100,6 +100,9 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	int OPTIONAL  = 48;
 	int REFERENCE = 50;
 
+	int UNION = 51;
+	// int INTERSECTION = 52;
+
 	// Type Variable Types
 	int TYPE_VAR_TYPE     = 64;
 	int INTERNAL_TYPE_VAR = 65;
@@ -149,12 +152,12 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	IType getObjectType();
 
-	default IType getReturnType()
+	default IType asReturnType()
 	{
 		return this;
 	}
 
-	default IType getParameterType()
+	default IType asParameterType()
 	{
 		return this;
 	}
@@ -199,94 +202,57 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	default int getSuperTypeDistance(IType superType)
 	{
-		IClass iClass = this.getTheClass();
-		return iClass == null ? 0 : iClass.getSuperTypeDistance(superType);
-	}
-
-	default float getSubTypeDistance(IType subtype)
-	{
-		if (subtype.isArrayType() && this.getTheClass() == Types.OBJECT_CLASS)
+		if (this == superType)
 		{
-			return ArrayType.OBJECT_DISTANCE;
+			return 1;
 		}
-		return subtype.getSuperTypeDistance(this);
-	}
 
-	default int getSubClassDistance(IType subtype)
-	{
-		return subtype.getSuperTypeDistance(this);
-	}
-
-	default IType getSuperType()
-	{
-		IClass iclass = this.getTheClass();
-		if (iclass != null)
-		{
-			return iclass.getSuperType();
-		}
-		return Types.OBJECT;
-	}
-
-	default IType combine(IType type)
-	{
-		return this;
+		final IClass thisClass = this.getTheClass();
+		return thisClass == null ? 0 : thisClass.getSuperTypeDistance(superType);
 	}
 
 	/**
 	 * Returns {@code true} iff this type is a super type of the given {@code type}, {@code false otherwise}.
 	 *
-	 * @param type
+	 * @param subType
 	 * 	the potential sub-type of this type
 	 *
 	 * @return {@code true} iff this type is a super type of the given type, {@code false} otherwise
 	 */
-	default boolean isSuperTypeOf(IType type)
+	default boolean isSuperTypeOf(IType subType)
 	{
-		if (this == type)
+		return this == subType || this.isSuperClassOf(subType);
+	}
+
+	default boolean isSuperClassOf(IType subType)
+	{
+		final IClass superClass = this.getTheClass();
+		if (superClass == null)
+		{
+			return false;
+		}
+		if (superClass == Types.OBJECT_CLASS)
 		{
 			return true;
 		}
 
-		IClass thisClass = this.getTheClass();
-		if (thisClass == null)
-		{
-			return false;
-		}
-		if (thisClass == Types.OBJECT_CLASS)
-		{
-			return true;
-		}
-		if (type.typeTag() == WILDCARD_TYPE)
-		{
-			return type.isSameType(this);
-		}
-		if (type.isArrayType())
-		{
-			return false;
-		}
-
-		final IClass thatClass = type.getTheClass();
-		return thatClass != null && (thatClass == thisClass || thatClass.isSubTypeOf(this));
+		final IClass subClass = subType.getTheClass();
+		return subClass != null && (subClass == superClass || subClass.isSubTypeOf(this));
 	}
 
-	default boolean isAssignableFrom(IType type)
+	boolean isSameType(IType type);
+
+	boolean isSameClass(IType type);
+
+	default boolean isConvertibleFrom(IType type)
 	{
-		return this.isSuperTypeOf(type);
+		return false;
 	}
 
-	default boolean isSuperClassOf(IType type)
+	default boolean isConvertibleTo(IType type)
 	{
-		final IClass thisClass = this.getTheClass();
-		final IClass thatClass = type.getTheClass();
-		return thatClass != null && thisClass != null && (thatClass == thisClass || thatClass.isSubTypeOf(this));
+		return false;
 	}
-
-	default boolean isSameType(IType type)
-	{
-		return this == type || this.getTheClass() == type.getTheClass();
-	}
-
-	boolean classEquals(IType type);
 
 	// Resolve
 
@@ -303,13 +269,18 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		return value.withType(this, typeContext, markers, context);
 	}
 
+	default IValue convertValueTo(IValue value, IType targetType, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		return null;
+	}
+
 	// Generics
 
 	/**
 	 * Returns the type argument in this generic type for the given type variable.
-	 * <p>
+	 * <p/>
 	 * Example:<br>
-	 * <p>
+	 * <p/>
 	 * <pre>
 	 * GenericType gt = type[List[String]]
 	 * ITypeParameter tv = type[List].getTypeVariable("E")
@@ -434,6 +405,8 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	Object getFrameType();
 
+	int getLocalSlots();
+
 	void writeCast(MethodWriter writer, IType target, int lineNumber) throws BytecodeException;
 
 	void writeClassExpression(MethodWriter writer) throws BytecodeException;
@@ -444,13 +417,18 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	static IType withAnnotation(IType type, IAnnotation annotation, TypePath typePath, int step, int steps)
 	{
-		if (typePath == null || step > steps)
+		if (typePath == null || step >= steps)
 		{
-			return new AnnotatedType(type, annotation);
+			return type.withAnnotation(annotation);
 		}
 
 		type.addAnnotation(annotation, typePath, step, steps);
 		return type;
+	}
+
+	default IType withAnnotation(IAnnotation annotation)
+	{
+		return null;
 	}
 
 	void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps);
@@ -555,6 +533,6 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	static boolean equals(IType type, Object obj)
 	{
-		return type.classEquals((IType) obj);
+		return type.isSameClass((IType) obj);
 	}
 }

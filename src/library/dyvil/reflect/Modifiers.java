@@ -212,11 +212,13 @@ public interface Modifiers
 	 * ABSTRACT} bit flag.
 	 */
 	int CLASS_TYPE_MODIFIERS = (INTERFACE_CLASS | ANNOTATION | ENUM | OBJECT_CLASS | TRAIT_CLASS) & ~ABSTRACT;
-	
+
+	int VISIBILITY_MODIFIERS = PUBLIC | PROTECTED | PRIVATE;
+
 	/**
 	 * The access modifiers.
 	 */
-	int ACCESS_MODIFIERS = PUBLIC | PROTECTED | PRIVATE | INTERNAL;
+	int ACCESS_MODIFIERS = VISIBILITY_MODIFIERS | INTERNAL;
 	
 	/**
 	 * The modifiers that can be used on any member.

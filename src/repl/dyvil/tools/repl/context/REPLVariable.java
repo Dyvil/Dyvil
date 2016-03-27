@@ -4,6 +4,7 @@ import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.reflect.ReflectUtils;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -23,14 +24,11 @@ public class REPLVariable extends Field
 	protected String className;
 	private   Class  theClass;
 
-	public REPLVariable(REPLContext context, ICodePosition position, Name name, IType type, IValue value, String className, ModifierSet modifiers)
+	public REPLVariable(REPLContext context, ICodePosition position, Name name, IType type, String className, ModifierSet modifiers, AnnotationList annotations)
 	{
-		super(null, name, type);
+		super(position, name, type, modifiers, annotations);
 		this.context = context;
 		this.className = className;
-		this.modifiers = modifiers;
-		this.position = position;
-		this.value = value;
 
 		REPLContext.updateModifiers(modifiers);
 	}
@@ -102,6 +100,11 @@ public class REPLVariable extends Field
 
 	protected void updateValue(DyvilREPL repl)
 	{
+		if (this.theClass == null)
+		{
+			return;
+		}
+
 		try
 		{
 			if (this.type == Types.VOID)
@@ -173,7 +176,7 @@ public class REPLVariable extends Field
 		// Generate <clinit> static initializer
 		final MethodWriter clinitWriter = new MethodWriterImpl(classWriter, classWriter.visitMethod(
 			Modifiers.STATIC | Modifiers.SYNTHETIC, "<clinit>", "()V", null, null));
-		clinitWriter.begin();
+		clinitWriter.visitCode();
 
 		for (IClassCompilable c : compilableList)
 		{
@@ -181,25 +184,25 @@ public class REPLVariable extends Field
 		}
 
 		// Write a call to the computeResult method
-		clinitWriter.writeInvokeInsn(Opcodes.INVOKESTATIC, className, "computeResult", methodType, false);
+		clinitWriter.visitMethodInsn(Opcodes.INVOKESTATIC, className, "computeResult", methodType, false);
 		if (this.type != Types.VOID)
 		{
 			// Store the value to the field
-			clinitWriter.writeFieldInsn(Opcodes.PUTSTATIC, className, name, extendedType);
+			clinitWriter.visitFieldInsn(Opcodes.PUTSTATIC, className, name, extendedType);
 		}
 
 		// Finish the <clinit> static initializer
-		clinitWriter.writeInsn(Opcodes.RETURN);
-		clinitWriter.end();
+		clinitWriter.visitInsn(Opcodes.RETURN);
+		clinitWriter.visitEnd();
 
 		// Writer the computeResult method
 		if (this.value != null)
 		{
 			final MethodWriter computeWriter = new MethodWriterImpl(classWriter, classWriter.visitMethod(
 				Modifiers.PRIVATE | Modifiers.STATIC, "computeResult", methodType, null, null));
-			computeWriter.begin();
+			computeWriter.visitCode();
 			this.value.writeExpression(computeWriter, this.type);
-			computeWriter.end(this.type);
+			computeWriter.visitEnd(this.type);
 		}
 
 		// Finish Class compilation
@@ -234,7 +237,7 @@ public class REPLVariable extends Field
 		}
 
 		String extended = this.type.getExtendedName();
-		writer.writeFieldInsn(Opcodes.GETSTATIC, this.className, this.bytecodeName, extended);
+		writer.visitFieldInsn(Opcodes.GETSTATIC, this.className, this.bytecodeName, extended);
 	}
 
 	@Override
@@ -247,11 +250,11 @@ public class REPLVariable extends Field
 
 		if (this.className == null)
 		{
-			writer.writeInsn(Opcodes.AUTO_POP);
+			writer.visitInsn(Opcodes.AUTO_POP);
 			return;
 		}
 
 		String extended = this.type.getExtendedName();
-		writer.writeFieldInsn(Opcodes.PUTSTATIC, this.className, this.bytecodeName, extended);
+		writer.visitFieldInsn(Opcodes.PUTSTATIC, this.className, this.bytecodeName, extended);
 	}
 }

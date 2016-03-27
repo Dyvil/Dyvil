@@ -153,11 +153,11 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 
 			if (this.receiver == null)
 			{
-				return this.field.getType().getReturnType();
+				return this.field.getType().asReturnType();
 			}
 
 			final ITypeContext typeContext = this.receiver.getType();
-			return this.type = this.field.getType().getConcreteType(typeContext).getReturnType();
+			return this.type = this.field.getType().getConcreteType(typeContext).asReturnType();
 		}
 		return this.type;
 	}
@@ -167,27 +167,27 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	{
 		if (this.field == null)
 		{
-			return this; // dont create an extra type error
+			return this; // don't create an extra type error
 		}
 		
-		return type.isSuperTypeOf(this.getType()) ? this : null;
+		return Types.isSuperType(type, this.getType()) ? this : null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		return this.field != null && type.isSuperTypeOf(this.getType());
+		return this.field != null && Types.isSuperType(type, this.getType());
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		if (this.field == null)
 		{
 			return 0;
 		}
 
-		return type.getSubTypeDistance(this.getType());
+		return Types.getDistance(type, this.getType());
 	}
 
 	@Override
@@ -242,7 +242,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	}
 	
 	@Override
-	public IValue toConstant(MarkerList markers, IContext context)
+	public IValue toAnnotationConstant(MarkerList markers, IContext context)
 	{
 		if (this.field == null)
 		{
@@ -264,7 +264,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		}
 		while (!value.isConstantOrField() || value == this);
 
-		return value.toConstant(markers, context);
+		return value.toAnnotationConstant(markers, context);
 	}
 	
 	@Override
@@ -489,9 +489,9 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		}
 		this.field.getType().writeCast(writer, type, lineNumber);
 
-		if (type == Types.VOID)
+		if (Types.isSameType(type, Types.VOID))
 		{
-			writer.writeInsn(this.type.getReturnOpcode());
+			writer.visitInsn(this.type.getReturnOpcode());
 		}
 	}
 	

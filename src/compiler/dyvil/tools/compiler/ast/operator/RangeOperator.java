@@ -6,7 +6,6 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.statement.loop.IterableForStatement;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -29,7 +28,6 @@ public class RangeOperator implements IValue
 		public static final IClass         RANGE_CLASS     = Package.dyvilCollection.resolveClass("Range");
 		public static final IClass         RANGEABLE_CLASS = Package.dyvilCollectionRange.resolveClass("Rangeable");
 		public static final IType          RANGEABLE       = RANGEABLE_CLASS.getClassType();
-		public static final ITypeParameter RANGEABLE_TYPE  = RANGEABLE_CLASS.getTypeParameter(0);
 
 		public static final IClass INT_RANGE_CLASS    = Package.dyvilCollectionRange.resolveClass("IntRange");
 		public static final IClass LONG_RANGE_CLASS   = Package.dyvilCollectionRange.resolveClass("LongRange");
@@ -169,7 +167,7 @@ public class RangeOperator implements IValue
 	{
 		if (this.elementType != Types.UNKNOWN)
 		{
-			return elementType.isSuperTypeOf(this.elementType);
+			return Types.isSuperType(elementType, this.elementType);
 		}
 
 		return this.startValue.isType(elementType) && this.endValue.isType(elementType);
@@ -181,7 +179,7 @@ public class RangeOperator implements IValue
 		{
 			return type.getElementType();
 		}
-		if (IterableForStatement.LazyFields.ITERABLE.isSuperClassOf(type))
+		if (Types.isSuperType(IterableForStatement.LazyFields.ITERABLE, type))
 		{
 			return type.resolveTypeSafely(IterableForStatement.LazyFields.ITERABLE_TYPE);
 		}
@@ -218,7 +216,7 @@ public class RangeOperator implements IValue
 	}
 
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		IType elementType = getElementType(type);
 		if (elementType == null)
@@ -226,9 +224,9 @@ public class RangeOperator implements IValue
 			return 0;
 		}
 
-		float f1 = this.startValue.getTypeMatch(elementType);
-		float f2 = this.endValue.getTypeMatch(elementType);
-		return f1 == 0 || f2 == 0 ? 0 : (f1 + f2) / 2F;
+		int f1 = this.startValue.getTypeMatch(elementType);
+		int f2 = this.endValue.getTypeMatch(elementType);
+		return f1 == 0 || f2 == 0 ? 0 : (f1 + f2) / 2;
 	}
 
 	@Override
@@ -277,7 +275,7 @@ public class RangeOperator implements IValue
 			}
 		}
 
-		if (LazyFields.RANGEABLE.isSuperClassOf(elementType))
+		if (Types.isSuperType(LazyFields.RANGEABLE, elementType))
 		{
 			return;
 		}
@@ -321,12 +319,12 @@ public class RangeOperator implements IValue
 	{
 		final String method = this.halfOpen ? "halfOpen" : "apply";
 
-		if (LazyFields.RANGEABLE.isSuperTypeOf(this.elementType))
+		if (Types.isSuperType(LazyFields.RANGEABLE, this.getElementType()))
 		{
 			this.startValue.writeExpression(writer, LazyFields.RANGEABLE_CLASS.getClassType());
 			this.endValue.writeExpression(writer, LazyFields.RANGEABLE_CLASS.getClassType());
 
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/Range", method,
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/collection/Range", method,
 			                       "(Ldyvil/collection/range/Rangeable;Ldyvil/collection/range/Rangeable;)Ldyvil/collection/Range;",
 			                       false);
 			return;
@@ -341,19 +339,19 @@ public class RangeOperator implements IValue
 		case PrimitiveType.SHORT_CODE:
 		case PrimitiveType.CHAR_CODE:
 		case PrimitiveType.INT_CODE:
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/range/IntRange", method,
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/collection/range/IntRange", method,
 			                       "(II)Ldyvil/collection/range/IntRange;", false);
 			return;
 		case PrimitiveType.LONG_CODE:
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/range/LongRange", method,
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/collection/range/LongRange", method,
 			                       "(JJ)Ldyvil/collection/range/LongRange;", false);
 			return;
 		case PrimitiveType.FLOAT_CODE:
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/range/FloatRange", method,
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/collection/range/FloatRange", method,
 			                       "(FF)Ldyvil/collection/range/FloatRange;", false);
 			return;
 		case PrimitiveType.DOUBLE_CODE:
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/collection/range/DoubleRange", method,
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/collection/range/DoubleRange", method,
 			                       "(DD)Ldyvil/collection/range/DoubleRange;", false);
 			return;
 		}
@@ -372,14 +370,14 @@ public class RangeOperator implements IValue
 			// Write the class instance to be able to reify the type in the
 			// method
 			String extended = this.elementType.getExtendedName();
-			writer.writeLDC(Type.getType(extended));
+			writer.visitLdcInsn(Type.getType(extended));
 
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", method,
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", method,
 			                       "(Ldyvil/collection/range/Rangeable;Ldyvil/collection/range/Rangeable;Ljava/lang/Class;)[Ldyvil/collection/range/Rangeable;",
 			                       false);
 
 			// CheckCast so the verifier doesn't complain about mismatching types
-			writer.writeTypeInsn(Opcodes.CHECKCAST, '[' + extended);
+			writer.visitTypeInsn(Opcodes.CHECKCAST, '[' + extended);
 			return;
 		}
 
@@ -387,28 +385,28 @@ public class RangeOperator implements IValue
 		switch (this.elementType.getTypecode())
 		{
 		case PrimitiveType.BOOLEAN_CODE:
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/BooleanArray", method, "(ZZ)[Z", false);
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/BooleanArray", method, "(ZZ)[Z", false);
 			return;
 		case PrimitiveType.BYTE_CODE:
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ByteArray", method, "(BB)[B", false);
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/ByteArray", method, "(BB)[B", false);
 			return;
 		case PrimitiveType.SHORT_CODE:
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/ShortArray", method, "(SS)[S", false);
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/ShortArray", method, "(SS)[S", false);
 			return;
 		case PrimitiveType.CHAR_CODE:
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/CharArray", method, "(CC)[C", false);
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/CharArray", method, "(CC)[C", false);
 			return;
 		case PrimitiveType.INT_CODE:
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/IntArray", method, "(II)[I", false);
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/IntArray", method, "(II)[I", false);
 			return;
 		case PrimitiveType.LONG_CODE:
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/LongArray", method, "(LL)[L", false);
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/LongArray", method, "(LL)[L", false);
 			return;
 		case PrimitiveType.FLOAT_CODE:
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/FloatArray", method, "(FF)[F", false);
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/FloatArray", method, "(FF)[F", false);
 			return;
 		case PrimitiveType.DOUBLE_CODE:
-			writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvil/array/DoubleArray", method, "(DD)[D", false);
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/DoubleArray", method, "(DD)[D", false);
 			return;
 		}
 	}

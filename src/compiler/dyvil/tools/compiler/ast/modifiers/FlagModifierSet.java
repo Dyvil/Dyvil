@@ -39,7 +39,7 @@ public class FlagModifierSet implements ModifierSet
 	@Override
 	public boolean hasModifier(Modifier modifier)
 	{
-		return this.hasIntModifier(modifier.intValue());
+		return false;
 	}
 
 	@Override

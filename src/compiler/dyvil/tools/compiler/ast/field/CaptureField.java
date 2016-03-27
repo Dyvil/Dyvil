@@ -60,22 +60,22 @@ public final class CaptureField extends CaptureDataMember implements IField
 	}
 
 	@Override
-	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context)
+	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue receiver, IContext context)
 	{
-		super.checkAccess(markers, position, instance, context);
+		super.checkAccess(markers, position, receiver, context);
 
-		if (instance == null)
+		if (receiver == null)
 		{
 			return new ThisExpr(this.enclosingClass.getType(), VariableThis.DEFAULT);
 		}
-		return instance;
+		return receiver;
 	}
 
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		writer.visitField(Modifiers.PRIVATE | Modifiers.MANDATED | Modifiers.SYNTHETIC, this.name,
-		                  this.getDescription(), this.getSignature(), null).visitEnd();
+		                  this.getDescriptor(), this.getSignature(), null).visitEnd();
 	}
 	
 	@Override
@@ -85,8 +85,8 @@ public final class CaptureField extends CaptureDataMember implements IField
 
 		String owner = this.enclosingClass.getInternalName();
 		String name = this.name;
-		String desc = this.getDescription();
-		writer.writeFieldInsn(Opcodes.GETFIELD, owner, name, desc);
+		String desc = this.getDescriptor();
+		writer.visitFieldInsn(Opcodes.GETFIELD, owner, name, desc);
 	}
 
 	@Override
@@ -97,7 +97,7 @@ public final class CaptureField extends CaptureDataMember implements IField
 			String owner = this.enclosingClass.getInternalName();
 			String name = this.name;
 			String desc = this.variable.getInternalType().getExtendedName();
-			writer.writeFieldInsn(Opcodes.PUTFIELD, owner, name, desc);
+			writer.visitFieldInsn(Opcodes.PUTFIELD, owner, name, desc);
 		}
 	}
 	

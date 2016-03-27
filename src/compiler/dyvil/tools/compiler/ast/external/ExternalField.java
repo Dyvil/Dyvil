@@ -16,9 +16,10 @@ public final class ExternalField extends Field
 	private boolean annotationsResolved;
 	private boolean returnTypeResolved;
 
-	public ExternalField(IClass iclass, Name name, IType type, ModifierSet modifierSet)
+	public ExternalField(IClass iclass, Name name, String desc, IType type, ModifierSet modifierSet)
 	{
 		super(iclass, name, type, modifierSet);
+		this.descriptor = desc;
 	}
 
 	private IContext getCombiningContext()

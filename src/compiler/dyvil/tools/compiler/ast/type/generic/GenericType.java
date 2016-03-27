@@ -196,19 +196,19 @@ public abstract class GenericType implements IObjectType, ITypeList
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		IClass iclass = this.getTheClass();
-		writer.writeLDC(iclass == null ? this.getName().qualified : iclass.getFullName());
+		writer.visitLdcInsn(iclass == null ? this.getName().qualified : iclass.getFullName());
 		
-		writer.writeLDC(this.typeArgumentCount);
-		writer.writeNewArray("dyvilx/lang/model/type/Type", 1);
+		writer.visitLdcInsn(this.typeArgumentCount);
+		writer.visitMultiANewArrayInsn("dyvilx/lang/model/type/Type", 1);
 		for (int i = 0; i < this.typeArgumentCount; i++)
 		{
-			writer.writeInsn(Opcodes.DUP);
-			writer.writeLDC(i);
+			writer.visitInsn(Opcodes.DUP);
+			writer.visitLdcInsn(i);
 			this.typeArguments[i].writeTypeExpression(writer);
-			writer.writeInsn(Opcodes.AASTORE);
+			writer.visitInsn(Opcodes.AASTORE);
 		}
 		
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/GenericType", "apply",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/GenericType", "apply",
 		                       "(Ljava/lang/String;[Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/GenericType;",
 		                       false);
 	}

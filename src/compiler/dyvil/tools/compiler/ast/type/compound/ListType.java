@@ -226,7 +226,7 @@ public class ListType implements IObjectType
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.elementType.writeTypeExpression(writer);
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/ListType", "apply",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/ListType", "apply",
 		                       "(Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/ListType;", false);
 	}
 

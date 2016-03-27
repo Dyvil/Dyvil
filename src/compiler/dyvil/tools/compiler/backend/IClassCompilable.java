@@ -24,7 +24,7 @@ public interface IClassCompilable
 	{
 	}
 
-	default void writeInit(MethodWriter writer) throws BytecodeException
+	default void writeClassInit(MethodWriter writer) throws BytecodeException
 	{
 	}
 }

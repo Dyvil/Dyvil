@@ -48,7 +48,7 @@ public class AnyType implements IRawType
 	}
 	
 	@Override
-	public boolean isSuperClassOf(IType type)
+	public boolean isSuperClassOf(IType subType)
 	{
 		return true;
 	}
@@ -114,7 +114,7 @@ public class AnyType implements IRawType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvilx/lang/model/type/AnyType", "instance",
+		writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvilx/lang/model/type/AnyType", "instance",
 		                      "Ldyvilx/lang/model/type/AnyType;");
 	}
 	
@@ -144,17 +144,5 @@ public class AnyType implements IRawType
 	public IType clone()
 	{
 		return this;
-	}
-	
-	@Override
-	public boolean equals(Object obj)
-	{
-		return this.isSameType((IType) obj);
-	}
-	
-	@Override
-	public int hashCode()
-	{
-		return ANY;
 	}
 }

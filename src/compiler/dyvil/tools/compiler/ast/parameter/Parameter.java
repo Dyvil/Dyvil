@@ -25,7 +25,6 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.backend.visitor.AnnotationValueReader;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -33,12 +32,15 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public abstract class Parameter extends Member implements IParameter
 {
+	public static final String DEFAULT_VALUE       = "Ldyvil/annotation/_internal/DefaultValue;";
+	public static final String DEFAULT_ARRAY_VALUE = "Ldyvil/annotation/_internal/DefaultArrayValue;";
+
 	protected IValue defaultValue;
 
 	// Metadata
-	protected int     index;
-	protected int     localIndex;
-	protected boolean varargs;
+	protected int   index;
+	protected int   localIndex;
+	protected IType internalType;
 
 	public Parameter()
 	{
@@ -81,6 +83,17 @@ public abstract class Parameter extends Member implements IParameter
 	}
 
 	@Override
+	public IType getInternalType()
+	{
+		if (this.internalType != null)
+		{
+			return this.internalType;
+		}
+
+		return this.internalType = this.getInternalType().asParameterType();
+	}
+
+	@Override
 	public void setValue(IValue value)
 	{
 		this.defaultValue = value;
@@ -119,17 +132,20 @@ public abstract class Parameter extends Member implements IParameter
 	@Override
 	public void setVarargs(boolean varargs)
 	{
-		this.varargs = varargs;
+		if (varargs)
+		{
+			this.getModifiers().addIntModifier(Modifiers.VARARGS);
+		}
 	}
 
 	@Override
 	public boolean isVarargs()
 	{
-		return this.varargs;
+		return this.hasModifier(Modifiers.VARARGS);
 	}
 
 	@Override
-	public String getDescription()
+	public String getDescriptor()
 	{
 		return this.getInternalType().getExtendedName();
 	}
@@ -161,32 +177,177 @@ public abstract class Parameter extends Member implements IParameter
 		return IParameter.super.visitAnnotation(internalType);
 	}
 
-	protected void writeDefaultAnnotation(MethodWriter writer)
+	@Override
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		if (this.type.isArrayType())
-		{
-			AnnotationVisitor visitor = writer.visitParameterAnnotation(this.index,
-			                                                            "Ldyvil/annotation/_internal/DefaultArrayValue;",
-			                                                            false);
-			visitor = visitor.visitArray("value");
+		super.resolveTypes(markers, context);
 
-			ArrayExpr arrayExpr = (ArrayExpr) this.defaultValue;
+		if (this.defaultValue != null)
+		{
+			this.defaultValue.resolveTypes(markers, context);
+		}
+
+		if (this.type == Types.UNKNOWN)
+		{
+			markers.add(Markers.semantic(this.position, this.getKind().getName() + ".type.infer", this.name));
+			this.type = Types.ANY;
+		}
+
+		this.internalType = null;
+	}
+
+	@Override
+	public void resolve(MarkerList markers, IContext context)
+	{
+		super.resolve(markers, context);
+
+		if (this.defaultValue == null)
+		{
+			return;
+		}
+
+		this.defaultValue = this.defaultValue.resolve(markers, context);
+
+		// TODO Use TypeChecker
+		final IValue typed = this.defaultValue.withType(this.type, null, markers, context);
+		if (typed == null)
+		{
+			final Marker marker = Markers.semantic(this.defaultValue.getPosition(),
+			                                       this.getKind().getName() + ".type.incompatible",
+			                                       this.name.unqualified);
+			marker.addInfo(Markers.getSemantic(this.getKind().getName() + ".type", this.type));
+			marker.addInfo(Markers.getSemantic("value.type", this.defaultValue.getType()));
+			markers.add(marker);
+		}
+		else
+		{
+			this.defaultValue = typed;
+		}
+
+		this.defaultValue = IValue.toAnnotationConstant(this.defaultValue, markers, context);
+	}
+
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		super.checkTypes(markers, context);
+
+		if (this.defaultValue != null)
+		{
+			this.defaultValue.checkTypes(markers, context);
+		}
+	}
+
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		super.check(markers, context);
+
+		if (this.defaultValue != null)
+		{
+			this.defaultValue.check(markers, context);
+		}
+
+		if (Types.isSameType(this.type, Types.VOID))
+		{
+			markers.add(Markers.semantic(this.position, this.getKind().getName() + ".type.void"));
+		}
+	}
+
+	@Override
+	public void foldConstants()
+	{
+		super.foldConstants();
+
+		if (this.defaultValue != null)
+		{
+			this.defaultValue = this.defaultValue.foldConstants();
+		}
+	}
+
+	@Override
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		super.cleanup(context, compilableList);
+
+		if (this.defaultValue != null)
+		{
+			this.defaultValue = this.defaultValue.cleanup(context, compilableList);
+		}
+	}
+
+	@Override
+	public void writeInit(MethodWriter writer, IValue value) throws BytecodeException
+	{
+		this.writeInit(writer);
+	}
+
+	@Override
+	public void writeInit(MethodWriter writer)
+	{
+		writeInitImpl(this, writer);
+	}
+
+	public static void writeInitImpl(IParameter parameter, MethodWriter writer)
+	{
+		final ModifierSet modifiers = parameter.getModifiers();
+		final AnnotationList annotations = parameter.getAnnotations();
+		final IType type = parameter.getType();
+		final IValue defaultValue = parameter.getValue();
+
+		final int intModifiers = modifiers == null ?
+			                         0 :
+			                         modifiers.toFlags() & Modifiers.PARAMETER_MODIFIERS
+				                         & ModifierUtil.JAVA_MODIFIER_MASK;
+
+		final int index = writer.localCount();
+
+		parameter.setLocalIndex(index);
+		writer.visitParameter(parameter.getLocalIndex(), parameter.getName().qualified, parameter.getInternalType(),
+		                      intModifiers);
+
+		// Annotations
+		final AnnotatableVisitor visitor = (desc, visible) -> writer.visitParameterAnnotation(index, desc, visible);
+
+		if (annotations != null)
+		{
+			annotations.write(visitor);
+		}
+
+		ModifierUtil.writeModifiers(visitor, modifiers);
+
+		type.writeAnnotations(writer, TypeReference.newFormalParameterReference(index), "");
+
+		// Default Value
+		if (defaultValue == null)
+		{
+			return;
+		}
+
+		if (type.isArrayType())
+		{
+			final AnnotationVisitor annotationVisitor = writer
+				                                            .visitParameterAnnotation(index, DEFAULT_ARRAY_VALUE, false)
+				                                            .visitArray("value");
+
+			ArrayExpr arrayExpr = (ArrayExpr) defaultValue;
 			int count = arrayExpr.valueCount();
-			IType elementType = this.type.getElementType();
+			IType elementType = type.getElementType();
 
 			for (int i = 0; i < count; i++)
 			{
-				writeDefaultAnnotation(visitor, elementType, arrayExpr.getValue(i));
+				writeDefaultAnnotation(annotationVisitor, elementType, arrayExpr.getValue(i));
 			}
 
-			visitor.visitEnd();
+			annotationVisitor.visitEnd();
 
 			return;
 		}
 
-		AnnotationVisitor visitor = writer.visitParameterAnnotation(this.index,
-		                                                            "Ldyvil/annotation/_internal/DefaultValue;", false);
-		writeDefaultAnnotation(visitor, this.type, this.defaultValue);
+		final AnnotationVisitor annotationVisitor = writer.visitParameterAnnotation(index, DEFAULT_VALUE, false);
+		writeDefaultAnnotation(annotationVisitor, type, defaultValue);
+
+		annotationVisitor.visitEnd();
 	}
 
 	private static void writeDefaultAnnotation(AnnotationVisitor visitor, IType type, IValue value)
@@ -231,148 +392,10 @@ public abstract class Parameter extends Member implements IParameter
 	}
 
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
-	{
-		super.resolveTypes(markers, context);
-
-		if (this.defaultValue != null)
-		{
-			this.defaultValue.resolveTypes(markers, context);
-		}
-
-		if (this.type == Types.UNKNOWN)
-		{
-			markers.add(Markers.semantic(this.position, this.getKind().getName() + ".type.infer", this.name));
-			this.type = Types.ANY;
-		}
-	}
-
-	@Override
-	public void resolve(MarkerList markers, IContext context)
-	{
-		super.resolve(markers, context);
-
-		if (this.defaultValue != null)
-		{
-			this.defaultValue = this.defaultValue.resolve(markers, context);
-
-			final IValue typed = this.defaultValue.withType(this.type, null, markers, context);
-			if (typed == null)
-			{
-				final Marker marker = Markers.semantic(this.defaultValue.getPosition(),
-				                                       this.getKind().getName() + ".type.incompatible",
-				                                       this.name.unqualified);
-				marker.addInfo(Markers.getSemantic(this.getKind().getName() + ".type", this.type));
-				marker.addInfo(Markers.getSemantic("value.type", this.defaultValue.getType()));
-				markers.add(marker);
-			}
-			else
-			{
-				this.defaultValue = typed;
-			}
-
-			this.defaultValue = Util.constant(this.defaultValue, markers, context);
-			return;
-		}
-	}
-
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		super.checkTypes(markers, context);
-
-		if (this.defaultValue != null)
-		{
-			this.defaultValue.checkTypes(markers, context);
-		}
-	}
-
-	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-		super.check(markers, context);
-
-		if (this.defaultValue != null)
-		{
-			this.defaultValue.check(markers, context);
-		}
-
-		if (this.type == Types.VOID)
-		{
-			markers.add(Markers.semantic(this.position, this.getKind().getName() + ".type.void"));
-		}
-	}
-
-	@Override
-	public void foldConstants()
-	{
-		super.foldConstants();
-
-		if (this.defaultValue != null)
-		{
-			this.defaultValue = this.defaultValue.foldConstants();
-		}
-	}
-
-	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
-	{
-		super.cleanup(context, compilableList);
-
-		if (this.defaultValue != null)
-		{
-			this.defaultValue = this.defaultValue.cleanup(context, compilableList);
-		}
-	}
-
-	@Override
-	public void writeInit(MethodWriter writer, IValue value) throws BytecodeException
-	{
-		this.writeInit(writer);
-	}
-
-	@Override
-	public void writeInit(MethodWriter writer)
-	{
-		final int modifiers = this.modifiers == null ?
-			                      0 :
-			                      this.modifiers.toFlags() & Modifiers.PARAMETER_MODIFIERS
-				                      & ModifierUtil.JAVA_MODIFIER_MASK;
-
-		this.localIndex = writer.localCount();
-		writer.registerParameter(this.localIndex, this.name.qualified, this.getInternalType(), modifiers);
-		this.writeAnnotations(writer);
-	}
-
-	@Override
 	public void writeLocal(MethodWriter writer, Label start, Label end)
 	{
-		writer.writeLocal(this.localIndex, this.name.qualified, this.getDescription(), this.getSignature(), start, end);
-	}
-
-	protected void writeAnnotations(MethodWriter writer)
-	{
-		final AnnotatableVisitor visitor = (desc, visible) -> writer
-			                                                      .visitParameterAnnotation(Parameter.this.index, desc,
-			                                                                                visible);
-
-		if (this.annotations != null)
-		{
-			final int count = this.annotations.annotationCount();
-			for (int i = 0; i < count; i++)
-			{
-				this.annotations.getAnnotation(i).write(visitor);
-			}
-		}
-
-		ModifierUtil.writeModifiers(visitor, this.modifiers);
-
-		this.type.writeAnnotations(writer, TypeReference.newFormalParameterReference(this.index), "");
-
-		if (this.defaultValue != null)
-		{
-			this.writeDefaultAnnotation(writer);
-		}
+		writer.visitLocalVariable(this.name.qualified, this.getDescriptor(), this.getSignature(), start, end,
+		                          this.localIndex);
 	}
 
 	@Override
@@ -393,22 +416,42 @@ public abstract class Parameter extends Member implements IParameter
 			this.modifiers.toString(buffer);
 		}
 
-		if (this.varargs)
+		boolean typeAscription = false;
+		if (this.type != null)
 		{
-			this.type.getElementType().toString(prefix, buffer);
-			buffer.append("... ");
+			typeAscription = Formatting.typeAscription("parameter.type_ascription", this);
+
+			if (!typeAscription)
+			{
+				this.appendType(prefix, buffer);
+			}
 		}
-		else
+
+		buffer.append(' ').append(this.name);
+
+		if (typeAscription)
 		{
-			this.type.toString(prefix, buffer);
-			buffer.append(' ');
+			Formatting.appendSeparator(buffer, "parameter.type_ascription", ':');
+			this.appendType(prefix, buffer);
 		}
-		buffer.append(this.name);
 
 		if (this.defaultValue != null)
 		{
 			Formatting.appendSeparator(buffer, "field.assignment", '=');
 			this.defaultValue.toString(prefix, buffer);
+		}
+	}
+
+	public void appendType(String prefix, StringBuilder buffer)
+	{
+		if (this.isVarargs())
+		{
+			this.type.getElementType().toString(prefix, buffer);
+			buffer.append("...");
+		}
+		else
+		{
+			this.type.toString(prefix, buffer);
 		}
 	}
 }

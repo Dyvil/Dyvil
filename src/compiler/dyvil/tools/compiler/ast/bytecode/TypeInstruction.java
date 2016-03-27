@@ -19,7 +19,13 @@ public class TypeInstruction implements IInstruction
 		this.opcode = opcode;
 		this.type = type;
 	}
-	
+
+	@Override
+	public int getOpcode()
+	{
+		return this.opcode;
+	}
+
 	@Override
 	public void write(MethodVisitor writer) throws BytecodeException
 	{

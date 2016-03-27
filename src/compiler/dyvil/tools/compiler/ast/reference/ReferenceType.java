@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.reference;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
@@ -15,8 +16,10 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvil.tools.compiler.ast.type.raw.IObjectType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -30,6 +33,29 @@ import java.io.IOException;
 
 public class ReferenceType implements IObjectType
 {
+	public static final class LazyFields
+	{
+		public static IClass OBJECT_SIMPLE_REF_CLASS = Package.dyvilRefSimple.resolveClass("SimpleObjectRef");
+		public static IClass OBJECT_REF_CLASS        = Package.dyvilRef.resolveClass("ObjectRef");
+
+		public static IType getObjectSimpleRef(IType type)
+		{
+			ClassGenericType gt = new ClassGenericType(OBJECT_SIMPLE_REF_CLASS);
+			gt.addType(type);
+			return gt;
+		}
+
+		public static String getInternalRef(IType type, String prefix)
+		{
+			return "dyvil/ref/" + prefix + type.getTypePrefix() + "Ref";
+		}
+
+		public static String getReferenceFactoryName(IType type, String prefix)
+		{
+			return "new" + prefix + type.getTypePrefix() + "Ref";
+		}
+	}
+
 	protected IClass theClass;
 	protected IType  type;
 
@@ -79,7 +105,7 @@ public class ReferenceType implements IObjectType
 		{
 			return 2;
 		}
-		return this.isSameType(superType) ? 1 : 0;
+		return Types.isSameType(superType, this) ? 1 : 0;
 	}
 
 	@Override
@@ -90,10 +116,10 @@ public class ReferenceType implements IObjectType
 
 	private boolean isSameBaseType(IType type)
 	{
-		if (this.theClass == Types.getObjectRefClass())
+		if (this.theClass == LazyFields.OBJECT_REF_CLASS)
 		{
 			final IType otherType = type.resolveType(this.theClass.getTypeParameter(0));
-			return otherType == null || this.type.isSameType(otherType);
+			return otherType == null || Types.isSameType(this.type, otherType);
 		}
 		return true;
 	}
@@ -242,7 +268,7 @@ public class ReferenceType implements IObjectType
 	@Override
 	public String getSignature()
 	{
-		if (this.theClass != Types.getObjectRefClass())
+		if (this.theClass != LazyFields.OBJECT_REF_CLASS)
 		{
 			return null;
 		}
@@ -256,7 +282,7 @@ public class ReferenceType implements IObjectType
 	public void appendSignature(StringBuilder buffer)
 	{
 		buffer.append('L').append(this.getInternalName());
-		if (this.theClass == Types.getObjectRefClass())
+		if (this.theClass == LazyFields.OBJECT_REF_CLASS)
 		{
 			buffer.append('<');
 			this.type.appendSignature(buffer);
@@ -269,8 +295,18 @@ public class ReferenceType implements IObjectType
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.type.writeTypeExpression(writer);
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/ReferenceType", "apply",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/ReferenceType", "apply",
 		                       "(Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/ReferenceType;", false);
+	}
+
+	@Override
+	public IType withAnnotation(IAnnotation annotation)
+	{
+		if (AnnotationUtil.IMPLICITLY_UNWRAPPED_INTERNAL.equals(annotation.getType().getInternalName()))
+		{
+			return new ImplicitReferenceType(this.theClass, this.type);
+		}
+		return null;
 	}
 
 	@Override
@@ -304,39 +340,39 @@ public class ReferenceType implements IObjectType
 	{
 		this.type = IType.readType(in);
 	}
-	
+
 	public void writeUnwrap(MethodWriter writer) throws BytecodeException
 	{
 		final String internal = this.theClass.getInternalName();
-		if (this.theClass == Types.getObjectRefClass())
+		if (this.theClass == LazyFields.OBJECT_REF_CLASS)
 		{
-			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, internal, "get", "()Ljava/lang/Object;", true);
-			
+			writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, internal, "get", "()Ljava/lang/Object;", true);
+
 			if (this.type.getTheClass() != Types.OBJECT_CLASS)
 			{
-				writer.writeTypeInsn(Opcodes.CHECKCAST, this.type.getInternalName());
+				writer.visitTypeInsn(Opcodes.CHECKCAST, this.type.getInternalName());
 			}
 			return;
 		}
-		
+
 		final StringBuilder stringBuilder = new StringBuilder("()");
 		this.type.appendExtendedName(stringBuilder);
-		writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, internal, "get", stringBuilder.toString(), true);
+		writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, internal, "get", stringBuilder.toString(), true);
 	}
-	
+
 	public void writeWrap(MethodWriter writer) throws BytecodeException
 	{
 		final String internal = this.theClass.getInternalName();
-		if (this.theClass == Types.getObjectRefClass())
+		if (this.theClass == LazyFields.OBJECT_REF_CLASS)
 		{
-			writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, internal, "set", "(Ljava/lang/Object;)V", true);
+			writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, internal, "set", "(Ljava/lang/Object;)V", true);
 			return;
 		}
-		
+
 		final StringBuilder stringBuilder = new StringBuilder().append('(');
 		this.type.appendExtendedName(stringBuilder);
 		stringBuilder.append(")V");
-		writer.writeInvokeInsn(Opcodes.INVOKEINTERFACE, internal, "set", stringBuilder.toString(), true);
+		writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, internal, "set", stringBuilder.toString(), true);
 	}
 
 	@Override

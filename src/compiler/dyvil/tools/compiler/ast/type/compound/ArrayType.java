@@ -8,12 +8,14 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.LiteralConversion;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.statement.loop.IterableForStatement;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
@@ -40,7 +42,7 @@ public class ArrayType implements IObjectType, ITyped
 	public ArrayType()
 	{
 	}
-	
+
 	public ArrayType(IType type)
 	{
 		this.type = type;
@@ -70,49 +72,49 @@ public class ArrayType implements IObjectType, ITyped
 			return type;
 		}
 	}
-	
+
 	@Override
 	public int typeTag()
 	{
 		return ARRAY;
 	}
-	
+
 	@Override
 	public boolean isGenericType()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public void setType(IType type)
 	{
 		this.type = type;
 	}
-	
+
 	@Override
 	public IType getType()
 	{
 		return this.type;
 	}
-	
+
 	@Override
 	public Name getName()
 	{
 		return this.type.getName();
 	}
-	
+
 	@Override
 	public IClass getTheClass()
 	{
 		return this.type.getArrayClass();
 	}
-	
+
 	@Override
 	public boolean isArrayType()
 	{
 		return true;
 	}
-	
+
 	@Override
 	public int getArrayDimensions()
 	{
@@ -135,34 +137,40 @@ public class ArrayType implements IObjectType, ITyped
 	{
 		return this.type;
 	}
-	
+
 	@Override
 	public IMethod getBoxMethod()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public IMethod getUnboxMethod()
 	{
 		return null;
 	}
-	
+
 	@Override
-	public IType getSuperType()
+	public IValue convertValueTo(IValue value, IType targetType, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		return Types.OBJECT;
+		if (!this.isConvertibleTo(targetType))
+		{
+			return null;
+		}
+
+		final IMethod toIterableMethod = this.getTheClass().getBody().getMethod(Name.getQualified("toIterable"));
+		return new LiteralConversion(value, toIterableMethod).withType(targetType, typeContext, markers, context);
 	}
-	
+
 	@Override
 	public boolean isSameType(IType type)
 	{
-		return type.isArrayType() && this.mutability == type.getMutability() && this.type
-				.isSameType(type.getElementType());
+		return type.isArrayType() && this.mutability == type.getMutability() && Types.isSameType(this.type,
+		                                                                                         type.getElementType());
 	}
-	
+
 	@Override
-	public boolean classEquals(IType type)
+	public boolean isSameClass(IType type)
 	{
 		if (!type.isArrayType())
 		{
@@ -170,7 +178,13 @@ public class ArrayType implements IObjectType, ITyped
 		}
 
 		final IType elementType = type.getElementType();
-		return this.checkPrimitiveType(elementType) && this.type.classEquals(elementType);
+		return this.checkPrimitiveType(elementType) && this.type.isSameClass(elementType);
+	}
+
+	@Override
+	public boolean isConvertibleTo(IType type)
+	{
+		return Types.isSuperType(type, IterableForStatement.LazyFields.ITERABLE);
 	}
 
 	@Override
@@ -186,18 +200,18 @@ public class ArrayType implements IObjectType, ITyped
 		}
 
 		final IType elementType = type.getElementType();
-		return this.checkPrimitiveType(elementType) && this.type.isSuperTypeOf(elementType);
+		return this.checkPrimitiveType(elementType) && Types.isSuperType(this.type, elementType);
 	}
 
 	@Override
-	public boolean isSuperClassOf(IType type)
+	public boolean isSuperClassOf(IType subType)
 	{
-		if (!type.isArrayType())
+		if (!subType.isArrayType())
 		{
 			return false;
 		}
 
-		final IType elementType = type.getElementType();
+		final IType elementType = subType.getElementType();
 		return this.checkPrimitiveType(elementType) && this.type.isSuperClassOf(elementType);
 	}
 
@@ -221,63 +235,23 @@ public class ArrayType implements IObjectType, ITyped
 		return this.type.getSuperTypeDistance(elementType);
 	}
 
-	@Override
-	public float getSubTypeDistance(IType subtype)
-	{
-		if (!subtype.isArrayType())
-		{
-			return 0F;
-		}
-		if (!checkImmutable(this, subtype))
-		{
-			return 0F;
-		}
-
-		final IType elementType = subtype.getElementType();
-		if (!this.checkPrimitiveType(elementType))
-		{
-			return 0F;
-		}
-		return this.type.getSubTypeDistance(elementType);
-	}
-
-	@Override
-	public int getSubClassDistance(IType subtype)
-	{
-		if (!subtype.isArrayType())
-		{
-			return 0;
-		}
-		if (checkImmutable(this, subtype))
-		{
-			return 0;
-		}
-
-		final IType elementType = subtype.getElementType();
-		if (!this.checkPrimitiveType(elementType))
-		{
-			return 0;
-		}
-		return this.type.getSubClassDistance(subtype.getElementType());
-	}
-
 	private static boolean checkImmutable(IType superType, IType subtype)
 	{
 		return superType.getMutability() == Mutability.UNDEFINED || superType.getMutability() == subtype
-				.getMutability();
+			                                                                                         .getMutability();
 	}
 
 	private boolean checkPrimitiveType(IType elementType)
 	{
 		return this.type.isPrimitive() == elementType.isPrimitive();
 	}
-	
+
 	@Override
 	public boolean isResolved()
 	{
 		return this.type.isResolved();
 	}
-	
+
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
@@ -288,13 +262,13 @@ public class ArrayType implements IObjectType, ITyped
 		this.type = this.type.resolveType(markers, context);
 		return this;
 	}
-	
+
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
 		this.type.resolve(markers, context);
 	}
-	
+
 	@Override
 	public void checkType(MarkerList markers, IContext context, TypePosition position)
 	{
@@ -302,34 +276,34 @@ public class ArrayType implements IObjectType, ITyped
 		{
 			markers.add(Markers.semantic(this.type.getPosition(), "type.super.array"));
 		}
-		
+
 		this.type.checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		this.type.check(markers, context);
 	}
-	
+
 	@Override
 	public void foldConstants()
 	{
 		this.type.foldConstants();
 	}
-	
+
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		this.type.cleanup(context, compilableList);
 	}
-	
+
 	@Override
 	public boolean hasTypeVariables()
 	{
 		return this.type.hasTypeVariables();
 	}
-	
+
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
@@ -344,14 +318,7 @@ public class ArrayType implements IObjectType, ITyped
 			}
 			if (concrete != null && concrete != this.type)
 			{
-				return new ArrayType(concrete, this.mutability)
-				{
-					@Override
-					public IType getReturnType()
-					{
-						return new ArrayType(typeParameter.getDefaultType(), this.mutability);
-					}
-				};
+				return new ArrayType(concrete, this.mutability);
 			}
 			return this;
 		}
@@ -363,13 +330,13 @@ public class ArrayType implements IObjectType, ITyped
 
 		return this;
 	}
-	
+
 	@Override
 	public IType resolveType(ITypeParameter typeParameter)
 	{
 		return this.type.resolveType(typeParameter);
 	}
-	
+
 	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
@@ -378,43 +345,43 @@ public class ArrayType implements IObjectType, ITyped
 			this.type.inferTypes(concrete.getElementType(), typeContext);
 		}
 	}
-	
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
 		return null;
 	}
-	
+
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		this.type.getArrayClass().getMethodMatches(list, instance, name, arguments);
 	}
-	
+
 	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}
-	
+
 	@Override
 	public IMethod getFunctionalMethod()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public String getInternalName()
 	{
 		return this.getExtendedName();
 	}
-	
+
 	@Override
 	public void appendExtendedName(StringBuilder buffer)
 	{
 		buffer.append('[');
 		this.type.appendExtendedName(buffer);
 	}
-	
+
 	@Override
 	public String getSignature()
 	{
@@ -425,22 +392,22 @@ public class ArrayType implements IObjectType, ITyped
 		}
 		return null;
 	}
-	
+
 	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
 		buffer.append('[');
 		this.type.appendSignature(buffer);
 	}
-	
+
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.type.writeTypeExpression(writer);
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/ArrayType", "apply",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/ArrayType", "apply",
 		                       "(Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/ArrayType;", false);
 	}
-	
+
 	@Override
 	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
 	{
@@ -462,21 +429,21 @@ public class ArrayType implements IObjectType, ITyped
 	{
 		this.type.writeAnnotations(visitor, typeRef, typePath.concat("["));
 	}
-	
+
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
 		IType.writeType(this.type, out);
 		this.mutability.write(out);
 	}
-	
+
 	@Override
 	public void read(DataInput in) throws IOException
 	{
 		this.type = IType.readType(in);
 		this.mutability = Mutability.read(in);
 	}
-	
+
 	@Override
 	public String toString()
 	{
@@ -485,7 +452,7 @@ public class ArrayType implements IObjectType, ITyped
 		builder.append(this.type.toString());
 		return builder.append(']').toString();
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
@@ -494,7 +461,7 @@ public class ArrayType implements IObjectType, ITyped
 		this.type.toString(prefix, buffer);
 		buffer.append(']');
 	}
-	
+
 	@Override
 	public IType clone()
 	{

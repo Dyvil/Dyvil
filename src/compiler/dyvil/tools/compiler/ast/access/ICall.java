@@ -185,15 +185,14 @@ public interface ICall extends IValue
 		return instance == null || context.getThisClass() == instance.getType().getTheClass();
 	}
 	
-	static IDataMember resolveField(IContext context, ITyped instance, Name name)
+	static IDataMember resolveField(IContext context, ITyped receiver, Name name)
 	{
-		IDataMember match;
-		if (instance != null)
+		if (receiver != null)
 		{
-			IType type = instance.getType();
-			if (type != null)
+			final IType receiverType = receiver.getType();
+			if (receiverType != null)
 			{
-				match = type.resolveField(name);
+				final IDataMember match = receiverType.resolveField(name);
 				if (match != null)
 				{
 					return match;
@@ -203,12 +202,13 @@ public interface ICall extends IValue
 			return null;
 		}
 		
-		match = context.resolveField(name);
+		final IDataMember match = context.resolveField(name);
 		if (match != null)
 		{
 			return match;
 		}
-		return null;
+
+		return Types.LANG_HEADER.resolveField(name);
 	}
 	
 	static IMethod resolveMethod(IContext context, IValue instance, Name name, IArguments arguments)

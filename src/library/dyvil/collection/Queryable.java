@@ -252,6 +252,12 @@ public interface Queryable<E> extends Iterable<E>
 	 * 		the condition
 	 */
 	void filter(Predicate<? super E> condition);
+
+	<R> Queryable<R> mapped(Function<? super E, ? extends R> mapper);
+
+	<R> Queryable<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper);
+
+	Queryable<E> filtered(Predicate<? super E> condition);
 	
 	default String toString(String prefix, String separator, String postfix)
 	{

@@ -29,13 +29,13 @@ public class AnnotatedType extends TypeDelegate
 	{
 		this.annotation = annotation;
 	}
-	
+
 	public AnnotatedType(IType type, IAnnotation annotation)
 	{
 		this.type = type;
 		this.annotation = annotation;
 	}
-	
+
 	@Override
 	public int typeTag()
 	{
@@ -62,6 +62,12 @@ public class AnnotatedType extends TypeDelegate
 		}
 
 		this.annotation.resolveTypes(markers, context);
+
+		final IType withAnnotation = this.type.withAnnotation(this.annotation);
+		if (withAnnotation != null)
+		{
+			return withAnnotation;
+		}
 		return this;
 	}
 

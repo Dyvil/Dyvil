@@ -101,19 +101,19 @@ public final class CaseClassMetadata extends ClassMetadata
 			mw = new MethodWriterImpl(writer, writer.visitMethod(this.applyMethod.getModifiers().toFlags(), "apply",
 			                                                     this.applyMethod.getDescriptor(),
 			                                                     this.applyMethod.getSignature(), null));
-			mw.begin();
-			mw.writeTypeInsn(Opcodes.NEW, this.theClass.getType().getInternalName());
-			mw.writeInsn(Opcodes.DUP);
+			mw.visitCode();
+			mw.visitTypeInsn(Opcodes.NEW, this.theClass.getType().getInternalName());
+			mw.visitInsn(Opcodes.DUP);
 			int len = this.theClass.parameterCount();
 			for (int i = 0; i < len; i++)
 			{
 				IParameter param = this.theClass.getParameter(i);
 				param.writeInit(mw);
-				mw.writeVarInsn(param.getType().getLoadOpcode(), param.getLocalIndex());
+				mw.visitVarInsn(param.getType().getLoadOpcode(), param.getLocalIndex());
 			}
 			this.constructor.writeInvoke(mw, 0);
-			mw.writeInsn(Opcodes.ARETURN);
-			mw.end(this.theClass.getType());
+			mw.visitInsn(Opcodes.ARETURN);
+			mw.visitEnd(this.theClass.getType());
 		}
 		
 		String internal = this.theClass.getInternalName();
@@ -122,10 +122,10 @@ public final class CaseClassMetadata extends ClassMetadata
 			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "equals",
 			                                                     "(Ljava/lang/Object;)Z", null, null));
 			mw.setThisType(internal);
-			mw.registerParameter(1, "obj", Types.OBJECT, 0);
-			mw.begin();
+			mw.visitParameter(1, "obj", Types.OBJECT, 0);
+			mw.visitCode();
 			CaseClasses.writeEquals(mw, this.theClass);
-			mw.end();
+			mw.visitEnd();
 		}
 		
 		if ((this.members & HASHCODE) == 0)
@@ -134,9 +134,9 @@ public final class CaseClassMetadata extends ClassMetadata
 			                          writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "hashCode", "()I",
 			                                             null, null));
 			mw.setThisType(internal);
-			mw.begin();
+			mw.visitCode();
 			CaseClasses.writeHashCode(mw, this.theClass);
-			mw.end();
+			mw.visitEnd();
 		}
 		
 		if ((this.members & TOSTRING) == 0)
@@ -144,9 +144,9 @@ public final class CaseClassMetadata extends ClassMetadata
 			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "toString",
 			                                                     "()Ljava/lang/String;", null, null));
 			mw.setThisType(internal);
-			mw.begin();
+			mw.visitCode();
 			CaseClasses.writeToString(mw, this.theClass);
-			mw.end();
+			mw.visitEnd();
 		}
 	}
 }

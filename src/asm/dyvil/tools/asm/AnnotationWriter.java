@@ -53,20 +53,20 @@ final class AnnotationWriter implements AnnotationVisitor
 		}
 		else if (value instanceof Byte)
 		{
-			this.bv.put12('B', this.cw.newInteger(((Byte) value).byteValue()).index);
+			this.bv.put12('B', this.cw.newInteger((Byte) value).index);
 		}
 		else if (value instanceof Boolean)
 		{
-			int v = ((Boolean) value).booleanValue() ? 1 : 0;
+			int v = (Boolean) value ? 1 : 0;
 			this.bv.put12('Z', this.cw.newInteger(v).index);
 		}
 		else if (value instanceof Character)
 		{
-			this.bv.put12('C', this.cw.newInteger(((Character) value).charValue()).index);
+			this.bv.put12('C', this.cw.newInteger((Character) value).index);
 		}
 		else if (value instanceof Short)
 		{
-			this.bv.put12('S', this.cw.newInteger(((Short) value).shortValue()).index);
+			this.bv.put12('S', this.cw.newInteger((Short) value).index);
 		}
 		else if (value instanceof Type)
 		{

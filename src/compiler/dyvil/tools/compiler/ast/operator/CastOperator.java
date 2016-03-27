@@ -4,13 +4,13 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -65,13 +65,7 @@ public final class CastOperator extends AbstractValue
 	{
 		this.type = type;
 	}
-	
-	@Override
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
-	{
-		return type.isSuperTypeOf(this.type) ? this : null;
-	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -106,11 +100,6 @@ public final class CastOperator extends AbstractValue
 		}
 
 		this.value = this.value.resolve(markers, context);
-		if (this.type == Types.VOID)
-		{
-			markers.add(Markers.semantic(this.position, "cast.void"));
-			return this;
-		}
 		
 		if (!this.type.isResolved())
 		{
@@ -119,13 +108,13 @@ public final class CastOperator extends AbstractValue
 		
 		IType valueType = this.value.getType();
 		
-		final IValue typedValue = this.value.withType(this.type, this.type, markers, context);
+		final IValue typedValue = TypeChecker.convertValue(this.value, this.type, this.type, markers, context);
 		if (typedValue != null)
 		{
 			this.value = typedValue;
 			
 			final IType newType = typedValue.getType();
-			if (!valueType.isSameType(newType) && this.type.isSuperClassOf(newType)
+			if (!Types.isSameType(valueType, newType) && this.type.isSuperClassOf(newType)
 					&& newType.isPrimitive() == this.type.isPrimitive())
 			{
 				this.typeHint = true;
@@ -200,15 +189,15 @@ public final class CastOperator extends AbstractValue
 	{
 		this.value.writeExpression(writer, null);
 
-		if (type == Types.VOID)
-		{
-			writer.writeInsn(Opcodes.AUTO_POP);
-			return;
-		}
-
 		if (type == null)
 		{
 			type = this.type;
+		}
+
+		if (Types.isSameType(type, Types.VOID))
+		{
+			writer.visitInsn(Opcodes.AUTO_POP);
+			return;
 		}
 		this.value.getType().writeCast(writer, type, this.getLineNumber());
 	}

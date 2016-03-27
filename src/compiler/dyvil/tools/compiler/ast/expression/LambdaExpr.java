@@ -18,6 +18,7 @@ import dyvil.tools.compiler.ast.generic.MapTypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.IParametric;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -35,7 +36,7 @@ import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public final class LambdaExpr implements IValue, IClassCompilable, IDefaultContext, IValueConsumer
+public final class LambdaExpr implements IValue, IClassCompilable, IDefaultContext, IValueConsumer, IParameterList
 {
 	public static final Handle BOOTSTRAP = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/LambdaMetafactory",
 	                                                  "metafactory",
@@ -141,19 +142,6 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	}
 
 	@Override
-	public void setInnerIndex(String internalName, int index)
-	{
-		this.owner = internalName;
-		this.name = "lambda$" + index;
-	}
-
-	@Override
-	public boolean isPrimitive()
-	{
-		return false;
-	}
-
-	@Override
 	public void setValue(IValue value)
 	{
 		this.value = value;
@@ -162,6 +150,43 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	public IValue getValue()
 	{
 		return this.value;
+	}
+
+	@Override
+	public int parameterCount()
+	{
+		return this.parameterCount;
+	}
+
+	@Override
+	public void addParameter(IParameter parameter)
+	{
+		int index = this.parameterCount++;
+		if (index >= this.parameters.length)
+		{
+			IParameter[] temp = new IParameter[index + 1];
+			System.arraycopy(this.parameters, 0, temp, 0, index);
+			this.parameters = temp;
+		}
+		this.parameters[index] = parameter;
+	}
+
+	@Override
+	public void setParameter(int index, IParameter parameter)
+	{
+		this.parameters[index] = parameter;
+	}
+
+	@Override
+	public IParameter getParameter(int index)
+	{
+		return this.parameters[index];
+	}
+
+	@Override
+	public IParameter[] getParameters()
+	{
+		return this.parameters;
 	}
 
 	public void setMethod(IMethod method)
@@ -183,6 +208,19 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	public void setReturnType(IType returnType)
 	{
 		this.returnType = returnType;
+	}
+
+	@Override
+	public void setInnerIndex(String internalName, int index)
+	{
+		this.owner = internalName;
+		this.name = "lambda$" + index;
+	}
+
+	@Override
+	public boolean isPrimitive()
+	{
+		return false;
 	}
 
 	@Override
@@ -307,7 +345,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			}
 
 			final IType methodParamType = this.method.getParameter(i).getType();
-			final IType concreteType = methodParamType.getConcreteType(this.type).getParameterType();
+			final IType concreteType = methodParamType.getConcreteType(this.type).asParameterType();
 
 			// Can't infer parameter type
 			if (concreteType == Types.UNKNOWN)
@@ -317,13 +355,13 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			parameter.setType(concreteType);
 		}
 
-		this.returnType = this.method.getType().getConcreteType(this.type).getReturnType().getParameterType();
+		this.returnType = this.method.getType().getConcreteType(this.type).asParameterType();
 	}
 
 	@Override
 	public boolean isType(IType type)
 	{
-		if (this.type != null && type.isSuperTypeOf(this.type))
+		if (this.type != null && Types.isSuperType(type, this.type))
 		{
 			return true;
 		}
@@ -360,8 +398,8 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			}
 
 			final IParameter methodParameter = method.getParameter(i);
-			final IType methodParameterType = methodParameter.getType().getParameterType();
-			if (!methodParameterType.isSuperTypeOf(lambdaParameterType))
+			final IType methodParameterType = methodParameter.getType().asParameterType();
+			if (!Types.isSuperType(methodParameterType, lambdaParameterType))
 			{
 				return false;
 			}
@@ -371,7 +409,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	}
 
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		if (type.getTheClass() == Types.OBJECT_CLASS)
 		{
@@ -578,12 +616,6 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 		if (receiver != null)
 		{
-			// Non-Static method in primitive wrapper class -> boxing required
-			if (receiver.isPrimitive() && !parametric.hasModifier(Modifiers.STATIC))
-			{
-				return false;
-			}
-
 			if (this.parameterCount <= 0)
 			{
 				return false;
@@ -682,9 +714,9 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			                                                  .getMethodType(this.getSpecialDescriptor());
 		final Handle handle = new Handle(handleType, this.owner, this.name, desc);
 
-		writer.writeLineNumber(this.getLineNumber());
-		writer.writeInvokeDynamic(invokedName, invokedType, BOOTSTRAP, methodDescriptorType, handle,
-		                          lambdaDescriptorType);
+		writer.visitLineNumber(this.getLineNumber());
+		writer.visitInvokeDynamicInsn(invokedName, invokedType, BOOTSTRAP, methodDescriptorType, handle,
+		                              lambdaDescriptorType);
 
 		if (type != null)
 		{
@@ -794,9 +826,9 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 		// Write the Value
 
-		methodWriter.begin();
+		methodWriter.visitCode();
 		this.value.writeExpression(methodWriter, this.returnType);
-		methodWriter.end(this.returnType);
+		methodWriter.visitEnd(this.returnType);
 	}
 
 	@Override

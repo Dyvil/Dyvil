@@ -13,6 +13,8 @@ import dyvil.util.Option;
 import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 @NilConvertible
 @ArrayConvertible
@@ -152,7 +154,18 @@ public interface MutableMap<K, V> extends Map<K, V>
 		copy.$minus$minus$eq(keys);
 		return copy;
 	}
-	
+
+	@Override
+	default <NK> MutableMap<NK, V> keyMapped(Function<? super K, ? extends NK> mapper)
+	{
+		MutableMap<NK, V> copy = this.emptyCopy();
+		for (Entry<K, V> entry : this)
+		{
+			copy.put(mapper.apply(entry.getKey()), entry.getValue());
+		}
+		return copy;
+	}
+
 	@Override
 	default <NK> MutableMap<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper)
 	{
@@ -164,7 +177,18 @@ public interface MutableMap<K, V> extends Map<K, V>
 		}
 		return copy;
 	}
-	
+
+	@Override
+	default <NV> MutableMap<K, NV> valueMapped(Function<? super V, ? extends NV> mapper)
+	{
+		MutableMap<K, NV> copy = this.emptyCopy();
+		for (Entry<K, V> entry : this)
+		{
+			copy.put(entry.getKey(), mapper.apply(entry.getValue()));
+		}
+		return copy;
+	}
+
 	@Override
 	default <NV> MutableMap<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper)
 	{
@@ -213,7 +237,23 @@ public interface MutableMap<K, V> extends Map<K, V>
 		copy.filter(condition);
 		return copy;
 	}
-	
+
+	@Override
+	default MutableMap<K, V> filteredByKey(Predicate<? super K> condition)
+	{
+		MutableMap<K, V> copy = this.copy();
+		copy.filterByKey(condition);
+		return copy;
+	}
+
+	@Override
+	default MutableMap<K, V> filteredByValue(Predicate<? super V> condition)
+	{
+		MutableMap<K, V> copy = this.copy();
+		copy.filterByValue(condition);
+		return copy;
+	}
+
 	@Override
 	default MutableMap<V, K> inverted()
 	{
@@ -328,34 +368,76 @@ public interface MutableMap<K, V> extends Map<K, V>
 		}
 		return removed;
 	}
-	
+
+	@Override
+	default void mapKeys(Function<? super K, ? extends K> mapper)
+	{
+		final int size = this.size();
+		final Entry<K, V>[] entries = this.toArray();
+
+		this.clear();
+		for (int i = 0; i < size; i++)
+		{
+			final Entry<K, V> entry = entries[i];
+			this.put(mapper.apply(entry.getKey()), entry.getValue());
+		}
+	}
+
 	@Override
 	default void mapKeys(BiFunction<? super K, ? super V, ? extends K> mapper)
 	{
-		int size = this.size();
-		Entry<K, V>[] entries = this.toArray();
+		final int size = this.size();
+		final Entry<K, V>[] entries = this.toArray();
 		
 		this.clear();
 		for (int i = 0; i < size; i++)
 		{
-			Entry<K, V> entry = entries[i];
-			V value = entry.getValue();
+			final Entry<K, V> entry = entries[i];
+			final V value = entry.getValue();
 			this.put(mapper.apply(entry.getKey(), value), value);
 		}
 	}
-	
+
 	@Override
-	void mapValues(BiFunction<? super K, ? super V, ? extends V> mapper);
-	
+	default void mapValues(Function<? super V, ? extends V> mapper)
+	{
+		final int size = this.size();
+		final Entry<K, V>[] entries = this.toArray();
+
+		this.clear();
+		for (int i = 0; i < size; i++)
+		{
+			final Entry<K, V> entry = entries[i];
+			this.put(entry.getKey(), mapper.apply(entry.getValue()));
+		}
+	}
+
+	@Override
+	default void mapValues(BiFunction<? super K, ? super V, ? extends V> mapper)
+	{
+		final int size = this.size();
+		final Entry<K, V>[] entries = this.toArray();
+
+		this.clear();
+		for (int i = 0; i < size; i++)
+		{
+			final Entry<K, V> entry = entries[i];
+			final K key = entry.getKey();
+			this.put(key, mapper.apply(key, entry.getValue()));
+		}
+	}
+
 	@Override
 	default void mapEntries(BiFunction<? super K, ? super V, ? extends Entry<? extends K, ? extends V>> mapper)
 	{
-		Entry<K, V>[] entries = this.toArray();
+		final int size = this.size();
+		final Entry<K, V>[] entries = this.toArray();
 		
 		this.clear();
-		for (Entry<K, V> entry : entries)
+		for (int i = 0; i < size; i++)
 		{
-			Entry<? extends K, ? extends V> newEntry = mapper.apply(entry.getKey(), entry.getValue());
+			final Entry<K, V> entry = entries[i];
+			final Entry<? extends K, ? extends V> newEntry = mapper.apply(entry.getKey(), entry.getValue());
 			if (newEntry != null)
 			{
 				this.put(newEntry);
@@ -366,7 +448,7 @@ public interface MutableMap<K, V> extends Map<K, V>
 	@Override
 	default void flatMap(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends K, ? extends V>>> mapper)
 	{
-		Entry<K, V>[] entries = this.toArray();
+		final Entry<K, V>[] entries = this.toArray();
 		
 		this.clear();
 		for (Entry<K, V> entry : entries)
@@ -380,7 +462,19 @@ public interface MutableMap<K, V> extends Map<K, V>
 	
 	@Override
 	void filter(BiPredicate<? super K, ? super V> condition);
-	
+
+	@Override
+	default void filterByKey(Predicate<? super K> condition)
+	{
+		this.filter((k, v) -> condition.test(k));
+	}
+
+	@Override
+	default void filterByValue(Predicate<? super V> condition)
+	{
+		this.filter((k, v) -> condition.test(v));
+	}
+
 	// Copying
 	
 	@Override

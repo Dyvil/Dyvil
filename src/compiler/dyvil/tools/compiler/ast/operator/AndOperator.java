@@ -6,7 +6,6 @@ import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -61,22 +60,6 @@ public final class AndOperator extends AbstractValue
 	public IType getType()
 	{
 		return Types.BOOLEAN;
-	}
-	
-	@Override
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
-	{
-		if (type == Types.BOOLEAN || type.isSuperTypeOf(Types.BOOLEAN))
-		{
-			return this;
-		}
-		return null;
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return type == Types.BOOLEAN || type.isSuperTypeOf(Types.BOOLEAN);
 	}
 	
 	@Override
@@ -153,11 +136,11 @@ public final class AndOperator extends AbstractValue
 		Label label2 = new Label();
 		this.left.writeInvJump(writer, label);
 		this.right.writeInvJump(writer, label);
-		writer.writeLDC(1);
-		writer.writeJumpInsn(Opcodes.GOTO, label2);
-		writer.writeLabel(label);
-		writer.writeLDC(0);
-		writer.writeLabel(label2);
+		writer.visitLdcInsn(1);
+		writer.visitJumpInsn(Opcodes.GOTO, label2);
+		writer.visitLabel(label);
+		writer.visitLdcInsn(0);
+		writer.visitLabel(label2);
 
 		if (type != null)
 		{

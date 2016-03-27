@@ -56,19 +56,13 @@ public interface IVariable extends IDataMember
 	@Override
 	default IDataMember capture(IContext context)
 	{
-		return this.capture(context, this);
-	}
-	
-	@Override
-	default IDataMember capture(IContext context, IVariable variable)
-	{
 		IDataMember capture = context.capture(this);
-		return capture == null ? variable : capture;
+		return capture == null ? this : capture;
 	}
-	
+
 	default void appendDescription(StringBuilder buf)
 	{
-		buf.append(this.getDescription());
+		buf.append(this.getDescriptor());
 	}
 	
 	default void appendSignature(StringBuilder buf)

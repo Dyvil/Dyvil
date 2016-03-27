@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.parser.classes;
+package dyvil.tools.compiler.parser.header;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
@@ -6,19 +6,14 @@ import dyvil.tools.compiler.ast.header.HeaderDeclaration;
 import dyvil.tools.compiler.ast.header.ImportDeclaration;
 import dyvil.tools.compiler.ast.header.IncludeDeclaration;
 import dyvil.tools.compiler.ast.header.PackageDeclaration;
-import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
-import dyvil.tools.compiler.ast.modifiers.Modifier;
-import dyvil.tools.compiler.ast.modifiers.ModifierList;
-import dyvil.tools.compiler.ast.modifiers.ModifierSet;
+import dyvil.tools.compiler.ast.modifiers.*;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
-import dyvil.tools.compiler.parser.imports.ImportParser;
-import dyvil.tools.compiler.parser.imports.IncludeParser;
-import dyvil.tools.compiler.parser.imports.PackageParser;
+import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.Markers;
@@ -123,7 +118,7 @@ public class DyvilHeaderParser extends Parser
 	protected boolean parseMetadata(IParserManager pm, IToken token, int type)
 	{
 		Modifier modifier;
-		if ((modifier = BaseModifiers.parseModifier(token, pm)) != null)
+		if ((modifier = ModifierUtil.parseModifier(token, pm)) != null)
 		{
 			if (this.modifiers == null)
 			{
@@ -241,8 +236,7 @@ public class DyvilHeaderParser extends Parser
 
 		final Annotation annotation = new Annotation(token.raw());
 		this.annotations.addAnnotation(annotation);
-		pm.pushParser(pm.newAnnotationParser(annotation));
-		return;
+		pm.pushParser(new AnnotationParser(annotation));
 	}
 
 	@Override

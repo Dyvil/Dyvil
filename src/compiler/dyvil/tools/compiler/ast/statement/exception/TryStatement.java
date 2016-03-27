@@ -146,7 +146,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	@Override
 	public boolean isType(IType type)
 	{
-		if (type == Types.VOID)
+		if (Types.isSameType(type, Types.VOID))
 		{
 			return true;
 		}
@@ -165,24 +165,24 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	}
 
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		if (DISALLOW_EXPRESSIONS)
 		{
-			return 0F;
+			return 0;
 		}
 
-		float total = this.action.getTypeMatch(type);
+		int total = this.action.getTypeMatch(type);
 		if (total <= 0F)
 		{
-			return 0F;
+			return 0;
 		}
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
-			final float blockMatch = this.catchBlocks[i].action.getTypeMatch(type);
+			final int blockMatch = this.catchBlocks[i].action.getTypeMatch(type);
 			if (blockMatch <= 0F)
 			{
-				return 0F;
+				return 0;
 			}
 			total += blockMatch;
 		}
@@ -371,7 +371,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	{
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
-			if (this.catchBlocks[i].type.isSuperTypeOf(type))
+			if (Types.isSuperType(this.catchBlocks[i].getType(), type))
 			{
 				return TRUE;
 			}
@@ -408,27 +408,27 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		final dyvil.tools.asm.Label tryEnd = new dyvil.tools.asm.Label();
 		final dyvil.tools.asm.Label endLabel = new dyvil.tools.asm.Label();
 
-		writer.writeTargetLabel(tryStart);
+		writer.visitTargetLabel(tryStart);
 		if (this.action != null)
 		{
 			this.action.writeExpression(writer, type);
 			if (expression)
 			{
-				writer.writeVarInsn(storeInsn, localIndex);
+				writer.visitVarInsn(storeInsn, localIndex);
 				writer.resetLocals(localIndex);
 			}
 
-			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
+			writer.visitJumpInsn(Opcodes.GOTO, endLabel);
 		}
-		writer.writeLabel(tryEnd);
+		writer.visitLabel(tryEnd);
 
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			final CatchBlock block = this.catchBlocks[i];
 			final dyvil.tools.asm.Label handlerLabel = new dyvil.tools.asm.Label();
-			final String handlerType = block.type.getInternalName();
+			final String handlerType = block.getType().getInternalName();
 
-			writer.writeTargetLabel(handlerLabel);
+			writer.visitTargetLabel(handlerLabel);
 			writer.startCatchBlock(handlerType);
 
 			// Check if the block's variable is actually used
@@ -444,42 +444,42 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			// Otherwise pop the exception from the stack
 			else
 			{
-				writer.writeInsn(Opcodes.POP);
+				writer.visitInsn(Opcodes.POP);
 				block.action.writeExpression(writer, type);
 			}
 
 			if (expression)
 			{
-				writer.writeVarInsn(storeInsn, localIndex);
+				writer.visitVarInsn(storeInsn, localIndex);
 				writer.resetLocals(localIndex);
 			}
 
-			writer.writeCatchBlock(tryStart, tryEnd, handlerLabel, handlerType);
-			writer.writeJumpInsn(Opcodes.GOTO, endLabel);
+			writer.visitTryCatchBlock(tryStart, tryEnd, handlerLabel, handlerType);
+			writer.visitJumpInsn(Opcodes.GOTO, endLabel);
 		}
 
 		if (this.finallyBlock != null)
 		{
 			final dyvil.tools.asm.Label finallyLabel = new dyvil.tools.asm.Label();
 
-			writer.writeLabel(finallyLabel);
+			writer.visitLabel(finallyLabel);
 			writer.startCatchBlock("java/lang/Throwable");
-			writer.writeInsn(Opcodes.POP);
+			writer.visitInsn(Opcodes.POP);
 
-			writer.writeLabel(endLabel);
+			writer.visitLabel(endLabel);
 			this.finallyBlock.writeExpression(writer, Types.VOID);
-			writer.writeFinallyBlock(tryStart, tryEnd, finallyLabel);
+			writer.visitFinallyBlock(tryStart, tryEnd, finallyLabel);
 		}
 		else
 		{
-			writer.writeLabel(endLabel);
+			writer.visitLabel(endLabel);
 		}
 
 		if (expression)
 		{
 			writer.setLocalType(localIndex, type.getFrameType());
 
-			writer.writeVarInsn(type.getLoadOpcode(), localIndex);
+			writer.visitVarInsn(type.getLoadOpcode(), localIndex);
 			writer.resetLocals(localIndex);
 		}
 	}
@@ -517,8 +517,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 
 			Formatting.appendSeparator(buffer, "try.catch.open_paren", '(');
 
-			block.type.toString(prefix, buffer);
-			buffer.append(' ').append(block.varName);
+			block.variable.toString(prefix, buffer);
 
 			if (Formatting.getBoolean("try.catch.close_paren.space_before"))
 			{

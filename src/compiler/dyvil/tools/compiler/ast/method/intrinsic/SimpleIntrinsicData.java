@@ -39,7 +39,7 @@ public class SimpleIntrinsicData implements IntrinsicData
 			return;
 		}
 		
-		writer.writeInsnAtLine(insn, lineNumber);
+		writer.visitInsnAtLine(insn, lineNumber);
 	}
 	
 	@Override
@@ -56,12 +56,12 @@ public class SimpleIntrinsicData implements IntrinsicData
 		int jumpInsn = Opcodes.getJumpOpcode(lastInsn);
 		if (jumpInsn > 0)
 		{
-			writer.writeJumpInsn(jumpInsn, dest);
+			writer.visitJumpInsn(jumpInsn, dest);
 			return;
 		}
 		
 		this.writeInsn(writer, instance, arguments, lineNumber, lastInsn);
-		writer.writeJumpInsn(Opcodes.IFNE, dest);
+		writer.visitJumpInsn(Opcodes.IFNE, dest);
 	}
 	
 	@Override
@@ -78,11 +78,11 @@ public class SimpleIntrinsicData implements IntrinsicData
 		int jumpInsn = Opcodes.getInvJumpOpcode(lastInsn);
 		if (jumpInsn > 0)
 		{
-			writer.writeJumpInsn(jumpInsn, dest);
+			writer.visitJumpInsn(jumpInsn, dest);
 			return;
 		}
 		
 		this.writeInsn(writer, instance, arguments, lineNumber, lastInsn);
-		writer.writeJumpInsn(Opcodes.IFEQ, dest);
+		writer.visitJumpInsn(Opcodes.IFEQ, dest);
 	}
 }

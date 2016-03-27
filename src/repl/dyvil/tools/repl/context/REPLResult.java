@@ -64,7 +64,7 @@ public class REPLResult implements IConstantValue
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		return 0;
 	}

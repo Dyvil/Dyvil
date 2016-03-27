@@ -42,10 +42,11 @@ public final class CharPattern extends Pattern
 	{
 		if (this.value.length() == 1 && this.type != STRING)
 		{
-			IPattern v = IPattern.primitiveWithType(this, type, Types.CHAR);
-			if (this.type == CHAR || v != null)
+			final IPattern pattern = IPattern.primitiveWithType(this, type, Types.CHAR);
+			if (this.type == CHAR || pattern != null)
 			{
-				return v;
+				this.type = CHAR;
+				return pattern;
 			}
 		}
 		if (this.type == CHAR)
@@ -53,12 +54,14 @@ public final class CharPattern extends Pattern
 			return null;
 		}
 		
-		if (type == Types.STRING || type.classEquals(Types.STRING))
+		if (Types.isSameType(type, Types.STRING))
 		{
+			this.type = STRING;
 			return this;
 		}
-		if (type.isSuperTypeOf(Types.STRING))
+		if (Types.isSuperType(type, Types.STRING))
 		{
+			this.type = STRING;
 			return new TypeCheckPattern(this, type, Types.STRING);
 		}
 		return null;
@@ -69,12 +72,12 @@ public final class CharPattern extends Pattern
 	{
 		if (this.value.length() == 1 && this.type != STRING)
 		{
-			if (type == Types.CHAR || type.isSuperTypeOf(Types.CHAR))
+			if (Types.isSuperType(type, Types.CHAR))
 			{
 				return true;
 			}
 		}
-		return this.type != CHAR && (type == Types.STRING || type.isSuperTypeOf(Types.STRING));
+		return this.type != CHAR && Types.isSuperType(type, Types.STRING);
 	}
 	
 	@Override
@@ -117,14 +120,14 @@ public final class CharPattern extends Pattern
 	{
 		if (this.type == STRING)
 		{
-			StringPattern.writeStringInvJump(writer, varIndex, matchedType, elseLabel, this.value);
+			StringPattern.writeStringInvJump(writer, varIndex, elseLabel, this.value);
 			return;
 		}
 
 		IPattern.loadVar(writer, varIndex, matchedType);
 		matchedType.writeCast(writer, Types.CHAR, this.getLineNumber());
-		writer.writeLDC(this.value.charAt(0));
-		writer.writeJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
+		writer.visitLdcInsn(this.value.charAt(0));
+		writer.visitJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
 	}
 	
 	@Override

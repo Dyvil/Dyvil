@@ -102,13 +102,13 @@ public final class TypeParameterParser extends Parser implements ITyped
 			{
 				if (type == DyvilKeywords.EXTENDS)
 				{
-					pm.pushParser(pm.newTypeParser(this));
+					pm.pushParser(new TypeParser(this));
 					this.boundMode = UPPER;
 					return;
 				}
 				if (type == DyvilKeywords.SUPER)
 				{
-					pm.pushParser(pm.newTypeParser(this));
+					pm.pushParser(new TypeParser(this));
 					this.boundMode = LOWER;
 					return;
 				}
@@ -120,20 +120,20 @@ public final class TypeParameterParser extends Parser implements ITyped
 				{
 					if (name == Names.ltcolon) // <: - Upper Bounds
 					{
-						pm.pushParser(pm.newTypeParser(this));
+						pm.pushParser(new TypeParser(this));
 						this.boundMode = UPPER;
 						return;
 					}
 					if (name == Names.gtcolon) // >: - Lower Bound
 					{
-						pm.pushParser(pm.newTypeParser(this));
+						pm.pushParser(new TypeParser(this));
 						this.boundMode = LOWER;
 						return;
 					}
 				}
 				else if (this.boundMode == UPPER && name == Names.amp)
 				{
-					pm.pushParser(pm.newTypeParser(this));
+					pm.pushParser(new TypeParser(this));
 					return;
 				}
 			}

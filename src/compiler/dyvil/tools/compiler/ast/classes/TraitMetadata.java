@@ -1,73 +1,63 @@
 package dyvil.tools.compiler.ast.classes;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.external.ExternalClass;
+import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.field.IField;
-import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.backend.ClassWriter;
+import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public class TraitMetadata implements IClassMetadata
+public class TraitMetadata extends InterfaceMetadata
 {
-	private final IClass theClass;
+	public static final String INIT_NAME = "trait$init";
 
 	public TraitMetadata(IClass theClass)
 	{
-		this.theClass = theClass;
+		super(theClass);
 	}
 
 	@Override
-	public void resolveTypesHeader(MarkerList markers, IContext context)
+	protected void processInitializer(IInitializer initializer, MarkerList markers)
 	{
-		if (this.theClass instanceof ExternalClass)
-		{
-			return;
-		}
+		// No error
+	}
 
-		final IClassBody classBody = this.theClass.getBody();
-		if (classBody == null)
-		{
-			return;
-		}
+	@Override
+	protected void processPropertyInitializer(ICodePosition position, MarkerList markers)
+	{
+		// No error
+	}
 
-		for (int i = 0, count = classBody.fieldCount(); i < count; i++)
-		{
-			final IField field = classBody.getField(i);
-			if (!field.isField())
-			{
-				// Skip properties
-				continue;
-			}
+	@Override
+	protected void processField(IField field, MarkerList markers)
+	{
+		this.processMember(field, markers);
 
-			final ModifierSet modifierSet = field.getModifiers();
-			if (!modifierSet.hasIntModifier(Modifiers.PUBLIC))
-			{
-				modifierSet.addIntModifier(Modifiers.PUBLIC);
-			}
-			if (!modifierSet.hasIntModifier(Modifiers.STATIC) || !modifierSet.hasIntModifier(Modifiers.FINAL))
-			{
-				modifierSet.addIntModifier(Modifiers.STATIC);
-				modifierSet.addIntModifier(Modifiers.FINAL);
-				markers.add(Markers.semantic(field.getPosition(), "field.trait.warning", field.getName()));
-			}
-		}
-
-		for (int i = 0, count = classBody.methodCount(); i < count; i++)
+		if (!field.hasModifier(Modifiers.STATIC) || !field.hasModifier(Modifiers.FINAL))
 		{
-			final IMethod method = classBody.getMethod(i);
-			if (!method.hasModifier(Modifiers.PUBLIC))
-			{
-				method.getModifiers().addIntModifier(Modifiers.PUBLIC);
-			}
+			field.getModifiers().addIntModifier(Modifiers.STATIC | Modifiers.FINAL);
+			markers.add(Markers.semanticWarning(field.getPosition(), "trait.field.warning", field.getName()));
 		}
 	}
-	
+
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
+		final String internalName = this.theClass.getInternalName();
+		final MethodWriter initWriter = new MethodWriterImpl(writer, writer.visitMethod(
+			Modifiers.PUBLIC | Modifiers.STATIC, INIT_NAME, "(L" + internalName + ";)V", null, null));
+
+		initWriter.visitCode();
+		initWriter.setLocalType(0, internalName);
+
+		this.theClass.writeClassInit(initWriter);
+
+		initWriter.visitInsn(Opcodes.RETURN);
+		initWriter.visitEnd();
 	}
 }

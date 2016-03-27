@@ -4,7 +4,7 @@ public class PropertyTest
 {
 	interface AbstractProperty
 	{
-		public abstract int subscript { get; set }
+		int subscript { get; set }
 	}
 	
 	class ConcreteProperty implements AbstractProperty

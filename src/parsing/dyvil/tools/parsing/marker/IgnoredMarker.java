@@ -4,8 +4,6 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class IgnoredMarker extends Marker
 {
-	private static final long serialVersionUID = 6339084541799017767L;
-	
 	public static final IgnoredMarker instance = new IgnoredMarker();
 	
 	private IgnoredMarker()
@@ -23,7 +21,13 @@ public class IgnoredMarker extends Marker
 	{
 		return "ignored";
 	}
-	
+
+	@Override
+	public String getColor()
+	{
+		return "";
+	}
+
 	@Override
 	public boolean isError()
 	{
@@ -37,7 +41,7 @@ public class IgnoredMarker extends Marker
 	}
 	
 	@Override
-	public void log(String code, StringBuilder buf)
+	public void log(String code, StringBuilder buf, boolean colors)
 	{
 	}
 }

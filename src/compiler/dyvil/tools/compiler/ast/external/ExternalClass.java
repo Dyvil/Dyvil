@@ -332,16 +332,34 @@ public final class ExternalClass extends AbstractClass
 			this.resolveGenerics();
 		}
 
-		if (this.body != null)
+		if (this.body == null)
 		{
-			IMethod m = this.body.getFunctionalMethod();
-			if (m != null)
-			{
-				return m;
-			}
+			return null;
 		}
 
-		return null;
+		IMethod functionalMethod = this.body.getFunctionalMethod();
+		if (functionalMethod != null)
+		{
+			return functionalMethod;
+		}
+		for (int i = 0, count = this.body.methodCount(); i < count; i++)
+		{
+			final IMethod method = this.body.getMethod(i);
+			if (!method.isAbstract() || method.isObjectMethod())
+			{
+				continue;
+			}
+			if (functionalMethod != null)
+			{
+				return null;
+			}
+			functionalMethod = method;
+		}
+		if (functionalMethod != null)
+		{
+			this.body.setFunctionalMethod(functionalMethod);
+		}
+		return functionalMethod;
 	}
 
 	@Override
@@ -360,7 +378,7 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public boolean checkImplements(MarkerList markers, IClass checkedClass, IMethod candidate, ITypeContext typeContext)
+	public boolean checkImplements(IMethod candidate, ITypeContext typeContext)
 	{
 		if (!this.genericsResolved)
 		{
@@ -370,7 +388,7 @@ public final class ExternalClass extends AbstractClass
 		{
 			this.resolveSuperTypes();
 		}
-		return super.checkImplements(markers, checkedClass, candidate, typeContext);
+		return super.checkImplements(candidate, typeContext);
 	}
 
 	@Override
@@ -650,21 +668,21 @@ public final class ExternalClass extends AbstractClass
 			{
 				if (s.equals(name))
 				{
-					ClassParameter param = new ClassParameter(Name.get(name), type, new FlagModifierSet(access));
+					ClassParameter param = new ClassParameter(this, Name.get(name), type, new FlagModifierSet(access));
 					this.addParameter(param);
 					return new SimpleFieldVisitor(param);
 				}
 			}
 		}
 
-		ExternalField field = new ExternalField(this, Name.get(name), type, new FlagModifierSet(access));
+		ExternalField field = new ExternalField(this, Name.get(name), desc, type, new FlagModifierSet(access));
 
 		if (value != null)
 		{
 			field.setValue(IValue.fromObject(value));
 		}
 
-		this.body.addField(field);
+		this.body.addDataMember(field);
 
 		return new SimpleFieldVisitor(field);
 	}
@@ -675,7 +693,7 @@ public final class ExternalClass extends AbstractClass
 
 		if (this.isAnnotation())
 		{
-			ClassParameter param = new ClassParameter(name1, ClassFormat.readReturnType(desc),
+			ClassParameter param = new ClassParameter(this, name1, ClassFormat.readReturnType(desc),
 			                                          new FlagModifierSet(access));
 			this.addParameter(param);
 			return new AnnotationClassVisitor(param);
@@ -766,7 +784,7 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public void writeInit(MethodWriter writer) throws BytecodeException
+	public void writeClassInit(MethodWriter writer) throws BytecodeException
 	{
 
 	}

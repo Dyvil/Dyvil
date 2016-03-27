@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.parser;
 
-import dyvil.tools.compiler.ast.constant.*;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
@@ -10,17 +8,17 @@ import dyvil.tools.parsing.token.IToken;
 public class ParserUtil
 {
 	// region Token Type Utilities
-	
+
 	public static boolean isIdentifier(int type)
 	{
 		return (type & Tokens.IDENTIFIER) != 0;
 	}
-	
+
 	public static boolean isCloseBracket(int type)
 	{
 		return (type & BaseSymbols.CLOSE_BRACKET) == BaseSymbols.CLOSE_BRACKET;
 	}
-	
+
 	public static boolean isTerminator(int type)
 	{
 		switch (type)
@@ -36,7 +34,7 @@ public class ParserUtil
 		}
 		return false;
 	}
-	
+
 	public static boolean isExpressionTerminator(int type)
 	{
 		if (isTerminator(type))
@@ -53,51 +51,71 @@ public class ParserUtil
 		case DyvilKeywords.ELSE:
 		case DyvilKeywords.FINALLY:
 		case DyvilKeywords.CATCH:
-		case BaseSymbols.OPEN_SQUARE_BRACKET:
 		case Tokens.STRING_PART:
 		case Tokens.STRING_END:
 			return true;
 		}
 		return false;
 	}
-	
-	public static boolean isSeperator(int type)
-	{
-		return type == BaseSymbols.COMMA || type == BaseSymbols.SEMICOLON;
-	}
-	
-	public static boolean isOperator(IParserManager pm, IToken token, int type)
-	{
-		if (type == Tokens.SYMBOL_IDENTIFIER)
-		{
-			return true;
-		}
-		return pm.getOperator(token.nameValue()) != null;
-	}
 
 	// endregion
-	
-	public static IValue parsePrimitive(IToken token, int type)
+
+	/**
+	 * Finds the next matching parenthesis, brace or bracket.
+	 *
+	 * @param token
+	 * 	the opening parenthesis, brace or bracket token
+	 *
+	 * @return the closing parenthesis, brace or bracket token or {@code null}
+	 */
+	public static IToken findMatch(IToken token)
 	{
-		switch (type)
+		int parenDepth = 0;
+		int bracketDepth = 0;
+		int braceDepth = 0;
+
+		for (; ; token = token.next())
 		{
-		case DyvilKeywords.TRUE:
-			return new BooleanValue(token.raw(), true);
-		case DyvilKeywords.FALSE:
-			return new BooleanValue(token.raw(), false);
-		case Tokens.STRING:
-			return new StringValue(token.raw(), token.stringValue());
-		case Tokens.SINGLE_QUOTED_STRING:
-			return new CharValue(token.raw(), token.stringValue());
-		case Tokens.INT:
-			return new IntValue(token.raw(), token.intValue());
-		case Tokens.LONG:
-			return new LongValue(token.raw(), token.longValue());
-		case Tokens.FLOAT:
-			return new FloatValue(token.raw(), token.floatValue());
-		case Tokens.DOUBLE:
-			return new DoubleValue(token.raw(), token.doubleValue());
+			switch (token.type())
+			{
+			case Tokens.EOF:
+				return null;
+			case BaseSymbols.OPEN_PARENTHESIS:
+				parenDepth++;
+				continue;
+			case BaseSymbols.CLOSE_PARENTHESIS:
+				if (parenDepth < 0)
+				{
+					return null;
+				}
+				parenDepth--;
+				break;
+			case BaseSymbols.OPEN_SQUARE_BRACKET:
+				bracketDepth++;
+				continue;
+			case BaseSymbols.CLOSE_SQUARE_BRACKET:
+				if (bracketDepth < 0)
+				{
+					return null;
+				}
+				bracketDepth--;
+				break;
+			case BaseSymbols.OPEN_CURLY_BRACKET:
+				braceDepth++;
+				continue;
+			case BaseSymbols.CLOSE_CURLY_BRACKET:
+				if (braceDepth < 0)
+				{
+					return null;
+				}
+				braceDepth--;
+				continue;
+			}
+
+			if (parenDepth == 0 && bracketDepth == 0 && braceDepth == 0)
+			{
+				return token;
+			}
 		}
-		return null;
 	}
 }

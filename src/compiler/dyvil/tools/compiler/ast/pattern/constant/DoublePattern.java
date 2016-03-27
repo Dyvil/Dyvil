@@ -40,19 +40,13 @@ public final class DoublePattern extends Pattern
 	}
 	
 	@Override
-	public boolean isType(IType type)
-	{
-		return type == Types.DOUBLE || type.isSuperTypeOf(Types.DOUBLE);
-	}
-	
-	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
 			throws BytecodeException
 	{
 		IPattern.loadVar(writer, varIndex, matchedType);
 		matchedType.writeCast(writer, Types.DOUBLE, this.getLineNumber());
-		writer.writeLDC(this.value);
-		writer.writeJumpInsn(Opcodes.IF_DCMPNE, elseLabel);
+		writer.visitLdcInsn(this.value);
+		writer.visitJumpInsn(Opcodes.IF_DCMPNE, elseLabel);
 	}
 	
 	@Override

@@ -180,14 +180,9 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 
 	@Override
-	public boolean hasSideEffects()
+	public boolean isObjectMethod()
 	{
-		return true;
-	}
-
-	@Override
-	public void setHasSideEffects(boolean sideEffects)
-	{
+		return false;
 	}
 
 	@Override
@@ -295,11 +290,16 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 	
 	@Override
-	public boolean checkOverride(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext)
+	public boolean checkOverride(IMethod candidate, ITypeContext typeContext)
 	{
 		return false;
 	}
-	
+
+	@Override
+	public void addOverride(IMethod method)
+	{
+	}
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
@@ -400,25 +400,32 @@ public class DynamicMethod implements IMethod, IDefaultContext
 		desc.append(')');
 		desc.append("Ljava/lang/Object;");
 		
-		writer.writeInvokeDynamic(this.name.qualified, desc.toString(), BOOTSTRAP, ObjectArray.EMPTY);
+		writer.visitInvokeDynamicInsn(this.name.qualified, desc.toString(), BOOTSTRAP, ObjectArray.EMPTY);
+
+		Types.OBJECT.writeCast(writer, targetType, lineNumber);
 	}
 	
 	@Override
 	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException
 	{
+		throw new BytecodeException();
 	}
 	
 	@Override
 	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException
 	{
+		this.writeCall(writer, instance, arguments, typeContext, Types.BOOLEAN, lineNumber);
+		writer.visitJumpInsn(Opcodes.IFNE, dest);
 	}
 	
 	@Override
 	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException
 	{
+		this.writeCall(writer, instance, arguments, typeContext, Types.BOOLEAN, lineNumber);
+		writer.visitJumpInsn(Opcodes.IFEQ, dest);
 	}
 	
 	@Override

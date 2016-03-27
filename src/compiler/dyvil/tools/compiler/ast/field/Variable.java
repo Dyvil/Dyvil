@@ -3,22 +3,25 @@ package dyvil.tools.compiler.ast.field;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
+import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -41,6 +44,19 @@ public final class Variable extends Member implements IVariable
 	{
 	}
 
+	public Variable(Name name, IType type)
+	{
+		this.name = name;
+		this.type = type;
+	}
+
+	public Variable(Name name, IType type, IValue value)
+	{
+		this.name = name;
+		this.type = type;
+		this.value = value;
+	}
+
 	public Variable(ICodePosition position)
 	{
 		this.position = position;
@@ -59,10 +75,9 @@ public final class Variable extends Member implements IVariable
 		this.type = type;
 	}
 
-	public Variable(Name name, IType type)
+	public Variable(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
-		this.name = name;
-		this.type = type;
+		super(position, name, type, modifiers, annotations);
 	}
 
 	@Override
@@ -108,9 +123,9 @@ public final class Variable extends Member implements IVariable
 	}
 
 	@Override
-	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue instance, IContext context)
+	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue receiver, IContext context)
 	{
-		return instance;
+		return receiver;
 	}
 
 	@Override
@@ -156,17 +171,17 @@ public final class Variable extends Member implements IVariable
 		{
 			this.value.resolveTypes(markers, context);
 		}
-		else
-		{
-			this.value = this.type.getDefaultValue();
-			markers.add(Markers.semanticError(this.position, "variable.value"));
-		}
 	}
 
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
 		super.resolve(markers, context);
+
+		if (this.value == null)
+		{
+			return;
+		}
 
 		this.value = this.value.resolve(markers, context);
 
@@ -182,24 +197,14 @@ public final class Variable extends Member implements IVariable
 			}
 		}
 
-		IValue value1 = this.type.convertValue(this.value, this.type, markers, context);
-		if (value1 == null)
+		final TypeChecker.MarkerSupplier markerSupplier = TypeChecker.markerSupplier("variable.type.incompatible",
+		                                                                             "variable.type", "value.type",
+		                                                                             this.name);
+		this.value = TypeChecker.convertValue(this.value, this.type, this.type, markers, context, markerSupplier);
+
+		if (inferType)
 		{
-			if (this.value.isResolved())
-			{
-				Marker marker = Markers.semantic(this.position, "variable.type.incompatible", this.name.unqualified);
-				marker.addInfo(Markers.getSemantic("variable.type", this.type));
-				marker.addInfo(Markers.getSemantic("value.type", this.value.getType()));
-				markers.add(marker);
-			}
-		}
-		else
-		{
-			this.value = value1;
-			if (inferType)
-			{
-				this.type = value1.getType();
-			}
+			this.type = this.value.getType();
 		}
 	}
 
@@ -208,7 +213,10 @@ public final class Variable extends Member implements IVariable
 	{
 		super.checkTypes(markers, context);
 
-		this.value.checkTypes(markers, context);
+		if (this.value != null)
+		{
+			this.value.checkTypes(markers, context);
+		}
 	}
 
 	@Override
@@ -216,14 +224,17 @@ public final class Variable extends Member implements IVariable
 	{
 		super.check(markers, context);
 
-		this.value.check(markers, context);
+		if (this.value != null)
+		{
+			this.value.check(markers, context);
+		}
 
 		if (this.modifiers != null)
 		{
 			ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.VARIABLE_MODIFIERS);
 		}
 
-		if (this.type == Types.VOID)
+		if (Types.isSameType(this.type, Types.VOID))
 		{
 			markers.add(Markers.semantic(this.position, "variable.type.void"));
 		}
@@ -234,7 +245,10 @@ public final class Variable extends Member implements IVariable
 	{
 		super.foldConstants();
 
-		this.value = this.value.foldConstants();
+		if (this.value != null)
+		{
+			this.value = this.value.foldConstants();
+		}
 	}
 
 	@Override
@@ -242,11 +256,14 @@ public final class Variable extends Member implements IVariable
 	{
 		super.cleanup(context, compilableList);
 
-		this.value = this.value.cleanup(context, compilableList);
+		if (this.value != null)
+		{
+			this.value = this.value.cleanup(context, compilableList);
+		}
 	}
 
 	@Override
-	public String getDescription()
+	public String getDescriptor()
 	{
 		return this.type.getExtendedName();
 	}
@@ -261,8 +278,8 @@ public final class Variable extends Member implements IVariable
 	public void writeLocal(MethodWriter writer, Label start, Label end)
 	{
 		final IType type = this.refType != null ? this.refType : this.type;
-		writer
-			.writeLocal(this.localIndex, this.name.qualified, type.getExtendedName(), type.getSignature(), start, end);
+		writer.visitLocalVariable(this.name.qualified, type.getExtendedName(), type.getSignature(), start, end,
+		                          this.localIndex);
 	}
 
 	@Override
@@ -271,8 +288,8 @@ public final class Variable extends Member implements IVariable
 		if (this.refType != null)
 		{
 			final IConstructor constructor = this.refType.getTheClass().getBody().getConstructor(0);
-			writer.writeTypeInsn(Opcodes.NEW, this.refType.getInternalName());
-			writer.writeInsn(Opcodes.DUP);
+			writer.visitTypeInsn(Opcodes.NEW, this.refType.getInternalName());
+			writer.visitInsn(Opcodes.DUP);
 
 			if (value != null)
 			{
@@ -280,14 +297,14 @@ public final class Variable extends Member implements IVariable
 			}
 			else
 			{
-				writer.writeInsn(Opcodes.AUTO_DUP_X1);
+				writer.visitInsn(Opcodes.AUTO_DUP_X1);
 			}
 			constructor.writeInvoke(writer, this.getLineNumber());
 
 			this.localIndex = writer.localCount();
 
 			writer.setLocalType(this.localIndex, this.refType.getInternalName());
-			writer.writeVarInsn(Opcodes.ASTORE, this.localIndex);
+			writer.visitVarInsn(Opcodes.ASTORE, this.localIndex);
 			return;
 		}
 
@@ -297,7 +314,7 @@ public final class Variable extends Member implements IVariable
 		}
 
 		this.localIndex = writer.localCount();
-		writer.writeVarInsn(this.type.getStoreOpcode(), this.localIndex);
+		writer.visitVarInsn(this.type.getStoreOpcode(), this.localIndex);
 		writer.setLocalType(this.localIndex, this.type.getFrameType());
 	}
 
@@ -306,10 +323,10 @@ public final class Variable extends Member implements IVariable
 	{
 		if (this.refType != null)
 		{
-			writer.writeVarInsn(Opcodes.ALOAD, this.localIndex);
+			writer.visitVarInsn(Opcodes.ALOAD, this.localIndex);
 			return;
 		}
-		writer.writeVarInsn(this.type.getLoadOpcode(), this.localIndex);
+		writer.visitVarInsn(this.type.getLoadOpcode(), this.localIndex);
 	}
 
 	@Override
@@ -321,7 +338,7 @@ public final class Variable extends Member implements IVariable
 			final IDataMember refField = refClass.getBody().getField(0);
 			refField.writeGet_Get(writer, lineNumber);
 
-			if (refClass == Types.getObjectSimpleRefClass())
+			if (refClass == ReferenceType.LazyFields.OBJECT_SIMPLE_REF_CLASS)
 			{
 				Types.OBJECT.writeCast(writer, this.type, lineNumber);
 			}
@@ -333,7 +350,7 @@ public final class Variable extends Member implements IVariable
 	{
 		if (this.refType != null)
 		{
-			writer.writeVarInsn(Opcodes.ALOAD, this.localIndex);
+			writer.visitVarInsn(Opcodes.ALOAD, this.localIndex);
 			return true;
 		}
 		return false;
@@ -354,23 +371,20 @@ public final class Variable extends Member implements IVariable
 	{
 		if (this.refType == null)
 		{
-			writer.writeVarInsn(this.type.getStoreOpcode(), this.localIndex);
+			writer.visitVarInsn(this.type.getStoreOpcode(), this.localIndex);
 		}
 	}
 
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.type != Types.UNKNOWN)
+		super.toString("", buffer);
+		if (this.modifiers != null)
 		{
-			this.type.toString("", buffer);
-		}
-		else
-		{
-			buffer.append(this.hasModifier(Modifiers.FINAL) ? "const" : "var");
+			this.modifiers.toString(buffer);
 		}
 
-		buffer.append(' ').append(this.name);
+		IDataMember.toString(prefix, buffer, this, "variable.type_ascription");
 
 		if (this.value != null)
 		{

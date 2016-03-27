@@ -43,13 +43,7 @@ public class UnknownType implements IRawType
 	{
 		return Types.OBJECT_CLASS;
 	}
-	
-	@Override
-	public IType getSuperType()
-	{
-		return null;
-	}
-	
+
 	@Override
 	public boolean hasTypeVariables()
 	{
@@ -59,7 +53,7 @@ public class UnknownType implements IRawType
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
-		return Types.ANY;
+		return this;
 	}
 	
 	@Override
@@ -155,7 +149,7 @@ public class UnknownType implements IRawType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvilx/lang/model/type/UnknownType", "instance",
+		writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvilx/lang/model/type/UnknownType", "instance",
 		                      "Ldyvilx/lang/model/type/UnknownType;", false);
 	}
 	
@@ -185,17 +179,5 @@ public class UnknownType implements IRawType
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append("auto");
-	}
-	
-	@Override
-	public boolean equals(Object obj)
-	{
-		return this == obj;
-	}
-	
-	@Override
-	public int hashCode()
-	{
-		return UNKNOWN;
 	}
 }

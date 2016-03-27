@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -63,7 +64,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 	@Override
 	public IPattern withType(IType type, MarkerList markers)
 	{
-		if (!type.isSuperTypeOf(this.type))
+		if (!this.isType(type))
 		{
 			return null;
 		}
@@ -114,7 +115,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 			}
 		}
 
-		if (type.classEquals(this.type))
+		if (Types.isSameType(type, this.type))
 		{
 			// No additional type check required
 			return this;
@@ -140,12 +141,6 @@ public class CaseClassPattern extends Pattern implements IPatternList
 			marker.addInfo(Markers.getSemantic("pattern.class.access.type", caseClass.getFullName()));
 			markers.add(marker);
 		}
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return type.isSuperTypeOf(this.type);
 	}
 	
 	@Override
@@ -224,7 +219,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 			}
 
 			// Load the instance
-			writer.writeVarInsn(Opcodes.ALOAD, varIndex);
+			writer.visitVarInsn(Opcodes.ALOAD, varIndex);
 			matchedType.writeCast(writer, this.type, lineNumber);
 
 			final IMethod method = this.getterMethods[i];

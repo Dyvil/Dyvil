@@ -409,14 +409,14 @@ public abstract class AbstractClass implements IClass
 			return 1;
 		}
 
-		int max = this.superType != null ? superType.getSubClassDistance(this.superType) : 0;
+		int max = this.superType != null ? this.superType.getSuperTypeDistance(superType) : 0;
 		if (!iclass.isInterface())
 		{
 			return max;
 		}
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			int m = superType.getSubClassDistance(this.interfaces[i]);
+			int m = this.interfaces[i].getSuperTypeDistance(superType);
 			if (m > max)
 			{
 				max = m;
@@ -518,14 +518,14 @@ public abstract class AbstractClass implements IClass
 	}
 
 	@Override
-	public boolean checkImplements(MarkerList markers, IClass checkedClass, IMethod candidate, ITypeContext typeContext)
+	public boolean checkImplements(IMethod candidate, ITypeContext typeContext)
 	{
 		if (candidate.getEnclosingClass() == this)
 		{
 			return !candidate.hasModifier(Modifiers.ABSTRACT);
 		}
 
-		if (this.body != null && this.body.checkImplements(markers, checkedClass, candidate, typeContext))
+		if (this.body != null && this.body.checkImplements(candidate, typeContext))
 		{
 			return true;
 		}
@@ -533,7 +533,7 @@ public abstract class AbstractClass implements IClass
 		if (this.superType != null)
 		{
 			final IClass superClass = this.superType.getTheClass();
-			if (superClass != null && superClass.checkImplements(markers, checkedClass, candidate,
+			if (superClass != null && superClass.checkImplements(candidate,
 			                                                     this.superType.getConcreteType(typeContext)))
 			{
 				return true;
@@ -544,7 +544,7 @@ public abstract class AbstractClass implements IClass
 		{
 			final IType interfaceType = this.interfaces[i];
 			final IClass interfaceClass = interfaceType.getTheClass();
-			if (interfaceClass != null && interfaceClass.checkImplements(markers, checkedClass, candidate,
+			if (interfaceClass != null && interfaceClass.checkImplements(candidate,
 			                                                             interfaceType.getConcreteType(typeContext)))
 			{
 				return true;
@@ -604,10 +604,10 @@ public abstract class AbstractClass implements IClass
 
 		if (this.body != null)
 		{
-			IMethod m = this.body.getFunctionalMethod();
-			if (m != null)
+			final IMethod method = this.body.getFunctionalMethod();
+			if (method != null)
 			{
-				return m;
+				return method;
 			}
 		}
 
@@ -913,7 +913,7 @@ public abstract class AbstractClass implements IClass
 	@Override
 	public IAccessible getAccessibleThis(IClass type)
 	{
-		if (type == this || type.getClassType().isSuperTypeOf(this.classType))
+		if (type == this || type.getClassType().isSuperClassOf(this.classType))
 		{
 			return VariableThis.DEFAULT;
 		}
@@ -1009,8 +1009,6 @@ public abstract class AbstractClass implements IClass
 		{
 			this.annotations.toString(prefix, buffer);
 		}
-
-		buffer.append(prefix);
 
 		this.modifiers.toString(buffer);
 		ModifierUtil.writeClassType(this.modifiers.toFlags(), buffer);

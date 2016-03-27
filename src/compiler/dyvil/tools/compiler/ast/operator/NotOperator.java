@@ -6,7 +6,6 @@ import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -51,12 +50,6 @@ public final class NotOperator extends AbstractValue
 	public IType getType()
 	{
 		return Types.BOOLEAN;
-	}
-	
-	@Override
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
-	{
-		return type == Types.BOOLEAN || type.isSuperTypeOf(Types.BOOLEAN) ? this : null;
 	}
 	
 	@Override
@@ -108,11 +101,11 @@ public final class NotOperator extends AbstractValue
 		Label label = new Label();
 		Label label2 = new Label();
 		this.value.writeInvJump(writer, label);
-		writer.writeLDC(0);
-		writer.writeJumpInsn(Opcodes.GOTO, label2);
-		writer.writeLabel(label);
-		writer.writeLDC(1);
-		writer.writeLabel(label2);
+		writer.visitLdcInsn(0);
+		writer.visitJumpInsn(Opcodes.GOTO, label2);
+		writer.visitLabel(label);
+		writer.visitLdcInsn(1);
+		writer.visitLabel(label2);
 
 		if (type != null)
 		{

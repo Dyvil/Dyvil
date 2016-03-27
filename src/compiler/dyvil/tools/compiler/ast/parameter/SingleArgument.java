@@ -21,7 +21,7 @@ import java.util.Iterator;
 public final class SingleArgument implements IArguments, IValueConsumer
 {
 	private IValue  value;
-	private boolean varargs;
+	private boolean varArgsArray;
 	
 	public SingleArgument()
 	{
@@ -120,7 +120,7 @@ public final class SingleArgument implements IArguments, IValueConsumer
 	{
 		if (index == 0 && this.value != null)
 		{
-			return this.value.getTypeMatch(param.getType());
+			return this.value.getTypeMatch(param.getInternalType());
 		}
 		return param.getValue() != null ? DEFAULT_MATCH : 0;
 	}
@@ -138,13 +138,13 @@ public final class SingleArgument implements IArguments, IValueConsumer
 			return 0;
 		}
 		
-		float valueMatch = this.value.getTypeMatch(param.getType());
+		float valueMatch = this.value.getTypeMatch(param.getInternalType());
 		if (valueMatch > 0)
 		{
 			return valueMatch;
 		}
 
-		valueMatch = this.value.getTypeMatch(param.getType().getElementType());
+		valueMatch = this.value.getTypeMatch(param.getInternalType().getElementType());
 		return valueMatch > 0 ? valueMatch + VARARGS_MATCH : 0;
 	}
 	
@@ -156,7 +156,7 @@ public final class SingleArgument implements IArguments, IValueConsumer
 			return;
 		}
 		
-		IType type = param.getInternalType().getParameterType();
+		IType type = param.getInternalType();
 		this.value = TypeChecker.convertValue(this.value, type, typeContext, markers, context,
 		                                      IArguments.argumentMarkerSupplier(param));
 	}
@@ -169,19 +169,18 @@ public final class SingleArgument implements IArguments, IValueConsumer
 			return;
 		}
 		
-		final IType arrayType = param.getInternalType().getParameterType();
+		final IType arrayType = param.getInternalType();
 		if (this.value.isType(arrayType.getConcreteType(typeContext)))
 		{
 			this.value = TypeChecker.convertValue(this.value, arrayType, typeContext, markers, context,
 			                                      IArguments.argumentMarkerSupplier(param));
-			this.varargs = true;
+			this.varArgsArray = true;
 			return;
 		}
 
 		final IType elementType = arrayType.getElementType();
 		this.value = TypeChecker.convertValue(this.value, elementType, typeContext, markers, context,
 		                                      IArguments.argumentMarkerSupplier(param));
-		return;
 	}
 	
 	@Override
@@ -189,7 +188,7 @@ public final class SingleArgument implements IArguments, IValueConsumer
 	{
 		if (index == 0 && this.value != null)
 		{
-			param.getType().inferTypes(this.value.getType(), typeContext);
+			param.getInternalType().inferTypes(this.value.getType(), typeContext);
 		}
 	}
 	
@@ -204,11 +203,11 @@ public final class SingleArgument implements IArguments, IValueConsumer
 		IType type = this.value.getType();
 		if (type.isArrayType())
 		{
-			param.getType().inferTypes(type, typeContext);
+			param.getInternalType().inferTypes(type, typeContext);
 			return;
 		}
 		
-		param.getType().getElementType().inferTypes(type, typeContext);
+		param.getInternalType().getElementType().inferTypes(type, typeContext);
 	}
 	
 	@Override
@@ -216,11 +215,11 @@ public final class SingleArgument implements IArguments, IValueConsumer
 	{
 		if (index == 0 && this.value != null)
 		{
-			this.value.writeExpression(writer, param.getType());
+			this.value.writeExpression(writer, param.getInternalType());
 			return;
 		}
 		
-		param.getValue().writeExpression(writer, param.getType());
+		param.getValue().writeExpression(writer, param.getInternalType());
 	}
 	
 	@Override
@@ -230,27 +229,27 @@ public final class SingleArgument implements IArguments, IValueConsumer
 		{
 			return;
 		}
-		if (this.varargs)
+		if (this.varArgsArray)
 		{
 			// Write the value as is (it is an array)
-			this.value.writeExpression(writer, param.getType());
+			this.value.writeExpression(writer, param.getInternalType());
 			return;
 		}
 		
 		// Write an array with one element
-		IType type = param.getType().getElementType();
-		writer.writeLDC(1);
-		writer.writeNewArray(type, 1);
-		writer.writeInsn(Opcodes.DUP);
-		writer.writeLDC(0);
+		IType type = param.getInternalType().getElementType();
+		writer.visitLdcInsn(1);
+		writer.visitMultiANewArrayInsn(type, 1);
+		writer.visitInsn(Opcodes.DUP);
+		writer.visitLdcInsn(0);
 		this.value.writeExpression(writer, type);
-		writer.writeInsn(type.getArrayStoreOpcode());
+		writer.visitInsn(type.getArrayStoreOpcode());
 	}
 	
 	@Override
 	public Iterator<IValue> iterator()
 	{
-		return this.value == null ? EmptyIterator.instance : new SingletonIterator<IValue>(this.value);
+		return this.value == null ? EmptyIterator.instance : new SingletonIterator<>(this.value);
 	}
 
 	@Override

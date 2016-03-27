@@ -1,11 +1,10 @@
 package dyvil.tools.parsing.marker;
 
+import dyvil.io.Console;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public class Warning extends Marker
 {
-	private static final long serialVersionUID = 8238564164743045522L;
-	
 	public Warning(ICodePosition position, String message)
 	{
 		super(position, message);
@@ -16,7 +15,13 @@ public class Warning extends Marker
 	{
 		return "warning";
 	}
-	
+
+	@Override
+	public String getColor()
+	{
+		return Console.ANSI_YELLOW;
+	}
+
 	@Override
 	public boolean isError()
 	{

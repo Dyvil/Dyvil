@@ -8,6 +8,9 @@ public final class AnnotationUtil
 
 	public static final String CLASS_PARAMETERS = "Ldyvil/annotation/_internal/ClassParameters;";
 
+	public static final String IMPLICITLY_UNWRAPPED_INTERNAL = "dyvil/annotation/_internal/ImplicitlyUnwrapped";
+	public static final String IMPLICITLY_UNWRAPPED          = "L" + IMPLICITLY_UNWRAPPED_INTERNAL + ";";
+
 	private AnnotationUtil()
 	{
 		// no instances

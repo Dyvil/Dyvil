@@ -95,7 +95,7 @@ public final class WildcardType implements IRawType, ITyped
 	}
 	
 	@Override
-	public IType getReturnType()
+	public IType asReturnType()
 	{
 		if (this.bound == null || this.variance == Variance.CONTRAVARIANT)
 		{
@@ -105,21 +105,15 @@ public final class WildcardType implements IRawType, ITyped
 	}
 	
 	@Override
-	public IType getParameterType()
+	public IType asParameterType()
 	{
-		if (this.bound == null || this.variance == Variance.COVARIANT)
+		if (this.bound == null)
 		{
 			return Types.ANY;
 		}
-		return this.bound;
+		return this.bound.asParameterType();
 	}
-	
-	@Override
-	public IType getSuperType()
-	{
-		return this.bound == null ? Types.UNKNOWN : this.bound;
-	}
-	
+
 	@Override
 	public boolean isSameType(IType type)
 	{
@@ -130,20 +124,6 @@ public final class WildcardType implements IRawType, ITyped
 	public boolean isSuperTypeOf(IType type)
 	{
 		return this.isSameType(type);
-	}
-	
-	@Override
-	public int getSubClassDistance(IType subtype)
-	{
-		int i = subtype.getTheClass().getSuperTypeDistance(this);
-		return i == 0 ? 0 : i + 100;
-	}
-	
-	@Override
-	public float getSubTypeDistance(IType subtype)
-	{
-		int i = subtype.getTheClass().getSuperTypeDistance(this);
-		return i == 0 ? 0 : i + 100;
 	}
 	
 	@Override
@@ -345,7 +325,7 @@ public final class WildcardType implements IRawType, ITyped
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/Variance", this.variance.name(),
+		writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/Variance", this.variance.name(),
 		                      "Ldyvil/reflect/Variance;");
 		
 		if (this.bound != null)
@@ -354,10 +334,10 @@ public final class WildcardType implements IRawType, ITyped
 		}
 		else
 		{
-			writer.writeInsn(Opcodes.ACONST_NULL);
+			writer.visitInsn(Opcodes.ACONST_NULL);
 		}
 		
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/WildcardType", "apply",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/WildcardType", "apply",
 		                       "(Ldyvil/reflect/Variance;Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/WildcardType;",
 		                       false);
 	}

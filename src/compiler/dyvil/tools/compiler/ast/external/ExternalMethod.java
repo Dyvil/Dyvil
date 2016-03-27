@@ -15,6 +15,8 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.AbstractMethod;
 import dyvil.tools.compiler.ast.method.IExternalCallableMember;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -53,6 +55,12 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	public IParameter getParameter_(int index)
 	{
 		return this.parameters[index];
+	}
+
+	@Override
+	public void setIntrinsicData(IntrinsicData intrinsicData)
+	{
+		this.intrinsicData = intrinsicData;
 	}
 
 	private IContext getCombiningContext()
@@ -98,7 +106,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 			this.resolveGenerics();
 		}
 
-		final IContext context = getCombiningContext();
+		final IContext context = this.getCombiningContext();
 
 		this.parametersResolved = true;
 
@@ -165,16 +173,6 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	protected boolean isObjectMethod()
-	{
-		if (!this.parametersResolved)
-		{
-			this.resolveParameters();
-		}
-		return super.isObjectMethod();
-	}
-
-	@Override
 	public IParameter getParameter(int index)
 	{
 		if (!this.parametersResolved)
@@ -182,6 +180,17 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 			this.resolveParameters();
 		}
 		return this.parameters[index];
+	}
+
+	@Override
+	public IValue getValue()
+	{
+		return null;
+	}
+
+	@Override
+	public void setValue(IValue value)
+	{
 	}
 
 	@Override
@@ -201,12 +210,13 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	protected void checkOverride_external()
+	protected boolean checkOverride0(IMethod candidate)
 	{
 		if (!this.parametersResolved)
 		{
 			this.resolveParameters();
 		}
+		return false;
 	}
 
 	@Override

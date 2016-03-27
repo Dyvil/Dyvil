@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.modifiers;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.token.IToken;
 
 public enum BaseModifiers implements Modifier
@@ -53,66 +54,6 @@ public enum BaseModifiers implements Modifier
 		this.intValue = intValue;
 		this.name = name;
 		this.keyword = keyword;
-	}
-
-	public static Modifier parseModifier(IToken token, IParserManager parserManager)
-	{
-		switch (token.type())
-		{
-		case DyvilKeywords.PRIVATE:
-			if (token.next().type() == DyvilKeywords.PROTECTED)
-			{
-				parserManager.skip();
-				return PRIVATE_PROTECTED;
-			}
-			return PRIVATE;
-		case DyvilKeywords.PACKAGE:
-			switch (token.next().type())
-			{
-			case DyvilKeywords.PROTECTED:
-				parserManager.skip();
-				return PACKAGE_PROTECTED;
-			case DyvilKeywords.PRIVATE:
-				parserManager.skip();
-				return PACKAGE_PRIVATE;
-			}
-			return null;
-		case DyvilKeywords.PROTECTED:
-			return PROTECTED;
-		case DyvilKeywords.PUBLIC:
-			return PUBLIC;
-		case DyvilKeywords.INTERNAL:
-			return INTERNAL;
-		case DyvilKeywords.PREFIX:
-			return PREFIX;
-		case DyvilKeywords.INFIX:
-			return INFIX;
-		case DyvilKeywords.POSTFIX:
-			return POSTFIX;
-		case DyvilKeywords.EXTENSION:
-			return EXTENSION;
-		case DyvilKeywords.ABSTRACT:
-			return ABSTRACT;
-		case DyvilKeywords.FINAL:
-			return FINAL;
-		case DyvilKeywords.STATIC:
-			return STATIC;
-		case DyvilKeywords.OVERRIDE:
-			return OVERRIDE;
-		case DyvilKeywords.INLINE:
-			return INLINE;
-		case DyvilKeywords.SYNCHRONIZED:
-			return SYNCHRONIZED;
-		case DyvilKeywords.FUNCTIONAL:
-			return FUNCTIONAL;
-		case DyvilKeywords.CONST:
-			return CONST;
-		case DyvilKeywords.LAZY:
-			return LAZY;
-		case DyvilKeywords.VAR:
-			return VAR;
-		}
-		return null;
 	}
 
 	@Override

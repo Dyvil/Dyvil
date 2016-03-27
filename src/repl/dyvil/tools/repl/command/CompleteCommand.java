@@ -89,7 +89,7 @@ public class CompleteCommand implements ICommand
 
 			this.printCompletions(repl, memberStart, type, value.valueTag() == IValue.CLASS_ACCESS);
 		};
-		new ParserManager(new ExpressionParser(valueConsumer), markers, context).parse(tokenIterator);
+		new ParserManager(tokenIterator, markers, context).parse(new ExpressionParser(valueConsumer));
 	}
 	
 	private void printREPLMembers(DyvilREPL repl, REPLContext context, String start)

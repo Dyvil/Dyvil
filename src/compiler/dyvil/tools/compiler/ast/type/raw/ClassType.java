@@ -13,10 +13,9 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.transform.Deprecation;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -35,13 +34,19 @@ public class ClassType implements IRawType
 	{
 		this.theClass = iclass;
 	}
-	
+
 	@Override
 	public int typeTag()
 	{
 		return CLASS;
 	}
-	
+
+	@Override
+	public IType atPosition(ICodePosition position)
+	{
+		return new ResolvedClassType(this.theClass, position);
+	}
+
 	// Names
 	
 	@Override
@@ -65,7 +70,7 @@ public class ClassType implements IRawType
 	}
 	
 	@Override
-	public boolean classEquals(IType type)
+	public boolean isSameClass(IType type)
 	{
 		return this.theClass == type.getTheClass() && !type.isPrimitive();
 	}
@@ -82,21 +87,6 @@ public class ClassType implements IRawType
 	public IType resolveType(MarkerList markers, IContext context)
 	{
 		return this;
-	}
-	
-	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
-	{
-		IClass iclass = this.theClass;
-		if (iclass != null)
-		{
-			Deprecation.checkAnnotations(markers, this.getPosition(), iclass);
-
-			if (IContext.getVisibility(context, iclass) == IContext.INTERNAL)
-			{
-				markers.add(Markers.semantic(this.getPosition(), "type.access.internal", iclass.getName()));
-			}
-		}
 	}
 	
 	// IContext
@@ -160,8 +150,8 @@ public class ClassType implements IRawType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeLDC(this.theClass.getFullName());
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/Type", "apply",
+		writer.visitLdcInsn(this.theClass.getFullName());
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/Type", "apply",
 		                       "(Ljava/lang/String;)Ldyvilx/lang/model/type/Type;", true);
 	}
 	
@@ -198,11 +188,5 @@ public class ClassType implements IRawType
 		ClassType t = new ClassType();
 		t.theClass = this.theClass;
 		return t;
-	}
-	
-	@Override
-	public boolean equals(Object obj)
-	{
-		return this.isSameType((IType) obj);
 	}
 }

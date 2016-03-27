@@ -4,7 +4,6 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -61,12 +60,6 @@ public final class NullCheckOperator implements IValue
 	}
 	
 	@Override
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
-	{
-		return type == Types.BOOLEAN || type.isSuperTypeOf(Types.BOOLEAN) ? this : null;
-	}
-	
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.value.resolveTypes(markers, context);
@@ -117,12 +110,12 @@ public final class NullCheckOperator implements IValue
 		Label label1 = new Label();
 		Label label2 = new Label();
 		
-		writer.writeJumpInsn(this.isNull ? Opcodes.IFNULL : Opcodes.IFNONNULL, label1);
-		writer.writeLDC(0);
-		writer.writeJumpInsn(Opcodes.GOTO, label2);
-		writer.writeLabel(label1);
-		writer.writeLDC(1);
-		writer.writeLabel(label2);
+		writer.visitJumpInsn(this.isNull ? Opcodes.IFNULL : Opcodes.IFNONNULL, label1);
+		writer.visitLdcInsn(0);
+		writer.visitJumpInsn(Opcodes.GOTO, label2);
+		writer.visitLabel(label1);
+		writer.visitLdcInsn(1);
+		writer.visitLabel(label2);
 
 		if (type != null)
 		{
@@ -134,14 +127,14 @@ public final class NullCheckOperator implements IValue
 	public void writeJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
 		this.value.writeExpression(writer, Types.OBJECT);
-		writer.writeJumpInsn(this.isNull ? Opcodes.IFNULL : Opcodes.IFNONNULL, dest);
+		writer.visitJumpInsn(this.isNull ? Opcodes.IFNULL : Opcodes.IFNONNULL, dest);
 	}
 	
 	@Override
 	public void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
 		this.value.writeExpression(writer, Types.OBJECT);
-		writer.writeJumpInsn(this.isNull ? Opcodes.IFNONNULL : Opcodes.IFNULL, dest);
+		writer.visitJumpInsn(this.isNull ? Opcodes.IFNONNULL : Opcodes.IFNULL, dest);
 	}
 	
 	@Override

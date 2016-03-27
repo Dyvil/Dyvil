@@ -12,7 +12,7 @@ public class CovariantTypeVarType extends TypeVarType
 	}
 
 	@Override
-	public IType getParameterType()
+	public IType asParameterType()
 	{
 		return this;
 	}

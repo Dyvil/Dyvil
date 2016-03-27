@@ -5,8 +5,10 @@ import dyvil.collection.mutable.TreeMap;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.parser.classes.ClassBodyParser;
-import dyvil.tools.compiler.parser.classes.DyvilHeaderParser;
+import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.compiler.parser.TryParserManager;
+import dyvil.tools.compiler.parser.header.DyvilHeaderParser;
+import dyvil.tools.compiler.parser.classes.MemberParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.transform.Names;
@@ -18,22 +20,24 @@ import dyvil.tools.parsing.lexer.LexerUtil;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.repl.command.*;
 import dyvil.tools.repl.context.REPLContext;
-import dyvil.tools.repl.input.REPLParser;
 
 import java.io.File;
 import java.io.PrintStream;
 
+import static dyvil.tools.compiler.parser.classes.MemberParser.NO_UNINITIALIZED_VARIABLES;
+import static dyvil.tools.compiler.parser.classes.MemberParser.OPERATOR_ERROR;
+
 public final class DyvilREPL
 {
 	public static final String VERSION = "$$replVersion$$";
-	
+
 	protected DyvilCompiler compiler = new DyvilCompiler();
-	
-	protected REPLContext context = new REPLContext(this);
-	protected REPLParser  parser  = new REPLParser(this.context);
-	
-	protected File dumpDir;
-	
+
+	protected REPLContext      context = new REPLContext(this);
+	protected TryParserManager parser  = new TryParserManager(this.context);
+
+	protected File    dumpDir;
+
 	private static final Map<String, ICommand> commands = new TreeMap<>();
 
 	static
@@ -50,7 +54,7 @@ public final class DyvilREPL
 		registerCommand(new VariablesCommand());
 		registerCommand(new VersionCommand());
 	}
-	
+
 	public DyvilREPL(PrintStream output)
 	{
 		this(output, output);
@@ -72,7 +76,7 @@ public final class DyvilREPL
 		return this.context;
 	}
 
-	public REPLParser getParser()
+	public TryParserManager getParser()
 	{
 		return this.parser;
 	}
@@ -103,7 +107,7 @@ public final class DyvilREPL
 
 		Names.init();
 
-		this.compiler.processArguments(args);
+		this.processArguments(args);
 
 		if (this.compiler.config.isDebug())
 		{
@@ -129,24 +133,46 @@ public final class DyvilREPL
 		}
 	}
 
+	private void processArguments(String[] args)
+	{
+		for (String arg : args)
+		{
+			if (!this.processArgument(arg))
+			{
+				this.compiler.processArgument(arg);
+			}
+		}
+	}
+
+	private boolean processArgument(String arg)
+	{
+		if (arg.startsWith("dumpDir"))
+		{
+			this.dumpDir = new File(arg.substring(arg.indexOf('=') + 1).trim());
+			return true;
+		}
+
+		return false;
+	}
+
 	public void shutdown()
 	{
 		this.compiler.shutdown();
 	}
-	
+
 	public void processInput(String input)
 	{
 		try
 		{
 			final String trim = input.trim();
 			if (trim.length() > 1 // not a single colon
-					&& trim.charAt(0) == ':' // first character must be a colon
-					&& LexerUtil.isIdentifierPart(trim.charAt(1))) // next character must be a letter
+				    && trim.charAt(0) == ':' // first character must be a colon
+				    && LexerUtil.isIdentifierPart(trim.charAt(1))) // next character must be a letter
 			{
 				this.runCommand(trim);
 				return;
 			}
-			
+
 			this.evaluate(input);
 		}
 		catch (Throwable t)
@@ -154,7 +180,7 @@ public final class DyvilREPL
 			t.printStackTrace(this.compiler.getErrorOutput());
 		}
 	}
-	
+
 	public void evaluate(String code)
 	{
 		this.context.startEvaluation(code);
@@ -163,22 +189,33 @@ public final class DyvilREPL
 		final TokenIterator tokens = new DyvilLexer(markers, DyvilSymbols.INSTANCE).tokenize(code);
 
 		SemicolonInference.inferSemicolons(tokens.first());
-		
-		if (this.parser.parse(markers, tokens, new DyvilHeaderParser(this.context, false), false))
-		{
-			this.context.reportErrors();
-			return;
-		}
-		if (this.parser.parse(markers, tokens, new ClassBodyParser(this.context), false))
+
+		if (this.tryParse(markers, tokens, new DyvilHeaderParser(this.context, false), false))
 		{
 			this.context.reportErrors();
 			return;
 		}
 
-		this.parser.parse(markers, tokens, new ExpressionParser(this.context), true);
+		if (this.tryParse(markers, tokens,
+		                  new MemberParser<>(this.context).withFlag(NO_UNINITIALIZED_VARIABLES | OPERATOR_ERROR),
+		                  false))
+		{
+			this.context.reportErrors();
+			return;
+		}
+
+		this.tryParse(markers, tokens, new ExpressionParser(this.context), true);
 		this.context.reportErrors();
 	}
-	
+
+	private boolean tryParse(MarkerList markers, TokenIterator tokens, Parser parser, boolean reportErrors)
+	{
+		tokens.reset();
+		markers.clear();
+		this.parser.reset(markers, tokens);
+		return this.parser.parse(parser, reportErrors);
+	}
+
 	private void runCommand(String line)
 	{
 		final int spaceIndex = line.indexOf(' ', 1);
@@ -187,10 +224,10 @@ public final class DyvilREPL
 			this.runCommand(line.substring(1), null);
 			return;
 		}
-		
+
 		this.runCommand(line.substring(1, spaceIndex), line.substring(spaceIndex + 1));
 	}
-	
+
 	public void runCommand(String name, String argument)
 	{
 		ICommand command = commands.get(name);
@@ -199,10 +236,10 @@ public final class DyvilREPL
 			this.compiler.error("Unknown Command: " + name);
 			return;
 		}
-		
+
 		command.execute(this, argument);
 	}
-	
+
 	public static void registerCommand(ICommand command)
 	{
 		commands.put(command.getName(), command);
@@ -216,7 +253,7 @@ public final class DyvilREPL
 			}
 		}
 	}
-	
+
 	public static Map<String, ICommand> getCommands()
 	{
 		return commands;

@@ -203,58 +203,28 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	// IType Overrides
 
 	@Override
-	public IType getParameterType()
+	public IType asParameterType()
 	{
-		if (this.hasTypeVariables())
+		if (!this.hasTypeVariables())
 		{
-			final IType[] parameterTypes = new IType[this.parameterCount];
-			for (int i = 0; i < this.parameterCount; i++)
-			{
-				parameterTypes[i] = this.parameterTypes[i].getParameterType();
-			}
-			final IType returnType = this.returnType.getParameterType();
-			final LambdaType lambdaType = new LambdaType(parameterTypes, this.parameterCount, returnType);
-			lambdaType.setExtension(this.extension);
-			return lambdaType;
+			return this;
 		}
 
-		return this;
+		final IType[] parameterTypes = new IType[this.parameterCount];
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			parameterTypes[i] = this.parameterTypes[i].asParameterType();
+		}
+		final IType returnType = this.returnType.asParameterType();
+		final LambdaType lambdaType = new LambdaType(parameterTypes, this.parameterCount, returnType);
+		lambdaType.setExtension(this.extension);
+		return lambdaType;
 	}
 
 	@Override
 	public IClass getTheClass()
 	{
 		return getLambdaClass(this.parameterCount);
-	}
-
-	@Override
-	public int getSubClassDistance(IType subtype)
-	{
-		if (this.parameterCount == 0)
-		{
-			final int returnDistance = this.returnType.getSubClassDistance(subtype);
-			if (returnDistance != 0)
-			{
-				return returnDistance;
-			}
-		}
-
-		return IObjectType.super.getSubClassDistance(subtype);
-	}
-
-	@Override
-	public float getSubTypeDistance(IType subtype)
-	{
-		if (this.parameterCount == 0)
-		{
-			final float returnDistance = this.returnType.getSubTypeDistance(subtype);
-			if (returnDistance != 0)
-			{
-				return returnDistance;
-			}
-		}
-
-		return IObjectType.super.getSubTypeDistance(subtype);
 	}
 
 	@Override
@@ -270,8 +240,8 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		ITypeParameter typeVar = functionClass.getTypeParameter(this.parameterCount);
 		IType resolvedType = type.resolveTypeSafely(typeVar);
 
-		// Return type is Covariant
-		if (!this.returnType.isSuperTypeOf(resolvedType))
+		// Return Type is Covariant
+		if (!Types.isSuperType(this.returnType, resolvedType))
 		{
 			return false;
 		}
@@ -281,8 +251,8 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 			typeVar = functionClass.getTypeParameter(i);
 			resolvedType = type.resolveType(typeVar);
 
-			// Contravariance
-			if (!resolvedType.isSuperTypeOf(this.parameterTypes[i]))
+			// Parameter Types are Contravariant
+			if (!Types.isSuperType(resolvedType, this.parameterTypes[i]))
 			{
 				return false;
 			}
@@ -292,9 +262,9 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	}
 
 	@Override
-	public boolean isAssignableFrom(IType type)
+	public boolean isConvertibleFrom(IType type)
 	{
-		return this.parameterCount == 0 && this.returnType.isSuperTypeOf(type) || this.isSuperTypeOf(type);
+		return this.parameterCount == 0 && Types.isSuperType(this.returnType, type);
 	}
 
 	@Override
@@ -390,28 +360,28 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		boolean found = false;
 
 		ITypeParameter typeVar;
-		IType concreteType;
-		IClass iclass = this.getTheClass();
+		IType elementType;
+		final IClass thisClass = this.getTheClass();
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			typeVar = iclass.getTypeParameter(i);
-			concreteType = concrete.resolveType(typeVar);
-			if (concreteType != null)
+			typeVar = thisClass.getTypeParameter(i);
+			elementType = concrete.resolveType(typeVar);
+			if (elementType != null)
 			{
-				this.parameterTypes[i].inferTypes(concreteType, typeContext);
+				this.parameterTypes[i].inferTypes(elementType, typeContext);
 				found = true;
 			}
 		}
 
-		typeVar = iclass.getTypeParameter(this.parameterCount);
-		concreteType = concrete.resolveType(typeVar);
-		if (concreteType != null)
+		typeVar = thisClass.getTypeParameter(this.parameterCount);
+		elementType = concrete.resolveType(typeVar);
+		if (elementType != null)
 		{
-			this.returnType.inferTypes(concreteType, typeContext);
+			this.returnType.inferTypes(elementType, typeContext);
 			found = true;
 		}
 
-		if (!found && this.parameterCount == 0 && this.returnType.isSuperTypeOf(concrete))
+		if (!found && this.parameterCount == 0 && Types.isSuperType(this.returnType, concrete))
 		{
 			this.returnType.inferTypes(concrete, typeContext);
 		}
@@ -428,7 +398,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameterTypes[i] = this.parameterTypes[i].resolveType(markers, context).getParameterType();
+			this.parameterTypes[i] = this.parameterTypes[i].resolveType(markers, context).asParameterType();
 		}
 		if (this.returnType == null)
 		{
@@ -437,7 +407,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		}
 		else
 		{
-			this.returnType = this.returnType.resolveType(markers, context).getReturnType();
+			this.returnType = this.returnType.resolveType(markers, context).asReturnType();
 		}
 
 		return this;
@@ -526,17 +496,17 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	{
 		this.returnType.writeTypeExpression(writer);
 
-		writer.writeLDC(this.parameterCount);
-		writer.writeNewArray("dyvilx/lang/model/type/Type", 1);
+		writer.visitLdcInsn(this.parameterCount);
+		writer.visitMultiANewArrayInsn("dyvilx/lang/model/type/Type", 1);
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			writer.writeInsn(Opcodes.DUP);
-			writer.writeLDC(i);
+			writer.visitInsn(Opcodes.DUP);
+			writer.visitLdcInsn(i);
 			this.parameterTypes[i].writeTypeExpression(writer);
-			writer.writeInsn(Opcodes.AASTORE);
+			writer.visitInsn(Opcodes.AASTORE);
 		}
 
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/FunctionType", "apply",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/FunctionType", "apply",
 		                       "(Ldyvilx/lang/model/type/Type;[Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/FunctionType;",
 		                       false);
 	}
@@ -584,8 +554,9 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		int index = typePath.getStepArgument(step);
 		if (index < this.parameterCount)
 		{
-			this.parameterTypes[index] = IType.withAnnotation(this.parameterTypes[index], annotation, typePath,
-			                                                  step + 1, steps);
+			this.parameterTypes[index] = IType
+				                             .withAnnotation(this.parameterTypes[index], annotation, typePath, step + 1,
+				                                             steps);
 			return;
 		}
 		this.returnType = IType.withAnnotation(this.returnType, annotation, typePath, step + 1, steps);
@@ -648,7 +619,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		if (this.parameterCount == 1 && this.parameterTypes[0].typeTag() != TUPLE && !Formatting.getBoolean(
-				"lambda.single.wrap"))
+			"lambda.single.wrap"))
 		{
 			this.parameterTypes[0].toString(prefix, buffer);
 

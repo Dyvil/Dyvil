@@ -376,7 +376,7 @@ public class REPLMemberClass implements IClass
 	}
 	
 	@Override
-	public boolean checkImplements(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext)
+	public boolean checkImplements(IMethod candidate, ITypeContext typeContext)
 	{
 		return false;
 	}
@@ -655,7 +655,7 @@ public class REPLMemberClass implements IClass
 	}
 
 	@Override
-	public void writeInit(MethodWriter writer) throws BytecodeException
+	public void writeClassInit(MethodWriter writer) throws BytecodeException
 	{
 
 	}

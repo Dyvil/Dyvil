@@ -16,6 +16,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -146,6 +147,7 @@ public final class MethodParameter extends Parameter
 		{
 			if (this.modifiers.hasIntModifier(Modifiers.VAR))
 			{
+				markers.add(Markers.semanticWarning(this.position, "parameter.var.deprecated"));
 				if (this.method instanceof ExternalMethod)
 				{
 					this.type = this.type.getElementType();
@@ -175,10 +177,10 @@ public final class MethodParameter extends Parameter
 	{
 		if (this.refType != null)
 		{
-			writer.writeVarInsn(Opcodes.ALOAD, this.localIndex);
+			writer.visitVarInsn(Opcodes.ALOAD, this.localIndex);
 			return;
 		}
-		writer.writeVarInsn(this.type.getLoadOpcode(), this.localIndex);
+		writer.visitVarInsn(this.type.getLoadOpcode(), this.localIndex);
 	}
 
 	@Override
@@ -195,7 +197,7 @@ public final class MethodParameter extends Parameter
 	{
 		if (this.refType != null)
 		{
-			writer.writeVarInsn(Opcodes.ALOAD, this.localIndex);
+			writer.visitVarInsn(Opcodes.ALOAD, this.localIndex);
 			return true;
 		}
 		return false;
@@ -215,7 +217,7 @@ public final class MethodParameter extends Parameter
 	{
 		if (this.refType == null)
 		{
-			writer.writeVarInsn(this.type.getStoreOpcode(), this.localIndex);
+			writer.visitVarInsn(this.type.getStoreOpcode(), this.localIndex);
 		}
 	}
 

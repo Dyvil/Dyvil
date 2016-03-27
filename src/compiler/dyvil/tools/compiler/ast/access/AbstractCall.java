@@ -19,56 +19,56 @@ import dyvil.tools.parsing.position.ICodePosition;
 public abstract class AbstractCall implements ICall, IReceiverAccess
 {
 	protected ICodePosition position;
-	
+
 	protected IValue receiver;
 	protected IArguments arguments = EmptyArguments.INSTANCE;
 	protected GenericData genericData;
-	
+
 	// Metadata
 	protected IMethod method;
 	protected IType   type;
-	
+
 	@Override
 	public ICodePosition getPosition()
 	{
 		return this.position;
 	}
-	
+
 	@Override
 	public void setPosition(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
 	@Override
 	public void setReceiver(IValue value)
 	{
 		this.receiver = value;
 	}
-	
+
 	@Override
 	public IValue getReceiver()
 	{
 		return this.receiver;
 	}
-	
+
 	@Override
 	public void setArguments(IArguments arguments)
 	{
 		this.arguments = arguments;
 	}
-	
+
 	@Override
 	public IArguments getArguments()
 	{
 		return this.arguments;
 	}
-	
+
 	public void setGenericData(GenericData data)
 	{
 		this.genericData = data;
 	}
-	
+
 	public GenericData getGenericData()
 	{
 		if (this.genericData != null)
@@ -79,20 +79,20 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 		{
 			return this.genericData = new GenericData();
 		}
-		return this.genericData = this.method.getGenericData(this.genericData, this.receiver, this.arguments);
+		return this.genericData = this.method.getGenericData(null, this.receiver, this.arguments);
 	}
-	
+
 	@Override
 	public boolean isResolved()
 	{
 		return this.method != null;
 	}
-	
+
 	public IMethod getMethod()
 	{
 		return this.method;
 	}
-	
+
 	@Override
 	public boolean isPrimitive()
 	{
@@ -102,34 +102,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 	@Override
 	public boolean hasSideEffects()
 	{
-		if (this.method == null)
-		{
-			return true;
-		}
-
-		// No @pure Annotation
-		if (this.method.hasSideEffects())
-		{
-			return true;
-		}
-
-		// Receiver has Side Effects
-		if (this.receiver != null && this.receiver.hasSideEffects())
-		{
-			return true;
-		}
-
-		// Any argument has Side Effects
-		for (int i = 0, count = this.arguments.size(); i < count; i++)
-		{
-			if (this.arguments.getValue(i, null).hasSideEffects())
-			{
-				return true;
-			}
-		}
-
-		// Method Call has no Side Effects
-		return false;
+		return true;
 	}
 
 	@Override
@@ -141,31 +114,23 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 		}
 		if (this.type == null)
 		{
-			this.type = this.method.getType().getConcreteType(this.getGenericData()).getReturnType();
+			this.type = this.method.getType().getConcreteType(this.getGenericData()).asReturnType();
 		}
 		return this.type;
 	}
-	
+
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		return type == Types.VOID || type.isSuperTypeOf(this.getType()) ? this : null;
+		return this.isType(type) ? this : null;
 	}
-	
+
 	@Override
 	public boolean isType(IType type)
 	{
-		if (type == Types.VOID)
-		{
-			return true;
-		}
-		if (this.method == null)
-		{
-			return false;
-		}
-		return type.isSuperTypeOf(this.getType());
+		return Types.isSameType(type, Types.VOID) || this.method != null && Types.isAssignable(this.getType(), type);
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -181,7 +146,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 		{
 			this.arguments.resolveTypes(markers, context);
 		}
-		
+
 		if (this.genericData != null)
 		{
 			this.genericData.resolveTypes(markers, context);
@@ -196,16 +161,16 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 			this.receiver = this.receiver.resolve(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void resolveArguments(MarkerList markers, IContext context)
 	{
 		this.arguments.resolve(markers, context);
 	}
-	
+
 	@Override
 	public abstract IValue resolveCall(MarkerList markers, IContext context);
-	
+
 	@Override
 	public void checkArguments(MarkerList markers, IContext context)
 	{
@@ -220,15 +185,15 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 			{
 				data = this.getGenericData();
 			}
-			
+
 			this.receiver = this.method
-					.checkArguments(markers, this.position, context, this.receiver, this.arguments, data);
+				                .checkArguments(markers, this.position, context, this.receiver, this.arguments, data);
 		}
-		
+
 		this.type = null;
 		this.type = this.getType();
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -236,10 +201,10 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 		{
 			this.receiver.checkTypes(markers, context);
 		}
-		
+
 		this.arguments.checkTypes(markers, context);
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
@@ -247,16 +212,16 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 		{
 			this.receiver.check(markers, context);
 		}
-		
+
 		if (this.method != null)
 		{
 			this.method
-					.checkCall(markers, this.position, context, this.receiver, this.arguments, this.getGenericData());
+				.checkCall(markers, this.position, context, this.receiver, this.arguments, this.getGenericData());
 		}
-		
+
 		this.arguments.check(markers, context);
 	}
-	
+
 	@Override
 	public IValue foldConstants()
 	{
@@ -267,7 +232,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 		this.arguments.foldConstants();
 		return this;
 	}
-	
+
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
@@ -278,7 +243,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 		this.arguments.cleanup(context, compilableList);
 		return this;
 	}
-	
+
 	// Inlined for performance
 	@Override
 	public int getLineNumber()
@@ -289,7 +254,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 		}
 		return this.position.startLine();
 	}
-	
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
@@ -300,19 +265,19 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 
 		this.method.writeCall(writer, this.receiver, this.arguments, this.genericData, type, this.getLineNumber());
 	}
-	
+
 	@Override
 	public void writeJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
 		this.method.writeJump(writer, dest, this.receiver, this.arguments, this.genericData, this.getLineNumber());
 	}
-	
+
 	@Override
 	public void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
 		this.method.writeInvJump(writer, dest, this.receiver, this.arguments, this.genericData, this.getLineNumber());
 	}
-	
+
 	@Override
 	public String toString()
 	{

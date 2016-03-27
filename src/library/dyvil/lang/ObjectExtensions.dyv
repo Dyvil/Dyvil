@@ -25,7 +25,7 @@ public final class ObjectExtensions
 	public infix boolean isNonNull(Object o) = o.isNonNull
 
 	// Structural Equality (equals)
-	public infix boolean operator ==(Object o1, Object o2)
+	public infix func ==(Object o1, Object o2): boolean
 	{
 		if (o1.isNull)	return o2.isNull
 		else			return o1 equals o2
@@ -33,15 +33,15 @@ public final class ObjectExtensions
 
 	// Reference Equality
 	@Intrinsic([ LOAD_0, LOAD_1, ACMPEQ ])
-	public infix boolean operator ===(Object o1, Object o2) = o1 === o2
+	public infix func ===(Object o1, Object o2): boolean = o1 === o2
 
 	// Structural Inequality (!equals)
 	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2, BNOT ], strings: [ "dyvil/lang/Predef", "$eq$eq", "(Ljava/lang/Object;Ljava/lang/Object;)Z" ])
-	public infix boolean operator !=(Object o1, Object o2) = !(o1 == o2)
+	public infix func !=(Object o1, Object o2): boolean = !(o1 == o2)
 
 	// Reference Inequality
 	@Intrinsic([ LOAD_0, LOAD_1, ACMPNE ])
-	public infix boolean operator !==(Object o1, Object o2) = o1 !== o2
+	public infix func !==(Object o1, Object o2): boolean = o1 !== o2
 
 	// Hashing
 
@@ -57,15 +57,15 @@ public final class ObjectExtensions
 		return result;
 	}
 
-	public infix int ##(Object o) = if (o == null) 0 else o.hashCode
+	public infix func ##(Object o): int = if (o == null) 0 else o.hashCode
 
 	// Comparable
 
-	public infix boolean operator <[T](Comparable[T] c1, T c2) = (c1 compareTo c2) < 0
+	public infix inline func <[T](Comparable[T] c1, T c2): boolean = (c1 compareTo c2) < 0
 
-	public infix boolean operator <=[T](Comparable[T] c1, T c2) = (c1 compareTo c2) < 0
+	public infix inline func <=[T](Comparable[T] c1, T c2): boolean = (c1 compareTo c2) <= 0
 
-	public infix boolean operator >[T](Comparable[T] c1, T c2) = (c1 compareTo c2) < 0
+	public infix inline func >[T](Comparable[T] c1, T c2): boolean = (c1 compareTo c2) > 0
 
-	public infix boolean operator >=[T](Comparable[T] c1, T c2) = (c1 compareTo c2) < 0
+	public infix inline func >=[T](Comparable[T] c1, T c2): boolean = (c1 compareTo c2) >= 0
 }

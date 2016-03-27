@@ -6,11 +6,10 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.statement.loop.IterableForStatement;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.Mutability;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -19,7 +18,6 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
-import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -32,8 +30,9 @@ public final class ArrayExpr implements IValue, IValueList
 	{
 		public static final IClass ARRAY_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("ArrayConvertible");
 
-		private static final TypeChecker.MarkerSupplier ELEMENT_MARKER_SUPPLIER = TypeChecker
-				                                                                          .markerSupplier("array.element.type.incompatible", "array.element.type.expected", "array.element.type.actual");
+		private static final TypeChecker.MarkerSupplier ELEMENT_MARKER_SUPPLIER = TypeChecker.markerSupplier(
+			"array.element.type.incompatible", "array.element.type.expected", "array.element.type.actual");
+
 		private LazyFields()
 		{
 			// no instances
@@ -41,35 +40,35 @@ public final class ArrayExpr implements IValue, IValueList
 	}
 
 	protected ICodePosition position;
-	
+
 	protected IValue[] values;
 	protected int      valueCount;
-	
+
 	// Metadata
 	protected IType arrayType;
 	protected IType elementType;
-	
+
 	public ArrayExpr()
 	{
-		this.values = new IValue[3];
+		this.values = new IValue[4];
 	}
-	
-	public ArrayExpr(ICodePosition position)
-	{
-		this.position = position;
-		this.values = new IValue[3];
-	}
-	
+
 	public ArrayExpr(IValue[] values, int valueCount)
 	{
 		this.values = values;
 		this.valueCount = valueCount;
 	}
 
-	public ArrayExpr(ICodePosition position, int valueCount)
+	public ArrayExpr(ICodePosition position)
 	{
 		this.position = position;
-		this.values = new IValue[valueCount];
+		this.values = new IValue[3];
+	}
+
+	public ArrayExpr(ICodePosition position, int capacity)
+	{
+		this.position = position;
+		this.values = new IValue[capacity];
 	}
 
 	public ArrayExpr(ICodePosition position, IValue[] values, int valueCount)
@@ -78,31 +77,31 @@ public final class ArrayExpr implements IValue, IValueList
 		this.values = values;
 		this.valueCount = valueCount;
 	}
-	
+
 	@Override
 	public ICodePosition getPosition()
 	{
 		return this.position;
 	}
-	
+
 	@Override
 	public void setPosition(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
 	@Override
 	public int valueTag()
 	{
 		return ARRAY;
 	}
-	
+
 	@Override
-	public boolean isConstant()
+	public boolean isAnnotationConstant()
 	{
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			if (!this.values[i].isConstant())
+			if (!this.values[i].isAnnotationConstant())
 			{
 				return false;
 			}
@@ -128,38 +127,39 @@ public final class ArrayExpr implements IValue, IValueList
 	{
 		return false;
 	}
-	
+
 	public IType getElementType()
 	{
 		if (this.elementType != null)
 		{
 			return this.elementType;
 		}
-		
+
 		return this.elementType = getCommonType(this.values, this.valueCount);
 	}
-	
+
 	public static IType getCommonType(IValue[] values, int valueCount)
 	{
 		if (valueCount == 0)
 		{
-			return dyvil.tools.compiler.ast.type.builtin.Types.ANY;
+			return Types.ANY;
 		}
-		
-		IType t = values[0].getType();
+
+		IType type = values[0].getType();
 		for (int i = 1; i < valueCount; i++)
 		{
-			IType t1 = values[i].getType();
-			t = dyvil.tools.compiler.ast.type.builtin.Types.combine(t, t1);
-			if (t == null)
+			final IType valueType = values[i].getType();
+			type = Types.combine(type, valueType);
+
+			if (type == null)
 			{
-				return dyvil.tools.compiler.ast.type.builtin.Types.ANY;
+				return Types.ANY;
 			}
 		}
-		
-		return t;
+
+		return type;
 	}
-	
+
 	@Override
 	public boolean isResolved()
 	{
@@ -169,7 +169,7 @@ public final class ArrayExpr implements IValue, IValueList
 		}
 		return this.elementType != null && this.elementType.isResolved();
 	}
-	
+
 	@Override
 	public IType getType()
 	{
@@ -177,28 +177,22 @@ public final class ArrayExpr implements IValue, IValueList
 		{
 			return this.arrayType;
 		}
-		
-		return this.arrayType = new ArrayType(this.getElementType());
+
+		return this.arrayType = new ArrayType(this.getElementType(), Mutability.IMMUTABLE);
 	}
-	
+
 	@Override
 	public IValue withType(IType arrayType, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		IType elementType;
 		if (!arrayType.isArrayType())
 		{
-			IClass iclass = arrayType.getTheClass();
-			IAnnotation annotation;
-			if ((annotation = iclass.getAnnotation(LazyFields.ARRAY_CONVERTIBLE)) != null)
+			final IAnnotation annotation;
+			if ((annotation = arrayType.getAnnotation(LazyFields.ARRAY_CONVERTIBLE)) != null)
 			{
 				return new LiteralConversion(this, annotation).withType(arrayType, typeContext, markers, context);
 			}
-			if (arrayType.classEquals(IterableForStatement.LazyFields.ITERABLE))
-			{
-				return new LiteralConversion(this, getArrayToIterable())
-						.withType(arrayType, typeContext, markers, context);
-			}
-			if (iclass != Types.OBJECT_CLASS)
+			if (arrayType.getTheClass() != Types.OBJECT_CLASS)
 			{
 				return null;
 			}
@@ -209,37 +203,23 @@ public final class ArrayExpr implements IValue, IValueList
 			// If the type is an array type, get it's element type
 			this.elementType = elementType = arrayType.getElementType();
 		}
-		
+
 		this.arrayType = arrayType;
-		
+
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			this.values[i] = TypeChecker.convertValue(this.values[i], elementType, typeContext, markers, context, LazyFields.ELEMENT_MARKER_SUPPLIER);
+			this.values[i] = TypeChecker.convertValue(this.values[i], elementType, typeContext, markers, context,
+			                                          LazyFields.ELEMENT_MARKER_SUPPLIER);
 		}
-		
+
 		return this;
 	}
-	
-	private static IMethod ARRAY_TO_ITERABLE;
-	
-	private static IMethod getArrayToIterable()
-	{
-		if (ARRAY_TO_ITERABLE != null)
-		{
-			return ARRAY_TO_ITERABLE;
-		}
-		return ARRAY_TO_ITERABLE = dyvil.tools.compiler.ast.type.builtin.Types.getObjectArray().getBody().getMethod(
-				Name.getQualified("toIterable"));
-	}
-	
+
 	private boolean isConvertibleFrom(IType type)
 	{
-		IClass iclass = type.getTheClass();
-		return iclass == dyvil.tools.compiler.ast.type.builtin.Types.OBJECT_CLASS
-				|| iclass.getAnnotation(LazyFields.ARRAY_CONVERTIBLE) != null
-				|| IterableForStatement.LazyFields.ITERABLE.isSuperClassOf(type);
+		return type.getTheClass() == Types.OBJECT_CLASS || type.getAnnotation(LazyFields.ARRAY_CONVERTIBLE) != null;
 	}
-	
+
 	@Override
 	public boolean isType(IType type)
 	{
@@ -247,31 +227,31 @@ public final class ArrayExpr implements IValue, IValueList
 		{
 			return this.isConvertibleFrom(type);
 		}
-		
+
 		// Skip getting the element type if this is an empty array
 		if (this.valueCount == 0)
 		{
 			return true;
 		}
-		
+
 		// If the type is an array type, get it's element type
-		IType type1 = type.getElementType();
-		
+		final IType elementType = type.getElementType();
+
 		// Check for every value if it is the element type
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			if (!this.values[i].isType(type1))
+			if (!this.values[i].isType(elementType))
 			{
 				// If not, this is not the type
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		if (!type.isArrayType())
 		{
@@ -279,57 +259,57 @@ public final class ArrayExpr implements IValue, IValueList
 			// CONVERSION_MATCH return value here is intentional.
 			return this.isConvertibleFrom(type) ? CONVERSION_MATCH : 0;
 		}
-		
+
 		// Skip getting the element type if this is an empty array
 		if (this.valueCount == 0)
 		{
 			return 1;
 		}
-		
+
 		// If the type is an array type, get it's element type
-		IType type1 = type.getElementType();
-		float total = 0;
-		
+		final IType elementType = type.getElementType();
+
+		int total = 0;
 		// Get the type match for every value in the array
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			float m = this.values[i].getTypeMatch(type1);
-			if (m <= 0F)
+			final int match = this.values[i].getTypeMatch(elementType);
+			if (match <= 0)
 			{
 				// If the type match for one value is zero, return 0
-				return 0F;
+				return 0;
 			}
-			total += m;
+			total += match;
 		}
-		
+
 		// Divide by the count
-		return 1F + total / this.valueCount;
+		return 1 + total / this.valueCount;
 	}
-	
+
 	@Override
 	public Iterator<IValue> iterator()
 	{
 		return new ArrayIterator<>(this.values, this.valueCount);
 	}
-	
+
 	@Override
 	public int valueCount()
 	{
 		return this.valueCount;
 	}
-	
+
 	@Override
 	public boolean isEmpty()
 	{
 		return this.valueCount == 0;
 	}
-	
+
 	@Override
 	public void setValue(int index, IValue value)
 	{
 		this.values[index] = value;
 	}
-	
+
 	@Override
 	public void addValue(IValue value)
 	{
@@ -342,7 +322,7 @@ public final class ArrayExpr implements IValue, IValueList
 		}
 		this.values[index] = value;
 	}
-	
+
 	@Override
 	public void addValue(int index, IValue value)
 	{
@@ -352,20 +332,20 @@ public final class ArrayExpr implements IValue, IValueList
 		System.arraycopy(this.values, index, temp, index + 1, this.valueCount - index - 1);
 		this.values = temp;
 	}
-	
+
 	@Override
 	public IValue getValue(int index)
 	{
 		return this.values[index];
 	}
-	
+
 	@Override
-	public IValue toConstant(MarkerList markers, IContext context)
+	public IValue toAnnotationConstant(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			final IValue value = this.values[i];
-			final IValue constant = value.toConstant(markers, context);
+			final IValue constant = value.toAnnotationConstant(markers, context);
 			if (constant == null)
 			{
 				markers.add(Markers.semantic(value.getPosition(), "annotation.array.not_constant"));
@@ -375,10 +355,10 @@ public final class ArrayExpr implements IValue, IValueList
 				this.values[i] = constant;
 			}
 		}
-		
+
 		return this;
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -387,7 +367,7 @@ public final class ArrayExpr implements IValue, IValueList
 			this.values[i].resolveTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
@@ -397,32 +377,16 @@ public final class ArrayExpr implements IValue, IValueList
 		}
 		return this;
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.elementType == null)
-		{
-			if (this.valueCount == 0)
-			{
-				markers.add(Markers.semantic(this.position, "array.empty"));
-				return;
-			}
-			
-			this.getType();
-			
-			for (int i = 0; i < this.valueCount; i++)
-			{
-				this.values[i].checkTypes(markers, context);
-			}
-		}
-		
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			this.values[i].checkTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
@@ -431,7 +395,7 @@ public final class ArrayExpr implements IValue, IValueList
 			this.values[i].check(markers, context);
 		}
 	}
-	
+
 	@Override
 	public IValue foldConstants()
 	{
@@ -441,7 +405,7 @@ public final class ArrayExpr implements IValue, IValueList
 		}
 		return this;
 	}
-	
+
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
@@ -451,22 +415,22 @@ public final class ArrayExpr implements IValue, IValueList
 		}
 		return this;
 	}
-	
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		IType elementType = this.elementType;
-		int opcode = elementType.getArrayStoreOpcode();
-		
-		writer.writeLDC(this.valueCount);
-		writer.writeNewArray(elementType, 1);
-		
+		final IType elementType = this.getElementType();
+		final int arrayStoreOpcode = elementType.getArrayStoreOpcode();
+
+		writer.visitLdcInsn(this.valueCount);
+		writer.visitMultiANewArrayInsn(elementType, 1);
+
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			writer.writeInsn(Opcodes.DUP);
-			writer.writeLDC(i);
+			writer.visitInsn(Opcodes.DUP);
+			writer.visitLdcInsn(i);
 			this.values[i].writeExpression(writer, elementType);
-			writer.writeInsn(opcode);
+			writer.visitInsn(arrayStoreOpcode);
 		}
 	}
 

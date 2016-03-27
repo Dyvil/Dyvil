@@ -34,20 +34,20 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	protected ICodePosition position;
 
 	protected IDataMember field;
-	protected IType type;
-	
+	protected IType       type;
+
 	public FieldAssignment(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
 	public FieldAssignment(ICodePosition position, IValue instance, Name name)
 	{
 		this.position = position;
 		this.receiver = instance;
 		this.name = name;
 	}
-	
+
 	public FieldAssignment(ICodePosition position, IValue instance, IDataMember field, IValue value)
 	{
 		this.position = position;
@@ -60,13 +60,13 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 			this.name = field.getName();
 		}
 	}
-	
+
 	@Override
 	public ICodePosition getPosition()
 	{
 		return this.position;
 	}
-	
+
 	@Override
 	public void setPosition(ICodePosition position)
 	{
@@ -78,7 +78,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	{
 		return FIELD_ASSIGN;
 	}
-	
+
 	@Override
 	public boolean isPrimitive()
 	{
@@ -90,13 +90,13 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	{
 		return true;
 	}
-	
+
 	@Override
 	public boolean isResolved()
 	{
 		return this.field != null;
 	}
-	
+
 	@Override
 	public IType getType()
 	{
@@ -108,75 +108,76 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 			}
 
 			final ITypeContext typeContext = this.receiver == null ? ITypeContext.NULL : this.receiver.getType();
-			return this.type = this.field.getType().getConcreteType(typeContext).getReturnType();
+			return this.type = this.field.getType().getConcreteType(typeContext).asReturnType();
 		}
 		return this.type;
 	}
-	
+
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type == Types.VOID)
+		if (Types.isSameType(type, Types.VOID))
 		{
 			return this;
 		}
-		
-		IValue value1 = this.value.withType(type, typeContext, markers, context);
-		if (value1 == null)
+
+		final IValue typedValue = this.value.withType(type, typeContext, markers, context);
+		if (typedValue == null)
 		{
 			return null;
 		}
-		this.value = value1;
+
+		this.value = typedValue;
 		return this;
 	}
-	
+
 	@Override
 	public boolean isType(IType type)
 	{
-		return type == Types.VOID || this.value.isType(type);
+		return Types.isSameType(type, Types.VOID) || this.value.isType(type);
 	}
-	
+
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		return this.value.getTypeMatch(type);
 	}
-	
+
 	@Override
 	public void setName(Name name)
 	{
 		this.name = name;
 	}
-	
+
 	@Override
 	public Name getName()
 	{
 		return this.name;
 	}
-	
+
 	@Override
 	public void setReceiver(IValue value)
 	{
 		this.value = value;
 	}
-	
+
 	@Override
 	public IValue getReceiver()
 	{
 		return this.value;
 	}
-	
+
 	@Override
 	public void setValue(IValue value)
 	{
 		this.value = value;
 	}
-	
+
 	public IValue getValue()
 	{
 		return this.value;
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -190,7 +191,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 			this.value.resolveTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void resolveReceiver(MarkerList markers, IContext context)
 	{
@@ -199,17 +200,17 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 			this.receiver = this.receiver.resolve(markers, context);
 		}
 	}
-	
+
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
 		this.resolveReceiver(markers, context);
-		
+
 		if (this.value != null)
 		{
 			this.value = this.value.resolve(markers, context);
 		}
-		
+
 		IValue v = this.resolveFieldAssignment(markers, context);
 		if (v != null)
 		{
@@ -220,17 +221,17 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 		{
 			return this;
 		}
-		
+
 		Marker marker = Markers.semantic(this.position, "resolve.field", this.name.unqualified);
 		if (this.receiver != null)
 		{
 			marker.addInfo(Markers.getSemantic("receiver.type", this.receiver.getType()));
 		}
-		
+
 		markers.add(marker);
 		return this;
 	}
-	
+
 	protected IValue resolveFieldAssignment(MarkerList markers, IContext context)
 	{
 		if (ICall.privateAccess(context, this.receiver))
@@ -280,10 +281,10 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 				return value;
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	private IValue resolveField(IValue receiver, IContext context)
 	{
 		IDataMember field = ICall.resolveField(context, receiver, this.name);
@@ -295,24 +296,24 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 		}
 		return null;
 	}
-	
+
 	private IValue resolveMethod(IValue receiver, MarkerList markers, IContext context)
 	{
 		final Name name = Util.addEq(this.name);
-		final IArguments arg = new SingleArgument(this.value);
-		final IMethod m = ICall.resolveMethod(context, receiver, name, arg);
-		if (m != null)
+
+		final IArguments argument = new SingleArgument(this.value);
+		final IMethod method = ICall.resolveMethod(context, receiver, name, argument);
+
+		if (method == null)
 		{
-			MethodCall mc = new MethodCall(this.position, receiver, name);
-			mc.arguments = arg;
-			mc.method = m;
-			mc.checkArguments(markers, context);
-			return mc;
+			return null;
 		}
 
-		return null;
+		final MethodAssignment methodAssignment = new MethodAssignment(this.position, receiver, method, argument);
+		methodAssignment.checkArguments(markers, context);
+		return methodAssignment;
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -320,20 +321,20 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 		{
 			this.receiver.checkTypes(markers, context);
 		}
-		
+
 		if (this.field != null)
 		{
 			this.field = this.field.capture(context);
 			this.receiver = this.field.checkAccess(markers, this.position, this.receiver, context);
 			this.value = this.field.checkAssign(markers, context, this.position, this.receiver, this.value);
 		}
-		
+
 		if (this.value != null)
 		{
 			this.value.checkTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
@@ -346,7 +347,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 			this.value.check(markers, context);
 		}
 	}
-	
+
 	@Override
 	public IValue foldConstants()
 	{
@@ -357,7 +358,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 		this.value = this.value.foldConstants();
 		return this;
 	}
-	
+
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
@@ -368,12 +369,12 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 		this.value = this.value.cleanup(context, compilableList);
 		return this;
 	}
-	
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		final int lineNumber = this.getLineNumber();
-		if (type == Types.VOID)
+		if (Types.isSameType(type, Types.VOID))
 		{
 			this.field.writeSet(writer, this.receiver, this.value, lineNumber);
 			return;
@@ -398,7 +399,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 
 			this.value.writeExpression(writer, fieldType);
 
-			writer.writeInsn(tempVar ? Opcodes.AUTO_DUP_X1 : Opcodes.AUTO_DUP);
+			writer.visitInsn(tempVar ? Opcodes.AUTO_DUP_X1 : Opcodes.AUTO_DUP);
 		}
 		else
 		{
@@ -406,7 +407,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 
 			this.value.writeExpression(writer, fieldType);
 
-			writer.writeInsn(Opcodes.AUTO_DUP_X1);
+			writer.visitInsn(Opcodes.AUTO_DUP_X1);
 		}
 
 		this.field.writeSet_Wrap(writer, lineNumber);
@@ -415,13 +416,13 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 		// Return value left on stack
 		fieldType.writeCast(writer, type, lineNumber);
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return IASTNode.toString(this);
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
@@ -430,9 +431,9 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 			this.receiver.toString(prefix, buffer);
 			buffer.append('.');
 		}
-		
+
 		buffer.append(this.name);
-		
+
 		if (this.value != null)
 		{
 			Formatting.appendSeparator(buffer, "field.assignment", '=');

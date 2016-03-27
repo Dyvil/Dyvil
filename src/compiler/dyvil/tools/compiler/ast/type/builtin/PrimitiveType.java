@@ -20,11 +20,13 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Mutability;
+import dyvil.tools.compiler.ast.type.TypeDelegate;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -44,9 +46,9 @@ public final class PrimitiveType implements IType
 	public static final int LONG_CODE    = 6;
 	public static final int FLOAT_CODE   = 7;
 	public static final int DOUBLE_CODE  = 8;
-	
+
 	private static final long PROMOTION_BITS;
-	
+
 	static
 	{
 		// Code to generate the value of PROMOTION_BITS. Uncomment as needed.
@@ -71,24 +73,24 @@ public final class PrimitiveType implements IType
 		//*/
 		// @formatter:on
 	}
-	
+
 	protected final Name   name;
 	protected       IClass theClass;
-	
+
 	private final int  typecode;
 	private final char typeChar;
-	
+
 	private final int    opcodeOffset1;
 	private final int    opcodeOffset2;
 	private final Object frameType;
-	
+
 	protected IMethod boxMethod;
 	protected IMethod unboxMethod;
-	
+
 	private IClass arrayClass;
 	private IClass refClass;
 	private IType  simpleRefType;
-	
+
 	public PrimitiveType(Name name, int typecode, char typeChar, int loadOpcode, int aloadOpcode, Object frameType)
 	{
 		this.name = name;
@@ -98,7 +100,7 @@ public final class PrimitiveType implements IType
 		this.opcodeOffset2 = aloadOpcode - Opcodes.IALOAD;
 		this.frameType = frameType;
 	}
-	
+
 	public static IType getPrimitiveType(IType type)
 	{
 		if (type.isArrayType())
@@ -145,7 +147,7 @@ public final class PrimitiveType implements IType
 		}
 		return type;
 	}
-	
+
 	public static PrimitiveType fromTypecode(int typecode)
 	{
 		switch (typecode)
@@ -170,37 +172,37 @@ public final class PrimitiveType implements IType
 			return Types.VOID;
 		}
 	}
-	
+
 	@Override
 	public int typeTag()
 	{
 		return PRIMITIVE;
 	}
-	
+
 	@Override
 	public boolean isPrimitive()
 	{
 		return true;
 	}
-	
+
 	@Override
 	public int getTypecode()
 	{
 		return this.typecode;
 	}
-	
+
 	@Override
 	public boolean isGenericType()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public ITypeParameter getTypeVariable()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public final IType getObjectType()
 	{
@@ -244,31 +246,31 @@ public final class PrimitiveType implements IType
 		final String className = "Simple" + this.getTypePrefix() + "Ref";
 		return this.simpleRefType = new ClassType(Package.dyvilRefSimple.resolveClass(className));
 	}
-	
+
 	@Override
 	public IMethod getBoxMethod()
 	{
 		return this.boxMethod;
 	}
-	
+
 	@Override
 	public IMethod getUnboxMethod()
 	{
 		return this.unboxMethod;
 	}
-	
+
 	@Override
 	public boolean isArrayType()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public int getArrayDimensions()
 	{
 		return 0;
 	}
-	
+
 	@Override
 	public IType getElementType()
 	{
@@ -303,40 +305,38 @@ public final class PrimitiveType implements IType
 	{
 		return Mutability.IMMUTABLE;
 	}
-	
+
 	@Override
 	public Name getName()
 	{
 		return this.name;
 	}
-	
+
 	@Override
 	public IClass getTheClass()
 	{
 		return this.theClass;
 	}
-	
+
 	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
-		if (type == this)
-		{
-			return true;
-		}
-		if (type.typeTag() == WILDCARD_TYPE)
-		{
-			return type.isSameType(this);
-		}
-		return !type.isArrayType() && this.isSuperClassOf(type);
+		return type == this || this.isSuperClassOf(type);
 	}
-	
+
 	@Override
-	public boolean isSuperClassOf(IType that)
+	public boolean isSuperClassOf(IType subType)
 	{
-		return this.theClass == that.getTheClass() || that.isPrimitive() && isPromotable(that.getTypecode(),
-		                                                                                 this.typecode);
+		return this.theClass == subType.getTheClass() || subType.isPrimitive() && isPromotable(subType.getTypecode(),
+		                                                                                       this.typecode);
 	}
-	
+
+	@Override
+	public boolean isSameType(IType type)
+	{
+		return this.theClass == type.getTheClass();
+	}
+
 	@Override
 	public int getSuperTypeDistance(IType superType)
 	{
@@ -359,89 +359,89 @@ public final class PrimitiveType implements IType
 		}
 		return m + 1;
 	}
-	
+
 	private static long bitMask(int from, int to)
 	{
 		return 1L << ((from - 1) | ((to - 1) << 3));
 	}
-	
+
 	private static boolean isPromotable(int from, int to)
 	{
 		return to != 0 && (PROMOTION_BITS & bitMask(from, to)) != 0L;
 	}
-	
+
 	@Override
-	public boolean classEquals(IType type)
+	public boolean isSameClass(IType type)
 	{
 		return type == this;
 	}
-	
+
 	@Override
 	public IType resolveType(ITypeParameter typeParameter)
 	{
-		return null;
+		return this.theClass.resolveType(typeParameter, this);
 	}
-	
+
 	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
 	}
-	
+
 	@Override
 	public boolean isResolved()
 	{
 		return true;
 	}
-	
+
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
 		return this;
 	}
-	
+
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
 	}
-	
+
 	@Override
 	public void checkType(MarkerList markers, IContext context, TypePosition position)
 	{
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 	}
-	
+
 	@Override
 	public void foldConstants()
 	{
 	}
-	
+
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
 	}
-	
+
 	@Override
 	public boolean hasTypeVariables()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
 		return this;
 	}
-	
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
 		return null;
 	}
-	
+
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
@@ -451,86 +451,98 @@ public final class PrimitiveType implements IType
 			this.theClass.getMethodMatches(list, instance, name, arguments);
 		}
 	}
-	
+
 	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}
-	
+
 	@Override
 	public IMethod getFunctionalMethod()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public String getInternalName()
 	{
 		return this.theClass.getInternalName();
 	}
-	
+
 	@Override
 	public void appendExtendedName(StringBuilder buf)
 	{
 		buf.append(this.typeChar);
 	}
-	
+
 	@Override
 	public String getSignature()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public void appendSignature(StringBuilder buf)
 	{
 		buf.append(this.typeChar);
 	}
-	
+
 	@Override
 	public int getLoadOpcode()
 	{
 		return Opcodes.ILOAD + this.opcodeOffset1;
 	}
-	
+
 	@Override
 	public int getArrayLoadOpcode()
 	{
 		return Opcodes.IALOAD + this.opcodeOffset2;
 	}
-	
+
 	@Override
 	public int getStoreOpcode()
 	{
 		return Opcodes.ISTORE + this.opcodeOffset1;
 	}
-	
+
 	@Override
 	public int getArrayStoreOpcode()
 	{
 		return Opcodes.IASTORE + this.opcodeOffset2;
 	}
-	
+
 	@Override
 	public int getReturnOpcode()
 	{
 		return Opcodes.IRETURN + this.opcodeOffset1;
 	}
-	
+
 	@Override
 	public Object getFrameType()
 	{
 		return this.frameType;
 	}
-	
+
+	@Override
+	public int getLocalSlots()
+	{
+		switch (this.typecode)
+		{
+		case LONG_CODE:
+		case DOUBLE_CODE:
+			return 2;
+		}
+		return 1;
+	}
+
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.writeLDC(this.typecode);
-		writer.writeInvokeInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/PrimitiveType", "apply",
+		writer.visitLdcInsn(this.typecode);
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/PrimitiveType", "apply",
 		                       "(I)Ldyvilx/lang/model/type/PrimitiveType;", false);
 	}
-	
+
 	@Override
 	public void writeDefaultValue(MethodWriter writer)
 	{
@@ -541,20 +553,20 @@ public final class PrimitiveType implements IType
 		case SHORT_CODE:
 		case CHAR_CODE:
 		case INT_CODE:
-			writer.writeLDC(0);
+			writer.visitLdcInsn(0);
 			break;
 		case LONG_CODE:
-			writer.writeLDC(0L);
+			writer.visitLdcInsn(0L);
 			break;
 		case FLOAT_CODE:
-			writer.writeLDC(0F);
+			writer.visitLdcInsn(0F);
 			break;
 		case DOUBLE_CODE:
-			writer.writeLDC(0D);
+			writer.visitLdcInsn(0D);
 			break;
 		}
 	}
-	
+
 	@Override
 	public void writeCast(MethodWriter writer, IType target, int lineNumber) throws BytecodeException
 	{
@@ -571,7 +583,7 @@ public final class PrimitiveType implements IType
 				return;
 			}
 		}
-		
+
 		switch (this.typecode)
 		{
 		case BOOLEAN_CODE:
@@ -638,7 +650,7 @@ public final class PrimitiveType implements IType
 			break;
 		}
 
-		writer.writeFieldInsn(Opcodes.GETSTATIC, owner, "TYPE", "Ljava/lang/Class;");
+		writer.visitFieldInsn(Opcodes.GETSTATIC, owner, "TYPE", "Ljava/lang/Class;");
 	}
 
 	private static void writeIntCast(IType cast, MethodWriter writer) throws BytecodeException
@@ -652,107 +664,107 @@ public final class PrimitiveType implements IType
 		case INT_CODE:
 			break;
 		case LONG_CODE:
-			writer.writeInsn(I2L);
+			writer.visitInsn(I2L);
 			break;
 		case FLOAT_CODE:
-			writer.writeInsn(I2F);
+			writer.visitInsn(I2F);
 			break;
 		case DOUBLE_CODE:
-			writer.writeInsn(I2D);
+			writer.visitInsn(I2D);
 			break;
 		}
 	}
-	
+
 	private static void writeLongCast(IType cast, MethodWriter writer) throws BytecodeException
 	{
 		switch (cast.getTypecode())
 		{
 		case BOOLEAN_CODE:
-			writer.writeInsn(L2I);
+			writer.visitInsn(L2I);
 			break;
 		case BYTE_CODE:
-			writer.writeInsn(L2B);
+			writer.visitInsn(L2B);
 			break;
 		case SHORT_CODE:
-			writer.writeInsn(L2S);
+			writer.visitInsn(L2S);
 			break;
 		case CHAR_CODE:
-			writer.writeInsn(L2C);
+			writer.visitInsn(L2C);
 			break;
 		case INT_CODE:
-			writer.writeInsn(L2I);
+			writer.visitInsn(L2I);
 			break;
 		case LONG_CODE:
 			break;
 		case FLOAT_CODE:
-			writer.writeInsn(L2F);
+			writer.visitInsn(L2F);
 			break;
 		case DOUBLE_CODE:
-			writer.writeInsn(L2D);
+			writer.visitInsn(L2D);
 			break;
 		}
 	}
-	
+
 	private static void writeFloatCast(IType cast, MethodWriter writer) throws BytecodeException
 	{
 		switch (cast.getTypecode())
 		{
 		case BOOLEAN_CODE:
-			writer.writeInsn(F2I);
+			writer.visitInsn(F2I);
 			break;
 		case BYTE_CODE:
-			writer.writeInsn(F2B);
+			writer.visitInsn(F2B);
 			break;
 		case SHORT_CODE:
-			writer.writeInsn(F2S);
+			writer.visitInsn(F2S);
 			break;
 		case CHAR_CODE:
-			writer.writeInsn(F2C);
+			writer.visitInsn(F2C);
 			break;
 		case INT_CODE:
-			writer.writeInsn(F2I);
+			writer.visitInsn(F2I);
 			break;
 		case LONG_CODE:
-			writer.writeInsn(F2L);
+			writer.visitInsn(F2L);
 			break;
 		case FLOAT_CODE:
 			break;
 		case DOUBLE_CODE:
-			writer.writeInsn(F2D);
+			writer.visitInsn(F2D);
 			break;
 		}
 	}
-	
+
 	private static void writeDoubleCast(IType cast, MethodWriter writer) throws BytecodeException
 	{
 		switch (cast.getTypecode())
 		{
 		case BOOLEAN_CODE:
-			writer.writeInsn(D2I);
+			writer.visitInsn(D2I);
 			break;
 		case BYTE_CODE:
-			writer.writeInsn(D2B);
+			writer.visitInsn(D2B);
 			break;
 		case SHORT_CODE:
-			writer.writeInsn(D2S);
+			writer.visitInsn(D2S);
 			break;
 		case CHAR_CODE:
-			writer.writeInsn(D2C);
+			writer.visitInsn(D2C);
 			break;
 		case INT_CODE:
-			writer.writeInsn(D2I);
+			writer.visitInsn(D2I);
 			break;
 		case LONG_CODE:
-			writer.writeInsn(D2L);
+			writer.visitInsn(D2L);
 			break;
 		case FLOAT_CODE:
-			writer.writeInsn(D2F);
+			writer.visitInsn(D2F);
 			break;
 		case DOUBLE_CODE:
 			break;
 		}
 	}
-	
+
 	@Override
 	public IConstantValue getDefaultValue()
 	{
@@ -774,52 +786,52 @@ public final class PrimitiveType implements IType
 		}
 		return null;
 	}
-	
+
 	@Override
 	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
 	{
 	}
-	
+
 	@Override
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
 	}
-	
+
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
 		out.writeByte(this.typecode);
 	}
-	
+
 	@Override
 	public void read(DataInput in) throws IOException
 	{
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return this.name.qualified;
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(this.name);
 	}
-	
+
 	@Override
 	public PrimitiveType clone()
 	{
 		return this; // no clones
 	}
-	
+
 	@Override
 	public boolean equals(Object obj)
 	{
 		return this == obj;
 	}
-	
+
 	@Override
 	public int hashCode()
 	{

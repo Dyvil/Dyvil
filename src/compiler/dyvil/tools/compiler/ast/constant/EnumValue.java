@@ -69,13 +69,7 @@ public class EnumValue implements IConstantValue, INamed
 		{
 			this.type = this.type.resolveType(markers, context);
 		}
-		return type.isSuperTypeOf(this.type) ? this : null;
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return type.isSuperTypeOf(this.type);
+		return this.isType(type) ? this : null;
 	}
 	
 	@Override
@@ -114,7 +108,7 @@ public class EnumValue implements IConstantValue, INamed
 		String owner = this.type.getInternalName();
 		String name = this.name.qualified;
 		String desc = this.type.getExtendedName();
-		writer.writeFieldInsn(Opcodes.GETSTATIC, owner, name, desc);
+		writer.visitFieldInsn(Opcodes.GETSTATIC, owner, name, desc);
 
 		if (type != null)
 		{

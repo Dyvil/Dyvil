@@ -5,6 +5,8 @@ import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 
@@ -19,33 +21,39 @@ public interface IntrinsicData
 	void writeInvIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
 			throws BytecodeException;
 	
-	static void writeArgument(MethodWriter writer, IMethod method, int index, IValue instance, IArguments arguments)
+	static IType writeArgument(MethodWriter writer, IMethod method, int index, IValue instance, IArguments arguments)
 			throws BytecodeException
 	{
 		if (instance == null)
 		{
-			arguments.writeValue(index, method.getParameter(index), writer);
-			return;
+			final IParameter parameter = method.getParameter(index);
+			arguments.writeValue(index, parameter, writer);
+			return parameter.getInternalType();
 		}
 		
 		if (index == 0)
 		{
 			if (method.hasModifier(Modifiers.INFIX))
 			{
-				instance.writeExpression(writer, method.getParameter(0).getType());
-				return;
+				final IType internalParameterType = method.getParameter(0).getInternalType();
+				instance.writeExpression(writer, internalParameterType);
+				return internalParameterType;
 			}
-			
-			instance.writeExpression(writer, method.getEnclosingClass().getType());
-			return;
+
+			final IType type = method.getEnclosingClass().getType();
+			instance.writeExpression(writer, type);
+			return type;
 		}
 		
 		if (method.hasModifier(Modifiers.INFIX))
 		{
-			arguments.writeValue(index - 1, method.getParameter(index), writer);
-			return;
+			final IParameter parameter = method.getParameter(index);
+			arguments.writeValue(index - 1, parameter, writer);
+			return parameter.getInternalType();
 		}
-		
-		arguments.writeValue(index - 1, method.getParameter(index - 1), writer);
+
+		final IParameter parameter = method.getParameter(index - 1);
+		arguments.writeValue(index - 1, parameter, writer);
+		return parameter.getInternalType();
 	}
 }

@@ -36,7 +36,7 @@ public final class ExpressionListParser extends Parser implements IValueConsumer
 		{
 		case EXPRESSION:
 			this.mode = COMMA;
-			pm.pushParser(pm.newExpressionParser(this), true);
+			pm.pushParser(new ExpressionParser(this), true);
 			return;
 		case COMMA:
 			if (type == BaseSymbols.COMMA || type == BaseSymbols.SEMICOLON && token.isInferred())

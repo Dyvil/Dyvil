@@ -114,7 +114,7 @@ public interface IClass extends IClassMember, ITypeParametric, IContext, IParame
 	
 	byte getVisibility(IClassMember member);
 	
-	boolean checkImplements(MarkerList markers, IClass iclass, IMethod candidate, ITypeContext typeContext);
+	boolean checkImplements(IMethod candidate, ITypeContext typeContext);
 	
 	void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext, Set<IClass> checkedClasses);
 	
@@ -147,7 +147,7 @@ public interface IClass extends IClassMember, ITypeParametric, IContext, IParame
 	void write(ClassWriter writer) throws BytecodeException;
 
 	@Override
-	void writeInit(MethodWriter writer) throws BytecodeException;
+	void writeClassInit(MethodWriter writer) throws BytecodeException;
 
 	@Override
 	void writeStaticInit(MethodWriter writer) throws BytecodeException;

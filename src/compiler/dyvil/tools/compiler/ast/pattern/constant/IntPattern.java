@@ -34,12 +34,6 @@ public final class IntPattern extends Pattern
 	}
 	
 	@Override
-	public boolean isType(IType type)
-	{
-		return type == Types.INT || type.isSuperTypeOf(Types.INT);
-	}
-	
-	@Override
 	public IPattern withType(IType type, MarkerList markers)
 	{
 		return IPattern.primitiveWithType(this, type, Types.INT);
@@ -81,8 +75,8 @@ public final class IntPattern extends Pattern
 	{
 		IPattern.loadVar(writer, varIndex, matchedType);
 		matchedType.writeCast(writer, Types.INT, this.getLineNumber());
-		writer.writeLDC(this.value);
-		writer.writeJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
+		writer.visitLdcInsn(this.value);
+		writer.visitJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
 	}
 
 	@Override

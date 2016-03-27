@@ -75,7 +75,7 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type == Types.VOID)
+		if (Types.isSameType(type, Types.VOID))
 		{
 			return this;
 		}
@@ -95,15 +95,11 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 	@Override
 	public boolean isType(IType type)
 	{
-		if (type == Types.VOID)
-		{
-			return true;
-		}
-		return this.value != null && this.value.isType(type);
+		return Types.isSameType(type, Types.VOID) || this.value != null && this.value.isType(type);
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		if (this.value == null)
 		{
@@ -146,7 +142,7 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 			}
 
 			final IType valueType = this.value.getType();
-			if (!returnType.isSuperTypeOf(valueType))
+			if (!Types.isSuperType(returnType, valueType))
 			{
 				final Marker marker = Markers.semanticError(this.position, "return.type.incompatible");
 				marker.addInfo(Markers.getSemantic("return.type", returnType));
@@ -194,9 +190,9 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 	{
 		if (this.value == null)
 		{
-			if (type == Types.VOID || type == null)
+			if (type == null || Types.isSameType(type, Types.VOID))
 			{
-				writer.writeInsn(Opcodes.RETURN);
+				writer.visitInsn(Opcodes.RETURN);
 				return;
 			}
 
@@ -204,10 +200,10 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 			return;
 		}
 
-		if (type == Types.VOID)
+		if (Types.isSameType(type, Types.VOID))
 		{
 			this.value.writeExpression(writer, null);
-			writer.writeInsn(this.value.getType().getReturnOpcode());
+			writer.visitInsn(this.value.getType().getReturnOpcode());
 			return;
 		}
 

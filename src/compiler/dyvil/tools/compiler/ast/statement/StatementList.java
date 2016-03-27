@@ -1,11 +1,8 @@
 package dyvil.tools.compiler.ast.statement;
 
-import dyvil.collection.Entry;
 import dyvil.collection.List;
-import dyvil.collection.Map;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.collection.mutable.ArrayList;
-import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.tools.compiler.ast.access.ICall;
 import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -15,8 +12,9 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.member.IClassMember;
+import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -31,6 +29,8 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.transform.TypeChecker;
+import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -47,9 +47,9 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	protected Label[]  labels;
 
 	// Metadata
-	protected Map<Name, Variable> variables;
-	protected List<IMethod>       methods;
-	protected IType               returnType;
+	protected List<IVariable> variables;
+	protected List<IMethod>   methods;
+	protected IType           returnType;
 
 	public StatementList()
 	{
@@ -93,6 +93,12 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	}
 
 	@Override
+	public boolean isStatement()
+	{
+		return true;
+	}
+
+	@Override
 	public boolean isUsableAsStatement()
 	{
 		return true;
@@ -123,7 +129,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	{
 		if (this.valueCount <= 0)
 		{
-			return type == Types.VOID ? this : null;
+			return Types.isSameType(type, Types.VOID) ? this : null;
 		}
 
 		context = context.push(this);
@@ -166,11 +172,11 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		{
 			return this.values[this.valueCount - 1].isType(type);
 		}
-		return type == Types.VOID;
+		return Types.isSameType(type, Types.VOID);
 	}
 
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		if (this.valueCount > 0)
 		{
@@ -264,10 +270,14 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	{
 		if (this.variables != null)
 		{
-			final IDataMember field = this.variables.get(name);
-			if (field != null)
+			// Intentionally start at the last variable
+			for (int i = this.variables.size() - 1; i >= 0; i--)
 			{
-				return field;
+				final IVariable variable = this.variables.get(i);
+				if (variable.getName() == name)
+				{
+					return variable;
+				}
 			}
 		}
 
@@ -318,7 +328,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	@Override
 	public boolean isMember(IVariable variable)
 	{
-		return this.variables != null && this.variables.containsValue(variable);
+		return this.variables != null && this.variables.contains(variable);
 	}
 
 	@Override
@@ -351,29 +361,34 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 
 		context = context.push(this);
 
-		// Resolve and check all values except the last one
-		int len = this.valueCount - 1;
-		for (int i = 0; i < len; i++)
+		// Resolve and check all values
+		final int lastIndex = this.valueCount - 1;
+		for (int i = 0; i < this.valueCount; i++)
 		{
 			final IValue resolvedValue = this.values[i] = this.values[i].resolve(markers, context);
 			final int valueTag = resolvedValue.valueTag();
 
 			if (valueTag == IValue.VARIABLE)
 			{
-				this.addVariable((FieldInitializer) resolvedValue);
+				this.addVariable((FieldInitializer) resolvedValue, markers, context);
 				continue;
 			}
-			if (valueTag == IValue.NESTED_METHOD)
+			if (valueTag == IValue.MEMBER_STATEMENT)
 			{
-				this.addMethod((MethodStatement) resolvedValue);
+				this.addMethod((MemberStatement) resolvedValue, markers);
 				continue;
+			}
+
+			if (i == lastIndex)
+			{
+				break;
 			}
 
 			// Try to resolve an applyStatement method
 
 			if (!resolvedValue.isStatement())
 			{
-				IValue applyStatementCall = resolveApplyStatement(markers, context, resolvedValue);
+				final IValue applyStatementCall = resolveApplyStatement(markers, context, resolvedValue);
 				if (applyStatementCall != null)
 				{
 					this.values[i] = applyStatementCall;
@@ -381,12 +396,8 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 				}
 			}
 
-			this.values[i] = IStatement
-				                 .checkStatement(markers, context, resolvedValue, "statementlist.statement");
+			this.values[i] = IStatement.checkStatement(markers, context, resolvedValue, "statementlist.statement");
 		}
-
-		// Resolved the last value
-		this.values[len] = this.values[len].resolve(markers, context);
 
 		context.pop();
 
@@ -422,25 +433,70 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		return null;
 	}
 
-	protected void addVariable(FieldInitializer initializer)
+	protected void addVariable(FieldInitializer initializer, MarkerList markers, IContext context)
 	{
-		if (this.variables == null)
+		final IVariable variable = initializer.variable;
+		final Name variableName = variable.getName();
+
+		// Additional Semantic Analysis
+
+		// Uninitialized Variables
+		if (variable.getValue() == null)
 		{
-			this.variables = new IdentityHashMap<>();
+			variable.setValue(variable.getType().getDefaultValue());
+			markers.add(Markers.semanticError(this.position, "variable.value", variableName));
 		}
 
-		final Variable variable = initializer.variable;
-		this.variables.put(variable.getName(), variable);
+		// Variable Name Shadowing
+		final IDataMember dataMember = context.resolveField(variableName);
+		if (dataMember != null && dataMember.isVariable())
+		{
+			markers.add(Markers.semantic(initializer.getPosition(), "variable.shadow", variableName));
+		}
+
+		// Actually add the Variable to the List (this has to happen after checking for shadowed variables)
+
+		if (this.variables == null)
+		{
+			this.variables = new ArrayList<>();
+		}
+		this.variables.add(variable);
 	}
 
-	protected void addMethod(MethodStatement methodStatement)
+	protected void addMethod(MemberStatement memberStatement, MarkerList markers)
 	{
+		final IClassMember member = memberStatement.member;
+		final MemberKind memberKind = member.getKind();
+		if (memberKind != MemberKind.METHOD)
+		{
+			markers.add(
+				Markers.semantic(member.getPosition(), "statementlist.declaration.invalid", Util.memberNamed(member)));
+
+			return;
+		}
+
+		final IMethod method = (IMethod) member;
+
 		if (this.methods == null)
 		{
 			this.methods = new ArrayList<>();
+			this.methods.add(method);
+			return;
 		}
 
-		this.methods.add(methodStatement.method);
+		final Name methodName = method.getName();
+		final int parameterCount = method.parameterCount();
+		final String desc = method.getDescriptor();
+		for (IMethod candidate : this.methods)
+		{
+			if (candidate.getName() == methodName // same name
+				    && candidate.parameterCount() == parameterCount && candidate.getDescriptor().equals(desc))
+			{
+				markers.add(Markers.semanticError(memberStatement.getPosition(), "method.duplicate", methodName, desc));
+			}
+		}
+
+		this.methods.add(method);
 	}
 
 	@Override
@@ -515,7 +571,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		dyvil.tools.asm.Label start = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label end = new dyvil.tools.asm.Label();
 
-		writer.writeLabel(start);
+		writer.visitLabel(start);
 		int localCount = writer.localCount();
 
 		if (this.labels == null)
@@ -537,7 +593,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 				Label label = this.labels[i];
 				if (label != null)
 				{
-					writer.writeLabel(label.target);
+					writer.visitLabel(label.target);
 				}
 
 				this.values[i].writeExpression(writer, Types.VOID);
@@ -547,24 +603,23 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 			Label label = this.labels[statementCount];
 			if (label != null)
 			{
-				writer.writeLabel(label.target);
+				writer.visitLabel(label.target);
 			}
 
 			this.values[statementCount].writeExpression(writer, type);
 		}
 
 		writer.resetLocals(localCount);
-		writer.writeLabel(end);
+		writer.visitLabel(end);
 
 		if (this.variables == null)
 		{
 			return;
 		}
 
-		for (Entry<Name, Variable> entry : this.variables)
+		for (IVariable variable : this.variables)
 		{
-			Variable var = entry.getValue();
-			var.writeLocal(writer, start, end);
+			variable.writeLocal(writer, start, end);
 		}
 	}
 

@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Names;
@@ -105,11 +106,10 @@ public final class LiteralConversion implements IValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		IMethod method = this.method;
-		if (method == null)
+		if (this.method == null)
 		{
-			method = IContext.resolveMethod(type, null, this.methodName, this.arguments);
-			if (method == null)
+			this.method = IContext.resolveMethod(type, null, this.methodName, this.arguments);
+			if (this.method == null)
 			{
 				StringBuilder builder = new StringBuilder();
 				this.arguments.typesToString(builder);
@@ -118,28 +118,26 @@ public final class LiteralConversion implements IValue
 				this.type = type;
 				return null;
 			}
-			
-			this.method = method;
 		}
 		
-		GenericData data = method.getGenericData(null, null, this.arguments);
-		method.checkArguments(markers, this.literal.getPosition(), context, null, this.arguments, data);
-		this.type = method.getType().getConcreteType(data);
+		final GenericData genericData = this.method.getGenericData(null, null, this.arguments);
+
+		this.method.checkArguments(markers, this.literal.getPosition(), context, null, this.arguments, genericData);
+		this.type = this.method.getType().getConcreteType(genericData);
 		
-		IType concrete = type.getConcreteType(typeContext);
-		if (!concrete.isSuperTypeOf(this.type))
+		final IType concrete = type.getConcreteType(typeContext);
+		if (!Types.isSuperType(concrete, this.type))
 		{
-			Marker m = Markers.semantic(this.literal.getPosition(), "literal.type.incompatible");
-			m.addInfo(Markers.getSemantic("type.expected", concrete));
-			m.addInfo(Markers.getSemantic("literal.type.conversion", this.type));
+			final Marker marker = Markers.semantic(this.literal.getPosition(), "literal.type.incompatible");
+			marker.addInfo(Markers.getSemantic("type.expected", concrete));
+			marker.addInfo(Markers.getSemantic("literal.type.conversion", this.type));
+			marker.addInfo(Markers.getSemantic("literal.type.method"));
 			
-			m.addInfo(Markers.getSemantic("literal.type.method"));
+			final StringBuilder stringBuilder = new StringBuilder("\t\t");
+			Util.methodSignatureToString(this.method, stringBuilder);
+			marker.addInfo(stringBuilder.toString());
 			
-			StringBuilder sb = new StringBuilder("\t\t");
-			Util.methodSignatureToString(method, sb);
-			m.addInfo(sb.toString());
-			
-			markers.add(m);
+			markers.add(marker);
 		}
 		
 		return this;

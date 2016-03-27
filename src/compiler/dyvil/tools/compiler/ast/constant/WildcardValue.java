@@ -60,7 +60,7 @@ public class WildcardValue implements IConstantValue
 	}
 	
 	@Override
-	public float getTypeMatch(IType type)
+	public int getTypeMatch(IType type)
 	{
 		return 1;
 	}
@@ -100,7 +100,7 @@ public class WildcardValue implements IConstantValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		if (type == Types.VOID)
+		if (Types.isSameType(type, Types.VOID))
 		{
 			return;
 		}

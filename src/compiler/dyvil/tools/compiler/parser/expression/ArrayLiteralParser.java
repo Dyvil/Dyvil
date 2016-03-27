@@ -94,7 +94,7 @@ public class ArrayLiteralParser extends Parser implements IValueConsumer
 
 	private ExpressionParser newExpressionParser(IParserManager pm)
 	{
-		return pm.newExpressionParser(this).withFlag(ExpressionParser.IGNORE_COLON);
+		return new ExpressionParser(this).withFlag(ExpressionParser.IGNORE_COLON);
 	}
 	
 	private void end(IToken token)

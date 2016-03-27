@@ -5,7 +5,6 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -104,18 +103,6 @@ public class ConstructorCall implements ICall
 	}
 	
 	@Override
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
-	{
-		return type.isSuperTypeOf(this.type) ? this : null;
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return type.isSuperTypeOf(this.type);
-	}
-	
-	@Override
 	public void setArguments(IArguments arguments)
 	{
 		this.arguments = arguments;
@@ -181,7 +168,7 @@ public class ConstructorCall implements ICall
 			{
 				Marker marker = Markers
 						.semanticError(this.position, "constructor.access.array.typevar", typeVar.getName());
-				marker.addInfo(Markers.getSemantic("typevariable", typeVar));
+				marker.addInfo(Markers.getSemantic("typeparameter.declaration", typeVar));
 				markers.add(marker);
 			}
 			
@@ -326,7 +313,7 @@ public class ConstructorCall implements ICall
 			if (len == 1)
 			{
 				this.arguments.getFirstValue().writeExpression(writer, Types.INT);
-				writer.writeNewArray(this.type.getElementType(), 1);
+				writer.visitMultiANewArrayInsn(this.type.getElementType(), 1);
 				return;
 			}
 			
@@ -339,7 +326,7 @@ public class ConstructorCall implements ICall
 				arrayType = arrayType.getElementType();
 			}
 			
-			writer.writeNewArray(arrayType, len);
+			writer.visitMultiANewArrayInsn(arrayType, len);
 			return;
 		}
 		
