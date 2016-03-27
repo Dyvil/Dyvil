@@ -136,6 +136,11 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			this.mode = SEPARATOR;
 			if (!ParserUtil.isIdentifier(type))
 			{
+				if (ParserUtil.isCloseBracket(type))
+				{
+					pm.popParser(true);
+				}
+
 				pm.report(token, "parameter.identifier");
 				return;
 			}

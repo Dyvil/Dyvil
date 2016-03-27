@@ -128,18 +128,16 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 			return;
 		case VARIABLE_END:
 			this.mode = CONDITION_END;
-			if (type == BaseSymbols.SEMICOLON)
+			if (token.next().type() != BaseSymbols.SEMICOLON)
 			{
-				if (token.next().type() == BaseSymbols.SEMICOLON)
-				{
-					return;
-				}
-
 				pm.pushParser(new ExpressionParser(this));
 				return;
 			}
-			pm.reparse();
-			pm.report(token, "for.variable.semicolon");
+			if (type != BaseSymbols.SEMICOLON)
+			{
+				pm.reparse();
+				pm.report(token, "for.variable.semicolon");
+			}
 			return;
 		case CONDITION_END:
 			this.mode = FOR_END;
@@ -187,38 +185,38 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 
 	public void parseEnd(IParserManager pm, IToken token, int type)
 	{
-		if (!this.parenthesis)
+		if (this.parenthesis)
 		{
-			switch (type)
+			this.mode = STATEMENT;
+			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
-			case BaseSymbols.SEMICOLON:
-			case BaseSymbols.CLOSE_CURLY_BRACKET:
 				pm.reparse();
-				// Fallthrough
-			case Tokens.EOF:
-				pm.popParser();
-				this.field.setValue(this.forStatement);
-				return;
-			case BaseSymbols.COLON:
-				this.mode = END;
-				pm.pushParser(new ExpressionParser(this));
-				return;
-			case BaseSymbols.OPEN_CURLY_BRACKET:
-				pm.pushParser(new StatementListParser(this), true);
-				this.mode = END;
-				return;
+				pm.report(token, "for.close_paren");
 			}
-
-			pm.report(token, "for.separator");
 			return;
 		}
 
-		this.mode = STATEMENT;
-		if (type != BaseSymbols.CLOSE_PARENTHESIS)
+		switch (type)
 		{
+		case BaseSymbols.SEMICOLON:
+		case BaseSymbols.CLOSE_CURLY_BRACKET:
 			pm.reparse();
-			pm.report(token, "for.close_paren");
+			// Fallthrough
+		case Tokens.EOF:
+			pm.popParser();
+			this.field.setValue(this.forStatement);
+			return;
+		case BaseSymbols.COLON:
+			this.mode = END;
+			pm.pushParser(new ExpressionParser(this));
+			return;
+		case BaseSymbols.OPEN_CURLY_BRACKET:
+			pm.pushParser(new StatementListParser(this), true);
+			this.mode = END;
+			return;
 		}
+
+		pm.report(token, "for.separator");
 	}
 
 	@Override

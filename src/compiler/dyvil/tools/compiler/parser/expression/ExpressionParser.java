@@ -117,7 +117,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 	private ExpressionParser subParser(IValueConsumer valueConsumer)
 	{
 		return new ExpressionParser(valueConsumer)
-		         .withFlag(this.flags & (IGNORE_COLON | IGNORE_LAMBDA | IGNORE_CLOSURE));
+			       .withFlag(this.flags & (IGNORE_COLON | IGNORE_LAMBDA | IGNORE_CLOSURE));
 	}
 
 	@Override
@@ -622,10 +622,19 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				return;
 			}
 
+			if (ParserUtil.isTerminator(type))
+			{
+				pm.popParser(true);
+			}
+
 			pm.report(Markers.syntaxError(token, "expression.dot.invalid", token.toString()));
 			return;
 		}
 
+		if (ParserUtil.isTerminator(type))
+		{
+			pm.popParser(true);
+		}
 		pm.report(Markers.syntaxError(token, "expression.invalid", token.toString()));
 	}
 
