@@ -18,28 +18,28 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class MapExpr implements IValue
 {
-	private static final TypeChecker.MarkerSupplier KEY_MARKER_SUPPLIER = TypeChecker
-			.markerSupplier("map.key.type.incompatible", "map.key.type.expected", "map.key.type.actual");
-	private static final TypeChecker.MarkerSupplier VALUE_MARKER_SUPPLIER = TypeChecker
-			.markerSupplier("map.value.type.incompatible", "map.value.type.expected", "map.value.type.actual");
+	private static final TypeChecker.MarkerSupplier KEY_MARKER_SUPPLIER   = TypeChecker.markerSupplier(
+		"map.key.type.incompatible", "map.key.type.expected", "map.key.type.actual");
+	private static final TypeChecker.MarkerSupplier VALUE_MARKER_SUPPLIER = TypeChecker.markerSupplier(
+		"map.value.type.incompatible", "map.value.type.expected", "map.value.type.actual");
 
 	protected ICodePosition position;
-	
+
 	protected IValue[] keys;
 	protected IValue[] values;
-	
+
 	protected int count;
-	
+
 	// Metadata
 	private IType type;
 	private IType keyType;
 	private IType valueType;
-	
+
 	public MapExpr(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
 	public MapExpr(ICodePosition position, IValue[] keys, IValue[] values, int count)
 	{
 		this.position = position;
@@ -47,25 +47,25 @@ public class MapExpr implements IValue
 		this.values = values;
 		this.count = count;
 	}
-	
+
 	@Override
 	public int valueTag()
 	{
 		return MAP;
 	}
-	
+
 	@Override
 	public void setPosition(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
 	@Override
 	public ICodePosition getPosition()
 	{
 		return this.position;
 	}
-	
+
 	public IType getKeyType()
 	{
 		if (this.keyType != null)
@@ -74,7 +74,7 @@ public class MapExpr implements IValue
 		}
 		return this.keyType = ArrayExpr.getCommonType(this.keys, this.count);
 	}
-	
+
 	public IType getValueType()
 	{
 		if (this.valueType != null)
@@ -83,30 +83,30 @@ public class MapExpr implements IValue
 		}
 		return this.valueType = ArrayExpr.getCommonType(this.values, this.count);
 	}
-	
+
 	@Override
 	public boolean isResolved()
 	{
 		return this.type != null && this.type.isResolved();
 	}
-	
+
 	@Override
 	public IType getType()
 	{
 		if (this.type == null)
 		{
-			return this.type = new MapType(this.getKeyType(), this.getValueType(), Mutability.UNDEFINED,
-			                               MapType.MapTypes.MAP_CLASS);
+			return this.type = new MapType(this.getKeyType(), this.getValueType(), Mutability.IMMUTABLE,
+			                               MapType.MapTypes.IMMUTABLE_MAP_CLASS);
 		}
 		return this.type;
 	}
-	
+
 	@Override
 	public void setType(IType type)
 	{
 		this.type = type;
 	}
-	
+
 	@Override
 	public IValue withType(IType mapType, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
@@ -115,30 +115,29 @@ public class MapExpr implements IValue
 			IAnnotation annotation = mapType.getTheClass().getAnnotation(MapType.MapTypes.MAP_CONVERTIBLE_CLASS);
 			if (annotation != null)
 			{
-				ArgumentList arguments = new ArgumentList(
-						new IValue[] { new ArrayExpr(this.keys, this.count), new ArrayExpr(this.values, this.count) },
-						2);
+				ArgumentList arguments = new ArgumentList(new IValue[] { new ArrayExpr(this.keys, this.count),
+					new ArrayExpr(this.values, this.count) }, 2);
 				return new LiteralConversion(this, annotation, arguments)
-						.withType(mapType, typeContext, markers, context);
+					       .withType(mapType, typeContext, markers, context);
 			}
 			return null;
 		}
-		
+
 		final IType keyType = this.keyType = mapType.resolveTypeSafely(MapType.MapTypes.KEY_VARIABLE);
 		final IType valueType = this.valueType = mapType.resolveTypeSafely(MapType.MapTypes.VALUE_VARIABLE);
-		
+
 		for (int i = 0; i < this.count; i++)
 		{
 			this.keys[i] = TypeChecker
-					.convertValue(this.keys[i], keyType, typeContext, markers, context, KEY_MARKER_SUPPLIER);
+				               .convertValue(this.keys[i], keyType, typeContext, markers, context, KEY_MARKER_SUPPLIER);
 
-			this.values[i] = TypeChecker
-					.convertValue(this.values[i], valueType, typeContext, markers, context, VALUE_MARKER_SUPPLIER);
+			this.values[i] = TypeChecker.convertValue(this.values[i], valueType, typeContext, markers, context,
+			                                          VALUE_MARKER_SUPPLIER);
 		}
-		
+
 		return this;
 	}
-	
+
 	@Override
 	public boolean isType(IType type)
 	{
@@ -146,10 +145,10 @@ public class MapExpr implements IValue
 		{
 			return this.isConvertibleFrom(type);
 		}
-		
+
 		IType keyType = type.resolveTypeSafely(MapType.MapTypes.KEY_VARIABLE);
 		IType valueType = type.resolveTypeSafely(MapType.MapTypes.VALUE_VARIABLE);
-		
+
 		for (int i = 0; i < this.count; i++)
 		{
 			if (!this.keys[i].isType(keyType))
@@ -161,15 +160,15 @@ public class MapExpr implements IValue
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	private boolean isConvertibleFrom(IType type)
 	{
 		return type.getTheClass().getAnnotation(MapType.MapTypes.MAP_CONVERTIBLE_CLASS) != null;
 	}
-	
+
 	@Override
 	public int getTypeMatch(IType type)
 	{
@@ -177,15 +176,15 @@ public class MapExpr implements IValue
 		{
 			return this.isConvertibleFrom(type) ? CONVERSION_MATCH : 0;
 		}
-		
+
 		if (this.count == 0)
 		{
 			return 1;
 		}
-		
+
 		final IType keyType = type.resolveTypeSafely(MapType.MapTypes.KEY_VARIABLE);
 		final IType valueType = type.resolveTypeSafely(MapType.MapTypes.VALUE_VARIABLE);
-		
+
 		int total = 0;
 		for (int i = 0; i < this.count; i++)
 		{
@@ -203,10 +202,10 @@ public class MapExpr implements IValue
 			}
 			total += match;
 		}
-		
+
 		return 1 + total / (this.count * 2);
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -216,7 +215,7 @@ public class MapExpr implements IValue
 			this.values[i].resolveTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
@@ -227,7 +226,7 @@ public class MapExpr implements IValue
 		}
 		return this;
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -237,7 +236,7 @@ public class MapExpr implements IValue
 			this.values[i].checkTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
@@ -247,7 +246,7 @@ public class MapExpr implements IValue
 			this.values[i].check(markers, context);
 		}
 	}
-	
+
 	@Override
 	public IValue foldConstants()
 	{
@@ -258,7 +257,7 @@ public class MapExpr implements IValue
 		}
 		return this;
 	}
-	
+
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
@@ -269,7 +268,7 @@ public class MapExpr implements IValue
 		}
 		return this;
 	}
-	
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
@@ -279,13 +278,13 @@ public class MapExpr implements IValue
 			                      "Ldyvil/collection/immutable/EmptyMap;");
 			return;
 		}
-		
+
 		IType keyObject = this.keyType.getObjectType();
 		IType valueObject = this.valueType.getObjectType();
-		
+
 		writer.visitLdcInsn(this.count);
 		writer.visitMultiANewArrayInsn("java/lang/Object", 1);
-		
+
 		for (int i = 0; i < this.count; i++)
 		{
 			writer.visitInsn(Opcodes.DUP);
@@ -293,10 +292,10 @@ public class MapExpr implements IValue
 			this.keys[i].writeExpression(writer, keyObject);
 			writer.visitInsn(Opcodes.AASTORE);
 		}
-		
+
 		writer.visitLdcInsn(this.count);
 		writer.visitMultiANewArrayInsn("java/lang/Object", 1);
-		
+
 		for (int i = 0; i < this.count; i++)
 		{
 			writer.visitInsn(Opcodes.DUP);
@@ -304,7 +303,7 @@ public class MapExpr implements IValue
 			this.values[i].writeExpression(writer, valueObject);
 			writer.visitInsn(Opcodes.AASTORE);
 		}
-		
+
 		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/collection/ImmutableMap", "apply",
 		                       "([Ljava/lang/Object;[Ljava/lang/Object;)Ldyvil/collection/ImmutableMap;", true);
 
@@ -313,7 +312,7 @@ public class MapExpr implements IValue
 			this.getType().writeCast(writer, type, this.getLineNumber());
 		}
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
@@ -336,7 +335,7 @@ public class MapExpr implements IValue
 		{
 			buffer.append(' ');
 		}
-		
+
 		this.keys[0].toString(mapPrefix, buffer);
 		Formatting.appendSeparator(buffer, "map.key_value_separator", ':');
 		this.values[0].toString(mapPrefix, buffer);
@@ -349,7 +348,7 @@ public class MapExpr implements IValue
 			Formatting.appendSeparator(buffer, "map.key_value_separator", ':');
 			this.values[i].toString(mapPrefix, buffer);
 		}
-		
+
 		if (Formatting.getBoolean("map.close_paren.space_before"))
 		{
 			buffer.append(' ');
