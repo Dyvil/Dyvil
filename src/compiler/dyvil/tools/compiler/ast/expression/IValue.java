@@ -53,10 +53,10 @@ public interface IValue extends IASTNode, ITyped
 
 	int CAST_OPERATOR    = 66;
 	int ISOF_OPERATOR    = 67;
-	int CASE_STATEMENT   = 68;
+	// int CASE_STATEMENT   = 68;
 	int MATCH            = 69;
 	int LAMBDA           = 70;
-	int PARTIAL_FUNCTION = 71;
+	// int PARTIAL_FUNCTION = 71;
 
 	// Access and Invocation
 	int CLASS_ACCESS  = 96;
@@ -112,6 +112,7 @@ public interface IValue extends IASTNode, ITyped
 	// Special Types only used by the compiler
 	int REFERENCE          = 240;
 	int LITERAL_CONVERSION = 241;
+	int OPERATOR_CHAIN     = 242;
 
 	// --- Other Constants ---
 
