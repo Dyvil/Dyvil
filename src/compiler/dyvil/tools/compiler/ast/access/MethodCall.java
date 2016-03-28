@@ -6,6 +6,8 @@ import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.operator.Operators;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.reference.IReference;
+import dyvil.tools.compiler.ast.reference.PropertyReference;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.ConstantFolder;
 import dyvil.tools.compiler.util.Util;
@@ -93,6 +95,17 @@ public final class MethodCall extends AbstractCall implements INamed
 		while (!v.isAnnotationConstant());
 		
 		return v.toAnnotationConstant(markers, context);
+	}
+
+	@Override
+	public IReference toReference()
+	{
+		if (!this.arguments.isEmpty())
+		{
+			return null;
+		}
+
+		return new PropertyReference(this.receiver, this.method);
 	}
 
 	@Override
