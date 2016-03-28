@@ -2,9 +2,7 @@
 .project
 .settings/
 .idea/
-bin/
-testbin/
-replbin/
+*bin/
 build/
 .gradle/
 

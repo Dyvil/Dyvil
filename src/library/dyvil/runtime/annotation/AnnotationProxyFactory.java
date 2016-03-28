@@ -1,14 +1,13 @@
 package dyvil.runtime.annotation;
 
-import dyvil.io.FileUtils;
 import dyvil.reflect.MethodReflection;
 import dyvil.reflect.Opcodes;
+import dyvil.runtime.BytecodeDump;
 import dyvil.tools.asm.ClassWriter;
 import dyvil.tools.asm.FieldVisitor;
 import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.asm.Type;
 
-import java.io.File;
 import java.lang.invoke.CallSite;
 import java.lang.invoke.ConstantCallSite;
 import java.lang.invoke.MethodHandles;
@@ -28,11 +27,6 @@ public final class AnnotationProxyFactory
 {
 	private static final int    CLASSFILE_VERSION = 52;
 	private static final String NAME_FACTORY      = "get$Proxy";
-
-	/**
-	 * Directory to dump generated class file bytecode.
-	 */
-	private static final File dumpDirectory = null;
 
 	/**
 	 * Used to ensure that each spun class name is unique
@@ -175,16 +169,11 @@ public final class AnnotationProxyFactory
 
 		this.cw.visitEnd();
 
-		byte[] bytes = this.cw.toByteArray();
+		final byte[] bytes = this.cw.toByteArray();
 
-		if (dumpDirectory != null)
-		{
-			File dumpFile = new File(dumpDirectory, this.className.replace('/', File.separatorChar).concat(".class"));
-			FileUtils.tryWrite(dumpFile, bytes);
-		}
+		BytecodeDump.dump(bytes, this.className);
 
 		// Define the generated class in this VM.
-
 		return UNSAFE.defineAnonymousClass(this.targetClass, bytes, null);
 	}
 

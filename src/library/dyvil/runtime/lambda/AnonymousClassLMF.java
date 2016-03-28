@@ -1,15 +1,14 @@
 package dyvil.runtime.lambda;
 
-import dyvil.io.FileUtils;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.runtime.BytecodeDump;
 import dyvil.runtime.TypeConverter;
 import dyvil.tools.asm.ClassWriter;
 import dyvil.tools.asm.FieldVisitor;
 import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.asm.Type;
 
-import java.io.File;
 import java.lang.invoke.*;
 import java.lang.reflect.Constructor;
 import java.security.AccessController;
@@ -27,11 +26,6 @@ public final class AnonymousClassLMF extends AbstractLMF
 {
 	private static final int    CLASSFILE_VERSION = 52;
 	private static final String NAME_FACTORY      = "get$Lambda";
-
-	/**
-	 * Directory to dump generated class file bytecode.
-	 */
-	private static final File dumpDirectory = null;
 
 	/**
 	 * Used to ensure that each spun class name is unique
@@ -198,17 +192,10 @@ public final class AnonymousClassLMF extends AbstractLMF
 
 		this.cw.visitEnd();
 
-		byte[] bytes = this.cw.toByteArray();
-
-		if (dumpDirectory != null)
-		{
-			File dumpFile = new File(dumpDirectory,
-			                         this.lambdaClassName.replace('/', File.separatorChar).concat(".class"));
-			FileUtils.tryWrite(dumpFile, bytes);
-		}
+		final byte[] bytes = this.cw.toByteArray();
+		BytecodeDump.dump(bytes, this.lambdaClassName);
 
 		// Define the generated class in this VM.
-
 		return UNSAFE.defineAnonymousClass(this.targetClass, bytes, null);
 	}
 
