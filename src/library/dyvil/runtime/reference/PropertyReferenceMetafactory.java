@@ -167,6 +167,7 @@ public class PropertyReferenceMetafactory
 		this.generateFactory(classWriter);
 		this.generateGetter(classWriter);
 		this.generateSetter(classWriter);
+		this.generateToString(classWriter);
 
 		classWriter.visitEnd();
 
@@ -284,5 +285,15 @@ public class PropertyReferenceMetafactory
 		setter.visitInsn(Opcodes.RETURN);
 		setter.visitMaxs(-1, -1);
 		setter.visitEnd();
+	}
+
+	private void generateToString(ClassWriter classWriter)
+	{
+		MethodVisitor toString = classWriter.visitMethod(PUBLIC, "toString", "()Ljava/lang/String;", null, null);
+		toString.visitCode();
+		toString.visitLdcInsn('<' + this.refClass.getName() + ">");
+		toString.visitInsn(Opcodes.ARETURN);
+		toString.visitMaxs(-1, -1);
+		toString.visitEnd();
 	}
 }
