@@ -1,12 +1,17 @@
 package dyvil.tools.compiler.ast.operator;
 
+import dyvil.collection.Stack;
+import dyvil.collection.mutable.LinkedList;
+import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -35,7 +40,7 @@ public class OperatorChain implements IValue
 			this.operators = tempOperators;
 
 			final ICodePosition[] tempPositions = new ICodePosition[index + 1];
-			System.arraycopy(this.operatorPositions, 0, tempPositions, 0, this.operators.length);
+			System.arraycopy(this.operatorPositions, 0, tempPositions, 0, this.operatorPositions.length);
 			this.operatorPositions = tempPositions;
 		}
 		this.operators[index] = operator;
@@ -80,22 +85,93 @@ public class OperatorChain implements IValue
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		System.out.println(this);
-
-		Name operatorName = this.operators[0];
-		Operator operator = null; // TODO Resolve Operator
-		IValue operand = this.operands[0];
-
-		for (int i = 1; i < this.operatorCount; i++)
+		for (int i = 0; i <= this.operatorCount; i++)
 		{
-
+			this.operands[i].resolveTypes(markers, context);
 		}
 	}
 
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		return this;
+		if (this.operatorCount == 0)
+		{
+			return this.operands[0];
+		}
+
+		final Stack<Integer> operatorStack = new LinkedList<>();
+		final Stack<IValue> operandStack = new LinkedList<>();
+		operandStack.push(this.operands[0]);
+
+		for (int i = 0; i < this.operatorCount; i++)
+		{
+			final Operator operator = resolveOperator(context, this.operators[i]);
+			int index;
+			Operator operator2;
+
+			while (!operatorStack.isEmpty())
+			{
+				index = operatorStack.peek();
+				operator2 = resolveOperator(context, this.operators[index]);
+				final int comparePrecedence = operator.comparePrecedence(operator2);
+
+				if (!operator.isRightAssociative() && 0 == comparePrecedence || comparePrecedence < 0)
+				{
+					operatorStack.pop();
+					this.pushCall(operandStack, index);
+				}
+				else
+				{
+					break;
+				}
+			}
+			operatorStack.push(i);
+			operandStack.push(this.operands[i + 1]);
+		}
+		while (!operatorStack.isEmpty())
+		{
+			this.pushCall(operandStack, operatorStack.pop());
+		}
+
+		return operandStack.pop().resolve(markers, context);
+	}
+
+	private static Operator resolveOperator(IContext context, Name name)
+	{
+		Operator operator = IContext.resolveOperator(context, name);
+
+		if (operator != null)
+		{
+			return operator;
+		}
+
+		if (!Util.hasEq(name))
+		{
+			return Operator.DEFAULT;
+		}
+
+		final Name removeEq = Util.removeEq(name);
+		operator = IContext.resolveOperator(context, removeEq);
+
+		if (operator == null)
+		{
+			return Operator.DEFAULT_RIGHT;
+		}
+		if (!operator.isRightAssociative())
+		{
+			return new Operator(removeEq, operator.precedence - 1, Operator.INFIX_RIGHT);
+		}
+		return operator;
+	}
+
+	private void pushCall(Stack<IValue> stack, int position)
+	{
+		final IValue rhs = stack.pop();
+		final IValue lhs = stack.pop();
+		final MethodCall methodCall = new MethodCall(this.operatorPositions[position], lhs, this.operators[position],
+		                                             new SingleArgument(rhs));
+		methodCall.setDotless(true);
+		stack.push(methodCall);
 	}
 
 	@Override

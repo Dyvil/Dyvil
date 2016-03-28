@@ -472,7 +472,10 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 		if (token.type() != Tokens.LETTER_IDENTIFIER)
 		{
-			if (this.value == null || ParserUtil.neighboring(token, next)) // prefix
+			final boolean neighboringLeft = ParserUtil.neighboring(token.prev(), token);
+			final boolean neighboringRight = ParserUtil.neighboring(token, token.next());
+
+			if (this.value == null || neighboringRight && !neighboringLeft) // prefix
 			{
 				// OPERATOR EXPRESSION
 				// token    next
@@ -486,7 +489,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				this.parseApply(pm, next, call);
 				return;
 			}
-			if (ParserUtil.isExpressionTerminator(nextType) || ParserUtil.neighboring(token.prev(), token)) // postfix
+			if (ParserUtil.isExpressionTerminator(nextType) || neighboringLeft && !neighboringRight) // postfix
 			{
 				final MethodCall call = new MethodCall(token, this.value, name);
 				call.setDotless(true);

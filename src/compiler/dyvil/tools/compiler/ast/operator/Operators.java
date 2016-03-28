@@ -11,12 +11,8 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
 
-import static dyvil.tools.compiler.ast.operator.Operator.INFIX_LEFT;
-
 public final class Operators
 {
-	public static final Operator DEFAULT = new Operator(null, 100000, INFIX_LEFT);
-
 	private Operators()
 	{
 		// no instances

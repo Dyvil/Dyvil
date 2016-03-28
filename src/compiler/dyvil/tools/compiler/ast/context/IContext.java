@@ -134,6 +134,17 @@ public interface IContext extends IMemberContext
 		return Types.LANG_HEADER.resolveType(name);
 	}
 
+	static Operator resolveOperator(IContext context, Name name)
+	{
+		final Operator operator = context.resolveOperator(name);
+		if (operator != null)
+		{
+			return operator;
+		}
+
+		return Types.LANG_HEADER.resolveOperator(name);
+	}
+
 	static IConstructor resolveConstructor(IMemberContext context, IArguments arguments)
 	{
 		ConstructorMatchList matches = new ConstructorMatchList();

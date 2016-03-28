@@ -13,7 +13,10 @@ public final class Operator
 	public static final int INFIX_NONE  = 2;
 	public static final int INFIX_RIGHT = 3;
 	public static final int POSTFIX     = 4;
-	
+
+	public static final Operator DEFAULT = new Operator(null, 100000, INFIX_LEFT);
+	public static final Operator DEFAULT_RIGHT = new Operator(null, 100000, INFIX_RIGHT);
+
 	public static final int PREFIX_PRECEDENCE = 1000;
 	
 	public final Name name;
@@ -108,5 +111,15 @@ public final class Operator
 		{
 			buffer.append(" { precedence ").append(this.precedence).append(" }");
 		}
+	}
+
+	public boolean isRightAssociative()
+	{
+		return this.type == INFIX_RIGHT;
+	}
+
+	public int comparePrecedence(Operator other)
+	{
+		return Integer.compare(this.precedence, other.precedence);
 	}
 }
