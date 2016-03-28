@@ -565,22 +565,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 				if (method != null && this.checkCall(call.getReceiver(), call.getArguments(), method))
 				{
-					switch (method.getInvokeOpcode())
-					{
-					case Opcodes.INVOKEVIRTUAL:
-						this.directInvokeOpcode = ClassFormat.H_INVOKEVIRTUAL;
-						break;
-					case Opcodes.INVOKESTATIC:
-						this.directInvokeOpcode = ClassFormat.H_INVOKESTATIC;
-						break;
-					case Opcodes.INVOKEINTERFACE:
-						this.directInvokeOpcode = ClassFormat.H_INVOKEINTERFACE;
-						break;
-					case Opcodes.INVOKESPECIAL:
-						this.directInvokeOpcode = ClassFormat.H_INVOKESPECIAL;
-						break;
-					}
-
+					this.directInvokeOpcode = ClassFormat.insnToHandle(method.getInvokeOpcode());
 					this.name = method.getName().qualified;
 					this.owner = method.getEnclosingClass().getInternalName();
 					this.lambdaDesc = method.getDescriptor();

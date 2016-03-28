@@ -355,7 +355,13 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	{
 		return Opcodes.INVOKEDYNAMIC;
 	}
-	
+
+	@Override
+	public Handle toHandle()
+	{
+		return null;
+	}
+
 	@Override
 	public String getDescriptor()
 	{

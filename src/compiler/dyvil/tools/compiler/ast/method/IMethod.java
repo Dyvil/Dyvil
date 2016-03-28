@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.method;
 
+import dyvil.tools.asm.Handle;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -64,6 +65,8 @@ public interface IMethod extends IClassMember, ICallableMember, ICallableSignatu
 	boolean isIntrinsic();
 	
 	int getInvokeOpcode();
+
+	Handle toHandle();
 	
 	String getDescriptor();
 	

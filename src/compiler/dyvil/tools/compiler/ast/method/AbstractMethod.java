@@ -905,6 +905,32 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
+	public int getInvokeOpcode()
+	{
+		int modifiers = this.modifiers.toFlags();
+		if ((modifiers & Modifiers.STATIC) != 0)
+		{
+			return Opcodes.INVOKESTATIC;
+		}
+		if ((modifiers & Modifiers.PRIVATE) == Modifiers.PRIVATE)
+		{
+			return Opcodes.INVOKESPECIAL;
+		}
+		if (this.enclosingClass.isInterface())
+		{
+			return Opcodes.INVOKEINTERFACE;
+		}
+		return Opcodes.INVOKEVIRTUAL;
+	}
+
+	@Override
+	public Handle toHandle()
+	{
+		return new Handle(ClassFormat.insnToHandle(this.getInvokeOpcode()), this.enclosingClass.getInternalName(),
+		                  this.name.qualified, this.getDescriptor());
+	}
+
+	@Override
 	public String getDescriptor()
 	{
 		if (this.descriptor != null)
@@ -1154,25 +1180,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		String name = this.name.qualified;
 		String desc = this.getDescriptor();
 		writer.visitMethodInsn(opcode, owner, name, desc, this.enclosingClass.isInterface());
-	}
-
-	@Override
-	public int getInvokeOpcode()
-	{
-		int modifiers = this.modifiers.toFlags();
-		if ((modifiers & Modifiers.STATIC) != 0)
-		{
-			return Opcodes.INVOKESTATIC;
-		}
-		if ((modifiers & Modifiers.PRIVATE) == Modifiers.PRIVATE)
-		{
-			return Opcodes.INVOKESPECIAL;
-		}
-		if (this.enclosingClass.isInterface())
-		{
-			return Opcodes.INVOKEINTERFACE;
-		}
-		return Opcodes.INVOKEVIRTUAL;
 	}
 
 	@Override
