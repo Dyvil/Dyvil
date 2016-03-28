@@ -32,7 +32,7 @@ public interface IClass extends IClassMember, ITypeParametric, IContext, IParame
 	}
 
 	void setHeader(IDyvilHeader unit);
-	
+
 	@Override
 	IDyvilHeader getHeader();
 	

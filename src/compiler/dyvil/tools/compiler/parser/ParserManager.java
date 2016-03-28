@@ -1,10 +1,6 @@
 package dyvil.tools.compiler.parser;
 
-import dyvil.tools.compiler.ast.operator.IOperatorMap;
-import dyvil.tools.compiler.ast.operator.Operator;
-import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -16,8 +12,6 @@ public class ParserManager implements IParserManager
 	
 	protected MarkerList markers;
 	
-	protected IOperatorMap operators;
-	
 	protected TokenIterator tokens;
 	protected int           skip;
 	protected boolean       reparse;
@@ -27,16 +21,10 @@ public class ParserManager implements IParserManager
 	{
 	}
 
-	public ParserManager(IOperatorMap operators)
-	{
-		this.operators = operators;
-	}
-
-	public ParserManager(TokenIterator tokens, MarkerList markers, IOperatorMap operators)
+	public ParserManager(TokenIterator tokens, MarkerList markers)
 	{
 		this.tokens = tokens;
 		this.markers = markers;
-		this.operators = operators;
 	}
 
 	@Override
@@ -49,29 +37,6 @@ public class ParserManager implements IParserManager
 	public TokenIterator getTokens()
 	{
 		return this.tokens;
-	}
-
-	@Override
-	public IOperatorMap getOperatorMap()
-	{
-		return this.operators;
-	}
-
-	@Override
-	public void setOperatorMap(IOperatorMap operators)
-	{
-		this.operators = operators;
-	}
-
-	@Override
-	public Operator getOperator(Name name)
-	{
-		Operator op = this.operators.getOperator(name);
-		if (op != null)
-		{
-			return op;
-		}
-		return Types.LANG_HEADER.getOperator(name);
 	}
 
 	public void reset()

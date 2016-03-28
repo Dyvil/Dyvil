@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -69,6 +70,8 @@ public interface IContext extends IMemberContext
 
 	@Override
 	ITypeParameter resolveTypeVariable(Name name);
+
+	Operator resolveOperator(Name name);
 
 	@Override
 	IDataMember resolveField(Name name);

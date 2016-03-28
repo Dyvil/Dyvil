@@ -301,7 +301,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 
 	@Override
-	public Operator getOperator(Name name)
+	public Operator resolveOperator(Name name)
 	{
 		if (this.operatorMap != null)
 		{
@@ -314,7 +314,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 
 		for (int i = 0; i < this.includeCount; i++)
 		{
-			final Operator operator = this.includes[i].getHeader().getOperator(name);
+			final Operator operator = this.includes[i].getHeader().resolveOperator(name);
 			if (operator != null)
 			{
 				return operator;
@@ -497,7 +497,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	{
 		if (this.tokens != null)
 		{
-			new ParserManager(this.tokens, this.markers, this).parse(new DyvilHeaderParser(this));
+			new ParserManager(this.tokens, this.markers).parse(new DyvilHeaderParser(this));
 		}
 	}
 

@@ -113,7 +113,7 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 			// no tokens have been returned by next() yet)
 			tokens.jump(token);
 			final MemberParser parser = new MemberParser<>(this).withFlag(NO_UNINITIALIZED_VARIABLES | OPERATOR_ERROR);
-			if (new TryParserManager(tokens, pm.getMarkers(), pm.getOperatorMap()).parse(parser, EXIT_ON_ROOT))
+			if (new TryParserManager(tokens, pm.getMarkers()).parse(parser, EXIT_ON_ROOT))
 			{
 				tokens.jump(tokens.lastReturned());
 				this.mode = SEPARATOR;

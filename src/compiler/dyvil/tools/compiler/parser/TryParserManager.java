@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.parser;
 
-import dyvil.tools.compiler.ast.operator.IOperatorMap;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.marker.Marker;
@@ -15,14 +14,14 @@ public class TryParserManager extends ParserManager
 	public static final int REPORT_ERRORS = 1;
 	public static final int EXIT_ON_ROOT  = 2;
 
-	public TryParserManager(IOperatorMap operatorMap)
+	public TryParserManager()
 	{
-		super(operatorMap);
+		super();
 	}
 
-	public TryParserManager(TokenIterator tokens, MarkerList markers, IOperatorMap operators)
+	public TryParserManager(TokenIterator tokens, MarkerList markers)
 	{
-		super(tokens, markers, operators);
+		super(tokens, markers);
 	}
 
 	@Override

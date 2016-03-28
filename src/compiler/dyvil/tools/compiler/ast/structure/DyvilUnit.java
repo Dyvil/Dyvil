@@ -105,13 +105,13 @@ public class DyvilUnit extends DyvilHeader implements IClassConsumer
 	@Override
 	public void parseHeader()
 	{
-		new ParserManager(this.tokens, this.markers, this).parse(new DyvilHeaderParser(this, true));
+		new ParserManager(this.tokens, this.markers).parse(new DyvilHeaderParser(this, true));
 	}
 	
 	@Override
 	public void parse()
 	{
-		new ParserManager(this.tokens, this.markers, this).parse(new DyvilUnitParser(this, true));
+		new ParserManager(this.tokens, this.markers).parse(new DyvilUnitParser(this, true));
 		this.tokens = null;
 	}
 	
