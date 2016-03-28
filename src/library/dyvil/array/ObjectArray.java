@@ -121,7 +121,7 @@ public interface ObjectArray
 
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	static <T> ObjectRef<T> subscriptRef(T[] array, int index)
+	static <T> ObjectRef<T> subscript_$amp(T[] array, int index)
 	{
 		return new ObjectArrayRef<>(array, index);
 	}

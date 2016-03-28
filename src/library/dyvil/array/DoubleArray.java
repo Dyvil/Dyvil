@@ -118,7 +118,7 @@ public interface DoubleArray
 
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	static DoubleRef subscriptRef(double[] array, int index)
+	static DoubleRef subscript_$amp(double[] array, int index)
 	{
 		return new DoubleArrayRef(array, index);
 	}

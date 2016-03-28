@@ -94,7 +94,14 @@ public final class MethodCall extends AbstractCall implements INamed
 		
 		return v.toAnnotationConstant(markers, context);
 	}
-	
+
+	@Override
+	public IValue toReferenceValue(MarkerList markers, IContext context)
+	{
+		final Name newName = Name.get(this.name.unqualified + "_&", this.name.qualified + "_$amp");
+		return AbstractCall.toReferenceValue(this, newName, markers, context);
+	}
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{

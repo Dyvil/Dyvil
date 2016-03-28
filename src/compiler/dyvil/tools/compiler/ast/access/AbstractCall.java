@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -129,6 +130,14 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 	public boolean isType(IType type)
 	{
 		return Types.isSameType(type, Types.VOID) || this.method != null && Types.isAssignable(this.getType(), type);
+	}
+
+	public static IValue toReferenceValue(AbstractCall call, Name name, MarkerList markers, IContext context)
+	{
+		MethodCall methodCall = new MethodCall(call.position, call.receiver, name, call.arguments);
+		methodCall.setGenericData(call.genericData);
+		methodCall.setType(call.type);
+		return methodCall.resolveCall(markers, context);
 	}
 
 	@Override

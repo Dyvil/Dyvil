@@ -61,7 +61,13 @@ public class ApplyMethodCall extends AbstractCall
 	{
 		return APPLY_CALL;
 	}
-	
+
+	@Override
+	public IValue toReferenceValue(MarkerList markers, IContext context)
+	{
+		return AbstractCall.toReferenceValue(this, Names.apply_$amp, markers, context);
+	}
+
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{

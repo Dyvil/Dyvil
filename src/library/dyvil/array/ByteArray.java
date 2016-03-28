@@ -118,7 +118,7 @@ public interface ByteArray
 
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	static ByteRef subscriptRef(byte[] array, int index)
+	static ByteRef subscript_$amp(byte[] array, int index)
 	{
 		return new ByteArrayRef(array, index);
 	}

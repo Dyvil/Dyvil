@@ -118,7 +118,7 @@ public interface IntArray
 
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	static IntRef subscriptRef(int[] array, int index)
+	static IntRef subscript_$amp(int[] array, int index)
 	{
 		return new IntArrayRef(array, index);
 	}

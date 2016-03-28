@@ -150,7 +150,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 *
 	 * @return a reference that points to the value at the given index
 	 */
-	default ObjectRef<E> subscriptRef(int index)
+	default ObjectRef<E> subscript_$amp(int index)
 	{
 		return new ObjectRef<E>()
 		{

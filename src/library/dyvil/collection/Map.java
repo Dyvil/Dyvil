@@ -382,7 +382,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 		return this.get(key);
 	}
 
-	default ObjectRef<V> subscriptRef(K key)
+	default ObjectRef<V> subscript_$amp(K key)
 	{
 		return new ObjectRef<V>()
 		{

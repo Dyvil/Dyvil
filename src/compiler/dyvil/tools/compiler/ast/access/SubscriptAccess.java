@@ -18,33 +18,33 @@ public class SubscriptAccess extends AbstractCall
 		this.position = position;
 		this.arguments = new ArgumentList();
 	}
-	
+
 	public SubscriptAccess(ICodePosition position, IValue instance)
 	{
 		this.position = position;
 		this.receiver = instance;
 		this.arguments = new ArgumentList();
 	}
-	
+
 	public SubscriptAccess(ICodePosition position, IValue instance, IArguments arguments)
 	{
 		this.position = position;
 		this.receiver = instance;
 		this.arguments = arguments;
 	}
-	
+
 	@Override
 	public int valueTag()
 	{
 		return SUBSCRIPT_GET;
 	}
-	
+
 	@Override
 	public IArguments getArguments()
 	{
 		return this.arguments;
 	}
-	
+
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
@@ -52,13 +52,13 @@ public class SubscriptAccess extends AbstractCall
 		// false if receiver == null
 		{
 			ICall call = (ICall) this.receiver;
-			
+
 			// Resolve Receiver if necessary
 			call.resolveReceiver(markers, context);
 			call.resolveArguments(markers, context);
-			
+
 			IArguments oldArgs = call.getArguments();
-			
+
 			ArrayExpr array = new ArrayExpr(this.position, this.arguments.size());
 			for (IValue v : this.arguments)
 			{
@@ -66,30 +66,30 @@ public class SubscriptAccess extends AbstractCall
 			}
 
 			call.setArguments(oldArgs.withLastValue(Names.subscript, array));
-			
+
 			IValue resolvedCall = call.resolveCall(markers, context);
 			if (resolvedCall != null)
 			{
 				return resolvedCall;
 			}
-			
+
 			// Revert
 			call.setArguments(oldArgs);
-			
+
 			this.receiver = call.resolveCall(markers, context);
 			resolvedCall = this.resolveCall(markers, context);
 			if (resolvedCall != null)
 			{
 				return resolvedCall;
 			}
-			
+
 			this.reportResolve(markers, context);
 			return this;
 		}
-		
+
 		return super.resolve(markers, context);
 	}
-	
+
 	@Override
 	public IValue resolveCall(MarkerList markers, IContext context)
 	{
@@ -100,17 +100,14 @@ public class SubscriptAccess extends AbstractCall
 			this.checkArguments(markers, context);
 			return this;
 		}
-		
+
 		return null;
 	}
 
 	@Override
 	public IValue toReferenceValue(MarkerList markers, IContext context)
 	{
-		MethodCall methodCall = new MethodCall(this.position, this.receiver, Names.subscriptRef, this.arguments);
-		methodCall.setGenericData(this.genericData);
-		methodCall.setType(this.type);
-		return methodCall.resolveCall(markers, context);
+		return toReferenceValue(this, Names.subscript_$amp, markers, context);
 	}
 
 	@Override
@@ -118,7 +115,7 @@ public class SubscriptAccess extends AbstractCall
 	{
 		ICall.addResolveMarker(markers, this.position, this.receiver, Names.subscript, this.arguments);
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
@@ -126,7 +123,7 @@ public class SubscriptAccess extends AbstractCall
 		{
 			this.receiver.toString(prefix, buffer);
 		}
-		
+
 		Formatting.appendSeparator(buffer, "method.subscript.open_bracket", '[');
 
 		int count = this.arguments.size();

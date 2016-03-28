@@ -247,9 +247,9 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 
 	@Override
 	@Mutating
-	default ObjectRef<E> subscriptRef(int index)
+	default ObjectRef<E> subscript_$amp(int index)
 	{
-		throw new ImmutableException("subscriptRef() on Immutable List");
+		throw new ImmutableException("subscript_&() on Immutable List");
 	}
 
 	@Override
