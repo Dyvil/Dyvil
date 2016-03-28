@@ -4,6 +4,10 @@ import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.asm.Opcodes;
 import dyvil.tools.asm.Type;
 
+import java.lang.invoke.MethodHandleInfo;
+
+import static dyvil.reflect.Opcodes.*;
+import static dyvil.reflect.Opcodes.IRETURN;
 import static dyvil.runtime.Wrapper.*;
 
 public class TypeConverter
@@ -287,5 +291,81 @@ public class TypeConverter
 				cast(mv, dSrc, dTarget);
 			}
 		}
+	}
+
+	public static int invocationOpcode(int kind) throws InternalError
+	{
+		switch (kind)
+		{
+		case MethodHandleInfo.REF_invokeStatic:
+			return INVOKESTATIC;
+		case MethodHandleInfo.REF_newInvokeSpecial:
+			return INVOKESPECIAL;
+		case MethodHandleInfo.REF_invokeVirtual:
+			return INVOKEVIRTUAL;
+		case MethodHandleInfo.REF_invokeInterface:
+			return INVOKEINTERFACE;
+		case MethodHandleInfo.REF_invokeSpecial:
+			return INVOKESPECIAL;
+		default:
+			throw new InternalError("Unexpected invocation kind: " + kind);
+		}
+	}
+
+	public static String getInternalName(Class<?> c)
+	{
+		return c.getName().replace('.', '/');
+	}
+
+	public static int getParameterSize(Class<?> c)
+	{
+		if (c == Void.TYPE)
+		{
+			return 0;
+		}
+		else if (c == Long.TYPE || c == Double.TYPE)
+		{
+			return 2;
+		}
+		return 1;
+	}
+
+	public static int getLoadOpcode(Class<?> c)
+	{
+		if (c == Void.TYPE)
+		{
+			throw new InternalError("Unexpected void type of load opcode");
+		}
+		return ILOAD + getOpcodeOffset(c);
+	}
+
+	public static int getReturnOpcode(Class<?> c)
+	{
+		if (c == Void.TYPE)
+		{
+			return RETURN;
+		}
+		return IRETURN + getOpcodeOffset(c);
+	}
+
+	private static int getOpcodeOffset(Class<?> c)
+	{
+		if (c.isPrimitive())
+		{
+			if (c == Long.TYPE)
+			{
+				return 1;
+			}
+			else if (c == Float.TYPE)
+			{
+				return 2;
+			}
+			else if (c == Double.TYPE)
+			{
+				return 3;
+			}
+			return 0;
+		}
+		return 4;
 	}
 }
