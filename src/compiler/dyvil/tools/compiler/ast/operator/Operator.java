@@ -122,4 +122,9 @@ public final class Operator
 	{
 		return Integer.compare(this.precedence, other.precedence);
 	}
+
+	public boolean isInfix()
+	{
+		return this.type != PREFIX && this.type != POSTFIX;
+	}
 }

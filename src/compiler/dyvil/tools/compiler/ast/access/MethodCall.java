@@ -100,7 +100,7 @@ public final class MethodCall extends AbstractCall implements INamed
 	@Override
 	public IValue toAssignment(IValue rhs, ICodePosition position)
 	{
-		final FieldAccess access = new FieldAccess(position, this.receiver, this.name);
+		final FieldAccess access = new FieldAccess(this.position, this.receiver, this.name);
 		return new UpdateMethodCall(this.position.to(position), access, this.arguments, rhs);
 	}
 
