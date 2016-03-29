@@ -15,7 +15,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public final class MethodCall extends AbstractCall implements INamed
+public class MethodCall extends AbstractCall implements INamed
 {
 	protected Name    name;
 	protected boolean dotless;

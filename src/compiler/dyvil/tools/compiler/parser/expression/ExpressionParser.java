@@ -478,9 +478,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				// OPERATOR EXPRESSION
 				// token    next
 
-				final MethodCall call = new MethodCall(token.raw(), null, name, EmptyArguments.VISIBLE);
-
-				call.setDotless(true);
+				final PrefixCall call = new PrefixCall(token.raw(), name);
 				this.value = call;
 				this.mode = ACCESS;
 

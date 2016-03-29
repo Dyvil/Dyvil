@@ -68,6 +68,7 @@ public interface IValue extends IASTNode, ITyped
 	int SUBSCRIPT_GET = 102;
 	int SUBSCRIPT_SET = 103;
 	int BRACE_ACCESS  = 104;
+	int PREFIX_CALL   = 105;
 
 	// Special Invocation
 	int CONSTRUCTOR_CALL = 112;
