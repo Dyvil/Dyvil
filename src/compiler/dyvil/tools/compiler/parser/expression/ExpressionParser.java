@@ -190,9 +190,8 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				// ... .[ ... ] ( ...
 
 				pm.skip();
-				IArguments arguments = parseArguments(pm, next.next());
-				ApplyMethodCall amc = new ApplyMethodCall(methodCall.getPosition(), methodCall.getReceiver(),
-				                                          arguments);
+				ApplyMethodCall amc = new ApplyMethodCall(methodCall.getPosition(), methodCall.getReceiver());
+				ArgumentListParser.parseArguments(pm, next.next(), amc);
 				amc.setGenericData(genericData);
 
 				this.value = amc;
@@ -323,8 +322,11 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 				// Parse an apply call
 				// e.g. 1("a"), this("stuff"), "myString"(2)
-				this.value = new ApplyMethodCall(this.value.getPosition(), this.value,
-				                                 parseArguments(pm, token.next()));
+
+				final ApplyMethodCall applyMethodCall = new ApplyMethodCall(this.value.getPosition(), this.value);
+				ArgumentListParser.parseArguments(pm, token.next(), applyMethodCall);
+
+				this.value = applyMethodCall;
 				this.mode = PARAMETERS_END;
 				return;
 			case BaseSymbols.COLON:
@@ -421,41 +423,6 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		return token.type() == BaseSymbols.OPEN_CURLY_BRACKET && this.hasFlag(IGNORE_CLOSURE);
 	}
 
-	/**
-	 * Parses an argument list and creates the appropriate AST representation. The following instances can be created by
-	 * this method:
-	 * <p>
-	 * <ul> <li>{@link EmptyArguments} - For empty argument lists:<br> <code> this.call() </code> <li>{@link
-	 * ArgumentList} - For simple indexed argument lists:<br> <code> this.call(1, "abc", null) </code> <li>{@link
-	 * ArgumentMap} - For named argument lists / maps:<br> <code> this.call(index: 1, string: "abc") </code> </ul>
-	 *
-	 * @param pm
-	 * 	the current parsing context manager.
-	 * @param next
-	 * 	the next token. The current token is assumed to be the opening parenthesis of the argument list.
-	 *
-	 * @return the appropriate AST representation for the type of argument list.
-	 */
-	public static IArguments parseArguments(IParserManager pm, IToken next)
-	{
-		final int type = next.type();
-
-		if (type == BaseSymbols.CLOSE_PARENTHESIS)
-		{
-			return EmptyArguments.VISIBLE;
-		}
-		if (ParserUtil.isIdentifier(type) && next.next().type() == BaseSymbols.COLON)
-		{
-			final ArgumentMap map = new ArgumentMap();
-			pm.pushParser(new ExpressionMapParser(map));
-			return map;
-		}
-
-		final ArgumentList list = new ArgumentList();
-		pm.pushParser(new ExpressionListParser(list));
-		return list;
-	}
-
 	private void parseInfixAccess(IParserManager pm, IToken token)
 	{
 		this.parseInfixAccess(pm, token, token.nameValue());
@@ -536,7 +503,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		{
 			// IDENTIFIER (
 			final MethodCall call = new MethodCall(token.raw(), this.value, name);
-			call.setArguments(parseArguments(pm, next.next()));
+			ArgumentListParser.parseArguments(pm, next.next(), call);
 			call.setDotless(!this.hasFlag(EXPLICIT_DOT));
 			this.value = call;
 

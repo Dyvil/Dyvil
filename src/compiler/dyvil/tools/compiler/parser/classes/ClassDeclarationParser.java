@@ -8,12 +8,11 @@ import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.consumer.IClassConsumer;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
-import dyvil.tools.compiler.parser.expression.ExpressionParser;
+import dyvil.tools.compiler.parser.expression.ArgumentListParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParameterListParser;
@@ -194,8 +193,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 		case EXTENDS_PARAMETERS:
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
-				final IArguments arguments = ExpressionParser.parseArguments(pm, token.next());
-				this.theClass.setSuperConstructorArguments(arguments);
+				ArgumentListParser.parseArguments(pm, token.next(), this.theClass::setSuperConstructorArguments);
 				this.mode = EXTENDS_PARAMETERS_END;
 				return;
 			}

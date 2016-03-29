@@ -4,6 +4,7 @@ import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
+import dyvil.tools.compiler.ast.consumer.IArgumentsConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -14,8 +15,9 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 import java.lang.annotation.ElementType;
 
-public interface IAnnotation extends IASTNode, ITyped, IObjectCompilable
+public interface IAnnotation extends IASTNode, ITyped, IObjectCompilable, IArgumentsConsumer
 {
+	@Override
 	void setArguments(IArguments arguments);
 	
 	IArguments getArguments();
