@@ -7,12 +7,12 @@ public interface IValueMap
 	void addValue(Name key, IValue value);
 	
 	IValue getValue(Name key);
-	
+
 	class KeyValuePair
 	{
 		public Name   key;
 		public IValue value;
-		
+
 		public KeyValuePair(Name key, IValue value)
 		{
 			this.key = key;

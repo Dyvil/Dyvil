@@ -19,10 +19,23 @@ import java.util.Iterator;
 
 public final class ArgumentMap implements IArguments, IValueMap
 {
-	private Name[]   keys   = new Name[3];
-	private IValue[] values = new IValue[3];
-	private int size;
-	
+	private Name[]   keys;
+	private IValue[] values;
+	private int      size;
+
+	public ArgumentMap()
+	{
+		this.keys = new Name[3];
+		this.values = new IValue[3];
+	}
+
+	public ArgumentMap(Name[] keys, IValue[] values, int size)
+	{
+		this.keys = keys;
+		this.values = values;
+		this.size = size;
+	}
+
 	@Override
 	public Iterator<IValue> iterator()
 	{
