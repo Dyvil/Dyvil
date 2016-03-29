@@ -29,7 +29,7 @@ public class AnnotationReader implements AnnotationVisitor
 	@Override
 	public void visit(String key, Object value)
 	{
-		this.arguments.addValue(Name.getQualified(key), IValue.fromObject(value));
+		this.arguments.addLastValue(Name.getQualified(key), IValue.fromObject(value));
 	}
 	
 	static IValue getEnumValue(String enumClass, String name)
@@ -44,7 +44,7 @@ public class AnnotationReader implements AnnotationVisitor
 		IValue enumValue = getEnumValue(enumClass, name);
 		if (enumValue != null)
 		{
-			this.arguments.addValue(Name.getQualified(key), enumValue);
+			this.arguments.addLastValue(Name.getQualified(key), enumValue);
 		}
 	}
 	
@@ -53,7 +53,7 @@ public class AnnotationReader implements AnnotationVisitor
 	{
 		Annotation annotation = new Annotation(ClassFormat.extendedToType(desc));
 		AnnotationValue value = new AnnotationValue(annotation);
-		this.arguments.addValue(Name.getQualified(key), value);
+		this.arguments.addLastValue(Name.getQualified(key), value);
 		return new AnnotationReader(value, annotation);
 	}
 	
@@ -61,7 +61,7 @@ public class AnnotationReader implements AnnotationVisitor
 	public AnnotationVisitor visitArray(String key)
 	{
 		ArrayExpr valueList = new ArrayExpr();
-		this.arguments.addValue(Name.getQualified(key), valueList);
+		this.arguments.addLastValue(Name.getQualified(key), valueList);
 		return new AnnotationValueReader(valueList);
 	}
 	

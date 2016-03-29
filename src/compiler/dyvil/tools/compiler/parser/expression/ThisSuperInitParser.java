@@ -72,7 +72,7 @@ public class ThisSuperInitParser extends Parser
 				if (next.type() == BaseSymbols.OPEN_PARENTHESIS)
 				{
 					pm.skip();
-					initializerCall.setArguments(ExpressionParser.parseArguments(pm, next.next()));
+					ArgumentListParser.parseArguments(pm, next.next(), initializerCall);
 					this.mode = INIT_END;
 				}
 

@@ -19,6 +19,12 @@ public class ApplyMethodCall extends AbstractCall
 		this.position = position;
 	}
 
+	public ApplyMethodCall(ICodePosition position, IValue receiver)
+	{
+		this.position = position;
+		this.receiver = receiver;
+	}
+
 	public ApplyMethodCall(ICodePosition position, IValue instance, IArguments arguments)
 	{
 		this.position = position;
