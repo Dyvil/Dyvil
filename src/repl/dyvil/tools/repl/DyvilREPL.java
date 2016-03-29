@@ -190,7 +190,7 @@ public final class DyvilREPL
 
 		SemicolonInference.inferSemicolons(tokens.first());
 
-		if (this.tryParse(markers, tokens, new DyvilHeaderParser(this.context, false), false))
+		if (this.tryParse(markers, tokens, new DyvilHeaderParser(this.context), false))
 		{
 			this.context.reportErrors();
 			return;

@@ -8,7 +8,6 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.ObjectFormat;
 import dyvil.tools.compiler.parser.ParserManager;
-import dyvil.tools.compiler.parser.header.DyvilHeaderParser;
 import dyvil.tools.compiler.parser.header.DyvilUnitParser;
 import dyvil.tools.compiler.sources.DyvilFileType;
 import dyvil.tools.parsing.Name;
@@ -103,15 +102,9 @@ public class DyvilUnit extends DyvilHeader implements IClassConsumer
 	}
 	
 	@Override
-	public void parseHeader()
-	{
-		new ParserManager(this.tokens, this.markers).parse(new DyvilHeaderParser(this, true));
-	}
-	
-	@Override
 	public void parse()
 	{
-		new ParserManager(this.tokens, this.markers).parse(new DyvilUnitParser(this, true));
+		new ParserManager(this.tokens, this.markers).parse(new DyvilUnitParser(this));
 		this.tokens = null;
 	}
 	

@@ -31,7 +31,7 @@ public class ExternalHeader extends DyvilHeader
 		this.importsResolved = true;
 		for (int i = 0; i < this.importCount; i++)
 		{
-			this.importDeclarations[i].resolveTypes(null, this, false);
+			this.importDeclarations[i].resolveTypes(null, this);
 		}
 	}
 	
@@ -40,7 +40,7 @@ public class ExternalHeader extends DyvilHeader
 		this.staticImportsResolved = true;
 		for (int i = 0; i < this.usingCount; i++)
 		{
-			this.usingDeclarations[i].resolveTypes(null, this, true);
+			this.usingDeclarations[i].resolveTypes(null, this);
 		}
 	}
 

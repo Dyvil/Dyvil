@@ -71,7 +71,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	protected int                  includeCount;
 	protected ITypeAlias[]         typeAliases;
 	protected int                  typeAliasCount;
-	protected IOperator[]           operators;
+	protected IOperator[]          operators;
 	protected int                  operatorCount;
 
 	protected Map<Name, IOperator> operatorMap;
@@ -355,7 +355,8 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 
 	private void putOperator(IOperator operator)
 	{
-		if (operator.getType() != IOperator.INFIX) {
+		if (operator.getType() != IOperator.INFIX)
+		{
 			return;
 		}
 
@@ -497,39 +498,27 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 
 	@Override
-	public void parseHeader()
-	{
-		if (this.tokens != null)
-		{
-			new ParserManager(this.tokens, this.markers).parse(new DyvilHeaderParser(this));
-		}
-	}
-
-	@Override
-	public void resolveHeader()
-	{
-		for (int i = 0; i < this.includeCount; i++)
-		{
-			this.includes[i].resolve(this.markers, this);
-		}
-	}
-
-	@Override
 	public void parse()
 	{
+		new ParserManager(this.tokens, this.markers).parse(new DyvilHeaderParser(this));
 	}
 
 	@Override
 	public void resolveTypes()
 	{
+		for (int i = 0; i < this.includeCount; i++)
+		{
+			this.includes[i].resolve(this.markers, this);
+		}
+
 		for (int i = 0; i < this.importCount; i++)
 		{
-			this.importDeclarations[i].resolveTypes(this.markers, this, false);
+			this.importDeclarations[i].resolveTypes(this.markers, this);
 		}
 
 		for (int i = 0; i < this.usingCount; i++)
 		{
-			this.usingDeclarations[i].resolveTypes(this.markers, this, true);
+			this.usingDeclarations[i].resolveTypes(this.markers, this);
 		}
 
 		for (int i = 0; i < this.typeAliasCount; i++)

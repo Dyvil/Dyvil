@@ -13,14 +13,9 @@ public final class DyvilUnitParser extends DyvilHeaderParser
 {
 	private static final int CLASS = 4;
 	
-	public DyvilUnitParser(IDyvilHeader unit, boolean classMode)
+	public DyvilUnitParser(IDyvilHeader unit)
 	{
-		super(unit, true);
-
-		if (classMode)
-		{
-			this.mode = CLASS;
-		}
+		super(unit);
 	}
 	
 	@Override

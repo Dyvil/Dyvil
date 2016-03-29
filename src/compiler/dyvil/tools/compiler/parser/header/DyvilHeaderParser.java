@@ -29,7 +29,6 @@ public class DyvilHeaderParser extends Parser
 	protected static final int METADATA = 4;
 
 	protected IDyvilHeader unit;
-	protected boolean      unitHeader;
 
 	protected ModifierSet    modifiers;
 	protected AnnotationList annotations;
@@ -40,13 +39,6 @@ public class DyvilHeaderParser extends Parser
 	{
 		this.unit = unit;
 		this.mode = PACKAGE;
-	}
-
-	public DyvilHeaderParser(IDyvilHeader unit, boolean unitHeader)
-	{
-		this.unit = unit;
-		this.mode = PACKAGE;
-		this.unitHeader = unitHeader;
 	}
 
 	protected boolean parsePackage(IParserManager pm, IToken token, int type)
@@ -201,17 +193,6 @@ public class DyvilHeaderParser extends Parser
 			{
 				return;
 			}
-		}
-
-		if (this.unitHeader)
-		{
-			if (this.lastToken != null)
-			{
-				pm.jump(this.lastToken);
-			}
-			pm.popParser();
-			pm.stop();
-			return;
 		}
 
 		reportInvalidElement(pm, token);
