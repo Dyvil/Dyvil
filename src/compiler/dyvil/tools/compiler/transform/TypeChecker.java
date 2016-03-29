@@ -85,7 +85,10 @@ public final class TypeChecker
 			return newValue;
 		}
 
-		markers.add(markerSupplier.createMarker(value.getPosition(), type, value.getType()));
+		if (value.isResolved())
+		{
+			markers.add(markerSupplier.createMarker(value.getPosition(), type, value.getType()));
+		}
 		return value;
 	}
 
