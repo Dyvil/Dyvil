@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.operator;
+package dyvil.tools.compiler.ast.intrinsic;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
@@ -12,20 +12,30 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public final class NotOperator extends AbstractValue
+public final class AndOperator extends AbstractValue
 {
-	public IValue value;
+	public IValue left;
+	public IValue right;
 	
-	public NotOperator(IValue right)
+	public AndOperator(IValue left, IValue right)
 	{
-		this.value = right;
+		this.left = left;
+		this.right = right;
+	}
+	
+	public AndOperator(ICodePosition position, IValue left, IValue right)
+	{
+		this.position = position;
+		this.left = left;
+		this.right = right;
 	}
 	
 	@Override
 	public int valueTag()
 	{
-		return BOOLEAN_NOT;
+		return BOOLEAN_AND;
 	}
 	
 	@Override
@@ -43,7 +53,7 @@ public final class NotOperator extends AbstractValue
 	@Override
 	public boolean hasSideEffects()
 	{
-		return this.value.hasSideEffects();
+		return this.left.hasSideEffects() || this.right.hasSideEffects();
 	}
 
 	@Override
@@ -55,43 +65,67 @@ public final class NotOperator extends AbstractValue
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		this.value.resolveTypes(markers, context);
+		this.left.resolveTypes(markers, context);
+		this.right.resolveTypes(markers, context);
 	}
 	
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		this.value = this.value.resolve(markers, context);
+		this.left = this.left.resolve(markers, context);
+		this.right = this.right.resolve(markers, context);
 		return this;
 	}
 	
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.value.checkTypes(markers, context);
+		this.left.checkTypes(markers, context);
+		this.right.checkTypes(markers, context);
 	}
 	
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		this.value.check(markers, context);
+		this.left.check(markers, context);
+		this.right.check(markers, context);
 	}
 	
 	@Override
 	public IValue foldConstants()
 	{
-		if (this.value.valueTag() == BOOLEAN)
+		if (this.left.valueTag() == BOOLEAN && !this.left.booleanValue())
 		{
-			return new BooleanValue(!this.value.booleanValue());
+			return BooleanValue.FALSE;
 		}
-		this.value = this.value.foldConstants();
+		if (this.bothTrue())
+		{
+			return BooleanValue.TRUE;
+		}
+		
+		this.left = this.left.foldConstants();
+		this.right = this.right.foldConstants();
+		
 		return this;
+	}
+	
+	private boolean bothTrue()
+	{
+		return this.left.valueTag() == BOOLEAN && this.left.booleanValue() && this.right.valueTag() == BOOLEAN
+				&& this.right.booleanValue();
 	}
 	
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		this.value = this.value.cleanup(context, compilableList);
+		this.left = this.left.cleanup(context, compilableList);
+		this.right = this.right.cleanup(context, compilableList);
+		
+		if (this.bothTrue())
+		{
+			return BooleanValue.TRUE;
+		}
+		
 		return this;
 	}
 	
@@ -100,11 +134,12 @@ public final class NotOperator extends AbstractValue
 	{
 		Label label = new Label();
 		Label label2 = new Label();
-		this.value.writeInvJump(writer, label);
-		writer.visitLdcInsn(0);
+		this.left.writeInvJump(writer, label);
+		this.right.writeInvJump(writer, label);
+		writer.visitLdcInsn(1);
 		writer.visitJumpInsn(Opcodes.GOTO, label2);
 		writer.visitLabel(label);
-		writer.visitLdcInsn(1);
+		writer.visitLdcInsn(0);
 		writer.visitLabel(label2);
 
 		if (type != null)
@@ -116,19 +151,22 @@ public final class NotOperator extends AbstractValue
 	@Override
 	public void writeJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
-		this.value.writeInvJump(writer, dest);
+		this.left.writeJump(writer, dest);
+		this.right.writeJump(writer, dest);
 	}
 	
 	@Override
 	public void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
-		this.value.writeJump(writer, dest);
+		this.left.writeInvJump(writer, dest);
+		this.right.writeInvJump(writer, dest);
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append('!');
-		this.value.toString(prefix, buffer);
+		this.left.toString(prefix, buffer);
+		buffer.append(" && ");
+		this.right.toString(prefix, buffer);
 	}
 }

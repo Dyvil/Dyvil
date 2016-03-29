@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.operator;
+package dyvil.tools.compiler.ast.expression;
 
 import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;

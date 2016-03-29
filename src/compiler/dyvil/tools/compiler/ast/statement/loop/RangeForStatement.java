@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.statement.loop;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.operator.RangeOperator;
+import dyvil.tools.compiler.ast.intrinsic.RangeOperator;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
