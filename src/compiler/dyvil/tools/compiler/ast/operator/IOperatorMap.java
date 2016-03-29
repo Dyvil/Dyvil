@@ -4,7 +4,7 @@ import dyvil.tools.parsing.Name;
 
 public interface IOperatorMap
 {
-	Operator resolveOperator(Name name);
+	IOperator resolveOperator(Name name);
 	
-	void addOperator(Operator operator);
+	void addOperator(IOperator operator);
 }

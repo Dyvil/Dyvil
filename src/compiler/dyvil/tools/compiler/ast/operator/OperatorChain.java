@@ -117,7 +117,8 @@ public class OperatorChain implements IValue
 				element2 = operatorStack.peek();
 
 				final int comparePrecedence = element1.operator.comparePrecedence(element2.operator);
-				if (!element1.operator.isRightAssociative() && comparePrecedence == 0 || comparePrecedence < 0)
+				if (comparePrecedence < 0
+					    || element1.operator.getAssociativity() != IOperator.RIGHT && comparePrecedence == 0)
 				{
 					operatorStack.pop();
 					this.pushCall(operandStack, element2);

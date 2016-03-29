@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.header.PackageDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
+import dyvil.tools.compiler.ast.operator.IOperator;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
@@ -70,10 +71,10 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	protected int                  includeCount;
 	protected ITypeAlias[]         typeAliases;
 	protected int                  typeAliasCount;
-	protected Operator[]           operators;
+	protected IOperator[]           operators;
 	protected int                  operatorCount;
 
-	protected Map<Name, Operator> operatorMap;
+	protected Map<Name, IOperator> operatorMap;
 
 	protected HeaderDeclaration headerDeclaration;
 
@@ -295,17 +296,17 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 
 	@Override
-	public Operator getOperator(int index)
+	public IOperator getOperator(int index)
 	{
 		return this.operators[index];
 	}
 
 	@Override
-	public Operator resolveOperator(Name name)
+	public IOperator resolveOperator(Name name)
 	{
 		if (this.operatorMap != null)
 		{
-			final Operator operator = this.operatorMap.get(name);
+			final IOperator operator = this.operatorMap.get(name);
 			if (operator != null)
 			{
 				return operator;
@@ -314,7 +315,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 
 		for (int i = 0; i < this.includeCount; i++)
 		{
-			final Operator operator = this.includes[i].getHeader().resolveOperator(name);
+			final IOperator operator = this.includes[i].getHeader().resolveOperator(name);
 			if (operator != null)
 			{
 				return operator;
@@ -324,13 +325,13 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 
 	@Override
-	public void setOperator(int index, Operator operator)
+	public void setOperator(int index, IOperator operator)
 	{
 		this.operators[index] = operator;
 	}
 
 	@Override
-	public void addOperator(Operator operator)
+	public void addOperator(IOperator operator)
 	{
 		if (this.operators == null)
 		{
@@ -343,7 +344,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		final int index = this.operatorCount++;
 		if (index >= this.operators.length)
 		{
-			final Operator[] temp = new Operator[index * 2];
+			final IOperator[] temp = new IOperator[index * 2];
 			System.arraycopy(this.operators, 0, temp, 0, index);
 			this.operators = temp;
 		}
@@ -352,19 +353,22 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		this.putOperator(operator);
 	}
 
-	private void putOperator(Operator operator)
+	private void putOperator(IOperator operator)
 	{
-		final Name name = operator.name;
+		if (operator.getType() != IOperator.INFIX) {
+			return;
+		}
+
+		final Name name = operator.getName();
 		if (this.operatorMap == null)
 		{
-
 			this.operatorMap = new IdentityHashMap<>();
 			this.operatorMap.put(name, operator);
 			return;
 		}
 
-		final Operator existing = this.operatorMap.get(name);
-		if (existing == null || existing.type == Operator.PREFIX || existing.type == Operator.POSTFIX)
+		final IOperator existing = this.operatorMap.get(name);
+		if (existing == null)
 		{
 			this.operatorMap.put(name, operator);
 		}
@@ -796,7 +800,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		out.writeShort(this.operatorCount);
 		for (int i = 0; i < this.operatorCount; i++)
 		{
-			this.operators[i].write(out);
+			this.operators[i].writeData(out);
 		}
 
 		// Type Aliases

@@ -12,7 +12,7 @@ class OperatorElement
 {
 	protected final Name          name;
 	protected final ICodePosition position;
-	protected       Operator      operator;
+	protected       IOperator      operator;
 
 	public OperatorElement(Name name, ICodePosition position)
 	{
@@ -22,14 +22,14 @@ class OperatorElement
 
 	protected void resolve(MarkerList markers, IContext context)
 	{
-		Operator operator = IContext.resolveOperator(context, this.name);
+		IOperator operator = IContext.resolveOperator(context, this.name);
 
 		if (operator != null)
 		{
 			this.operator = operator;
 
 			// Infix check
-			if (!operator.isInfix())
+			if (operator.getType() != IOperator.INFIX)
 			{
 				final Marker marker = Markers.semantic(this.position, "operator.not_infix", this.name);
 				marker.addInfo(Markers.getSemantic("operator.declaration", operator.toString()));
@@ -55,13 +55,13 @@ class OperatorElement
 			this.operator = Operator.DEFAULT_RIGHT;
 			return;
 		}
-		if (!operator.isRightAssociative())
+		if (operator.getAssociativity() != IOperator.RIGHT)
 		{
-			this.operator = new Operator(removeEq, operator.precedence - 1, Operator.INFIX_RIGHT);
+			this.operator = new Operator(removeEq, IOperator.RIGHT, operator.getPrecedence() - 1);
 			return;
 		}
 
-		// No infix check required, the type is INFIX_RIGHT
+		// No infix check required, the type is ID_INFIX_RIGHT
 		this.operator = operator;
 	}
 }

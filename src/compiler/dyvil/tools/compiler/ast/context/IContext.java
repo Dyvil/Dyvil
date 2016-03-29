@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
-import dyvil.tools.compiler.ast.operator.Operator;
+import dyvil.tools.compiler.ast.operator.IOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -71,7 +71,7 @@ public interface IContext extends IMemberContext
 	@Override
 	ITypeParameter resolveTypeVariable(Name name);
 
-	Operator resolveOperator(Name name);
+	IOperator resolveOperator(Name name);
 
 	@Override
 	IDataMember resolveField(Name name);
@@ -134,9 +134,9 @@ public interface IContext extends IMemberContext
 		return Types.LANG_HEADER.resolveType(name);
 	}
 
-	static Operator resolveOperator(IContext context, Name name)
+	static IOperator resolveOperator(IContext context, Name name)
 	{
-		final Operator operator = context.resolveOperator(name);
+		final IOperator operator = context.resolveOperator(name);
 		if (operator != null)
 		{
 			return operator;

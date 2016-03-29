@@ -84,14 +84,14 @@ public class DyvilHeaderParser extends Parser
 			return true;
 		}
 		case DyvilKeywords.OPERATOR:
-			pm.pushParser(new OperatorParser(this.unit, Operator.INFIX_NONE), true);
+			pm.pushParser(new OperatorParser(this.unit, Operator.INFIX), true);
 			return true;
 		case DyvilKeywords.PREFIX:
 		case DyvilKeywords.POSTFIX:
 		case DyvilKeywords.INFIX:
 			if (token.next().type() == DyvilKeywords.OPERATOR)
 			{
-				final OperatorParser operatorParser = new OperatorParser(this.unit, -1);
+				final OperatorParser operatorParser = new OperatorParser(this.unit);
 				// Parse this token so the OperatorParser correctly detects the type (prefix, postfix, infix)
 				operatorParser.parse(pm, token);
 				pm.pushParser(operatorParser);
