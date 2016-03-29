@@ -19,6 +19,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IValue extends IASTNode, ITyped
 {
@@ -160,6 +161,8 @@ public interface IValue extends IASTNode, ITyped
 		return this.isStatement();
 	}
 
+	boolean isResolved();
+
 	default IReference toReference()
 	{
 		return null;
@@ -170,7 +173,10 @@ public interface IValue extends IASTNode, ITyped
 		return null;
 	}
 
-	boolean isResolved();
+	default IValue toAssignment(IValue rhs, ICodePosition position)
+	{
+		return null;
+	}
 
 	@Override
 	IType getType();

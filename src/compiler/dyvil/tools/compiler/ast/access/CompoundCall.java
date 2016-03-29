@@ -48,8 +48,7 @@ public final class CompoundCall
 				return null;
 			}
 
-			IValue update = new UpdateMethodCall(position, applyReceiver,
-			                                     applyArguments.withLastValue(Names.update, op))
+			IValue update = new UpdateMethodCall(position, applyReceiver, applyArguments, op)
 				                .resolveCall(markers, context);
 
 			return helper.finish(update);
@@ -74,8 +73,7 @@ public final class CompoundCall
 				return null;
 			}
 
-			IArguments subscriptSetterArguments = subscriptArguments.withLastValue(Names.subscript_$eq, op);
-			IValue subscript = new SubscriptAssignment(position, subscriptReceiver, subscriptSetterArguments)
+			IValue subscript = new SubscriptAssignment(position, subscriptReceiver, subscriptArguments, op)
 				                   .resolveCall(markers, context);
 
 			return helper.finish(subscript);

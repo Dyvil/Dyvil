@@ -180,7 +180,7 @@ public class OperatorChain implements IValue
 		}
 		if (operator == Names.eq)
 		{
-			final IValue assignment = assignment(position, lhs, rhs);
+			final IValue assignment = lhs.toAssignment(rhs, position);
 			if (assignment != null)
 			{
 				stack.push(assignment);
@@ -191,46 +191,6 @@ public class OperatorChain implements IValue
 		final MethodCall methodCall = new MethodCall(position, lhs, operator, new SingleArgument(rhs));
 		methodCall.setDotless(true);
 		stack.push(methodCall);
-	}
-
-	private static IValue assignment(ICodePosition position, IValue lhs, IValue rhs)
-	{
-		switch (lhs.valueTag())
-		{
-		case IValue.FIELD_ACCESS:
-		{
-			final FieldAccess access = (FieldAccess) lhs;
-			final FieldAssignment assignment = new FieldAssignment(position, access.getInstance(), access.getName());
-			assignment.setValue(rhs);
-			return assignment;
-		}
-		case IValue.APPLY_CALL:
-		{
-			final ApplyMethodCall applyCall = (ApplyMethodCall) lhs;
-			final UpdateMethodCall updateCall = new UpdateMethodCall(position, applyCall.getReceiver(),
-			                                                         applyCall.getArguments());
-			updateCall.setValue(rhs);
-			return updateCall;
-		}
-		case IValue.METHOD_CALL:
-		{
-			final MethodCall call = (MethodCall) lhs;
-			final FieldAccess access = new FieldAccess(position, call.getReceiver(), call.getName());
-			final UpdateMethodCall updateCall = new UpdateMethodCall(position, access, call.getArguments());
-			updateCall.setValue(rhs);
-			return updateCall;
-		}
-		case IValue.SUBSCRIPT_GET:
-		{
-			final SubscriptAccess subscriptAccess = (SubscriptAccess) lhs;
-			final SubscriptAssignment subscriptAssignment = new SubscriptAssignment(position,
-			                                                                        subscriptAccess.getReceiver(),
-			                                                                        subscriptAccess.getArguments());
-			subscriptAssignment.setValue(rhs);
-			return subscriptAssignment;
-		}
-		}
-		return null;
 	}
 
 	@Override

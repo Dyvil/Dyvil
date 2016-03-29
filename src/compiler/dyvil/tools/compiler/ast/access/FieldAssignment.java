@@ -41,17 +41,25 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 		this.position = position;
 	}
 
-	public FieldAssignment(ICodePosition position, IValue instance, Name name)
+	public FieldAssignment(ICodePosition position, IValue receiver, Name name)
 	{
 		this.position = position;
-		this.receiver = instance;
+		this.receiver = receiver;
 		this.name = name;
 	}
 
-	public FieldAssignment(ICodePosition position, IValue instance, IDataMember field, IValue value)
+	public FieldAssignment(ICodePosition position, IValue receiver, Name name, IValue value)
 	{
 		this.position = position;
-		this.receiver = instance;
+		this.receiver = receiver;
+		this.name = name;
+		this.value = value;
+	}
+
+	public FieldAssignment(ICodePosition position, IValue receiver, IDataMember field, IValue value)
+	{
+		this.position = position;
+		this.receiver = receiver;
 		this.field = field;
 		this.value = value;
 

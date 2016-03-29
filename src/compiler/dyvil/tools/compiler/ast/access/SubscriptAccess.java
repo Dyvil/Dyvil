@@ -46,6 +46,18 @@ public class SubscriptAccess extends AbstractCall
 	}
 
 	@Override
+	public IValue toAssignment(IValue rhs, ICodePosition position)
+	{
+		return new SubscriptAssignment(this.position.to(position), this.receiver, this.arguments, rhs);
+	}
+
+	@Override
+	public IValue toReferenceValue(MarkerList markers, IContext context)
+	{
+		return toReferenceValue(this, Names.subscript_$amp, markers, context);
+	}
+
+	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
 		if (this.receiver instanceof ICall)
@@ -102,12 +114,6 @@ public class SubscriptAccess extends AbstractCall
 		}
 
 		return null;
-	}
-
-	@Override
-	public IValue toReferenceValue(MarkerList markers, IContext context)
-	{
-		return toReferenceValue(this, Names.subscript_$amp, markers, context);
 	}
 
 	@Override
