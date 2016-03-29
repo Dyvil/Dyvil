@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
+import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -134,6 +135,24 @@ public final class TupleExpr implements IValue, IValueList
 	public boolean isResolved()
 	{
 		return this.tupleType != null;
+	}
+
+	@Override
+	public IReference toReference()
+	{
+		return this.valueCount != 1 ? null : this.values[0].toReference();
+	}
+
+	@Override
+	public IValue toReferenceValue(MarkerList markers, IContext context)
+	{
+		return this.valueCount != 1 ? null : this.values[0].toReferenceValue(markers, context);
+	}
+
+	@Override
+	public IValue toAssignment(IValue rhs, ICodePosition position)
+	{
+		return this.valueCount != 1 ? null : this.values[0].toAssignment(rhs, position);
 	}
 
 	@Override

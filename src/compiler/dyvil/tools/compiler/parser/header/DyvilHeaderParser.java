@@ -29,7 +29,6 @@ public class DyvilHeaderParser extends Parser
 	protected static final int METADATA = 4;
 
 	protected IDyvilHeader unit;
-	protected boolean      unitHeader;
 
 	protected ModifierSet    modifiers;
 	protected AnnotationList annotations;
@@ -40,13 +39,6 @@ public class DyvilHeaderParser extends Parser
 	{
 		this.unit = unit;
 		this.mode = PACKAGE;
-	}
-
-	public DyvilHeaderParser(IDyvilHeader unit, boolean unitHeader)
-	{
-		this.unit = unit;
-		this.mode = PACKAGE;
-		this.unitHeader = unitHeader;
 	}
 
 	protected boolean parsePackage(IParserManager pm, IToken token, int type)
@@ -84,14 +76,14 @@ public class DyvilHeaderParser extends Parser
 			return true;
 		}
 		case DyvilKeywords.OPERATOR:
-			pm.pushParser(new OperatorParser(this.unit, Operator.INFIX_NONE), true);
+			pm.pushParser(new OperatorParser(this.unit, Operator.INFIX), true);
 			return true;
 		case DyvilKeywords.PREFIX:
 		case DyvilKeywords.POSTFIX:
 		case DyvilKeywords.INFIX:
 			if (token.next().type() == DyvilKeywords.OPERATOR)
 			{
-				final OperatorParser operatorParser = new OperatorParser(this.unit, -1);
+				final OperatorParser operatorParser = new OperatorParser(this.unit);
 				// Parse this token so the OperatorParser correctly detects the type (prefix, postfix, infix)
 				operatorParser.parse(pm, token);
 				pm.pushParser(operatorParser);
@@ -201,17 +193,6 @@ public class DyvilHeaderParser extends Parser
 			{
 				return;
 			}
-		}
-
-		if (this.unitHeader)
-		{
-			if (this.lastToken != null)
-			{
-				pm.jump(this.lastToken);
-			}
-			pm.popParser();
-			pm.stop();
-			return;
 		}
 
 		reportInvalidElement(pm, token);

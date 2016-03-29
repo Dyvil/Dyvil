@@ -140,54 +140,11 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	{
 		return this.field != null;
 	}
-	
-	@Override
-	public IType getType()
-	{
-		if (this.type == null)
-		{
-			if (this.field == null)
-			{
-				return Types.UNKNOWN;
-			}
 
-			if (this.receiver == null)
-			{
-				return this.field.getType().asReturnType();
-			}
-
-			final ITypeContext typeContext = this.receiver.getType();
-			return this.type = this.field.getType().getConcreteType(typeContext).asReturnType();
-		}
-		return this.type;
-	}
-	
 	@Override
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	public IValue toAssignment(IValue rhs, ICodePosition position)
 	{
-		if (this.field == null)
-		{
-			return this; // don't create an extra type error
-		}
-		
-		return Types.isSuperType(type, this.getType()) ? this : null;
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return this.field != null && Types.isSuperType(type, this.getType());
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		if (this.field == null)
-		{
-			return 0;
-		}
-
-		return Types.getDistance(type, this.getType());
+		return new FieldAssignment(this.position.to(position), this.receiver, this.name, rhs);
 	}
 
 	@Override
@@ -215,6 +172,55 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 			return new VariableReference(this);
 		}
 		return null;
+	}
+
+	@Override
+	public IType getType()
+	{
+		if (this.type == null)
+		{
+			if (this.field == null)
+			{
+				return Types.UNKNOWN;
+			}
+
+			if (this.receiver == null)
+			{
+				return this.field.getType().asReturnType();
+			}
+
+			final ITypeContext typeContext = this.receiver.getType();
+			return this.type = this.field.getType().getConcreteType(typeContext).asReturnType();
+		}
+		return this.type;
+	}
+
+	@Override
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		if (this.field == null)
+		{
+			return this; // don't create an extra type error
+		}
+
+		return Types.isSuperType(type, this.getType()) ? this : null;
+	}
+
+	@Override
+	public boolean isType(IType type)
+	{
+		return this.field != null && Types.isSuperType(type, this.getType());
+	}
+
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		if (this.field == null)
+		{
+			return 0;
+		}
+
+		return Types.getDistance(type, this.getType());
 	}
 
 	@Override

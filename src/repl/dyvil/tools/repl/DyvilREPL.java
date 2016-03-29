@@ -34,7 +34,7 @@ public final class DyvilREPL
 	protected DyvilCompiler compiler = new DyvilCompiler();
 
 	protected REPLContext      context = new REPLContext(this);
-	protected TryParserManager parser  = new TryParserManager(this.context);
+	protected TryParserManager parser  = new TryParserManager();
 
 	protected File    dumpDir;
 
@@ -190,7 +190,7 @@ public final class DyvilREPL
 
 		SemicolonInference.inferSemicolons(tokens.first());
 
-		if (this.tryParse(markers, tokens, new DyvilHeaderParser(this.context, false), false))
+		if (this.tryParse(markers, tokens, new DyvilHeaderParser(this.context), false))
 		{
 			this.context.reportErrors();
 			return;

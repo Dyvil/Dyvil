@@ -1,8 +1,5 @@
 package dyvil.tools.compiler.parser;
 
-import dyvil.tools.compiler.ast.operator.IOperatorMap;
-import dyvil.tools.compiler.ast.operator.Operator;
-import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -17,12 +14,6 @@ public interface IParserManager
 	void report(IToken token, String message);
 
 	void report(Marker error);
-
-	void setOperatorMap(IOperatorMap operators);
-	
-	IOperatorMap getOperatorMap();
-	
-	Operator getOperator(Name name);
 	
 	void stop();
 	

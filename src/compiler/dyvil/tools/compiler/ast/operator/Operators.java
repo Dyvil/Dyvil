@@ -3,20 +3,18 @@ package dyvil.tools.compiler.ast.operator;
 import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.access.FieldAssignment;
 import dyvil.tools.compiler.ast.constant.IntValue;
+import dyvil.tools.compiler.ast.expression.ColonOperator;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.StringConcatExpr;
+import dyvil.tools.compiler.ast.intrinsic.StringConcatExpr;
+import dyvil.tools.compiler.ast.intrinsic.*;
 import dyvil.tools.compiler.ast.reference.ReferenceOperator;
 import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
 
-import static dyvil.tools.compiler.ast.operator.Operator.INFIX_LEFT;
-
 public final class Operators
 {
-	public static final Operator DEFAULT = new Operator(null, 100000, INFIX_LEFT);
-
 	private Operators()
 	{
 		// no instances

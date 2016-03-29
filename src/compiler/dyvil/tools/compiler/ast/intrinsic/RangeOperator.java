@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.operator;
+package dyvil.tools.compiler.ast.intrinsic;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Type;

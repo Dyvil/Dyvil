@@ -60,6 +60,11 @@ public class ParserUtil
 
 	// endregion
 
+	public static boolean neighboring(IToken first, IToken next)
+	{
+		return next.startIndex() == first.endIndex();
+	}
+
 	/**
 	 * Finds the next matching parenthesis, brace or bracket.
 	 *

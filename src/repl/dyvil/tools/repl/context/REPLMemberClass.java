@@ -24,6 +24,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
+import dyvil.tools.compiler.ast.operator.IOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -443,7 +444,13 @@ public class REPLMemberClass implements IClass
 	{
 		return this.context.resolveTypeVariable(name);
 	}
-	
+
+	@Override
+	public IOperator resolveOperator(Name name)
+	{
+		return this.context.resolveOperator(name);
+	}
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{

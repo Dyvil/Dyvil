@@ -5,6 +5,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.IAccessible;
@@ -37,7 +38,7 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 import java.lang.annotation.ElementType;
 
-public abstract class AbstractClass implements IClass
+public abstract class AbstractClass implements IClass, IDefaultContext
 {
 	// Modifiers and Annotations
 
@@ -81,6 +82,9 @@ public abstract class AbstractClass implements IClass
 	{
 		return this.enclosingClass;
 	}
+
+	@Override
+	public abstract IDyvilHeader getHeader();
 
 	@Override
 	public void setEnclosingClass(IClass enclosingClass)

@@ -60,11 +60,11 @@ public final class ImportDeclaration implements IASTNode, IObjectCompilable
 		return this.theImport;
 	}
 	
-	public void resolveTypes(MarkerList markers, IContext context, boolean isStatic)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.theImport == null)
 		{
-			markers.add(Markers.semantic(this.position, isStatic ? "using.invalid" : "import.invalid"));
+			markers.add(Markers.semantic(this.position, this.isStatic ? "using.invalid" : "import.invalid"));
 			return;
 		}
 		

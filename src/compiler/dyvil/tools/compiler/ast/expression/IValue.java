@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.operator.ClassOperator;
 import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -19,6 +18,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IValue extends IASTNode, ITyped
 {
@@ -53,10 +53,10 @@ public interface IValue extends IASTNode, ITyped
 
 	int CAST_OPERATOR    = 66;
 	int ISOF_OPERATOR    = 67;
-	int CASE_STATEMENT   = 68;
+	// int CASE_STATEMENT   = 68;
 	int MATCH            = 69;
 	int LAMBDA           = 70;
-	int PARTIAL_FUNCTION = 71;
+	// int PARTIAL_FUNCTION = 71;
 
 	// Access and Invocation
 	int CLASS_ACCESS  = 96;
@@ -112,6 +112,7 @@ public interface IValue extends IASTNode, ITyped
 	// Special Types only used by the compiler
 	int REFERENCE          = 240;
 	int LITERAL_CONVERSION = 241;
+	int OPERATOR_CHAIN     = 242;
 
 	// --- Other Constants ---
 
@@ -159,6 +160,8 @@ public interface IValue extends IASTNode, ITyped
 		return this.isStatement();
 	}
 
+	boolean isResolved();
+
 	default IReference toReference()
 	{
 		return null;
@@ -169,7 +172,10 @@ public interface IValue extends IASTNode, ITyped
 		return null;
 	}
 
-	boolean isResolved();
+	default IValue toAssignment(IValue rhs, ICodePosition position)
+	{
+		return null;
+	}
 
 	@Override
 	IType getType();

@@ -45,6 +45,9 @@ public final class Names
 	public static final Name any     = Name.getQualified("any");
 	public static final Name auto    = Name.getQualified("auto");
 
+	public static final Name eq    = Name.get("=", "$eq");
+	public static final Name colon = Name.get(":", "$colon");
+
 	public static final Name plus    = Name.get("+", "$plus");
 	public static final Name minus   = Name.get("-", "$minus");
 	public static final Name times   = Name.get("*", "$times");

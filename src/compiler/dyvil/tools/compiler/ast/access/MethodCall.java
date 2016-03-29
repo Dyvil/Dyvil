@@ -19,19 +19,19 @@ public final class MethodCall extends AbstractCall implements INamed
 {
 	protected Name    name;
 	protected boolean dotless;
-	
+
 	public MethodCall(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
 	public MethodCall(ICodePosition position, IValue instance, Name name)
 	{
 		this.position = position;
 		this.receiver = instance;
 		this.name = name;
 	}
-	
+
 	public MethodCall(ICodePosition position, IValue instance, Name name, IArguments arguments)
 	{
 		this.position = position;
@@ -39,7 +39,7 @@ public final class MethodCall extends AbstractCall implements INamed
 		this.name = name;
 		this.arguments = arguments;
 	}
-	
+
 	public MethodCall(ICodePosition position, IValue instance, IMethod method, IArguments arguments)
 	{
 		this.position = position;
@@ -48,53 +48,60 @@ public final class MethodCall extends AbstractCall implements INamed
 		this.method = method;
 		this.arguments = arguments;
 	}
-	
+
 	@Override
 	public int valueTag()
 	{
 		return METHOD_CALL;
 	}
-	
+
 	@Override
 	public void setName(Name name)
 	{
 		this.name = name;
 	}
-	
+
 	@Override
 	public Name getName()
 	{
 		return this.name;
 	}
-	
+
 	public boolean isDotless()
 	{
 		return this.dotless;
 	}
-	
+
 	public void setDotless(boolean dotless)
 	{
 		this.dotless = dotless;
 	}
-	
+
 	@Override
 	public IValue toAnnotationConstant(MarkerList markers, IContext context)
 	{
 		int depth = context.getCompilationContext().config.getMaxConstantDepth();
 		IValue v = this;
-		
+
 		do
 		{
 			if (depth-- < 0)
 			{
 				return null;
 			}
-			
+
 			v = v.foldConstants();
 		}
 		while (!v.isAnnotationConstant());
-		
+
 		return v.toAnnotationConstant(markers, context);
+	}
+
+	@Override
+	public IValue toAssignment(IValue rhs, ICodePosition position)
+	{
+		final FieldAccess access = new FieldAccess(this.position, this.receiver, this.name);
+		return new UpdateMethodCall(this.position.to(position), access, this.arguments, rhs);
 	}
 
 	@Override
@@ -122,10 +129,10 @@ public final class MethodCall extends AbstractCall implements INamed
 		{
 			this.genericData.resolveTypes(markers, context);
 		}
-		
+
 		super.resolveTypes(markers, context);
 	}
-	
+
 	@Override
 	public IValue resolveCall(MarkerList markers, IContext context)
 	{
@@ -204,8 +211,8 @@ public final class MethodCall extends AbstractCall implements INamed
 			if (Util.hasEq(this.name))
 			{
 				return CompoundCall
-						.resolveCall(markers, context, this.position, this.receiver, Util.removeEq(this.name),
-						             this.arguments);
+					       .resolveCall(markers, context, this.position, this.receiver, Util.removeEq(this.name),
+					                    this.arguments);
 			}
 			break;
 		}
@@ -237,13 +244,13 @@ public final class MethodCall extends AbstractCall implements INamed
 		}
 		return null;
 	}
-	
+
 	@Override
 	public void reportResolve(MarkerList markers, IContext context)
 	{
 		ICall.addResolveMarker(markers, this.position, this.receiver, this.name, this.arguments);
 	}
-	
+
 	@Override
 	public IValue foldConstants()
 	{
@@ -282,7 +289,7 @@ public final class MethodCall extends AbstractCall implements INamed
 			this.arguments.foldConstants();
 			return this;
 		}
-		
+
 		if (this.receiver != null)
 		{
 			if (this.receiver.isConstant())
@@ -294,12 +301,12 @@ public final class MethodCall extends AbstractCall implements INamed
 					return folded;
 				}
 			}
-			
+
 			this.receiver = this.receiver.foldConstants();
 		}
 		return this;
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
@@ -315,14 +322,14 @@ public final class MethodCall extends AbstractCall implements INamed
 				buffer.append('.');
 			}
 		}
-		
+
 		if (this.genericData != null)
 		{
 			this.genericData.toString(prefix, buffer);
 		}
-		
+
 		buffer.append(this.name);
-		
+
 		this.arguments.toString(prefix, buffer);
 	}
 }
