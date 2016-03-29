@@ -130,7 +130,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			if ((type & Tokens.IDENTIFIER) != 0)
 			{
 				// IDENTIFIER ...
-				this.parsePrefixAccess(pm, token);
+				this.parseInfixAccess(pm, token);
 				return;
 			}
 			if (this.parseValue(pm, token, type))
@@ -455,11 +455,6 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		return list;
 	}
 
-	private void parsePrefixAccess(IParserManager pm, IToken token)
-	{
-		this.parseInfixAccess(pm, token, token.nameValue());
-	}
-
 	private void parseInfixAccess(IParserManager pm, IToken token)
 	{
 		this.parseInfixAccess(pm, token, token.nameValue());
@@ -472,6 +467,8 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 		if (token.type() != Tokens.LETTER_IDENTIFIER)
 		{
+			// Identifier is an operator
+
 			final boolean neighboringLeft = ParserUtil.neighboring(token.prev(), token);
 			final boolean neighboringRight = ParserUtil.neighboring(token, token.next());
 
@@ -491,6 +488,10 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			}
 			if (ParserUtil.isExpressionTerminator(nextType) || neighboringLeft && !neighboringRight) // postfix
 			{
+				// EXPRESSION_OPERATOR EXPRESSION
+				// EXPRESSION OPERATOR EOF
+				//            token    next
+
 				final MethodCall call = new MethodCall(token, this.value, name);
 				call.setDotless(true);
 				this.value = call;
@@ -526,7 +527,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			return;
 		}
 
-		// Identifier is neither a defined nor a compound operator
+		// Identifier is nor an operator
 
 		switch (nextType)
 		{
@@ -561,7 +562,9 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				break;
 			}
 
-			// IDENTIFIER => ...
+			// IDENTIFIER =>   ...
+			// token      next
+
 			// Lambda Expression with one untyped parameter
 
 			final MethodParameter parameter = new MethodParameter(token.raw(), token.nameValue(), Types.UNKNOWN,
@@ -578,32 +581,47 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		if (ParserUtil.isExpressionTerminator(nextType) || nextType == DyvilSymbols.DOUBLE_ARROW_RIGHT
 			    || this.ignoreClosure(next))
 		{
-			// ... IDENTIFIER EXPRESSION-TERMINATOR
-			// e.g. this.someField ;
-			final FieldAccess access = new FieldAccess(token, this.value, name);
-			access.setDotless(!this.hasFlag(EXPLICIT_DOT));
-			this.value = access;
-			this.mode = ACCESS;
+			// IDENTIFIER END
+			// token      next
+			this.parseFieldAccess(token, name);
 			return;
 		}
 
 		if (ParserUtil.isIdentifier(nextType))
 		{
-			// ... IDENTIFIER IDENTIFIER ...
-			// e.g. this call ...
-			if (nextType != Tokens.LETTER_IDENTIFIER
-				    || !ParserUtil.isExpressionTerminator(next.next().type()))
-			// ... IDENTIFIER NON-EXPRESSION-TERMINATOR
+			// IDENTIFIER IDENTIFIER ...
+			// token      next       next2
+
+			final IToken next2 = next.next();
+			if (!ParserUtil.isExpressionTerminator(next2.type()))
 			{
-				final FieldAccess access = new FieldAccess(token, this.value, name);
-				access.setDotless(!this.hasFlag(EXPLICIT_DOT));
-				this.value = access;
-				this.mode = ACCESS;
+				if (nextType == Tokens.LETTER_IDENTIFIER)
+				{
+					// IDENTIFIER LETTER-IDENTIFIER ...
+					this.parseFieldAccess(token, name);
+					return;
+				}
+
+				// IDENTIFIER SYMBOL-IDENTIFIER ...
+				if (!ParserUtil.neighboring(next, next2)) // not a prefix operator
+				{
+					this.parseFieldAccess(token, name);
+					return;
+				}
+			}
+
+			// IDENTIFIER IDENTIFIER END
+			if (nextType != Tokens.LETTER_IDENTIFIER) // postfix operator
+			{
+				this.parseFieldAccess(token, name);
 				return;
 			}
 		}
 
-		// Else -> Fallback to single-argument call
+		// IDENTIFIER EXPRESSION
+		// token      next
+
+		// Fallback to single-argument call
 		// e.g. this.call 10;
 
 		final MethodCall call = new MethodCall(token, this.value, name, EmptyArguments.INSTANCE);
@@ -613,6 +631,14 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		this.mode = ACCESS;
 
 		this.parseApply(pm, token.next(), call);
+	}
+
+	private void parseFieldAccess(IToken token, Name name)
+	{
+		final FieldAccess access = new FieldAccess(token.raw(), this.value, name);
+		access.setDotless(!this.hasFlag(EXPLICIT_DOT));
+		this.value = access;
+		this.mode = ACCESS;
 	}
 
 	/**
