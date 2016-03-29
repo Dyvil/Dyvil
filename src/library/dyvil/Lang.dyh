@@ -74,24 +74,25 @@ type	Triple[A, B, C]		= (A, B, C)
 
 // ---------------------------------------- Operator Definitions Declarations ----------------------------------------
 
-// Top-Level Statements
-prefix	operator print		{ precedence 1 }
-prefix	operator println	{ precedence 1 }
-prefix	operator assert		{ precedence 1 }
-prefix	operator consume	{ precedence 1 }
-
 // Postfix Operators
 postfix	operator ++
 postfix	operator --
+postfix operator !
 
 // Prefix Operators
 prefix	operator +
 prefix	operator -
 prefix	operator ~
 prefix	operator !
+prefix	operator ++
+prefix	operator --
+
+// Assignment Operator
+infix	operator `=`	{ right, 100 }
 
 // Ternary Operator
-infix	operator ?		{ right, 100 }
+infix	operator ?		{ right, 150 }
+infix	operator `:`	{ right, 150 }
 
 // Boolean and Bitwise Operators
 infix	operator ||		{ left, 200 }

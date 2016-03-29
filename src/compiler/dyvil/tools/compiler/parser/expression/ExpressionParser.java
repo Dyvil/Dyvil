@@ -30,11 +30,11 @@ import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
-import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;
 
 public final class ExpressionParser extends Parser implements IValueConsumer
@@ -281,11 +281,6 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			case DyvilKeywords.WHILE:
 				this.end(pm, true);
 				return;
-			case BaseSymbols.EQUALS:
-				// EXPRESSION =
-
-				this.parseAssignment(pm, token);
-				return;
 			case DyvilKeywords.AS:
 			{
 				// EXPRESSION as
@@ -333,11 +328,17 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				this.mode = PARAMETERS_END;
 				return;
 			case BaseSymbols.COLON:
-				final ColonOperator colonOperator = new ColonOperator(token.raw(), this.value, null);
+				this.parseInfixAccess(pm, token, Names.colon);
+				return;
+			case BaseSymbols.EQUALS:
+				if (this.value == null)
+				{
+					pm.report(Markers.syntaxError(token, "assignment.invalid", token));
+					this.mode = VALUE;
+					return;
+				}
 
-				pm.pushParser(this.subParser(colonOperator::setRight));
-				this.value = colonOperator;
-				this.mode = END;
+				this.parseInfixAccess(pm, token, Names.eq);
 				return;
 			}
 
@@ -404,7 +405,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				pm.popParser(true);
 			}
 
-			pm.report(Markers.syntaxError(token, "expression.dot.invalid", token.toString()));
+			pm.report(Markers.syntaxError(token, "expression.dot.invalid"));
 			return;
 		}
 
@@ -477,7 +478,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				// OPERATOR EXPRESSION
 				// token    next
 
-				final MethodCall call = new MethodCall(token, null, name, EmptyArguments.VISIBLE);
+				final MethodCall call = new MethodCall(token.raw(), null, name, EmptyArguments.VISIBLE);
 
 				call.setDotless(true);
 				this.value = call;
@@ -492,7 +493,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				// EXPRESSION OPERATOR EOF
 				//            token    next
 
-				final MethodCall call = new MethodCall(token, this.value, name);
+				final MethodCall call = new MethodCall(token.raw(), this.value, name);
 				call.setDotless(true);
 				this.value = call;
 				this.mode = ACCESS;
@@ -548,7 +549,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			// IDENTIFIER [
 
 			final FieldAccess fieldAccess = new FieldAccess(token.raw(), this.value, name);
-			final SubscriptAccess subscriptAccess = new SubscriptAccess(token, fieldAccess);
+			final SubscriptAccess subscriptAccess = new SubscriptAccess(next.raw(), fieldAccess);
 
 			this.value = subscriptAccess;
 			this.mode = SUBSCRIPT_END;
@@ -624,7 +625,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		// Fallback to single-argument call
 		// e.g. this.call 10;
 
-		final MethodCall call = new MethodCall(token, this.value, name, EmptyArguments.INSTANCE);
+		final MethodCall call = new MethodCall(token.raw(), this.value, name, EmptyArguments.INSTANCE);
 		call.setDotless(!this.hasFlag(EXPLICIT_DOT));
 
 		this.value = call;
@@ -678,79 +679,6 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		final SingleArgument argument = new SingleArgument();
 		call.setArguments(argument);
 		pm.pushParser(new StatementListParser(argument, true));
-	}
-
-	/**
-	 * Parses an assignment based on the current {@code value}.
-	 *
-	 * @param pm
-	 * 	the current parsing context manager
-	 * @param token
-	 * 	the current token, i.e. the '=' sign
-	 */
-	private void parseAssignment(IParserManager pm, IToken token)
-	{
-		if (this.value != null)
-		{
-			final ICodePosition position = this.value.getPosition();
-			final int valueType = this.value.valueTag();
-
-			switch (valueType)
-			{
-			case IValue.FIELD_ACCESS:
-			{
-				// ... IDENTIFIER =
-
-				final FieldAccess access = (FieldAccess) this.value;
-				final FieldAssignment assignment = new FieldAssignment(position, access.getInstance(),
-				                                                       access.getName());
-				this.value = assignment;
-				pm.pushParser(this.subParser(assignment));
-				return;
-			}
-			case IValue.APPLY_CALL:
-			{
-				// ... ( ... ) =
-
-				final ApplyMethodCall applyCall = (ApplyMethodCall) this.value;
-				final UpdateMethodCall updateCall = new UpdateMethodCall(position, applyCall.getReceiver(),
-				                                                         applyCall.getArguments());
-
-				this.value = updateCall;
-				pm.pushParser(this.subParser(updateCall));
-				return;
-			}
-			case IValue.METHOD_CALL:
-			{
-				// ... IDENTIFIER ( ... ) =
-
-				final MethodCall call = (MethodCall) this.value;
-				final FieldAccess access = new FieldAccess(position, call.getReceiver(), call.getName());
-				final UpdateMethodCall updateCall = new UpdateMethodCall(position, access, call.getArguments());
-
-				this.value = updateCall;
-				pm.pushParser(this.subParser(updateCall));
-				return;
-			}
-			case IValue.SUBSCRIPT_GET:
-			{
-				// ... [ ... ] =
-
-				final SubscriptAccess subscriptAccess = (SubscriptAccess) this.value;
-				final SubscriptAssignment subscriptAssignment = new SubscriptAssignment(position,
-				                                                                        subscriptAccess.getReceiver(),
-				                                                                        subscriptAccess.getArguments());
-
-				this.value = subscriptAssignment;
-				pm.pushParser(this.subParser(subscriptAssignment));
-				return;
-			}
-			}
-		}
-
-		pm.report(Markers.syntaxError(token, "assignment.invalid", token));
-		this.mode = VALUE;
-		this.value = null;
 	}
 
 	private boolean parseValue(IParserManager pm, IToken token, int type)

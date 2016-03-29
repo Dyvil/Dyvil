@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.operator;
 
 import dyvil.collection.Stack;
 import dyvil.collection.mutable.LinkedList;
-import dyvil.tools.compiler.ast.access.MethodCall;
+import dyvil.tools.compiler.ast.access.*;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
@@ -164,14 +165,72 @@ public class OperatorChain implements IValue
 		return operator;
 	}
 
-	private void pushCall(Stack<IValue> stack, int position)
+	private void pushCall(Stack<IValue> stack, int index)
 	{
 		final IValue rhs = stack.pop();
 		final IValue lhs = stack.pop();
-		final MethodCall methodCall = new MethodCall(this.operatorPositions[position], lhs, this.operators[position],
-		                                             new SingleArgument(rhs));
+
+		final Name operator = this.operators[index];
+		final ICodePosition position = this.operatorPositions[index];
+
+		if (operator == Names.colon)
+		{
+			stack.push(new ColonOperator(position, lhs, rhs));
+			return;
+		}
+		if (operator == Names.eq)
+		{
+			final IValue assignment = assignment(position, lhs, rhs);
+			if (assignment != null)
+			{
+				stack.push(assignment);
+				return;
+			}
+		}
+
+		final MethodCall methodCall = new MethodCall(position, lhs, operator, new SingleArgument(rhs));
 		methodCall.setDotless(true);
 		stack.push(methodCall);
+	}
+
+	private static IValue assignment(ICodePosition position, IValue lhs, IValue rhs)
+	{
+		switch (lhs.valueTag())
+		{
+		case IValue.FIELD_ACCESS:
+		{
+			final FieldAccess access = (FieldAccess) lhs;
+			final FieldAssignment assignment = new FieldAssignment(position, access.getInstance(), access.getName());
+			assignment.setValue(rhs);
+			return assignment;
+		}
+		case IValue.APPLY_CALL:
+		{
+			final ApplyMethodCall applyCall = (ApplyMethodCall) lhs;
+			final UpdateMethodCall updateCall = new UpdateMethodCall(position, applyCall.getReceiver(),
+			                                                         applyCall.getArguments());
+			updateCall.setValue(rhs);
+			return updateCall;
+		}
+		case IValue.METHOD_CALL:
+		{
+			final MethodCall call = (MethodCall) lhs;
+			final FieldAccess access = new FieldAccess(position, call.getReceiver(), call.getName());
+			final UpdateMethodCall updateCall = new UpdateMethodCall(position, access, call.getArguments());
+			updateCall.setValue(rhs);
+			return updateCall;
+		}
+		case IValue.SUBSCRIPT_GET:
+		{
+			final SubscriptAccess subscriptAccess = (SubscriptAccess) lhs;
+			final SubscriptAssignment subscriptAssignment = new SubscriptAssignment(position,
+			                                                                        subscriptAccess.getReceiver(),
+			                                                                        subscriptAccess.getArguments());
+			subscriptAssignment.setValue(rhs);
+			return subscriptAssignment;
+		}
+		}
+		return null;
 	}
 
 	@Override
