@@ -93,7 +93,7 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 			}
 			return;
 		case EXPRESSION:
-			if (type == BaseSymbols.SEMICOLON)
+			if (type == BaseSymbols.SEMICOLON || type == BaseSymbols.COMMA)
 			{
 				return;
 			}

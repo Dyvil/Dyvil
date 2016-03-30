@@ -51,6 +51,12 @@ public final class TypeParser extends Parser implements ITypeConsumer
 		this.mode = NAME;
 	}
 
+	public TypeParser(ITypeConsumer consumer, IType parentType)
+	{
+		this.consumer = consumer;
+		this.parentType = parentType;
+	}
+
 	public void setNamedOnly(boolean namedOnly)
 	{
 		this.namedOnly = namedOnly;
@@ -94,6 +100,11 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					return;
 				}
 			}
+			if (type == BaseSymbols.DOT)
+			{
+				pm.pushParser(new TypeParser(this, this.type));
+				return;
+			}
 
 			if (this.type != null)
 			{
@@ -105,7 +116,6 @@ public final class TypeParser extends Parser implements ITypeConsumer
 		case NAME:
 			if (!this.namedOnly)
 			{
-
 				switch (type)
 				{
 				case DyvilSymbols.AT:
@@ -143,7 +153,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				}
 				case DyvilSymbols.DOUBLE_ARROW_RIGHT:
 				{
-					final LambdaType lambdaType = new LambdaType(token.raw());
+					final LambdaType lambdaType = new LambdaType(token.raw(), this.parentType);
 					pm.pushParser(new TypeParser(lambdaType));
 					this.type = lambdaType;
 					this.mode = LAMBDA_END;
@@ -171,7 +181,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				case DyvilSymbols.DOUBLE_ARROW_RIGHT:
 					if (this.parentType == null && !this.namedOnly)
 					{
-						LambdaType lt = new LambdaType(new NamedType(token.raw(), token.nameValue()));
+						LambdaType lt = new LambdaType(new NamedType(token.raw(), token.nameValue(), this.parentType));
 						lt.setPosition(next.raw());
 						this.type = lt;
 						this.mode = LAMBDA_END;
@@ -180,15 +190,6 @@ public final class TypeParser extends Parser implements ITypeConsumer
 						return;
 					}
 					break; // intentional
-				case BaseSymbols.DOT:
-					NamedType namedType = new NamedType(token.raw(), token.nameValue(), this.parentType);
-					TypeParser parser = new TypeParser(this);
-					parser.parentType = namedType;
-
-					pm.pushParser(parser);
-					pm.skip();
-					this.mode = END;
-					return;
 				}
 
 				this.type = new NamedType(token.raw(), token.nameValue(), this.parentType);
@@ -267,9 +268,6 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				this.mode = GENERICS_END;
 				return;
 			}
-			this.type.expandPosition(token.prev());
-			this.consumer.setType(this.type);
-			pm.popParser(true);
 			return;
 		case WILDCARD_TYPE:
 		{

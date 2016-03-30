@@ -54,10 +54,10 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		this.parameterTypes = new IType[2];
 	}
 
-	public LambdaType(IType type)
+	public LambdaType(IType parameterType)
 	{
 		this.parameterTypes = new IType[1];
-		this.parameterTypes[0] = type;
+		this.parameterTypes[0] = parameterType;
 		this.parameterCount = 1;
 	}
 
@@ -71,6 +71,25 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	public LambdaType(int typeCount)
 	{
 		this.parameterTypes = new IType[typeCount];
+	}
+
+	public LambdaType(ICodePosition position)
+	{
+		this();
+		this.position = position;
+	}
+
+	public LambdaType(ICodePosition position, IType receiverType)
+	{
+		this.position = position;
+
+		if (receiverType != null) {
+			this.parameterTypes = new IType[] { receiverType };
+			this.parameterCount = 1;
+			return;
+		}
+
+		this.parameterTypes = new IType[2];
 	}
 
 	public LambdaType(ICodePosition position, IType receiverType, TupleType tupleType)
@@ -92,12 +111,6 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		this.parameterTypes[0] = receiverType;
 
 		System.arraycopy(tupleType.types, 0, this.parameterTypes, 1, tupleType.typeCount);
-	}
-
-	public LambdaType(ICodePosition position)
-	{
-		this();
-		this.position = position;
 	}
 
 	public static IClass getLambdaClass(int typeCount)
