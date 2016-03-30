@@ -30,14 +30,19 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	public static final int NAME      = 2;
 	public static final int SEPARATOR = 4;
 
+	// Flags
+
+	private static final int VARARGS          = 1;
+	public static final  int LAMBDA_ARROW_END = 2;
+
 	protected IParameterConsumer consumer;
 
 	// Metadata
 	private ModifierList   modifiers;
 	private AnnotationList annotations;
 
-	private IType   type;
-	private boolean varargs;
+	private IType type;
+	private int   flags;
 
 	public ParameterListParser(IParameterConsumer consumer)
 	{
@@ -45,12 +50,23 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 		this.mode = TYPE;
 	}
 
+	public ParameterListParser withFlags(int flags)
+	{
+		this.flags |= flags;
+		return this;
+	}
+
 	private void reset()
 	{
 		this.modifiers = null;
 		this.annotations = null;
 		this.type = null;
-		this.varargs = false;
+		this.flags &= ~VARARGS;
+	}
+
+	private boolean hasFlag(int flag)
+	{
+		return (this.flags & flag) != 0;
 	}
 
 	@Override
@@ -78,13 +94,18 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				return;
 			}
 
-			if (ParserUtil.isIdentifier(type) && ParserUtil.isTerminator(token.next().type()))
+			if (ParserUtil.isIdentifier(type))
 			{
-				// ... , IDENTIFIER , ...
-				this.type = Types.UNKNOWN;
-				this.mode = NAME;
-				pm.reparse();
-				return;
+				final int nextType = token.next().type();
+				if (ParserUtil.isTerminator(nextType) || nextType == DyvilSymbols.DOUBLE_ARROW_RIGHT && this.hasFlag(
+					LAMBDA_ARROW_END))
+				{
+					// ... , IDENTIFIER , ...
+					this.type = Types.UNKNOWN;
+					this.mode = NAME;
+					pm.reparse();
+					return;
+				}
 			}
 
 			if (type == DyvilSymbols.AT)
@@ -115,12 +136,12 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				pm.popParser();
 				return;
 			case DyvilSymbols.ELLIPSIS:
-				if (this.varargs)
+				if (this.hasFlag(VARARGS))
 				{
 					pm.report(token, "parameter.identifier");
 					return;
 				}
-				this.varargs = true;
+				this.flags |= VARARGS;
 				return;
 			case DyvilKeywords.THIS:
 				this.mode = SEPARATOR;
@@ -145,7 +166,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				return;
 			}
 
-			if (this.varargs)
+			if (this.hasFlag(VARARGS))
 			{
 				this.type = new ArrayType(this.type);
 			}
@@ -182,6 +203,12 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 
 			switch (type)
 			{
+			case DyvilSymbols.DOUBLE_ARROW_RIGHT:
+				if (!this.hasFlag(LAMBDA_ARROW_END))
+				{
+					break; // produce a syntax error
+				}
+				// Fallthrough
 			case BaseSymbols.CLOSE_PARENTHESIS:
 			case BaseSymbols.CLOSE_CURLY_BRACKET:
 			case BaseSymbols.CLOSE_SQUARE_BRACKET:
@@ -204,7 +231,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 		final IParameter parameter = this.consumer
 			                             .createParameter(token.raw(), token.nameValue(), this.type, this.modifiers,
 			                                              this.annotations);
-		parameter.setVarargs(this.varargs);
+		parameter.setVarargs(this.hasFlag(VARARGS));
 		return parameter;
 	}
 

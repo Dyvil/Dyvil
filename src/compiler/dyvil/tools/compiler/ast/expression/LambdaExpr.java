@@ -887,6 +887,9 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			buffer.append(' ');
 		}
 
-		this.value.toString(prefix, buffer);
+		if (this.value != null)
+		{
+			this.value.toString(prefix, buffer);
+		}
 	}
 }

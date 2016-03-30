@@ -114,7 +114,7 @@ public class ParserUtil
 					return null;
 				}
 				braceDepth--;
-				continue;
+				break;
 			}
 
 			if (parenDepth == 0 && bracketDepth == 0 && braceDepth == 0)
