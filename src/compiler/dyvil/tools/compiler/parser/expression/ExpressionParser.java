@@ -314,12 +314,13 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			case BaseSymbols.OPEN_SQUARE_BRACKET:
 				// EXPRESSION [
 
-				// Parse a subscript getter
+				// Parse a subscript access
 				// e.g. this[1], array[0]
-				SubscriptAccess getter = new SubscriptAccess(token, this.value);
-				this.value = getter;
+
+				final SubscriptAccess subscriptAccess = new SubscriptAccess(token, this.value);
+				ArgumentListParser.parseArguments(pm, token.next(), subscriptAccess);
+				this.value = subscriptAccess;
 				this.mode = SUBSCRIPT_END;
-				pm.pushParser(new ExpressionListParser((IValueList) getter.getArguments()));
 				return;
 			case BaseSymbols.OPEN_PARENTHESIS:
 				// EXPRESSION (
@@ -519,11 +520,11 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 			final FieldAccess fieldAccess = new FieldAccess(token.raw(), this.value, name);
 			final SubscriptAccess subscriptAccess = new SubscriptAccess(next.raw(), fieldAccess);
+			ArgumentListParser.parseArguments(pm, next.next(), subscriptAccess);
 
 			this.value = subscriptAccess;
 			this.mode = SUBSCRIPT_END;
 			pm.skip();
-			pm.pushParser(new ExpressionListParser((IValueList) subscriptAccess.getArguments()));
 			return;
 		}
 		case DyvilSymbols.DOUBLE_ARROW_RIGHT:

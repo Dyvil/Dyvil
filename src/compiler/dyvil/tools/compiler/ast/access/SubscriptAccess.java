@@ -4,7 +4,6 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Names;
@@ -16,14 +15,12 @@ public class SubscriptAccess extends AbstractCall
 	public SubscriptAccess(ICodePosition position)
 	{
 		this.position = position;
-		this.arguments = new ArgumentList();
 	}
 
 	public SubscriptAccess(ICodePosition position, IValue instance)
 	{
 		this.position = position;
 		this.receiver = instance;
-		this.arguments = new ArgumentList();
 	}
 
 	public SubscriptAccess(ICodePosition position, IValue instance, IArguments arguments)
