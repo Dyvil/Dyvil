@@ -1,5 +1,6 @@
 package dyvil.collection;
 
+import dyvil.annotation._internal.Covariant;
 import dyvil.tuple.Tuple2;
 
 import java.io.Serializable;
@@ -15,7 +16,7 @@ import java.util.Objects;
  * @param <V>
  * 		the type of the value
  */
-public interface Entry<K, V> extends Serializable
+public interface Entry<@Covariant K, @Covariant V> extends Serializable
 {
 	/**
 	 * Returns the key stored by this entry
@@ -38,7 +39,7 @@ public interface Entry<K, V> extends Serializable
 	 */
 	default Tuple2<K, V> toTuple()
 	{
-		return new Tuple2<K, V>(this.getKey(), this.getValue());
+		return new Tuple2<>(this.getKey(), this.getValue());
 	}
 	
 	/**
@@ -96,12 +97,7 @@ public interface Entry<K, V> extends Serializable
 	
 	static boolean entryEquals(Entry<?, ?> entry, Object o)
 	{
-		if (!(o instanceof Entry))
-		{
-			return false;
-		}
-		
-		return entryEquals(entry, (Entry) o);
+		return o instanceof Entry && entryEquals(entry, (Entry) o);
 	}
 	
 	static boolean entryEquals(Entry<?, ?> entry1, Entry<?, ?> entry2)
