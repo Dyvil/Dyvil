@@ -9,6 +9,8 @@ import dyvil.tools.compiler.ast.expression.*;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.operator.OperatorChain;
+import dyvil.tools.compiler.ast.operator.PostfixCall;
+import dyvil.tools.compiler.ast.operator.PrefixCall;
 import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.statement.ReturnStatement;
@@ -495,9 +497,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				// EXPRESSION OPERATOR EOF
 				//            token    next
 
-				final MethodCall call = new MethodCall(token.raw(), this.value, name);
-				call.setDotless(true);
-				this.value = call;
+				this.value = new PostfixCall(token.raw(), this.value, name);
 				this.mode = ACCESS;
 				return;
 			}
