@@ -465,10 +465,11 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 	private void parseInfixAccess(IParserManager pm, IToken token, Name name)
 	{
+		final int type = token.type();
 		final IToken next = token.next();
 		final int nextType = next.type();
 
-		if (token.type() != Tokens.LETTER_IDENTIFIER)
+		if (type == Tokens.SYMBOL_IDENTIFIER || (type & Tokens.SYMBOL) != 0)
 		{
 			// Identifier is an operator
 
@@ -529,7 +530,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			return;
 		}
 
-		// Identifier is nor an operator
+		// Identifier is not an operator
 
 		switch (nextType)
 		{
@@ -597,7 +598,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			final IToken next2 = next.next();
 			if (!ParserUtil.isExpressionTerminator(next2.type()))
 			{
-				if (nextType == Tokens.LETTER_IDENTIFIER)
+				if (nextType != Tokens.SYMBOL_IDENTIFIER)
 				{
 					// IDENTIFIER LETTER-IDENTIFIER ...
 					this.parseFieldAccess(token, name);
@@ -613,7 +614,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			}
 
 			// IDENTIFIER IDENTIFIER END
-			if (nextType != Tokens.LETTER_IDENTIFIER) // postfix operator
+			if (nextType == Tokens.SYMBOL_IDENTIFIER) // postfix operator
 			{
 				this.parseFieldAccess(token, name);
 				return;
