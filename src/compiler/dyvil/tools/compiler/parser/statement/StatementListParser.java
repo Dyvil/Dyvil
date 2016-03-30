@@ -42,10 +42,11 @@ import static dyvil.tools.compiler.parser.method.ParameterListParser.LAMBDA_ARRO
 
 public final class StatementListParser extends Parser implements IValueConsumer, IMemberConsumer<IVariable>
 {
-	private static final int OPEN_BRACKET = 0;
-	private static final int LAMBDA_ARROW = 1;
-	private static final int EXPRESSION   = 2;
-	private static final int SEPARATOR    = 4;
+	private static final int OPEN_BRACKET          = 0;
+	private static final int LAMBDA_PARAMETERS_END = 1;
+	private static final int LAMBDA_ARROW          = 2;
+	private static final int EXPRESSION            = 4;
+	private static final int SEPARATOR             = 8;
 
 	protected IValueConsumer consumer;
 	protected boolean        closure;
@@ -87,20 +88,33 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 		if (type == Tokens.EOF)
 		{
 			this.end(pm);
-			pm.report(token, "statementlist.close_brace");
+			pm.report(token, "statement_list.close_brace");
 			return;
 		}
 
 		switch (this.mode)
 		{
 		case OPEN_BRACKET:
-			final IToken lambdaArrow = this.findLambdaArrow(token.next());
+		{
+			final IToken next = token.next();
+			final IToken lambdaArrow = this.findLambdaArrow(next);
 			if (lambdaArrow != null)
 			{
-				this.mode = LAMBDA_ARROW;
 				this.lambdaExpr = new LambdaExpr(lambdaArrow.raw());
 				this.lambdaExpr.setValue(this.statementList = new StatementList(token));
-				pm.pushParser(new ParameterListParser(this.lambdaExpr).withFlags(LAMBDA_ARROW_END));
+
+				if (next.type() == BaseSymbols.OPEN_PARENTHESIS)
+				{
+					pm.skip();
+					pm.pushParser(new ParameterListParser(this.lambdaExpr));
+					this.mode = LAMBDA_PARAMETERS_END;
+					return;
+				}
+				else
+				{
+					pm.pushParser(new ParameterListParser(this.lambdaExpr).withFlags(LAMBDA_ARROW_END));
+					this.mode = LAMBDA_ARROW;
+				}
 				return;
 			}
 
@@ -108,12 +122,24 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 			this.mode = EXPRESSION;
 			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
 			{
-				pm.report(token, "statementlist.open_brace");
+				pm.report(token, "statement_list.open_brace");
 				pm.reparse();
 			}
 			return;
+		}
+		case LAMBDA_PARAMETERS_END:
+			this.mode = LAMBDA_ARROW;
+			if (type != BaseSymbols.CLOSE_PARENTHESIS)
+			{
+				pm.report(token, "statement_list.lambda.close_paren");
+			}
+			return;
 		case LAMBDA_ARROW:
-			assert type == DyvilSymbols.DOUBLE_ARROW_RIGHT;
+			if (type != DyvilSymbols.DOUBLE_ARROW_RIGHT)
+			{
+				pm.report(token, "statement_list.lambda.arrow");
+				return;
+			}
 			this.mode = EXPRESSION;
 			return;
 		case EXPRESSION:
@@ -159,7 +185,7 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 				pm.reparse();
 				return;
 			}
-			pm.report(token, "statementlist.semicolon");
+			pm.report(token, "statement_list.semicolon");
 		}
 	}
 
@@ -203,6 +229,12 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 					return null;
 				}
 				braceDepth--;
+				continue;
+			case BaseSymbols.EQUALS:
+				if (parenDepth == 0 && bracketDepth == 0 && braceDepth == 0)
+				{
+					return null;
+				}
 				continue;
 			case DyvilSymbols.DOUBLE_ARROW_RIGHT:
 				if (parenDepth == 0 && bracketDepth == 0 && braceDepth == 0)
