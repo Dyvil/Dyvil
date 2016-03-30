@@ -84,6 +84,11 @@ public class OperatorChain implements IValue
 		{
 			this.operands[i].resolveTypes(markers, context);
 		}
+
+		for (int i = 0; i < this.operatorCount; i++)
+		{
+			this.operators[i].resolve(markers, context);
+		}
 	}
 
 	@Override
@@ -94,14 +99,8 @@ public class OperatorChain implements IValue
 		case 0:
 			return this.operands[0];
 		case 1:
-			this.operators[0].resolve(markers, context);
 			return createCall(this.operators[0], this.operands[0], this.operands[1]).resolve(markers, context);
 		// TODO Inline Operator resolution for 2 operators?
-		}
-
-		for (int i = 0; i < this.operatorCount; i++)
-		{
-			this.operators[i].resolve(markers, context);
 		}
 
 		final Stack<OperatorElement> operatorStack = new LinkedList<>();

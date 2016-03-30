@@ -2,7 +2,10 @@ package dyvil.tools.compiler.ast.access;
 
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.operator.IOperator;
+import dyvil.tools.compiler.ast.operator.OperatorElement;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -28,9 +31,19 @@ public class PrefixCall extends MethodCall
 	}
 
 	@Override
-	public IValue resolve(MarkerList markers, IContext context)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		return super.resolve(markers, context);
+		final IOperator operator = IContext.resolveOperator(context, this.name, IOperator.PREFIX);
+		if (operator == null)
+		{
+			markers.add(Markers.semantic(this.position, "operator.unresolved", this.name));
+		}
+		else
+		{
+			OperatorElement.checkPosition(markers, this.position, operator, IOperator.PREFIX);
+		}
+
+		super.resolveTypes(markers, context);
 	}
 
 	@Override

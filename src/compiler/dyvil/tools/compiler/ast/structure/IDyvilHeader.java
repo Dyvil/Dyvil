@@ -80,7 +80,7 @@ public interface IDyvilHeader extends IObjectCompilable, IStaticContext, IClassL
 	int operatorCount();
 
 	@Override
-	IOperator resolveOperator(Name name);
+	IOperator resolveOperator(Name name, int type);
 	
 	IOperator getOperator(int index);
 

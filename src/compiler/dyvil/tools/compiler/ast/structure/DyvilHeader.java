@@ -74,7 +74,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	protected IOperator[]          operators;
 	protected int                  operatorCount;
 
-	protected Map<Name, IOperator> operatorMap;
+	protected Map<Name, IOperator> infixOperatorMap;
 
 	protected HeaderDeclaration headerDeclaration;
 
@@ -302,20 +302,38 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 
 	@Override
-	public IOperator resolveOperator(Name name)
+	public IOperator resolveOperator(Name name, int type)
 	{
-		if (this.operatorMap != null)
+		if (type == IOperator.INFIX && this.infixOperatorMap != null)
 		{
-			final IOperator operator = this.operatorMap.get(name);
+			final IOperator operator = this.infixOperatorMap.get(name);
 			if (operator != null)
 			{
 				return operator;
 			}
 		}
 
+		IOperator candidate = null;
+		for (int i = 0; i < this.operatorCount; i++)
+		{
+			final IOperator operator = this.operators[i];
+			if (operator.getName() == name)
+			{
+				if (operator.getType() == type)
+				{
+					return operator;
+				}
+				candidate = operator;
+			}
+		}
+		if (candidate != null)
+		{
+			return candidate;
+		}
+
 		for (int i = 0; i < this.includeCount; i++)
 		{
-			final IOperator operator = this.includes[i].getHeader().resolveOperator(name);
+			final IOperator operator = this.includes[i].getHeader().resolveOperator(name, type);
 			if (operator != null)
 			{
 				return operator;
@@ -361,17 +379,17 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		}
 
 		final Name name = operator.getName();
-		if (this.operatorMap == null)
+		if (this.infixOperatorMap == null)
 		{
-			this.operatorMap = new IdentityHashMap<>();
-			this.operatorMap.put(name, operator);
+			this.infixOperatorMap = new IdentityHashMap<>();
+			this.infixOperatorMap.put(name, operator);
 			return;
 		}
 
-		final IOperator existing = this.operatorMap.get(name);
+		final IOperator existing = this.infixOperatorMap.get(name);
 		if (existing == null)
 		{
-			this.operatorMap.put(name, operator);
+			this.infixOperatorMap.put(name, operator);
 		}
 	}
 
