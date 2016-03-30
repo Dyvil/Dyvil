@@ -72,18 +72,20 @@ type	ImmutableMap[K, V]	= [final K : V]
 type	Pair[A, B]			= (A, B)
 type	Triple[A, B, C]		= (A, B, C)
 
-// ---------------------------------------- Operator Definitions Declarations ----------------------------------------
+// ---------------------------------------- Operator Definitions ----------------------------------------
 
 // Postfix Operators
+postfix operator !	// unwrap operator
 postfix	operator ++
 postfix	operator --
-postfix operator !
 
 // Prefix Operators
 prefix	operator +
 prefix	operator -
 prefix	operator ~
 prefix	operator !
+prefix	operator &	// reference operator
+prefix	operator *	// de-reference operator
 prefix	operator ++
 prefix	operator --
 
