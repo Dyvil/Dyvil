@@ -780,41 +780,33 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			this.mode = ACCESS;
 			return true;
 		case DyvilKeywords.INIT:
+			// init ...
 			this.mode = ACCESS;
 			pm.pushParser(new ThisSuperInitParser(this), true);
 			return true;
 		case DyvilKeywords.THIS:
+			// this ...
 			this.mode = ACCESS;
 			pm.pushParser(new ThisSuperInitParser(this, false));
 			return true;
 		case DyvilKeywords.SUPER:
+			// super ...
 			this.mode = ACCESS;
 			pm.pushParser(new ThisSuperInitParser(this, true));
 			return true;
 		case DyvilKeywords.CLASS:
-		{
 			// class ...
-
-			final ClassOperator classOperator = new ClassOperator(token);
-			this.value = classOperator;
-
-			pm.pushParser(new TypeParser(classOperator));
 			this.mode = ACCESS;
+			pm.pushParser(new TypeClassParser(this, token, true));
 			return true;
-		}
 		case DyvilKeywords.TYPE:
-		{
 			// type ...
-
-			TypeOperator typeOperator = new TypeOperator(token);
-			this.value = typeOperator;
-
-			pm.pushParser(new TypeParser(typeOperator));
 			this.mode = ACCESS;
+			pm.pushParser(new TypeClassParser(this, token, false));
 			return true;
-		}
 		case DyvilKeywords.NEW:
 			// new ...
+			this.mode = ACCESS;
 			pm.pushParser(new ConstructorCallParser(this), true);
 			return true;
 		case DyvilKeywords.RETURN:
