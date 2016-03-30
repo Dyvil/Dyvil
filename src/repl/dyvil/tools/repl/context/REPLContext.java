@@ -47,7 +47,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberConsumer<REPLVariable>, IClassCompilableList
 {
 	private static final String REPL$CLASSES     = "repl$classes/";
-	public static final  int    ACCESS_MODIFIERS = Modifiers.PUBLIC | Modifiers.PRIVATE | Modifiers.PROTECTED;
 
 	protected final DyvilREPL repl;
 
@@ -103,7 +102,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 	public void startEvaluation(String code)
 	{
 		this.currentCode = code;
-		this.className = REPL$CLASSES + "REPL$Result$" + this.classIndex++;
+		this.className = REPL$CLASSES + "REPL$Result" + this.classIndex++;
 		this.cleanup();
 	}
 
@@ -547,7 +546,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 
 	public static void updateModifiers(ModifierSet modifiers)
 	{
-		if ((modifiers.toFlags() & ACCESS_MODIFIERS) == 0)
+		if ((modifiers.toFlags() & Modifiers.VISIBILITY_MODIFIERS) == 0)
 		{
 			modifiers.addIntModifier(Modifiers.PUBLIC);
 		}
