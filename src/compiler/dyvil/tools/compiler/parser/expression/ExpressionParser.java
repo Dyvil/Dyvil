@@ -8,7 +8,9 @@ import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.*;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
-import dyvil.tools.compiler.ast.operator.*;
+import dyvil.tools.compiler.ast.operator.OperatorChain;
+import dyvil.tools.compiler.ast.operator.PostfixCall;
+import dyvil.tools.compiler.ast.operator.PrefixCall;
 import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.statement.ReturnStatement;
@@ -36,6 +38,8 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
+
+import static dyvil.tools.compiler.parser.ParserUtil.neighboring;
 
 public final class ExpressionParser extends Parser implements IValueConsumer
 {
@@ -430,39 +434,37 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 	private void parseInfixAccess(IParserManager pm, IToken token, Name name)
 	{
+		final int type = token.type();
 		final IToken next = token.next();
 		final int nextType = next.type();
 
-		if (token.type() != Tokens.LETTER_IDENTIFIER)
+		if (type == Tokens.SYMBOL_IDENTIFIER || (type & Tokens.SYMBOL) != 0)
 		{
 			// Identifier is an operator
 
-			final boolean neighboringLeft = ParserUtil.neighboring(token.prev(), token);
-			final boolean neighboringRight = ParserUtil.neighboring(token, token.next());
+			final boolean neighboringLeft = neighboring(token.prev(), token);
+			final boolean neighboringRight = neighboring(token, next);
 
 			if (this.value == null || neighboringRight && !neighboringLeft) // prefix
 			{
 				// OPERATOR EXPRESSION
 				// token    next
 
-				final MethodCall call = new MethodCall(token.raw(), null, name, EmptyArguments.VISIBLE);
-
-				call.setDotless(true);
+				final PrefixCall call = new PrefixCall(token.raw(), name);
 				this.value = call;
 				this.mode = ACCESS;
 
 				this.parseApply(pm, next, call);
 				return;
 			}
-			if (ParserUtil.isExpressionTerminator(nextType) || neighboringLeft && !neighboringRight) // postfix
+			if (ParserUtil.isExpressionTerminator(nextType) || neighboringLeft && !neighboringRight // postfix
+				                                                   && !neighboring(next, next.next()))
 			{
 				// EXPRESSION_OPERATOR EXPRESSION
 				// EXPRESSION OPERATOR EOF
 				//            token    next
 
-				final MethodCall call = new MethodCall(token.raw(), this.value, name);
-				call.setDotless(true);
-				this.value = call;
+				this.value = new PostfixCall(token.raw(), this.value, name);
 				this.mode = ACCESS;
 				return;
 			}
@@ -479,7 +481,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 			final OperatorChain chain;
 
-			if (this.value instanceof OperatorChain)
+			if (this.value.valueTag() == IValue.OPERATOR_CHAIN)
 			{
 				chain = (OperatorChain) this.value;
 			}
@@ -495,7 +497,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			return;
 		}
 
-		// Identifier is nor an operator
+		// Identifier is not an operator
 
 		switch (nextType)
 		{
@@ -563,7 +565,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			final IToken next2 = next.next();
 			if (!ParserUtil.isExpressionTerminator(next2.type()))
 			{
-				if (nextType == Tokens.LETTER_IDENTIFIER)
+				if (nextType != Tokens.SYMBOL_IDENTIFIER)
 				{
 					// IDENTIFIER LETTER-IDENTIFIER ...
 					this.parseFieldAccess(token, name);
@@ -571,7 +573,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				}
 
 				// IDENTIFIER SYMBOL-IDENTIFIER ...
-				if (!ParserUtil.neighboring(next, next2)) // not a prefix operator
+				if (!neighboring(next, next2)) // not a prefix operator
 				{
 					this.parseFieldAccess(token, name);
 					return;
@@ -579,7 +581,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			}
 
 			// IDENTIFIER IDENTIFIER END
-			if (nextType != Tokens.LETTER_IDENTIFIER) // postfix operator
+			if (nextType == Tokens.SYMBOL_IDENTIFIER) // postfix operator
 			{
 				this.parseFieldAccess(token, name);
 				return;

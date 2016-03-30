@@ -8,11 +8,11 @@ import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-class OperatorElement
+public class OperatorElement
 {
 	protected final Name          name;
 	protected final ICodePosition position;
-	protected       IOperator      operator;
+	protected       IOperator     operator;
 
 	public OperatorElement(Name name, ICodePosition position)
 	{
@@ -22,19 +22,14 @@ class OperatorElement
 
 	protected void resolve(MarkerList markers, IContext context)
 	{
-		IOperator operator = IContext.resolveOperator(context, this.name);
+		IOperator operator = IContext.resolveOperator(context, this.name, IOperator.INFIX);
 
 		if (operator != null)
 		{
 			this.operator = operator;
 
 			// Infix check
-			if (operator.getType() != IOperator.INFIX)
-			{
-				final Marker marker = Markers.semantic(this.position, "operator.not_infix", this.name);
-				marker.addInfo(Markers.getSemantic("operator.declaration", operator.toString()));
-				markers.add(marker);
-			}
+			checkPosition(markers, this.position, operator, IOperator.INFIX);
 			return;
 		}
 
@@ -48,7 +43,7 @@ class OperatorElement
 
 		// = at the end
 		final Name removeEq = Util.removeEq(this.name);
-		operator = IContext.resolveOperator(context, removeEq);
+		operator = IContext.resolveOperator(context, removeEq, IOperator.INFIX);
 
 		if (operator == null)
 		{
@@ -63,5 +58,30 @@ class OperatorElement
 
 		// No infix check required, the type is ID_INFIX_RIGHT
 		this.operator = operator;
+	}
+
+	public static void checkPosition(MarkerList markers, ICodePosition position, IOperator operator, int expectedType)
+	{
+		if (operator.getType() != expectedType)
+		{
+			final Marker marker = Markers.semantic(position, "operator.invalid_position", operator.getName(),
+			                                       typeToString(operator.getType()), typeToString(expectedType));
+			marker.addInfo(Markers.getSemantic("operator.declaration", operator.toString()));
+			markers.add(marker);
+		}
+	}
+
+	private static String typeToString(int type)
+	{
+		switch (type)
+		{
+		case IOperator.INFIX:
+			return "infix";
+		case IOperator.PREFIX:
+			return "prefix";
+		case IOperator.POSTFIX:
+			return "postfix";
+		}
+		return null;
 	}
 }

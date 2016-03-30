@@ -571,7 +571,7 @@ public final class DyvilLexer
 			final int keywordType = this.symbols.getKeywordType(s);
 			if (keywordType == 0)
 			{
-				return new IdentifierToken(prev, Name.get(s), type, line, start, start + len);
+				return new IdentifierToken(prev, Name.get(s), LETTER_IDENTIFIER, line, start, start + len);
 			}
 			return new SymbolToken(this.symbols, prev, keywordType, line, start);
 		}
@@ -582,12 +582,12 @@ public final class DyvilLexer
 			final int symbolType = this.symbols.getSymbolType(s);
 			if (symbolType == 0)
 			{
-				return new IdentifierToken(prev, Name.get(s), type, line, start, start + len);
+				return new IdentifierToken(prev, Name.get(s), SYMBOL_IDENTIFIER, line, start, start + len);
 			}
 			return new SymbolToken(this.symbols, prev, symbolType, line, start);
 		}
 		case SPECIAL_IDENTIFIER:
-			return new IdentifierToken(prev, Name.getSpecial(s), type, line, start, start + len + 2);
+			return new IdentifierToken(prev, Name.getSpecial(s), SPECIAL_IDENTIFIER, line, start, start + len + 2);
 		case SYMBOL:
 		case BaseSymbols.DOT:
 		case BaseSymbols.COLON:

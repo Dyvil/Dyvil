@@ -71,7 +71,7 @@ public interface IContext extends IMemberContext
 	@Override
 	ITypeParameter resolveTypeVariable(Name name);
 
-	IOperator resolveOperator(Name name);
+	IOperator resolveOperator(Name name, int type);
 
 	@Override
 	IDataMember resolveField(Name name);
@@ -134,15 +134,15 @@ public interface IContext extends IMemberContext
 		return Types.LANG_HEADER.resolveType(name);
 	}
 
-	static IOperator resolveOperator(IContext context, Name name)
+	static IOperator resolveOperator(IContext context, Name name, int type)
 	{
-		final IOperator operator = context.resolveOperator(name);
+		final IOperator operator = context.resolveOperator(name, type);
 		if (operator != null)
 		{
 			return operator;
 		}
 
-		return Types.LANG_HEADER.resolveOperator(name);
+		return Types.LANG_HEADER.resolveOperator(name, type);
 	}
 
 	static IConstructor resolveConstructor(IMemberContext context, IArguments arguments)

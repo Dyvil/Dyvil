@@ -446,9 +446,9 @@ public class REPLMemberClass implements IClass
 	}
 
 	@Override
-	public IOperator resolveOperator(Name name)
+	public IOperator resolveOperator(Name name, int type)
 	{
-		return this.context.resolveOperator(name);
+		return this.context.resolveOperator(name, type);
 	}
 
 	@Override

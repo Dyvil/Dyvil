@@ -60,7 +60,7 @@ public interface IStaticContext extends IContext
 	}
 
 	@Override
-	default IOperator resolveOperator(Name name)
+	default IOperator resolveOperator(Name name, int type)
 	{
 		return null;
 	}
