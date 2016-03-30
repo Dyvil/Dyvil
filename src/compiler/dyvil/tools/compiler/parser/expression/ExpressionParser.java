@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.*;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
-import dyvil.tools.compiler.ast.operator.*;
+import dyvil.tools.compiler.ast.operator.OperatorChain;
 import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.statement.ReturnStatement;
@@ -36,6 +36,8 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
+
+import static dyvil.tools.compiler.parser.ParserUtil.neighboring;
 
 public final class ExpressionParser extends Parser implements IValueConsumer
 {
@@ -470,8 +472,8 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		{
 			// Identifier is an operator
 
-			final boolean neighboringLeft = ParserUtil.neighboring(token.prev(), token);
-			final boolean neighboringRight = ParserUtil.neighboring(token, token.next());
+			final boolean neighboringLeft = neighboring(token.prev(), token);
+			final boolean neighboringRight = neighboring(token, next);
 
 			if (this.value == null || neighboringRight && !neighboringLeft) // prefix
 			{
@@ -485,7 +487,8 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				this.parseApply(pm, next, call);
 				return;
 			}
-			if (ParserUtil.isExpressionTerminator(nextType) || neighboringLeft && !neighboringRight) // postfix
+			if (ParserUtil.isExpressionTerminator(nextType) || neighboringLeft && !neighboringRight // postfix
+				                                                   && !neighboring(next, next.next()))
 			{
 				// EXPRESSION_OPERATOR EXPRESSION
 				// EXPRESSION OPERATOR EOF
@@ -510,7 +513,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 			final OperatorChain chain;
 
-			if (this.value instanceof OperatorChain)
+			if (this.value.valueTag() == IValue.OPERATOR_CHAIN)
 			{
 				chain = (OperatorChain) this.value;
 			}
@@ -602,7 +605,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				}
 
 				// IDENTIFIER SYMBOL-IDENTIFIER ...
-				if (!ParserUtil.neighboring(next, next2)) // not a prefix operator
+				if (!neighboring(next, next2)) // not a prefix operator
 				{
 					this.parseFieldAccess(token, name);
 					return;
