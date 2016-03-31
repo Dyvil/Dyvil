@@ -4,7 +4,7 @@ import dyvil.tools.compiler.ast.consumer.IArgumentsConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.parameter.ArgumentMap;
+import dyvil.tools.compiler.ast.parameter.NamedArgumentList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
@@ -45,7 +45,7 @@ public class ArgumentListParser extends Parser implements IValueConsumer
 		}
 		else
 		{
-			this.consumer.setArguments(new ArgumentMap(this.names, this.values, this.valueCount));
+			this.consumer.setArguments(new NamedArgumentList(this.names, this.values, this.valueCount));
 		}
 
 		pm.popParser(true);

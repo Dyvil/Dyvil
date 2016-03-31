@@ -16,19 +16,19 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 import java.util.Iterator;
 
-public final class ArgumentMap implements IArguments
+public final class NamedArgumentList implements IArguments
 {
 	private Name[]   keys;
 	private IValue[] values;
 	private int      size;
 
-	public ArgumentMap()
+	public NamedArgumentList()
 	{
 		this.keys = new Name[3];
 		this.values = new IValue[3];
 	}
 
-	public ArgumentMap(Name[] keys, IValue[] values, int size)
+	public NamedArgumentList(Name[] keys, IValue[] values, int size)
 	{
 		this.keys = keys;
 		this.values = values;
@@ -78,7 +78,7 @@ public final class ArgumentMap implements IArguments
 		keys[index] = name;
 		values[index] = value;
 
-		return new ArgumentMap(keys, values, size);
+		return new NamedArgumentList(keys, values, size);
 	}
 
 	@Override
@@ -122,6 +122,17 @@ public final class ArgumentMap implements IArguments
 	}
 
 	@Override
+	public IValue getValue(int index, IParameter param)
+	{
+		final int argIndex = this.findIndex(index, param.getName());
+		if (argIndex < 0)
+		{
+			return null;
+		}
+		return this.values[argIndex];
+	}
+
+	@Override
 	public void setValue(int index, IParameter param, IValue value)
 	{
 		if (param == null)
@@ -130,44 +141,69 @@ public final class ArgumentMap implements IArguments
 			return;
 		}
 
-		Name key = param.getName();
-		for (int i = 0; i < this.size; i++)
+		final int argIndex = this.findIndex(index, param.getName());
+		if (argIndex >= 0)
 		{
-			if (this.keys[i] == key)
-			{
-				this.values[i] = value;
-				return;
-			}
+			this.values[argIndex] = value;
 		}
 	}
 
-	private boolean isNameAt(int index, int paramIndex, Name name)
+	private int findIndex(int index, Name name)
 	{
-		final Name nameAt = this.keys[index];
-		return nameAt == null ? index == paramIndex : nameAt == name;
-	}
-
-	@Override
-	public IValue getValue(int index, IParameter param)
-	{
-		final Name name = param.getName();
+		boolean firstName = false;
 		for (int i = 0; i < this.size; i++)
 		{
-			if (this.isNameAt(i, index, name))
+			final Name nameAt = this.keys[i];
+			if (nameAt == null)
 			{
-				return this.values[i];
+				if (!firstName && i == index)
+				{
+					return i;
+				}
+				continue;
+			}
+
+			if (nameAt == name)
+			{
+				return i;
+			}
+
+			firstName = true;
+		}
+		return -1;
+	}
+
+	private int findNextName(int startIndex)
+	{
+		for (; startIndex < this.size; startIndex++)
+		{
+			if (this.keys[startIndex] != null)
+			{
+				return startIndex;
 			}
 		}
-		return null;
+
+		return this.size;
 	}
 
 	@Override
 	public float getTypeMatch(int index, IParameter param)
 	{
-		final IValue value = this.getValue(index, param);
-		if (value != null)
+		final int argIndex = this.findIndex(index, param.getName());
+		if (argIndex >= 0)
 		{
-			return value.getTypeMatch(param.getInternalType());
+			if (param.isVarargs())
+			{
+				final int endIndex = this.findNextName(argIndex + 1);
+				return ArgumentList.getVarargsTypeMatch(this.values, argIndex, endIndex, param);
+			}
+
+			return this.values[argIndex].getTypeMatch(param.getInternalType());
+		}
+
+		if (param.isVarargs())
+		{
+			return VARARGS_MATCH;
 		}
 		return param.getValue() != null ? DEFAULT_MATCH : 0;
 	}
@@ -175,49 +211,62 @@ public final class ArgumentMap implements IArguments
 	@Override
 	public void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		final Name name = param.getName();
-		for (int i = 0; i < this.size; i++)
+		final int argIndex = this.findIndex(index, param.getName());
+		if (argIndex < 0)
 		{
-			if (!this.isNameAt(i, index, name))
-			{
-				continue;
-			}
-
-			final IType type = param.getInternalType();
-			this.values[i] = TypeChecker.convertValue(this.values[i], type, typeContext, markers, context,
-			                                          IArguments.argumentMarkerSupplier(param));
 			return;
+		}
+
+		if (!param.isVarargs())
+		{
+			final IType type = param.getInternalType();
+			this.values[argIndex] = TypeChecker.convertValue(this.values[argIndex], type, typeContext, markers, context,
+			                                                 IArguments.argumentMarkerSupplier(param));
+			return;
+		}
+
+		final int endIndex = this.findNextName(argIndex + 1);
+		if (ArgumentList.checkVarargsValue(this.values, argIndex, endIndex, param, typeContext, markers, context))
+		{
+			final int moved = this.size - endIndex;
+			if (moved > 0)
+			{
+				System.arraycopy(this.values, endIndex, this.values, argIndex + 1, moved);
+				System.arraycopy(this.keys, endIndex, this.keys, argIndex + 1, moved);
+			}
+			this.size = argIndex + moved + 1;
 		}
 	}
 
 	@Override
 	public void inferType(int index, IParameter param, ITypeContext typeContext)
 	{
-		final Name name = param.getName();
-		for (int i = 0; i < this.size; i++)
+		final int argIndex = this.findIndex(index, param.getName());
+		if (argIndex < 0)
 		{
-			if (this.isNameAt(i, index, name))
-			{
-				param.getInternalType().inferTypes(this.values[i].getType(), typeContext);
-				return;
-			}
+			return;
 		}
+
+		if (param.isVarargs())
+		{
+			final int endIndex = this.findNextName(argIndex + 1);
+			ArgumentList.inferVarargsType(this.values, argIndex, endIndex, param, typeContext);
+			return;
+		}
+		param.getInternalType().inferTypes(this.values[argIndex].getType(), typeContext);
 	}
 
 	@Override
 	public void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
 	{
-		final Name name = param.getName();
-		for (int i = 0; i < this.size; i++)
+		final int argIndex = this.findIndex(index, param.getName());
+		if (argIndex >= 0)
 		{
-			if (this.isNameAt(i, index, name))
-			{
-				this.values[i].writeExpression(writer, param.getInternalType());
-				return;
-			}
+			this.values[argIndex].writeExpression(writer, param.getInternalType());
+			return;
 		}
 
-		param.getValue().writeExpression(writer, param.getInternalType());
+		EmptyArguments.writeArguments(writer, param);
 	}
 
 	@Override
@@ -243,6 +292,11 @@ public final class ArgumentMap implements IArguments
 			final IValue value = this.values[i];
 
 			value.resolveTypes(markers, context);
+
+			if (key == null)
+			{
+				continue;
+			}
 
 			for (int j = 0; j < i; j++)
 			{

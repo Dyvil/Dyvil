@@ -29,6 +29,7 @@ public class Main
 		ReferenceTest.main(args)
 		ReifyTest.main(args)
 		SelfTypeTest.main(args)
+		VarargsTest.main(args)
 	}
 
 	public static void test(String testName, any expected, any actual)
