@@ -245,7 +245,7 @@ public interface Modifiers
 	/**
 	 * The modifiers that can be used on parameters.
 	 */
-	int PARAMETER_MODIFIERS = FINAL | LAZY | VAR | MANDATED | EXTENSION;
+	int PARAMETER_MODIFIERS = FINAL | LAZY | VAR | MANDATED | EXTENSION | VARARGS;
 
 	/**
 	 * The modifiers that can be applied to class parameters.

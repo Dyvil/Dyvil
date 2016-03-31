@@ -28,7 +28,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	@Override
 	public void visitParameter(String name, int modifiers)
 	{
-		final IParameter parameter = this.method.getParameter_(this.parameterIndex);
+		final IParameter parameter = this.method.getParameterNoResolve(this.parameterIndex);
 		if (parameter == null)
 		{
 			return;
@@ -46,7 +46,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	@Override
 	public AnnotationVisitor visitParameterAnnotation(int parameter, String type, boolean visible)
 	{
-		IParameter param = this.method.getParameter_(parameter);
+		IParameter param = this.method.getParameterNoResolve(parameter);
 		if (AnnotationUtil.DYVIL_MODIFIERS.equals(type))
 		{
 			return new ModifierVisitor(param.getModifiers());

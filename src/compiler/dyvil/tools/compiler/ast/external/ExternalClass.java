@@ -87,11 +87,13 @@ public final class ExternalClass extends AbstractClass
 
 	private void resolveMetadata()
 	{
+		this.metadataResolved = true;
+
 		final IContext context = this.getCombiningContext();
 
 		this.metadata = IClass.getClassMetadata(this, this.modifiers.toFlags());
-		this.metadata.resolveTypesHeader(null, Package.rootPackage);
-		this.metadata.resolveTypesBody(null, Package.rootPackage);
+		this.metadata.resolveTypesHeader(null, context);
+		this.metadata.resolveTypesBody(null, context);
 	}
 
 	private void resolveGenerics()
@@ -535,7 +537,7 @@ public final class ExternalClass extends AbstractClass
 		this.body.getConstructorMatches(list, arguments);
 	}
 
-	public void visit(int version, int access, String name, String signature, String superName, String[] interfaces)
+	public void visit(int access, String name, String signature, String superName, String[] interfaces)
 	{
 		this.modifiers = new FlagModifierSet(access);
 		this.internalName = name;
@@ -594,7 +596,7 @@ public final class ExternalClass extends AbstractClass
 		this.thisType = new ClassType(this);
 	}
 
-	public AnnotationVisitor visitAnnotation(String type, boolean visible)
+	public AnnotationVisitor visitAnnotation(String type)
 	{
 		switch (type)
 		{
@@ -618,7 +620,7 @@ public final class ExternalClass extends AbstractClass
 		return null;
 	}
 
-	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible)
+	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc)
 	{
 		IAnnotation annotation = new Annotation(ClassFormat.extendedToType(desc));
 		switch (TypeReference.getSort(typeRef))
@@ -725,7 +727,7 @@ public final class ExternalClass extends AbstractClass
 
 			if ((access & Modifiers.VARARGS) != 0)
 			{
-				constructor.getParameter(constructor.parameterCount() - 1).setVarargs(true);
+				constructor.getParameterNoResolve(constructor.parameterCount() - 1).setVarargs(true);
 			}
 
 			this.body.addConstructor(constructor);
@@ -752,14 +754,14 @@ public final class ExternalClass extends AbstractClass
 
 		if ((access & Modifiers.VARARGS) != 0)
 		{
-			method.setVarargsParameter();
+			method.getParameterNoResolve(method.parameterCount() - 1).setVarargs(true);
 		}
 
 		this.body.addMethod(method);
 		return new SimpleMethodVisitor(method);
 	}
 
-	public void visitInnerClass(String name, String outerName, String innerName, int access)
+	public void visitInnerClass(String name, String outerName, String innerName)
 	{
 		if (!this.internalName.equals(outerName))
 		{
@@ -786,13 +788,11 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public void writeClassInit(MethodWriter writer) throws BytecodeException
 	{
-
 	}
 
 	@Override
 	public void writeStaticInit(MethodWriter writer) throws BytecodeException
 	{
-
 	}
 
 	@Override

@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.parameter.IParameter;
 
 public interface IExternalCallableMember extends ICallableMember
 {
-	IParameter getParameter_(int index);
+	IParameter getParameterNoResolve(int index);
 	
 	AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible);
 
