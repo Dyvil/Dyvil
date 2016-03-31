@@ -16,7 +16,7 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 
 	public init(int... elements)
 	{
-		super.init(elements)
+		super.init(elements...)
 	}
 
 	public init(Collection[int] elements)

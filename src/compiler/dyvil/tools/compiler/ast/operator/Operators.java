@@ -5,7 +5,6 @@ import dyvil.tools.compiler.ast.access.FieldAssignment;
 import dyvil.tools.compiler.ast.constant.IntValue;
 import dyvil.tools.compiler.ast.expression.ColonOperator;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.intrinsic.StringConcatExpr;
 import dyvil.tools.compiler.ast.intrinsic.*;
 import dyvil.tools.compiler.ast.reference.ReferenceOperator;
 import dyvil.tools.compiler.ast.statement.IfStatement;
@@ -55,6 +54,11 @@ public final class Operators
 
 	public static IValue getPostfix(IValue arg1, Name name)
 	{
+		if (name == Names.dotdotdot)
+		{
+			return new VarargsOperator(arg1);
+		}
+
 		return getIncOperator(name, arg1, false);
 	}
 

@@ -51,11 +51,11 @@ public interface IValue extends IASTNode, ITyped
 	int THIS  = 64;
 	int SUPER = 65;
 
-	int CAST_OPERATOR    = 66;
-	int ISOF_OPERATOR    = 67;
+	int CAST_OPERATOR = 66;
+	int ISOF_OPERATOR = 67;
 	// int CASE_STATEMENT   = 68;
-	int MATCH            = 69;
-	int LAMBDA           = 70;
+	int MATCH         = 69;
+	int LAMBDA        = 70;
 	// int PARTIAL_FUNCTION = 71;
 
 	// Access and Invocation
@@ -79,16 +79,17 @@ public interface IValue extends IASTNode, ITyped
 	int METHOD_ASSIGN = 121;
 
 	// Special Operators and Intrinsics
-	int BOOLEAN_AND    = 129;
-	int BOOLEAN_OR     = 130;
-	int BOOLEAN_NOT    = 131;
-	int CLASS_OPERATOR = 132;
-	int TYPE_OPERATOR  = 133;
-	int NULLCHECK      = 134;
-	int RANGE_OPERATOR = 135;
-	int STRINGBUILDER  = 136;
-	int INC            = 137;
-	int COLON          = 138;
+	int BOOLEAN_AND       = 129;
+	int BOOLEAN_OR        = 130;
+	int BOOLEAN_NOT       = 131;
+	int CLASS_OPERATOR    = 132;
+	int TYPE_OPERATOR     = 133;
+	int NULLCHECK         = 134;
+	int RANGE_OPERATOR    = 135;
+	int STRINGBUILDER     = 136;
+	int INC               = 137;
+	int COLON             = 138;
+	int VARARGS_EXPANSION = 139;
 
 	// Basic Control Statements
 	int RETURN       = 192;
@@ -176,6 +177,11 @@ public interface IValue extends IASTNode, ITyped
 	default IValue toAssignment(IValue rhs, ICodePosition position)
 	{
 		return null;
+	}
+
+	default boolean checkVarargs(boolean typeCheck)
+	{
+		return false;
 	}
 
 	@Override

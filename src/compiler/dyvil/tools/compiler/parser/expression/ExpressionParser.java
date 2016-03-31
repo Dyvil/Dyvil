@@ -337,6 +337,9 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			case BaseSymbols.COLON:
 				this.parseInfixAccess(pm, token, Names.colon);
 				return;
+			case DyvilSymbols.ELLIPSIS:
+				this.parseInfixAccess(pm, token, Names.dotdotdot);
+				return;
 			case BaseSymbols.EQUALS:
 				if (this.value == null)
 				{

@@ -207,16 +207,16 @@ public final class ArgumentList implements IArguments, IValueList
 
 	protected static float getVarargsTypeMatch(IValue[] values, int startIndex, int endIndex, IParameter param)
 	{
-		IValue argument = values[startIndex];
-		IType type = param.getInternalType();
-		float totalMatch = argument.getTypeMatch(type);
-		if (totalMatch > 0F)
+		final IValue argument = values[startIndex];
+		final IType arrayType = param.getInternalType();
+		if (argument.checkVarargs(false))
 		{
-			return totalMatch;
+			return argument.getTypeMatch(arrayType);
 		}
 
-		IType elementType = type.getElementType();
-		for (totalMatch = 0; startIndex < endIndex; startIndex++)
+		float totalMatch = 0;
+		final IType elementType = arrayType.getElementType();
+		for (; startIndex < endIndex; startIndex++)
 		{
 			float valueMatch = values[startIndex].getTypeMatch(elementType);
 			if (valueMatch <= 0)
@@ -256,7 +256,7 @@ public final class ArgumentList implements IArguments, IValueList
 		final IType arrayType = param.getInternalType();
 
 		final IValue value = values[startIndex];
-		if (value.isType(arrayType))
+		if (value.checkVarargs(true))
 		{
 			values[startIndex] = TypeChecker.convertValue(value, arrayType, typeContext, markers, context,
 			                                              IArguments.argumentMarkerSupplier(param));
@@ -300,8 +300,10 @@ public final class ArgumentList implements IArguments, IValueList
 
 	protected static void inferVarargsType(IValue[] values, int startIndex, int endIndex, IParameter param, ITypeContext typeContext)
 	{
-		IType type = values[startIndex].getType();
-		if (startIndex + 1 == endIndex && type.isArrayType())
+		final IValue value = values[startIndex];
+		IType type = value.getType();
+
+		if (startIndex + 1 == endIndex && value.checkVarargs(true))
 		{
 			param.getInternalType().inferTypes(type, typeContext);
 			return;
