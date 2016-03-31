@@ -78,6 +78,18 @@ public class VarargsOperator implements IValue
 	}
 
 	@Override
+	public boolean isType(IType type)
+	{
+		return this.value.isType(type);
+	}
+
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		return this.value.getTypeMatch(type);
+	}
+
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.value.resolveTypes(markers, context);
