@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -50,5 +51,18 @@ public class PrefixCall extends MethodCall
 	{
 		final Name name = Name.get(this.name.unqualified + "_=", this.name.qualified + "_$eq");
 		return new MethodCall(this.position, this.arguments.getFirstValue(), name, new SingleArgument(rhs));
+	}
+
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
+	}
+
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		buffer.append(this.name);
+		this.arguments.getFirstValue().toString(prefix, buffer);
 	}
 }

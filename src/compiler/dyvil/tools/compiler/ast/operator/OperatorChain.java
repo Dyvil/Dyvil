@@ -215,15 +215,12 @@ public class OperatorChain implements IValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append('(');
 		this.operands[0].toString(prefix, buffer);
 
 		for (int i = 0; i < this.operatorCount; i++)
 		{
-			buffer.append(") ").append(this.operators[i]).append(" (");
+			buffer.append(this.operators[i].name);
 			this.operands[i + 1].toString(prefix, buffer);
 		}
-
-		buffer.append(')');
 	}
 }
