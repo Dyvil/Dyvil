@@ -20,37 +20,37 @@ import java.util.Iterator;
 
 public final class SingleArgument implements IArguments, IValueConsumer
 {
-	private IValue  value;
-	
+	private IValue value;
+
 	public SingleArgument()
 	{
 	}
-	
+
 	public SingleArgument(IValue value)
 	{
 		this.value = value;
 	}
-	
+
 	@Override
 	public int size()
 	{
 		return this.value == null ? 0 : 1;
 	}
-	
+
 	@Override
 	public boolean isEmpty()
 	{
 		return this.value == null;
 	}
-	
+
 	// 'Variations'
-	
+
 	@Override
 	public IArguments dropFirstValue()
 	{
 		return EmptyArguments.INSTANCE;
 	}
-	
+
 	@Override
 	public IArguments withLastValue(IValue value)
 	{
@@ -58,47 +58,47 @@ public final class SingleArgument implements IArguments, IValueConsumer
 		{
 			return new SingleArgument(value);
 		}
-		
+
 		ArgumentList list = new ArgumentList();
 		list.addValue(this.value);
 		list.addValue(value);
 		return list;
 	}
-	
+
 	// First Values
-	
+
 	@Override
 	public IValue getFirstValue()
 	{
 		return this.value;
 	}
-	
+
 	@Override
 	public void setFirstValue(IValue value)
 	{
 		this.value = value;
 	}
-	
+
 	@Override
 	public IValue getLastValue()
 	{
 		return this.value;
 	}
-	
+
 	@Override
 	public void setLastValue(IValue value)
 	{
 		this.value = value;
 	}
-	
+
 	@Override
 	public void setValue(IValue value)
 	{
 		this.value = value;
 	}
-	
+
 	// Used by Methods
-	
+
 	@Override
 	public void setValue(int index, IParameter param, IValue value)
 	{
@@ -107,36 +107,30 @@ public final class SingleArgument implements IArguments, IValueConsumer
 			this.value = value;
 		}
 	}
-	
+
 	@Override
 	public IValue getValue(int index, IParameter param)
 	{
 		return index == 0 ? this.value : null;
 	}
-	
+
 	@Override
 	public float getTypeMatch(int index, IParameter param)
 	{
-		if (index == 0 && this.value != null)
+		if (index != 0 || this.value == null)
 		{
-			return this.value.getTypeMatch(param.getInternalType());
+			return param.getValue() != null ? DEFAULT_MATCH : 0;
 		}
-		return param.getValue() != null ? DEFAULT_MATCH : 0;
+
+		if (param.isVarargs())
+		{
+			return this.getVarargsTypeMatch(param);
+		}
+		return this.value.getTypeMatch(param.getInternalType());
 	}
-	
-	@Override
-	public float getVarargsTypeMatch(int index, IParameter param)
+
+	private float getVarargsTypeMatch(IParameter param)
 	{
-		int size = this.size();
-		if (index == size)
-		{
-			return VARARGS_MATCH;
-		}
-		if (index > size)
-		{
-			return 0;
-		}
-		
 		float valueMatch = this.value.getTypeMatch(param.getInternalType());
 		if (valueMatch > 0)
 		{
@@ -146,7 +140,7 @@ public final class SingleArgument implements IArguments, IValueConsumer
 		valueMatch = this.value.getTypeMatch(param.getInternalType().getElementType());
 		return valueMatch > 0 ? valueMatch + VARARGS_MATCH : 0;
 	}
-	
+
 	@Override
 	public void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
@@ -154,20 +148,20 @@ public final class SingleArgument implements IArguments, IValueConsumer
 		{
 			return;
 		}
-		
+
+		if (param.isVarargs())
+		{
+			this.checkVarargsValue(param, typeContext, markers, context);
+			return;
+		}
+
 		IType type = param.getInternalType();
 		this.value = TypeChecker.convertValue(this.value, type, typeContext, markers, context,
 		                                      IArguments.argumentMarkerSupplier(param));
 	}
-	
-	@Override
-	public void checkVarargsValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
+
+	private void checkVarargsValue(IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (index != 0 || this.value == null)
-		{
-			return;
-		}
-		
 		final IType arrayType = param.getInternalType();
 		if (this.value.isType(arrayType.getConcreteType(typeContext)))
 		{
@@ -183,34 +177,35 @@ public final class SingleArgument implements IArguments, IValueConsumer
 		this.value = new ArrayExpr(this.value.getPosition(), new IValue[] { this.value }, 1);
 		this.value.setType(arrayType);
 	}
-	
+
 	@Override
 	public void inferType(int index, IParameter param, ITypeContext typeContext)
-	{
-		if (index == 0 && this.value != null)
-		{
-			param.getInternalType().inferTypes(this.value.getType(), typeContext);
-		}
-	}
-	
-	@Override
-	public void inferVarargsType(int index, IParameter param, ITypeContext typeContext)
 	{
 		if (index != 0 || this.value == null)
 		{
 			return;
 		}
-		
-		IType type = this.value.getType();
+
+		if (param.isVarargs())
+		{
+			this.inferVarargsType(param, typeContext);
+			return;
+		}
+		param.getInternalType().inferTypes(this.value.getType(), typeContext);
+	}
+
+	private void inferVarargsType(IParameter param, ITypeContext typeContext)
+	{
+		final IType type = this.value.getType();
 		if (type.isArrayType())
 		{
 			param.getInternalType().inferTypes(type, typeContext);
 			return;
 		}
-		
+
 		param.getInternalType().getElementType().inferTypes(type, typeContext);
 	}
-	
+
 	@Override
 	public void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
 	{
@@ -219,10 +214,10 @@ public final class SingleArgument implements IArguments, IValueConsumer
 			this.value.writeExpression(writer, param.getInternalType());
 			return;
 		}
-		
+
 		param.getValue().writeExpression(writer, param.getInternalType());
 	}
-	
+
 	@Override
 	public Iterator<IValue> iterator()
 	{
@@ -243,7 +238,7 @@ public final class SingleArgument implements IArguments, IValueConsumer
 			this.value.resolveTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
@@ -252,7 +247,7 @@ public final class SingleArgument implements IArguments, IValueConsumer
 			this.value = this.value.resolve(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -261,7 +256,7 @@ public final class SingleArgument implements IArguments, IValueConsumer
 			this.value.checkTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
@@ -270,7 +265,7 @@ public final class SingleArgument implements IArguments, IValueConsumer
 			this.value.check(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void foldConstants()
 	{
@@ -279,7 +274,7 @@ public final class SingleArgument implements IArguments, IValueConsumer
 			this.value = this.value.foldConstants();
 		}
 	}
-	
+
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
@@ -288,13 +283,13 @@ public final class SingleArgument implements IArguments, IValueConsumer
 			this.value = this.value.cleanup(context, compilableList);
 		}
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return IASTNode.toString(this);
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
@@ -302,7 +297,7 @@ public final class SingleArgument implements IArguments, IValueConsumer
 		{
 			return;
 		}
-		
+
 		if (Formatting.getBoolean("method.call.java_format"))
 		{
 			Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
@@ -313,7 +308,7 @@ public final class SingleArgument implements IArguments, IValueConsumer
 		buffer.append(' ');
 		this.value.toString(prefix, buffer);
 	}
-	
+
 	@Override
 	public void typesToString(StringBuilder buffer)
 	{

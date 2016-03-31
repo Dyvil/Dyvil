@@ -183,6 +183,11 @@ public final class ArgumentList implements IArguments, IValueList
 	@Override
 	public float getTypeMatch(int index, IParameter param)
 	{
+		if (param.isVarargs())
+		{
+			return this.getVarargsTypeMatch(index, param);
+		}
+
 		if (index >= this.size)
 		{
 			return param.getValue() != null ? DEFAULT_MATCH : 0;
@@ -191,8 +196,7 @@ public final class ArgumentList implements IArguments, IValueList
 		return this.values[index].getTypeMatch(param.getInternalType());
 	}
 
-	@Override
-	public float getVarargsTypeMatch(int index, IParameter param)
+	private float getVarargsTypeMatch(int index, IParameter param)
 	{
 		if (index == this.size)
 		{
@@ -232,20 +236,20 @@ public final class ArgumentList implements IArguments, IValueList
 			return;
 		}
 
+		if (param.isVarargs())
+		{
+			this.checkVarargsValue(index, param, typeContext, markers, context);
+			return;
+		}
+
 		final IType type = param.getInternalType();
 
 		this.values[index] = TypeChecker.convertValue(this.values[index], type, typeContext, markers, context,
 		                                              IArguments.argumentMarkerSupplier(param));
 	}
 
-	@Override
-	public void checkVarargsValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
+	private void checkVarargsValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (index >= this.size)
-		{
-			return;
-		}
-
 		final IType arrayType = param.getInternalType();
 
 		final IValue value = this.values[index];
@@ -280,11 +284,17 @@ public final class ArgumentList implements IArguments, IValueList
 		{
 			return;
 		}
+
+		if (param.isVarargs())
+		{
+			this.inferVarargsType(index, param, typeContext);
+			return;
+		}
+
 		param.getInternalType().inferTypes(this.values[index].getType(), typeContext);
 	}
 
-	@Override
-	public void inferVarargsType(int index, IParameter param, ITypeContext typeContext)
+	private void inferVarargsType(int index, IParameter param, ITypeContext typeContext)
 	{
 		if (index >= this.size)
 		{

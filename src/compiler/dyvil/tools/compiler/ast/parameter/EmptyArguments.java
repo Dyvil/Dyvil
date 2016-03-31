@@ -110,29 +110,17 @@ public final class EmptyArguments implements IArguments
 	}
 
 	@Override
-	public void inferVarargsType(int index, IParameter param, ITypeContext typeContext)
-	{
-	}
-
-	@Override
 	public float getTypeMatch(int index, IParameter param)
 	{
+		if (param.isVarargs())
+		{
+			return VARARGS_MATCH;
+		}
 		return param.getValue() != null ? DEFAULT_MATCH : 0;
 	}
 
 	@Override
-	public float getVarargsTypeMatch(int index, IParameter param)
-	{
-		return VARARGS_MATCH;
-	}
-
-	@Override
 	public void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
-	{
-	}
-
-	@Override
-	public void checkVarargsValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 	}
 

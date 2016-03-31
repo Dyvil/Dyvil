@@ -297,35 +297,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 		int match = 1;
 		int argumentCount = arguments.size();
 
-		if (this.modifiers.hasIntModifier(Modifiers.VARARGS))
-		{
-			int parCount = this.parameterCount - 1;
-			if (argumentCount <= parCount)
-			{
-				return 0;
-			}
-
-			float m;
-			IParameter varParam = this.parameters[parCount];
-			for (int i = 0; i < parCount; i++)
-			{
-				IParameter par = this.parameters[i];
-				m = arguments.getTypeMatch(i, par);
-				if (m == 0)
-				{
-					return 0;
-				}
-				match += m;
-			}
-
-			m = arguments.getVarargsTypeMatch(parCount, varParam);
-			if (m == 0)
-			{
-				return 0;
-			}
-			return m + match;
-		}
-		else if (argumentCount > this.parameterCount)
+		if (argumentCount > this.parameterCount && !this.isVariadic())
 		{
 			return 0;
 		}
@@ -358,21 +330,9 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 			}
 		};
 
-		if (this.modifiers.hasIntModifier(Modifiers.VARARGS))
+		for (int i = 0; i < this.parameterCount; i++)
 		{
-			int index = this.parameterCount - 1;
-			for (int i = 0; i < index; i++)
-			{
-				arguments.inferType(i, this.parameters[i], gt);
-			}
-			arguments.inferVarargsType(index, this.parameters[index], gt);
-		}
-		else
-		{
-			for (int i = 0; i < this.parameterCount; i++)
-			{
-				arguments.inferType(i, this.parameters[i], gt);
-			}
+			arguments.inferType(i, this.parameters[i], gt);
 		}
 
 		for (int i = 0; i < typeVarCount; i++)
@@ -393,18 +353,6 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	@Override
 	public void checkArguments(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments)
 	{
-		if (this.modifiers.hasIntModifier(Modifiers.VARARGS))
-		{
-			int len = this.parameterCount - 1;
-			arguments.checkVarargsValue(len, this.parameters[len], type, markers, context);
-
-			for (int i = 0; i < len; i++)
-			{
-				arguments.checkValue(i, this.parameters[i], type, markers, context);
-			}
-			return;
-		}
-
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			arguments.checkValue(i, this.parameters[i], type, markers, context);

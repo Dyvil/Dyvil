@@ -546,34 +546,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				}
 			}
 		}
-		if (this.isVariadic())
-		{
-			final int varargsStart = this.parameterCount - 1 - parameterStartIndex;
-
-			for (int i = parameterStartIndex; i < varargsStart; i++)
-			{
-				final IParameter parameter = this.parameters[i + parameterStartIndex];
-				final float valueMatch = arguments.getTypeMatch(i, parameter);
-				if (valueMatch <= 0)
-				{
-					return 0;
-				}
-
-				totalMatch += valueMatch;
-			}
-
-			final IParameter varParam = this.parameters[varargsStart + parameterStartIndex];
-			final float varargsMatch = arguments.getVarargsTypeMatch(varargsStart, varParam);
-			if (varargsMatch <= 0)
-			{
-				return 0;
-			}
-
-			return totalMatch + varargsMatch;
-		}
 
 		final int parametersLeft = this.parameterCount - parameterStartIndex;
-		if (argumentCount > parametersLeft)
+		if (argumentCount > parametersLeft && !this.isVariadic())
 		{
 			return 0;
 		}
@@ -639,20 +614,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				receiver = TypeChecker.convertValue(receiver, paramType, typeContext, markers, context,
 				                                    TypeChecker.markerSupplier("method.access.infix_type", this.name));
 
-				if (this.isVariadic())
-				{
-					arguments.checkVarargsValue(this.parameterCount - 2, this.parameters[this.parameterCount - 1],
-					                            typeContext, markers, context);
-
-					for (int i = 0; i < this.parameterCount - 2; i++)
-					{
-						arguments.checkValue(i, this.parameters[i + 1], typeContext, markers, context);
-					}
-
-					this.checkTypeVarsInferred(markers, position, typeContext);
-					return receiver;
-				}
-
 				for (int i = 0; i < this.parameterCount - 1; i++)
 				{
 					arguments.checkValue(i, this.parameters[i + 1], typeContext, markers, context);
@@ -704,20 +665,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 		}
 
-		if (this.isVariadic())
-		{
-			final int len = this.parameterCount - 1;
-			arguments.checkVarargsValue(len, this.parameters[len], typeContext, markers, null);
-
-			for (int i = 0; i < len; i++)
-			{
-				arguments.checkValue(i, this.parameters[i], typeContext, markers, context);
-			}
-
-			this.checkTypeVarsInferred(markers, position, typeContext);
-			return receiver;
-		}
-
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			arguments.checkValue(i, this.parameters[i], typeContext, markers, context);
@@ -746,19 +693,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			this.parameters[0].getType().inferTypes(instance.getType(), genericData);
 			parIndex = 1;
-		}
-
-		if ((modifiers & Modifiers.VARARGS) != 0)
-		{
-			int len = this.parameterCount - parIndex - 1;
-			for (int i = 0; i < len; i++)
-			{
-				param = this.parameters[i + parIndex];
-				arguments.inferType(i, param, genericData);
-			}
-
-			arguments.inferVarargsType(len, this.parameters[len + parIndex], genericData);
-			return;
 		}
 
 		int len = this.parameterCount - parIndex;
