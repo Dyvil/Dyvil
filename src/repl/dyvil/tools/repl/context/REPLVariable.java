@@ -3,7 +3,6 @@ package dyvil.tools.repl.context;
 import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
-import dyvil.reflect.ReflectUtils;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
@@ -107,17 +106,10 @@ public class REPLVariable extends Field
 
 		try
 		{
-			if (this.type == Types.VOID)
-			{
-				ReflectUtils.UNSAFE.ensureClassInitialized(this.theClass);
-			}
-			else
-			{
-				java.lang.reflect.Field field = this.theClass.getDeclaredFields()[0];
-				field.setAccessible(true);
-				Object result = field.get(null);
-				this.value = new REPLResult(result);
-			}
+			java.lang.reflect.Field field = this.theClass.getDeclaredFields()[0];
+			field.setAccessible(true);
+			Object result = field.get(null);
+			this.value = new REPLResult(result);
 		}
 		catch (IllegalAccessException illegalAccess)
 		{

@@ -53,213 +53,213 @@ public class REPLMemberClass implements IClass
 {
 	protected static final ClassLoader      CLASS_LOADER      = REPLVariable.class.getClassLoader();
 	private static final   ProtectionDomain PROTECTION_DOMAIN = REPLVariable.class.getProtectionDomain();
-	
+
 	private REPLContext  context;
 	private Name         name;
 	private IClassMember member;
-	
+
 	public REPLMemberClass(Name name, IClassMember member, REPLContext context)
 	{
 		this.name = name;
 		this.member = member;
 		this.context = context;
 	}
-	
+
 	public void setMember(IClassMember member)
 	{
 		this.member = member;
 	}
-	
+
 	@Override
 	public ICodePosition getPosition()
 	{
 		return ICodePosition.ORIGIN;
 	}
-	
+
 	@Override
 	public void setPosition(ICodePosition position)
 	{
 	}
-	
+
 	@Override
 	public int getAccessLevel()
 	{
 		return 0;
 	}
-	
+
 	@Override
 	public void setName(Name name)
 	{
 	}
-	
+
 	@Override
 	public Name getName()
 	{
 		return this.name;
 	}
-	
+
 	@Override
 	public void setType(IType type)
 	{
 	}
-	
+
 	@Override
 	public IType getType()
 	{
 		return new ClassType(this);
 	}
-	
+
 	@Override
 	public IType getClassType()
 	{
 		return new ClassType(this);
 	}
-	
+
 	@Override
 	public void setModifiers(ModifierSet modifiers)
 	{
 	}
-	
+
 	@Override
 	public ModifierSet getModifiers()
 	{
 		return new FlagModifierSet();
 	}
-	
+
 	@Override
 	public boolean hasModifier(int mod)
 	{
 		return false;
 	}
-	
+
 	@Override
 	public AnnotationList getAnnotations()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public void setAnnotations(AnnotationList annotations)
 	{
 	}
-	
+
 	@Override
 	public void addAnnotation(IAnnotation annotation)
 	{
 	}
-	
+
 	@Override
 	public IAnnotation getAnnotation(IClass type)
 	{
 		return null;
 	}
-	
+
 	@Override
 	public ElementType getElementType()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public void setTypeParametric()
 	{
 	}
-	
+
 	@Override
 	public boolean isTypeParametric()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public int typeParameterCount()
 	{
 		return 0;
 	}
-	
+
 	@Override
 	public void setTypeParameters(ITypeParameter[] typeParameters, int count)
 	{
 	}
-	
+
 	@Override
 	public void setTypeParameter(int index, ITypeParameter typeParameter)
 	{
 	}
-	
+
 	@Override
 	public void addTypeParameter(ITypeParameter typeParameter)
 	{
 	}
-	
+
 	@Override
 	public ITypeParameter[] getTypeParameters()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public ITypeParameter getTypeParameter(int index)
 	{
 		return null;
 	}
-	
+
 	@Override
 	public int parameterCount()
 	{
 		return 0;
 	}
-	
+
 	@Override
 	public void setParameter(int index, IParameter parameter)
 	{
 	}
-	
+
 	@Override
 	public void addParameter(IParameter parameter)
 	{
 	}
-	
+
 	@Override
 	public IParameter getParameter(int index)
 	{
 		return null;
 	}
-	
+
 	@Override
 	public IParameter[] getParameters()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public void setHeader(IDyvilHeader unit)
 	{
 	}
-	
+
 	@Override
 	public IDyvilHeader getHeader()
 	{
 		return this.context;
 	}
-	
+
 	@Override
 	public void setEnclosingClass(IClass enclosingClass)
 	{
 	}
-	
+
 	@Override
 	public IClass getEnclosingClass()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public boolean isAbstract()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public boolean isInterface()
 	{
@@ -271,132 +271,132 @@ public class REPLMemberClass implements IClass
 	{
 		return false;
 	}
-	
+
 	@Override
 	public boolean isObject()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public void setFullName(String name)
 	{
 	}
-	
+
 	@Override
 	public String getFullName()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public void setSuperType(IType type)
 	{
 	}
-	
+
 	@Override
 	public IType getSuperType()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public boolean isSubTypeOf(IType type)
 	{
 		return false;
 	}
-	
+
 	@Override
 	public int getSuperTypeDistance(IType superType)
 	{
 		return 0;
 	}
-	
+
 	@Override
 	public int interfaceCount()
 	{
 		return 0;
 	}
-	
+
 	@Override
 	public void setInterface(int index, IType type)
 	{
 	}
-	
+
 	@Override
 	public void addInterface(IType type)
 	{
 	}
-	
+
 	@Override
 	public IType getInterface(int index)
 	{
 		return null;
 	}
-	
+
 	@Override
 	public void setBody(IClassBody body)
 	{
 	}
-	
+
 	@Override
 	public IClassBody getBody()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public void setMetadata(IClassMetadata metadata)
 	{
 	}
-	
+
 	@Override
 	public IClassMetadata getMetadata()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 	}
-	
+
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 	}
-	
+
 	@Override
 	public boolean checkImplements(IMethod candidate, ITypeContext typeContext)
 	{
 		return false;
 	}
-	
+
 	@Override
 	public void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext, Set<IClass> checkedClasses)
 	{
 	}
-	
+
 	@Override
 	public void foldConstants()
 	{
 	}
-	
+
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
 	}
-	
+
 	@Override
 	public boolean isStatic()
 	{
@@ -426,19 +426,19 @@ public class REPLMemberClass implements IClass
 	{
 		return this.context.resolvePackage(name);
 	}
-	
+
 	@Override
 	public IClass resolveClass(Name name)
 	{
 		return this.context.resolveClass(name);
 	}
-	
+
 	@Override
 	public IType resolveType(Name name)
 	{
 		return this.context.resolveType(name);
 	}
-	
+
 	@Override
 	public ITypeParameter resolveTypeVariable(Name name)
 	{
@@ -456,18 +456,18 @@ public class REPLMemberClass implements IClass
 	{
 		return this.context.resolveField(name);
 	}
-	
+
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		this.context.getMethodMatches(list, instance, name, arguments);
 	}
-	
+
 	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}
-	
+
 	@Override
 	public byte getVisibility(IClassMember member)
 	{
@@ -476,7 +476,7 @@ public class REPLMemberClass implements IClass
 		{
 			return VISIBLE;
 		}
-		
+
 		int level = member.getAccessLevel();
 		if ((level & Modifiers.INTERNAL) != 0)
 		{
@@ -491,10 +491,10 @@ public class REPLMemberClass implements IClass
 		{
 			return VISIBLE;
 		}
-		
+
 		return INVISIBLE;
 	}
-	
+
 	@Override
 	public byte checkException(IType type)
 	{
@@ -512,85 +512,85 @@ public class REPLMemberClass implements IClass
 	{
 		return variable == this.member;
 	}
-	
+
 	@Override
 	public IDataMember capture(IVariable capture)
 	{
 		return capture;
 	}
-	
+
 	@Override
 	public IAccessible getAccessibleThis(IClass type)
 	{
 		return null;
 	}
-	
+
 	@Override
 	public IValue getImplicit()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public IType resolveType(ITypeParameter typeVar, IType concrete)
 	{
 		return null;
 	}
-	
+
 	@Override
 	public IMethod getFunctionalMethod()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public IDataMember getSuperField(Name name)
 	{
 		return null;
 	}
-	
+
 	@Override
 	public boolean isMember(IClassMember member)
 	{
 		return false;
 	}
-	
+
 	@Override
 	public int compilableCount()
 	{
 		return this.context.innerClassCount();
 	}
-	
+
 	@Override
 	public void addCompilable(IClassCompilable compilable)
 	{
 		this.context.addInnerClass(compilable);
 	}
-	
+
 	@Override
 	public IClassCompilable getCompilable(int index)
 	{
 		return null;
 	}
-	
+
 	@Override
 	public String getInternalName()
 	{
 		return this.name.qualified;
 	}
-	
+
 	@Override
 	public String getSignature()
 	{
 		return 'L' + this.name.qualified + ';';
 	}
-	
+
 	@Override
 	public String[] getInterfaceArray()
 	{
 		return null;
 	}
-	
+
 	public static Class compile(DyvilREPL repl, IClass iclass)
 	{
 		try
@@ -607,7 +607,7 @@ public class REPLMemberClass implements IClass
 			return null;
 		}
 	}
-	
+
 	private static void dumpClass(DyvilREPL repl, String name, byte[] bytes)
 	{
 		int index = name.lastIndexOf('/');
@@ -620,31 +620,36 @@ public class REPLMemberClass implements IClass
 		{
 			fileName = name.substring(index + 1) + ".class";
 		}
-		
+
 		FileUtils.tryWrite(new File(repl.getDumpDir(), fileName), bytes);
 	}
-	
+
 	protected static Class loadClass(DyvilREPL repl, String name, byte[] bytes)
 	{
 		if (repl.getDumpDir() != null)
 		{
 			dumpClass(repl, name, bytes);
 		}
-		
-		return ReflectUtils.UNSAFE
-				.defineClass(name.replace('/', '.'), bytes, 0, bytes.length, CLASS_LOADER, PROTECTION_DOMAIN);
+
+		final Class<?> theClass = ReflectUtils.UNSAFE
+			                          .defineClass(name.replace('/', '.'), bytes, 0, bytes.length, CLASS_LOADER,
+			                                       PROTECTION_DOMAIN);
+		ReflectUtils.UNSAFE.ensureClassInitialized(theClass);
+		return theClass;
 	}
-	
+
 	protected static Class loadAnonymousClass(DyvilREPL repl, String name, byte[] bytes)
 	{
 		if (repl.getDumpDir() != null)
 		{
 			dumpClass(repl, name, bytes);
 		}
-		
-		return ReflectUtils.UNSAFE.defineAnonymousClass(REPLVariable.class, bytes, null);
+
+		final Class<?> theClass = ReflectUtils.UNSAFE.defineAnonymousClass(REPLVariable.class, bytes, null);
+		ReflectUtils.UNSAFE.ensureClassInitialized(theClass);
+		return theClass;
 	}
-	
+
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
@@ -652,9 +657,9 @@ public class REPLMemberClass implements IClass
 		writer.visit(ClassFormat.CLASS_VERSION, Modifiers.PUBLIC | Opcodes.ACC_SUPER, name, null, "java/lang/Object",
 		             null);
 		writer.visitSource(name, null);
-		
+
 		this.member.write(writer);
-		
+
 		for (IClassCompilable c : this.context.compilableList)
 		{
 			c.write(writer);
@@ -672,22 +677,22 @@ public class REPLMemberClass implements IClass
 	{
 
 	}
-	
+
 	@Override
 	public void writeInnerClassInfo(ClassWriter writer)
 	{
 	}
-	
+
 	@Override
 	public void writeSignature(DataOutput out) throws IOException
 	{
 	}
-	
+
 	@Override
 	public void readSignature(DataInput in) throws IOException
 	{
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
