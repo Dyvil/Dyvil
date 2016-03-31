@@ -122,6 +122,17 @@ public final class NamedArgumentList implements IArguments
 	}
 
 	@Override
+	public IValue getValue(int index, IParameter param)
+	{
+		final int argIndex = this.findIndex(index, param.getName());
+		if (argIndex < 0)
+		{
+			return null;
+		}
+		return this.values[argIndex];
+	}
+
+	@Override
 	public void setValue(int index, IParameter param, IValue value)
 	{
 		if (param == null)
@@ -130,44 +141,45 @@ public final class NamedArgumentList implements IArguments
 			return;
 		}
 
-		Name key = param.getName();
-		for (int i = 0; i < this.size; i++)
+		final int argIndex = this.findIndex(index, param.getName());
+		if (argIndex >= 0)
 		{
-			if (this.keys[i] == key)
-			{
-				this.values[i] = value;
-				return;
-			}
+			this.values[argIndex] = value;
 		}
 	}
 
-	private boolean isNameAt(int index, int paramIndex, Name name)
+	private int findIndex(int index, Name name)
 	{
-		final Name nameAt = this.keys[index];
-		return nameAt == null ? index == paramIndex : nameAt == name;
-	}
-
-	@Override
-	public IValue getValue(int index, IParameter param)
-	{
-		final Name name = param.getName();
+		boolean firstName = false;
 		for (int i = 0; i < this.size; i++)
 		{
-			if (this.isNameAt(i, index, name))
+			final Name nameAt = this.keys[i];
+			if (nameAt == null)
 			{
-				return this.values[i];
+				if (!firstName && i == index)
+				{
+					return i;
+				}
+				continue;
 			}
+
+			if (nameAt == name)
+			{
+				return i;
+			}
+
+			firstName = true;
 		}
-		return null;
+		return -1;
 	}
 
 	@Override
 	public float getTypeMatch(int index, IParameter param)
 	{
-		final IValue value = this.getValue(index, param);
-		if (value != null)
+		final int argIndex = this.findIndex(index, param.getName());
+		if (argIndex >= 0)
 		{
-			return value.getTypeMatch(param.getInternalType());
+			return this.values[argIndex].getTypeMatch(param.getInternalType());
 		}
 		return param.getValue() != null ? DEFAULT_MATCH : 0;
 	}
@@ -175,49 +187,40 @@ public final class NamedArgumentList implements IArguments
 	@Override
 	public void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		final Name name = param.getName();
-		for (int i = 0; i < this.size; i++)
+		final int argIndex = this.findIndex(index, param.getName());
+		if (argIndex < 0)
 		{
-			if (!this.isNameAt(i, index, name))
-			{
-				continue;
-			}
-
-			final IType type = param.getInternalType();
-			this.values[i] = TypeChecker.convertValue(this.values[i], type, typeContext, markers, context,
-			                                          IArguments.argumentMarkerSupplier(param));
 			return;
 		}
+
+		final IType type = param.getInternalType();
+		this.values[argIndex] = TypeChecker.convertValue(this.values[argIndex], type, typeContext, markers, context,
+		                                                 IArguments.argumentMarkerSupplier(param));
 	}
 
 	@Override
 	public void inferType(int index, IParameter param, ITypeContext typeContext)
 	{
-		final Name name = param.getName();
-		for (int i = 0; i < this.size; i++)
+		final int argIndex = this.findIndex(index, param.getName());
+		if (argIndex < 0)
 		{
-			if (this.isNameAt(i, index, name))
-			{
-				param.getInternalType().inferTypes(this.values[i].getType(), typeContext);
-				return;
-			}
+			return;
 		}
+
+		param.getInternalType().inferTypes(this.values[argIndex].getType(), typeContext);
 	}
 
 	@Override
 	public void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
 	{
-		final Name name = param.getName();
-		for (int i = 0; i < this.size; i++)
+		final int argIndex = this.findIndex(index, param.getName());
+		if (argIndex < 0)
 		{
-			if (this.isNameAt(i, index, name))
-			{
-				this.values[i].writeExpression(writer, param.getInternalType());
-				return;
-			}
+			param.getValue().writeExpression(writer, param.getInternalType());
+			return;
 		}
 
-		param.getValue().writeExpression(writer, param.getInternalType());
+		this.values[argIndex].writeExpression(writer, param.getInternalType());
 	}
 
 	@Override
@@ -243,6 +246,11 @@ public final class NamedArgumentList implements IArguments
 			final IValue value = this.values[i];
 
 			value.resolveTypes(markers, context);
+
+			if (key == null)
+			{
+				continue;
+			}
 
 			for (int j = 0; j < i; j++)
 			{

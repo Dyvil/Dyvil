@@ -185,7 +185,16 @@ public final class ArgumentList implements IArguments, IValueList
 	{
 		if (param.isVarargs())
 		{
-			return this.getVarargsTypeMatch(index, param);
+			if (index == this.size)
+			{
+				return VARARGS_MATCH;
+			}
+			if (index > this.size)
+			{
+				return 0;
+			}
+
+			return getVarargsTypeMatch(this.values, index, this.size, param);
 		}
 
 		if (index >= this.size)
@@ -196,18 +205,9 @@ public final class ArgumentList implements IArguments, IValueList
 		return this.values[index].getTypeMatch(param.getInternalType());
 	}
 
-	private float getVarargsTypeMatch(int index, IParameter param)
+	private static float getVarargsTypeMatch(IValue[] values, int fromIndex, int toIndex, IParameter param)
 	{
-		if (index == this.size)
-		{
-			return VARARGS_MATCH;
-		}
-		if (index > this.size)
-		{
-			return 0;
-		}
-
-		IValue argument = this.values[index];
+		IValue argument = values[fromIndex];
 		IType type = param.getInternalType();
 		float totalMatch = argument.getTypeMatch(type);
 		if (totalMatch > 0F)
@@ -216,9 +216,9 @@ public final class ArgumentList implements IArguments, IValueList
 		}
 
 		IType elementType = type.getElementType();
-		for (totalMatch = 0; index < this.size; index++)
+		for (totalMatch = 0; fromIndex < toIndex; fromIndex++)
 		{
-			float valueMatch = this.values[index].getTypeMatch(elementType);
+			float valueMatch = values[fromIndex].getTypeMatch(elementType);
 			if (valueMatch <= 0)
 			{
 				return 0F;
@@ -238,7 +238,10 @@ public final class ArgumentList implements IArguments, IValueList
 
 		if (param.isVarargs())
 		{
-			this.checkVarargsValue(index, param, typeContext, markers, context);
+			if (checkVarargsValue(this.values, index, this.size, param, typeContext, markers, context))
+			{
+				this.size = index + 1;
+			}
 			return;
 		}
 
@@ -248,33 +251,33 @@ public final class ArgumentList implements IArguments, IValueList
 		                                              IArguments.argumentMarkerSupplier(param));
 	}
 
-	private void checkVarargsValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
+	private static boolean checkVarargsValue(IValue[] values, int fromIndex, int toIndex, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		final IType arrayType = param.getInternalType();
 
-		final IValue value = this.values[index];
+		final IValue value = values[fromIndex];
 		if (value.isType(arrayType))
 		{
-			this.values[index] = TypeChecker.convertValue(value, arrayType, typeContext, markers, context,
-			                                              IArguments.argumentMarkerSupplier(param));
-			return;
+			values[fromIndex] = TypeChecker.convertValue(value, arrayType, typeContext, markers, context,
+			                                             IArguments.argumentMarkerSupplier(param));
+			return false;
 		}
 
 		final IType elementType = arrayType.getElementType();
-		final int varargsArguments = this.size - index;
-		final IValue[] values = new IValue[varargsArguments];
-		final ArrayExpr arrayExpr = new ArrayExpr(values, varargsArguments);
+		final int varargsArguments = toIndex - fromIndex;
+		final IValue[] arrayValues = new IValue[varargsArguments];
+		final ArrayExpr arrayExpr = new ArrayExpr(arrayValues, varargsArguments);
 
 		arrayExpr.setType(arrayType);
 
 		for (int i = 0; i < varargsArguments; i++)
 		{
-			values[i] = TypeChecker.convertValue(this.values[i + index], elementType, typeContext, markers, context,
-			                                     IArguments.argumentMarkerSupplier(param));
+			arrayValues[i] = TypeChecker.convertValue(values[i + fromIndex], elementType, typeContext, markers, context,
+			                                          IArguments.argumentMarkerSupplier(param));
 		}
 
-		this.values[index] = arrayExpr;
-		this.size = index + 1;
+		values[fromIndex] = arrayExpr;
+		return true;
 	}
 
 	@Override
