@@ -1,9 +1,7 @@
 package dyvil.tools.repl.context;
 
 import dyvil.collection.Set;
-import dyvil.io.FileUtils;
 import dyvil.reflect.Modifiers;
-import dyvil.reflect.ReflectUtils;
 import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -40,20 +38,14 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
-import dyvil.tools.repl.DyvilREPL;
 
 import java.io.DataInput;
 import java.io.DataOutput;
-import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.ElementType;
-import java.security.ProtectionDomain;
 
 public class REPLMemberClass implements IClass
 {
-	protected static final ClassLoader      CLASS_LOADER      = REPLVariable.class.getClassLoader();
-	private static final   ProtectionDomain PROTECTION_DOMAIN = REPLVariable.class.getProtectionDomain();
-
 	private REPLContext  context;
 	private Name         name;
 	private IClassMember member;
@@ -589,65 +581,6 @@ public class REPLMemberClass implements IClass
 	public String[] getInterfaceArray()
 	{
 		return null;
-	}
-
-	public static Class compile(DyvilREPL repl, IClass iclass)
-	{
-		try
-		{
-			ClassWriter cw = new ClassWriter(ClassFormat.ASM_VERSION);
-			iclass.write(cw);
-			cw.visitEnd();
-			byte[] bytes = cw.toByteArray();
-			return loadClass(repl, iclass.getInternalName(), bytes);
-		}
-		catch (Throwable t)
-		{
-			t.printStackTrace(repl.getOutput());
-			return null;
-		}
-	}
-
-	private static void dumpClass(DyvilREPL repl, String name, byte[] bytes)
-	{
-		int index = name.lastIndexOf('/');
-		String fileName;
-		if (index <= 0)
-		{
-			fileName = name + ".class";
-		}
-		else
-		{
-			fileName = name.substring(index + 1) + ".class";
-		}
-
-		FileUtils.tryWrite(new File(repl.getDumpDir(), fileName), bytes);
-	}
-
-	protected static Class loadClass(DyvilREPL repl, String name, byte[] bytes)
-	{
-		if (repl.getDumpDir() != null)
-		{
-			dumpClass(repl, name, bytes);
-		}
-
-		final Class<?> theClass = ReflectUtils.UNSAFE
-			                          .defineClass(name.replace('/', '.'), bytes, 0, bytes.length, CLASS_LOADER,
-			                                       PROTECTION_DOMAIN);
-		ReflectUtils.UNSAFE.ensureClassInitialized(theClass);
-		return theClass;
-	}
-
-	protected static Class loadAnonymousClass(DyvilREPL repl, String name, byte[] bytes)
-	{
-		if (repl.getDumpDir() != null)
-		{
-			dumpClass(repl, name, bytes);
-		}
-
-		final Class<?> theClass = ReflectUtils.UNSAFE.defineAnonymousClass(REPLVariable.class, bytes, null);
-		ReflectUtils.UNSAFE.ensureClassInitialized(theClass);
-		return theClass;
 	}
 
 	@Override

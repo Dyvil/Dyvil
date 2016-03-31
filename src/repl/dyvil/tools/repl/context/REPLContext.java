@@ -142,7 +142,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 			{
 				String fileName = icc.getFileName();
 				byte[] bytes = ClassWriter.compile(icc);
-				REPLMemberClass.loadClass(this.repl, REPL$CLASSES.concat(fileName), bytes);
+				REPLCompiler.loadClass(this.repl, REPL$CLASSES.concat(fileName), bytes);
 			}
 			catch (Throwable t)
 			{
@@ -239,7 +239,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 	private void compileClass(IClass iclass)
 	{
 		this.compileInnerClasses();
-		REPLMemberClass.compile(this.repl, iclass);
+		REPLCompiler.compile(this.repl, iclass);
 	}
 
 	@Override
@@ -390,7 +390,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 		// Check if the class is already defined
 		try
 		{
-			Class.forName(iclass.getFullName(), false, REPLMemberClass.CLASS_LOADER);
+			Class.forName(iclass.getFullName(), false, REPLCompiler.CLASS_LOADER);
 			this.compiler.getErrorOutput().println("The class '" + iclass.getName() + "' cannot be re-defined");
 			return;
 		}

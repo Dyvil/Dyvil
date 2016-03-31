@@ -38,38 +38,6 @@ public class REPLVariable extends Field
 		return mod == Modifiers.STATIC || this.modifiers.hasIntModifier(mod);
 	}
 
-	private static void filterStackTrace(Throwable throwable)
-	{
-		StackTraceElement[] traceElements = throwable.getStackTrace();
-		int count = traceElements.length;
-		int lastIndex = count - 1;
-
-		for (; lastIndex >= 0; --lastIndex)
-		{
-			if (traceElements[lastIndex].getClassName().startsWith("sun.misc.Unsafe"))
-			{
-				--lastIndex;
-				break;
-			}
-		}
-
-		StackTraceElement[] newTraceElements = new StackTraceElement[lastIndex + 1];
-		System.arraycopy(traceElements, 0, newTraceElements, 0, lastIndex + 1);
-
-		throwable.setStackTrace(newTraceElements);
-
-		Throwable cause = throwable.getCause();
-		if (cause != null)
-		{
-			filterStackTrace(cause);
-		}
-
-		for (Throwable suppressed : throwable.getSuppressed())
-		{
-			filterStackTrace(suppressed);
-		}
-	}
-
 	protected void compute(DyvilREPL repl, List<IClassCompilable> compilableList)
 	{
 		if (this.isConstant() && !compilableList.isEmpty())
@@ -77,29 +45,34 @@ public class REPLVariable extends Field
 			return;
 		}
 
+		final byte[] bytes;
+
 		try
 		{
-			this.theClass = this.generateClass(this.className, compilableList);
+			bytes = this.generateClass(this.className, compilableList);
 		}
 		catch (Throwable throwable)
 		{
 			throwable.printStackTrace(repl.getErrorOutput());
+			return;
 		}
 
-		try
+		if (this.type == Types.VOID && compilableList.isEmpty())
 		{
-			this.updateValue(repl);
+			// We don't have any variables, so the Class can be GC'd after it has been loaded and initialized.
+			this.theClass = REPLCompiler.loadAnonymousClass(this.context.repl, this.className, bytes);
+			return;
 		}
-		catch (Throwable t)
-		{
-			filterStackTrace(t);
-			t.printStackTrace(repl.getOutput());
-		}
+
+		// The type contains the value, so we have to keep the class loaded.
+		this.theClass = REPLCompiler.loadClass(this.context.repl, this.className, bytes);
+
+		this.updateValue(repl);
 	}
 
 	protected void updateValue(DyvilREPL repl)
 	{
-		if (this.theClass == null)
+		if (this.theClass == null || this.type == Types.VOID)
 		{
 			return;
 		}
@@ -113,18 +86,7 @@ public class REPLVariable extends Field
 		}
 		catch (IllegalAccessException illegalAccess)
 		{
-			illegalAccess.printStackTrace(repl.getOutput());
-		}
-		catch (ExceptionInInitializerError initializerError)
-		{
-			final Throwable cause = initializerError.getCause();
-			filterStackTrace(cause);
-			cause.printStackTrace(repl.getOutput());
-		}
-		catch (Throwable throwable)
-		{
-			filterStackTrace(throwable);
-			throwable.printStackTrace(repl.getOutput());
+			illegalAccess.printStackTrace(repl.getErrorOutput());
 		}
 	}
 
@@ -139,7 +101,7 @@ public class REPLVariable extends Field
 		return tag >= 0 && tag != IValue.NIL && tag < IValue.STRING;
 	}
 
-	private Class generateClass(String className, List<IClassCompilable> compilableList) throws Throwable
+	private byte[] generateClass(String className, List<IClassCompilable> compilableList) throws Throwable
 	{
 		final String name = this.bytecodeName = this.name.qualified;
 		final String extendedType = this.type.getExtendedName();
@@ -200,17 +162,7 @@ public class REPLVariable extends Field
 		// Finish Class compilation
 		classWriter.visitEnd();
 
-		final byte[] bytes = classWriter.toByteArray();
-
-		if (this.type != Types.VOID || !compilableList.isEmpty())
-		{
-			// The type contains the value, so we have to keep the class loaded.
-			return REPLMemberClass.loadClass(this.context.repl, className, bytes);
-		}
-
-		// We don't have any variables, so we can throw the Class away after
-		// it has been loaded.
-		return REPLMemberClass.loadAnonymousClass(this.context.repl, className, bytes);
+		return classWriter.toByteArray();
 	}
 
 	@Override
