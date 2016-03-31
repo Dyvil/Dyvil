@@ -10,14 +10,14 @@ public interface LongRef
 	void set(long value);
 
 	@DyvilModifiers(Modifiers.INLINE)
-	static long $times(LongRef intRef)
+	static long $times(LongRef ref)
 	{
-		return intRef.get();
+		return ref.get();
 	}
 
 	@DyvilModifiers(Modifiers.INLINE | Modifiers.INFIX)
-	static void $times$eq(LongRef intRef, long value)
+	static void $times_$eq(LongRef ref, long value)
 	{
-		intRef.set(value);
+		ref.set(value);
 	}
 }

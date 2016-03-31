@@ -10,14 +10,14 @@ public interface ShortRef
 	void set(short value);
 
 	@DyvilModifiers(Modifiers.INLINE)
-	static short $times(ShortRef intRef)
+	static short $times(ShortRef ref)
 	{
-		return intRef.get();
+		return ref.get();
 	}
 
 	@DyvilModifiers(Modifiers.INLINE | Modifiers.INFIX)
-	static void $times$eq(ShortRef intRef, short value)
+	static void $times_$eq(ShortRef ref, short value)
 	{
-		intRef.set(value);
+		ref.set(value);
 	}
 }

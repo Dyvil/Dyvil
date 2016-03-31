@@ -10,14 +10,14 @@ public interface BooleanRef
 	void set(boolean value);
 
 	@DyvilModifiers(Modifiers.INLINE)
-	static boolean $times(BooleanRef intRef)
+	static boolean $times(BooleanRef ref)
 	{
-		return intRef.get();
+		return ref.get();
 	}
 
 	@DyvilModifiers(Modifiers.INLINE | Modifiers.INFIX)
-	static void $times_$eq(BooleanRef intRef, boolean value)
+	static void $times_$eq(BooleanRef ref, boolean value)
 	{
-		intRef.set(value);
+		ref.set(value);
 	}
 }

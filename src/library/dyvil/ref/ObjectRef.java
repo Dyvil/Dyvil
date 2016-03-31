@@ -10,14 +10,14 @@ public interface ObjectRef<T>
 	void set(T value);
 
 	@DyvilModifiers(Modifiers.INLINE)
-	static <T> T $times(ObjectRef<T> intRef)
+	static <T> T $times(ObjectRef<T> ref)
 	{
-		return intRef.get();
+		return ref.get();
 	}
 
 	@DyvilModifiers(Modifiers.INLINE | Modifiers.INFIX)
-	static <T> void $times$eq(ObjectRef<T> intRef, T value)
+	static <T> void $times_$eq(ObjectRef<T> ref, T value)
 	{
-		intRef.set(value);
+		ref.set(value);
 	}
 }

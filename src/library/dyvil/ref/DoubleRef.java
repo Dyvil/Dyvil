@@ -10,14 +10,14 @@ public interface DoubleRef
 	void set(double value);
 
 	@DyvilModifiers(Modifiers.INLINE)
-	static double $times(DoubleRef intRef)
+	static double $times(DoubleRef ref)
 	{
-		return intRef.get();
+		return ref.get();
 	}
 
 	@DyvilModifiers(Modifiers.INLINE | Modifiers.INFIX)
-	static void $times_$eq(DoubleRef intRef, double value)
+	static void $times_$eq(DoubleRef ref, double value)
 	{
-		intRef.set(value);
+		ref.set(value);
 	}
 }

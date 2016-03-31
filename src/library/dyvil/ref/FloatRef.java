@@ -10,14 +10,14 @@ public interface FloatRef
 	void set(float value);
 
 	@DyvilModifiers(Modifiers.INLINE)
-	static float $times(FloatRef intRef)
+	static float $times(FloatRef ref)
 	{
-		return intRef.get();
+		return ref.get();
 	}
 
 	@DyvilModifiers(Modifiers.INLINE | Modifiers.INFIX)
-	static void $times_$eq(FloatRef intRef, float value)
+	static void $times_$eq(FloatRef ref, float value)
 	{
-		intRef.set(value);
+		ref.set(value);
 	}
 }
