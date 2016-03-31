@@ -191,7 +191,7 @@ public final class TupleExpr implements IValue, IValueList
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			final IType elementType =
-				theClass == Types.OBJECT_CLASS ? Types.ANY : type.resolveTypeSafely(theClass.getTypeParameter(i));
+				theClass == Types.OBJECT_CLASS ? Types.ANY : Types.resolveTypeSafely(type, theClass.getTypeParameter(i));
 
 			this.values[i] = TypeChecker.convertValue(this.values[i], elementType, typeContext, markers, context,
 			                                          LazyFields.ELEMENT_MARKER_SUPPLIER);

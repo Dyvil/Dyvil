@@ -5,8 +5,6 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.WildcardValue;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.LiteralConversion;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -129,8 +127,8 @@ public class ColonOperator implements IValue
 		}
 		else
 		{
-			leftType = type.resolveTypeSafely(iclass.getTypeParameter(0));
-			rightType = type.resolveTypeSafely(iclass.getTypeParameter(1));
+			leftType = Types.resolveTypeSafely(type, iclass.getTypeParameter(0));
+			rightType = Types.resolveTypeSafely(type, iclass.getTypeParameter(1));
 		}
 
 		this.left = TypeChecker.convertValue(this.left, leftType, typeContext, markers, context,
