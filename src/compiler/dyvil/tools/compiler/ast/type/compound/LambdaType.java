@@ -251,7 +251,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		final IClass functionClass = this.getTheClass();
 
 		ITypeParameter typeVar = functionClass.getTypeParameter(this.parameterCount);
-		IType resolvedType = type.resolveTypeSafely(typeVar);
+		IType resolvedType = Types.resolveTypeSafely(type, typeVar);
 
 		// Return Type is Covariant
 		if (!Types.isSuperType(this.returnType, resolvedType))

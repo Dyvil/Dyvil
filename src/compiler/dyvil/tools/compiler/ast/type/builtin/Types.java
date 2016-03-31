@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.dynamic.DynamicType;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -321,5 +322,11 @@ public final class Types
 			return UNKNOWN;
 		}
 		return null;
+	}
+
+	public static IType resolveTypeSafely(IType type, ITypeParameter typeVar)
+	{
+		final IType resolved = type.resolveType(typeVar);
+		return resolved != null ? resolved : typeVar.getDefaultType();
 	}
 }

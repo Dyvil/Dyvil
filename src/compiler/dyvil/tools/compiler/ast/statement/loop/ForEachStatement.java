@@ -239,8 +239,8 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 		}
 		if (Types.isSuperType(IterableForStatement.LazyFields.ITERATOR, valueType))
 		{
-			final IType iteratorType = valueType.resolveTypeSafely(IterableForStatement.LazyFields.ITERATOR_TYPE)
-			                                    .asReturnType();
+			final IType iteratorType = Types.resolveTypeSafely(valueType, IterableForStatement.LazyFields.ITERATOR_TYPE)
+			                                .asReturnType();
 			if (varType == Types.UNKNOWN)
 			{
 				this.inferVariableType(markers, iteratorType);
@@ -260,8 +260,8 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 		}
 		if (Types.isSuperType(IterableForStatement.LazyFields.ITERABLE, valueType))
 		{
-			final IType iterableType = valueType.resolveTypeSafely(IterableForStatement.LazyFields.ITERABLE_TYPE)
-			                                    .asReturnType();
+			final IType iterableType = Types.resolveTypeSafely(valueType, IterableForStatement.LazyFields.ITERABLE_TYPE)
+			                                .asReturnType();
 			if (varType == Types.UNKNOWN)
 			{
 				this.inferVariableType(markers, iterableType);

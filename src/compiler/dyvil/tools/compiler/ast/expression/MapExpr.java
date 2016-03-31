@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Mutability;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.MapType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -123,8 +124,8 @@ public class MapExpr implements IValue
 			return null;
 		}
 
-		final IType keyType = this.keyType = mapType.resolveTypeSafely(MapType.MapTypes.KEY_VARIABLE);
-		final IType valueType = this.valueType = mapType.resolveTypeSafely(MapType.MapTypes.VALUE_VARIABLE);
+		final IType keyType = this.keyType = Types.resolveTypeSafely(mapType, MapType.MapTypes.KEY_VARIABLE);
+		final IType valueType = this.valueType = Types.resolveTypeSafely(mapType, MapType.MapTypes.VALUE_VARIABLE);
 
 		for (int i = 0; i < this.count; i++)
 		{
@@ -146,8 +147,8 @@ public class MapExpr implements IValue
 			return this.isConvertibleFrom(type);
 		}
 
-		IType keyType = type.resolveTypeSafely(MapType.MapTypes.KEY_VARIABLE);
-		IType valueType = type.resolveTypeSafely(MapType.MapTypes.VALUE_VARIABLE);
+		IType keyType = Types.resolveTypeSafely(type, MapType.MapTypes.KEY_VARIABLE);
+		IType valueType = Types.resolveTypeSafely(type, MapType.MapTypes.VALUE_VARIABLE);
 
 		for (int i = 0; i < this.count; i++)
 		{
@@ -182,8 +183,8 @@ public class MapExpr implements IValue
 			return 1;
 		}
 
-		final IType keyType = type.resolveTypeSafely(MapType.MapTypes.KEY_VARIABLE);
-		final IType valueType = type.resolveTypeSafely(MapType.MapTypes.VALUE_VARIABLE);
+		final IType keyType = Types.resolveTypeSafely(type, MapType.MapTypes.KEY_VARIABLE);
+		final IType valueType = Types.resolveTypeSafely(type, MapType.MapTypes.VALUE_VARIABLE);
 
 		int total = 0;
 		for (int i = 0; i < this.count; i++)

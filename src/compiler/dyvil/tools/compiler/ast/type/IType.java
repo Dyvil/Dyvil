@@ -290,12 +290,6 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	@Override
 	IType resolveType(ITypeParameter typeParameter);
 
-	default IType resolveTypeSafely(ITypeParameter typeVar)
-	{
-		IType t = this.resolveType(typeVar);
-		return t == null ? Types.ANY : t;
-	}
-
 	/**
 	 * Returns true if this is or contains any type variables.
 	 */

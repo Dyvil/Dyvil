@@ -152,6 +152,7 @@ public class InlineIntrinsicData extends InstructionList implements IntrinsicDat
 		else
 		{
 			this.writeInstruction(lastInstruction, writer, instance, arguments, localCount);
+			writer.visitJumpInsn(Opcodes.IFNE, dest);
 		}
 
 		writer.resetLocals(localCount);
@@ -181,6 +182,7 @@ public class InlineIntrinsicData extends InstructionList implements IntrinsicDat
 		else
 		{
 			this.writeInstruction(lastInstruction, writer, instance, arguments, localCount);
+			writer.visitJumpInsn(Opcodes.IFEQ, dest);
 		}
 
 		writer.resetLocals(localCount);
