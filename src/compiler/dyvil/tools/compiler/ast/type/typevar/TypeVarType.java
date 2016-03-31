@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.type.typevar;
 
-import dyvil.tools.asm.Opcodes;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.context.IContext;

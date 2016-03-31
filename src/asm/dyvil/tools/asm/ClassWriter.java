@@ -24,7 +24,7 @@ public class ClassWriter implements ClassVisitor
 	public static final int COMPUTE_MAXS            = 1;
 	public static final int COMPUTE_FRAMES          = 2;
 	static final        int ACC_SYNTHETIC_ATTRIBUTE = 0x40000;
-	static final        int TO_ACC_SYNTHETIC        = ACC_SYNTHETIC_ATTRIBUTE / Opcodes.ACC_SYNTHETIC;
+	static final        int TO_ACC_SYNTHETIC        = ACC_SYNTHETIC_ATTRIBUTE / ASMConstants.ACC_SYNTHETIC;
 	static final        int NOARG_INSN              = 0;
 	static final        int SBYTE_INSN              = 1;
 	static final        int SHORT_INSN              = 2;
@@ -333,15 +333,15 @@ public class ClassWriter implements ClassVisitor
 			size += 10;
 			this.newUTF8("EnclosingMethod");
 		}
-		if ((this.access & Opcodes.ACC_DEPRECATED) != 0)
+		if ((this.access & ASMConstants.ACC_DEPRECATED) != 0)
 		{
 			++attributeCount;
 			size += 6;
 			this.newUTF8("Deprecated");
 		}
-		if ((this.access & Opcodes.ACC_SYNTHETIC) != 0)
+		if ((this.access & ASMConstants.ACC_SYNTHETIC) != 0)
 		{
-			if ((this.version & 0xFFFF) < Opcodes.V1_5 || (this.access & ACC_SYNTHETIC_ATTRIBUTE) != 0)
+			if ((this.version & 0xFFFF) < ASMConstants.V1_5 || (this.access & ACC_SYNTHETIC_ATTRIBUTE) != 0)
 			{
 				++attributeCount;
 				size += 6;
@@ -389,7 +389,7 @@ public class ClassWriter implements ClassVisitor
 		ByteVector out = new ByteVector(size);
 		out.putInt(0xCAFEBABE).putInt(this.version);
 		out.putShort(this.index).putByteArray(this.pool.data, 0, this.pool.length);
-		int mask = Opcodes.ACC_DEPRECATED | ACC_SYNTHETIC_ATTRIBUTE
+		int mask = ASMConstants.ACC_DEPRECATED | ACC_SYNTHETIC_ATTRIBUTE
 				| (this.access & ACC_SYNTHETIC_ATTRIBUTE) / TO_ACC_SYNTHETIC;
 		out.putShort(this.access & ~mask).putShort(this.name).putShort(this.superName);
 		out.putShort(this.interfaceCount);
@@ -437,13 +437,13 @@ public class ClassWriter implements ClassVisitor
 			out.putShort(this.newUTF8("EnclosingMethod")).putInt(4);
 			out.putShort(this.enclosingMethodOwner).putShort(this.enclosingMethod);
 		}
-		if ((this.access & Opcodes.ACC_DEPRECATED) != 0)
+		if ((this.access & ASMConstants.ACC_DEPRECATED) != 0)
 		{
 			out.putShort(this.newUTF8("Deprecated")).putInt(0);
 		}
-		if ((this.access & Opcodes.ACC_SYNTHETIC) != 0)
+		if ((this.access & ASMConstants.ACC_SYNTHETIC) != 0)
 		{
-			if ((this.version & 0xFFFF) < Opcodes.V1_5 || (this.access & ACC_SYNTHETIC_ATTRIBUTE) != 0)
+			if ((this.version & 0xFFFF) < ASMConstants.V1_5 || (this.access & ACC_SYNTHETIC_ATTRIBUTE) != 0)
 			{
 				out.putShort(this.newUTF8("Synthetic")).putInt(0);
 			}
@@ -634,13 +634,13 @@ public class ClassWriter implements ClassVisitor
 		Item result = this.get(this.key4);
 		if (result == null)
 		{
-			if (tag <= Opcodes.H_PUTSTATIC)
+			if (tag <= ASMConstants.H_PUTSTATIC)
 			{
 				this.put112(HANDLE, tag, this.newField(owner, name, desc));
 			}
 			else
 			{
-				this.put112(HANDLE, tag, this.newMethod(owner, name, desc, tag == Opcodes.H_INVOKEINTERFACE));
+				this.put112(HANDLE, tag, this.newMethod(owner, name, desc, tag == ASMConstants.H_INVOKEINTERFACE));
 			}
 			result = new Item(this.index++, this.key4);
 			this.put(result);

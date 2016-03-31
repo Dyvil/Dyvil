@@ -1,10 +1,11 @@
 package dyvil.runtime.reference;
 
+import dyvil.reflect.Opcodes;
 import dyvil.runtime.BytecodeDump;
 import dyvil.runtime.TypeConverter;
+import dyvil.tools.asm.ASMConstants;
 import dyvil.tools.asm.ClassWriter;
 import dyvil.tools.asm.MethodVisitor;
-import dyvil.tools.asm.Opcodes;
 
 import java.lang.invoke.*;
 import java.lang.reflect.Constructor;
@@ -155,7 +156,7 @@ public class PropertyReferenceMetafactory
 		final ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 
 		classWriter
-			.visit(CLASS_VERSION, PUBLIC | SYNTHETIC | Opcodes.ACC_FINAL, this.className, null, "java/lang/Object",
+			.visit(CLASS_VERSION, PUBLIC | SYNTHETIC | ASMConstants.ACC_FINAL, this.className, null, "java/lang/Object",
 			       new String[] { refItf });
 
 		if (this.receiverType != null)

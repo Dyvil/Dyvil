@@ -4,8 +4,9 @@ import dyvil.collection.Set;
 import dyvil.collection.mutable.ArraySet;
 import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.reflect.Modifiers;
+import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.ASMConstants;
 import dyvil.tools.asm.AnnotationVisitor;
-import dyvil.tools.asm.Opcodes;
 import dyvil.tools.asm.TypeReference;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
@@ -512,7 +513,7 @@ public class CodeClass extends AbstractClass
 		int modifiers = this.modifiers.toFlags();
 		if ((modifiers & Modifiers.INTERFACE_CLASS) != Modifiers.INTERFACE_CLASS)
 		{
-			modifiers |= Opcodes.ACC_SUPER;
+			modifiers |= ASMConstants.ACC_SUPER;
 		}
 		writer
 			.visit(ClassFormat.CLASS_VERSION, modifiers & 0x7631, this.internalName, signature, superClass, interfaces);
@@ -829,11 +830,11 @@ public class CodeClass extends AbstractClass
 			int modifiers = this.modifiers.toFlags() & 0x761F;
 			if ((modifiers & Modifiers.INTERFACE_CLASS) != Modifiers.INTERFACE_CLASS)
 			{
-				modifiers |= Opcodes.ACC_STATIC;
+				modifiers |= Modifiers.STATIC;
 			}
 			else
 			{
-				modifiers &= ~Opcodes.ACC_STATIC;
+				modifiers &= ~Modifiers.STATIC;
 			}
 			writer.visitInnerClass(this.internalName, this.enclosingClass.getInternalName(), this.name.qualified,
 			                       modifiers);

@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.backend;
 
+import dyvil.tools.asm.ASMConstants;
 import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.backend.exception.StackUnderflowException;
@@ -829,7 +830,7 @@ public class Frame
 			stack--;
 		}
 		
-		mv.visitFrame(dyvil.tools.asm.Opcodes.F_NEW, localIndex, locals, stack, this.stack);
+		mv.visitFrame(ASMConstants.F_NEW, localIndex, locals, stack, this.stack);
 	}
 	
 	public Frame copy()

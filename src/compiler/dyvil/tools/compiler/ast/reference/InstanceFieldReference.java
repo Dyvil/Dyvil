@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.reference;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.asm.Opcodes;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Type;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;

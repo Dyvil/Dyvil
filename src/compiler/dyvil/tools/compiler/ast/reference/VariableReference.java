@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.reference;
 
-import dyvil.tools.asm.Opcodes;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IVariable;

@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.bytecode;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.MethodVisitor;
-import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 
 public class MultiArrayInstruction implements IInstruction

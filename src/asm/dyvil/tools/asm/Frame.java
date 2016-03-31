@@ -315,7 +315,7 @@ final class Frame
 		this.inputLocals = new int[maxLocals];
 		this.inputStack = new int[0];
 		int i = 0;
-		if ((access & Opcodes.ACC_STATIC) == 0)
+		if ((access & ASMConstants.ACC_STATIC) == 0)
 		{
 			if ((access & MethodWriter.ACC_CONSTRUCTOR) == 0)
 			{
@@ -346,51 +346,51 @@ final class Frame
 		int t1, t2, t3, t4;
 		switch (opcode)
 		{
-		case Opcodes.NOP:
-		case Opcodes.INEG:
-		case Opcodes.LNEG:
-		case Opcodes.FNEG:
-		case Opcodes.DNEG:
-		case Opcodes.I2B:
-		case Opcodes.I2C:
-		case Opcodes.I2S:
-		case Opcodes.GOTO:
-		case Opcodes.RETURN:
+		case ASMConstants.NOP:
+		case ASMConstants.INEG:
+		case ASMConstants.LNEG:
+		case ASMConstants.FNEG:
+		case ASMConstants.DNEG:
+		case ASMConstants.I2B:
+		case ASMConstants.I2C:
+		case ASMConstants.I2S:
+		case ASMConstants.GOTO:
+		case ASMConstants.RETURN:
 			break;
-		case Opcodes.ACONST_NULL:
+		case ASMConstants.ACONST_NULL:
 			this.push(NULL);
 			break;
-		case Opcodes.ICONST_M1:
-		case Opcodes.ICONST_0:
-		case Opcodes.ICONST_1:
-		case Opcodes.ICONST_2:
-		case Opcodes.ICONST_3:
-		case Opcodes.ICONST_4:
-		case Opcodes.ICONST_5:
-		case Opcodes.BIPUSH:
-		case Opcodes.SIPUSH:
-		case Opcodes.ILOAD:
+		case ASMConstants.ICONST_M1:
+		case ASMConstants.ICONST_0:
+		case ASMConstants.ICONST_1:
+		case ASMConstants.ICONST_2:
+		case ASMConstants.ICONST_3:
+		case ASMConstants.ICONST_4:
+		case ASMConstants.ICONST_5:
+		case ASMConstants.BIPUSH:
+		case ASMConstants.SIPUSH:
+		case ASMConstants.ILOAD:
 			this.push(INTEGER);
 			break;
-		case Opcodes.LCONST_0:
-		case Opcodes.LCONST_1:
-		case Opcodes.LLOAD:
+		case ASMConstants.LCONST_0:
+		case ASMConstants.LCONST_1:
+		case ASMConstants.LLOAD:
 			this.push(LONG);
 			this.push(TOP);
 			break;
-		case Opcodes.FCONST_0:
-		case Opcodes.FCONST_1:
-		case Opcodes.FCONST_2:
-		case Opcodes.FLOAD:
+		case ASMConstants.FCONST_0:
+		case ASMConstants.FCONST_1:
+		case ASMConstants.FCONST_2:
+		case ASMConstants.FLOAD:
 			this.push(FLOAT);
 			break;
-		case Opcodes.DCONST_0:
-		case Opcodes.DCONST_1:
-		case Opcodes.DLOAD:
+		case ASMConstants.DCONST_0:
+		case ASMConstants.DCONST_1:
+		case ASMConstants.DLOAD:
 			this.push(DOUBLE);
 			this.push(TOP);
 			break;
-		case Opcodes.LDC:
+		case ASMConstants.LDC:
 			switch (item.type)
 			{
 			case ClassWriter.INT:
@@ -421,40 +421,40 @@ final class Frame
 				this.push(OBJECT | cw.addType("java/lang/invoke/MethodHandle"));
 			}
 			break;
-		case Opcodes.ALOAD:
+		case ASMConstants.ALOAD:
 			this.push(this.get(arg));
 			break;
-		case Opcodes.IALOAD:
-		case Opcodes.BALOAD:
-		case Opcodes.CALOAD:
-		case Opcodes.SALOAD:
+		case ASMConstants.IALOAD:
+		case ASMConstants.BALOAD:
+		case ASMConstants.CALOAD:
+		case ASMConstants.SALOAD:
 			this.pop(2);
 			this.push(INTEGER);
 			break;
-		case Opcodes.LALOAD:
-		case Opcodes.D2L:
+		case ASMConstants.LALOAD:
+		case ASMConstants.D2L:
 			this.pop(2);
 			this.push(LONG);
 			this.push(TOP);
 			break;
-		case Opcodes.FALOAD:
+		case ASMConstants.FALOAD:
 			this.pop(2);
 			this.push(FLOAT);
 			break;
-		case Opcodes.DALOAD:
-		case Opcodes.L2D:
+		case ASMConstants.DALOAD:
+		case ASMConstants.L2D:
 			this.pop(2);
 			this.push(DOUBLE);
 			this.push(TOP);
 			break;
-		case Opcodes.AALOAD:
+		case ASMConstants.AALOAD:
 			this.pop(1);
 			t1 = this.pop();
 			this.push(ELEMENT_OF + t1);
 			break;
-		case Opcodes.ISTORE:
-		case Opcodes.FSTORE:
-		case Opcodes.ASTORE:
+		case ASMConstants.ISTORE:
+		case ASMConstants.FSTORE:
+		case ASMConstants.ASTORE:
 			t1 = this.pop();
 			this.set(arg, t1);
 			if (arg > 0)
@@ -471,8 +471,8 @@ final class Frame
 				}
 			}
 			break;
-		case Opcodes.LSTORE:
-		case Opcodes.DSTORE:
+		case ASMConstants.LSTORE:
+		case ASMConstants.DSTORE:
 			this.pop(1);
 			t1 = this.pop();
 			this.set(arg, t1);
@@ -491,63 +491,63 @@ final class Frame
 				}
 			}
 			break;
-		case Opcodes.IASTORE:
-		case Opcodes.BASTORE:
-		case Opcodes.CASTORE:
-		case Opcodes.SASTORE:
-		case Opcodes.FASTORE:
-		case Opcodes.AASTORE:
+		case ASMConstants.IASTORE:
+		case ASMConstants.BASTORE:
+		case ASMConstants.CASTORE:
+		case ASMConstants.SASTORE:
+		case ASMConstants.FASTORE:
+		case ASMConstants.AASTORE:
 			this.pop(3);
 			break;
-		case Opcodes.LASTORE:
-		case Opcodes.DASTORE:
+		case ASMConstants.LASTORE:
+		case ASMConstants.DASTORE:
 			this.pop(4);
 			break;
-		case Opcodes.POP:
-		case Opcodes.IFEQ:
-		case Opcodes.IFNE:
-		case Opcodes.IFLT:
-		case Opcodes.IFGE:
-		case Opcodes.IFGT:
-		case Opcodes.IFLE:
-		case Opcodes.IRETURN:
-		case Opcodes.FRETURN:
-		case Opcodes.ARETURN:
-		case Opcodes.TABLESWITCH:
-		case Opcodes.LOOKUPSWITCH:
-		case Opcodes.ATHROW:
-		case Opcodes.MONITORENTER:
-		case Opcodes.MONITOREXIT:
-		case Opcodes.IFNULL:
-		case Opcodes.IFNONNULL:
+		case ASMConstants.POP:
+		case ASMConstants.IFEQ:
+		case ASMConstants.IFNE:
+		case ASMConstants.IFLT:
+		case ASMConstants.IFGE:
+		case ASMConstants.IFGT:
+		case ASMConstants.IFLE:
+		case ASMConstants.IRETURN:
+		case ASMConstants.FRETURN:
+		case ASMConstants.ARETURN:
+		case ASMConstants.TABLESWITCH:
+		case ASMConstants.LOOKUPSWITCH:
+		case ASMConstants.ATHROW:
+		case ASMConstants.MONITORENTER:
+		case ASMConstants.MONITOREXIT:
+		case ASMConstants.IFNULL:
+		case ASMConstants.IFNONNULL:
 			this.pop(1);
 			break;
-		case Opcodes.POP2:
-		case Opcodes.IF_ICMPEQ:
-		case Opcodes.IF_ICMPNE:
-		case Opcodes.IF_ICMPLT:
-		case Opcodes.IF_ICMPGE:
-		case Opcodes.IF_ICMPGT:
-		case Opcodes.IF_ICMPLE:
-		case Opcodes.IF_ACMPEQ:
-		case Opcodes.IF_ACMPNE:
-		case Opcodes.LRETURN:
-		case Opcodes.DRETURN:
+		case ASMConstants.POP2:
+		case ASMConstants.IF_ICMPEQ:
+		case ASMConstants.IF_ICMPNE:
+		case ASMConstants.IF_ICMPLT:
+		case ASMConstants.IF_ICMPGE:
+		case ASMConstants.IF_ICMPGT:
+		case ASMConstants.IF_ICMPLE:
+		case ASMConstants.IF_ACMPEQ:
+		case ASMConstants.IF_ACMPNE:
+		case ASMConstants.LRETURN:
+		case ASMConstants.DRETURN:
 			this.pop(2);
 			break;
-		case Opcodes.DUP:
+		case ASMConstants.DUP:
 			t1 = this.pop();
 			this.push(t1);
 			this.push(t1);
 			break;
-		case Opcodes.DUP_X1:
+		case ASMConstants.DUP_X1:
 			t1 = this.pop();
 			t2 = this.pop();
 			this.push(t1);
 			this.push(t2);
 			this.push(t1);
 			break;
-		case Opcodes.DUP_X2:
+		case ASMConstants.DUP_X2:
 			t1 = this.pop();
 			t2 = this.pop();
 			t3 = this.pop();
@@ -556,7 +556,7 @@ final class Frame
 			this.push(t2);
 			this.push(t1);
 			break;
-		case Opcodes.DUP2:
+		case ASMConstants.DUP2:
 			t1 = this.pop();
 			t2 = this.pop();
 			this.push(t2);
@@ -564,7 +564,7 @@ final class Frame
 			this.push(t2);
 			this.push(t1);
 			break;
-		case Opcodes.DUP2_X1:
+		case ASMConstants.DUP2_X1:
 			t1 = this.pop();
 			t2 = this.pop();
 			t3 = this.pop();
@@ -574,7 +574,7 @@ final class Frame
 			this.push(t2);
 			this.push(t1);
 			break;
-		case Opcodes.DUP2_X2:
+		case ASMConstants.DUP2_X2:
 			t1 = this.pop();
 			t2 = this.pop();
 			t3 = this.pop();
@@ -586,161 +586,161 @@ final class Frame
 			this.push(t2);
 			this.push(t1);
 			break;
-		case Opcodes.SWAP:
+		case ASMConstants.SWAP:
 			t1 = this.pop();
 			t2 = this.pop();
 			this.push(t1);
 			this.push(t2);
 			break;
-		case Opcodes.IADD:
-		case Opcodes.ISUB:
-		case Opcodes.IMUL:
-		case Opcodes.IDIV:
-		case Opcodes.IREM:
-		case Opcodes.IAND:
-		case Opcodes.IOR:
-		case Opcodes.IXOR:
-		case Opcodes.ISHL:
-		case Opcodes.ISHR:
-		case Opcodes.IUSHR:
-		case Opcodes.L2I:
-		case Opcodes.D2I:
-		case Opcodes.FCMPL:
-		case Opcodes.FCMPG:
+		case ASMConstants.IADD:
+		case ASMConstants.ISUB:
+		case ASMConstants.IMUL:
+		case ASMConstants.IDIV:
+		case ASMConstants.IREM:
+		case ASMConstants.IAND:
+		case ASMConstants.IOR:
+		case ASMConstants.IXOR:
+		case ASMConstants.ISHL:
+		case ASMConstants.ISHR:
+		case ASMConstants.IUSHR:
+		case ASMConstants.L2I:
+		case ASMConstants.D2I:
+		case ASMConstants.FCMPL:
+		case ASMConstants.FCMPG:
 			this.pop(2);
 			this.push(INTEGER);
 			break;
-		case Opcodes.LADD:
-		case Opcodes.LSUB:
-		case Opcodes.LMUL:
-		case Opcodes.LDIV:
-		case Opcodes.LREM:
-		case Opcodes.LAND:
-		case Opcodes.LOR:
-		case Opcodes.LXOR:
+		case ASMConstants.LADD:
+		case ASMConstants.LSUB:
+		case ASMConstants.LMUL:
+		case ASMConstants.LDIV:
+		case ASMConstants.LREM:
+		case ASMConstants.LAND:
+		case ASMConstants.LOR:
+		case ASMConstants.LXOR:
 			this.pop(4);
 			this.push(LONG);
 			this.push(TOP);
 			break;
-		case Opcodes.FADD:
-		case Opcodes.FSUB:
-		case Opcodes.FMUL:
-		case Opcodes.FDIV:
-		case Opcodes.FREM:
-		case Opcodes.L2F:
-		case Opcodes.D2F:
+		case ASMConstants.FADD:
+		case ASMConstants.FSUB:
+		case ASMConstants.FMUL:
+		case ASMConstants.FDIV:
+		case ASMConstants.FREM:
+		case ASMConstants.L2F:
+		case ASMConstants.D2F:
 			this.pop(2);
 			this.push(FLOAT);
 			break;
-		case Opcodes.DADD:
-		case Opcodes.DSUB:
-		case Opcodes.DMUL:
-		case Opcodes.DDIV:
-		case Opcodes.DREM:
+		case ASMConstants.DADD:
+		case ASMConstants.DSUB:
+		case ASMConstants.DMUL:
+		case ASMConstants.DDIV:
+		case ASMConstants.DREM:
 			this.pop(4);
 			this.push(DOUBLE);
 			this.push(TOP);
 			break;
-		case Opcodes.LSHL:
-		case Opcodes.LSHR:
-		case Opcodes.LUSHR:
+		case ASMConstants.LSHL:
+		case ASMConstants.LSHR:
+		case ASMConstants.LUSHR:
 			this.pop(3);
 			this.push(LONG);
 			this.push(TOP);
 			break;
-		case Opcodes.IINC:
+		case ASMConstants.IINC:
 			this.set(arg, INTEGER);
 			break;
-		case Opcodes.I2L:
-		case Opcodes.F2L:
+		case ASMConstants.I2L:
+		case ASMConstants.F2L:
 			this.pop(1);
 			this.push(LONG);
 			this.push(TOP);
 			break;
-		case Opcodes.I2F:
+		case ASMConstants.I2F:
 			this.pop(1);
 			this.push(FLOAT);
 			break;
-		case Opcodes.I2D:
-		case Opcodes.F2D:
+		case ASMConstants.I2D:
+		case ASMConstants.F2D:
 			this.pop(1);
 			this.push(DOUBLE);
 			this.push(TOP);
 			break;
-		case Opcodes.F2I:
-		case Opcodes.ARRAYLENGTH:
-		case Opcodes.INSTANCEOF:
+		case ASMConstants.F2I:
+		case ASMConstants.ARRAYLENGTH:
+		case ASMConstants.INSTANCEOF:
 			this.pop(1);
 			this.push(INTEGER);
 			break;
-		case Opcodes.LCMP:
-		case Opcodes.DCMPL:
-		case Opcodes.DCMPG:
+		case ASMConstants.LCMP:
+		case ASMConstants.DCMPL:
+		case ASMConstants.DCMPG:
 			this.pop(4);
 			this.push(INTEGER);
 			break;
-		case Opcodes.JSR:
-		case Opcodes.RET:
+		case ASMConstants.JSR:
+		case ASMConstants.RET:
 			throw new RuntimeException("JSR/RET are not supported with computeFrames option");
-		case Opcodes.GETSTATIC:
+		case ASMConstants.GETSTATIC:
 			this.push(cw, item.strVal3);
 			break;
-		case Opcodes.PUTSTATIC:
+		case ASMConstants.PUTSTATIC:
 			this.pop(item.strVal3);
 			break;
-		case Opcodes.GETFIELD:
+		case ASMConstants.GETFIELD:
 			this.pop(1);
 			this.push(cw, item.strVal3);
 			break;
-		case Opcodes.PUTFIELD:
+		case ASMConstants.PUTFIELD:
 			this.pop(item.strVal3);
 			this.pop();
 			break;
-		case Opcodes.INVOKEVIRTUAL:
-		case Opcodes.INVOKESPECIAL:
-		case Opcodes.INVOKESTATIC:
-		case Opcodes.INVOKEINTERFACE:
+		case ASMConstants.INVOKEVIRTUAL:
+		case ASMConstants.INVOKESPECIAL:
+		case ASMConstants.INVOKESTATIC:
+		case ASMConstants.INVOKEINTERFACE:
 			this.pop(item.strVal3);
-			if (opcode != Opcodes.INVOKESTATIC)
+			if (opcode != ASMConstants.INVOKESTATIC)
 			{
 				t1 = this.pop();
-				if (opcode == Opcodes.INVOKESPECIAL && item.strVal2.charAt(0) == '<')
+				if (opcode == ASMConstants.INVOKESPECIAL && item.strVal2.charAt(0) == '<')
 				{
 					this.init(t1);
 				}
 			}
 			this.push(cw, item.strVal3);
 			break;
-		case Opcodes.INVOKEDYNAMIC:
+		case ASMConstants.INVOKEDYNAMIC:
 			this.pop(item.strVal2);
 			this.push(cw, item.strVal2);
 			break;
-		case Opcodes.NEW:
+		case ASMConstants.NEW:
 			this.push(UNINITIALIZED | cw.addUninitializedType(item.strVal1, arg));
 			break;
-		case Opcodes.NEWARRAY:
+		case ASMConstants.NEWARRAY:
 			this.pop();
 			switch (arg)
 			{
-			case Opcodes.T_BOOLEAN:
+			case ASMConstants.T_BOOLEAN:
 				this.push(ARRAY_OF | BOOLEAN);
 				break;
-			case Opcodes.T_CHAR:
+			case ASMConstants.T_CHAR:
 				this.push(ARRAY_OF | CHAR);
 				break;
-			case Opcodes.T_BYTE:
+			case ASMConstants.T_BYTE:
 				this.push(ARRAY_OF | BYTE);
 				break;
-			case Opcodes.T_SHORT:
+			case ASMConstants.T_SHORT:
 				this.push(ARRAY_OF | SHORT);
 				break;
-			case Opcodes.T_INT:
+			case ASMConstants.T_INT:
 				this.push(ARRAY_OF | INTEGER);
 				break;
-			case Opcodes.T_FLOAT:
+			case ASMConstants.T_FLOAT:
 				this.push(ARRAY_OF | FLOAT);
 				break;
-			case Opcodes.T_DOUBLE:
+			case ASMConstants.T_DOUBLE:
 				this.push(ARRAY_OF | DOUBLE);
 				break;
 			// case Opcodes.T_LONG:
@@ -749,7 +749,7 @@ final class Frame
 				break;
 			}
 			break;
-		case Opcodes.ANEWARRAY:
+		case ASMConstants.ANEWARRAY:
 			String s = item.strVal1;
 			this.pop();
 			if (s.charAt(0) == '[')
@@ -761,7 +761,7 @@ final class Frame
 				this.push(ARRAY_OF | OBJECT | cw.addType(s));
 			}
 			break;
-		case Opcodes.CHECKCAST:
+		case ASMConstants.CHECKCAST:
 			s = item.strVal1;
 			this.pop();
 			if (s.charAt(0) == '[')

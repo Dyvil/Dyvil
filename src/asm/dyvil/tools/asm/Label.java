@@ -131,7 +131,7 @@ public class Label
 					 * limited to 65535 bytes).
 					 */
 					int opcode = data[reference - 1] & 0xFF;
-					if (opcode <= Opcodes.JSR)
+					if (opcode <= ASMConstants.JSR)
 					{
 						// changes IFEQ ... JSR to opcodes 202 to 217
 						data[reference - 1] = (byte) (opcode + 49);

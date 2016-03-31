@@ -4,10 +4,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.runtime.BytecodeDump;
 import dyvil.runtime.TypeConverter;
-import dyvil.tools.asm.ClassWriter;
-import dyvil.tools.asm.FieldVisitor;
-import dyvil.tools.asm.MethodVisitor;
-import dyvil.tools.asm.Type;
+import dyvil.tools.asm.*;
 
 import java.lang.invoke.*;
 import java.lang.reflect.Constructor;
@@ -170,7 +167,7 @@ public final class AnonymousClassLMF extends AbstractLMF
 		String samIntf = TypeConverter.getInternalName(this.samBase);
 
 		this.cw
-			.visit(CLASSFILE_VERSION, dyvil.tools.asm.Opcodes.ACC_SUPER | FINAL | SYNTHETIC, this.lambdaClassName, null,
+			.visit(CLASSFILE_VERSION, ASMConstants.ACC_SUPER | FINAL | SYNTHETIC, this.lambdaClassName, null,
 			       "java/lang/Object", new String[] { samIntf });
 
 		// Generate final fields to be filled in by constructor
