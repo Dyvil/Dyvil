@@ -26,6 +26,20 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 	@Override
 	void setValue(IValue value);
 
+	default IProperty getProperty()
+	{
+		return null;
+	}
+
+	default IProperty createProperty()
+	{
+		return null;
+	}
+
+	default void setProperty(IProperty property)
+	{
+	}
+
 	IValue checkAccess(MarkerList markers, ICodePosition position, IValue receiver, IContext context);
 
 	default IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue receiver, IValue newValue)

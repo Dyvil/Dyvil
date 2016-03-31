@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisExpr;
 import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -31,6 +32,8 @@ import java.lang.annotation.ElementType;
 public class Field extends Member implements IField
 {
 	protected IValue value;
+
+	protected IProperty property;
 
 	// Metadata
 	protected IClass enclosingClass;
@@ -92,6 +95,24 @@ public class Field extends Member implements IField
 	public IValue getValue()
 	{
 		return this.value;
+	}
+
+	@Override
+	public IProperty getProperty()
+	{
+		return this.property;
+	}
+
+	@Override
+	public void setProperty(IProperty property)
+	{
+		this.property = property;
+	}
+
+	@Override
+	public IProperty createProperty()
+	{
+		return new Property(this.position, this.name, this.type, new FlagModifierSet(), null);
 	}
 
 	@Override
