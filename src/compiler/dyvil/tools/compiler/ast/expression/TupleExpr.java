@@ -175,15 +175,14 @@ public final class TupleExpr implements IValue, IValueList
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		final IAnnotation annotation = type.getAnnotation(LazyFields.TUPLE_CONVERTIBLE);
-		if (annotation != null)
+		if (!TupleType.getTupleClass(this.valueCount).isSubTypeOf(type))
 		{
-			return new LiteralConversion(this, annotation, new ArgumentList(this.values, this.valueCount))
-				       .withType(type, typeContext, markers, context);
-		}
-
-		if (!Types.isSuperType(type, this.getType()))
-		{
+			final IAnnotation annotation = type.getAnnotation(LazyFields.TUPLE_CONVERTIBLE);
+			if (annotation != null)
+			{
+				return new LiteralConversion(this, annotation, new ArgumentList(this.values, this.valueCount))
+					       .withType(type, typeContext, markers, context);
+			}
 			return null;
 		}
 
@@ -196,6 +195,8 @@ public final class TupleExpr implements IValue, IValueList
 			this.values[i] = TypeChecker.convertValue(this.values[i], elementType, typeContext, markers, context,
 			                                          LazyFields.ELEMENT_MARKER_SUPPLIER);
 		}
+
+		this.getType(); // ensure tupleType field is not null
 
 		return this;
 	}
