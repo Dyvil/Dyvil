@@ -272,6 +272,14 @@ public class ClassBody implements IClassBody
 		{
 			this.properties[i].getMethodMatches(list, receiver, name, arguments);
 		}
+		for (int i = 0; i < this.fieldCount; i++)
+		{
+			final IProperty property = this.fields[i].getProperty();
+			if (property != null)
+			{
+				property.getMethodMatches(list, receiver, name, arguments);
+			}
+		}
 	}
 
 	@Override
@@ -484,23 +492,22 @@ public class ClassBody implements IClassBody
 	{
 		for (int i = 0; i < this.methodCount; i++)
 		{
-			if (checkOverride(this.methods[i], candidate, typeContext))
+			if (checkMethodOverride(this.methods[i], candidate, typeContext))
 			{
 				return true;
 			}
 		}
 		for (int i = 0; i < this.propertyCount; i++)
 		{
-			final IProperty property = this.properties[i];
-
-			final IMethod getter = property.getGetter();
-			if (getter != null && checkOverride(getter, candidate, typeContext))
+			if (checkPropertyOverride(candidate, typeContext, this.properties[i]))
 			{
 				return true;
 			}
-
-			final IMethod setter = property.getSetter();
-			if (setter != null && checkOverride(setter, candidate, typeContext))
+		}
+		for (int i = 0; i < this.fieldCount; i++)
+		{
+			final IProperty property = this.fields[i].getProperty();
+			if (property != null && checkPropertyOverride(candidate, typeContext, property))
 			{
 				return true;
 			}
@@ -508,7 +515,7 @@ public class ClassBody implements IClassBody
 		return false;
 	}
 
-	private static boolean checkOverride(IMethod method, IMethod candidate, ITypeContext typeContext)
+	private static boolean checkMethodOverride(IMethod method, IMethod candidate, ITypeContext typeContext)
 	{
 		if (method.checkOverride(candidate, typeContext))
 		{
@@ -518,28 +525,35 @@ public class ClassBody implements IClassBody
 		return false;
 	}
 
+	private static boolean checkPropertyOverride(IMethod candidate, ITypeContext typeContext, IProperty property)
+	{
+		final IMethod getter = property.getGetter();
+		if (getter != null && checkMethodOverride(getter, candidate, typeContext))
+		{
+			return true;
+		}
+
+		final IMethod setter = property.getSetter();
+		return setter != null && checkMethodOverride(setter, candidate, typeContext);
+	}
+
 	@Override
 	public void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext)
 	{
 		for (int i = 0; i < this.methodCount; i++)
 		{
-			final IMethod candidate = this.methods[i];
-			this.checkMethod(markers, checkedClass, typeContext, candidate);
+			this.checkMethod(markers, checkedClass, typeContext, this.methods[i]);
 		}
 		for (int i = 0; i < this.propertyCount; i++)
 		{
-			final IProperty property = this.properties[i];
-
-			final IMethod getter = property.getGetter();
-			if (getter != null)
+			this.checkProperty(markers, checkedClass, typeContext, this.properties[i]);
+		}
+		for (int i = 0; i < this.fieldCount; i++)
+		{
+			final IProperty property = this.fields[i].getProperty();
+			if (property != null)
 			{
-				this.checkMethod(markers, checkedClass, typeContext, getter);
-			}
-
-			final IMethod setter = property.getSetter();
-			if (setter != null)
-			{
-				this.checkMethod(markers, checkedClass, typeContext, setter);
+				this.checkProperty(markers, checkedClass, typeContext, property);
 			}
 		}
 	}
@@ -566,6 +580,21 @@ public class ClassBody implements IClassBody
 			// Create an abstract method error
 			markers.add(Markers.semantic(checkedClass.getPosition(), "class.method.abstract", checkedClass.getName(),
 			                             candidate.getName(), this.theClass.getName()));
+		}
+	}
+
+	private void checkProperty(MarkerList markers, IClass checkedClass, ITypeContext typeContext, IProperty property)
+	{
+		final IMethod getter = property.getGetter();
+		if (getter != null)
+		{
+			this.checkMethod(markers, checkedClass, typeContext, getter);
+		}
+
+		final IMethod setter = property.getSetter();
+		if (setter != null)
+		{
+			this.checkMethod(markers, checkedClass, typeContext, setter);
 		}
 	}
 
