@@ -124,15 +124,15 @@ final class FieldWriter implements FieldVisitor
 			this.cw.newUTF8("ConstantValue");
 			size += 8;
 		}
-		if ((this.access & Opcodes.ACC_SYNTHETIC) != 0)
+		if ((this.access & ASMConstants.ACC_SYNTHETIC) != 0)
 		{
-			if ((this.cw.version & 0xFFFF) < Opcodes.V1_5 || (this.access & ClassWriter.ACC_SYNTHETIC_ATTRIBUTE) != 0)
+			if ((this.cw.version & 0xFFFF) < ASMConstants.V1_5 || (this.access & ClassWriter.ACC_SYNTHETIC_ATTRIBUTE) != 0)
 			{
 				this.cw.newUTF8("Synthetic");
 				size += 6;
 			}
 		}
-		if ((this.access & Opcodes.ACC_DEPRECATED) != 0)
+		if ((this.access & ASMConstants.ACC_DEPRECATED) != 0)
 		{
 			this.cw.newUTF8("Deprecated");
 			size += 6;
@@ -172,7 +172,7 @@ final class FieldWriter implements FieldVisitor
 	void put(final ByteVector out)
 	{
 		final int FACTOR = ClassWriter.TO_ACC_SYNTHETIC;
-		int mask = Opcodes.ACC_DEPRECATED | ClassWriter.ACC_SYNTHETIC_ATTRIBUTE
+		int mask = ASMConstants.ACC_DEPRECATED | ClassWriter.ACC_SYNTHETIC_ATTRIBUTE
 				| (this.access & ClassWriter.ACC_SYNTHETIC_ATTRIBUTE) / FACTOR;
 		out.putShort(this.access & ~mask).putShort(this.name).putShort(this.desc);
 		int attributeCount = 0;
@@ -180,14 +180,14 @@ final class FieldWriter implements FieldVisitor
 		{
 			++attributeCount;
 		}
-		if ((this.access & Opcodes.ACC_SYNTHETIC) != 0)
+		if ((this.access & ASMConstants.ACC_SYNTHETIC) != 0)
 		{
-			if ((this.cw.version & 0xFFFF) < Opcodes.V1_5 || (this.access & ClassWriter.ACC_SYNTHETIC_ATTRIBUTE) != 0)
+			if ((this.cw.version & 0xFFFF) < ASMConstants.V1_5 || (this.access & ClassWriter.ACC_SYNTHETIC_ATTRIBUTE) != 0)
 			{
 				++attributeCount;
 			}
 		}
-		if ((this.access & Opcodes.ACC_DEPRECATED) != 0)
+		if ((this.access & ASMConstants.ACC_DEPRECATED) != 0)
 		{
 			++attributeCount;
 		}
@@ -221,14 +221,14 @@ final class FieldWriter implements FieldVisitor
 			out.putShort(this.cw.newUTF8("ConstantValue"));
 			out.putInt(2).putShort(this.value);
 		}
-		if ((this.access & Opcodes.ACC_SYNTHETIC) != 0)
+		if ((this.access & ASMConstants.ACC_SYNTHETIC) != 0)
 		{
-			if ((this.cw.version & 0xFFFF) < Opcodes.V1_5 || (this.access & ClassWriter.ACC_SYNTHETIC_ATTRIBUTE) != 0)
+			if ((this.cw.version & 0xFFFF) < ASMConstants.V1_5 || (this.access & ClassWriter.ACC_SYNTHETIC_ATTRIBUTE) != 0)
 			{
 				out.putShort(this.cw.newUTF8("Synthetic")).putInt(0);
 			}
 		}
-		if ((this.access & Opcodes.ACC_DEPRECATED) != 0)
+		if ((this.access & ASMConstants.ACC_DEPRECATED) != 0)
 		{
 			out.putShort(this.cw.newUTF8("Deprecated")).putInt(0);
 		}

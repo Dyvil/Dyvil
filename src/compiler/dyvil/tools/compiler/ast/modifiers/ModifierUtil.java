@@ -85,8 +85,6 @@ public final class ModifierUtil
 			return BaseModifiers.CONST;
 		case DyvilKeywords.LAZY:
 			return BaseModifiers.LAZY;
-		case DyvilKeywords.VAR:
-			return BaseModifiers.VAR;
 		}
 		return null;
 	}
@@ -354,10 +352,6 @@ public final class ModifierUtil
 		if ((mod & Modifiers.FINAL) == Modifiers.FINAL)
 		{
 			sb.append("final ");
-		}
-		if ((mod & Modifiers.VAR) == Modifiers.VAR)
-		{
-			sb.append("var ");
 		}
 	}
 

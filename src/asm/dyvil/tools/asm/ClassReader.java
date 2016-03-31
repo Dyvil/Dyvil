@@ -43,7 +43,7 @@ public class ClassReader
 	{
 		this.b = b;
 		// checks the class version
-		if (this.readShort(off + 6) > Opcodes.V1_8)
+		if (this.readShort(off + 6) > ASMConstants.V1_8)
 		{
 			throw new IllegalArgumentException();
 		}
@@ -394,11 +394,11 @@ public class ClassReader
 			}
 			else if ("Deprecated".equals(attrName))
 			{
-				access |= Opcodes.ACC_DEPRECATED;
+				access |= ASMConstants.ACC_DEPRECATED;
 			}
 			else if ("Synthetic".equals(attrName))
 			{
-				access |= Opcodes.ACC_SYNTHETIC | ClassWriter.ACC_SYNTHETIC_ATTRIBUTE;
+				access |= ASMConstants.ACC_SYNTHETIC | ClassWriter.ACC_SYNTHETIC_ATTRIBUTE;
 			}
 			else if ("SourceDebugExtension".equals(attrName))
 			{
@@ -555,11 +555,11 @@ public class ClassReader
 			}
 			else if ("Deprecated".equals(attrName))
 			{
-				access |= Opcodes.ACC_DEPRECATED;
+				access |= ASMConstants.ACC_DEPRECATED;
 			}
 			else if ("Synthetic".equals(attrName))
 			{
-				access |= Opcodes.ACC_SYNTHETIC | ClassWriter.ACC_SYNTHETIC_ATTRIBUTE;
+				access |= ASMConstants.ACC_SYNTHETIC | ClassWriter.ACC_SYNTHETIC_ATTRIBUTE;
 			}
 			else if ("RuntimeVisibleAnnotations".equals(attrName))
 			{
@@ -699,7 +699,7 @@ public class ClassReader
 			}
 			else if ("Deprecated".equals(attrName))
 			{
-				context.access |= Opcodes.ACC_DEPRECATED;
+				context.access |= ASMConstants.ACC_DEPRECATED;
 			}
 			else if ("RuntimeVisibleAnnotations".equals(attrName))
 			{
@@ -715,7 +715,7 @@ public class ClassReader
 			}
 			else if ("Synthetic".equals(attrName))
 			{
-				context.access |= Opcodes.ACC_SYNTHETIC | ClassWriter.ACC_SYNTHETIC_ATTRIBUTE;
+				context.access |= ASMConstants.ACC_SYNTHETIC | ClassWriter.ACC_SYNTHETIC_ATTRIBUTE;
 			}
 			else if ("RuntimeInvisibleAnnotations".equals(attrName))
 			{
@@ -920,7 +920,7 @@ public class ClassReader
 				break;
 			case ClassWriter.WIDE_INSN:
 				opcode = b[u + 1] & 0xFF;
-				if (opcode == Opcodes.IINC)
+				if (opcode == ASMConstants.IINC)
 				{
 					u += 6;
 				}
@@ -1169,7 +1169,7 @@ public class ClassReader
 					int v = this.readUnsignedShort(i + 1);
 					if (v >= 0 && v < codeLength)
 					{
-						if ((b[codeStart + v] & 0xFF) == Opcodes.NEW)
+						if ((b[codeStart + v] & 0xFF) == ASMConstants.NEW)
 						{
 							this.readLabel(v, labels);
 						}
@@ -1211,7 +1211,7 @@ public class ClassReader
 				{
 					if (!zip || unzip)
 					{
-						mv.visitFrame(Opcodes.F_NEW, frame.localCount, frame.local, frame.stackCount, frame.stack);
+						mv.visitFrame(ASMConstants.F_NEW, frame.localCount, frame.local, frame.stackCount, frame.stack);
 					}
 					else
 					{
@@ -1238,15 +1238,15 @@ public class ClassReader
 				u += 1;
 				break;
 			case ClassWriter.IMPLVAR_INSN:
-				if (opcode > Opcodes.ISTORE)
+				if (opcode > ASMConstants.ISTORE)
 				{
 					opcode -= 59; // ISTORE_0
-					mv.visitVarInsn(Opcodes.ISTORE + (opcode >> 2), opcode & 0x3);
+					mv.visitVarInsn(ASMConstants.ISTORE + (opcode >> 2), opcode & 0x3);
 				}
 				else
 				{
 					opcode -= 26; // ILOAD_0
-					mv.visitVarInsn(Opcodes.ILOAD + (opcode >> 2), opcode & 0x3);
+					mv.visitVarInsn(ASMConstants.ILOAD + (opcode >> 2), opcode & 0x3);
 				}
 				u += 1;
 				break;
@@ -1260,7 +1260,7 @@ public class ClassReader
 				break;
 			case ClassWriter.WIDE_INSN:
 				opcode = b[u + 1] & 0xFF;
-				if (opcode == Opcodes.IINC)
+				if (opcode == ASMConstants.IINC)
 				{
 					mv.visitIincInsn(this.readUnsignedShort(u + 2), this.readShort(u + 4));
 					u += 6;
@@ -1337,7 +1337,7 @@ public class ClassReader
 				cpIndex = this.items[this.readUnsignedShort(cpIndex + 2)];
 				String iname = this.readUTF8(cpIndex, c);
 				String idesc = this.readUTF8(cpIndex + 2, c);
-				if (opcode < Opcodes.INVOKEVIRTUAL)
+				if (opcode < ASMConstants.INVOKEVIRTUAL)
 				{
 					mv.visitFieldInsn(opcode, iowner, iname, idesc);
 				}
@@ -1345,7 +1345,7 @@ public class ClassReader
 				{
 					mv.visitMethodInsn(opcode, iowner, iname, idesc, itf);
 				}
-				if (opcode == Opcodes.INVOKEINTERFACE)
+				if (opcode == ASMConstants.INVOKEINTERFACE)
 				{
 					u += 5;
 				}
@@ -1857,11 +1857,11 @@ public class ClassReader
 		String desc = frame.desc;
 		Object[] locals = frame.local;
 		int local = 0;
-		if ((frame.access & Opcodes.ACC_STATIC) == 0)
+		if ((frame.access & ASMConstants.ACC_STATIC) == 0)
 		{
 			if ("<init>".equals(frame.name))
 			{
-				locals[local++] = Opcodes.UNINITIALIZED_THIS;
+				locals[local++] = ASMConstants.UNINITIALIZED_THIS;
 			}
 			else
 			{
@@ -1880,16 +1880,16 @@ public class ClassReader
 			case 'B':
 			case 'S':
 			case 'I':
-				locals[local++] = Opcodes.INTEGER;
+				locals[local++] = ASMConstants.INTEGER;
 				break;
 			case 'F':
-				locals[local++] = Opcodes.FLOAT;
+				locals[local++] = ASMConstants.FLOAT;
 				break;
 			case 'J':
-				locals[local++] = Opcodes.LONG;
+				locals[local++] = ASMConstants.LONG;
 				break;
 			case 'D':
-				locals[local++] = Opcodes.DOUBLE;
+				locals[local++] = ASMConstants.DOUBLE;
 				break;
 			case '[':
 				while (desc.charAt(i) == '[')
@@ -1939,14 +1939,14 @@ public class ClassReader
 		if (tag < MethodWriter.SAME_LOCALS_1_STACK_ITEM_FRAME)
 		{
 			delta = tag;
-			frame.mode = Opcodes.F_SAME;
+			frame.mode = ASMConstants.F_SAME;
 			frame.stackCount = 0;
 		}
 		else if (tag < MethodWriter.RESERVED)
 		{
 			delta = tag - MethodWriter.SAME_LOCALS_1_STACK_ITEM_FRAME;
 			stackMap = this.readFrameType(frame.stack, 0, stackMap, c, labels);
-			frame.mode = Opcodes.F_SAME1;
+			frame.mode = ASMConstants.F_SAME1;
 			frame.stackCount = 1;
 		}
 		else
@@ -1956,19 +1956,19 @@ public class ClassReader
 			if (tag == MethodWriter.SAME_LOCALS_1_STACK_ITEM_FRAME_EXTENDED)
 			{
 				stackMap = this.readFrameType(frame.stack, 0, stackMap, c, labels);
-				frame.mode = Opcodes.F_SAME1;
+				frame.mode = ASMConstants.F_SAME1;
 				frame.stackCount = 1;
 			}
 			else if (tag >= MethodWriter.CHOP_FRAME && tag < MethodWriter.SAME_FRAME_EXTENDED)
 			{
-				frame.mode = Opcodes.F_CHOP;
+				frame.mode = ASMConstants.F_CHOP;
 				frame.localDiff = MethodWriter.SAME_FRAME_EXTENDED - tag;
 				frame.localCount -= frame.localDiff;
 				frame.stackCount = 0;
 			}
 			else if (tag == MethodWriter.SAME_FRAME_EXTENDED)
 			{
-				frame.mode = Opcodes.F_SAME;
+				frame.mode = ASMConstants.F_SAME;
 				frame.stackCount = 0;
 			}
 			else if (tag < MethodWriter.FULL_FRAME)
@@ -1978,14 +1978,14 @@ public class ClassReader
 				{
 					stackMap = this.readFrameType(frame.local, local++, stackMap, c, labels);
 				}
-				frame.mode = Opcodes.F_APPEND;
+				frame.mode = ASMConstants.F_APPEND;
 				frame.localDiff = tag - MethodWriter.SAME_FRAME_EXTENDED;
 				frame.localCount += frame.localDiff;
 				frame.stackCount = 0;
 			}
 			else
 			{ // if (tag == FULL_FRAME) {
-				frame.mode = Opcodes.F_FULL;
+				frame.mode = ASMConstants.F_FULL;
 				int n = this.readUnsignedShort(stackMap);
 				stackMap += 2;
 				frame.localDiff = n;
@@ -2014,25 +2014,25 @@ public class ClassReader
 		switch (type)
 		{
 		case 0:
-			frame[index] = Opcodes.TOP;
+			frame[index] = ASMConstants.TOP;
 			break;
 		case 1:
-			frame[index] = Opcodes.INTEGER;
+			frame[index] = ASMConstants.INTEGER;
 			break;
 		case 2:
-			frame[index] = Opcodes.FLOAT;
+			frame[index] = ASMConstants.FLOAT;
 			break;
 		case 3:
-			frame[index] = Opcodes.DOUBLE;
+			frame[index] = ASMConstants.DOUBLE;
 			break;
 		case 4:
-			frame[index] = Opcodes.LONG;
+			frame[index] = ASMConstants.LONG;
 			break;
 		case 5:
-			frame[index] = Opcodes.NULL;
+			frame[index] = ASMConstants.NULL;
 			break;
 		case 6:
-			frame[index] = Opcodes.UNINITIALIZED_THIS;
+			frame[index] = ASMConstants.UNINITIALIZED_THIS;
 			break;
 		case 7: // Object
 			frame[index] = this.readClass(v, buf);

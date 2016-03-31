@@ -3,10 +3,7 @@ package dyvil.runtime.annotation;
 import dyvil.reflect.MethodReflection;
 import dyvil.reflect.Opcodes;
 import dyvil.runtime.BytecodeDump;
-import dyvil.tools.asm.ClassWriter;
-import dyvil.tools.asm.FieldVisitor;
-import dyvil.tools.asm.MethodVisitor;
-import dyvil.tools.asm.Type;
+import dyvil.tools.asm.*;
 
 import java.lang.invoke.CallSite;
 import java.lang.invoke.ConstantCallSite;
@@ -144,7 +141,7 @@ public final class AnnotationProxyFactory
 	{
 		String annotationItf = this.annotationType.getName().replace('.', '/');
 
-		this.cw.visit(CLASSFILE_VERSION, dyvil.tools.asm.Opcodes.ACC_SUPER | FINAL | SYNTHETIC, this.className, null,
+		this.cw.visit(CLASSFILE_VERSION, ASMConstants.ACC_SUPER | FINAL | SYNTHETIC, this.className, null,
 		              "java/lang/Object", new String[] { annotationItf });
 
 		// Generate final fields to be filled in by constructor

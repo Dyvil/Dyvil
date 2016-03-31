@@ -2,7 +2,7 @@ package dyvil.tools.repl.context;
 
 import dyvil.collection.Set;
 import dyvil.reflect.Modifiers;
-import dyvil.tools.asm.Opcodes;
+import dyvil.tools.asm.ASMConstants;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -587,7 +587,7 @@ public class REPLMemberClass implements IClass
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		String name = this.name.qualified;
-		writer.visit(ClassFormat.CLASS_VERSION, Modifiers.PUBLIC | Opcodes.ACC_SUPER, name, null, "java/lang/Object",
+		writer.visit(ClassFormat.CLASS_VERSION, Modifiers.PUBLIC | ASMConstants.ACC_SUPER, name, null, "java/lang/Object",
 		             null);
 		writer.visitSource(name, null);
 

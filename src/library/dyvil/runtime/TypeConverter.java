@@ -1,13 +1,12 @@
 package dyvil.runtime;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.MethodVisitor;
-import dyvil.tools.asm.Opcodes;
 import dyvil.tools.asm.Type;
 
 import java.lang.invoke.MethodHandleInfo;
 
 import static dyvil.reflect.Opcodes.*;
-import static dyvil.reflect.Opcodes.IRETURN;
 import static dyvil.runtime.Wrapper.*;
 
 public class TypeConverter

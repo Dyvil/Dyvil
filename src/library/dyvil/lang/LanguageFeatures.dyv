@@ -29,13 +29,13 @@ public final class LanguageFeatures
 
 	// Increments
 
-	public static void inc(int^ i, int n = 1) = i.set(i.get + n)
+	public static void inc(int^ i, int n = 1) = *i = *i + n
 
-	public static void inc(long^ l, long n = 1L) = l.set(l.get + n)
+	public static void inc(long^ l, long n = 1L) = *l = *l + n
 
-	public static void inc(float^ f, float n = 1F) = f.set(f.get + n)
+	public static void inc(float^ f, float n = 1F) = *f = *f + n
 
-	public static void inc(double^ d, double n = 1D) = d.set(d.get + n)
+	public static void inc(double^ d, double n = 1D) = *d = *d + n
 
 	// Useful Globals
 

@@ -139,7 +139,7 @@ class MethodWriter implements MethodVisitor
 		{
 			// updates maxLocals
 			int size = Type.getArgumentsAndReturnSizes(this.descriptor) >> 2;
-			if ((access & Opcodes.ACC_STATIC) != 0)
+			if ((access & ASMConstants.ACC_STATIC) != 0)
 			{
 				--size;
 			}
@@ -276,7 +276,7 @@ class MethodWriter implements MethodVisitor
 			return;
 		}
 		
-		if (type == Opcodes.F_NEW)
+		if (type == ASMConstants.F_NEW)
 		{
 			if (this.previousFrame == null)
 			{
@@ -331,7 +331,7 @@ class MethodWriter implements MethodVisitor
 				delta = this.code.length - this.previousFrameOffset - 1;
 				if (delta < 0)
 				{
-					if (type == Opcodes.F_SAME)
+					if (type == ASMConstants.F_SAME)
 					{
 						return;
 					}
@@ -341,7 +341,7 @@ class MethodWriter implements MethodVisitor
 			
 			switch (type)
 			{
-			case Opcodes.F_FULL:
+			case ASMConstants.F_FULL:
 				this.currentLocals = nLocal;
 				this.stackMap.putByte(FULL_FRAME).putShort(delta).putShort(nLocal);
 				for (int i = 0; i < nLocal; ++i)
@@ -354,7 +354,7 @@ class MethodWriter implements MethodVisitor
 					this.writeFrameType(stack[i]);
 				}
 				break;
-			case Opcodes.F_APPEND:
+			case ASMConstants.F_APPEND:
 				this.currentLocals += nLocal;
 				this.stackMap.putByte(SAME_FRAME_EXTENDED + nLocal).putShort(delta);
 				for (int i = 0; i < nLocal; ++i)
@@ -362,11 +362,11 @@ class MethodWriter implements MethodVisitor
 					this.writeFrameType(local[i]);
 				}
 				break;
-			case Opcodes.F_CHOP:
+			case ASMConstants.F_CHOP:
 				this.currentLocals -= nLocal;
 				this.stackMap.putByte(SAME_FRAME_EXTENDED - nLocal).putShort(delta);
 				break;
-			case Opcodes.F_SAME:
+			case ASMConstants.F_SAME:
 				if (delta < 64)
 				{
 					this.stackMap.putByte(delta);
@@ -376,7 +376,7 @@ class MethodWriter implements MethodVisitor
 					this.stackMap.putByte(SAME_FRAME_EXTENDED).putShort(delta);
 				}
 				break;
-			case Opcodes.F_SAME1:
+			case ASMConstants.F_SAME1:
 				if (delta < 64)
 				{
 					this.stackMap.putByte(SAME_LOCALS_1_STACK_ITEM_FRAME + delta);
@@ -422,7 +422,7 @@ class MethodWriter implements MethodVisitor
 				this.stackSize = size;
 			}
 			// if opcode == ATHROW or xRETURN, ends current block (no successor)
-			if (opcode >= Opcodes.IRETURN && opcode <= Opcodes.RETURN || opcode == Opcodes.ATHROW)
+			if (opcode >= ASMConstants.IRETURN && opcode <= ASMConstants.RETURN || opcode == ASMConstants.ATHROW)
 			{
 				this.noSuccessor();
 			}
@@ -440,7 +440,7 @@ class MethodWriter implements MethodVisitor
 			{
 				this.currentBlock.frame.execute(opcode, operand, null, null);
 			}
-			else if (opcode != Opcodes.NEWARRAY)
+			else if (opcode != ASMConstants.NEWARRAY)
 			{
 				// updates current and max stack sizes only for NEWARRAY
 				// (stack size variation = 0 for BIPUSH or SIPUSH)
@@ -453,7 +453,7 @@ class MethodWriter implements MethodVisitor
 			}
 		}
 		// adds the instruction to the bytecode of the method
-		if (opcode == Opcodes.SIPUSH)
+		if (opcode == ASMConstants.SIPUSH)
 		{
 			this.code.put12(opcode, operand);
 		}
@@ -477,7 +477,7 @@ class MethodWriter implements MethodVisitor
 			else
 			{
 				// updates current and max stack sizes
-				if (opcode == Opcodes.RET)
+				if (opcode == ASMConstants.RET)
 				{
 					// no stack change, but end of current block (no successor)
 					this.currentBlock.status |= Label.RET;
@@ -501,8 +501,8 @@ class MethodWriter implements MethodVisitor
 		{
 			// updates max locals
 			int n;
-			if (opcode == Opcodes.LLOAD || opcode == Opcodes.DLOAD || opcode == Opcodes.LSTORE
-					|| opcode == Opcodes.DSTORE)
+			if (opcode == ASMConstants.LLOAD || opcode == ASMConstants.DLOAD || opcode == ASMConstants.LSTORE
+					|| opcode == ASMConstants.DSTORE)
 			{
 				n = var + 2;
 			}
@@ -516,18 +516,18 @@ class MethodWriter implements MethodVisitor
 			}
 		}
 		// adds the instruction to the bytecode of the method
-		if (var < 4 && opcode != Opcodes.RET)
+		if (var < 4 && opcode != ASMConstants.RET)
 		{
 			int opt;
-			if (opcode < Opcodes.ISTORE)
+			if (opcode < ASMConstants.ISTORE)
 			{
 				/* ILOAD_0 */
-				opt = 26 + (opcode - Opcodes.ILOAD << 2) + var;
+				opt = 26 + (opcode - ASMConstants.ILOAD << 2) + var;
 			}
 			else
 			{
 				/* ISTORE_0 */
-				opt = 59 + (opcode - Opcodes.ISTORE << 2) + var;
+				opt = 59 + (opcode - ASMConstants.ISTORE << 2) + var;
 			}
 			this.code.putByte(opt);
 		}
@@ -539,7 +539,7 @@ class MethodWriter implements MethodVisitor
 		{
 			this.code.put11(opcode, var);
 		}
-		if (opcode >= Opcodes.ISTORE && this.compute == FRAMES && this.handlerCount > 0)
+		if (opcode >= ASMConstants.ISTORE && this.compute == FRAMES && this.handlerCount > 0)
 		{
 			this.visitLabel(new Label());
 		}
@@ -557,7 +557,7 @@ class MethodWriter implements MethodVisitor
 			{
 				this.currentBlock.frame.execute(opcode, this.code.length, this.cw, i);
 			}
-			else if (opcode == Opcodes.NEW)
+			else if (opcode == ASMConstants.NEW)
 			{
 				// updates current and max stack sizes only if opcode == NEW
 				// (no stack change for ANEWARRAY, CHECKCAST, INSTANCEOF)
@@ -592,13 +592,13 @@ class MethodWriter implements MethodVisitor
 				char c = desc.charAt(0);
 				switch (opcode)
 				{
-				case Opcodes.GETSTATIC:
+				case ASMConstants.GETSTATIC:
 					size = this.stackSize + (c == 'D' || c == 'J' ? 2 : 1);
 					break;
-				case Opcodes.PUTSTATIC:
+				case ASMConstants.PUTSTATIC:
 					size = this.stackSize + (c == 'D' || c == 'J' ? -2 : -1);
 					break;
-				case Opcodes.GETFIELD:
+				case ASMConstants.GETFIELD:
 					size = this.stackSize + (c == 'D' || c == 'J' ? 1 : 0);
 					break;
 				// case Constants.PUTFIELD:
@@ -651,7 +651,7 @@ class MethodWriter implements MethodVisitor
 					i.intVal = argSize;
 				}
 				int size;
-				if (opcode == Opcodes.INVOKESTATIC)
+				if (opcode == ASMConstants.INVOKESTATIC)
 				{
 					size = this.stackSize - (argSize >> 2) + (argSize & 0x03) + 1;
 				}
@@ -668,14 +668,14 @@ class MethodWriter implements MethodVisitor
 			}
 		}
 		// adds the instruction to the bytecode of the method
-		if (opcode == Opcodes.INVOKEINTERFACE)
+		if (opcode == ASMConstants.INVOKEINTERFACE)
 		{
 			if (argSize == 0)
 			{
 				argSize = Type.getArgumentsAndReturnSizes(desc);
 				i.intVal = argSize;
 			}
-			this.code.put12(Opcodes.INVOKEINTERFACE, i.index).put11(argSize >> 2, 0);
+			this.code.put12(ASMConstants.INVOKEINTERFACE, i.index).put11(argSize >> 2, 0);
 		}
 		else
 		{
@@ -694,7 +694,7 @@ class MethodWriter implements MethodVisitor
 		{
 			if (this.compute == FRAMES)
 			{
-				this.currentBlock.frame.execute(Opcodes.INVOKEDYNAMIC, 0, this.cw, i);
+				this.currentBlock.frame.execute(ASMConstants.INVOKEDYNAMIC, 0, this.cw, i);
 			}
 			else
 			{
@@ -726,7 +726,7 @@ class MethodWriter implements MethodVisitor
 			}
 		}
 		// adds the instruction to the bytecode of the method
-		this.code.put12(Opcodes.INVOKEDYNAMIC, i.index);
+		this.code.put12(ASMConstants.INVOKEDYNAMIC, i.index);
 		this.code.putShort(0);
 	}
 	
@@ -745,7 +745,7 @@ class MethodWriter implements MethodVisitor
 				label.getFirst().status |= Label.TARGET;
 				// adds 'label' as a successor of this basic block
 				this.addSuccessor(Edge.NORMAL, label);
-				if (opcode != Opcodes.GOTO)
+				if (opcode != ASMConstants.GOTO)
 				{
 					// creates a Label for the next basic block
 					nextInsn = new Label();
@@ -753,7 +753,7 @@ class MethodWriter implements MethodVisitor
 			}
 			else
 			{
-				if (opcode == Opcodes.JSR)
+				if (opcode == ASMConstants.JSR)
 				{
 					if ((label.status & Label.SUBROUTINE) == 0)
 					{
@@ -791,11 +791,11 @@ class MethodWriter implements MethodVisitor
 			 * "opposite" opcode of IFxxx (i.e., IFNE for IFEQ) and where <l'>
 			 * designates the instruction just after the GOTO_W.
 			 */
-			if (opcode == Opcodes.GOTO)
+			if (opcode == ASMConstants.GOTO)
 			{
 				this.code.putByte(200); // GOTO_W
 			}
-			else if (opcode == Opcodes.JSR)
+			else if (opcode == ASMConstants.JSR)
 			{
 				this.code.putByte(201); // JSR_W
 			}
@@ -834,7 +834,7 @@ class MethodWriter implements MethodVisitor
 				// current block, and starts a new basic block
 				this.visitLabel(nextInsn);
 			}
-			if (opcode == Opcodes.GOTO)
+			if (opcode == ASMConstants.GOTO)
 			{
 				this.noSuccessor();
 			}
@@ -918,7 +918,7 @@ class MethodWriter implements MethodVisitor
 		{
 			if (this.compute == FRAMES)
 			{
-				this.currentBlock.frame.execute(Opcodes.LDC, 0, this.cw, i);
+				this.currentBlock.frame.execute(ASMConstants.LDC, 0, this.cw, i);
 			}
 			else
 			{
@@ -952,7 +952,7 @@ class MethodWriter implements MethodVisitor
 		}
 		else
 		{
-			this.code.put11(Opcodes.LDC, index);
+			this.code.put11(ASMConstants.LDC, index);
 		}
 	}
 	
@@ -964,7 +964,7 @@ class MethodWriter implements MethodVisitor
 		{
 			if (this.compute == FRAMES)
 			{
-				this.currentBlock.frame.execute(Opcodes.IINC, var, null, null);
+				this.currentBlock.frame.execute(ASMConstants.IINC, var, null, null);
 			}
 		}
 		if (this.compute != NOTHING)
@@ -979,11 +979,11 @@ class MethodWriter implements MethodVisitor
 		// adds the instruction to the bytecode of the method
 		if (var > 255 || increment > 127 || increment < -128)
 		{
-			this.code.putByte(196 /* WIDE */).put12(Opcodes.IINC, var).putShort(increment);
+			this.code.putByte(196 /* WIDE */).put12(ASMConstants.IINC, var).putShort(increment);
 		}
 		else
 		{
-			this.code.putByte(Opcodes.IINC).put11(var, increment);
+			this.code.putByte(ASMConstants.IINC).put11(var, increment);
 		}
 	}
 	
@@ -993,7 +993,7 @@ class MethodWriter implements MethodVisitor
 		this.lastCodeOffset = this.code.length;
 		// adds the instruction to the bytecode of the method
 		int source = this.code.length;
-		this.code.putByte(Opcodes.TABLESWITCH);
+		this.code.putByte(ASMConstants.TABLESWITCH);
 		this.code.putByteArray(null, 0, (4 - this.code.length % 4) % 4);
 		dflt.put(this, this.code, source, true);
 		this.code.putInt(min).putInt(max);
@@ -1011,7 +1011,7 @@ class MethodWriter implements MethodVisitor
 		this.lastCodeOffset = this.code.length;
 		// adds the instruction to the bytecode of the method
 		int source = this.code.length;
-		this.code.putByte(Opcodes.LOOKUPSWITCH);
+		this.code.putByte(ASMConstants.LOOKUPSWITCH);
 		this.code.putByteArray(null, 0, (4 - this.code.length % 4) % 4);
 		dflt.put(this, this.code, source, true);
 		this.code.putInt(labels.length);
@@ -1031,7 +1031,7 @@ class MethodWriter implements MethodVisitor
 		{
 			if (this.compute == FRAMES)
 			{
-				this.currentBlock.frame.execute(Opcodes.LOOKUPSWITCH, 0, null, null);
+				this.currentBlock.frame.execute(ASMConstants.LOOKUPSWITCH, 0, null, null);
 				// adds current block successors
 				this.addSuccessor(Edge.NORMAL, dflt);
 				dflt.getFirst().status |= Label.TARGET;
@@ -1067,7 +1067,7 @@ class MethodWriter implements MethodVisitor
 		{
 			if (this.compute == FRAMES)
 			{
-				this.currentBlock.frame.execute(Opcodes.MULTIANEWARRAY, dims, this.cw, i);
+				this.currentBlock.frame.execute(ASMConstants.MULTIANEWARRAY, dims, this.cw, i);
 			}
 			else
 			{
@@ -1077,7 +1077,7 @@ class MethodWriter implements MethodVisitor
 			}
 		}
 		// adds the instruction to the bytecode of the method
-		this.code.put12(Opcodes.MULTIANEWARRAY, i.index).putByte(dims);
+		this.code.put12(ASMConstants.MULTIANEWARRAY, i.index).putByte(dims);
 	}
 	
 	@Override
@@ -1336,9 +1336,9 @@ class MethodWriter implements MethodVisitor
 						// replaces instructions with NOP ... NOP ATHROW
 						for (int i = start; i < end; ++i)
 						{
-							this.code.data[i] = Opcodes.NOP;
+							this.code.data[i] = ASMConstants.NOP;
 						}
-						this.code.data[end] = (byte) Opcodes.ATHROW;
+						this.code.data[end] = (byte) ASMConstants.ATHROW;
 						// emits a frame for this unreachable block
 						int frameIndex = this.startFrame(start, 0, 1);
 						this.frame[frameIndex] = Frame.OBJECT | this.cw.addType("java/lang/Throwable");
@@ -1601,7 +1601,7 @@ class MethodWriter implements MethodVisitor
 	{
 		// There can be at most descriptor.length() + 1 locals
 		int frameIndex = this.startFrame(0, this.descriptor.length() + 1, 0);
-		if ((this.access & Opcodes.ACC_STATIC) == 0)
+		if ((this.access & ASMConstants.ACC_STATIC) == 0)
 		{
 			if ((this.access & ACC_CONSTRUCTOR) == 0)
 			{
@@ -1697,7 +1697,7 @@ class MethodWriter implements MethodVisitor
 	{
 		int clocalsSize = this.frame[1];
 		int cstackSize = this.frame[2];
-		if ((this.cw.version & 0xFFFF) < Opcodes.V1_6)
+		if ((this.cw.version & 0xFFFF) < ASMConstants.V1_6)
 		{
 			this.stackMap.putShort(this.frame[0]).putShort(clocalsSize);
 			this.writeFrameTypes(3, 3 + clocalsSize);
@@ -1905,7 +1905,7 @@ class MethodWriter implements MethodVisitor
 			}
 			if (this.stackMap != null)
 			{
-				boolean zip = (this.cw.version & 0xFFFF) >= Opcodes.V1_6;
+				boolean zip = (this.cw.version & 0xFFFF) >= ASMConstants.V1_6;
 				this.cw.newUTF8(zip ? "StackMapTable" : "StackMap");
 				size += 8 + this.stackMap.length;
 			}
@@ -1929,15 +1929,15 @@ class MethodWriter implements MethodVisitor
 			this.cw.newUTF8("Exceptions");
 			size += 8 + 2 * this.exceptionCount;
 		}
-		if ((this.access & Opcodes.ACC_SYNTHETIC) != 0)
+		if ((this.access & ASMConstants.ACC_SYNTHETIC) != 0)
 		{
-			if ((this.cw.version & 0xFFFF) < Opcodes.V1_5 || (this.access & ClassWriter.ACC_SYNTHETIC_ATTRIBUTE) != 0)
+			if ((this.cw.version & 0xFFFF) < ASMConstants.V1_5 || (this.access & ClassWriter.ACC_SYNTHETIC_ATTRIBUTE) != 0)
 			{
 				this.cw.newUTF8("Synthetic");
 				size += 6;
 			}
 		}
-		if ((this.access & Opcodes.ACC_DEPRECATED) != 0)
+		if ((this.access & ASMConstants.ACC_DEPRECATED) != 0)
 		{
 			this.cw.newUTF8("Deprecated");
 			size += 6;
@@ -2006,7 +2006,7 @@ class MethodWriter implements MethodVisitor
 	final void put(final ByteVector out)
 	{
 		final int FACTOR = ClassWriter.TO_ACC_SYNTHETIC;
-		int mask = ACC_CONSTRUCTOR | Opcodes.ACC_DEPRECATED | ClassWriter.ACC_SYNTHETIC_ATTRIBUTE
+		int mask = ACC_CONSTRUCTOR | ASMConstants.ACC_DEPRECATED | ClassWriter.ACC_SYNTHETIC_ATTRIBUTE
 				| (this.access & ClassWriter.ACC_SYNTHETIC_ATTRIBUTE) / FACTOR;
 		out.putShort(this.access & ~mask).putShort(this.name).putShort(this.desc);
 		if (this.classReaderOffset != 0)
@@ -2023,14 +2023,14 @@ class MethodWriter implements MethodVisitor
 		{
 			++attributeCount;
 		}
-		if ((this.access & Opcodes.ACC_SYNTHETIC) != 0)
+		if ((this.access & ASMConstants.ACC_SYNTHETIC) != 0)
 		{
-			if ((this.cw.version & 0xFFFF) < Opcodes.V1_5 || (this.access & ClassWriter.ACC_SYNTHETIC_ATTRIBUTE) != 0)
+			if ((this.cw.version & 0xFFFF) < ASMConstants.V1_5 || (this.access & ClassWriter.ACC_SYNTHETIC_ATTRIBUTE) != 0)
 			{
 				++attributeCount;
 			}
 		}
-		if ((this.access & Opcodes.ACC_DEPRECATED) != 0)
+		if ((this.access & ASMConstants.ACC_DEPRECATED) != 0)
 		{
 			++attributeCount;
 		}
@@ -2170,7 +2170,7 @@ class MethodWriter implements MethodVisitor
 			}
 			if (this.stackMap != null)
 			{
-				boolean zip = (this.cw.version & 0xFFFF) >= Opcodes.V1_6;
+				boolean zip = (this.cw.version & 0xFFFF) >= ASMConstants.V1_6;
 				out.putShort(this.cw.newUTF8(zip ? "StackMapTable" : "StackMap"));
 				out.putInt(this.stackMap.length + 2).putShort(this.frameCount);
 				out.putByteArray(this.stackMap.data, 0, this.stackMap.length);
@@ -2199,14 +2199,14 @@ class MethodWriter implements MethodVisitor
 				out.putShort(this.exceptions[i]);
 			}
 		}
-		if ((this.access & Opcodes.ACC_SYNTHETIC) != 0)
+		if ((this.access & ASMConstants.ACC_SYNTHETIC) != 0)
 		{
-			if ((this.cw.version & 0xFFFF) < Opcodes.V1_5 || (this.access & ClassWriter.ACC_SYNTHETIC_ATTRIBUTE) != 0)
+			if ((this.cw.version & 0xFFFF) < ASMConstants.V1_5 || (this.access & ClassWriter.ACC_SYNTHETIC_ATTRIBUTE) != 0)
 			{
 				out.putShort(this.cw.newUTF8("Synthetic")).putInt(0);
 			}
 		}
-		if ((this.access & Opcodes.ACC_DEPRECATED) != 0)
+		if ((this.access & ASMConstants.ACC_DEPRECATED) != 0)
 		{
 			out.putShort(this.cw.newUTF8("Deprecated")).putInt(0);
 		}
@@ -2334,7 +2334,7 @@ class MethodWriter implements MethodVisitor
 					{
 						if (!resize[u])
 						{
-							if (opcode == Opcodes.GOTO || opcode == Opcodes.JSR)
+							if (opcode == ASMConstants.GOTO || opcode == ASMConstants.JSR)
 							{
 								// two additional bytes will be required to
 								// replace this GOTO or JSR instruction with
@@ -2403,7 +2403,7 @@ class MethodWriter implements MethodVisitor
 					break;
 				case ClassWriter.WIDE_INSN:
 					opcode = b[u + 1] & 0xFF;
-					if (opcode == Opcodes.IINC)
+					if (opcode == ASMConstants.IINC)
 					{
 						u += 6;
 					}
@@ -2496,11 +2496,11 @@ class MethodWriter implements MethodVisitor
 					// the "opposite" opcode of IFxxx (i.e., IFNE for IFEQ)
 					// and where <l'> designates the instruction just after
 					// the GOTO_W.
-					if (opcode == Opcodes.GOTO)
+					if (opcode == ASMConstants.GOTO)
 					{
 						newCode.putByte(200); // GOTO_W
 					}
-					else if (opcode == Opcodes.JSR)
+					else if (opcode == ASMConstants.JSR)
 					{
 						newCode.putByte(201); // JSR_W
 					}
@@ -2533,7 +2533,7 @@ class MethodWriter implements MethodVisitor
 				v = u;
 				u = u + 4 - (v & 3);
 				// reads and copies instruction
-				newCode.putByte(Opcodes.TABLESWITCH);
+				newCode.putByte(ASMConstants.TABLESWITCH);
 				newCode.putByteArray(null, 0, (4 - newCode.length % 4) % 4);
 				label = v + readInt(b, u);
 				u += 4;
@@ -2558,7 +2558,7 @@ class MethodWriter implements MethodVisitor
 				v = u;
 				u = u + 4 - (v & 3);
 				// reads and copies instruction
-				newCode.putByte(Opcodes.LOOKUPSWITCH);
+				newCode.putByte(ASMConstants.LOOKUPSWITCH);
 				newCode.putByteArray(null, 0, (4 - newCode.length % 4) % 4);
 				label = v + readInt(b, u);
 				u += 4;
@@ -2579,7 +2579,7 @@ class MethodWriter implements MethodVisitor
 				break;
 			case ClassWriter.WIDE_INSN:
 				opcode = b[u + 1] & 0xFF;
-				if (opcode == Opcodes.IINC)
+				if (opcode == ASMConstants.IINC)
 				{
 					newCode.putByteArray(b, u, 6);
 					u += 6;

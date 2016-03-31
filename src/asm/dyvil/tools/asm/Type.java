@@ -516,7 +516,7 @@ public class Type
 	
 	public int getOpcode(final int opcode)
 	{
-		if (opcode == Opcodes.IALOAD || opcode == Opcodes.IASTORE)
+		if (opcode == ASMConstants.IALOAD || opcode == ASMConstants.IASTORE)
 		{
 			// the offset for IALOAD or IASTORE is in byte 1 of 'off' for
 			// primitive types (buf == null)

@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
-import dyvil.tools.asm.Opcodes;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.WildcardValue;

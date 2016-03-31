@@ -10,14 +10,14 @@ public interface ByteRef
 	void set(byte value);
 
 	@DyvilModifiers(Modifiers.INLINE)
-	static byte $times(ByteRef intRef)
+	static byte $times(ByteRef ref)
 	{
-		return intRef.get();
+		return ref.get();
 	}
 
 	@DyvilModifiers(Modifiers.INLINE | Modifiers.INFIX)
-	static void $times_$eq(ByteRef intRef, byte value)
+	static void $times_$eq(ByteRef ref, byte value)
 	{
-		intRef.set(value);
+		ref.set(value);
 	}
 }

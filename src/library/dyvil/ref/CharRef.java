@@ -10,14 +10,14 @@ public interface CharRef
 	void set(char value);
 
 	@DyvilModifiers(Modifiers.INLINE)
-	static char $times(CharRef intRef)
+	static char $times(CharRef ref)
 	{
-		return intRef.get();
+		return ref.get();
 	}
 
 	@DyvilModifiers(Modifiers.INLINE | Modifiers.INFIX)
-	static void $times_$eq(CharRef intRef, char value)
+	static void $times_$eq(CharRef ref, char value)
 	{
-		intRef.set(value);
+		ref.set(value);
 	}
 }

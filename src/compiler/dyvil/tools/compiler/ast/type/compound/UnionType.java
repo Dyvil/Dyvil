@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.type.compound;
 
 import dyvil.collection.Set;
-import dyvil.tools.asm.Opcodes;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Type;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;

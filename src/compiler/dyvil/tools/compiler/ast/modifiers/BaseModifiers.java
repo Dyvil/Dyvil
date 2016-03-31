@@ -1,10 +1,7 @@
 package dyvil.tools.compiler.ast.modifiers;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.transform.DyvilKeywords;
-import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.token.IToken;
 
 public enum BaseModifiers implements Modifier
 {
@@ -34,9 +31,7 @@ public enum BaseModifiers implements Modifier
 	FUNCTIONAL(Modifiers.FUNCTIONAL, "functional", DyvilKeywords.FUNCTIONAL),
 	// Field Modifiers
 	CONST(Modifiers.CONST, "const", DyvilKeywords.CONST),
-	LAZY(Modifiers.LAZY, "lazy", DyvilKeywords.LAZY),
-	// Parameter Modifiers
-	VAR(Modifiers.VAR, "var", DyvilKeywords.VAR);
+	LAZY(Modifiers.LAZY, "lazy", DyvilKeywords.LAZY);
 
 	private final int    intValue;
 	private final int    keyword;

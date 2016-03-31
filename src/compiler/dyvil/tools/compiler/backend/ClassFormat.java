@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.backend;
 
-import dyvil.tools.asm.Opcodes;
+import dyvil.tools.asm.ASMConstants;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
@@ -22,18 +22,18 @@ import dyvil.tools.parsing.Name;
 
 public final class ClassFormat
 {
-	public static final int CLASS_VERSION = Opcodes.V1_8;
-	public static final int ASM_VERSION   = Opcodes.ASM5;
+	public static final int CLASS_VERSION = ASMConstants.V1_8;
+	public static final int ASM_VERSION   = ASMConstants.ASM5;
 
-	public static final int H_GETFIELD         = Opcodes.H_GETFIELD;
-	public static final int H_GETSTATIC        = Opcodes.H_GETSTATIC;
-	public static final int H_PUTFIELD         = Opcodes.H_PUTFIELD;
-	public static final int H_PUTSTATIC        = Opcodes.H_PUTSTATIC;
-	public static final int H_INVOKEVIRTUAL    = Opcodes.H_INVOKEVIRTUAL;
-	public static final int H_INVOKESTATIC     = Opcodes.H_INVOKESTATIC;
-	public static final int H_INVOKESPECIAL    = Opcodes.H_INVOKESPECIAL;
-	public static final int H_NEWINVOKESPECIAL = Opcodes.H_NEWINVOKESPECIAL;
-	public static final int H_INVOKEINTERFACE  = Opcodes.H_INVOKEINTERFACE;
+	public static final int H_GETFIELD         = ASMConstants.H_GETFIELD;
+	public static final int H_GETSTATIC        = ASMConstants.H_GETSTATIC;
+	public static final int H_PUTFIELD         = ASMConstants.H_PUTFIELD;
+	public static final int H_PUTSTATIC        = ASMConstants.H_PUTSTATIC;
+	public static final int H_INVOKEVIRTUAL    = ASMConstants.H_INVOKEVIRTUAL;
+	public static final int H_INVOKESTATIC     = ASMConstants.H_INVOKESTATIC;
+	public static final int H_INVOKESPECIAL    = ASMConstants.H_INVOKESPECIAL;
+	public static final int H_NEWINVOKESPECIAL = ASMConstants.H_NEWINVOKESPECIAL;
+	public static final int H_INVOKEINTERFACE  = ASMConstants.H_INVOKEINTERFACE;
 
 	public static final int T_BOOLEAN = 4;
 	public static final int T_CHAR    = 5;
@@ -44,31 +44,31 @@ public final class ClassFormat
 	public static final int T_INT     = 10;
 	public static final int T_LONG    = 11;
 
-	public static final int ACC_SUPER = Opcodes.ACC_SUPER;
+	public static final int ACC_SUPER = ASMConstants.ACC_SUPER;
 
-	public static final Integer UNINITIALIZED_THIS = Opcodes.UNINITIALIZED_THIS;
-	public static final Integer NULL               = Opcodes.NULL;
-	public static final Integer TOP                = Opcodes.TOP;
+	public static final Integer UNINITIALIZED_THIS = ASMConstants.UNINITIALIZED_THIS;
+	public static final Integer NULL               = ASMConstants.NULL;
+	public static final Integer TOP                = ASMConstants.TOP;
 	public static final Integer BOOLEAN            = new Integer(1);
 	public static final Integer BYTE               = new Integer(1);
 	public static final Integer SHORT              = new Integer(1);
 	public static final Integer CHAR               = new Integer(1);
-	public static final Integer INT                = Opcodes.INTEGER;
-	public static final Integer LONG               = Opcodes.LONG;
-	public static final Integer FLOAT              = Opcodes.FLOAT;
-	public static final Integer DOUBLE             = Opcodes.DOUBLE;
+	public static final Integer INT                = ASMConstants.INTEGER;
+	public static final Integer LONG               = ASMConstants.LONG;
+	public static final Integer FLOAT              = ASMConstants.FLOAT;
+	public static final Integer DOUBLE             = ASMConstants.DOUBLE;
 
 	public static int insnToHandle(int invokeOpcode)
 	{
 		switch (invokeOpcode)
 		{
-		case Opcodes.INVOKEVIRTUAL:
+		case ASMConstants.INVOKEVIRTUAL:
 			return ClassFormat.H_INVOKEVIRTUAL;
-		case Opcodes.INVOKESTATIC:
+		case ASMConstants.INVOKESTATIC:
 			return ClassFormat.H_INVOKESTATIC;
-		case Opcodes.INVOKEINTERFACE:
+		case ASMConstants.INVOKEINTERFACE:
 			return ClassFormat.H_INVOKEINTERFACE;
-		case Opcodes.INVOKESPECIAL:
+		case ASMConstants.INVOKESPECIAL:
 			return ClassFormat.H_INVOKESPECIAL;
 		}
 		return -1;
