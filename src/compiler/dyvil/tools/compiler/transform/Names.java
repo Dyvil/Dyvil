@@ -78,8 +78,9 @@ public final class Names
 	public static final Name bang    = Name.get("!", "$bang");
 	public static final Name tilde   = Name.get("~", "$tilde");
 
-	public static final Name dotdot   = Name.get("..", "$dot$dot");
-	public static final Name dotdotlt = Name.get("..<", "$dot$dot$lt");
+	public static final Name dotdot    = Name.get("..", "$dot$dot");
+	public static final Name dotdotdot = Name.get("...", "$dot$dot$dot");
+	public static final Name dotdotlt  = Name.get("..<", "$dot$dot$lt");
 
 	public static final Name pluseq = Name.get("+=", "$plus$eq");
 

@@ -78,6 +78,7 @@ type	Triple[A, B, C]		= (A, B, C)
 postfix operator !	// unwrap operator
 postfix	operator ++
 postfix	operator --
+postfix	operator ... // varargs expansion operator
 
 // Prefix Operators
 prefix	operator +
