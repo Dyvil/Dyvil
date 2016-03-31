@@ -54,12 +54,22 @@ public abstract class GenericType implements IObjectType, ITypeList
 		return true;
 	}
 	
-	@Override
-	public void setType(int index, IType type)
+	public int typeArgumentCount()
 	{
-		this.typeArguments[index] = type;
+		return this.typeArgumentCount;
 	}
-	
+
+	public IType[] getTypeArguments()
+	{
+		return this.typeArguments;
+	}
+
+	@Override
+	public IType getType(int index)
+	{
+		return this.typeArguments[index];
+	}
+
 	@Override
 	public void addType(IType type)
 	{
@@ -72,13 +82,13 @@ public abstract class GenericType implements IObjectType, ITypeList
 		}
 		this.typeArguments[index] = type;
 	}
-	
+
 	@Override
-	public IType getType(int index)
+	public void setType(int index, IType type)
 	{
-		return this.typeArguments[index];
+		this.typeArguments[index] = type;
 	}
-	
+
 	@Override
 	public boolean hasTypeVariables()
 	{
