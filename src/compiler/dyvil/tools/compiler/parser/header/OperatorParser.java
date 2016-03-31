@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -14,13 +15,14 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class OperatorParser extends Parser
 {
-	private static final int TYPE          = 1;
-	private static final int OPERATOR      = 2;
-	private static final int OPEN_BRACKET  = 4;
-	private static final int PROPERTY      = 8;
-	private static final int PRECEDENCE    = 16;
-	private static final int ASSOCIATIVITY = 32;
-	private static final int COMMA         = 64;
+	private static final int TYPE            = 0;
+	private static final int OPERATOR        = 1;
+	private static final int OPERATOR_SYMBOL = 2;
+	private static final int SEPARATOR       = 4;
+	private static final int PROPERTY        = 8;
+	private static final int PRECEDENCE      = 16;
+	private static final int ASSOCIATIVITY   = 32;
+	private static final int COMMA           = 64;
 
 	public static final Name associativity = Name.getQualified("associativity");
 	public static final Name precedence    = Name.getQualified("precedence");
@@ -35,7 +37,7 @@ public final class OperatorParser extends Parser
 	public OperatorParser(IOperatorMap map)
 	{
 		this.map = map;
-		this.mode = TYPE;
+		// this.mode = TYPE;
 	}
 
 	public OperatorParser(IOperatorMap map, byte type)
@@ -69,64 +71,53 @@ public final class OperatorParser extends Parser
 			pm.report(token, "operator.type.invalid");
 			return;
 		case OPERATOR:
-			this.mode = OPEN_BRACKET;
-			if (type == DyvilKeywords.OPERATOR)
+			this.mode = OPERATOR_SYMBOL;
+			if (type != DyvilKeywords.OPERATOR)
 			{
-				IToken next = token.next();
-				Name name = next.nameValue();
-				pm.skip();
-				if (name == null)
-				{
-					pm.report(next, "operator.identifier");
-					return;
-				}
-
-				this.operator = new Operator(name, this.type);
-				return;
+				pm.reparse();
+				pm.report(token, "operator.operator");
 			}
-			pm.report(token, "operator.operator");
 			return;
-		case OPEN_BRACKET:
-			switch (this.type)
+		case OPERATOR_SYMBOL:
+			if (type == Tokens.SYMBOL_IDENTIFIER || type == Tokens.SPECIAL_IDENTIFIER)
 			{
-			case IOperator.PREFIX:
-				if (type == BaseSymbols.OPEN_CURLY_BRACKET)
-				{
-					this.mode = PROPERTY;
-					return;
-				}
-				pm.popParser();
-				this.map.addOperator(this.operator);
-				if (type != BaseSymbols.SEMICOLON && type != Tokens.EOF)
-				{
-					pm.report(token, "operator.prefix.semicolon");
-					return;
-				}
-				return;
-			case IOperator.POSTFIX:
-				if (type == BaseSymbols.OPEN_CURLY_BRACKET)
-				{
-					this.mode = PROPERTY;
-					return;
-				}
-				pm.popParser();
-				this.map.addOperator(this.operator);
-				if (type != BaseSymbols.SEMICOLON && type != Tokens.EOF)
-				{
-					pm.report(token, "operator.postfix.semicolon");
-					return;
-				}
-				return;
-			default: // infix
-				this.mode = PROPERTY;
-				if (type != BaseSymbols.OPEN_CURLY_BRACKET)
-				{
-					pm.reparse();
-					pm.report(token, "operator.infix.open_brace");
-					return;
-				}
+				this.operator = new Operator(token.nameValue(), this.type);
+				this.mode = SEPARATOR;
 				return;
 			}
+			if (type == Tokens.LETTER_IDENTIFIER)
+			{
+				this.operator = new Operator(token.nameValue(), this.type);
+				pm.report(Markers.syntaxWarning(token, "operator.identifier.not_symbol"));
+				this.mode = SEPARATOR;
+				return;
+			}
+			if ((type & Tokens.SYMBOL) != 0)
+			{
+				this.operator = new Operator(Name.get(DyvilSymbols.INSTANCE.toString(type)), this.type);
+				this.mode = SEPARATOR;
+				return;
+			}
+
+			pm.report(token, "operator.identifier");
+			return;
+		case SEPARATOR:
+			if (type == BaseSymbols.SEMICOLON)
+			{
+				pm.popParser();
+				this.map.addOperator(this.operator);
+				return;
+			}
+			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
+			{
+				this.mode = PROPERTY;
+				return;
+			}
+
+			pm.popParser(true);
+			this.map.addOperator(this.operator);
+			pm.report(token, "operator.separator");
+			return;
 		case PROPERTY:
 			if (type == Tokens.LETTER_IDENTIFIER)
 			{

@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -114,18 +115,28 @@ public class OperatorChain implements IValue
 			while (!operatorStack.isEmpty())
 			{
 				element2 = operatorStack.peek();
-
 				final int comparePrecedence = element1.operator.comparePrecedence(element2.operator);
-				if (comparePrecedence < 0
-					    || element1.operator.getAssociativity() != IOperator.RIGHT && comparePrecedence == 0)
+
+				if (comparePrecedence < 0)
 				{
 					operatorStack.pop();
 					this.pushCall(operandStack, element2);
+					continue;
 				}
-				else
+				if (comparePrecedence == 0)
 				{
-					break;
+					switch (element1.operator.getAssociativity())
+					{
+					case IOperator.NONE:
+						markers.add(Markers.semantic(element1.position, "operator.infix_none", element1.name));
+						// Fallthrough
+					case IOperator.LEFT:
+						operatorStack.pop();
+						this.pushCall(operandStack, element2);
+						continue;
+					}
 				}
+				break;
 			}
 			operatorStack.push(element1);
 			operandStack.push(this.operands[i + 1]);
