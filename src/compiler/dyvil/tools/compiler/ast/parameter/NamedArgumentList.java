@@ -16,19 +16,19 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 import java.util.Iterator;
 
-public final class ArgumentMap implements IArguments
+public final class NamedArgumentList implements IArguments
 {
 	private Name[]   keys;
 	private IValue[] values;
 	private int      size;
 
-	public ArgumentMap()
+	public NamedArgumentList()
 	{
 		this.keys = new Name[3];
 		this.values = new IValue[3];
 	}
 
-	public ArgumentMap(Name[] keys, IValue[] values, int size)
+	public NamedArgumentList(Name[] keys, IValue[] values, int size)
 	{
 		this.keys = keys;
 		this.values = values;
@@ -78,7 +78,7 @@ public final class ArgumentMap implements IArguments
 		keys[index] = name;
 		values[index] = value;
 
-		return new ArgumentMap(keys, values, size);
+		return new NamedArgumentList(keys, values, size);
 	}
 
 	@Override

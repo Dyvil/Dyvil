@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.consumer.IAnnotationConsumer;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.parameter.ArgumentMap;
+import dyvil.tools.compiler.ast.parameter.NamedArgumentList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.parsing.Name;
@@ -17,13 +17,13 @@ public class AnnotationReader implements AnnotationVisitor
 {
 	private IAnnotationConsumer consumer;
 	private IAnnotation         annotation;
-	private ArgumentMap         arguments;
+	private NamedArgumentList   arguments;
 	
 	public AnnotationReader(IAnnotationConsumer consumer, IAnnotation annotation)
 	{
 		this.consumer = consumer;
 		this.annotation = annotation;
-		this.annotation.setArguments(this.arguments = new ArgumentMap());
+		this.annotation.setArguments(this.arguments = new NamedArgumentList());
 	}
 	
 	@Override
