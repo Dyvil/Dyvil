@@ -1,22 +1,17 @@
 package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.reflect.Modifiers;
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.external.ExternalMethod;
 import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
-import dyvil.tools.compiler.ast.reference.ImplicitReferenceType;
-import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -27,9 +22,7 @@ public final class MethodParameter extends Parameter
 {
 	// Metadata
 	protected ICallableMember method;
-
-	protected ReferenceType refType;
-	protected boolean       assigned;
+	protected boolean         assigned;
 
 	public MethodParameter()
 	{
@@ -103,24 +96,6 @@ public final class MethodParameter extends Parameter
 	}
 
 	@Override
-	public IType getInternalType()
-	{
-		return this.refType != null ? this.refType : this.type;
-	}
-
-	@Override
-	public boolean isReferenceCapturable()
-	{
-		return this.refType != null;
-	}
-
-	@Override
-	public boolean isReferenceType()
-	{
-		return this.refType != null;
-	}
-
-	@Override
 	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue receiver, IContext context)
 	{
 		return receiver;
@@ -145,16 +120,7 @@ public final class MethodParameter extends Parameter
 
 		if (this.modifiers != null)
 		{
-			if (this.modifiers.hasIntModifier(Modifiers.VAR))
-			{
-				markers.add(Markers.semanticWarning(this.position, "parameter.var.deprecated"));
-				if (this.method instanceof ExternalMethod)
-				{
-					this.type = this.type.getElementType();
-				}
-				this.refType = new ImplicitReferenceType(this.type.getRefClass(), this.type);
-			}
-			else if (this.modifiers.hasIntModifier(Modifiers.INFIX_FLAG))
+			if (this.modifiers.hasIntModifier(Modifiers.INFIX_FLAG))
 			{
 				this.type.setExtension(true);
 			}
@@ -175,50 +141,13 @@ public final class MethodParameter extends Parameter
 	@Override
 	public void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
-		if (this.refType != null)
-		{
-			writer.visitVarInsn(Opcodes.ALOAD, this.localIndex);
-			return;
-		}
 		writer.visitVarInsn(this.type.getLoadOpcode(), this.localIndex);
-	}
-
-	@Override
-	public void writeGet_Unwrap(MethodWriter writer, int lineNumber) throws BytecodeException
-	{
-		if (this.refType != null)
-		{
-			this.refType.writeUnwrap(writer);
-		}
-	}
-
-	@Override
-	public boolean writeSet_PreValue(MethodWriter writer, int lineNumber) throws BytecodeException
-	{
-		if (this.refType != null)
-		{
-			writer.visitVarInsn(Opcodes.ALOAD, this.localIndex);
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public void writeSet_Wrap(MethodWriter writer, int lineNumber) throws BytecodeException
-	{
-		if (this.refType != null)
-		{
-			this.refType.writeWrap(writer);
-		}
 	}
 
 	@Override
 	public void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
-		if (this.refType == null)
-		{
-			writer.visitVarInsn(this.type.getStoreOpcode(), this.localIndex);
-		}
+		writer.visitVarInsn(this.type.getStoreOpcode(), this.localIndex);
 	}
 
 	@Override
