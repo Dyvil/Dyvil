@@ -3,6 +3,8 @@ package dyvil.tools.compiler.ast.field;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.FieldVisitor;
+import dyvil.tools.compiler.ast.access.FieldAccess;
+import dyvil.tools.compiler.ast.access.FieldAssignment;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -10,9 +12,11 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisExpr;
 import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -112,7 +116,7 @@ public class Field extends Member implements IField
 	@Override
 	public IProperty createProperty()
 	{
-		return new Property(this.position, this.name, this.type, new FlagModifierSet(), null);
+		return new Property(this.position, this.name, Types.UNKNOWN, new FlagModifierSet(), null);
 	}
 
 	@Override
@@ -215,6 +219,17 @@ public class Field extends Member implements IField
 		{
 			this.value.resolveTypes(markers, context);
 		}
+
+		if (this.property != null)
+		{
+			final int modifiers =
+				this.modifiers.toFlags() & (Modifiers.STATIC | Modifiers.PUBLIC | Modifiers.PROTECTED);
+			// only transfer public, static and protected modifiers to the property
+
+			this.property.getModifiers().addIntModifier(modifiers);
+			this.property.setEnclosingClass(this.enclosingClass);
+			this.property.resolveTypes(markers, context);
+		}
 	}
 
 	@Override
@@ -247,13 +262,47 @@ public class Field extends Member implements IField
 					this.type = Types.ANY;
 				}
 			}
-
-			return;
 		}
-		if (this.type == Types.UNKNOWN)
+		else if (this.type == Types.UNKNOWN)
 		{
 			markers.add(Markers.semantic(this.position, "field.type.infer.novalue", this.name.unqualified));
 			this.type = Types.ANY;
+		}
+
+		if (this.property == null)
+		{
+			return;
+		}
+
+		this.property.setType(this.type);
+
+		final IMethod getter = this.property.getGetter();
+		final IMethod setter = this.property.getSetter();
+
+		final IValue receiver = this.hasModifier(Modifiers.STATIC) ?
+			                        null :
+			                        new ThisExpr(this.enclosingClass.getType(), VariableThis.DEFAULT);
+		if (getter != null)
+		{
+			getter.setType(this.type);
+			if (getter.getValue() == null)
+			{
+				// get: this.FIELD_NAME
+				getter.setValue(new FieldAccess(getter.getPosition(), receiver, this));
+			}
+		}
+		if (setter != null)
+		{
+			final IParameter setterParameter = setter.getParameter(0);
+			setterParameter.setType(this.type);
+
+			if (setter.getValue() == null)
+			{
+				// set: this.FIELD_NAME = newValue
+				final ICodePosition setterPosition = setter.getPosition();
+				setter.setValue(new FieldAssignment(setterPosition, receiver, this,
+				                                    new FieldAccess(setterPosition, null, setterParameter)));
+			}
 		}
 	}
 
@@ -266,6 +315,11 @@ public class Field extends Member implements IField
 		{
 			this.value.checkTypes(markers, context);
 		}
+
+		if (this.property != null)
+		{
+			this.property.checkTypes(markers, context);
+		}
 	}
 
 	@Override
@@ -276,6 +330,11 @@ public class Field extends Member implements IField
 		if (this.value != null)
 		{
 			this.value.check(markers, context);
+		}
+
+		if (this.property != null)
+		{
+			this.property.checkTypes(markers, context);
 		}
 
 		if (Types.isSameType(this.type, Types.VOID))
@@ -295,6 +354,11 @@ public class Field extends Member implements IField
 		{
 			this.value = this.value.foldConstants();
 		}
+
+		if (this.property != null)
+		{
+			this.property.foldConstants();
+		}
 	}
 
 	@Override
@@ -305,6 +369,11 @@ public class Field extends Member implements IField
 		if (this.value != null)
 		{
 			this.value = this.value.cleanup(context, compilableList);
+		}
+
+		if (this.property != null)
+		{
+			this.property.cleanup(context, compilableList);
 		}
 	}
 
@@ -318,28 +387,53 @@ public class Field extends Member implements IField
 
 		IField.writeAnnotations(fieldVisitor, this.modifiers, this.annotations, this.type);
 		fieldVisitor.visitEnd();
+
+		if (this.property != null)
+		{
+			this.property.write(writer);
+		}
 	}
 
 	@Override
 	public void writeClassInit(MethodWriter writer) throws BytecodeException
 	{
-		if (this.value != null && !this.modifiers.hasIntModifier(Modifiers.STATIC) && !this.value.isConstant())
+		if (this.modifiers.hasIntModifier(Modifiers.STATIC))
+		{
+			return;
+		}
+
+		if (this.value != null && !this.value.isConstant())
 		{
 			writer.visitVarInsn(Opcodes.ALOAD, 0);
 			this.value.writeExpression(writer, this.type);
 			writer.visitFieldInsn(Opcodes.PUTFIELD, this.enclosingClass.getInternalName(), this.name.qualified,
 			                      this.getDescriptor());
 		}
+
+		if (this.property != null)
+		{
+			this.property.writeClassInit(writer);
+		}
 	}
 
 	@Override
 	public void writeStaticInit(MethodWriter writer) throws BytecodeException
 	{
-		if (this.value != null && this.modifiers.hasIntModifier(Modifiers.STATIC) && !this.value.isConstant())
+		if (!this.modifiers.hasIntModifier(Modifiers.STATIC))
+		{
+			return;
+		}
+
+		if (this.value != null && !this.value.isConstant())
 		{
 			this.value.writeExpression(writer, this.type);
 			writer.visitFieldInsn(Opcodes.PUTSTATIC, this.enclosingClass.getInternalName(), this.name.qualified,
 			                      this.getDescriptor());
+		}
+
+		if (this.property != null)
+		{
+			this.property.writeStaticInit(writer);
 		}
 	}
 

@@ -468,7 +468,8 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 			}
 			return;
 		case FIELD_PROPERTY:
-			if (type == BaseSymbols.SEMICOLON && token.isInferred())
+			if (type == BaseSymbols.SEMICOLON && token.isInferred()
+				    && token.next().type() == BaseSymbols.OPEN_CURLY_BRACKET)
 			{
 				return;
 			}
