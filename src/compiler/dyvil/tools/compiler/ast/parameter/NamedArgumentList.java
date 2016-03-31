@@ -173,13 +173,37 @@ public final class NamedArgumentList implements IArguments
 		return -1;
 	}
 
+	private int findNextName(int startIndex)
+	{
+		for (; startIndex < this.size; startIndex++)
+		{
+			if (this.keys[startIndex] != null)
+			{
+				return startIndex;
+			}
+		}
+
+		return this.size;
+	}
+
 	@Override
 	public float getTypeMatch(int index, IParameter param)
 	{
 		final int argIndex = this.findIndex(index, param.getName());
 		if (argIndex >= 0)
 		{
+			if (param.isVarargs())
+			{
+				final int endIndex = this.findNextName(argIndex + 1);
+				return ArgumentList.getVarargsTypeMatch(this.values, argIndex, endIndex, param);
+			}
+
 			return this.values[argIndex].getTypeMatch(param.getInternalType());
+		}
+
+		if (param.isVarargs())
+		{
+			return VARARGS_MATCH;
 		}
 		return param.getValue() != null ? DEFAULT_MATCH : 0;
 	}
@@ -193,9 +217,25 @@ public final class NamedArgumentList implements IArguments
 			return;
 		}
 
-		final IType type = param.getInternalType();
-		this.values[argIndex] = TypeChecker.convertValue(this.values[argIndex], type, typeContext, markers, context,
-		                                                 IArguments.argumentMarkerSupplier(param));
+		if (!param.isVarargs())
+		{
+			final IType type = param.getInternalType();
+			this.values[argIndex] = TypeChecker.convertValue(this.values[argIndex], type, typeContext, markers, context,
+			                                                 IArguments.argumentMarkerSupplier(param));
+			return;
+		}
+
+		final int endIndex = this.findNextName(argIndex + 1);
+		if (ArgumentList.checkVarargsValue(this.values, argIndex, endIndex, param, typeContext, markers, context))
+		{
+			final int moved = this.size - endIndex;
+			if (moved > 0)
+			{
+				System.arraycopy(this.values, endIndex, this.values, argIndex + 1, moved);
+				System.arraycopy(this.keys, endIndex, this.keys, argIndex + 1, moved);
+			}
+			this.size = argIndex + moved + 1;
+		}
 	}
 
 	@Override
@@ -207,6 +247,12 @@ public final class NamedArgumentList implements IArguments
 			return;
 		}
 
+		if (param.isVarargs())
+		{
+			final int endIndex = this.findNextName(argIndex + 1);
+			ArgumentList.inferVarargsType(this.values, argIndex, endIndex, param, typeContext);
+			return;
+		}
 		param.getInternalType().inferTypes(this.values[argIndex].getType(), typeContext);
 	}
 

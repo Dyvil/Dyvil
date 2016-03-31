@@ -205,9 +205,9 @@ public final class ArgumentList implements IArguments, IValueList
 		return this.values[index].getTypeMatch(param.getInternalType());
 	}
 
-	private static float getVarargsTypeMatch(IValue[] values, int fromIndex, int toIndex, IParameter param)
+	protected static float getVarargsTypeMatch(IValue[] values, int startIndex, int endIndex, IParameter param)
 	{
-		IValue argument = values[fromIndex];
+		IValue argument = values[startIndex];
 		IType type = param.getInternalType();
 		float totalMatch = argument.getTypeMatch(type);
 		if (totalMatch > 0F)
@@ -216,9 +216,9 @@ public final class ArgumentList implements IArguments, IValueList
 		}
 
 		IType elementType = type.getElementType();
-		for (totalMatch = 0; fromIndex < toIndex; fromIndex++)
+		for (totalMatch = 0; startIndex < endIndex; startIndex++)
 		{
-			float valueMatch = values[fromIndex].getTypeMatch(elementType);
+			float valueMatch = values[startIndex].getTypeMatch(elementType);
 			if (valueMatch <= 0)
 			{
 				return 0F;
@@ -251,20 +251,20 @@ public final class ArgumentList implements IArguments, IValueList
 		                                              IArguments.argumentMarkerSupplier(param));
 	}
 
-	private static boolean checkVarargsValue(IValue[] values, int fromIndex, int toIndex, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
+	protected static boolean checkVarargsValue(IValue[] values, int startIndex, int endIndex, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		final IType arrayType = param.getInternalType();
 
-		final IValue value = values[fromIndex];
+		final IValue value = values[startIndex];
 		if (value.isType(arrayType))
 		{
-			values[fromIndex] = TypeChecker.convertValue(value, arrayType, typeContext, markers, context,
-			                                             IArguments.argumentMarkerSupplier(param));
+			values[startIndex] = TypeChecker.convertValue(value, arrayType, typeContext, markers, context,
+			                                              IArguments.argumentMarkerSupplier(param));
 			return false;
 		}
 
 		final IType elementType = arrayType.getElementType();
-		final int varargsArguments = toIndex - fromIndex;
+		final int varargsArguments = endIndex - startIndex;
 		final IValue[] arrayValues = new IValue[varargsArguments];
 		final ArrayExpr arrayExpr = new ArrayExpr(arrayValues, varargsArguments);
 
@@ -272,11 +272,12 @@ public final class ArgumentList implements IArguments, IValueList
 
 		for (int i = 0; i < varargsArguments; i++)
 		{
-			arrayValues[i] = TypeChecker.convertValue(values[i + fromIndex], elementType, typeContext, markers, context,
-			                                          IArguments.argumentMarkerSupplier(param));
+			arrayValues[i] = TypeChecker
+				                 .convertValue(values[i + startIndex], elementType, typeContext, markers, context,
+				                               IArguments.argumentMarkerSupplier(param));
 		}
 
-		values[fromIndex] = arrayExpr;
+		values[startIndex] = arrayExpr;
 		return true;
 	}
 
@@ -290,30 +291,25 @@ public final class ArgumentList implements IArguments, IValueList
 
 		if (param.isVarargs())
 		{
-			this.inferVarargsType(index, param, typeContext);
+			inferVarargsType(this.values, index, this.size, param, typeContext);
 			return;
 		}
 
 		param.getInternalType().inferTypes(this.values[index].getType(), typeContext);
 	}
 
-	private void inferVarargsType(int index, IParameter param, ITypeContext typeContext)
+	protected static void inferVarargsType(IValue[] values, int startIndex, int endIndex, IParameter param, ITypeContext typeContext)
 	{
-		if (index >= this.size)
-		{
-			return;
-		}
-
-		IType type = this.values[index].getType();
-		if (index + 1 == this.size && type.isArrayType())
+		IType type = values[startIndex].getType();
+		if (startIndex + 1 == endIndex && type.isArrayType())
 		{
 			param.getInternalType().inferTypes(type, typeContext);
 			return;
 		}
 
-		for (int i = index + 1; i < this.size; i++)
+		for (int i = startIndex + 1; i < endIndex; i++)
 		{
-			type = Types.combine(type, this.values[i].getType());
+			type = Types.combine(type, values[i].getType());
 		}
 
 		param.getInternalType().getElementType().inferTypes(type, typeContext);
