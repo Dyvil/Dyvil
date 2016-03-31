@@ -377,11 +377,26 @@ public class Field extends Member implements IField
 		}
 	}
 
+	private boolean hasFinalValue()
+	{
+		return this.hasModifier(Modifiers.FINAL) && this.value.isConstant();
+	}
+
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		final int modifiers = this.modifiers.toFlags() & ModifierUtil.JAVA_MODIFIER_MASK;
-		final Object value = this.value != null && this.value.isConstant() ? this.value.toObject() : null;
+
+		final Object value;
+		if (this.value != null && this.hasModifier(Modifiers.STATIC) && this.hasFinalValue())
+		{
+			value = this.value.toObject();
+		}
+		else
+		{
+			value = null;
+		}
+
 		final FieldVisitor fieldVisitor = writer.visitField(modifiers, this.name.qualified, this.getDescriptor(),
 		                                                    this.getSignature(), value);
 
@@ -402,7 +417,7 @@ public class Field extends Member implements IField
 			return;
 		}
 
-		if (this.value != null && !this.value.isConstant())
+		if (this.value != null)
 		{
 			writer.visitVarInsn(Opcodes.ALOAD, 0);
 			this.value.writeExpression(writer, this.type);
@@ -424,7 +439,7 @@ public class Field extends Member implements IField
 			return;
 		}
 
-		if (this.value != null && !this.value.isConstant())
+		if (this.value != null && !this.hasFinalValue())
 		{
 			this.value.writeExpression(writer, this.type);
 			writer.visitFieldInsn(Opcodes.PUTSTATIC, this.enclosingClass.getInternalName(), this.name.qualified,
