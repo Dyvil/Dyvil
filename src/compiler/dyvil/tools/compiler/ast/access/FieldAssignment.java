@@ -256,13 +256,13 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 				final IValue implicit = context.getImplicit();
 				if (implicit != null)
 				{
-					value = this.resolveField(implicit, context);
+					value = this.resolveMethod(implicit, markers, context);
 					if (value != null)
 					{
 						return value;
 					}
 
-					value = this.resolveMethod(implicit, markers, context);
+					value = this.resolveField(implicit, context);
 					if (value != null)
 					{
 						return value;

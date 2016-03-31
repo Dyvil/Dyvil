@@ -477,7 +477,6 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 			{
 				final IDataMember member = (IDataMember) this.member;
 				final IProperty property = member.createProperty();
-				member.setProperty(property);
 				pm.pushParser(new PropertyParser(property));
 				this.mode = END;
 				return;

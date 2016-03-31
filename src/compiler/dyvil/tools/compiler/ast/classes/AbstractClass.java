@@ -8,10 +8,7 @@ import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.external.ExternalClass;
-import dyvil.tools.compiler.ast.field.IAccessible;
-import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.field.VariableThis;
+import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.member.IClassMember;
@@ -529,6 +526,15 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			return !candidate.hasModifier(Modifiers.ABSTRACT);
 		}
 
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			final IProperty property = this.parameters[i].getProperty();
+			if (property != null && ClassBody.checkPropertyImplements(property, candidate, typeContext))
+			{
+				return true;
+			}
+		}
+
 		if (this.body != null && this.body.checkImplements(candidate, typeContext))
 		{
 			return true;
@@ -537,8 +543,8 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		if (this.superType != null)
 		{
 			final IClass superClass = this.superType.getTheClass();
-			if (superClass != null && superClass.checkImplements(candidate,
-			                                                     this.superType.getConcreteType(typeContext)))
+			if (superClass != null && superClass
+				                          .checkImplements(candidate, this.superType.getConcreteType(typeContext)))
 			{
 				return true;
 			}
@@ -548,8 +554,8 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		{
 			final IType interfaceType = this.interfaces[i];
 			final IClass interfaceClass = interfaceType.getTheClass();
-			if (interfaceClass != null && interfaceClass.checkImplements(candidate,
-			                                                             interfaceType.getConcreteType(typeContext)))
+			if (interfaceClass != null && interfaceClass
+				                              .checkImplements(candidate, interfaceType.getConcreteType(typeContext)))
 			{
 				return true;
 			}
@@ -559,7 +565,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext, Set<IClass> checkedClasses)
+	public void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext, Set<IClass> checkedClasses)
 	{
 		if (checkedClasses.contains(this))
 		{
@@ -567,12 +573,21 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		}
 		checkedClasses.add(this);
 
-		if (this.body != null)
+		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.body.checkMethods(markers, iclass, typeContext);
+			final IProperty property = this.parameters[i].getProperty();
+			if (property != null)
+			{
+				ClassBody.checkProperty(property, markers, checkedClass, typeContext);
+			}
 		}
 
-		this.checkSuperMethods(markers, iclass, typeContext, checkedClasses);
+		if (this.body != null)
+		{
+			this.body.checkMethods(markers, checkedClass, typeContext);
+		}
+
+		this.checkSuperMethods(markers, checkedClass, typeContext, checkedClasses);
 	}
 
 	public void checkSuperMethods(MarkerList markers, IClass thisClass, ITypeContext typeContext, Set<IClass> checkedClasses)
@@ -813,6 +828,15 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			final IProperty property = this.parameters[i].getProperty();
+			if (property != null)
+			{
+				property.getMethodMatches(list, instance, name, arguments);
+			}
+		}
+
 		if (this.body != null)
 		{
 			this.body.getMethodMatches(list, instance, name, arguments);

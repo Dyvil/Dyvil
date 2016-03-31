@@ -2,36 +2,19 @@ package dyvil.test
 
 public class BuilderTest
 {
-	public case class Buildable(private int _int
-                                private double _double
-                                private String _string)
+	public case class Buildable(int myInt		{ get; set }
+    							double myDouble	{ get; set }
+    							String myString	{ get; set }
+    							)
     {
 		public static Buildable apply() = new Buildable(0, 0D, null)
 
-		public static Buildable apply(extension Buildable => void configure)
+		public static Buildable apply(Buildable.() => void configure)
 		{
 			return Buildable().{
 				configure $0
 				$0
 			}
-		}
-
-		public int myInt
-		{
-			get: return this._int
-			set: this._int = newValue
-		}
-
-		public double myDouble
-		{
-			get: return this._double
-			set: this._double = newValue
-		}
-
-		public String myString
-		{
-			get: return this._string
-			set: this._string = newValue
 		}
     }
 
