@@ -44,9 +44,10 @@ import dyvil.tools.repl.DyvilREPL;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberConsumer<REPLVariable>, IClassCompilableList
+public class REPLContext extends DyvilHeader
+	implements IValueConsumer, IMemberConsumer<REPLVariable>, IClassCompilableList
 {
-	private static final String REPL$CLASSES     = "repl$classes/";
+	private static final String REPL$CLASSES = "repl$classes/";
 
 	protected final DyvilREPL repl;
 
@@ -256,25 +257,25 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 		ModifierList modifierList = new ModifierList();
 		modifierList.addModifier(BaseModifiers.FINAL);
 
-		final REPLVariable field = new REPLVariable(this, ICodePosition.ORIGIN, null, Types.UNKNOWN, this.className,
-		                                            modifierList, null);
-		field.setValue(value);
-
-		this.memberClass = this.getREPLClass(field);
-
 		value.resolveTypes(this.markers, this);
 		value = value.resolve(this.markers, this);
 
 		if (value.valueTag() == IValue.FIELD_ACCESS)
 		{
-			IDataMember f = ((FieldAccess) value).getField();
-			if (f instanceof REPLVariable)
+			final IDataMember field = ((FieldAccess) value).getField();
+			if (field instanceof REPLVariable)
 			{
-				((REPLVariable) f).updateValue(this.repl);
-				this.compiler.getOutput().println(f);
+				((REPLVariable) field).updateValue(this.repl);
+				this.compiler.getOutput().println(field);
 				return;
 			}
 		}
+
+		final REPLVariable field = new REPLVariable(this, ICodePosition.ORIGIN, null, Types.UNKNOWN, this.className,
+		                                            modifierList, null);
+		field.setValue(value);
+
+		this.memberClass = this.getREPLClass(field);
 
 		IType type = value.getType();
 		IValue typedValue = value.withType(type, type, this.markers, this);
@@ -464,11 +465,16 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 	public void addDataMember(REPLVariable variable)
 	{
 		this.memberClass = this.getREPLClass(variable);
+		final Name variableName = variable.getName();
 
+		this.fields.put(variableName, variable);
 		if (this.computeVariable(variable))
 		{
-			this.fields.put(variable.getName(), variable);
 			this.compiler.getOutput().println(variable.toString());
+		}
+		else
+		{
+			this.fields.removeKey(variableName);
 		}
 	}
 
@@ -625,10 +631,22 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 			IContext.getMethodMatch(list, receiver, name, arguments, method);
 		}
 
-		final IProperty property = this.properties.get(Util.removeEq(name));
+		final Name removeEq = Util.removeEq(name);
+
+		IProperty property = this.properties.get(removeEq);
 		if (property != null)
 		{
 			property.getMethodMatches(list, receiver, name, arguments);
+		}
+
+		final IField field = this.fields.get(removeEq);
+		if (field != null)
+		{
+			property = field.getProperty();
+			if (property != null)
+			{
+				property.getMethodMatches(list, receiver, name, arguments);
+			}
 		}
 
 		if (!list.isEmpty())
