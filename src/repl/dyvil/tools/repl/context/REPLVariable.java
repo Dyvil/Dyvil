@@ -6,22 +6,27 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.*;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.repl.DyvilREPL;
+
+import java.lang.reflect.InvocationTargetException;
 
 public class REPLVariable extends Field
 {
 	private REPLContext context;
 
-	protected String bytecodeName;
-	protected String className;
-	private   Class  theClass;
+	protected String   bytecodeName;
+	protected String   className;
+	private   Class<?> theClass;
+	private   Object   displayValue;
 
 	public REPLVariable(REPLContext context, ICodePosition position, Name name, IType type, String className, ModifierSet modifiers, AnnotationList annotations)
 	{
@@ -77,17 +82,49 @@ public class REPLVariable extends Field
 			return;
 		}
 
-		try
+		final Object result;
+		if (this.property != null)
 		{
-			java.lang.reflect.Field field = this.theClass.getDeclaredFields()[0];
-			field.setAccessible(true);
-			Object result = field.get(null);
-			this.value = new REPLResult(result);
+			try
+			{
+				final java.lang.reflect.Method method = this.theClass.getDeclaredMethod(this.name.qualified);
+				method.setAccessible(true);
+				result = method.invoke(null);
+			}
+			catch (InvocationTargetException ex)
+			{
+				ex.getCause().printStackTrace(repl.getOutput());
+				this.displayValue = "<error>";
+				this.value = null;
+				return;
+			}
+			catch (ReflectiveOperationException ex)
+			{
+				ex.printStackTrace(repl.getErrorOutput());
+				this.displayValue = "<error>";
+				this.value = null;
+				return;
+			}
 		}
-		catch (IllegalAccessException illegalAccess)
+		else
 		{
-			illegalAccess.printStackTrace(repl.getErrorOutput());
+			try
+			{
+				final java.lang.reflect.Field field = this.theClass.getDeclaredFields()[0];
+				field.setAccessible(true);
+				result = field.get(null);
+			}
+			catch (ReflectiveOperationException ex)
+			{
+				ex.printStackTrace(repl.getErrorOutput());
+				this.displayValue = "<error>";
+				this.value = null;
+				return;
+			}
 		}
+
+		this.value = IValue.fromObject(result);
+		this.displayValue = result;
 	}
 
 	private boolean isConstant()
@@ -137,6 +174,11 @@ public class REPLVariable extends Field
 			c.writeStaticInit(clinitWriter);
 		}
 
+		if (this.property != null)
+		{
+			this.property.writeStaticInit(clinitWriter);
+		}
+
 		// Write a call to the computeResult method
 		clinitWriter.visitMethodInsn(Opcodes.INVOKESTATIC, className, "computeResult", methodType, false);
 		if (this.type != Types.VOID)
@@ -157,6 +199,12 @@ public class REPLVariable extends Field
 			computeWriter.visitCode();
 			this.value.writeExpression(computeWriter, this.type);
 			computeWriter.visitEnd(this.type);
+		}
+
+		// Write the property, if necessary
+		if (this.property != null)
+		{
+			this.property.write(classWriter);
 		}
 
 		// Finish Class compilation
@@ -200,5 +248,24 @@ public class REPLVariable extends Field
 
 		String extended = this.type.getExtendedName();
 		writer.visitFieldInsn(Opcodes.PUTSTATIC, this.className, this.bytecodeName, extended);
+	}
+
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		if (this.annotations != null)
+		{
+			this.annotations.toString(prefix, buffer);
+		}
+		this.modifiers.toString(buffer);
+
+		IDataMember.toString(prefix, buffer, this, "field.type_ascription");
+
+		if (this.displayValue != null)
+		{
+			Formatting.appendSeparator(buffer, "field.assignment", '=');
+
+			buffer.append(this.displayValue);
+		}
 	}
 }

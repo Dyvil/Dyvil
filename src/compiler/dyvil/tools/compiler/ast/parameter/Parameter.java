@@ -187,12 +187,6 @@ public abstract class Parameter extends Member implements IParameter
 			this.defaultValue.resolveTypes(markers, context);
 		}
 
-		if (this.type == Types.UNKNOWN)
-		{
-			markers.add(Markers.semantic(this.position, this.getKind().getName() + ".type.infer", this.name));
-			this.type = Types.ANY;
-		}
-
 		this.internalType = null;
 	}
 
@@ -200,6 +194,12 @@ public abstract class Parameter extends Member implements IParameter
 	public void resolve(MarkerList markers, IContext context)
 	{
 		super.resolve(markers, context);
+
+		if (this.type == Types.UNKNOWN)
+		{
+			markers.add(Markers.semantic(this.position, this.getKind().getName() + ".type.infer", this.name));
+			this.type = Types.ANY;
+		}
 
 		if (this.defaultValue == null)
 		{

@@ -4,34 +4,25 @@ public class PropertyTest
 {
 	interface AbstractProperty
 	{
-		int subscript { get; set }
+		int value { get; set }
 	}
 	
 	class ConcreteProperty implements AbstractProperty
 	{
-		private int value
-		private boolean _setterCalled
-
-		public override int subscript
+		private boolean setterCalled = false
 		{
-			init
-			{
-				this.value = 1
-			}
-
-			get: this.value
-
-			set (newValue)
-			{
-				this._setterCalled = true
-				this.value = newValue
-			}
+			public get
+			public set
 		}
 
-		public boolean setterCalled
+		private int value = 1
 		{
-			init: this._setterCalled = false
-			get: this._setterCalled
+			public override get
+			public override set(newValue)
+			{
+				this.setterCalled = true
+				this.value = newValue
+			}
 		}
 	}
 	
@@ -39,12 +30,12 @@ public class PropertyTest
 	{
 		var c = new ConcreteProperty
 
-		Main.test("Property Initializer", 1, c[])
+		Main.test("Property Initializer", 1, c.value)
 
-		c[] = 20
-		Main.test("Property Getter", 20, c[])
+		c.value = 20
+		Main.test("Property Getter", 20, c.value)
 
-		c.subscript = 10
+		c.value = 10
 		Main.test("Property Setter", true, c.setterCalled)
 	}
 }

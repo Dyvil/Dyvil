@@ -59,6 +59,7 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 	protected static final int METHOD_VALUE               = 1 << 13;
 	protected static final int CONSTRUCTOR_PARAMETERS     = 1 << 14;
 	protected static final int CONSTRUCTOR_PARAMETERS_END = 1 << 15;
+	protected static final int FIELD_PROPERTY             = 1 << 16;
 
 	// Member Kinds
 
@@ -75,6 +76,7 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 
 	public static final int OPERATOR_ERROR             = 1 << 4;
 	public static final int NO_UNINITIALIZED_VARIABLES = 1 << 5;
+	public static final int NO_FIELD_PROPERTIES        = 1 << 6;
 
 	// ----------
 
@@ -164,7 +166,7 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 				return;
 			}
 
-			Modifier modifier;
+			final Modifier modifier;
 			if ((modifier = ModifierUtil.parseModifier(token, pm)) != null)
 			{
 				this.modifiers.addModifier(modifier);
@@ -310,9 +312,17 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 					                                            this.annotations);
 				this.member = field;
 				this.setMemberKind(FIELD);
-				this.mode = END;
 
-				pm.pushParser(new ExpressionParser(field));
+				if ((this.flags & NO_FIELD_PROPERTIES) != 0)
+				{
+					this.mode = END;
+					pm.pushParser(new ExpressionParser(field));
+				}
+				else
+				{
+					this.mode = FIELD_PROPERTY;
+					pm.pushParser(new ExpressionParser(field).withFlag(ExpressionParser.IGNORE_CLOSURE));
+				}
 				return;
 			}
 			case BaseSymbols.OPEN_CURLY_BRACKET:
@@ -457,6 +467,22 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 				pm.report(token, "constructor.parameters.close_paren");
 			}
 			return;
+		case FIELD_PROPERTY:
+			if (type == BaseSymbols.SEMICOLON && token.isInferred()
+				    && token.next().type() == BaseSymbols.OPEN_CURLY_BRACKET)
+			{
+				return;
+			}
+			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
+			{
+				final IDataMember member = (IDataMember) this.member;
+				final IProperty property = member.createProperty();
+				member.setProperty(property);
+				pm.pushParser(new PropertyParser(property));
+				this.mode = END;
+				return;
+			}
+			// Fallthrough
 		case END:
 			switch (this.flags & MEMBER_KIND_MASK)
 			{
