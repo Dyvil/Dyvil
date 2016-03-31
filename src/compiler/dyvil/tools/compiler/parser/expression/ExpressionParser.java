@@ -39,7 +39,7 @@ import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 
-import static dyvil.tools.compiler.parser.ParserUtil.neighboring;
+import static dyvil.tools.compiler.parser.ParserUtil.*;
 
 public final class ExpressionParser extends Parser implements IValueConsumer
 {
@@ -203,7 +203,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				this.mode = PARAMETERS_END;
 				return;
 			}
-			if (ParserUtil.isIdentifier(nextType))
+			if (isIdentifier(nextType))
 			{
 				// ... .[ ... ] IDENTIFIER ...
 				pm.skip();
@@ -222,7 +222,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				}
 				return;
 			}
-			if (ParserUtil.isExpressionTerminator(nextType))
+			if (isExpressionTerminator(nextType))
 			{
 				// ... .[ ... ] ;
 
@@ -346,7 +346,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				return;
 			}
 
-			if (ParserUtil.isIdentifier(type))
+			if (isIdentifier(type))
 			{
 				// EXPRESSION IDENTIFIER
 				this.parseInfixAccess(pm, token);
@@ -387,7 +387,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				return;
 			}
 
-			if (ParserUtil.isIdentifier(type))
+			if (isIdentifier(type))
 			{
 				// EXPRESSION . IDENTIFIER
 
@@ -448,7 +448,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		{
 			return EmptyArguments.VISIBLE;
 		}
-		if (ParserUtil.isIdentifier(type) && next.next().type() == BaseSymbols.COLON)
+		if (isIdentifier(type) && next.next().type() == BaseSymbols.COLON)
 		{
 			final ArgumentMap map = new ArgumentMap();
 			pm.pushParser(new ExpressionMapParser(map));
@@ -471,7 +471,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		final IToken next = token.next();
 		final int nextType = next.type();
 
-		if (type == Tokens.SYMBOL_IDENTIFIER || (type & Tokens.SYMBOL) != 0)
+		if (isSymbol(type))
 		{
 			// Identifier is an operator
 
@@ -490,7 +490,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				this.parseApply(pm, next, call);
 				return;
 			}
-			if (ParserUtil.isExpressionTerminator(nextType) || neighboringLeft && !neighboringRight // postfix
+			if (isExpressionTerminator(nextType) || neighboringLeft && !neighboringRight // postfix
 				                                                   && !neighboring(next, next.next()))
 			{
 				// EXPRESSION_OPERATOR EXPRESSION
@@ -581,7 +581,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			return;
 		}
 
-		if (ParserUtil.isExpressionTerminator(nextType) || nextType == DyvilSymbols.DOUBLE_ARROW_RIGHT
+		if (isExpressionTerminator(nextType) || nextType == DyvilSymbols.DOUBLE_ARROW_RIGHT
 			    || this.ignoreClosure(next))
 		{
 			// IDENTIFIER END
@@ -590,42 +590,36 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			return;
 		}
 
-		if (ParserUtil.isIdentifier(nextType))
+		if (isSymbol(nextType))
 		{
-			// IDENTIFIER IDENTIFIER ...
-			// token      next       next2
-
-			final IToken next2 = next.next();
-			if (!ParserUtil.isExpressionTerminator(next2.type()))
+			// IDENTIFIER SYMBOL
+			if (neighboring(token, next) || !neighboring(next, next.next())) // next is not a prefix operator
 			{
-				if (nextType != Tokens.SYMBOL_IDENTIFIER)
-				{
-					// IDENTIFIER LETTER-IDENTIFIER ...
-					this.parseFieldAccess(token, name);
-					return;
-				}
-
-				// IDENTIFIER SYMBOL-IDENTIFIER ...
-				if (!neighboring(next, next2)) // not a prefix operator
-				{
-					this.parseFieldAccess(token, name);
-					return;
-				}
-			}
-
-			// IDENTIFIER IDENTIFIER END
-			if (nextType == Tokens.SYMBOL_IDENTIFIER) // postfix operator
-			{
+				// IDENTIFIER_SYMBOL ...
+				// IDENTIFIER SYMBOL EXPRESSION
 				this.parseFieldAccess(token, name);
 				return;
 			}
+		}
+		else if (isIdentifier(nextType) && !isExpressionTerminator(next.next().type()))
+		{
+			// IDENTIFIER IDENTIFIER ...
+			// token      next
+
+			// Parse a field access
+			// e.g. System out ;
+
+			this.parseFieldAccess(token, name);
+			return;
 		}
 
 		// IDENTIFIER EXPRESSION
 		// token      next
 
 		// Fallback to single-argument call
-		// e.g. this.call 10;
+		// e.g. println "abc"
+		//      println -1
+		//      println i
 
 		final MethodCall call = new MethodCall(token.raw(), this.value, name, EmptyArguments.INSTANCE);
 		call.setDotless(!this.hasFlag(EXPLICIT_DOT));
@@ -930,7 +924,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			this.value = breakStatement;
 
 			final IToken next = token.next();
-			if (ParserUtil.isIdentifier(next.type()))
+			if (isIdentifier(next.type()))
 			{
 				breakStatement.setName(next.nameValue());
 				pm.skip();
@@ -945,7 +939,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			this.value = continueStatement;
 
 			final IToken next = token.next();
-			if (ParserUtil.isIdentifier(next.type()))
+			if (isIdentifier(next.type()))
 			{
 				continueStatement.setName(next.nameValue());
 				pm.skip();
@@ -960,7 +954,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			this.value = statement;
 
 			final IToken next = token.next();
-			if (ParserUtil.isIdentifier(next.type()))
+			if (isIdentifier(next.type()))
 			{
 				statement.setName(next.nameValue());
 				pm.skip();
