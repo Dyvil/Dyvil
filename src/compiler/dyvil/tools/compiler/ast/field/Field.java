@@ -510,5 +510,10 @@ public class Field extends Member implements IField
 			Formatting.appendSeparator(buffer, "field.assignment", '=');
 			this.value.toString(prefix, buffer);
 		}
+
+		if (this.property != null)
+		{
+			Property.formatBody(this.property, prefix, buffer);
+		}
 	}
 }

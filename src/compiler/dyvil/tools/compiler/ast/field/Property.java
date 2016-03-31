@@ -442,7 +442,11 @@ public class Property extends Member implements IProperty
 		this.modifiers.toString(buffer);
 
 		IDataMember.toString(prefix, buffer, this, "property.type_ascription");
+		formatBody(this, prefix, buffer);
+	}
 
+	public static void formatBody(IProperty property, String prefix, StringBuilder buffer)
+	{
 		// Block Start
 		if (Formatting.getBoolean("property.block.newline"))
 		{
@@ -456,44 +460,48 @@ public class Property extends Member implements IProperty
 
 		// Initializer
 
-		if (this.initializer != null)
-		{
-			this.formatInitializer(prefix, buffer);
+		final IValue initializer = property.getInitializer();
+		final IMethod getter = property.getGetter();
+		final IMethod setter = property.getSetter();
 
-			if (this.getter != null || this.setter != null)
+		if (initializer != null)
+		{
+			formatInitializer(initializer, prefix, buffer);
+
+			if (getter != null || setter != null)
 			{
 				buffer.append('\n').append(prefix);
 			}
 		}
 
 		// Getter
-		if (this.getter != null)
+		if (getter != null)
 		{
-			this.formatGetter(prefix, buffer);
+			formatGetter(getter, prefix, buffer);
 
-			if (this.setter != null)
+			if (setter != null)
 			{
 				buffer.append('\n').append(prefix);
 			}
 		}
 
 		// Setter
-		if (this.setter != null)
+		if (setter != null)
 		{
-			this.formatSetter(prefix, buffer);
+			formatSetter(setter, prefix, buffer);
 		}
 
 		// Block End
 		buffer.append('\n').append(prefix).append('}');
 	}
 
-	private void formatInitializer(String prefix, StringBuilder buffer)
+	private static void formatInitializer(IValue initializer, String prefix, StringBuilder buffer)
 	{
 		final String initializerPrefix = Formatting.getIndent("property.initializer.indent", prefix);
 
 		buffer.append('\n').append(initializerPrefix).append("init");
 
-		if (Util.formatStatementList(initializerPrefix, buffer, this.initializer))
+		if (Util.formatStatementList(initializerPrefix, buffer, initializer))
 		{
 			return;
 		}
@@ -513,7 +521,7 @@ public class Property extends Member implements IProperty
 			buffer.append(' ');
 		}
 
-		this.initializer.toString(prefix, buffer);
+		initializer.toString(prefix, buffer);
 
 		if (Formatting.getBoolean("property.initializer.semicolon"))
 		{
@@ -521,15 +529,15 @@ public class Property extends Member implements IProperty
 		}
 	}
 
-	private void formatGetter(String prefix, StringBuilder buffer)
+	private static void formatGetter(IMethod getter, String prefix, StringBuilder buffer)
 	{
 		final String getterPrefix = Formatting.getIndent("property.getter.indent", prefix);
 
-		final IValue getterValue = this.getter.getValue();
-		final ModifierSet getterModifiers = this.getter.getModifiers();
+		final IValue getterValue = getter.getValue();
+		final ModifierSet getterModifiers = getter.getModifiers();
 
 		buffer.append('\n').append(getterPrefix);
-		if (getterModifiers != null && getterModifiers != this.modifiers)
+		if (getterModifiers != null)
 		{
 			getterModifiers.toString(buffer);
 		}
@@ -566,15 +574,15 @@ public class Property extends Member implements IProperty
 		}
 	}
 
-	private void formatSetter(String prefix, StringBuilder buffer)
+	private static void formatSetter(IMethod setter, String prefix, StringBuilder buffer)
 	{
 		final String setterPrefix = Formatting.getIndent("property.setter.indent", prefix);
-		final IValue setterValue = this.setter.getValue();
-		final ModifierSet setterModifiers = this.setter.getModifiers();
-		final Name setterParameterName = this.setterParameter.getName();
+		final IValue setterValue = setter.getValue();
+		final ModifierSet setterModifiers = setter.getModifiers();
+		final Name setterParameterName = setter.getParameter(0).getName();
 
 		buffer.append('\n').append(setterPrefix);
-		if (setterModifiers != null && setterModifiers != this.modifiers)
+		if (setterModifiers != null)
 		{
 			setterModifiers.toString(buffer);
 		}
