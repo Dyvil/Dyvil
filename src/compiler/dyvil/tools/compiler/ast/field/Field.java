@@ -117,7 +117,12 @@ public class Field extends Member implements IField
 	@Override
 	public IProperty createProperty()
 	{
-		return new Property(this.position, this.name, Types.UNKNOWN, new FlagModifierSet(), null);
+		if (this.property != null)
+		{
+			return this.property;
+		}
+
+		return this.property = new Property(this.position, this.name, Types.UNKNOWN, new FlagModifierSet(), null);
 	}
 
 	@Override

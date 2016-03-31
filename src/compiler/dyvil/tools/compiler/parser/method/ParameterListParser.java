@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.consumer.IParameterConsumer;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
+import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.modifiers.Modifier;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
@@ -18,6 +19,7 @@ import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
+import dyvil.tools.compiler.parser.header.PropertyParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
@@ -31,12 +33,14 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	public static final int NAME            = 2;
 	public static final int TYPE_ASCRIPTION = 4;
 	public static final int DEFAULT_VALUE   = 8;
-	public static final int SEPARATOR       = 16;
+	public static final int PROPERTY        = 16;
+	public static final int SEPARATOR       = 32;
 
 	// Flags
 
 	private static final int VARARGS          = 1;
 	public static final  int LAMBDA_ARROW_END = 2;
+	public static final  int ALLOW_PROPERTIES = 4;
 
 	protected IParameterConsumer consumer;
 
@@ -176,7 +180,6 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				return;
 			}
 
-			this.mode = SEPARATOR;
 			if (!ParserUtil.isIdentifier(type))
 			{
 				if (ParserUtil.isCloseBracket(type))
@@ -184,6 +187,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 					pm.popParser(true);
 				}
 
+				this.mode = SEPARATOR;
 				pm.report(token, "parameter.identifier");
 				return;
 			}
@@ -212,8 +216,17 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 		case DEFAULT_VALUE:
 			if (type == BaseSymbols.EQUALS)
 			{
-				this.mode = SEPARATOR;
+				this.mode = PROPERTY;
 				pm.pushParser(new ExpressionParser(this.parameter));
+				return;
+			}
+			// Fallthrough
+		case PROPERTY:
+			if (type == BaseSymbols.OPEN_CURLY_BRACKET && this.hasFlag(ALLOW_PROPERTIES))
+			{
+				final IProperty property = this.parameter.createProperty();
+				pm.pushParser(new PropertyParser(property));
+				this.mode = SEPARATOR;
 				return;
 			}
 			// Fallthrough

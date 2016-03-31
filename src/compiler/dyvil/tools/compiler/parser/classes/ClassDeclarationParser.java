@@ -101,7 +101,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 		case PARAMETERS:
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
-				pm.pushParser(new ParameterListParser(this.theClass));
+				pm.pushParser(new ParameterListParser(this.theClass).withFlags(ParameterListParser.ALLOW_PROPERTIES));
 				this.mode = PARAMETERS_END;
 				return;
 			}

@@ -173,14 +173,23 @@ public final class ClassParameter extends Field implements IParameter
 	}
 
 	@Override
+	public void resolveTypes(MarkerList markers, IContext context)
+	{
+		if (this.property != null)
+		{
+			this.property.getModifiers().addIntModifier(Modifiers.PUBLIC);
+		}
+
+		super.resolveTypes(markers, context);
+	}
+
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		super.check(markers, context);
 
-		if (this.modifiers != null)
-		{
-			ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.CLASS_PARAMETER_MODIFIERS);
-		}
+		// TODO remove duplicate modifier check
+		ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.CLASS_PARAMETER_MODIFIERS);
 	}
 
 	@Override
