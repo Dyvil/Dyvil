@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.access.FieldAssignment;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisExpr;
@@ -298,12 +299,22 @@ public class Field extends Member implements IField
 
 			if (setter.getValue() == null)
 			{
-				// set: this.FIELD_NAME = newValue
 				final ICodePosition setterPosition = setter.getPosition();
-				setter.setValue(new FieldAssignment(setterPosition, receiver, this,
-				                                    new FieldAccess(setterPosition, null, setterParameter)));
+				if (this.hasModifier(Modifiers.FINAL))
+				{
+					markers.add(Markers.semanticError(setterPosition, "field.property.setter.final", this.name));
+					setter.setValue(new VoidValue(setterPosition)); // avoid abstract method error
+				}
+				else
+				{
+					// set: this.FIELD_NAME = newValue
+					setter.setValue(new FieldAssignment(setterPosition, receiver, this,
+					                                    new FieldAccess(setterPosition, null, setterParameter)));
+				}
 			}
 		}
+
+		this.property.resolve(markers, context);
 	}
 
 	@Override
