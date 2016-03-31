@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -197,7 +198,8 @@ public final class ArrayExpr implements IValue, IValueList
 			final IAnnotation annotation;
 			if ((annotation = arrayType.getAnnotation(LazyFields.ARRAY_CONVERTIBLE)) != null)
 			{
-				return new LiteralConversion(this, annotation).withType(arrayType, typeContext, markers, context);
+				return new LiteralConversion(this, annotation, new ArgumentList(this.values, this.valueCount))
+					       .withType(arrayType, typeContext, markers, context);
 			}
 			if (arrayType.getTheClass() != Types.OBJECT_CLASS)
 			{
