@@ -58,6 +58,11 @@ public class ParserUtil
 		return false;
 	}
 
+	public static boolean isSymbol(int type)
+	{
+		return type == Tokens.SYMBOL_IDENTIFIER || (type & Tokens.SYMBOL) != 0;
+	}
+
 	// endregion
 
 	public static boolean neighboring(IToken first, IToken next)
