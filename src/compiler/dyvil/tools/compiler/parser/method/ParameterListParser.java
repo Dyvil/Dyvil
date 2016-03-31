@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.parser.method;
 
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.consumer.IParameterConsumer;
@@ -26,9 +27,11 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class ParameterListParser extends Parser implements ITypeConsumer
 {
-	public static final int TYPE      = 1;
-	public static final int NAME      = 2;
-	public static final int SEPARATOR = 4;
+	public static final int TYPE            = 1;
+	public static final int NAME            = 2;
+	public static final int TYPE_ASCRIPTION = 4;
+	public static final int DEFAULT_VALUE   = 8;
+	public static final int SEPARATOR       = 16;
 
 	// Flags
 
@@ -41,8 +44,10 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	private ModifierList   modifiers;
 	private AnnotationList annotations;
 
-	private IType type;
-	private int   flags;
+	private IType      type;
+	private IParameter parameter;
+
+	private int flags;
 
 	public ParameterListParser(IParameterConsumer consumer)
 	{
@@ -61,6 +66,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 		this.modifiers = null;
 		this.annotations = null;
 		this.type = null;
+		this.parameter = null;
 		this.flags &= ~VARARGS;
 	}
 
@@ -77,8 +83,24 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 		switch (this.mode)
 		{
 		case TYPE:
-			if (type == BaseSymbols.SEMICOLON && token.isInferred())
+			switch (type)
 			{
+			case BaseSymbols.SEMICOLON:
+				if (token.isInferred())
+				{
+					return;
+				}
+				break;
+			case DyvilKeywords.LET:
+				if (this.modifiers == null)
+				{
+					this.modifiers = new ModifierList();
+				}
+				this.modifiers.addIntModifier(Modifiers.FINAL);
+				// Fallthrough
+			case DyvilKeywords.VAR:
+				this.mode = NAME;
+				this.type = Types.UNKNOWN;
 				return;
 			}
 
@@ -171,34 +193,36 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				this.type = new ArrayType(this.type);
 			}
 
-			final IParameter parameter = this.createParameter(token);
-			this.consumer.addParameter(parameter);
-
-			final IToken next = token.next();
-			switch (next.type())
+			this.parameter = this.createParameter(token);
+			this.mode = TYPE_ASCRIPTION;
+			return;
+		case TYPE_ASCRIPTION:
+			if (type == BaseSymbols.COLON)
 			{
-			case BaseSymbols.EQUALS:
-				// ... IDENTIFIER = EXPRESSION ...
-
-				pm.skip();
-				pm.pushParser(new ExpressionParser(parameter));
-				return;
-			case BaseSymbols.COLON:
-				// ... IDENTIFIER : TYPE ...
 				if (this.type != Types.UNKNOWN)
 				{
-					pm.report(next, "parameter.type.duplicate");
+					pm.report(token, "parameter.type.duplicate");
 				}
 
-				pm.skip();
-				pm.pushParser(new TypeParser(parameter));
+				this.mode = DEFAULT_VALUE;
+				pm.pushParser(new TypeParser(this.parameter));
 				return;
 			}
-
-			this.reset();
-			return;
+			// Fallthrough
+		case DEFAULT_VALUE:
+			if (type == BaseSymbols.EQUALS)
+			{
+				this.mode = SEPARATOR;
+				pm.pushParser(new ExpressionParser(this.parameter));
+				return;
+			}
+			// Fallthrough
 		case SEPARATOR:
 			this.mode = TYPE;
+			if (this.parameter != null)
+			{
+				this.consumer.addParameter(this.parameter);
+			}
 			this.reset();
 
 			switch (type)
