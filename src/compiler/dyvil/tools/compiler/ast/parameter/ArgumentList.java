@@ -323,7 +323,8 @@ public final class ArgumentList implements IArguments, IValueList
 			this.values[index].writeExpression(writer, param.getInternalType());
 			return;
 		}
-		param.getValue().writeExpression(writer, param.getInternalType());
+
+		EmptyArguments.writeArguments(writer, param);
 	}
 
 	@Override

@@ -119,6 +119,11 @@ public final class SingleArgument implements IArguments, IValueConsumer
 	{
 		if (index != 0 || this.value == null)
 		{
+			if (param.isVarargs())
+			{
+				return VARARGS_MATCH;
+			}
+
 			return param.getValue() != null ? DEFAULT_MATCH : 0;
 		}
 
@@ -215,7 +220,7 @@ public final class SingleArgument implements IArguments, IValueConsumer
 			return;
 		}
 
-		param.getValue().writeExpression(writer, param.getInternalType());
+		EmptyArguments.writeArguments(writer, param);
 	}
 
 	@Override

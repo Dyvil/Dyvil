@@ -92,19 +92,6 @@ public final class EmptyArguments implements IArguments
 	}
 
 	@Override
-	public void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
-	{
-		if (param.isVarargs())
-		{
-			writer.visitLdcInsn(0);
-			writer.visitMultiANewArrayInsn(param.getType().getElementType(), 1);
-			return;
-		}
-
-		param.getValue().writeExpression(writer, param.getType());
-	}
-
-	@Override
 	public void inferType(int index, IParameter param, ITypeContext typeContext)
 	{
 	}
@@ -122,6 +109,24 @@ public final class EmptyArguments implements IArguments
 	@Override
 	public void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
+	}
+
+	@Override
+	public void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
+	{
+		writeArguments(writer, param);
+	}
+
+	protected static void writeArguments(MethodWriter writer, IParameter param)
+	{
+		if (param.isVarargs())
+		{
+			writer.visitLdcInsn(0);
+			writer.visitMultiANewArrayInsn(param.getType().getElementType(), 1);
+			return;
+		}
+
+		param.getValue().writeExpression(writer, param.getType());
 	}
 
 	@Override

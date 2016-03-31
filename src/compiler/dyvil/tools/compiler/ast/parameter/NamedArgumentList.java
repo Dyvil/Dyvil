@@ -260,13 +260,13 @@ public final class NamedArgumentList implements IArguments
 	public void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
 	{
 		final int argIndex = this.findIndex(index, param.getName());
-		if (argIndex < 0)
+		if (argIndex >= 0)
 		{
-			param.getValue().writeExpression(writer, param.getInternalType());
+			this.values[argIndex].writeExpression(writer, param.getInternalType());
 			return;
 		}
 
-		this.values[argIndex].writeExpression(writer, param.getInternalType());
+		EmptyArguments.writeArguments(writer, param);
 	}
 
 	@Override
