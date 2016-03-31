@@ -394,7 +394,7 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext, Set<IClass> checkedClasses)
+	public void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext, Set<IClass> checkedClasses)
 	{
 		if (!this.genericsResolved)
 		{
@@ -404,7 +404,7 @@ public final class ExternalClass extends AbstractClass
 		{
 			this.resolveSuperTypes();
 		}
-		super.checkMethods(markers, iclass, typeContext, checkedClasses);
+		super.checkMethods(markers, checkedClass, typeContext, checkedClasses);
 	}
 
 	@Override
