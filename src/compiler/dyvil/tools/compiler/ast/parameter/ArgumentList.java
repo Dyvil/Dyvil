@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.collection.iterator.ArrayIterator;
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -20,9 +20,7 @@ public final class ArgumentList implements IArguments, IValueList
 {
 	private IValue[] values;
 	private int      size;
-	
-	private boolean varArgsArray;
-	
+
 	public ArgumentList()
 	{
 		this.values = new IValue[3];
@@ -33,47 +31,47 @@ public final class ArgumentList implements IArguments, IValueList
 		this.values = values;
 		this.size = values.length;
 	}
-	
+
 	public ArgumentList(int size)
 	{
 		this.values = new IValue[size];
 	}
-	
+
 	public ArgumentList(IValue[] values, int size)
 	{
 		this.values = values;
 		this.size = size;
 	}
-	
+
 	public IValue[] getValues()
 	{
 		return this.values;
 	}
-	
+
 	@Override
 	public Iterator<IValue> iterator()
 	{
 		return new ArrayIterator<>(this.values, this.size);
 	}
-	
+
 	@Override
 	public int size()
 	{
 		return this.size;
 	}
-	
+
 	@Override
 	public int valueCount()
 	{
 		return this.size;
 	}
-	
+
 	@Override
 	public boolean isEmpty()
 	{
 		return this.size == 0;
 	}
-	
+
 	@Override
 	public IArguments dropFirstValue()
 	{
@@ -82,7 +80,7 @@ public final class ArgumentList implements IArguments, IValueList
 		System.arraycopy(this.values, 1, values, 0, len1);
 		return new ArgumentList(values, len1);
 	}
-	
+
 	@Override
 	public IArguments withLastValue(IValue value)
 	{
@@ -91,43 +89,43 @@ public final class ArgumentList implements IArguments, IValueList
 		values[this.size] = value;
 		return new ArgumentList(values, this.size + 1);
 	}
-	
+
 	@Override
 	public IValue getFirstValue()
 	{
 		return this.values[0];
 	}
-	
+
 	@Override
 	public void setFirstValue(IValue value)
 	{
 		this.values[0] = value;
 	}
-	
+
 	@Override
 	public IValue getLastValue()
 	{
 		return this.values[this.size - 1];
 	}
-	
+
 	@Override
 	public void setLastValue(IValue value)
 	{
 		this.values[this.size - 1] = value;
 	}
-	
+
 	@Override
 	public void setValue(int index, IParameter param, IValue value)
 	{
 		this.values[index] = value;
 	}
-	
+
 	@Override
 	public void setValue(int index, IValue value)
 	{
 		this.values[index] = value;
 	}
-	
+
 	@Override
 	public void addValue(IValue value)
 	{
@@ -140,7 +138,7 @@ public final class ArgumentList implements IArguments, IValueList
 		}
 		this.values[index] = value;
 	}
-	
+
 	@Override
 	public void addValue(int index, IValue value)
 	{
@@ -160,7 +158,7 @@ public final class ArgumentList implements IArguments, IValueList
 			this.values[index] = value;
 		}
 	}
-	
+
 	@Override
 	public IValue getValue(int index)
 	{
@@ -170,7 +168,7 @@ public final class ArgumentList implements IArguments, IValueList
 		}
 		return this.values[index];
 	}
-	
+
 	@Override
 	public IValue getValue(int index, IParameter param)
 	{
@@ -181,7 +179,7 @@ public final class ArgumentList implements IArguments, IValueList
 
 		return this.values[index];
 	}
-	
+
 	@Override
 	public float getTypeMatch(int index, IParameter param)
 	{
@@ -189,10 +187,10 @@ public final class ArgumentList implements IArguments, IValueList
 		{
 			return param.getValue() != null ? DEFAULT_MATCH : 0;
 		}
-		
+
 		return this.values[index].getTypeMatch(param.getInternalType());
 	}
-	
+
 	@Override
 	public float getVarargsTypeMatch(int index, IParameter param)
 	{
@@ -204,7 +202,7 @@ public final class ArgumentList implements IArguments, IValueList
 		{
 			return 0;
 		}
-		
+
 		IValue argument = this.values[index];
 		IType type = param.getInternalType();
 		float totalMatch = argument.getTypeMatch(type);
@@ -225,7 +223,7 @@ public final class ArgumentList implements IArguments, IValueList
 		}
 		return totalMatch > 0F ? totalMatch + VARARGS_MATCH : 0;
 	}
-	
+
 	@Override
 	public void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
@@ -233,13 +231,13 @@ public final class ArgumentList implements IArguments, IValueList
 		{
 			return;
 		}
-		
+
 		final IType type = param.getInternalType();
 
 		this.values[index] = TypeChecker.convertValue(this.values[index], type, typeContext, markers, context,
 		                                              IArguments.argumentMarkerSupplier(param));
 	}
-	
+
 	@Override
 	public void checkVarargsValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
@@ -247,28 +245,34 @@ public final class ArgumentList implements IArguments, IValueList
 		{
 			return;
 		}
-		
+
 		final IType arrayType = param.getInternalType();
-		
+
 		final IValue value = this.values[index];
 		if (value.isType(arrayType))
 		{
-			this.varArgsArray = true;
 			this.values[index] = TypeChecker.convertValue(value, arrayType, typeContext, markers, context,
 			                                              IArguments.argumentMarkerSupplier(param));
 			return;
 		}
-		
+
 		final IType elementType = arrayType.getElementType();
-		
-		for (; index < this.size; index++)
+		final int varargsArguments = this.size - index;
+		final IValue[] values = new IValue[varargsArguments];
+		final ArrayExpr arrayExpr = new ArrayExpr(values, varargsArguments);
+
+		arrayExpr.setType(arrayType);
+
+		for (int i = 0; i < varargsArguments; i++)
 		{
-			this.values[index] = TypeChecker
-					.convertValue(this.values[index], elementType, typeContext, markers, context,
-					              IArguments.argumentMarkerSupplier(param));
+			values[i] = TypeChecker.convertValue(this.values[i + index], elementType, typeContext, markers, context,
+			                                     IArguments.argumentMarkerSupplier(param));
 		}
+
+		this.values[index] = arrayExpr;
+		this.size = index + 1;
 	}
-	
+
 	@Override
 	public void inferType(int index, IParameter param, ITypeContext typeContext)
 	{
@@ -278,7 +282,7 @@ public final class ArgumentList implements IArguments, IValueList
 		}
 		param.getInternalType().inferTypes(this.values[index].getType(), typeContext);
 	}
-	
+
 	@Override
 	public void inferVarargsType(int index, IParameter param, ITypeContext typeContext)
 	{
@@ -286,22 +290,22 @@ public final class ArgumentList implements IArguments, IValueList
 		{
 			return;
 		}
-		
+
 		IType type = this.values[index].getType();
 		if (index + 1 == this.size && type.isArrayType())
 		{
 			param.getInternalType().inferTypes(type, typeContext);
 			return;
 		}
-		
+
 		for (int i = index + 1; i < this.size; i++)
 		{
 			type = Types.combine(type, this.values[i].getType());
 		}
-		
+
 		param.getInternalType().getElementType().inferTypes(type, typeContext);
 	}
-	
+
 	@Override
 	public void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
 	{
@@ -311,39 +315,6 @@ public final class ArgumentList implements IArguments, IValueList
 			return;
 		}
 		param.getValue().writeExpression(writer, param.getInternalType());
-	}
-	
-	@Override
-	public void writeVarargsValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
-	{
-		if (this.varArgsArray)
-		{
-			this.values[index].writeExpression(writer, param.getInternalType());
-			return;
-		}
-		
-		IType type = param.getInternalType().getElementType();
-		int len = this.size - index;
-		if (len <= 0)
-		{
-			writer.visitLdcInsn(0);
-			writer.visitMultiANewArrayInsn(type, 1);
-			return;
-		}
-		
-		int opcode = type.getArrayStoreOpcode();
-		
-		writer.visitLdcInsn(len);
-		writer.visitMultiANewArrayInsn(type, 1);
-		
-		for (int i = 0; i < len; i++)
-		{
-			writer.visitInsn(Opcodes.DUP);
-			IValue value = this.values[index + i];
-			writer.visitLdcInsn(i);
-			value.writeExpression(writer, type);
-			writer.visitInsn(opcode);
-		}
 	}
 
 	@Override
@@ -367,7 +338,7 @@ public final class ArgumentList implements IArguments, IValueList
 			this.values[i].resolveTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
@@ -376,7 +347,7 @@ public final class ArgumentList implements IArguments, IValueList
 			this.values[i] = this.values[i].resolve(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -385,7 +356,7 @@ public final class ArgumentList implements IArguments, IValueList
 			this.values[i].checkTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
@@ -394,7 +365,7 @@ public final class ArgumentList implements IArguments, IValueList
 			this.values[i].check(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void foldConstants()
 	{
@@ -403,7 +374,7 @@ public final class ArgumentList implements IArguments, IValueList
 			this.values[i] = this.values[i].foldConstants();
 		}
 	}
-	
+
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
@@ -412,7 +383,7 @@ public final class ArgumentList implements IArguments, IValueList
 			this.values[i] = this.values[i].cleanup(context, compilableList);
 		}
 	}
-	
+
 	@Override
 	public String toString()
 	{
@@ -420,7 +391,7 @@ public final class ArgumentList implements IArguments, IValueList
 		this.toString("", buf);
 		return buf.toString();
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
@@ -437,7 +408,7 @@ public final class ArgumentList implements IArguments, IValueList
 		}
 		buffer.append(')');
 	}
-	
+
 	@Override
 	public void typesToString(StringBuilder buffer)
 	{

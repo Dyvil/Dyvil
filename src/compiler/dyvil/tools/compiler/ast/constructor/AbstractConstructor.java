@@ -501,24 +501,9 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	@Override
 	public void writeArguments(MethodWriter writer, IArguments arguments) throws BytecodeException
 	{
-		if (this.modifiers.hasIntModifier(Modifiers.VARARGS))
-		{
-			int len = this.parameterCount - 1;
-			IParameter param;
-			for (int i = 0; i < len; i++)
-			{
-				param = this.parameters[i];
-				arguments.writeValue(i, param, writer);
-			}
-			param = this.parameters[len];
-			arguments.writeVarargsValue(len, param, writer);
-			return;
-		}
-
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			IParameter param = this.parameters[i];
-			arguments.writeValue(i, param, writer);
+			arguments.writeValue(i, this.parameters[i], writer);
 		}
 	}
 

@@ -2,9 +2,9 @@ package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.collection.iterator.EmptyIterator;
 import dyvil.collection.iterator.SingletonIterator;
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -21,7 +21,6 @@ import java.util.Iterator;
 public final class SingleArgument implements IArguments, IValueConsumer
 {
 	private IValue  value;
-	private boolean varArgsArray;
 	
 	public SingleArgument()
 	{
@@ -174,13 +173,15 @@ public final class SingleArgument implements IArguments, IValueConsumer
 		{
 			this.value = TypeChecker.convertValue(this.value, arrayType, typeContext, markers, context,
 			                                      IArguments.argumentMarkerSupplier(param));
-			this.varArgsArray = true;
 			return;
 		}
 
 		final IType elementType = arrayType.getElementType();
 		this.value = TypeChecker.convertValue(this.value, elementType, typeContext, markers, context,
 		                                      IArguments.argumentMarkerSupplier(param));
+
+		this.value = new ArrayExpr(this.value.getPosition(), new IValue[] { this.value }, 1);
+		this.value.setType(arrayType);
 	}
 	
 	@Override
@@ -220,30 +221,6 @@ public final class SingleArgument implements IArguments, IValueConsumer
 		}
 		
 		param.getValue().writeExpression(writer, param.getInternalType());
-	}
-	
-	@Override
-	public void writeVarargsValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
-	{
-		if (index != 0 || this.value == null)
-		{
-			return;
-		}
-		if (this.varArgsArray)
-		{
-			// Write the value as is (it is an array)
-			this.value.writeExpression(writer, param.getInternalType());
-			return;
-		}
-		
-		// Write an array with one element
-		IType type = param.getInternalType().getElementType();
-		writer.visitLdcInsn(1);
-		writer.visitMultiANewArrayInsn(type, 1);
-		writer.visitInsn(Opcodes.DUP);
-		writer.visitLdcInsn(0);
-		this.value.writeExpression(writer, type);
-		writer.visitInsn(type.getArrayStoreOpcode());
 	}
 	
 	@Override

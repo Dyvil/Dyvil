@@ -182,6 +182,13 @@ public final class ArrayExpr implements IValue, IValueList
 	}
 
 	@Override
+	public void setType(IType type)
+	{
+		this.arrayType = type;
+		this.elementType = type.getElementType();
+	}
+
+	@Override
 	public IValue withType(IType arrayType, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		IType elementType;

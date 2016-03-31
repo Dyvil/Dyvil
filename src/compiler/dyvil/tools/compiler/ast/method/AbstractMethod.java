@@ -1101,38 +1101,18 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 	protected void writeArguments(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
 	{
-		int parIndex = 0;
-		int modifiers = this.modifiers.toFlags();
-
-		if (instance != null && (modifiers & Modifiers.INFIX) == Modifiers.INFIX)
+		if (instance != null && this.hasModifier(Modifiers.INFIX))
 		{
-			parIndex = 1;
-		}
-
-		if ((modifiers & Modifiers.VARARGS) != 0)
-		{
-			int len = this.parameterCount - 1 - parIndex;
-			if (len < 0)
+			for (int i = 0, len = this.parameterCount - 1; i < len; i++)
 			{
-				return;
+				arguments.writeValue(i, this.parameters[i + 1], writer);
 			}
-
-			IParameter param;
-			for (int i = 0; i < len; i++)
-			{
-				param = this.parameters[i + parIndex];
-				arguments.writeValue(i, param, writer);
-			}
-			param = this.parameters[len];
-			arguments.writeVarargsValue(len, param, writer);
 			return;
 		}
 
-		int len = this.parameterCount - parIndex;
-		for (int i = 0; i < len; i++)
+		for (int i = 0; i < this.parameterCount; i++)
 		{
-			IParameter param = this.parameters[i + parIndex];
-			arguments.writeValue(i, param, writer);
+			arguments.writeValue(i, this.parameters[i], writer);
 		}
 	}
 

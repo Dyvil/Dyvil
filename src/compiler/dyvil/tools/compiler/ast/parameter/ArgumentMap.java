@@ -239,12 +239,6 @@ public final class ArgumentMap implements IArguments
 	}
 
 	@Override
-	public void writeVarargsValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
-	{
-		this.writeValue(index, param, writer);
-	}
-
-	@Override
 	public boolean isResolved()
 	{
 		for (int i = 0; i < this.size; i++)
