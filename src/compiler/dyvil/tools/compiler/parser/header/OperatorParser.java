@@ -244,6 +244,9 @@ public final class OperatorParser extends Parser
 		case IOperator.PREFIX:
 			pm.report(token, "operator.prefix.associativity");
 			return;
+		case IOperator.TERNARY:
+			pm.report(token, "operator.ternary.associativity");
+			return;
 		}
 
 		this.operator.setAssociativity(associativity);

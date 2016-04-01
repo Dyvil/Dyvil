@@ -108,6 +108,9 @@ public final class Operator implements IOperator
 			return;
 		case INFIX:
 			this.id = ID_INFIX_NONE;
+			return;
+		case TERNARY:
+			this.id = ID_TERNARY;
 		}
 	}
 

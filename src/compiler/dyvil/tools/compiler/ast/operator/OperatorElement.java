@@ -62,10 +62,11 @@ public class OperatorElement
 
 	public static void checkPosition(MarkerList markers, ICodePosition position, IOperator operator, int expectedType)
 	{
-		if (operator.getType() != expectedType)
+		final byte operatorType = operator.getType();
+		if (operatorType != expectedType && !(operatorType == IOperator.TERNARY && expectedType == IOperator.INFIX))
 		{
 			final Marker marker = Markers.semantic(position, "operator.invalid_position", operator.getName(),
-			                                       typeToString(operator.getType()), typeToString(expectedType));
+			                                       typeToString(operatorType), typeToString(expectedType));
 			marker.addInfo(Markers.getSemantic("operator.declaration", operator.toString()));
 			markers.add(marker);
 		}
@@ -81,6 +82,8 @@ public class OperatorElement
 			return "prefix";
 		case IOperator.POSTFIX:
 			return "postfix";
+		case IOperator.TERNARY:
+			return "ternary";
 		}
 		return null;
 	}

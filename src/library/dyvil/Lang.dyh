@@ -93,8 +93,8 @@ prefix	operator --
 // Assignment Operator
 infix	operator =		{ right, 100 }
 
-// Ternary Operator
-infix	operator ? :	{ right, 125 }
+// Ternary Conditional Operator
+infix	operator ? :	{ precedence 125 }
 
 // Colon Operator
 infix	operator :		{ right, 150 }
