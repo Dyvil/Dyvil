@@ -91,11 +91,11 @@ prefix	operator ++
 prefix	operator --
 
 // Assignment Operator
-infix	operator `=`	{ right, 100 }
+infix	operator =		{ right, 100 }
 
 // Ternary Operator
-infix	operator ?		{ right, 150 }
-infix	operator `:`	{ right, 150 }
+infix	operator ?		{ right, 125 }
+infix	operator :		{ right, 150 }
 
 // Boolean and Bitwise Operators
 infix	operator ||		{ left, 200 }
