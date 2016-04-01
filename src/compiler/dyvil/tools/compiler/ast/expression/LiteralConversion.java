@@ -131,11 +131,10 @@ public final class LiteralConversion implements IValue
 			final Marker marker = Markers.semantic(this.literal.getPosition(), "literal.type.incompatible");
 			marker.addInfo(Markers.getSemantic("type.expected", concrete));
 			marker.addInfo(Markers.getSemantic("literal.type.conversion", this.type));
-			marker.addInfo(Markers.getSemantic("literal.type.method"));
-			
-			final StringBuilder stringBuilder = new StringBuilder("\t\t");
+
+			final StringBuilder stringBuilder = new StringBuilder();
 			Util.methodSignatureToString(this.method, stringBuilder);
-			marker.addInfo(stringBuilder.toString());
+			marker.addInfo(Markers.getSemantic("literal.type.method", stringBuilder.toString()));
 			
 			markers.add(marker);
 		}
