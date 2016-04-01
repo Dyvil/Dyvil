@@ -11,6 +11,7 @@ public interface IOperator
 	byte PREFIX = 0;
 	byte INFIX = 1;
 	byte POSTFIX = 2;
+	byte TERNARY = 3;
 
 	byte LEFT = 0;
 	byte RIGHT = 1;
@@ -19,6 +20,10 @@ public interface IOperator
 	Name getName();
 
 	void setName(Name name);
+
+	Name getTernaryName();
+
+	void setTernaryName(Name name);
 
 	byte getType();
 

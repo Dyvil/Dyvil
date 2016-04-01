@@ -6,7 +6,9 @@ import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.ColonOperator;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
+import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -100,7 +102,7 @@ public class OperatorChain implements IValue
 		case 0:
 			return this.operands[0];
 		case 1:
-			return createCall(this.operators[0], this.operands[0], this.operands[1]).resolve(markers, context);
+			return binaryOp(this.operands[0], this.operators[0], this.operands[1]).resolve(markers, context);
 		// TODO Inline Operator resolution for 2 operators?
 		}
 
@@ -110,72 +112,135 @@ public class OperatorChain implements IValue
 
 		for (int i = 0; i < this.operatorCount; i++)
 		{
-			final OperatorElement element1 = this.operators[i];
-			OperatorElement element2;
-			while (!operatorStack.isEmpty())
-			{
-				element2 = operatorStack.peek();
-				final int comparePrecedence = element1.operator.comparePrecedence(element2.operator);
-
-				if (comparePrecedence < 0)
-				{
-					operatorStack.pop();
-					this.pushCall(operandStack, element2);
-					continue;
-				}
-				if (comparePrecedence == 0)
-				{
-					switch (element1.operator.getAssociativity())
-					{
-					case IOperator.NONE:
-						markers.add(Markers.semantic(element1.position, "operator.infix_none", element1.name));
-						// Fallthrough
-					case IOperator.LEFT:
-						operatorStack.pop();
-						this.pushCall(operandStack, element2);
-						continue;
-					}
-				}
-				break;
-			}
-			operatorStack.push(element1);
+			final OperatorElement element = this.operators[i];
+			pushOperator(operandStack, operatorStack, element, markers);
 			operandStack.push(this.operands[i + 1]);
 		}
 		while (!operatorStack.isEmpty())
 		{
-			this.pushCall(operandStack, operatorStack.pop());
+			popOperator(operandStack, operatorStack);
 		}
 
 		return operandStack.pop().resolve(markers, context);
 	}
 
-	private void pushCall(Stack<IValue> stack, OperatorElement element)
+	private static void pushOperator(Stack<IValue> operandStack, Stack<OperatorElement> operatorStack, OperatorElement element, MarkerList markers)
 	{
-		final IValue rhs = stack.pop();
-		final IValue lhs = stack.pop();
-		stack.push(createCall(element, lhs, rhs));
+		OperatorElement element2;
+		while (!operatorStack.isEmpty())
+		{
+			element2 = operatorStack.peek();
+			final OperatorElement ternary = operatorStack.peek(1);
+			if (!lowerPrecedence(element, element2,
+			                     ternary != null && ternary.operator.getType() == IOperator.TERNARY ? ternary : null,
+			                     markers))
+			{
+				break;
+			}
+			// operatorStack.pop() == element2
+			popOperator(operandStack, operatorStack);
+		}
+		operatorStack.push(element);
 	}
 
-	private static IValue createCall(OperatorElement element, IValue lhs, IValue rhs)
+	private static void popOperator(Stack<IValue> operandStack, Stack<OperatorElement> operatorStack)
 	{
-		final Name operator = element.name;
+		final OperatorElement operatorElement = operatorStack.pop();
+		final IValue rhs = operandStack.pop();
+		final IValue lhs = operandStack.pop();
+		final IValue res;
 
-		if (operator == Names.colon)
+		final OperatorElement peek = operatorStack.peek();
+		if (peek != null && peek.operator.getType() == IOperator.TERNARY // ternary operator
+			    && operatorElement.name == peek.operator.getTernaryName()) // right-hand part
 		{
-			return new ColonOperator(element.position, lhs, rhs);
+			final IValue cond = operandStack.pop();
+			operatorStack.pop(); // == peek
+			res = ternaryOp(cond, peek, lhs, operatorElement, rhs);
 		}
-		if (operator == Names.eq)
+		else
 		{
-			final IValue assignment = lhs.toAssignment(rhs, element.position);
+			res = binaryOp(lhs, operatorElement, rhs);
+		}
+
+		operandStack.push(res);
+	}
+
+	private static boolean lowerPrecedence(OperatorElement element1, OperatorElement element2, OperatorElement ternaryOperator, MarkerList markers)
+	{
+		if (element1.operator.getType() == IOperator.TERNARY)
+		{
+			if (element2.operator.getType() == IOperator.TERNARY)
+			{
+				return false;
+			}
+			if (element2.name == element1.operator.getTernaryName())
+			{
+				return false;
+			}
+		}
+		if (ternaryOperator != null && element1.name == ternaryOperator.operator.getTernaryName())
+		{
+			if (element2.name == element1.name)
+			{
+				return true;
+			}
+			if (element2.name == ternaryOperator.name)
+			{
+				return false;
+			}
+		}
+
+		final int comparePrecedence = element1.operator.comparePrecedence(element2.operator);
+
+		if (comparePrecedence < 0)
+		{
+			return true;
+		}
+		if (comparePrecedence == 0)
+		{
+			switch (element1.operator.getAssociativity())
+			{
+			case IOperator.NONE:
+				markers.add(Markers.semantic(element1.position, "operator.infix_none", element1.name));
+				// Fallthrough
+			case IOperator.LEFT:
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static IValue binaryOp(IValue lhs, OperatorElement operator, IValue rhs)
+	{
+		final Name name = operator.name;
+
+		if (name == Names.colon)
+		{
+			return new ColonOperator(operator.position, lhs, rhs);
+		}
+		if (name == Names.eq)
+		{
+			final IValue assignment = lhs.toAssignment(rhs, operator.position);
 			if (assignment != null)
 			{
 				return assignment;
 			}
 		}
 
-		final MethodCall methodCall = new MethodCall(element.position, lhs, operator, new SingleArgument(rhs));
+		final MethodCall methodCall = new MethodCall(operator.position, lhs, name, new SingleArgument(rhs));
 		methodCall.setDotless(true);
 		return methodCall;
+	}
+
+	private static IValue ternaryOp(IValue lhs, OperatorElement operator1, IValue center, OperatorElement operator2, IValue rhs)
+	{
+		if (operator1.name == Names.qmark && operator2.name == Names.colon)
+		{
+			return new IfStatement(lhs, center, rhs);
+		}
+
+		return new MethodCall(operator1.position, lhs, operator1.name, new ArgumentList(center, rhs));
 	}
 
 	@Override

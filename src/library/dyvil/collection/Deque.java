@@ -157,7 +157,10 @@ public interface Deque<E> extends BidiQueryable<E>, Queue<E>, Stack<E>
 	{
 		return this.getFirst();
 	}
-	
+
+	@Override
+	E peek(int index);
+
 	/**
 	 * Returns a copy of this deque that contains the same elements as this deque in the same order.
 	 *

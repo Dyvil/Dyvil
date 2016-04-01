@@ -79,28 +79,30 @@ public final class OperatorParser extends Parser
 			}
 			return;
 		case OPERATOR_SYMBOL:
-			if (type == Tokens.SYMBOL_IDENTIFIER || type == Tokens.SPECIAL_IDENTIFIER)
+		{
+			Name name = getOperatorName(pm, token);
+			if (name == null)
 			{
-				this.operator = new Operator(token.nameValue(), this.type);
-				this.mode = SEPARATOR;
-				return;
-			}
-			if (type == Tokens.LETTER_IDENTIFIER)
-			{
-				this.operator = new Operator(token.nameValue(), this.type);
-				pm.report(Markers.syntaxWarning(token, "operator.identifier.not_symbol"));
-				this.mode = SEPARATOR;
-				return;
-			}
-			if ((type & Tokens.SYMBOL) != 0)
-			{
-				this.operator = new Operator(Name.get(DyvilSymbols.INSTANCE.toString(type)), this.type);
-				this.mode = SEPARATOR;
+				pm.report(token, "operator.identifier");
 				return;
 			}
 
-			pm.report(token, "operator.identifier");
+			this.operator = new Operator(name, this.type);
+
+			// TODO Add 'ternary' keyword?
+			if (this.type == IOperator.INFIX || this.type == IOperator.TERNARY)
+			{
+				name = getOperatorName(pm, token.next());
+				if (name != null)
+				{
+					this.operator.setType(IOperator.TERNARY);
+					this.operator.setTernaryName(name);
+					pm.skip();
+				}
+			}
+			this.mode = SEPARATOR;
 			return;
+		}
 		case SEPARATOR:
 			if (type == BaseSymbols.SEMICOLON)
 			{
@@ -193,6 +195,25 @@ public final class OperatorParser extends Parser
 		}
 	}
 
+	private static Name getOperatorName(IParserManager pm, IToken token)
+	{
+		final int type = token.type();
+		if (type == Tokens.SYMBOL_IDENTIFIER || type == Tokens.SPECIAL_IDENTIFIER)
+		{
+			return token.nameValue();
+		}
+		if (type == Tokens.LETTER_IDENTIFIER)
+		{
+			pm.report(Markers.syntaxWarning(token, "operator.identifier.not_symbol"));
+			return token.nameValue();
+		}
+		if ((type & Tokens.SYMBOL) != 0)
+		{
+			return Name.get(DyvilSymbols.INSTANCE.toString(type));
+		}
+		return null;
+	}
+
 	public boolean parseAssociativity(IParserManager pm, IToken token, Name name)
 	{
 		if (name == left)
@@ -222,6 +243,9 @@ public final class OperatorParser extends Parser
 			return;
 		case IOperator.PREFIX:
 			pm.report(token, "operator.prefix.associativity");
+			return;
+		case IOperator.TERNARY:
+			pm.report(token, "operator.ternary.associativity");
 			return;
 		}
 
