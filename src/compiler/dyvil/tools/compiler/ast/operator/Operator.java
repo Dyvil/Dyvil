@@ -16,8 +16,10 @@ public final class Operator implements IOperator
 	protected static final int ID_INFIX_NONE  = 2;
 	protected static final int ID_INFIX_RIGHT = 3;
 	protected static final int ID_POSTFIX     = 4;
+	protected static final int ID_TERNARY     = 5;
 
 	protected Name name;
+	protected Name ternaryName;
 	protected int  precedence;
 	protected byte id;
 
@@ -67,6 +69,18 @@ public final class Operator implements IOperator
 	}
 
 	@Override
+	public Name getTernaryName()
+	{
+		return this.ternaryName;
+	}
+
+	@Override
+	public void setTernaryName(Name ternaryName)
+	{
+		this.ternaryName = ternaryName;
+	}
+
+	@Override
 	public byte getType()
 	{
 		switch (this.id)
@@ -75,6 +89,8 @@ public final class Operator implements IOperator
 			return PREFIX;
 		case ID_POSTFIX:
 			return POSTFIX;
+		case ID_TERNARY:
+			return TERNARY;
 		}
 		return INFIX;
 	}
@@ -151,6 +167,10 @@ public final class Operator implements IOperator
 		{
 			dos.writeInt(this.precedence);
 		}
+		if (this.id == ID_TERNARY)
+		{
+			dos.writeUTF(this.ternaryName.unqualified);
+		}
 	}
 
 	@Override
@@ -162,6 +182,10 @@ public final class Operator implements IOperator
 		if (this.id != ID_PREFIX && this.id != ID_POSTFIX)
 		{
 			this.precedence = in.readInt();
+		}
+		if (this.id == ID_TERNARY)
+		{
+			this.ternaryName = Name.get(in.readUTF());
 		}
 	}
 
@@ -192,11 +216,8 @@ public final class Operator implements IOperator
 			buffer.append("postfix operator ").append(this.name);
 			return;
 		case ID_INFIX_NONE:
-			buffer.append("infix operator ").append(this.name);
-			if (this.precedence != 0)
-			{
-				buffer.append(" { precedence ").append(this.precedence).append(" }");
-			}
+			buffer.append("infix operator ").append(this.name).append(" { precedence ").append(this.precedence)
+			      .append(" }");
 			return;
 		case ID_INFIX_LEFT:
 			buffer.append("infix operator ").append(this.name).append(" { associativity left, precedence ")
@@ -205,6 +226,10 @@ public final class Operator implements IOperator
 		case ID_INFIX_RIGHT:
 			buffer.append("infix operator ").append(this.name).append(" { associativity right, precedence ")
 			      .append(this.precedence).append(" }");
+			return;
+		case ID_TERNARY:
+			buffer.append("infix operator ").append(this.name).append(' ').append(this.ternaryName)
+			      .append(" { precedence ").append(this.precedence).append(" }");
 		}
 	}
 }

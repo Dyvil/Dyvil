@@ -94,7 +94,9 @@ prefix	operator --
 infix	operator =		{ right, 100 }
 
 // Ternary Operator
-infix	operator ?		{ right, 125 }
+infix	operator ? :	{ right, 125 }
+
+// Colon Operator
 infix	operator :		{ right, 150 }
 
 // Boolean and Bitwise Operators
