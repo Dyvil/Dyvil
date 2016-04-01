@@ -367,22 +367,25 @@ public final class NamedArgumentList implements IArguments
 	{
 		Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
 
-		for (int i = 0, len = this.size; ; i++)
+		if (this.size > 0)
 		{
-			final Name key = this.keys[i];
-			if (key != null)
+			for (int i = 0, len = this.size; ; i++)
 			{
-				buffer.append(key);
-				Formatting.appendSeparator(buffer, "parameters.name_value_separator", ':');
-			}
+				final Name key = this.keys[i];
+				if (key != null)
+				{
+					buffer.append(key);
+					Formatting.appendSeparator(buffer, "parameters.name_value_separator", ':');
+				}
 
-			this.values[i].toString(prefix, buffer);
-			if (i + 1 >= len)
-			{
-				break;
-			}
+				this.values[i].toString(prefix, buffer);
+				if (i + 1 >= len)
+				{
+					break;
+				}
 
-			Formatting.appendSeparator(buffer, "parameters.separator", ',');
+				Formatting.appendSeparator(buffer, "parameters.separator", ',');
+			}
 		}
 
 		Formatting.appendSeparator(buffer, "parameters.close_paren", ')');
