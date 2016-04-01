@@ -130,7 +130,10 @@ public class OperatorChain implements IValue
 		while (!operatorStack.isEmpty())
 		{
 			element2 = operatorStack.peek();
-			if (!lowerPrecedence(element, element2, markers))
+			final OperatorElement ternary = operatorStack.peek(1);
+			if (!lowerPrecedence(element, element2,
+			                     ternary != null && ternary.operator.getType() == IOperator.TERNARY ? ternary : null,
+			                     markers))
 			{
 				break;
 			}
@@ -148,7 +151,8 @@ public class OperatorChain implements IValue
 		final IValue res;
 
 		final OperatorElement peek = operatorStack.peek();
-		if (peek != null && peek.name == Names.qmark && operatorElement.name == Names.colon)
+		if (peek != null && peek.operator.getType() == IOperator.TERNARY // ternary operator
+			    && operatorElement.name == peek.operator.getTernaryName()) // right-hand part
 		{
 			final IValue cond = operandStack.pop();
 			operatorStack.pop(); // == peek
@@ -162,26 +166,26 @@ public class OperatorChain implements IValue
 		operandStack.push(res);
 	}
 
-	private static boolean lowerPrecedence(OperatorElement element1, OperatorElement element2, MarkerList markers)
+	private static boolean lowerPrecedence(OperatorElement element1, OperatorElement element2, OperatorElement ternaryOperator, MarkerList markers)
 	{
-		if (element1.name == Names.qmark)
+		if (element1.operator.getType() == IOperator.TERNARY)
 		{
-			if (element2.name == Names.qmark)
+			if (element2.operator.getType() == IOperator.TERNARY)
 			{
 				return false;
 			}
-			if (element2.name == Names.colon)
+			if (element2.name == element1.operator.getTernaryName())
 			{
 				return false;
 			}
 		}
-		if (element1.name == Names.colon)
+		if (ternaryOperator != null && element1.name == ternaryOperator.operator.getTernaryName())
 		{
-			if (element2.name == Names.colon)
+			if (element2.name == element1.name)
 			{
 				return true;
 			}
-			if (element2.name == Names.qmark)
+			if (element2.name == ternaryOperator.name)
 			{
 				return false;
 			}
