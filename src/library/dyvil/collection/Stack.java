@@ -55,7 +55,7 @@ public interface Stack<E> extends Queryable<E>, Serializable
 	 * @param element
 	 * 		the element to add
 	 */
-	void push(E e);
+	void push(E element);
 	
 	/**
 	 * Adds all elements in the given collection of {@code elements} to the top of this stack in the order in which they
@@ -102,6 +102,8 @@ public interface Stack<E> extends Queryable<E>, Serializable
 	 * @return the top element of this stack.
 	 */
 	E peek();
+
+	E peek(int index);
 	
 	@Override
 	void map(Function<? super E, ? extends E> mapper);
