@@ -68,8 +68,7 @@ public class REPLCompiler
 			return null;
 		}
 
-		initialize(repl, theClass);
-		return theClass;
+		return initialize(repl, theClass);
 	}
 
 	protected static Class loadAnonymousClass(DyvilREPL repl, String name, byte[] bytes)
@@ -91,15 +90,15 @@ public class REPLCompiler
 			return null;
 		}
 
-		initialize(repl, theClass);
-		return theClass;
+		return initialize(repl, theClass);
 	}
 
-	private static void initialize(DyvilREPL repl, Class<?> theClass)
+	private static Class<?> initialize(DyvilREPL repl, Class<?> theClass)
 	{
 		try
 		{
 			ReflectUtils.UNSAFE.ensureClassInitialized(theClass);
+			return theClass;
 		}
 		catch (ExceptionInInitializerError initializerError)
 		{
@@ -112,6 +111,7 @@ public class REPLCompiler
 			filterStackTrace(throwable);
 			throwable.printStackTrace(repl.getOutput());
 		}
+		return null;
 	}
 
 	protected static void filterStackTrace(Throwable throwable)
