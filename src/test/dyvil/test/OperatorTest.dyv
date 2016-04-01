@@ -1,0 +1,39 @@
+package dyvil.test
+
+public class OperatorTest
+{
+	public static final void main([String] args)
+	{
+		unaryTest()
+		binaryTest()
+		ternaryTest()
+	}
+
+	private static void unaryTest()
+	{
+		var i = 1- -1
+		var j = 1 - -1
+		var k = 1 -1
+
+		// don't care about values, resolution pass is sufficient
+	}
+
+	private static void binaryTest()
+	{
+		var i = 1 + 2 * 3 + 4
+		var k = 1 : 2 : 3
+
+		Main.test("Operator Precedence Test", 11, i)
+		Main.test("Operator Associativity Test", (1, (2, 3)), k)
+	}
+
+	private static void ternaryTest()
+	{
+		var i = true ? 1 : 2
+		var j = true ? 1 : true ? 2 : 3
+		var k = true ? true ? 1 : 2 : 3
+		var l = true ? 1+1 : true ? true ? 2+2 : 3+3 : 4+4
+
+		// don't care about values, type check pass is sufficient
+	}
+}

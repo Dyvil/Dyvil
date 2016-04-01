@@ -23,6 +23,7 @@ public class Main
 		MatchTest.main(args)
 		NestedMethodTest.main(args)
 		FibonacciTest.main(args)
+		OperatorTest.main(args)
 		PrimitiveTest main args
 		PropertyTest.main(args)
 		RangeTest.main(args)
