@@ -165,7 +165,12 @@ public class PropertyReferenceMetafactory
 		}
 
 		this.generateConstructor(classWriter);
-		this.generateFactory(classWriter);
+
+		if (this.receiverType != null)
+		{
+			this.generateFactory(classWriter);
+		}
+
 		this.generateGetter(classWriter);
 		this.generateSetter(classWriter);
 		this.generateToString(classWriter);
@@ -186,10 +191,7 @@ public class PropertyReferenceMetafactory
 		factory.visitTypeInsn(Opcodes.NEW, this.className);
 		factory.visitInsn(Opcodes.DUP);
 
-		if (this.receiverType != null)
-		{
-			factory.visitVarInsn(ALOAD, 0);
-		}
+		factory.visitVarInsn(ALOAD, 0);
 		factory
 			.visitMethodInsn(INVOKESPECIAL, this.className, "<init>", this.constructorType.toMethodDescriptorString(),
 			                 false);
