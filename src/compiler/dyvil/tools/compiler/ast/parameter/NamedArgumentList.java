@@ -124,6 +124,11 @@ public final class NamedArgumentList implements IArguments
 	@Override
 	public IValue getValue(int index, IParameter param)
 	{
+		if (param == null)
+		{
+			return this.values[index];
+		}
+
 		final int argIndex = this.findIndex(index, param.getName());
 		if (argIndex < 0)
 		{
