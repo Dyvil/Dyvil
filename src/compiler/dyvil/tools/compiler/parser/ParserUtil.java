@@ -35,7 +35,7 @@ public class ParserUtil
 		return false;
 	}
 
-	public static boolean isExpressionTerminator(int type)
+	public static boolean isExpressionEnd(int type)
 	{
 		if (isTerminator(type))
 		{

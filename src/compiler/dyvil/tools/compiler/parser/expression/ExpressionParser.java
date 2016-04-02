@@ -11,7 +11,9 @@ import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.operator.OperatorChain;
 import dyvil.tools.compiler.ast.operator.PostfixCall;
 import dyvil.tools.compiler.ast.operator.PrefixCall;
-import dyvil.tools.compiler.ast.parameter.*;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
+import dyvil.tools.compiler.ast.parameter.MethodParameter;
+import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.statement.ReturnStatement;
 import dyvil.tools.compiler.ast.statement.SyncStatement;
@@ -221,7 +223,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				}
 				return;
 			}
-			if (isExpressionTerminator(nextType))
+			if (isExpressionEnd(nextType))
 			{
 				// ... .[ ... ] ;
 
@@ -446,10 +448,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		{
 			// Identifier is an operator
 
-			final boolean neighboringLeft = neighboring(token.prev(), token);
-			final boolean neighboringRight = neighboring(token, next);
-
-			if (this.value == null || neighboringRight && !neighboringLeft) // prefix
+			if (this.value == null) // prefix
 			{
 				// OPERATOR EXPRESSION
 				// token    next
@@ -458,11 +457,16 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				this.value = call;
 				this.mode = ACCESS;
 
+				if (isExpressionEnd(nextType))
+				{
+					pm.report(next, "expression.prefix.expression");
+					return;
+				}
 				this.parseApply(pm, next, call);
 				return;
 			}
-			if (isExpressionTerminator(nextType) || neighboringLeft && !neighboringRight // postfix
-				                                                   && !neighboring(next, next.next()))
+			if (isExpressionEnd(nextType) || isSymbol(nextType) && neighboring(token.prev(), token) && !neighboring(
+				next, next.next()))
 			{
 				// EXPRESSION_OPERATOR EXPRESSION
 				// EXPRESSION OPERATOR EOF
@@ -552,8 +556,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			return;
 		}
 
-		if (isExpressionTerminator(nextType) || nextType == DyvilSymbols.DOUBLE_ARROW_RIGHT
-			    || this.ignoreClosure(next))
+		if (isExpressionEnd(nextType) || nextType == DyvilSymbols.DOUBLE_ARROW_RIGHT || this.ignoreClosure(next))
 		{
 			// IDENTIFIER END
 			// token      next
@@ -561,10 +564,11 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			return;
 		}
 
-		if (isSymbol(nextType))
+		if (isSymbol(nextType) && nextType != DyvilSymbols.UNDERSCORE)
 		{
 			// IDENTIFIER SYMBOL
-			if (neighboring(token, next) || !neighboring(next, next.next())) // next is not a prefix operator
+			final IToken next2 = next.next();
+			if (neighboring(token, next) || isExpressionEnd(next.next().type()) || !neighboring(next, next2))
 			{
 				// IDENTIFIER_SYMBOL ...
 				// IDENTIFIER SYMBOL EXPRESSION
@@ -572,13 +576,13 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				return;
 			}
 		}
-		else if (isIdentifier(nextType) && !isExpressionTerminator(next.next().type()))
+		else if (isIdentifier(nextType) && !isExpressionEnd(next.next().type()))
 		{
-			// IDENTIFIER IDENTIFIER ...
+			// IDENTIFIER IDENTIFIER EXPRESSION
 			// token      next
 
 			// Parse a field access
-			// e.g. System out ;
+			// e.g. out println 1
 
 			this.parseFieldAccess(token, name);
 			return;

@@ -11,11 +11,21 @@ public class OperatorTest
 
 	private static void unaryTest()
 	{
-		var i = 1- -1
-		var j = 1 - -1
-		var k = 1 -1
+		infix (int, int) apply(int i, int j) = (i, j)
+		postfix func ++(int i): int = i
+
+		var i = 1							// Canonical Representation:
+		var j = i -i						// i.apply(-i)
+		var k = [ i - i, i-i, i- i ]		// i - i
+		var l = [ i- -i, i - -i, i - - i ]	// i - (-i)
+		var m = [ i++ , i++, i ++ ]			// i++
+		var n = i++ + i						// (i++) + i
+		var o = i++ + ++ i					// (i++) + (++i)
+		var p = i++ + + ++ i				// (i++) + (+ (++i))
 
 		// don't care about values, resolution pass is sufficient
+
+		Main.test("Unary Operator Test", (1, -1), j)
 	}
 
 	private static void binaryTest()
