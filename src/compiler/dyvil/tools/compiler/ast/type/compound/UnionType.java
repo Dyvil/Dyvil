@@ -211,38 +211,44 @@ public class UnionType implements IObjectType
 			return arrayElementCombine(left.getElementType(), right.getElementType());
 		}
 
-		IClass leftClass = left.getTheClass();
-		if (leftClass == null)
+		if (left.getTypeVariable() == null)
 		{
-			// left type unresolved -> result right type
-			return right;
-		}
-		if (leftClass == Types.NULL_CLASS)
-		{
-			// left type is null -> result reference right type
-			return right.getObjectType();
-		}
-		if (leftClass == Types.OBJECT_CLASS)
-		{
-			// left type is Object -> result Object
-			return Types.ANY;
+			IClass leftClass = left.getTheClass();
+			if (leftClass == null)
+			{
+				// left type unresolved -> result right type
+				return right;
+			}
+			if (leftClass == Types.NULL_CLASS)
+			{
+				// left type is null -> result reference right type
+				return right.getObjectType();
+			}
+			if (leftClass == Types.OBJECT_CLASS)
+			{
+				// left type is Object -> result Object
+				return Types.ANY;
+			}
 		}
 
-		final IClass rightClass = right.getTheClass();
-		if (rightClass == null)
+		if (right.getTypeVariable() == null)
 		{
-			// right type unresolved -> result left type
-			return left;
-		}
-		if (rightClass == Types.NULL_CLASS)
-		{
-			// right type is null -> result reference left type
-			return left.getObjectType();
-		}
-		if (rightClass == Types.OBJECT_CLASS)
-		{
-			// right type is Object -> result Object
-			return Types.ANY;
+			final IClass rightClass = right.getTheClass();
+			if (rightClass == null)
+			{
+				// right type unresolved -> result left type
+				return left;
+			}
+			if (rightClass == Types.NULL_CLASS)
+			{
+				// right type is null -> result reference left type
+				return left.getObjectType();
+			}
+			if (rightClass == Types.OBJECT_CLASS)
+			{
+				// right type is Object -> result Object
+				return Types.ANY;
+			}
 		}
 
 		if (Types.isSameType(left, right) || Types.isSuperType(left, right))

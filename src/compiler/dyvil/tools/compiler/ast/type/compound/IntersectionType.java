@@ -211,28 +211,34 @@ public class IntersectionType implements IObjectType
 			return arrayElementCombine(left.getElementType(), right.getElementType());
 		}
 
-		IClass leftClass = left.getTheClass();
-		if (leftClass == null)
+		if (left.getTypeVariable() == null)
 		{
-			// left type unresolved -> result right type
-			return right;
-		}
-		if (leftClass == Types.NULL_CLASS || leftClass == Types.OBJECT_CLASS)
-		{
-			// left type is null or Object -> result reference right type
-			return right.getObjectType();
+			IClass leftClass = left.getTheClass();
+			if (leftClass == null)
+			{
+				// left type unresolved -> result right type
+				return right;
+			}
+			if (leftClass == Types.NULL_CLASS || leftClass == Types.OBJECT_CLASS)
+			{
+				// left type is null or Object -> result reference right type
+				return right.getObjectType();
+			}
 		}
 
-		final IClass rightClass = right.getTheClass();
-		if (rightClass == null)
+		if (right.getTypeVariable() == null)
 		{
-			// right type unresolved -> result left type
-			return left;
-		}
-		if (rightClass == Types.NULL_CLASS || rightClass == Types.OBJECT_CLASS)
-		{
-			// right type is null or Object -> result reference left type
-			return left.getObjectType();
+			final IClass rightClass = right.getTheClass();
+			if (rightClass == null)
+			{
+				// right type unresolved -> result left type
+				return left;
+			}
+			if (rightClass == Types.NULL_CLASS || rightClass == Types.OBJECT_CLASS)
+			{
+				// right type is null or Object -> result reference left type
+				return left.getObjectType();
+			}
 		}
 
 		if (Types.isSameType(left, right) || Types.isSuperType(left, right))
