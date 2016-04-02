@@ -1,5 +1,6 @@
 package dyvil.tools.repl.context;
 
+import dyvil.array.ObjectArray;
 import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
@@ -261,11 +262,15 @@ public class REPLVariable extends Field
 
 		IDataMember.toString(prefix, buffer, this, "field.type_ascription");
 
-		if (this.displayValue != null)
-		{
-			Formatting.appendSeparator(buffer, "field.assignment", '=');
+		Formatting.appendSeparator(buffer, "field.assignment", '=');
 
-			buffer.append(this.displayValue);
+		if (this.value != null)
+		{
+			this.value.toString(prefix, buffer);
+		}
+		else
+		{
+			ObjectArray.toString(this.displayValue, buffer);
 		}
 	}
 }
