@@ -284,7 +284,7 @@ public class MapExpr implements IValue
 		IType valueObject = this.valueType.getObjectType();
 
 		writer.visitLdcInsn(this.count);
-		writer.visitMultiANewArrayInsn("java/lang/Object", 1);
+		writer.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object");
 
 		for (int i = 0; i < this.count; i++)
 		{
@@ -295,7 +295,7 @@ public class MapExpr implements IValue
 		}
 
 		writer.visitLdcInsn(this.count);
-		writer.visitMultiANewArrayInsn("java/lang/Object", 1);
+		writer.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object");
 
 		for (int i = 0; i < this.count; i++)
 		{

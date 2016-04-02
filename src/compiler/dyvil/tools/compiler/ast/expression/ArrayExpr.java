@@ -418,7 +418,7 @@ public final class ArrayExpr implements IValue, IValueList
 		final int arrayStoreOpcode = elementType.getArrayStoreOpcode();
 
 		writer.visitLdcInsn(this.valueCount);
-		writer.visitMultiANewArrayInsn(elementType, 1);
+		writer.visitMultiANewArrayInsn(this.getType(), 1);
 
 		for (int i = 0; i < this.valueCount; i++)
 		{

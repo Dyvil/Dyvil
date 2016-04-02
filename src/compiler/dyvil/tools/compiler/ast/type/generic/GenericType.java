@@ -220,7 +220,7 @@ public abstract class GenericType implements IObjectType, ITypeList
 		writer.visitLdcInsn(iclass == null ? this.getName().qualified : iclass.getFullName());
 		
 		writer.visitLdcInsn(this.typeArgumentCount);
-		writer.visitMultiANewArrayInsn("dyvilx/lang/model/type/Type", 1);
+		writer.visitTypeInsn(Opcodes.ANEWARRAY, "dyvilx/lang/model/type/Type");
 		for (int i = 0; i < this.typeArgumentCount; i++)
 		{
 			writer.visitInsn(Opcodes.DUP);

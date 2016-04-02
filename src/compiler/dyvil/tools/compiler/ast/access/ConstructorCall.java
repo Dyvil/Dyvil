@@ -308,22 +308,21 @@ public class ConstructorCall implements ICall
 	{
 		if (this.type.isArrayType())
 		{
-			int len = this.arguments.size();
-			
+			IType arrayType = this.getType();
+
+			final int len = this.arguments.size();
 			if (len == 1)
 			{
 				this.arguments.getFirstValue().writeExpression(writer, Types.INT);
-				writer.visitMultiANewArrayInsn(this.type.getElementType(), 1);
+				writer.visitMultiANewArrayInsn(arrayType, 1);
 				return;
 			}
-			
-			ArgumentList paramList = (ArgumentList) this.arguments;
-			IType arrayType = this.type;
-			
+
+			final ArgumentList paramList = (ArgumentList) this.arguments;
+
 			for (int i = 0; i < len; i++)
 			{
 				paramList.getValue(i).writeExpression(writer, Types.INT);
-				arrayType = arrayType.getElementType();
 			}
 			
 			writer.visitMultiANewArrayInsn(arrayType, len);

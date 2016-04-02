@@ -122,7 +122,7 @@ public final class EmptyArguments implements IArguments
 		if (param.isVarargs())
 		{
 			writer.visitLdcInsn(0);
-			writer.visitMultiANewArrayInsn(param.getType().getElementType(), 1);
+			writer.visitMultiANewArrayInsn(param.getType(), 1);
 			return;
 		}
 

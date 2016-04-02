@@ -510,7 +510,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		this.returnType.writeTypeExpression(writer);
 
 		writer.visitLdcInsn(this.parameterCount);
-		writer.visitMultiANewArrayInsn("dyvilx/lang/model/type/Type", 1);
+		writer.visitTypeInsn(Opcodes.ANEWARRAY, "dyvilx/lang/model/type/Type");
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			writer.visitInsn(Opcodes.DUP);

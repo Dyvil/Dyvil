@@ -325,7 +325,6 @@ public final class MethodWriterImpl implements MethodWriter
 		if (c == Type.class)
 		{
 			this.visitLdcInsn((Type) cst);
-			return;
 		}
 	}
 
@@ -688,12 +687,6 @@ public final class MethodWriterImpl implements MethodWriter
 	@Override
 	public void visitMultiANewArrayInsn(String type, int dims) throws BytecodeException
 	{
-		if (dims == 1)
-		{
-			this.visitTypeInsn(Opcodes.ANEWARRAY, type);
-			return;
-		}
-		
 		this.insnCallback();
 		
 		this.frame.visitNewArray(type, dims);
@@ -726,29 +719,24 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void visitMultiANewArrayInsn(IType type, int dims) throws BytecodeException
+	public void visitMultiANewArrayInsn(IType arrayType, int dims) throws BytecodeException
 	{
+		this.insnCallback();
+
 		if (dims == 1)
 		{
-			if (type.isPrimitive())
+			final IType elementType = arrayType.getElementType();
+			if (elementType.isPrimitive())
 			{
-				this.visitIntInsn(Opcodes.NEWARRAY, getNewArrayCode(type.getTypecode()));
+				this.visitIntInsn(Opcodes.NEWARRAY, getNewArrayCode(elementType.getTypecode()));
 				return;
 			}
-			
-			this.visitTypeInsn(Opcodes.ANEWARRAY, type.getInternalName());
+
+			this.visitTypeInsn(Opcodes.ANEWARRAY, elementType.getInternalName());
 			return;
 		}
-		
-		this.insnCallback();
-		
-		StringBuilder builder = new StringBuilder();
-		for (int i = 0; i < dims; i++)
-		{
-			builder.append('[');
-		}
-		type.appendExtendedName(builder);
-		String extended = builder.toString();
+
+		final String extended = arrayType.getExtendedName();
 		this.frame.visitNewArray(extended, dims);
 		
 		this.mv.visitMultiANewArrayInsn(extended, dims);
