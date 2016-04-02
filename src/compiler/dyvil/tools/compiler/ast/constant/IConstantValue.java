@@ -59,7 +59,7 @@ public interface IConstantValue extends IValue
 	}
 	
 	@Override
-	default IValue toAnnotationConstant(MarkerList markers, IContext context)
+	default IValue toAnnotationConstant(MarkerList markers, IContext context, int depth)
 	{
 		return this;
 	}

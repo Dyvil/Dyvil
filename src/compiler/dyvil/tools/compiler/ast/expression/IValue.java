@@ -17,6 +17,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -239,22 +240,29 @@ public interface IValue extends IASTNode, ITyped
 
 	IValue cleanup(IContext context, IClassCompilableList compilableList);
 
-	default IValue toAnnotationConstant(MarkerList markers, IContext context)
+	default IValue toAnnotationConstant(MarkerList markers, IContext context, int depth)
 	{
 		return null;
 	}
 
+	default Marker getAnnotationError()
+	{
+		return Markers.semantic(this.getPosition(), "value.constant");
+	}
+
 	static IValue toAnnotationConstant(IValue value, MarkerList markers, IContext context)
 	{
-		final IValue constant = value.toAnnotationConstant(markers, context);
-		if (constant == null)
+		final int depth = context.getCompilationContext().config.getMaxConstantDepth();
+		final IValue constant = value.toAnnotationConstant(markers, context, depth);
+		if (constant != null)
 		{
-			markers.add(Markers.semantic(value.getPosition(), "value.constant",
-			                             context.getCompilationContext().config.getMaxConstantDepth()));
-			return value.getType().getDefaultValue();
+			return constant;
 		}
 
-		return constant;
+		final Marker marker = value.getAnnotationError();
+		marker.addInfo(Markers.getSemantic("value.constant.depth", depth));
+		markers.add(marker);
+		return value.getType().getDefaultValue();
 	}
 
 	default int stringSize()

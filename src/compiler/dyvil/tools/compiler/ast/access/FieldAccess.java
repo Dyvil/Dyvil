@@ -29,6 +29,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -248,29 +249,31 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	}
 
 	@Override
-	public IValue toAnnotationConstant(MarkerList markers, IContext context)
+	public IValue toAnnotationConstant(MarkerList markers, IContext context, int depth)
 	{
 		if (this.field == null)
 		{
 			return this; // do not create an extra error
 		}
 
-		int depth = context.getCompilationContext().config.getMaxConstantDepth();
-		IValue value = this;
-
-		do
+		if (depth == 0 || !this.isConstantOrField())
 		{
-			if (depth-- < 0)
-			{
-				markers.add(Markers.semantic(this.getPosition(), "annotation.field.not_constant", this.name));
-				return this;
-			}
-
-			value = value.foldConstants();
+			return null;
 		}
-		while (!value.isConstantOrField() || value == this);
 
-		return value.toAnnotationConstant(markers, context);
+		IValue value = this.field.getValue();
+		if (value == null)
+		{
+			return null;
+		}
+
+		return value.toAnnotationConstant(markers, context, depth - 1);
+	}
+
+	@Override
+	public Marker getAnnotationError()
+	{
+		return Markers.semantic(this.getPosition(), "annotation.field.not_constant", this.name);
 	}
 
 	@Override

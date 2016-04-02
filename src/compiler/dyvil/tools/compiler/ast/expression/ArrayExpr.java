@@ -17,7 +17,6 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.TypeChecker;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -111,19 +110,6 @@ public final class ArrayExpr implements IValue, IValueList
 	}
 
 	@Override
-	public boolean isConstantOrField()
-	{
-		for (int i = 0; i < this.valueCount; i++)
-		{
-			if (!this.values[i].isConstantOrField())
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
-	@Override
 	public boolean isPrimitive()
 	{
 		return false;
@@ -187,6 +173,26 @@ public final class ArrayExpr implements IValue, IValueList
 	{
 		this.arrayType = type;
 		this.elementType = type.getElementType();
+	}
+
+	@Override
+	public IValue toAnnotationConstant(MarkerList markers, IContext context, int depth)
+	{
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			final IValue value = this.values[i];
+			final IValue constant = value.toAnnotationConstant(markers, context, depth);
+			if (constant == null)
+			{
+				return null;
+			}
+			else
+			{
+				this.values[i] = constant;
+			}
+		}
+
+		return this;
 	}
 
 	@Override
@@ -346,26 +352,6 @@ public final class ArrayExpr implements IValue, IValueList
 	public IValue getValue(int index)
 	{
 		return this.values[index];
-	}
-
-	@Override
-	public IValue toAnnotationConstant(MarkerList markers, IContext context)
-	{
-		for (int i = 0; i < this.valueCount; i++)
-		{
-			final IValue value = this.values[i];
-			final IValue constant = value.toAnnotationConstant(markers, context);
-			if (constant == null)
-			{
-				markers.add(Markers.semantic(value.getPosition(), "annotation.array.not_constant"));
-			}
-			else
-			{
-				this.values[i] = constant;
-			}
-		}
-
-		return this;
 	}
 
 	@Override
