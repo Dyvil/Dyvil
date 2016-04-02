@@ -35,7 +35,7 @@ public final class DyvilLexer
 		int subtype = 0;
 		boolean addToken = false;
 		boolean reparse = true;
-		boolean string = false;
+		int stringParens = 0;
 		for (int i = 0; i < len; ++i, prevChar = currentChar)
 		{
 			currentChar = code.charAt(i);
@@ -51,13 +51,6 @@ public final class DyvilLexer
 				}
 				if (currentChar <= ' ')
 				{
-					continue;
-				}
-
-				if (string && currentChar == ')')
-				{
-					type = STRING;
-					subtype = STRING_PART;
 					continue;
 				}
 
@@ -156,6 +149,20 @@ public final class DyvilLexer
 				reparse = false;
 				break;
 			case BRACKET:
+				if (stringParens != 0)
+				{
+					if (currentChar == '(')
+					{
+						stringParens++;
+					}
+					else if (currentChar == ')' && --stringParens == 0)
+					{
+						type = STRING;
+						subtype = STRING_PART;
+						continue;
+					}
+				}
+
 				buf.append(currentChar);
 				addToken = true;
 				reparse = false;
@@ -340,9 +347,9 @@ public final class DyvilLexer
 				addToken = true;
 				break;
 			case STRING:
-				if (currentChar == '"' && (buf.length() > 0 || string))
+				if (currentChar == '"' && (buf.length() > 0 || subtype == STRING_PART))
 				{
-					if (!string && buf.charAt(0) == '"')
+					if (subtype != STRING_PART && buf.charAt(0) == '"')
 					{
 						subtype = STRING;
 					}
@@ -350,7 +357,6 @@ public final class DyvilLexer
 					{
 						subtype = STRING_END;
 					}
-					string = false;
 					addToken = true;
 					reparse = false;
 					break;
@@ -358,7 +364,7 @@ public final class DyvilLexer
 				else if (currentChar == '\\')
 				{
 					char c1 = code.charAt(i + 1);
-					if (c1 == '(')
+					if (c1 == '(' && stringParens == 0)
 					{
 						i += 2;
 						if (buf.length() == 0 || buf.charAt(0) != '"')
@@ -369,8 +375,8 @@ public final class DyvilLexer
 						{
 							subtype = STRING_START;
 						}
+						stringParens = 1;
 						addToken = true;
-						string = true;
 						break;
 					}
 					else if (appendEscape(buf, c1))
