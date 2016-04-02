@@ -66,6 +66,12 @@ public class CatchBlock implements IDefaultContext, IValueConsumer
 		return null;
 	}
 
+	@Override
+	public boolean isMember(IVariable variable)
+	{
+		return variable == this.variable;
+	}
+
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.variable.resolveTypes(markers, context);

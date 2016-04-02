@@ -132,6 +132,12 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 	}
 
 	@Override
+	public boolean isMember(IVariable variable)
+	{
+		return variable == this.variable;
+	}
+
+	@Override
 	public Label resolveLabel(Name name)
 	{
 		if (name == $forStart)
