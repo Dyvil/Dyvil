@@ -18,9 +18,21 @@ public class CovariantTypeVarType extends TypeVarType
 	}
 
 	@Override
+	public boolean isSameType(IType type)
+	{
+		return type.getTypeVariable() != null && this.typeParameter.isSuperTypeOf(type);
+	}
+
+	@Override
+	public boolean isSuperClassOf(IType subType)
+	{
+		return this.typeParameter.isSuperClassOf(subType);
+	}
+
+	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
-		return this.typeParameter.isAssignableFrom(type);
+		return this.typeParameter.isSuperTypeOf(type);
 	}
 
 	@Override

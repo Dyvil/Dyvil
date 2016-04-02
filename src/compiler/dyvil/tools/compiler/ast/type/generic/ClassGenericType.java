@@ -74,12 +74,6 @@ public class ClassGenericType extends GenericType
 	}
 
 	@Override
-	public IType asParameterType()
-	{
-		return this;
-	}
-
-	@Override
 	public boolean isSameType(IType type)
 	{
 		return this == type || super.isSameType(type) && this.argumentsMatch(type);

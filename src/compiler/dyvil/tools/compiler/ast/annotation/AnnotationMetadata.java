@@ -56,7 +56,7 @@ public final class AnnotationMetadata implements IClassMetadata
 	public void resolveTypesHeader(MarkerList markers, IContext context)
 	{
 		// Add the java.lang.Annotation interface
-		if (!this.theClass.isSubTypeOf(Annotation.LazyFields.ANNOTATION))
+		if (!this.theClass.isSubClassOf(Annotation.LazyFields.ANNOTATION))
 		{
 			this.theClass.addInterface(Annotation.LazyFields.ANNOTATION);
 		}

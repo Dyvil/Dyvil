@@ -326,7 +326,7 @@ public class CodeMethod extends AbstractMethod
 	@Override
 	public void addOverride(IMethod candidate)
 	{
-		if (this.enclosingClass.isSubTypeOf(candidate.getEnclosingClass().getClassType()))
+		if (this.enclosingClass.isSubClassOf(candidate.getEnclosingClass().getClassType()))
 		{
 			if (this.overrideMethods == null)
 			{
@@ -402,7 +402,7 @@ public class CodeMethod extends AbstractMethod
 
 			final IType superReturnType = overrideMethod.getType().getConcreteType(typeContext);
 			if (superReturnType != this.type && superReturnType.isResolved() // avoid extra error
-				    && !Types.isSuperType(superReturnType, this.type))
+				    && !Types.isSuperType(superReturnType.asParameterType(), this.type))
 			{
 				final Marker marker = Markers
 					                      .semanticError(this.position, "method.override.type.incompatible", this.name);

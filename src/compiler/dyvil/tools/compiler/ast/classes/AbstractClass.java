@@ -376,10 +376,10 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public boolean isSubTypeOf(IType type)
+	public boolean isSubClassOf(IType type)
 	{
 		IClass iclass = type.getTheClass();
-		if (this == iclass || this.superType != null && type.isSuperClassOf(this.superType))
+		if (this == iclass || this.superType != null && Types.isSuperClass(type, this.superType))
 		{
 			return true;
 		}
@@ -389,7 +389,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		}
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			if (type.isSuperClassOf(this.interfaces[i]))
+			if (Types.isSuperClass(type, this.interfaces[i]))
 			{
 				return true;
 			}
@@ -941,7 +941,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public IAccessible getAccessibleThis(IClass type)
 	{
-		if (type == this || type.getClassType().isSuperClassOf(this.classType))
+		if (type == this || Types.isSuperClass(this, type))
 		{
 			return VariableThis.DEFAULT;
 		}

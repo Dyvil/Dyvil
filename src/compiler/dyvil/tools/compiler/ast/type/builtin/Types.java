@@ -198,14 +198,54 @@ public final class Types
 		return OBJECT_ARRAY_CLASS;
 	}
 
+	public static boolean isSameClass(IType type1, IType type2)
+	{
+		return type1 == type2 || type1.isSameClass(type2);
+	}
+
 	public static boolean isSameType(IType type1, IType type2)
 	{
-		return type1 == type2 || type1.isSameType(type2);
+		if (type1 == type2)
+		{
+			return true;
+		}
+
+		if (type2.needsSubTypeCheck() && !type1.needsSubTypeCheck())
+		{
+			return type2.isSameType(type1);
+		}
+		return type1.isSameType(type2);
+	}
+
+	public static boolean isSuperClass(IClass superClass, IClass subClass)
+	{
+		return superClass == subClass || superClass.getClassType().isSuperClassOf(subClass.getClassType());
+	}
+
+	public static boolean isSuperClass(IType superType, IType subType)
+	{
+		if (superType == subType)
+		{
+			return true;
+		}
+		if (subType.needsSubTypeCheck())
+		{
+			return subType.isSubClassOf(superType);
+		}
+		return superType.isSuperClassOf(subType);
 	}
 
 	public static boolean isSuperType(IType superType, IType subType)
 	{
-		return superType == subType || superType.isSuperTypeOf(subType);
+		if (superType == subType)
+		{
+			return true;
+		}
+		if (subType.needsSubTypeCheck() && !superType.needsSubTypeCheck())
+		{
+			return subType.isSubTypeOf(superType);
+		}
+		return superType.isSuperTypeOf(subType);
 	}
 
 	public static boolean isAssignable(IType fromType, IType toType)
@@ -215,6 +255,11 @@ public final class Types
 
 	public static int getDistance(IType superType, IType subType)
 	{
+		if (superType == subType)
+		{
+			return 1;
+		}
+
 		final int distance = subType.getSuperTypeDistance(superType);
 		if (distance != 0)
 		{

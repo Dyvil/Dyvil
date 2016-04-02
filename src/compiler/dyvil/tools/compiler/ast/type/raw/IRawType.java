@@ -14,6 +14,12 @@ import dyvil.tools.parsing.marker.MarkerList;
 public interface IRawType extends IObjectType
 {
 	@Override
+	default IType asParameterType()
+	{
+		return this;
+	}
+
+	@Override
 	default IType getConcreteType(ITypeContext context)
 	{
 		return this;

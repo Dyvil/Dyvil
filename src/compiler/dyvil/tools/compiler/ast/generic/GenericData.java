@@ -6,7 +6,6 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -16,12 +15,12 @@ public final class GenericData implements ITypeList, ITypeContext
 	public IMethod method;
 	public IType[] generics;
 	public int     genericCount;
-	public IValue  instance;
-	
+	public IValue  receiver;
+
 	public GenericData()
 	{
 	}
-	
+
 	public GenericData(IMethod method, int count)
 	{
 		this.method = method;
@@ -34,20 +33,20 @@ public final class GenericData implements ITypeList, ITypeContext
 		this.genericCount = generics.length;
 		this.generics = generics;
 	}
-	
+
 	@Override
 	public int typeCount()
 	{
 		return this.genericCount;
 	}
-	
+
 	public void setTypeCount(int count)
 	{
 		if (this.generics == null)
 		{
 			this.generics = new IType[count];
 		}
-		
+
 		if (count > this.generics.length)
 		{
 			IType[] temp = new IType[count];
@@ -55,13 +54,13 @@ public final class GenericData implements ITypeList, ITypeContext
 			this.generics = temp;
 		}
 	}
-	
+
 	@Override
 	public void setType(int index, IType type)
 	{
 		this.generics[index] = type;
 	}
-	
+
 	@Override
 	public void addType(IType type)
 	{
@@ -72,7 +71,7 @@ public final class GenericData implements ITypeList, ITypeContext
 			this.genericCount = 1;
 			return;
 		}
-		
+
 		int index = this.genericCount++;
 		if (this.genericCount > this.generics.length)
 		{
@@ -82,23 +81,24 @@ public final class GenericData implements ITypeList, ITypeContext
 		}
 		this.generics[index] = type;
 	}
-	
+
 	@Override
 	public IType getType(int index)
 	{
 		return this.generics[index];
 	}
-	
+
 	private boolean isMethodTypeVariable(ITypeParameter typeVar)
 	{
-		int index = typeVar.getIndex();
-		if (index >= this.method.typeParameterCount())
+		if (typeVar.getGeneric() == this.method)
 		{
-			return false;
+			return true;
 		}
-		return this.method.getTypeParameter(index) == typeVar;
+
+		final int index = typeVar.getIndex();
+		return index < this.method.typeParameterCount() && this.method.getTypeParameter(index) == typeVar;
 	}
-	
+
 	@Override
 	public IType resolveType(ITypeParameter typeParameter)
 	{
@@ -107,13 +107,13 @@ public final class GenericData implements ITypeList, ITypeContext
 			int index = typeParameter.getIndex();
 			if (index >= this.genericCount)
 			{
-				return new TypeVarType(typeParameter);
+				return null;
 			}
 			return this.generics[index];
 		}
-		return this.instance.getType().resolveType(typeParameter);
+		return this.receiver.getType().resolveType(typeParameter);
 	}
-	
+
 	@Override
 	public void addMapping(ITypeParameter typeVar, IType type)
 	{
@@ -121,13 +121,13 @@ public final class GenericData implements ITypeList, ITypeContext
 		{
 			return;
 		}
-		
+
 		int index = typeVar.getIndex();
 		if (!this.isMethodTypeVariable(typeVar))
 		{
 			return;
 		}
-		
+
 		if (index < this.genericCount)
 		{
 			if (this.generics[index] == null)
@@ -138,7 +138,7 @@ public final class GenericData implements ITypeList, ITypeContext
 			this.generics[index] = Types.combine(this.generics[index], type);
 			return;
 		}
-		
+
 		this.genericCount = index + 1;
 		if (index >= this.generics.length)
 		{
@@ -148,7 +148,7 @@ public final class GenericData implements ITypeList, ITypeContext
 		}
 		this.generics[typeVar.getIndex()] = type;
 	}
-	
+
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.genericCount; i++)
@@ -156,7 +156,7 @@ public final class GenericData implements ITypeList, ITypeContext
 			this.generics[i] = this.generics[i].resolveType(markers, context);
 		}
 	}
-	
+
 	@Override
 	public String toString()
 	{
@@ -164,7 +164,7 @@ public final class GenericData implements ITypeList, ITypeContext
 		this.toString("", builder);
 		return builder.toString();
 	}
-	
+
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		int len = this.genericCount;

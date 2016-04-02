@@ -293,7 +293,7 @@ public class REPLMemberClass implements IClass
 	}
 
 	@Override
-	public boolean isSubTypeOf(IType type)
+	public boolean isSubClassOf(IType type)
 	{
 		return false;
 	}

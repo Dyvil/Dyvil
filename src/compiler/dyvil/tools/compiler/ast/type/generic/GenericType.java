@@ -53,7 +53,7 @@ public abstract class GenericType implements IObjectType, ITypeList
 	{
 		return true;
 	}
-	
+
 	public int typeArgumentCount()
 	{
 		return this.typeArgumentCount;
@@ -87,6 +87,17 @@ public abstract class GenericType implements IObjectType, ITypeList
 	public void setType(int index, IType type)
 	{
 		this.typeArguments[index] = type;
+	}
+
+	@Override
+	public IType asParameterType()
+	{
+		final GenericType copy = this.clone();
+		for (int i = 0; i < this.typeArgumentCount; i++)
+		{
+			copy.typeArguments[i] = this.typeArguments[i].asParameterType();
+		}
+		return copy;
 	}
 
 	@Override

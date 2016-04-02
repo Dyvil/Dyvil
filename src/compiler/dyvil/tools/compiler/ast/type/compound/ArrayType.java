@@ -110,6 +110,13 @@ public class ArrayType implements IObjectType, ITyped
 	}
 
 	@Override
+	public IType asParameterType()
+	{
+		final IType elementType = this.type.asParameterType();
+		return elementType == this.type ? this : new ArrayType(elementType, this.mutability);
+	}
+
+	@Override
 	public boolean isArrayType()
 	{
 		return true;
@@ -212,7 +219,7 @@ public class ArrayType implements IObjectType, ITyped
 		}
 
 		final IType elementType = subType.getElementType();
-		return this.checkPrimitiveType(elementType) && this.type.isSuperClassOf(elementType);
+		return this.checkPrimitiveType(elementType) && Types.isSuperClass(this.type, elementType);
 	}
 
 	@Override

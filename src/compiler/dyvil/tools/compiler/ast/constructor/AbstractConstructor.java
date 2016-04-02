@@ -341,7 +341,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 				                             typeParameter.getName(), inferredType));
 				typeContext.addMapping(typeParameter, inferredType);
 			}
-			else if (!typeParameter.isAssignableFrom(typeArgument))
+			else if (!typeParameter.isAssignableFrom(typeArgument, typeContext))
 			{
 				final Marker marker = Markers.semanticError(position, "constructor.typevar.incompatible",
 				                                            theClass.getName(), typeParameter.getName());

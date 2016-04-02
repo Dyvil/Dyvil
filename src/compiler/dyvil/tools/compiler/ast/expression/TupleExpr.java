@@ -175,7 +175,7 @@ public final class TupleExpr implements IValue, IValueList
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (!TupleType.getTupleClass(this.valueCount).isSubTypeOf(type))
+		if (!TupleType.getTupleClass(this.valueCount).isSubClassOf(type))
 		{
 			final IAnnotation annotation = type.getAnnotation(LazyFields.TUPLE_CONVERTIBLE);
 			if (annotation != null)

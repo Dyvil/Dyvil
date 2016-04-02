@@ -111,7 +111,7 @@ public class MapExpr implements IValue
 	@Override
 	public IValue withType(IType mapType, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (!MapType.MapTypes.MAP_CLASS.isSubTypeOf(mapType))
+		if (!MapType.MapTypes.MAP_CLASS.isSubClassOf(mapType))
 		{
 			IAnnotation annotation = mapType.getTheClass().getAnnotation(MapType.MapTypes.MAP_CONVERTIBLE_CLASS);
 			if (annotation != null)
@@ -142,7 +142,7 @@ public class MapExpr implements IValue
 	@Override
 	public boolean isType(IType type)
 	{
-		if (!MapType.MapTypes.MAP_CLASS.isSubTypeOf(type))
+		if (!MapType.MapTypes.MAP_CLASS.isSubClassOf(type))
 		{
 			return this.isConvertibleFrom(type);
 		}
@@ -173,7 +173,7 @@ public class MapExpr implements IValue
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		if (!MapType.MapTypes.MAP_CLASS.isSubTypeOf(type))
+		if (!MapType.MapTypes.MAP_CLASS.isSubClassOf(type))
 		{
 			return this.isConvertibleFrom(type) ? CONVERSION_MATCH : 0;
 		}

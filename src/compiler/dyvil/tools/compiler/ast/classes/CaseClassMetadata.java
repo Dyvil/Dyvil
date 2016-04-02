@@ -34,7 +34,7 @@ public final class CaseClassMetadata extends ClassMetadata
 	{
 		super.resolveTypesHeader(markers, context);
 		
-		if (!this.theClass.isSubTypeOf(Types.SERIALIZABLE))
+		if (!this.theClass.isSubClassOf(Types.SERIALIZABLE))
 		{
 			this.theClass.addInterface(Types.SERIALIZABLE);
 		}

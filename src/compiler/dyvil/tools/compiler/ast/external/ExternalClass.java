@@ -238,13 +238,13 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public boolean isSubTypeOf(IType type)
+	public boolean isSubClassOf(IType type)
 	{
 		if (!this.superTypesResolved)
 		{
 			this.resolveSuperTypes();
 		}
-		return super.isSubTypeOf(type);
+		return super.isSubClassOf(type);
 	}
 
 	@Override

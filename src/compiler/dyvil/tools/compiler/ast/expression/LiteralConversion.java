@@ -125,7 +125,7 @@ public final class LiteralConversion implements IValue
 		this.method.checkArguments(markers, this.literal.getPosition(), context, null, this.arguments, genericData);
 		this.type = this.method.getType().getConcreteType(genericData);
 		
-		final IType concrete = type.getConcreteType(typeContext);
+		final IType concrete = type.getConcreteType(typeContext).asParameterType();
 		if (!Types.isSuperType(concrete, this.type))
 		{
 			final Marker marker = Markers.semantic(this.literal.getPosition(), "literal.type.incompatible");

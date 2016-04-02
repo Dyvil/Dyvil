@@ -8,17 +8,18 @@ import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.ClassOperator;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.TypeOperator;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
-import dyvil.tools.compiler.ast.expression.ClassOperator;
-import dyvil.tools.compiler.ast.expression.TypeOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.IntersectionType;
 import dyvil.tools.compiler.ast.type.typevar.CovariantTypeVarType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -31,6 +32,9 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.annotation.ElementType;
+
+import static dyvil.tools.compiler.ast.type.builtin.Types.isSuperClass;
+import static dyvil.tools.compiler.ast.type.builtin.Types.isSuperType;
 
 public final class TypeParameter implements ITypeParameter
 {
@@ -48,12 +52,12 @@ public final class TypeParameter implements ITypeParameter
 
 	// Metadata
 	private int index;
-
 	private int parameterIndex;
 
 	private ITypeParametric generic;
 	private ReifiedKind reifiedKind = ReifiedKind.NOT_REIFIED;
 
+	private IType defaultType = Types.OBJECT;
 	private IType covariantType = new CovariantTypeVarType(this);
 
 	public TypeParameter(ITypeParametric generic)
@@ -207,19 +211,7 @@ public final class TypeParameter implements ITypeParameter
 	@Override
 	public IType getDefaultType()
 	{
-		switch (this.upperBoundCount)
-		{
-		case 0:
-			return Types.ANY;
-		case 1:
-			return this.upperBounds[0];
-		case 2:
-			if (this.upperBounds[0].getTheClass() == Types.OBJECT_CLASS)
-			{
-				return this.upperBounds[1];
-			}
-		}
-		return Types.ANY;
+		return this.defaultType;
 	}
 
 	@Override
@@ -288,21 +280,18 @@ public final class TypeParameter implements ITypeParameter
 	}
 
 	@Override
-	public boolean isAssignableFrom(IType type)
+	public boolean isAssignableFrom(IType type, ITypeContext typeContext)
 	{
-		if (this.upperBoundCount > 0)
+		for (int i = 0; i < this.upperBoundCount; i++)
 		{
-			for (int i = 0; i < this.upperBoundCount; i++)
+			if (!isSuperType(this.upperBounds[i].getConcreteType(typeContext), type))
 			{
-				if (!Types.isSuperType(this.upperBounds[i], type))
-				{
-					return false;
-				}
+				return false;
 			}
 		}
 		if (this.lowerBound != null)
 		{
-			if (!Types.isSuperType(type, this.lowerBound))
+			if (!isSuperType(type, this.lowerBound.getConcreteType(typeContext)))
 			{
 				return false;
 			}
@@ -311,26 +300,123 @@ public final class TypeParameter implements ITypeParameter
 	}
 
 	@Override
-	public boolean isSuperClassOf(IType type)
+	public boolean isSameType(IType superType)
 	{
-		if (this.upperBoundCount > 0)
+		for (int i = 0; i < this.upperBoundCount; i++)
 		{
-			for (int i = 0; i < this.upperBoundCount; i++)
+			if (Types.isSameType(superType, this.upperBounds[i]))
 			{
-				if (!this.upperBounds[i].isSuperClassOf(type))
-				{
-					return false;
-				}
+				return true;
 			}
 		}
 		if (this.lowerBound != null)
 		{
-			if (!type.isSuperClassOf(this.lowerBound))
+			if (Types.isSameType(this.lowerBound, superType))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean isSameClass(IType superType)
+	{
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			if (Types.isSameClass(superType, this.upperBounds[i]))
+			{
+				return true;
+			}
+		}
+		if (this.lowerBound != null)
+		{
+			if (Types.isSameClass(this.lowerBound, superType))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean isSuperTypeOf(IType subType)
+	{
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			if (!isSuperType(this.upperBounds[i], subType))
+			{
+				return false;
+			}
+		}
+		if (this.lowerBound != null)
+		{
+			if (!isSuperType(subType, this.lowerBound))
 			{
 				return false;
 			}
 		}
 		return true;
+	}
+
+	@Override
+	public boolean isSuperClassOf(IType subType)
+	{
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			if (!isSuperClass(this.upperBounds[i], subType))
+			{
+				return false;
+			}
+		}
+		if (this.lowerBound != null)
+		{
+			if (!isSuperClass(subType, this.lowerBound))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public boolean isSubTypeOf(IType superType)
+	{
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			if (isSuperType(superType, this.upperBounds[i]))
+			{
+				return true;
+			}
+		}
+		if (this.lowerBound != null)
+		{
+			if (isSuperType(this.lowerBound, superType))
+			{
+				return true;
+			}
+		}
+		return Types.isSameType(superType, Types.OBJECT);
+	}
+
+	@Override
+	public boolean isSubClassOf(IType superType)
+	{
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			if (isSuperClass(superType, this.upperBounds[i]))
+			{
+				return true;
+			}
+		}
+		if (this.lowerBound != null)
+		{
+			if (isSuperClass(this.lowerBound, superType))
+			{
+				return true;
+			}
+		}
+		return Types.isSameClass(superType, Types.OBJECT);
 	}
 
 	@Override
@@ -396,26 +482,32 @@ public final class TypeParameter implements ITypeParameter
 					if (++this.upperBoundCount > this.upperBounds.length)
 					{
 						IType[] temp = new IType[this.upperBoundCount];
-						temp[0] = Types.OBJECT;
+						type = temp[0] = Types.OBJECT;
 						System.arraycopy(this.upperBounds, 0, temp, 1, this.upperBoundCount - 1);
 						this.upperBounds = temp;
 					}
 					else
 					{
 						System.arraycopy(this.upperBounds, 0, this.upperBounds, 1, this.upperBoundCount - 1);
-						this.upperBounds[0] = Types.OBJECT;
+						type = this.upperBounds[0] = Types.OBJECT;
 					}
 				}
 			}
+
+			this.defaultType = type;
 
 			// Check if the remaining upper bounds are interfaces, and remove if
 			// not.
 			for (int i = 1; i < this.upperBoundCount; i++)
 			{
 				type = this.upperBounds[i] = this.upperBounds[i].resolveType(markers, context);
+				this.defaultType = IntersectionType.combine(this.defaultType, type, null);
+
 				iclass = type.getTheClass();
 				if (iclass != null && !iclass.hasModifier(Modifiers.INTERFACE_CLASS))
 				{
+					// TODO Error
+
 					System.arraycopy(this.upperBounds, i + 1, this.upperBounds, i, this.upperBoundCount - i - 1);
 					this.upperBoundCount--;
 					i--;

@@ -143,6 +143,13 @@ public class ReferenceType implements IObjectType
 	}
 
 	@Override
+	public IType asParameterType()
+	{
+		final IType type = this.type.asParameterType();
+		return type == this.type ? this : new ReferenceType(type);
+	}
+
+	@Override
 	public IType resolveType(ITypeParameter typeParameter)
 	{
 		if (typeParameter.getGeneric() == this.theClass)

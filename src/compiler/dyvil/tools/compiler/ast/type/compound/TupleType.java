@@ -116,7 +116,7 @@ public final class TupleType implements IObjectType, ITypeList
 	public static boolean isSuperType(IType type, ITyped[] typedArray, int count)
 	{
 		IClass iclass = getTupleClass(count);
-		if (!iclass.isSubTypeOf(type))
+		if (!iclass.isSubClassOf(type))
 		{
 			return false;
 		}
@@ -210,7 +210,7 @@ public final class TupleType implements IObjectType, ITypeList
 	public boolean isSuperTypeOf(IType type)
 	{
 		IClass iclass = getTupleClass(this.typeCount);
-		if (!iclass.isSubTypeOf(type))
+		if (!iclass.isSubClassOf(type))
 		{
 			return false;
 		}

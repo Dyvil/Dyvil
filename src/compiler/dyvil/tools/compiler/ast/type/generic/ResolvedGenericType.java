@@ -58,7 +58,7 @@ public class ResolvedGenericType extends ClassGenericType
 		{
 			final ITypeParameter typeVariable = this.theClass.getTypeParameter(i);
 			final IType type = this.typeArguments[i];
-			if (typeVariable != null && type.isResolved() && !typeVariable.isAssignableFrom(type))
+			if (typeVariable != null && type.isResolved() && !typeVariable.isSuperTypeOf(type))
 			{
 				final Marker marker = Markers
 						.semantic(type.getPosition(), "generic.type.incompatible", typeVariable.getName().qualified,

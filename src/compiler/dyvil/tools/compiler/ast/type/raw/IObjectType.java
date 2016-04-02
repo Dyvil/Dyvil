@@ -182,7 +182,7 @@ public interface IObjectType extends IType
 			return;
 		}
 
-		if (!target.isSuperClassOf(this))
+		if (!Types.isSuperClass(target, this))
 		{
 			writer.visitLineNumber(lineNumber);
 			writer.visitTypeInsn(Opcodes.CHECKCAST, target.getInternalName());

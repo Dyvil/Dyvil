@@ -31,7 +31,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public class UnionType implements IObjectType
+public class IntersectionType implements IObjectType
 {
 	private static final IClass[] OBJECT_CLASS_ARRAY = { Types.OBJECT_CLASS };
 
@@ -41,7 +41,7 @@ public class UnionType implements IObjectType
 	// Metadata
 	private IClass[] commonClasses;
 
-	public UnionType(IType left, IType right)
+	public IntersectionType(IType left, IType right)
 	{
 		this.left = left;
 		this.right = right;
@@ -62,7 +62,7 @@ public class UnionType implements IObjectType
 	@Override
 	public Name getName()
 	{
-		return Names.Union;
+		return Names.Intersection;
 	}
 
 	@Override
@@ -91,7 +91,7 @@ public class UnionType implements IObjectType
 	@Override
 	public IType asParameterType()
 	{
-		return new UnionType(this.left.asParameterType(), this.right.asParameterType());
+		return new IntersectionType(this.left.asParameterType(), this.right.asParameterType());
 	}
 
 	@Override
@@ -103,31 +103,31 @@ public class UnionType implements IObjectType
 	@Override
 	public boolean isSuperTypeOf(IType subType)
 	{
-		return Types.isSuperType(this.left, subType) || Types.isSuperType(this.right, subType);
+		return Types.isSuperType(this.left, subType) && Types.isSuperType(this.right, subType);
 	}
 
 	@Override
 	public boolean isSuperClassOf(IType subType)
 	{
-		return Types.isSuperClass(this.left, subType) || Types.isSuperClass(this.right, subType);
+		return Types.isSuperClass(this.left, subType) && Types.isSuperClass(this.right, subType);
 	}
 
 	@Override
 	public boolean isSubTypeOf(IType superType)
 	{
-		return Types.isSuperType(superType, this.left) && Types.isSuperType(superType, this.right);
+		return Types.isSuperType(superType, this.left) || Types.isSuperType(superType, this.right);
 	}
 
 	@Override
 	public boolean isSubClassOf(IType superType)
 	{
-		return Types.isSuperClass(superType, this.left) && Types.isSuperClass(superType, this.right);
+		return Types.isSuperClass(superType, this.left) || Types.isSuperClass(superType, this.right);
 	}
 
 	@Override
 	public int getSuperTypeDistance(IType superType)
 	{
-		return Math.min(this.left.getSuperTypeDistance(superType), this.right.getSuperTypeDistance(superType));
+		return Math.max(this.left.getSuperTypeDistance(superType), this.right.getSuperTypeDistance(superType));
 	}
 
 	@Override
@@ -144,7 +144,7 @@ public class UnionType implements IObjectType
 			return left;
 		}
 
-		return new UnionType(left, right);
+		return new IntersectionType(left, right);
 	}
 
 	@Override
@@ -163,7 +163,7 @@ public class UnionType implements IObjectType
 			return this;
 		}
 
-		return new UnionType(left, right);
+		return new IntersectionType(left, right);
 	}
 
 	@Override
@@ -187,7 +187,7 @@ public class UnionType implements IObjectType
 		return combine(this.left, this.right, this);
 	}
 
-	public static IType combine(IType left, IType right, UnionType unionType)
+	public static IType combine(IType left, IType right, IntersectionType intersectionType)
 	{
 		if (Types.isSameType(left, Types.VOID) || Types.isSameType(right, Types.VOID))
 		{
@@ -217,15 +217,10 @@ public class UnionType implements IObjectType
 			// left type unresolved -> result right type
 			return right;
 		}
-		if (leftClass == Types.NULL_CLASS)
+		if (leftClass == Types.NULL_CLASS || leftClass == Types.OBJECT_CLASS)
 		{
-			// left type is null -> result reference right type
+			// left type is null or Object -> result reference right type
 			return right.getObjectType();
-		}
-		if (leftClass == Types.OBJECT_CLASS)
-		{
-			// left type is Object -> result Object
-			return Types.ANY;
 		}
 
 		final IClass rightClass = right.getTheClass();
@@ -234,29 +229,24 @@ public class UnionType implements IObjectType
 			// right type unresolved -> result left type
 			return left;
 		}
-		if (rightClass == Types.NULL_CLASS)
+		if (rightClass == Types.NULL_CLASS || rightClass == Types.OBJECT_CLASS)
 		{
-			// right type is null -> result reference left type
+			// right type is null or Object -> result reference left type
 			return left.getObjectType();
-		}
-		if (rightClass == Types.OBJECT_CLASS)
-		{
-			// right type is Object -> result Object
-			return Types.ANY;
 		}
 
 		if (Types.isSameType(left, right) || Types.isSuperType(left, right))
 		{
 			// same type, or left type is a super type of right type -> result left type
-			return left;
+			return right;
 		}
 		if (Types.isSuperType(right, left))
 		{
 			// right type is a super type of left type -> result right type
-			return right;
+			return left;
 		}
 
-		return unionType != null ? unionType : new UnionType(left, right);
+		return intersectionType != null ? intersectionType : new IntersectionType(left, right);
 	}
 
 	private static IType arrayElementCombine(IType left, IType right)
@@ -299,17 +289,19 @@ public class UnionType implements IObjectType
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		return this.getTheClass().resolveField(name);
+		final IDataMember field = this.left.resolveField(name);
+		if (field != null)
+		{
+			return field;
+		}
+		return this.right.resolveField(name);
 	}
 
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
-		this.getTheClass();
-		for (IClass commonClass : this.commonClasses)
-		{
-			commonClass.getMethodMatches(list, instance, name, arguments);
-		}
+		this.left.getMethodMatches(list, instance, name, arguments);
+		this.right.getMethodMatches(list, instance, name, arguments);
 	}
 
 	@Override
@@ -349,8 +341,8 @@ public class UnionType implements IObjectType
 		writer.visitLdcInsn(Type.getObjectType(this.getTheClass().getInternalName()));
 		this.left.writeTypeExpression(writer);
 		this.right.writeTypeExpression(writer);
-		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/UnionType", "apply",
-		                       "(Ljava/lang/Class;Ldyvilx/lang/model/type/Type;Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/UnionType;",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/IntersectionType", "apply",
+		                       "(Ljava/lang/Class;Ldyvilx/lang/model/type/Type;Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/IntersectionType;",
 		                       false);
 	}
 
@@ -388,13 +380,13 @@ public class UnionType implements IObjectType
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		this.left.toString(prefix, buffer);
-		buffer.append(" | ");
+		buffer.append(" & ");
 		this.right.toString(prefix, buffer);
 	}
 
 	@Override
 	public IType clone()
 	{
-		return new UnionType(this.left.clone(), this.right.clone());
+		return new IntersectionType(this.left.clone(), this.right.clone());
 	}
 }

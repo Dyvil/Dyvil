@@ -55,7 +55,7 @@ public final class TuplePattern extends Pattern implements IPatternList
 	public IPattern withType(IType type, MarkerList markers)
 	{
 		IClass tupleClass = TupleType.getTupleClass(this.patternCount);
-		if (tupleClass == null || !tupleClass.isSubTypeOf(type))
+		if (tupleClass == null || !tupleClass.isSubClassOf(type))
 		{
 			return null;
 		}

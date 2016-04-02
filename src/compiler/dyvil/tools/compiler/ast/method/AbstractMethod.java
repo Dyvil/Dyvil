@@ -648,8 +648,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				final TypeChecker.MarkerSupplier markerSupplier = TypeChecker
 					                                                  .markerSupplier("method.access.receiver_type",
 					                                                                  this.name);
-				receiver = TypeChecker.convertValue(receiver, this.receiverType, typeContext, markers, context,
-				                                    markerSupplier);
+				// TODO Cache 'asParameterType'
+				receiver = TypeChecker.convertValue(receiver, this.receiverType.asParameterType(), typeContext, markers,
+				                                    context, markerSupplier);
 			}
 		}
 		else if (!this.modifiers.hasIntModifier(Modifiers.STATIC))
@@ -678,11 +679,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		if (instance != null)
 		{
-			genericData.instance = instance;
+			genericData.receiver = instance;
 		}
 		else
 		{
-			genericData.instance = new ThisExpr(this.enclosingClass.getType());
+			genericData.receiver = new ThisExpr(this.enclosingClass.getType());
 		}
 
 		int modifiers = this.modifiers.toFlags();
@@ -717,7 +718,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				                             inferredType));
 				typeContext.addMapping(typeParameter, inferredType);
 			}
-			else if (!typeParameter.isAssignableFrom(typeArgument))
+			else if (!typeParameter.isAssignableFrom(typeArgument, typeContext))
 			{
 				final Marker marker = Markers.semanticError(position, "method.typevar.incompatible", this.name,
 				                                            typeParameter.getName());
@@ -805,8 +806,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		// Check Parameter Types
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			final IType parType = this.parameters[i].getType().getConcreteType(typeContext);
-			final IType candidateParType = candidate.getParameter(i).getType().getConcreteType(typeContext);
+			final IType parType = this.parameters[i].getInternalType().getConcreteType(typeContext);
+			final IType candidateParType = candidate.getParameter(i).getInternalType().getConcreteType(typeContext);
 			if (!Types.isSameType(parType, candidateParType))
 			{
 				return false;

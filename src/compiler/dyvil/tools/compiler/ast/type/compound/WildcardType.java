@@ -43,6 +43,12 @@ public final class WildcardType implements IRawType, ITyped
 		this.variance = variance;
 	}
 
+	public WildcardType(Variance variance, IType bound)
+	{
+		this.variance = variance;
+		this.bound = bound;
+	}
+
 	public WildcardType(ICodePosition position)
 	{
 		this.position = position;
@@ -109,9 +115,16 @@ public final class WildcardType implements IRawType, ITyped
 	{
 		if (this.bound == null)
 		{
-			return Types.ANY;
+			return this;
 		}
-		return this.bound.asParameterType();
+
+		final IType bound = this.bound.asParameterType();
+		if (this.variance == Variance.CONTRAVARIANT)
+		{
+			return bound;
+		}
+
+		return bound == this.bound ? this : new WildcardType(this.variance, bound);
 	}
 
 	@Override
@@ -196,7 +209,7 @@ public final class WildcardType implements IRawType, ITyped
 	@Override
 	public IType resolveType(ITypeParameter typeParameter)
 	{
-		if (this.bound != null && this.variance == Variance.COVARIANT)
+		if (this.bound != null)
 		{
 			return this.bound.resolveType(typeParameter);
 		}
@@ -225,10 +238,11 @@ public final class WildcardType implements IRawType, ITyped
 		{
 			return this;
 		}
+
 		final IType concreteBound = this.bound.getConcreteType(context);
 		if (concreteBound == this.bound)
 		{
-			return concreteBound;
+			return this;
 		}
 
 		if (concreteBound.typeTag() == WILDCARD_TYPE)

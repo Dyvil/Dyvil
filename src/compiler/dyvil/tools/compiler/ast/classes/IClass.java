@@ -69,7 +69,7 @@ public interface IClass extends IClassMember, ITypeParametric, IContext, IParame
 	
 	IType getSuperType();
 	
-	boolean isSubTypeOf(IType type);
+	boolean isSubClassOf(IType type);
 	
 	int getSuperTypeDistance(IType superType);
 
