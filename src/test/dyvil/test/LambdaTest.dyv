@@ -17,6 +17,8 @@ public class LambdaTest
 	{
 		override func apply(int value): int
 	}
+
+	public static void repeatClosure(int n, => void f) = for (var i <- 0 ..< n) f()
 	
 	private static int staticSum = 0
 	
@@ -76,7 +78,7 @@ public class LambdaTest
 		() => void function1 = function { result += "a" }
 		() => String function2 = function { "b" }
 
-		`repeat`(3) { result += function2() }
+		repeatClosure(3) { result += function2() }
 
 		with ("c") { result += $0 }
 

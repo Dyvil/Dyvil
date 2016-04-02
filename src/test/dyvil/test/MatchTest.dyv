@@ -134,39 +134,45 @@ public class MatchTest
 
 	private static void caseClasses()
 	{
-		Option[int] intOption = Some 1
-		int value = _
+		{
+			Option[int] option = Some 1
+			int value = _
 
-		intOption match {
-			case Some(int i) => value = i
-			case _			 => value = -1
+			option match {
+				case Some(int i) => value = i
+				case _			 => value = -1
+			}
+
+			Main.test("Match Case Classes (primitive)", 1, value)
 		}
-
-		Main.test("Match Case Classes (primitive)", 1, value)
 
 		// ------------------------------------------------------------
 
-		Some[String] stringOption = Some "abc"
-		String value = _
+		{
+			Some[String] option = Some "abc"
+			String value = _
 
-		stringOption match {
-			case Some(String s) => value = s
-			case _				=> value = null
+			option match {
+				case Some(String s) => value = s
+				case _				=> value = null
+			}
+
+			Main.test("Match Case Classes (Object)", "abc", value)
 		}
-
-		Main.test("Match Case Classes (Object)", "abc", value)
 
 		// ------------------------------------------------------------
 
-		Some[int] intOption = Some 2
-		int value = _
+		{
+			Some[int] option = Some 2
+			int value = _
 
-		intOption match {
-			case Some(int i) => value = i
-			case _			 => value = -1
+			option match {
+				case Some(int i) => value = i
+				case _			 => value = -1
+			}
+
+			Main.test("Match Case Classes (primitive 2)", 2, value)
 		}
-
-		Main.test("Match Case Classes (primitive 2)", 2, value)
 	}
 
 	private static void objects()

@@ -43,12 +43,6 @@ public final class LanguageFeatures
 
 	public static inline R with[T, R](T receiver, T => R f) = f(receiver)
 
-	@Deprecated
-	public static void `repeat`(int n, => void f)
-	{
-		for (var i <- 0 ..< n) f()
-	}
-
 	// I/O
 
 	public const String ENDL = System.lineSeparator
