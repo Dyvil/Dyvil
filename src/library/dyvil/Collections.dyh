@@ -4,6 +4,7 @@ package dyvil
 infix	operator ?		{ associativity none,	precedence 1200 }
 infix	operator ++		{ associativity left,	precedence 1200 }
 infix	operator --		{ associativity left,	precedence 1200 }
+infix	operator ::		{ associativity right,	precedence 1200 }
 
 // Map Operators
 infix	operator ?@		{ associativity none,	precedence 1200 }

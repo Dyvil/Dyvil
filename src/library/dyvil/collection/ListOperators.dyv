@@ -24,6 +24,9 @@ public class ListOperators
 
 	// Immutable List Operators
 
+	public infix inline func ::[E](E head, ImmutableList[E] tail): ImmutableList[E]
+		= new dyvil.collection.immutable.PrependList(head, tail)
+
 	public infix inline func +[T](ImmutableList[T] list, T element): ImmutableList[T] = list.added(element)
 
 	public infix inline func ++[T](ImmutableList[T] list, List[_ <: T] elements): ImmutableList[T] = list.union(elements)

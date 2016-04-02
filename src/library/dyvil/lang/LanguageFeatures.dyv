@@ -19,14 +19,6 @@ public final class LanguageFeatures
 
 	public static Type[T] typeOf[@Reified T](T value) = type T
 
-	// Lists
-
-	@Deprecated
-	public infix inline func ::[E](ImmutableList[E] list, E element): ImmutableList[E] = list.added(element)
-
-	@Deprecated
-	public infix inline func ::[E](E element1, E element2): ImmutableList[E] = ImmutableList(element1, element2)
-
 	// Increments
 
 	public static void inc(int^ i, int n = 1) = *i = *i + n

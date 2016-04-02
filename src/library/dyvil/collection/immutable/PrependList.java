@@ -23,6 +23,16 @@ public class PrependList<E> implements ImmutableList<E>
 	private transient ImmutableList<E> tail;
 	
 	private transient int size;
+
+	public static <E> PrependList<E> apply(E head)
+	{
+		return new PrependList<>(head);
+	}
+
+	public static <E> PrependList<E> apply(E head, ImmutableList<E> tail)
+	{
+		return new PrependList<>(head, tail);
+	}
 	
 	public PrependList(E element)
 	{
