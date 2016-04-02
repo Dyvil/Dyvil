@@ -1,0 +1,16 @@
+package dyvil.collection
+
+public class ListOperators
+{
+	// List Operators
+
+	public infix inline func +[T](List[T] list, T element): List[T] = list.added(element)
+
+	public infix inline func ++[T](List[T] list, List[_ <: T] elements): List[T] = list.union(elements)
+
+	public infix inline func -[T](List[T] list, any element): List[T] = list.removed(element)
+
+	public infix inline func --[T](List[T] list, List[_] elements): List[T] = list.difference(elements)
+
+
+}

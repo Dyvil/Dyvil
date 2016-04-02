@@ -31,7 +31,7 @@ import java.util.function.Predicate;
  * </pre>
  *
  * @param <E>
- * 		the element type
+ * 	the element type
  *
  * @author Clashsoft
  */
@@ -49,7 +49,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	{
 		return ImmutableSet.apply();
 	}
-	
+
 	/**
 	 * Returns an empty, mutable collection. The exact type of the returned object is given by {@link
 	 * MutableList#apply()}.
@@ -60,13 +60,13 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	{
 		return MutableList.apply();
 	}
-	
+
 	/**
 	 * Returns an immutable collection containing all of the given {@code elements}. This method is primarily for use
 	 * with <i>Array Expressions</i> in <i>Dyvil</i> and is defined by {@link ImmutableList#apply(Object...)}.
 	 *
 	 * @param elements
-	 * 		the elements of the returned collection
+	 * 	the elements of the returned collection
 	 *
 	 * @return an immutable collection containing all of the given elements
 	 */
@@ -75,9 +75,9 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	{
 		return ImmutableList.apply(elements);
 	}
-	
+
 	// Accessors
-	
+
 	/**
 	 * Returns {@code true} iff this collection is immutable, i.e. the number and order of it's elements cannot be
 	 * changed after it's creation.
@@ -85,7 +85,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 * @return true, iff this collection is immutable
 	 */
 	boolean isImmutable();
-	
+
 	/**
 	 * Returns the size of this collection, i.e. the number of elements contained in this collection.
 	 *
@@ -93,7 +93,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 */
 	@Override
 	int size();
-	
+
 	/**
 	 * Returns true if and if only this collection is empty. The standard implementation defines a collection as empty
 	 * if it's size as calculated by {@link #size()} is exactly {@code 0}.
@@ -105,7 +105,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	{
 		return this.size() == 0;
 	}
-	
+
 	default boolean isDistinct()
 	{
 		int size = this.size();
@@ -113,21 +113,21 @@ public interface Collection<E> extends Queryable<E>, Serializable
 		{
 			return true;
 		}
-		
+
 		Object[] array = this.toArray();
 		return Set.isDistinct(array, size);
 	}
-	
+
 	default boolean isSorted()
 	{
 		return this.size() < 2 || iteratorSorted(this.iterator());
 	}
-	
+
 	default boolean isSorted(Comparator<? super E> comparator)
 	{
 		return this.size() < 2 || iteratorSorted(this.iterator(), comparator);
 	}
-	
+
 	/**
 	 * Creates and returns an {@link Iterator} over the elements of this collection.
 	 *
@@ -135,7 +135,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 */
 	@Override
 	Iterator<E> iterator();
-	
+
 	/**
 	 * Creates and returns a {@link Spliterator} over the elements of this collection.
 	 *
@@ -146,25 +146,12 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	{
 		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.SIZED);
 	}
-	
+
 	/**
 	 * Returns true if and if only this collection contains the element specified by {@code element}.
 	 *
 	 * @param element
-	 * 		the element
-	 *
-	 * @return true, if this collection contains the element
-	 */
-	default boolean $qmark(Object element)
-	{
-		return this.contains(element);
-	}
-	
-	/**
-	 * Returns true if and if only this collection contains the element specified by {@code element}.
-	 *
-	 * @param element
-	 * 		the element
+	 * 	the element
 	 *
 	 * @return true, if this collection contains the element
 	 */
@@ -173,7 +160,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	{
 		return iterableContains(this, element);
 	}
-	
+
 	default boolean intersects(Collection<?> collection)
 	{
 		if (collection.size() < this.size())
@@ -185,10 +172,10 @@ public interface Collection<E> extends Queryable<E>, Serializable
 					return true;
 				}
 			}
-			
+
 			return false;
 		}
-		
+
 		for (Object o : collection)
 		{
 			if (this.contains(o))
@@ -196,170 +183,104 @@ public interface Collection<E> extends Queryable<E>, Serializable
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	// Non-mutating Operations
-	
+
 	/**
 	 * Returns a collection that contains all elements of this collection plus the element given by {@code element}.
 	 *
 	 * @param element
-	 * 		the element to be added
+	 * 	the element to be added
 	 *
 	 * @return a collection that contains all elements of this collection plus the given element
 	 */
-	Collection<E> $plus(E element);
-	
-	/**
-	 * Returns a collection that contains all elements of this collection plus all elements of the given {@code
-	 * collection}.
-	 *
-	 * @param collection
-	 * 		the collection of elements to be added
-	 *
-	 * @return a collection that contains all elements of this collection plus all elements of the collection
-	 */
-	Collection<? extends E> $plus$plus(Collection<? extends E> collection);
-	
+	Collection<E> added(E element);
+
 	/**
 	 * Returns a collection that contains all elements of this collection excluding the element given by {@code
 	 * element}.
 	 *
 	 * @param element
-	 * 		the element to be removed
+	 * 	the element to be removed
 	 *
 	 * @return a collection that contains all elements of this collection excluding the given element
 	 */
-	Collection<E> $minus(Object element);
-	
+	Collection<E> removed(Object element);
+
+	/**
+	 * Returns a collection that contains all elements of this collection plus all elements of the given {@code
+	 * collection}.
+	 *
+	 * @param collection
+	 * 	the collection of elements to be added
+	 *
+	 * @return a collection that contains all elements of this collection plus all elements of the collection
+	 */
+	Collection<? extends E> union(Collection<? extends E> collection);
+
 	/**
 	 * Returns a collection that contains all elements of this collection excluding all elements of the given {@code
 	 * collection}.
 	 *
 	 * @param collection
-	 * 		the collection of elements to be removed
+	 * 	the collection of elements to be removed
 	 *
 	 * @return a collection that contains all elements of this collection excluding all elements of the collection
 	 */
-	Collection<? extends E> $minus$minus(Collection<?> collection);
-	
+	Collection<? extends E> difference(Collection<?> collection);
+
 	/**
 	 * Returns a collection that contains all elements of this collection that are present in the given collection.
 	 *
 	 * @param collection
-	 * 		the collection of elements to be retained
+	 * 	the collection of elements to be retained
 	 *
 	 * @return a collection that contains all elements of this collection that are present in the given collection
 	 */
-	Collection<? extends E> $amp(Collection<? extends E> collection);
-	
+	Collection<? extends E> intersection(Collection<? extends E> collection);
+
 	/**
 	 * Returns a collection that is mapped from this collection by supplying each of this collection's elements to the
 	 * given {@code mapper}, and adding the returned mappings to a new collection.
 	 *
 	 * @param mapper
-	 * 		the mapping function
+	 * 	the mapping function
 	 *
 	 * @return a collection mapped by the mapping function
 	 */
 	@Override
 	<R> Collection<R> mapped(Function<? super E, ? extends R> mapper);
-	
+
 	/**
 	 * Returns a collection that is flat-mapped from this collection by supplying each of this collection's elements to
 	 * the given {@code mapper}, and adding all elements by iterating over the {@link Iterable} returned by the {@code
 	 * mapper}
 	 *
 	 * @param mapper
-	 * 		the mapping function
+	 * 	the mapping function
 	 *
 	 * @return a collection flat-mapped by the mapping function
 	 */
 	@Override
 	<R> Collection<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper);
-	
+
 	/**
 	 * Returns a collection that is filtered from this collection by filtering each of this collection's elements using
 	 * the given {@code condition}.
 	 *
 	 * @param condition
-	 * 		the filter condition predicate
+	 * 	the filter condition predicate
 	 *
 	 * @return a collection filtered by the filter condition predicate
 	 */
 	@Override
 	Collection<E> filtered(Predicate<? super E> condition);
-	
-	// Mutating Operations
-	
-	/**
-	 * Adds the element given by {@code element} to this collection. This method should throw an {@link
-	 * ImmutableException} if this is an immutable collection.
-	 *
-	 * @param element
-	 * 		the element to be added
-	 */
-	default void $plus$eq(E element)
-	{
-		this.add(element);
-	}
-	
-	/**
-	 * Adds all elements of the given {@code collection} to this collection. This method should throw an {@link
-	 * ImmutableException} if this is an immutable collection.
-	 *
-	 * @param collection
-	 * 		the collection of elements to be added
-	 */
-	default void $plus$plus$eq(Collection<? extends E> collection)
-	{
-		for (E e : collection)
-		{
-			this.$plus$eq(e);
-		}
-	}
-	
-	/**
-	 * Removes the element given by {@code element} from this collection. This method should throw an {@link
-	 * ImmutableException} if this is an immutable collection.
-	 *
-	 * @param element
-	 * 		the element to be removed
-	 */
-	default void $minus$eq(Object element)
-	{
-		this.remove(element);
-	}
-	
-	/**
-	 * Removes all elements of the given {@code collection} from this collection. This method should throw an {@link
-	 * ImmutableException} if the callee is an immutable collection.
-	 *
-	 * @param collection
-	 * 		the collection of elements to be removed
-	 */
-	default void $minus$minus$eq(Collection<?> collection)
-	{
-		for (Object e : collection)
-		{
-			this.$minus$eq(e);
-		}
-	}
 
-	/**
-	 * Removes all elements of this collection that are not present in the given {@code collection}. This method should
-	 * throw an {@link ImmutableException} if this is an immutable collection.
-	 *
-	 * @param collection
-	 * 		the collection of elements to be retained
-	 */
-	default void $amp$eq(Collection<? extends E> collection)
-	{
-		this.intersect(collection);
-	}
-	
+	// Mutating Operations
+
 	/**
 	 * Clears this collection such that all elements of this collection are removed and {@link #size()} returns {@code
 	 * 0} after an invocation of this method. Note that implementations of this method in classes using an {@code int
@@ -368,7 +289,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 * garbage-collected.
 	 */
 	void clear();
-	
+
 	/**
 	 * Adds the element given by {@code element} to this collection and returns the {@code true} if it was not present
 	 * in this collection, {@code false} otherwise (does not apply to {@link List Lists} as the element will always be
@@ -376,18 +297,20 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 * ImmutableException} if this is an immutable collection.
 	 *
 	 * @param element
-	 * 		the element to be added
+	 * 	the element to be added
 	 *
-	 * @return the old element
+	 * @return {@code true} if the element was not present in this collection, {@code false} otherwise
 	 */
 	boolean add(E element);
-	
+
 	/**
 	 * Adds all elements of the given {@code collection} to this collection. This method should throw an {@link
 	 * ImmutableException} if this is an immutable collection.
 	 *
 	 * @param collection
-	 * 		the collection of elements to be added
+	 * 	the collection of elements to be added
+	 *
+	 * @return {@code true} iff any elements have been removed from this collection, {@code false} otherwise
 	 */
 	default boolean addAll(Collection<? extends E> collection)
 	{
@@ -401,25 +324,27 @@ public interface Collection<E> extends Queryable<E>, Serializable
 		}
 		return added;
 	}
-	
+
 	/**
 	 * Removes the given {@code element} from this collection. If the element is not present in this list, it is simply
 	 * ignored and {@code false} is returned. Otherwise, if the element has been successfully removed, {@code true} is
 	 * returned.
 	 *
 	 * @param element
-	 * 		the element to be removed
+	 * 	the element to be removed
 	 *
-	 * @return true, iff the element has been removed successfully, false otherwise
+	 * @return {@code true}, iff the element has been removed successfully, {@code false} otherwise
 	 */
 	boolean remove(Object element);
-	
+
 	/**
 	 * Removes all elements of the given {@code collection} from this collection. This method should throw an {@link
 	 * ImmutableException} if the callee is an immutable collection.
 	 *
 	 * @param collection
-	 * 		the collection of elements to be removed
+	 * 	the collection of elements to be removed
+	 *
+	 * @return {@code true} iff any elements have been removed from this collection, {@code false} otherwise
 	 */
 	default boolean removeAll(Collection<?> collection)
 	{
@@ -433,15 +358,17 @@ public interface Collection<E> extends Queryable<E>, Serializable
 		}
 		return removed;
 	}
-	
+
 	/**
 	 * Removes all elements of this collection that are not present in the given {@code collection}. This method should
 	 * throw an {@link ImmutableException} if this is an immutable collection.
 	 *
 	 * @param collection
-	 * 		the collection of elements to be retained
+	 * 	the collection of elements to be retained
+	 *
+	 * @return {@code true} iff any elements have been removed from this collection, {@code false} otherwise
 	 */
-	default boolean intersect(Collection<? extends E> collection)
+	default boolean retainAll(Collection<? extends E> collection)
 	{
 		boolean removed = false;
 		Iterator<E> iterator = this.iterator();
@@ -455,35 +382,35 @@ public interface Collection<E> extends Queryable<E>, Serializable
 		}
 		return removed;
 	}
-	
+
 	/**
 	 * Maps the elements of this collection using the given {@code mapper}. This is done by supplying each of this
 	 * collection's elements to the mapping function and replacing them with the result returned by it.
 	 *
 	 * @param mapper
-	 * 		the mapping function
+	 * 	the mapping function
 	 */
 	@Override
 	void map(Function<? super E, ? extends E> mapper);
-	
+
 	/**
 	 * Flat-maps the elements of this collection using the given {@code mapper}. This is done by supplying each of this
 	 * collection's elements to the mapping function and replacing them with the all elements of the {@link Iterator}
 	 * returned by it.
 	 *
 	 * @param mapper
-	 * 		the mapping function
+	 * 	the mapping function
 	 */
 	@Override
 	void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
-	
+
 	/**
 	 * Filters the elements of this collection using the given {@code condition} . This is done by supplying each of
 	 * this collection's elements to the predicate condition, and removing them if the predicate fails, i.e. returns
 	 * {@code false}.
 	 *
 	 * @param condition
-	 * 		the filter condition predicate
+	 * 	the filter condition predicate
 	 */
 	@Override
 	default void filter(Predicate<? super E> condition)
@@ -497,9 +424,9 @@ public interface Collection<E> extends Queryable<E>, Serializable
 			}
 		}
 	}
-	
+
 	// toArray
-	
+
 	/**
 	 * Creates and returns an array containing the elements of this collection.
 	 *
@@ -511,7 +438,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 		this.toArray(0, array);
 		return array;
 	}
-	
+
 	/**
 	 * Creates and returns an array containing the elements of this collection. The type of the array is specified by
 	 * the given {@code type} representing the {@link Class} object of it's component type. Note that this method
@@ -519,7 +446,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 * Class#cast(Object) cast} method.
 	 *
 	 * @param type
-	 * 		the array type
+	 * 	the array type
 	 *
 	 * @return an array containing this collection's elements
 	 */
@@ -529,7 +456,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 		this.toArray(0, array);
 		return array;
 	}
-	
+
 	/**
 	 * Stores all elements of this collection sequentially in the given {@code store} array, starting at the index
 	 * {@code 0}. The order in which the element are added to the array is the same order in which they would appear in
@@ -538,13 +465,13 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 * ArrayIndexOutOfBoundsException}.
 	 *
 	 * @param store
-	 * 		the array to store the elements in
+	 * 	the array to store the elements in
 	 */
 	default void toArray(Object[] store)
 	{
 		this.toArray(0, store);
 	}
-	
+
 	/**
 	 * Stores all elements of this collection sequentially in the given {@code store} array, starting at given {@code
 	 * index}. The order in which the element are added to the array is the same order in which they would appear in
@@ -553,9 +480,9 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 * ArrayIndexOutOfBoundsException}.
 	 *
 	 * @param index
-	 * 		the index in the array at which the first element of this collection should be placed
+	 * 	the index in the array at which the first element of this collection should be placed
 	 * @param store
-	 * 		the array to store the elements in
+	 * 	the array to store the elements in
 	 */
 	default void toArray(int index, Object[] store)
 	{
@@ -564,9 +491,9 @@ public interface Collection<E> extends Queryable<E>, Serializable
 			store[index++] = e;
 		}
 	}
-	
+
 	// Copying and Views
-	
+
 	/**
 	 * Creates a copy of this collection. The general contract of this method is that the type of the returned
 	 * collection is the same as this collection's type, such that
@@ -582,7 +509,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	<RE> MutableCollection<RE> emptyCopy();
 
 	<RE> MutableCollection<RE> emptyCopy(int capacity);
-	
+
 	/**
 	 * Returns a mutable collection that contains the exact same elements as this collection. Already mutable
 	 * collections should return themselves when this method is called on them, while immutable collections should
@@ -591,7 +518,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 * @return a mutable collection with the same elements as this collection
 	 */
 	MutableCollection<E> mutable();
-	
+
 	/**
 	 * Returns a mutable copy of this collection. For mutable collections, this method has the same result as the {@link
 	 * #copy()} method, while for immutable collections, the result of this method is the equivalent of a call to {@link
@@ -600,7 +527,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 * @return a mutable copy of this collection
 	 */
 	MutableCollection<E> mutableCopy();
-	
+
 	/**
 	 * Returns an immutable collection that contains the exact same elements as this collection. Already immutable
 	 * collections should return themselves when this method is called on them, while mutable collections should return
@@ -609,7 +536,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 * @return a immutable collection with the same elements as this collection
 	 */
 	ImmutableCollection<E> immutable();
-	
+
 	/**
 	 * Returns a immutable copy of this collection. For immutable collections, this method has the same result as the
 	 * {@link #copy()} method, while for mutable collections, the result of this method is the equivalent of a call to
@@ -622,7 +549,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	<RE> ImmutableCollection.Builder<RE> immutableBuilder();
 
 	<RE> ImmutableCollection.Builder<RE> immutableBuilder(int capacity);
-	
+
 	/**
 	 * Returns a view on the elements of this collection. Immutable collections return themselves, as they are already
 	 * immutable and therefore already provide a view. Mutable collections return a special collection that references
@@ -631,7 +558,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 * @return a view on the elements of this collection
 	 */
 	ImmutableCollection<E> view();
-	
+
 	/**
 	 * Returns the Java Collection Framework equivalent of this collection. The returned collection is not a view of
 	 * this one, but an exact copy. Immutable collections should return a collection that is locked for mutation, which
@@ -641,14 +568,14 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 * @return a java collection containing the elements of this collection
 	 */
 	java.util.Collection<E> toJava();
-	
+
 	// toString, equals and hashCode
 
 	String EMPTY_STRING             = "[]";
 	String START_STRING             = "[ ";
 	String END_STRING               = " ]";
 	String ELEMENT_SEPARATOR_STRING = ", ";
-	
+
 	@Override
 	String toString();
 
@@ -665,10 +592,10 @@ public interface Collection<E> extends Queryable<E>, Serializable
 
 	@Override
 	boolean equals(Object obj);
-	
+
 	@Override
 	int hashCode();
-	
+
 	static <E> boolean iterableContains(Iterable<E> iterable, Object element)
 	{
 		if (element == null)
@@ -682,7 +609,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 			}
 			return false;
 		}
-		
+
 		for (E e : iterable)
 		{
 			if (element.equals(e))
@@ -692,14 +619,14 @@ public interface Collection<E> extends Queryable<E>, Serializable
 		}
 		return false;
 	}
-	
+
 	static <E> String collectionToString(Queryable<E> collection)
 	{
 		if (collection.isEmpty())
 		{
 			return "[]";
 		}
-		
+
 		StringBuilder builder = new StringBuilder("[");
 		Iterator<E> iterator = collection.iterator();
 		while (true)
@@ -715,17 +642,17 @@ public interface Collection<E> extends Queryable<E>, Serializable
 				break;
 			}
 		}
-		
+
 		return builder.append(']').toString();
 	}
-	
+
 	static <E> boolean orderedEquals(Queryable<E> c1, Queryable<E> c2)
 	{
 		if (c1.size() != c2.size())
 		{
 			return false;
 		}
-		
+
 		Iterator<E> iterator1 = c1.iterator();
 		Iterator<E> iterator2 = c2.iterator();
 		while (iterator1.hasNext())
@@ -739,7 +666,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 		}
 		return true;
 	}
-	
+
 	static <E> boolean unorderedEquals(Queryable<E> c1, Queryable<E> c2)
 	{
 		if (c1.size() != c2.size())
@@ -774,14 +701,14 @@ public interface Collection<E> extends Queryable<E>, Serializable
 		}
 		return sum * 31 + product;
 	}
-	
+
 	static <E> boolean isSorted(E[] array, int size)
 	{
 		if (size < 2)
 		{
 			return true;
 		}
-		
+
 		for (int i = 1; i < size; i++)
 		{
 			if (((Comparable<E>) array[i - 1]).compareTo(array[i]) > 0)
@@ -791,14 +718,14 @@ public interface Collection<E> extends Queryable<E>, Serializable
 		}
 		return true;
 	}
-	
+
 	static <E> boolean isSorted(E[] array, int size, Comparator<? super E> comparator)
 	{
 		if (size < 2)
 		{
 			return true;
 		}
-		
+
 		for (int i = 1; i < size; i++)
 		{
 			if (comparator.compare(array[i - 1], array[i]) > 0)
@@ -808,7 +735,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 		}
 		return true;
 	}
-	
+
 	static <E> boolean iteratorSorted(Iterator<E> iterator)
 	{
 		Comparable<? super E> prev = (Comparable<? super E>) iterator.next();
@@ -823,7 +750,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 		}
 		return true;
 	}
-	
+
 	static <E> boolean iteratorSorted(Iterator<E> iterator, Comparator<? super E> comparator)
 	{
 		E prev = iterator.next();

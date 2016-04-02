@@ -278,7 +278,7 @@ public final class Types
 	{
 		final Set<IClass> superTypes1 = superClasses(type1);
 		final Set<IClass> superTypes2 = superClasses(type2);
-		superTypes1.intersect(superTypes2);
+		superTypes1.retainAll(superTypes2);
 		return superTypes1;
 	}
 

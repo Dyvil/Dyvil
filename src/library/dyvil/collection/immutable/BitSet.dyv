@@ -31,7 +31,7 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 
 	protected override void removeAt(int bit) = throw new dyvil.util.ImmutableException("Iterator.remove() on Immutable Set")
 
-	public override BitSet operator +(int element)
+	public override BitSet added(int element)
 	{
 		if (this.bitSet(element)) return this
 
@@ -40,7 +40,7 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 		return copy
 	}
 
-	public override BitSet operator -(Object element)
+	public override BitSet removed(Object element)
 	{
 		if (!(element is Int)) return this
 
@@ -52,7 +52,19 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 		return copy
 	}
 
-	public override BitSet operator --(Collection[_] collection)
+	public override BitSet union(Collection[_ <: int] collection)
+	{
+		if (collection.isEmpty) return this
+
+		final BitSet copy = new BitSet(this)
+		for (int element <- collection)
+		{
+			copy.setBit(element)
+		}
+		return copy
+	}
+
+	public override BitSet difference(Collection[_] collection)
 	{
 		if (collection.isEmpty || this.isEmpty) return this
 
@@ -67,7 +79,7 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 		return copy
 	}
 
-	public override BitSet operator &(Collection[_ <: int] collection)
+	public override BitSet intersection(Collection[_ <: int] collection)
 	{
 		if (collection.isEmpty || this.isEmpty) return this
 
@@ -82,19 +94,7 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 		return copy
 	}
 
-	public override BitSet operator |(Collection[_ <: int] collection)
-	{
-		if (collection.isEmpty) return this
-
-		final BitSet copy = new BitSet(this)
-		for (int element <- collection)
-		{
-			copy.setBit(element)
-		}
-		return copy
-	}
-
-	public override BitSet operator ^(Collection[_ <: int] collection)
+	public override BitSet symmetricDifference(Collection[_ <: int] collection)
 	{
 		if (collection.isEmpty) return this
 		if (this.isEmpty) return new BitSet(collection)

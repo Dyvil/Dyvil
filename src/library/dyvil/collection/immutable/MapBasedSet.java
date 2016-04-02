@@ -54,19 +54,19 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 	}
 
 	@Override
-	public ImmutableSet<E> $plus(E element)
+	public ImmutableSet<E> added(E element)
 	{
 		return new MapBasedSet<>(this.map.$plus(element, true));
 	}
 
 	@Override
-	public ImmutableSet<E> $minus(Object element)
+	public ImmutableSet<E> removed(Object element)
 	{
 		return new MapBasedSet<>(this.map.$minus$at(element));
 	}
 
 	@Override
-	public ImmutableSet<? extends E> $minus$minus(Collection<?> collection)
+	public ImmutableSet<? extends E> difference(Collection<?> collection)
 	{
 		ImmutableMap.Builder<E, Boolean> builder = this.map.immutableBuilder();
 		for (Entry<E, ?> entry : this.map)
@@ -81,7 +81,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 	}
 
 	@Override
-	public ImmutableSet<? extends E> $amp(Collection<? extends E> collection)
+	public ImmutableSet<? extends E> intersection(Collection<? extends E> collection)
 	{
 		ImmutableMap.Builder<E, Boolean> builder = this.map.immutableBuilder();
 		for (Entry<E, ?> entry : this.map)
@@ -96,7 +96,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 	}
 
 	@Override
-	public ImmutableSet<? extends E> $bar(Collection<? extends E> collection)
+	public ImmutableSet<? extends E> union(Collection<? extends E> collection)
 	{
 		ImmutableMap.Builder<E, Boolean> builder = this.map.immutableBuilder();
 		builder.putAll(this.map);
@@ -108,7 +108,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 	}
 
 	@Override
-	public ImmutableSet<? extends E> $up(Collection<? extends E> collection)
+	public ImmutableSet<? extends E> symmetricDifference(Collection<? extends E> collection)
 	{
 		ImmutableMap.Builder<E, Boolean> builder = this.map.immutableBuilder();
 		for (Entry<E, ?> entry : this.map)

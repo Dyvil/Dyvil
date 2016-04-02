@@ -93,45 +93,45 @@ public class PrependList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public ImmutableList<E> $plus(E element)
+	public ImmutableList<E> added(E element)
 	{
-		return new PrependList<>(this.head, this.tail.$plus(element));
+		return new PrependList<>(this.head, this.tail.added(element));
 	}
 	
 	@Override
-	public ImmutableList<? extends E> $plus$plus(Collection<? extends E> collection)
+	public ImmutableList<? extends E> union(Collection<? extends E> collection)
 	{
-		return new PrependList<>(this.head, (ImmutableList<E>) this.tail.$plus$plus(collection));
+		return new PrependList<>(this.head, (ImmutableList<E>) this.tail.union(collection));
 	}
 	
 	@Override
-	public ImmutableList<E> $minus(Object element)
+	public ImmutableList<E> removed(Object element)
 	{
 		if (Objects.equals(element, this.head))
 		{
-			return this.tail.$minus(element);
+			return this.tail.removed(element);
 		}
-		return new PrependList<>(this.head, this.tail.$minus(element));
+		return new PrependList<>(this.head, this.tail.removed(element));
 	}
 	
 	@Override
-	public ImmutableList<? extends E> $minus$minus(Collection<?> collection)
+	public ImmutableList<? extends E> difference(Collection<?> collection)
 	{
 		if (collection.contains(this.head))
 		{
-			return this.tail.$minus$minus(collection);
+			return this.tail.difference(collection);
 		}
-		return new PrependList<>(this.head, (ImmutableList<E>) this.tail.$minus$minus(collection));
+		return new PrependList<>(this.head, (ImmutableList<E>) this.tail.difference(collection));
 	}
 	
 	@Override
-	public ImmutableList<? extends E> $amp(Collection<? extends E> collection)
+	public ImmutableList<? extends E> intersection(Collection<? extends E> collection)
 	{
 		if (!collection.contains(this.head))
 		{
-			return this.tail.$amp(collection);
+			return this.tail.intersection(collection);
 		}
-		return new PrependList<>(this.head, (ImmutableList<E>) this.tail.$amp(collection));
+		return new PrependList<>(this.head, (ImmutableList<E>) this.tail.intersection(collection));
 	}
 	
 	@Override

@@ -39,19 +39,19 @@ public interface MutableCollection<E> extends Collection<E>
 	// Non-mutating Operations
 	
 	@Override
-	MutableCollection<E> $plus(E element);
+	MutableCollection<E> added(E element);
 	
 	@Override
-	MutableCollection<? extends E> $plus$plus(Collection<? extends E> collection);
+	MutableCollection<? extends E> union(Collection<? extends E> collection);
 	
 	@Override
-	MutableCollection<E> $minus(Object element);
+	MutableCollection<E> removed(Object element);
 	
 	@Override
-	MutableCollection<? extends E> $minus$minus(Collection<?> collection);
+	MutableCollection<? extends E> difference(Collection<?> collection);
 	
 	@Override
-	MutableCollection<? extends E> $amp(Collection<? extends E> collection);
+	MutableCollection<? extends E> intersection(Collection<? extends E> collection);
 	
 	@Override
 	<R> MutableCollection<R> mapped(Function<? super E, ? extends R> mapper);

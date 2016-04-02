@@ -14,6 +14,12 @@ infix	operator -:		{ associativity none,	precedence 1200 }
 // Import all classes from the dyvil.collection package
 import	dyvil.collection._
 
+using	dyvil.collection.{
+	CollectionOperators._
+	ListOperators._
+	SetOperators._
+}
+
 // Lists
 import	dyvil.collection.immutable.ArrayList		=> ImmutableArrayList
 

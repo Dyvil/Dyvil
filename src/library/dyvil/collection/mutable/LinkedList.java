@@ -344,7 +344,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	}
 
 	@Override
-	public void $plus$eq(E element)
+	public void addElement(E element)
 	{
 		this.addLast(element);
 	}
@@ -495,12 +495,12 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	}
 
 	@Override
-	public boolean removeFirst(Object o)
+	public boolean removeFirst(Object element)
 	{
 		Node<E> node = this.first;
 		for (; node != null; node = node.next)
 		{
-			if (Objects.equals(node.item, o))
+			if (Objects.equals(node.item, element))
 			{
 				this.unlink(node);
 				return true;
@@ -510,12 +510,12 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	}
 
 	@Override
-	public boolean removeLast(Object o)
+	public boolean removeLast(Object element)
 	{
 		Node<E> node = this.last;
 		for (; node != null; node = node.prev)
 		{
-			if (Objects.equals(node.item, o))
+			if (Objects.equals(node.item, element))
 			{
 				this.unlink(node);
 				return true;

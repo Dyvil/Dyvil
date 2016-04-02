@@ -129,7 +129,7 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public ImmutableSet<E> $plus(E element)
+	public ImmutableSet<E> added(E element)
 	{
 		if (this.contains(element))
 		{
@@ -143,7 +143,7 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public ImmutableSet<E> $minus(Object element)
+	public ImmutableSet<E> removed(Object element)
 	{
 		Object[] newArray = new Object[this.size];
 		int index = 0;
@@ -159,7 +159,7 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> $minus$minus(Collection<?> collection)
+	public ImmutableSet<? extends E> difference(Collection<?> collection)
 	{
 		Object[] newArray = new Object[this.size];
 		int index = 0;
@@ -175,7 +175,7 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> $amp(Collection<? extends E> collection)
+	public ImmutableSet<? extends E> intersection(Collection<? extends E> collection)
 	{
 		Object[] newArray = new Object[Math.min(this.size, collection.size())];
 		int index = 0;
@@ -191,7 +191,7 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> $bar(Collection<? extends E> collection)
+	public ImmutableSet<? extends E> union(Collection<? extends E> collection)
 	{
 		int size = this.size;
 		Object[] newArray = new Object[size + collection.size()];
@@ -207,7 +207,7 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> $up(Collection<? extends E> collection)
+	public ImmutableSet<? extends E> symmetricDifference(Collection<? extends E> collection)
 	{
 		Object[] newArray = new Object[this.size + collection.size()];
 		int index = 0;

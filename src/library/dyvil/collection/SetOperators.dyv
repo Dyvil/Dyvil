@@ -1,0 +1,74 @@
+package dyvil.collection
+
+import dyvil.util.ImmutableException
+
+public class SetOperators
+{
+	// Set Operators
+
+	public infix inline func +[T](Set[T] set, T element): Set[T] = set.added(element)
+
+	public infix inline func ++[T](Set[T] set, Set[_ <: T] elements): Set[T] = set.union(elements)
+
+	public infix inline func -[T](Set[T] set, any element): Set[T] = set.removed(element)
+
+	public infix inline func --[T](Set[T] set, Set[_] elements): Set[T] = set.difference(elements)
+
+	public infix inline func &[T](Set[T] set, Collection[_ <: T] elements): Set[T] = set.intersection(elements)
+
+	public infix inline func |[T](Set[T] set, Collection[_ <: T] elements): Set[T] = set.union(elements)
+
+	public infix inline func ^[T](Set[T] set, Collection[_ <: T] elements): Set[T] = set.symmetricDifference(elements)
+
+	// Mutable Set Operators
+
+	public infix inline func +[T](MutableSet[T] set, T element): MutableSet[T] = set.added(element)
+
+	public infix inline func ++[T](MutableSet[T] set, MutableSet[_ <: T] elements): MutableSet[T] = set.union(elements)
+
+	public infix inline func -[T](MutableSet[T] set, any element): MutableSet[T] = set.removed(element)
+
+	public infix inline func --[T](MutableSet[T] set, MutableSet[_] elements): MutableSet[T] = set.difference(elements)
+
+	public infix inline func &[T](MutableSet[T] set, Collection[_ <: T] elements): MutableSet[T] = set.intersection(elements)
+
+	public infix inline func |[T](MutableSet[T] set, Collection[_ <: T] elements): MutableSet[T] = set.union(elements)
+
+	public infix inline func ^[T](MutableSet[T] set, Collection[_ <: T] elements): MutableSet[T] = set.symmetricDifference(elements)
+
+	// Immutable Set Operators
+
+	public infix inline func +[T](ImmutableSet[T] set, T element): ImmutableSet[T] = set.added(element)
+
+	public infix inline func ++[T](ImmutableSet[T] set, ImmutableSet[_ <: T] elements): ImmutableSet[T] = set.union(elements)
+
+	public infix inline func -[T](ImmutableSet[T] set, any element): ImmutableSet[T] = set.removed(element)
+
+	public infix inline func --[T](ImmutableSet[T] set, ImmutableSet[_] elements): ImmutableSet[T] = set.difference(elements)
+
+	public infix inline func &[T](ImmutableSet[T] set, Collection[_ <: T] elements): ImmutableSet[T] = set.intersection(elements)
+
+	public infix inline func |[T](ImmutableSet[T] set, Collection[_ <: T] elements): ImmutableSet[T] = set.union(elements)
+
+	public infix inline func ^[T](ImmutableSet[T] set, Collection[_ <: T] elements): ImmutableSet[T] = set.symmetricDifference(elements)
+
+	// Mutating Operators
+
+	public infix inline func &=[T](Set[T] set, Collection[_ <: T] elements): void = set.retainAll(elements)
+
+	public infix inline func |=[T](Set[T] set, Collection[_ <: T] elements): void = set.union(elements)
+
+	public infix inline func ^=[T](Set[T] set, Collection[_ <: T] elements): void = set.symmetricDifferenceInplace(elements)
+
+	@Mutating
+	public infix inline func &=[T](ImmutableSet[T] set, Collection[_ <: T] elements): void
+		= throw new ImmutableException("&= on Immutable Set")
+
+	@Mutating
+	public infix inline func |=[T](ImmutableSet[T] set, Collection[_ <: T] elements): void
+		= throw new ImmutableException("|= on Immutable Set")
+
+	@Mutating
+	public infix inline func ^=[T](ImmutableSet[T] set, Collection[_ <: T] elements): void
+		= throw new ImmutableException("^= on Immutable Set")
+}

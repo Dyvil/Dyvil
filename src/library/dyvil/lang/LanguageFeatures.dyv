@@ -22,7 +22,7 @@ public final class LanguageFeatures
 	// Lists
 
 	@Deprecated
-	public infix inline func ::[E](ImmutableList[E] list, E element): ImmutableList[E] = list + element
+	public infix inline func ::[E](ImmutableList[E] list, E element): ImmutableList[E] = list.added(element)
 
 	@Deprecated
 	public infix inline func ::[E](E element1, E element2): ImmutableList[E] = ImmutableList(element1, element2)

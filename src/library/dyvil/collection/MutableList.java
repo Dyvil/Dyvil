@@ -78,15 +78,15 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	}
 	
 	@Override
-	default MutableList<E> $plus(E element)
+	default MutableList<E> added(E element)
 	{
 		MutableList<E> copy = this.copy();
-		copy.$plus$eq(element);
+		copy.addElement(element);
 		return copy;
 	}
 	
 	@Override
-	default MutableList<E> $minus(Object element)
+	default MutableList<E> removed(Object element)
 	{
 		MutableList<E> copy = this.emptyCopy();
 		if (element == null)
@@ -113,7 +113,7 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	}
 	
 	@Override
-	default MutableList<? extends E> $minus$minus(Collection<?> collection)
+	default MutableList<? extends E> difference(Collection<?> collection)
 	{
 		MutableList<E> copy = this.emptyCopy();
 		for (E e : this)
@@ -127,15 +127,15 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	}
 	
 	@Override
-	default MutableList<? extends E> $plus$plus(Collection<? extends E> collection)
+	default MutableList<? extends E> union(Collection<? extends E> collection)
 	{
 		MutableList<E> copy = this.copy(this.size() + collection.size());
-		copy.$plus$plus$eq(collection);
+		copy.addAll(collection);
 		return copy;
 	}
 	
 	@Override
-	default MutableList<? extends E> $amp(Collection<? extends E> collection)
+	default MutableList<? extends E> intersection(Collection<? extends E> collection)
 	{
 		MutableList<E> copy = this.emptyCopy(Math.min(this.size(), collection.size()));
 		for (E e : this)
@@ -232,7 +232,7 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	// Mutating Operations
 	
 	@Override
-	void $plus$eq(E element);
+	void addElement(E element);
 
 	@Override
 	E set(int index, E element);
@@ -247,7 +247,7 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	default boolean add(E element)
 	{
 		// Duplicate override because of conflicting default methods
-		this.$plus$eq(element);
+		this.addElement(element);
 		return true;
 	}
 	

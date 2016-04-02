@@ -128,7 +128,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 	}
 	
 	@Override
-	public ImmutableList<E> $plus(E element)
+	public ImmutableList<E> added(E element)
 	{
 		Object[] array = new Object[this.size + 1];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
@@ -137,7 +137,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 	}
 	
 	@Override
-	public ImmutableList<? extends E> $plus$plus(Collection<? extends E> collection)
+	public ImmutableList<? extends E> union(Collection<? extends E> collection)
 	{
 		int len = collection.size();
 		Object[] array = new Object[this.size + len];
@@ -149,7 +149,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 	}
 	
 	@Override
-	public ImmutableList<E> $minus(Object element)
+	public ImmutableList<E> removed(Object element)
 	{
 		int index = this.indexOf(element);
 		if (index < 0)
@@ -172,7 +172,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 	}
 	
 	@Override
-	public ImmutableList<? extends E> $minus$minus(Collection<?> collection)
+	public ImmutableList<? extends E> difference(Collection<?> collection)
 	{
 		int index = 0;
 		Object[] array = new Object[this.size];
@@ -189,7 +189,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 	}
 	
 	@Override
-	public ImmutableList<? extends E> $amp(Collection<? extends E> collection)
+	public ImmutableList<? extends E> intersection(Collection<? extends E> collection)
 	{
 		int index = 0;
 		Object[] array = new Object[this.size];

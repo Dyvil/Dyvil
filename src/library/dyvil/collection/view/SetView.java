@@ -44,45 +44,39 @@ public class SetView<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public ImmutableSet<E> $plus(E element)
+	public ImmutableSet<E> added(E element)
 	{
-		return new SetView<>(this.set.$plus(element));
+		return new SetView<>(this.set.added(element));
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> $plus$plus(Collection<? extends E> collection)
+	public ImmutableSet<E> removed(Object element)
 	{
-		return new SetView<>(this.set.$plus$plus(collection));
+		return new SetView<>(this.set.removed(element));
+	}
+
+	@Override
+	public ImmutableSet<? extends E> union(Collection<? extends E> collection)
+	{
+		return new SetView<>(this.set.union(collection));
+	}
+
+	@Override
+	public ImmutableSet<? extends E> difference(Collection<?> collection)
+	{
+		return new SetView<>(this.set.difference(collection));
 	}
 	
 	@Override
-	public ImmutableSet<E> $minus(Object element)
+	public ImmutableSet<? extends E> intersection(Collection<? extends E> collection)
 	{
-		return new SetView<>(this.set.$minus(element));
+		return new SetView<>(this.set.intersection(collection));
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> $minus$minus(Collection<?> collection)
+	public ImmutableSet<? extends E> symmetricDifference(Collection<? extends E> collection)
 	{
-		return new SetView<>(this.set.$minus$minus(collection));
-	}
-	
-	@Override
-	public ImmutableSet<? extends E> $amp(Collection<? extends E> collection)
-	{
-		return new SetView<>(this.set.$amp(collection));
-	}
-	
-	@Override
-	public ImmutableSet<? extends E> $bar(Collection<? extends E> collection)
-	{
-		return new SetView<>(this.set.$bar(collection));
-	}
-	
-	@Override
-	public ImmutableSet<? extends E> $up(Collection<? extends E> collection)
-	{
-		return new SetView<>(this.set.$up(collection));
+		return new SetView<>(this.set.symmetricDifference(collection));
 	}
 	
 	@Override

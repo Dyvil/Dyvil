@@ -136,19 +136,19 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public ImmutableList<E> $plus(E element)
+	public ImmutableList<E> added(E element)
 	{
 		return ImmutableList.apply(this.element, element);
 	}
 	
 	@Override
-	public ImmutableList<? extends E> $plus$plus(Collection<? extends E> collection)
+	public ImmutableList<? extends E> union(Collection<? extends E> collection)
 	{
 		return new PrependList<>(this.element, (ImmutableList<E>) ImmutableList.linked(collection));
 	}
 	
 	@Override
-	public ImmutableList<E> $minus(Object element)
+	public ImmutableList<E> removed(Object element)
 	{
 		if (Objects.equals(this.element, element))
 		{
@@ -158,7 +158,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public ImmutableList<? extends E> $minus$minus(Collection<?> collection)
+	public ImmutableList<? extends E> difference(Collection<?> collection)
 	{
 		if (collection.contains(this.element))
 		{
@@ -168,7 +168,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public ImmutableList<? extends E> $amp(Collection<? extends E> collection)
+	public ImmutableList<? extends E> intersection(Collection<? extends E> collection)
 	{
 		if (!collection.contains(this.element))
 		{

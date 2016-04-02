@@ -102,33 +102,33 @@ public class ListView<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public ImmutableList<E> $plus(E element)
+	public ImmutableList<E> added(E element)
 	{
-		return new ListView<>(this.list.$plus(element));
+		return new ListView<>(this.list.added(element));
 	}
 	
 	@Override
-	public ImmutableList<? extends E> $plus$plus(Collection<? extends E> collection)
+	public ImmutableList<? extends E> union(Collection<? extends E> collection)
 	{
-		return new ListView<>(this.list.$plus$plus(collection));
+		return new ListView<>(this.list.union(collection));
 	}
 	
 	@Override
-	public ImmutableList<E> $minus(Object element)
+	public ImmutableList<E> removed(Object element)
 	{
-		return new ListView<>(this.list.$minus(element));
+		return new ListView<>(this.list.removed(element));
 	}
 	
 	@Override
-	public ImmutableList<? extends E> $minus$minus(Collection<?> collection)
+	public ImmutableList<? extends E> difference(Collection<?> collection)
 	{
-		return new ListView<>(this.list.$minus$minus(collection));
+		return new ListView<>(this.list.difference(collection));
 	}
 	
 	@Override
-	public ImmutableList<? extends E> $amp(Collection<? extends E> collection)
+	public ImmutableList<? extends E> intersection(Collection<? extends E> collection)
 	{
-		return new ListView<>(this.list.$amp(collection));
+		return new ListView<>(this.list.intersection(collection));
 	}
 	
 	@Override

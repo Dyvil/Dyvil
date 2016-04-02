@@ -52,19 +52,19 @@ public interface ImmutableCollection<@Covariant E> extends Collection<E>
 	// Non-mutating Operations
 	
 	@Override
-	ImmutableCollection<E> $plus(E element);
+	ImmutableCollection<E> added(E element);
 	
 	@Override
-	ImmutableCollection<? extends E> $plus$plus(Collection<? extends E> collection);
+	ImmutableCollection<? extends E> union(Collection<? extends E> collection);
 	
 	@Override
-	ImmutableCollection<E> $minus(Object element);
+	ImmutableCollection<E> removed(Object element);
 	
 	@Override
-	ImmutableCollection<? extends E> $minus$minus(Collection<?> collection);
+	ImmutableCollection<? extends E> difference(Collection<?> collection);
 	
 	@Override
-	ImmutableCollection<? extends E> $amp(Collection<? extends E> collection);
+	ImmutableCollection<? extends E> intersection(Collection<? extends E> collection);
 	
 	@Override
 	<R> ImmutableCollection<R> mapped(Function<? super E, ? extends R> mapper);
@@ -83,45 +83,6 @@ public interface ImmutableCollection<@Covariant E> extends Collection<E>
 	{
 		throw new ImmutableException("clear() on Immutable Collection");
 	}
-	
-	@Override
-	@Mutating
-	default void $plus$eq(E entry)
-	{
-		throw new ImmutableException("+= on Immutable Collection");
-	}
-	
-	@Override
-	@Mutating
-	default void $plus$plus$eq(Collection<? extends E> collection)
-	{
-		throw new ImmutableException("++= on Immutable Collection");
-	}
-	
-	// Mutating Operations
-	
-	@Override
-	@Mutating
-	default void $minus$eq(Object entry)
-	{
-		throw new ImmutableException("-= on Immutable Collection");
-	}
-	
-	@Override
-	@Mutating
-	default void $minus$minus$eq(Collection<?> collection)
-	{
-		throw new ImmutableException("--= on Immutable Collection");
-	}
-	
-	@Override
-	@Mutating
-	default void $amp$eq(Collection<? extends E> collection)
-	{
-		throw new ImmutableException("&= on Immutable Collection");
-	}
-	
-	// Mutating Operations
 	
 	@Override
 	@Mutating
@@ -150,7 +111,7 @@ public interface ImmutableCollection<@Covariant E> extends Collection<E>
 	}
 	
 	@Override
-	default boolean intersect(Collection<? extends E> collection)
+	default boolean retainAll(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("intersect() on Immutable Collection");
 	}
