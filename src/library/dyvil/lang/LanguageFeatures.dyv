@@ -3,6 +3,7 @@ package dyvil.lang
 import	java.io.PrintStream
 import	dyvilx.lang.model.`type`.Type
 import	dyvil.annotation.Reified
+import	dyvil.util.AutoPrinter
 using	dyvil.reflect.Opcodes._
 
 /**
@@ -52,6 +53,8 @@ public final class LanguageFeatures
 		stream.print(value)
 		return stream
 	}
+
+	public static inline func println(AutoPrinter.() => void closure): void = closure(new AutoPrinter)
 
 	// Timing
 
