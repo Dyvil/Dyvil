@@ -123,7 +123,13 @@ public abstract class Member implements IMember
 	{
 		return this.modifiers;
 	}
-	
+
+	@Override
+	public boolean hasModifier(int mod)
+	{
+		return this.modifiers != null && this.modifiers.hasIntModifier(mod);
+	}
+
 	@Override
 	public int getAccessLevel()
 	{

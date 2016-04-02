@@ -8,11 +8,7 @@ public interface IModified
 	
 	default boolean hasModifier(int mod)
 	{
-		ModifierSet modifierSet = this.getModifiers();
-		if (modifierSet == null)
-		{
-			return mod == 0;
-		}
-		return modifierSet.hasIntModifier(mod);
+		final ModifierSet modifiers = this.getModifiers();
+		return modifiers != null && modifiers.hasIntModifier(mod);
 	}
 }

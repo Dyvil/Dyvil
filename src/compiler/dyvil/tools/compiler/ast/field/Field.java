@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.field;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.FieldVisitor;
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.access.FieldAssignment;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
@@ -23,6 +24,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Deprecation;
@@ -393,7 +395,7 @@ public class Field extends Member implements IField
 		}
 	}
 
-	private boolean hasFinalValue()
+	private boolean hasConstantValue()
 	{
 		return this.hasModifier(Modifiers.FINAL) && this.value.isConstant();
 	}
@@ -404,7 +406,7 @@ public class Field extends Member implements IField
 		final int modifiers = this.modifiers.toFlags() & ModifierUtil.JAVA_MODIFIER_MASK;
 
 		final Object value;
-		if (this.value != null && this.hasModifier(Modifiers.STATIC) && this.hasFinalValue())
+		if (this.value != null && this.hasModifier(Modifiers.STATIC) && this.hasConstantValue())
 		{
 			value = this.value.toObject();
 		}
@@ -413,8 +415,10 @@ public class Field extends Member implements IField
 			value = null;
 		}
 
-		final FieldVisitor fieldVisitor = writer.visitField(modifiers, this.name.qualified, this.getDescriptor(),
-		                                                    this.getSignature(), value);
+		final String descriptor = this.getDescriptor();
+		final String name = this.name.qualified;
+
+		final FieldVisitor fieldVisitor = writer.visitField(modifiers, name, descriptor, this.getSignature(), value);
 
 		IField.writeAnnotations(fieldVisitor, this.modifiers, this.annotations, this.type);
 		fieldVisitor.visitEnd();
@@ -423,17 +427,85 @@ public class Field extends Member implements IField
 		{
 			this.property.write(writer);
 		}
+
+		if (!this.hasModifier(Modifiers.LAZY))
+		{
+			return;
+		}
+
+		final String lazyName = name + "$lazy";
+		final String ownerClass = this.enclosingClass.getInternalName();
+		final boolean isStatic = (modifiers & Modifiers.STATIC) != 0;
+
+		writer
+			.visitField(isStatic ? Modifiers.PRIVATE | Modifiers.STATIC : Modifiers.PRIVATE, lazyName, "Z", null, null);
+
+		final MethodWriter access = new MethodWriterImpl(writer, writer.visitMethod(modifiers, lazyName,
+		                                                                            "()" + descriptor, null, null));
+		access.visitCode();
+
+		// Get the $lazy flag
+		int getOpcode;
+		if (!isStatic)
+		{
+			access.setLocalType(0, ownerClass);
+			access.visitVarInsn(Opcodes.ALOAD, 0);
+			access.visitFieldInsn(getOpcode = Opcodes.GETFIELD, ownerClass, lazyName, "Z");
+		}
+		else
+		{
+			access.visitFieldInsn(getOpcode = Opcodes.GETSTATIC, ownerClass, lazyName, "Z");
+		}
+
+		Label label = new Label();
+		final int returnOpcode = this.type.getReturnOpcode();
+		access.visitJumpInsn(Opcodes.IFEQ, label);                      // if (this.fieldName$lazy) {
+
+		if (!isStatic)
+		{
+			access.visitVarInsn(Opcodes.ALOAD, 0);
+		}
+
+		access.visitFieldInsn(getOpcode, ownerClass, name, descriptor); //     this.fieldName ->
+		access.visitInsn(returnOpcode);                                 //     return
+		access.visitTargetLabel(label);                                 // }
+
+		// this.fieldName$lazy = true
+		// return this.fieldName = value
+
+		if (!isStatic)
+		{
+			access.visitVarInsn(Opcodes.ALOAD, 0);
+			access.visitInsn(Opcodes.DUP);
+			access.visitLdcInsn(1);
+			access.visitFieldInsn(Opcodes.PUTFIELD, ownerClass, lazyName, "Z");
+
+			this.value.writeExpression(access, this.type);
+			access.visitInsn(Opcodes.AUTO_DUP_X1);
+			access.visitFieldInsn(Opcodes.PUTFIELD, ownerClass, name, descriptor);
+		}
+		else
+		{
+			access.visitLdcInsn(1);
+			access.visitFieldInsn(Opcodes.PUTSTATIC, ownerClass, lazyName, "Z");
+
+			this.value.writeExpression(access, this.type);
+			access.visitInsn(Opcodes.AUTO_DUP);
+			access.visitFieldInsn(Opcodes.PUTSTATIC, ownerClass, name, descriptor);
+		}
+		access.visitInsn(returnOpcode);
+		access.visitEnd();
 	}
 
 	@Override
 	public void writeClassInit(MethodWriter writer) throws BytecodeException
 	{
-		if (this.modifiers.hasIntModifier(Modifiers.STATIC))
+		if (this.hasModifier(Modifiers.STATIC))
 		{
 			return;
 		}
 
-		if (this.value != null)
+		if (this.value != null && !this.hasModifier(Modifiers.LAZY))
 		{
 			writer.visitVarInsn(Opcodes.ALOAD, 0);
 			this.value.writeExpression(writer, this.type);
@@ -450,12 +522,12 @@ public class Field extends Member implements IField
 	@Override
 	public void writeStaticInit(MethodWriter writer) throws BytecodeException
 	{
-		if (!this.modifiers.hasIntModifier(Modifiers.STATIC))
+		if (!this.hasModifier(Modifiers.STATIC))
 		{
 			return;
 		}
 
-		if (this.value != null && !this.hasFinalValue())
+		if (this.value != null && !this.hasConstantValue() && !this.hasModifier(Modifiers.LAZY))
 		{
 			this.value.writeExpression(writer, this.type);
 			writer.visitFieldInsn(Opcodes.PUTSTATIC, this.enclosingClass.getInternalName(), this.name.qualified,
@@ -473,15 +545,24 @@ public class Field extends Member implements IField
 	{
 		String owner = this.enclosingClass.getInternalName();
 		String name = this.name.qualified;
-		String desc = this.type.getExtendedName();
-		if (this.modifiers.hasIntModifier(Modifiers.STATIC))
+		String desc = this.getDescriptor();
+
+		writer.visitLineNumber(lineNumber);
+		switch (this.modifiers.toFlags() & (Modifiers.STATIC | Modifiers.LAZY))
 		{
-			writer.visitFieldInsn(Opcodes.GETSTATIC, owner, name, desc);
-		}
-		else
-		{
-			writer.visitLineNumber(lineNumber);
+		case 0: // neither static nor lazy
 			writer.visitFieldInsn(Opcodes.GETFIELD, owner, name, desc);
+			return;
+		case Modifiers.STATIC:
+			writer.visitFieldInsn(Opcodes.GETSTATIC, owner, name, desc);
+			return;
+		case Modifiers.LAZY:
+			writer.visitMethodInsn(this.hasModifier(Modifiers.PRIVATE) ? Opcodes.INVOKESPECIAL : Opcodes.INVOKEVIRTUAL,
+			                       owner, name + "$lazy", "()" + desc, this.enclosingClass.isInterface());
+			return;
+		case Modifiers.STATIC | Modifiers.LAZY: // both static and lazy
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, owner, name + "$lazy", "()" + desc,
+			                       this.enclosingClass.isInterface());
 		}
 	}
 
@@ -490,7 +571,8 @@ public class Field extends Member implements IField
 	{
 		String owner = this.enclosingClass.getInternalName();
 		String name = this.name.qualified;
-		String desc = this.type.getExtendedName();
+		String desc = this.getDescriptor();
+
 		if (this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{
 			writer.visitFieldInsn(Opcodes.PUTSTATIC, owner, name, desc);
