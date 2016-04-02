@@ -148,7 +148,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $plus(K key, V value)
+	public ImmutableMap<K, V> withEntry(K key, V value)
 	{
 		TupleMap<K, V> copy = new TupleMap<>(this);
 		copy.putInternal(new Tuple2<>(key, value));
@@ -156,7 +156,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map)
+	public ImmutableMap<K, V> union(Map<? extends K, ? extends V> map)
 	{
 		TupleMap<K, V> copy = new TupleMap<>(this);
 		for (Entry<? extends K, ? extends V> entry : map)
@@ -167,7 +167,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$at(Object key)
+	public ImmutableMap<K, V> keyRemoved(Object key)
 	{
 		Tuple2<K, V>[] entries = (Tuple2<K, V>[]) new Tuple2[this.size];
 		
@@ -186,7 +186,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(Object key, Object value)
+	public ImmutableMap<K, V> removed(Object key, Object value)
 	{
 		Tuple2<K, V>[] entries = (Tuple2<K, V>[]) new Tuple2[this.size];
 		
@@ -205,7 +205,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$colon(Object value)
+	public ImmutableMap<K, V> valueRemoved(Object value)
 	{
 		Tuple2<K, V>[] entries = (Tuple2<K, V>[]) new Tuple2[this.size];
 		
@@ -224,7 +224,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Map<?, ?> map)
+	public ImmutableMap<K, V> difference(Map<?, ?> map)
 	{
 		Tuple2<K, V>[] entries = (Tuple2<K, V>[]) new Tuple2[this.size];
 		
@@ -243,7 +243,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Collection<?> keys)
+	public ImmutableMap<K, V> keyDifference(Collection<?> keys)
 	{
 		Tuple2<K, V>[] entries = (Tuple2<K, V>[]) new Tuple2[this.size];
 		

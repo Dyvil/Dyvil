@@ -102,7 +102,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $plus(K key, V value)
+	public ImmutableMap<K, V> withEntry(K key, V value)
 	{
 		IdentityHashMap<K, V> map = new IdentityHashMap<>(this);
 		map.ensureCapacity(this.size + 1);
@@ -111,7 +111,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map)
+	public ImmutableMap<K, V> union(Map<? extends K, ? extends V> map)
 	{
 		IdentityHashMap<K, V> copy = new IdentityHashMap<>(this);
 		copy.ensureCapacity(this.size + map.size());
@@ -120,7 +120,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$at(Object key)
+	public ImmutableMap<K, V> keyRemoved(Object key)
 	{
 		IdentityHashMap<K, V> copy = new IdentityHashMap<>(this.size);
 		for (Entry<K, V> entry : this)
@@ -135,7 +135,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(Object key, Object value)
+	public ImmutableMap<K, V> removed(Object key, Object value)
 	{
 		IdentityHashMap<K, V> copy = new IdentityHashMap<>(this.size);
 		for (Entry<K, V> entry : this)
@@ -151,7 +151,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$colon(Object value)
+	public ImmutableMap<K, V> valueRemoved(Object value)
 	{
 		IdentityHashMap<K, V> copy = new IdentityHashMap<>(this.size);
 		for (Entry<K, V> entry : this)
@@ -166,7 +166,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Map<?, ?> map)
+	public ImmutableMap<K, V> difference(Map<?, ?> map)
 	{
 		IdentityHashMap<K, V> copy = new IdentityHashMap<>(this.size);
 		for (Entry<K, V> entry : this)
@@ -182,7 +182,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Collection<?> keys)
+	public ImmutableMap<K, V> keyDifference(Collection<?> keys)
 	{
 		IdentityHashMap<K, V> copy = new IdentityHashMap<>(this.size);
 		for (Entry<K, V> entry : this)

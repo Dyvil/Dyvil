@@ -56,13 +56,13 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 	@Override
 	public ImmutableSet<E> added(E element)
 	{
-		return new MapBasedSet<>(this.map.$plus(element, true));
+		return new MapBasedSet<>(this.map.withEntry(element, true));
 	}
 
 	@Override
 	public ImmutableSet<E> removed(Object element)
 	{
-		return new MapBasedSet<>(this.map.$minus$at(element));
+		return new MapBasedSet<>(this.map.keyRemoved(element));
 	}
 
 	@Override

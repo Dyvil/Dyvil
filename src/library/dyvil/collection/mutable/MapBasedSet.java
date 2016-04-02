@@ -27,19 +27,19 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 	@Override
 	public MutableSet<E> added(E element)
 	{
-		return new MapBasedSet<>(this.map.$plus(element, true));
+		return new MapBasedSet<>(this.map.withEntry(element, true));
 	}
 
 	@Override
 	public MutableSet<E> removed(Object element)
 	{
-		return new MapBasedSet<>(this.map.$minus$at(element));
+		return new MapBasedSet<>(this.map.keyRemoved(element));
 	}
 
 	@Override
 	public MutableSet<? extends E> difference(Collection<?> collection)
 	{
-		return new MapBasedSet<>(this.map.$minus$minus(collection));
+		return new MapBasedSet<>(this.map.keyDifference(collection));
 	}
 
 	@Override

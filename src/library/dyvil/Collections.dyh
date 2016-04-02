@@ -19,6 +19,7 @@ using	dyvil.collection.{
 	CollectionOperators._
 	ListOperators._
 	SetOperators._
+	MapOperators._
 }
 
 // Collection Type Aliases
