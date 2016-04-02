@@ -1,5 +1,7 @@
 package dyvil.test
 
+infix operator <<< { 120 }
+
 public class TypeTest
 {
 	case class MyList[T](T... elements)
@@ -16,7 +18,7 @@ public class TypeTest
 		}
 	}
 
-	infix func <<<[T, C <: Collection[T]](C collection, T element) = collection + element
+	infix func <<<[T, C <: Collection[T]](C collection, T element) = collection.added(element)
 
 	static func voidTest[T](T value) = "\(value)" // will error if CovariantTypeVarType.isSameType(Types.VOID) returns true
 
