@@ -597,60 +597,38 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 	private boolean checkCall(IValue receiver, IArguments arguments, IParametric parametric)
 	{
-		boolean hasReceiver = false;
-
-		if (receiver != null)
+		final int params = this.parameterCount;
+		if (receiver == null)
 		{
-			if (this.parameterCount <= 0)
+			if (arguments.size() != params)
 			{
 				return false;
 			}
 
-			if (isFieldAccess(receiver, this.parameters[0]))
+			for (int i = 0; i < params; i++)
 			{
-				if (arguments.size() != this.parameterCount - 1)
+				final IValue argument = arguments.getValue(i, parametric.getParameter(i));
+				if (!isFieldAccess(argument, this.parameters[i]))
 				{
 					return false;
 				}
-
-				for (int i = 1; i < this.parameterCount; i++)
-				{
-					final IValue argument = arguments.getValue(i - 1, parametric.getParameter(i - 1));
-					if (!isFieldAccess(argument, this.parameters[i]))
-					{
-						return false;
-					}
-				}
-
-				this.value = null;
-				return true;
 			}
 
-			hasReceiver = true;
+			return true;
 		}
 
-		if (arguments.size() != this.parameterCount)
+		if (params <= 0 || arguments.size() != params - 1 || !isFieldAccess(receiver, this.parameters[0]))
 		{
 			return false;
 		}
 
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 1; i < params; i++)
 		{
-			final IValue argument = arguments.getValue(i, parametric.getParameter(i));
+			final IValue argument = arguments.getValue(i - 1, parametric.getParameter(i - 1));
 			if (!isFieldAccess(argument, this.parameters[i]))
 			{
 				return false;
 			}
-		}
-
-		if (hasReceiver)
-		{
-			this.value = receiver;
-			this.captureHelper.setThisClass(receiver.getType().getTheClass());
-		}
-		else
-		{
-			this.value = null;
 		}
 
 		return true;
@@ -681,11 +659,6 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		}
 		else
 		{
-			if (this.value != null)
-			{
-				this.value.writeExpression(writer, this.returnType);
-			}
-
 			handleType = this.directInvokeOpcode;
 		}
 

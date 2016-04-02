@@ -10,6 +10,7 @@ import dyvil.collection.range.Rangeable;
 import dyvil.ref.ObjectRef;
 import dyvil.ref.array.ObjectArrayRef;
 import dyvil.reflect.Modifiers;
+import dyvil.runtime.Wrapper;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -249,7 +250,7 @@ public interface ObjectArray
 	static <T, @Reified(erasure = true) U> U[] mapped(T[] array, Function<T, U> mapper, Class<U> type)
 	{
 		int len = array.length;
-		U[] res = (U[]) Array.newInstance(type, len);
+		U[] res = (U[]) Array.newInstance(type.isPrimitive() ? Wrapper.forPrimitiveType(type).wrapperType() : type, len);
 		for (int i = 0; i < len; i++)
 		{
 			res[i] = mapper.apply(array[i]);
@@ -261,6 +262,7 @@ public interface ObjectArray
 	static <T, @Reified(erasure = true) U> U[] flatMapped(T[] array, Function<T, U[]> mapper, Class<U> type)
 	{
 		int size = 0;
+		final Class classType = type.isPrimitive() ? Wrapper.forPrimitiveType(type).wrapperType() : type;
 		U[] res = (U[]) EMPTY;
 		
 		for (T v : array)
@@ -269,7 +271,7 @@ public interface ObjectArray
 			int alen = a.length;
 			if (size + alen >= res.length)
 			{
-				U[] newRes = (U[]) Array.newInstance(type, size + alen);
+				U[] newRes = (U[]) Array.newInstance(classType, size + alen);
 				System.arraycopy(res, 0, newRes, 0, res.length);
 				res = newRes;
 			}
