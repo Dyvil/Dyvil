@@ -23,28 +23,28 @@ import dyvil.tools.parsing.marker.MarkerList;
 public final class CaseClassMetadata extends ClassMetadata
 {
 	protected IMethod applyMethod;
-	
+
 	public CaseClassMetadata(IClass iclass)
 	{
 		super(iclass);
 	}
-	
+
 	@Override
 	public void resolveTypesHeader(MarkerList markers, IContext context)
 	{
 		super.resolveTypesHeader(markers, context);
-		
+
 		if (!this.theClass.isSubClassOf(Types.SERIALIZABLE))
 		{
 			this.theClass.addInterface(Types.SERIALIZABLE);
 		}
 	}
-	
+
 	@Override
 	public void resolveTypesBody(MarkerList markers, IContext context)
 	{
 		super.resolveTypesBody(markers, context);
-		
+
 		this.checkMethods();
 	}
 
@@ -60,23 +60,28 @@ public final class CaseClassMetadata extends ClassMetadata
 
 		// Generate the apply method signature
 
-		CodeMethod applyMethod = new CodeMethod(this.theClass, Names.apply, this.theClass.getType(),
+		final CodeMethod applyMethod = new CodeMethod(this.theClass, Names.apply, this.theClass.getType(),
 		                                        new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC));
-		IParameter[] parameters = this.theClass.getParameters();
-		int parameterCount = this.theClass.parameterCount();
-
-		applyMethod.setParameters(parameters, parameterCount);
 		applyMethod.setTypeParameters(this.theClass.getTypeParameters(), this.theClass.typeParameterCount());
 
-		if (parameterCount > 0 && parameters[parameterCount - 1].isVarargs())
+		if (this.constructor != null && (this.members & CONSTRUCTOR) == 0)
 		{
-			applyMethod.setVariadic();
+			applyMethod.setParameters(this.constructor.getParameters(), this.constructor.parameterCount());
+
+			if (this.constructor.isVariadic())
+			{
+				applyMethod.setVariadic();
+			}
+		}
+		else
+		{
+			this.copyClassParameters(applyMethod);
 		}
 
 		applyMethod.resolveTypes(markers, context);
 		this.applyMethod = applyMethod;
 	}
-	
+
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
@@ -89,13 +94,13 @@ public final class CaseClassMetadata extends ClassMetadata
 			}
 		}
 	}
-	
+
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		super.write(writer);
 		MethodWriter mw;
-		
+
 		if ((this.members & APPLY) == 0)
 		{
 			mw = new MethodWriterImpl(writer, writer.visitMethod(this.applyMethod.getModifiers().toFlags(), "apply",
@@ -115,7 +120,7 @@ public final class CaseClassMetadata extends ClassMetadata
 			mw.visitInsn(Opcodes.ARETURN);
 			mw.visitEnd(this.theClass.getType());
 		}
-		
+
 		String internal = this.theClass.getInternalName();
 		if ((this.members & EQUALS) == 0)
 		{
@@ -127,18 +132,17 @@ public final class CaseClassMetadata extends ClassMetadata
 			CaseClasses.writeEquals(mw, this.theClass);
 			mw.visitEnd();
 		}
-		
+
 		if ((this.members & HASHCODE) == 0)
 		{
-			mw = new MethodWriterImpl(writer,
-			                          writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "hashCode", "()I",
-			                                             null, null));
+			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "hashCode",
+			                                                     "()I", null, null));
 			mw.setThisType(internal);
 			mw.visitCode();
 			CaseClasses.writeHashCode(mw, this.theClass);
 			mw.visitEnd();
 		}
-		
+
 		if ((this.members & TOSTRING) == 0)
 		{
 			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "toString",
