@@ -84,7 +84,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	 */
 	protected IMethod method;
 
-	protected CaptureHelper captureHelper = new CaptureHelper(CaptureVariable.FACTORY);
+	protected CaptureHelper captureHelper;
 
 	/**
 	 * The enclosing class internal name
@@ -264,6 +264,15 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	private void setHandleType(int handleType)
 	{
 		this.flags = this.flags & ~HANDLE_TYPE_MASK | handleType;
+	}
+
+	private CaptureHelper getCaptureHelper()
+	{
+		if (this.captureHelper != null)
+		{
+			return this.captureHelper;
+		}
+		return this.captureHelper = new CaptureHelper(CaptureVariable.FACTORY);
 	}
 
 	@Override
@@ -451,7 +460,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	@Override
 	public IAccessible getAccessibleThis(IClass type)
 	{
-		this.captureHelper.setThisClass(type);
+		this.getCaptureHelper().setThisClass(type);
 		return VariableThis.DEFAULT;
 	}
 
@@ -476,7 +485,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			return variable;
 		}
 
-		return this.captureHelper.capture(variable);
+		return this.getCaptureHelper().capture(variable);
 	}
 
 	@Override
@@ -511,11 +520,19 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			if (this.parameters[i].getType() == Types.UNKNOWN)
+			final IParameter parameter = this.parameters[i];
+
+			if (parameter.getType() == Types.UNKNOWN)
 			{
+				parameter.setType(null); // avoid missing parameter type error
+				parameter.resolve(markers, context);
+				parameter.setType(Types.UNKNOWN);
+
 				// Resolving the value happens in withType
 				return this;
 			}
+
+			parameter.resolve(markers, context);
 		}
 
 		// All parameter types are known, we can actually resolve the return value now
@@ -533,24 +550,42 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameters[i].checkTypes(markers, context);
+		}
+
 		context = context.push(this);
-
 		this.value.checkTypes(markers, context);
-
 		context = context.pop();
 
-		this.captureHelper.checkCaptures(markers, context);
+		if (this.captureHelper != null)
+		{
+			this.captureHelper.checkCaptures(markers, context);
+		}
 	}
 
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameters[i].check(markers, context);
+		}
+
+		context = context.push(this);
 		this.value.check(markers, context);
+		context.pop();
 	}
 
 	@Override
 	public IValue foldConstants()
 	{
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameters[i].foldConstants();
+		}
+
 		this.value = this.value.foldConstants();
 		return this;
 	}
@@ -558,9 +593,16 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		this.value = this.value.cleanup(context, compilableList);
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameters[i].cleanup(context, compilableList);
+		}
 
-		if (!this.captureHelper.hasCaptures())
+		context = context.push(this);
+		this.value = this.value.cleanup(context, compilableList);
+		context.pop();
+
+		if (this.captureHelper == null || !this.captureHelper.hasCaptures())
 		{
 			if (this.value instanceof AbstractCall)
 			{
@@ -649,16 +691,15 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		int handleType = this.getHandleType();
 		if (handleType == 0)
 		{
-			if (this.captureHelper.isThisCaptured())
+			handleType = ClassFormat.H_INVOKESTATIC;
+			if (this.captureHelper != null)
 			{
-				handleType = ClassFormat.H_INVOKESPECIAL;
+				if (this.captureHelper.isThisCaptured())
+				{
+					handleType = ClassFormat.H_INVOKESPECIAL;
+				}
+				this.captureHelper.writeCaptures(writer);
 			}
-			else
-			{
-				handleType = ClassFormat.H_INVOKESTATIC;
-			}
-
-			this.captureHelper.writeCaptures(writer);
 		}
 
 		final String desc = this.getTargetDescriptor();
@@ -689,8 +730,11 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	{
 		final StringBuilder builder = new StringBuilder().append('(');
 
-		this.captureHelper.appendThisCaptureType(builder);
-		this.captureHelper.appendCaptureTypes(builder);
+		if (this.captureHelper != null)
+		{
+			this.captureHelper.appendThisCaptureType(builder);
+			this.captureHelper.appendCaptureTypes(builder);
+		}
 
 		builder.append(')');
 
@@ -733,7 +777,11 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 		final StringBuilder builder = new StringBuilder().append('(');
 
-		this.captureHelper.appendCaptureTypes(builder);
+		if (this.captureHelper != null)
+		{
+			this.captureHelper.appendCaptureTypes(builder);
+		}
+
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].getType().appendExtendedName(builder);
@@ -754,7 +802,8 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			return;
 		}
 
-		final int modifiers = this.captureHelper.isThisCaptured() ?
+		final boolean thisCaptured = this.captureHelper != null && this.captureHelper.isThisCaptured();
+		final int modifiers = thisCaptured ?
 			                      Modifiers.PRIVATE | Modifiers.SYNTHETIC :
 			                      Modifiers.PRIVATE | Modifiers.STATIC | Modifiers.SYNTHETIC;
 
@@ -763,13 +812,17 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		                                                                                  null, null));
 
 		int index = 0;
-		if (this.captureHelper.isThisCaptured())
-		{
-			methodWriter.setThisType(this.owner);
-			index = 1;
-		}
 
-		this.captureHelper.writeCaptureParameters(methodWriter, index);
+		if (this.captureHelper != null)
+		{
+			if (thisCaptured)
+			{
+				methodWriter.setThisType(this.owner);
+				index = 1;
+			}
+
+			this.captureHelper.writeCaptureParameters(methodWriter, index);
+		}
 
 		for (int i = 0; i < this.parameterCount; i++)
 		{
