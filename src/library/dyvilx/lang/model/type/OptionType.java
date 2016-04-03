@@ -4,29 +4,41 @@ import dyvil.annotation._internal.ClassParameters;
 import dyvil.util.Option;
 
 @ClassParameters(names = { "type" })
-public class OptionType implements Type
+public class OptionType<T> implements Type<Option<T>>
 {
-	protected final Type type;
+	protected final Type<T> type;
 
-	public static OptionType apply(Type type)
+	public static <T> OptionType<T> apply(Type<T> type)
 	{
-		return new OptionType(type);
+		return new OptionType<>(type);
 	}
 
-	public OptionType(Type type)
+	public OptionType(Type<T> type)
 	{
 		this.type = type;
 	}
 
-	public Type type()
+	public Type<T> type()
 	{
 		return this.type;
 	}
 
 	@Override
-	public Class erasure()
+	public Class<Option<T>> erasure()
 	{
-		return Option.class;
+		return (Class<Option<T>>) (Class) Option.class;
+	}
+
+	@Override
+	public int typeArgumentCount()
+	{
+		return 1;
+	}
+
+	@Override
+	public <R> Type<R> typeArgument(int index)
+	{
+		return (Type<R>) (Type) this.type;
 	}
 
 	@Override

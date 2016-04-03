@@ -39,7 +39,17 @@ public interface Type<T>
 	}
 	
 	Class<T> erasure();
-	
+
+	default int typeArgumentCount()
+	{
+		return 0;
+	}
+
+	default <R> Type<R> typeArgument(int index)
+	{
+		return null;
+	}
+
 	String name();
 	
 	String qualifiedName();

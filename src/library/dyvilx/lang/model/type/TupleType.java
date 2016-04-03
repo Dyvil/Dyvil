@@ -5,30 +5,41 @@ import dyvil.lang.literal.TupleConvertible;
 
 @TupleConvertible
 @ClassParameters(names = { "types" })
-public class TupleType implements Type
+public class TupleType<T> implements Type<T>
 {
 	protected final Type<?>[] types;
-	protected final Class<?>  theClass;
+	protected final Class<T>  tupleClass;
 	
-	public static TupleType apply(Type<?>... types)
+	public static <T> TupleType<T> apply(Type<?>... types)
 	{
-		return new TupleType(types);
+		return new TupleType<>(types);
+	}
+
+	public static <T> TupleType<T> apply(Class<T> tupleClass, Type<?>... types)
+	{
+		return new TupleType<>(tupleClass, types);
 	}
 	
 	public TupleType(Type<?>... types)
 	{
 		this.types = types;
 
-		Class<?> theClass;
+		Class<T> theClass;
 		try
 		{
-			theClass = Class.forName(this.qualifiedName());
+			theClass = (Class<T>) Class.forName(this.qualifiedName());
 		}
 		catch (ClassNotFoundException ex)
 		{
 			theClass = null;
 		}
-		this.theClass = theClass;
+		this.tupleClass = theClass;
+	}
+
+	public TupleType(Class<T> tupleClass, Type<?>... types)
+	{
+		this.types = types;
+		this.tupleClass = tupleClass;
 	}
 
 	public Type<?>[] types()
@@ -37,11 +48,26 @@ public class TupleType implements Type
 	}
 	
 	@Override
-	public Class erasure()
+	public Class<T> erasure()
 	{
-		return this.theClass;
+		return this.tupleClass;
 	}
-	
+
+	@Override
+	public int typeArgumentCount()
+	{
+		return this.types.length;
+	}
+
+	@Override
+	public <R> Type<R> typeArgument(int index)
+	{
+		if (index >= this.types.length) {
+			return null;
+		}
+		return (Type<R>) this.types[index];
+	}
+
 	@Override
 	public String name()
 	{
@@ -82,14 +108,13 @@ public class TupleType implements Type
 	@Override
 	public void appendSignature(StringBuilder builder)
 	{
-		builder.append('L').append(this.qualifiedName()).append(';');
+		builder.append("Ldyvil/tuple/Tuple").append(this.types.length).append(';');
 	}
 	
 	@Override
 	public void appendGenericSignature(StringBuilder builder)
 	{
-		builder.append('L').append(this.qualifiedName());
-		builder.append('<');
+		builder.append("Ldyvil/tuple/Tuple").append(this.types.length).append('<');
 		int len = this.types.length;
 		if (len > 0)
 		{

@@ -28,7 +28,19 @@ public class ListType<E> implements Type<List<E>>
 	{
 		return this.elementType;
 	}
-	
+
+	@Override
+	public int typeArgumentCount()
+	{
+		return 0;
+	}
+
+	@Override
+	public <R> Type<R> typeArgument(int index)
+	{
+		return index == 0 ? (Type<R>) this.elementType : null;
+	}
+
 	@Override
 	public String name()
 	{
