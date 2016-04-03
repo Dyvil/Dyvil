@@ -284,7 +284,7 @@ public class OperatorChain implements IValue
 
 		for (int i = 0; i < this.operatorCount; i++)
 		{
-			buffer.append(this.operators[i].name);
+			buffer.append(' ').append(this.operators[i].name).append(' ');
 			this.operands[i + 1].toString(prefix, buffer);
 		}
 	}
