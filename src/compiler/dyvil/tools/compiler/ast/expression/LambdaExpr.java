@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Modifiers;
-import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Handle;
 import dyvil.tools.compiler.ast.access.AbstractCall;
 import dyvil.tools.compiler.ast.access.ConstructorCall;
@@ -51,6 +50,11 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	                                                                                                   "method.type",
 	                                                                                                   "value.type");
 
+	// Flags
+
+	private static final int HANDLE_TYPE_MASK = 0b1111;
+	private static final int VALUE_RESOLVED   = 0b10000;
+
 	protected IParameter[] parameters;
 	protected int          parameterCount;
 
@@ -61,9 +65,9 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	protected ICodePosition position;
 
 	/**
-	 * Marks if the return value has been resolved yet
+	 * Stores various metadata about this Lambda Expression. See Flags constants for possible values
 	 */
-	private boolean valueResolved;
+	private int flags;
 
 	/**
 	 * The instantiated type this lambda expression represents
@@ -95,12 +99,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	/**
 	 * The descriptor of the synthetic lambda method
 	 */
-	private String lambdaDesc;
-
-	/**
-	 * The opcode for direct method reference invocation
-	 */
-	private int directInvokeOpcode;
+	private String descriptor;
 
 	public LambdaExpr(ICodePosition position)
 	{
@@ -252,6 +251,21 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		this.type = type;
 	}
 
+	/**
+	 * Returns the Handle Type for Direct Invocation if this is a Method Pointer, {@code 0} otherwise.
+	 *
+	 * @return the Handle Type for Direct Invocation
+	 */
+	public int getHandleType()
+	{
+		return this.flags & HANDLE_TYPE_MASK;
+	}
+
+	private void setHandleType(int handleType)
+	{
+		this.flags = this.flags & ~HANDLE_TYPE_MASK | handleType;
+	}
+
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
@@ -274,9 +288,10 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 			final IContext combinedContext = context.push(this);
 
-			if (!this.valueResolved)
+			if ((this.flags & VALUE_RESOLVED) == 0)
 			{
 				this.value = this.value.resolve(markers, combinedContext);
+				this.flags |= VALUE_RESOLVED;
 			}
 
 			if (this.returnType == Types.UNKNOWN)
@@ -475,18 +490,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			final IParameter parameter = this.parameters[i];
-			if (parameter.getType() == Types.UNKNOWN)
-			{
-				// Avoid invalid parameter type error
-				parameter.setType(null);
-				parameter.resolveTypes(markers, context);
-				parameter.setType(Types.UNKNOWN);
-			}
-			else
-			{
-				parameter.resolveTypes(markers, context);
-			}
+			this.parameters[i].resolveTypes(markers, context);
 		}
 
 		if (this.value != null)
@@ -520,7 +524,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		this.value = this.value.resolve(markers, context);
 		context.pop();
 
-		this.valueResolved = true;
+		this.flags |= VALUE_RESOLVED;
 		this.returnType = this.value.getType();
 
 		return this;
@@ -565,10 +569,10 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 				if (method != null && this.checkCall(call.getReceiver(), call.getArguments(), method))
 				{
-					this.directInvokeOpcode = ClassFormat.insnToHandle(method.getInvokeOpcode());
+					this.setHandleType(ClassFormat.insnToHandle(method.getInvokeOpcode()));
 					this.name = method.getName().qualified;
 					this.owner = method.getEnclosingClass().getInternalName();
-					this.lambdaDesc = method.getDescriptor();
+					this.descriptor = method.getDescriptor();
 					return this;
 				}
 			}
@@ -580,10 +584,10 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 				if (this.checkCall(null, call.getArguments(), constructor))
 				{
-					this.directInvokeOpcode = ClassFormat.H_NEWINVOKESPECIAL;
+					this.setHandleType(ClassFormat.H_NEWINVOKESPECIAL);
 					this.name = "<init>";
 					this.owner = constructor.getEnclosingClass().getInternalName();
-					this.lambdaDesc = constructor.getDescriptor();
+					this.descriptor = constructor.getDescriptor();
 
 					return this;
 				}
@@ -642,9 +646,8 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		final int handleType;
-
-		if (this.directInvokeOpcode == 0)
+		int handleType = this.getHandleType();
+		if (handleType == 0)
 		{
 			if (this.captureHelper.isThisCaptured())
 			{
@@ -657,19 +660,15 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 			this.captureHelper.writeCaptures(writer);
 		}
-		else
-		{
-			handleType = this.directInvokeOpcode;
-		}
 
-		final String desc = this.getLambdaDescriptor();
+		final String desc = this.getTargetDescriptor();
 		final String invokedName = this.method.getName().qualified;
 		final String invokedType = this.getInvokeDescriptor();
 
 		final dyvil.tools.asm.Type methodDescriptorType = dyvil.tools.asm.Type
 			                                                  .getMethodType(this.method.getDescriptor());
 		final dyvil.tools.asm.Type lambdaDescriptorType = dyvil.tools.asm.Type
-			                                                  .getMethodType(this.getSpecialDescriptor());
+			                                                  .getMethodType(this.getLambdaDescriptor());
 		final Handle handle = new Handle(handleType, this.owner, this.name, desc);
 
 		writer.visitLineNumber(this.getLineNumber());
@@ -701,9 +700,10 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	}
 
 	/**
-	 * @return the specialized method type of the SAM method, as opposed to {@link IMethod#getDescriptor()}.
+	 * @return the specialized descriptor of the lambda callback method, including parameter types and return type, but
+	 * excluding captured variables
 	 */
-	private String getSpecialDescriptor()
+	private String getLambdaDescriptor()
 	{
 		final StringBuilder buffer = new StringBuilder().append('(');
 
@@ -722,40 +722,34 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	 * @return the descriptor of the (synthetic) lambda callback method, including captured variables, parameter types
 	 * and the return type.
 	 */
-	private String getLambdaDescriptor()
+	private String getTargetDescriptor()
 	{
-		if (this.lambdaDesc != null)
+		if (this.descriptor != null)
 		{
-			return this.lambdaDesc;
+			return this.descriptor;
 		}
+
+		assert this.getHandleType() == 0;
 
 		final StringBuilder builder = new StringBuilder().append('(');
 
 		this.captureHelper.appendCaptureTypes(builder);
-		for (int i = this.directInvokeOpcode != 0 && this.directInvokeOpcode != Opcodes.INVOKESTATIC ? 1 : 0;
-		     i < this.parameterCount; i++)
+		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].getType().appendExtendedName(builder);
 		}
 
 		builder.append(')');
 
-		if (this.directInvokeOpcode == ClassFormat.H_NEWINVOKESPECIAL)
-		{
-			builder.append('V');
-		}
-		else
-		{
-			this.returnType.appendExtendedName(builder);
-		}
+		this.returnType.appendExtendedName(builder);
 
-		return this.lambdaDesc = builder.toString();
+		return this.descriptor = builder.toString();
 	}
 
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		if (this.directInvokeOpcode != 0)
+		if (this.getHandleType() != 0)
 		{
 			return;
 		}
@@ -765,7 +759,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			                      Modifiers.PRIVATE | Modifiers.STATIC | Modifiers.SYNTHETIC;
 
 		final MethodWriter methodWriter = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name,
-		                                                                                  this.getLambdaDescriptor(),
+		                                                                                  this.getTargetDescriptor(),
 		                                                                                  null, null));
 
 		int index = 0;
@@ -817,23 +811,10 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 				buffer.append(' ');
 			}
 
-			parameter = this.parameters[0];
-			if (parameter.getType() == Types.UNKNOWN)
-			{
-				buffer.append(parameter.getName());
-				for (int i = 1; i < this.parameterCount; i++)
-				{
-					Formatting.appendSeparator(buffer, "lambda.separator", ',');
-					buffer.append(this.parameters[i].getName());
-				}
-			}
-			else
-			{
-				Util.astToString(prefix, this.parameters, this.parameterCount,
-				                 Formatting.getSeparator("lambda.separator", ','), buffer);
-			}
+			Util.astToString(prefix, this.parameters, this.parameterCount,
+			                 Formatting.getSeparator("lambda.separator", ','), buffer);
 
-			if (Formatting.getBoolean("lambda.close_paren.space-before"))
+			if (Formatting.getBoolean("lambda.close_paren.space_before"))
 			{
 				buffer.append(' ');
 			}

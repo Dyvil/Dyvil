@@ -424,10 +424,11 @@ public abstract class Parameter extends Member implements IParameter
 			if (!typeAscription)
 			{
 				this.appendType(prefix, buffer);
+				buffer.append(' ');
 			}
 		}
 
-		buffer.append(' ').append(this.name);
+		buffer.append(this.name);
 
 		if (typeAscription)
 		{
