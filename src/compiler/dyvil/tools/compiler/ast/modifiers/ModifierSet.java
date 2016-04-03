@@ -27,6 +27,8 @@ public interface ModifierSet extends Iterable<Modifier>
 
 	void addIntModifier(int modifier);
 
+	void removeIntModifier(int modifier);
+
 	void check(MarkerList markers);
 
 	int toFlags();

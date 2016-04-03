@@ -49,15 +49,21 @@ public class FlagModifierSet implements ModifierSet
 	}
 
 	@Override
+	public void addModifier(Modifier modifier)
+	{
+		this.flags |= modifier.intValue();
+	}
+
+	@Override
 	public void addIntModifier(int modifier)
 	{
 		this.flags |= modifier;
 	}
 
 	@Override
-	public void addModifier(Modifier modifier)
+	public void removeIntModifier(int modifier)
 	{
-		this.flags |= modifier.intValue();
+		this.flags &= ~modifier;
 	}
 
 	@Override
