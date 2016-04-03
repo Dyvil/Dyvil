@@ -1,3 +1,161 @@
+Dyvil v0.20.0
+=============
+
+- Apply and Named Method Calls can now define custom Reference Methods, similar to `subscript_&`. #240
+- Extension Lambda Types can now be declared with any type as the receiver type.
+- Named Argument Lists can now handle Varargs Parameters. #248
+- Named Argument Lists no longer require every Parameter to have a Name Label. #242
+- Operator Definitions can now use reserved symbols as the Operator Name. #246
+- Postfix Operators now check if their Operator can be resolved and is declared `postfix`.
+- Prefix Operator Calls now check if their Operator can be resolved and is declared `prefix`.
+- Statement Lists can now define Lambda Parameters in the first line. #244
+- String Interpolations can now contain nested Parentheses. #238
+- The `var` and `let` keywords are now allowed in Parameter Lists.
+- Infix Operator Definitions no longer require the additional options in braces.
+- Prefix and Postfix operators can now be declared with (empty) braces.
+- Added support for the definition of multiple Varargs Parameters. #249
+- Added Field and Class Parameter Properties. #232
+- Added Property References using anonymous inner classes. #234
+- Added support for Prefix Assignment Operators. #243
+- Added support for Ternary Operator Definitions. #245
+- Added the Varargs Expansion Operator. #247
+- Improved the Parsing Rules for Prefix and Postfix Operators. #181, #236
+- Re-added support for Lazy Fields. #230
+- Removed `*` as the Reference Operator. #235
+- Renamed the `subscriptRef` method to `subscript_&`. #240
+
+## Dyvil Library v0.20.0
+
+- The `::` Operator is now right-associative and requires a List as the tail.
+- The `AnnotationProxyFactory` class now generates a simple `toString` method.
+- The Dyvil Lexer now produces `SYMBOL_IDENTIFIER` tokens for `DOT_IDENTIFIER`s.
+- Added `PrependList.apply` methods.
+- Added all Collection Operator Methods as `infix` methods in the `CollectionOperators`, `ListOperators` and `SetOperators` classes.
+- Added all Map Operator Methods as `infix` methods in the `MapOperators` class.
+- Added the Dereference Operators `*` for all `dyvil.ref.*Ref` classes.
+- Added the Reference Assignment Operator `*_=` for all `dyvil.ref.*Ref` classes.
+- Added the Ternary Conditional Operator definition in the Lang Header.
+- Added the `LanguageFeatures.println(AutoPrinter.() => void)` that mimics the `AutoPrinter.apply` behaviour.
+- Added the `Stack.peek(int)` method.
+- Added the `dyvil.runtime.BytecodeDump` class for runtime bytecode dumps.
+- Added the `dyvilx.lang.model.type.Type.typeArgumentCount()` and `.typeArgument(int)` methods.
+- Added unary Plus operators in the `Primitives` class.
+- Fixed the `Function1.compose` method being implemented incorrectly.
+- Fixed the `dyvil.array.ObjectArray.mapped` and `flatMapped` methods causing runtime errors with primitive types.
+- Fixed the `dyvil.collection.Entry` type parameters not being covariant.
+- Cleaned up the `AnnotationProxyFactory` class.
+- Moved the Collection Type Aliases from the Lang Header to the `dyvil.Collections` header.
+- Removed all mutating Collection Operator Methods.
+- Removed all mutating Map Operator Methods.
+- Removed the `LanguageFeatures.repeat(int, => void)` method.
+- Removed the `dyvil.ref.*.String*Ref` classes.
+- Renamed all non-mutating Collection Operator Methods to descriptive names.
+- Renamed all non-mutating Map Operator Methods to descriptive names.
+- Renamed the `Collection.intersect` method to `retainAll`.
+- Renamed the `dyvil.tools.asm.Opcodes` class to `ASMConstants`.
+- Updated the Lang Header to add the Reference, De-reference and Unwrap Operators.
+- Updated the Library to use the Varargs Expansion Operator.
+
+## Dyvil Compiler v0.20.0
+
+- All Varargs Parameters are now stored as such in the Bytecode.
+- Argument Lists now check for and require Varargs Expansions instead of testing for array types. #247
+- Array Constructors can now handle Named Argument Lists.
+- Array Constructors no longer need to specify all length parameters.
+- Array Literal conversions now support non-varargs methods.
+- Colon and Assignment Operator Resolution now happens during `OperatorChain` resolution.
+- Deferred the Parameter Type Inference error to the `RESOLVE` phase.
+- Field Accesses and Assignments that target an implicit value will resolve as a method call before falling back to field resolution now.
+- Lambda Expressions now have a `flags` variable for various metadata.
+- Map Expression now infer the Immutable Map type.
+- Overhauled the `Operator` class.
+- Statement Lists can now also be separated by commas.
+- Subscript Access expressions can now use named arguments.
+- The Expression Parser no longer needs to lookup operators, instead it produces `OperatorChain`s that are resolved later. #236
+- The `AnnotationVisitor` class now throws a `BytecodeException` if the `value` argument of the `visit(String, Object)` method cannot be converted to an `IValue`.
+- The `IContext.resolveOperator(Name)` method now takes an additional `type` parameter to tell operators with the same name apart.
+- The `LambdaExpr.captureHelper` field is now only initialized when needed.
+- Varargs Calls are now replaced with Array Literals instead of inlining their compilation.
+- Added a global method to check if one type is a super class of another.
+- Added a syntax error for Prefix Operators without operands.
+- Added an Argument List Parser that can parse Argument Lists with optional labels.
+- Added an error for Array Types with `void` as the element type.
+- Added an internal representation for Intersection Types.
+- Added missing `IType.asParameterType` implementations.
+- Added the `ClassFormat.insnToHandle(int)` method.
+- Added the `IArgumentsConsumer` interface.
+- Added the `IMethod.toHandle()` method.
+- Added the `IOperator` interface for the new Operator API.
+- Added the `IParameterList.setParameters([IParameter], int)` method.
+- Added the `IValue.toAssignment(IValue, ICodePosition)` method to allow each AST node to define a custom Assignment conversion.
+- Added the `ModifierSet.removeIntModifier(int)` method.
+- Extracted the `ConstructorCallParser` class from the `ExpressionParser` implementation.
+- Extracted the `ThisSuperInitParser` class from the `ExpressionParser` implementation.
+- Updated Parenthesis handling for the `class` and `type` Operators.
+- Updated Tuple Type Checking to allow implicit Value conversions.
+- Updated Type Argument inference and Bound Checking for Constructors.
+- Updated `ArgumentMap` resolution to work correctly with unnamed arguments.
+- Updated the `LambdaExpr` class for `Parameter` type checking and formatting changes.
+- Updated the `MethodVisitor.visitMultiANewArrayInsn(...)` methods and callers.
+- Improved Annotation Value Conversion.
+- Improved Constructor and Apply Method generation.
+- Improved Documentation and Naming in the `LambdaExpr` class.
+- Improved Parameter Type Ascription and Default Value parsing.
+- Improved Postfix Operator → Assignment conversion.
+- Improved Wildcard Type resolution when other wildcard types are inferred as their bound.
+- Improved the Error Message for incompatible Literal Conversions.
+- Improved the Expression Parser for Method Calls without Parentheses.
+- Improved the Generic Array Creation error message.
+- Improved the Missing Lambda Parameter Type Error for Lambda Expressions with implicit Parameters.
+- Improved the Parsing Rules for Field Accesses over Method Calls in the Expression Parser.
+- Improved the `Incompatible Method Return Type` semantic error message.
+- Improved the `Invalid Dot Access` syntax error message.
+- Fixed Annotations with Package Types causing compiler errors.
+- Fixed Field Accesses inlining Array Literals.
+- Fixed Lambda Compilation for Lambda Expressions that return Method Calls whose receiver references a Lambda parameter.
+- Fixed Lambda Expressions without return values causing compiler errors when formatted or printed.
+- Fixed Lambda Parameters not going through all compiler phases.
+- Fixed Union and Intersection Types working incorrectly with Type Parameters.
+- Fixed Varargs Class Parameters being `transient`.
+- Fixed Variable Capture in For, For Each and Catch Statements.
+- Fixed an issue with Lambda Expressions and Varargs calls causing runtime Lambda errors.
+- Fixed empty Named Argument Lists causing compiler errors when formatted.
+- Fixed missing Varargs Arguments causing compiler errors upon bytecode generation.
+- Fixed non-final non-static Fields generating `ConstantValue` attributes instead of a field assignment in the initializer.
+- Fixed the Variable Name Shadowing warning message.
+- Fixed the `InlineIntrinsicData.writeJump(…)` and `writeInvJump(…)` methods working incorrectly if the last instruction is not a jump instruction.
+- Fixed the `Parameter.getInternalType()` method causing infinite recursion.
+- Fixed the `ParserUtil.findMatch(IToken)` method working incorrectly with braces.
+- Simplified Varargs Method Match Computation, Resolution and Type Checking.
+- Cleaned up the `ExternalClass` class.
+- Cleaned up the `TypeConverter`, `AnonymousClassLMF` and `AnnotationProxyFactory` classes.
+- Removed `MethodParameter` handling for the `var` modifier.
+- Removed `var` as a modifier.
+- Removed a redundant parameter from the `ImportDeclaration.resolveTypes(...)` method.
+- Removed the `ExpressionMapParser` class.
+- Removed the `IValueMap` interface.
+- Removed the `PARSE_HEADER` and `RESOLVE_HEADER` compiler phases.
+- Removed the deprecation warning for C-Style For Statements.
+- Renamed the `ArgumentMap` class to `NamedArgumentList`.
+- Renamed the `IClass.isSubTypeOf` method to `isSubClassOf`.
+- Renamed the `IExternalMethod.getParameter_(int)` method to `getParameterNoResolve`.
+- Moved Operator Resolution from `ParserManager` to `IContext`.
+- Moved the `ClassOperator`, `TypeOperator`, `InstanceOfOperator` and `CastOperator` classes to the `dyvil.tools.compiler.ast.expression` package.
+- Moved the `ExpressionParser.parseArguments(IParserManager, IToken)` method to `ArgumentListParser.parseArguments(IParserManager, IToken, IArgumentsConsumer)`.
+- Moved the `IParameterList.setVariadic` and `.isVariadic` methods to the `IParametric` class.
+- Moved the `IType.resolveTypeSafely(ITypeParameter)` to the `Types` class as `resolveTypeSafely(IType, ITypeParameter)`.
+- Moved the `StringConcatExpr`, `AndOperator`, `OrOperator`, `NotOperator`, `IncOperator` and `NullCheckOperator` classes to the `dyvil.tools.compiler.ast.intrinsic` package.
+
+## Dyvil REPL v0.13.0
+
+- The REPL now handles Field Properties correctly.
+- REPL classes are loaded, verified and initialized upon definition now.
+- Improved Error handling in the REPL.
+- Improved Name Mangling for Result Class names in the REPL.
+- Improved REPL Variable Formatting for Array Values.
+- Refactored the compilation mechanism in the REPL to the new `REPLCompiler` class.
+- Removed the `REPLResult` class.
+
 Dyvil v0.19.0
 =============
 
