@@ -225,6 +225,11 @@ public class REPLMemberClass implements IClass
 	}
 
 	@Override
+	public void setParameters(IParameter[] parameters, int parameterCount)
+	{
+	}
+
+	@Override
 	public void setHeader(IDyvilHeader unit)
 	{
 	}

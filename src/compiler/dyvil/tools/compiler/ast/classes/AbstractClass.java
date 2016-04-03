@@ -308,11 +308,15 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public void setParameter(int index, IParameter parameter)
+	public IParameter createParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
-		parameter.setEnclosingClass(this);
-		parameter.setIndex(index);
-		this.parameters[index] = parameter;
+		return new ClassParameter(position, name, type, modifiers, annotations);
+	}
+
+	@Override
+	public IParameter getParameter(int index)
+	{
+		return this.parameters[index];
 	}
 
 	@Override
@@ -344,21 +348,24 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public IParameter createParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public void setParameter(int index, IParameter parameter)
 	{
-		return new ClassParameter(position, name, type, modifiers, annotations);
-	}
-
-	@Override
-	public IParameter getParameter(int index)
-	{
-		return this.parameters[index];
+		parameter.setEnclosingClass(this);
+		parameter.setIndex(index);
+		this.parameters[index] = parameter;
 	}
 
 	@Override
 	public IParameter[] getParameters()
 	{
 		return this.parameters;
+	}
+
+	@Override
+	public void setParameters(IParameter[] parameters, int parameterCount)
+	{
+		this.parameters = parameters;
+		this.parameterCount = parameterCount;
 	}
 
 	// Super Types

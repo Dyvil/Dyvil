@@ -141,21 +141,24 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		return LAMBDA;
 	}
 
-	@Override
-	public void setValue(IValue value)
-	{
-		this.value = value;
-	}
-
-	public IValue getValue()
-	{
-		return this.value;
-	}
+	// Parameters
 
 	@Override
 	public int parameterCount()
 	{
 		return this.parameterCount;
+	}
+
+	@Override
+	public IParameter getParameter(int index)
+	{
+		return this.parameters[index];
+	}
+
+	@Override
+	public void setParameter(int index, IParameter parameter)
+	{
+		this.parameters[index] = parameter;
 	}
 
 	@Override
@@ -172,22 +175,32 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	}
 
 	@Override
-	public void setParameter(int index, IParameter parameter)
-	{
-		this.parameters[index] = parameter;
-	}
-
-	@Override
-	public IParameter getParameter(int index)
-	{
-		return this.parameters[index];
-	}
-
-	@Override
 	public IParameter[] getParameters()
 	{
 		return this.parameters;
 	}
+
+	@Override
+	public void setParameters(IParameter[] parameters, int parameterCount)
+	{
+		this.parameters = parameters;
+		this.parameterCount = parameterCount;
+	}
+
+	// Return Value
+
+	@Override
+	public void setValue(IValue value)
+	{
+		this.value = value;
+	}
+
+	public IValue getValue()
+	{
+		return this.value;
+	}
+
+	// Metadata
 
 	public void setMethod(IMethod method)
 	{
