@@ -140,13 +140,13 @@ public class AppendList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public ImmutableList<E> $plus(E element)
+	public ImmutableList<E> added(E element)
 	{
 		return new AppendList<>(this, element);
 	}
 	
 	@Override
-	public ImmutableList<? extends E> $plus$plus(Collection<? extends E> collection)
+	public ImmutableList<? extends E> union(Collection<? extends E> collection)
 	{
 		AppendList<E> ll = this;
 		for (E element : collection)
@@ -157,33 +157,33 @@ public class AppendList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public ImmutableList<E> $minus(Object element)
+	public ImmutableList<E> removed(Object element)
 	{
 		if (Objects.equals(element, this.tail))
 		{
-			return this.head.$minus(element);
+			return this.head.removed(element);
 		}
-		return new AppendList<>(this.head.$minus(element), this.tail);
+		return new AppendList<>(this.head.removed(element), this.tail);
 	}
 	
 	@Override
-	public ImmutableList<? extends E> $minus$minus(Collection<?> collection)
+	public ImmutableList<? extends E> difference(Collection<?> collection)
 	{
 		if (collection.contains(this.tail))
 		{
-			return this.head.$minus$minus(collection);
+			return this.head.difference(collection);
 		}
-		return new AppendList<>((ImmutableList<E>) this.head.$minus$minus(collection), this.tail);
+		return new AppendList<>((ImmutableList<E>) this.head.difference(collection), this.tail);
 	}
 	
 	@Override
-	public ImmutableList<? extends E> $amp(Collection<? extends E> collection)
+	public ImmutableList<? extends E> intersection(Collection<? extends E> collection)
 	{
 		if (!collection.contains(this.tail))
 		{
-			return this.head.$amp(collection);
+			return this.head.intersection(collection);
 		}
-		return new AppendList<>((ImmutableList<E>) this.head.$amp(collection), this.tail);
+		return new AppendList<>((ImmutableList<E>) this.head.intersection(collection), this.tail);
 	}
 	
 	@Override

@@ -30,6 +30,8 @@ public class ResolveTypesPhase implements ICompilerPhase
 	public void apply(DyvilCompiler compiler)
 	{
 		long now = System.nanoTime();
+
+		Types.initHeaders();
 		
 		// Loads primitive data types
 		Types.initTypes();

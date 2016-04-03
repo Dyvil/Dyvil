@@ -129,7 +129,7 @@ public interface FloatArray
 
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	static FloatRef subscriptRef(float[] array, int index)
+	static FloatRef subscript_$amp(float[] array, int index)
 	{
 		return new FloatArrayRef(array, index);
 	}

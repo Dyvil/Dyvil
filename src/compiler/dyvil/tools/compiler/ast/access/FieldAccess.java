@@ -29,6 +29,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -37,17 +38,17 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	protected ICodePosition position;
 	protected IValue        receiver;
 	protected Name          name;
-	
+
 	protected boolean dotless;
-	
+
 	// Metadata
 	protected IDataMember field;
 	protected IType       type;
-	
+
 	public FieldAccess()
 	{
 	}
-	
+
 	public FieldAccess(ICodePosition position)
 	{
 		this.position = position;
@@ -65,7 +66,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		this.receiver = instance;
 		this.name = name;
 	}
-	
+
 	public FieldAccess(ICodePosition position, IValue instance, IDataMember field)
 	{
 		this.position = position;
@@ -73,19 +74,19 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		this.field = field;
 		this.name = field.getName();
 	}
-	
+
 	@Override
 	public ICodePosition getPosition()
 	{
 		return this.position;
 	}
-	
+
 	@Override
 	public void setPosition(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
 	public MethodCall toMethodCall(IMethod method)
 	{
 		MethodCall call = new MethodCall(this.position);
@@ -96,33 +97,33 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		call.arguments = EmptyArguments.INSTANCE;
 		return call;
 	}
-	
+
 	@Override
 	public int valueTag()
 	{
 		return FIELD_ACCESS;
 	}
-	
+
 	public IValue getInstance()
 	{
 		return this.receiver;
 	}
-	
+
 	public IDataMember getField()
 	{
 		return this.field;
 	}
-	
+
 	public boolean isDotless()
 	{
 		return this.dotless;
 	}
-	
+
 	public void setDotless(boolean dotless)
 	{
 		this.dotless = dotless;
 	}
-	
+
 	@Override
 	public boolean isConstantOrField()
 	{
@@ -140,54 +141,11 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	{
 		return this.field != null;
 	}
-	
-	@Override
-	public IType getType()
-	{
-		if (this.type == null)
-		{
-			if (this.field == null)
-			{
-				return Types.UNKNOWN;
-			}
 
-			if (this.receiver == null)
-			{
-				return this.field.getType().asReturnType();
-			}
-
-			final ITypeContext typeContext = this.receiver.getType();
-			return this.type = this.field.getType().getConcreteType(typeContext).asReturnType();
-		}
-		return this.type;
-	}
-	
 	@Override
-	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	public IValue toAssignment(IValue rhs, ICodePosition position)
 	{
-		if (this.field == null)
-		{
-			return this; // don't create an extra type error
-		}
-		
-		return Types.isSuperType(type, this.getType()) ? this : null;
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return this.field != null && Types.isSuperType(type, this.getType());
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		if (this.field == null)
-		{
-			return 0;
-		}
-
-		return Types.getDistance(type, this.getType());
+		return new FieldAssignment(this.position.to(position), this.receiver, this.name, rhs);
 	}
 
 	@Override
@@ -218,55 +176,106 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	}
 
 	@Override
+	public IType getType()
+	{
+		if (this.type == null)
+		{
+			if (this.field == null)
+			{
+				return Types.UNKNOWN;
+			}
+
+			if (this.receiver == null)
+			{
+				return this.field.getType().asReturnType();
+			}
+
+			final ITypeContext typeContext = this.receiver.getType();
+			return this.type = this.field.getType().getConcreteType(typeContext).asReturnType();
+		}
+		return this.type;
+	}
+
+	@Override
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		if (this.field == null)
+		{
+			return this; // don't create an extra type error
+		}
+
+		return Types.isSuperType(type, this.getType()) ? this : null;
+	}
+
+	@Override
+	public boolean isType(IType type)
+	{
+		return this.field != null && Types.isSuperType(type, this.getType());
+	}
+
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		if (this.field == null)
+		{
+			return 0;
+		}
+
+		return Types.getDistance(type, this.getType());
+	}
+
+	@Override
 	public void setName(Name name)
 	{
 		this.name = name;
 	}
-	
+
 	@Override
 	public Name getName()
 	{
 		return this.name;
 	}
-	
+
 	@Override
 	public void setReceiver(IValue value)
 	{
 		this.receiver = value;
 	}
-	
+
 	@Override
 	public IValue getReceiver()
 	{
 		return this.receiver;
 	}
-	
+
 	@Override
-	public IValue toAnnotationConstant(MarkerList markers, IContext context)
+	public IValue toAnnotationConstant(MarkerList markers, IContext context, int depth)
 	{
 		if (this.field == null)
 		{
 			return this; // do not create an extra error
 		}
-		
-		int depth = context.getCompilationContext().config.getMaxConstantDepth();
-		IValue value = this;
-		
-		do
-		{
-			if (depth-- < 0)
-			{
-				markers.add(Markers.semantic(this.getPosition(), "annotation.field.not_constant", this.name));
-				return this;
-			}
-			
-			value = value.foldConstants();
-		}
-		while (!value.isConstantOrField() || value == this);
 
-		return value.toAnnotationConstant(markers, context);
+		if (depth == 0 || !this.isConstantOrField())
+		{
+			return null;
+		}
+
+		IValue value = this.field.getValue();
+		if (value == null)
+		{
+			return null;
+		}
+
+		return value.toAnnotationConstant(markers, context, depth - 1);
 	}
-	
+
+	@Override
+	public Marker getAnnotationError()
+	{
+		return Markers.semantic(this.getPosition(), "annotation.field.not_constant", this.name);
+	}
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -275,7 +284,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 			this.receiver.resolveTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void resolveReceiver(MarkerList markers, IContext context)
 	{
@@ -324,13 +333,13 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 				final IValue implicit = context.getImplicit();
 				if (implicit != null)
 				{
-					value = this.resolveField(implicit, context);
+					value = this.resolveMethod(implicit, markers, context);
 					if (value != null)
 					{
 						return value;
 					}
 
-					value = this.resolveMethod(implicit, markers, context);
+					value = this.resolveField(implicit, context);
 					if (value != null)
 					{
 						return value;
@@ -407,14 +416,14 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 			{
 				return new EnumValue(field.getType(), this.name);
 			}
-			
+
 			this.field = field;
 			this.receiver = receiver;
 			return this;
 		}
 		return null;
 	}
-	
+
 	private IValue resolveMethod(IValue receiver, MarkerList markers, IContext context)
 	{
 		final IMethod method = ICall.resolveMethod(context, receiver, this.name, EmptyArguments.INSTANCE);
@@ -435,14 +444,14 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		{
 			this.receiver.checkTypes(markers, context);
 		}
-		
+
 		if (this.field != null)
 		{
 			this.field = this.field.capture(context);
 			this.receiver = this.field.checkAccess(markers, this.position, this.receiver, context);
 		}
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
@@ -451,7 +460,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 			this.receiver.check(markers, context);
 		}
 	}
-	
+
 	@Override
 	public IValue foldConstants()
 	{
@@ -466,7 +475,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		}
 		return this;
 	}
-	
+
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
@@ -476,7 +485,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		}
 		return this;
 	}
-	
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
@@ -487,20 +496,24 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		{
 			type = this.getType();
 		}
-		this.field.getType().writeCast(writer, type, lineNumber);
-
-		if (Types.isSameType(type, Types.VOID))
+		else if (Types.isSameType(type, Types.VOID))
 		{
-			writer.visitInsn(this.type.getReturnOpcode());
+			type = this.getType();
+			this.field.getType().writeCast(writer, type, lineNumber);
+
+			writer.visitInsn(type.getReturnOpcode());
+			return;
 		}
+
+		this.field.getType().writeCast(writer, type, lineNumber);
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return IASTNode.toString(this);
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
@@ -516,7 +529,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 				buffer.append('.');
 			}
 		}
-		
+
 		buffer.append(this.name);
 	}
 }

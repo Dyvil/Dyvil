@@ -201,15 +201,7 @@ public class NilExpr implements IValue
 			}
 
 			writer.visitLdcInsn(0);
-			int dims = 1;
-			while (elementType.isArrayType())
-			{
-				elementType = elementType.getElementType();
-				dims++;
-				writer.visitLdcInsn(0);
-			}
-
-			writer.visitMultiANewArrayInsn(elementType, dims);
+			writer.visitMultiANewArrayInsn(this.requiredType, 1);
 		}
 		else
 		{

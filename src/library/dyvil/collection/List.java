@@ -150,7 +150,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 *
 	 * @return a reference that points to the value at the given index
 	 */
-	default ObjectRef<E> subscriptRef(int index)
+	default ObjectRef<E> subscript_$amp(int index)
 	{
 		return new ObjectRef<E>()
 		{
@@ -202,10 +202,10 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	List<E> subList(int startIndex, int length);
 
 	@Override
-	List<E> $plus(E element);
+	List<E> added(E element);
 	
 	@Override
-	List<? extends E> $plus$plus(Collection<? extends E> collection);
+	List<? extends E> union(Collection<? extends E> collection);
 	
 	/**
 	 * {@inheritDoc} Since {@link List Lists} can contain that same element multiple times, implementations should
@@ -218,13 +218,13 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * </pre>
 	 */
 	@Override
-	List<E> $minus(Object element);
+	List<E> removed(Object element);
 	
 	@Override
-	List<? extends E> $minus$minus(Collection<?> collection);
+	List<? extends E> difference(Collection<?> collection);
 	
 	@Override
-	List<? extends E> $amp(Collection<? extends E> collection);
+	List<? extends E> intersection(Collection<? extends E> collection);
 	
 	@Override
 	<R> List<R> mapped(Function<? super E, ? extends R> mapper);
@@ -265,11 +265,8 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	// Mutating Operations
 	
 	@Override
-	void $plus$eq(E element);
-	
-	@Override
 	void clear();
-	
+
 	/**
 	 * Ensures the capacity of this list to be at least {@code minSize}. This can be used to avoid having to recreate
 	 * arrays in {@link ArrayList}s when the amount of elements to be added is already known.
@@ -280,7 +277,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	default void ensureCapacity(int minSize)
 	{
 	}
-	
+
 	/**
 	 * Updates the element at the given {@code index} of this list. The default implementation of this method delegates
 	 * to {@link #set(int, Object)}.
@@ -334,7 +331,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * 		if the index is out of the bounds of this list
 	 */
 	E set(int index, E element);
-	
+
 	/**
 	 * Updates the element at the given {@code index} of this list. Unlike {@link #set(int, Object)}, this method will
 	 * not throw any exceptions if the given {@code index} is out of bounds. Instead, it resizes the list to the
@@ -348,7 +345,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * @return the old element, if present, {@code null} otherwise
 	 */
 	E setResizing(int index, E element);
-	
+
 	/**
 	 * Inserts the element at the given {@code index} of this list. This method throws an {@link
 	 * IndexOutOfBoundsException} if the given {@code index} is less than {@code 0} or greater than the size of this
@@ -363,7 +360,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * 		if the index is out of the bounds of this list
 	 */
 	void insert(int index, E element);
-	
+
 	/**
 	 * Inserts the element at the given {@code index} of this list. Unlike {@link #insert(int, Object)}, this method
 	 * will not throw any exception if the given {@code index} is out of bounds. Instead, it simply resizes this list to
@@ -384,10 +381,12 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 		this.insert(index, element);
 	}
 
+	void addElement(E element);
+
 	@Override
 	default boolean add(E element)
 	{
-		this.$plus$eq(element);
+		this.addElement(element);
 		return true;
 	}
 

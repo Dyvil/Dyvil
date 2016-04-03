@@ -95,6 +95,9 @@ public final class Primitives
 
 	// Int Operators
 
+	@Intrinsic([ LOAD_0 ])
+	public static func +(int value): int = value
+
 	@Intrinsic([ LOAD_0, INEG ])
 	public static func -(int value): int = -value
 
@@ -194,6 +197,9 @@ public final class Primitives
 
 	// Long Operators
 
+	@Intrinsic([ LOAD_0 ])
+	public static func +(long value): long = value
+
 	@Intrinsic([ LOAD_0, LNEG ])
 	public static func -(long value): long = -value
 
@@ -283,6 +289,9 @@ public final class Primitives
 
 	// Float Operators
 
+	@Intrinsic([ LOAD_0 ])
+	public static func +(float value): float = value
+
 	@Intrinsic([ LOAD_0, FNEG ])
 	public static func -(float value): float = -value
 
@@ -334,6 +343,9 @@ public final class Primitives
 	public postfix int hashCode(float value) = value.hashCode
 
 	// Double Operators
+
+	@Intrinsic([ LOAD_0 ])
+	public static func +(double value): double = value
 
 	@Intrinsic([ LOAD_0, DNEG ])
 	public static func -(double value): double = -value

@@ -119,6 +119,12 @@ public class MapType implements IObjectType
 	}
 
 	@Override
+	public IType asParameterType()
+	{
+		return new MapType(this.keyType.asParameterType(), this.valueType.asParameterType(), this.mutability, this.theClass);
+	}
+
+	@Override
 	public Mutability getMutability()
 	{
 		return this.mutability;

@@ -80,44 +80,34 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 	// Non-mutating Operations
 	
 	@Override
-	ImmutableSet<E> $plus(E element);
-	
-	/**
-	 * {@inheritDoc} This operator represents the 'union' ImmutableSet operation and delegates to {@link
-	 * #$bar(Collection)}.
-	 */
-	@Override
-	default ImmutableSet<? extends E> $plus$plus(Collection<? extends E> collection)
-	{
-		return this.$bar(collection);
-	}
+	ImmutableSet<E> added(E element);
 	
 	@Override
-	ImmutableSet<E> $minus(Object element);
-	
-	/**
-	 * {@inheritDoc} This operator represents the 'subtract' ImmutableSet operation.
-	 */
-	@Override
-	ImmutableSet<? extends E> $minus$minus(Collection<?> collection);
-	
-	/**
-	 * {@inheritDoc} This operator represents the 'intersect' ImmutableSet operation.
-	 */
-	@Override
-	ImmutableSet<? extends E> $amp(Collection<? extends E> collection);
-	
+	ImmutableSet<E> removed(Object element);
+
 	/**
 	 * {@inheritDoc} This operator represents the 'union' ImmutableSet operation.
 	 */
 	@Override
-	ImmutableSet<? extends E> $bar(Collection<? extends E> collection);
-	
+	ImmutableSet<? extends E> union(Collection<? extends E> collection);
+
+	/**
+	 * {@inheritDoc} This operator represents the 'subtract' ImmutableSet operation.
+	 */
+	@Override
+	ImmutableSet<? extends E> difference(Collection<?> collection);
+
+	/**
+	 * {@inheritDoc} This operator represents the 'intersect' ImmutableSet operation.
+	 */
+	@Override
+	ImmutableSet<? extends E> intersection(Collection<? extends E> collection);
+
 	/**
 	 * {@inheritDoc} This operator represents the 'exclusive OR' ImmutableSet operation.
 	 */
 	@Override
-	ImmutableSet<? extends E> $up(Collection<? extends E> collection);
+	ImmutableSet<? extends E> symmetricDifference(Collection<? extends E> collection);
 	
 	@Override
 	<R> ImmutableSet<R> mapped(Function<? super E, ? extends R> mapper);
@@ -127,50 +117,6 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 	
 	@Override
 	ImmutableSet<E> filtered(Predicate<? super E> condition);
-	
-	// Mutating Operations
-	
-	@Override
-	default void $plus$eq(E element)
-	{
-		throw new ImmutableException("+= on Immutable Set");
-	}
-	
-	@Override
-	default void $plus$plus$eq(Collection<? extends E> collection)
-	{
-		throw new ImmutableException("++= on Immutable Set");
-	}
-	
-	@Override
-	default void $minus$eq(Object element)
-	{
-		throw new ImmutableException("-= on Immutable Set");
-	}
-	
-	@Override
-	default void $minus$minus$eq(Collection<?> collection)
-	{
-		throw new ImmutableException("--= on Immutable Set");
-	}
-	
-	@Override
-	default void $amp$eq(Collection<? extends E> collection)
-	{
-		throw new ImmutableException("&= on Immutable Set");
-	}
-	
-	@Override
-	default void $bar$eq(Collection<? extends E> collection)
-	{
-		throw new ImmutableException("|= on Immutable Set");
-	}
-	
-	@Override
-	default void $up$eq(Collection<? extends E> collection)
-	{
-		throw new ImmutableException("^= on Immutable Set");
-	}
 	
 	// Mutating Operations
 	
@@ -205,19 +151,19 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 	}
 	
 	@Override
-	default boolean intersect(Collection<? extends E> collection)
+	default boolean retainAll(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("intersect() on Immutable Set");
 	}
 	
 	@Override
-	default boolean union(Collection<? extends E> collection)
+	default boolean unionInplace(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("union() on Immutable Set");
 	}
 	
 	@Override
-	default boolean exclusiveOr(Collection<? extends E> collection)
+	default boolean symmetricDifferenceInplace(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("exclusiveOr() on Immutable Set");
 	}

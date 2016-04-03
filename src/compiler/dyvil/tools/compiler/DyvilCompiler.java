@@ -116,8 +116,6 @@ public final class DyvilCompiler implements Tool
 		{
 		case "compile":
 			this.phases.add(ICompilerPhase.TOKENIZE);
-			this.phases.add(ICompilerPhase.PARSE_HEADER);
-			this.phases.add(ICompilerPhase.RESOLVE_HEADER);
 			this.phases.add(ICompilerPhase.PARSE);
 			this.phases.add(ICompilerPhase.RESOLVE_TYPES);
 			this.phases.add(ICompilerPhase.RESOLVE);

@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.operator.RangeOperator;
+import dyvil.tools.compiler.ast.intrinsic.RangeOperator;
 import dyvil.tools.compiler.ast.statement.control.Label;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -132,6 +132,12 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 	}
 
 	@Override
+	public boolean isMember(IVariable variable)
+	{
+		return variable == this.variable;
+	}
+
+	@Override
 	public Label resolveLabel(Name name)
 	{
 		if (name == $forStart)
@@ -239,8 +245,8 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 		}
 		if (Types.isSuperType(IterableForStatement.LazyFields.ITERATOR, valueType))
 		{
-			final IType iteratorType = valueType.resolveTypeSafely(IterableForStatement.LazyFields.ITERATOR_TYPE)
-			                                    .asReturnType();
+			final IType iteratorType = Types.resolveTypeSafely(valueType, IterableForStatement.LazyFields.ITERATOR_TYPE)
+			                                .asReturnType();
 			if (varType == Types.UNKNOWN)
 			{
 				this.inferVariableType(markers, iteratorType);
@@ -260,8 +266,8 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 		}
 		if (Types.isSuperType(IterableForStatement.LazyFields.ITERABLE, valueType))
 		{
-			final IType iterableType = valueType.resolveTypeSafely(IterableForStatement.LazyFields.ITERABLE_TYPE)
-			                                    .asReturnType();
+			final IType iterableType = Types.resolveTypeSafely(valueType, IterableForStatement.LazyFields.ITERABLE_TYPE)
+			                                .asReturnType();
 			if (varType == Types.UNKNOWN)
 			{
 				this.inferVariableType(markers, iterableType);

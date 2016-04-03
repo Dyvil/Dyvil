@@ -20,13 +20,11 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Mutability;
-import dyvil.tools.compiler.ast.type.TypeDelegate;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -210,6 +208,12 @@ public final class PrimitiveType implements IType
 	}
 
 	@Override
+	public IType asParameterType()
+	{
+		return this;
+	}
+
+	@Override
 	public String getTypePrefix()
 	{
 		switch (this.typecode)
@@ -316,12 +320,6 @@ public final class PrimitiveType implements IType
 	public IClass getTheClass()
 	{
 		return this.theClass;
-	}
-
-	@Override
-	public boolean isSuperTypeOf(IType type)
-	{
-		return type == this || this.isSuperClassOf(type);
 	}
 
 	@Override

@@ -46,58 +46,50 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	// Non-mutating Operations
 	
 	@Override
-	default MutableSet<E> $plus(E element)
+	default MutableSet<E> added(E element)
 	{
 		MutableSet<E> copy = this.copy();
-		copy.$plus$eq(element);
+		copy.add(element);
 		return copy;
 	}
 	
 	@Override
-	default MutableSet<E> $minus(Object element)
+	default MutableSet<E> removed(Object element)
 	{
 		MutableSet<E> copy = this.copy();
-		copy.$minus$eq(element);
+		copy.remove(element);
+		return copy;
+	}
+
+	@Override
+	default MutableSet<? extends E> union(Collection<? extends E> collection)
+	{
+		MutableSet<E> copy = this.copy();
+		copy.addAll(collection);
+		return copy;
+	}
+
+	@Override
+	default MutableSet<? extends E> difference(Collection<?> collection)
+	{
+		MutableSet<E> copy = this.copy();
+		copy.removeAll(collection);
+		return copy;
+	}
+
+	@Override
+	default MutableSet<? extends E> intersection(Collection<? extends E> collection)
+	{
+		MutableSet<E> copy = this.copy();
+		copy.retainAll(collection);
 		return copy;
 	}
 	
 	@Override
-	default MutableSet<? extends E> $minus$minus(Collection<?> collection)
+	default MutableSet<? extends E> symmetricDifference(Collection<? extends E> collection)
 	{
 		MutableSet<E> copy = this.copy();
-		copy.$minus$minus$eq(collection);
-		return copy;
-	}
-	
-	@Override
-	default MutableSet<? extends E> $plus$plus(Collection<? extends E> collection)
-	{
-		MutableSet<E> copy = this.copy();
-		copy.$bar$eq(collection);
-		return copy;
-	}
-	
-	@Override
-	default MutableSet<? extends E> $amp(Collection<? extends E> collection)
-	{
-		MutableSet<E> copy = this.copy();
-		copy.$amp$eq(collection);
-		return copy;
-	}
-	
-	@Override
-	default MutableSet<? extends E> $bar(Collection<? extends E> collection)
-	{
-		MutableSet<E> copy = this.copy();
-		copy.$bar$eq(collection);
-		return copy;
-	}
-	
-	@Override
-	default MutableSet<? extends E> $up(Collection<? extends E> collection)
-	{
-		MutableSet<E> copy = this.copy();
-		copy.$up$eq(collection);
+		copy.symmetricDifferenceInplace(collection);
 		return copy;
 	}
 

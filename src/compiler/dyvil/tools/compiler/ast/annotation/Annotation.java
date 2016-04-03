@@ -193,6 +193,11 @@ public final class Annotation implements IAnnotation
 		}
 
 		final IClass theClass = this.type.getTheClass();
+		if (theClass == null)
+		{
+			return;
+		}
+
 		if (!theClass.hasModifier(Modifiers.ANNOTATION))
 		{
 			markers.add(Markers.semanticError(this.position, "annotation.type", this.type.getName()));

@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.operator;
+package dyvil.tools.compiler.ast.intrinsic;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Type;
@@ -181,7 +181,7 @@ public class RangeOperator implements IValue
 		}
 		if (Types.isSuperType(IterableForStatement.LazyFields.ITERABLE, type))
 		{
-			return type.resolveTypeSafely(IterableForStatement.LazyFields.ITERABLE_TYPE);
+			return Types.resolveTypeSafely(type, IterableForStatement.LazyFields.ITERABLE_TYPE);
 		}
 		return null;
 	}

@@ -97,7 +97,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 				this.checkMethodAccess(markers, caseClass, param, i, paramCount, pattern);
 			}
 
-			final IType paramType = param.getType().getConcreteType(type);
+			final IType paramType = param.getInternalType().getConcreteType(type);
 			this.paramTypes[i] = paramType;
 
 			final IPattern typedPattern = pattern.withType(paramType, markers);

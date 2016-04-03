@@ -1,9 +1,7 @@
-package dyvil.tools.compiler.ast.operator;
+package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.AbstractValue;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
@@ -114,7 +112,7 @@ public final class CastOperator extends AbstractValue
 			this.value = typedValue;
 			
 			final IType newType = typedValue.getType();
-			if (!Types.isSameType(valueType, newType) && this.type.isSuperClassOf(newType)
+			if (!Types.isSameType(valueType, newType) && Types.isSuperClass(this.type, newType)
 					&& newType.isPrimitive() == this.type.isPrimitive())
 			{
 				this.typeHint = true;
@@ -128,7 +126,7 @@ public final class CastOperator extends AbstractValue
 		final boolean primitiveType = this.type.isPrimitive();
 		final boolean primitiveValue = this.value.isPrimitive();
 		
-		if (typedValue == null && !(primitiveType && primitiveValue) && !valueType.isSuperClassOf(this.type))
+		if (typedValue == null && !(primitiveType && primitiveValue) && !Types.isSuperClass(valueType, this.type))
 		{
 			markers.add(Markers.semantic(this.position, "cast.incompatible", valueType, this.type));
 			return this;

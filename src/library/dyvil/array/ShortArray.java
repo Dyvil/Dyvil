@@ -129,7 +129,7 @@ public interface ShortArray
 
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	static ShortRef subscriptRef(short[] array, int index)
+	static ShortRef subscript_$amp(short[] array, int index)
 	{
 		return new ShortArrayRef(array, index);
 	}

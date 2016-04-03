@@ -54,10 +54,10 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		this.parameterTypes = new IType[2];
 	}
 
-	public LambdaType(IType type)
+	public LambdaType(IType parameterType)
 	{
 		this.parameterTypes = new IType[1];
-		this.parameterTypes[0] = type;
+		this.parameterTypes[0] = parameterType;
 		this.parameterCount = 1;
 	}
 
@@ -71,6 +71,25 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	public LambdaType(int typeCount)
 	{
 		this.parameterTypes = new IType[typeCount];
+	}
+
+	public LambdaType(ICodePosition position)
+	{
+		this();
+		this.position = position;
+	}
+
+	public LambdaType(ICodePosition position, IType receiverType)
+	{
+		this.position = position;
+
+		if (receiverType != null) {
+			this.parameterTypes = new IType[] { receiverType };
+			this.parameterCount = 1;
+			return;
+		}
+
+		this.parameterTypes = new IType[2];
 	}
 
 	public LambdaType(ICodePosition position, IType receiverType, TupleType tupleType)
@@ -92,12 +111,6 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		this.parameterTypes[0] = receiverType;
 
 		System.arraycopy(tupleType.types, 0, this.parameterTypes, 1, tupleType.typeCount);
-	}
-
-	public LambdaType(ICodePosition position)
-	{
-		this();
-		this.position = position;
 	}
 
 	public static IClass getLambdaClass(int typeCount)
@@ -238,7 +251,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		final IClass functionClass = this.getTheClass();
 
 		ITypeParameter typeVar = functionClass.getTypeParameter(this.parameterCount);
-		IType resolvedType = type.resolveTypeSafely(typeVar);
+		IType resolvedType = Types.resolveTypeSafely(type, typeVar);
 
 		// Return Type is Covariant
 		if (!Types.isSuperType(this.returnType, resolvedType))
@@ -293,13 +306,14 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	{
 		IType returnType = value.getType();
 
-		LambdaExpr le = new LambdaExpr(value.getPosition(), null, 0);
-		le.setMethod(this.getFunctionalMethod());
-		le.setReturnType(returnType);
-		le.setValue(value);
-		le.setType(this);
-		le.inferReturnType(this, typeContext, returnType);
-		return le;
+		final LambdaExpr lambdaExpr = new LambdaExpr(value.getPosition(), null, 0);
+		lambdaExpr.setImplicitParameters(true);
+		lambdaExpr.setMethod(this.getFunctionalMethod());
+		lambdaExpr.setReturnType(returnType);
+		lambdaExpr.setValue(value);
+		lambdaExpr.setType(this);
+		lambdaExpr.inferReturnType(this, typeContext, returnType);
+		return lambdaExpr;
 	}
 
 	@Override
@@ -497,7 +511,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		this.returnType.writeTypeExpression(writer);
 
 		writer.visitLdcInsn(this.parameterCount);
-		writer.visitMultiANewArrayInsn("dyvilx/lang/model/type/Type", 1);
+		writer.visitTypeInsn(Opcodes.ANEWARRAY, "dyvilx/lang/model/type/Type");
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			writer.visitInsn(Opcodes.DUP);

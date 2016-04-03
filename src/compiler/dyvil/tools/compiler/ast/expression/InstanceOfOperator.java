@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.operator;
+package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.constant.BooleanValue;

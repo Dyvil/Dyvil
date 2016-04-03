@@ -55,7 +55,7 @@ public final class TuplePattern extends Pattern implements IPatternList
 	public IPattern withType(IType type, MarkerList markers)
 	{
 		IClass tupleClass = TupleType.getTupleClass(this.patternCount);
-		if (tupleClass == null || !tupleClass.isSubTypeOf(type))
+		if (tupleClass == null || !tupleClass.isSubClassOf(type))
 		{
 			return null;
 		}
@@ -63,7 +63,7 @@ public final class TuplePattern extends Pattern implements IPatternList
 		this.tupleType = type;
 		for (int i = 0; i < this.patternCount; i++)
 		{
-			IType elementType = type.resolveTypeSafely(tupleClass.getTypeParameter(i));
+			IType elementType = Types.resolveTypeSafely(type, tupleClass.getTypeParameter(i));
 			IPattern pattern = this.patterns[i];
 			IPattern typedPattern = pattern.withType(elementType, markers);
 			if (typedPattern == null)
@@ -170,7 +170,7 @@ public final class TuplePattern extends Pattern implements IPatternList
 			writer.visitVarInsn(Opcodes.ALOAD, varIndex);
 			matchedType.writeCast(writer, this.tupleType, lineNumber);
 			writer.visitFieldInsn(Opcodes.GETFIELD, internalTupleClassName, "_" + (i + 1), "Ljava/lang/Object;");
-			final IType targetType = this.tupleType.resolveTypeSafely(tupleClass.getTypeParameter(i));
+			final IType targetType = Types.resolveTypeSafely(this.tupleType, tupleClass.getTypeParameter(i));
 
 			Types.OBJECT.writeCast(writer, targetType, lineNumber);
 			this.patterns[i].writeInvJump(writer, -1, targetType, elseLabel);

@@ -1,28 +1,33 @@
 package dyvil.tools.repl.context;
 
+import dyvil.array.ObjectArray;
 import dyvil.collection.List;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
-import dyvil.reflect.ReflectUtils;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.*;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.repl.DyvilREPL;
+
+import java.lang.reflect.InvocationTargetException;
 
 public class REPLVariable extends Field
 {
 	private REPLContext context;
 
-	protected String bytecodeName;
-	protected String className;
-	private   Class  theClass;
+	protected String   bytecodeName;
+	protected String   className;
+	private   Class<?> theClass;
+	private   Object   displayValue;
 
 	public REPLVariable(REPLContext context, ICodePosition position, Name name, IType type, String className, ModifierSet modifiers, AnnotationList annotations)
 	{
@@ -39,38 +44,6 @@ public class REPLVariable extends Field
 		return mod == Modifiers.STATIC || this.modifiers.hasIntModifier(mod);
 	}
 
-	private static void filterStackTrace(Throwable throwable)
-	{
-		StackTraceElement[] traceElements = throwable.getStackTrace();
-		int count = traceElements.length;
-		int lastIndex = count - 1;
-
-		for (; lastIndex >= 0; --lastIndex)
-		{
-			if (traceElements[lastIndex].getClassName().startsWith("sun.misc.Unsafe"))
-			{
-				--lastIndex;
-				break;
-			}
-		}
-
-		StackTraceElement[] newTraceElements = new StackTraceElement[lastIndex + 1];
-		System.arraycopy(traceElements, 0, newTraceElements, 0, lastIndex + 1);
-
-		throwable.setStackTrace(newTraceElements);
-
-		Throwable cause = throwable.getCause();
-		if (cause != null)
-		{
-			filterStackTrace(cause);
-		}
-
-		for (Throwable suppressed : throwable.getSuppressed())
-		{
-			filterStackTrace(suppressed);
-		}
-	}
-
 	protected void compute(DyvilREPL repl, List<IClassCompilable> compilableList)
 	{
 		if (this.isConstant() && !compilableList.isEmpty())
@@ -78,62 +51,81 @@ public class REPLVariable extends Field
 			return;
 		}
 
+		final byte[] bytes;
+
 		try
 		{
-			this.theClass = this.generateClass(this.className, compilableList);
+			bytes = this.generateClass(this.className, compilableList);
 		}
 		catch (Throwable throwable)
 		{
 			throwable.printStackTrace(repl.getErrorOutput());
+			return;
 		}
 
-		try
+		if (this.type == Types.VOID && compilableList.isEmpty())
 		{
-			this.updateValue(repl);
+			// We don't have any variables, so the Class can be GC'd after it has been loaded and initialized.
+			this.theClass = REPLCompiler.loadAnonymousClass(this.context.repl, this.className, bytes);
+			return;
 		}
-		catch (Throwable t)
-		{
-			filterStackTrace(t);
-			t.printStackTrace(repl.getOutput());
-		}
+
+		// The type contains the value, so we have to keep the class loaded.
+		this.theClass = REPLCompiler.loadClass(this.context.repl, this.className, bytes);
+
+		this.updateValue(repl);
 	}
 
 	protected void updateValue(DyvilREPL repl)
 	{
-		if (this.theClass == null)
+		if (this.theClass == null || this.type == Types.VOID)
 		{
 			return;
 		}
 
-		try
+		final Object result;
+		if (this.property != null)
 		{
-			if (this.type == Types.VOID)
+			try
 			{
-				ReflectUtils.UNSAFE.ensureClassInitialized(this.theClass);
+				final java.lang.reflect.Method method = this.theClass.getDeclaredMethod(this.name.qualified);
+				method.setAccessible(true);
+				result = method.invoke(null);
 			}
-			else
+			catch (InvocationTargetException ex)
 			{
-				java.lang.reflect.Field field = this.theClass.getDeclaredFields()[0];
+				ex.getCause().printStackTrace(repl.getOutput());
+				this.displayValue = "<error>";
+				this.value = null;
+				return;
+			}
+			catch (ReflectiveOperationException ex)
+			{
+				ex.printStackTrace(repl.getErrorOutput());
+				this.displayValue = "<error>";
+				this.value = null;
+				return;
+			}
+		}
+		else
+		{
+			try
+			{
+				final java.lang.reflect.Field field = this.theClass.getDeclaredFields()[0];
 				field.setAccessible(true);
-				Object result = field.get(null);
-				this.value = new REPLResult(result);
+				result = field.get(null);
+			}
+			catch (ReflectiveOperationException ex)
+			{
+				ex.printStackTrace(repl.getErrorOutput());
+				this.displayValue = "<error>";
+				this.value = null;
+				return;
 			}
 		}
-		catch (IllegalAccessException illegalAccess)
-		{
-			illegalAccess.printStackTrace(repl.getOutput());
-		}
-		catch (ExceptionInInitializerError initializerError)
-		{
-			final Throwable cause = initializerError.getCause();
-			filterStackTrace(cause);
-			cause.printStackTrace(repl.getOutput());
-		}
-		catch (Throwable throwable)
-		{
-			filterStackTrace(throwable);
-			throwable.printStackTrace(repl.getOutput());
-		}
+
+		this.value = IValue.fromObject(result);
+		this.displayValue = result;
 	}
 
 	private boolean isConstant()
@@ -147,7 +139,7 @@ public class REPLVariable extends Field
 		return tag >= 0 && tag != IValue.NIL && tag < IValue.STRING;
 	}
 
-	private Class generateClass(String className, List<IClassCompilable> compilableList) throws Throwable
+	private byte[] generateClass(String className, List<IClassCompilable> compilableList) throws Throwable
 	{
 		final String name = this.bytecodeName = this.name.qualified;
 		final String extendedType = this.type.getExtendedName();
@@ -183,6 +175,11 @@ public class REPLVariable extends Field
 			c.writeStaticInit(clinitWriter);
 		}
 
+		if (this.property != null)
+		{
+			this.property.writeStaticInit(clinitWriter);
+		}
+
 		// Write a call to the computeResult method
 		clinitWriter.visitMethodInsn(Opcodes.INVOKESTATIC, className, "computeResult", methodType, false);
 		if (this.type != Types.VOID)
@@ -205,20 +202,16 @@ public class REPLVariable extends Field
 			computeWriter.visitEnd(this.type);
 		}
 
+		// Write the property, if necessary
+		if (this.property != null)
+		{
+			this.property.write(classWriter);
+		}
+
 		// Finish Class compilation
 		classWriter.visitEnd();
 
-		final byte[] bytes = classWriter.toByteArray();
-
-		if (this.type != Types.VOID || !compilableList.isEmpty())
-		{
-			// The type contains the value, so we have to keep the class loaded.
-			return REPLMemberClass.loadClass(this.context.repl, className, bytes);
-		}
-
-		// We don't have any variables, so we can throw the Class away after
-		// it has been loaded.
-		return REPLMemberClass.loadAnonymousClass(this.context.repl, className, bytes);
+		return classWriter.toByteArray();
 	}
 
 	@Override
@@ -256,5 +249,28 @@ public class REPLVariable extends Field
 
 		String extended = this.type.getExtendedName();
 		writer.visitFieldInsn(Opcodes.PUTSTATIC, this.className, this.bytecodeName, extended);
+	}
+
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		if (this.annotations != null)
+		{
+			this.annotations.toString(prefix, buffer);
+		}
+		this.modifiers.toString(buffer);
+
+		IDataMember.toString(prefix, buffer, this, "field.type_ascription");
+
+		Formatting.appendSeparator(buffer, "field.assignment", '=');
+
+		if (this.value != null)
+		{
+			this.value.toString(prefix, buffer);
+		}
+		else
+		{
+			ObjectArray.toString(this.displayValue, buffer);
+		}
 	}
 }

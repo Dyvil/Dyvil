@@ -18,11 +18,11 @@ public class UpdateMethodCall extends AbstractCall implements IValueConsumer
 		this.position = position;
 	}
 	
-	public UpdateMethodCall(ICodePosition position, IValue instance, IArguments arguments)
+	public UpdateMethodCall(ICodePosition position, IValue instance, IArguments arguments, IValue rhs)
 	{
 		this.position = position;
 		this.receiver = instance;
-		this.arguments = arguments;
+		this.arguments = arguments.withLastValue(Names.eq, rhs);
 	}
 	
 	@Override

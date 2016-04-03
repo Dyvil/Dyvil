@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.dynamic.DynamicType;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -197,14 +198,54 @@ public final class Types
 		return OBJECT_ARRAY_CLASS;
 	}
 
+	public static boolean isSameClass(IType type1, IType type2)
+	{
+		return type1 == type2 || type1.isSameClass(type2);
+	}
+
 	public static boolean isSameType(IType type1, IType type2)
 	{
-		return type1 == type2 || type1.isSameType(type2);
+		if (type1 == type2)
+		{
+			return true;
+		}
+
+		if (type2.needsSubTypeCheck() && !type1.needsSubTypeCheck())
+		{
+			return type2.isSameType(type1);
+		}
+		return type1.isSameType(type2);
+	}
+
+	public static boolean isSuperClass(IClass superClass, IClass subClass)
+	{
+		return superClass == subClass || superClass.getClassType().isSuperClassOf(subClass.getClassType());
+	}
+
+	public static boolean isSuperClass(IType superType, IType subType)
+	{
+		if (superType == subType)
+		{
+			return true;
+		}
+		if (subType.needsSubTypeCheck())
+		{
+			return subType.isSubClassOf(superType);
+		}
+		return superType.isSuperClassOf(subType);
 	}
 
 	public static boolean isSuperType(IType superType, IType subType)
 	{
-		return superType == subType || superType.isSuperTypeOf(subType);
+		if (superType == subType)
+		{
+			return true;
+		}
+		if (subType.needsSubTypeCheck() && !superType.needsSubTypeCheck())
+		{
+			return subType.isSubTypeOf(superType);
+		}
+		return superType.isSuperTypeOf(subType);
 	}
 
 	public static boolean isAssignable(IType fromType, IType toType)
@@ -214,6 +255,11 @@ public final class Types
 
 	public static int getDistance(IType superType, IType subType)
 	{
+		if (superType == subType)
+		{
+			return 1;
+		}
+
 		final int distance = subType.getSuperTypeDistance(superType);
 		if (distance != 0)
 		{
@@ -232,7 +278,7 @@ public final class Types
 	{
 		final Set<IClass> superTypes1 = superClasses(type1);
 		final Set<IClass> superTypes2 = superClasses(type2);
-		superTypes1.intersect(superTypes2);
+		superTypes1.retainAll(superTypes2);
 		return superTypes1;
 	}
 
@@ -321,5 +367,11 @@ public final class Types
 			return UNKNOWN;
 		}
 		return null;
+	}
+
+	public static IType resolveTypeSafely(IType type, ITypeParameter typeVar)
+	{
+		final IType resolved = type.resolveType(typeVar);
+		return resolved != null ? resolved : typeVar.getDefaultType();
 	}
 }

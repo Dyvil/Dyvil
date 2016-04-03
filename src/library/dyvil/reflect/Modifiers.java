@@ -177,16 +177,6 @@ public interface Modifiers
 	 */
 	int LAZY = 0x00010000;
 	
-	// Parameter Modifiers
-	
-	// LAZY
-	
-	/**
-	 * <i>Dyvil</i> {@code var} modifier. This is used to mark that a parameter is Call-By-Reference. If a parameter
-	 * doesn't have this flag, it behaves like a normal formal parameter.
-	 */
-	int VAR = 0x00040000;
-	
 	// Member Modifiers
 	
 	/**
@@ -245,7 +235,7 @@ public interface Modifiers
 	/**
 	 * The modifiers that can be used on parameters.
 	 */
-	int PARAMETER_MODIFIERS = FINAL | LAZY | VAR | MANDATED | EXTENSION;
+	int PARAMETER_MODIFIERS = FINAL | LAZY | MANDATED | EXTENSION | VARARGS | SYNTHETIC;
 
 	/**
 	 * The modifiers that can be applied to class parameters.

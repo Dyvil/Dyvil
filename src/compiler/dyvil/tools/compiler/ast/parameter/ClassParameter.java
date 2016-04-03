@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
@@ -24,9 +25,10 @@ import dyvil.tools.parsing.position.ICodePosition;
 public final class ClassParameter extends Field implements IParameter
 {
 	// Metadata
-	protected int   index;
-	protected int   localIndex;
-	protected IType internalType;
+	protected int     index;
+	protected int     localIndex;
+	protected IType   internalType;
+	protected boolean varargs;
 
 	public ClassParameter(IClass enclosingClass)
 	{
@@ -97,16 +99,13 @@ public final class ClassParameter extends Field implements IParameter
 	@Override
 	public void setVarargs(boolean varargs)
 	{
-		if (varargs)
-		{
-			this.modifiers.addIntModifier(Modifiers.VARARGS);
-		}
+		this.varargs = varargs;
 	}
 
 	@Override
 	public boolean isVarargs()
 	{
-		return this.modifiers.hasIntModifier(Modifiers.VARARGS);
+		return this.varargs;
 	}
 
 	@Override
@@ -173,14 +172,34 @@ public final class ClassParameter extends Field implements IParameter
 	}
 
 	@Override
+	public void resolveTypes(MarkerList markers, IContext context)
+	{
+		if (this.property != null)
+		{
+			this.property.getModifiers().addIntModifier(Modifiers.PUBLIC);
+		}
+
+		super.resolveTypes(markers, context);
+	}
+
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		super.check(markers, context);
 
-		if (this.modifiers != null)
+		// TODO remove duplicate modifier check
+		ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.CLASS_PARAMETER_MODIFIERS);
+	}
+
+	@Override
+	public void write(ClassWriter writer) throws BytecodeException
+	{
+		if (this.isVarargs())
 		{
-			ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.CLASS_PARAMETER_MODIFIERS);
+			this.modifiers.removeIntModifier(Modifiers.VARARGS);
 		}
+
+		super.write(writer);
 	}
 
 	@Override
@@ -192,6 +211,17 @@ public final class ClassParameter extends Field implements IParameter
 	@Override
 	public void writeInit(MethodWriter writer) throws BytecodeException
 	{
+		if (this.varargs && !this.modifiers.hasIntModifier(Modifiers.VARARGS))
+		{
+			// Bugfix: VARARGS is the same bitflag as TRANSIENT, so Class Parameters cannot use the Modifier and have
+			// to rely on a boolean field.
+
+			this.modifiers.addIntModifier(Modifiers.VARARGS);
+			Parameter.writeInitImpl(this, writer);
+			this.modifiers.removeIntModifier(Modifiers.VARARGS);
+			return;
+		}
+
 		Parameter.writeInitImpl(this, writer);
 	}
 

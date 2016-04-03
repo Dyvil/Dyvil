@@ -10,4 +10,13 @@ public interface IParametric extends INamed, IModified, IParameterList
 	{
 		return false;
 	}
+
+	default void setVariadic()
+	{
+	}
+
+	default boolean isVariadic()
+	{
+		return false;
+	}
 }

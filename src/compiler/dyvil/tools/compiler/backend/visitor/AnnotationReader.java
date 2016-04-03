@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.consumer.IAnnotationConsumer;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.parameter.ArgumentMap;
+import dyvil.tools.compiler.ast.parameter.NamedArgumentList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.parsing.Name;
@@ -17,19 +17,19 @@ public class AnnotationReader implements AnnotationVisitor
 {
 	private IAnnotationConsumer consumer;
 	private IAnnotation         annotation;
-	private ArgumentMap         arguments;
+	private NamedArgumentList   arguments;
 	
 	public AnnotationReader(IAnnotationConsumer consumer, IAnnotation annotation)
 	{
 		this.consumer = consumer;
 		this.annotation = annotation;
-		this.annotation.setArguments(this.arguments = new ArgumentMap());
+		this.annotation.setArguments(this.arguments = new NamedArgumentList());
 	}
 	
 	@Override
 	public void visit(String key, Object value)
 	{
-		this.arguments.addValue(Name.getQualified(key), IValue.fromObject(value));
+		this.arguments.addLastValue(Name.getQualified(key), IValue.fromObject(value));
 	}
 	
 	static IValue getEnumValue(String enumClass, String name)
@@ -44,7 +44,7 @@ public class AnnotationReader implements AnnotationVisitor
 		IValue enumValue = getEnumValue(enumClass, name);
 		if (enumValue != null)
 		{
-			this.arguments.addValue(Name.getQualified(key), enumValue);
+			this.arguments.addLastValue(Name.getQualified(key), enumValue);
 		}
 	}
 	
@@ -53,7 +53,7 @@ public class AnnotationReader implements AnnotationVisitor
 	{
 		Annotation annotation = new Annotation(ClassFormat.extendedToType(desc));
 		AnnotationValue value = new AnnotationValue(annotation);
-		this.arguments.addValue(Name.getQualified(key), value);
+		this.arguments.addLastValue(Name.getQualified(key), value);
 		return new AnnotationReader(value, annotation);
 	}
 	
@@ -61,7 +61,7 @@ public class AnnotationReader implements AnnotationVisitor
 	public AnnotationVisitor visitArray(String key)
 	{
 		ArrayExpr valueList = new ArrayExpr();
-		this.arguments.addValue(Name.getQualified(key), valueList);
+		this.arguments.addLastValue(Name.getQualified(key), valueList);
 		return new AnnotationValueReader(valueList);
 	}
 	

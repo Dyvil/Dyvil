@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.access;
 
+import dyvil.tools.compiler.ast.consumer.IArgumentsConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LambdaExpr;
@@ -20,7 +21,7 @@ import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public interface ICall extends IValue
+public interface ICall extends IValue, IArgumentsConsumer
 {
 	default IValue getReceiver()
 	{
@@ -31,6 +32,7 @@ public interface ICall extends IValue
 	{
 	}
 
+	@Override
 	void setArguments(IArguments arguments);
 	
 	IArguments getArguments();
@@ -86,6 +88,7 @@ public interface ICall extends IValue
 		}
 
 		LambdaExpr lambdaExpr = new LambdaExpr(position, parameters, wildcards);
+		lambdaExpr.setImplicitParameters(true);
 		lambdaExpr.setValue(this);
 		return lambdaExpr.resolve(markers, context);
 	}

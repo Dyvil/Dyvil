@@ -26,7 +26,7 @@ import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
-import dyvil.tools.compiler.ast.operator.Operator;
+import dyvil.tools.compiler.ast.operator.IOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -44,10 +44,10 @@ import dyvil.tools.repl.DyvilREPL;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberConsumer<REPLVariable>, IClassCompilableList
+public class REPLContext extends DyvilHeader
+	implements IValueConsumer, IMemberConsumer<REPLVariable>, IClassCompilableList
 {
-	private static final String REPL$CLASSES     = "repl$classes/";
-	public static final  int    ACCESS_MODIFIERS = Modifiers.PUBLIC | Modifiers.PRIVATE | Modifiers.PROTECTED;
+	private static final String REPL$CLASSES = "repl$classes/";
 
 	protected final DyvilREPL repl;
 
@@ -103,7 +103,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 	public void startEvaluation(String code)
 	{
 		this.currentCode = code;
-		this.className = REPL$CLASSES + "REPL$Result$" + this.classIndex++;
+		this.className = REPL$CLASSES + "REPL$Result" + this.classIndex++;
 		this.cleanup();
 	}
 
@@ -143,7 +143,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 			{
 				String fileName = icc.getFileName();
 				byte[] bytes = ClassWriter.compile(icc);
-				REPLMemberClass.loadClass(this.repl, REPL$CLASSES.concat(fileName), bytes);
+				REPLCompiler.loadClass(this.repl, REPL$CLASSES.concat(fileName), bytes);
 			}
 			catch (Throwable t)
 			{
@@ -240,7 +240,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 	private void compileClass(IClass iclass)
 	{
 		this.compileInnerClasses();
-		REPLMemberClass.compile(this.repl, iclass);
+		REPLCompiler.compile(this.repl, iclass);
 	}
 
 	@Override
@@ -257,25 +257,25 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 		ModifierList modifierList = new ModifierList();
 		modifierList.addModifier(BaseModifiers.FINAL);
 
-		final REPLVariable field = new REPLVariable(this, ICodePosition.ORIGIN, null, Types.UNKNOWN, this.className,
-		                                            modifierList, null);
-		field.setValue(value);
-
-		this.memberClass = this.getREPLClass(field);
-
 		value.resolveTypes(this.markers, this);
 		value = value.resolve(this.markers, this);
 
 		if (value.valueTag() == IValue.FIELD_ACCESS)
 		{
-			IDataMember f = ((FieldAccess) value).getField();
-			if (f instanceof REPLVariable)
+			final IDataMember field = ((FieldAccess) value).getField();
+			if (field instanceof REPLVariable)
 			{
-				((REPLVariable) f).updateValue(this.repl);
-				this.compiler.getOutput().println(f);
+				((REPLVariable) field).updateValue(this.repl);
+				this.compiler.getOutput().println(field);
 				return;
 			}
 		}
+
+		final REPLVariable field = new REPLVariable(this, ICodePosition.ORIGIN, null, Types.UNKNOWN, this.className,
+		                                            modifierList, null);
+		field.setValue(value);
+
+		this.memberClass = this.getREPLClass(field);
 
 		IType type = value.getType();
 		IValue typedValue = value.withType(type, type, this.markers, this);
@@ -315,7 +315,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 	}
 
 	@Override
-	public void addOperator(Operator operator)
+	public void addOperator(IOperator operator)
 	{
 		super.addOperator(operator);
 		this.compiler.getOutput().println("Defined " + operator);
@@ -324,7 +324,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 	@Override
 	public void addImport(ImportDeclaration declaration)
 	{
-		declaration.resolveTypes(this.markers, this, false);
+		declaration.resolveTypes(this.markers, this);
 
 		if (this.hasErrors())
 		{
@@ -338,7 +338,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 	@Override
 	public void addUsing(ImportDeclaration usingDeclaration)
 	{
-		usingDeclaration.resolveTypes(this.markers, this, true);
+		usingDeclaration.resolveTypes(this.markers, this);
 
 		if (this.hasErrors())
 		{
@@ -391,7 +391,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 		// Check if the class is already defined
 		try
 		{
-			Class.forName(iclass.getFullName(), false, REPLMemberClass.CLASS_LOADER);
+			Class.forName(iclass.getFullName(), false, REPLCompiler.CLASS_LOADER);
 			this.compiler.getErrorOutput().println("The class '" + iclass.getName() + "' cannot be re-defined");
 			return;
 		}
@@ -465,11 +465,16 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 	public void addDataMember(REPLVariable variable)
 	{
 		this.memberClass = this.getREPLClass(variable);
+		final Name variableName = variable.getName();
 
+		this.fields.put(variableName, variable);
 		if (this.computeVariable(variable))
 		{
-			this.fields.put(variable.getName(), variable);
 			this.compiler.getOutput().println(variable.toString());
+		}
+		else
+		{
+			this.fields.removeKey(variableName);
 		}
 	}
 
@@ -547,7 +552,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 
 	public static void updateModifiers(ModifierSet modifiers)
 	{
-		if ((modifiers.toFlags() & ACCESS_MODIFIERS) == 0)
+		if ((modifiers.toFlags() & Modifiers.VISIBILITY_MODIFIERS) == 0)
 		{
 			modifiers.addIntModifier(Modifiers.PUBLIC);
 		}
@@ -626,10 +631,22 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 			IContext.getMethodMatch(list, receiver, name, arguments, method);
 		}
 
-		final IProperty property = this.properties.get(Util.removeEq(name));
+		final Name removeEq = Util.removeEq(name);
+
+		IProperty property = this.properties.get(removeEq);
 		if (property != null)
 		{
 			property.getMethodMatches(list, receiver, name, arguments);
+		}
+
+		final IField field = this.fields.get(removeEq);
+		if (field != null)
+		{
+			property = field.getProperty();
+			if (property != null)
+			{
+				property.getMethodMatches(list, receiver, name, arguments);
+			}
 		}
 
 		if (!list.isEmpty())

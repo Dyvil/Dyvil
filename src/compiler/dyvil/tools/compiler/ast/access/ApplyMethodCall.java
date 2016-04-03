@@ -18,7 +18,13 @@ public class ApplyMethodCall extends AbstractCall
 	{
 		this.position = position;
 	}
-	
+
+	public ApplyMethodCall(ICodePosition position, IValue receiver)
+	{
+		this.position = position;
+		this.receiver = receiver;
+	}
+
 	public ApplyMethodCall(ICodePosition position, IValue instance, IArguments arguments)
 	{
 		this.position = position;
@@ -26,7 +32,7 @@ public class ApplyMethodCall extends AbstractCall
 		this.arguments = arguments;
 	}
 
-	public ApplyMethodCall(ICodePosition position, IValue instance, IMethod method,  IArguments arguments)
+	public ApplyMethodCall(ICodePosition position, IValue instance, IMethod method, IArguments arguments)
 	{
 		this.position = position;
 		this.receiver = instance;
@@ -55,13 +61,25 @@ public class ApplyMethodCall extends AbstractCall
 		call.checkArguments(markers, context);
 		return call;
 	}
-	
+
 	@Override
 	public int valueTag()
 	{
 		return APPLY_CALL;
 	}
-	
+
+	@Override
+	public IValue toAssignment(IValue rhs, ICodePosition position)
+	{
+		return new UpdateMethodCall(this.position.to(position), this.receiver, this.arguments, rhs);
+	}
+
+	@Override
+	public IValue toReferenceValue(MarkerList markers, IContext context)
+	{
+		return AbstractCall.toReferenceValue(this, Names.apply_$amp, markers, context);
+	}
+
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
@@ -73,41 +91,41 @@ public class ApplyMethodCall extends AbstractCall
 		{
 			ICall call = (ICall) this.receiver;
 			IValue argument = this.arguments.getFirstValue();
-			
+
 			if (argument instanceof Closure)
 			{
 				argument = argument.resolve(markers, context);
-				
+
 				IArguments oldArgs = call.getArguments();
 				call.resolveReceiver(markers, context);
 				call.resolveArguments(markers, context);
-				
+
 				call.setArguments(oldArgs.withLastValue(Names.apply, argument));
-				
+
 				IValue resolvedCall = call.resolveCall(markers, context);
 				if (resolvedCall != null)
 				{
 					return resolvedCall;
 				}
-				
+
 				// Revert
 				call.setArguments(oldArgs);
-				
+
 				this.receiver = call.resolveCall(markers, context);
 				resolvedCall = this.resolveCall(markers, context);
 				if (resolvedCall != null)
 				{
 					return resolvedCall;
 				}
-				
+
 				this.reportResolve(markers, context);
 				return this;
 			}
 		}
-		
+
 		return super.resolve(markers, context);
 	}
-	
+
 	@Override
 	public IValue resolveCall(MarkerList markers, IContext context)
 	{
@@ -118,16 +136,16 @@ public class ApplyMethodCall extends AbstractCall
 			this.checkArguments(markers, context);
 			return this;
 		}
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public void reportResolve(MarkerList markers, IContext context)
 	{
 		ICall.addResolveMarker(markers, this.position, this.receiver, Names.apply, this.arguments);
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
@@ -135,12 +153,12 @@ public class ApplyMethodCall extends AbstractCall
 		{
 			this.receiver.toString(prefix, buffer);
 		}
-		
+
 		if (this.genericData != null)
 		{
 			this.genericData.toString(prefix, buffer);
 		}
-		
+
 		this.arguments.toString(prefix, buffer);
 	}
 }

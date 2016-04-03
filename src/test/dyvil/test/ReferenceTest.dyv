@@ -6,9 +6,21 @@ public class ReferenceTest
 
 	static int staticField = 0
 
+	static int staticProperty
+	{
+		get: staticField
+		set: staticField = newValue
+	}
+
 	static class Holder
 	{
 		public int instanceField = 0
+
+		public int instanceProperty
+		{
+			get: this.instanceField
+			set: this.instanceField = newValue
+		}
 	}
 
 	static case class ImmutableHolder(public final int value)
@@ -21,6 +33,7 @@ public class ReferenceTest
 	public static void main([String] args)
 	{
 		testFieldReference()
+		testPropertyReference()
 		testVariableReference()
 		testReceiverReference()
 	}
@@ -35,6 +48,16 @@ public class ReferenceTest
 		Main.test("Instance Field Reference", 1, holder.instanceField)
 	}
 
+	private static void testPropertyReference()
+	{
+		inc(&staticProperty)
+		Main.test("Static Property Reference", 2, staticField)
+
+		Holder holder = new Holder
+		inc(&holder.instanceProperty)
+		Main.test("Instance Property Reference", 1, holder.instanceField)
+	}
+
 	private static void testVariableReference()
 	{
 		int variable = 0
@@ -42,7 +65,10 @@ public class ReferenceTest
 		Main.test("Variable Reference", 1, variable)
 
 		int capturedVariable = 0
-		`repeat`(3) { inc capturedVariable }
+		LambdaTest.repeatClosure(3) {
+			inc capturedVariable
+		}
+
 		Main.test("Captured Variable Reference", 3, capturedVariable)
 	}
 

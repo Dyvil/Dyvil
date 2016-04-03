@@ -101,7 +101,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public void $plus$eq(E element)
+	public void addElement(E element)
 	{
 		this.ensureCapacity(this.size + 1);
 		this.elements[this.size++] = element;
@@ -189,7 +189,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	{
 		if (index == this.size)
 		{
-			this.$plus$eq(element);
+			this.addElement(element);
 			return;
 		}
 		List.rangeCheck(index, this.size);
@@ -271,7 +271,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	}
 	
 	@Override
-	public boolean intersect(Collection<? extends E> collection)
+	public boolean retainAll(Collection<? extends E> collection)
 	{
 		boolean removed = false;
 		int index = 0;

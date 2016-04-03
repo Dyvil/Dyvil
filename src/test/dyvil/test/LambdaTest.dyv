@@ -1,5 +1,7 @@
 package dyvil.test
 
+include dyvil.Collections
+
 public class LambdaTest
 {
 	@FunctionalInterface
@@ -15,6 +17,8 @@ public class LambdaTest
 	{
 		override func apply(int value): int
 	}
+
+	public static void repeatClosure(int n, => void f) = for (var i <- 0 ..< n) f()
 	
 	private static int staticSum = 0
 	
@@ -74,7 +78,7 @@ public class LambdaTest
 		() => void function1 = function { result += "a" }
 		() => String function2 = function { "b" }
 
-		`repeat`(3) { result += function2() }
+		repeatClosure(3) { result += function2() }
 
 		with ("c") { result += $0 }
 
@@ -86,19 +90,19 @@ public class LambdaTest
 
 	private static void partialFunctionTest()
 	{
-		(int, int) => int compareInts = _ compareTo _
-		any => void printFun1 = Main.test("Partial Function Test 1", -1, _)
+		((int, int) => int) compareInts = _ compareTo _
+		(any => void) testFun = Main.test("Partial Function Test 1", -1, _)
 
-		printFun1(compareInts(1, 2))
+		testFun(compareInts(1, 2))
 
 		with ("A", Main.test("Partial Function Test 2", "A", _))
 	}
 
 	public static void curriedTest()
 	{
-		int => int => int add2 = i => j => i + j
-		int => int => int => int add3 = i => j => k => i + j + k
-		int => int => int => int => int add4 = i => j => k => l => i + j + k + l
+		(int => int => int) add2 = i => j => i + j
+		(int => int => int => int) add3 = i => j => k => i + j + k
+		(int => int => int => int => int) add4 = i => j => k => l => i + j + k + l
 
 		Main.test("Curried Test (1 nested level)", 11, add2 1 10)
 		Main.test("Curried Test (2 nested levels)", 111, add3 1 10 100)

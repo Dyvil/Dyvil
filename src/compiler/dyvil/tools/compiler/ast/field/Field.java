@@ -3,20 +3,28 @@ package dyvil.tools.compiler.ast.field;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.FieldVisitor;
+import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.ast.access.FieldAccess;
+import dyvil.tools.compiler.ast.access.FieldAssignment;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisExpr;
 import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Deprecation;
@@ -31,6 +39,8 @@ import java.lang.annotation.ElementType;
 public class Field extends Member implements IField
 {
 	protected IValue value;
+
+	protected IProperty property;
 
 	// Metadata
 	protected IClass enclosingClass;
@@ -92,6 +102,29 @@ public class Field extends Member implements IField
 	public IValue getValue()
 	{
 		return this.value;
+	}
+
+	@Override
+	public IProperty getProperty()
+	{
+		return this.property;
+	}
+
+	@Override
+	public void setProperty(IProperty property)
+	{
+		this.property = property;
+	}
+
+	@Override
+	public IProperty createProperty()
+	{
+		if (this.property != null)
+		{
+			return this.property;
+		}
+
+		return this.property = new Property(this.position, this.name, Types.UNKNOWN, new FlagModifierSet(), null);
 	}
 
 	@Override
@@ -194,6 +227,17 @@ public class Field extends Member implements IField
 		{
 			this.value.resolveTypes(markers, context);
 		}
+
+		if (this.property != null)
+		{
+			final int modifiers =
+				this.modifiers.toFlags() & (Modifiers.STATIC | Modifiers.PUBLIC | Modifiers.PROTECTED);
+			// only transfer public, static and protected modifiers to the property
+
+			this.property.getModifiers().addIntModifier(modifiers);
+			this.property.setEnclosingClass(this.enclosingClass);
+			this.property.resolveTypes(markers, context);
+		}
 	}
 
 	@Override
@@ -226,14 +270,58 @@ public class Field extends Member implements IField
 					this.type = Types.ANY;
 				}
 			}
-
-			return;
 		}
-		if (this.type == Types.UNKNOWN)
+		else if (this.type == Types.UNKNOWN)
 		{
 			markers.add(Markers.semantic(this.position, "field.type.infer.novalue", this.name.unqualified));
 			this.type = Types.ANY;
 		}
+
+		if (this.property == null)
+		{
+			return;
+		}
+
+		this.property.setType(this.type);
+
+		final IMethod getter = this.property.getGetter();
+		final IMethod setter = this.property.getSetter();
+
+		final IValue receiver = this.hasModifier(Modifiers.STATIC) ?
+			                        null :
+			                        new ThisExpr(this.enclosingClass.getType(), VariableThis.DEFAULT);
+		if (getter != null)
+		{
+			getter.setType(this.type);
+			if (getter.getValue() == null)
+			{
+				// get: this.FIELD_NAME
+				getter.setValue(new FieldAccess(getter.getPosition(), receiver, this));
+			}
+		}
+		if (setter != null)
+		{
+			final IParameter setterParameter = setter.getParameter(0);
+			setterParameter.setType(this.type);
+
+			if (setter.getValue() == null)
+			{
+				final ICodePosition setterPosition = setter.getPosition();
+				if (this.hasModifier(Modifiers.FINAL))
+				{
+					markers.add(Markers.semanticError(setterPosition, "field.property.setter.final", this.name));
+					setter.setValue(new VoidValue(setterPosition)); // avoid abstract method error
+				}
+				else
+				{
+					// set: this.FIELD_NAME = newValue
+					setter.setValue(new FieldAssignment(setterPosition, receiver, this,
+					                                    new FieldAccess(setterPosition, null, setterParameter)));
+				}
+			}
+		}
+
+		this.property.resolve(markers, context);
 	}
 
 	@Override
@@ -245,6 +333,11 @@ public class Field extends Member implements IField
 		{
 			this.value.checkTypes(markers, context);
 		}
+
+		if (this.property != null)
+		{
+			this.property.checkTypes(markers, context);
+		}
 	}
 
 	@Override
@@ -255,6 +348,11 @@ public class Field extends Member implements IField
 		if (this.value != null)
 		{
 			this.value.check(markers, context);
+		}
+
+		if (this.property != null)
+		{
+			this.property.checkTypes(markers, context);
 		}
 
 		if (Types.isSameType(this.type, Types.VOID))
@@ -274,6 +372,11 @@ public class Field extends Member implements IField
 		{
 			this.value = this.value.foldConstants();
 		}
+
+		if (this.property != null)
+		{
+			this.property.foldConstants();
+		}
 	}
 
 	@Override
@@ -285,40 +388,155 @@ public class Field extends Member implements IField
 		{
 			this.value = this.value.cleanup(context, compilableList);
 		}
+
+		if (this.property != null)
+		{
+			this.property.cleanup(context, compilableList);
+		}
+	}
+
+	private boolean hasConstantValue()
+	{
+		return this.hasModifier(Modifiers.FINAL) && this.value.isConstant();
 	}
 
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		final int modifiers = this.modifiers.toFlags() & ModifierUtil.JAVA_MODIFIER_MASK;
-		final Object value = this.value != null && this.value.isConstant() ? this.value.toObject() : null;
-		final FieldVisitor fieldVisitor = writer.visitField(modifiers, this.name.qualified, this.getDescriptor(),
-		                                                    this.getSignature(), value);
+
+		final Object value;
+		if (this.value != null && this.hasModifier(Modifiers.STATIC) && this.hasConstantValue())
+		{
+			value = this.value.toObject();
+		}
+		else
+		{
+			value = null;
+		}
+
+		final String descriptor = this.getDescriptor();
+		final String name = this.name.qualified;
+
+		final FieldVisitor fieldVisitor = writer.visitField(modifiers, name, descriptor, this.getSignature(), value);
 
 		IField.writeAnnotations(fieldVisitor, this.modifiers, this.annotations, this.type);
 		fieldVisitor.visitEnd();
+
+		if (this.property != null)
+		{
+			this.property.write(writer);
+		}
+
+		if (!this.hasModifier(Modifiers.LAZY))
+		{
+			return;
+		}
+
+		final String lazyName = name + "$lazy";
+		final String ownerClass = this.enclosingClass.getInternalName();
+		final boolean isStatic = (modifiers & Modifiers.STATIC) != 0;
+
+		writer
+			.visitField(isStatic ? Modifiers.PRIVATE | Modifiers.STATIC : Modifiers.PRIVATE, lazyName, "Z", null, null);
+
+		final MethodWriter access = new MethodWriterImpl(writer, writer.visitMethod(modifiers, lazyName,
+		                                                                            "()" + descriptor, null, null));
+		access.visitCode();
+
+		// Get the $lazy flag
+		int getOpcode;
+		if (!isStatic)
+		{
+			access.setLocalType(0, ownerClass);
+			access.visitVarInsn(Opcodes.ALOAD, 0);
+			access.visitFieldInsn(getOpcode = Opcodes.GETFIELD, ownerClass, lazyName, "Z");
+		}
+		else
+		{
+			access.visitFieldInsn(getOpcode = Opcodes.GETSTATIC, ownerClass, lazyName, "Z");
+		}
+
+		Label label = new Label();
+		final int returnOpcode = this.type.getReturnOpcode();
+		access.visitJumpInsn(Opcodes.IFEQ, label);                      // if (this.fieldName$lazy) {
+
+		if (!isStatic)
+		{
+			access.visitVarInsn(Opcodes.ALOAD, 0);
+		}
+
+		access.visitFieldInsn(getOpcode, ownerClass, name, descriptor); //     this.fieldName ->
+		access.visitInsn(returnOpcode);                                 //     return
+		access.visitTargetLabel(label);                                 // }
+
+		// this.fieldName$lazy = true
+		// return this.fieldName = value
+
+		if (!isStatic)
+		{
+			access.visitVarInsn(Opcodes.ALOAD, 0);
+			access.visitInsn(Opcodes.DUP);
+			access.visitLdcInsn(1);
+			access.visitFieldInsn(Opcodes.PUTFIELD, ownerClass, lazyName, "Z");
+
+			this.value.writeExpression(access, this.type);
+			access.visitInsn(Opcodes.AUTO_DUP_X1);
+			access.visitFieldInsn(Opcodes.PUTFIELD, ownerClass, name, descriptor);
+		}
+		else
+		{
+			access.visitLdcInsn(1);
+			access.visitFieldInsn(Opcodes.PUTSTATIC, ownerClass, lazyName, "Z");
+
+			this.value.writeExpression(access, this.type);
+			access.visitInsn(Opcodes.AUTO_DUP);
+			access.visitFieldInsn(Opcodes.PUTSTATIC, ownerClass, name, descriptor);
+		}
+		access.visitInsn(returnOpcode);
+		access.visitEnd();
 	}
 
 	@Override
 	public void writeClassInit(MethodWriter writer) throws BytecodeException
 	{
-		if (this.value != null && !this.modifiers.hasIntModifier(Modifiers.STATIC) && !this.value.isConstant())
+		if (this.hasModifier(Modifiers.STATIC))
+		{
+			return;
+		}
+
+		if (this.value != null && !this.hasModifier(Modifiers.LAZY))
 		{
 			writer.visitVarInsn(Opcodes.ALOAD, 0);
 			this.value.writeExpression(writer, this.type);
 			writer.visitFieldInsn(Opcodes.PUTFIELD, this.enclosingClass.getInternalName(), this.name.qualified,
 			                      this.getDescriptor());
 		}
+
+		if (this.property != null)
+		{
+			this.property.writeClassInit(writer);
+		}
 	}
 
 	@Override
 	public void writeStaticInit(MethodWriter writer) throws BytecodeException
 	{
-		if (this.value != null && this.modifiers.hasIntModifier(Modifiers.STATIC) && !this.value.isConstant())
+		if (!this.hasModifier(Modifiers.STATIC))
+		{
+			return;
+		}
+
+		if (this.value != null && !this.hasConstantValue() && !this.hasModifier(Modifiers.LAZY))
 		{
 			this.value.writeExpression(writer, this.type);
 			writer.visitFieldInsn(Opcodes.PUTSTATIC, this.enclosingClass.getInternalName(), this.name.qualified,
 			                      this.getDescriptor());
+		}
+
+		if (this.property != null)
+		{
+			this.property.writeStaticInit(writer);
 		}
 	}
 
@@ -327,15 +545,24 @@ public class Field extends Member implements IField
 	{
 		String owner = this.enclosingClass.getInternalName();
 		String name = this.name.qualified;
-		String desc = this.type.getExtendedName();
-		if (this.modifiers.hasIntModifier(Modifiers.STATIC))
+		String desc = this.getDescriptor();
+
+		writer.visitLineNumber(lineNumber);
+		switch (this.modifiers.toFlags() & (Modifiers.STATIC | Modifiers.LAZY))
 		{
-			writer.visitFieldInsn(Opcodes.GETSTATIC, owner, name, desc);
-		}
-		else
-		{
-			writer.visitLineNumber(lineNumber);
+		case 0: // neither static nor lazy
 			writer.visitFieldInsn(Opcodes.GETFIELD, owner, name, desc);
+			return;
+		case Modifiers.STATIC:
+			writer.visitFieldInsn(Opcodes.GETSTATIC, owner, name, desc);
+			return;
+		case Modifiers.LAZY:
+			writer.visitMethodInsn(this.hasModifier(Modifiers.PRIVATE) ? Opcodes.INVOKESPECIAL : Opcodes.INVOKEVIRTUAL,
+			                       owner, name + "$lazy", "()" + desc, this.enclosingClass.isInterface());
+			return;
+		case Modifiers.STATIC | Modifiers.LAZY: // both static and lazy
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, owner, name + "$lazy", "()" + desc,
+			                       this.enclosingClass.isInterface());
 		}
 	}
 
@@ -344,7 +571,8 @@ public class Field extends Member implements IField
 	{
 		String owner = this.enclosingClass.getInternalName();
 		String name = this.name.qualified;
-		String desc = this.type.getExtendedName();
+		String desc = this.getDescriptor();
+
 		if (this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{
 			writer.visitFieldInsn(Opcodes.PUTSTATIC, owner, name, desc);
@@ -368,6 +596,11 @@ public class Field extends Member implements IField
 		{
 			Formatting.appendSeparator(buffer, "field.assignment", '=');
 			this.value.toString(prefix, buffer);
+		}
+
+		if (this.property != null)
+		{
+			Property.formatBody(this.property, prefix, buffer);
 		}
 	}
 }

@@ -128,13 +128,13 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $plus(K key, V value)
+	public ImmutableMap<K, V> withEntry(K key, V value)
 	{
 		return new ArrayMap<>(new Object[] { this.key, key }, new Object[] { this.value, value }, 2, true);
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map)
+	public ImmutableMap<K, V> union(Map<? extends K, ? extends V> map)
 	{
 		int index = 1;
 		Tuple2<? extends K, ? extends V>[] tuples = new Tuple2[1 + map.size()];
@@ -147,31 +147,31 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$at(Object key)
+	public ImmutableMap<K, V> keyRemoved(Object key)
 	{
 		return Objects.equals(this.key, key) ? EmptyMap.instance : this;
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(Object key, Object value)
+	public ImmutableMap<K, V> removed(Object key, Object value)
 	{
 		return Objects.equals(this.key, key) && Objects.equals(this.value, value) ? EmptyMap.instance : this;
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$colon(Object value)
+	public ImmutableMap<K, V> valueRemoved(Object value)
 	{
 		return Objects.equals(this.value, value) ? EmptyMap.instance : this;
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Map<?, ?> map)
+	public ImmutableMap<K, V> difference(Map<?, ?> map)
 	{
 		return map.contains(this.key, this.value) ? EmptyMap.instance : this;
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Collection<?> keys)
+	public ImmutableMap<K, V> keyDifference(Collection<?> keys)
 	{
 		return keys.contains(this.key) ? EmptyMap.instance : this;
 	}

@@ -5,12 +5,10 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.external.ExternalClass;
-import dyvil.tools.compiler.ast.field.IAccessible;
-import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.field.VariableThis;
+import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.member.IClassMember;
@@ -37,7 +35,7 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 import java.lang.annotation.ElementType;
 
-public abstract class AbstractClass implements IClass
+public abstract class AbstractClass implements IClass, IDefaultContext
 {
 	// Modifiers and Annotations
 
@@ -81,6 +79,9 @@ public abstract class AbstractClass implements IClass
 	{
 		return this.enclosingClass;
 	}
+
+	@Override
+	public abstract IDyvilHeader getHeader();
 
 	@Override
 	public void setEnclosingClass(IClass enclosingClass)
@@ -307,11 +308,15 @@ public abstract class AbstractClass implements IClass
 	}
 
 	@Override
-	public void setParameter(int index, IParameter parameter)
+	public IParameter createParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
-		parameter.setEnclosingClass(this);
-		parameter.setIndex(index);
-		this.parameters[index] = parameter;
+		return new ClassParameter(position, name, type, modifiers, annotations);
+	}
+
+	@Override
+	public IParameter getParameter(int index)
+	{
+		return this.parameters[index];
 	}
 
 	@Override
@@ -343,21 +348,24 @@ public abstract class AbstractClass implements IClass
 	}
 
 	@Override
-	public IParameter createParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public void setParameter(int index, IParameter parameter)
 	{
-		return new ClassParameter(position, name, type, modifiers, annotations);
-	}
-
-	@Override
-	public IParameter getParameter(int index)
-	{
-		return this.parameters[index];
+		parameter.setEnclosingClass(this);
+		parameter.setIndex(index);
+		this.parameters[index] = parameter;
 	}
 
 	@Override
 	public IParameter[] getParameters()
 	{
 		return this.parameters;
+	}
+
+	@Override
+	public void setParameters(IParameter[] parameters, int parameterCount)
+	{
+		this.parameters = parameters;
+		this.parameterCount = parameterCount;
 	}
 
 	// Super Types
@@ -375,10 +383,10 @@ public abstract class AbstractClass implements IClass
 	}
 
 	@Override
-	public boolean isSubTypeOf(IType type)
+	public boolean isSubClassOf(IType type)
 	{
 		IClass iclass = type.getTheClass();
-		if (this == iclass || this.superType != null && type.isSuperClassOf(this.superType))
+		if (this == iclass || this.superType != null && Types.isSuperClass(type, this.superType))
 		{
 			return true;
 		}
@@ -388,7 +396,7 @@ public abstract class AbstractClass implements IClass
 		}
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			if (type.isSuperClassOf(this.interfaces[i]))
+			if (Types.isSuperClass(type, this.interfaces[i]))
 			{
 				return true;
 			}
@@ -525,6 +533,15 @@ public abstract class AbstractClass implements IClass
 			return !candidate.hasModifier(Modifiers.ABSTRACT);
 		}
 
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			final IProperty property = this.parameters[i].getProperty();
+			if (property != null && ClassBody.checkPropertyImplements(property, candidate, typeContext))
+			{
+				return true;
+			}
+		}
+
 		if (this.body != null && this.body.checkImplements(candidate, typeContext))
 		{
 			return true;
@@ -533,8 +550,8 @@ public abstract class AbstractClass implements IClass
 		if (this.superType != null)
 		{
 			final IClass superClass = this.superType.getTheClass();
-			if (superClass != null && superClass.checkImplements(candidate,
-			                                                     this.superType.getConcreteType(typeContext)))
+			if (superClass != null && superClass
+				                          .checkImplements(candidate, this.superType.getConcreteType(typeContext)))
 			{
 				return true;
 			}
@@ -544,8 +561,8 @@ public abstract class AbstractClass implements IClass
 		{
 			final IType interfaceType = this.interfaces[i];
 			final IClass interfaceClass = interfaceType.getTheClass();
-			if (interfaceClass != null && interfaceClass.checkImplements(candidate,
-			                                                             interfaceType.getConcreteType(typeContext)))
+			if (interfaceClass != null && interfaceClass
+				                              .checkImplements(candidate, interfaceType.getConcreteType(typeContext)))
 			{
 				return true;
 			}
@@ -555,7 +572,7 @@ public abstract class AbstractClass implements IClass
 	}
 
 	@Override
-	public void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext, Set<IClass> checkedClasses)
+	public void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext, Set<IClass> checkedClasses)
 	{
 		if (checkedClasses.contains(this))
 		{
@@ -563,12 +580,21 @@ public abstract class AbstractClass implements IClass
 		}
 		checkedClasses.add(this);
 
-		if (this.body != null)
+		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.body.checkMethods(markers, iclass, typeContext);
+			final IProperty property = this.parameters[i].getProperty();
+			if (property != null)
+			{
+				ClassBody.checkProperty(property, markers, checkedClass, typeContext);
+			}
 		}
 
-		this.checkSuperMethods(markers, iclass, typeContext, checkedClasses);
+		if (this.body != null)
+		{
+			this.body.checkMethods(markers, checkedClass, typeContext);
+		}
+
+		this.checkSuperMethods(markers, checkedClass, typeContext, checkedClasses);
 	}
 
 	public void checkSuperMethods(MarkerList markers, IClass thisClass, ITypeContext typeContext, Set<IClass> checkedClasses)
@@ -809,6 +835,15 @@ public abstract class AbstractClass implements IClass
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			final IProperty property = this.parameters[i].getProperty();
+			if (property != null)
+			{
+				property.getMethodMatches(list, instance, name, arguments);
+			}
+		}
+
 		if (this.body != null)
 		{
 			this.body.getMethodMatches(list, instance, name, arguments);
@@ -913,7 +948,7 @@ public abstract class AbstractClass implements IClass
 	@Override
 	public IAccessible getAccessibleThis(IClass type)
 	{
-		if (type == this || type.getClassType().isSuperClassOf(this.classType))
+		if (type == this || Types.isSuperClass(this, type))
 		{
 			return VariableThis.DEFAULT;
 		}

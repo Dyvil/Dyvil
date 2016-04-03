@@ -68,19 +68,11 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	
 	float getTypeMatch(int index, IParameter param);
 	
-	float getVarargsTypeMatch(int index, IParameter param);
-	
 	void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context);
-	
-	void checkVarargsValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context);
 	
 	void inferType(int index, IParameter param, ITypeContext typeContext);
 	
-	void inferVarargsType(int index, IParameter param, ITypeContext typeContext);
-	
 	void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException;
-	
-	void writeVarargsValue(int index, IParameter param, MethodWriter writer) throws BytecodeException;
 	
 	// Phase Methods
 

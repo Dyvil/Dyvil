@@ -129,7 +129,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $plus(K key, V value)
+	public ImmutableMap<K, V> withEntry(K key, V value)
 	{
 		if (!checkType(this.type, key))
 		{
@@ -148,7 +148,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map)
+	public ImmutableMap<K, V> union(Map<? extends K, ? extends V> map)
 	{
 		Object[] newValues = this.values.clone();
 		int newSize = this.size;
@@ -168,7 +168,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$at(Object key)
+	public ImmutableMap<K, V> keyRemoved(Object key)
 	{
 		if (!checkType(this.type, key))
 		{
@@ -187,7 +187,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(Object key, Object value)
+	public ImmutableMap<K, V> removed(Object key, Object value)
 	{
 		if (!checkType(this.type, key))
 		{
@@ -206,7 +206,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$colon(Object value)
+	public ImmutableMap<K, V> valueRemoved(Object value)
 	{
 		Object[] newValues = this.values.clone();
 		int newSize = this.size;
@@ -224,7 +224,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Map<?, ?> map)
+	public ImmutableMap<K, V> difference(Map<?, ?> map)
 	{
 		Object[] newValues = this.values.clone();
 		int newSize = this.size;
@@ -244,7 +244,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Collection<?> keys)
+	public ImmutableMap<K, V> keyDifference(Collection<?> keys)
 	{
 		Object[] newValues = this.values.clone();
 		int newSize = this.size;

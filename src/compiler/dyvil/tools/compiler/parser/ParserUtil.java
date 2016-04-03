@@ -35,7 +35,7 @@ public class ParserUtil
 		return false;
 	}
 
-	public static boolean isExpressionTerminator(int type)
+	public static boolean isExpressionEnd(int type)
 	{
 		if (isTerminator(type))
 		{
@@ -58,7 +58,17 @@ public class ParserUtil
 		return false;
 	}
 
+	public static boolean isSymbol(int type)
+	{
+		return type == Tokens.SYMBOL_IDENTIFIER || (type & Tokens.SYMBOL) != 0;
+	}
+
 	// endregion
+
+	public static boolean neighboring(IToken first, IToken next)
+	{
+		return next.startIndex() == first.endIndex();
+	}
 
 	/**
 	 * Finds the next matching parenthesis, brace or bracket.
@@ -109,7 +119,7 @@ public class ParserUtil
 					return null;
 				}
 				braceDepth--;
-				continue;
+				break;
 			}
 
 			if (parenDepth == 0 && bracketDepth == 0 && braceDepth == 0)

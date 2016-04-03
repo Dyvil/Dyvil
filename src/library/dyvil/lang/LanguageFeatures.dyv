@@ -3,6 +3,7 @@ package dyvil.lang
 import	java.io.PrintStream
 import	dyvilx.lang.model.`type`.Type
 import	dyvil.annotation.Reified
+import	dyvil.util.AutoPrinter
 using	dyvil.reflect.Opcodes._
 
 /**
@@ -19,21 +20,15 @@ public final class LanguageFeatures
 
 	public static Type[T] typeOf[@Reified T](T value) = type T
 
-	// Lists
-
-	public infix inline func ::[E](ImmutableList[E] list, E element): ImmutableList[E] = list + element
-
-	public infix inline func ::[E](E element1, E element2): ImmutableList[E] = ImmutableList(element1, element2)
-
 	// Increments
 
-	public static void inc(int^ i, int n = 1) = i.set(i.get + n)
+	public static void inc(int^ i, int n = 1) = *i = *i + n
 
-	public static void inc(long^ l, long n = 1L) = l.set(l.get + n)
+	public static void inc(long^ l, long n = 1L) = *l = *l + n
 
-	public static void inc(float^ f, float n = 1F) = f.set(f.get + n)
+	public static void inc(float^ f, float n = 1F) = *f = *f + n
 
-	public static void inc(double^ d, double n = 1D) = d.set(d.get + n)
+	public static void inc(double^ d, double n = 1D) = *d = *d + n
 
 	// Useful Globals
 
@@ -49,12 +44,6 @@ public final class LanguageFeatures
 
 	public static inline R with[T, R](T receiver, T => R f) = f(receiver)
 
-	@Deprecated
-	public static void `repeat`(int n, => void f)
-	{
-		for (var i <- 0 ..< n) f()
-	}
-
 	// I/O
 
 	public const String ENDL = System.lineSeparator
@@ -64,6 +53,8 @@ public final class LanguageFeatures
 		stream.print(value)
 		return stream
 	}
+
+	public static inline func println(AutoPrinter.() => void closure): void = closure(new AutoPrinter)
 
 	// Timing
 

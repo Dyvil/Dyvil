@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.type.typevar;
 
-import dyvil.tools.asm.Opcodes;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -17,6 +17,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -46,7 +47,13 @@ public class TypeVarType implements IRawType
 	{
 		return this.typeParameter.getName();
 	}
-	
+
+	@Override
+	public IType atPosition(ICodePosition position)
+	{
+		return new ResolvedTypeVarType(this.typeParameter, position);
+	}
+
 	@Override
 	public ITypeParameter getTypeVariable()
 	{
@@ -72,9 +79,21 @@ public class TypeVarType implements IRawType
 	}
 
 	@Override
-	public IType asReturnType()
+	public boolean needsSubTypeCheck()
 	{
-		return this.typeParameter.getCovariantType();
+		return true;
+	}
+
+	@Override
+	public boolean isSameType(IType type)
+	{
+		return this.typeParameter == type.asReturnType().getTypeVariable();
+	}
+
+	@Override
+	public boolean isSameClass(IType type)
+	{
+		return this.typeParameter.isSameClass(type);
 	}
 
 	@Override
@@ -82,31 +101,31 @@ public class TypeVarType implements IRawType
 	{
 		return this.isSameType(type);
 	}
-	
+
 	@Override
 	public boolean isSuperClassOf(IType subType)
 	{
 		return this.typeParameter.isSuperClassOf(subType);
 	}
-	
+
+	@Override
+	public boolean isSubTypeOf(IType superType)
+	{
+		return this.typeParameter.isSubTypeOf(superType);
+	}
+
+	@Override
+	public boolean isSubClassOf(IType superType)
+	{
+		return this.typeParameter.isSubClassOf(superType);
+	}
+
 	@Override
 	public int getSuperTypeDistance(IType superType)
 	{
 		return this.typeParameter.getSuperTypeDistance(superType);
 	}
-	
-	@Override
-	public boolean isSameType(IType type)
-	{
-		return this.typeParameter == type.asReturnType().getTypeVariable();
-	}
-	
-	@Override
-	public boolean isSameClass(IType type)
-	{
-		return this.isSameType(type);
-	}
-	
+
 	@Override
 	public boolean hasTypeVariables()
 	{
@@ -120,19 +139,15 @@ public class TypeVarType implements IRawType
 		{
 			return this;
 		}
-		
+
 		final IType concreteType = context.resolveType(this.typeParameter);
-		if (concreteType != null)
-		{
-			return concreteType;
-		}
-		return this.typeParameter.getDefaultType();
+		return concreteType != null ? concreteType : this;
 	}
 	
 	@Override
 	public IType resolveType(ITypeParameter typeParameter)
 	{
-		return this.typeParameter == typeParameter ? this : null;
+		return this.typeParameter == typeParameter ? this : this.typeParameter.getDefaultType().resolveType(typeParameter);
 	}
 	
 	@Override

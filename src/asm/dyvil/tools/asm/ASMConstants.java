@@ -31,9 +31,9 @@ package dyvil.tools.asm;
  * @author Eric Bruneton
  * @author Eugene Kuleshov
  */
-public interface Opcodes
+@SuppressWarnings( { "UnnecessaryBoxing", "unused", "PointlessBitwiseExpression" })
+public interface ASMConstants
 {
-	
 	// ASM API versions
 	
 	int ASM4 = 4 << 16 | 0 << 8 | 0;

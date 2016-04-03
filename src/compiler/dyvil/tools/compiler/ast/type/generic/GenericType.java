@@ -53,13 +53,23 @@ public abstract class GenericType implements IObjectType, ITypeList
 	{
 		return true;
 	}
-	
-	@Override
-	public void setType(int index, IType type)
+
+	public int typeArgumentCount()
 	{
-		this.typeArguments[index] = type;
+		return this.typeArgumentCount;
 	}
-	
+
+	public IType[] getTypeArguments()
+	{
+		return this.typeArguments;
+	}
+
+	@Override
+	public IType getType(int index)
+	{
+		return this.typeArguments[index];
+	}
+
 	@Override
 	public void addType(IType type)
 	{
@@ -72,13 +82,24 @@ public abstract class GenericType implements IObjectType, ITypeList
 		}
 		this.typeArguments[index] = type;
 	}
-	
+
 	@Override
-	public IType getType(int index)
+	public void setType(int index, IType type)
 	{
-		return this.typeArguments[index];
+		this.typeArguments[index] = type;
 	}
-	
+
+	@Override
+	public IType asParameterType()
+	{
+		final GenericType copy = this.clone();
+		for (int i = 0; i < this.typeArgumentCount; i++)
+		{
+			copy.typeArguments[i] = this.typeArguments[i].asParameterType();
+		}
+		return copy;
+	}
+
 	@Override
 	public boolean hasTypeVariables()
 	{
@@ -199,7 +220,7 @@ public abstract class GenericType implements IObjectType, ITypeList
 		writer.visitLdcInsn(iclass == null ? this.getName().qualified : iclass.getFullName());
 		
 		writer.visitLdcInsn(this.typeArgumentCount);
-		writer.visitMultiANewArrayInsn("dyvilx/lang/model/type/Type", 1);
+		writer.visitTypeInsn(Opcodes.ANEWARRAY, "dyvilx/lang/model/type/Type");
 		for (int i = 0; i < this.typeArgumentCount; i++)
 		{
 			writer.visitInsn(Opcodes.DUP);

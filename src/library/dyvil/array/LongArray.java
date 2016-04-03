@@ -118,7 +118,7 @@ public interface LongArray
 
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	static LongRef subscriptRef(long[] array, int index)
+	static LongRef subscript_$amp(long[] array, int index)
 	{
 		return new LongArrayRef(array, index);
 	}

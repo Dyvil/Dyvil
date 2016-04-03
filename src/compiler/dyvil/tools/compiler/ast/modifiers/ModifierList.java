@@ -80,6 +80,12 @@ public class ModifierList implements ModifierSet
 	}
 
 	@Override
+	public void removeIntModifier(int modifier)
+	{
+		this.intModifiers &= ~modifier;
+	}
+
+	@Override
 	public void check(MarkerList markers)
 	{
 	}

@@ -118,7 +118,7 @@ public interface CharArray
 
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	static CharRef subscriptRef(char[] array, int index)
+	static CharRef subscript_$amp(char[] array, int index)
 	{
 		return new CharArrayRef(array, index);
 	}

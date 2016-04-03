@@ -1,15 +1,15 @@
 package dyvil.tools.compiler.backend;
 
-import dyvil.tools.asm.Opcodes;
+import dyvil.tools.asm.ASMConstants;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.ast.generic.TypeParameter;
 import dyvil.tools.compiler.ast.generic.Variance;
+import dyvil.tools.compiler.ast.method.ICallableSignature;
 import dyvil.tools.compiler.ast.method.IExceptionList;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.ICallableSignature;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
@@ -22,19 +22,19 @@ import dyvil.tools.parsing.Name;
 
 public final class ClassFormat
 {
-	public static final int CLASS_VERSION = Opcodes.V1_8;
-	public static final int ASM_VERSION   = Opcodes.ASM5;
+	public static final int CLASS_VERSION = ASMConstants.V1_8;
+	public static final int ASM_VERSION   = ASMConstants.ASM5;
 
-	public static final int H_GETFIELD         = Opcodes.H_GETFIELD;
-	public static final int H_GETSTATIC        = Opcodes.H_GETSTATIC;
-	public static final int H_PUTFIELD         = Opcodes.H_PUTFIELD;
-	public static final int H_PUTSTATIC        = Opcodes.H_PUTSTATIC;
-	public static final int H_INVOKEVIRTUAL    = Opcodes.H_INVOKEVIRTUAL;
-	public static final int H_INVOKESTATIC     = Opcodes.H_INVOKESTATIC;
-	public static final int H_INVOKESPECIAL    = Opcodes.H_INVOKESPECIAL;
-	public static final int H_NEWINVOKESPECIAL = Opcodes.H_NEWINVOKESPECIAL;
-	public static final int H_INVOKEINTERFACE  = Opcodes.H_INVOKEINTERFACE;
-	
+	public static final int H_GETFIELD         = ASMConstants.H_GETFIELD;
+	public static final int H_GETSTATIC        = ASMConstants.H_GETSTATIC;
+	public static final int H_PUTFIELD         = ASMConstants.H_PUTFIELD;
+	public static final int H_PUTSTATIC        = ASMConstants.H_PUTSTATIC;
+	public static final int H_INVOKEVIRTUAL    = ASMConstants.H_INVOKEVIRTUAL;
+	public static final int H_INVOKESTATIC     = ASMConstants.H_INVOKESTATIC;
+	public static final int H_INVOKESPECIAL    = ASMConstants.H_INVOKESPECIAL;
+	public static final int H_NEWINVOKESPECIAL = ASMConstants.H_NEWINVOKESPECIAL;
+	public static final int H_INVOKEINTERFACE  = ASMConstants.H_INVOKEINTERFACE;
+
 	public static final int T_BOOLEAN = 4;
 	public static final int T_CHAR    = 5;
 	public static final int T_FLOAT   = 6;
@@ -43,41 +43,57 @@ public final class ClassFormat
 	public static final int T_SHORT   = 9;
 	public static final int T_INT     = 10;
 	public static final int T_LONG    = 11;
-	
-	public static final int ACC_SUPER = Opcodes.ACC_SUPER;
-	
-	public static final Integer UNINITIALIZED_THIS = Opcodes.UNINITIALIZED_THIS;
-	public static final Integer NULL               = Opcodes.NULL;
-	public static final Integer TOP                = Opcodes.TOP;
+
+	public static final int ACC_SUPER = ASMConstants.ACC_SUPER;
+
+	public static final Integer UNINITIALIZED_THIS = ASMConstants.UNINITIALIZED_THIS;
+	public static final Integer NULL               = ASMConstants.NULL;
+	public static final Integer TOP                = ASMConstants.TOP;
 	public static final Integer BOOLEAN            = new Integer(1);
 	public static final Integer BYTE               = new Integer(1);
 	public static final Integer SHORT              = new Integer(1);
 	public static final Integer CHAR               = new Integer(1);
-	public static final Integer INT                = Opcodes.INTEGER;
-	public static final Integer LONG               = Opcodes.LONG;
-	public static final Integer FLOAT              = Opcodes.FLOAT;
-	public static final Integer DOUBLE             = Opcodes.DOUBLE;
-	
+	public static final Integer INT                = ASMConstants.INTEGER;
+	public static final Integer LONG               = ASMConstants.LONG;
+	public static final Integer FLOAT              = ASMConstants.FLOAT;
+	public static final Integer DOUBLE             = ASMConstants.DOUBLE;
+
+	public static int insnToHandle(int invokeOpcode)
+	{
+		switch (invokeOpcode)
+		{
+		case ASMConstants.INVOKEVIRTUAL:
+			return ClassFormat.H_INVOKEVIRTUAL;
+		case ASMConstants.INVOKESTATIC:
+			return ClassFormat.H_INVOKESTATIC;
+		case ASMConstants.INVOKEINTERFACE:
+			return ClassFormat.H_INVOKEINTERFACE;
+		case ASMConstants.INVOKESPECIAL:
+			return ClassFormat.H_INVOKESPECIAL;
+		}
+		return -1;
+	}
+
 	public static String packageToInternal(String pack)
 	{
 		return pack.replace('.', '/');
 	}
-	
+
 	public static String internalToPackage(String internal)
 	{
 		return internal.replace('/', '.');
 	}
-	
+
 	public static String internalToExtended(String internal)
 	{
 		return 'L' + internal + ';';
 	}
-	
+
 	public static String extendedToInternal(String extended)
 	{
 		return extended.substring(1, extended.length() - 1);
 	}
-	
+
 	public static String extendedToPackage(String extended)
 	{
 		int len = extended.length() - 1;
@@ -94,7 +110,7 @@ public final class ClassFormat
 		}
 		return builder.toString();
 	}
-	
+
 	public static String userToExtended(String name)
 	{
 		switch (name)
@@ -124,22 +140,22 @@ public final class ClassFormat
 		}
 		return name;
 	}
-	
+
 	public static IType internalToType(String internal)
 	{
 		return new InternalType(internal);
 	}
-	
+
 	public static IType extendedToType(String extended)
 	{
 		return readType(extended, 0, extended.length() - 1);
 	}
-	
+
 	public static IType readReturnType(String desc)
 	{
 		return readType(desc, desc.lastIndexOf(')') + 1, desc.length() - 1);
 	}
-	
+
 	public static void readClassSignature(String desc, IClass iclass)
 	{
 		int i = 0;
@@ -152,7 +168,7 @@ public final class ClassFormat
 			}
 			i++;
 		}
-		
+
 		int len = desc.length();
 		i = readTyped(desc, i, iclass::setSuperType);
 		while (i < len)
@@ -165,7 +181,7 @@ public final class ClassFormat
 	{
 		return methodSignature::addParameterType;
 	}
-	
+
 	public static void readMethodType(String desc, IMethod method)
 	{
 		int i = 1;
@@ -183,7 +199,7 @@ public final class ClassFormat
 		}
 		i++;
 		i = readTyped(desc, i, method);
-		
+
 		// Throwables
 		int len = desc.length();
 		while (i < len && desc.charAt(i) == '^')
@@ -191,7 +207,7 @@ public final class ClassFormat
 			i = readException(desc, i + 1, method);
 		}
 	}
-	
+
 	public static void readConstructorType(String desc, IConstructor constructor)
 	{
 		int i = 1;
@@ -200,14 +216,14 @@ public final class ClassFormat
 			i = readTyped(desc, i, addParameterType(constructor));
 		}
 		i += 2;
-		
+
 		int len = desc.length();
 		while (i < len && desc.charAt(i) == '^')
 		{
 			i = readException(desc, i + 1, constructor);
 		}
 	}
-	
+
 	public static void readExceptions(String[] exceptions, IExceptionList exceptionList)
 	{
 		for (String s : exceptions)
@@ -215,14 +231,14 @@ public final class ClassFormat
 			exceptionList.addException(internalToType(s));
 		}
 	}
-	
+
 	private static IType readType(String desc, int start, int end)
 	{
 		if (desc.charAt(start) == '[')
 		{
 			return new ArrayType(readType(desc, start + 1, end));
 		}
-		
+
 		switch (desc.charAt(start))
 		{
 		case 'V':
@@ -250,7 +266,7 @@ public final class ClassFormat
 		}
 		return null;
 	}
-	
+
 	private static IType readReferenceType(String desc, int start, int end)
 	{
 		int index = desc.indexOf('<', start);
@@ -258,17 +274,17 @@ public final class ClassFormat
 		{
 			GenericType type = new InternalGenericType(desc.substring(start, index));
 			index++;
-			
+
 			while (desc.charAt(index) != '>')
 			{
 				index = readTyped(desc, index, type);
 			}
 			return type;
 		}
-		
+
 		return new InternalType(desc.substring(start, end));
 	}
-	
+
 	private static int readTyped(String desc, int start, ITypeConsumer consumer)
 	{
 		int array = 0;
@@ -278,7 +294,7 @@ public final class ClassFormat
 			array++;
 			start++;
 		}
-		
+
 		switch (c)
 		{
 		case 'V':
@@ -350,7 +366,7 @@ public final class ClassFormat
 		}
 		return start;
 	}
-	
+
 	private static int readGeneric(String desc, int start, ITypeParametric generic)
 	{
 		int index = desc.indexOf(':', start);
@@ -368,7 +384,7 @@ public final class ClassFormat
 		generic.addTypeParameter(typeVar);
 		return index;
 	}
-	
+
 	private static int readException(String desc, int start, IExceptionList list)
 	{
 		switch (desc.charAt(start))
@@ -390,7 +406,7 @@ public final class ClassFormat
 		}
 		return start;
 	}
-	
+
 	private static int getMatchingSemicolon(String s, int start, int end)
 	{
 		int depth = 0;

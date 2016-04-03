@@ -124,7 +124,7 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $plus(K key, V value)
+	public ImmutableMap<K, V> withEntry(K key, V value)
 	{
 		ArrayMap<K, V> copy = new ArrayMap<>(this);
 		copy.putInternal(key, value);
@@ -132,7 +132,7 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map)
+	public ImmutableMap<K, V> union(Map<? extends K, ? extends V> map)
 	{
 		ArrayMap<K, V> copy = new ArrayMap<>(this.size + map.size());
 		
@@ -149,7 +149,7 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$at(Object key)
+	public ImmutableMap<K, V> keyRemoved(Object key)
 	{
 		Object[] keys = new Object[this.size];
 		Object[] values = new Object[this.size];
@@ -170,7 +170,7 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(Object key, Object value)
+	public ImmutableMap<K, V> removed(Object key, Object value)
 	{
 		Object[] keys = new Object[this.size];
 		Object[] values = new Object[this.size];
@@ -195,7 +195,7 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$colon(Object value)
+	public ImmutableMap<K, V> valueRemoved(Object value)
 	{
 		Object[] keys = new Object[this.size];
 		Object[] values = new Object[this.size];
@@ -216,7 +216,7 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Map<?, ?> map)
+	public ImmutableMap<K, V> difference(Map<?, ?> map)
 	{
 		Object[] keys = new Object[this.size];
 		Object[] values = new Object[this.size];
@@ -238,7 +238,7 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Collection<?> collection)
+	public ImmutableMap<K, V> keyDifference(Collection<?> collection)
 	{
 		Object[] keys = new Object[this.size];
 		Object[] values = new Object[this.size];

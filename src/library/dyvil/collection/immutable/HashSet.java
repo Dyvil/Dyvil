@@ -113,7 +113,7 @@ public class HashSet<E> extends AbstractHashSet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public ImmutableSet<E> $plus(E element)
+	public ImmutableSet<E> added(E element)
 	{
 		HashSet<E> newSet = new HashSet<E>(this);
 		newSet.ensureCapacityInternal(this.size + 1);
@@ -122,7 +122,7 @@ public class HashSet<E> extends AbstractHashSet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public ImmutableSet<E> $minus(Object element)
+	public ImmutableSet<E> removed(Object element)
 	{
 		HashSet<E> newSet = new HashSet<E>(this.size);
 		
@@ -137,7 +137,7 @@ public class HashSet<E> extends AbstractHashSet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> $minus$minus(Collection<?> collection)
+	public ImmutableSet<? extends E> difference(Collection<?> collection)
 	{
 		HashSet<E> newSet = new HashSet<E>(this.size);
 		
@@ -153,7 +153,7 @@ public class HashSet<E> extends AbstractHashSet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> $amp(Collection<? extends E> collection)
+	public ImmutableSet<? extends E> intersection(Collection<? extends E> collection)
 	{
 		HashSet<E> newSet = new HashSet<E>(this.size);
 		
@@ -169,7 +169,7 @@ public class HashSet<E> extends AbstractHashSet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> $bar(Collection<? extends E> collection)
+	public ImmutableSet<? extends E> union(Collection<? extends E> collection)
 	{
 		HashSet<E> newSet = new HashSet<E>(this);
 		newSet.ensureCapacity(this.size + collection.size());
@@ -181,7 +181,7 @@ public class HashSet<E> extends AbstractHashSet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> $up(Collection<? extends E> collection)
+	public ImmutableSet<? extends E> symmetricDifference(Collection<? extends E> collection)
 	{
 		HashSet<E> newSet = new HashSet<E>(this.size + collection.size());
 		

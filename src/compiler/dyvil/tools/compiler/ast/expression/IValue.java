@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.operator.ClassOperator;
 import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -18,7 +17,9 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IValue extends IASTNode, ITyped
 {
@@ -51,12 +52,12 @@ public interface IValue extends IASTNode, ITyped
 	int THIS  = 64;
 	int SUPER = 65;
 
-	int CAST_OPERATOR    = 66;
-	int ISOF_OPERATOR    = 67;
-	int CASE_STATEMENT   = 68;
-	int MATCH            = 69;
-	int LAMBDA           = 70;
-	int PARTIAL_FUNCTION = 71;
+	int CAST_OPERATOR = 66;
+	int ISOF_OPERATOR = 67;
+	// int CASE_STATEMENT   = 68;
+	int MATCH         = 69;
+	int LAMBDA        = 70;
+	// int PARTIAL_FUNCTION = 71;
 
 	// Access and Invocation
 	int CLASS_ACCESS  = 96;
@@ -68,6 +69,7 @@ public interface IValue extends IASTNode, ITyped
 	int SUBSCRIPT_GET = 102;
 	int SUBSCRIPT_SET = 103;
 	int BRACE_ACCESS  = 104;
+	int PREFIX_CALL   = 105;
 
 	// Special Invocation
 	int CONSTRUCTOR_CALL = 112;
@@ -78,16 +80,17 @@ public interface IValue extends IASTNode, ITyped
 	int METHOD_ASSIGN = 121;
 
 	// Special Operators and Intrinsics
-	int BOOLEAN_AND    = 129;
-	int BOOLEAN_OR     = 130;
-	int BOOLEAN_NOT    = 131;
-	int CLASS_OPERATOR = 132;
-	int TYPE_OPERATOR  = 133;
-	int NULLCHECK      = 134;
-	int RANGE_OPERATOR = 135;
-	int STRINGBUILDER  = 136;
-	int INC            = 137;
-	int COLON          = 138;
+	int BOOLEAN_AND       = 129;
+	int BOOLEAN_OR        = 130;
+	int BOOLEAN_NOT       = 131;
+	int CLASS_OPERATOR    = 132;
+	int TYPE_OPERATOR     = 133;
+	int NULLCHECK         = 134;
+	int RANGE_OPERATOR    = 135;
+	int STRINGBUILDER     = 136;
+	int INC               = 137;
+	int COLON             = 138;
+	int VARARGS_EXPANSION = 139;
 
 	// Basic Control Statements
 	int RETURN       = 192;
@@ -112,6 +115,7 @@ public interface IValue extends IASTNode, ITyped
 	// Special Types only used by the compiler
 	int REFERENCE          = 240;
 	int LITERAL_CONVERSION = 241;
+	int OPERATOR_CHAIN     = 242;
 
 	// --- Other Constants ---
 
@@ -159,6 +163,8 @@ public interface IValue extends IASTNode, ITyped
 		return this.isStatement();
 	}
 
+	boolean isResolved();
+
 	default IReference toReference()
 	{
 		return null;
@@ -169,7 +175,15 @@ public interface IValue extends IASTNode, ITyped
 		return null;
 	}
 
-	boolean isResolved();
+	default IValue toAssignment(IValue rhs, ICodePosition position)
+	{
+		return null;
+	}
+
+	default boolean checkVarargs(boolean typeCheck)
+	{
+		return false;
+	}
 
 	@Override
 	IType getType();
@@ -226,22 +240,29 @@ public interface IValue extends IASTNode, ITyped
 
 	IValue cleanup(IContext context, IClassCompilableList compilableList);
 
-	default IValue toAnnotationConstant(MarkerList markers, IContext context)
+	default IValue toAnnotationConstant(MarkerList markers, IContext context, int depth)
 	{
 		return null;
 	}
 
+	default Marker getAnnotationError()
+	{
+		return Markers.semantic(this.getPosition(), "value.constant");
+	}
+
 	static IValue toAnnotationConstant(IValue value, MarkerList markers, IContext context)
 	{
-		final IValue constant = value.toAnnotationConstant(markers, context);
-		if (constant == null)
+		final int depth = context.getCompilationContext().config.getMaxConstantDepth();
+		final IValue constant = value.toAnnotationConstant(markers, context, depth);
+		if (constant != null)
 		{
-			markers.add(Markers.semantic(value.getPosition(), "value.constant",
-			                             context.getCompilationContext().config.getMaxConstantDepth()));
-			return value.getType().getDefaultValue();
+			return constant;
 		}
 
-		return constant;
+		final Marker marker = value.getAnnotationError();
+		marker.addInfo(Markers.getSemantic("value.constant.depth", depth));
+		markers.add(marker);
+		return value.getType().getDefaultValue();
 	}
 
 	default int stringSize()

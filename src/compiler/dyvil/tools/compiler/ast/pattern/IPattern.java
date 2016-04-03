@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.pattern;
 
+import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
-import dyvil.tools.asm.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.type.IType;

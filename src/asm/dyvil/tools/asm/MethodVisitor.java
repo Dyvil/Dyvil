@@ -52,7 +52,7 @@ public interface MethodVisitor extends AnnotatableVisitor, TypeAnnotatableVisito
 	@Deprecated
 	default void visitMethodInsn(int opcode, String owner, String name, String desc)
 	{
-		this.visitMethodInsn(opcode, owner, name, desc, opcode == Opcodes.INVOKEINTERFACE);
+		this.visitMethodInsn(opcode, owner, name, desc, opcode == ASMConstants.INVOKEINTERFACE);
 	}
 	
 	void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf);

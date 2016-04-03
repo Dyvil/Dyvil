@@ -4,6 +4,7 @@ package dyvil
 infix	operator ?		{ associativity none,	precedence 1200 }
 infix	operator ++		{ associativity left,	precedence 1200 }
 infix	operator --		{ associativity left,	precedence 1200 }
+infix	operator ::		{ associativity right,	precedence 1200 }
 
 // Map Operators
 infix	operator ?@		{ associativity none,	precedence 1200 }
@@ -13,6 +14,27 @@ infix	operator -:		{ associativity none,	precedence 1200 }
 
 // Import all classes from the dyvil.collection package
 import	dyvil.collection._
+
+// Use Collection Operators
+using	dyvil.collection.{
+	CollectionOperators._
+	ListOperators._
+	SetOperators._
+	MapOperators._
+}
+
+// Collection Type Aliases
+type	Array[E]			= [E]
+type	MutableArray[E]		= [var E]
+type	ImmutableArray[E]	= [final E]
+
+type	List[E]				= [E...]
+type	MutableList[E]		= [var E...]
+type	ImmutableList[E]	= [final E...]
+
+type	Map[K, V]			= [K:V]
+type	MutableMap[K, V]	= [var K : V]
+type	ImmutableMap[K, V]	= [final K : V]
 
 // Lists
 import	dyvil.collection.immutable.ArrayList		=> ImmutableArrayList

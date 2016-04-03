@@ -38,7 +38,7 @@ public class ClassReader implements ClassVisitor
 	@Override
 	public void visit(int version, int access, String name, String signature, String superName, String[] interfaces)
 	{
-		this.theClass.visit(version, access, name, signature, superName, interfaces);
+		this.theClass.visit(access, name, signature, superName, interfaces);
 	}
 	
 	@Override
@@ -54,7 +54,7 @@ public class ClassReader implements ClassVisitor
 	@Override
 	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
-		return this.theClass.visitAnnotation(type, visible);
+		return this.theClass.visitAnnotation(type);
 	}
 	
 	@Override
@@ -65,13 +65,13 @@ public class ClassReader implements ClassVisitor
 	@Override
 	public void visitInnerClass(String name, String outerName, String innerName, int access)
 	{
-		this.theClass.visitInnerClass(name, outerName, innerName, access);
+		this.theClass.visitInnerClass(name, outerName, innerName);
 	}
 	
 	@Override
 	public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String desc, boolean visible)
 	{
-		return this.theClass.visitTypeAnnotation(typeRef, typePath, desc, visible);
+		return this.theClass.visitTypeAnnotation(typeRef, typePath, desc);
 	}
 	
 	@Override

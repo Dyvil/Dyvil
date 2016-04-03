@@ -1,12 +1,10 @@
-package dyvil.tools.compiler.ast.operator;
+package dyvil.tools.compiler.ast.expression;
 
-import dyvil.tools.asm.Opcodes;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.WildcardValue;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.LiteralConversion;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -19,6 +17,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -113,7 +112,7 @@ public class ColonOperator implements IValue
 				       .withType(type, typeContext, markers, context);
 		}
 
-		if (!type.isSuperClassOf(TupleType.getTupleClass(2).getClassType()))
+		if (!Types.isSuperClass(type, TupleType.getTupleClass(2).getClassType()))
 		{
 			return null;
 		}
@@ -129,8 +128,8 @@ public class ColonOperator implements IValue
 		}
 		else
 		{
-			leftType = type.resolveTypeSafely(iclass.getTypeParameter(0));
-			rightType = type.resolveTypeSafely(iclass.getTypeParameter(1));
+			leftType = Types.resolveTypeSafely(type, iclass.getTypeParameter(0));
+			rightType = Types.resolveTypeSafely(type, iclass.getTypeParameter(1));
 		}
 
 		this.left = TypeChecker.convertValue(this.left, leftType, typeContext, markers, context,
@@ -242,6 +241,12 @@ public class ColonOperator implements IValue
 		{
 			TupleType.getTupleClass(2).getClassType().writeCast(writer, type, lineNumber);
 		}
+	}
+
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
 	}
 
 	@Override

@@ -91,6 +91,13 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
+	public IType asParameterType()
+	{
+		final IType type = this.type.asParameterType();
+		return type == this.type ? this : this.wrap(type);
+	}
+
+	@Override
 	public String getTypePrefix()
 	{
 		return this.type.getTypePrefix();

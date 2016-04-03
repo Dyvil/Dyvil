@@ -73,9 +73,19 @@ public interface ITypeParameter extends IASTNode, INamed, IAnnotated, IObjectCom
 
 	IClass getTheClass();
 
-	boolean isAssignableFrom(IType type);
+	boolean isAssignableFrom(IType type, ITypeContext typeContext);
 
-	boolean isSuperClassOf(IType type);
+	boolean isSameType(IType type);
+
+	boolean isSameClass(IType type);
+
+	boolean isSuperTypeOf(IType subType);
+
+	boolean isSuperClassOf(IType subType);
+
+	boolean isSubTypeOf(IType superType);
+
+	boolean isSubClassOf(IType superType);
 
 	int getSuperTypeDistance(IType superType);
 

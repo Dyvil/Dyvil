@@ -10,10 +10,10 @@ public final class Names
 	public static final Name set            = Name.getQualified("set");
 	public static final Name apply          = Name.getQualified("apply");
 	public static final Name applyStatement = Name.getQualified("applyStatement");
-	public static final Name unapply        = Name.getQualified("unapply");
+	public static final Name apply_$amp     = Name.get("apply_&", "apply_$amp");
 	public static final Name update         = Name.getQualified("update");
 	public static final Name subscript      = Name.getQualified("subscript");
-	public static final Name subscriptRef   = Name.getQualified("subscriptRef");
+	public static final Name subscript_$amp = Name.get("subscript_&", "subscript_$amp");
 	public static final Name subscript_$eq  = Name.get("subscript_=", "subscript_$eq");
 	public static final Name in             = Name.getQualified("in");
 	public static final Name length         = Name.getQualified("length");
@@ -26,9 +26,10 @@ public final class Names
 	public static final Name writeReplace = Name.getQualified("writeReplace");
 	public static final Name readResolve  = Name.getQualified("readResolve");
 
-	public static final Name Function = Name.getQualified("Function");
-	public static final Name Tuple    = Name.getQualified("Tuple");
-	public static final Name Union    = Name.getQualified("Union");
+	public static final Name Function     = Name.getQualified("Function");
+	public static final Name Tuple        = Name.getQualified("Tuple");
+	public static final Name Union        = Name.getQualified("Union");
+	public static final Name Intersection = Name.getQualified("Intersection");
 
 	public static final Name _null    = Name.getQualified("null");
 	public static final Name _void    = Name.getQualified("void");
@@ -44,6 +45,9 @@ public final class Names
 	public static final Name dynamic = Name.getQualified("dynamic");
 	public static final Name any     = Name.getQualified("any");
 	public static final Name auto    = Name.getQualified("auto");
+
+	public static final Name eq    = Name.get("=", "$eq");
+	public static final Name colon = Name.get(":", "$colon");
 
 	public static final Name plus    = Name.get("+", "$plus");
 	public static final Name minus   = Name.get("-", "$minus");
@@ -74,11 +78,10 @@ public final class Names
 	public static final Name qmark   = Name.get("?", "$qmark");
 	public static final Name bang    = Name.get("!", "$bang");
 	public static final Name tilde   = Name.get("~", "$tilde");
-	public static final Name minusgt = Name.get("->", "$minus$gt");
-	public static final Name ltminus = Name.get("<-", "$lt$minus");
 
-	public static final Name dotdot   = Name.get("..", "$dot$dot");
-	public static final Name dotdotlt = Name.get("..<", "$dot$dot$lt");
+	public static final Name dotdot    = Name.get("..", "$dot$dot");
+	public static final Name dotdotdot = Name.get("...", "$dot$dot$dot");
+	public static final Name dotdotlt  = Name.get("..<", "$dot$dot$lt");
 
 	public static final Name pluseq = Name.get("+=", "$plus$eq");
 

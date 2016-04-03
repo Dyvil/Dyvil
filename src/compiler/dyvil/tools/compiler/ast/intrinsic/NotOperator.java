@@ -1,44 +1,37 @@
-package dyvil.tools.compiler.ast.operator;
+package dyvil.tools.compiler.ast.intrinsic;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
-public final class NullCheckOperator implements IValue
+public final class NotOperator extends AbstractValue
 {
-	private IValue  value;
-	private boolean isNull;
+	public IValue value;
 	
-	public NullCheckOperator(IValue value, boolean isNull)
+	public NotOperator(IValue right)
 	{
-		this.value = value;
-		this.isNull = isNull;
-	}
-	
-	@Override
-	public ICodePosition getPosition()
-	{
-		return this.value.getPosition();
-	}
-	
-	@Override
-	public void setPosition(ICodePosition position)
-	{
+		this.value = right;
 	}
 	
 	@Override
 	public int valueTag()
 	{
-		return NULLCHECK;
+		return BOOLEAN_NOT;
+	}
+	
+	@Override
+	public boolean isPrimitive()
+	{
+		return true;
 	}
 	
 	@Override
@@ -76,11 +69,6 @@ public final class NullCheckOperator implements IValue
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		this.value.checkTypes(markers, context);
-		
-		if (this.value.isPrimitive())
-		{
-			markers.add(Markers.semantic(this.value.getPosition(), "nullcheck.primitive"));
-		}
 	}
 	
 	@Override
@@ -92,6 +80,10 @@ public final class NullCheckOperator implements IValue
 	@Override
 	public IValue foldConstants()
 	{
+		if (this.value.valueTag() == BOOLEAN)
+		{
+			return new BooleanValue(!this.value.booleanValue());
+		}
 		this.value = this.value.foldConstants();
 		return this;
 	}
@@ -106,14 +98,12 @@ public final class NullCheckOperator implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		this.value.writeExpression(writer, Types.OBJECT);
-		Label label1 = new Label();
+		Label label = new Label();
 		Label label2 = new Label();
-		
-		writer.visitJumpInsn(this.isNull ? Opcodes.IFNULL : Opcodes.IFNONNULL, label1);
+		this.value.writeInvJump(writer, label);
 		writer.visitLdcInsn(0);
 		writer.visitJumpInsn(Opcodes.GOTO, label2);
-		writer.visitLabel(label1);
+		writer.visitLabel(label);
 		writer.visitLdcInsn(1);
 		writer.visitLabel(label2);
 
@@ -126,21 +116,19 @@ public final class NullCheckOperator implements IValue
 	@Override
 	public void writeJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
-		this.value.writeExpression(writer, Types.OBJECT);
-		writer.visitJumpInsn(this.isNull ? Opcodes.IFNULL : Opcodes.IFNONNULL, dest);
+		this.value.writeInvJump(writer, dest);
 	}
 	
 	@Override
 	public void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
-		this.value.writeExpression(writer, Types.OBJECT);
-		writer.visitJumpInsn(this.isNull ? Opcodes.IFNONNULL : Opcodes.IFNULL, dest);
+		this.value.writeJump(writer, dest);
 	}
 	
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
+		buffer.append('!');
 		this.value.toString(prefix, buffer);
-		buffer.append(this.isNull ? " == null" : " != null");
 	}
 }

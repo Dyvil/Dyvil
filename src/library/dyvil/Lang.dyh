@@ -55,43 +55,36 @@ type	Long	= java.lang.Long
 type	Float	= java.lang.Float
 type	Double	= java.lang.Double
 
-// Collection Type Aliases
-type	Array[E]			= [E]
-type	MutableArray[E]		= [var E]
-type	ImmutableArray[E]	= [final E]
-
-type	List[E]				= [E...]
-type	MutableList[E]		= [var E...]
-type	ImmutableList[E]	= [final E...]
-
-type	Map[K, V]			= [K:V]
-type	MutableMap[K, V]	= [var K : V]
-type	ImmutableMap[K, V]	= [final K : V]
-
 // Tuple Type Aliases
 type	Pair[A, B]			= (A, B)
 type	Triple[A, B, C]		= (A, B, C)
 
-// ---------------------------------------- Operator Definitions Declarations ----------------------------------------
-
-// Top-Level Statements
-prefix	operator print		{ precedence 1 }
-prefix	operator println	{ precedence 1 }
-prefix	operator assert		{ precedence 1 }
-prefix	operator consume	{ precedence 1 }
+// ---------------------------------------- Operator Definitions ----------------------------------------
 
 // Postfix Operators
+postfix operator !	// unwrap operator
 postfix	operator ++
 postfix	operator --
+postfix	operator ... // varargs expansion operator
 
 // Prefix Operators
 prefix	operator +
 prefix	operator -
 prefix	operator ~
 prefix	operator !
+prefix	operator &	// reference operator
+prefix	operator *	// de-reference operator
+prefix	operator ++
+prefix	operator --
 
-// Ternary Operator
-infix	operator ?		{ right, 100 }
+// Assignment Operator
+infix	operator =		{ right, 100 }
+
+// Ternary Conditional Operator
+infix	operator ? :	{ precedence 125 }
+
+// Colon Operator
+infix	operator :		{ right, 150 }
 
 // Boolean and Bitwise Operators
 infix	operator ||		{ left, 200 }

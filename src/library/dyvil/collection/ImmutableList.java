@@ -129,19 +129,19 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	ImmutableList<E> subList(int startIndex, int length);
 	
 	@Override
-	ImmutableList<E> $plus(E element);
+	ImmutableList<E> added(E element);
 	
 	@Override
-	ImmutableList<? extends E> $plus$plus(Collection<? extends E> collection);
+	ImmutableList<? extends E> union(Collection<? extends E> collection);
 	
 	@Override
-	ImmutableList<E> $minus(Object element);
+	ImmutableList<E> removed(Object element);
 	
 	@Override
-	ImmutableList<? extends E> $minus$minus(Collection<?> collection);
+	ImmutableList<? extends E> difference(Collection<?> collection);
 	
 	@Override
-	ImmutableList<? extends E> $amp(Collection<? extends E> collection);
+	ImmutableList<? extends E> intersection(Collection<? extends E> collection);
 	
 	@Override
 	<R> ImmutableList<R> mapped(Function<? super E, ? extends R> mapper);
@@ -166,57 +166,22 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	
 	@Override
 	ImmutableList<E> distinct(Comparator<? super E> comparator);
-	
+
 	// Mutating Operations
-	
-	@Override
-	@Mutating
-	default void $plus$eq(E element)
-	{
-		throw new ImmutableException("+= on Immutable List");
-	}
-	
-	@Override
-	@Mutating
-	default void $plus$plus$eq(Collection<? extends E> collection)
-	{
-		throw new ImmutableException("++= on Immutable List");
-	}
-	
-	@Override
-	@Mutating
-	default void $minus$eq(Object element)
-	{
-		throw new ImmutableException("-= on Immutable List");
-	}
-	
-	@Override
-	@Mutating
-	default void $minus$minus$eq(Collection<?> collection)
-	{
-		throw new ImmutableException("--= on Immutable List");
-	}
-	
-	@Override
-	@Mutating
-	default void $amp$eq(Collection<? extends E> collection)
-	{
-		throw new ImmutableException("&= on Immutable List");
-	}
-	
+
 	@Override
 	@Mutating
 	default void clear()
 	{
 		throw new ImmutableException("clear() on Immutable List");
 	}
-	
+
 	@Override
 	@Mutating
 	default void ensureCapacity(int minSize)
 	{
 	}
-	
+
 	@Override
 	@Mutating
 	default void subscript_$eq(int index, E element)
@@ -247,9 +212,9 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 
 	@Override
 	@Mutating
-	default ObjectRef<E> subscriptRef(int index)
+	default ObjectRef<E> subscript_$amp(int index)
 	{
-		throw new ImmutableException("subscriptRef() on Immutable List");
+		throw new ImmutableException("subscript_&() on Immutable List");
 	}
 
 	@Override
@@ -265,7 +230,7 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	{
 		throw new ImmutableException("setResizing() on Immutable List");
 	}
-	
+
 	@Override
 	@Mutating
 	default void insert(int index, E element)
@@ -278,6 +243,13 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	default void insertResizing(int index, E element)
 	{
 		throw new ImmutableException("insertResizing() on Immutable List");
+	}
+
+	@Override
+	@Mutating
+	default void addElement(E element)
+	{
+		throw new ImmutableException("addElement() on Immutable List");
 	}
 
 	@Override
@@ -331,7 +303,7 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	
 	@Override
 	@Mutating
-	default boolean intersect(Collection<? extends E> collection)
+	default boolean retainAll(Collection<? extends E> collection)
 	{
 		throw new ImmutableException("intersect() on Immutable List");
 	}

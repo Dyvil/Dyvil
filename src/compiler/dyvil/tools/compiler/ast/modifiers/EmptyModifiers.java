@@ -42,19 +42,21 @@ public class EmptyModifiers implements ModifierSet
 	@Override
 	public void addModifier(Modifier modifier)
 	{
-
 	}
 
 	@Override
 	public void addIntModifier(int modifier)
 	{
+	}
 
+	@Override
+	public void removeIntModifier(int modifier)
+	{
 	}
 
 	@Override
 	public void check(MarkerList markers)
 	{
-
 	}
 
 	@Override
@@ -66,6 +68,5 @@ public class EmptyModifiers implements ModifierSet
 	@Override
 	public void toString(StringBuilder builder)
 	{
-
 	}
 }

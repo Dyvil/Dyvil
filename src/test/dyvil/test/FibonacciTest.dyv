@@ -1,5 +1,7 @@
 package dyvil.test
 
+include dyvil.Collections
+
 public class FibonacciTest
 {
 	public static void main([String] args)

@@ -38,7 +38,7 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 	}
 	
 	@Override
-	public IParameter getParameter_(int index)
+	public IParameter getParameterNoResolve(int index)
 	{
 		return this.parameters[index];
 	}

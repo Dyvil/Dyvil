@@ -96,7 +96,7 @@ public interface BooleanArray
 
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	static BooleanRef subscriptRef(boolean[] array, int index)
+	static BooleanRef subscript_$amp(boolean[] array, int index)
 	{
 		return new BooleanArrayRef(array, index);
 	}

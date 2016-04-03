@@ -15,7 +15,7 @@ import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
-import dyvil.tools.compiler.ast.operator.ClassOperator;
+import dyvil.tools.compiler.ast.expression.ClassOperator;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
@@ -90,7 +90,7 @@ public abstract class Parameter extends Member implements IParameter
 			return this.internalType;
 		}
 
-		return this.internalType = this.getInternalType().asParameterType();
+		return this.internalType = this.type.asParameterType();
 	}
 
 	@Override
@@ -187,12 +187,6 @@ public abstract class Parameter extends Member implements IParameter
 			this.defaultValue.resolveTypes(markers, context);
 		}
 
-		if (this.type == Types.UNKNOWN)
-		{
-			markers.add(Markers.semantic(this.position, this.getKind().getName() + ".type.infer", this.name));
-			this.type = Types.ANY;
-		}
-
 		this.internalType = null;
 	}
 
@@ -200,6 +194,12 @@ public abstract class Parameter extends Member implements IParameter
 	public void resolve(MarkerList markers, IContext context)
 	{
 		super.resolve(markers, context);
+
+		if (this.type == Types.UNKNOWN)
+		{
+			markers.add(Markers.semantic(this.position, this.getKind().getName() + ".type.infer", this.name));
+			this.type = Types.ANY;
+		}
 
 		if (this.defaultValue == null)
 		{
@@ -424,10 +424,11 @@ public abstract class Parameter extends Member implements IParameter
 			if (!typeAscription)
 			{
 				this.appendType(prefix, buffer);
+				buffer.append(' ');
 			}
 		}
 
-		buffer.append(' ').append(this.name);
+		buffer.append(this.name);
 
 		if (typeAscription)
 		{

@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -16,7 +17,6 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.TypeChecker;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -110,19 +110,6 @@ public final class ArrayExpr implements IValue, IValueList
 	}
 
 	@Override
-	public boolean isConstantOrField()
-	{
-		for (int i = 0; i < this.valueCount; i++)
-		{
-			if (!this.values[i].isConstantOrField())
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
-	@Override
 	public boolean isPrimitive()
 	{
 		return false;
@@ -182,6 +169,33 @@ public final class ArrayExpr implements IValue, IValueList
 	}
 
 	@Override
+	public void setType(IType type)
+	{
+		this.arrayType = type;
+		this.elementType = type.getElementType();
+	}
+
+	@Override
+	public IValue toAnnotationConstant(MarkerList markers, IContext context, int depth)
+	{
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			final IValue value = this.values[i];
+			final IValue constant = value.toAnnotationConstant(markers, context, depth);
+			if (constant == null)
+			{
+				return null;
+			}
+			else
+			{
+				this.values[i] = constant;
+			}
+		}
+
+		return this;
+	}
+
+	@Override
 	public IValue withType(IType arrayType, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		IType elementType;
@@ -190,7 +204,8 @@ public final class ArrayExpr implements IValue, IValueList
 			final IAnnotation annotation;
 			if ((annotation = arrayType.getAnnotation(LazyFields.ARRAY_CONVERTIBLE)) != null)
 			{
-				return new LiteralConversion(this, annotation).withType(arrayType, typeContext, markers, context);
+				return new LiteralConversion(this, annotation, new ArgumentList(this.values, this.valueCount))
+					       .withType(arrayType, typeContext, markers, context);
 			}
 			if (arrayType.getTheClass() != Types.OBJECT_CLASS)
 			{
@@ -340,26 +355,6 @@ public final class ArrayExpr implements IValue, IValueList
 	}
 
 	@Override
-	public IValue toAnnotationConstant(MarkerList markers, IContext context)
-	{
-		for (int i = 0; i < this.valueCount; i++)
-		{
-			final IValue value = this.values[i];
-			final IValue constant = value.toAnnotationConstant(markers, context);
-			if (constant == null)
-			{
-				markers.add(Markers.semantic(value.getPosition(), "annotation.array.not_constant"));
-			}
-			else
-			{
-				this.values[i] = constant;
-			}
-		}
-
-		return this;
-	}
-
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.valueCount; i++)
@@ -423,7 +418,7 @@ public final class ArrayExpr implements IValue, IValueList
 		final int arrayStoreOpcode = elementType.getArrayStoreOpcode();
 
 		writer.visitLdcInsn(this.valueCount);
-		writer.visitMultiANewArrayInsn(elementType, 1);
+		writer.visitMultiANewArrayInsn(this.getType(), 1);
 
 		for (int i = 0; i < this.valueCount; i++)
 		{

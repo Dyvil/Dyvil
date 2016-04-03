@@ -46,13 +46,8 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		this.descriptor = desc;
 	}
 
-	public void setVarargsParameter()
-	{
-		this.parameters[this.parameterCount - 1].setVarargs(true);
-	}
-
 	@Override
-	public IParameter getParameter_(int index)
+	public IParameter getParameterNoResolve(int index)
 	{
 		return this.parameters[index];
 	}

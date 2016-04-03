@@ -546,34 +546,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				}
 			}
 		}
-		if (this.isVariadic())
-		{
-			final int varargsStart = this.parameterCount - 1 - parameterStartIndex;
-
-			for (int i = parameterStartIndex; i < varargsStart; i++)
-			{
-				final IParameter parameter = this.parameters[i + parameterStartIndex];
-				final float valueMatch = arguments.getTypeMatch(i, parameter);
-				if (valueMatch <= 0)
-				{
-					return 0;
-				}
-
-				totalMatch += valueMatch;
-			}
-
-			final IParameter varParam = this.parameters[varargsStart + parameterStartIndex];
-			final float varargsMatch = arguments.getVarargsTypeMatch(varargsStart, varParam);
-			if (varargsMatch <= 0)
-			{
-				return 0;
-			}
-
-			return totalMatch + varargsMatch;
-		}
 
 		final int parametersLeft = this.parameterCount - parameterStartIndex;
-		if (argumentCount > parametersLeft)
+		if (argumentCount > parametersLeft && !this.isVariadic())
 		{
 			return 0;
 		}
@@ -639,20 +614,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				receiver = TypeChecker.convertValue(receiver, paramType, typeContext, markers, context,
 				                                    TypeChecker.markerSupplier("method.access.infix_type", this.name));
 
-				if (this.isVariadic())
-				{
-					arguments.checkVarargsValue(this.parameterCount - 2, this.parameters[this.parameterCount - 1],
-					                            typeContext, markers, context);
-
-					for (int i = 0; i < this.parameterCount - 2; i++)
-					{
-						arguments.checkValue(i, this.parameters[i + 1], typeContext, markers, context);
-					}
-
-					this.checkTypeVarsInferred(markers, position, typeContext);
-					return receiver;
-				}
-
 				for (int i = 0; i < this.parameterCount - 1; i++)
 				{
 					arguments.checkValue(i, this.parameters[i + 1], typeContext, markers, context);
@@ -687,8 +648,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				final TypeChecker.MarkerSupplier markerSupplier = TypeChecker
 					                                                  .markerSupplier("method.access.receiver_type",
 					                                                                  this.name);
-				receiver = TypeChecker.convertValue(receiver, this.receiverType, typeContext, markers, context,
-				                                    markerSupplier);
+				// TODO Cache 'asParameterType'
+				receiver = TypeChecker.convertValue(receiver, this.receiverType.asParameterType(), typeContext, markers,
+				                                    context, markerSupplier);
 			}
 		}
 		else if (!this.modifiers.hasIntModifier(Modifiers.STATIC))
@@ -704,20 +666,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 		}
 
-		if (this.isVariadic())
-		{
-			final int len = this.parameterCount - 1;
-			arguments.checkVarargsValue(len, this.parameters[len], typeContext, markers, null);
-
-			for (int i = 0; i < len; i++)
-			{
-				arguments.checkValue(i, this.parameters[i], typeContext, markers, context);
-			}
-
-			this.checkTypeVarsInferred(markers, position, typeContext);
-			return receiver;
-		}
-
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			arguments.checkValue(i, this.parameters[i], typeContext, markers, context);
@@ -731,11 +679,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		if (instance != null)
 		{
-			genericData.instance = instance;
+			genericData.receiver = instance;
 		}
 		else
 		{
-			genericData.instance = new ThisExpr(this.enclosingClass.getType());
+			genericData.receiver = new ThisExpr(this.enclosingClass.getType());
 		}
 
 		int modifiers = this.modifiers.toFlags();
@@ -746,19 +694,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			this.parameters[0].getType().inferTypes(instance.getType(), genericData);
 			parIndex = 1;
-		}
-
-		if ((modifiers & Modifiers.VARARGS) != 0)
-		{
-			int len = this.parameterCount - parIndex - 1;
-			for (int i = 0; i < len; i++)
-			{
-				param = this.parameters[i + parIndex];
-				arguments.inferType(i, param, genericData);
-			}
-
-			arguments.inferVarargsType(len, this.parameters[len + parIndex], genericData);
-			return;
 		}
 
 		int len = this.parameterCount - parIndex;
@@ -783,7 +718,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				                             inferredType));
 				typeContext.addMapping(typeParameter, inferredType);
 			}
-			else if (!typeParameter.isAssignableFrom(typeArgument))
+			else if (!typeParameter.isAssignableFrom(typeArgument, typeContext))
 			{
 				final Marker marker = Markers.semanticError(position, "method.typevar.incompatible", this.name,
 				                                            typeParameter.getName());
@@ -871,8 +806,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		// Check Parameter Types
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			final IType parType = this.parameters[i].getType().getConcreteType(typeContext);
-			final IType candidateParType = candidate.getParameter(i).getType().getConcreteType(typeContext);
+			final IType parType = this.parameters[i].getInternalType().getConcreteType(typeContext);
+			final IType candidateParType = candidate.getParameter(i).getInternalType().getConcreteType(typeContext);
 			if (!Types.isSameType(parType, candidateParType))
 			{
 				return false;
@@ -902,6 +837,32 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public boolean isIntrinsic()
 	{
 		return this.intrinsicData != null;
+	}
+
+	@Override
+	public int getInvokeOpcode()
+	{
+		int modifiers = this.modifiers.toFlags();
+		if ((modifiers & Modifiers.STATIC) != 0)
+		{
+			return Opcodes.INVOKESTATIC;
+		}
+		if ((modifiers & Modifiers.PRIVATE) == Modifiers.PRIVATE)
+		{
+			return Opcodes.INVOKESPECIAL;
+		}
+		if (this.enclosingClass.isInterface())
+		{
+			return Opcodes.INVOKEINTERFACE;
+		}
+		return Opcodes.INVOKEVIRTUAL;
+	}
+
+	@Override
+	public Handle toHandle()
+	{
+		return new Handle(ClassFormat.insnToHandle(this.getInvokeOpcode()), this.enclosingClass.getInternalName(),
+		                  this.name.qualified, this.getDescriptor());
 	}
 
 	@Override
@@ -1075,38 +1036,18 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 	protected void writeArguments(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
 	{
-		int parIndex = 0;
-		int modifiers = this.modifiers.toFlags();
-
-		if (instance != null && (modifiers & Modifiers.INFIX) == Modifiers.INFIX)
+		if (instance != null && this.hasModifier(Modifiers.INFIX))
 		{
-			parIndex = 1;
-		}
-
-		if ((modifiers & Modifiers.VARARGS) != 0)
-		{
-			int len = this.parameterCount - 1 - parIndex;
-			if (len < 0)
+			for (int i = 0, len = this.parameterCount - 1; i < len; i++)
 			{
-				return;
+				arguments.writeValue(i, this.parameters[i + 1], writer);
 			}
-
-			IParameter param;
-			for (int i = 0; i < len; i++)
-			{
-				param = this.parameters[i + parIndex];
-				arguments.writeValue(i, param, writer);
-			}
-			param = this.parameters[len];
-			arguments.writeVarargsValue(len, param, writer);
 			return;
 		}
 
-		int len = this.parameterCount - parIndex;
-		for (int i = 0; i < len; i++)
+		for (int i = 0; i < this.parameterCount; i++)
 		{
-			IParameter param = this.parameters[i + parIndex];
-			arguments.writeValue(i, param, writer);
+			arguments.writeValue(i, this.parameters[i], writer);
 		}
 	}
 
@@ -1154,25 +1095,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		String name = this.name.qualified;
 		String desc = this.getDescriptor();
 		writer.visitMethodInsn(opcode, owner, name, desc, this.enclosingClass.isInterface());
-	}
-
-	@Override
-	public int getInvokeOpcode()
-	{
-		int modifiers = this.modifiers.toFlags();
-		if ((modifiers & Modifiers.STATIC) != 0)
-		{
-			return Opcodes.INVOKESTATIC;
-		}
-		if ((modifiers & Modifiers.PRIVATE) == Modifiers.PRIVATE)
-		{
-			return Opcodes.INVOKESPECIAL;
-		}
-		if (this.enclosingClass.isInterface())
-		{
-			return Opcodes.INVOKEINTERFACE;
-		}
-		return Opcodes.INVOKEVIRTUAL;
 	}
 
 	@Override

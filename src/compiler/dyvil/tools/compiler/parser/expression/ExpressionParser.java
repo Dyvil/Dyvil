@@ -3,15 +3,17 @@ package dyvil.tools.compiler.parser.expression;
 import dyvil.tools.compiler.ast.access.*;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationValue;
-import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.*;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
-import dyvil.tools.compiler.ast.operator.*;
-import dyvil.tools.compiler.ast.parameter.*;
+import dyvil.tools.compiler.ast.operator.OperatorChain;
+import dyvil.tools.compiler.ast.operator.PostfixCall;
+import dyvil.tools.compiler.ast.operator.PrefixCall;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
+import dyvil.tools.compiler.ast.parameter.MethodParameter;
+import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.statement.ReturnStatement;
 import dyvil.tools.compiler.ast.statement.SyncStatement;
@@ -27,61 +29,51 @@ import dyvil.tools.compiler.parser.IParserManager;
 import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
-import dyvil.tools.compiler.parser.classes.ClassBodyParser;
 import dyvil.tools.compiler.parser.statement.*;
 import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
-import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;
+
+import static dyvil.tools.compiler.parser.ParserUtil.*;
 
 public final class ExpressionParser extends Parser implements IValueConsumer
 {
-	protected static final int VALUE      = 0x1;
-	protected static final int ACCESS     = 0x2;
-	protected static final int DOT_ACCESS = 0x4;
+	// Modes
 
-	protected static final int PARAMETERS                 = 0x8;
-	protected static final int PARAMETERS_END             = 0x10;
-	protected static final int CONSTRUCTOR_PARAMETERS     = 0x20;
-	protected static final int CONSTRUCTOR_PARAMETERS_END = 0x40;
-	protected static final int ANONYMOUS_CLASS_END        = 0x80;
-	protected static final int SUBSCRIPT_END              = 0x100;
-	protected static final int TYPE_ARGUMENTS_END         = 0x200;
-
-	protected static final int PARAMETRIC_THIS_END  = 0x400;
-	protected static final int PARAMETRIC_SUPER_END = 0x800;
+	protected static final int VALUE              = 0;
+	protected static final int ACCESS             = 1;
+	protected static final int DOT_ACCESS         = 2;
+	protected static final int PARAMETERS_END     = 4;
+	protected static final int SUBSCRIPT_END      = 8;
+	protected static final int TYPE_ARGUMENTS_END = 16;
 
 	// Flags
 
 	public static final int EXPLICIT_DOT   = 1;
-	public static final int IGNORE_COLON   = 2;
-	public static final int IGNORE_LAMBDA  = 4;
-	public static final int IGNORE_CLOSURE = 8;
+	public static final int OPERATOR       = 2;
+	public static final int IGNORE_COLON   = 4;
+	public static final int IGNORE_LAMBDA  = 8;
+	public static final int IGNORE_CLOSURE = 16;
+
+	// ----------
 
 	protected IValueConsumer valueConsumer;
 
 	private IValue value;
 
-	private int      flags;
-	private Operator operator;
+	private int flags;
 
 	public ExpressionParser(IValueConsumer valueConsumer)
 	{
-		this.mode = VALUE;
 		this.valueConsumer = valueConsumer;
-	}
-
-	public ExpressionParser withOperator(Operator operator)
-	{
-		this.operator = operator;
-		return this;
+		// this.mode = VALUE;
 	}
 
 	public boolean hasFlag(int flag)
@@ -141,124 +133,13 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			this.end(pm, true);
 			return;
 		case VALUE:
-			switch (type)
-			{
-			case Tokens.STRING:
-				this.value = new StringValue(token.raw(), token.stringValue());
-				this.mode = ACCESS;
-				return;
-			case Tokens.STRING_START:
-			{
-				final StringInterpolationExpr stringInterpolation = new StringInterpolationExpr(token);
-				this.value = stringInterpolation;
-				this.mode = ACCESS;
-				pm.pushParser(new StingInterpolationParser(stringInterpolation), true);
-				return;
-			}
-			case Tokens.SINGLE_QUOTED_STRING:
-				this.value = new CharValue(token.raw(), token.stringValue());
-				this.mode = ACCESS;
-				return;
-			case Tokens.INT:
-				this.value = new IntValue(token.raw(), token.intValue());
-				this.mode = ACCESS;
-				return;
-			case Tokens.LONG:
-				this.value = new LongValue(token.raw(), token.longValue());
-				this.mode = ACCESS;
-				return;
-			case Tokens.FLOAT:
-				this.value = new FloatValue(token.raw(), token.floatValue());
-				this.mode = ACCESS;
-				return;
-			case Tokens.DOUBLE:
-				this.value = new DoubleValue(token.raw(), token.doubleValue());
-				this.mode = ACCESS;
-				return;
-			case DyvilSymbols.UNDERSCORE:
-				// _ ...
-				this.value = new WildcardValue(token.raw());
-				this.mode = ACCESS;
-				return;
-			case BaseSymbols.OPEN_PARENTHESIS:
-				// ( ...
-				final IToken next = token.next();
-
-				if (!this.hasFlag(IGNORE_LAMBDA))
-				{
-					if (next.type() != BaseSymbols.CLOSE_PARENTHESIS)
-					{
-						// ( ...
-						pm.pushParser(new LambdaOrTupleParser(this), true);
-						this.mode = ACCESS;
-						return;
-					}
-
-					final IToken next2 = next.next();
-					if (next2.type() == DyvilSymbols.DOUBLE_ARROW_RIGHT)
-					{
-						// () => ...
-						final LambdaExpr lambda = new LambdaExpr(next2.raw());
-						this.value = lambda;
-						pm.skip(2);
-						pm.pushParser(new ExpressionParser(lambda));
-						this.mode = ACCESS;
-						return;
-					}
-				}
-				else if (next.type() != BaseSymbols.CLOSE_PARENTHESIS)
-				{
-					pm.pushParser(new LambdaOrTupleParser(this, true), true);
-					this.mode = ACCESS;
-					return;
-				}
-
-				// ()
-				this.value = new VoidValue(token.to(token.next()));
-				pm.skip();
-				this.mode = ACCESS;
-				return;
-			case BaseSymbols.OPEN_SQUARE_BRACKET:
-				// [ ...
-				this.mode = ACCESS;
-				pm.pushParser(new ArrayLiteralParser(this), true);
-				return;
-			case BaseSymbols.OPEN_CURLY_BRACKET:
-				// { ...
-				this.mode = ACCESS;
-				pm.pushParser(new StatementListParser(this), true);
-				return;
-			case DyvilSymbols.AT:
-				// @ ...
-				Annotation a = new Annotation();
-				pm.pushParser(new AnnotationParser(a));
-				this.value = new AnnotationValue(a);
-				this.mode = END;
-				return;
-			case DyvilSymbols.DOUBLE_ARROW_RIGHT:
-			{
-				if (this.hasFlag(IGNORE_LAMBDA))
-				{
-					pm.popParser(true);
-					return;
-				}
-
-				// => ...
-				LambdaExpr lambda = new LambdaExpr(token.raw());
-				this.value = lambda;
-				this.mode = ACCESS;
-				pm.pushParser(new ExpressionParser(lambda));
-				return;
-			}
-			}
-
 			if ((type & Tokens.IDENTIFIER) != 0)
 			{
 				// IDENTIFIER ...
-				this.parseIdentifierAccess(pm, token);
+				this.parseInfixAccess(pm, token);
 				return;
 			}
-			if (this.parseKeyword(pm, token, type))
+			if (this.parseValue(pm, token, type))
 			{
 				// keyword ...
 				return;
@@ -268,19 +149,6 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			// Leave the big switch and jump right over to the ACCESS
 			// section
 			break;
-		case ANONYMOUS_CLASS_END:
-			// new ... { ... } ...
-			//               ^
-			this.value.expandPosition(token);
-			this.mode = ACCESS;
-
-			if (type != BaseSymbols.CLOSE_CURLY_BRACKET)
-			{
-				pm.reparse();
-				pm.report(token, "class.anonymous.body.end");
-			}
-
-			return;
 		case PARAMETERS_END:
 			// ... ( ... )
 			//           ^
@@ -307,67 +175,6 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			}
 
 			return;
-		case CONSTRUCTOR_PARAMETERS:
-		{
-			// new ...
-			//         ^
-
-			final ConstructorCall constructorCall = (ConstructorCall) this.value;
-			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
-			{
-				// new ... {
-				this.parseBody(pm, constructorCall.toClassConstructor());
-				return;
-			}
-		}
-		case PARAMETERS:
-		{
-			final ICall call = (ICall) this.value;
-
-			if (type == BaseSymbols.OPEN_PARENTHESIS)
-			{
-				// new ... (
-				final IArguments arguments = parseArguments(pm, token.next());
-				call.setArguments(arguments);
-				this.mode = CONSTRUCTOR_PARAMETERS_END;
-				return;
-			}
-
-			// new ... ;
-			if (ParserUtil.isExpressionTerminator(type))
-			{
-				this.mode = ACCESS;
-				pm.reparse();
-				return;
-			}
-
-			final SingleArgument argument = new SingleArgument();
-			call.setArguments(argument);
-
-			pm.pushParser(this.subParser(argument).withOperator(Operators.DEFAULT), true);
-			this.mode = END;
-			return;
-		}
-		case CONSTRUCTOR_PARAMETERS_END:
-			// new ... ( ... )
-			//               ^
-			if (type != BaseSymbols.CLOSE_PARENTHESIS)
-			{
-				pm.reparse();
-				pm.report(token, "constructor.call.close_paren");
-			}
-			this.value.expandPosition(token);
-			this.mode = ACCESS;
-
-			if (token.next().type() == BaseSymbols.OPEN_CURLY_BRACKET)
-			{
-				// new ... ( ... ) { ...
-
-				pm.skip();
-				this.parseBody(pm, ((ConstructorCall) this.value).toClassConstructor());
-				return;
-			}
-			return;
 		case TYPE_ARGUMENTS_END:
 		{
 			// ... .[ ... ]
@@ -389,21 +196,20 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				// ... .[ ... ] ( ...
 
 				pm.skip();
-				IArguments arguments = parseArguments(pm, next.next());
-				ApplyMethodCall amc = new ApplyMethodCall(methodCall.getPosition(), methodCall.getReceiver(),
-				                                          arguments);
+				ApplyMethodCall amc = new ApplyMethodCall(methodCall.getPosition(), methodCall.getReceiver());
+				ArgumentListParser.parseArguments(pm, next.next(), amc);
 				amc.setGenericData(genericData);
 
 				this.value = amc;
 				this.mode = PARAMETERS_END;
 				return;
 			}
-			if (ParserUtil.isIdentifier(nextType))
+			if (isIdentifier(nextType))
 			{
 				// ... .[ ... ] IDENTIFIER ...
 				pm.skip();
 				this.value = methodCall.getReceiver();
-				this.parseIdentifierAccess(pm, token.next(), token.next().nameValue(), null);
+				this.parseInfixAccess(pm, token.next());
 
 				if (this.value instanceof AbstractCall)
 				{
@@ -417,7 +223,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				}
 				return;
 			}
-			if (ParserUtil.isExpressionTerminator(nextType))
+			if (isExpressionEnd(nextType))
 			{
 				// ... .[ ... ] ;
 
@@ -437,31 +243,11 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			applyCall.setGenericData(genericData);
 			this.value = applyCall;
 
-			this.parseApply(pm, next, applyCall, Operators.DEFAULT);
+			this.parseApply(pm, next, applyCall);
 			this.mode = ACCESS;
 
 			return;
 		}
-		case PARAMETRIC_THIS_END:
-			// this[ ... ]
-			//           ^
-
-			this.mode = ACCESS;
-			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
-			{
-				pm.report(token, "this.close_bracket");
-			}
-			return;
-		case PARAMETRIC_SUPER_END:
-			// super[ ... ]
-			//            ^
-
-			this.mode = ACCESS;
-			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
-			{
-				pm.report(token, "super.close_bracket");
-			}
-			return;
 		}
 
 		if (ParserUtil.isCloseBracket(type) || type == BaseSymbols.COLON && this.hasFlag(IGNORE_COLON))
@@ -469,11 +255,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			// ... ]
 
 			// Close bracket, end expression
-			if (this.value != null)
-			{
-				this.valueConsumer.setValue(this.value);
-			}
-			pm.popParser(true);
+			this.end(pm, true);
 			return;
 		}
 
@@ -503,11 +285,6 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			case DyvilKeywords.FINALLY:
 			case DyvilKeywords.WHILE:
 				this.end(pm, true);
-				return;
-			case BaseSymbols.EQUALS:
-				// EXPRESSION =
-
-				this.parseAssignment(pm, token);
 				return;
 			case DyvilKeywords.AS:
 			{
@@ -539,35 +316,48 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			case BaseSymbols.OPEN_SQUARE_BRACKET:
 				// EXPRESSION [
 
-				// Parse a subscript getter
+				// Parse a subscript access
 				// e.g. this[1], array[0]
-				SubscriptAccess getter = new SubscriptAccess(token, this.value);
-				this.value = getter;
+
+				final SubscriptAccess subscriptAccess = new SubscriptAccess(token, this.value);
+				ArgumentListParser.parseArguments(pm, token.next(), subscriptAccess);
+				this.value = subscriptAccess;
 				this.mode = SUBSCRIPT_END;
-				pm.pushParser(new ExpressionListParser((IValueList) getter.getArguments()));
 				return;
 			case BaseSymbols.OPEN_PARENTHESIS:
 				// EXPRESSION (
 
 				// Parse an apply call
 				// e.g. 1("a"), this("stuff"), "myString"(2)
-				this.value = new ApplyMethodCall(this.value.getPosition(), this.value,
-				                                 parseArguments(pm, token.next()));
+
+				final ApplyMethodCall applyMethodCall = new ApplyMethodCall(this.value.getPosition(), this.value);
+				ArgumentListParser.parseArguments(pm, token.next(), applyMethodCall);
+
+				this.value = applyMethodCall;
 				this.mode = PARAMETERS_END;
 				return;
 			case BaseSymbols.COLON:
-				final ColonOperator colonOperator = new ColonOperator(token.raw(), this.value, null);
+				this.parseInfixAccess(pm, token, Names.colon);
+				return;
+			case DyvilSymbols.ELLIPSIS:
+				this.parseInfixAccess(pm, token, Names.dotdotdot);
+				return;
+			case BaseSymbols.EQUALS:
+				if (this.value == null)
+				{
+					pm.report(Markers.syntaxError(token, "assignment.invalid", token));
+					this.mode = VALUE;
+					return;
+				}
 
-				pm.pushParser(this.subParser(colonOperator::setRight));
-				this.value = colonOperator;
-				this.mode = END;
+				this.parseInfixAccess(pm, token, Names.eq);
 				return;
 			}
 
-			if (ParserUtil.isIdentifier(type))
+			if (isIdentifier(type))
 			{
 				// EXPRESSION IDENTIFIER
-				this.parseAccess(pm, token);
+				this.parseInfixAccess(pm, token);
 				return;
 			}
 
@@ -575,7 +365,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			{
 				// EXPRESSION EXPRESSION -> EXPRESSION ( EXPRESSION )
 
-				if (this.operator != null || this.ignoreClosure(token))
+				if (this.hasFlag(OPERATOR) || this.ignoreClosure(token))
 				{
 					this.end(pm, true);
 					return;
@@ -585,7 +375,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				                                                      EmptyArguments.VISIBLE);
 
 				this.value = applyCall;
-				this.parseApply(pm, token, applyCall, Operators.DEFAULT);
+				this.parseApply(pm, token, applyCall);
 				pm.reparse();
 				return;
 			}
@@ -605,11 +395,11 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				return;
 			}
 
-			if (ParserUtil.isIdentifier(type))
+			if (isIdentifier(type))
 			{
 				// EXPRESSION . IDENTIFIER
 
-				this.parseAccess(pm, token);
+				this.parseInfixAccess(pm, token);
 				return;
 			}
 			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
@@ -627,7 +417,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				pm.popParser(true);
 			}
 
-			pm.report(Markers.syntaxError(token, "expression.dot.invalid", token.toString()));
+			pm.report(Markers.syntaxError(token, "expression.dot.invalid"));
 			return;
 		}
 
@@ -643,278 +433,184 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		return token.type() == BaseSymbols.OPEN_CURLY_BRACKET && this.hasFlag(IGNORE_CLOSURE);
 	}
 
-	/**
-	 * Creates the body and initializes parsing for anonymous classes.
-	 *
-	 * @param pm
-	 * 	the current parsing context manager.
-	 * @param classConstructor
-	 * 	the anonymous class AST node.
-	 */
-	private void parseBody(IParserManager pm, ClassConstructor classConstructor)
+	private void parseInfixAccess(IParserManager pm, IToken token)
 	{
-		final IClass nestedClass = classConstructor.getNestedClass();
-		final IClassBody body = nestedClass.getBody();
-
-		pm.pushParser(new ClassBodyParser(body), true);
-		this.mode = ANONYMOUS_CLASS_END;
-		this.value = classConstructor;
+		this.parseInfixAccess(pm, token, token.nameValue());
 	}
 
-	/**
-	 * Parses an argument list and creates the appropriate AST representation. The following instances can be created by
-	 * this method:
-	 * <p>
-	 * <ul> <li>{@link EmptyArguments} - For empty argument lists:<br> <code> this.call() </code> <li>{@link
-	 * ArgumentList} - For simple indexed argument lists:<br> <code> this.call(1, "abc", null) </code> <li>{@link
-	 * ArgumentMap} - For named argument lists / maps:<br> <code> this.call(index: 1, string: "abc") </code> </ul>
-	 *
-	 * @param pm
-	 * 	the current parsing context manager.
-	 * @param next
-	 * 	the next token. The current token is assumed to be the opening parenthesis of the argument list.
-	 *
-	 * @return the appropriate AST representation for the type of argument list.
-	 */
-	public static IArguments parseArguments(IParserManager pm, IToken next)
+	private void parseInfixAccess(IParserManager pm, IToken token, Name name)
 	{
-		final int type = next.type();
-
-		if (type == BaseSymbols.CLOSE_PARENTHESIS)
-		{
-			return EmptyArguments.VISIBLE;
-		}
-		if (ParserUtil.isIdentifier(type) && next.next().type() == BaseSymbols.COLON)
-		{
-			final ArgumentMap map = new ArgumentMap();
-			pm.pushParser(new ExpressionMapParser(map));
-			return map;
-		}
-
-		final ArgumentList list = new ArgumentList();
-		pm.pushParser(new ExpressionListParser(list));
-		return list;
-	}
-
-	private void parseAccess(IParserManager pm, IToken token)
-	{
-		final Name name = token.nameValue();
-		this.parseAccess(pm, token, name, pm.getOperator(name));
-	}
-
-	/**
-	 * Checks for operator precedence and associativity, and POPs if necessary.
-	 *
-	 * @param pm
-	 * 	the current parsing context manager.
-	 * @param token
-	 * 	the current token, has to be any {@code IDENTIFIER} token.
-	 * @param name
-	 * 	the {@code nameValue} of the {@code token}.
-	 * @param operator
-	 * 	the operator corresponding to the {@code name}, or {@code null}
-	 */
-	private void parseAccess(IParserManager pm, IToken token, Name name, Operator operator)
-	{
-		if (!this.hasFlag(EXPLICIT_DOT) && this.operator != null)
-		{
-			// Handle operator precedence
-			int p;
-			if (operator == null || (p = this.operator.precedence) > operator.precedence)
-			{
-				this.valueConsumer.setValue(this.value);
-				pm.popParser(true);
-				return;
-			}
-			if (p == operator.precedence)
-			{
-				// Handle associativity
-				switch (operator.type)
-				{
-				case Operator.INFIX_NONE:
-					pm.report(Markers.syntaxError(token, "expression.operator.invalid", name.toString()));
-					return;
-				case Operator.INFIX_LEFT:
-					if (this.operator.type != Operator.INFIX_RIGHT)
-					{
-						this.valueConsumer.setValue(this.value);
-						pm.popParser(true);
-						return;
-					}
-					break;
-				case Operator.INFIX_RIGHT:
-					break;
-				}
-			}
-		}
-
-		this.parseIdentifierAccess(pm, token, name, operator);
-	}
-
-	private void parseIdentifierAccess(IParserManager pm, IToken token)
-	{
-		final Name name = token.nameValue();
-		this.parseIdentifierAccess(pm, token, name, pm.getOperator(name));
-	}
-
-	/**
-	 * Parses an ACCESS sequence.
-	 *
-	 * @param pm
-	 * 	the current parsing context manager.
-	 * @param token
-	 * 	the current token, has to be any {@code IDENTIFIER} token.
-	 * @param name
-	 * 	the {@code nameValue} of the {@code token}.
-	 * @param operator
-	 * 	the operator corresponding to the {@code name}, or {@code null}
-	 */
-	private void parseIdentifierAccess(IParserManager pm, IToken token, Name name, Operator operator)
-	{
+		final int type = token.type();
 		final IToken next = token.next();
 		final int nextType = next.type();
 
-		if (operator != null && !this.hasFlag(EXPLICIT_DOT))
+		if (isSymbol(type))
 		{
-			if (this.value == null)
+			// Identifier is an operator
+
+			if (this.value == null) // prefix
 			{
 				// OPERATOR EXPRESSION
 				// token    next
 
-				final MethodCall call = new MethodCall(token, null, name, EmptyArguments.VISIBLE);
-
-				call.setDotless(true);
+				final PrefixCall call = new PrefixCall(token.raw(), name);
 				this.value = call;
 				this.mode = ACCESS;
 
-				this.parseApply(pm, token.next(), call, operator);
+				if (isExpressionEnd(nextType))
+				{
+					pm.report(next, "expression.prefix.expression");
+					return;
+				}
+				this.parseApply(pm, next, call);
+				return;
+			}
+			if (isExpressionEnd(nextType) || isSymbol(nextType) && neighboring(token.prev(), token) && !neighboring(
+				next, next.next()))
+			{
+				// EXPRESSION_OPERATOR EXPRESSION
+				// EXPRESSION OPERATOR EOF
+				//            token    next
+
+				this.value = new PostfixCall(token.raw(), this.value, name);
+				this.mode = ACCESS;
+				return;
+			}
+
+			if (this.hasFlag(OPERATOR))
+			{
+				this.valueConsumer.setValue(this.value);
+				pm.popParser(true);
 				return;
 			}
 
 			// EXPRESSION OPERATOR EXPRESSION
 			//            token    next
 
-			final MethodCall call = new MethodCall(token, this.value, name);
-			call.setDotless(true);
-			this.value = call;
-			this.mode = ACCESS;
+			final OperatorChain chain;
 
-			if (operator.type != Operator.POSTFIX && !ParserUtil.isExpressionTerminator(nextType))
+			if (this.value.valueTag() == IValue.OPERATOR_CHAIN)
 			{
-				this.parseApply(pm, token, call, operator);
+				chain = (OperatorChain) this.value;
 			}
+			else
+			{
+				chain = new OperatorChain();
+				chain.addOperand(this.value);
+				this.value = chain;
+			}
+
+			chain.addOperator(name, token.raw());
+			pm.pushParser(this.subParser(chain::addOperand).withFlag(OPERATOR));
 			return;
 		}
 
-		if (Util.hasEq(name))
-		{
-			// Identifier is a compound operator (ends with '=' or '$eq')
-			// e.g. this += that
+		// Identifier is not an operator
 
-			final Name newName = Util.removeEq(name);
-			operator = pm.getOperator(newName);
-			if (operator == null)
-			{
-				operator = new Operator(newName, 1, Operator.INFIX_RIGHT);
-			}
-			else if (operator.type == Operator.INFIX_LEFT)
-			{
-				// Compound Operators are always right-associative, so create a
-				// copy
-				operator = new Operator(newName, operator.precedence, Operator.INFIX_RIGHT);
-			}
+		switch (nextType)
+		{
+		case BaseSymbols.OPEN_PARENTHESIS:
+		{
+			// IDENTIFIER (
+			final MethodCall call = new MethodCall(token.raw(), this.value, name);
+			ArgumentListParser.parseArguments(pm, next.next(), call);
+			call.setDotless(!this.hasFlag(EXPLICIT_DOT));
+			this.value = call;
+
+			this.mode = PARAMETERS_END;
+			pm.skip();
+			return;
 		}
-		else
+		case BaseSymbols.OPEN_SQUARE_BRACKET:
 		{
-			// Identifier is neither a defined nor a compound operator
+			// IDENTIFIER [
 
-			switch (nextType)
+			final FieldAccess fieldAccess = new FieldAccess(token.raw(), this.value, name);
+			final SubscriptAccess subscriptAccess = new SubscriptAccess(next.raw(), fieldAccess);
+			ArgumentListParser.parseArguments(pm, next.next(), subscriptAccess);
+
+			this.value = subscriptAccess;
+			this.mode = SUBSCRIPT_END;
+			pm.skip();
+			return;
+		}
+		case DyvilSymbols.DOUBLE_ARROW_RIGHT:
+			if (this.hasFlag(IGNORE_LAMBDA))
 			{
-			case BaseSymbols.OPEN_PARENTHESIS:
-			{
-				// IDENTIFIER (
-				final MethodCall call = new MethodCall(token.raw(), this.value, name);
-				call.setArguments(parseArguments(pm, next.next()));
-				call.setDotless(!this.hasFlag(EXPLICIT_DOT));
-				this.value = call;
-
-				this.mode = PARAMETERS_END;
-				pm.skip();
-				return;
-			}
-			case BaseSymbols.OPEN_SQUARE_BRACKET:
-			{
-				// IDENTIFIER [
-
-				final FieldAccess fieldAccess = new FieldAccess(token.raw(), this.value, name);
-				final SubscriptAccess subscriptAccess = new SubscriptAccess(token, fieldAccess);
-
-				this.value = subscriptAccess;
-				this.mode = SUBSCRIPT_END;
-				pm.skip();
-				pm.pushParser(new ExpressionListParser((IValueList) subscriptAccess.getArguments()));
-				return;
-			}
-			case DyvilSymbols.DOUBLE_ARROW_RIGHT:
-				if (this.hasFlag(IGNORE_LAMBDA))
-				{
-					break;
-				}
-
-				// IDENTIFIER => ...
-				// Lambda Expression with one untyped parameter
-
-				final MethodParameter parameter = new MethodParameter(token.raw(), token.nameValue(), Types.UNKNOWN,
-				                                                      EmptyModifiers.INSTANCE, null);
-				final LambdaExpr lambdaExpr = new LambdaExpr(next.raw(), parameter);
-
-				this.mode = END;
-				this.value = lambdaExpr;
-				pm.pushParser(new ExpressionParser(lambdaExpr));
-				pm.skip();
-				return;
+				break;
 			}
 
-			if (ParserUtil.isExpressionTerminator(nextType) || nextType == DyvilSymbols.DOUBLE_ARROW_RIGHT
-				    || this.ignoreClosure(next))
-			{
-				// ... IDENTIFIER EXPRESSION-TERMINATOR
-				// e.g. this.someField ;
-				final FieldAccess access = new FieldAccess(token, this.value, name);
-				access.setDotless(!this.hasFlag(EXPLICIT_DOT));
-				this.value = access;
-				this.mode = ACCESS;
-				return;
-			}
+			// IDENTIFIER =>   ...
+			// token      next
 
-			if (ParserUtil.isIdentifier(nextType))
-			{
-				// ... IDENTIFIER IDENTIFIER ...
-				// e.g. this call ...
-				if (nextType == Tokens.SYMBOL_IDENTIFIER // ... SYMBOL-IDENTIFIER ... // this ++<>++ that
-					    || pm.getOperator(next.nameValue()) != null // ... OPERATOR ... // this + that
-					    || !ParserUtil.isExpressionTerminator(next.next().type()))
-				// ... IDENTIFIER NON-EXPRESSION-TERMINATOR
-				{
-					final FieldAccess access = new FieldAccess(token, this.value, name);
-					access.setDotless(!this.hasFlag(EXPLICIT_DOT));
-					this.value = access;
-					this.mode = ACCESS;
-					return;
-				}
-			}
+			// Lambda Expression with one untyped parameter
 
-			// Else -> Fallback to single-argument call
-			// e.g. this.call 10;
+			final MethodParameter parameter = new MethodParameter(token.raw(), token.nameValue(), Types.UNKNOWN,
+			                                                      EmptyModifiers.INSTANCE, null);
+			final LambdaExpr lambdaExpr = new LambdaExpr(next.raw(), parameter);
+
+			this.mode = END;
+			this.value = lambdaExpr;
+			pm.pushParser(new ExpressionParser(lambdaExpr));
+			pm.skip();
+			return;
 		}
 
-		final MethodCall call = new MethodCall(token, this.value, name, EmptyArguments.INSTANCE);
+		if (isExpressionEnd(nextType) || nextType == DyvilSymbols.DOUBLE_ARROW_RIGHT || this.ignoreClosure(next))
+		{
+			// IDENTIFIER END
+			// token      next
+			this.parseFieldAccess(token, name);
+			return;
+		}
+
+		if (isSymbol(nextType) && nextType != DyvilSymbols.UNDERSCORE)
+		{
+			// IDENTIFIER SYMBOL
+			final IToken next2 = next.next();
+			if (neighboring(token, next) || isExpressionEnd(next.next().type()) || !neighboring(next, next2))
+			{
+				// IDENTIFIER_SYMBOL ...
+				// IDENTIFIER SYMBOL EXPRESSION
+				this.parseFieldAccess(token, name);
+				return;
+			}
+		}
+		else if (isIdentifier(nextType) && !isExpressionEnd(next.next().type()))
+		{
+			// IDENTIFIER IDENTIFIER EXPRESSION
+			// token      next
+
+			// Parse a field access
+			// e.g. out println 1
+
+			this.parseFieldAccess(token, name);
+			return;
+		}
+
+		// IDENTIFIER EXPRESSION
+		// token      next
+
+		// Fallback to single-argument call
+		// e.g. println "abc"
+		//      println -1
+		//      println i
+
+		final MethodCall call = new MethodCall(token.raw(), this.value, name, EmptyArguments.INSTANCE);
 		call.setDotless(!this.hasFlag(EXPLICIT_DOT));
 
 		this.value = call;
 		this.mode = ACCESS;
 
-		this.parseApply(pm, token.next(), call, operator == null ? Operators.DEFAULT : operator);
+		this.parseApply(pm, token.next(), call);
+	}
+
+	private void parseFieldAccess(IToken token, Name name)
+	{
+		final FieldAccess access = new FieldAccess(token.raw(), this.value, name);
+		access.setDotless(!this.hasFlag(EXPLICIT_DOT));
+		this.value = access;
+		this.mode = ACCESS;
 	}
 
 	/**
@@ -934,16 +630,14 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 	 * 	the first token of the expression that is a parameter to the APPLY method
 	 * @param call
 	 * 	the method or apply call
-	 * @param operator
-	 * 	the operator that precedes this call. Can be null.
 	 */
-	private void parseApply(IParserManager pm, IToken token, ICall call, Operator operator)
+	private void parseApply(IParserManager pm, IToken token, ICall call)
 	{
 		if (token.type() != BaseSymbols.OPEN_CURLY_BRACKET)
 		{
 			final SingleArgument argument = new SingleArgument();
 			call.setArguments(argument);
-			pm.pushParser(this.subParser(argument).withOperator(operator));
+			pm.pushParser(this.subParser(argument).withFlag(OPERATOR));
 			return;
 		}
 
@@ -958,83 +652,119 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		pm.pushParser(new StatementListParser(argument, true));
 	}
 
-	/**
-	 * Parses an assignment based on the current {@code value}.
-	 *
-	 * @param pm
-	 * 	the current parsing context manager
-	 * @param token
-	 * 	the current token, i.e. the '=' sign
-	 */
-	private void parseAssignment(IParserManager pm, IToken token)
-	{
-		if (this.value != null)
-		{
-			final ICodePosition position = this.value.getPosition();
-			final int valueType = this.value.valueTag();
-
-			switch (valueType)
-			{
-			case IValue.FIELD_ACCESS:
-			{
-				// ... IDENTIFIER =
-
-				final FieldAccess access = (FieldAccess) this.value;
-				final FieldAssignment assignment = new FieldAssignment(position, access.getInstance(),
-				                                                       access.getName());
-				this.value = assignment;
-				pm.pushParser(this.subParser(assignment));
-				return;
-			}
-			case IValue.APPLY_CALL:
-			{
-				// ... ( ... ) =
-
-				final ApplyMethodCall applyCall = (ApplyMethodCall) this.value;
-				final UpdateMethodCall updateCall = new UpdateMethodCall(position, applyCall.getReceiver(),
-				                                                         applyCall.getArguments());
-
-				this.value = updateCall;
-				pm.pushParser(this.subParser(updateCall));
-				return;
-			}
-			case IValue.METHOD_CALL:
-			{
-				// ... IDENTIFIER ( ... ) =
-
-				final MethodCall call = (MethodCall) this.value;
-				final FieldAccess access = new FieldAccess(position, call.getReceiver(), call.getName());
-				final UpdateMethodCall updateCall = new UpdateMethodCall(position, access, call.getArguments());
-
-				this.value = updateCall;
-				pm.pushParser(this.subParser(updateCall));
-				return;
-			}
-			case IValue.SUBSCRIPT_GET:
-			{
-				// ... [ ... ] =
-
-				final SubscriptAccess subscriptAccess = (SubscriptAccess) this.value;
-				final SubscriptAssignment subscriptAssignment = new SubscriptAssignment(position,
-				                                                                        subscriptAccess.getReceiver(),
-				                                                                        subscriptAccess.getArguments());
-
-				this.value = subscriptAssignment;
-				pm.pushParser(this.subParser(subscriptAssignment));
-				return;
-			}
-			}
-		}
-
-		pm.report(Markers.syntaxError(token, "assignment.invalid", token));
-		this.mode = VALUE;
-		this.value = null;
-	}
-
-	private boolean parseKeyword(IParserManager pm, IToken token, int type)
+	private boolean parseValue(IParserManager pm, IToken token, int type)
 	{
 		switch (type)
 		{
+		case Tokens.STRING:
+			this.value = new StringValue(token.raw(), token.stringValue());
+			this.mode = ACCESS;
+			return true;
+		case Tokens.STRING_START:
+		{
+			final StringInterpolationExpr stringInterpolation = new StringInterpolationExpr(token);
+			this.value = stringInterpolation;
+			this.mode = ACCESS;
+			pm.pushParser(new StingInterpolationParser(stringInterpolation), true);
+			return true;
+		}
+		case Tokens.SINGLE_QUOTED_STRING:
+			this.value = new CharValue(token.raw(), token.stringValue());
+			this.mode = ACCESS;
+			return true;
+		case Tokens.INT:
+			this.value = new IntValue(token.raw(), token.intValue());
+			this.mode = ACCESS;
+			return true;
+		case Tokens.LONG:
+			this.value = new LongValue(token.raw(), token.longValue());
+			this.mode = ACCESS;
+			return true;
+		case Tokens.FLOAT:
+			this.value = new FloatValue(token.raw(), token.floatValue());
+			this.mode = ACCESS;
+			return true;
+		case Tokens.DOUBLE:
+			this.value = new DoubleValue(token.raw(), token.doubleValue());
+			this.mode = ACCESS;
+			return true;
+		case DyvilSymbols.UNDERSCORE:
+			// _ ...
+			this.value = new WildcardValue(token.raw());
+			this.mode = ACCESS;
+			return true;
+		case BaseSymbols.OPEN_PARENTHESIS:
+		{
+			// ( ...
+			final IToken next = token.next();
+
+			if (!this.hasFlag(IGNORE_LAMBDA))
+			{
+				if (next.type() != BaseSymbols.CLOSE_PARENTHESIS)
+				{
+					// ( ...
+					pm.pushParser(new LambdaOrTupleParser(this), true);
+					this.mode = ACCESS;
+					return true;
+				}
+
+				final IToken next2 = next.next();
+				if (next2.type() == DyvilSymbols.DOUBLE_ARROW_RIGHT)
+				{
+					// () => ...
+					final LambdaExpr lambda = new LambdaExpr(next2.raw());
+					this.value = lambda;
+					pm.skip(2);
+					pm.pushParser(new ExpressionParser(lambda));
+					this.mode = ACCESS;
+					return true;
+				}
+			}
+			else if (next.type() != BaseSymbols.CLOSE_PARENTHESIS)
+			{
+				pm.pushParser(new LambdaOrTupleParser(this, true), true);
+				this.mode = ACCESS;
+				return true;
+			}
+
+			// ()
+			this.value = new VoidValue(token.to(token.next()));
+			pm.skip();
+			this.mode = ACCESS;
+			return true;
+		}
+		case BaseSymbols.OPEN_SQUARE_BRACKET:
+			// [ ...
+			this.mode = ACCESS;
+			pm.pushParser(new ArrayLiteralParser(this), true);
+			return true;
+		case BaseSymbols.OPEN_CURLY_BRACKET:
+			// { ...
+			this.mode = ACCESS;
+			pm.pushParser(new StatementListParser(this), true);
+			return true;
+		case DyvilSymbols.AT:
+			// @ ...
+			Annotation a = new Annotation();
+			pm.pushParser(new AnnotationParser(a));
+			this.value = new AnnotationValue(a);
+			this.mode = END;
+			return true;
+		case DyvilSymbols.DOUBLE_ARROW_RIGHT:
+		{
+			if (this.hasFlag(IGNORE_LAMBDA))
+			{
+				pm.popParser(true);
+				return true;
+			}
+
+			// => ...
+			LambdaExpr lambda = new LambdaExpr(token.raw());
+			this.value = lambda;
+			this.mode = ACCESS;
+			pm.pushParser(new ExpressionParser(lambda));
+			return true;
+		}
 		case DyvilKeywords.NULL:
 			this.value = new NullValue(token.raw());
 			this.mode = ACCESS;
@@ -1051,95 +781,36 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			this.value = new BooleanValue(token.raw(), false);
 			this.mode = ACCESS;
 			return true;
+		case DyvilKeywords.INIT:
+			// init ...
+			this.mode = ACCESS;
+			pm.pushParser(new ThisSuperInitParser(this), true);
+			return true;
 		case DyvilKeywords.THIS:
-		{
 			// this ...
-
-			final IToken next = token.next();
-			switch (next.type())
-			{
-			case BaseSymbols.OPEN_SQUARE_BRACKET:
-			{
-				// this [ ... ]
-				final ThisExpr thisExpr = new ThisExpr(token.raw());
-
-				this.mode = PARAMETRIC_THIS_END;
-				this.value = thisExpr;
-				pm.skip();
-				pm.pushParser(new TypeParser(thisExpr));
-				return true;
-			}
-			case BaseSymbols.DOT:
-				// this.init OR this.new
-				if (this.parseInitializer(pm, next, false))
-				{
-					return true;
-				}
-			}
-			this.value = new ThisExpr(token.raw());
 			this.mode = ACCESS;
+			pm.pushParser(new ThisSuperInitParser(this, false));
 			return true;
-		}
 		case DyvilKeywords.SUPER:
-		{
-			final IToken next = token.next();
-			switch (next.type())
-			{
-			case BaseSymbols.OPEN_SQUARE_BRACKET:
-			{
-				// super [ ... ]
-				final SuperExpr superExpr = new SuperExpr(token.raw());
-
-				this.mode = PARAMETRIC_SUPER_END;
-				this.value = superExpr;
-				pm.skip();
-				pm.pushParser(new TypeParser(superExpr));
-				return true;
-			}
-			case BaseSymbols.DOT:
-				// super.init OR super.new
-				if (this.parseInitializer(pm, next, true))
-				{
-					return true;
-				}
-			}
-			this.value = new SuperExpr(token.raw());
+			// super ...
 			this.mode = ACCESS;
+			pm.pushParser(new ThisSuperInitParser(this, true));
 			return true;
-		}
 		case DyvilKeywords.CLASS:
-		{
 			// class ...
-
-			final ClassOperator classOperator = new ClassOperator(token);
-			this.value = classOperator;
-
-			pm.pushParser(new TypeParser(classOperator));
 			this.mode = ACCESS;
+			pm.pushParser(new TypeClassParser(this, token, true));
 			return true;
-		}
 		case DyvilKeywords.TYPE:
-		{
 			// type ...
-
-			TypeOperator typeOperator = new TypeOperator(token);
-			this.value = typeOperator;
-
-			pm.pushParser(new TypeParser(typeOperator));
 			this.mode = ACCESS;
+			pm.pushParser(new TypeClassParser(this, token, false));
 			return true;
-		}
 		case DyvilKeywords.NEW:
-		{
 			// new ...
-
-			final ConstructorCall call = new ConstructorCall(token);
-			this.value = call;
-
-			this.mode = CONSTRUCTOR_PARAMETERS;
-			pm.pushParser(new TypeParser(call));
+			this.mode = ACCESS;
+			pm.pushParser(new ConstructorCallParser(this), true);
 			return true;
-		}
 		case DyvilKeywords.RETURN:
 		{
 			// return ...
@@ -1220,7 +891,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			this.value = breakStatement;
 
 			final IToken next = token.next();
-			if (ParserUtil.isIdentifier(next.type()))
+			if (isIdentifier(next.type()))
 			{
 				breakStatement.setName(next.nameValue());
 				pm.skip();
@@ -1235,7 +906,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			this.value = continueStatement;
 
 			final IToken next = token.next();
-			if (ParserUtil.isIdentifier(next.type()))
+			if (isIdentifier(next.type()))
 			{
 				continueStatement.setName(next.nameValue());
 				pm.skip();
@@ -1250,7 +921,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			this.value = statement;
 
 			final IToken next = token.next();
-			if (ParserUtil.isIdentifier(next.type()))
+			if (isIdentifier(next.type()))
 			{
 				statement.setName(next.nameValue());
 				pm.skip();
@@ -1314,32 +985,6 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			this.mode = END;
 			return true;
 		}
-		}
-		return false;
-	}
-
-	/**
-	 * Parses a {@code this} or {@code super} initializer.
-	 *
-	 * @param pm
-	 * 	the current parsing context manager
-	 * @param next
-	 * 	the token after the {@code this} or {@code super} token. Usually a {@code DOT .}.
-	 * @param isSuper
-	 * 	{@code true} if the previous token was {@code super}, {@code false} for {@code this}.
-	 *
-	 * @return {@code true}, iff an initializer could be parsed successfully
-	 */
-	private boolean parseInitializer(IParserManager pm, IToken next, boolean isSuper)
-	{
-		final IToken next2 = next.next();
-
-		if (next2.type() == DyvilKeywords.INIT)
-		{
-			this.value = new InitializerCall(next2.raw(), isSuper);
-			pm.skip(2);
-			this.mode = PARAMETERS;
-			return true;
 		}
 		return false;
 	}

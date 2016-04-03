@@ -10,7 +10,9 @@ import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.generic.MapTypeContext;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
@@ -20,7 +22,6 @@ import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -29,6 +30,7 @@ import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -297,35 +299,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 		int match = 1;
 		int argumentCount = arguments.size();
 
-		if (this.modifiers.hasIntModifier(Modifiers.VARARGS))
-		{
-			int parCount = this.parameterCount - 1;
-			if (argumentCount <= parCount)
-			{
-				return 0;
-			}
-
-			float m;
-			IParameter varParam = this.parameters[parCount];
-			for (int i = 0; i < parCount; i++)
-			{
-				IParameter par = this.parameters[i];
-				m = arguments.getTypeMatch(i, par);
-				if (m == 0)
-				{
-					return 0;
-				}
-				match += m;
-			}
-
-			m = arguments.getVarargsTypeMatch(parCount, varParam);
-			if (m == 0)
-			{
-				return 0;
-			}
-			return m + match;
-		}
-		else if (argumentCount > this.parameterCount)
+		if (argumentCount > this.parameterCount && !this.isVariadic())
 		{
 			return 0;
 		}
@@ -347,64 +321,42 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	@Override
 	public IType checkGenericType(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments)
 	{
-		int typeVarCount = this.enclosingClass.typeParameterCount();
-		ClassGenericType gt = new ClassGenericType(this.enclosingClass, new IType[typeVarCount], typeVarCount)
-		{
-			@Override
-			public void addMapping(ITypeParameter typeVar, IType type)
-			{
-				int index = typeVar.getIndex();
-				this.typeArguments[index] = type;
-			}
-		};
+		final ITypeContext typeContext = new MapTypeContext();
+		final IClass theClass = this.enclosingClass;
 
-		if (this.modifiers.hasIntModifier(Modifiers.VARARGS))
+		for (int i = 0; i < this.parameterCount; i++)
 		{
-			int index = this.parameterCount - 1;
-			for (int i = 0; i < index; i++)
-			{
-				arguments.inferType(i, this.parameters[i], gt);
-			}
-			arguments.inferVarargsType(index, this.parameters[index], gt);
-		}
-		else
-		{
-			for (int i = 0; i < this.parameterCount; i++)
-			{
-				arguments.inferType(i, this.parameters[i], gt);
-			}
+			arguments.inferType(i, this.parameters[i], typeContext);
 		}
 
-		for (int i = 0; i < typeVarCount; i++)
+		for (int i = 0, count = theClass.typeParameterCount(); i < count; i++)
 		{
-			if (gt.getType(i) == null)
-			{
-				gt.setType(i, Types.ANY);
+			final ITypeParameter typeParameter = theClass.getTypeParameter(i);
+			final IType typeArgument = typeContext.resolveType(typeParameter);
 
-				markers.add(Markers.semantic(position, "constructor.typevar.infer",
-				                             this.enclosingClass.getTypeParameter(i).getName(),
-				                             this.enclosingClass.getName()));
+			if (typeArgument == null || typeArgument.getTypeVariable() == typeParameter)
+			{
+				final IType inferredType = typeParameter.getDefaultType();
+				markers.add(Markers.semantic(position, "constructor.typevar.infer", theClass.getName(),
+				                             typeParameter.getName(), inferredType));
+				typeContext.addMapping(typeParameter, inferredType);
+			}
+			else if (!typeParameter.isAssignableFrom(typeArgument, typeContext))
+			{
+				final Marker marker = Markers.semanticError(position, "constructor.typevar.incompatible",
+				                                            theClass.getName(), typeParameter.getName());
+				marker.addInfo(Markers.getSemantic("generic.type", typeArgument));
+				marker.addInfo(Markers.getSemantic("typeparameter.declaration", typeParameter));
+				markers.add(marker);
 			}
 		}
 
-		return gt;
+		return theClass.getType().getConcreteType(typeContext);
 	}
 
 	@Override
 	public void checkArguments(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments)
 	{
-		if (this.modifiers.hasIntModifier(Modifiers.VARARGS))
-		{
-			int len = this.parameterCount - 1;
-			arguments.checkVarargsValue(len, this.parameters[len], type, markers, context);
-
-			for (int i = 0; i < len; i++)
-			{
-				arguments.checkValue(i, this.parameters[i], type, markers, context);
-			}
-			return;
-		}
-
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			arguments.checkValue(i, this.parameters[i], type, markers, context);
@@ -501,24 +453,9 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	@Override
 	public void writeArguments(MethodWriter writer, IArguments arguments) throws BytecodeException
 	{
-		if (this.modifiers.hasIntModifier(Modifiers.VARARGS))
-		{
-			int len = this.parameterCount - 1;
-			IParameter param;
-			for (int i = 0; i < len; i++)
-			{
-				param = this.parameters[i];
-				arguments.writeValue(i, param, writer);
-			}
-			param = this.parameters[len];
-			arguments.writeVarargsValue(len, param, writer);
-			return;
-		}
-
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			IParameter param = this.parameters[i];
-			arguments.writeValue(i, param, writer);
+			arguments.writeValue(i, this.parameters[i], writer);
 		}
 	}
 

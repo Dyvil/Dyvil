@@ -9,8 +9,8 @@ import dyvil.tools.compiler.ast.header.ImportDeclaration;
 import dyvil.tools.compiler.ast.header.IncludeDeclaration;
 import dyvil.tools.compiler.ast.header.PackageDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
+import dyvil.tools.compiler.ast.operator.IOperator;
 import dyvil.tools.compiler.ast.operator.IOperatorMap;
-import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.alias.ITypeAliasMap;
 import dyvil.tools.compiler.backend.IClassCompilable;
@@ -80,14 +80,14 @@ public interface IDyvilHeader extends IObjectCompilable, IStaticContext, IClassL
 	int operatorCount();
 
 	@Override
-	Operator getOperator(Name name);
+	IOperator resolveOperator(Name name, int type);
 	
-	Operator getOperator(int index);
+	IOperator getOperator(int index);
 
-	void setOperator(int index, Operator operator);
+	void setOperator(int index, IOperator operator);
 
 	@Override
-	void addOperator(Operator op);
+	void addOperator(IOperator op);
 
 	// Type Aliases
 

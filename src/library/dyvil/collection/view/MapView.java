@@ -97,45 +97,45 @@ public class MapView<K, V> implements ImmutableMap<K, V>
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $plus(K key, V value)
+	public ImmutableMap<K, V> withEntry(K key, V value)
 	{
-		return new MapView(this.map.$plus(key, value));
+		return new MapView(this.map.withEntry(key, value));
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map)
+	public ImmutableMap<K, V> union(Map<? extends K, ? extends V> map)
 	{
-		return new MapView(this.map.$plus$plus(map));
+		return new MapView(this.map.union(map));
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$at(Object key)
+	public ImmutableMap<K, V> keyRemoved(Object key)
 	{
-		return new MapView(this.map.$minus$at(key));
+		return new MapView(this.map.keyRemoved(key));
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(Object key, Object value)
+	public ImmutableMap<K, V> removed(Object key, Object value)
 	{
-		return new MapView(this.map.$minus(key, value));
+		return new MapView(this.map.removed(key, value));
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$colon(Object value)
+	public ImmutableMap<K, V> valueRemoved(Object value)
 	{
-		return new MapView(this.map.$minus$colon(value));
+		return new MapView(this.map.valueRemoved(value));
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Map<?, ?> map)
+	public ImmutableMap<K, V> difference(Map<?, ?> map)
 	{
-		return new MapView(this.map.$minus$minus(map));
+		return new MapView(this.map.difference(map));
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Collection<?> keys)
+	public ImmutableMap<K, V> keyDifference(Collection<?> keys)
 	{
-		return new MapView(this.map.$minus$minus(keys));
+		return new MapView(this.map.keyDifference(keys));
 	}
 	
 	@Override

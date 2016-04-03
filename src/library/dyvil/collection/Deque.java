@@ -96,7 +96,7 @@ public interface Deque<E> extends BidiQueryable<E>, Queue<E>, Stack<E>
 	 *
 	 * @return true, if the element was removed successfully
 	 */
-	boolean removeFirst(Object o);
+	boolean removeFirst(Object element);
 	
 	/**
 	 * Removes the last occurence of the given {@code element} from this deque and returns {@code true} if the element
@@ -107,7 +107,7 @@ public interface Deque<E> extends BidiQueryable<E>, Queue<E>, Stack<E>
 	 *
 	 * @return true, if the element was removed successfully
 	 */
-	boolean removeLast(Object o);
+	boolean removeLast(Object element);
 	
 	@Override
 	void map(Function<? super E, ? extends E> mapper);
@@ -157,7 +157,10 @@ public interface Deque<E> extends BidiQueryable<E>, Queue<E>, Stack<E>
 	{
 		return this.getFirst();
 	}
-	
+
+	@Override
+	E peek(int index);
+
 	/**
 	 * Returns a copy of this deque that contains the same elements as this deque in the same order.
 	 *

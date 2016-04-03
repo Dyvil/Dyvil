@@ -13,13 +13,20 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class SubscriptAssignment extends AbstractCall implements IValueConsumer
 {
-	public SubscriptAssignment(ICodePosition position, IValue instance, IArguments arguments)
+	public SubscriptAssignment(ICodePosition position, IValue receiver, IArguments arguments)
 	{
 		this.position = position;
-		this.receiver = instance;
+		this.receiver = receiver;
 		this.arguments = arguments;
 	}
-	
+
+	public SubscriptAssignment(ICodePosition position, IValue receiver, IArguments arguments, IValue rhs)
+	{
+		this.position = position;
+		this.receiver = receiver;
+		this.arguments = arguments.withLastValue(Names.eq, rhs);
+	}
+
 	@Override
 	public int valueTag()
 	{

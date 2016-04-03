@@ -73,37 +73,37 @@ public final class EmptySet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public ImmutableSet<E> $plus(E element)
+	public ImmutableSet<E> added(E element)
 	{
 		return new SingletonSet<>(element);
 	}
 	
 	@Override
-	public ImmutableSet<E> $minus(Object element)
+	public ImmutableSet<E> removed(Object element)
 	{
 		return this;
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> $minus$minus(Collection<?> collection)
+	public ImmutableSet<? extends E> difference(Collection<?> collection)
 	{
 		return this;
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> $amp(Collection<? extends E> collection)
+	public ImmutableSet<? extends E> intersection(Collection<? extends E> collection)
 	{
 		return this;
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> $bar(Collection<? extends E> collection)
+	public ImmutableSet<? extends E> union(Collection<? extends E> collection)
 	{
 		return new ArraySet<>(collection);
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> $up(Collection<? extends E> collection)
+	public ImmutableSet<? extends E> symmetricDifference(Collection<? extends E> collection)
 	{
 		return new ArraySet<>(collection);
 	}

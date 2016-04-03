@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Modifiers;
-import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Handle;
 import dyvil.tools.compiler.ast.access.AbstractCall;
 import dyvil.tools.compiler.ast.access.ConstructorCall;
@@ -51,6 +50,12 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	                                                                                                   "method.type",
 	                                                                                                   "value.type");
 
+	// Flags
+
+	private static final int HANDLE_TYPE_MASK    = 0b00001111;
+	private static final int VALUE_RESOLVED      = 0b00010000;
+	public static final  int IMPLICIT_PARAMETERS = 0b00100000;
+
 	protected IParameter[] parameters;
 	protected int          parameterCount;
 
@@ -61,9 +66,9 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	protected ICodePosition position;
 
 	/**
-	 * Marks if the return value has been resolved yet
+	 * Stores various metadata about this Lambda Expression. See Flags constants for possible values
 	 */
-	private boolean valueResolved;
+	private int flags;
 
 	/**
 	 * The instantiated type this lambda expression represents
@@ -80,7 +85,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	 */
 	protected IMethod method;
 
-	protected CaptureHelper captureHelper = new CaptureHelper(CaptureVariable.FACTORY);
+	protected CaptureHelper captureHelper;
 
 	/**
 	 * The enclosing class internal name
@@ -95,12 +100,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	/**
 	 * The descriptor of the synthetic lambda method
 	 */
-	private String lambdaDesc;
-
-	/**
-	 * The opcode for direct method reference invocation
-	 */
-	private int directInvokeOpcode;
+	private String descriptor;
 
 	public LambdaExpr(ICodePosition position)
 	{
@@ -141,21 +141,24 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		return LAMBDA;
 	}
 
-	@Override
-	public void setValue(IValue value)
-	{
-		this.value = value;
-	}
-
-	public IValue getValue()
-	{
-		return this.value;
-	}
+	// Parameters
 
 	@Override
 	public int parameterCount()
 	{
 		return this.parameterCount;
+	}
+
+	@Override
+	public IParameter getParameter(int index)
+	{
+		return this.parameters[index];
+	}
+
+	@Override
+	public void setParameter(int index, IParameter parameter)
+	{
+		this.parameters[index] = parameter;
 	}
 
 	@Override
@@ -172,22 +175,32 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	}
 
 	@Override
-	public void setParameter(int index, IParameter parameter)
-	{
-		this.parameters[index] = parameter;
-	}
-
-	@Override
-	public IParameter getParameter(int index)
-	{
-		return this.parameters[index];
-	}
-
-	@Override
 	public IParameter[] getParameters()
 	{
 		return this.parameters;
 	}
+
+	@Override
+	public void setParameters(IParameter[] parameters, int parameterCount)
+	{
+		this.parameters = parameters;
+		this.parameterCount = parameterCount;
+	}
+
+	// Return Value
+
+	@Override
+	public void setValue(IValue value)
+	{
+		this.value = value;
+	}
+
+	public IValue getValue()
+	{
+		return this.value;
+	}
+
+	// Metadata
 
 	public void setMethod(IMethod method)
 	{
@@ -252,6 +265,42 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		this.type = type;
 	}
 
+	/**
+	 * Returns the Handle Type for Direct Invocation if this is a Method Pointer, {@code 0} otherwise.
+	 *
+	 * @return the Handle Type for Direct Invocation
+	 */
+	public int getHandleType()
+	{
+		return this.flags & HANDLE_TYPE_MASK;
+	}
+
+	private void setHandleType(int handleType)
+	{
+		this.flags = this.flags & ~HANDLE_TYPE_MASK | handleType;
+	}
+
+	public void setImplicitParameters(boolean implicitParameters)
+	{
+		if (implicitParameters)
+		{
+			this.flags |= IMPLICIT_PARAMETERS;
+		}
+		else
+		{
+			this.flags &= ~IMPLICIT_PARAMETERS;
+		}
+	}
+
+	private CaptureHelper getCaptureHelper()
+	{
+		if (this.captureHelper != null)
+		{
+			return this.captureHelper;
+		}
+		return this.captureHelper = new CaptureHelper(CaptureVariable.FACTORY);
+	}
+
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
@@ -274,9 +323,10 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 			final IContext combinedContext = context.push(this);
 
-			if (!this.valueResolved)
+			if ((this.flags & VALUE_RESOLVED) == 0)
 			{
 				this.value = this.value.resolve(markers, combinedContext);
+				this.flags |= VALUE_RESOLVED;
 			}
 
 			if (this.returnType == Types.UNKNOWN)
@@ -350,7 +400,15 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			// Can't infer parameter type
 			if (concreteType == Types.UNKNOWN)
 			{
-				markers.add(Markers.semantic(parameter.getPosition(), "lambda.parameter.type", parameter.getName()));
+				if ((this.flags & IMPLICIT_PARAMETERS) != 0)
+				{
+					markers.add(Markers.semanticError(parameter.getPosition(), "lambda.parameter.implicit"));
+				}
+				else
+				{
+					markers.add(
+						Markers.semanticError(parameter.getPosition(), "lambda.parameter.type", parameter.getName()));
+				}
 			}
 			parameter.setType(concreteType);
 		}
@@ -436,7 +494,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	@Override
 	public IAccessible getAccessibleThis(IClass type)
 	{
-		this.captureHelper.setThisClass(type);
+		this.getCaptureHelper().setThisClass(type);
 		return VariableThis.DEFAULT;
 	}
 
@@ -461,7 +519,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			return variable;
 		}
 
-		return this.captureHelper.capture(variable);
+		return this.getCaptureHelper().capture(variable);
 	}
 
 	@Override
@@ -475,18 +533,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			final IParameter parameter = this.parameters[i];
-			if (parameter.getType() == Types.UNKNOWN)
-			{
-				// Avoid invalid parameter type error
-				parameter.setType(null);
-				parameter.resolveTypes(markers, context);
-				parameter.setType(Types.UNKNOWN);
-			}
-			else
-			{
-				parameter.resolveTypes(markers, context);
-			}
+			this.parameters[i].resolveTypes(markers, context);
 		}
 
 		if (this.value != null)
@@ -507,11 +554,19 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			if (this.parameters[i].getType() == Types.UNKNOWN)
+			final IParameter parameter = this.parameters[i];
+
+			if (parameter.getType() == Types.UNKNOWN)
 			{
+				parameter.setType(null); // avoid missing parameter type error
+				parameter.resolve(markers, context);
+				parameter.setType(Types.UNKNOWN);
+
 				// Resolving the value happens in withType
 				return this;
 			}
+
+			parameter.resolve(markers, context);
 		}
 
 		// All parameter types are known, we can actually resolve the return value now
@@ -520,7 +575,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		this.value = this.value.resolve(markers, context);
 		context.pop();
 
-		this.valueResolved = true;
+		this.flags |= VALUE_RESOLVED;
 		this.returnType = this.value.getType();
 
 		return this;
@@ -529,24 +584,42 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameters[i].checkTypes(markers, context);
+		}
+
 		context = context.push(this);
-
 		this.value.checkTypes(markers, context);
-
 		context = context.pop();
 
-		this.captureHelper.checkCaptures(markers, context);
+		if (this.captureHelper != null)
+		{
+			this.captureHelper.checkCaptures(markers, context);
+		}
 	}
 
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameters[i].check(markers, context);
+		}
+
+		context = context.push(this);
 		this.value.check(markers, context);
+		context.pop();
 	}
 
 	@Override
 	public IValue foldConstants()
 	{
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameters[i].foldConstants();
+		}
+
 		this.value = this.value.foldConstants();
 		return this;
 	}
@@ -554,9 +627,16 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		this.value = this.value.cleanup(context, compilableList);
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameters[i].cleanup(context, compilableList);
+		}
 
-		if (!this.captureHelper.hasCaptures())
+		context = context.push(this);
+		this.value = this.value.cleanup(context, compilableList);
+		context.pop();
+
+		if (this.captureHelper == null || !this.captureHelper.hasCaptures())
 		{
 			if (this.value instanceof AbstractCall)
 			{
@@ -565,25 +645,10 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 				if (method != null && this.checkCall(call.getReceiver(), call.getArguments(), method))
 				{
-					switch (method.getInvokeOpcode())
-					{
-					case Opcodes.INVOKEVIRTUAL:
-						this.directInvokeOpcode = ClassFormat.H_INVOKEVIRTUAL;
-						break;
-					case Opcodes.INVOKESTATIC:
-						this.directInvokeOpcode = ClassFormat.H_INVOKESTATIC;
-						break;
-					case Opcodes.INVOKEINTERFACE:
-						this.directInvokeOpcode = ClassFormat.H_INVOKEINTERFACE;
-						break;
-					case Opcodes.INVOKESPECIAL:
-						this.directInvokeOpcode = ClassFormat.H_INVOKESPECIAL;
-						break;
-					}
-
+					this.setHandleType(ClassFormat.insnToHandle(method.getInvokeOpcode()));
 					this.name = method.getName().qualified;
 					this.owner = method.getEnclosingClass().getInternalName();
-					this.lambdaDesc = method.getDescriptor();
+					this.descriptor = method.getDescriptor();
 					return this;
 				}
 			}
@@ -595,10 +660,10 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 				if (this.checkCall(null, call.getArguments(), constructor))
 				{
-					this.directInvokeOpcode = ClassFormat.H_NEWINVOKESPECIAL;
+					this.setHandleType(ClassFormat.H_NEWINVOKESPECIAL);
 					this.name = "<init>";
 					this.owner = constructor.getEnclosingClass().getInternalName();
-					this.lambdaDesc = constructor.getDescriptor();
+					this.descriptor = constructor.getDescriptor();
 
 					return this;
 				}
@@ -612,60 +677,38 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 	private boolean checkCall(IValue receiver, IArguments arguments, IParametric parametric)
 	{
-		boolean hasReceiver = false;
-
-		if (receiver != null)
+		final int params = this.parameterCount;
+		if (receiver == null)
 		{
-			if (this.parameterCount <= 0)
+			if (arguments.size() != params)
 			{
 				return false;
 			}
 
-			if (isFieldAccess(receiver, this.parameters[0]))
+			for (int i = 0; i < params; i++)
 			{
-				if (arguments.size() != this.parameterCount - 1)
+				final IValue argument = arguments.getValue(i, parametric.getParameter(i));
+				if (!isFieldAccess(argument, this.parameters[i]))
 				{
 					return false;
 				}
-
-				for (int i = 1; i < this.parameterCount; i++)
-				{
-					final IValue argument = arguments.getValue(i - 1, parametric.getParameter(i - 1));
-					if (!isFieldAccess(argument, this.parameters[i]))
-					{
-						return false;
-					}
-				}
-
-				this.value = null;
-				return true;
 			}
 
-			hasReceiver = true;
+			return true;
 		}
 
-		if (arguments.size() != this.parameterCount)
+		if (params <= 0 || arguments.size() != params - 1 || !isFieldAccess(receiver, this.parameters[0]))
 		{
 			return false;
 		}
 
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 1; i < params; i++)
 		{
-			final IValue argument = arguments.getValue(i, parametric.getParameter(i));
+			final IValue argument = arguments.getValue(i - 1, parametric.getParameter(i - 1));
 			if (!isFieldAccess(argument, this.parameters[i]))
 			{
 				return false;
 			}
-		}
-
-		if (hasReceiver)
-		{
-			this.value = receiver;
-			this.captureHelper.setThisClass(receiver.getType().getTheClass());
-		}
-		else
-		{
-			this.value = null;
 		}
 
 		return true;
@@ -679,39 +722,28 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		final int handleType;
-
-		if (this.directInvokeOpcode == 0)
+		int handleType = this.getHandleType();
+		if (handleType == 0)
 		{
-			if (this.captureHelper.isThisCaptured())
+			handleType = ClassFormat.H_INVOKESTATIC;
+			if (this.captureHelper != null)
 			{
-				handleType = ClassFormat.H_INVOKESPECIAL;
+				if (this.captureHelper.isThisCaptured())
+				{
+					handleType = ClassFormat.H_INVOKESPECIAL;
+				}
+				this.captureHelper.writeCaptures(writer);
 			}
-			else
-			{
-				handleType = ClassFormat.H_INVOKESTATIC;
-			}
-
-			this.captureHelper.writeCaptures(writer);
-		}
-		else
-		{
-			if (this.value != null)
-			{
-				this.value.writeExpression(writer, this.returnType);
-			}
-
-			handleType = this.directInvokeOpcode;
 		}
 
-		final String desc = this.getLambdaDescriptor();
+		final String desc = this.getTargetDescriptor();
 		final String invokedName = this.method.getName().qualified;
 		final String invokedType = this.getInvokeDescriptor();
 
 		final dyvil.tools.asm.Type methodDescriptorType = dyvil.tools.asm.Type
 			                                                  .getMethodType(this.method.getDescriptor());
 		final dyvil.tools.asm.Type lambdaDescriptorType = dyvil.tools.asm.Type
-			                                                  .getMethodType(this.getSpecialDescriptor());
+			                                                  .getMethodType(this.getLambdaDescriptor());
 		final Handle handle = new Handle(handleType, this.owner, this.name, desc);
 
 		writer.visitLineNumber(this.getLineNumber());
@@ -732,8 +764,11 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	{
 		final StringBuilder builder = new StringBuilder().append('(');
 
-		this.captureHelper.appendThisCaptureType(builder);
-		this.captureHelper.appendCaptureTypes(builder);
+		if (this.captureHelper != null)
+		{
+			this.captureHelper.appendThisCaptureType(builder);
+			this.captureHelper.appendCaptureTypes(builder);
+		}
 
 		builder.append(')');
 
@@ -743,9 +778,10 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	}
 
 	/**
-	 * @return the specialized method type of the SAM method, as opposed to {@link IMethod#getDescriptor()}.
+	 * @return the specialized descriptor of the lambda callback method, including parameter types and return type, but
+	 * excluding captured variables
 	 */
-	private String getSpecialDescriptor()
+	private String getLambdaDescriptor()
 	{
 		final StringBuilder buffer = new StringBuilder().append('(');
 
@@ -764,60 +800,63 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	 * @return the descriptor of the (synthetic) lambda callback method, including captured variables, parameter types
 	 * and the return type.
 	 */
-	private String getLambdaDescriptor()
+	private String getTargetDescriptor()
 	{
-		if (this.lambdaDesc != null)
+		if (this.descriptor != null)
 		{
-			return this.lambdaDesc;
+			return this.descriptor;
 		}
+
+		assert this.getHandleType() == 0;
 
 		final StringBuilder builder = new StringBuilder().append('(');
 
-		this.captureHelper.appendCaptureTypes(builder);
-		for (int i = this.directInvokeOpcode != 0 && this.directInvokeOpcode != Opcodes.INVOKESTATIC ? 1 : 0;
-		     i < this.parameterCount; i++)
+		if (this.captureHelper != null)
+		{
+			this.captureHelper.appendCaptureTypes(builder);
+		}
+
+		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].getType().appendExtendedName(builder);
 		}
 
 		builder.append(')');
 
-		if (this.directInvokeOpcode == ClassFormat.H_NEWINVOKESPECIAL)
-		{
-			builder.append('V');
-		}
-		else
-		{
-			this.returnType.appendExtendedName(builder);
-		}
+		this.returnType.appendExtendedName(builder);
 
-		return this.lambdaDesc = builder.toString();
+		return this.descriptor = builder.toString();
 	}
 
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		if (this.directInvokeOpcode != 0)
+		if (this.getHandleType() != 0)
 		{
 			return;
 		}
 
-		final int modifiers = this.captureHelper.isThisCaptured() ?
+		final boolean thisCaptured = this.captureHelper != null && this.captureHelper.isThisCaptured();
+		final int modifiers = thisCaptured ?
 			                      Modifiers.PRIVATE | Modifiers.SYNTHETIC :
 			                      Modifiers.PRIVATE | Modifiers.STATIC | Modifiers.SYNTHETIC;
 
 		final MethodWriter methodWriter = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name,
-		                                                                                  this.getLambdaDescriptor(),
+		                                                                                  this.getTargetDescriptor(),
 		                                                                                  null, null));
 
 		int index = 0;
-		if (this.captureHelper.isThisCaptured())
-		{
-			methodWriter.setThisType(this.owner);
-			index = 1;
-		}
 
-		this.captureHelper.writeCaptureParameters(methodWriter, index);
+		if (this.captureHelper != null)
+		{
+			if (thisCaptured)
+			{
+				methodWriter.setThisType(this.owner);
+				index = 1;
+			}
+
+			this.captureHelper.writeCaptureParameters(methodWriter, index);
+		}
 
 		for (int i = 0; i < this.parameterCount; i++)
 		{
@@ -859,23 +898,10 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 				buffer.append(' ');
 			}
 
-			parameter = this.parameters[0];
-			if (parameter.getType() == Types.UNKNOWN)
-			{
-				buffer.append(parameter.getName());
-				for (int i = 1; i < this.parameterCount; i++)
-				{
-					Formatting.appendSeparator(buffer, "lambda.separator", ',');
-					buffer.append(this.parameters[i].getName());
-				}
-			}
-			else
-			{
-				Util.astToString(prefix, this.parameters, this.parameterCount,
-				                 Formatting.getSeparator("lambda.separator", ','), buffer);
-			}
+			Util.astToString(prefix, this.parameters, this.parameterCount,
+			                 Formatting.getSeparator("lambda.separator", ','), buffer);
 
-			if (Formatting.getBoolean("lambda.close_paren.space-before"))
+			if (Formatting.getBoolean("lambda.close_paren.space_before"))
 			{
 				buffer.append(' ');
 			}
@@ -902,6 +928,9 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			buffer.append(' ');
 		}
 
-		this.value.toString(prefix, buffer);
+		if (this.value != null)
+		{
+			this.value.toString(prefix, buffer);
+		}
 	}
 }

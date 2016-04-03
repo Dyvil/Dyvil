@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.method;
 
+import dyvil.tools.asm.Handle;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -9,7 +10,6 @@ import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -36,8 +36,6 @@ public interface IMethod extends IClassMember, ICallableMember, ICallableSignatu
 	boolean isAbstract();
 
 	boolean isObjectMethod();
-	
-	void setParameters(IParameter[] parameters, int parameterCount);
 
 	/**
 	 * Checks if this method overrides the given {@code candidate} method.
@@ -64,6 +62,8 @@ public interface IMethod extends IClassMember, ICallableMember, ICallableSignatu
 	boolean isIntrinsic();
 	
 	int getInvokeOpcode();
+
+	Handle toHandle();
 	
 	String getDescriptor();
 	

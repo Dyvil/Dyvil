@@ -62,48 +62,32 @@ public interface Set<E> extends Collection<E>
 	// Non-mutating Operations
 	
 	@Override
-	Set<E> $plus(E element);
-	
+	Set<E> added(E element);
+
+	@Override
+	Set<E> removed(Object element);
+
 	/**
-	 * {@inheritDoc} This operator represents the 'union' Set operation and delegates to {@link #$bar(Collection)}.
+	 * {@inheritDoc} This operator represents the 'union' Set operation and delegates to {@link #union(Collection)}.
 	 */
 	@Override
-	default Set<? extends E> $plus$plus(Collection<? extends E> collection)
-	{
-		return this.$bar(collection);
-	}
-	
-	@Override
-	Set<E> $minus(Object element);
-	
+	Set<? extends E> union(Collection<? extends E> collection);
+
 	/**
-	 * {@inheritDoc} This operator represents the 'subtract' Set operation.
+	 * {@inheritDoc} This operator represents the 'difference' Set operation.
 	 */
 	@Override
-	Set<? extends E> $minus$minus(Collection<?> collection);
+	Set<? extends E> difference(Collection<?> collection);
 	
 	/**
 	 * {@inheritDoc} This operator represents the 'intersect' Set operation.
 	 */
 	@Override
-	Set<? extends E> $amp(Collection<? extends E> collection);
-	
-	/**
-	 * Returns a collection that contains all elements of this collection plus all elements of the given {@code
-	 * collection} that are not currently present in this collection. This operator represents the 'union' Set
-	 * operation.
-	 *
-	 * @param collection
-	 * 		the collection of elements to be added
-	 *
-	 * @return a collection that contains all elements of this collection plus all elements in the given collection that
-	 * are not present in this collection.
-	 */
-	Set<? extends E> $bar(Collection<? extends E> collection);
+	Set<? extends E> intersection(Collection<? extends E> collection);
 	
 	/**
 	 * Returns a collection that contains all elements that are present in either this or the given {@code collection},
-	 * but not in both. This operator represents the 'exclusive OR' Set operation.
+	 * but not in both. This operator represents the 'symmetric difference' Set operation.
 	 *
 	 * @param collection
 	 * 		the collection
@@ -111,7 +95,7 @@ public interface Set<E> extends Collection<E>
 	 * @return a collection that contains all elements that are present in either this or the given collection, but not
 	 * in both.
 	 */
-	Set<? extends E> $up(Collection<? extends E> collection);
+	Set<? extends E> symmetricDifference(Collection<? extends E> collection);
 	
 	@Override
 	<R> Set<R> mapped(Function<? super E, ? extends R> mapper);
@@ -124,29 +108,6 @@ public interface Set<E> extends Collection<E>
 	
 	// Mutating Operations
 	
-	/**
-	 * Adds all elements of the given {@code collection} if they are not already present in this set.
-	 *
-	 * @param collection
-	 * 		the collection to add
-	 */
-	default void $bar$eq(Collection<? extends E> collection)
-	{
-		this.addAll(collection);
-	}
-	
-	/**
-	 * Removes all elements of the given {@code collection} from this collection and adds those that are not currently
-	 * present in this collection.
-	 *
-	 * @param collection
-	 * 		the collection to XOR with
-	 */
-	default void $up$eq(Collection<? extends E> collection)
-	{
-		this.exclusiveOr(collection);
-	}
-	
 	@Override
 	void clear();
 	
@@ -156,12 +117,19 @@ public interface Set<E> extends Collection<E>
 	@Override
 	boolean remove(Object element);
 	
-	default boolean union(Collection<? extends E> collection)
+	default boolean unionInplace(Collection<? extends E> collection)
 	{
 		return this.addAll(collection);
 	}
-	
-	default boolean exclusiveOr(Collection<? extends E> collection)
+
+	/**
+	 * Removes all elements of the given {@code collection} from this collection and adds those that are not currently
+	 * present in this collection.
+	 *
+	 * @param collection
+	 * 	the collection to XOR with
+	 */
+	default boolean symmetricDifferenceInplace(Collection<? extends E> collection)
 	{
 		boolean changed = false;
 		for (E element : collection)

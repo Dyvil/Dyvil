@@ -4,19 +4,14 @@ import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.access.FieldAssignment;
 import dyvil.tools.compiler.ast.constant.IntValue;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.StringConcatExpr;
+import dyvil.tools.compiler.ast.intrinsic.*;
 import dyvil.tools.compiler.ast.reference.ReferenceOperator;
-import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
 
-import static dyvil.tools.compiler.ast.operator.Operator.INFIX_LEFT;
-
 public final class Operators
 {
-	public static final Operator DEFAULT = new Operator(null, 100000, INFIX_LEFT);
-
 	private Operators()
 	{
 		// no instances
@@ -31,7 +26,7 @@ public final class Operators
 				return new NotOperator(arg1);
 			}
 		}
-		if (name == Names.amp || name == Names.times) // TODO remove '*' (times)
+		if (name == Names.amp)
 		{
 			return new ReferenceOperator(arg1);
 		}
@@ -57,6 +52,11 @@ public final class Operators
 
 	public static IValue getPostfix(IValue arg1, Name name)
 	{
+		if (name == Names.dotdotdot)
+		{
+			return new VarargsOperator(arg1);
+		}
+
 		return getIncOperator(name, arg1, false);
 	}
 
@@ -83,14 +83,6 @@ public final class Operators
 			if (arg1.valueTag() == IValue.NULL)
 			{
 				return new NullCheckOperator(arg2, false);
-			}
-		}
-		if (name == Names.qmark)
-		{
-			if (arg1.isType(Types.BOOLEAN) && arg2.valueTag() == IValue.COLON)
-			{
-				final ColonOperator colonOperator = (ColonOperator) arg2;
-				return new IfStatement(arg1, colonOperator.getLeft(), colonOperator.getRight());
 			}
 		}
 		return null;

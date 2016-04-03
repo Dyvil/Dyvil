@@ -119,7 +119,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $plus(K key, V value)
+	public ImmutableMap<K, V> withEntry(K key, V value)
 	{
 		HashMap<K, V> copy = new HashMap<>(this);
 		copy.ensureCapacity(this.size + 1);
@@ -128,7 +128,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map)
+	public ImmutableMap<K, V> union(Map<? extends K, ? extends V> map)
 	{
 		HashMap<K, V> copy = new HashMap<>(this);
 		copy.putInternal(map);
@@ -136,7 +136,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$at(Object key)
+	public ImmutableMap<K, V> keyRemoved(Object key)
 	{
 		HashMap<K, V> copy = new HashMap<>(this.size);
 		for (Entry<K, V> entry : this)
@@ -151,7 +151,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(Object key, Object value)
+	public ImmutableMap<K, V> removed(Object key, Object value)
 	{
 		HashMap<K, V> copy = new HashMap<>(this.size);
 		for (Entry<K, V> entry : this)
@@ -167,7 +167,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$colon(Object value)
+	public ImmutableMap<K, V> valueRemoved(Object value)
 	{
 		HashMap<K, V> copy = new HashMap<>(this.size);
 		for (Entry<K, V> entry : this)
@@ -182,7 +182,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Map<?, ?> map)
+	public ImmutableMap<K, V> difference(Map<?, ?> map)
 	{
 		HashMap<K, V> copy = new HashMap<>(this.size);
 		for (Entry<K, V> entry : this)
@@ -198,7 +198,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Collection<?> keys)
+	public ImmutableMap<K, V> keyDifference(Collection<?> keys)
 	{
 		HashMap<K, V> copy = new HashMap<>(this.size);
 		for (Entry<K, V> entry : this)

@@ -157,10 +157,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		return this;
 	}
 
-	default IType asParameterType()
-	{
-		return this;
-	}
+	IType asParameterType();
 
 	String getTypePrefix();
 
@@ -221,7 +218,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	 */
 	default boolean isSuperTypeOf(IType subType)
 	{
-		return this == subType || this.isSuperClassOf(subType);
+		return this == subType || Types.isSuperClass(this, subType);
 	}
 
 	default boolean isSuperClassOf(IType subType)
@@ -237,7 +234,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		}
 
 		final IClass subClass = subType.getTheClass();
-		return subClass != null && (subClass == superClass || subClass.isSubTypeOf(this));
+		return subClass != null && (subClass == superClass || subClass.isSubClassOf(this));
 	}
 
 	boolean isSameType(IType type);
@@ -252,6 +249,24 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	default boolean isConvertibleTo(IType type)
 	{
 		return false;
+	}
+
+	/**
+	 * Returns true if this type has a special role within the type system and needs special subtyping checks.
+	 */
+	default boolean needsSubTypeCheck()
+	{
+		return false;
+	}
+
+	default boolean isSubClassOf(IType superType)
+	{
+		throw new Error();
+	}
+
+	default boolean isSubTypeOf(IType superType)
+	{
+		throw new Error();
 	}
 
 	// Resolve
@@ -289,12 +304,6 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	 */
 	@Override
 	IType resolveType(ITypeParameter typeParameter);
-
-	default IType resolveTypeSafely(ITypeParameter typeVar)
-	{
-		IType t = this.resolveType(typeVar);
-		return t == null ? Types.ANY : t;
-	}
 
 	/**
 	 * Returns true if this is or contains any type variables.

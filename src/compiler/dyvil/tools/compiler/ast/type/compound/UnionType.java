@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.type.compound;
 
 import dyvil.collection.Set;
-import dyvil.tools.asm.Opcodes;
+import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Type;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
@@ -89,16 +89,39 @@ public class UnionType implements IObjectType
 	}
 
 	@Override
-	public boolean isSuperTypeOf(IType type)
+	public IType asParameterType()
 	{
-		if (type.typeTag() != UNION)
-		{
-			return Types.isSuperType(this.left, type) || Types.isSuperType(this.right, type);
-		}
+		return new UnionType(this.left.asParameterType(), this.right.asParameterType());
+	}
 
-		final UnionType unionType = (UnionType) type;
-		return Types.isSuperType(this.left, unionType.right) && Types.isSuperType(this.right, unionType.right)
-			       || Types.isSuperType(this.left, unionType.right) && Types.isSuperType(this.right, unionType.left);
+	@Override
+	public boolean needsSubTypeCheck()
+	{
+		return true;
+	}
+
+	@Override
+	public boolean isSuperTypeOf(IType subType)
+	{
+		return Types.isSuperType(this.left, subType) || Types.isSuperType(this.right, subType);
+	}
+
+	@Override
+	public boolean isSuperClassOf(IType subType)
+	{
+		return Types.isSuperClass(this.left, subType) || Types.isSuperClass(this.right, subType);
+	}
+
+	@Override
+	public boolean isSubTypeOf(IType superType)
+	{
+		return Types.isSuperType(superType, this.left) && Types.isSuperType(superType, this.right);
+	}
+
+	@Override
+	public boolean isSubClassOf(IType superType)
+	{
+		return Types.isSuperClass(superType, this.left) && Types.isSuperClass(superType, this.right);
 	}
 
 	@Override
@@ -166,8 +189,6 @@ public class UnionType implements IObjectType
 
 	public static IType combine(IType left, IType right, UnionType unionType)
 	{
-		// TODO rename type1, type2 to left and right
-
 		if (Types.isSameType(left, Types.VOID) || Types.isSameType(right, Types.VOID))
 		{
 			// either type is void -> result void
@@ -190,38 +211,44 @@ public class UnionType implements IObjectType
 			return arrayElementCombine(left.getElementType(), right.getElementType());
 		}
 
-		IClass leftClass = left.getTheClass();
-		if (leftClass == null)
+		if (left.getTypeVariable() == null)
 		{
-			// left type unresolved -> result right type
-			return right;
-		}
-		if (leftClass == Types.NULL_CLASS)
-		{
-			// left type is null -> result reference right type
-			return right.getObjectType();
-		}
-		if (leftClass == Types.OBJECT_CLASS)
-		{
-			// left type is Object -> result Object
-			return Types.ANY;
+			IClass leftClass = left.getTheClass();
+			if (leftClass == null)
+			{
+				// left type unresolved -> result right type
+				return right;
+			}
+			if (leftClass == Types.NULL_CLASS)
+			{
+				// left type is null -> result reference right type
+				return right.getObjectType();
+			}
+			if (leftClass == Types.OBJECT_CLASS)
+			{
+				// left type is Object -> result Object
+				return Types.ANY;
+			}
 		}
 
-		final IClass rightClass = right.getTheClass();
-		if (rightClass == null)
+		if (right.getTypeVariable() == null)
 		{
-			// right type unresolved -> result left type
-			return left;
-		}
-		if (rightClass == Types.NULL_CLASS)
-		{
-			// right type is null -> result reference left type
-			return left.getObjectType();
-		}
-		if (rightClass == Types.OBJECT_CLASS)
-		{
-			// right type is Object -> result Object
-			return Types.ANY;
+			final IClass rightClass = right.getTheClass();
+			if (rightClass == null)
+			{
+				// right type unresolved -> result left type
+				return left;
+			}
+			if (rightClass == Types.NULL_CLASS)
+			{
+				// right type is null -> result reference left type
+				return left.getObjectType();
+			}
+			if (rightClass == Types.OBJECT_CLASS)
+			{
+				// right type is Object -> result Object
+				return Types.ANY;
+			}
 		}
 
 		if (Types.isSameType(left, right) || Types.isSuperType(left, right))

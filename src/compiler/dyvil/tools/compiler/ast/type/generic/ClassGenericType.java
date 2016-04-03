@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -73,12 +74,6 @@ public class ClassGenericType extends GenericType
 	}
 
 	@Override
-	public IType asParameterType()
-	{
-		return this;
-	}
-
-	@Override
 	public boolean isSameType(IType type)
 	{
 		return this == type || super.isSameType(type) && this.argumentsMatch(type);
@@ -97,7 +92,7 @@ public class ClassGenericType extends GenericType
 		{
 			ITypeParameter typeVar = this.theClass.getTypeParameter(i);
 
-			IType otherType = type.resolveTypeSafely(typeVar);
+			IType otherType = Types.resolveTypeSafely(type, typeVar);
 			if (!typeVar.getVariance().checkCompatible(this.typeArguments[i], otherType))
 			{
 				return false;

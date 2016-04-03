@@ -8,7 +8,6 @@ import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.statement.control.Label;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -16,7 +15,6 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -122,6 +120,12 @@ public class ForStatement implements IForStatement, IDefaultContext
 		}
 
 		return null;
+	}
+
+	@Override
+	public boolean isMember(IVariable variable)
+	{
+		return variable == this.variable;
 	}
 
 	@Override
@@ -235,8 +239,6 @@ public class ForStatement implements IForStatement, IDefaultContext
 		{
 			this.variable.check(markers, context);
 		}
-
-		markers.add(Markers.semanticWarning(this.position, "for.deprecated"));
 
 		context = context.push(this);
 		if (this.update != null)

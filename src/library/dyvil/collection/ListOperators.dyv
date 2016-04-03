@@ -1,0 +1,37 @@
+package dyvil.collection
+
+public class ListOperators
+{
+	// List Operators
+
+	public infix inline func +[T](List[T] list, T element): List[T] = list.added(element)
+
+	public infix inline func ++[T](List[T] list, List[_ <: T] elements): List[T] = list.union(elements)
+
+	public infix inline func -[T](List[T] list, any element): List[T] = list.removed(element)
+
+	public infix inline func --[T](List[T] list, List[_] elements): List[T] = list.difference(elements)
+
+	// Mutable List Operators
+
+	public infix inline func +[T](MutableList[T] list, T element): MutableList[T] = list.added(element)
+
+	public infix inline func ++[T](MutableList[T] list, List[_ <: T] elements): MutableList[T] = list.union(elements)
+
+	public infix inline func -[T](MutableList[T] list, any element): MutableList[T] = list.removed(element)
+
+	public infix inline func --[T](MutableList[T] list, List[_] elements): MutableList[T] = list.difference(elements)
+
+	// Immutable List Operators
+
+	public infix inline func ::[E](E head, ImmutableList[E] tail): ImmutableList[E]
+		= new dyvil.collection.immutable.PrependList(head, tail)
+
+	public infix inline func +[T](ImmutableList[T] list, T element): ImmutableList[T] = list.added(element)
+
+	public infix inline func ++[T](ImmutableList[T] list, List[_ <: T] elements): ImmutableList[T] = list.union(elements)
+
+	public infix inline func -[T](ImmutableList[T] list, any element): ImmutableList[T] = list.removed(element)
+
+	public infix inline func --[T](ImmutableList[T] list, List[_] elements): ImmutableList[T] = list.difference(elements)
+}

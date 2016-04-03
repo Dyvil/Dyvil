@@ -4,24 +4,35 @@ import dyvil.annotation._internal.ClassParameters;
 import dyvil.ref.*;
 
 @ClassParameters(names = { "type" })
-public class ReferenceType implements Type
+public class ReferenceType<T, R> implements Type<R>
 {
-	protected final Type type;
+	protected final Type<T> type;
 
-	protected final Class erasureClass;
+	protected final Class<R> referenceClass;
 
-	public static ReferenceType apply(Type type)
+	public static <T, R> ReferenceType<T, R> apply(Type<T> type)
 	{
-		return new ReferenceType(type);
+		return new ReferenceType<>(type);
 	}
 
-	public ReferenceType(Type type)
+	public static <T, R> ReferenceType<T, R> apply(Class<R> referenceClass, Type<T> type)
+	{
+		return new ReferenceType<>(referenceClass, type);
+	}
+
+	public ReferenceType(Type<T> type)
 	{
 		this.type = type;
-		this.erasureClass = getErasureClass(type);
+		this.referenceClass = (Class<R>) (Class) getErasureClass(type);
 	}
 
-	private static Class getErasureClass(Type type)
+	public ReferenceType(Class<R> referenceClass, Type<T> type)
+	{
+		this.type = type;
+		this.referenceClass = referenceClass;
+	}
+
+	private static Class<?> getErasureClass(Type<?> type)
 	{
 		if (type == PrimitiveType.BOOLEAN)
 		{
@@ -58,15 +69,27 @@ public class ReferenceType implements Type
 		return ObjectRef.class;
 	}
 
-	public Type type()
+	public Type<T> type()
 	{
 		return this.type;
 	}
 
 	@Override
-	public Class erasure()
+	public Class<R> erasure()
 	{
-		return this.erasureClass;
+		return this.referenceClass;
+	}
+
+	@Override
+	public int typeArgumentCount()
+	{
+		return 1;
+	}
+
+	@Override
+	public <R1> Type<R1> typeArgument(int index)
+	{
+		return index == 0 ? (Type<R1>) (Type) this.type : null;
 	}
 
 	@Override
@@ -84,14 +107,14 @@ public class ReferenceType implements Type
 	@Override
 	public void appendSignature(StringBuilder builder)
 	{
-		builder.append('L').append(this.erasureClass.getCanonicalName().replace('.', '/')).append(';');
+		builder.append('L').append(this.referenceClass.getCanonicalName().replace('.', '/')).append(';');
 	}
 
 	@Override
 	public void appendGenericSignature(StringBuilder builder)
 	{
-		if (this.erasureClass == ObjectRef.class) {
-			builder.append('L').append(this.erasureClass.getCanonicalName().replace('.', '/')).append('<');
+		if (this.referenceClass == ObjectRef.class) {
+			builder.append('L').append(this.referenceClass.getCanonicalName().replace('.', '/')).append('<');
 			this.type.appendGenericSignature(builder);
 			builder.append(">;");
 			return;

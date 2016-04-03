@@ -25,7 +25,19 @@ public class ArrayType<T> implements Type<T[]>
 	{
 		return (Class<T[]>) ObjectArray.getArrayType(this.componentType.erasure());
 	}
-	
+
+	@Override
+	public int typeArgumentCount()
+	{
+		return 1;
+	}
+
+	@Override
+	public Type<T[]> typeArgument(int index)
+	{
+		return index != 0 ? null : this.componentType;
+	}
+
 	@Override
 	public String name()
 	{

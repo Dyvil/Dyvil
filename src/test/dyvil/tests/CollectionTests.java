@@ -82,19 +82,19 @@ public class CollectionTests
 		
 		if (!isImmutable)
 		{
-			Collection newCollection = collection.$plus("newValue");
+			Collection newCollection = collection.added("newValue");
 			collection.add("newValue");
 			assertEquals("+ or += does not work correctly: " + collection.getClass(), collection, newCollection);
 			collection.remove("newValue");
 			assertEquals("- or -= does not work correctly: " + collection.getClass(), copy, collection);
 			
-			assertEquals(immutable.$plus("newElement"), collection.$plus("newElement"));
-			assertEquals(immutable.$minus("newElement"), collection.$minus("newElement"));
+			assertEquals(immutable.added("newElement"), collection.added("newElement"));
+			assertEquals(immutable.removed("newElement"), collection.removed("newElement"));
 		}
 		else
 		{
-			assertEquals(mutable.$plus("newElement"), collection.$plus("newElement"));
-			assertEquals(immutable.$minus("newElement"), collection.$minus("newElement"));
+			assertEquals(mutable.added("newElement"), collection.added("newElement"));
+			assertEquals(immutable.removed("newElement"), collection.removed("newElement"));
 		}
 	}
 	

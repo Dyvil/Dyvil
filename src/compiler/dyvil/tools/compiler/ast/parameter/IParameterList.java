@@ -14,13 +14,6 @@ public interface IParameterList extends IParameterConsumer
 	IParameter getParameter(int index);
 	
 	IParameter[] getParameters();
-	
-	default void setVariadic()
-	{
-	}
-	
-	default boolean isVariadic()
-	{
-		return false;
-	}
+
+	void setParameters(IParameter[] parameters, int parameterCount);
 }

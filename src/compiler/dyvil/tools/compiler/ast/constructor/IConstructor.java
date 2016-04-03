@@ -36,6 +36,7 @@ public interface IConstructor extends IClassMember, ICallableMember, ICallableSi
 	
 	// Misc
 	
+	@Override
 	void setParameters(IParameter[] parameters, int parameterCount);
 
 	@Override

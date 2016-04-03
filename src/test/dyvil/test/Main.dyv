@@ -23,12 +23,14 @@ public class Main
 		MatchTest.main(args)
 		NestedMethodTest.main(args)
 		FibonacciTest.main(args)
+		OperatorTest.main(args)
 		PrimitiveTest main args
 		PropertyTest.main(args)
 		RangeTest.main(args)
 		ReferenceTest.main(args)
 		ReifyTest.main(args)
-		SelfTypeTest.main(args)
+		TypeTest.main(args)
+		VarargsTest.main(args)
 	}
 
 	public static void test(String testName, any expected, any actual)

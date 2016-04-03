@@ -95,6 +95,13 @@ public class ListType implements IObjectType
 	}
 
 	@Override
+	public IType asParameterType()
+	{
+		final IType type = this.elementType.asParameterType();
+		return type == this.elementType ? this : new ListType(type, this.mutability, this.theClass);
+	}
+
+	@Override
 	public IType resolveType(ITypeParameter typeParameter)
 	{
 		if (typeParameter.getGeneric() == this.theClass)

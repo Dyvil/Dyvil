@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.IParametric;
 import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -73,7 +74,8 @@ public class ClassMetadata implements IClassMetadata
 		Name name = method.getName();
 		if (name == Names.equals)
 		{
-			if (method.parameterCount() == 1 && method.getParameter(0).getInternalType().getTheClass() == Types.OBJECT_CLASS)
+			if (method.parameterCount() == 1
+				    && method.getParameter(0).getInternalType().getTheClass() == Types.OBJECT_CLASS)
 			{
 				this.members |= EQUALS;
 			}
@@ -139,20 +141,22 @@ public class ClassMetadata implements IClassMetadata
 		// Check if a constructor needs to be generated
 
 		final IClassBody body = this.theClass.getBody();
-		if (body != null && body.constructorCount() > 0)
+		if (body == null || body.constructorCount() <= 0)
 		{
-			final IConstructor constructor = body.getConstructor(this.theClass.getParameters(),
-			                                                     this.theClass.parameterCount());
-			if (constructor != null)
-			{
-				this.constructor = constructor;
-				this.members |= CONSTRUCTOR;
-			}
+			return;
+		}
 
-			if (this.theClass.parameterCount() == 0)
-			{
-				this.members |= CONSTRUCTOR;
-			}
+		final int parameterCount = this.theClass.parameterCount();
+		final IConstructor constructor = body.getConstructor(this.theClass.getParameters(), parameterCount);
+		if (constructor != null)
+		{
+			this.constructor = constructor;
+			this.members |= CONSTRUCTOR;
+		}
+
+		if (parameterCount == 0)
+		{
+			this.members |= CONSTRUCTOR;
 		}
 	}
 
@@ -167,28 +171,36 @@ public class ClassMetadata implements IClassMetadata
 		// Generate the constructor signature
 
 		CodeConstructor constructor = new CodeConstructor(this.theClass, new FlagModifierSet(Modifiers.PUBLIC));
-		int parameterCount = this.theClass.parameterCount();
 
-		IParameter[] parameters = new IParameter[parameterCount];
+		this.copyClassParameters(constructor);
+
+		constructor.resolveTypes(markers, context);
+		this.constructor = constructor;
+	}
+
+	protected void copyClassParameters(IParametric constructor)
+	{
+		final int parameterCount = this.theClass.parameterCount();
+		final IParameter[] parameters = new IParameter[parameterCount];
 
 		for (int i = 0; i < parameterCount; i++)
 		{
 			final IParameter classParameter = this.theClass.getParameter(i);
+
+			int modifiers = classParameter.getModifiers().toFlags() & Modifiers.PARAMETER_MODIFIERS;
+			if (classParameter.isVarargs())
+			{
+				modifiers |= Modifiers.VARARGS;
+				constructor.setVariadic();
+			}
+
 			parameters[i] = new MethodParameter(classParameter.getPosition(), classParameter.getName(),
-			                                    classParameter.getType(), classParameter.getModifiers(),
+			                                    classParameter.getType(), new FlagModifierSet(modifiers),
 			                                    classParameter.getAnnotations());
 			parameters[i].setIndex(i);
 		}
 
 		constructor.setParameters(parameters, parameterCount);
-
-		if (parameterCount > 0 && parameters[parameterCount - 1].isVarargs())
-		{
-			constructor.setVariadic();
-		}
-
-		constructor.resolveTypes(markers, context);
-		this.constructor = constructor;
 	}
 
 	@Override

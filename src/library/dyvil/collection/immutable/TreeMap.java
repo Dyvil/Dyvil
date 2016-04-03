@@ -103,7 +103,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $plus(K key, V value)
+	public ImmutableMap<K, V> withEntry(K key, V value)
 	{
 		TreeMap<K, V> copy = new TreeMap<>(this, this.comparator);
 		copy.putInternal(key, value);
@@ -111,7 +111,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $plus$plus(Map<? extends K, ? extends V> map)
+	public ImmutableMap<K, V> union(Map<? extends K, ? extends V> map)
 	{
 		TreeMap<K, V> copy = new TreeMap<>(this, this.comparator);
 		for (Entry<? extends K, ? extends V> entry : map)
@@ -122,7 +122,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$at(Object key)
+	public ImmutableMap<K, V> keyRemoved(Object key)
 	{
 		TreeMap<K, V> copy = new TreeMap<>(this, this.comparator);
 		boolean found = false;
@@ -141,7 +141,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus(Object key, Object value)
+	public ImmutableMap<K, V> removed(Object key, Object value)
 	{
 		TreeMap<K, V> copy = new TreeMap<>(this, this.comparator);
 		boolean found = false;
@@ -164,7 +164,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$colon(Object value)
+	public ImmutableMap<K, V> valueRemoved(Object value)
 	{
 		TreeMap<K, V> copy = new TreeMap<>(this, this.comparator);
 		for (TreeEntry<K, V> entry = this.getFirstEntry(); entry != null; entry = successor(entry))
@@ -179,7 +179,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Map<?, ?> map)
+	public ImmutableMap<K, V> difference(Map<?, ?> map)
 	{
 		TreeMap<K, V> copy = new TreeMap<>(this, this.comparator);
 		for (TreeEntry<K, V> entry = this.getFirstEntry(); entry != null; entry = successor(entry))
@@ -195,7 +195,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 	}
 	
 	@Override
-	public ImmutableMap<K, V> $minus$minus(Collection<?> keys)
+	public ImmutableMap<K, V> keyDifference(Collection<?> keys)
 	{
 		TreeMap<K, V> copy = new TreeMap<>(this, this.comparator);
 		for (TreeEntry<K, V> entry = this.getFirstEntry(); entry != null; entry = successor(entry))

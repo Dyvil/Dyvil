@@ -32,7 +32,7 @@ public interface IClass extends IClassMember, ITypeParametric, IContext, IParame
 	}
 
 	void setHeader(IDyvilHeader unit);
-	
+
 	@Override
 	IDyvilHeader getHeader();
 	
@@ -69,7 +69,7 @@ public interface IClass extends IClassMember, ITypeParametric, IContext, IParame
 	
 	IType getSuperType();
 	
-	boolean isSubTypeOf(IType type);
+	boolean isSubClassOf(IType type);
 	
 	int getSuperTypeDistance(IType superType);
 
@@ -116,7 +116,7 @@ public interface IClass extends IClassMember, ITypeParametric, IContext, IParame
 	
 	boolean checkImplements(IMethod candidate, ITypeContext typeContext);
 	
-	void checkMethods(MarkerList markers, IClass iclass, ITypeContext typeContext, Set<IClass> checkedClasses);
+	void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext, Set<IClass> checkedClasses);
 	
 	// Other Compilables (Lambda Expressions, ...)
 	
