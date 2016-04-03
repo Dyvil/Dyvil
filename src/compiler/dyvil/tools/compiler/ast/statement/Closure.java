@@ -74,6 +74,7 @@ public class Closure extends StatementList
 		}
 
 		final LambdaExpr lambdaExpr = new LambdaExpr(this.position, parameters, parameterCount);
+		lambdaExpr.setImplicitParameters(true);
 		lambdaExpr.setValue(this);
 
 		this.resolved = true;

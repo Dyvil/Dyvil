@@ -52,8 +52,9 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 	// Flags
 
-	private static final int HANDLE_TYPE_MASK = 0b1111;
-	private static final int VALUE_RESOLVED   = 0b10000;
+	private static final int HANDLE_TYPE_MASK    = 0b00001111;
+	private static final int VALUE_RESOLVED      = 0b00010000;
+	public static final  int IMPLICIT_PARAMETERS = 0b00100000;
 
 	protected IParameter[] parameters;
 	protected int          parameterCount;
@@ -266,6 +267,18 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		this.flags = this.flags & ~HANDLE_TYPE_MASK | handleType;
 	}
 
+	public void setImplicitParameters(boolean implicitParameters)
+	{
+		if (implicitParameters)
+		{
+			this.flags |= IMPLICIT_PARAMETERS;
+		}
+		else
+		{
+			this.flags &= ~IMPLICIT_PARAMETERS;
+		}
+	}
+
 	private CaptureHelper getCaptureHelper()
 	{
 		if (this.captureHelper != null)
@@ -374,7 +387,15 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			// Can't infer parameter type
 			if (concreteType == Types.UNKNOWN)
 			{
-				markers.add(Markers.semantic(parameter.getPosition(), "lambda.parameter.type", parameter.getName()));
+				if ((this.flags & IMPLICIT_PARAMETERS) != 0)
+				{
+					markers.add(Markers.semanticError(parameter.getPosition(), "lambda.parameter.implicit"));
+				}
+				else
+				{
+					markers.add(
+						Markers.semanticError(parameter.getPosition(), "lambda.parameter.type", parameter.getName()));
+				}
 			}
 			parameter.setType(concreteType);
 		}

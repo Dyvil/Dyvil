@@ -306,13 +306,14 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	{
 		IType returnType = value.getType();
 
-		LambdaExpr le = new LambdaExpr(value.getPosition(), null, 0);
-		le.setMethod(this.getFunctionalMethod());
-		le.setReturnType(returnType);
-		le.setValue(value);
-		le.setType(this);
-		le.inferReturnType(this, typeContext, returnType);
-		return le;
+		final LambdaExpr lambdaExpr = new LambdaExpr(value.getPosition(), null, 0);
+		lambdaExpr.setImplicitParameters(true);
+		lambdaExpr.setMethod(this.getFunctionalMethod());
+		lambdaExpr.setReturnType(returnType);
+		lambdaExpr.setValue(value);
+		lambdaExpr.setType(this);
+		lambdaExpr.inferReturnType(this, typeContext, returnType);
+		return lambdaExpr;
 	}
 
 	@Override

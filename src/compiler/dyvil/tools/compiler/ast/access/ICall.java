@@ -88,6 +88,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 		}
 
 		LambdaExpr lambdaExpr = new LambdaExpr(position, parameters, wildcards);
+		lambdaExpr.setImplicitParameters(true);
 		lambdaExpr.setValue(this);
 		return lambdaExpr.resolve(markers, context);
 	}
