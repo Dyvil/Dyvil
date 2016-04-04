@@ -39,12 +39,17 @@ public final class TypeParser extends Parser implements ITypeConsumer
 	public static final int LAMBDA_END         = 128;
 	public static final int ANNOTATION_END     = 256;
 
+	// Flags
+
+	public static final int NAMED_ONLY    = 1;
+	public static final int IGNORE_LAMBDA = 2;
+
 	protected ITypeConsumer consumer;
 
 	private IType parentType;
 	private IType type;
 
-	private boolean namedOnly;
+	private int flags;
 
 	public TypeParser(ITypeConsumer consumer)
 	{
@@ -58,14 +63,15 @@ public final class TypeParser extends Parser implements ITypeConsumer
 		this.parentType = parentType;
 	}
 
-	public void setNamedOnly(boolean namedOnly)
+	public TypeParser withFlags(int flags)
 	{
-		this.namedOnly = namedOnly;
+		this.flags |= flags;
+		return this;
 	}
 
 	public TypeParser namedOnly()
 	{
-		this.setNamedOnly(true);
+		this.flags |= NAMED_ONLY;
 		return this;
 	}
 
@@ -77,26 +83,40 @@ public final class TypeParser extends Parser implements ITypeConsumer
 		{
 		case END:
 		{
-			if (!this.namedOnly && ParserUtil.isIdentifier(type))
+			if ((this.flags & NAMED_ONLY) == 0)
 			{
-				switch (token.stringValue().charAt(0))
+				if (ParserUtil.isIdentifier(type))
 				{
-				case '?':
-					this.type = new OptionType(this.type);
-					pm.splitJump(token, 1);
-					return;
-				case '!':
-					this.type = new ImplicitOptionType(this.type);
-					pm.splitJump(token, 1);
-					return;
-				case '*':
-					this.type = new ReferenceType(this.type);
-					pm.splitJump(token, 1);
-					return;
-				case '^':
-					this.type = new ImplicitReferenceType(this.type);
-					pm.splitJump(token, 1);
-					return;
+					switch (token.stringValue().charAt(0))
+					{
+					case '?':
+						this.type = new OptionType(this.type);
+						pm.splitJump(token, 1);
+						return;
+					case '!':
+						this.type = new ImplicitOptionType(this.type);
+						pm.splitJump(token, 1);
+						return;
+					case '*':
+						this.type = new ReferenceType(this.type);
+						pm.splitJump(token, 1);
+						return;
+					case '^':
+						this.type = new ImplicitReferenceType(this.type);
+						pm.splitJump(token, 1);
+						return;
+					}
+				}
+				else if (type == DyvilSymbols.DOUBLE_ARROW_RIGHT)
+				{
+					if (this.parentType == null && (this.flags & IGNORE_LAMBDA) == 0)
+					{
+						final LambdaType lambdaType = new LambdaType(token.raw(), this.type);
+						this.type = lambdaType;
+						this.mode = LAMBDA_END;
+						pm.pushParser(new TypeParser(lambdaType));
+						return;
+					}
 				}
 			}
 			if (type == BaseSymbols.DOT)
@@ -113,7 +133,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			return;
 		}
 		case NAME:
-			if (!this.namedOnly)
+			if ((this.flags & NAMED_ONLY) == 0)
 			{
 				switch (type)
 				{
@@ -204,21 +224,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				final IToken next = token.next();
 				final int nextType = next.type();
 
-				if (nextType == DyvilSymbols.DOUBLE_ARROW_RIGHT)
-				{
-					if (this.parentType == null && !this.namedOnly)
-					{
-						// TODO This doesn't support G<T> => ...
-						LambdaType lt = new LambdaType(new NamedType(token.raw(), name, this.parentType));
-						lt.setPosition(next.raw());
-						this.type = lt;
-						this.mode = LAMBDA_END;
-						pm.skip();
-						pm.pushParser(new TypeParser(lt));
-						return;
-					}
-				}
-				else if (nextType == BaseSymbols.OPEN_SQUARE_BRACKET || isGenericStart(next, nextType))
+				if (nextType == BaseSymbols.OPEN_SQUARE_BRACKET || isGenericStart(next, nextType))
 				{
 					this.type = new NamedGenericType(token.raw(), name, this.parentType);
 					this.mode = GENERICS;
