@@ -117,7 +117,7 @@ public class NamedType implements IRawType, ITypeConsumer
 		// If the type is not a Type Variable Reference
 		if (resolved.getTypeVariable() == null && resolved != Types.UNKNOWN)
 		{
-			// Replace Type Variable References with their default value
+			// Replace Type Variable References with their default value (raw type)
 			return resolved.getConcreteType(DEFAULT);
 		}
 		// Otherwise, simply return it.

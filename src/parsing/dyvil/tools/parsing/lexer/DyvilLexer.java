@@ -22,7 +22,7 @@ public final class DyvilLexer
 
 	private StringBuilder buffer = new StringBuilder();
 	private int parseIndex;
-	private int lineNumber;
+	private int lineNumber = 1;
 	private int stringParens;
 
 	public DyvilLexer(MarkerList markers, Symbols symbols)
