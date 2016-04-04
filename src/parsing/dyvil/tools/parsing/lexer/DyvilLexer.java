@@ -211,9 +211,10 @@ public final class DyvilLexer
 			switch (currentChar)
 			{
 			case '\\':
-				if (appendEscape(this.buffer, this.nextCodePoint()))
+				final int consumed = appendEscape(this.buffer, this.nextCodePoint());
+				if (consumed > 0)
 				{
-					this.parseIndex += 2;
+					this.parseIndex += 1 + consumed;
 					continue;
 				}
 				this.buffer.append('\\'); // TODO Invalid Escape Sequence Error
@@ -260,6 +261,7 @@ public final class DyvilLexer
 			{
 			case '\\':
 				final int nextChar = this.nextCodePoint();
+				final int consumed;
 				if (nextChar == '(' && this.stringParens == 0)
 				{
 					this.tokens.append(
@@ -269,9 +271,9 @@ public final class DyvilLexer
 					this.stringParens = 1;
 					return;
 				}
-				else if (appendEscape(this.buffer, nextChar))
+				else if ((consumed = appendEscape(this.buffer, this.nextCodePoint())) > 0)
 				{
-					this.parseIndex += 2;
+					this.parseIndex += 1 + consumed;
 					continue;
 				}
 				this.buffer.append('\\'); // TODO Invalid Escape Sequence Error
@@ -796,7 +798,7 @@ public final class DyvilLexer
 		this.buffer.delete(0, this.buffer.length());
 	}
 
-	private static boolean appendEscape(StringBuilder buf, int n)
+	private static int appendEscape(StringBuilder buf, int n)
 	{
 		switch (n)
 		{
@@ -804,24 +806,24 @@ public final class DyvilLexer
 		case '\'':
 		case '\\':
 			buf.append(n);
-			return true;
+			return 1;
 		case 'n':
 			buf.append('\n');
-			return true;
+			return 1;
 		case 't':
 			buf.append('\t');
-			return true;
+			return 1;
 		case 'r':
 			buf.append('\r');
-			return true;
+			return 1;
 		case 'b':
 			buf.append('\b');
-			return true;
+			return 1;
 		case 'f':
 			buf.append('\f');
-			return true;
+			return 1;
 		// TODO Unicode Literals
 		}
-		return false;
+		return 0;
 	}
 }

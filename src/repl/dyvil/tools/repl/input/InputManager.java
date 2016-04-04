@@ -71,7 +71,11 @@ public class InputManager
 					}
 					break;
 				case '\\':
-					if (mode >= DOUBLE_STRING)
+					if ((mode & ESCAPE) != 0)
+					{
+						break;
+					}
+					if (mode == DOUBLE_STRING || mode == SINGLE_STRING)
 					{
 						mode |= ESCAPE;
 					}
@@ -114,7 +118,7 @@ public class InputManager
 					break;
 				}
 
-				mode &= ~1;
+				mode &= ~ESCAPE;
 			}
 
 			buffer.append('\n');
