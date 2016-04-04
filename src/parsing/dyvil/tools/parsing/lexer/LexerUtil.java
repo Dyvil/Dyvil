@@ -3,7 +3,7 @@ package dyvil.tools.parsing.lexer;
 public class LexerUtil
 {
 	
-	public static boolean isOpenBracket(char c)
+	public static boolean isOpenBracket(int c)
 	{
 		switch (c)
 		{
@@ -15,7 +15,7 @@ public class LexerUtil
 		return false;
 	}
 	
-	public static boolean isCloseBracket(char c)
+	public static boolean isCloseBracket(int c)
 	{
 		switch (c)
 		{
@@ -27,7 +27,7 @@ public class LexerUtil
 		return false;
 	}
 	
-	public static boolean isBinDigit(char c)
+	public static boolean isBinDigit(int c)
 	{
 		switch (c)
 		{
@@ -38,7 +38,7 @@ public class LexerUtil
 		return false;
 	}
 	
-	public static boolean isOctDigit(char c)
+	public static boolean isOctDigit(int c)
 	{
 		switch (c)
 		{
@@ -74,7 +74,7 @@ public class LexerUtil
 		return false;
 	}
 	
-	public static boolean isHexDigit(char c)
+	public static boolean isHexDigit(int c)
 	{
 		switch (c)
 		{

@@ -4,6 +4,8 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SyntaxError;
+import dyvil.tools.parsing.position.CodePosition;
+import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.*;
 
 import static dyvil.tools.parsing.lexer.BaseSymbols.*;
@@ -180,8 +182,7 @@ public final class DyvilLexer
 			case '\b':
 				continue;
 			case EOF:
-				this.markers.add(
-					new SyntaxError(new EndToken(this.parseIndex, this.lineNumber), "identifier.backtick.unclosed"));
+				this.error("identifier.backtick.unclosed");
 				// Fallthrough
 			case '`':
 				this.tokens.append(
@@ -211,26 +212,17 @@ public final class DyvilLexer
 			switch (currentChar)
 			{
 			case '\\':
-				final int consumed = appendEscape(this.buffer, this.nextCodePoint());
-				if (consumed > 0)
-				{
-					this.parseIndex += 1 + consumed;
-					continue;
-				}
-				this.buffer.append('\\'); // TODO Invalid Escape Sequence Error
-				this.parseIndex++;
+				this.parseEscape(this.nextCodePoint());
 				continue;
 			case '\t':
 			case '\b':
 				continue;
 			case '\n':
 				this.lineNumber++;
-				this.markers
-					.add(new SyntaxError(new EndToken(this.parseIndex, this.lineNumber), "string.single.newline"));
+				this.error("string.single.newline");
 				continue;
 			case EOF:
-				this.markers
-					.add(new SyntaxError(new EndToken(this.parseIndex, this.lineNumber), "string.single.unclosed"));
+				this.error("string.single.unclosed");
 				// Fallthrough
 			case '\'':
 				this.tokens.append(new StringToken(this.buffer.toString(), SINGLE_QUOTED_STRING, startLine, startIndex,
@@ -261,7 +253,6 @@ public final class DyvilLexer
 			{
 			case '\\':
 				final int nextChar = this.nextCodePoint();
-				final int consumed;
 				if (nextChar == '(' && this.stringParens == 0)
 				{
 					this.tokens.append(
@@ -271,17 +262,11 @@ public final class DyvilLexer
 					this.stringParens = 1;
 					return;
 				}
-				else if ((consumed = appendEscape(this.buffer, this.nextCodePoint())) > 0)
-				{
-					this.parseIndex += 1 + consumed;
-					continue;
-				}
-				this.buffer.append('\\'); // TODO Invalid Escape Sequence Error
-				this.parseIndex++;
+
+				this.parseEscape(nextChar);
 				continue;
 			case EOF:
-				this.markers
-					.add(new SyntaxError(new EndToken(this.parseIndex, this.lineNumber), "string.double.unclosed"));
+				this.error("string.double.unclosed");
 				// Fallthrough
 			case '"':
 				this.tokens.append(
@@ -321,8 +306,7 @@ public final class DyvilLexer
 			switch (currentChar)
 			{
 			case EOF:
-				this.markers
-					.add(new SyntaxError(new EndToken(this.parseIndex, this.lineNumber), "string.verbatim.unclosed"));
+				this.error("string.verbatim.unclosed");
 				// Fallthrough
 			case '"':
 				this.tokens.append(
@@ -527,8 +511,7 @@ public final class DyvilLexer
 				}
 				catch (NumberFormatException ex)
 				{
-					this.markers
-						.add(new SyntaxError(token, this.markers.getI18n().getString("literal.integer.invalid")));
+					this.error(token, "literal.integer.invalid");
 				}
 
 				this.tokens.append(token);
@@ -543,7 +526,7 @@ public final class DyvilLexer
 				}
 				catch (NumberFormatException ex)
 				{
-					this.markers.add(new SyntaxError(token, this.markers.getI18n().getString("literal.long.invalid")));
+					this.error(token, "literal.long.invalid");
 				}
 
 				this.tokens.append(token);
@@ -558,7 +541,7 @@ public final class DyvilLexer
 				}
 				catch (NumberFormatException ex)
 				{
-					this.markers.add(new SyntaxError(token, this.markers.getI18n().getString("literal.float.invalid")));
+					this.error(token, "literal.float.invalid");
 				}
 
 				this.tokens.append(token);
@@ -577,8 +560,7 @@ public final class DyvilLexer
 				}
 				catch (NumberFormatException ex)
 				{
-					this.markers
-						.add(new SyntaxError(token, this.markers.getI18n().getString("literal.double.invalid")));
+					this.error(token, "literal.double.invalid");
 				}
 
 				this.tokens.append(token);
@@ -630,8 +612,7 @@ public final class DyvilLexer
 			switch (currentChar)
 			{
 			case EOF:
-				this.markers
-					.add(new SyntaxError(new EndToken(this.parseIndex, this.lineNumber), "comment.block.unclosed"));
+				this.error("comment.block.unclosed");
 				return;
 			case '\n':
 				this.lineNumber++;
@@ -771,6 +752,87 @@ public final class DyvilLexer
 		}
 	}
 
+	private void parseEscape(int n)
+	{
+		switch (n)
+		{
+		case '"':
+		case '\'':
+		case '\\':
+			this.buffer.append((char) n);
+			this.parseIndex += 2;
+			return;
+		case 'n':
+			this.buffer.append('\n');
+			this.parseIndex += 2;
+			return;
+		case 't':
+			this.buffer.append('\t');
+			this.parseIndex += 2;
+			return;
+		case 'r':
+			this.buffer.append('\r');
+			this.parseIndex += 2;
+			return;
+		case 'b':
+			this.buffer.append('\b');
+			this.parseIndex += 2;
+			return;
+		case 'f':
+			this.buffer.append('\f');
+			this.parseIndex += 2;
+			return;
+		case 'u':
+			int buf = 0;
+			this.parseIndex += 2;
+
+			if (this.codePoint() != '{')
+			{
+				this.error("escape.unicode.open_brace");
+				return;
+			}
+
+			this.parseIndex++;
+			loop:
+			while (true)
+			{
+				int codePoint = this.codePoint();
+				switch (codePoint)
+				{
+				case '\n':
+					this.error("escape.unicode.newline");
+					this.lineNumber++;
+					// Fallthrough
+				case ' ':
+				case '_':
+				case '\t':
+					this.parseIndex++;
+					continue;
+				case '}':
+					this.parseIndex++;
+					break loop;
+				}
+				if (!LexerUtil.isHexDigit(codePoint))
+				{
+					this.error("escape.unicode.hex_digit");
+					this.advance(codePoint);
+					break;
+				}
+
+				buf <<= 4;
+				buf += Character.digit(codePoint, 16);
+				this.parseIndex++;
+			}
+
+			this.buffer.appendCodePoint(buf);
+			return;
+		}
+
+		this.error("escape.invalid");
+
+		this.parseIndex += 2;
+	}
+
 	// Utility Methods
 
 	private boolean hasNextCodePoint()
@@ -798,32 +860,13 @@ public final class DyvilLexer
 		this.buffer.delete(0, this.buffer.length());
 	}
 
-	private static int appendEscape(StringBuilder buf, int n)
+	private void error(String key)
 	{
-		switch (n)
-		{
-		case '"':
-		case '\'':
-		case '\\':
-			buf.append(n);
-			return 1;
-		case 'n':
-			buf.append('\n');
-			return 1;
-		case 't':
-			buf.append('\t');
-			return 1;
-		case 'r':
-			buf.append('\r');
-			return 1;
-		case 'b':
-			buf.append('\b');
-			return 1;
-		case 'f':
-			buf.append('\f');
-			return 1;
-		// TODO Unicode Literals
-		}
-		return 0;
+		this.error(new CodePosition(this.lineNumber, this.parseIndex, this.parseIndex + 1), key);
+	}
+
+	private void error(ICodePosition position, String key)
+	{
+		this.markers.add(new SyntaxError(position, this.markers.getI18n().getString(key)));
 	}
 }
