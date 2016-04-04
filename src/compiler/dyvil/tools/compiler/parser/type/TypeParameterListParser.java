@@ -23,7 +23,7 @@ public class TypeParameterListParser extends Parser
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
-		int type = token.type();
+		final int type = token.type();
 		switch (this.mode)
 		{
 		case TYPE_VARIABLE:
@@ -31,7 +31,7 @@ public class TypeParameterListParser extends Parser
 			pm.pushParser(new TypeParameterParser(this.typeParameterized), true);
 			return;
 		case COMMA:
-			if (ParserUtil.isCloseBracket(type))
+			if (ParserUtil.isCloseBracket(type) || TypeParser.isGenericEnd(token, type))
 			{
 				pm.popParser(true);
 				return;
@@ -42,7 +42,6 @@ public class TypeParameterListParser extends Parser
 				pm.report(token, "typeparameter.list.comma");
 				pm.reparse();
 			}
-			return;
 		}
 	}
 }

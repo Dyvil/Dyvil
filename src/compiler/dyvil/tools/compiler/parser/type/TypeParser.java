@@ -325,12 +325,12 @@ public final class TypeParser extends Parser implements ITypeConsumer
 		}
 	}
 
-	protected static boolean isGenericStart(IToken token, int type)
+	public static boolean isGenericStart(IToken token, int type)
 	{
 		return ParserUtil.isIdentifier(type) && token.nameValue().unqualified.charAt(0) == '<';
 	}
 
-	protected static boolean isGenericEnd(IToken token, int type)
+	public static boolean isGenericEnd(IToken token, int type)
 	{
 		return ParserUtil.isIdentifier(type) && token.nameValue().unqualified.charAt(0) == '>';
 	}

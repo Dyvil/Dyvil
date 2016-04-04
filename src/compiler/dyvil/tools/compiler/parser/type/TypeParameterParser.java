@@ -88,7 +88,7 @@ public final class TypeParameterParser extends Parser implements ITyped
 			pm.report(token, "typeparameter.identifier");
 			return;
 		case TYPE_BOUNDS:
-			if (ParserUtil.isTerminator(type))
+			if (ParserUtil.isTerminator(type) || TypeParser.isGenericEnd(token, type))
 			{
 				if (this.typeParameter != null)
 				{
@@ -144,7 +144,6 @@ public final class TypeParameterParser extends Parser implements ITyped
 			}
 			pm.popParser(true);
 			pm.report(token, "typeparameter.bound.invalid");
-			return;
 		}
 	}
 
