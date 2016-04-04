@@ -163,7 +163,7 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 			tokens.jump(token);
 			final MemberParser parser = new MemberParser<>(this).withFlag(
 				NO_UNINITIALIZED_VARIABLES | OPERATOR_ERROR | NO_FIELD_PROPERTIES);
-			if (new TryParserManager(tokens, pm.getMarkers()).parse(parser, EXIT_ON_ROOT))
+			if (new TryParserManager(DyvilSymbols.INSTANCE, tokens, pm.getMarkers()).parse(parser, EXIT_ON_ROOT))
 			{
 				tokens.jump(tokens.lastReturned());
 				this.mode = SEPARATOR;

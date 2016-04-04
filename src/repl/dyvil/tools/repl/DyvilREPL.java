@@ -34,7 +34,7 @@ public final class DyvilREPL
 	protected DyvilCompiler compiler = new DyvilCompiler();
 
 	protected REPLContext      context = new REPLContext(this);
-	protected TryParserManager parser  = new TryParserManager();
+	protected TryParserManager parser  = new TryParserManager(DyvilSymbols.INSTANCE);
 
 	protected File    dumpDir;
 

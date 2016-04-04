@@ -1,5 +1,6 @@
 package dyvil.tools.parsing;
 
+import dyvil.tools.parsing.lexer.Symbols;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.token.IToken;
@@ -12,14 +13,14 @@ public class TryParserManager extends ParserManager
 	public static final int REPORT_ERRORS = 1;
 	public static final int EXIT_ON_ROOT  = 2;
 
-	public TryParserManager()
+	public TryParserManager(Symbols symbols)
 	{
-		super();
+		super(symbols);
 	}
 
-	public TryParserManager(TokenIterator tokens, MarkerList markers)
+	public TryParserManager(Symbols symbols, TokenIterator tokens, MarkerList markers)
 	{
-		super(tokens, markers);
+		super(symbols, tokens, markers);
 	}
 
 	@Override

@@ -518,7 +518,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public void parse()
 	{
-		new ParserManager(this.tokens, this.markers).parse(new DyvilHeaderParser(this));
+		new ParserManager(DyvilSymbols.INSTANCE, this.tokens, this.markers).parse(new DyvilHeaderParser(this));
 	}
 
 	@Override
