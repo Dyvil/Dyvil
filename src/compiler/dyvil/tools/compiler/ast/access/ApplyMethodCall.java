@@ -156,6 +156,7 @@ public class ApplyMethodCall extends AbstractCall
 
 		if (this.genericData != null)
 		{
+			buffer.append(".apply");
 			this.genericData.toString(prefix, buffer);
 		}
 

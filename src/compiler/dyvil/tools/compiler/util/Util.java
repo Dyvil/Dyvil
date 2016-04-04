@@ -73,14 +73,14 @@ public final class Util
 		int typeVariables = typeParameterized.typeParameterCount();
 		if (typeVariables > 0)
 		{
-			buf.append('[');
+			buf.append('<');
 			typeParameterized.getTypeParameter(0).toString("", buf);
 			for (int i = 1; i < typeVariables; i++)
 			{
 				buf.append(", ");
 				typeParameterized.getTypeParameter(i).toString("", buf);
 			}
-			buf.append(']');
+			buf.append('>');
 		}
 	}
 

@@ -1051,10 +1051,12 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 
 		if (this.typeParameterCount > 0)
 		{
-			Formatting.appendSeparator(buffer, "generics.open_bracket", '[');
+			// TODO Append space if the name is a symbol
+
+			Formatting.appendSeparator(buffer, "generics.open_bracket", '<');
 			Util.astToString(prefix, this.typeParameters, this.typeParameterCount,
 			                 Formatting.getSeparator("generics.separator", ','), buffer);
-			Formatting.appendSeparator(buffer, "generics.close_bracket", ']');
+			Formatting.appendSeparator(buffer, "generics.close_bracket", '>');
 		}
 
 		if (this.parameterCount > 0)
