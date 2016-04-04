@@ -49,7 +49,13 @@ public class IdentifierToken implements IToken
 	{
 		return this.name;
 	}
-	
+
+	@Override
+	public String stringValue()
+	{
+		return this.name.unqualified;
+	}
+
 	@Override
 	public int startIndex()
 	{

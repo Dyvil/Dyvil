@@ -70,12 +70,12 @@ public class ParserManager implements IParserManager
 	@Override
 	public IToken split(IToken token, int length)
 	{
-		final Name name = token.nameValue();
+		final String stringValue = token.stringValue();
 		final int line = token.startLine();
 		final int startIndex = token.startIndex();
 
-		final String part1 = name.unqualified.substring(0, length);
-		final String part2 = name.unqualified.substring(length);
+		final String part1 = stringValue.substring(0, length);
+		final String part2 = stringValue.substring(length);
 
 		if (part2.isEmpty())
 		{
