@@ -63,7 +63,7 @@ public final class DyvilLexer
 		case '@':
 			if (this.nextCodePoint() == '"')
 			{
-				this.parseLiteralString(currentChar);
+				this.parseVerbatimString(currentChar);
 				return;
 			}
 
@@ -179,7 +179,10 @@ public final class DyvilLexer
 			case '\t':
 			case '\b':
 				continue;
-			case EOF: // TODO Unclosed Backtick Identifier Error
+			case EOF:
+				this.markers.add(
+					new SyntaxError(new EndToken(this.parseIndex, this.lineNumber), "identifier.backtick.unclosed"));
+				// Fallthrough
 			case '`':
 				this.tokens.append(
 					new IdentifierToken(Name.getSpecial(this.buffer.toString()), SPECIAL_IDENTIFIER, startLine,
@@ -220,8 +223,14 @@ public final class DyvilLexer
 			case '\b':
 				continue;
 			case '\n':
-				this.lineNumber++; // TODO Newline in Single String Error
-			case EOF: // TODO Unclosed Single-Quoted String Error
+				this.lineNumber++;
+				this.markers
+					.add(new SyntaxError(new EndToken(this.parseIndex, this.lineNumber), "string.single.newline"));
+				continue;
+			case EOF:
+				this.markers
+					.add(new SyntaxError(new EndToken(this.parseIndex, this.lineNumber), "string.single.unclosed"));
+				// Fallthrough
 			case '\'':
 				this.tokens.append(new StringToken(this.buffer.toString(), SINGLE_QUOTED_STRING, startLine, startIndex,
 				                                   this.parseIndex + 1));
@@ -268,7 +277,10 @@ public final class DyvilLexer
 				this.buffer.append('\\'); // TODO Invalid Escape Sequence Error
 				this.parseIndex++;
 				continue;
-			case EOF: // TODO Unclosed Double-Quoted String Error
+			case EOF:
+				this.markers
+					.add(new SyntaxError(new EndToken(this.parseIndex, this.lineNumber), "string.double.unclosed"));
+				// Fallthrough
 			case '"':
 				this.tokens.append(
 					new StringToken(this.buffer.toString(), stringPart ? STRING_END : STRING, startLine, startIndex,
@@ -288,7 +300,7 @@ public final class DyvilLexer
 		}
 	}
 
-	private void parseLiteralString(int currentChar)
+	private void parseVerbatimString(int currentChar)
 	{
 		assert currentChar == '@';
 
@@ -306,7 +318,10 @@ public final class DyvilLexer
 
 			switch (currentChar)
 			{
-			case EOF: // TODO Unclosed Literal String Error
+			case EOF:
+				this.markers
+					.add(new SyntaxError(new EndToken(this.parseIndex, this.lineNumber), "string.verbatim.unclosed"));
+				// Fallthrough
 			case '"':
 				this.tokens.append(
 					new StringToken(this.buffer.toString(), LITERAL_STRING, startLine, startIndex, this.parseIndex));
@@ -510,7 +525,8 @@ public final class DyvilLexer
 				}
 				catch (NumberFormatException ex)
 				{
-					this.markers.add(new SyntaxError(token, this.markers.getI18n().getString("literal.integer.invalid")));
+					this.markers
+						.add(new SyntaxError(token, this.markers.getI18n().getString("literal.integer.invalid")));
 				}
 
 				this.tokens.append(token);
@@ -559,7 +575,8 @@ public final class DyvilLexer
 				}
 				catch (NumberFormatException ex)
 				{
-					this.markers.add(new SyntaxError(token, this.markers.getI18n().getString("literal.double.invalid")));
+					this.markers
+						.add(new SyntaxError(token, this.markers.getI18n().getString("literal.double.invalid")));
 				}
 
 				this.tokens.append(token);
@@ -611,7 +628,9 @@ public final class DyvilLexer
 			switch (currentChar)
 			{
 			case EOF:
-				return; // TODO Unclosed Block Comment Error
+				this.markers
+					.add(new SyntaxError(new EndToken(this.parseIndex, this.lineNumber), "comment.block.unclosed"));
+				return;
 			case '\n':
 				this.lineNumber++;
 				this.parseIndex++;
