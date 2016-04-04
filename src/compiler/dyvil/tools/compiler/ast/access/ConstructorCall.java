@@ -222,6 +222,13 @@ public class ConstructorCall implements ICall
 			return;
 		}
 
+		final IClass theClass = this.type.getTheClass();
+		if (theClass != null && theClass.isInterface())
+		{
+			markers.add(Markers.semantic(this.position, "constructor.access.interface", this.type));
+			return;
+		}
+
 		Marker marker = Markers.semantic(this.position, "resolve.constructor", this.type.toString());
 		if (!this.arguments.isEmpty())
 		{
@@ -251,23 +258,14 @@ public class ConstructorCall implements ICall
 			return;
 		}
 
-		IClass iclass = this.type.getTheClass();
-		if (iclass == null)
-		{
-			return;
-		}
-		if (iclass.hasModifier(Modifiers.INTERFACE_CLASS))
-		{
-			markers.add(Markers.semantic(this.position, "constructor.interface", this.type));
-			return;
-		}
-		if (iclass.hasModifier(Modifiers.ABSTRACT))
-		{
-			markers.add(Markers.semantic(this.position, "constructor.abstract", this.type));
-		}
-
 		if (this.constructor != null)
 		{
+			final IClass iclass = this.type.getTheClass();
+			if (iclass.hasModifier(Modifiers.ABSTRACT) && iclass.hasModifier(Modifiers.INTERFACE_CLASS))
+			{
+				markers.add(Markers.semantic(this.position, "constructor.access.abstract", this.type));
+			}
+
 			this.constructor.checkCall(markers, this.position, context, this.arguments);
 		}
 	}
