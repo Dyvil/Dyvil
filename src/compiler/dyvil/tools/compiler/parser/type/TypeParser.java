@@ -13,15 +13,15 @@ import dyvil.tools.compiler.ast.type.compound.*;
 import dyvil.tools.compiler.ast.type.generic.GenericType;
 import dyvil.tools.compiler.ast.type.generic.NamedGenericType;
 import dyvil.tools.compiler.ast.type.raw.NamedType;
-import dyvil.tools.parsing.IParserManager;
-import dyvil.tools.parsing.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
@@ -31,12 +31,13 @@ public final class TypeParser extends Parser implements ITypeConsumer
 	public static final int NAME           = 0;
 	public static final int GENERICS       = 1;
 	public static final int GENERICS_END   = 2;
-	public static final int ARRAY_COLON    = 4;
-	public static final int ARRAY_END      = 8;
-	public static final int WILDCARD_TYPE  = 16;
-	public static final int TUPLE_END      = 32;
-	public static final int LAMBDA_END     = 64;
-	public static final int ANNOTATION_END = 128;
+	public static final int ANGLE_GENERICS_END   = 4;
+	public static final int ARRAY_COLON    = 8;
+	public static final int ARRAY_END      = 16;
+	public static final int WILDCARD_TYPE  = 32;
+	public static final int TUPLE_END      = 64;
+	public static final int LAMBDA_END     = 128;
+	public static final int ANNOTATION_END = 256;
 
 	protected ITypeConsumer consumer;
 
@@ -171,14 +172,11 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			}
 			if (ParserUtil.isIdentifier(type))
 			{
-				IToken next = token.next();
-				switch (next.type())
+				final IToken next = token.next();
+				final int nextType = next.type();
+
+				if (nextType == DyvilSymbols.DOUBLE_ARROW_RIGHT)
 				{
-				case BaseSymbols.OPEN_SQUARE_BRACKET:
-					this.type = new NamedGenericType(token.raw(), token.nameValue(), this.parentType);
-					this.mode = GENERICS;
-					return;
-				case DyvilSymbols.DOUBLE_ARROW_RIGHT:
 					if (this.parentType == null && !this.namedOnly)
 					{
 						LambdaType lt = new LambdaType(new NamedType(token.raw(), token.nameValue(), this.parentType));
@@ -189,7 +187,11 @@ public final class TypeParser extends Parser implements ITypeConsumer
 						pm.pushParser(new TypeParser(lt));
 						return;
 					}
-					break; // intentional
+				}
+				else if (nextType == BaseSymbols.OPEN_SQUARE_BRACKET || isGenericStart(next, nextType)) {
+					this.type = new NamedGenericType(token.raw(), token.nameValue(), this.parentType);
+					this.mode = GENERICS;
+					return;
 				}
 
 				this.type = new NamedType(token.raw(), token.nameValue(), this.parentType);
@@ -268,6 +270,13 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				this.mode = GENERICS_END;
 				return;
 			}
+			if (isGenericStart(token, type))
+			{
+				pm.splitJump(token, 1);
+				pm.pushParser(new TypeListParser((GenericType) this.type));
+				this.mode = ANGLE_GENERICS_END;
+				return;
+			}
 			return;
 		case WILDCARD_TYPE:
 		{
@@ -299,10 +308,31 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				pm.report(token, "type.generic.close_bracket");
 			}
 			return;
+		case ANGLE_GENERICS_END:
+			this.mode = END;
+			if (isGenericEnd(token, type))
+			{
+				pm.splitJump(token, 1);
+				return;
+			}
+
+			pm.reparse();
+			pm.report(token, "type.generic.close_angle");
+			return;
 		case ANNOTATION_END:
 			this.mode = END;
 			pm.pushParser(new TypeParser((ITyped) this.type), true);
 		}
+	}
+
+	protected static boolean isGenericStart(IToken token, int type)
+	{
+		return ParserUtil.isIdentifier(type) && token.nameValue().unqualified.charAt(0) == '<';
+	}
+
+	protected static boolean isGenericEnd(IToken token, int type)
+	{
+		return ParserUtil.isIdentifier(type) && token.nameValue().unqualified.charAt(0) == '>';
 	}
 
 	@Override
