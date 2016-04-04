@@ -19,8 +19,6 @@ import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.parsing.IParserManager;
-import dyvil.tools.parsing.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
@@ -34,7 +32,9 @@ import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -44,22 +44,23 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 {
 	protected static final int TYPE                       = 0;
 	protected static final int NAME_OPERATOR              = 1;
-	protected static final int NAME                       = 1 << 1;
-	protected static final int FIELD_NAME                 = 1 << 2;
-	protected static final int FIELD_TYPE                 = 1 << 3;
-	protected static final int FIELD_SEPARATOR            = 1 << 4;
-	protected static final int METHOD_NAME                = 1 << 5;
-	protected static final int METHOD_SEPARATOR           = 1 << 6;
-	protected static final int PARAMETERS                 = 1 << 7;
-	protected static final int PARAMETERS_END             = 1 << 8;
-	protected static final int GENERICS                   = 1 << 9;
-	protected static final int GENERICS_END               = 1 << 10;
-	protected static final int METHOD_TYPE                = 1 << 11;
-	protected static final int METHOD_THROWS              = 1 << 12;
-	protected static final int METHOD_VALUE               = 1 << 13;
-	protected static final int CONSTRUCTOR_PARAMETERS     = 1 << 14;
-	protected static final int CONSTRUCTOR_PARAMETERS_END = 1 << 15;
-	protected static final int FIELD_PROPERTY             = 1 << 16;
+	protected static final int NAME                       = 2;
+	protected static final int FIELD_NAME                 = 3;
+	protected static final int FIELD_TYPE                 = 4;
+	protected static final int FIELD_SEPARATOR            = 5;
+	protected static final int METHOD_NAME                = 6;
+	protected static final int METHOD_SEPARATOR           = 7;
+	protected static final int PARAMETERS                 = 8;
+	protected static final int PARAMETERS_END             = 9;
+	protected static final int GENERICS                   = 10;
+	protected static final int GENERICS_END               = 11;
+	protected static final int ANGLE_GENERICS_END         = 12;
+	protected static final int METHOD_TYPE                = 13;
+	protected static final int METHOD_THROWS              = 14;
+	protected static final int METHOD_VALUE               = 15;
+	protected static final int CONSTRUCTOR_PARAMETERS     = 16;
+	protected static final int CONSTRUCTOR_PARAMETERS_END = 17;
+	protected static final int FIELD_PROPERTY             = 18;
 
 	// Member Kinds
 
@@ -263,6 +264,11 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 				this.mode = METHOD_SEPARATOR;
 				return;
 			}
+			if (TypeParser.isGenericStart(nextToken, nextType))
+			{
+				this.mode = METHOD_SEPARATOR;
+				return;
+			}
 
 			this.mode = END;
 			pm.report(token, "class.body.declaration.invalid");
@@ -373,6 +379,13 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 			// Fallthrough
 		}
 		case GENERICS:
+			if (TypeParser.isGenericStart(token, type))
+			{
+				pm.splitJump(token, 1);
+				this.mode = ANGLE_GENERICS_END;
+				pm.pushParser(new TypeParameterListParser((IMethod) this.member));
+				return;
+			}
 			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
 			{
 				this.mode = GENERICS_END;
@@ -440,6 +453,17 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 				pm.reparse();
 				pm.report(token, "method.generic.close_bracket");
 			}
+			return;
+		case ANGLE_GENERICS_END:
+			this.mode = PARAMETERS;
+			if (TypeParser.isGenericEnd(token, type))
+			{
+				pm.splitJump(token, 1);
+				return;
+			}
+
+			pm.reparse();
+			pm.report(token, "method.generic.close_angle");
 			return;
 		case PARAMETERS_END:
 			this.mode = METHOD_TYPE;
