@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.parser;
 
 import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
@@ -140,7 +141,7 @@ public class ParserUtil
 					{
 					case '<':
 						angleDepth++;
-						continue outer;
+						continue;
 					case '>':
 						if (--angleDepth < 0)
 						{
@@ -150,6 +151,9 @@ public class ParserUtil
 					}
 				}
 				break;
+			case DyvilSymbols.ARROW_LEFT:
+				angleDepth++;
+				continue;
 			case BaseSymbols.SEMICOLON:
 				if (angleBrackets && parenDepth == 0 && bracketDepth == 0 && braceDepth == 0)
 				{

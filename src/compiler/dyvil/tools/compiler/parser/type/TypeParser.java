@@ -23,7 +23,7 @@ import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
-import dyvil.tools.parsing.lexer.Tokens;
+import dyvil.tools.parsing.position.CodePosition;
 import dyvil.tools.parsing.token.IToken;
 
 public final class TypeParser extends Parser implements ITypeConsumer
@@ -77,27 +77,25 @@ public final class TypeParser extends Parser implements ITypeConsumer
 		{
 		case END:
 		{
-			if (type == Tokens.SYMBOL_IDENTIFIER && !this.namedOnly)
+			if (!this.namedOnly && ParserUtil.isIdentifier(type))
 			{
-				final Name name = token.nameValue();
-				if (name == Names.qmark)
+				switch (token.stringValue().charAt(0))
 				{
+				case '?':
 					this.type = new OptionType(this.type);
+					pm.splitJump(token, 1);
 					return;
-				}
-				if (name == Names.bang)
-				{
+				case '!':
 					this.type = new ImplicitOptionType(this.type);
+					pm.splitJump(token, 1);
 					return;
-				}
-				if (name == Names.times)
-				{
+				case '*':
 					this.type = new ReferenceType(this.type);
+					pm.splitJump(token, 1);
 					return;
-				}
-				if (name == Names.up)
-				{
+				case '^':
 					this.type = new ImplicitReferenceType(this.type);
+					pm.splitJump(token, 1);
 					return;
 				}
 			}
@@ -169,27 +167,40 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					this.mode = WILDCARD_TYPE;
 					return;
 				}
+
+				if (ParserUtil.isIdentifier(type))
+				{
+					final String identifier = token.stringValue();
+					switch (identifier.charAt(0))
+					{
+					case '_':
+						this.type = new WildcardType(new CodePosition(token.startLine(), token.startIndex(),
+						                                              token.startIndex() + 1));
+						this.mode = WILDCARD_TYPE;
+						pm.splitJump(token, 1);
+						return;
+					case '+':
+					{
+						final WildcardType wildcardType = new WildcardType(Variance.COVARIANT);
+						pm.pushParser(new TypeParser(wildcardType));
+						this.type = wildcardType;
+						this.mode = END;
+						return;
+					}
+					case '-':
+					{
+						final WildcardType wildcardType = new WildcardType(Variance.CONTRAVARIANT);
+						pm.pushParser(new TypeParser(wildcardType));
+						this.type = wildcardType;
+						this.mode = END;
+						return;
+					}
+					}
+				}
 			}
 			if (ParserUtil.isIdentifier(type))
 			{
 				final Name name = token.nameValue();
-				if (name == Names.plus)
-				{
-					final WildcardType wildcardType = new WildcardType(Variance.COVARIANT);
-					pm.pushParser(new TypeParser(wildcardType));
-					this.type = wildcardType;
-					this.mode = END;
-					return;
-				}
-				if (name == Names.minus)
-				{
-					final WildcardType wildcardType = new WildcardType(Variance.COVARIANT);
-					pm.pushParser(new TypeParser(wildcardType));
-					this.type = wildcardType;
-					this.mode = END;
-					return;
-				}
-
 				final IToken next = token.next();
 				final int nextType = next.type();
 
@@ -351,7 +362,8 @@ public final class TypeParser extends Parser implements ITypeConsumer
 
 	public static boolean isGenericStart(IToken token, int type)
 	{
-		return ParserUtil.isIdentifier(type) && token.nameValue().unqualified.charAt(0) == '<';
+		return type == DyvilSymbols.ARROW_LEFT
+			       || ParserUtil.isIdentifier(type) && token.nameValue().unqualified.charAt(0) == '<';
 	}
 
 	public static boolean isGenericEnd(IToken token, int type)
