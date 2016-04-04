@@ -62,6 +62,56 @@ public class ParserManager implements IParserManager
 	}
 
 	@Override
+	public IToken split(IToken token, int length)
+	{
+		final Name name = token.nameValue();
+		final int line = token.startLine();
+		final int startIndex = token.startIndex();
+
+		final String part1 = name.unqualified.substring(0, length);
+		final String part2 = name.unqualified.substring(length + 1);
+
+		final IToken prev = token.prev();
+		final IToken token1 = this.toToken(part1, startIndex, line);
+		final IToken token2 = this.toToken(part2, startIndex + length, line);
+		final IToken next = token.next();
+
+		// Link the tokens
+		prev.setNext(token1);
+		token1.setPrev(prev);
+		token1.setNext(token2);
+		token2.setPrev(token1);
+		token2.setNext(next);
+		next.setPrev(token2);
+
+		return token1;
+	}
+
+	private IToken toToken(String identifier, int start, int line)
+	{
+		final int length = identifier.length();
+		final int lastCodePoint = identifier.codePointBefore(length);
+
+		if (LexerUtil.isIdentifierSymbol(lastCodePoint))
+		{
+			final int symbol = this.symbols.getSymbolType(identifier);
+			if (symbol != 0)
+			{
+				return new SymbolToken(this.symbols, symbol, line, start);
+			}
+			return new IdentifierToken(Name.get(identifier), Tokens.SYMBOL_IDENTIFIER, line, start, start + length);
+		}
+
+		final int keyword = this.symbols.getKeywordType(identifier);
+		if (keyword != 0)
+		{
+			return new SymbolToken(this.symbols, keyword, line, start);
+		}
+
+		return new IdentifierToken(Name.get(identifier), Tokens.LETTER_IDENTIFIER, line, start, start + length);
+	}
+
+	@Override
 	public void report(IToken token, String message)
 	{
 		this.report(new SyntaxError(token, this.markers.getI18n().getString(message)));

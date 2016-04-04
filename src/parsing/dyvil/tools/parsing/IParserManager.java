@@ -10,20 +10,22 @@ public interface IParserManager
 
 	MarkerList getMarkers();
 
+	IToken split(IToken token, int length);
+
 	void report(IToken token, String message);
 
 	void report(Marker error);
-	
+
 	void stop();
-	
+
 	void skip();
-	
+
 	void skip(int n);
-	
+
 	void reparse();
-	
+
 	void jump(IToken token);
-	
+
 	void setParser(Parser parser);
 	
 	Parser getParser();
