@@ -3,8 +3,8 @@ package dyvil.tools.compiler.parser.expression;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.StringInterpolationExpr;
-import dyvil.tools.compiler.parser.IParserManager;
-import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.parsing.IParserManager;
+import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 

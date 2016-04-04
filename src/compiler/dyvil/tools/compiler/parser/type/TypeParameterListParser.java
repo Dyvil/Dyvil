@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.parser.type;
 
 import dyvil.tools.compiler.ast.generic.ITypeParametric;
-import dyvil.tools.compiler.parser.IParserManager;
-import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.parsing.IParserManager;
+import dyvil.tools.parsing.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;

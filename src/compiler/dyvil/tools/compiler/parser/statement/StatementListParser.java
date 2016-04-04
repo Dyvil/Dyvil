@@ -20,10 +20,10 @@ import dyvil.tools.compiler.ast.statement.MemberStatement;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.statement.control.Label;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.parser.IParserManager;
-import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.parsing.IParserManager;
+import dyvil.tools.parsing.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
-import dyvil.tools.compiler.parser.TryParserManager;
+import dyvil.tools.parsing.TryParserManager;
 import dyvil.tools.compiler.parser.classes.MemberParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
@@ -35,7 +35,7 @@ import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;
 
-import static dyvil.tools.compiler.parser.TryParserManager.EXIT_ON_ROOT;
+import static dyvil.tools.parsing.TryParserManager.EXIT_ON_ROOT;
 import static dyvil.tools.compiler.parser.classes.MemberParser.*;
 import static dyvil.tools.compiler.parser.method.ParameterListParser.LAMBDA_ARROW_END;
 

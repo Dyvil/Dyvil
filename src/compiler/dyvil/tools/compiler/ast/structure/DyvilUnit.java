@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.consumer.IClassConsumer;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.ObjectFormat;
-import dyvil.tools.compiler.parser.ParserManager;
+import dyvil.tools.parsing.ParserManager;
 import dyvil.tools.compiler.parser.header.DyvilUnitParser;
 import dyvil.tools.compiler.sources.DyvilFileType;
 import dyvil.tools.parsing.Name;

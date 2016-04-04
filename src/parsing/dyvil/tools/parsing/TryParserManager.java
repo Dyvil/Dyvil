@@ -1,6 +1,5 @@
-package dyvil.tools.compiler.parser;
+package dyvil.tools.parsing;
 
-import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.token.IToken;

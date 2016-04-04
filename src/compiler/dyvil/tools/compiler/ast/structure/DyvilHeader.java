@@ -27,7 +27,7 @@ import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.ObjectFormat;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.parser.ParserManager;
+import dyvil.tools.parsing.ParserManager;
 import dyvil.tools.compiler.parser.header.DyvilHeaderParser;
 import dyvil.tools.compiler.sources.DyvilFileType;
 import dyvil.tools.compiler.transform.DyvilSymbols;

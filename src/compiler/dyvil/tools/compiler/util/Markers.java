@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.util;
 
-import dyvil.tools.parsing.BaseMarkers;
+import dyvil.tools.parsing.marker.BaseMarkers;
 import dyvil.tools.parsing.marker.*;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.util.I18n;

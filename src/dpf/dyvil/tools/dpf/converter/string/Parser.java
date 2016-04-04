@@ -3,7 +3,7 @@ package dyvil.tools.dpf.converter.string;
 import dyvil.io.FileUtils;
 import dyvil.tools.dpf.ast.RootNode;
 import dyvil.tools.dpf.visitor.*;
-import dyvil.tools.parsing.BaseMarkers;
+import dyvil.tools.parsing.marker.BaseMarkers;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.DyvilLexer;
