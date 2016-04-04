@@ -55,7 +55,7 @@ public class LexerUtil
 		return false;
 	}
 	
-	public static boolean isDigit(char c)
+	public static boolean isDigit(int c)
 	{
 		switch (c)
 		{
@@ -105,7 +105,7 @@ public class LexerUtil
 		return false;
 	}
 	
-	public static boolean isIdentifierPart(char c)
+	public static boolean isIdentifierPart(int c)
 	{
 		if (c <= 0xA0)
 		{
@@ -115,7 +115,7 @@ public class LexerUtil
 		return Character.isUnicodeIdentifierPart(c);
 	}
 	
-	public static boolean isIdentifierSymbol(char c)
+	public static boolean isIdentifierSymbol(int c)
 	{
 		if (c <= 0xA0)
 		{

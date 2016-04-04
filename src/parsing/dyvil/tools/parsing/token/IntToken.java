@@ -51,7 +51,12 @@ public final class IntToken implements IToken
 	{
 		return Tokens.INT;
 	}
-	
+
+	public void setValue(int value)
+	{
+		this.value = value;
+	}
+
 	@Override
 	public int intValue()
 	{
@@ -116,12 +121,6 @@ public final class IntToken implements IToken
 	public boolean hasPrev()
 	{
 		return this.prev.type() != 0;
-	}
-	
-	@Override
-	public void setLong(long value)
-	{
-		this.value = (int) value;
 	}
 	
 	@Override

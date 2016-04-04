@@ -40,7 +40,12 @@ public final class FloatToken implements IToken
 	{
 		return Tokens.FLOAT;
 	}
-	
+
+	public void setValue(float value)
+	{
+		this.value = value;
+	}
+
 	@Override
 	public float floatValue()
 	{
