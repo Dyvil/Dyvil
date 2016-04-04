@@ -47,22 +47,19 @@ public class ResolvedGenericType extends ClassGenericType
 	@Override
 	public void checkType(MarkerList markers, IContext context, TypePosition position)
 	{
-		final IClass theClass = this.theClass;
-		if (theClass != null)
-		{
-			ModifierUtil.checkVisibility(theClass, this.position, markers, context);
-		}
+		ModifierUtil.checkVisibility(this.theClass, this.position, markers, context);
 
 		// Check if the Type Variable Bounds accept the supplied Type Arguments
-		for (int i = 0; i < this.typeArgumentCount; i++)
+		final int count = Math.min(this.typeArgumentCount, this.theClass.typeParameterCount());
+		for (int i = 0; i < count; i++)
 		{
 			final ITypeParameter typeVariable = this.theClass.getTypeParameter(i);
 			final IType type = this.typeArguments[i];
-			if (typeVariable != null && type.isResolved() && !typeVariable.isSuperTypeOf(type))
+
+			if (type.isResolved() && !typeVariable.isSuperTypeOf(type))
 			{
-				final Marker marker = Markers
-						.semantic(type.getPosition(), "generic.type.incompatible", typeVariable.getName().qualified,
-						          this.theClass.getFullName());
+				final Marker marker = Markers.semantic(type.getPosition(), "generic.type.incompatible",
+				                                       typeVariable.getName().qualified, this.theClass.getFullName());
 				marker.addInfo(Markers.getSemantic("generic.type", type));
 				marker.addInfo(Markers.getSemantic("typeparameter.declaration", typeVariable));
 				markers.add(marker);
