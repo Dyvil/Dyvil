@@ -86,10 +86,14 @@ public final class DyvilLexer
 			this.parseIdentifier('/', MOD_SYMBOL);
 			return;
 		case '(':
+			if (this.stringParens > 0)
+			{
+				this.stringParens++;
+			}
 			this.tokens.append(new SymbolToken(INSTANCE, OPEN_PARENTHESIS, this.lineNumber, this.parseIndex++));
 			return;
 		case ')':
-			if (--this.stringParens == 0)
+			if (this.stringParens > 0 && --this.stringParens == 0)
 			{
 				this.parseDoubleString(')', true);
 				return;
@@ -253,12 +257,18 @@ public final class DyvilLexer
 			{
 			case '\\':
 				final int nextChar = this.nextCodePoint();
-				if (nextChar == '(' && this.stringParens == 0)
+				if (nextChar == '(')
 				{
+					this.parseIndex += 2;
+					if (this.stringParens > 0)
+					{
+						this.error("string.double.interpolation.nested");
+						continue; // parse the rest of the string as normal
+					}
+
 					this.tokens.append(
 						new StringToken(this.buffer.toString(), stringPart ? STRING_PART : STRING_START, startLine,
 						                startIndex, this.parseIndex + 1));
-					this.parseIndex += 2;
 					this.stringParens = 1;
 					return;
 				}
@@ -814,7 +824,7 @@ public final class DyvilLexer
 				}
 				if (!LexerUtil.isHexDigit(codePoint))
 				{
-					this.error("escape.unicode.hex_digit");
+					this.error("escape.unicode.close_brace");
 					this.advance(codePoint);
 					break;
 				}
