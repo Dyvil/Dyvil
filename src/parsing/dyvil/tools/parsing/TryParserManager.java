@@ -66,13 +66,19 @@ public class TryParserManager extends ParserManager
 	@Override
 	public IToken split(IToken token, int length)
 	{
+		final IToken split = super.split(token, length);
+		if (split == token)
+		{
+			return token;
+		}
+
 		if (this.splitTokens == null)
 		{
 			this.splitTokens = new ArrayList<>();
 		}
 		this.splitTokens.add(token);
 
-		return super.split(token, length);
+		return split;
 	}
 
 	public boolean parse(Parser parser, boolean reportErrors)

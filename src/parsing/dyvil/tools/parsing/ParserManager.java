@@ -62,6 +62,12 @@ public class ParserManager implements IParserManager
 	}
 
 	@Override
+	public void splitJump(IToken token, int length)
+	{
+		this.jump(this.split(token, 1).next());
+	}
+
+	@Override
 	public IToken split(IToken token, int length)
 	{
 		final Name name = token.nameValue();
@@ -69,7 +75,12 @@ public class ParserManager implements IParserManager
 		final int startIndex = token.startIndex();
 
 		final String part1 = name.unqualified.substring(0, length);
-		final String part2 = name.unqualified.substring(length + 1);
+		final String part2 = name.unqualified.substring(length);
+
+		if (part2.isEmpty())
+		{
+			return token;
+		}
 
 		final IToken prev = token.prev();
 		final IToken token1 = this.toToken(part1, startIndex, line);
