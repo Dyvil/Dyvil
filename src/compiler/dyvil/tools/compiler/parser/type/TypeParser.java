@@ -28,16 +28,16 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class TypeParser extends Parser implements ITypeConsumer
 {
-	public static final int NAME           = 0;
-	public static final int GENERICS       = 1;
-	public static final int GENERICS_END   = 2;
-	public static final int ANGLE_GENERICS_END   = 4;
-	public static final int ARRAY_COLON    = 8;
-	public static final int ARRAY_END      = 16;
-	public static final int WILDCARD_TYPE  = 32;
-	public static final int TUPLE_END      = 64;
-	public static final int LAMBDA_END     = 128;
-	public static final int ANNOTATION_END = 256;
+	public static final int NAME               = 0;
+	public static final int GENERICS           = 1;
+	public static final int GENERICS_END       = 2;
+	public static final int ANGLE_GENERICS_END = 4;
+	public static final int ARRAY_COLON        = 8;
+	public static final int ARRAY_END          = 16;
+	public static final int WILDCARD_TYPE      = 32;
+	public static final int TUPLE_END          = 64;
+	public static final int LAMBDA_END         = 128;
+	public static final int ANNOTATION_END     = 256;
 
 	protected ITypeConsumer consumer;
 
@@ -172,6 +172,24 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			}
 			if (ParserUtil.isIdentifier(type))
 			{
+				final Name name = token.nameValue();
+				if (name == Names.plus)
+				{
+					final WildcardType wildcardType = new WildcardType(Variance.COVARIANT);
+					pm.pushParser(new TypeParser(wildcardType));
+					this.type = wildcardType;
+					this.mode = END;
+					return;
+				}
+				if (name == Names.minus)
+				{
+					final WildcardType wildcardType = new WildcardType(Variance.COVARIANT);
+					pm.pushParser(new TypeParser(wildcardType));
+					this.type = wildcardType;
+					this.mode = END;
+					return;
+				}
+
 				final IToken next = token.next();
 				final int nextType = next.type();
 
@@ -179,7 +197,8 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				{
 					if (this.parentType == null && !this.namedOnly)
 					{
-						LambdaType lt = new LambdaType(new NamedType(token.raw(), token.nameValue(), this.parentType));
+						// TODO This doesn't support G<T> => ...
+						LambdaType lt = new LambdaType(new NamedType(token.raw(), name, this.parentType));
 						lt.setPosition(next.raw());
 						this.type = lt;
 						this.mode = LAMBDA_END;
@@ -188,13 +207,14 @@ public final class TypeParser extends Parser implements ITypeConsumer
 						return;
 					}
 				}
-				else if (nextType == BaseSymbols.OPEN_SQUARE_BRACKET || isGenericStart(next, nextType)) {
-					this.type = new NamedGenericType(token.raw(), token.nameValue(), this.parentType);
+				else if (nextType == BaseSymbols.OPEN_SQUARE_BRACKET || isGenericStart(next, nextType))
+				{
+					this.type = new NamedGenericType(token.raw(), name, this.parentType);
 					this.mode = GENERICS;
 					return;
 				}
 
-				this.type = new NamedType(token.raw(), token.nameValue(), this.parentType);
+				this.type = new NamedType(token.raw(), name, this.parentType);
 				this.mode = END;
 				return;
 			}
@@ -282,8 +302,10 @@ public final class TypeParser extends Parser implements ITypeConsumer
 		{
 			final Name name = token.nameValue();
 			final WildcardType wildcardType = (WildcardType) this.type;
-			if (name == Names.ltcolon) // <: - Upper Bound
+			if (name == Names.ltcolon) // <: + Upper Bound
 			{
+				pm.report(Markers.syntaxWarning(token, "type.wildcard.upper.deprecated"));
+
 				wildcardType.setVariance(Variance.COVARIANT);
 				pm.pushParser(new TypeParser(wildcardType));
 				this.mode = END;
@@ -291,6 +313,8 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			}
 			if (name == Names.gtcolon) // >: - Lower Bound
 			{
+				pm.report(Markers.syntaxWarning(token, "type.wildcard.lower.deprecated"));
+
 				wildcardType.setVariance(Variance.CONTRAVARIANT);
 				pm.pushParser(new TypeParser(wildcardType));
 				this.mode = END;
