@@ -5,7 +5,7 @@ import dyvil.collection.range.Rangeable
 
 public class RangeTest
 {
-	case class RangeableInt(final int value) implements Rangeable[RangeableInt]
+	case class RangeableInt(final int value) implements Rangeable<RangeableInt>
 	{
 		public override RangeableInt next() = RangeableInt(this.value + 1)
 
@@ -27,28 +27,28 @@ public class RangeTest
 		var range1 = 1 .. 4
 		var range2 = 1 ..< 4
 
-		List[int] rangeInclusive = List.[int]
+		var rangeInclusive = List<int>
 		for (var i <- range1)
 		{
 			rangeInclusive += i
 		}
 		Main.test("Int Range (inclusive)", List(1, 2, 3, 4), rangeInclusive)
 
-		List[int] rangeExclusive = List.[int]
+		var rangeExclusive = List<int>
 		for (var i <- range2)
 		{
 			rangeExclusive += i
 		}
 		Main.test("Int Range (exclusive)", List(1, 2, 3), rangeExclusive)
 
-		List[int] forInclusive = List.[int]
+		var forInclusive = List<int>
 		for (var i <- 1 .. 4)
 		{
 			forInclusive += i
 		}
 		Main.test("Int Range For (inclusive)", List(1, 2, 3, 4), forInclusive)
 
-		List[int] forExclusive = List.[int]
+		var forExclusive = List<int>
 		for (var i <- 1 ..< 4)
 		{
 			forExclusive += i
@@ -64,28 +64,28 @@ public class RangeTest
 		var range1 = one .. four
 		var range2 = one ..< four
 		
-		var rangeInclusive = List.[RangeableInt]
+		var rangeInclusive = List<RangeableInt>
 		for (var i <- range1)
 		{
 			rangeInclusive += i
 		}
 		Main.test("Rangeable Range (inclusive)", List(RangeableInt 1, RangeableInt 2, RangeableInt 3, RangeableInt 4), rangeInclusive)
 
-		var rangeExclusive = List.[RangeableInt]
+		var rangeExclusive = List<RangeableInt>
 		for (var i <- range2)
 		{
 			rangeExclusive += i
 		}
 		Main.test("Rangeable Range (exclusive)", List(RangeableInt 1, RangeableInt 2, RangeableInt 3), rangeExclusive)
 
-		var forInclusive = List.[RangeableInt]
+		var forInclusive = List<RangeableInt>
 		for (var i <- one .. four)
 		{
 			forInclusive += i
 		}
 		Main.test("Rangeable Range For (inclusive)", List(RangeableInt 1, RangeableInt 2, RangeableInt 3, RangeableInt 4), forInclusive)
 
-		var forExclusive = List.[RangeableInt]
+		var forExclusive = List<RangeableInt>
 		for (var i <- one ..< four)
 		{
 			forExclusive += i

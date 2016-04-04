@@ -40,7 +40,13 @@ public final class SymbolToken implements IToken
 	{
 		return this.type;
 	}
-	
+
+	@Override
+	public String stringValue()
+	{
+		return this.symbols.toString(this.type);
+	}
+
 	@Override
 	public int startIndex()
 	{

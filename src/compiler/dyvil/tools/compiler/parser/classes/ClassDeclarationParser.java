@@ -9,8 +9,6 @@ import dyvil.tools.compiler.ast.consumer.IClassConsumer;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.parsing.IParserManager;
-import dyvil.tools.parsing.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.expression.ArgumentListParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
@@ -18,14 +16,17 @@ import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParameterListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.parsing.IParserManager;
+import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
 public final class ClassDeclarationParser extends Parser implements ITypeConsumer
 {
-	private static final int NAME                   = 1;
-	private static final int GENERICS               = 2;
-	private static final int GENERICS_END           = 4;
+	private static final int NAME                   = 0;
+	private static final int GENERICS               = 1;
+	private static final int GENERICS_END           = 2;
+	private static final int ANGLE_GENERICS_END     = 4;
 	private static final int PARAMETERS             = 8;
 	private static final int PARAMETERS_END         = 16;
 	private static final int EXTENDS                = 32;
@@ -40,24 +41,24 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 	// Parsed and populated by the Unit / Header / Class Body parser; these values are just passed to the CodeClass constructors.
 	protected ModifierSet    modifiers;
 	protected AnnotationList annotations;
-	
+
 	private IClass theClass;
-	
+
 	public ClassDeclarationParser(IClassConsumer consumer)
 	{
 		this.consumer = consumer;
-		this.mode = NAME;
+		// this.mode = NAME;
 	}
-	
+
 	public ClassDeclarationParser(IClassConsumer consumer, ModifierSet modifiers, AnnotationList annotations)
 	{
 		this.consumer = consumer;
-		
+
 		this.modifiers = modifiers;
 		this.annotations = annotations;
-		this.mode = NAME;
+		// this.mode = NAME;
 	}
-	
+
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
@@ -67,7 +68,8 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 		case NAME:
 			if (ParserUtil.isIdentifier(type))
 			{
-				this.theClass = this.consumer.createClass(token.raw(), token.nameValue(), this.modifiers, this.annotations);
+				this.theClass = this.consumer
+					                .createClass(token.raw(), token.nameValue(), this.modifiers, this.annotations);
 				this.mode = GENERICS;
 				return;
 			}
@@ -81,6 +83,17 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				pm.report(token, "class.generic.close_bracket");
 			}
 			return;
+		case ANGLE_GENERICS_END:
+			this.mode = PARAMETERS;
+			if (TypeParser.isGenericEnd(token, type))
+			{
+				pm.splitJump(token, 1);
+				return;
+			}
+
+			pm.reparse();
+			pm.report(token, "class.generic.close_angle");
+			return;
 		case PARAMETERS_END:
 			this.mode = EXTENDS;
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
@@ -90,6 +103,14 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			}
 			return;
 		case GENERICS:
+			if (TypeParser.isGenericStart(token, type))
+			{
+				pm.splitJump(token, 1);
+				pm.pushParser(new TypeParameterListParser(this.theClass));
+				this.theClass.setTypeParametric();
+				this.mode = ANGLE_GENERICS_END;
+				return;
+			}
 			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
 			{
 				pm.pushParser(new TypeParameterListParser(this.theClass));
@@ -126,7 +147,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			{
 				pm.pushParser(new TypeListParser(this));
 				this.mode = BODY;
-				
+
 				if (this.theClass.hasModifier(Modifiers.INTERFACE_CLASS))
 				{
 					pm.report(token, "class.interface.implements");
@@ -164,7 +185,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 						return;
 					}
 				}
-				
+
 				pm.popParser(true);
 				this.consumer.addClass(this.theClass);
 				return;
@@ -201,7 +222,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			pm.reparse();
 		}
 	}
-	
+
 	@Override
 	public void setType(IType type)
 	{

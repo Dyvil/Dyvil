@@ -79,12 +79,13 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		this.position = position;
 	}
 
-	public LambdaType(ICodePosition position, IType receiverType)
+	public LambdaType(ICodePosition position, IType parameterType)
 	{
 		this.position = position;
 
-		if (receiverType != null) {
-			this.parameterTypes = new IType[] { receiverType };
+		if (parameterType != null)
+		{
+			this.parameterTypes = new IType[] { parameterType };
 			this.parameterCount = 1;
 			return;
 		}
@@ -632,10 +633,14 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.parameterCount == 1 && this.parameterTypes[0].typeTag() != TUPLE && !Formatting.getBoolean(
-			"lambda.single.wrap"))
+		final IType parameterType;
+		final int parameterTypeTag;
+		if (this.parameterCount == 1 && (parameterTypeTag = (parameterType = this.parameterTypes[0]).typeTag()) != TUPLE
+			    && parameterTypeTag != LAMBDA && !Formatting.getBoolean("lambda.single.wrap"))
 		{
-			this.parameterTypes[0].toString(prefix, buffer);
+			// Single Parameter Type that is neither a Lambda Type nor a Tuple Type
+
+			parameterType.toString(prefix, buffer);
 
 			if (Formatting.getBoolean("lambda.arrow.space_before"))
 			{

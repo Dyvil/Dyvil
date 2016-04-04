@@ -309,18 +309,18 @@ public class MethodCall extends AbstractCall implements INamed
 			{
 				buffer.append(' ');
 			}
-			else if (this.genericData == null)
+			else
 			{
 				buffer.append('.');
 			}
 		}
 
+		buffer.append(this.name);
+
 		if (this.genericData != null)
 		{
 			this.genericData.toString(prefix, buffer);
 		}
-
-		buffer.append(this.name);
 
 		this.arguments.toString(prefix, buffer);
 	}

@@ -390,35 +390,39 @@ public final class WildcardType implements IRawType, ITyped
 	}
 
 	@Override
+	public String toString()
+	{
+		if (this.bound == null)
+		{
+			return "_";
+		}
+
+		final StringBuilder builder = new StringBuilder();
+		this.variance.appendPrefix(builder);
+		builder.append(this.bound);
+		return builder.toString();
+	}
+
+	@Override
+	public void toString(String prefix, StringBuilder buffer)
+	{
+		if (this.bound != null)
+		{
+			this.variance.appendPrefix(buffer);
+			this.bound.toString(prefix, buffer);
+		}
+		else
+		{
+			buffer.append('_');
+		}
+	}
+
+	@Override
 	public WildcardType clone()
 	{
 		WildcardType clone = new WildcardType(this.position);
 		clone.variance = this.variance;
 		clone.bound = this.bound;
 		return clone;
-	}
-
-	@Override
-	public String toString()
-	{
-		StringBuilder sb = new StringBuilder();
-		sb.append('_');
-		if (this.bound != null)
-		{
-			this.variance.appendInfix(sb);
-			sb.append(this.bound);
-		}
-		return sb.toString();
-	}
-
-	@Override
-	public void toString(String prefix, StringBuilder buffer)
-	{
-		buffer.append('_');
-		if (this.bound != null)
-		{
-			this.variance.appendInfix(buffer);
-			this.bound.toString(prefix, buffer);
-		}
 	}
 }

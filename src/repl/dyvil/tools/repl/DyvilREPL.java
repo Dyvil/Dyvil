@@ -34,7 +34,7 @@ public final class DyvilREPL
 	protected DyvilCompiler compiler = new DyvilCompiler();
 
 	protected REPLContext      context = new REPLContext(this);
-	protected TryParserManager parser  = new TryParserManager();
+	protected TryParserManager parser  = new TryParserManager(DyvilSymbols.INSTANCE);
 
 	protected File    dumpDir;
 
@@ -210,9 +210,9 @@ public final class DyvilREPL
 
 	private boolean tryParse(MarkerList markers, TokenIterator tokens, Parser parser, boolean reportErrors)
 	{
-		tokens.reset();
 		markers.clear();
 		this.parser.reset(markers, tokens);
+		this.parser.resetTo(tokens.first());
 		return this.parser.parse(parser, reportErrors);
 	}
 

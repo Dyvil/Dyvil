@@ -1,28 +1,36 @@
 package dyvil.tools.parsing;
 
+import dyvil.tools.parsing.lexer.LexerUtil;
+import dyvil.tools.parsing.lexer.Symbols;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SyntaxError;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;
+import dyvil.tools.parsing.token.IdentifierToken;
+import dyvil.tools.parsing.token.SymbolToken;
 
 public class ParserManager implements IParserManager
 {
 	protected Parser parser;
-	
+
 	protected MarkerList markers;
-	
+
+	protected Symbols       symbols;
 	protected TokenIterator tokens;
 	protected int           skip;
 	protected boolean       reparse;
 	protected boolean       hasStopped;
-	
-	public ParserManager()
+
+	public ParserManager(Symbols symbols)
 	{
+		this.symbols = symbols;
 	}
 
-	public ParserManager(TokenIterator tokens, MarkerList markers)
+	public ParserManager(Symbols symbols, TokenIterator tokens, MarkerList markers)
 	{
+		this.symbols = symbols;
 		this.tokens = tokens;
 		this.markers = markers;
 	}
@@ -54,6 +62,67 @@ public class ParserManager implements IParserManager
 	}
 
 	@Override
+	public void splitJump(IToken token, int length)
+	{
+		this.jump(this.split(token, 1).next());
+	}
+
+	@Override
+	public IToken split(IToken token, int length)
+	{
+		final String stringValue = token.stringValue();
+		final int line = token.startLine();
+		final int startIndex = token.startIndex();
+
+		final String part1 = stringValue.substring(0, length);
+		final String part2 = stringValue.substring(length);
+
+		if (part2.isEmpty())
+		{
+			return token;
+		}
+
+		final IToken prev = token.prev();
+		final IToken token1 = this.toToken(part1, startIndex, line);
+		final IToken token2 = this.toToken(part2, startIndex + length, line);
+		final IToken next = token.next();
+
+		// Link the tokens
+		prev.setNext(token1);
+		token1.setPrev(prev);
+		token1.setNext(token2);
+		token2.setPrev(token1);
+		token2.setNext(next);
+		next.setPrev(token2);
+
+		return token1;
+	}
+
+	private IToken toToken(String identifier, int start, int line)
+	{
+		final int length = identifier.length();
+		final int lastCodePoint = identifier.codePointBefore(length);
+
+		if (LexerUtil.isIdentifierSymbol(lastCodePoint))
+		{
+			final int symbol = this.symbols.getSymbolType(identifier);
+			if (symbol != 0)
+			{
+				return new SymbolToken(this.symbols, symbol, line, start);
+			}
+			return new IdentifierToken(Name.get(identifier), Tokens.SYMBOL_IDENTIFIER, line, start, start + length);
+		}
+
+		final int keyword = this.symbols.getKeywordType(identifier);
+		if (keyword != 0)
+		{
+			return new SymbolToken(this.symbols, keyword, line, start);
+		}
+
+		return new IdentifierToken(Name.get(identifier), Tokens.LETTER_IDENTIFIER, line, start, start + length);
+	}
+
+	@Override
 	public void report(IToken token, String message)
 	{
 		this.report(new SyntaxError(token, this.markers.getI18n().getString(message)));
@@ -70,7 +139,7 @@ public class ParserManager implements IParserManager
 		this.parser = parser;
 
 		IToken token = null;
-		
+
 		while (!this.hasStopped)
 		{
 			if (this.reparse)
@@ -83,16 +152,16 @@ public class ParserManager implements IParserManager
 				{
 					break;
 				}
-				
+
 				token = this.tokens.next();
 			}
-			
+
 			if (this.skip > 0)
 			{
 				this.skip--;
 				continue;
 			}
-			
+
 			if (this.parser == null)
 			{
 				this.reportUnparsed(token);
@@ -101,7 +170,7 @@ public class ParserManager implements IParserManager
 
 			this.tryParse(token, this.parser);
 		}
-		
+
 		this.parseRemaining(token);
 	}
 
@@ -119,11 +188,11 @@ public class ParserManager implements IParserManager
 		{
 			return;
 		}
-		
+
 		while (this.parser != null)
 		{
 			token = token.next();
-			
+
 			Parser prevParser = this.parser;
 			int mode = prevParser.getMode();
 
@@ -162,51 +231,51 @@ public class ParserManager implements IParserManager
 	{
 		this.hasStopped = true;
 	}
-	
+
 	@Override
 	public void skip()
 	{
 		this.skip++;
 	}
-	
+
 	@Override
 	public void skip(int tokens)
 	{
 		this.skip += tokens;
 	}
-	
+
 	@Override
 	public void reparse()
 	{
 		this.reparse = true;
 	}
-	
+
 	@Override
 	public void jump(IToken token)
 	{
 		this.tokens.jump(token);
 		this.reparse = false;
 	}
-	
+
 	@Override
 	public void setParser(Parser parser)
 	{
 		this.parser = parser;
 	}
-	
+
 	@Override
 	public Parser getParser()
 	{
 		return this.parser;
 	}
-	
+
 	@Override
 	public void pushParser(Parser parser)
 	{
 		parser.parent = this.parser;
 		this.parser = parser;
 	}
-	
+
 	@Override
 	public void pushParser(Parser parser, boolean reparse)
 	{
@@ -214,13 +283,13 @@ public class ParserManager implements IParserManager
 		this.parser = parser;
 		this.reparse = reparse;
 	}
-	
+
 	@Override
 	public void popParser()
 	{
 		this.parser = this.parser.parent;
 	}
-	
+
 	@Override
 	public void popParser(boolean reparse)
 	{

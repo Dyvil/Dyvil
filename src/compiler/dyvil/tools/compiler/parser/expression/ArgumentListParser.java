@@ -11,6 +11,7 @@ import dyvil.tools.parsing.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 
 public class ArgumentListParser extends Parser implements IValueConsumer
@@ -55,7 +56,7 @@ public class ArgumentListParser extends Parser implements IValueConsumer
 	public void parse(IParserManager pm, IToken token)
 	{
 		final int type = token.type();
-		if (ParserUtil.isCloseBracket(type))
+		if (ParserUtil.isCloseBracket(type) || type == Tokens.EOF)
 		{
 			if (this.name != null)
 			{

@@ -260,12 +260,12 @@ public abstract class GenericType implements IObjectType, ITypeList
 	{
 		if (this.typeArgumentCount > 0)
 		{
-			builder.append('[').append(this.typeArguments[0].toString());
+			builder.append('<').append(this.typeArguments[0].toString());
 			for (int i = 1; i < this.typeArgumentCount; i++)
 			{
 				builder.append(", ").append(this.typeArguments[i].toString());
 			}
-			builder.append(']');
+			builder.append('>');
 		}
 	}
 	
@@ -298,7 +298,7 @@ public abstract class GenericType implements IObjectType, ITypeList
 
 		if (this.typeArgumentCount > 0)
 		{
-			Formatting.appendSeparator(buffer, "generics.open_bracket", '[');
+			Formatting.appendSeparator(buffer, "generics.open_bracket", '<');
 			Util.astToString(prefix, this.typeArguments, this.typeArgumentCount,
 			                 Formatting.getSeparator("generics.separator", ','), buffer);
 
@@ -306,7 +306,7 @@ public abstract class GenericType implements IObjectType, ITypeList
 			{
 				buffer.append(' ');
 			}
-			buffer.append(']');
+			buffer.append('>');
 		}
 	}
 	

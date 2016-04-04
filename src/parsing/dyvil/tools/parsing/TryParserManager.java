@@ -1,5 +1,8 @@
 package dyvil.tools.parsing;
 
+import dyvil.collection.List;
+import dyvil.collection.mutable.ArrayList;
+import dyvil.tools.parsing.lexer.Symbols;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.token.IToken;
@@ -9,17 +12,19 @@ public class TryParserManager extends ParserManager
 	private boolean hasSyntaxErrors;
 	private boolean reportErrors;
 
+	private List<IToken> splitTokens;
+
 	public static final int REPORT_ERRORS = 1;
 	public static final int EXIT_ON_ROOT  = 2;
 
-	public TryParserManager()
+	public TryParserManager(Symbols symbols)
 	{
-		super();
+		super(symbols);
 	}
 
-	public TryParserManager(TokenIterator tokens, MarkerList markers)
+	public TryParserManager(Symbols symbols, TokenIterator tokens, MarkerList markers)
 	{
-		super(tokens, markers);
+		super(symbols, tokens, markers);
 	}
 
 	@Override
@@ -35,6 +40,45 @@ public class TryParserManager extends ParserManager
 		{
 			super.report(error);
 		}
+	}
+
+	public void resetTo(IToken token)
+	{
+		this.tokens.jump(token);
+
+		if (this.splitTokens == null)
+		{
+			return;
+		}
+
+		// Restore all tokens that have been split
+		for (IToken splitToken : this.splitTokens)
+		{
+			// The original tokens prev and next fields have not been updated by the split method
+
+			splitToken.prev().setNext(splitToken);
+			splitToken.next().setPrev(splitToken);
+		}
+
+		this.splitTokens.clear();
+	}
+
+	@Override
+	public IToken split(IToken token, int length)
+	{
+		final IToken split = super.split(token, length);
+		if (split == token)
+		{
+			return token;
+		}
+
+		if (this.splitTokens == null)
+		{
+			this.splitTokens = new ArrayList<>();
+		}
+		this.splitTokens.add(token);
+
+		return split;
 	}
 
 	public boolean parse(Parser parser, boolean reportErrors)
@@ -94,7 +138,6 @@ public class TryParserManager extends ParserManager
 			try
 			{
 				this.parser.parse(this, token);
-
 			}
 			catch (Exception ex)
 			{

@@ -33,7 +33,7 @@ public final class TypeListParser extends Parser
 			return;
 		case SEPARATOR:
 			if (ParserUtil.isCloseBracket(type) || type == BaseSymbols.OPEN_CURLY_BRACKET
-				    || type == BaseSymbols.SEMICOLON || type == Tokens.EOF)
+				    || type == BaseSymbols.SEMICOLON || type == Tokens.EOF || TypeParser.isGenericEnd(token, type))
 			{
 				pm.popParser(true);
 				return;
