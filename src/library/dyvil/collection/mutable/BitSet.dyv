@@ -2,7 +2,7 @@ package dyvil.collection.mutable
 
 import dyvil.collection.impl.AbstractBitSet
 
-public class BitSet extends AbstractBitSet implements MutableSet[int]
+public class BitSet extends AbstractBitSet implements MutableSet<int>
 {
 	public init()
 	{
@@ -19,7 +19,7 @@ public class BitSet extends AbstractBitSet implements MutableSet[int]
 		super.init(elements...)
 	}
 
-	public init(Collection[int] elements)
+	public init(Collection<int> elements)
 	{
 		super.init(elements)
 	}
@@ -59,7 +59,7 @@ public class BitSet extends AbstractBitSet implements MutableSet[int]
 
 	public override void removeAt(int bit) = this.clearBit(bit)
 
-	public override void map(java.util.function.Function[_ >: int, _ <: int] mapper)
+	public override void map(java.util.function.Function<-int, +int> mapper)
 	{
 		final [int] ints = this.toIntArray
 
@@ -70,7 +70,7 @@ public class BitSet extends AbstractBitSet implements MutableSet[int]
 		}
 	}
 
-	public override void flatMap(java.util.function.Function[_ >: int, _ <: Iterable[_ <: int]] mapper)
+	public override void flatMap(java.util.function.Function<-int, +Iterable<+int>> mapper)
 	{
 		final [int] ints = this.toIntArray
 
@@ -84,7 +84,7 @@ public class BitSet extends AbstractBitSet implements MutableSet[int]
 		}
 	}
 
-	public override MutableSet[int] copy() = this.mutableCopy
+	public override MutableSet<int> copy() = this.mutableCopy
 
-	public override ImmutableSet[int] immutable() = this.immutableCopy
+	public override ImmutableSet<int> immutable() = this.immutableCopy
 }

@@ -43,7 +43,7 @@ public class ForTest
 	private static void testIterable()
 	{
 		[int] ints = [ 1, 2, 3 ]
-		Iterable[int] iterable = ints.toIterable
+		Iterable<int> iterable = ints.toIterable
 		[int] array = []
 
 		for (var i <- iterable)
@@ -57,7 +57,7 @@ public class ForTest
 	private static void testIterator()
 	{
 		[int] ints = [ 1, 2, 3 ]
-		Iterator[int] iterator = ints.toIterable.iterator
+		Iterator<int> iterator = ints.toIterable.iterator
 		[int] array = []
 
 		for (var i <- iterator)
@@ -83,7 +83,7 @@ public class ForTest
 
 	private static void testNested()
 	{
-		var results = List.[(int, int)]()
+		var results = List<(int, int)>
 
 		for (var i <- 0 .. 1)
 		{

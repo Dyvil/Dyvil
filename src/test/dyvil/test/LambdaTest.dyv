@@ -5,15 +5,15 @@ include dyvil.Collections
 public class LambdaTest
 {
 	@FunctionalInterface
-	public interface MyFunction[P, R]
+	public interface MyFunction<P, R>
 	{
 		func apply(P par1): R
 		
-		func andThen[A](MyFunction[R, A] other): MyFunction[P, A] = x => other(this(x))
+		func andThen<A>(MyFunction<R, A> other): MyFunction<P, A> = x => other(this(x))
 	}
 
 	@FunctionalInterface
-	public interface IntFunction extends MyFunction[int, int]
+	public interface IntFunction extends MyFunction<int, int>
 	{
 		override func apply(int value): int
 	}
@@ -73,7 +73,7 @@ public class LambdaTest
 
 	private static void closureTest()
 	{
-		List[String] result = List.[String]
+		var result = List<String>
 
 		() => void function1 = function { result += "a" }
 		() => String function2 = function { "b" }
@@ -84,7 +84,7 @@ public class LambdaTest
 
 		function1()
 
-		List[String] expected = [ "b", "b", "b", "c", "a" ]
+		List<String> expected = [ "b", "b", "b", "c", "a" ]
 		Main.test("Closures", expected, result)
 	}
 
