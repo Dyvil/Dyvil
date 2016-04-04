@@ -1,8 +1,9 @@
 package dyvil.tools.compiler.util;
 
-import dyvil.io.AppendablePrintStream;
+import dyvil.tools.parsing.BaseMarkers;
 import dyvil.tools.parsing.marker.*;
 import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.util.I18n;
 import dyvil.util.MarkerLevel;
 
 import java.util.HashMap;
@@ -12,19 +13,31 @@ import java.util.ResourceBundle;
 
 public final class Markers
 {
+	private static final ResourceBundle SEMANTIC_BUNDLE = ResourceBundle
+		                                                      .getBundle("dyvil.tools.compiler.lang.SemanticMarkers");
+
+	private static final ResourceBundle SYNTAX_BUNDLE = ResourceBundle
+		                                                    .getBundle("dyvil.tools.compiler.lang.SyntaxMarkers");
+
+	private static final ResourceBundle MARKER_LEVEL_BUNDLE = ResourceBundle.getBundle(
+		"dyvil.tools.compiler.config.MarkerLevels");
+
+	public static final I18n INSTANCE = key -> {
+		if (SEMANTIC_BUNDLE.containsKey(key))
+		{
+			return SEMANTIC_BUNDLE.getString(key);
+		}
+		if (SYNTAX_BUNDLE.containsKey(key))
+		{
+			return SYNTAX_BUNDLE.getString(key);
+		}
+		return BaseMarkers.INSTANCE.getString(key);
+	};
+
 	private Markers()
 	{
 		// do not instantiate
 	}
-	
-	private static final ResourceBundle SEMANTIC_BUNDLE = ResourceBundle
-			.getBundle("dyvil.tools.compiler.lang.SemanticMarkers");
-
-	private static final ResourceBundle SYNTAX_BUNDLE = ResourceBundle
-			.getBundle("dyvil.tools.compiler.lang.SyntaxMarkers");
-
-	private static final ResourceBundle MARKER_LEVEL_BUNDLE = ResourceBundle
-			.getBundle("dyvil.tools.compiler.config.MarkerLevels");
 
 	public static String getSemantic(String key)
 	{
@@ -37,7 +50,7 @@ public final class Markers
 			return "!" + key + "!";
 		}
 	}
-	
+
 	public static String getSemantic(String key, Object... args)
 	{
 		return String.format(getSemantic(key), args);
@@ -59,9 +72,9 @@ public final class Markers
 	{
 		return String.format(getSyntax(key), args);
 	}
-	
+
 	static final Map<String, MarkerLevel> markerLevelMap = new HashMap<>();
-	
+
 	private static MarkerLevel getMarkerLevel(String key)
 	{
 		MarkerLevel m = markerLevelMap.get(key);
@@ -103,7 +116,7 @@ public final class Markers
 		markerLevelMap.put(key, m);
 		return m;
 	}
-	
+
 	public static Marker withText(ICodePosition position, MarkerLevel level, String text)
 	{
 		switch (level)
@@ -118,32 +131,32 @@ public final class Markers
 			return null;
 		}
 	}
-	
+
 	public static Marker semantic(ICodePosition position, String key)
 	{
 		return withText(position, getMarkerLevel(key), getSemantic(key));
 	}
-	
+
 	public static Marker semantic(ICodePosition position, MarkerLevel level, String key)
 	{
 		return withText(position, level, getSemantic(key));
 	}
-	
+
 	public static Marker semantic(ICodePosition position, String key, Object... args)
 	{
 		return withText(position, getMarkerLevel(key), getSemantic(key, args));
 	}
-	
+
 	public static Marker semantic(ICodePosition position, MarkerLevel level, String key, Object... args)
 	{
 		return withText(position, level, getSemantic(key, args));
 	}
-	
+
 	public static Marker semanticError(ICodePosition position, String key)
 	{
 		return new SemanticError(position, getSemantic(key));
 	}
-	
+
 	public static Marker semanticError(ICodePosition position, String key, Object... args)
 	{
 		return new SemanticError(position, getSemantic(key, args));
@@ -177,19 +190,5 @@ public final class Markers
 	public static Marker syntaxError(ICodePosition position, String key, Object... args)
 	{
 		return new SyntaxError(position, getSyntax(key, args));
-	}
-
-	public static Marker parserError(ICodePosition position, Throwable ex)
-	{
-		final Marker marker = Markers.syntaxError(position, "parser.error", position.toString(), ex.getLocalizedMessage());
-		appendThrowable(marker, ex);
-		return marker;
-	}
-
-	public static void appendThrowable(Marker marker, Throwable ex)
-	{
-		final StringBuilder builder = new StringBuilder();
-		ex.printStackTrace(new AppendablePrintStream(builder));
-		marker.addInfo(builder.toString());
 	}
 }

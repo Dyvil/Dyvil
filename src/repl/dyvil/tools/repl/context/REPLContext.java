@@ -35,6 +35,7 @@ import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.IClassCompilable;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
@@ -64,7 +65,7 @@ public class REPLContext extends DyvilHeader
 	protected String currentCode;
 	private   int    classIndex;
 	private   String className;
-	protected final MarkerList             markers        = new MarkerList();
+	protected final MarkerList             markers        = new MarkerList(Markers.INSTANCE);
 	protected final List<IClassCompilable> compilableList = new ArrayList<>();
 	protected final List<IClassCompilable> innerClassList = new ArrayList<>();
 

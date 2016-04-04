@@ -18,6 +18,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.ParserManager;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.DyvilLexer;
@@ -76,7 +77,7 @@ public class CompleteCommand implements ICommand
 		final String expression = argument.substring(0, dotIndex);
 		final String memberStart = BaseSymbols.qualify(argument.substring(dotIndex + 1));
 
-		final MarkerList markers = new MarkerList();
+		final MarkerList markers = new MarkerList(Markers.INSTANCE);
 		final TokenIterator tokenIterator = new DyvilLexer(markers, DyvilSymbols.INSTANCE).tokenize(expression);
 
 		final IValueConsumer valueConsumer = value -> {

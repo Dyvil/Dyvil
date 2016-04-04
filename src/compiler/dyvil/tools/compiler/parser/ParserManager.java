@@ -1,9 +1,10 @@
 package dyvil.tools.compiler.parser;
 
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.marker.SyntaxError;
+import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;
 
 public class ParserManager implements IParserManager
@@ -56,7 +57,7 @@ public class ParserManager implements IParserManager
 	@Override
 	public void report(IToken token, String message)
 	{
-		this.report(Markers.syntaxError(token, message));
+		this.report(new SyntaxError(token, this.markers.getI18n().getString(message)));
 	}
 
 	@Override
@@ -95,10 +96,7 @@ public class ParserManager implements IParserManager
 			
 			if (this.parser == null)
 			{
-				if (token != null && !token.isInferred())
-				{
-					this.report(Markers.syntaxError(token, "parser.unexpected", token));
-				}
+				this.reportUnparsed(token);
 				continue;
 			}
 
@@ -106,6 +104,14 @@ public class ParserManager implements IParserManager
 		}
 		
 		this.parseRemaining(token);
+	}
+
+	protected void reportUnparsed(IToken token)
+	{
+		if (token != null && !token.isInferred())
+		{
+			this.report(new SyntaxError(token, this.markers.getI18n().getString("parser.unexpected", token)));
+		}
 	}
 
 	protected void parseRemaining(IToken token)
@@ -131,7 +137,7 @@ public class ParserManager implements IParserManager
 		}
 	}
 
-	private void tryParse(IToken token, Parser prevParser)
+	protected void tryParse(IToken token, Parser prevParser)
 	{
 		try
 		{
@@ -139,8 +145,17 @@ public class ParserManager implements IParserManager
 		}
 		catch (Exception ex)
 		{
-			this.report(Markers.parserError(token, ex));
+			this.reportError(token, ex);
 		}
+	}
+
+	protected void reportError(ICodePosition position, Throwable ex)
+	{
+		final Marker marker = new SyntaxError(position, this.markers.getI18n()
+		                                                            .getString("parser.error", position.toString(),
+		                                                                       ex.getLocalizedMessage()));
+		marker.addError(ex);
+		this.markers.add(marker);
 	}
 
 	@Override

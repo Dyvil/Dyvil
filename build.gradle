@@ -52,6 +52,12 @@ sourceSets {
 			srcDir 'src/asm'
 			srcDir 'src/parsing'
 		}
+		resources {
+			srcDir 'src/resources'
+
+			include resourceFilters
+			include 'dyvil/tools/parsing/**'
+		}
 	}
 
 	dpf {
@@ -74,6 +80,7 @@ sourceSets {
 			srcDir 'src/resources'
 
 			include resourceFilters
+			include 'dyvil/tools/compiler/**'
 		}
 		return
 	}

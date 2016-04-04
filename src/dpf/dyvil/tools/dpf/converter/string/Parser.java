@@ -3,6 +3,7 @@ package dyvil.tools.dpf.converter.string;
 import dyvil.io.FileUtils;
 import dyvil.tools.dpf.ast.RootNode;
 import dyvil.tools.dpf.visitor.*;
+import dyvil.tools.parsing.BaseMarkers;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.DyvilLexer;
@@ -17,6 +18,11 @@ public class Parser
 {
 	private TokenIterator tokens;
 	private MarkerList    markers;
+
+	public Parser(String code)
+	{
+		this(new MarkerList(BaseMarkers.INSTANCE), code);
+	}
 	
 	public Parser(MarkerList markers, String code)
 	{
@@ -33,9 +39,8 @@ public class Parser
 	
 	public static RootNode parse(String code)
 	{
-		MarkerList markers = new MarkerList();
 		RootNode file = new RootNode();
-		new Parser(markers, code).parseNodeBody(file);
+		new Parser(code).parseNodeBody(file);
 		return file;
 	}
 	
@@ -287,7 +292,6 @@ public class Parser
 		case BaseSymbols.OPEN_CURLY_BRACKET:
 			this.parseBuilderNode(visitor);
 			visitor.visitEnd();
-			return;
 		}
 	}
 	

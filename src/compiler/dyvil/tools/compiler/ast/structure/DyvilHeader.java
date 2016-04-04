@@ -59,7 +59,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	protected Package pack;
 
 	protected TokenIterator tokens;
-	protected MarkerList markers = new MarkerList();
+	protected MarkerList markers = new MarkerList(Markers.INSTANCE);
 
 	protected PackageDeclaration packageDeclaration;
 
@@ -500,7 +500,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		}
 		catch (IOException ex)
 		{
-			this.markers.add(Markers.parserError(ICodePosition.ORIGIN, ex));
+			this.compiler.warn("Cannot load source file '" + this.inputFile + "'");
 			return false;
 		}
 	}

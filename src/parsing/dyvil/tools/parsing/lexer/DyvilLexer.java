@@ -510,7 +510,7 @@ public final class DyvilLexer
 				}
 				catch (NumberFormatException ex)
 				{
-					this.markers.add(new SyntaxError(token, "Invalid Integer Literal - Out of Range"));
+					this.markers.add(new SyntaxError(token, this.markers.getI18n().getString("literal.integer.invalid")));
 				}
 
 				this.tokens.append(token);
@@ -525,7 +525,7 @@ public final class DyvilLexer
 				}
 				catch (NumberFormatException ex)
 				{
-					this.markers.add(new SyntaxError(token, "Invalid Long Literal - Out of Range"));
+					this.markers.add(new SyntaxError(token, this.markers.getI18n().getString("literal.long.invalid")));
 				}
 
 				this.tokens.append(token);
@@ -540,7 +540,7 @@ public final class DyvilLexer
 				}
 				catch (NumberFormatException ex)
 				{
-					this.markers.add(new SyntaxError(token, "Invalid Float Literal - Out of Range"));
+					this.markers.add(new SyntaxError(token, this.markers.getI18n().getString("literal.float.invalid")));
 				}
 
 				this.tokens.append(token);
@@ -559,7 +559,7 @@ public final class DyvilLexer
 				}
 				catch (NumberFormatException ex)
 				{
-					this.markers.add(new SyntaxError(token, "Invalid Double Literal - Out of Range"));
+					this.markers.add(new SyntaxError(token, this.markers.getI18n().getString("literal.double.invalid")));
 				}
 
 				this.tokens.append(token);

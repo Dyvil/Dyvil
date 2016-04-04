@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.parser;
 
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -80,30 +79,27 @@ public class TryParserManager extends ParserManager
 				{
 					return this.success();
 				}
-				if (token != null && !token.isInferred())
-				{
-					this.report(Markers.syntaxError(token, "parser.unexpected", token));
-				}
+				this.reportUnparsed(token);
 				continue;
+			}
+			if (!this.reportErrors && this.parser.reportErrors())
+			{
+				if (this.hasSyntaxErrors)
+				{
+					return false;
+				}
+
+				this.reportErrors = true;
 			}
 
 			try
 			{
 				this.parser.parse(this, token);
 
-				if (!this.reportErrors && this.parser.reportErrors())
-				{
-					if (this.hasSyntaxErrors)
-					{
-						return false;
-					}
-
-					this.reportErrors = true;
-				}
 			}
 			catch (Exception ex)
 			{
-				this.report(Markers.parserError(token, ex));
+				this.reportError(token, ex);
 				return this.success();
 			}
 
