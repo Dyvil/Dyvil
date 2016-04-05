@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.generic;
 
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
@@ -12,10 +11,11 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public final class GenericData implements ITypeList, ITypeContext
 {
-	public IMethod method;
-	public IType[] generics;
-	public int     genericCount;
-	public IValue  receiver;
+	public    IMethod method;
+	protected IType[] generics;
+	protected int     genericCount;
+	protected int     lockedCount;
+	public    IType   receiverType;
 
 	public GenericData()
 	{
@@ -32,6 +32,16 @@ public final class GenericData implements ITypeList, ITypeContext
 		this.method = method;
 		this.genericCount = generics.length;
 		this.generics = generics;
+	}
+
+	public IType getReceiverType()
+	{
+		return this.receiverType;
+	}
+
+	public void setReceiverType(IType receiverType)
+	{
+		this.receiverType = receiverType;
 	}
 
 	@Override
@@ -111,7 +121,7 @@ public final class GenericData implements ITypeList, ITypeContext
 			}
 			return this.generics[index];
 		}
-		return this.receiver.getType().resolveType(typeParameter);
+		return this.receiverType.resolveType(typeParameter);
 	}
 
 	@Override
@@ -135,7 +145,10 @@ public final class GenericData implements ITypeList, ITypeContext
 				this.generics[index] = type;
 				return;
 			}
-			this.generics[index] = Types.combine(this.generics[index], type);
+			if (index >= this.lockedCount)
+			{
+				this.generics[index] = Types.combine(this.generics[index], type);
+			}
 			return;
 		}
 
@@ -155,6 +168,8 @@ public final class GenericData implements ITypeList, ITypeContext
 		{
 			this.generics[i] = this.generics[i].resolveType(markers, context);
 		}
+
+		this.lockedCount = this.genericCount;
 	}
 
 	@Override

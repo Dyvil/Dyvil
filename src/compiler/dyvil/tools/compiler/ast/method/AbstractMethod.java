@@ -675,24 +675,24 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		return receiver;
 	}
 
-	private void inferTypes(GenericData genericData, IValue instance, IArguments arguments)
+	private void inferTypes(GenericData genericData, IValue receiver, IArguments arguments)
 	{
-		if (instance != null)
+		if (receiver != null)
 		{
-			genericData.receiver = instance;
+			genericData.receiverType = receiver.getType();
 		}
 		else
 		{
-			genericData.receiver = new ThisExpr(this.enclosingClass.getType());
+			genericData.receiverType = this.receiverType;
 		}
 
 		int modifiers = this.modifiers.toFlags();
 
 		int parIndex = 0;
 		IParameter param;
-		if (instance != null && (modifiers & Modifiers.INFIX) == Modifiers.INFIX)
+		if (receiver != null && (modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
-			this.parameters[0].getType().inferTypes(instance.getType(), genericData);
+			this.parameters[0].getType().inferTypes(receiver.getType(), genericData);
 			parIndex = 1;
 		}
 
