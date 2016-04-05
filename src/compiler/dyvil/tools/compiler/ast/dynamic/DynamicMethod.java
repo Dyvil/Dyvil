@@ -322,7 +322,7 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 	
 	@Override
-	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext)
+	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, GenericData genericData)
 	{
 		return instance;
 	}

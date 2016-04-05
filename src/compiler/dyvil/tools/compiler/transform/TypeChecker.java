@@ -84,14 +84,14 @@ public final class TypeChecker
 
 	public static IValue convertValue(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context, MarkerSupplier markerSupplier)
 	{
-		if (type.hasTypeVariables())
-		{
-			type = type.getConcreteType(typeContext);
-		}
-
-		final IValue newValue = convertValueDirect(value, type, typeContext, markers, context);
+		final IType concreteType = type.getConcreteType(typeContext);
+		final IValue newValue = convertValueDirect(value, concreteType, typeContext, markers, context);
 		if (newValue != null)
 		{
+			if (typeContext != null && !typeContext.isReadonly())
+			{
+				type.inferTypes(newValue.getType(), typeContext);
+			}
 			return newValue;
 		}
 

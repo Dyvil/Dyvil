@@ -317,42 +317,29 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		this.type = type;
 		this.method = type.getFunctionalMethod();
 
-		if (this.method != null)
+		assert this.method != null; // Otherwise isType would have returns false
+
+		this.inferTypes(markers);
+
+		final IContext combinedContext = context.push(this);
+
+		if ((this.flags & VALUE_RESOLVED) == 0)
 		{
-			this.inferTypes(markers);
-
-			final IContext combinedContext = context.push(this);
-
-			if ((this.flags & VALUE_RESOLVED) == 0)
-			{
-				this.value = this.value.resolve(markers, combinedContext);
-				this.flags |= VALUE_RESOLVED;
-			}
-
-			if (this.returnType == Types.UNKNOWN)
-			{
-				this.returnType = this.value.getType();
-			}
-
-			this.value = TypeChecker
-				             .convertValue(this.value, this.returnType, this.returnType, markers, combinedContext,
-				                           LAMBDA_MARKER_SUPPLIER);
-
-			this.inferReturnType(type, typeContext, this.value.getType());
-
-			context.pop();
+			this.value = this.value.resolve(markers, combinedContext);
+			this.flags |= VALUE_RESOLVED;
 		}
 
-		if (this.type.typeTag() == IType.LAMBDA)
+		if (this.returnType == Types.UNKNOWN)
 		{
-			// Trash the old lambda type and generate a new one from scratch
-			this.type = null;
-			this.type = this.getType();
+			this.returnType = this.value.getType();
 		}
-		else
-		{
-			this.type = type.getConcreteType(typeContext);
-		}
+
+		this.value = TypeChecker.convertValue(this.value, this.returnType, this.returnType, markers, combinedContext,
+		                                      LAMBDA_MARKER_SUPPLIER);
+
+		this.inferReturnType(type, typeContext, this.value.getType());
+
+		context.pop();
 
 		return this;
 	}
@@ -367,6 +354,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		type.inferTypes(concreteType, typeContext);
 
 		this.returnType = valueType;
+		this.type = type.getConcreteType(tempContext).getConcreteType(typeContext);
 	}
 
 	private void inferTypes(MarkerList markers)

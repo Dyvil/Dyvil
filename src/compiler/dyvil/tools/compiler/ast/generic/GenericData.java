@@ -15,7 +15,7 @@ public final class GenericData implements ITypeList, ITypeContext
 	protected IType[] generics;
 	protected int     genericCount;
 	protected int     lockedCount;
-	public    IType   receiverType;
+	protected IType   receiverType;
 
 	public GenericData()
 	{
@@ -42,6 +42,14 @@ public final class GenericData implements ITypeList, ITypeContext
 	public void setReceiverType(IType receiverType)
 	{
 		this.receiverType = receiverType;
+	}
+
+	public void lock(int lockedCount)
+	{
+		if (lockedCount > this.lockedCount)
+		{
+			this.lockedCount = lockedCount;
+		}
 	}
 
 	@Override
@@ -115,13 +123,19 @@ public final class GenericData implements ITypeList, ITypeContext
 		if (this.isMethodTypeVariable(typeParameter))
 		{
 			int index = typeParameter.getIndex();
-			if (index >= this.genericCount)
+			if (index >= this.genericCount || index >= this.lockedCount)
 			{
 				return null;
 			}
 			return this.generics[index];
 		}
-		return this.receiverType.resolveType(typeParameter);
+		return this.receiverType == null ? null : this.receiverType.resolveType(typeParameter);
+	}
+
+	@Override
+	public boolean isReadonly()
+	{
+		return false;
 	}
 
 	@Override

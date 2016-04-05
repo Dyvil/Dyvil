@@ -215,7 +215,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue receiver, IArguments arguments, ITypeContext typeContext)
+	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue receiver, IArguments arguments, GenericData genericData)
 	{
 		if (!this.annotationsResolved)
 		{
@@ -225,7 +225,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		{
 			this.resolveParameters();
 		}
-		return super.checkArguments(markers, position, context, receiver, arguments, typeContext);
+		return super.checkArguments(markers, position, context, receiver, arguments, genericData);
 	}
 
 	@Override
