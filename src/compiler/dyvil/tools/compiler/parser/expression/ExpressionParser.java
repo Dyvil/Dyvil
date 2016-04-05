@@ -709,6 +709,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		switch (type)
 		{
 		case Tokens.STRING:
+		case Tokens.VERBATIM_STRING:
 			this.value = new StringValue(token.raw(), token.stringValue());
 			this.mode = ACCESS;
 			return true;

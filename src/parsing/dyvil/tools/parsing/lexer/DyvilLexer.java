@@ -189,10 +189,10 @@ public final class DyvilLexer
 				this.error("identifier.backtick.unclosed");
 				// Fallthrough
 			case '`':
+				this.parseIndex++;
 				this.tokens.append(
 					new IdentifierToken(Name.getSpecial(this.buffer.toString()), SPECIAL_IDENTIFIER, startLine,
 					                    startIndex, this.parseIndex));
-				this.parseIndex++;
 				return;
 			}
 
@@ -229,9 +229,9 @@ public final class DyvilLexer
 				this.error("string.single.unclosed");
 				// Fallthrough
 			case '\'':
+				this.parseIndex++;
 				this.tokens.append(new StringToken(this.buffer.toString(), SINGLE_QUOTED_STRING, startLine, startIndex,
 				                                   this.parseIndex + 1));
-				this.parseIndex++;
 				return;
 			}
 
@@ -279,10 +279,10 @@ public final class DyvilLexer
 				this.error("string.double.unclosed");
 				// Fallthrough
 			case '"':
+				this.parseIndex++;
 				this.tokens.append(
 					new StringToken(this.buffer.toString(), stringPart ? STRING_END : STRING, startLine, startIndex,
 					                this.parseIndex));
-				this.parseIndex++;
 				return;
 			case '\n':
 				this.lineNumber++;
@@ -319,8 +319,9 @@ public final class DyvilLexer
 				this.error("string.verbatim.unclosed");
 				// Fallthrough
 			case '"':
+				this.parseIndex++;
 				this.tokens.append(
-					new StringToken(this.buffer.toString(), LITERAL_STRING, startLine, startIndex, this.parseIndex));
+					new StringToken(this.buffer.toString(), VERBATIM_STRING, startLine, startIndex, this.parseIndex));
 				return;
 			case '\n':
 				this.lineNumber++;
