@@ -560,7 +560,7 @@ public final class DyvilLexer
 			}
 			case 3: // double
 			{
-				final DoubleToken token = new DoubleToken(0, this.lineNumber, startIndex, this.parseIndex + 1);
+				final DoubleToken token = new DoubleToken(0, this.lineNumber, startIndex, this.parseIndex);
 				try
 				{
 					if (radix == 16)

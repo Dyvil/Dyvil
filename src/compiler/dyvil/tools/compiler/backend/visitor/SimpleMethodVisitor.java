@@ -17,13 +17,13 @@ public final class SimpleMethodVisitor implements MethodVisitor
 {
 	private final IExternalCallableMember method;
 	private       InlineIntrinsicData     intrinsicData;
+	private       boolean                 unsupportedInline;
+	private       int                     parameterIndex;
 
 	public SimpleMethodVisitor(IExternalCallableMember method)
 	{
 		this.method = method;
 	}
-
-	private int parameterIndex;
 
 	@Override
 	public void visitParameter(String name, int modifiers)
@@ -160,13 +160,13 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	@Override
 	public void visitJumpInsn(int opcode, Label label)
 	{
-		// Unsupported
+		this.unsupportedInline = true;
 	}
 
 	@Override
 	public void visitLabel(Label label)
 	{
-		// Unsupported
+		this.unsupportedInline = true;
 	}
 
 	@Override
@@ -208,7 +208,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	@Override
 	public void visitTryCatchBlock(Label start, Label end, Label handler, String type)
 	{
-		// Unsupported
+		this.unsupportedInline = true;
 	}
 
 	@Override
@@ -237,7 +237,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	@Override
 	public void visitEnd()
 	{
-		if (this.intrinsicData != null)
+		if (this.intrinsicData != null && !this.unsupportedInline)
 		{
 			this.method.setIntrinsicData(this.intrinsicData);
 		}
