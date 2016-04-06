@@ -157,7 +157,10 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		return this;
 	}
 
-	IType asParameterType();
+	default IType asParameterType()
+	{
+		return this.getConcreteType(ITypeContext.COVARIANT);
+	}
 
 	String getTypePrefix();
 
