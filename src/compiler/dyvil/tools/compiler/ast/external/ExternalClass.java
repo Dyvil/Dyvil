@@ -692,7 +692,7 @@ public final class ExternalClass extends AbstractClass
 
 		if (value != null)
 		{
-			field.setValue(IValue.fromObject(value));
+			field.setConstantValue(value);
 		}
 
 		this.body.addDataMember(field);
