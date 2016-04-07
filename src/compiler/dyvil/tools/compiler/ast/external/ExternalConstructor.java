@@ -26,17 +26,18 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class ExternalConstructor extends AbstractConstructor implements IExternalCallableMember
 {
-	private boolean annotationsResolved;
-	private boolean returnTypeResolved;
-	private boolean parametersResolved;
-	private boolean exceptionsResolved;
-	
-	public ExternalConstructor(IClass iclass)
+	private static final int ANNOTATIONS = 1;
+	private static final int PARAMETERS  = 1 << 1;
+	private static final int EXCEPTIONS  = 1 << 2;
+
+	private int resolved;
+
+	public ExternalConstructor(IClass enclosingClass)
 	{
-		super(iclass);
-		this.type = iclass.getType();
+		super(enclosingClass);
+		this.type = enclosingClass.getType();
 	}
-	
+
 	@Override
 	public IParameter getParameterNoResolve(int index)
 	{
@@ -74,84 +75,78 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 	{
 		return new CombiningContext(this, new CombiningContext(this.enclosingClass, Package.rootPackage));
 	}
-	
+
 	private void resolveAnnotations()
 	{
-		this.annotationsResolved = true;
+		this.resolved |= ANNOTATIONS;
 		if (this.annotations != null)
 		{
 			this.annotations.resolveTypes(null, this.getCombiningContext(), this);
 		}
 	}
-	
-	private void resolveReturnType()
-	{
-		this.returnTypeResolved = true;
-		this.type = this.enclosingClass.getType();
-	}
-	
+
 	private void resolveParameters()
 	{
-		final IContext context = this.getCombiningContext();
+		this.resolved |= PARAMETERS;
 
-		this.parametersResolved = true;
+		final IContext context = this.getCombiningContext();
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].resolveTypes(null, context);
 		}
 	}
-	
+
 	private void resolveExceptions()
 	{
-		final IContext context = this.getCombiningContext();
+		this.resolved |= EXCEPTIONS;
 
-		this.exceptionsResolved = true;
+		final IContext context = this.getCombiningContext();
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
 			this.exceptions[i] = this.exceptions[i].resolveType(null, context);
 		}
 	}
-	
-	@Override
-	public IType getType()
-	{
-		if (!this.returnTypeResolved)
-		{
-			this.resolveReturnType();
-		}
-		return this.type;
-	}
-	
+
 	@Override
 	public IParameter getParameter(int index)
 	{
-		if (!this.parametersResolved)
+		if ((this.resolved & PARAMETERS) == 0)
 		{
 			this.resolveParameters();
 		}
 		return this.parameters[index];
 	}
-	
+
+	@Override
+	public IParameter[] getParameters()
+	{
+		if ((this.resolved & PARAMETERS) == 0)
+		{
+			this.resolveParameters();
+		}
+		return super.getParameters();
+	}
+
 	@Override
 	public float getSignatureMatch(IArguments arguments)
 	{
-		if (!this.parametersResolved)
+		if ((this.resolved & PARAMETERS) == 0)
 		{
 			this.resolveParameters();
 		}
 		return super.getSignatureMatch(arguments);
 	}
-	
+
 	@Override
 	public IType getException(int index)
 	{
-		if (!this.exceptionsResolved)
+		if ((this.resolved & PARAMETERS) == 0)
 		{
 			this.resolveExceptions();
 		}
 		return this.exceptions[index];
 	}
-	
+
 	@Override
 	public IAnnotation getAnnotation(IClass type)
 	{
@@ -159,8 +154,8 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 		{
 			return null;
 		}
-		
-		if (!this.annotationsResolved)
+
+		if ((this.resolved & ANNOTATIONS) == 0)
 		{
 			this.resolveAnnotations();
 		}
@@ -170,11 +165,7 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 	@Override
 	public void checkArguments(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments)
 	{
-		if (!this.returnTypeResolved)
-		{
-			this.resolveReturnType();
-		}
-		if (!this.parametersResolved)
+		if ((this.resolved & PARAMETERS) == 0)
 		{
 			this.resolveParameters();
 		}
@@ -220,8 +211,8 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 		case TypeReference.EXCEPTION_PARAMETER:
 		{
 			int index = TypeReference.getExceptionIndex(typeRef);
-			this.exceptions[index] = IType
-					.withAnnotation(this.exceptions[index], annotation, typePath, 0, typePath.getLength());
+			this.exceptions[index] = IType.withAnnotation(this.exceptions[index], annotation, typePath, 0,
+			                                              typePath.getLength());
 			break;
 		}
 		case TypeReference.METHOD_FORMAL_PARAMETER:

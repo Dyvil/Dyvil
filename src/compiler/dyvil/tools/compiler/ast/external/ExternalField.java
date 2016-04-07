@@ -13,8 +13,10 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public final class ExternalField extends Field
 {
-	private boolean annotationsResolved;
-	private boolean returnTypeResolved;
+	private static final int ANNOTATIONS = 1;
+	private static final int RETURN_TYPE = 2;
+
+	private int resolved;
 
 	public ExternalField(IClass iclass, Name name, String desc, IType type, ModifierSet modifierSet)
 	{
@@ -29,7 +31,7 @@ public final class ExternalField extends Field
 
 	private void resolveAnnotations()
 	{
-		this.annotationsResolved = true;
+		this.resolved |= ANNOTATIONS;
 		if (this.annotations != null)
 		{
 			this.annotations.resolveTypes(null, this.getCombiningContext(), this);
@@ -38,14 +40,14 @@ public final class ExternalField extends Field
 
 	private void resolveReturnType()
 	{
-		this.returnTypeResolved = true;
+		this.resolved |= RETURN_TYPE;
 		this.type = this.type.resolveType(null, this.getCombiningContext());
 	}
 
 	@Override
 	public IType getType()
 	{
-		if (!this.returnTypeResolved)
+		if ((this.resolved & RETURN_TYPE) == 0)
 		{
 			this.resolveReturnType();
 		}
@@ -60,7 +62,7 @@ public final class ExternalField extends Field
 			return null;
 		}
 
-		if (!this.annotationsResolved)
+		if ((this.resolved & ANNOTATIONS) == 0)
 		{
 			this.resolveAnnotations();
 		}
