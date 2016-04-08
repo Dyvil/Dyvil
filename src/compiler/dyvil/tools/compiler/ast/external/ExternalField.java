@@ -18,7 +18,7 @@ public final class ExternalField extends Field
 	private static final int RETURN_TYPE    = 1 << 1;
 	private static final int CONSTANT_VALUE = 1 << 2;
 
-	private int    resolved;
+	private int resolved = CONSTANT_VALUE;
 	private Object constantValue;
 
 	public ExternalField(IClass iclass, Name name, String desc, IType type, ModifierSet modifierSet)
@@ -35,6 +35,7 @@ public final class ExternalField extends Field
 	public void setConstantValue(Object constantValue)
 	{
 		this.constantValue = constantValue;
+		this.resolved &= ~CONSTANT_VALUE;
 	}
 
 	private IContext getCombiningContext()
