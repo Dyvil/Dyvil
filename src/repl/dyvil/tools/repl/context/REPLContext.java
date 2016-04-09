@@ -69,7 +69,7 @@ public class REPLContext extends DyvilHeader
 	protected final List<IClassCompilable> compilableList = new ArrayList<>();
 	protected final List<IClassCompilable> innerClassList = new ArrayList<>();
 
-	private IClass memberClass;
+	private REPLMemberClass memberClass = new REPLMemberClass(this);
 
 	public REPLContext(DyvilREPL repl)
 	{
@@ -105,6 +105,7 @@ public class REPLContext extends DyvilHeader
 	{
 		this.currentCode = code;
 		this.className = REPL$CLASSES + "REPL$Result" + this.classIndex++;
+		this.memberClass.setName(Name.getQualified(this.className));
 		this.cleanup();
 	}
 
@@ -230,12 +231,11 @@ public class REPLContext extends DyvilHeader
 		field.compute(this.repl, this.compilableList);
 	}
 
-	private REPLMemberClass getREPLClass(IClassMember member)
+	private void initMember(IClassMember member)
 	{
-		REPLMemberClass iclass = new REPLMemberClass(Name.getQualified(this.className), member, this);
-		member.setEnclosingClass(iclass);
+		this.memberClass.setMember(member);
+		member.setEnclosingClass(this.memberClass);
 		member.getModifiers().addIntModifier(Modifiers.STATIC);
-		return iclass;
 	}
 
 	private void compileClass(IClass iclass)
@@ -276,7 +276,7 @@ public class REPLContext extends DyvilHeader
 		                                            modifierList, null);
 		field.setValue(value);
 
-		this.memberClass = this.getREPLClass(field);
+		this.initMember(field);
 
 		IType type = value.getType();
 		IValue typedValue = value.withType(type, type, this.markers, this);
@@ -465,7 +465,8 @@ public class REPLContext extends DyvilHeader
 	@Override
 	public void addDataMember(REPLVariable variable)
 	{
-		this.memberClass = this.getREPLClass(variable);
+		this.initMember(variable);
+
 		final Name variableName = variable.getName();
 
 		this.fields.put(variableName, variable);
@@ -488,9 +489,9 @@ public class REPLContext extends DyvilHeader
 	@Override
 	public void addProperty(IProperty property)
 	{
-		REPLMemberClass iclass = this.getREPLClass(property);
+		this.initMember(property);
 
-		property.setEnclosingClass(iclass);
+		property.setEnclosingClass(this.memberClass);
 		property.resolveTypes(this.markers, this);
 		property.resolve(this.markers, this);
 		property.checkTypes(this.markers, this);
@@ -508,7 +509,7 @@ public class REPLContext extends DyvilHeader
 		}
 		property.cleanup(this, this);
 
-		this.compileClass(iclass);
+		this.compileClass(this.memberClass);
 
 		this.properties.put(property.getName(), property);
 
@@ -522,7 +523,7 @@ public class REPLContext extends DyvilHeader
 	{
 		updateModifiers(method.getModifiers());
 
-		REPLMemberClass iclass = this.getREPLClass(method);
+		this.initMember(method);
 
 		method.resolveTypes(this.markers, this);
 		if (this.hasErrors())
@@ -546,7 +547,7 @@ public class REPLContext extends DyvilHeader
 		}
 		method.cleanup(this, this);
 
-		this.compileClass(iclass);
+		this.compileClass(this.memberClass);
 
 		this.registerMethod(method);
 	}

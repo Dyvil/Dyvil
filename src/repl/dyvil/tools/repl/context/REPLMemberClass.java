@@ -50,16 +50,9 @@ public class REPLMemberClass implements IClass
 	private Name         name;
 	private IClassMember member;
 
-	public REPLMemberClass(Name name, IClassMember member, REPLContext context)
+	public REPLMemberClass(REPLContext context)
 	{
-		this.name = name;
-		this.member = member;
 		this.context = context;
-	}
-
-	public void setMember(IClassMember member)
-	{
-		this.member = member;
 	}
 
 	@Override
@@ -73,15 +66,20 @@ public class REPLMemberClass implements IClass
 	{
 	}
 
-	@Override
-	public int getAccessLevel()
+	public IClassMember getMember()
 	{
-		return 0;
+		return this.member;
+	}
+
+	public void setMember(IClassMember member)
+	{
+		this.member = member;
 	}
 
 	@Override
 	public void setName(Name name)
 	{
+		this.name = name;
 	}
 
 	@Override
@@ -105,6 +103,12 @@ public class REPLMemberClass implements IClass
 	public IType getClassType()
 	{
 		return new ClassType(this);
+	}
+
+	@Override
+	public int getAccessLevel()
+	{
+		return 0;
 	}
 
 	@Override
