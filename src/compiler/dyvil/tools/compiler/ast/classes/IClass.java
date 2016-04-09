@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.classes;
 import dyvil.collection.Set;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationMetadata;
+import dyvil.tools.compiler.ast.classes.metadata.*;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;

@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.classes;
+package dyvil.tools.compiler.ast.classes.metadata;
 
 import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
