@@ -23,9 +23,6 @@ public final class Names
 	public static final Name newValue       = Name.getQualified("newValue");
 	public static final Name $0             = Name.getQualified("$0");
 
-	public static final Name writeReplace = Name.getQualified("writeReplace");
-	public static final Name readResolve  = Name.getQualified("readResolve");
-
 	public static final Name Function     = Name.getQualified("Function");
 	public static final Name Tuple        = Name.getQualified("Tuple");
 	public static final Name Union        = Name.getQualified("Union");

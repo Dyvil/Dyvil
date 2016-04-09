@@ -45,7 +45,11 @@ public final class CaseClassMetadata extends ClassMetadata
 	{
 		super.resolveTypesBody(markers, context);
 
-		this.checkMethods();
+		final IClassBody classBody = this.theClass.getBody();
+		if (classBody != null)
+		{
+			this.checkMembers(classBody);
+		}
 	}
 
 	@Override
@@ -61,7 +65,7 @@ public final class CaseClassMetadata extends ClassMetadata
 		// Generate the apply method signature
 
 		final CodeMethod applyMethod = new CodeMethod(this.theClass, Names.apply, this.theClass.getType(),
-		                                        new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC));
+		                                              new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC));
 		applyMethod.setTypeParameters(this.theClass.getTypeParameters(), this.theClass.typeParameterCount());
 
 		if (this.constructor != null && (this.members & CONSTRUCTOR) == 0)

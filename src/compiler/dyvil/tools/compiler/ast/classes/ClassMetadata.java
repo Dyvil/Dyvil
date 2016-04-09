@@ -7,6 +7,8 @@ import dyvil.tools.compiler.ast.constructor.CodeConstructor;
 import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -19,24 +21,26 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.transform.Names;
-import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public class ClassMetadata implements IClassMetadata
 {
-	protected static final int CONSTRUCTOR = 0x1;
-	protected static final int APPLY       = 0x2;
-	protected static final int EQUALS      = 0x4;
-	protected static final int HASHCODE    = 0x8;
-	protected static final int TOSTRING    = 0x10;
+	protected static final int CONSTRUCTOR = 1;
+	protected static final int APPLY       = 1 << 1;
+	protected static final int EQUALS      = 1 << 2;
+	protected static final int HASHCODE    = 1 << 3;
+	protected static final int TOSTRING    = 1 << 4;
+	protected static final int NULLVALUE   = 1 << 5;
+	protected static final int NILVALUE    = 1 << 6;
 
-	protected static final int READ_RESOLVE  = 0x1001;
-	protected static final int WRITE_REPLACE = 0x1002;
-	// protected static final int WRITE_OBJECT  = 0x1004;
-	// protected static final int READ_OBJECT   = 0x1008;
+	protected static final int READ_RESOLVE  = 1 << 7;
+	protected static final int WRITE_REPLACE = 1 << 8;
+	// protected static final int WRITE_OBJECT  = 1 << 9;
+	// protected static final int READ_OBJECT   = 1 << 10;
 
-	protected static final int INSTANCE_FIELD = 0x2001;
+	protected static final int INSTANCE_FIELD = 1 << 16;
+	protected static final int NULL_FIELD     = 1 << 17;
+	protected static final int NIL_FIELD      = 1 << 18;
 
 	protected final IClass theClass;
 
@@ -56,49 +60,79 @@ public class ClassMetadata implements IClassMetadata
 		return this.constructor;
 	}
 
-	protected void checkMethods()
+	protected void checkMembers(IClassBody body)
 	{
-		IClassBody body = this.theClass.getBody();
-		if (body != null)
+		for (int i = 0, count = body.methodCount(); i < count; i++)
 		{
-			int count = body.methodCount();
-			for (int i = 0; i < count; i++)
+			this.checkMethod(body.getMethod(i));
+		}
+
+		for (int i = 0, count = body.propertyCount(); i < count; i++)
+		{
+			final IMethod getter = body.getProperty(i).getGetter();
+			if (getter != null)
 			{
-				this.checkMethod(body.getMethod(i));
+				this.checkMethod(getter);
 			}
+
+			// only check the getter
+		}
+
+		for (int i = 0, count = body.fieldCount(); i < count; i++)
+		{
+			final IField field = body.getField(i);
+			this.checkField(field);
+
+			final IProperty property = field.getProperty();
+			final IMethod getter;
+			if (property != null && (getter = property.getGetter()) != null)
+			{
+				this.checkMethod(getter);
+			}
+
+			// only check the getter
+		}
+	}
+
+	private void checkField(IField field)
+	{
+		switch (field.getName().qualified)
+		{
+		case "NULL":
+			this.members |= NULL_FIELD;
+			return;
+		case "NIL":
+			this.members |= NIL_FIELD;
+			return;
+		case "instance":
+			this.members |= INSTANCE_FIELD;
 		}
 	}
 
 	private void checkMethod(IMethod method)
 	{
-		Name name = method.getName();
-		if (name == Names.equals)
+		switch (method.getName().unqualified)
 		{
+		case "equals":
 			if (method.parameterCount() == 1
 				    && method.getParameter(0).getInternalType().getTheClass() == Types.OBJECT_CLASS)
 			{
 				this.members |= EQUALS;
 			}
 			return;
-		}
-		if (name == Names.hashCode)
-		{
+		case "hashCode":
 			if (method.parameterCount() == 0)
 			{
 				this.members |= HASHCODE;
 			}
 			return;
-		}
-		if (name == Names.toString)
-		{
+		case "toString":
 			if (method.parameterCount() == 0)
 			{
 				this.members |= TOSTRING;
 			}
 			return;
-		}
-		if (name == Names.apply)
-		{
+		case "apply":
 			if (method.parameterCount() == this.theClass.parameterCount())
 			{
 				final int len = this.theClass.parameterCount();
@@ -115,12 +149,28 @@ public class ClassMetadata implements IClassMetadata
 				this.members |= APPLY;
 			}
 			return;
-		}
-		if (name == Names.readResolve || name == Names.writeReplace)
-		{
-			if (method.parameterCount() == 0 && method.getType().getTheClass() == Types.OBJECT_CLASS)
+		case "readResolve":
+			if (method.parameterCount() == 0)
 			{
-				this.members |= name == Names.writeReplace ? WRITE_REPLACE : READ_RESOLVE;
+				this.members |= READ_RESOLVE;
+			}
+			return;
+		case "writeReplace":
+			if (method.parameterCount() == 0)
+			{
+				this.members |= WRITE_REPLACE;
+			}
+			return;
+		case "nullValue":
+			if (method.parameterCount() == 0)
+			{
+				this.members |= NULLVALUE;
+			}
+			return;
+		case "nilValue":
+			if (method.parameterCount() == 0)
+			{
+				this.members |= NILVALUE;
 			}
 		}
 	}
