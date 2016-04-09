@@ -633,21 +633,24 @@ public class REPLContext extends DyvilHeader
 			IContext.getMethodMatch(list, receiver, name, arguments, method);
 		}
 
-		final Name removeEq = Util.removeEq(name);
-
-		IProperty property = this.properties.get(removeEq);
-		if (property != null)
+		if (name != null)
 		{
-			property.getMethodMatches(list, receiver, name, arguments);
-		}
+			final Name removeEq = Util.removeEq(name);
 
-		final IField field = this.fields.get(removeEq);
-		if (field != null)
-		{
-			property = field.getProperty();
+			IProperty property = this.properties.get(removeEq);
 			if (property != null)
 			{
 				property.getMethodMatches(list, receiver, name, arguments);
+			}
+
+			final IField field = this.fields.get(removeEq);
+			if (field != null)
+			{
+				property = field.getProperty();
+				if (property != null)
+				{
+					property.getMethodMatches(list, receiver, name, arguments);
+				}
 			}
 		}
 

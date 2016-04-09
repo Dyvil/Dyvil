@@ -39,6 +39,11 @@ public final class MethodMatchList
 		this.values[this.size] = match;
 		this.size++;
 	}
+
+	public IMethod getMethod(int index)
+	{
+		return this.methods[index];
+	}
 	
 	public IMethod getBestMethod()
 	{

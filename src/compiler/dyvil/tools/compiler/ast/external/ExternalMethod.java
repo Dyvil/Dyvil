@@ -204,7 +204,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	public float getSignatureMatch(Name name, IValue receiver, IArguments arguments)
 	{
 		// Fail fast
-		if (name != this.name)
+		if (name != this.name && name != null)
 		{
 			return 0;
 		}

@@ -502,15 +502,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return 0;
 		}
 
-		// Only matching the name
-		if (arguments == null)
-		{
-			return 1;
-		}
-
 		int parameterStartIndex = 0;
 		int totalMatch = 1;
-		int argumentCount = arguments.size();
 
 		// infix modifier implementation
 		if (receiver != null)
@@ -547,6 +540,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 		}
 
+		// Only matching the name
+		if (arguments == null)
+		{
+			return totalMatch;
+		}
+
+		final int argumentCount = arguments.size();
 		final int parametersLeft = this.parameterCount - parameterStartIndex;
 		if (argumentCount > parametersLeft && !this.isVariadic())
 		{
