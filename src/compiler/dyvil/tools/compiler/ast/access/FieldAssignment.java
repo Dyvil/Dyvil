@@ -36,6 +36,17 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	protected IDataMember field;
 	protected IType       type;
 
+	public FieldAssignment(IDataMember field, IValue value)
+	{
+		this.field = field;
+		this.value = value;
+
+		if (field != null)
+		{
+			this.name = field.getName();
+		}
+	}
+
 	public FieldAssignment(ICodePosition position)
 	{
 		this.position = position;

@@ -318,14 +318,16 @@ public class IfStatement implements IValue
 			return;
 		}
 
+		final IType commonType = this.getType();
+
 		dyvil.tools.asm.Label elseStart = new dyvil.tools.asm.Label();
 		dyvil.tools.asm.Label elseEnd = new dyvil.tools.asm.Label();
-		Object commonFrameType = this.commonType.getFrameType();
+		Object commonFrameType = commonType.getFrameType();
 
 		// Condition
 		this.condition.writeInvJump(writer, elseStart);
 		// If Block
-		this.then.writeExpression(writer, this.commonType);
+		this.then.writeExpression(writer, commonType);
 
 		if (!writer.hasReturn())
 		{
@@ -338,11 +340,11 @@ public class IfStatement implements IValue
 		// Else Block
 		if (this.elseThen == null)
 		{
-			this.commonType.writeDefaultValue(writer);
+			commonType.writeDefaultValue(writer);
 		}
 		else
 		{
-			this.elseThen.writeExpression(writer, this.commonType);
+			this.elseThen.writeExpression(writer, commonType);
 		}
 
 		if (!writer.hasReturn())

@@ -30,9 +30,16 @@ public class ConstructorCall implements ICall
 
 	protected IConstructor constructor;
 
-	protected ConstructorCall()
+	public ConstructorCall()
 	{
 		this.arguments = EmptyArguments.INSTANCE;
+	}
+
+	public ConstructorCall(IConstructor constructor, IArguments arguments)
+	{
+		this.constructor = constructor;
+		this.type = constructor.getType();
+		this.arguments = arguments;
 	}
 
 	public ConstructorCall(ICodePosition position)
