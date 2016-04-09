@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.tools.compiler.ast.classes.AnonymousClass;
-import dyvil.tools.compiler.ast.classes.AnonymousClassMetadata;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -18,30 +17,29 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class ClassConstructor extends ConstructorCall
 {
-	private AnonymousClass         nestedClass;
-	private AnonymousClassMetadata metadata;
-	
+	private AnonymousClass nestedClass;
+
 	public ClassConstructor(ICodePosition position)
 	{
 		this.position = position;
 		this.nestedClass = new AnonymousClass(position);
 	}
-	
+
 	public ClassConstructor(ICodePosition position, IType type, IArguments arguments)
 	{
 		super(position, type, arguments);
 	}
-	
+
 	public AnonymousClass getNestedClass()
 	{
 		return this.nestedClass;
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		super.resolveTypes(markers, context);
-		
+
 		if (this.type.getTheClass().isInterface())
 		{
 			this.nestedClass.addInterface(this.type);
@@ -53,13 +51,13 @@ public class ClassConstructor extends ConstructorCall
 
 		this.nestedClass.resolveTypes(markers, context);
 	}
-	
+
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
 		this.type.resolve(markers, context);
 		this.arguments.resolve(markers, context);
-		
+
 		if (this.type.getTheClass().isInterface())
 		{
 			this.constructor = IContext.resolveConstructor(Types.OBJECT_CLASS, this.arguments);
@@ -75,9 +73,8 @@ public class ClassConstructor extends ConstructorCall
 
 		final IClass enclosingClass = context.getThisClass();
 		assert enclosingClass != null;
-		
-		this.metadata = new AnonymousClassMetadata(this.nestedClass, this.constructor);
-		this.nestedClass.setMetadata(this.metadata);
+
+		this.nestedClass.setConstructor(this.constructor);
 		this.nestedClass.setEnclosingClass(enclosingClass);
 
 		final IDyvilHeader header = enclosingClass.getHeader();
@@ -89,7 +86,7 @@ public class ClassConstructor extends ConstructorCall
 		this.nestedClass.resolve(markers, context);
 		return this;
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -97,7 +94,7 @@ public class ClassConstructor extends ConstructorCall
 
 		this.nestedClass.checkTypes(markers, context);
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
@@ -105,36 +102,36 @@ public class ClassConstructor extends ConstructorCall
 
 		this.nestedClass.check(markers, context);
 	}
-	
+
 	@Override
 	public IValue foldConstants()
 	{
 		this.arguments.foldConstants();
-		
+
 		this.nestedClass.foldConstants();
 		return this;
 	}
-	
+
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		this.arguments.cleanup(context, compilableList);
 		this.nestedClass.cleanup(context, compilableList);
-		
+
 		return this;
 	}
-	
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		this.metadata.writeConstructorCall(writer, this.arguments);
+		this.nestedClass.writeConstructorCall(writer, this.arguments);
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		super.toString(prefix, buffer);
-		
+
 		IClassBody body = this.nestedClass.getBody();
 		if (body != null)
 		{
