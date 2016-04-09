@@ -41,18 +41,6 @@ public final class CaseClassMetadata extends ClassMetadata
 	}
 
 	@Override
-	public void resolveTypesBody(MarkerList markers, IContext context)
-	{
-		super.resolveTypesBody(markers, context);
-
-		final IClassBody classBody = this.theClass.getBody();
-		if (classBody != null)
-		{
-			this.checkMembers(classBody);
-		}
-	}
-
-	@Override
 	public void resolveTypesGenerate(MarkerList markers, IContext context)
 	{
 		super.resolveTypesGenerate(markers, context);

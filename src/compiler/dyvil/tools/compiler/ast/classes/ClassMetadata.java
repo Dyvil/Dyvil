@@ -1,26 +1,34 @@
 package dyvil.tools.compiler.ast.classes;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.access.ClassParameterSetter;
-import dyvil.tools.compiler.ast.access.InitializerCall;
+import dyvil.tools.compiler.ast.access.*;
+import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.constant.StringValue;
 import dyvil.tools.compiler.ast.constructor.CodeConstructor;
 import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.NilExpr;
+import dyvil.tools.compiler.ast.field.Field;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
+import dyvil.tools.compiler.ast.intrinsic.NullCheckOperator;
+import dyvil.tools.compiler.ast.method.CodeMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
-import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.IParametric;
-import dyvil.tools.compiler.ast.parameter.MethodParameter;
+import dyvil.tools.compiler.ast.parameter.*;
+import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public class ClassMetadata implements IClassMetadata
@@ -42,12 +50,18 @@ public class ClassMetadata implements IClassMetadata
 	protected static final int NULL_FIELD     = 1 << 17;
 	protected static final int NIL_FIELD      = 1 << 18;
 
+	public static final Name NULL      = Name.getQualified("NULL");
+	public static final Name nullValue = Name.getQualified("nullValue");
+
 	protected final IClass theClass;
+
+	protected int members;
 
 	protected IConstructor    constructor;
 	protected InitializerCall superInitializer;
 
-	protected int members;
+	protected IField  nullField;
+	protected IMethod nullValueMethod;
 
 	public ClassMetadata(IClass iclass)
 	{
@@ -60,7 +74,7 @@ public class ClassMetadata implements IClassMetadata
 		return this.constructor;
 	}
 
-	protected void checkMembers(IClassBody body)
+	private void checkMembers(IClassBody body)
 	{
 		for (int i = 0, count = body.methodCount(); i < count; i++)
 		{
@@ -100,12 +114,14 @@ public class ClassMetadata implements IClassMetadata
 		{
 		case "NULL":
 			this.members |= NULL_FIELD;
+			this.nullField = field;
 			return;
 		case "NIL":
 			this.members |= NIL_FIELD;
 			return;
 		case "instance":
 			this.members |= INSTANCE_FIELD;
+			this.setInstanceField(field);
 		}
 	}
 
@@ -191,8 +207,14 @@ public class ClassMetadata implements IClassMetadata
 		// Check if a constructor needs to be generated
 
 		final IClassBody body = this.theClass.getBody();
-		if (body == null || body.constructorCount() <= 0)
+		if (body == null)
 		{
+			return;
+		}
+
+		this.checkMembers(body);
+
+		if (body.constructorCount() <= 0) {
 			return;
 		}
 
@@ -202,6 +224,7 @@ public class ClassMetadata implements IClassMetadata
 		{
 			this.constructor = constructor;
 			this.members |= CONSTRUCTOR;
+			return;
 		}
 
 		if (parameterCount == 0)
@@ -213,19 +236,66 @@ public class ClassMetadata implements IClassMetadata
 	@Override
 	public void resolveTypesGenerate(MarkerList markers, IContext context)
 	{
-		if ((this.members & CONSTRUCTOR) != 0)
+		if ((this.members & CONSTRUCTOR) == 0)
 		{
-			return;
+			// Generate the constructor signature
+
+			final CodeConstructor constructor = new CodeConstructor(this.theClass,
+			                                                        new FlagModifierSet(Modifiers.PUBLIC));
+
+			this.copyClassParameters(constructor);
+
+			constructor.resolveTypes(markers, context);
+			this.constructor = constructor;
 		}
 
-		// Generate the constructor signature
+		if (this.theClass.hasModifier(Modifiers.NULL_CLASS))
+		{
+			this.generateNullMembers(markers);
+		}
+	}
 
-		CodeConstructor constructor = new CodeConstructor(this.theClass, new FlagModifierSet(Modifiers.PUBLIC));
+	private void generateNullMembers(MarkerList markers)
+	{
+		// Generate the NilConvertible annotation
+		if (this.theClass.getAnnotation(NilExpr.LazyFields.NIL_CONVERTIBLE_CLASS) == null)
+		{
+			final Annotation annotation = new Annotation(this.theClass.getPosition(),
+			                                             NilExpr.LazyFields.NIL_CONVERTIBLE_CLASS.getClassType());
+			annotation.setArguments(new SingleArgument(new StringValue("nullValue")));
+			this.theClass.addAnnotation(annotation); // @NilConvertible("nullValue")
+		}
 
-		this.copyClassParameters(constructor);
+		// Generate the NULL field
+		if ((this.members & NULL_FIELD) == 0)
+		{
+			this.nullField = new Field(this.theClass, NULL, this.theClass.getClassType(),
+			                                       new FlagModifierSet(Modifiers.PRIVATE | Modifiers.STATIC));
+		}
+		else
+		{
+			markers.add(Markers.semanticError(this.nullField.getPosition(), "class.null.field", this.theClass.getName()));
+		}
 
-		constructor.resolveTypes(markers, context);
-		this.constructor = constructor;
+		// Generate the nullValue() method
+		if ((this.members & NULLVALUE) == 0)
+		{
+			// public static TypeName nullValue() = if (NULL != null) NULL else NULL = new TypeName(0, false, null, ...)
+
+			final FieldAccess fieldAccess = new FieldAccess(this.nullField);
+			this.nullValueMethod = new CodeMethod(this.theClass, nullValue, this.theClass.getClassType(),
+			                                      new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC));
+
+			final ArgumentList arguments = new ArgumentList();
+			for (int i = 0, count = this.theClass.parameterCount(); i < count; i++)
+			{
+				arguments.addValue(this.theClass.getParameter(i).getInternalType().getDefaultValue());
+			}
+
+			final IValue value = new ConstructorCall(this.constructor, arguments);
+			this.nullValueMethod.setValue(new IfStatement(new NullCheckOperator(fieldAccess, false), fieldAccess,
+			                                              new FieldAssignment(this.nullField, value)));
+		}
 	}
 
 	protected void copyClassParameters(IParametric constructor)
@@ -251,6 +321,25 @@ public class ClassMetadata implements IClassMetadata
 		}
 
 		constructor.setParameters(parameters, parameterCount);
+	}
+
+	@Override
+	public IDataMember resolveField(Name name)
+	{
+		if (name == NULL && this.nullField != null)
+		{
+			return this.nullField;
+		}
+		return null;
+	}
+
+	@Override
+	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	{
+		if (name == nullValue && this.nullValueMethod != null)
+		{
+			IContext.getMethodMatch(list, instance, name, arguments, this.nullValueMethod);
+		}
 	}
 
 	@Override
@@ -337,11 +426,18 @@ public class ClassMetadata implements IClassMetadata
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		if ((this.members & CONSTRUCTOR) != 0)
+		if ((this.members & CONSTRUCTOR) == 0)
 		{
-			return;
+			this.constructor.write(writer);
 		}
 
-		this.constructor.write(writer);
+		if (this.nullField != null && (this.members & NULL_FIELD) == 0)
+		{
+			this.nullField.write(writer);
+		}
+		if (this.nullValueMethod != null && (this.members & NULLVALUE) == 0)
+		{
+			this.nullValueMethod.write(writer);
+		}
 	}
 }
