@@ -1,0 +1,35 @@
+package dyvil.test
+
+import java.io._
+
+public class ObjectTest
+{
+	public object TestObject
+
+	public static void main([String] args)
+	{
+		let obj = TestObject.instance
+
+		Main.test("Object Equality", TestObject, obj)
+		Main.test("Object hashCode", TestObject.hashCode, obj.hashCode)
+
+		Main.test("Object toString", "TestObject", TestObject.toString)
+
+		// ---- Serialize ----
+
+		let bos = new ByteArrayOutputStream
+		let oos = new ObjectOutputStream(bos)
+
+		oos.writeObject(TestObject)
+		oos.close()
+
+		let bytes = bos.toByteArray
+
+		// ---- Deserialize ----
+
+		let ois = new ObjectInputStream(new ByteArrayInputStream(bytes))
+		let deserialized = ois.readObject
+
+		Main.test("Object Serialization", TestObject, deserialized)
+	}
+}
