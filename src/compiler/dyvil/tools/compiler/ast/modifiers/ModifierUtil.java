@@ -85,6 +85,10 @@ public final class ModifierUtil
 			return BaseModifiers.CONST;
 		case DyvilKeywords.LAZY:
 			return BaseModifiers.LAZY;
+		case DyvilKeywords.NIL:
+			return BaseModifiers.NIL;
+		case DyvilKeywords.NULL:
+			return BaseModifiers.NULL;
 		}
 		return null;
 	}
