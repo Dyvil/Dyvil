@@ -793,6 +793,22 @@ public final class DyvilLexer
 			this.buffer.append('\f');
 			this.parseIndex += 2;
 			return;
+		case 'v':
+			this.buffer.append('\u000B'); // U+000B VERTICAL TABULATION
+			this.parseIndex += 2;
+			return;
+		case 'a':
+			this.buffer.append('\u0007'); // U+0007 BELL
+			this.parseIndex += 2;
+			return;
+		case 'e':
+			this.buffer.append('\u001B'); // U+001B ESCAPE
+			this.parseIndex += 2;
+			return;
+		case '0':
+			this.buffer.append('\0'); // U+0000 NULL
+			this.parseIndex += 2;
+			return;
 		case 'u':
 			int buf = 0;
 			this.parseIndex += 2;
