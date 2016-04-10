@@ -33,7 +33,6 @@ import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Mutability;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -390,29 +389,14 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public IType resolveType(Name name)
+	public ITypeParameter resolveTypeParameter(Name name)
 	{
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			ITypeParameter var = this.typeParameters[i];
-			if (var.getName() == name)
+			final ITypeParameter typeParameter = this.typeParameters[i];
+			if (typeParameter.getName() == name)
 			{
-				return new TypeVarType(var);
-			}
-		}
-
-		return null;
-	}
-
-	@Override
-	public ITypeParameter resolveTypeVariable(Name name)
-	{
-		for (int i = 0; i < this.typeParameterCount; i++)
-		{
-			ITypeParameter var = this.typeParameters[i];
-			if (var.getName() == name)
-			{
-				return var;
+				return typeParameter;
 			}
 		}
 

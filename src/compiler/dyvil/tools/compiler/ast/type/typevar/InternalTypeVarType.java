@@ -29,7 +29,7 @@ public class InternalTypeVarType extends InternalType
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
-		ITypeParameter typeVar = context.resolveTypeVariable(Name.getQualified(this.internalName));
+		ITypeParameter typeVar = context.resolveTypeParameter(Name.getQualified(this.internalName));
 		if (typeVar == null)
 		{
 			return this;

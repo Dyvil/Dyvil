@@ -31,6 +31,7 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
@@ -445,14 +446,14 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public IType resolveType(Name name)
+	public ITypeAlias resolveTypeAlias(Name name, int arity)
 	{
 		if ((this.resolved & INNER_TYPES) == 0)
 		{
 			this.resolveInnerTypes();
 		}
 
-		return super.resolveType(name);
+		return super.resolveTypeAlias(name, arity);
 	}
 
 	@Override

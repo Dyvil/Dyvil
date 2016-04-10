@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
-import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.parsing.Name;
 
 public class ExternalHeader extends DyvilHeader
@@ -100,14 +100,14 @@ public class ExternalHeader extends DyvilHeader
 	}
 
 	@Override
-	public IType resolveType(Name name)
+	public ITypeAlias resolveTypeAlias(Name name, int arity)
 	{
 		if ((this.resolved & TYPE_ALIASES) == 0)
 		{
 			this.resolveTypeAliases();
 		}
 
-		return super.resolveType(name);
+		return super.resolveTypeAlias(name, arity);
 	}
 
 	@Override

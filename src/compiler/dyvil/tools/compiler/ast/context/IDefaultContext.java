@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.parsing.Name;
 
 public interface IDefaultContext extends IStaticContext
@@ -44,7 +45,7 @@ public interface IDefaultContext extends IStaticContext
 	}
 	
 	@Override
-	default IType resolveType(Name name)
+	default ITypeAlias resolveTypeAlias(Name name, int arity)
 	{
 		return null;
 	}

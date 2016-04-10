@@ -8,7 +8,6 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
@@ -157,14 +156,14 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	}
 
 	@Override
-	public IType resolveType(Name name)
+	public ITypeParameter resolveTypeParameter(Name name)
 	{
 		for (int i = 0; i < this.typeVariableCount; i++)
 		{
-			ITypeParameter typeVariable = this.typeVariables[i];
+			final ITypeParameter typeVariable = this.typeVariables[i];
 			if (typeVariable.getName() == name)
 			{
-				return new TypeVarType(typeVariable);
+				return typeVariable;
 			}
 		}
 

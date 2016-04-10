@@ -357,17 +357,10 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	}
 
 	@Override
-	default IType resolveType(Name name)
+	default ITypeParameter resolveTypeParameter(Name name)
 	{
 		final IClass theClass = this.getTheClass();
-		return theClass == null ? null : theClass.resolveType(name);
-	}
-
-	@Override
-	default ITypeParameter resolveTypeVariable(Name name)
-	{
-		final IClass theClass = this.getTheClass();
-		return theClass == null ? null : theClass.resolveTypeVariable(name);
+		return theClass == null ? null : theClass.resolveTypeParameter(name);
 	}
 
 	@Override

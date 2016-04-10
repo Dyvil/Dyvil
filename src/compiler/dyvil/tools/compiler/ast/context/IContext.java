@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -17,7 +18,11 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.raw.ClassType;
+import dyvil.tools.compiler.ast.type.raw.PackageType;
+import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.parsing.Name;
 
@@ -65,11 +70,10 @@ public interface IContext extends IMemberContext
 	@Override
 	IClass resolveClass(Name name);
 
-	@Override
-	IType resolveType(Name name);
+	ITypeAlias resolveTypeAlias(Name name, int arity);
 
 	@Override
-	ITypeParameter resolveTypeVariable(Name name);
+	ITypeParameter resolveTypeParameter(Name name);
 
 	IOperator resolveOperator(Name name, int type);
 
@@ -123,15 +127,37 @@ public interface IContext extends IMemberContext
 		return Types.LANG_HEADER.resolveClass(name);
 	}
 
-	static IType resolveType(IMemberContext context, Name name)
+	static IType resolveType(IContext context, Name name)
 	{
-		IType itype = context.resolveType(name);
-		if (itype != null)
+		final IClass theClass = context.resolveClass(name);
+		if (theClass != null)
 		{
-			return itype;
+			return new ClassType(theClass);
 		}
 
-		return Types.LANG_HEADER.resolveType(name);
+		final ITypeParameter typeParameter = context.resolveTypeParameter(name);
+		if (typeParameter != null)
+		{
+			return new TypeVarType(typeParameter);
+		}
+
+		final Package thePackage = Package.rootPackage.resolvePackage(name);
+		if (thePackage != null)
+		{
+			return new PackageType(thePackage);
+		}
+
+		final ITypeAlias type = context.resolveTypeAlias(name, 0);
+		if (type != null)
+		{
+			return type.getType().getConcreteType(ITypeContext.DEFAULT);
+		}
+
+		if (context != Types.LANG_HEADER)
+		{
+			return resolveType(Types.LANG_HEADER, name);
+		}
+		return null;
 	}
 
 	static IOperator resolveOperator(IContext context, Name name, int type)

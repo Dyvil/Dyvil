@@ -77,12 +77,6 @@ public class PackageType implements IRawType
 	}
 
 	@Override
-	public IType resolveType(Name name)
-	{
-		return this.thePackage.resolveType(name);
-	}
-
-	@Override
 	public Package resolvePackage(Name name)
 	{
 		return this.thePackage.resolvePackage(name);

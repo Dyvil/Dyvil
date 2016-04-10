@@ -29,6 +29,7 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -436,15 +437,15 @@ public class REPLMemberClass implements IClass
 	}
 
 	@Override
-	public IType resolveType(Name name)
+	public ITypeAlias resolveTypeAlias(Name name, int arity)
 	{
-		return this.context.resolveType(name);
+		return this.context.resolveTypeAlias(name, arity);
 	}
 
 	@Override
-	public ITypeParameter resolveTypeVariable(Name name)
+	public ITypeParameter resolveTypeParameter(Name name)
 	{
-		return this.context.resolveTypeVariable(name);
+		return this.context.resolveTypeParameter(name);
 	}
 
 	@Override

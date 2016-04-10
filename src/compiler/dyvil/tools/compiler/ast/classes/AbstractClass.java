@@ -24,7 +24,6 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
-import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Deprecation;
@@ -750,40 +749,14 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public IType resolveType(Name name)
-	{
-		if (name == this.name)
-		{
-			return this.thisType;
-		}
-
-		for (int i = 0; i < this.typeParameterCount; i++)
-		{
-			ITypeParameter var = this.typeParameters[i];
-			if (var.getName() == name)
-			{
-				return new TypeVarType(var);
-			}
-		}
-
-		final IClass innerClass = this.resolveInnerClass(name);
-		if (innerClass != null)
-		{
-			return innerClass.getClassType();
-		}
-
-		return null;
-	}
-
-	@Override
-	public ITypeParameter resolveTypeVariable(Name name)
+	public ITypeParameter resolveTypeParameter(Name name)
 	{
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			ITypeParameter var = this.typeParameters[i];
-			if (var.getName() == name)
+			final ITypeParameter typeParameter = this.typeParameters[i];
+			if (typeParameter.getName() == name)
 			{
-				return var;
+				return typeParameter;
 			}
 		}
 

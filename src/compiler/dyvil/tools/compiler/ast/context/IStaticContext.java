@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.parsing.Name;
 
 public interface IStaticContext extends IContext
@@ -51,10 +52,10 @@ public interface IStaticContext extends IContext
 	IClass resolveClass(Name name);
 	
 	@Override
-	IType resolveType(Name name);
+	ITypeAlias resolveTypeAlias(Name name, int arity);
 	
 	@Override
-	default ITypeParameter resolveTypeVariable(Name name)
+	default ITypeParameter resolveTypeParameter(Name name)
 	{
 		return null;
 	}
