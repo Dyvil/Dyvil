@@ -3,6 +3,7 @@ package dyvil.tools.compiler.util;
 import dyvil.string.CharUtils;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -17,26 +18,37 @@ public final class Util
 {
 	// region Member & AST toString
 
-	public static void memberSignatureToString(IMember member, StringBuilder stringBuilder)
-	{
-		member.getType().toString("", stringBuilder);
-		stringBuilder.append(' ').append(member.getName());
-	}
-
-	public static String methodSignatureToString(IMethod method)
+	public static String memberSignatureToString(IMember member, ITypeContext typeContext)
 	{
 		final StringBuilder stringBuilder = new StringBuilder();
-		methodSignatureToString(method, stringBuilder);
+		memberSignatureToString(member, typeContext, stringBuilder);
+		return stringBuilder.toString();
+	}
+
+	public static void memberSignatureToString(IMember member, ITypeContext typeContext, StringBuilder stringBuilder)
+	{
+		stringBuilder.append(member.getName()).append(": ");
+
+		ITypeContext.apply(typeContext, member.getType()).toString("", stringBuilder);
+	}
+
+	public static String methodSignatureToString(IMethod method, ITypeContext typeContext)
+	{
+		final StringBuilder stringBuilder = new StringBuilder();
+		methodSignatureToString(method, typeContext, stringBuilder);
 		return stringBuilder.toString();
 	}
 	
-	public static void methodSignatureToString(IMethod method, StringBuilder stringBuilder)
+	public static void methodSignatureToString(IMethod method, ITypeContext typeContext, StringBuilder stringBuilder)
 	{
-		memberSignatureToString(method, stringBuilder);
-		
+		stringBuilder.append(method.getName());
+
 		typeParametersToString(method, stringBuilder);
-		
+
 		parametersToString(method, stringBuilder);
+
+		stringBuilder.append(": ");
+		ITypeContext.apply(typeContext, method.getType()).toString("", stringBuilder);
 	}
 
 	public static void classSignatureToString(IClass iClass, StringBuilder stringBuilder)

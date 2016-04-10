@@ -9,7 +9,6 @@ import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
@@ -19,6 +18,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.ParserManager;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -115,14 +115,14 @@ public class CompleteCommand implements ICommand
 		{
 			if (variable.getName().startWith(start))
 			{
-				fields.add(getSignature(variable, Types.UNKNOWN));
+				fields.add(Util.memberSignatureToString(variable, Types.UNKNOWN));
 			}
 		}
 		for (IMethod method : context.getMethods())
 		{
 			if (method.getName().startWith(start))
 			{
-				methods.add(getSignature(method, Types.UNKNOWN));
+				methods.add(Util.memberSignatureToString(method, Types.UNKNOWN));
 			}
 		}
 
@@ -221,7 +221,7 @@ public class CompleteCommand implements ICommand
 			final IMethod method = matchList.getMethod(i);
 			if (matches(memberStart, method, true))
 			{
-				methods.add(getSignature(method, null));
+				methods.add(Util.methodSignatureToString(method, null));
 			}
 		}
 	}
@@ -241,7 +241,7 @@ public class CompleteCommand implements ICommand
 			final IParameter parameter = iclass.getParameter(i);
 			if (matches(start, parameter, statics))
 			{
-				fields.add(getSignature(parameter, type));
+				fields.add(Util.memberSignatureToString(parameter, type));
 			}
 		}
 
@@ -253,7 +253,7 @@ public class CompleteCommand implements ICommand
 				final IField field = body.getField(i);
 				if (matches(start, field, statics))
 				{
-					fields.add(getSignature(field, type));
+					fields.add(Util.memberSignatureToString(field, type));
 				}
 			}
 
@@ -262,7 +262,7 @@ public class CompleteCommand implements ICommand
 				final IProperty property = body.getProperty(i);
 				if (matches(start, property, statics))
 				{
-					properties.add(getSignature(property, type));
+					properties.add(Util.memberSignatureToString(property, type));
 				}
 			}
 
@@ -271,7 +271,7 @@ public class CompleteCommand implements ICommand
 				final IMethod method = body.getMethod(i);
 				if (matches(start, method, statics))
 				{
-					methods.add(getSignature(method, type));
+					methods.add(Util.memberSignatureToString(method, type));
 				}
 			}
 		}
@@ -308,32 +308,5 @@ public class CompleteCommand implements ICommand
 
 		int modifiers = member.getModifiers().toFlags();
 		return (modifiers & Modifiers.PUBLIC) != 0 && statics == ((modifiers & Modifiers.STATIC) != 0);
-	}
-
-	private static String getSignature(IMember member, ITypeContext typeContext)
-	{
-		final StringBuilder builder = new StringBuilder().append(member.getName()).append(" : ");
-		member.getType().getConcreteType(typeContext).toString("", builder);
-		return builder.toString();
-	}
-
-	private static String getSignature(IMethod method, ITypeContext typeContext)
-	{
-		final StringBuilder builder = new StringBuilder().append(method.getName()).append('(');
-
-		int paramCount = method.parameterCount();
-		if (paramCount > 0)
-		{
-			method.getParameter(0).getType().getConcreteType(typeContext).toString("", builder);
-			for (int i = 1; i < paramCount; i++)
-			{
-				builder.append(", ");
-				method.getParameter(i).getType().getConcreteType(typeContext).toString("", builder);
-			}
-		}
-
-		builder.append(") : ");
-		method.getType().getConcreteType(typeContext).toString("", builder);
-		return builder.toString();
 	}
 }

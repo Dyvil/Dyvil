@@ -133,7 +133,7 @@ public final class LiteralConversion implements IValue
 			marker.addInfo(Markers.getSemantic("literal.type.conversion", this.type));
 
 			final StringBuilder stringBuilder = new StringBuilder();
-			Util.methodSignatureToString(this.method, stringBuilder);
+			Util.methodSignatureToString(this.method, typeContext, stringBuilder);
 			marker.addInfo(Markers.getSemantic("literal.type.method", stringBuilder.toString()));
 			
 			markers.add(marker);

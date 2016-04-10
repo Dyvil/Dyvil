@@ -32,7 +32,7 @@ public class MethodsCommand implements ICommand
 		for (IMethod method : context.getMethods())
 		{
 			StringBuilder builder = new StringBuilder();
-			Util.methodSignatureToString(method, builder);
+			Util.methodSignatureToString(method, null, builder);
 			repl.getOutput().println(builder.toString());
 		}
 	}

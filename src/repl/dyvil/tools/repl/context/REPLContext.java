@@ -514,7 +514,7 @@ public class REPLContext extends DyvilHeader
 		this.properties.put(property.getName(), property);
 
 		StringBuilder buf = new StringBuilder("Defined Property '");
-		Util.memberSignatureToString(property, buf);
+		Util.memberSignatureToString(property, null, buf);
 		this.compiler.getOutput().println(buf.append('\'').toString());
 	}
 
@@ -587,7 +587,7 @@ public class REPLContext extends DyvilHeader
 		}
 
 		buf.append('\'');
-		Util.methodSignatureToString(method, buf);
+		Util.methodSignatureToString(method, null, buf);
 		this.compiler.getOutput().println(buf.append('\'').toString());
 	}
 
