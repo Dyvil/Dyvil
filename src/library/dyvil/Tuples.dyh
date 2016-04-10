@@ -1,0 +1,11 @@
+package dyvil
+
+// Import all Tuple* classes
+import	dyvil.tuple._
+
+// Import Tuple types with more useful names
+import	dyvil.tuple.{ Tuple2 => Pair, Tuple3 => Triple }
+
+// Tuple Type Aliases
+type	Pair<A, B>			= (A, B)
+type	Triple<A, B, C>		= (A, B, C)

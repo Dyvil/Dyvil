@@ -1,6 +1,7 @@
 package dyvil.test
 
 include dyvil.Collections
+include dyvil.Functions
 
 public class LambdaTest
 {

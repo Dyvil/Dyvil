@@ -1,0 +1,8 @@
+package dyvil
+
+// Import all Function* classes
+import	dyvil.function._
+
+// Use special Function conversion methods
+using	dyvil.lang.FunctionConversions._
+
