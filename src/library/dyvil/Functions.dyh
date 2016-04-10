@@ -6,3 +6,17 @@ import	dyvil.function._
 // Use special Function conversion methods
 using	dyvil.lang.FunctionConversions._
 
+// Function Type Aliases
+type	Function<R>	= => R
+type	Function<P1, R>		= P1 => R
+type	Function<P1, P2, R>	= (P1, P2) => R
+type	Function<P1, P2, P3, R>		= (P1, P2, P3) => R
+type	Function<P1, P2, P3, P4, R>	= (P1, P2, P4, P3) => R
+type	Function<P1, P2, P3, P4, P5, R>		= (P1, P2, P3, P4, P5) => R
+type	Function<P1, P2, P3, P4, P5, P6, R>	= (P1, P2, P3, P4, P5, P6) => R
+type	Function<P1, P2, P3, P4, P5, P6, P7, R>		= (P1, P2, P3, P4, P5, P6, P7) => R
+type	Function<P1, P2, P3, P4, P5, P6, P7, P8, R>	= (P1, P2, P3, P4, P5, P6, P7, P8) => R
+type	Function<P1, P2, P3, P4, P5, P6, P7, P8, P9, R>			= (P1, P2, P3, P4, P5, P6, P7, P8, P9) => R
+type	Function<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, R>	= (P1, P2, P3, P4, P5, P6, P7, P8, P9, P10) => R
+
+
