@@ -6,5 +6,5 @@ public interface ITypeAliasMap
 {
 	void addTypeAlias(ITypeAlias typeAlias);
 	
-	ITypeAlias getTypeAlias(Name name);
+	ITypeAlias resolveTypeAlias(Name name, int arity);
 }

@@ -94,7 +94,7 @@ public interface IDyvilHeader extends IObjectCompilable, IStaticContext, IClassL
 	int typeAliasCount();
 	
 	@Override
-	ITypeAlias getTypeAlias(Name name);
+	ITypeAlias resolveTypeAlias(Name name, int arity);
 
 	ITypeAlias getTypeAlias(int index);
 

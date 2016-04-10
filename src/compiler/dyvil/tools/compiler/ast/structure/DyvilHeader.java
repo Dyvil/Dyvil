@@ -406,17 +406,38 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 
 	@Override
-	public ITypeAlias getTypeAlias(Name name)
+	public ITypeAlias resolveTypeAlias(Name name, int arity)
 	{
+		ITypeAlias candidate = null;
 		for (int i = 0; i < this.typeAliasCount; i++)
 		{
 			final ITypeAlias typeAlias = this.typeAliases[i];
 			if (typeAlias.getName() == name)
 			{
-				return typeAlias;
+				if (typeAlias.typeParameterCount() == arity)
+				{
+					return typeAlias;
+				}
+
+				if (candidate == null)
+				{
+					candidate = typeAlias;
+				}
 			}
 		}
+		if (candidate != null)
+		{
+			return candidate;
+		}
 
+		for (int i = 0; i < this.includeCount; i++)
+		{
+			final ITypeAlias includedTypeAlias = this.includes[i].resolveTypeAlias(name, arity);
+			if (includedTypeAlias != null)
+			{
+				return includedTypeAlias;
+			}
+		}
 		return null;
 	}
 
@@ -636,26 +657,6 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		if (this.pack != null)
 		{
 			return this.pack.resolveClass(name);
-		}
-		return null;
-	}
-
-	@Override
-	public ITypeAlias resolveTypeAlias(Name name, int arity)
-	{
-		final ITypeAlias typeAlias = this.getTypeAlias(name);
-		if (typeAlias != null)
-		{
-			return typeAlias;
-		}
-
-		for (int i = 0; i < this.includeCount; i++)
-		{
-			final ITypeAlias includedTypeAlias = this.includes[i].resolveTypeAlias(name, arity);
-			if (includedTypeAlias != null)
-			{
-				return includedTypeAlias;
-			}
 		}
 		return null;
 	}

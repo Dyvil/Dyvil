@@ -8,7 +8,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -150,7 +149,7 @@ public interface IContext extends IMemberContext
 		final ITypeAlias type = context.resolveTypeAlias(name, 0);
 		if (type != null)
 		{
-			return type.getType().getConcreteType(ITypeContext.DEFAULT);
+			return type.getType();
 		}
 
 		if (context != Types.LANG_HEADER)
