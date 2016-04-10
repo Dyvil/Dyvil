@@ -50,9 +50,10 @@ public class REPLMemberClass implements IClass
 	private Name         name;
 	private IClassMember member;
 
-	public REPLMemberClass(REPLContext context)
+	public REPLMemberClass(REPLContext context, Name name)
 	{
 		this.context = context;
+		this.name = name;
 	}
 
 	@Override

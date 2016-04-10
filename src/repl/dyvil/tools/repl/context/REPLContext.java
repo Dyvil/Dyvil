@@ -69,7 +69,7 @@ public class REPLContext extends DyvilHeader
 	protected final List<IClassCompilable> compilableList = new ArrayList<>();
 	protected final List<IClassCompilable> innerClassList = new ArrayList<>();
 
-	private REPLMemberClass memberClass = new REPLMemberClass(this);
+	private REPLMemberClass memberClass;
 
 	public REPLContext(DyvilREPL repl)
 	{
@@ -105,7 +105,7 @@ public class REPLContext extends DyvilHeader
 	{
 		this.currentCode = code;
 		this.className = REPL$CLASSES + "REPL$Result" + this.classIndex++;
-		this.memberClass.setName(Name.getQualified(this.className));
+		this.memberClass = new REPLMemberClass(this, Name.getQualified(this.className));
 		this.cleanup();
 	}
 
