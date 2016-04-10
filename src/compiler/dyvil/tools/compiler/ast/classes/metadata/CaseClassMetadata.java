@@ -86,6 +86,8 @@ public final class CaseClassMetadata extends ClassMetadata
 				list.add(this.applyMethod, match);
 			}
 		}
+
+		super.getMethodMatches(list, instance, name, arguments);
 	}
 
 	@Override

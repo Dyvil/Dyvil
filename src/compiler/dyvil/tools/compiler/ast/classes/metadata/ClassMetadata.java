@@ -216,7 +216,8 @@ public class ClassMetadata implements IClassMetadata
 
 		this.checkMembers(body);
 
-		if (body.constructorCount() <= 0) {
+		if (body.constructorCount() <= 0)
+		{
 			return;
 		}
 
@@ -272,31 +273,22 @@ public class ClassMetadata implements IClassMetadata
 		if ((this.members & NULL_FIELD) == 0)
 		{
 			this.nullField = new Field(this.theClass, NULL, this.theClass.getClassType(),
-			                                       new FlagModifierSet(Modifiers.PRIVATE | Modifiers.STATIC));
+			                           new FlagModifierSet(Modifiers.PRIVATE | Modifiers.STATIC));
 		}
 		else
 		{
-			markers.add(Markers.semanticError(this.nullField.getPosition(), "class.null.field", this.theClass.getName()));
+			markers
+				.add(Markers.semanticError(this.nullField.getPosition(), "class.null.field", this.theClass.getName()));
 		}
 
-		// Generate the nullValue() method
 		if ((this.members & NULLVALUE) == 0)
 		{
-			// public static TypeName nullValue() = if (NULL != null) NULL else NULL = new TypeName(0, false, null, ...)
+			// Generate the nullValue() method
 
-			final FieldAccess fieldAccess = new FieldAccess(this.nullField);
+			// public static TypeName nullValue()
+
 			this.nullValueMethod = new CodeMethod(this.theClass, nullValue, this.theClass.getClassType(),
 			                                      new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC));
-
-			final ArgumentList arguments = new ArgumentList();
-			for (int i = 0, count = this.theClass.parameterCount(); i < count; i++)
-			{
-				arguments.addValue(this.theClass.getParameter(i).getInternalType().getDefaultValue());
-			}
-
-			final IValue value = new ConstructorCall(this.constructor, arguments);
-			this.nullValueMethod.setValue(new IfStatement(new NullCheckOperator(fieldAccess, false), fieldAccess,
-			                                              new FieldAssignment(this.nullField, value)));
 		}
 	}
 
@@ -347,31 +339,40 @@ public class ClassMetadata implements IClassMetadata
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		if ((this.members & CONSTRUCTOR) != 0)
+		if ((this.members & CONSTRUCTOR) == 0 && this.theClass.getSuperType() != null)
 		{
-			return;
+			// Generate the constructor body
+			this.superInitializer = (InitializerCall) new InitializerCall(this.theClass.getPosition(), null,
+			                                                              this.theClass.getSuperConstructorArguments(),
+			                                                              true).resolve(markers, this.constructor);
+			this.constructor.setInitializer(this.superInitializer);
+
+			final StatementList constructorBody = new StatementList();
+			for (int i = 0, count = this.theClass.parameterCount(); i < count; i++)
+			{
+				constructorBody.addValue(new ClassParameterSetter(this.theClass, this.constructor.getParameter(i)));
+			}
+
+			this.constructor.setValue(constructorBody);
 		}
 
-		// Generate the constructor body
-
-		final IType superType = this.theClass.getSuperType();
-		if (superType == null)
+		if ((this.members & NULLVALUE) == 0 && this.nullField != null)
 		{
-			return;
+			// Generate the nullValue body
+
+			// public static TypeName nullValue() = if (NULL != null) NULL else NULL = new TypeName(0, false, null, ...)
+
+			final ArgumentList arguments = new ArgumentList();
+			for (int i = 0, count = this.theClass.parameterCount(); i < count; i++)
+			{
+				arguments.addValue(this.theClass.getParameter(i).getInternalType().getDefaultValue());
+			}
+
+			final FieldAccess fieldAccess = new FieldAccess(this.nullField);
+			final IValue value = new ConstructorCall(this.constructor, arguments);
+			this.nullValueMethod.setValue(new IfStatement(new NullCheckOperator(fieldAccess, false), fieldAccess,
+			                                              new FieldAssignment(this.nullField, value)));
 		}
-
-		this.superInitializer = (InitializerCall) new InitializerCall(this.theClass.getPosition(), null,
-		                                                              this.theClass.getSuperConstructorArguments(),
-		                                                              true).resolve(markers, this.constructor);
-		this.constructor.setInitializer(this.superInitializer);
-
-		final StatementList constructorBody = new StatementList();
-		for (int i = 0, count = this.theClass.parameterCount(); i < count; i++)
-		{
-			constructorBody.addValue(new ClassParameterSetter(this.theClass, this.constructor.getParameter(i)));
-		}
-
-		this.constructor.setValue(constructorBody);
 	}
 
 	@Override
