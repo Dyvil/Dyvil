@@ -3,41 +3,41 @@ package dyvil.tools.compiler.parser.header;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.alias.ITypeAliasMap;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
-import dyvil.tools.parsing.IParserManager;
-import dyvil.tools.parsing.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.type.TypeParameterListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
 public class TypeAliasParser extends Parser
 {
-	private static final int END                 = -1;
-	private static final int TYPE                = 1;
-	private static final int NAME                = 2;
-	private static final int TYPE_PARAMETERS     = 4;
-	private static final int TYPE_PARAMETERS_END = 8;
-	private static final int EQUAL               = 16;
-	
+	private static final int TYPE                      = 0;
+	private static final int NAME                      = 1;
+	private static final int TYPE_PARAMETERS           = 1 << 1;
+	private static final int TYPE_PARAMETERS_END       = 1 << 2;
+	private static final int ANGLE_TYPE_PARAMETERS_END = 1 << 3;
+	private static final int EQUAL                     = 1 << 4;
+
 	protected ITypeAliasMap map;
 	protected ITypeAlias    typeAlias;
-	
+
 	public TypeAliasParser(ITypeAliasMap map)
 	{
 		this.map = map;
-		this.mode = TYPE;
+		// this.mode = TYPE;
 	}
-	
+
 	public TypeAliasParser(ITypeAliasMap map, ITypeAlias typeAlias)
 	{
 		this.map = map;
 		this.typeAlias = typeAlias;
 		this.mode = NAME;
 	}
-	
+
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
@@ -70,6 +70,14 @@ public class TypeAliasParser extends Parser
 			pm.report(token, "typealias.identifier");
 			return;
 		case TYPE_PARAMETERS:
+			if (TypeParser.isGenericStart(token, type))
+			{
+				this.typeAlias.setTypeParametric();
+				this.mode = ANGLE_TYPE_PARAMETERS_END;
+				pm.splitJump(token, 1);
+				pm.pushParser(new TypeParameterListParser(this.typeAlias));
+				return;
+			}
 			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
 			{
 				this.typeAlias.setTypeParametric();
@@ -95,6 +103,17 @@ public class TypeAliasParser extends Parser
 				pm.reparse();
 				pm.report(token, "typealias.generic.close_bracket");
 			}
+			return;
+		case ANGLE_TYPE_PARAMETERS_END:
+			this.mode = EQUAL;
+			if (TypeParser.isGenericEnd(token, type))
+			{
+				pm.splitJump(token, 1);
+				return;
+			}
+
+			pm.reparse();
+			pm.report(token, "typealias.generic.close_angle");
 		}
 	}
 

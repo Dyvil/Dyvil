@@ -56,8 +56,8 @@ type	Float	= java.lang.Float
 type	Double	= java.lang.Double
 
 // Tuple Type Aliases
-type	Pair[A, B]			= (A, B)
-type	Triple[A, B, C]		= (A, B, C)
+type	Pair<A, B>			= (A, B)
+type	Triple<A, B, C>		= (A, B, C)
 
 // ---------------------------------------- Operator Definitions ----------------------------------------
 

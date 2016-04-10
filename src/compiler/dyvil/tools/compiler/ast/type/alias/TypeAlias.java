@@ -307,7 +307,7 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 
 		if (this.typeVariableCount > 0)
 		{
-			Formatting.appendSeparator(buffer, "generics.open_bracket", '[');
+			Formatting.appendSeparator(buffer, "generics.open_bracket", '<');
 			this.typeVariables[0].toString(prefix, buffer);
 
 			for (int i = 1; i < this.typeVariableCount; i++)
@@ -320,7 +320,7 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 			{
 				buffer.append(' ');
 			}
-			buffer.append(']');
+			buffer.append('>');
 		}
 
 		Formatting.appendSeparator(buffer, "field.assignment", '=');
