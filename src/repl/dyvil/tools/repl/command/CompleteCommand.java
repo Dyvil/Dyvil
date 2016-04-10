@@ -87,23 +87,22 @@ public class CompleteCommand implements ICommand
 			value = value.resolve(markers, context);
 			value.checkTypes(markers, context);
 
+			if (!markers.isEmpty())
+			{
+				// Print Errors, if any
+				final StringBuilder builder = new StringBuilder();
+				final boolean colors = repl.getCompiler().config.useAnsiColors();
+
+				markers.sort();
+				for (Marker marker : markers)
+				{
+					marker.log(expression, builder, colors);
+				}
+
+				repl.getOutput().println(builder);
+			}
+
 			this.printCompletions(repl, memberStart, value);
-
-			if (markers.isEmpty())
-			{
-				return;
-			}
-
-			// Print Errors, if any
-			final StringBuilder builder = new StringBuilder();
-			final boolean colors = repl.getCompiler().config.useAnsiColors();
-			markers.sort();
-			for (Marker marker : markers)
-			{
-				marker.log(expression, builder, colors);
-			}
-
-			repl.getOutput().print(builder);
 		}));
 	}
 
@@ -210,7 +209,7 @@ public class CompleteCommand implements ICommand
 		}
 	}
 
-	private static void findExtensions(DyvilREPL repl, String memberStart, IType type,  IValue value, Set<String> methods)
+	private static void findExtensions(DyvilREPL repl, String memberStart, IType type, IValue value, Set<String> methods)
 	{
 		MethodMatchList matchList = new MethodMatchList();
 		type.getMethodMatches(matchList, value, null, null);

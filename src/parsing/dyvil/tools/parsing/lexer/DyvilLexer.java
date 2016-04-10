@@ -37,9 +37,15 @@ public final class DyvilLexer
 		this.code = code;
 		this.length = code.length();
 
-		while (this.hasNextCodePoint())
+		while (true)
 		{
-			this.parseCharacter(this.codePoint());
+			final int currentChar = this.codePoint();
+			if (currentChar == 0)
+			{
+				break;
+			}
+
+			this.parseCharacter(currentChar);
 		}
 
 		this.tokens.append(new EndToken(this.parseIndex, this.lineNumber));
@@ -309,7 +315,7 @@ public final class DyvilLexer
 
 		this.clearBuffer();
 
-		while (this.hasNextCodePoint())
+		while (true)
 		{
 			currentChar = this.codePoint();
 
