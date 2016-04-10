@@ -6,7 +6,7 @@ import dyvil.collection.List;
 import dyvil.collection.immutable.EmptyList;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.math.MathUtils;
-import dyvil.random.RandomUtils;
+import dyvil.random.JavaRandoms;
 import dyvil.reflect.Modifiers;
 
 import java.lang.reflect.Field;
@@ -603,7 +603,7 @@ public final class StringUtils
 	@DyvilModifiers(Modifiers.INFIX)
 	public static String nextNoun(java.util.Random random, int minLength, int maxLength)
 	{
-		int len = RandomUtils.nextInt(random, minLength, maxLength);
+		int len = JavaRandoms.nextInt(random, minLength, maxLength);
 		StringBuilder buf = new StringBuilder(len);
 		
 		char prev = CharUtils.nextUppercaseLetter(random);

@@ -1,7 +1,7 @@
 package dyvil
 
-// Random Utilities
-using	dyvil.random.RandomUtils._
+// Random Extensions
+using	dyvil.random.JavaRandoms._
 
 // Collection Utilities and Conversions
 using	dyvil.collection.JavaCollections._

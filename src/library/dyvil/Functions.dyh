@@ -4,7 +4,7 @@ package dyvil
 import	dyvil.function._
 
 // Use special Function conversion methods
-using	dyvil.lang.FunctionConversions._
+using	dyvil.function.FunctionConversions._
 
 // Function Type Aliases
 type	Function<R>	= => R
