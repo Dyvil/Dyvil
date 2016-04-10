@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -13,10 +14,12 @@ import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
 import java.io.DataInput;
@@ -91,6 +94,12 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
+	public IType asReturnType()
+	{
+		return this.type.asReturnType();
+	}
+
+	@Override
 	public IType asParameterType()
 	{
 		final IType type = this.type.asParameterType();
@@ -107,6 +116,12 @@ public abstract class TypeDelegate implements IType, ITyped
 	public IClass getRefClass()
 	{
 		return this.type.getRefClass();
+	}
+
+	@Override
+	public IType getRefType()
+	{
+		return this.type.getRefType();
 	}
 
 	@Override
@@ -175,6 +190,24 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
+	public IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		return this.type.convertValue(value, typeContext, markers, context);
+	}
+
+	@Override
+	public IValue convertValueTo(IValue value, IType targetType, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		return this.type.convertValueTo(value, targetType, typeContext, markers, context);
+	}
+
+	@Override
+	public int getSuperTypeDistance(IType superType)
+	{
+		return this.type.getSuperTypeDistance(superType);
+	}
+
+	@Override
 	public boolean isSameType(IType type)
 	{
 		return this.type.isSameType(type);
@@ -196,6 +229,36 @@ public abstract class TypeDelegate implements IType, ITyped
 	public boolean isSuperClassOf(IType subType)
 	{
 		return this.type.isSuperClassOf(subType);
+	}
+
+	@Override
+	public boolean isSubTypeOf(IType superType)
+	{
+		return this.type.isSubTypeOf(superType);
+	}
+
+	@Override
+	public boolean isSubClassOf(IType superType)
+	{
+		return this.type.isSubClassOf(superType);
+	}
+
+	@Override
+	public boolean isConvertibleFrom(IType type)
+	{
+		return this.type.isConvertibleFrom(type);
+	}
+
+	@Override
+	public boolean isConvertibleTo(IType type)
+	{
+		return this.type.isConvertibleTo(type);
+	}
+
+	@Override
+	public boolean needsSubTypeCheck()
+	{
+		return this.type.needsSubTypeCheck();
 	}
 
 	@Override
@@ -233,6 +296,24 @@ public abstract class TypeDelegate implements IType, ITyped
 	public IAnnotation getAnnotation(IClass type)
 	{
 		return this.type.getAnnotation(type);
+	}
+
+	@Override
+	public Package resolvePackage(Name name)
+	{
+		return this.type.resolvePackage(name);
+	}
+
+	@Override
+	public IClass resolveClass(Name name)
+	{
+		return this.type.resolveClass(name);
+	}
+
+	@Override
+	public ITypeParameter resolveTypeParameter(Name name)
+	{
+		return this.type.resolveTypeParameter(name);
 	}
 
 	@Override

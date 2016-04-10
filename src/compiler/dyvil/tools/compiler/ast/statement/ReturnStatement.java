@@ -19,24 +19,24 @@ import dyvil.tools.parsing.position.ICodePosition;
 public class ReturnStatement extends AbstractValue implements IValueConsumer
 {
 	protected IValue value;
-	
+
 	public ReturnStatement(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
 	public ReturnStatement(ICodePosition position, IValue value)
 	{
 		this.position = position;
 		this.value = value;
 	}
-	
+
 	@Override
 	public int valueTag()
 	{
 		return RETURN;
 	}
-	
+
 	@Override
 	public boolean isPrimitive()
 	{
@@ -54,24 +54,24 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 	{
 		return this.value == null || this.value.isResolved();
 	}
-	
+
 	@Override
 	public void setValue(IValue value)
 	{
 		this.value = value;
 	}
-	
+
 	public IValue getValue()
 	{
 		return this.value;
 	}
-	
+
 	@Override
 	public IType getType()
 	{
 		return this.value == null ? Types.VOID : this.value.getType();
 	}
-	
+
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
@@ -91,13 +91,13 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 		this.value = value1;
 		return this;
 	}
-	
+
 	@Override
 	public boolean isType(IType type)
 	{
 		return Types.isSameType(type, Types.VOID) || this.value != null && this.value.isType(type);
 	}
-	
+
 	@Override
 	public int getTypeMatch(IType type)
 	{
@@ -105,10 +105,10 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 		{
 			return 0;
 		}
-		
+
 		return this.value.getTypeMatch(type);
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -117,7 +117,7 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 			this.value.resolveTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
@@ -127,7 +127,7 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 		}
 		return this;
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -137,7 +137,8 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 		{
 			this.value.checkTypes(markers, context);
 
-			if (returnType == null) {
+			if (returnType == null)
+			{
 				return;
 			}
 
@@ -150,12 +151,12 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 				markers.add(marker);
 			}
 		}
-		else if (returnType != null && returnType != Types.VOID)
+		else if (returnType != null && !Types.isSameClass(returnType, Types.VOID))
 		{
 			markers.add(Markers.semanticError(this.position, "return.void.invalid"));
 		}
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
@@ -164,7 +165,7 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 			this.value.check(markers, context);
 		}
 	}
-	
+
 	@Override
 	public IValue foldConstants()
 	{
@@ -174,7 +175,7 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 		}
 		return this;
 	}
-	
+
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
@@ -184,7 +185,7 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 		}
 		return this;
 	}
-	
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{

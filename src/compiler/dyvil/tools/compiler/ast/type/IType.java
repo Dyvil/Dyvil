@@ -19,6 +19,7 @@ import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
+import dyvil.tools.compiler.ast.type.builtin.ResolvedTypeDelegate;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.*;
 import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
@@ -127,9 +128,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	default IType atPosition(ICodePosition position)
 	{
-		IType copy = this.clone();
-		copy.setPosition(position);
-		return copy;
+		return new ResolvedTypeDelegate(position, this);
 	}
 
 	int typeTag();
