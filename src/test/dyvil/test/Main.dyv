@@ -13,6 +13,7 @@ public class Main
 		BridgeTest.main(args)
 		BuilderTest.main(args)
 		CaptureTest.main(args)
+		CaseClassTest.main(args)
 		ConstructorTest.main(args)
 		ExtensionTest.main(args)
 		ForTest.main(args)
@@ -23,6 +24,7 @@ public class Main
 		MatchTest.main(args)
 		NestedMethodTest.main(args)
 		FibonacciTest.main(args)
+		ObjectTest.main(args)
 		OperatorTest.main(args)
 		PrimitiveTest main args
 		PropertyTest.main(args)

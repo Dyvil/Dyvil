@@ -1,9 +1,11 @@
-package dyvil.tools.compiler.ast.classes;
+package dyvil.tools.compiler.ast.classes.metadata;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.access.ConstructorCall;
+import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IDataMember;
@@ -30,9 +32,15 @@ public final class ObjectClassMetadata extends ClassMetadata
 	}
 
 	@Override
-	public IDataMember getInstanceField()
+	public IField getInstanceField()
 	{
 		return this.instanceField;
+	}
+
+	@Override
+	public void setInstanceField(IField field)
+	{
+		this.instanceField = field;
 	}
 
 	@Override
@@ -47,44 +55,32 @@ public final class ObjectClassMetadata extends ClassMetadata
 	}
 
 	@Override
-	public void resolveTypesBody(MarkerList markers, IContext context)
+	public void resolveTypesGenerate(MarkerList markers, IContext context)
 	{
-		super.resolveTypesBody(markers, context);
+		super.resolveTypesGenerate(markers, context);
 
 		final IClassBody body = this.theClass.getBody();
-		if (body == null)
-		{
-			return;
-		}
-
-		this.checkMembers(body);
-
-		if (markers != null && body.constructorCount() > 0)
+		if (body != null && body.constructorCount() > 0)
 		{
 			markers.add(Markers.semantic(this.theClass.getPosition(), "class.object.constructor",
 			                             this.theClass.getName().qualified));
 		}
 
-		final IField field = body.getField(Names.instance);
-		if (field != null)
+		if ((this.members & INSTANCE_FIELD) == 0)
 		{
-			this.members |= INSTANCE_FIELD;
+			final Field field = new Field(this.theClass, Names.instance, this.theClass.getType(),
+			                              new FlagModifierSet(Modifiers.PUBLIC | Modifiers.CONST));
 			this.instanceField = field;
+
+			this.constructor.setModifiers(new FlagModifierSet(Modifiers.PRIVATE));
+			final ConstructorCall call = new ConstructorCall(null, this.constructor, EmptyArguments.INSTANCE);
+			field.setValue(call);
 		}
-	}
-
-	@Override
-	public void resolveTypesGenerate(MarkerList markers, IContext context)
-	{
-		super.resolveTypesGenerate(markers, context);
-
-		final Field field = new Field(this.theClass, Names.instance, this.theClass.getType(),
-		                              new FlagModifierSet(Modifiers.PUBLIC | Modifiers.CONST));
-		this.instanceField = field;
-
-		this.constructor.setModifiers(new FlagModifierSet(Modifiers.PRIVATE));
-		ConstructorCall call = new ConstructorCall(null, this.constructor, EmptyArguments.INSTANCE);
-		field.setValue(call);
+		else
+		{
+			markers.add(
+				Markers.semanticError(this.instanceField.getPosition(), "class.object.field", this.theClass.getName()));
+		}
 	}
 
 	@Override
@@ -100,7 +96,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 	@Override
 	public void writeStaticInit(MethodWriter mw) throws BytecodeException
 	{
-		if (this.instanceField != null)
+		if (this.instanceField != null && (this.members & INSTANCE_FIELD) == 0)
 		{
 			this.instanceField.writeStaticInit(mw);
 		}
@@ -109,7 +105,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		if (this.instanceField != null)
+		if (this.instanceField != null && (this.members & INSTANCE_FIELD) == 0)
 		{
 			this.instanceField.write(writer);
 		}
