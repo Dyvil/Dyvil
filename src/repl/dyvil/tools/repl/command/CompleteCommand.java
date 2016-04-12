@@ -271,7 +271,7 @@ public class CompleteCommand implements ICommand
 				final IMethod method = body.getMethod(i);
 				if (matches(start, method, statics))
 				{
-					methods.add(Util.memberSignatureToString(method, type));
+					methods.add(Util.methodSignatureToString(method, type));
 				}
 			}
 		}

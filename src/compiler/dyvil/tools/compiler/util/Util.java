@@ -8,7 +8,6 @@ import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
-import dyvil.tools.compiler.ast.parameter.IParametric;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
@@ -45,7 +44,20 @@ public final class Util
 
 		typeParametersToString(method, stringBuilder);
 
-		parametersToString(method, stringBuilder);
+		stringBuilder.append('(');
+
+		int params = method.parameterCount();
+		if (params > 0)
+		{
+			method.getParameter(0).getType().getConcreteType(typeContext).toString("", stringBuilder);
+			for (int i = 1; i < params; i++)
+			{
+				stringBuilder.append(", ");
+				method.getParameter(i).getType().getConcreteType(typeContext).toString("", stringBuilder);
+			}
+		}
+
+		stringBuilder.append(')');
 
 		stringBuilder.append(": ");
 		ITypeContext.apply(typeContext, method.getType()).toString("", stringBuilder);
@@ -59,25 +71,20 @@ public final class Util
 
 		typeParametersToString(iClass, stringBuilder);
 
-		parametersToString(iClass, stringBuilder);
-	}
-
-	private static void parametersToString(IParametric parameterized, StringBuilder buf)
-	{
-		buf.append('(');
-
-		int params = parameterized.parameterCount();
+		final int params = iClass.parameterCount();
 		if (params > 0)
 		{
-			parameterized.getParameter(0).getType().toString("", buf);
+			stringBuilder.append('(');
+
+			iClass.getParameter(0).getType().toString("", stringBuilder);
 			for (int i = 1; i < params; i++)
 			{
-				buf.append(", ");
-				parameterized.getParameter(i).getType().toString("", buf);
+				stringBuilder.append(", ");
+				iClass.getParameter(i).getType().toString("", stringBuilder);
 			}
-		}
 
-		buf.append(')');
+			stringBuilder.append(')');
+		}
 	}
 
 	private static void typeParametersToString(ITypeParametric typeParameterized, StringBuilder buf)
