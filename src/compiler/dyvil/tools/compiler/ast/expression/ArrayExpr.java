@@ -211,15 +211,15 @@ public final class ArrayExpr implements IValue, IValueList
 			{
 				return null;
 			}
-			elementType = this.getElementType();
+			elementType = this.getType().getElementType();
 		}
 		else
 		{
 			// If the type is an array type, get it's element type
 			this.elementType = elementType = arrayType.getElementType();
+			this.arrayType = arrayType;
 		}
 
-		this.arrayType = arrayType;
 
 		for (int i = 0; i < this.valueCount; i++)
 		{
