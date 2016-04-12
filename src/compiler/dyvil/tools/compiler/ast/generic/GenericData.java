@@ -146,11 +146,13 @@ public final class GenericData implements ITypeList, ITypeContext
 			return;
 		}
 
-		int index = typeVar.getIndex();
+		final int index = typeVar.getIndex();
 		if (!this.isMethodTypeVariable(typeVar))
 		{
 			return;
 		}
+
+		type = type.asReturnType();
 
 		if (index < this.genericCount)
 		{

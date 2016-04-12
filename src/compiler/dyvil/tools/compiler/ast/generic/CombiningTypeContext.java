@@ -15,6 +15,12 @@ public class CombiningTypeContext implements ITypeContext
 	}
 
 	@Override
+	public boolean isReadonly()
+	{
+		return this.context1.isReadonly() && this.context2.isReadonly();
+	}
+
+	@Override
 	public IType resolveType(ITypeParameter typeParameter)
 	{
 		final IType type1 = this.context1.resolveType(typeParameter);
@@ -29,5 +35,12 @@ public class CombiningTypeContext implements ITypeContext
 		}
 
 		return Types.combine(type1, type2);
+	}
+
+	@Override
+	public void addMapping(ITypeParameter typeVar, IType type)
+	{
+		this.context1.addMapping(typeVar, type);
+		this.context2.addMapping(typeVar, type);
 	}
 }

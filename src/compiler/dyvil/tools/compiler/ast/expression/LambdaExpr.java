@@ -351,10 +351,10 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 		final IType concreteType = this.method.getEnclosingClass().getType().getConcreteType(tempContext);
 
-		type.inferTypes(concreteType, typeContext);
+		type.inferTypes(concreteType, tempContext);
 
 		this.returnType = valueType;
-		this.type = type.getConcreteType(tempContext).getConcreteType(typeContext);
+		this.type = type.getConcreteType(tempContext);
 	}
 
 	private void inferTypes(MarkerList markers)
@@ -383,7 +383,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			}
 
 			final IType methodParamType = this.method.getParameter(i).getType();
-			final IType concreteType = methodParamType.getConcreteType(this.type).asParameterType();
+			final IType concreteType = methodParamType.getConcreteType(this.type).asParameterType().asReturnType();
 
 			// Can't infer parameter type
 			if (concreteType == Types.UNKNOWN)
@@ -401,7 +401,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			parameter.setType(concreteType);
 		}
 
-		this.returnType = this.method.getType().getConcreteType(this.type).asParameterType();
+		this.returnType = this.method.getType().getConcreteType(this.type).asParameterType().asReturnType();
 	}
 
 	@Override
