@@ -60,33 +60,31 @@ public final class DyvilLexer
 		switch (currentChar)
 		{
 		case '`':
-			this.parseBacktickIdentifier(currentChar);
+			this.parseBacktickIdentifier();
 			return;
 		case '"':
-			this.parseDoubleString(currentChar, false);
+			this.parseDoubleString(false);
 			return;
 		case '\'':
-			this.parseSingleString(currentChar);
+			this.parseSingleString();
 			return;
 		case '@':
 			if (this.nextCodePoint() == '"')
 			{
-				this.parseVerbatimString(currentChar);
+				this.parseVerbatimString();
 				return;
 			}
 
 			this.parseIdentifier('@', MOD_SYMBOL);
 			return;
 		case '/':
-			int n = this.nextCodePoint();
-			if (n == '*')
+			switch (this.nextCodePoint())
 			{
-				this.parseBlockComment(currentChar);
+			case '*':
+				this.parseBlockComment();
 				return;
-			}
-			if (n == '/')
-			{
-				this.parseLineComment(currentChar);
+			case '/':
+				this.parseLineComment();
 				return;
 			}
 			this.parseIdentifier('/', MOD_SYMBOL);
@@ -101,7 +99,7 @@ public final class DyvilLexer
 		case ')':
 			if (this.stringParens > 0 && --this.stringParens == 0)
 			{
-				this.parseDoubleString(')', true);
+				this.parseDoubleString(true);
 				return;
 			}
 
@@ -120,7 +118,8 @@ public final class DyvilLexer
 			this.tokens.append(new SymbolToken(INSTANCE, CLOSE_CURLY_BRACKET, this.lineNumber, this.parseIndex++));
 			return;
 		case '.':
-			n = this.nextCodePoint();
+		{
+			final int n = this.nextCodePoint();
 			if (LexerUtil.isIdentifierSymbol(n) || n == '.')
 			{
 				this.parseIdentifier('.', MOD_DOT);
@@ -128,6 +127,7 @@ public final class DyvilLexer
 			}
 			this.tokens.append(new SymbolToken(INSTANCE, DOT, this.lineNumber, this.parseIndex++));
 			return;
+		}
 		case ';':
 			this.tokens.append(new SymbolToken(INSTANCE, SEMICOLON, this.lineNumber, this.parseIndex++));
 			return;
@@ -172,18 +172,18 @@ public final class DyvilLexer
 		this.advance(currentChar);
 	}
 
-	private void parseBacktickIdentifier(int currentChar)
+	private void parseBacktickIdentifier()
 	{
-		assert currentChar == '`';
+		// assert this.codePoint() == '`';
 
-		int startIndex = this.parseIndex++;
-		int startLine = this.lineNumber;
+		final int startIndex = this.parseIndex++;
+		final int startLine = this.lineNumber;
 
 		this.clearBuffer();
 
 		while (true)
 		{
-			currentChar = this.codePoint();
+			final int currentChar = this.codePoint();
 			switch (currentChar)
 			{
 			case '\n':
@@ -207,18 +207,18 @@ public final class DyvilLexer
 		}
 	}
 
-	private void parseSingleString(int currentChar)
+	private void parseSingleString()
 	{
-		assert currentChar == '\'';
+		// assert this.codePoint() == '\'';
 
-		int startIndex = this.parseIndex++;
-		int startLine = this.lineNumber;
+		final int startIndex = this.parseIndex++;
+		final int startLine = this.lineNumber;
 
 		this.clearBuffer();
 
 		while (true)
 		{
-			currentChar = this.codePoint();
+			final int currentChar = this.codePoint();
 			switch (currentChar)
 			{
 			case '\\':
@@ -246,18 +246,18 @@ public final class DyvilLexer
 		}
 	}
 
-	private void parseDoubleString(int currentChar, boolean stringPart)
+	private void parseDoubleString(boolean stringPart)
 	{
-		assert currentChar == (stringPart ? ')' : '"');
+		// assert this.codePoint() == (stringPart ? ')' : '"');
 
-		int startIndex = this.parseIndex++;
-		int startLine = this.lineNumber;
+		final int startIndex = this.parseIndex++;
+		final int startLine = this.lineNumber;
 
 		this.clearBuffer();
 
 		while (true)
 		{
-			currentChar = this.codePoint();
+			final int currentChar = this.codePoint();
 
 			switch (currentChar)
 			{
@@ -303,21 +303,22 @@ public final class DyvilLexer
 		}
 	}
 
-	private void parseVerbatimString(int currentChar)
+	private void parseVerbatimString()
 	{
-		assert currentChar == '@';
+		// assert this.codePoint() == '@';
 
-		int startIndex = this.parseIndex;
-		int startLine = this.lineNumber;
+		final int startIndex = this.parseIndex;
+		final int startLine = this.lineNumber;
 
-		assert this.nextCodePoint() == '"';
+		// assert this.nextCodePoint() == '"';
+
 		this.parseIndex += 2;
 
 		this.clearBuffer();
 
 		while (true)
 		{
-			currentChar = this.codePoint();
+			final int currentChar = this.codePoint();
 
 			switch (currentChar)
 			{
@@ -589,15 +590,16 @@ public final class DyvilLexer
 		}
 	}
 
-	private void parseLineComment(int currentChar)
+	private void parseLineComment()
 	{
-		assert currentChar == '/';
-		assert this.nextCodePoint() == '/';
+		// assert this.codePoint() == '/';
+		// assert this.nextCodePoint() == '/';
+
 		this.parseIndex += 2;
 
 		while (true)
 		{
-			currentChar = this.codePoint();
+			final int currentChar = this.codePoint();
 
 			if (currentChar == EOF)
 			{
@@ -614,17 +616,17 @@ public final class DyvilLexer
 		}
 	}
 
-	private void parseBlockComment(int currentChar)
+	private void parseBlockComment()
 	{
-		assert currentChar == '/';
-		assert this.nextCodePoint() == '*';
+		// assert this.codePoint() == '/';
+		// assert this.nextCodePoint() == '*';
 
 		int level = 1;
 		this.parseIndex += 2;
 
 		while (true)
 		{
-			currentChar = this.codePoint();
+			final int currentChar = this.codePoint();
 
 			switch (currentChar)
 			{
@@ -667,7 +669,7 @@ public final class DyvilLexer
 
 	private void parseIdentifier(int currentChar, int subtype)
 	{
-		int startIndex = this.parseIndex;
+		final int startIndex = this.parseIndex;
 
 		this.clearBuffer();
 		this.buffer.appendCodePoint(currentChar);
@@ -769,14 +771,14 @@ public final class DyvilLexer
 		}
 	}
 
-	private void parseEscape(int n)
+	private void parseEscape(int nextChar)
 	{
-		switch (n)
+		switch (nextChar)
 		{
 		case '"':
 		case '\'':
 		case '\\':
-			this.buffer.append((char) n);
+			this.buffer.append((char) nextChar);
 			this.parseIndex += 2;
 			return;
 		case 'n':
@@ -868,11 +870,6 @@ public final class DyvilLexer
 
 	// Utility Methods
 
-	private boolean hasNextCodePoint()
-	{
-		return this.parseIndex + 1 < this.length;
-	}
-
 	private int codePoint()
 	{
 		return this.parseIndex >= this.length ? 0 : this.code.codePointAt(this.parseIndex);
@@ -880,7 +877,7 @@ public final class DyvilLexer
 
 	private int nextCodePoint()
 	{
-		return !this.hasNextCodePoint() ? 0 : this.code.codePointAt(this.parseIndex + 1);
+		return this.parseIndex + 1 >= this.length ? 0 : this.code.codePointAt(this.parseIndex + 1);
 	}
 
 	private void advance(int currentChar)
