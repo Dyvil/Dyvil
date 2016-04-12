@@ -140,7 +140,7 @@ public interface Modifiers
 
 	int NULL_CLASS = 0x00100000;
 
-	int NIL_CLASS = 0x00100000;
+	int NIL_CLASS = 0x00200000;
 
 	// Method Modifiers
 
