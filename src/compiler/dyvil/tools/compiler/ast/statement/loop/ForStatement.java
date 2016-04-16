@@ -309,9 +309,9 @@ public class ForStatement implements IForStatement, IDefaultContext
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		dyvil.tools.asm.Label startLabel = this.startLabel.target = new dyvil.tools.asm.Label();
-		dyvil.tools.asm.Label updateLabel = this.updateLabel.target = new dyvil.tools.asm.Label();
-		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label startLabel = this.startLabel.getTarget();
+		dyvil.tools.asm.Label updateLabel = this.updateLabel.getTarget();
+		dyvil.tools.asm.Label endLabel = this.endLabel.getTarget();
 
 		IVariable var = this.variable;
 

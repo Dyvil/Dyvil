@@ -69,9 +69,9 @@ public class RangeForStatement extends ForEachStatement
 			}
 		}
 
-		dyvil.tools.asm.Label startLabel = this.startLabel.target = new dyvil.tools.asm.Label();
-		dyvil.tools.asm.Label updateLabel = this.updateLabel.target = new dyvil.tools.asm.Label();
-		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label startLabel = this.startLabel.getTarget();
+		dyvil.tools.asm.Label updateLabel = this.updateLabel.getTarget();
+		dyvil.tools.asm.Label endLabel = this.endLabel.getTarget();
 		dyvil.tools.asm.Label scopeLabel = new dyvil.tools.asm.Label();
 		writer.visitLabel(scopeLabel);
 

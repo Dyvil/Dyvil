@@ -1,0 +1,46 @@
+package dyvil.test
+
+using dyvil.math.MathUtils.sqrt
+
+public class MathTest
+{
+	public static void main([String] args)
+	{
+	}
+
+	private static boolean isPrime(int value)
+	{
+		for var j <- 2 .. value.sqrt
+		{
+			if value % j == 0
+			{
+				return false
+			}
+		}
+		return true
+	}
+
+	private static List<int> primeFactors(int value)
+	{
+		if value <= 1
+		{
+			return List(1)
+		}
+
+		var res = List<int>
+		outer: while value > 1
+		{
+			for var prime <- 2 .. value
+			{
+				if value % prime == 0 && isPrime(prime)
+				{
+					res.add(prime)
+					value \= prime
+					continue outer
+				}
+			}
+		}
+
+		return res.immutable
+	}
+}

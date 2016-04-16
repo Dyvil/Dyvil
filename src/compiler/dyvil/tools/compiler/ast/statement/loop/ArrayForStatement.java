@@ -27,9 +27,9 @@ public class ArrayForStatement extends ForEachStatement
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		dyvil.tools.asm.Label startLabel = this.startLabel.target = new dyvil.tools.asm.Label();
-		dyvil.tools.asm.Label updateLabel = this.updateLabel.target = new dyvil.tools.asm.Label();
-		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label startLabel = this.startLabel.getTarget();
+		dyvil.tools.asm.Label updateLabel = this.updateLabel.getTarget();
+		dyvil.tools.asm.Label endLabel = this.endLabel.getTarget();
 
 		final IVariable var = this.variable;
 		final IType elementType = this.arrayType.getElementType();
