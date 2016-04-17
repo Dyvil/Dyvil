@@ -102,7 +102,14 @@ public class CompleteCommand implements ICommand
 				repl.getOutput().println(builder);
 			}
 
-			this.printCompletions(repl, memberStart, value);
+			try
+			{
+				this.printCompletions(repl, memberStart, value);
+			}
+			catch (Throwable throwable)
+			{
+				throwable.printStackTrace(repl.getErrorOutput());
+			}
 		}));
 	}
 
@@ -149,17 +156,25 @@ public class CompleteCommand implements ICommand
 	private void printCompletions(DyvilREPL repl, String memberStart, IValue value)
 	{
 		final IType type = value.getType();
-		repl.getOutput().println("Available completions for '" + value + "' of type '" + type + "':");
-
 		final boolean statics = value.valueTag() == IValue.CLASS_ACCESS;
-
 		final Set<String> fields = new TreeSet<>();
 		final Set<String> properties = new TreeSet<>();
 		final Set<String> methods = new TreeSet<>();
 		final Set<String> extensionMethods = new TreeSet<>();
 
-		findCompletions(type, fields, properties, methods, memberStart, statics, new IdentityHashSet<>());
-		findExtensions(repl, memberStart, type, value, extensionMethods);
+		if (statics)
+		{
+			repl.getOutput().println("Available completions for type '" + type + "':");
+
+			findMembers(type, fields, properties, methods, memberStart, true);
+		}
+		else
+		{
+			repl.getOutput().println("Available completions for '" + value + "' of type '" + type + "':");
+
+			findCompletions(type, fields, properties, methods, memberStart, new IdentityHashSet<>());
+			findExtensions(repl, memberStart, type, value, extensionMethods);
+		}
 
 		boolean output = false;
 		if (!fields.isEmpty())
@@ -209,6 +224,80 @@ public class CompleteCommand implements ICommand
 		}
 	}
 
+	private static void findCompletions(IType type, Set<String> fields, Set<String> properties, Set<String> methods, String start, Set<IClass> dejaVu)
+	{
+		final IClass iclass = type.getTheClass();
+		if (dejaVu.contains(iclass))
+		{
+			return;
+		}
+		dejaVu.add(iclass);
+
+		// Add members
+		for (int i = 0, count = iclass.parameterCount(); i < count; i++)
+		{
+			final IParameter parameter = iclass.getParameter(i);
+			if (matches(start, parameter, false))
+			{
+				fields.add(Util.memberSignatureToString(parameter, type));
+			}
+		}
+
+		findMembers(type, fields, properties, methods, start, false);
+
+		// Recursively scan super types
+		final IType superType = iclass.getSuperType();
+		if (superType != null)
+		{
+			findCompletions(superType.getConcreteType(type), fields, properties, methods, start, dejaVu);
+		}
+
+		for (int i = 0, count = iclass.interfaceCount(); i < count; i++)
+		{
+			final IType superInterface = iclass.getInterface(i);
+			if (superInterface != null)
+			{
+				findCompletions(superInterface.getConcreteType(type), fields, properties, methods, start, dejaVu);
+			}
+		}
+	}
+
+	private static void findMembers(IType type, Set<String> fields, Set<String> properties, Set<String> methods, String start, boolean statics)
+	{
+		final IClassBody body = type.getTheClass().getBody();
+		if (body == null)
+		{
+			return;
+		}
+
+		for (int i = 0, count = body.fieldCount(); i < count; i++)
+		{
+			final IField field = body.getField(i);
+			if (matches(start, field, statics))
+			{
+				fields.add(Util.memberSignatureToString(field, type));
+			}
+		}
+
+		for (int i = 0, count = body.propertyCount(); i < count; i++)
+		{
+			final IProperty property = body.getProperty(i);
+			if (matches(start, property, statics))
+			{
+				properties.add(Util.memberSignatureToString(property, type));
+			}
+		}
+
+		for (int i = 0, count = body.methodCount(); i < count; i++)
+		{
+			final IMethod method = body.getMethod(i);
+			if (matches(start, method, statics))
+			{
+				methods.add(Util.methodSignatureToString(method, type));
+			}
+		}
+	}
+
 	private static void findExtensions(DyvilREPL repl, String memberStart, IType type, IValue value, Set<String> methods)
 	{
 		MethodMatchList matchList = new MethodMatchList();
@@ -222,79 +311,6 @@ public class CompleteCommand implements ICommand
 			if (matches(memberStart, method, true))
 			{
 				methods.add(Util.methodSignatureToString(method, null));
-			}
-		}
-	}
-
-	private static void findCompletions(IType type, Set<String> fields, Set<String> properties, Set<String> methods, String start, boolean statics, Set<IClass> dejaVu)
-	{
-		IClass iclass = type.getTheClass();
-		if (dejaVu.contains(iclass))
-		{
-			return;
-		}
-		dejaVu.add(iclass);
-
-		// Add members
-		for (int i = 0, count = iclass.parameterCount(); i < count; i++)
-		{
-			final IParameter parameter = iclass.getParameter(i);
-			if (matches(start, parameter, statics))
-			{
-				fields.add(Util.memberSignatureToString(parameter, type));
-			}
-		}
-
-		final IClassBody body = iclass.getBody();
-		if (body != null)
-		{
-			for (int i = 0, count = body.fieldCount(); i < count; i++)
-			{
-				final IField field = body.getField(i);
-				if (matches(start, field, statics))
-				{
-					fields.add(Util.memberSignatureToString(field, type));
-				}
-			}
-
-			for (int i = 0, count = body.propertyCount(); i < count; i++)
-			{
-				final IProperty property = body.getProperty(i);
-				if (matches(start, property, statics))
-				{
-					properties.add(Util.memberSignatureToString(property, type));
-				}
-			}
-
-			for (int i = 0, count = body.methodCount(); i < count; i++)
-			{
-				final IMethod method = body.getMethod(i);
-				if (matches(start, method, statics))
-				{
-					methods.add(Util.methodSignatureToString(method, type));
-				}
-			}
-		}
-
-		if (statics)
-		{
-			return;
-		}
-
-		// Recursively scan super types
-		final IType superType = iclass.getSuperType();
-		if (superType != null)
-		{
-			findCompletions(superType.getConcreteType(type), fields, properties, methods, start, false, dejaVu);
-		}
-
-		for (int i = 0, count = iclass.interfaceCount(); i < count; i++)
-		{
-			final IType superInterface = iclass.getInterface(i);
-			if (superInterface != null)
-			{
-				findCompletions(superInterface.getConcreteType(type), fields, properties, methods, start, false,
-				                dejaVu);
 			}
 		}
 	}
