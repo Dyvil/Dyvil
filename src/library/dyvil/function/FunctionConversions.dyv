@@ -2,29 +2,27 @@ package dyvil.function
 
 import	java.util.concurrent.Callable
 
-using	dyvil.reflect.Opcodes._
-
 public final class FunctionConversions
 {
 	private init() {}
 
 	// Functions
 
-	public static inline func function<R>(=> R f): => R = f
+	public static inline func function<R>(-> R f): -> R = f
 
-	public static inline func function1<P1, R>(P1 => R f): P1 => R = f
+	public static inline func function1<P1, R>(P1 -> R f): P1 -> R = f
 
-	public static inline func function2<P1, P2, R>((P1, P2) => R f): (P1, P2) => R = f
+	public static inline func function2<P1, P2, R>((P1, P2) -> R f): (P1, P2) -> R = f
 
-	public static inline func function3<P1, P2, P3, R>((P1, P2, P3) => R f): (P1, P2, P3) => R = f
+	public static inline func function3<P1, P2, P3, R>((P1, P2, P3) -> R f): (P1, P2, P3) -> R = f
 
 	// Function Conversions
 
-	public static Runnable runnable(=> void f) = => f()
+	public static Runnable runnable(-> void f) = => f()
 
-	public static Callable<T> callable<T>(=> T f) = => f()
+	public static Callable<T> callable<T>(-> T f) = => f()
 
-	public static Thread thread(=> void f) = new Thread {
+	public static Thread thread(-> void f) = new Thread {
 		public override void run() = f()
 	}
 }

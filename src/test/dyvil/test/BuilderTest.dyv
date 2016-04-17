@@ -9,7 +9,7 @@ public class BuilderTest
     {
 		public static Buildable apply() = new Buildable(0, 0D, null)
 
-		public static Buildable apply(Buildable.() => void configure)
+		public static Buildable apply(Buildable.() -> void configure)
 		{
 			return Buildable().{
 				configure $0
