@@ -11,6 +11,7 @@ public class TryParserManager extends ParserManager
 {
 	private boolean hasSyntaxErrors;
 	private boolean reportErrors;
+	private int     reportedMarkers;
 
 	private List<IToken> splitTokens;
 
@@ -31,20 +32,26 @@ public class TryParserManager extends ParserManager
 	public void report(Marker error)
 	{
 		final boolean isError = error.isError();
-		if (!this.hasSyntaxErrors)
+		if (!this.hasSyntaxErrors && isError)
 		{
-			this.hasSyntaxErrors = isError;
+			this.hasSyntaxErrors = true;
 		}
 
 		if (this.reportErrors || !isError)
 		{
 			super.report(error);
+			this.reportedMarkers++;
 		}
 	}
 
 	public void resetTo(IToken token)
 	{
 		this.tokens.jump(token);
+
+		if (this.reportedMarkers >= 0)
+		{
+			this.markers.remove(this.reportedMarkers);
+		}
 
 		if (this.splitTokens == null)
 		{

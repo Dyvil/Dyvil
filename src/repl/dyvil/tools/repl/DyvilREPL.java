@@ -210,7 +210,6 @@ public final class DyvilREPL
 
 	private boolean tryParse(MarkerList markers, TokenIterator tokens, Parser parser, boolean reportErrors)
 	{
-		markers.clear();
 		this.parser.reset(markers, tokens);
 		this.parser.resetTo(tokens.first());
 		return this.parser.parse(parser, reportErrors);
