@@ -850,7 +850,6 @@ public final class DyvilLexer
 				if (!LexerUtil.isHexDigit(codePoint))
 				{
 					this.error("escape.unicode.close_brace");
-					this.advance(codePoint);
 					break;
 				}
 
@@ -863,9 +862,9 @@ public final class DyvilLexer
 			return;
 		}
 
+		this.parseIndex++;
 		this.error("escape.invalid");
-
-		this.parseIndex += 2;
+		this.parseIndex++;
 	}
 
 	// Utility Methods
