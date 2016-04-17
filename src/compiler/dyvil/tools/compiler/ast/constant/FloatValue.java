@@ -170,12 +170,20 @@ public class FloatValue implements IConstantValue
 	@Override
 	public String toString()
 	{
+		if (!Float.isFinite(this.value))
+		{
+			return String.valueOf(this.value);
+		}
 		return this.value + "F";
 	}
 
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(this.value).append('F');
+		buffer.append(this.value);
+		if (Float.isFinite(this.value))
+		{
+			buffer.append('F');
+		}
 	}
 }
