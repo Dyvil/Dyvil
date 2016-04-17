@@ -112,8 +112,8 @@ public class LambdaTest
 
 	public static void typeInferenceTest()
 	{
-		var function1 = (int i) -> int => i
-		var function2 = (int i, int j) => (i, j)
+		var function1 = { int i -> int => i }
+		var function2 = { int i, int j => (i, j) }
 		var functionCurried = (int i) => (int j) => (i, j)
 
 		Main.test("Type Inference Test (1 Parameter)", type(int -> int).toString, typeOf(function1).toString)

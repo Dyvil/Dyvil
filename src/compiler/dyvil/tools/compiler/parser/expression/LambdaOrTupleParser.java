@@ -127,8 +127,7 @@ public class LambdaOrTupleParser extends Parser
 			}
 			if (type == DyvilSymbols.ARROW_RIGHT)
 			{
-				pm.pushParser(
-					new TypeParser(((LambdaExpr) this.value)::setReturnType).withFlags(TypeParser.IGNORE_LAMBDA));
+				pm.pushParser(returnTypeParser((LambdaExpr) this.value));
 				this.mode = RETURN_ARROW;
 				return;
 			}
@@ -146,5 +145,10 @@ public class LambdaOrTupleParser extends Parser
 			pm.popParser(true);
 			this.consumer.setValue(this.value);
 		}
+	}
+
+	public static TypeParser returnTypeParser(LambdaExpr value)
+	{
+		return new TypeParser(value::setReturnType).withFlags(TypeParser.IGNORE_LAMBDA);
 	}
 }
