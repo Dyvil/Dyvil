@@ -2,6 +2,7 @@ package dyvil.tools.parsing.marker;
 
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
+import dyvil.io.AppendablePrintStream;
 import dyvil.io.Console;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -40,6 +41,13 @@ public abstract class Marker implements Comparable<Marker>
 			this.info = new ArrayList<>(2);
 		}
 		this.info.add(info);
+	}
+
+	public void addError(Throwable throwable)
+	{
+		final StringBuilder builder = new StringBuilder();
+		throwable.printStackTrace(new AppendablePrintStream(builder));
+		this.addInfo(builder.toString());
 	}
 
 	public abstract String getMarkerType();

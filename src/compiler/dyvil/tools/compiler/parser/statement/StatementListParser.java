@@ -20,32 +20,30 @@ import dyvil.tools.compiler.ast.statement.MemberStatement;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.statement.control.Label;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.parser.IParserManager;
-import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
-import dyvil.tools.compiler.parser.TryParserManager;
 import dyvil.tools.compiler.parser.classes.MemberParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
+import dyvil.tools.compiler.parser.expression.LambdaOrTupleParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.TokenIterator;
+import dyvil.tools.parsing.*;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;
 
-import static dyvil.tools.compiler.parser.TryParserManager.EXIT_ON_ROOT;
 import static dyvil.tools.compiler.parser.classes.MemberParser.*;
 import static dyvil.tools.compiler.parser.method.ParameterListParser.LAMBDA_ARROW_END;
+import static dyvil.tools.parsing.TryParserManager.EXIT_ON_ROOT;
 
 public final class StatementListParser extends Parser implements IValueConsumer, IMemberConsumer<IVariable>
 {
 	private static final int OPEN_BRACKET          = 0;
 	private static final int LAMBDA_PARAMETERS_END = 1;
-	private static final int LAMBDA_ARROW          = 2;
-	private static final int EXPRESSION            = 4;
-	private static final int SEPARATOR             = 8;
+	private static final int LAMBDA_TYPE_ARROW     = 1 << 1;
+	private static final int LAMBDA_RETURN_ARROW   = 1 << 2;
+	private static final int EXPRESSION            = 1 << 3;
+	private static final int SEPARATOR             = 1 << 4;
 
 	protected IValueConsumer consumer;
 	protected boolean        closure;
@@ -112,7 +110,7 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 				else
 				{
 					pm.pushParser(new ParameterListParser(this.lambdaExpr).withFlags(LAMBDA_ARROW_END));
-					this.mode = LAMBDA_ARROW;
+					this.mode = LAMBDA_TYPE_ARROW;
 				}
 				return;
 			}
@@ -127,13 +125,21 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 			return;
 		}
 		case LAMBDA_PARAMETERS_END:
-			this.mode = LAMBDA_ARROW;
+			this.mode = LAMBDA_TYPE_ARROW;
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.report(token, "statement_list.lambda.close_paren");
 			}
 			return;
-		case LAMBDA_ARROW:
+		case LAMBDA_TYPE_ARROW:
+			if (type == DyvilSymbols.ARROW_RIGHT)
+			{
+				pm.pushParser(LambdaOrTupleParser.returnTypeParser(this.lambdaExpr));
+				this.mode = LAMBDA_RETURN_ARROW;
+				return;
+			}
+			// Fallthrough
+		case LAMBDA_RETURN_ARROW:
 			if (type != DyvilSymbols.DOUBLE_ARROW_RIGHT)
 			{
 				pm.report(token, "statement_list.lambda.arrow");
@@ -158,20 +164,22 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 
 			final TokenIterator tokens = pm.getTokens();
 
+			final MemberParser parser = new MemberParser<>(this).withFlag(
+				NO_UNINITIALIZED_VARIABLES | OPERATOR_ERROR | NO_FIELD_PROPERTIES);
+			final TryParserManager parserManager = new TryParserManager(DyvilSymbols.INSTANCE, tokens, pm.getMarkers());
+
 			// Have to rewind one token because the TryParserManager assumes the TokenIterator is at the beginning (i.e.
 			// no tokens have been returned by next() yet)
 			tokens.jump(token);
-			final MemberParser parser = new MemberParser<>(this).withFlag(
-				NO_UNINITIALIZED_VARIABLES | OPERATOR_ERROR | NO_FIELD_PROPERTIES);
-			if (new TryParserManager(tokens, pm.getMarkers()).parse(parser, EXIT_ON_ROOT))
+			if (parserManager.parse(parser, EXIT_ON_ROOT))
 			{
 				tokens.jump(tokens.lastReturned());
 				this.mode = SEPARATOR;
 				return;
 			}
 
-			// Reset to the current token
-			tokens.jump(token);
+			// Reset to the current token and restore split tokens
+			parserManager.resetTo(token);
 			pm.pushParser(new ExpressionParser(this));
 			return;
 		case SEPARATOR:
@@ -236,6 +244,7 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 					return null;
 				}
 				continue;
+			case DyvilSymbols.ARROW_RIGHT:
 			case DyvilSymbols.DOUBLE_ARROW_RIGHT:
 				if (parenDepth == 0 && bracketDepth == 0 && braceDepth == 0)
 				{

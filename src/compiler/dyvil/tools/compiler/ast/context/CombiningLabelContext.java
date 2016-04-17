@@ -6,26 +6,26 @@ import dyvil.tools.parsing.Name;
 
 public class CombiningLabelContext implements ILabelContext
 {
-	private ILabelContext context1;
-	private ILabelContext context2;
+	private ILabelContext inner;
+	private ILabelContext outer;
 	
-	public CombiningLabelContext(ILabelContext context1, ILabelContext context2)
+	public CombiningLabelContext(ILabelContext inner, ILabelContext outer)
 	{
-		this.context1 = context1;
-		this.context2 = context2;
+		this.inner = inner;
+		this.outer = outer;
 	}
 	
 	@Override
 	public Label resolveLabel(Name name)
 	{
-		Label label = this.context1.resolveLabel(name);
-		return label == null ? this.context2.resolveLabel(name) : label;
+		final Label innerLabel = this.inner.resolveLabel(name);
+		return innerLabel != null ? innerLabel : this.outer.resolveLabel(name);
 	}
 	
 	@Override
 	public ILoop getEnclosingLoop()
 	{
-		ILoop loop = this.context1.getEnclosingLoop();
-		return loop == null ? this.context2.getEnclosingLoop() : loop;
+		final ILoop innerLoop = this.inner.getEnclosingLoop();
+		return innerLoop == null ? this.outer.getEnclosingLoop() : innerLoop;
 	}
 }

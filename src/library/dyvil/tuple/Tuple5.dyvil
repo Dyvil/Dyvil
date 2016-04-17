@@ -1,7 +1,7 @@
 package dyvil.tuple
 
 @Immutable
-public case class Tuple5[+A, +B, +C, +D, +E] (
+public case class Tuple5<+A, +B, +C, +D, +E> (
 		public final A _1
 		public final B _2
 		public final C _3

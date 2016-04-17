@@ -8,7 +8,6 @@ import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.parsing.Name;
 
 public interface IMemberContext
@@ -17,9 +16,7 @@ public interface IMemberContext
 
 	IClass resolveClass(Name name);
 
-	IType resolveType(Name name);
-
-	ITypeParameter resolveTypeVariable(Name name);
+	ITypeParameter resolveTypeParameter(Name name);
 
 	IDataMember resolveField(Name name);
 

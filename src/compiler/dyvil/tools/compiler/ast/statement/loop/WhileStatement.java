@@ -199,8 +199,8 @@ public final class WhileStatement extends AbstractValue implements IStatement, I
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		dyvil.tools.asm.Label startLabel = this.startLabel.target = new dyvil.tools.asm.Label();
-		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label startLabel = this.startLabel.getTarget();
+		dyvil.tools.asm.Label endLabel = this.endLabel.getTarget();
 		
 		// Condition
 		writer.visitTargetLabel(startLabel);

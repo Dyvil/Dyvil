@@ -40,7 +40,12 @@ public final class DoubleToken implements IToken
 	{
 		return Tokens.DOUBLE;
 	}
-	
+
+	public void setValue(double value)
+	{
+		this.value = value;
+	}
+
 	@Override
 	public double doubleValue()
 	{

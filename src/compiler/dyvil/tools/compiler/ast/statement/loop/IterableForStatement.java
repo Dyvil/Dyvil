@@ -25,7 +25,6 @@ public class IterableForStatement extends ForEachStatement
 		public static final ITypeParameter ITERATOR_TYPE  = ITERATOR_CLASS.getTypeParameter(0);
 	}
 
-	protected IMethod boxMethod;
 	protected boolean iterator;
 
 	public IterableForStatement(ICodePosition position, IVariable variable, boolean iterator)
@@ -37,9 +36,9 @@ public class IterableForStatement extends ForEachStatement
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
-		dyvil.tools.asm.Label startLabel = this.startLabel.target = new dyvil.tools.asm.Label();
-		dyvil.tools.asm.Label updateLabel = this.updateLabel.target = new dyvil.tools.asm.Label();
-		dyvil.tools.asm.Label endLabel = this.endLabel.target = new dyvil.tools.asm.Label();
+		dyvil.tools.asm.Label startLabel = this.startLabel.getTarget();
+		dyvil.tools.asm.Label updateLabel = this.updateLabel.getTarget();
+		dyvil.tools.asm.Label endLabel = this.endLabel.getTarget();
 
 		final IVariable var = this.variable;
 		final IType varType = var.getType();

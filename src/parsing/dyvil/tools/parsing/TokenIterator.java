@@ -1,51 +1,58 @@
 package dyvil.tools.parsing;
 
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
+import dyvil.tools.parsing.token.StartToken;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class TokenIterator implements Iterator<IToken>
 {
-	protected final IToken first;
-	
-	protected IToken lastReturned;
-	protected IToken next;
-	
-	public TokenIterator(IToken first)
+	protected final IToken startToken;
+	protected IToken       lastReturned;
+	protected IToken       next;
+
+	public TokenIterator()
 	{
-		this.first = first;
-		this.next = first;
+		this.startToken = this.next = new StartToken();
 	}
-	
+
 	public void reset()
 	{
 		this.lastReturned = null;
-		this.next = this.first;
+		this.next = this.startToken.next();
 	}
-	
+
 	public void jump(IToken next)
 	{
 		this.lastReturned = null;
 		this.next = next;
 	}
-	
+
+	public void append(IToken token)
+	{
+		token.setPrev(this.next);
+		this.next.setNext(token);
+		this.next = token;
+	}
+
 	@Override
 	public boolean hasNext()
 	{
-		return this.next.type() != 0;
+		return this.next.type() != Tokens.EOF;
 	}
-	
+
 	public IToken first()
 	{
-		return this.first;
+		return this.startToken.next();
 	}
-	
+
 	public IToken lastReturned()
 	{
 		return this.lastReturned;
 	}
-	
+
 	@Override
 	public IToken next()
 	{
@@ -53,12 +60,12 @@ public class TokenIterator implements Iterator<IToken>
 		{
 			throw new NoSuchElementException();
 		}
-		
+
 		this.lastReturned = this.next;
 		this.next = this.next.next();
 		return this.lastReturned;
 	}
-	
+
 	@Override
 	public void remove()
 	{
@@ -67,20 +74,20 @@ public class TokenIterator implements Iterator<IToken>
 		{
 			throw new IllegalStateException();
 		}
-		
+
 		IToken next = this.next.next();
-		
+
 		prev.setNext(next);
 		next.setPrev(prev);
 		this.lastReturned = null;
 		this.next = next;
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		StringBuilder buf = new StringBuilder();
-		for (IToken token = this.first; token.type() != 0; token = token.next())
+		for (IToken token = this.first(); token.type() != Tokens.EOF; token = token.next())
 		{
 			buf.append(token).append('\n');
 		}

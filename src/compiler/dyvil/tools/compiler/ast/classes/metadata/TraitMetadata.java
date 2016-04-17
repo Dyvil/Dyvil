@@ -1,7 +1,8 @@
-package dyvil.tools.compiler.ast.classes;
+package dyvil.tools.compiler.ast.classes.metadata;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.backend.ClassWriter;

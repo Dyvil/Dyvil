@@ -25,7 +25,7 @@ public class CaptureTest
 			public override String toString() = this[ThisCapture].toString
 		}
 		
-		public => ThisCapture lambda() = => this
+		public -> ThisCapture lambda() = => this
 
 		public override String toString() = System.identityHashCode(this).toHexString
 	}

@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.parsing.Name;
 
 public class CombiningContext implements IContext
@@ -87,17 +88,17 @@ public class CombiningContext implements IContext
 	}
 
 	@Override
-	public IType resolveType(Name name)
+	public ITypeAlias resolveTypeAlias(Name name, int arity)
 	{
-		IType type = this.inner.resolveType(name);
-		return type == null ? this.outer.resolveType(name) : type;
+		final ITypeAlias inner = this.inner.resolveTypeAlias(name, arity);
+		return inner == null ? this.outer.resolveTypeAlias(name, arity) : inner;
 	}
 
 	@Override
-	public ITypeParameter resolveTypeVariable(Name name)
+	public ITypeParameter resolveTypeParameter(Name name)
 	{
-		ITypeParameter typeVar = this.inner.resolveTypeVariable(name);
-		return typeVar == null ? this.outer.resolveTypeVariable(name) : typeVar;
+		ITypeParameter typeVar = this.inner.resolveTypeParameter(name);
+		return typeVar == null ? this.outer.resolveTypeParameter(name) : typeVar;
 	}
 
 	@Override

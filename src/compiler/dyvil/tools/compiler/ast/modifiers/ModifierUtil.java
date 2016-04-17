@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.IMember;
-import dyvil.tools.compiler.parser.IParserManager;
+import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
@@ -78,13 +78,14 @@ public final class ModifierUtil
 			return BaseModifiers.INLINE;
 		case DyvilKeywords.SYNCHRONIZED:
 			return BaseModifiers.SYNCHRONIZED;
-		case DyvilKeywords.FUNCTIONAL:
-			parserManager.report(Markers.syntaxWarning(token, "modifier.functional.deprecated"));
-			return BaseModifiers.FUNCTIONAL;
 		case DyvilKeywords.CONST:
 			return BaseModifiers.CONST;
 		case DyvilKeywords.LAZY:
 			return BaseModifiers.LAZY;
+		case DyvilKeywords.NIL:
+			return BaseModifiers.NIL;
+		case DyvilKeywords.NULL:
+			return BaseModifiers.NULL;
 		}
 		return null;
 	}

@@ -16,9 +16,12 @@ public final class LanguageFeatures
 
 	// Class and Type
 
-	public static Class[T] classOf[@Reified(true) T](T value) = class T
+	@Intrinsic([ LOAD_0 ])
+	public static T cast<T>(any value) = cast<T>(value)
 
-	public static Type[T] typeOf[@Reified T](T value) = type T
+	public static Class<T> classOf<@Reified(true) T>(T value) = class T
+
+	public static Type<T> typeOf<@Reified T>(T value) = type T
 
 	// Increments
 
@@ -32,17 +35,17 @@ public final class LanguageFeatures
 
 	// Useful Globals
 
-	public static inline R run[R](=> R f) = f()
+	public static inline R run<R>(-> R f) = f()
 
-	public static infix inline R run[T, R](T self, T.() => R f) = f(self)
+	public static infix inline R run<T, R>(T self, T.() -> R f) = f(self)
 
-	public static infix inline T use[T](T self, T.() => void f)
+	public static infix inline T use<T>(T self, T.() -> void f)
 	{
 		f(self)
 		return self
 	}
 
-	public static inline R with[T, R](T receiver, T => R f) = f(receiver)
+	public static inline R with<T, R>(T receiver, T -> R f) = f(receiver)
 
 	// I/O
 
@@ -54,18 +57,18 @@ public final class LanguageFeatures
 		return stream
 	}
 
-	public static inline func println(AutoPrinter.() => void closure): void = closure(new AutoPrinter)
+	public static inline func println(AutoPrinter.() -> void closure): void = closure(new AutoPrinter)
 
 	// Timing
 
-	public static inline long measureMillis(=> void f)
+	public static inline long measureMillis(-> void f)
 	{
 		long millis = System.currentTimeMillis
 		f()
 		return System.currentTimeMillis - millis
 	}
 
-	public static inline long measureNanos(=> void f)
+	public static inline long measureNanos(-> void f)
 	{
 		long nanos = System.nanoTime
 		f()

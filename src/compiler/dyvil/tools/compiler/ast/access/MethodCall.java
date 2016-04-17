@@ -115,17 +115,6 @@ public class MethodCall extends AbstractCall implements INamed
 	}
 
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
-	{
-		if (this.genericData != null)
-		{
-			this.genericData.resolveTypes(markers, context);
-		}
-
-		super.resolveTypes(markers, context);
-	}
-
-	@Override
 	public IValue resolveCall(MarkerList markers, IContext context)
 	{
 		final int args = this.arguments.size();
@@ -309,18 +298,18 @@ public class MethodCall extends AbstractCall implements INamed
 			{
 				buffer.append(' ');
 			}
-			else if (this.genericData == null)
+			else
 			{
 				buffer.append('.');
 			}
 		}
 
+		buffer.append(this.name);
+
 		if (this.genericData != null)
 		{
 			this.genericData.toString(prefix, buffer);
 		}
-
-		buffer.append(this.name);
 
 		this.arguments.toString(prefix, buffer);
 	}

@@ -1,54 +1,45 @@
 package dyvil.tools.compiler.ast.modifiers;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.transform.DyvilKeywords;
 
 public enum BaseModifiers implements Modifier
 {
 	// Visibility Modifiers
 	PACKAGE_PRIVATE(0, "package private"),
-	PRIVATE(Modifiers.PRIVATE, "private", DyvilKeywords.PRIVATE),
+	PRIVATE(Modifiers.PRIVATE, "private"),
 	PRIVATE_PROTECTED(Modifiers.PROTECTED, "private protected"),
-	PROTECTED(Modifiers.PROTECTED, "protected", DyvilKeywords.PROTECTED),
+	PROTECTED(Modifiers.PROTECTED, "protected"),
 	PACKAGE_PROTECTED(Modifiers.PUBLIC, "package protected"),
-	PUBLIC(Modifiers.PUBLIC, "public", DyvilKeywords.PUBLIC),
-	INTERNAL(Modifiers.INTERNAL, "internal", DyvilKeywords.INTERNAL),
+	PUBLIC(Modifiers.PUBLIC, "public"),
+	INTERNAL(Modifiers.INTERNAL, "internal"),
 	// Access Modifiers
-	STATIC(Modifiers.STATIC, "static", DyvilKeywords.STATIC),
-	FINAL(Modifiers.FINAL, "final", DyvilKeywords.FINAL),
-	ABSTRACT(Modifiers.ABSTRACT, "abstract", DyvilKeywords.ABSTRACT),
+	STATIC(Modifiers.STATIC, "static"),
+	FINAL(Modifiers.FINAL, "final"),
+	ABSTRACT(Modifiers.ABSTRACT, "abstract"),
 	// Method Modifiers
-	PREFIX(Modifiers.PREFIX, "prefix", DyvilKeywords.PREFIX),
-	INFIX(Modifiers.INFIX, "infix", DyvilKeywords.INFIX),
-	POSTFIX(Modifiers.INFIX, "postfix", DyvilKeywords.POSTFIX),
-	OVERRIDE(Modifiers.OVERRIDE, "override", DyvilKeywords.OVERRIDE),
-	INLINE(Modifiers.INLINE, "inline", DyvilKeywords.INLINE),
-	SYNCHRONIZED(Modifiers.SYNCHRONIZED, "synchronized", DyvilKeywords.SYNCHRONIZED),
-	EXTENSION(Modifiers.EXTENSION, "extension", DyvilKeywords.EXTENSION),
+	PREFIX(Modifiers.PREFIX, "prefix"),
+	INFIX(Modifiers.INFIX, "infix"),
+	POSTFIX(Modifiers.INFIX, "postfix"),
+	OVERRIDE(Modifiers.OVERRIDE, "override"),
+	INLINE(Modifiers.INLINE, "inline"),
+	SYNCHRONIZED(Modifiers.SYNCHRONIZED, "synchronized"),
+	EXTENSION(Modifiers.EXTENSION, "extension"),
 	// Class Modifiers
-	SEALED(Modifiers.SEALED, "sealed", DyvilKeywords.SEALED),
-	CASE(Modifiers.CASE_CLASS, "case", DyvilKeywords.CASE),
-	FUNCTIONAL(Modifiers.FUNCTIONAL, "functional", DyvilKeywords.FUNCTIONAL),
+	SEALED(Modifiers.SEALED, "sealed"),
+	CASE(Modifiers.CASE_CLASS, "case"),
+	NULL(Modifiers.NULL_CLASS, "null"),
+	NIL(Modifiers.NIL_CLASS, "nil"),
 	// Field Modifiers
-	CONST(Modifiers.CONST, "const", DyvilKeywords.CONST),
-	LAZY(Modifiers.LAZY, "lazy", DyvilKeywords.LAZY);
+	CONST(Modifiers.CONST, "const"),
+	LAZY(Modifiers.LAZY, "lazy");
 
 	private final int    intValue;
-	private final int    keyword;
 	private final String name;
 
 	BaseModifiers(int intValue, String name)
 	{
 		this.intValue = intValue;
 		this.name = name;
-		this.keyword = -1;
-	}
-
-	BaseModifiers(int intValue, String name, int keyword)
-	{
-		this.intValue = intValue;
-		this.name = name;
-		this.keyword = keyword;
 	}
 
 	@Override

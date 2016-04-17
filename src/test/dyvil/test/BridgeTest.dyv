@@ -2,14 +2,14 @@ package dyvil.test
 
 public class BridgeTest
 {
-	public interface Container[T]
+	public interface Container<T>
 	{
 		T get()
 		
 		void set(T value)
 	}
 	
-	public case class IntContainer(int value) implements Container[int]
+	public case class IntContainer(int value) implements Container<int>
 	{
 		public override int get() = this.value
 		
@@ -19,7 +19,7 @@ public class BridgeTest
 		}
 	}
 	
-	public case class LongContainer(long value) implements Container[long]
+	public case class LongContainer(long value) implements Container<long>
 	{
 		public override long get() = this.value
 				
@@ -34,14 +34,14 @@ public class BridgeTest
 		var ic = IntContainer(1)
 		Main.test("IntContainer", 1, ic.get)
 
-		Container[int] intContainer = ic
+		Container<int> intContainer = ic
 		ic.set(3)
 		Main.test("Container[int]", 3, intContainer.get)
 		
 		var lc = LongContainer(2L)
 		Main.test("LongContainer", 2L, lc.get)
 
-		Container[long] longContainer = lc
+		Container<long> longContainer = lc
 		lc.set(4L)
 		Main.test("Container[long]", 4L, longContainer.get)
 	}

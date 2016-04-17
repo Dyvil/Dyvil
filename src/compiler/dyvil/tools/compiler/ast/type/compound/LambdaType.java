@@ -79,12 +79,13 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		this.position = position;
 	}
 
-	public LambdaType(ICodePosition position, IType receiverType)
+	public LambdaType(ICodePosition position, IType parameterType)
 	{
 		this.position = position;
 
-		if (receiverType != null) {
-			this.parameterTypes = new IType[] { receiverType };
+		if (parameterType != null)
+		{
+			this.parameterTypes = new IType[] { parameterType };
 			this.parameterCount = 1;
 			return;
 		}
@@ -297,22 +298,20 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		final IValue typedReturnValue = value.withType(this.returnType, typeContext, markers, context);
 		if (typedReturnValue != null)
 		{
-			return this.wrapLambda(typedReturnValue, typeContext);
+			return this.wrapLambda(typedReturnValue);
 		}
 		return null;
 	}
 
-	public LambdaExpr wrapLambda(IValue value, ITypeContext typeContext)
+	public LambdaExpr wrapLambda(IValue value)
 	{
 		IType returnType = value.getType();
 
 		final LambdaExpr lambdaExpr = new LambdaExpr(value.getPosition(), null, 0);
 		lambdaExpr.setImplicitParameters(true);
 		lambdaExpr.setMethod(this.getFunctionalMethod());
-		lambdaExpr.setReturnType(returnType);
 		lambdaExpr.setValue(value);
-		lambdaExpr.setType(this);
-		lambdaExpr.inferReturnType(this, typeContext, returnType);
+		lambdaExpr.inferReturnType(this, returnType);
 		return lambdaExpr;
 	}
 
@@ -625,17 +624,21 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 				sb.append(", ").append(this.parameterTypes[i]);
 			}
 		}
-		sb.append(") => ").append(this.returnType);
+		sb.append(") -> ").append(this.returnType);
 		return sb.toString();
 	}
 
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.parameterCount == 1 && this.parameterTypes[0].typeTag() != TUPLE && !Formatting.getBoolean(
-			"lambda.single.wrap"))
+		final IType parameterType;
+		final int parameterTypeTag;
+		if (this.parameterCount == 1 && (parameterTypeTag = (parameterType = this.parameterTypes[0]).typeTag()) != TUPLE
+			    && parameterTypeTag != LAMBDA && !Formatting.getBoolean("lambda.single.wrap"))
 		{
-			this.parameterTypes[0].toString(prefix, buffer);
+			// Single Parameter Type that is neither a Lambda Type nor a Tuple Type
+
+			parameterType.toString(prefix, buffer);
 
 			if (Formatting.getBoolean("lambda.arrow.space_before"))
 			{
@@ -653,7 +656,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 			Util.astToString(prefix, this.parameterTypes, this.parameterCount,
 			                 Formatting.getSeparator("lambda.separator", ','), buffer);
 
-			if (Formatting.getBoolean("lambda.close_paren.space-before"))
+			if (Formatting.getBoolean("lambda.close_paren.space_before"))
 			{
 				buffer.append(' ');
 			}
@@ -674,7 +677,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 			}
 		}
 
-		buffer.append("=>");
+		buffer.append("->");
 
 		if (Formatting.getBoolean("lambda.arrow.space_after"))
 		{

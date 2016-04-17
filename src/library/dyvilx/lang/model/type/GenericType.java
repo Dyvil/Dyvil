@@ -78,17 +78,18 @@ public class GenericType<T> extends NamedType<T>
 	public void toString(StringBuilder builder)
 	{
 		builder.append(this.name);
-		int len = this.typeArguments.length;
-		if (len > 0)
+
+		final int count = this.typeArguments.length;
+		if (count > 0)
 		{
-			builder.append('[');
+			builder.append('<');
 			this.typeArguments[0].toString(builder);
-			for (int i = 1; i < len; i++)
+			for (int i = 1; i < count; i++)
 			{
 				builder.append(", ");
 				this.typeArguments[i].toString(builder);
 			}
-			builder.append(']');
+			builder.append('>');
 		}
 	}
 

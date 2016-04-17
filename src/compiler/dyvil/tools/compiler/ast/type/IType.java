@@ -19,6 +19,7 @@ import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
+import dyvil.tools.compiler.ast.type.builtin.ResolvedTypeDelegate;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.*;
 import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
@@ -127,9 +128,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	default IType atPosition(ICodePosition position)
 	{
-		IType copy = this.clone();
-		copy.setPosition(position);
-		return copy;
+		return new ResolvedTypeDelegate(position, this);
 	}
 
 	int typeTag();
@@ -157,7 +156,10 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		return this;
 	}
 
-	IType asParameterType();
+	default IType asParameterType()
+	{
+		return this.getConcreteType(ITypeContext.COVARIANT);
+	}
 
 	String getTypePrefix();
 
@@ -354,17 +356,10 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	}
 
 	@Override
-	default IType resolveType(Name name)
+	default ITypeParameter resolveTypeParameter(Name name)
 	{
 		final IClass theClass = this.getTheClass();
-		return theClass == null ? null : theClass.resolveType(name);
-	}
-
-	@Override
-	default ITypeParameter resolveTypeVariable(Name name)
-	{
-		final IClass theClass = this.getTheClass();
-		return theClass == null ? null : theClass.resolveTypeVariable(name);
+		return theClass == null ? null : theClass.resolveTypeParameter(name);
 	}
 
 	@Override
@@ -428,7 +423,13 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	{
 		if (typePath == null || step >= steps)
 		{
-			return type.withAnnotation(annotation);
+			final IType customType = type.withAnnotation(annotation);
+			if (customType != null)
+			{
+				return customType;
+			}
+
+			return new AnnotatedType(type, annotation);
 		}
 
 		type.addAnnotation(annotation, typePath, step, steps);

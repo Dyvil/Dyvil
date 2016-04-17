@@ -2,7 +2,7 @@ package dyvil.test
 
 import dyvilx.lang.model.`type`.Type
 
-type SL = List[String]
+type SL = List<String>
 
 public class ReifyTest
 {
@@ -14,29 +14,29 @@ public class ReifyTest
 	}
 
 	// Reify Type
-	private static Type[T] typeOf[@Reified T]() = type T
+	private static Type<T> typeOf<@Reified T>() = type T
 
 	// Reify Type, with Argument
-	private static Type[T] typeOf[@Reified T](T value) = type T
+	private static Type<T> typeOf<@Reified T>(T value) = type T
 
 	// Reify Class
-	private static Class[T] classOf[@Reified T]() = class T
+	private static Class<T> classOf<@Reified T>() = class T
 
 	// Reify Class, with Argument
-	private static Class[T] classOf[@Reified T](T value) = class T
+	private static Class<T> classOf<@Reified T>(T value) = class T
 
 	// Reify Class from Erasure
-	private static Class[T] classOfErasure[@Reified(erasure: true) T]() = class T
+	private static Class<T> classOfErasure<@Reified(erasure: true) T>() = class T
 
 	// Reify Class from Erasure, with Argument
-	private static Class[T] classOfErasure[@Reified(erasure: true) T](T value) = class T
+	private static Class<T> classOfErasure<@Reified(erasure: true) T>(T value) = class T
 
 	private static void typeTest()
 	{
-		Type[SL] slType = type SL
+		Type<SL> slType = type SL
 
-		Type[SL] type1 = ReifyTest.[SL]typeOf
-		Type[SL] type2 = ReifyTest.typeOf(List("a", "b", "c") as SL)
+		Type<SL> type1 = ReifyTest.typeOf<SL>
+		Type<SL> type2 = ReifyTest.typeOf(List("a", "b", "c") as SL)
 
 		Main.test("Reify Type Test", type1, slType, type1.toString == slType.toString)
 		Main.test("Reity Type Test with Argument", type2, slType, type2.toString == slType.toString)
@@ -44,10 +44,10 @@ public class ReifyTest
 
 	private static void classTest()
 	{
-		Class[String] stringClass = class String
+		Class<String> stringClass = class String
 
-		Class[String] class1 = ReifyTest.[String]classOf
-		Class[String] class2 = ReifyTest.classOf "abc"
+		Class<String> class1 = ReifyTest.classOf<String>
+		Class<String> class2 = ReifyTest.classOf "abc"
 
 		Main.test("Reify Class Test", class1, stringClass)
 		Main.test("Reify Class Test with Argument", class2, stringClass)
@@ -55,10 +55,10 @@ public class ReifyTest
 
 	private static void classErasureTest()
 	{
-		Class[String] stringClass = class String
+		Class<String> stringClass = class String
 
-		Class[String] class1 = ReifyTest.[String]classOfErasure
-		Class[String] class2 = ReifyTest.classOfErasure "abc"
+		Class<String> class1 = ReifyTest.classOfErasure<String>
+		Class<String> class2 = ReifyTest.classOfErasure "abc"
 
 		Main.test("Reify Erasure Class Test", class1, stringClass)
 		Main.test("Reify Erasure Class Test with Argument", class2, stringClass)

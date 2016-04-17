@@ -428,7 +428,7 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 		for (int i = 1; i < this.size; i++)
 		{
 			entry = this.entries[i];
-			builder.append(Map.START_STRING).append(entry._1).append(Map.KEY_VALUE_SEPARATOR_STRING).append(entry._2);
+			builder.append(Map.ENTRY_SEPARATOR_STRING).append(entry._1).append(Map.KEY_VALUE_SEPARATOR_STRING).append(entry._2);
 		}
 		return builder.append(Map.END_STRING).toString();
 	}

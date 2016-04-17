@@ -20,6 +20,7 @@ import dyvil.tools.compiler.ast.type.raw.InternalType;
 import dyvil.tools.compiler.ast.type.typevar.InternalTypeVarType;
 import dyvil.tools.parsing.Name;
 
+@SuppressWarnings( { "UnnecessaryBoxing", "unused" })
 public final class ClassFormat
 {
 	public static final int CLASS_VERSION = ASMConstants.V1_8;
@@ -287,81 +288,70 @@ public final class ClassFormat
 
 	private static int readTyped(String desc, int start, ITypeConsumer consumer)
 	{
-		int array = 0;
-		char c;
-		while ((c = desc.charAt(start)) == '[')
-		{
-			array++;
-			start++;
-		}
-
-		switch (c)
+		switch (desc.charAt(start))
 		{
 		case 'V':
-			consumer.setType(ArrayType.getArrayType(Types.VOID, array));
+			consumer.setType(Types.VOID);
 			return start + 1;
 		case 'Z':
-			consumer.setType(ArrayType.getArrayType(Types.BOOLEAN, array));
+			consumer.setType(Types.BOOLEAN);
 			return start + 1;
 		case 'B':
-			consumer.setType(ArrayType.getArrayType(Types.BYTE, array));
+			consumer.setType(Types.BYTE);
 			return start + 1;
 		case 'S':
-			consumer.setType(ArrayType.getArrayType(Types.SHORT, array));
+			consumer.setType(Types.SHORT);
 			return start + 1;
 		case 'C':
-			consumer.setType(ArrayType.getArrayType(Types.CHAR, array));
+			consumer.setType(Types.CHAR);
 			return start + 1;
 		case 'I':
-			consumer.setType(ArrayType.getArrayType(Types.INT, array));
+			consumer.setType(Types.INT);
 			return start + 1;
 		case 'J':
-			consumer.setType(ArrayType.getArrayType(Types.LONG, array));
+			consumer.setType(Types.LONG);
 			return start + 1;
 		case 'F':
-			consumer.setType(ArrayType.getArrayType(Types.FLOAT, array));
+			consumer.setType(Types.FLOAT);
 			return start + 1;
 		case 'D':
-			consumer.setType(ArrayType.getArrayType(Types.DOUBLE, array));
+			consumer.setType(Types.DOUBLE);
 			return start + 1;
 		case 'L':
 		{
-			int end1 = getMatchingSemicolon(desc, start, desc.length());
-			IType type = readReferenceType(desc, start + 1, end1);
-			if (array > 0)
-			{
-				type = ArrayType.getArrayType(type, array);
-			}
-			consumer.setType(type);
-			return end1 + 1;
+			final int end = getMatchingSemicolon(desc, start, desc.length());
+			consumer.setType(readReferenceType(desc, start + 1, end));
+			return end + 1;
 		}
 		case 'T':
 		{
-			int end1 = desc.indexOf(';', start);
-			IType type = new InternalTypeVarType(desc.substring(start + 1, end1));
-			if (array > 0)
-			{
-				type = ArrayType.getArrayType(type, array);
-			}
-			consumer.setType(type);
-			return end1 + 1;
+			final int end = desc.indexOf(';', start);
+			consumer.setType(new InternalTypeVarType(desc.substring(start + 1, end)));
+			return end + 1;
 		}
 		case '*':
 			consumer.setType(new WildcardType(Variance.INVARIANT));
 			return start + 1;
 		case '+':
 		{
-			WildcardType var = new WildcardType(Variance.COVARIANT);
-			int end1 = readTyped(desc, start + 1, var);
+			final WildcardType var = new WildcardType(Variance.COVARIANT);
+			final int end = readTyped(desc, start + 1, var);
 			consumer.setType(var);
-			return end1;
+			return end;
 		}
 		case '-':
 		{
-			WildcardType var = new WildcardType(Variance.CONTRAVARIANT);
-			int end1 = readTyped(desc, start + 1, var);
+			final WildcardType var = new WildcardType(Variance.CONTRAVARIANT);
+			final int end = readTyped(desc, start + 1, var);
 			consumer.setType(var);
-			return end1;
+			return end;
+		}
+		case '[':
+		{
+			final ArrayType arrayType = new ArrayType();
+			final int end = readTyped(desc, start + 1, arrayType);
+			consumer.setType(arrayType);
+			return end;
 		}
 		}
 		return start;

@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.AbstractClass;
 import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.classes.IClassMetadata;
+import dyvil.tools.compiler.ast.classes.metadata.IClassMetadata;
 import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -31,6 +31,7 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
@@ -50,17 +51,17 @@ import java.io.IOException;
 
 public final class ExternalClass extends AbstractClass
 {
-	public Package thePackage;
+	private static final int METADATA    = 1;
+	private static final int SUPER_TYPES = 1 << 1;
+	private static final int GENERICS    = 1 << 2;
+	private static final int PARAMETERS  = 1 << 3;
+	private static final int ANNOTATIONS = 1 << 4;
+	private static final int INNER_TYPES = 1 << 5;
 
+	protected Package thePackage;
+
+	private int resolved;
 	private Map<String, String> innerTypes;
-
-	private boolean metadataResolved;
-	private boolean superTypesResolved;
-	private boolean genericsResolved;
-	private boolean parametersResolved;
-	private boolean annotationsResolved;
-	private boolean innerTypesResolved;
-
 	private String[] classParameters;
 
 	public ExternalClass(Name name)
@@ -87,7 +88,7 @@ public final class ExternalClass extends AbstractClass
 
 	private void resolveMetadata()
 	{
-		this.metadataResolved = true;
+		this.resolved |= METADATA;
 
 		final IContext context = this.getCombiningContext();
 
@@ -98,7 +99,7 @@ public final class ExternalClass extends AbstractClass
 
 	private void resolveGenerics()
 	{
-		this.genericsResolved = true;
+		this.resolved |= GENERICS;
 		if (this.typeParameterCount <= 0)
 		{
 			return;
@@ -120,9 +121,9 @@ public final class ExternalClass extends AbstractClass
 
 	private void resolveParameters()
 	{
-		final IContext context = this.getCombiningContext();
+		this.resolved |= PARAMETERS;
 
-		this.parametersResolved = true;
+		final IContext context = this.getCombiningContext();
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].resolveTypes(null, context);
@@ -131,9 +132,9 @@ public final class ExternalClass extends AbstractClass
 
 	private void resolveSuperTypes()
 	{
-		final IContext context = this.getCombiningContext();
+		this.resolved |= SUPER_TYPES;
 
-		this.superTypesResolved = true;
+		final IContext context = this.getCombiningContext();
 		if (this.superType != null)
 		{
 			this.superType = this.superType.resolveType(null, context);
@@ -147,7 +148,8 @@ public final class ExternalClass extends AbstractClass
 
 	private void resolveAnnotations()
 	{
-		this.annotationsResolved = true;
+		this.resolved |= ANNOTATIONS;
+
 		if (this.annotations != null)
 		{
 			this.annotations.resolveTypes(null, this.getCombiningContext(), this);
@@ -156,7 +158,7 @@ public final class ExternalClass extends AbstractClass
 
 	private void resolveInnerTypes()
 	{
-		this.innerTypesResolved = true;
+		this.resolved |= INNER_TYPES;
 
 		if (this.innerTypes == null)
 		{
@@ -200,7 +202,7 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public IType getType()
 	{
-		if (!this.genericsResolved)
+		if ((this.resolved & GENERICS) == 0)
 		{
 			this.resolveGenerics();
 		}
@@ -210,7 +212,7 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public IClass getThisClass()
 	{
-		if (!this.genericsResolved)
+		if ((this.resolved & GENERICS) == 0)
 		{
 			this.resolveGenerics();
 		}
@@ -220,7 +222,7 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public IType getSuperType()
 	{
-		if (!this.superTypesResolved)
+		if ((this.resolved & SUPER_TYPES) == 0)
 		{
 			this.resolveSuperTypes();
 		}
@@ -230,7 +232,7 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public IClass getEnclosingClass()
 	{
-		if (!this.innerTypesResolved)
+		if ((this.resolved & INNER_TYPES) == 0)
 		{
 			this.resolveInnerTypes();
 		}
@@ -240,7 +242,7 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public boolean isSubClassOf(IType type)
 	{
-		if (!this.superTypesResolved)
+		if ((this.resolved & SUPER_TYPES) == 0)
 		{
 			this.resolveSuperTypes();
 		}
@@ -250,7 +252,7 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public int getSuperTypeDistance(IType superType)
 	{
-		if (!this.superTypesResolved)
+		if ((this.resolved & SUPER_TYPES) == 0)
 		{
 			this.resolveSuperTypes();
 		}
@@ -260,7 +262,7 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public ITypeParameter[] getTypeParameters()
 	{
-		if (!this.genericsResolved)
+		if ((this.resolved & GENERICS) == 0)
 		{
 			this.resolveGenerics();
 		}
@@ -270,7 +272,7 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public ITypeParameter getTypeParameter(int index)
 	{
-		if (!this.genericsResolved)
+		if ((this.resolved & GENERICS) == 0)
 		{
 			this.resolveGenerics();
 		}
@@ -280,7 +282,7 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public IAnnotation getAnnotation(IClass type)
 	{
-		if (!this.annotationsResolved)
+		if ((this.resolved & ANNOTATIONS) == 0)
 		{
 			this.resolveAnnotations();
 		}
@@ -290,7 +292,7 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public IParameter getParameter(int index)
 	{
-		if (!this.parametersResolved)
+		if ((this.resolved & PARAMETERS) == 0)
 		{
 			this.resolveParameters();
 		}
@@ -298,13 +300,23 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
+	public IParameter[] getParameters()
+	{
+		if ((this.resolved & PARAMETERS) == 0)
+		{
+			this.resolveParameters();
+		}
+		return super.getParameters();
+	}
+
+	@Override
 	public IType resolveType(ITypeParameter typeVar, IType concrete)
 	{
-		if (!this.genericsResolved)
+		if ((this.resolved & GENERICS) == 0)
 		{
 			this.resolveGenerics();
 		}
-		if (!this.superTypesResolved)
+		if ((this.resolved & SUPER_TYPES) == 0)
 		{
 			this.resolveSuperTypes();
 		}
@@ -314,7 +326,7 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public IClassMetadata getMetadata()
 	{
-		if (!this.metadataResolved)
+		if ((this.resolved & METADATA) == 0)
 		{
 			this.resolveMetadata();
 		}
@@ -329,7 +341,7 @@ public final class ExternalClass extends AbstractClass
 			return null;
 		}
 
-		if (!this.genericsResolved)
+		if ((this.resolved & GENERICS) == 0)
 		{
 			this.resolveGenerics();
 		}
@@ -382,11 +394,11 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public boolean checkImplements(IMethod candidate, ITypeContext typeContext)
 	{
-		if (!this.genericsResolved)
+		if ((this.resolved & GENERICS) == 0)
 		{
 			this.resolveGenerics();
 		}
-		if (!this.superTypesResolved)
+		if ((this.resolved & SUPER_TYPES) == 0)
 		{
 			this.resolveSuperTypes();
 		}
@@ -396,11 +408,11 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext, Set<IClass> checkedClasses)
 	{
-		if (!this.genericsResolved)
+		if ((this.resolved & GENERICS) == 0)
 		{
 			this.resolveGenerics();
 		}
-		if (!this.superTypesResolved)
+		if ((this.resolved & SUPER_TYPES) == 0)
 		{
 			this.resolveSuperTypes();
 		}
@@ -425,7 +437,7 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		if (!this.innerTypesResolved)
+		if ((this.resolved & INNER_TYPES) == 0)
 		{
 			this.resolveInnerTypes();
 		}
@@ -434,20 +446,20 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public IType resolveType(Name name)
+	public ITypeAlias resolveTypeAlias(Name name, int arity)
 	{
-		if (!this.innerTypesResolved)
+		if ((this.resolved & INNER_TYPES) == 0)
 		{
 			this.resolveInnerTypes();
 		}
 
-		return super.resolveType(name);
+		return super.resolveTypeAlias(name, arity);
 	}
 
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		if (!this.parametersResolved)
+		if ((this.resolved & PARAMETERS) == 0)
 		{
 			// Includes resolveGenerics
 			this.resolveParameters();
@@ -469,7 +481,7 @@ public final class ExternalClass extends AbstractClass
 			return field;
 		}
 
-		if (!this.superTypesResolved)
+		if ((this.resolved & SUPER_TYPES) == 0)
 		{
 			this.resolveSuperTypes();
 		}
@@ -489,7 +501,7 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
-		if (!this.genericsResolved)
+		if ((this.resolved & GENERICS) == 0)
 		{
 			this.resolveGenerics();
 		}
@@ -501,7 +513,7 @@ public final class ExternalClass extends AbstractClass
 			return;
 		}
 
-		if (!this.superTypesResolved)
+		if ((this.resolved & SUPER_TYPES) == 0)
 		{
 			this.resolveSuperTypes();
 		}
@@ -525,11 +537,11 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
-		if (!this.superTypesResolved)
+		if ((this.resolved & SUPER_TYPES) == 0)
 		{
 			this.resolveSuperTypes();
 		}
-		if (!this.genericsResolved)
+		if ((this.resolved & GENERICS) == 0)
 		{
 			this.resolveGenerics();
 		}
@@ -681,7 +693,7 @@ public final class ExternalClass extends AbstractClass
 
 		if (value != null)
 		{
-			field.setValue(IValue.fromObject(value));
+			field.setConstantValue(value);
 		}
 
 		this.body.addDataMember(field);

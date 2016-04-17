@@ -1,26 +1,26 @@
 package dyvil
 
-// Random Utilities
-using	dyvil.random.RandomUtils._
+// Random Extensions
+using	dyvil.random.JavaRandoms._
 
 // Collection Utilities and Conversions
 using	dyvil.collection.JavaCollections._
 using	dyvil.collection.JavaMaps._
 
 // Common Java Types
-type	JCollection[E]	= java.util.Collection[E]
+type	JCollection<E>	= java.util.Collection<E>
 
 // Lists
-type	JList[E]		= java.util.List[E]
-type	JArrayList[E]	= java.util.ArrayList[E]
-type	JLinkedList[E]	= java.util.LinkedList[E]
+type	JList<E>		= java.util.List<E>
+type	JArrayList<E>	= java.util.ArrayList<E>
+type	JLinkedList<E>	= java.util.LinkedList<E>
 
 // Sets
-type	JSet[E]			= java.util.Set[E]
-type	JTreeSet[E]		= java.util.TreeSet[E]
-type	JHashSet[E]		= java.util.HashSet[E]
+type	JSet<E>			= java.util.Set<E>
+type	JTreeSet<E>		= java.util.TreeSet<E>
+type	JHashSet<E>		= java.util.HashSet<E>
 
 // Maps
-type	JMap[K, V]		= java.util.Map[K, V]
-type	JHashMap[K, V]	= java.util.HashMap[K, V]
-type	JTreeMap[K, V]	= java.util.TreeMap[K, V]
+type	JMap<K, V>		= java.util.Map<K, V>
+type	JHashMap<K, V>	= java.util.HashMap<K, V>
+type	JTreeMap<K, V>	= java.util.TreeMap<K, V>

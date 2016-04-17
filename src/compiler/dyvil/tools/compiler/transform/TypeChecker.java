@@ -55,13 +55,8 @@ public final class TypeChecker
 		return (position, expected, actual) -> typeError(position, expected, actual, error, args);
 	}
 
-	public static IValue convertValue(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	private static IValue convertValueDirect(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type.hasTypeVariables())
-		{
-			type = type.getConcreteType(typeContext);
-		}
-
 		final IValue typedValue = type.convertValue(value, typeContext, markers, context);
 		if (typedValue != null)
 		{
@@ -77,17 +72,32 @@ public final class TypeChecker
 		return null;
 	}
 
+	public static IValue convertValue(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		if (type.hasTypeVariables())
+		{
+			type = type.getConcreteType(typeContext);
+		}
+
+		return convertValueDirect(value, type, typeContext, markers, context);
+	}
+
 	public static IValue convertValue(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context, MarkerSupplier markerSupplier)
 	{
-		final IValue newValue = convertValue(value, type, typeContext, markers, context);
+		final IType concreteType = type.getConcreteType(typeContext);
+		final IValue newValue = convertValueDirect(value, concreteType, typeContext, markers, context);
 		if (newValue != null)
 		{
+			if (typeContext != null && !typeContext.isReadonly())
+			{
+				type.inferTypes(newValue.getType(), typeContext);
+			}
 			return newValue;
 		}
 
 		if (value.isResolved())
 		{
-			markers.add(markerSupplier.createMarker(value.getPosition(), type, value.getType()));
+			markers.add(markerSupplier.createMarker(value.getPosition(), concreteType, value.getType()));
 		}
 		return value;
 	}

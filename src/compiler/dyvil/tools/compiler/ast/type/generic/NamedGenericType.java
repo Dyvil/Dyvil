@@ -12,11 +12,8 @@ import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.ast.type.compound.LambdaType;
-import dyvil.tools.compiler.ast.type.compound.TupleType;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.ast.type.raw.NamedType;
-import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -103,24 +100,6 @@ public class NamedGenericType extends GenericType
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
-		if (this.parent == null)
-		{
-			if (this.name == Names.Tuple)
-			{
-				this.resolveTypeArguments(markers, context);
-				return new TupleType(this.typeArguments, this.typeArgumentCount);
-			}
-			if (this.name == Names.Function)
-			{
-				if (this.typeArgumentCount > 0)
-				{
-					this.resolveTypeArguments(markers, context);
-					return new LambdaType(this.typeArguments, this.typeArgumentCount - 1,
-					                      this.typeArguments[this.typeArgumentCount - 1]);
-				}
-			}
-		}
-
 		// resolveType0 is used to avoid Type Variable -> Default Value replacement done by resolveType
 		final IType resolved = new NamedType(this.position, this.name, this.parent).resolveType0(markers, context);
 

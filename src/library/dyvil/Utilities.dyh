@@ -4,4 +4,4 @@ include	dyvil.Strings
 include	dyvil.IO
 
 using	dyvil.math.MathUtils._
-using	dyvil.random.RandomUtils._
+using	dyvil.random.JavaRandoms._

@@ -13,7 +13,13 @@ public final class MapTypeContext implements ITypeContext
 	{
 		return this.map.get(typeParameter);
 	}
-	
+
+	@Override
+	public boolean isReadonly()
+	{
+		return false;
+	}
+
 	@Override
 	public void addMapping(ITypeParameter typeVar, IType type)
 	{

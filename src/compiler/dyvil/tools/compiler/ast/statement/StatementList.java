@@ -5,6 +5,7 @@ import dyvil.collection.iterator.ArrayIterator;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.ast.access.ICall;
 import dyvil.tools.compiler.ast.access.MethodCall;
+import dyvil.tools.compiler.ast.context.CombiningLabelContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
@@ -345,9 +346,10 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	@Override
 	public void resolveStatement(ILabelContext context, MarkerList markers)
 	{
+		final ILabelContext labelContext = new CombiningLabelContext(this, context);
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			this.values[i].resolveStatement(context, markers);
+			this.values[i].resolveStatement(labelContext, markers);
 		}
 	}
 
@@ -587,23 +589,24 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		}
 		else
 		{
+			final int labelCount = this.labels.length;
+			Label label;
+
 			// Write all statements except the last one
 			for (int i = 0; i < statementCount; i++)
 			{
-				Label label = this.labels[i];
-				if (label != null)
+				if (i < labelCount && (label = this.labels[i]) != null)
 				{
-					writer.visitLabel(label.target);
+					writer.visitLabel(label.getTarget());
 				}
 
 				this.values[i].writeExpression(writer, Types.VOID);
 			}
 
 			// Write last expression (and label)
-			Label label = this.labels[statementCount];
-			if (label != null)
+			if (statementCount < labelCount && (label = this.labels[statementCount]) != null)
 			{
-				writer.visitLabel(label.target);
+				writer.visitLabel(label.getTarget());
 			}
 
 			this.values[statementCount].writeExpression(writer, type);
@@ -670,7 +673,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 				prevLine = pos.endLine();
 			}
 
-			if (this.labels != null && (label = this.labels[i]) != null)
+			if (this.labels != null && i < this.labels.length && (label = this.labels[i]) != null)
 			{
 				buffer.append(label.name);
 

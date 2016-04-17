@@ -1,10 +1,11 @@
-package dyvil.tools.compiler.ast.classes;
+package dyvil.tools.compiler.ast.classes.metadata;
 
 import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -18,11 +19,11 @@ import java.util.Set;
 
 public interface IClassMetadata extends IClassCompilable
 {
-	default void setInstanceField(IDataMember field)
+	default void setInstanceField(IField field)
 	{
 	}
 	
-	default IDataMember getInstanceField()
+	default IField getInstanceField()
 	{
 		return null;
 	}

@@ -33,7 +33,6 @@ import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Mutability;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -390,29 +389,14 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public IType resolveType(Name name)
+	public ITypeParameter resolveTypeParameter(Name name)
 	{
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			ITypeParameter var = this.typeParameters[i];
-			if (var.getName() == name)
+			final ITypeParameter typeParameter = this.typeParameters[i];
+			if (typeParameter.getName() == name)
 			{
-				return new TypeVarType(var);
-			}
-		}
-
-		return null;
-	}
-
-	@Override
-	public ITypeParameter resolveTypeVariable(Name name)
-	{
-		for (int i = 0; i < this.typeParameterCount; i++)
-		{
-			ITypeParameter var = this.typeParameters[i];
-			if (var.getName() == name)
-			{
-				return var;
+				return typeParameter;
 			}
 		}
 
@@ -502,15 +486,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return 0;
 		}
 
-		// Only matching the name
-		if (arguments == null)
-		{
-			return 1;
-		}
-
 		int parameterStartIndex = 0;
 		int totalMatch = 1;
-		int argumentCount = arguments.size();
 
 		// infix modifier implementation
 		if (receiver != null)
@@ -547,6 +524,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 		}
 
+		// Only matching the name
+		if (arguments == null)
+		{
+			return totalMatch;
+		}
+
+		final int argumentCount = arguments.size();
 		final int parametersLeft = this.parameterCount - parameterStartIndex;
 		if (argumentCount > parametersLeft && !this.isVariadic())
 		{
@@ -578,23 +562,17 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 		if (genericData == null)
 		{
-			genericData = new GenericData(this, this.typeParameterCount);
-
-			this.inferTypes(genericData, instance, arguments);
-
-			return genericData;
+			return new GenericData(this, this.typeParameterCount);
 		}
 
 		genericData.method = this;
-
 		genericData.setTypeCount(this.typeParameterCount);
-		this.inferTypes(genericData, instance, arguments);
 
 		return genericData;
 	}
 
 	@Override
-	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue receiver, IArguments arguments, ITypeContext typeContext)
+	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue receiver, IArguments arguments, GenericData genericData)
 	{
 		if (this.modifiers.hasIntModifier(Modifiers.PREFIX) && !this.isStatic())
 		{
@@ -605,21 +583,27 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 		if (receiver != null)
 		{
-			int mod = this.modifiers.toFlags() & Modifiers.INFIX;
+			final int mod = this.modifiers.toFlags() & Modifiers.INFIX;
 			if (mod == Modifiers.INFIX && receiver.valueTag() != IValue.CLASS_ACCESS)
 			{
 				final IParameter parameter = this.parameters[0];
 				final IType paramType = parameter.getInternalType();
 
-				receiver = TypeChecker.convertValue(receiver, paramType, typeContext, markers, context,
+				updateReceiverType(receiver, genericData);
+				receiver = TypeChecker.convertValue(receiver, paramType, genericData, markers, context,
 				                                    TypeChecker.markerSupplier("method.access.infix_type", this.name));
 
-				for (int i = 0; i < this.parameterCount - 1; i++)
+				updateReceiverType(receiver, genericData);
+
+				for (int i = 1; i < this.parameterCount; i++)
 				{
-					arguments.checkValue(i, this.parameters[i + 1], typeContext, markers, context);
+					arguments.checkValue(i - 1, this.parameters[i], genericData, markers, context);
 				}
 
-				this.checkTypeVarsInferred(markers, position, typeContext);
+				if (genericData != null)
+				{
+					this.checkTypeVarsInferred(markers, position, genericData);
+				}
 				return receiver;
 			}
 
@@ -645,12 +629,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 			else
 			{
-				final TypeChecker.MarkerSupplier markerSupplier = TypeChecker
-					                                                  .markerSupplier("method.access.receiver_type",
-					                                                                  this.name);
-				// TODO Cache 'asParameterType'
-				receiver = TypeChecker.convertValue(receiver, this.receiverType.asParameterType(), typeContext, markers,
-				                                    context, markerSupplier);
+				updateReceiverType(receiver, genericData);
+				receiver = TypeChecker.convertValue(receiver, this.receiverType, genericData, markers, context,
+				                                    TypeChecker
+					                                    .markerSupplier("method.access.receiver_type", this.name));
+				updateReceiverType(receiver, genericData);
 			}
 		}
 		else if (!this.modifiers.hasIntModifier(Modifiers.STATIC))
@@ -662,63 +645,54 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			else
 			{
 				markers.add(Markers.semantic(position, "method.access.unqualified", this.name.unqualified));
-				receiver = new ThisExpr(position, this.enclosingClass.getType(), context, markers);
+
+				final IType receiverType = this.enclosingClass.getType();
+				receiver = new ThisExpr(position, receiverType, context, markers);
+				if (genericData != null)
+				{
+					genericData.setReceiverType(receiverType);
+				}
 			}
 		}
 
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			arguments.checkValue(i, this.parameters[i], typeContext, markers, context);
+			arguments.checkValue(i, this.parameters[i], genericData, markers, context);
 		}
 
-		this.checkTypeVarsInferred(markers, position, typeContext);
+		if (genericData != null)
+		{
+			this.checkTypeVarsInferred(markers, position, genericData);
+		}
 		return receiver;
 	}
 
-	private void inferTypes(GenericData genericData, IValue instance, IArguments arguments)
+	private static void updateReceiverType(IValue receiver, GenericData genericData)
 	{
-		if (instance != null)
+		if (genericData != null)
 		{
-			genericData.receiver = instance;
-		}
-		else
-		{
-			genericData.receiver = new ThisExpr(this.enclosingClass.getType());
-		}
-
-		int modifiers = this.modifiers.toFlags();
-
-		int parIndex = 0;
-		IParameter param;
-		if (instance != null && (modifiers & Modifiers.INFIX) == Modifiers.INFIX)
-		{
-			this.parameters[0].getType().inferTypes(instance.getType(), genericData);
-			parIndex = 1;
-		}
-
-		int len = this.parameterCount - parIndex;
-		for (int i = 0; i < len; i++)
-		{
-			param = this.parameters[i + parIndex];
-			arguments.inferType(i, param, genericData);
+			genericData.lock(genericData.typeCount());
+			genericData.setReceiverType(receiver.getType());
 		}
 	}
 
-	private void checkTypeVarsInferred(MarkerList markers, ICodePosition position, ITypeContext typeContext)
+	private void checkTypeVarsInferred(MarkerList markers, ICodePosition position, GenericData genericData)
 	{
+		genericData.lock(this.typeParameterCount);
+
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
 			final ITypeParameter typeParameter = this.typeParameters[i];
-			final IType typeArgument = typeContext.resolveType(typeParameter);
+			final IType typeArgument = genericData.getType(typeParameter.getIndex());
 
-			if (typeArgument == null || typeArgument.getTypeVariable() == typeParameter)
+			if (typeArgument == null)
 			{
 				final IType inferredType = typeParameter.getDefaultType();
 				markers.add(Markers.semantic(position, "method.typevar.infer", this.name, typeParameter.getName(),
 				                             inferredType));
-				typeContext.addMapping(typeParameter, inferredType);
+				genericData.addMapping(typeParameter, inferredType);
 			}
-			else if (!typeParameter.isAssignableFrom(typeArgument, typeContext))
+			else if (!typeParameter.isAssignableFrom(typeArgument, genericData))
 			{
 				final Marker marker = Markers.semanticError(position, "method.typevar.incompatible", this.name,
 				                                            typeParameter.getName());
@@ -1132,10 +1106,12 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		// Type Parameters
 		if (this.typeParameterCount > 0)
 		{
-			Formatting.appendSeparator(buffer, "generics.open_bracket", '[');
+			// TODO Append space if the name is a symbol
+
+			Formatting.appendSeparator(buffer, "generics.open_bracket", '<');
 			Util.astToString(prefix, this.typeParameters, this.typeParameterCount,
 			                 Formatting.getSeparator("generics.separator", ','), buffer);
-			Formatting.appendSeparator(buffer, "generics.close_bracket", ']');
+			Formatting.appendSeparator(buffer, "generics.close_bracket", '>');
 		}
 
 		// Parameters

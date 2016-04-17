@@ -22,12 +22,14 @@ public final class MethodMatchList
 		{
 			return;
 		}
-		
-		IMethod[] tempMethods = new IMethod[capacity];
+
+		final int newCapacity = capacity << 1;
+
+		final IMethod[] tempMethods = new IMethod[newCapacity];
 		System.arraycopy(this.methods, 0, tempMethods, 0, this.size);
 		this.methods = tempMethods;
 		
-		float[] tempValues = new float[capacity];
+		final float[] tempValues = new float[newCapacity];
 		System.arraycopy(this.values, 0, tempValues, 0, this.size);
 		this.values = tempValues;
 	}
@@ -38,6 +40,11 @@ public final class MethodMatchList
 		this.methods[this.size] = method;
 		this.values[this.size] = match;
 		this.size++;
+	}
+
+	public IMethod getMethod(int index)
+	{
+		return this.methods[index];
 	}
 	
 	public IMethod getBestMethod()

@@ -27,7 +27,7 @@ public interface IMethod extends IClassMember, ICallableMember, ICallableSignatu
 
 	float getSignatureMatch(Name name, IValue instance, IArguments arguments);
 	
-	IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext);
+	IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, GenericData genericData);
 	
 	void checkCall(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext);
 	

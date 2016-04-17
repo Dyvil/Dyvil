@@ -2,7 +2,7 @@ package dyvil.collection.immutable
 
 import dyvil.collection.impl.AbstractBitSet
 
-public class BitSet extends AbstractBitSet implements ImmutableSet[int]
+public class BitSet extends AbstractBitSet implements ImmutableSet<int>
 {
 	public init()
 	{
@@ -19,7 +19,7 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 		super.init(elements...)
 	}
 
-	public init(Collection[int] elements)
+	public init(Collection<int> elements)
 	{
 		super.init(elements)
 	}
@@ -35,7 +35,7 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 	{
 		if (this.bitSet(element)) return this
 
-		BitSet copy = new BitSet(this)
+		let copy = new BitSet(this)
 		copy.setBit(element)
 		return copy
 	}
@@ -47,16 +47,16 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 		final int bit = element as int
 		if (!this.bitSet(bit)) return this
 
-		BitSet copy = new BitSet(this)
+		let copy = new BitSet(this)
 		copy.clearBit(bit)
 		return copy
 	}
 
-	public override BitSet union(Collection[_ <: int] collection)
+	public override BitSet union(Collection<+int> collection)
 	{
 		if (collection.isEmpty) return this
 
-		final BitSet copy = new BitSet(this)
+		let copy = new BitSet(this)
 		for (int element <- collection)
 		{
 			copy.setBit(element)
@@ -64,11 +64,11 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 		return copy
 	}
 
-	public override BitSet difference(Collection[_] collection)
+	public override BitSet difference(Collection<_> collection)
 	{
 		if (collection.isEmpty || this.isEmpty) return this
 
-		final BitSet copy = new BitSet(this)
+		let copy = new BitSet(this)
 		for (Object element <- collection)
 		{
 			if (element is Int)
@@ -79,11 +79,11 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 		return copy
 	}
 
-	public override BitSet intersection(Collection[_ <: int] collection)
+	public override BitSet intersection(Collection<+int> collection)
 	{
 		if (collection.isEmpty || this.isEmpty) return this
 
-		final BitSet copy = new BitSet(this.size)
+		let copy = new BitSet(this.size)
 		for (int element <- collection)
 		{
 			if (this.bitSet(element))
@@ -94,12 +94,12 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 		return copy
 	}
 
-	public override BitSet symmetricDifference(Collection[_ <: int] collection)
+	public override BitSet symmetricDifference(Collection<+int> collection)
 	{
 		if (collection.isEmpty) return this
 		if (this.isEmpty) return new BitSet(collection)
 
-		final BitSet copy = new BitSet
+		let copy = new BitSet
 		for (int element <- collection)
 		{
 			if (!this.bitSet(element))
@@ -118,9 +118,9 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 		return copy
 	}
 
-	public override ImmutableSet[R] mapped[R](java.util.function.Function[_ >: int, _ <: R] mapper)
+	public override ImmutableSet<R> mapped<R>(java.util.function.Function<-int, +R> mapper)
 	{
-		final ImmutableSet.Builder[R] builder = ImmutableSet.[R]builder
+		let builder = ImmutableSet.builder<R>
 		for (int element <- this)
 		{
 			builder.add(mapper.apply(element))
@@ -128,9 +128,9 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 		return builder.build
 	}
 
-	public override ImmutableSet[R] flatMapped[R](java.util.function.Function[_ >: int, _ <: Iterable[_ <: R]] mapper)
+	public override ImmutableSet<R> flatMapped<R>(java.util.function.Function<-int, +Iterable<+R>> mapper)
 	{
-		final ImmutableSet.Builder[R] builder = ImmutableSet.[R]builder
+		let builder = ImmutableSet.builder<R>
 		for (int element <- this)
 		{
 			for (R result <- mapper.apply(element))
@@ -141,9 +141,9 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 		return builder.build
 	}
 
-	public override BitSet filtered(java.util.function.Predicate[_ >: int] condition)
+	public override BitSet filtered(java.util.function.Predicate<-int> condition)
 	{
-		final BitSet copy = new BitSet(this.size)
+		let copy = new BitSet(this.size)
 		for (int element <- this)
 		{
 			if (condition.test(element))
@@ -154,9 +154,9 @@ public class BitSet extends AbstractBitSet implements ImmutableSet[int]
 		return copy
 	}
 
-    public override ImmutableSet[int] copy() = this.immutableCopy
+    public override ImmutableSet<int> copy() = this.immutableCopy
 
-	public override MutableSet[int] mutable() = this.mutableCopy
+	public override MutableSet<int> mutable() = this.mutableCopy
 
-	public override java.util.Set[int] toJava() = java.util.Collections.unmodifiableSet(super.toJava)
+	public override java.util.Set<int> toJava() = java.util.Collections.unmodifiableSet(super.toJava)
 }

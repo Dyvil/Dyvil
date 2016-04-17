@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
-import dyvil.tools.compiler.ast.classes.IClassMetadata;
+import dyvil.tools.compiler.ast.classes.metadata.IClassMetadata;
 import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -29,6 +29,7 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -50,16 +51,10 @@ public class REPLMemberClass implements IClass
 	private Name         name;
 	private IClassMember member;
 
-	public REPLMemberClass(Name name, IClassMember member, REPLContext context)
+	public REPLMemberClass(REPLContext context, Name name)
 	{
-		this.name = name;
-		this.member = member;
 		this.context = context;
-	}
-
-	public void setMember(IClassMember member)
-	{
-		this.member = member;
+		this.name = name;
 	}
 
 	@Override
@@ -73,15 +68,20 @@ public class REPLMemberClass implements IClass
 	{
 	}
 
-	@Override
-	public int getAccessLevel()
+	public IClassMember getMember()
 	{
-		return 0;
+		return this.member;
+	}
+
+	public void setMember(IClassMember member)
+	{
+		this.member = member;
 	}
 
 	@Override
 	public void setName(Name name)
 	{
+		this.name = name;
 	}
 
 	@Override
@@ -105,6 +105,12 @@ public class REPLMemberClass implements IClass
 	public IType getClassType()
 	{
 		return new ClassType(this);
+	}
+
+	@Override
+	public int getAccessLevel()
+	{
+		return 0;
 	}
 
 	@Override
@@ -431,15 +437,15 @@ public class REPLMemberClass implements IClass
 	}
 
 	@Override
-	public IType resolveType(Name name)
+	public ITypeAlias resolveTypeAlias(Name name, int arity)
 	{
-		return this.context.resolveType(name);
+		return this.context.resolveTypeAlias(name, arity);
 	}
 
 	@Override
-	public ITypeParameter resolveTypeVariable(Name name)
+	public ITypeParameter resolveTypeParameter(Name name)
 	{
-		return this.context.resolveTypeVariable(name);
+		return this.context.resolveTypeParameter(name);
 	}
 
 	@Override

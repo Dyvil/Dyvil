@@ -21,34 +21,34 @@ import java.io.IOException;
 public abstract class Member implements IMember
 {
 	protected ICodePosition position;
-	
+
 	protected ModifierSet    modifiers;
 	protected AnnotationList annotations;
 
 	protected IType type;
 	protected Name  name;
-	
+
 	protected Member()
 	{
 	}
-	
+
 	protected Member(Name name)
 	{
 		this.name = name;
 		this.modifiers = new ModifierList();
 	}
-	
+
 	public Member(IType type)
 	{
 		this.type = type;
 	}
-	
+
 	public Member(Name name, IType type)
 	{
 		this.name = name;
 		this.type = type;
 	}
-	
+
 	public Member(Name name, IType type, ModifierSet modifiers)
 	{
 		this.name = name;
@@ -77,31 +77,31 @@ public abstract class Member implements IMember
 	{
 		return this.position;
 	}
-	
+
 	@Override
 	public void setPosition(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
 	@Override
 	public AnnotationList getAnnotations()
 	{
 		return this.annotations;
 	}
-	
+
 	@Override
 	public IAnnotation getAnnotation(IClass type)
 	{
 		return this.annotations == null ? null : this.annotations.getAnnotation(type);
 	}
-	
+
 	@Override
 	public void setAnnotations(AnnotationList annotations)
 	{
 		this.annotations = annotations;
 	}
-	
+
 	@Override
 	public void addAnnotation(IAnnotation annotation)
 	{
@@ -111,13 +111,13 @@ public abstract class Member implements IMember
 		}
 		this.annotations.addAnnotation(annotation);
 	}
-	
+
 	@Override
 	public void setModifiers(ModifierSet modifiers)
 	{
 		this.modifiers = modifiers;
 	}
-	
+
 	@Override
 	public ModifierSet getModifiers()
 	{
@@ -135,31 +135,31 @@ public abstract class Member implements IMember
 	{
 		return this.modifiers.toFlags() & Modifiers.ACCESS_MODIFIERS;
 	}
-	
+
 	@Override
 	public void setType(IType type)
 	{
 		this.type = type;
 	}
-	
+
 	@Override
 	public IType getType()
 	{
 		return this.type;
 	}
-	
+
 	@Override
 	public void setName(Name name)
 	{
 		this.name = name;
 	}
-	
+
 	@Override
 	public Name getName()
 	{
 		return this.name;
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -173,7 +173,7 @@ public abstract class Member implements IMember
 			this.annotations.resolveTypes(markers, context, this);
 		}
 	}
-	
+
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
@@ -186,7 +186,7 @@ public abstract class Member implements IMember
 			this.annotations.resolve(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -199,7 +199,7 @@ public abstract class Member implements IMember
 			this.annotations.checkTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
@@ -212,7 +212,7 @@ public abstract class Member implements IMember
 			this.annotations.check(markers, context, this.getElementType());
 		}
 	}
-	
+
 	@Override
 	public void foldConstants()
 	{
@@ -225,7 +225,7 @@ public abstract class Member implements IMember
 			this.annotations.foldConstants();
 		}
 	}
-	
+
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
@@ -238,43 +238,43 @@ public abstract class Member implements IMember
 			this.type.cleanup(context, compilableList);
 		}
 	}
-	
+
 	public void write(DataOutput out) throws IOException
 	{
 		this.writeSignature(out);
 		out.writeUTF(this.name.unqualified);
 		this.writeAnnotations(out);
 	}
-	
+
 	public void writeSignature(DataOutput out) throws IOException
 	{
 		IType.writeType(this.type, out);
 	}
-	
+
 	protected void writeAnnotations(DataOutput out) throws IOException
 	{
 		ModifierSet.write(this.modifiers, out);
 		AnnotationList.write(this.annotations, out);
 	}
-	
+
 	public void read(DataInput in) throws IOException
 	{
 		this.readSignature(in);
 		this.name = Name.get(in.readUTF());
 		this.readAnnotations(in);
 	}
-	
+
 	public void readSignature(DataInput in) throws IOException
 	{
 		this.type = IType.readType(in);
 	}
-	
+
 	protected void readAnnotations(DataInput in) throws IOException
 	{
 		this.modifiers = ModifierSet.read(in);
 		this.annotations = AnnotationList.read(in);
 	}
-	
+
 	@Override
 	public String toString()
 	{
@@ -282,7 +282,7 @@ public abstract class Member implements IMember
 		this.toString("", builder);
 		return builder.toString();
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

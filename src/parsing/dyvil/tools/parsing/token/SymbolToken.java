@@ -15,24 +15,38 @@ public final class SymbolToken implements IToken
 	
 	private final int lineNumber;
 	private final int start;
-	
+
+	public SymbolToken(Symbols symbols, int type, int lineNumber, int start)
+	{
+		this.symbols = symbols;
+		this.type = type;
+		this.lineNumber = lineNumber;
+		this.start = start;
+	}
+
 	public SymbolToken(Symbols symbols, IToken prev, int type, int lineNumber, int start)
 	{
 		this.symbols = symbols;
 		this.prev = prev;
 		prev.setNext(this);
 		this.type = type;
-		
+
 		this.lineNumber = lineNumber;
 		this.start = start;
 	}
-	
+
 	@Override
 	public int type()
 	{
 		return this.type;
 	}
-	
+
+	@Override
+	public String stringValue()
+	{
+		return this.symbols.toString(this.type);
+	}
+
 	@Override
 	public int startIndex()
 	{

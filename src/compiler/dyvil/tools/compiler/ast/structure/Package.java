@@ -11,8 +11,6 @@ import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.external.ExternalHeader;
 import dyvil.tools.compiler.ast.header.PackageDeclaration;
 import dyvil.tools.compiler.ast.member.INamed;
-import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassReader;
 import dyvil.tools.compiler.backend.ObjectFormat;
@@ -340,17 +338,6 @@ public class Package implements INamed, IDefaultContext
 			header.pack = this;
 			this.headers.add(header);
 			return ObjectFormat.read(rootPackage.compiler, inputStream, header);
-		}
-		return null;
-	}
-	
-	@Override
-	public IType resolveType(Name name)
-	{
-		IClass iclass = this.resolveClass(name);
-		if (iclass != null)
-		{
-			return new ClassType(iclass);
 		}
 		return null;
 	}

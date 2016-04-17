@@ -44,19 +44,11 @@ public class DPFTests
 	}
 
 	@Test
-	public void testMap()
-	{
-		Map<String, Object> map = FlatMapConverter.parse(TEST_FILE);
-
-		map.forEach(System.out::println);
-	}
-
-	@Test
 	public void testExpand()
 	{
 		// Parse as a Map
 		Map<String, Object> baseMap = new TreeMap<>();
-		FlatMapConverter.parse(TEST_FILE, baseMap);
+		new Parser(TEST_FILE).parseNodeBody(new FlatMapConverter(baseMap));
 
 		// Expand the Node structure
 		RootNode expandedNode = this.rootNode.expand(baseMap, false);

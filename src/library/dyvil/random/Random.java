@@ -80,14 +80,16 @@ public interface Random
 	
 	default int nextInt(int max)
 	{
-		int r = next(31);
-		int m = max - 1;
+		int r = this.next(31);
+		final int m = max - 1;
 		if ((max & m) == 0)
 		{
 			return (int) (max * (long) r >> 31);
 		}
-		for (int u = r; u - (r = u % max) + m < 0; u = next(31))
+		int u = r;
+		while (u - (r = u % max) + m < 0)
 		{
+			u = this.next(31);
 		}
 		return r;
 	}
@@ -104,19 +106,21 @@ public interface Random
 	
 	default long nextLong()
 	{
-		return ((long) next(32) << 32) + next(32);
+		return ((long) this.next(32) << 32) + this.next(32);
 	}
 	
 	default long nextLong(long max)
 	{
 		long r = this.nextLong();
-		long m = max - 1;
+		final long m = max - 1;
 		if ((max & m) == 0L)
 		{
 			return r & m;
 		}
-		for (long u = r >>> 1; u + m - (r = u % max) < 0L; u = this.nextLong() >>> 1)
+		long u = r >>> 1;
+		while (u + m - (r = u % max) < 0L)
 		{
+			u = this.nextLong() >>> 1;
 		}
 		return r;
 	}
@@ -128,7 +132,7 @@ public interface Random
 	
 	default float nextFloat()
 	{
-		return next(24) * FLOAT_UNIT;
+		return this.next(24) * FLOAT_UNIT;
 	}
 	
 	default float nextFloat(float max)
@@ -143,7 +147,7 @@ public interface Random
 	
 	default double nextDouble()
 	{
-		return (((long) next(26) << 27) + next(27)) * DOUBLE_UNIT;
+		return (((long) this.next(26) << 27) + this.next(27)) * DOUBLE_UNIT;
 	}
 	
 	default double nextDouble(double max)

@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.generic;
 
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
@@ -12,10 +11,11 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public final class GenericData implements ITypeList, ITypeContext
 {
-	public IMethod method;
-	public IType[] generics;
-	public int     genericCount;
-	public IValue  receiver;
+	public    IMethod method;
+	protected IType[] generics;
+	protected int     genericCount;
+	protected int     lockedCount;
+	protected IType   receiverType;
 
 	public GenericData()
 	{
@@ -32,6 +32,24 @@ public final class GenericData implements ITypeList, ITypeContext
 		this.method = method;
 		this.genericCount = generics.length;
 		this.generics = generics;
+	}
+
+	public IType getReceiverType()
+	{
+		return this.receiverType;
+	}
+
+	public void setReceiverType(IType receiverType)
+	{
+		this.receiverType = receiverType;
+	}
+
+	public void lock(int lockedCount)
+	{
+		if (lockedCount > this.lockedCount)
+		{
+			this.lockedCount = lockedCount;
+		}
 	}
 
 	@Override
@@ -105,13 +123,19 @@ public final class GenericData implements ITypeList, ITypeContext
 		if (this.isMethodTypeVariable(typeParameter))
 		{
 			int index = typeParameter.getIndex();
-			if (index >= this.genericCount)
+			if (index >= this.genericCount || index >= this.lockedCount)
 			{
 				return null;
 			}
 			return this.generics[index];
 		}
-		return this.receiver.getType().resolveType(typeParameter);
+		return this.receiverType == null ? null : this.receiverType.resolveType(typeParameter);
+	}
+
+	@Override
+	public boolean isReadonly()
+	{
+		return false;
 	}
 
 	@Override
@@ -122,11 +146,13 @@ public final class GenericData implements ITypeList, ITypeContext
 			return;
 		}
 
-		int index = typeVar.getIndex();
+		final int index = typeVar.getIndex();
 		if (!this.isMethodTypeVariable(typeVar))
 		{
 			return;
 		}
+
+		type = type.asReturnType();
 
 		if (index < this.genericCount)
 		{
@@ -135,7 +161,10 @@ public final class GenericData implements ITypeList, ITypeContext
 				this.generics[index] = type;
 				return;
 			}
-			this.generics[index] = Types.combine(this.generics[index], type);
+			if (index >= this.lockedCount)
+			{
+				this.generics[index] = Types.combine(this.generics[index], type);
+			}
 			return;
 		}
 
@@ -155,6 +184,8 @@ public final class GenericData implements ITypeList, ITypeContext
 		{
 			this.generics[i] = this.generics[i].resolveType(markers, context);
 		}
+
+		this.lockedCount = this.genericCount;
 	}
 
 	@Override
@@ -167,13 +198,12 @@ public final class GenericData implements ITypeList, ITypeContext
 
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		int len = this.genericCount;
-		if (len > 0)
+		if (this.genericCount > 0)
 		{
-			buffer.append('.');
-			Formatting.appendSeparator(buffer, "generics.open_bracket", '[');
-			Util.astToString(prefix, this.generics, len, Formatting.getSeparator("generics.separator", ','), buffer);
-			Formatting.appendSeparator(buffer, "generics.close_bracket", ']');
+			Formatting.appendSeparator(buffer, "generics.open_bracket", '<');
+			Util.astToString(prefix, this.generics, this.genericCount,
+			                 Formatting.getSeparator("generics.separator", ','), buffer);
+			Formatting.appendSeparator(buffer, "generics.close_bracket", '>');
 		}
 	}
 }

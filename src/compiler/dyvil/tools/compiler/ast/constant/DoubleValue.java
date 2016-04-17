@@ -162,12 +162,20 @@ public class DoubleValue implements IConstantValue
 	@Override
 	public String toString()
 	{
+		if (!Double.isFinite(this.value))
+		{
+			return String.valueOf(this.value);
+		}
 		return this.value + "D";
 	}
 
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(this.value).append('D');
+		buffer.append(this.value);
+		if (Double.isFinite(this.value))
+		{
+			buffer.append('D');
+		}
 	}
 }

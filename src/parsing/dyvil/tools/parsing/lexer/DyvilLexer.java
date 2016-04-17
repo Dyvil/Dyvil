@@ -4,14 +4,26 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SyntaxError;
+import dyvil.tools.parsing.position.CodePosition;
+import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.*;
 
+import static dyvil.tools.parsing.lexer.BaseSymbols.*;
 import static dyvil.tools.parsing.lexer.Tokens.*;
 
 public final class DyvilLexer
 {
 	private MarkerList markers;
 	private Symbols    symbols;
+
+	private String        code;
+	private int           length;
+	private TokenIterator tokens;
+
+	private StringBuilder buffer = new StringBuilder();
+	private int parseIndex;
+	private int lineNumber = 1;
+	private int stringParens;
 
 	public DyvilLexer(MarkerList markers, Symbols symbols)
 	{
@@ -21,674 +33,869 @@ public final class DyvilLexer
 
 	public TokenIterator tokenize(String code)
 	{
-		int len = code.length();
+		this.tokens = new TokenIterator();
+		this.code = code;
+		this.length = code.length();
 
-		StringBuilder buf = new StringBuilder(20);
-		IToken first = new StartToken();
-		IToken prev = first;
-		int start = 0;
-		int lineNumber = 1;
-
-		char prevChar = 0;
-		char currentChar;
-		int type = 0;
-		int subtype = 0;
-		boolean addToken = false;
-		boolean reparse = true;
-		int stringParens = 0;
-		for (int i = 0; i < len; ++i, prevChar = currentChar)
+		while (true)
 		{
-			currentChar = code.charAt(i);
-
-			if (type == 0)
+			final int currentChar = this.codePoint();
+			if (currentChar == 0)
 			{
-				start = i;
-
-				if (currentChar == '\n')
-				{
-					lineNumber++;
-					continue;
-				}
-				if (currentChar <= ' ')
-				{
-					continue;
-				}
-
-				int m = getMode(currentChar, code, i);
-				type = m & 0xFFFF;
-				subtype = m & 0xFFFF0000;
-			}
-
-			typeswitch:
-			switch (type)
-			{
-			case IDENTIFIER:
-				switch (subtype)
-				{
-				case MOD_LETTER:
-					if (currentChar == '_' || currentChar == '$')
-					{
-						buf.append(currentChar);
-						subtype = MOD_LETTER | MOD_SYMBOL;
-						continue;
-					}
-					if (LexerUtil.isIdentifierPart(currentChar))
-					{
-						buf.append(currentChar);
-						continue;
-					}
-					addToken = true;
-					break typeswitch;
-				case MOD_DOT:
-					if (currentChar == '.')
-					{
-						buf.append(currentChar);
-						continue;
-					}
-					// Fallthrough
-				case MOD_SYMBOL:
-					if (currentChar == '_' || currentChar == '$')
-					{
-						buf.append(currentChar);
-						subtype = MOD_LETTER | MOD_SYMBOL;
-						continue;
-					}
-					if (LexerUtil.isIdentifierSymbol(currentChar))
-					{
-						subtype = MOD_SYMBOL;
-						buf.append(currentChar);
-						continue;
-					}
-					addToken = true;
-					break typeswitch;
-				case MOD_LETTER | MOD_SYMBOL:
-					if (currentChar == '_' || currentChar == '$')
-					{
-						buf.append(currentChar);
-						continue;
-					}
-					if (LexerUtil.isIdentifierPart(currentChar))
-					{
-						buf.append(currentChar);
-						subtype = MOD_LETTER;
-						continue;
-					}
-					if (LexerUtil.isIdentifierSymbol(currentChar))
-					{
-						buf.append(currentChar);
-						subtype = MOD_SYMBOL;
-						continue;
-					}
-					addToken = true;
-					break typeswitch;
-				}
-				break;
-			case SPECIAL_IDENTIFIER:
-				switch (currentChar)
-				{
-				case '\n':
-				case '\t':
-				case '\b':
-					continue;
-				case '`':
-					if (buf.length() == 0)
-					{
-						continue;
-					}
-
-					addToken = true;
-					reparse = false;
-					break typeswitch;
-				default:
-					buf.append(currentChar);
-					continue;
-				}
-			case SYMBOL:
-				buf.append(currentChar);
-				addToken = true;
-				reparse = false;
-				break;
-			case BRACKET:
-				if (stringParens != 0)
-				{
-					if (currentChar == '(')
-					{
-						stringParens++;
-					}
-					else if (currentChar == ')' && --stringParens == 0)
-					{
-						type = STRING;
-						subtype = STRING_PART;
-						continue;
-					}
-				}
-
-				buf.append(currentChar);
-				addToken = true;
-				reparse = false;
-				break;
-			case LINE_COMMENT:
-				if (currentChar == '\n')
-				{
-					type = 0;
-					lineNumber++;
-					continue;
-				}
-				break;
-			case BLOCK_COMMENT:
-				if (currentChar == '\n')
-				{
-					lineNumber++;
-				}
-				else if (prevChar == '/' && currentChar == '*')
-				{
-					subtype++;
-				}
-				else if (prevChar == '*' && currentChar == '/' && --subtype == 0)
-				{
-					type = 0;
-					continue;
-				}
-				break;
-			case INT:
-			case LONG:
-				switch (currentChar)
-				{
-				case 'l':
-				case 'L':
-					if (LexerUtil.isIdentifierPart(code.charAt(i + 1)))
-					{
-						addToken = true;
-						break typeswitch;
-					}
-
-					type = LONG;
-					addToken = true;
-					reparse = false;
-					break;
-				case '_':
-					continue;
-				}
-				if (subtype == MOD_DEC)
-				{
-					if (LexerUtil.isDigit(currentChar))
-					{
-						buf.append(currentChar);
-						break;
-					}
-
-					switch (currentChar)
-					{
-					case '.':
-						if (!LexerUtil.isDigit(code.charAt(i + 1)))
-						{
-							reparse = true;
-							break;
-						}
-						type = DOUBLE;
-						buf.append('.');
-						break typeswitch;
-					case 'e':
-					case 'E':
-						type = DOUBLE;
-						buf.append('e');
-						break typeswitch;
-					case 'f':
-					case 'F':
-						if (LexerUtil.isIdentifierPart(code.charAt(i + 1)))
-						{
-							addToken = true;
-							break typeswitch;
-						}
-
-						type = FLOAT;
-						addToken = true;
-						reparse = false;
-						break typeswitch;
-					case 'd':
-					case 'D':
-						if (LexerUtil.isIdentifierPart(code.charAt(i + 1)))
-						{
-							addToken = true;
-							break typeswitch;
-						}
-
-						type = DOUBLE;
-						addToken = true;
-						reparse = false;
-						break typeswitch;
-					}
-					addToken = true;
-					break;
-				}
-				else if (subtype == MOD_BIN)
-				{
-					if (currentChar == 'b' || LexerUtil.isBinDigit(currentChar))
-					{
-						buf.append(currentChar);
-					}
-					else
-					{
-						addToken = true;
-					}
-				}
-				else if (subtype == MOD_OCT)
-				{
-					if (currentChar == 'o' || LexerUtil.isOctDigit(currentChar))
-					{
-						buf.append(currentChar);
-					}
-					else
-					{
-						addToken = true;
-					}
-				}
-				else if (subtype == MOD_HEX)
-				{
-					if (currentChar == 'x' || LexerUtil.isHexDigit(currentChar))
-					{
-						buf.append(currentChar);
-					}
-					else
-					{
-						addToken = true;
-					}
-				}
-				break;
-			case FLOAT:
-			case DOUBLE:
-				if (LexerUtil.isDigit(currentChar))
-				{
-					buf.append(currentChar);
-					break;
-				}
-
-				switch (currentChar)
-				{
-				case 'x':
-					subtype = MOD_HEX;
-					buf.append(currentChar);
-					break typeswitch;
-				case 'f':
-				case 'F':
-					if (LexerUtil.isIdentifierPart(code.charAt(i + 1)))
-					{
-						addToken = true;
-						break typeswitch;
-					}
-
-					type = FLOAT;
-					addToken = true;
-					reparse = false;
-					break typeswitch;
-				case 'd':
-				case 'D':
-					if (LexerUtil.isIdentifierPart(code.charAt(i + 1)))
-					{
-						addToken = true;
-						break typeswitch;
-					}
-
-					type = DOUBLE;
-					addToken = true;
-					reparse = false;
-					break typeswitch;
-				case 'e':
-					buf.append('e');
-					break typeswitch;
-				case '-':
-					if (code.charAt(i - 1) == 'e')
-					{
-						buf.append('-');
-						break typeswitch;
-					}
-				}
-
-				addToken = true;
-				break;
-			case STRING:
-				if (currentChar == '"' && (buf.length() > 0 || subtype == STRING_PART))
-				{
-					if (subtype != STRING_PART && buf.charAt(0) == '"')
-					{
-						subtype = STRING;
-					}
-					else
-					{
-						subtype = STRING_END;
-					}
-					addToken = true;
-					reparse = false;
-					break;
-				}
-				else if (currentChar == '\\')
-				{
-					char c1 = code.charAt(i + 1);
-					if (c1 == '(' && stringParens == 0)
-					{
-						i += 2;
-						if (buf.length() == 0 || buf.charAt(0) != '"')
-						{
-							subtype = STRING_PART;
-						}
-						else
-						{
-							subtype = STRING_START;
-						}
-						stringParens = 1;
-						addToken = true;
-						break;
-					}
-					else if (appendEscape(buf, c1))
-					{
-						i++;
-						continue;
-					}
-					buf.append('\\');
-					break;
-				}
-				else if (currentChar != '\t')
-				{
-					buf.append(currentChar);
-				}
-				break;
-			case SINGLE_QUOTED_STRING:
-				if (currentChar == '\'' && buf.length() > 0)
-				{
-					addToken = true;
-					reparse = false;
-				}
-				else if (currentChar == '\\' && appendEscape(buf, code.charAt(i + 1)))
-				{
-					i++;
-					continue;
-				}
-				else if (currentChar != '\t')
-				{
-					buf.append(currentChar);
-				}
-				break;
-			case LITERAL_STRING:
-				if (currentChar == '"' && buf.length() > 0)
-				{
-					addToken = true;
-					reparse = false;
-				}
-				else if (currentChar != '@' || buf.length() > 0)
-				{
-					buf.append(currentChar);
-				}
 				break;
 			}
 
-			if (addToken)
-			{
-				prev = this.addToken(prev, buf, type | subtype, lineNumber, start);
-				addToken = false;
-				type = 0;
-
-				if (reparse)
-				{
-					i--;
-				}
-				else
-				{
-					reparse = true;
-				}
-			}
+			this.parseCharacter(currentChar);
 		}
 
-		if (buf.length() > 0)
-		{
-			prev = this.addToken(prev, buf, type | subtype, lineNumber, start);
-		}
-
-		EndToken end = new EndToken(len, lineNumber);
-		prev.setNext(end);
-		end.setPrev(prev);
-
-		first.next().setPrev(first);
-
-		return new TokenIterator(first.next());
+		this.tokens.append(new EndToken(this.parseIndex, this.lineNumber));
+		this.tokens.reset();
+		return this.tokens;
 	}
 
-	private static int getMode(char c, String code, int i)
+	// Parsing
+
+	private void parseCharacter(int currentChar)
 	{
-		switch (c)
+		switch (currentChar)
 		{
 		case '`':
-			return SPECIAL_IDENTIFIER;
+			this.parseBacktickIdentifier();
+			return;
 		case '"':
-			return STRING;
+			this.parseDoubleString(false);
+			return;
 		case '\'':
-			return SINGLE_QUOTED_STRING;
+			this.parseSingleString();
+			return;
+		case '@':
+			if (this.nextCodePoint() == '"')
+			{
+				this.parseVerbatimString();
+				return;
+			}
+
+			this.parseIdentifier('@', MOD_SYMBOL);
+			return;
 		case '/':
-			char n = code.charAt(i + 1);
-			if (n == '*')
+			switch (this.nextCodePoint())
 			{
-				return BLOCK_COMMENT;
+			case '*':
+				this.parseBlockComment();
+				return;
+			case '/':
+				this.parseLineComment();
+				return;
 			}
-			else if (n == '/')
-			{
-				return LINE_COMMENT;
-			}
-			else
-			{
-				return IDENTIFIER | MOD_SYMBOL;
-			}
-		case '0':
-			n = code.charAt(i + 1);
-			if (n == 'b')
-			{
-				return INT | MOD_BIN;
-			}
-			else if (n == 'x')
-			{
-				return INT | MOD_HEX;
-			}
-			else if (n == 'o')
-			{
-				return INT | MOD_OCT;
-			}
-			return INT;
+			this.parseIdentifier('/', MOD_SYMBOL);
+			return;
 		case '(':
-			return BaseSymbols.OPEN_PARENTHESIS;
+			if (this.stringParens > 0)
+			{
+				this.stringParens++;
+			}
+			this.tokens.append(new SymbolToken(INSTANCE, OPEN_PARENTHESIS, this.lineNumber, this.parseIndex++));
+			return;
 		case ')':
-			return BaseSymbols.CLOSE_PARENTHESIS;
+			if (this.stringParens > 0 && --this.stringParens == 0)
+			{
+				this.parseDoubleString(true);
+				return;
+			}
+
+			this.tokens.append(new SymbolToken(INSTANCE, CLOSE_PARENTHESIS, this.lineNumber, this.parseIndex++));
+			return;
 		case '[':
-			return BaseSymbols.OPEN_SQUARE_BRACKET;
+			this.tokens.append(new SymbolToken(INSTANCE, OPEN_SQUARE_BRACKET, this.lineNumber, this.parseIndex++));
+			return;
 		case ']':
-			return BaseSymbols.CLOSE_SQUARE_BRACKET;
+			this.tokens.append(new SymbolToken(INSTANCE, CLOSE_SQUARE_BRACKET, this.lineNumber, this.parseIndex++));
+			return;
 		case '{':
-			return BaseSymbols.OPEN_CURLY_BRACKET;
+			this.tokens.append(new SymbolToken(INSTANCE, OPEN_CURLY_BRACKET, this.lineNumber, this.parseIndex++));
+			return;
 		case '}':
-			return BaseSymbols.CLOSE_CURLY_BRACKET;
+			this.tokens.append(new SymbolToken(INSTANCE, CLOSE_CURLY_BRACKET, this.lineNumber, this.parseIndex++));
+			return;
 		case '.':
-			n = code.charAt(i + 1);
+		{
+			final int n = this.nextCodePoint();
 			if (LexerUtil.isIdentifierSymbol(n) || n == '.')
 			{
-				return DOT_IDENTIFIER;
+				this.parseIdentifier('.', MOD_DOT);
+				return;
 			}
-			return BaseSymbols.DOT;
+			this.tokens.append(new SymbolToken(INSTANCE, DOT, this.lineNumber, this.parseIndex++));
+			return;
+		}
 		case ';':
-			return BaseSymbols.SEMICOLON;
+			this.tokens.append(new SymbolToken(INSTANCE, SEMICOLON, this.lineNumber, this.parseIndex++));
+			return;
 		case ',':
-			return BaseSymbols.COMMA;
+			this.tokens.append(new SymbolToken(INSTANCE, COMMA, this.lineNumber, this.parseIndex++));
+			return;
 		case '_':
 		case '$':
-			return IDENTIFIER | MOD_SYMBOL | MOD_LETTER;
-		case '@':
-			if (code.charAt(i + 1) == '"')
-			{
-				return LITERAL_STRING;
-			}
-			return IDENTIFIER | MOD_SYMBOL;
+			this.parseIdentifier(currentChar, MOD_SYMBOL | MOD_LETTER);
+			return;
+		case '0':
+		case '1':
+		case '2':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
+		case '8':
+		case '9':
+			this.parseNumberLiteral(currentChar);
+			return;
+		case '\n':
+			this.lineNumber++;
+			// Fallthrough
+		case ' ':
+		case '\t':
+			this.parseIndex++;
+			return;
 		}
-		if (LexerUtil.isDigit(c))
+		if (LexerUtil.isIdentifierSymbol(currentChar))
 		{
-			return INT;
+			this.parseIdentifier(currentChar, MOD_SYMBOL);
+			return;
 		}
-		else if (LexerUtil.isIdentifierSymbol(c))
+		if (LexerUtil.isIdentifierPart(currentChar))
 		{
-			return IDENTIFIER | MOD_SYMBOL;
+			this.parseIdentifier(currentChar, MOD_LETTER);
+			return;
 		}
-		else if (LexerUtil.isIdentifierPart(c))
-		{
-			return IDENTIFIER | MOD_LETTER;
-		}
-		return 0;
+
+		this.advance(currentChar);
 	}
 
-	private static boolean appendEscape(StringBuilder buf, char n)
+	private void parseBacktickIdentifier()
 	{
-		switch (n)
+		// assert this.codePoint() == '`';
+
+		final int startIndex = this.parseIndex++;
+		final int startLine = this.lineNumber;
+
+		this.clearBuffer();
+
+		while (true)
+		{
+			final int currentChar = this.codePoint();
+			switch (currentChar)
+			{
+			case '\n':
+				this.lineNumber++;
+			case '\t':
+			case '\b':
+				continue;
+			case EOF:
+				this.error("identifier.backtick.unclosed");
+				// Fallthrough
+			case '`':
+				this.parseIndex++;
+				this.tokens.append(
+					new IdentifierToken(Name.getSpecial(this.buffer.toString()), SPECIAL_IDENTIFIER, startLine,
+					                    startIndex, this.parseIndex));
+				return;
+			}
+
+			this.buffer.appendCodePoint(currentChar);
+			this.advance(currentChar);
+		}
+	}
+
+	private void parseSingleString()
+	{
+		// assert this.codePoint() == '\'';
+
+		final int startIndex = this.parseIndex++;
+		final int startLine = this.lineNumber;
+
+		this.clearBuffer();
+
+		while (true)
+		{
+			final int currentChar = this.codePoint();
+			switch (currentChar)
+			{
+			case '\\':
+				this.parseEscape(this.nextCodePoint());
+				continue;
+			case '\t':
+			case '\b':
+				continue;
+			case '\n':
+				this.lineNumber++;
+				this.error("string.single.newline");
+				continue;
+			case EOF:
+				this.error("string.single.unclosed");
+				// Fallthrough
+			case '\'':
+				this.parseIndex++;
+				this.tokens.append(new StringToken(this.buffer.toString(), SINGLE_QUOTED_STRING, startLine, startIndex,
+				                                   this.parseIndex + 1));
+				return;
+			}
+
+			this.buffer.appendCodePoint(currentChar);
+			this.advance(currentChar);
+		}
+	}
+
+	private void parseDoubleString(boolean stringPart)
+	{
+		// assert this.codePoint() == (stringPart ? ')' : '"');
+
+		final int startIndex = this.parseIndex++;
+		final int startLine = this.lineNumber;
+
+		this.clearBuffer();
+
+		while (true)
+		{
+			final int currentChar = this.codePoint();
+
+			switch (currentChar)
+			{
+			case '\\':
+				final int nextChar = this.nextCodePoint();
+				if (nextChar == '(')
+				{
+					this.parseIndex += 2;
+					if (this.stringParens > 0)
+					{
+						this.error("string.double.interpolation.nested");
+						continue; // parse the rest of the string as normal
+					}
+
+					this.tokens.append(
+						new StringToken(this.buffer.toString(), stringPart ? STRING_PART : STRING_START, startLine,
+						                startIndex, this.parseIndex + 1));
+					this.stringParens = 1;
+					return;
+				}
+
+				this.parseEscape(nextChar);
+				continue;
+			case EOF:
+				this.error("string.double.unclosed");
+				// Fallthrough
+			case '"':
+				this.parseIndex++;
+				this.tokens.append(
+					new StringToken(this.buffer.toString(), stringPart ? STRING_END : STRING, startLine, startIndex,
+					                this.parseIndex));
+				return;
+			case '\n':
+				this.lineNumber++;
+				break;
+			case '\t':
+				this.parseIndex++;
+				continue;
+			}
+
+			this.buffer.appendCodePoint(currentChar);
+			this.advance(currentChar);
+		}
+	}
+
+	private void parseVerbatimString()
+	{
+		// assert this.codePoint() == '@';
+
+		final int startIndex = this.parseIndex;
+		final int startLine = this.lineNumber;
+
+		// assert this.nextCodePoint() == '"';
+
+		this.parseIndex += 2;
+
+		this.clearBuffer();
+
+		while (true)
+		{
+			final int currentChar = this.codePoint();
+
+			switch (currentChar)
+			{
+			case EOF:
+				this.error("string.verbatim.unclosed");
+				// Fallthrough
+			case '"':
+				this.parseIndex++;
+				this.tokens.append(
+					new StringToken(this.buffer.toString(), VERBATIM_STRING, startLine, startIndex, this.parseIndex));
+				return;
+			case '\n':
+				this.lineNumber++;
+				this.parseIndex++;
+				continue;
+			case '\t':
+				this.parseIndex++;
+				continue;
+			}
+
+			this.buffer.appendCodePoint(currentChar);
+			this.advance(currentChar);
+		}
+	}
+
+	private void parseNumberLiteral(int currentChar)
+	{
+		final int radix;
+
+		this.clearBuffer();
+		if (currentChar == '0')
+		{
+			switch (this.nextCodePoint())
+			{
+			case 'o':
+			case 'O':
+				this.parseIndex++;
+				radix = 8;
+				break;
+			case 'x':
+			case 'X':
+				this.parseIndex++;
+				radix = 16;
+				break;
+			case 'b':
+			case 'B':
+				this.parseIndex++;
+				radix = 2;
+				break;
+			default:
+				this.buffer.append('0');
+				radix = 10;
+			}
+		}
+		else
+		{
+			this.buffer.append((char) currentChar);
+			radix = 10;
+		}
+
+		int startIndex = this.parseIndex++;
+		byte type = 0; // 0 -> int, 1 -> long, 2 -> float, 3 -> double
+
+		while (true)
+		{
+			currentChar = this.codePoint();
+
+			switch (currentChar)
+			{
+			case EOF:
+				break;
+			case '0':
+			case '1':
+				this.buffer.append((char) currentChar);
+				this.parseIndex++;
+				continue;
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+				if (radix >= 8)
+				{
+					this.buffer.append((char) currentChar);
+					this.parseIndex++;
+					continue;
+				}
+				break;
+			case '8':
+			case '9':
+				if (radix >= 10)
+				{
+					this.buffer.append((char) currentChar);
+					this.parseIndex++;
+					continue;
+				}
+				break;
+			case 'a':
+			case 'b':
+			case 'c':
+				if (radix == 16)
+				{
+					this.buffer.append((char) currentChar);
+					this.parseIndex++;
+					continue;
+				}
+				break;
+			case '_':
+				this.parseIndex++;
+				continue;
+			case 'd':
+			case 'D':
+				if (radix == 16)
+				{
+					this.buffer.append((char) currentChar);
+					this.parseIndex++;
+					continue;
+				}
+				// Fallthrough
+				if (radix >= 10 && !LexerUtil.isIdentifierPart(this.nextCodePoint()))
+				{
+					this.parseIndex++;
+					type = 3; // double
+					continue;
+				}
+				break;
+			case '.':
+				if (radix == 10 && LexerUtil.isDigit(this.nextCodePoint()))
+				{
+					this.buffer.append('.');
+					this.parseIndex++;
+					type = 3; // double
+					continue;
+				}
+				break;
+			case 'e':
+			case 'E':
+				if (radix == 16)
+				{
+					this.buffer.append((char) currentChar);
+					this.parseIndex++;
+					continue;
+				}
+				if (radix == 10)
+				{
+					int n = this.nextCodePoint();
+					if (LexerUtil.isDigit(n))
+					{
+						this.buffer.append((char) currentChar);
+						this.parseIndex++;
+						type = 3; // double
+						continue;
+					}
+					if (n == '-')
+					{
+						this.buffer.append('e').append('-');
+						this.parseIndex += 2;
+						type = 3; // double
+						continue;
+					}
+				}
+				break;
+			case 'f':
+			case 'F':
+				if (radix == 16)
+				{
+					this.buffer.append((char) currentChar);
+					this.parseIndex++;
+					continue;
+				}
+				if (radix >= 10 && !LexerUtil.isIdentifierPart(this.nextCodePoint()))
+				{
+					this.parseIndex++;
+					type = 2; // float
+					continue;
+				}
+				break;
+			case 'l':
+			case 'L':
+				if (!LexerUtil.isIdentifierPart(this.nextCodePoint()))
+				{
+					this.parseIndex++;
+					type = 1; // long
+					continue;
+				}
+				break;
+			case 'p':
+			case 'P':
+				if (radix == 16)
+				{
+					this.buffer.append((char) currentChar);
+					this.parseIndex++;
+					type = 3; // float
+					continue;
+				}
+				break;
+			}
+
+			switch (type)
+			{
+			case 0: // int
+			{
+				final IntToken token = new IntToken(0, this.lineNumber, startIndex, this.parseIndex);
+				try
+				{
+					token.setValue(Integer.parseInt(this.buffer.toString(), radix));
+				}
+				catch (NumberFormatException ex)
+				{
+					this.error(token, "literal.integer.invalid");
+				}
+
+				this.tokens.append(token);
+				return;
+			}
+			case 1: // long
+			{
+				final LongToken token = new LongToken(0, this.lineNumber, startIndex, this.parseIndex);
+				try
+				{
+					token.setValue(Long.parseLong(this.buffer.toString(), radix));
+				}
+				catch (NumberFormatException ex)
+				{
+					this.error(token, "literal.long.invalid");
+				}
+
+				this.tokens.append(token);
+				return;
+			}
+			case 2: // float
+			{
+				final FloatToken token = new FloatToken(0, this.lineNumber, startIndex, this.parseIndex);
+				try
+				{
+					token.setValue(Float.parseFloat(this.buffer.toString()));
+				}
+				catch (NumberFormatException ex)
+				{
+					this.error(token, "literal.float.invalid");
+				}
+
+				this.tokens.append(token);
+				return;
+			}
+			case 3: // double
+			{
+				final DoubleToken token = new DoubleToken(0, this.lineNumber, startIndex, this.parseIndex);
+				try
+				{
+					if (radix == 16)
+					{
+						this.buffer.insert(0, "0x");
+					}
+					token.setValue(Double.parseDouble(this.buffer.toString()));
+				}
+				catch (NumberFormatException ex)
+				{
+					this.error(token, "literal.double.invalid");
+				}
+
+				this.tokens.append(token);
+				return;
+			}
+			}
+
+			return;
+		}
+	}
+
+	private void parseLineComment()
+	{
+		// assert this.codePoint() == '/';
+		// assert this.nextCodePoint() == '/';
+
+		this.parseIndex += 2;
+
+		while (true)
+		{
+			final int currentChar = this.codePoint();
+
+			if (currentChar == EOF)
+			{
+				return;
+			}
+			if (currentChar == '\n')
+			{
+				this.parseIndex++;
+				this.lineNumber++;
+				return;
+			}
+
+			this.advance(currentChar);
+		}
+	}
+
+	private void parseBlockComment()
+	{
+		// assert this.codePoint() == '/';
+		// assert this.nextCodePoint() == '*';
+
+		int level = 1;
+		this.parseIndex += 2;
+
+		while (true)
+		{
+			final int currentChar = this.codePoint();
+
+			switch (currentChar)
+			{
+			case EOF:
+				this.error("comment.block.unclosed");
+				return;
+			case '\n':
+				this.lineNumber++;
+				this.parseIndex++;
+				continue;
+			case '/':
+				if (this.nextCodePoint() == '*')
+				{
+					level++;
+					this.parseIndex += 2;
+					continue;
+				}
+				this.parseIndex++;
+				continue;
+			case '*':
+				if (this.nextCodePoint() == '/')
+				{
+					level--;
+					this.parseIndex += 2;
+
+					if (level == 0)
+					{
+						return;
+					}
+					continue;
+				}
+
+				this.parseIndex++;
+				continue;
+			}
+
+			this.advance(currentChar);
+		}
+	}
+
+	private void parseIdentifier(int currentChar, int subtype)
+	{
+		final int startIndex = this.parseIndex;
+
+		this.clearBuffer();
+		this.buffer.appendCodePoint(currentChar);
+
+		this.advance(currentChar);
+
+		while (true)
+		{
+			currentChar = this.codePoint();
+
+			switch (subtype)
+			{
+			case MOD_LETTER:
+			{
+				if (currentChar == '_' || currentChar == '$')
+				{
+					this.buffer.append((char) currentChar);
+					this.parseIndex++;
+					subtype = MOD_LETTER | MOD_SYMBOL;
+					continue;
+				}
+				if (LexerUtil.isIdentifierPart(currentChar)) // also matches digits
+				{
+					this.buffer.appendCodePoint(currentChar);
+					this.advance(currentChar);
+					continue;
+				}
+
+				final String id = this.buffer.toString();
+				final int keyword = this.symbols.getKeywordType(id);
+				if (keyword != 0)
+				{
+					this.tokens.append(new SymbolToken(this.symbols, keyword, this.lineNumber, startIndex));
+					return;
+				}
+				this.tokens.append(
+					new IdentifierToken(Name.get(id), Tokens.LETTER_IDENTIFIER, this.lineNumber, startIndex,
+					                    this.parseIndex));
+				return;
+			}
+			case MOD_DOT:
+				if (currentChar == '.')
+				{
+					this.buffer.append('.');
+					this.parseIndex++;
+					continue;
+				}
+				// Fallthrough
+			case MOD_SYMBOL:
+				if (currentChar == '_' || currentChar == '$')
+				{
+					this.buffer.append((char) currentChar);
+					this.parseIndex++;
+					subtype = MOD_LETTER | MOD_SYMBOL;
+					continue;
+				}
+				if (LexerUtil.isIdentifierSymbol(currentChar))
+				{
+					this.buffer.appendCodePoint(currentChar);
+					this.parseIndex++;
+					subtype = MOD_SYMBOL;
+					continue;
+				}
+				break;
+			case MOD_LETTER | MOD_SYMBOL:
+				if (currentChar == '_' || currentChar == '$')
+				{
+					this.buffer.append((char) currentChar);
+					this.parseIndex++;
+					continue;
+				}
+				if (LexerUtil.isIdentifierPart(currentChar))
+				{
+					this.buffer.appendCodePoint(currentChar);
+					this.advance(currentChar);
+					subtype = MOD_LETTER;
+					continue;
+				}
+				if (LexerUtil.isIdentifierSymbol(currentChar))
+				{
+					this.buffer.appendCodePoint(currentChar);
+					this.advance(currentChar);
+					subtype = MOD_SYMBOL;
+					continue;
+				}
+				break;
+			}
+
+			final String id = this.buffer.toString();
+			final int symbol = this.symbols.getSymbolType(id);
+			if (symbol != 0)
+			{
+				this.tokens.append(new SymbolToken(this.symbols, symbol, this.lineNumber, startIndex));
+				return;
+			}
+			this.tokens.append(new IdentifierToken(Name.get(id), Tokens.SYMBOL_IDENTIFIER, this.lineNumber, startIndex,
+			                                       this.parseIndex));
+			return;
+		}
+	}
+
+	private void parseEscape(int nextChar)
+	{
+		switch (nextChar)
 		{
 		case '"':
 		case '\'':
 		case '\\':
-			buf.append(n);
-			return true;
+			this.buffer.append((char) nextChar);
+			this.parseIndex += 2;
+			return;
 		case 'n':
-			buf.append('\n');
-			return true;
+			this.buffer.append('\n');
+			this.parseIndex += 2;
+			return;
 		case 't':
-			buf.append('\t');
-			return true;
+			this.buffer.append('\t');
+			this.parseIndex += 2;
+			return;
 		case 'r':
-			buf.append('\r');
-			return true;
+			this.buffer.append('\r');
+			this.parseIndex += 2;
+			return;
 		case 'b':
-			buf.append('\b');
-			return true;
+			this.buffer.append('\b');
+			this.parseIndex += 2;
+			return;
 		case 'f':
-			buf.append('\f');
-			return true;
-		}
-		return false;
-	}
+			this.buffer.append('\f');
+			this.parseIndex += 2;
+			return;
+		case 'v':
+			this.buffer.append('\u000B'); // U+000B VERTICAL TABULATION
+			this.parseIndex += 2;
+			return;
+		case 'a':
+			this.buffer.append('\u0007'); // U+0007 BELL
+			this.parseIndex += 2;
+			return;
+		case 'e':
+			this.buffer.append('\u001B'); // U+001B ESCAPE
+			this.parseIndex += 2;
+			return;
+		case '0':
+			this.buffer.append('\0'); // U+0000 NULL
+			this.parseIndex += 2;
+			return;
+		case 'u':
+			int buf = 0;
+			this.parseIndex += 2;
 
-	private IToken addToken(IToken prev, String s, int type, int line, int start, int len)
-	{
-		switch (type)
-		{
-		case IDENTIFIER:
-		case LETTER_IDENTIFIER:
-		{
-			final int keywordType = this.symbols.getKeywordType(s);
-			if (keywordType == 0)
+			if (this.codePoint() != '{')
 			{
-				return new IdentifierToken(prev, Name.get(s), LETTER_IDENTIFIER, line, start, start + len);
-			}
-			return new SymbolToken(this.symbols, prev, keywordType, line, start);
-		}
-		case DOT_IDENTIFIER:
-		case SYMBOL_IDENTIFIER:
-		case SYMBOL_IDENTIFIER | LETTER_IDENTIFIER:
-		{
-			final int symbolType = this.symbols.getSymbolType(s);
-			if (symbolType == 0)
-			{
-				return new IdentifierToken(prev, Name.get(s), SYMBOL_IDENTIFIER, line, start, start + len);
-			}
-			return new SymbolToken(this.symbols, prev, symbolType, line, start);
-		}
-		case SPECIAL_IDENTIFIER:
-			return new IdentifierToken(prev, Name.getSpecial(s), SPECIAL_IDENTIFIER, line, start, start + len + 2);
-		case SYMBOL:
-		case BaseSymbols.DOT:
-		case BaseSymbols.COLON:
-		case BaseSymbols.SEMICOLON:
-		case BaseSymbols.COMMA:
-		case BaseSymbols.EQUALS:
-			/* Brackets */
-		case BaseSymbols.OPEN_BRACKET:
-		case BaseSymbols.CLOSE_BRACKET:
-		case BaseSymbols.OPEN_PARENTHESIS:
-		case BaseSymbols.CLOSE_PARENTHESIS:
-		case BaseSymbols.OPEN_SQUARE_BRACKET:
-		case BaseSymbols.CLOSE_SQUARE_BRACKET:
-		case BaseSymbols.OPEN_CURLY_BRACKET:
-		case BaseSymbols.CLOSE_CURLY_BRACKET:
-			return new SymbolToken(BaseSymbols.INSTANCE, prev, type, line, start);
-		case INT:
-			return this.intToken(prev, s, line, start, len, 10, false);
-		case INT | MOD_BIN:
-			return this.intToken(prev, s, line, start, len, 2, false);
-		case INT | MOD_OCT:
-			return this.intToken(prev, s, line, start, len, 8, false);
-		case INT | MOD_HEX:
-			return this.intToken(prev, s, line, start, len, 16, false);
-		case LONG:
-			return this.intToken(prev, s, line, start, len + 1, 10, true);
-		case LONG | MOD_BIN:
-			return this.intToken(prev, s, line, start, len, 2, true);
-		case LONG | MOD_OCT:
-			return this.intToken(prev, s, line, start, len, 8, true);
-		case LONG | MOD_HEX:
-			return this.intToken(prev, s, line, start, len, 16, true);
-		case FLOAT:
-			return new FloatToken(prev, Float.parseFloat(s), line, start, start + len + 1);
-		case FLOAT | MOD_HEX:
-			return new FloatToken(prev, Float.parseFloat(s.substring(2)), line, start, start + len);
-		case DOUBLE:
-			return new DoubleToken(prev, Double.parseDouble(s), line, start, start + len + 1);
-		case DOUBLE | MOD_HEX:
-			return new DoubleToken(prev, Double.parseDouble(s.substring(2)), line, start, start + len);
-		case STRING:
-			return new StringToken(prev, STRING, s.substring(1), line, start, start + len + 1);
-		case STRING_START:
-			return new StringToken(prev, STRING_START, s.substring(1), line, start, start + len);
-		case STRING_PART:
-			return new StringToken(prev, STRING_PART, s, line, start, start + len);
-		case STRING_END:
-			return new StringToken(prev, STRING_END, s, line, start, start + len);
-		case SINGLE_QUOTED_STRING:
-			return new StringToken(prev, SINGLE_QUOTED_STRING, s.substring(1), line, start, start + len);
-		case LITERAL_STRING:
-			return new StringToken(prev, STRING, s.substring(1), line, start, start + len);
-		}
-		return null;
-	}
-
-	private IToken intToken(IToken prev, String s, int line, int start, int len, int radix, boolean isLong)
-	{
-		IToken token = isLong ?
-			               new LongToken(prev, line, start, start + len) :
-			               new IntToken(prev, line, start, start + len);
-		this.parseInteger(token, s, radix, isLong);
-		return token;
-	}
-
-	private void parseInteger(IToken token, String str, int radix, boolean isLong)
-	{
-		long result = 0;
-		int from = radix != 10 ? 2 : 0;
-		int to = str.length();
-		long limit = isLong ? -Long.MAX_VALUE : -Integer.MAX_VALUE;
-		long multmin;
-		int digit;
-
-		multmin = limit / radix;
-		while (from < to)
-		{
-			// Accumulating negatively avoids surprises near MAX_VALUE
-			digit = Character.digit(str.charAt(from++), radix);
-			if (result < multmin || (result *= radix) < limit + digit)
-			{
-				this.markers.add(new SyntaxError(token, "Invalid Integer - Out of Range"));
+				this.error("escape.unicode.open_brace");
 				return;
 			}
-			result -= digit;
+
+			this.parseIndex++;
+			loop:
+			while (true)
+			{
+				int codePoint = this.codePoint();
+				switch (codePoint)
+				{
+				case '\n':
+					this.error("escape.unicode.newline");
+					this.lineNumber++;
+					// Fallthrough
+				case ' ':
+				case '_':
+				case '\t':
+					this.parseIndex++;
+					continue;
+				case '}':
+					this.parseIndex++;
+					break loop;
+				}
+				if (!LexerUtil.isHexDigit(codePoint))
+				{
+					this.error("escape.unicode.close_brace");
+					break;
+				}
+
+				buf <<= 4;
+				buf += Character.digit(codePoint, 16);
+				this.parseIndex++;
+			}
+
+			this.buffer.appendCodePoint(buf);
+			return;
 		}
 
-		token.setLong(-result);
+		this.parseIndex++;
+		this.error("escape.invalid");
+		this.parseIndex++;
 	}
 
-	private IToken addToken(IToken prev, StringBuilder buf, int type, int line, int start)
+	// Utility Methods
+
+	private int codePoint()
 	{
-		String s = buf.toString();
-		int len = buf.length();
-		buf.delete(0, len);
-		return this.addToken(prev, s, type, line, start, len);
+		return this.parseIndex >= this.length ? 0 : this.code.codePointAt(this.parseIndex);
+	}
+
+	private int nextCodePoint()
+	{
+		return this.parseIndex + 1 >= this.length ? 0 : this.code.codePointAt(this.parseIndex + 1);
+	}
+
+	private void advance(int currentChar)
+	{
+		this.parseIndex += Character.charCount(currentChar);
+	}
+
+	private void clearBuffer()
+	{
+		this.buffer.delete(0, this.buffer.length());
+	}
+
+	private void error(String key)
+	{
+		this.error(new CodePosition(this.lineNumber, this.parseIndex, this.parseIndex + 1), key);
+	}
+
+	private void error(ICodePosition position, String key)
+	{
+		this.markers.add(new SyntaxError(position, this.markers.getI18n().getString(key)));
 	}
 }

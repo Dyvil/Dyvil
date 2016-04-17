@@ -1,6 +1,8 @@
-package dyvil.tools.compiler.ast.classes;
+package dyvil.tools.compiler.ast.classes.metadata;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.context.IContext;

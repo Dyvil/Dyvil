@@ -7,37 +7,62 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
-import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.parsing.Name;
 
 public class ExternalHeader extends DyvilHeader
 {
-	private boolean importsResolved;
-	private boolean staticImportsResolved;
-	private boolean typeAliasesResolved;
-	
+	private static final int IMPORT_DECLARATIONS  = 1;
+	private static final int USING_DECLARATIONS   = 1 << 1;
+	private static final int INCLUDE_DECLARATIONS = 1 << 2;
+	private static final int TYPE_ALIASES         = 1 << 3;
+
+	private int resolved;
+
 	public ExternalHeader(DyvilCompiler compiler)
 	{
 		super(compiler);
 	}
-	
+
 	public ExternalHeader(DyvilCompiler compiler, Name name)
 	{
 		super(compiler, name);
 	}
-	
-	private void resolveImports()
+
+	private void resolveIncludeDeclarations()
 	{
-		this.importsResolved = true;
+		this.resolved |= INCLUDE_DECLARATIONS;
+
+		for (int i = 0; i < this.includeCount; i++)
+		{
+			this.includes[i].resolve(null, this);
+		}
+	}
+
+	private void resolveImportDeclarations()
+	{
+		if ((this.resolved & INCLUDE_DECLARATIONS) == 0)
+		{
+			this.resolveIncludeDeclarations();
+		}
+
+		this.resolved |= IMPORT_DECLARATIONS;
+
 		for (int i = 0; i < this.importCount; i++)
 		{
 			this.importDeclarations[i].resolveTypes(null, this);
 		}
 	}
-	
-	private void resolveStaticImports()
+
+	private void resolveUsingDeclarations()
 	{
-		this.staticImportsResolved = true;
+		if ((this.resolved & INCLUDE_DECLARATIONS) == 0)
+		{
+			this.resolveIncludeDeclarations();
+		}
+
+		this.resolved |= USING_DECLARATIONS;
+
 		for (int i = 0; i < this.usingCount; i++)
 		{
 			this.usingDeclarations[i].resolveTypes(null, this);
@@ -46,51 +71,51 @@ public class ExternalHeader extends DyvilHeader
 
 	private void resolveTypeAliases()
 	{
-		this.typeAliasesResolved = true;
+		this.resolved |= TYPE_ALIASES;
 
 		for (int i = 0; i < this.typeAliasCount; i++)
 		{
 			this.typeAliases[i].resolveTypes(null, this);
 		}
 	}
-	
+
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		if (!this.importsResolved)
+		if ((this.resolved & IMPORT_DECLARATIONS) == 0)
 		{
-			this.resolveImports();
+			this.resolveImportDeclarations();
 		}
 		return super.resolveClass(name);
 	}
-	
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		if (!this.staticImportsResolved)
+		if ((this.resolved & USING_DECLARATIONS) == 0)
 		{
-			this.resolveStaticImports();
+			this.resolveUsingDeclarations();
 		}
 		return super.resolveField(name);
 	}
 
 	@Override
-	public IType resolveType(Name name)
+	public ITypeAlias resolveTypeAlias(Name name, int arity)
 	{
-		if (!this.typeAliasesResolved)
+		if ((this.resolved & TYPE_ALIASES) == 0)
 		{
 			this.resolveTypeAliases();
 		}
 
-		return super.resolveType(name);
+		return super.resolveTypeAlias(name, arity);
 	}
 
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
-		if (!this.staticImportsResolved)
+		if ((this.resolved & USING_DECLARATIONS) == 0)
 		{
-			this.resolveStaticImports();
+			this.resolveUsingDeclarations();
 		}
 		super.getMethodMatches(list, instance, name, arguments);
 	}

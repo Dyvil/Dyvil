@@ -13,15 +13,15 @@ public final class LanguageCommons
 
 	// Ternary Operator
 
-	public infix func ?[T](boolean condition, (=> T, => T) branches): T = if (condition) branches._1() else branches._2()
+	public infix func ? <T>(boolean condition, (-> T, -> T) branches): T = if (condition) branches._1() else branches._2()
 
 	// Assertions
 
 	public static void assert(boolean condition) = if (!condition) throw new AssertionError()
 
-	public static void assert(boolean condition, => any message) = if (!condition) throw new AssertionError(message())
+	public static void assert(boolean condition, -> any message) = if (!condition) throw new AssertionError(message())
 
-	public static void assert((boolean, => any) tuple) = if (!tuple._1) throw new AssertionError(tuple._2())
+	public static void assert((boolean, -> any) tuple) = if (!tuple._1) throw new AssertionError(tuple._2())
 
 	// Errors
 

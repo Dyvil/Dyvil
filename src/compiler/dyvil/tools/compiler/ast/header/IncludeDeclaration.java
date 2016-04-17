@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
@@ -69,9 +69,9 @@ public class IncludeDeclaration implements IASTNode
 		return this.header == null ? null : this.header.resolveClass(name);
 	}
 	
-	public IType resolveType(Name name)
+	public ITypeAlias resolveTypeAlias(Name name, int arity)
 	{
-		return this.header == null ? null : this.header.resolveType(name);
+		return this.header == null ? null : this.header.resolveTypeAlias(name, arity);
 	}
 	
 	public IDataMember resolveField(Name name)

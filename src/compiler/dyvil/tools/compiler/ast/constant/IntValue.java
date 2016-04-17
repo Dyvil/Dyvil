@@ -81,9 +81,10 @@ public final class IntValue implements IConstantValue
 		{
 			switch (type.getTypecode())
 			{
+			case PrimitiveType.CHAR_CODE:
+				return new CharValue(this.position, String.valueOf((char) this.value), true);
 			case PrimitiveType.BYTE_CODE:
 			case PrimitiveType.SHORT_CODE:
-			case PrimitiveType.CHAR_CODE:
 			case PrimitiveType.INT_CODE:
 				return this;
 			case PrimitiveType.LONG_CODE:

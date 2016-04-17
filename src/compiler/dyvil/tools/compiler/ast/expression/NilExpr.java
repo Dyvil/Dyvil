@@ -4,7 +4,6 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -88,7 +87,7 @@ public class NilExpr implements IValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type.isArrayType())
+		if (type.isArrayType() || Types.isSameType(type, Types.STRING))
 		{
 			this.requiredType = type;
 			this.methodName = Names.apply;
@@ -98,9 +97,7 @@ public class NilExpr implements IValue
 		final IAnnotation annotation = type.getTheClass().getAnnotation(LazyFields.NIL_CONVERTIBLE_CLASS);
 		if (annotation != null)
 		{
-			this.methodName = LiteralConversion.getMethodName(annotation);
-			this.requiredType = type;
-			return this;
+			return this.withAnnotation(type, annotation, markers);
 		}
 
 		if (type != Types.UNKNOWN)
@@ -111,10 +108,46 @@ public class NilExpr implements IValue
 		return this;
 	}
 
+	private NilExpr withAnnotation(IType type, IAnnotation annotation, MarkerList markers)
+	{
+		this.methodName = LiteralConversion.getMethodName(annotation);
+		this.requiredType = type;
+
+		final IMethod match = IContext.resolveMethod(type, null, this.methodName, EmptyArguments.INSTANCE);
+		if (match == null)
+		{
+			markers.add(Markers.semantic(this.position, "nil.method", type.toString(), this.methodName));
+		}
+		else
+		{
+			this.method = match;
+			this.requiredType = match.getType()
+			                         .getConcreteType(match.getGenericData(null, null, EmptyArguments.INSTANCE));
+		}
+		return this;
+	}
+
+	public static IValue nilOrDefault(ICodePosition position, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		if (type.isArrayType())
+		{
+			return new NilExpr(position).withType(type, typeContext, markers, context);
+		}
+
+		final IAnnotation annotation = type.getAnnotation(NilExpr.LazyFields.NIL_CONVERTIBLE_CLASS);
+		if (annotation != null)
+		{
+			return new NilExpr(position).withAnnotation(type, annotation, markers);
+		}
+
+		return type.getDefaultValue();
+	}
+
 	@Override
 	public boolean isType(IType type)
 	{
-		return type.isArrayType() || type.getTheClass().getAnnotation(LazyFields.NIL_CONVERTIBLE_CLASS) != null;
+		return type.isArrayType() || Types.isSameType(type, Types.STRING)
+			       || type.getTheClass().getAnnotation(LazyFields.NIL_CONVERTIBLE_CLASS) != null;
 	}
 
 	@Override
@@ -146,24 +179,6 @@ public class NilExpr implements IValue
 		if (this.requiredType == null)
 		{
 			markers.add(Markers.semantic(this.position, "nil.untyped"));
-			return;
-		}
-
-		if (this.requiredType == Types.UNKNOWN || this.requiredType.isArrayType())
-		{
-			return;
-		}
-
-		IMethod match = IContext.resolveMethod(this.requiredType, null, this.methodName, EmptyArguments.INSTANCE);
-		if (match == null)
-		{
-			markers.add(Markers.semantic(this.position, "nil.method", this.requiredType.toString(), this.methodName));
-		}
-		else
-		{
-			this.method = match;
-			GenericData data = match.getGenericData(null, null, EmptyArguments.INSTANCE);
-			this.requiredType = match.getType().getConcreteType(data);
 		}
 	}
 
@@ -202,6 +217,10 @@ public class NilExpr implements IValue
 
 			writer.visitLdcInsn(0);
 			writer.visitMultiANewArrayInsn(this.requiredType, 1);
+		}
+		else if (Types.isSameType(this.requiredType, Types.STRING))
+		{
+			writer.visitLdcInsn("");
 		}
 		else
 		{

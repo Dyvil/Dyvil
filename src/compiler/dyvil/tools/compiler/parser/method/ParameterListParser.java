@@ -14,8 +14,6 @@ import dyvil.tools.compiler.ast.parameter.IParametric;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
-import dyvil.tools.compiler.parser.IParserManager;
-import dyvil.tools.compiler.parser.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
@@ -23,6 +21,8 @@ import dyvil.tools.compiler.parser.header.PropertyParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.parsing.IParserManager;
+import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
@@ -123,8 +123,9 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			if (ParserUtil.isIdentifier(type))
 			{
 				final int nextType = token.next().type();
-				if (ParserUtil.isTerminator(nextType) || nextType == DyvilSymbols.DOUBLE_ARROW_RIGHT && this.hasFlag(
-					LAMBDA_ARROW_END))
+				if (ParserUtil.isTerminator(nextType)
+					    || (nextType == DyvilSymbols.ARROW_RIGHT || nextType == DyvilSymbols.DOUBLE_ARROW_RIGHT)
+						       && this.hasFlag(LAMBDA_ARROW_END))
 				{
 					// ... , IDENTIFIER , ...
 					this.type = Types.UNKNOWN;
@@ -240,6 +241,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 
 			switch (type)
 			{
+			case DyvilSymbols.ARROW_RIGHT:
 			case DyvilSymbols.DOUBLE_ARROW_RIGHT:
 				if (!this.hasFlag(LAMBDA_ARROW_END))
 				{

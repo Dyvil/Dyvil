@@ -9,8 +9,8 @@ import dyvil.tools.compiler.ast.generic.TypeParameter;
 import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
-import dyvil.tools.compiler.parser.IParserManager;
-import dyvil.tools.compiler.parser.Parser;
+import dyvil.tools.parsing.IParserManager;
+import dyvil.tools.parsing.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
@@ -88,7 +88,7 @@ public final class TypeParameterParser extends Parser implements ITyped
 			pm.report(token, "typeparameter.identifier");
 			return;
 		case TYPE_BOUNDS:
-			if (ParserUtil.isTerminator(type))
+			if (ParserUtil.isTerminator(type) || TypeParser.isGenericEnd(token, type))
 			{
 				if (this.typeParameter != null)
 				{
@@ -144,7 +144,6 @@ public final class TypeParameterParser extends Parser implements ITyped
 			}
 			pm.popParser(true);
 			pm.report(token, "typeparameter.bound.invalid");
-			return;
 		}
 	}
 

@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.parser;
+package dyvil.tools.parsing;
 
 import dyvil.tools.parsing.token.IToken;
 

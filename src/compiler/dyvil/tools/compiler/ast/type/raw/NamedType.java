@@ -117,7 +117,7 @@ public class NamedType implements IRawType, ITypeConsumer
 		// If the type is not a Type Variable Reference
 		if (resolved.getTypeVariable() == null && resolved != Types.UNKNOWN)
 		{
-			// Replace Type Variable References with their default value
+			// Replace Type Variable References with their default value (raw type)
 			return resolved.getConcreteType(DEFAULT);
 		}
 		// Otherwise, simply return it.
@@ -135,10 +135,10 @@ public class NamedType implements IRawType, ITypeConsumer
 				return this;
 			}
 
-			final IType type = this.parent.resolveType(this.name);
-			if (type != null)
+			final IClass theClass = this.parent.resolveClass(this.name);
+			if (theClass != null)
 			{
-				return type;
+				return new ResolvedClassType(theClass, this.position);
 			}
 
 			final Package thePackage = this.parent.resolvePackage(this.name);
@@ -166,12 +166,6 @@ public class NamedType implements IRawType, ITypeConsumer
 		if (type != null)
 		{
 			return type.atPosition(this.position);
-		}
-
-		final Package thePackage = Package.rootPackage.resolvePackage(this.name);
-		if (thePackage != null)
-		{
-			return new PackageType(thePackage);
 		}
 
 		markers.add(Markers.semanticError(this.position, "resolve.type", this.name));

@@ -1,7 +1,8 @@
-package dyvil.tools.compiler.ast.classes;
+package dyvil.tools.compiler.ast.classes.metadata;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.CodeMethod;
@@ -41,14 +42,6 @@ public final class CaseClassMetadata extends ClassMetadata
 	}
 
 	@Override
-	public void resolveTypesBody(MarkerList markers, IContext context)
-	{
-		super.resolveTypesBody(markers, context);
-
-		this.checkMethods();
-	}
-
-	@Override
 	public void resolveTypesGenerate(MarkerList markers, IContext context)
 	{
 		super.resolveTypesGenerate(markers, context);
@@ -61,7 +54,7 @@ public final class CaseClassMetadata extends ClassMetadata
 		// Generate the apply method signature
 
 		final CodeMethod applyMethod = new CodeMethod(this.theClass, Names.apply, this.theClass.getType(),
-		                                        new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC));
+		                                              new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC));
 		applyMethod.setTypeParameters(this.theClass.getTypeParameters(), this.theClass.typeParameterCount());
 
 		if (this.constructor != null && (this.members & CONSTRUCTOR) == 0)
@@ -93,6 +86,8 @@ public final class CaseClassMetadata extends ClassMetadata
 				list.add(this.applyMethod, match);
 			}
 		}
+
+		super.getMethodMatches(list, instance, name, arguments);
 	}
 
 	@Override

@@ -50,7 +50,12 @@ public final class LongToken implements IToken
 	{
 		return Tokens.LONG;
 	}
-	
+
+	public void setValue(long value)
+	{
+		this.value = value;
+	}
+
 	@Override
 	public long longValue()
 	{
@@ -115,12 +120,6 @@ public final class LongToken implements IToken
 	public boolean hasPrev()
 	{
 		return this.prev.type() != 0;
-	}
-	
-	@Override
-	public void setLong(long value)
-	{
-		this.value = value;
 	}
 	
 	@Override

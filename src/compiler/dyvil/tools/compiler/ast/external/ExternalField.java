@@ -4,6 +4,7 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -13,13 +14,28 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public final class ExternalField extends Field
 {
-	private boolean annotationsResolved;
-	private boolean returnTypeResolved;
+	private static final int ANNOTATIONS    = 1;
+	private static final int RETURN_TYPE    = 1 << 1;
+	private static final int CONSTANT_VALUE = 1 << 2;
+
+	private int resolved = CONSTANT_VALUE;
+	private Object constantValue;
 
 	public ExternalField(IClass iclass, Name name, String desc, IType type, ModifierSet modifierSet)
 	{
 		super(iclass, name, type, modifierSet);
 		this.descriptor = desc;
+	}
+
+	public Object getConstantValue()
+	{
+		return this.constantValue;
+	}
+
+	public void setConstantValue(Object constantValue)
+	{
+		this.constantValue = constantValue;
+		this.resolved &= ~CONSTANT_VALUE;
 	}
 
 	private IContext getCombiningContext()
@@ -29,7 +45,7 @@ public final class ExternalField extends Field
 
 	private void resolveAnnotations()
 	{
-		this.annotationsResolved = true;
+		this.resolved |= ANNOTATIONS;
 		if (this.annotations != null)
 		{
 			this.annotations.resolveTypes(null, this.getCombiningContext(), this);
@@ -38,14 +54,30 @@ public final class ExternalField extends Field
 
 	private void resolveReturnType()
 	{
-		this.returnTypeResolved = true;
+		this.resolved |= RETURN_TYPE;
 		this.type = this.type.resolveType(null, this.getCombiningContext());
+	}
+
+	private void resolveConstantValue()
+	{
+		if ((this.resolved & RETURN_TYPE) == 0)
+		{
+			this.resolveReturnType();
+		}
+
+		this.resolved |= CONSTANT_VALUE;
+
+		final IValue value = IValue.fromObject(this.constantValue);
+		if (value != null)
+		{
+			this.value = value.withType(this.type, null, null, this.getCombiningContext());
+		}
 	}
 
 	@Override
 	public IType getType()
 	{
-		if (!this.returnTypeResolved)
+		if ((this.resolved & RETURN_TYPE) == 0)
 		{
 			this.resolveReturnType();
 		}
@@ -60,11 +92,21 @@ public final class ExternalField extends Field
 			return null;
 		}
 
-		if (!this.annotationsResolved)
+		if ((this.resolved & ANNOTATIONS) == 0)
 		{
 			this.resolveAnnotations();
 		}
 		return this.annotations.getAnnotation(type);
+	}
+
+	@Override
+	public IValue getValue()
+	{
+		if ((this.resolved & CONSTANT_VALUE) == 0)
+		{
+			this.resolveConstantValue();
+		}
+		return super.getValue();
 	}
 
 	@Override
