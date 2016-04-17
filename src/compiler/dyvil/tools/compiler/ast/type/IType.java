@@ -423,7 +423,13 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	{
 		if (typePath == null || step >= steps)
 		{
-			return type.withAnnotation(annotation);
+			final IType customType = type.withAnnotation(annotation);
+			if (customType != null)
+			{
+				return customType;
+			}
+
+			return new AnnotatedType(type, annotation);
 		}
 
 		type.addAnnotation(annotation, typePath, step, steps);

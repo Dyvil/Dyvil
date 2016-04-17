@@ -100,8 +100,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	@Override
 	public void addParameterType(IType type)
 	{
-		final int parameterIndex = this.parameterCount;
-		this.addParameter(new MethodParameter(Name.getQualified("par" + parameterIndex), type));
+		this.addParameter(new MethodParameter(Name.getQualified("par" + this.parameterCount), type));
 	}
 
 	@Override
