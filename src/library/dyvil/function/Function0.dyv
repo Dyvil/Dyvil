@@ -1,7 +1,7 @@
 package dyvil.function
 
 @FunctionalInterface
-public interface Function0[+R]
+public interface Function0<+R>
 {
 	func apply(): R
 }

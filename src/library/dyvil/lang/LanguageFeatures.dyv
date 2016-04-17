@@ -21,7 +21,7 @@ public final class LanguageFeatures
 
 	public static Class<T> classOf<@Reified(true) T>(T value) = class T
 
-	public static Type[T] typeOf<@Reified T>(T value) = type T
+	public static Type<T> typeOf<@Reified T>(T value) = type T
 
 	// Increments
 

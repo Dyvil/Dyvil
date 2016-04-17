@@ -2,21 +2,21 @@ package dyvil.test
 
 public class InheritanceTest
 {
-	trait IFoo[T]
+	trait IFoo<T>
 	{
 		void onFooInit()
 
 		init { this.onFooInit }
 	}
 
-	trait IBar[T]
+	trait IBar<T>
 	{
 		T bar()
 	}
 
-	interface IFooBar[T] extends IFoo, IBar[T]
+	interface IFooBar<T> extends IFoo, IBar<T>
 
-	class FooBar implements IFooBar[String]
+	class FooBar implements IFooBar<String>
 	{
 		public override String bar() = "FooBar.bar"
 

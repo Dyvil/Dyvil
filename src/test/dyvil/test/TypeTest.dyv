@@ -4,7 +4,7 @@ infix operator <<< { 120 }
 
 public class TypeTest
 {
-	case class MyList[T](T... elements)
+	case class MyList<T>(T... elements)
 	{
 		public double sum(MyList<double> this)
 		{
@@ -18,9 +18,9 @@ public class TypeTest
 		}
 	}
 
-	infix func <<<[T, C <: Collection<T>](C collection, T element) = collection.added(element)
+	infix func <<< <T, C <: Collection<T>>(C collection, T element) = collection.added(element)
 
-	static func voidTest[T](T value) = "\(value)" // will error if CovariantTypeVarType.isSameType(Types.VOID) returns true
+	static func voidTest<T>(T value) = "\(value)" // will error if CovariantTypeVarType.isSameType(Types.VOID) returns true
 
 	public static void main([String] args)
 	{

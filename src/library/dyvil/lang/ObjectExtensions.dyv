@@ -61,11 +61,11 @@ public final class ObjectExtensions
 
 	// Comparable
 
-	public infix inline func <[T](Comparable[T] c1, T c2): boolean = (c1 compareTo c2) < 0
+	public infix inline func < <T>(Comparable<T> c1, T c2): boolean = (c1 compareTo c2) < 0
 
-	public infix inline func <=[T](Comparable[T] c1, T c2): boolean = (c1 compareTo c2) <= 0
+	public infix inline func <= <T>(Comparable<T> c1, T c2): boolean = (c1 compareTo c2) <= 0
 
-	public infix inline func >[T](Comparable[T] c1, T c2): boolean = (c1 compareTo c2) > 0
+	public infix inline func > <T>(Comparable<T> c1, T c2): boolean = (c1 compareTo c2) > 0
 
-	public infix inline func >=[T](Comparable[T] c1, T c2): boolean = (c1 compareTo c2) >= 0
+	public infix inline func >= <T>(Comparable<T> c1, T c2): boolean = (c1 compareTo c2) >= 0
 }
