@@ -1,3 +1,120 @@
+Dyvil v0.21.0
+=============
+
+- Class Declarations can now declare their Type Parameters in Angle Brackets. #180
+- Closure Lambda Expressions in Statement Lists can now define an explicit Return Type. #253
+- Generic Type Aliases can now be declared with Angle Brackets. #180
+- Generic Types can now uses Angle Brackets. #180
+- Lambda Expressions can now define an explicit Return Type. #253
+- Method Call Expressions can now use Angle Brackets. #180
+- Method Declarations can now declare their Type Parameters in Angle Brackets. #180
+- The Double Arrow `=>` is now deprecated for Lambda Types. #253
+- The Single Arrow `->` can now be used for Function and Lambda Return Types. #253
+- The `nil` literal can now be used in place of `String`s.
+- Type Aliases with different arities can now be overloaded. #260
+- Added Unicode Escape Sequences in String Literals in the form `\u{hexDigits}`. #259
+- Added the `\v`, `\a`, `\e` and `\0` escape codes. #259
+- Added the `nil` and `null` class modifiers. #257
+- Updated the Wildcard Type Syntax. #255
+- Removed `do` Statements Notation. #213
+- Removed the `functional` keyword. #227
+- Deprecated Method Calls with Square Brackets for Generic Types. #180
+
+## Dyvil Compiler v0.21.0
+
+- All formatting methods now use Angle Brackets for Generics.
+- External Fields now resolve their Constant Value lazily.
+- Object Classes now produce an error if they explicitly declare an `instance` field.
+- The `External*` classes now use bitflags instead of boolean fields to indicate which types have already been resolved.
+- Added a default implementation for the `IType.asParameterType` method.
+- Added a new `ConstructorCall` constructor.
+- Added a new `FieldAssignment` constructor.
+- Added deprecation warnings for Generic Types and Declarations with Square Brackets instead of Angle Brackets.
+- Implemented the `nil` class modifier. #257
+- Implemented the `null` class modifier. #257
+- Updated Lambda Type Formatting to use the Single Arrow `->` instead of `=>`.
+- Updated Member Resolution for Case and Object Classes.
+- Updated Type Alias resolution to use the new `IContext.resolveTypeAlias(Name, int)` method.
+- Updated Wildcard Type formatting.
+- Updated and Improved Generic Type Parameter Inference for Method Calls.
+- Updated and moved the `AnonymousClassMetadata` class into the `AnonymousClass` file.
+- Updated the Type Parser to improve support Lambda Types with one Parameter Type.
+- Updated the `BaseModifiers` class.
+- Updated the `CombiningLabelContext` class.
+- Improved Lambda Type formatting.
+- Improved Object Class Resolution and Diagnostics.
+- Improved String and Char Literal Formatting.
+- Improved Type Inference for Lambda Expressions.
+- Improved `MethodMatchList` resizing.
+- Improved bytecode Type decompilation.
+- Improved the Error markers for Constructors Calls of Interface Types.
+- Improved the `Util.methodSignatureToString(...)` and `.memberSignatureToString(...)` methods.
+- Resolved some edge cases in the Type Parser.
+- Fixed Annotated Type bytecode decompilation.
+- Fixed Array Expressions causing JVM errors when used in place of Type Parameter Types.
+- Fixed Break and Continue Statements causing compiler errors with unresolved labels.
+- Fixed Explicit Generic Type Arguments being overwritten by Type Inference.
+- Fixed External Fields of type `char` with constant values being inlined incorrectly.
+- Fixed Float and Double Literals being formatted incorrectly with NaN or Infinity values.
+- Fixed If Statements causing compiler errors in some cases.
+- Fixed Member Signature Formatting working incorrectly in some cases.
+- Fixed Method Calls being type-resolved twice.
+- Fixed Primitive Types not restoring their source code position.
+- Fixed Statement List Labels being resolved incorrectly.
+- Fixed Type Mismatch Errors not printing the concrete type.
+- Fixed Type Mismatch Errors showing uninferred types instead of concrete ones.
+- Fixed `static final` fields without a Constant Value being treated as if it was `null`.
+- Fixed the `:complete` command formatting Methods without their Parameter Types.
+- Fixed the `ResolvedGenericType.checkType` implementation working incorrectly with too many type arguments.
+- Fixed the compiler error when it is unable to load a file.
+- Removed compiler support for nominal Function and Tuple Types.
+- Removed the `CompleteCommand.getSignature(...)` methods.
+- Removed the `IContext.resolveType(Name)` method.
+- Disabled external Methods with Jump instructions in the bytecode from being inlined.
+- Moved the `*Metadata` classes from the `dyvil.tools.compiler.ast.classes` package to `d.t.c.a.classes.metadata`.
+- Moved the `dyvil.tools.compiler.parser.IParserManager`, `ParserManager`, `TryParserManager` and `Parser` classes to the `dyvil.tools.parsing` package.
+
+## Dyvil Library v0.21.0
+
+- Lexer Errors can now be localized with the `dyvil.tools.parsing.lang.SyntaxMarkers` property file.
+- The `ParserManager` class now requires a `Symbols` instance to be passed.
+- The `TryParserManager` class can restore split tokens when being reset.
+- Added Lexer Errors for Unclosed Backtick Identifiers and String Literals.
+- Added a Lexer Error for Newlines within Single-Quoted String Literals.
+- Added a Lexer Error for Unclosed Block Comments.
+- Added support for direct casts (without implicit conversion) using the `LanguageFeatures.cast<T>(any)` method.
+- Added the `IParserManager.split(IToken, int)` method for splitting a token into two.
+- Added the `Marker.addError(Throwable)` class.
+- Added the `dyvil.Functions` and `dyvil.Tuples` headers.
+- Added the `dyvil.util.I18n` class.
+- Rewrote and structured the `DyvilLexer` class.
+- Updated the `dyvilx.lang.model.type.GenericType.toString` implementation to use Angle Brackets.
+- Improved Error reporting in the `DyvilLexer` class.
+- Improved Unicode support in the Lexer.
+- Fixed Errors and Warnings not being reset from the `MarkerList` by `TryParserManager`s.
+- Fixed single Characters not being parsed by the Dyvil Lexer.
+- Fixed the `AbstractTupleMap.toString()` implementation using the wrong Entry separator.
+- Removed the `Names.writeReplace` and `.readResolve` fields.
+- Cleaned up the `dyvil.random.Random` class.
+- Moved the `dyvil.lang.FunctionConversions` class to the `dyvil.function` package.
+- Moved the `dyvil.tools.compiler.parser.IParserManager`, `ParserManager`, `TryParserManager` and `Parser` classes to the `dyvil.tools.parsing` package.
+- Renamed the `dyvil.random.RandomUtils` class to `JavaRandoms`.
+
+## Dyvil REPL v0.14.0
+
+- The `:complete` REPL command can now display available Extension Methods.
+- Updated the `REPLContext` class to always provide a member class.
+- Updated the `REPLMemberClass` class.
+- Improved `:complete` Error diagnostics.
+- Fixed Escaped Backslash Character (`\\`) being handled incorrectly in the REPL.
+- Fixed Lexer errors not being reported in the REPL.
+- Fixed REPL methods causing runtime errors when called from the REPL.
+- Fixed Static Completions by the `:complete` command working incorrectly.
+
+## Dyvil Property Format v0.5.0
+
+- Removed the `FlatMapConverter.parse(String, ...)` methods.
+
 Dyvil v0.20.0
 =============
 
@@ -155,6 +272,8 @@ Dyvil v0.20.0
 - Improved REPL Variable Formatting for Array Values.
 - Refactored the compilation mechanism in the REPL to the new `REPLCompiler` class.
 - Removed the `REPLResult` class.
+
+## Dyvil Property Format v0.4.1
 
 Dyvil v0.19.0
 =============
