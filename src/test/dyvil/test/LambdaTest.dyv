@@ -19,7 +19,7 @@ public class LambdaTest
 		override func apply(int value): int
 	}
 
-	public static void repeatClosure(int n, => void f) = for (var i <- 0 ..< n) f()
+	public static void repeatClosure(int n, -> void f) = for (var i <- 0 ..< n) f()
 	
 	private static int staticSum = 0
 	
@@ -45,18 +45,18 @@ public class LambdaTest
 	
 	private static void chainTest()
 	{
-		var fun1 = (int i) => i + 1
-		var fun2 = (int i) => i * 2
-		var fun12 = fun1 andThen fun2
-		var result = (fun12(7))
+		let fun1 = (int i) -> int => i + 1
+		let fun2 = (int i) -> int => i * 2
+		let fun12 = fun1 andThen fun2
+		let result = (fun12(7))
 
 		Main.test("Function Chain", 16, result)
 	}
 	
 	private static void compoundAssignmentTest()
 	{
-		int localSum = 0
-		var list = List(1, 2, 3)
+		var localSum = 0
+		let list = List(1, 2, 3)
 		list.forEach(i => localSum += i)
 		list.forEach(i => staticSum += i)
 
@@ -112,7 +112,7 @@ public class LambdaTest
 
 	public static void typeInferenceTest()
 	{
-		var function1 = (int i) => i
+		var function1 = (int i) -> int => i
 		var function2 = (int i, int j) => (i, j)
 		var functionCurried = (int i) => (int j) => (i, j)
 

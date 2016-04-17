@@ -7,12 +7,10 @@ import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.*;
 import dyvil.tools.compiler.ast.generic.GenericData;
-import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.operator.OperatorChain;
 import dyvil.tools.compiler.ast.operator.PostfixCall;
 import dyvil.tools.compiler.ast.operator.PrefixCall;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
-import dyvil.tools.compiler.ast.parameter.MethodParameter;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.statement.ReturnStatement;
@@ -24,7 +22,6 @@ import dyvil.tools.compiler.ast.statement.exception.ThrowStatement;
 import dyvil.tools.compiler.ast.statement.exception.TryStatement;
 import dyvil.tools.compiler.ast.statement.loop.RepeatStatement;
 import dyvil.tools.compiler.ast.statement.loop.WhileStatement;
-import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.statement.*;
@@ -294,6 +291,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 			switch (type)
 			{
+			case DyvilSymbols.ARROW_RIGHT:
 			case DyvilSymbols.DOUBLE_ARROW_RIGHT:
 				if (!this.hasFlag(IGNORE_LAMBDA))
 				{
@@ -556,6 +554,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			pm.skip();
 			return;
 		}
+		case DyvilSymbols.ARROW_RIGHT:
 		case DyvilSymbols.DOUBLE_ARROW_RIGHT:
 			if (this.hasFlag(IGNORE_LAMBDA))
 			{
@@ -567,14 +566,8 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 			// Lambda Expression with one untyped parameter
 
-			final MethodParameter parameter = new MethodParameter(token.raw(), token.nameValue(), Types.UNKNOWN,
-			                                                      EmptyModifiers.INSTANCE, null);
-			final LambdaExpr lambdaExpr = new LambdaExpr(next.raw(), parameter);
-
+			pm.pushParser(new LambdaOrTupleParser(this, LambdaOrTupleParser.SINGLE_PARAMETER), true);
 			this.mode = END;
-			this.value = lambdaExpr;
-			pm.pushParser(new ExpressionParser(lambdaExpr));
-			pm.skip();
 			return;
 		}
 
@@ -623,7 +616,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 	private boolean parseFieldAccess(IToken token, IToken next, int nextType)
 	{
-		if (isExpressionEnd(nextType) || nextType == DyvilSymbols.DOUBLE_ARROW_RIGHT || this.ignoreClosure(next))
+		if (isExpressionEnd(nextType) || this.ignoreClosure(next))
 		{
 			// IDENTIFIER END
 			// token      next
@@ -751,31 +744,9 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			// ( ...
 			final IToken next = token.next();
 
-			if (!this.hasFlag(IGNORE_LAMBDA))
+			if (next.type() != BaseSymbols.CLOSE_PARENTHESIS)
 			{
-				if (next.type() != BaseSymbols.CLOSE_PARENTHESIS)
-				{
-					// ( ...
-					pm.pushParser(new LambdaOrTupleParser(this), true);
-					this.mode = ACCESS;
-					return true;
-				}
-
-				final IToken next2 = next.next();
-				if (next2.type() == DyvilSymbols.DOUBLE_ARROW_RIGHT)
-				{
-					// () => ...
-					final LambdaExpr lambda = new LambdaExpr(next2.raw());
-					this.value = lambda;
-					pm.skip(2);
-					pm.pushParser(new ExpressionParser(lambda));
-					this.mode = ACCESS;
-					return true;
-				}
-			}
-			else if (next.type() != BaseSymbols.CLOSE_PARENTHESIS)
-			{
-				pm.pushParser(new LambdaOrTupleParser(this, true), true);
+				pm.pushParser(new LambdaOrTupleParser(this, this.hasFlag(IGNORE_LAMBDA)), true);
 				this.mode = ACCESS;
 				return true;
 			}
@@ -803,6 +774,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			this.value = new AnnotationValue(a);
 			this.mode = END;
 			return true;
+		case DyvilSymbols.ARROW_RIGHT:
 		case DyvilSymbols.DOUBLE_ARROW_RIGHT:
 		{
 			if (this.hasFlag(IGNORE_LAMBDA))
@@ -812,10 +784,8 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			}
 
 			// => ...
-			LambdaExpr lambda = new LambdaExpr(token.raw());
-			this.value = lambda;
-			this.mode = ACCESS;
-			pm.pushParser(new ExpressionParser(lambda));
+			// -> ...
+			pm.pushParser(new LambdaOrTupleParser(this, LambdaOrTupleParser.TYPE_ARROW), true);
 			return true;
 		}
 		case DyvilKeywords.NULL:
