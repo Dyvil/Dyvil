@@ -888,9 +888,6 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			this.mode = END;
 			return true;
 		}
-		case DyvilKeywords.DO:
-			pm.report(Markers.semanticWarning(token, "do.deprecated"));
-			// fallthrough
 		case DyvilKeywords.REPEAT:
 		{
 			// repeat ...

@@ -78,9 +78,6 @@ public final class ModifierUtil
 			return BaseModifiers.INLINE;
 		case DyvilKeywords.SYNCHRONIZED:
 			return BaseModifiers.SYNCHRONIZED;
-		case DyvilKeywords.FUNCTIONAL:
-			parserManager.report(Markers.syntaxWarning(token, "modifier.functional.deprecated"));
-			return BaseModifiers.FUNCTIONAL;
 		case DyvilKeywords.CONST:
 			return BaseModifiers.CONST;
 		case DyvilKeywords.LAZY:
