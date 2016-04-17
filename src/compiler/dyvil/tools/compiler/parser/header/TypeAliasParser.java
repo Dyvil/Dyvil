@@ -7,6 +7,7 @@ import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.type.TypeParameterListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.Parser;
@@ -80,6 +81,7 @@ public class TypeAliasParser extends Parser
 			}
 			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
 			{
+				pm.report(Markers.syntaxWarning(token, "generic.open_bracket.deprecated"));
 				this.typeAlias.setTypeParametric();
 				this.mode = TYPE_PARAMETERS_END;
 				pm.pushParser(new TypeParameterListParser(this.typeAlias));
@@ -101,7 +103,7 @@ public class TypeAliasParser extends Parser
 			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{
 				pm.reparse();
-				pm.report(token, "typealias.generic.close_bracket");
+				pm.report(token, "generic.close_bracket");
 			}
 			return;
 		case ANGLE_TYPE_PARAMETERS_END:
@@ -113,7 +115,7 @@ public class TypeAliasParser extends Parser
 			}
 
 			pm.reparse();
-			pm.report(token, "typealias.generic.close_angle");
+			pm.report(token, "generic.close_angle");
 		}
 	}
 

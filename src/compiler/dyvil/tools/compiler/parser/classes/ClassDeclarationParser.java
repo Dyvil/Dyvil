@@ -16,6 +16,7 @@ import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParameterListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -80,7 +81,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{
 				pm.reparse();
-				pm.report(token, "class.generic.close_bracket");
+				pm.report(token, "generic.close_bracket");
 			}
 			return;
 		case ANGLE_GENERICS_END:
@@ -92,7 +93,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			}
 
 			pm.reparse();
-			pm.report(token, "class.generic.close_angle");
+			pm.report(token, "generic.close_angle");
 			return;
 		case PARAMETERS_END:
 			this.mode = EXTENDS;
@@ -113,6 +114,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			}
 			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
 			{
+				pm.report(Markers.syntaxWarning(token, "generic.open_bracket.deprecated"));
 				pm.pushParser(new TypeParameterListParser(this.theClass));
 				this.theClass.setTypeParametric();
 				this.mode = GENERICS_END;

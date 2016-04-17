@@ -388,6 +388,7 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 			}
 			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
 			{
+				pm.report(Markers.syntaxWarning(token, "generic.open_bracket.deprecated"));
 				this.mode = GENERICS_END;
 				pm.pushParser(new TypeParameterListParser((IMethod) this.member));
 				return;
@@ -451,7 +452,7 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{
 				pm.reparse();
-				pm.report(token, "method.generic.close_bracket");
+				pm.report(token, "generic.close_bracket");
 			}
 			return;
 		case ANGLE_GENERICS_END:
@@ -463,7 +464,7 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 			}
 
 			pm.reparse();
-			pm.report(token, "method.generic.close_angle");
+			pm.report(token, "generic.close_angle");
 			return;
 		case PARAMETERS_END:
 			this.mode = METHOD_TYPE;

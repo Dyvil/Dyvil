@@ -312,17 +312,18 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			}
 			return;
 		case GENERICS:
-			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
-			{
-				pm.pushParser(new TypeListParser((GenericType) this.type));
-				this.mode = GENERICS_END;
-				return;
-			}
 			if (isGenericStart(token, type))
 			{
 				pm.splitJump(token, 1);
 				pm.pushParser(new TypeListParser((GenericType) this.type));
 				this.mode = ANGLE_GENERICS_END;
+				return;
+			}
+			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
+			{
+				pm.report(Markers.syntaxWarning(token, "type.generic.open_bracket.deprecated"));
+				pm.pushParser(new TypeListParser((GenericType) this.type));
+				this.mode = GENERICS_END;
 				return;
 			}
 			return;
