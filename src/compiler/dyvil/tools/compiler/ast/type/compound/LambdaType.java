@@ -626,7 +626,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 				sb.append(", ").append(this.parameterTypes[i]);
 			}
 		}
-		sb.append(") => ").append(this.returnType);
+		sb.append(") -> ").append(this.returnType);
 		return sb.toString();
 	}
 
@@ -658,7 +658,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 			Util.astToString(prefix, this.parameterTypes, this.parameterCount,
 			                 Formatting.getSeparator("lambda.separator", ','), buffer);
 
-			if (Formatting.getBoolean("lambda.close_paren.space-before"))
+			if (Formatting.getBoolean("lambda.close_paren.space_before"))
 			{
 				buffer.append(' ');
 			}
@@ -679,7 +679,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 			}
 		}
 
-		buffer.append("=>");
+		buffer.append("->");
 
 		if (Formatting.getBoolean("lambda.arrow.space_after"))
 		{

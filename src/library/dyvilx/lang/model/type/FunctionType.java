@@ -116,7 +116,7 @@ public class FunctionType<F> implements Type<F>
 				this.parameterTypes[i].toString(builder);
 			}
 		}
-		builder.append(") => ");
+		builder.append(") -> ");
 		this.returnType.toString(builder);
 	}
 
