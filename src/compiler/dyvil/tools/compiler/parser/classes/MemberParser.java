@@ -402,7 +402,7 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 			}
 			// Fallthrough
 		case METHOD_TYPE:
-			if (type == BaseSymbols.COLON)
+			if (type == BaseSymbols.COLON || type == DyvilSymbols.ARROW_RIGHT)
 			{
 				if (this.type != Types.UNKNOWN)
 				{

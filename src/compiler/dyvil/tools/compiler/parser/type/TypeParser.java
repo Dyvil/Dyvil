@@ -107,16 +107,19 @@ public final class TypeParser extends Parser implements ITypeConsumer
 						return;
 					}
 				}
-				else if (type == DyvilSymbols.DOUBLE_ARROW_RIGHT)
+				else if ((type == DyvilSymbols.DOUBLE_ARROW_RIGHT || type == DyvilSymbols.ARROW_RIGHT)
+					         && this.parentType == null && (this.flags & IGNORE_LAMBDA) == 0)
 				{
-					if (this.parentType == null && (this.flags & IGNORE_LAMBDA) == 0)
+					if (type == DyvilSymbols.DOUBLE_ARROW_RIGHT)
 					{
-						final LambdaType lambdaType = new LambdaType(token.raw(), this.type);
-						this.type = lambdaType;
-						this.mode = LAMBDA_END;
-						pm.pushParser(new TypeParser(lambdaType));
-						return;
+						pm.report(Markers.syntaxWarning(token, "type.lambda.double_arrow.deprecated"));
 					}
+
+					final LambdaType lambdaType = new LambdaType(token.raw(), this.type);
+					this.type = lambdaType;
+					this.mode = LAMBDA_END;
+					pm.pushParser(new TypeParser(lambdaType));
+					return;
 				}
 			}
 			if (type == BaseSymbols.DOT)
@@ -170,7 +173,11 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					pm.pushParser(new TypeParser(arrayType));
 					return;
 				}
+
 				case DyvilSymbols.DOUBLE_ARROW_RIGHT:
+					pm.report(Markers.syntaxWarning(token, "type.lambda.double_arrow.deprecated"));
+					// Fallthrough
+				case DyvilSymbols.ARROW_RIGHT:
 				{
 					final LambdaType lambdaType = new LambdaType(token.raw(), this.parentType);
 					pm.pushParser(new TypeParser(lambdaType));
@@ -251,8 +258,12 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			}
 
 			final IToken nextToken = token.next();
-			if (nextToken.type() == DyvilSymbols.DOUBLE_ARROW_RIGHT)
+			switch (nextToken.type())
 			{
+			case DyvilSymbols.DOUBLE_ARROW_RIGHT:
+				pm.report(Markers.syntaxWarning(nextToken, "type.lambda.double_arrow.deprecated"));
+				// Fallthrough
+			case DyvilSymbols.ARROW_RIGHT:
 				final LambdaType lambdaType = new LambdaType(nextToken.raw(), this.parentType, (TupleType) this.type);
 				this.type = lambdaType;
 				this.mode = LAMBDA_END;
@@ -261,11 +272,11 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				pm.pushParser(new TypeParser(lambdaType));
 				return;
 			}
-			else if (this.parentType != null)
+
+			if (this.parentType != null)
 			{
 				pm.report(nextToken, "type.tuple.lambda_arrow");
 			}
-
 			this.type.expandPosition(token);
 			this.mode = END;
 			return;
