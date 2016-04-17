@@ -19,7 +19,7 @@ public class LambdaTest
 		override func apply(int value): int
 	}
 
-	public static void repeatClosure(int n, => void f) = for (var i <- 0 ..< n) f()
+	public static void repeatClosure(int n, -> void f) = for (var i <- 0 ..< n) f()
 	
 	private static int staticSum = 0
 	
@@ -45,18 +45,18 @@ public class LambdaTest
 	
 	private static void chainTest()
 	{
-		var fun1 = (int i) => i + 1
-		var fun2 = (int i) => i * 2
-		var fun12 = fun1 andThen fun2
-		var result = (fun12(7))
+		let fun1 = (int i) -> int => i + 1
+		let fun2 = (int i) -> int => i * 2
+		let fun12 = fun1 andThen fun2
+		let result = (fun12(7))
 
 		Main.test("Function Chain", 16, result)
 	}
 	
 	private static void compoundAssignmentTest()
 	{
-		int localSum = 0
-		var list = List(1, 2, 3)
+		var localSum = 0
+		let list = List(1, 2, 3)
 		list.forEach(i => localSum += i)
 		list.forEach(i => staticSum += i)
 
@@ -76,8 +76,8 @@ public class LambdaTest
 	{
 		var result = List<String>
 
-		() => void function1 = function { result += "a" }
-		() => String function2 = function { "b" }
+		() -> void function1 = function { result += "a" }
+		() -> String function2 = function { "b" }
 
 		repeatClosure(3) { result += function2() }
 
@@ -91,8 +91,8 @@ public class LambdaTest
 
 	private static void partialFunctionTest()
 	{
-		((int, int) => int) compareInts = _ compareTo _
-		(any => void) testFun = Main.test("Partial Function Test 1", -1, _)
+		((int, int) -> int) compareInts = _ compareTo _
+		(any -> void) testFun = Main.test("Partial Function Test 1", -1, _)
 
 		testFun(compareInts(1, 2))
 
@@ -101,9 +101,9 @@ public class LambdaTest
 
 	public static void curriedTest()
 	{
-		(int => int => int) add2 = i => j => i + j
-		(int => int => int => int) add3 = i => j => k => i + j + k
-		(int => int => int => int => int) add4 = i => j => k => l => i + j + k + l
+		(int -> int -> int) add2 = i => j => i + j
+		(int -> int -> int -> int) add3 = i => j => k => i + j + k
+		(int -> int -> int -> int -> int) add4 = i => j => k => l => i + j + k + l
 
 		Main.test("Curried Test (1 nested level)", 11, add2 1 10)
 		Main.test("Curried Test (2 nested levels)", 111, add3 1 10 100)
@@ -112,12 +112,12 @@ public class LambdaTest
 
 	public static void typeInferenceTest()
 	{
-		var function1 = (int i) => i
-		var function2 = (int i, int j) => (i, j)
+		var function1 = { int i -> int => i }
+		var function2 = { int i, int j => (i, j) }
 		var functionCurried = (int i) => (int j) => (i, j)
 
-		Main.test("Type Inference Test (1 Parameter)", type(int => int).toString, typeOf(function1).toString)
-		Main.test("Type Inference Test (2 Parameters", type((int, int) => (int, int)).toString, typeOf(function2).toString)
-		Main.test("Type Inference Test (Curried)", type(int => int => (int, int)).toString, typeOf(functionCurried).toString)
+		Main.test("Type Inference Test (1 Parameter)", type(int -> int).toString, typeOf(function1).toString)
+		Main.test("Type Inference Test (2 Parameters", type((int, int) -> (int, int)).toString, typeOf(function2).toString)
+		Main.test("Type Inference Test (Curried)", type(int -> int -> (int, int)).toString, typeOf(functionCurried).toString)
 	}
 }

@@ -298,22 +298,20 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		final IValue typedReturnValue = value.withType(this.returnType, typeContext, markers, context);
 		if (typedReturnValue != null)
 		{
-			return this.wrapLambda(typedReturnValue, typeContext);
+			return this.wrapLambda(typedReturnValue);
 		}
 		return null;
 	}
 
-	public LambdaExpr wrapLambda(IValue value, ITypeContext typeContext)
+	public LambdaExpr wrapLambda(IValue value)
 	{
 		IType returnType = value.getType();
 
 		final LambdaExpr lambdaExpr = new LambdaExpr(value.getPosition(), null, 0);
 		lambdaExpr.setImplicitParameters(true);
 		lambdaExpr.setMethod(this.getFunctionalMethod());
-		lambdaExpr.setReturnType(returnType);
 		lambdaExpr.setValue(value);
-		lambdaExpr.setType(this);
-		lambdaExpr.inferReturnType(this, typeContext, returnType);
+		lambdaExpr.inferReturnType(this, returnType);
 		return lambdaExpr;
 	}
 
@@ -626,7 +624,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 				sb.append(", ").append(this.parameterTypes[i]);
 			}
 		}
-		sb.append(") => ").append(this.returnType);
+		sb.append(") -> ").append(this.returnType);
 		return sb.toString();
 	}
 
@@ -658,7 +656,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 			Util.astToString(prefix, this.parameterTypes, this.parameterCount,
 			                 Formatting.getSeparator("lambda.separator", ','), buffer);
 
-			if (Formatting.getBoolean("lambda.close_paren.space-before"))
+			if (Formatting.getBoolean("lambda.close_paren.space_before"))
 			{
 				buffer.append(' ');
 			}
@@ -679,7 +677,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 			}
 		}
 
-		buffer.append("=>");
+		buffer.append("->");
 
 		if (Formatting.getBoolean("lambda.arrow.space_after"))
 		{

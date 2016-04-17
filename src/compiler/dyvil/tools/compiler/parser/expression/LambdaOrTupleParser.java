@@ -4,21 +4,26 @@ import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LambdaExpr;
 import dyvil.tools.compiler.ast.expression.TupleExpr;
-import dyvil.tools.parsing.IParserManager;
-import dyvil.tools.parsing.Parser;
+import dyvil.tools.compiler.ast.parameter.MethodParameter;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
+import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.parsing.IParserManager;
+import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
 public class LambdaOrTupleParser extends Parser
 {
-	protected static final int OPEN_PARENTHESIS = 1;
-	protected static final int TUPLE            = 2;
-	protected static final int PARAMETERS_END   = 4;
-	protected static final int ARROW            = 8;
-	protected static final int TUPLE_END        = 16;
+	protected static final int OPEN_PARENTHESIS = 0;
+	protected static final int TUPLE            = 1;
+	protected static final int PARAMETERS_END   = 1 << 1;
+	protected static final int TYPE_ARROW       = 1 << 2;
+	protected static final int RETURN_ARROW     = 1 << 3;
+	protected static final int TUPLE_END        = 1 << 4;
+	protected static final int SINGLE_PARAMETER = 1 << 5;
 
 	protected IValueConsumer consumer;
 
@@ -27,6 +32,12 @@ public class LambdaOrTupleParser extends Parser
 	public LambdaOrTupleParser(IValueConsumer consumer)
 	{
 		this.mode = OPEN_PARENTHESIS;
+		this.consumer = consumer;
+	}
+
+	public LambdaOrTupleParser(IValueConsumer consumer, int mode)
+	{
+		this.mode = mode;
 		this.consumer = consumer;
 	}
 
@@ -39,6 +50,7 @@ public class LambdaOrTupleParser extends Parser
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
+		final int type = token.type();
 		switch (this.mode)
 		{
 		case OPEN_PARENTHESIS:
@@ -52,16 +64,23 @@ public class LambdaOrTupleParser extends Parser
 			 * produce syntax errors.
 			 */
 
-			final IToken closeParenthesis = ParserUtil.findMatch(token);
-			if (closeParenthesis != null && closeParenthesis.next().type() == DyvilSymbols.DOUBLE_ARROW_RIGHT)
+			final IToken closeParen = ParserUtil.findMatch(token);
+			if (closeParen != null)
 			{
-				// ( ... ) =>
+				final IToken next = closeParen.next();
+				final int nextType = next.type();
+				if (nextType == DyvilSymbols.ARROW_RIGHT || nextType == DyvilSymbols.DOUBLE_ARROW_RIGHT)
+				{
+					// (     ... )          =>
+					// (     ... )          ->
+					// token     closeParen next
 
-				final LambdaExpr lambdaExpr = new LambdaExpr(closeParenthesis.next());
-				pm.pushParser(new ParameterListParser(lambdaExpr));
-				this.value = lambdaExpr;
-				this.mode = PARAMETERS_END;
-				return;
+					final LambdaExpr lambdaExpr = new LambdaExpr(next);
+					pm.pushParser(new ParameterListParser(lambdaExpr));
+					this.value = lambdaExpr;
+					this.mode = PARAMETERS_END;
+					return;
+				}
 			}
 			// Fallthrough
 		case TUPLE:
@@ -76,24 +95,47 @@ public class LambdaOrTupleParser extends Parser
 			this.consumer.setValue(this.value);
 
 			pm.popParser();
-			if (token.type() != BaseSymbols.CLOSE_PARENTHESIS)
+			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();
 				pm.report(token, "tuple.close_paren");
 			}
 			return;
 		case PARAMETERS_END:
-			this.mode = ARROW;
-			if (token.type() != BaseSymbols.CLOSE_PARENTHESIS)
+
+			this.mode = TYPE_ARROW;
+			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.reparse();
 				pm.report(token, "lambda.close_paren");
 			}
 			return;
-		case ARROW:
+		case SINGLE_PARAMETER:
+			if (ParserUtil.isIdentifier(type))
+			{
+				final LambdaExpr lambdaExpr = new LambdaExpr(token.next());
+				lambdaExpr.addParameter(new MethodParameter(token.raw(), token.nameValue(), Types.UNKNOWN));
+				this.value = lambdaExpr;
+				this.mode = TYPE_ARROW;
+				return;
+			}
+			// Fallthrough
+		case TYPE_ARROW:
+			if (this.value == null)
+			{
+				this.value = new LambdaExpr(token.raw());
+			}
+			if (type == DyvilSymbols.ARROW_RIGHT)
+			{
+				pm.pushParser(returnTypeParser((LambdaExpr) this.value));
+				this.mode = RETURN_ARROW;
+				return;
+			}
+			// Fallthrough
+		case RETURN_ARROW:
 			pm.pushParser(new ExpressionParser(((LambdaExpr) this.value)));
 			this.mode = END;
-			if (token.type() != DyvilSymbols.DOUBLE_ARROW_RIGHT)
+			if (type != DyvilSymbols.DOUBLE_ARROW_RIGHT)
 			{
 				pm.reparse();
 				pm.report(token, "lambda.arrow");
@@ -103,5 +145,10 @@ public class LambdaOrTupleParser extends Parser
 			pm.popParser(true);
 			this.consumer.setValue(this.value);
 		}
+	}
+
+	public static TypeParser returnTypeParser(LambdaExpr value)
+	{
+		return new TypeParser(value::setReturnType).withFlags(TypeParser.IGNORE_LAMBDA);
 	}
 }
