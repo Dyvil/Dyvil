@@ -1,3 +1,26 @@
+Dyvil v0.21.1
+=============
+
+## Dyvil Library v0.21.1
+
+- Added a Lexer error for empty Backtick Identifiers.
+- Fixed String Tokens being displayed with incorrect length in Marker Messages.
+- Fixed Syntax Error Diagnostics working incorrectly with `TryParserManager`s in some cases.
+
+## Dyvil Compiler v0.21.1
+
+- Improved Type Parsing for `<>` and `_>` edge cases.
+- Improved Error Diagnostics for unresolved types.
+- Improved and fixed nullary Lambda Type Parsing in special contexts.
+- Fixed Annotations with invalid Types causing compiler errors.
+- Fixed nullary Lambda Expressions being treated as invalid syntax.
+
+## Dyvil REPL v0.14.1
+
+- Fixed Extension Methods available through `using` declarations not being displayed by the `:complete` command.
+
+## Dyvil Property Format v0.5.0
+
 Dyvil v0.21.0
 =============
 

@@ -195,6 +195,12 @@ public final class DyvilLexer
 				this.error("identifier.backtick.unclosed");
 				// Fallthrough
 			case '`':
+				if (this.buffer.length() == 0)
+				{
+					this.error("identifier.backtick.empty");
+					this.buffer.append('_');
+				}
+
 				this.parseIndex++;
 				this.tokens.append(
 					new IdentifierToken(Name.getSpecial(this.buffer.toString()), SPECIAL_IDENTIFIER, startLine,
@@ -237,7 +243,7 @@ public final class DyvilLexer
 			case '\'':
 				this.parseIndex++;
 				this.tokens.append(new StringToken(this.buffer.toString(), SINGLE_QUOTED_STRING, startLine, startIndex,
-				                                   this.parseIndex + 1));
+				                                   this.parseIndex));
 				return;
 			}
 
@@ -265,16 +271,17 @@ public final class DyvilLexer
 				final int nextChar = this.nextCodePoint();
 				if (nextChar == '(')
 				{
-					this.parseIndex += 2;
+					this.parseIndex++;
 					if (this.stringParens > 0)
 					{
 						this.error("string.double.interpolation.nested");
 						continue; // parse the rest of the string as normal
 					}
 
+					this.parseIndex++;
 					this.tokens.append(
 						new StringToken(this.buffer.toString(), stringPart ? STRING_PART : STRING_START, startLine,
-						                startIndex, this.parseIndex + 1));
+						                startIndex, this.parseIndex));
 					this.stringParens = 1;
 					return;
 				}

@@ -37,6 +37,12 @@ public class LambdaTest
 	
 	private static void basicTest()
 	{
+		let nullary1 = () => 1
+		let nullary2 = -> long => 2
+		let nullary3 = { => 1 }
+		let nullary4 = { -> float => 2 }
+		// Make sure these compile without errors
+
 		var expected = [ 1 : "A" ]
 		var actual = expected.flatMapped((i, s) => [ (i, s) ])
 

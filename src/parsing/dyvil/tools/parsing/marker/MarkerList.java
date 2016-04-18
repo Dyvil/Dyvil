@@ -75,47 +75,39 @@ public final class MarkerList implements Iterable<Marker>
 		int index = this.markerCount++;
 		if (index >= this.markers.length)
 		{
-			Marker[] temp = new Marker[this.markerCount];
-			System.arraycopy(this.markers, 0, temp, 0, this.markers.length);
+			Marker[] temp = new Marker[this.markerCount << 1];
+			System.arraycopy(this.markers, 0, temp, 0, index);
 			this.markers = temp;
 		}
 		this.markers[index] = marker;
 	}
 
-	public void remove(int count)
+	public void addAll(MarkerList markers)
 	{
-		if (count <= 0)
+		final int newLength = this.markerCount + markers.markerCount;
+		if (newLength >= this.markerCount)
 		{
-			return;
+			Marker[] temp = new Marker[newLength];
+			System.arraycopy(this.markers, 0, temp, 0, this.markerCount);
+			this.markers = temp;
 		}
-		if (count > this.markerCount)
-		{
-			count = this.markerCount;
-		}
+		System.arraycopy(markers.markers, 0, this.markers, this.markerCount, markers.markerCount);
 
-		int warnings = 0;
-		int errors = 0;
-		for (int i = this.markerCount - count; i < this.markerCount; i++)
-		{
-			final Marker marker = this.markers[i];
-			if (marker.isError())
-			{
-				errors++;
-			}
-			if (marker.isWarning())
-			{
-				warnings++;
-			}
-		}
-
-		this.markerCount -= count;
-		this.warnings -= warnings;
-		this.errors -= errors;
+		this.markerCount += markers.markerCount;
+		this.warnings += markers.warnings;
+		this.errors += markers.errors;
 	}
 
 	@Override
 	public Iterator<Marker> iterator()
 	{
 		return new ArrayIterator<>(this.markers, this.markerCount);
+	}
+
+	@Override
+	public String toString()
+	{
+		return "MarkerList(count: " + this.markerCount + ", errors: " + this.errors + ", warnings: " + this.warnings
+			       + ")";
 	}
 }

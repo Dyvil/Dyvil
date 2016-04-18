@@ -212,8 +212,9 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					switch (identifier.charAt(0))
 					{
 					case '_':
-						if (identifier.charAt(1) == '>')
+						if (identifier.length() == 1 || identifier.charAt(1) == '>')
 						{
+							// _
 							// Special Case: _> as in Class<_>
 							this.type = new WildcardType(new CodePosition(token.startLine(), token.startIndex(),
 							                                              token.startIndex() + 1));
