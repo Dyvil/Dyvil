@@ -213,11 +213,16 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					switch (identifier.charAt(0))
 					{
 					case '_':
-						this.type = new WildcardType(new CodePosition(token.startLine(), token.startIndex(),
-						                                              token.startIndex() + 1));
-						this.mode = WILDCARD_TYPE;
-						pm.splitJump(token, 1);
-						return;
+						if (identifier.charAt(1) == '>')
+						{
+							// Special Case: _> as in Class<_>
+							this.type = new WildcardType(new CodePosition(token.startLine(), token.startIndex(),
+							                                              token.startIndex() + 1));
+							this.mode = WILDCARD_TYPE;
+							pm.splitJump(token, 1);
+							return;
+						}
+						break; // Parse as Identifier
 					case '+':
 					{
 						final WildcardType wildcardType = new WildcardType(Variance.COVARIANT);
@@ -234,6 +239,11 @@ public final class TypeParser extends Parser implements ITypeConsumer
 						this.mode = END;
 						return;
 					}
+					case '>':
+						// Special Case: > as in List<>
+						pm.split(token, 1);
+						pm.popParser(); // no reparse
+						return;
 					}
 				}
 			}
