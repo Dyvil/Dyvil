@@ -19,6 +19,7 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.transform.TypeChecker;
@@ -125,6 +126,7 @@ public final class Annotation implements IAnnotation
 		else
 		{
 			markers.add(Markers.semanticError(this.position, "annotation.type.invalid"));
+			this.type = Types.UNKNOWN;
 		}
 
 		this.arguments.resolveTypes(markers, context);
