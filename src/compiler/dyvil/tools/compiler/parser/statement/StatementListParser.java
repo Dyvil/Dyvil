@@ -100,21 +100,31 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 				this.lambdaExpr = new LambdaExpr(lambdaArrow.raw());
 				this.lambdaExpr.setValue(this.statementList = new StatementList(token));
 
+				if (next == lambdaArrow)
+				{
+					// { ->
+					// { =>
+					this.mode = LAMBDA_TYPE_ARROW;
+					return;
+				}
 				if (next.type() == BaseSymbols.OPEN_PARENTHESIS)
 				{
+					// { ( ... ) =>
+					// { ( ... ) ->
 					pm.skip();
 					pm.pushParser(new ParameterListParser(this.lambdaExpr));
 					this.mode = LAMBDA_PARAMETERS_END;
 					return;
 				}
-				else
-				{
-					pm.pushParser(new ParameterListParser(this.lambdaExpr).withFlags(LAMBDA_ARROW_END));
-					this.mode = LAMBDA_TYPE_ARROW;
-				}
+
+				// { ... ->
+				// { ... =>
+				pm.pushParser(new ParameterListParser(this.lambdaExpr).withFlags(LAMBDA_ARROW_END));
+				this.mode = LAMBDA_TYPE_ARROW;
 				return;
 			}
 
+			// { ...
 			this.statementList = this.closure ? new Closure(token) : new StatementList(token);
 			this.mode = EXPRESSION;
 			if (type != BaseSymbols.OPEN_CURLY_BRACKET)

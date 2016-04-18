@@ -174,10 +174,22 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				}
 
 				case DyvilSymbols.DOUBLE_ARROW_RIGHT:
+					if ((this.flags & IGNORE_LAMBDA) != 0)
+					{
+						pm.popParser(true);
+						return;
+					}
+
 					pm.report(Markers.syntaxWarning(token, "type.lambda.double_arrow.deprecated"));
 					// Fallthrough
 				case DyvilSymbols.ARROW_RIGHT:
 				{
+					if ((this.flags & IGNORE_LAMBDA) != 0)
+					{
+						pm.popParser(true);
+						return;
+					}
+
 					final LambdaType lambdaType = new LambdaType(token.raw(), this.parentType);
 					pm.pushParser(new TypeParser(lambdaType));
 					this.type = lambdaType;
