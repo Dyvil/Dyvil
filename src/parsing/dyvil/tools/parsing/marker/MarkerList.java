@@ -84,6 +84,15 @@ public final class MarkerList implements Iterable<Marker>
 
 	public void remove(int count)
 	{
+		if (count <= 0)
+		{
+			return;
+		}
+		if (count > this.markerCount)
+		{
+			count = this.markerCount;
+		}
+
 		int warnings = 0;
 		int errors = 0;
 		for (int i = this.markerCount - count; i < this.markerCount; i++)

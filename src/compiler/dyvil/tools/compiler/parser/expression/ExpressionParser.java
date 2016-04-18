@@ -751,6 +751,21 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				return true;
 			}
 
+			if (!this.hasFlag(IGNORE_LAMBDA))
+			{
+				final IToken next2 = next.next();
+				final int next2Type = next2.type();
+				if (next2Type == DyvilSymbols.ARROW_RIGHT || next2Type == DyvilSymbols.DOUBLE_ARROW_RIGHT)
+				{
+					// () =>
+					// () ->
+					pm.skip();
+					pm.pushParser(new LambdaOrTupleParser(this, LambdaOrTupleParser.TYPE_ARROW));
+					this.mode = END;
+					return true;
+				}
+			}
+
 			// ()
 			this.value = new VoidValue(token.to(token.next()));
 			pm.skip();
