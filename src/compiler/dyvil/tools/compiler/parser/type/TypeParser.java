@@ -17,7 +17,6 @@ import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Name;
@@ -33,7 +32,6 @@ public final class TypeParser extends Parser implements ITypeConsumer
 	protected static final int GENERICS_END   = 1 << 1;
 	protected static final int ARRAY_COLON    = 1 << 2;
 	protected static final int ARRAY_END      = 1 << 3;
-	protected static final int WILDCARD_TYPE  = 1 << 4;
 	protected static final int TUPLE_END      = 1 << 5;
 	protected static final int LAMBDA_END     = 1 << 6;
 	protected static final int ANNOTATION_END = 1 << 7;
@@ -202,7 +200,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					return;
 				case DyvilSymbols.UNDERSCORE:
 					this.type = new WildcardType(token.raw());
-					this.mode = WILDCARD_TYPE;
+					this.mode = END;
 					return;
 				}
 
@@ -218,7 +216,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 							// Special Case: _> as in Class<_>
 							this.type = new WildcardType(new CodePosition(token.startLine(), token.startIndex(),
 							                                              token.startIndex() + 1));
-							this.mode = WILDCARD_TYPE;
+							this.mode = END;
 							pm.splitJump(token, 1);
 							return;
 						}
@@ -341,32 +339,6 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				return;
 			}
 			return;
-		case WILDCARD_TYPE:
-		{
-			final Name name = token.nameValue();
-			final WildcardType wildcardType = (WildcardType) this.type;
-			if (name == Names.ltcolon) // <: + Upper Bound
-			{
-				pm.report(Markers.syntaxWarning(token, "type.wildcard.upper.deprecated"));
-
-				wildcardType.setVariance(Variance.COVARIANT);
-				pm.pushParser(new TypeParser(wildcardType));
-				this.mode = END;
-				return;
-			}
-			if (name == Names.gtcolon) // >: - Lower Bound
-			{
-				pm.report(Markers.syntaxWarning(token, "type.wildcard.lower.deprecated"));
-
-				wildcardType.setVariance(Variance.CONTRAVARIANT);
-				pm.pushParser(new TypeParser(wildcardType));
-				this.mode = END;
-				return;
-			}
-			this.consumer.setType(this.type);
-			pm.popParser(true);
-			return;
-		}
 		case GENERICS_END:
 			this.mode = END;
 			if (isGenericEnd(token, type))
