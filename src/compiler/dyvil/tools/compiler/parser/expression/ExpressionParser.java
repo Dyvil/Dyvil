@@ -6,7 +6,6 @@ import dyvil.tools.compiler.ast.annotation.AnnotationValue;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.*;
-import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.operator.OperatorChain;
 import dyvil.tools.compiler.ast.operator.PostfixCall;
 import dyvil.tools.compiler.ast.operator.PrefixCall;
@@ -46,19 +45,18 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 	protected static final int VALUE              = 0;
 	protected static final int ACCESS             = 1;
-	protected static final int DOT_ACCESS         = 2;
-	protected static final int PARAMETERS_END     = 4;
-	protected static final int SUBSCRIPT_END      = 8;
-	protected static final int TYPE_ARGUMENTS_END = 16;
-	protected static final int ANGLE_GENERICS_END = 32;
+	protected static final int DOT_ACCESS         = 1 << 1;
+	protected static final int PARAMETERS_END     = 1 << 2;
+	protected static final int SUBSCRIPT_END      = 1 << 3;
+	protected static final int TYPE_ARGUMENTS_END = 1 << 4;
 
 	// Flags
 
-	public static final int EXPLICIT_DOT   = 1;
-	public static final int OPERATOR       = 2;
-	public static final int IGNORE_COLON   = 4;
-	public static final int IGNORE_LAMBDA  = 8;
-	public static final int IGNORE_CLOSURE = 16;
+	public static final int EXPLICIT_DOT   = 0b00001;
+	public static final int OPERATOR       = 0b00010;
+	public static final int IGNORE_COLON   = 0b00100;
+	public static final int IGNORE_LAMBDA  = 0b01000;
+	public static final int IGNORE_CLOSURE = 0b10000;
 
 	// ----------
 
@@ -174,80 +172,6 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 			return;
 		case TYPE_ARGUMENTS_END:
-		{
-			// ... .[ ... ]
-			//            ^
-
-			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
-			{
-				pm.reparse();
-				pm.report(token, "method.call.generic.close_bracket");
-			}
-
-			final MethodCall methodCall = (MethodCall) this.value;
-			final GenericData genericData = methodCall.getGenericData();
-
-			final IToken next = token.next();
-			final int nextType = next.type();
-
-			if (nextType == BaseSymbols.OPEN_PARENTHESIS)
-			{
-				// ... .[ ... ] ( ...
-
-				pm.skip();
-				ApplyMethodCall amc = new ApplyMethodCall(methodCall.getPosition(), methodCall.getReceiver());
-				ArgumentListParser.parseArguments(pm, next.next(), amc);
-				amc.setGenericData(genericData);
-
-				this.value = amc;
-				this.mode = PARAMETERS_END;
-				return;
-			}
-			if (isIdentifier(nextType))
-			{
-				// ... .[ ... ] IDENTIFIER ...
-				pm.skip();
-				this.value = methodCall.getReceiver();
-				this.parseInfixAccess(pm, token.next());
-
-				if (this.value instanceof AbstractCall)
-				{
-					((AbstractCall) this.value).setGenericData(genericData);
-				}
-				if (this.value instanceof FieldAccess)
-				{
-					FieldAccess fieldAccess = (FieldAccess) this.value;
-					methodCall.setName(fieldAccess.getName());
-					this.value = methodCall;
-				}
-				return;
-			}
-			if (isExpressionEnd(nextType))
-			{
-				// ... .[ ... ] ;
-
-				ApplyMethodCall amc = new ApplyMethodCall(methodCall.getPosition(), methodCall.getReceiver(),
-				                                          EmptyArguments.INSTANCE);
-				amc.setGenericData(genericData);
-				this.value = amc;
-				this.mode = ACCESS;
-				return;
-			}
-
-			// EXPRESSION .[ ... ] ...
-			//                     ^
-
-			final ApplyMethodCall applyCall = new ApplyMethodCall(methodCall.getPosition(), methodCall.getReceiver(),
-			                                                      EmptyArguments.VISIBLE);
-			applyCall.setGenericData(genericData);
-			this.value = applyCall;
-
-			this.parseApply(pm, next, applyCall);
-			this.mode = ACCESS;
-
-			return;
-		}
-		case ANGLE_GENERICS_END:
 			if (!TypeParser.isGenericEnd(token, type))
 			{
 				pm.reparse();
@@ -420,17 +344,6 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				this.parseInfixAccess(pm, token);
 				return;
 			}
-			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
-			{
-				pm.report(Markers.syntaxWarning(token, "method.call.generic.square_bracket.deprecated"));
-
-				// EXPRESSION . [
-				MethodCall call = new MethodCall(token, this.value, null);
-				pm.pushParser(new TypeListParser(call.getGenericData()));
-				this.mode = TYPE_ARGUMENTS_END;
-				this.value = call;
-				return;
-			}
 
 			if (ParserUtil.isTerminator(type))
 			{
@@ -583,7 +496,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 				pm.splitJump(next, 1);
 				pm.pushParser(new TypeListParser(call.getGenericData()));
-				this.mode = ANGLE_GENERICS_END;
+				this.mode = TYPE_ARGUMENTS_END;
 				return;
 			}
 		}

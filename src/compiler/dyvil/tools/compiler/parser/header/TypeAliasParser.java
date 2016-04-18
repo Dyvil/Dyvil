@@ -7,7 +7,6 @@ import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.type.TypeParameterListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.Parser;
@@ -20,8 +19,7 @@ public class TypeAliasParser extends Parser
 	private static final int NAME                      = 1;
 	private static final int TYPE_PARAMETERS           = 1 << 1;
 	private static final int TYPE_PARAMETERS_END       = 1 << 2;
-	private static final int ANGLE_TYPE_PARAMETERS_END = 1 << 3;
-	private static final int EQUAL                     = 1 << 4;
+	private static final int EQUAL                     = 1 << 3;
 
 	protected ITypeAliasMap map;
 	protected ITypeAlias    typeAlias;
@@ -74,16 +72,8 @@ public class TypeAliasParser extends Parser
 			if (TypeParser.isGenericStart(token, type))
 			{
 				this.typeAlias.setTypeParametric();
-				this.mode = ANGLE_TYPE_PARAMETERS_END;
-				pm.splitJump(token, 1);
-				pm.pushParser(new TypeParameterListParser(this.typeAlias));
-				return;
-			}
-			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
-			{
-				pm.report(Markers.syntaxWarning(token, "generic.open_bracket.deprecated"));
-				this.typeAlias.setTypeParametric();
 				this.mode = TYPE_PARAMETERS_END;
+				pm.splitJump(token, 1);
 				pm.pushParser(new TypeParameterListParser(this.typeAlias));
 				return;
 			}
@@ -99,14 +89,6 @@ public class TypeAliasParser extends Parser
 			}
 			return;
 		case TYPE_PARAMETERS_END:
-			this.mode = EQUAL;
-			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
-			{
-				pm.reparse();
-				pm.report(token, "generic.close_bracket");
-			}
-			return;
-		case ANGLE_TYPE_PARAMETERS_END:
 			this.mode = EQUAL;
 			if (TypeParser.isGenericEnd(token, type))
 			{
