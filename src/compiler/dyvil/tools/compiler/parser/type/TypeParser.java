@@ -104,14 +104,9 @@ public final class TypeParser extends Parser implements ITypeConsumer
 						return;
 					}
 				}
-				else if ((type == DyvilSymbols.DOUBLE_ARROW_RIGHT || type == DyvilSymbols.ARROW_RIGHT)
-					         && this.parentType == null && (this.flags & IGNORE_LAMBDA) == 0)
+				else if (type == DyvilSymbols.ARROW_RIGHT && this.parentType == null
+					         && (this.flags & IGNORE_LAMBDA) == 0)
 				{
-					if (type == DyvilSymbols.DOUBLE_ARROW_RIGHT)
-					{
-						pm.report(Markers.syntaxWarning(token, "type.lambda.double_arrow.deprecated"));
-					}
-
 					final LambdaType lambdaType = new LambdaType(token.raw(), this.type);
 					this.type = lambdaType;
 					this.mode = LAMBDA_END;
@@ -170,16 +165,6 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					pm.pushParser(new TypeParser(arrayType));
 					return;
 				}
-
-				case DyvilSymbols.DOUBLE_ARROW_RIGHT:
-					if ((this.flags & IGNORE_LAMBDA) != 0)
-					{
-						pm.popParser(true);
-						return;
-					}
-
-					pm.report(Markers.syntaxWarning(token, "type.lambda.double_arrow.deprecated"));
-					// Fallthrough
 				case DyvilSymbols.ARROW_RIGHT:
 				{
 					if ((this.flags & IGNORE_LAMBDA) != 0)
@@ -277,12 +262,8 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			}
 
 			final IToken nextToken = token.next();
-			switch (nextToken.type())
+			if (nextToken.type() == DyvilSymbols.ARROW_RIGHT)
 			{
-			case DyvilSymbols.DOUBLE_ARROW_RIGHT:
-				pm.report(Markers.syntaxWarning(nextToken, "type.lambda.double_arrow.deprecated"));
-				// Fallthrough
-			case DyvilSymbols.ARROW_RIGHT:
 				final LambdaType lambdaType = new LambdaType(nextToken.raw(), this.parentType, (TupleType) this.type);
 				this.type = lambdaType;
 				this.mode = LAMBDA_END;
