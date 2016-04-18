@@ -198,7 +198,6 @@ public abstract class Parameter extends Member implements IParameter
 		if (this.type == Types.UNKNOWN)
 		{
 			markers.add(Markers.semantic(this.position, this.getKind().getName() + ".type.infer", this.name));
-			this.type = Types.ANY;
 		}
 
 		if (this.defaultValue == null)

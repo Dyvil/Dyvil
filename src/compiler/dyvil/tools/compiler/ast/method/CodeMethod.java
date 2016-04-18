@@ -180,10 +180,9 @@ public class CodeMethod extends AbstractMethod
 			{
 				inferType = true;
 				this.type = this.value.getType();
-				if (this.type == Types.UNKNOWN)
+				if (this.type == Types.UNKNOWN && this.value.isResolved())
 				{
 					markers.add(Markers.semantic(this.position, "method.type.infer", this.name.unqualified));
-					this.type = Types.ANY;
 				}
 			}
 
