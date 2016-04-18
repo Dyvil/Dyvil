@@ -654,7 +654,7 @@ public class REPLContext extends DyvilHeader
 			}
 		}
 
-		if (!list.isEmpty())
+		if (!list.isEmpty() && name != null)
 		{
 			return;
 		}
