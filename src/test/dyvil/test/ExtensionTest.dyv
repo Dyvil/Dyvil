@@ -4,13 +4,15 @@ public class ExtensionTest
 {
 	class SuperClass
 	
-	class SubClass extends SuperClass {
+	class SubClass extends SuperClass
+	{
 		public String foo() = "SubClass.foo"
 	}
 	
 	public extension String foo(SuperClass superClass) = "extension.foo"
-	
-	public static void main([String] args) {
+
+	public static void main([String] args)
+	{
 		SuperClass sup = new SuperClass
 		SubClass sub = new SubClass
 		SuperClass sub1 = sub
@@ -18,5 +20,15 @@ public class ExtensionTest
 		Main.test("Super Class Extension", "extension.foo", sup.foo)
 		Main.test("Sub Class Extension", "SubClass.foo", sub.foo)
 		Main.test("Sub Class Extension (Compile-Time Super Class)", "SubClass.foo", sub1.foo)
+
+		sub.name = "Sub Class"
+
+		Main.test("Name Extension", "Sub Class", sub.name)
 	}
+
+	private static Map<any, String> nameMap = dyvil.collection.mutable.IdentityHashMap<any, String>
+
+	public infix String name(any value) = nameMap[value]
+
+	public infix func name_=(any value, String newName): void = nameMap[value] = newName
 }

@@ -157,7 +157,7 @@ public final class SingleImport extends Import
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		if (name == this.name || name == this.alias)
+		if (name == null || name == this.name || name == this.alias)
 		{
 			return this.field;
 		}
@@ -167,24 +167,18 @@ public final class SingleImport extends Import
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
-		if (name != this.name && name != this.alias)
-		{
-			return;
-		}
-		
 		if (this.methods == null)
 		{
 			return;
 		}
+		if (name != null && name != this.name && name != this.alias)
+		{
+			return;
+		}
+
 		for (IMethod method : this.methods)
 		{
-			Name usedName = method.getName() == this.alias ? this.alias : this.name;
-
-			float match = method.getSignatureMatch(usedName, instance, arguments);
-			if (match > 0)
-			{
-				list.add(method, match);
-			}
+			IContext.getMethodMatch(list, instance, null, arguments, method);
 		}
 	}
 	
