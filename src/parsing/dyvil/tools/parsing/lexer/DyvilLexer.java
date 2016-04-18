@@ -195,6 +195,12 @@ public final class DyvilLexer
 				this.error("identifier.backtick.unclosed");
 				// Fallthrough
 			case '`':
+				if (this.buffer.length() == 0)
+				{
+					this.error("identifier.backtick.empty");
+					this.buffer.append('_');
+				}
+
 				this.parseIndex++;
 				this.tokens.append(
 					new IdentifierToken(Name.getSpecial(this.buffer.toString()), SPECIAL_IDENTIFIER, startLine,
