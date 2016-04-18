@@ -113,7 +113,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	@Override
 	public boolean isResolved()
 	{
-		return this.field != null;
+		return this.field != null && this.value.isResolved();
 	}
 
 	@Override
