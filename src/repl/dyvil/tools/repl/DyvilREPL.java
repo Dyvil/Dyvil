@@ -212,7 +212,7 @@ public final class DyvilREPL
 	{
 		this.parser.reset(markers, tokens);
 		this.parser.resetTo(tokens.first());
-		return this.parser.parse(parser, reportErrors);
+		return this.parser.parse(parser, markers, reportErrors ? TryParserManager.REPORT_ERRORS : 0);
 	}
 
 	private void runCommand(String line)
