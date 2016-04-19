@@ -240,6 +240,8 @@ public class PatternParser extends Parser implements ITypeConsumer
 			return new StringPattern(token.raw(), token.stringValue());
 		case Tokens.SINGLE_QUOTED_STRING:
 			return new CharPattern(token.raw(), token.stringValue());
+		case Tokens.VERBATIM_CHAR:
+			return new CharPattern(token.raw(), token.stringValue(), true);
 		case Tokens.INT:
 			return new IntPattern(token.raw(), token.intValue());
 		case Tokens.LONG:

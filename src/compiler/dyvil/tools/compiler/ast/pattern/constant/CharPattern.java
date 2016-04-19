@@ -15,6 +15,9 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class CharPattern extends Pattern
 {
+	private static final byte TYPE_CHAR   = 1;
+	private static final byte TYPE_STRING = 2;
+
 	private String value;
 	
 	private byte type;
@@ -24,13 +27,19 @@ public final class CharPattern extends Pattern
 		this.position = position;
 		this.value = value;
 	}
-	
+	public CharPattern(ICodePosition position, String value, boolean forceChar)
+	{
+		this.position = position;
+		this.value = value;
+		this.type = forceChar ? TYPE_CHAR : TYPE_STRING;
+	}
+
 	@Override
 	public int getPatternType()
 	{
-		return CHAR;
+		return IPattern.CHAR;
 	}
-	
+
 	@Override
 	public IType getType()
 	{
@@ -40,28 +49,28 @@ public final class CharPattern extends Pattern
 	@Override
 	public IPattern withType(IType type, MarkerList markers)
 	{
-		if (this.value.length() == 1 && this.type != STRING)
+		if (this.value.length() == 1 && this.type != TYPE_STRING)
 		{
 			final IPattern pattern = IPattern.primitiveWithType(this, type, Types.CHAR);
-			if (this.type == CHAR || pattern != null)
+			if (this.type == TYPE_CHAR || pattern != null)
 			{
-				this.type = CHAR;
+				this.type = TYPE_CHAR;
 				return pattern;
 			}
 		}
-		if (this.type == CHAR)
+		if (this.type == TYPE_CHAR)
 		{
 			return null;
 		}
 		
 		if (Types.isSameType(type, Types.STRING))
 		{
-			this.type = STRING;
+			this.type = TYPE_STRING;
 			return this;
 		}
 		if (Types.isSuperType(type, Types.STRING))
 		{
-			this.type = STRING;
+			this.type = TYPE_STRING;
 			return new TypeCheckPattern(this, type, Types.STRING);
 		}
 		return null;
@@ -70,14 +79,14 @@ public final class CharPattern extends Pattern
 	@Override
 	public boolean isType(IType type)
 	{
-		if (this.value.length() == 1 && this.type != STRING)
+		if (this.value.length() == 1 && this.type != TYPE_STRING)
 		{
 			if (Types.isSuperType(type, Types.CHAR))
 			{
 				return true;
 			}
 		}
-		return this.type != CHAR && Types.isSuperType(type, Types.STRING);
+		return this.type != TYPE_CHAR && Types.isSuperType(type, Types.STRING);
 	}
 	
 	@Override
@@ -95,7 +104,7 @@ public final class CharPattern extends Pattern
 	@Override
 	public int switchValue()
 	{
-		if (this.type == CHAR)
+		if (this.type == TYPE_CHAR)
 		{
 			return this.value.charAt(0);
 		}
@@ -118,7 +127,7 @@ public final class CharPattern extends Pattern
 	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
 			throws BytecodeException
 	{
-		if (this.type == STRING)
+		if (this.type == TYPE_STRING)
 		{
 			StringPattern.writeStringInvJump(writer, varIndex, elseLabel, this.value);
 			return;
