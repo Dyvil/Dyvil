@@ -37,7 +37,5 @@ public interface Tokens
 	int STRING_END           = STRING | 0x00040000;
 	int SINGLE_QUOTED_STRING = 0x00000400;
 	int VERBATIM_STRING      = 0x00000800;
-
-	int LINE_COMMENT  = 0x00001000;
-	int BLOCK_COMMENT = 0x00002000;
+	int VERBATIM_CHAR        = 0x00001000;
 }
