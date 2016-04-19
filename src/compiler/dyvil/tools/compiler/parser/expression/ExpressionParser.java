@@ -631,6 +631,10 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			this.value = new CharValue(token.raw(), token.stringValue());
 			this.mode = ACCESS;
 			return true;
+		case Tokens.VERBATIM_CHAR:
+			this.value = new CharValue(token.raw(), token.stringValue(), true);
+			this.mode = ACCESS;
+			return true;
 		case Tokens.INT:
 			this.value = new IntValue(token.raw(), token.intValue());
 			this.mode = ACCESS;

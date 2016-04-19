@@ -69,9 +69,13 @@ public final class DyvilLexer
 			this.parseSingleString();
 			return;
 		case '@':
-			if (this.nextCodePoint() == '"')
+			switch (this.nextCodePoint())
 			{
+			case '"':
 				this.parseVerbatimString();
+				return;
+			case '\'':
+				this.parseVerbatimChar();
 				return;
 			}
 
@@ -235,6 +239,7 @@ public final class DyvilLexer
 				continue;
 			case '\n':
 				this.lineNumber++;
+				this.parseIndex++;
 				this.error("string.single.newline");
 				continue;
 			case EOF:
@@ -349,6 +354,52 @@ public final class DyvilLexer
 			this.buffer.appendCodePoint(currentChar);
 			this.advance(currentChar);
 		}
+	}
+
+	private void parseVerbatimChar()
+	{
+		// assert this.codePoint() == '@';
+
+		final int startIndex = this.parseIndex;
+		final int startLine = this.lineNumber;
+
+		// assert this.nextCodePoint() == '\'';
+
+		this.parseIndex += 2;
+
+		this.clearBuffer();
+
+		int currentChar = this.codePoint();
+		switch (currentChar)
+		{
+		case '\\':
+			this.parseEscape(this.nextCodePoint());
+			break;
+		case '\n':
+			this.lineNumber++;
+			this.buffer.append('\n');
+			this.parseIndex++;
+			break;
+		default:
+			this.buffer.appendCodePoint(currentChar);
+			this.advance(currentChar);
+		}
+
+		while ((currentChar = this.codePoint()) != '\'')
+		{
+			if (currentChar == 0)
+			{
+				this.error("char.verbatim.unclosed");
+				break;
+			}
+
+			this.error("char.verbatim.invalid");
+			this.advance(currentChar);
+		}
+
+		this.parseIndex++;
+		this.tokens
+			.append(new StringToken(this.buffer.toString(), VERBATIM_CHAR, startLine, startIndex, this.parseIndex));
 	}
 
 	private void parseNumberLiteral(int currentChar)

@@ -110,6 +110,8 @@ public class Parser
 			return;
 		case Tokens.SINGLE_QUOTED_STRING:
 		case Tokens.STRING:
+		case Tokens.VERBATIM_STRING:
+		case Tokens.VERBATIM_CHAR:
 			valueVisitor.visitString(token.stringValue());
 			return;
 		case Tokens.STRING_START:
