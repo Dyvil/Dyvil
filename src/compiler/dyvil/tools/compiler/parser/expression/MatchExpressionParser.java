@@ -1,108 +1,63 @@
 package dyvil.tools.compiler.parser.expression;
 
-import dyvil.tools.compiler.ast.consumer.IValueConsumer;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.MatchCase;
 import dyvil.tools.compiler.ast.expression.MatchExpr;
+import dyvil.tools.compiler.parser.pattern.CaseParser;
+import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Parser;
-import dyvil.tools.compiler.parser.pattern.PatternParser;
-import dyvil.tools.compiler.parser.statement.StatementListParser;
-import dyvil.tools.compiler.transform.DyvilKeywords;
-import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
-import static dyvil.tools.compiler.parser.expression.ExpressionParser.*;
-
-public class MatchExpressionParser extends Parser implements IValueConsumer
+public class MatchExpressionParser extends Parser
 {
-	private static final int OPEN_BRACKET = 1;
-	private static final int CASE         = 2;
-	private static final int CONDITION    = 4;
-	private static final int ACTION       = 8;
-	private static final int SEPARATOR    = 16;
-	
+	private static final int OPEN_BRACKET = 0;
+	private static final int CASE         = 1;
+	private static final int SEPARATOR    = 2;
+
 	protected MatchExpr matchExpression;
-	
-	private MatchCase currentCase;
-	private boolean   singleCase;
-	
+
 	public MatchExpressionParser(MatchExpr matchExpression)
 	{
 		this.matchExpression = matchExpression;
-		this.mode = OPEN_BRACKET;
+		// this.mode = OPEN_BRACKET;
 	}
-	
+
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
-		int type = token.type();
-		
+		final int type = token.type();
 		switch (this.mode)
 		{
 		case OPEN_BRACKET:
-			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
+			if (type == DyvilKeywords.CASE)
 			{
-				this.mode = CASE;
+				pm.pushParser(new CaseParser(this.matchExpression), true);
+				this.mode = END;
 				return;
 			}
-			if (type != DyvilKeywords.CASE)
+			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
 			{
 				pm.report(token, "match.invalid");
 				return;
 			}
-			this.singleCase = true;
+			this.mode = SEPARATOR;
+			pm.pushParser(new CaseParser(this.matchExpression));
+			return;
 		case CASE:
-			if (type == BaseSymbols.SEMICOLON && token.isInferred())
-			{
-				return;
-			}
-			if (type == DyvilKeywords.CASE)
-			{
-				this.currentCase = new MatchCase();
-				this.mode = CONDITION;
-				pm.pushParser(new PatternParser(this.currentCase));
-				return;
-			}
 			if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
 				pm.popParser();
 				return;
 			}
-			pm.report(token, "match.case");
-			return;
-		case CONDITION:
-			if (type == DyvilKeywords.IF)
+			if (type == BaseSymbols.SEMICOLON)
 			{
-				this.mode = ACTION;
-				pm.pushParser(new ExpressionParser(this).withFlag(IGNORE_COLON | IGNORE_CLOSURE | IGNORE_LAMBDA));
 				return;
 			}
-			// Fallthrough
-		case ACTION:
+
 			this.mode = SEPARATOR;
-			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
-			{
-				pm.pushParser(new StatementListParser(this), true);
-				return;
-			}
-			pm.pushParser(new ExpressionParser(this));
-			if (type != BaseSymbols.COLON && type != DyvilSymbols.DOUBLE_ARROW_RIGHT)
-			{
-				pm.reparse();
-				pm.report(token, "match.case.action");
-			}
+			pm.pushParser(new CaseParser(this.matchExpression), true);
 			return;
 		case SEPARATOR:
-			this.matchExpression.addCase(this.currentCase);
-			if (this.singleCase)
-			{
-				pm.popParser(true);
-				return;
-			}
-			
-			this.currentCase = null;
 			if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
 				pm.popParser();
@@ -114,19 +69,9 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 				pm.reparse();
 				pm.report(token, "match.case.end");
 			}
-		}
-	}
-	
-	@Override
-	public void setValue(IValue value)
-	{
-		switch (this.mode)
-		{
-		case ACTION:
-			this.currentCase.setCondition(value);
 			return;
-		case SEPARATOR:
-			this.currentCase.setAction(value);
+		case END:
+			pm.popParser(true);
 		}
 	}
 }
