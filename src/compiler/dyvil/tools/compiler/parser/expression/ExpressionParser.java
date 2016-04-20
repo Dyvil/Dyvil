@@ -125,87 +125,24 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		case VALUE:
 			if ((type & Tokens.IDENTIFIER) != 0)
 			{
-				// IDENTIFIER ...
+				// IDENTIFIER
 				this.parseInfixAccess(pm, token);
 				return;
 			}
 			if (this.parseValue(pm, token, type))
 			{
-				// keyword ...
+				// KEYWORD
+				// LITERAL
+				// STATEMENT
 				return;
 			}
-
-			this.mode = ACCESS;
-			// Leave the big switch and jump right over to the ACCESS
-			// section
-			break;
-		case PARAMETERS_END:
-			// ... ( ... )
-			//           ^
-			this.mode = ACCESS;
-			this.value.expandPosition(token);
-
-			if (type != BaseSymbols.CLOSE_PARENTHESIS)
-			{
-				pm.reparse();
-				pm.report(token, "method.call.close_paren");
-			}
-
-			return;
-		case SUBSCRIPT_END:
-			// ... [ ... ]
-			//           ^
-			this.mode = ACCESS;
-			this.value.expandPosition(token);
-
-			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
-			{
-				pm.reparse();
-				pm.report(token, "method.subscript.close_bracket");
-			}
-
-			return;
-		case TYPE_ARGUMENTS_END:
-			if (!TypeParser.isGenericEnd(token, type))
-			{
-				pm.reparse();
-				pm.report(token, "method.call.generic.close_angle");
-			}
-
-			final IToken next = token.next();
-			if (next.type() == BaseSymbols.OPEN_PARENTHESIS)
-			{
-				pm.skip();
-				ArgumentListParser.parseArguments(pm, next.next(), (ICall) this.value);
-				this.mode = PARAMETERS_END;
-				return;
-			}
-
-			this.mode = ACCESS;
-			return;
-		}
-
-		if (ParserUtil.isCloseBracket(type) || type == BaseSymbols.COLON && this.hasFlag(IGNORE_COLON))
-		{
-			// ... ]
-
-			// Close bracket, end expression
-			this.end(pm, true);
-			return;
-		}
-
-		if (this.mode == ACCESS)
-		{
-			if (type == BaseSymbols.DOT)
-			{
-				// ... .
-
-				this.mode = DOT_ACCESS;
-				return;
-			}
-
+			// Fallthrough
+		case ACCESS:
 			switch (type)
 			{
+			case BaseSymbols.DOT:
+				this.mode = DOT_ACCESS;
+				return;
 			case DyvilSymbols.ARROW_RIGHT:
 			case DyvilSymbols.DOUBLE_ARROW_RIGHT:
 				if (!this.hasFlag(IGNORE_LAMBDA))
@@ -270,6 +207,12 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				this.mode = PARAMETERS_END;
 				return;
 			case BaseSymbols.COLON:
+				if (this.hasFlag(IGNORE_COLON))
+				{
+					this.end(pm, true);
+					return;
+				}
+
 				this.parseInfixAccess(pm, token, Names.colon);
 				return;
 			case DyvilSymbols.ELLIPSIS:
@@ -278,7 +221,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			case BaseSymbols.EQUALS:
 				if (this.value == null)
 				{
-					pm.report(Markers.syntaxError(token, "assignment.invalid", token));
+					pm.report(Markers.syntaxError(token, "expression.assignment.invalid", token));
 					this.mode = VALUE;
 					return;
 				}
@@ -287,8 +230,20 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				return;
 			}
 
+			if (ParserUtil.isExpressionEnd(type))
+			{
+				// ... ]
+
+				// Close bracket, end expression
+				this.end(pm, true);
+				return;
+			}
+
 			if (isSymbol(type))
 			{
+				// EXPRESSION IDENTIFIER
+				// EXPRESSION SYMBOL
+
 				this.parseInfixAccess(pm, token);
 				return;
 			}
@@ -296,6 +251,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			if (this.value != null)
 			{
 				// EXPRESSION EXPRESSION -> EXPRESSION ( EXPRESSION )
+				// Juxtaposition
 
 				if (this.hasFlag(IGNORE_APPLY) || this.ignoreClosure(token))
 				{
@@ -311,9 +267,10 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				pm.reparse();
 				return;
 			}
-		}
-		if (this.mode == DOT_ACCESS)
-		{
+
+			pm.report(Markers.syntaxError(token, "expression.invalid", token.toString()));
+			return;
+		case DOT_ACCESS:
 			// EXPRESSION .
 
 			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
@@ -335,23 +292,62 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				return;
 			}
 
-			if (ParserUtil.isTerminator(type))
+			if (ParserUtil.isExpressionEnd(type))
 			{
 				pm.popParser(true);
 			}
 
-			pm.report(Markers.syntaxError(token, "expression.dot.invalid"));
+			pm.report(Markers.syntaxError(token, "expression.access.dot.invalid"));
+			return;
+		case PARAMETERS_END:
+			// ... ( ... )
+			//           ^
+			this.mode = ACCESS;
+			this.value.expandPosition(token);
+
+			if (type != BaseSymbols.CLOSE_PARENTHESIS)
+			{
+				pm.reparse();
+				pm.report(token, "method.call.close_paren");
+			}
+
+			return;
+		case SUBSCRIPT_END:
+			// ... [ ... ]
+			//           ^
+			this.mode = ACCESS;
+			this.value.expandPosition(token);
+
+			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
+			{
+				pm.reparse();
+				pm.report(token, "method.subscript.close_bracket");
+			}
+
+			return;
+		case TYPE_ARGUMENTS_END:
+			if (!TypeParser.isGenericEnd(token, type))
+			{
+				pm.reparse();
+				pm.report(token, "method.call.generic.close_angle");
+			}
+
+			final IToken next = token.next();
+			if (next.type() == BaseSymbols.OPEN_PARENTHESIS)
+			{
+				pm.skip();
+				ArgumentListParser.parseArguments(pm, next.next(), (ICall) this.value);
+				this.mode = PARAMETERS_END;
+				return;
+			}
+
+			this.mode = ACCESS;
 			return;
 		}
-
-		if (ParserUtil.isTerminator(type))
-		{
-			pm.popParser(true);
-		}
-		pm.report(Markers.syntaxError(token, "expression.invalid", token.toString()));
+		throw new Error("unreachable");
 	}
 
-	public boolean ignoreClosure(IToken token)
+	private boolean ignoreClosure(IToken token)
 	{
 		return token.type() == BaseSymbols.OPEN_CURLY_BRACKET && this.hasFlag(IGNORE_CLOSURE);
 	}
@@ -473,22 +469,18 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			return;
 		}
 
-		if (TypeParser.isGenericStart(next, nextType))
+		if (isGenericCall(next, nextType))
 		{
-			final IToken endToken = ParserUtil.findMatch(next, true);
-			if (endToken != null && isTypeArgumentsEnd(endToken))
-			{
-				final MethodCall call = new MethodCall(token.raw(), this.value, name, EmptyArguments.INSTANCE);
-				this.value = call;
+			final MethodCall call = new MethodCall(token.raw(), this.value, name, EmptyArguments.INSTANCE);
+			this.value = call;
 
-				pm.splitJump(next, 1);
-				pm.pushParser(new TypeListParser(call.getGenericData()));
-				this.mode = TYPE_ARGUMENTS_END;
-				return;
-			}
+			pm.splitJump(next, 1);
+			pm.pushParser(new TypeListParser(call.getGenericData()));
+			this.mode = TYPE_ARGUMENTS_END;
+			return;
 		}
 
-		if (this.parseFieldAccess(token, next, nextType))
+		if (this.isFieldAccess(token, next, nextType))
 		{
 			this.value = new FieldAccess(token.raw(), this.value, name);
 			this.mode = ACCESS;
@@ -510,9 +502,9 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		this.parseApply(pm, token.next(), call);
 	}
 
-	private boolean parseFieldAccess(IToken token, IToken next, int nextType)
+	private boolean isFieldAccess(IToken token, IToken next, int nextType)
 	{
-		if (this.ignoreClosure(next))
+		if (this.hasFlag(IGNORE_APPLY) || this.ignoreClosure(next))
 		{
 			return true;
 		}
@@ -525,25 +517,44 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		}
 		// IDENTIFIER END
 		// token      next
-		return isExpressionEnd(nextType) || this.hasFlag(IGNORE_APPLY);
+		return isExpressionEnd(nextType);
 	}
 
-	private static boolean isTypeArgumentsEnd(IToken token)
+	private static boolean isGenericCall(IToken next, int nextType)
 	{
-		final IToken next = token.next();
-		final int nextType = next.type();
-
-		if (isExpressionEnd(nextType))
+		if (!TypeParser.isGenericStart(next, nextType))
 		{
+			return false;
+		}
+
+		// IDENTIFIER <
+
+		final IToken endToken = ParserUtil.findMatch(next, true);
+		if (endToken == null)
+		{
+			return false;
+		}
+
+		// IDENTIFIER < ... >
+		final IToken endTokenNext = endToken.next();
+		final int endTokenNextType = endTokenNext.type();
+
+		if (isExpressionEnd(endTokenNextType))
+		{
+			// IDENTIFIER < ... > END
 			return true;
 		}
-		switch (nextType)
+		switch (endTokenNextType)
 		{
 		case BaseSymbols.OPEN_CURLY_BRACKET:
+			// IDENTIFIER < ... > {
 			return true;
 		case BaseSymbols.OPEN_PARENTHESIS:
 		case BaseSymbols.OPEN_SQUARE_BRACKET:
-			return neighboring(token, next);
+			// IDENTIFIER < ... >(
+			// IDENTIFIER < ... >[
+			//                  ^^ note the spacing
+			return neighboring(endToken, endTokenNext);
 		}
 		return false;
 	}
