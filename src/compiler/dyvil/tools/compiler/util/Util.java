@@ -94,6 +94,11 @@ public final class Util
 		final int typeParams = iClass.typeParameterCount();
 		if (typeParams > 0)
 		{
+			if (endsWithSymbol(stringBuilder))
+			{
+				stringBuilder.append(' ');
+			}
+
 			stringBuilder.append('<');
 			iClass.getTypeParameter(0).toString("", stringBuilder);
 			for (int i1 = 1; i1 < typeParams; i1++)
@@ -244,9 +249,10 @@ public final class Util
 
 	// endregion
 
-	// region Value transformations
-
-	// endregion
+	public static boolean endsWithSymbol(StringBuilder buffer)
+	{
+		return LexerUtil.isIdentifierSymbol(buffer.codePointBefore(buffer.length()));
+	}
 
 	public static String toTime(long nanos)
 	{

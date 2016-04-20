@@ -1106,7 +1106,10 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		// Type Parameters
 		if (this.typeParameterCount > 0)
 		{
-			// TODO Append space if the name is a symbol
+			if (Util.endsWithSymbol(buffer))
+			{
+				buffer.append(' ');
+			}
 
 			Formatting.appendSeparator(buffer, "generics.open_bracket", '<');
 			Util.astToString(prefix, this.typeParameters, this.typeParameterCount,
