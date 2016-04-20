@@ -35,6 +35,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
+import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;
 
 import static dyvil.tools.compiler.parser.ParserUtil.*;
@@ -501,6 +502,12 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			}
 		}
 
+		if (this.value != null && !this.hasFlag(EXPLICIT_DOT))
+		{
+			pm.report(Markers.syntaxWarning(ICodePosition.between(token.prev(), token),
+			                                "expression.identifier.juxtaposition.deprecated"));
+		}
+
 		if (this.parseFieldAccess(token, next, nextType))
 		{
 			final FieldAccess access = new FieldAccess(token.raw(), this.value, name);
@@ -543,6 +550,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			return neighboring(token, next) || isExpressionEnd(next.next().type()) || !neighboring(next, next.next());
 		}
 
+		// TODO Remove this condition when removing identifier juxtaposition
 		// IDENTIFIER IDENTIFIER EXPRESSION
 		// token      next
 

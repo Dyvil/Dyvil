@@ -3,6 +3,11 @@ package dyvil.tools.parsing.position;
 public interface ICodePosition
 {
 	ICodePosition ORIGIN = new CodePosition(1, 0, 1);
+
+	static ICodePosition between(ICodePosition start, ICodePosition end)
+	{
+		return new CodePosition(start.endLine(), end.startLine(), start.endIndex(), end.startIndex());
+	}
 	
 	int startIndex();
 	
