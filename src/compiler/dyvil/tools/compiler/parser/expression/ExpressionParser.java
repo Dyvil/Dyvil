@@ -35,6 +35,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
+import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;
 
 import static dyvil.tools.compiler.parser.ParserUtil.*;
@@ -259,8 +260,8 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 					return;
 				}
 
-				final ApplyMethodCall applyCall = new ApplyMethodCall(this.value.getPosition(), this.value,
-				                                                      EmptyArguments.VISIBLE);
+				final ApplyMethodCall applyCall = new ApplyMethodCall(ICodePosition.between(token.prev(), token),
+				                                                      this.value, EmptyArguments.VISIBLE);
 
 				this.value = applyCall;
 				this.parseApply(pm, token, applyCall);
@@ -292,12 +293,15 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				return;
 			}
 
-			if (ParserUtil.isExpressionEnd(type))
+			pm.report(Markers.syntaxError(token, "expression.access.dot.invalid"));
+			if (ParserUtil.isTerminator(type))
 			{
 				pm.popParser(true);
+				return;
 			}
 
-			pm.report(Markers.syntaxError(token, "expression.access.dot.invalid"));
+			this.mode = ACCESS;
+			pm.reparse();
 			return;
 		case PARAMETERS_END:
 			// ... ( ... )
