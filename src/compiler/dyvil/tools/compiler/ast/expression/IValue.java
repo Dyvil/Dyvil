@@ -25,21 +25,23 @@ public interface IValue extends IASTNode, ITyped
 {
 	// --- Expression IDs ---
 
+	int UNKNOWN = 0;
+
 	// Literals
-	int VOID                 = 0;
-	int NULL                 = 1;
-	int NIL                  = 2;
-	int WILDCARD             = 3;
-	int BOOLEAN              = 4;
-	int BYTE                 = 5;
-	int SHORT                = 6;
-	int CHAR                 = 7;
-	int INT                  = 8;
-	int LONG                 = 9;
-	int FLOAT                = 10;
-	int DOUBLE               = 11;
-	int STRING               = 12;
-	int STRING_INTERPOLATION = 13;
+	int VOID                 = 1;
+	int NULL                 = 2;
+	int NIL                  = 3;
+	int WILDCARD             = 4;
+	int BOOLEAN              = 5;
+	int BYTE                 = 6;
+	int SHORT                = 7;
+	int CHAR                 = 8;
+	int INT                  = 9;
+	int LONG                 = 10;
+	int FLOAT                = 11;
+	int DOUBLE               = 12;
+	int STRING               = 13;
+	int STRING_INTERPOLATION = 14;
 
 	// Compound Constructs
 	int STATEMENT_LIST = 32;

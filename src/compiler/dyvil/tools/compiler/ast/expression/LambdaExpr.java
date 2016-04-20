@@ -559,7 +559,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		else
 		{
 			markers.add(Markers.semantic(this.position, "lambda.value.invalid"));
-			this.value = new VoidValue(this.position);
+			this.value = new DummyValue();
 		}
 	}
 
