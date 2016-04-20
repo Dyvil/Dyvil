@@ -27,7 +27,7 @@ public class Main
 		FibonacciTest.main(args)
 		ObjectTest.main(args)
 		OperatorTest.main(args)
-		PrimitiveTest main args
+		PrimitiveTest.main(args)
 		PropertyTest.main(args)
 		RangeTest.main(args)
 		ReferenceTest.main(args)

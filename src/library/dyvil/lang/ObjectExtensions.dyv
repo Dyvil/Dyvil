@@ -28,7 +28,7 @@ public final class ObjectExtensions
 	public infix func ==(Object o1, Object o2): boolean
 	{
 		if (o1.isNull)	return o2.isNull
-		else			return o1 equals o2
+		else			return o1.equals o2
 	}
 
 	// Reference Equality
@@ -61,11 +61,11 @@ public final class ObjectExtensions
 
 	// Comparable
 
-	public infix inline func < <T>(Comparable<T> c1, T c2): boolean = (c1 compareTo c2) < 0
+	public infix inline func < <T>(Comparable<T> c1, T c2): boolean = c1.compareTo(c2) < 0
 
-	public infix inline func <= <T>(Comparable<T> c1, T c2): boolean = (c1 compareTo c2) <= 0
+	public infix inline func <= <T>(Comparable<T> c1, T c2): boolean = c1.compareTo(c2) <= 0
 
-	public infix inline func > <T>(Comparable<T> c1, T c2): boolean = (c1 compareTo c2) > 0
+	public infix inline func > <T>(Comparable<T> c1, T c2): boolean = c1.compareTo(c2) > 0
 
-	public infix inline func >= <T>(Comparable<T> c1, T c2): boolean = (c1 compareTo c2) >= 0
+	public infix inline func >= <T>(Comparable<T> c1, T c2): boolean = c1.compareTo(c2) >= 0
 }

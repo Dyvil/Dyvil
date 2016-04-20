@@ -13,7 +13,7 @@ public class RangeTest
 
 		public override int distanceTo(RangeableInt other) = Math.abs(this.value - other.value)
 
-		public override int compareTo(RangeableInt other) = this.value compareTo other.value
+		public override int compareTo(RangeableInt other) = this.value.compareTo other.value
 	}
 
 	public static void main([String] args)

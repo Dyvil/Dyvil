@@ -7,7 +7,7 @@ public interface Function1<-P1, +R>
 
 	infix func andThen<A, B, C>(A -> B first, B -> C second): A -> C = x => second(first(x))
 
-	infix func compose<A, B, C>(B -> C second, A -> B first): A -> C = first andThen second
+	infix func compose<A, B, C>(B -> C second, A -> B first): A -> C = first.andThen second
 
 	static func identity<T>: T -> T = x => x
 }

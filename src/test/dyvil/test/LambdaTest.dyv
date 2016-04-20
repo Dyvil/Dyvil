@@ -53,7 +53,7 @@ public class LambdaTest
 	{
 		let fun1 = (int i) -> int => i + 1
 		let fun2 = (int i) -> int => i * 2
-		let fun12 = fun1 andThen fun2
+		let fun12 = fun1.andThen fun2
 		let result = (fun12(7))
 
 		Main.test("Function Chain", 16, result)
@@ -97,7 +97,7 @@ public class LambdaTest
 
 	private static void partialFunctionTest()
 	{
-		((int, int) -> int) compareInts = _ compareTo _
+		((int, int) -> int) compareInts = _.compareTo _
 		(any -> void) testFun = Main.test("Partial Function Test 1", -1, _)
 
 		testFun(compareInts(1, 2))
