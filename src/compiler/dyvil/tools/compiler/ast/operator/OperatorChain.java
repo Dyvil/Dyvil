@@ -102,7 +102,22 @@ public class OperatorChain implements IValue
 			return this.operands[0];
 		case 1:
 			return binaryOp(this.operands[0], this.operators[0], this.operands[1]).resolve(markers, context);
-		// TODO Inline Operator resolution for 2 operators?
+		case 2:
+			final IValue lhs = this.operands[0];
+			final OperatorElement element1 = this.operators[0];
+			final IValue center = this.operands[1];
+			final OperatorElement element2 = this.operators[1];
+			final IValue rhs = this.operands[2];
+
+			if (element1.operator.getType() == IOperator.TERNARY && element2.name == element1.operator.getTernaryName())
+			{
+				return ternaryOp(lhs, element1, center, element2, rhs).resolve(markers, context);
+			}
+			if (lowerPrecedence(element1, element2, null, markers))
+			{
+				return binaryOp(lhs, element1, binaryOp(center, element2, rhs)).resolve(markers, context);
+			}
+			return binaryOp(binaryOp(lhs, element1, center), element2, rhs).resolve(markers, context);
 		}
 
 		final Stack<OperatorElement> operatorStack = new LinkedList<>();
