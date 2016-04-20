@@ -1,5 +1,6 @@
-package dyvil.tools.compiler.ast.access;
+package dyvil.tools.compiler.ast.operator;
 
+import dyvil.tools.compiler.ast.access.*;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.intrinsic.IncOperator;
@@ -31,50 +32,53 @@ public final class CompoundCall
 		int type = receiver.valueTag();
 		if (type == IValue.APPLY_CALL)
 		{
-			ApplyMethodCall applyCall = (ApplyMethodCall) receiver;
+			final ApplyMethodCall applyCall = (ApplyMethodCall) receiver;
 
 			// x(y...) op= z
 			// -> x(y...) = x(y...).op(z)
 			// -> x.update(y..., x.apply(y...).op(z))
 
-			SideEffectHelper helper = new SideEffectHelper();
+			final SideEffectHelper helper = new SideEffectHelper();
 
-			IValue applyReceiver = applyCall.receiver = helper.processValue(applyCall.receiver);
-			IArguments applyArguments = applyCall.arguments = helper.processArguments(applyCall.arguments);
+			final IValue applyReceiver = helper.processValue(applyCall.getReceiver());
+			final IArguments applyArguments = helper.processArguments(applyCall.getArguments());
 
-			IValue op = new MethodCall(position, receiver, name, arguments).resolveCall(markers, context);
+			final IValue op = new MethodCall(position, receiver, name, arguments).resolveCall(markers, context);
 			if (op == null)
 			{
 				return null;
 			}
 
-			IValue update = new UpdateMethodCall(position, applyReceiver, applyArguments, op)
-				                .resolveCall(markers, context);
+			applyCall.setArguments(applyArguments);
+			applyCall.setReceiver(applyReceiver);
+			final IValue update = new UpdateMethodCall(position, applyReceiver, applyArguments, op)
+				                      .resolveCall(markers, context);
 
 			return helper.finish(update);
 		}
 		else if (type == IValue.SUBSCRIPT_GET)
 		{
-			SubscriptAccess subscriptAccess = (SubscriptAccess) receiver;
+			final SubscriptAccess subscriptAccess = (SubscriptAccess) receiver;
 
 			// x[y...] op= z
 			// -> x[y...] = x[y...].op(z)
 			// -> x.subscript_=(y..., x.subscript(y...).op(z))
 
-			SideEffectHelper helper = new SideEffectHelper();
+			final SideEffectHelper helper = new SideEffectHelper();
 
-			IValue subscriptReceiver = subscriptAccess.receiver = helper.processValue(subscriptAccess.receiver);
-			IArguments subscriptArguments = subscriptAccess.arguments = helper.processArguments(
-				subscriptAccess.arguments);
+			final IValue subscriptReceiver = helper.processValue(subscriptAccess.getReceiver());
+			final IArguments subscriptArguments = helper.processArguments(subscriptAccess.getArguments());
 
-			IValue op = new MethodCall(position, receiver, name, arguments).resolveCall(markers, context);
+			final IValue op = new MethodCall(position, receiver, name, arguments).resolveCall(markers, context);
 			if (op == null)
 			{
 				return null;
 			}
 
-			IValue subscript = new SubscriptAssignment(position, subscriptReceiver, subscriptArguments, op)
-				                   .resolveCall(markers, context);
+			subscriptAccess.setReceiver(subscriptReceiver);
+			subscriptAccess.setArguments(subscriptArguments);
+			final IValue subscript = new SubscriptAssignment(position, subscriptReceiver, subscriptArguments, op)
+				                         .resolveCall(markers, context);
 
 			return helper.finish(subscript);
 		}
@@ -82,11 +86,11 @@ public final class CompoundCall
 		{
 			final FieldAccess fieldAccess = (FieldAccess) receiver;
 
-			final IncOperator op = getIncOperator(name, arguments, fieldAccess);
-			if (op != null)
+			final IncOperator incOp = getIncOperator(name, arguments, fieldAccess);
+			if (incOp != null)
 			{
-				op.setPosition(position);
-				return op.resolveOperator(markers, context);
+				incOp.setPosition(position);
+				return incOp.resolveOperator(markers, context);
 			}
 
 			// x op= z
@@ -94,16 +98,16 @@ public final class CompoundCall
 
 			final SideEffectHelper helper = new SideEffectHelper();
 
-			final IValue fieldReceiver = fieldAccess.receiver = helper.processValue(fieldAccess.receiver);
+			final IValue fieldReceiver = helper.processValue(fieldAccess.getReceiver());
 
-			final IValue methodCall = new MethodCall(position, receiver, name, arguments).resolveCall(markers, context);
-			if (methodCall == null)
+			final IValue op = new MethodCall(position, receiver, name, arguments).resolveCall(markers, context);
+			if (op == null)
 			{
 				return null;
 			}
 
-			final FieldAssignment assignment = new FieldAssignment(position, fieldReceiver, fieldAccess.field,
-			                                                       methodCall);
+			fieldAccess.setReceiver(fieldReceiver);
+			final FieldAssignment assignment = new FieldAssignment(position, fieldReceiver, fieldAccess.getField(), op);
 			return helper.finish(assignment);
 		}
 

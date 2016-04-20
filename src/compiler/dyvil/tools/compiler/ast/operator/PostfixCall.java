@@ -48,6 +48,27 @@ public class PostfixCall extends MethodCall
 	}
 
 	@Override
+	public IValue resolveCall(MarkerList markers, IContext context)
+	{
+		final IValue op = Operators.getPostfix(this.receiver, this.name);
+		if (op != null)
+		{
+			// Intrinsic Postfix Operators (..., ++ and --)
+			op.setPosition(this.position);
+			return op.resolveOperator(markers, context);
+		}
+
+		// Normal Method Resolution
+		if (this.resolveMethodCall(markers, context))
+		{
+			return this;
+		}
+
+		// No Implicit or Apply Resolution
+		return null;
+	}
+
+	@Override
 	public String toString()
 	{
 		return IASTNode.toString(this);
@@ -56,7 +77,10 @@ public class PostfixCall extends MethodCall
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		this.receiver.toString(prefix, buffer);
+		if (this.receiver != null)
+		{
+			this.receiver.toString(prefix, buffer);
+		}
 		buffer.append(this.name);
 	}
 }

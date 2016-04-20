@@ -45,6 +45,33 @@ public class PrefixCall extends MethodCall
 	}
 
 	@Override
+	public IValue resolveCall(MarkerList markers, IContext context)
+	{
+		final IValue op = Operators.getPrefix(this.name, this.arguments.getFirstValue());
+		if (op != null)
+		{
+			// Intrinsic Prefix Operators (! and *)
+			op.setPosition(this.position);
+			return op.resolveOperator(markers, context);
+		}
+
+		// Normal Method Resolution
+		if (this.resolveMethodCall(markers, context))
+		{
+			return this;
+		}
+
+		// Implicit Resolution
+		if (this.resolveImplicitCall(markers, context))
+		{
+			return this;
+		}
+
+		// No apply Resolution
+		return null;
+	}
+
+	@Override
 	public IValue toAssignment(IValue rhs, ICodePosition position)
 	{
 		final Name name = Name.get(this.name.unqualified + "_=", this.name.qualified + "_$eq");
@@ -61,6 +88,9 @@ public class PrefixCall extends MethodCall
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(this.name);
-		this.arguments.getFirstValue().toString(prefix, buffer);
+		if (!this.arguments.isEmpty())
+		{
+			this.arguments.getFirstValue().toString(prefix, buffer);
+		}
 	}
 }

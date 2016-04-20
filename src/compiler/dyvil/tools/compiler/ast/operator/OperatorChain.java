@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.ColonOperator;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -228,7 +227,7 @@ public class OperatorChain implements IValue
 			}
 		}
 
-		return new MethodCall(operator.position, lhs, name, new SingleArgument(rhs));
+		return new InfixCall(operator.position, lhs, name, rhs);
 	}
 
 	private static IValue ternaryOp(IValue lhs, OperatorElement operator1, IValue center, OperatorElement operator2, IValue rhs)
