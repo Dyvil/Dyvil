@@ -113,11 +113,11 @@ public class OperatorChain implements IValue
 			{
 				return ternaryOp(lhs, element1, center, element2, rhs).resolve(markers, context);
 			}
-			if (lowerPrecedence(element1, element2, null, markers))
+			if (lowerPrecedence(element2, element1, null, markers))
 			{
-				return binaryOp(lhs, element1, binaryOp(center, element2, rhs)).resolve(markers, context);
+				return binaryOp(binaryOp(lhs, element1, center), element2, rhs).resolve(markers, context);
 			}
-			return binaryOp(binaryOp(lhs, element1, center), element2, rhs).resolve(markers, context);
+			return binaryOp(lhs, element1, binaryOp(center, element2, rhs)).resolve(markers, context);
 		}
 
 		final Stack<OperatorElement> operatorStack = new LinkedList<>();
