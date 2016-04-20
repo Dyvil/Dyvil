@@ -16,7 +16,6 @@ public class PostfixCall extends MethodCall
 	public PostfixCall(ICodePosition position, IValue receiver, Name name)
 	{
 		super(position, receiver, name);
-		this.dotless = true;
 	}
 
 	@Override

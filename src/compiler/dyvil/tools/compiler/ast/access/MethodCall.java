@@ -8,7 +8,6 @@ import dyvil.tools.compiler.ast.operator.Operators;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.reference.PropertyReference;
-import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.ConstantFolder;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -18,7 +17,6 @@ import dyvil.tools.parsing.position.ICodePosition;
 public class MethodCall extends AbstractCall implements INamed
 {
 	protected Name    name;
-	protected boolean dotless;
 
 	public MethodCall(ICodePosition position)
 	{
@@ -65,16 +63,6 @@ public class MethodCall extends AbstractCall implements INamed
 	public Name getName()
 	{
 		return this.name;
-	}
-
-	public boolean isDotless()
-	{
-		return this.dotless;
-	}
-
-	public void setDotless(boolean dotless)
-	{
-		this.dotless = dotless;
 	}
 
 	@Override
@@ -294,14 +282,7 @@ public class MethodCall extends AbstractCall implements INamed
 		if (this.receiver != null)
 		{
 			this.receiver.toString(prefix, buffer);
-			if (this.dotless && !Formatting.getBoolean("method.access.java_format"))
-			{
-				buffer.append(' ');
-			}
-			else
-			{
-				buffer.append('.');
-			}
+			buffer.append('.');
 		}
 
 		buffer.append(this.name);

@@ -228,9 +228,7 @@ public class OperatorChain implements IValue
 			}
 		}
 
-		final MethodCall methodCall = new MethodCall(operator.position, lhs, name, new SingleArgument(rhs));
-		methodCall.setDotless(true);
-		return methodCall;
+		return new MethodCall(operator.position, lhs, name, new SingleArgument(rhs));
 	}
 
 	private static IValue ternaryOp(IValue lhs, OperatorElement operator1, IValue center, OperatorElement operator2, IValue rhs)

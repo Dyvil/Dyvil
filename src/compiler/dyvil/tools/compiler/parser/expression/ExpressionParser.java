@@ -53,7 +53,6 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 	// Flags
 
-	public static final int EXPLICIT_DOT   = 0b00001;
 	public static final int OPERATOR       = 0b00010;
 	public static final int IGNORE_COLON   = 0b00100;
 	public static final int IGNORE_LAMBDA  = 0b01000;
@@ -208,11 +207,8 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				// ... .
 
 				this.mode = DOT_ACCESS;
-				this.addFlag(EXPLICIT_DOT);
 				return;
 			}
-
-			this.removeFlag(EXPLICIT_DOT);
 
 			switch (type)
 			{
@@ -448,7 +444,6 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			// IDENTIFIER (
 			final MethodCall call = new MethodCall(token.raw(), this.value, name);
 			ArgumentListParser.parseArguments(pm, next.next(), call);
-			call.setDotless(!this.hasFlag(EXPLICIT_DOT));
 			this.value = call;
 
 			this.mode = PARAMETERS_END;
@@ -491,8 +486,6 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			if (endToken != null && isTypeArgumentsEnd(endToken))
 			{
 				final MethodCall call = new MethodCall(token.raw(), this.value, name, EmptyArguments.INSTANCE);
-				call.setDotless(!this.hasFlag(EXPLICIT_DOT));
-
 				this.value = call;
 
 				pm.splitJump(next, 1);
@@ -502,17 +495,19 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			}
 		}
 
-		if (this.value != null && !this.hasFlag(EXPLICIT_DOT))
+		if (this.value != null)
 		{
-			pm.report(Markers.syntaxWarning(ICodePosition.between(token.prev(), token),
-			                                "expression.identifier.juxtaposition.deprecated"));
+			final IToken prev = token.prev();
+			if (prev.type() != BaseSymbols.DOT)
+			{
+				pm.report(Markers.syntaxWarning(ICodePosition.between(prev, token),
+				                                "expression.access.dotless.deprecated"));
+			}
 		}
 
 		if (this.parseFieldAccess(token, next, nextType))
 		{
-			final FieldAccess access = new FieldAccess(token.raw(), this.value, name);
-			access.setDotless(!this.hasFlag(EXPLICIT_DOT));
-			this.value = access;
+			this.value = new FieldAccess(token.raw(), this.value, name);
 			this.mode = ACCESS;
 			return;
 		}
@@ -526,8 +521,6 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		//      println i
 
 		final MethodCall call = new MethodCall(token.raw(), this.value, name, EmptyArguments.INSTANCE);
-		call.setDotless(!this.hasFlag(EXPLICIT_DOT));
-
 		this.value = call;
 		this.mode = ACCESS;
 

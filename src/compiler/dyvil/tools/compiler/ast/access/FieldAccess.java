@@ -25,7 +25,6 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.raw.PackageType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
@@ -38,8 +37,6 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	protected ICodePosition position;
 	protected IValue        receiver;
 	protected Name          name;
-
-	protected boolean dotless;
 
 	// Metadata
 	protected IDataMember field;
@@ -93,7 +90,6 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		call.receiver = this.receiver;
 		call.name = this.name;
 		call.method = method;
-		call.dotless = this.dotless;
 		call.arguments = EmptyArguments.INSTANCE;
 		return call;
 	}
@@ -112,16 +108,6 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	public IDataMember getField()
 	{
 		return this.field;
-	}
-
-	public boolean isDotless()
-	{
-		return this.dotless;
-	}
-
-	public void setDotless(boolean dotless)
-	{
-		this.dotless = dotless;
 	}
 
 	@Override
@@ -519,15 +505,8 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	{
 		if (this.receiver != null)
 		{
-			this.receiver.toString("", buffer);
-			if (this.dotless && !Formatting.getBoolean("field.access.java_format"))
-			{
-				buffer.append(' ');
-			}
-			else
-			{
-				buffer.append('.');
-			}
+			this.receiver.toString(prefix, buffer);
+			buffer.append('.');
 		}
 
 		buffer.append(this.name);

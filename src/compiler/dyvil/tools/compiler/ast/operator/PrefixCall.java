@@ -15,13 +15,11 @@ public class PrefixCall extends MethodCall
 	public PrefixCall(ICodePosition position, Name name)
 	{
 		super(position, null, name);
-		this.dotless = true;
 	}
 
 	public PrefixCall(ICodePosition position, Name name, IValue argument)
 	{
 		super(position, null, name, new SingleArgument(argument));
-		this.dotless = true;
 	}
 
 	@Override
