@@ -35,7 +35,6 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
-import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;
 
 import static dyvil.tools.compiler.parser.ParserUtil.*;
@@ -53,10 +52,11 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 	// Flags
 
-	public static final int OPERATOR       = 0b00010;
-	public static final int IGNORE_COLON   = 0b00100;
-	public static final int IGNORE_LAMBDA  = 0b01000;
-	public static final int IGNORE_CLOSURE = 0b10000;
+	private static final int IGNORE_APPLY    = 0b00001;
+	private static final int IGNORE_OPERATOR = 0b00010;
+	public static final  int IGNORE_COLON    = 0b00100;
+	public static final  int IGNORE_LAMBDA   = 0b01000;
+	public static final  int IGNORE_CLOSURE  = 0b10000;
 
 	// ----------
 
@@ -100,12 +100,6 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			this.valueConsumer.setValue(this.value);
 		}
 		pm.popParser(reparse);
-	}
-
-	private ExpressionParser subParser(IValueConsumer valueConsumer)
-	{
-		return new ExpressionParser(valueConsumer)
-			       .withFlag(this.flags & (IGNORE_COLON | IGNORE_LAMBDA | IGNORE_CLOSURE));
 	}
 
 	@Override
@@ -293,9 +287,8 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				return;
 			}
 
-			if (isIdentifier(type))
+			if (isSymbol(type))
 			{
-				// EXPRESSION IDENTIFIER
 				this.parseInfixAccess(pm, token);
 				return;
 			}
@@ -304,7 +297,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			{
 				// EXPRESSION EXPRESSION -> EXPRESSION ( EXPRESSION )
 
-				if (this.hasFlag(OPERATOR) || this.ignoreClosure(token))
+				if (this.hasFlag(IGNORE_APPLY) || this.ignoreClosure(token))
 				{
 					this.end(pm, true);
 					return;
@@ -407,7 +400,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				return;
 			}
 
-			if (this.hasFlag(OPERATOR))
+			if (this.hasFlag(IGNORE_OPERATOR))
 			{
 				this.valueConsumer.setValue(this.value);
 				pm.popParser(true);
@@ -431,7 +424,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			}
 
 			chain.addOperator(name, token.raw());
-			pm.pushParser(this.subParser(chain::addOperand).withFlag(OPERATOR));
+			pm.pushParser(new ExpressionParser(chain::addOperand).withFlag(this.flags | IGNORE_OPERATOR));
 			return;
 		}
 
@@ -495,14 +488,11 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			}
 		}
 
-		if (this.value != null)
+		if (this.hasFlag(IGNORE_APPLY))
 		{
-			final IToken prev = token.prev();
-			if (prev.type() != BaseSymbols.DOT)
-			{
-				pm.report(Markers.syntaxWarning(ICodePosition.between(prev, token),
-				                                "expression.access.dotless.deprecated"));
-			}
+			this.value = new FieldAccess(token.raw(), this.value, name);
+			this.end(pm, false);
+			return;
 		}
 
 		if (this.parseFieldAccess(token, next, nextType))
@@ -529,10 +519,8 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 	private boolean parseFieldAccess(IToken token, IToken next, int nextType)
 	{
-		if (isExpressionEnd(nextType) || this.ignoreClosure(next))
+		if (this.ignoreClosure(next))
 		{
-			// IDENTIFIER END
-			// token      next
 			return true;
 		}
 		if (isSymbol(nextType) && nextType != DyvilSymbols.UNDERSCORE)
@@ -542,14 +530,9 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 			return neighboring(token, next) || isExpressionEnd(next.next().type()) || !neighboring(next, next.next());
 		}
-
-		// TODO Remove this condition when removing identifier juxtaposition
-		// IDENTIFIER IDENTIFIER EXPRESSION
+		// IDENTIFIER END
 		// token      next
-
-		// Parse a field access
-		// e.g. out println 1
-		return isIdentifier(nextType) && !isExpressionEnd(next.next().type());
+		return isExpressionEnd(nextType);
 	}
 
 	private static boolean isTypeArgumentsEnd(IToken token)
@@ -596,7 +579,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		{
 			final SingleArgument argument = new SingleArgument();
 			call.setArguments(argument);
-			pm.pushParser(this.subParser(argument).withFlag(OPERATOR));
+			pm.pushParser(new ExpressionParser(argument).withFlag(this.flags | IGNORE_APPLY | IGNORE_OPERATOR));
 			return;
 		}
 
