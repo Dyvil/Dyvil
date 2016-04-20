@@ -488,13 +488,6 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			}
 		}
 
-		if (this.hasFlag(IGNORE_APPLY))
-		{
-			this.value = new FieldAccess(token.raw(), this.value, name);
-			this.end(pm, false);
-			return;
-		}
-
 		if (this.parseFieldAccess(token, next, nextType))
 		{
 			this.value = new FieldAccess(token.raw(), this.value, name);
@@ -532,7 +525,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		}
 		// IDENTIFIER END
 		// token      next
-		return isExpressionEnd(nextType);
+		return isExpressionEnd(nextType) || this.hasFlag(IGNORE_APPLY);
 	}
 
 	private static boolean isTypeArgumentsEnd(IToken token)
