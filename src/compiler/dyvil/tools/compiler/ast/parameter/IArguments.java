@@ -38,9 +38,7 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	boolean isEmpty();
 	
 	// 'Variations'
-	
-	IArguments dropFirstValue();
-	
+
 	IArguments withLastValue(IValue value);
 	
 	default IArguments withLastValue(Name name, IValue value)

@@ -54,12 +54,6 @@ public final class NamedArgumentList implements IArguments
 	}
 
 	@Override
-	public IArguments dropFirstValue()
-	{
-		return this; // FIXME
-	}
-
-	@Override
 	public IArguments withLastValue(IValue value)
 	{
 		return this.withLastValue(null, value);

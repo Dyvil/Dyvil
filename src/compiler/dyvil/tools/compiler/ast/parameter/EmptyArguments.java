@@ -47,12 +47,6 @@ public final class EmptyArguments implements IArguments
 	}
 
 	@Override
-	public IArguments dropFirstValue()
-	{
-		return null;
-	}
-
-	@Override
 	public IArguments withLastValue(IValue value)
 	{
 		return new SingleArgument(value);

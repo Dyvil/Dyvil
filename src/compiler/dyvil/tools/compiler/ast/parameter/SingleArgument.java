@@ -46,12 +46,6 @@ public final class SingleArgument implements IArguments, IValueConsumer
 	// 'Variations'
 
 	@Override
-	public IArguments dropFirstValue()
-	{
-		return EmptyArguments.INSTANCE;
-	}
-
-	@Override
 	public IArguments withLastValue(IValue value)
 	{
 		if (this.value == null)

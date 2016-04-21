@@ -10,12 +10,12 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
+import dyvil.tools.compiler.ast.expression.ClassOperator;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
-import dyvil.tools.compiler.ast.expression.ClassOperator;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
@@ -24,9 +24,9 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.backend.visitor.AnnotationValueReader;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -205,25 +205,16 @@ public abstract class Parameter extends Member implements IParameter
 			return;
 		}
 
-		this.defaultValue = this.defaultValue.resolve(markers, context);
+		IValue defaultValue = this.defaultValue.resolve(markers, context);
 
-		// TODO Use TypeChecker
-		final IValue typed = this.defaultValue.withType(this.type, null, markers, context);
-		if (typed == null)
-		{
-			final Marker marker = Markers.semantic(this.defaultValue.getPosition(),
-			                                       this.getKind().getName() + ".type.incompatible",
-			                                       this.name.unqualified);
-			marker.addInfo(Markers.getSemantic(this.getKind().getName() + ".type", this.type));
-			marker.addInfo(Markers.getSemantic("value.type", this.defaultValue.getType()));
-			markers.add(marker);
-		}
-		else
-		{
-			this.defaultValue = typed;
-		}
+		final String kindName = this.getKind().getName();
+		final TypeChecker.MarkerSupplier markerSupplier = TypeChecker.markerSupplier(kindName + ".type.incompatible",
+		                                                                             kindName + ".type", "value.type",
+		                                                                             this.name);
 
-		this.defaultValue = IValue.toAnnotationConstant(this.defaultValue, markers, context);
+		defaultValue = TypeChecker.convertValue(defaultValue, this.type, null, markers, context, markerSupplier);
+
+		this.defaultValue = IValue.toAnnotationConstant(defaultValue, markers, context);
 	}
 
 	@Override

@@ -85,6 +85,13 @@ public final class Util
 		ITypeContext.apply(typeContext, type).toString("", stringBuilder);
 	}
 
+	public static String classSignatureToString(IClass iClass)
+	{
+		final StringBuilder stringBuilder = new StringBuilder();
+		classSignatureToString(iClass, stringBuilder);
+		return stringBuilder.toString();
+	}
+
 	public static void classSignatureToString(IClass iClass, StringBuilder stringBuilder)
 	{
 		ModifierUtil.writeClassType(iClass.getModifiers().toFlags(), stringBuilder);

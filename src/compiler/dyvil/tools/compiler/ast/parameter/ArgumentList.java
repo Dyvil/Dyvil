@@ -73,15 +73,6 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 
 	@Override
-	public IArguments dropFirstValue()
-	{
-		int len1 = this.size - 1;
-		IValue[] values = new IValue[len1];
-		System.arraycopy(this.values, 1, values, 0, len1);
-		return new ArgumentList(values, len1);
-	}
-
-	@Override
 	public IArguments withLastValue(IValue value)
 	{
 		IValue[] values = new IValue[this.size + 1];
