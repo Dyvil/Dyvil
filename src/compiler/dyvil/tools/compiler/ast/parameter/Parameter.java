@@ -410,7 +410,7 @@ public abstract class Parameter extends Member implements IParameter
 
 		if (this.modifiers != null)
 		{
-			this.modifiers.toString(buffer);
+			this.modifiers.toString(this.getKind(), buffer);
 		}
 
 		boolean typeAscription = false;

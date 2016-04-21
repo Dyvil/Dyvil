@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.field;
 
-import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
@@ -11,7 +10,6 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
-import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -229,11 +227,6 @@ public final class Variable extends Member implements IVariable
 			this.value.check(markers, context);
 		}
 
-		if (this.modifiers != null)
-		{
-			ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.VARIABLE_MODIFIERS);
-		}
-
 		if (Types.isSameType(this.type, Types.VOID))
 		{
 			markers.add(Markers.semantic(this.position, "variable.type.void"));
@@ -378,12 +371,7 @@ public final class Variable extends Member implements IVariable
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		super.toString("", buffer);
-		if (this.modifiers != null)
-		{
-			this.modifiers.toString(buffer);
-		}
-
+		super.toString(prefix, buffer);
 		IDataMember.toString(prefix, buffer, this, "variable.type_ascription");
 
 		if (this.value != null)

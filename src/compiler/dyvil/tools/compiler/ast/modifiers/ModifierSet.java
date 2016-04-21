@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.modifiers;
 
+import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.parsing.marker.MarkerList;
 
 import java.io.DataInput;
@@ -29,7 +31,7 @@ public interface ModifierSet extends Iterable<Modifier>
 
 	void removeIntModifier(int modifier);
 
-	void check(MarkerList markers);
+	void check(IMember member, MarkerList markers);
 
 	int toFlags();
 
@@ -43,5 +45,5 @@ public interface ModifierSet extends Iterable<Modifier>
 		return new FlagModifierSet(input.readInt());
 	}
 
-	void toString(StringBuilder builder);
+	void toString(MemberKind memberKind, StringBuilder builder);
 }

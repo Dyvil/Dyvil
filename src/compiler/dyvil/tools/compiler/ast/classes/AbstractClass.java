@@ -1018,8 +1018,8 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		{
 			this.annotations.toString(prefix, buffer);
 		}
+		this.modifiers.toString(this.getKind(), buffer);
 
-		this.modifiers.toString(buffer);
 		ModifierUtil.writeClassType(this.modifiers.toFlags(), buffer);
 		buffer.append(this.name);
 

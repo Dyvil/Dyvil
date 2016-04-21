@@ -1075,7 +1075,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		super.toString(prefix, buffer);
-		this.modifiers.toString(buffer);
 
 		// Type
 		boolean typeAscription = false;

@@ -258,7 +258,7 @@ public class REPLVariable extends Field
 		{
 			this.annotations.toString(prefix, buffer);
 		}
-		this.modifiers.toString(buffer);
+		this.modifiers.toString(this.getKind(), buffer);
 
 		IDataMember.toString(prefix, buffer, this, "field.type_ascription");
 

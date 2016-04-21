@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.annotation.IAnnotated;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.INamed;
+import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.modifiers.IModified;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
@@ -160,8 +161,8 @@ public class HeaderDeclaration implements IASTNode, INamed, IModified, IAnnotate
 		{
 			this.annotations.toString(prefix, buffer);
 		}
+		this.modifiers.toString(MemberKind.HEADER, buffer);
 
-		this.modifiers.toString(buffer);
 		buffer.append("header ").append(this.name);
 	}
 }

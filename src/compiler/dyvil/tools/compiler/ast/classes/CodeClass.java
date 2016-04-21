@@ -291,12 +291,11 @@ public class CodeClass extends AbstractClass
 	{
 		context = context.push(this);
 
-		ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.CLASS_MODIFIERS);
-
 		if (this.annotations != null)
 		{
 			this.annotations.check(markers, context, this.getElementType());
 		}
+		this.modifiers.check(this, markers);
 
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{

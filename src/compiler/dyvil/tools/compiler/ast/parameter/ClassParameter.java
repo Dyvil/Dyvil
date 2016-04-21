@@ -183,15 +183,6 @@ public final class ClassParameter extends Field implements IParameter
 	}
 
 	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-		super.check(markers, context);
-
-		// TODO remove duplicate modifier check
-		ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.CLASS_PARAMETER_MODIFIERS);
-	}
-
-	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		if (this.isVarargs())

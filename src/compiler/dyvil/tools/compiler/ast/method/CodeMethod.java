@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
+import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -281,11 +282,7 @@ public class CodeMethod extends AbstractMethod
 			this.value.check(markers, this);
 		}
 
-		// Check for illegal modifiers
-		ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.METHOD_MODIFIERS);
-
-		// Check illegal modifier combinations
-		ModifierUtil.checkMethodModifiers(markers, this, this.modifiers.toFlags(), this.value != null);
+		ModifierList.checkMethodModifiers(markers, this, this.modifiers.toFlags());
 
 		if (!this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{

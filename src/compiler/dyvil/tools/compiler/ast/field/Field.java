@@ -359,8 +359,6 @@ public class Field extends Member implements IField
 		{
 			markers.add(Markers.semantic(this.position, "field.type.void"));
 		}
-
-		ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.FIELD_MODIFIERS);
 	}
 
 	@Override
@@ -588,8 +586,6 @@ public class Field extends Member implements IField
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		super.toString(prefix, buffer);
-		this.modifiers.toString(buffer);
-
 		IDataMember.toString(prefix, buffer, this, "field.type_ascription");
 
 		if (this.value != null)

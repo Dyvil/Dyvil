@@ -4,16 +4,15 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
-import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.IMember;
-import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;
@@ -205,13 +204,6 @@ public final class ModifierUtil
 		sb.append("class ");
 	}
 
-	public static String classModifiersToString(int mod)
-	{
-		StringBuilder stringBuilder = new StringBuilder();
-		writeClassModifiers(mod, stringBuilder);
-		return stringBuilder.toString();
-	}
-
 	public static void writeClassModifiers(int mod, StringBuilder sb)
 	{
 		if ((mod & Modifiers.STATIC) == Modifiers.STATIC)
@@ -244,13 +236,6 @@ public final class ModifierUtil
 		}
 	}
 
-	public static String fieldModifiersToString(int mod)
-	{
-		StringBuilder stringBuilder = new StringBuilder();
-		writeFieldModifiers(mod, stringBuilder);
-		return stringBuilder.toString();
-	}
-
 	public static void writeFieldModifiers(int mod, StringBuilder sb)
 	{
 		if ((mod & Modifiers.LAZY) == Modifiers.LAZY)
@@ -281,13 +266,6 @@ public final class ModifierUtil
 		{
 			sb.append("@Volatile ");
 		}
-	}
-
-	public static String methodModifiersToString(int mod)
-	{
-		StringBuilder stringBuilder = new StringBuilder();
-		writeMethodModifiers(mod, stringBuilder);
-		return stringBuilder.toString();
 	}
 
 	public static void writeMethodModifiers(int mod, StringBuilder sb)
@@ -353,89 +331,6 @@ public final class ModifierUtil
 		if ((mod & Modifiers.FINAL) == Modifiers.FINAL)
 		{
 			sb.append("final ");
-		}
-	}
-
-	public static void checkModifiers(MarkerList markers, IMember member, ModifierSet modifiers, int allowedModifiers)
-	{
-		StringBuilder stringBuilder = null;
-		for (Modifier modifier : modifiers)
-		{
-			if ((modifier.intValue() & allowedModifiers) == 0)
-			{
-				if (stringBuilder == null)
-				{
-					stringBuilder = new StringBuilder();
-				}
-				else
-				{
-					stringBuilder.append(", ");
-				}
-				modifier.toString(stringBuilder);
-			}
-		}
-
-		if (stringBuilder != null)
-		{
-			markers.add(Markers.semanticError(member.getPosition(), "modifiers.illegal", Util.memberNamed(member),
-			                                  stringBuilder.toString()));
-		}
-	}
-
-	public static void checkMethodModifiers(MarkerList markers, IClassMember member, int modifiers, boolean hasValue)
-	{
-		boolean isStatic = (modifiers & Modifiers.STATIC) != 0;
-		boolean isAbstract = (modifiers & Modifiers.ABSTRACT) != 0;
-		boolean isNative = (modifiers & Modifiers.NATIVE) != 0;
-
-		// If the method does not have an implementation and is static
-		if (isStatic && isAbstract)
-		{
-			markers.add(
-				Markers.semanticError(member.getPosition(), "modifiers.static.abstract", Util.memberNamed(member)));
-		}
-		else if (isAbstract && isNative)
-		{
-			markers.add(
-				Markers.semanticError(member.getPosition(), "modifiers.native.abstract", Util.memberNamed(member)));
-		}
-		else
-		{
-			if (isStatic)
-			{
-				if (!hasValue)
-				{
-					markers.add(Markers.semanticError(member.getPosition(), "modifiers.static.unimplemented",
-					                                  Util.memberNamed(member)));
-				}
-			}
-			if (isNative)
-			{
-				if (!hasValue)
-				{
-					markers.add(Markers.semanticError(member.getPosition(), "modifiers.native.implemented",
-					                                  Util.memberNamed(member)));
-				}
-			}
-			if (isAbstract)
-			{
-				final IClass enclosingClass = member.getEnclosingClass();
-				if (!enclosingClass.isAbstract())
-				{
-					markers.add(Markers.semanticError(member.getPosition(), "modifiers.abstract.concrete_class",
-					                                  Util.memberNamed(member), enclosingClass.getName()));
-				}
-				if (hasValue)
-				{
-					markers.add(Markers.semanticError(member.getPosition(), "modifiers.abstract.implemented",
-					                                  Util.memberNamed(member)));
-				}
-			}
-		}
-		if (!hasValue && !isAbstract && !isNative && !isStatic)
-		{
-			markers
-				.add(Markers.semanticError(member.getPosition(), "modifiers.unimplemented", Util.memberNamed(member)));
 		}
 	}
 

@@ -462,8 +462,6 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		super.toString(prefix, buffer);
-
-		this.modifiers.toString(buffer);
 		buffer.append("init");
 
 		Formatting.appendSeparator(buffer, "parameters.open_paren", '(');

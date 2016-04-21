@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
-import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -102,8 +101,6 @@ public class Initializer extends Member implements IInitializer
 	public void check(MarkerList markers, IContext context)
 	{
 		super.check(markers, context);
-
-		ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.PRIVATE | Modifiers.STATIC);
 
 		if (this.value != null)
 		{

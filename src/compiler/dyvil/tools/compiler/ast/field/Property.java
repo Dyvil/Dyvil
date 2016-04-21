@@ -439,8 +439,6 @@ public class Property extends Member implements IProperty
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		super.toString(prefix, buffer);
-		this.modifiers.toString(buffer);
-
 		IDataMember.toString(prefix, buffer, this, "property.type_ascription");
 		formatBody(this, prefix, buffer);
 	}
@@ -539,7 +537,7 @@ public class Property extends Member implements IProperty
 		buffer.append('\n').append(getterPrefix);
 		if (getterModifiers != null)
 		{
-			getterModifiers.toString(buffer);
+			getterModifiers.toString(getter.getKind(), buffer);
 		}
 		buffer.append("get");
 
@@ -584,7 +582,7 @@ public class Property extends Member implements IProperty
 		buffer.append('\n').append(setterPrefix);
 		if (setterModifiers != null)
 		{
-			setterModifiers.toString(buffer);
+			setterModifiers.toString(setter.getKind(), buffer);
 		}
 		buffer.append("set");
 
