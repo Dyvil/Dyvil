@@ -24,7 +24,10 @@ import dyvil.tools.compiler.ast.type.typevar.CovariantTypeVarType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -472,32 +475,27 @@ public final class TypeParameter implements ITypeParameter
 			// The first upper bound is meant to be a class bound.
 			IType type = this.upperBounds[0] = this.upperBounds[0].resolveType(markers, context);
 			IClass iclass = type.getTheClass();
-			if (iclass != null)
+			if (iclass != null && iclass.hasModifier(Modifiers.INTERFACE_CLASS))
 			{
-				// If the first upper bound is an interface...
-				if (iclass.hasModifier(Modifiers.INTERFACE_CLASS))
+				// shift the entire array one to the right and insert
+				// Types.OBJECT at index 0
+				if (++this.upperBoundCount > this.upperBounds.length)
 				{
-					// shift the entire array one to the right and insert
-					// Type.OBJECT at index 0
-					if (++this.upperBoundCount > this.upperBounds.length)
-					{
-						IType[] temp = new IType[this.upperBoundCount];
-						type = temp[0] = Types.OBJECT;
-						System.arraycopy(this.upperBounds, 0, temp, 1, this.upperBoundCount - 1);
-						this.upperBounds = temp;
-					}
-					else
-					{
-						System.arraycopy(this.upperBounds, 0, this.upperBounds, 1, this.upperBoundCount - 1);
-						type = this.upperBounds[0] = Types.OBJECT;
-					}
+					IType[] temp = new IType[this.upperBoundCount];
+					type = temp[0] = Types.OBJECT;
+					System.arraycopy(this.upperBounds, 0, temp, 1, this.upperBoundCount - 1);
+					this.upperBounds = temp;
+				}
+				else
+				{
+					System.arraycopy(this.upperBounds, 0, this.upperBounds, 1, this.upperBoundCount - 1);
+					type = this.upperBounds[0] = Types.OBJECT;
 				}
 			}
 
 			this.defaultType = type;
 
-			// Check if the remaining upper bounds are interfaces, and remove if
-			// not.
+			// Check if the remaining upper bounds are interfaces
 			for (int i = 1; i < this.upperBoundCount; i++)
 			{
 				type = this.upperBounds[i] = this.upperBounds[i].resolveType(markers, context);
@@ -506,11 +504,9 @@ public final class TypeParameter implements ITypeParameter
 				iclass = type.getTheClass();
 				if (iclass != null && !iclass.hasModifier(Modifiers.INTERFACE_CLASS))
 				{
-					// TODO Error
-
-					System.arraycopy(this.upperBounds, i + 1, this.upperBounds, i, this.upperBoundCount - i - 1);
-					this.upperBoundCount--;
-					i--;
+					final Marker marker = Markers.semanticError(type.getPosition(), "typeparameter.bound.class");
+					marker.addInfo(Markers.getSemantic("class.declaration", Util.classSignatureToString(iclass)));
+					markers.add(marker);
 				}
 			}
 		}
