@@ -18,7 +18,7 @@ import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.MethodParameter;
+import dyvil.tools.compiler.ast.parameter.CodeParameter;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -100,7 +100,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	@Override
 	public void addParameterType(IType type)
 	{
-		this.addParameter(new MethodParameter(Name.getQualified("par" + this.parameterCount), type));
+		this.addParameter(new CodeParameter(Name.getQualified("par" + this.parameterCount), type));
 	}
 
 	@Override

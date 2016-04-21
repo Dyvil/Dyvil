@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.MethodParameter;
+import dyvil.tools.compiler.ast.parameter.CodeParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -52,7 +52,7 @@ public final class Annotation implements IAnnotation
 		}
 	}
 
-	public static final MethodParameter VALUE = new MethodParameter(Name.getQualified("value"));
+	public static final CodeParameter VALUE = new CodeParameter(Name.getQualified("value"));
 
 	protected ICodePosition position;
 	protected IArguments arguments = EmptyArguments.INSTANCE;

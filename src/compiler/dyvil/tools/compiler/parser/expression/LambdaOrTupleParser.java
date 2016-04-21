@@ -4,7 +4,7 @@ import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LambdaExpr;
 import dyvil.tools.compiler.ast.expression.TupleExpr;
-import dyvil.tools.compiler.ast.parameter.MethodParameter;
+import dyvil.tools.compiler.ast.parameter.CodeParameter;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
@@ -114,7 +114,7 @@ public class LambdaOrTupleParser extends Parser
 			if (ParserUtil.isIdentifier(type))
 			{
 				final LambdaExpr lambdaExpr = new LambdaExpr(token.next());
-				lambdaExpr.addParameter(new MethodParameter(token.raw(), token.nameValue(), Types.UNKNOWN));
+				lambdaExpr.addParameter(new CodeParameter(token.raw(), token.nameValue(), Types.UNKNOWN));
 				this.value = lambdaExpr;
 				this.mode = TYPE_ARROW;
 				return;

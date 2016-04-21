@@ -351,9 +351,9 @@ public class ClassMetadata implements IClassMetadata
 				constructor.setVariadic();
 			}
 
-			parameters[i] = new MethodParameter(classParameter.getPosition(), classParameter.getName(),
-			                                    classParameter.getType(), new FlagModifierSet(modifiers),
-			                                    classParameter.getAnnotations());
+			parameters[i] = new CodeParameter(classParameter.getPosition(), classParameter.getName(),
+			                                  classParameter.getType(), new FlagModifierSet(modifiers),
+			                                  classParameter.getAnnotations());
 			parameters[i].setIndex(i);
 		}
 

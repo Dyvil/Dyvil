@@ -39,12 +39,6 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 	}
 
 	@Override
-	public IParameter getParameterNoResolve(int index)
-	{
-		return this.parameters[index];
-	}
-
-	@Override
 	public void setIntrinsicData(IntrinsicData intrinsicData)
 	{
 	}
@@ -71,7 +65,8 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 	{
 	}
 
-	private IContext getCombiningContext()
+	@Override
+	public IContext getExternalContext()
 	{
 		return new CombiningContext(this, new CombiningContext(this.enclosingClass, Package.rootPackage));
 	}
@@ -81,7 +76,7 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 		this.resolved |= ANNOTATIONS;
 		if (this.annotations != null)
 		{
-			this.annotations.resolveTypes(null, this.getCombiningContext(), this);
+			this.annotations.resolveTypes(null, this.getExternalContext(), this);
 		}
 	}
 
@@ -89,7 +84,7 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 	{
 		this.resolved |= PARAMETERS;
 
-		final IContext context = this.getCombiningContext();
+		final IContext context = this.getExternalContext();
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].resolveTypes(null, context);
@@ -100,7 +95,7 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 	{
 		this.resolved |= EXCEPTIONS;
 
-		final IContext context = this.getCombiningContext();
+		final IContext context = this.getExternalContext();
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
 			this.exceptions[i] = this.exceptions[i].resolveType(null, context);

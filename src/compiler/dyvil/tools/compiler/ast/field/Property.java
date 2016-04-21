@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.MethodParameter;
+import dyvil.tools.compiler.ast.parameter.CodeParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -46,8 +46,8 @@ public class Property extends Member implements IProperty
 
 	protected IClass enclosingClass;
 
-	protected MethodParameter setterParameter;
-	protected ICodePosition   initializerPosition;
+	protected CodeParameter setterParameter;
+	protected ICodePosition initializerPosition;
 
 	public Property(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
@@ -120,8 +120,8 @@ public class Property extends Member implements IProperty
 
 		final Name name = Name.get(this.name.unqualified + "_=", this.name.qualified + "_$eq");
 		this.setter = new CodeMethod(this.enclosingClass, name, Types.VOID, this.modifiers);
-		this.setterParameter = new MethodParameter(this.position, Names.newValue, this.type, EmptyModifiers.INSTANCE,
-		                                           null);
+		this.setterParameter = new CodeParameter(this.position, Names.newValue, this.type, EmptyModifiers.INSTANCE,
+		                                         null);
 		this.setter.addParameter(this.setterParameter);
 
 		return this.setter;

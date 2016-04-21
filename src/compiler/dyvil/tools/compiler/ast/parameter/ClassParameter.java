@@ -208,12 +208,12 @@ public final class ClassParameter extends Field implements IParameter
 			// to rely on a boolean field.
 
 			this.modifiers.addIntModifier(Modifiers.VARARGS);
-			MethodParameter.writeInitImpl(this, writer);
+			AbstractParameter.writeInitImpl(this, writer);
 			this.modifiers.removeIntModifier(Modifiers.VARARGS);
 			return;
 		}
 
-		MethodParameter.writeInitImpl(this, writer);
+		AbstractParameter.writeInitImpl(this, writer);
 	}
 
 	@Override

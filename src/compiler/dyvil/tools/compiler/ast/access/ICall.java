@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.MethodParameter;
+import dyvil.tools.compiler.ast.parameter.CodeParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -65,8 +65,8 @@ public interface ICall extends IValue, IArgumentsConsumer
 		IParameter[] parameters = new IParameter[wildcards];
 		for (int i = 0; i < wildcards; i++)
 		{
-			parameters[i] = new MethodParameter(position, Name.getQualified("wildcard$" + i), Types.UNKNOWN,
-			                                    EmptyModifiers.INSTANCE, null);
+			parameters[i] = new CodeParameter(position, Name.getQualified("wildcard$" + i), Types.UNKNOWN,
+			                                  EmptyModifiers.INSTANCE, null);
 		}
 
 		int index = 0;

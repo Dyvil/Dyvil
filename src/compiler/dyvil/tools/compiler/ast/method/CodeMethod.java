@@ -21,7 +21,7 @@ import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.MethodParameter;
+import dyvil.tools.compiler.ast.parameter.CodeParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
@@ -692,7 +692,7 @@ public class CodeMethod extends AbstractMethod
 		this.parameters = new IParameter[parameterCount];
 		for (int i = 0; i < parameterCount; i++)
 		{
-			this.parameters[i] = new MethodParameter(Name.getQualified("par" + i), IType.readType(in));
+			this.parameters[i] = new CodeParameter(Name.getQualified("par" + i), IType.readType(in));
 		}
 	}
 
@@ -708,7 +708,7 @@ public class CodeMethod extends AbstractMethod
 		this.parameters = new IParameter[parameterCount];
 		for (int i = 0; i < parameterCount; i++)
 		{
-			MethodParameter param = new MethodParameter();
+			CodeParameter param = new CodeParameter();
 			param.read(in);
 			this.parameters[i] = param;
 		}

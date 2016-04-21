@@ -739,7 +739,7 @@ public final class ExternalClass extends AbstractClass
 
 			if ((access & Modifiers.VARARGS) != 0)
 			{
-				constructor.getParameterNoResolve(constructor.parameterCount() - 1).setVarargs(true);
+				constructor.getParameter(constructor.parameterCount() - 1).setVarargs(true);
 			}
 
 			this.body.addConstructor(constructor);
@@ -766,7 +766,7 @@ public final class ExternalClass extends AbstractClass
 
 		if ((access & Modifiers.VARARGS) != 0)
 		{
-			method.getParameterNoResolve(method.parameterCount() - 1).setVarargs(true);
+			method.getParameter(method.parameterCount() - 1).setVarargs(true);
 		}
 
 		this.body.addMethod(method);

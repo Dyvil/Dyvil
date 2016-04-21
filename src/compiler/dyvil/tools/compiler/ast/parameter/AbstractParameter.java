@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.parameter;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.asm.AnnotationVisitor;
-import dyvil.tools.asm.Label;
 import dyvil.tools.asm.TypeReference;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -18,7 +17,6 @@ import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -27,15 +25,13 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.backend.visitor.AnnotationValueReader;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.transform.TypeChecker;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
 import java.lang.annotation.ElementType;
 
-public final class MethodParameter extends Member implements IParameter
+public abstract class AbstractParameter extends Member implements IParameter
 {
 	public static final String DEFAULT_VALUE       = "Ldyvil/annotation/_internal/DefaultValue;";
 	public static final String DEFAULT_ARRAY_VALUE = "Ldyvil/annotation/_internal/DefaultArrayValue;";
@@ -49,31 +45,26 @@ public final class MethodParameter extends Member implements IParameter
 	protected int             localIndex;
 	protected IType           internalType;
 
-	public MethodParameter()
+	public AbstractParameter()
 	{
 	}
 
-	public MethodParameter(Name name)
+	public AbstractParameter(Name name)
 	{
 		super(name);
 	}
 
-	public MethodParameter(Name name, IType type)
+	public AbstractParameter(Name name, IType type)
 	{
 		super(name, type);
 	}
 
-	public MethodParameter(Name name, IType type, ModifierSet modifierSet)
-	{
-		super(name, type, modifierSet);
-	}
-
-	public MethodParameter(ICodePosition position, Name name, IType type)
+	public AbstractParameter(ICodePosition position, Name name, IType type)
 	{
 		super(position, name, type);
 	}
 
-	public MethodParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public AbstractParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
 	}
@@ -258,93 +249,16 @@ public final class MethodParameter extends Member implements IParameter
 
 		this.internalType = null;
 
-		if (this.type != null && this.type.isExtension())
+		if (this.type != null)
 		{
-			this.getModifiers().addIntModifier(Modifiers.INFIX_FLAG);
-		}
-
-		if (this.modifiers != null)
-		{
-			if (this.modifiers.hasIntModifier(Modifiers.INFIX_FLAG))
+			if (this.type.isExtension())
+			{
+				this.getModifiers().addIntModifier(Modifiers.INFIX_FLAG);
+			}
+			else if (this.modifiers != null && this.modifiers.hasIntModifier(Modifiers.INFIX_FLAG))
 			{
 				this.type.setExtension(true);
 			}
-		}
-	}
-
-	@Override
-	public void resolve(MarkerList markers, IContext context)
-	{
-		super.resolve(markers, context);
-
-		if (this.type == Types.UNKNOWN)
-		{
-			markers.add(Markers.semantic(this.position, this.getKind().getName() + ".type.infer", this.name));
-		}
-
-		if (this.defaultValue == null)
-		{
-			return;
-		}
-
-		IValue defaultValue = this.defaultValue.resolve(markers, context);
-
-		final String kindName = this.getKind().getName();
-		final TypeChecker.MarkerSupplier markerSupplier = TypeChecker.markerSupplier(kindName + ".type.incompatible",
-		                                                                             kindName + ".type", "value.type",
-		                                                                             this.name);
-
-		defaultValue = TypeChecker.convertValue(defaultValue, this.type, null, markers, context, markerSupplier);
-
-		this.defaultValue = IValue.toAnnotationConstant(defaultValue, markers, context);
-	}
-
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		super.checkTypes(markers, context);
-
-		if (this.defaultValue != null)
-		{
-			this.defaultValue.checkTypes(markers, context);
-		}
-	}
-
-	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-		super.check(markers, context);
-
-		if (this.defaultValue != null)
-		{
-			this.defaultValue.check(markers, context);
-		}
-
-		if (Types.isSameType(this.type, Types.VOID))
-		{
-			markers.add(Markers.semantic(this.position, this.getKind().getName() + ".type.void"));
-		}
-	}
-
-	@Override
-	public void foldConstants()
-	{
-		super.foldConstants();
-
-		if (this.defaultValue != null)
-		{
-			this.defaultValue = this.defaultValue.foldConstants();
-		}
-	}
-
-	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
-	{
-		super.cleanup(context, compilableList);
-
-		if (this.defaultValue != null)
-		{
-			this.defaultValue = this.defaultValue.cleanup(context, compilableList);
 		}
 	}
 
@@ -363,25 +277,6 @@ public final class MethodParameter extends Member implements IParameter
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-	}
-
-	@Override
-	public void writeLocal(MethodWriter writer, Label start, Label end)
-	{
-		writer.visitLocalVariable(this.name.qualified, this.getDescriptor(), this.getSignature(), start, end,
-		                          this.localIndex);
-	}
-
-	@Override
-	public void writeInit(MethodWriter writer)
-	{
-		MethodParameter.writeInitImpl(this, writer);
-	}
-
-	@Override
-	public void writeInit(MethodWriter writer, IValue value) throws BytecodeException
-	{
-		this.writeInit(writer);
 	}
 
 	public static void writeInitImpl(IParameter parameter, MethodWriter writer)
@@ -488,6 +383,18 @@ public final class MethodParameter extends Member implements IParameter
 	}
 
 	@Override
+	public void writeInit(MethodWriter writer)
+	{
+		AbstractParameter.writeInitImpl(this, writer);
+	}
+
+	@Override
+	public void writeInit(MethodWriter writer, IValue value) throws BytecodeException
+	{
+		this.writeInit(writer);
+	}
+
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		if (this.annotations != null)
@@ -532,7 +439,7 @@ public final class MethodParameter extends Member implements IParameter
 		}
 	}
 
-	public void appendType(String prefix, StringBuilder buffer)
+	private void appendType(String prefix, StringBuilder buffer)
 	{
 		if (this.isVarargs())
 		{
