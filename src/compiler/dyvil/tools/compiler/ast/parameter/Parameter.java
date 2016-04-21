@@ -83,6 +83,13 @@ public abstract class Parameter extends Member implements IParameter
 	}
 
 	@Override
+	public void setType(IType type)
+	{
+		this.type = type;
+		this.internalType = null;
+	}
+
+	@Override
 	public IType getInternalType()
 	{
 		if (this.internalType != null)
