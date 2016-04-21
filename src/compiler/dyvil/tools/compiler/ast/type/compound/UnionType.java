@@ -101,9 +101,9 @@ public class UnionType implements IObjectType
 	}
 
 	@Override
-	public boolean needsSubTypeCheck()
+	public int subTypeCheckLevel()
 	{
-		return true;
+		return 1;
 	}
 
 	@Override

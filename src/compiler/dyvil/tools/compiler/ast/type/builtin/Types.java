@@ -210,7 +210,7 @@ public final class Types
 			return true;
 		}
 
-		if (type2.needsSubTypeCheck() && !type1.needsSubTypeCheck())
+		if (type2.subTypeCheckLevel() > type1.subTypeCheckLevel())
 		{
 			return type2.isSameType(type1);
 		}
@@ -228,7 +228,7 @@ public final class Types
 		{
 			return true;
 		}
-		if (subType.needsSubTypeCheck())
+		if (subType.subTypeCheckLevel() > superType.subTypeCheckLevel())
 		{
 			return subType.isSubClassOf(superType);
 		}
@@ -241,7 +241,7 @@ public final class Types
 		{
 			return true;
 		}
-		if (subType.needsSubTypeCheck() && !superType.needsSubTypeCheck())
+		if (subType.subTypeCheckLevel() > superType.subTypeCheckLevel())
 		{
 			return subType.isSubTypeOf(superType);
 		}

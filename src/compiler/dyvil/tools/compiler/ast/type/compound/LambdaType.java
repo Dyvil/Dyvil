@@ -411,7 +411,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameterTypes[i] = this.parameterTypes[i].resolveType(markers, context).asParameterType();
+			this.parameterTypes[i] = this.parameterTypes[i].resolveType(markers, context);
 		}
 		if (this.returnType == null)
 		{

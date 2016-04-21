@@ -256,9 +256,9 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
-	public boolean needsSubTypeCheck()
+	public int subTypeCheckLevel()
 	{
-		return this.type.needsSubTypeCheck();
+		return this.type.subTypeCheckLevel();
 	}
 
 	@Override

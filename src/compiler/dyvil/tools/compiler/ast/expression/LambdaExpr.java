@@ -403,11 +403,11 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			}
 
 			final IType methodParamType = this.method.getParameter(i).getType();
-			final IType concreteType = methodParamType.getConcreteType(this.type).asParameterType().asReturnType();
+			final IType concreteType = methodParamType.getConcreteType(this.type);
 
 			// Can't infer parameter type
 			if (concreteType == Types.UNKNOWN || concreteType instanceof CovariantTypeVarType)
-				// TODO Use better check
+			// TODO Use better check
 			{
 				if ((this.flags & IMPLICIT_PARAMETERS) != 0)
 				{
@@ -422,8 +422,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			parameter.setType(concreteType);
 		}
 
-		this.checkReturnType(markers,
-		                     this.method.getType().getConcreteType(this.type).asParameterType().asReturnType());
+		this.checkReturnType(markers, this.method.getType().getConcreteType(this.type));
 	}
 
 	@Override
@@ -457,16 +456,13 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			final IParameter lambdaParameter = this.parameters[i];
-
-			final IType lambdaParameterType = lambdaParameter.getType();
+			final IType lambdaParameterType = this.parameters[i].getInternalType();
 			if (lambdaParameterType == Types.UNKNOWN)
 			{
 				continue;
 			}
 
-			final IParameter methodParameter = method.getParameter(i);
-			final IType methodParameterType = methodParameter.getType().asParameterType();
+			final IType methodParameterType = method.getParameter(i).getInternalType();
 			if (!Types.isSuperType(methodParameterType, lambdaParameterType))
 			{
 				return false;
