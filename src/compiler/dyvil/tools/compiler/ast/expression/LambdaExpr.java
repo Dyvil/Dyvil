@@ -6,7 +6,6 @@ import dyvil.tools.compiler.ast.access.AbstractCall;
 import dyvil.tools.compiler.ast.access.ConstructorCall;
 import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -23,6 +22,7 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.LambdaType;
+import dyvil.tools.compiler.ast.type.typevar.CovariantTypeVarType;
 import dyvil.tools.compiler.backend.*;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -406,7 +406,8 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			final IType concreteType = methodParamType.getConcreteType(this.type).asParameterType().asReturnType();
 
 			// Can't infer parameter type
-			if (concreteType == Types.UNKNOWN)
+			if (concreteType == Types.UNKNOWN || concreteType instanceof CovariantTypeVarType)
+				// TODO Use better check
 			{
 				if ((this.flags & IMPLICIT_PARAMETERS) != 0)
 				{

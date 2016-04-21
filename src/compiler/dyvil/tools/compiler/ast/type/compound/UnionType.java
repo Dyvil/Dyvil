@@ -82,6 +82,12 @@ public class UnionType implements IObjectType
 		final Set<IClass> commonClassSet = Types.commonClasses(this.left, this.right);
 		commonClassSet.remove(Types.OBJECT_CLASS);
 
+		if (commonClassSet.isEmpty())
+		{
+			this.commonClasses = OBJECT_CLASS_ARRAY;
+			return Types.OBJECT_CLASS;
+		}
+
 		this.commonClasses = new IClass[commonClassSet.size()];
 		commonClassSet.toArray(this.commonClasses);
 
