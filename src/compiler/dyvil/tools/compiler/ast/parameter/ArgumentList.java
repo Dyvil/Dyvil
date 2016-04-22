@@ -8,7 +8,6 @@ import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.TypeChecker;
@@ -270,42 +269,6 @@ public final class ArgumentList implements IArguments, IValueList
 
 		values[startIndex] = arrayExpr;
 		return true;
-	}
-
-	@Override
-	public void inferType(int index, IParameter param, ITypeContext typeContext)
-	{
-		if (index >= this.size)
-		{
-			return;
-		}
-
-		if (param.isVarargs())
-		{
-			inferVarargsType(this.values, index, this.size, param, typeContext);
-			return;
-		}
-
-		param.getInternalType().inferTypes(this.values[index].getType(), typeContext);
-	}
-
-	protected static void inferVarargsType(IValue[] values, int startIndex, int endIndex, IParameter param, ITypeContext typeContext)
-	{
-		final IValue value = values[startIndex];
-		IType type = value.getType();
-
-		if (startIndex + 1 == endIndex && value.checkVarargs(true))
-		{
-			param.getInternalType().inferTypes(type, typeContext);
-			return;
-		}
-
-		for (int i = startIndex + 1; i < endIndex; i++)
-		{
-			type = Types.combine(type, values[i].getType());
-		}
-
-		param.getInternalType().getElementType().inferTypes(type, typeContext);
 	}
 
 	@Override

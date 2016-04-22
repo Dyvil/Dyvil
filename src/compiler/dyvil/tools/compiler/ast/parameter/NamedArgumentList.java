@@ -238,24 +238,6 @@ public final class NamedArgumentList implements IArguments
 	}
 
 	@Override
-	public void inferType(int index, IParameter param, ITypeContext typeContext)
-	{
-		final int argIndex = this.findIndex(index, param.getName());
-		if (argIndex < 0)
-		{
-			return;
-		}
-
-		if (param.isVarargs())
-		{
-			final int endIndex = this.findNextName(argIndex + 1);
-			ArgumentList.inferVarargsType(this.values, argIndex, endIndex, param, typeContext);
-			return;
-		}
-		param.getInternalType().inferTypes(this.values[argIndex].getType(), typeContext);
-	}
-
-	@Override
 	public void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
 	{
 		final int argIndex = this.findIndex(index, param.getName());

@@ -86,11 +86,6 @@ public final class EmptyArguments implements IArguments
 	}
 
 	@Override
-	public void inferType(int index, IParameter param, ITypeContext typeContext)
-	{
-	}
-
-	@Override
 	public float getTypeMatch(int index, IParameter param)
 	{
 		if (param.isVarargs())

@@ -495,7 +495,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return new GenericData(this, this.typeParameterCount);
 		}
 
-		genericData.method = this;
+		genericData.setTypeParametric(this);
 		genericData.setTypeCount(this.typeParameterCount);
 
 		return genericData;
@@ -580,7 +580,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				receiver = new ThisExpr(position, receiverType, context, markers);
 				if (genericData != null)
 				{
-					genericData.setReceiverType(receiverType);
+					genericData.setFallbackTypeContext(receiverType);
 				}
 			}
 		}
@@ -602,7 +602,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		if (genericData != null)
 		{
 			genericData.lock(genericData.typeCount());
-			genericData.setReceiverType(receiver.getType());
+			genericData.setFallbackTypeContext(receiver.getType());
 		}
 	}
 

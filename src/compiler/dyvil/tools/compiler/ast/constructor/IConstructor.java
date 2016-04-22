@@ -27,9 +27,7 @@ public interface IConstructor extends IClassMember, ICallableMember, ICallableSi
 
 	float getSignatureMatch(IArguments arguments);
 	
-	IType checkGenericType(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments);
-	
-	void checkArguments(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments);
+	IType checkArguments(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments);
 	
 	void checkCall(MarkerList markers, ICodePosition position, IContext context, IArguments arguments);
 

@@ -176,22 +176,6 @@ public final class SingleArgument implements IArguments, IValueConsumer
 		this.value.setType(arrayType);
 	}
 
-	@Override
-	public void inferType(int index, IParameter param, ITypeContext typeContext)
-	{
-		if (index != 0 || this.value == null)
-		{
-			return;
-		}
-
-		if (param.isVarargs())
-		{
-			this.inferVarargsType(param, typeContext);
-			return;
-		}
-		param.getInternalType().inferTypes(this.value.getType(), typeContext);
-	}
-
 	private void inferVarargsType(IParameter param, ITypeContext typeContext)
 	{
 		final IType type = this.value.getType();

@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.generic;
 
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -11,37 +10,47 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public final class GenericData implements ITypeList, ITypeContext
 {
-	public    IMethod method;
-	protected IType[] generics;
-	protected int     genericCount;
-	protected int     lockedCount;
-	protected IType   receiverType;
+	protected ITypeParametric typeParametric;
+	protected IType[]         generics;
+	protected int             genericCount;
+	protected int             lockedCount;
+	protected ITypeContext    fallbackTypeContext;
 
 	public GenericData()
 	{
 	}
 
-	public GenericData(IMethod method, int count)
+	public GenericData(ITypeParametric typeParametric, int capacity)
 	{
-		this.method = method;
-		this.generics = new IType[count];
+		this.typeParametric = typeParametric;
+		this.generics = new IType[capacity];
 	}
 
-	public GenericData(IMethod method, IType... generics)
+	public GenericData(ITypeParametric typeParametric, IType... generics)
 	{
-		this.method = method;
+		this.typeParametric = typeParametric;
 		this.genericCount = generics.length;
 		this.generics = generics;
 	}
 
-	public IType getReceiverType()
+	public ITypeParametric getTypeParametric()
 	{
-		return this.receiverType;
+		return this.typeParametric;
 	}
 
-	public void setReceiverType(IType receiverType)
+	public void setTypeParametric(ITypeParametric typeParametric)
 	{
-		this.receiverType = receiverType;
+		this.typeParametric = typeParametric;
+	}
+
+	public ITypeContext getFallbackTypeContext()
+	{
+		return this.fallbackTypeContext;
+	}
+
+	public void setFallbackTypeContext(ITypeContext fallbackTypeContext)
+	{
+		this.fallbackTypeContext = fallbackTypeContext;
 	}
 
 	public void lock(int lockedCount)
@@ -108,13 +117,14 @@ public final class GenericData implements ITypeList, ITypeContext
 
 	private boolean isMethodTypeVariable(ITypeParameter typeVar)
 	{
-		if (typeVar.getGeneric() == this.method)
+		if (typeVar.getGeneric() == this.typeParametric)
 		{
 			return true;
 		}
 
 		final int index = typeVar.getIndex();
-		return index < this.method.typeParameterCount() && this.method.getTypeParameter(index) == typeVar;
+		return index < this.typeParametric.typeParameterCount()
+			       && this.typeParametric.getTypeParameter(index) == typeVar;
 	}
 
 	@Override
@@ -129,7 +139,7 @@ public final class GenericData implements ITypeList, ITypeContext
 			}
 			return this.generics[index];
 		}
-		return this.receiverType == null ? null : this.receiverType.resolveType(typeParameter);
+		return this.fallbackTypeContext == null ? null : this.fallbackTypeContext.resolveType(typeParameter);
 	}
 
 	@Override

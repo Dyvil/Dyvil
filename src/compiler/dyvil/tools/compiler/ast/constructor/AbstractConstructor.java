@@ -10,13 +10,15 @@ import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.generic.MapTypeContext;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
-import dyvil.tools.compiler.ast.parameter.*;
+import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -246,30 +248,47 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	}
 
 	@Override
-	public IType checkGenericType(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments)
+	public IType checkArguments(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments)
 	{
-		final ITypeContext typeContext = new MapTypeContext();
 		final IClass theClass = this.enclosingClass;
 
-		for (int i = 0, count = this.parameters.size(); i < count; i++)
+		if (!theClass.isTypeParametric())
 		{
-			// TODO Remove this
-			arguments.inferType(i, this.parameters.get(i), typeContext);
+			for (int i = 0, count = this.parameters.size(); i < count; i++)
+			{
+				arguments.checkValue(i, this.parameters.get(i), null, markers, context);
+			}
+			return type;
 		}
 
+		final IType theClassType = theClass.getType();
+		final GenericData genericData = new GenericData(theClass);
+
+		theClassType.inferTypes(type, genericData);
+		genericData.lock(genericData.typeCount());
+
+		// Check Values and infer Types
+		for (int i = 0, count = this.parameters.size(); i < count; i++)
+		{
+			arguments.checkValue(i, this.parameters.get(i), genericData, markers, context);
+		}
+
+		genericData.lock(genericData.typeCount());
+
+		// Check Type Var Inference and Compatibility
 		for (int i = 0, count = theClass.typeParameterCount(); i < count; i++)
 		{
 			final ITypeParameter typeParameter = theClass.getTypeParameter(i);
-			final IType typeArgument = typeContext.resolveType(typeParameter);
+			final IType typeArgument = genericData.resolveType(typeParameter);
 
 			if (typeArgument == null || typeArgument.getTypeVariable() == typeParameter)
 			{
 				final IType inferredType = typeParameter.getDefaultType();
 				markers.add(Markers.semantic(position, "constructor.typevar.infer", theClass.getName(),
 				                             typeParameter.getName(), inferredType));
-				typeContext.addMapping(typeParameter, inferredType);
+				genericData.addMapping(typeParameter, inferredType);
 			}
-			else if (!typeParameter.isAssignableFrom(typeArgument, typeContext))
+			else if (!typeParameter.isAssignableFrom(typeArgument, genericData))
 			{
 				final Marker marker = Markers.semanticError(position, "constructor.typevar.incompatible",
 				                                            theClass.getName(), typeParameter.getName());
@@ -279,16 +298,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 			}
 		}
 
-		return theClass.getType().getConcreteType(typeContext);
-	}
-
-	@Override
-	public void checkArguments(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments)
-	{
-		for (int i = 0, count = this.parameters.size(); i < count; i++)
-		{
-			arguments.checkValue(i, this.parameters.get(i), type, markers, context);
-		}
+		return theClassType.getConcreteType(genericData);
 	}
 
 	@Override
