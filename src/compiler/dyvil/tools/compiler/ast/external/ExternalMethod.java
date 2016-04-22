@@ -5,6 +5,7 @@ import dyvil.tools.asm.Label;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.asm.TypeReference;
 import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.CombiningContext;
@@ -110,7 +111,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 			}
 		}
 
-		this.parameterCount -= parametersToRemove;
+		this.parameters.remove(parametersToRemove);
 
 		if (this.receiverType != null)
 		{
@@ -160,9 +161,9 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	public void addParameterType(IType type)
+	public IParameter createParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
-		this.addParameter(new ExternalParameter(Name.getQualified("par" + this.parameterCount), type));
+		return new ExternalParameter(name, type, modifiers, annotations);
 	}
 
 	@Override
@@ -351,7 +352,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		case TypeReference.METHOD_FORMAL_PARAMETER:
 		{
 			int index = TypeReference.getFormalParameterIndex(typeRef);
-			IParameter param = this.parameters[index];
+			IParameter param = this.parameters.get(index);
 			param.setType(IType.withAnnotation(param.getType(), annotation, typePath, 0, typePath.getLength()));
 			break;
 		}

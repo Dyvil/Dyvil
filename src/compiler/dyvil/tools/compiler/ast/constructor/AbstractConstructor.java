@@ -16,9 +16,7 @@ import dyvil.tools.compiler.ast.generic.MapTypeContext;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
-import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.CodeParameter;
+import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -38,8 +36,7 @@ import java.lang.annotation.ElementType;
 
 public abstract class AbstractConstructor extends Member implements IConstructor, IDefaultContext
 {
-	protected IParameter[] parameters = new IParameter[3];
-	protected int parameterCount;
+	protected ParameterList parameters = new ParameterList(3);
 
 	protected IType[] exceptions;
 	protected int     exceptionCount;
@@ -91,63 +88,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	// Parameters
 
 	@Override
-	public void setParameters(IParameter[] parameters, int parameterCount)
-	{
-		this.parameters = parameters;
-		this.parameterCount = parameterCount;
-	}
-
-	@Override
-	public void addParameterType(IType type)
-	{
-		this.addParameter(new CodeParameter(Name.getQualified("par" + this.parameterCount), type));
-	}
-
-	@Override
-	public int parameterCount()
-	{
-		return this.parameterCount;
-	}
-
-	@Override
-	public void setParameter(int index, IParameter parameter)
-	{
-		parameter.setMethod(this);
-		parameter.setIndex(index);
-		this.parameters[index] = parameter;
-	}
-
-	@Override
-	public void addParameter(IParameter parameter)
-	{
-		parameter.setMethod(this);
-
-		final int index = this.parameterCount++;
-
-		parameter.setIndex(index);
-
-		if (parameter.isVarargs())
-		{
-			this.setVariadic();
-		}
-
-		if (index >= this.parameters.length)
-		{
-			IParameter[] temp = new IParameter[this.parameterCount];
-			System.arraycopy(this.parameters, 0, temp, 0, index);
-			this.parameters = temp;
-		}
-		this.parameters[index] = parameter;
-	}
-
-	@Override
-	public IParameter getParameter(int index)
-	{
-		return this.parameters[index];
-	}
-
-	@Override
-	public IParameter[] getParameters()
+	public IParameterList getParameterList()
 	{
 		return this.parameters;
 	}
@@ -237,16 +178,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			IParameter param = this.parameters[i];
-			if (param.getName() == name)
-			{
-				return param;
-			}
-		}
-
-		return null;
+		return this.parameters.resolveParameter(name);
 	}
 
 	@Override
@@ -276,14 +208,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	@Override
 	public boolean isMember(IVariable variable)
 	{
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			if (this.parameters[i] == variable)
-			{
-				return true;
-			}
-		}
-		return false;
+		return this.parameters.isParameter(variable);
 	}
 
 	@Override
@@ -295,26 +220,29 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	@Override
 	public float getSignatureMatch(IArguments arguments)
 	{
-		int match = 1;
-		int argumentCount = arguments.size();
+		int totalMatch = 1;
 
-		if (argumentCount > this.parameterCount && !this.isVariadic())
+		final int parameterCount = this.parameters.size();
+		final int argumentCount = arguments.size();
+
+		if (argumentCount > parameterCount && !this.isVariadic())
 		{
 			return 0;
 		}
 
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0; i < parameterCount; i++)
 		{
-			IParameter par = this.parameters[i];
-			float m = arguments.getTypeMatch(i, par);
+			final IParameter parameter = this.parameters.get(i);
+			final float m = arguments.getTypeMatch(i, parameter);
+
 			if (m == 0)
 			{
 				return 0;
 			}
-			match += m;
+			totalMatch += m;
 		}
 
-		return match;
+		return totalMatch;
 	}
 
 	@Override
@@ -323,9 +251,10 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 		final ITypeContext typeContext = new MapTypeContext();
 		final IClass theClass = this.enclosingClass;
 
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0, count = this.parameters.size(); i < count; i++)
 		{
-			arguments.inferType(i, this.parameters[i], typeContext);
+			// TODO Remove this
+			arguments.inferType(i, this.parameters.get(i), typeContext);
 		}
 
 		for (int i = 0, count = theClass.typeParameterCount(); i < count; i++)
@@ -356,9 +285,9 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	@Override
 	public void checkArguments(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments)
 	{
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0, count = this.parameters.size(); i < count; i++)
 		{
-			arguments.checkValue(i, this.parameters[i], type, markers, context);
+			arguments.checkValue(i, this.parameters.get(i), type, markers, context);
 		}
 	}
 
@@ -382,10 +311,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	{
 		StringBuilder buffer = new StringBuilder();
 		buffer.append('(');
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].appendDescription(buffer);
-		}
+		this.parameters.appendDescriptor(buffer);
 		buffer.append(")V");
 		return buffer.toString();
 	}
@@ -393,17 +319,14 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	@Override
 	public String getSignature()
 	{
-		if (!this.enclosingClass.isTypeParametric())
+		if (!this.enclosingClass.isTypeParametric() && !this.parameters.needsSignature())
 		{
 			return null;
 		}
 
 		StringBuilder buffer = new StringBuilder();
 		buffer.append('(');
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].appendSignature(buffer);
-		}
+		this.parameters.appendSignature(buffer);
 		buffer.append(")V");
 		return buffer.toString();
 	}
@@ -452,9 +375,9 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	@Override
 	public void writeArguments(MethodWriter writer, IArguments arguments) throws BytecodeException
 	{
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0, count = this.parameters.size(); i < count; i++)
 		{
-			arguments.writeValue(i, this.parameters[i], writer);
+			arguments.writeValue(i, this.parameters.get(i), writer);
 		}
 	}
 
@@ -464,10 +387,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 		super.toString(prefix, buffer);
 		buffer.append("init");
 
-		Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
-		Util.astToString(prefix, this.parameters, this.parameterCount,
-		                 Formatting.getSeparator("parameters.separator", ','), buffer);
-		Formatting.appendSeparator(buffer, "parameters.close_paren", ')');
+		this.parameters.toString(prefix, buffer);
 
 		if (this.exceptionCount > 0)
 		{

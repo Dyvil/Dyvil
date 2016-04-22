@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.method.ICallableSignature;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -33,14 +32,6 @@ public interface IConstructor extends IClassMember, ICallableMember, ICallableSi
 	void checkArguments(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments);
 	
 	void checkCall(MarkerList markers, ICodePosition position, IContext context, IArguments arguments);
-	
-	// Misc
-	
-	@Override
-	void setParameters(IParameter[] parameters, int parameterCount);
-
-	@Override
-	void addParameterType(IType type);
 
 	// Compilation
 	

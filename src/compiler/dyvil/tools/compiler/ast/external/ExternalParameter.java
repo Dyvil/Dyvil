@@ -1,9 +1,11 @@
 package dyvil.tools.compiler.ast.external;
 
 import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.method.IExternalCallableMember;
 import dyvil.tools.compiler.ast.parameter.AbstractParameter;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -17,6 +19,11 @@ public class ExternalParameter extends AbstractParameter
 	public ExternalParameter(Name name, IType type)
 	{
 		super(name, type);
+	}
+
+	public ExternalParameter(Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	{
+		super(null, name, type, modifiers, annotations);
 	}
 
 	private void resolveTypes()

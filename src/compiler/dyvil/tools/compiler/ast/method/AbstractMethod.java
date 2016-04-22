@@ -27,7 +27,8 @@ import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.CodeParameter;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.statement.loop.ILoop;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
@@ -64,8 +65,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 	protected IType receiverType;
 
-	protected IParameter[] parameters = new IParameter[3];
-	protected int parameterCount;
+	protected ParameterList parameters = new ParameterList();
 
 	protected IType[] exceptions;
 	protected int     exceptionCount;
@@ -202,62 +202,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void setParameters(IParameter[] parameters, int parameterCount)
-	{
-		this.parameters = parameters;
-		this.parameterCount = parameterCount;
-	}
-
-	@Override
-	public int parameterCount()
-	{
-		return this.parameterCount;
-	}
-
-	@Override
-	public void setParameter(int index, IParameter parameter)
-	{
-		parameter.setMethod(this);
-		parameter.setIndex(index);
-		this.parameters[index] = parameter;
-	}
-
-	@Override
-	public void addParameter(IParameter parameter)
-	{
-		final int index = this.parameterCount++;
-
-		parameter.setMethod(this);
-		parameter.setIndex(index);
-
-		if (parameter.isVarargs())
-		{
-			this.setVariadic();
-		}
-
-		if (index >= this.parameters.length)
-		{
-			IParameter[] temp = new IParameter[this.parameterCount];
-			System.arraycopy(this.parameters, 0, temp, 0, index);
-			this.parameters = temp;
-		}
-		this.parameters[index] = parameter;
-	}
-
-	@Override
-	public void addParameterType(IType type)
-	{
-		this.addParameter(new CodeParameter(Name.getQualified("par" + this.parameterCount), type));
-	}
-
-	@Override
-	public IParameter getParameter(int index)
-	{
-		return this.parameters[index];
-	}
-
-	@Override
-	public IParameter[] getParameters()
+	public IParameterList getParameterList()
 	{
 		return this.parameters;
 	}
@@ -357,12 +302,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public boolean isObjectMethod()
 	{
-		switch (this.parameterCount)
+		switch (this.parameters.size())
 		{
 		case 0:
 			return this.name == Names.toString || this.name == Names.hashCode;
 		case 1:
-			if (this.name == Names.equals && this.getParameter(0).getInternalType().getTheClass() == Types.OBJECT_CLASS)
+			if (this.name == Names.equals
+				    && this.parameters.get(0).getInternalType().getTheClass() == Types.OBJECT_CLASS)
 			{
 				return true;
 			}
@@ -406,16 +352,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			IParameter param = this.parameters[i];
-			if (param.getName() == name)
-			{
-				return param;
-			}
-		}
-
-		return null;
+		return this.parameters.resolveParameter(name);
 	}
 
 	@Override
@@ -462,14 +399,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public boolean isMember(IVariable variable)
 	{
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			if (this.parameters[i] == variable)
-			{
-				return true;
-			}
-		}
-		return false;
+		return this.parameters.isParameter(variable);
 	}
 
 	@Override
@@ -497,7 +427,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			{
 				if (mod == Modifiers.INFIX)
 				{
-					final IType infixReceiverType = this.parameters[0].getType();
+					final IType infixReceiverType = this.parameters.get(0).getType();
 					final float receiverMatch = receiver.getTypeMatch(infixReceiverType);
 					if (receiverMatch == 0)
 					{
@@ -531,7 +461,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 
 		final int argumentCount = arguments.size();
-		final int parametersLeft = this.parameterCount - parameterStartIndex;
+		final int parametersLeft = this.parameters.size() - parameterStartIndex;
 		if (argumentCount > parametersLeft && !this.isVariadic())
 		{
 			return 0;
@@ -539,7 +469,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 		for (int argumentIndex = 0; argumentIndex < parametersLeft; argumentIndex++)
 		{
-			final IParameter parameter = this.parameters[argumentIndex + parameterStartIndex];
+			final IParameter parameter = this.parameters.get(argumentIndex + parameterStartIndex);
 			final float valueMatch = arguments.getTypeMatch(argumentIndex, parameter);
 			if (valueMatch <= 0)
 			{
@@ -586,7 +516,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			final int mod = this.modifiers.toFlags() & Modifiers.INFIX;
 			if (mod == Modifiers.INFIX && receiver.valueTag() != IValue.CLASS_ACCESS)
 			{
-				final IParameter parameter = this.parameters[0];
+				final IParameter parameter = this.parameters.get(0);
 				final IType paramType = parameter.getInternalType();
 
 				updateReceiverType(receiver, genericData);
@@ -595,9 +525,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 				updateReceiverType(receiver, genericData);
 
-				for (int i = 1; i < this.parameterCount; i++)
+				for (int i = 1, count = this.parameters.size(); i < count; i++)
 				{
-					arguments.checkValue(i - 1, this.parameters[i], genericData, markers, context);
+					arguments.checkValue(i - 1, this.parameters.get(i), genericData, markers, context);
 				}
 
 				if (genericData != null)
@@ -655,9 +585,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 		}
 
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0, count = this.parameters.size(); i < count; i++)
 		{
-			arguments.checkValue(i, this.parameters[i], genericData, markers, context);
+			arguments.checkValue(i, this.parameters.get(i), genericData, markers, context);
 		}
 
 		if (genericData != null)
@@ -765,8 +695,10 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return false;
 		}
 
+		final IParameterList candidateParameters = candidate.getParameterList();
+
 		// Check Parameter Count
-		if (candidate.parameterCount() != this.parameterCount)
+		if (candidateParameters.size() != this.parameters.size())
 		{
 			return false;
 		}
@@ -778,10 +710,10 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 
 		// Check Parameter Types
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0, count = this.parameters.size(); i < count; i++)
 		{
-			final IType parType = this.parameters[i].getInternalType().getConcreteType(typeContext);
-			final IType candidateParType = candidate.getParameter(i).getInternalType().getConcreteType(typeContext);
+			final IType parType = this.parameters.get(i).getInternalType().getConcreteType(typeContext);
+			final IType candidateParType = candidateParameters.get(i).getInternalType().getConcreteType(typeContext);
 			if (!Types.isSameType(parType, candidateParType))
 			{
 				return false;
@@ -851,10 +783,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		final StringBuilder buffer = new StringBuilder();
 		buffer.append('(');
 
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].getInternalType().appendExtendedName(buffer);
-		}
+		this.parameters.appendDescriptor(buffer);
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
 			this.typeParameters[i].appendParameterDescriptor(buffer);
@@ -868,19 +797,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 	private boolean needsSignature()
 	{
-		if (this.typeParameterCount != 0 || this.type.isGenericType() || this.type.hasTypeVariables())
-		{
-			return true;
-		}
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			final IType parameterType = this.parameters[i].getInternalType();
-			if (parameterType.isGenericType() || parameterType.hasTypeVariables())
-			{
-				return true;
-			}
-		}
-		return false;
+		return this.typeParameterCount != 0 || this.type.isGenericType() || this.type.hasTypeVariables()
+			       || this.parameters.needsSignature();
 	}
 
 	@Override
@@ -903,10 +821,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 
 		buffer.append('(');
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].getInternalType().appendSignature(buffer);
-		}
+		this.parameters.appendSignature(buffer);
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
 			this.typeParameters[i].appendParameterSignature(buffer);
@@ -994,7 +909,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			if (this.modifiers.hasIntModifier(Modifiers.INFIX))
 			{
-				receiver.writeExpression(writer, this.parameters[0].getType());
+				receiver.writeExpression(writer, this.parameters.get(0).getType());
 				return;
 			}
 
@@ -1012,16 +927,16 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		if (instance != null && this.hasModifier(Modifiers.INFIX))
 		{
-			for (int i = 0, len = this.parameterCount - 1; i < len; i++)
+			for (int i = 0, count = this.parameters.size() - 1; i < count; i++)
 			{
-				arguments.writeValue(i, this.parameters[i + 1], writer);
+				arguments.writeValue(i, this.parameters.get(i + 1), writer);
 			}
 			return;
 		}
 
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0, count = this.parameters.size(); i < count; i++)
 		{
-			arguments.writeValue(i, this.parameters[i], writer);
+			arguments.writeValue(i, this.parameters.get(i), writer);
 		}
 	}
 
@@ -1090,13 +1005,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			else
 			{
 				buffer.append("func");
-				parameters = this.parameterCount > 0 || Formatting.getBoolean("method.parameters.visible");
+				parameters = this.parameters.size() > 0 || Formatting.getBoolean("method.parameters.visible");
 			}
 		}
 		else
 		{
 			buffer.append("func");
-			parameters = this.parameterCount > 0 || Formatting.getBoolean("method.parameters.visible");
+			parameters = this.parameters.size() > 0 || Formatting.getBoolean("method.parameters.visible");
 		}
 
 		// Name
@@ -1119,10 +1034,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		// Parameters
 		if (parameters)
 		{
-			Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
-			Util.astToString(prefix, this.parameters, this.parameterCount,
-			                 Formatting.getSeparator("parameters.separator", ','), buffer);
-			Formatting.appendSeparator(buffer, "parameters.close_paren", ')');
+			this.parameters.toString(prefix, buffer);
 		}
 
 		// Exceptions

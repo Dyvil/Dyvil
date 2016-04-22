@@ -122,7 +122,7 @@ public class Property extends Member implements IProperty
 		this.setter = new CodeMethod(this.enclosingClass, name, Types.VOID, this.modifiers);
 		this.setterParameter = new CodeParameter(this.position, Names.newValue, this.type, EmptyModifiers.INSTANCE,
 		                                         null);
-		this.setter.addParameter(this.setterParameter);
+		this.setter.getParameterList().addParameter(this.setterParameter);
 
 		return this.setter;
 	}
@@ -396,7 +396,7 @@ public class Property extends Member implements IProperty
 			}
 
 			this.writeAnnotations(mw, modifiers);
-			this.setter.getParameter(0).writeInit(mw);
+			this.setter.getParameterList().get(0).writeInit(mw);
 
 			if (setterValue != null)
 			{
@@ -577,7 +577,7 @@ public class Property extends Member implements IProperty
 		final String setterPrefix = Formatting.getIndent("property.setter.indent", prefix);
 		final IValue setterValue = setter.getValue();
 		final ModifierSet setterModifiers = setter.getModifiers();
-		final Name setterParameterName = setter.getParameter(0).getName();
+		final Name setterParameterName = setter.getParameterList().get(0).getName();
 
 		buffer.append('\n').append(setterPrefix);
 		if (setterModifiers != null)

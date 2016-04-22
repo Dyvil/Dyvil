@@ -17,9 +17,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
-import dyvil.tools.compiler.ast.parameter.ClassParameter;
-import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -49,8 +47,8 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	protected ITypeParameter[] typeParameters;
 	protected int              typeParameterCount;
 
-	protected IParameter[] parameters;
-	protected int          parameterCount;
+	// TODO Allow this to be null for performance
+	protected ParameterList parameters = new ParameterList();
 
 	protected IType superType = Types.OBJECT;
 	protected IType[] interfaces;
@@ -302,70 +300,15 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	// Class Parameters
 
 	@Override
-	public int parameterCount()
-	{
-		return this.parameterCount;
-	}
-
-	@Override
-	public IParameter createParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
-	{
-		return new ClassParameter(position, name, type, modifiers, annotations);
-	}
-
-	@Override
-	public IParameter getParameter(int index)
-	{
-		return this.parameters[index];
-	}
-
-	@Override
-	public void addParameter(IParameter parameter)
-	{
-		parameter.setEnclosingClass(this);
-
-		if (this.parameters == null)
-		{
-			parameter.setIndex(0);
-
-			this.parameters = new ClassParameter[2];
-			this.parameters[0] = parameter;
-			this.parameterCount = 1;
-			return;
-		}
-
-		final int index = this.parameterCount++;
-
-		parameter.setIndex(index);
-
-		if (this.parameterCount > this.parameters.length)
-		{
-			IParameter[] temp = new IParameter[this.parameterCount];
-			System.arraycopy(this.parameters, 0, temp, 0, index);
-			this.parameters = temp;
-		}
-		this.parameters[index] = parameter;
-	}
-
-	@Override
-	public void setParameter(int index, IParameter parameter)
-	{
-		parameter.setEnclosingClass(this);
-		parameter.setIndex(index);
-		this.parameters[index] = parameter;
-	}
-
-	@Override
-	public IParameter[] getParameters()
+	public IParameterList getParameterList()
 	{
 		return this.parameters;
 	}
 
 	@Override
-	public void setParameters(IParameter[] parameters, int parameterCount)
+	public IParameter createParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
-		this.parameters = parameters;
-		this.parameterCount = parameterCount;
+		return new ClassParameter(this, position, name, type, modifiers, annotations);
 	}
 
 	// Super Types
@@ -533,9 +476,9 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			return !candidate.hasModifier(Modifiers.ABSTRACT);
 		}
 
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0, count = this.parameters.size(); i < count; i++)
 		{
-			final IProperty property = this.parameters[i].getProperty();
+			final IProperty property = this.parameters.get(i).getProperty();
 			if (property != null && ClassBody.checkPropertyImplements(property, candidate, typeContext))
 			{
 				return true;
@@ -580,9 +523,9 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		}
 		checkedClasses.add(this);
 
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0, count = this.parameters.size(); i < count; i++)
 		{
-			final IProperty property = this.parameters[i].getProperty();
+			final IProperty property = this.parameters.get(i).getProperty();
 			if (property != null)
 			{
 				ClassBody.checkProperty(property, markers, checkedClass, typeContext);
@@ -767,13 +710,10 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		for (int i = 0; i < this.parameterCount; i++)
+		final IParameter parameter = this.parameters.resolveParameter(name);
+		if (parameter != null)
 		{
-			final IParameter param = this.parameters[i];
-			if (param.getName() == name)
-			{
-				return param;
-			}
+			return parameter;
 		}
 
 		IDataMember field;
@@ -809,9 +749,9 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0, count = this.parameters.size(); i < count; i++)
 		{
-			final IProperty property = this.parameters[i].getProperty();
+			final IProperty property = this.parameters.get(i).getProperty();
 			if (property != null)
 			{
 				property.getMethodMatches(list, instance, name, arguments);
@@ -903,14 +843,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public boolean isMember(IVariable variable)
 	{
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			if (this.parameters[i] == variable)
-			{
-				return true;
-			}
-		}
-		return false;
+		return this.parameters.isParameter(variable);
 	}
 
 	@Override
@@ -1036,12 +969,9 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			Formatting.appendSeparator(buffer, "generics.close_bracket", '>');
 		}
 
-		if (this.parameterCount > 0)
+		if (!this.parameters.isEmpty())
 		{
-			Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
-			Util.astToString(prefix, this.parameters, this.parameterCount,
-			                 Formatting.getSeparator("parameters.separator", ','), buffer);
-			Formatting.appendSeparator(buffer, "parameters.close_paren", ')');
+			this.parameters.toString(prefix, buffer);
 		}
 
 		if (this.superType == null)

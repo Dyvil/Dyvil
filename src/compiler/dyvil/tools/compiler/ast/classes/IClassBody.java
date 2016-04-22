@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -87,7 +87,7 @@ public interface IClassBody extends IASTNode, IClassList, IMemberConsumer<IField
 	
 	IConstructor getConstructor(int index);
 	
-	IConstructor getConstructor(IParameter[] parameters, int parameterCount);
+	IConstructor getConstructor(IParameterList parameters);
 	
 	void getConstructorMatches(ConstructorMatchList list, IArguments arguments);
 

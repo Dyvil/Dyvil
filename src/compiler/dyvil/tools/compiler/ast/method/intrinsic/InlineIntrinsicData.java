@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.bytecode.VarInstruction;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -70,11 +71,12 @@ public class InlineIntrinsicData extends InstructionList implements IntrinsicDat
 			}
 
 			this.storedParameters = lastStoredIndex + 1;
-
+			final IParameterList parameterList = this.method.getParameterList();
 			int parameterSlots = 0;
-			for (int i = 0, parameterCount = (this.method.parameterCount()); i < parameterCount; i++)
+
+			for (int i = 0, parameterCount = parameterList.size(); i < parameterCount; i++)
 			{
-				parameterSlots += this.method.getParameter(i).getInternalType().getLocalSlots();
+				parameterSlots += parameterList.get(i).getInternalType().getLocalSlots();
 			}
 			this.parameterSlots = parameterSlots;
 		}

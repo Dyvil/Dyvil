@@ -114,7 +114,7 @@ public class LambdaOrTupleParser extends Parser
 			if (ParserUtil.isIdentifier(type))
 			{
 				final LambdaExpr lambdaExpr = new LambdaExpr(token.next());
-				lambdaExpr.addParameter(new CodeParameter(token.raw(), token.nameValue(), Types.UNKNOWN));
+				lambdaExpr.getParameterList().addParameter(new CodeParameter(token.raw(), token.nameValue(), Types.UNKNOWN));
 				this.value = lambdaExpr;
 				this.mode = TYPE_ARROW;
 				return;

@@ -16,7 +16,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.Modifier;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.IParametric;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.ParserUtil;
@@ -461,7 +461,7 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 			this.mode = CONSTRUCTOR_PARAMETERS_END;
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
-				pm.pushParser(new ParameterListParser((IParameterList) this.member));
+				pm.pushParser(new ParameterListParser((IParametric) this.member));
 				return;
 			}
 			pm.reparse();

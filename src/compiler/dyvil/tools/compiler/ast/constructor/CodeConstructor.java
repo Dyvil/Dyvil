@@ -11,8 +11,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
-import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.CodeParameter;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -23,7 +22,6 @@ import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -83,10 +81,7 @@ public class CodeConstructor extends AbstractConstructor
 
 		super.resolveTypes(markers, context);
 
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].resolveTypes(markers, context);
-		}
+		this.parameters.resolveTypes(markers, context);
 
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
@@ -108,10 +103,7 @@ public class CodeConstructor extends AbstractConstructor
 
 		context = context.push(this);
 
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].resolve(markers, context);
-		}
+		this.parameters.resolve(markers, context);
 
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
@@ -190,10 +182,7 @@ public class CodeConstructor extends AbstractConstructor
 
 		super.checkTypes(markers, context);
 
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].checkTypes(markers, context);
-		}
+		this.parameters.checkTypes(markers, context);
 
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
@@ -220,10 +209,7 @@ public class CodeConstructor extends AbstractConstructor
 
 		super.check(markers, context);
 
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].check(markers, context);
-		}
+		this.parameters.check(markers, context);
 
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
@@ -268,10 +254,7 @@ public class CodeConstructor extends AbstractConstructor
 			this.annotations.foldConstants();
 		}
 
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].foldConstants();
-		}
+		this.parameters.foldConstants();
 
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
@@ -295,10 +278,7 @@ public class CodeConstructor extends AbstractConstructor
 
 		super.cleanup(context, compilableList);
 
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].cleanup(context, compilableList);
-		}
+		this.parameters.cleanup(context, compilableList);
 
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
@@ -341,10 +321,7 @@ public class CodeConstructor extends AbstractConstructor
 
 		// Write Parameters
 		methodWriter.setThisType(this.enclosingClass.getInternalName());
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].writeInit(methodWriter);
-		}
+		this.parameters.writeInit(methodWriter);
 
 		// Write Code
 		final Label start = new Label();
@@ -374,20 +351,13 @@ public class CodeConstructor extends AbstractConstructor
 		// Write Local Variable Data
 		methodWriter.visitLocalVariable("this", 'L' + this.enclosingClass.getInternalName() + ';', null, start, end, 0);
 
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].writeLocal(methodWriter, start, end);
-		}
+		this.parameters.writeLocals(methodWriter, start, end);
 	}
 
 	@Override
 	public void writeSignature(DataOutput out) throws IOException
 	{
-		out.writeByte(this.parameterCount);
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			IType.writeType(this.parameters[i].getType(), out);
-		}
+		this.parameters.writeSignature(out);
 	}
 
 	@Override
@@ -395,46 +365,19 @@ public class CodeConstructor extends AbstractConstructor
 	{
 		this.writeAnnotations(out);
 
-		out.writeByte(this.parameterCount);
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].write(out);
-		}
+		this.parameters.write(out);
 	}
 
 	@Override
 	public void readSignature(DataInput in) throws IOException
 	{
-		int parameterCount = in.readByte();
-		if (this.parameterCount != 0)
-		{
-			for (int i = 0; i < parameterCount; i++)
-			{
-				this.parameters[i].setType(IType.readType(in));
-			}
-			this.parameterCount = parameterCount;
-			return;
-		}
-
-		this.parameters = new IParameter[parameterCount];
-		for (int i = 0; i < parameterCount; i++)
-		{
-			this.parameters[i] = new CodeParameter(Name.getQualified("par" + i), IType.readType(in));
-		}
+		this.parameters.readSignature(in);
 	}
 
 	@Override
 	public void read(DataInput in) throws IOException
 	{
 		this.readAnnotations(in);
-
-		int parameterCount = in.readByte();
-		this.parameters = new IParameter[parameterCount];
-		for (int i = 0; i < parameterCount; i++)
-		{
-			CodeParameter param = new CodeParameter();
-			param.read(in);
-			this.parameters[i] = param;
-		}
+		this.parameters = ParameterList.read(in);
 	}
 }

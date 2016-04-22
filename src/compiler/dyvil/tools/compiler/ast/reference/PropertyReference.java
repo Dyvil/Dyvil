@@ -45,7 +45,7 @@ public class PropertyReference implements IReference
 		this.setterMethod = ICall.resolveMethod(context, this.receiver, setterName,
 		                                        new SingleArgument(new WildcardValue(null)));
 
-		if (this.setterMethod == null || this.setterMethod.parameterCount() != 1)
+		if (this.setterMethod == null || this.setterMethod.getParameterList().size() != 1)
 		{
 			markers.add(Markers.semanticError(position, "reference.property.no_setter", getterName));
 		}

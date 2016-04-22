@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -59,8 +60,7 @@ public final class CaseClassMetadata extends ClassMetadata
 
 		if (this.constructor != null && (this.members & CONSTRUCTOR) == 0)
 		{
-			applyMethod.setParameters(this.constructor.getParameters(), this.constructor.parameterCount());
-
+			this.constructor.getParameterList().copyTo(applyMethod.getParameterList());
 			if (this.constructor.isVariadic())
 			{
 				applyMethod.setVariadic();
@@ -104,10 +104,11 @@ public final class CaseClassMetadata extends ClassMetadata
 			mw.visitCode();
 			mw.visitTypeInsn(Opcodes.NEW, this.theClass.getType().getInternalName());
 			mw.visitInsn(Opcodes.DUP);
-			int len = this.theClass.parameterCount();
-			for (int i = 0; i < len; i++)
+
+			final IParameterList parameterList = this.theClass.getParameterList();
+			for (int i = 0, count = parameterList.size(); i < count; i++)
 			{
-				IParameter param = this.theClass.getParameter(i);
+				IParameter param = parameterList.get(i);
 				param.writeInit(mw);
 				mw.visitVarInsn(param.getType().getLoadOpcode(), param.getLocalIndex());
 			}

@@ -31,7 +31,7 @@ public class REPLVariable extends Field
 
 	public REPLVariable(REPLContext context, ICodePosition position, Name name, IType type, String className, ModifierSet modifiers, AnnotationList annotations)
 	{
-		super(position, name, type, modifiers, annotations);
+		super(null, position, name, type, modifiers, annotations);
 		this.context = context;
 		this.className = className;
 

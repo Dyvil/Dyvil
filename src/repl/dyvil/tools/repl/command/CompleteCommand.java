@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
@@ -234,9 +235,10 @@ public class CompleteCommand implements ICommand
 		dejaVu.add(iclass);
 
 		// Add members
-		for (int i = 0, count = iclass.parameterCount(); i < count; i++)
+		final IParameterList parameterList = iclass.getParameterList();
+		for (int i = 0, count = parameterList.size(); i < count; i++)
 		{
-			final IParameter parameter = iclass.getParameter(i);
+			final IParameter parameter = parameterList.get(i);
 			if (matches(start, parameter, false))
 			{
 				fields.add(Util.memberSignatureToString(parameter, type));

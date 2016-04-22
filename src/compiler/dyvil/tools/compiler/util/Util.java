@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
@@ -55,26 +56,13 @@ public final class Util
 			stringBuilder.append('>');
 		}
 
-		stringBuilder.append('(');
-
-		final int params = method.parameterCount();
-		if (params > 0)
-		{
-			appendType(method.getParameter(0).getType(), typeContext, stringBuilder);
-			for (int i = 1; i < params; i++)
-			{
-				stringBuilder.append(", ");
-				appendType(method.getParameter(i).getType(), typeContext, stringBuilder);
-			}
-		}
-
-		stringBuilder.append(')');
+		method.getParameterList().signatureToString(stringBuilder, typeContext);
 
 		stringBuilder.append(": ");
 		ITypeContext.apply(typeContext, method.getType()).toString("", stringBuilder);
 	}
 
-	private static void appendType(IType type, ITypeContext typeContext, StringBuilder stringBuilder)
+	public static void typeToString(IType type, ITypeContext typeContext, StringBuilder stringBuilder)
 	{
 		if (type == null)
 		{
@@ -116,19 +104,10 @@ public final class Util
 			stringBuilder.append('>');
 		}
 
-		final int params = iClass.parameterCount();
-		if (params > 0)
+		final IParameterList parameterList = iClass.getParameterList();
+		if (!parameterList.isEmpty())
 		{
-			stringBuilder.append('(');
-
-			appendType(iClass.getParameter(0).getType(), null, stringBuilder);
-			for (int i = 1; i < params; i++)
-			{
-				stringBuilder.append(", ");
-				appendType(iClass.getParameter(i).getType(), null, stringBuilder);
-			}
-
-			stringBuilder.append(')');
+			parameterList.signatureToString(stringBuilder, null);
 		}
 	}
 

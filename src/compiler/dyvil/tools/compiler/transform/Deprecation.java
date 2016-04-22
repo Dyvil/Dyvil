@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
@@ -38,21 +39,24 @@ public final class Deprecation
 
 	public static final IType DEPRECATED = new ClassType(DEPRECATED_CLASS);
 
-	private static final IParameter DEP_VALUE_PARAM        = DEPRECATED_CLASS.getParameter(0);
-	private static final IParameter DEP_DESCRIPTION_PARAM  = DEPRECATED_CLASS.getParameter(1);
-	private static final IParameter DEP_SINCE_PARAM        = DEPRECATED_CLASS.getParameter(2);
-	private static final IParameter DEP_REASONS_PARAM      = DEPRECATED_CLASS.getParameter(3);
-	private static final IParameter DEP_REPLACEMENTS_PARAM = DEPRECATED_CLASS.getParameter(4);
-	private static final IParameter DEP_MARKER_TYPE_PARAM  = DEPRECATED_CLASS.getParameter(5);
+	private static final IParameterList DEPRECATED_PARAMETERS  = DEPRECATED_CLASS.getParameterList();
+	private static final IParameter     DEP_VALUE_PARAM        = DEPRECATED_PARAMETERS.get(0);
+	private static final IParameter     DEP_DESCRIPTION_PARAM  = DEPRECATED_PARAMETERS.get(1);
+	private static final IParameter     DEP_SINCE_PARAM        = DEPRECATED_PARAMETERS.get(2);
+	private static final IParameter     DEP_REASONS_PARAM      = DEPRECATED_PARAMETERS.get(3);
+	private static final IParameter     DEP_REPLACEMENTS_PARAM = DEPRECATED_PARAMETERS.get(4);
+	private static final IParameter     DEP_MARKER_TYPE_PARAM  = DEPRECATED_PARAMETERS.get(5);
 
-	private static final IParameter EXP_VALUE_PARAM       = EXPERIMENTAL_CLASS.getParameter(0);
-	private static final IParameter EXP_DESCRIPTION_PARAM = EXPERIMENTAL_CLASS.getParameter(1);
-	private static final IParameter EXP_STAGE_PARAM       = EXPERIMENTAL_CLASS.getParameter(2);
-	private static final IParameter EXP_MARKER_TYPE_PARAM = EXPERIMENTAL_CLASS.getParameter(3);
+	private static final IParameterList EXPERIMENTAL_PARAMETERS = EXPERIMENTAL_CLASS.getParameterList();
+	private static final IParameter     EXP_VALUE_PARAM         = EXPERIMENTAL_PARAMETERS.get(0);
+	private static final IParameter     EXP_DESCRIPTION_PARAM   = EXPERIMENTAL_PARAMETERS.get(1);
+	private static final IParameter     EXP_STAGE_PARAM         = EXPERIMENTAL_PARAMETERS.get(2);
+	private static final IParameter     EXP_MARKER_TYPE_PARAM   = EXPERIMENTAL_PARAMETERS.get(3);
 
-	private static final IParameter INF_VALUE_PARAM       = USAGE_INFO_CLASS.getParameter(0);
-	private static final IParameter INF_DESCRIPTION_PARAM = USAGE_INFO_CLASS.getParameter(1);
-	private static final IParameter INF_MARKER_TYPE_PARAM = USAGE_INFO_CLASS.getParameter(2);
+	private static final IParameterList USAGE_INFO_PARAMETERS = USAGE_INFO_CLASS.getParameterList();
+	private static final IParameter     INF_VALUE_PARAM       = USAGE_INFO_PARAMETERS.get(0);
+	private static final IParameter     INF_DESCRIPTION_PARAM = USAGE_INFO_PARAMETERS.get(1);
+	private static final IParameter     INF_MARKER_TYPE_PARAM = USAGE_INFO_PARAMETERS.get(2);
 
 	public static final String MEMBER_KIND = "{member.kind}";
 	public static final String MEMBER_NAME = "{member.name}";

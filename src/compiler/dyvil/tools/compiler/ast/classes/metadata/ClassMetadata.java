@@ -25,7 +25,6 @@ import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -134,64 +133,53 @@ public class ClassMetadata implements IClassMetadata
 
 	private void checkMethod(IMethod method)
 	{
+		final IParameterList parameters = method.getParameterList();
 		switch (method.getName().unqualified)
 		{
 		case "equals":
-			if (method.parameterCount() == 1
-				    && method.getParameter(0).getInternalType().getTheClass() == Types.OBJECT_CLASS)
+			if (parameters.size() == 1 && parameters.get(0).getInternalType().getTheClass() == Types.OBJECT_CLASS)
 			{
 				this.members |= EQUALS;
 			}
 			return;
 		case "hashCode":
-			if (method.parameterCount() == 0)
+			if (parameters.isEmpty())
 			{
 				this.members |= HASHCODE;
 			}
 			return;
 		case "toString":
-			if (method.parameterCount() == 0)
+			if (parameters.isEmpty())
 			{
 				this.members |= TOSTRING;
 			}
 			return;
 		case "apply":
-			if (method.parameterCount() == this.theClass.parameterCount())
+			if (parameters.matches(this.theClass.getParameterList()))
 			{
-				final int len = this.theClass.parameterCount();
-				for (int i = 0; i < len; i++)
-				{
-					final IType methodParameterType = method.getParameter(i).getType();
-					final IType classParameterType = this.theClass.getParameter(i).getType();
-					if (!Types.isSameType(methodParameterType, classParameterType))
-					{
-						return;
-					}
-				}
-
 				this.members |= APPLY;
 			}
 			return;
 		case "readResolve":
-			if (method.parameterCount() == 0)
+			if (parameters.isEmpty())
 			{
 				this.members |= READ_RESOLVE;
 			}
 			return;
 		case "writeReplace":
-			if (method.parameterCount() == 0)
+			if (parameters.isEmpty())
 			{
 				this.members |= WRITE_REPLACE;
 			}
 			return;
 		case "nullValue":
-			if (method.parameterCount() == 0)
+			if (parameters.isEmpty())
 			{
 				this.members |= NULLVALUE;
 			}
 			return;
 		case "nilValue":
-			if (method.parameterCount() == 0)
+			if (parameters.isEmpty())
 			{
 				this.members |= NILVALUE;
 			}
@@ -226,8 +214,8 @@ public class ClassMetadata implements IClassMetadata
 			return;
 		}
 
-		final int parameterCount = this.theClass.parameterCount();
-		final IConstructor constructor = body.getConstructor(this.theClass.getParameters(), parameterCount);
+		final IParameterList parameters = this.theClass.getParameterList();
+		final IConstructor constructor = body.getConstructor(parameters);
 		if (constructor != null)
 		{
 			this.constructor = constructor;
@@ -235,8 +223,9 @@ public class ClassMetadata implements IClassMetadata
 			return;
 		}
 
-		if (parameterCount == 0)
+		if (parameters.isEmpty())
 		{
+			// Empty Default Constructor
 			this.members |= CONSTRUCTOR;
 		}
 	}
@@ -337,12 +326,13 @@ public class ClassMetadata implements IClassMetadata
 
 	protected void copyClassParameters(IParametric constructor)
 	{
-		final int parameterCount = this.theClass.parameterCount();
+		final IParameterList classParameters = this.theClass.getParameterList();
+		final int parameterCount = classParameters.size();
 		final IParameter[] parameters = new IParameter[parameterCount];
 
 		for (int i = 0; i < parameterCount; i++)
 		{
-			final IParameter classParameter = this.theClass.getParameter(i);
+			final IParameter classParameter = classParameters.get(i);
 
 			int modifiers = classParameter.getModifiers().toFlags() & Modifiers.PARAMETER_MODIFIERS;
 			if (classParameter.isVarargs())
@@ -357,7 +347,7 @@ public class ClassMetadata implements IClassMetadata
 			parameters[i].setIndex(i);
 		}
 
-		constructor.setParameters(parameters, parameterCount);
+		constructor.getParameterList().setParameterArray(parameters, parameterCount);
 	}
 
 	@Override
@@ -395,9 +385,11 @@ public class ClassMetadata implements IClassMetadata
 			this.constructor.setInitializer(this.superInitializer);
 
 			final StatementList constructorBody = new StatementList();
-			for (int i = 0, count = this.theClass.parameterCount(); i < count; i++)
+			final IParameterList parameters = this.constructor.getParameterList();
+
+			for (int i = 0, count = parameters.size(); i < count; i++)
 			{
-				constructorBody.addValue(new ClassParameterSetter(this.theClass, this.constructor.getParameter(i)));
+				constructorBody.addValue(new ClassParameterSetter(this.theClass, parameters.get(i)));
 			}
 
 			this.constructor.setValue(constructorBody);
@@ -410,9 +402,11 @@ public class ClassMetadata implements IClassMetadata
 			// public static TypeName nullValue() = if (NULL != null) NULL else NULL = new TypeName(0, false, null, ...)
 
 			final ArgumentList arguments = new ArgumentList();
-			for (int i = 0, count = this.theClass.parameterCount(); i < count; i++)
+			final IParameterList parameters = this.theClass.getParameterList();
+
+			for (int i = 0, count = parameters.size(); i < count; i++)
 			{
-				arguments.addValue(this.theClass.getParameter(i).getInternalType().getDefaultValue());
+				arguments.addValue(parameters.get(i).getInternalType().getDefaultValue());
 			}
 
 			final FieldAccess fieldAccess = new FieldAccess(this.nullField);
@@ -428,9 +422,11 @@ public class ClassMetadata implements IClassMetadata
 			// public static TypeName nilValue() = if (NIL != null) NIL else NIL = new TypeName(0, false, nil, ...)
 
 			final ArgumentList arguments = new ArgumentList();
-			for (int i = 0, count = this.theClass.parameterCount(); i < count; i++)
+			final IParameterList parameters = this.theClass.getParameterList();
+
+			for (int i = 0, count = parameters.size(); i < count; i++)
 			{
-				final IParameter parameter = this.theClass.getParameter(i);
+				final IParameter parameter = parameters.get(i);
 
 				arguments.addValue(
 					NilExpr.nilOrDefault(parameter.getPosition(), parameter.getInternalType(), null, markers, context));

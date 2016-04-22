@@ -4,12 +4,14 @@ import dyvil.tools.asm.ASMConstants;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
+import dyvil.tools.compiler.ast.external.ExternalParameter;
 import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.ast.generic.TypeParameter;
 import dyvil.tools.compiler.ast.generic.Variance;
-import dyvil.tools.compiler.ast.method.ICallableSignature;
+import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.method.IExceptionList;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
@@ -178,9 +180,15 @@ public final class ClassFormat
 		}
 	}
 
-	private static ITypeConsumer addParameterType(ICallableSignature methodSignature)
+	private static ITypeConsumer parameterTypeConsumer(ICallableMember methodSignature)
 	{
-		return methodSignature::addParameterType;
+		final IParameterList parameterList = methodSignature.getParameterList();
+		return type -> {
+			final ExternalParameter parameter = new ExternalParameter(Name.getQualified("par" + parameterList.size()),
+			                                                          type);
+			parameter.setMethod(methodSignature);
+			parameterList.addParameter(parameter);
+		};
 	}
 
 	public static void readMethodType(String desc, IMethod method)
@@ -196,7 +204,7 @@ public final class ClassFormat
 		}
 		while (desc.charAt(i) != ')')
 		{
-			i = readTyped(desc, i, addParameterType(method));
+			i = readTyped(desc, i, parameterTypeConsumer(method));
 		}
 		i++;
 		i = readTyped(desc, i, method);
@@ -214,7 +222,7 @@ public final class ClassFormat
 		int i = 1;
 		while (desc.charAt(i) != ')')
 		{
-			i = readTyped(desc, i, addParameterType(constructor));
+			i = readTyped(desc, i, parameterTypeConsumer(constructor));
 		}
 		i += 2;
 

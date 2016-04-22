@@ -21,7 +21,8 @@ import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.CodeParameter;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
@@ -119,10 +120,7 @@ public class CodeMethod extends AbstractMethod
 			this.typeParameters[i].resolveTypes(markers, context);
 		}
 
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].resolveTypes(markers, context);
-		}
+		this.parameters.resolveTypes(markers, context);
 
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
@@ -162,10 +160,7 @@ public class CodeMethod extends AbstractMethod
 			this.receiverType.resolve(markers, context);
 		}
 
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].resolve(markers, context);
-		}
+		this.parameters.resolve(markers, context);
 
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
@@ -223,10 +218,7 @@ public class CodeMethod extends AbstractMethod
 			this.typeParameters[i].checkTypes(markers, context);
 		}
 
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].checkTypes(markers, context);
-		}
+		this.parameters.checkTypes(markers, context);
 
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
@@ -259,10 +251,7 @@ public class CodeMethod extends AbstractMethod
 			this.receiverType.check(markers, context);
 		}
 
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].check(markers, this);
-		}
+		this.parameters.check(markers, context);
 
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
@@ -306,8 +295,11 @@ public class CodeMethod extends AbstractMethod
 		final String desc = this.getDescriptor();
 		for (int i = body.methodCount() - 1; i >= 0; i--)
 		{
+			// TODO Extract method for duplicate check
+
 			final IMethod method = body.getMethod(i);
-			if (method == this || method.getName() != this.name || method.parameterCount() != this.parameterCount)
+			if (method == this || method.getName() != this.name || method.getParameterList().size() != this.parameters
+				                                                                                           .size())
 			{
 				continue;
 			}
@@ -428,10 +420,7 @@ public class CodeMethod extends AbstractMethod
 			this.receiverType.foldConstants();
 		}
 
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].foldConstants();
-		}
+		this.parameters.foldConstants();
 
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
@@ -470,10 +459,7 @@ public class CodeMethod extends AbstractMethod
 			this.typeParameters[i].cleanup(context, compilableList);
 		}
 
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].cleanup(context, compilableList);
-		}
+		this.parameters.cleanup(context, compilableList);
 
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
@@ -516,10 +502,7 @@ public class CodeMethod extends AbstractMethod
 
 		this.writeAnnotations(methodWriter, modifiers);
 
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].writeInit(methodWriter);
-		}
+		this.parameters.writeInit(methodWriter);
 
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
@@ -538,10 +521,7 @@ public class CodeMethod extends AbstractMethod
 			methodWriter.visitEnd(this.type);
 		}
 
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].writeLocal(methodWriter, start, end);
-		}
+		this.parameters.writeLocals(methodWriter, start, end);
 
 		if ((modifiers & Modifiers.STATIC) != 0)
 		{
@@ -583,10 +563,12 @@ public class CodeMethod extends AbstractMethod
 
 			methodWriter.visitVarInsn(Opcodes.ALOAD, 0);
 
-			for (int p = 0; p < this.parameterCount; p++)
+			final IParameterList overrideParameterList = overrideMethod.getParameterList();
+
+			for (int p = 0, count = this.parameters.size(); p < count; p++)
 			{
-				final IParameter overrideParameter = overrideMethod.getParameter(p);
-				final IType parameterType = this.parameters[p].getInternalType();
+				final IParameter overrideParameter = overrideParameterList.get(p);
+				final IType parameterType = this.parameters.get(p).getInternalType();
 				final IType overrideParameterType = overrideParameter.getInternalType();
 
 				overrideParameter.writeInit(methodWriter);
@@ -650,11 +632,7 @@ public class CodeMethod extends AbstractMethod
 		out.writeUTF(this.name.qualified);
 		IType.writeType(this.type, out);
 
-		out.writeByte(this.parameterCount);
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			IType.writeType(this.parameters[i].getType(), out);
-		}
+		this.parameters.writeSignature(out);
 	}
 
 	@Override
@@ -665,11 +643,7 @@ public class CodeMethod extends AbstractMethod
 		out.writeUTF(this.name.qualified);
 		IType.writeType(this.type, out);
 
-		out.writeByte(this.parameterCount);
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].write(out);
-		}
+		this.parameters.write(out);
 	}
 
 	@Override
@@ -677,23 +651,7 @@ public class CodeMethod extends AbstractMethod
 	{
 		this.type = IType.readType(in);
 
-		int parameterCount = in.readByte();
-		if (this.parameterCount != 0)
-		{
-
-			for (int i = 0; i < parameterCount; i++)
-			{
-				this.parameters[i].setType(IType.readType(in));
-			}
-			this.parameterCount = parameterCount;
-			return;
-		}
-
-		this.parameters = new IParameter[parameterCount];
-		for (int i = 0; i < parameterCount; i++)
-		{
-			this.parameters[i] = new CodeParameter(Name.getQualified("par" + i), IType.readType(in));
-		}
+		this.parameters.readSignature(in);
 	}
 
 	@Override
@@ -703,14 +661,6 @@ public class CodeMethod extends AbstractMethod
 
 		this.name = Name.get(in.readUTF());
 		this.type = IType.readType(in);
-
-		int parameterCount = in.readByte();
-		this.parameters = new IParameter[parameterCount];
-		for (int i = 0; i < parameterCount; i++)
-		{
-			CodeParameter param = new CodeParameter();
-			param.read(in);
-			this.parameters[i] = param;
-		}
+		this.parameters = ParameterList.read(in);
 	}
 }

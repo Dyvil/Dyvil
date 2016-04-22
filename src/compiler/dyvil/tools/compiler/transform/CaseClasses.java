@@ -4,6 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -27,7 +28,7 @@ public interface CaseClasses
 		writer.visitInsn(IRETURN); // return true
 		// else
 		writer.visitLabel(label);
-		
+
 		// Write check 'if (obj == null)'
 		writer.visitVarInsn(ALOAD, 1);
 		// if
@@ -37,7 +38,7 @@ public interface CaseClasses
 		writer.visitInsn(IRETURN); // return false
 		// else
 		writer.visitLabel(label);
-		
+
 		// Write check 'if (this.getClass() != obj.getClass())'
 		// this.getClass()
 		writer.visitVarInsn(ALOAD, 0);
@@ -52,27 +53,27 @@ public interface CaseClasses
 		writer.visitInsn(IRETURN);
 		// else
 		writer.visitLabel(label);
-		
+
 		// var = (ClassName) obj
 		writer.visitVarInsn(ALOAD, 1);
 		writer.visitTypeInsn(CHECKCAST, theClass.getInternalName());
 		// 'var' variable that stores the casted 'obj' parameter
 		writer.visitVarInsn(ASTORE, 2);
-		
-		int len = theClass.parameterCount();
-		for (int i = 0; i < len; i++)
+
+		final IParameterList parameters = theClass.getParameterList();
+		for (int i = 0, count = parameters.size(); i < count; i++)
 		{
-			writeEquals(writer, theClass.getParameter(i));
+			writeEquals(writer, parameters.get(i));
 		}
-		
+
 		writer.visitLdcInsn(1);
 		writer.visitInsn(IRETURN);
 	}
-	
+
 	static void writeEquals(MethodWriter writer, IDataMember field) throws BytecodeException
 	{
 		IType type = field.getType();
-		
+
 		if (type.isPrimitive())
 		{
 			// Push 'this'
@@ -81,7 +82,7 @@ public interface CaseClasses
 			// Push 'var'
 			writer.visitVarInsn(ALOAD, 2);
 			field.writeGet(writer, null, 0);
-			
+
 			Label label = new Label();
 			switch (type.getTypecode())
 			{
@@ -107,11 +108,11 @@ public interface CaseClasses
 			writer.visitLabel(label);
 			return;
 		}
-		
+
 		// if (this.f == null) { if (var.f != null) return true }
 		// else if (!this.f.equals(var.f)) return false;
 		// Code generated using ASMifier
-		
+
 		Label elseLabel = new Label();
 		Label endLabel = new Label();
 		writer.visitVarInsn(ALOAD, 0);
@@ -127,7 +128,7 @@ public interface CaseClasses
 		field.writeGet(writer, null, 0);
 		writer.visitVarInsn(ALOAD, 2);
 		field.writeGet(writer, null, 0);
-		
+
 		writer.visitLineNumber(0);
 		if (type.isArrayType())
 		{
@@ -137,13 +138,13 @@ public interface CaseClasses
 		{
 			writer.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false);
 		}
-		
+
 		writer.visitJumpInsn(IFNE, endLabel);
 		writer.visitLdcInsn(0);
 		writer.visitInsn(IRETURN);
 		writer.visitLabel(endLabel);
 	}
-	
+
 	static void writeArrayEquals(MethodWriter writer, IType type) throws BytecodeException
 	{
 		switch (type.typeTag())
@@ -185,36 +186,36 @@ public interface CaseClasses
 		default:
 			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", "equals",
 			                       "([Ljava/lang/Object;[Ljava/lang/Object;)Z", true);
-			return;
 		}
 	}
-	
+
 	static void writeHashCode(MethodWriter writer, IClass theClass) throws BytecodeException
 	{
 		writer.visitLdcInsn(31);
-		
-		int len = theClass.parameterCount();
-		for (int i = 0; i < len; i++)
+
+		final IParameterList parameters = theClass.getParameterList();
+		for (int i = 0, count = parameters.size(); i < count; i++)
 		{
-			IDataMember field = theClass.getParameter(i);
+			final IDataMember parameter = parameters.get(i);
+
 			// Load the value of the field
 			writer.visitVarInsn(ALOAD, 0);
-			field.writeGet(writer, null, 0);
-			// Write the hashing strategy for the field
-			writeHashCode(writer, field.getType());
+			parameter.writeGet(writer, null, 0);
+			// Write the hashing strategy for the parameter
+			writeHashCode(writer, parameter.getType());
 			// Add the hash to the previous result
 			writer.visitInsn(IADD);
 			writer.visitLdcInsn(31);
 			// Multiply the result by 31
 			writer.visitInsn(IMUL);
 		}
-		
+
 		writer.visitInsn(IRETURN);
 	}
-	
+
 	static void writeHashCode(MethodWriter writer, IType type) throws BytecodeException
 	{
-		
+
 		if (type.isPrimitive())
 		{
 			switch (type.getTypecode())
@@ -272,12 +273,12 @@ public interface CaseClasses
 				return;
 			}
 		}
-		
+
 		Label elseLabel = new Label();
 		Label endLabel = new Label();
-		
+
 		// Write an Object hashing snippet
-		
+
 		// if
 		writer.visitInsn(DUP);
 		writer.visitJumpInsn(IFNULL, elseLabel);
@@ -298,7 +299,7 @@ public interface CaseClasses
 		writer.visitLdcInsn(0);
 		writer.visitLabel(endLabel);
 	}
-	
+
 	static void writeArrayHashCode(MethodWriter writer, IType type) throws BytecodeException
 	{
 		switch (type.typeTag())
@@ -338,12 +339,12 @@ public interface CaseClasses
 			                       "([Ljava/lang/Object;)I", true);
 			return;
 		default:
-			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", "hashCode",
-			                       "([Ljava/lang/Object;)I", true);
-			return;
+			writer
+				.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", "hashCode", "([Ljava/lang/Object;)I",
+				                 true);
 		}
 	}
-	
+
 	static void writeToString(MethodWriter writer, IClass theClass) throws BytecodeException
 	{
 		// ----- StringBuilder Constructor -----
@@ -353,20 +354,20 @@ public interface CaseClasses
 		// argument
 		writer.visitLdcInsn(theClass.getName() + "(");
 		writer.visitMethodInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(Ljava/lang/String;)V", false);
-		
-		// ----- Fields -----
-		int params = theClass.parameterCount();
-		for (int i = 0; i < params; i++)
+
+		// ----- Class Parameters -----
+		final IParameterList parameters = theClass.getParameterList();
+		for (int i = 0, count = parameters.size(); i < count; i++)
 		{
-			IDataMember field = theClass.getParameter(i);
-			IType type = field.getType();
-			
-			// Get the field
+			final IDataMember parameter = parameters.get(i);
+			IType type = parameter.getType();
+
+			// Get the parameter value
 			writer.visitVarInsn(ALOAD, 0);
-			field.writeGet(writer, null, 0);
-			
+			parameter.writeGet(writer, null, 0);
+
 			writeStringAppend(writer, type);
-			if (i + 1 < params)
+			if (i + 1 < count)
 			{
 				// Separator Comma
 				writer.visitLdcInsn(", ");
@@ -374,20 +375,20 @@ public interface CaseClasses
 				                       "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false);
 			}
 		}
-		
+
 		// ----- Append Closing Parenthesis -----
 		writer.visitLdcInsn(")");
 		// Write the call to the StringBuilder#append(String) method
 		writer.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append",
 		                       "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false);
-		
+
 		// ----- ToString -----
 		// Write the call to the StringBuilder#toString() method
 		writer.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);
 		// Write the return
 		writer.visitInsn(ARETURN);
 	}
-	
+
 	static void writeStringAppend(MethodWriter writer, String string) throws BytecodeException
 	{
 		switch (string.length())
@@ -403,17 +404,16 @@ public interface CaseClasses
 			writer.visitLdcInsn(string);
 			writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append",
 			                       "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false);
-			return;
 		}
 	}
-	
+
 	static void writeStringAppend(MethodWriter writer, IType type) throws BytecodeException
 	{
 		// Write the call to the StringBuilder#append() method that
 		// corresponds to the type of the field
-		
+
 		writer.visitLineNumber(0);
-		
+
 		if (type.isArrayType())
 		{
 			writer.visitInsn(Opcodes.SWAP);
@@ -421,7 +421,7 @@ public interface CaseClasses
 			writeArrayStringAppend(writer, type.getElementType());
 			return;
 		}
-		
+
 		StringBuilder desc = new StringBuilder().append('(');
 		if (type.isPrimitive())
 		{
@@ -436,11 +436,10 @@ public interface CaseClasses
 			desc.append("Ljava/lang/Object;");
 		}
 		desc.append(")Ljava/lang/StringBuilder;");
-		
+
 		writer.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", desc.toString(), false);
-		return;
 	}
-	
+
 	static void writeArrayStringAppend(MethodWriter writer, IType type) throws BytecodeException
 	{
 		switch (type.typeTag())
@@ -490,7 +489,6 @@ public interface CaseClasses
 		default:
 			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", "toString",
 			                       "([Ljava/lang/Object;Ljava/lang/StringBuilder;)V", true);
-			return;
 		}
 	}
 }

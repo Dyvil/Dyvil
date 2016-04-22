@@ -69,9 +69,10 @@ public class Field extends Member implements IField
 		this.enclosingClass = enclosingClass;
 	}
 
-	public Field(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public Field(IClass enclosingClass, ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
+		this.enclosingClass = enclosingClass;
 	}
 
 	@Override
@@ -301,7 +302,7 @@ public class Field extends Member implements IField
 		}
 		if (setter != null)
 		{
-			final IParameter setterParameter = setter.getParameter(0);
+			final IParameter setterParameter = setter.getParameterList().get(0);
 			setterParameter.setType(this.type);
 
 			if (setter.getValue() == null)

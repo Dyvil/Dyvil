@@ -45,9 +45,9 @@ public class ClassParameter extends Field implements IParameter
 		super(enclosingClass, name, type);
 	}
 
-	public ClassParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public ClassParameter(IClass enclosingClass, ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
-		super(position, name, type, modifiers == null ? new ModifierList() : modifiers, annotations);
+		super(enclosingClass, position, name, type, modifiers == null ? new ModifierList() : modifiers, annotations);
 	}
 
 	@Override

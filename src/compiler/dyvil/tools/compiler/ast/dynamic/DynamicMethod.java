@@ -17,7 +17,8 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -78,11 +79,6 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	public IType getType()
 	{
 		return Types.DYNAMIC;
-	}
-	
-	@Override
-	public void addParameterType(IType type)
-	{
 	}
 
 	@Override
@@ -218,40 +214,13 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	{
 		return null;
 	}
-	
+
 	@Override
-	public int parameterCount()
+	public IParameterList getParameterList()
 	{
-		return 0;
+		return new ParameterList(0); // TODO EmptyParameterList?
 	}
-	
-	@Override
-	public void setParameters(IParameter[] parameters, int parameterCount)
-	{
-	}
-	
-	@Override
-	public void setParameter(int index, IParameter parameter)
-	{
-	}
-	
-	@Override
-	public void addParameter(IParameter parameter)
-	{
-	}
-	
-	@Override
-	public IParameter getParameter(int index)
-	{
-		return null;
-	}
-	
-	@Override
-	public IParameter[] getParameters()
-	{
-		return null;
-	}
-	
+
 	@Override
 	public int exceptionCount()
 	{
