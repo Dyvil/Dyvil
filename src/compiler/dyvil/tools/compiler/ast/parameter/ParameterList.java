@@ -19,8 +19,6 @@ import java.io.IOException;
 
 public class ParameterList implements IParameterList
 {
-	protected IParametric parametric;
-
 	protected IParameter[] parameters;
 	protected int          parameterCount;
 
@@ -102,8 +100,14 @@ public class ParameterList implements IParameterList
 
 	public void remove(int count)
 	{
+		final int end = this.parameterCount;
+
+		// Set excessive array elements to null to let the GC do it's job
 		this.parameterCount -= count;
-		// TODO Set array elements to null
+		for (int i = this.parameterCount; i < end; i++)
+		{
+			this.parameters[i] = null;
+		}
 	}
 
 	// Resolution
