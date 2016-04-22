@@ -1,8 +1,9 @@
-package dyvil.tools.compiler.ast.parameter;
+package dyvil.tools.compiler.ast.external;
 
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.method.IExternalCallableMember;
+import dyvil.tools.compiler.ast.parameter.AbstractParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;

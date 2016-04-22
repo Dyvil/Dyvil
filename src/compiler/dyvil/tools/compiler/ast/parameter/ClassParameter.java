@@ -22,7 +22,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public final class ClassParameter extends Field implements IParameter
+public class ClassParameter extends Field implements IParameter
 {
 	// Metadata
 	protected int     index;
@@ -43,11 +43,6 @@ public final class ClassParameter extends Field implements IParameter
 	public ClassParameter(IClass enclosingClass, Name name, IType type)
 	{
 		super(enclosingClass, name, type);
-	}
-
-	public ClassParameter(IClass enclosingClass, Name name, IType type, ModifierSet modifiers)
-	{
-		super(enclosingClass, name, type, modifiers == null ? new ModifierList() : modifiers);
 	}
 
 	public ClassParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
