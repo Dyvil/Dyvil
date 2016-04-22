@@ -15,12 +15,12 @@ import java.util.function.Function;
 public class ArraySet<E> extends AbstractArraySet<E> implements MutableSet<E>
 {
 	private static final long serialVersionUID = -6676561653968567088L;
-	
+
 	public static <E> ArraySet<E> apply()
 	{
 		return new ArraySet<>();
 	}
-	
+
 	@SafeVarargs
 	public static <E> ArraySet<E> apply(E... elements)
 	{
@@ -31,43 +31,43 @@ public class ArraySet<E> extends AbstractArraySet<E> implements MutableSet<E>
 	{
 		return new ArraySet<>(elements);
 	}
-	
+
 	public ArraySet()
 	{
 		super(new Object[DEFAULT_CAPACITY], 0, true);
 	}
-	
+
 	public ArraySet(int size)
 	{
 		super(new Object[size], 0, true);
 	}
-	
+
 	@SafeVarargs
 	public ArraySet(E... elements)
 	{
-		super(elements);
+		super((Object[]) elements);
 	}
-	
+
 	public ArraySet(E[] elements, int size)
 	{
 		super(elements, size);
 	}
-	
+
 	public ArraySet(E[] elements, boolean trusted)
 	{
 		super(elements, elements.length, trusted);
 	}
-	
+
 	public ArraySet(E[] elements, int size, boolean trusted)
 	{
 		super(elements, size, trusted);
 	}
-	
+
 	public ArraySet(Collection<E> elements)
 	{
 		super(elements);
 	}
-	
+
 	@Override
 	public void clear()
 	{
@@ -77,26 +77,13 @@ public class ArraySet<E> extends AbstractArraySet<E> implements MutableSet<E>
 			this.elements[i] = null;
 		}
 	}
-	
+
 	@Override
 	public boolean add(E element)
 	{
-		if (this.contains(element))
-		{
-			return false;
-		}
-		
-		int index = this.size++;
-		if (index >= this.elements.length)
-		{
-			Object[] temp = new Object[this.size];
-			System.arraycopy(this.elements, 0, temp, 0, index);
-			this.elements = temp;
-		}
-		this.elements[index] = element;
-		return true;
+		return this.addInternal(element);
 	}
-	
+
 	@Override
 	public boolean remove(Object element)
 	{
@@ -110,7 +97,7 @@ public class ArraySet<E> extends AbstractArraySet<E> implements MutableSet<E>
 		}
 		return false;
 	}
-	
+
 	@Override
 	protected void removeAt(int index)
 	{
@@ -121,25 +108,25 @@ public class ArraySet<E> extends AbstractArraySet<E> implements MutableSet<E>
 		}
 		this.elements[this.size] = null;
 	}
-	
+
 	@Override
 	public void map(Function<? super E, ? extends E> mapper)
 	{
 		this.mapImpl(mapper);
 	}
-	
+
 	@Override
 	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper)
 	{
 		this.flatMapImpl(mapper);
 	}
-	
+
 	@Override
 	public MutableSet<E> copy()
 	{
 		return this.mutableCopy();
 	}
-	
+
 	@Override
 	public ImmutableSet<E> immutable()
 	{
