@@ -6,6 +6,8 @@ import	dyvil.annotation.Reified
 import	dyvil.util.AutoPrinter
 using	dyvil.reflect.Opcodes._
 
+using   java.lang.System.currentTimeMillis => milliTime
+
 /**
  * Experimental Language Features
  */
@@ -39,11 +41,7 @@ public final class LanguageFeatures
 
 	public static infix inline R run<T, R>(T self, T.() -> R f) = f(self)
 
-	public static infix inline T use<T>(T self, T.() -> void f)
-	{
-		f(self)
-		return self
-	}
+	public static infix inline T use<T>(T self, T.() -> void f) = self.{ f $0; $0 }
 
 	public static inline R with<T, R>(T receiver, T -> R f) = f(receiver)
 
@@ -51,27 +49,17 @@ public final class LanguageFeatures
 
 	public const String ENDL = System.lineSeparator
 
-	public infix inline func <<(PrintStream stream, any value): PrintStream
-	{
-		stream.print(value)
-		return stream
-	}
+	public infix inline func <<(PrintStream stream, any value): PrintStream = stream.{ print value; $0 }
 
-	public static inline func println(AutoPrinter.() -> void closure): void = closure(new AutoPrinter)
+	public static inline func println(AutoPrinter.() -> void closure): void = closure(AutoPrinter)
 
 	// Timing
 
-	public static inline long measureMillis(-> void f)
-	{
-		long millis = System.currentTimeMillis
-		f()
-		return System.currentTimeMillis - millis
-	}
+	public static inline long measureMillis(-> void f) = System.milliTime.{ f(); System.milliTime - $0 }
 
-	public static inline long measureNanos(-> void f)
-	{
-		long nanos = System.nanoTime
-		f()
-		return System.nanoTime - nanos
-	}
+	public static inline long measureNanos(-> void f) = System.nanoTime.{ f(); System.nanoTime - $0 }
+
+	public static inline (R, long) milliTimed<R>(-> R f) = System.milliTime.{ (f(), System.milliTime - $0) }
+
+	public static inline (R, long) nanoTimed<R>(-> R f) = System.nanoTime.{ (f(), System.nanoTime - $0) }
 }
