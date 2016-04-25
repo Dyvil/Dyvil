@@ -427,7 +427,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			{
 				if (mod == Modifiers.INFIX)
 				{
-					final IType infixReceiverType = this.parameters.get(0).getType();
+					final IType infixReceiverType = this.parameters.get(0).getInternalType();
 					final float receiverMatch = receiver.getTypeMatch(infixReceiverType);
 					if (receiverMatch == 0)
 					{
@@ -860,9 +860,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			this.writeArgumentsAndInvoke(writer, instance, arguments, typeContext, lineNumber);
 		}
 
-		if (Types.isSameType(targetType, Types.VOID))
+		if (Types.isVoid(targetType))
 		{
-			if (!Types.isSameType(this.type, Types.VOID))
+			if (!Types.isVoid(this.type))
 			{
 				writer.visitInsn(Opcodes.AUTO_POP);
 			}

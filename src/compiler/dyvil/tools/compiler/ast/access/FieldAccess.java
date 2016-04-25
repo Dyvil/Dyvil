@@ -482,7 +482,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		{
 			type = this.getType();
 		}
-		else if (Types.isSameType(type, Types.VOID))
+		else if (Types.isVoid(type))
 		{
 			type = this.getType();
 			this.field.getType().writeCast(writer, type, lineNumber);

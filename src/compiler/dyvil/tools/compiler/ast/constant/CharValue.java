@@ -225,7 +225,7 @@ public final class CharValue implements IConstantValue
 		}
 
 		writer.visitLdcInsn(this.value);
-		if (Types.isSameType(type, Types.VOID))
+		if (Types.isVoid(type))
 		{
 			writer.visitInsn(Opcodes.ARETURN);
 		}

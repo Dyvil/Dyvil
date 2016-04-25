@@ -112,7 +112,7 @@ public final class CastOperator extends AbstractValue
 			this.value = typedValue;
 			
 			final IType newType = typedValue.getType();
-			if (!Types.isSameType(valueType, newType) && Types.isSuperClass(this.type, newType)
+			if (!Types.isExactType(valueType, newType) && Types.isSuperClass(this.type, newType)
 					&& newType.isPrimitive() == this.type.isPrimitive())
 			{
 				this.typeHint = true;
@@ -192,7 +192,7 @@ public final class CastOperator extends AbstractValue
 			type = this.type;
 		}
 
-		if (Types.isSameType(type, Types.VOID))
+		if (Types.isVoid(type))
 		{
 			writer.visitInsn(Opcodes.AUTO_POP);
 			return;

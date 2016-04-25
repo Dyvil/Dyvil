@@ -250,7 +250,7 @@ public class Property extends Member implements IProperty
 	{
 		super.check(markers, context);
 
-		if (Types.isSameType(this.type, Types.VOID))
+		if (Types.isVoid(this.type))
 		{
 			markers.add(Markers.semanticError(this.position, "property.type.void"));
 		}

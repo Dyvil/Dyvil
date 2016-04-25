@@ -89,7 +89,7 @@ public class CodeParameter extends AbstractParameter
 			this.defaultValue.check(markers, context);
 		}
 
-		if (Types.isSameType(this.type, Types.VOID))
+		if (Types.isVoid(this.type))
 		{
 			markers.add(Markers.semantic(this.position, this.getKind().getName() + ".type.void"));
 		}

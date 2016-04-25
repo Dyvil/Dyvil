@@ -146,7 +146,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	@Override
 	public boolean isType(IType type)
 	{
-		if (Types.isSameType(type, Types.VOID))
+		if (Types.isVoid(type))
 		{
 			return true;
 		}

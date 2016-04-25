@@ -399,7 +399,7 @@ public final class TypeParameter implements ITypeParameter
 				return true;
 			}
 		}
-		return Types.isSameType(superType, Types.OBJECT);
+		return Types.isExactType(superType, Types.OBJECT);
 	}
 
 	@Override

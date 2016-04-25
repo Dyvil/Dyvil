@@ -146,7 +146,7 @@ public class ReferenceType implements IObjectType
 	public IType asParameterType()
 	{
 		final IType type = this.type.asParameterType();
-		return type == this.type ? this : new ReferenceType(type);
+		return type == this.type ? this : type.getRefType();
 	}
 
 	@Override

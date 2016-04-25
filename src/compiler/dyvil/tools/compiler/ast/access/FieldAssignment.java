@@ -135,7 +135,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (Types.isSameType(type, Types.VOID))
+		if (Types.isVoid(type))
 		{
 			return this;
 		}
@@ -153,7 +153,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	@Override
 	public boolean isType(IType type)
 	{
-		return Types.isSameType(type, Types.VOID) || this.value.isType(type);
+		return Types.isVoid(type) || this.value.isType(type);
 	}
 
 	@Override
@@ -393,7 +393,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		final int lineNumber = this.getLineNumber();
-		if (Types.isSameType(type, Types.VOID))
+		if (Types.isVoid(type))
 		{
 			this.field.writeSet(writer, this.receiver, this.value, lineNumber);
 			return;

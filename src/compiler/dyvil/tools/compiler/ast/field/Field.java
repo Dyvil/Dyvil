@@ -356,7 +356,7 @@ public class Field extends Member implements IField
 			this.property.checkTypes(markers, context);
 		}
 
-		if (Types.isSameType(this.type, Types.VOID))
+		if (Types.isVoid(this.type))
 		{
 			markers.add(Markers.semantic(this.position, "field.type.void"));
 		}

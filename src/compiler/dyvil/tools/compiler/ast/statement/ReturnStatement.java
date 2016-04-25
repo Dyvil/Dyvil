@@ -75,7 +75,7 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (Types.isSameType(type, Types.VOID))
+		if (Types.isVoid(type))
 		{
 			return this;
 		}
@@ -95,7 +95,7 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 	@Override
 	public boolean isType(IType type)
 	{
-		return Types.isSameType(type, Types.VOID) || this.value != null && this.value.isType(type);
+		return Types.isVoid(type) || this.value != null && this.value.isType(type);
 	}
 
 	@Override
@@ -191,7 +191,7 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 	{
 		if (this.value == null)
 		{
-			if (type == null || Types.isSameType(type, Types.VOID))
+			if (type == null || Types.isVoid(type))
 			{
 				writer.visitInsn(Opcodes.RETURN);
 				return;
@@ -201,7 +201,7 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 			return;
 		}
 
-		if (Types.isSameType(type, Types.VOID))
+		if (Types.isVoid(type))
 		{
 			this.value.writeExpression(writer, null);
 			writer.visitInsn(this.value.getType().getReturnOpcode());

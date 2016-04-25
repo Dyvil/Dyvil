@@ -227,7 +227,7 @@ public final class Variable extends Member implements IVariable
 			this.value.check(markers, context);
 		}
 
-		if (Types.isSameType(this.type, Types.VOID))
+		if (Types.isVoid(this.type))
 		{
 			markers.add(Markers.semantic(this.position, "variable.type.void"));
 		}

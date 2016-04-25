@@ -3,8 +3,6 @@ package dyvil.tools.compiler.ast.expression;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.AbstractValue;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
@@ -146,7 +144,7 @@ public final class InstanceOfOperator extends AbstractValue
 		}
 		
 		final IType valueType = this.value.getType();
-		if (Types.isSameType(this.type, valueType))
+		if (Types.isExactType(this.type, valueType))
 		{
 			markers.add(Markers.semantic(this.position, "instanceof.type.equal", valueType));
 			return;

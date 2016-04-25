@@ -157,7 +157,7 @@ public interface IValue extends IASTNode, ITyped
 
 	default boolean isStatement()
 	{
-		return Types.isSameType(this.getType(), Types.VOID);
+		return Types.isVoid(this.getType());
 	}
 
 	default boolean isUsableAsStatement()

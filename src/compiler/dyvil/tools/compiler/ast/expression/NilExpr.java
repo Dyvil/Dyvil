@@ -87,7 +87,7 @@ public class NilExpr implements IValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (type.isArrayType() || Types.isSameType(type, Types.STRING))
+		if (type.isArrayType() || Types.isExactType(type, Types.STRING))
 		{
 			this.requiredType = type;
 			this.methodName = Names.apply;
@@ -146,7 +146,7 @@ public class NilExpr implements IValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return type.isArrayType() || Types.isSameType(type, Types.STRING)
+		return type.isArrayType() || Types.isExactType(type, Types.STRING)
 			       || type.getTheClass().getAnnotation(LazyFields.NIL_CONVERTIBLE_CLASS) != null;
 	}
 
@@ -218,7 +218,7 @@ public class NilExpr implements IValue
 			writer.visitLdcInsn(0);
 			writer.visitMultiANewArrayInsn(this.requiredType, 1);
 		}
-		else if (Types.isSameType(this.requiredType, Types.STRING))
+		else if (Types.isExactType(this.requiredType, Types.STRING))
 		{
 			writer.visitLdcInsn("");
 		}

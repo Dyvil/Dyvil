@@ -195,7 +195,7 @@ public class UnionType implements IObjectType
 
 	public static IType combine(IType left, IType right, UnionType unionType)
 	{
-		if (Types.isSameType(left, Types.VOID) || Types.isSameType(right, Types.VOID))
+		if (Types.isVoid(left) || Types.isVoid(right))
 		{
 			// either type is void -> result void
 			return Types.VOID;

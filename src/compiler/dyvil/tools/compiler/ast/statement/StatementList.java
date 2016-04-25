@@ -130,7 +130,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	{
 		if (this.valueCount <= 0)
 		{
-			return Types.isSameType(type, Types.VOID) ? this : null;
+			return Types.isVoid(type) ? this : null;
 		}
 
 		context = context.push(this);
@@ -173,7 +173,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		{
 			return this.values[this.valueCount - 1].isType(type);
 		}
-		return Types.isSameType(type, Types.VOID);
+		return Types.isVoid(type);
 	}
 
 	@Override

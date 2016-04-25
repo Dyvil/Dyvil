@@ -63,7 +63,7 @@ public final class CharPattern extends Pattern
 			return null;
 		}
 		
-		if (Types.isSameType(type, Types.STRING))
+		if (Types.isExactType(type, Types.STRING))
 		{
 			this.type = TYPE_STRING;
 			return this;

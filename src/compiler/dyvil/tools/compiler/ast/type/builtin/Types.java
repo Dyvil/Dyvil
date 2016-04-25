@@ -217,6 +217,16 @@ public final class Types
 		return type1.isSameType(type2);
 	}
 
+	public static boolean isVoid(IType type)
+	{
+		return type.getTypecode() == PrimitiveType.VOID_CODE;
+	}
+
+	public static boolean isExactType(IType type1, IType type2)
+	{
+		return type1 == type2 || type1.isSameType(type2) && type2.isSameType(type1);
+	}
+
 	public static boolean isSuperClass(IClass superClass, IClass subClass)
 	{
 		return superClass == subClass || superClass.getClassType().isSuperClassOf(subClass.getClassType());

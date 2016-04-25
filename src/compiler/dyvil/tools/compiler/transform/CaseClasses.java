@@ -427,7 +427,7 @@ public interface CaseClasses
 		{
 			type.appendExtendedName(desc);
 		}
-		else if (Types.isSameType(type, Types.STRING))
+		else if (Types.isExactType(type, Types.STRING))
 		{
 			desc.append("Ljava/lang/String;");
 		}

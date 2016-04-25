@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.generic;
 
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.ast.type.typevar.CovariantTypeVarType;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -15,10 +14,6 @@ public enum Variance
 			@Override
 			public boolean checkCompatible(IType a, IType b)
 			{
-				if (a instanceof CovariantTypeVarType)
-				{
-					return a.isSuperTypeOf(b);
-				}
 				return Types.isSameType(a, b);
 			}
 		},
