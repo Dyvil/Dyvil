@@ -324,7 +324,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 				candidate = operator;
 			}
 		}
-		if (candidate != null)
+		if (candidate != null && candidate.getType() == type)
 		{
 			return candidate;
 		}
@@ -337,7 +337,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 				return operator;
 			}
 		}
-		return null;
+		return candidate;
 	}
 
 	@Override

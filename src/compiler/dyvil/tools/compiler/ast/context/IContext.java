@@ -162,12 +162,11 @@ public interface IContext extends IMemberContext
 	static IOperator resolveOperator(IContext context, Name name, int type)
 	{
 		final IOperator operator = context.resolveOperator(name, type);
-		if (operator != null)
+		if (operator == null || operator.getType() != type)
 		{
-			return operator;
+			return Types.LANG_HEADER.resolveOperator(name, type);
 		}
-
-		return Types.LANG_HEADER.resolveOperator(name, type);
+		return operator;
 	}
 
 	static IConstructor resolveConstructor(IMemberContext context, IArguments arguments)
