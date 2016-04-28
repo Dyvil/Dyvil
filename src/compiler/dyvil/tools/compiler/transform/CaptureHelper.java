@@ -49,12 +49,12 @@ public class CaptureHelper
 		// Check if the variable is already in the array
 		for (int i = 0; i < this.capturedFieldCount; i++)
 		{
-			final CaptureDataMember var = this.capturedFields[i];
-			if (var.getVariable() == variable)
+			final CaptureDataMember capture = this.capturedFields[i];
+			if (capture.getVariable() == variable)
 			{
 				// If yes, return the match and skip adding the variable
 				// again.
-				return variable;
+				return capture;
 			}
 		}
 
