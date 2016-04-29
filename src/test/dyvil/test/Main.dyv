@@ -32,6 +32,7 @@ public class Main
 		RangeTest.main(args)
 		ReferenceTest.main(args)
 		ReifyTest.main(args)
+		SortTest.main(args)
 		TypeTest.main(args)
 		VarargsTest.main(args)
 	}
