@@ -6,20 +6,24 @@ import dyvil.tools.compiler.ast.header.HeaderDeclaration;
 import dyvil.tools.compiler.ast.header.ImportDeclaration;
 import dyvil.tools.compiler.ast.header.IncludeDeclaration;
 import dyvil.tools.compiler.ast.header.PackageDeclaration;
-import dyvil.tools.compiler.ast.modifiers.*;
+import dyvil.tools.compiler.ast.modifiers.Modifier;
+import dyvil.tools.compiler.ast.modifiers.ModifierList;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
+import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
-import dyvil.tools.parsing.IParserManager;
-import dyvil.tools.parsing.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
+import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;
 
 public class DyvilHeaderParser extends Parser
@@ -59,6 +63,15 @@ public class DyvilHeaderParser extends Parser
 		{
 		case DyvilKeywords.IMPORT:
 		{
+			final IToken next = token.next();
+			if (next.type() == DyvilKeywords.STATIC)
+			{
+				pm.report(Markers.syntaxWarning(next, "import.using.static"));
+				pm.skip();
+				this.createUsingDeclaration(pm, token.to(next));
+				return true;
+			}
+
 			ImportDeclaration i = new ImportDeclaration(token.raw());
 			pm.pushParser(new ImportParser(im -> {
 				i.setImport(im);
@@ -68,11 +81,7 @@ public class DyvilHeaderParser extends Parser
 		}
 		case DyvilKeywords.USING:
 		{
-			ImportDeclaration i = new ImportDeclaration(token.raw(), true);
-			pm.pushParser(new ImportParser(im -> {
-				i.setImport(im);
-				this.unit.addUsing(i);
-			}));
+			this.createUsingDeclaration(pm, token);
 			return true;
 		}
 		case DyvilKeywords.OPERATOR:
@@ -107,6 +116,15 @@ public class DyvilHeaderParser extends Parser
 		return false;
 	}
 
+	private void createUsingDeclaration(IParserManager pm, ICodePosition position)
+	{
+		ImportDeclaration i = new ImportDeclaration(position, true);
+		pm.pushParser(new ImportParser(im -> {
+			i.setImport(im);
+			this.unit.addUsing(i);
+		}));
+	}
+
 	protected boolean parseMetadata(IParserManager pm, IToken token, int type)
 	{
 		Modifier modifier;
@@ -139,7 +157,7 @@ public class DyvilHeaderParser extends Parser
 
 				Name name = next.nameValue();
 				this.unit.setHeaderDeclaration(
-						new HeaderDeclaration(this.unit, next.raw(), name, this.modifiers, this.annotations));
+					new HeaderDeclaration(this.unit, next.raw(), name, this.modifiers, this.annotations));
 				this.modifiers = null;
 				this.annotations = null;
 				this.lastToken = null;
