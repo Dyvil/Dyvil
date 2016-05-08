@@ -44,11 +44,11 @@ public class FlatMapConverter implements NodeVisitor
 	
 	public override ValueVisitor visitProperty(Name name) = new DyvilValueVisitor()
 	{
-		String propertyName = this[FlatMapConverter].getName(name)
+		String propertyName = this<FlatMapConverter>.getName(name)
 
 		protected override void visitObject(Object o)
 		{
-			this[FlatMapConverter].map.put(this.propertyName, o)
+			this<FlatMapConverter>.map.put(this.propertyName, o)
 		}
 	}
 }

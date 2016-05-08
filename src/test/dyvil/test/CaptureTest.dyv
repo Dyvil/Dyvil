@@ -22,7 +22,7 @@ public class CaptureTest
 	class ThisCapture
 	{
 		public Object anonymous() = new Object {
-			public override String toString() = this[ThisCapture].toString
+			public override String toString() = this<ThisCapture>.toString
 		}
 		
 		public -> ThisCapture lambda() = => this

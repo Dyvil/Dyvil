@@ -140,14 +140,14 @@ public abstract class AbstractBitSet implements Set<int>
 
 	public override Iterator<int> iterator() = new Iterator<int>()
 	{
-		private int currentBit = this[AbstractBitSet].nextSetBit(-1)
+		private int currentBit = this<AbstractBitSet>.nextSetBit(-1)
 
 		public override int next()
 		{
 			final int current = this.currentBit
 			if (current < 0) throw new NoSuchElementException
 
-			this.currentBit = this[AbstractBitSet].nextSetBit(current)
+			this.currentBit = this<AbstractBitSet>.nextSetBit(current)
 			return current
 		}
 
@@ -157,8 +157,8 @@ public abstract class AbstractBitSet implements Set<int>
 		{
 			if (this.currentBit < 0) throw new NoSuchElementException
 
-			this[AbstractBitSet].removeAt(this.currentBit)
-			this.currentBit = this[AbstractBitSet].nextSetBit(this.currentBit)
+			this<AbstractBitSet>.removeAt(this.currentBit)
+			this.currentBit = this<AbstractBitSet>.nextSetBit(this.currentBit)
 		}
 	}
 
