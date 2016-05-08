@@ -227,6 +227,10 @@ public class IfStatement implements IValue
 		{
 			this.then.checkTypes(markers, context);
 		}
+		if (this.elseThen != null)
+		{
+			this.elseThen.checkTypes(markers, context);
+		}
 	}
 
 	@Override
