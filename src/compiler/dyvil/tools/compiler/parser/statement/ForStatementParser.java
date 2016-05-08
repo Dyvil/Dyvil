@@ -12,14 +12,15 @@ import dyvil.tools.compiler.ast.statement.loop.ForStatement;
 import dyvil.tools.compiler.ast.statement.loop.IForStatement;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.parsing.IParserManager;
-import dyvil.tools.parsing.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.classes.DataMemberParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -101,12 +102,16 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 				return;
 			}
 
-			pm.pushParser(new DataMemberParser<>(this), true);
+			pm.pushParser(new DataMemberParser<>(this).ignoringTypeAscription(), true);
 			this.mode = VARIABLE_SEPARATOR;
 			return;
 		case VARIABLE_SEPARATOR:
-			if (type == DyvilSymbols.ARROW_LEFT)
+			switch (type)
 			{
+			case BaseSymbols.COLON:
+				pm.report(Markers.syntaxWarning(token, "for.variable.colon.deprecated"));
+				// Fallthrough
+			case DyvilSymbols.ARROW_LEFT:
 				this.mode = FOR_EACH_END;
 				final ExpressionParser parser = new ExpressionParser(this.variable);
 				if (!this.parenthesis)
@@ -115,14 +120,13 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 				}
 				pm.pushParser(parser);
 				return;
-			}
-
-			this.mode = VARIABLE_END;
-			if (type == BaseSymbols.EQUALS)
-			{
+			case BaseSymbols.EQUALS:
+				this.mode = VARIABLE_END;
 				pm.pushParser(new ExpressionParser(this.variable));
 				return;
 			}
+
+			this.mode = VARIABLE_END;
 			pm.reparse();
 			pm.report(token, "for.variable.separator");
 			return;

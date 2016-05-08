@@ -12,13 +12,13 @@ import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.parsing.IParserManager;
-import dyvil.tools.parsing.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.parsing.IParserManager;
+import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
@@ -29,6 +29,8 @@ public class DataMemberParser<T extends IDataMember> extends Parser implements I
 
 	protected IDataMemberConsumer<T> consumer;
 
+	private boolean ignoreTypeAscription;
+
 	private ModifierSet    modifiers;
 	private AnnotationList annotations;
 	private IType          type;
@@ -37,6 +39,12 @@ public class DataMemberParser<T extends IDataMember> extends Parser implements I
 	public DataMemberParser(IDataMemberConsumer<T> consumer)
 	{
 		this.consumer = consumer;
+	}
+
+	public DataMemberParser<T> ignoringTypeAscription()
+	{
+		this.ignoreTypeAscription = true;
+		return this;
 	}
 
 	@Override
@@ -120,6 +128,13 @@ public class DataMemberParser<T extends IDataMember> extends Parser implements I
 				// ... IDENTIFIER : TYPE ...
 				if (this.dataMember.getType() != Types.UNKNOWN)
 				{
+					if (this.ignoreTypeAscription)
+					{
+						this.consumer.addDataMember(this.dataMember);
+						pm.popParser(true);
+						return;
+					}
+
 					pm.report(token, "variable.type.duplicate");
 				}
 				pm.pushParser(new TypeParser(this.dataMember));
