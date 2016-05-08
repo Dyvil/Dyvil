@@ -85,11 +85,6 @@ public interface IContext extends IMemberContext
 	@Override
 	void getConstructorMatches(ConstructorMatchList list, IArguments arguments);
 
-	default boolean handleException(IType type)
-	{
-		return this.checkException(type) != FALSE;
-	}
-
 	byte checkException(IType type);
 
 	IType getReturnType();
@@ -207,6 +202,6 @@ public interface IContext extends IMemberContext
 	{
 		return Types.isSuperType(Types.EXCEPTION, exceptionType) // Exception type is sub-type of java.lang.Exception
 			       && !Types.isSuperType(Types.RUNTIME_EXCEPTION, exceptionType) // but not java.lang.RuntimeException
-			       && context.handleException(exceptionType);
+			       && context.checkException(exceptionType) == FALSE;
 	}
 }
