@@ -67,8 +67,8 @@ public final class NamedArgumentList implements IArguments
 		final Name[] keys = new Name[size];
 		final IValue[] values = new IValue[size];
 
-		System.arraycopy(this.keys, 0, keys, 0, size);
-		System.arraycopy(this.values, 0, values, 0, size);
+		System.arraycopy(this.keys, 0, keys, 0, this.size);
+		System.arraycopy(this.values, 0, values, 0, this.size);
 		keys[index] = name;
 		values[index] = value;
 

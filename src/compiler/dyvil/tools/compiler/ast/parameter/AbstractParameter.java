@@ -291,9 +291,9 @@ public abstract class AbstractParameter extends Member implements IParameter
 			                         modifiers.toFlags() & Modifiers.PARAMETER_MODIFIERS
 				                         & ModifierUtil.JAVA_MODIFIER_MASK;
 
-		final int index = writer.localCount();
+		final int index = parameter.getIndex();
 
-		parameter.setLocalIndex(index);
+		parameter.setLocalIndex(writer.localCount());
 		writer.visitParameter(parameter.getLocalIndex(), parameter.getName().qualified, parameter.getInternalType(),
 		                      intModifiers);
 
