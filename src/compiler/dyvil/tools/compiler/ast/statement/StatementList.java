@@ -136,6 +136,17 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		context = context.push(this);
 
 		final IValue value = this.values[this.valueCount - 1];
+		if (Types.isVoid(type) && !value.isStatement())
+		{
+			final IValue applyStatementCall = resolveApplyStatement(markers, context, value);
+			if (applyStatementCall != null)
+			{
+				this.returnType = type;
+				this.values[this.valueCount - 1] = applyStatementCall;
+				return this;
+			}
+		}
+
 		final IValue typed = value.withType(type, typeContext, markers, context);
 
 		context.pop();
@@ -147,22 +158,10 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 			return this;
 		}
 
-		if (type != Types.VOID)
-		{
-			return null;
-		}
-
-		final IValue applyStatementCall = resolveApplyStatement(markers, context, value);
-		if (applyStatementCall != null)
-		{
-			this.returnType = type;
-			this.values[this.valueCount - 1] = applyStatementCall;
-			return this;
-		}
-
 		markers.add(TypeChecker
 			            .typeError(value.getPosition(), type, value.getType(), "statementlist.return", "type.expected",
 			                       "return.type"));
+
 		return this;
 	}
 
