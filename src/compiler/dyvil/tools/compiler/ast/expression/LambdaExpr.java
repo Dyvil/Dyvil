@@ -343,7 +343,9 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 				final IParameter parameter = this.parameters.get(i);
 				if (parameter.getType() == Types.UNKNOWN)
 				{
-					parameter.setType(this.method.getParameterList().get(i).getType());
+					final IType type = this.method.getParameterList().get(i).getType()
+					                              .atPosition(parameter.getPosition());
+					parameter.setType(type);
 				}
 			}
 
@@ -359,24 +361,30 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 				continue;
 			}
 
+			final ICodePosition position = parameter.getPosition();
 			final IType methodParamType = this.method.getParameterList().get(i).getType();
-			final IType concreteType = methodParamType.getConcreteType(this.type);
+			IType concreteType = methodParamType.getConcreteType(this.type);
 
 			// Can't infer parameter type
 			if (concreteType == Types.UNKNOWN || concreteType instanceof CovariantTypeVarType)
-			// TODO Use better check
+			// TODO Use better check for Covariant Type Var Types
 			{
 				if ((this.flags & IMPLICIT_PARAMETERS) != 0)
 				{
-					markers.add(Markers.semanticError(parameter.getPosition(), "lambda.parameter.implicit"));
+					markers.add(Markers.semanticError(position, "lambda.parameter.implicit"));
 				}
 				else
 				{
-					markers.add(
-						Markers.semanticError(parameter.getPosition(), "lambda.parameter.type", parameter.getName()));
+					markers.add(Markers.semanticError(position, "lambda.parameter.type", parameter.getName()));
 				}
 			}
-			parameter.setType(concreteType);
+			if (concreteType.typeTag() == IType.WILDCARD_TYPE)
+			// TODO Use better check for Wildcard Types
+			{
+				concreteType = Types.ANY;
+			}
+
+			parameter.setType(concreteType.atPosition(position));
 		}
 
 		this.checkReturnType(markers, this.method.getType().getConcreteType(this.type));

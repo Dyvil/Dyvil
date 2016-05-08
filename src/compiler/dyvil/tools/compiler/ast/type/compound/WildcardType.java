@@ -55,6 +55,26 @@ public final class WildcardType implements IRawType, ITyped
 	}
 
 	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
+	}
+
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+
+	@Override
+	public IType atPosition(ICodePosition position)
+	{
+		final WildcardType clone = this.clone();
+		clone.position = position;
+		return clone;
+	}
+
+	@Override
 	public void setType(IType upperBound)
 	{
 		this.bound = upperBound;
@@ -290,7 +310,7 @@ public final class WildcardType implements IRawType, ITyped
 	@Override
 	public String getInternalName()
 	{
-		if (this.variance == Variance.CONTRAVARIANT)
+		if (this.variance == Variance.CONTRAVARIANT || this.bound == null)
 		{
 			return "java/lang/Object";
 		}

@@ -71,7 +71,14 @@ public class CodeParameter extends AbstractParameter
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		super.checkTypes(markers, context);
+		if (this.type != null)
+		{
+			this.type.checkType(markers, context, IType.TypePosition.PARAMETER_TYPE);
+		}
+		if (this.annotations != null)
+		{
+			this.annotations.checkTypes(markers, context);
+		}
 
 		if (this.defaultValue != null)
 		{
