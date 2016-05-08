@@ -239,11 +239,11 @@ task compileLibraryDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'copyLi
 	runCompiler exec, 'scripts/lib_options.txt', 'src/library/', "$buildDir/dyvilbin"
 }
 
-task compileDPFDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'copyDPFDyvil' ]) { JavaExec exec ->
+task compileDPFDyvil(type: JavaExec, dependsOn: [ 'compileLibraryDyvil', 'copyDPFDyvil' ]) { JavaExec exec ->
 	runCompiler exec, 'scripts/dpf_options.txt', 'src/dpf/', "$buildDir/dpfbin"
 }
 
-task compileTestDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'copyTestDyvil' ]) { JavaExec exec ->
+task compileTestDyvil(type: JavaExec, dependsOn: [ 'compileDPFDyvil', 'copyTestDyvil' ]) { JavaExec exec ->
 	runCompiler exec, 'scripts/test_options.txt', 'src/test/', "$buildDir/dyviltestbin"
 }
 
@@ -260,6 +260,8 @@ private void runCompiler(JavaExec exec, String config, String src, String bin)
 	exec.main = 'dyvil.tools.compiler.Main'
 	exec.classpath = sourceSets.compiler.runtimeClasspath
 	exec.args = [ "@$config", 'compile' ]
+
+	if (System.console() != null) exec.args += "--ansi";
 }
 
 // ---------------------------------------- Test Tasks ----------------------------------------
@@ -276,7 +278,7 @@ test.dependsOn 'testDyvil'
 /**
  * Creates a Jar file that contains all library classes (from src/library), including ASM
  */
-task buildLibrary(type: Jar, dependsOn: [ 'classes', 'compileLibraryDyvil' ]) {
+task buildLibrary(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil' ]) {
 	from sourceSets.main.resources
 	from sourceSets.library.output
 
@@ -287,7 +289,7 @@ task buildLibrary(type: Jar, dependsOn: [ 'classes', 'compileLibraryDyvil' ]) {
 	archiveName = "dyvil-library-${ libraryVersion }.jar"
 }
 
-task buildDPF(type: Jar, dependsOn: [ 'buildLibrary', 'compileDPFDyvil' ]) {
+task buildDPF(type: Jar, dependsOn: [ 'dpfClasses', 'compileDPFDyvil' ]) {
 	from sourceSets.dpf.output
 
 	from("$buildDir/dpfbin") {
