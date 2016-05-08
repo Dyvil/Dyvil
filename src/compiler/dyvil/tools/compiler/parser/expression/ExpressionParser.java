@@ -336,6 +336,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				pm.report(token, "method.call.generic.close_angle");
 			}
 
+			pm.splitJump(token, 1);
 			final IToken next = token.next();
 			if (next.type() == BaseSymbols.OPEN_PARENTHESIS)
 			{
@@ -524,16 +525,16 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		return isExpressionEnd(nextType);
 	}
 
-	private static boolean isGenericCall(IToken next, int nextType)
+	public static boolean isGenericCall(IToken token, int tokenType)
 	{
-		if (!TypeParser.isGenericStart(next, nextType))
+		if (!TypeParser.isGenericStart(token, tokenType))
 		{
 			return false;
 		}
 
 		// IDENTIFIER <
 
-		final IToken endToken = ParserUtil.findMatch(next, true);
+		final IToken endToken = ParserUtil.findMatch(token, true);
 		if (endToken == null)
 		{
 			return false;

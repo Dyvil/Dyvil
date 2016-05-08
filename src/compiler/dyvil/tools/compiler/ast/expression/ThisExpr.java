@@ -185,9 +185,9 @@ public final class ThisExpr implements IValue
 
 		if (this.type != Types.UNKNOWN)
 		{
-			buffer.append('[');
+			buffer.append('<');
 			this.type.toString(prefix, buffer);
-			buffer.append(']');
+			buffer.append('>');
 		}
 	}
 }
