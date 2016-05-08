@@ -820,8 +820,11 @@ public class CodeClass extends AbstractClass
 			{
 				modifiers &= ~Modifiers.STATIC;
 			}
-			writer.visitInnerClass(this.internalName, this.enclosingClass.getInternalName(), this.name.qualified,
+			final String outerName = this.enclosingClass.getInternalName();
+			writer.visitInnerClass(this.internalName, outerName, this.name.qualified,
 			                       modifiers);
+
+			writer.visitOuterClass(outerName, null, null);
 		}
 	}
 

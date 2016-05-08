@@ -202,7 +202,7 @@ class AnonymousClassMetadata implements IClassMetadata
 
 		captureHelper.writeFieldAssignments(initWriter);
 
-		this.writeClassInit(initWriter);
+		this.theClass.writeClassInit(initWriter);
 
 		initWriter.visitEnd(Types.VOID);
 	}
