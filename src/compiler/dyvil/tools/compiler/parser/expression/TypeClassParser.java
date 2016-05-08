@@ -4,10 +4,10 @@ import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.ClassOperator;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.TypeOperator;
-import dyvil.tools.parsing.IParserManager;
-import dyvil.tools.parsing.Parser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.parsing.IParserManager;
+import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
@@ -16,6 +16,7 @@ public class TypeClassParser extends Parser
 	private static final int TYPE_CLASS      = 0;
 	private static final int TYPE            = 1;
 	private static final int PARENTHESES_END = 2;
+	private static final int ANGLE_END       = 4;
 
 	private IValueConsumer valueConsumer;
 
@@ -69,11 +70,17 @@ public class TypeClassParser extends Parser
 			{
 				this.mode = PARENTHESES_END;
 			}
+			else if (TypeParser.isGenericStart(token, type))
+			{
+				this.mode = ANGLE_END;
+				pm.splitJump(token, 1);
+			}
 			else
 			{
-				pm.reparse();
 				this.mode = END;
+				pm.reparse();
 			}
+
 			pm.pushParser(new TypeParser(this.value));
 			return;
 		case PARENTHESES_END:
@@ -87,6 +94,21 @@ public class TypeClassParser extends Parser
 
 			this.valueConsumer.setValue(this.value);
 			pm.popParser();
+			return;
+		case ANGLE_END:
+			this.valueConsumer.setValue(this.value);
+			pm.popParser();
+
+			if (TypeParser.isGenericEnd(token, type))
+			{
+				pm.splitJump(token, 1);
+				return;
+			}
+
+			pm.reparse();
+			pm.report(token, this.value.valueTag() == IValue.CLASS_OPERATOR ?
+				                 "classoperator.close_angle" :
+				                 "typeoperator.close_angle");
 			return;
 		case END:
 			this.valueConsumer.setValue(this.value);
