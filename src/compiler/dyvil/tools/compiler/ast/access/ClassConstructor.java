@@ -40,13 +40,17 @@ public class ClassConstructor extends ConstructorCall
 	{
 		super.resolveTypes(markers, context);
 
-		if (this.type.getTheClass().isInterface())
+		final IClass theClass = this.type.getTheClass();
+		if (theClass != null)
 		{
-			this.nestedClass.addInterface(this.type);
-		}
-		else
-		{
-			this.nestedClass.setSuperType(this.type);
+			if (theClass.isInterface())
+			{
+				this.nestedClass.addInterface(this.type);
+			}
+			else
+			{
+				this.nestedClass.setSuperType(this.type);
+			}
 		}
 
 		this.nestedClass.resolveTypes(markers, context);
@@ -58,17 +62,21 @@ public class ClassConstructor extends ConstructorCall
 		this.type.resolve(markers, context);
 		this.arguments.resolve(markers, context);
 
-		if (this.type.getTheClass().isInterface())
+		final IClass theClass = this.type.getTheClass();
+		if (theClass != null)
 		{
-			this.constructor = IContext.resolveConstructor(Types.OBJECT_CLASS, this.arguments);
-		}
-		else
-		{
-			this.constructor = IContext.resolveConstructor(this.type, this.arguments);
-		}
-		if (this.constructor == null)
-		{
-			this.reportResolve(markers, context);
+			if (theClass.isInterface())
+			{
+				this.constructor = IContext.resolveConstructor(Types.OBJECT_CLASS, this.arguments);
+			}
+			else
+			{
+				this.constructor = IContext.resolveConstructor(this.type, this.arguments);
+			}
+			if (this.constructor == null)
+			{
+				this.reportResolve(markers, context);
+			}
 		}
 
 		final IClass enclosingClass = context.getThisClass();

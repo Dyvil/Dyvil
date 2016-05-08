@@ -172,7 +172,7 @@ public class CodeMethod extends AbstractMethod
 			this.value = this.value.resolve(markers, context);
 
 			boolean inferType = false;
-			if (this.type == Types.UNKNOWN)
+			if (this.type == Types.UNKNOWN || this.type == null)
 			{
 				inferType = true;
 				this.type = this.value.getType();

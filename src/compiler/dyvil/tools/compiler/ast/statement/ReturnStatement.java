@@ -137,7 +137,7 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 		{
 			this.value.checkTypes(markers, context);
 
-			if (returnType == null)
+			if (returnType == null || !this.value.isResolved())
 			{
 				return;
 			}
