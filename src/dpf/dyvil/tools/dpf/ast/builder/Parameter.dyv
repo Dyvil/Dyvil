@@ -1,0 +1,68 @@
+package dyvil.tools.dpf.ast.builder;
+
+import dyvil.collection.Map;
+import dyvil.tools.dpf.ast.Expandable;
+import dyvil.tools.dpf.ast.value.Value;
+import dyvil.tools.dpf.converter.DPFValueVisitor;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.position.ICodePosition;
+
+public case class Parameter
+	(
+		Name name { get; set }
+		Value value { get; set }
+	) extends DPFValueVisitor implements IASTNode, Expandable
+{
+	// Constructors
+
+	public init(Name name)
+	{
+		this.name = name
+	}
+
+	public static Parameter apply(Name name)
+	{
+		return new Parameter(name, null)
+	}
+
+	public static Parameter apply(Name name, Value value)
+	{
+		return new Parameter(name, value)
+	}
+
+	public static Parameter apply(Value value)
+	{
+		return new Parameter(null, value)
+	}
+
+	// Accessors
+	
+	public Name getName() = this.name
+	
+	public Value getValue() = this.value
+
+	public override void setValue(Value value) = this.value = value
+
+	public override ICodePosition getPosition() = null
+
+	public override void setPosition(ICodePosition position) { }
+
+	public override Parameter expand(Map<String, Object> mappings, boolean mutate)
+	{
+		Parameter parameter = mutate ? this : new Parameter(this.name)
+		parameter.value = Value.wrap(Expandable.expand(this.value, mappings, mutate))
+		return parameter
+	}
+
+	public override String toString() = IASTNode.toString(this)
+
+	public override void toString(String indent, StringBuilder buffer)
+	{
+		if (this.name != null)
+		{
+			buffer.append(this.name).append(": ")
+		}
+		this.value.toString(indent, buffer)
+	}
+}

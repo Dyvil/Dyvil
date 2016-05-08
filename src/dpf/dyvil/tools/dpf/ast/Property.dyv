@@ -15,31 +15,34 @@ public class Property extends DPFValueVisitor implements NodeElement, Expandable
 	
 	private ICodePosition position;
 	
-	public Property(Name name)
+	public init(Name name)
 	{
 		this.name = name;
 	}
 
-	public Property(Name name, ICodePosition position)
+	public init(Name name, ICodePosition position)
 	{
 		this.name = name;
 		this.position = position;
 	}
 
-	@Override
-	public void setPosition(ICodePosition position)
+	public init(Name name, Value value)
+	{
+		this.name = name;
+		this.value = value;
+	}
+
+	public override void setPosition(ICodePosition position)
 	{
 		this.position = position;
 	}
 	
-	@Override
-	public ICodePosition getPosition()
+	public override ICodePosition getPosition()
 	{
 		return this.position;
 	}
 	
-	@Override
-	public Name getName()
+	public override Name getName()
 	{
 		return this.name;
 	}
@@ -55,56 +58,37 @@ public class Property extends DPFValueVisitor implements NodeElement, Expandable
 		this.value = value;
 	}
 	
-	@Override
-	public void accept(NodeVisitor visitor)
+	public override void accept(NodeVisitor visitor)
 	{
 		this.value.accept(visitor.visitProperty(this.name));
 	}
 
-	@Override
-	public Property expand(Map<String, Object> mappings, boolean mutate)
+	public override Property expand(Map<String, Object> mappings, boolean mutate)
 	{
 		Property property = mutate ? this : new Property(this.name, this.position);
 		property.value = Value.wrap(Expandable.expand(this.value, mappings, mutate));
 		return property;
 	}
 
-	@Override
-	public String toString()
+	public override String toString()
 	{
 		return IASTNode.toString(this);
 	}
 	
-	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public override void toString(String indent, StringBuilder buffer)
 	{
 		buffer.append(this.name).append(" = ");
-		this.value.toString(prefix, buffer);
+		this.value.toString(indent, buffer);
 	}
 
-	@Override
-	public boolean equals(Object obj)
+	public override boolean equals(Object obj)
 	{
-		if (obj == this)
-		{
-			return true;
-		}
-		if (obj == null || !(obj instanceof Property))
-		{
-			return false;
-		}
+		if (obj === this) return true
+		if (!(obj is Property)) return false
 
-		final Property other = (Property) obj;
-		return this.name == other.name // equal name
-				&& this.value.equals(other.value); // equal value
+		let that = obj as Property
+		return this.name === that.name && this.value == that.value
 	}
 
-	@Override
-	public int hashCode()
-	{
-		final int prime = 31;
-		int result = this.name.hashCode();
-		result = prime * result + this.value.hashCode();
-		return result;
-	}
+	public override int hashCode() = 31 * this.name.hashCode + this.value.hashCode
 }

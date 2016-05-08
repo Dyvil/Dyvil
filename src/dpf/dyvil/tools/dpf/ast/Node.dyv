@@ -1,0 +1,196 @@
+package dyvil.tools.dpf.ast;
+
+import dyvil.collection.Collection;
+import dyvil.collection.List;
+import dyvil.collection.Map;
+import dyvil.collection.mutable.ArrayList;
+import dyvil.tools.dpf.visitor.NodeVisitor;
+import dyvil.tools.dpf.visitor.ValueVisitor;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.position.ICodePosition;
+
+public class Node implements NodeElement, NodeVisitor, Expandable
+{
+	protected Name name
+	protected List<Node>       nodes        = new ArrayList<Node>
+	protected List<Property>   properties   = new ArrayList<Property>
+	protected List<NodeAccess> nodeAccesses = new ArrayList<NodeAccess>
+	
+	protected ICodePosition position;
+	
+	public init(Name name)
+	{
+		this.name = name;
+	}
+	
+	public override void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+	
+	public override ICodePosition getPosition()
+	{
+		return this.position;
+	}
+	
+	public override Name getName()
+	{
+		return this.name;
+	}
+
+	public void addNode(Node node)
+	{
+		this.nodes.add(node);
+	}
+
+	public void addNodeAccess(NodeAccess nodeAccess)
+	{
+		this.nodeAccesses.add(nodeAccess);
+	}
+
+	public void addProperty(Property property)
+	{
+		this.properties.add(property);
+	}
+	
+	public override NodeVisitor visitNode(Name name)
+	{
+		Node node = new Node(name);
+		this.nodes.add(node);
+		return node;
+	}
+	
+	public override ValueVisitor visitProperty(Name name)
+	{
+		Property property = new Property(name);
+		this.properties.add(property);
+		return property;
+	}
+	
+	public override NodeVisitor visitNodeAccess(Name name)
+	{
+		NodeAccess access = new NodeAccess(name);
+		this.nodeAccesses.add(access);
+		return access;
+	}
+	
+	public override void accept(NodeVisitor visitor)
+	{
+		this.acceptBody(visitor.visitNode(this.name));
+	}
+
+	public void acceptBody(NodeVisitor nodeVisitor)
+	{
+		for (Property element <- this.properties)
+		{
+			element.accept(nodeVisitor);
+		}
+		for (Node node <- this.nodes)
+		{
+			node.accept(nodeVisitor);
+		}
+		for (NodeAccess nodeAccess <- this.nodeAccesses)
+		{
+			nodeAccess.accept(nodeVisitor);
+		}
+		nodeVisitor.visitEnd();
+	}
+
+	public override Node expand(Map<String, Object> mappings, boolean mutate)
+	{
+		if (mutate)
+		{
+			this.expandChildren(mappings);
+			return this;
+		}
+		else
+		{
+			Node node = new Node(this.name);
+			this.expand(node, mappings);
+			return node;
+		}
+	}
+
+	protected void expandChildren(Map<String, Object> mappings)
+	{
+		for (Node node <- this.nodes)
+		{
+			node.expand(mappings, true);
+		}
+		for (Property property <- this.properties)
+		{
+			property.expand(mappings, true);
+		}
+		for (NodeAccess nodeAccess <- this.nodeAccesses)
+		{
+			nodeAccess.expand(mappings, true);
+		}
+	}
+
+	protected void expand(Node node, Map<String, Object> mappings)
+	{
+		node.nodes = this.nodes.mapped(childNode => childNode.expand(mappings, false));
+		node.properties = this.properties.mapped(property => property.expand(mappings, false));
+		node.nodeAccesses = this.nodeAccesses.mapped(nodeAccess => nodeAccess.expand(mappings, false));
+	}
+
+	public override String toString() = IASTNode.toString(this)
+	
+	public override void toString(String indent, StringBuilder buffer)
+	{
+		buffer.append(this.name).append('\n').append(indent).append('{').append('\n');
+		
+		this.bodyToString(indent + '\t', buffer);
+		
+		buffer.append(indent).append('}');
+	}
+	
+	public void bodyToString(String indent, StringBuilder buffer)
+	{
+		for (NodeElement element <- this.properties)
+		{
+			buffer.append(indent);
+			element.toString(indent, buffer);
+			buffer.append('\n');
+		}
+		
+		for (Node node <- this.nodes)
+		{
+			buffer.append(indent).append('\n').append(indent);
+			node.toString(indent, buffer);
+			buffer.append('\n');
+		}
+
+		for (NodeAccess nodeAccess <- this.nodeAccesses)
+		{
+			buffer.append(indent).append('\n').append(indent);
+			nodeAccess.toString(indent, buffer);
+			buffer.append('\n');
+		}
+	}
+
+	public override boolean equals(Object obj)
+	{
+		if (this === obj) return true
+		if (!(obj is Node)) return false
+
+		let other = obj as Node;
+
+		if (this.name !== other.name) return false
+		if (!Collection.unorderedEquals(this.properties, other.properties)) return false
+		if (!Collection.unorderedEquals(this.nodes, other.nodes)) return false
+		if (!Collection.unorderedEquals(this.nodeAccesses, other.nodeAccesses)) return false
+		return true
+	}
+
+	public override int hashCode()
+	{
+		final int prime = 31
+		int result = this.name.hashCode()
+		result = prime * result + Collection.unorderedHashCode(this.properties)
+		result = prime * result + Collection.unorderedHashCode(this.nodes)
+		result = prime * result + Collection.unorderedHashCode(this.nodeAccesses)
+		return result
+	}
+}

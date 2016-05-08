@@ -1,0 +1,94 @@
+package dyvil.tools.dpf.ast.value;
+
+import dyvil.collection.Map;
+import dyvil.tools.dpf.ast.Expandable;
+import dyvil.tools.dpf.converter.DPFValueVisitor;
+import dyvil.tools.dpf.visitor.ValueVisitor;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ast.IASTNode;
+
+import java.util.Objects;
+
+public class NameAccess extends DPFValueVisitor implements Value, Expandable
+{
+	protected Name  name;
+	protected Value value;
+
+	public init(Name name)
+	{
+		this.name = name;
+	}
+	
+	public Name getName()
+	{
+		return this.name;
+	}
+	
+	@Override
+	protected void setValue(Value value)
+	{
+		this.value = value;
+	}
+	
+	public Value getValue()
+	{
+		return this.value;
+	}
+	
+	public override void accept(ValueVisitor visitor)
+	{
+		if (this.value == null)
+		{
+			visitor.visitName(this.name);
+			return;
+		}
+
+		this.value.accept(visitor.visitValueAccess(this.name));
+	}
+
+	public override Object expand(Map<String, Object> mappings, boolean mutate)
+	{
+		StringBuilder builder = new StringBuilder();
+
+		Value value = this.value;
+		while (value != null)
+		{
+			if (value is NameAccess)
+			{
+				let nameAccess = value as NameAccess
+				builder.insert(0, '.').insert(0, nameAccess.name)
+				value = nameAccess.getValue();
+				continue;
+			}
+			break;
+		}
+
+		builder.append(this.name);
+
+		Object result = mappings.get(builder.toString())
+		return result == null ? this : result
+	}
+
+	public override String toString() = IASTNode.toString(this)
+	
+	public override void toString(String indent, StringBuilder buffer)
+	{
+		if (this.value != null)
+		{
+			this.value.toString(indent, buffer);
+			buffer.append('.');
+		}
+		buffer.append(this.name);
+	}
+
+	public override boolean equals(Object o)
+	{
+		if (this === o) return true
+		if (!(o is NameAccess)) return false
+
+		let that = o as NameAccess
+		return this.name === that.name && this.value == that.value
+	}
+
+	public override int hashCode() = 31 * this.name.hashCode + this.value.hashCode
+}

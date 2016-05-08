@@ -1,0 +1,166 @@
+package dyvil.tools.dpf.ast.builder;
+
+import dyvil.collection.List;
+import dyvil.collection.Map;
+import dyvil.collection.mutable.ArrayList;
+import dyvil.tools.dpf.ast.Expandable;
+import dyvil.tools.dpf.ast.Node;
+import dyvil.tools.dpf.ast.value.Value;
+import dyvil.tools.dpf.visitor.BuilderVisitor;
+import dyvil.tools.dpf.visitor.NodeVisitor;
+import dyvil.tools.dpf.visitor.ValueVisitor;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.position.ICodePosition;
+
+public class Builder implements Value, BuilderVisitor, Expandable
+{
+	private Name name
+	private List<Parameter> parameters
+	private Node node
+
+	public static Builder apply(Name name)
+	{
+		return new Builder(name)
+	}
+
+	public static Builder apply(Name name, Parameter... parameters)
+	{
+		return new Builder(name, new ArrayList(parameters...))
+	}
+
+	public static Builder apply(Name name, List<Parameter> parameters, Node node = null)
+	{
+		return new Builder(name, parameters, node)
+	}
+	
+	public init(Name name)
+	{
+		this.name = name
+		this.parameters = new ArrayList<Parameter>
+	}
+
+	public init(Name name, List<Parameter> parameters, Node node = null)
+	{
+		this.name = name
+		this.parameters = parameters
+	}
+
+	public Builder withNode(Node node)
+	{
+		this.node = node
+		return this
+	}
+
+	public void addParameter(Parameter parameter)
+	{
+		this.parameters.add(parameter)
+	}
+
+	public Node makeNode()
+	{
+		if (this.node != null) return this.node
+		return this.node = new Node(this.name)
+	}
+
+	public override ValueVisitor visitParameter(Name name)
+	{
+		Parameter parameter = new Parameter(name)
+		this.parameters.add(parameter)
+		return parameter
+	}
+
+	public override NodeVisitor visitNode()
+	{
+		Node node = new Node(this.name)
+		this.node = node
+		return node
+	}
+	
+	public override void visitEnd() { }
+	
+	public override void accept(ValueVisitor visitor)
+	{
+		final BuilderVisitor builderVisitor = visitor.visitBuilder(this.name)
+		for (Parameter parameter <- this.parameters)
+		{
+			parameter.getValue().accept(builderVisitor.visitParameter(parameter.getName()))
+		}
+		if (this.node != null)
+		{
+			this.node.acceptBody(builderVisitor.visitNode())
+		}
+		builderVisitor.visitEnd()
+	}
+
+	public override Builder expand(Map<String, Object> mappings, boolean mutate)
+	{
+		if (mutate)
+		{
+			for (Parameter parameter <- this.parameters)
+			{
+				parameter.expand(mappings, true)
+			}
+			this.node = this.node.expand(mappings, true)
+			return this
+		}
+		else
+		{
+			Builder builder = new Builder(this.name)
+			builder.parameters = this.parameters.mapped(parameter => parameter.expand(mappings, false))
+			builder.node = this.node.expand(mappings, false)
+			return builder
+		}
+	}
+
+	public override String toString() = IASTNode.toString(this)
+	
+	public override void toString(String indent, StringBuilder buffer)
+	{
+		buffer.append(this.name)
+		
+		let parameterCount = this.parameters.size
+		if (parameterCount > 0)
+		{
+			buffer.append('(')
+			
+			this.parameters[0].toString(indent, buffer)
+			for (int i <- 1 ..< parameterCount)
+			{
+				buffer.append(", ")
+				this.parameters[i].toString(indent, buffer)
+			}
+			
+			buffer.append(')')
+		}
+		else if (this.node == null)
+		{
+			buffer.append("()")
+			return
+		}
+		
+		if (this.node != null)
+		{
+			buffer.append(" {\n")
+			this.node.bodyToString(indent + '\t', buffer)
+			buffer.append(indent).append('}')
+		}
+	}
+
+	public override boolean equals(Object o)
+	{
+		if (this === o) return true
+		if (!(o is Builder)) return false
+
+		let that = o as Builder
+		return this.name === that.name && this.parameters == that.parameters && this.node == that.node
+	}
+
+	public override int hashCode()
+	{
+		int result = this.name.hashCode
+		result = 31 * result + this.parameters.hashCode
+		result = 31 * result + this.node.hashCode
+		return result;
+	}
+}

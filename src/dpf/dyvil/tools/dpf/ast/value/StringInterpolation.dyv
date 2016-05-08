@@ -1,0 +1,137 @@
+package dyvil.tools.dpf.ast.value;
+
+import dyvil.collection.List;
+import dyvil.collection.Map;
+import dyvil.collection.mutable.ArrayList;
+import dyvil.tools.dpf.ast.Expandable;
+import dyvil.tools.dpf.converter.DPFValueVisitor;
+import dyvil.tools.dpf.visitor.StringInterpolationVisitor;
+import dyvil.tools.dpf.visitor.ValueVisitor;
+import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.lexer.LexerUtil;
+
+public class StringInterpolation extends DPFValueVisitor implements Value, StringInterpolationVisitor, Expandable
+{
+	protected List<String> strings
+	protected List<Value>  values
+
+	public init()
+	{
+		this.strings = new ArrayList<String>
+		this.values = new ArrayList<Value>
+	}
+
+	public init(String... stringParts, Value... values)
+	{
+		this.strings = new ArrayList(stringParts...)
+		this.values = new ArrayList(values...)
+	}
+
+	public init(String... stringParts, Object... values)
+	{
+		this.strings = new ArrayList(stringParts...)
+		this.values = new ArrayList<Value>(values.length)
+
+		for (Object o <- values)
+		{
+			this.values.add(Value.wrap(o))
+		}
+	}
+
+	public override void visitStringPart(String string)
+	{
+		this.strings.add(string);
+	}
+
+	protected override void setValue(Value value)
+	{
+		this.values.add(value);
+	}
+
+	public override ValueVisitor visitValue() = this
+
+	public override void visitEnd() { }
+
+	public override void accept(ValueVisitor visitor)
+	{
+		StringInterpolationVisitor stringVisitor = visitor.visitStringInterpolation();
+		final int len = this.values.size();
+
+		stringVisitor.visitStringPart(this.strings[0]);
+		
+		for (int i = 0; i < len; i++)
+		{
+			this.values[i].accept(stringVisitor.visitValue());
+			stringVisitor.visitStringPart(this.strings[i + 1]);
+		}
+		
+		stringVisitor.visitEnd();
+	}
+
+	public override Object expand(Map<String, Object> mappings, boolean mutate)
+	{
+		// StringInterpolation stringInterpolation = mutate ? this : new StringInterpolation();
+
+		StringBuilder builder = new StringBuilder
+
+		int index = 0
+		for (Value value <- this.values)
+		{
+			Object o = Expandable.expand(value, mappings, mutate);
+
+			builder.append(this.strings[index++])
+			Constant constant = null
+
+			if (o is String)
+			{
+				builder.append(o.toString)
+			}
+			else if (o is Constant && (constant = o as Constant).isConstant)
+			{
+				constant.appendString(builder)
+			}
+			else if (o is Value)
+			{
+				return this
+			}
+			else
+			{
+				builder.append(o)
+			}
+		}
+
+		// Add the last String
+		builder.append(this.strings[index])
+
+		return builder.toString
+	}
+
+	public override String toString() = IASTNode.toString(this)
+
+	public override void toString(String indent, StringBuilder buffer)
+	{
+		int len = this.values.size()
+		buffer.append('"')
+		LexerUtil.appendStringLiteralBody(this.strings[0], buffer)
+
+		for (int i = 0; i < len; i++)
+		{
+			buffer.append("\\(")
+			this.values[i].toString(indent, buffer)
+			buffer.append(')')
+			LexerUtil.appendStringLiteralBody(this.strings[i + 1], buffer)
+		}
+		buffer.append('"')
+	}
+
+	public override boolean equals(Object o)
+	{
+		if (this === o) return true
+		if (!(o is StringInterpolation)) return false
+
+		let that = o as StringInterpolation;
+		return this.strings == that.strings && this.values == that.values
+	}
+
+	public override int hashCode() = 31 * this.strings.hashCode + (this.values != null ? this.values.hashCode : 0)
+}

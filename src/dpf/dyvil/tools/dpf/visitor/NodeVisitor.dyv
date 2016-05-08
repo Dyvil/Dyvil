@@ -10,7 +10,5 @@ public interface NodeVisitor
 	
 	NodeVisitor visitNodeAccess(Name name);
 	
-	default void visitEnd()
-	{
-	}
+	void visitEnd() { }
 }

@@ -1,0 +1,31 @@
+package dyvil.tools.dpf.converter
+
+import dyvil.collection.Map
+import dyvil.tools.dpf.ast.Expandable
+
+public class NameAccess extends DyvilValueVisitor implements Expandable
+{
+	private Object value
+	private String name
+	
+	public init(String name)
+	{
+		this.name = name;
+	}
+
+	protected override void visitObject(Object o)
+	{
+		this.value = o;
+	}
+	
+	public override Object expand(Map<String, Object> mappings, boolean mutate) = mappings[this.toString]
+
+	public override String toString()
+	{
+		if (this.value == null)
+		{
+			return this.name
+		}
+		return this.value.toString + '.' + this.name
+	}
+}

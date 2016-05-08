@@ -1,21 +1,21 @@
-package dyvil.tools.dpf.converter.binary;
+package dyvil.tools.dpf.converter.binary
 
-import dyvil.tools.dpf.visitor.*;
-import dyvil.tools.parsing.Name;
+import dyvil.tools.dpf.visitor._
+import dyvil.tools.parsing.Name
 
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.DataOutput
+import java.io.IOException
 
-import static dyvil.tools.dpf.converter.binary.BinaryConstants.*;
+using dyvil.tools.dpf.converter.binary.BinaryConstants._
 
 public class BinaryWriter
 		implements NodeVisitor, ValueVisitor, ListVisitor, MapVisitor, StringInterpolationVisitor, BuilderVisitor
 {
-	private final DataOutput dataOutput;
+	private DataOutput dataOutput
 
-	public BinaryWriter(DataOutput dataOutput)
+	public init(DataOutput dataOutput)
 	{
-		this.dataOutput = dataOutput;
+		this.dataOutput = dataOutput
 	}
 
 	private void writeTag(int tag)
@@ -32,7 +32,7 @@ public class BinaryWriter
 
 	private void writeTagThrowing(int tag) throws IOException
 	{
-		this.dataOutput.writeByte((byte) tag);
+		this.dataOutput.writeByte(tag as byte);
 	}
 
 	private void writeName(Name name)
@@ -77,22 +77,19 @@ public class BinaryWriter
 
 	// NodeVisitor
 
-	@Override
-	public NodeVisitor visitNode(Name name)
+	public override NodeVisitor visitNode(Name name)
 	{
 		this.writeTagAndName(NODE, name);
 		return this;
 	}
 
-	@Override
-	public ValueVisitor visitProperty(Name name)
+	public override ValueVisitor visitProperty(Name name)
 	{
 		this.writeTagAndName(PROPERTY, name);
 		return this;
 	}
 
-	@Override
-	public NodeVisitor visitNodeAccess(Name name)
+	public override NodeVisitor visitNodeAccess(Name name)
 	{
 		this.writeTagAndName(NODE_ACCESS, name);
 		return this;
@@ -100,8 +97,7 @@ public class BinaryWriter
 
 	// ValueVisitor
 
-	@Override
-	public void visitInt(int value)
+	public override void visitInt(int value)
 	{
 		try
 		{
@@ -114,8 +110,7 @@ public class BinaryWriter
 		}
 	}
 
-	@Override
-	public void visitLong(long value)
+	public override void visitLong(long value)
 	{
 		try
 		{
@@ -128,8 +123,7 @@ public class BinaryWriter
 		}
 	}
 
-	@Override
-	public void visitFloat(float value)
+	public override void visitFloat(float value)
 	{
 		try
 		{
@@ -142,8 +136,7 @@ public class BinaryWriter
 		}
 	}
 
-	@Override
-	public void visitDouble(double value)
+	public override void visitDouble(double value)
 	{
 		try
 		{
@@ -156,8 +149,7 @@ public class BinaryWriter
 		}
 	}
 
-	@Override
-	public void visitString(String value)
+	public override void visitString(String value)
 	{
 		try
 		{
@@ -170,42 +162,36 @@ public class BinaryWriter
 		}
 	}
 
-	@Override
-	public StringInterpolationVisitor visitStringInterpolation()
+	public override StringInterpolationVisitor visitStringInterpolation()
 	{
 		this.writeTag(STRING_INTERPOLATION);
 		return this;
 	}
 
-	@Override
-	public void visitName(Name name)
+	public override void visitName(Name name)
 	{
 		this.writeTagAndName(NAME, name);
 	}
 
-	@Override
-	public ValueVisitor visitValueAccess(Name name)
+	public override ValueVisitor visitValueAccess(Name name)
 	{
 		this.writeTagAndName(NAME_ACCESS, name);
 		return this;
 	}
 
-	@Override
-	public ListVisitor visitList()
+	public override ListVisitor visitList()
 	{
 		this.writeTag(LIST);
 		return this;
 	}
 
-	@Override
-	public MapVisitor visitMap()
+	public override MapVisitor visitMap()
 	{
 		this.writeTag(MAP);
 		return this;
 	}
 
-	@Override
-	public BuilderVisitor visitBuilder(Name name)
+	public override BuilderVisitor visitBuilder(Name name)
 	{
 		this.writeTagAndName(BUILDER, name);
 		return this;
@@ -213,24 +199,21 @@ public class BinaryWriter
 
 	// ListVisitor
 
-	@Override
-	public ValueVisitor visitElement()
+	public override ValueVisitor visitElement()
 	{
 		return this;
 	}
 
 	// MapVisitor
 
-	@Override
-	public ValueVisitor visitKey()
+	public override ValueVisitor visitKey()
 	{
 		return this;
 	}
 
 	// StringInterpolationVisitor
 
-	@Override
-	public void visitStringPart(String string)
+	public override void visitStringPart(String string)
 	{
 		try
 		{
@@ -244,15 +227,13 @@ public class BinaryWriter
 
 	// BuilderVisitor
 
-	@Override
-	public ValueVisitor visitParameter(Name name)
+	public override ValueVisitor visitParameter(Name name)
 	{
 		this.writeName(name);
 		return this;
 	}
 
-	@Override
-	public NodeVisitor visitNode()
+	public override NodeVisitor visitNode()
 	{
 		this.writeName(null);
 		this.writeTag(END);
@@ -261,14 +242,12 @@ public class BinaryWriter
 
 	// Shared
 
-	@Override
-	public ValueVisitor visitValue()
+	public override ValueVisitor visitValue()
 	{
 		return this;
 	}
 
-	@Override
-	public void visitEnd()
+	public override void visitEnd()
 	{
 		this.writeTag(END);
 	}

@@ -2,10 +2,7 @@ package dyvil.tools.dpf.ast.value;
 
 public interface Constant extends Value
 {
-	default boolean isConstant()
-	{
-		return true;
-	}
+	boolean isConstant() = true
 
 	Object toObject();
 
