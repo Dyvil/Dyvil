@@ -17,6 +17,7 @@ public class Main
 		ConstructorTest.main(args)
 		ExtensionTest.main(args)
 		ForTest.main(args)
+		HanoiTest.main(args)
 		IncTest.main(args)
 		InheritanceTest.main(args)
 		IntrinsicTest.main(args)
