@@ -15,6 +15,7 @@ public class Main
 		CaptureTest.main(args)
 		CaseClassTest.main(args)
 		ConstructorTest.main(args)
+		DPFTest.main(args)
 		ExtensionTest.main(args)
 		ForTest.main(args)
 		HanoiTest.main(args)

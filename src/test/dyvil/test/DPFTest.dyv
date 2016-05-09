@@ -1,0 +1,123 @@
+package dyvil.test
+
+import java.io._
+
+import dyvil.collection.Map
+import dyvil.collection.mutable.TreeMap
+
+import dyvil.tools.parsing.Name
+import dyvil.tools.dpf.ast._
+import dyvil.tools.dpf.ast.value.Value
+import dyvil.tools.dpf.converter.{ binary._, string._, flatmap._ }
+
+using dyvil.tools.dpf.DSL._
+
+public class DPFTest
+{
+	public case class Button(String text, int x, int y)
+	{
+		private boolean visible = false
+		{
+			public get
+			public set
+		}
+
+		public Value toPropertyValue()
+		{
+			return "Button"(this.text, "x": this.x, "y": this.y) {
+				"visible": this.visible
+			}
+		}
+
+		public Button apply(Configure<Button> configure)
+		{
+			configure this
+			return this
+		}
+	}
+
+	public static final RootNode TEST_NODE = (dpf {
+		"node1" {
+			"intProperty": 10
+			"stringProperty": "abc"
+			"stringProperty2":
+				"String Interpolation: \("node1.stringProperty") where intProperty = \("node1.intProperty")"
+			"listProperty": [ 1, "a", true ]
+			"mapProperty": [ 1 : "a", 2 : "B" ]
+
+			// Typesafe Builder, with automatic Conversion
+			"builderProperty1": Button(text: "Click Me", x: 10, y: 20) {
+				visible = true
+			}
+
+			// DSL Builder
+			"builderProperty2": "Button"("Click Me", "x": 10, "y": 20) {
+				"visible": true
+			}
+		}
+
+		"node2" {
+			"subProperty1": 42
+			"subNode1" {
+				"subProperty2": 13
+			}
+		}
+	})
+
+	public static final String TEST_STRING = TEST_NODE.toString
+
+	public static void main([String] args)
+	{
+		// Main.test("DPF Parser", TEST_NODE, Parser.parse(TEST_STRING))
+
+		// new Parser(TEST_STRING).parseNodeBody(new Printer)
+
+		testExpand()
+		testBinary()
+	}
+
+	private static void testExpand()
+	{
+		// Parse as a Map
+		Map<String, Object> baseMap = new TreeMap<String, Object>
+		TEST_NODE.accept(new FlatMapConverter(baseMap))
+
+		// Expand the Node structure
+		RootNode expandedNode = TEST_NODE.expand(baseMap, false)
+
+		// Convert the Node structure to a Map
+		Map<String, Object> nodeMap = new TreeMap<String, Object>
+		expandedNode.accept(new FlatMapConverter(nodeMap))
+
+		let expandedMap = Expandable.expandMap(baseMap, baseMap, false) as Map<String, Object>
+
+		Main.test("DPF Expansion Test", nodeMap, expandedMap)
+	}
+
+	private static void testBinary()
+	{
+		let newNode = new RootNode
+
+		try
+		{
+			let byteArrayOutputStream = new ByteArrayOutputStream()
+			let dataOutputStream = new DataOutputStream(byteArrayOutputStream)
+
+			TEST_NODE.accept(new BinaryWriter(dataOutputStream))
+
+			let bytes = byteArrayOutputStream.toByteArray
+			let byteArrayInputStream = new ByteArrayInputStream(bytes)
+			let dataInputStream = new DataInputStream(byteArrayInputStream)
+
+			let binaryReader = new BinaryReader(dataInputStream)
+
+			binaryReader.readNodes(newNode)
+		}
+		catch (Throwable ex)
+		{
+			ex.printStackTrace
+		}
+
+		Main.test("DPF Binary Conversion", TEST_NODE, newNode)
+	}
+}
