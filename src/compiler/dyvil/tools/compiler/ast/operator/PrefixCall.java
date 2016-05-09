@@ -47,12 +47,17 @@ public class PrefixCall extends MethodCall
 	@Override
 	public IValue resolveCall(MarkerList markers, IContext context)
 	{
-		final IValue op = Operators.getPrefix(this.name, this.arguments.getFirstValue());
-		if (op != null)
+		final IValue operand = this.arguments.getFirstValue();
+
+		if (operand != null)
 		{
-			// Intrinsic Prefix Operators (! and *)
-			op.setPosition(this.position);
-			return op.resolveOperator(markers, context);
+			final IValue op = Operators.getPrefix(this.name, operand);
+			if (op != null)
+			{
+				// Intrinsic Prefix Operators (! and *)
+				op.setPosition(this.position);
+				return op.resolveOperator(markers, context);
+			}
 		}
 
 		// Normal Method Resolution
