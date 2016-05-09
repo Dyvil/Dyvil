@@ -60,6 +60,14 @@ public final class SemicolonInference
 			{
 				switch (prevType)
 				{
+				case DyvilSymbols.HASH:
+				{
+					// Strip the # token
+					final IToken prev2 = prev.prev();
+					prev2.setNext(next);
+					next.setPrev(prev2);
+					return; // don't infer a semicolon
+				}
 				case DyvilSymbols.UNDERSCORE:
 				case DyvilSymbols.ELLIPSIS:
 					break; // continue inference checking
@@ -76,6 +84,7 @@ public final class SemicolonInference
 				case DyvilKeywords.FALSE:
 				case DyvilKeywords.BREAK:
 				case DyvilKeywords.CONTINUE:
+				case DyvilKeywords.RETURN:
 				case DyvilKeywords.THIS:
 				case DyvilKeywords.SUPER:
 				case DyvilKeywords.NIL:
