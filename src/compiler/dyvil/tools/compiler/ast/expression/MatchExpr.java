@@ -5,6 +5,7 @@ import dyvil.math.MathUtils;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.consumer.ICaseConsumer;
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -24,7 +25,7 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 import java.util.Arrays;
 
-public final class MatchExpr implements IValue, ICaseConsumer
+public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 {
 	protected ICodePosition position;
 	
@@ -35,7 +36,12 @@ public final class MatchExpr implements IValue, ICaseConsumer
 	// Metadata
 	private boolean exhaustive;
 	private IType   returnType;
-	
+
+	public MatchExpr(ICodePosition position)
+	{
+		this.position = position;
+	}
+
 	public MatchExpr(ICodePosition position, IValue matchedValue)
 	{
 		this.position = position;
@@ -66,7 +72,18 @@ public final class MatchExpr implements IValue, ICaseConsumer
 	{
 		return MATCH;
 	}
-	
+
+	public IValue getValue()
+	{
+		return this.matchedValue;
+	}
+
+	@Override
+	public void setValue(IValue value)
+	{
+		this.matchedValue = value;
+	}
+
 	@Override
 	public void addCase(ICase iCase)
 	{

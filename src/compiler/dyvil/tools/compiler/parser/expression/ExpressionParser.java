@@ -794,6 +794,16 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			this.end(pm, true);
 			return true;
 		}
+		case DyvilKeywords.MATCH:
+		{
+			// match ...
+			final MatchExpr matchExpr = new MatchExpr(token.raw());
+			this.value = matchExpr;
+
+			pm.pushParser(new MatchExpressionParser(matchExpr));
+			this.mode = END;
+			return true;
+		}
 		case DyvilKeywords.WHILE:
 		{
 			// while ...
@@ -806,7 +816,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				return true;
 			}
 
-			final WhileStatement whileStatement = new WhileStatement(token);
+			final WhileStatement whileStatement = new WhileStatement(token.raw());
 			this.value = whileStatement;
 
 			pm.pushParser(new WhileStatementParser(whileStatement));
@@ -817,7 +827,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		{
 			// repeat ...
 
-			final RepeatStatement repeatStatement = new RepeatStatement(token);
+			final RepeatStatement repeatStatement = new RepeatStatement(token.raw());
 			this.value = repeatStatement;
 
 			pm.pushParser(new RepeatStatementParser(repeatStatement));
