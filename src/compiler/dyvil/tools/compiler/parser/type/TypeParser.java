@@ -114,10 +114,20 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					return;
 				}
 			}
-			if (type == BaseSymbols.DOT)
+			switch (type)
 			{
-				pm.pushParser(new TypeParser(this, this.type));
+			case BaseSymbols.DOT:
+				pm.pushParser(new TypeParser(this, this.type, this.flags));
 				return;
+			case BaseSymbols.OPEN_SQUARE_BRACKET:
+				final IToken next = token.next();
+				if (next.type() == BaseSymbols.CLOSE_SQUARE_BRACKET)
+				{
+					this.type = new ArrayType(this.type);
+					pm.report(Markers.syntaxWarning(token.to(next), "type.array.java"));
+					pm.skip();
+					return;
+				}
 			}
 
 			if (this.type != null)
