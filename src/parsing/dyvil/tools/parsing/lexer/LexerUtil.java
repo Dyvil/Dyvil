@@ -115,6 +115,11 @@ public class LexerUtil
 		return Character.isUnicodeIdentifierPart(c);
 	}
 
+	public static boolean isIdentifierConnector(int c)
+	{
+		return c == '_' || c == '$';
+	}
+
 	public static boolean isIdentifierSymbol(int c)
 	{
 		if (c <= 0xA0)

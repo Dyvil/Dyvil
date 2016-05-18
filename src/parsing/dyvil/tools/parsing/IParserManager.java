@@ -34,6 +34,8 @@ public interface IParserManager
 	 */
 	void splitJump(IToken token, int length);
 
+	void splitReparse(IToken token, int length);
+
 	void report(IToken token, String message);
 
 	void report(Marker error);
