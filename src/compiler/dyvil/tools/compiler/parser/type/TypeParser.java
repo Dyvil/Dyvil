@@ -17,12 +17,13 @@ import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
-import dyvil.tools.parsing.position.CodePosition;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 
 public final class TypeParser extends Parser implements ITypeConsumer
@@ -40,6 +41,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 
 	public static final int NAMED_ONLY    = 1;
 	public static final int IGNORE_LAMBDA = 2;
+	public static final int CLOSE_ANGLE   = 4;
 
 	protected ITypeConsumer consumer;
 
@@ -51,13 +53,26 @@ public final class TypeParser extends Parser implements ITypeConsumer
 	public TypeParser(ITypeConsumer consumer)
 	{
 		this.consumer = consumer;
-		this.mode = NAME;
+		// this.mode = NAME;
 	}
 
-	public TypeParser(ITypeConsumer consumer, IType parentType)
+	public TypeParser(ITypeConsumer consumer, boolean closeAngle)
+	{
+		this.consumer = consumer;
+
+		if (closeAngle)
+		{
+			this.flags = CLOSE_ANGLE;
+		}
+		// this.mode = NAME;
+	}
+
+	protected TypeParser(ITypeConsumer consumer, IType parentType, int flags)
 	{
 		this.consumer = consumer;
 		this.parentType = parentType;
+		this.flags = flags;
+		// this.mode = NAME;
 	}
 
 	public TypeParser withFlags(int flags)
@@ -66,10 +81,9 @@ public final class TypeParser extends Parser implements ITypeConsumer
 		return this;
 	}
 
-	public TypeParser namedOnly()
+	private TypeParser subParser(ITypeConsumer consumer)
 	{
-		this.flags |= NAMED_ONLY;
-		return this;
+		return new TypeParser(consumer).withFlags(this.flags);
 	}
 
 	@Override
@@ -110,7 +124,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					final LambdaType lambdaType = new LambdaType(token.raw(), this.type);
 					this.type = lambdaType;
 					this.mode = LAMBDA_END;
-					pm.pushParser(new TypeParser(lambdaType));
+					pm.pushParser(this.subParser(lambdaType));
 					return;
 				}
 			}
@@ -184,7 +198,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					}
 
 					final LambdaType lambdaType = new LambdaType(token.raw(), this.parentType);
-					pm.pushParser(new TypeParser(lambdaType));
+					pm.pushParser(this.subParser(lambdaType));
 					this.type = lambdaType;
 					this.mode = LAMBDA_END;
 					return;
@@ -197,71 +211,72 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					this.type = new WildcardType(token.raw());
 					this.mode = END;
 					return;
-				}
-
-				if (ParserUtil.isIdentifier(type))
-				{
-					final String identifier = token.stringValue();
-					switch (identifier.charAt(0))
-					{
-					case '_':
-						if (identifier.length() == 1 || identifier.charAt(1) == '>')
-						{
-							// _
-							// Special Case: _> as in Class<_>
-							this.type = new WildcardType(new CodePosition(token.startLine(), token.startIndex(),
-							                                              token.startIndex() + 1));
-							this.mode = END;
-							pm.splitJump(token, 1);
-							return;
-						}
-						break; // Parse as Identifier
-					case '+':
+				case Tokens.SYMBOL_IDENTIFIER:
+					final Name name = token.nameValue();
+					if (name == Names.plus)
 					{
 						final WildcardType wildcardType = new WildcardType(Variance.COVARIANT);
-						pm.pushParser(new TypeParser(wildcardType));
+						pm.pushParser(this.subParser(wildcardType));
 						this.type = wildcardType;
 						this.mode = END;
 						return;
 					}
-					case '-':
+					if (name == Names.minus)
 					{
 						final WildcardType wildcardType = new WildcardType(Variance.CONTRAVARIANT);
-						pm.pushParser(new TypeParser(wildcardType));
+						pm.pushParser(this.subParser(wildcardType));
 						this.type = wildcardType;
 						this.mode = END;
-						return;
-					}
-					case '>':
-						// Special Case: > as in List<>
-						pm.split(token, 1);
-						pm.popParser(); // no reparse
 						return;
 					}
 				}
 			}
-			if (ParserUtil.isIdentifier(type))
-			{
-				final Name name = token.nameValue();
-				final IToken next = token.next();
 
-				if (isGenericStart(next, next.type()))
+			if (!ParserUtil.isIdentifier(type))
+			{
+				if (ParserUtil.isTerminator(type))
 				{
-					this.type = new NamedGenericType(token.raw(), name, this.parentType);
-					this.mode = GENERICS;
+					pm.popParser(true);
+					return;
+				}
+				pm.report(Markers.syntaxError(token, "type.invalid", token.toString()));
+				return;
+			}
+
+			final Name name = token.nameValue();
+
+			final int closeAngleIndex;
+			if ((this.flags & CLOSE_ANGLE) != 0 && type == Tokens.SYMBOL_IDENTIFIER
+				    && (closeAngleIndex = name.unqualified.indexOf('>')) >= 0)
+			{
+				// Token contains a > and is not backticked
+
+				if (closeAngleIndex == 0)
+				{
+					// Token is a single >
+					// Handles Type< > gracefully
+
+					pm.popParser(true);
 					return;
 				}
 
-				this.type = new NamedType(token.raw(), name, this.parentType);
-				this.mode = END;
+				// strip the trailing > and reparse the first part of the token
+				// Handles Type<?> gracefully
+				pm.splitReparse(token, closeAngleIndex);
 				return;
 			}
-			if (ParserUtil.isTerminator(type))
+
+			final IToken next = token.next();
+
+			if (isGenericStart(next, next.type()))
 			{
-				pm.popParser(true);
+				this.type = new NamedGenericType(token.raw(), name, this.parentType);
+				this.mode = GENERICS;
 				return;
 			}
-			pm.report(Markers.syntaxError(token, "type.invalid", token.toString()));
+
+			this.type = new NamedType(token.raw(), name, this.parentType);
+			this.mode = END;
 			return;
 		case TUPLE_END:
 		{
@@ -279,7 +294,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				this.mode = LAMBDA_END;
 
 				pm.skip();
-				pm.pushParser(new TypeParser(lambdaType));
+				pm.pushParser(this.subParser(lambdaType));
 				return;
 			}
 
@@ -325,7 +340,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			if (isGenericStart(token, type))
 			{
 				pm.splitJump(token, 1);
-				pm.pushParser(new TypeListParser((GenericType) this.type));
+				pm.pushParser(new TypeListParser((GenericType) this.type, true));
 				this.mode = GENERICS_END;
 				return;
 			}
@@ -343,7 +358,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			return;
 		case ANNOTATION_END:
 			this.mode = END;
-			pm.pushParser(new TypeParser((ITyped) this.type), true);
+			pm.pushParser(this.subParser((ITyped) this.type), true);
 		}
 	}
 

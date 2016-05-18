@@ -124,7 +124,7 @@ public class PatternParser extends Parser implements ITypeConsumer
 				}
 
 				this.mode = TYPE_END;
-				pm.pushParser(new TypeParser(this).namedOnly(), true);
+				pm.pushParser(new TypeParser(this).withFlags(TypeParser.NAMED_ONLY), true);
 				return;
 			}
 

@@ -9,14 +9,14 @@ import dyvil.tools.compiler.ast.generic.TypeParameter;
 import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
-import dyvil.tools.parsing.IParserManager;
-import dyvil.tools.parsing.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.token.IToken;
 
 public final class TypeParameterParser extends Parser implements ITyped
@@ -102,13 +102,13 @@ public final class TypeParameterParser extends Parser implements ITyped
 			{
 				if (type == DyvilKeywords.EXTENDS)
 				{
-					pm.pushParser(new TypeParser(this));
+					pm.pushParser(this.newTypeParser());
 					this.boundMode = UPPER;
 					return;
 				}
 				if (type == DyvilKeywords.SUPER)
 				{
-					pm.pushParser(new TypeParser(this));
+					pm.pushParser(this.newTypeParser());
 					this.boundMode = LOWER;
 					return;
 				}
@@ -120,20 +120,20 @@ public final class TypeParameterParser extends Parser implements ITyped
 				{
 					if (name == Names.ltcolon) // <: - Upper Bounds
 					{
-						pm.pushParser(new TypeParser(this));
+						pm.pushParser(this.newTypeParser());
 						this.boundMode = UPPER;
 						return;
 					}
 					if (name == Names.gtcolon) // >: - Lower Bound
 					{
-						pm.pushParser(new TypeParser(this));
+						pm.pushParser(this.newTypeParser());
 						this.boundMode = LOWER;
 						return;
 					}
 				}
 				else if (this.boundMode == UPPER && name == Names.amp)
 				{
-					pm.pushParser(new TypeParser(this));
+					pm.pushParser(this.newTypeParser());
 					return;
 				}
 			}
@@ -145,6 +145,12 @@ public final class TypeParameterParser extends Parser implements ITyped
 			pm.popParser(true);
 			pm.report(token, "typeparameter.bound.invalid");
 		}
+	}
+
+	private TypeParser newTypeParser()
+	{
+		// All Type Parameters are within Angle Brackets
+		return new TypeParser(this).withFlags(TypeParser.CLOSE_ANGLE);
 	}
 
 	private void createTypeParameter(IToken token, Variance variance)

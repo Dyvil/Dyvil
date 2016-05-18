@@ -116,7 +116,7 @@ public class ThisSuperInitParser extends Parser
 				this.mode = TYPE_END;
 
 				pm.splitJump(token, 1);
-				pm.pushParser(new TypeParser(this.value));
+				pm.pushParser(new TypeParser(this.value, true));
 				return;
 			}
 

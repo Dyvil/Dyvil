@@ -66,14 +66,17 @@ public class TypeClassParser extends Parser
 
 			throw new Error();
 		case TYPE:
-			if (type == BaseSymbols.OPEN_PARENTHESIS)
-			{
-				this.mode = PARENTHESES_END;
-			}
-			else if (TypeParser.isGenericStart(token, type))
+			if (TypeParser.isGenericStart(token, type))
 			{
 				this.mode = ANGLE_END;
 				pm.splitJump(token, 1);
+				pm.pushParser(new TypeParser(this.value, true));
+				return;
+			}
+
+			if (type == BaseSymbols.OPEN_PARENTHESIS)
+			{
+				this.mode = PARENTHESES_END;
 			}
 			else
 			{
