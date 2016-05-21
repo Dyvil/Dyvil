@@ -31,6 +31,7 @@ import dyvil.tools.compiler.parser.type.TypeParameterListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Name;
@@ -45,15 +46,15 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 	protected static final int TYPE                       = 0;
 	protected static final int NAME_OPERATOR              = 1;
 	protected static final int NAME                       = 2;
-	protected static final int FIELD_NAME                 = 3;
-	protected static final int FIELD_TYPE                 = 4;
-	protected static final int FIELD_SEPARATOR            = 5;
-	protected static final int METHOD_NAME                = 6;
-	protected static final int METHOD_SEPARATOR           = 7;
-	protected static final int PARAMETERS                 = 8;
-	protected static final int PARAMETERS_END             = 9;
-	protected static final int GENERICS                   = 10;
-	protected static final int GENERICS_END               = 11;
+	protected static final int FIELD_NAME                 = 4;
+	protected static final int FIELD_TYPE                 = 5;
+	protected static final int FIELD_SEPARATOR            = 6;
+	protected static final int METHOD_NAME                = 7;
+	protected static final int METHOD_SEPARATOR           = 8;
+	protected static final int PARAMETERS                 = 9;
+	protected static final int PARAMETERS_END             = 10;
+	protected static final int GENERICS                   = 11;
+	protected static final int GENERICS_END               = 12;
 	protected static final int METHOD_TYPE                = 13;
 	protected static final int METHOD_THROWS              = 14;
 	protected static final int METHOD_VALUE               = 15;
@@ -211,9 +212,6 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 		case NAME:
 			switch (type)
 			{
-			default:
-				pm.report(token, "member.identifier");
-				return;
 			case Tokens.SYMBOL_IDENTIFIER:
 			case Tokens.DOT_IDENTIFIER:
 				if (token.prev().type() != DyvilKeywords.OPERATOR)
@@ -234,42 +232,27 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 				{
 					pm.report(Markers.syntaxWarning(token, "member.identifier.operator"));
 				}
-				// Fallthrough
+				break;
+			default:
+				if (this.parseSeparator(token))
+				{
+					// Improve error handling for missing identifiers
+					this.position = token.raw();
+					this.name = Names.auto;
+					pm.reparse();
+				}
+
+				pm.report(token, "member.identifier");
+				return;
 			}
 
 			this.name = token.nameValue();
 			this.position = token.raw();
 
-			final IToken nextToken = token.next();
-			final int nextType = nextToken.type();
-
-			switch (nextType)
+			if (!this.parseSeparator(token.next()))
 			{
-			case Tokens.EOF:
-			case BaseSymbols.SEMICOLON:
-			case BaseSymbols.CLOSE_CURLY_BRACKET:
-				if ((this.flags & NO_UNINITIALIZED_VARIABLES) != 0)
-				{
-					// Produce an error
-					break;
-				}
-				// Fallthrough
-			case BaseSymbols.OPEN_CURLY_BRACKET:
-			case BaseSymbols.EQUALS:
-				this.mode = FIELD_TYPE;
-				return;
-			case BaseSymbols.OPEN_PARENTHESIS:
-				this.mode = METHOD_SEPARATOR;
-				return;
+				pm.report(token, "class.body.declaration.invalid");
 			}
-			if (TypeParser.isGenericStart(nextToken, nextType))
-			{
-				this.mode = METHOD_SEPARATOR;
-				return;
-			}
-
-			this.mode = END;
-			pm.report(token, "class.body.declaration.invalid");
 			return;
 		case FIELD_NAME:
 			if (!ParserUtil.isIdentifier(type))
@@ -374,8 +357,8 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 			                                                  this.annotations);
 			this.setMemberKind(METHOD);
 			this.member = method;
-			// Fallthrough
 		}
+		// Fallthrough
 		case GENERICS:
 			if (TypeParser.isGenericStart(token, type))
 			{
@@ -519,6 +502,36 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 
 			pm.popParser(true);
 		}
+	}
+
+	private boolean parseSeparator(IToken token)
+	{
+		final int type = token.type();
+		switch (type)
+		{
+		case Tokens.EOF:
+		case BaseSymbols.SEMICOLON:
+		case BaseSymbols.CLOSE_CURLY_BRACKET:
+			if ((this.flags & NO_UNINITIALIZED_VARIABLES) != 0)
+			{
+				// Produce an error
+				return false;
+			}
+			// Fallthrough
+		case BaseSymbols.OPEN_CURLY_BRACKET:
+		case BaseSymbols.EQUALS:
+			this.mode = FIELD_TYPE;
+			return true;
+		case BaseSymbols.OPEN_PARENTHESIS:
+			this.mode = METHOD_SEPARATOR;
+			return true;
+		}
+		if (TypeParser.isGenericStart(token, type))
+		{
+			this.mode = METHOD_SEPARATOR;
+			return true;
+		}
+		return false;
 	}
 
 	@Override
