@@ -45,6 +45,7 @@ if (droneBuild)
 
 // ---------------------------------------- Source Settings ----------------------------------------
 
+//noinspection GroovyAssignabilityCheck
 sourceSets {
 	library {
 		java {
@@ -53,44 +54,32 @@ sourceSets {
 			srcDir 'src/parsing'
 		}
 		resources {
-			srcDir 'src/resources'
+			srcDir 'src/parsing'
 
 			include resourceFilters
-			include 'dyvil/tools/parsing/**'
 		}
 	}
 
 	dpf {
 		java {
 			srcDir 'src/dpf'
-
-			compileClasspath += library.output
-			runtimeClasspath += library.output
 		}
 	}
 
 	compiler {
 		java {
 			srcDir 'src/compiler'
-
-			compileClasspath += library.output
-			runtimeClasspath += library.output + compiler.resources
 		}
 		resources {
-			srcDir 'src/resources'
+			srcDir 'src/compiler'
 
 			include resourceFilters
-			include 'dyvil/tools/compiler/**'
 		}
-		return
 	}
 
 	repl {
 		java {
 			srcDir 'src/repl'
-
-			compileClasspath += library.output + compiler.output
-			runtimeClasspath += library.output + compiler.output + compiler.resources
 		}
 	}
 
@@ -101,6 +90,7 @@ sourceSets {
 	}
 }
 
+//noinspection GroovyAssignabilityCheck
 processResources {
 	include resourceFilters
 }
@@ -114,27 +104,28 @@ repositories {
 dependencies {
 	// Runtime Dependencies (Resources)
 
-	runtime files("$buildDir/dyvilbin") {
+	def libraryFiles = files("$buildDir/dyvilbin") {
 		builtBy 'compileLibraryDyvil'
 	}
-
-	runtime files("$buildDir/dyviltestbin") {
+	def dpfFiles = files("$buildDir/dpfbin") {
+		builtBy 'compileDPFDyvil'
+	}
+	def testFiles = files("$buildDir/dyviltestbin") {
 		builtBy 'compileTestDyvil'
 	}
 
-	runtime files("$buildDir/dpfbin") {
-		builtBy 'compileDPFDyvil'
-	}
+	libraryRuntime libraryFiles
 
-	runtime files("src/resources")
+	compilerCompile sourceSets.library.output
 
-	// Test Dependencies
-	testCompile 'junit:junit:4.12'
+	dpfCompile sourceSets.library.output
+	dpfRuntime dpfFiles
 
-	testCompile sourceSets.library.output
-	testCompile sourceSets.compiler.output
-	testCompile sourceSets.repl.output
-	testCompile sourceSets.dpf.output
+	replCompile sourceSets.library.output, sourceSets.compiler.output
+	replRuntime libraryFiles, dpfFiles, testFiles
+
+	testCompile 'junit:junit:4.12', sourceSets.library.output
+	testRuntime libraryFiles, dpfFiles, testFiles
 }
 
 // ---------------------------------------- Copy Tasks ----------------------------------------
@@ -268,7 +259,7 @@ private void runCompiler(JavaExec exec, String config, String src, String bin)
 
 task testDyvil(type: JavaExec, dependsOn: [ 'compileTestDyvil' ]) {
 	main = 'dyvil.test.Main'
-	classpath = sourceSets.library.runtimeClasspath + files("$buildDir/dyviltestbin", "$buildDir/dyvilbin", "$buildDir/dpfbin")
+	classpath = sourceSets.test.runtimeClasspath
 }
 
 test.dependsOn 'testDyvil'
