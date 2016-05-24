@@ -1,7 +1,9 @@
 package dyvil.tools.compiler;
 
-import dyvil.io.*;
+import dyvil.io.AppendablePrintStream;
+import dyvil.io.BasicPrintStream;
 import dyvil.io.Console;
+import dyvil.io.FileUtils;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -12,6 +14,7 @@ import dyvil.tools.compiler.phase.ICompilerPhase;
 import dyvil.tools.compiler.phase.PrintPhase;
 import dyvil.tools.compiler.sources.DyvilFileType;
 import dyvil.tools.compiler.sources.FileFinder;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.TestThread;
 import dyvil.tools.compiler.util.Util;
 
@@ -86,18 +89,18 @@ public final class DyvilCompiler implements Tool
 		File sourceDir = this.config.getSourceDir();
 		if (sourceDir == null)
 		{
-			this.log("No source path defined in Configuration File. Skipping Compilation.");
+			this.log(Markers.getInfo("config.source_path.missing"));
 			return false;
 		}
 
 		if (!sourceDir.exists())
 		{
-			this.log("The specified source path '" + sourceDir + "' does not exist. Skipping Compilation.");
+			this.log(Markers.getInfo("config.source_path.not_found", sourceDir));
 			return false;
 		}
 
 		final long endTime = System.nanoTime();
-		this.log("Loaded Config (" + Util.toTime(endTime - startTime) + ")");
+		this.log(Markers.getInfo("config.loaded", Util.toTime(endTime - startTime)));
 
 		return true;
 	}
@@ -190,19 +193,19 @@ public final class DyvilCompiler implements Tool
 
 		if (!ConfigParser.readProperty(this.config, arg))
 		{
-			this.warn("Invalid Argument '" + arg + "'. Ignoring.");
+			this.warn(Markers.getInfo("argument.invalid", arg));
 		}
 	}
 
 	private void loadConfig(String source)
 	{
-		this.log("Loading Configuration File from '" + source + "'");
+		this.log(Markers.getInfo("config.loading", source));
 
 		final File file = new File(source);
 		this.config.setConfigFile(file);
 		if (!file.exists())
 		{
-			this.error("Configuration File '" + source + "' does not exist");
+			this.error(Markers.getInfo("config.not_found", source));
 			return;
 		}
 
@@ -213,7 +216,7 @@ public final class DyvilCompiler implements Tool
 		}
 		catch (IOException ex)
 		{
-			this.error("Failed to load configuration file '" + source + "'", ex);
+			this.error(Markers.getInfo("config.error", source), ex);
 		}
 	}
 
@@ -231,8 +234,9 @@ public final class DyvilCompiler implements Tool
 		Package.initRoot(this);
 
 		final long endTime = System.nanoTime();
-		this.log(
-			"Loaded " + libs + (libs == 1 ? " Library (" : " Libraries (") + Util.toTime(endTime - startTime) + ")");
+		this.log(Markers.getInfo("library.found",
+		                         libs == 1 ? Markers.getInfo("libraries.1") : Markers.getInfo("libraries.n", libs),
+		                         Util.toTime(endTime - startTime)));
 	}
 
 	private void initLogger()
@@ -296,7 +300,7 @@ public final class DyvilCompiler implements Tool
 		final File sourceDir = this.config.getSourceDir();
 		final File outputDir = this.config.getOutputDir();
 
-		this.log("Compiling '" + sourceDir + "' to '" + outputDir + "'");
+		this.log(Markers.getInfo("compilation.init", sourceDir, outputDir));
 
 		// Scan for Packages and Compilation Units
 		DyvilFileType.setupFileFinder(this.fileFinder);
@@ -309,10 +313,10 @@ public final class DyvilCompiler implements Tool
 
 		final long endTime = System.nanoTime();
 
-		this.log("Found " + fileCount + (fileCount == 1 ? " File (" : " Files (") + unitCount + (unitCount == 1 ?
-			                                                                                         " Compilation Unit)" :
-			                                                                                         " Compilation Units)")
-			         + " (" + Util.toTime(endTime - startTime) + ")");
+		this.log(Markers.getInfo("files.found",
+		                         fileCount == 1 ? Markers.getInfo("files.1") : Markers.getInfo("files.n", fileCount),
+		                         unitCount == 1 ? Markers.getInfo("units.1") : Markers.getInfo("units.n", unitCount),
+		                         Util.toTime(endTime - startTime)));
 		this.log("");
 	}
 
@@ -323,11 +327,13 @@ public final class DyvilCompiler implements Tool
 		// Apply states
 		if (this.config.isDebug())
 		{
-			this.log("Applying " + phases + (phases == 1 ? " Phase: " : " Phases: ") + this.phases);
+			this.log(phases == 1 ?
+				         Markers.getInfo("phase.applying.1", this.phases) :
+				         Markers.getInfo("phase.applying.n", phases, this.phases));
 
 			for (ICompilerPhase phase : this.phases)
 			{
-				this.log("Applying " + phase.getName());
+				this.log(Markers.getInfo("phase.applying", phase.getName()));
 				if (!this.applyPhaseDebug(phase))
 				{
 					return false;
@@ -373,13 +379,13 @@ public final class DyvilCompiler implements Tool
 			phase.apply(this);
 
 			final long endTime = System.nanoTime();
-			this.log(phase.getName() + " completed (" + Util.toTime(endTime - startTime) + ")");
+			this.log(Markers.getInfo("phase.completed", phase.getName(), Util.toTime(endTime - startTime)));
 
 			return true;
 		}
 		catch (Throwable t)
 		{
-			this.log(phase.getName() + " failed!");
+			this.log(Markers.getInfo("phase.failed", phase.getName()));
 			this.error(phase.getName(), "apply", t);
 			return false;
 		}
@@ -396,8 +402,7 @@ public final class DyvilCompiler implements Tool
 		File file = new File(this.config.getOutputDir(), this.config.getMainType().replace('.', '/') + ".class");
 		if (!file.exists())
 		{
-			this.log(
-				"The Main Type '" + this.config.getMainType() + "' does not exist or was not compiled, skipping test.");
+			this.log(Markers.getInfo("test.main_type.not_found", this.config.getMainType()));
 			return;
 		}
 
@@ -430,20 +435,17 @@ public final class DyvilCompiler implements Tool
 	{
 		if (Library.dyvilLibrary == null)
 		{
-			this.error("Could not load Dyvil Runtime Library");
+			this.error(Markers.getInfo("library.dyvil"));
 		}
 		if (Library.javaLibrary == null)
 		{
-			this.error("Could not load Java Runtime Library");
+			this.error(Markers.getInfo("library.java"));
 		}
 
 		if (Types.LANG_HEADER == null)
 		{
-			this.error("The dyvil.Lang header could not be found. This may cause serious compilation problems.");
-			for (Library library : this.config.libraries)
-			{
-				this.error("\tlibrary = " + library);
-			}
+			this.error(Markers.getInfo("library.lang_header", this.config.libraries));
+
 			Types.LANG_HEADER = new DyvilHeader(this);
 		}
 	}

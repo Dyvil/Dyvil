@@ -36,27 +36,23 @@ public final class TestThread extends Thread
 
 			final long endTime = System.nanoTime();
 
-			this.compiler.log("Test completed (" + Util.toTime(endTime - startTime) + ")");
-			return;
+			this.compiler.log(Markers.getInfo("test.completed", Util.toTime(endTime - startTime)));
 		}
 		catch (VerifyError verifyError)
 		{
 			final String message = "BYTECODE VERIFICATION FAILED\n\n" + "Main Type: " + mainClassName + '\n' +
-					"Main Args: " + Arrays.toString(args) +
-					"\n\n----- ERROR -----\n";
+				                       "Main Args: " + Arrays.toString(args) +
+				                       "\n\n----- ERROR -----\n";
 
 			this.compiler.error(message, verifyError);
-			return;
 		}
 		catch (InvocationTargetException ex)
 		{
 			this.failTest(mainClassName, args, ex.getCause());
-			return;
 		}
 		catch (Throwable ex)
 		{
 			this.failTest(mainClassName, args, ex);
-			return;
 		}
 	}
 
@@ -78,8 +74,8 @@ public final class TestThread extends Thread
 	private void failTest(String mainType, String[] args, Throwable ex)
 	{
 		final String message = "Test Failed\n\n" + "Main Type: " + mainType + '\n' +
-				"Main Args: " + Arrays.toString(args) +
-				"\n\n----- ERROR -----\n";
+			                       "Main Args: " + Arrays.toString(args) +
+			                       "\n\n----- ERROR -----\n";
 		this.compiler.error(message, ex);
 	}
 }

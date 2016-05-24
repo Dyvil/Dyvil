@@ -519,7 +519,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		}
 		catch (IOException ex)
 		{
-			this.compiler.warn("Cannot load source file '" + this.inputFile + "'");
+			this.compiler.error(Markers.getInfo("source.error", this.inputFile), ex);
 			return false;
 		}
 	}
@@ -603,7 +603,8 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	protected boolean printMarkers()
 	{
 		return ICompilationUnit
-			       .printMarkers(this.compiler, this.markers, "Dyvil Header", this.name, this.inputFile, this.code);
+			       .printMarkers(this.compiler, this.markers, DyvilFileType.DYVIL_HEADER, this.name, this.inputFile,
+			                     this.code);
 	}
 
 	@Override

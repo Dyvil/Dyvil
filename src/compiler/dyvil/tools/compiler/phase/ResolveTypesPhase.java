@@ -3,6 +3,7 @@ package dyvil.tools.compiler.phase;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 
 public class ResolveTypesPhase implements ICompilerPhase
@@ -40,7 +41,7 @@ public class ResolveTypesPhase implements ICompilerPhase
 		
 		if (compiler.config.isDebug())
 		{
-			compiler.log("Loaded Base Types (" + Util.toTime(System.nanoTime() - now) + ")");
+			compiler.log(Markers.getInfo("library.types.loaded", Util.toTime(System.nanoTime() - now)));
 		}
 		
 		for (ICompilationUnit unit : compiler.fileFinder.units)

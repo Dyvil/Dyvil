@@ -9,6 +9,8 @@ import java.io.File;
 public interface IFileType
 {
 	String getExtension();
+
+	String getLocalizedName();
 	
 	ICompilationUnit createUnit(DyvilCompiler compiler, Package pack, File inputFile, File outputFile);
 }

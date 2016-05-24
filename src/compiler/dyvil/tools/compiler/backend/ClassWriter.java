@@ -4,6 +4,7 @@ import dyvil.collection.List;
 import dyvil.io.FileUtils;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.config.CompilerConfig;
+import dyvil.tools.compiler.util.Markers;
 
 import java.io.*;
 import java.util.jar.Attributes;
@@ -45,8 +46,7 @@ public class ClassWriter extends dyvil.tools.asm.ClassWriter
 		catch (IOException ex)
 		{
 			// If file saving fails, simply report the error.
-			compiler.error("Error during compilation of '" + file + "': " + ex.getMessage());
-			compiler.error("ClassWriter", "save", ex);
+			compiler.error(Markers.getInfo("compile.class.save", file), ex);
 		}
 	}
 	
@@ -62,8 +62,7 @@ public class ClassWriter extends dyvil.tools.asm.ClassWriter
 		catch (Throwable ex)
 		{
 			// If the compilation fails, skip creating and writing the file.
-			compiler.error("Error during compilation of '" + file + "': " + ex);
-			compiler.error("ClassWriter", "compile", ex);
+			compiler.error(Markers.getInfo("compile.class.bytecode", file), ex);
 			return;
 		}
 		

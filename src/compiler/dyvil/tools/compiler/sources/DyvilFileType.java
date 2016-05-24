@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.structure.DyvilUnit;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.util.Markers;
 
 import java.io.File;
 
@@ -19,8 +20,8 @@ public class DyvilFileType implements IFileType
 	public static final String CLASS_EXTENSION  = ".class";
 	public static final String OBJECT_EXTENSION = ".dyo";
 	
-	public static final IFileType DYVIL_UNIT   = new DyvilFileType("dyv", DyvilUnit::new);
-	public static final IFileType DYVIL_HEADER = new DyvilFileType("dyh", DyvilHeader::new);
+	public static final IFileType DYVIL_UNIT   = new DyvilFileType("unit", "dyv", DyvilUnit::new);
+	public static final IFileType DYVIL_HEADER = new DyvilFileType("header", "dyh", DyvilHeader::new);
 
 	public static void setupFileFinder(FileFinder fileFinder)
 	{
@@ -31,10 +32,12 @@ public class DyvilFileType implements IFileType
 	}
 	
 	protected String         extension;
+	protected String identifier;
 	protected HeaderSupplier headerSupplier;
 	
-	public DyvilFileType(String extension, HeaderSupplier headerSupplier)
+	public DyvilFileType(String identifier, String extension, HeaderSupplier headerSupplier)
 	{
+		this.identifier = identifier;
 		this.extension = extension;
 		this.headerSupplier = headerSupplier;
 	}
@@ -44,7 +47,13 @@ public class DyvilFileType implements IFileType
 	{
 		return this.extension;
 	}
-	
+
+	@Override
+	public String getLocalizedName()
+	{
+		return Markers.getInfo("unit.filetype." + this.identifier);
+	}
+
 	@Override
 	public ICompilationUnit createUnit(DyvilCompiler compiler, Package pack, File inputFile, File outputFile)
 	{
