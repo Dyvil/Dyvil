@@ -2,6 +2,7 @@ package dyvil.tools.compiler.util;
 
 import dyvil.collection.List;
 import dyvil.tools.compiler.DyvilCompiler;
+import dyvil.tools.compiler.lang.I18n;
 import dyvil.tools.compiler.library.Library;
 
 import java.lang.reflect.InvocationTargetException;
@@ -36,7 +37,7 @@ public final class TestThread extends Thread
 
 			final long endTime = System.nanoTime();
 
-			this.compiler.log(Markers.getInfo("test.completed", Util.toTime(endTime - startTime)));
+			this.compiler.log(I18n.get("test.completed", Util.toTime(endTime - startTime)));
 		}
 		catch (VerifyError verifyError)
 		{

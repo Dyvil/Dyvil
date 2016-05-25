@@ -12,8 +12,6 @@ import java.util.ResourceBundle;
 
 public final class Markers
 {
-	private static final ResourceBundle MESSAGE_BUNDLE = ResourceBundle
-		                                                     .getBundle("dyvil.tools.compiler.lang.InfoMessages");
 
 	private static final ResourceBundle SEMANTIC_BUNDLE = ResourceBundle
 		                                                      .getBundle("dyvil.tools.compiler.lang.SemanticMarkers");
@@ -39,23 +37,6 @@ public final class Markers
 	private Markers()
 	{
 		// do not instantiate
-	}
-
-	public static String getInfo(String key)
-	{
-		try
-		{
-			return MESSAGE_BUNDLE.getString(key);
-		}
-		catch (MissingResourceException ex)
-		{
-			return "!" + key + "!";
-		}
-	}
-
-	public static String getInfo(String key, Object... args)
-	{
-		return String.format(getInfo(key), args);
 	}
 
 	public static String getSemantic(String key)

@@ -1,7 +1,7 @@
 package dyvil.tools.compiler;
 
 import dyvil.io.Console;
-import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.compiler.lang.I18n;
 import dyvil.tools.compiler.util.Util;
 
 public final class Main
@@ -10,7 +10,7 @@ public final class Main
 	{
 		final long startTime = System.nanoTime();
 
-		System.out.println(Markers.getInfo("compiler.init", DyvilCompiler.VERSION, DyvilCompiler.DYVIL_VERSION));
+		System.out.println(I18n.get("compiler.init", DyvilCompiler.VERSION, DyvilCompiler.DYVIL_VERSION));
 		System.out.println();
 
 		final DyvilCompiler compiler = new DyvilCompiler();
@@ -27,7 +27,7 @@ public final class Main
 			{
 				builder.append(Console.ANSI_RED);
 			}
-			builder.append(Markers.getInfo("compilation.failure"));
+			builder.append(I18n.get("compilation.failure"));
 		}
 		else
 		{
@@ -35,7 +35,7 @@ public final class Main
 			{
 				builder.append(Console.ANSI_GREEN);
 			}
-			builder.append(Markers.getInfo("compilation.success"));
+			builder.append(I18n.get("compilation.success"));
 		}
 		if (colors)
 		{

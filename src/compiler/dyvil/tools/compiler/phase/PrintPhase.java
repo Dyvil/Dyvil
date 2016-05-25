@@ -2,7 +2,7 @@ package dyvil.tools.compiler.phase;
 
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
-import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.compiler.lang.I18n;
 
 public class PrintPhase implements ICompilerPhase
 {
@@ -28,7 +28,7 @@ public class PrintPhase implements ICompilerPhase
 	@Override
 	public void apply(DyvilCompiler compiler)
 	{
-		compiler.log(Markers.getInfo("phase.syntax_trees", this.predecessor.getName()));
+		compiler.log(I18n.get("phase.syntax_trees", this.predecessor.getName()));
 		for (ICompilationUnit unit : compiler.fileFinder.units)
 		{
 			try
@@ -37,7 +37,7 @@ public class PrintPhase implements ICompilerPhase
 			}
 			catch (Throwable throwable)
 			{
-				compiler.error(Markers.getInfo("phase.syntax_trees.error", unit.getInputFile()), throwable);
+				compiler.error(I18n.get("phase.syntax_trees.error", unit.getInputFile()), throwable);
 			}
 		}
 	}

@@ -25,6 +25,7 @@ import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.ObjectFormat;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lang.I18n;
 import dyvil.tools.compiler.parser.header.DyvilHeaderParser;
 import dyvil.tools.compiler.sources.DyvilFileType;
 import dyvil.tools.compiler.transform.DyvilSymbols;
@@ -519,7 +520,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		}
 		catch (IOException ex)
 		{
-			this.compiler.error(Markers.getInfo("source.error", this.inputFile), ex);
+			this.compiler.error(I18n.get("source.error", this.inputFile), ex);
 			return false;
 		}
 	}

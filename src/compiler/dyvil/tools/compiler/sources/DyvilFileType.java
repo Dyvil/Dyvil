@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.structure.DyvilUnit;
 import dyvil.tools.compiler.ast.structure.ICompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.compiler.lang.I18n;
 
 import java.io.File;
 
@@ -51,7 +51,7 @@ public class DyvilFileType implements IFileType
 	@Override
 	public String getLocalizedName()
 	{
-		return Markers.getInfo("unit.filetype." + this.identifier);
+		return I18n.get("unit.filetype." + this.identifier);
 	}
 
 	@Override

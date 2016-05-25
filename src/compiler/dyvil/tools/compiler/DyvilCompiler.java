@@ -9,12 +9,12 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.compiler.config.ConfigParser;
+import dyvil.tools.compiler.lang.I18n;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.phase.ICompilerPhase;
 import dyvil.tools.compiler.phase.PrintPhase;
 import dyvil.tools.compiler.sources.DyvilFileType;
 import dyvil.tools.compiler.sources.FileFinder;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.TestThread;
 import dyvil.tools.compiler.util.Util;
 
@@ -89,18 +89,18 @@ public final class DyvilCompiler implements Tool
 		File sourceDir = this.config.getSourceDir();
 		if (sourceDir == null)
 		{
-			this.log(Markers.getInfo("config.source_path.missing"));
+			this.log(I18n.get("config.source_path.missing"));
 			return false;
 		}
 
 		if (!sourceDir.exists())
 		{
-			this.log(Markers.getInfo("config.source_path.not_found", sourceDir));
+			this.log(I18n.get("config.source_path.not_found", sourceDir));
 			return false;
 		}
 
 		final long endTime = System.nanoTime();
-		this.log(Markers.getInfo("config.loaded", Util.toTime(endTime - startTime)));
+		this.log(I18n.get("config.loaded", Util.toTime(endTime - startTime)));
 
 		return true;
 	}
@@ -193,19 +193,19 @@ public final class DyvilCompiler implements Tool
 
 		if (!ConfigParser.readProperty(this.config, arg))
 		{
-			this.warn(Markers.getInfo("argument.invalid", arg));
+			this.warn(I18n.get("argument.invalid", arg));
 		}
 	}
 
 	private void loadConfig(String source)
 	{
-		this.log(Markers.getInfo("config.loading", source));
+		this.log(I18n.get("config.loading", source));
 
 		final File file = new File(source);
 		this.config.setConfigFile(file);
 		if (!file.exists())
 		{
-			this.error(Markers.getInfo("config.not_found", source));
+			this.error(I18n.get("config.not_found", source));
 			return;
 		}
 
@@ -216,7 +216,7 @@ public final class DyvilCompiler implements Tool
 		}
 		catch (IOException ex)
 		{
-			this.error(Markers.getInfo("config.error", source), ex);
+			this.error(I18n.get("config.error", source), ex);
 		}
 	}
 
@@ -234,9 +234,9 @@ public final class DyvilCompiler implements Tool
 		Package.initRoot(this);
 
 		final long endTime = System.nanoTime();
-		this.log(Markers.getInfo("library.found",
-		                         libs == 1 ? Markers.getInfo("libraries.1") : Markers.getInfo("libraries.n", libs),
-		                         Util.toTime(endTime - startTime)));
+		this.log(I18n.get("library.found",
+		                  libs == 1 ? I18n.get("libraries.1") : I18n.get("libraries.n", libs),
+		                  Util.toTime(endTime - startTime)));
 	}
 
 	private void initLogger()
@@ -300,7 +300,7 @@ public final class DyvilCompiler implements Tool
 		final File sourceDir = this.config.getSourceDir();
 		final File outputDir = this.config.getOutputDir();
 
-		this.log(Markers.getInfo("compilation.init", sourceDir, outputDir));
+		this.log(I18n.get("compilation.init", sourceDir, outputDir));
 
 		// Scan for Packages and Compilation Units
 		DyvilFileType.setupFileFinder(this.fileFinder);
@@ -313,10 +313,10 @@ public final class DyvilCompiler implements Tool
 
 		final long endTime = System.nanoTime();
 
-		this.log(Markers.getInfo("files.found",
-		                         fileCount == 1 ? Markers.getInfo("files.1") : Markers.getInfo("files.n", fileCount),
-		                         unitCount == 1 ? Markers.getInfo("units.1") : Markers.getInfo("units.n", unitCount),
-		                         Util.toTime(endTime - startTime)));
+		this.log(I18n.get("files.found",
+		                  fileCount == 1 ? I18n.get("files.1") : I18n.get("files.n", fileCount),
+		                  unitCount == 1 ? I18n.get("units.1") : I18n.get("units.n", unitCount),
+		                  Util.toTime(endTime - startTime)));
 		this.log("");
 	}
 
@@ -328,12 +328,12 @@ public final class DyvilCompiler implements Tool
 		if (this.config.isDebug())
 		{
 			this.log(phases == 1 ?
-				         Markers.getInfo("phase.applying.1", this.phases) :
-				         Markers.getInfo("phase.applying.n", phases, this.phases));
+				         I18n.get("phase.applying.1", this.phases) :
+				         I18n.get("phase.applying.n", phases, this.phases));
 
 			for (ICompilerPhase phase : this.phases)
 			{
-				this.log(Markers.getInfo("phase.applying", phase.getName()));
+				this.log(I18n.get("phase.applying", phase.getName()));
 				if (!this.applyPhaseDebug(phase))
 				{
 					return false;
@@ -379,13 +379,13 @@ public final class DyvilCompiler implements Tool
 			phase.apply(this);
 
 			final long endTime = System.nanoTime();
-			this.log(Markers.getInfo("phase.completed", phase.getName(), Util.toTime(endTime - startTime)));
+			this.log(I18n.get("phase.completed", phase.getName(), Util.toTime(endTime - startTime)));
 
 			return true;
 		}
 		catch (Throwable t)
 		{
-			this.log(Markers.getInfo("phase.failed", phase.getName()));
+			this.log(I18n.get("phase.failed", phase.getName()));
 			this.error(phase.getName(), "apply", t);
 			return false;
 		}
@@ -402,7 +402,7 @@ public final class DyvilCompiler implements Tool
 		File file = new File(this.config.getOutputDir(), this.config.getMainType().replace('.', '/') + ".class");
 		if (!file.exists())
 		{
-			this.log(Markers.getInfo("test.main_type.not_found", this.config.getMainType()));
+			this.log(I18n.get("test.main_type.not_found", this.config.getMainType()));
 			return;
 		}
 
@@ -435,16 +435,16 @@ public final class DyvilCompiler implements Tool
 	{
 		if (Library.dyvilLibrary == null)
 		{
-			this.error(Markers.getInfo("library.dyvil"));
+			this.error(I18n.get("library.dyvil"));
 		}
 		if (Library.javaLibrary == null)
 		{
-			this.error(Markers.getInfo("library.java"));
+			this.error(I18n.get("library.java"));
 		}
 
 		if (Types.LANG_HEADER == null)
 		{
-			this.error(Markers.getInfo("library.lang_header", this.config.libraries));
+			this.error(I18n.get("library.lang_header", this.config.libraries));
 
 			Types.LANG_HEADER = new DyvilHeader(this);
 		}

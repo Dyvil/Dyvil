@@ -4,9 +4,9 @@ import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.lang.I18n;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.sources.FileFinder;
-import dyvil.tools.compiler.util.Markers;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -141,7 +141,7 @@ public class CompilerConfig
 		}
 		catch (FileNotFoundException ex)
 		{
-			this.compiler.error(Markers.getInfo("library.not_found", file), ex);
+			this.compiler.error(I18n.get("library.not_found", file), ex);
 		}
 	}
 	

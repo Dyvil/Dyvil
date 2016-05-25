@@ -2,8 +2,8 @@ package dyvil.tools.compiler.ast.structure;
 
 import dyvil.io.Console;
 import dyvil.tools.compiler.DyvilCompiler;
+import dyvil.tools.compiler.lang.I18n;
 import dyvil.tools.compiler.sources.IFileType;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.Marker;
@@ -48,9 +48,9 @@ public interface ICompilationUnit extends IASTNode
 			return false;
 		}
 
-		final StringBuilder builder = new StringBuilder(Markers
-			                                                .getInfo("unit.problems", fileType.getLocalizedName(), name,
-			                                                         inputFile)).append("\n\n");
+		final StringBuilder builder = new StringBuilder(I18n
+			                                                .get("unit.problems", fileType.getLocalizedName(), name,
+			                                                     inputFile)).append("\n\n");
 
 		final int warnings = markers.getWarnings();
 		final int errors = markers.getErrors();
@@ -69,7 +69,7 @@ public interface ICompilationUnit extends IASTNode
 				builder.append(Console.ANSI_RED);
 			}
 
-			builder.append(errors == 1 ? Markers.getInfo("unit.errors.1") : Markers.getInfo("unit.errors.n", errors));
+			builder.append(errors == 1 ? I18n.get("unit.errors.1") : I18n.get("unit.errors.n", errors));
 
 			if (colors)
 			{
@@ -88,7 +88,7 @@ public interface ICompilationUnit extends IASTNode
 				builder.append(Console.ANSI_YELLOW);
 			}
 			builder.append(
-				warnings == 1 ? Markers.getInfo("unit.warnings.1") : Markers.getInfo("unit.warnings.n", warnings));
+				warnings == 1 ? I18n.get("unit.warnings.1") : I18n.get("unit.warnings.n", warnings));
 
 			if (colors)
 			{
@@ -100,7 +100,7 @@ public interface ICompilationUnit extends IASTNode
 		if (errors > 0)
 		{
 			compiler.failCompilation();
-			compiler.warn(Markers.getInfo("unit.problems.not_compiled", name));
+			compiler.warn(I18n.get("unit.problems.not_compiled", name));
 			compiler.warn("");
 			return true;
 		}
