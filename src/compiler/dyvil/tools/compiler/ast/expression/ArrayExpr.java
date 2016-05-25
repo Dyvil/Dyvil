@@ -154,7 +154,19 @@ public final class ArrayExpr implements IValue, IValueList
 		{
 			return this.arrayType.isResolved();
 		}
-		return this.elementType != null && this.elementType.isResolved();
+		if (this.elementType != null)
+		{
+			return this.elementType.isResolved();
+		}
+
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			if (!this.values[i].isResolved())
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override
@@ -219,7 +231,6 @@ public final class ArrayExpr implements IValue, IValueList
 			this.elementType = elementType = arrayType.getElementType();
 			this.arrayType = arrayType;
 		}
-
 
 		for (int i = 0; i < this.valueCount; i++)
 		{
