@@ -54,6 +54,7 @@ sourceSets {
 			srcDir 'src/parsing'
 		}
 		resources {
+			srcDir 'src/library'
 			srcDir 'src/parsing'
 
 			include resourceFilters
@@ -63,6 +64,11 @@ sourceSets {
 	dpf {
 		java {
 			srcDir 'src/dpf'
+		}
+		resources {
+			srcDir 'src/dpf'
+
+			include resourceFilters
 		}
 	}
 
@@ -80,6 +86,11 @@ sourceSets {
 	repl {
 		java {
 			srcDir 'src/repl'
+		}
+		resources {
+			srcDir 'src/repl'
+
+			include resourceFilters
 		}
 	}
 
