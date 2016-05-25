@@ -25,6 +25,7 @@ import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -376,12 +377,13 @@ public class ClassMetadata implements IClassMetadata
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		if ((this.members & CONSTRUCTOR) == 0 && this.theClass.getSuperType() != null)
+		final IType superType = this.theClass.getSuperType();
+		if ((this.members & CONSTRUCTOR) == 0 && superType != null)
 		{
 			// Generate the constructor body
-			this.superInitializer = (InitializerCall) new InitializerCall(this.theClass.getPosition(), null,
+			this.superInitializer = (InitializerCall) new InitializerCall(this.theClass.getPosition(), true,
 			                                                              this.theClass.getSuperConstructorArguments(),
-			                                                              true).resolve(markers, this.constructor);
+			                                                              superType).resolve(markers, this.constructor);
 			this.constructor.setInitializer(this.superInitializer);
 
 			final StatementList constructorBody = new StatementList();

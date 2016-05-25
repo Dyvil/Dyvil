@@ -172,7 +172,7 @@ public class CodeConstructor extends AbstractConstructor
 			return;
 		}
 
-		this.initializerCall = new InitializerCall(this.position, match, EmptyArguments.INSTANCE, true);
+		this.initializerCall = new InitializerCall(this.position, true, EmptyArguments.INSTANCE, superType, match);
 	}
 
 	@Override
