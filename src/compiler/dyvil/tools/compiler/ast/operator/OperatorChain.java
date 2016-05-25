@@ -182,7 +182,8 @@ public class OperatorChain implements IValue
 
 	private static boolean lowerPrecedence(OperatorElement element1, OperatorElement element2, OperatorElement ternaryOperator, MarkerList markers)
 	{
-		if (element1.operator.getType() == IOperator.TERNARY)
+		final byte element1Type = element1.operator.getType();
+		if (element1Type == IOperator.TERNARY)
 		{
 			if (element2.operator.getType() == IOperator.TERNARY)
 			{
@@ -211,16 +212,24 @@ public class OperatorChain implements IValue
 		{
 			return true;
 		}
-		if (comparePrecedence == 0)
+		if (comparePrecedence > 0)
 		{
-			switch (element1.operator.getAssociativity())
+			return false;
+		}
+
+		// Both operators have the same precedence
+		switch (element1.operator.getAssociativity())
+		{
+		case IOperator.NONE:
+			if (element1Type != IOperator.INFIX)
 			{
-			case IOperator.NONE:
-				markers.add(Markers.semantic(element1.position, "operator.infix_none", element1.name));
-				// Fallthrough
-			case IOperator.LEFT:
+				// Prefix and Postfix operators are left-associative when (incorrectly) used in infix position
 				return true;
 			}
+			markers.add(Markers.semantic(element1.position, "operator.infix_none", element1.name));
+			// Fallthrough
+		case IOperator.LEFT:
+			return true;
 		}
 		return false;
 	}
