@@ -7,6 +7,7 @@ import dyvil.collection.mutable.HashMap;
 import dyvil.collection.mutable.TreeMap;
 import dyvil.collection.mutable.TreeSet;
 import dyvil.tools.repl.DyvilREPL;
+import dyvil.tools.repl.lang.I18n;
 
 import java.io.PrintStream;
 
@@ -16,12 +17,6 @@ public class HelpCommand implements ICommand
 	public String getName()
 	{
 		return "help";
-	}
-	
-	@Override
-	public String getDescription()
-	{
-		return "Shows this help text";
 	}
 
 	@Override
@@ -45,7 +40,7 @@ public class HelpCommand implements ICommand
 	private void printAllCommands(DyvilREPL repl)
 	{
 		final PrintStream output = repl.getOutput();
-		output.println("Available Commands:");
+		output.println(I18n.get("command.help.available"));
 
 		Map<ICommand, Set<String>> commands = new HashMap<>();
 
@@ -77,7 +72,7 @@ public class HelpCommand implements ICommand
 
 		for (Entry<String, ICommand> entry : result)
 		{
-			output.printf("%1$" + maxLength + "s - %2$s\n", entry.getKey(), entry.getValue().getDescription());
+			output.printf("%1$" + maxLength + "s - %2$s\n", entry.getKey(), getDesc(entry.getValue().getName()));
 		}
 	}
 
@@ -86,31 +81,24 @@ public class HelpCommand implements ICommand
 		final ICommand command = DyvilREPL.getCommands().get(commandName);
 		if (command == null)
 		{
-			repl.getErrorOutput().println("Command not found: " + commandName);
+			repl.getErrorOutput().println(I18n.get("command.not_found", commandName));
 			return;
 		}
 
 		final PrintStream output = repl.getOutput();
 
-		output.print(':');
-		output.print(command.getName());
-		output.print(" - ");
-		output.println(command.getDescription());
-		output.print("  Usage:\t");
-		output.println(command.getUsage());
+		output.println(I18n.get("command.help.header", command.getName(), getDesc(commandName)));
+		output.println(I18n.get("command.help.usage", command.getUsage()));
 
 		final String[] aliases = command.getAliases();
 		if (aliases != null && aliases.length > 0)
 		{
-			output.print("  Aliases:\t");
-			output.print(aliases[0]);
-			for (int i = 1; i < aliases.length; i++)
-			{
-				output.print(", ");
-				output.print(aliases[i]);
-			}
-
-			output.println();
+			output.println(I18n.get("command.help.aliases", String.join(", ", (CharSequence[]) aliases)));
 		}
+	}
+
+	private static String getDesc(String commandName)
+	{
+		return I18n.get("command." + commandName + ".desc");
 	}
 }

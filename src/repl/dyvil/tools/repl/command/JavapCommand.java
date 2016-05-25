@@ -2,6 +2,7 @@ package dyvil.tools.repl.command;
 
 import dyvil.reflect.ReflectUtils;
 import dyvil.tools.repl.DyvilREPL;
+import dyvil.tools.repl.lang.I18n;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,12 +18,6 @@ public class JavapCommand implements ICommand
 	}
 
 	@Override
-	public String getDescription()
-	{
-		return "Shows the Javap Decompiler Output for the given class";
-	}
-
-	@Override
 	public String getUsage()
 	{
 		return ":javap <classname>";
@@ -33,7 +28,7 @@ public class JavapCommand implements ICommand
 	{
 		if (argument == null)
 		{
-			repl.getErrorOutput().println("Missing Class Argument. Usage: " + this.getUsage());
+			repl.getErrorOutput().println(I18n.get("command.javap.missing", this.getUsage()));
 			return;
 		}
 
@@ -81,7 +76,7 @@ public class JavapCommand implements ICommand
 		}
 		catch (ClassNotFoundException ex)
 		{
-			repl.getOutput().println("Could not find Class '" + className + "'");
+			repl.getErrorOutput().println(I18n.get("command.javap.not_found", className));
 			return null;
 		}
 

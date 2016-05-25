@@ -1,6 +1,7 @@
 package dyvil.tools.repl.command;
 
 import dyvil.tools.repl.DyvilREPL;
+import dyvil.tools.repl.lang.I18n;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,12 +12,6 @@ public class DumpCommand implements ICommand
 	public String getName()
 	{
 		return "dump";
-	}
-	
-	@Override
-	public String getDescription()
-	{
-		return "Sets the directory for Result Class Dumping";
 	}
 
 	@Override
@@ -30,7 +25,7 @@ public class DumpCommand implements ICommand
 	{
 		if (argument == null)
 		{
-			repl.getOutput().println("Result Class Dumping disabled.");
+			repl.getOutput().println(I18n.get("command.dump.disabled"));
 			repl.setDumpDir(null);
 			return;
 		}
@@ -40,13 +35,12 @@ public class DumpCommand implements ICommand
 		
 		try
 		{
-			String canonical = dumpDir.getCanonicalPath();
-			repl.getOutput().println("Dumping Result Classes to '" + canonical + "'");
+			repl.getOutput().println(I18n.get("command.dump.enabled", dumpDir.getCanonicalPath()));
 		}
 		catch (IOException ex)
 		{
 			String absolute = dumpDir.getAbsolutePath();
-			repl.getErrorOutput().println("Invalid Dumping Path: " + absolute);
+			repl.getErrorOutput().println(I18n.get("command.dump.invalid", absolute));
 		}
 	}
 }

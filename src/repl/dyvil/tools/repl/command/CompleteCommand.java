@@ -28,6 +28,7 @@ import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.repl.DyvilREPL;
 import dyvil.tools.repl.context.REPLContext;
+import dyvil.tools.repl.lang.I18n;
 
 public class CompleteCommand implements ICommand
 {
@@ -41,12 +42,6 @@ public class CompleteCommand implements ICommand
 	public String[] getAliases()
 	{
 		return new String[] { "c" };
-	}
-
-	@Override
-	public String getDescription()
-	{
-		return "Prints a list of possible completions";
 	}
 
 	@Override
@@ -138,19 +133,19 @@ public class CompleteCommand implements ICommand
 		if (!fields.isEmpty())
 		{
 			output = true;
-			repl.getOutput().println("Fields:");
+			repl.getOutput().println(I18n.get("command.complete.fields"));
 			printAll(repl, fields);
 		}
 		if (!methods.isEmpty())
 		{
 			output = true;
-			repl.getOutput().println("Methods:");
+			repl.getOutput().println(I18n.get("command.complete.methods"));
 			printAll(repl, methods);
 		}
 
 		if (!output)
 		{
-			repl.getOutput().println("No completions available");
+			repl.getOutput().println(I18n.get("command.complete.none"));
 		}
 	}
 
@@ -165,13 +160,13 @@ public class CompleteCommand implements ICommand
 
 		if (statics)
 		{
-			repl.getOutput().println("Available completions for type '" + type + "':");
+			repl.getOutput().println(I18n.get("command.complete.type", type));
 
 			findMembers(type, fields, properties, methods, memberStart, true);
 		}
 		else
 		{
-			repl.getOutput().println("Available completions for '" + value + "' of type '" + type + "':");
+			repl.getOutput().println(I18n.get("command.complete.expression", value, type));
 
 			findCompletions(type, fields, properties, methods, memberStart, new IdentityHashSet<>());
 			findExtensions(repl, memberStart, type, value, extensionMethods);
@@ -181,38 +176,31 @@ public class CompleteCommand implements ICommand
 		if (!fields.isEmpty())
 		{
 			output = true;
-			repl.getOutput().println("Fields:");
+			repl.getOutput().println(I18n.get("command.complete.fields"));
 			printAll(repl, fields);
 		}
 		if (!properties.isEmpty())
 		{
 			output = true;
-			repl.getOutput().println("Properties:");
+			repl.getOutput().println(I18n.get("command.complete.properties"));
 			printAll(repl, properties);
 		}
 		if (!methods.isEmpty())
 		{
 			output = true;
-			repl.getOutput().println("Methods:");
+			repl.getOutput().println(I18n.get("command.complete.methods"));
 			printAll(repl, methods);
 		}
 		if (!extensionMethods.isEmpty())
 		{
 			output = true;
-			repl.getOutput().println("Extension Methods:");
+			repl.getOutput().println(I18n.get("command.complete.extensions"));
 			printAll(repl, extensionMethods);
 		}
 
 		if (!output)
 		{
-			if (statics)
-			{
-				repl.getOutput().println("No static completions available for type " + type);
-			}
-			else
-			{
-				repl.getOutput().println("No completions available for type " + type);
-			}
+			repl.getOutput().println(I18n.get("command.complete.none"));
 		}
 	}
 

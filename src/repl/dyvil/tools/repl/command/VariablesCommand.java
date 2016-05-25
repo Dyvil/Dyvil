@@ -11,12 +11,6 @@ public class VariablesCommand implements ICommand
 	{
 		return "variables";
 	}
-	
-	@Override
-	public String getDescription()
-	{
-		return "Prints all available variables";
-	}
 
 	@Override
 	public String getUsage()
@@ -27,7 +21,7 @@ public class VariablesCommand implements ICommand
 	@Override
 	public void execute(DyvilREPL repl, String args)
 	{
-		REPLContext context = repl.getContext();
+		final REPLContext context = repl.getContext();
 		for (IField field : context.getFields().values())
 		{
 			repl.getOutput().println(field);

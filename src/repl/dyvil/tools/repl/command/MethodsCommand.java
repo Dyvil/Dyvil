@@ -12,12 +12,6 @@ public class MethodsCommand implements ICommand
 	{
 		return "methods";
 	}
-	
-	@Override
-	public String getDescription()
-	{
-		return "Prints the signatures of all available methods";
-	}
 
 	@Override
 	public String getUsage()
@@ -28,12 +22,10 @@ public class MethodsCommand implements ICommand
 	@Override
 	public void execute(DyvilREPL repl, String args)
 	{
-		REPLContext context = repl.getContext();
+		final REPLContext context = repl.getContext();
 		for (IMethod method : context.getMethods())
 		{
-			StringBuilder builder = new StringBuilder();
-			Util.methodSignatureToString(method, null, builder);
-			repl.getOutput().println(builder.toString());
+			repl.getOutput().println(Util.methodSignatureToString(method, null));
 		}
 	}
 }
