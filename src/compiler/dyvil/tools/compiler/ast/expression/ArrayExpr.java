@@ -17,6 +17,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.TypeChecker;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -230,6 +231,11 @@ public final class ArrayExpr implements IValue, IValueList
 			// If the type is an array type, get it's element type
 			this.elementType = elementType = arrayType.getElementType();
 			this.arrayType = arrayType;
+
+			if (Types.isVoid(elementType))
+			{
+				markers.add(Markers.semanticError(this.position, "array.void"));
+			}
 		}
 
 		for (int i = 0; i < this.valueCount; i++)
