@@ -211,7 +211,6 @@ public final class ArrayExpr implements IValue, IValueList
 	@Override
 	public IValue withType(IType arrayType, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		IType elementType;
 		if (!arrayType.isArrayType())
 		{
 			final IAnnotation annotation;
@@ -224,15 +223,27 @@ public final class ArrayExpr implements IValue, IValueList
 			{
 				return null;
 			}
-			elementType = this.getType().getElementType();
+
+			// Compute array and element type from scratch
+			this.getType();
 		}
 		else
 		{
 			// If the type is an array type, get it's element type
-			this.elementType = elementType = arrayType.getElementType();
-			this.arrayType = arrayType;
 
-			if (Types.isVoid(elementType))
+			final IType elementType = arrayType.getElementType();
+			if (elementType.isUninferred())
+			{
+				// Compute element type from scratch
+				this.elementType = this.getElementType().getObjectType();
+			}
+			else
+			{
+				this.elementType = elementType.asReturnType();
+			}
+
+			this.arrayType = new ArrayType(this.elementType, arrayType.getMutability());
+			if (Types.isVoid(this.elementType))
 			{
 				markers.add(Markers.semanticError(this.position, "array.void"));
 			}
@@ -240,7 +251,7 @@ public final class ArrayExpr implements IValue, IValueList
 
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			this.values[i] = TypeChecker.convertValue(this.values[i], elementType, typeContext, markers, context,
+			this.values[i] = TypeChecker.convertValue(this.values[i], this.elementType, typeContext, markers, context,
 			                                          LazyFields.ELEMENT_MARKER_SUPPLIER);
 		}
 

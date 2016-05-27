@@ -18,6 +18,18 @@ public class CovariantTypeVarType extends TypeVarType
 	}
 
 	@Override
+	public IType asReturnType()
+	{
+		return this.typeParameter.getDefaultType();
+	}
+
+	@Override
+	public boolean isUninferred()
+	{
+		return true;
+	}
+
+	@Override
 	public int subTypeCheckLevel()
 	{
 		// Make sure CovariantTVT.isSubTypeOf(ResolvedTVT) is called instead of

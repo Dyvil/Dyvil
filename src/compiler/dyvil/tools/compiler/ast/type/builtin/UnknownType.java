@@ -49,6 +49,12 @@ public class UnknownType implements IRawType
 	{
 		return true;
 	}
+
+	@Override
+	public boolean isUninferred()
+	{
+		return true;
+	}
 	
 	@Override
 	public IType getConcreteType(ITypeContext context)
@@ -115,7 +121,7 @@ public class UnknownType implements IRawType
 	public void appendSignature(StringBuilder buffer)
 	{
 	}
-	
+
 	@Override
 	public int getLoadOpcode()
 	{

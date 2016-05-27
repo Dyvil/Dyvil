@@ -312,6 +312,8 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	 */
 	boolean hasTypeVariables();
 
+	boolean isUninferred();
+
 	IType getConcreteType(ITypeContext context);
 
 	void inferTypes(IType concrete, ITypeContext typeContext);

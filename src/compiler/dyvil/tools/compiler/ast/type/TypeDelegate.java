@@ -274,6 +274,12 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
+	public boolean isUninferred()
+	{
+		return this.type.isUninferred();
+	}
+
+	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
 		final IType concreteType = this.type.getConcreteType(context);

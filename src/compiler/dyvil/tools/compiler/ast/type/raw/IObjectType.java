@@ -107,6 +107,12 @@ public interface IObjectType extends IType
 	}
 
 	@Override
+	default boolean isUninferred()
+	{
+		return false;
+	}
+
+	@Override
 	default boolean isSameType(IType type)
 	{
 		return this == type || this.getTheClass() == type.getTheClass();

@@ -19,7 +19,6 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.LambdaType;
-import dyvil.tools.compiler.ast.type.typevar.CovariantTypeVarType;
 import dyvil.tools.compiler.backend.*;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -366,8 +365,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			IType concreteType = methodParamType.getConcreteType(this.type);
 
 			// Can't infer parameter type
-			if (concreteType == Types.UNKNOWN || concreteType instanceof CovariantTypeVarType)
-			// TODO Use better check for Covariant Type Var Types
+			if (this.type.isUninferred())
 			{
 				if ((this.flags & IMPLICIT_PARAMETERS) != 0)
 				{
@@ -378,13 +376,9 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 					markers.add(Markers.semanticError(position, "lambda.parameter.type", parameter.getName()));
 				}
 			}
-			if (concreteType.typeTag() == IType.WILDCARD_TYPE)
-			// TODO Use better check for Wildcard Types
-			{
-				concreteType = Types.ANY;
-			}
 
-			parameter.setType(concreteType.atPosition(position));
+			// asReturnType is required for Wildcard Types
+			parameter.setType(concreteType.asReturnType().atPosition(position));
 		}
 
 		this.checkReturnType(markers, this.method.getType().getConcreteType(this.type));
