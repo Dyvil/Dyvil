@@ -238,15 +238,15 @@ task copyTestDyvil(type: Copy, dependsOn: clearCopyDir) {
  * Compiles the Dyvil Classes and Headers in the Dyvil Library by running the freshly-compiled compiler
  */
 task compileLibraryDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'copyLibraryDyvil' ]) { JavaExec exec ->
-	runCompiler exec, 'scripts/lib_options.txt', 'src/library/', "$buildDir/dyvilbin"
+	runCompiler exec, 'config/lib.dyc', 'src/library/', "$buildDir/dyvilbin"
 }
 
 task compileDPFDyvil(type: JavaExec, dependsOn: [ 'compileLibraryDyvil', 'copyDPFDyvil' ]) { JavaExec exec ->
-	runCompiler exec, 'scripts/dpf_options.txt', 'src/dpf/', "$buildDir/dpfbin"
+	runCompiler exec, 'config/dpf.dyc', 'src/dpf/', "$buildDir/dpfbin"
 }
 
 task compileTestDyvil(type: JavaExec, dependsOn: [ 'compileDPFDyvil', 'copyTestDyvil' ]) { JavaExec exec ->
-	runCompiler exec, 'scripts/test_options.txt', 'src/test/', "$buildDir/dyviltestbin"
+	runCompiler exec, 'config/test.dyc', 'src/test/', "$buildDir/dyviltestbin"
 }
 
 private void runCompiler(JavaExec exec, String config, String src, String bin)
