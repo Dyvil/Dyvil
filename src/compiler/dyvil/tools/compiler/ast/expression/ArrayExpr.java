@@ -242,7 +242,7 @@ public final class ArrayExpr implements IValue, IValueList
 				this.elementType = elementType.asReturnType();
 			}
 
-			this.arrayType = new ArrayType(this.elementType, arrayType.getMutability());
+			this.arrayType = null;
 			if (Types.isVoid(this.elementType))
 			{
 				markers.add(Markers.semanticError(this.position, "array.void"));
