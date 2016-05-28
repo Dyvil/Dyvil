@@ -13,6 +13,12 @@ public class VariablesCommand implements ICommand
 	}
 
 	@Override
+	public String[] getAliases()
+	{
+		return new String[] { "v", "vars" };
+	}
+
+	@Override
 	public String getUsage()
 	{
 		return ":variables";
@@ -22,6 +28,7 @@ public class VariablesCommand implements ICommand
 	public void execute(DyvilREPL repl, String args)
 	{
 		final REPLContext context = repl.getContext();
+
 		for (IField field : context.getFields().values())
 		{
 			repl.getOutput().println(field);

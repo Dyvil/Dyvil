@@ -14,6 +14,12 @@ public class MethodsCommand implements ICommand
 	}
 
 	@Override
+	public String[] getAliases()
+	{
+		return new String[] { "m" };
+	}
+
+	@Override
 	public String getUsage()
 	{
 		return ":methods";
