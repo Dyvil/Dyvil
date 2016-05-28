@@ -118,14 +118,14 @@ public class CompleteCommand implements ICommand
 		{
 			if (variable.getName().startWith(start))
 			{
-				fields.add(Util.memberSignatureToString(variable, Types.UNKNOWN));
+				fields.add(Util.memberSignatureToString(variable, null));
 			}
 		}
 		for (IMethod method : context.getMethods())
 		{
 			if (method.getName().startWith(start))
 			{
-				methods.add(Util.memberSignatureToString(method, Types.UNKNOWN));
+				methods.add(Util.methodSignatureToString(method, null));
 			}
 		}
 
@@ -133,7 +133,7 @@ public class CompleteCommand implements ICommand
 		if (!fields.isEmpty())
 		{
 			output = true;
-			repl.getOutput().println(I18n.get("command.complete.fields"));
+			repl.getOutput().println(I18n.get("command.complete.variables"));
 			printAll(repl, fields);
 		}
 		if (!methods.isEmpty())
