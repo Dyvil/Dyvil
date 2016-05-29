@@ -235,6 +235,16 @@ public final class Util
 
 	// endregion
 
+	public static boolean startsWithSymbol(Name name)
+	{
+		return LexerUtil.isIdentifierSymbol(name.unqualified.codePointAt(0));
+	}
+
+	public static boolean endsWithSymbol(Name name)
+	{
+		return LexerUtil.isIdentifierSymbol(name.unqualified.codePointBefore(name.unqualified.length()));
+	}
+
 	public static boolean endsWithSymbol(StringBuilder buffer)
 	{
 		return LexerUtil.isIdentifierSymbol(buffer.codePointBefore(buffer.length()));

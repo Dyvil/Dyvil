@@ -12,13 +12,13 @@ import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
-import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.compiler.util.MemberSorter;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.ParserManager;
 import dyvil.tools.parsing.TokenIterator;
@@ -111,36 +111,30 @@ public class CompleteCommand implements ICommand
 
 	private void printREPLMembers(DyvilREPL repl, REPLContext context, String start)
 	{
-		final Set<String> fields = new TreeSet<>();
-		final Set<String> methods = new TreeSet<>();
+		final Set<IField> variables = new TreeSet<>(MemberSorter.MEMBER_COMPARATOR);
+		final Set<IMethod> methods = new TreeSet<>(MemberSorter.METHOD_COMPARATOR);
 
 		for (IField variable : context.getFields().values())
 		{
-			if (variable.getName().startWith(start))
-			{
-				fields.add(Util.memberSignatureToString(variable, null));
-			}
+			checkMember(variables, variable, start);
 		}
 		for (IMethod method : context.getMethods())
 		{
-			if (method.getName().startWith(start))
-			{
-				methods.add(Util.methodSignatureToString(method, null));
-			}
+			checkMember(methods, method, start);
 		}
 
 		boolean output = false;
-		if (!fields.isEmpty())
+		if (!variables.isEmpty())
 		{
 			output = true;
 			repl.getOutput().println(I18n.get("command.complete.variables"));
-			printAll(repl, fields);
+			printMembers(repl, variables);
 		}
 		if (!methods.isEmpty())
 		{
 			output = true;
 			repl.getOutput().println(I18n.get("command.complete.methods"));
-			printAll(repl, methods);
+			printMethods(repl, methods);
 		}
 
 		if (!output)
@@ -153,10 +147,10 @@ public class CompleteCommand implements ICommand
 	{
 		final IType type = value.getType();
 		final boolean statics = value.valueTag() == IValue.CLASS_ACCESS;
-		final Set<String> fields = new TreeSet<>();
-		final Set<String> properties = new TreeSet<>();
-		final Set<String> methods = new TreeSet<>();
-		final Set<String> extensionMethods = new TreeSet<>();
+		final Set<IField> fields = new TreeSet<>(MemberSorter.MEMBER_COMPARATOR);
+		final Set<IProperty> properties = new TreeSet<>(MemberSorter.MEMBER_COMPARATOR);
+		final Set<IMethod> methods = new TreeSet<>(MemberSorter.METHOD_COMPARATOR);
+		final Set<IMethod> extensionMethods = new TreeSet<>(MemberSorter.METHOD_COMPARATOR);
 
 		if (statics)
 		{
@@ -168,8 +162,8 @@ public class CompleteCommand implements ICommand
 		{
 			repl.getOutput().println(I18n.get("command.complete.expression", value, type));
 
-			findCompletions(type, fields, properties, methods, memberStart, new IdentityHashSet<>());
-			findExtensions(repl, memberStart, type, value, extensionMethods);
+			findInstanceMembers(type, fields, properties, methods, memberStart, new IdentityHashSet<>());
+			findExtensions(repl, type, value, extensionMethods, memberStart);
 		}
 
 		boolean output = false;
@@ -177,25 +171,25 @@ public class CompleteCommand implements ICommand
 		{
 			output = true;
 			repl.getOutput().println(I18n.get("command.complete.fields"));
-			printAll(repl, fields);
+			printMembers(repl, fields);
 		}
 		if (!properties.isEmpty())
 		{
 			output = true;
 			repl.getOutput().println(I18n.get("command.complete.properties"));
-			printAll(repl, properties);
+			printMembers(repl, properties);
 		}
 		if (!methods.isEmpty())
 		{
 			output = true;
 			repl.getOutput().println(I18n.get("command.complete.methods"));
-			printAll(repl, methods);
+			printMethods(repl, methods);
 		}
 		if (!extensionMethods.isEmpty())
 		{
 			output = true;
 			repl.getOutput().println(I18n.get("command.complete.extensions"));
-			printAll(repl, extensionMethods);
+			printMethods(repl, extensionMethods);
 		}
 
 		if (!output)
@@ -204,16 +198,49 @@ public class CompleteCommand implements ICommand
 		}
 	}
 
-	private static void printAll(DyvilREPL repl, Set<String> members)
+	private static void printMembers(DyvilREPL repl, Set<? extends IMember> members)
 	{
-		for (String field : members)
+		for (IMember member : members)
 		{
 			repl.getOutput().print('\t');
-			repl.getOutput().println(field);
+			repl.getOutput().println(Util.memberSignatureToString(member, null));
 		}
 	}
 
-	private static void findCompletions(IType type, Set<String> fields, Set<String> properties, Set<String> methods, String start, Set<IClass> dejaVu)
+	private static void printMethods(DyvilREPL repl, Set<IMethod> methods)
+	{
+		for (IMethod method : methods)
+		{
+			repl.getOutput().print('\t');
+			repl.getOutput().println(Util.methodSignatureToString(method, null));
+		}
+	}
+
+	private static void findMembers(IType type, Set<IField> fields, Set<IProperty> properties, Set<IMethod> methods, String start, boolean statics)
+	{
+		final IClassBody body = type.getTheClass().getBody();
+		if (body == null)
+		{
+			return;
+		}
+
+		for (int i = 0, count = body.fieldCount(); i < count; i++)
+		{
+			checkMember(fields, body.getField(i), start, statics);
+		}
+
+		for (int i = 0, count = body.propertyCount(); i < count; i++)
+		{
+			checkMember(properties, body.getProperty(i), start, statics);
+		}
+
+		for (int i = 0, count = body.methodCount(); i < count; i++)
+		{
+			checkMember(methods, body.getMethod(i), start, statics);
+		}
+	}
+
+	private static void findInstanceMembers(IType type, Set<IField> fields, Set<IProperty> properties, Set<IMethod> methods, String start, Set<IClass> dejaVu)
 	{
 		final IClass iclass = type.getTheClass();
 		if (dejaVu.contains(iclass))
@@ -226,11 +253,8 @@ public class CompleteCommand implements ICommand
 		final IParameterList parameterList = iclass.getParameterList();
 		for (int i = 0, count = parameterList.size(); i < count; i++)
 		{
-			final IParameter parameter = parameterList.get(i);
-			if (matches(start, parameter, false))
-			{
-				fields.add(Util.memberSignatureToString(parameter, type));
-			}
+			// TODO IClassParameter interface
+			checkMember(fields, (IField) parameterList.get(i), start, false);
 		}
 
 		findMembers(type, fields, properties, methods, start, false);
@@ -239,7 +263,7 @@ public class CompleteCommand implements ICommand
 		final IType superType = iclass.getSuperType();
 		if (superType != null)
 		{
-			findCompletions(superType.getConcreteType(type), fields, properties, methods, start, dejaVu);
+			findInstanceMembers(superType.getConcreteType(type), fields, properties, methods, start, dejaVu);
 		}
 
 		for (int i = 0, count = iclass.interfaceCount(); i < count; i++)
@@ -247,48 +271,12 @@ public class CompleteCommand implements ICommand
 			final IType superInterface = iclass.getInterface(i);
 			if (superInterface != null)
 			{
-				findCompletions(superInterface.getConcreteType(type), fields, properties, methods, start, dejaVu);
+				findInstanceMembers(superInterface.getConcreteType(type), fields, properties, methods, start, dejaVu);
 			}
 		}
 	}
 
-	private static void findMembers(IType type, Set<String> fields, Set<String> properties, Set<String> methods, String start, boolean statics)
-	{
-		final IClassBody body = type.getTheClass().getBody();
-		if (body == null)
-		{
-			return;
-		}
-
-		for (int i = 0, count = body.fieldCount(); i < count; i++)
-		{
-			final IField field = body.getField(i);
-			if (matches(start, field, statics))
-			{
-				fields.add(Util.memberSignatureToString(field, type));
-			}
-		}
-
-		for (int i = 0, count = body.propertyCount(); i < count; i++)
-		{
-			final IProperty property = body.getProperty(i);
-			if (matches(start, property, statics))
-			{
-				properties.add(Util.memberSignatureToString(property, type));
-			}
-		}
-
-		for (int i = 0, count = body.methodCount(); i < count; i++)
-		{
-			final IMethod method = body.getMethod(i);
-			if (matches(start, method, statics))
-			{
-				methods.add(Util.methodSignatureToString(method, type));
-			}
-		}
-	}
-
-	private static void findExtensions(DyvilREPL repl, String memberStart, IType type, IValue value, Set<String> methods)
+	private static void findExtensions(DyvilREPL repl, IType type, IValue value, Set<IMethod> methods, String start)
 	{
 		MethodMatchList matchList = new MethodMatchList();
 		type.getMethodMatches(matchList, value, null, null);
@@ -297,22 +285,29 @@ public class CompleteCommand implements ICommand
 
 		for (int i = 0, count = matchList.size(); i < count; i++)
 		{
-			final IMethod method = matchList.getMethod(i);
-			if (matches(memberStart, method, true))
-			{
-				methods.add(Util.methodSignatureToString(method, null));
-			}
+			checkMember(methods, matchList.getMethod(i), start, true);
 		}
 	}
 
-	private static boolean matches(String start, IMember member, boolean statics)
+	private static <T extends IMember> void checkMember(Set<T> set, T member, String start)
+	{
+		if (member.getName().startWith(start))
+		{
+			set.add(member);
+		}
+	}
+
+	private static <T extends IMember> void checkMember(Set<T> set, T member, String start, boolean statics)
 	{
 		if (!member.getName().startWith(start))
 		{
-			return false;
+			return;
 		}
 
-		int modifiers = member.getModifiers().toFlags();
-		return (modifiers & Modifiers.PUBLIC) != 0 && statics == ((modifiers & Modifiers.STATIC) != 0);
+		final int modifiers = member.getModifiers().toFlags();
+		if ((modifiers & Modifiers.PUBLIC) != 0 && statics == ((modifiers & Modifiers.STATIC) != 0))
+		{
+			set.add(member);
+		}
 	}
 }

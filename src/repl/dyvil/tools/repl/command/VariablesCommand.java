@@ -1,8 +1,12 @@
 package dyvil.tools.repl.command;
 
 import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.util.MemberSorter;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.repl.DyvilREPL;
 import dyvil.tools.repl.context.REPLContext;
+
+import java.util.Arrays;
 
 public class VariablesCommand implements ICommand
 {
@@ -29,9 +33,12 @@ public class VariablesCommand implements ICommand
 	{
 		final REPLContext context = repl.getContext();
 
-		for (IField field : context.getFields().values())
+		final IField[] fields = context.getFields().toValueArray(IField.class);
+		Arrays.sort(fields, MemberSorter.MEMBER_COMPARATOR);
+
+		for (IField field : fields)
 		{
-			repl.getOutput().println(field);
+			repl.getOutput().println(Util.memberSignatureToString(field, null));
 		}
 	}
 }
