@@ -16,7 +16,6 @@ import dyvil.tools.compiler.parser.type.TypeListParser;
 import dyvil.tools.compiler.parser.type.TypeParameterListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -27,7 +26,6 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 	private static final int NAME                   = 0;
 	private static final int GENERICS               = 1;
 	private static final int GENERICS_END           = 2;
-	private static final int ANGLE_GENERICS_END     = 4;
 	private static final int PARAMETERS             = 8;
 	private static final int PARAMETERS_END         = 16;
 	private static final int EXTENDS                = 32;
@@ -78,14 +76,6 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			return;
 		case GENERICS_END:
 			this.mode = PARAMETERS;
-			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
-			{
-				pm.reparse();
-				pm.report(token, "generic.close_bracket");
-			}
-			return;
-		case ANGLE_GENERICS_END:
-			this.mode = PARAMETERS;
 			if (TypeParser.isGenericEnd(token, type))
 			{
 				pm.splitJump(token, 1);
@@ -107,14 +97,6 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			if (TypeParser.isGenericStart(token, type))
 			{
 				pm.splitJump(token, 1);
-				pm.pushParser(new TypeParameterListParser(this.theClass));
-				this.theClass.setTypeParametric();
-				this.mode = ANGLE_GENERICS_END;
-				return;
-			}
-			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
-			{
-				pm.report(Markers.syntaxWarning(token, "generic.open_bracket.deprecated"));
 				pm.pushParser(new TypeParameterListParser(this.theClass));
 				this.theClass.setTypeParametric();
 				this.mode = GENERICS_END;

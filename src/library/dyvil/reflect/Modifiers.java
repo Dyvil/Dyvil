@@ -252,4 +252,8 @@ public interface Modifiers
 	 * The modifiers that cna be applied to variables.
 	 */
 	int VARIABLE_MODIFIERS = FINAL;
+
+	int CONSTRUCTOR_MODIFIERS = ACCESS_MODIFIERS;
+
+	int INITIALIZER_MODIFIERS = PRIVATE | STATIC;
 }

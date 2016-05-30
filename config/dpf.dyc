@@ -1,0 +1,4 @@
+source_dir = ../src/dpf
+output_dir = ../build/dpfbin
+
+libraries = [ ../build/dyvilbin ]

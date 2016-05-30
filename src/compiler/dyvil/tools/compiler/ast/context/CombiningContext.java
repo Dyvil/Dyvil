@@ -105,7 +105,12 @@ public class CombiningContext implements IContext
 	public IOperator resolveOperator(Name name, int type)
 	{
 		final IOperator inner = this.inner.resolveOperator(name, type);
-		return inner != null ? inner : this.outer.resolveOperator(name, type);
+		if (inner == null || inner.getType() != type)
+		{
+			return this.outer.resolveOperator(name, type);
+		}
+
+		return inner;
 	}
 
 	@Override

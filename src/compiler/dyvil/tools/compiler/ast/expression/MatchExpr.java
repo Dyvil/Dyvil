@@ -4,9 +4,12 @@ import dyvil.collection.Collection;
 import dyvil.math.MathUtils;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.ast.consumer.ICaseConsumer;
+import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.pattern.ICase;
 import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -22,7 +25,7 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 import java.util.Arrays;
 
-public final class MatchExpr implements IValue
+public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 {
 	protected ICodePosition position;
 	
@@ -33,7 +36,12 @@ public final class MatchExpr implements IValue
 	// Metadata
 	private boolean exhaustive;
 	private IType   returnType;
-	
+
+	public MatchExpr(ICodePosition position)
+	{
+		this.position = position;
+	}
+
 	public MatchExpr(ICodePosition position, IValue matchedValue)
 	{
 		this.position = position;
@@ -64,8 +72,20 @@ public final class MatchExpr implements IValue
 	{
 		return MATCH;
 	}
-	
-	public void addCase(MatchCase matchCase)
+
+	public IValue getValue()
+	{
+		return this.matchedValue;
+	}
+
+	@Override
+	public void setValue(IValue value)
+	{
+		this.matchedValue = value;
+	}
+
+	@Override
+	public void addCase(ICase iCase)
 	{
 		int index = this.caseCount++;
 		if (index >= this.cases.length)
@@ -74,7 +94,7 @@ public final class MatchExpr implements IValue
 			System.arraycopy(this.cases, 0, temp, 0, index);
 			this.cases = temp;
 		}
-		this.cases[index] = matchCase;
+		this.cases[index] = (MatchCase) iCase; // TODO Get rid of cast
 	}
 	
 	@Override
@@ -169,13 +189,13 @@ public final class MatchExpr implements IValue
 			                                            TypeChecker.markerSupplier("match.value.type.incompatible"));
 		}
 		
-		return Types.isSameType(type, Types.VOID) || Types.isSuperType(type, this.getType()) ? this : null;
+		return Types.isVoid(type) || Types.isSuperType(type, this.getType()) ? this : null;
 	}
 	
 	@Override
 	public boolean isType(IType type)
 	{
-		if (Types.isSameType(type, Types.VOID))
+		if (Types.isVoid(type))
 		{
 			return true;
 		}

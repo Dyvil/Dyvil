@@ -82,6 +82,12 @@ public class UnionType implements IObjectType
 		final Set<IClass> commonClassSet = Types.commonClasses(this.left, this.right);
 		commonClassSet.remove(Types.OBJECT_CLASS);
 
+		if (commonClassSet.isEmpty())
+		{
+			this.commonClasses = OBJECT_CLASS_ARRAY;
+			return Types.OBJECT_CLASS;
+		}
+
 		this.commonClasses = new IClass[commonClassSet.size()];
 		commonClassSet.toArray(this.commonClasses);
 
@@ -95,9 +101,9 @@ public class UnionType implements IObjectType
 	}
 
 	@Override
-	public boolean needsSubTypeCheck()
+	public int subTypeCheckLevel()
 	{
-		return true;
+		return 1;
 	}
 
 	@Override
@@ -189,7 +195,7 @@ public class UnionType implements IObjectType
 
 	public static IType combine(IType left, IType right, UnionType unionType)
 	{
-		if (Types.isSameType(left, Types.VOID) || Types.isSameType(right, Types.VOID))
+		if (Types.isVoid(left) || Types.isVoid(right))
 		{
 			// either type is void -> result void
 			return Types.VOID;

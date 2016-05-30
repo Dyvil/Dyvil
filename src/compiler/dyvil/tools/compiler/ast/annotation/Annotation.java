@@ -11,10 +11,7 @@ import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
-import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.MethodParameter;
+import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -52,7 +49,7 @@ public final class Annotation implements IAnnotation
 		}
 	}
 
-	public static final MethodParameter VALUE = new MethodParameter(Name.getQualified("value"));
+	public static final CodeParameter VALUE = new CodeParameter(Name.getQualified("value"));
 
 	protected ICodePosition position;
 	protected IArguments arguments = EmptyArguments.INSTANCE;
@@ -143,9 +140,10 @@ public final class Annotation implements IAnnotation
 			return;
 		}
 
-		for (int i = 0, count = theClass.parameterCount(); i < count; i++)
+		final IParameterList parameterList = theClass.getParameterList();
+		for (int i = 0, count = parameterList.size(); i < count; i++)
 		{
-			final IParameter parameter = theClass.getParameter(i);
+			final IParameter parameter = parameterList.get(i);
 			final IType parameterType = parameter.getType();
 
 			final IValue value = this.arguments.getValue(i, parameter);
@@ -264,15 +262,16 @@ public final class Annotation implements IAnnotation
 	@Override
 	public void write(AnnotationVisitor visitor)
 	{
-		IClass iclass = this.type.getTheClass();
-		int count = iclass.parameterCount();
-		for (int i = 0; i < count; i++)
+		final IClass iclass = this.type.getTheClass();
+		final IParameterList parameterList = iclass.getParameterList();
+
+		for (int i = 0, count = parameterList.size(); i < count; i++)
 		{
-			IParameter param = iclass.getParameter(i);
-			IValue v = this.arguments.getValue(i, param);
-			if (v != null)
+			final IParameter parameter = parameterList.get(i);
+			final IValue argument = this.arguments.getValue(i, parameter);
+			if (argument != null)
 			{
-				visitValue(visitor, param.getName().qualified, v);
+				visitValue(visitor, parameter.getName().qualified, argument);
 			}
 		}
 		visitor.visitEnd();

@@ -4,6 +4,7 @@ import dyvil.collection.Map;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.repl.DyvilREPL;
+import dyvil.tools.repl.lang.I18n;
 
 public class RenameCommand implements ICommand
 {
@@ -20,12 +21,6 @@ public class RenameCommand implements ICommand
 	}
 
 	@Override
-	public String getDescription()
-	{
-		return "Renames a field or method defined in the current context";
-	}
-
-	@Override
 	public String getUsage()
 	{
 		return ":r[ename] <oldname> <newname>";
@@ -34,16 +29,10 @@ public class RenameCommand implements ICommand
 	@Override
 	public void execute(DyvilREPL repl, String argument)
 	{
-		if (argument == null)
+		final String[] split;
+		if (argument == null || (split = argument.split(" ", 2)).length < 2)
 		{
-			repl.getErrorOutput().println("Missing Arguments. Usage: " + this.getUsage());
-			return;
-		}
-
-		final String[] split = argument.split(" ", 2);
-		if (split.length < 2)
-		{
-			repl.getErrorOutput().println("Invalid Number of Arguments. Usage: " + this.getUsage());
+			repl.getErrorOutput().println(I18n.get("command.argument_list.invalid", this.getUsage()));
 			return;
 		}
 
@@ -55,11 +44,11 @@ public class RenameCommand implements ICommand
 		if (field != null)
 		{
 			field.setName(newName);
-			repl.getOutput().println("Renamed field '" + memberName + "' to '" + newName + "'");
+			repl.getOutput().println(I18n.get("command.rename.success", memberName, newName));
 		}
 		else
 		{
-			repl.getOutput().println("No field named '" + memberName + "' was found");
+			repl.getOutput().println(I18n.get("command.rename.not_found", memberName));
 		}
 	}
 }

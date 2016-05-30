@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -94,13 +95,13 @@ public class AnonymousClass extends CodeClass
 			return this.constructorDesc;
 		}
 
-		int len = this.constructor.parameterCount();
-		StringBuilder buf = new StringBuilder();
+		final IParameterList parameterList = this.constructor.getParameterList();
+		final StringBuilder buf = new StringBuilder();
 
 		buf.append('(');
-		for (int i = 0; i < len; i++)
+		for (int i = 0, count = parameterList.size(); i < count; i++)
 		{
-			this.constructor.getParameter(i).getType().appendExtendedName(buf);
+			parameterList.get(i).getType().appendExtendedName(buf);
 		}
 
 		FieldThis thisField = this.thisField;
@@ -157,15 +158,16 @@ class AnonymousClassMetadata implements IClassMetadata
 		                                                                                this.theClass
 			                                                                                .getConstructorDesc(), null,
 		                                                                                null));
-		final int params = constructor.parameterCount();
+		final IParameterList parameterList = constructor.getParameterList();
+		final int parameterCount = parameterList.size();
 
 		// Signature & Parameter Data
 
 		initWriter.setThisType(this.theClass.getInternalName());
 
-		for (int i = 0; i < params; i++)
+		for (int i = 0; i < parameterCount; i++)
 		{
-			constructor.getParameter(i).writeInit(initWriter);
+			parameterList.get(i).writeInit(initWriter);
 		}
 
 		int index = initWriter.localCount();
@@ -184,9 +186,9 @@ class AnonymousClassMetadata implements IClassMetadata
 
 		initWriter.visitCode();
 		initWriter.visitVarInsn(Opcodes.ALOAD, 0);
-		for (int i = 0; i < params; i++)
+		for (int i = 0; i < parameterCount; i++)
 		{
-			constructor.getParameter(i).writeGet(initWriter);
+			parameterList.get(i).writeGet(initWriter);
 		}
 		constructor.writeInvoke(initWriter, 0);
 
@@ -200,7 +202,7 @@ class AnonymousClassMetadata implements IClassMetadata
 
 		captureHelper.writeFieldAssignments(initWriter);
 
-		this.writeClassInit(initWriter);
+		this.theClass.writeClassInit(initWriter);
 
 		initWriter.visitEnd(Types.VOID);
 	}

@@ -1,0 +1,49 @@
+package dyvil.tools.dpf.converter;
+
+import dyvil.collection.List;
+import dyvil.collection.Map;
+import dyvil.collection.mutable.ArrayList;
+import dyvil.tools.dpf.ast.Expandable;
+import dyvil.tools.dpf.visitor.StringInterpolationVisitor;
+import dyvil.tools.dpf.visitor.ValueVisitor;
+
+public class StringInterpolation implements StringInterpolationVisitor, Expandable
+{
+	protected List<String> strings = new ArrayList<String>
+	protected List<Object> values  = new ArrayList<Object>
+
+	public override void visitStringPart(String string)
+	{
+		this.strings.add(string);
+	}
+
+	public override ValueVisitor visitValue()
+	{
+		return new DyvilValueVisitor
+		{
+			protected override void visitObject(Object o) = this<StringInterpolation>.values.add(o)
+		}
+	}
+
+	public override void visitEnd() { }
+
+	public override Object expand(Map<String, Object> mappings, boolean mutate)
+	{
+		StringBuilder builder = new StringBuilder(this.strings[0]);
+		
+		int len = this.values.size();
+		for (int i = 0; i < len; i++)
+		{
+			Object o = Expandable.expand(this.values[i], mappings, mutate);
+			builder.append(o);
+			builder.append(this.strings[i + 1]);
+		}
+		
+		return builder.toString();
+	}
+
+	public override String toString()
+	{
+		return "StringInterpolation(" + this.strings.toString + ", " + this.values.toString + ")";
+	}
+}

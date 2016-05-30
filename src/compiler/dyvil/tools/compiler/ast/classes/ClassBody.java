@@ -15,11 +15,10 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
@@ -152,7 +151,7 @@ public class ClassBody implements IClassBody
 	@Override
 	public IField createDataMember(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
-		return new Field(position, name, type, modifiers, annotations);
+		return new Field(this.theClass, position, name, type, modifiers, annotations);
 	}
 
 	@Override
@@ -324,28 +323,17 @@ public class ClassBody implements IClassBody
 	}
 
 	@Override
-	public IConstructor getConstructor(IParameter[] parameters, int parameterCount)
+	public IConstructor getConstructor(IParameterList parameters)
 	{
-		outer:
 		for (int i = 0; i < this.constructorCount; i++)
 		{
-			IConstructor c = this.constructors[i];
-			if (c.parameterCount() != parameterCount)
-			{
-				continue;
-			}
+			final IConstructor constructor = this.constructors[i];
+			final IParameterList constructorParameterList = constructor.getParameterList();
 
-			for (int p = 0; p < parameterCount; p++)
+			if (parameters.matches(constructorParameterList))
 			{
-				IType classParamType = parameters[p].getType();
-				IType constructorParamType = c.getParameter(p).getType();
-				if (!Types.isSameType(classParamType, constructorParamType))
-				{
-					continue outer;
-				}
+				return constructor;
 			}
-
-			return c;
 		}
 
 		return null;

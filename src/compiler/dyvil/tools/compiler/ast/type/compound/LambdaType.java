@@ -411,7 +411,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameterTypes[i] = this.parameterTypes[i].resolveType(markers, context).asParameterType();
+			this.parameterTypes[i] = this.parameterTypes[i].resolveType(markers, context);
 		}
 		if (this.returnType == null)
 		{
@@ -588,7 +588,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
-		out.writeByte(this.parameterCount);
+		out.writeByte(this.extension ? -this.parameterCount : this.parameterCount);
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			IType.writeType(this.parameterTypes[i], out);
@@ -599,7 +599,14 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	@Override
 	public void read(DataInput in) throws IOException
 	{
-		int len = this.parameterCount = in.readByte();
+		int len = in.readByte();
+		if (len < 0)
+		{
+			len = -len;
+			this.extension = true;
+		}
+
+		this.parameterCount = len;
 		if (len > this.parameterTypes.length)
 		{
 			this.parameterTypes = new IType[len];

@@ -5,21 +5,22 @@ import dyvil.collection.mutable.TreeMap;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.parsing.Parser;
-import dyvil.tools.parsing.TryParserManager;
-import dyvil.tools.compiler.parser.header.DyvilHeaderParser;
 import dyvil.tools.compiler.parser.classes.MemberParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
+import dyvil.tools.compiler.parser.header.DyvilHeaderParser;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.transform.SemicolonInference;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.TokenIterator;
+import dyvil.tools.parsing.TryParserManager;
 import dyvil.tools.parsing.lexer.DyvilLexer;
 import dyvil.tools.parsing.lexer.LexerUtil;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.repl.command.*;
 import dyvil.tools.repl.context.REPLContext;
+import dyvil.tools.repl.lang.I18n;
 
 import java.io.File;
 import java.io.PrintStream;
@@ -103,7 +104,7 @@ public final class DyvilREPL
 
 	protected void launch(String[] args)
 	{
-		this.compiler.log("Dyvil REPL v" + VERSION + " for Dyvil v" + DyvilCompiler.DYVIL_VERSION);
+		this.compiler.log(I18n.get("repl.init", VERSION, DyvilCompiler.DYVIL_VERSION));
 
 		Names.init();
 
@@ -111,7 +112,7 @@ public final class DyvilREPL
 
 		if (this.compiler.config.isDebug())
 		{
-			this.compiler.log("Dyvil Compiler Version: v" + DyvilCompiler.VERSION);
+			this.compiler.log(I18n.get("repl.compiler", DyvilCompiler.VERSION));
 		}
 
 		final long startTime = System.nanoTime();
@@ -129,7 +130,7 @@ public final class DyvilREPL
 		{
 			final long endTime = System.nanoTime();
 
-			this.compiler.log("Loaded REPL (" + Util.toTime(endTime - startTime) + ")");
+			this.compiler.log(I18n.get("repl.loaded", Util.toTime(endTime - startTime)));
 		}
 	}
 
@@ -232,7 +233,7 @@ public final class DyvilREPL
 		ICommand command = commands.get(name);
 		if (command == null)
 		{
-			this.compiler.error("Unknown Command: " + name);
+			this.compiler.error(I18n.get("command.not_found", name));
 			return;
 		}
 

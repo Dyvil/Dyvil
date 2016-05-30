@@ -23,26 +23,25 @@ import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
-import dyvil.tools.parsing.position.CodePosition;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 
 public final class TypeParser extends Parser implements ITypeConsumer
 {
-	public static final int NAME               = 0;
-	public static final int GENERICS           = 1;
-	public static final int GENERICS_END       = 2;
-	public static final int ANGLE_GENERICS_END = 4;
-	public static final int ARRAY_COLON        = 8;
-	public static final int ARRAY_END          = 16;
-	public static final int WILDCARD_TYPE      = 32;
-	public static final int TUPLE_END          = 64;
-	public static final int LAMBDA_END         = 128;
-	public static final int ANNOTATION_END     = 256;
+	protected static final int NAME           = 0;
+	protected static final int GENERICS       = 1;
+	protected static final int GENERICS_END   = 1 << 1;
+	protected static final int ARRAY_COLON    = 1 << 2;
+	protected static final int ARRAY_END      = 1 << 3;
+	protected static final int TUPLE_END      = 1 << 5;
+	protected static final int LAMBDA_END     = 1 << 6;
+	protected static final int ANNOTATION_END = 1 << 7;
 
 	// Flags
 
 	public static final int NAMED_ONLY    = 1;
 	public static final int IGNORE_LAMBDA = 2;
+	public static final int CLOSE_ANGLE   = 4;
 
 	protected ITypeConsumer consumer;
 
@@ -54,13 +53,26 @@ public final class TypeParser extends Parser implements ITypeConsumer
 	public TypeParser(ITypeConsumer consumer)
 	{
 		this.consumer = consumer;
-		this.mode = NAME;
+		// this.mode = NAME;
 	}
 
-	public TypeParser(ITypeConsumer consumer, IType parentType)
+	public TypeParser(ITypeConsumer consumer, boolean closeAngle)
+	{
+		this.consumer = consumer;
+
+		if (closeAngle)
+		{
+			this.flags = CLOSE_ANGLE;
+		}
+		// this.mode = NAME;
+	}
+
+	protected TypeParser(ITypeConsumer consumer, IType parentType, int flags)
 	{
 		this.consumer = consumer;
 		this.parentType = parentType;
+		this.flags = flags;
+		// this.mode = NAME;
 	}
 
 	public TypeParser withFlags(int flags)
@@ -69,10 +81,9 @@ public final class TypeParser extends Parser implements ITypeConsumer
 		return this;
 	}
 
-	public TypeParser namedOnly()
+	private TypeParser subParser(ITypeConsumer consumer)
 	{
-		this.flags |= NAMED_ONLY;
-		return this;
+		return new TypeParser(consumer).withFlags(this.flags);
 	}
 
 	@Override
@@ -107,25 +118,30 @@ public final class TypeParser extends Parser implements ITypeConsumer
 						return;
 					}
 				}
-				else if ((type == DyvilSymbols.DOUBLE_ARROW_RIGHT || type == DyvilSymbols.ARROW_RIGHT)
-					         && this.parentType == null && (this.flags & IGNORE_LAMBDA) == 0)
+				else if (type == DyvilSymbols.ARROW_RIGHT && this.parentType == null
+					         && (this.flags & IGNORE_LAMBDA) == 0)
 				{
-					if (type == DyvilSymbols.DOUBLE_ARROW_RIGHT)
-					{
-						pm.report(Markers.syntaxWarning(token, "type.lambda.double_arrow.deprecated"));
-					}
-
 					final LambdaType lambdaType = new LambdaType(token.raw(), this.type);
 					this.type = lambdaType;
 					this.mode = LAMBDA_END;
-					pm.pushParser(new TypeParser(lambdaType));
+					pm.pushParser(this.subParser(lambdaType));
 					return;
 				}
 			}
-			if (type == BaseSymbols.DOT)
+			switch (type)
 			{
-				pm.pushParser(new TypeParser(this, this.type));
+			case BaseSymbols.DOT:
+				pm.pushParser(new TypeParser(this, this.type, this.flags));
 				return;
+			case BaseSymbols.OPEN_SQUARE_BRACKET:
+				final IToken next = token.next();
+				if (next.type() == BaseSymbols.CLOSE_SQUARE_BRACKET)
+				{
+					this.type = new ArrayType(this.type);
+					pm.report(Markers.syntaxWarning(token.to(next), "type.array.java"));
+					pm.skip();
+					return;
+				}
 			}
 
 			if (this.type != null)
@@ -173,16 +189,6 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					pm.pushParser(new TypeParser(arrayType));
 					return;
 				}
-
-				case DyvilSymbols.DOUBLE_ARROW_RIGHT:
-					if ((this.flags & IGNORE_LAMBDA) != 0)
-					{
-						pm.popParser(true);
-						return;
-					}
-
-					pm.report(Markers.syntaxWarning(token, "type.lambda.double_arrow.deprecated"));
-					// Fallthrough
 				case DyvilSymbols.ARROW_RIGHT:
 				{
 					if ((this.flags & IGNORE_LAMBDA) != 0)
@@ -192,7 +198,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					}
 
 					final LambdaType lambdaType = new LambdaType(token.raw(), this.parentType);
-					pm.pushParser(new TypeParser(lambdaType));
+					pm.pushParser(this.subParser(lambdaType));
 					this.type = lambdaType;
 					this.mode = LAMBDA_END;
 					return;
@@ -203,74 +209,74 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					return;
 				case DyvilSymbols.UNDERSCORE:
 					this.type = new WildcardType(token.raw());
-					this.mode = WILDCARD_TYPE;
+					this.mode = END;
 					return;
-				}
-
-				if (ParserUtil.isIdentifier(type))
-				{
-					final String identifier = token.stringValue();
-					switch (identifier.charAt(0))
-					{
-					case '_':
-						if (identifier.length() == 1 || identifier.charAt(1) == '>')
-						{
-							// _
-							// Special Case: _> as in Class<_>
-							this.type = new WildcardType(new CodePosition(token.startLine(), token.startIndex(),
-							                                              token.startIndex() + 1));
-							this.mode = WILDCARD_TYPE;
-							pm.splitJump(token, 1);
-							return;
-						}
-						break; // Parse as Identifier
-					case '+':
+				case Tokens.SYMBOL_IDENTIFIER:
+					final Name name = token.nameValue();
+					if (name == Names.plus)
 					{
 						final WildcardType wildcardType = new WildcardType(Variance.COVARIANT);
-						pm.pushParser(new TypeParser(wildcardType));
+						pm.pushParser(this.subParser(wildcardType));
 						this.type = wildcardType;
 						this.mode = END;
 						return;
 					}
-					case '-':
+					if (name == Names.minus)
 					{
 						final WildcardType wildcardType = new WildcardType(Variance.CONTRAVARIANT);
-						pm.pushParser(new TypeParser(wildcardType));
+						pm.pushParser(this.subParser(wildcardType));
 						this.type = wildcardType;
 						this.mode = END;
-						return;
-					}
-					case '>':
-						// Special Case: > as in List<>
-						pm.split(token, 1);
-						pm.popParser(); // no reparse
 						return;
 					}
 				}
 			}
-			if (ParserUtil.isIdentifier(type))
-			{
-				final Name name = token.nameValue();
-				final IToken next = token.next();
-				final int nextType = next.type();
 
-				if (nextType == BaseSymbols.OPEN_SQUARE_BRACKET || isGenericStart(next, nextType))
+			if (!ParserUtil.isIdentifier(type))
+			{
+				if (ParserUtil.isTerminator(type))
 				{
-					this.type = new NamedGenericType(token.raw(), name, this.parentType);
-					this.mode = GENERICS;
+					pm.popParser(true);
+					return;
+				}
+				pm.report(Markers.syntaxError(token, "type.invalid", token.toString()));
+				return;
+			}
+
+			final Name name = token.nameValue();
+
+			final int closeAngleIndex;
+			if ((this.flags & CLOSE_ANGLE) != 0 && type == Tokens.SYMBOL_IDENTIFIER
+				    && (closeAngleIndex = name.unqualified.indexOf('>')) >= 0)
+			{
+				// Token contains a > and is not backticked
+
+				if (closeAngleIndex == 0)
+				{
+					// Token is a single >
+					// Handles Type< > gracefully
+
+					pm.popParser(true);
 					return;
 				}
 
-				this.type = new NamedType(token.raw(), name, this.parentType);
-				this.mode = END;
+				// strip the trailing > and reparse the first part of the token
+				// Handles Type<?> gracefully
+				pm.splitReparse(token, closeAngleIndex);
 				return;
 			}
-			if (ParserUtil.isTerminator(type))
+
+			final IToken next = token.next();
+
+			if (isGenericStart(next, next.type()))
 			{
-				pm.popParser(true);
+				this.type = new NamedGenericType(token.raw(), name, this.parentType);
+				this.mode = GENERICS;
 				return;
 			}
-			pm.report(Markers.syntaxError(token, "type.invalid", token.toString()));
+
+			this.type = new NamedType(token.raw(), name, this.parentType);
+			this.mode = END;
 			return;
 		case TUPLE_END:
 		{
@@ -281,18 +287,14 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			}
 
 			final IToken nextToken = token.next();
-			switch (nextToken.type())
+			if (nextToken.type() == DyvilSymbols.ARROW_RIGHT)
 			{
-			case DyvilSymbols.DOUBLE_ARROW_RIGHT:
-				pm.report(Markers.syntaxWarning(nextToken, "type.lambda.double_arrow.deprecated"));
-				// Fallthrough
-			case DyvilSymbols.ARROW_RIGHT:
 				final LambdaType lambdaType = new LambdaType(nextToken.raw(), this.parentType, (TupleType) this.type);
 				this.type = lambdaType;
 				this.mode = LAMBDA_END;
 
 				pm.skip();
-				pm.pushParser(new TypeParser(lambdaType));
+				pm.pushParser(this.subParser(lambdaType));
 				return;
 			}
 
@@ -338,53 +340,12 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			if (isGenericStart(token, type))
 			{
 				pm.splitJump(token, 1);
-				pm.pushParser(new TypeListParser((GenericType) this.type));
-				this.mode = ANGLE_GENERICS_END;
-				return;
-			}
-			if (type == BaseSymbols.OPEN_SQUARE_BRACKET)
-			{
-				pm.report(Markers.syntaxWarning(token, "type.generic.open_bracket.deprecated"));
-				pm.pushParser(new TypeListParser((GenericType) this.type));
+				pm.pushParser(new TypeListParser((GenericType) this.type, true));
 				this.mode = GENERICS_END;
 				return;
 			}
 			return;
-		case WILDCARD_TYPE:
-		{
-			final Name name = token.nameValue();
-			final WildcardType wildcardType = (WildcardType) this.type;
-			if (name == Names.ltcolon) // <: + Upper Bound
-			{
-				pm.report(Markers.syntaxWarning(token, "type.wildcard.upper.deprecated"));
-
-				wildcardType.setVariance(Variance.COVARIANT);
-				pm.pushParser(new TypeParser(wildcardType));
-				this.mode = END;
-				return;
-			}
-			if (name == Names.gtcolon) // >: - Lower Bound
-			{
-				pm.report(Markers.syntaxWarning(token, "type.wildcard.lower.deprecated"));
-
-				wildcardType.setVariance(Variance.CONTRAVARIANT);
-				pm.pushParser(new TypeParser(wildcardType));
-				this.mode = END;
-				return;
-			}
-			this.consumer.setType(this.type);
-			pm.popParser(true);
-			return;
-		}
 		case GENERICS_END:
-			this.mode = END;
-			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
-			{
-				pm.reparse();
-				pm.report(token, "type.generic.close_bracket");
-			}
-			return;
-		case ANGLE_GENERICS_END:
 			this.mode = END;
 			if (isGenericEnd(token, type))
 			{
@@ -397,7 +358,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			return;
 		case ANNOTATION_END:
 			this.mode = END;
-			pm.pushParser(new TypeParser((ITyped) this.type), true);
+			pm.pushParser(this.subParser((ITyped) this.type), true);
 		}
 	}
 

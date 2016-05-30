@@ -1,5 +1,8 @@
 package dyvil
 
+// Allow Number Juxtaposition for Multiplication
+using	dyvil.lang.Primitives. * => apply
+
 // Math Utilities
 using	dyvil.math.MathUtils._
 
@@ -7,7 +10,7 @@ using	dyvil.math.MathUtils._
 import	dyvil.math.Complex
 
 // BigInteger and BigDecimal and Dyvil-style apply methods
-import	java.math.{ BigInteger, BigDecimal }
+import	java.math.{ BigInteger => BigInt, BigDecimal }
 
 using	java.math.BigInteger.valueOf => apply
 using	java.math.BigDecimal.valueOf => apply

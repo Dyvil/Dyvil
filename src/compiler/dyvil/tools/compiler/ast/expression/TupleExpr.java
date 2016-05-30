@@ -19,6 +19,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -189,8 +190,9 @@ public final class TupleExpr implements IValue, IValueList
 		final IClass theClass = type.getTheClass();
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			final IType elementType =
-				theClass == Types.OBJECT_CLASS ? Types.ANY : Types.resolveTypeSafely(type, theClass.getTypeParameter(i));
+			final IType elementType = theClass == Types.OBJECT_CLASS ?
+				                          Types.ANY :
+				                          Types.resolveTypeSafely(type, theClass.getTypeParameter(i));
 
 			this.values[i] = TypeChecker.convertValue(this.values[i], elementType, typeContext, markers, context,
 			                                          LazyFields.ELEMENT_MARKER_SUPPLIER);
@@ -310,6 +312,12 @@ public final class TupleExpr implements IValue, IValueList
 		{
 			this.tupleType.writeCast(writer, type, this.getLineNumber());
 		}
+	}
+
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
 	}
 
 	@Override

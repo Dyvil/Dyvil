@@ -5,6 +5,7 @@ import dyvil.tools.asm.TypePath;
 import dyvil.tools.asm.TypeReference;
 import dyvil.tools.compiler.ast.access.InitializerCall;
 import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.AbstractConstructor;
@@ -13,7 +14,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IExternalCallableMember;
 import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -21,13 +22,13 @@ import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.backend.visitor.AnnotationReader;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public final class ExternalConstructor extends AbstractConstructor implements IExternalCallableMember
 {
 	private static final int ANNOTATIONS = 1;
-	private static final int PARAMETERS  = 1 << 1;
 	private static final int EXCEPTIONS  = 1 << 2;
 
 	private int resolved;
@@ -36,12 +37,6 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 	{
 		super(enclosingClass);
 		this.type = enclosingClass.getType();
-	}
-
-	@Override
-	public IParameter getParameterNoResolve(int index)
-	{
-		return this.parameters[index];
 	}
 
 	@Override
@@ -71,7 +66,8 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 	{
 	}
 
-	private IContext getCombiningContext()
+	@Override
+	public IContext getExternalContext()
 	{
 		return new CombiningContext(this, new CombiningContext(this.enclosingClass, Package.rootPackage));
 	}
@@ -81,18 +77,7 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 		this.resolved |= ANNOTATIONS;
 		if (this.annotations != null)
 		{
-			this.annotations.resolveTypes(null, this.getCombiningContext(), this);
-		}
-	}
-
-	private void resolveParameters()
-	{
-		this.resolved |= PARAMETERS;
-
-		final IContext context = this.getCombiningContext();
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].resolveTypes(null, context);
+			this.annotations.resolveTypes(null, this.getExternalContext(), this);
 		}
 	}
 
@@ -100,51 +85,11 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 	{
 		this.resolved |= EXCEPTIONS;
 
-		final IContext context = this.getCombiningContext();
+		final IContext context = this.getExternalContext();
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
 			this.exceptions[i] = this.exceptions[i].resolveType(null, context);
 		}
-	}
-
-	@Override
-	public IParameter getParameter(int index)
-	{
-		if ((this.resolved & PARAMETERS) == 0)
-		{
-			this.resolveParameters();
-		}
-		return this.parameters[index];
-	}
-
-	@Override
-	public IParameter[] getParameters()
-	{
-		if ((this.resolved & PARAMETERS) == 0)
-		{
-			this.resolveParameters();
-		}
-		return super.getParameters();
-	}
-
-	@Override
-	public float getSignatureMatch(IArguments arguments)
-	{
-		if ((this.resolved & PARAMETERS) == 0)
-		{
-			this.resolveParameters();
-		}
-		return super.getSignatureMatch(arguments);
-	}
-
-	@Override
-	public IType getException(int index)
-	{
-		if ((this.resolved & PARAMETERS) == 0)
-		{
-			this.resolveExceptions();
-		}
-		return this.exceptions[index];
 	}
 
 	@Override
@@ -163,13 +108,9 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 	}
 
 	@Override
-	public void checkArguments(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments)
+	public IParameter createParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
-		if ((this.resolved & PARAMETERS) == 0)
-		{
-			this.resolveParameters();
-		}
-		super.checkArguments(markers, position, context, type, arguments);
+		return new ExternalParameter(name, type, modifiers, annotations);
 	}
 
 	@Override
@@ -218,7 +159,7 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 		case TypeReference.METHOD_FORMAL_PARAMETER:
 		{
 			int index = TypeReference.getFormalParameterIndex(typeRef);
-			IParameter param = this.parameters[index];
+			IParameter param = this.parameters.get(index);
 			param.setType(IType.withAnnotation(param.getType(), annotation, typePath, 0, typePath.getLength()));
 		}
 		}

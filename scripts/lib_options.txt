@@ -1,8 +1,0 @@
-jar_name = Dyvil Library
-jar_vendor = Clashsoft
-jar_version = 0.17.0
-
-source_dir = ../src/library
-output_dir = ../build/dyvilbin
-
-libraries = []

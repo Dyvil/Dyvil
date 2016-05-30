@@ -130,12 +130,23 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	{
 		if (this.valueCount <= 0)
 		{
-			return Types.isSameType(type, Types.VOID) ? this : null;
+			return Types.isVoid(type) ? this : null;
 		}
 
 		context = context.push(this);
 
 		final IValue value = this.values[this.valueCount - 1];
+		if (Types.isVoid(type) && !value.isStatement())
+		{
+			final IValue applyStatementCall = resolveApplyStatement(markers, context, value);
+			if (applyStatementCall != null)
+			{
+				this.returnType = type;
+				this.values[this.valueCount - 1] = applyStatementCall;
+				return this;
+			}
+		}
+
 		final IValue typed = value.withType(type, typeContext, markers, context);
 
 		context.pop();
@@ -147,22 +158,10 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 			return this;
 		}
 
-		if (type != Types.VOID)
-		{
-			return null;
-		}
-
-		final IValue applyStatementCall = resolveApplyStatement(markers, context, value);
-		if (applyStatementCall != null)
-		{
-			this.returnType = type;
-			this.values[this.valueCount - 1] = applyStatementCall;
-			return this;
-		}
-
 		markers.add(TypeChecker
 			            .typeError(value.getPosition(), type, value.getType(), "statementlist.return", "type.expected",
 			                       "return.type"));
+
 		return this;
 	}
 
@@ -173,7 +172,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		{
 			return this.values[this.valueCount - 1].isType(type);
 		}
-		return Types.isSameType(type, Types.VOID);
+		return Types.isVoid(type);
 	}
 
 	@Override
@@ -487,12 +486,12 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		}
 
 		final Name methodName = method.getName();
-		final int parameterCount = method.parameterCount();
+		final int parameterCount = method.getParameterList().size();
 		final String desc = method.getDescriptor();
 		for (IMethod candidate : this.methods)
 		{
 			if (candidate.getName() == methodName // same name
-				    && candidate.parameterCount() == parameterCount && candidate.getDescriptor().equals(desc))
+				    && candidate.getParameterList().size() == parameterCount && candidate.getDescriptor().equals(desc))
 			{
 				markers.add(Markers.semanticError(memberStatement.getPosition(), "method.duplicate", methodName, desc));
 			}

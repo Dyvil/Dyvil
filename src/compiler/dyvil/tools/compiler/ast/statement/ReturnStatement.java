@@ -11,13 +11,17 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public class ReturnStatement extends AbstractValue implements IValueConsumer
 {
+	private static final TypeChecker.MarkerSupplier MARKER_SUPPLIER = TypeChecker
+		                                                                  .markerSupplier("return.type.incompatible",
+		                                                                                  "return.type", "value.type");
+
 	protected IValue value;
 
 	public ReturnStatement(ICodePosition position)
@@ -75,7 +79,7 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (Types.isSameType(type, Types.VOID))
+		if (Types.isVoid(type))
 		{
 			return this;
 		}
@@ -83,19 +87,13 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 		{
 			return null;
 		}
-		IValue value1 = this.value.withType(type, typeContext, markers, context);
-		if (value1 == null)
-		{
-			return null;
-		}
-		this.value = value1;
-		return this;
+		return this.value.withType(type, typeContext, markers, context);
 	}
 
 	@Override
 	public boolean isType(IType type)
 	{
-		return Types.isSameType(type, Types.VOID) || this.value != null && this.value.isType(type);
+		return Types.isVoid(type) || this.value != null && this.value.isType(type);
 	}
 
 	@Override
@@ -135,23 +133,19 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 
 		if (this.value != null)
 		{
+			// return ... ;
+
+			if (returnType != null && this.value.isResolved())
+			{
+				this.value = TypeChecker.convertValue(this.value, returnType, null, markers, context, MARKER_SUPPLIER);
+			}
+
 			this.value.checkTypes(markers, context);
-
-			if (returnType == null)
-			{
-				return;
-			}
-
-			final IType valueType = this.value.getType();
-			if (!Types.isSuperType(returnType, valueType))
-			{
-				final Marker marker = Markers.semanticError(this.position, "return.type.incompatible");
-				marker.addInfo(Markers.getSemantic("return.type", returnType));
-				marker.addInfo(Markers.getSemantic("value.type", valueType));
-				markers.add(marker);
-			}
+			return;
 		}
-		else if (returnType != null && !Types.isSameClass(returnType, Types.VOID))
+
+		// return;
+		if (returnType != null && !Types.isSameClass(returnType, Types.VOID))
 		{
 			markers.add(Markers.semanticError(this.position, "return.void.invalid"));
 		}
@@ -191,7 +185,7 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 	{
 		if (this.value == null)
 		{
-			if (type == null || Types.isSameType(type, Types.VOID))
+			if (type == null || Types.isVoid(type))
 			{
 				writer.visitInsn(Opcodes.RETURN);
 				return;
@@ -201,7 +195,7 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 			return;
 		}
 
-		if (Types.isSameType(type, Types.VOID))
+		if (Types.isVoid(type))
 		{
 			this.value.writeExpression(writer, null);
 			writer.visitInsn(this.value.getType().getReturnOpcode());

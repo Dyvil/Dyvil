@@ -46,12 +46,6 @@ public final class SingleArgument implements IArguments, IValueConsumer
 	// 'Variations'
 
 	@Override
-	public IArguments dropFirstValue()
-	{
-		return EmptyArguments.INSTANCE;
-	}
-
-	@Override
 	public IArguments withLastValue(IValue value)
 	{
 		if (this.value == null)
@@ -180,22 +174,6 @@ public final class SingleArgument implements IArguments, IValueConsumer
 
 		this.value = new ArrayExpr(this.value.getPosition(), new IValue[] { this.value }, 1);
 		this.value.setType(arrayType);
-	}
-
-	@Override
-	public void inferType(int index, IParameter param, ITypeContext typeContext)
-	{
-		if (index != 0 || this.value == null)
-		{
-			return;
-		}
-
-		if (param.isVarargs())
-		{
-			this.inferVarargsType(param, typeContext);
-			return;
-		}
-		param.getInternalType().inferTypes(this.value.getType(), typeContext);
 	}
 
 	private void inferVarargsType(IParameter param, ITypeContext typeContext)

@@ -6,6 +6,7 @@ import dyvil.io.StringPoolWriter;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.lang.I18n;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -33,12 +34,10 @@ public final class ObjectFormat
 		catch (Throwable ex)
 		{
 			// If the compilation fails, skip creating and writing the file.
-			compiler.error("Error during compilation of '" + file + "': " + ex.getLocalizedMessage());
-			compiler.error("ClassWriter", "compile", ex);
-			return;
+			compiler.error(I18n.get("compile.object", file), ex);
 		}
 	}
-	
+
 	public static DyvilHeader read(DyvilCompiler compiler, InputStream is, DyvilHeader header)
 	{
 		try (StringPoolReader reader = new StringPoolReader(is))

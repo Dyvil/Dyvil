@@ -1,0 +1,140 @@
+package dyvil.tools.dpf.converter.string
+
+import dyvil.tools.dpf.visitor._
+import dyvil.tools.parsing.Name
+
+public class Printer implements NodeVisitor, ValueVisitor, ListVisitor, MapVisitor, StringInterpolationVisitor
+{
+	private int indent = 0
+	
+	private void printIndent()
+	{
+		for (int i <- 0 ..< this.indent)
+		{
+			System.out.print('\t')
+		}
+	}
+	
+	public override NodeVisitor visitNode(Name name)
+	{
+		this.printIndent();
+		System.out.println("Node " + name);
+		this.indent++;
+		return this;
+	}
+	
+	public override ValueVisitor visitProperty(Name name)
+	{
+		this.printIndent();
+		System.out.println("Property " + name);
+		return this;
+	}
+	
+	public override NodeVisitor visitNodeAccess(Name name)
+	{
+		this.printIndent();
+		System.out.println("Access " + name);
+		return this;
+	}
+	
+	public override void visitInt(int value)
+	{
+		this.printIndent();
+		System.out.println("Int " + value);
+	}
+	
+	public override void visitLong(long value)
+	{
+		this.printIndent();
+		System.out.println("Long " + value);
+	}
+	
+	public override void visitFloat(float value)
+	{
+		this.printIndent();
+		System.out.println("Float " + value);
+	}
+	
+	public override void visitDouble(double value)
+	{
+		this.printIndent();
+		System.out.println("Double " + value);
+	}
+	
+	public override void visitString(String value)
+	{
+		this.printIndent();
+		System.out.println("String '" + value + "'");
+	}
+	
+	public override StringInterpolationVisitor visitStringInterpolation()
+	{
+		this.indent++;
+		return this;
+	}
+	
+	public override void visitName(Name name)
+	{
+		this.printIndent();
+		System.out.println("Name " + name);
+	}
+	
+	public override ValueVisitor visitValueAccess(Name name)
+	{
+		System.out.println("Access " + name);
+		return this;
+	}
+	
+	public override ListVisitor visitList()
+	{
+		this.printIndent();
+		System.out.println("List ");
+		this.indent++;
+		return this;
+	}
+	
+	public override MapVisitor visitMap()
+	{
+		this.printIndent();
+		System.out.println("Map ");
+		return this;
+	}
+	
+	public override BuilderVisitor visitBuilder(Name name)
+	{
+		return null;
+	}
+	
+	public override ValueVisitor visitElement()
+	{
+		this.printIndent();
+		System.out.print("Element ");
+		return this;
+	}
+	
+	public override ValueVisitor visitKey()
+	{
+		this.printIndent();
+		System.out.print("Key ");
+		return this;
+	}
+	
+	public override ValueVisitor visitValue()
+	{
+		this.printIndent();
+		System.out.print("Value ");
+		return this;
+	}
+	
+	public override void visitEnd()
+	{
+		this.indent--;
+	}
+	
+	public override void visitStringPart(String string)
+	{
+		this.printIndent();
+		System.out.print("String '" + string + "'");
+		return;
+	}
+}

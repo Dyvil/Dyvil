@@ -126,6 +126,11 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
+		if (DISALLOW_EXPRESSIONS && !Types.isVoid(type))
+		{
+			return null;
+		}
+
 		if (this.action != null)
 		{
 			this.action = TypeChecker
@@ -146,7 +151,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	@Override
 	public boolean isType(IType type)
 	{
-		if (Types.isSameType(type, Types.VOID))
+		if (Types.isVoid(type))
 		{
 			return true;
 		}
@@ -387,23 +392,6 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 			type = this.getType();
 		}
 
-		final boolean expression;
-		final int storeInsn;
-		final int localIndex;
-
-		if (type != Types.VOID)
-		{
-			storeInsn = type.getStoreOpcode();
-			localIndex = writer.localCount();
-			expression = true;
-		}
-		else
-		{
-			storeInsn = 0;
-			localIndex = -1;
-			expression = false;
-		}
-
 		final dyvil.tools.asm.Label tryStart = new dyvil.tools.asm.Label();
 		final dyvil.tools.asm.Label tryEnd = new dyvil.tools.asm.Label();
 		final dyvil.tools.asm.Label endLabel = new dyvil.tools.asm.Label();
@@ -412,11 +400,6 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		if (this.action != null)
 		{
 			this.action.writeExpression(writer, type);
-			if (expression)
-			{
-				writer.visitVarInsn(storeInsn, localIndex);
-				writer.resetLocals(localIndex);
-			}
 
 			writer.visitJumpInsn(Opcodes.GOTO, endLabel);
 		}
@@ -448,12 +431,6 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 				block.action.writeExpression(writer, type);
 			}
 
-			if (expression)
-			{
-				writer.visitVarInsn(storeInsn, localIndex);
-				writer.resetLocals(localIndex);
-			}
-
 			writer.visitTryCatchBlock(tryStart, tryEnd, handlerLabel, handlerType);
 			writer.visitJumpInsn(Opcodes.GOTO, endLabel);
 		}
@@ -473,14 +450,6 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		else
 		{
 			writer.visitLabel(endLabel);
-		}
-
-		if (expression)
-		{
-			writer.setLocalType(localIndex, type.getFrameType());
-
-			writer.visitVarInsn(type.getLoadOpcode(), localIndex);
-			writer.resetLocals(localIndex);
 		}
 	}
 

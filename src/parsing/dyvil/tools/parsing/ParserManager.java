@@ -62,12 +62,6 @@ public class ParserManager implements IParserManager
 	}
 
 	@Override
-	public void splitJump(IToken token, int length)
-	{
-		this.jump(this.split(token, 1).next());
-	}
-
-	@Override
 	public IToken split(IToken token, int length)
 	{
 		final String stringValue = token.stringValue();
@@ -103,7 +97,7 @@ public class ParserManager implements IParserManager
 		final int length = identifier.length();
 		final int lastCodePoint = identifier.codePointBefore(length);
 
-		if (LexerUtil.isIdentifierSymbol(lastCodePoint))
+		if (LexerUtil.isIdentifierSymbol(lastCodePoint) || LexerUtil.isIdentifierConnector(lastCodePoint))
 		{
 			final int symbol = this.symbols.getSymbolType(identifier);
 			if (symbol != 0)
@@ -120,6 +114,18 @@ public class ParserManager implements IParserManager
 		}
 
 		return new IdentifierToken(Name.get(identifier), Tokens.LETTER_IDENTIFIER, line, start, start + length);
+	}
+
+	@Override
+	public void splitJump(IToken token, int length)
+	{
+		this.jump(this.split(token, length).next());
+	}
+
+	@Override
+	public void splitReparse(IToken token, int length)
+	{
+		this.jump(this.split(token, length));
 	}
 
 	@Override

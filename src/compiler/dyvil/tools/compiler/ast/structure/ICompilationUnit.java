@@ -2,6 +2,8 @@ package dyvil.tools.compiler.ast.structure;
 
 import dyvil.io.Console;
 import dyvil.tools.compiler.DyvilCompiler;
+import dyvil.tools.compiler.lang.I18n;
+import dyvil.tools.compiler.sources.IFileType;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.Marker;
@@ -38,7 +40,7 @@ public interface ICompilationUnit extends IASTNode
 
 	void compile();
 
-	static boolean printMarkers(DyvilCompiler compiler, MarkerList markers, String fileType, Name name, File inputFile, String source)
+	static boolean printMarkers(DyvilCompiler compiler, MarkerList markers, IFileType fileType, Name name, File inputFile, String source)
 	{
 		final int size = markers.size();
 		if (size <= 0)
@@ -46,8 +48,9 @@ public interface ICompilationUnit extends IASTNode
 			return false;
 		}
 
-		final StringBuilder builder = new StringBuilder("Problems in ").append(fileType).append(' ').append(inputFile)
-		                                                               .append(":\n\n");
+		final StringBuilder builder = new StringBuilder(I18n
+			                                                .get("unit.problems", fileType.getLocalizedName(), name,
+			                                                     inputFile)).append("\n\n");
 
 		final int warnings = markers.getWarnings();
 		final int errors = markers.getErrors();
@@ -66,7 +69,7 @@ public interface ICompilationUnit extends IASTNode
 				builder.append(Console.ANSI_RED);
 			}
 
-			builder.append(errors).append(errors == 1 ? " Error" : " Errors");
+			builder.append(errors == 1 ? I18n.get("unit.errors.1") : I18n.get("unit.errors.n", errors));
 
 			if (colors)
 			{
@@ -84,7 +87,8 @@ public interface ICompilationUnit extends IASTNode
 			{
 				builder.append(Console.ANSI_YELLOW);
 			}
-			builder.append(warnings).append(warnings == 1 ? " Warning" : " Warnings");
+			builder.append(
+				warnings == 1 ? I18n.get("unit.warnings.1") : I18n.get("unit.warnings.n", warnings));
 
 			if (colors)
 			{
@@ -96,7 +100,8 @@ public interface ICompilationUnit extends IASTNode
 		if (errors > 0)
 		{
 			compiler.failCompilation();
-			compiler.warn(name + " was not compiled due to errors in the Compilation Unit\n");
+			compiler.warn(I18n.get("unit.problems.not_compiled", name));
+			compiler.warn("");
 			return true;
 		}
 		return false;

@@ -35,7 +35,7 @@ public class InterfaceMetadata implements IClassMetadata
 			return;
 		}
 
-		if (this.theClass.parameterCount() > 0)
+		if (!this.theClass.getParameterList().isEmpty())
 		{
 			markers.add(Markers.semanticError(this.theClass.getPosition(), "interface.classparameters"));
 		}

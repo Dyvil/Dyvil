@@ -3,7 +3,6 @@ package dyvil.tools.compiler.parser.method;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
-import dyvil.tools.compiler.ast.consumer.IParameterConsumer;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.modifiers.Modifier;
@@ -42,7 +41,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	public static final  int LAMBDA_ARROW_END = 2;
 	public static final  int ALLOW_PROPERTIES = 4;
 
-	protected IParameterConsumer consumer;
+	protected IParametric consumer;
 
 	// Metadata
 	private ModifierList   modifiers;
@@ -53,7 +52,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 
 	private int flags;
 
-	public ParameterListParser(IParameterConsumer consumer)
+	public ParameterListParser(IParametric consumer)
 	{
 		this.consumer = consumer;
 		this.mode = TYPE;
@@ -173,7 +172,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			case DyvilKeywords.THIS:
 				this.mode = SEPARATOR;
 				this.reset();
-				if (this.consumer instanceof IParametric && !((IParametric) this.consumer).setReceiverType(this.type))
+				if (!this.consumer.setReceiverType(this.type))
 				{
 					pm.report(token, "parameter.receivertype.invalid");
 					return;
@@ -196,6 +195,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			if (this.hasFlag(VARARGS))
 			{
 				this.type = new ArrayType(this.type);
+				this.consumer.setVariadic();
 			}
 
 			this.parameter = this.createParameter(token);
@@ -235,7 +235,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			this.mode = TYPE;
 			if (this.parameter != null)
 			{
-				this.consumer.addParameter(this.parameter);
+				this.consumer.getParameterList().addParameter(this.parameter);
 			}
 			this.reset();
 

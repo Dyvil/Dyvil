@@ -14,6 +14,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -98,7 +99,13 @@ public class BraceAccessExpr implements IValue, IDefaultContext
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		this.statement = this.statement.withType(type, typeContext, markers, context);
+		final IValue withType = this.statement.withType(type, typeContext, markers, context);
+		if (withType == null)
+		{
+			return null;
+		}
+
+		this.statement = withType;
 		return this;
 	}
 
@@ -200,6 +207,12 @@ public class BraceAccessExpr implements IValue, IDefaultContext
 		this.statement = this.statement.cleanup(context, compilableList);
 		context.pop();
 		return this;
+	}
+
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
 	}
 
 	@Override

@@ -38,9 +38,7 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	boolean isEmpty();
 	
 	// 'Variations'
-	
-	IArguments dropFirstValue();
-	
+
 	IArguments withLastValue(IValue value);
 	
 	default IArguments withLastValue(Name name, IValue value)
@@ -69,9 +67,7 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	float getTypeMatch(int index, IParameter param);
 	
 	void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context);
-	
-	void inferType(int index, IParameter param, ITypeContext typeContext);
-	
+
 	void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException;
 	
 	// Phase Methods

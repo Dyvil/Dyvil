@@ -2,12 +2,12 @@ package dyvil.tools.repl.context;
 
 import dyvil.array.ObjectArray;
 import dyvil.collection.List;
+import dyvil.io.Console;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
-import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -31,7 +31,7 @@ public class REPLVariable extends Field
 
 	public REPLVariable(REPLContext context, ICodePosition position, Name name, IType type, String className, ModifierSet modifiers, AnnotationList annotations)
 	{
-		super(position, name, type, modifiers, annotations);
+		super(null, position, name, type, modifiers, annotations);
 		this.context = context;
 		this.className = className;
 
@@ -254,13 +254,28 @@ public class REPLVariable extends Field
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
+		final boolean colors = this.context.getCompilationContext().config.useAnsiColors();
+
 		if (this.annotations != null)
 		{
 			this.annotations.toString(prefix, buffer);
 		}
-		this.modifiers.toString(buffer);
 
-		IDataMember.toString(prefix, buffer, this, "field.type_ascription");
+		this.modifiers.toString(this.getKind(), buffer);
+
+		this.type.toString(prefix, buffer);
+		buffer.append(' ');
+
+		if (colors)
+		{
+			buffer.append(Console.ANSI_BLUE);
+			buffer.append(this.name);
+			buffer.append(Console.ANSI_RESET);
+		}
+		else
+		{
+			buffer.append(this.name);
+		}
 
 		Formatting.appendSeparator(buffer, "field.assignment", '=');
 

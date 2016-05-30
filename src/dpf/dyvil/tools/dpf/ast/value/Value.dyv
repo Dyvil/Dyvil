@@ -1,0 +1,148 @@
+package dyvil.tools.dpf.ast.value
+
+import dyvil.lang.literal._
+
+import dyvil.collection.Collection
+import dyvil.collection.Map
+import dyvil.collection.immutable.ArrayMap
+
+import dyvil.tools.dpf.ast.value._
+import dyvil.tools.dpf.visitor.ValueVisitor
+import dyvil.tools.parsing.Name
+import dyvil.tools.parsing.ast.IASTNode
+import dyvil.tools.parsing.position.ICodePosition
+
+import java.lang.reflect.Array;
+
+@IntConvertible
+@LongConvertible
+@FloatConvertible
+@DoubleConvertible
+@CharConvertible
+@StringConvertible
+@BooleanConvertible
+@StringInterpolationConvertible
+@ArrayConvertible
+@MapConvertible
+public interface Value extends IASTNode
+{
+	// Conversion Methods
+
+	static Value apply(Object value) = wrap(value)
+
+	static IntValue apply(int literal) = IntValue(literal)
+
+	static LongValue apply(long literal) = LongValue(literal)
+
+	static FloatValue apply(float literal) = FloatValue(literal)
+
+	static DoubleValue apply(double literal) = DoubleValue(literal)
+
+	static StringValue apply(char literal) = StringValue(literal.toString)
+
+	static StringValue apply(String literal) = StringValue(literal)
+
+	static NameAccess apply(Name literal) = new NameAccess(literal)
+
+	static NameAccess apply(boolean literal) = new NameAccess(Name.getQualified(literal.toString))
+
+	static ListValue apply(Value... elements) = new ListValue(elements)
+
+	static MapValue apply([Value] keys, [Value] values) = new MapValue(new ArrayMap(keys, values))
+
+	static StringInterpolation apply(String base, Value... values)
+	{
+		return new StringInterpolation(base.split(@"\\\d+")..., values...)
+	}
+
+	static StringInterpolation apply(String base, Object... values)
+	{
+		return new StringInterpolation(base.split(@"\\\d+")..., values...)
+	}
+
+	// Override Methods
+
+	override ICodePosition getPosition() = null
+
+	override void setPosition(ICodePosition position) { }
+
+	override void expandPosition(ICodePosition position) { }
+
+	override void toString(String indent, StringBuilder buffer)
+
+	void accept(ValueVisitor visitor)
+
+	// Value Conversions
+
+	static Value wrap(any value)
+	{
+		return value.toPropertyValue
+	}
+
+	extension Value toPropertyValue(any value)
+	{
+		if (value == null)
+		{
+			return null;
+		}
+
+		if (value is Value)
+		{
+			return value as Value;
+		}
+
+		Class<_> valueClass = value.getClass();
+		if (valueClass == class String)
+		{
+			return new StringValue(value as String);
+		}
+		if (valueClass == class Int)
+		{
+			return new IntValue(value as Int);
+		}
+		if (valueClass == class Long)
+		{
+			return new LongValue(value as Long);
+		}
+		if (valueClass == class Float)
+		{
+			return new FloatValue(value as Float);
+		}
+		if (valueClass == class Double)
+		{
+			return new DoubleValue(value as Double);
+		}
+		if (valueClass == class Name)
+		{
+			return new NameAccess(value as Name)
+		}
+		if (valueClass == class Boolean)
+		{
+			return Value(value as boolean)
+		}
+
+		if (value is Collection)
+		{
+			return new ListValue(value as Collection)
+		}
+		if (value is Map)
+		{
+			return new MapValue(value as Map)
+		}
+		if (value.getClass.isArray)
+		{
+			// Convert Arrays using Reflection
+			let size = Array.getLength(value)
+			let listValue = new ListValue(size)
+
+			for var i <- 0 ..< size
+			{
+				listValue.addValue(wrap(Array.get(value, i)))
+			}
+
+			return listValue
+		}
+
+		throw new RuntimeException("Cannot convert instance of type \(value.getClass) to a DPF Value")
+	}
+}

@@ -1,9 +1,12 @@
 package dyvil.tools.repl.command;
 
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.util.MemberSorter;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.repl.DyvilREPL;
 import dyvil.tools.repl.context.REPLContext;
+
+import java.util.Arrays;
 
 public class MethodsCommand implements ICommand
 {
@@ -12,11 +15,11 @@ public class MethodsCommand implements ICommand
 	{
 		return "methods";
 	}
-	
+
 	@Override
-	public String getDescription()
+	public String[] getAliases()
 	{
-		return "Prints the signatures of all available methods";
+		return new String[] { "m" };
 	}
 
 	@Override
@@ -28,12 +31,14 @@ public class MethodsCommand implements ICommand
 	@Override
 	public void execute(DyvilREPL repl, String args)
 	{
-		REPLContext context = repl.getContext();
-		for (IMethod method : context.getMethods())
+		final REPLContext context = repl.getContext();
+
+		final IMethod[] methods = context.getMethods().toArray(IMethod.class);
+		Arrays.sort(methods, MemberSorter.METHOD_COMPARATOR);
+
+		for (IMethod method : methods)
 		{
-			StringBuilder builder = new StringBuilder();
-			Util.methodSignatureToString(method, null, builder);
-			repl.getOutput().println(builder.toString());
+			repl.getOutput().println(Util.methodSignatureToString(method, null));
 		}
 	}
 }

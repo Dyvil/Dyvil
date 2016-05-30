@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.util;
 
-import dyvil.tools.parsing.marker.BaseMarkers;
 import dyvil.tools.parsing.marker.*;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.util.I18n;
@@ -13,6 +12,7 @@ import java.util.ResourceBundle;
 
 public final class Markers
 {
+
 	private static final ResourceBundle SEMANTIC_BUNDLE = ResourceBundle
 		                                                      .getBundle("dyvil.tools.compiler.lang.SemanticMarkers");
 

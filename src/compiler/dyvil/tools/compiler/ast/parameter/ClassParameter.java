@@ -22,7 +22,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public final class ClassParameter extends Field implements IParameter
+public class ClassParameter extends Field implements IParameter
 {
 	// Metadata
 	protected int     index;
@@ -45,14 +45,9 @@ public final class ClassParameter extends Field implements IParameter
 		super(enclosingClass, name, type);
 	}
 
-	public ClassParameter(IClass enclosingClass, Name name, IType type, ModifierSet modifiers)
+	public ClassParameter(IClass enclosingClass, ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
-		super(enclosingClass, name, type, modifiers == null ? new ModifierList() : modifiers);
-	}
-
-	public ClassParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
-	{
-		super(position, name, type, modifiers == null ? new ModifierList() : modifiers, annotations);
+		super(enclosingClass, position, name, type, modifiers == null ? new ModifierList() : modifiers, annotations);
 	}
 
 	@Override
@@ -183,15 +178,6 @@ public final class ClassParameter extends Field implements IParameter
 	}
 
 	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-		super.check(markers, context);
-
-		// TODO remove duplicate modifier check
-		ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.CLASS_PARAMETER_MODIFIERS);
-	}
-
-	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		if (this.isVarargs())
@@ -217,12 +203,12 @@ public final class ClassParameter extends Field implements IParameter
 			// to rely on a boolean field.
 
 			this.modifiers.addIntModifier(Modifiers.VARARGS);
-			Parameter.writeInitImpl(this, writer);
+			AbstractParameter.writeInitImpl(this, writer);
 			this.modifiers.removeIntModifier(Modifiers.VARARGS);
 			return;
 		}
 
-		Parameter.writeInitImpl(this, writer);
+		AbstractParameter.writeInitImpl(this, writer);
 	}
 
 	@Override

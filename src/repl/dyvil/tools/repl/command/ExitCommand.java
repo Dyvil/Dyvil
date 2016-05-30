@@ -1,6 +1,7 @@
 package dyvil.tools.repl.command;
 
 import dyvil.tools.repl.DyvilREPL;
+import dyvil.tools.repl.lang.I18n;
 
 public class ExitCommand implements ICommand
 {
@@ -14,12 +15,6 @@ public class ExitCommand implements ICommand
 	public String[] getAliases()
 	{
 		return new String[] { "q", "quit" };
-	}
-
-	@Override
-	public String getDescription()
-	{
-		return "Exits the current REPL instance";
 	}
 
 	@Override
@@ -43,9 +38,7 @@ public class ExitCommand implements ICommand
 		}
 		catch (NumberFormatException ex)
 		{
-			repl.getErrorOutput().println("Invalid Exit Code " + argument);
-			return;
+			repl.getErrorOutput().println(I18n.get("command.exit.invalid", argument));
 		}
-		return;
 	}
 }

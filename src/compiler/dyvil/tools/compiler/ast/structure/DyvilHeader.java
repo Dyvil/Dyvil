@@ -25,6 +25,7 @@ import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.ObjectFormat;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.lang.I18n;
 import dyvil.tools.compiler.parser.header.DyvilHeaderParser;
 import dyvil.tools.compiler.sources.DyvilFileType;
 import dyvil.tools.compiler.transform.DyvilSymbols;
@@ -324,7 +325,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 				candidate = operator;
 			}
 		}
-		if (candidate != null)
+		if (candidate != null && candidate.getType() == type)
 		{
 			return candidate;
 		}
@@ -337,7 +338,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 				return operator;
 			}
 		}
-		return null;
+		return candidate;
 	}
 
 	@Override
@@ -519,7 +520,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		}
 		catch (IOException ex)
 		{
-			this.compiler.warn("Cannot load source file '" + this.inputFile + "'");
+			this.compiler.error(I18n.get("source.error", this.inputFile), ex);
 			return false;
 		}
 	}
@@ -603,7 +604,8 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	protected boolean printMarkers()
 	{
 		return ICompilationUnit
-			       .printMarkers(this.compiler, this.markers, "Dyvil Header", this.name, this.inputFile, this.code);
+			       .printMarkers(this.compiler, this.markers, DyvilFileType.DYVIL_HEADER, this.name, this.inputFile,
+			                     this.code);
 	}
 
 	@Override

@@ -14,28 +14,28 @@ public class Frame
 	protected int      stackCount;
 	protected int      actualStackCount;
 	protected int      maxStack;
-	
+
 	protected Object[] locals;
 	protected int      localCount;
 	protected int      maxLocals;
-	
+
 	public Frame()
 	{
 		this.stack = new Object[3];
 		this.locals = new Object[4];
 	}
-	
+
 	public Frame(int stackCount, Object[] stack, int localCount, Object[] locals)
 	{
 		this.stackCount = stackCount;
 		this.stack = new Object[stackCount];
 		System.arraycopy(stack, 0, this.stack, 0, stackCount);
-		
+
 		this.localCount = localCount;
 		this.locals = new Object[localCount];
 		System.arraycopy(locals, 0, this.locals, 0, localCount);
 	}
-	
+
 	public static int getArgumentCount(String desc)
 	{
 		int index = desc.lastIndexOf(')');
@@ -58,7 +58,7 @@ public class Frame
 		}
 		return count;
 	}
-	
+
 	public static Object returnType(String desc)
 	{
 		int index = desc.lastIndexOf(')') + 1;
@@ -91,7 +91,7 @@ public class Frame
 			return null;
 		}
 	}
-	
+
 	public static Object fieldType(String desc)
 	{
 		char c = desc.charAt(0);
@@ -123,7 +123,7 @@ public class Frame
 			return null;
 		}
 	}
-	
+
 	public static String frameTypeName(Object o)
 	{
 		if (o == BOOLEAN)
@@ -172,14 +172,14 @@ public class Frame
 		}
 		return o.toString();
 	}
-	
+
 	public void setInstance(String type)
 	{
 		this.localCount = 1;
 		this.maxLocals = 1;
 		this.locals[0] = type;
 	}
-	
+
 	private void ensureLocals(int count)
 	{
 		if (count > this.locals.length)
@@ -199,7 +199,7 @@ public class Frame
 			this.localCount = count;
 		}
 	}
-	
+
 	public void setLocal(int index, Object type)
 	{
 		if (type == LONG || type == DOUBLE)
@@ -209,11 +209,11 @@ public class Frame
 			this.locals[index + 1] = TOP;
 			return;
 		}
-		
+
 		this.ensureLocals(index + 1);
 		this.locals[index] = type;
 	}
-	
+
 	private void ensureStack(int count)
 	{
 		if (count > this.stack.length)
@@ -227,12 +227,12 @@ public class Frame
 			this.maxStack = this.actualStackCount;
 		}
 	}
-	
+
 	public int stackCount()
 	{
 		return this.stackCount;
 	}
-	
+
 	public void set(Object type)
 	{
 		if (type == null)
@@ -248,10 +248,10 @@ public class Frame
 				this.actualStackCount++;
 			}
 		}
-		
+
 		this.stack[this.stackCount - 1] = type;
 	}
-	
+
 	public void push(Object type)
 	{
 		if (type == LONG || type == DOUBLE)
@@ -262,11 +262,11 @@ public class Frame
 		{
 			this.actualStackCount++;
 		}
-		
+
 		this.ensureStack(this.stackCount + 1);
 		this.stack[this.stackCount++] = type;
 	}
-	
+
 	public void reserve(int stackSlots)
 	{
 		if (this.actualStackCount + stackSlots > this.maxStack)
@@ -274,14 +274,14 @@ public class Frame
 			this.maxStack = this.actualStackCount + stackSlots;
 		}
 	}
-	
+
 	public void pop() throws StackUnderflowException
 	{
 		if (this.stackCount == 0)
 		{
 			throw new StackUnderflowException();
 		}
-		
+
 		Object o = this.stack[--this.stackCount];
 		if (o == LONG || o == DOUBLE)
 		{
@@ -292,7 +292,7 @@ public class Frame
 			this.actualStackCount--;
 		}
 	}
-	
+
 	public Object popAndGet() throws StackUnderflowException
 	{
 		Object o = this.stack[--this.stackCount];
@@ -306,12 +306,12 @@ public class Frame
 		}
 		return o;
 	}
-	
+
 	public Object peek()
 	{
 		return this.stack[this.stackCount - 1];
 	}
-	
+
 	public void visitInsn(int opcode) throws BytecodeException
 	{
 		switch (opcode)
@@ -470,7 +470,7 @@ public class Frame
 				this.stack[this.stackCount++] = o;
 				return;
 			}
-			
+
 			this.actualStackCount += 2;
 			this.ensureStack(this.stackCount + 2);
 			this.stack[this.stackCount] = this.stack[this.stackCount - 2];
@@ -622,7 +622,7 @@ public class Frame
 			return;
 		}
 	}
-	
+
 	public void visitIntInsn(int opcode, int operand) throws BytecodeException
 	{
 		switch (opcode)
@@ -666,7 +666,7 @@ public class Frame
 			}
 		}
 	}
-	
+
 	public void visitJumpInsn(int opcode) throws BytecodeException
 	{
 		switch (opcode)
@@ -698,7 +698,7 @@ public class Frame
 			return;
 		}
 	}
-	
+
 	public void visitTypeInsn(int opcode, String type) throws BytecodeException
 	{
 		switch (opcode)
@@ -708,7 +708,14 @@ public class Frame
 			return;
 		case ANEWARRAY:
 			this.pop();
-			this.push('[' + type);
+			if (type.charAt(0) == '[')
+			{
+				this.push('[' + type); // [foo --> [[foo
+			}
+			else
+			{
+				this.push("[L" + type + ';'); // foo --> [Lfoo;
+			}
 			return;
 		case CHECKCAST:
 			this.pop();
@@ -720,7 +727,7 @@ public class Frame
 			return;
 		}
 	}
-	
+
 	public void visitNewArray(String type, int dims) throws BytecodeException
 	{
 		for (int i = 0; i < dims; i++)
@@ -729,7 +736,7 @@ public class Frame
 		}
 		this.push(type);
 	}
-	
+
 	public void visitVarInsn(int opcode, int index) throws BytecodeException
 	{
 		switch (opcode)
@@ -774,7 +781,7 @@ public class Frame
 			return;
 		}
 	}
-	
+
 	public void visitFieldInsn(int opcode, Object returnType) throws BytecodeException
 	{
 		switch (opcode)
@@ -795,11 +802,11 @@ public class Frame
 			return;
 		}
 	}
-	
+
 	public void visitInvokeInsn(int args, Object returnType) throws BytecodeException
 	{
 		this.stackCount -= args;
-		
+
 		if (this.stackCount < 0)
 		{
 			throw new StackUnderflowException();
@@ -809,7 +816,7 @@ public class Frame
 			this.push(returnType);
 		}
 	}
-	
+
 	public void visitFrame(MethodVisitor mv)
 	{
 		Object[] locals = new Object[this.localCount];
@@ -823,16 +830,16 @@ public class Frame
 				i++;
 			}
 		}
-		
+
 		int stack = this.stackCount;
 		while (stack > 0 && this.stack[stack - 1] == TOP)
 		{
 			stack--;
 		}
-		
+
 		mv.visitFrame(ASMConstants.F_NEW, localIndex, locals, stack, this.stack);
 	}
-	
+
 	public Frame copy()
 	{
 		Frame copy = new Frame(this.stackCount, this.stack, this.localCount, this.locals);
@@ -841,7 +848,7 @@ public class Frame
 		copy.actualStackCount = this.actualStackCount;
 		return copy;
 	}
-	
+
 	@Override
 	public String toString()
 	{

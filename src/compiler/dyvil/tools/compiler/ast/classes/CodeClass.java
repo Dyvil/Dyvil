@@ -17,10 +17,10 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
-import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
@@ -172,10 +172,7 @@ public class CodeClass extends AbstractClass
 			this.annotations.resolveTypes(markers, context, this);
 		}
 
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].resolveTypes(markers, context);
-		}
+		this.parameters.resolveTypes(markers, context);
 
 		if (this.superType != null)
 		{
@@ -219,10 +216,7 @@ public class CodeClass extends AbstractClass
 			this.typeParameters[i].resolve(markers, context);
 		}
 
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].resolve(markers, context);
-		}
+		this.parameters.resolve(markers, context);
 
 		if (this.superType != null)
 		{
@@ -259,10 +253,7 @@ public class CodeClass extends AbstractClass
 			this.typeParameters[i].checkTypes(markers, context);
 		}
 
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].checkTypes(markers, context);
-		}
+		this.parameters.checkTypes(markers, context);
 
 		if (this.superType != null)
 		{
@@ -291,22 +282,18 @@ public class CodeClass extends AbstractClass
 	{
 		context = context.push(this);
 
-		ModifierUtil.checkModifiers(markers, this, this.modifiers, Modifiers.CLASS_MODIFIERS);
-
 		if (this.annotations != null)
 		{
 			this.annotations.check(markers, context, this.getElementType());
 		}
+		this.modifiers.check(this, markers);
 
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
 			this.typeParameters[i].check(markers, context);
 		}
 
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].check(markers, context);
-		}
+		this.parameters.check(markers, context);
 
 		if (this.superType != null)
 		{
@@ -434,10 +421,7 @@ public class CodeClass extends AbstractClass
 			this.typeParameters[i].foldConstants();
 		}
 
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].foldConstants();
-		}
+		this.parameters.foldConstants();
 
 		if (this.superType != null)
 		{
@@ -472,10 +456,7 @@ public class CodeClass extends AbstractClass
 			this.typeParameters[i].cleanup(context, this);
 		}
 
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].cleanup(context, this);
-		}
+		this.parameters.cleanup(context, this);
 
 		if (this.superType != null)
 		{
@@ -584,10 +565,7 @@ public class CodeClass extends AbstractClass
 
 		this.metadata.write(writer);
 
-		if (this.parameterCount > 0)
-		{
-			this.writeClassParameters(writer);
-		}
+		this.writeClassParameters(writer);
 
 		if (this.body != null)
 		{
@@ -710,14 +688,19 @@ public class CodeClass extends AbstractClass
 
 	private void writeClassParameters(ClassWriter writer) throws BytecodeException
 	{
+		final int parameterCount = this.parameters.size();
+		if (parameterCount == 0) {
+			return;
+		}
+
 		final AnnotationVisitor annotationVisitor = writer.visitAnnotation(AnnotationUtil.CLASS_PARAMETERS, false);
 		final AnnotationVisitor arrayVisitor = annotationVisitor.visitArray("names");
 
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0; i < parameterCount; i++)
 		{
-			IParameter param = this.parameters[i];
-			param.write(writer);
-			arrayVisitor.visit("", param.getName().qualified);
+			final IParameter parameter = this.parameters.get(i);
+			parameter.write(writer);
+			arrayVisitor.visit("", parameter.getName().qualified);
 		}
 
 		arrayVisitor.visitEnd();
@@ -837,8 +820,11 @@ public class CodeClass extends AbstractClass
 			{
 				modifiers &= ~Modifiers.STATIC;
 			}
-			writer.visitInnerClass(this.internalName, this.enclosingClass.getInternalName(), this.name.qualified,
+			final String outerName = this.enclosingClass.getInternalName();
+			writer.visitInnerClass(this.internalName, outerName, this.name.qualified,
 			                       modifiers);
+
+			writer.visitOuterClass(outerName, null, null);
 		}
 	}
 
@@ -859,12 +845,7 @@ public class CodeClass extends AbstractClass
 	{
 		this.writeTypes(out);
 
-		int params = this.parameterCount;
-		out.writeByte(params);
-		for (int i = 0; i < params; i++)
-		{
-			IType.writeType(this.parameters[i].getType(), out);
-		}
+		this.parameters.writeSignature(out);
 	}
 
 	@Override
@@ -877,12 +858,7 @@ public class CodeClass extends AbstractClass
 
 		this.writeTypes(out);
 
-		int params = this.parameterCount;
-		out.writeByte(params);
-		for (int i = 0; i < params; i++)
-		{
-			this.parameters[i].write(out);
-		}
+		this.parameters.write(out);
 	}
 
 	private void readTypes(DataInput in) throws IOException
@@ -903,23 +879,7 @@ public class CodeClass extends AbstractClass
 	{
 		this.readTypes(in);
 
-		int params = in.readByte();
-		if (this.parameterCount != 0)
-		{
-			this.parameterCount = params;
-			for (int i = 0; i < params; i++)
-			{
-				this.parameters[i].setType(IType.readType(in));
-			}
-			return;
-		}
-
-		this.parameterCount = params;
-		this.parameters = new IParameter[params];
-		for (int i = 0; i < params; i++)
-		{
-			this.parameters[i] = new ClassParameter(this, Name.getQualified("par" + i), IType.readType(in));
-		}
+		this.parameters.readSignature(in);
 	}
 
 	@Override
@@ -932,14 +892,6 @@ public class CodeClass extends AbstractClass
 
 		this.readTypes(in);
 
-		int params = in.readByte();
-		this.parameters = new IParameter[params];
-		this.parameterCount = params;
-		for (int i = 0; i < params; i++)
-		{
-			ClassParameter param = new ClassParameter(this);
-			param.read(in);
-			this.parameters[i] = param;
-		}
+		this.parameters = ParameterList.read(in);
 	}
 }

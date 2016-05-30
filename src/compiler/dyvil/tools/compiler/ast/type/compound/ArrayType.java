@@ -268,7 +268,7 @@ public class ArrayType implements IObjectType, ITyped
 		}
 		this.type = this.type.resolveType(markers, context);
 
-		if (Types.isSameType(this.type, Types.VOID))
+		if (Types.isVoid(this.type))
 		{
 			markers.add(Markers.semanticError(this.type.getPosition(), "type.array.void"));
 		}

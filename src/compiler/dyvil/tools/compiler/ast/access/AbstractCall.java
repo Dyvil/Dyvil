@@ -129,7 +129,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 	@Override
 	public boolean isType(IType type)
 	{
-		return Types.isSameType(type, Types.VOID) || this.method != null && Types.isAssignable(this.getType(), type);
+		return Types.isVoid(type) || this.method != null && Types.isAssignable(this.getType(), type);
 	}
 
 	public static IValue toReferenceValue(AbstractCall call, Name name, MarkerList markers, IContext context)

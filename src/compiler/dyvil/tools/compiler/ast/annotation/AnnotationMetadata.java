@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -131,22 +132,22 @@ public final class AnnotationMetadata implements IClassMetadata
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		int params = this.theClass.parameterCount();
-		for (int i = 0; i < params; i++)
+		final IParameterList parameterList = this.theClass.getParameterList();
+		for (int i = 0, count = parameterList.size(); i < count; i++)
 		{
-			IParameter param = this.theClass.getParameter(i);
+			final IParameter parameter = parameterList.get(i);
 			
-			StringBuilder desc = new StringBuilder("()");
-			param.getType().appendExtendedName(desc);
+			final StringBuilder desc = new StringBuilder("()");
+			parameter.getType().appendExtendedName(desc);
 			MethodVisitor mw = writer
-					.visitMethod(Modifiers.PUBLIC | Modifiers.ABSTRACT, param.getName().qualified, desc.toString(),
+					.visitMethod(Modifiers.PUBLIC | Modifiers.ABSTRACT, parameter.getName().qualified, desc.toString(),
 					             null, null);
 			
-			IValue value = param.getValue();
-			if (value != null)
+			final IValue argument = parameter.getValue();
+			if (argument != null)
 			{
 				AnnotationVisitor av = mw.visitAnnotationDefault();
-				Annotation.visitValue(av, null, value);
+				Annotation.visitValue(av, null, argument);
 			}
 		}
 	}

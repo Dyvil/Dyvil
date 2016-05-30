@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -74,8 +75,9 @@ public class CaseClassPattern extends Pattern implements IPatternList
 		{
 			return this; // skip
 		}
-		
-		final int paramCount = caseClass.parameterCount();
+
+		final IParameterList parameters = caseClass.getParameterList();
+		final int paramCount = parameters.size();
 		if (this.patternCount != paramCount)
 		{
 			final Marker marker = Markers.semantic(this.position, "pattern.class.count", this.type.toString());
@@ -90,7 +92,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 		for (int i = 0; i < paramCount; i++)
 		{
 			final IPattern pattern = this.patterns[i];
-			final IParameter param = caseClass.getParameter(i);
+			final IParameter param = parameters.get(i);
 
 			if (param.getAccessLevel() != Modifiers.PUBLIC)
 			{
@@ -115,7 +117,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 			}
 		}
 
-		if (Types.isSameType(type, this.type))
+		if (Types.isExactType(type, this.type))
 		{
 			// No additional type check required
 			return this;
@@ -208,6 +210,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 		varIndex = IPattern.ensureVar(writer, varIndex, matchedType);
 
 		final IClass caseClass = this.type.getTheClass();
+		final IParameterList parameters = caseClass.getParameterList();
 		final int lineNumber = this.getLineNumber();
 
 		for (int i = 0; i < this.patternCount; i++)
@@ -234,7 +237,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 			}
 			else
 			{
-				final IDataMember field = caseClass.getParameter(i);
+				final IDataMember field = parameters.get(i);
 				memberType = field.getType();
 
 				field.writeGet(writer, null, lineNumber);

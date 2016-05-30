@@ -47,12 +47,6 @@ public final class EmptyArguments implements IArguments
 	}
 
 	@Override
-	public IArguments dropFirstValue()
-	{
-		return null;
-	}
-
-	@Override
 	public IArguments withLastValue(IValue value)
 	{
 		return new SingleArgument(value);
@@ -89,11 +83,6 @@ public final class EmptyArguments implements IArguments
 	public IValue getValue(int index, IParameter param)
 	{
 		return null;
-	}
-
-	@Override
-	public void inferType(int index, IParameter param, ITypeContext typeContext)
-	{
 	}
 
 	@Override

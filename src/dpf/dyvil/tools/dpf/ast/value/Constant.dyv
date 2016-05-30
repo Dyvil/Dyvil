@@ -1,0 +1,10 @@
+package dyvil.tools.dpf.ast.value;
+
+public interface Constant extends Value
+{
+	boolean isConstant() = true
+
+	Object toObject();
+
+	void appendString(StringBuilder builder);
+}

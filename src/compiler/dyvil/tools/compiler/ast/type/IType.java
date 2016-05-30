@@ -256,9 +256,9 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	/**
 	 * Returns true if this type has a special role within the type system and needs special subtyping checks.
 	 */
-	default boolean needsSubTypeCheck()
+	default int subTypeCheckLevel()
 	{
-		return false;
+		return 0;
 	}
 
 	default boolean isSubClassOf(IType superType)
@@ -311,6 +311,8 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	 * Returns true if this is or contains any type variables.
 	 */
 	boolean hasTypeVariables();
+
+	boolean isUninferred();
 
 	IType getConcreteType(ITypeContext context);
 

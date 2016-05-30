@@ -7,11 +7,11 @@ import dyvil.tools.compiler.ast.consumer.IClassConsumer;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.ObjectFormat;
-import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.parsing.ParserManager;
 import dyvil.tools.compiler.parser.header.DyvilUnitParser;
 import dyvil.tools.compiler.sources.DyvilFileType;
+import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ParserManager;
 
 import java.io.File;
 
@@ -21,24 +21,24 @@ public class DyvilUnit extends DyvilHeader implements IClassConsumer
 	private int classCount;
 	private IClassCompilable[] innerClasses = new IClassCompilable[2];
 	private int innerClassCount;
-	
+
 	public DyvilUnit(DyvilCompiler compiler, Package pack, File input, File output)
 	{
 		super(compiler, pack, input, output);
 	}
-	
+
 	@Override
 	public boolean isHeader()
 	{
 		return this.headerDeclaration != null;
 	}
-	
+
 	@Override
 	public int classCount()
 	{
 		return this.classCount;
 	}
-	
+
 	@Override
 	public void addClass(IClass iclass)
 	{
@@ -54,13 +54,13 @@ public class DyvilUnit extends DyvilHeader implements IClassConsumer
 
 		this.classes[index] = iclass;
 	}
-	
+
 	@Override
 	public IClass getClass(int index)
 	{
 		return this.classes[index];
 	}
-	
+
 	@Override
 	public IClass getClass(Name name)
 	{
@@ -74,13 +74,13 @@ public class DyvilUnit extends DyvilHeader implements IClassConsumer
 		}
 		return null;
 	}
-	
+
 	@Override
 	public int innerClassCount()
 	{
 		return this.innerClassCount;
 	}
-	
+
 	@Override
 	public void addInnerClass(IClassCompilable iclass)
 	{
@@ -92,28 +92,28 @@ public class DyvilUnit extends DyvilHeader implements IClassConsumer
 			this.innerClasses = temp;
 		}
 		this.innerClasses[index] = iclass;
-		
+
 		iclass.setInnerIndex(this.getInternalName(), index);
 	}
-	
+
 	@Override
 	public IClassCompilable getInnerClass(int index)
 	{
 		return this.innerClasses[index];
 	}
-	
+
 	@Override
 	public void parse()
 	{
 		new ParserManager(DyvilSymbols.INSTANCE, this.tokens, this.markers).parse(new DyvilUnitParser(this));
 		this.tokens = null;
 	}
-	
+
 	@Override
 	public void resolveTypes()
 	{
 		super.resolveTypes();
-		
+
 		for (int i = 0; i < this.classCount; i++)
 		{
 			IClass iclass = this.classes[i];
@@ -126,7 +126,7 @@ public class DyvilUnit extends DyvilHeader implements IClassConsumer
 			this.classes[i].resolveTypes(this.markers, this);
 		}
 	}
-	
+
 	@Override
 	public void resolve()
 	{
@@ -135,7 +135,7 @@ public class DyvilUnit extends DyvilHeader implements IClassConsumer
 			this.classes[i].resolve(this.markers, this);
 		}
 	}
-	
+
 	@Override
 	public void checkTypes()
 	{
@@ -144,7 +144,7 @@ public class DyvilUnit extends DyvilHeader implements IClassConsumer
 			this.classes[i].checkTypes(this.markers, this);
 		}
 	}
-	
+
 	@Override
 	public void check()
 	{
@@ -153,13 +153,13 @@ public class DyvilUnit extends DyvilHeader implements IClassConsumer
 		{
 			this.headerDeclaration.check(this.markers);
 		}
-		
+
 		for (int i = 0; i < this.classCount; i++)
 		{
 			this.classes[i].check(this.markers, this);
 		}
 	}
-	
+
 	@Override
 	public void foldConstants()
 	{
@@ -168,7 +168,7 @@ public class DyvilUnit extends DyvilHeader implements IClassConsumer
 			this.classes[i].foldConstants();
 		}
 	}
-	
+
 	@Override
 	public void cleanup()
 	{
@@ -177,13 +177,15 @@ public class DyvilUnit extends DyvilHeader implements IClassConsumer
 			this.classes[i].cleanup(this, null);
 		}
 	}
-	
+
 	@Override
 	protected boolean printMarkers()
 	{
-		return ICompilationUnit.printMarkers(this.compiler, this.markers, "Dyvil Unit", this.name, this.inputFile, this.code);
+		return ICompilationUnit
+			       .printMarkers(this.compiler, this.markers, DyvilFileType.DYVIL_UNIT, this.name, this.inputFile,
+			                     this.code);
 	}
-	
+
 	@Override
 	public void compile()
 	{
@@ -191,12 +193,12 @@ public class DyvilUnit extends DyvilHeader implements IClassConsumer
 		{
 			return;
 		}
-		
+
 		if (this.headerDeclaration != null)
 		{
 			ObjectFormat.write(this.compiler, new File(this.outputDirectory, this.name.qualified + ".dyo"), this);
 		}
-		
+
 		for (int i = 0; i < this.classCount; i++)
 		{
 			IClass iclass = this.classes[i];
@@ -210,10 +212,10 @@ public class DyvilUnit extends DyvilHeader implements IClassConsumer
 			{
 				name1 = name.qualified + DyvilFileType.CLASS_EXTENSION;
 			}
-			
+
 			File file = new File(this.outputDirectory, name1);
 			ClassWriter.compile(this.compiler, file, iclass);
-			
+
 			IClassBody body = iclass.getBody();
 			if (body != null)
 			{
@@ -227,7 +229,7 @@ public class DyvilUnit extends DyvilHeader implements IClassConsumer
 				}
 			}
 		}
-		
+
 		for (int i = 0; i < this.innerClassCount; i++)
 		{
 			IClassCompilable iclass = this.innerClasses[i];
@@ -236,7 +238,7 @@ public class DyvilUnit extends DyvilHeader implements IClassConsumer
 			ClassWriter.compile(this.compiler, file, iclass);
 		}
 	}
-	
+
 	@Override
 	public IClass resolveClass(Name name)
 	{
@@ -249,15 +251,15 @@ public class DyvilUnit extends DyvilHeader implements IClassConsumer
 				return c;
 			}
 		}
-		
+
 		return super.resolveClass(name);
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		super.toString(prefix, buffer);
-		
+
 		for (int i = 0; i < this.classCount; i++)
 		{
 			this.classes[i].toString(prefix, buffer);

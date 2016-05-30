@@ -210,11 +210,21 @@ public final class Types
 			return true;
 		}
 
-		if (type2.needsSubTypeCheck() && !type1.needsSubTypeCheck())
+		if (type2.subTypeCheckLevel() > type1.subTypeCheckLevel())
 		{
 			return type2.isSameType(type1);
 		}
 		return type1.isSameType(type2);
+	}
+
+	public static boolean isVoid(IType type)
+	{
+		return type.getTypecode() == PrimitiveType.VOID_CODE;
+	}
+
+	public static boolean isExactType(IType type1, IType type2)
+	{
+		return type1 == type2 || type1.isSameType(type2) && type2.isSameType(type1);
 	}
 
 	public static boolean isSuperClass(IClass superClass, IClass subClass)
@@ -228,7 +238,7 @@ public final class Types
 		{
 			return true;
 		}
-		if (subType.needsSubTypeCheck())
+		if (subType.subTypeCheckLevel() > superType.subTypeCheckLevel())
 		{
 			return subType.isSubClassOf(superType);
 		}
@@ -241,7 +251,7 @@ public final class Types
 		{
 			return true;
 		}
-		if (subType.needsSubTypeCheck() && !superType.needsSubTypeCheck())
+		if (subType.subTypeCheckLevel() > superType.subTypeCheckLevel())
 		{
 			return subType.isSubTypeOf(superType);
 		}

@@ -66,7 +66,7 @@ public final class BindingPattern extends Pattern
 			this.type = type;
 			return this;
 		}
-		if (Types.isSameType(type, this.type))
+		if (Types.isExactType(type, this.type))
 		{
 			return this;
 		}

@@ -4,6 +4,7 @@ import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.lang.I18n;
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.compiler.sources.FileFinder;
 
@@ -140,7 +141,7 @@ public class CompilerConfig
 		}
 		catch (FileNotFoundException ex)
 		{
-			this.compiler.error(ex.getMessage());
+			this.compiler.error(I18n.get("library.not_found", file), ex);
 		}
 	}
 	

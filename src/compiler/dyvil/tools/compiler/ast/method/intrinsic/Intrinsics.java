@@ -8,15 +8,15 @@ import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.MethodParameter;
+import dyvil.tools.compiler.ast.parameter.CodeParameter;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.parsing.Name;
 
 public class Intrinsics
 {
-	private static final MethodParameter STRINGS = new MethodParameter(Name.getQualified("strings"),
-	                                                                   new ArrayType(Types.STRING));
+	private static final CodeParameter STRINGS = new CodeParameter(Name.getQualified("strings"),
+	                                                               new ArrayType(Types.STRING));
 	
 	public static IntrinsicData readAnnotation(IMethod method, IAnnotation annotation)
 	{

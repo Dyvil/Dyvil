@@ -27,7 +27,7 @@ public class REPLCompiler
 		}
 		catch (Throwable t)
 		{
-			t.printStackTrace(repl.getOutput());
+			t.printStackTrace(repl.getErrorOutput());
 			return null;
 		}
 	}
@@ -104,12 +104,12 @@ public class REPLCompiler
 		{
 			final Throwable cause = initializerError.getCause();
 			filterStackTrace(cause);
-			cause.printStackTrace(repl.getOutput());
+			cause.printStackTrace(repl.getErrorOutput());
 		}
 		catch (Throwable throwable)
 		{
 			filterStackTrace(throwable);
-			throwable.printStackTrace(repl.getOutput());
+			throwable.printStackTrace(repl.getErrorOutput());
 		}
 		return null;
 	}

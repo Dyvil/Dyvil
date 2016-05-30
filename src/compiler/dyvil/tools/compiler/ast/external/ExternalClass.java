@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.external;
 import dyvil.collection.Entry;
 import dyvil.collection.Map;
 import dyvil.collection.Set;
+import dyvil.collection.immutable.ArraySet;
 import dyvil.collection.mutable.HashMap;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.*;
@@ -27,6 +28,7 @@ import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -54,15 +56,14 @@ public final class ExternalClass extends AbstractClass
 	private static final int METADATA    = 1;
 	private static final int SUPER_TYPES = 1 << 1;
 	private static final int GENERICS    = 1 << 2;
-	private static final int PARAMETERS  = 1 << 3;
 	private static final int ANNOTATIONS = 1 << 4;
 	private static final int INNER_TYPES = 1 << 5;
 
 	protected Package thePackage;
 
-	private int resolved;
+	private int                 resolved;
 	private Map<String, String> innerTypes;
-	private String[] classParameters;
+	private Set<String>         classParameters;
 
 	public ExternalClass(Name name)
 	{
@@ -117,17 +118,6 @@ public final class ExternalClass extends AbstractClass
 		}
 
 		this.thisType = type;
-	}
-
-	private void resolveParameters()
-	{
-		this.resolved |= PARAMETERS;
-
-		final IContext context = this.getCombiningContext();
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].resolveTypes(null, context);
-		}
 	}
 
 	private void resolveSuperTypes()
@@ -185,7 +175,7 @@ public final class ExternalClass extends AbstractClass
 
 	public void setClassParameters(String[] classParameters)
 	{
-		this.classParameters = classParameters;
+		this.classParameters = ArraySet.apply(classParameters);
 	}
 
 	@Override
@@ -287,26 +277,6 @@ public final class ExternalClass extends AbstractClass
 			this.resolveAnnotations();
 		}
 		return super.getAnnotation(type);
-	}
-
-	@Override
-	public IParameter getParameter(int index)
-	{
-		if ((this.resolved & PARAMETERS) == 0)
-		{
-			this.resolveParameters();
-		}
-		return super.getParameter(index);
-	}
-
-	@Override
-	public IParameter[] getParameters()
-	{
-		if ((this.resolved & PARAMETERS) == 0)
-		{
-			this.resolveParameters();
-		}
-		return super.getParameters();
 	}
 
 	@Override
@@ -459,19 +429,10 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		if ((this.resolved & PARAMETERS) == 0)
+		final IParameter parameter = this.parameters.resolveParameter(name);
+		if (parameter != null)
 		{
-			// Includes resolveGenerics
-			this.resolveParameters();
-		}
-
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			IParameter param = this.parameters[i];
-			if (param.getName() == name)
-			{
-				return param;
-			}
+			return parameter;
 		}
 
 		// Own fields
@@ -676,20 +637,15 @@ public final class ExternalClass extends AbstractClass
 	{
 		IType type = ClassFormat.extendedToType(signature == null ? desc : signature);
 
-		if (this.classParameters != null)
+		if (this.classParameters != null && this.classParameters.contains(name))
 		{
-			for (String s : this.classParameters)
-			{
-				if (s.equals(name))
-				{
-					ClassParameter param = new ClassParameter(this, Name.get(name), type, new FlagModifierSet(access));
-					this.addParameter(param);
-					return new SimpleFieldVisitor(param);
-				}
-			}
+			final ClassParameter param = new ExternalClassParameter(this, Name.get(name), type,
+			                                                        new FlagModifierSet(access));
+			this.parameters.addParameter(param);
+			return new SimpleFieldVisitor(param);
 		}
 
-		ExternalField field = new ExternalField(this, Name.get(name), desc, type, new FlagModifierSet(access));
+		final ExternalField field = new ExternalField(this, Name.get(name), desc, type, new FlagModifierSet(access));
 
 		if (value != null)
 		{
@@ -707,9 +663,9 @@ public final class ExternalClass extends AbstractClass
 
 		if (this.isAnnotation())
 		{
-			ClassParameter param = new ClassParameter(this, name1, ClassFormat.readReturnType(desc),
-			                                          new FlagModifierSet(access));
-			this.addParameter(param);
+			final ClassParameter param = new ExternalClassParameter(this, name1, ClassFormat.readReturnType(desc),
+			                                                        new FlagModifierSet(access));
+			this.parameters.addParameter(param);
 			return new AnnotationClassVisitor(param);
 		}
 
@@ -739,7 +695,8 @@ public final class ExternalClass extends AbstractClass
 
 			if ((access & Modifiers.VARARGS) != 0)
 			{
-				constructor.getParameterNoResolve(constructor.parameterCount() - 1).setVarargs(true);
+				final IParameterList parameterList = constructor.getParameterList();
+				parameterList.get(parameterList.size() - 1).setVarargs(true);
 			}
 
 			this.body.addConstructor(constructor);
@@ -766,7 +723,8 @@ public final class ExternalClass extends AbstractClass
 
 		if ((access & Modifiers.VARARGS) != 0)
 		{
-			method.getParameterNoResolve(method.parameterCount() - 1).setVarargs(true);
+			final IParameterList parameterList = method.getParameterList();
+			parameterList.get(parameterList.size() - 1).setVarargs(true);
 		}
 
 		this.body.addMethod(method);

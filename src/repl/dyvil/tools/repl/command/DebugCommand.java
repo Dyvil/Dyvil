@@ -2,6 +2,7 @@ package dyvil.tools.repl.command;
 
 import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.repl.DyvilREPL;
+import dyvil.tools.repl.lang.I18n;
 
 public class DebugCommand implements ICommand
 {
@@ -9,12 +10,6 @@ public class DebugCommand implements ICommand
 	public String getName()
 	{
 		return "debug";
-	}
-	
-	@Override
-	public String getDescription()
-	{
-		return "Enables or disables Debug Mode";
 	}
 
 	@Override
@@ -44,7 +39,7 @@ public class DebugCommand implements ICommand
 				enableDebug = false;
 				break;
 			default:
-				repl.getErrorOutput().println("Invalid Argument. Usage: " + this.getUsage());
+				repl.getErrorOutput().println(I18n.get("command.argument.invalid", this.getUsage()));
 				return;
 			}
 		}
@@ -54,6 +49,6 @@ public class DebugCommand implements ICommand
 		}
 
 		config.setDebug(enableDebug);
-		repl.getOutput().println("Setting debug mode to " + (enableDebug ? "ON" : "OFF"));
+		repl.getOutput().println(I18n.get(enableDebug ? "command.debug.on" : "command.debug.off"));
 	}
 }

@@ -13,11 +13,11 @@ public final class StringExtensions
 	 * String or a single-quoted String with zero or more than one character to the `char` method.
 	 */
 	@UsageInfo(value: "Multi-character Literal or String passed to 'char' method", level: dyvil.util.MarkerLevel.WARNING)
-	public static char char(String c) = c charAt 0
+	public static char char(String c) = c.charAt 0
 
 	public extension void toString(Object o, StringBuilder builder) = builder.append(o)
 
-	public infix inline char subscript(String s, int index) = s charAt index
+	public infix inline char subscript(String s, int index) = s.charAt index
 
 	public infix inline String subscript(String s, Range<int> range) = s.substring(range.first, range.last)
 }

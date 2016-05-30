@@ -10,8 +10,6 @@ public interface ICommand
 	{
 		return null;
 	}
-	
-	String getDescription();
 
 	String getUsage();
 	

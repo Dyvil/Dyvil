@@ -4,21 +4,17 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.operator.Operators;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.reference.PropertyReference;
-import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.ConstantFolder;
-import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public class MethodCall extends AbstractCall implements INamed
 {
-	protected Name    name;
-	protected boolean dotless;
+	protected Name name;
 
 	public MethodCall(ICodePosition position)
 	{
@@ -67,16 +63,6 @@ public class MethodCall extends AbstractCall implements INamed
 		return this.name;
 	}
 
-	public boolean isDotless()
-	{
-		return this.dotless;
-	}
-
-	public void setDotless(boolean dotless)
-	{
-		this.dotless = dotless;
-	}
-
 	@Override
 	public IValue toAnnotationConstant(MarkerList markers, IContext context, int depth)
 	{
@@ -117,113 +103,52 @@ public class MethodCall extends AbstractCall implements INamed
 	@Override
 	public IValue resolveCall(MarkerList markers, IContext context)
 	{
-		final int args = this.arguments.size();
-		final IValue op1 = this.resolvePriorityOperator(markers, context, args);
-		if (op1 != null)
-		{
-			return op1;
-		}
-
 		// Normal Method Resolution
-		IMethod method = ICall.resolveMethod(context, this.receiver, this.name, this.arguments);
-		if (method != null)
+		if (this.resolveMethodCall(markers, context))
 		{
-			this.method = method;
-			this.checkArguments(markers, context);
 			return this;
 		}
 
-		if (this.receiver != null)
+		// Implicit Resolution
+		if (this.receiver == null && this.resolveImplicitCall(markers, context))
 		{
-			final IValue op = this.resolveOperator(markers, context, args);
-			if (op != null)
-			{
-				return op;
-			}
-		}
-		else
-		{
-			// Implicit Calls
-			final IValue implicit = context.getImplicit();
-			if (implicit != null)
-			{
-				method = ICall.resolveMethod(context, implicit, this.name, this.arguments);
-				if (method != null)
-				{
-					this.receiver = implicit;
-					this.method = method;
-					this.checkArguments(markers, context);
-					return this;
-				}
-			}
+			return this;
 		}
 
-		// Resolve Apply Method
+		// Apply Method Resolution
 		return ApplyMethodCall.resolveApply(markers, context, this.position, this.receiver, this.name, this.arguments,
 		                                    this.genericData);
 	}
 
-	public IValue resolveOperator(MarkerList markers, IContext context, int args)
+	protected boolean resolveMethodCall(MarkerList markers, IContext context)
 	{
-		switch (args)
+		final IMethod method = ICall.resolveMethod(context, this.receiver, this.name, this.arguments);
+		if (method != null)
 		{
-		case 0:
-		{
-			// Postfix Operators
-			final IValue op = Operators.getPostfix(this.receiver, this.name);
-			if (op != null)
-			{
-				op.setPosition(this.position);
-				return op.resolveOperator(markers, context);
-			}
-			break;
+			this.method = method;
+			this.checkArguments(markers, context);
+			return true;
 		}
-		case 1:
-		{
-			// Infix Operators
-			final IValue op = Operators.getInfix(this.receiver, this.name, this.arguments.getFirstValue());
-			if (op != null)
-			{
-				op.setPosition(this.position);
-				return op.resolveOperator(markers, context);
-			}
-
-			// Compound Operators
-			if (Util.hasEq(this.name))
-			{
-				return CompoundCall
-					       .resolveCall(markers, context, this.position, this.receiver, Util.removeEq(this.name),
-					                    this.arguments);
-			}
-			break;
-		}
-		}
-		return null;
+		return false;
 	}
 
-	public IValue resolvePriorityOperator(MarkerList markers, IContext context, int args)
+	protected boolean resolveImplicitCall(MarkerList markers, IContext context)
 	{
-		if (args == 1)
+		final IValue implicit = context.getImplicit();
+		if ((implicit) == null)
 		{
-			final IValue op;
-			if (this.receiver == null)
-			{
-				// Prefix Operators (! and *)
-				op = Operators.getPrefix(this.name, this.arguments.getFirstValue());
-			}
-			else
-			{
-				// Prioritized Infix Operators (namely ==, ===, != and !== for null)
-				op = Operators.getInfix_Priority(this.receiver, this.name, this.arguments.getFirstValue());
-			}
-
-			if (op != null)
-			{
-				op.setPosition(this.position);
-				return op.resolveOperator(markers, context);
-			}
+			return false;
 		}
-		return null;
+
+		final IMethod method = ICall.resolveMethod(context, implicit, this.name, this.arguments);
+		if (method != null)
+		{
+			this.receiver = implicit;
+			this.method = method;
+			this.checkArguments(markers, context);
+			return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -294,14 +219,7 @@ public class MethodCall extends AbstractCall implements INamed
 		if (this.receiver != null)
 		{
 			this.receiver.toString(prefix, buffer);
-			if (this.dotless && !Formatting.getBoolean("method.access.java_format"))
-			{
-				buffer.append(' ');
-			}
-			else
-			{
-				buffer.append('.');
-			}
+			buffer.append('.');
 		}
 
 		buffer.append(this.name);

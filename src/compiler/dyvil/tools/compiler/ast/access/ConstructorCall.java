@@ -177,12 +177,6 @@ public class ConstructorCall implements ICall
 				return null;
 			}
 
-			if (this.constructor.getEnclosingClass().isTypeParametric() && !this.type.isGenericType())
-			{
-				this.type = this.constructor
-					            .checkGenericType(markers, this.position, context, this.type, this.arguments);
-			}
-
 			this.checkArguments(markers, context);
 			return this;
 		}
@@ -218,7 +212,7 @@ public class ConstructorCall implements ICall
 	@Override
 	public void checkArguments(MarkerList markers, IContext context)
 	{
-		this.constructor.checkArguments(markers, this.position, context, this.type, this.arguments);
+		this.type = this.constructor.checkArguments(markers, this.position, context, this.type, this.arguments);
 	}
 
 	@Override

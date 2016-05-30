@@ -1,0 +1,6 @@
+source_dir = ../src/test
+output_dir = ../build/dyviltestbin
+
+main_type = dyvil.test.Main
+
+libraries = [ ../build/dyvilbin, ../build/dpfbin ]

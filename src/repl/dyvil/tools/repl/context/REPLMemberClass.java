@@ -24,7 +24,7 @@ import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.operator.IOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -203,36 +203,9 @@ public class REPLMemberClass implements IClass
 	}
 
 	@Override
-	public int parameterCount()
+	public IParameterList getParameterList()
 	{
-		return 0;
-	}
-
-	@Override
-	public void setParameter(int index, IParameter parameter)
-	{
-	}
-
-	@Override
-	public void addParameter(IParameter parameter)
-	{
-	}
-
-	@Override
-	public IParameter getParameter(int index)
-	{
-		return null;
-	}
-
-	@Override
-	public IParameter[] getParameters()
-	{
-		return null;
-	}
-
-	@Override
-	public void setParameters(IParameter[] parameters, int parameterCount)
-	{
+		return IParameterList.EMPTY;
 	}
 
 	@Override

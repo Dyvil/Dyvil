@@ -256,9 +256,9 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
-	public boolean needsSubTypeCheck()
+	public int subTypeCheckLevel()
 	{
-		return this.type.needsSubTypeCheck();
+		return this.type.subTypeCheckLevel();
 	}
 
 	@Override
@@ -271,6 +271,12 @@ public abstract class TypeDelegate implements IType, ITyped
 	public boolean hasTypeVariables()
 	{
 		return this.type.hasTypeVariables();
+	}
+
+	@Override
+	public boolean isUninferred()
+	{
+		return this.type.isUninferred();
 	}
 
 	@Override

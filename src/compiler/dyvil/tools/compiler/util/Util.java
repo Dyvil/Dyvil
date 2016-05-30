@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
@@ -55,26 +56,13 @@ public final class Util
 			stringBuilder.append('>');
 		}
 
-		stringBuilder.append('(');
-
-		final int params = method.parameterCount();
-		if (params > 0)
-		{
-			appendType(method.getParameter(0).getType(), typeContext, stringBuilder);
-			for (int i = 1; i < params; i++)
-			{
-				stringBuilder.append(", ");
-				appendType(method.getParameter(i).getType(), typeContext, stringBuilder);
-			}
-		}
-
-		stringBuilder.append(')');
+		method.getParameterList().signatureToString(stringBuilder, typeContext);
 
 		stringBuilder.append(": ");
 		ITypeContext.apply(typeContext, method.getType()).toString("", stringBuilder);
 	}
 
-	private static void appendType(IType type, ITypeContext typeContext, StringBuilder stringBuilder)
+	public static void typeToString(IType type, ITypeContext typeContext, StringBuilder stringBuilder)
 	{
 		if (type == null)
 		{
@@ -83,6 +71,13 @@ public final class Util
 		}
 
 		ITypeContext.apply(typeContext, type).toString("", stringBuilder);
+	}
+
+	public static String classSignatureToString(IClass iClass)
+	{
+		final StringBuilder stringBuilder = new StringBuilder();
+		classSignatureToString(iClass, stringBuilder);
+		return stringBuilder.toString();
 	}
 
 	public static void classSignatureToString(IClass iClass, StringBuilder stringBuilder)
@@ -94,6 +89,11 @@ public final class Util
 		final int typeParams = iClass.typeParameterCount();
 		if (typeParams > 0)
 		{
+			if (endsWithSymbol(stringBuilder))
+			{
+				stringBuilder.append(' ');
+			}
+
 			stringBuilder.append('<');
 			iClass.getTypeParameter(0).toString("", stringBuilder);
 			for (int i1 = 1; i1 < typeParams; i1++)
@@ -104,19 +104,10 @@ public final class Util
 			stringBuilder.append('>');
 		}
 
-		final int params = iClass.parameterCount();
-		if (params > 0)
+		final IParameterList parameterList = iClass.getParameterList();
+		if (!parameterList.isEmpty())
 		{
-			stringBuilder.append('(');
-
-			appendType(iClass.getParameter(0).getType(), null, stringBuilder);
-			for (int i = 1; i < params; i++)
-			{
-				stringBuilder.append(", ");
-				appendType(iClass.getParameter(i).getType(), null, stringBuilder);
-			}
-
-			stringBuilder.append(')');
+			parameterList.signatureToString(stringBuilder, null);
 		}
 	}
 
@@ -244,9 +235,20 @@ public final class Util
 
 	// endregion
 
-	// region Value transformations
+	public static boolean startsWithSymbol(Name name)
+	{
+		return LexerUtil.isIdentifierSymbol(name.unqualified.codePointAt(0));
+	}
 
-	// endregion
+	public static boolean endsWithSymbol(Name name)
+	{
+		return LexerUtil.isIdentifierSymbol(name.unqualified.codePointBefore(name.unqualified.length()));
+	}
+
+	public static boolean endsWithSymbol(StringBuilder buffer)
+	{
+		return LexerUtil.isIdentifierSymbol(buffer.codePointBefore(buffer.length()));
+	}
 
 	public static String toTime(long nanos)
 	{

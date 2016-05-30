@@ -75,10 +75,7 @@ public class NestedMethod extends CodeMethod
 		final StringBuilder buffer = new StringBuilder();
 		buffer.append('(');
 
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].getInternalType().appendExtendedName(buffer);
-		}
+		this.parameters.appendDescriptor(buffer);
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
 			this.typeParameters[i].appendParameterDescriptor(buffer);
@@ -110,10 +107,7 @@ public class NestedMethod extends CodeMethod
 			methodWriter.setThisType(this.enclosingClass.getInternalName());
 		}
 
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].writeInit(methodWriter);
-		}
+		this.parameters.writeInit(methodWriter);
 
 		this.captureHelper.writeCaptureParameters(methodWriter, methodWriter.localCount());
 
@@ -129,10 +123,7 @@ public class NestedMethod extends CodeMethod
 			methodWriter.visitEnd(this.type);
 		}
 
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].writeLocal(methodWriter, start, end);
-		}
+		this.parameters.writeLocals(methodWriter, start, end);
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import dyvil.tools.asm.Label;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.asm.TypeReference;
 import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.CombiningContext;
@@ -49,18 +50,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	public IParameter getParameterNoResolve(int index)
-	{
-		return this.parameters[index];
-	}
-
-	@Override
-	public void setIntrinsicData(IntrinsicData intrinsicData)
-	{
-		this.intrinsicData = intrinsicData;
-	}
-
-	private IContext getCombiningContext()
+	public IContext getExternalContext()
 	{
 		return new CombiningContext(this, new CombiningContext(this.enclosingClass, Package.rootPackage));
 	}
@@ -70,7 +60,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		this.resolved |= ANNOTATIONS;
 		if (this.annotations != null)
 		{
-			this.annotations.resolveTypes(null, this.getCombiningContext(), this);
+			this.annotations.resolveTypes(null, this.getExternalContext(), this);
 		}
 	}
 
@@ -82,14 +72,14 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		}
 
 		this.resolved |= RETURN_TYPE;
-		this.type = this.type.resolveType(null, this.getCombiningContext());
+		this.type = this.type.resolveType(null, this.getExternalContext());
 	}
 
 	private void resolveGenerics()
 	{
 		this.resolved |= GENERICS;
 
-		final IContext context = this.getCombiningContext();
+		final IContext context = this.getExternalContext();
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
 			this.typeParameters[i].resolveTypes(null, context);
@@ -103,7 +93,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 			this.resolveGenerics();
 		}
 
-		final IContext context = this.getCombiningContext();
+		final IContext context = this.getExternalContext();
 
 		this.resolved |= PARAMETERS;
 
@@ -121,12 +111,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 			}
 		}
 
-		this.parameterCount -= parametersToRemove;
-
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			this.parameters[i].resolveTypes(null, context);
-		}
+		this.parameters.remove(parametersToRemove);
 
 		if (this.receiverType != null)
 		{
@@ -142,7 +127,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	{
 		this.resolved |= EXCEPTIONS;
 
-		final IContext context = this.getCombiningContext();
+		final IContext context = this.getExternalContext();
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
 			this.exceptions[i] = this.exceptions[i].resolveType(null, context);
@@ -170,23 +155,15 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	public IParameter getParameter(int index)
+	public void setIntrinsicData(IntrinsicData intrinsicData)
 	{
-		if ((this.resolved & PARAMETERS) == 0)
-		{
-			this.resolveParameters();
-		}
-		return this.parameters[index];
+		this.intrinsicData = intrinsicData;
 	}
 
 	@Override
-	public IParameter[] getParameters()
+	public IParameter createParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
-		if ((this.resolved & PARAMETERS) == 0)
-		{
-			this.resolveParameters();
-		}
-		return super.getParameters();
+		return new ExternalParameter(name, type, modifiers, annotations);
 	}
 
 	@Override
@@ -375,7 +352,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		case TypeReference.METHOD_FORMAL_PARAMETER:
 		{
 			int index = TypeReference.getFormalParameterIndex(typeRef);
-			IParameter param = this.parameters[index];
+			IParameter param = this.parameters.get(index);
 			param.setType(IType.withAnnotation(param.getType(), annotation, typePath, 0, typePath.getLength()));
 			break;
 		}

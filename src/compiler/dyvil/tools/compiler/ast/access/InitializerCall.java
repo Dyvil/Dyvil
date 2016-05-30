@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -25,6 +26,7 @@ public class InitializerCall implements ICall
 	protected IArguments arguments = EmptyArguments.INSTANCE;
 
 	// Metadata
+	protected IType        targetType;
 	protected IConstructor constructor;
 
 	public InitializerCall(ICodePosition position, boolean isSuper)
@@ -33,11 +35,20 @@ public class InitializerCall implements ICall
 		this.isSuper = isSuper;
 	}
 
-	public InitializerCall(ICodePosition position, IConstructor constructor, IArguments arguments, boolean isSuper)
+	public InitializerCall(ICodePosition position, boolean isSuper, IArguments arguments, IType targetType)
+	{
+		this.position = position;
+		this.isSuper = isSuper;
+		this.arguments = arguments;
+		this.targetType = targetType;
+	}
+
+	public InitializerCall(ICodePosition position, boolean isSuper, IArguments arguments, IType targetType, IConstructor constructor)
 	{
 		this.position = position;
 		this.constructor = constructor;
 		this.arguments = arguments;
+		this.targetType = targetType;
 		this.isSuper = isSuper;
 	}
 
@@ -97,30 +108,35 @@ public class InitializerCall implements ICall
 	@Override
 	public void checkArguments(MarkerList markers, IContext context)
 	{
-		this.constructor.checkArguments(markers, this.position, context, this.constructor.getEnclosingClass().getType(),
-		                                this.arguments);
+		this.constructor.checkArguments(markers, this.position, context, this.targetType, this.arguments);
+	}
+
+	private IType getTargetType(IContext context)
+	{
+		if (this.targetType != null)
+		{
+			return this.targetType;
+		}
+
+		final IType type = context.getThisType();
+
+		if (!this.isSuper)
+		{
+			return this.targetType = type;
+		}
+		return this.targetType = type.getTheClass().getSuperType();
 	}
 
 	@Override
 	public IValue resolveCall(MarkerList markers, IContext context)
 	{
-		IClass iclass = context.getThisClass();
-		if (iclass == null)
+		final IType targetType = this.getTargetType(context);
+		if (targetType == null || !targetType.isResolved())
 		{
 			return null;
 		}
 
-		if (this.isSuper)
-		{
-			iclass = iclass.getSuperType().getTheClass();
-
-			if (iclass == null)
-			{
-				return null;
-			}
-		}
-
-		final IConstructor match = IContext.resolveConstructor(iclass, this.arguments);
+		final IConstructor match = IContext.resolveConstructor(targetType, this.arguments);
 		if (match != null)
 		{
 			this.constructor = match;
@@ -190,6 +206,12 @@ public class InitializerCall implements ICall
 		writer.visitVarInsn(Opcodes.ALOAD, 0);
 		this.constructor.writeArguments(writer, this.arguments);
 		this.constructor.writeInvoke(writer, this.getLineNumber());
+	}
+
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
 	}
 
 	@Override

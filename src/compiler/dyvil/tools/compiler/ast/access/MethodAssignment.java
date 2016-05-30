@@ -45,7 +45,7 @@ public class MethodAssignment extends AbstractCall implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		if (Types.isSameType(type, Types.VOID))
+		if (Types.isVoid(type))
 		{
 			super.writeExpression(writer, type);
 			return;

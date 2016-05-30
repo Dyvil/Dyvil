@@ -54,12 +54,6 @@ public final class NamedArgumentList implements IArguments
 	}
 
 	@Override
-	public IArguments dropFirstValue()
-	{
-		return this; // FIXME
-	}
-
-	@Override
 	public IArguments withLastValue(IValue value)
 	{
 		return this.withLastValue(null, value);
@@ -73,8 +67,8 @@ public final class NamedArgumentList implements IArguments
 		final Name[] keys = new Name[size];
 		final IValue[] values = new IValue[size];
 
-		System.arraycopy(this.keys, 0, keys, 0, size);
-		System.arraycopy(this.values, 0, values, 0, size);
+		System.arraycopy(this.keys, 0, keys, 0, this.size);
+		System.arraycopy(this.values, 0, values, 0, this.size);
 		keys[index] = name;
 		values[index] = value;
 
@@ -241,24 +235,6 @@ public final class NamedArgumentList implements IArguments
 			}
 			this.size = argIndex + moved + 1;
 		}
-	}
-
-	@Override
-	public void inferType(int index, IParameter param, ITypeContext typeContext)
-	{
-		final int argIndex = this.findIndex(index, param.getName());
-		if (argIndex < 0)
-		{
-			return;
-		}
-
-		if (param.isVarargs())
-		{
-			final int endIndex = this.findNextName(argIndex + 1);
-			ArgumentList.inferVarargsType(this.values, argIndex, endIndex, param, typeContext);
-			return;
-		}
-		param.getInternalType().inferTypes(this.values[argIndex].getType(), typeContext);
 	}
 
 	@Override

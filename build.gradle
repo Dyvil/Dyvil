@@ -45,6 +45,7 @@ if (droneBuild)
 
 // ---------------------------------------- Source Settings ----------------------------------------
 
+//noinspection GroovyAssignabilityCheck
 sourceSets {
 	library {
 		java {
@@ -53,44 +54,43 @@ sourceSets {
 			srcDir 'src/parsing'
 		}
 		resources {
-			srcDir 'src/resources'
+			srcDir 'src/library'
+			srcDir 'src/parsing'
 
 			include resourceFilters
-			include 'dyvil/tools/parsing/**'
 		}
 	}
 
 	dpf {
 		java {
 			srcDir 'src/dpf'
+		}
+		resources {
+			srcDir 'src/dpf'
 
-			compileClasspath += library.output
-			runtimeClasspath += library.output
+			include resourceFilters
 		}
 	}
 
 	compiler {
 		java {
 			srcDir 'src/compiler'
-
-			compileClasspath += library.output
-			runtimeClasspath += library.output + compiler.resources
 		}
 		resources {
-			srcDir 'src/resources'
+			srcDir 'src/compiler'
 
 			include resourceFilters
-			include 'dyvil/tools/compiler/**'
 		}
-		return
 	}
 
 	repl {
 		java {
 			srcDir 'src/repl'
+		}
+		resources {
+			srcDir 'src/repl'
 
-			compileClasspath += library.output + compiler.output
-			runtimeClasspath += library.output + compiler.output + compiler.resources
+			include resourceFilters
 		}
 	}
 
@@ -101,6 +101,7 @@ sourceSets {
 	}
 }
 
+//noinspection GroovyAssignabilityCheck
 processResources {
 	include resourceFilters
 }
@@ -114,23 +115,28 @@ repositories {
 dependencies {
 	// Runtime Dependencies (Resources)
 
-	runtime files("$buildDir/dyvilbin") {
+	def libraryFiles = files("$buildDir/dyvilbin") {
 		builtBy 'compileLibraryDyvil'
 	}
-
-	runtime files("$buildDir/dyviltestbin") {
+	def dpfFiles = files("$buildDir/dpfbin") {
+		builtBy 'compileDPFDyvil'
+	}
+	def testFiles = files("$buildDir/dyviltestbin") {
 		builtBy 'compileTestDyvil'
 	}
 
-	runtime files("src/resources")
+	libraryRuntime libraryFiles
 
-	// Test Dependencies
-	testCompile 'junit:junit:4.12'
+	compilerCompile sourceSets.library.output
 
-	testCompile sourceSets.library.output
-	testCompile sourceSets.compiler.output
-	testCompile sourceSets.repl.output
-	testCompile sourceSets.dpf.output
+	dpfCompile sourceSets.library.output
+	dpfRuntime dpfFiles
+
+	replCompile sourceSets.library.output, sourceSets.compiler.output
+	replRuntime libraryFiles, dpfFiles, testFiles
+
+	testCompile 'junit:junit:4.12', sourceSets.library.output
+	testRuntime libraryFiles, dpfFiles, testFiles
 }
 
 // ---------------------------------------- Copy Tasks ----------------------------------------
@@ -208,6 +214,14 @@ task copyDpfJava(type: Copy, dependsOn: clearCopyDir) {
 compileDpfJava.dependsOn(copyDpfJava)
 compileDpfJava.source = "$buildDir/src/java/dpf"
 
+task copyDPFDyvil(type: Copy, dependsOn: clearCopyDir) {
+	from 'src/dpf'
+	into "$buildDir/src/dyvil/dpf"
+
+	includeEmptyDirs = false
+	include dyvilFilters
+}
+
 // Tests
 
 task copyTestDyvil(type: Copy, dependsOn: clearCopyDir) {
@@ -224,11 +238,15 @@ task copyTestDyvil(type: Copy, dependsOn: clearCopyDir) {
  * Compiles the Dyvil Classes and Headers in the Dyvil Library by running the freshly-compiled compiler
  */
 task compileLibraryDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'copyLibraryDyvil' ]) { JavaExec exec ->
-	runCompiler exec, 'scripts/lib_options.txt', 'src/library/', "$buildDir/dyvilbin"
+	runCompiler exec, 'config/lib.dyc', 'src/library/', "$buildDir/dyvilbin"
 }
 
-task compileTestDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'copyTestDyvil' ]) { JavaExec exec ->
-	runCompiler exec, 'scripts/test_options.txt', 'src/test/', "$buildDir/dyviltestbin"
+task compileDPFDyvil(type: JavaExec, dependsOn: [ 'compileLibraryDyvil', 'copyDPFDyvil' ]) { JavaExec exec ->
+	runCompiler exec, 'config/dpf.dyc', 'src/dpf/', "$buildDir/dpfbin"
+}
+
+task compileTestDyvil(type: JavaExec, dependsOn: [ 'compileDPFDyvil', 'copyTestDyvil' ]) { JavaExec exec ->
+	runCompiler exec, 'config/test.dyc', 'src/test/', "$buildDir/dyviltestbin"
 }
 
 private void runCompiler(JavaExec exec, String config, String src, String bin)
@@ -244,13 +262,15 @@ private void runCompiler(JavaExec exec, String config, String src, String bin)
 	exec.main = 'dyvil.tools.compiler.Main'
 	exec.classpath = sourceSets.compiler.runtimeClasspath
 	exec.args = [ "@$config", 'compile' ]
+
+	if (System.console() != null) exec.args += "--ansi";
 }
 
 // ---------------------------------------- Test Tasks ----------------------------------------
 
 task testDyvil(type: JavaExec, dependsOn: [ 'compileTestDyvil' ]) {
 	main = 'dyvil.test.Main'
-	classpath = sourceSets.library.runtimeClasspath + files("build/dyviltestbin") + files("build/dyvilbin")
+	classpath = sourceSets.test.runtimeClasspath
 }
 
 test.dependsOn 'testDyvil'
@@ -260,7 +280,7 @@ test.dependsOn 'testDyvil'
 /**
  * Creates a Jar file that contains all library classes (from src/library), including ASM
  */
-task buildLibrary(type: Jar, dependsOn: [ 'classes', 'compileLibraryDyvil' ]) {
+task buildLibrary(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil' ]) {
 	from sourceSets.main.resources
 	from sourceSets.library.output
 
@@ -271,8 +291,12 @@ task buildLibrary(type: Jar, dependsOn: [ 'classes', 'compileLibraryDyvil' ]) {
 	archiveName = "dyvil-library-${ libraryVersion }.jar"
 }
 
-task buildDPF(type: Jar, dependsOn: 'buildLibrary') {
+task buildDPF(type: Jar, dependsOn: [ 'dpfClasses', 'compileDPFDyvil' ]) {
 	from sourceSets.dpf.output
+
+	from("$buildDir/dpfbin") {
+		include resourceFilters
+	}
 	
 	archiveName = "dyvil-property-format-${ dpfVersion }.jar"
 }
@@ -313,6 +337,9 @@ task buildAll(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil', '
 	from sourceSets.dpf.output
 
 	from("$buildDir/dyvilbin") {
+		include resourceFilters
+	}
+	from("$buildDir/dpfbin") {
 		include resourceFilters
 	}
 
@@ -378,6 +405,7 @@ task wrapper(type: Wrapper) {
  */
 clean.doLast {
 	file('build/dyvilbin').mkdirs()
+	file('build/dpfbin').mkdirs()
 }
 
 /**
@@ -390,4 +418,5 @@ task cleanTemps(type: Delete) {
 	delete file("${ buildDir }/tmp/")
 	delete file("${ buildDir }/resources/")
 	delete fileTree("$buildDir/dyvilbin")
+	delete fileTree("$buildDir/dpfbin")
 }

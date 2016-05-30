@@ -1,0 +1,52 @@
+package dyvil.tools.dpf.converter
+
+import dyvil.annotation._internal.DyvilModifiers
+import dyvil.reflect.Modifiers
+import dyvil.tools.dpf.visitor._
+import dyvil.tools.parsing.Name
+
+public final object IgnoreVisitor
+	implements NodeVisitor, ValueVisitor, ListVisitor, MapVisitor, StringInterpolationVisitor, BuilderVisitor
+{
+	public override ValueVisitor visitParameter(Name name) = this
+
+	public override NodeVisitor visitNode() = this
+
+	public override ValueVisitor visitElement() = this
+
+	public override ValueVisitor visitKey() = this
+
+	public override void visitStringPart(String string) { }
+
+	public override ValueVisitor visitValue() = this
+
+	public override NodeVisitor visitNode(Name name) = this
+
+	public override ValueVisitor visitProperty(Name name) = this
+
+	public override NodeVisitor visitNodeAccess(Name name) = this
+
+	public override void visitEnd() { }
+
+	public override void visitInt(int value) { }
+
+	public override void visitLong(long value) { }
+
+	public override void visitFloat(float value) { }
+
+	public override void visitDouble(double value) { }
+
+	public override void visitString(String value) { }
+
+	public override StringInterpolationVisitor visitStringInterpolation() = this
+
+	public override void visitName(Name name) { }
+
+	public override ValueVisitor visitValueAccess(Name name) = this
+
+	public override ListVisitor visitList() = this
+
+	public override MapVisitor visitMap() = this
+
+	public override BuilderVisitor visitBuilder(Name name) = this
+}

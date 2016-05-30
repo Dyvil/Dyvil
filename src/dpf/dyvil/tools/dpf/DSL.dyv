@@ -1,0 +1,100 @@
+package dyvil.tools.dpf
+
+import dyvil.tools.parsing.Name
+import dyvil.tools.dpf.ast._
+import dyvil.tools.dpf.ast.builder._
+import dyvil.tools.dpf.ast.value._
+
+public class DSL
+{
+	@dyvil.lang.literal.ColonConvertible
+	public static class PropertyPair(public Name name, public Value value)
+	{
+		public static PropertyPair apply(Name name, any value)
+		{
+			return new PropertyPair(name, Value.wrap(value))
+		}
+
+		public static PropertyPair apply(Name name, Value value)
+		{
+			return new PropertyPair(name, value)
+		}
+	}
+
+	public static RootNode dpf(Configure<RootNode> configure) = new RootNode().use(configure)
+
+	/**
+	 * Node creation:
+	 *
+	 * "name" { ... }
+	 */
+	public infix Node apply(Name name, Configure<Node> configure) = new Node(name).use(configure)
+
+	/**
+	 * Nested Node creation
+	 *
+	 * "parent" {
+	 *     "child" { ... }
+	 * }
+	 */
+	public infix void applyStatement(Node base, Node node) = base.addNode(node)
+
+	/**
+	 * Property creation with Colon
+	 * "name": value
+	 */
+	public infix void applyStatement(Node base, PropertyPair property)
+	{
+		base.addProperty(new Property(property.name, property.value))
+	}
+
+	public infix Builder apply(Builder builder, Configure<Node> configure)
+	{
+		builder.makeNode.use(configure)
+		return builder
+	}
+
+	public infix Builder apply(Name name, PropertyPair... parameters)
+	{
+		let builder = new Builder(name)
+
+		for (var pair <- parameters)
+		{
+			builder.addParameter(Parameter(pair.name, pair.value))
+		}
+
+		return builder
+	}
+
+	public infix Builder apply(Name name, Value... parameters)
+	{
+		let builder = new Builder(name)
+
+		for (var value <- parameters)
+		{
+			builder.addParameter(Parameter(null, value))
+		}
+
+		return builder
+	}
+
+	public infix Builder apply(Name name, any... parameters)
+	{
+		let builder = new Builder(name)
+
+		for (var value <- parameters)
+		{
+			if (value is dyvil.tuple.Tuple2)
+			{
+				let tuple = value as dyvil.tuple.Tuple2
+				builder.addParameter(Parameter(Name.wrap(tuple._1), Value.wrap(tuple._2)))
+			}
+			else
+			{
+				builder.addParameter(Parameter(Value.wrap(value)))
+			}
+		}
+
+		return builder
+	}
+}

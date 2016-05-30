@@ -2,6 +2,7 @@ package dyvil.tools.repl.command;
 
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.repl.DyvilREPL;
+import dyvil.tools.repl.lang.I18n;
 
 public class VersionCommand implements ICommand
 {
@@ -9,12 +10,6 @@ public class VersionCommand implements ICommand
 	public String getName()
 	{
 		return "version";
-	}
-	
-	@Override
-	public String getDescription()
-	{
-		return "Prints information about the current Dyvil Installation";
 	}
 
 	@Override
@@ -26,13 +21,9 @@ public class VersionCommand implements ICommand
 	@Override
 	public void execute(DyvilREPL repl, String args)
 	{
-		repl.getOutput().print("Dyvil version:\t\t");
-		repl.getOutput().println(DyvilCompiler.DYVIL_VERSION);
-		repl.getOutput().print(" Library version:\t");
-		repl.getOutput().println(DyvilCompiler.LIBRARY_VERSION);
-		repl.getOutput().print(" Compiler version:\t");
-		repl.getOutput().println(DyvilCompiler.VERSION);
-		repl.getOutput().print(" REPL version:\t\t");
-		repl.getOutput().println(DyvilREPL.VERSION);
+		repl.getOutput().println(I18n.get("command.version.dyvil", DyvilCompiler.DYVIL_VERSION));
+		repl.getOutput().println(I18n.get("command.version.library", DyvilCompiler.LIBRARY_VERSION));
+		repl.getOutput().println(I18n.get("command.version.compiler", DyvilCompiler.VERSION));
+		repl.getOutput().println(I18n.get("command.version.repl", DyvilREPL.VERSION));
 	}
 }

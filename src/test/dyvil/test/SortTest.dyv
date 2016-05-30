@@ -1,0 +1,77 @@
+package dyvil.test
+
+include dyvil.Collections
+import java.util.Random
+
+public class SortTest
+{
+	public static void main([String] args)
+	{
+		ImmutableList<int> list = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
+		Main.test("Sorted Quicksort", list, quicksort(list))
+
+		list = [ 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 ]
+		Main.test("Reverse Quicksort", list.reversed, quicksort(list))
+
+		list = [ 1, 2, 3, 1, 4, 2, 3, 4, 1, 2, 3, 4, 1, 2 ]
+		Main.test("Few Unique Quicksort", list.sorted, quicksort(list))
+
+		let random = new Random
+		list = List.generate(100, i => random.nextInt 100)
+		let sortedList = list.sorted
+
+		Main.test("Random Quicksort", sortedList, quicksort(list))
+
+		var mutableList = list.mutable
+		quicksort(mutableList)
+		Main.test("Random Inplace Quicksort", sortedList, mutableList)
+	}
+
+	public static ImmutableList<T> quicksort<T extends Comparable>(ImmutableList<T> list)
+	{
+		// TODO Allow the type parameter to be <T extends Comparable<T>>
+		if (list.isEmpty) return list
+
+		let pivot = list[list.size \ 2]
+		let less = quicksort(list.filtered(_ < pivot))
+		let equal = list.filtered(_ == pivot)
+		let greater = quicksort(list.filtered(_ > pivot))
+
+		return less ++ equal ++ greater
+	}
+
+	public static void swap<T>(T* left, T* right)
+	{
+		T temp = *left
+		(*left) = *right
+		(*right) = temp
+	}
+
+	public static void quicksort<T extends Comparable>(MutableList<T> list)
+	{
+		quicksortRange(list, 0, list.size - 1)
+	}
+
+	private static void quicksortRange<T extends Comparable>(MutableList<T> list, int left, int right)
+	{
+		int i = left
+		int j = right
+		T pivot = list[left + (right - left) \ 2]
+
+		while i <= j
+		{
+			while (list[i] < pivot) i++
+			while (list[j] > pivot) j--
+
+			if i <= j
+			{
+				swap(&list[i], &list[j])
+				i++
+				j--
+			}
+		}
+
+		if (left < j)  quicksortRange(list, left, j)
+		if (i < right) quicksortRange(list, i, right)
+	}
+}

@@ -39,7 +39,7 @@ public final class StringPattern extends Pattern
 	@Override
 	public IPattern withType(IType type, MarkerList markers)
 	{
-		if (Types.isSameType(type, Types.STRING))
+		if (Types.isExactType(type, Types.STRING))
 		{
 			return this;
 		}

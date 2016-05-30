@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
@@ -27,9 +28,7 @@ public class AnnotationValue implements IValue, IAnnotationConsumer
 			                                                                + ")Ljava/lang/invoke/CallSite;");
 
 	protected IAnnotation annotation;
-	
-	private boolean isAnnotationParameter;
-	
+
 	public AnnotationValue()
 	{
 	}
@@ -82,7 +81,6 @@ public class AnnotationValue implements IValue, IAnnotationConsumer
 	@Override
 	public IValue toAnnotationConstant(MarkerList markers, IContext context, int depth)
 	{
-		this.isAnnotationParameter = true;
 		return this;
 	}
 	
@@ -128,26 +126,22 @@ public class AnnotationValue implements IValue, IAnnotationConsumer
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		StringBuilder descBuilder = new StringBuilder().append('(');
+		final StringBuilder descBuilder = new StringBuilder().append('(');
 		
-		IArguments arguments = this.annotation.getArguments();
-		IClass iclass = this.annotation.getType().getTheClass();
-		
-		int len = iclass.parameterCount();
-		String[] parameterNames = new String[len];
-		for (int i = 0; i < len; i++)
+		final IArguments arguments = this.annotation.getArguments();
+		final IClass iclass = this.annotation.getType().getTheClass();
+		final IParameterList parameterList = iclass.getParameterList();
+		final int count = parameterList.size();
+
+		String[] parameterNames = new String[count];
+		for (int i = 0; i < count; i++)
 		{
-			IParameter parameter = iclass.getParameter(i);
-			IType parameterType = parameter.getType();
+			final IParameter parameter = parameterList.get(i);
+			final IType parameterType = parameter.getType();
+
 			parameterNames[i] = parameter.getName().qualified;
 			parameterType.appendExtendedName(descBuilder);
-			
-			IValue value = arguments.getValue(i, parameter);
-			if (value == null)
-			{
-				value = parameter.getValue().withType(parameterType, parameterType, null, null);
-			}
-			
+
 			arguments.writeValue(i, parameter, writer);
 		}
 		

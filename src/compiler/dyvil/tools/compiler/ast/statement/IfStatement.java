@@ -146,7 +146,7 @@ public class IfStatement implements IValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return Types.isSameType(type, Types.VOID) // void is always valid
+		return Types.isVoid(type) // void is always valid
 			       || !(this.then != null && !this.then.isType(type)) // check then action
 				          && (this.elseThen == null || this.elseThen.isType(type)); // check else action
 	}
@@ -226,6 +226,10 @@ public class IfStatement implements IValue
 		if (this.then != null)
 		{
 			this.then.checkTypes(markers, context);
+		}
+		if (this.elseThen != null)
+		{
+			this.elseThen.checkTypes(markers, context);
 		}
 	}
 
@@ -312,7 +316,7 @@ public class IfStatement implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		if (Types.isSameType(type, Types.VOID))
+		if (Types.isVoid(type))
 		{
 			this.writeStatement(writer);
 			return;

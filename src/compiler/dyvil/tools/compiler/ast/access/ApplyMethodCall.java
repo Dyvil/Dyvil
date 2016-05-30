@@ -100,7 +100,7 @@ public class ApplyMethodCall extends AbstractCall
 				call.resolveReceiver(markers, context);
 				call.resolveArguments(markers, context);
 
-				call.setArguments(oldArgs.withLastValue(Names.apply, argument));
+				call.setArguments(oldArgs.withLastValue(null, argument));
 
 				IValue resolvedCall = call.resolveCall(markers, context);
 				if (resolvedCall != null)
@@ -111,7 +111,14 @@ public class ApplyMethodCall extends AbstractCall
 				// Revert
 				call.setArguments(oldArgs);
 
-				this.receiver = call.resolveCall(markers, context);
+				resolvedCall = call.resolveCall(markers, context);
+				if (resolvedCall == null)
+				{
+					call.reportResolve(markers, context);
+					return this;
+				}
+
+				this.receiver = resolvedCall;
 				resolvedCall = this.resolveCall(markers, context);
 				if (resolvedCall != null)
 				{

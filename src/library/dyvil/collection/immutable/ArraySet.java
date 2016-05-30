@@ -19,57 +19,35 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 {
 	public static class Builder<E> implements ImmutableSet.Builder<E>
 	{
-		private Object[] elements;
-		private int      size;
+		private ArraySet<E> result;
 
 		public Builder()
 		{
-			this.elements = new Object[DEFAULT_CAPACITY];
+			this.result = new ArraySet<>();
 		}
 
 		public Builder(int capacity)
 		{
-			this.elements = new Object[capacity];
+			this.result = new ArraySet<>(capacity);
 		}
 
 		@Override
 		public void add(E element)
 		{
-			if (this.size < 0)
+			if (this.result == null)
 			{
 				throw new IllegalStateException("Already built");
 			}
 
-			for (int i = 0; i < this.size; i++)
-			{
-				if (Objects.equals(this.elements[i], element))
-				{
-					this.elements[i] = element;
-					return;
-				}
-			}
-
-			int index = this.size++;
-			if (index >= this.elements.length)
-			{
-				Object[] temp = new Object[(int) (this.size * 1.1F)];
-				System.arraycopy(this.elements, 0, temp, 0, index);
-				this.elements = temp;
-			}
-			this.elements[index] = element;
+			this.result.addInternal(element);
 		}
 
 		@Override
 		public ArraySet<E> build()
 		{
-			if (this.size < 0)
-			{
-				return null;
-			}
-
-			ArraySet<E> set = new ArraySet<>((E[]) this.elements, this.size, true);
-			this.size = -1;
-			return set;
+			final ArraySet<E> result = this.result;
+			this.result = null;
+			return result;
 		}
 	}
 
@@ -96,38 +74,48 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 		return new Builder<>(capacity);
 	}
 
+	protected ArraySet()
+	{
+		super();
+	}
+
+	protected ArraySet(int capacity)
+	{
+		super(capacity);
+	}
+
 	@SafeVarargs
 	public ArraySet(E... elements)
 	{
-		super(elements);
+		super((Object[]) elements);
 	}
-	
+
 	public ArraySet(E[] elements, int size)
 	{
 		super(elements, size);
 	}
-	
+
 	public ArraySet(E[] elements, boolean trusted)
 	{
 		super(elements, elements.length, trusted);
 	}
-	
+
 	public ArraySet(E[] elements, int size, boolean trusted)
 	{
 		super(elements, size, trusted);
 	}
-	
+
 	public ArraySet(Collection<E> elements)
 	{
 		super(elements);
 	}
-	
+
 	@Override
 	protected void removeAt(int index)
 	{
 		throw new ImmutableException("removeAt() on Immutable Set");
 	}
-	
+
 	@Override
 	public ImmutableSet<E> added(E element)
 	{
@@ -135,13 +123,13 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 		{
 			return this;
 		}
-		
+
 		Object[] newArray = new Object[this.size + 1];
 		System.arraycopy(this.elements, 0, newArray, 0, this.size);
 		newArray[this.size] = element;
 		return new ArraySet<>((E[]) newArray, this.size + 1, true);
 	}
-	
+
 	@Override
 	public ImmutableSet<E> removed(Object element)
 	{
@@ -157,7 +145,7 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 		}
 		return new ArraySet<>((E[]) newArray, index, true);
 	}
-	
+
 	@Override
 	public ImmutableSet<? extends E> difference(Collection<?> collection)
 	{
@@ -173,7 +161,7 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 		}
 		return new ArraySet<>((E[]) newArray, index, true);
 	}
-	
+
 	@Override
 	public ImmutableSet<? extends E> intersection(Collection<? extends E> collection)
 	{
@@ -189,7 +177,7 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 		}
 		return new ArraySet<>((E[]) newArray, index, true);
 	}
-	
+
 	@Override
 	public ImmutableSet<? extends E> union(Collection<? extends E> collection)
 	{
@@ -205,7 +193,7 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 		}
 		return new ArraySet<>((E[]) newArray, size, true);
 	}
-	
+
 	@Override
 	public ImmutableSet<? extends E> symmetricDifference(Collection<? extends E> collection)
 	{
@@ -228,7 +216,7 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 		}
 		return new ArraySet<>((E[]) newArray, index, true);
 	}
-	
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public <R> ImmutableSet<R> mapped(Function<? super E, ? extends R> mapper)
@@ -246,7 +234,7 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 		copy.flatMapImpl((Function) mapper);
 		return copy;
 	}
-	
+
 	@Override
 	public ImmutableSet<E> filtered(Predicate<? super E> condition)
 	{
@@ -262,19 +250,19 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 		}
 		return new ArraySet<>((E[]) newArray, index, true);
 	}
-	
+
 	@Override
 	public ImmutableSet<E> copy()
 	{
 		return this.immutableCopy();
 	}
-	
+
 	@Override
 	public MutableSet<E> mutable()
 	{
 		return this.mutableCopy();
 	}
-	
+
 	@Override
 	public java.util.Set<E> toJava()
 	{

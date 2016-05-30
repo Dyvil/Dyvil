@@ -163,7 +163,7 @@ public class IncOperator extends AbstractValue
 		final int lineNumber = this.getLineNumber();
 		boolean receiver = this.receiver != null;
 
-		if (Types.isSameType(type, Types.VOID))
+		if (Types.isVoid(type))
 		{
 			// Prefix / Postfix doesn't make a difference here
 

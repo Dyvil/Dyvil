@@ -32,27 +32,27 @@ public final class CaptureField extends CaptureDataMember implements IField
 	{
 		this.enclosingClass = iclass;
 	}
-	
+
 	public CaptureField(IClass iclass, IVariable variable)
 	{
 		super(variable);
 		this.enclosingClass = iclass;
-		
+
 		this.name = "this$" + variable.getName().qualified;
 	}
-	
+
 	@Override
 	public void setEnclosingClass(IClass enclosingClass)
 	{
 		this.enclosingClass = enclosingClass;
 	}
-	
+
 	@Override
 	public IClass getEnclosingClass()
 	{
 		return this.enclosingClass;
 	}
-	
+
 	@Override
 	public ElementType getElementType()
 	{
@@ -66,7 +66,7 @@ public final class CaptureField extends CaptureDataMember implements IField
 
 		if (receiver == null)
 		{
-			return new ThisExpr(this.enclosingClass.getType(), VariableThis.DEFAULT);
+			return new ThisExpr(this.getPosition(), this.enclosingClass.getType(), context, markers);
 		}
 		return receiver;
 	}
@@ -74,10 +74,11 @@ public final class CaptureField extends CaptureDataMember implements IField
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		writer.visitField(Modifiers.PRIVATE | Modifiers.MANDATED | Modifiers.SYNTHETIC, this.name,
-		                  this.getDescriptor(), this.getSignature(), null).visitEnd();
+		writer
+			.visitField(Modifiers.MANDATED | Modifiers.SYNTHETIC, this.name, this.getDescriptor(), this.getSignature(),
+			            null).visitEnd();
 	}
-	
+
 	@Override
 	public void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
@@ -100,12 +101,12 @@ public final class CaptureField extends CaptureDataMember implements IField
 			writer.visitFieldInsn(Opcodes.PUTFIELD, owner, name, desc);
 		}
 	}
-	
+
 	@Override
 	public void writeSignature(DataOutput out) throws IOException
 	{
 	}
-	
+
 	@Override
 	public void readSignature(DataInput in) throws IOException
 	{

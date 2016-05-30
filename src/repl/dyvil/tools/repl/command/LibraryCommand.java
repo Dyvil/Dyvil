@@ -2,6 +2,7 @@ package dyvil.tools.repl.command;
 
 import dyvil.tools.compiler.library.Library;
 import dyvil.tools.repl.DyvilREPL;
+import dyvil.tools.repl.lang.I18n;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,12 +22,6 @@ public class LibraryCommand implements ICommand
 	}
 
 	@Override
-	public String getDescription()
-	{
-		return "Makes an external Jar File or Folder available on the Classpath";
-	}
-
-	@Override
 	public String getUsage()
 	{
 		return ":<library|lib|loadlibrary|cp> <path>";
@@ -37,7 +32,7 @@ public class LibraryCommand implements ICommand
 	{
 		if (argument == null)
 		{
-			repl.getErrorOutput().println("Missing Path Argument. Usage: " + this.getUsage());
+			repl.getErrorOutput().println(I18n.get("command.library.missing", this.getUsage()));
 			return;
 		}
 
@@ -48,7 +43,7 @@ public class LibraryCommand implements ICommand
 			library.loadLibrary();
 			repl.getCompiler().config.addLibrary(library);
 
-			repl.getOutput().println("Successfully added " + library + " to Classpath");
+			repl.getOutput().println(I18n.get("command.library.success", library));
 		}
 		catch (FileNotFoundException ex)
 		{

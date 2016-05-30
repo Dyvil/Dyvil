@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.modifiers;
 
 import dyvil.collection.iterator.EmptyIterator;
+import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.parsing.marker.MarkerList;
 
 import java.util.Iterator;
@@ -67,7 +69,7 @@ public class FlagModifierSet implements ModifierSet
 	}
 
 	@Override
-	public void check(MarkerList markers)
+	public void check(IMember member, MarkerList markers)
 	{
 	}
 
@@ -78,7 +80,7 @@ public class FlagModifierSet implements ModifierSet
 	}
 
 	@Override
-	public void toString(StringBuilder builder)
+	public void toString(MemberKind memberKind, StringBuilder builder)
 	{
 		ModifierUtil.writeAccessModifiers(this.flags, builder);
 		ModifierUtil.writeClassModifiers(this.flags, builder);

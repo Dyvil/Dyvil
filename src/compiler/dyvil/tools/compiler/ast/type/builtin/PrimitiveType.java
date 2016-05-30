@@ -429,6 +429,12 @@ public final class PrimitiveType implements IType
 	}
 
 	@Override
+	public boolean isUninferred()
+	{
+		return false;
+	}
+
+	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
 		return this;

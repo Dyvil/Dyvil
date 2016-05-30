@@ -79,9 +79,9 @@ public class TypeVarType implements IRawType
 	}
 
 	@Override
-	public boolean needsSubTypeCheck()
+	public int subTypeCheckLevel()
 	{
-		return true;
+		return 1;
 	}
 
 	@Override

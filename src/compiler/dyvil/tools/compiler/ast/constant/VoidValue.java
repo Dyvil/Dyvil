@@ -72,7 +72,7 @@ public class VoidValue implements IConstantValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		if (type == null || Types.isSameType(type, Types.VOID))
+		if (type == null || Types.isVoid(type))
 		{
 			return;
 		}

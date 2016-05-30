@@ -1,108 +1,112 @@
 package dyvil.tools.compiler.parser.expression;
 
-import dyvil.tools.compiler.ast.consumer.IValueConsumer;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.MatchCase;
 import dyvil.tools.compiler.ast.expression.MatchExpr;
+import dyvil.tools.compiler.parser.pattern.CaseParser;
+import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Parser;
-import dyvil.tools.compiler.parser.pattern.PatternParser;
-import dyvil.tools.compiler.parser.statement.StatementListParser;
-import dyvil.tools.compiler.transform.DyvilKeywords;
-import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
-import static dyvil.tools.compiler.parser.expression.ExpressionParser.*;
+import static dyvil.tools.compiler.parser.expression.ExpressionParser.IGNORE_CLOSURE;
+import static dyvil.tools.compiler.parser.expression.ExpressionParser.IGNORE_COLON;
 
-public class MatchExpressionParser extends Parser implements IValueConsumer
+public class MatchExpressionParser extends Parser
 {
-	private static final int OPEN_BRACKET = 1;
-	private static final int CASE         = 2;
-	private static final int CONDITION    = 4;
-	private static final int ACTION       = 8;
-	private static final int SEPARATOR    = 16;
-	
+	private static final int EXPRESSION     = 0;
+	private static final int CLOSE_PAREN    = 1;
+	private static final int SINGLE_CASE    = 2;
+	private static final int VALUE_END      = 4;
+	private static final int CASE           = 8;
+	private static final int CASE_SEPARATOR = 16;
+
 	protected MatchExpr matchExpression;
-	
-	private MatchCase currentCase;
-	private boolean   singleCase;
-	
+
 	public MatchExpressionParser(MatchExpr matchExpression)
 	{
 		this.matchExpression = matchExpression;
-		this.mode = OPEN_BRACKET;
+
+		if (matchExpression.getValue() == null)
+		{
+			// match ... { ... }
+			this.mode = EXPRESSION;
+		}
+		else
+		{
+			// ... match { ... }
+			this.mode = SINGLE_CASE;
+		}
 	}
-	
+
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
-		int type = token.type();
-		
+		final int type = token.type();
 		switch (this.mode)
 		{
-		case OPEN_BRACKET:
-			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
+		case EXPRESSION:
+			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
-				this.mode = CASE;
+				this.mode = CLOSE_PAREN;
+				pm.pushParser(new ExpressionParser(this.matchExpression));
 				return;
 			}
-			if (type != DyvilKeywords.CASE)
+
+			this.mode = VALUE_END;
+			pm.pushParser(new ExpressionParser(this.matchExpression).withFlag(IGNORE_CLOSURE | IGNORE_COLON), true);
+			return;
+		case VALUE_END:
+			if (type == BaseSymbols.COLON)
 			{
-				pm.report(token, "match.invalid");
+				this.mode = SINGLE_CASE;
 				return;
 			}
-			this.singleCase = true;
-		case CASE:
-			if (type == BaseSymbols.SEMICOLON && token.isInferred())
+			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
 			{
+				pm.report(token, "match.brace");
 				return;
 			}
+			this.mode = CASE_SEPARATOR;
+			pm.pushParser(new CaseParser(this.matchExpression));
+			return;
+		case CLOSE_PAREN:
+			this.mode = SINGLE_CASE;
+			if (type != BaseSymbols.CLOSE_PARENTHESIS)
+			{
+				pm.report(token, "match.close_paren");
+				pm.reparse();
+			}
+			return;
+		case SINGLE_CASE:
 			if (type == DyvilKeywords.CASE)
 			{
-				this.currentCase = new MatchCase();
-				this.mode = CONDITION;
-				pm.pushParser(new PatternParser(this.currentCase));
+				pm.pushParser(new CaseParser(this.matchExpression), true);
+				this.mode = END;
 				return;
 			}
+			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
+			{
+				pm.report(token, "match.brace_case");
+				return;
+			}
+			this.mode = CASE_SEPARATOR;
+			pm.pushParser(new CaseParser(this.matchExpression));
+			return;
+		case CASE:
 			if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
 				pm.popParser();
 				return;
 			}
-			pm.report(token, "match.case");
+			if (type == BaseSymbols.SEMICOLON)
+			{
+				return;
+			}
+
+			this.mode = CASE_SEPARATOR;
+			pm.pushParser(new CaseParser(this.matchExpression), true);
 			return;
-		case CONDITION:
-			if (type == DyvilKeywords.IF)
-			{
-				this.mode = ACTION;
-				pm.pushParser(new ExpressionParser(this).withFlag(IGNORE_COLON | IGNORE_CLOSURE | IGNORE_LAMBDA));
-				return;
-			}
-			// Fallthrough
-		case ACTION:
-			this.mode = SEPARATOR;
-			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
-			{
-				pm.pushParser(new StatementListParser(this), true);
-				return;
-			}
-			pm.pushParser(new ExpressionParser(this));
-			if (type != BaseSymbols.COLON && type != DyvilSymbols.DOUBLE_ARROW_RIGHT)
-			{
-				pm.reparse();
-				pm.report(token, "match.case.action");
-			}
-			return;
-		case SEPARATOR:
-			this.matchExpression.addCase(this.currentCase);
-			if (this.singleCase)
-			{
-				pm.popParser(true);
-				return;
-			}
-			
-			this.currentCase = null;
+		case CASE_SEPARATOR:
 			if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
 				pm.popParser();
@@ -114,19 +118,9 @@ public class MatchExpressionParser extends Parser implements IValueConsumer
 				pm.reparse();
 				pm.report(token, "match.case.end");
 			}
-		}
-	}
-	
-	@Override
-	public void setValue(IValue value)
-	{
-		switch (this.mode)
-		{
-		case ACTION:
-			this.currentCase.setCondition(value);
 			return;
-		case SEPARATOR:
-			this.currentCase.setAction(value);
+		case END:
+			pm.popParser(true);
 		}
 	}
 }

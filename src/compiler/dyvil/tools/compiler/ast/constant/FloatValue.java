@@ -76,11 +76,11 @@ public class FloatValue implements IConstantValue
 		{
 			return this;
 		}
-		if (Types.isSameType(type, Types.DOUBLE))
+		if (Types.isExactType(type, Types.DOUBLE))
 		{
 			return new DoubleValue(this.position, this.value);
 		}
-		if (Types.isSuperType(type, Types.FLOAT))
+		if (Types.isExactType(type, Types.FLOAT))
 		{
 			return this;
 		}
