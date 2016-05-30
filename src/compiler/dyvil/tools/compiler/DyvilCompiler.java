@@ -510,9 +510,7 @@ public final class DyvilCompiler implements Tool
 	{
 		if (this.config.useAnsiColors())
 		{
-			this.output.print(Console.ANSI_YELLOW);
-			this.output.print(message);
-			this.output.println(Console.ANSI_RESET);
+			this.output.println(Console.ANSI_YELLOW + message + Console.ANSI_RESET);
 		}
 		else
 		{
