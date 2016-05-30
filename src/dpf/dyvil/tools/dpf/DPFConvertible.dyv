@@ -1,0 +1,8 @@
+package dyvil.tools.dpf
+
+import dyvil.tools.dpf.ast.value.Value
+
+public interface DPFConvertible
+{
+	Value toPropertyValue()
+}

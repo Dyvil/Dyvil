@@ -2,6 +2,8 @@ package dyvil.tools.dpf.ast.value
 
 import dyvil.lang.literal._
 
+import dyvil.tools.dpf.DPFConvertible
+
 import dyvil.collection.Collection
 import dyvil.collection.Map
 import dyvil.collection.immutable.ArrayMap
@@ -76,11 +78,6 @@ public interface Value extends IASTNode
 
 	static Value wrap(any value)
 	{
-		return value.toPropertyValue
-	}
-
-	extension Value toPropertyValue(any value)
-	{
 		if (value == null)
 		{
 			return null;
@@ -141,6 +138,10 @@ public interface Value extends IASTNode
 			}
 
 			return listValue
+		}
+		if (value is DPFConvertible)
+		{
+			return (value as DPFConvertible).toPropertyValue()
 		}
 
 		throw new RuntimeException("Cannot convert instance of type \(value.getClass) to a DPF Value")

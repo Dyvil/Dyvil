@@ -10,11 +10,12 @@ import dyvil.tools.dpf.ast._
 import dyvil.tools.dpf.ast.value.Value
 import dyvil.tools.dpf.converter.{ binary._, string._, flatmap._ }
 
-using dyvil.tools.dpf.DSL._
+using dyvil.tools.dpf.DPFSyntax._
+import dyvil.tools.dpf.DPFConvertible
 
 public class DPFTest
 {
-	public case class Button(String text, int x, int y)
+	public case class Button(String text, int x, int y) implements DPFConvertible
 	{
 		private boolean visible = false
 		{
@@ -22,7 +23,7 @@ public class DPFTest
 			public set
 		}
 
-		public Value toPropertyValue()
+		public override Value toPropertyValue()
 		{
 			return "Button"(this.text, "x": this.x, "y": this.y) {
 				"visible": this.visible

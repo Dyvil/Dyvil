@@ -5,7 +5,7 @@ import dyvil.tools.dpf.ast._
 import dyvil.tools.dpf.ast.builder._
 import dyvil.tools.dpf.ast.value._
 
-public class DSL
+public class DPFSyntax
 {
 	@dyvil.lang.literal.ColonConvertible
 	public static class PropertyPair(public Name name, public Value value)
