@@ -211,6 +211,8 @@ public final class ArrayExpr implements IValue, IValueList
 	@Override
 	public IValue withType(IType arrayType, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
+		final IType elementType;
+		final Mutability mutability;
 		if (!arrayType.isArrayType())
 		{
 			final IAnnotation annotation;
@@ -224,36 +226,47 @@ public final class ArrayExpr implements IValue, IValueList
 				return null;
 			}
 
-			// Compute array and element type from scratch
-			this.getType();
+			// Compute element type from scratch
+			elementType = this.getElementType();
+			mutability = Mutability.UNDEFINED;
 		}
 		else
 		{
 			// If the type is an array type, get it's element type
 
-			final IType elementType = arrayType.getElementType();
-			if (elementType.isUninferred())
-			{
-				// Compute element type from scratch
-				this.elementType = this.getElementType().getObjectType();
-			}
-			else
-			{
-				this.elementType = elementType.asReturnType();
-			}
+			elementType = arrayType.getElementType();
+			mutability = arrayType.getMutability();
+		}
 
-			this.arrayType = null;
-			if (Types.isVoid(this.elementType))
-			{
-				markers.add(Markers.semanticError(this.position, "array.void"));
-			}
+		if (this.valueCount == 0)
+		{
+			this.elementType = elementType.getConcreteType(ITypeContext.DEFAULT);
+			this.arrayType = new ArrayType(this.elementType, mutability);
+			return this;
 		}
 
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			this.values[i] = TypeChecker.convertValue(this.values[i], this.elementType, typeContext, markers, context,
+			this.values[i] = TypeChecker.convertValue(this.values[i], elementType, typeContext, markers, context,
 			                                          LazyFields.ELEMENT_MARKER_SUPPLIER);
 		}
+
+		this.elementType = null;
+		final int typecode = elementType.getTypecode();
+		if (typecode < 0)
+		{
+			// local element type is an object type, so we infer the reference version of the computed element type
+			this.elementType = this.getElementType().getObjectType();
+		}
+		else if (typecode != this.getElementType().getTypecode())
+		{
+			// local element type is a primitive type, but a different one from the computed element type,
+			// so we infer the local one
+			this.elementType = elementType;
+		}
+		// else: the above call to this.getElementType() has set this.elementType already
+
+		this.arrayType = new ArrayType(this.elementType, mutability);
 
 		return this;
 	}
@@ -416,6 +429,11 @@ public final class ArrayExpr implements IValue, IValueList
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			this.values[i].check(markers, context);
+		}
+
+		if (Types.isVoid(this.getElementType()))
+		{
+			markers.add(Markers.semanticError(this.position, "array.void"));
 		}
 	}
 

@@ -10,6 +10,7 @@ public class Main
 	private static void runTests([String] args)
 	{
 		AnnotationTest.main(args)
+		ArrayTest.main(args)
 		BridgeTest.main(args)
 		BuilderTest.main(args)
 		CaptureTest.main(args)

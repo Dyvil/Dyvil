@@ -1,0 +1,21 @@
+package dyvil.test
+
+public class ArrayTest
+{
+	public static void main([String] args)
+	{
+		Main.test("Array Element Type Test 1", class any,    []   .elementType)
+		Main.test("Array Element Type Test 2", class [any],  [[]] .elementType)
+		Main.test("Array Element Type Test 3", class int,    [1]  .elementType)
+		Main.test("Array Element Type Test 4", class String, ["a"].elementType)
+
+		Main.test("Nested Array Element Type Test 1", class any,    []     .nestedElementType)
+		Main.test("Nested Array Element Type Test 2", class any,    [[]]   .nestedElementType)
+		Main.test("Nested Array Element Type Test 3", class int,    [[1]]  .nestedElementType)
+		Main.test("Nested Array Element Type Test 4", class String, [["a"]].nestedElementType)
+	}
+
+	postfix Class<T> elementType <@Reified(true) T>([T] array) = class T
+
+	postfix Class<T> nestedElementType <@Reified(true) T>([[T]] array) = class T
+}
