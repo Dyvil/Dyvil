@@ -2,7 +2,9 @@ package dyvil.tools.compiler.ast.statement.loop;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.constant.VoidValue;
+import dyvil.tools.compiler.ast.context.CombiningLabelContext;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.statement.IStatement;
@@ -82,7 +84,8 @@ public final class RepeatStatement extends AbstractValue implements IStatement, 
 	@Override
 	public Label resolveLabel(Name name)
 	{
-		if (name == $repeatStart) {
+		if (name == $repeatStart)
+		{
 			return this.startLabel;
 		}
 		if (name == $repeatCondition)
@@ -107,6 +110,15 @@ public final class RepeatStatement extends AbstractValue implements IStatement, 
 		if (this.condition != null)
 		{
 			this.condition.resolveTypes(markers, context);
+		}
+	}
+
+	@Override
+	public void resolveStatement(ILabelContext context, MarkerList markers)
+	{
+		if (this.action != null)
+		{
+			this.action.resolveStatement(new CombiningLabelContext(this, context), markers);
 		}
 	}
 
