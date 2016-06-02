@@ -52,8 +52,8 @@ public class DPFTest
 			}
 
 			// DSL Builder
-			"builderProperty2": "Button"("Click Me", "x": 10, "y": 20) {
-				"visible": true
+			"builderProperty2": "TextField"("Hello World", "x": 100, "y": 200) {
+				"visible": false
 			}
 		}
 
