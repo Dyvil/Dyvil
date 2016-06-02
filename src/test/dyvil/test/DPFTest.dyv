@@ -69,9 +69,7 @@ public class DPFTest
 
 	public static void main([String] args)
 	{
-		// Main.test("DPF Parser", TEST_NODE, Parser.parse(TEST_STRING))
-
-		// new Parser(TEST_STRING).parseNodeBody(new Printer)
+		Main.test("DPF Parser", TEST_NODE, Parser.parse(TEST_STRING))
 
 		testExpand()
 		testBinary()
