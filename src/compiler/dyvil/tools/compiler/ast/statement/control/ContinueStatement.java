@@ -52,14 +52,12 @@ public class ContinueStatement extends AbstractValue implements IStatement
 	{
 		if (this.name == null)
 		{
-			ILoop loop = context.getEnclosingLoop();
-			if (loop == null)
+			this.label = context.getContinueLabel();
+			if (this.label == null)
 			{
 				markers.add(Markers.semantic(this.position, "continue.invalid"));
-				return;
 			}
 
-			this.label = loop.getBreakLabel();
 			return;
 		}
 

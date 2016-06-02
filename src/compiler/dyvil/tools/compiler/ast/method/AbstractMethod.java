@@ -29,7 +29,6 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
-import dyvil.tools.compiler.ast.statement.loop.ILoop;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Mutability;
@@ -362,7 +361,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public ILoop getEnclosingLoop()
+	public dyvil.tools.compiler.ast.statement.control.Label getBreakLabel()
+	{
+		return null;
+	}
+
+	@Override
+	public dyvil.tools.compiler.ast.statement.control.Label getContinueLabel()
 	{
 		return null;
 	}

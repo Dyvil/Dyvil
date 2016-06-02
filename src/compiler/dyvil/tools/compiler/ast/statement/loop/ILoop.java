@@ -7,20 +7,16 @@ import dyvil.tools.parsing.Name;
 
 public interface ILoop extends ILabelContext
 {
-	Label getContinueLabel();
-	
-	Label getBreakLabel();
-
 	IValue getAction();
 
 	void setAction(IValue action);
-	
+
 	@Override
-	default ILoop getEnclosingLoop()
-	{
-		return this;
-	}
-	
+	Label getBreakLabel();
+
+	@Override
+	Label getContinueLabel();
+
 	@Override
 	Label resolveLabel(Name name);
 }

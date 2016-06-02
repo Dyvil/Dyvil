@@ -157,12 +157,6 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 	}
 
 	@Override
-	public ILoop getEnclosingLoop()
-	{
-		return this;
-	}
-
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.variable != null)

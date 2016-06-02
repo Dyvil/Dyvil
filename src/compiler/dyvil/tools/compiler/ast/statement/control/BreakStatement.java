@@ -52,14 +52,12 @@ public class BreakStatement extends AbstractValue implements IStatement
 	{
 		if (this.name == null)
 		{
-			ILoop loop = context.getEnclosingLoop();
-			if (loop == null)
+			this.label = context.getBreakLabel();
+			if (this.label == null)
 			{
 				markers.add(Markers.semantic(this.position, "break.invalid"));
-				return;
 			}
 
-			this.label = loop.getBreakLabel();
 			return;
 		}
 
