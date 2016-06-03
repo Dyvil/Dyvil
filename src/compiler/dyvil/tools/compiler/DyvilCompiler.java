@@ -60,7 +60,7 @@ public final class DyvilCompiler implements Tool
 		this.output = BasicPrintStream.apply(out, this.output);
 		this.errorOutput = BasicPrintStream.apply(out, this.errorOutput);
 
-		if (!this.loadConfig(arguments))
+		if (!this.baseInit(arguments))
 		{
 			this.shutdown();
 			return 1;
@@ -79,12 +79,12 @@ public final class DyvilCompiler implements Tool
 		return this.compilationFailed ? 1 : 0;
 	}
 
-	public boolean loadConfig(String[] arguments)
+	public boolean baseInit(String[] args)
 	{
-		final long startTime = System.nanoTime();
+		this.loadConfig(args);
 
 		// Sets up States from arguments
-		this.processArguments(arguments);
+		this.processArguments(args);
 
 		File sourceDir = this.config.getSourceDir();
 		if (sourceDir == null)
@@ -99,10 +99,44 @@ public final class DyvilCompiler implements Tool
 			return false;
 		}
 
-		final long endTime = System.nanoTime();
-		this.log(I18n.get("config.loaded", Util.toTime(endTime - startTime)));
-
 		return true;
+	}
+
+	public void loadConfig(String[] args)
+	{
+		for (String arg : args)
+		{
+			if (arg.charAt(0) == '@')
+			{
+				this.loadConfigFile(arg.substring(1));
+			}
+		}
+	}
+
+	private void loadConfigFile(String source)
+	{
+		final File file = new File(source);
+		this.config.setConfigFile(file);
+		if (!file.exists())
+		{
+			this.error(I18n.get("config.not_found", source));
+			return;
+		}
+
+		try
+		{
+			final long startTime = System.nanoTime();
+
+			final String code = FileUtils.read(file);
+			ConfigParser.parse(code, this.config);
+
+			final long endTime = System.nanoTime();
+			this.log(I18n.get("config.loaded", source, Util.toTime(endTime - startTime)));
+		}
+		catch (IOException ex)
+		{
+			this.error(I18n.get("config.error", source), ex);
+		}
 	}
 
 	public void processArguments(String[] args)
@@ -173,7 +207,6 @@ public final class DyvilCompiler implements Tool
 		}
 		if (arg.charAt(0) == '@')
 		{
-			this.loadConfig(arg.substring(1));
 			return;
 		}
 		if (arg.startsWith("print["))
@@ -197,29 +230,6 @@ public final class DyvilCompiler implements Tool
 		}
 	}
 
-	private void loadConfig(String source)
-	{
-		this.log(I18n.get("config.loading", source));
-
-		final File file = new File(source);
-		this.config.setConfigFile(file);
-		if (!file.exists())
-		{
-			this.error(I18n.get("config.not_found", source));
-			return;
-		}
-
-		try
-		{
-			final String code = FileUtils.read(file);
-			ConfigParser.parse(code, this.config);
-		}
-		catch (IOException ex)
-		{
-			this.error(I18n.get("config.error", source), ex);
-		}
-	}
-
 	public void loadLibraries()
 	{
 		final int libs = this.config.libraries.size();
@@ -234,8 +244,7 @@ public final class DyvilCompiler implements Tool
 		Package.initRoot(this);
 
 		final long endTime = System.nanoTime();
-		this.log(I18n.get("library.found",
-		                  libs == 1 ? I18n.get("libraries.1") : I18n.get("libraries.n", libs),
+		this.log(I18n.get("library.found", libs == 1 ? I18n.get("libraries.1") : I18n.get("libraries.n", libs),
 		                  Util.toTime(endTime - startTime)));
 	}
 
@@ -313,8 +322,7 @@ public final class DyvilCompiler implements Tool
 
 		final long endTime = System.nanoTime();
 
-		this.log(I18n.get("files.found",
-		                  fileCount == 1 ? I18n.get("files.1") : I18n.get("files.n", fileCount),
+		this.log(I18n.get("files.found", fileCount == 1 ? I18n.get("files.1") : I18n.get("files.n", fileCount),
 		                  unitCount == 1 ? I18n.get("units.1") : I18n.get("units.n", unitCount),
 		                  Util.toTime(endTime - startTime)));
 		this.log("");
