@@ -192,7 +192,8 @@ public final class ArgumentList implements IArguments, IValueList
 			return param.getValue() != null ? DEFAULT_MATCH : 0;
 		}
 
-		return this.values[index].getTypeMatch(param.getInternalType());
+		final IValue argument = this.values[index];
+		return IArguments.getTypeMatch(argument, param.getInternalType());
 	}
 
 	protected static float getVarargsTypeMatch(IValue[] values, int startIndex, int endIndex, IParameter param)
@@ -201,20 +202,27 @@ public final class ArgumentList implements IArguments, IValueList
 		final IType arrayType = param.getInternalType();
 		if (argument.checkVarargs(false))
 		{
-			return argument.getTypeMatch(arrayType);
+			return IArguments.getDirectTypeMatch(argument, arrayType);
+		}
+
+		if (startIndex == endIndex)
+		{
+			return VARARGS_MATCH;
 		}
 
 		float totalMatch = 0;
 		final IType elementType = arrayType.getElementType();
 		for (; startIndex < endIndex; startIndex++)
 		{
-			float valueMatch = values[startIndex].getTypeMatch(elementType);
+			final float valueMatch = IArguments.getTypeMatch(values[startIndex], elementType);
 			if (valueMatch <= 0)
 			{
 				return 0F;
 			}
 			totalMatch += valueMatch;
 		}
+		totalMatch /= endIndex - startIndex;
+
 		return totalMatch > 0F ? totalMatch + VARARGS_MATCH : 0;
 	}
 

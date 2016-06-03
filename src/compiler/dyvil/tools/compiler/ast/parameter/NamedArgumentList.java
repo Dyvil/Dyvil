@@ -197,7 +197,7 @@ public final class NamedArgumentList implements IArguments
 				return ArgumentList.getVarargsTypeMatch(this.values, argIndex, endIndex, param);
 			}
 
-			return this.values[argIndex].getTypeMatch(param.getInternalType());
+			return IArguments.getTypeMatch(this.values[argIndex], param.getInternalType());
 		}
 
 		if (param.isVarargs())

@@ -8,6 +8,7 @@ public class VarargsTest
 	{
 		singleTest()
 		multipleTest()
+		expansionTest()
 	}
 
 	private static [int] single(int... args) = args
@@ -53,5 +54,20 @@ public class VarargsTest
 		expected = ([], [])
 		actual = multiple()
 		Main.test("Single Varargs Test (Empty Arguments)", toString(expected), toString(actual), expected == actual)
+	}
+
+	static Set<T> newSet<T>(T... elements) = Set(elements...)
+
+	private static void expansionTest()
+	{
+		let set1 = newSet(1, 2, 3)
+		Main.test("Varargs Expansion Test 1", Set(1, 2, 3), set1)
+
+		let array: [Int] = [ 1, 2, 3 ]
+		let set2 = newSet(array...)
+		Main.test("Varargs Expansion Test 2", Set(1, 2, 3), set2)
+
+		let set3 = newSet(array)
+		Main.test("Varargs Expansion Test 3", Set(array), set3)
 	}
 }

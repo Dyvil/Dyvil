@@ -132,10 +132,11 @@ public final class SingleArgument implements IArguments, IValueConsumer
 	{
 		if (this.value.checkVarargs(false))
 		{
-			return this.value.getTypeMatch(param.getInternalType());
+			return IArguments.getDirectTypeMatch(this.value, param.getInternalType());
 		}
 
-		final float valueMatch = this.value.getTypeMatch(param.getInternalType().getElementType());
+		final IType elementType = param.getInternalType().getElementType();
+		final float valueMatch = IArguments.getTypeMatch(this.value, elementType);
 		return valueMatch > 0 ? valueMatch + VARARGS_MATCH : 0;
 	}
 
