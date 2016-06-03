@@ -39,46 +39,7 @@ public class InlineIntrinsicData extends InstructionList implements IntrinsicDat
 		if (!this.preProcessed)
 		{
 			this.preProcessed = true;
-
-			final int[] accessCounts = new int[this.maxLocals];
-			int lastStoredIndex = -1;
-
-			for (int i = 0; i < this.instructionCount; i++)
-			{
-				final IInstruction instruction = this.instructions[i];
-				final int opcode = instruction.getOpcode();
-
-				if (Opcodes.isLoadOpcode(opcode))
-				{
-					final int varIndex = ((VarInstruction) instruction).getIndex();
-
-					if (++accessCounts[varIndex] < 2)
-					{
-						// Local Variable loaded for the first time -> might not need to store it
-						continue;
-					}
-
-					// Local Variable loaded at least two times -> need to store it and all parameters before
-					if (varIndex > lastStoredIndex)
-					{
-						lastStoredIndex = varIndex;
-					}
-				}
-				else if (Opcodes.isReturnOpcode(opcode))
-				{
-					this.returnIndex = i;
-				}
-			}
-
-			this.storedParameters = lastStoredIndex + 1;
-			final IParameterList parameterList = this.method.getParameterList();
-			int parameterSlots = 0;
-
-			for (int i = 0, parameterCount = parameterList.size(); i < parameterCount; i++)
-			{
-				parameterSlots += parameterList.get(i).getInternalType().getLocalSlots();
-			}
-			this.parameterSlots = parameterSlots;
+			this.preProcess();
 		}
 
 		for (int i = 0; i < this.storedParameters; i++)
@@ -87,6 +48,50 @@ public class InlineIntrinsicData extends InstructionList implements IntrinsicDat
 			writer.visitVarInsn(type.getStoreOpcode(), localCount);
 			localCount = writer.localCount();
 		}
+	}
+
+	private void preProcess()
+	{
+		final IParameterList parameterList = this.method.getParameterList();
+		int parameterSlots = 0;
+
+		for (int i = 0, parameterCount = parameterList.size(); i < parameterCount; i++)
+		{
+			parameterSlots += parameterList.get(i).getInternalType().getLocalSlots();
+		}
+		this.parameterSlots = parameterSlots;
+
+		final int[] accessCounts = new int[this.maxLocals];
+		int lastStoredIndex = -1;
+
+		for (int i = 0; i < this.instructionCount; i++)
+		{
+			final IInstruction instruction = this.instructions[i];
+			final int opcode = instruction.getOpcode();
+
+			if (Opcodes.isLoadOpcode(opcode))
+			{
+				final int varIndex = ((VarInstruction) instruction).getIndex();
+
+				if (accessCounts[varIndex]++ == 0)
+				{
+					// Local Variable loaded for the first time -> might not need to store it
+					continue;
+				}
+
+				// Local Variable loaded at least two times -> need to store it and all parameters before
+				if (varIndex > lastStoredIndex && varIndex < parameterSlots)
+				{
+					lastStoredIndex = varIndex;
+				}
+			}
+			else if (Opcodes.isReturnOpcode(opcode))
+			{
+				this.returnIndex = i;
+			}
+		}
+
+		this.storedParameters = lastStoredIndex + 1;
 	}
 
 	private void writeInstruction(IInstruction instruction, MethodWriter writer, IValue instance, IArguments arguments, int localCount)
