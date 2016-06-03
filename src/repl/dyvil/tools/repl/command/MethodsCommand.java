@@ -1,10 +1,11 @@
 package dyvil.tools.repl.command;
 
+import dyvil.collection.List;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.util.MemberSorter;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.repl.DyvilREPL;
-import dyvil.tools.repl.context.REPLContext;
+import dyvil.tools.repl.lang.I18n;
 
 import java.util.Arrays;
 
@@ -31,9 +32,15 @@ public class MethodsCommand implements ICommand
 	@Override
 	public void execute(DyvilREPL repl, String args)
 	{
-		final REPLContext context = repl.getContext();
+		final List<IMethod> methodList = repl.getContext().getMethods();
 
-		final IMethod[] methods = context.getMethods().toArray(IMethod.class);
+		if (methodList.isEmpty())
+		{
+			repl.getOutput().println(I18n.get("command.methods.none"));
+			return;
+		}
+
+		final IMethod[] methods = methodList.toArray(IMethod.class);
 		Arrays.sort(methods, MemberSorter.METHOD_COMPARATOR);
 
 		for (IMethod method : methods)
