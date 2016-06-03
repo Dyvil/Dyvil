@@ -166,7 +166,6 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	@Override
 	public void visitLabel(Label label)
 	{
-		this.unsupportedInline = true;
 	}
 
 	@Override
@@ -184,13 +183,13 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	@Override
 	public void visitTableSwitchInsn(int min, int max, Label dflt, Label... labels)
 	{
-		this.intrinsicData.addInstruction(new TableSwitchInstruction(min, max, dflt, labels));
+		this.unsupportedInline = true;
 	}
 
 	@Override
 	public void visitLookupSwitchInsn(Label dflt, int[] keys, Label[] labels)
 	{
-		this.intrinsicData.addInstruction(new LookupSwitchInstruction(dflt, keys, labels));
+		this.unsupportedInline = true;
 	}
 
 	@Override
