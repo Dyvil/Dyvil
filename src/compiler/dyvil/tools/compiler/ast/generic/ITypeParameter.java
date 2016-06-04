@@ -89,6 +89,8 @@ public interface ITypeParameter extends IASTNode, INamed, IAnnotated, IObjectCom
 
 	int getSuperTypeDistance(IType superType);
 
+	int getSubTypeDistance(IType subType);
+
 	// Resolution
 
 	IDataMember resolveField(Name name);

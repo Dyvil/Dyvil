@@ -133,7 +133,33 @@ public class UnionType implements IObjectType
 	@Override
 	public int getSuperTypeDistance(IType superType)
 	{
-		return Math.min(this.left.getSuperTypeDistance(superType), this.right.getSuperTypeDistance(superType));
+		final int left = Types.getDistance(superType, this.left);
+		final int right = Types.getDistance(superType, this.right);
+
+		// Both have to match
+		if (left == 0 || right == 0)
+		{
+			return 0;
+		}
+		return Math.min(left, right);
+	}
+
+	@Override
+	public int getSubTypeDistance(IType subType)
+	{
+		final int left = Types.getDistance(this.left, subType);
+		final int right = Types.getDistance(this.right, subType);
+
+		// Either one has to match
+		if (left == 0)
+		{
+			return right;
+		}
+		if (right == 0)
+		{
+			return left;
+		}
+		return Math.min(left, right);
 	}
 
 	@Override

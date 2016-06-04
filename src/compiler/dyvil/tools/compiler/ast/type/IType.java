@@ -253,22 +253,24 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		return false;
 	}
 
-	/**
-	 * Returns true if this type has a special role within the type system and needs special subtyping checks.
-	 */
 	default int subTypeCheckLevel()
 	{
 		return 0;
 	}
 
+	default int getSubTypeDistance(IType subType)
+	{
+		throw new UnsupportedOperationException(this.getClass().getName() + ".getSubTypeDistance");
+	}
+
 	default boolean isSubClassOf(IType superType)
 	{
-		throw new Error();
+		throw new UnsupportedOperationException(this.getClass().getName() + ".isSubClassOf");
 	}
 
 	default boolean isSubTypeOf(IType superType)
 	{
-		throw new Error();
+		throw new UnsupportedOperationException(this.getClass().getName() + ".isSubTypeOf");
 	}
 
 	// Resolve

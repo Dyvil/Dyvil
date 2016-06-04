@@ -60,7 +60,7 @@ public final class TypeParameter implements ITypeParameter
 	private ITypeParametric generic;
 	private ReifiedKind reifiedKind = ReifiedKind.NOT_REIFIED;
 
-	private IType defaultType = Types.OBJECT;
+	private IType defaultType   = Types.OBJECT;
 	private IType covariantType = new CovariantTypeVarType(this);
 
 	public TypeParameter(ITypeParametric generic)
@@ -425,15 +425,53 @@ public final class TypeParameter implements ITypeParameter
 	@Override
 	public int getSuperTypeDistance(IType superType)
 	{
+		if (this.upperBoundCount == 0)
+		{
+			return Types.getDistance(superType, Types.OBJECT);
+		}
+
+		int min = Integer.MAX_VALUE;
 		for (int i = 0; i < this.upperBoundCount; i++)
 		{
-			int m = this.upperBounds[i].getSuperTypeDistance(superType);
-			if (m > 0)
+			final int distance = Types.getDistance(superType, this.upperBounds[i]);
+			if (distance > 0 && distance < min)
 			{
-				return m;
+				// At least one upper bound has to match
+				min = distance;
 			}
 		}
-		return 2;
+
+		if (min == Integer.MAX_VALUE)
+		{
+			// No matches
+			return 0;
+		}
+		return min;
+	}
+
+	@Override
+	public int getSubTypeDistance(IType subType)
+	{
+		if (this.upperBoundCount == 0)
+		{
+			return Types.getDistance(Types.OBJECT, subType);
+		}
+
+		int min = Integer.MAX_VALUE;
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			final int distance = Types.getDistance(this.upperBounds[i], subType);
+			if (distance <= 0)
+			{
+				// All upper bounds have to match
+				return 0;
+			}
+			if (distance < min)
+			{
+				min = distance;
+			}
+		}
+		return min;
 	}
 
 	@Override

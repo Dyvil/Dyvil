@@ -127,6 +127,12 @@ public class TypeVarType implements IRawType
 	}
 
 	@Override
+	public int getSubTypeDistance(IType subType)
+	{
+		return this.typeParameter.getSubTypeDistance(subType);
+	}
+
+	@Override
 	public boolean hasTypeVariables()
 	{
 		return true;

@@ -270,7 +270,16 @@ public final class Types
 			return 1;
 		}
 
-		final int distance = subType.getSuperTypeDistance(superType);
+		final int distance;
+		if (superType.subTypeCheckLevel() > subType.subTypeCheckLevel())
+		{
+			distance = superType.getSubTypeDistance(subType);
+		}
+		else
+		{
+			distance = subType.getSuperTypeDistance(superType);
+		}
+
 		if (distance != 0)
 		{
 			return distance;

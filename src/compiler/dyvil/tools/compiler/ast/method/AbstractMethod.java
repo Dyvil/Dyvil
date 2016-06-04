@@ -511,6 +511,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		if (this.modifiers.hasIntModifier(Modifiers.PREFIX) && !this.isStatic())
 		{
+			// TODO get rid of prefix argument swapping
+
 			IValue argument = arguments.getFirstValue();
 			arguments.setFirstValue(receiver);
 			receiver = argument;
@@ -521,6 +523,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			final int mod = this.modifiers.toFlags() & Modifiers.INFIX;
 			if (mod == Modifiers.INFIX && receiver.valueTag() != IValue.CLASS_ACCESS)
 			{
+				// infix or extension method, declaring class implicit
+
 				final IParameter parameter = this.parameters.get(0);
 				final IType paramType = parameter.getInternalType();
 
@@ -544,26 +548,38 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 			if ((mod & Modifiers.STATIC) != 0)
 			{
+				// static method or infix, extension method with explicit declaring class
+
 				if (receiver.valueTag() != IValue.CLASS_ACCESS)
 				{
+					// static method called like instance method -> warning
+
 					markers.add(Markers.semantic(position, "method.access.static", this.name));
 				}
 				else if (receiver.getType().getTheClass() != this.enclosingClass)
 				{
+					// static method called on wrong type -> warning
+
 					markers.add(Markers.semantic(position, "method.access.static.type", this.name,
 					                             this.enclosingClass.getFullName()));
 				}
-				receiver = null;
+				receiver = null; // TODO don't hide the receiver
 			}
 			else if (receiver.valueTag() == IValue.CLASS_ACCESS)
 			{
+				// instance method, accessed via declaring class
+
 				if (!receiver.getType().getTheClass().isObject())
 				{
-					markers.add(Markers.semantic(position, "method.access.instance", this.name));
+					// declaring class is not an object class -> error
+
+					markers.add(Markers.semanticError(position, "method.access.instance", this.name));
 				}
 			}
 			else
 			{
+				// normal instance method access
+
 				updateReceiverType(receiver, genericData);
 				receiver = TypeChecker.convertValue(receiver, this.receiverType, genericData, markers, context,
 				                                    TypeChecker
@@ -573,12 +589,18 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 		else if (!this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{
+			// no receiver, non-static method
+
 			if (context.isStatic())
 			{
+				// called from static context -> error
+
 				markers.add(Markers.semantic(position, "method.access.instance", this.name));
 			}
 			else
 			{
+				// unqualified call
+
 				markers.add(Markers.semantic(position, "method.access.unqualified", this.name.unqualified));
 
 				final IType receiverType = this.enclosingClass.getType();
