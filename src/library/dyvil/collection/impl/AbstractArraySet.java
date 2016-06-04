@@ -33,6 +33,12 @@ public abstract class AbstractArraySet<E> implements Set<E>
 		this.size = Set.distinct(this.elements, size);
 	}
 
+	public AbstractArraySet(Object[] elements, @SuppressWarnings("UnusedParameters") boolean trusted)
+	{
+		this.elements = elements;
+		this.size = Set.distinct(elements, elements.length);
+	}
+
 	public AbstractArraySet(Object[] elements, int size, @SuppressWarnings("UnusedParameters") boolean trusted)
 	{
 		this.elements = elements;

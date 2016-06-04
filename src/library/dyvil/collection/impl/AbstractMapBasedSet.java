@@ -97,7 +97,7 @@ public abstract class AbstractMapBasedSet<E> implements Set<E>
 		}
 
 		final int len = builder.length();
-		return builder.replace(len, len - Collection.ELEMENT_SEPARATOR_STRING.length(), Collection.END_STRING).toString();
+		return builder.replace(len - Collection.ELEMENT_SEPARATOR_STRING.length(), len, Collection.END_STRING).toString();
 	}
 	
 	@Override

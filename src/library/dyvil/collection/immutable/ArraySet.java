@@ -97,7 +97,7 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 
 	public ArraySet(E[] elements, boolean trusted)
 	{
-		super(elements, elements.length, trusted);
+		super(elements, trusted);
 	}
 
 	public ArraySet(E[] elements, int size, boolean trusted)
