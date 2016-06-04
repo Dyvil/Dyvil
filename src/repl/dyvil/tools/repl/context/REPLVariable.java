@@ -282,10 +282,17 @@ public class REPLVariable extends Field
 		if (this.value != null)
 		{
 			this.value.toString(prefix, buffer);
+			return;
 		}
-		else
+
+		try
 		{
 			ObjectArray.toString(this.displayValue, buffer);
+		}
+		catch (Throwable t)
+		{
+			t.printStackTrace(this.context.getCompilationContext().getErrorOutput());
+			buffer.append("<error>");
 		}
 	}
 }
