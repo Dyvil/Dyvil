@@ -175,6 +175,11 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 	public void resolveArguments(MarkerList markers, IContext context)
 	{
 		this.arguments.resolve(markers, context);
+
+		if (this.genericData != null)
+		{
+			this.genericData.resolve(markers, context);
+		}
 	}
 
 	@Override
@@ -212,6 +217,11 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 		}
 
 		this.arguments.checkTypes(markers, context);
+
+		if (this.genericData != null)
+		{
+			this.genericData.checkTypes(markers, context);
+		}
 	}
 
 	@Override
@@ -229,6 +239,11 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 		}
 
 		this.arguments.check(markers, context);
+
+		if (this.genericData != null)
+		{
+			this.genericData.check(markers, context);
+		}
 	}
 
 	@Override
@@ -238,7 +253,14 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 		{
 			this.receiver = this.receiver.foldConstants();
 		}
+
 		this.arguments.foldConstants();
+
+		if (this.genericData != null)
+		{
+			this.genericData.foldConstants();
+		}
+
 		return this;
 	}
 
@@ -249,7 +271,13 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 		{
 			this.receiver = this.receiver.cleanup(context, compilableList);
 		}
+
 		this.arguments.cleanup(context, compilableList);
+
+		if (this.genericData != null)
+		{
+			this.genericData.cleanup(context, compilableList);
+		}
 		return this;
 	}
 
