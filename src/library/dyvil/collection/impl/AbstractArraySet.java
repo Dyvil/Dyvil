@@ -6,6 +6,7 @@ import dyvil.collection.MutableSet;
 import dyvil.collection.Set;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Objects;
@@ -15,57 +16,69 @@ public abstract class AbstractArraySet<E> implements Set<E>
 {
 	private static final long serialVersionUID = -7004392809193010314L;
 
-	protected static final int DEFAULT_CAPACITY = 10;
+	protected static final int DEFAULT_CAPACITY = 16;
 
 	protected transient Object[] elements;
 	protected transient int      size;
 
-	public AbstractArraySet(Object... elements)
+	protected AbstractArraySet()
+	{
+		this.elements = new Object[DEFAULT_CAPACITY];
+	}
+
+	protected AbstractArraySet(int capacity)
+	{
+		this.elements = new Object[capacity];
+	}
+
+	@SafeVarargs
+	public AbstractArraySet(E... elements)
 	{
 		this.elements = elements.clone();
 		this.size = Set.distinct(this.elements, elements.length);
 	}
 
-	public AbstractArraySet(Object[] elements, int size)
+	public AbstractArraySet(E[] elements, int size)
 	{
 		this.elements = new Object[size];
 		System.arraycopy(elements, 0, this.elements, 0, size);
 		this.size = Set.distinct(this.elements, size);
 	}
 
-	public AbstractArraySet(Object[] elements, @SuppressWarnings("UnusedParameters") boolean trusted)
+	public AbstractArraySet(E[] elements, @SuppressWarnings("UnusedParameters") boolean trusted)
 	{
 		this.elements = elements;
 		this.size = Set.distinct(elements, elements.length);
 	}
 
-	public AbstractArraySet(Object[] elements, int size, @SuppressWarnings("UnusedParameters") boolean trusted)
+	public AbstractArraySet(E[] elements, int size, @SuppressWarnings("UnusedParameters") boolean trusted)
 	{
 		this.elements = elements;
 		this.size = size;
 	}
 
-	public AbstractArraySet(Collection<E> elements)
+	public AbstractArraySet(Iterable<? extends E> iterable)
 	{
-		Object[] array = new Object[elements.size()];
-		int index = 0;
-		outer:
-		for (E element : elements)
-		{
-			// Check if the element is already present in the array
-			for (int i = 0; i < index; i++)
-			{
-				if (Objects.equals(array[i], element))
-				{
-					continue outer;
-				}
-			}
+		this();
+		this.addAllInternal(iterable);
+	}
 
-			array[index++] = element;
-		}
+	public AbstractArraySet(Collection<? extends E> collection)
+	{
+		this(collection.size());
+		this.addAllInternal(collection);
+	}
 
-		this.elements = array;
-		this.size = index;
+	public AbstractArraySet(Set<? extends E> set)
+	{
+		this(set.size());
+		this.addAllInternal(set);
+	}
+
+	public AbstractArraySet(AbstractArraySet<? extends E> arraySet)
+	{
+		this.elements = arraySet.elements.clone();
+		this.size = arraySet.size;
 	}
 
 	protected boolean addInternal(E element)
@@ -78,15 +91,42 @@ public abstract class AbstractArraySet<E> implements Set<E>
 			}
 		}
 
-		int index = this.size++;
-		if (index >= this.elements.length)
-		{
-			Object[] temp = new Object[(int) (this.size * 1.1F)];
-			System.arraycopy(this.elements, 0, temp, 0, index);
-			this.elements = temp;
-		}
+
+		final int index = this.size;
+		this.ensureCapacityInternal(index + 1);
 		this.elements[index] = element;
+		this.size++;
 		return true;
+	}
+
+	protected void addAllInternal(Iterable<? extends E> iterable)
+	{
+		for (E element : iterable)
+		{
+			this.addInternal(element);
+		}
+	}
+
+	protected void addAllInternal(Set<? extends E> set)
+	{
+		this.ensureCapacityInternal(this.size + set.size());
+		set.toArray(this.size, this.elements);
+	}
+
+	protected void ensureCapacityInternal(int minCapacity)
+	{
+		final int length = this.elements.length;
+		if (minCapacity - length <= 0)
+		{
+			return;
+		}
+
+		int newCapacity = length + (length >> 1);
+		if (newCapacity - minCapacity < 0)
+		{
+			newCapacity = minCapacity;
+		}
+		this.elements = Arrays.copyOf(this.elements, newCapacity);
 	}
 
 	@Override

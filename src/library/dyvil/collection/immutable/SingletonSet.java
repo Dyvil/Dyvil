@@ -106,7 +106,7 @@ public class SingletonSet<E> implements ImmutableSet<E>
 	{
 		if (!collection.contains(this))
 		{
-			return new ArraySet<>(collection);
+			return ImmutableSet.from(collection);
 		}
 		
 		Object[] array = new Object[1 + collection.size()];
@@ -133,7 +133,7 @@ public class SingletonSet<E> implements ImmutableSet<E>
 	{
 		if (!collection.contains(this.element))
 		{
-			return new ArraySet<>(collection);
+			return ImmutableSet.from(collection);
 		}
 		
 		Object[] array = new Object[1 + collection.size()];
@@ -164,7 +164,7 @@ public class SingletonSet<E> implements ImmutableSet<E>
 	@Override
 	public <R> ImmutableSet<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
 	{
-		return (ImmutableSet<R>) ImmutableSet.apply(mapper.apply(this.element));
+		return ImmutableSet.from(mapper.apply(this.element));
 	}
 	
 	@Override

@@ -38,25 +38,40 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	
 	static <E> ImmutableList<E> apply(E element)
 	{
-		return new SingletonList<>(element);
+		return SingletonList.apply(element);
 	}
 	
 	static <E> ImmutableList<E> apply(E e1, E e2)
 	{
-		return new ArrayList<>((E[]) new Object[] { e1, e2 }, 2, true);
+		return ArrayList.apply(e1, e2);
 	}
 	
 	static <E> ImmutableList<E> apply(E e1, E e2, E e3)
 	{
-		return new ArrayList<>((E[]) new Object[] { e1, e2, e3 }, 3, true);
+		return ArrayList.apply(e1, e2, e3);
 	}
 	
 	@SafeVarargs
 	static <E> ImmutableList<E> apply(E... elements)
 	{
-		return new ArrayList<>(elements, true);
+		return ArrayList.apply(elements);
 	}
 	
+	static <E> ImmutableList<E> from(E[] array)
+	{
+		return ArrayList.from(array);
+	}
+
+	static <E> ImmutableList<E> from(Iterable<? extends E> iterable)
+	{
+		return ArrayList.from(iterable);
+	}
+
+	static <E> ImmutableList<E> from(Collection<? extends E> collection)
+	{
+		return ArrayList.from(collection);
+	}
+
 	static <E> ImmutableList<E> repeat(int count, E repeatedValue)
 	{
 		E[] elements = (E[]) new Object[count];
@@ -66,7 +81,7 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 		}
 		return new ArrayList<>(elements, count, true);
 	}
-	
+
 	static <E> ImmutableList<E> generate(int count, IntFunction<E> generator)
 	{
 		E[] elements = (E[]) new Object[count];
@@ -76,16 +91,11 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 		}
 		return new ArrayList<>(elements, count, true);
 	}
-	
-	static <E> ImmutableList<E> fromArray(E[] elements)
-	{
-		return new ArrayList<>(elements);
-	}
-	
+
 	@SafeVarargs
 	static <E> ImmutableList<E> linked(E... elements)
 	{
-		return AppendList.apply(elements);
+		return AppendList.from(elements);
 	}
 	
 	static <E> Builder<E> builder()

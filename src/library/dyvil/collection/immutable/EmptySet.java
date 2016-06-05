@@ -99,13 +99,13 @@ public final class EmptySet<E> implements ImmutableSet<E>
 	@Override
 	public ImmutableSet<? extends E> union(Collection<? extends E> collection)
 	{
-		return new ArraySet<>(collection);
+		return ImmutableSet.from(collection);
 	}
 	
 	@Override
 	public ImmutableSet<? extends E> symmetricDifference(Collection<? extends E> collection)
 	{
-		return new ArraySet<>(collection);
+		return ImmutableSet.from(collection);
 	}
 	
 	@Override

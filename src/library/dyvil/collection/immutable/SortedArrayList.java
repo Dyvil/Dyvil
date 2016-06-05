@@ -4,6 +4,7 @@ import dyvil.annotation.Immutable;
 import dyvil.collection.Collection;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.Set;
+import dyvil.collection.impl.AbstractArrayList;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -38,13 +39,25 @@ public class SortedArrayList<E> extends ArrayList<E>
 		super(elements, size, trusted);
 		this.comparator = comparator;
 	}
-	
-	public SortedArrayList(Collection<E> elements, Comparator<? super E> comparator)
+
+	public SortedArrayList(Iterable<? extends E> iterable, Comparator<? super E> comparator)
 	{
-		super(elements);
+		super(iterable);
 		this.useComparator(comparator);
 	}
-	
+
+	public SortedArrayList(Collection<? extends E> collection, Comparator<? super E> comparator)
+	{
+		super(collection);
+		this.useComparator(comparator);
+	}
+
+	public SortedArrayList(AbstractArrayList<? extends E> arrayList, Comparator<? super E> comparator)
+	{
+		super(arrayList);
+		this.useComparator(comparator);
+	}
+
 	private void useComparator(Comparator<? super E> comparator)
 	{
 		if (comparator == null)

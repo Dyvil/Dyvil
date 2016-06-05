@@ -3,6 +3,7 @@ package dyvil.collection.mutable;
 import dyvil.collection.Collection;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
+import dyvil.collection.Set;
 import dyvil.collection.impl.AbstractArraySet;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
@@ -16,6 +17,8 @@ public class ArraySet<E> extends AbstractArraySet<E> implements MutableSet<E>
 {
 	private static final long serialVersionUID = -6676561653968567088L;
 
+	// Factory Methods
+
 	public static <E> ArraySet<E> apply()
 	{
 		return new ArraySet<>();
@@ -27,25 +30,46 @@ public class ArraySet<E> extends AbstractArraySet<E> implements MutableSet<E>
 		return new ArraySet<>(elements, true);
 	}
 
-	public static <E> ArraySet<E> fromArray(E[] elements)
+	public static <E> ArraySet<E> from(E[] array)
 	{
-		return new ArraySet<>(elements);
+		return new ArraySet<>(array);
 	}
+
+	public static <E> ArraySet<E> from(Iterable<? extends E> iterable)
+	{
+		return new ArraySet<>(iterable);
+	}
+
+	public static <E> ArraySet<E> from(Collection<? extends E> collection)
+	{
+		return new ArraySet<>(collection);
+	}
+
+	public static <E> ArraySet<E> from(Set<? extends E> set)
+	{
+		return new ArraySet<>(set);
+	}
+
+	public static <E> ArraySet<E> from(AbstractArraySet<? extends E> arraySet)
+	{
+		return new ArraySet<>(arraySet);
+	}
+
+	// Constructors
 
 	public ArraySet()
 	{
-		super(new Object[DEFAULT_CAPACITY], 0, true);
+		super();
 	}
 
-	public ArraySet(int size)
+	public ArraySet(int capacity)
 	{
-		super(new Object[size], 0, true);
+		super(capacity);
 	}
 
-	@SafeVarargs
-	public ArraySet(E... elements)
+	public ArraySet(E[] elements)
 	{
-		super((Object[]) elements);
+		super(elements);
 	}
 
 	public ArraySet(E[] elements, int size)
@@ -63,10 +87,27 @@ public class ArraySet<E> extends AbstractArraySet<E> implements MutableSet<E>
 		super(elements, size, trusted);
 	}
 
-	public ArraySet(Collection<E> elements)
+	public ArraySet(Iterable<? extends E> iterable)
 	{
-		super(elements);
+		super(iterable);
 	}
+
+	public ArraySet(Collection<? extends E> collection)
+	{
+		super(collection);
+	}
+
+	public ArraySet(Set<? extends E> set)
+	{
+		super(set);
+	}
+
+	public ArraySet(AbstractArraySet<? extends E> arraySet)
+	{
+		super(arraySet);
+	}
+
+	// Implementation Methods
 
 	@Override
 	public void clear()

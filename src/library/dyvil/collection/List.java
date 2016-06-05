@@ -85,11 +85,21 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 		return ImmutableList.apply(elements);
 	}
 	
-	static <E> ImmutableList<E> fromArray(E[] elements)
+	static <E> ImmutableList<E> from(E[] array)
 	{
-		return ImmutableList.fromArray(elements);
+		return ImmutableList.from(array);
 	}
-	
+
+	static <E> ImmutableList<E> from(Iterable<? extends E> array)
+	{
+		return ImmutableList.from(array);
+	}
+
+	static <E> ImmutableList<E> from(Collection<? extends E> array)
+	{
+		return ImmutableList.from(array);
+	}
+
 	static <E> ImmutableList<E> repeat(int count, E repeatedValue)
 	{
 		return ImmutableList.repeat(count, repeatedValue);

@@ -4,6 +4,7 @@ import dyvil.annotation.Immutable;
 import dyvil.collection.Collection;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
+import dyvil.collection.Set;
 import dyvil.collection.impl.AbstractArraySet;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.util.ImmutableException;
@@ -53,15 +54,37 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 
 	private static final long serialVersionUID = 5534347282324757054L;
 
+	// Factory Methods
+
 	@SafeVarargs
 	public static <E> ArraySet<E> apply(E... elements)
 	{
 		return new ArraySet<>(elements, true);
 	}
 
-	public static <E> ArraySet<E> fromArray(E[] elements)
+	public static <E> ArraySet<E> from(E[] array)
 	{
-		return new ArraySet<>(elements);
+		return new ArraySet<>(array);
+	}
+
+	public static <E> ArraySet<E> from(Iterable<? extends E> iterable)
+	{
+		return new ArraySet<>(iterable);
+	}
+
+	public static <E> ArraySet<E> from(Collection<? extends E> collection)
+	{
+		return new ArraySet<>(collection);
+	}
+
+	public static <E> ArraySet<E> from(Set<? extends E> set)
+	{
+		return new ArraySet<>(set);
+	}
+
+	public static <E> ArraySet<E> from(AbstractArraySet<E> arraySet)
+	{
+		return new ArraySet<>(arraySet);
 	}
 
 	public static <E> Builder<E> builder()
@@ -74,6 +97,8 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 		return new Builder<>(capacity);
 	}
 
+	// Constructors
+
 	protected ArraySet()
 	{
 		super();
@@ -84,10 +109,9 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 		super(capacity);
 	}
 
-	@SafeVarargs
-	public ArraySet(E... elements)
+	public ArraySet(E[] elements)
 	{
-		super((Object[]) elements);
+		super(elements);
 	}
 
 	public ArraySet(E[] elements, int size)
@@ -105,10 +129,27 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 		super(elements, size, trusted);
 	}
 
-	public ArraySet(Collection<E> elements)
+	public ArraySet(Iterable<? extends E> iterable)
 	{
-		super(elements);
+		super(iterable);
 	}
+
+	public ArraySet(Collection<? extends E> collection)
+	{
+		super(collection);
+	}
+
+	public ArraySet(Set<? extends E> set)
+	{
+		super(set);
+	}
+
+	public ArraySet(AbstractArraySet<E> arraySet)
+	{
+		super(arraySet);
+	}
+
+	// Implementation Methods
 
 	@Override
 	protected void removeAt(int index)
