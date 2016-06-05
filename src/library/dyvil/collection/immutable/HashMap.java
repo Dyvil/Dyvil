@@ -56,17 +56,42 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 
 	private static final long serialVersionUID = -1489214367993445801L;
 
-	public static <K, V> HashMap<K, V> apply(K key, V value)
-	{
-		final HashMap<K, V> result = new HashMap<>(1);
-		result.putInternal(key, value);
-		return result;
-	}
+	// Factory Methods
 
 	@SafeVarargs
 	public static <K, V> HashMap<K, V> apply(Entry<K, V>... entries)
 	{
 		return new HashMap<>(entries);
+	}
+
+	public static <K, V> HashMap<K, V> from(Entry<? extends K, ? extends V>[] array)
+	{
+		return new HashMap<>(array);
+	}
+
+	public static <K, V> HashMap<K, V> from(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	{
+		return new HashMap<>(iterable);
+	}
+
+	public static <K, V> HashMap<K, V> from(SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	{
+		return new HashMap<>(iterable);
+	}
+
+	public static <K, V> HashMap<K, V> from(Set<? extends Entry<? extends K, ? extends V>> set)
+	{
+		return new HashMap<>(set);
+	}
+
+	public static <K, V> HashMap<K, V> from(Map<? extends K, ? extends V> map)
+	{
+		return new HashMap<>(map);
+	}
+
+	public static <K, V> HashMap<K, V> from(AbstractHashMap<? extends K, ? extends V> hashMap)
+	{
+		return new HashMap<>(hashMap);
 	}
 
 	public static <K, V> Builder<K, V> builder()
@@ -79,31 +104,49 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 		return new Builder<>(capacity);
 	}
 
+	// Constructors
+
 	protected HashMap()
 	{
-		super(DEFAULT_CAPACITY);
+		super();
 	}
 	
 	protected HashMap(int capacity)
 	{
 		super(capacity);
 	}
-	
-	public HashMap(Map<K, V> map)
-	{
-		super(map);
-	}
-	
-	public HashMap(AbstractHashMap<K, V> map)
-	{
-		super(map);
-	}
-	
-	@SafeVarargs
-	public HashMap(Entry<K, V>... entries)
+
+	public HashMap(Entry<? extends K, ? extends V>[] entries)
 	{
 		super(entries);
 	}
+
+	public HashMap(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	{
+		super(iterable);
+	}
+
+	public HashMap(SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	{
+		super(iterable);
+	}
+
+	public HashMap(Set<? extends Entry<? extends K, ? extends V>> set)
+	{
+		super(set);
+	}
+
+	public HashMap(Map<? extends K, ? extends V> map)
+	{
+		super(map);
+	}
+
+	public HashMap(AbstractHashMap<? extends K, ? extends V> hashMap)
+	{
+		super(hashMap);
+	}
+
+	// Implementation Methods
 	
 	@Override
 	protected void addEntry(int hash, K key, V value, int index)

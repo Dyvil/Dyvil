@@ -1,9 +1,6 @@
 package dyvil.collection.mutable;
 
-import dyvil.collection.Collection;
-import dyvil.collection.ImmutableSet;
-import dyvil.collection.MutableSet;
-import dyvil.collection.Set;
+import dyvil.collection.*;
 import dyvil.collection.impl.AbstractHashSet;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
@@ -46,9 +43,9 @@ public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 		return new HashSet<>(iterable);
 	}
 
-	public static <E> HashSet<E> from(Collection<? extends E> collection)
+	public static <E> HashSet<E> from(SizedIterable<? extends E> iterable)
 	{
-		return new HashSet<>(collection);
+		return new HashSet<>(iterable);
 	}
 
 	public static <E> HashSet<E> from(Set<? extends E> set)
@@ -102,9 +99,9 @@ public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 		this.defaultThreshold();
 	}
 
-	public HashSet(Collection<? extends E> collection)
+	public HashSet(SizedIterable<? extends E> iterable)
 	{
-		super(collection);
+		super(iterable);
 		this.defaultThreshold();
 	}
 

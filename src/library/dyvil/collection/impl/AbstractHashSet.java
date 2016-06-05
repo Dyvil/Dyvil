@@ -1,9 +1,7 @@
 package dyvil.collection.impl;
 
-import dyvil.collection.Collection;
-import dyvil.collection.ImmutableSet;
-import dyvil.collection.MutableSet;
-import dyvil.collection.Set;
+import dyvil.array.ObjectArray;
+import dyvil.collection.*;
 import dyvil.math.MathUtils;
 
 import java.io.IOException;
@@ -41,6 +39,8 @@ public abstract class AbstractHashSet<E> implements Set<E>
 	protected transient int              size;
 	protected transient HashElement<E>[] elements;
 
+	// Constructors
+
 	public AbstractHashSet()
 	{
 		this.elements = (HashElement<E>[]) new HashElement[DEFAULT_CAPACITY];
@@ -57,46 +57,57 @@ public abstract class AbstractHashSet<E> implements Set<E>
 
 	public AbstractHashSet(E[] elements)
 	{
-		int length = MathUtils.powerOfTwo(AbstractHashMap.grow(elements.length));
-		@SuppressWarnings("unchecked") HashElement<E>[] hashElements = this.elements = new HashElement[length];
-		int size = 0;
-
-		outer:
-		for (E element : elements)
-		{
-			int hash = hash(element);
-			int index = index(hash, length);
-			for (HashElement e = hashElements[index]; e != null; e = e.next)
-			{
-				Object k;
-				if (e.hash == hash && ((k = e.element) == element || element != null && element.equals(k)))
-				{
-					e.element = element;
-					continue outer;
-				}
-			}
-
-			hashElements[index] = new HashElement<>(element, hash, hashElements[index]);
-			size++;
-		}
-
-		this.size = size;
+		this(elements.length);
+		this.loadEntries(ObjectArray.toIterable(elements));
 	}
 
 	public AbstractHashSet(Iterable<? extends E> iterable)
 	{
 		this();
-		this.addAllInternal(iterable);
+		this.loadEntries(iterable);
 	}
 
-	public AbstractHashSet(Collection<? extends E> elements)
+	public AbstractHashSet(SizedIterable<? extends E> iterable)
 	{
-		int length = MathUtils.powerOfTwo(AbstractHashMap.grow(elements.size()));
-		@SuppressWarnings("unchecked") HashElement<E>[] hashElements = this.elements = new HashElement[length];
+		this(iterable.size());
+		this.loadEntries(iterable);
+	}
+
+	public AbstractHashSet(Set<? extends E> set)
+	{
+		this(set.size());
+		this.loadDistinctElements(set);
+	}
+
+	public AbstractHashSet(AbstractHashSet<? extends E> elements)
+	{
+		this(elements.size);
+		this.size = elements.size;
+
+		final HashElement<E>[] hashElements = this.elements;
+		final int length = hashElements.length;
+
+		for (HashElement hashElement : elements.elements)
+		{
+			for (; hashElement != null; hashElement = hashElement.next)
+			{
+				final int hash = hashElement.hash;
+				final int index = index(hash, length);
+				hashElements[index] = new HashElement<>((E) hashElement.element, hash, hashElements[index]);
+			}
+		}
+	}
+
+	// Implementation Methods
+
+	private void loadEntries(Iterable<? extends E> iterable)
+	{
+		final HashElement<E>[] hashElements = this.elements;
+		final int length = this.elements.length;
 		int size = 0;
 
 		outer:
-		for (E element : elements)
+		for (E element : iterable)
 		{
 			int hash = hash(element);
 			int index = index(hash, length);
@@ -117,36 +128,21 @@ public abstract class AbstractHashSet<E> implements Set<E>
 		this.size = size;
 	}
 
-	public AbstractHashSet(Set<? extends E> elements)
+	private void loadDistinctElements(Iterable<? extends E> iterable)
 	{
-		int size = this.size = elements.size();
-		int length = MathUtils.powerOfTwo(AbstractHashMap.grow(size));
-		@SuppressWarnings("unchecked") HashElement<E>[] hashElements = this.elements = new HashElement[length];
+		final HashElement<E>[] hashElements = this.elements;
+		final int length = hashElements.length;
+		int size = 0;
 
 		// Assume unique elements
-		for (E element : elements)
+		for (E element : iterable)
 		{
+			size++;
 			int hash = hash(element);
 			int index = index(hash, length);
 			hashElements[index] = new HashElement<>(element, hash, hashElements[index]);
 		}
-	}
-
-	public AbstractHashSet(AbstractHashSet<? extends E> elements)
-	{
-		int size = this.size = elements.size();
-		int length = MathUtils.powerOfTwo(AbstractHashMap.grow(size));
-		@SuppressWarnings("unchecked") HashElement<E>[] hashElements = this.elements = new HashElement[length];
-
-		for (HashElement hashElement : elements.elements)
-		{
-			for (; hashElement != null; hashElement = hashElement.next)
-			{
-				int hash = hashElement.hash;
-				int index = index(hash, length);
-				hashElements[index] = new HashElement<>((E) hashElement.element, hash, hashElements[index]);
-			}
-		}
+		this.size = size;
 	}
 
 	protected void flatten()
