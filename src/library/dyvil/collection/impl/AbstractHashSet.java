@@ -1,6 +1,5 @@
 package dyvil.collection.impl;
 
-import dyvil.array.ObjectArray;
 import dyvil.collection.*;
 import dyvil.math.MathUtils;
 
@@ -58,25 +57,28 @@ public abstract class AbstractHashSet<E> implements Set<E>
 	public AbstractHashSet(E[] elements)
 	{
 		this(elements.length);
-		this.loadEntries(ObjectArray.toIterable(elements));
+		for (E element : elements)
+		{
+			this.addInternal(element);
+		}
 	}
 
 	public AbstractHashSet(Iterable<? extends E> iterable)
 	{
 		this();
-		this.loadEntries(iterable);
+		this.addAllInternal(iterable);
 	}
 
 	public AbstractHashSet(SizedIterable<? extends E> iterable)
 	{
 		this(iterable.size());
-		this.loadEntries(iterable);
+		this.addAllInternal((Iterable<? extends E>) iterable);
 	}
 
 	public AbstractHashSet(Set<? extends E> set)
 	{
 		this(set.size());
-		this.loadDistinctElements(set);
+		this.loadDistinct(set);
 	}
 
 	public AbstractHashSet(AbstractHashSet<? extends E> elements)
@@ -99,51 +101,6 @@ public abstract class AbstractHashSet<E> implements Set<E>
 	}
 
 	// Implementation Methods
-
-	private void loadEntries(Iterable<? extends E> iterable)
-	{
-		final HashElement<E>[] hashElements = this.elements;
-		final int length = this.elements.length;
-		int size = 0;
-
-		outer:
-		for (E element : iterable)
-		{
-			int hash = hash(element);
-			int index = index(hash, length);
-			for (HashElement<E> e = hashElements[index]; e != null; e = e.next)
-			{
-				Object k;
-				if (e.hash == hash && ((k = e.element) == element || element != null && element.equals(k)))
-				{
-					e.element = element;
-					continue outer;
-				}
-			}
-
-			hashElements[index] = new HashElement<>(element, hash, hashElements[index]);
-			size++;
-		}
-
-		this.size = size;
-	}
-
-	private void loadDistinctElements(Iterable<? extends E> iterable)
-	{
-		final HashElement<E>[] hashElements = this.elements;
-		final int length = hashElements.length;
-		int size = 0;
-
-		// Assume unique elements
-		for (E element : iterable)
-		{
-			size++;
-			int hash = hash(element);
-			int index = index(hash, length);
-			hashElements[index] = new HashElement<>(element, hash, hashElements[index]);
-		}
-		this.size = size;
-	}
 
 	protected void flatten()
 	{
@@ -221,6 +178,29 @@ public abstract class AbstractHashSet<E> implements Set<E>
 		{
 			this.addInternal(element);
 		}
+	}
+
+	protected void addAllInternal(SizedIterable<? extends E> iterable)
+	{
+		this.ensureCapacity(this.size + iterable.size());
+		this.addAllInternal((Iterable<? extends E>) iterable);
+	}
+
+	private void loadDistinct(Iterable<? extends E> iterable)
+	{
+		final HashElement<E>[] hashElements = this.elements;
+		final int length = hashElements.length;
+		int size = 0;
+
+		// Assume unique elements
+		for (E element : iterable)
+		{
+			size++;
+			int hash = hash(element);
+			int index = index(hash, length);
+			hashElements[index] = new HashElement<>(element, hash, hashElements[index]);
+		}
+		this.size = size;
 	}
 
 	@Override

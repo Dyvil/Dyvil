@@ -1,14 +1,11 @@
 package dyvil.collection.mutable;
 
-import dyvil.collection.ImmutableMap;
-import dyvil.collection.Map;
-import dyvil.collection.MutableMap;
+import dyvil.collection.*;
 import dyvil.collection.impl.AbstractHashMap;
 import dyvil.collection.impl.AbstractIdentityHashMap;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.ColonConvertible;
 import dyvil.lang.literal.NilConvertible;
-import dyvil.tuple.Tuple2;
 
 import java.util.Arrays;
 import java.util.function.BiFunction;
@@ -29,18 +26,50 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		return new IdentityHashMap<>();
 	}
 
-	public static <K, V> IdentityHashMap<K, V> apply(K key, V value)
+	public static <K, V> IdentityHashMap<K, V> singleton(K key, V value)
 	{
-		final IdentityHashMap<K, V> result = new IdentityHashMap<>();
+		final IdentityHashMap<K, V> result = new IdentityHashMap<>(1);
 		result.putInternal(key, value);
 		return result;
 	}
-	
+
 	@SafeVarargs
-	public static <K, V> IdentityHashMap<K, V> apply(Tuple2<K, V>... entries)
+	public static <K, V> IdentityHashMap<K, V> apply(Entry<? extends K, ? extends V>... entries)
 	{
 		return new IdentityHashMap<>(entries);
 	}
+
+	public static <K, V> IdentityHashMap<K, V> from(Entry<? extends K, ? extends V>[] entries)
+	{
+		return new IdentityHashMap<>(entries);
+	}
+
+	public static <K, V> IdentityHashMap<K, V> from(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	{
+		return new IdentityHashMap<>(iterable);
+	}
+
+	public static <K, V> IdentityHashMap<K, V> from(SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	{
+		return new IdentityHashMap<>(iterable);
+	}
+
+	public static <K, V> IdentityHashMap<K, V> from(Set<? extends Entry<? extends K, ? extends V>> set)
+	{
+		return new IdentityHashMap<>(set);
+	}
+
+	public static <K, V> IdentityHashMap<K, V> from(Map<? extends K, ? extends V> map)
+	{
+		return new IdentityHashMap<>(map);
+	}
+
+	public static <K, V> IdentityHashMap<K, V> from(AbstractIdentityHashMap<? extends K, ? extends V> identityHashMap)
+	{
+		return new IdentityHashMap<>(identityHashMap);
+	}
+
+	// Constructors
 	
 	public IdentityHashMap()
 	{
@@ -68,29 +97,51 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		this.loadFactor = loadFactor;
 		this.threshold = (int) Math.min(capacity * loadFactor, AbstractHashMap.MAX_ARRAY_SIZE + 1);
 	}
-	
-	public IdentityHashMap(Map<K, V> map)
-	{
-		super(map);
-		this.loadFactor = DEFAULT_LOAD_FACTOR;
-		this.updateThreshold(this.table.length >> 1);
-	}
-	
-	public IdentityHashMap(AbstractIdentityHashMap<K, V> map)
-	{
-		super(map);
-		this.loadFactor = DEFAULT_LOAD_FACTOR;
-		this.updateThreshold(this.table.length >> 1);
-	}
-	
-	@SafeVarargs
-	public IdentityHashMap(Tuple2<K, V>... entries)
+
+	public IdentityHashMap(Entry<? extends K, ? extends V>[] entries)
 	{
 		super(entries);
+		this.defaultLoadFactor();
+	}
+
+	public IdentityHashMap(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	{
+		super(iterable);
+		this.defaultLoadFactor();
+	}
+
+	public IdentityHashMap(SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	{
+		super(iterable);
+		this.defaultLoadFactor();
+	}
+
+	public IdentityHashMap(Set<? extends Entry<? extends K, ? extends V>> set)
+	{
+		super(set);
+		this.defaultLoadFactor();
+	}
+
+	public IdentityHashMap(Map<? extends K, ? extends V> map)
+	{
+		super(map);
+		this.defaultLoadFactor();
+	}
+
+	public IdentityHashMap(AbstractIdentityHashMap<? extends K, ? extends V> identityHashMap)
+	{
+		super(identityHashMap);
+		this.defaultLoadFactor();
+	}
+
+	// Implementation Methods
+
+	private void defaultLoadFactor()
+	{
 		this.loadFactor = DEFAULT_LOAD_FACTOR;
 		this.updateThreshold(this.table.length >> 1);
 	}
-	
+
 	@Override
 	protected void updateThreshold(int newCapacity)
 	{
@@ -109,7 +160,13 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	{
 		return this.putInternal(key, value);
 	}
-	
+
+	@Override
+	public void putAll(Map<? extends K, ? extends V> map)
+	{
+		this.putAllInternal(map);
+	}
+
 	@Override
 	protected void addEntry(int index, Object key, V value)
 	{

@@ -174,7 +174,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	public ImmutableMap<K, V> union(Map<? extends K, ? extends V> map)
 	{
 		HashMap<K, V> copy = new HashMap<>(this);
-		copy.putInternal(map);
+		copy.putAllInternal(map);
 		return copy;
 	}
 	

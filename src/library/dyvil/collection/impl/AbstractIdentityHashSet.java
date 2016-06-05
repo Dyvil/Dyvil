@@ -1,9 +1,6 @@
 package dyvil.collection.impl;
 
-import dyvil.collection.Collection;
-import dyvil.collection.ImmutableSet;
-import dyvil.collection.MutableSet;
-import dyvil.collection.Set;
+import dyvil.collection.*;
 import dyvil.math.MathUtils;
 import dyvil.util.ImmutableException;
 
@@ -51,24 +48,19 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 	public AbstractIdentityHashSet(Iterable<? extends E> iterable)
 	{
 		this();
-		for (E element : iterable)
-		{
-			this.addInternal(element);
-		}
+		this.addAllInternal(iterable);
+	}
+
+	public AbstractIdentityHashSet(SizedIterable<? extends E> iterable)
+	{
+		this(iterable.size());
+		this.addAllInternal(iterable);
 	}
 
 	public AbstractIdentityHashSet(Set<? extends E> set)
 	{
-		this((Collection<? extends E>) set);
-	}
-
-	public AbstractIdentityHashSet(Collection<? extends E> collection)
-	{
-		this(collection.size());
-		for (E element : collection)
-		{
-			this.addInternal(element);
-		}
+		this(set.size());
+		this.addAllInternal(set);
 	}
 
 	public AbstractIdentityHashSet(AbstractIdentityHashSet<? extends E> set)
@@ -160,6 +152,13 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 		if (++this.size >= this.table.length * AbstractIdentityHashMap.DEFAULT_LOAD_FACTOR)
 		{
 			this.flatten();
+		}
+	}
+
+	protected void addAllInternal(Iterable<? extends E> iterable)
+	{
+		for (E element : iterable) {
+			this.addInternal(element);
 		}
 	}
 

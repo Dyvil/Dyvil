@@ -1,10 +1,7 @@
 package dyvil.collection.immutable;
 
 import dyvil.annotation.Immutable;
-import dyvil.collection.Collection;
-import dyvil.collection.ImmutableSet;
-import dyvil.collection.MutableSet;
-import dyvil.collection.Set;
+import dyvil.collection.*;
 import dyvil.collection.impl.AbstractIdentityHashSet;
 import dyvil.lang.literal.ArrayConvertible;
 
@@ -64,7 +61,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 		return new IdentityHashSet<>(iterable);
 	}
 
-	public static <E> IdentityHashSet<E> from(Collection<? extends E> iterable)
+	public static <E> IdentityHashSet<E> from(SizedIterable<? extends E> iterable)
 	{
 		return new IdentityHashSet<>(iterable);
 	}
@@ -111,9 +108,9 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 		super(iterable);
 	}
 
-	public IdentityHashSet(Collection<? extends E> collection)
+	public IdentityHashSet(SizedIterable<? extends E> iterable)
 	{
-		super(collection);
+		super(iterable);
 	}
 
 	public IdentityHashSet(Set<? extends E> set)

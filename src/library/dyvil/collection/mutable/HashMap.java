@@ -200,7 +200,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements MutableMap<K
 	@Override
 	public void putAll(Map<? extends K, ? extends V> map)
 	{
-		this.putInternal(map);
+		this.putAllInternal(map);
 	}
 
 	@Override

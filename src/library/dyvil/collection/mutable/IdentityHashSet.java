@@ -1,9 +1,6 @@
 package dyvil.collection.mutable;
 
-import dyvil.collection.Collection;
-import dyvil.collection.ImmutableSet;
-import dyvil.collection.MutableSet;
-import dyvil.collection.Set;
+import dyvil.collection.*;
 import dyvil.collection.impl.AbstractHashMap;
 import dyvil.collection.impl.AbstractIdentityHashSet;
 import dyvil.lang.literal.ArrayConvertible;
@@ -41,7 +38,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Mu
 		return new IdentityHashSet<>(iterable);
 	}
 
-	public static <E> IdentityHashSet<E> from(Collection<? extends E> iterable)
+	public static <E> IdentityHashSet<E> from(SizedIterable<? extends E> iterable)
 	{
 		return new IdentityHashSet<>(iterable);
 	}
@@ -97,9 +94,9 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Mu
 		this.defaultLoadFactor();
 	}
 
-	public IdentityHashSet(Collection<? extends E> collection)
+	public IdentityHashSet(SizedIterable<? extends E> iterable)
 	{
-		super(collection);
+		super(iterable);
 		this.defaultLoadFactor();
 	}
 

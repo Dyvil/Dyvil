@@ -183,34 +183,32 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	public AbstractHashMap(Entry<? extends K, ? extends V>[] entries)
 	{
 		this(entries.length);
-		this.loadEntries(ObjectArray.toIterable(entries));
+		this.putAllInternal(ObjectArray.toIterable(entries));
 	}
 
 	public AbstractHashMap(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
 	{
 		this();
-		for (Entry<? extends K, ? extends V> entry : iterable)
-		{
-			this.putInternal(entry.getKey(), entry.getValue());
-		}
+		this.putAllInternal(iterable);
 	}
 
 	public AbstractHashMap(SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
 	{
 		this(iterable.size());
-		this.loadEntries(iterable);
+		// Call the putAllInternal(Iterable) method to avoid redundant ensureCapacity call
+		this.putAllInternal((Iterable<? extends Entry<? extends K,? extends V>>) iterable);
 	}
 
 	public AbstractHashMap(Set<? extends Entry<? extends K, ? extends V>> set)
 	{
 		this(set.size());
-		this.loadDistinctEntries(set);
+		this.loadDistinct(set);
 	}
 
 	public AbstractHashMap(Map<? extends K, ? extends V> map)
 	{
 		this(map.size());
-		this.loadDistinctEntries(map);
+		this.loadDistinct(map);
 	}
 
 	public AbstractHashMap(AbstractHashMap<? extends K, ? extends V> map)
@@ -233,56 +231,6 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	}
 
 	// Implementation Methods
-
-	private void loadEntries(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
-	{
-		final HashEntry<K, V>[] hashTable = this.entries;
-		final int length = this.entries.length;
-		int size = 0;
-
-		outer:
-		for (Entry<? extends K, ? extends V> entry : iterable)
-		{
-			final K key = entry.getKey();
-			final V value = entry.getValue();
-			final int hash = hash(key);
-			final int i = index(hash, length);
-
-			for (HashEntry e = hashTable[i]; e != null; e = e.next)
-			{
-				final Object k;
-				if (e.hash == hash && ((k = e.key) == key || key != null && key.equals(k)))
-				{
-					// Key already exists
-					e.value = value;
-					continue outer;
-				}
-			}
-
-			hashTable[i] = new HashEntry<>(key, value, hash, hashTable[i]);
-			size++;
-		}
-
-		this.size = size;
-	}
-
-	private void loadDistinctEntries(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
-	{
-		final HashEntry<K, V>[] entries = this.entries;
-		final int length = this.entries.length;
-		int size = 0;
-
-		for (Entry<? extends K, ? extends V> entry : iterable)
-		{
-			final K key = entry.getKey();
-			final int hash = hash(key);
-			final int i = index(hash, length);
-
-			entries[i] = new HashEntry<>(key, entry.getValue(), hash, entries[i]);
-			size++;
-		}
-		this.size = size;
-	}
 
 	public static int hash(Object key)
 	{
@@ -351,16 +299,6 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	{
 	}
 
-	protected void putInternal(Map<? extends K, ? extends V> map)
-	{
-		this.ensureCapacity(this.size + map.size());
-
-		for (Entry<? extends K, ? extends V> entry : map)
-		{
-			this.putInternal(entry.getKey(), entry.getValue());
-		}
-	}
-
 	protected void putInternal(K key, V value)
 	{
 		int hash = hash(key);
@@ -379,6 +317,38 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	}
 
 	protected abstract void addEntry(int hash, K key, V value, int index);
+
+	private void putAllInternal(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	{
+		for (Entry<? extends K, ? extends V> entry : iterable)
+		{
+			this.putInternal(entry.getKey(), entry.getValue());
+		}
+	}
+
+	protected void putAllInternal(SizedIterable<? extends Entry<? extends K, ? extends V>> map)
+	{
+		this.ensureCapacity(this.size + map.size());
+		this.putAllInternal((Iterable<? extends Entry<? extends K,? extends V>>) map);
+	}
+
+	private void loadDistinct(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	{
+		final HashEntry<K, V>[] entries = this.entries;
+		final int length = this.entries.length;
+		int size = 0;
+
+		for (Entry<? extends K, ? extends V> entry : iterable)
+		{
+			final K key = entry.getKey();
+			final int hash = hash(key);
+			final int i = index(hash, length);
+
+			entries[i] = new HashEntry<>(key, entry.getValue(), hash, entries[i]);
+			size++;
+		}
+		this.size = size;
+	}
 
 	protected void removeEntry(HashEntry<K, V> entry)
 	{

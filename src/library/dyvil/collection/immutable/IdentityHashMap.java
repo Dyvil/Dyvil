@@ -12,7 +12,7 @@ import java.util.function.BiPredicate;
 
 @NilConvertible
 @ArrayConvertible
-@ColonConvertible
+@ColonConvertible(methodName = "singleton")
 @Immutable
 public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> implements ImmutableMap<K, V>
 {
@@ -52,7 +52,9 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 
 	private static final long serialVersionUID = 7106880090218416170L;
 
-	public static <K, V> IdentityHashMap<K, V> apply(K key, V value)
+	// Factory Methods
+
+	public static <K, V> IdentityHashMap<K, V> singleton(K key, V value)
 	{
 		final IdentityHashMap<K, V> result = new IdentityHashMap<>(1);
 		result.putInternal(key, value);
@@ -60,9 +62,39 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	}
 
 	@SafeVarargs
-	public static <K, V> IdentityHashMap<K, V> apply(Entry<K, V>... entries)
+	public static <K, V> IdentityHashMap<K, V> apply(Entry<? extends K, ? extends V>... entries)
 	{
 		return new IdentityHashMap<>(entries);
+	}
+
+	public static <K, V> IdentityHashMap<K, V> from(Entry<? extends K, ? extends V>[] entries)
+	{
+		return new IdentityHashMap<>(entries);
+	}
+
+	public static <K, V> IdentityHashMap<K, V> from(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	{
+		return new IdentityHashMap<>(iterable);
+	}
+
+	public static <K, V> IdentityHashMap<K, V> from(SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	{
+		return new IdentityHashMap<>(iterable);
+	}
+
+	public static <K, V> IdentityHashMap<K, V> from(Set<? extends Entry<? extends K, ? extends V>> set)
+	{
+		return new IdentityHashMap<>(set);
+	}
+
+	public static <K, V> IdentityHashMap<K, V> from(Map<? extends K, ? extends V> map)
+	{
+		return new IdentityHashMap<>(map);
+	}
+
+	public static <K, V> IdentityHashMap<K, V> from(AbstractIdentityHashMap<? extends K, ? extends V> identityHashMap)
+	{
+		return new IdentityHashMap<>(identityHashMap);
 	}
 
 	public static <K, V> Builder<K, V> builder()
@@ -75,32 +107,50 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		return new Builder<>(capacity);
 	}
 
+	// Constructors
+
 	protected IdentityHashMap()
 	{
-		super(AbstractIdentityHashMap.DEFAULT_CAPACITY);
+		super();
 	}
 
 	protected IdentityHashMap(int capacity)
 	{
 		super(capacity);
 	}
-	
-	public IdentityHashMap(Map<K, V> map)
-	{
-		super(map);
-	}
-	
-	public IdentityHashMap(AbstractIdentityHashMap<K, V> map)
-	{
-		super(map);
-	}
-	
-	@SafeVarargs
-	public IdentityHashMap(Entry<K, V>... entries)
+
+	public IdentityHashMap(Entry<? extends K, ? extends V>[] entries)
 	{
 		super(entries);
 	}
-	
+
+	public IdentityHashMap(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	{
+		super(iterable);
+	}
+
+	public IdentityHashMap(SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	{
+		super(iterable);
+	}
+
+	public IdentityHashMap(Set<? extends Entry<? extends K, ? extends V>> set)
+	{
+		super(set);
+	}
+
+	public IdentityHashMap(Map<? extends K, ? extends V> map)
+	{
+		super(map);
+	}
+
+	public IdentityHashMap(AbstractIdentityHashMap<? extends K, ? extends V> identityHashMap)
+	{
+		super(identityHashMap);
+	}
+
+	// Implementation Methods
+
 	@Override
 	public ImmutableMap<K, V> withEntry(K key, V value)
 	{
@@ -113,9 +163,8 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	@Override
 	public ImmutableMap<K, V> union(Map<? extends K, ? extends V> map)
 	{
-		IdentityHashMap<K, V> copy = new IdentityHashMap<>(this);
-		copy.ensureCapacity(this.size + map.size());
-		copy.putInternal(map);
+		final IdentityHashMap<K, V> copy = new IdentityHashMap<>(this);
+		copy.putAllInternal(map);
 		return copy;
 	}
 	
