@@ -15,21 +15,6 @@ public class MemberSorter
 
 	public static int compareNames(Name name1, Name name2)
 	{
-		if (Util.startsWithSymbol(name1))
-		{
-			if (!Util.startsWithSymbol(name2))
-			{
-				return -1;
-			}
-		}
-		else if (Util.startsWithSymbol(name2))
-		{
-			if (!Util.startsWithSymbol(name1))
-			{
-				return 1;
-			}
-		}
-
 		return name1.qualified.compareToIgnoreCase(name2.qualified);
 	}
 
