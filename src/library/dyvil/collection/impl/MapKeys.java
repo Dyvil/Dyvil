@@ -51,7 +51,8 @@ public class MapKeys<K> implements Queryable<K>
 	@Override
 	public <R> Queryable<R> mapped(Function<? super K, ? extends R> mapper)
 	{
-		return this.entries.keyMapped(mapper).keys();
+		final Map<R, ?> entries = this.entries.keyMapped(mapper);
+		return entries.keys();
 	}
 
 	@Override
