@@ -21,15 +21,15 @@ public class StringInterpolation extends DPFValueVisitor implements Value, Strin
 		this.values = new ArrayList<Value>
 	}
 
-	public init(String... stringParts, Value... values)
+	public init([String] stringParts, [Value] values)
 	{
-		this.strings = new ArrayList(stringParts...)
-		this.values = new ArrayList(values...)
+		this.strings = new ArrayList(stringParts)
+		this.values = new ArrayList(values)
 	}
 
-	public init(String... stringParts, Object... values)
+	public init([String] stringParts, [Object] values)
 	{
-		this.strings = new ArrayList(stringParts...)
+		this.strings = new ArrayList(stringParts)
 		this.values = new ArrayList<Value>(values.length)
 
 		for (Object o <- values)
