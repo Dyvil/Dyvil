@@ -2,7 +2,6 @@ package dyvil.collection.mutable;
 
 import dyvil.collection.Entry;
 import dyvil.collection.ImmutableMap;
-import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractTreeMap;
 import dyvil.lang.literal.ArrayConvertible;
@@ -15,69 +14,103 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 @NilConvertible
-@ColonConvertible
+@ColonConvertible(methodName = "singleton")
 @ArrayConvertible
 public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K, V>
 {
 	private static final long serialVersionUID = -7707452456610472904L;
-	
-	public static <K, V> TreeMap<K, V> apply()
-	{
-		return new TreeMap<>();
-	}
 
-	public static <K extends Comparable<K>, V> TreeMap<K, V> apply(K key, V value)
+	// Factory Methods
+
+	public static <K, V> TreeMap<K, V> singleton(K key, V value)
 	{
 		final TreeMap<K, V> result = new TreeMap<>();
 		result.putInternal(key, value);
 		return result;
 	}
-	
+
+	public static <K, V> TreeMap<K, V> apply()
+	{
+		return new TreeMap<>();
+	}
+
 	@SafeVarargs
-	public static <K extends Comparable<K>, V> TreeMap<K, V> apply(Entry<K, V>... entries)
+	public static <K extends Comparable<K>, V> TreeMap<K, V> apply(Entry<? extends K, ? extends V>... entries)
 	{
 		return new TreeMap<>(entries);
 	}
-	
+
+	public static <K extends Comparable<K>, V> TreeMap<K, V> from(Entry<? extends K, ? extends V>[] array)
+	{
+		return new TreeMap<>(array);
+	}
+
+	public static <K extends Comparable<K>, V> TreeMap<K, V> from(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	{
+		return new TreeMap<>(iterable);
+	}
+
+	public static <K extends Comparable<K>, V> TreeMap<K, V> from(AbstractTreeMap<? extends K, ? extends V> treeMap)
+	{
+		return new TreeMap<>(treeMap);
+	}
+
+	// Constructors
+
 	public TreeMap()
 	{
-		super();
 	}
-	
+
 	public TreeMap(Comparator<? super K> comparator)
 	{
 		super(comparator);
 	}
-	
-	public TreeMap(Map<? extends K, ? extends V> m)
-	{
-		super(m, null);
-	}
-	
-	public TreeMap(Map<? extends K, ? extends V> m, Comparator<? super K> comparator)
-	{
-		super(m, comparator);
-	}
 
-	@SafeVarargs
-	public TreeMap(Entry<? extends K, ? extends V>... entries)
+	public TreeMap(Entry<? extends K, ? extends V>[] entries)
 	{
 		super(entries);
 	}
-	
+
+	public TreeMap(Entry<? extends K, ? extends V>[] entries, Comparator<? super K> comparator)
+	{
+		super(entries, comparator);
+	}
+
+	public TreeMap(Iterable<? extends Entry<? extends K, ? extends V>> map)
+	{
+		super(map);
+	}
+
+	public TreeMap(Iterable<? extends Entry<? extends K, ? extends V>> map, Comparator<? super K> comparator)
+	{
+		super(map, comparator);
+	}
+
+	public TreeMap(AbstractTreeMap<? extends K, ? extends V> treeMap)
+	{
+		super(treeMap);
+	}
+
+	public TreeMap(AbstractTreeMap<? extends K, ? extends V> treeMap, Comparator<? super K> comparator)
+	{
+		super(treeMap, comparator);
+	}
+
+	// Implementation Methods
+
 	@Override
 	public void clear()
 	{
 		this.size = 0;
 		this.root = null;
 	}
-	
+
 	@Override
 	public V put(K key, V value)
 	{
 		return this.putInternal(key, value);
 	}
-	
+
 	@Override
 	public V putIfAbsent(K key, V value)
 	{
@@ -86,11 +119,11 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 		{
 			return entry.value;
 		}
-		
+
 		this.putInternal(key, value);
 		return value;
 	}
-	
+
 	@Override
 	public boolean replace(K key, V oldValue, V newValue)
 	{
@@ -102,7 +135,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 		}
 		return false;
 	}
-	
+
 	@Override
 	public V replace(K key, V value)
 	{
@@ -115,7 +148,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 		}
 		return null;
 	}
-	
+
 	@Override
 	public V removeKey(Object key)
 	{
@@ -124,12 +157,12 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 		{
 			return null;
 		}
-		
+
 		V value = entry.value;
 		this.deleteEntry(entry);
 		return value;
 	}
-	
+
 	@Override
 	public boolean removeValue(Object value)
 	{
@@ -143,7 +176,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 		}
 		return false;
 	}
-	
+
 	@Override
 	public boolean remove(Object key, Object value)
 	{
@@ -152,11 +185,11 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 		{
 			return false;
 		}
-		
+
 		this.deleteEntry(entry);
 		return true;
 	}
-	
+
 	@Override
 	public void mapValues(BiFunction<? super K, ? super V, ? extends V> function)
 	{
@@ -165,7 +198,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 			e.value = function.apply(e.key, e.value);
 		}
 	}
-	
+
 	@Override
 	public void filter(BiPredicate<? super K, ? super V> condition)
 	{
@@ -180,13 +213,13 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 			e = next;
 		}
 	}
-	
+
 	@Override
 	public MutableMap<K, V> copy()
 	{
 		return this.mutableCopy();
 	}
-	
+
 	@Override
 	public ImmutableMap<K, V> immutable()
 	{

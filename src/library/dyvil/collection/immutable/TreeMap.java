@@ -15,7 +15,7 @@ import java.util.function.BiPredicate;
 
 @NilConvertible
 @ArrayConvertible
-@ColonConvertible
+@ColonConvertible(methodName = "singleton")
 @Immutable
 public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap<K, V>
 {
@@ -54,7 +54,9 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 
 	private static final long serialVersionUID = 2012245218476747334L;
 
-	public static <K, V> TreeMap<K, V> apply(K key, V value)
+	// Factory Methods
+
+	public static <K, V> TreeMap<K, V> singleton(K key, V value)
 	{
 		final TreeMap<K, V> result = new TreeMap<>();
 		result.putInternal(key, value);
@@ -62,9 +64,24 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 	}
 
 	@SafeVarargs
-	public static <K extends Comparable<K>, V> TreeMap<K, V> apply(Entry<K, V>... entries)
+	public static <K extends Comparable<K>, V> TreeMap<K, V> apply(Entry<? extends K, ? extends V>... entries)
 	{
 		return new TreeMap<>(entries);
+	}
+
+	public static <K extends Comparable<K>, V> TreeMap<K, V> from(Entry<? extends K, ? extends V>[] array)
+	{
+		return new TreeMap<>(array);
+	}
+
+	public static <K extends Comparable<K>, V> TreeMap<K, V> from(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	{
+		return new TreeMap<>(iterable);
+	}
+
+	public static <K extends Comparable<K>, V> TreeMap<K, V> from(AbstractTreeMap<? extends K, ? extends V> treeMap)
+	{
+		return new TreeMap<>(treeMap);
 	}
 
 	public static <K, V> Builder<K, V> builder()
@@ -77,30 +94,49 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 		return new Builder<>(comparator);
 	}
 
+	// Constructors
+
 	protected TreeMap()
 	{
+		super();
 	}
-	
+
 	public TreeMap(Comparator<? super K> comparator)
 	{
 		super(comparator);
 	}
-	
-	public TreeMap(Map<? extends K, ? extends V> map)
+
+	public TreeMap(Entry<? extends K, ? extends V>[] entries)
 	{
-		super(map, null);
+		super(entries);
 	}
-	
-	public TreeMap(Map<? extends K, ? extends V> map, Comparator<? super K> comparator)
+
+	public TreeMap(Entry<? extends K, ? extends V>[] entries, Comparator<? super K> comparator)
+	{
+		super(entries, comparator);
+	}
+
+	public TreeMap(Iterable<? extends Entry<? extends K, ? extends V>> map)
+	{
+		super(map);
+	}
+
+	public TreeMap(Iterable<? extends Entry<? extends K, ? extends V>> map, Comparator<? super K> comparator)
 	{
 		super(map, comparator);
 	}
 
-	@SafeVarargs
-	public TreeMap(Entry<? extends K, ? extends V>... entries)
+	public TreeMap(AbstractTreeMap<? extends K, ? extends V> treeMap)
 	{
-		super(entries);
+		super(treeMap);
 	}
+
+	public TreeMap(AbstractTreeMap<? extends K, ? extends V> treeMap, Comparator<? super K> comparator)
+	{
+		super(treeMap, comparator);
+	}
+
+	// Implementation Methods
 	
 	@Override
 	public ImmutableMap<K, V> withEntry(K key, V value)
