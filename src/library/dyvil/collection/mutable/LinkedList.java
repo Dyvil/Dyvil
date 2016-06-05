@@ -711,7 +711,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	@Override
 	public ImmutableList<E> immutable()
 	{
-		return AppendList.apply(this);
+		return AppendList.from(this);
 	}
 
 	@Override

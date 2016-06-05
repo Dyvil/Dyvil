@@ -44,7 +44,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 		}
 
 		@Override
-		public ImmutableMap<K, V> build()
+		public TreeMap<K, V> build()
 		{
 			TreeMap<K, V> map = this.map;
 			this.map = null;

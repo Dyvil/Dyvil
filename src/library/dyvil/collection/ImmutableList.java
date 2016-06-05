@@ -95,7 +95,7 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	@SafeVarargs
 	static <E> ImmutableList<E> linked(E... elements)
 	{
-		return AppendList.from(elements);
+		return AppendList.apply(elements);
 	}
 	
 	static <E> Builder<E> builder()

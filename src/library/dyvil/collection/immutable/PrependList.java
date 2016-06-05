@@ -28,11 +28,6 @@ public class PrependList<E> implements ImmutableList<E>
 	{
 		return new PrependList<>(head);
 	}
-
-	public static <E> PrependList<E> apply(E head, ImmutableList<E> tail)
-	{
-		return new PrependList<>(head, tail);
-	}
 	
 	public PrependList(E element)
 	{

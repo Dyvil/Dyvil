@@ -1,7 +1,6 @@
 package dyvil.collection.immutable;
 
 import dyvil.annotation.Immutable;
-import dyvil.collection.ImmutableMap;
 import dyvil.collection.ImmutableSet;
 import dyvil.lang.literal.ArrayConvertible;
 
@@ -40,6 +39,8 @@ public class TreeSet<E> extends MapBasedSet<E>
 
 	private static final long serialVersionUID = -6636571715777235576L;
 
+	// Factory Methods
+
 	public static <E> TreeSet<E> apply()
 	{
 		return new TreeSet<>();
@@ -49,6 +50,14 @@ public class TreeSet<E> extends MapBasedSet<E>
 	public static <E> TreeSet<E> apply(E... elements)
 	{
 		return new TreeSet<>(elements);
+	}
+
+	public static <E> TreeSet<E> from(E[] array) { return new TreeSet<>(array);
+	}
+
+	public static <E> TreeSet<E> from(Iterable<? extends E> iterable)
+	{
+		return new TreeSet<>(buildMap(iterable));
 	}
 
 	public static <E> Builder<E> builder()
@@ -61,7 +70,9 @@ public class TreeSet<E> extends MapBasedSet<E>
 		return new Builder<>(comparator);
 	}
 
-	public TreeSet()
+	// Constructors
+
+	private TreeSet()
 	{
 		super(new TreeMap<>());
 	}
@@ -70,28 +81,41 @@ public class TreeSet<E> extends MapBasedSet<E>
 	{
 		super(new TreeMap<>(comparator));
 	}
-	
-	@SafeVarargs
-	public TreeSet(E... elements)
+
+	public TreeSet(E[] elements)
 	{
 		super(buildMap(elements));
 	}
+
+	public TreeSet(Iterable<? extends E> iterable)
+	{
+		super(buildMap(iterable));
+	}
+
+	// Implementation Methods
 	
-	protected TreeSet(ImmutableMap<E, Boolean> map)
+	protected TreeSet(TreeMap<E, Boolean> map)
 	{
 		super(map);
 	}
-	
-	@SafeVarargs
-	private static <E> ImmutableMap<E, Boolean> buildMap(E... elements)
+
+	private static <E> TreeMap<E, Boolean> buildMap(E[] array)
 	{
-		TreeMap.Builder<E, Boolean> builder = new TreeMap.Builder<>();
-		
-		for (E element : elements)
+		final TreeMap.Builder<E, Boolean> builder = new TreeMap.Builder<>();
+		for (E element : array)
 		{
 			builder.put(element, true);
 		}
-		
+		return builder.build();
+	}
+
+	private static <E> TreeMap<E, Boolean> buildMap(Iterable<? extends E> iterable)
+	{
+		final TreeMap.Builder<E, Boolean> builder = new TreeMap.Builder<>();
+		for (E element : iterable)
+		{
+			builder.put(element, true);
+		}
 		return builder.build();
 	}
 }
