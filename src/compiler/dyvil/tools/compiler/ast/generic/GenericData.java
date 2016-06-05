@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.generic;
 
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -196,6 +197,46 @@ public final class GenericData implements ITypeList, ITypeContext
 		}
 
 		this.lockedCount = this.genericCount;
+	}
+
+	public void resolve(MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			this.generics[i].resolve(markers, context);
+		}
+	}
+
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			this.generics[i].checkType(markers, context, IType.TypePosition.GENERIC_ARGUMENT);
+		}
+	}
+
+	public void check(MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			this.generics[i].check(markers, context);
+		}
+	}
+
+	public void foldConstants()
+	{
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			this.generics[i].foldConstants();
+		}
+	}
+
+	public void cleanup(IContext context, IClassCompilableList compilableList)
+	{
+		for (int i = 0; i < this.genericCount; i++)
+		{
+			this.generics[i].cleanup(context, compilableList);
+		}
 	}
 
 	@Override

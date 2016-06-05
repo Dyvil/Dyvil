@@ -1,9 +1,6 @@
 package dyvil.collection.mutable;
 
-import dyvil.collection.Entry;
-import dyvil.collection.ImmutableMap;
-import dyvil.collection.Map;
-import dyvil.collection.MutableMap;
+import dyvil.collection.*;
 import dyvil.collection.impl.AbstractTupleMap;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.ColonConvertible;
@@ -15,86 +12,137 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 @NilConvertible
-@ColonConvertible
+@ColonConvertible(methodName = "singleton")
 @ArrayConvertible
 public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements MutableMap<K, V>
 {
 	private static final long serialVersionUID = 5771226814337471265L;
-	
-	public static <K, V> TupleMap<K, V> apply()
+
+	// Factory Methods
+
+	public static <K, V> TupleMap<K, V> singleton(K key, V value)
 	{
-		return new TupleMap<>(DEFAULT_CAPACITY);
+		final TupleMap<K, V> result = new TupleMap<>();
+		result.putInternal(new Tuple2<>(key, value));
+		return result;
 	}
 
-	public static <K, V> TupleMap<K, V> apply(K key, V value)
+	public static <K, V> TupleMap<K, V> apply()
 	{
-		return new TupleMap<>(new Tuple2<>(key, value));
+		return new TupleMap<>();
 	}
 
 	@SafeVarargs
-	public static <K, V> TupleMap<K, V> apply(Entry<K, V>... entries)
+	public static <K, V> TupleMap<K, V> apply(Entry<? extends K, ? extends V>... entries)
 	{
 		return new TupleMap<>(entries);
 	}
 
 	@SafeVarargs
-	public static <K, V> TupleMap<K, V> apply(Tuple2<K, V>... entries)
+	public static <K, V> TupleMap<K, V> apply(Tuple2<? extends K, ? extends V>... entries)
 	{
 		return new TupleMap<>(entries, true);
 	}
-	
-	public static <K, V> AbstractTupleMap<K, V> fromArray(Tuple2<K, V>[] entries)
+
+	public static <K, V> TupleMap<K, V> from(Entry<? extends K, ? extends V>[] array)
 	{
-		return new TupleMap<>(entries);
+		return new TupleMap<>(array);
 	}
-	
+
+	public static <K, V> TupleMap<K, V> from(Tuple2<? extends K, ? extends V>[] array)
+	{
+		return new TupleMap<>(array);
+	}
+
+	public static <K, V> TupleMap<K, V> from(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	{
+		return new TupleMap<>(iterable);
+	}
+
+	public static <K, V> TupleMap<K, V> from(SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	{
+		return new TupleMap<>(iterable);
+	}
+
+	public static <K, V> TupleMap<K, V> from(Set<? extends Entry<? extends K, ? extends V>> set)
+	{
+		return new TupleMap<>(set);
+	}
+
+	public static <K, V> TupleMap<K, V> from(Map<? extends K, ? extends V> map)
+	{
+		return new TupleMap<>(map);
+	}
+
+	public static <K, V> TupleMap<K, V> from(AbstractTupleMap<? extends K, ? extends V> tupleMap)
+	{
+		return new TupleMap<>(tupleMap);
+	}
+
+	// Constructors
+
 	public TupleMap()
 	{
-		super(DEFAULT_CAPACITY);
+		super();
 	}
-	
+
 	public TupleMap(int capacity)
 	{
 		super(capacity);
 	}
 
-	@SafeVarargs
-	public TupleMap(Entry<K, V>... entries)
+	public TupleMap(Entry<? extends K, ? extends V>[] entries)
 	{
 		super(entries);
 	}
 
-	@SafeVarargs
-	public TupleMap(Tuple2<K, V>... entries)
+	public TupleMap(Tuple2<? extends K, ? extends V>[] entries)
 	{
 		super(entries);
 	}
-	
-	public TupleMap(Tuple2<K, V>[] entries, int size)
+
+	public TupleMap(Tuple2<? extends K, ? extends V>[] entries, int size)
 	{
 		super(entries, size);
 	}
-	
-	public TupleMap(Tuple2<K, V>[] entries, boolean trusted)
+
+	public TupleMap(Tuple2<? extends K, ? extends V>[] entries, boolean trusted)
 	{
 		super(entries, trusted);
 	}
-	
-	public TupleMap(Tuple2<K, V>[] entries, int size, boolean trusted)
+
+	public TupleMap(Tuple2<? extends K, ? extends V>[] entries, int size, boolean trusted)
 	{
 		super(entries, size, trusted);
 	}
-	
-	public TupleMap(Map<K, V> map)
+
+	public TupleMap(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	{
+		super(iterable);
+	}
+
+	public TupleMap(SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	{
+		super(iterable);
+	}
+
+	public TupleMap(Set<? extends Entry<? extends K, ? extends V>> set)
+	{
+		super(set);
+	}
+
+	public TupleMap(Map<? extends K, ? extends V> map)
 	{
 		super(map);
 	}
-	
-	public TupleMap(AbstractTupleMap<K, V> map)
+
+	public TupleMap(AbstractTupleMap<? extends K, ? extends V> map)
 	{
 		super(map);
 	}
-	
+
+	// Implementation Methods
+
 	@Override
 	public void clear()
 	{
@@ -104,31 +152,31 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements MutableMap
 		}
 		this.size = 0;
 	}
-	
+
 	@Override
 	public V put(K key, V value)
 	{
 		return this.put(new Tuple2<>(key, value));
 	}
-	
+
 	@Override
 	public V put(Entry<? extends K, ? extends V> entry)
 	{
 		return this.putInternal((Tuple2<K, V>) entry.toTuple());
 	}
-	
+
 	@Override
 	public V putIfAbsent(K key, V value)
 	{
 		return this.putIfAbsent(new Tuple2<>(key, value));
 	}
-	
+
 	@Override
 	public V putIfAbsent(Entry<? extends K, ? extends V> entry)
 	{
 		return this.putIfAbsent((Tuple2<K, V>) entry.toTuple());
 	}
-	
+
 	private V putIfAbsent(Tuple2<K, V> tuple)
 	{
 		final K key = tuple._1;
@@ -140,23 +188,23 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements MutableMap
 				return entry._2;
 			}
 		}
-		
+
 		this.putNew(tuple);
 		return tuple._2;
 	}
-	
+
 	@Override
 	public V replace(K key, V newValue)
 	{
 		return this.replace(new Tuple2<>(key, newValue));
 	}
-	
+
 	@Override
 	public V replace(Entry<? extends K, ? extends V> entry)
 	{
 		return this.replace((Tuple2<K, V>) entry.toTuple());
 	}
-	
+
 	private V replace(Tuple2<K, V> tuple)
 	{
 		K key = tuple._1;
@@ -172,7 +220,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements MutableMap
 		}
 		return null;
 	}
-	
+
 	@Override
 	public boolean replace(K key, V oldValue, V newValue)
 	{
@@ -185,14 +233,14 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements MutableMap
 				{
 					return false;
 				}
-				
+
 				this.entries[i] = new Tuple2<>(key, newValue);
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	@Override
 	protected void removeAt(int index)
 	{
@@ -203,7 +251,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements MutableMap
 		}
 		this.entries[this.size] = null;
 	}
-	
+
 	@Override
 	public V removeKey(Object key)
 	{
@@ -219,7 +267,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements MutableMap
 		}
 		return null;
 	}
-	
+
 	@Override
 	public boolean removeValue(Object value)
 	{
@@ -233,7 +281,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements MutableMap
 		}
 		return false;
 	}
-	
+
 	@Override
 	public boolean remove(Object key, Object value)
 	{
@@ -252,7 +300,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements MutableMap
 		}
 		return false;
 	}
-	
+
 	@Override
 	public void mapValues(BiFunction<? super K, ? super V, ? extends V> mapper)
 	{
@@ -263,7 +311,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements MutableMap
 			this.entries[i] = new Tuple2<>(key, mapper.apply(key, entry._2));
 		}
 	}
-	
+
 	@Override
 	public void filter(BiPredicate<? super K, ? super V> condition)
 	{
@@ -276,13 +324,13 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements MutableMap
 			}
 		}
 	}
-	
+
 	@Override
 	public MutableMap<K, V> copy()
 	{
 		return this.mutableCopy();
 	}
-	
+
 	@Override
 	public ImmutableMap<K, V> immutable()
 	{

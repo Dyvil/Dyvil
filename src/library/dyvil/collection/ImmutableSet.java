@@ -33,20 +33,30 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 	
 	static <E> ImmutableSet<E> apply(E element)
 	{
-		return new SingletonSet<>(element);
+		return SingletonSet.apply(element);
 	}
 	
 	@SafeVarargs
 	static <E> ImmutableSet<E> apply(E... elements)
 	{
-		return new ArraySet<>(elements, true);
+		return ArraySet.apply(elements);
 	}
 	
-	static <E> ImmutableSet<E> fromArray(E[] elements)
+	static <E> ImmutableSet<E> from(E[] array)
 	{
-		return new ArraySet<>(elements);
+		return ArraySet.from(array);
 	}
-	
+
+	static <E> ImmutableSet<E> from(Iterable<? extends E> iterable)
+	{
+		return ArraySet.from(iterable);
+	}
+
+	static <E> ImmutableSet<E> from(Collection<? extends E> collection)
+	{
+		return ArraySet.from(collection);
+	}
+
 	static <E> Builder<E> builder()
 	{
 		return new ArraySet.Builder<>();

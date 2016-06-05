@@ -143,7 +143,7 @@ public final class EmptyList<E> implements ImmutableList<E>
 	@Override
 	public ImmutableList<? extends E> union(Collection<? extends E> collection)
 	{
-		return new ArrayList<>(collection);
+		return ImmutableList.from(collection);
 	}
 	
 	@Override

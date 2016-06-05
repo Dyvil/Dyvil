@@ -50,16 +50,16 @@ public interface Value extends IASTNode
 
 	static ListValue apply(Value... elements) = new ListValue(elements)
 
-	static MapValue apply([Value] keys, [Value] values) = new MapValue(new ArrayMap(keys, values))
+	static MapValue apply(Value... keys, Value... values) = new MapValue(new ArrayMap(keys, values))
 
 	static StringInterpolation apply(String base, Value... values)
 	{
-		return new StringInterpolation(base.split(@"\\\d+")..., values...)
+		return new StringInterpolation(base.split(@"\\\d+"), values)
 	}
 
 	static StringInterpolation apply(String base, Object... values)
 	{
-		return new StringInterpolation(base.split(@"\\\d+")..., values...)
+		return new StringInterpolation(base.split(@"\\\d+"), values)
 	}
 
 	// Override Methods

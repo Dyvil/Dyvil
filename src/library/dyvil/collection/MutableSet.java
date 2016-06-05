@@ -27,12 +27,22 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	@SafeVarargs
 	static <E> MutableSet<E> apply(E... elements)
 	{
-		return new ArraySet<>(elements, true);
+		return ArraySet.apply(elements);
 	}
 
-	static <E> MutableSet<E> fromArray(E[] elements)
+	static <E> MutableSet<E> from(E[] array)
 	{
-		return new ArraySet<>(elements);
+		return ArraySet.from(array);
+	}
+
+	static <E> MutableSet<E> from(Iterable<? extends E> iterable)
+	{
+		return ArraySet.from(iterable);
+	}
+
+	static <E> MutableSet<E> from(Collection<? extends E> collection)
+	{
+		return ArraySet.from(collection);
 	}
 	
 	// Accessors

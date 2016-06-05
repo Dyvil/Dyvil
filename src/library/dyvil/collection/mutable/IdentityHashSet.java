@@ -1,8 +1,6 @@
 package dyvil.collection.mutable;
 
-import dyvil.collection.Collection;
-import dyvil.collection.ImmutableSet;
-import dyvil.collection.MutableSet;
+import dyvil.collection.*;
 import dyvil.collection.impl.AbstractHashMap;
 import dyvil.collection.impl.AbstractIdentityHashSet;
 import dyvil.lang.literal.ArrayConvertible;
@@ -21,6 +19,8 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Mu
 	
 	private           float loadFactor;
 	private transient int   threshold;
+
+	// Factory Methods
 	
 	public static <E> IdentityHashSet<E> apply()
 	{
@@ -32,6 +32,28 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Mu
 	{
 		return new IdentityHashSet<>(elements);
 	}
+
+	public static <E> IdentityHashSet<E> from(Iterable<? extends E> iterable)
+	{
+		return new IdentityHashSet<>(iterable);
+	}
+
+	public static <E> IdentityHashSet<E> from(SizedIterable<? extends E> iterable)
+	{
+		return new IdentityHashSet<>(iterable);
+	}
+
+	public static <E> IdentityHashSet<E> from(Set<? extends E> iterable)
+	{
+		return new IdentityHashSet<>(iterable);
+	}
+
+	public static <E> IdentityHashSet<E> from(AbstractIdentityHashSet<? extends E> iterable)
+	{
+		return new IdentityHashSet<>(iterable);
+	}
+
+	// Constructors
 	
 	public IdentityHashSet()
 	{
@@ -59,28 +81,44 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Mu
 		this.loadFactor = loadFactor;
 		this.threshold = (int) Math.min(capacity * loadFactor, AbstractHashMap.MAX_ARRAY_SIZE + 1);
 	}
-	
-	public IdentityHashSet(Collection<E> collection)
-	{
-		super(collection);
-		this.loadFactor = DEFAULT_LOAD_FACTOR;
-		this.updateThreshold(this.table.length);
-	}
-	
-	public IdentityHashSet(AbstractIdentityHashSet<E> set)
-	{
-		super(set);
-		this.loadFactor = DEFAULT_LOAD_FACTOR;
-		this.updateThreshold(this.table.length);
-	}
-	
-	@SafeVarargs
-	public IdentityHashSet(E... elements)
+
+	public IdentityHashSet(E[] elements)
 	{
 		super(elements);
+		this.defaultLoadFactor();
+	}
+
+	public IdentityHashSet(Iterable<? extends E> iterable)
+	{
+		super(iterable);
+		this.defaultLoadFactor();
+	}
+
+	public IdentityHashSet(SizedIterable<? extends E> iterable)
+	{
+		super(iterable);
+		this.defaultLoadFactor();
+	}
+
+	public IdentityHashSet(Set<? extends E> set)
+	{
+		super(set);
+		this.defaultLoadFactor();
+	}
+
+	public IdentityHashSet(AbstractIdentityHashSet<? extends E> identityHashSet)
+	{
+		super(identityHashSet);
+		this.defaultLoadFactor();
+	}
+
+	private void defaultLoadFactor()
+	{
 		this.loadFactor = DEFAULT_LOAD_FACTOR;
 		this.updateThreshold(this.table.length);
 	}
+
+	// Implementation Methods
 	
 	@Override
 	protected void updateThreshold(int newCapacity)

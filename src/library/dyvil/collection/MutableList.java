@@ -19,35 +19,45 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 		return new ArrayList<>();
 	}
 
-	static <RE> MutableList<RE> withCapacity(int capacity)
+	static <E> MutableList<E> withCapacity(int capacity)
 	{
 		return new ArrayList<>(capacity);
 	}
 	
 	static <E> MutableList<E> apply(E element)
 	{
-		return new ArrayList<>((E[]) new Object[] { element }, 1, true);
+		return ArrayList.apply(element);
 	}
 	
 	static <E> MutableList<E> apply(E e1, E e2)
 	{
-		return new ArrayList<>((E[]) new Object[] { e1, e2 }, 2, true);
+		return ArrayList.apply(e1, e2);
 	}
 	
 	static <E> MutableList<E> apply(E e1, E e2, E e3)
 	{
-		return new ArrayList<>((E[]) new Object[] { e1, e2, e3 }, 3, true);
+		return ArrayList.apply(e1, e2, e3);
 	}
 	
 	@SafeVarargs
 	static <E> MutableList<E> apply(E... elements)
 	{
-		return new ArrayList<>(elements);
+		return ArrayList.apply(elements);
 	}
 	
-	static <E> MutableList<E> fromArray(E[] elements)
+	static <E> MutableList<E> from(E[] array)
 	{
-		return new ArrayList<>(elements, true);
+		return ArrayList.from(array);
+	}
+
+	static <E> MutableList<E> from(Iterable<? extends E> iterable)
+	{
+		return ArrayList.from(iterable);
+	}
+
+	static <E> MutableList<E> from(Collection<? extends E> collection)
+	{
+		return ArrayList.from(collection);
 	}
 	
 	// Accessors

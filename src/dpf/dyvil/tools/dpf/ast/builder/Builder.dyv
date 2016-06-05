@@ -26,7 +26,7 @@ public class Builder implements Value, BuilderVisitor, Expandable
 
 	public static Builder apply(Name name, Parameter... parameters)
 	{
-		return new Builder(name, new ArrayList(parameters...))
+		return new Builder(name, ArrayList(parameters...))
 	}
 
 	public static Builder apply(Name name, List<Parameter> parameters, Node node = null)

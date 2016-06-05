@@ -1,9 +1,6 @@
 package dyvil.collection.impl;
 
-import dyvil.collection.Collection;
-import dyvil.collection.ImmutableSet;
-import dyvil.collection.MutableSet;
-import dyvil.collection.Set;
+import dyvil.collection.*;
 import dyvil.math.MathUtils;
 import dyvil.util.ImmutableException;
 
@@ -18,43 +15,28 @@ import static dyvil.collection.impl.AbstractIdentityHashMap.*;
 public abstract class AbstractIdentityHashSet<E> implements Set<E>
 {
 	private static final long serialVersionUID = -6688373107015354853L;
-	
-	protected static final int   DEFAULT_CAPACITY    = 12;
+
+	protected static final int   DEFAULT_CAPACITY    = 16;
 	protected static final float DEFAULT_LOAD_FACTOR = 2F / 3F;
-	
+
 	protected Object[] table;
 	protected int      size;
-	
+
 	public AbstractIdentityHashSet()
 	{
+		this.table = new Object[DEFAULT_CAPACITY << 1];
 	}
-	
+
 	public AbstractIdentityHashSet(int capacity)
 	{
 		if (capacity < 0)
 		{
 			throw new IllegalArgumentException("Invalid Capacity: " + capacity);
 		}
-		this.table = new Object[MathUtils.powerOfTwo(AbstractHashMap.grow(capacity))];
+		this.table = new Object[MathUtils.powerOfTwo(AbstractHashMap.grow(capacity)) << 1];
 	}
-	
-	public AbstractIdentityHashSet(Collection<E> collection)
-	{
-		this(collection.size());
-		for (E element : collection)
-		{
-			this.addInternal(element);
-		}
-	}
-	
-	public AbstractIdentityHashSet(AbstractIdentityHashSet<E> set)
-	{
-		this.table = set.table.clone();
-		this.size = set.size;
-	}
-	
-	@SafeVarargs
-	public AbstractIdentityHashSet(E... elements)
+
+	public AbstractIdentityHashSet(E[] elements)
 	{
 		this(elements.length);
 		for (E element : elements)
@@ -62,17 +44,41 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 			this.addInternal(element);
 		}
 	}
-	
+
+	public AbstractIdentityHashSet(Iterable<? extends E> iterable)
+	{
+		this();
+		this.addAllInternal(iterable);
+	}
+
+	public AbstractIdentityHashSet(SizedIterable<? extends E> iterable)
+	{
+		this(iterable.size());
+		this.addAllInternal(iterable);
+	}
+
+	public AbstractIdentityHashSet(Set<? extends E> set)
+	{
+		this(set.size());
+		this.addAllInternal(set);
+	}
+
+	public AbstractIdentityHashSet(AbstractIdentityHashSet<? extends E> set)
+	{
+		this.table = set.table.clone();
+		this.size = set.size;
+	}
+
 	protected static int nextIndex(int i, int len)
 	{
 		return i + 1 < len ? i + 1 : 0;
 	}
-	
+
 	protected void flatten()
 	{
 		this.ensureCapacityInternal(this.table.length << 1);
 	}
-	
+
 	public void ensureCapacity(int newCapacity)
 	{
 		if (newCapacity > this.table.length)
@@ -80,7 +86,7 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 			this.ensureCapacityInternal(MathUtils.powerOfTwo(newCapacity));
 		}
 	}
-	
+
 	protected void ensureCapacityInternal(int newCapacity)
 	{
 		Object[] oldTable = this.table;
@@ -93,9 +99,9 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 			}
 			newCapacity = AbstractHashMap.MAX_ARRAY_SIZE;
 		}
-		
+
 		Object[] newTable = new Object[newCapacity];
-		
+
 		for (int j = 0; j < oldLength; j++)
 		{
 			Object key = oldTable[j];
@@ -111,21 +117,21 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 			}
 		}
 		this.table = newTable;
-		
+
 		this.updateThreshold(newCapacity);
 	}
-	
+
 	protected void updateThreshold(int newCapacity)
 	{
 	}
-	
+
 	protected boolean addInternal(E element)
 	{
 		Object k = maskNull(element);
 		Object[] tab = this.table;
 		int len = tab.length;
 		int i = index(k, len);
-		
+
 		Object item;
 		while ((item = tab[i]) != null)
 		{
@@ -135,11 +141,11 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 			}
 			i = nextIndex(i, len);
 		}
-		
+
 		this.addElement(i, k);
 		return true;
 	}
-	
+
 	protected void addElement(int index, Object element)
 	{
 		this.table[index] = element;
@@ -148,13 +154,20 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 			this.flatten();
 		}
 	}
-	
+
+	protected void addAllInternal(Iterable<? extends E> iterable)
+	{
+		for (E element : iterable) {
+			this.addInternal(element);
+		}
+	}
+
 	@Override
 	public int size()
 	{
 		return this.size;
 	}
-	
+
 	@Override
 	public Iterator<E> iterator()
 	{
@@ -164,7 +177,7 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 			int lastReturnedIndex = -1;
 			boolean indexValid;
 			Object[] traversalTable = AbstractIdentityHashSet.this.table;
-			
+
 			@Override
 			public boolean hasNext()
 			{
@@ -181,7 +194,7 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 				this.index = tab.length;
 				return false;
 			}
-			
+
 			@Override
 			public E next()
 			{
@@ -189,13 +202,13 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 				{
 					throw new NoSuchElementException();
 				}
-				
+
 				this.indexValid = false;
 				this.lastReturnedIndex = this.index;
 				this.index++;
 				return (E) unmaskNull(this.traversalTable[this.lastReturnedIndex]);
 			}
-			
+
 			@Override
 			public void remove()
 			{
@@ -207,28 +220,28 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 				{
 					throw new ImmutableException("Iterator.remove() on Immutable Set");
 				}
-				
+
 				int deletedSlot = this.lastReturnedIndex;
 				this.lastReturnedIndex = -1;
 				// back up index to revisit new contents after deletion
 				this.index = deletedSlot;
 				this.indexValid = false;
-				
+
 				Object[] tab = this.traversalTable;
 				int len = tab.length;
-				
+
 				int d = deletedSlot;
 				Object key = tab[d];
 				tab[d] = null;
-				
+
 				if (tab != AbstractIdentityHashSet.this.table)
 				{
 					AbstractIdentityHashSet.this.remove(key);
 					return;
 				}
-				
+
 				AbstractIdentityHashSet.this.size--;
-				
+
 				Object item;
 				for (int i = nextIndex(d, len); (item = tab[i]) != null; i = nextIndex(i, len))
 				{
@@ -237,7 +250,7 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 					if (i < r && (r <= d || d <= i) || r <= d && d <= i)
 					{
 						if (i < deletedSlot && d >= deletedSlot
-								&& this.traversalTable == AbstractIdentityHashSet.this.table)
+							    && this.traversalTable == AbstractIdentityHashSet.this.table)
 						{
 							int remaining = len - deletedSlot;
 							Object[] newTable = new Object[remaining];
@@ -245,7 +258,7 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 							this.traversalTable = newTable;
 							this.index = 0;
 						}
-						
+
 						tab[d] = item;
 						tab[i] = null;
 						d = i;
@@ -254,7 +267,7 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 			}
 		};
 	}
-	
+
 	@Override
 	public void forEach(Consumer<? super E> action)
 	{
@@ -266,7 +279,7 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 			}
 		}
 	}
-	
+
 	@Override
 	public boolean contains(Object element)
 	{
@@ -281,7 +294,7 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 			}
 			return false;
 		}
-		
+
 		for (Object o : this.table)
 		{
 			if (element == o)
@@ -291,7 +304,7 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 		}
 		return false;
 	}
-	
+
 	@Override
 	public void toArray(int index, Object[] store)
 	{
@@ -350,32 +363,32 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 		}
 		return Collections.newSetFromMap(map);
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return Collection.collectionToString(this);
 	}
-	
+
 	@Override
 	public boolean equals(Object obj)
 	{
 		return Set.setEquals(this, obj);
 	}
-	
+
 	@Override
 	public int hashCode()
 	{
 		return Set.setHashCode(this);
 	}
-	
+
 	private void writeObject(java.io.ObjectOutputStream out) throws IOException
 	{
 		out.defaultWriteObject();
-		
+
 		out.writeInt(this.size);
 		out.writeInt(this.table.length);
-		
+
 		for (Object key : this.table)
 		{
 			// Avoid the NULL object
@@ -385,14 +398,14 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 			}
 		}
 	}
-	
+
 	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
 	{
 		in.defaultReadObject();
-		
+
 		this.size = in.readInt();
 		this.table = new Object[in.readInt()];
-		
+
 		// Read (size) key-value pairs and put them in this map
 		for (int i = 0; i < this.size; i++)
 		{

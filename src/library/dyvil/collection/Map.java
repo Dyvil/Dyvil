@@ -22,7 +22,7 @@ import java.util.stream.StreamSupport;
 @ColonConvertible(methodName = "singleton")
 @ArrayConvertible
 @MapConvertible
-public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
+public interface Map<K, V> extends SizedIterable<Entry<K, V>>, Serializable
 {
 	static <K, V> ImmutableMap<K, V> empty()
 	{
@@ -62,6 +62,7 @@ public interface Map<K, V> extends Iterable<Entry<K, V>>, Serializable
 	/**
 	 * Returns the size of this map, i.e. the number of mappings contained in this map.
 	 */
+	@Override
 	int size();
 
 	/**

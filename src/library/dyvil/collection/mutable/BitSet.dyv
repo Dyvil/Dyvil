@@ -1,9 +1,29 @@
 package dyvil.collection.mutable
 
 import dyvil.collection.impl.AbstractBitSet
+import dyvil.lang.literal.{ NilConvertible, ArrayConvertible }
 
+@Immutable
+@NilConvertible
+@ArrayConvertible
 public class BitSet extends AbstractBitSet implements MutableSet<int>
 {
+	// Factory Methods
+
+	public static BitSet apply() = new BitSet
+
+	public static BitSet apply(int... elements) = new BitSet(elements)
+
+	public static BitSet from([int] array) = new BitSet(array)
+
+	public static BitSet from(Iterable<+int> iterable) = new BitSet(iterable)
+
+	public static BitSet from(SizedIterable<+int> iterable) = new BitSet(iterable)
+
+	public static BitSet from(AbstractBitSet bitSet) = new BitSet(bitSet)
+
+	// Constructors
+
 	public init()
 	{
 		super.init()
@@ -14,20 +34,27 @@ public class BitSet extends AbstractBitSet implements MutableSet<int>
 		super.init(capacity)
 	}
 
-	public init(int... elements)
-	{
-		super.init(elements...)
-	}
-
-	public init(Collection<int> elements)
+	public init([int] elements)
 	{
 		super.init(elements)
 	}
 
-	public init(AbstractBitSet elements)
+	public init(Iterable<+int> iterable)
 	{
-		super.init(elements)
+		super.init(iterable)
 	}
+
+	public init(SizedIterable<+int> iterable)
+	{
+		super.init(iterable)
+	}
+
+	public init(AbstractBitSet bitSet)
+	{
+		super.init(bitSet)
+	}
+
+	// Implementation Methods
 
 	public override void clear()
 	{

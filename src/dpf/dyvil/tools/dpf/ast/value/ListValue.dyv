@@ -26,9 +26,18 @@ public class ListValue extends DPFValueVisitor implements Value, ListVisitor, Ex
 		this.elements = new ArrayList<Value>(capacity)
 	}
 
-	public init(Value... values)
+	public init([Value] values)
 	{
-		this.elements = new ArrayList<Value>(values...)
+		this.elements = new ArrayList<Value>(values)
+	}
+
+	public init([Object] values)
+	{
+		this.elements = new ArrayList<Value>(values.length)
+		for (Object element <- values)
+		{
+			this.elements.add(Value.wrap(element))
+		}
 	}
 
 	public init(Iterable<_> iterable)

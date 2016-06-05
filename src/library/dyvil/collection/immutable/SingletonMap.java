@@ -34,7 +34,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	
 	public static <K, V> SingletonMap<K, V> apply(Entry<K, V> entry)
 	{
-		return new SingletonMap(entry.getKey(), entry.getValue());
+		return new SingletonMap<>(entry.getKey(), entry.getValue());
 	}
 	
 	public SingletonMap(K key, V value)
@@ -130,20 +130,16 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	@Override
 	public ImmutableMap<K, V> withEntry(K key, V value)
 	{
-		return new ArrayMap<>(new Object[] { this.key, key }, new Object[] { this.value, value }, 2, true);
+		return ImmutableMap.singleton(key, value);
 	}
 	
 	@Override
 	public ImmutableMap<K, V> union(Map<? extends K, ? extends V> map)
 	{
-		int index = 1;
-		Tuple2<? extends K, ? extends V>[] tuples = new Tuple2[1 + map.size()];
-		tuples[0] = new Tuple2<>(this.key, this.value);
-		for (Entry<? extends K, ? extends V> entry : map)
-		{
-			tuples[index++] = new Tuple2<K, V>(entry.getKey(), entry.getValue());
-		}
-		return new TupleMap(tuples, index);
+		final ImmutableMap.Builder<K, V> builder = new ArrayMap.Builder<>(map.size() + 1);
+		builder.put(this.key, this.value);
+		builder.putAll(map);
+		return builder.build();
 	}
 	
 	@Override
@@ -185,7 +181,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	@Override
 	public <NV> ImmutableMap<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper)
 	{
-		return new SingletonMap(this.key, mapper.apply(this.key, this.value));
+		return new SingletonMap<>(this.key, mapper.apply(this.key, this.value));
 	}
 	
 	@Override
@@ -215,7 +211,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	@Override
 	public Entry<K, V>[] toArray()
 	{
-		return new Entry[] { this };
+		return (Entry<K, V>[]) new Entry[] { this };
 	}
 	
 	@Override
@@ -251,7 +247,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	@Override
 	public ImmutableMap<V, K> inverted()
 	{
-		return new SingletonMap<V, K>(this.value, this.key);
+		return new SingletonMap<>(this.value, this.key);
 	}
 	
 	@Override
@@ -307,7 +303,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	{
 		if (obj instanceof Map)
 		{
-			return Map.mapEquals(this, (Map) obj);
+			return Map.mapEquals(this, (Map<K, V>) obj);
 		}
 		return obj instanceof Entry && Entry.entryEquals(this, (Entry) obj);
 	}

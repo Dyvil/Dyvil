@@ -34,9 +34,19 @@ public interface Set<E> extends Collection<E>
 		return ImmutableSet.apply(elements);
 	}
 	
-	static <E> ImmutableSet<E> fromArray(E[] elements)
+	static <E> ImmutableSet<E> from(E[] array)
 	{
-		return ImmutableSet.fromArray(elements);
+		return ImmutableSet.from(array);
+	}
+
+	static <E> ImmutableSet<E> from(Iterable<? extends E> iterable)
+	{
+		return ImmutableSet.from(iterable);
+	}
+
+	static <E> ImmutableSet<E> from(Collection<? extends E> collection)
+	{
+		return ImmutableSet.from(collection);
 	}
 	
 	// Accessors

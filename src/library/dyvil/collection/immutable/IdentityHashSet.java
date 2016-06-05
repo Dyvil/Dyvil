@@ -1,10 +1,7 @@
 package dyvil.collection.immutable;
 
 import dyvil.annotation.Immutable;
-import dyvil.collection.Collection;
-import dyvil.collection.ImmutableSet;
-import dyvil.collection.MutableSet;
-import dyvil.collection.Set;
+import dyvil.collection.*;
 import dyvil.collection.impl.AbstractIdentityHashSet;
 import dyvil.lang.literal.ArrayConvertible;
 
@@ -51,10 +48,32 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 
 	private static final long serialVersionUID = -1347044009183554635L;
 
+	// Factory Methods
+
 	@SafeVarargs
 	public static <E> IdentityHashSet<E> apply(E... elements)
 	{
 		return new IdentityHashSet<>(elements);
+	}
+
+	public static <E> IdentityHashSet<E> from(Iterable<? extends E> iterable)
+	{
+		return new IdentityHashSet<>(iterable);
+	}
+
+	public static <E> IdentityHashSet<E> from(SizedIterable<? extends E> iterable)
+	{
+		return new IdentityHashSet<>(iterable);
+	}
+
+	public static <E> IdentityHashSet<E> from(Set<? extends E> iterable)
+	{
+		return new IdentityHashSet<>(iterable);
+	}
+
+	public static <E> IdentityHashSet<E> from(AbstractIdentityHashSet<? extends E> iterable)
+	{
+		return new IdentityHashSet<>(iterable);
 	}
 
 	public static <E> Builder<E> builder()
@@ -67,37 +86,45 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 		return new Builder<>(capacity);
 	}
 
+	// Constructors
+
 	protected IdentityHashSet()
 	{
 		super(DEFAULT_CAPACITY);
 	}
-	
+
 	protected IdentityHashSet(int capacity)
 	{
 		super(capacity);
 	}
-	
-	public IdentityHashSet(Collection<E> collection)
-	{
-		super(collection);
-	}
-	
-	public IdentityHashSet(Set<E> set)
-	{
-		super(set);
-	}
-	
-	public IdentityHashSet(AbstractIdentityHashSet<E> set)
-	{
-		super(set);
-	}
-	
-	@SafeVarargs
-	public IdentityHashSet(E... elements)
+
+	public IdentityHashSet(E[] elements)
 	{
 		super(elements);
 	}
-	
+
+	public IdentityHashSet(Iterable<? extends E> iterable)
+	{
+		super(iterable);
+	}
+
+	public IdentityHashSet(SizedIterable<? extends E> iterable)
+	{
+		super(iterable);
+	}
+
+	public IdentityHashSet(Set<? extends E> set)
+	{
+		super(set);
+	}
+
+	public IdentityHashSet(AbstractIdentityHashSet<? extends E> set)
+	{
+		super(set);
+	}
+
+	// Implementation Methods
+
 	@Override
 	public ImmutableSet<E> added(E element)
 	{
@@ -106,7 +133,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 		copy.addInternal(element);
 		return copy;
 	}
-	
+
 	@Override
 	public ImmutableSet<E> removed(Object element)
 	{
@@ -120,7 +147,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 		}
 		return copy;
 	}
-	
+
 	@Override
 	public ImmutableSet<? extends E> difference(Collection<?> collection)
 	{
@@ -134,7 +161,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 		}
 		return copy;
 	}
-	
+
 	@Override
 	public ImmutableSet<? extends E> intersection(Collection<? extends E> collection)
 	{
@@ -148,7 +175,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 		}
 		return copy;
 	}
-	
+
 	@Override
 	public ImmutableSet<? extends E> union(Collection<? extends E> collection)
 	{
@@ -163,7 +190,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 		}
 		return copy;
 	}
-	
+
 	@Override
 	public ImmutableSet<? extends E> symmetricDifference(Collection<? extends E> collection)
 	{
@@ -184,7 +211,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 		}
 		return copy;
 	}
-	
+
 	@Override
 	public <R> ImmutableSet<R> mapped(Function<? super E, ? extends R> mapper)
 	{
@@ -195,7 +222,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 		}
 		return copy;
 	}
-	
+
 	@Override
 	public <R> ImmutableSet<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
 	{
@@ -209,7 +236,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 		}
 		return copy;
 	}
-	
+
 	@Override
 	public ImmutableSet<E> filtered(Predicate<? super E> condition)
 	{
@@ -223,13 +250,13 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 		}
 		return set;
 	}
-	
+
 	@Override
 	public ImmutableSet<E> copy()
 	{
 		return this.immutableCopy();
 	}
-	
+
 	@Override
 	public MutableSet<E> mutable()
 	{

@@ -16,7 +16,9 @@ import java.util.function.Predicate;
 public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 {
 	private static final long serialVersionUID = 5286872411535856904L;
-	
+
+	// Factory Methods
+
 	public static <E> ArrayList<E> apply()
 	{
 		return new ArrayList<>();
@@ -28,23 +30,34 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		return new ArrayList<>(elements, true);
 	}
 	
-	public static <E> ArrayList<E> fromArray(E[] elements)
+	public static <E> ArrayList<E> from(E[] array)
 	{
-		return new ArrayList<>(elements);
+		return new ArrayList<>(array);
 	}
+
+	public static <E> ArrayList<E> from(Iterable<? extends E> iterable)
+	{
+		return new ArrayList<>(iterable);
+	}
+
+	public static <E> ArrayList<E> from(Collection<? extends E> collection)
+	{
+		return new ArrayList<>(collection);
+	}
+
+	// Constructors
 	
 	public ArrayList()
 	{
 		super();
 	}
 	
-	public ArrayList(int size)
+	public ArrayList(int capacity)
 	{
-		super((E[]) new Object[size], 0, true);
+		super(capacity);
 	}
-	
-	@SafeVarargs
-	public ArrayList(E... elements)
+
+	public ArrayList(E[] elements)
 	{
 		super(elements);
 	}
@@ -63,11 +76,23 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	{
 		super(elements, size, trusted);
 	}
-	
-	public ArrayList(Collection<E> collection)
+
+	public ArrayList(Iterable<? extends E> iterable)
+	{
+		super(iterable);
+	}
+
+	public ArrayList(Collection<? extends E> collection)
 	{
 		super(collection);
 	}
+
+	public ArrayList(AbstractArrayList<? extends E> arrayList)
+	{
+		super(arrayList);
+	}
+
+	// Implementation Methods
 	
 	@Override
 	public MutableList<E> subList(int startIndex, int length)
@@ -103,8 +128,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 	@Override
 	public void addElement(E element)
 	{
-		this.ensureCapacity(this.size + 1);
-		this.elements[this.size++] = element;
+		this.addInternal(element);
 	}
 	
 	@Override
@@ -129,25 +153,15 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 			this.size = newLength;
 			return;
 		}
-		
-		if (newLength > this.elements.length)
-		{
-			Object[] temp = new Object[newLength];
-			System.arraycopy(this.elements, 0, temp, 0, this.size);
-			this.elements = temp;
-		}
+
+		this.ensureCapacityInternal(newLength);
 		this.size = newLength;
 	}
 	
 	@Override
 	public void ensureCapacity(int minSize)
 	{
-		if (minSize > this.elements.length)
-		{
-			Object[] temp = new Object[minSize];
-			System.arraycopy(this.elements, 0, temp, 0, this.size);
-			this.elements = temp;
-		}
+		this.ensureCapacityInternal(minSize);
 	}
 	
 	@Override
@@ -194,7 +208,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		}
 		List.rangeCheck(index, this.size);
 		
-		this.ensureCapacity(this.size + 1);
+		this.ensureCapacityInternal(this.size + 1);
 		System.arraycopy(this.elements, index, this.elements, index + 1, this.size - index);
 		this.elements[index] = element;
 		this.size++;
@@ -207,9 +221,8 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		{
 			return false;
 		}
-		
-		this.ensureCapacity(this.size + collection.size());
-		collection.toArray(this.size, this.elements);
+
+		this.addAllInternal(collection);
 		return true;
 	}
 	

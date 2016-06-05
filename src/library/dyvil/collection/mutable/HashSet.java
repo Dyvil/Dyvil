@@ -1,9 +1,6 @@
 package dyvil.collection.mutable;
 
-import dyvil.collection.Collection;
-import dyvil.collection.ImmutableSet;
-import dyvil.collection.MutableSet;
-import dyvil.collection.Set;
+import dyvil.collection.*;
 import dyvil.collection.impl.AbstractHashSet;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.NilConvertible;
@@ -19,36 +16,65 @@ import static dyvil.collection.impl.AbstractHashMap.*;
 public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 {
 	private static final long serialVersionUID = -993127062150101200L;
-	
+
 	private           float loadFactor;
 	private transient int   threshold;
-	
+
+	// Factory Methods
+
 	public static <E> HashSet<E> apply()
 	{
 		return new HashSet<>();
 	}
-	
+
 	@SafeVarargs
 	public static <E> HashSet<E> apply(E... elements)
 	{
 		return new HashSet<>(elements);
 	}
-	
+
+	public static <E> HashSet<E> from(E[] array)
+	{
+		return new HashSet<>(array);
+	}
+
+	public static <E> HashSet<E> from(Iterable<? extends E> iterable)
+	{
+		return new HashSet<>(iterable);
+	}
+
+	public static <E> HashSet<E> from(SizedIterable<? extends E> iterable)
+	{
+		return new HashSet<>(iterable);
+	}
+
+	public static <E> HashSet<E> from(Set<? extends E> set)
+	{
+		return new HashSet<>(set);
+	}
+
+	public static <E> HashSet<E> from(AbstractHashSet<? extends E> hashSet)
+	{
+		return new HashSet<>(hashSet);
+	}
+
+	// Constructors
+
 	public HashSet()
 	{
 		this(DEFAULT_CAPACITY, DEFAULT_LOAD_FACTOR);
 	}
-	
+
 	public HashSet(int capacity)
 	{
 		this(capacity, DEFAULT_LOAD_FACTOR);
 	}
-	
+
 	public HashSet(float loadFactor)
 	{
 		this(DEFAULT_CAPACITY, loadFactor);
 	}
-	
+
 	public HashSet(int capacity, float loadFactor)
 	{
 		super(capacity);
@@ -56,48 +82,55 @@ public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 		{
 			throw new IllegalArgumentException("Invalid Load Factor: " + loadFactor);
 		}
-		
+
 		this.loadFactor = loadFactor;
 		this.threshold = (int) (capacity * this.loadFactor);
 	}
-	
-	public HashSet(Collection<E> collection)
-	{
-		super(collection);
-		this.defaultThreshold();
-	}
-	
-	public HashSet(Set<E> set)
-	{
-		super(set);
-		this.defaultThreshold();
-	}
-	
-	public HashSet(AbstractHashSet<E> set)
-	{
-		super(set);
-		this.defaultThreshold();
-	}
-	
-	@SafeVarargs
-	public HashSet(E... elements)
+
+	public HashSet(E[] elements)
 	{
 		super(elements);
 		this.defaultThreshold();
 	}
-	
+
+	public HashSet(Iterable<? extends E> iterable)
+	{
+		super(iterable);
+		this.defaultThreshold();
+	}
+
+	public HashSet(SizedIterable<? extends E> iterable)
+	{
+		super(iterable);
+		this.defaultThreshold();
+	}
+
+	public HashSet(Set<? extends E> set)
+	{
+		super(set);
+		this.defaultThreshold();
+	}
+
+	public HashSet(AbstractHashSet<? extends E> hashSet)
+	{
+		super(hashSet);
+		this.defaultThreshold();
+	}
+
+	// Implementation Methods
+
 	private void defaultThreshold()
 	{
 		this.loadFactor = DEFAULT_LOAD_FACTOR;
 		this.threshold = (int) (this.elements.length * DEFAULT_LOAD_FACTOR);
 	}
-	
+
 	@Override
 	protected void updateThreshold(int newCapacity)
 	{
 		this.threshold = (int) Math.min(newCapacity * this.loadFactor, MAX_ARRAY_SIZE + 1);
 	}
-	
+
 	@Override
 	public void clear()
 	{
@@ -108,7 +141,7 @@ public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 			this.elements[i] = null;
 		}
 	}
-	
+
 	@Override
 	protected void addElement(int hash, E element, int index)
 	{
@@ -117,22 +150,22 @@ public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 		{
 			// Rehash / flatten the table if the threshold is exceeded
 			this.flatten();
-			
+
 			tab = this.elements;
 			hash = hash(element);
 			index = index(hash, tab.length);
 		}
-		
+
 		tab[index] = new HashElement<>(element, hash, tab[index]);
 		this.size++;
 	}
-	
+
 	@Override
 	public boolean add(E element)
 	{
 		return this.addInternal(element);
 	}
-	
+
 	@Override
 	public boolean remove(Object element)
 	{
@@ -140,7 +173,7 @@ public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 		int i = index(hash, this.elements.length);
 		HashElement<E> prev = this.elements[i];
 		HashElement<E> e = prev;
-		
+
 		while (e != null)
 		{
 			HashElement<E> next = e.next;
@@ -156,16 +189,16 @@ public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 				{
 					prev.next = next;
 				}
-				
+
 				return true;
 			}
 			prev = e;
 			e = next;
 		}
-		
+
 		return false;
 	}
-	
+
 	@Override
 	public void map(Function<? super E, ? extends E> mapper)
 	{
@@ -175,7 +208,7 @@ public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 		int len = MathUtils.powerOfTwo(this.size);
 		HashElement<E>[] newElements = (HashElement<E>[]) new HashElement[len];
 		int size = 0;
-		
+
 		for (HashElement<E> element : this.elements)
 		{
 			outer:
@@ -185,7 +218,7 @@ public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 				int hash = hash(newElement);
 				int index = index(hash, len);
 				HashElement oldElement = newElements[index];
-				
+
 				for (; oldElement != null; oldElement = oldElement.next)
 				{
 					if (oldElement.hash == hash && Objects.equals(oldElement.element, newElement))
@@ -194,16 +227,16 @@ public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 						continue outer;
 					}
 				}
-				
+
 				size++;
 				newElements[index] = new HashElement<>(newElement, hash, newElements[index]);
 			}
 		}
-		
+
 		this.elements = newElements;
 		this.size = size;
 	}
-	
+
 	@Override
 	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper)
 	{
@@ -217,14 +250,14 @@ public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 				copy.add(newElement);
 			}
 		}
-		
+
 		// After supplying all elements to the wrapper, we simply use the
 		// elements of the copy, which will be discarded anyway.
 		this.size = copy.size;
 		this.elements = copy.elements;
 		this.threshold = copy.threshold;
 	}
-	
+
 	@Override
 	public MutableSet<E> copy()
 	{

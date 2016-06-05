@@ -58,7 +58,7 @@ public class AppendList<E> implements ImmutableList<E>
 		return list;
 	}
 
-	public static <E> ImmutableList<E> apply(Iterable<? extends E> iterable)
+	public static <E> ImmutableList<E> from(Iterable<? extends E> iterable)
 	{
 		ImmutableList<E> list = EmptyList.apply();
 		for (E element : iterable)
@@ -66,6 +66,11 @@ public class AppendList<E> implements ImmutableList<E>
 			list = new AppendList<>(list, element);
 		}
 		return list;
+	}
+
+	public static <E> ImmutableList<E> from(Collection<? extends E> collection)
+	{
+		return from((Iterable<E>) collection);
 	}
 
 	public static <E> Builder<E> builder()

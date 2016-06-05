@@ -5,9 +5,9 @@ import dyvil.collection.mutable.HashMap;
 import dyvil.collection.mutable.TupleMap;
 import dyvil.collection.view.MapView;
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.ColonConvertible;
 import dyvil.lang.literal.MapConvertible;
 import dyvil.lang.literal.NilConvertible;
-import dyvil.tuple.Tuple2;
 import dyvil.util.Option;
 
 import java.util.Iterator;
@@ -18,6 +18,7 @@ import java.util.function.Predicate;
 
 @NilConvertible
 @ArrayConvertible
+@ColonConvertible(methodName = "singleton")
 @MapConvertible
 public interface MutableMap<K, V> extends Map<K, V>
 {
@@ -33,25 +34,18 @@ public interface MutableMap<K, V> extends Map<K, V>
 
 	static <K, V> MutableMap<K, V> singleton(K key, V value)
 	{
-		return new TupleMap<>(new Tuple2<>(key, value));
+		return ArrayMap.singleton(key, value);
 	}
 
 	static <K, V> MutableMap<K, V> apply(Entry<K, V> entry)
 	{
-		TupleMap<K, V> map = new TupleMap<>();
-		map.put(entry);
-		return map;
+		return TupleMap.apply(entry);
 	}
 
 	@SafeVarargs
 	static <K, V> MutableMap<K, V> apply(Entry<? extends K, ? extends V>... entries)
 	{
-		TupleMap<K, V> map = new TupleMap<>();
-		for (Entry<? extends K, ? extends V> entry : entries)
-		{
-			map.put(entry);
-		}
-		return map;
+		return TupleMap.apply(entries);
 	}
 
 	static <K, V> MutableMap<K, V> apply(K[] keys, V[] values)

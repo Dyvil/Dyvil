@@ -51,7 +51,8 @@ public class MapValues<V> implements Queryable<V>
 	@Override
 	public <R> Queryable<R> mapped(Function<? super V, ? extends R> mapper)
 	{
-		return this.entries.valueMapped(mapper).values();
+		final Map<?, R> entries = this.entries.valueMapped(mapper);
+		return entries.values();
 	}
 
 	@Override

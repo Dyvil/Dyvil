@@ -3,7 +3,6 @@ package dyvil.collection.mutable;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.Entry;
 import dyvil.collection.ImmutableMap;
-import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractEnumMap;
 import dyvil.lang.literal.ArrayConvertible;
@@ -20,7 +19,7 @@ import java.util.function.BiPredicate;
 
 @ClassConvertible
 @TypeConvertible
-@ColonConvertible
+@ColonConvertible(methodName = "singleton")
 @ArrayConvertible
 public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> implements MutableMap<K, V>
 {
@@ -36,7 +35,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 		return new EnumMap<>(type);
 	}
 
-	public static <K extends Enum<K>, V> EnumMap<K, V> apply(K key, V value)
+	public static <K extends Enum<K>, V> EnumMap<K, V> singleton(K key, V value)
 	{
 		return new EnumMap<>(getKeyType(key), (K[]) new Object[] { key }, (V[]) new Object[] { value }, 1);
 	}
@@ -45,6 +44,21 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	public static <K extends Enum<K>, V> EnumMap<K, V> apply(Entry<K, V>... entries)
 	{
 		return new EnumMap<>(entries);
+	}
+
+	public static <K extends Enum<K>, V> EnumMap<K, V> from(Entry<? extends K, ? extends V>[] entries)
+	{
+		return new EnumMap<>(entries);
+	}
+
+	public static <K extends Enum<K>, V> EnumMap<K, V> from(Iterable<? extends Entry<? extends K, ? extends V>> map)
+	{
+		return new EnumMap<>(map);
+	}
+
+	public static <K extends Enum<K>, V> EnumMap<K, V> from(AbstractEnumMap<? extends K, ? extends V> map)
+	{
+		return new EnumMap<K, V>(map);
 	}
 
 	@DyvilModifiers(Modifiers.INTERNAL)
@@ -62,23 +76,22 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	{
 		super(type.erasure());
 	}
-	
-	public EnumMap(Map<K, V> map)
-	{
-		super(map);
-	}
-	
-	public EnumMap(AbstractEnumMap<K, V> map)
-	{
-		super(map);
-	}
-	
-	@SafeVarargs
-	public EnumMap(Entry<K, V>... entries)
+
+	public EnumMap(Entry<? extends K, ? extends V>[] entries)
 	{
 		super(entries);
 	}
-	
+
+	public EnumMap(Iterable<? extends Entry<? extends K, ? extends V>> map)
+	{
+		super(map);
+	}
+
+	public EnumMap(AbstractEnumMap<? extends K, ? extends V> map)
+	{
+		super(map);
+	}
+
 	@Override
 	protected void removeAt(int index)
 	{
