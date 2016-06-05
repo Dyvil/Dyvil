@@ -15,7 +15,7 @@ import java.util.function.BiPredicate;
 
 @NilConvertible
 @ArrayConvertible
-@ColonConvertible
+@ColonConvertible(methodName = "singleton")
 @Immutable
 public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap<K, V>
 {
@@ -57,6 +57,18 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	private static final long serialVersionUID = -1489214367993445801L;
 
 	// Factory Methods
+
+	public static <K, V> HashMap<K, V> singleton(K key, V value)
+	{
+		final HashMap<K, V> result = new HashMap<>(1);
+		result.putInternal(key, value);
+		return result;
+	}
+
+	public static <K, V> HashMap<K, V> apply()
+	{
+		return new HashMap<>(0);
+	}
 
 	@SafeVarargs
 	public static <K, V> HashMap<K, V> apply(Entry<K, V>... entries)

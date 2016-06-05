@@ -11,7 +11,7 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 @NilConvertible
-@ColonConvertible
+@ColonConvertible(methodName = "singleton")
 @ArrayConvertible
 public class HashMap<K, V> extends AbstractHashMap<K, V> implements MutableMap<K, V>
 {
@@ -21,6 +21,13 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements MutableMap<K
 	private transient int   threshold;
 
 	// Factory Methods
+
+	public static <K, V> HashMap<K, V> singleton(K key, V value)
+	{
+		final HashMap<K, V> result = new HashMap<>();
+		result.putInternal(key, value);
+		return result;
+	}
 
 	public static <K, V> HashMap<K, V> apply()
 	{

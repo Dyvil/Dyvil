@@ -12,7 +12,7 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 @NilConvertible
-@ColonConvertible
+@ColonConvertible(methodName = "singleton")
 @ArrayConvertible
 public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> implements MutableMap<K, V>
 {
@@ -20,17 +20,17 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	
 	private           float loadFactor;
 	private transient int   threshold;
-	
-	public static <K, V> IdentityHashMap<K, V> apply()
-	{
-		return new IdentityHashMap<>();
-	}
 
 	public static <K, V> IdentityHashMap<K, V> singleton(K key, V value)
 	{
 		final IdentityHashMap<K, V> result = new IdentityHashMap<>(1);
 		result.putInternal(key, value);
 		return result;
+	}
+
+	public static <K, V> IdentityHashMap<K, V> apply()
+	{
+		return new IdentityHashMap<>();
 	}
 
 	@SafeVarargs

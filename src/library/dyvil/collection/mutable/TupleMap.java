@@ -12,13 +12,20 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 @NilConvertible
-@ColonConvertible
+@ColonConvertible(methodName = "singleton")
 @ArrayConvertible
 public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements MutableMap<K, V>
 {
 	private static final long serialVersionUID = 5771226814337471265L;
 
 	// Factory Methods
+
+	public static <K, V> TupleMap<K, V> singleton(K key, V value)
+	{
+		final TupleMap<K, V> result = new TupleMap<>();
+		result.putInternal(new Tuple2<>(key, value));
+		return result;
+	}
 
 	public static <K, V> TupleMap<K, V> apply()
 	{

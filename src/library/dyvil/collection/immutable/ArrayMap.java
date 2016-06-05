@@ -16,7 +16,7 @@ import java.util.function.BiPredicate;
 @SuppressWarnings("SuspiciousSystemArraycopy")
 @NilConvertible
 @ArrayConvertible
-@ColonConvertible
+@ColonConvertible(methodName = "singleton")
 @Immutable
 public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableMap<K, V>
 {
@@ -57,6 +57,18 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 	private static final long serialVersionUID = 4583062458335627011L;
 
 	// Factory Methods
+
+	public static <K, V> ArrayMap<K, V> singleton(K key, V value)
+	{
+		final ArrayMap<K, V> result = new ArrayMap<>(1);
+		result.putInternal(key, value);
+		return result;
+	}
+
+	public static <K, V> ArrayMap<K, V> apply()
+	{
+		return new ArrayMap<>(0);
+	}
 
 	@SafeVarargs
 	public static <K, V> ArrayMap<K, V> apply(Entry<? extends K, ? extends V>... entries)

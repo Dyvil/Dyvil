@@ -7,6 +7,7 @@ import dyvil.collection.immutable.EmptyMap;
 import dyvil.collection.immutable.SingletonMap;
 import dyvil.collection.immutable.TupleMap;
 import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.literal.ColonConvertible;
 import dyvil.lang.literal.MapConvertible;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.util.ImmutableException;
@@ -22,6 +23,7 @@ import java.util.function.Predicate;
 
 @NilConvertible
 @ArrayConvertible
+@ColonConvertible(methodName = "singleton")
 @MapConvertible
 public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 {
@@ -57,7 +59,7 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 
 	static <K, V> ImmutableMap<K, V> apply(Entry<K, V> entry)
 	{
-		return new SingletonMap<>(entry.getKey(), entry.getValue());
+		return SingletonMap.apply(entry.getKey(), entry.getValue());
 	}
 
 	@SafeVarargs
@@ -68,11 +70,10 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 		case 0:
 			return EmptyMap.apply();
 		case 1:
-			Entry<? extends K, ? extends V> entry = entries[0];
-			return new SingletonMap<>(entry.getKey(), entry.getValue());
+			// Safe cast, Entry is covariant
+			return SingletonMap.apply((Entry<K, V>) entries[0]);
 		default:
-			// Save cast, Entry is covariant
-			return new TupleMap<>((Entry<K, V>[]) entries);
+			return TupleMap.apply(entries);
 		}
 	}
 

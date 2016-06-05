@@ -11,18 +11,25 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 @NilConvertible
-@ColonConvertible
+@ColonConvertible(methodName = "singleton")
 @ArrayConvertible
 public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements MutableMap<K, V>
 {
 	private static final long serialVersionUID = 5171722024919718041L;
 
+	// Factory Methods
+
+	public static <K, V> ArrayMap<K, V> singleton(K key, V value)
+	{
+		final ArrayMap<K, V> result = new ArrayMap<>();
+		result.putInternal(key, value);
+		return result;
+	}
+
 	public static <K, V> ArrayMap<K, V> apply()
 	{
 		return new ArrayMap<>();
 	}
-
-	// Factory Methods
 
 	@SafeVarargs
 	public static <K, V> ArrayMap<K, V> apply(Entry<? extends K, ? extends V>... entries)

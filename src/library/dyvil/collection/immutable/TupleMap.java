@@ -16,7 +16,7 @@ import java.util.function.BiPredicate;
 
 @NilConvertible
 @ArrayConvertible
-@ColonConvertible
+@ColonConvertible(methodName = "singleton")
 @Immutable
 public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableMap<K, V>
 {
@@ -68,6 +68,16 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 	private static final long serialVersionUID = -5372836862143742212L;
 
 	// Factory Methods
+
+	public static <K, V> TupleMap<K, V> singleton(K key, V value)
+	{
+		return apply(new Tuple2<>(key, value));
+	}
+
+	public static <K, V> TupleMap<K, V> apply()
+	{
+		return new TupleMap<>(0);
+	}
 
 	@SafeVarargs
 	public static <K, V> TupleMap<K, V> apply(Entry<? extends K, ? extends V>... entries)
