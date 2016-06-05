@@ -10,6 +10,8 @@ public abstract class AbstractBitSet implements Set<int>
 	protected @Transient int size
 	protected @Transient() [long] words
 
+	// Constructors
+
 	public init()
 	{
 		this.init(DEFAULT_CAPACITY)
@@ -20,7 +22,7 @@ public abstract class AbstractBitSet implements Set<int>
 		this.words = new [long](dyvil.math.MathUtils.ceil(capacity / 64))
 	}
 
-	public init(int... elements)
+	public init([int] elements)
 	{
 		this.init(elements.length)
 		this.size = elements.length
@@ -32,23 +34,34 @@ public abstract class AbstractBitSet implements Set<int>
 		}
 	}
 
-	public init(Collection<int> elements)
+	public init(Iterable<+int> iterable)
 	{
-		// Copy from above
-		this.init(elements.size)
-		this.size = elements.size
+		this.init()
 
-		for (int i <- elements)
+		for (int i <- iterable)
 		{
-			final int wordIndex = wordIndex(i)
-            this.words[wordIndex] |= mask(bitIndex(i))
+			this.setBit(i)
 		}
 	}
 
-	public init(AbstractBitSet elements)
+	public init(SizedIterable<+int> iterable)
 	{
-		this.size = elements.size
-		this.words = elements.words.copy()
+		this.init(iterable.size)
+
+		var size = 0
+		for (int i <- iterable)
+		{
+			final int wordIndex = wordIndex(i)
+            this.words[wordIndex] |= mask(bitIndex(i))
+            size++
+		}
+		this.size = size
+	}
+
+	public init(AbstractBitSet bitSet)
+	{
+		this.size = bitSet.size
+		this.words = bitSet.words.copy()
 	}
 
 	// Utility Methods
@@ -130,7 +143,7 @@ public abstract class AbstractBitSet implements Set<int>
 		}
 	}
 
-	// Override Methods
+	// Implementation Methods
 
 	public override int size() = this.size
 
