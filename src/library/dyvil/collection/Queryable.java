@@ -22,13 +22,14 @@ import java.util.stream.StreamSupport;
  * @param <E>
  * 		the element type
  */
-public interface Queryable<E> extends Iterable<E>
+public interface Queryable<E> extends SizedIterable<E>
 {
 	/**
 	 * Returns the number of elements in this query.
 	 *
 	 * @return the number of elements
 	 */
+	@Override
 	int size();
 	
 	/**
