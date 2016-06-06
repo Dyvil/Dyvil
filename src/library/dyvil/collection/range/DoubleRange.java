@@ -179,14 +179,14 @@ public class DoubleRange implements Range<Double>
 		{
 			for (double i = this.start; i < this.end; i += this.increment)
 			{
-				store[(int) (i + index)] = i;
+				store[index++] = i;
 			}
 			return;
 		}
 
 		for (double i = this.start; i <= this.end; i += this.increment)
 		{
-			store[(int) (i + index)] = i;
+			store[index++] = i;
 		}
 	}
 

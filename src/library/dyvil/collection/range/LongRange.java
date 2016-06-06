@@ -179,14 +179,14 @@ public class LongRange implements Range<Long>
 		{
 			for (long i = this.start; i < this.end; i += this.increment)
 			{
-				store[(int) (i + index)] = i;
+				store[index++] = i;
 			}
 			return;
 		}
 
 		for (long i = this.start; i <= this.end; i += this.increment)
 		{
-			store[(int) (i + index)] = i;
+			store[index++] = i;
 		}
 	}
 

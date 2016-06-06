@@ -173,14 +173,14 @@ public class IntRange implements Range<Integer>
 		{
 			for (int i = this.start; i < this.end; i += this.increment)
 			{
-				store[i + index] = i;
+				store[index++] = i;
 			}
 			return;
 		}
 
 		for (int i = this.start; i <= this.end; i += this.increment)
 		{
-			store[i + index] = i;
+			store[index++] = i;
 		}
 	}
 
