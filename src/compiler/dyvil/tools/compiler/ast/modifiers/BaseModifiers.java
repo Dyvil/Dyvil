@@ -27,8 +27,6 @@ public enum BaseModifiers implements Modifier
 	// Class Modifiers
 	SEALED(Modifiers.SEALED, "sealed"),
 	CASE(Modifiers.CASE_CLASS, "case"),
-	NULL(Modifiers.NULL_CLASS, "null"),
-	NIL(Modifiers.NIL_CLASS, "nil"),
 	// Field Modifiers
 	CONST(Modifiers.CONST, "const"),
 	LAZY(Modifiers.LAZY, "lazy");

@@ -138,10 +138,6 @@ public interface Modifiers
 	 */
 	int TRAIT_CLASS = 0x00080000 | INTERFACE_CLASS;
 
-	int NULL_CLASS = 0x00100000;
-
-	int NIL_CLASS = 0x00200000;
-
 	// Method Modifiers
 
 	/**
@@ -223,8 +219,7 @@ public interface Modifiers
 	 * The modifiers that can be used on classes.
 	 */
 	int CLASS_MODIFIERS =
-		MEMBER_MODIFIERS | CLASS_TYPE_MODIFIERS | ABSTRACT | STRICT | CASE_CLASS | FUNCTIONAL | SEALED | NULL_CLASS
-			| NIL_CLASS;
+		MEMBER_MODIFIERS | CLASS_TYPE_MODIFIERS | ABSTRACT | STRICT | CASE_CLASS | FUNCTIONAL | SEALED;
 
 	/**
 	 * The modifiers that can be used on fields.
