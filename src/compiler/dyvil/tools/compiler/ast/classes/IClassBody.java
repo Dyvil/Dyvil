@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -64,6 +65,8 @@ public interface IClassBody extends IASTNode, IClassList, IMemberConsumer<IField
 	IMethod getMethod(Name name);
 
 	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
+
+	void getImplicitMatches(MethodMatchList list, IValue value, IType targetType);
 
 	default IMethod getFunctionalMethod()
 	{

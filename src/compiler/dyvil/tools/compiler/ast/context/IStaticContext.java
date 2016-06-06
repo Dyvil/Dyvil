@@ -68,14 +68,16 @@ public interface IStaticContext extends IContext
 
 	@Override
 	IDataMember resolveField(Name name);
-	
+
 	@Override
 	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
-	
+
+	@Override
+	void getImplicitMatches(MethodMatchList list, IValue value, IType targetType);
+
 	@Override
 	default void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
-
 	}
 	
 	@Override

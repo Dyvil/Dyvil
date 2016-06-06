@@ -82,6 +82,8 @@ public interface IContext extends IMemberContext
 	@Override
 	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
 
+	void getImplicitMatches(MethodMatchList list, IValue value, IType targetType);
+
 	@Override
 	void getConstructorMatches(ConstructorMatchList list, IArguments arguments);
 
@@ -181,6 +183,15 @@ public interface IContext extends IMemberContext
 	static void getMethodMatch(MethodMatchList list, IValue receiver, Name name, IArguments arguments, IMethod method)
 	{
 		float match = method.getSignatureMatch(name, receiver, arguments);
+		if (match > 0)
+		{
+			list.add(method, match);
+		}
+	}
+
+	static void getImplicitMatch(MethodMatchList list, IValue value, IType targetType, IMethod method)
+	{
+		float match = method.getImplicitMatch(value, targetType);
 		if (match > 0)
 		{
 			list.add(method, match);

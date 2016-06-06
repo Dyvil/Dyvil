@@ -288,7 +288,13 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	{
 		return 0;
 	}
-	
+
+	@Override
+	public float getImplicitMatch(IValue value, IType type)
+	{
+		return 0;
+	}
+
 	@Override
 	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, GenericData genericData)
 	{

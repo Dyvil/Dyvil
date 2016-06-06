@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -140,7 +141,16 @@ public final class MultiImport extends Import implements IImportList
 			this.imports[i].getMethodMatches(list, instance, name, arguments);
 		}
 	}
-	
+
+	@Override
+	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+		for (int i = 0; i < this.importCount; i++)
+		{
+			this.imports[i].getImplicitMatches(list, value, targetType);
+		}
+	}
+
 	@Override
 	public void write(DataOutput out) throws IOException
 	{

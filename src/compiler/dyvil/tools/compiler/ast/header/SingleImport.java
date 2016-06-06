@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
@@ -25,42 +26,42 @@ public final class SingleImport extends Import
 {
 	public Name name;
 	public Name alias;
-	
+
 	private IClass  theClass;
 	private Package thePackage;
-	
+
 	private IDataMember   field;
 	private List<IMethod> methods;
-	
+
 	public SingleImport(ICodePosition position)
 	{
 		super(position);
 	}
-	
+
 	public SingleImport(ICodePosition position, Name name)
 	{
 		super(position);
 		this.name = name;
 	}
-	
+
 	@Override
 	public int importTag()
 	{
 		return SINGLE;
 	}
-	
+
 	@Override
 	public void setAlias(Name alias)
 	{
 		this.alias = alias;
 	}
-	
+
 	@Override
 	public Name getAlias()
 	{
 		return this.alias;
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context, boolean using)
 	{
@@ -68,13 +69,13 @@ public final class SingleImport extends Import
 		{
 			this.parent.resolveTypes(markers, context, false);
 			context = this.parent.getContext();
-			
+
 			if (context == null)
 			{
 				return;
 			}
 		}
-		
+
 		if (using)
 		{
 			if (!(context instanceof IClass))
@@ -82,16 +83,16 @@ public final class SingleImport extends Import
 				markers.add(Markers.semantic(this.position, "using.class.invalid"));
 				return;
 			}
-			
+
 			IClassBody body = ((IClass) context).getBody();
-			
+
 			IDataMember field = body.getField(this.name);
 			if (field != null)
 			{
 				this.field = field;
 				return;
 			}
-			
+
 			this.methods = new ArrayList<>();
 			int len = body.methodCount();
 			for (int i = 0; i < len; i++)
@@ -106,34 +107,34 @@ public final class SingleImport extends Import
 			{
 				return;
 			}
-			
+
 			markers.add(Markers.semantic(this.position, "resolve.method_field", this.name.qualified));
 			return;
 		}
-		
+
 		Package pack = context.resolvePackage(this.name);
 		if (pack != null)
 		{
 			this.thePackage = pack;
 			return;
 		}
-		
+
 		IClass iclass = context.resolveClass(this.name);
 		if (iclass != null)
 		{
 			this.theClass = iclass;
 			return;
 		}
-		
+
 		markers.add(Markers.semantic(this.position, "resolve.package", this.name.qualified));
 	}
-	
+
 	@Override
 	public IContext getContext()
 	{
 		return this.theClass != null ? this.theClass : this.thePackage;
 	}
-	
+
 	@Override
 	public Package resolvePackage(Name name)
 	{
@@ -143,7 +144,7 @@ public final class SingleImport extends Import
 		}
 		return null;
 	}
-	
+
 	@Override
 	public IClass resolveClass(Name name)
 	{
@@ -153,7 +154,7 @@ public final class SingleImport extends Import
 		}
 		return null;
 	}
-	
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
@@ -163,7 +164,7 @@ public final class SingleImport extends Import
 		}
 		return null;
 	}
-	
+
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
@@ -181,12 +182,26 @@ public final class SingleImport extends Import
 			IContext.getMethodMatch(list, instance, null, arguments, method);
 		}
 	}
-	
+
+	@Override
+	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+		if (this.methods == null)
+		{
+			return;
+		}
+
+		for (IMethod method : this.methods)
+		{
+			IContext.getImplicitMatch(list, value, targetType, method);
+		}
+	}
+
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
 		IImport.writeImport(this.parent, out);
-		
+
 		out.writeUTF(this.name.qualified);
 		if (this.alias != null)
 		{
@@ -197,21 +212,21 @@ public final class SingleImport extends Import
 			out.writeUTF("");
 		}
 	}
-	
+
 	@Override
 	public void read(DataInput in) throws IOException
 	{
 		this.parent = IImport.readImport(in);
-		
+
 		this.name = Name.getQualified(in.readUTF());
-		
+
 		String alias = in.readUTF();
 		if (!alias.isEmpty())
 		{
 			this.alias = Name.getQualified(alias);
 		}
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

@@ -72,4 +72,9 @@ public interface IDefaultContext extends IStaticContext
 	default void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 	}
+
+	@Override
+	default void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+	}
 }

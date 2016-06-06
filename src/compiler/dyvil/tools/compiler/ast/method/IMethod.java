@@ -26,6 +26,8 @@ public interface IMethod extends IClassMember, ICallableMember, ICallableSignatu
 	}
 
 	float getSignatureMatch(Name name, IValue instance, IArguments arguments);
+
+	float getImplicitMatch(IValue value, IType type);
 	
 	IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, GenericData genericData);
 	

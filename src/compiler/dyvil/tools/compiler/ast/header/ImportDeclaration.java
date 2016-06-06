@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.IObjectCompilable;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
@@ -85,7 +86,12 @@ public final class ImportDeclaration implements IASTNode, IObjectCompilable
 	{
 		return this.theImport.resolveField(name);
 	}
-	
+
+	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+		this.theImport.getImplicitMatches(list, value, targetType);
+	}
+
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		this.theImport.getMethodMatches(list, instance, name, arguments);

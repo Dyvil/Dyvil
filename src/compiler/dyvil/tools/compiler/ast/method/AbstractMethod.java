@@ -375,11 +375,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
-		final float selfMatch = this.getSignatureMatch(name, instance, arguments);
-		if (selfMatch > 0)
-		{
-			list.add(this, selfMatch);
-		}
+		IContext.getMethodMatch(list, instance, name, arguments, this);
+	}
+
+	@Override
+	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+		IContext.getImplicitMatch(list, value, targetType, this);
 	}
 
 	@Override
@@ -485,6 +487,25 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 
 		return totalMatch;
+	}
+
+	@Override
+	public float getImplicitMatch(IValue value, IType type)
+	{
+		if (!this.hasModifier(Modifiers.IMPLICIT | Modifiers.STATIC) || this.parameters.size() != 1)
+		{
+			// The method has to be 'implicit static' and only take exactly one parameter
+			return 0;
+		}
+		if (type != null && !Types.isSuperType(type, this.type))
+		{
+			// The method's return type has to be a sub-type of the target type
+			return 0;
+		}
+
+		final IType parType = this.parameters.get(0).getInternalType();
+		// Note: this explicitly uses IValue.getTypeMatch to avoid nested implicit conversions
+		return value.getTypeMatch(parType);
 	}
 
 	@Override

@@ -47,7 +47,7 @@ import java.lang.annotation.ElementType;
 
 public class REPLMemberClass implements IClass
 {
-	private REPLContext  context;
+	private REPLContext  context; // TODO simplify and remove this
 	private Name         name;
 	private IClassMember member;
 
@@ -437,6 +437,12 @@ public class REPLMemberClass implements IClass
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		this.context.getMethodMatches(list, instance, name, arguments);
+	}
+
+	@Override
+	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+		this.context.getImplicitMatches(list, value, targetType);
 	}
 
 	@Override

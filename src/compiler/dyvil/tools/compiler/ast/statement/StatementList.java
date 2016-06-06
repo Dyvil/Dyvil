@@ -293,11 +293,21 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 
 		for (IMethod method : this.methods)
 		{
-			final float match = method.getSignatureMatch(name, instance, arguments);
-			if (match > 0)
-			{
-				list.add(method, match);
-			}
+			IContext.getMethodMatch(list, instance, name, arguments, method);
+		}
+	}
+
+	@Override
+	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+		if (this.methods == null)
+		{
+			return;
+		}
+
+		for (IMethod method : this.methods)
+		{
+			IContext.getImplicitMatch(list, value, targetType, method);
 		}
 	}
 

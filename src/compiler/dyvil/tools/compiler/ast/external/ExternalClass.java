@@ -467,7 +467,12 @@ public final class ExternalClass extends AbstractClass
 			this.resolveGenerics();
 		}
 
+		/*
+		Note: unlike AbstractClass.getMethodMatches, this does not check the Class Parameter Properties, because
+		External classes do not have any class parameters with associated properties
+		*/
 		this.body.getMethodMatches(list, instance, name, arguments);
+		// The same applies for the Metadata
 
 		if (!list.isEmpty())
 		{

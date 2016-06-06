@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -60,6 +61,8 @@ public interface IImport extends IASTNode
 	}
 	
 	IContext getContext();
+
+	// TODO Use a common interface for this and ImportDeclarations
 	
 	Package resolvePackage(Name name);
 	
@@ -68,6 +71,8 @@ public interface IImport extends IASTNode
 	IDataMember resolveField(Name name);
 	
 	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
+
+	void getImplicitMatches(MethodMatchList list, IValue value, IType targetType);
 	
 	// Compilation
 	

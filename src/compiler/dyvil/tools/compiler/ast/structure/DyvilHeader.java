@@ -20,6 +20,7 @@ import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.operator.IOperator;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 import dyvil.tools.compiler.backend.IClassCompilable;
@@ -697,6 +698,20 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		for (int i = 0; i < this.includeCount; i++)
 		{
 			this.includes[i].getMethodMatches(list, instance, name, arguments);
+		}
+	}
+
+	@Override
+	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+		for (int i = 0; i < this.usingCount; i++)
+		{
+			this.usingDeclarations[i].getImplicitMatches(list, value, targetType);
+		}
+
+		for (int i = 0; i < this.includeCount; i++)
+		{
+			this.includes[i].getImplicitMatches(list, value, targetType);
 		}
 	}
 

@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -19,18 +20,18 @@ import java.io.IOException;
 public final class WildcardImport extends Import
 {
 	private IContext context;
-	
+
 	public WildcardImport(ICodePosition position)
 	{
 		super(position);
 	}
-	
+
 	@Override
 	public int importTag()
 	{
 		return WILDCARD;
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context, boolean using)
 	{
@@ -44,7 +45,7 @@ public final class WildcardImport extends Import
 				return;
 			}
 		}
-		
+
 		if (using)
 		{
 			if (!(context instanceof IClass))
@@ -52,11 +53,11 @@ public final class WildcardImport extends Import
 				markers.add(Markers.semantic(this.position, "using.wildcard.invalid"));
 				return;
 			}
-			
+
 			this.context = context;
 			return;
 		}
-		
+
 		if (!(context instanceof Package))
 		{
 			markers.add(Markers.semantic(this.position, "import.wildcard.invalid"));
@@ -64,13 +65,13 @@ public final class WildcardImport extends Import
 		}
 		this.context = context;
 	}
-	
+
 	@Override
 	public IContext getContext()
 	{
 		return this.context;
 	}
-	
+
 	@Override
 	public Package resolvePackage(Name name)
 	{
@@ -81,7 +82,7 @@ public final class WildcardImport extends Import
 
 		return this.context.resolvePackage(name);
 	}
-	
+
 	@Override
 	public IClass resolveClass(Name name)
 	{
@@ -92,7 +93,7 @@ public final class WildcardImport extends Import
 
 		return this.context.resolveClass(name);
 	}
-	
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
@@ -103,7 +104,7 @@ public final class WildcardImport extends Import
 
 		return this.context.resolveField(name);
 	}
-	
+
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
@@ -114,19 +115,30 @@ public final class WildcardImport extends Import
 
 		this.context.getMethodMatches(list, instance, name, arguments);
 	}
-	
+
+	@Override
+	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+		if (this.context == null)
+		{
+			return;
+		}
+
+		this.context.getImplicitMatches(list, value, targetType);
+	}
+
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
 		IImport.writeImport(this.parent, out);
 	}
-	
+
 	@Override
 	public void read(DataInput in) throws IOException
 	{
 		this.parent = IImport.readImport(in);
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

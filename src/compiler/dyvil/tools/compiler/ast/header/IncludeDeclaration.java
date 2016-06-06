@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.method.MethodMatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
@@ -24,29 +25,29 @@ import java.io.IOException;
 public class IncludeDeclaration implements IASTNode
 {
 	private ICodePosition position;
-	
+
 	private Name[] nameParts = new Name[3];
 	private int namePartCount;
-	
+
 	private IDyvilHeader header;
-	
+
 	public IncludeDeclaration(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
 	@Override
 	public ICodePosition getPosition()
 	{
 		return this.position;
 	}
-	
+
 	@Override
 	public void setPosition(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
 	public void addNamePart(Name name)
 	{
 		int index = this.namePartCount++;
@@ -58,27 +59,27 @@ public class IncludeDeclaration implements IASTNode
 		}
 		this.nameParts[index] = name;
 	}
-	
+
 	public IDyvilHeader getHeader()
 	{
 		return this.header;
 	}
-	
+
 	public IClass resolveClass(Name name)
 	{
 		return this.header == null ? null : this.header.resolveClass(name);
 	}
-	
+
 	public ITypeAlias resolveTypeAlias(Name name, int arity)
 	{
 		return this.header == null ? null : this.header.resolveTypeAlias(name, arity);
 	}
-	
+
 	public IDataMember resolveField(Name name)
 	{
 		return this.header == null ? null : this.header.resolveField(name);
 	}
-	
+
 	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
 	{
 		if (this.header != null)
@@ -86,7 +87,15 @@ public class IncludeDeclaration implements IASTNode
 			this.header.getMethodMatches(list, instance, name, arguments);
 		}
 	}
-	
+
+	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+		if (this.header != null)
+		{
+			this.header.getImplicitMatches(list, value, targetType);
+		}
+	}
+
 	public void resolve(MarkerList markers, IContext context)
 	{
 		Package pack = Package.rootPackage;
@@ -100,14 +109,14 @@ public class IncludeDeclaration implements IASTNode
 				return;
 			}
 		}
-		
+
 		this.header = pack.resolveHeader(this.nameParts[count].qualified);
 
 		if (markers == null)
 		{
 			return;
 		}
-		
+
 		if (this.header == null)
 		{
 			markers.add(Markers.semantic(this.position, "resolve.header", this.nameParts[count]));
@@ -151,7 +160,7 @@ public class IncludeDeclaration implements IASTNode
 			}
 		}
 	}
-	
+
 	public void write(DataOutput out) throws IOException
 	{
 		out.writeShort(this.namePartCount);
@@ -160,7 +169,7 @@ public class IncludeDeclaration implements IASTNode
 			out.writeUTF(this.nameParts[i].qualified);
 		}
 	}
-	
+
 	public void read(DataInput in) throws IOException
 	{
 		this.namePartCount = in.readShort();
@@ -170,13 +179,13 @@ public class IncludeDeclaration implements IASTNode
 			this.nameParts[i] = Name.getQualified(in.readUTF());
 		}
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return IASTNode.toString(this);
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

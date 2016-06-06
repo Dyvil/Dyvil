@@ -663,6 +663,22 @@ public class REPLContext extends DyvilHeader
 	}
 
 	@Override
+	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+		for (IMethod method : this.methods)
+		{
+			IContext.getImplicitMatch(list, value, targetType, method);
+		}
+
+		if (!list.isEmpty())
+		{
+			return;
+		}
+
+		super.getImplicitMatches(list, value, targetType);
+	}
+
+	@Override
 	public IType getReturnType()
 	{
 		return null;

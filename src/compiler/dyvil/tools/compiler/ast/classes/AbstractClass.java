@@ -787,6 +787,17 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
+	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+		if (this.body != null)
+		{
+			this.body.getImplicitMatches(list, value, targetType);
+		}
+
+		// TODO look into super types?
+	}
+
+	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 		if (this.body != null)

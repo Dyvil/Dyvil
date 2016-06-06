@@ -282,6 +282,15 @@ public class ClassBody implements IClassBody
 	}
 
 	@Override
+	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			IContext.getImplicitMatch(list, value, targetType, this.methods[i]);
+		}
+	}
+
+	@Override
 	public IMethod getFunctionalMethod()
 	{
 		return this.functionalMethod;

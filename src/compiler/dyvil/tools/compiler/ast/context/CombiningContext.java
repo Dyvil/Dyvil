@@ -132,6 +132,17 @@ public class CombiningContext implements IContext
 	}
 
 	@Override
+	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+		this.inner.getImplicitMatches(list, value, targetType);
+
+		if (list.isEmpty())
+		{
+			this.outer.getImplicitMatches(list, value, targetType);
+		}
+	}
+
+	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 		this.inner.getConstructorMatches(list, arguments);
