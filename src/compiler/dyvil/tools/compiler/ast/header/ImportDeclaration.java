@@ -19,11 +19,8 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public final class ImportDeclaration implements IASTNode, IObjectCompilable
+public final class ImportDeclaration implements IASTNode, IObjectCompilable, IImportContext
 {
-	public static final int IMPORT = 0;
-	public static final int USING  = 1;
-	
 	protected ICodePosition position;
 	protected IImport       theImport;
 	protected boolean       isStatic;
@@ -71,45 +68,54 @@ public final class ImportDeclaration implements IASTNode, IObjectCompilable
 		
 		this.theImport.resolveTypes(markers, Package.rootPackage, this.isStatic);
 	}
+
+	// Context
 	
+	@Override
 	public Package resolvePackage(Name name)
 	{
 		return this.theImport.resolvePackage(name);
 	}
 	
+	@Override
 	public IClass resolveClass(Name name)
 	{
 		return this.theImport.resolveClass(name);
 	}
 	
+	@Override
 	public IDataMember resolveField(Name name)
 	{
 		return this.theImport.resolveField(name);
 	}
 
+	@Override
 	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
 	{
 		this.theImport.getImplicitMatches(list, value, targetType);
 	}
 
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	@Override
+	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
-		this.theImport.getMethodMatches(list, instance, name, arguments);
+		this.theImport.getMethodMatches(list, receiver, name, arguments);
+	}
+
+	// Compilation
+	
+	@Override
+	public void write(DataOutput output) throws IOException
+	{
+		IImport.writeImport(this.theImport, output);
 	}
 	
 	@Override
-	public void write(DataOutput dos) throws IOException
+	public void read(DataInput input) throws IOException
 	{
-		dos.writeByte(this.theImport.importTag());
-		this.theImport.write(dos);
+		this.theImport = IImport.readImport(input);
 	}
-	
-	@Override
-	public void read(DataInput dis) throws IOException
-	{
-		this.theImport = IImport.fromTag(dis.readByte());
-		this.theImport.read(dis);
-	}
+
+	// Formatting
 	
 	@Override
 	public String toString()

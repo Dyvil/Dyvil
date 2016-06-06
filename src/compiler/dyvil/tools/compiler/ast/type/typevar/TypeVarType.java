@@ -186,9 +186,9 @@ public class TypeVarType implements IRawType
 	}
 	
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
-		this.typeParameter.getMethodMatches(list, instance, name, arguments);
+		this.typeParameter.getMethodMatches(list, receiver, name, arguments);
 	}
 	
 	@Override

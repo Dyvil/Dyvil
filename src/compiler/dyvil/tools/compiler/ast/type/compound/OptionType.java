@@ -221,9 +221,9 @@ public class OptionType implements IObjectType
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
-		LazyFields.OPTION_CLASS.getMethodMatches(list, instance, name, arguments);
+		LazyFields.OPTION_CLASS.getMethodMatches(list, receiver, name, arguments);
 	}
 
 	@Override

@@ -447,12 +447,12 @@ public final class PrimitiveType implements IType
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
-		Types.PRIMITIVES_CLASS.getMethodMatches(list, instance, name, arguments);
+		Types.PRIMITIVES_CLASS.getMethodMatches(list, receiver, name, arguments);
 		if (this.theClass != null)
 		{
-			this.theClass.getMethodMatches(list, instance, name, arguments);
+			this.theClass.getMethodMatches(list, receiver, name, arguments);
 		}
 	}
 

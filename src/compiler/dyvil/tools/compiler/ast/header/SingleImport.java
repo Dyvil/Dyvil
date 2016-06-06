@@ -166,7 +166,7 @@ public final class SingleImport extends Import
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
 		if (this.methods == null)
 		{
@@ -179,7 +179,7 @@ public final class SingleImport extends Import
 
 		for (IMethod method : this.methods)
 		{
-			IContext.getMethodMatch(list, instance, null, arguments, method);
+			IContext.getMethodMatch(list, receiver, null, arguments, method);
 		}
 	}
 
@@ -198,7 +198,7 @@ public final class SingleImport extends Import
 	}
 
 	@Override
-	public void write(DataOutput out) throws IOException
+	public void writeData(DataOutput out) throws IOException
 	{
 		IImport.writeImport(this.parent, out);
 
@@ -214,7 +214,7 @@ public final class SingleImport extends Import
 	}
 
 	@Override
-	public void read(DataInput in) throws IOException
+	public void readData(DataInput in) throws IOException
 	{
 		this.parent = IImport.readImport(in);
 

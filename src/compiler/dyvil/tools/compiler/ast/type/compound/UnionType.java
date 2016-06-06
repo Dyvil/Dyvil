@@ -341,12 +341,12 @@ public class UnionType implements IObjectType
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
 		this.getTheClass();
 		for (IClass commonClass : this.commonClasses)
 		{
-			commonClass.getMethodMatches(list, instance, name, arguments);
+			commonClass.getMethodMatches(list, receiver, name, arguments);
 		}
 	}
 

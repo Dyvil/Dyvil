@@ -1,13 +1,6 @@
 package dyvil.tools.compiler.ast.header;
 
-import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
-import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -17,7 +10,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public interface IImport extends IASTNode
+public interface IImport extends IASTNode, IImportContext
 {
 	int SINGLE   = 1;
 	int WILDCARD = 2;
@@ -61,18 +54,6 @@ public interface IImport extends IASTNode
 	}
 	
 	IContext getContext();
-
-	// TODO Use a common interface for this and ImportDeclarations
-	
-	Package resolvePackage(Name name);
-	
-	IClass resolveClass(Name name);
-	
-	IDataMember resolveField(Name name);
-	
-	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
-
-	void getImplicitMatches(MethodMatchList list, IValue value, IType targetType);
 	
 	// Compilation
 	
@@ -85,22 +66,25 @@ public interface IImport extends IASTNode
 		}
 		
 		dos.writeByte(iimport.importTag());
-		iimport.write(dos);
+		iimport.writeData(dos);
 	}
 	
 	static IImport readImport(DataInput dis) throws IOException
 	{
-		byte type = dis.readByte();
+		final byte type = dis.readByte();
 		if (type == 0)
 		{
 			return null;
 		}
-		IImport iimport = fromTag(type);
-		iimport.read(dis);
+
+		final IImport iimport = fromTag(type);
+		assert iimport != null;
+
+		iimport.readData(dis);
 		return iimport;
 	}
 	
-	void write(DataOutput out) throws IOException;
+	void writeData(DataOutput out) throws IOException;
 	
-	void read(DataInput in) throws IOException;
+	void readData(DataInput in) throws IOException;
 }

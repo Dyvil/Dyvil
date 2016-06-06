@@ -47,7 +47,7 @@ import java.lang.annotation.ElementType;
 
 public class REPLMemberClass implements IClass
 {
-	private REPLContext  context; // TODO simplify and remove this
+	private REPLContext  context;
 	private Name         name;
 	private IClassMember member;
 
@@ -434,9 +434,9 @@ public class REPLMemberClass implements IClass
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
-		this.context.getMethodMatches(list, instance, name, arguments);
+		this.context.getMethodMatches(list, receiver, name, arguments);
 	}
 
 	@Override
@@ -577,8 +577,9 @@ public class REPLMemberClass implements IClass
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		String name = this.name.qualified;
-		writer.visit(ClassFormat.CLASS_VERSION, Modifiers.PUBLIC | ASMConstants.ACC_SUPER, name, null, "java/lang/Object",
-		             null);
+		writer
+			.visit(ClassFormat.CLASS_VERSION, Modifiers.PUBLIC | ASMConstants.ACC_SUPER, name, null, "java/lang/Object",
+			       null);
 		writer.visitSource(name, null);
 
 		this.member.write(writer);

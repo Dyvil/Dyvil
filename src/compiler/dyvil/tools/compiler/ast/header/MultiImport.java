@@ -134,11 +134,11 @@ public final class MultiImport extends Import implements IImportList
 	}
 	
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
 		for (int i = 0; i < this.importCount; i++)
 		{
-			this.imports[i].getMethodMatches(list, instance, name, arguments);
+			this.imports[i].getMethodMatches(list, receiver, name, arguments);
 		}
 	}
 
@@ -152,7 +152,7 @@ public final class MultiImport extends Import implements IImportList
 	}
 
 	@Override
-	public void write(DataOutput out) throws IOException
+	public void writeData(DataOutput out) throws IOException
 	{
 		IImport.writeImport(this.parent, out);
 		
@@ -164,7 +164,7 @@ public final class MultiImport extends Import implements IImportList
 	}
 	
 	@Override
-	public void read(DataInput in) throws IOException
+	public void readData(DataInput in) throws IOException
 	{
 		this.parent = IImport.readImport(in);
 		

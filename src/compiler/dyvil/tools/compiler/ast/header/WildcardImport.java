@@ -106,14 +106,14 @@ public final class WildcardImport extends Import
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
 		if (this.context == null)
 		{
 			return;
 		}
 
-		this.context.getMethodMatches(list, instance, name, arguments);
+		this.context.getMethodMatches(list, receiver, name, arguments);
 	}
 
 	@Override
@@ -128,13 +128,13 @@ public final class WildcardImport extends Import
 	}
 
 	@Override
-	public void write(DataOutput out) throws IOException
+	public void writeData(DataOutput out) throws IOException
 	{
 		IImport.writeImport(this.parent, out);
 	}
 
 	@Override
-	public void read(DataInput in) throws IOException
+	public void readData(DataInput in) throws IOException
 	{
 		this.parent = IImport.readImport(in);
 	}

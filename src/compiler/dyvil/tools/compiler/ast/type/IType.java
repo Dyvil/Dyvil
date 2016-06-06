@@ -370,7 +370,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	IDataMember resolveField(Name name);
 
 	@Override
-	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
+	void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments);
 
 	@Override
 	void getConstructorMatches(ConstructorMatchList list, IArguments arguments);

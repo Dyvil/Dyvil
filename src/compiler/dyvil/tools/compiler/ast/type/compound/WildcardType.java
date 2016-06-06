@@ -288,11 +288,11 @@ public final class WildcardType implements IRawType, ITyped
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
 		if (this.bound != null && this.variance == Variance.COVARIANT)
 		{
-			this.bound.getMethodMatches(list, instance, name, arguments);
+			this.bound.getMethodMatches(list, receiver, name, arguments);
 		}
 	}
 

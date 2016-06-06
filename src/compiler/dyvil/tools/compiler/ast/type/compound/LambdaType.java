@@ -488,9 +488,9 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
-		getLambdaClass(this.parameterCount).getMethodMatches(list, instance, name, arguments);
+		getLambdaClass(this.parameterCount).getMethodMatches(list, receiver, name, arguments);
 	}
 
 	@Override

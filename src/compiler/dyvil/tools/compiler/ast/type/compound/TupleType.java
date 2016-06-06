@@ -370,9 +370,9 @@ public final class TupleType implements IObjectType, ITypeList
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
-		this.getTheClass().getMethodMatches(list, instance, name, arguments);
+		this.getTheClass().getMethodMatches(list, receiver, name, arguments);
 	}
 
 	@Override

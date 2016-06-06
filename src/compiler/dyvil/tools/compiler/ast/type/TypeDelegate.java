@@ -329,9 +329,9 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
-		this.type.getMethodMatches(list, instance, name, arguments);
+		this.type.getMethodMatches(list, receiver, name, arguments);
 	}
 
 	@Override

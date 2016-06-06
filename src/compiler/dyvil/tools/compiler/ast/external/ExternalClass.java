@@ -460,7 +460,7 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
 		if ((this.resolved & GENERICS) == 0)
 		{
@@ -471,7 +471,7 @@ public final class ExternalClass extends AbstractClass
 		Note: unlike AbstractClass.getMethodMatches, this does not check the Class Parameter Properties, because
 		External classes do not have any class parameters with associated properties
 		*/
-		this.body.getMethodMatches(list, instance, name, arguments);
+		this.body.getMethodMatches(list, receiver, name, arguments);
 		// The same applies for the Metadata
 
 		if (!list.isEmpty())
@@ -486,7 +486,7 @@ public final class ExternalClass extends AbstractClass
 
 		if (this.superType != null)
 		{
-			this.superType.getMethodMatches(list, instance, name, arguments);
+			this.superType.getMethodMatches(list, receiver, name, arguments);
 		}
 
 		if (!list.isEmpty())
@@ -496,7 +496,7 @@ public final class ExternalClass extends AbstractClass
 
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			this.interfaces[i].getMethodMatches(list, instance, name, arguments);
+			this.interfaces[i].getMethodMatches(list, receiver, name, arguments);
 		}
 	}
 

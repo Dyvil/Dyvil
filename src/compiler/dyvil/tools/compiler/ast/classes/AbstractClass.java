@@ -747,23 +747,23 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
 		for (int i = 0, count = this.parameters.size(); i < count; i++)
 		{
 			final IProperty property = this.parameters.get(i).getProperty();
 			if (property != null)
 			{
-				property.getMethodMatches(list, instance, name, arguments);
+				property.getMethodMatches(list, receiver, name, arguments);
 			}
 		}
 
 		if (this.body != null)
 		{
-			this.body.getMethodMatches(list, instance, name, arguments);
+			this.body.getMethodMatches(list, receiver, name, arguments);
 		}
 
-		this.metadata.getMethodMatches(list, instance, name, arguments);
+		this.metadata.getMethodMatches(list, receiver, name, arguments);
 
 		if (!list.isEmpty())
 		{
@@ -772,7 +772,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 
 		if (this.superType != null)
 		{
-			this.superType.getMethodMatches(list, instance, name, arguments);
+			this.superType.getMethodMatches(list, receiver, name, arguments);
 		}
 
 		if (!list.isEmpty())
@@ -782,7 +782,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			this.interfaces[i].getMethodMatches(list, instance, name, arguments);
+			this.interfaces[i].getMethodMatches(list, receiver, name, arguments);
 		}
 	}
 

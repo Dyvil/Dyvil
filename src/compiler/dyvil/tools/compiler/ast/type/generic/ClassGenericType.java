@@ -145,9 +145,9 @@ public class ClassGenericType extends GenericType
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
-		this.theClass.getMethodMatches(list, instance, name, arguments);
+		this.theClass.getMethodMatches(list, receiver, name, arguments);
 	}
 
 	@Override

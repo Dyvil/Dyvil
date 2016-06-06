@@ -154,14 +154,14 @@ public interface ICall extends IValue, IArgumentsConsumer
 	
 	void reportResolve(MarkerList markers, IContext context);
 	
-	static void addResolveMarker(MarkerList markers, ICodePosition position, IValue instance, Name name, IArguments arguments)
+	static void addResolveMarker(MarkerList markers, ICodePosition position, IValue receiver, Name name, IArguments arguments)
 	{
 		if (arguments == EmptyArguments.INSTANCE)
 		{
 			Marker marker = Markers.semantic(position, "resolve.method_field", name);
-			if (instance != null)
+			if (receiver != null)
 			{
-				marker.addInfo(Markers.getSemantic("receiver.type", instance.getType()));
+				marker.addInfo(Markers.getSemantic("receiver.type", receiver.getType()));
 			}
 			
 			markers.add(marker);
@@ -169,9 +169,9 @@ public interface ICall extends IValue, IArgumentsConsumer
 		}
 		
 		Marker marker = Markers.semantic(position, "resolve.method", name);
-		if (instance != null)
+		if (receiver != null)
 		{
-			marker.addInfo(Markers.getSemantic("receiver.type", instance.getType()));
+			marker.addInfo(Markers.getSemantic("receiver.type", receiver.getType()));
 		}
 		if (!arguments.isEmpty())
 		{
@@ -183,9 +183,9 @@ public interface ICall extends IValue, IArgumentsConsumer
 		markers.add(marker);
 	}
 	
-	static boolean privateAccess(IContext context, IValue instance)
+	static boolean privateAccess(IContext context, IValue receiver)
 	{
-		return instance == null || context.getThisClass() == instance.getType().getTheClass();
+		return receiver == null || context.getThisClass() == receiver.getType().getTheClass();
 	}
 	
 	static IDataMember resolveField(IContext context, ITyped receiver, Name name)
@@ -214,15 +214,15 @@ public interface ICall extends IValue, IArgumentsConsumer
 		return Types.LANG_HEADER.resolveField(name);
 	}
 	
-	static IMethod resolveMethod(IContext context, IValue instance, Name name, IArguments arguments)
+	static IMethod resolveMethod(IContext context, IValue receiver, Name name, IArguments arguments)
 	{
 		MethodMatchList matches = new MethodMatchList();
-		if (instance != null)
+		if (receiver != null)
 		{
-			IType type = instance.getType();
+			IType type = receiver.getType();
 			if (type != null)
 			{
-				type.getMethodMatches(matches, instance, name, arguments);
+				type.getMethodMatches(matches, receiver, name, arguments);
 				
 				if (!matches.isEmpty())
 				{
@@ -238,7 +238,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 			IType type = v.getType();
 			if (type != null)
 			{
-				type.getMethodMatches(matches, instance, name, arguments);
+				type.getMethodMatches(matches, receiver, name, arguments);
 				
 				if (!matches.isEmpty())
 				{
@@ -247,13 +247,13 @@ public interface ICall extends IValue, IArgumentsConsumer
 			}
 		}
 
-		context.getMethodMatches(matches, instance, name, arguments);
+		context.getMethodMatches(matches, receiver, name, arguments);
 		if (!matches.isEmpty())
 		{
 			return matches.getBestMethod();
 		}
 		
-		Types.LANG_HEADER.getMethodMatches(matches, instance, name, arguments);
+		Types.LANG_HEADER.getMethodMatches(matches, receiver, name, arguments);
 		if (!matches.isEmpty())
 		{
 			return matches.getBestMethod();

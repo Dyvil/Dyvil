@@ -111,12 +111,12 @@ public class ExternalHeader extends DyvilHeader
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
 		if ((this.resolved & USING_DECLARATIONS) == 0)
 		{
 			this.resolveUsingDeclarations();
 		}
-		super.getMethodMatches(list, instance, name, arguments);
+		super.getMethodMatches(list, receiver, name, arguments);
 	}
 }

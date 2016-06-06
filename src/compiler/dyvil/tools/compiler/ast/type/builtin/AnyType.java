@@ -77,9 +77,9 @@ public class AnyType implements IRawType
 	}
 	
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
-		Types.OBJECT_CLASS.getMethodMatches(list, instance, name, arguments);
+		Types.OBJECT_CLASS.getMethodMatches(list, receiver, name, arguments);
 	}
 	
 	@Override

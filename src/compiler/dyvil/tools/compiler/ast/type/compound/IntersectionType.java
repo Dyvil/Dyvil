@@ -330,10 +330,10 @@ public class IntersectionType implements IObjectType
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
-		this.left.getMethodMatches(list, instance, name, arguments);
-		this.right.getMethodMatches(list, instance, name, arguments);
+		this.left.getMethodMatches(list, receiver, name, arguments);
+		this.right.getMethodMatches(list, receiver, name, arguments);
 	}
 
 	@Override

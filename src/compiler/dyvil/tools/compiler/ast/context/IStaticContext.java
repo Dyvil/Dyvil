@@ -70,7 +70,7 @@ public interface IStaticContext extends IContext
 	IDataMember resolveField(Name name);
 
 	@Override
-	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
+	void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments);
 
 	@Override
 	void getImplicitMatches(MethodMatchList list, IValue value, IType targetType);

@@ -284,7 +284,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
 		if (this.methods == null)
 		{
@@ -293,7 +293,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 
 		for (IMethod method : this.methods)
 		{
-			IContext.getMethodMatch(list, instance, name, arguments, method);
+			IContext.getMethodMatch(list, receiver, name, arguments, method);
 		}
 	}
 

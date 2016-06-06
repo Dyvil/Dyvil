@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IImportContext;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MethodMatchList;
@@ -22,10 +23,9 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.ast.type.raw.PackageType;
 import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
-import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.parsing.Name;
 
-public interface IContext extends IMemberContext
+public interface IContext extends IMemberContext, IImportContext
 {
 	byte VISIBLE   = 0;
 	byte INVISIBLE = 1;
@@ -80,8 +80,9 @@ public interface IContext extends IMemberContext
 	IDataMember resolveField(Name name);
 
 	@Override
-	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
+	void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments);
 
+	@Override
 	void getImplicitMatches(MethodMatchList list, IValue value, IType targetType);
 
 	@Override
@@ -98,19 +99,6 @@ public interface IContext extends IMemberContext
 	IAccessible getAccessibleThis(IClass type);
 
 	IValue getImplicit();
-
-	static void addCompilable(IContext context, IClassCompilable compilable)
-	{
-		IClass iclass = context.getThisClass();
-		if (iclass != null)
-		{
-			iclass.addCompilable(compilable);
-			return;
-		}
-
-		IDyvilHeader header = context.getHeader();
-		header.addInnerClass(compilable);
-	}
 
 	static IClass resolveClass(IMemberContext context, Name name)
 	{
@@ -173,10 +161,10 @@ public interface IContext extends IMemberContext
 		return matches.getBestConstructor();
 	}
 
-	static IMethod resolveMethod(IMemberContext context, IValue instance, Name name, IArguments arguments)
+	static IMethod resolveMethod(IMemberContext context, IValue receiver, Name name, IArguments arguments)
 	{
 		MethodMatchList matches = new MethodMatchList();
-		context.getMethodMatches(matches, instance, name, arguments);
+		context.getMethodMatches(matches, receiver, name, arguments);
 		return matches.getBestMethod();
 	}
 
