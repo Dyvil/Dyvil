@@ -88,6 +88,11 @@ public class PackageType implements IRawType
 	}
 
 	@Override
+	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+	}
+
+	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}

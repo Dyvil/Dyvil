@@ -337,6 +337,13 @@ public class IntersectionType implements IObjectType
 	}
 
 	@Override
+	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+		this.left.getImplicitMatches(list, value, targetType);
+		this.right.getImplicitMatches(list, value, targetType);
+	}
+
+	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}

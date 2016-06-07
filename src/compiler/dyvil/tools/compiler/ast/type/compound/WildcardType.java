@@ -297,6 +297,15 @@ public final class WildcardType implements IRawType, ITyped
 	}
 
 	@Override
+	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+		if (this.bound != null && this.variance == Variance.COVARIANT)
+		{
+			this.bound.getImplicitMatches(list, value, targetType);
+		}
+	}
+
+	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}

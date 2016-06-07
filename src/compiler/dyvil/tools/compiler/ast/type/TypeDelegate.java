@@ -335,6 +335,12 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
+	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+		this.type.getImplicitMatches(list, value, targetType);
+	}
+
+	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 		this.type.getConstructorMatches(list, arguments);

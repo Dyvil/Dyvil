@@ -97,6 +97,8 @@ public interface ITypeParameter extends IASTNode, INamed, IAnnotated, IObjectCom
 
 	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
 
+	void getImplicitMatches(MethodMatchList list, IValue value, IType targetType);
+
 	// Phases
 
 	void resolveTypes(MarkerList markers, IContext context);

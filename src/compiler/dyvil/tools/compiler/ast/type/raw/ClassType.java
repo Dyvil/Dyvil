@@ -24,12 +24,12 @@ import java.io.IOException;
 public class ClassType implements IRawType
 {
 	public IClass theClass;
-	
+
 	public ClassType()
 	{
 		super();
 	}
-	
+
 	public ClassType(IClass iclass)
 	{
 		this.theClass = iclass;
@@ -48,64 +48,67 @@ public class ClassType implements IRawType
 	}
 
 	// Names
-	
+
 	@Override
 	public Name getName()
 	{
 		return this.theClass.getName();
 	}
-	
+
 	@Override
 	public IClass getTheClass()
 	{
 		return this.theClass;
 	}
-	
+
 	// Super Type
-	
+
 	@Override
 	public boolean isSameType(IType type)
 	{
 		return this.theClass == type.getTheClass() && this.isPrimitive() == type.isPrimitive();
 	}
-	
+
 	@Override
 	public boolean isSameClass(IType type)
 	{
 		return this.theClass == type.getTheClass() && !type.isPrimitive();
 	}
-	
+
 	// Resolve
-	
+
 	@Override
 	public boolean isResolved()
 	{
 		return true;
 	}
-	
+
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
 		return this;
 	}
-	
+
 	// IContext
-	
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		return this.theClass == null ? null : this.theClass.resolveField(name);
+		return this.theClass.resolveField(name);
 	}
-	
+
 	@Override
 	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
-		if (this.theClass != null)
-		{
-			this.theClass.getMethodMatches(list, receiver, name, arguments);
-		}
+		this.theClass.getMethodMatches(list, receiver, name, arguments);
 	}
-	
+
+	@Override
+	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+		this.theClass.getImplicitMatches(list, value, targetType);
+	}
+
 	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
@@ -114,39 +117,39 @@ public class ClassType implements IRawType
 			this.theClass.getConstructorMatches(list, arguments);
 		}
 	}
-	
+
 	@Override
 	public IMethod getFunctionalMethod()
 	{
-		return this.theClass == null ? null : this.theClass.getFunctionalMethod();
+		return this.theClass.getFunctionalMethod();
 	}
-	
+
 	// Compilation
-	
+
 	@Override
 	public String getInternalName()
 	{
 		return this.theClass.getInternalName();
 	}
-	
+
 	@Override
 	public void appendExtendedName(StringBuilder buffer)
 	{
 		buffer.append('L').append(this.theClass.getInternalName()).append(';');
 	}
-	
+
 	@Override
 	public String getSignature()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
 		buffer.append('L').append(this.theClass.getInternalName()).append(';');
 	}
-	
+
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
@@ -154,34 +157,34 @@ public class ClassType implements IRawType
 		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/Type", "apply",
 		                       "(Ljava/lang/String;)Ldyvilx/lang/model/type/Type;", true);
 	}
-	
+
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
 		out.writeUTF(this.theClass.getInternalName());
 	}
-	
+
 	@Override
 	public void read(DataInput in) throws IOException
 	{
 		String internal = in.readUTF();
 		this.theClass = Package.rootPackage.resolveInternalClass(internal);
 	}
-	
+
 	// Misc
-	
+
 	@Override
 	public String toString()
 	{
 		return this.theClass.getFullName();
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(this.theClass.getName());
 	}
-	
+
 	@Override
 	public ClassType clone()
 	{

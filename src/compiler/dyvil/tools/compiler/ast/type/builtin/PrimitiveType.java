@@ -457,6 +457,12 @@ public final class PrimitiveType implements IType
 	}
 
 	@Override
+	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+		Types.PRIMITIVES_CLASS.getImplicitMatches(list, value, targetType);
+	}
+
+	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}

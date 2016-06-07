@@ -256,6 +256,12 @@ public class ReferenceType implements IObjectType
 	}
 
 	@Override
+	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+		this.theClass.getImplicitMatches(list, value, targetType);
+	}
+
+	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}

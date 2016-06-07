@@ -371,6 +371,12 @@ public class ArrayType implements IObjectType, ITyped
 	}
 
 	@Override
+	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+		this.type.getArrayClass().getImplicitMatches(list, value, targetType);
+	}
+
+	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}

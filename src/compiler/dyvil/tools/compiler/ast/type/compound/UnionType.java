@@ -351,6 +351,16 @@ public class UnionType implements IObjectType
 	}
 
 	@Override
+	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+		this.getTheClass();
+		for (IClass commonClass : this.commonClasses)
+		{
+			commonClass.getImplicitMatches(list, value, targetType);
+		}
+	}
+
+	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}

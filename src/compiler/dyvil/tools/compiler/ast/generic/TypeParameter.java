@@ -501,6 +501,15 @@ public final class TypeParameter implements ITypeParameter
 	}
 
 	@Override
+	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			this.upperBounds[i].getImplicitMatches(list, value, targetType);
+		}
+	}
+
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.lowerBound != null)

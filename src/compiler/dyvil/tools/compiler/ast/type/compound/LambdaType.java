@@ -494,6 +494,12 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	}
 
 	@Override
+	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+		getLambdaClass(this.parameterCount).getImplicitMatches(list, value, targetType);
+	}
+
+	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
 	}

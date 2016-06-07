@@ -190,7 +190,13 @@ public class TypeVarType implements IRawType
 	{
 		this.typeParameter.getMethodMatches(list, receiver, name, arguments);
 	}
-	
+
+	@Override
+	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+		this.typeParameter.getImplicitMatches(list, value, targetType);
+	}
+
 	@Override
 	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
 	{
