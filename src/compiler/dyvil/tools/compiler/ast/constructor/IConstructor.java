@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.constructor;
 
 import dyvil.tools.compiler.ast.access.InitializerCall;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.method.ICallableMember;
@@ -25,7 +26,7 @@ public interface IConstructor extends IClassMember, ICallableMember, ICallableSi
 
 	void setInitializer(InitializerCall initializer);
 
-	float getSignatureMatch(IArguments arguments);
+	float getSignatureMatch(IArguments arguments, IImplicitContext implicitContext);
 	
 	IType checkArguments(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments);
 	

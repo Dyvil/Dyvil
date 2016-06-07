@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
@@ -220,7 +221,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	}
 
 	@Override
-	public float getSignatureMatch(IArguments arguments)
+	public float getSignatureMatch(IArguments arguments, IImplicitContext implicitContext)
 	{
 		int totalMatch = 1;
 

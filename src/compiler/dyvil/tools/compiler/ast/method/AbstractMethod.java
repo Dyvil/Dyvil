@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisExpr;
@@ -417,6 +418,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 	@Override
 	public float getSignatureMatch(Name name, IValue receiver, IArguments arguments)
+	public float getSignatureMatch(Name name, IValue receiver, IArguments arguments, IImplicitContext implicitContext)
 	{
 		if (name != this.name && name != null)
 		{

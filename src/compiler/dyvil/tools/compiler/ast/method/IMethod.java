@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.method;
 import dyvil.tools.asm.Handle;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -25,7 +26,7 @@ public interface IMethod extends IClassMember, ICallableMember, ICallableSignatu
 		return MemberKind.METHOD;
 	}
 
-	float getSignatureMatch(Name name, IValue instance, IArguments arguments);
+	float getSignatureMatch(Name name, IValue instance, IArguments arguments, IImplicitContext implicitContext);
 
 	float getImplicitMatch(IValue value, IType type);
 	

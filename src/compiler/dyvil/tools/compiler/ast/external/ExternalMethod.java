@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -178,7 +179,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	public float getSignatureMatch(Name name, IValue receiver, IArguments arguments)
+	public float getSignatureMatch(Name name, IValue receiver, IArguments arguments, IImplicitContext implicitContext)
 	{
 		// Fail fast
 		if (name != this.name && name != null)
@@ -190,7 +191,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		{
 			this.resolveParameters();
 		}
-		return super.getSignatureMatch(name, receiver, arguments);
+		return super.getSignatureMatch(name, receiver, arguments, implicitContext);
 	}
 
 	@Override
