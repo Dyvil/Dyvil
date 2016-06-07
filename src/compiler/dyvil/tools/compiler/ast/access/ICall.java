@@ -216,7 +216,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 	
 	static IMethod resolveMethod(IContext context, IValue receiver, Name name, IArguments arguments)
 	{
-		MethodMatchList matches = new MethodMatchList();
+		MethodMatchList matches = new MethodMatchList(context);
 		if (receiver != null)
 		{
 			IType type = receiver.getType();

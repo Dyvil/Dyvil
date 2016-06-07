@@ -154,23 +154,23 @@ public interface IContext extends IMemberContext, IImportContext
 		return operator;
 	}
 
+	static IConstructor resolveConstructor(IImplicitContext implicitContext, IMemberContext type, IArguments arguments)
 	{
-		ConstructorMatchList matches = new ConstructorMatchList();
-		context.getConstructorMatches(matches, arguments);
+		ConstructorMatchList matches = new ConstructorMatchList(implicitContext);
 		type.getConstructorMatches(matches, arguments);
 		return matches.getBestConstructor();
 	}
 
 	static IMethod resolveMethod(IMemberContext context, IValue receiver, Name name, IArguments arguments)
 	{
-		MethodMatchList matches = new MethodMatchList();
+		MethodMatchList matches = new MethodMatchList(context);
 		context.getMethodMatches(matches, receiver, name, arguments);
 		return matches.getBestMethod();
 	}
 
 	static void getConstructorMatch(ConstructorMatchList list, IArguments arguments, IConstructor constructor)
 	{
-		final float match = constructor.getSignatureMatch(arguments);
+		final float match = constructor.getSignatureMatch(arguments, list);
 		if (match > 0)
 		{
 			list.add(constructor, match);
@@ -179,7 +179,7 @@ public interface IContext extends IMemberContext, IImportContext
 
 	static void getMethodMatch(MethodMatchList list, IValue receiver, Name name, IArguments arguments, IMethod method)
 	{
-		final float match = method.getSignatureMatch(name, receiver, arguments);
+		final float match = method.getSignatureMatch(name, receiver, arguments, list);
 		if (match > 0)
 		{
 			list.add(method, match);

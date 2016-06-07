@@ -1,21 +1,32 @@
 package dyvil.tools.compiler.ast.method;
 
-public final class MethodMatchList
+import dyvil.tools.compiler.ast.context.IImplicitContext;
+import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.type.IType;
+
+public final class MethodMatchList implements IImplicitContext
 {
 	private IMethod[] methods = new IMethod[4];
 	private float[]   values  = new float[4];
 	private int size;
-	
+
+	private final IImplicitContext implicitContext;
+
+	public MethodMatchList(IImplicitContext implicitContext)
+	{
+		this.implicitContext = implicitContext;
+	}
+
 	public int size()
 	{
 		return this.size;
 	}
-	
+
 	public boolean isEmpty()
 	{
 		return this.size <= 0;
 	}
-	
+
 	public void ensureCapacity(int capacity)
 	{
 		if (capacity <= this.methods.length)
@@ -28,12 +39,12 @@ public final class MethodMatchList
 		final IMethod[] tempMethods = new IMethod[newCapacity];
 		System.arraycopy(this.methods, 0, tempMethods, 0, this.size);
 		this.methods = tempMethods;
-		
+
 		final float[] tempValues = new float[newCapacity];
 		System.arraycopy(this.values, 0, tempValues, 0, this.size);
 		this.values = tempValues;
 	}
-	
+
 	public void add(IMethod method, float match)
 	{
 		this.ensureCapacity(this.size + 1);
@@ -42,33 +53,65 @@ public final class MethodMatchList
 		this.size++;
 	}
 
+	public float getValue(int index)
+	{
+		return this.values[index];
+	}
+
 	public IMethod getMethod(int index)
 	{
 		return this.methods[index];
 	}
-	
-	public IMethod getBestMethod()
+
+	public int getBestIndex()
 	{
 		switch (this.size)
 		{
 		case 0:
-			return null;
+			return -1;
 		case 1:
-			return this.methods[0];
+			return 0;
 		}
-		
-		IMethod bestMethod = this.methods[0];
+
+		int bestIndex = 0;
 		float bestMatch = this.values[0];
 		for (int i = 1; i < this.size; i++)
 		{
 			float match = this.values[i];
 			if (match < bestMatch)
 			{
-				bestMethod = this.methods[i];
+				bestIndex = i;
 				bestMatch = match;
 			}
 		}
-		
-		return bestMethod;
+
+		return bestIndex;
+	}
+
+	public float getBestValue()
+	{
+		final int bestIndex = this.getBestIndex();
+		if (bestIndex < 0)
+		{
+			return 0F;
+		}
+		return this.values[bestIndex];
+	}
+
+	public IMethod getBestMethod()
+	{
+		final int bestIndex = this.getBestIndex();
+		if (bestIndex < 0)
+		{
+			return null;
+		}
+
+		return this.methods[bestIndex];
+	}
+
+	@Override
+	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	{
+		this.implicitContext.getImplicitMatches(list, value, targetType);
 	}
 }
