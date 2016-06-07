@@ -67,11 +67,11 @@ public class ClassConstructor extends ConstructorCall
 		{
 			if (theClass.isInterface())
 			{
-				this.constructor = IContext.resolveConstructor(Types.OBJECT_CLASS, this.arguments);
+				this.constructor = IContext.resolveConstructor(context, Types.OBJECT_CLASS, this.arguments);
 			}
 			else
 			{
-				this.constructor = IContext.resolveConstructor(this.type, this.arguments);
+				this.constructor = IContext.resolveConstructor(context, this.type, this.arguments);
 			}
 			if (this.constructor == null)
 			{

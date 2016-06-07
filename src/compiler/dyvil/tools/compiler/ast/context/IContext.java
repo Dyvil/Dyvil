@@ -154,10 +154,10 @@ public interface IContext extends IMemberContext, IImportContext
 		return operator;
 	}
 
-	static IConstructor resolveConstructor(IMemberContext context, IArguments arguments)
 	{
 		ConstructorMatchList matches = new ConstructorMatchList();
 		context.getConstructorMatches(matches, arguments);
+		type.getConstructorMatches(matches, arguments);
 		return matches.getBestConstructor();
 	}
 

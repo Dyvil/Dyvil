@@ -76,14 +76,14 @@ public final class CaseClassMetadata extends ClassMetadata
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
 		if (name == Names.apply && this.applyMethod != null)
 		{
-			IContext.getMethodMatch(list, instance, name, arguments, this.applyMethod);
+			IContext.getMethodMatch(list, receiver, name, arguments, this.applyMethod);
 		}
 
-		super.getMethodMatches(list, instance, name, arguments);
+		super.getMethodMatches(list, receiver, name, arguments);
 	}
 
 	@Override

@@ -171,7 +171,7 @@ public class ConstructorCall implements ICall
 
 		if (!this.type.isArrayType())
 		{
-			this.constructor = IContext.resolveConstructor(this.type, this.arguments);
+			this.constructor = IContext.resolveConstructor(context, this.type, this.arguments);
 			if (this.constructor == null)
 			{
 				return null;

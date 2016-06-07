@@ -100,7 +100,7 @@ public interface IClassMetadata extends IClassCompilable
 		return null;
 	}
 	
-	default void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	default void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
 	{
 	}
 	
