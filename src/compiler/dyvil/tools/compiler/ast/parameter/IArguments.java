@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -20,13 +21,7 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 		return TypeChecker.markerSupplier("method.access.argument_type", parameter.getName());
 	}
 
-	static float getDirectTypeMatch(IValue value, IType type)
-	{
-		return value.getTypeMatch(type);
-		// TODO Automatic Conversion
-	}
-
-	static float getTypeMatch(IValue value, IType type)
+	static float getTypeMatch(IValue value, IType type, IImplicitContext implicitContext)
 	{
 		if (value.checkVarargs(false))
 		{
@@ -35,11 +30,12 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 			return 0F;
 		}
 
-		return getDirectTypeMatch(value, type);
+		return TypeChecker.getTypeMatch(value, type, implicitContext);
 	}
 
 	float DEFAULT_MATCH = 1000;
 	float VARARGS_MATCH = 100;
+	float IMPLICIT_CONVERSION_MATCH = 100;
 
 	@Override
 	default ICodePosition getPosition()
@@ -83,7 +79,7 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 
 	IValue getValue(int index, IParameter param);
 
-	float getTypeMatch(int index, IParameter param);
+	float getTypeMatch(int index, IParameter param, IImplicitContext implicitContext);
 
 	void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context);
 

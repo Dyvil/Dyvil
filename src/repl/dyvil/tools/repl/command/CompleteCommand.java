@@ -278,7 +278,7 @@ public class CompleteCommand implements ICommand
 
 	private static void findExtensions(DyvilREPL repl, IType type, IValue value, Set<IMethod> methods, String start)
 	{
-		MethodMatchList matchList = new MethodMatchList();
+		MethodMatchList matchList = new MethodMatchList(repl.getContext());
 		type.getMethodMatches(matchList, value, null, null);
 		repl.getContext().getMethodMatches(matchList, value, null, null);
 		Types.LANG_HEADER.getMethodMatches(matchList, value, null, null);

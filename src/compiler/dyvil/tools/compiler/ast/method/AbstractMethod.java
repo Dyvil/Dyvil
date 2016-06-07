@@ -417,7 +417,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public float getSignatureMatch(Name name, IValue receiver, IArguments arguments)
 	public float getSignatureMatch(Name name, IValue receiver, IArguments arguments, IImplicitContext implicitContext)
 	{
 		if (name != this.name && name != null)
@@ -437,7 +436,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				if (mod == Modifiers.INFIX)
 				{
 					final IType infixReceiverType = this.parameters.get(0).getInternalType();
-					final float receiverMatch = receiver.getTypeMatch(infixReceiverType);
+					final float receiverMatch = TypeChecker.getTypeMatch(receiver, infixReceiverType, implicitContext);
 					if (receiverMatch == 0)
 					{
 						return 0;
@@ -453,7 +452,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				}
 				else
 				{
-					final float receiverMatch = receiver.getTypeMatch(this.enclosingClass.getClassType());
+					final IType receiverType = this.enclosingClass.getClassType();
+					final float receiverMatch = TypeChecker.getTypeMatch(receiver, receiverType, implicitContext);
 					if (receiverMatch <= 0)
 					{
 						return 0;
@@ -479,7 +479,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		for (int argumentIndex = 0; argumentIndex < parametersLeft; argumentIndex++)
 		{
 			final IParameter parameter = this.parameters.get(argumentIndex + parameterStartIndex);
-			final float valueMatch = arguments.getTypeMatch(argumentIndex, parameter);
+			final float valueMatch = arguments.getTypeMatch(argumentIndex, parameter, implicitContext);
 			if (valueMatch <= 0)
 			{
 				return 0;

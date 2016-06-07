@@ -236,7 +236,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 		for (int i = 0; i < parameterCount; i++)
 		{
 			final IParameter parameter = this.parameters.get(i);
-			final float m = arguments.getTypeMatch(i, parameter);
+			final float m = arguments.getTypeMatch(i, parameter, implicitContext);
 
 			if (m == 0)
 			{

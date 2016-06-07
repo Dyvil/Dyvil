@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -186,7 +187,7 @@ public final class NamedArgumentList implements IArguments
 	}
 
 	@Override
-	public float getTypeMatch(int index, IParameter param)
+	public float getTypeMatch(int index, IParameter param, IImplicitContext implicitContext)
 	{
 		final int argIndex = this.findIndex(index, param.getName());
 		if (argIndex >= 0)
@@ -194,10 +195,10 @@ public final class NamedArgumentList implements IArguments
 			if (param.isVarargs())
 			{
 				final int endIndex = this.findNextName(argIndex + 1);
-				return ArgumentList.getVarargsTypeMatch(this.values, argIndex, endIndex, param);
+				return ArgumentList.getVarargsTypeMatch(this.values, argIndex, endIndex, param, implicitContext);
 			}
 
-			return IArguments.getTypeMatch(this.values[argIndex], param.getInternalType());
+			return TypeChecker.getTypeMatch(this.values[argIndex], param.getInternalType(), implicitContext);
 		}
 
 		if (param.isVarargs())

@@ -2,8 +2,12 @@ package dyvil.tools.compiler.transform;
 
 import dyvil.array.ObjectArray;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.LiteralConversion;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.Marker;
@@ -55,6 +59,25 @@ public final class TypeChecker
 		return (position, expected, actual) -> typeError(position, expected, actual, error, args);
 	}
 
+	public static float getTypeMatch(IValue value, IType type, IImplicitContext context)
+	{
+		final float direct = value.getTypeMatch(type);
+		if (direct > 0)
+		{
+			return direct;
+		}
+
+		MethodMatchList list = new MethodMatchList(null);
+		context.getImplicitMatches(list, value, type);
+		if (list.isEmpty())
+		{
+			// No implicit conversions available
+			return 0;
+		}
+
+		return list.getBestValue() + IArguments.IMPLICIT_CONVERSION_MATCH;
+	}
+
 	private static IValue convertValueDirect(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		final IValue typedValue = type.convertValue(value, typeContext, markers, context);
@@ -69,7 +92,14 @@ public final class TypeChecker
 			return convertedValue;
 		}
 
-		return null;
+		MethodMatchList list = new MethodMatchList(null);
+		context.getImplicitMatches(list, value, type);
+		if (list.isEmpty())
+		{
+			return null;
+		}
+
+		return new LiteralConversion(value, list.getBestMethod());
 	}
 
 	public static IValue convertValue(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)

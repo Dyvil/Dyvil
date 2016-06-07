@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
@@ -171,7 +172,7 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 
 	@Override
-	public float getTypeMatch(int index, IParameter param)
+	public float getTypeMatch(int index, IParameter param, IImplicitContext implicitContext)
 	{
 		if (param.isVarargs())
 		{
@@ -184,7 +185,7 @@ public final class ArgumentList implements IArguments, IValueList
 				return 0;
 			}
 
-			return getVarargsTypeMatch(this.values, index, this.size, param);
+			return getVarargsTypeMatch(this.values, index, this.size, param, implicitContext);
 		}
 
 		if (index >= this.size)
@@ -193,16 +194,16 @@ public final class ArgumentList implements IArguments, IValueList
 		}
 
 		final IValue argument = this.values[index];
-		return IArguments.getTypeMatch(argument, param.getInternalType());
+		return IArguments.getTypeMatch(argument, param.getInternalType(), implicitContext);
 	}
 
-	protected static float getVarargsTypeMatch(IValue[] values, int startIndex, int endIndex, IParameter param)
+	protected static float getVarargsTypeMatch(IValue[] values, int startIndex, int endIndex, IParameter param, IImplicitContext implicitContext)
 	{
 		final IValue argument = values[startIndex];
 		final IType arrayType = param.getInternalType();
 		if (argument.checkVarargs(false))
 		{
-			return IArguments.getDirectTypeMatch(argument, arrayType);
+			return TypeChecker.getTypeMatch(argument, arrayType, implicitContext);
 		}
 
 		if (startIndex == endIndex)
@@ -214,7 +215,7 @@ public final class ArgumentList implements IArguments, IValueList
 		final IType elementType = arrayType.getElementType();
 		for (; startIndex < endIndex; startIndex++)
 		{
-			final float valueMatch = IArguments.getTypeMatch(values[startIndex], elementType);
+			final float valueMatch = TypeChecker.getTypeMatch(values[startIndex], elementType, implicitContext);
 			if (valueMatch <= 0)
 			{
 				return 0F;
