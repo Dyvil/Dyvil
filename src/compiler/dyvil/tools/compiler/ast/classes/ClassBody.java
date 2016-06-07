@@ -353,12 +353,7 @@ public class ClassBody implements IClassBody
 	{
 		for (int i = 0; i < this.constructorCount; i++)
 		{
-			IConstructor ctor = this.constructors[i];
-			float match = ctor.getSignatureMatch(arguments);
-			if (match > 0)
-			{
-				list.add(ctor, match);
-			}
+			IContext.getConstructorMatch(list, arguments, this.constructors[i]);
 		}
 	}
 

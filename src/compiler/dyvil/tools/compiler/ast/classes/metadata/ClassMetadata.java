@@ -296,11 +296,7 @@ public class ClassMetadata implements IClassMetadata
 			return;
 		}
 
-		float match = this.constructor.getSignatureMatch(arguments);
-		if (match > 0)
-		{
-			list.add(this.constructor, match);
-		}
+		IContext.getConstructorMatch(list, arguments, this.constructor);
 	}
 
 	@Override

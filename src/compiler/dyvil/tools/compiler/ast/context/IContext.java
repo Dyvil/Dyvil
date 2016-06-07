@@ -168,9 +168,18 @@ public interface IContext extends IMemberContext, IImportContext
 		return matches.getBestMethod();
 	}
 
+	static void getConstructorMatch(ConstructorMatchList list, IArguments arguments, IConstructor constructor)
+	{
+		final float match = constructor.getSignatureMatch(arguments);
+		if (match > 0)
+		{
+			list.add(constructor, match);
+		}
+	}
+
 	static void getMethodMatch(MethodMatchList list, IValue receiver, Name name, IArguments arguments, IMethod method)
 	{
-		float match = method.getSignatureMatch(name, receiver, arguments);
+		final float match = method.getSignatureMatch(name, receiver, arguments);
 		if (match > 0)
 		{
 			list.add(method, match);
@@ -179,7 +188,7 @@ public interface IContext extends IMemberContext, IImportContext
 
 	static void getImplicitMatch(MethodMatchList list, IValue value, IType targetType, IMethod method)
 	{
-		float match = method.getImplicitMatch(value, targetType);
+		final float match = method.getImplicitMatch(value, targetType);
 		if (match > 0)
 		{
 			list.add(method, match);
