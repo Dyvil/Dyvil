@@ -3,9 +3,9 @@ package dyvil.tools.compiler.parser.expression;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
+import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Parser;
-import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 

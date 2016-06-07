@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -278,14 +278,14 @@ public class CompleteCommand implements ICommand
 
 	private static void findExtensions(DyvilREPL repl, IType type, IValue value, Set<IMethod> methods, String start)
 	{
-		MethodMatchList matchList = new MethodMatchList(repl.getContext());
+		MatchList<IMethod> matchList = new MatchList<>(repl.getContext());
 		type.getMethodMatches(matchList, value, null, null);
 		repl.getContext().getMethodMatches(matchList, value, null, null);
 		Types.LANG_HEADER.getMethodMatches(matchList, value, null, null);
 
 		for (int i = 0, count = matchList.size(); i < count; i++)
 		{
-			checkMember(methods, matchList.getMethod(i), start, true);
+			checkMember(methods, matchList.getCandidate(i), start, true);
 		}
 	}
 

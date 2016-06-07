@@ -1,10 +1,10 @@
 package dyvil.tools.compiler.parser.annotation;
 
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
-import dyvil.tools.parsing.IParserManager;
-import dyvil.tools.parsing.Parser;
 import dyvil.tools.compiler.parser.expression.ArgumentListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
+import dyvil.tools.parsing.IParserManager;
+import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 

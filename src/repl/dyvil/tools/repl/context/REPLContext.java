@@ -22,7 +22,7 @@ import dyvil.tools.compiler.ast.header.ImportDeclaration;
 import dyvil.tools.compiler.ast.header.IncludeDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -626,7 +626,7 @@ public class REPLContext extends DyvilHeader
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
 		for (IMethod method : this.methods)
 		{
@@ -663,7 +663,7 @@ public class REPLContext extends DyvilHeader
 	}
 
 	@Override
-	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
 		for (IMethod method : this.methods)
 		{

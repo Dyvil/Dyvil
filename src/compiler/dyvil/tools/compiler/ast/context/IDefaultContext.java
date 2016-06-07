@@ -4,7 +4,8 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -69,12 +70,12 @@ public interface IDefaultContext extends IStaticContext
 	}
 
 	@Override
-	default void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
+	default void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
 	}
 
 	@Override
-	default void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	default void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
 	}
 }

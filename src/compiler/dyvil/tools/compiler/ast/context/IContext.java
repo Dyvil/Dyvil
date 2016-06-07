@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.context;
 
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IAccessible;
@@ -12,7 +11,7 @@ import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.header.IImportContext;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.operator.IOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
@@ -80,13 +79,13 @@ public interface IContext extends IMemberContext, IImportContext
 	IDataMember resolveField(Name name);
 
 	@Override
-	void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments);
+	void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments);
 
 	@Override
-	void getImplicitMatches(MethodMatchList list, IValue value, IType targetType);
+	void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType);
 
 	@Override
-	void getConstructorMatches(ConstructorMatchList list, IArguments arguments);
+	void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments);
 
 	byte checkException(IType type);
 
@@ -156,19 +155,19 @@ public interface IContext extends IMemberContext, IImportContext
 
 	static IConstructor resolveConstructor(IImplicitContext implicitContext, IMemberContext type, IArguments arguments)
 	{
-		ConstructorMatchList matches = new ConstructorMatchList(implicitContext);
+		MatchList<IConstructor> matches = new MatchList<>(implicitContext);
 		type.getConstructorMatches(matches, arguments);
-		return matches.getBestConstructor();
+		return matches.getBestCandidate();
 	}
 
 	static IMethod resolveMethod(IMemberContext context, IValue receiver, Name name, IArguments arguments)
 	{
-		MethodMatchList matches = new MethodMatchList(context);
+		MatchList<IMethod> matches = new MatchList<>(context);
 		context.getMethodMatches(matches, receiver, name, arguments);
-		return matches.getBestMethod();
+		return matches.getBestCandidate();
 	}
 
-	static void getConstructorMatch(ConstructorMatchList list, IArguments arguments, IConstructor constructor)
+	static void getConstructorMatch(MatchList<IConstructor> list, IArguments arguments, IConstructor constructor)
 	{
 		final float match = constructor.getSignatureMatch(arguments, list);
 		if (match > 0)
@@ -177,7 +176,7 @@ public interface IContext extends IMemberContext, IImportContext
 		}
 	}
 
-	static void getMethodMatch(MethodMatchList list, IValue receiver, Name name, IArguments arguments, IMethod method)
+	static void getMethodMatch(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments, IMethod method)
 	{
 		final float match = method.getSignatureMatch(name, receiver, arguments, list);
 		if (match > 0)
@@ -186,7 +185,7 @@ public interface IContext extends IMemberContext, IImportContext
 		}
 	}
 
-	static void getImplicitMatch(MethodMatchList list, IValue value, IType targetType, IMethod method)
+	static void getImplicitMatch(MatchList<IMethod> list, IValue value, IType targetType, IMethod method)
 	{
 		final float match = method.getImplicitMatch(value, targetType);
 		if (match > 0)

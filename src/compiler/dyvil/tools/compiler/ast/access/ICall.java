@@ -6,12 +6,12 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LambdaExpr;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
+import dyvil.tools.compiler.ast.parameter.CodeParameter;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.CodeParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -216,7 +216,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 	
 	static IMethod resolveMethod(IContext context, IValue receiver, Name name, IArguments arguments)
 	{
-		MethodMatchList matches = new MethodMatchList(context);
+		MatchList<IMethod> matches = new MatchList<>(context);
 		if (receiver != null)
 		{
 			IType type = receiver.getType();
@@ -226,7 +226,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 				
 				if (!matches.isEmpty())
 				{
-					return matches.getBestMethod();
+					return matches.getBestCandidate();
 				}
 			}
 		}
@@ -242,7 +242,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 				
 				if (!matches.isEmpty())
 				{
-					return matches.getBestMethod();
+					return matches.getBestCandidate();
 				}
 			}
 		}
@@ -250,13 +250,13 @@ public interface ICall extends IValue, IArgumentsConsumer
 		context.getMethodMatches(matches, receiver, name, arguments);
 		if (!matches.isEmpty())
 		{
-			return matches.getBestMethod();
+			return matches.getBestCandidate();
 		}
 		
 		Types.LANG_HEADER.getMethodMatches(matches, receiver, name, arguments);
 		if (!matches.isEmpty())
 		{
-			return matches.getBestMethod();
+			return matches.getBestCandidate();
 		}
 		
 		return null;

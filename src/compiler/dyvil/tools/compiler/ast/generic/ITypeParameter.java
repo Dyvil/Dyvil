@@ -9,7 +9,8 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.INamed;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -95,9 +96,9 @@ public interface ITypeParameter extends IASTNode, INamed, IAnnotated, IObjectCom
 
 	IDataMember resolveField(Name name);
 
-	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
+	void getMethodMatches(MatchList<IMethod> list, IValue instance, Name name, IArguments arguments);
 
-	void getImplicitMatches(MethodMatchList list, IValue value, IType targetType);
+	void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType);
 
 	// Phases
 

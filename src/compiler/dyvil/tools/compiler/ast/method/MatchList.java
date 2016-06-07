@@ -4,15 +4,15 @@ import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.type.IType;
 
-public final class MethodMatchList implements IImplicitContext
+public class MatchList<T> implements IImplicitContext
 {
-	private IMethod[] methods = new IMethod[4];
-	private float[]   values  = new float[4];
+	private T[]     methods = (T[]) new Object[4];
+	private float[] values  = new float[4];
 	private int size;
 
 	private final IImplicitContext implicitContext;
 
-	public MethodMatchList(IImplicitContext implicitContext)
+	public MatchList(IImplicitContext implicitContext)
 	{
 		this.implicitContext = implicitContext;
 	}
@@ -36,7 +36,7 @@ public final class MethodMatchList implements IImplicitContext
 
 		final int newCapacity = capacity << 1;
 
-		final IMethod[] tempMethods = new IMethod[newCapacity];
+		final T[] tempMethods = (T[]) new Object[newCapacity];
 		System.arraycopy(this.methods, 0, tempMethods, 0, this.size);
 		this.methods = tempMethods;
 
@@ -45,7 +45,7 @@ public final class MethodMatchList implements IImplicitContext
 		this.values = tempValues;
 	}
 
-	public void add(IMethod method, float match)
+	public void add(T method, float match)
 	{
 		this.ensureCapacity(this.size + 1);
 		this.methods[this.size] = method;
@@ -58,7 +58,7 @@ public final class MethodMatchList implements IImplicitContext
 		return this.values[index];
 	}
 
-	public IMethod getMethod(int index)
+	public T getCandidate(int index)
 	{
 		return this.methods[index];
 	}
@@ -98,7 +98,7 @@ public final class MethodMatchList implements IImplicitContext
 		return this.values[bestIndex];
 	}
 
-	public IMethod getBestMethod()
+	public T getBestCandidate()
 	{
 		final int bestIndex = this.getBestIndex();
 		if (bestIndex < 0)
@@ -110,7 +110,7 @@ public final class MethodMatchList implements IImplicitContext
 	}
 
 	@Override
-	public void getImplicitMatches(MethodMatchList list, IValue value, IType targetType)
+	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
 		this.implicitContext.getImplicitMatches(list, value, targetType);
 	}
