@@ -338,7 +338,7 @@ public final class ClassFormat
 			return end + 1;
 		}
 		case '*':
-			consumer.setType(new WildcardType(Variance.INVARIANT));
+			consumer.setType(new WildcardType(Variance.COVARIANT));
 			return start + 1;
 		case '+':
 		{

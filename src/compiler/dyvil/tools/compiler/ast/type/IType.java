@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -196,6 +197,13 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	boolean isExtension();
 
 	void setExtension(boolean extension);
+
+	// Wildcard Types
+
+	default Variance getVariance()
+	{
+		return null;
+	}
 
 	// Super Type
 
