@@ -121,7 +121,13 @@ public interface IValue extends IASTNode, ITyped
 
 	// --- Other Constants ---
 
-	int CONVERSION_MATCH = 1000;
+	int MISMATCH                  = 0;
+	int IMPLICIT_CONVERSION_MATCH = 1;
+	int CONVERSION_MATCH          = 2;
+	int SECONDARY_SUBTYPE_MATCH   = 3;
+	int SECONDARY_MATCH           = 4;
+	int SUBTYPE_MATCH             = 5;
+	int EXACT_MATCH               = 6;
 
 	int valueTag();
 
@@ -208,7 +214,8 @@ public interface IValue extends IASTNode, ITyped
 
 	/**
 	 * Returns how much the type of this value 'matches' the given type. {@code 1} indicates a perfect match, while
-	 * {@code 0} marks incompatible types. A higher value means that the value is less suitable for the type.
+	 * {@code 0} marks incompatible types. A higher value means that the value is less suitable for the type. A negative
+	 * value means an implicit conversion was applied.
 	 *
 	 * @param type
 	 * 	the type to match
@@ -217,7 +224,12 @@ public interface IValue extends IASTNode, ITyped
 	 */
 	default int getTypeMatch(IType type)
 	{
-		return Types.getDistance(type, this.getType());
+		final IType thisType = this.getType();
+		if (Types.isSameType(type, thisType))
+		{
+			return EXACT_MATCH;
+		}
+		return Types.isSuperType(type, thisType) ? SUBTYPE_MATCH : MISMATCH;
 	}
 
 	void resolveTypes(MarkerList markers, IContext context);

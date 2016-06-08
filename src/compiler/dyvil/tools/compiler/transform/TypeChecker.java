@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -59,12 +60,17 @@ public final class TypeChecker
 		return (position, expected, actual) -> typeError(position, expected, actual, error, args);
 	}
 
-	public static double getTypeMatch(IValue value, IType type, IImplicitContext context)
+	public static int getTypeMatch(IValue value, IType type, IImplicitContext context)
 	{
 		final int direct = value.getTypeMatch(type);
-		if (direct > 0)
+		if (direct != IValue.MISMATCH)
 		{
 			return direct;
+		}
+
+		if (Types.isConvertible(value.getType(), type))
+		{
+			return IValue.CONVERSION_MATCH;
 		}
 
 		final MatchList<IMethod> list = new MatchList<>(null);
@@ -72,10 +78,10 @@ public final class TypeChecker
 		if (list.isEmpty())
 		{
 			// No implicit conversions available
-			return 0;
+			return IValue.MISMATCH;
 		}
 
-		return list.getBestCandidate().getValue(0) + IValue.CONVERSION_MATCH;
+		return IValue.IMPLICIT_CONVERSION_MATCH;
 	}
 
 	private static IValue convertValueDirect(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)

@@ -98,12 +98,16 @@ public final class TypeOperator extends AbstractValue
 	@Override
 	public int getTypeMatch(IType type)
 	{
+		final int i = super.getTypeMatch(type);
+		if (i != MISMATCH)
+		{
+			return i;
+		}
 		if (type.getAnnotation(LazyFields.TYPE_CONVERTIBLE) != null)
 		{
 			return CONVERSION_MATCH;
 		}
-
-		return Types.getDistance(type, this.getType());
+		return MISMATCH;
 	}
 
 	@Override

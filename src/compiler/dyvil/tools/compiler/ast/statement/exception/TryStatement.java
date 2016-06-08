@@ -174,25 +174,29 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	{
 		if (DISALLOW_EXPRESSIONS)
 		{
-			return 0;
+			return MISMATCH;
 		}
 
-		int total = this.action.getTypeMatch(type);
-		if (total <= 0F)
+		int min = this.action.getTypeMatch(type);
+		if (min == MISMATCH)
 		{
-			return 0;
+			return MISMATCH;
 		}
+
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			final int blockMatch = this.catchBlocks[i].action.getTypeMatch(type);
-			if (blockMatch <= 0F)
+			if (blockMatch == MISMATCH)
 			{
-				return 0;
+				return MISMATCH;
 			}
-			total += blockMatch;
+			if (blockMatch < min)
+			{
+				min = blockMatch;
+			}
 		}
 
-		return total / (1 + this.catchBlockCount);
+		return min;
 	}
 
 	public void addCatchBlock(CatchBlock block)

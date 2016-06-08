@@ -99,12 +99,16 @@ public final class ClassOperator extends AbstractValue implements IConstantValue
 	@Override
 	public int getTypeMatch(IType type)
 	{
+		final int i = super.getTypeMatch(type);
+		if (i != MISMATCH)
+		{
+			return i;
+		}
 		if (type.getAnnotation(LazyFields.CLASS_CONVERTIBLE) != null)
 		{
 			return CONVERSION_MATCH;
 		}
-		
-		return Types.getDistance(type, this.getType());
+		return MISMATCH;
 	}
 	
 	@Override

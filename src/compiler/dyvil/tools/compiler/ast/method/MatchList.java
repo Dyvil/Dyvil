@@ -1,9 +1,10 @@
 package dyvil.tools.compiler.ast.method;
 
-import dyvil.array.DoubleArray;
+import dyvil.array.IntArray;
 import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.util.MemberSorter;
 
 import java.util.Arrays;
 
@@ -11,29 +12,41 @@ public class MatchList<T extends ICallableSignature> implements IImplicitContext
 {
 	public static final class Candidate<T extends ICallableSignature> implements Comparable<Candidate<T>>
 	{
-		protected final T        member;
-		protected final double[] values;
-		protected final int      defaults;
-		protected final int      varargs;
+		protected final T       member;
+		protected final int[]   values;
+		protected final IType[] types;
+		protected final int     defaults;
+		protected final int     varargs;
 
 		public Candidate(T member)
 		{
 			this.member = member;
 			this.defaults = this.varargs = 0;
-			this.values = DoubleArray.EMPTY;
+			this.values = IntArray.EMPTY;
+			this.types = new IType[0];
 		}
 
-		public Candidate(T member, double... values)
+		public Candidate(T member, int value1, IType type1)
 		{
 			this.member = member;
-			this.values = values;
+			this.values = new int[] { value1 };
+			this.types = new IType[] { type1 };
 			this.defaults = this.varargs = 0;
 		}
 
-		public Candidate(T member, int defaults, int varargs, double... values)
+		public Candidate(T member, int[] values, IType[] types)
 		{
 			this.member = member;
 			this.values = values;
+			this.types = types;
+			this.defaults = this.varargs = 0;
+		}
+
+		public Candidate(T member, int defaults, int varargs, int[] values, IType[] types)
+		{
+			this.member = member;
+			this.values = values;
+			this.types = types;
 			this.defaults = defaults;
 			this.varargs = varargs;
 		}
@@ -55,14 +68,14 @@ public class MatchList<T extends ICallableSignature> implements IImplicitContext
 
 			for (int i = 0, length = this.values.length; i < length; i++)
 			{
-				final double thisValue = this.values[i];
-				final double otherValue = that.values[i];
-				if (thisValue > otherValue)
+				int conversion = compare(this.values[i], this.types[i], that.values[i], that.types[i]);
+
+				if (conversion > 0)
 				{
 					// one conversion is worse
 					return 1;
 				}
-				if (better || thisValue < otherValue)
+				if (better || conversion < 0)
 				{
 					// one conversion is better
 					better = true;
@@ -73,14 +86,14 @@ public class MatchList<T extends ICallableSignature> implements IImplicitContext
 				return -1;
 			}
 
-			// Compare number of defaulted parameters (less defaults are better)
+			// Compare number of defaulted parameters (less is better)
 			final int defaults = Integer.compare(this.defaults, that.defaults);
 			if (defaults != 0)
 			{
 				return defaults;
 			}
 
-			// Compare number of varargs-applied arguments (less arguments are better)
+			// Compare number of varargs-applied arguments (less is better)
 			final int varargs = Integer.compare(this.varargs, that.varargs);
 			if (varargs != 0)
 			{
@@ -91,13 +104,34 @@ public class MatchList<T extends ICallableSignature> implements IImplicitContext
 			return Boolean.compare(this.member.isVariadic(), that.member.isVariadic());
 		}
 
+		private static int compare(int value1, IType type1, int value2, IType type2)
+		{
+			if (value1 < value2)
+			{
+				return 1;
+			}
+			if (value1 > value2)
+			{
+				return -1;
+			}
+			if (value1 == IValue.CONVERSION_MATCH || value2 == IValue.CONVERSION_MATCH)
+			{
+				return 0;
+			}
+			return MemberSorter.compareTypes(type1, type2);
+		}
+
 		@Override
 		public boolean equals(Object o)
 		{
 			if (this == o)
+			{
 				return true;
+			}
 			if (!(o instanceof Candidate))
+			{
 				return false;
+			}
 
 			final Candidate<?> that = (Candidate<?>) o;
 			return this.defaults == that.defaults && this.varargs == that.varargs //

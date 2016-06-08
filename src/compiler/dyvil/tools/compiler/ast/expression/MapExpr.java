@@ -167,7 +167,7 @@ public class MapExpr implements IValue
 
 	private boolean isConvertibleFrom(IType type)
 	{
-		return type.getTheClass().getAnnotation(MapType.MapTypes.MAP_CONVERTIBLE_CLASS) != null;
+		return type.getAnnotation(MapType.MapTypes.MAP_CONVERTIBLE_CLASS) != null;
 	}
 
 	@Override
@@ -180,31 +180,37 @@ public class MapExpr implements IValue
 
 		if (this.count == 0)
 		{
-			return 1;
+			return EXACT_MATCH;
 		}
 
 		final IType keyType = Types.resolveTypeSafely(type, MapType.MapTypes.KEY_VARIABLE);
 		final IType valueType = Types.resolveTypeSafely(type, MapType.MapTypes.VALUE_VARIABLE);
 
-		int total = 0;
+		int min = Integer.MAX_VALUE;
 		for (int i = 0; i < this.count; i++)
 		{
-			float match = this.keys[i].getTypeMatch(keyType);
-			if (match <= 0F)
+			int match = this.keys[i].getTypeMatch(keyType);
+			if (match == MISMATCH)
 			{
-				return 0;
+				return MISMATCH;
 			}
-			total += match;
+			if (match < min)
+			{
+				min = match;
+			}
 
 			match = this.values[i].getTypeMatch(valueType);
-			if (match <= 0)
+			if (match == MISMATCH)
 			{
 				return 0;
 			}
-			total += match;
+			if (match < min)
+			{
+				min = match;
+			}
 		}
 
-		return 1 + total / (this.count * 2);
+		return min;
 	}
 
 	@Override

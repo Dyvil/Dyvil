@@ -754,7 +754,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			final IProperty property = this.parameters.get(i).getProperty();
 			if (property != null)
 			{
-				property.getMethodMatches(list, receiver, name, arguments);
+				property.checkMatch(list, receiver, name, arguments);
 			}
 		}
 

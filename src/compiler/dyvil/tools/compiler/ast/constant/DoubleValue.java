@@ -94,15 +94,16 @@ public class DoubleValue implements IConstantValue
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		if (type == Types.DOUBLE)
+		final int i = IConstantValue.super.getTypeMatch(type);
+		if (i != MISMATCH)
 		{
-			return 1;
+			return i;
 		}
 		if (type.getAnnotation(Types.DOUBLE_CONVERTIBLE_CLASS) != null)
 		{
 			return CONVERSION_MATCH;
 		}
-		return Types.getDistance(type, Types.DOUBLE);
+		return MISMATCH;
 	}
 
 	@Override

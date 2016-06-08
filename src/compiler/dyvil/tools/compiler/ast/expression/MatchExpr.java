@@ -28,11 +28,11 @@ import java.util.Arrays;
 public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 {
 	protected ICodePosition position;
-	
+
 	protected IValue matchedValue;
 	protected MatchCase[] cases = new MatchCase[3];
 	protected int caseCount;
-	
+
 	// Metadata
 	private boolean exhaustive;
 	private IType   returnType;
@@ -47,26 +47,26 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		this.position = position;
 		this.matchedValue = matchedValue;
 	}
-	
+
 	public MatchExpr(IValue matchedValue, MatchCase[] cases)
 	{
 		this.matchedValue = matchedValue;
 		this.cases = cases;
 		this.caseCount = cases.length;
 	}
-	
+
 	@Override
 	public ICodePosition getPosition()
 	{
 		return this.position;
 	}
-	
+
 	@Override
 	public void setPosition(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
 	@Override
 	public int valueTag()
 	{
@@ -96,7 +96,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		}
 		this.cases[index] = (MatchCase) iCase; // TODO Get rid of cast
 	}
-	
+
 	@Override
 	public boolean isPrimitive()
 	{
@@ -125,13 +125,13 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 
 		return true;
 	}
-	
+
 	@Override
 	public boolean isResolved()
 	{
 		return this.returnType != null && this.returnType.isResolved();
 	}
-	
+
 	@Override
 	public IType getType()
 	{
@@ -139,14 +139,14 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		{
 			return this.returnType;
 		}
-		
+
 		int len = this.caseCount;
 		if (len == 0)
 		{
 			this.returnType = Types.VOID;
 			return this.returnType;
 		}
-		
+
 		IType t = null;
 		for (int i = 0; i < len; i++)
 		{
@@ -161,17 +161,17 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 				t = t1;
 				continue;
 			}
-			
+
 			t = Types.combine(t, t1);
 		}
-		
+
 		if (t == null)
 		{
 			return this.returnType = Types.VOID;
 		}
 		return this.returnType = t;
 	}
-	
+
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
@@ -179,19 +179,19 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		{
 			final MatchCase matchCase = this.cases[i];
 			final IValue action = matchCase.action;
-			
+
 			if (action == null)
 			{
 				continue;
 			}
-			
+
 			matchCase.action = TypeChecker.convertValue(action, type, typeContext, markers, context,
 			                                            TypeChecker.markerSupplier("match.value.type.incompatible"));
 		}
-		
+
 		return Types.isVoid(type) || Types.isSuperType(type, this.getType()) ? this : null;
 	}
-	
+
 	@Override
 	public boolean isType(IType type)
 	{
@@ -199,7 +199,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		{
 			return true;
 		}
-		
+
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			final IValue action = this.cases[i].action;
@@ -210,16 +210,16 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		}
 		return true;
 	}
-	
+
 	@Override
 	public int getTypeMatch(IType type)
 	{
 		if (this.caseCount == 0)
 		{
-			return 0;
+			return MISMATCH;
 		}
-		
-		int total = 0;
+
+		int min = Integer.MAX_VALUE;
 		for (int i = 0; i < this.caseCount; i++)
 		{
 			final IValue action = this.cases[i].action;
@@ -227,17 +227,22 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 			{
 				continue;
 			}
-			
+
 			final int match = action.getTypeMatch(type);
-			if (match == 0)
+			if (match == MISMATCH)
 			{
-				return 0;
+				return MISMATCH;
 			}
-			total += match;
+			if (match < min)
+			{
+				min = match;
+			}
 		}
-		return 1 + total / this.caseCount;
+
+		// min might be unchanged in case all actions were null
+		return min == Integer.MAX_VALUE ? MISMATCH : min;
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -250,7 +255,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 			this.cases[i].resolveTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void resolveStatement(ILabelContext context, MarkerList markers)
 	{
@@ -263,7 +268,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 			}
 		}
 	}
-	
+
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
@@ -272,7 +277,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		{
 			this.matchedValue = this.matchedValue.resolve(markers, context);
 			type = this.matchedValue.getType();
-			
+
 			this.matchedValue = this.matchedValue.withType(type, type, markers, context);
 		}
 		else
@@ -288,17 +293,17 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 			{
 				markers.add(Markers.semantic(c.getPattern().getPosition(), "pattern.dead"));
 			}
-			
+
 			c.resolve(markers, type, context);
 			if (c.pattern != null && c.isExhaustive())
 			{
 				this.exhaustive = true;
 			}
 		}
-		
+
 		return this;
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -312,7 +317,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 			this.cases[i].checkTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
@@ -326,7 +331,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 			this.cases[i].check(markers, context);
 		}
 	}
-	
+
 	@Override
 	public IValue foldConstants()
 	{
@@ -340,7 +345,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		}
 		return this;
 	}
-	
+
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
@@ -354,7 +359,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		}
 		return this;
 	}
-	
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
@@ -375,7 +380,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 			this.generateBranched(writer, type.getFrameType());
 		}
 	}
-	
+
 	private boolean canGenerateSwitch()
 	{
 		// First run: Determine if a switch instruction can be generated
@@ -386,10 +391,10 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	private void generateBranched(MethodWriter writer, Object frameType) throws BytecodeException
 	{
 		final boolean expr = frameType != null;
@@ -400,22 +405,22 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		writer.visitVarInsn(matchedType.getStoreOpcode(), varIndex);
 
 		final int localCount = writer.localCount();
-		
+
 		Label elseLabel = new Label();
 		Label endLabel = new Label();
 		for (int i = 0; ; )
 		{
 			MatchCase c = this.cases[i];
 			IValue condition = c.condition;
-			
+
 			c.pattern.writeInvJump(writer, varIndex, matchedType, elseLabel);
 			if (condition != null)
 			{
 				condition.writeInvJump(writer, elseLabel);
 			}
-			
+
 			this.writeAction(writer, expr, frameType, c.action);
-			
+
 			writer.resetLocals(localCount);
 			writer.visitJumpInsn(Opcodes.GOTO, endLabel);
 			writer.visitLabel(elseLabel);
@@ -428,7 +433,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 				break;
 			}
 		}
-		
+
 		// MatchError
 		writer.visitLabel(elseLabel);
 		if (!this.exhaustive)
@@ -439,7 +444,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		writer.visitLabel(endLabel);
 		writer.resetLocals(varIndex);
 	}
-	
+
 	private void writeMatchError(MethodWriter writer, int varIndex, IType matchedType) throws BytecodeException
 	{
 		final int lineNumber = this.getLineNumber();
@@ -451,12 +456,12 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		matchedType.writeCast(writer, Types.OBJECT, lineNumber);
 
 		writer.visitLineNumber(lineNumber);
-		writer.visitMethodInsn(Opcodes.INVOKESPECIAL, "dyvil/util/MatchError", "<init>", "(Ljava/lang/Object;)V",
-		                       false);
+		writer
+			.visitMethodInsn(Opcodes.INVOKESPECIAL, "dyvil/util/MatchError", "<init>", "(Ljava/lang/Object;)V", false);
 		writer.visitInsn(Opcodes.ATHROW);
 		writer.setHasReturn(false);
 	}
-	
+
 	private void writeAction(MethodWriter writer, boolean expr, Object frameType, IValue value) throws BytecodeException
 	{
 		if (value != null)
@@ -476,7 +481,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 			this.returnType.writeDefaultValue(writer);
 		}
 	}
-	
+
 	private void generateSwitch(MethodWriter writer, Object frameType) throws BytecodeException
 	{
 		MatchCase defaultCase = null;
@@ -485,7 +490,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		int low = Integer.MAX_VALUE; // the minimum int
 		int high = Integer.MIN_VALUE; // the maximum int
 		boolean switchVar = false; // Do we need to store the value in a variable (for string equality checks later)
-		
+
 		// Second run: count the number of total cases, the minimum and maximum
 		// int value, find the default case, and find out if a variable needs to
 		// generated.
@@ -493,34 +498,34 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		{
 			MatchCase matchCase = this.cases[i];
 			IPattern pattern = matchCase.pattern;
-			
+
 			if (switchVar || pattern.switchCheck())
 			{
 				switchVar = true;
 			}
-			
+
 			if (pattern.isExhaustive())
 			{
 				defaultCase = matchCase;
 				defaultLabel = new Label();
 				continue;
 			}
-			
+
 			int min = pattern.minValue();
 			if (min < low)
 			{
 				low = min;
 			}
-			
+
 			int max = pattern.maxValue();
 			if (max > high)
 			{
 				high = max;
 			}
-			
+
 			cases += pattern.subPatterns();
 		}
-		
+
 		// Check if a match error should be generated - Non-exhaustive pattern
 		// and no default label
 		final Label endLabel = new Label();
@@ -544,11 +549,11 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		}
 
 		final boolean expr = frameType != null;
-		
+
 		// Write the value
 		final IType matchedType = this.matchedValue.getType();
 		this.matchedValue.writeExpression(writer, null);
-		
+
 		int varIndex = -1;
 		if (switchVar)
 		{
@@ -557,13 +562,13 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 			writer.visitVarInsn(matchedType.getStoreOpcode(), varIndex);
 			writer.visitVarInsn(matchedType.getLoadOpcode(), varIndex);
 		}
-		
+
 		// Not a primitive type (String) - we need the hashCode
 		if (!matchedType.isPrimitive())
 		{
 			writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "hashCode", "()I", false);
 		}
-		
+
 		final int localCount = writer.localCount();
 
 		final KeyCache keyCache = new KeyCache(cases);
@@ -673,32 +678,32 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 			writer.resetLocals(localCount);
 			writer.visitJumpInsn(Opcodes.GOTO, endLabel);
 		}
-		
+
 		// Generate Match Error
 		if (matchErrorLabel != null)
 		{
 			writer.visitLabel(matchErrorLabel);
 			this.writeMatchError(writer, varIndex, matchedType);
 		}
-		
+
 		writer.visitLabel(endLabel);
-		
+
 		if (switchVar)
 		{
 			writer.resetLocals(varIndex);
 		}
 	}
-	
+
 	/**
 	 * Determines whether to generate a {@code tableswitch} or a {@code lookupswitch} instruction, and returns {@code
 	 * true} when a {@code tableswitch} should be generated.
 	 *
 	 * @param low
-	 * 		the lowest value
+	 * 	the lowest value
 	 * @param high
-	 * 		the highest value
+	 * 	the highest value
 	 * @param count
-	 * 		the number of cases
+	 * 	the number of cases
 	 *
 	 * @return true, if a tableswitch instruction should be used
 	 */
@@ -710,12 +715,12 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		int lookupTime = MathUtils.logBaseTwo(count); // binary search O(log n)
 		return count > 0 && tableSpace + 3 * tableTime <= lookupSpace + 3 * lookupTime;
 	}
-	
+
 	/**
 	 * Generates a {@code lookupswitch} instruction
 	 */
 	private void writeLookupSwitch(MethodWriter writer, Collection<KeyCache.Entry> entries, Label defaultLabel, int cases)
-			throws BytecodeException
+		throws BytecodeException
 	{
 		if (cases <= 0)
 		{
@@ -738,12 +743,12 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 
 		writer.visitLookupSwitchInsn(defaultLabel, keys, handlers);
 	}
-	
+
 	/**
 	 * Generates a {@code tableswitch} instruction
 	 */
 	private void writeTableSwitch(MethodWriter writer, Collection<KeyCache.Entry> entries, Label defaultLabel, int low, int high)
-			throws BytecodeException
+		throws BytecodeException
 	{
 		assert defaultLabel != null;
 
@@ -754,16 +759,16 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		{
 			handlers[entry.key - low] = entry.switchLabel;
 		}
-		
+
 		writer.visitTableSwitchInsn(low, high, defaultLabel, handlers);
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return IASTNode.toString(this);
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

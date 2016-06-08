@@ -25,9 +25,9 @@ public class RangeOperator implements IValue
 {
 	public static final class LazyFields
 	{
-		public static final IClass         RANGE_CLASS     = Package.dyvilCollection.resolveClass("Range");
-		public static final IClass         RANGEABLE_CLASS = Package.dyvilCollectionRange.resolveClass("Rangeable");
-		public static final IType          RANGEABLE       = RANGEABLE_CLASS.getClassType();
+		public static final IClass RANGE_CLASS     = Package.dyvilCollection.resolveClass("Range");
+		public static final IClass RANGEABLE_CLASS = Package.dyvilCollectionRange.resolveClass("Rangeable");
+		public static final IType  RANGEABLE       = RANGEABLE_CLASS.getClassType();
 
 		public static final IClass INT_RANGE_CLASS    = Package.dyvilCollectionRange.resolveClass("IntRange");
 		public static final IClass LONG_RANGE_CLASS   = Package.dyvilCollectionRange.resolveClass("LongRange");
@@ -218,15 +218,13 @@ public class RangeOperator implements IValue
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		IType elementType = getElementType(type);
+		final IType elementType = getElementType(type);
 		if (elementType == null)
 		{
 			return 0;
 		}
 
-		int f1 = this.startValue.getTypeMatch(elementType);
-		int f2 = this.endValue.getTypeMatch(elementType);
-		return f1 == 0 || f2 == 0 ? 0 : (f1 + f2) / 2;
+		return Math.min(this.startValue.getTypeMatch(elementType), this.endValue.getTypeMatch(elementType));
 	}
 
 	@Override

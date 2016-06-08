@@ -109,15 +109,16 @@ public class LongValue implements IConstantValue
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		if (type == Types.LONG)
+		final int i = IConstantValue.super.getTypeMatch(type);
+		if (i != MISMATCH)
 		{
-			return 1;
+			return i;
 		}
 		if (type.getAnnotation(Types.LONG_CONVERTIBLE_CLASS) != null)
 		{
 			return CONVERSION_MATCH;
 		}
-		return Types.getDistance(type, Types.LONG);
+		return MISMATCH;
 	}
 
 	@Override

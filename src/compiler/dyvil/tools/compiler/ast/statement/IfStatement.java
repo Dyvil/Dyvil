@@ -159,9 +159,7 @@ public class IfStatement implements IValue
 			return this.then.getTypeMatch(type);
 		}
 
-		final int thenMatch = this.then.getTypeMatch(type);
-		final int elseMatch = this.elseThen.getTypeMatch(type);
-		return thenMatch == 0 || elseMatch == 0 ? 0 : (thenMatch + elseMatch) / 2;
+		return Math.min(this.then.getTypeMatch(type), this.elseThen.getTypeMatch(type));
 	}
 
 	@Override

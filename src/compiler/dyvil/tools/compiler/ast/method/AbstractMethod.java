@@ -427,7 +427,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		final int argumentStartIndex;
 		final int argumentCount;
 		final int parameterCount = this.parameters.size();
-		final double[] totalMatch;
+
+		final int[] matchValues;
+		final IType[] matchTypes;
 
 		final int mod;
 		if (receiver == null)
@@ -439,7 +441,10 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				list.add(new MatchList.Candidate<>(this));
 				return;
 			}
-			totalMatch = new double[argumentCount = arguments.size()];
+
+			argumentCount = arguments.size();
+			matchValues = new int[argumentCount];
+			matchTypes = new IType[argumentCount];
 			argumentStartIndex = 0;
 			parameterStartIndex = 0;
 		}
@@ -455,13 +460,16 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 			if (arguments == null)
 			{
-				list.add(new MatchList.Candidate<>(this, 1));
+				list.add(new MatchList.Candidate<>(this, IValue.EXACT_MATCH, null));
 				return;
 			}
-			totalMatch = new double[1 + (argumentCount = arguments.size())];
-			totalMatch[0] = 1;
-			argumentStartIndex = 1;
+
 			parameterStartIndex = 0;
+			argumentCount = arguments.size();
+			argumentStartIndex = 1;
+			matchValues = new int[1 + argumentCount];
+			matchTypes = new IType[1 + argumentCount];
+			matchValues[0] = 1;
 		}
 		else
 		{
@@ -479,20 +487,23 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				parameterStartIndex = 0;
 			}
 
-			final double receiverMatch = TypeChecker.getTypeMatch(receiver, receiverType, list);
-			if (receiverMatch == 0)
+			final int receiverMatch = TypeChecker.getTypeMatch(receiver, receiverType, list);
+			if (receiverMatch == IValue.MISMATCH)
 			{
 				return;
 			}
 			if (arguments == null)
 			{
-				list.add(new MatchList.Candidate<>(this, 0, receiverMatch));
+				list.add(new MatchList.Candidate<>(this, receiverMatch, receiverType));
 				return;
 			}
 
-			totalMatch = new double[1 + (argumentCount = arguments.size())];
-			totalMatch[0] = receiverMatch;
+			argumentCount = arguments.size();
 			argumentStartIndex = 1;
+			matchValues = new int[1 + argumentCount];
+			matchTypes = new IType[1 + argumentCount];
+			matchValues[0] = receiverMatch;
+			matchTypes[0] = receiverType;
 		}
 
 		final int parametersLeft = parameterCount - parameterStartIndex;
@@ -506,7 +517,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		for (int argumentIndex = 0; argumentIndex < parametersLeft; argumentIndex++)
 		{
 			final IParameter parameter = this.parameters.get(parameterStartIndex + argumentIndex);
-			final int partialVarargs = arguments.checkMatch(totalMatch, argumentStartIndex, argumentIndex, parameter, list);
+			final int partialVarargs = arguments.checkMatch(matchValues, matchTypes, argumentStartIndex, argumentIndex, parameter,
+			                                                list);
 			if (partialVarargs >= 0)
 			{
 				varargs += partialVarargs;
@@ -521,7 +533,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return; // Mismatch
 		}
 
-		list.add(new MatchList.Candidate<>(this, defaults, varargs, totalMatch));
+		list.add(new MatchList.Candidate<>(this, defaults, varargs, matchValues, matchTypes));
 	}
 
 	@Override
@@ -541,10 +553,10 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		final IType parType = this.parameters.get(0).getInternalType();
 
 		// Note: this explicitly uses IValue.getTypeMatch to avoid nested implicit conversions
-		final double typeMatch = value.getTypeMatch(parType);
-		if (typeMatch > 0)
+		final int match = value.getTypeMatch(parType);
+		if (match > IValue.CONVERSION_MATCH)
 		{
-			list.add(new MatchList.Candidate<>(this, 0, typeMatch));
+			list.add(new MatchList.Candidate<>(this, match, parType));
 		}
 	}
 

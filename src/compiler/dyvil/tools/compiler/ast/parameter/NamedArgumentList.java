@@ -187,7 +187,7 @@ public final class NamedArgumentList implements IArguments
 	}
 
 	@Override
-	public int checkMatch(double[] match, int matchStartIndex, int argumentIndex, IParameter param, IImplicitContext implicitContext)
+	public int checkMatch(int[] values, IType[] types, int matchStartIndex, int argumentIndex, IParameter param, IImplicitContext implicitContext)
 	{
 		final int argIndex = this.findIndex(argumentIndex, param.getName());
 		if (argIndex < 0)
@@ -201,13 +201,13 @@ public final class NamedArgumentList implements IArguments
 		{
 			// Not a varargs parameter
 
-			return ArgumentList.checkMatch(match, matchStartIndex + argIndex, this.values[argIndex], param.getInternalType(),
+			return ArgumentList.checkMatch(values, types, matchStartIndex + argIndex, this.values[argIndex], param.getInternalType(),
 			                               implicitContext) ? 0 : -1;
 		}
 
 		// Varargs Parameter
 		final int endIndex = this.findNextName(argIndex + 1);
-		return ArgumentList.checkVarargsMatch(match, matchStartIndex, this.values, argIndex, endIndex, param,
+		return ArgumentList.checkVarargsMatch(values, types, matchStartIndex, this.values, argIndex, endIndex, param,
 		                                      implicitContext);
 	}
 

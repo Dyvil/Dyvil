@@ -271,17 +271,12 @@ public final class ArrayExpr implements IValue, IValueList
 		return this;
 	}
 
-	private boolean isConvertibleFrom(IType type)
-	{
-		return type.getTheClass() == Types.OBJECT_CLASS || type.getAnnotation(LazyFields.ARRAY_CONVERTIBLE) != null;
-	}
-
 	@Override
 	public boolean isType(IType type)
 	{
 		if (!type.isArrayType())
 		{
-			return this.isConvertibleFrom(type);
+			return type.getTheClass() == Types.OBJECT_CLASS || type.getAnnotation(LazyFields.ARRAY_CONVERTIBLE) != null;
 		}
 
 		// Skip getting the element type if this is an empty array
@@ -311,35 +306,43 @@ public final class ArrayExpr implements IValue, IValueList
 	{
 		if (!type.isArrayType())
 		{
-			// isConvertibleFrom also returns true for Object, but the
-			// CONVERSION_MATCH return value here is intentional.
-			return this.isConvertibleFrom(type) ? CONVERSION_MATCH : 0;
+			if (type.getTheClass() == Types.OBJECT_CLASS)
+			{
+				return SUBTYPE_MATCH;
+			}
+			if (type.getAnnotation(LazyFields.ARRAY_CONVERTIBLE) != null)
+			{
+				return CONVERSION_MATCH;
+			}
+			return MISMATCH;
 		}
 
 		// Skip getting the element type if this is an empty array
 		if (this.valueCount == 0)
 		{
-			return 1;
+			return EXACT_MATCH;
 		}
 
 		// If the type is an array type, get it's element type
 		final IType elementType = type.getElementType();
 
-		int total = 0;
-		// Get the type match for every value in the array
+		int min = Integer.MAX_VALUE;
 		for (int i = 0; i < this.valueCount; i++)
 		{
+			// TODO Implicit conversions?
 			final int match = this.values[i].getTypeMatch(elementType);
-			if (match <= 0)
+			if (match == MISMATCH)
 			{
-				// If the type match for one value is zero, return 0
-				return 0;
+				// If any element type has a mismatch, produce a mismatch
+				return MISMATCH;
 			}
-			total += match;
+			if (match < min)
+			{
+				min = match;
+			}
 		}
 
-		// Divide by the count
-		return 1 + total / this.valueCount;
+		return min;
 	}
 
 	@Override

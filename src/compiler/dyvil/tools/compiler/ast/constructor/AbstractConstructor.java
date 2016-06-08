@@ -231,13 +231,15 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 			return;
 		}
 
-		final double[] totalMatch = new double[argumentCount];
+		final int[] matchValues = new int[argumentCount];
+		final IType[] matchTypes = new IType[argumentCount];
+
 		int defaults = 0;
 		int varargs = 0;
 		for (int i = 0; i < parameterCount; i++)
 		{
 			final IParameter parameter = this.parameters.get(i);
-			final int partialVarargs = arguments.checkMatch(totalMatch, 0, i, parameter, list);
+			final int partialVarargs = arguments.checkMatch(matchValues, matchTypes, 0, i, parameter, list);
 
 			if (partialVarargs >= 0)
 			{
@@ -253,7 +255,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 			return; // Mismatch
 		}
 
-		list.add(new MatchList.Candidate<>(this, defaults, varargs, totalMatch));
+		list.add(new MatchList.Candidate<>(this, defaults, varargs, matchValues, matchTypes));
 	}
 
 	@Override

@@ -110,7 +110,7 @@ public final class SingleArgument implements IArguments, IValueConsumer
 	}
 
 	@Override
-	public int checkMatch(double[] match, int matchStartIndex, int argumentIndex, IParameter param, IImplicitContext implicitContext)
+	public int checkMatch(int[] values, IType[] types, int matchStartIndex, int argumentIndex, IParameter param, IImplicitContext implicitContext)
 	{
 		if (argumentIndex != 0 || this.value == null)
 		{
@@ -119,12 +119,12 @@ public final class SingleArgument implements IArguments, IValueConsumer
 
 		if (!param.isVarargs() || this.value.checkVarargs(false))
 		{
-			return ArgumentList.checkMatch(match, matchStartIndex + argumentIndex, this.value, param.getInternalType(),
+			return ArgumentList.checkMatch(values, types, matchStartIndex + argumentIndex, this.value, param.getInternalType(),
 			                               implicitContext) ? 0 : -1;
 		}
 
 		final IType elementType = param.getInternalType().getElementType();
-		if (ArgumentList.checkMatch(match, matchStartIndex + argumentIndex, this.value, elementType, implicitContext))
+		if (ArgumentList.checkMatch(values, types, matchStartIndex + argumentIndex, this.value, elementType, implicitContext))
 		{
 			// One argument applied as varargs
 			return 1;

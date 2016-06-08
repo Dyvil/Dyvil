@@ -204,10 +204,9 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	{
 		if (this.field == null)
 		{
-			return 0;
+			return MISMATCH;
 		}
-
-		return Types.getDistance(type, this.getType());
+		return IValue.super.getTypeMatch(type);
 	}
 
 	@Override

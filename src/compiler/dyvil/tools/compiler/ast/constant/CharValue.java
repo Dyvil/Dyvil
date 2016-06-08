@@ -129,12 +129,14 @@ public final class CharValue implements IConstantValue
 	{
 		if (this.value.length() == 1 && this.type != TYPE_STRING)
 		{
-			final int distance = Types.getDistance(type, Types.CHAR);
-			if (distance > 0)
+			if (Types.isSameType(type, Types.CHAR))
 			{
-				return distance;
+				return EXACT_MATCH;
 			}
-
+			if (Types.isSuperType(type, Types.CHAR))
+			{
+				return SUBTYPE_MATCH;
+			}
 			if (type.getAnnotation(Types.CHAR_CONVERTIBLE_CLASS) != null)
 			{
 				return CONVERSION_MATCH;
@@ -143,18 +145,21 @@ public final class CharValue implements IConstantValue
 
 		if (this.type == TYPE_CHAR)
 		{
-			return 0;
+			return MISMATCH;
 		}
-		final int distance = Types.getDistance(type, Types.STRING);
-		if (distance > 0F)
+		if (Types.isSameType(type, Types.STRING))
 		{
-			return distance;
+			return SECONDARY_MATCH;
+		}
+		if (Types.isSuperType(type, Types.STRING))
+		{
+			return SECONDARY_SUBTYPE_MATCH;
 		}
 		if (type.getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null)
 		{
-			return CONVERSION_MATCH + 1;
+			return CONVERSION_MATCH;
 		}
-		return 0;
+		return MISMATCH;
 	}
 
 	@Override
