@@ -8,7 +8,6 @@ import dyvil.tools.compiler.ast.expression.LiteralConversion;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.Marker;
@@ -60,15 +59,15 @@ public final class TypeChecker
 		return (position, expected, actual) -> typeError(position, expected, actual, error, args);
 	}
 
-	public static float getTypeMatch(IValue value, IType type, IImplicitContext context)
+	public static double getTypeMatch(IValue value, IType type, IImplicitContext context)
 	{
-		final float direct = value.getTypeMatch(type);
+		final int direct = value.getTypeMatch(type);
 		if (direct > 0)
 		{
 			return direct;
 		}
 
-		MatchList<IMethod> list = new MatchList<>(null);
+		final MatchList<IMethod> list = new MatchList<>(null);
 		context.getImplicitMatches(list, value, type);
 		if (list.isEmpty())
 		{
@@ -76,7 +75,7 @@ public final class TypeChecker
 			return 0;
 		}
 
-		return list.getBestValue() + IArguments.IMPLICIT_CONVERSION_MATCH;
+		return list.getBestCandidate().getValue(0) + IValue.CONVERSION_MATCH;
 	}
 
 	private static IValue convertValueDirect(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
@@ -100,7 +99,8 @@ public final class TypeChecker
 			return null;
 		}
 
-		return new LiteralConversion(value, list.getBestCandidate());
+		// TODO Ambiguity check
+		return new LiteralConversion(value, list.getBestMember());
 	}
 
 	public static IValue convertValue(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)

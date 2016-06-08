@@ -187,25 +187,28 @@ public final class NamedArgumentList implements IArguments
 	}
 
 	@Override
-	public float getTypeMatch(int index, IParameter param, IImplicitContext implicitContext)
+	public int checkMatch(double[] match, int matchStartIndex, int argumentIndex, IParameter param, IImplicitContext implicitContext)
 	{
-		final int argIndex = this.findIndex(index, param.getName());
-		if (argIndex >= 0)
+		final int argIndex = this.findIndex(argumentIndex, param.getName());
+		if (argIndex < 0)
 		{
-			if (param.isVarargs())
-			{
-				final int endIndex = this.findNextName(argIndex + 1);
-				return ArgumentList.getVarargsTypeMatch(this.values, argIndex, endIndex, param, implicitContext);
-			}
+			// No argument for parameter name
 
-			return TypeChecker.getTypeMatch(this.values[argIndex], param.getInternalType(), implicitContext);
+			return param.isVarargs() ? 0 : -1;
 		}
 
-		if (param.isVarargs())
+		if (!param.isVarargs())
 		{
-			return VARARGS_MATCH;
+			// Not a varargs parameter
+
+			return ArgumentList.checkMatch(match, matchStartIndex + argIndex, this.values[argIndex], param.getInternalType(),
+			                               implicitContext) ? 0 : -1;
 		}
-		return param.getValue() != null ? DEFAULT_MATCH : 0;
+
+		// Varargs Parameter
+		final int endIndex = this.findNextName(argIndex + 1);
+		return ArgumentList.checkVarargsMatch(match, matchStartIndex, this.values, argIndex, endIndex, param,
+		                                      implicitContext);
 	}
 
 	@Override

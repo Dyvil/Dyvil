@@ -293,7 +293,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 
 		for (IMethod method : this.methods)
 		{
-			IContext.getMethodMatch(list, receiver, name, arguments, method);
+			method.checkMatch(list, receiver, name, arguments);
 		}
 	}
 
@@ -307,7 +307,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 
 		for (IMethod method : this.methods)
 		{
-			IContext.getImplicitMatch(list, value, targetType, method);
+			method.checkImplicitMatch(list, value, targetType);
 		}
 	}
 

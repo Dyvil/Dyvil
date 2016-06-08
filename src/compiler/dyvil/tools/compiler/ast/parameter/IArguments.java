@@ -5,7 +5,6 @@ import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.TypeChecker;
@@ -20,22 +19,6 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	{
 		return TypeChecker.markerSupplier("method.access.argument_type", parameter.getName());
 	}
-
-	static float getTypeMatch(IValue value, IType type, IImplicitContext implicitContext)
-	{
-		if (value.checkVarargs(false))
-		{
-			// Varargs Expansion Operator in place of non-varargs parameter
-
-			return 0F;
-		}
-
-		return TypeChecker.getTypeMatch(value, type, implicitContext);
-	}
-
-	float DEFAULT_MATCH = 1000;
-	float VARARGS_MATCH = 100;
-	float IMPLICIT_CONVERSION_MATCH = 100;
 
 	@Override
 	default ICodePosition getPosition()
@@ -79,7 +62,7 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 
 	IValue getValue(int index, IParameter param);
 
-	float getTypeMatch(int index, IParameter param, IImplicitContext implicitContext);
+	int checkMatch(double[] match, int matchStartIndex, int argumentIndex, IParameter param, IImplicitContext implicitContext);
 
 	void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context);
 

@@ -179,7 +179,7 @@ public final class SingleImport extends Import
 
 		for (IMethod method : this.methods)
 		{
-			IContext.getMethodMatch(list, receiver, null, arguments, method);
+			method.checkMatch(list, receiver, null, arguments);
 		}
 	}
 
@@ -193,7 +193,7 @@ public final class SingleImport extends Import
 
 		for (IMethod method : this.methods)
 		{
-			IContext.getImplicitMatch(list, value, targetType, method);
+			method.checkImplicitMatch(list, value, targetType);
 		}
 	}
 

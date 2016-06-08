@@ -11,7 +11,6 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
-import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisExpr;
@@ -376,13 +375,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
-		IContext.getMethodMatch(list, receiver, name, arguments, this);
+		this.checkMatch(list, receiver, name, arguments);
 	}
 
 	@Override
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
-		IContext.getImplicitMatch(list, value, targetType, this);
+		this.checkImplicitMatch(list, value, targetType);
 	}
 
 	@Override
@@ -417,97 +416,136 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public float getSignatureMatch(Name name, IValue receiver, IArguments arguments, IImplicitContext implicitContext)
+	public void checkMatch(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
 		if (name != this.name && name != null)
 		{
-			return 0;
+			return;
 		}
 
-		int parameterStartIndex = 0;
-		int totalMatch = 1;
+		final int parameterStartIndex;
+		final int argumentStartIndex;
+		final int argumentCount;
+		final int parameterCount = this.parameters.size();
+		final double[] totalMatch;
 
-		// infix modifier implementation
-		if (receiver != null)
+		final int mod;
+		if (receiver == null)
 		{
-			final int mod = this.modifiers.toFlags() & Modifiers.INFIX;
-			if (mod == 0 || receiver.valueTag() != IValue.CLASS_ACCESS)
+			// No receiver
+
+			if (arguments == null)
 			{
-				if (mod == Modifiers.INFIX)
-				{
-					final IType infixReceiverType = this.parameters.get(0).getInternalType();
-					final float receiverMatch = TypeChecker.getTypeMatch(receiver, infixReceiverType, implicitContext);
-					if (receiverMatch == 0)
-					{
-						return 0;
-					}
-
-					totalMatch += receiverMatch;
-					parameterStartIndex = 1;
-				}
-				else if (mod == Modifiers.STATIC && receiver.valueTag() != IValue.CLASS_ACCESS)
-				{
-					// Disallow non-static access to static method
-					return 0;
-				}
-				else
-				{
-					final IType receiverType = this.enclosingClass.getClassType();
-					final float receiverMatch = TypeChecker.getTypeMatch(receiver, receiverType, implicitContext);
-					if (receiverMatch <= 0)
-					{
-						return 0;
-					}
-					totalMatch += receiverMatch;
-				}
+				list.add(new MatchList.Candidate<>(this));
+				return;
 			}
+			totalMatch = new double[argumentCount = arguments.size()];
+			argumentStartIndex = 0;
+			parameterStartIndex = 0;
 		}
-
-		// Only matching the name
-		if (arguments == null)
+		else if ((mod = this.modifiers.toFlags() & Modifiers.INFIX) == Modifiers.STATIC
+			         && receiver.valueTag() != IValue.CLASS_ACCESS)
 		{
-			return totalMatch;
+			// Disallow non-static access to static method
+			return;
+		}
+		else if (mod != 0 && receiver.valueTag() == IValue.CLASS_ACCESS)
+		{
+			// Static access to static method
+
+			if (arguments == null)
+			{
+				list.add(new MatchList.Candidate<>(this, 1));
+				return;
+			}
+			totalMatch = new double[1 + (argumentCount = arguments.size())];
+			totalMatch[0] = 1;
+			argumentStartIndex = 1;
+			parameterStartIndex = 0;
+		}
+		else
+		{
+			final IType receiverType;
+			if (mod == Modifiers.INFIX)
+			{
+				// Infix access to infix method
+				receiverType = this.parameters.get(0).getInternalType();
+				parameterStartIndex = 1;
+			}
+			else
+			{
+				// Infix access to instance method
+				receiverType = this.enclosingClass.getClassType();
+				parameterStartIndex = 0;
+			}
+
+			final double receiverMatch = TypeChecker.getTypeMatch(receiver, receiverType, list);
+			if (receiverMatch == 0)
+			{
+				return;
+			}
+			if (arguments == null)
+			{
+				list.add(new MatchList.Candidate<>(this, 0, receiverMatch));
+				return;
+			}
+
+			totalMatch = new double[1 + (argumentCount = arguments.size())];
+			totalMatch[0] = receiverMatch;
+			argumentStartIndex = 1;
 		}
 
-		final int argumentCount = arguments.size();
-		final int parametersLeft = this.parameters.size() - parameterStartIndex;
+		final int parametersLeft = parameterCount - parameterStartIndex;
 		if (argumentCount > parametersLeft && !this.isVariadic())
 		{
-			return 0;
+			return;
 		}
 
+		int defaults = 0;
+		int varargs = 0;
 		for (int argumentIndex = 0; argumentIndex < parametersLeft; argumentIndex++)
 		{
-			final IParameter parameter = this.parameters.get(argumentIndex + parameterStartIndex);
-			final float valueMatch = arguments.getTypeMatch(argumentIndex, parameter, implicitContext);
-			if (valueMatch <= 0)
+			final IParameter parameter = this.parameters.get(parameterStartIndex + argumentIndex);
+			final int partialVarargs = arguments.checkMatch(totalMatch, argumentStartIndex, argumentIndex, parameter, list);
+			if (partialVarargs >= 0)
 			{
-				return 0;
+				varargs += partialVarargs;
+				continue;
+			}
+			if (parameter.getValue() != null)
+			{
+				defaults++;
+				continue;
 			}
 
-			totalMatch += valueMatch;
+			return; // Mismatch
 		}
 
-		return totalMatch;
+		list.add(new MatchList.Candidate<>(this, defaults, varargs, totalMatch));
 	}
 
 	@Override
-	public float getImplicitMatch(IValue value, IType type)
+	public void checkImplicitMatch(MatchList<IMethod> list, IValue value, IType type)
 	{
 		if (!this.hasModifier(Modifiers.IMPLICIT | Modifiers.STATIC) || this.parameters.size() != 1)
 		{
 			// The method has to be 'implicit static' and only take exactly one parameter
-			return 0;
+			return;
 		}
 		if (type != null && !Types.isSuperType(type, this.type))
 		{
 			// The method's return type has to be a sub-type of the target type
-			return 0;
+			return;
 		}
 
 		final IType parType = this.parameters.get(0).getInternalType();
+
 		// Note: this explicitly uses IValue.getTypeMatch to avoid nested implicit conversions
-		return value.getTypeMatch(parType);
+		final double typeMatch = value.getTypeMatch(parType);
+		if (typeMatch > 0)
+		{
+			list.add(new MatchList.Candidate<>(this, 0, typeMatch));
+		}
 	}
 
 	@Override

@@ -213,52 +213,55 @@ public interface ICall extends IValue, IArgumentsConsumer
 
 		return Types.LANG_HEADER.resolveField(name);
 	}
-	
+
 	static IMethod resolveMethod(IContext context, IValue receiver, Name name, IArguments arguments)
 	{
+		return resolveMethods(context, receiver, name, arguments).getBestMember();
+	}
+	
+	static MatchList<IMethod> resolveMethods(IContext context, IValue receiver, Name name, IArguments arguments)
+	{
 		MatchList<IMethod> matches = new MatchList<>(context);
+
+		// Methods available through the receiver
 		if (receiver != null)
 		{
-			IType type = receiver.getType();
+			final IType type = receiver.getType();
 			if (type != null)
 			{
 				type.getMethodMatches(matches, receiver, name, arguments);
 				
 				if (!matches.isEmpty())
 				{
-					return matches.getBestCandidate();
+					return matches;
 				}
 			}
 		}
 		
-		// Prefix Methods
+		// Methods available through the first argument
 		if (arguments.size() == 1)
 		{
-			IValue v = arguments.getFirstValue();
-			IType type = v.getType();
+			final IType type = arguments.getFirstValue().getType();
 			if (type != null)
 			{
 				type.getMethodMatches(matches, receiver, name, arguments);
 				
 				if (!matches.isEmpty())
 				{
-					return matches.getBestCandidate();
+					return matches;
 				}
 			}
 		}
 
+		// Methods available in the current context
 		context.getMethodMatches(matches, receiver, name, arguments);
 		if (!matches.isEmpty())
 		{
-			return matches.getBestCandidate();
+			return matches;
 		}
-		
+
+		// Methods available through the Lang Header
 		Types.LANG_HEADER.getMethodMatches(matches, receiver, name, arguments);
-		if (!matches.isEmpty())
-		{
-			return matches.getBestCandidate();
-		}
-		
-		return null;
+		return matches;
 	}
 }

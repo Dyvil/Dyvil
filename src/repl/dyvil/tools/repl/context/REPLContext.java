@@ -13,7 +13,6 @@ import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.consumer.IMemberConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
-import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
@@ -630,7 +629,7 @@ public class REPLContext extends DyvilHeader
 	{
 		for (IMethod method : this.methods)
 		{
-			IContext.getMethodMatch(list, receiver, name, arguments, method);
+			method.checkMatch(list, receiver, name, arguments);
 		}
 
 		if (name != null)
@@ -640,7 +639,7 @@ public class REPLContext extends DyvilHeader
 			IProperty property = this.properties.get(removeEq);
 			if (property != null)
 			{
-				property.getMethodMatches(list, receiver, name, arguments);
+				property.checkMatch(list, receiver, name, arguments);
 			}
 
 			final IField field = this.fields.get(removeEq);
@@ -649,7 +648,7 @@ public class REPLContext extends DyvilHeader
 				property = field.getProperty();
 				if (property != null)
 				{
-					property.getMethodMatches(list, receiver, name, arguments);
+					property.checkMatch(list, receiver, name, arguments);
 				}
 			}
 		}
@@ -667,7 +666,7 @@ public class REPLContext extends DyvilHeader
 	{
 		for (IMethod method : this.methods)
 		{
-			IContext.getImplicitMatch(list, value, targetType, method);
+			method.checkImplicitMatch(list, value, targetType);
 		}
 
 		if (!list.isEmpty())

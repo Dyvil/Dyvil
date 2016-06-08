@@ -80,7 +80,7 @@ public final class CaseClassMetadata extends ClassMetadata
 	{
 		if (name == Names.apply && this.applyMethod != null)
 		{
-			IContext.getMethodMatch(list, receiver, name, arguments, this.applyMethod);
+			this.applyMethod.checkMatch(list, receiver, name, arguments);
 		}
 
 		super.getMethodMatches(list, receiver, name, arguments);

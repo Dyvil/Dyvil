@@ -110,35 +110,26 @@ public final class SingleArgument implements IArguments, IValueConsumer
 	}
 
 	@Override
-	public float getTypeMatch(int index, IParameter param, IImplicitContext implicitContext)
+	public int checkMatch(double[] match, int matchStartIndex, int argumentIndex, IParameter param, IImplicitContext implicitContext)
 	{
-		if (index != 0 || this.value == null)
+		if (argumentIndex != 0 || this.value == null)
 		{
-			if (param.isVarargs())
-			{
-				return VARARGS_MATCH;
-			}
-
-			return param.getValue() != null ? DEFAULT_MATCH : 0;
+			return param.isVarargs() ? 0 : -1;
 		}
 
-		if (param.isVarargs())
+		if (!param.isVarargs() || this.value.checkVarargs(false))
 		{
-			return this.getVarargsTypeMatch(param, implicitContext);
-		}
-		return TypeChecker.getTypeMatch(this.value, param.getInternalType(), implicitContext);
-	}
-
-	private float getVarargsTypeMatch(IParameter param, IImplicitContext implicitContext)
-	{
-		if (this.value.checkVarargs(false))
-		{
-			return TypeChecker.getTypeMatch(this.value, param.getInternalType(), implicitContext);
+			return ArgumentList.checkMatch(match, matchStartIndex + argumentIndex, this.value, param.getInternalType(),
+			                               implicitContext) ? 0 : -1;
 		}
 
 		final IType elementType = param.getInternalType().getElementType();
-		final float valueMatch = IArguments.getTypeMatch(this.value, elementType, implicitContext);
-		return valueMatch > 0 ? valueMatch + VARARGS_MATCH : 0;
+		if (ArgumentList.checkMatch(match, matchStartIndex + argumentIndex, this.value, elementType, implicitContext))
+		{
+			// One argument applied as varargs
+			return 1;
+		}
+		return -1;
 	}
 
 	@Override

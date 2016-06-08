@@ -264,18 +264,18 @@ public class ClassBody implements IClassBody
 	{
 		for (int i = 0; i < this.methodCount; i++)
 		{
-			IContext.getMethodMatch(list, receiver, name, arguments, this.methods[i]);
+			this.methods[i].checkMatch(list, receiver, name, arguments);
 		}
 		for (int i = 0; i < this.propertyCount; i++)
 		{
-			this.properties[i].getMethodMatches(list, receiver, name, arguments);
+			this.properties[i].checkMatch(list, receiver, name, arguments);
 		}
 		for (int i = 0; i < this.fieldCount; i++)
 		{
 			final IProperty property = this.fields[i].getProperty();
 			if (property != null)
 			{
-				property.getMethodMatches(list, receiver, name, arguments);
+				property.checkMatch(list, receiver, name, arguments);
 			}
 		}
 	}
@@ -285,7 +285,7 @@ public class ClassBody implements IClassBody
 	{
 		for (int i = 0; i < this.methodCount; i++)
 		{
-			IContext.getImplicitMatch(list, value, targetType, this.methods[i]);
+			this.methods[i].checkImplicitMatch(list, value, targetType);
 		}
 	}
 
@@ -352,7 +352,7 @@ public class ClassBody implements IClassBody
 	{
 		for (int i = 0; i < this.constructorCount; i++)
 		{
-			IContext.getConstructorMatch(list, arguments, this.constructors[i]);
+			this.constructors[i].checkMatch(list, arguments);
 		}
 	}
 

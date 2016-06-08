@@ -296,7 +296,7 @@ public class ClassMetadata implements IClassMetadata
 			return;
 		}
 
-		IContext.getConstructorMatch(list, arguments, this.constructor);
+		this.constructor.checkMatch(list, arguments);
 	}
 
 	@Override

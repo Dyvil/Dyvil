@@ -152,16 +152,16 @@ public class Property extends Member implements IProperty
 	}
 
 	@Override
-	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
+	public void checkMatch(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
 		if (this.getter != null)
 		{
-			IContext.getMethodMatch(list, receiver, name, arguments, this.getter);
+			this.getter.checkMatch(list, receiver, name, arguments);
 		}
 
 		if (this.setter != null)
 		{
-			IContext.getMethodMatch(list, receiver, name, arguments, this.setter);
+			this.setter.checkMatch(list, receiver, name, arguments);
 		}
 	}
 

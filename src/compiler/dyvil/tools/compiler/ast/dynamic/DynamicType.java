@@ -30,7 +30,7 @@ public final class DynamicType extends UnknownType
 
 		if (list.isEmpty())
 		{
-			list.add(new DynamicMethod(name), 1);
+			list.add(new MatchList.Candidate<>(new DynamicMethod(name)));
 		}
 	}
 

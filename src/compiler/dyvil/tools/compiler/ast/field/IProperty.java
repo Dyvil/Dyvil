@@ -17,7 +17,7 @@ public interface IProperty extends IClassMember
 		return MemberKind.PROPERTY;
 	}
 
-	void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments);
+	void checkMatch(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments);
 
 	// Getter
 

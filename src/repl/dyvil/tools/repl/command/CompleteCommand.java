@@ -285,7 +285,7 @@ public class CompleteCommand implements ICommand
 
 		for (int i = 0, count = matchList.size(); i < count; i++)
 		{
-			checkMember(methods, matchList.getCandidate(i), start, true);
+			checkMember(methods, matchList.getCandidate(i).getMember(), start, true);
 		}
 	}
 

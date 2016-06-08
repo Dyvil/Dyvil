@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
-import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
@@ -222,31 +221,39 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	}
 
 	@Override
-	public float getSignatureMatch(IArguments arguments, IImplicitContext implicitContext)
+	public void checkMatch(MatchList<IConstructor> list, IArguments arguments)
 	{
-		int totalMatch = 1;
-
 		final int parameterCount = this.parameters.size();
 		final int argumentCount = arguments.size();
 
 		if (argumentCount > parameterCount && !this.isVariadic())
 		{
-			return 0;
+			return;
 		}
 
+		final double[] totalMatch = new double[argumentCount];
+		int defaults = 0;
+		int varargs = 0;
 		for (int i = 0; i < parameterCount; i++)
 		{
 			final IParameter parameter = this.parameters.get(i);
-			final float m = arguments.getTypeMatch(i, parameter, implicitContext);
+			final int partialVarargs = arguments.checkMatch(totalMatch, 0, i, parameter, list);
 
-			if (m == 0)
+			if (partialVarargs >= 0)
 			{
-				return 0;
+				varargs += partialVarargs;
+				continue;
 			}
-			totalMatch += m;
+			if (parameter.getValue() != null)
+			{
+				defaults++;
+				continue;
+			}
+
+			return; // Mismatch
 		}
 
-		return totalMatch;
+		list.add(new MatchList.Candidate<>(this, defaults, varargs, totalMatch));
 	}
 
 	@Override

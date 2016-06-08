@@ -157,41 +157,14 @@ public interface IContext extends IMemberContext, IImportContext
 	{
 		MatchList<IConstructor> matches = new MatchList<>(implicitContext);
 		type.getConstructorMatches(matches, arguments);
-		return matches.getBestCandidate();
+		return matches.getBestMember();
 	}
 
 	static IMethod resolveMethod(IMemberContext context, IValue receiver, Name name, IArguments arguments)
 	{
 		MatchList<IMethod> matches = new MatchList<>(context);
 		context.getMethodMatches(matches, receiver, name, arguments);
-		return matches.getBestCandidate();
-	}
-
-	static void getConstructorMatch(MatchList<IConstructor> list, IArguments arguments, IConstructor constructor)
-	{
-		final float match = constructor.getSignatureMatch(arguments, list);
-		if (match > 0)
-		{
-			list.add(constructor, match);
-		}
-	}
-
-	static void getMethodMatch(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments, IMethod method)
-	{
-		final float match = method.getSignatureMatch(name, receiver, arguments, list);
-		if (match > 0)
-		{
-			list.add(method, match);
-		}
-	}
-
-	static void getImplicitMatch(MatchList<IMethod> list, IValue value, IType targetType, IMethod method)
-	{
-		final float match = method.getImplicitMatch(value, targetType);
-		if (match > 0)
-		{
-			list.add(method, match);
-		}
+		return matches.getBestMember();
 	}
 
 	static byte getVisibility(IContext context, IClassMember member)

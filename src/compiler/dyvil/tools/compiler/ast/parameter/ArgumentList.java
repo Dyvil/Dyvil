@@ -172,59 +172,64 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 
 	@Override
-	public float getTypeMatch(int index, IParameter param, IImplicitContext implicitContext)
+	public int checkMatch(double[] match, int matchStartIndex, int argumentIndex, IParameter param, IImplicitContext implicitContext)
 	{
+		if (argumentIndex > this.size)
+		{
+			return -1;
+		}
+		if (argumentIndex == this.size)
+		{
+			return param.isVarargs() ? 0 : -1;
+		}
+
 		if (param.isVarargs())
 		{
-			if (index == this.size)
-			{
-				return VARARGS_MATCH;
-			}
-			if (index > this.size)
-			{
-				return 0;
-			}
-
-			return getVarargsTypeMatch(this.values, index, this.size, param, implicitContext);
+			return checkVarargsMatch(match, matchStartIndex, this.values, argumentIndex, this.size, param,
+			                         implicitContext);
 		}
-
-		if (index >= this.size)
-		{
-			return param.getValue() != null ? DEFAULT_MATCH : 0;
-		}
-
-		final IValue argument = this.values[index];
-		return IArguments.getTypeMatch(argument, param.getInternalType(), implicitContext);
+		return checkMatch(match, matchStartIndex + argumentIndex, this.values[argumentIndex], param.getInternalType(),
+		                  implicitContext) ? 0 : -1;
 	}
 
-	protected static float getVarargsTypeMatch(IValue[] values, int startIndex, int endIndex, IParameter param, IImplicitContext implicitContext)
+	protected static boolean checkMatch(double[] match, int matchIndex, IValue argument, IType type, IImplicitContext implicitContext)
+	{
+		final double result = TypeChecker.getTypeMatch(argument, type, implicitContext);
+		if (result <= 0)
+		{
+			return false;
+		}
+
+		match[matchIndex] = result;
+		return true;
+	}
+
+	protected static int checkVarargsMatch(double[] match, int matchStartIndex, //
+		                                      IValue[] values, int startIndex, int endIndex, //
+		                                      IParameter param, IImplicitContext implicitContext)
 	{
 		final IValue argument = values[startIndex];
 		final IType arrayType = param.getInternalType();
 		if (argument.checkVarargs(false))
 		{
-			return TypeChecker.getTypeMatch(argument, arrayType, implicitContext);
+			return checkMatch(match, matchStartIndex, argument, arrayType, implicitContext) ? 0 : -1;
 		}
 
 		if (startIndex == endIndex)
 		{
-			return VARARGS_MATCH;
+			return 0;
 		}
 
-		float totalMatch = 0;
+		final int count = endIndex - startIndex;
 		final IType elementType = arrayType.getElementType();
 		for (; startIndex < endIndex; startIndex++)
 		{
-			final float valueMatch = TypeChecker.getTypeMatch(values[startIndex], elementType, implicitContext);
-			if (valueMatch <= 0)
+			if (!checkMatch(match, matchStartIndex + startIndex, values[startIndex], elementType, implicitContext))
 			{
-				return 0F;
+				return -1;
 			}
-			totalMatch += valueMatch;
 		}
-		totalMatch /= endIndex - startIndex;
-
-		return totalMatch > 0F ? totalMatch + VARARGS_MATCH : 0;
+		return count;
 	}
 
 	@Override

@@ -9,12 +9,12 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
-import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -285,15 +285,13 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 	
 	@Override
-	public float getSignatureMatch(Name name, IValue instance, IArguments arguments, IImplicitContext implicitContext)
+	public void checkMatch(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
-		return 0;
 	}
 
 	@Override
-	public float getImplicitMatch(IValue value, IType type)
+	public void checkImplicitMatch(MatchList<IMethod> list, IValue value, IType type)
 	{
-		return 0;
 	}
 
 	@Override

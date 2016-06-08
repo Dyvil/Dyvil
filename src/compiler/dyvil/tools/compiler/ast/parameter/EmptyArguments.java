@@ -87,13 +87,9 @@ public final class EmptyArguments implements IArguments
 	}
 
 	@Override
-	public float getTypeMatch(int index, IParameter param, IImplicitContext implicitContext)
+	public int checkMatch(double[] match, int matchStartIndex, int argumentIndex, IParameter param, IImplicitContext implicitContext)
 	{
-		if (param.isVarargs())
-		{
-			return VARARGS_MATCH;
-		}
-		return param.getValue() != null ? DEFAULT_MATCH : 0;
+		return param.isVarargs() ? 0 : -1;
 	}
 
 	@Override
