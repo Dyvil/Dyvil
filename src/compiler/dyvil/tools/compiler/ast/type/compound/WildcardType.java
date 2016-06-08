@@ -148,15 +148,39 @@ public final class WildcardType implements IRawType, ITyped
 	}
 
 	@Override
+	public int subTypeCheckLevel()
+	{
+		return SUBTYPE_WILDCARD;
+	}
+
+	@Override
 	public boolean isSameType(IType type)
 	{
 		return this.bound == null || this.variance.checkCompatible(this.bound, type);
 	}
 
 	@Override
-	public boolean isSuperTypeOf(IType type)
+	public boolean isSuperClassOf(IType subType)
 	{
-		return this.isSameType(type);
+		return this.isSameType(subType);
+	}
+
+	@Override
+	public boolean isSuperTypeOf(IType subType)
+	{
+		return this.isSameType(subType);
+	}
+
+	@Override
+	public boolean isSubClassOf(IType superType)
+	{
+		return this.isSameType(superType);
+	}
+
+	@Override
+	public boolean isSubTypeOf(IType superType)
+	{
+		return this.isSameType(superType);
 	}
 
 	@Override

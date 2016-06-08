@@ -348,35 +348,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public int getSuperTypeDistance(IType superType)
-	{
-		IClass iclass = superType.getTheClass();
-		if (iclass == null)
-		{
-			return 0;
-		}
-		if (this == iclass)
-		{
-			return 1;
-		}
-
-		int max = this.superType != null ? this.superType.getSuperTypeDistance(superType) : 0;
-		if (!iclass.isInterface())
-		{
-			return max;
-		}
-		for (int i = 0; i < this.interfaceCount; i++)
-		{
-			int m = this.interfaces[i].getSuperTypeDistance(superType);
-			if (m > max)
-			{
-				max = m;
-			}
-		}
-		return max == 0 ? 0 : 1 + max;
-	}
-
-	@Override
 	public int interfaceCount()
 	{
 		return this.interfaceCount;

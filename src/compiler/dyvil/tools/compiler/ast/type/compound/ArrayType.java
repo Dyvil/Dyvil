@@ -222,26 +222,6 @@ public class ArrayType implements IObjectType, ITyped
 		return this.checkPrimitiveType(elementType) && Types.isSuperClass(this.type, elementType);
 	}
 
-	@Override
-	public int getSuperTypeDistance(IType superType)
-	{
-		if (!superType.isArrayType())
-		{
-			return superType.getTheClass() == Types.OBJECT_CLASS ? OBJECT_DISTANCE : 0;
-		}
-		if (!checkImmutable(superType, this))
-		{
-			return 0;
-		}
-
-		IType elementType = superType.getElementType();
-		if (!this.checkPrimitiveType(elementType))
-		{
-			return 0;
-		}
-		return this.type.getSuperTypeDistance(elementType);
-	}
-
 	private static boolean checkImmutable(IType superType, IType subtype)
 	{
 		return superType.getMutability() == Mutability.UNDEFINED || superType.getMutability() == subtype

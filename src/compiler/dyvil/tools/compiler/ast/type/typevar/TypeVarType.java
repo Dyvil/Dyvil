@@ -81,7 +81,7 @@ public class TypeVarType implements IRawType
 	@Override
 	public int subTypeCheckLevel()
 	{
-		return 1;
+		return SUBTYPE_TYPEVAR;
 	}
 
 	@Override
@@ -118,18 +118,6 @@ public class TypeVarType implements IRawType
 	public boolean isSubClassOf(IType superType)
 	{
 		return this.typeParameter.isSubClassOf(superType);
-	}
-
-	@Override
-	public int getSuperTypeDistance(IType superType)
-	{
-		return this.typeParameter.getSuperTypeDistance(superType);
-	}
-
-	@Override
-	public int getSubTypeDistance(IType subType)
-	{
-		return this.typeParameter.getSubTypeDistance(subType);
 	}
 
 	@Override

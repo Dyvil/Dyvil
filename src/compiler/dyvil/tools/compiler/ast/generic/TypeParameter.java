@@ -423,58 +423,6 @@ public final class TypeParameter implements ITypeParameter
 	}
 
 	@Override
-	public int getSuperTypeDistance(IType superType)
-	{
-		if (this.upperBoundCount == 0)
-		{
-			return Types.getDistance(superType, Types.OBJECT);
-		}
-
-		int min = Integer.MAX_VALUE;
-		for (int i = 0; i < this.upperBoundCount; i++)
-		{
-			final int distance = Types.getDistance(superType, this.upperBounds[i]);
-			if (distance > 0 && distance < min)
-			{
-				// At least one upper bound has to match
-				min = distance;
-			}
-		}
-
-		if (min == Integer.MAX_VALUE)
-		{
-			// No matches
-			return 0;
-		}
-		return min;
-	}
-
-	@Override
-	public int getSubTypeDistance(IType subType)
-	{
-		if (this.upperBoundCount == 0)
-		{
-			return Types.getDistance(Types.OBJECT, subType);
-		}
-
-		int min = Integer.MAX_VALUE;
-		for (int i = 0; i < this.upperBoundCount; i++)
-		{
-			final int distance = Types.getDistance(this.upperBounds[i], subType);
-			if (distance <= 0)
-			{
-				// All upper bounds have to match
-				return 0;
-			}
-			if (distance < min)
-			{
-				min = distance;
-			}
-		}
-		return min;
-	}
-
-	@Override
 	public IDataMember resolveField(Name name)
 	{
 		IDataMember field;

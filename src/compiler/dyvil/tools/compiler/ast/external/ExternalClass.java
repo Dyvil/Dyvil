@@ -240,16 +240,6 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public int getSuperTypeDistance(IType superType)
-	{
-		if ((this.resolved & SUPER_TYPES) == 0)
-		{
-			this.resolveSuperTypes();
-		}
-		return super.getSuperTypeDistance(superType);
-	}
-
-	@Override
 	public ITypeParameter[] getTypeParameters()
 	{
 		if ((this.resolved & GENERICS) == 0)

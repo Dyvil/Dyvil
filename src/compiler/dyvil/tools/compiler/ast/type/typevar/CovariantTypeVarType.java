@@ -34,7 +34,7 @@ public class CovariantTypeVarType extends TypeVarType
 	{
 		// Make sure CovariantTVT.isSubTypeOf(ResolvedTVT) is called instead of
 		// ResolveTVT.isSuperTypeOf(CovariantTVT)
-		return 2;
+		return SUBTYPE_COVARIANT_TYPEVAR;
 	}
 
 	@Override

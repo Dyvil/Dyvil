@@ -99,16 +99,6 @@ public class ReferenceType implements IObjectType
 	}
 
 	@Override
-	public int getSuperTypeDistance(IType superType)
-	{
-		if (superType.getTheClass() == Types.OBJECT_CLASS)
-		{
-			return 2;
-		}
-		return Types.isSameType(superType, this) ? 1 : 0;
-	}
-
-	@Override
 	public boolean isSuperTypeOf(IType type)
 	{
 		return IObjectType.super.isSuperTypeOf(type) && this.isSameBaseType(type);

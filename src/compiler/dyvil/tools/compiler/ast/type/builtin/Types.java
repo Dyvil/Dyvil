@@ -7,7 +7,6 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.dynamic.DynamicType;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -261,31 +260,6 @@ public final class Types
 	public static boolean isAssignable(IType fromType, IType toType)
 	{
 		return isSuperType(toType, fromType) || isConvertible(fromType, toType);
-	}
-
-	public static int getDistance(IType superType, IType subType)
-	{
-		if (superType == subType)
-		{
-			return 1;
-		}
-
-		final int distance;
-		if (superType.subTypeCheckLevel() > subType.subTypeCheckLevel())
-		{
-			distance = superType.getSubTypeDistance(subType);
-		}
-		else
-		{
-			distance = subType.getSuperTypeDistance(superType);
-		}
-
-		if (distance != 0)
-		{
-			return distance;
-		}
-
-		return isConvertible(subType, superType) ? IValue.CONVERSION_MATCH : 0;
 	}
 
 	public static boolean isConvertible(IType fromType, IType toType)

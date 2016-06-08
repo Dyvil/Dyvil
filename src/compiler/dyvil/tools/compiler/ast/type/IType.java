@@ -199,17 +199,6 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	// Super Type
 
-	default int getSuperTypeDistance(IType superType)
-	{
-		if (this == superType)
-		{
-			return 1;
-		}
-
-		final IClass thisClass = this.getTheClass();
-		return thisClass == null ? 0 : thisClass.getSuperTypeDistance(superType);
-	}
-
 	/**
 	 * Returns {@code true} iff this type is a super type of the given {@code type}, {@code false otherwise}.
 	 *
@@ -253,14 +242,15 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		return false;
 	}
 
+	int SUBTYPE_BASE               = 0;
+	int SUBTYPE_UNION_INTERSECTION = 1;
+	int SUBTYPE_TYPEVAR            = 2;
+	int SUBTYPE_COVARIANT_TYPEVAR  = 3;
+	int SUBTYPE_WILDCARD           = 4;
+
 	default int subTypeCheckLevel()
 	{
-		return 0;
-	}
-
-	default int getSubTypeDistance(IType subType)
-	{
-		throw new UnsupportedOperationException(this.getClass().getName() + ".getSubTypeDistance");
+		return SUBTYPE_BASE;
 	}
 
 	default boolean isSubClassOf(IType superType)

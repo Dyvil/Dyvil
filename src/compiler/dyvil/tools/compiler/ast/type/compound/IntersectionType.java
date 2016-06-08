@@ -97,7 +97,7 @@ public class IntersectionType implements IObjectType
 	@Override
 	public int subTypeCheckLevel()
 	{
-		return 1;
+		return SUBTYPE_UNION_INTERSECTION;
 	}
 
 	@Override
@@ -122,38 +122,6 @@ public class IntersectionType implements IObjectType
 	public boolean isSubClassOf(IType superType)
 	{
 		return Types.isSuperClass(superType, this.left) || Types.isSuperClass(superType, this.right);
-	}
-
-	@Override
-	public int getSuperTypeDistance(IType superType)
-	{
-		final int left = Types.getDistance(superType, this.left);
-		final int right = Types.getDistance(superType, this.right);
-
-		// Either one has to match
-		if (left == 0)
-		{
-			return right;
-		}
-		if (right == 0)
-		{
-			return left;
-		}
-		return Math.min(left, right);
-	}
-
-	@Override
-	public int getSubTypeDistance(IType subType)
-	{
-		final int left = Types.getDistance(this.left, subType);
-		final int right = Types.getDistance(this.right, subType);
-
-		// Both have to match
-		if (left == 0 || right == 0)
-		{
-			return 0;
-		}
-		return Math.min(left, right);
 	}
 
 	@Override

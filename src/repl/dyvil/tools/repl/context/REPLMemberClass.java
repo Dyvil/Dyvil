@@ -283,12 +283,6 @@ public class REPLMemberClass implements IClass
 	}
 
 	@Override
-	public int getSuperTypeDistance(IType superType)
-	{
-		return 0;
-	}
-
-	@Override
 	public int interfaceCount()
 	{
 		return 0;

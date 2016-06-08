@@ -202,12 +202,6 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
-	public int getSuperTypeDistance(IType superType)
-	{
-		return this.type.getSuperTypeDistance(superType);
-	}
-
-	@Override
 	public boolean isSameType(IType type)
 	{
 		return this.type.isSameType(type);
