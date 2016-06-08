@@ -71,11 +71,11 @@ public final class LiteralConversion extends MethodCall
 				markers.add(Markers.semantic(this.literal.getPosition(), "literal.method", this.literal.getType(), type,
 				                             builder));
 				this.type = type;
-				return null;
+				return this;
 			}
 		}
 
-		this.resolveCall(markers, context);
+		this.checkArguments(markers, context);
 
 		final IType thisType = this.getType();
 		if (!Types.isSuperType(type, thisType))
