@@ -114,10 +114,6 @@ public class MatchList<T extends ICallableSignature> implements IImplicitContext
 			{
 				return -1;
 			}
-			if (value1 == IValue.CONVERSION_MATCH || value2 == IValue.CONVERSION_MATCH)
-			{
-				return 0;
-			}
 			return MemberSorter.compareTypes(type1, type2);
 		}
 

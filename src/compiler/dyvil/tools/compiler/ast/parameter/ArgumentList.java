@@ -188,11 +188,17 @@ public final class ArgumentList implements IArguments, IValueList
 			return checkVarargsMatch(values, types, matchStartIndex, this.values, argumentIndex, this.size, param,
 			                         implicitContext);
 		}
-		return checkMatch(values, types, matchStartIndex + argumentIndex, this.values[argumentIndex], param.getInternalType(),
-		                  implicitContext) ? 0 : -1;
+		return checkMatch(values, types, matchStartIndex + argumentIndex, this.values[argumentIndex],
+		                  param.getInternalType(), implicitContext) ? 0 : -1;
 	}
 
 	protected static boolean checkMatch(int[] matchValues, IType[] matchTypes, int matchIndex, IValue argument, IType type, IImplicitContext implicitContext)
+	{
+		return !argument.checkVarargs(false) && checkMatch_(matchValues, matchTypes, matchIndex, argument, type,
+		                                                    implicitContext);
+	}
+
+	private static boolean checkMatch_(int[] matchValues, IType[] matchTypes, int matchIndex, IValue argument, IType type, IImplicitContext implicitContext)
 	{
 		final int result = TypeChecker.getTypeMatch(argument, type, implicitContext);
 		if (result == 0)
@@ -213,7 +219,7 @@ public final class ArgumentList implements IArguments, IValueList
 		final IType arrayType = param.getInternalType();
 		if (argument.checkVarargs(false))
 		{
-			return checkMatch(matchValues, matchTypes, matchStartIndex, argument, arrayType, implicitContext) ? 0 : -1;
+			return checkMatch_(matchValues, matchTypes, matchStartIndex, argument, arrayType, implicitContext) ? 0 : -1;
 		}
 
 		if (startIndex == endIndex)
@@ -225,7 +231,8 @@ public final class ArgumentList implements IArguments, IValueList
 		final IType elementType = arrayType.getElementType();
 		for (; startIndex < endIndex; startIndex++)
 		{
-			if (!checkMatch(matchValues, matchTypes, matchStartIndex + startIndex, values[startIndex], elementType, implicitContext))
+			if (!checkMatch(matchValues, matchTypes, matchStartIndex + startIndex, values[startIndex], elementType,
+			                implicitContext))
 			{
 				return -1;
 			}
