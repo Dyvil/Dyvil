@@ -1,0 +1,50 @@
+package dyvil.test
+
+public class OverloadTest
+{
+	public static String f(int i) = "f(int)"
+	public static String f(Object o) = "f(Object)"
+	public static String f(String s) = "f(String)"
+
+	public static String f(Object o, Object o) = "f(Object, Object)"
+	public static String f(Object o, String s) = "f(Object, String)"
+	public static String f(String s, Object o) = "f(String, Object)"
+	public static String f(String s1, String s2) = "f(String, String)"
+
+	public static String f() = "f()"
+	public static String f(Object... os) = "f(Object...)"
+
+	public static String f(String s, String... ss) = "f(String, String...)"
+	public static String f(String s, Object... os) = "f(String, Object...)"
+
+	public static String f(Object o, Object... os) = "f(Object, Object...)"
+	public static String f(Object o, String... ss) = "f(Object, String...)"
+
+	public static void main([String] args)
+	{
+		Object o = null
+		String s = ""
+		int i = 0
+
+		Main.test("Overload Test 0.1", "f()", f())
+
+		Main.test("Overload Test 1.1", "f(Object)", f(o))
+		Main.test("Overload Test 1.2", "f(String)", f(s))
+		Main.test("Overload Test 1.3", "f(int)",    f(i))
+
+		Main.test("Overload Test 2.1", "f(Object, Object)",    f(o, o))
+		Main.test("Overload Test 2.2", "f(Object, String)",    f(o, s))
+		Main.test("Overload Test 2.3", "f(String, Object)",    f(s, o))
+		Main.test("Overload Test 2.4", "f(String, String)",    f(s, s))
+
+		Main.test("Overload Test 3.1", "f(Object, Object...)", f(o, o, o))
+		Main.test("Overload Test 3.2", "f(Object, Object...)", f(o, o, s))
+		Main.test("Overload Test 3.3", "f(Object, Object...)", f(o, s, o))
+		Main.test("Overload Test 3.4", "f(Object, String...)", f(o, s, s))
+
+		Main.test("Overload Test 4.1", "f(String, Object...)", f(s, s, o))
+		Main.test("Overload Test 4.2", "f(String, String...)", f(s, s, s))
+		Main.test("Overload Test 4.3", "f(String, Object...)", f(s, o, o))
+		Main.test("Overload Test 4.4", "f(String, Object...)", f(s, o, s))
+	}
+}

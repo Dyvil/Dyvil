@@ -35,9 +35,9 @@ public final class LanguageCommons
 
 	public static inline void println(boolean v) = System.out.println(v)
 
-	public static inline void println(byte v) = System.out.println(v)
+	public static inline void println(byte v) = System.out.println(v as int)
 
-	public static inline void println(short v) = System.out.println(v)
+	public static inline void println(short v) = System.out.println(v as int)
 
 	public static inline void println(char v) = System.out.println(v)
 

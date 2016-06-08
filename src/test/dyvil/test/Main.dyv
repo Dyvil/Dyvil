@@ -2,9 +2,12 @@ package dyvil.test
 
 public class Main
 {
+	private static var errors = List<String>
+
 	public static void main([String] args)
 	{
 		runTests(args)
+		verify()
 	}	
 		
 	private static void runTests([String] args)
@@ -30,6 +33,7 @@ public class Main
 		FibonacciTest.main(args)
 		ObjectTest.main(args)
 		OperatorTest.main(args)
+		OverloadTest.main(args)
 		PrimitiveTest.main(args)
 		PropertyTest.main(args)
 		RangeTest.main(args)
@@ -38,6 +42,22 @@ public class Main
 		SortTest.main(args)
 		TypeTest.main(args)
 		VarargsTest.main(args)
+	}
+
+	private static void verify()
+	{
+		if (errors.isEmpty)
+		{
+			return
+		}
+
+		errors.forEach(println _)
+		throw new AssertionError()
+	}
+
+	public static void error(String message)
+	{
+		errors.add message
 	}
 
 	public static void test(String testName, any expected, any actual)
@@ -49,8 +69,7 @@ public class Main
 	{
 		if (!condition)
 		{
-			String text = testName + " FAILED: expected: " + expected + " - actual: " + actual
-			throw new AssertionError(text as Object)
+			errors.add "\(testName) FAILED:\n\texpected: \(expected)\n\tactual:   \(actual)"
 		}
 	}
 
@@ -58,7 +77,7 @@ public class Main
 	{
 		if (!condition)
 		{
-			throw new AssertionError(testName as Object)
+			errors.add "\(testName) FAILED"
 		}
 	}
 }
