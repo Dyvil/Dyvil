@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralConversion;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.util.Markers;
@@ -73,15 +72,13 @@ public final class TypeChecker
 			return IValue.CONVERSION_MATCH;
 		}
 
-		final MatchList<IMethod> list = new MatchList<>(null);
-		context.getImplicitMatches(list, value, type);
-		if (list.isEmpty())
+		if (!IContext.resolveImplicits(context, value, type).isEmpty())
 		{
-			// No implicit conversions available
-			return IValue.MISMATCH;
+			return IValue.IMPLICIT_CONVERSION_MATCH;
 		}
 
-		return IValue.IMPLICIT_CONVERSION_MATCH;
+		// No implicit conversions available
+		return IValue.MISMATCH;
 	}
 
 	private static IValue convertValueDirect(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)
@@ -98,15 +95,13 @@ public final class TypeChecker
 			return convertedValue;
 		}
 
-		MatchList<IMethod> list = new MatchList<>(null);
-		context.getImplicitMatches(list, value, type);
-		if (list.isEmpty())
+		final IMethod converter = IContext.resolveImplicits(context, value, type).getBestMember();
+		if (converter == null)
 		{
 			return null;
 		}
 
-		// TODO Ambiguity check
-		return new LiteralConversion(value, list.getBestMember());
+		return new LiteralConversion(value, converter);
 	}
 
 	public static IValue convertValue(IValue value, IType type, ITypeContext typeContext, MarkerList markers, IContext context)

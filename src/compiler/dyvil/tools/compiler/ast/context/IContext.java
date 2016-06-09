@@ -155,16 +155,44 @@ public interface IContext extends IMemberContext, IImportContext
 
 	static IConstructor resolveConstructor(IImplicitContext implicitContext, IMemberContext type, IArguments arguments)
 	{
+		return resolveConstructors(implicitContext, type, arguments).getBestMember();
+	}
+
+	static MatchList<IConstructor> resolveConstructors(IImplicitContext implicitContext, IMemberContext type, IArguments arguments)
+	{
 		MatchList<IConstructor> matches = new MatchList<>(implicitContext);
 		type.getConstructorMatches(matches, arguments);
-		return matches.getBestMember();
+		return matches;
 	}
 
 	static IMethod resolveMethod(IMemberContext context, IValue receiver, Name name, IArguments arguments)
 	{
+		return resolveMethods(context, receiver, name, arguments).getBestMember();
+	}
+
+	static MatchList<IMethod> resolveMethods(IMemberContext context, IValue receiver, Name name, IArguments arguments)
+	{
 		MatchList<IMethod> matches = new MatchList<>(context);
 		context.getMethodMatches(matches, receiver, name, arguments);
-		return matches.getBestMember();
+		return matches;
+	}
+
+	static IMethod resolveImplicit(IImplicitContext context, IValue value, IType targetType)
+	{
+		return resolveImplicits(context, value, targetType).getBestMember();
+	}
+
+	static MatchList<IMethod> resolveImplicits(IImplicitContext context, IValue value, IType targetType)
+	{
+		MatchList<IMethod> matches = new MatchList<>(null);
+		context.getImplicitMatches(matches, value, targetType);
+		if (!matches.isEmpty() || targetType == null)
+		{
+			return matches;
+		}
+
+		targetType.getImplicitMatches(matches, value, targetType);
+		return matches;
 	}
 
 	static byte getVisibility(IContext context, IClassMember member)

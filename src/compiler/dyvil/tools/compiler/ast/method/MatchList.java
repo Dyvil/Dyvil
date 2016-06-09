@@ -1,12 +1,14 @@
 package dyvil.tools.compiler.ast.method;
 
+import dyvil.collection.iterator.ArrayIterator;
 import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.type.IType;
 
 import java.util.Arrays;
+import java.util.Iterator;
 
-public class MatchList<T extends ICallableSignature> implements IImplicitContext
+public class MatchList<T extends ICallableSignature> implements IImplicitContext, Iterable<Candidate<T>>
 {
 	private Candidate<T>[] candidates = (Candidate<T>[]) new Candidate[4];
 	private int size;
@@ -120,5 +122,12 @@ public class MatchList<T extends ICallableSignature> implements IImplicitContext
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
 		this.implicitContext.getImplicitMatches(list, value, targetType);
+	}
+
+	@Override
+	public Iterator<Candidate<T>> iterator()
+	{
+		this.sort();
+		return new ArrayIterator<>(this.candidates, 0, this.size);
 	}
 }
