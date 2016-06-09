@@ -491,6 +491,17 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
+	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
+	{
+		if ((this.resolved & GENERICS) == 0)
+		{
+			this.resolveGenerics();
+		}
+
+		this.body.getImplicitMatches(list, value, targetType);
+	}
+
+	@Override
 	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
 	{
 		if ((this.resolved & SUPER_TYPES) == 0)

@@ -423,10 +423,12 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return;
 		}
 
+		final IParameterList parameters = this.getParameterList();
+
 		final int parameterStartIndex;
 		final int argumentStartIndex;
 		final int argumentCount;
-		final int parameterCount = this.parameters.size();
+		final int parameterCount = parameters.size();
 
 		final int[] matchValues;
 		final IType[] matchTypes;
@@ -438,7 +440,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 			if (arguments == null)
 			{
-				list.add(new MatchList.Candidate<>(this));
+				list.add(new Candidate<>(this));
 				return;
 			}
 
@@ -460,7 +462,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 			if (arguments == null)
 			{
-				list.add(new MatchList.Candidate<>(this, IValue.EXACT_MATCH, null));
+				list.add(new Candidate<>(this, IValue.EXACT_MATCH, null));
 				return;
 			}
 
@@ -477,7 +479,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			if (mod == Modifiers.INFIX)
 			{
 				// Infix access to infix method
-				receiverType = this.parameters.get(0).getInternalType();
+				receiverType = parameters.get(0).getInternalType();
 				parameterStartIndex = 1;
 			}
 			else
@@ -494,7 +496,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 			if (arguments == null)
 			{
-				list.add(new MatchList.Candidate<>(this, receiverMatch, receiverType));
+				list.add(new Candidate<>(this, receiverMatch, receiverType));
 				return;
 			}
 
@@ -516,9 +518,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		int varargs = 0;
 		for (int argumentIndex = 0; argumentIndex < parametersLeft; argumentIndex++)
 		{
-			final IParameter parameter = this.parameters.get(parameterStartIndex + argumentIndex);
-			final int partialVarargs = arguments.checkMatch(matchValues, matchTypes, argumentStartIndex, argumentIndex, parameter,
-			                                                list);
+			final IParameter parameter = parameters.get(parameterStartIndex + argumentIndex);
+			final int partialVarargs = arguments.checkMatch(matchValues, matchTypes, argumentStartIndex, argumentIndex,
+			                                                parameter, list);
 			if (partialVarargs >= 0)
 			{
 				varargs += partialVarargs;
@@ -533,30 +535,36 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return; // Mismatch
 		}
 
-		list.add(new MatchList.Candidate<>(this, defaults, varargs, matchValues, matchTypes));
+		list.add(new Candidate<>(this, defaults, varargs, matchValues, matchTypes));
 	}
 
 	@Override
 	public void checkImplicitMatch(MatchList<IMethod> list, IValue value, IType type)
 	{
-		if (!this.hasModifier(Modifiers.IMPLICIT | Modifiers.STATIC) || this.parameters.size() != 1)
+		if (!this.hasModifier(Modifiers.IMPLICIT | Modifiers.STATIC))
 		{
-			// The method has to be 'implicit static' and only take exactly one parameter
+			// The method has to be 'implicit static'
 			return;
 		}
-		if (type != null && !Types.isSuperType(type, this.type))
+		final IParameterList parameterList = this.getParameterList();
+		if (parameterList.size() != 1)
+		{
+			// and only take exactly one parameter
+			return;
+		}
+		if (type != null && !Types.isSuperType(type, this.getType())) // getType to ensure it is resolved by ExternalMethods
 		{
 			// The method's return type has to be a sub-type of the target type
 			return;
 		}
 
-		final IType parType = this.parameters.get(0).getInternalType();
+		final IType parType = parameterList.get(0).getInternalType();
 
 		// Note: this explicitly uses IValue.getTypeMatch to avoid nested implicit conversions
 		final int match = value.getTypeMatch(parType);
 		if (match > IValue.CONVERSION_MATCH)
 		{
-			list.add(new MatchList.Candidate<>(this, match, parType));
+			list.add(new Candidate<>(this, match, parType));
 		}
 	}
 

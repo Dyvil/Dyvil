@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.dynamic;
 
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.method.Candidate;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -30,7 +31,7 @@ public final class DynamicType extends UnknownType
 
 		if (list.isEmpty())
 		{
-			list.add(new MatchList.Candidate<>(new DynamicMethod(name)));
+			list.add(new Candidate<>(new DynamicMethod(name)));
 		}
 	}
 

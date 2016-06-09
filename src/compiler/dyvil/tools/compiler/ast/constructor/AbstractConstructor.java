@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.method.Candidate;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
@@ -255,7 +256,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 			return; // Mismatch
 		}
 
-		list.add(new MatchList.Candidate<>(this, defaults, varargs, matchValues, matchTypes));
+		list.add(new Candidate<>(this, defaults, varargs, matchValues, matchTypes));
 	}
 
 	@Override
