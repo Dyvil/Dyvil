@@ -94,15 +94,16 @@ public final class BooleanValue implements IConstantValue
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		if (type == Types.BOOLEAN)
+		final int i = IConstantValue.super.getTypeMatch(type);
+		if (i != MISMATCH)
 		{
-			return 1;
+			return i;
 		}
 		if (type.getAnnotation(Types.BOOLEAN_CONVERTIBLE_CLASS) != null)
 		{
 			return CONVERSION_MATCH;
 		}
-		return Types.getDistance(type, Types.BOOLEAN);
+		return MISMATCH;
 	}
 
 	@Override

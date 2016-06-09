@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.classes.metadata.IClassMetadata;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.external.ExternalClass;
@@ -19,7 +19,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.operator.IOperator;
@@ -283,12 +283,6 @@ public class REPLMemberClass implements IClass
 	}
 
 	@Override
-	public int getSuperTypeDistance(IType superType)
-	{
-		return 0;
-	}
-
-	@Override
 	public int interfaceCount()
 	{
 		return 0;
@@ -434,13 +428,19 @@ public class REPLMemberClass implements IClass
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
-		this.context.getMethodMatches(list, instance, name, arguments);
+		this.context.getMethodMatches(list, receiver, name, arguments);
 	}
 
 	@Override
-	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
+	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
+	{
+		this.context.getImplicitMatches(list, value, targetType);
+	}
+
+	@Override
+	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
 	{
 	}
 
@@ -571,8 +571,9 @@ public class REPLMemberClass implements IClass
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		String name = this.name.qualified;
-		writer.visit(ClassFormat.CLASS_VERSION, Modifiers.PUBLIC | ASMConstants.ACC_SUPER, name, null, "java/lang/Object",
-		             null);
+		writer
+			.visit(ClassFormat.CLASS_VERSION, Modifiers.PUBLIC | ASMConstants.ACC_SUPER, name, null, "java/lang/Object",
+			       null);
 		writer.visitSource(name, null);
 
 		this.member.write(writer);

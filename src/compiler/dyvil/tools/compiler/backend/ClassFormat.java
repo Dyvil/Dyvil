@@ -2,15 +2,15 @@ package dyvil.tools.compiler.backend;
 
 import dyvil.tools.asm.ASMConstants;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
+import dyvil.tools.compiler.ast.external.ExternalConstructor;
+import dyvil.tools.compiler.ast.external.ExternalMethod;
 import dyvil.tools.compiler.ast.external.ExternalParameter;
 import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.ast.generic.TypeParameter;
 import dyvil.tools.compiler.ast.generic.Variance;
-import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.method.IExceptionList;
-import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.IExternalCallableMember;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -180,9 +180,9 @@ public final class ClassFormat
 		}
 	}
 
-	private static ITypeConsumer parameterTypeConsumer(ICallableMember methodSignature)
+	private static ITypeConsumer parameterTypeConsumer(IExternalCallableMember methodSignature)
 	{
-		final IParameterList parameterList = methodSignature.getParameterList();
+		final IParameterList parameterList = methodSignature.getExternalParameterList();
 		return type -> {
 			final ExternalParameter parameter = new ExternalParameter(Name.getQualified("par" + parameterList.size()),
 			                                                          type);
@@ -191,7 +191,7 @@ public final class ClassFormat
 		};
 	}
 
-	public static void readMethodType(String desc, IMethod method)
+	public static void readMethodType(String desc, ExternalMethod method)
 	{
 		int i = 1;
 		if (desc.charAt(0) == '<')
@@ -217,7 +217,7 @@ public final class ClassFormat
 		}
 	}
 
-	public static void readConstructorType(String desc, IConstructor constructor)
+	public static void readConstructorType(String desc, ExternalConstructor constructor)
 	{
 		int i = 1;
 		while (desc.charAt(i) != ')')
@@ -338,7 +338,7 @@ public final class ClassFormat
 			return end + 1;
 		}
 		case '*':
-			consumer.setType(new WildcardType(Variance.INVARIANT));
+			consumer.setType(new WildcardType(Variance.COVARIANT));
 			return start + 1;
 		case '+':
 		{

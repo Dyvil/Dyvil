@@ -159,12 +159,12 @@ public final class StringInterpolationExpr implements IValue
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		final int distance = Types.getDistance(type, Types.STRING);
-		if (distance != 0)
+		final int i = IValue.super.getTypeMatch(type);
+		if (i != MISMATCH)
 		{
-			return distance;
+			return i;
 		}
-		return this.isConvertible(type) ? CONVERSION_MATCH : 0;
+		return this.isConvertible(type) ? CONVERSION_MATCH : MISMATCH;
 	}
 
 	@Override

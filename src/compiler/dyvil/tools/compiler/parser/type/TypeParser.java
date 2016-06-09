@@ -208,14 +208,14 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					pm.popParser();
 					return;
 				case DyvilSymbols.UNDERSCORE:
-					this.type = new WildcardType(token.raw());
+					this.type = new WildcardType(token.raw(), Variance.COVARIANT);
 					this.mode = END;
 					return;
 				case Tokens.SYMBOL_IDENTIFIER:
 					final Name name = token.nameValue();
 					if (name == Names.plus)
 					{
-						final WildcardType wildcardType = new WildcardType(Variance.COVARIANT);
+						final WildcardType wildcardType = new WildcardType(token.raw(), Variance.COVARIANT);
 						pm.pushParser(this.subParser(wildcardType));
 						this.type = wildcardType;
 						this.mode = END;
@@ -223,7 +223,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					}
 					if (name == Names.minus)
 					{
-						final WildcardType wildcardType = new WildcardType(Variance.CONTRAVARIANT);
+						final WildcardType wildcardType = new WildcardType(token.raw(), Variance.CONTRAVARIANT);
 						pm.pushParser(this.subParser(wildcardType));
 						this.type = wildcardType;
 						this.mode = END;

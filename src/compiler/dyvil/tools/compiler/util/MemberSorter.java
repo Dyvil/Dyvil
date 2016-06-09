@@ -38,19 +38,20 @@ public class MemberSorter
 		return method1.getDescriptor().compareTo(method2.getDescriptor());
 	}
 
-	private static int compareTypes(IType type1, IType type2)
+	public static int compareTypes(IType type1, IType type2)
 	{
-		if (Types.isSameType(type1, type2))
-		{
-			return 0;
-		}
 		if (Types.isSuperType(type1, type2))
 		{
-			return 1;
+			if (Types.isSuperType(type2, type1))
+			{
+				return 0; // same type
+			}
+
+			return 1; // type2 is more specific than type1
 		}
 		if (Types.isSuperType(type2, type1))
 		{
-			return -1;
+			return -1; // type2 is less specific than type1
 		}
 		return 0;
 	}

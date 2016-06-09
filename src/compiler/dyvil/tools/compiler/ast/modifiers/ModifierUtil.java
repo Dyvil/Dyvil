@@ -75,16 +75,14 @@ public final class ModifierUtil
 			return BaseModifiers.OVERRIDE;
 		case DyvilKeywords.INLINE:
 			return BaseModifiers.INLINE;
+		case DyvilKeywords.IMPLICIT:
+			return BaseModifiers.IMPLICIT;
 		case DyvilKeywords.SYNCHRONIZED:
 			return BaseModifiers.SYNCHRONIZED;
 		case DyvilKeywords.CONST:
 			return BaseModifiers.CONST;
 		case DyvilKeywords.LAZY:
 			return BaseModifiers.LAZY;
-		case DyvilKeywords.NIL:
-			return BaseModifiers.NIL;
-		case DyvilKeywords.NULL:
-			return BaseModifiers.NULL;
 		}
 		return null;
 	}

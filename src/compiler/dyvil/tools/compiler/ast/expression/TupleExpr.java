@@ -223,7 +223,7 @@ public final class TupleExpr implements IValue, IValueList
 			return this.values[0].getTypeMatch(type);
 		}
 
-		return Types.getDistance(type, this.getType());
+		return IValue.super.getTypeMatch(type);
 	}
 
 	@Override

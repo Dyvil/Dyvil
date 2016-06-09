@@ -1,0 +1,31 @@
+package dyvil.test
+
+public class ImplicitTest
+{
+	@FunctionalInterface
+	public static interface DebugPrintable
+	{
+		static implicit func int2debug(int i): DebugPrintable = => i.toString
+
+		static implicit func string2debug(String s): DebugPrintable = => s
+
+		func toDebugString: String
+	}
+
+	public static implicit func i2s(int i): String = i.toString
+
+	public static implicit func b2s(boolean b): String = b.toString
+
+	public static void main([String] args)
+	{
+		String s = 123
+
+		Main.test("Implicit Assignment Test", "123", s)
+
+		Main.test("Implicit Method Call Test", "TRUE", true.toUpperCase)
+
+		// Type Check is enough
+		DebugPrintable debug = "abc"
+		debug = 123
+	}
+}

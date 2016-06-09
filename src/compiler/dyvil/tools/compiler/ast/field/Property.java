@@ -8,11 +8,11 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.CodeMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.CodeParameter;
+import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -152,16 +152,16 @@ public class Property extends Member implements IProperty
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
+	public void checkMatch(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
 		if (this.getter != null)
 		{
-			IContext.getMethodMatch(list, receiver, name, arguments, this.getter);
+			this.getter.checkMatch(list, receiver, name, arguments);
 		}
 
 		if (this.setter != null)
 		{
-			IContext.getMethodMatch(list, receiver, name, arguments, this.setter);
+			this.setter.checkMatch(list, receiver, name, arguments);
 		}
 	}
 

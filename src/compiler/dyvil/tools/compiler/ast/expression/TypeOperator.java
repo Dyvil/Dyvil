@@ -3,9 +3,6 @@ package dyvil.tools.compiler.ast.expression;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.AbstractValue;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.LiteralConversion;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -101,12 +98,16 @@ public final class TypeOperator extends AbstractValue
 	@Override
 	public int getTypeMatch(IType type)
 	{
+		final int i = super.getTypeMatch(type);
+		if (i != MISMATCH)
+		{
+			return i;
+		}
 		if (type.getAnnotation(LazyFields.TYPE_CONVERTIBLE) != null)
 		{
 			return CONVERSION_MATCH;
 		}
-
-		return Types.getDistance(type, this.getType());
+		return MISMATCH;
 	}
 
 	@Override

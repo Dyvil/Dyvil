@@ -373,13 +373,15 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
-		final float selfMatch = this.getSignatureMatch(name, instance, arguments);
-		if (selfMatch > 0)
-		{
-			list.add(this, selfMatch);
-		}
+		this.checkMatch(list, receiver, name, arguments);
+	}
+
+	@Override
+	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
+	{
+		this.checkImplicitMatch(list, value, targetType);
 	}
 
 	@Override
@@ -414,77 +416,156 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public float getSignatureMatch(Name name, IValue receiver, IArguments arguments)
+	public void checkMatch(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
 		if (name != this.name && name != null)
 		{
-			return 0;
+			return;
 		}
 
-		int parameterStartIndex = 0;
-		int totalMatch = 1;
+		final IParameterList parameters = this.getParameterList();
 
-		// infix modifier implementation
-		if (receiver != null)
+		final int parameterStartIndex;
+		final int argumentStartIndex;
+		final int argumentCount;
+		final int parameterCount = parameters.size();
+
+		final int[] matchValues;
+		final IType[] matchTypes;
+
+		final int mod;
+		if (receiver == null)
 		{
-			final int mod = this.modifiers.toFlags() & Modifiers.INFIX;
-			if (mod == 0 || receiver.valueTag() != IValue.CLASS_ACCESS)
+			// No receiver
+
+			if (arguments == null)
 			{
-				if (mod == Modifiers.INFIX)
-				{
-					final IType infixReceiverType = this.parameters.get(0).getInternalType();
-					final float receiverMatch = receiver.getTypeMatch(infixReceiverType);
-					if (receiverMatch == 0)
-					{
-						return 0;
-					}
-
-					totalMatch += receiverMatch;
-					parameterStartIndex = 1;
-				}
-				else if (mod == Modifiers.STATIC && receiver.valueTag() != IValue.CLASS_ACCESS)
-				{
-					// Disallow non-static access to static method
-					return 0;
-				}
-				else
-				{
-					final float receiverMatch = receiver.getTypeMatch(this.enclosingClass.getClassType());
-					if (receiverMatch <= 0)
-					{
-						return 0;
-					}
-					totalMatch += receiverMatch;
-				}
+				list.add(new Candidate<>(this));
+				return;
 			}
-		}
 
-		// Only matching the name
-		if (arguments == null)
+			argumentCount = arguments.size();
+			matchValues = new int[argumentCount];
+			matchTypes = new IType[argumentCount];
+			argumentStartIndex = 0;
+			parameterStartIndex = 0;
+		}
+		else if ((mod = this.modifiers.toFlags() & Modifiers.INFIX) == Modifiers.STATIC
+			         && receiver.valueTag() != IValue.CLASS_ACCESS)
 		{
-			return totalMatch;
+			// Disallow non-static access to static method
+			return;
+		}
+		else if (mod != 0 && receiver.valueTag() == IValue.CLASS_ACCESS)
+		{
+			// Static access to static method
+
+			if (arguments == null)
+			{
+				list.add(new Candidate<>(this, IValue.EXACT_MATCH, null));
+				return;
+			}
+
+			parameterStartIndex = 0;
+			argumentCount = arguments.size();
+			argumentStartIndex = 1;
+			matchValues = new int[1 + argumentCount];
+			matchTypes = new IType[1 + argumentCount];
+			matchValues[0] = 1;
+		}
+		else
+		{
+			final IType receiverType;
+			if (mod == Modifiers.INFIX)
+			{
+				// Infix access to infix method
+				receiverType = parameters.get(0).getInternalType();
+				parameterStartIndex = 1;
+			}
+			else
+			{
+				// Infix access to instance method
+				receiverType = this.enclosingClass.getClassType();
+				parameterStartIndex = 0;
+			}
+
+			final int receiverMatch = TypeChecker.getTypeMatch(receiver, receiverType, list);
+			if (receiverMatch == IValue.MISMATCH)
+			{
+				return;
+			}
+			if (arguments == null)
+			{
+				list.add(new Candidate<>(this, receiverMatch, receiverType));
+				return;
+			}
+
+			argumentCount = arguments.size();
+			argumentStartIndex = 1;
+			matchValues = new int[1 + argumentCount];
+			matchTypes = new IType[1 + argumentCount];
+			matchValues[0] = receiverMatch;
+			matchTypes[0] = receiverType;
 		}
 
-		final int argumentCount = arguments.size();
-		final int parametersLeft = this.parameters.size() - parameterStartIndex;
+		final int parametersLeft = parameterCount - parameterStartIndex;
 		if (argumentCount > parametersLeft && !this.isVariadic())
 		{
-			return 0;
+			return;
 		}
 
+		int defaults = 0;
+		int varargs = 0;
 		for (int argumentIndex = 0; argumentIndex < parametersLeft; argumentIndex++)
 		{
-			final IParameter parameter = this.parameters.get(argumentIndex + parameterStartIndex);
-			final float valueMatch = arguments.getTypeMatch(argumentIndex, parameter);
-			if (valueMatch <= 0)
+			final IParameter parameter = parameters.get(parameterStartIndex + argumentIndex);
+			final int partialVarargs = arguments.checkMatch(matchValues, matchTypes, argumentStartIndex, argumentIndex,
+			                                                parameter, list);
+			if (partialVarargs >= 0)
 			{
-				return 0;
+				varargs += partialVarargs;
+				continue;
+			}
+			if (parameter.getValue() != null)
+			{
+				defaults++;
+				continue;
 			}
 
-			totalMatch += valueMatch;
+			return; // Mismatch
 		}
 
-		return totalMatch;
+		list.add(new Candidate<>(this, defaults, varargs, matchValues, matchTypes));
+	}
+
+	@Override
+	public void checkImplicitMatch(MatchList<IMethod> list, IValue value, IType type)
+	{
+		if (!this.hasModifier(Modifiers.IMPLICIT | Modifiers.STATIC))
+		{
+			// The method has to be 'implicit static'
+			return;
+		}
+		final IParameterList parameterList = this.getParameterList();
+		if (parameterList.size() != 1)
+		{
+			// and only take exactly one parameter
+			return;
+		}
+		if (type != null && !Types.isSuperType(type, this.getType())) // getType to ensure it is resolved by ExternalMethods
+		{
+			// The method's return type has to be a sub-type of the target type
+			return;
+		}
+
+		final IType parType = parameterList.get(0).getInternalType();
+
+		// Note: this explicitly uses IValue.getTypeMatch to avoid nested implicit conversions
+		final int match = value.getTypeMatch(parType);
+		if (match > IValue.CONVERSION_MATCH)
+		{
+			list.add(new Candidate<>(this, match, parType));
+		}
 	}
 
 	@Override

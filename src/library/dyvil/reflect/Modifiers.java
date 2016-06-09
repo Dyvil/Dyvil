@@ -149,8 +149,8 @@ public interface Modifiers
 	int INFIX_FLAG = 0x00020000;
 
 	/**
-	 * <i>Dyvil</i> {@code infix} modifier. If a method is marked with this modifier, it is a method that can be called
-	 * on any Object and virtually has the instance as the first parameter. An infix method is always static.
+	 * <i>Dyvil</i> {@code infix} modifier. If a method is marked with this modifier, it can be called on any Object and
+	 * virtually has the receiver as the first parameter. An infix method is always static.
 	 */
 	int INFIX = INFIX_FLAG | STATIC;
 
@@ -159,8 +159,8 @@ public interface Modifiers
 	int EXTENSION = EXTENSION_FLAG | INFIX;
 
 	/**
-	 * <i>Dyvil</i> {@code prefix} modifier. If a method is marked with this modifier, it is a method that can be called
-	 * on any Object and virtually uses the first (and only) parameter as the instance.
+	 * <i>Dyvil</i> {@code prefix} modifier. If a method is marked with this modifier, the first argument and the
+	 * receiver. are swapped at the call site.
 	 */
 	int PREFIX = 0x00040000;
 
@@ -168,6 +168,11 @@ public interface Modifiers
 	 * <i>Dyvil</i> {@code override} modifier. This modifier is a shortcut for the {@link Override} annotation.
 	 */
 	int OVERRIDE = 0x00080000;
+
+	/**
+	 * <i>Dyvil</i> {@code implicit} modifier.
+	 */
+	int IMPLICIT = 0x00200000;
 
 	// Field Modifiers
 
@@ -230,8 +235,8 @@ public interface Modifiers
 	 * The modifiers that can be used on methods.
 	 */
 	int METHOD_MODIFIERS =
-		MEMBER_MODIFIERS | ABSTRACT | SYNCHRONIZED | NATIVE | STRICT | INLINE | INFIX | EXTENSION | PREFIX | BRIDGE
-			| VARARGS | OVERRIDE;
+		MEMBER_MODIFIERS | ABSTRACT | SYNCHRONIZED | NATIVE | STRICT | INLINE | INFIX | EXTENSION | IMPLICIT | PREFIX
+			| BRIDGE | VARARGS | OVERRIDE;
 
 	/**
 	 * The modifiers that can be used on parameters.

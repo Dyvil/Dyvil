@@ -6,12 +6,12 @@ import dyvil.tools.compiler.ast.access.InitializerCall;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.constructor.CodeConstructor;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.statement.StatementList;
@@ -289,18 +289,14 @@ public class ClassMetadata implements IClassMetadata
 	}
 
 	@Override
-	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
+	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
 	{
 		if ((this.members & CONSTRUCTOR) != 0)
 		{
 			return;
 		}
 
-		float match = this.constructor.getSignatureMatch(arguments);
-		if (match > 0)
-		{
-			list.add(this.constructor, match);
-		}
+		this.constructor.checkMatch(list, arguments);
 	}
 
 	@Override

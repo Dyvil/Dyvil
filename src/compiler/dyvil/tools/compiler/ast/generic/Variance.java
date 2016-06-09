@@ -60,6 +60,23 @@ public enum Variance
 
 	public abstract boolean checkCompatible(IType type1, IType type2);
 
+	public static boolean checkCompatible(Variance base, IType type1, IType type2)
+	{
+		Variance variance = type1.getVariance();
+		if (variance != null && variance.checkCompatible(type1, type2))
+		{
+			return true;
+		}
+
+		variance = type2.getVariance();
+		if (variance != null && variance.checkCompatible(type2, type1))
+		{
+			return true;
+		}
+		//
+		return base.checkCompatible(type1, type2);
+	}
+
 	public static void write(Variance variance, DataOutput out) throws IOException
 	{
 		out.writeByte(variance.ordinal());

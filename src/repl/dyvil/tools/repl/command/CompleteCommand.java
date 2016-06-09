@@ -9,9 +9,10 @@ import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -29,6 +30,8 @@ import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.repl.DyvilREPL;
 import dyvil.tools.repl.context.REPLContext;
 import dyvil.tools.repl.lang.I18n;
+
+import java.io.PrintStream;
 
 public class CompleteCommand implements ICommand
 {
@@ -123,23 +126,25 @@ public class CompleteCommand implements ICommand
 			checkMember(methods, method, start);
 		}
 
-		boolean output = false;
+		final PrintStream output = repl.getOutput();
+
+		boolean hasOutput = false;
 		if (!variables.isEmpty())
 		{
-			output = true;
-			repl.getOutput().println(I18n.get("command.complete.variables"));
-			printMembers(repl, variables);
+			hasOutput = true;
+			output.println(I18n.get("command.complete.variables"));
+			printMembers(output, variables, null);
 		}
 		if (!methods.isEmpty())
 		{
-			output = true;
-			repl.getOutput().println(I18n.get("command.complete.methods"));
-			printMethods(repl, methods);
+			hasOutput = true;
+			output.println(I18n.get("command.complete.methods"));
+			printMethods(output, methods, null);
 		}
 
-		if (!output)
+		if (!hasOutput)
 		{
-			repl.getOutput().println(I18n.get("command.complete.none"));
+			output.println(I18n.get("command.complete.none"));
 		}
 	}
 
@@ -151,68 +156,77 @@ public class CompleteCommand implements ICommand
 		final Set<IProperty> properties = new TreeSet<>(MemberSorter.MEMBER_COMPARATOR);
 		final Set<IMethod> methods = new TreeSet<>(MemberSorter.METHOD_COMPARATOR);
 		final Set<IMethod> extensionMethods = new TreeSet<>(MemberSorter.METHOD_COMPARATOR);
+		final Set<IMethod> conversionMethods = new TreeSet<>(MemberSorter.METHOD_COMPARATOR);
 
+		final PrintStream output = repl.getOutput();
 		if (statics)
 		{
-			repl.getOutput().println(I18n.get("command.complete.type", type));
+			output.println(I18n.get("command.complete.type", type));
 
 			findMembers(type, fields, properties, methods, memberStart, true);
 		}
 		else
 		{
-			repl.getOutput().println(I18n.get("command.complete.expression", value, type));
+			output.println(I18n.get("command.complete.expression", value, type));
 
 			findInstanceMembers(type, fields, properties, methods, memberStart, new IdentityHashSet<>());
 			findExtensions(repl, type, value, extensionMethods, memberStart);
+			findConversions(repl, type, value, conversionMethods);
 		}
 
-		boolean output = false;
+		boolean hasOutput = false;
 		if (!fields.isEmpty())
 		{
-			output = true;
-			repl.getOutput().println(I18n.get("command.complete.fields"));
-			printMembers(repl, fields);
+			hasOutput = true;
+			output.println(I18n.get("command.complete.fields"));
+			printMembers(output, fields, type);
 		}
 		if (!properties.isEmpty())
 		{
-			output = true;
-			repl.getOutput().println(I18n.get("command.complete.properties"));
-			printMembers(repl, properties);
+			hasOutput = true;
+			output.println(I18n.get("command.complete.properties"));
+			printMembers(output, properties, type);
 		}
 		if (!methods.isEmpty())
 		{
-			output = true;
-			repl.getOutput().println(I18n.get("command.complete.methods"));
-			printMethods(repl, methods);
+			hasOutput = true;
+			output.println(I18n.get("command.complete.methods"));
+			printMethods(output, methods, type);
 		}
 		if (!extensionMethods.isEmpty())
 		{
-			output = true;
-			repl.getOutput().println(I18n.get("command.complete.extensions"));
-			printMethods(repl, extensionMethods);
+			hasOutput = true;
+			output.println(I18n.get("command.complete.extensions"));
+			printMethods(output, extensionMethods, type);
+		}
+		if (!conversionMethods.isEmpty())
+		{
+			hasOutput = true;
+			output.println(I18n.get("command.complete.conversions"));
+			printMethods(output, conversionMethods, type);
 		}
 
-		if (!output)
+		if (!hasOutput)
 		{
-			repl.getOutput().println(I18n.get("command.complete.none"));
+			output.println(I18n.get("command.complete.none"));
 		}
 	}
 
-	private static void printMembers(DyvilREPL repl, Set<? extends IMember> members)
+	private static void printMembers(PrintStream out, Set<? extends IMember> members, ITypeContext typeContext)
 	{
 		for (IMember member : members)
 		{
-			repl.getOutput().print('\t');
-			repl.getOutput().println(Util.memberSignatureToString(member, null));
+			out.print('\t');
+			out.println(Util.memberSignatureToString(member, typeContext));
 		}
 	}
 
-	private static void printMethods(DyvilREPL repl, Set<IMethod> methods)
+	private static void printMethods(PrintStream out, Set<IMethod> methods, ITypeContext typeContext)
 	{
 		for (IMethod method : methods)
 		{
-			repl.getOutput().print('\t');
-			repl.getOutput().println(Util.methodSignatureToString(method, null));
+			out.print('\t');
+			out.println(Util.methodSignatureToString(method, typeContext));
 		}
 	}
 
@@ -278,14 +292,27 @@ public class CompleteCommand implements ICommand
 
 	private static void findExtensions(DyvilREPL repl, IType type, IValue value, Set<IMethod> methods, String start)
 	{
-		MethodMatchList matchList = new MethodMatchList();
+		MatchList<IMethod> matchList = new MatchList<>(repl.getContext());
 		type.getMethodMatches(matchList, value, null, null);
 		repl.getContext().getMethodMatches(matchList, value, null, null);
 		Types.LANG_HEADER.getMethodMatches(matchList, value, null, null);
 
 		for (int i = 0, count = matchList.size(); i < count; i++)
 		{
-			checkMember(methods, matchList.getMethod(i), start, true);
+			checkMember(methods, matchList.getCandidate(i).getMember(), start, true);
+		}
+	}
+
+	private static void findConversions(DyvilREPL repl, IType type, IValue value, Set<IMethod> methods)
+	{
+		MatchList<IMethod> matchList = new MatchList<>(null);
+		type.getImplicitMatches(matchList, value, null);
+		repl.getContext().getImplicitMatches(matchList, value, null);
+		Types.LANG_HEADER.getImplicitMatches(matchList, value, null);
+
+		for (int i = 0, count = matchList.size(); i < count; i++)
+		{
+			checkMember(methods, matchList.getCandidate(i).getMember(), "", true);
 		}
 	}
 

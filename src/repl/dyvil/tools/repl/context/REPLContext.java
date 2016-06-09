@@ -13,7 +13,6 @@ import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.consumer.IMemberConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
-import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
@@ -22,7 +21,7 @@ import dyvil.tools.compiler.ast.header.ImportDeclaration;
 import dyvil.tools.compiler.ast.header.IncludeDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -626,11 +625,11 @@ public class REPLContext extends DyvilHeader
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
 		for (IMethod method : this.methods)
 		{
-			IContext.getMethodMatch(list, receiver, name, arguments, method);
+			method.checkMatch(list, receiver, name, arguments);
 		}
 
 		if (name != null)
@@ -640,7 +639,7 @@ public class REPLContext extends DyvilHeader
 			IProperty property = this.properties.get(removeEq);
 			if (property != null)
 			{
-				property.getMethodMatches(list, receiver, name, arguments);
+				property.checkMatch(list, receiver, name, arguments);
 			}
 
 			final IField field = this.fields.get(removeEq);
@@ -649,7 +648,7 @@ public class REPLContext extends DyvilHeader
 				property = field.getProperty();
 				if (property != null)
 				{
-					property.getMethodMatches(list, receiver, name, arguments);
+					property.checkMatch(list, receiver, name, arguments);
 				}
 			}
 		}
@@ -660,6 +659,22 @@ public class REPLContext extends DyvilHeader
 		}
 
 		super.getMethodMatches(list, receiver, name, arguments);
+	}
+
+	@Override
+	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
+	{
+		for (IMethod method : this.methods)
+		{
+			method.checkImplicitMatch(list, value, targetType);
+		}
+
+		if (!list.isEmpty())
+		{
+			return;
+		}
+
+		super.getImplicitMatches(list, value, targetType);
 	}
 
 	@Override

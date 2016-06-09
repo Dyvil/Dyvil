@@ -21,6 +21,7 @@ import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
@@ -167,6 +168,22 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
+	public IParameterList getExternalParameterList()
+	{
+		return this.parameters;
+	}
+
+	@Override
+	public IParameterList getParameterList()
+	{
+		if ((this.resolved & PARAMETERS) == 0)
+		{
+			this.resolveParameters();
+		}
+		return this.parameters;
+	}
+
+	@Override
 	public IValue getValue()
 	{
 		return null;
@@ -175,22 +192,6 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	@Override
 	public void setValue(IValue value)
 	{
-	}
-
-	@Override
-	public float getSignatureMatch(Name name, IValue receiver, IArguments arguments)
-	{
-		// Fail fast
-		if (name != this.name && name != null)
-		{
-			return 0;
-		}
-
-		if ((this.resolved & PARAMETERS) == 0)
-		{
-			this.resolveParameters();
-		}
-		return super.getSignatureMatch(name, receiver, arguments);
 	}
 
 	@Override

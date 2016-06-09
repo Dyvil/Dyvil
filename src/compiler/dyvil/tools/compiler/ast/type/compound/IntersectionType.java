@@ -7,14 +7,14 @@ import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -97,7 +97,7 @@ public class IntersectionType implements IObjectType
 	@Override
 	public int subTypeCheckLevel()
 	{
-		return 1;
+		return SUBTYPE_UNION_INTERSECTION;
 	}
 
 	@Override
@@ -122,38 +122,6 @@ public class IntersectionType implements IObjectType
 	public boolean isSubClassOf(IType superType)
 	{
 		return Types.isSuperClass(superType, this.left) || Types.isSuperClass(superType, this.right);
-	}
-
-	@Override
-	public int getSuperTypeDistance(IType superType)
-	{
-		final int left = Types.getDistance(superType, this.left);
-		final int right = Types.getDistance(superType, this.right);
-
-		// Either one has to match
-		if (left == 0)
-		{
-			return right;
-		}
-		if (right == 0)
-		{
-			return left;
-		}
-		return Math.min(left, right);
-	}
-
-	@Override
-	public int getSubTypeDistance(IType subType)
-	{
-		final int left = Types.getDistance(this.left, subType);
-		final int right = Types.getDistance(this.right, subType);
-
-		// Both have to match
-		if (left == 0 || right == 0)
-		{
-			return 0;
-		}
-		return Math.min(left, right);
 	}
 
 	@Override
@@ -330,14 +298,21 @@ public class IntersectionType implements IObjectType
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
-		this.left.getMethodMatches(list, instance, name, arguments);
-		this.right.getMethodMatches(list, instance, name, arguments);
+		this.left.getMethodMatches(list, receiver, name, arguments);
+		this.right.getMethodMatches(list, receiver, name, arguments);
 	}
 
 	@Override
-	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
+	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
+	{
+		this.left.getImplicitMatches(list, value, targetType);
+		this.right.getImplicitMatches(list, value, targetType);
+	}
+
+	@Override
+	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
 	{
 	}
 

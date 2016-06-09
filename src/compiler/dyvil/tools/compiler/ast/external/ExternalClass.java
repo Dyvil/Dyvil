@@ -15,7 +15,7 @@ import dyvil.tools.compiler.ast.classes.AbstractClass;
 import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.metadata.IClassMetadata;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -23,7 +23,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -240,16 +240,6 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public int getSuperTypeDistance(IType superType)
-	{
-		if ((this.resolved & SUPER_TYPES) == 0)
-		{
-			this.resolveSuperTypes();
-		}
-		return super.getSuperTypeDistance(superType);
-	}
-
-	@Override
 	public ITypeParameter[] getTypeParameters()
 	{
 		if ((this.resolved & GENERICS) == 0)
@@ -460,14 +450,19 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
 		if ((this.resolved & GENERICS) == 0)
 		{
 			this.resolveGenerics();
 		}
 
-		this.body.getMethodMatches(list, instance, name, arguments);
+		/*
+		Note: unlike AbstractClass.getMethodMatches, this does not check the Class Parameter Properties, because
+		External classes do not have any class parameters with associated properties
+		*/
+		this.body.getMethodMatches(list, receiver, name, arguments);
+		// The same applies for the Metadata
 
 		if (!list.isEmpty())
 		{
@@ -481,7 +476,7 @@ public final class ExternalClass extends AbstractClass
 
 		if (this.superType != null)
 		{
-			this.superType.getMethodMatches(list, instance, name, arguments);
+			this.superType.getMethodMatches(list, receiver, name, arguments);
 		}
 
 		if (!list.isEmpty())
@@ -491,12 +486,23 @@ public final class ExternalClass extends AbstractClass
 
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			this.interfaces[i].getMethodMatches(list, instance, name, arguments);
+			this.interfaces[i].getMethodMatches(list, receiver, name, arguments);
 		}
 	}
 
 	@Override
-	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
+	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
+	{
+		if ((this.resolved & GENERICS) == 0)
+		{
+			this.resolveGenerics();
+		}
+
+		this.body.getImplicitMatches(list, value, targetType);
+	}
+
+	@Override
+	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
 	{
 		if ((this.resolved & SUPER_TYPES) == 0)
 		{
@@ -695,7 +701,7 @@ public final class ExternalClass extends AbstractClass
 
 			if ((access & Modifiers.VARARGS) != 0)
 			{
-				final IParameterList parameterList = constructor.getParameterList();
+				final IParameterList parameterList = constructor.getExternalParameterList();
 				parameterList.get(parameterList.size() - 1).setVarargs(true);
 			}
 
@@ -723,7 +729,7 @@ public final class ExternalClass extends AbstractClass
 
 		if ((access & Modifiers.VARARGS) != 0)
 		{
-			final IParameterList parameterList = method.getParameterList();
+			final IParameterList parameterList = method.getExternalParameterList();
 			parameterList.get(parameterList.size() - 1).setVarargs(true);
 		}
 

@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.classes;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -12,7 +11,7 @@ import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
@@ -261,23 +260,32 @@ public class ClassBody implements IClassBody
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
 		for (int i = 0; i < this.methodCount; i++)
 		{
-			IContext.getMethodMatch(list, receiver, name, arguments, this.methods[i]);
+			this.methods[i].checkMatch(list, receiver, name, arguments);
 		}
 		for (int i = 0; i < this.propertyCount; i++)
 		{
-			this.properties[i].getMethodMatches(list, receiver, name, arguments);
+			this.properties[i].checkMatch(list, receiver, name, arguments);
 		}
 		for (int i = 0; i < this.fieldCount; i++)
 		{
 			final IProperty property = this.fields[i].getProperty();
 			if (property != null)
 			{
-				property.getMethodMatches(list, receiver, name, arguments);
+				property.checkMatch(list, receiver, name, arguments);
 			}
+		}
+	}
+
+	@Override
+	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
+	{
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			this.methods[i].checkImplicitMatch(list, value, targetType);
 		}
 	}
 
@@ -340,16 +348,11 @@ public class ClassBody implements IClassBody
 	}
 
 	@Override
-	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
+	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
 	{
 		for (int i = 0; i < this.constructorCount; i++)
 		{
-			IConstructor ctor = this.constructors[i];
-			float match = ctor.getSignatureMatch(arguments);
-			if (match > 0)
-			{
-				list.add(ctor, match);
-			}
+			this.constructors[i].checkMatch(list, arguments);
 		}
 	}
 

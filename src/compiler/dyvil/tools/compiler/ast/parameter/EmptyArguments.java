@@ -1,9 +1,11 @@
 package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -86,13 +88,9 @@ public final class EmptyArguments implements IArguments
 	}
 
 	@Override
-	public float getTypeMatch(int index, IParameter param)
+	public int checkMatch(int[] values, IType[] types, int matchStartIndex, int argumentIndex, IParameter param, IImplicitContext implicitContext)
 	{
-		if (param.isVarargs())
-		{
-			return VARARGS_MATCH;
-		}
-		return param.getValue() != null ? DEFAULT_MATCH : 0;
+		return param.isVarargs() ? 0 : -1;
 	}
 
 	@Override

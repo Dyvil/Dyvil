@@ -2,14 +2,14 @@ package dyvil.tools.compiler.ast.type.typevar;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.raw.IRawType;
@@ -81,7 +81,7 @@ public class TypeVarType implements IRawType
 	@Override
 	public int subTypeCheckLevel()
 	{
-		return 1;
+		return SUBTYPE_TYPEVAR;
 	}
 
 	@Override
@@ -118,18 +118,6 @@ public class TypeVarType implements IRawType
 	public boolean isSubClassOf(IType superType)
 	{
 		return this.typeParameter.isSubClassOf(superType);
-	}
-
-	@Override
-	public int getSuperTypeDistance(IType superType)
-	{
-		return this.typeParameter.getSuperTypeDistance(superType);
-	}
-
-	@Override
-	public int getSubTypeDistance(IType subType)
-	{
-		return this.typeParameter.getSubTypeDistance(subType);
 	}
 
 	@Override
@@ -186,13 +174,19 @@ public class TypeVarType implements IRawType
 	}
 	
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
-		this.typeParameter.getMethodMatches(list, instance, name, arguments);
+		this.typeParameter.getMethodMatches(list, receiver, name, arguments);
 	}
-	
+
 	@Override
-	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
+	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
+	{
+		this.typeParameter.getImplicitMatches(list, value, targetType);
+	}
+
+	@Override
+	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
 	{
 	}
 	

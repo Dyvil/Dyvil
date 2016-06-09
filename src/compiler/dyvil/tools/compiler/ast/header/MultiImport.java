@@ -4,9 +4,11 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -133,16 +135,25 @@ public final class MultiImport extends Import implements IImportList
 	}
 	
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
 		for (int i = 0; i < this.importCount; i++)
 		{
-			this.imports[i].getMethodMatches(list, instance, name, arguments);
+			this.imports[i].getMethodMatches(list, receiver, name, arguments);
 		}
 	}
-	
+
 	@Override
-	public void write(DataOutput out) throws IOException
+	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
+	{
+		for (int i = 0; i < this.importCount; i++)
+		{
+			this.imports[i].getImplicitMatches(list, value, targetType);
+		}
+	}
+
+	@Override
+	public void writeData(DataOutput out) throws IOException
 	{
 		IImport.writeImport(this.parent, out);
 		
@@ -154,7 +165,7 @@ public final class MultiImport extends Import implements IImportList
 	}
 	
 	@Override
-	public void read(DataInput in) throws IOException
+	public void readData(DataInput in) throws IOException
 	{
 		this.parent = IImport.readImport(in);
 		

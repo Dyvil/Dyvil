@@ -127,12 +127,12 @@ public class CodeConstructor extends AbstractConstructor
 			}
 		}
 
-		this.resolveSuperConstructors(markers);
+		this.resolveSuperConstructors(markers, context);
 
 		context.pop();
 	}
 
-	private void resolveSuperConstructors(MarkerList markers)
+	private void resolveSuperConstructors(MarkerList markers, IContext context)
 	{
 		if (this.value.valueTag() == IValue.INITIALIZER_CALL)
 		{
@@ -165,7 +165,7 @@ public class CodeConstructor extends AbstractConstructor
 		}
 
 		// Implicit Super Constructor
-		final IConstructor match = IContext.resolveConstructor(superType, EmptyArguments.INSTANCE);
+		final IConstructor match = IContext.resolveConstructor(context, superType, EmptyArguments.INSTANCE);
 		if (match == null)
 		{
 			markers.add(Markers.semantic(this.position, "constructor.super"));

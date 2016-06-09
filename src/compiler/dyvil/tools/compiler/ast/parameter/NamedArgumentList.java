@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -186,25 +187,28 @@ public final class NamedArgumentList implements IArguments
 	}
 
 	@Override
-	public float getTypeMatch(int index, IParameter param)
+	public int checkMatch(int[] values, IType[] types, int matchStartIndex, int argumentIndex, IParameter param, IImplicitContext implicitContext)
 	{
-		final int argIndex = this.findIndex(index, param.getName());
-		if (argIndex >= 0)
+		final int argIndex = this.findIndex(argumentIndex, param.getName());
+		if (argIndex < 0)
 		{
-			if (param.isVarargs())
-			{
-				final int endIndex = this.findNextName(argIndex + 1);
-				return ArgumentList.getVarargsTypeMatch(this.values, argIndex, endIndex, param);
-			}
+			// No argument for parameter name
 
-			return IArguments.getTypeMatch(this.values[argIndex], param.getInternalType());
+			return param.isVarargs() ? 0 : -1;
 		}
 
-		if (param.isVarargs())
+		if (!param.isVarargs())
 		{
-			return VARARGS_MATCH;
+			// Not a varargs parameter
+
+			return ArgumentList.checkMatch(values, types, matchStartIndex + argIndex, this.values[argIndex], param.getInternalType(),
+			                               implicitContext) ? 0 : -1;
 		}
-		return param.getValue() != null ? DEFAULT_MATCH : 0;
+
+		// Varargs Parameter
+		final int endIndex = this.findNextName(argIndex + 1);
+		return ArgumentList.checkVarargsMatch(values, types, matchStartIndex, this.values, argIndex, endIndex, param,
+		                                      implicitContext);
 	}
 
 	@Override

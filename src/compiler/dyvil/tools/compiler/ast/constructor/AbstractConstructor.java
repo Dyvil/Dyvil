@@ -13,6 +13,8 @@ import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.method.Candidate;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -184,7 +186,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	}
 
 	@Override
-	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
+	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
 	{
 	}
 
@@ -220,31 +222,41 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	}
 
 	@Override
-	public float getSignatureMatch(IArguments arguments)
+	public void checkMatch(MatchList<IConstructor> list, IArguments arguments)
 	{
-		int totalMatch = 1;
-
 		final int parameterCount = this.parameters.size();
 		final int argumentCount = arguments.size();
 
 		if (argumentCount > parameterCount && !this.isVariadic())
 		{
-			return 0;
+			return;
 		}
 
+		final int[] matchValues = new int[argumentCount];
+		final IType[] matchTypes = new IType[argumentCount];
+
+		int defaults = 0;
+		int varargs = 0;
 		for (int i = 0; i < parameterCount; i++)
 		{
 			final IParameter parameter = this.parameters.get(i);
-			final float m = arguments.getTypeMatch(i, parameter);
+			final int partialVarargs = arguments.checkMatch(matchValues, matchTypes, 0, i, parameter, list);
 
-			if (m == 0)
+			if (partialVarargs >= 0)
 			{
-				return 0;
+				varargs += partialVarargs;
+				continue;
 			}
-			totalMatch += m;
+			if (parameter.getValue() != null)
+			{
+				defaults++;
+				continue;
+			}
+
+			return; // Mismatch
 		}
 
-		return totalMatch;
+		list.add(new Candidate<>(this, defaults, varargs, matchValues, matchTypes));
 	}
 
 	@Override

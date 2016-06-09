@@ -5,7 +5,7 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.metadata.IClassMetadata;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.external.ExternalClass;
@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.*;
@@ -345,35 +345,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			}
 		}
 		return false;
-	}
-
-	@Override
-	public int getSuperTypeDistance(IType superType)
-	{
-		IClass iclass = superType.getTheClass();
-		if (iclass == null)
-		{
-			return 0;
-		}
-		if (this == iclass)
-		{
-			return 1;
-		}
-
-		int max = this.superType != null ? this.superType.getSuperTypeDistance(superType) : 0;
-		if (!iclass.isInterface())
-		{
-			return max;
-		}
-		for (int i = 0; i < this.interfaceCount; i++)
-		{
-			int m = this.interfaces[i].getSuperTypeDistance(superType);
-			if (m > max)
-			{
-				max = m;
-			}
-		}
-		return max == 0 ? 0 : 1 + max;
 	}
 
 	@Override
@@ -747,23 +718,23 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
 		for (int i = 0, count = this.parameters.size(); i < count; i++)
 		{
 			final IProperty property = this.parameters.get(i).getProperty();
 			if (property != null)
 			{
-				property.getMethodMatches(list, instance, name, arguments);
+				property.checkMatch(list, receiver, name, arguments);
 			}
 		}
 
 		if (this.body != null)
 		{
-			this.body.getMethodMatches(list, instance, name, arguments);
+			this.body.getMethodMatches(list, receiver, name, arguments);
 		}
 
-		this.metadata.getMethodMatches(list, instance, name, arguments);
+		this.metadata.getMethodMatches(list, receiver, name, arguments);
 
 		if (!list.isEmpty())
 		{
@@ -772,7 +743,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 
 		if (this.superType != null)
 		{
-			this.superType.getMethodMatches(list, instance, name, arguments);
+			this.superType.getMethodMatches(list, receiver, name, arguments);
 		}
 
 		if (!list.isEmpty())
@@ -782,12 +753,23 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			this.interfaces[i].getMethodMatches(list, instance, name, arguments);
+			this.interfaces[i].getMethodMatches(list, receiver, name, arguments);
 		}
 	}
 
 	@Override
-	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
+	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
+	{
+		if (this.body != null)
+		{
+			this.body.getImplicitMatches(list, value, targetType);
+		}
+
+		// TODO look into super types?
+	}
+
+	@Override
+	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
 	{
 		if (this.body != null)
 		{

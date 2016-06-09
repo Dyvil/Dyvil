@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.TypeOperator;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -423,58 +423,6 @@ public final class TypeParameter implements ITypeParameter
 	}
 
 	@Override
-	public int getSuperTypeDistance(IType superType)
-	{
-		if (this.upperBoundCount == 0)
-		{
-			return Types.getDistance(superType, Types.OBJECT);
-		}
-
-		int min = Integer.MAX_VALUE;
-		for (int i = 0; i < this.upperBoundCount; i++)
-		{
-			final int distance = Types.getDistance(superType, this.upperBounds[i]);
-			if (distance > 0 && distance < min)
-			{
-				// At least one upper bound has to match
-				min = distance;
-			}
-		}
-
-		if (min == Integer.MAX_VALUE)
-		{
-			// No matches
-			return 0;
-		}
-		return min;
-	}
-
-	@Override
-	public int getSubTypeDistance(IType subType)
-	{
-		if (this.upperBoundCount == 0)
-		{
-			return Types.getDistance(Types.OBJECT, subType);
-		}
-
-		int min = Integer.MAX_VALUE;
-		for (int i = 0; i < this.upperBoundCount; i++)
-		{
-			final int distance = Types.getDistance(this.upperBounds[i], subType);
-			if (distance <= 0)
-			{
-				// All upper bounds have to match
-				return 0;
-			}
-			if (distance < min)
-			{
-				min = distance;
-			}
-		}
-		return min;
-	}
-
-	@Override
 	public IDataMember resolveField(Name name)
 	{
 		IDataMember field;
@@ -492,11 +440,20 @@ public final class TypeParameter implements ITypeParameter
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue instance, Name name, IArguments arguments)
 	{
 		for (int i = 0; i < this.upperBoundCount; i++)
 		{
 			this.upperBounds[i].getMethodMatches(list, instance, name, arguments);
+		}
+	}
+
+	@Override
+	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
+	{
+		for (int i = 0; i < this.upperBoundCount; i++)
+		{
+			this.upperBounds[i].getImplicitMatches(list, value, targetType);
 		}
 	}
 

@@ -136,7 +136,7 @@ public class InitializerCall implements ICall
 			return null;
 		}
 
-		final IConstructor match = IContext.resolveConstructor(targetType, this.arguments);
+		final IConstructor match = IContext.resolveConstructor(context, targetType, this.arguments);
 		if (match != null)
 		{
 			this.constructor = match;

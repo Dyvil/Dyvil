@@ -28,7 +28,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	@Override
 	public void visitParameter(String name, int modifiers)
 	{
-		final IParameter parameter = this.method.getParameterList().get(this.parameterIndex);
+		final IParameter parameter = this.method.getExternalParameterList().get(this.parameterIndex);
 		if (parameter == null)
 		{
 			return;
@@ -46,7 +46,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	@Override
 	public AnnotationVisitor visitParameterAnnotation(int parameter, String type, boolean visible)
 	{
-		final IParameter param = this.method.getParameterList().get(parameter);
+		final IParameter param = this.method.getExternalParameterList().get(parameter);
 		if (AnnotationUtil.DYVIL_MODIFIERS.equals(type))
 		{
 			return new ModifierVisitor(param.getModifiers());

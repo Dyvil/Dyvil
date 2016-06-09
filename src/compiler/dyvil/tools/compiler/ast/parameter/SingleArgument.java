@@ -4,6 +4,7 @@ import dyvil.collection.iterator.EmptyIterator;
 import dyvil.collection.iterator.SingletonIterator;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -109,35 +110,26 @@ public final class SingleArgument implements IArguments, IValueConsumer
 	}
 
 	@Override
-	public float getTypeMatch(int index, IParameter param)
+	public int checkMatch(int[] values, IType[] types, int matchStartIndex, int argumentIndex, IParameter param, IImplicitContext implicitContext)
 	{
-		if (index != 0 || this.value == null)
+		if (argumentIndex != 0 || this.value == null)
 		{
-			if (param.isVarargs())
-			{
-				return VARARGS_MATCH;
-			}
-
-			return param.getValue() != null ? DEFAULT_MATCH : 0;
+			return param.isVarargs() ? 0 : -1;
 		}
 
-		if (param.isVarargs())
+		if (!param.isVarargs() || this.value.checkVarargs(false))
 		{
-			return this.getVarargsTypeMatch(param);
-		}
-		return this.value.getTypeMatch(param.getInternalType());
-	}
-
-	private float getVarargsTypeMatch(IParameter param)
-	{
-		if (this.value.checkVarargs(false))
-		{
-			return IArguments.getDirectTypeMatch(this.value, param.getInternalType());
+			return ArgumentList.checkMatch(values, types, matchStartIndex + argumentIndex, this.value, param.getInternalType(),
+			                               implicitContext) ? 0 : -1;
 		}
 
 		final IType elementType = param.getInternalType().getElementType();
-		final float valueMatch = IArguments.getTypeMatch(this.value, elementType);
-		return valueMatch > 0 ? valueMatch + VARARGS_MATCH : 0;
+		if (ArgumentList.checkMatch(values, types, matchStartIndex + argumentIndex, this.value, elementType, implicitContext))
+		{
+			// One argument applied as varargs
+			return 1;
+		}
+		return -1;
 	}
 
 	@Override

@@ -5,14 +5,15 @@ import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -167,6 +168,12 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
+	public Variance getVariance()
+	{
+		return this.type.getVariance();
+	}
+
+	@Override
 	public Mutability getMutability()
 	{
 		final Mutability mutability = IType.super.getMutability();
@@ -199,12 +206,6 @@ public abstract class TypeDelegate implements IType, ITyped
 	public IValue convertValueTo(IValue value, IType targetType, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		return this.type.convertValueTo(value, targetType, typeContext, markers, context);
-	}
-
-	@Override
-	public int getSuperTypeDistance(IType superType)
-	{
-		return this.type.getSuperTypeDistance(superType);
 	}
 
 	@Override
@@ -329,13 +330,19 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
-		this.type.getMethodMatches(list, instance, name, arguments);
+		this.type.getMethodMatches(list, receiver, name, arguments);
 	}
 
 	@Override
-	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
+	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
+	{
+		this.type.getImplicitMatches(list, value, targetType);
+	}
+
+	@Override
+	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
 	{
 		this.type.getConstructorMatches(list, arguments);
 	}
