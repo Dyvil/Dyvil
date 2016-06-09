@@ -168,13 +168,19 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
+	public IParameterList getExternalParameterList()
+	{
+		return this.parameters;
+	}
+
+	@Override
 	public IParameterList getParameterList()
 	{
 		if ((this.resolved & PARAMETERS) == 0)
 		{
 			this.resolveParameters();
 		}
-		return super.getParameterList();
+		return this.parameters;
 	}
 
 	@Override

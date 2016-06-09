@@ -701,7 +701,7 @@ public final class ExternalClass extends AbstractClass
 
 			if ((access & Modifiers.VARARGS) != 0)
 			{
-				final IParameterList parameterList = constructor.getParameterList();
+				final IParameterList parameterList = constructor.getExternalParameterList();
 				parameterList.get(parameterList.size() - 1).setVarargs(true);
 			}
 
@@ -729,7 +729,7 @@ public final class ExternalClass extends AbstractClass
 
 		if ((access & Modifiers.VARARGS) != 0)
 		{
-			final IParameterList parameterList = method.getParameterList();
+			final IParameterList parameterList = method.getExternalParameterList();
 			parameterList.get(parameterList.size() - 1).setVarargs(true);
 		}
 
