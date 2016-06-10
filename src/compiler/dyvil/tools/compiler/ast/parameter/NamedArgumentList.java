@@ -15,6 +15,7 @@ import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 public final class NamedArgumentList implements IArguments
@@ -201,8 +202,8 @@ public final class NamedArgumentList implements IArguments
 		{
 			// Not a varargs parameter
 
-			return ArgumentList.checkMatch(values, types, matchStartIndex + argIndex, this.values[argIndex], param.getInternalType(),
-			                               implicitContext) ? 0 : -1;
+			return ArgumentList.checkMatch(values, types, matchStartIndex + argIndex, this.values[argIndex],
+			                               param.getInternalType(), implicitContext) ? 0 : -1;
 		}
 
 		// Varargs Parameter
@@ -337,6 +338,13 @@ public final class NamedArgumentList implements IArguments
 		{
 			this.values[i] = this.values[i].cleanup(context, compilableList);
 		}
+	}
+
+	@Override
+	public IArguments copy()
+	{
+		return new NamedArgumentList(Arrays.copyOf(this.keys, this.size), Arrays.copyOf(this.values, this.size),
+		                             this.size);
 	}
 
 	@Override

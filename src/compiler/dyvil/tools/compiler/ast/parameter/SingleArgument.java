@@ -260,6 +260,12 @@ public final class SingleArgument implements IArguments, IValueConsumer
 	}
 
 	@Override
+	public IArguments copy()
+	{
+		return new SingleArgument(this.value);
+	}
+
+	@Override
 	public String toString()
 	{
 		return IASTNode.toString(this);

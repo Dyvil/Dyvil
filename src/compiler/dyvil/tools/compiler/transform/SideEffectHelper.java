@@ -11,7 +11,7 @@ import dyvil.tools.parsing.Name;
 public class SideEffectHelper
 {
 	private StatementList statementList;
-	private int registered = 0;
+	private int registered;
 
 	public IValue processValue(IValue value)
 	{
@@ -37,12 +37,13 @@ public class SideEffectHelper
 	
 	public IArguments processArguments(IArguments arguments)
 	{
+		final IArguments copy = arguments.copy();
 		for (int i = 0, count = arguments.size(); i < count; i++)
 		{
 			final IValue value = arguments.getValue(i, null);
-			arguments.setValue(i, null, this.processValue(value));
+			copy.setValue(i, null, this.processValue(value));
 		}
-		return arguments;
+		return copy;
 	}
 	
 	public IValue finish(IValue value)

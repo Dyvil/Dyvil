@@ -14,6 +14,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.parsing.marker.MarkerList;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 public final class ArgumentList implements IArguments, IValueList
@@ -370,6 +371,12 @@ public final class ArgumentList implements IArguments, IValueList
 		{
 			this.values[i] = this.values[i].cleanup(context, compilableList);
 		}
+	}
+
+	@Override
+	public IArguments copy()
+	{
+		return new ArgumentList(Arrays.copyOf(this.values, this.size), this.size);
 	}
 
 	@Override

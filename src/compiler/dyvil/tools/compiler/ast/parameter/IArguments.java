@@ -85,6 +85,8 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 
 	void cleanup(IContext context, IClassCompilableList compilableList);
 
+	IArguments copy();
+
 	@Override
 	void toString(String prefix, StringBuilder buffer);
 

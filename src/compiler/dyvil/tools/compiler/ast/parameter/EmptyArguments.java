@@ -153,6 +153,12 @@ public final class EmptyArguments implements IArguments
 	}
 
 	@Override
+	public IArguments copy()
+	{
+		return this;
+	}
+
+	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		if (!this.visible)
