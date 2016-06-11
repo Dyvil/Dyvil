@@ -97,7 +97,7 @@ public class IfStatement implements IValue
 	@Override
 	public boolean isResolved()
 	{
-		return this.commonType != null && this.commonType.isResolved();
+		return this.then.isResolved() && (this.elseThen == null || this.elseThen.isResolved());
 	}
 
 	@Override

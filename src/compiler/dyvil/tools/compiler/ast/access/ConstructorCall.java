@@ -162,25 +162,36 @@ public class ConstructorCall implements ICall
 	}
 
 	@Override
-	public IValue resolveCall(MarkerList markers, IContext context)
+	public IValue resolveCall(MarkerList markers, IContext context, boolean report)
 	{
 		if (!this.type.isResolved())
 		{
 			return this;
 		}
 
-		if (!this.type.isArrayType())
+		if (this.type.isArrayType())
 		{
-			this.constructor = IContext.resolveConstructor(context, this.type, this.arguments);
-			if (this.constructor == null)
-			{
-				return null;
-			}
+			this.resolveArrayConstructor(markers, context);
+			return this;
+		}
 
+		this.constructor = IContext.resolveConstructor(context, this.type, this.arguments);
+		if (this.constructor != null)
+		{
 			this.checkArguments(markers, context);
 			return this;
 		}
 
+		if (report)
+		{
+			this.reportResolve(markers, context);
+			return this;
+		}
+		return null;
+	}
+
+	private void resolveArrayConstructor(MarkerList markers, IContext context)
+	{
 		final ITypeParameter typeVar = this.type.getElementType().getTypeVariable();
 		if (typeVar != null)
 		{
@@ -191,11 +202,11 @@ public class ConstructorCall implements ICall
 		final int dims = this.type.getArrayDimensions();
 		if (len > dims)
 		{
-			final Marker marker = Markers.semantic(this.position, "constructor.access.array.length");
+			final Marker marker = Markers.semanticError(this.position, "constructor.access.array.length");
 			marker.addInfo(Markers.getSemantic("type.dimensions", dims));
 			marker.addInfo(Markers.getSemantic("constructor.access.array.count", len));
 			markers.add(marker);
-			return this;
+			return;
 		}
 
 		for (int i = 0; i < len; i++)
@@ -205,8 +216,6 @@ public class ConstructorCall implements ICall
 			                                              TypeChecker.markerSupplier("constructor.access.array.type"));
 			this.arguments.setValue(i, null, typed);
 		}
-
-		return this;
 	}
 
 	@Override
@@ -218,24 +227,17 @@ public class ConstructorCall implements ICall
 	@Override
 	public void reportResolve(MarkerList markers, IContext context)
 	{
-		if (!this.type.isResolved())
-		{
-			return;
-		}
-
 		final IClass theClass = this.type.getTheClass();
 		if (theClass != null && theClass.isInterface())
 		{
-			markers.add(Markers.semantic(this.position, "constructor.access.interface", this.type));
+			markers.add(Markers.semanticError(this.position, "constructor.access.interface", this.type));
 			return;
 		}
 
-		Marker marker = Markers.semantic(this.position, "resolve.constructor", this.type.toString());
+		final Marker marker = Markers.semanticError(this.position, "resolve.constructor", this.type.toString());
 		if (!this.arguments.isEmpty())
 		{
-			StringBuilder builder = new StringBuilder("Argument Types: ");
-			this.arguments.typesToString(builder);
-			marker.addInfo(builder.toString());
+			marker.addInfo(Markers.getSemantic("argument.types", this.arguments.typesToString()));
 		}
 
 		markers.add(marker);

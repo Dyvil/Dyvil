@@ -90,5 +90,12 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	@Override
 	void toString(String prefix, StringBuilder buffer);
 
+	default String typesToString()
+	{
+		final StringBuilder builder = new StringBuilder();
+		this.typesToString(builder);
+		return builder.toString();
+	}
+
 	void typesToString(StringBuilder buffer);
 }

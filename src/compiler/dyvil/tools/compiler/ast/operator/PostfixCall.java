@@ -48,7 +48,7 @@ public class PostfixCall extends MethodCall
 	}
 
 	@Override
-	public IValue resolveCall(MarkerList markers, IContext context)
+	public IValue resolveCall(MarkerList markers, IContext context, boolean report)
 	{
 		final IValue op = Operators.getPostfix(this.receiver, this.name);
 		if (op != null)
@@ -65,6 +65,11 @@ public class PostfixCall extends MethodCall
 		}
 
 		// No Implicit or Apply Resolution
+		if (report)
+		{
+			this.reportResolve(markers, context);
+			return this;
+		}
 		return null;
 	}
 

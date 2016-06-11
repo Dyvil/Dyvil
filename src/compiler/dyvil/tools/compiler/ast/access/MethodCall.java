@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.reference.PropertyReference;
 import dyvil.tools.compiler.transform.ConstantFolder;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -64,6 +65,12 @@ public class MethodCall extends AbstractCall implements INamed
 	}
 
 	@Override
+	protected Name getReferenceName()
+	{
+		return Name.get(this.name.unqualified + "_&", this.name.qualified + "_$amp");
+	}
+
+	@Override
 	public IValue toAnnotationConstant(MarkerList markers, IContext context, int depth)
 	{
 		final IValue value = this.foldConstants().foldConstants();
@@ -94,14 +101,7 @@ public class MethodCall extends AbstractCall implements INamed
 	}
 
 	@Override
-	public IValue toReferenceValue(MarkerList markers, IContext context)
-	{
-		final Name newName = Name.get(this.name.unqualified + "_&", this.name.qualified + "_$amp");
-		return AbstractCall.toReferenceValue(this, newName, markers, context);
-	}
-
-	@Override
-	public IValue resolveCall(MarkerList markers, IContext context)
+	public IValue resolveCall(MarkerList markers, IContext context, boolean report)
 	{
 		// Normal Method Resolution
 		if (this.resolveMethodCall(markers, context))
@@ -116,8 +116,35 @@ public class MethodCall extends AbstractCall implements INamed
 		}
 
 		// Apply Method Resolution
-		return ApplyMethodCall.resolveApply(markers, context, this.position, this.receiver, this.name, this.arguments,
-		                                    this.genericData);
+		final IValue fieldAccess = new FieldAccess(this.position, this.receiver, this.name)
+			                           .resolveFieldAccess(markers, context);
+		if (fieldAccess == null)
+		{
+			// No suitable field or type found
+
+			if (report)
+			{
+				this.reportResolve(markers, context);
+				return this;
+			}
+			return null;
+		}
+
+		final IMethod applyMethod = ICall.resolveMethod(context, fieldAccess, Names.apply, this.arguments);
+		if (applyMethod != null)
+		{
+			final ApplyMethodCall call = new ApplyMethodCall(this.position, fieldAccess, applyMethod, this.arguments);
+			call.genericData = this.genericData;
+			call.checkArguments(markers, context);
+			return call;
+		}
+
+		if (report)
+		{
+			ICall.addResolveMarker(markers, this.position, fieldAccess, Names.apply, this.arguments);
+			return this;
+		}
+		return null;
 	}
 
 	protected boolean resolveMethodCall(MarkerList markers, IContext context)
@@ -135,7 +162,7 @@ public class MethodCall extends AbstractCall implements INamed
 	protected boolean resolveImplicitCall(MarkerList markers, IContext context)
 	{
 		final IValue implicit = context.getImplicit();
-		if ((implicit) == null)
+		if (implicit == null)
 		{
 			return false;
 		}
@@ -149,12 +176,6 @@ public class MethodCall extends AbstractCall implements INamed
 			return true;
 		}
 		return false;
-	}
-
-	@Override
-	public void reportResolve(MarkerList markers, IContext context)
-	{
-		ICall.addResolveMarker(markers, this.position, this.receiver, this.name, this.arguments);
 	}
 
 	@Override

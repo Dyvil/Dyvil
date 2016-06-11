@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.access;
 
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
@@ -40,28 +39,6 @@ public class ApplyMethodCall extends AbstractCall
 		this.method = method;
 	}
 
-	protected static ApplyMethodCall resolveApply(MarkerList markers, IContext context, ICodePosition position, IValue receiver, Name name, IArguments arguments, GenericData genericData)
-	{
-		final IValue fieldAccess = new FieldAccess(position, receiver, name).resolveFieldAccess(markers, context);
-		if (fieldAccess == null)
-		{
-			// No suitable field or type found
-			return null;
-		}
-
-		final IMethod method = ICall.resolveMethod(context, fieldAccess, Names.apply, arguments);
-		if (method == null)
-		{
-			// No apply method found
-			return null;
-		}
-
-		final ApplyMethodCall call = new ApplyMethodCall(position, fieldAccess, method, arguments);
-		call.genericData = genericData;
-		call.checkArguments(markers, context);
-		return call;
-	}
-
 	@Override
 	public int valueTag()
 	{
@@ -69,15 +46,21 @@ public class ApplyMethodCall extends AbstractCall
 	}
 
 	@Override
-	public IValue toAssignment(IValue rhs, ICodePosition position)
+	public Name getName()
 	{
-		return new UpdateMethodCall(this.position.to(position), this.receiver, this.arguments, rhs);
+		return Names.apply;
 	}
 
 	@Override
-	public IValue toReferenceValue(MarkerList markers, IContext context)
+	protected Name getReferenceName()
 	{
-		return AbstractCall.toReferenceValue(this, Names.apply_$amp, markers, context);
+		return Names.apply_$amp;
+	}
+
+	@Override
+	public IValue toAssignment(IValue rhs, ICodePosition position)
+	{
+		return new UpdateMethodCall(this.position.to(position), this.receiver, this.arguments, rhs);
 	}
 
 	@Override
@@ -89,20 +72,20 @@ public class ApplyMethodCall extends AbstractCall
 		// -> with(x..., { statements })
 		if (this.arguments.getClass() == SingleArgument.class && this.receiver instanceof ICall)
 		{
-			ICall call = (ICall) this.receiver;
+			final ICall call = (ICall) this.receiver;
 			IValue argument = this.arguments.getFirstValue();
 
 			if (argument instanceof Closure)
 			{
 				argument = argument.resolve(markers, context);
 
-				IArguments oldArgs = call.getArguments();
+				final IArguments oldArgs = call.getArguments();
 				call.resolveReceiver(markers, context);
 				call.resolveArguments(markers, context);
 
 				call.setArguments(oldArgs.withLastValue(null, argument));
 
-				IValue resolvedCall = call.resolveCall(markers, context);
+				final IValue resolvedCall = call.resolveCall(markers, context, false);
 				if (resolvedCall != null)
 				{
 					return resolvedCall;
@@ -111,46 +94,12 @@ public class ApplyMethodCall extends AbstractCall
 				// Revert
 				call.setArguments(oldArgs);
 
-				resolvedCall = call.resolveCall(markers, context);
-				if (resolvedCall == null)
-				{
-					call.reportResolve(markers, context);
-					return this;
-				}
-
-				this.receiver = resolvedCall;
-				resolvedCall = this.resolveCall(markers, context);
-				if (resolvedCall != null)
-				{
-					return resolvedCall;
-				}
-
-				this.reportResolve(markers, context);
-				return this;
+				this.receiver = call.resolveCall(markers, context, true);
+				return this.resolveCall(markers, context, true);
 			}
 		}
 
 		return super.resolve(markers, context);
-	}
-
-	@Override
-	public IValue resolveCall(MarkerList markers, IContext context)
-	{
-		IMethod method = ICall.resolveMethod(context, this.receiver, Names.apply, this.arguments);
-		if (method != null)
-		{
-			this.method = method;
-			this.checkArguments(markers, context);
-			return this;
-		}
-
-		return null;
-	}
-
-	@Override
-	public void reportResolve(MarkerList markers, IContext context)
-	{
-		ICall.addResolveMarker(markers, this.position, this.receiver, Names.apply, this.arguments);
 	}
 
 	@Override

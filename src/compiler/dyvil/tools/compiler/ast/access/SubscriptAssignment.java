@@ -1,14 +1,12 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
-import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Names;
-import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public class SubscriptAssignment extends AbstractCall implements IValueConsumer
@@ -32,31 +30,23 @@ public class SubscriptAssignment extends AbstractCall implements IValueConsumer
 	{
 		return SUBSCRIPT_SET;
 	}
-	
+
+	@Override
+	public Name getName()
+	{
+		return Names.subscript_$eq;
+	}
+
+	@Override
+	protected Name getReferenceName()
+	{
+		return null;
+	}
+
 	@Override
 	public void setValue(IValue value)
 	{
 		this.arguments = this.arguments.withLastValue(Names.update, value);
-	}
-	
-	@Override
-	public IValue resolveCall(MarkerList markers, IContext context)
-	{
-		IMethod m = ICall.resolveMethod(context, this.receiver, Names.subscript_$eq, this.arguments);
-		if (m != null)
-		{
-			this.method = m;
-			this.checkArguments(markers, context);
-			return this;
-		}
-		
-		return null;
-	}
-	
-	@Override
-	public void reportResolve(MarkerList markers, IContext context)
-	{
-		ICall.addResolveMarker(markers, this.position, this.receiver, Names.subscript_$eq, this.arguments);
 	}
 	
 	@Override

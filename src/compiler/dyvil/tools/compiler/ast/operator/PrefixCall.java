@@ -45,7 +45,7 @@ public class PrefixCall extends MethodCall
 	}
 
 	@Override
-	public IValue resolveCall(MarkerList markers, IContext context)
+	public IValue resolveCall(MarkerList markers, IContext context, boolean report)
 	{
 		final IValue operand = this.arguments.getFirstValue();
 
@@ -73,6 +73,11 @@ public class PrefixCall extends MethodCall
 		}
 
 		// No apply Resolution
+		if (report)
+		{
+			this.reportResolve(markers, context);
+			return this;
+		}
 		return null;
 	}
 

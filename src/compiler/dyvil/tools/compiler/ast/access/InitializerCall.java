@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -128,37 +127,36 @@ public class InitializerCall implements ICall
 	}
 
 	@Override
-	public IValue resolveCall(MarkerList markers, IContext context)
+	public IValue resolveCall(MarkerList markers, IContext context, boolean report)
 	{
 		final IType targetType = this.getTargetType(context);
-		if (targetType == null || !targetType.isResolved())
+		if (targetType != null && targetType.isResolved())
 		{
-			return null;
+			final IConstructor constructor = IContext.resolveConstructor(context, targetType, this.arguments);
+			if (constructor != null)
+			{
+				this.constructor = constructor;
+				this.checkArguments(markers, context);
+				return this;
+			}
 		}
 
-		final IConstructor match = IContext.resolveConstructor(context, targetType, this.arguments);
-		if (match != null)
+		if (report)
 		{
-			this.constructor = match;
-			this.checkArguments(markers, context);
+			this.reportResolve(markers, context);
 			return this;
 		}
-
 		return null;
 	}
 
 	@Override
 	public void reportResolve(MarkerList markers, IContext context)
 	{
-		IClass iclass = context.getThisClass();
-		Marker marker = Markers.semantic(this.position, "resolve.constructor", iclass.getName().qualified);
+		final Marker marker = Markers.semanticError(this.position, "resolve.constructor", this.getTargetType(context));
 		if (!this.arguments.isEmpty())
 		{
-			StringBuilder builder = new StringBuilder("Argument Types: ");
-			this.arguments.typesToString(builder);
-			marker.addInfo(builder.toString());
+			marker.addInfo(Markers.getSemantic("argument.types", this.arguments.typesToString()));
 		}
-
 		markers.add(marker);
 	}
 

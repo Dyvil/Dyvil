@@ -53,6 +53,8 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 		return this.receiver;
 	}
 
+	public abstract Name getName();
+
 	@Override
 	public void setArguments(IArguments arguments)
 	{
@@ -132,12 +134,14 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 		return Types.isVoid(type) || this.method != null && Types.isAssignable(this.getType(), type);
 	}
 
-	public static IValue toReferenceValue(AbstractCall call, Name name, MarkerList markers, IContext context)
+	protected abstract Name getReferenceName();
+
+	@Override
+	public IValue toReferenceValue(MarkerList markers, IContext context)
 	{
-		MethodCall methodCall = new MethodCall(call.position, call.receiver, name, call.arguments);
-		methodCall.setGenericData(call.genericData);
-		methodCall.setType(call.type);
-		return methodCall.resolveCall(markers, context);
+		final MethodCall methodCall = new MethodCall(this.position, this.receiver, this.getReferenceName(), this.arguments);
+		methodCall.setGenericData(this.genericData);
+		return methodCall.resolveCall(markers, context, false);
 	}
 
 	@Override
@@ -183,7 +187,29 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 	}
 
 	@Override
-	public abstract IValue resolveCall(MarkerList markers, IContext context);
+	public IValue resolveCall(MarkerList markers, IContext context, boolean report)
+	{
+		final IMethod method = ICall.resolveMethod(context, this.receiver, this.getName(), this.arguments);
+		if (method != null)
+		{
+			this.method = method;
+			this.checkArguments(markers, context);
+			return this;
+		}
+
+		if (report)
+		{
+			this.reportResolve(markers, context);
+			return this;
+		}
+		return null;
+	}
+
+	@Override
+	public void reportResolve(MarkerList markers, IContext context)
+	{
+		ICall.addResolveMarker(markers, this.position, this.receiver, this.getName(), this.arguments);
+	}
 
 	@Override
 	public void checkArguments(MarkerList markers, IContext context)

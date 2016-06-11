@@ -121,32 +121,21 @@ public interface ICall extends IValue, IArgumentsConsumer
 		this.resolveReceiver(markers, context);
 		this.resolveArguments(markers, context);
 
-		IValue resolved = this.resolveCall(markers, context);
-		if (resolved != null)
-		{
-			return resolved;
-		}
-
-		// Don't report an error if the receiver is not resolved
+		// Don't resolve and report an error if the receiver is not resolved
 		IValue receiver = this.getReceiver();
 		if (receiver != null && !receiver.isResolved())
 		{
 			return this;
 		}
 
-		// Don't report an error if the arguments are not resolved
+		// Don't resolve and report an error if the arguments are not resolved
 		if (!this.getArguments().isResolved())
 		{
 			return this;
 		}
 
-		this.reportResolve(markers, context);
-		return this;
+		return this.resolveCall(markers, context, true);
 	}
-
-	void checkArguments(MarkerList markers, IContext context);
-
-	IValue resolveCall(MarkerList markers, IContext context);
 
 	default void resolveReceiver(MarkerList markers, IContext context)
 	{
@@ -154,13 +143,17 @@ public interface ICall extends IValue, IArgumentsConsumer
 
 	void resolveArguments(MarkerList markers, IContext context);
 
+	IValue resolveCall(MarkerList markers, IContext context, boolean report);
+
 	void reportResolve(MarkerList markers, IContext context);
+
+	void checkArguments(MarkerList markers, IContext context);
 
 	static void addResolveMarker(MarkerList markers, ICodePosition position, IValue receiver, Name name, IArguments arguments)
 	{
 		if (arguments == EmptyArguments.INSTANCE)
 		{
-			Marker marker = Markers.semantic(position, "resolve.method_field", name);
+			final Marker marker = Markers.semanticError(position, "resolve.method_field", name);
 			if (receiver != null)
 			{
 				marker.addInfo(Markers.getSemantic("receiver.type", receiver.getType()));
@@ -170,16 +163,14 @@ public interface ICall extends IValue, IArgumentsConsumer
 			return;
 		}
 
-		Marker marker = Markers.semantic(position, "resolve.method", name);
+		final Marker marker = Markers.semanticError(position, "resolve.method", name);
 		if (receiver != null)
 		{
 			marker.addInfo(Markers.getSemantic("receiver.type", receiver.getType()));
 		}
 		if (!arguments.isEmpty())
 		{
-			StringBuilder builder = new StringBuilder("Argument Types: ");
-			arguments.typesToString(builder);
-			marker.addInfo(builder.toString());
+			marker.addInfo(Markers.getSemantic("argument.types", arguments.typesToString()));
 		}
 
 		markers.add(marker);
