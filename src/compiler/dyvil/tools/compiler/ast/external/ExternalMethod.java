@@ -352,9 +352,9 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		}
 		case TypeReference.METHOD_FORMAL_PARAMETER:
 		{
-			int index = TypeReference.getFormalParameterIndex(typeRef);
-			IParameter param = this.parameters.get(index);
-			param.setType(IType.withAnnotation(param.getType(), annotation, typePath, 0, typePath.getLength()));
+			final int index = TypeReference.getFormalParameterIndex(typeRef);
+			final ExternalParameter parameter = (ExternalParameter) this.parameters.get(index);
+			parameter.addTypeAnnotation(annotation, typePath);
 			break;
 		}
 		}
