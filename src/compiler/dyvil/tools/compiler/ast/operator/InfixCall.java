@@ -4,6 +4,8 @@ import dyvil.tools.compiler.ast.access.*;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.intrinsic.IncOperator;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.transform.Names;
@@ -32,7 +34,8 @@ public class InfixCall extends MethodCall
 		}
 
 		// Normal Method Resolution
-		if (this.resolveMethodCall(markers, context))
+		final MatchList<IMethod> ambiguousCandidates = this.resolveMethodCall(markers, context);
+		if (ambiguousCandidates == null)
 		{
 			return this;
 		}
@@ -59,7 +62,7 @@ public class InfixCall extends MethodCall
 		// No Implicit or Apply Resolution
 		if (report)
 		{
-			this.reportResolve(markers, context);
+			this.reportResolve(markers, ambiguousCandidates);
 			return this;
 		}
 		return null;

@@ -7,6 +7,8 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.method.Candidate;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -17,6 +19,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -175,16 +178,27 @@ public class ConstructorCall implements ICall
 			return this;
 		}
 
-		this.constructor = IContext.resolveConstructor(context, this.type, this.arguments);
-		if (this.constructor != null)
+		final IClass theClass = this.type.getTheClass();
+		if (theClass != null && theClass.isInterface())
 		{
-			this.checkArguments(markers, context);
+			if (!report)
+			{
+				return null;
+			}
+
+			markers.add(Markers.semanticError(this.position, "constructor.access.interface", this.type));
+			return this;
+		}
+
+		final MatchList<IConstructor> ambigousConstructors = this.resolveConstructor(markers, context, this.type);
+		if (ambigousConstructors == null)
+		{
 			return this;
 		}
 
 		if (report)
 		{
-			this.reportResolve(markers, context);
+			reportResolve(markers, ambigousConstructors, this.position, this.type, this.arguments);
 			return this;
 		}
 		return null;
@@ -218,29 +232,78 @@ public class ConstructorCall implements ICall
 		}
 	}
 
+	protected MatchList<IConstructor> resolveConstructor(MarkerList markers, IContext context, IType type)
+	{
+		final MatchList<IConstructor> list = IContext.resolveConstructors(context, type, this.arguments);
+		final IConstructor constructor = list.getBestMember();
+
+		if (constructor != null)
+		{
+			this.constructor = constructor;
+			this.checkArguments(markers, context);
+			return null;
+		}
+		return list;
+	}
+
+	protected static void reportResolve(MarkerList markers, MatchList<IConstructor> list, ICodePosition position, IType type, IArguments arguments)
+	{
+		final Marker marker;
+		if (list == null || !list.isAmbigous())
+		{
+			marker = Markers.semanticError(position, "constructor.access.resolve", type.toString());
+			addArgumentInfo(marker, arguments);
+		}
+		else
+		{
+			marker = Markers.semanticError(position, "constructor.access.ambiguous", type.toString());
+			addArgumentInfo(marker, arguments);
+			addCandidates(list, marker);
+		}
+
+		markers.add(marker);
+	}
+
+	private static void addArgumentInfo(Marker marker, IArguments arguments)
+	{
+		if (!arguments.isEmpty())
+		{
+			marker.addInfo(Markers.getSemantic("method.access.argument_types", arguments.typesToString()));
+		}
+	}
+
+	protected static void addCandidates(MatchList<IConstructor> matches, Marker marker)
+	{
+		// Duplicate in AbstractCall.addCandidates
+
+		marker.addInfo(Markers.getSemantic("method.access.candidates"));
+
+		final Candidate<IConstructor> first = matches.getCandidate(0);
+		addCandidateInfo(marker, first);
+
+		for (int i = 1, count = matches.size(); i < count; i++)
+		{
+			final Candidate<IConstructor> candidate = matches.getCandidate(i);
+			if (!candidate.equals(first))
+			{
+				break;
+			}
+
+			addCandidateInfo(marker, candidate);
+		}
+	}
+
+	protected static void addCandidateInfo(Marker marker, Candidate<IConstructor> candidate)
+	{
+		final StringBuilder sb = new StringBuilder().append('\t');
+		Util.constructorSignatureToString(candidate.getMember(), null, sb);
+		marker.addInfo(sb.toString());
+	}
+
 	@Override
 	public void checkArguments(MarkerList markers, IContext context)
 	{
 		this.type = this.constructor.checkArguments(markers, this.position, context, this.type, this.arguments);
-	}
-
-	@Override
-	public void reportResolve(MarkerList markers, IContext context)
-	{
-		final IClass theClass = this.type.getTheClass();
-		if (theClass != null && theClass.isInterface())
-		{
-			markers.add(Markers.semanticError(this.position, "constructor.access.interface", this.type));
-			return;
-		}
-
-		final Marker marker = Markers.semanticError(this.position, "resolve.constructor", this.type.toString());
-		if (!this.arguments.isEmpty())
-		{
-			marker.addInfo(Markers.getSemantic("argument.types", this.arguments.typesToString()));
-		}
-
-		markers.add(marker);
 	}
 
 	@Override

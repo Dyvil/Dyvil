@@ -108,7 +108,7 @@ public final class SingleImport extends Import
 				return;
 			}
 
-			markers.add(Markers.semantic(this.position, "resolve.method_field", this.name.qualified));
+			markers.add(Markers.semantic(this.position, "method.access.resolve.field", this.name.qualified));
 			return;
 		}
 

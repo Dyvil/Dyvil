@@ -4,6 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -13,7 +14,6 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.ast.IASTNode;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -104,12 +104,6 @@ public class InitializerCall implements ICall
 		this.arguments.resolveTypes(markers, context);
 	}
 
-	@Override
-	public void checkArguments(MarkerList markers, IContext context)
-	{
-		this.constructor.checkArguments(markers, this.position, context, this.targetType, this.arguments);
-	}
-
 	private IType getTargetType(IContext context)
 	{
 		if (this.targetType != null)
@@ -130,34 +124,31 @@ public class InitializerCall implements ICall
 	public IValue resolveCall(MarkerList markers, IContext context, boolean report)
 	{
 		final IType targetType = this.getTargetType(context);
-		if (targetType != null && targetType.isResolved())
+		if (targetType == null || !targetType.isResolved())
 		{
-			final IConstructor constructor = IContext.resolveConstructor(context, targetType, this.arguments);
-			if (constructor != null)
-			{
-				this.constructor = constructor;
-				this.checkArguments(markers, context);
-				return this;
-			}
+			return this;
+		}
+
+		final MatchList<IConstructor> candidates = IContext.resolveConstructors(context, targetType, this.arguments);
+		if (!candidates.isEmpty() && !candidates.isAmbigous())
+		{
+			this.constructor = candidates.getBestMember();
+			this.checkArguments(markers, context);
+			return this;
 		}
 
 		if (report)
 		{
-			this.reportResolve(markers, context);
+			ConstructorCall.reportResolve(markers, candidates, this.position, targetType, this.arguments);
 			return this;
 		}
 		return null;
 	}
 
 	@Override
-	public void reportResolve(MarkerList markers, IContext context)
+	public void checkArguments(MarkerList markers, IContext context)
 	{
-		final Marker marker = Markers.semanticError(this.position, "resolve.constructor", this.getTargetType(context));
-		if (!this.arguments.isEmpty())
-		{
-			marker.addInfo(Markers.getSemantic("argument.types", this.arguments.typesToString()));
-		}
-		markers.add(marker);
+		this.constructor.checkArguments(markers, this.position, context, this.targetType, this.arguments);
 	}
 
 	@Override

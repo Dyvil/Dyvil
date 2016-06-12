@@ -3,8 +3,10 @@ package dyvil.tools.compiler.ast.access;
 import dyvil.tools.compiler.ast.classes.AnonymousClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
@@ -57,27 +59,42 @@ public class ClassConstructor extends ConstructorCall
 	}
 
 	@Override
+	public IValue resolveCall(MarkerList markers, IContext context, boolean report)
+	{
+		if (!this.type.isResolved())
+		{
+			return this;
+		}
+
+		final IClass theClass = this.type.getTheClass();
+		if (theClass == null)
+		{
+			return this;
+		}
+
+		final IType type = theClass.isInterface() ? Types.OBJECT : this.type;
+
+		final MatchList<IConstructor> ambigousConstructors = this.resolveConstructor(markers, context, type);
+		if (ambigousConstructors == null)
+		{
+			return this;
+		}
+
+		if (report)
+		{
+			reportResolve(markers, ambigousConstructors, this.position, type, this.arguments);
+			return this;
+		}
+		return null;
+	}
+
+	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
 		this.type.resolve(markers, context);
 		this.arguments.resolve(markers, context);
 
-		final IClass theClass = this.type.getTheClass();
-		if (theClass != null)
-		{
-			if (theClass.isInterface())
-			{
-				this.constructor = IContext.resolveConstructor(context, Types.OBJECT_CLASS, this.arguments);
-			}
-			else
-			{
-				this.constructor = IContext.resolveConstructor(context, this.type, this.arguments);
-			}
-			if (this.constructor == null)
-			{
-				this.reportResolve(markers, context);
-			}
-		}
+		this.resolveCall(markers, context, true);
 
 		final IClass enclosingClass = context.getThisClass();
 		assert enclosingClass != null;

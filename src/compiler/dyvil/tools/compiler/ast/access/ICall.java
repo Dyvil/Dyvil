@@ -11,15 +11,12 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.parameter.CodeParameter;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -145,36 +142,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 
 	IValue resolveCall(MarkerList markers, IContext context, boolean report);
 
-	void reportResolve(MarkerList markers, IContext context);
-
 	void checkArguments(MarkerList markers, IContext context);
-
-	static void addResolveMarker(MarkerList markers, ICodePosition position, IValue receiver, Name name, IArguments arguments)
-	{
-		if (arguments == EmptyArguments.INSTANCE)
-		{
-			final Marker marker = Markers.semanticError(position, "resolve.method_field", name);
-			if (receiver != null)
-			{
-				marker.addInfo(Markers.getSemantic("receiver.type", receiver.getType()));
-			}
-
-			markers.add(marker);
-			return;
-		}
-
-		final Marker marker = Markers.semanticError(position, "resolve.method", name);
-		if (receiver != null)
-		{
-			marker.addInfo(Markers.getSemantic("receiver.type", receiver.getType()));
-		}
-		if (!arguments.isEmpty())
-		{
-			marker.addInfo(Markers.getSemantic("argument.types", arguments.typesToString()));
-		}
-
-		markers.add(marker);
-	}
 
 	static boolean privateAccess(IContext context, IValue receiver)
 	{

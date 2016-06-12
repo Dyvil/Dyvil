@@ -296,7 +296,13 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 			return this;
 		}
 
-		ICall.addResolveMarker(markers, this.position, this.receiver, this.name, EmptyArguments.INSTANCE);
+		final Marker marker = Markers.semanticError(this.position, "method.access.resolve.field", this.name);
+		if (this.receiver != null)
+		{
+			marker.addInfo(Markers.getSemantic("receiver.type", this.receiver.getType()));
+		}
+
+		markers.add(marker);
 		return this;
 	}
 

@@ -4,11 +4,11 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.reference.PropertyReference;
 import dyvil.tools.compiler.transform.ConstantFolder;
-import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -104,7 +104,8 @@ public class MethodCall extends AbstractCall implements INamed
 	public IValue resolveCall(MarkerList markers, IContext context, boolean report)
 	{
 		// Normal Method Resolution
-		if (this.resolveMethodCall(markers, context))
+		final MatchList<IMethod> ambigousCandidates = this.resolveMethodCall(markers, context);
+		if (ambigousCandidates == null)
 		{
 			return this;
 		}
@@ -118,45 +119,21 @@ public class MethodCall extends AbstractCall implements INamed
 		// Apply Method Resolution
 		final IValue fieldAccess = new FieldAccess(this.position, this.receiver, this.name)
 			                           .resolveFieldAccess(markers, context);
-		if (fieldAccess == null)
+		if (fieldAccess != null)
 		{
-			// No suitable field or type found
+			// Field Access available, try to resolve an apply method
 
-			if (report)
-			{
-				this.reportResolve(markers, context);
-				return this;
-			}
-			return null;
-		}
-
-		final IMethod applyMethod = ICall.resolveMethod(context, fieldAccess, Names.apply, this.arguments);
-		if (applyMethod != null)
-		{
-			final ApplyMethodCall call = new ApplyMethodCall(this.position, fieldAccess, applyMethod, this.arguments);
+			final ApplyMethodCall call = new ApplyMethodCall(this.position, fieldAccess, this.arguments);
 			call.genericData = this.genericData;
-			call.checkArguments(markers, context);
-			return call;
+			return call.resolveCall(markers, context, report);
 		}
 
 		if (report)
 		{
-			ICall.addResolveMarker(markers, this.position, fieldAccess, Names.apply, this.arguments);
+			this.reportResolve(markers, ambigousCandidates);
 			return this;
 		}
 		return null;
-	}
-
-	protected boolean resolveMethodCall(MarkerList markers, IContext context)
-	{
-		final IMethod method = ICall.resolveMethod(context, this.receiver, this.name, this.arguments);
-		if (method != null)
-		{
-			this.method = method;
-			this.checkArguments(markers, context);
-			return true;
-		}
-		return false;
 	}
 
 	protected boolean resolveImplicitCall(MarkerList markers, IContext context)

@@ -2,6 +2,7 @@ package dyvil.tools.compiler.util;
 
 import dyvil.string.CharUtils;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IMember;
@@ -60,6 +61,19 @@ public final class Util
 
 		stringBuilder.append(": ");
 		ITypeContext.apply(typeContext, method.getType()).toString("", stringBuilder);
+	}
+
+	public static String constructorSignatureToString(IConstructor constructor, ITypeContext typeContext)
+	{
+		final StringBuilder stringBuilder = new StringBuilder();
+		constructorSignatureToString(constructor, typeContext, stringBuilder);
+		return stringBuilder.toString();
+	}
+
+	public static void constructorSignatureToString(IConstructor constructor, ITypeContext typeContext, StringBuilder stringBuilder)
+	{
+		stringBuilder.append("init");
+		constructor.getParameterList().signatureToString(stringBuilder, typeContext);
 	}
 
 	public static void typeToString(IType type, ITypeContext typeContext, StringBuilder stringBuilder)
