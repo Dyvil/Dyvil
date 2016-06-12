@@ -4,8 +4,6 @@ import dyvil.array.IntArray;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.util.MemberSorter;
 
-import java.util.Arrays;
-
 public final class Candidate<T extends ICallableSignature> implements Comparable<Candidate<T>>
 {
 	protected final T       member;
@@ -60,7 +58,8 @@ public final class Candidate<T extends ICallableSignature> implements Comparable
 	@Override
 	public int compareTo(Candidate<T> that)
 	{
-		boolean better = false;
+		int better = 0;
+		int worse = 0;
 
 		for (int i = 0, length = this.values.length; i < length; i++)
 		{
@@ -68,18 +67,20 @@ public final class Candidate<T extends ICallableSignature> implements Comparable
 
 			if (conversion > 0)
 			{
-				// one conversion is worse
-				return 1;
+				worse++;
 			}
-			if (better || conversion < 0)
+			if (conversion < 0)
 			{
-				// one conversion is better
-				better = true;
+				better++;
 			}
 		}
-		if (better)
+		if (better > worse)
 		{
 			return -1;
+		}
+		if (better < worse)
+		{
+			return 1;
 		}
 
 		// Compare number of defaulted parameters (less is better)
@@ -116,28 +117,13 @@ public final class Candidate<T extends ICallableSignature> implements Comparable
 	@Override
 	public boolean equals(Object o)
 	{
-		if (this == o)
-		{
-			return true;
-		}
-		if (!(o instanceof Candidate))
-		{
-			return false;
-		}
-
-		final Candidate<?> that = (Candidate<?>) o;
-		return this.defaults == that.defaults && this.varargs == that.varargs //
-			       && Arrays.equals(this.values, that.values) //
-			       && this.member.isVariadic() == that.member.isVariadic();
+		return this == o || o instanceof Candidate && this.compareTo((Candidate<T>) o) == 0;
 	}
 
 	@Override
 	public int hashCode()
 	{
-		int result = Arrays.hashCode(this.values);
-		result = 31 * result + this.defaults;
-		result = 31 * result + this.varargs;
-		result = 31 * result + (this.member.isVariadic() ? 1237 : 1231);
-		return result;
+		// we cannot provide a meaningful hashCode without breaking the equality contract
+		return 0;
 	}
 }
