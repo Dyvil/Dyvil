@@ -388,7 +388,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 				if (this.isOperatorEnd(nextType))
 				{
-					pm.report(next, "expression.prefix.expression");
+					pm.report(ICodePosition.between(token, next), "expression.prefix.expression");
 					return;
 				}
 				this.parseApply(pm, next, call);

@@ -129,9 +129,9 @@ public class ParserManager implements IParserManager
 	}
 
 	@Override
-	public void report(IToken token, String message)
+	public void report(ICodePosition position, String message)
 	{
-		this.report(new SyntaxError(token, this.markers.getI18n().getString(message)));
+		this.report(new SyntaxError(position, this.markers.getI18n().getString(message)));
 	}
 
 	@Override
