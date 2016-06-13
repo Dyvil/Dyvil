@@ -254,7 +254,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				// EXPRESSION EXPRESSION -> EXPRESSION ( EXPRESSION )
 				// Juxtaposition
 
-				if (this.hasFlag(IGNORE_APPLY) || this.ignoreClosure(token))
+				if (this.hasFlag(IGNORE_APPLY) || this.ignoreClosure(type))
 				{
 					this.end(pm, true);
 					return;
@@ -352,9 +352,14 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		throw new Error("unreachable");
 	}
 
-	private boolean ignoreClosure(IToken token)
+	private boolean ignoreClosure(int nextType)
 	{
-		return token.type() == BaseSymbols.OPEN_CURLY_BRACKET && this.hasFlag(IGNORE_CLOSURE);
+		return nextType == BaseSymbols.OPEN_CURLY_BRACKET && this.hasFlag(IGNORE_CLOSURE);
+	}
+
+	private boolean isOperatorEnd(int nextType)
+	{
+		return isExpressionEnd(nextType) || this.ignoreClosure(nextType);
 	}
 
 	private void parseInfixAccess(IParserManager pm, IToken token)
@@ -381,7 +386,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				this.value = call;
 				this.mode = ACCESS;
 
-				if (isExpressionEnd(nextType))
+				if (this.isOperatorEnd(nextType))
 				{
 					pm.report(next, "expression.prefix.expression");
 					return;
@@ -389,7 +394,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				this.parseApply(pm, next, call);
 				return;
 			}
-			if (isExpressionEnd(nextType) || isSymbol(nextType) && neighboring(token.prev(), token) && !neighboring(
+			if (this.isOperatorEnd(nextType) || isSymbol(nextType) && neighboring(token.prev(), token) && !neighboring(
 				next, next.next()))
 			{
 				// EXPRESSION_OPERATOR EXPRESSION
@@ -509,7 +514,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 	private boolean isFieldAccess(IToken token, IToken next, int nextType)
 	{
-		if (this.hasFlag(IGNORE_APPLY) || this.ignoreClosure(next))
+		if (this.hasFlag(IGNORE_APPLY) || this.ignoreClosure(nextType))
 		{
 			return true;
 		}
