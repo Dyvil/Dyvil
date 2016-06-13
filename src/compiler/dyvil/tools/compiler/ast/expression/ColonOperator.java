@@ -89,7 +89,7 @@ public class ColonOperator implements IValue
 	@Override
 	public boolean isResolved()
 	{
-		return this.type != null;
+		return this.left.isResolved() && this.right.isResolved();
 	}
 
 	@Override

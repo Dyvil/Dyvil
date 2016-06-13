@@ -129,7 +129,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			if ((type & Tokens.IDENTIFIER) != 0)
 			{
 				// IDENTIFIER
-				this.parseInfixAccess(pm, token);
+				this.parseInfixAccess(pm, token, token.nameValue());
 				return;
 			}
 			if (this.parseValue(pm, token, type))
@@ -218,9 +218,6 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 				this.parseInfixAccess(pm, token, Names.colon);
 				return;
-			case DyvilSymbols.ELLIPSIS:
-				this.parseInfixAccess(pm, token, Names.dotdotdot);
-				return;
 			case BaseSymbols.EQUALS:
 				if (this.value == null)
 				{
@@ -291,7 +288,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			{
 				// EXPRESSION . IDENTIFIER
 
-				this.parseInfixAccess(pm, token);
+				this.parseInfixAccess(pm, token, token.nameValue());
 				return;
 			}
 
@@ -366,7 +363,12 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 	private void parseInfixAccess(IParserManager pm, IToken token)
 	{
-		this.parseInfixAccess(pm, token, token.nameValue());
+		Name name = token.nameValue();
+		if (name == null)
+		{
+			name = Name.get(token.stringValue());
+		}
+		this.parseInfixAccess(pm, token, name);
 	}
 
 	private void parseInfixAccess(IParserManager pm, IToken token, Name name)
