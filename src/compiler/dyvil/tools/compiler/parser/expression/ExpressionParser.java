@@ -53,11 +53,13 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 	// Flags
 
-	private static final int IGNORE_APPLY    = 0b00001;
+	public static final  int IGNORE_APPLY    = 0b00001;
 	private static final int IGNORE_OPERATOR = 0b00010;
 	public static final  int IGNORE_COLON    = 0b00100;
 	public static final  int IGNORE_LAMBDA   = 0b01000;
 	public static final  int IGNORE_CLOSURE  = 0b10000;
+
+	public static final int IGNORE_STATEMENT = IGNORE_APPLY | IGNORE_COLON | IGNORE_CLOSURE;
 
 	// ----------
 

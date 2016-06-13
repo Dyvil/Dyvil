@@ -64,7 +64,8 @@ public class IfStatement implements IValue
 	@Override
 	public boolean isUsableAsStatement()
 	{
-		return this.then.isUsableAsStatement() && (this.elseThen == null || this.elseThen.isUsableAsStatement());
+		return (this.then == null || this.then.isUsableAsStatement()) //
+			       && (this.elseThen == null || this.elseThen.isUsableAsStatement());
 	}
 
 	public void setCondition(IValue condition)
@@ -100,7 +101,7 @@ public class IfStatement implements IValue
 	@Override
 	public boolean isResolved()
 	{
-		return this.then.isResolved() && (this.elseThen == null || this.elseThen.isResolved());
+		return this.then != null && this.then.isResolved() && (this.elseThen == null || this.elseThen.isResolved());
 	}
 
 	@Override

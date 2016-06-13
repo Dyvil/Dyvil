@@ -12,16 +12,14 @@ import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 
-import static dyvil.tools.compiler.parser.expression.ExpressionParser.IGNORE_CLOSURE;
-import static dyvil.tools.compiler.parser.expression.ExpressionParser.IGNORE_COLON;
+import static dyvil.tools.compiler.parser.expression.ExpressionParser.IGNORE_STATEMENT;
 
 public final class WhileStatementParser extends Parser implements IValueConsumer
 {
 	protected static final int WHILE         = 0;
 	protected static final int CONDITION     = 1;
-	protected static final int CONDITION_END = 2;
-	protected static final int SEPARATOR     = 4;
-	protected static final int BLOCK         = 8;
+	protected static final int SEPARATOR     = 2;
+	protected static final int BLOCK         = 3;
 
 	protected WhileStatement statement;
 
@@ -47,24 +45,8 @@ public final class WhileStatementParser extends Parser implements IValueConsumer
 			pm.report(token, "while.while");
 			// Fallthrough
 		case CONDITION:
-			if (type == BaseSymbols.OPEN_PARENTHESIS)
-			{
-				this.mode = CONDITION_END;
-				pm.pushParser(new ExpressionParser(this));
-			}
-			else
-			{
-				this.mode = SEPARATOR;
-				pm.pushParser(new ExpressionParser(this).withFlag(IGNORE_CLOSURE | IGNORE_COLON), true);
-			}
-			return;
-		case CONDITION_END:
-			this.mode = BLOCK;
-			if (type != BaseSymbols.CLOSE_PARENTHESIS)
-			{
-				pm.reparse();
-				pm.report(token, "while.close_paren");
-			}
+			pm.pushParser(new ExpressionParser(this).withFlag(IGNORE_STATEMENT), true);
+			this.mode = SEPARATOR;
 			return;
 		case SEPARATOR:
 			switch (type)
@@ -79,13 +61,11 @@ public final class WhileStatementParser extends Parser implements IValueConsumer
 				this.mode = END;
 				pm.pushParser(new ExpressionParser(this));
 				return;
-			case BaseSymbols.OPEN_CURLY_BRACKET:
-				this.mode = END;
-				pm.pushParser(new StatementListParser(this), true);
-				return;
 			}
 
-			pm.report(token, "while.separator");
+			this.mode = END;
+			pm.pushParser(new ExpressionParser(this), true);
+			// pm.report(token, "while.separator");
 			return;
 		case BLOCK:
 			if (ParserUtil.isTerminator(type) && !token.isInferred())
@@ -107,7 +87,6 @@ public final class WhileStatementParser extends Parser implements IValueConsumer
 		switch (this.mode)
 		{
 		case SEPARATOR:
-		case CONDITION_END:
 			this.statement.setCondition(value);
 			return;
 		case END:

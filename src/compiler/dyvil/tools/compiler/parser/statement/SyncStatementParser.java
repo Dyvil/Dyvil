@@ -12,16 +12,14 @@ import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 
-import static dyvil.tools.compiler.parser.expression.ExpressionParser.IGNORE_CLOSURE;
-import static dyvil.tools.compiler.parser.expression.ExpressionParser.IGNORE_COLON;
+import static dyvil.tools.compiler.parser.expression.ExpressionParser.IGNORE_STATEMENT;
 
 public class SyncStatementParser extends Parser implements IValueConsumer
 {
 	private static final int SYNCHRONIZED = 0;
 	private static final int LOCK         = 1;
-	private static final int LOCK_END     = 2;
-	private static final int SEPARATOR    = 4;
-	private static final int ACTION       = 8;
+	private static final int SEPARATOR    = 2;
+	private static final int ACTION       = 3;
 
 	protected SyncStatement statement;
 
@@ -47,24 +45,8 @@ public class SyncStatementParser extends Parser implements IValueConsumer
 			pm.report(token, "sync.synchronized");
 			// Fallthrough
 		case LOCK:
-			if (type == BaseSymbols.OPEN_PARENTHESIS)
-			{
-				this.mode = LOCK_END;
-				pm.pushParser(new ExpressionParser(this));
-			}
-			else
-			{
-				this.mode = SEPARATOR;
-				pm.pushParser(new ExpressionParser(this).withFlag(IGNORE_CLOSURE | IGNORE_COLON));
-			}
-			return;
-		case LOCK_END:
-			this.mode = ACTION;
-			if (type != BaseSymbols.CLOSE_PARENTHESIS)
-			{
-				pm.reparse();
-				pm.report(token, "sync.close_paren");
-			}
+			pm.pushParser(new ExpressionParser(this).withFlag(IGNORE_STATEMENT));
+			this.mode = SEPARATOR;
 			return;
 		case SEPARATOR:
 			switch (type)
@@ -79,13 +61,11 @@ public class SyncStatementParser extends Parser implements IValueConsumer
 				this.mode = END;
 				pm.pushParser(new ExpressionParser(this));
 				return;
-			case BaseSymbols.OPEN_CURLY_BRACKET:
-				this.mode = END;
-				pm.pushParser(new StatementListParser(this), true);
-				return;
 			}
 
-			pm.report(token, "sync.separator");
+			this.mode = END;
+			pm.pushParser(new ExpressionParser(this), true);
+			// pm.report(token, "sync.separator");
 			return;
 		case ACTION:
 			if (ParserUtil.isTerminator(type) && !token.isInferred())
@@ -107,7 +87,7 @@ public class SyncStatementParser extends Parser implements IValueConsumer
 	{
 		switch (this.mode)
 		{
-		case LOCK_END:
+		case SEPARATOR:
 			this.statement.setLock(value);
 			return;
 		case END:
