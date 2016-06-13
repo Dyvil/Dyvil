@@ -95,6 +95,8 @@ public class CodeMethod extends AbstractMethod
 
 		super.resolveTypes(markers, context);
 
+		this.unmangleName();
+
 		if (this.receiverType != null)
 		{
 			this.receiverType = this.receiverType.resolveType(markers, context);
@@ -141,6 +143,24 @@ public class CodeMethod extends AbstractMethod
 		}
 
 		context.pop();
+	}
+
+	private void unmangleName()
+	{
+		final Name name = this.name;
+		final String unqualified = name.unqualified;
+		final int index = unqualified.indexOf(NAME_SEPARATOR);
+
+		if (index < 0)
+		{
+			return;
+		}
+
+		final String qualified = name.qualified;
+		final String newUnqualified = unqualified.substring(0, index);
+		final String newQualified = qualified.substring(0, qualified.indexOf(NAME_SEPARATOR));
+		this.mangledName = qualified;
+		this.name = Name.from(newUnqualified, newQualified);
 	}
 
 	@Override
@@ -295,7 +315,9 @@ public class CodeMethod extends AbstractMethod
 		final String descriptor = this.getDescriptor();
 		final String signature = this.getSignature();
 		final int parameterCount = this.parameters.size();
+
 		String mangledName = this.getMangledName();
+		boolean thisMangled = mangledName.contains(NAME_SEPARATOR);
 
 		for (int i = body.methodCount() - 1; i >= 0; i--)
 		{
@@ -307,19 +329,20 @@ public class CodeMethod extends AbstractMethod
 				continue;
 			}
 
+			final String otherMangledName = method.getMangledName();
+			if (!mangledName.equals(otherMangledName))
+			{
+				continue;
+			}
+
 			// Name mangling required
 
-			if (!mangledName.contains(NAME_SEPARATOR))
+			if (!thisMangled)
 			{
 				// ensure this method gets name-mangled
 				this.mangledName = mangledName = createMangledName(this);
-			}
+				thisMangled = true;
 
-			String otherMangledName = method.getMangledName();
-			if (!otherMangledName.contains(NAME_SEPARATOR))
-			{
-				// ensure other method name-mangled (if not already)
-				method.setMangledName(otherMangledName = createMangledName(method));
 			}
 
 			if (mangledName.equals(otherMangledName))
