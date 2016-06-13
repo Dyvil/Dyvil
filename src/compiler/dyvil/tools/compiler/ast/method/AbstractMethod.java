@@ -925,28 +925,12 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		return this.descriptor = buffer.toString();
 	}
 
-	private boolean needsSignature()
-	{
-		return this.typeParameterCount != 0 || this.type.isGenericType() || this.type.hasTypeVariables()
-			       || this.parameters.needsSignature();
-	}
-
 	@Override
 	public String getSignature()
 	{
-		//noinspection StringEquality
-		if (this.signature == "")
-		{
-			return null; // no signature required
-		}
 		if (this.signature != null)
 		{
 			return this.signature;
-		}
-
-		if (!this.needsSignature())
-		{
-			return this.signature = "";
 		}
 
 		StringBuilder buffer = new StringBuilder();

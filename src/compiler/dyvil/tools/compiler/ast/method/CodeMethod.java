@@ -332,26 +332,53 @@ public class CodeMethod extends AbstractMethod
 
 	private static String createMangledName(IMethod method)
 	{
-		final StringBuilder builder = new StringBuilder(method.getName().qualified);
-		builder.append(NAME_SEPARATOR).append(method.getSignature());
-		for (int i = 0; i < builder.length(); i++)
+		final String qualifiedName = method.getName().qualified;
+		final String signature = method.getSignature();
+
+		final StringBuilder builder = new StringBuilder(qualifiedName.length() + NAME_SEPARATOR.length() + signature
+			                                                                                                   .length());
+		builder.append(qualifiedName).append(NAME_SEPARATOR);
+
+		for (int i = 0, length = signature.length(); i < length; i++)
 		{
 			// Replace special chars with dollar signs
-			switch (builder.charAt(i))
+			final char c = signature.charAt(i);
+			switch (c)
 			{
 			case '(':
 			case ')':
-			case '/':
-				builder.setCharAt(i, '_');
+				// strip opening and closing paren
 				continue;
 			case '<':
+				if (i == 0)
+				{
+					// strip opening angle bracket if at first position
+					continue;
+				}
+				builder.append("$_");
+				continue;
 			case '>':
+				if (signature.charAt(i + 1) == ';')
+				{
+					// the next token is a semicolon, so '_$' will be appended
+					builder.append('_');
+					continue;
+				}
+				// double separator between type and value parameter lists
+				builder.append("__");
+				continue;
 			case '+':
 			case ';':
 			case ':':
 			case '-':
 			case '*':
-				builder.setCharAt(i, '$');
+				builder.append('$');
+				continue;
+			case '/':
+				builder.append('_');
+				continue;
+			default:
+				builder.append(c);
 			}
 		}
 		return builder.toString();
@@ -540,10 +567,11 @@ public class CodeMethod extends AbstractMethod
 		final String ownerClassName = this.enclosingClass.getInternalName();
 		final String mangledName = this.getMangledName();
 		final String descriptor = this.getDescriptor();
+		final String signature = this.needsSignature() ? this.getSignature() : null;
 		final String[] exceptionTypes = this.getInternalExceptions();
 
 		MethodWriter methodWriter = new MethodWriterImpl(writer, writer.visitMethod(
-			modifiers & ModifierUtil.JAVA_MODIFIER_MASK, mangledName, descriptor, this.getSignature(), exceptionTypes));
+			modifiers & ModifierUtil.JAVA_MODIFIER_MASK, mangledName, descriptor, signature, exceptionTypes));
 
 		if ((modifiers & Modifiers.STATIC) == 0)
 		{
@@ -641,6 +669,12 @@ public class CodeMethod extends AbstractMethod
 			methodWriter.visitInsn(overrideReturnType.getReturnOpcode());
 			methodWriter.visitEnd();
 		}
+	}
+
+	private boolean needsSignature()
+	{
+		return this.typeParameterCount != 0 || this.type.isGenericType() || this.type.hasTypeVariables()
+			       || this.parameters.needsSignature();
 	}
 
 	protected void writeAnnotations(MethodWriter writer, int modifiers)
