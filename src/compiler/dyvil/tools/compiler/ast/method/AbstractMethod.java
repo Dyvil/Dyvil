@@ -55,9 +55,11 @@ import static dyvil.reflect.Opcodes.IFNE;
 
 public abstract class AbstractMethod extends Member implements IMethod, ILabelContext, IDefaultContext
 {
-	static final Handle EXTENSION_BSM = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/DynamicLinker",
-	                                               "linkExtension",
-	                                               "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;)Ljava/lang/invoke/CallSite;");
+	protected static final Handle EXTENSION_BSM = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/DynamicLinker",
+	                                                         "linkExtension",
+	                                                         "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;)Ljava/lang/invoke/CallSite;");
+
+	protected static final String NAME_SEPARATOR = "_$_";
 
 	protected ITypeParameter[] typeParameters;
 	protected int              typeParameterCount;
@@ -71,7 +73,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 	// Metadata
 	protected IClass        enclosingClass;
+	protected String        mangledName;
 	protected String        descriptor;
+	protected String        signature;
 	protected IntrinsicData intrinsicData;
 
 	public AbstractMethod(IClass enclosingClass)
@@ -552,7 +556,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			// and only take exactly one parameter
 			return;
 		}
-		if (type != null && !Types.isSuperType(type, this.getType())) // getType to ensure it is resolved by ExternalMethods
+		if (type != null && !Types.isSuperType(type,
+		                                       this.getType())) // getType to ensure it is resolved by ExternalMethods
 		{
 			// The method's return type has to be a sub-type of the target type
 			return;
@@ -876,7 +881,24 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public Handle toHandle()
 	{
 		return new Handle(ClassFormat.insnToHandle(this.getInvokeOpcode()), this.enclosingClass.getInternalName(),
-		                  this.name.qualified, this.getDescriptor());
+		                  this.getMangledName(), this.getDescriptor());
+	}
+
+	@Override
+	public String getMangledName()
+	{
+		if (this.mangledName != null)
+		{
+			return this.mangledName;
+		}
+
+		return this.mangledName = this.name.qualified;
+	}
+
+	@Override
+	public void setMangledName(String mangledName)
+	{
+		this.mangledName = mangledName;
 	}
 
 	@Override
@@ -912,9 +934,19 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public String getSignature()
 	{
+		//noinspection StringEquality
+		if (this.signature == "")
+		{
+			return null; // no signature required
+		}
+		if (this.signature != null)
+		{
+			return this.signature;
+		}
+
 		if (!this.needsSignature())
 		{
-			return null;
+			return this.signature = "";
 		}
 
 		StringBuilder buffer = new StringBuilder();
@@ -936,7 +968,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 		buffer.append(')');
 		this.type.appendSignature(buffer);
-		return buffer.toString();
+		return this.signature = buffer.toString();
 	}
 
 	@Override
@@ -1071,11 +1103,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		int opcode;
 		int modifiers = this.modifiers.toFlags();
 
-		String owner = this.enclosingClass.getInternalName();
+		final String owner = this.enclosingClass.getInternalName();
+		final String mangledName = this.getMangledName();
+
 		if ((modifiers & Modifiers.EXTENSION) == Modifiers.EXTENSION)
 		{
-			writer.visitInvokeDynamicInsn(this.name.qualified, this.getDescriptor(), EXTENSION_BSM,
-			                              new Handle(ClassFormat.H_INVOKESTATIC, owner, this.name.qualified,
+			writer.visitInvokeDynamicInsn(mangledName, this.getDescriptor(), EXTENSION_BSM,
+			                              new Handle(ClassFormat.H_INVOKESTATIC, owner, mangledName,
 			                                         this.getDescriptor()));
 			return;
 		}
@@ -1089,9 +1123,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			opcode = this.getInvokeOpcode();
 		}
 
-		String name = this.name.qualified;
-		String desc = this.getDescriptor();
-		writer.visitMethodInsn(opcode, owner, name, desc, this.enclosingClass.isInterface());
+		writer.visitMethodInsn(opcode, owner, mangledName, this.getDescriptor(), this.enclosingClass.isInterface());
 	}
 
 	@Override

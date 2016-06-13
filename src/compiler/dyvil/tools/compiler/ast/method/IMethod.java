@@ -66,7 +66,13 @@ public interface IMethod extends IClassMember, ICallableMember, ICallableSignatu
 	int getInvokeOpcode();
 
 	Handle toHandle();
-	
+
+	String getMangledName();
+
+	default void setMangledName(String mangledName)
+	{
+	}
+
 	String getDescriptor();
 	
 	String getSignature();
