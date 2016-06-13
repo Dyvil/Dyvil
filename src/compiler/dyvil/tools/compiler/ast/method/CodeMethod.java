@@ -343,6 +343,11 @@ public class CodeMethod extends AbstractMethod
 				this.mangledName = mangledName = createMangledName(this);
 				thisMangled = true;
 
+				final Marker marker = Markers.semantic(this.position, "method.name_mangled", this.name);
+				marker.addInfo(Markers.getSemantic("method.name_mangled.1", this.name));
+				marker.addInfo(Markers.getSemantic("method.name_mangled.2", this.name));
+				marker.addInfo(Markers.getSemantic("name.mangled", mangledName));
+				markers.add(marker);
 			}
 
 			if (mangledName.equals(otherMangledName))
