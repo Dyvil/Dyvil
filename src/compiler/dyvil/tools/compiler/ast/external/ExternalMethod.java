@@ -43,10 +43,22 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 
 	private int resolved;
 
-	public ExternalMethod(IClass enclosingClass, Name name, String desc, ModifierSet modifiers)
+	public ExternalMethod(IClass enclosingClass, String name, String desc, String signature, ModifierSet modifiers)
 	{
-		super(enclosingClass, name, null, modifiers);
-		this.name = name;
+		super(enclosingClass, null, null, modifiers);
+
+		final int index = name.indexOf(NAME_SEPARATOR);
+		if (index >= 0)
+		{
+			this.name = Name.fromUnqualified(name.substring(0, index));
+		}
+		else
+		{
+			this.name = Name.fromUnqualified(name);
+		}
+
+		this.mangledName = name;
+		this.signature = signature;
 		this.descriptor = desc;
 	}
 

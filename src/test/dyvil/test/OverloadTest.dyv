@@ -20,6 +20,18 @@ public class OverloadTest
 	public static String f(Object o, Object... os) = "f(Object, Object...)"
 	public static String f(Object o, String... ss) = "f(Object, String...)"
 
+	// These will be name-mangled
+	public static String g(List<int> ints) = "g(List<int>)"
+	public static String g(List<String> strings) = "g(List<String>)"
+
+	public static String g<T extends Set<int>>(T ints) = "g(Set<int>)"
+	public static String g<T extends Set<String>>(T strings) = "g(Set<String>)"
+
+	public static String h(List<int> anys) = "h(List<int>)"
+	public static String h(List<long> bools) = "h(List<long>)"
+	public static String h_$_1(List<float> ints) = "h(List<float>)"
+	public static String h_$_2(List<double> ints) = "h(List<double>)"
+
 	public static void main([String] args)
 	{
 		Object o = null
@@ -46,5 +58,15 @@ public class OverloadTest
 		Main.test("Overload Test 4.2", "f(String, String...)", f(s, s, s))
 		Main.test("Overload Test 4.3", "f(String, Object...)", f(s, o, o))
 		Main.test("Overload Test 4.4", "f(String, Object...)", f(s, o, s))
+
+		Main.test("Overload Test 5.1", "g(List<int>)", g(List<int>))
+		Main.test("Overload Test 5.2", "g(List<String>)", g(List<String>))
+		Main.test("Overload Test 5.3", "g(Set<int>)", g(Set<int>))
+		Main.test("Overload Test 5.4", "g(Set<String>)", g(Set<String>))
+
+		Main.test("Overload Test 6.1", "h(List<int>)", h(List<int>))
+		Main.test("Overload Test 6.2", "h(List<long>)", h(List<long>))
+		Main.test("Overload Test 6.3", "h(List<float>)", h(List<float>))
+		Main.test("Overload Test 6.4", "h(List<double>)", h(List<double>))
 	}
 }

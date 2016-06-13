@@ -336,6 +336,12 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 
 	@Override
+	public String getMangledName()
+	{
+		return this.name.qualified;
+	}
+
+	@Override
 	public String getDescriptor()
 	{
 		return null;

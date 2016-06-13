@@ -665,16 +665,6 @@ public final class ExternalClass extends AbstractClass
 
 	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
 	{
-		Name name1 = Name.get(name);
-
-		if (this.isAnnotation())
-		{
-			final ClassParameter param = new ExternalClassParameter(this, name1, ClassFormat.readReturnType(desc),
-			                                                        new FlagModifierSet(access));
-			this.parameters.addParameter(param);
-			return new AnnotationClassVisitor(param);
-		}
-
 		if ((access & Modifiers.SYNTHETIC) != 0)
 		{
 			return null;
@@ -710,7 +700,15 @@ public final class ExternalClass extends AbstractClass
 			return new SimpleMethodVisitor(constructor);
 		}
 
-		ExternalMethod method = new ExternalMethod(this, name1, desc, new FlagModifierSet(access));
+		if (this.isAnnotation())
+		{
+			final ClassParameter param = new ExternalClassParameter(this, Name.fromQualified(name), ClassFormat.readReturnType(desc),
+			                                                        new FlagModifierSet(access));
+			this.parameters.addParameter(param);
+			return new AnnotationClassVisitor(param);
+		}
+
+		final ExternalMethod method = new ExternalMethod(this, name, desc, signature, new FlagModifierSet(access));
 
 		if (signature != null)
 		{

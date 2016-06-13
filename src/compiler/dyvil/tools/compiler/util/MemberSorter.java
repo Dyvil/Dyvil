@@ -35,7 +35,7 @@ public class MemberSorter
 			return compareTypes(method1.getType(), method2.getType());
 		}
 
-		return method1.getDescriptor().compareTo(method2.getDescriptor());
+		return method1.getSignature().compareTo(method2.getSignature());
 	}
 
 	public static int compareTypes(IType type1, IType type2)
