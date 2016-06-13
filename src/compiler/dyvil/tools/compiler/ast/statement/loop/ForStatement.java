@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -25,6 +26,9 @@ public class ForStatement implements IForStatement, IDefaultContext
 	public static final Name $forStart  = Name.getQualified("$forStart");
 	public static final Name $forUpdate = Name.getQualified("$forCondition");
 	public static final Name $forEnd    = Name.getQualified("$forEnd");
+
+	private static final TypeChecker.MarkerSupplier CONDITION_MARKER_SUPPLIER = TypeChecker.markerSupplier(
+		"for.condition.type");
 
 	protected ICodePosition position;
 	protected IVariable     variable;
@@ -190,7 +194,8 @@ public class ForStatement implements IForStatement, IDefaultContext
 		if (this.condition != null)
 		{
 			this.condition = this.condition.resolve(markers, context);
-			this.condition = IStatement.checkCondition(markers, context, this.condition, "for.condition.type");
+			this.condition = TypeChecker.convertValue(this.condition, Types.BOOLEAN, null, markers, context,
+			                                          CONDITION_MARKER_SUPPLIER);
 		}
 		if (this.update != null)
 		{

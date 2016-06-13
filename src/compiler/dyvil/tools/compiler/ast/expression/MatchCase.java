@@ -5,10 +5,11 @@ import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.pattern.ICase;
 import dyvil.tools.compiler.ast.pattern.IPattern;
-import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
@@ -16,6 +17,9 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public class MatchCase implements ICase, IDefaultContext
 {
+	private static final TypeChecker.MarkerSupplier CONDITION_MARKER_SUPPLIER = TypeChecker.markerSupplier(
+		"match.condition.type");
+
 	protected IPattern pattern;
 	protected IValue   condition;
 	protected IValue   action;
@@ -25,49 +29,49 @@ public class MatchCase implements ICase, IDefaultContext
 	{
 		return this.pattern;
 	}
-	
+
 	@Override
 	public void setPattern(IPattern pattern)
 	{
 		this.pattern = pattern;
 	}
-	
+
 	@Override
 	public IValue getCondition()
 	{
 		return this.condition;
 	}
-	
+
 	@Override
 	public void setCondition(IValue condition)
 	{
 		this.condition = condition;
 	}
-	
+
 	@Override
 	public IValue getAction()
 	{
 		return this.action;
 	}
-	
+
 	@Override
 	public void setAction(IValue action)
 	{
 		this.action = action;
 	}
-	
+
 	public boolean isExhaustive()
 	{
 		return this.pattern.isExhaustive() && this.condition == null;
 	}
-	
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
 		final IDataMember field = this.pattern.resolveField(name);
 		return field != null ? field : null;
 	}
-	
+
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		context = context.push(this);
@@ -81,7 +85,7 @@ public class MatchCase implements ICase, IDefaultContext
 		}
 		context.pop();
 	}
-	
+
 	public void resolve(MarkerList markers, IType type, IContext context)
 	{
 		if (this.pattern != null)
@@ -107,9 +111,10 @@ public class MatchCase implements ICase, IDefaultContext
 		if (this.condition != null)
 		{
 			this.condition = this.condition.resolve(markers, context);
-			this.condition = IStatement.checkCondition(markers, context, this.condition, "match.condition.type");
+			this.condition = TypeChecker.convertValue(this.condition, Types.BOOLEAN, null, markers, context,
+			                                          CONDITION_MARKER_SUPPLIER);
 		}
-		
+
 		if (this.action != null)
 		{
 			this.action = this.action.resolve(markers, context);
@@ -117,14 +122,13 @@ public class MatchCase implements ICase, IDefaultContext
 
 		context.pop();
 	}
-	
+
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		context = context.push(this);
 		if (this.condition != null)
 		{
-			this.condition.checkTypes(markers, context
-			);
+			this.condition.checkTypes(markers, context);
 		}
 		if (this.action != null)
 		{
@@ -132,7 +136,7 @@ public class MatchCase implements ICase, IDefaultContext
 		}
 		context.pop();
 	}
-	
+
 	public void check(MarkerList markers, IContext context)
 	{
 		context = context.push(this);
@@ -146,7 +150,7 @@ public class MatchCase implements ICase, IDefaultContext
 		}
 		context.pop();
 	}
-	
+
 	public void foldConstants()
 	{
 		if (this.condition != null)
@@ -158,7 +162,7 @@ public class MatchCase implements ICase, IDefaultContext
 			this.action = this.action.foldConstants();
 		}
 	}
-	
+
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		context = context.push(this);

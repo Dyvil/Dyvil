@@ -20,6 +20,9 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class IfStatement implements IValue
 {
+	private static final TypeChecker.MarkerSupplier CONDITION_MARKER_SUPPLIER = TypeChecker.markerSupplier(
+		"if.condition.type");
+
 	protected IValue condition;
 	protected IValue then;
 	protected IValue elseThen;
@@ -201,7 +204,8 @@ public class IfStatement implements IValue
 		if (this.condition != null)
 		{
 			this.condition = this.condition.resolve(markers, context);
-			this.condition = IStatement.checkCondition(markers, context, this.condition, "if.condition.type");
+			this.condition = TypeChecker.convertValue(this.condition, Types.BOOLEAN, null, markers, context,
+			                                          CONDITION_MARKER_SUPPLIER);
 		}
 		if (this.then != null)
 		{

@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -24,6 +25,9 @@ public final class RepeatStatement extends AbstractValue implements IStatement, 
 	private static final Name $repeatStart     = Name.getQualified("$repeatStart");
 	private static final Name $repeatCondition = Name.getQualified("$repeatCondition");
 	private static final Name $repeatEnd       = Name.getQualified("$repeatEnd");
+
+	private static final TypeChecker.MarkerSupplier CONDITION_MARKER_SUPPLIER = TypeChecker.markerSupplier(
+		"repeat.condition.type");
 
 	protected IValue action;
 	protected IValue condition;
@@ -133,7 +137,8 @@ public final class RepeatStatement extends AbstractValue implements IStatement, 
 		if (this.condition != null)
 		{
 			this.condition = this.condition.resolve(markers, context);
-			this.condition = IStatement.checkCondition(markers, context, this.condition, "repeat.condition.type");
+			this.condition = TypeChecker.convertValue(this.condition, Types.BOOLEAN, null, markers, context,
+			                                          CONDITION_MARKER_SUPPLIER);
 		}
 		return this;
 	}

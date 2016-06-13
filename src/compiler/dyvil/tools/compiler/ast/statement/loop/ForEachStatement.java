@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.intrinsic.RangeOperator;
+import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.statement.control.Label;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -327,18 +328,7 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 		context = context.push(this);
 
 		this.action = action.resolve(markers, context);
-
-		final IValue typedAction = this.action.withType(Types.VOID, Types.VOID, markers, context);
-		if (typedAction != null && typedAction.isUsableAsStatement())
-		{
-			this.action = typedAction;
-		}
-		else if (this.action.isResolved())
-		{
-			final Marker marker = Markers.semanticError(this.action.getPosition(), "for.action.type");
-			marker.addInfo(Markers.getSemantic("action.type", this.action.getType()));
-			markers.add(marker);
-		}
+		this.action = IStatement.checkStatement(markers, context, this.action, "for.action.type");
 
 		context.pop();
 	}

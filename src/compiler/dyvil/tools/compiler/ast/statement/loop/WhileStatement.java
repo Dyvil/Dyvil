@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -24,62 +25,65 @@ public final class WhileStatement extends AbstractValue implements IStatement, I
 {
 	public static final Name $whileStart = Name.getQualified("$whileStart");
 	public static final Name $whileEnd   = Name.getQualified("$whileEnd");
-	
+
+	private static final TypeChecker.MarkerSupplier CONDITION_MARKER_SUPPLIER = TypeChecker.markerSupplier(
+		"while.condition.type");
+
 	protected IValue condition;
 	protected IValue action;
-	
+
 	// Metadata
 	private Label startLabel;
 	private Label endLabel;
-	
+
 	public WhileStatement(ICodePosition position)
 	{
 		this.position = position;
-		
+
 		this.startLabel = new Label($whileStart);
 		this.endLabel = new Label($whileEnd);
 	}
-	
+
 	public void setCondition(IValue condition)
 	{
 		this.condition = condition;
 	}
-	
+
 	public IValue getCondition()
 	{
 		return this.condition;
 	}
-	
+
 	@Override
 	public void setAction(IValue action)
 	{
 		this.action = action;
 	}
-	
+
 	@Override
 	public IValue getAction()
 	{
 		return this.action;
 	}
-	
+
 	@Override
 	public int valueTag()
 	{
 		return WHILE;
 	}
-	
+
 	@Override
 	public Label getContinueLabel()
 	{
 		return this.startLabel;
 	}
-	
+
 	@Override
 	public Label getBreakLabel()
 	{
 		return this.endLabel;
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -92,7 +96,7 @@ public final class WhileStatement extends AbstractValue implements IStatement, I
 			this.action.resolveTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void resolveStatement(ILabelContext context, MarkerList markers)
 	{
@@ -101,14 +105,15 @@ public final class WhileStatement extends AbstractValue implements IStatement, I
 			this.action.resolveStatement(new CombiningLabelContext(this, context), markers);
 		}
 	}
-	
+
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
 		if (this.condition != null)
 		{
 			this.condition = this.condition.resolve(markers, context);
-			this.condition = IStatement.checkCondition(markers, context, this.condition, "while.condition.type");
+			this.condition = TypeChecker.convertValue(this.condition, Types.BOOLEAN, null, markers, context,
+			                                          CONDITION_MARKER_SUPPLIER);
 		}
 		if (this.action != null)
 		{
@@ -117,7 +122,7 @@ public final class WhileStatement extends AbstractValue implements IStatement, I
 		}
 		return this;
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -130,7 +135,7 @@ public final class WhileStatement extends AbstractValue implements IStatement, I
 			this.action.checkTypes(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
@@ -147,7 +152,7 @@ public final class WhileStatement extends AbstractValue implements IStatement, I
 			this.action.check(markers, context);
 		}
 	}
-	
+
 	@Override
 	public IValue foldConstants()
 	{
@@ -166,7 +171,7 @@ public final class WhileStatement extends AbstractValue implements IStatement, I
 		}
 		return this;
 	}
-	
+
 	@Override
 	public IValue cleanup(IContext context, IClassCompilableList compilableList)
 	{
@@ -180,7 +185,7 @@ public final class WhileStatement extends AbstractValue implements IStatement, I
 		}
 		return this;
 	}
-	
+
 	@Override
 	public Label resolveLabel(Name name)
 	{
@@ -192,16 +197,16 @@ public final class WhileStatement extends AbstractValue implements IStatement, I
 		{
 			return this.endLabel;
 		}
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
 		dyvil.tools.asm.Label startLabel = this.startLabel.getTarget();
 		dyvil.tools.asm.Label endLabel = this.endLabel.getTarget();
-		
+
 		// Condition
 		writer.visitTargetLabel(startLabel);
 		this.condition.writeInvJump(writer, endLabel);
@@ -211,10 +216,10 @@ public final class WhileStatement extends AbstractValue implements IStatement, I
 			this.action.writeExpression(writer, Types.VOID);
 		}
 		writer.visitJumpInsn(Opcodes.GOTO, startLabel);
-		
+
 		writer.visitLabel(endLabel);
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
