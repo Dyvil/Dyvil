@@ -39,7 +39,7 @@ public class InternalType implements IRawType
 	@Override
 	public Name getName()
 	{
-		return Name.getQualified(this.internalName.substring(this.internalName.lastIndexOf('/') + 1));
+		return Name.fromRaw(this.internalName.substring(this.internalName.lastIndexOf('/') + 1));
 	}
 	
 	@Override

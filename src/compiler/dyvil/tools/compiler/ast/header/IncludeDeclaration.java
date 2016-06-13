@@ -177,7 +177,7 @@ public class IncludeDeclaration implements IASTNode
 		this.nameParts = new Name[this.namePartCount];
 		for (int i = 0; i < this.namePartCount; i++)
 		{
-			this.nameParts[i] = Name.getQualified(in.readUTF());
+			this.nameParts[i] = Name.fromRaw(in.readUTF());
 		}
 	}
 

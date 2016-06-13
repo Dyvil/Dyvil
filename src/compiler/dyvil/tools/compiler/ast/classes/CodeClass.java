@@ -888,7 +888,7 @@ public class CodeClass extends AbstractClass
 		this.modifiers = ModifierSet.read(in);
 		this.annotations = AnnotationList.read(in);
 
-		this.name = Name.get(in.readUTF());
+		this.name = Name.from(in.readUTF());
 
 		this.readTypes(in);
 

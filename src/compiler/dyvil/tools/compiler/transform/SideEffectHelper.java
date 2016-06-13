@@ -25,7 +25,7 @@ public class SideEffectHelper
 			this.statementList = new StatementList();
 		}
 
-		final Variable variable = new Variable(value.getPosition(), Name.getQualified("sideEffect$" + this.registered),
+		final Variable variable = new Variable(value.getPosition(), Name.fromRaw("sideEffect$" + this.registered),
 		                                       value.getType());
 		variable.setValue(value);
 

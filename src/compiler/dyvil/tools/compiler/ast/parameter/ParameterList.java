@@ -321,7 +321,7 @@ public class ParameterList implements IParameterList
 		this.parameters = new IParameter[parameterCount];
 		for (int i = 0; i < parameterCount; i++)
 		{
-			this.parameters[i] = new CodeParameter(Name.getQualified("par" + i), IType.readType(in));
+			this.parameters[i] = new CodeParameter(Name.fromRaw("par" + i), IType.readType(in));
 		}
 	}
 

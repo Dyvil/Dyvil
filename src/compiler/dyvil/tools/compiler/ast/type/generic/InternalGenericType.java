@@ -44,7 +44,7 @@ public class InternalGenericType extends GenericType
 	@Override
 	public Name getName()
 	{
-		return Name.getQualified(this.internalName.substring(this.internalName.lastIndexOf('/') + 1));
+		return Name.fromRaw(this.internalName.substring(this.internalName.lastIndexOf('/') + 1));
 	}
 	
 	@Override

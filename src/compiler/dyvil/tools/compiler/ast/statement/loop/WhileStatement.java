@@ -23,8 +23,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class WhileStatement extends AbstractValue implements IStatement, ILoop
 {
-	public static final Name $whileStart = Name.getQualified("$whileStart");
-	public static final Name $whileEnd   = Name.getQualified("$whileEnd");
+	public static final Name $whileStart = Name.fromRaw("$whileStart");
+	public static final Name $whileEnd   = Name.fromRaw("$whileEnd");
 
 	private static final TypeChecker.MarkerSupplier CONDITION_MARKER_SUPPLIER = TypeChecker.markerSupplier(
 		"while.condition.type");

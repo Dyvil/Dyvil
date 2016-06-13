@@ -207,7 +207,7 @@ public final class DyvilLexer
 
 				this.parseIndex++;
 				this.tokens.append(
-					new IdentifierToken(Name.getSpecial(this.buffer.toString()), SPECIAL_IDENTIFIER, startLine,
+					new IdentifierToken(Name.fromUnqualified(this.buffer.toString()), SPECIAL_IDENTIFIER, startLine,
 					                    startIndex, this.parseIndex));
 				return;
 			}
@@ -764,7 +764,7 @@ public final class DyvilLexer
 					return;
 				}
 				this.tokens.append(
-					new IdentifierToken(Name.get(id), Tokens.LETTER_IDENTIFIER, this.lineNumber, startIndex,
+					new IdentifierToken(Name.from(id), Tokens.LETTER_IDENTIFIER, this.lineNumber, startIndex,
 					                    this.parseIndex));
 				return;
 			}
@@ -823,7 +823,7 @@ public final class DyvilLexer
 				this.tokens.append(new SymbolToken(this.symbols, symbol, this.lineNumber, startIndex));
 				return;
 			}
-			this.tokens.append(new IdentifierToken(Name.get(id), Tokens.SYMBOL_IDENTIFIER, this.lineNumber, startIndex,
+			this.tokens.append(new IdentifierToken(Name.from(id), Tokens.SYMBOL_IDENTIFIER, this.lineNumber, startIndex,
 			                                       this.parseIndex));
 			return;
 		}

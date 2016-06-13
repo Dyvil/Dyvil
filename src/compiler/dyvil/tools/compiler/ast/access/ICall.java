@@ -64,7 +64,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 		IParameter[] parameters = new IParameter[wildcards];
 		for (int i = 0; i < wildcards; i++)
 		{
-			parameters[i] = new CodeParameter(position, Name.getQualified("wildcard$" + i), Types.UNKNOWN,
+			parameters[i] = new CodeParameter(position, Name.fromRaw("wildcard$" + i), Types.UNKNOWN,
 			                                  EmptyModifiers.INSTANCE, null);
 		}
 

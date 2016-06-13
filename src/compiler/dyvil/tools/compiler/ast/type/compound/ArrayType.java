@@ -165,7 +165,7 @@ public class ArrayType implements IObjectType, ITyped
 			return null;
 		}
 
-		final IMethod toIterableMethod = this.getTheClass().getBody().getMethod(Name.getQualified("toIterable"));
+		final IMethod toIterableMethod = this.getTheClass().getBody().getMethod(Name.fromRaw("toIterable"));
 		return new LiteralConversion(value, toIterableMethod).withType(targetType, typeContext, markers, context);
 	}
 

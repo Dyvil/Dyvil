@@ -218,12 +218,12 @@ public final class SingleImport extends Import
 	{
 		this.parent = IImport.readImport(in);
 
-		this.name = Name.getQualified(in.readUTF());
+		this.name = Name.fromRaw(in.readUTF());
 
 		String alias = in.readUTF();
 		if (!alias.isEmpty())
 		{
-			this.alias = Name.getQualified(alias);
+			this.alias = Name.fromRaw(alias);
 		}
 	}
 

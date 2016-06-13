@@ -36,8 +36,8 @@ public class RenameCommand implements ICommand
 			return;
 		}
 
-		final Name memberName = Name.get(split[0]);
-		final Name newName = Name.get(split[1]);
+		final Name memberName = Name.from(split[0]);
+		final Name newName = Name.from(split[1]);
 		final Map<Name, IField> fields = repl.getContext().getFields();
 		final IField field = fields.remap(memberName, newName);
 

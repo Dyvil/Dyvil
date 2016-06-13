@@ -104,7 +104,7 @@ public class ParserManager implements IParserManager
 			{
 				return new SymbolToken(this.symbols, symbol, line, start);
 			}
-			return new IdentifierToken(Name.get(identifier), Tokens.SYMBOL_IDENTIFIER, line, start, start + length);
+			return new IdentifierToken(Name.from(identifier), Tokens.SYMBOL_IDENTIFIER, line, start, start + length);
 		}
 
 		final int keyword = this.symbols.getKeywordType(identifier);
@@ -113,7 +113,7 @@ public class ParserManager implements IParserManager
 			return new SymbolToken(this.symbols, keyword, line, start);
 		}
 
-		return new IdentifierToken(Name.get(identifier), Tokens.LETTER_IDENTIFIER, line, start, start + length);
+		return new IdentifierToken(Name.from(identifier), Tokens.LETTER_IDENTIFIER, line, start, start + length);
 	}
 
 	@Override

@@ -22,9 +22,9 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class RepeatStatement extends AbstractValue implements IStatement, ILoop
 {
-	private static final Name $repeatStart     = Name.getQualified("$repeatStart");
-	private static final Name $repeatCondition = Name.getQualified("$repeatCondition");
-	private static final Name $repeatEnd       = Name.getQualified("$repeatEnd");
+	private static final Name $repeatStart     = Name.fromRaw("$repeatStart");
+	private static final Name $repeatCondition = Name.fromRaw("$repeatCondition");
+	private static final Name $repeatEnd       = Name.fromRaw("$repeatEnd");
 
 	private static final TypeChecker.MarkerSupplier CONDITION_MARKER_SUPPLIER = TypeChecker.markerSupplier(
 		"repeat.condition.type");

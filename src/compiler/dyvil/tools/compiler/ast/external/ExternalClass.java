@@ -157,7 +157,7 @@ public final class ExternalClass extends AbstractClass
 
 		for (Entry<String, String> entry : this.innerTypes)
 		{
-			Name name = Name.getQualified(entry.getKey());
+			Name name = Name.fromQualified(entry.getKey());
 			String internal = entry.getValue();
 
 			// Resolve the class name
@@ -534,15 +534,15 @@ public final class ExternalClass extends AbstractClass
 		}
 		if (index == -1)
 		{
-			this.name = Name.getQualified(name);
+			this.name = Name.fromQualified(name);
 			this.thePackage = Package.rootPackage;
 			this.fullName = name;
 		}
 		else
 		{
-			this.name = Name.getQualified(name.substring(index + 1));
+			this.name = Name.fromQualified(name.substring(index + 1));
 			this.fullName = name.replace('/', '.');
-			this.thePackage = Package.rootPackage.resolvePackage(Name.getQualified(this.fullName.substring(0, index)));
+			this.thePackage = Package.rootPackage.resolvePackage(Name.fromQualified(this.fullName.substring(0, index)));
 		}
 
 		if (signature != null)
@@ -645,13 +645,13 @@ public final class ExternalClass extends AbstractClass
 
 		if (this.classParameters != null && this.classParameters.contains(name))
 		{
-			final ClassParameter param = new ExternalClassParameter(this, Name.get(name), type,
+			final ClassParameter param = new ExternalClassParameter(this, Name.fromQualified(name), type,
 			                                                        new FlagModifierSet(access));
 			this.parameters.addParameter(param);
 			return new SimpleFieldVisitor(param);
 		}
 
-		final ExternalField field = new ExternalField(this, Name.get(name), desc, type, new FlagModifierSet(access));
+		final ExternalField field = new ExternalField(this, Name.fromQualified(name), desc, type, new FlagModifierSet(access));
 
 		if (value != null)
 		{

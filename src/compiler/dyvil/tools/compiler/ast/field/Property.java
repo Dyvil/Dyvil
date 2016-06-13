@@ -118,7 +118,7 @@ public class Property extends Member implements IProperty
 			return this.setter;
 		}
 
-		final Name name = Name.get(this.name.unqualified + "_=", this.name.qualified + "_$eq");
+		final Name name = Name.from(this.name.unqualified + "_=", this.name.qualified + "_$eq");
 		this.setter = new CodeMethod(this.enclosingClass, name, Types.VOID, this.modifiers);
 		this.setterParameter = new CodeParameter(this.position, Names.newValue, this.type, EmptyModifiers.INSTANCE,
 		                                         null);

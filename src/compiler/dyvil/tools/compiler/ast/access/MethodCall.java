@@ -67,7 +67,7 @@ public class MethodCall extends AbstractCall implements INamed
 	@Override
 	protected Name getReferenceName()
 	{
-		return Name.get(this.name.unqualified + "_&", this.name.qualified + "_$amp");
+		return Name.from(this.name.unqualified + "_&", this.name.qualified + "_$amp");
 	}
 
 	@Override

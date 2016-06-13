@@ -749,7 +749,7 @@ public final class TypeParameter implements ITypeParameter
 	@Override
 	public void read(DataInput in) throws IOException
 	{
-		this.name = Name.getQualified(in.readUTF());
+		this.name = Name.fromRaw(in.readUTF());
 
 		this.variance = Variance.read(in);
 

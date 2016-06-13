@@ -7,7 +7,7 @@ public class RootNode extends Node
 {
 	public init()
 	{
-		super.init(Name.getQualified("root"))
+		super.init(Name.fromRaw("root"))
 	}
 	
 	public override void accept(NodeVisitor visitor) = this.acceptBody(visitor)

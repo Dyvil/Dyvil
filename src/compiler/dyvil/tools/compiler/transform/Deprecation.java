@@ -25,9 +25,9 @@ import dyvil.util.MarkerLevel;
 
 public final class Deprecation
 {
-	public static final Name Deprecated   = Name.getQualified("Deprecated");
-	public static final Name Experimental = Name.getQualified("Experimental");
-	public static final Name UsageInfo    = Name.getQualified("UsageInfo");
+	public static final Name Deprecated   = Name.fromRaw("Deprecated");
+	public static final Name Experimental = Name.fromRaw("Experimental");
+	public static final Name UsageInfo    = Name.fromRaw("UsageInfo");
 
 	public static final String JAVA_INTERNAL  = "java/lang/Deprecated";
 	public static final String DYVIL_INTERNAL = "dyvil/annotation/Deprecated";

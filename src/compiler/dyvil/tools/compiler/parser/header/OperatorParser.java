@@ -24,11 +24,11 @@ public final class OperatorParser extends Parser
 	private static final int ASSOCIATIVITY   = 32;
 	private static final int COMMA           = 64;
 
-	public static final Name associativity = Name.getQualified("associativity");
-	public static final Name precedence    = Name.getQualified("precedence");
-	public static final Name none          = Name.getQualified("none");
-	public static final Name left          = Name.getQualified("left");
-	public static final Name right         = Name.getQualified("right");
+	public static final Name associativity = Name.fromRaw("associativity");
+	public static final Name precedence    = Name.fromRaw("precedence");
+	public static final Name none          = Name.fromRaw("none");
+	public static final Name left          = Name.fromRaw("left");
+	public static final Name right         = Name.fromRaw("right");
 
 	protected IOperatorMap map;
 	private   byte         type;
@@ -209,7 +209,7 @@ public final class OperatorParser extends Parser
 		}
 		if ((type & Tokens.SYMBOL) != 0)
 		{
-			return Name.get(DyvilSymbols.INSTANCE.toString(type));
+			return Name.from(DyvilSymbols.INSTANCE.toString(type));
 		}
 		return null;
 	}

@@ -72,7 +72,7 @@ public class REPLContext extends DyvilHeader
 
 	public REPLContext(DyvilREPL repl)
 	{
-		super(repl.getCompiler(), Name.getQualified("REPL"));
+		super(repl.getCompiler(), Name.fromRaw("REPL"));
 		this.repl = repl;
 	}
 
@@ -104,7 +104,7 @@ public class REPLContext extends DyvilHeader
 	{
 		this.currentCode = code;
 		this.className = REPL$CLASSES + "REPL$Result" + this.classIndex++;
-		this.memberClass = new REPLMemberClass(this, Name.getQualified(this.className));
+		this.memberClass = new REPLMemberClass(this, Name.fromRaw(this.className));
 		this.cleanup();
 	}
 
@@ -221,7 +221,7 @@ public class REPLContext extends DyvilHeader
 		}
 
 		int index = ai.incrementAndGet();
-		return Name.get(sb.append(index).toString());
+		return Name.from(sb.append(index).toString());
 	}
 
 	private void compileVariable(REPLVariable field)
@@ -698,7 +698,7 @@ public class REPLContext extends DyvilHeader
 	@Override
 	public Name getName()
 	{
-		return Name.getQualified(this.className);
+		return Name.fromRaw(this.className);
 	}
 
 	@Override

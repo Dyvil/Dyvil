@@ -366,7 +366,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		Name name = token.nameValue();
 		if (name == null)
 		{
-			name = Name.get(token.stringValue());
+			name = Name.from(token.stringValue());
 		}
 		this.parseInfixAccess(pm, token, name);
 	}

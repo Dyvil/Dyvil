@@ -75,7 +75,7 @@ public class BinaryReader
 
 	private Name readName() throws IOException
 	{
-		return Name.getSpecial(this.dataInput.readUTF());
+		return Name.fromUnqualified(this.dataInput.readUTF());
 	}
 
 	private void readStringInterpolation(StringInterpolationVisitor stringInterpolationVisitor) throws IOException
@@ -128,7 +128,7 @@ public class BinaryReader
 		while (true)
 		{
 			final String param = this.dataInput.readUTF();
-			final Name paramName = param.isEmpty() ? null : Name.getSpecial(param);
+			final Name paramName = param.isEmpty() ? null : Name.fromUnqualified(param);
 
 			final int tag = this.dataInput.readByte();
 			if (tag == END)

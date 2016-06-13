@@ -23,9 +23,9 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class ForStatement implements IForStatement, IDefaultContext
 {
-	public static final Name $forStart  = Name.getQualified("$forStart");
-	public static final Name $forUpdate = Name.getQualified("$forCondition");
-	public static final Name $forEnd    = Name.getQualified("$forEnd");
+	public static final Name $forStart  = Name.fromRaw("$forStart");
+	public static final Name $forUpdate = Name.fromRaw("$forCondition");
+	public static final Name $forEnd    = Name.fromRaw("$forEnd");
 
 	private static final TypeChecker.MarkerSupplier CONDITION_MARKER_SUPPLIER = TypeChecker.markerSupplier(
 		"for.condition.type");

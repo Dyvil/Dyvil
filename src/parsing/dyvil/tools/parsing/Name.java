@@ -15,7 +15,7 @@ public final class Name
 
 	public static Name apply(String literal)
 	{
-		return get(literal);
+		return from(literal);
 	}
 
 	public static Name wrap(Object value)
@@ -42,7 +42,18 @@ public final class Name
 		map.put(unqualified, this);
 	}
 
-	public static Name get(String unqualified, String qualified)
+	public static Name from(String value)
+	{
+		Name name = map.get(value);
+		if (name != null)
+		{
+			return name;
+		}
+
+		return from(BaseSymbols.unqualify(value), BaseSymbols.qualify(value));
+	}
+
+	public static Name from(String unqualified, String qualified)
 	{
 		Name name = map.get(qualified);
 		if (name != null)
@@ -59,29 +70,17 @@ public final class Name
 		return new Name(unqualified, qualified);
 	}
 
-	public static Name get(String value)
+	public static Name fromUnqualified(String unqualified)
 	{
-		Name name = map.get(value);
-		if (name != null)
-		{
-			return name;
-		}
-
-		return get(BaseSymbols.unqualify(value), BaseSymbols.qualify(value));
+		return from(unqualified, BaseSymbols.qualify(unqualified));
 	}
 
-	public static Name getSpecial(String value)
+	public static Name fromQualified(String qualified)
 	{
-		Name name = map.get(value);
-		if (name != null)
-		{
-			return name;
-		}
-
-		return get(value, BaseSymbols.qualify(value));
+		return from(BaseSymbols.unqualify(qualified), qualified);
 	}
 
-	public static Name getQualified(String value)
+	public static Name fromRaw(String value)
 	{
 		Name name = map.get(value);
 		if (name != null)

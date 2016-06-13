@@ -87,7 +87,7 @@ public class PrefixCall extends MethodCall
 	@Override
 	public IValue toAssignment(IValue rhs, ICodePosition position)
 	{
-		final Name name = Name.get(this.name.unqualified + "_=", this.name.qualified + "_$eq");
+		final Name name = Name.from(this.name.unqualified + "_=", this.name.qualified + "_$eq");
 		return new MethodCall(this.position, this.arguments.getFirstValue(), name, new SingleArgument(rhs));
 	}
 

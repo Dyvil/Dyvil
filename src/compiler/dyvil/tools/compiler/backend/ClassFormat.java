@@ -184,7 +184,7 @@ public final class ClassFormat
 	{
 		final IParameterList parameterList = methodSignature.getExternalParameterList();
 		return type -> {
-			final ExternalParameter parameter = new ExternalParameter(Name.getQualified("par" + parameterList.size()),
+			final ExternalParameter parameter = new ExternalParameter(Name.fromRaw("par" + parameterList.size()),
 			                                                          type);
 			parameter.setMethod(methodSignature);
 			parameterList.addParameter(parameter);
@@ -368,7 +368,7 @@ public final class ClassFormat
 	private static int readGeneric(String desc, int start, ITypeParametric generic)
 	{
 		int index = desc.indexOf(':', start);
-		Name name = Name.getQualified(desc.substring(start, index));
+		Name name = Name.fromRaw(desc.substring(start, index));
 		TypeParameter typeVar = new TypeParameter(generic, name);
 		if (desc.charAt(index + 1) == ':')
 		{

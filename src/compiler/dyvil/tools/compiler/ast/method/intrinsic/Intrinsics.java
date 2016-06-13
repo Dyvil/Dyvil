@@ -15,7 +15,7 @@ import dyvil.tools.parsing.Name;
 
 public class Intrinsics
 {
-	private static final CodeParameter STRINGS = new CodeParameter(Name.getQualified("strings"),
+	private static final CodeParameter STRINGS = new CodeParameter(Name.fromRaw("strings"),
 	                                                               new ArrayType(Types.STRING));
 	
 	public static IntrinsicData readAnnotation(IMethod method, IAnnotation annotation)

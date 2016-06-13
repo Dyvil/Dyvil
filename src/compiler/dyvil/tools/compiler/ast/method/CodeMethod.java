@@ -659,7 +659,7 @@ public class CodeMethod extends AbstractMethod
 	{
 		this.readAnnotations(in);
 
-		this.name = Name.get(in.readUTF());
+		this.name = Name.from(in.readUTF());
 		this.type = IType.readType(in);
 		this.parameters = ParameterList.read(in);
 	}

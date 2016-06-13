@@ -162,7 +162,7 @@ public class Package implements INamed, IDefaultContext
 			return pack;
 		}
 		
-		pack = new Package(this, Name.getQualified(name));
+		pack = new Package(this, Name.fromRaw(name));
 		this.subPackages.put(name, pack);
 		return pack;
 	}
@@ -215,7 +215,7 @@ public class Package implements INamed, IDefaultContext
 	
 	public IDyvilHeader resolveHeader(String name)
 	{
-		return this.resolveHeader(Name.getQualified(name));
+		return this.resolveHeader(Name.fromRaw(name));
 	}
 	
 	public IDyvilHeader resolveHeader(Name name)
@@ -232,7 +232,7 @@ public class Package implements INamed, IDefaultContext
 	
 	public IClass resolveClass(String name)
 	{
-		return this.resolveClass(Name.getQualified(name));
+		return this.resolveClass(Name.fromRaw(name));
 	}
 	
 	@Override
@@ -259,8 +259,8 @@ public class Package implements INamed, IDefaultContext
 		int cashIndex = qualifiedName.indexOf('$');
 		if (cashIndex >= 0)
 		{
-			Name firstName = Name.getQualified(qualifiedName.substring(0, cashIndex));
-			Name lastName = Name.getQualified(qualifiedName.substring(cashIndex + 1));
+			Name firstName = Name.fromRaw(qualifiedName.substring(0, cashIndex));
+			Name lastName = Name.fromRaw(qualifiedName.substring(cashIndex + 1));
 			
 			IClass c = this.resolveClass(firstName);
 			if (c != null)

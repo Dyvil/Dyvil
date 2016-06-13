@@ -47,7 +47,7 @@ public final class LiteralConversion extends MethodCall
 		IValue v = annotation.getArguments().getFirstValue();
 		if (v != null)
 		{
-			return Name.get(v.stringValue());
+			return Name.from(v.stringValue());
 		}
 		return Names.apply;
 	}

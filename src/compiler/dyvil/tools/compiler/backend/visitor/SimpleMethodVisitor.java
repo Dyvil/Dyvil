@@ -35,7 +35,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 		}
 
 		this.parameterIndex++;
-		parameter.setName(Name.getQualified(name));
+		parameter.setName(Name.fromQualified(name));
 
 		if (modifiers != 0)
 		{
