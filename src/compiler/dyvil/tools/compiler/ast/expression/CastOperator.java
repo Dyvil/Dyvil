@@ -144,7 +144,7 @@ public final class CastOperator extends AbstractValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.type.checkType(markers, context, TypePosition.TYPE);
+		this.type.checkType(markers, context, TypePosition.RETURN_TYPE);
 		if (this.value != null)
 		{
 			this.value.checkTypes(markers, context);
