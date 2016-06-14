@@ -50,11 +50,11 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		final int index = name.indexOf(NAME_SEPARATOR);
 		if (index >= 0)
 		{
-			this.name = Name.fromUnqualified(name.substring(0, index));
+			this.name = Name.fromQualified(name.substring(0, index));
 		}
 		else
 		{
-			this.name = Name.fromUnqualified(name);
+			this.name = Name.fromQualified(name);
 		}
 
 		this.mangledName = name;

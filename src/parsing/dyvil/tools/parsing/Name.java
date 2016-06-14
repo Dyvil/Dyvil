@@ -8,7 +8,13 @@ import dyvil.tools.parsing.name.Qualifier;
 @StringConvertible
 public final class Name
 {
-	private static final Map<String, Name> map = new HashMap<>();
+	/**
+	 * This is about the size of the CACHE after the REPL has been initialized. Eagerly creating a large Hash Table may
+	 * improve performance by reducing the number of resize operations.
+	 */
+	private static final int CACHE_CAPACITY = 1024;
+
+	private static final Map<String, Name> CACHE = new HashMap<>(CACHE_CAPACITY);
 
 	public final String qualified;
 	public final String unqualified;
@@ -24,13 +30,13 @@ public final class Name
 		{
 			return (Name) value;
 		}
-		return apply(value.toString());
+		return from(value.toString());
 	}
 
-	public Name(String name)
+	public Name(String qualified)
 	{
-		this.qualified = this.unqualified = name;
-		map.put(name, this);
+		this.qualified = this.unqualified = qualified;
+		CACHE.put(qualified, this);
 	}
 
 	public Name(String unqualified, String qualified)
@@ -38,13 +44,13 @@ public final class Name
 		this.qualified = qualified;
 		this.unqualified = unqualified;
 
-		map.put(qualified, this);
-		map.put(unqualified, this);
+		CACHE.put(qualified, this);
+		CACHE.put(unqualified, this);
 	}
 
 	public static Name from(String value)
 	{
-		Name name = map.get(value);
+		Name name = CACHE.get(value);
 		if (name != null)
 		{
 			return name;
@@ -53,42 +59,49 @@ public final class Name
 		return from(Qualifier.unqualify(value), Qualifier.qualify(value));
 	}
 
-	public static Name from(String unqualified, String qualified)
+	@Deprecated
+	public static Name fromUnqualified(String unqualified)
 	{
-		Name name = map.get(qualified);
+		return from(unqualified);
+	}
+
+	public static Name fromQualified(String qualified)
+	{
+		Name name = CACHE.get(qualified);
 		if (name != null)
 		{
 			return name;
 		}
 
-		name = map.get(unqualified);
-		if (name != null)
-		{
+		final String unqualified = Qualifier.unqualify(qualified);
+		name = CACHE.get(unqualified);
+		if (name != null) {
 			return name;
 		}
 
 		return new Name(unqualified, qualified);
 	}
 
-	public static Name fromUnqualified(String unqualified)
-	{
-		return from(unqualified, Qualifier.qualify(unqualified));
-	}
-
-	public static Name fromQualified(String qualified)
-	{
-		return from(Qualifier.unqualify(qualified), qualified);
-	}
-
 	public static Name fromRaw(String value)
 	{
-		Name name = map.get(value);
+		final Name name = CACHE.get(value);
 		if (name != null)
 		{
 			return name;
 		}
 
 		return new Name(value);
+	}
+
+	public static Name from(String unqualified, String qualified)
+	{
+		final Name name = CACHE.get(qualified);
+		if (name != null)
+		{
+			return name;
+		}
+
+		return new Name(unqualified, qualified);
 	}
 
 	public boolean equals(String name)

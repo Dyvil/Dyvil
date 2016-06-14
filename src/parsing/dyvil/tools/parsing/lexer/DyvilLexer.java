@@ -207,8 +207,8 @@ public final class DyvilLexer
 
 				this.parseIndex++;
 				this.tokens.append(
-					new IdentifierToken(Name.fromUnqualified(this.buffer.toString()), SPECIAL_IDENTIFIER, startLine,
-					                    startIndex, this.parseIndex));
+					new IdentifierToken(Name.from(this.buffer.toString()), SPECIAL_IDENTIFIER, startLine, startIndex,
+					                    this.parseIndex));
 				return;
 			}
 
