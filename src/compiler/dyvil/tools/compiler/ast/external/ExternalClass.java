@@ -737,7 +737,7 @@ public final class ExternalClass extends AbstractClass
 
 	public void visitInnerClass(String name, String outerName, String innerName)
 	{
-		if (!this.internalName.equals(outerName))
+		if (innerName == null || !this.internalName.equals(outerName))
 		{
 			return;
 		}
