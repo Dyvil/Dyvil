@@ -23,10 +23,10 @@ import dyvil.tools.compiler.util.MemberSorter;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.ParserManager;
 import dyvil.tools.parsing.TokenIterator;
-import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.DyvilLexer;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.name.Qualifier;
 import dyvil.tools.repl.DyvilREPL;
 import dyvil.tools.repl.context.REPLContext;
 import dyvil.tools.repl.lang.I18n;
@@ -71,12 +71,12 @@ public class CompleteCommand implements ICommand
 		{
 			// REPL Variable Completions
 
-			this.printREPLMembers(repl, context, BaseSymbols.qualify(argument));
+			this.printREPLMembers(repl, context, Qualifier.qualify(argument));
 			return;
 		}
 
 		final String expression = argument.substring(0, dotIndex);
-		final String memberStart = BaseSymbols.qualify(argument.substring(dotIndex + 1));
+		final String memberStart = Qualifier.qualify(argument.substring(dotIndex + 1));
 
 		final MarkerList markers = new MarkerList(Markers.INSTANCE);
 		final TokenIterator tokenIterator = new DyvilLexer(markers, DyvilSymbols.INSTANCE).tokenize(expression);

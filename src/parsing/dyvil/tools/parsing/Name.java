@@ -3,7 +3,7 @@ package dyvil.tools.parsing;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.HashMap;
 import dyvil.lang.literal.StringConvertible;
-import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.name.Qualifier;
 
 @StringConvertible
 public final class Name
@@ -50,7 +50,7 @@ public final class Name
 			return name;
 		}
 
-		return from(BaseSymbols.unqualify(value), BaseSymbols.qualify(value));
+		return from(Qualifier.unqualify(value), Qualifier.qualify(value));
 	}
 
 	public static Name from(String unqualified, String qualified)
@@ -72,12 +72,12 @@ public final class Name
 
 	public static Name fromUnqualified(String unqualified)
 	{
-		return from(unqualified, BaseSymbols.qualify(unqualified));
+		return from(unqualified, Qualifier.qualify(unqualified));
 	}
 
 	public static Name fromQualified(String qualified)
 	{
-		return from(BaseSymbols.unqualify(qualified), qualified);
+		return from(Qualifier.unqualify(qualified), qualified);
 	}
 
 	public static Name fromRaw(String value)
