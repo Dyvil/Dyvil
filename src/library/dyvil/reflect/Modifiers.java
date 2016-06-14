@@ -159,12 +159,6 @@ public interface Modifiers
 	int EXTENSION = EXTENSION_FLAG | INFIX;
 
 	/**
-	 * <i>Dyvil</i> {@code prefix} modifier. If a method is marked with this modifier, the first argument and the
-	 * receiver. are swapped at the call site.
-	 */
-	int PREFIX = 0x00040000;
-
-	/**
 	 * <i>Dyvil</i> {@code override} modifier. This modifier is a shortcut for the {@link Override} annotation.
 	 */
 	int OVERRIDE = 0x00080000;
@@ -235,8 +229,8 @@ public interface Modifiers
 	 * The modifiers that can be used on methods.
 	 */
 	int METHOD_MODIFIERS =
-		MEMBER_MODIFIERS | ABSTRACT | SYNCHRONIZED | NATIVE | STRICT | INLINE | INFIX | EXTENSION | IMPLICIT | PREFIX
-			| BRIDGE | VARARGS | OVERRIDE;
+		MEMBER_MODIFIERS | ABSTRACT | SYNCHRONIZED | NATIVE | STRICT | INLINE | INFIX | EXTENSION | IMPLICIT | BRIDGE
+			| VARARGS | OVERRIDE;
 
 	/**
 	 * The modifiers that can be used on parameters.

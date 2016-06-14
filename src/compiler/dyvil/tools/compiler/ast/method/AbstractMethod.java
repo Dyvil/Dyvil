@@ -595,15 +595,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue receiver, IArguments arguments, GenericData genericData)
 	{
-		if (this.modifiers.hasIntModifier(Modifiers.PREFIX) && !this.isStatic())
-		{
-			// TODO get rid of prefix argument swapping
-
-			IValue argument = arguments.getFirstValue();
-			arguments.setFirstValue(receiver);
-			receiver = argument;
-		}
-
 		if (receiver != null)
 		{
 			final int mod = this.modifiers.toFlags() & Modifiers.INFIX;

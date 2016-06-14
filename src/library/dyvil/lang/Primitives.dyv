@@ -57,7 +57,7 @@ public final class Primitives
 	// Boolean Operators
 	
 	@Intrinsic([ LOAD_0, BNOT ])
-	public static func !(boolean v): boolean = !v
+	public prefix func !(boolean v): boolean = !v
 	
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
 	public infix func ==(boolean v1, boolean v2): boolean = v1 == v2
@@ -96,13 +96,13 @@ public final class Primitives
 	// Int Operators
 
 	@Intrinsic([ LOAD_0 ])
-	public static func +(int value): int = value
+	public prefix func +(int value): int = value
 
 	@Intrinsic([ LOAD_0, INEG ])
-	public static func -(int value): int = -value
+	public prefix func -(int value): int = -value
 
 	@Intrinsic([ LOAD_0, INOT ])
-    public static func ~(int value): int = ~value
+    public prefix func ~(int value): int = ~value
 
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
 	public infix func ==(int v1, int v2): boolean = v1 == v2
@@ -198,13 +198,13 @@ public final class Primitives
 	// Long Operators
 
 	@Intrinsic([ LOAD_0 ])
-	public static func +(long value): long = value
+	public prefix func +(long value): long = value
 
 	@Intrinsic([ LOAD_0, LNEG ])
-	public static func -(long value): long = -value
+	public prefix func -(long value): long = -value
 
 	@Intrinsic([ LOAD_0, LNOT ])
-	public static func ~(long value): long = ~value
+	public prefix func ~(long value): long = ~value
 
 	@Intrinsic([ LOAD_0, LOAD_1, LCMPEQ ])
 	public infix func ==(long v1, long v2): boolean = v1 == v2
@@ -290,10 +290,10 @@ public final class Primitives
 	// Float Operators
 
 	@Intrinsic([ LOAD_0 ])
-	public static func +(float value): float = value
+	public prefix func +(float value): float = value
 
 	@Intrinsic([ LOAD_0, FNEG ])
-	public static func -(float value): float = -value
+	public prefix func -(float value): float = -value
 
 	@Intrinsic([ LOAD_0, LOAD_1, FCMPEQ ])
 	public infix func ==(float v1, float v2): boolean = v1 == v2
@@ -345,10 +345,10 @@ public final class Primitives
 	// Double Operators
 
 	@Intrinsic([ LOAD_0 ])
-	public static func +(double value): double = value
+	public prefix func +(double value): double = value
 
 	@Intrinsic([ LOAD_0, DNEG ])
-	public static func -(double value): double = -value
+	public prefix func -(double value): double = -value
 
 	@Intrinsic([ LOAD_0, LOAD_1, DCMPEQ ])
 	public infix func ==(double v1, double v2): boolean = v1 == v2

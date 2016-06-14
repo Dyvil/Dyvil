@@ -1,5 +1,7 @@
 package dyvil.collection
 
+import dyvil.collection.immutable.PrependList
+
 public class ListOperators
 {
 	// List Operators
@@ -24,8 +26,7 @@ public class ListOperators
 
 	// Immutable List Operators
 
-	public infix inline func :: <E>(E head, ImmutableList<E> tail): ImmutableList<E>
-		= new dyvil.collection.immutable.PrependList(head, tail)
+	public infix inline func :: <T>(T head, ImmutableList<T> tail): ImmutableList<T> = new PrependList(head, tail)
 
 	public infix inline func + <T>(ImmutableList<T> list, T element): ImmutableList<T> = list.added(element)
 

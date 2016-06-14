@@ -17,7 +17,7 @@ public enum BaseModifiers implements Modifier
 	FINAL(Modifiers.FINAL, "final"),
 	ABSTRACT(Modifiers.ABSTRACT, "abstract"),
 	// Method Modifiers
-	PREFIX(Modifiers.PREFIX, "prefix"),
+	PREFIX(Modifiers.STATIC, "prefix"),
 	INFIX(Modifiers.INFIX, "infix"),
 	POSTFIX(Modifiers.INFIX, "postfix"),
 	IMPLICIT(Modifiers.IMPLICIT, "implicit"),

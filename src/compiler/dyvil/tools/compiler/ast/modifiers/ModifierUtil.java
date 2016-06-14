@@ -289,10 +289,6 @@ public final class ModifierUtil
 		{
 			sb.append("sealed ");
 		}
-		if ((mod & Modifiers.PREFIX) == Modifiers.PREFIX)
-		{
-			sb.append("prefix ");
-		}
 
 		if ((mod & Modifiers.SYNCHRONIZED) == Modifiers.SYNCHRONIZED)
 		{
