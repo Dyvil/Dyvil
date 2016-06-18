@@ -10,7 +10,7 @@ public class DyvilKeywords
 	public static final int CASE         = Tokens.KEYWORD | 0x00040000;
 	public static final int CATCH        = Tokens.KEYWORD | 0x00050000;
 	public static final int CLASS        = Tokens.KEYWORD | 0x00060000;
-	public static final int CONST        = Tokens.KEYWORD | 0x00070000;
+	public static final int CONST        = Tokens.KEYWORD | 0x00070000; // TODO use for expression templates
 	public static final int CONTINUE     = Tokens.KEYWORD | 0x00080000;
 	public static final int DO           = Tokens.KEYWORD | 0x00090000; // unused
 	public static final int ELSE         = Tokens.KEYWORD | 0x000A0000;
