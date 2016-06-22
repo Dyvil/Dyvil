@@ -36,6 +36,12 @@ public interface ObjectArray
 	{
 		return (T[]) Array.newInstance(type, count);
 	}
+
+	@DyvilModifiers(Modifiers.IMPLICIT | Modifiers.INLINE)
+	static <@Reified(erasure = true) T extends Rangeable<T>> T[] of(Range<T> range, Class<T> type)
+	{
+		return range.toArray(type);
+	}
 	
 	static <@Reified(erasure = true) T> T[] repeat(int count, T repeatedValue, Class<T> type)
 	{

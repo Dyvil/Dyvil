@@ -5,6 +5,7 @@ import dyvil.annotation.Mutating;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
+import dyvil.collection.range.LongRange;
 import dyvil.ref.LongRef;
 import dyvil.ref.array.LongArrayRef;
 import dyvil.reflect.Modifiers;
@@ -29,6 +30,12 @@ public interface LongArray
 	static long[] apply(int count)
 	{
 		return new long[count];
+	}
+
+	@DyvilModifiers(Modifiers.IMPLICIT | Modifiers.INLINE)
+	static long[] of(LongRange range)
+	{
+		return range.toLongArray();
 	}
 	
 	static long[] repeat(int count, long repeatedValue)
