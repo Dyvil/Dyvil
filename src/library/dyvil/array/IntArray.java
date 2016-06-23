@@ -5,6 +5,7 @@ import dyvil.annotation.Mutating;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
+import dyvil.collection.range.IntRange;
 import dyvil.ref.IntRef;
 import dyvil.ref.array.IntArrayRef;
 import dyvil.reflect.Modifiers;
@@ -29,6 +30,12 @@ public interface IntArray
 	static int[] apply(int count)
 	{
 		return new int[count];
+	}
+
+	@DyvilModifiers(Modifiers.IMPLICIT | Modifiers.INLINE)
+	static int[] of(IntRange range)
+	{
+		return range.toIntArray();
 	}
 	
 	static int[] repeat(int count, int repeatedValue)

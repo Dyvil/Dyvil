@@ -88,7 +88,6 @@ public interface IValue extends IASTNode, ITyped
 	int CLASS_OPERATOR    = 132;
 	int TYPE_OPERATOR     = 133;
 	int NULLCHECK         = 134;
-	int RANGE_OPERATOR    = 135;
 	int STRINGBUILDER     = 136;
 	int INC               = 137;
 	int COLON             = 138;

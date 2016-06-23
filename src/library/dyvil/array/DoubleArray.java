@@ -5,6 +5,7 @@ import dyvil.annotation.Mutating;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
+import dyvil.collection.range.DoubleRange;
 import dyvil.ref.DoubleRef;
 import dyvil.ref.array.DoubleArrayRef;
 import dyvil.reflect.Modifiers;
@@ -29,6 +30,12 @@ public interface DoubleArray
 	static double[] apply(int count)
 	{
 		return new double[count];
+	}
+
+	@DyvilModifiers(Modifiers.IMPLICIT | Modifiers.INLINE)
+	static double[] of(DoubleRange range)
+	{
+		return range.toDoubleArray();
 	}
 	
 	static double[] repeat(int count, double repeatedValue)

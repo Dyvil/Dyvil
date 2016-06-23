@@ -5,6 +5,7 @@ import dyvil.annotation.Mutating;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
+import dyvil.collection.range.FloatRange;
 import dyvil.ref.FloatRef;
 import dyvil.ref.array.FloatArrayRef;
 import dyvil.reflect.Modifiers;
@@ -29,6 +30,12 @@ public interface FloatArray
 	static float[] apply(int count)
 	{
 		return new float[count];
+	}
+
+	@DyvilModifiers(Modifiers.IMPLICIT | Modifiers.INLINE)
+	static float[] of(FloatRange range)
+	{
+		return range.toFloatArray();
 	}
 	
 	static float[] repeat(int count, float repeatedValue)
