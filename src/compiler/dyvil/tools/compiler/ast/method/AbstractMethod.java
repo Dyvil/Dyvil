@@ -102,7 +102,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		this.enclosingClass = enclosingClass;
 	}
 
-	public AbstractMethod(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public AbstractMethod(ICodePosition position, Name name, IType type, ModifierSet modifiers,
+		                     AnnotationList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
 	}
@@ -556,8 +557,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			// and only take exactly one parameter
 			return;
 		}
-		if (type != null && !Types.isSuperType(type,
-		                                       this.getType())) // getType to ensure it is resolved by ExternalMethods
+		if (type != null && !Types.isSuperType(type, this.getType()
+		                                                 .asParameterType())) // getType to ensure it is resolved by ExternalMethods
 		{
 			// The method's return type has to be a sub-type of the target type
 			return;
@@ -593,7 +594,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue receiver, IArguments arguments, GenericData genericData)
+	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue receiver,
+		                            IArguments arguments, GenericData genericData)
 	{
 		if (receiver != null)
 		{
@@ -738,7 +740,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext)
+	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IValue instance,
+		                     IArguments arguments, ITypeContext typeContext)
 	{
 		ModifierUtil.checkVisibility(this, position, markers, context);
 
@@ -963,8 +966,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, IType targetType, int lineNumber)
-		throws BytecodeException
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext,
+		                     IType targetType, int lineNumber) throws BytecodeException
 	{
 		if (this.intrinsicData != null)
 		{
@@ -991,8 +994,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
-		throws BytecodeException
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments,
+		                     ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
 		if (this.intrinsicData != null)
 		{
@@ -1005,8 +1008,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
-		throws BytecodeException
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments,
+		                        ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
 		if (this.intrinsicData != null)
 		{
@@ -1055,8 +1058,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 	}
 
-	private void writeArgumentsAndInvoke(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
-		throws BytecodeException
+	private void writeArgumentsAndInvoke(MethodWriter writer, IValue instance, IArguments arguments,
+		                                    ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
 		this.writeReceiver(writer, instance);
 		this.writeArguments(writer, instance, arguments);
@@ -1064,8 +1067,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
-		throws BytecodeException
+	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext,
+		                       int lineNumber) throws BytecodeException
 	{
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
