@@ -103,6 +103,8 @@ public interface IClassBody extends IASTNode, IClassList, IMemberConsumer<IField
 	IInitializer getInitializer(int index);
 
 	// Phases
+
+	void initExternalCache();
 	
 	void resolveTypes(MarkerList markers, IContext context);
 	

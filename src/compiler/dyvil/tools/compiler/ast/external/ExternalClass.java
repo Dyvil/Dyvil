@@ -56,6 +56,7 @@ public final class ExternalClass extends AbstractClass
 	private static final int METADATA    = 1;
 	private static final int SUPER_TYPES = 1 << 1;
 	private static final int GENERICS    = 1 << 2;
+	private static final int BODY_CACHE  = 1 << 3;
 	private static final int ANNOTATIONS = 1 << 4;
 	private static final int INNER_TYPES = 1 << 5;
 
@@ -118,6 +119,12 @@ public final class ExternalClass extends AbstractClass
 		}
 
 		this.thisType = type;
+	}
+
+	private void resolveBodyCache()
+	{
+		this.body.initExternalCache();
+		this.resolved |= BODY_CACHE;
 	}
 
 	private void resolveSuperTypes()
@@ -362,11 +369,16 @@ public final class ExternalClass extends AbstractClass
 		{
 			this.resolveSuperTypes();
 		}
+		if ((this.resolved & BODY_CACHE) == 0)
+		{
+			this.resolveBodyCache();
+		}
 		return super.checkImplements(candidate, typeContext);
 	}
 
 	@Override
-	public void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext, Set<IClass> checkedClasses)
+	public void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext,
+		                        Set<IClass> checkedClasses)
 	{
 		if ((this.resolved & GENERICS) == 0)
 		{
@@ -455,6 +467,10 @@ public final class ExternalClass extends AbstractClass
 		if ((this.resolved & GENERICS) == 0)
 		{
 			this.resolveGenerics();
+		}
+		if ((this.resolved & BODY_CACHE) == 0)
+		{
+			this.resolveBodyCache();
 		}
 
 		/*
@@ -651,7 +667,8 @@ public final class ExternalClass extends AbstractClass
 			return new SimpleFieldVisitor(param);
 		}
 
-		final ExternalField field = new ExternalField(this, Name.fromQualified(name), desc, type, new FlagModifierSet(access));
+		final ExternalField field = new ExternalField(this, Name.fromQualified(name), desc, type,
+		                                              new FlagModifierSet(access));
 
 		if (value != null)
 		{
@@ -702,7 +719,8 @@ public final class ExternalClass extends AbstractClass
 
 		if (this.isAnnotation())
 		{
-			final ClassParameter param = new ExternalClassParameter(this, Name.fromQualified(name), ClassFormat.readReturnType(desc),
+			final ClassParameter param = new ExternalClassParameter(this, Name.fromQualified(name),
+			                                                        ClassFormat.readReturnType(desc),
 			                                                        new FlagModifierSet(access));
 			this.parameters.addParameter(param);
 			return new AnnotationClassVisitor(param);

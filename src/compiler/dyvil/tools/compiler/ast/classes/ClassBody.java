@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.classes;
 
+import dyvil.math.MathUtils;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
@@ -27,6 +28,26 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class ClassBody implements IClassBody
 {
+	private static class MethodLink
+	{
+		protected IMethod    method;
+		protected MethodLink next;
+		protected int        hash;
+
+		public MethodLink(IMethod method, int hash)
+		{
+			this.method = method;
+			this.hash = hash;
+		}
+
+		public MethodLink(IMethod method, int hash, MethodLink next)
+		{
+			this.method = method;
+			this.hash = hash;
+			this.next = next;
+		}
+	}
+
 	public IClass theClass;
 
 	public IClass[] classes;
@@ -43,7 +64,9 @@ public class ClassBody implements IClassBody
 	private IInitializer[] initializers = new IInitializer[1];
 	private int initializerCount;
 
-	protected IMethod functionalMethod;
+	// Cache
+	protected MethodLink[] methodCache;
+	protected IMethod      functionalMethod;
 
 	public ClassBody(IClass iclass)
 	{
@@ -148,7 +171,8 @@ public class ClassBody implements IClassBody
 	}
 
 	@Override
-	public IField createDataMember(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public IField createDataMember(ICodePosition position, Name name, IType type, ModifierSet modifiers,
+		                              AnnotationList annotations)
 	{
 		return new Field(this.theClass, position, name, type, modifiers, annotations);
 	}
@@ -262,20 +286,41 @@ public class ClassBody implements IClassBody
 	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
+		final int cacheSize = this.methodCache.length;
+		if (cacheSize == 0)
+		{
+			return;
+		}
+
+		if (name != null)
+		{
+			final int hash = hash(name);
+			final int index = hash & (cacheSize - 1);
+			for (MethodLink link = this.methodCache[index]; link != null; link = link.next)
+			{
+				if (link.hash == hash)
+				{
+					link.method.checkMatch(list, receiver, name, arguments);
+				}
+			}
+
+			return;
+		}
+
 		for (int i = 0; i < this.methodCount; i++)
 		{
-			this.methods[i].checkMatch(list, receiver, name, arguments);
+			this.methods[i].checkMatch(list, receiver, null, arguments);
 		}
 		for (int i = 0; i < this.propertyCount; i++)
 		{
-			this.properties[i].checkMatch(list, receiver, name, arguments);
+			this.properties[i].checkMatch(list, receiver, null, arguments);
 		}
 		for (int i = 0; i < this.fieldCount; i++)
 		{
 			final IProperty property = this.fields[i].getProperty();
 			if (property != null)
 			{
-				property.checkMatch(list, receiver, name, arguments);
+				property.checkMatch(list, receiver, null, arguments);
 			}
 		}
 	}
@@ -299,6 +344,118 @@ public class ClassBody implements IClassBody
 	public void setFunctionalMethod(IMethod functionalMethod)
 	{
 		this.functionalMethod = functionalMethod;
+	}
+
+	@Override
+	public boolean checkImplements(IMethod candidate, ITypeContext typeContext)
+	{
+		final int cacheSize = this.methodCache.length;
+		if (cacheSize == 0)
+		{
+			return false;
+		}
+
+		final int hash = hash(candidate.getName());
+		final int index = hash & (cacheSize - 1);
+		for (MethodLink link = this.methodCache[index]; link != null; link = link.next)
+		{
+			if (link.hash == hash && checkMethodImplements(link.method, candidate, typeContext))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public static boolean checkMethodImplements(IMethod method, IMethod candidate, ITypeContext typeContext)
+	{
+		if (method.checkOverride(candidate, typeContext))
+		{
+			method.addOverride(candidate);
+			return !method.hasModifier(Modifiers.ABSTRACT);
+		}
+		return false;
+	}
+
+	public static boolean checkPropertyImplements(IProperty property, IMethod candidate, ITypeContext typeContext)
+	{
+		final IMethod getter = property.getGetter();
+		if (getter != null && checkMethodImplements(getter, candidate, typeContext))
+		{
+			return true;
+		}
+
+		final IMethod setter = property.getSetter();
+		return setter != null && checkMethodImplements(setter, candidate, typeContext);
+	}
+
+	@Override
+	public void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext)
+	{
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			checkMethod(this.methods[i], markers, checkedClass, typeContext);
+		}
+		for (int i = 0; i < this.propertyCount; i++)
+		{
+			checkProperty(this.properties[i], markers, checkedClass, typeContext);
+		}
+		for (int i = 0; i < this.fieldCount; i++)
+		{
+			final IProperty property = this.fields[i].getProperty();
+			if (property != null)
+			{
+				checkProperty(property, markers, checkedClass, typeContext);
+			}
+		}
+	}
+
+	public static void checkMethod(IMethod method, MarkerList markers, IClass checkedClass, ITypeContext typeContext)
+	{
+		if (method.hasModifier(Modifiers.STATIC))
+		{
+			// Don't check static methods
+			return;
+		}
+
+		// Check if the super class implements the method
+		// We cannot do the modifier checks beforehand, because methods need to know which methods they implement to
+		// generate bridges.
+		if (checkedClass.checkImplements(method, typeContext))
+		{
+			return;
+		}
+
+		// If it doesn't, check for abstract modifiers
+		if (method.hasModifier(Modifiers.ABSTRACT) && !checkedClass.hasModifier(Modifiers.ABSTRACT))
+		{
+			// Create an abstract method error
+			markers.add(Markers.semantic(checkedClass.getPosition(), "class.method.abstract", checkedClass.getName(),
+			                             method.getName(), method.getEnclosingClass().getName()));
+		}
+	}
+
+	public static void checkProperty(IProperty property, MarkerList markers, IClass checkedClass,
+		                                ITypeContext typeContext)
+	{
+		if (property.hasModifier(Modifiers.STATIC))
+		{
+			// Don't check static properties
+			return;
+		}
+
+		final IMethod getter = property.getGetter();
+		if (getter != null)
+		{
+			checkMethod(getter, markers, checkedClass, typeContext);
+		}
+
+		final IMethod setter = property.getSetter();
+		if (setter != null)
+		{
+			checkMethod(setter, markers, checkedClass, typeContext);
+		}
 	}
 
 	// Constructors
@@ -388,9 +545,33 @@ public class ClassBody implements IClassBody
 	// Phases
 
 	@Override
+	public void initExternalCache()
+	{
+		final int cacheSize = MathUtils.powerOfTwo(this.methodCount);
+		final int mask = cacheSize - 1;
+		final MethodLink[] cache = this.methodCache = new MethodLink[cacheSize];
+
+		// External Classes do not have any properties or fields with properties
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			addMethod(cache, this.methods[i], mask);
+		}
+	}
+
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		final IDyvilHeader header = this.theClass.getHeader();
+
+		/*
+		 * The cache size is calculated as follows: We sum the number of methods assuming they all have unique names, add
+		 * twice the amount of properties with the same assumption and half the amount of fields, assuming there are
+		 * as many property getters and setters as there are fields. At the end, we compute the next power of two that
+		 * is larger than our sum, and use it as the cache size.
+		 */
+		final int cacheSize = MathUtils.powerOfTwo(this.methodCount + (this.propertyCount << 1) + this.fieldCount);
+		final int mask = cacheSize - 1;
+		final MethodLink[] cache = this.methodCache = new MethodLink[cacheSize];
 
 		for (int i = 0; i < this.classCount; i++)
 		{
@@ -398,18 +579,33 @@ public class ClassBody implements IClassBody
 			innerClass.setHeader(header);
 			innerClass.resolveTypes(markers, context);
 		}
+
 		for (int i = 0; i < this.fieldCount; i++)
 		{
-			this.fields[i].resolveTypes(markers, context);
+			final IField field = this.fields[i];
+			field.resolveTypes(markers, context);
+
+			final IProperty property = field.getProperty();
+			if (property != null)
+			{
+				addProperty(cache, property, mask);
+			}
 		}
+
 		for (int i = 0; i < this.propertyCount; i++)
 		{
-			this.properties[i].resolveTypes(markers, context);
+			final IProperty property = this.properties[i];
+			property.resolveTypes(markers, context);
+			addProperty(cache, property, mask);
 		}
+
 		for (int i = 0; i < this.methodCount; i++)
 		{
-			this.methods[i].resolveTypes(markers, context);
+			final IMethod method = this.methods[i];
+			method.resolveTypes(markers, context);
+			addMethod(cache, method, mask);
 		}
+
 		for (int i = 0; i < this.constructorCount; i++)
 		{
 			this.constructors[i].resolveTypes(markers, context);
@@ -418,6 +614,33 @@ public class ClassBody implements IClassBody
 		{
 			this.initializers[i].resolveTypes(markers, context);
 		}
+	}
+
+	private static void addProperty(MethodLink[] cache, IProperty property, int mask)
+	{
+		final IMethod getter = property.getGetter();
+		if (getter != null)
+		{
+			addMethod(cache, getter, mask);
+		}
+
+		final IMethod setter = property.getSetter();
+		if (setter != null)
+		{
+			addMethod(cache, setter, mask);
+		}
+	}
+
+	private static void addMethod(MethodLink[] cache, IMethod method, int mask)
+	{
+		final int hash = hash(method.getName());
+		final int index = hash & mask;
+		cache[index] = new MethodLink(method, hash, cache[index]);
+	}
+
+	private static int hash(Name name)
+	{
+		return name.unqualified.hashCode();
 	}
 
 	@Override
@@ -475,123 +698,6 @@ public class ClassBody implements IClassBody
 		for (int i = 0; i < this.initializerCount; i++)
 		{
 			this.initializers[i].checkTypes(markers, context);
-		}
-	}
-
-	@Override
-	public boolean checkImplements(IMethod candidate, ITypeContext typeContext)
-	{
-		for (int i = 0; i < this.methodCount; i++)
-		{
-			if (checkMethodImplements(this.methods[i], candidate, typeContext))
-			{
-				return true;
-			}
-		}
-		for (int i = 0; i < this.propertyCount; i++)
-		{
-			if (checkPropertyImplements(this.properties[i], candidate, typeContext))
-			{
-				return true;
-			}
-		}
-		for (int i = 0; i < this.fieldCount; i++)
-		{
-			final IProperty property = this.fields[i].getProperty();
-			if (property != null && checkPropertyImplements(property, candidate, typeContext))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public static boolean checkMethodImplements(IMethod method, IMethod candidate, ITypeContext typeContext)
-	{
-		if (method.checkOverride(candidate, typeContext))
-		{
-			method.addOverride(candidate);
-			return !method.hasModifier(Modifiers.ABSTRACT);
-		}
-		return false;
-	}
-
-	public static boolean checkPropertyImplements(IProperty property, IMethod candidate, ITypeContext typeContext)
-	{
-		final IMethod getter = property.getGetter();
-		if (getter != null && checkMethodImplements(getter, candidate, typeContext))
-		{
-			return true;
-		}
-
-		final IMethod setter = property.getSetter();
-		return setter != null && checkMethodImplements(setter, candidate, typeContext);
-	}
-
-	@Override
-	public void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext)
-	{
-		for (int i = 0; i < this.methodCount; i++)
-		{
-			checkMethod(this.methods[i], markers, checkedClass, typeContext);
-		}
-		for (int i = 0; i < this.propertyCount; i++)
-		{
-			checkProperty(this.properties[i], markers, checkedClass, typeContext);
-		}
-		for (int i = 0; i < this.fieldCount; i++)
-		{
-			final IProperty property = this.fields[i].getProperty();
-			if (property != null)
-			{
-				checkProperty(property, markers, checkedClass, typeContext);
-			}
-		}
-	}
-
-	public static void checkMethod(IMethod method, MarkerList markers, IClass checkedClass, ITypeContext typeContext)
-	{
-		if (method.hasModifier(Modifiers.STATIC))
-		{
-			// Don't check static methods
-			return;
-		}
-
-		// Check if the super class implements the method
-		// We cannot do the modifier checks beforehand, because methods need to know which methods they implement to
-		// generate bridges.
-		if (checkedClass.checkImplements(method, typeContext))
-		{
-			return;
-		}
-
-		// If it doesn't, check for abstract modifiers
-		if (method.hasModifier(Modifiers.ABSTRACT) && !checkedClass.hasModifier(Modifiers.ABSTRACT))
-		{
-			// Create an abstract method error
-			markers.add(Markers.semantic(checkedClass.getPosition(), "class.method.abstract", checkedClass.getName(),
-			                             method.getName(), method.getEnclosingClass().getName()));
-		}
-	}
-
-	public static void checkProperty(IProperty property, MarkerList markers, IClass checkedClass, ITypeContext typeContext)
-	{
-		if (property.hasModifier(Modifiers.STATIC))
-		{
-			// Don't check static properties
-			return;
-		}
-
-		final IMethod getter = property.getGetter();
-		if (getter != null)
-		{
-			checkMethod(getter, markers, checkedClass, typeContext);
-		}
-
-		final IMethod setter = property.getSetter();
-		if (setter != null)
-		{
-			checkMethod(setter, markers, checkedClass, typeContext);
 		}
 	}
 
