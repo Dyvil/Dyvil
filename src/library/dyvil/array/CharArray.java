@@ -20,15 +20,35 @@ import static dyvil.reflect.Opcodes.*;
 public interface CharArray
 {
 	char[] EMPTY = new char[0];
-	
-	static char[] apply()
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static char[] empty()
 	{
 		return EMPTY;
 	}
-	
-	static char[] apply(int count)
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static char[] empty(int size)
 	{
-		return new char[count];
+		return new char[size];
+	}
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static char[] apply()
+	{
+		return new char[0];
+	}
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static char[] apply(char... values)
+	{
+		return values;
+	}
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static char[] from(char[] array)
+	{
+		return array.clone();
 	}
 	
 	static char[] repeat(int count, char repeatedValue)

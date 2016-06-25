@@ -21,19 +21,39 @@ import static dyvil.reflect.Opcodes.*;
 public interface FloatArray
 {
 	float[] EMPTY = new float[0];
-	
-	static float[] apply()
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static float[] empty()
 	{
 		return EMPTY;
 	}
-	
-	static float[] apply(int count)
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static float[] empty(int size)
 	{
-		return new float[count];
+		return new float[size];
+	}
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static float[] apply()
+	{
+		return new float[0];
+	}
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static float[] apply(float... values)
+	{
+		return values;
+	}
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static float[] from(float[] array)
+	{
+		return array.clone();
 	}
 
 	@DyvilModifiers(Modifiers.IMPLICIT | Modifiers.INLINE)
-	static float[] of(FloatRange range)
+	static float[] from(FloatRange range)
 	{
 		return range.toFloatArray();
 	}
@@ -54,17 +74,6 @@ public interface FloatArray
 		for (int i = 0; i < count; i++)
 		{
 			array[i] = (float) generator.applyAsDouble(i);
-		}
-		return array;
-	}
-	
-	static float[] apply(float start, float end)
-	{
-		int i = 0;
-		float[] array = new float[(int) (end - start + 1)];
-		for (; start <= end; start++)
-		{
-			array[i++] = start;
 		}
 		return array;
 	}

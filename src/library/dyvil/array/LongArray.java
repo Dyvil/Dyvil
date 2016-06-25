@@ -21,19 +21,39 @@ import static dyvil.reflect.Opcodes.*;
 public interface LongArray
 {
 	long[] EMPTY = new long[0];
-	
-	static long[] apply()
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static long[] empty()
 	{
 		return EMPTY;
 	}
-	
-	static long[] apply(int count)
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static long[] empty(int size)
 	{
-		return new long[count];
+		return new long[size];
+	}
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static long[] apply()
+	{
+		return new long[0];
+	}
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static long[] apply(long... values)
+	{
+		return values;
+	}
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static long[] from(long[] array)
+	{
+		return array.clone();
 	}
 
 	@DyvilModifiers(Modifiers.IMPLICIT | Modifiers.INLINE)
-	static long[] of(LongRange range)
+	static long[] from(LongRange range)
 	{
 		return range.toLongArray();
 	}

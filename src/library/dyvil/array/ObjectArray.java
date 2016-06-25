@@ -26,19 +26,40 @@ import static dyvil.reflect.Opcodes.*;
 public interface ObjectArray
 {
 	Object[] EMPTY = new Object[0];
-	
-	static <T> T[] apply()
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static <@Reified(erasure = true) T> T[] empty(Class<T> type)
 	{
-		return (T[]) EMPTY;
+		return empty(0, type);
 	}
-	
-	static <@Reified(erasure = true) T> T[] apply(int count, Class<T> type)
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static <@Reified(erasure = true) T> T[] empty(int size, Class<T> type)
 	{
-		return (T[]) Array.newInstance(type, count);
+		return (T[]) Array.newInstance(type, size);
+	}
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static <@Reified(erasure = true) T> T[] apply(Class<T> type)
+	{
+		return empty(0, type);
+	}
+
+	@SafeVarargs
+	@DyvilModifiers(Modifiers.INLINE)
+	static <T> T[] apply(T... values)
+	{
+		return values;
+	}
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static <T> T[] from(T[] array)
+	{
+		return array.clone();
 	}
 
 	@DyvilModifiers(Modifiers.IMPLICIT)
-	static <@Reified(erasure = true) T extends Rangeable<T>> T[] of(Range<T> range, Class<T> type)
+	static <@Reified(erasure = true) T extends Rangeable<T>> T[] from(Range<T> range, Class<T> type)
 	{
 		return range.toArray(type);
 	}

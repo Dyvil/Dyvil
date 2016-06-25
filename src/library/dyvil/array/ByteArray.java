@@ -20,17 +20,37 @@ import static dyvil.reflect.Opcodes.*;
 public interface ByteArray
 {
 	byte[] EMPTY = new byte[0];
-	
-	static byte[] apply()
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static byte[] empty()
 	{
 		return EMPTY;
 	}
-	
-	static byte[] apply(int count)
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static byte[] empty(int size)
 	{
-		return new byte[count];
+		return new byte[size];
 	}
-	
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static byte[] apply()
+	{
+		return new byte[0];
+	}
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static byte[] apply(byte... values)
+	{
+		return values;
+	}
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static byte[] from(byte[] array)
+	{
+		return array.clone();
+	}
+
 	static byte[] repeat(int count, byte repeatedValue)
 	{
 		byte[] array = new byte[count];

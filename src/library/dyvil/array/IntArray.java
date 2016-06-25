@@ -21,19 +21,39 @@ import static dyvil.reflect.Opcodes.*;
 public interface IntArray
 {
 	int[] EMPTY = new int[0];
-	
-	static int[] apply()
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static int[] empty()
 	{
 		return EMPTY;
 	}
-	
-	static int[] apply(int count)
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static int[] empty(int size)
 	{
-		return new int[count];
+		return new int[size];
+	}
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static int[] apply()
+	{
+		return new int[0];
+	}
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static int[] apply(int... values)
+	{
+		return values;
+	}
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static int[] from(int[] array)
+	{
+		return array.clone();
 	}
 
 	@DyvilModifiers(Modifiers.IMPLICIT | Modifiers.INLINE)
-	static int[] of(IntRange range)
+	static int[] from(IntRange range)
 	{
 		return range.toIntArray();
 	}
