@@ -426,11 +426,15 @@ public final class PrimitiveType implements IType
 	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
-		Types.PRIMITIVES_CLASS.getMethodMatches(list, receiver, name, arguments);
 		if (this.theClass != null)
 		{
 			this.theClass.getMethodMatches(list, receiver, name, arguments);
+			if (!list.isEmpty())
+			{
+				return;
+			}
 		}
+		Types.PRIMITIVES_CLASS.getMethodMatches(list, receiver, name, arguments);
 	}
 
 	@Override
