@@ -4,6 +4,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IMemberContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -113,7 +114,12 @@ public class NamedType implements IRawType, ITypeConsumer
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
-		final IType resolved = this.resolveType0(markers, context);
+		final IType resolved = NamedType.resolveType(markers, context, this.name, this.position, this.parent);
+		if (resolved == null)
+		{
+			return this;
+		}
+
 		// If the type is not a Type Variable Reference
 		if (resolved.getTypeVariable() == null && resolved != Types.UNKNOWN)
 		{
@@ -124,52 +130,68 @@ public class NamedType implements IRawType, ITypeConsumer
 		return resolved;
 	}
 
-	public IType resolveType0(MarkerList markers, IContext context)
+	public static IType resolveType(MarkerList markers, IContext context, Name name, ICodePosition position,
+		                               IType parent)
 	{
-		if (this.parent != null)
+		if (parent == null)
 		{
-			this.parent = this.parent.resolveType(markers, context);
-
-			if (!this.parent.isResolved())
+			final IType type = resolveTopLevel(context, name, position);
+			if (type != null)
 			{
-				return this;
+				return type;
 			}
 
-			final IClass theClass = this.parent.resolveClass(this.name);
-			if (theClass != null)
-			{
-				return new ResolvedClassType(theClass, this.position);
-			}
-
-			final Package thePackage = this.parent.resolvePackage(this.name);
-			if (thePackage != null)
-			{
-				return new PackageType(thePackage);
-			}
-
-			markers.add(Markers.semanticError(this.position, "resolve.type.package", this.name, this.parent));
-			return this;
+			markers.add(Markers.semanticError(position, "resolve.type", name));
+			return null;
 		}
 
-		final IType primitive = Types.resolvePrimitive(this.name);
-		if (primitive != null)
-		{
-			if (primitive == Types.UNKNOWN)
-			{
-				markers.add(Markers.semanticWarning(this.position, "type.auto.deprecated"));
-			}
+		parent = parent.resolveType(markers, context);
 
-			return primitive.atPosition(this.position);
+		if (!parent.isResolved())
+		{
+			return null;
 		}
 
-		final IType type = IContext.resolveType(context, this.name);
+		final IType type = resolveWithParent(parent, name, position);
 		if (type != null)
 		{
-			return type.atPosition(this.position);
+			return type;
 		}
 
-		markers.add(Markers.semanticError(this.position, "resolve.type", this.name));
-		return this;
+		markers.add(Markers.semanticError(position, "resolve.type.package", name, parent));
+		return null;
+	}
+
+	public static IType resolveWithParent(IMemberContext context, Name name, ICodePosition position)
+	{
+		final IClass theClass = context.resolveClass(name);
+		if (theClass != null)
+		{
+			return new ResolvedClassType(theClass, position);
+		}
+
+		final Package thePackage = context.resolvePackage(name);
+		if (thePackage != null)
+		{
+			return new PackageType(thePackage);
+		}
+		return null;
+	}
+
+	public static IType resolveTopLevel(IContext context, Name name, ICodePosition position)
+	{
+		final IType primitive = Types.resolvePrimitive(name);
+		if (primitive != null)
+		{
+			return primitive.atPosition(position);
+		}
+
+		final IType type = IContext.resolveType(context, name);
+		if (type != null)
+		{
+			return type.atPosition(position);
+		}
+		return null;
 	}
 
 	@Override

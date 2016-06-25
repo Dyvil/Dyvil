@@ -28,7 +28,7 @@ public class NamedGenericType extends GenericType
 	protected IType         parent;
 	protected ICodePosition position;
 	protected Name          name;
-	
+
 	public NamedGenericType(ICodePosition position, Name name)
 	{
 		this.position = position;
@@ -41,30 +41,30 @@ public class NamedGenericType extends GenericType
 		this.name = name;
 		this.parent = parent;
 	}
-	
+
 	@Override
 	public int typeTag()
 	{
 		return GENERIC_NAMED;
 	}
-	
+
 	@Override
 	public Name getName()
 	{
 		return this.name;
 	}
-	
+
 	@Override
 	public IClass getTheClass()
 	{
 		return Types.OBJECT_CLASS;
 	}
-	
+
 	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
 	}
-	
+
 	@Override
 	public IType resolveType(ITypeParameter typeParameter)
 	{
@@ -88,7 +88,7 @@ public class NamedGenericType extends GenericType
 	{
 		return false;
 	}
-	
+
 	private void resolveTypeArguments(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.typeArgumentCount; i++)
@@ -96,16 +96,16 @@ public class NamedGenericType extends GenericType
 			this.typeArguments[i] = this.typeArguments[i].resolveType(markers, context);
 		}
 	}
-	
+
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
 		// resolveType0 is used to avoid Type Variable -> Default Value replacement done by resolveType
-		final IType resolved = new NamedType(this.position, this.name, this.parent).resolveType0(markers, context);
+		final IType resolved = NamedType.resolveType(markers, context, this.name, this.position, this.parent);
 
 		this.resolveTypeArguments(markers, context);
 
-		if (!resolved.isResolved())
+		if (resolved == null || !resolved.isResolved())
 		{
 			return this;
 		}
@@ -118,8 +118,8 @@ public class NamedGenericType extends GenericType
 		{
 			if (!iClass.isTypeParametric())
 			{
-				markers.add(
-						Markers.semanticError(this.position, "type.generic.class_not_generic", iClass.getFullName()));
+				markers
+					.add(Markers.semanticError(this.position, "type.generic.class_not_generic", iClass.getFullName()));
 				return new ClassType(iClass);
 			}
 
@@ -140,13 +140,13 @@ public class NamedGenericType extends GenericType
 
 		return concrete;
 	}
-	
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
 		return null;
 	}
-	
+
 	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
@@ -161,31 +161,31 @@ public class NamedGenericType extends GenericType
 	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
 	{
 	}
-	
+
 	@Override
 	public IMethod getFunctionalMethod()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public String getInternalName()
 	{
 		return this.name.qualified;
 	}
-	
+
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
 		out.writeUTF(this.name.qualified);
 	}
-	
+
 	@Override
 	public void read(DataInput in) throws IOException
 	{
 		this.name = Name.fromRaw(in.readUTF());
 	}
-	
+
 	@Override
 	public String toString()
 	{
@@ -193,7 +193,7 @@ public class NamedGenericType extends GenericType
 		this.appendFullTypes(sb);
 		return sb.toString();
 	}
-	
+
 	@Override
 	public GenericType clone()
 	{
