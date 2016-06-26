@@ -1,10 +1,11 @@
 package dyvil.tools.compiler.ast.expression;
 
-import dyvil.tools.compiler.ast.access.MethodCall;
+import dyvil.tools.compiler.ast.access.AbstractCall;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.type.IType;
@@ -15,10 +16,17 @@ import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
-public final class LiteralConversion extends MethodCall
+public class LiteralConversion extends AbstractCall
 {
-	private IValue literal;
+	protected IValue literal;
+	protected Name   name;
+
+	public LiteralConversion(ICodePosition position)
+	{
+		this.position = position;
+	}
 
 	public LiteralConversion(IValue literal, IAnnotation annotation)
 	{
@@ -27,8 +35,10 @@ public final class LiteralConversion extends MethodCall
 
 	public LiteralConversion(IValue literal, IAnnotation annotation, IArguments arguments)
 	{
-		super(literal.getPosition(), null, getMethodName(annotation), arguments);
+		this.position = literal.getPosition();
 		this.literal = literal;
+		this.name = getMethodName(annotation);
+		this.arguments = arguments;
 	}
 
 	public LiteralConversion(IValue literal, IMethod method)
@@ -38,16 +48,23 @@ public final class LiteralConversion extends MethodCall
 
 	public LiteralConversion(IValue literal, IMethod method, IArguments arguments)
 	{
-		super(literal.getPosition(), null, method, arguments);
+		this.position = literal.getPosition();
 		this.literal = literal;
+		this.arguments = arguments;
+
+		if (method != null)
+		{
+			this.method = method;
+			this.name = method.getName();
+		}
 	}
 
 	public static Name getMethodName(IAnnotation annotation)
 	{
-		IValue v = annotation.getArguments().getFirstValue();
-		if (v != null)
+		final IValue value = annotation.getArguments().getFirstValue();
+		if (value != null)
 		{
-			return Name.from(v.stringValue());
+			return Name.from(value.stringValue());
 		}
 		return Names.apply;
 	}
@@ -59,20 +76,37 @@ public final class LiteralConversion extends MethodCall
 	}
 
 	@Override
+	public Name getName()
+	{
+		return this.name;
+	}
+
+	@Override
+	protected Name getReferenceName()
+	{
+		return this.name;
+	}
+
+	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (this.method == null)
 		{
-			this.method = IContext.resolveMethod(type, null, this.name, this.arguments);
-			if (this.method == null)
+			final MatchList<IMethod> candidates = IContext.resolveMethods(type, null, this.name, this.arguments);
+			if (candidates.isEmpty())
 			{
-				StringBuilder builder = new StringBuilder();
-				this.arguments.typesToString(builder);
-				markers.add(Markers.semantic(this.literal.getPosition(), "literal.method", this.literal.getType(), type,
-				                             builder));
 				this.type = type;
+				this.reportResolve(markers, candidates);
 				return this;
 			}
+			else if (candidates.isAmbigous())
+			{
+				this.type = type;
+				super.reportResolve(markers, candidates);
+				return this;
+			}
+
+			this.method = candidates.getBestMember();
 		}
 
 		this.checkArguments(markers, context);
@@ -80,7 +114,7 @@ public final class LiteralConversion extends MethodCall
 		final IType thisType = this.getType();
 		if (!Types.isSuperType(type, thisType))
 		{
-			final Marker marker = Markers.semantic(this.literal.getPosition(), "literal.type.incompatible");
+			final Marker marker = Markers.semantic(this.position, "literal.type.incompatible");
 			marker.addInfo(Markers.getSemantic("type.expected", type));
 			marker.addInfo(Markers.getSemantic("literal.type.conversion", thisType));
 
@@ -92,6 +126,13 @@ public final class LiteralConversion extends MethodCall
 		}
 
 		return this;
+	}
+
+	@Override
+	protected void reportResolve(MarkerList markers, MatchList<IMethod> matches)
+	{
+		markers.add(Markers.semanticError(this.position, "literal.method", this.literal.getType(), this.type, this.name,
+		                                  this.arguments.typesToString()));
 	}
 
 	@Override
