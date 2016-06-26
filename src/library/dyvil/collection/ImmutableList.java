@@ -142,16 +142,16 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	ImmutableList<E> added(E element);
 	
 	@Override
-	ImmutableList<? extends E> union(Collection<? extends E> collection);
+	ImmutableList<E> union(Collection<? extends E> collection);
 	
 	@Override
 	ImmutableList<E> removed(Object element);
 	
 	@Override
-	ImmutableList<? extends E> difference(Collection<?> collection);
+	ImmutableList<E> difference(Collection<?> collection);
 	
 	@Override
-	ImmutableList<? extends E> intersection(Collection<? extends E> collection);
+	ImmutableList<E> intersection(Collection<? extends E> collection);
 	
 	@Override
 	<R> ImmutableList<R> mapped(Function<? super E, ? extends R> mapper);

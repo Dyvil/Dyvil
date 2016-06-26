@@ -108,7 +108,7 @@ public class ListView<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public ImmutableList<? extends E> union(Collection<? extends E> collection)
+	public ImmutableList<E> union(Collection<? extends E> collection)
 	{
 		return new ListView<>(this.list.union(collection));
 	}
@@ -120,13 +120,13 @@ public class ListView<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public ImmutableList<? extends E> difference(Collection<?> collection)
+	public ImmutableList<E> difference(Collection<?> collection)
 	{
 		return new ListView<>(this.list.difference(collection));
 	}
 	
 	@Override
-	public ImmutableList<? extends E> intersection(Collection<? extends E> collection)
+	public ImmutableList<E> intersection(Collection<? extends E> collection)
 	{
 		return new ListView<>(this.list.intersection(collection));
 	}

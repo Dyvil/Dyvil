@@ -1,10 +1,7 @@
 package dyvil.collection.view;
 
 import dyvil.annotation.Immutable;
-import dyvil.collection.Collection;
-import dyvil.collection.ImmutableSet;
-import dyvil.collection.MutableSet;
-import dyvil.collection.Set;
+import dyvil.collection.*;
 import dyvil.collection.iterator.ImmutableIterator;
 
 import java.util.Collections;
@@ -56,25 +53,25 @@ public class SetView<E> implements ImmutableSet<E>
 	}
 
 	@Override
-	public ImmutableSet<? extends E> union(Collection<? extends E> collection)
+	public ImmutableSet<E> union(Collection<? extends E> collection)
 	{
 		return new SetView<>(this.set.union(collection));
 	}
 
 	@Override
-	public ImmutableSet<? extends E> difference(Collection<?> collection)
+	public ImmutableSet<E> difference(Collection<?> collection)
 	{
 		return new SetView<>(this.set.difference(collection));
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> intersection(Collection<? extends E> collection)
+	public ImmutableSet<E> intersection(Collection<? extends E> collection)
 	{
 		return new SetView<>(this.set.intersection(collection));
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> symmetricDifference(Collection<? extends E> collection)
+	public ImmutableSet<E> symmetricDifference(Collection<? extends E> collection)
 	{
 		return new SetView<>(this.set.symmetricDifference(collection));
 	}

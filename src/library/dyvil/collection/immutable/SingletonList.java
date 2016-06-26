@@ -142,7 +142,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public ImmutableList<? extends E> union(Collection<? extends E> collection)
+	public ImmutableList<E> union(Collection<? extends E> collection)
 	{
 		return new PrependList<>(this.element, (ImmutableList<E>) ImmutableList.linked(collection));
 	}
@@ -158,7 +158,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public ImmutableList<? extends E> difference(Collection<?> collection)
+	public ImmutableList<E> difference(Collection<?> collection)
 	{
 		if (collection.contains(this.element))
 		{
@@ -168,7 +168,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public ImmutableList<? extends E> intersection(Collection<? extends E> collection)
+	public ImmutableList<E> intersection(Collection<? extends E> collection)
 	{
 		if (!collection.contains(this.element))
 		{

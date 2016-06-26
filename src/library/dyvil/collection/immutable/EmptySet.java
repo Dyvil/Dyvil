@@ -3,10 +3,7 @@ package dyvil.collection.immutable;
 import dyvil.annotation.Immutable;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.array.ObjectArray;
-import dyvil.collection.Collection;
-import dyvil.collection.ImmutableSet;
-import dyvil.collection.MutableSet;
-import dyvil.collection.Set;
+import dyvil.collection.*;
 import dyvil.collection.iterator.EmptyIterator;
 import dyvil.lang.literal.NilConvertible;
 import dyvil.reflect.Modifiers;
@@ -85,25 +82,25 @@ public final class EmptySet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> difference(Collection<?> collection)
+	public ImmutableSet<E> difference(Collection<?> collection)
 	{
 		return this;
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> intersection(Collection<? extends E> collection)
+	public ImmutableSet<E> intersection(Collection<? extends E> collection)
 	{
 		return this;
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> union(Collection<? extends E> collection)
+	public ImmutableSet<E> union(Collection<? extends E> collection)
 	{
 		return ImmutableSet.from(collection);
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> symmetricDifference(Collection<? extends E> collection)
+	public ImmutableSet<E> symmetricDifference(Collection<? extends E> collection)
 	{
 		return ImmutableSet.from(collection);
 	}

@@ -55,16 +55,16 @@ public interface ImmutableCollection<@Covariant E> extends Collection<E>
 	ImmutableCollection<E> added(E element);
 	
 	@Override
-	ImmutableCollection<? extends E> union(Collection<? extends E> collection);
+	ImmutableCollection<E> union(Collection<? extends E> collection);
 	
 	@Override
 	ImmutableCollection<E> removed(Object element);
 	
 	@Override
-	ImmutableCollection<? extends E> difference(Collection<?> collection);
+	ImmutableCollection<E> difference(Collection<?> collection);
 	
 	@Override
-	ImmutableCollection<? extends E> intersection(Collection<? extends E> collection);
+	ImmutableCollection<E> intersection(Collection<? extends E> collection);
 	
 	@Override
 	<R> ImmutableCollection<R> mapped(Function<? super E, ? extends R> mapper);

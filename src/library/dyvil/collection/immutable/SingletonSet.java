@@ -1,10 +1,7 @@
 package dyvil.collection.immutable;
 
 import dyvil.annotation.Immutable;
-import dyvil.collection.Collection;
-import dyvil.collection.ImmutableSet;
-import dyvil.collection.MutableSet;
-import dyvil.collection.Set;
+import dyvil.collection.*;
 import dyvil.collection.iterator.SingletonIterator;
 import dyvil.lang.literal.TupleConvertible;
 
@@ -82,7 +79,7 @@ public class SingletonSet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> difference(Collection<?> collection)
+	public ImmutableSet<E> difference(Collection<?> collection)
 	{
 		if (collection.contains(this.element))
 		{
@@ -92,7 +89,7 @@ public class SingletonSet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> intersection(Collection<? extends E> collection)
+	public ImmutableSet<E> intersection(Collection<? extends E> collection)
 	{
 		if (!collection.contains(this.element))
 		{
@@ -102,7 +99,7 @@ public class SingletonSet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> union(Collection<? extends E> collection)
+	public ImmutableSet<E> union(Collection<? extends E> collection)
 	{
 		if (!collection.contains(this))
 		{
@@ -129,7 +126,7 @@ public class SingletonSet<E> implements ImmutableSet<E>
 	}
 	
 	@Override
-	public ImmutableSet<? extends E> symmetricDifference(Collection<? extends E> collection)
+	public ImmutableSet<E> symmetricDifference(Collection<? extends E> collection)
 	{
 		if (!collection.contains(this.element))
 		{

@@ -159,7 +159,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 	}
 
 	@Override
-	public ImmutableList<? extends E> union(Collection<? extends E> collection)
+	public ImmutableList<E> union(Collection<? extends E> collection)
 	{
 		int len = collection.size();
 		Object[] array = new Object[this.size + len];
@@ -194,7 +194,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 	}
 
 	@Override
-	public ImmutableList<? extends E> difference(Collection<?> collection)
+	public ImmutableList<E> difference(Collection<?> collection)
 	{
 		int index = 0;
 		Object[] array = new Object[this.size];
@@ -211,7 +211,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 	}
 
 	@Override
-	public ImmutableList<? extends E> intersection(Collection<? extends E> collection)
+	public ImmutableList<E> intersection(Collection<? extends E> collection)
 	{
 		int index = 0;
 		Object[] array = new Object[this.size];

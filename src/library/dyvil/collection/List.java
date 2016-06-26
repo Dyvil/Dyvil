@@ -215,7 +215,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	List<E> added(E element);
 	
 	@Override
-	List<? extends E> union(Collection<? extends E> collection);
+	List<E> union(Collection<? extends E> collection);
 	
 	/**
 	 * {@inheritDoc} Since {@link List Lists} can contain that same element multiple times, implementations should
@@ -231,10 +231,10 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	List<E> removed(Object element);
 	
 	@Override
-	List<? extends E> difference(Collection<?> collection);
+	List<E> difference(Collection<?> collection);
 	
 	@Override
-	List<? extends E> intersection(Collection<? extends E> collection);
+	List<E> intersection(Collection<? extends E> collection);
 	
 	@Override
 	<R> List<R> mapped(Function<? super E, ? extends R> mapper);

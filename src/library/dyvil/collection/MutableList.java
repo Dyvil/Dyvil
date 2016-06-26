@@ -123,7 +123,7 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	}
 	
 	@Override
-	default MutableList<? extends E> difference(Collection<?> collection)
+	default MutableList<E> difference(Collection<?> collection)
 	{
 		MutableList<E> copy = this.emptyCopy();
 		for (E e : this)
@@ -137,7 +137,7 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	}
 	
 	@Override
-	default MutableList<? extends E> union(Collection<? extends E> collection)
+	default MutableList<E> union(Collection<? extends E> collection)
 	{
 		MutableList<E> copy = this.copy(this.size() + collection.size());
 		copy.addAll(collection);
@@ -145,7 +145,7 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	}
 	
 	@Override
-	default MutableList<? extends E> intersection(Collection<? extends E> collection)
+	default MutableList<E> intersection(Collection<? extends E> collection)
 	{
 		MutableList<E> copy = this.emptyCopy(Math.min(this.size(), collection.size()));
 		for (E e : this)

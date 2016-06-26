@@ -66,7 +66,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 	}
 
 	@Override
-	public ImmutableSet<? extends E> difference(Collection<?> collection)
+	public ImmutableSet<E> difference(Collection<?> collection)
 	{
 		ImmutableMap.Builder<E, Boolean> builder = this.map.immutableBuilder();
 		for (Entry<E, ?> entry : this.map)
@@ -81,7 +81,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 	}
 
 	@Override
-	public ImmutableSet<? extends E> intersection(Collection<? extends E> collection)
+	public ImmutableSet<E> intersection(Collection<? extends E> collection)
 	{
 		ImmutableMap.Builder<E, Boolean> builder = this.map.immutableBuilder();
 		for (Entry<E, ?> entry : this.map)
@@ -96,7 +96,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 	}
 
 	@Override
-	public ImmutableSet<? extends E> union(Collection<? extends E> collection)
+	public ImmutableSet<E> union(Collection<? extends E> collection)
 	{
 		ImmutableMap.Builder<E, Boolean> builder = this.map.immutableBuilder();
 		builder.putAll(this.map);
@@ -108,7 +108,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 	}
 
 	@Override
-	public ImmutableSet<? extends E> symmetricDifference(Collection<? extends E> collection)
+	public ImmutableSet<E> symmetricDifference(Collection<? extends E> collection)
 	{
 		ImmutableMap.Builder<E, Boolean> builder = this.map.immutableBuilder();
 		for (Entry<E, ?> entry : this.map)
