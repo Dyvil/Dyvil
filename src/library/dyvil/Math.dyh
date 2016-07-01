@@ -14,3 +14,4 @@ import	java.math.{ BigInteger => BigInt, BigDecimal }
 
 using	java.math.BigInteger.valueOf => apply
 using	java.math.BigDecimal.valueOf => apply
+using   dyvil.math.BigDecimalOperators._

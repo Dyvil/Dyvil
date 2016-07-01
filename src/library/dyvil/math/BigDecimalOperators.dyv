@@ -1,0 +1,21 @@
+package dyvil.math
+
+import java.math.BigDecimal
+
+public class BigDecimalOperators
+{
+	public infix implicit inline func toBigDecimal(int i):    BigDecimal = BigDecimal.valueOf(i as long)
+	public infix implicit inline func toBigDecimal(long i):   BigDecimal = BigDecimal.valueOf(i)
+	public infix implicit inline func toBigDecimal(float i):  BigDecimal = BigDecimal.valueOf(i as double)
+	public infix implicit inline func toBigDecimal(double i): BigDecimal = BigDecimal.valueOf(i)
+	public infix implicit inline func toBigDecimal(java.math.BigInteger i): BigDecimal = new BigDecimal(i)
+
+	public static inline func +(BigDecimal a): BigDecimal = a
+	public static inline func -(BigDecimal a): BigDecimal = a.negate()
+
+	public infix inline func +(BigDecimal a, BigDecimal b): BigDecimal = a.add(b)
+	public infix inline func -(BigDecimal a, BigDecimal b): BigDecimal = a.subtract(b)
+	public infix inline func *(BigDecimal a, BigDecimal b): BigDecimal = a.multiply(b)
+	public infix inline func /(BigDecimal a, BigDecimal b): BigDecimal = a.divide(b)
+	public infix inline func %(BigDecimal a, BigDecimal b): BigDecimal = a.remainder(b)
+}
