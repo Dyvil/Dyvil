@@ -256,7 +256,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 			return; // Mismatch
 		}
 
-		list.add(new Candidate<>(this, defaults, varargs, matchValues, matchTypes));
+		list.add(new Candidate<>(this, matchValues, matchTypes, defaults, varargs));
 	}
 
 	@Override

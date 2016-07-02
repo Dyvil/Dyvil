@@ -437,6 +437,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 		final int[] matchValues;
 		final IType[] matchTypes;
+		boolean invalid = false;
 
 		final int mod;
 		if (receiver == null)
@@ -455,19 +456,18 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			argumentStartIndex = 0;
 			parameterStartIndex = 0;
 		}
-		else if ((mod = this.modifiers.toFlags() & Modifiers.INFIX) == Modifiers.STATIC
-			         && receiver.valueTag() != IValue.CLASS_ACCESS)
-		{
-			// Disallow non-static access to static method
-			return;
-		}
-		else if (mod != 0 && receiver.valueTag() == IValue.CLASS_ACCESS)
+		else if ((mod = this.modifiers.toFlags() & Modifiers.INFIX) != 0 && receiver.valueTag() == IValue.CLASS_ACCESS)
 		{
 			// Static access to static method
 
+			if (!Types.isSuperType(this.enclosingClass.getClassType(), receiver.getType()))
+			{
+				// Disallow access from the wrong type
+				return;
+			}
 			if (arguments == null)
 			{
-				list.add(new Candidate<>(this, IValue.EXACT_MATCH, null));
+				list.add(new Candidate<>(this, IValue.EXACT_MATCH, null, false));
 				return;
 			}
 
@@ -480,6 +480,12 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 		else
 		{
+			if (mod == Modifiers.STATIC && receiver.valueTag() != IValue.CLASS_ACCESS)
+			{
+				// Disallow non-static access to static method
+				invalid = true;
+			}
+
 			final IType receiverType;
 			if (mod == Modifiers.INFIX)
 			{
@@ -501,7 +507,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 			if (arguments == null)
 			{
-				list.add(new Candidate<>(this, receiverMatch, receiverType));
+				list.add(new Candidate<>(this, receiverMatch, receiverType, false));
 				return;
 			}
 
@@ -540,7 +546,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return; // Mismatch
 		}
 
-		list.add(new Candidate<>(this, defaults, varargs, matchValues, matchTypes));
+		list.add(new Candidate<>(this, matchValues, matchTypes, defaults, varargs, invalid));
 	}
 
 	@Override
@@ -570,7 +576,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		final int match = value.getTypeMatch(parType);
 		if (match > IValue.CONVERSION_MATCH)
 		{
-			list.add(new Candidate<>(this, match, parType));
+			list.add(new Candidate<>(this, match, parType, false));
 		}
 	}
 
