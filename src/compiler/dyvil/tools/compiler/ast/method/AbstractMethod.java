@@ -552,7 +552,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public void checkImplicitMatch(MatchList<IMethod> list, IValue value, IType type)
 	{
-		if (!this.hasModifier(Modifiers.IMPLICIT | Modifiers.STATIC))
+		if (!this.isImplicitConversion())
 		{
 			// The method has to be 'implicit static'
 			return;
@@ -578,6 +578,12 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			list.add(new Candidate<>(this, match, parType, false));
 		}
+	}
+
+	@Override
+	public boolean isImplicitConversion()
+	{
+		return this.modifiers != null && this.modifiers.hasIntModifier(Modifiers.IMPLICIT | Modifiers.STATIC);
 	}
 
 	@Override

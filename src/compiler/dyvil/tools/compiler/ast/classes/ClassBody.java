@@ -55,17 +55,21 @@ public class ClassBody implements IClassBody
 
 	private IField[] fields = new IField[3];
 	private int fieldCount;
-	private IProperty[] properties = new IProperty[3];
-	private int propertyCount;
+
+	private IProperty[] properties;
+	private int         propertyCount;
+
 	private IMethod[] methods = new IMethod[3];
 	private int methodCount;
-	private IConstructor[] constructors = new IConstructor[1];
-	private int constructorCount;
-	private IInitializer[] initializers = new IInitializer[1];
-	private int initializerCount;
 
-	// Cache
-	protected MethodLink[] methodCache;
+	private IConstructor[] constructors = new IConstructor[1];
+	private int            constructorCount;
+	private IInitializer[] initializers;
+	private int            initializerCount;
+
+	// Caches
+	protected MethodLink[] namedMethodCache;
+	protected IMethod[]    implicitCache;
 	protected IMethod      functionalMethod;
 
 	public ClassBody(IClass iclass)
@@ -210,7 +214,12 @@ public class ClassBody implements IClassBody
 	{
 		property.setEnclosingClass(this.theClass);
 
-		int index = this.propertyCount++;
+		final int index = this.propertyCount++;
+		if (index == 0) {
+			this.properties = new IProperty[3];
+			this.properties[0] = property;
+			return;
+		}
 		if (index >= this.properties.length)
 		{
 			IProperty[] temp = new IProperty[this.propertyCount];
@@ -286,7 +295,7 @@ public class ClassBody implements IClassBody
 	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
-		final int cacheSize = this.methodCache.length;
+		final int cacheSize = this.namedMethodCache.length;
 		if (cacheSize == 0)
 		{
 			return;
@@ -296,7 +305,7 @@ public class ClassBody implements IClassBody
 		{
 			final int hash = hash(name);
 			final int index = hash & (cacheSize - 1);
-			for (MethodLink link = this.methodCache[index]; link != null; link = link.next)
+			for (MethodLink link = this.namedMethodCache[index]; link != null; link = link.next)
 			{
 				if (link.hash == hash)
 				{
@@ -328,9 +337,14 @@ public class ClassBody implements IClassBody
 	@Override
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
-		for (int i = 0; i < this.methodCount; i++)
+		if (this.implicitCache == null)
 		{
-			this.methods[i].checkImplicitMatch(list, value, targetType);
+			return;
+		}
+
+		for (IMethod method : this.implicitCache)
+		{
+			method.checkImplicitMatch(list, value, targetType);
 		}
 	}
 
@@ -349,7 +363,7 @@ public class ClassBody implements IClassBody
 	@Override
 	public boolean checkImplements(IMethod candidate, ITypeContext typeContext)
 	{
-		final int cacheSize = this.methodCache.length;
+		final int cacheSize = this.namedMethodCache.length;
 		if (cacheSize == 0)
 		{
 			return false;
@@ -357,7 +371,7 @@ public class ClassBody implements IClassBody
 
 		final int hash = hash(candidate.getName());
 		final int index = hash & (cacheSize - 1);
-		for (MethodLink link = this.methodCache[index]; link != null; link = link.next)
+		for (MethodLink link = this.namedMethodCache[index]; link != null; link = link.next)
 		{
 			if (link.hash == hash && checkMethodImplements(link.method, candidate, typeContext))
 			{
@@ -471,10 +485,10 @@ public class ClassBody implements IClassBody
 	{
 		constructor.setEnclosingClass(this.theClass);
 
-		int index = this.constructorCount++;
+		final int index = this.constructorCount++;
 		if (index >= this.constructors.length)
 		{
-			IConstructor[] temp = new IConstructor[this.constructorCount];
+			IConstructor[] temp = new IConstructor[index + 1];
 			System.arraycopy(this.constructors, 0, temp, 0, index);
 			this.constructors = temp;
 		}
@@ -526,10 +540,16 @@ public class ClassBody implements IClassBody
 	{
 		initializer.setEnclosingClass(this.theClass);
 
-		int index = this.initializerCount++;
+		final int index = this.initializerCount++;
+		if (index == 0)
+		{
+			this.initializers = new IInitializer[2];
+			this.initializers[0] = initializer;
+			return;
+		}
 		if (index >= this.initializers.length)
 		{
-			IInitializer[] temp = new IInitializer[this.initializerCount];
+			final IInitializer[] temp = new IInitializer[index + 1];
 			System.arraycopy(this.initializers, 0, temp, 0, index);
 			this.initializers = temp;
 		}
@@ -549,7 +569,7 @@ public class ClassBody implements IClassBody
 	{
 		final int cacheSize = MathUtils.powerOfTwo(this.methodCount);
 		final int mask = cacheSize - 1;
-		final MethodLink[] cache = this.methodCache = new MethodLink[cacheSize];
+		final MethodLink[] cache = this.namedMethodCache = new MethodLink[cacheSize];
 
 		// External Classes do not have any properties or fields with properties
 		for (int i = 0; i < this.methodCount; i++)
@@ -571,7 +591,7 @@ public class ClassBody implements IClassBody
 		 */
 		final int cacheSize = MathUtils.powerOfTwo(this.methodCount + (this.propertyCount << 1) + this.fieldCount);
 		final int mask = cacheSize - 1;
-		final MethodLink[] cache = this.methodCache = new MethodLink[cacheSize];
+		final MethodLink[] cache = this.namedMethodCache = new MethodLink[cacheSize];
 
 		for (int i = 0; i < this.classCount; i++)
 		{
@@ -599,11 +619,28 @@ public class ClassBody implements IClassBody
 			addProperty(cache, property, mask);
 		}
 
+		int implicitCount = 0;
+		IMethod[] implicitCache = null;
 		for (int i = 0; i < this.methodCount; i++)
 		{
 			final IMethod method = this.methods[i];
 			method.resolveTypes(markers, context);
 			addMethod(cache, method, mask);
+
+			// Add method to implicit cache
+			if (method.isImplicitConversion())
+			{
+				if (implicitCache == null)
+				{
+					implicitCache = new IMethod[this.methodCount];
+				}
+				implicitCache[implicitCount++] = method;
+			}
+		}
+		if (implicitCount > 0)
+		{
+			this.implicitCache = new IMethod[implicitCount];
+			System.arraycopy(implicitCache, 0, this.implicitCache, 0, implicitCount);
 		}
 
 		for (int i = 0; i < this.constructorCount; i++)

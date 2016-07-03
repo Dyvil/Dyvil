@@ -37,6 +37,8 @@ public interface IMethod extends IClassMember, ICallableMember, ICallableSignatu
 	
 	boolean isAbstract();
 
+	boolean isImplicitConversion();
+
 	boolean isObjectMethod();
 
 	/**

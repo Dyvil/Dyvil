@@ -176,6 +176,12 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 
 	@Override
+	public boolean isImplicitConversion()
+	{
+		return false;
+	}
+
+	@Override
 	public boolean isObjectMethod()
 	{
 		return false;
