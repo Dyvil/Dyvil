@@ -10,8 +10,10 @@ using	dyvil.math.MathUtils._
 import	dyvil.math.Complex
 
 // BigInteger and BigDecimal and Dyvil-style apply methods
-import	java.math.{ BigInteger => BigInt, BigDecimal }
-
+import	java.math.BigInteger => BigInt
 using	java.math.BigInteger.valueOf => apply
+using   dyvil.math.BigIntegerOperators._
+
+import  java.math.BigDecimal
 using	java.math.BigDecimal.valueOf => apply
 using   dyvil.math.BigDecimalOperators._
