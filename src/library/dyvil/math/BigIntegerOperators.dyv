@@ -16,6 +16,8 @@ public class BigIntegerOperators
 	public infix inline func *(BigInteger a, BigInteger b): BigInteger = a.multiply(b)
 	public infix inline func /(BigInteger a, BigInteger b): BigInteger = a.divide(b)
 	public infix inline func %(BigInteger a, BigInteger b): BigInteger = a.remainder(b)
+	public infix inline func **(BigInteger a, int b): BigInteger = a.pow(b)
+
 	public infix inline func &(BigInteger a, BigInteger b): BigInteger = a.and(b)
 	public infix inline func |(BigInteger a, BigInteger b): BigInteger = a.or(b)
 	public infix inline func ^(BigInteger a, BigInteger b): BigInteger = a.xor(b)

@@ -132,6 +132,8 @@ public final class Primitives
 	@Intrinsic([ LOAD_0, LOAD_1, IMUL ])
 	public infix func *(int v1, int v2): int = v1 * v2
 
+	public infix func **(int v1, int v2): long = dyvil.math.PowImpl.pow(v1, v2)
+
 	@Intrinsic([ LOAD_0, I2F, LOAD_1, I2F, FDIV ])
 	public infix func /(int v1, int v2): float = v1 / v2
 
@@ -238,6 +240,8 @@ public final class Primitives
 	@Intrinsic([ LOAD_0, LOAD_1, LMUL ])
 	public infix func *(long v1, long v2): long = v1 * v2
 
+	public infix func **(long v1, int v2): long = dyvil.math.PowImpl.pow(v1, v2)
+
 	@Intrinsic([ LOAD_0, L2D, LOAD_1, L2D, DDIV ])
 	public infix func /(long v1, long v2): double = v1 / v2
 
@@ -331,6 +335,9 @@ public final class Primitives
 	@Intrinsic([ LOAD_0, LOAD_1, FMUL ])
 	public infix func *(float v1, float v2): float = v1 * v2
 
+	@Intrinsic([ LOAD_0, F2D, LOAD_1, F2D, INVOKESTATIC, 0, 1, 2, D2F], strings: [ "java/lang/MathUtils", "pow", "(DD)D" ])
+	public infix func **(float v1, float v2): double = Math.pow(v1, v2)
+
 	@Intrinsic([ LOAD_0, LOAD_1, FDIV ])
 	public infix func /(float v1, float v2): float = v1 / v2
 
@@ -389,6 +396,9 @@ public final class Primitives
 
 	@Intrinsic([ LOAD_0, LOAD_1, DMUL ])
 	public infix func *(double v1, double v2): double = v1 * v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2], strings: [ "java/lang/Math", "pow", "(DD)D" ])
+	public infix func **(double v1, double v2): double = Math.pow(v1, v2)
 
 	@Intrinsic([ LOAD_0, LOAD_1, DDIV ])
 	public infix func /(double v1, double v2): double = v1 / v2

@@ -18,4 +18,8 @@ public class BigDecimalOperators
 	public infix inline func *(BigDecimal a, BigDecimal b): BigDecimal = a.multiply(b)
 	public infix inline func /(BigDecimal a, BigDecimal b): BigDecimal = a.divide(b)
 	public infix inline func %(BigDecimal a, BigDecimal b): BigDecimal = a.remainder(b)
+
+	public infix inline func **(BigDecimal a, int b): BigDecimal = a.pow(b)
+	public infix func **(BigDecimal a, double b): BigDecimal = PowImpl.pow(a, b)
+	public infix func **(BigDecimal a, BigDecimal b): BigDecimal = PowImpl.pow(a, b)
 }
