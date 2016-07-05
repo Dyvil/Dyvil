@@ -104,8 +104,14 @@ public interface IClassBody extends IASTNode, IClassList, IMemberConsumer<IField
 
 	// Phases
 
-	void initExternalCache();
-	
+	default void initExternalMethodCache()
+	{
+	}
+
+	default void initExternalImplicitCache()
+	{
+	}
+
 	void resolveTypes(MarkerList markers, IContext context);
 	
 	void resolve(MarkerList markers, IContext context);

@@ -53,12 +53,13 @@ import java.io.IOException;
 
 public final class ExternalClass extends AbstractClass
 {
-	private static final int METADATA    = 1;
-	private static final int SUPER_TYPES = 1 << 1;
-	private static final int GENERICS    = 1 << 2;
-	private static final int BODY_CACHE  = 1 << 3;
-	private static final int ANNOTATIONS = 1 << 4;
-	private static final int INNER_TYPES = 1 << 5;
+	private static final int METADATA          = 1;
+	private static final int SUPER_TYPES       = 1 << 1;
+	private static final int GENERICS          = 1 << 2;
+	private static final int BODY_METHOD_CACHE = 1 << 3;
+	private static final int BODY_IMPLICIT_CACHE = 1 << 4;
+	private static final int ANNOTATIONS       = 1 << 5;
+	private static final int INNER_TYPES       = 1 << 6;
 
 	protected Package thePackage;
 
@@ -121,10 +122,16 @@ public final class ExternalClass extends AbstractClass
 		this.thisType = type;
 	}
 
-	private void resolveBodyCache()
+	private void resolveMethodCache()
 	{
-		this.body.initExternalCache();
-		this.resolved |= BODY_CACHE;
+		this.body.initExternalMethodCache();
+		this.resolved |= BODY_METHOD_CACHE;
+	}
+
+	private void resolveImplicitCache()
+	{
+		this.body.initExternalImplicitCache();
+		this.resolved |= BODY_IMPLICIT_CACHE;
 	}
 
 	private void resolveSuperTypes()
@@ -369,9 +376,9 @@ public final class ExternalClass extends AbstractClass
 		{
 			this.resolveSuperTypes();
 		}
-		if ((this.resolved & BODY_CACHE) == 0)
+		if ((this.resolved & BODY_METHOD_CACHE) == 0)
 		{
-			this.resolveBodyCache();
+			this.resolveMethodCache();
 		}
 		return super.checkImplements(candidate, typeContext);
 	}
@@ -468,9 +475,9 @@ public final class ExternalClass extends AbstractClass
 		{
 			this.resolveGenerics();
 		}
-		if ((this.resolved & BODY_CACHE) == 0)
+		if ((this.resolved & BODY_METHOD_CACHE) == 0)
 		{
-			this.resolveBodyCache();
+			this.resolveMethodCache();
 		}
 
 		/*
@@ -512,6 +519,10 @@ public final class ExternalClass extends AbstractClass
 		if ((this.resolved & GENERICS) == 0)
 		{
 			this.resolveGenerics();
+		}
+		if ((this.resolved & BODY_IMPLICIT_CACHE) == 0)
+		{
+			this.resolveImplicitCache();
 		}
 
 		this.body.getImplicitMatches(list, value, targetType);

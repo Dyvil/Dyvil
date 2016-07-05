@@ -215,7 +215,8 @@ public class ClassBody implements IClassBody
 		property.setEnclosingClass(this.theClass);
 
 		final int index = this.propertyCount++;
-		if (index == 0) {
+		if (index == 0)
+		{
 			this.properties = new IProperty[3];
 			this.properties[0] = property;
 			return;
@@ -565,7 +566,7 @@ public class ClassBody implements IClassBody
 	// Phases
 
 	@Override
-	public void initExternalCache()
+	public void initExternalMethodCache()
 	{
 		final int cacheSize = MathUtils.powerOfTwo(this.methodCount);
 		final int mask = cacheSize - 1;
@@ -575,6 +576,34 @@ public class ClassBody implements IClassBody
 		for (int i = 0; i < this.methodCount; i++)
 		{
 			addMethod(cache, this.methods[i], mask);
+		}
+	}
+
+	@Override
+	public void initExternalImplicitCache()
+	{
+		IMethod[] implicitCache = null;
+		int implicitCount = 0;
+
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			final IMethod method = this.methods[i];
+
+			// Add method to implicit cache
+			if (method.isImplicitConversion())
+			{
+				if (implicitCache == null)
+				{
+					implicitCache = new IMethod[this.methodCount];
+				}
+
+				implicitCache[implicitCount++] = method;
+			}
+		}
+
+		if (implicitCount > 0)
+		{
+			this.initImplicitCache(implicitCount, implicitCache);
 		}
 	}
 
@@ -639,8 +668,7 @@ public class ClassBody implements IClassBody
 		}
 		if (implicitCount > 0)
 		{
-			this.implicitCache = new IMethod[implicitCount];
-			System.arraycopy(implicitCache, 0, this.implicitCache, 0, implicitCount);
+			this.initImplicitCache(implicitCount, implicitCache);
 		}
 
 		for (int i = 0; i < this.constructorCount; i++)
@@ -651,6 +679,12 @@ public class ClassBody implements IClassBody
 		{
 			this.initializers[i].resolveTypes(markers, context);
 		}
+	}
+
+	private void initImplicitCache(int implicitCount, IMethod[] implicitCache)
+	{
+		this.implicitCache = new IMethod[implicitCount];
+		System.arraycopy(implicitCache, 0, this.implicitCache, 0, implicitCount);
 	}
 
 	private static void addProperty(MethodLink[] cache, IProperty property, int mask)
