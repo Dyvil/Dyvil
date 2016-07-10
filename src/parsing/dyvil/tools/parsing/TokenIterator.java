@@ -24,7 +24,7 @@ public class TokenIterator implements Iterator<IToken>
 		this.next = this.startToken.next();
 	}
 
-	public void jump(IToken next)
+	public void setNext(IToken next)
 	{
 		this.lastReturned = null;
 		this.next = next;

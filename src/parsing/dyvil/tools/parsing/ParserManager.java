@@ -119,13 +119,13 @@ public class ParserManager implements IParserManager
 	@Override
 	public void splitJump(IToken token, int length)
 	{
-		this.jump(this.split(token, length).next());
+		this.setNext(this.split(token, length).next());
 	}
 
 	@Override
 	public void splitReparse(IToken token, int length)
 	{
-		this.jump(this.split(token, length));
+		this.setNext(this.split(token, length));
 	}
 
 	@Override
@@ -140,7 +140,7 @@ public class ParserManager implements IParserManager
 		this.markers.add(error);
 	}
 
-	public final void parse(Parser parser)
+	public void parse(Parser parser)
 	{
 		this.parser = parser;
 
@@ -257,9 +257,9 @@ public class ParserManager implements IParserManager
 	}
 
 	@Override
-	public void jump(IToken token)
+	public void setNext(IToken token)
 	{
-		this.tokens.jump(token);
+		this.tokens.setNext(token);
 		this.reparse = false;
 	}
 

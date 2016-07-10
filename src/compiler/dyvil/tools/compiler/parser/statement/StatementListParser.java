@@ -26,7 +26,10 @@ import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.expression.LambdaOrTupleParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.parsing.*;
+import dyvil.tools.parsing.IParserManager;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.Parser;
+import dyvil.tools.parsing.TryParserManager;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -44,6 +47,10 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 	private static final int LAMBDA_RETURN_ARROW   = 1 << 2;
 	private static final int EXPRESSION            = 1 << 3;
 	private static final int SEPARATOR             = 1 << 4;
+
+	private static final TryParserManager TRY_PARSER = new TryParserManager(DyvilSymbols.INSTANCE);
+
+	private static final int MEMBER_FLAGS = NO_UNINITIALIZED_VARIABLES | OPERATOR_ERROR | NO_FIELD_PROPERTIES;
 
 	protected IValueConsumer consumer;
 	protected boolean        closure;
@@ -172,25 +179,13 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 				return;
 			}
 
-			final TokenIterator tokens = pm.getTokens();
-
-			final MemberParser parser = new MemberParser<>(this).withFlag(
-				NO_UNINITIALIZED_VARIABLES | OPERATOR_ERROR | NO_FIELD_PROPERTIES);
-			final TryParserManager parserManager = new TryParserManager(DyvilSymbols.INSTANCE, tokens);
-
-			// Have to rewind one token because the TryParserManager assumes the TokenIterator is at the beginning (i.e.
-			// no tokens have been returned by next() yet)
-			tokens.jump(token);
-			if (parserManager.parse(parser, pm.getMarkers(), EXIT_ON_ROOT))
+			if (TRY_PARSER.tryParse(pm, new MemberParser<>(this).withFlag(MEMBER_FLAGS), token, EXIT_ON_ROOT))
 			{
-				tokens.jump(tokens.lastReturned());
 				this.mode = SEPARATOR;
 				return;
 			}
 
-			// Reset to the current token and restore split tokens
-			parserManager.resetTo(token);
-			pm.pushParser(new ExpressionParser(this));
+			pm.pushParser(new ExpressionParser(this), true);
 			return;
 		case SEPARATOR:
 			this.mode = EXPRESSION;
@@ -289,7 +284,8 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 	}
 
 	@Override
-	public IVariable createDataMember(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public IVariable createDataMember(ICodePosition position, Name name, IType type, ModifierSet modifiers,
+		                                 AnnotationList annotations)
 	{
 		return new Variable(position, name, type, modifiers, annotations);
 	}
@@ -301,7 +297,8 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 	}
 
 	@Override
-	public IMethod createMethod(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public IMethod createMethod(ICodePosition position, Name name, IType type, ModifierSet modifiers,
+		                           AnnotationList annotations)
 	{
 		return new NestedMethod(position, name, type, modifiers, annotations);
 	}

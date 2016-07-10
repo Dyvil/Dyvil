@@ -49,7 +49,7 @@ public interface IParserManager
 
 	void reparse();
 
-	void jump(IToken token);
+	void setNext(IToken token);
 
 	void setParser(Parser parser);
 

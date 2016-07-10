@@ -48,11 +48,11 @@ public class TryParserManager extends ParserManager
 		}
 	}
 
-	public void resetTo(IToken token)
+	private void setNextAndReset(IToken token)
 	{
-		this.tokens.jump(token);
+		this.tokens.setNext(token);
 
-		if (this.splitTokens == null)
+		if (this.splitTokens == null || this.splitTokens.isEmpty())
 		{
 			return;
 		}
@@ -87,16 +87,34 @@ public class TryParserManager extends ParserManager
 		return split;
 	}
 
-	@Deprecated
-	public boolean parse(Parser parser, boolean reportErrors)
+	public boolean tryParse(IParserManager pm, Parser parser, IToken token, int flags)
 	{
-		return this.parse(parser, this.markers, reportErrors ? REPORT_ERRORS : 0);
+		final TokenIterator tokens = pm.getTokens();
+		final MarkerList markers = pm.getMarkers();
+
+		this.reset(markers, tokens);
+
+		// Have to rewind one token because the TryParserManager assumes the TokenIterator is at the beginning (i.e.
+		// no tokens have been returned by next() yet)
+		this.setNext(token);
+
+		if (this.parse(parser, markers, EXIT_ON_ROOT))
+		{
+			tokens.setNext(tokens.lastReturned());
+
+			return true;
+		}
+
+		// Reset to the next token and restore split tokens
+		this.setNextAndReset(token.next());
+		return false;
 	}
 
+	@Override
 	@Deprecated
-	public boolean parse(Parser parser, int flags)
+	public void parse(Parser parser)
 	{
-		return this.parse(parser, this.markers, flags);
+		this.parse(parser, this.markers, 0);
 	}
 
 	public boolean parse(Parser parser, MarkerList markers, int flags)
