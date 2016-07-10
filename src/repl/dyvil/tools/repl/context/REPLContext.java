@@ -118,7 +118,7 @@ public class REPLContext extends DyvilHeader
 		return this.markers.getErrors() > 0;
 	}
 
-	public void reportErrors()
+	public void endEvaluation()
 	{
 		if (this.markers.isEmpty())
 		{

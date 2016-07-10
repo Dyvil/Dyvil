@@ -5,28 +5,22 @@ import dyvil.collection.mutable.TreeMap;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.parser.classes.MemberParser;
-import dyvil.tools.compiler.parser.expression.ExpressionParser;
-import dyvil.tools.compiler.parser.header.DyvilHeaderParser;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.transform.SemicolonInference;
 import dyvil.tools.compiler.util.Util;
-import dyvil.tools.parsing.Parser;
+import dyvil.tools.parsing.ParserManager;
 import dyvil.tools.parsing.TokenIterator;
-import dyvil.tools.parsing.TryParserManager;
 import dyvil.tools.parsing.lexer.DyvilLexer;
 import dyvil.tools.parsing.lexer.LexerUtil;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.repl.command.*;
 import dyvil.tools.repl.context.REPLContext;
+import dyvil.tools.repl.input.REPLParser;
 import dyvil.tools.repl.lang.I18n;
 
 import java.io.File;
 import java.io.PrintStream;
-
-import static dyvil.tools.compiler.parser.classes.MemberParser.NO_UNINITIALIZED_VARIABLES;
-import static dyvil.tools.compiler.parser.classes.MemberParser.OPERATOR_ERROR;
 
 public final class DyvilREPL
 {
@@ -35,7 +29,7 @@ public final class DyvilREPL
 	protected DyvilCompiler compiler = new DyvilCompiler();
 
 	protected REPLContext      context = new REPLContext(this);
-	protected TryParserManager parser  = new TryParserManager(DyvilSymbols.INSTANCE);
+	protected REPLParser parser = new REPLParser(this.context);
 
 	protected File    dumpDir;
 
@@ -77,7 +71,7 @@ public final class DyvilREPL
 		return this.context;
 	}
 
-	public TryParserManager getParser()
+	public REPLParser getParser()
 	{
 		return this.parser;
 	}
@@ -190,29 +184,9 @@ public final class DyvilREPL
 
 		SemicolonInference.inferSemicolons(tokens.first());
 
-		if (this.tryParse(markers, tokens, new DyvilHeaderParser(this.context), false))
-		{
-			this.context.reportErrors();
-			return;
-		}
+		new ParserManager(DyvilSymbols.INSTANCE, tokens, markers).parse(this.parser);
 
-		if (this.tryParse(markers, tokens,
-		                  new MemberParser<>(this.context).withFlag(NO_UNINITIALIZED_VARIABLES | OPERATOR_ERROR),
-		                  false))
-		{
-			this.context.reportErrors();
-			return;
-		}
-
-		this.tryParse(markers, tokens, new ExpressionParser(this.context), true);
-		this.context.reportErrors();
-	}
-
-	private boolean tryParse(MarkerList markers, TokenIterator tokens, Parser parser, boolean reportErrors)
-	{
-		this.parser.reset(markers, tokens);
-		this.parser.resetTo(tokens.first());
-		return this.parser.parse(parser, markers, reportErrors ? TryParserManager.REPORT_ERRORS : 0);
+		this.context.endEvaluation();
 	}
 
 	private void runCommand(String line)
