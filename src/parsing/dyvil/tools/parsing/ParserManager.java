@@ -154,12 +154,11 @@ public class ParserManager implements IParserManager
 			}
 			else
 			{
-				if (!this.tokens.hasNext())
+				token = this.tokens.next();
+				if (token.type() == Tokens.EOF)
 				{
 					break;
 				}
-
-				token = this.tokens.next();
 			}
 
 			if (this.skip > 0)

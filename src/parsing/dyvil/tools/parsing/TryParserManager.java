@@ -50,6 +50,7 @@ public class TryParserManager extends ParserManager
 
 	private void setNextAndReset(IToken token)
 	{
+		this.reset();
 		this.tokens.setNext(token);
 
 		if (this.splitTokens == null || this.splitTokens.isEmpty())
@@ -100,7 +101,10 @@ public class TryParserManager extends ParserManager
 
 		if (this.parse(parser, markers, EXIT_ON_ROOT))
 		{
-			tokens.setNext(tokens.lastReturned());
+			this.reset();
+
+			final IToken last = tokens.lastReturned();
+			tokens.setNext(last);
 
 			return true;
 		}
