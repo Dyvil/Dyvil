@@ -14,6 +14,7 @@ import dyvil.tools.repl.context.REPLContext;
 
 import static dyvil.tools.compiler.parser.classes.MemberParser.NO_UNINITIALIZED_VARIABLES;
 import static dyvil.tools.compiler.parser.classes.MemberParser.OPERATOR_ERROR;
+import static dyvil.tools.parsing.TryParserManager.EXIT_ON_ROOT;
 
 public class REPLParser extends Parser
 {
@@ -23,12 +24,17 @@ public class REPLParser extends Parser
 	protected static final TryParserManager TRY_PARSER   = new TryParserManager(DyvilSymbols.INSTANCE);
 	private static final   int              MEMBER_FLAGS = NO_UNINITIALIZED_VARIABLES | OPERATOR_ERROR;
 
-	protected REPLContext context;
+	protected final REPLContext context;
 
 	public REPLParser(REPLContext context)
 	{
 		this.context = context;
-		// this.mode = ELEMENT
+		this.reset();
+	}
+
+	public void reset()
+	{
+		this.mode = ELEMENT;
 	}
 
 	@Override
@@ -45,12 +51,12 @@ public class REPLParser extends Parser
 			}
 
 			this.mode = SEPARATOR;
-			if (TRY_PARSER.tryParse(pm, new DyvilHeaderParser(this.context), token, 0))
+			if (TRY_PARSER.tryParse(pm, new DyvilHeaderParser(this.context), token, EXIT_ON_ROOT))
 			{
 				return;
 			}
 
-			if (TRY_PARSER.tryParse(pm, new MemberParser<>(this.context).withFlag(MEMBER_FLAGS), token, 0))
+			if (TRY_PARSER.tryParse(pm, new MemberParser<>(this.context).withFlag(MEMBER_FLAGS), token, EXIT_ON_ROOT))
 			{
 				return;
 			}

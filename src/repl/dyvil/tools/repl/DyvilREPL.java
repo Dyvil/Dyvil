@@ -28,10 +28,10 @@ public final class DyvilREPL
 
 	protected DyvilCompiler compiler = new DyvilCompiler();
 
-	protected REPLContext      context = new REPLContext(this);
-	protected REPLParser parser = new REPLParser(this.context);
+	protected REPLContext context = new REPLContext(this);
+	protected REPLParser  parser  = new REPLParser(this.context);
 
-	protected File    dumpDir;
+	protected File dumpDir;
 
 	private static final Map<String, ICommand> commands = new TreeMap<>();
 
@@ -184,6 +184,7 @@ public final class DyvilREPL
 
 		SemicolonInference.inferSemicolons(tokens.first());
 
+		this.parser.reset();
 		new ParserManager(DyvilSymbols.INSTANCE, tokens, markers).parse(this.parser);
 
 		this.context.endEvaluation();
