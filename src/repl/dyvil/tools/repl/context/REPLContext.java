@@ -3,11 +3,11 @@ package dyvil.tools.repl.context;
 import dyvil.collection.List;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayList;
-import dyvil.collection.mutable.HashMap;
 import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
+import dyvil.tools.compiler.ast.classes.ClassBody;
+import dyvil.tools.compiler.ast.classes.CodeClass;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.constructor.IInitializer;
@@ -20,6 +20,7 @@ import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.header.ImportDeclaration;
 import dyvil.tools.compiler.ast.header.IncludeDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
+import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
@@ -28,7 +29,6 @@ import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.operator.IOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.DyvilHeader;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -42,10 +42,7 @@ import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.repl.DyvilREPL;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
-public class REPLContext extends DyvilHeader
-	implements IValueConsumer, IMemberConsumer<REPLVariable>, IClassCompilableList
+public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberConsumer<REPLVariable>
 {
 	private static final String REPL$CLASSES = "repl$classes/";
 
@@ -58,17 +55,16 @@ public class REPLContext extends DyvilHeader
 	private final List<IMethod>        methods    = new ArrayList<>();
 	private final Map<Name, IClass>    classes    = new IdentityHashMap<>();
 
-	private Map<String, AtomicInteger> resultIndexes = new HashMap<>();
+	// Updated for every input
+	private   int       resultIndex;
+	private   int       classIndex;
+	protected String    currentCode;
+	private   CodeClass currentClass;
 
-	// Cleared / Updated for every evaluation
-	protected String currentCode;
-	private   int    classIndex;
-	private   String className;
+	// Cleared for every input
 	protected final MarkerList             markers        = new MarkerList(Markers.INSTANCE);
-	protected final List<IClassCompilable> compilableList = new ArrayList<>();
 	protected final List<IClassCompilable> innerClassList = new ArrayList<>();
-
-	private REPLMemberClass memberClass;
+	protected final List<IMember>          members        = new ArrayList<>();
 
 	public REPLContext(DyvilREPL repl)
 	{
@@ -102,10 +98,10 @@ public class REPLContext extends DyvilHeader
 
 	public void startEvaluation(String code)
 	{
+		final String className = "REPL$Result" + this.classIndex++;
+		this.currentClass = new CodeClass(this, Name.fromRaw(className));
+		this.currentClass.setBody(new ClassBody(this.currentClass));
 		this.currentCode = code;
-		this.className = REPL$CLASSES + "REPL$Result" + this.classIndex++;
-		this.memberClass = new REPLMemberClass(this, Name.fromRaw(this.className));
-		this.cleanup();
 	}
 
 	public MarkerList getMarkers()
@@ -119,6 +115,78 @@ public class REPLContext extends DyvilHeader
 	}
 
 	public void endEvaluation()
+	{
+		this.currentClass.resolveTypes(this.markers, this);
+		this.currentClass.resolve(this.markers, this);
+		this.currentClass.checkTypes(this.markers, this);
+		this.currentClass.check(this.markers, this);
+
+		if (this.markers.getErrors() > 0)
+		{
+			this.printErrors();
+			this.cleanup();
+			return;
+		}
+
+		for (int i = this.compiler.config.getConstantFolding() - 1; i >= 0; i--)
+		{
+			this.currentClass.foldConstants();
+		}
+
+		this.currentClass.cleanup(this, this.currentClass);
+
+		final Class<?> theClass = this.compileAndLoad();
+
+		for (IMember member : this.members)
+		{
+			this.processMember(member, theClass);
+		}
+
+		this.printErrors();
+		this.cleanup();
+	}
+
+	private Class<?> compileAndLoad()
+	{
+		// Compile all inner class
+		for (IClassCompilable innerClass : this.innerClassList)
+		{
+			try
+			{
+				final String fileName = innerClass.getFileName();
+				final byte[] bytes = ClassWriter.compile(innerClass);
+				REPLCompiler.loadClass(this.repl, REPL$CLASSES.concat(fileName), bytes);
+			}
+			catch (Throwable t)
+			{
+				t.printStackTrace(this.compiler.getErrorOutput());
+			}
+		}
+
+		return REPLCompiler.compile(this.repl, this.currentClass);
+	}
+
+	public void processMember(IMember member, Class<?> theClass)
+	{
+		if (member instanceof REPLVariable)
+		{
+			final REPLVariable replVariable = (REPLVariable) member;
+			replVariable.setRuntimeClass(theClass);
+			replVariable.updateValue(this.repl);
+		}
+
+		this.repl.getOutput().println(member);
+	}
+
+	@Override
+	public void cleanup()
+	{
+		this.innerClassList.clear();
+		this.markers.clear();
+		this.members.clear();
+	}
+
+	private void printErrors()
 	{
 		if (this.markers.isEmpty())
 		{
@@ -134,45 +202,6 @@ public class REPLContext extends DyvilHeader
 		}
 
 		this.compiler.getOutput().println(buf.toString());
-	}
-
-	private void compileInnerClasses()
-	{
-		for (IClassCompilable icc : this.innerClassList)
-		{
-			try
-			{
-				String fileName = icc.getFileName();
-				byte[] bytes = ClassWriter.compile(icc);
-				REPLCompiler.loadClass(this.repl, REPL$CLASSES.concat(fileName), bytes);
-			}
-			catch (Throwable t)
-			{
-				t.printStackTrace(this.compiler.getErrorOutput());
-			}
-		}
-	}
-
-	private boolean computeVariable(REPLVariable field)
-	{
-		field.resolveTypes(this.markers, this);
-		field.resolve(this.markers, this);
-		field.checkTypes(this.markers, this);
-		field.check(this.markers, this);
-
-		if (this.hasErrors())
-		{
-			return false;
-		}
-
-		final int folding = this.compiler.config.getConstantFolding();
-		for (int i = 0; i < folding; i++)
-		{
-			field.foldConstants();
-		}
-		field.cleanup(this, this);
-		this.compileVariable(field);
-		return true;
 	}
 
 	private static void getClassName(StringBuilder builder, IType type)
@@ -193,125 +222,32 @@ public class REPLContext extends DyvilHeader
 		builder.append(type.getName().unqualified);
 	}
 
-	private Name getFieldName(IType type)
-	{
-		StringBuilder sb = new StringBuilder();
-		getClassName(sb, type);
-
-		// Make the first character lower case
-		sb.setCharAt(0, Character.toLowerCase(sb.charAt(0)));
-
-		// Strip trailing digits
-		for (int i = 0, len = sb.length(); i < len; i++)
-		{
-			if (Character.isDigit(sb.charAt(i)))
-			{
-				sb.delete(i, len);
-				break;
-			}
-		}
-
-		// The final variable name, without the index
-		String shortName = sb.toString();
-
-		AtomicInteger ai = this.resultIndexes.get(shortName);
-		if (ai == null)
-		{
-			this.resultIndexes.put(shortName, ai = new AtomicInteger(0));
-		}
-
-		int index = ai.incrementAndGet();
-		return Name.from(sb.append(index).toString());
-	}
-
-	private void compileVariable(REPLVariable field)
-	{
-		this.compileInnerClasses();
-		field.compute(this.repl, this.compilableList);
-	}
-
 	private void initMember(IClassMember member)
 	{
-		this.memberClass.setMember(member);
-		member.setEnclosingClass(this.memberClass);
-		member.getModifiers().addIntModifier(Modifiers.STATIC);
-	}
+		member.setEnclosingClass(this.currentClass);
 
-	private void compileClass(IClass iclass)
-	{
-		this.compileInnerClasses();
-		REPLCompiler.compile(this.repl, iclass);
-	}
-
-	@Override
-	public void cleanup()
-	{
-		this.compilableList.clear();
-		this.innerClassList.clear();
-		this.markers.clear();
+		// Ensure public & static
+		final ModifierSet modifiers = member.getModifiers();
+		if ((modifiers.toFlags() & Modifiers.VISIBILITY_MODIFIERS) == 0)
+		{
+			modifiers.addIntModifier(Modifiers.PUBLIC);
+		}
+		modifiers.addIntModifier(Modifiers.STATIC);
 	}
 
 	@Override
 	public void setValue(IValue value)
 	{
-		ModifierList modifierList = new ModifierList();
+		final ModifierList modifierList = new ModifierList();
 		modifierList.addModifier(BaseModifiers.FINAL);
 
-		value.resolveTypes(this.markers, this);
-		value = value.resolve(this.markers, this);
-
-		if (value.valueTag() == IValue.FIELD_ACCESS)
-		{
-			final IDataMember field = ((FieldAccess) value).getField();
-			if (field instanceof REPLVariable)
-			{
-				((REPLVariable) field).updateValue(this.repl);
-				this.compiler.getOutput().println(field);
-				return;
-			}
-		}
-
-		final REPLVariable field = new REPLVariable(this, ICodePosition.ORIGIN, null, Types.UNKNOWN, this.className,
-		                                            modifierList, null);
+		final Name name = Name.fromRaw("res" + this.resultIndex++);
+		final REPLVariable field = new REPLVariable(this, value.getPosition(), name, Types.UNKNOWN, modifierList, null);
 		field.setValue(value);
 
 		this.initMember(field);
-
-		IType type = value.getType();
-		IValue typedValue = value.withType(type, type, this.markers, this);
-		if (typedValue != null)
-		{
-			value = typedValue;
-		}
-
-		type = value.getType();
-
-		value.checkTypes(this.markers, this);
-		value.check(this.markers, this);
-
-		if (this.hasErrors())
-		{
-			return;
-		}
-
-		final int folding = this.compiler.config.getConstantFolding();
-		for (int i = 0; i < folding; i++)
-		{
-			value = value.foldConstants();
-		}
-
-		value = value.cleanup(this, this);
-		field.setValue(value);
-		field.setType(type);
-
-		field.setName(this.getFieldName(type));
-
-		this.compileVariable(field);
-		if (type != Types.VOID)
-		{
-			this.fields.put(field.getName(), field);
-			this.compiler.getOutput().println(field.toString());
-		}
+		this.currentClass.getBody().addDataMember(field);
+		this.members.add(field);
 	}
 
 	@Override
@@ -332,7 +268,7 @@ public class REPLContext extends DyvilHeader
 		}
 
 		super.addImport(declaration);
-		this.compiler.getOutput().println(declaration);
+		this.compiler.getOutput().println("Imported " + declaration.getImport());
 	}
 
 	@Override
@@ -346,7 +282,7 @@ public class REPLContext extends DyvilHeader
 		}
 
 		super.addUsing(usingDeclaration);
-		this.compiler.getOutput().println(usingDeclaration);
+		this.compiler.getOutput().println("Imported " + usingDeclaration.getImport());
 	}
 
 	@Override
@@ -360,7 +296,7 @@ public class REPLContext extends DyvilHeader
 		}
 
 		super.addInclude(includeDeclaration);
-		this.compiler.getOutput().println(includeDeclaration);
+		this.compiler.getOutput().println("Included " + includeDeclaration.getHeader().getFullName());
 	}
 
 	@Override
@@ -377,7 +313,7 @@ public class REPLContext extends DyvilHeader
 		}
 
 		typeAlias.foldConstants();
-		typeAlias.cleanup(this, this);
+		typeAlias.cleanup(this, this.currentClass);
 
 		super.addTypeAlias(typeAlias);
 		this.compiler.getOutput().println(typeAlias);
@@ -386,178 +322,47 @@ public class REPLContext extends DyvilHeader
 	@Override
 	public void addClass(IClass iclass)
 	{
-		iclass.setHeader(this);
-
-		// Check if the class is already defined
-		try
-		{
-			Class.forName(iclass.getFullName(), false, REPLCompiler.CLASS_LOADER);
-			this.compiler.getErrorOutput().println("The class '" + iclass.getName() + "' cannot be re-defined");
-			return;
-		}
-		catch (ClassNotFoundException ignored)
-		{
-		}
-
-		// Run the usual phases
-		iclass.resolveTypes(this.markers, this);
-		iclass.resolve(this.markers, this);
-		iclass.checkTypes(this.markers, this);
-		iclass.check(this.markers, this);
-
-		if (this.hasErrors())
-		{
-			return;
-		}
-
-		final int folding = this.compiler.config.getConstantFolding();
-		for (int i = 0; i < folding; i++)
-		{
-			iclass.foldConstants();
-		}
-		iclass.cleanup(this, this);
-
-		// Compile and load the class
-
-		this.compileClass(iclass);
-
-		this.classes.put(iclass.getName(), iclass);
-
-		StringBuilder buf = new StringBuilder("Defined ");
-		Util.classSignatureToString(iclass, buf);
-		this.compiler.getOutput().println(buf.toString());
+		this.initMember(iclass);
+		this.currentClass.getBody().addClass(iclass);
+		this.members.add(iclass);
 	}
 
 	@Override
 	public void addInnerClass(IClassCompilable iclass)
 	{
-		if (iclass.hasSeparateFile())
-		{
-			iclass.setInnerIndex(this.className, this.innerClassList.size());
-			this.innerClassList.add(iclass);
-		}
-		else
-		{
-			this.addCompilable(iclass);
-		}
+		iclass.setInnerIndex(this.currentClass.getInternalName(), this.innerClassList.size());
+		this.innerClassList.add(iclass);
 	}
 
 	@Override
-	public int compilableCount()
+	public REPLVariable createDataMember(ICodePosition position, Name name, IType type, ModifierSet modifiers,
+		                                    AnnotationList annotations)
 	{
-		return this.compilableList.size();
-	}
-
-	@Override
-	public void addCompilable(IClassCompilable compilable)
-	{
-		compilable.setInnerIndex(this.className, this.compilableList.size());
-		this.compilableList.add(compilable);
-	}
-
-	@Override
-	public IClassCompilable getCompilable(int index)
-	{
-		return this.compilableList.get(index);
+		return new REPLVariable(this, position, name, type, modifiers, annotations);
 	}
 
 	@Override
 	public void addDataMember(REPLVariable variable)
 	{
 		this.initMember(variable);
-
-		final Name variableName = variable.getName();
-
-		this.fields.put(variableName, variable);
-		if (this.computeVariable(variable))
-		{
-			this.compiler.getOutput().println(variable.toString());
-		}
-		else
-		{
-			this.fields.removeKey(variableName);
-		}
-	}
-
-	@Override
-	public REPLVariable createDataMember(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
-	{
-		return new REPLVariable(this, position, name, type, this.className, modifiers, annotations);
+		this.currentClass.getBody().addDataMember(variable);
+		this.members.add(variable);
 	}
 
 	@Override
 	public void addProperty(IProperty property)
 	{
 		this.initMember(property);
-
-		property.setEnclosingClass(this.memberClass);
-		property.resolveTypes(this.markers, this);
-		property.resolve(this.markers, this);
-		property.checkTypes(this.markers, this);
-		property.check(this.markers, this);
-
-		if (this.hasErrors())
-		{
-			return;
-		}
-
-		final int folding = this.compiler.config.getConstantFolding();
-		for (int i = 0; i < folding; i++)
-		{
-			property.foldConstants();
-		}
-		property.cleanup(this, this);
-
-		this.compileClass(this.memberClass);
-
-		this.properties.put(property.getName(), property);
-
-		StringBuilder buf = new StringBuilder("Defined Property '");
-		Util.memberSignatureToString(property, null, buf);
-		this.compiler.getOutput().println(buf.append('\'').toString());
+		this.currentClass.getBody().addProperty(property);
+		this.members.add(property);
 	}
 
 	@Override
 	public void addMethod(IMethod method)
 	{
-		updateModifiers(method.getModifiers());
-
 		this.initMember(method);
-
-		method.resolveTypes(this.markers, this);
-		if (this.hasErrors())
-		{
-			return;
-		}
-
-		method.resolve(this.markers, this);
-		method.checkTypes(this.markers, this);
-		method.check(this.markers, this);
-
-		if (this.hasErrors())
-		{
-			return;
-		}
-
-		final int folding = this.compiler.config.getConstantFolding();
-		for (int i = 0; i < folding; i++)
-		{
-			method.foldConstants();
-		}
-		method.cleanup(this, this);
-
-		this.compileClass(this.memberClass);
-
-		this.registerMethod(method);
-	}
-
-	public static void updateModifiers(ModifierSet modifiers)
-	{
-		if ((modifiers.toFlags() & Modifiers.VISIBILITY_MODIFIERS) == 0)
-		{
-			modifiers.addIntModifier(Modifiers.PUBLIC);
-		}
-		modifiers.addIntModifier(Modifiers.STATIC);
+		this.currentClass.getBody().addMethod(method);
+		this.members.add(method);
 	}
 
 	private void registerMethod(IMethod method)
@@ -599,6 +404,8 @@ public class REPLContext extends DyvilHeader
 	public void addConstructor(IConstructor constructor)
 	{
 	}
+
+	// region IContext overrides
 
 	@Override
 	public IClass resolveClass(Name name)
@@ -692,19 +499,21 @@ public class REPLContext extends DyvilHeader
 	@Override
 	public IClass getThisClass()
 	{
-		return this.memberClass;
+		return this.currentClass;
 	}
+
+	// endregion
 
 	@Override
 	public Name getName()
 	{
-		return Name.fromRaw(this.className);
+		return this.currentClass.getName();
 	}
 
 	@Override
 	public String getFullName()
 	{
-		return this.className;
+		return this.currentClass.getFullName();
 	}
 
 	@Override
@@ -716,7 +525,7 @@ public class REPLContext extends DyvilHeader
 	@Override
 	public String getInternalName()
 	{
-		return this.className;
+		return this.currentClass.getInternalName();
 	}
 
 	@Override
