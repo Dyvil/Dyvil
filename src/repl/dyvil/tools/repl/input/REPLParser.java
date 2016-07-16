@@ -61,7 +61,7 @@ public class REPLParser extends Parser
 				return;
 			}
 
-			pm.pushParser(new ExpressionParser(this.context), true);
+			pm.pushParser(new ExpressionParser(this.context));
 			return;
 		case SEPARATOR:
 			switch (type)
@@ -77,7 +77,6 @@ public class REPLParser extends Parser
 			this.mode = ELEMENT;
 			pm.report(token, "statement_list.semicolon");
 			pm.reparse();
-			return;
 		}
 	}
 }

@@ -185,7 +185,7 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 				return;
 			}
 
-			pm.pushParser(new ExpressionParser(this), true);
+			pm.pushParser(new ExpressionParser(this));
 			return;
 		case SEPARATOR:
 			this.mode = EXPRESSION;

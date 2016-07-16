@@ -3,6 +3,7 @@ package dyvil.tools.parsing;
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.parsing.lexer.Symbols;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.token.IToken;
@@ -95,23 +96,21 @@ public class TryParserManager extends ParserManager
 
 		this.reset(markers, tokens);
 
-		// Have to rewind one token because the TryParserManager assumes the TokenIterator is at the beginning (i.e.
-		// no tokens have been returned by next() yet)
-		this.setNext(token);
+		// Have to rewind one token because the TryParserManager assumes the TokenIterator is at the beginning
+		// (i.e. no tokens have been returned by next() yet)
+		tokens.setNext(token);
 
-		if (this.parse(parser, markers, EXIT_ON_ROOT))
+		if (!this.parse(parser, markers, flags))
 		{
-			this.reset();
-
-			final IToken last = tokens.lastReturned();
-			tokens.setNext(last);
-
-			return true;
+			// Reset to the next token and restore split tokens
+			this.setNextAndReset(token);
+			return false;
 		}
 
-		// Reset to the next token and restore split tokens
-		this.setNextAndReset(token.next());
-		return false;
+		this.reset();
+
+		tokens.setNext(tokens.lastReturned());
+		return true;
 	}
 
 	@Override
@@ -138,12 +137,11 @@ public class TryParserManager extends ParserManager
 			}
 			else
 			{
-				if (!this.tokens.hasNext())
+				token = this.tokens.next();
+				if (token.type() == Tokens.EOF)
 				{
 					break;
 				}
-
-				token = this.tokens.next();
 			}
 
 			if (this.skip > 0)
@@ -188,6 +186,7 @@ public class TryParserManager extends ParserManager
 		}
 
 		this.parseRemaining(token);
+		this.reparse = false;
 
 		return this.success(markers);
 	}
