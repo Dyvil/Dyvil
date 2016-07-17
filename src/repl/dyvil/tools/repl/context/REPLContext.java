@@ -168,11 +168,29 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 
 	public void processMember(IMember member, Class<?> theClass)
 	{
-		if (member instanceof REPLVariable)
+		switch (member.getKind())
 		{
-			final REPLVariable replVariable = (REPLVariable) member;
-			replVariable.setRuntimeClass(theClass);
-			replVariable.updateValue(this.repl);
+		case FIELD:
+
+			if (member instanceof REPLVariable)
+			{
+
+				final REPLVariable replVariable = (REPLVariable) member;
+				replVariable.setRuntimeClass(theClass);
+				replVariable.updateValue(this.repl);
+			}
+
+			this.fields.put(member.getName(), (IField) member);
+			break;
+		case METHOD:
+			this.methods.add((IMethod) member);
+			break;
+		case PROPERTY:
+			this.properties.put(member.getName(), (IProperty) member);
+			break;
+		case CLASS:
+			this.classes.put(member.getName(), (IClass) member);
+			break;
 		}
 
 		this.repl.getOutput().println(member);
