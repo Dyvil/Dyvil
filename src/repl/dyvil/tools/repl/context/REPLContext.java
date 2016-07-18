@@ -171,6 +171,11 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 		switch (member.getKind())
 		{
 		case FIELD:
+			if (Types.isVoid(member.getType()))
+			{
+				// Don't register the variable
+				return;
+			}
 
 			if (member instanceof REPLVariable)
 			{

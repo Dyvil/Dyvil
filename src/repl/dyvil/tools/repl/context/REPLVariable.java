@@ -5,6 +5,7 @@ import dyvil.io.Console;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -16,6 +17,7 @@ import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.repl.DyvilREPL;
 
@@ -114,13 +116,27 @@ public class REPLVariable extends Field
 	}
 
 	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		if (!Types.isVoid(this.type))
+		{
+			super.check(markers, context);
+			return;
+		}
+
+		this.type = Types.UNKNOWN;
+		super.check(markers, context);
+		this.type = Types.VOID;
+	}
+
+	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		final String name = this.getBytecodeName();
 		final String descriptor = this.getDescriptor();
 		final String methodType = "()" + descriptor;
 
-		if (this.type != Types.VOID)
+		if (!Types.isVoid(this.type))
 		{
 			// Generate the field holding the value
 			writer.visitField(this.modifiers.toFlags(), name, descriptor, null, null);
@@ -153,7 +169,7 @@ public class REPLVariable extends Field
 
 		// Write a call to the repl$compute$... method
 		writer.visitMethodInsn(Opcodes.INVOKESTATIC, owner, "repl$compute$" + name, methodType, false);
-		if (this.type != Types.VOID)
+		if (!Types.isVoid(this.type))
 		{
 			// Store the value to the field
 			writer.visitFieldInsn(Opcodes.PUTSTATIC, owner, name, descriptor);
