@@ -179,7 +179,6 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 
 			if (member instanceof REPLVariable)
 			{
-
 				final REPLVariable replVariable = (REPLVariable) member;
 				replVariable.setRuntimeClass(theClass);
 				replVariable.updateValue(this.repl);
@@ -194,7 +193,11 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 			this.properties.put(member.getName(), (IProperty) member);
 			break;
 		case CLASS:
-			this.classes.put(member.getName(), (IClass) member);
+			// Compile and load the inner class
+			final IClass innerClass = (IClass) member;
+			REPLCompiler.compile(this.repl, innerClass);
+
+			this.classes.put(member.getName(), innerClass);
 			break;
 		}
 
