@@ -308,7 +308,7 @@ public class Parser
 			token = token.next.next
 		}
 		
-		this.tokens.jump(token.next())
+		this.tokens.setNext(token.next())
 		while (token.prev.ttype == BaseSymbols.DOT)
 		{
 			visitor = visitor.visitValueAccess(token.nameValue)
