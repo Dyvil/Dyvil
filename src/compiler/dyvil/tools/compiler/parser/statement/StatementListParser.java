@@ -48,7 +48,7 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 	private static final int EXPRESSION            = 1 << 3;
 	private static final int SEPARATOR             = 1 << 4;
 
-	private static final TryParserManager TRY_PARSER = new TryParserManager(DyvilSymbols.INSTANCE);
+	private final TryParserManager tryParserManager = new TryParserManager(DyvilSymbols.INSTANCE);
 
 	private static final int MEMBER_FLAGS = NO_UNINITIALIZED_VARIABLES | OPERATOR_ERROR | NO_FIELD_PROPERTIES;
 
@@ -180,7 +180,8 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 			}
 
 			this.mode = SEPARATOR;
-			if (TRY_PARSER.tryParse(pm, new MemberParser<>(this).withFlags(MEMBER_FLAGS), token, EXIT_ON_ROOT))
+			if (this.tryParserManager
+				    .tryParse(pm, new MemberParser<>(this).withFlags(MEMBER_FLAGS), token, EXIT_ON_ROOT))
 			{
 				return;
 			}
@@ -191,11 +192,6 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 			this.mode = EXPRESSION;
 			if (type == BaseSymbols.SEMICOLON)
 			{
-				return;
-			}
-			if (token.prev().type() == BaseSymbols.CLOSE_CURLY_BRACKET)
-			{
-				pm.reparse();
 				return;
 			}
 			pm.report(token, "statement_list.semicolon");
