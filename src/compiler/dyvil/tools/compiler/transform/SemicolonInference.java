@@ -23,16 +23,8 @@ public final class SemicolonInference
 		IToken next = first.next();
 		while (next.type() != Tokens.EOF)
 		{
-			inferSemicolon(prev, next);
-			prev = next;
-			next = next.next();
-		}
-		
-		prev = first;
-		next = first.next();
-		while (next.type() != Tokens.EOF)
-		{
 			next.setPrev(prev);
+			inferSemicolon(prev, next);
 			prev = next;
 			next = next.next();
 		}
@@ -125,6 +117,8 @@ public final class SemicolonInference
 		
 		final IToken semicolon = new InferredSemicolon(prevLine, prev.endIndex());
 		semicolon.setNext(next);
+		semicolon.setPrev(prev);
+		next.setPrev(semicolon);
 		prev.setNext(semicolon);
 	}
 }
