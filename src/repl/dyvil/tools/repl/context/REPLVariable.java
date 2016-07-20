@@ -13,7 +13,6 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
@@ -55,7 +54,7 @@ public class REPLVariable extends Field
 		{
 			try
 			{
-				final java.lang.reflect.Method method = this.runtimeClass.getDeclaredMethod(this.name.qualified);
+				final java.lang.reflect.Method method = this.runtimeClass.getDeclaredMethod(this.getBytecodeName());
 				method.setAccessible(true);
 				result = method.invoke(null);
 			}
@@ -78,7 +77,7 @@ public class REPLVariable extends Field
 		{
 			try
 			{
-				final java.lang.reflect.Field field = this.runtimeClass.getDeclaredFields()[0];
+				final java.lang.reflect.Field field = this.runtimeClass.getDeclaredField(this.getBytecodeName());
 				field.setAccessible(true);
 				result = field.get(null);
 			}
@@ -134,22 +133,11 @@ public class REPLVariable extends Field
 	{
 		final String name = this.getBytecodeName();
 		final String descriptor = this.getDescriptor();
-		final String methodType = "()" + descriptor;
 
 		if (!Types.isVoid(this.type))
 		{
 			// Generate the field holding the value
 			writer.visitField(this.modifiers.toFlags(), name, descriptor, null, null);
-		}
-
-		// Write the repl$compute$... method
-		if (this.value != null)
-		{
-			final MethodWriter computeWriter = new MethodWriterImpl(writer, writer.visitMethod(
-				Modifiers.PRIVATE | Modifiers.STATIC, "repl$compute$" + name, methodType, null, null));
-			computeWriter.visitCode();
-			this.value.writeExpression(computeWriter, this.type);
-			computeWriter.visitEnd(this.type);
 		}
 
 		// Write the property, if necessary
@@ -162,13 +150,11 @@ public class REPLVariable extends Field
 	@Override
 	public void writeStaticInit(MethodWriter writer) throws BytecodeException
 	{
+		final String owner = this.enclosingClass.getInternalName();
 		final String name = this.getBytecodeName();
 		final String descriptor = this.getDescriptor();
-		final String methodType = "()" + descriptor;
-		final String owner = this.enclosingClass.getInternalName();
 
-		// Write a call to the repl$compute$... method
-		writer.visitMethodInsn(Opcodes.INVOKESTATIC, owner, "repl$compute$" + name, methodType, false);
+		this.value.writeExpression(writer, this.type);
 		if (!Types.isVoid(this.type))
 		{
 			// Store the value to the field
