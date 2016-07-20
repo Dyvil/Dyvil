@@ -401,7 +401,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public void addCompilable(IClassCompilable compilable)
 	{
-		compilable.setInnerIndex(this.internalName, this.compilableCount);
+		compilable.setInnerIndex(this.getInternalName(), this.compilableCount);
 
 		if (this.compilables == null)
 		{
@@ -910,12 +910,15 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public String getFileName()
 	{
-		int index = this.internalName.lastIndexOf('/');
-		if (index < 0)
+		final String internalName = this.getInternalName();
+		final int slashIndex = internalName.lastIndexOf('/');
+
+		if (slashIndex < 0)
 		{
-			return this.internalName;
+			return internalName;
 		}
-		return this.internalName.substring(index + 1);
+		// Strip the package/ part
+		return internalName.substring(slashIndex + 1);
 	}
 
 	@Override
