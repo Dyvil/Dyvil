@@ -190,8 +190,10 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 			return;
 		case SEPARATOR:
 			this.mode = EXPRESSION;
-			if (type == BaseSymbols.SEMICOLON)
+			switch (type)
 			{
+			case BaseSymbols.SEMICOLON:
+			case BaseSymbols.COMMA:
 				return;
 			}
 			pm.report(token, "statement_list.semicolon");

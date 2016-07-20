@@ -53,14 +53,15 @@ public class REPLParser extends Parser
 	public void parse(IParserManager pm, IToken token)
 	{
 		final int type = token.type();
+		if (type == Tokens.EOF)
+		{
+			pm.popParser();
+			return;
+		}
+
 		switch (this.mode)
 		{
 		case ELEMENT:
-			if (type == Tokens.EOF)
-			{
-				pm.popParser();
-				return;
-			}
 
 			this.mode = SEPARATOR;
 			if (TRY_PARSER
@@ -77,19 +78,14 @@ public class REPLParser extends Parser
 			pm.pushParser(new ExpressionParser(this.context));
 			return;
 		case SEPARATOR:
+			this.mode = ELEMENT;
 			switch (type)
 			{
-			case Tokens.EOF:
-				pm.popParser();
-				return;
 			case BaseSymbols.SEMICOLON:
-				this.mode = ELEMENT;
+			case BaseSymbols.COMMA:
 				return;
 			}
-
-			this.mode = ELEMENT;
 			pm.report(token, "statement_list.semicolon");
-			pm.reparse();
 		}
 	}
 }
