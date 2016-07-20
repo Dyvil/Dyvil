@@ -179,13 +179,13 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 				return;
 			}
 
+			this.mode = SEPARATOR;
 			if (TRY_PARSER.tryParse(pm, new MemberParser<>(this).withFlag(MEMBER_FLAGS), token, EXIT_ON_ROOT))
 			{
-				this.mode = SEPARATOR;
 				return;
 			}
 
-			pm.pushParser(new ExpressionParser(this), true);
+			pm.pushParser(new ExpressionParser(this));
 			return;
 		case SEPARATOR:
 			this.mode = EXPRESSION;

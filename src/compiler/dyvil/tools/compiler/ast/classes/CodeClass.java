@@ -68,20 +68,11 @@ public class CodeClass extends AbstractClass
 		this.interfaces = new IType[1];
 	}
 
-	public CodeClass(ICodePosition position, IDyvilHeader unit)
+	public CodeClass(IDyvilHeader unit, Name name)
 	{
-		this.position = position;
 		this.unit = unit;
+		this.name = name;
 		this.modifiers = new ModifierList();
-
-		this.interfaces = new IType[1];
-	}
-
-	public CodeClass(ICodePosition position, IDyvilHeader unit, ModifierSet modifiers)
-	{
-		this.position = position;
-		this.unit = unit;
-		this.modifiers = modifiers;
 
 		this.interfaces = new IType[1];
 	}
@@ -99,6 +90,12 @@ public class CodeClass extends AbstractClass
 	}
 
 	@Override
+	public IDyvilHeader getHeader()
+	{
+		return this.unit;
+	}
+
+	@Override
 	public void setHeader(IDyvilHeader unit)
 	{
 		this.unit = unit;
@@ -108,12 +105,6 @@ public class CodeClass extends AbstractClass
 			this.internalName = unit.getInternalName(this.name);
 			this.fullName = unit.getFullName(this.name);
 		}
-	}
-
-	@Override
-	public IDyvilHeader getHeader()
-	{
-		return this.unit;
 	}
 
 	@Override
@@ -479,6 +470,26 @@ public class CodeClass extends AbstractClass
 	}
 
 	@Override
+	public String getFullName()
+	{
+		if (this.fullName != null)
+		{
+			return this.fullName;
+		}
+		return this.fullName = this.unit.getFullName(this.name);
+	}
+
+	@Override
+	public String getInternalName()
+	{
+		if (this.internalName != null)
+		{
+			return this.internalName;
+		}
+		return this.internalName = this.unit.getInternalName(this.name);
+	}
+
+	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		// Header
@@ -497,8 +508,8 @@ public class CodeClass extends AbstractClass
 		{
 			modifiers |= ASMConstants.ACC_SUPER;
 		}
-		writer
-			.visit(ClassFormat.CLASS_VERSION, modifiers & 0x7631, this.internalName, signature, superClass, interfaces);
+		writer.visit(ClassFormat.CLASS_VERSION, modifiers & 0x7631, this.getInternalName(), signature, superClass,
+		             interfaces);
 
 		// Source
 
@@ -689,7 +700,8 @@ public class CodeClass extends AbstractClass
 	private void writeClassParameters(ClassWriter writer) throws BytecodeException
 	{
 		final int parameterCount = this.parameters.size();
-		if (parameterCount == 0) {
+		if (parameterCount == 0)
+		{
 			return;
 		}
 
@@ -821,8 +833,7 @@ public class CodeClass extends AbstractClass
 				modifiers &= ~Modifiers.STATIC;
 			}
 			final String outerName = this.enclosingClass.getInternalName();
-			writer.visitInnerClass(this.internalName, outerName, this.name.qualified,
-			                       modifiers);
+			writer.visitInnerClass(this.getInternalName(), outerName, this.name.qualified, modifiers);
 
 			writer.visitOuterClass(outerName, null, null);
 		}
