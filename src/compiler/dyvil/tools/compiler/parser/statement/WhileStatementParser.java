@@ -45,7 +45,7 @@ public final class WhileStatementParser extends Parser implements IValueConsumer
 			pm.report(token, "while.while");
 			// Fallthrough
 		case CONDITION:
-			pm.pushParser(new ExpressionParser(this).withFlag(IGNORE_STATEMENT), true);
+			pm.pushParser(new ExpressionParser(this).withFlags(IGNORE_STATEMENT), true);
 			this.mode = SEPARATOR;
 			return;
 		case SEPARATOR:

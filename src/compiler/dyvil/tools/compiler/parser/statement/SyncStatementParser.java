@@ -45,7 +45,7 @@ public class SyncStatementParser extends Parser implements IValueConsumer
 			pm.report(token, "sync.synchronized");
 			// Fallthrough
 		case LOCK:
-			pm.pushParser(new ExpressionParser(this).withFlag(IGNORE_STATEMENT));
+			pm.pushParser(new ExpressionParser(this).withFlags(IGNORE_STATEMENT));
 			this.mode = SEPARATOR;
 			return;
 		case SEPARATOR:

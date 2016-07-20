@@ -80,18 +80,18 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		return (this.flags & flag) != 0;
 	}
 
-	public void addFlag(int flag)
+	public void addFlags(int flag)
 	{
 		this.flags |= flag;
 	}
 
-	public ExpressionParser withFlag(int flag)
+	public ExpressionParser withFlags(int flag)
 	{
 		this.flags |= flag;
 		return this;
 	}
 
-	public void removeFlag(int flag)
+	public void removeFlags(int flag)
 	{
 		this.flags &= ~flag;
 	}
@@ -434,7 +434,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			}
 
 			chain.addOperator(name, token.raw());
-			pm.pushParser(new ExpressionParser(chain::addOperand).withFlag(this.flags | IGNORE_OPERATOR));
+			pm.pushParser(new ExpressionParser(chain::addOperand).withFlags(this.flags | IGNORE_OPERATOR));
 			return;
 		}
 
@@ -597,7 +597,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		{
 			final SingleArgument argument = new SingleArgument();
 			call.setArguments(argument);
-			pm.pushParser(new ExpressionParser(argument).withFlag(this.flags | IGNORE_APPLY | IGNORE_OPERATOR));
+			pm.pushParser(new ExpressionParser(argument).withFlags(this.flags | IGNORE_APPLY | IGNORE_OPERATOR));
 			return;
 		}
 

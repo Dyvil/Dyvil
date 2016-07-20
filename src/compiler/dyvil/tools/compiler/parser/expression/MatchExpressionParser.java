@@ -54,7 +54,7 @@ public class MatchExpressionParser extends Parser
 			// Fallthrough
 		case EXPRESSION:
 			this.mode = EXPRESSION_END;
-			pm.pushParser(new ExpressionParser(this.matchExpression).withFlag(IGNORE_STATEMENT), true);
+			pm.pushParser(new ExpressionParser(this.matchExpression).withFlags(IGNORE_STATEMENT), true);
 			return;
 		case EXPRESSION_END:
 			if (type == BaseSymbols.COLON)

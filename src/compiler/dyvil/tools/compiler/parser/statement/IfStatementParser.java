@@ -49,7 +49,7 @@ public class IfStatementParser extends Parser implements IValueConsumer
 			pm.report(token, "if.if");
 			// Fallthrough
 		case CONDITION:
-			pm.pushParser(new ExpressionParser(this).withFlag(IGNORE_STATEMENT), true);
+			pm.pushParser(new ExpressionParser(this).withFlags(IGNORE_STATEMENT), true);
 			this.mode = SEPARATOR;
 			return;
 		case SEPARATOR:

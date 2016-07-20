@@ -69,7 +69,7 @@ public class REPLParser extends Parser
 				return;
 			}
 
-			if (TRY_PARSER.tryParse(pm, new MemberParser<>(this.context).withFlag(MEMBER_FLAGS), token, EXIT_ON_ROOT))
+			if (TRY_PARSER.tryParse(pm, new MemberParser<>(this.context).withFlags(MEMBER_FLAGS), token, EXIT_ON_ROOT))
 			{
 				return;
 			}
