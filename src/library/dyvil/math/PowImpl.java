@@ -3,7 +3,7 @@ package dyvil.math;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-final class PowImpl
+public final class PowImpl
 {
 	private PowImpl()
 	{
