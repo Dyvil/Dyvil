@@ -183,6 +183,7 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 			{
 				// IDENTIFIER : ...
 				this.label = token.nameValue();
+				pm.report(Markers.syntaxWarning(token, "statement_list.label.deprecated", this.label));
 				pm.skip();
 				// mode stays EXPRESSION
 				return;
