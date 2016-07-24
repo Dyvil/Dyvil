@@ -689,6 +689,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 
 			if (this.labels != null && i < this.labels.length && (label = this.labels[i]) != null)
 			{
+				buffer.append("label ");
 				buffer.append(label.name);
 
 				if (Formatting.getBoolean("label.separator.space_before"))

@@ -25,7 +25,9 @@ import dyvil.tools.compiler.parser.classes.MemberParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.expression.LambdaOrTupleParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
+import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.Parser;
@@ -46,7 +48,9 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 	private static final int LAMBDA_TYPE_ARROW     = 1 << 1;
 	private static final int LAMBDA_RETURN_ARROW   = 1 << 2;
 	private static final int EXPRESSION            = 1 << 3;
-	private static final int SEPARATOR             = 1 << 4;
+	private static final int LABEL_NAME            = 1 << 4;
+	private static final int LABEL_END             = 1 << 5;
+	private static final int SEPARATOR             = 1 << 6;
 
 	private final TryParserManager tryParserManager = new TryParserManager(DyvilSymbols.INSTANCE);
 
@@ -165,8 +169,13 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 			this.mode = EXPRESSION;
 			return;
 		case EXPRESSION:
-			if (type == BaseSymbols.SEMICOLON || type == BaseSymbols.COMMA)
+			switch (type)
 			{
+			case BaseSymbols.SEMICOLON:
+			case BaseSymbols.COMMA:
+				return;
+			case DyvilKeywords.LABEL:
+				this.mode = LABEL_NAME;
 				return;
 			}
 
@@ -187,6 +196,31 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 			}
 
 			pm.pushParser(new ExpressionParser(this));
+			return;
+		case LABEL_NAME:
+			if (ParserUtil.isIdentifier(type))
+			{
+				this.mode = LABEL_END;
+				return;
+			}
+			this.mode = EXPRESSION;
+			if (type != BaseSymbols.COLON)
+			{
+				pm.reparse();
+			}
+			pm.report(token, "statement_list.label.name");
+			return;
+		case LABEL_END:
+			switch (type)
+			{
+			case BaseSymbols.COLON:
+			case BaseSymbols.SEMICOLON:
+				this.mode = EXPRESSION;
+				return;
+			}
+			this.mode = EXPRESSION;
+			pm.reparse();
+			pm.report(ICodePosition.between(token, token.next()), "statement_list.label.separator");
 			return;
 		case SEPARATOR:
 			this.mode = EXPRESSION;
