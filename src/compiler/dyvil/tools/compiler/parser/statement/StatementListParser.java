@@ -27,7 +27,6 @@ import dyvil.tools.compiler.parser.expression.LambdaOrTupleParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.Parser;
@@ -176,16 +175,6 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 				return;
 			case DyvilKeywords.LABEL:
 				this.mode = LABEL_NAME;
-				return;
-			}
-
-			if (ParserUtil.isIdentifier(type) && token.next().type() == BaseSymbols.COLON)
-			{
-				// IDENTIFIER : ...
-				this.label = token.nameValue();
-				pm.report(Markers.syntaxWarning(token, "statement_list.label.deprecated", this.label));
-				pm.skip();
-				// mode stays EXPRESSION
 				return;
 			}
 
