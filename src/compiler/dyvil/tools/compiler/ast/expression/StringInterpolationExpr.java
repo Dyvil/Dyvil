@@ -233,6 +233,30 @@ public final class StringInterpolationExpr implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
+		this.writeExpression(writer);
+
+		if (type != null)
+		{
+			Types.STRING.writeCast(writer, type, this.getLineNumber());
+		}
+	}
+
+	private void writeExpression(MethodWriter writer)
+	{
+		switch (this.valueCount)
+		{
+		case 0:
+			writer.visitLdcInsn(this.strings[0]);
+			return;
+		case 1:
+			if (this.strings[0].isEmpty() && this.strings[1].isEmpty())
+			{
+				// "\(someValue)"
+				CaseClasses.writeToString(writer, this.values[0]);
+				return;
+			}
+		}
+
 		String string = this.strings[0];
 
 		int estSize = string.length();
@@ -261,11 +285,6 @@ public final class StringInterpolationExpr implements IValue
 
 		writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;",
 		                       false);
-
-		if (type != null)
-		{
-			Types.STRING.writeCast(writer, type, this.getLineNumber());
-		}
 	}
 
 	@Override
