@@ -141,13 +141,9 @@ dependencies {
 
 // ---------------------------------------- Copy Tasks ----------------------------------------
 
-task clearCopyDir(type: Delete) {
-	delete fileTree("$buildDir/src/")
-}
-
 // Library
 
-task copyLibraryJava(type: Copy, dependsOn: clearCopyDir) {
+task copyLibraryJava(type: Sync) {
 	from sourceSets.library.java
 	into "${ buildDir }/src/java/library"
 	
@@ -157,7 +153,7 @@ task copyLibraryJava(type: Copy, dependsOn: clearCopyDir) {
 compileLibraryJava.dependsOn copyLibraryJava
 compileLibraryJava.source = "$buildDir/src/java/library"
 
-task copyLibraryDyvil(type: Copy, dependsOn: clearCopyDir) {
+task copyLibraryDyvil(type: Sync) {
 	from 'src/library'
 	into "$buildDir/src/dyvil/library"
 	
@@ -167,7 +163,7 @@ task copyLibraryDyvil(type: Copy, dependsOn: clearCopyDir) {
 
 // Compiler
 
-task copyCompilerJava(type: Copy, dependsOn: clearCopyDir) {
+task copyCompilerJava(type: Sync) {
 	from sourceSets.compiler.java
 	into "$buildDir/src/java/compiler"
 	
@@ -186,7 +182,7 @@ compileCompilerJava.source = "$buildDir/src/java/compiler"
 
 // REPL
 
-task copyReplJava(type: Copy, dependsOn: clearCopyDir) {
+task copyReplJava(type: Sync) {
 	from sourceSets.repl.java
 	into "$buildDir/src/java/repl"
 
@@ -203,7 +199,7 @@ compileReplJava.source = "$buildDir/src/java/repl"
 
 // DPF
 
-task copyDpfJava(type: Copy, dependsOn: clearCopyDir) {
+task copyDpfJava(type: Sync) {
 	from sourceSets.dpf.java
 	into "$buildDir/src/java/dpf"
 
@@ -214,7 +210,7 @@ task copyDpfJava(type: Copy, dependsOn: clearCopyDir) {
 compileDpfJava.dependsOn(copyDpfJava)
 compileDpfJava.source = "$buildDir/src/java/dpf"
 
-task copyDPFDyvil(type: Copy, dependsOn: clearCopyDir) {
+task copyDPFDyvil(type: Sync) {
 	from 'src/dpf'
 	into "$buildDir/src/dyvil/dpf"
 
@@ -224,7 +220,7 @@ task copyDPFDyvil(type: Copy, dependsOn: clearCopyDir) {
 
 // Tests
 
-task copyTestDyvil(type: Copy, dependsOn: clearCopyDir) {
+task copyTestDyvil(type: Sync) {
 	from 'src/test'
 	into "$buildDir/src/dyvil/test"
 
