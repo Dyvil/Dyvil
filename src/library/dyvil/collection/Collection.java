@@ -219,7 +219,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return a collection that contains all elements of this collection plus all elements of the collection
 	 */
-	Collection<? extends E> union(Collection<? extends E> collection);
+	Collection<E> union(Collection<? extends E> collection);
 
 	/**
 	 * Returns a collection that contains all elements of this collection excluding all elements of the given {@code
@@ -230,7 +230,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return a collection that contains all elements of this collection excluding all elements of the collection
 	 */
-	Collection<? extends E> difference(Collection<?> collection);
+	Collection<E> difference(Collection<?> collection);
 
 	/**
 	 * Returns a collection that contains all elements of this collection that are present in the given collection.
@@ -240,7 +240,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return a collection that contains all elements of this collection that are present in the given collection
 	 */
-	Collection<? extends E> intersection(Collection<? extends E> collection);
+	Collection<E> intersection(Collection<? extends E> collection);
 
 	/**
 	 * Returns a collection that is mapped from this collection by supplying each of this collection's elements to the

@@ -17,9 +17,10 @@ public enum BaseModifiers implements Modifier
 	FINAL(Modifiers.FINAL, "final"),
 	ABSTRACT(Modifiers.ABSTRACT, "abstract"),
 	// Method Modifiers
-	PREFIX(Modifiers.PREFIX, "prefix"),
+	PREFIX(Modifiers.STATIC, "prefix"),
 	INFIX(Modifiers.INFIX, "infix"),
 	POSTFIX(Modifiers.INFIX, "postfix"),
+	IMPLICIT(Modifiers.IMPLICIT, "implicit"),
 	OVERRIDE(Modifiers.OVERRIDE, "override"),
 	INLINE(Modifiers.INLINE, "inline"),
 	SYNCHRONIZED(Modifiers.SYNCHRONIZED, "synchronized"),
@@ -27,8 +28,6 @@ public enum BaseModifiers implements Modifier
 	// Class Modifiers
 	SEALED(Modifiers.SEALED, "sealed"),
 	CASE(Modifiers.CASE_CLASS, "case"),
-	NULL(Modifiers.NULL_CLASS, "null"),
-	NIL(Modifiers.NIL_CLASS, "nil"),
 	// Field Modifiers
 	CONST(Modifiers.CONST, "const"),
 	LAZY(Modifiers.LAZY, "lazy");

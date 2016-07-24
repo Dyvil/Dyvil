@@ -4,9 +4,11 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.IObjectCompilable;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
@@ -18,11 +20,8 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public final class ImportDeclaration implements IASTNode, IObjectCompilable
+public final class ImportDeclaration implements IASTNode, IObjectCompilable, IImportContext
 {
-	public static final int IMPORT = 0;
-	public static final int USING  = 1;
-	
 	protected ICodePosition position;
 	protected IImport       theImport;
 	protected boolean       isStatic;
@@ -70,40 +69,54 @@ public final class ImportDeclaration implements IASTNode, IObjectCompilable
 		
 		this.theImport.resolveTypes(markers, Package.rootPackage, this.isStatic);
 	}
+
+	// Context
 	
+	@Override
 	public Package resolvePackage(Name name)
 	{
 		return this.theImport.resolvePackage(name);
 	}
 	
+	@Override
 	public IClass resolveClass(Name name)
 	{
 		return this.theImport.resolveClass(name);
 	}
 	
+	@Override
 	public IDataMember resolveField(Name name)
 	{
 		return this.theImport.resolveField(name);
 	}
-	
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+
+	@Override
+	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
-		this.theImport.getMethodMatches(list, instance, name, arguments);
+		this.theImport.getImplicitMatches(list, value, targetType);
+	}
+
+	@Override
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
+	{
+		this.theImport.getMethodMatches(list, receiver, name, arguments);
+	}
+
+	// Compilation
+	
+	@Override
+	public void write(DataOutput output) throws IOException
+	{
+		IImport.writeImport(this.theImport, output);
 	}
 	
 	@Override
-	public void write(DataOutput dos) throws IOException
+	public void read(DataInput input) throws IOException
 	{
-		dos.writeByte(this.theImport.importTag());
-		this.theImport.write(dos);
+		this.theImport = IImport.readImport(input);
 	}
-	
-	@Override
-	public void read(DataInput dis) throws IOException
-	{
-		this.theImport = IImport.fromTag(dis.readByte());
-		this.theImport.read(dis);
-	}
+
+	// Formatting
 	
 	@Override
 	public String toString()

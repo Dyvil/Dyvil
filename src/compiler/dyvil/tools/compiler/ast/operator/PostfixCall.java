@@ -3,6 +3,8 @@ package dyvil.tools.compiler.ast.operator;
 import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
@@ -48,7 +50,7 @@ public class PostfixCall extends MethodCall
 	}
 
 	@Override
-	public IValue resolveCall(MarkerList markers, IContext context)
+	public IValue resolveCall(MarkerList markers, IContext context, boolean report)
 	{
 		final IValue op = Operators.getPostfix(this.receiver, this.name);
 		if (op != null)
@@ -59,12 +61,18 @@ public class PostfixCall extends MethodCall
 		}
 
 		// Normal Method Resolution
-		if (this.resolveMethodCall(markers, context))
+		final MatchList<IMethod> ambiguousCandidates = this.resolveMethodCall(markers, context);
+		if (ambiguousCandidates == null)
 		{
 			return this;
 		}
 
 		// No Implicit or Apply Resolution
+		if (report)
+		{
+			this.reportResolve(markers, ambiguousCandidates);
+			return this;
+		}
 		return null;
 	}
 

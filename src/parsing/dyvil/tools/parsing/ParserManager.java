@@ -104,7 +104,7 @@ public class ParserManager implements IParserManager
 			{
 				return new SymbolToken(this.symbols, symbol, line, start);
 			}
-			return new IdentifierToken(Name.get(identifier), Tokens.SYMBOL_IDENTIFIER, line, start, start + length);
+			return new IdentifierToken(Name.from(identifier), Tokens.SYMBOL_IDENTIFIER, line, start, start + length);
 		}
 
 		final int keyword = this.symbols.getKeywordType(identifier);
@@ -113,25 +113,25 @@ public class ParserManager implements IParserManager
 			return new SymbolToken(this.symbols, keyword, line, start);
 		}
 
-		return new IdentifierToken(Name.get(identifier), Tokens.LETTER_IDENTIFIER, line, start, start + length);
+		return new IdentifierToken(Name.from(identifier), Tokens.LETTER_IDENTIFIER, line, start, start + length);
 	}
 
 	@Override
 	public void splitJump(IToken token, int length)
 	{
-		this.jump(this.split(token, length).next());
+		this.setNext(this.split(token, length).next());
 	}
 
 	@Override
 	public void splitReparse(IToken token, int length)
 	{
-		this.jump(this.split(token, length));
+		this.setNext(this.split(token, length));
 	}
 
 	@Override
-	public void report(IToken token, String message)
+	public void report(ICodePosition position, String message)
 	{
-		this.report(new SyntaxError(token, this.markers.getI18n().getString(message)));
+		this.report(new SyntaxError(position, this.markers.getI18n().getString(message)));
 	}
 
 	@Override
@@ -140,7 +140,7 @@ public class ParserManager implements IParserManager
 		this.markers.add(error);
 	}
 
-	public final void parse(Parser parser)
+	public void parse(Parser parser)
 	{
 		this.parser = parser;
 
@@ -154,12 +154,11 @@ public class ParserManager implements IParserManager
 			}
 			else
 			{
-				if (!this.tokens.hasNext())
+				token = this.tokens.next();
+				if (token.type() == Tokens.EOF)
 				{
 					break;
 				}
-
-				token = this.tokens.next();
 			}
 
 			if (this.skip > 0)
@@ -257,9 +256,9 @@ public class ParserManager implements IParserManager
 	}
 
 	@Override
-	public void jump(IToken token)
+	public void setNext(IToken token)
 	{
-		this.tokens.jump(token);
+		this.tokens.setNext(token);
 		this.reparse = false;
 	}
 

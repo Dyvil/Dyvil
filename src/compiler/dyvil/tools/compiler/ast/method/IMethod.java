@@ -25,7 +25,9 @@ public interface IMethod extends IClassMember, ICallableMember, ICallableSignatu
 		return MemberKind.METHOD;
 	}
 
-	float getSignatureMatch(Name name, IValue instance, IArguments arguments);
+	void checkMatch(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments);
+
+	void checkImplicitMatch(MatchList<IMethod> list, IValue value, IType type);
 	
 	IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, GenericData genericData);
 	
@@ -34,6 +36,8 @@ public interface IMethod extends IClassMember, ICallableMember, ICallableSignatu
 	// Misc
 	
 	boolean isAbstract();
+
+	boolean isImplicitConversion();
 
 	boolean isObjectMethod();
 
@@ -64,7 +68,13 @@ public interface IMethod extends IClassMember, ICallableMember, ICallableSignatu
 	int getInvokeOpcode();
 
 	Handle toHandle();
-	
+
+	String getMangledName();
+
+	default void setMangledName(String mangledName)
+	{
+	}
+
 	String getDescriptor();
 	
 	String getSignature();

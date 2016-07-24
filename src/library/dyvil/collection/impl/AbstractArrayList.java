@@ -14,7 +14,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 {
 	private static final long serialVersionUID = 5613951730812933112L;
 
-	protected static final int DEFAULT_CAPACITY = 10;
+	protected static final int DEFAULT_CAPACITY = 16;
 
 	protected transient Object[] elements;
 	protected transient int      size;

@@ -138,10 +138,6 @@ public interface Modifiers
 	 */
 	int TRAIT_CLASS = 0x00080000 | INTERFACE_CLASS;
 
-	int NULL_CLASS = 0x00100000;
-
-	int NIL_CLASS = 0x00200000;
-
 	// Method Modifiers
 
 	/**
@@ -153,8 +149,8 @@ public interface Modifiers
 	int INFIX_FLAG = 0x00020000;
 
 	/**
-	 * <i>Dyvil</i> {@code infix} modifier. If a method is marked with this modifier, it is a method that can be called
-	 * on any Object and virtually has the instance as the first parameter. An infix method is always static.
+	 * <i>Dyvil</i> {@code infix} modifier. If a method is marked with this modifier, it can be called on any Object and
+	 * virtually has the receiver as the first parameter. An infix method is always static.
 	 */
 	int INFIX = INFIX_FLAG | STATIC;
 
@@ -163,15 +159,14 @@ public interface Modifiers
 	int EXTENSION = EXTENSION_FLAG | INFIX;
 
 	/**
-	 * <i>Dyvil</i> {@code prefix} modifier. If a method is marked with this modifier, it is a method that can be called
-	 * on any Object and virtually uses the first (and only) parameter as the instance.
-	 */
-	int PREFIX = 0x00040000;
-
-	/**
 	 * <i>Dyvil</i> {@code override} modifier. This modifier is a shortcut for the {@link Override} annotation.
 	 */
 	int OVERRIDE = 0x00080000;
+
+	/**
+	 * <i>Dyvil</i> {@code implicit} modifier.
+	 */
+	int IMPLICIT = 0x00200000;
 
 	// Field Modifiers
 
@@ -223,8 +218,7 @@ public interface Modifiers
 	 * The modifiers that can be used on classes.
 	 */
 	int CLASS_MODIFIERS =
-		MEMBER_MODIFIERS | CLASS_TYPE_MODIFIERS | ABSTRACT | STRICT | CASE_CLASS | FUNCTIONAL | SEALED | NULL_CLASS
-			| NIL_CLASS;
+		MEMBER_MODIFIERS | CLASS_TYPE_MODIFIERS | ABSTRACT | STRICT | CASE_CLASS | FUNCTIONAL | SEALED;
 
 	/**
 	 * The modifiers that can be used on fields.
@@ -235,7 +229,7 @@ public interface Modifiers
 	 * The modifiers that can be used on methods.
 	 */
 	int METHOD_MODIFIERS =
-		MEMBER_MODIFIERS | ABSTRACT | SYNCHRONIZED | NATIVE | STRICT | INLINE | INFIX | EXTENSION | PREFIX | BRIDGE
+		MEMBER_MODIFIERS | ABSTRACT | SYNCHRONIZED | NATIVE | STRICT | INLINE | INFIX | EXTENSION | IMPLICIT | BRIDGE
 			| VARARGS | OVERRIDE;
 
 	/**

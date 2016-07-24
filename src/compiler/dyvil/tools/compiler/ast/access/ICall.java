@@ -2,22 +2,21 @@ package dyvil.tools.compiler.ast.access;
 
 import dyvil.tools.compiler.ast.consumer.IArgumentsConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LambdaExpr;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.method.Candidate;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
+import dyvil.tools.compiler.ast.parameter.CodeParameter;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.CodeParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -34,7 +33,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 
 	@Override
 	void setArguments(IArguments arguments);
-	
+
 	IArguments getArguments();
 
 	default int wildcardCount()
@@ -65,7 +64,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 		IParameter[] parameters = new IParameter[wildcards];
 		for (int i = 0; i < wildcards; i++)
 		{
-			parameters[i] = new CodeParameter(position, Name.getQualified("wildcard$" + i), Types.UNKNOWN,
+			parameters[i] = new CodeParameter(position, Name.fromRaw("wildcard$" + i), Types.UNKNOWN,
 			                                  EmptyModifiers.INSTANCE, null);
 		}
 
@@ -93,13 +92,13 @@ public interface ICall extends IValue, IArgumentsConsumer
 		return lambdaExpr.resolve(markers, context);
 	}
 
-	public static IValue convertWildcardValue(IValue value, IParameter parameter)
+	static IValue convertWildcardValue(IValue value, IParameter parameter)
 	{
 		ICodePosition valuePosition = value.getPosition();
 		parameter.setPosition(valuePosition);
 		return new FieldAccess(valuePosition, null, parameter);
 	}
-	
+
 	@Override
 	default boolean isUsableAsStatement()
 	{
@@ -119,75 +118,37 @@ public interface ICall extends IValue, IArgumentsConsumer
 		this.resolveReceiver(markers, context);
 		this.resolveArguments(markers, context);
 
-		IValue resolved = this.resolveCall(markers, context);
-		if (resolved != null)
-		{
-			return resolved;
-		}
-
-		// Don't report an error if the receiver is not resolved
+		// Don't resolve and report an error if the receiver is not resolved
 		IValue receiver = this.getReceiver();
 		if (receiver != null && !receiver.isResolved())
 		{
 			return this;
 		}
 
-		// Don't report an error if the arguments are not resolved
+		// Don't resolve and report an error if the arguments are not resolved
 		if (!this.getArguments().isResolved())
 		{
 			return this;
 		}
 
-		this.reportResolve(markers, context);
-		return this;
+		return this.resolveCall(markers, context, true);
 	}
-	
-	void checkArguments(MarkerList markers, IContext context);
-	
-	IValue resolveCall(MarkerList markers, IContext context);
-	
+
 	default void resolveReceiver(MarkerList markers, IContext context)
 	{
 	}
-	
+
 	void resolveArguments(MarkerList markers, IContext context);
-	
-	void reportResolve(MarkerList markers, IContext context);
-	
-	static void addResolveMarker(MarkerList markers, ICodePosition position, IValue instance, Name name, IArguments arguments)
+
+	IValue resolveCall(MarkerList markers, IContext context, boolean report);
+
+	void checkArguments(MarkerList markers, IContext context);
+
+	static boolean privateAccess(IContext context, IValue receiver)
 	{
-		if (arguments == EmptyArguments.INSTANCE)
-		{
-			Marker marker = Markers.semantic(position, "resolve.method_field", name);
-			if (instance != null)
-			{
-				marker.addInfo(Markers.getSemantic("receiver.type", instance.getType()));
-			}
-			
-			markers.add(marker);
-			return;
-		}
-		
-		Marker marker = Markers.semantic(position, "resolve.method", name);
-		if (instance != null)
-		{
-			marker.addInfo(Markers.getSemantic("receiver.type", instance.getType()));
-		}
-		if (!arguments.isEmpty())
-		{
-			StringBuilder builder = new StringBuilder("Argument Types: ");
-			arguments.typesToString(builder);
-			marker.addInfo(builder.toString());
-		}
-		
-		markers.add(marker);
+		return receiver == null || context.getThisClass() == receiver.getType().getTheClass();
 	}
-	
-	static boolean privateAccess(IContext context, IValue instance)
-	{
-		return instance == null || context.getThisClass() == instance.getType().getTheClass();
-	}
-	
+
 	static IDataMember resolveField(IContext context, ITyped receiver, Name name)
 	{
 		if (receiver != null)
@@ -201,10 +162,10 @@ public interface ICall extends IValue, IArgumentsConsumer
 					return match;
 				}
 			}
-			
+
 			return null;
 		}
-		
+
 		final IDataMember match = context.resolveField(name);
 		if (match != null)
 		{
@@ -213,52 +174,61 @@ public interface ICall extends IValue, IArgumentsConsumer
 
 		return Types.LANG_HEADER.resolveField(name);
 	}
-	
-	static IMethod resolveMethod(IContext context, IValue instance, Name name, IArguments arguments)
+
+	static IMethod resolveMethod(IContext context, IValue receiver, Name name, IArguments arguments)
 	{
-		MethodMatchList matches = new MethodMatchList();
-		if (instance != null)
+		return resolveMethods(context, receiver, name, arguments).getBestMember();
+	}
+
+	static MatchList<IMethod> resolveMethods(IContext context, IValue receiver, Name name, IArguments arguments)
+	{
+		@SuppressWarnings("UnnecessaryLocalVariable") final IImplicitContext implicitContext = context;
+
+		final MatchList<IMethod> matches = new MatchList<>(implicitContext);
+
+		// Methods available through the receiver
+		if (receiver != null)
 		{
-			IType type = instance.getType();
-			if (type != null)
+			receiver.getType().getMethodMatches(matches, receiver, name, arguments);
+			if (!matches.isEmpty())
 			{
-				type.getMethodMatches(matches, instance, name, arguments);
-				
-				if (!matches.isEmpty())
-				{
-					return matches.getBestMethod();
-				}
+				return matches;
 			}
 		}
-		
-		// Prefix Methods
+
+		// Methods available through the first argument
 		if (arguments.size() == 1)
 		{
-			IValue v = arguments.getFirstValue();
-			IType type = v.getType();
-			if (type != null)
+			arguments.getFirstValue().getType().getMethodMatches(matches, receiver, name, arguments);
+			if (!matches.isEmpty())
 			{
-				type.getMethodMatches(matches, instance, name, arguments);
-				
+				return matches;
+			}
+		}
+
+		// Methods available in the current context
+		context.getMethodMatches(matches, receiver, name, arguments);
+		if (!matches.isEmpty())
+		{
+			return matches;
+		}
+
+		// Methods available through implicit conversions
+		if (receiver != null)
+		{
+			MatchList<IMethod> implicits = IContext.resolveImplicits(implicitContext, receiver, null);
+			for (Candidate<IMethod> candidate : implicits)
+			{
+				candidate.getMember().getType().getMethodMatches(matches, receiver, name, arguments);
 				if (!matches.isEmpty())
 				{
-					return matches.getBestMethod();
+					return matches;
 				}
 			}
 		}
 
-		context.getMethodMatches(matches, instance, name, arguments);
-		if (!matches.isEmpty())
-		{
-			return matches.getBestMethod();
-		}
-		
-		Types.LANG_HEADER.getMethodMatches(matches, instance, name, arguments);
-		if (!matches.isEmpty())
-		{
-			return matches.getBestMethod();
-		}
-		
-		return null;
+		// Methods available through the Lang Header
+		Types.LANG_HEADER.getMethodMatches(matches, receiver, name, arguments);
+		return matches;
 	}
 }

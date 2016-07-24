@@ -22,7 +22,7 @@ public final class RootPackage extends Package
 		this.compiler = compiler;
 
 		this.setInternalName(this.fullName = ""); // Assignment intentional
-		this.name = Name.getQualified("");
+		this.name = Name.fromRaw("");
 	}
 	
 	@Override

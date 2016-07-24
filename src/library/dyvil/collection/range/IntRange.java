@@ -166,6 +166,35 @@ public class IntRange implements Range<Integer>
 		return value >= this.start && (this.halfOpen ? value < this.end : value <= this.end);
 	}
 
+	public int[] toIntArray()
+	{
+		final int[] result = new int[this.count()];
+
+		int index = 0;
+		if (this.halfOpen)
+		{
+			for (int i = this.start; i < this.end; i += this.increment)
+			{
+				result[index++] = i;
+			}
+			return result;
+		}
+
+		for (int i = this.start; i <= this.end; i += this.increment)
+		{
+			result[index++] = i;
+		}
+		return result;
+	}
+
+	@Override
+	public Integer[] toArray()
+	{
+		final Integer[] result = new Integer[this.count()];
+		this.toArray(0, result);
+		return result;
+	}
+
 	@Override
 	public void toArray(int index, Object[] store)
 	{

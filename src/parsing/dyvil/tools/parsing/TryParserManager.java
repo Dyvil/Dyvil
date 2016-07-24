@@ -3,6 +3,7 @@ package dyvil.tools.parsing;
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.parsing.lexer.Symbols;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.token.IToken;
@@ -48,11 +49,12 @@ public class TryParserManager extends ParserManager
 		}
 	}
 
-	public void resetTo(IToken token)
+	private void setNextAndReset(IToken token)
 	{
-		this.tokens.jump(token);
+		this.reset();
+		this.tokens.setNext(token);
 
-		if (this.splitTokens == null)
+		if (this.splitTokens == null || this.splitTokens.isEmpty())
 		{
 			return;
 		}
@@ -87,16 +89,35 @@ public class TryParserManager extends ParserManager
 		return split;
 	}
 
-	@Deprecated
-	public boolean parse(Parser parser, boolean reportErrors)
+	public boolean tryParse(IParserManager pm, Parser parser, IToken token, int flags)
 	{
-		return this.parse(parser, this.markers, reportErrors ? REPORT_ERRORS : 0);
+		final TokenIterator tokens = pm.getTokens();
+		final MarkerList markers = pm.getMarkers();
+
+		this.reset(markers, tokens);
+
+		// Have to rewind one token because the TryParserManager assumes the TokenIterator is at the beginning
+		// (i.e. no tokens have been returned by next() yet)
+		tokens.setNext(token);
+
+		if (!this.parse(parser, markers, flags))
+		{
+			// Reset to the next token and restore split tokens
+			this.setNextAndReset(token);
+			return false;
+		}
+
+		this.reset();
+
+		tokens.setNext(tokens.lastReturned());
+		return true;
 	}
 
+	@Override
 	@Deprecated
-	public boolean parse(Parser parser, int flags)
+	public void parse(Parser parser)
 	{
-		return this.parse(parser, this.markers, flags);
+		this.parse(parser, this.markers, 0);
 	}
 
 	public boolean parse(Parser parser, MarkerList markers, int flags)
@@ -116,12 +137,11 @@ public class TryParserManager extends ParserManager
 			}
 			else
 			{
-				if (!this.tokens.hasNext())
+				token = this.tokens.next();
+				if (token.type() == Tokens.EOF)
 				{
 					break;
 				}
-
-				token = this.tokens.next();
 			}
 
 			if (this.skip > 0)
@@ -166,6 +186,7 @@ public class TryParserManager extends ParserManager
 		}
 
 		this.parseRemaining(token);
+		this.reparse = false;
 
 		return this.success(markers);
 	}

@@ -2,6 +2,7 @@ package dyvil.tools.compiler.config;
 
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
+import dyvil.io.FileUtils;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.lang.I18n;
@@ -10,6 +11,7 @@ import dyvil.tools.compiler.sources.FileFinder;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.regex.Pattern;
 
 public class CompilerConfig
 {
@@ -27,8 +29,8 @@ public class CompilerConfig
 	private File outputDir;
 	public final List<Library> libraries = new ArrayList<>();
 	
-	public final List<String> includedFiles = new ArrayList<>();
-	public final List<String> excludedFiles = new ArrayList<>();
+	public final List<String>  includedFiles     = new ArrayList<>();
+	public final List<Pattern> exclusionPatterns = new ArrayList<>();
 	
 	private String mainType;
 	public final List<String> mainArgs = new ArrayList<>();
@@ -155,9 +157,9 @@ public class CompilerConfig
 		this.includedFiles.add(fileName);
 	}
 	
-	public void excludeFile(String fileName)
+	public void excludeFile(String pattern)
 	{
-		this.excludedFiles.add(fileName);
+		this.exclusionPatterns.add(FileUtils.antToRegex(pattern));
 	}
 
 	public boolean isDebug()
@@ -215,9 +217,9 @@ public class CompilerConfig
 
 	public boolean isExcluded(String name)
 	{
-		for (String s : this.excludedFiles)
+		for (Pattern p : this.exclusionPatterns)
 		{
-			if (name.endsWith(s))
+			if (p.matcher(name).find())
 			{
 				return false;
 			}
@@ -282,7 +284,7 @@ public class CompilerConfig
 				", outputDir=" + this.outputDir +
 				", libraryFiles=" + this.libraries +
 				", includedFiles=" + this.includedFiles +
-				", excludedFiles=" + this.excludedFiles +
+				", exclusionPatterns=" + this.exclusionPatterns +
 				", mainType=" + this.mainType +
 				", mainArgs=" + this.mainArgs + "]";
 	}

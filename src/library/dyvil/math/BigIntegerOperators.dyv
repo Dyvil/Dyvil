@@ -1,0 +1,26 @@
+package dyvil.math
+
+import java.math.BigInteger
+
+public class BigIntegerOperators
+{
+	public infix implicit inline func toBigInteger(int i):    BigInteger = BigInteger.valueOf(i as long)
+	public infix implicit inline func toBigInteger(long i):   BigInteger = BigInteger.valueOf(i)
+
+	public static inline func +(BigInteger a): BigInteger = a
+	public static inline func -(BigInteger a): BigInteger = a.negate()
+	public static inline func ~(BigInteger a): BigInteger = a.xor(BigInteger.valueOf(-1))
+
+	public infix inline func +(BigInteger a, BigInteger b): BigInteger = a.add(b)
+	public infix inline func -(BigInteger a, BigInteger b): BigInteger = a.subtract(b)
+	public infix inline func *(BigInteger a, BigInteger b): BigInteger = a.multiply(b)
+	public infix inline func /(BigInteger a, BigInteger b): BigInteger = a.divide(b)
+	public infix inline func %(BigInteger a, BigInteger b): BigInteger = a.remainder(b)
+	public infix inline func **(BigInteger a, int b): BigInteger = a.pow(b)
+
+	public infix inline func &(BigInteger a, BigInteger b): BigInteger = a.and(b)
+	public infix inline func |(BigInteger a, BigInteger b): BigInteger = a.or(b)
+	public infix inline func ^(BigInteger a, BigInteger b): BigInteger = a.xor(b)
+	public infix inline func <<(BigInteger a, int b)      : BigInteger = a.shiftLeft(b)
+	public infix inline func >>(BigInteger a, int b)      : BigInteger = a.shiftRight(b)
+}

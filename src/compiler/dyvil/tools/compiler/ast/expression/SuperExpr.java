@@ -85,33 +85,20 @@ public final class SuperExpr implements IValue
 		final IType enclosingType = enclosingClass.getType();
 		if (this.type == Types.UNKNOWN)
 		{
-			this.type = enclosingClass.getSuperType();
-			if (this.type == null)
+			final IType superType = enclosingClass.getSuperType();
+			if (superType == null)
 			{
 				Marker marker = Markers.semantic(this.position, "super.access.type");
 				marker.addInfo(Markers.getSemantic("type.enclosing", enclosingType));
 				markers.add(marker);
+				return;
 			}
+
+			this.type = superType;
 			return;
 		}
 
 		this.type = this.type.resolveType(markers, context);
-		if (!this.type.isResolved())
-		{
-			return;
-		}
-
-		int distance = enclosingType.getSuperTypeDistance(this.type);
-		if (distance == 1)
-		{
-			return;
-		}
-
-		final Marker marker = Markers.semantic(this.position,
-		                                       distance == 0 ? "super.type.invalid" : "super.type.indirect");
-		marker.addInfo(Markers.getSemantic("type.enclosing", enclosingType));
-		marker.addInfo(Markers.getSemantic("super.type.requested", this.type));
-		markers.add(marker);
 	}
 
 	@Override
@@ -132,6 +119,46 @@ public final class SuperExpr implements IValue
 	public void check(MarkerList markers, IContext context)
 	{
 		this.type.check(markers, context);
+
+		if (!this.type.isResolved())
+		{
+			return;
+		}
+
+		final IClass enclosingClass = context.getThisClass();
+		final IType enclosingType = enclosingClass.getType();
+
+		final String message;
+		if (this.type.isSameClass(enclosingType))
+		{
+			// The specified type is the same as the enclosing type
+
+			message = "super.type.invalid";
+		}
+		else
+		{
+			// Check if the specified type is either the direct super type or a direct super interface
+
+			if (enclosingClass.getSuperType().isSameClass(this.type))
+			{
+				return;
+			}
+
+			for (int i = 0, count = enclosingClass.interfaceCount(); i < count; i++)
+			{
+				if (enclosingClass.getInterface(i).isSameClass(this.type))
+				{
+					return;
+				}
+			}
+
+			message = "super.type.indirect";
+		}
+
+		final Marker marker = Markers.semantic(this.position, message);
+		marker.addInfo(Markers.getSemantic("type.enclosing", enclosingType));
+		marker.addInfo(Markers.getSemantic("super.type.requested", this.type));
+		markers.add(marker);
 	}
 
 	@Override

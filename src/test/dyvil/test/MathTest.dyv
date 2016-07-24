@@ -28,7 +28,9 @@ public class MathTest
 		}
 
 		var res = List<int>
-		outer: while value > 1
+
+		label outer:
+		while value > 1
 		{
 			for var prime <- 2 .. value
 			{

@@ -135,7 +135,14 @@ public final class TupleExpr implements IValue, IValueList
 	@Override
 	public boolean isResolved()
 	{
-		return this.tupleType != null;
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			if (!this.values[i].isResolved())
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override
@@ -223,7 +230,7 @@ public final class TupleExpr implements IValue, IValueList
 			return this.values[0].getTypeMatch(type);
 		}
 
-		return Types.getDistance(type, this.getType());
+		return IValue.super.getTypeMatch(type);
 	}
 
 	@Override

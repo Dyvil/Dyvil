@@ -128,13 +128,6 @@ public final class Operators
 			FieldAccess fa = (FieldAccess) arg1;
 			return new FieldAssignment(null, fa.getInstance(), fa.getField(), arg2);
 		}
-		boolean openRange = false;
-		if (name == Names.dotdot || (openRange = name == Names.dotdotlt))
-		{
-			final RangeOperator rangeOperator = new RangeOperator(arg1, arg2);
-			rangeOperator.setHalfOpen(openRange);
-			return rangeOperator;
-		}
 		if (name == Names.ampamp)
 		{
 			if (arg1.isType(Types.BOOLEAN) && arg2.isType(Types.BOOLEAN))

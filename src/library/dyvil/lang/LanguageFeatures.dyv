@@ -19,7 +19,10 @@ public final class LanguageFeatures
 	// Class and Type
 
 	@Intrinsic([ LOAD_0 ])
-	public static T cast<T>(any value) = cast<T>(value)
+	public static T cast<T>(any value) = value as T
+
+	@Intrinsic([ LOAD_0 ])
+	public static T convert<T>(T value) = value
 
 	public static Class<T> classOf<@Reified(true) T>(T value) = class T
 

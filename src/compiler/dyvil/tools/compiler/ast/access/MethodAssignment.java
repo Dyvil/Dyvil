@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -32,14 +33,22 @@ public class MethodAssignment extends AbstractCall implements IValue
 	}
 
 	@Override
-	public IValue resolveCall(MarkerList markers, IContext context)
+	public Name getName()
 	{
-		return this;
+		return this.method.getName();
 	}
 
 	@Override
-	public void reportResolve(MarkerList markers, IContext context)
+	protected Name getReferenceName()
 	{
+		return null;
+	}
+
+	@Override
+	public IValue resolveCall(MarkerList markers, IContext context, boolean report)
+	{
+		// No resolution is necessary - this is a compiler-created AST instance
+		return this;
 	}
 
 	@Override

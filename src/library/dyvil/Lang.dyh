@@ -118,3 +118,6 @@ infix	operator *		{ left, 1200 }
 infix	operator /		{ left, 1200 }
 infix	operator \		{ left, 1200 }
 infix	operator %		{ left, 1200 }
+
+// Exponentiation Operators
+infix   operator **     { right, 1300 }

@@ -81,19 +81,19 @@ public interface Set<E> extends Collection<E>
 	 * {@inheritDoc} This operator represents the 'union' Set operation and delegates to {@link #union(Collection)}.
 	 */
 	@Override
-	Set<? extends E> union(Collection<? extends E> collection);
+	Set<E> union(Collection<? extends E> collection);
 
 	/**
 	 * {@inheritDoc} This operator represents the 'difference' Set operation.
 	 */
 	@Override
-	Set<? extends E> difference(Collection<?> collection);
+	Set<E> difference(Collection<?> collection);
 	
 	/**
 	 * {@inheritDoc} This operator represents the 'intersect' Set operation.
 	 */
 	@Override
-	Set<? extends E> intersection(Collection<? extends E> collection);
+	Set<E> intersection(Collection<? extends E> collection);
 	
 	/**
 	 * Returns a collection that contains all elements that are present in either this or the given {@code collection},
@@ -105,7 +105,7 @@ public interface Set<E> extends Collection<E>
 	 * @return a collection that contains all elements that are present in either this or the given collection, but not
 	 * in both.
 	 */
-	Set<? extends E> symmetricDifference(Collection<? extends E> collection);
+	Set<E> symmetricDifference(Collection<? extends E> collection);
 	
 	@Override
 	<R> Set<R> mapped(Function<? super E, ? extends R> mapper);

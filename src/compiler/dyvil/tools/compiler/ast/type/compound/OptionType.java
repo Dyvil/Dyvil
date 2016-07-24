@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.NilExpr;
@@ -17,7 +17,7 @@ import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -221,13 +221,19 @@ public class OptionType implements IObjectType
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
-		LazyFields.OPTION_CLASS.getMethodMatches(list, instance, name, arguments);
+		LazyFields.OPTION_CLASS.getMethodMatches(list, receiver, name, arguments);
 	}
 
 	@Override
-	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
+	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
+	{
+		LazyFields.OPTION_CLASS.getImplicitMatches(list, value, targetType);
+	}
+
+	@Override
+	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
 	{
 	}
 

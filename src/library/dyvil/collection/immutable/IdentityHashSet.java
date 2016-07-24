@@ -149,7 +149,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 	}
 
 	@Override
-	public ImmutableSet<? extends E> difference(Collection<?> collection)
+	public ImmutableSet<E> difference(Collection<?> collection)
 	{
 		IdentityHashSet<E> copy = new IdentityHashSet<>(this.size);
 		for (E e : this)
@@ -163,7 +163,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 	}
 
 	@Override
-	public ImmutableSet<? extends E> intersection(Collection<? extends E> collection)
+	public ImmutableSet<E> intersection(Collection<? extends E> collection)
 	{
 		IdentityHashSet<E> copy = new IdentityHashSet<>(this.size);
 		for (E e : this)
@@ -177,7 +177,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 	}
 
 	@Override
-	public ImmutableSet<? extends E> union(Collection<? extends E> collection)
+	public ImmutableSet<E> union(Collection<? extends E> collection)
 	{
 		IdentityHashSet<E> copy = new IdentityHashSet<>(this.size + collection.size());
 		for (E e : this)
@@ -192,7 +192,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 	}
 
 	@Override
-	public ImmutableSet<? extends E> symmetricDifference(Collection<? extends E> collection)
+	public ImmutableSet<E> symmetricDifference(Collection<? extends E> collection)
 	{
 		IdentityHashSet<E> copy = new IdentityHashSet<>(this.size + collection.size());
 		for (E e : this)

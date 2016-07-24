@@ -5,7 +5,9 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.method.Candidate;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -13,7 +15,10 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -52,6 +57,8 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 	{
 		return this.receiver;
 	}
+
+	public abstract Name getName();
 
 	@Override
 	public void setArguments(IArguments arguments)
@@ -132,12 +139,15 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 		return Types.isVoid(type) || this.method != null && Types.isAssignable(this.getType(), type);
 	}
 
-	public static IValue toReferenceValue(AbstractCall call, Name name, MarkerList markers, IContext context)
+	protected abstract Name getReferenceName();
+
+	@Override
+	public IValue toReferenceValue(MarkerList markers, IContext context)
 	{
-		MethodCall methodCall = new MethodCall(call.position, call.receiver, name, call.arguments);
-		methodCall.setGenericData(call.genericData);
-		methodCall.setType(call.type);
-		return methodCall.resolveCall(markers, context);
+		final MethodCall methodCall = new MethodCall(this.position, this.receiver, this.getReferenceName(),
+		                                             this.arguments);
+		methodCall.setGenericData(this.genericData);
+		return methodCall.resolveCall(markers, context, false);
 	}
 
 	@Override
@@ -183,7 +193,94 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 	}
 
 	@Override
-	public abstract IValue resolveCall(MarkerList markers, IContext context);
+	public IValue resolveCall(MarkerList markers, IContext context, boolean report)
+	{
+		final MatchList<IMethod> ambigousCandidates = this.resolveMethodCall(markers, context);
+		if (ambigousCandidates == null)
+		{
+			return this;
+		}
+
+		if (report)
+		{
+			this.reportResolve(markers, ambigousCandidates);
+			return this;
+		}
+		return null;
+	}
+
+	protected MatchList<IMethod> resolveMethodCall(MarkerList markers, IContext context)
+	{
+		final MatchList<IMethod> list = ICall.resolveMethods(context, this.receiver, this.getName(), this.arguments);
+		final IMethod method = list.getBestMember();
+
+		if (method != null)
+		{
+			this.method = method;
+			this.checkArguments(markers, context);
+			return null;
+		}
+		return list;
+	}
+
+	protected void reportResolve(MarkerList markers, MatchList<IMethod> matches)
+	{
+		final Marker marker;
+		if (matches == null || !matches.isAmbigous()) // isAmbiguous returns false for empty lists
+		{
+			marker = Markers.semanticError(this.position, "method.access.resolve", this.getName());
+			this.addArgumentInfo(marker);
+		}
+		else
+		{
+			marker = Markers.semanticError(this.position, "method.access.ambiguous", this.getName());
+			this.addArgumentInfo(marker);
+
+			addCandidates(matches, marker);
+		}
+
+		markers.add(marker);
+	}
+
+	private void addArgumentInfo(Marker marker)
+	{
+		if (this.receiver != null)
+		{
+			marker.addInfo(Markers.getSemantic("receiver.type", this.receiver.getType()));
+		}
+		if (!this.arguments.isEmpty())
+		{
+			marker.addInfo(Markers.getSemantic("method.access.argument_types", this.arguments.typesToString()));
+		}
+	}
+
+	private static void addCandidates(MatchList<IMethod> matches, Marker marker)
+	{
+		// Duplicate in ConstructorCall.addCandidates
+
+		marker.addInfo(Markers.getSemantic("method.access.candidates"));
+
+		final Candidate<IMethod> first = matches.getCandidate(0);
+		addCandidateInfo(marker, first);
+
+		for (int i = 1, count = matches.size(); i < count; i++)
+		{
+			final Candidate<IMethod> candidate = matches.getCandidate(i);
+			if (!candidate.equals(first))
+			{
+				break;
+			}
+
+			addCandidateInfo(marker, candidate);
+		}
+	}
+
+	private static void addCandidateInfo(Marker marker, Candidate<IMethod> candidate)
+	{
+		final StringBuilder sb = new StringBuilder().append('\t');
+		Util.methodSignatureToString(candidate.getMember(), null, sb);
+		marker.addInfo(sb.toString());
+	}
 
 	@Override
 	public void checkArguments(MarkerList markers, IContext context)

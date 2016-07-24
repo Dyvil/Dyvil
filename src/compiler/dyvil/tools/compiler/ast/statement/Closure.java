@@ -6,8 +6,8 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LambdaExpr;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.CodeParameter;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -67,7 +67,7 @@ public class Closure extends StatementList
 
 		for (int i = 0; i < parameterCount; i++)
 		{
-			parameters[i] = new CodeParameter(this.position, Name.getQualified("$" + i), Types.UNKNOWN);
+			parameters[i] = new CodeParameter(this.position, Name.fromRaw("$" + i), Types.UNKNOWN);
 		}
 
 		if (type.isExtension() && parameterCount > 0)

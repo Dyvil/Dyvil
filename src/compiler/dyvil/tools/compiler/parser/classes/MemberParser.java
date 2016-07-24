@@ -98,7 +98,7 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 		// this.mode = TYPE;
 	}
 
-	public MemberParser<T> withFlag(int flag)
+	public MemberParser<T> withFlags(int flag)
 	{
 		this.flags |= flag;
 		return this;
@@ -308,7 +308,7 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 				else
 				{
 					this.mode = FIELD_PROPERTY;
-					pm.pushParser(new ExpressionParser(field).withFlag(ExpressionParser.IGNORE_CLOSURE));
+					pm.pushParser(new ExpressionParser(field).withFlags(ExpressionParser.IGNORE_CLOSURE));
 				}
 				return;
 			}

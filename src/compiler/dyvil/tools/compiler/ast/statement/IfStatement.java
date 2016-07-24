@@ -20,6 +20,9 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class IfStatement implements IValue
 {
+	private static final TypeChecker.MarkerSupplier CONDITION_MARKER_SUPPLIER = TypeChecker.markerSupplier(
+		"if.condition.type");
+
 	protected IValue condition;
 	protected IValue then;
 	protected IValue elseThen;
@@ -61,7 +64,8 @@ public class IfStatement implements IValue
 	@Override
 	public boolean isUsableAsStatement()
 	{
-		return this.then.isUsableAsStatement() && (this.elseThen == null || this.elseThen.isUsableAsStatement());
+		return (this.then == null || this.then.isUsableAsStatement()) //
+			       && (this.elseThen == null || this.elseThen.isUsableAsStatement());
 	}
 
 	public void setCondition(IValue condition)
@@ -97,7 +101,7 @@ public class IfStatement implements IValue
 	@Override
 	public boolean isResolved()
 	{
-		return this.commonType != null && this.commonType.isResolved();
+		return this.then != null && this.then.isResolved() && (this.elseThen == null || this.elseThen.isResolved());
 	}
 
 	@Override
@@ -159,9 +163,7 @@ public class IfStatement implements IValue
 			return this.then.getTypeMatch(type);
 		}
 
-		final int thenMatch = this.then.getTypeMatch(type);
-		final int elseMatch = this.elseThen.getTypeMatch(type);
-		return thenMatch == 0 || elseMatch == 0 ? 0 : (thenMatch + elseMatch) / 2;
+		return Math.min(this.then.getTypeMatch(type), this.elseThen.getTypeMatch(type));
 	}
 
 	@Override
@@ -203,7 +205,8 @@ public class IfStatement implements IValue
 		if (this.condition != null)
 		{
 			this.condition = this.condition.resolve(markers, context);
-			this.condition = IStatement.checkCondition(markers, context, this.condition, "if.condition.type");
+			this.condition = TypeChecker.convertValue(this.condition, Types.BOOLEAN, null, markers, context,
+			                                          CONDITION_MARKER_SUPPLIER);
 		}
 		if (this.then != null)
 		{

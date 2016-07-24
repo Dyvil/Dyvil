@@ -3,6 +3,8 @@ package dyvil.tools.compiler.ast.operator;
 import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
@@ -45,7 +47,7 @@ public class PrefixCall extends MethodCall
 	}
 
 	@Override
-	public IValue resolveCall(MarkerList markers, IContext context)
+	public IValue resolveCall(MarkerList markers, IContext context, boolean report)
 	{
 		final IValue operand = this.arguments.getFirstValue();
 
@@ -61,7 +63,8 @@ public class PrefixCall extends MethodCall
 		}
 
 		// Normal Method Resolution
-		if (this.resolveMethodCall(markers, context))
+		final MatchList<IMethod> ambiguousCandidates = this.resolveMethodCall(markers, context);
+		if (ambiguousCandidates == null)
 		{
 			return this;
 		}
@@ -73,13 +76,18 @@ public class PrefixCall extends MethodCall
 		}
 
 		// No apply Resolution
+		if (report)
+		{
+			this.reportResolve(markers, ambiguousCandidates);
+			return this;
+		}
 		return null;
 	}
 
 	@Override
 	public IValue toAssignment(IValue rhs, ICodePosition position)
 	{
-		final Name name = Name.get(this.name.unqualified + "_=", this.name.qualified + "_$eq");
+		final Name name = Name.from(this.name.unqualified + "_=", this.name.qualified + "_$eq");
 		return new MethodCall(this.position, this.arguments.getFirstValue(), name, new SingleArgument(rhs));
 	}
 

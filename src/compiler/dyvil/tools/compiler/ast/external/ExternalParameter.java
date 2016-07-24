@@ -1,11 +1,13 @@
 package dyvil.tools.compiler.ast.external;
 
 import dyvil.tools.asm.Label;
+import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.method.IExternalCallableMember;
-import dyvil.tools.compiler.ast.parameter.AbstractParameter;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
+import dyvil.tools.compiler.ast.parameter.AbstractParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -31,6 +33,11 @@ public class ExternalParameter extends AbstractParameter
 		this.resolved = true;
 
 		this.resolveTypes(null, ((IExternalCallableMember) this.method).getExternalContext());
+	}
+
+	public void addTypeAnnotation(IAnnotation annotation, TypePath path)
+	{
+		this.type = IType.withAnnotation(this.type, annotation, path, 0, path.getLength());
 	}
 
 	@Override

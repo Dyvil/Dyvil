@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.util.regex.Pattern;
 
 /**
  * The {@linkplain Utility utility interface} <b>FileUtils</b> can be used for several {@link File} -related operations
@@ -26,7 +27,60 @@ public final class FileUtils
 	{
 		// no instances
 	}
-	
+
+	/**
+	 * Converts an Ant-style filename pattern to a Regular Expression Pattern
+	 *
+	 * @param pattern
+	 * 	the filename pattern
+	 *
+	 * @return the Regular Expression pattern
+	 */
+	public static Pattern antToRegex(String pattern)
+	{
+		final int length = pattern.length();
+		StringBuilder builder = new StringBuilder(length);
+
+		for (int i = 0; i < length; i++)
+		{
+			char c = pattern.charAt(i);
+			switch (c)
+			{
+			case '?':
+				builder.append('.');
+				continue;
+			case '*':
+				if (i + 1 < length && pattern.charAt(i + 1) == '*')
+				{
+					builder.append(".*");
+					continue;
+				}
+				builder.append("[^/]*");
+				continue;
+			case '(':
+			case ')':
+			case '[':
+			case ']':
+			case '{':
+			case '}':
+			case '.':
+			case '^':
+			case '$':
+			case '|':
+				builder.append('\\').append(c);
+				continue;
+			}
+			builder.append(c);
+		}
+
+		return Pattern.compile(builder.toString());
+	}
+
+	public static boolean matches(String filename, String pattern)
+	{
+		return antToRegex(pattern).matcher(filename).find();
+	}
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static boolean tryCreate(File file)
 	{
@@ -62,7 +116,7 @@ public final class FileUtils
 	{
 		return tryWrite(file, text.getBytes());
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static boolean tryWrite(File file, byte[] bytes)
 	{
@@ -112,14 +166,14 @@ public final class FileUtils
 		Files.write(file.toPath(), lines, Charset.defaultCharset());
 		return true;
 	}
-	
+
 	/**
 	 * Reads the content of the the given {@link File} {@code file} and returns it as a {@link String}. If the {@code
 	 * file} does not exist, it returns {@code null}. If any other {@link IOException} occurs, the stack trace of the
 	 * exception is printed using {@link Throwable#printStackTrace()}.
 	 *
 	 * @param file
-	 * 		the file
+	 * 	the file
 	 *
 	 * @return the file content
 	 */
@@ -146,7 +200,7 @@ public final class FileUtils
 		byte[] bytes = Files.readAllBytes(file.toPath());
 		return new String(bytes);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static List<String> tryReadLines(File file)
 	{
@@ -182,14 +236,14 @@ public final class FileUtils
 			return result;
 		}
 	}
-	
+
 	/**
 	 * Recursively deletes the given {@link File} {@code file}. If the {@code file} is a directory, this method deletes
 	 * all sub-files of that directory by calling itself on the sub-file. Otherwise, it simply deletes the file using
 	 * {@link File#delete()}.
 	 *
 	 * @param file
-	 * 		the file to delete
+	 * 	the file to delete
 	 *
 	 * @return {@code true} iff the file was successfully deleted, {@code false} otherwise
 	 */
@@ -208,7 +262,7 @@ public final class FileUtils
 		}
 		return file.delete();
 	}
-	
+
 	/**
 	 * Recursively deletes the given {@link File} {@code file}. If the {@code file} is a directory, this method deletes
 	 * all sub-files of that directory by calling itself on the sub-file. Otherwise, it simply deletes the file using
@@ -216,9 +270,9 @@ public final class FileUtils
 	 * depth. If it set to {@code 0}, it is ignored whether or not the given {@code file} is a directory.
 	 *
 	 * @param file
-	 * 		the file to delete
+	 * 	the file to delete
 	 * @param maxDepth
-	 * 		the maximum recursion depth
+	 * 	the maximum recursion depth
 	 *
 	 * @return {@code true} iff the file was successfully deleted, {@code false} otherwise
 	 */
@@ -237,7 +291,7 @@ public final class FileUtils
 		}
 		return file.delete();
 	}
-	
+
 	/**
 	 * Returns the user application data directory of the host OS. Common paths are: <ul> <li>Windows: {@code
 	 * %appdata%/} <li>Mac OS: {@code $username$/Library/Application Support/} <li>Linux: {@code $username$} <li>Every

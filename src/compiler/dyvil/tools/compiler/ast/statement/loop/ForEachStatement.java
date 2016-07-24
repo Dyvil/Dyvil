@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.statement.loop;
 
+import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.context.CombiningLabelContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
@@ -8,7 +9,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.intrinsic.RangeOperator;
+import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.statement.control.Label;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -199,25 +200,30 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 		final IValue value = this.resolveValue(markers, context);
 		final IType valueType = value.getType();
 
-		if (value.valueTag() == IValue.RANGE_OPERATOR)
+		if (value.valueTag() == IValue.METHOD_CALL)
 		{
-			final RangeOperator rangeOperator = (RangeOperator) value;
-
-			if (varType == Types.UNKNOWN)
+			final MethodCall rangeOperator = (MethodCall) value;
+			if (RangeForStatement.isRangeOperator(rangeOperator))
 			{
-				this.inferVariableType(markers, rangeOperator.getElementType());
-			}
-			else if (!Types.isSuperType(varType, rangeOperator.getElementType()))
-			{
-				final Marker marker = Markers.semantic(value.getPosition(), "for.range.type");
-				marker.addInfo(Markers.getSemantic("range.type", valueType));
-				marker.addInfo(Markers.getSemantic("variable.type", varType));
-				markers.add(marker);
-			}
+				final IType elementType = RangeForStatement.getElementType(rangeOperator);
 
-			final RangeForStatement rangeForStatement = new RangeForStatement(this.position, this.variable);
-			rangeForStatement.resolveAction(this.action, markers, context);
-			return rangeForStatement;
+				if (varType == Types.UNKNOWN)
+				{
+					this.inferVariableType(markers, elementType);
+				}
+				else if (!Types.isSuperType(varType, elementType))
+				{
+					final Marker marker = Markers.semantic(value.getPosition(), "for.range.type");
+					marker.addInfo(Markers.getSemantic("range.type", valueType));
+					marker.addInfo(Markers.getSemantic("variable.type", varType));
+					markers.add(marker);
+				}
+
+				final RangeForStatement rangeForStatement = new RangeForStatement(this.position, this.variable,
+				                                                                  elementType);
+				rangeForStatement.resolveAction(this.action, markers, context);
+				return rangeForStatement;
+			}
 		}
 		if (valueType.isArrayType())
 		{
@@ -327,18 +333,7 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 		context = context.push(this);
 
 		this.action = action.resolve(markers, context);
-
-		final IValue typedAction = this.action.withType(Types.VOID, Types.VOID, markers, context);
-		if (typedAction != null && typedAction.isUsableAsStatement())
-		{
-			this.action = typedAction;
-		}
-		else if (this.action.isResolved())
-		{
-			final Marker marker = Markers.semanticError(this.action.getPosition(), "for.action.type");
-			marker.addInfo(Markers.getSemantic("action.type", this.action.getType()));
-			markers.add(marker);
-		}
+		this.action = IStatement.checkStatement(markers, context, this.action, "for.action.type");
 
 		context.pop();
 	}

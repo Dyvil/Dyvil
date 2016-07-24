@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.ast.classes;
 
+import dyvil.math.MathUtils;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
@@ -28,6 +28,26 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class ClassBody implements IClassBody
 {
+	private static class MethodLink
+	{
+		protected IMethod    method;
+		protected MethodLink next;
+		protected int        hash;
+
+		public MethodLink(IMethod method, int hash)
+		{
+			this.method = method;
+			this.hash = hash;
+		}
+
+		public MethodLink(IMethod method, int hash, MethodLink next)
+		{
+			this.method = method;
+			this.hash = hash;
+			this.next = next;
+		}
+	}
+
 	public IClass theClass;
 
 	public IClass[] classes;
@@ -35,16 +55,22 @@ public class ClassBody implements IClassBody
 
 	private IField[] fields = new IField[3];
 	private int fieldCount;
-	private IProperty[] properties = new IProperty[3];
-	private int propertyCount;
+
+	private IProperty[] properties;
+	private int         propertyCount;
+
 	private IMethod[] methods = new IMethod[3];
 	private int methodCount;
-	private IConstructor[] constructors = new IConstructor[1];
-	private int constructorCount;
-	private IInitializer[] initializers = new IInitializer[1];
-	private int initializerCount;
 
-	protected IMethod functionalMethod;
+	private IConstructor[] constructors = new IConstructor[1];
+	private int            constructorCount;
+	private IInitializer[] initializers;
+	private int            initializerCount;
+
+	// Caches
+	protected MethodLink[] namedMethodCache;
+	protected IMethod[]    implicitCache;
+	protected IMethod      functionalMethod;
 
 	public ClassBody(IClass iclass)
 	{
@@ -149,7 +175,8 @@ public class ClassBody implements IClassBody
 	}
 
 	@Override
-	public IField createDataMember(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public IField createDataMember(ICodePosition position, Name name, IType type, ModifierSet modifiers,
+		                              AnnotationList annotations)
 	{
 		return new Field(this.theClass, position, name, type, modifiers, annotations);
 	}
@@ -187,7 +214,13 @@ public class ClassBody implements IClassBody
 	{
 		property.setEnclosingClass(this.theClass);
 
-		int index = this.propertyCount++;
+		final int index = this.propertyCount++;
+		if (index == 0)
+		{
+			this.properties = new IProperty[3];
+			this.properties[0] = property;
+			return;
+		}
 		if (index >= this.properties.length)
 		{
 			IProperty[] temp = new IProperty[this.propertyCount];
@@ -261,23 +294,58 @@ public class ClassBody implements IClassBody
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue receiver, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
+		final int cacheSize = this.namedMethodCache.length;
+		if (cacheSize == 0)
+		{
+			return;
+		}
+
+		if (name != null)
+		{
+			final int hash = hash(name);
+			final int index = hash & (cacheSize - 1);
+			for (MethodLink link = this.namedMethodCache[index]; link != null; link = link.next)
+			{
+				if (link.hash == hash)
+				{
+					link.method.checkMatch(list, receiver, name, arguments);
+				}
+			}
+
+			return;
+		}
+
 		for (int i = 0; i < this.methodCount; i++)
 		{
-			IContext.getMethodMatch(list, receiver, name, arguments, this.methods[i]);
+			this.methods[i].checkMatch(list, receiver, null, arguments);
 		}
 		for (int i = 0; i < this.propertyCount; i++)
 		{
-			this.properties[i].getMethodMatches(list, receiver, name, arguments);
+			this.properties[i].checkMatch(list, receiver, null, arguments);
 		}
 		for (int i = 0; i < this.fieldCount; i++)
 		{
 			final IProperty property = this.fields[i].getProperty();
 			if (property != null)
 			{
-				property.getMethodMatches(list, receiver, name, arguments);
+				property.checkMatch(list, receiver, null, arguments);
 			}
+		}
+	}
+
+	@Override
+	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
+	{
+		if (this.implicitCache == null)
+		{
+			return;
+		}
+
+		for (IMethod method : this.implicitCache)
+		{
+			method.checkImplicitMatch(list, value, targetType);
 		}
 	}
 
@@ -293,213 +361,25 @@ public class ClassBody implements IClassBody
 		this.functionalMethod = functionalMethod;
 	}
 
-	// Constructors
-
-	@Override
-	public int constructorCount()
-	{
-		return this.constructorCount;
-	}
-
-	@Override
-	public void addConstructor(IConstructor constructor)
-	{
-		constructor.setEnclosingClass(this.theClass);
-
-		int index = this.constructorCount++;
-		if (index >= this.constructors.length)
-		{
-			IConstructor[] temp = new IConstructor[this.constructorCount];
-			System.arraycopy(this.constructors, 0, temp, 0, index);
-			this.constructors = temp;
-		}
-		this.constructors[index] = constructor;
-	}
-
-	@Override
-	public IConstructor getConstructor(int index)
-	{
-		return this.constructors[index];
-	}
-
-	@Override
-	public IConstructor getConstructor(IParameterList parameters)
-	{
-		for (int i = 0; i < this.constructorCount; i++)
-		{
-			final IConstructor constructor = this.constructors[i];
-			final IParameterList constructorParameterList = constructor.getParameterList();
-
-			if (parameters.matches(constructorParameterList))
-			{
-				return constructor;
-			}
-		}
-
-		return null;
-	}
-
-	@Override
-	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
-	{
-		for (int i = 0; i < this.constructorCount; i++)
-		{
-			IConstructor ctor = this.constructors[i];
-			float match = ctor.getSignatureMatch(arguments);
-			if (match > 0)
-			{
-				list.add(ctor, match);
-			}
-		}
-	}
-
-	// Initializers
-
-	@Override
-	public int initializerCount()
-	{
-		return this.initializerCount;
-	}
-
-	@Override
-	public void addInitializer(IInitializer initializer)
-	{
-		initializer.setEnclosingClass(this.theClass);
-
-		int index = this.initializerCount++;
-		if (index >= this.initializers.length)
-		{
-			IInitializer[] temp = new IInitializer[this.initializerCount];
-			System.arraycopy(this.initializers, 0, temp, 0, index);
-			this.initializers = temp;
-		}
-		this.initializers[index] = initializer;
-	}
-
-	@Override
-	public IInitializer getInitializer(int index)
-	{
-		return this.initializers[index];
-	}
-
-	// Phases
-
-	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
-	{
-		final IDyvilHeader header = this.theClass.getHeader();
-
-		for (int i = 0; i < this.classCount; i++)
-		{
-			final IClass innerClass = this.classes[i];
-			innerClass.setHeader(header);
-			innerClass.resolveTypes(markers, context);
-		}
-		for (int i = 0; i < this.fieldCount; i++)
-		{
-			this.fields[i].resolveTypes(markers, context);
-		}
-		for (int i = 0; i < this.propertyCount; i++)
-		{
-			this.properties[i].resolveTypes(markers, context);
-		}
-		for (int i = 0; i < this.methodCount; i++)
-		{
-			this.methods[i].resolveTypes(markers, context);
-		}
-		for (int i = 0; i < this.constructorCount; i++)
-		{
-			this.constructors[i].resolveTypes(markers, context);
-		}
-		for (int i = 0; i < this.initializerCount; i++)
-		{
-			this.initializers[i].resolveTypes(markers, context);
-		}
-	}
-
-	@Override
-	public void resolve(MarkerList markers, IContext context)
-	{
-		for (int i = 0; i < this.classCount; i++)
-		{
-			this.classes[i].resolve(markers, context);
-		}
-		for (int i = 0; i < this.fieldCount; i++)
-		{
-			this.fields[i].resolve(markers, context);
-		}
-		for (int i = 0; i < this.propertyCount; i++)
-		{
-			this.properties[i].resolve(markers, context);
-		}
-		for (int i = 0; i < this.methodCount; i++)
-		{
-			this.methods[i].resolve(markers, context);
-		}
-		for (int i = 0; i < this.constructorCount; i++)
-		{
-			this.constructors[i].resolve(markers, context);
-		}
-		for (int i = 0; i < this.initializerCount; i++)
-		{
-			this.initializers[i].resolve(markers, context);
-		}
-	}
-
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		for (int i = 0; i < this.classCount; i++)
-		{
-			this.classes[i].checkTypes(markers, context);
-		}
-		for (int i = 0; i < this.fieldCount; i++)
-		{
-			this.fields[i].checkTypes(markers, context);
-		}
-		for (int i = 0; i < this.propertyCount; i++)
-		{
-			this.properties[i].checkTypes(markers, context);
-		}
-		for (int i = 0; i < this.methodCount; i++)
-		{
-			this.methods[i].checkTypes(markers, context);
-		}
-		for (int i = 0; i < this.constructorCount; i++)
-		{
-			this.constructors[i].checkTypes(markers, context);
-		}
-		for (int i = 0; i < this.initializerCount; i++)
-		{
-			this.initializers[i].checkTypes(markers, context);
-		}
-	}
-
 	@Override
 	public boolean checkImplements(IMethod candidate, ITypeContext typeContext)
 	{
-		for (int i = 0; i < this.methodCount; i++)
+		final int cacheSize = this.namedMethodCache.length;
+		if (cacheSize == 0)
 		{
-			if (checkMethodImplements(this.methods[i], candidate, typeContext))
+			return false;
+		}
+
+		final int hash = hash(candidate.getName());
+		final int index = hash & (cacheSize - 1);
+		for (MethodLink link = this.namedMethodCache[index]; link != null; link = link.next)
+		{
+			if (link.hash == hash && checkMethodImplements(link.method, candidate, typeContext))
 			{
 				return true;
 			}
 		}
-		for (int i = 0; i < this.propertyCount; i++)
-		{
-			if (checkPropertyImplements(this.properties[i], candidate, typeContext))
-			{
-				return true;
-			}
-		}
-		for (int i = 0; i < this.fieldCount; i++)
-		{
-			final IProperty property = this.fields[i].getProperty();
-			if (property != null && checkPropertyImplements(property, candidate, typeContext))
-			{
-				return true;
-			}
-		}
+
 		return false;
 	}
 
@@ -571,7 +451,8 @@ public class ClassBody implements IClassBody
 		}
 	}
 
-	public static void checkProperty(IProperty property, MarkerList markers, IClass checkedClass, ITypeContext typeContext)
+	public static void checkProperty(IProperty property, MarkerList markers, IClass checkedClass,
+		                                ITypeContext typeContext)
 	{
 		if (property.hasModifier(Modifiers.STATIC))
 		{
@@ -589,6 +470,305 @@ public class ClassBody implements IClassBody
 		if (setter != null)
 		{
 			checkMethod(setter, markers, checkedClass, typeContext);
+		}
+	}
+
+	// Constructors
+
+	@Override
+	public int constructorCount()
+	{
+		return this.constructorCount;
+	}
+
+	@Override
+	public void addConstructor(IConstructor constructor)
+	{
+		constructor.setEnclosingClass(this.theClass);
+
+		final int index = this.constructorCount++;
+		if (index >= this.constructors.length)
+		{
+			IConstructor[] temp = new IConstructor[index + 1];
+			System.arraycopy(this.constructors, 0, temp, 0, index);
+			this.constructors = temp;
+		}
+		this.constructors[index] = constructor;
+	}
+
+	@Override
+	public IConstructor getConstructor(int index)
+	{
+		return this.constructors[index];
+	}
+
+	@Override
+	public IConstructor getConstructor(IParameterList parameters)
+	{
+		for (int i = 0; i < this.constructorCount; i++)
+		{
+			final IConstructor constructor = this.constructors[i];
+			final IParameterList constructorParameterList = constructor.getParameterList();
+
+			if (parameters.matches(constructorParameterList))
+			{
+				return constructor;
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
+	{
+		for (int i = 0; i < this.constructorCount; i++)
+		{
+			this.constructors[i].checkMatch(list, arguments);
+		}
+	}
+
+	// Initializers
+
+	@Override
+	public int initializerCount()
+	{
+		return this.initializerCount;
+	}
+
+	@Override
+	public void addInitializer(IInitializer initializer)
+	{
+		initializer.setEnclosingClass(this.theClass);
+
+		final int index = this.initializerCount++;
+		if (index == 0)
+		{
+			this.initializers = new IInitializer[2];
+			this.initializers[0] = initializer;
+			return;
+		}
+		if (index >= this.initializers.length)
+		{
+			final IInitializer[] temp = new IInitializer[index + 1];
+			System.arraycopy(this.initializers, 0, temp, 0, index);
+			this.initializers = temp;
+		}
+		this.initializers[index] = initializer;
+	}
+
+	@Override
+	public IInitializer getInitializer(int index)
+	{
+		return this.initializers[index];
+	}
+
+	// Phases
+
+	@Override
+	public void initExternalMethodCache()
+	{
+		final int cacheSize = MathUtils.powerOfTwo(this.methodCount);
+		final int mask = cacheSize - 1;
+		final MethodLink[] cache = this.namedMethodCache = new MethodLink[cacheSize];
+
+		// External Classes do not have any properties or fields with properties
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			addMethod(cache, this.methods[i], mask);
+		}
+	}
+
+	@Override
+	public void initExternalImplicitCache()
+	{
+		IMethod[] implicitCache = null;
+		int implicitCount = 0;
+
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			final IMethod method = this.methods[i];
+
+			// Add method to implicit cache
+			if (method.isImplicitConversion())
+			{
+				if (implicitCache == null)
+				{
+					implicitCache = new IMethod[this.methodCount];
+				}
+
+				implicitCache[implicitCount++] = method;
+			}
+		}
+
+		if (implicitCount > 0)
+		{
+			this.initImplicitCache(implicitCount, implicitCache);
+		}
+	}
+
+	@Override
+	public void resolveTypes(MarkerList markers, IContext context)
+	{
+		final IDyvilHeader header = this.theClass.getHeader();
+
+		/*
+		 * The cache size is calculated as follows: We sum the number of methods assuming they all have unique names, add
+		 * twice the amount of properties with the same assumption and half the amount of fields, assuming there are
+		 * as many property getters and setters as there are fields. At the end, we compute the next power of two that
+		 * is larger than our sum, and use it as the cache size.
+		 */
+		final int cacheSize = MathUtils.powerOfTwo(this.methodCount + (this.propertyCount << 1) + this.fieldCount);
+		final int mask = cacheSize - 1;
+		final MethodLink[] cache = this.namedMethodCache = new MethodLink[cacheSize];
+
+		for (int i = 0; i < this.classCount; i++)
+		{
+			final IClass innerClass = this.classes[i];
+			innerClass.setHeader(header);
+			innerClass.resolveTypes(markers, context);
+		}
+
+		for (int i = 0; i < this.fieldCount; i++)
+		{
+			final IField field = this.fields[i];
+			field.resolveTypes(markers, context);
+
+			final IProperty property = field.getProperty();
+			if (property != null)
+			{
+				addProperty(cache, property, mask);
+			}
+		}
+
+		for (int i = 0; i < this.propertyCount; i++)
+		{
+			final IProperty property = this.properties[i];
+			property.resolveTypes(markers, context);
+			addProperty(cache, property, mask);
+		}
+
+		int implicitCount = 0;
+		IMethod[] implicitCache = null;
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			final IMethod method = this.methods[i];
+			method.resolveTypes(markers, context);
+			addMethod(cache, method, mask);
+
+			// Add method to implicit cache
+			if (method.isImplicitConversion())
+			{
+				if (implicitCache == null)
+				{
+					implicitCache = new IMethod[this.methodCount];
+				}
+				implicitCache[implicitCount++] = method;
+			}
+		}
+		if (implicitCount > 0)
+		{
+			this.initImplicitCache(implicitCount, implicitCache);
+		}
+
+		for (int i = 0; i < this.constructorCount; i++)
+		{
+			this.constructors[i].resolveTypes(markers, context);
+		}
+		for (int i = 0; i < this.initializerCount; i++)
+		{
+			this.initializers[i].resolveTypes(markers, context);
+		}
+	}
+
+	private void initImplicitCache(int implicitCount, IMethod[] implicitCache)
+	{
+		this.implicitCache = new IMethod[implicitCount];
+		System.arraycopy(implicitCache, 0, this.implicitCache, 0, implicitCount);
+	}
+
+	private static void addProperty(MethodLink[] cache, IProperty property, int mask)
+	{
+		final IMethod getter = property.getGetter();
+		if (getter != null)
+		{
+			addMethod(cache, getter, mask);
+		}
+
+		final IMethod setter = property.getSetter();
+		if (setter != null)
+		{
+			addMethod(cache, setter, mask);
+		}
+	}
+
+	private static void addMethod(MethodLink[] cache, IMethod method, int mask)
+	{
+		final int hash = hash(method.getName());
+		final int index = hash & mask;
+		cache[index] = new MethodLink(method, hash, cache[index]);
+	}
+
+	private static int hash(Name name)
+	{
+		return name.unqualified.hashCode();
+	}
+
+	@Override
+	public void resolve(MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.classCount; i++)
+		{
+			this.classes[i].resolve(markers, context);
+		}
+		for (int i = 0; i < this.fieldCount; i++)
+		{
+			this.fields[i].resolve(markers, context);
+		}
+		for (int i = 0; i < this.propertyCount; i++)
+		{
+			this.properties[i].resolve(markers, context);
+		}
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			this.methods[i].resolve(markers, context);
+		}
+		for (int i = 0; i < this.constructorCount; i++)
+		{
+			this.constructors[i].resolve(markers, context);
+		}
+		for (int i = 0; i < this.initializerCount; i++)
+		{
+			this.initializers[i].resolve(markers, context);
+		}
+	}
+
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.classCount; i++)
+		{
+			this.classes[i].checkTypes(markers, context);
+		}
+		for (int i = 0; i < this.fieldCount; i++)
+		{
+			this.fields[i].checkTypes(markers, context);
+		}
+		for (int i = 0; i < this.propertyCount; i++)
+		{
+			this.properties[i].checkTypes(markers, context);
+		}
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			this.methods[i].checkTypes(markers, context);
+		}
+		for (int i = 0; i < this.constructorCount; i++)
+		{
+			this.constructors[i].checkTypes(markers, context);
+		}
+		for (int i = 0; i < this.initializerCount; i++)
+		{
+			this.initializers[i].checkTypes(markers, context);
 		}
 	}
 

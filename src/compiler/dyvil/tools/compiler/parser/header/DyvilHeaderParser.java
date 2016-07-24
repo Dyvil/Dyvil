@@ -32,17 +32,31 @@ public class DyvilHeaderParser extends Parser
 	protected static final int IMPORT   = 2;
 	protected static final int METADATA = 4;
 
+	// Flags
+
+	private static final int METADATA_FLAG = 1;
+	public static final  int ONE_ELEMENT   = 2;
+
+	// -----
+
 	protected IDyvilHeader unit;
 
+	// Parser data
 	protected ModifierSet    modifiers;
 	protected AnnotationList annotations;
 
-	protected IToken lastToken;
+	protected int flags;
 
 	public DyvilHeaderParser(IDyvilHeader unit)
 	{
 		this.unit = unit;
 		this.mode = PACKAGE;
+	}
+
+	public DyvilHeaderParser withFlags(int flags)
+	{
+		this.flags |= flags;
+		return this;
 	}
 
 	protected boolean parsePackage(IParserManager pm, IToken token, int type)
@@ -73,10 +87,11 @@ public class DyvilHeaderParser extends Parser
 			}
 
 			ImportDeclaration i = new ImportDeclaration(token.raw());
-			pm.pushParser(new ImportParser(im -> {
-				i.setImport(im);
-				this.unit.addImport(i);
-			}));
+			pm.pushParser(new ImportParser(im ->
+			                               {
+				                               i.setImport(im);
+				                               this.unit.addImport(i);
+			                               }));
 			return true;
 		}
 		case DyvilKeywords.USING:
@@ -119,10 +134,11 @@ public class DyvilHeaderParser extends Parser
 	private void createUsingDeclaration(IParserManager pm, ICodePosition position)
 	{
 		ImportDeclaration i = new ImportDeclaration(position, true);
-		pm.pushParser(new ImportParser(im -> {
-			i.setImport(im);
-			this.unit.addUsing(i);
-		}));
+		pm.pushParser(new ImportParser(im ->
+		                               {
+			                               i.setImport(im);
+			                               this.unit.addUsing(i);
+		                               }));
 	}
 
 	protected boolean parseMetadata(IParserManager pm, IToken token, int type)
@@ -160,7 +176,7 @@ public class DyvilHeaderParser extends Parser
 					new HeaderDeclaration(this.unit, next.raw(), name, this.modifiers, this.annotations));
 				this.modifiers = null;
 				this.annotations = null;
-				this.lastToken = null;
+				this.flags &= ~METADATA_FLAG;
 				this.mode = IMPORT;
 				return true;
 			}
@@ -180,8 +196,12 @@ public class DyvilHeaderParser extends Parser
 				pm.report(token, "header.element");
 			}
 			pm.popParser();
-			// Fallthrough
+			return;
 		case BaseSymbols.SEMICOLON:
+			if ((this.flags & ONE_ELEMENT) != 0)
+			{
+				pm.popParser(true);
+			}
 			return;
 		}
 
@@ -204,7 +224,7 @@ public class DyvilHeaderParser extends Parser
 		case METADATA:
 			if (this.mode != METADATA)
 			{
-				this.lastToken = token;
+				this.flags |= METADATA_FLAG;
 				this.mode = METADATA;
 			}
 			if (this.parseMetadata(pm, token, type))
@@ -241,6 +261,6 @@ public class DyvilHeaderParser extends Parser
 	@Override
 	public boolean reportErrors()
 	{
-		return this.mode > PACKAGE && this.lastToken == null;
+		return this.mode > PACKAGE && (this.flags & METADATA_FLAG) == 0;
 	}
 }

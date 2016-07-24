@@ -1,10 +1,7 @@
 package dyvil.collection.immutable;
 
 import dyvil.annotation.Immutable;
-import dyvil.collection.Collection;
-import dyvil.collection.ImmutableSet;
-import dyvil.collection.MutableSet;
-import dyvil.collection.Set;
+import dyvil.collection.*;
 import dyvil.collection.impl.AbstractArraySet;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.util.ImmutableException;
@@ -188,7 +185,7 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 	}
 
 	@Override
-	public ImmutableSet<? extends E> difference(Collection<?> collection)
+	public ImmutableSet<E> difference(Collection<?> collection)
 	{
 		Object[] newArray = new Object[this.size];
 		int index = 0;
@@ -204,7 +201,7 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 	}
 
 	@Override
-	public ImmutableSet<? extends E> intersection(Collection<? extends E> collection)
+	public ImmutableSet<E> intersection(Collection<? extends E> collection)
 	{
 		Object[] newArray = new Object[Math.min(this.size, collection.size())];
 		int index = 0;
@@ -220,7 +217,7 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 	}
 
 	@Override
-	public ImmutableSet<? extends E> union(Collection<? extends E> collection)
+	public ImmutableSet<E> union(Collection<? extends E> collection)
 	{
 		int size = this.size;
 		Object[] newArray = new Object[size + collection.size()];
@@ -236,7 +233,7 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 	}
 
 	@Override
-	public ImmutableSet<? extends E> symmetricDifference(Collection<? extends E> collection)
+	public ImmutableSet<E> symmetricDifference(Collection<? extends E> collection)
 	{
 		Object[] newArray = new Object[this.size + collection.size()];
 		int index = 0;

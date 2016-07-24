@@ -2,6 +2,7 @@ package dyvil.tools.compiler.util;
 
 import dyvil.string.CharUtils;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IMember;
@@ -60,6 +61,19 @@ public final class Util
 
 		stringBuilder.append(": ");
 		ITypeContext.apply(typeContext, method.getType()).toString("", stringBuilder);
+	}
+
+	public static String constructorSignatureToString(IConstructor constructor, ITypeContext typeContext)
+	{
+		final StringBuilder stringBuilder = new StringBuilder();
+		constructorSignatureToString(constructor, typeContext, stringBuilder);
+		return stringBuilder.toString();
+	}
+
+	public static void constructorSignatureToString(IConstructor constructor, ITypeContext typeContext, StringBuilder stringBuilder)
+	{
+		stringBuilder.append("init");
+		constructor.getParameterList().signatureToString(stringBuilder, typeContext);
 	}
 
 	public static void typeToString(IType type, ITypeContext typeContext, StringBuilder stringBuilder)
@@ -205,10 +219,10 @@ public final class Util
 		if (LexerUtil.isIdentifierSymbol(lastChar))
 		{
 			// Last character is a symbol -> add = without _
-			return Name.get(name.unqualified.concat("="), name.qualified.concat("$eq"));
+			return Name.from(name.unqualified.concat("="), name.qualified.concat("$eq"));
 		}
 		// Last character is NOT a symbol -> add _=
-		return Name.get(name.unqualified.concat("_="), name.qualified.concat("_$eq"));
+		return Name.from(name.unqualified.concat("_="), name.qualified.concat("_$eq"));
 
 		// We use 'concat' above to avoid implicit StringBuilders to be created
 	}
@@ -222,13 +236,13 @@ public final class Util
 		{
 			final String newQualified = qualified.substring(0, qualified.length() - 4); // 4 = "_$eq".length
 			final String newUnqualified = unqualified.substring(0, unqualified.length() - 2); // 2 = "_=".length
-			return Name.get(newQualified, newUnqualified);
+			return Name.from(newQualified, newUnqualified);
 		}
 		if (unqualified.endsWith("="))
 		{
 			final String newQualified = qualified.substring(0, qualified.length() - 3); // 3 = "$eq".length
 			final String newUnqualified = unqualified.substring(0, unqualified.length() - 1); // 1 = "=".length
-			return Name.get(newQualified, newUnqualified);
+			return Name.from(newQualified, newUnqualified);
 		}
 		return name;
 	}

@@ -1,14 +1,19 @@
 package dyvil.tools.compiler.ast.statement.loop;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.access.MethodCall;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.intrinsic.RangeOperator;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public class RangeForStatement extends ForEachStatement
@@ -19,9 +24,42 @@ public class RangeForStatement extends ForEachStatement
 	private static final int DOUBLE    = 3;
 	private static final int RANGEABLE = 4;
 
-	public RangeForStatement(ICodePosition position, IVariable var)
+	private final IType elementType;
+
+	public RangeForStatement(ICodePosition position, IVariable var, IType elementType)
 	{
 		super(position, var);
+
+		this.elementType = elementType;
+	}
+
+	public static boolean isRangeOperator(MethodCall methodCall)
+	{
+		final Name name = methodCall.getName();
+		return (name == Names.dotdot || name == Names.dotdotlt) // name is .. or ..<
+			       && methodCall.getReceiver() != null // has receiver
+			       && methodCall.getArguments().size() == 1 // has exactly one argument
+			       ;//&& Types.isSuperType(LazyFields.RANGE, methodCall.getType()); // return type <: dyvil.collection.Range
+	}
+
+	public static boolean isHalfOpen(MethodCall rangeOperator)
+	{
+		return rangeOperator.getName() == Names.dotdotlt;
+	}
+
+	public static IValue getStartValue(MethodCall rangeOperator)
+	{
+		return rangeOperator.getReceiver();
+	}
+
+	public static IValue getEndValue(MethodCall rangeOperator)
+	{
+		return rangeOperator.getArguments().getFirstValue();
+	}
+
+	public static IType getElementType(MethodCall range)
+	{
+		return Types.combine(range.getReceiver().getType(), range.getArguments().getFirstValue().getType());
 	}
 
 	@Override
@@ -36,11 +74,11 @@ public class RangeForStatement extends ForEachStatement
 		final IVariable var = this.variable;
 		final IType varType = var.getType();
 
-		final RangeOperator rangeOperator = (RangeOperator) var.getValue();
-		final IValue startValue = rangeOperator.getStartValue();
-		final IValue endValue = rangeOperator.getEndValue();
-		final IType elementType = rangeOperator.getElementType();
-		final boolean halfOpen = rangeOperator.isHalfOpen();
+		final MethodCall rangeOperator = (MethodCall) var.getValue();
+		final IValue startValue = getStartValue(rangeOperator);
+		final IValue endValue = getEndValue(rangeOperator);
+		final IType elementType = this.elementType;
+		final boolean halfOpen = isHalfOpen(rangeOperator);
 
 		if (elementType.isPrimitive())
 		{
@@ -210,9 +248,9 @@ public class RangeForStatement extends ForEachStatement
 			writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, "dyvil/collection/range/Rangeable", "next",
 			                       "()Ldyvil/collection/range/Rangeable;", true);
 
-			if (elementType.getTheClass() != RangeOperator.LazyFields.RANGEABLE_CLASS)
+			if (elementType.getTheClass() != LazyFields.RANGEABLE_CLASS)
 			{
-				RangeOperator.LazyFields.RANGEABLE.writeCast(writer, elementType, lineNumber);
+				LazyFields.RANGEABLE.writeCast(writer, elementType, lineNumber);
 			}
 
 			assert !boxed;
@@ -228,5 +266,15 @@ public class RangeForStatement extends ForEachStatement
 		writer.visitLabel(endLabel);
 
 		var.writeLocal(writer, scopeLabel, endLabel);
+	}
+
+	public static final class LazyFields
+	{
+		public static final IClass RANGEABLE_CLASS = Package.dyvilCollectionRange.resolveClass("Rangeable");
+		public static final IType  RANGEABLE       = RANGEABLE_CLASS.getClassType();
+
+		private static final IClass         RANGE_CLASS = Package.dyvilCollection.resolveClass("Range");
+		public static final  IType          RANGE       = RANGE_CLASS.getClassType();
+		public static final  ITypeParameter RANGE_TYPE  = RANGE_CLASS.getTypeParameter(0);
 	}
 }

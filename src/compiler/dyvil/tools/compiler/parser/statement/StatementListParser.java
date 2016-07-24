@@ -25,8 +25,13 @@ import dyvil.tools.compiler.parser.classes.MemberParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.expression.LambdaOrTupleParser;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
+import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.parsing.*;
+import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.parsing.IParserManager;
+import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.Parser;
+import dyvil.tools.parsing.TryParserManager;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -43,7 +48,13 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 	private static final int LAMBDA_TYPE_ARROW     = 1 << 1;
 	private static final int LAMBDA_RETURN_ARROW   = 1 << 2;
 	private static final int EXPRESSION            = 1 << 3;
-	private static final int SEPARATOR             = 1 << 4;
+	private static final int LABEL_NAME            = 1 << 4;
+	private static final int LABEL_END             = 1 << 5;
+	private static final int SEPARATOR             = 1 << 6;
+
+	private final TryParserManager tryParserManager = new TryParserManager(DyvilSymbols.INSTANCE);
+
+	private static final int MEMBER_FLAGS = NO_UNINITIALIZED_VARIABLES | OPERATOR_ERROR | NO_FIELD_PROPERTIES;
 
 	protected IValueConsumer consumer;
 	protected boolean        closure;
@@ -158,8 +169,13 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 			this.mode = EXPRESSION;
 			return;
 		case EXPRESSION:
-			if (type == BaseSymbols.SEMICOLON || type == BaseSymbols.COMMA)
+			switch (type)
 			{
+			case BaseSymbols.SEMICOLON:
+			case BaseSymbols.COMMA:
+				return;
+			case DyvilKeywords.LABEL:
+				this.mode = LABEL_NAME;
 				return;
 			}
 
@@ -167,40 +183,53 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 			{
 				// IDENTIFIER : ...
 				this.label = token.nameValue();
+				pm.report(Markers.syntaxWarning(token, "statement_list.label.deprecated", this.label));
 				pm.skip();
 				// mode stays EXPRESSION
 				return;
 			}
 
-			final TokenIterator tokens = pm.getTokens();
-
-			final MemberParser parser = new MemberParser<>(this).withFlag(
-				NO_UNINITIALIZED_VARIABLES | OPERATOR_ERROR | NO_FIELD_PROPERTIES);
-			final TryParserManager parserManager = new TryParserManager(DyvilSymbols.INSTANCE, tokens);
-
-			// Have to rewind one token because the TryParserManager assumes the TokenIterator is at the beginning (i.e.
-			// no tokens have been returned by next() yet)
-			tokens.jump(token);
-			if (parserManager.parse(parser, pm.getMarkers(), EXIT_ON_ROOT))
+			this.mode = SEPARATOR;
+			if (this.tryParserManager
+				    .tryParse(pm, new MemberParser<>(this).withFlags(MEMBER_FLAGS), token, EXIT_ON_ROOT))
 			{
-				tokens.jump(tokens.lastReturned());
-				this.mode = SEPARATOR;
 				return;
 			}
 
-			// Reset to the current token and restore split tokens
-			parserManager.resetTo(token);
 			pm.pushParser(new ExpressionParser(this));
+			return;
+		case LABEL_NAME:
+			if (ParserUtil.isIdentifier(type))
+			{
+				this.label = token.nameValue();
+				this.mode = LABEL_END;
+				return;
+			}
+			this.mode = EXPRESSION;
+			if (type != BaseSymbols.COLON)
+			{
+				pm.reparse();
+			}
+			pm.report(token, "statement_list.label.name");
+			return;
+		case LABEL_END:
+			switch (type)
+			{
+			case BaseSymbols.COLON:
+			case BaseSymbols.SEMICOLON:
+				this.mode = EXPRESSION;
+				return;
+			}
+			this.mode = EXPRESSION;
+			pm.reparse();
+			pm.report(ICodePosition.between(token, token.next()), "statement_list.label.separator");
 			return;
 		case SEPARATOR:
 			this.mode = EXPRESSION;
-			if (type == BaseSymbols.SEMICOLON)
+			switch (type)
 			{
-				return;
-			}
-			if (token.prev().type() == BaseSymbols.CLOSE_CURLY_BRACKET)
-			{
-				pm.reparse();
+			case BaseSymbols.SEMICOLON:
+			case BaseSymbols.COMMA:
 				return;
 			}
 			pm.report(token, "statement_list.semicolon");
@@ -289,7 +318,8 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 	}
 
 	@Override
-	public IVariable createDataMember(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public IVariable createDataMember(ICodePosition position, Name name, IType type, ModifierSet modifiers,
+		                                 AnnotationList annotations)
 	{
 		return new Variable(position, name, type, modifiers, annotations);
 	}
@@ -301,7 +331,8 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 	}
 
 	@Override
-	public IMethod createMethod(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public IMethod createMethod(ICodePosition position, Name name, IType type, ModifierSet modifiers,
+		                           AnnotationList annotations)
 	{
 		return new NestedMethod(position, name, type, modifiers, annotations);
 	}

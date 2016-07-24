@@ -15,7 +15,7 @@ import dyvil.tools.compiler.ast.classes.AbstractClass;
 import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.metadata.IClassMetadata;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -23,7 +23,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -53,11 +53,13 @@ import java.io.IOException;
 
 public final class ExternalClass extends AbstractClass
 {
-	private static final int METADATA    = 1;
-	private static final int SUPER_TYPES = 1 << 1;
-	private static final int GENERICS    = 1 << 2;
-	private static final int ANNOTATIONS = 1 << 4;
-	private static final int INNER_TYPES = 1 << 5;
+	private static final int METADATA          = 1;
+	private static final int SUPER_TYPES       = 1 << 1;
+	private static final int GENERICS          = 1 << 2;
+	private static final int BODY_METHOD_CACHE = 1 << 3;
+	private static final int BODY_IMPLICIT_CACHE = 1 << 4;
+	private static final int ANNOTATIONS       = 1 << 5;
+	private static final int INNER_TYPES       = 1 << 6;
 
 	protected Package thePackage;
 
@@ -120,6 +122,18 @@ public final class ExternalClass extends AbstractClass
 		this.thisType = type;
 	}
 
+	private void resolveMethodCache()
+	{
+		this.body.initExternalMethodCache();
+		this.resolved |= BODY_METHOD_CACHE;
+	}
+
+	private void resolveImplicitCache()
+	{
+		this.body.initExternalImplicitCache();
+		this.resolved |= BODY_IMPLICIT_CACHE;
+	}
+
 	private void resolveSuperTypes()
 	{
 		this.resolved |= SUPER_TYPES;
@@ -157,7 +171,7 @@ public final class ExternalClass extends AbstractClass
 
 		for (Entry<String, String> entry : this.innerTypes)
 		{
-			Name name = Name.getQualified(entry.getKey());
+			Name name = Name.fromQualified(entry.getKey());
 			String internal = entry.getValue();
 
 			// Resolve the class name
@@ -237,16 +251,6 @@ public final class ExternalClass extends AbstractClass
 			this.resolveSuperTypes();
 		}
 		return super.isSubClassOf(type);
-	}
-
-	@Override
-	public int getSuperTypeDistance(IType superType)
-	{
-		if ((this.resolved & SUPER_TYPES) == 0)
-		{
-			this.resolveSuperTypes();
-		}
-		return super.getSuperTypeDistance(superType);
 	}
 
 	@Override
@@ -372,11 +376,16 @@ public final class ExternalClass extends AbstractClass
 		{
 			this.resolveSuperTypes();
 		}
+		if ((this.resolved & BODY_METHOD_CACHE) == 0)
+		{
+			this.resolveMethodCache();
+		}
 		return super.checkImplements(candidate, typeContext);
 	}
 
 	@Override
-	public void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext, Set<IClass> checkedClasses)
+	public void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext,
+		                        Set<IClass> checkedClasses)
 	{
 		if ((this.resolved & GENERICS) == 0)
 		{
@@ -460,14 +469,23 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
 		if ((this.resolved & GENERICS) == 0)
 		{
 			this.resolveGenerics();
 		}
+		if ((this.resolved & BODY_METHOD_CACHE) == 0)
+		{
+			this.resolveMethodCache();
+		}
 
-		this.body.getMethodMatches(list, instance, name, arguments);
+		/*
+		Note: unlike AbstractClass.getMethodMatches, this does not check the Class Parameter Properties, because
+		External classes do not have any class parameters with associated properties
+		*/
+		this.body.getMethodMatches(list, receiver, name, arguments);
+		// The same applies for the Metadata
 
 		if (!list.isEmpty())
 		{
@@ -481,7 +499,7 @@ public final class ExternalClass extends AbstractClass
 
 		if (this.superType != null)
 		{
-			this.superType.getMethodMatches(list, instance, name, arguments);
+			this.superType.getMethodMatches(list, receiver, name, arguments);
 		}
 
 		if (!list.isEmpty())
@@ -491,12 +509,27 @@ public final class ExternalClass extends AbstractClass
 
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			this.interfaces[i].getMethodMatches(list, instance, name, arguments);
+			this.interfaces[i].getMethodMatches(list, receiver, name, arguments);
 		}
 	}
 
 	@Override
-	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
+	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
+	{
+		if ((this.resolved & GENERICS) == 0)
+		{
+			this.resolveGenerics();
+		}
+		if ((this.resolved & BODY_IMPLICIT_CACHE) == 0)
+		{
+			this.resolveImplicitCache();
+		}
+
+		this.body.getImplicitMatches(list, value, targetType);
+	}
+
+	@Override
+	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
 	{
 		if ((this.resolved & SUPER_TYPES) == 0)
 		{
@@ -528,15 +561,15 @@ public final class ExternalClass extends AbstractClass
 		}
 		if (index == -1)
 		{
-			this.name = Name.getQualified(name);
+			this.name = Name.fromQualified(name);
 			this.thePackage = Package.rootPackage;
 			this.fullName = name;
 		}
 		else
 		{
-			this.name = Name.getQualified(name.substring(index + 1));
+			this.name = Name.fromQualified(name.substring(index + 1));
 			this.fullName = name.replace('/', '.');
-			this.thePackage = Package.rootPackage.resolvePackage(Name.getQualified(this.fullName.substring(0, index)));
+			this.thePackage = Package.rootPackage.resolvePackage(Name.fromQualified(this.fullName.substring(0, index)));
 		}
 
 		if (signature != null)
@@ -639,13 +672,14 @@ public final class ExternalClass extends AbstractClass
 
 		if (this.classParameters != null && this.classParameters.contains(name))
 		{
-			final ClassParameter param = new ExternalClassParameter(this, Name.get(name), type,
+			final ClassParameter param = new ExternalClassParameter(this, Name.fromQualified(name), type,
 			                                                        new FlagModifierSet(access));
 			this.parameters.addParameter(param);
 			return new SimpleFieldVisitor(param);
 		}
 
-		final ExternalField field = new ExternalField(this, Name.get(name), desc, type, new FlagModifierSet(access));
+		final ExternalField field = new ExternalField(this, Name.fromQualified(name), desc, type,
+		                                              new FlagModifierSet(access));
 
 		if (value != null)
 		{
@@ -659,16 +693,6 @@ public final class ExternalClass extends AbstractClass
 
 	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions)
 	{
-		Name name1 = Name.get(name);
-
-		if (this.isAnnotation())
-		{
-			final ClassParameter param = new ExternalClassParameter(this, name1, ClassFormat.readReturnType(desc),
-			                                                        new FlagModifierSet(access));
-			this.parameters.addParameter(param);
-			return new AnnotationClassVisitor(param);
-		}
-
 		if ((access & Modifiers.SYNTHETIC) != 0)
 		{
 			return null;
@@ -695,7 +719,7 @@ public final class ExternalClass extends AbstractClass
 
 			if ((access & Modifiers.VARARGS) != 0)
 			{
-				final IParameterList parameterList = constructor.getParameterList();
+				final IParameterList parameterList = constructor.getExternalParameterList();
 				parameterList.get(parameterList.size() - 1).setVarargs(true);
 			}
 
@@ -704,7 +728,16 @@ public final class ExternalClass extends AbstractClass
 			return new SimpleMethodVisitor(constructor);
 		}
 
-		ExternalMethod method = new ExternalMethod(this, name1, desc, new FlagModifierSet(access));
+		if (this.isAnnotation())
+		{
+			final ClassParameter param = new ExternalClassParameter(this, Name.fromQualified(name),
+			                                                        ClassFormat.readReturnType(desc),
+			                                                        new FlagModifierSet(access));
+			this.parameters.addParameter(param);
+			return new AnnotationClassVisitor(param);
+		}
+
+		final ExternalMethod method = new ExternalMethod(this, name, desc, signature, new FlagModifierSet(access));
 
 		if (signature != null)
 		{
@@ -723,7 +756,7 @@ public final class ExternalClass extends AbstractClass
 
 		if ((access & Modifiers.VARARGS) != 0)
 		{
-			final IParameterList parameterList = method.getParameterList();
+			final IParameterList parameterList = method.getExternalParameterList();
 			parameterList.get(parameterList.size() - 1).setVarargs(true);
 		}
 
@@ -733,7 +766,7 @@ public final class ExternalClass extends AbstractClass
 
 	public void visitInnerClass(String name, String outerName, String innerName)
 	{
-		if (!this.internalName.equals(outerName))
+		if (innerName == null || !this.internalName.equals(outerName))
 		{
 			return;
 		}

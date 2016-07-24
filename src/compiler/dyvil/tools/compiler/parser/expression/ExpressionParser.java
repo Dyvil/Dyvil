@@ -53,11 +53,13 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 	// Flags
 
-	private static final int IGNORE_APPLY    = 0b00001;
+	public static final  int IGNORE_APPLY    = 0b00001;
 	private static final int IGNORE_OPERATOR = 0b00010;
 	public static final  int IGNORE_COLON    = 0b00100;
 	public static final  int IGNORE_LAMBDA   = 0b01000;
 	public static final  int IGNORE_CLOSURE  = 0b10000;
+
+	public static final int IGNORE_STATEMENT = IGNORE_APPLY | IGNORE_COLON | IGNORE_CLOSURE;
 
 	// ----------
 
@@ -78,18 +80,18 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		return (this.flags & flag) != 0;
 	}
 
-	public void addFlag(int flag)
+	public void addFlags(int flag)
 	{
 		this.flags |= flag;
 	}
 
-	public ExpressionParser withFlag(int flag)
+	public ExpressionParser withFlags(int flag)
 	{
 		this.flags |= flag;
 		return this;
 	}
 
-	public void removeFlag(int flag)
+	public void removeFlags(int flag)
 	{
 		this.flags &= ~flag;
 	}
@@ -127,7 +129,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			if ((type & Tokens.IDENTIFIER) != 0)
 			{
 				// IDENTIFIER
-				this.parseInfixAccess(pm, token);
+				this.parseInfixAccess(pm, token, token.nameValue());
 				return;
 			}
 			if (this.parseValue(pm, token, type))
@@ -216,9 +218,6 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 				this.parseInfixAccess(pm, token, Names.colon);
 				return;
-			case DyvilSymbols.ELLIPSIS:
-				this.parseInfixAccess(pm, token, Names.dotdotdot);
-				return;
 			case BaseSymbols.EQUALS:
 				if (this.value == null)
 				{
@@ -254,7 +253,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				// EXPRESSION EXPRESSION -> EXPRESSION ( EXPRESSION )
 				// Juxtaposition
 
-				if (this.hasFlag(IGNORE_APPLY) || this.ignoreClosure(token))
+				if (this.hasFlag(IGNORE_APPLY) || this.ignoreClosure(type))
 				{
 					this.end(pm, true);
 					return;
@@ -289,7 +288,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			{
 				// EXPRESSION . IDENTIFIER
 
-				this.parseInfixAccess(pm, token);
+				this.parseInfixAccess(pm, token, token.nameValue());
 				return;
 			}
 
@@ -352,14 +351,24 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		throw new Error("unreachable");
 	}
 
-	private boolean ignoreClosure(IToken token)
+	private boolean ignoreClosure(int nextType)
 	{
-		return token.type() == BaseSymbols.OPEN_CURLY_BRACKET && this.hasFlag(IGNORE_CLOSURE);
+		return nextType == BaseSymbols.OPEN_CURLY_BRACKET && this.hasFlag(IGNORE_CLOSURE);
+	}
+
+	private boolean isOperatorEnd(int nextType)
+	{
+		return isExpressionEnd(nextType) || this.ignoreClosure(nextType);
 	}
 
 	private void parseInfixAccess(IParserManager pm, IToken token)
 	{
-		this.parseInfixAccess(pm, token, token.nameValue());
+		Name name = token.nameValue();
+		if (name == null)
+		{
+			name = Name.from(token.stringValue());
+		}
+		this.parseInfixAccess(pm, token, name);
 	}
 
 	private void parseInfixAccess(IParserManager pm, IToken token, Name name)
@@ -381,15 +390,15 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				this.value = call;
 				this.mode = ACCESS;
 
-				if (isExpressionEnd(nextType))
+				if (this.isOperatorEnd(nextType))
 				{
-					pm.report(next, "expression.prefix.expression");
+					pm.report(ICodePosition.between(token, next), "expression.prefix.expression");
 					return;
 				}
 				this.parseApply(pm, next, call);
 				return;
 			}
-			if (isExpressionEnd(nextType) || isSymbol(nextType) && neighboring(token.prev(), token) && !neighboring(
+			if (this.isOperatorEnd(nextType) || isSymbol(nextType) && neighboring(token.prev(), token) && !neighboring(
 				next, next.next()))
 			{
 				// EXPRESSION_OPERATOR EXPRESSION
@@ -425,7 +434,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			}
 
 			chain.addOperator(name, token.raw());
-			pm.pushParser(new ExpressionParser(chain::addOperand).withFlag(this.flags | IGNORE_OPERATOR));
+			pm.pushParser(new ExpressionParser(chain::addOperand).withFlags(this.flags | IGNORE_OPERATOR));
 			return;
 		}
 
@@ -509,7 +518,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 	private boolean isFieldAccess(IToken token, IToken next, int nextType)
 	{
-		if (this.hasFlag(IGNORE_APPLY) || this.ignoreClosure(next))
+		if (this.hasFlag(IGNORE_APPLY) || this.ignoreClosure(nextType))
 		{
 			return true;
 		}
@@ -588,7 +597,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		{
 			final SingleArgument argument = new SingleArgument();
 			call.setArguments(argument);
-			pm.pushParser(new ExpressionParser(argument).withFlag(this.flags | IGNORE_APPLY | IGNORE_OPERATOR));
+			pm.pushParser(new ExpressionParser(argument).withFlags(this.flags | IGNORE_APPLY | IGNORE_OPERATOR));
 			return;
 		}
 

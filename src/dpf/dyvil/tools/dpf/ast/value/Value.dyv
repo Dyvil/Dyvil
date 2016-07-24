@@ -46,7 +46,7 @@ public interface Value extends IASTNode
 
 	static NameAccess apply(Name literal) = new NameAccess(literal)
 
-	static NameAccess apply(boolean literal) = new NameAccess(Name.getQualified(literal.toString))
+	static NameAccess apply(boolean literal) = new NameAccess(Name.fromRaw(literal.toString))
 
 	static ListValue apply(Value... elements) = new ListValue(elements)
 

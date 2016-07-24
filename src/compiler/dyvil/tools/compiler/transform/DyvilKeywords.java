@@ -10,9 +10,9 @@ public class DyvilKeywords
 	public static final int CASE         = Tokens.KEYWORD | 0x00040000;
 	public static final int CATCH        = Tokens.KEYWORD | 0x00050000;
 	public static final int CLASS        = Tokens.KEYWORD | 0x00060000;
-	public static final int CONST        = Tokens.KEYWORD | 0x00070000;
+	public static final int CONST        = Tokens.KEYWORD | 0x00070000; // TODO use for expression templates
 	public static final int CONTINUE     = Tokens.KEYWORD | 0x00080000;
-	public static final int DO           = Tokens.KEYWORD | 0x00090000;
+	public static final int DO           = Tokens.KEYWORD | 0x00090000; // unused
 	public static final int ELSE         = Tokens.KEYWORD | 0x000A0000;
 	public static final int ENUM         = Tokens.KEYWORD | 0x000B0000;
 	public static final int EXTENDS      = Tokens.KEYWORD | 0x000C0000;
@@ -35,9 +35,10 @@ public class DyvilKeywords
 	public static final int INTERFACE    = Tokens.KEYWORD | 0x001D0000;
 	public static final int INTERNAL     = Tokens.KEYWORD | 0x001E0000;
 	public static final int IS           = Tokens.KEYWORD | 0x001F0000;
+	public static final int LABEL        = Tokens.KEYWORD | 0x00410000;
 	public static final int LAZY         = Tokens.KEYWORD | 0x00200000;
 	public static final int LET          = Tokens.KEYWORD | 0x00210000;
-	public static final int MACRO        = Tokens.KEYWORD | 0x00220000;
+	public static final int MACRO        = Tokens.KEYWORD | 0x00220000; // unused
 	public static final int MATCH        = Tokens.KEYWORD | 0x00230000;
 	public static final int NEW          = Tokens.KEYWORD | 0x00240000;
 	public static final int NIL          = Tokens.KEYWORD | 0x00250000;
@@ -53,7 +54,7 @@ public class DyvilKeywords
 	public static final int PUBLIC       = Tokens.KEYWORD | 0x002F0000;
 	public static final int REPEAT       = Tokens.KEYWORD | 0x00400000;
 	public static final int RETURN       = Tokens.KEYWORD | 0x00300000;
-	public static final int SEALED       = Tokens.KEYWORD | 0x00310000;
+	public static final int SEALED       = Tokens.KEYWORD | 0x00310000; // unused
 	public static final int STATIC       = Tokens.KEYWORD | 0x00320000;
 	public static final int SUPER        = Tokens.KEYWORD | 0x00330000;
 	public static final int SYNCHRONIZED = Tokens.KEYWORD | 0x00340000;
@@ -66,7 +67,7 @@ public class DyvilKeywords
 	public static final int TYPE         = Tokens.KEYWORD | 0x003B0000;
 	public static final int USING        = Tokens.KEYWORD | 0x003C0000;
 	public static final int VAR          = Tokens.KEYWORD | 0x003D0000;
-	public static final int WHERE        = Tokens.KEYWORD | 0x003E0000;
+	public static final int WHERE        = Tokens.KEYWORD | 0x003E0000; // unused
 	public static final int WHILE        = Tokens.KEYWORD | 0x003F0000;
 
 	public static int getKeywordType(String s)
@@ -105,6 +106,7 @@ public class DyvilKeywords
 		case "interface": return INTERFACE;
 		case "internal": return INTERNAL;
 		case "is": return IS;
+		case "label": return LABEL;
 		case "lazy": return LAZY;
 		case "let": return LET;
 		case "macro": return MACRO;
@@ -179,6 +181,7 @@ public class DyvilKeywords
 		case INTERFACE: return "interface";
 		case INTERNAL: return "internal";
 		case IS: return "is";
+		case LABEL: return "label";
 		case LAZY: return "lazy";
 		case LET :  return "let";
 		case MACRO: return "macro";

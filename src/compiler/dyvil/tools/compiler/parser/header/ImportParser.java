@@ -18,8 +18,8 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class ImportParser extends Parser
 {
-	public static final Name annotation = Name.getQualified("annotation");
-	public static final Name type       = Name.getQualified("type");
+	public static final Name annotation = Name.fromRaw("annotation");
+	public static final Name type       = Name.fromRaw("type");
 
 	private static final int IMPORT           = 1;
 	private static final int DOT_ALIAS        = 2;

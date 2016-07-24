@@ -55,9 +55,11 @@ import static dyvil.reflect.Opcodes.IFNE;
 
 public abstract class AbstractMethod extends Member implements IMethod, ILabelContext, IDefaultContext
 {
-	static final Handle EXTENSION_BSM = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/DynamicLinker",
-	                                               "linkExtension",
-	                                               "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;)Ljava/lang/invoke/CallSite;");
+	protected static final Handle EXTENSION_BSM = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/DynamicLinker",
+	                                                         "linkExtension",
+	                                                         "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;)Ljava/lang/invoke/CallSite;");
+
+	protected static final String NAME_SEPARATOR = "_$_";
 
 	protected ITypeParameter[] typeParameters;
 	protected int              typeParameterCount;
@@ -71,7 +73,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 	// Metadata
 	protected IClass        enclosingClass;
+	protected String        mangledName;
 	protected String        descriptor;
+	protected String        signature;
 	protected IntrinsicData intrinsicData;
 
 	public AbstractMethod(IClass enclosingClass)
@@ -98,7 +102,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		this.enclosingClass = enclosingClass;
 	}
 
-	public AbstractMethod(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public AbstractMethod(ICodePosition position, Name name, IType type, ModifierSet modifiers,
+		                     AnnotationList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
 	}
@@ -373,13 +378,15 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
-		final float selfMatch = this.getSignatureMatch(name, instance, arguments);
-		if (selfMatch > 0)
-		{
-			list.add(this, selfMatch);
-		}
+		this.checkMatch(list, receiver, name, arguments);
+	}
+
+	@Override
+	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
+	{
+		this.checkImplicitMatch(list, value, targetType);
 	}
 
 	@Override
@@ -414,77 +421,169 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public float getSignatureMatch(Name name, IValue receiver, IArguments arguments)
+	public void checkMatch(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
 		if (name != this.name && name != null)
 		{
-			return 0;
+			return;
 		}
 
-		int parameterStartIndex = 0;
-		int totalMatch = 1;
+		final IParameterList parameters = this.getParameterList();
 
-		// infix modifier implementation
-		if (receiver != null)
+		final int parameterStartIndex;
+		final int argumentStartIndex;
+		final int argumentCount;
+		final int parameterCount = parameters.size();
+
+		final int[] matchValues;
+		final IType[] matchTypes;
+		boolean invalid = false;
+
+		final int mod;
+		if (receiver == null)
 		{
-			final int mod = this.modifiers.toFlags() & Modifiers.INFIX;
-			if (mod == 0 || receiver.valueTag() != IValue.CLASS_ACCESS)
+			// No receiver
+
+			if (arguments == null)
 			{
-				if (mod == Modifiers.INFIX)
-				{
-					final IType infixReceiverType = this.parameters.get(0).getInternalType();
-					final float receiverMatch = receiver.getTypeMatch(infixReceiverType);
-					if (receiverMatch == 0)
-					{
-						return 0;
-					}
-
-					totalMatch += receiverMatch;
-					parameterStartIndex = 1;
-				}
-				else if (mod == Modifiers.STATIC && receiver.valueTag() != IValue.CLASS_ACCESS)
-				{
-					// Disallow non-static access to static method
-					return 0;
-				}
-				else
-				{
-					final float receiverMatch = receiver.getTypeMatch(this.enclosingClass.getClassType());
-					if (receiverMatch <= 0)
-					{
-						return 0;
-					}
-					totalMatch += receiverMatch;
-				}
+				list.add(new Candidate<>(this));
+				return;
 			}
-		}
 
-		// Only matching the name
-		if (arguments == null)
+			argumentCount = arguments.size();
+			matchValues = new int[argumentCount];
+			matchTypes = new IType[argumentCount];
+			argumentStartIndex = 0;
+			parameterStartIndex = 0;
+		}
+		else if ((mod = this.modifiers.toFlags() & Modifiers.INFIX) != 0 && receiver.valueTag() == IValue.CLASS_ACCESS)
 		{
-			return totalMatch;
+			// Static access to static method
+
+			if (!Types.isSuperType(this.enclosingClass.getClassType(), receiver.getType()))
+			{
+				// Disallow access from the wrong type
+				return;
+			}
+			if (arguments == null)
+			{
+				list.add(new Candidate<>(this, IValue.EXACT_MATCH, null, false));
+				return;
+			}
+
+			parameterStartIndex = 0;
+			argumentCount = arguments.size();
+			argumentStartIndex = 1;
+			matchValues = new int[1 + argumentCount];
+			matchTypes = new IType[1 + argumentCount];
+			matchValues[0] = 1;
+		}
+		else
+		{
+			if (mod == Modifiers.STATIC && receiver.valueTag() != IValue.CLASS_ACCESS)
+			{
+				// Disallow non-static access to static method
+				invalid = true;
+			}
+
+			final IType receiverType;
+			if (mod == Modifiers.INFIX)
+			{
+				// Infix access to infix method
+				receiverType = parameters.get(0).getInternalType();
+				parameterStartIndex = 1;
+			}
+			else
+			{
+				// Infix access to instance method
+				receiverType = this.enclosingClass.getClassType();
+				parameterStartIndex = 0;
+			}
+
+			final int receiverMatch = TypeChecker.getTypeMatch(receiver, receiverType, list);
+			if (receiverMatch == IValue.MISMATCH)
+			{
+				return;
+			}
+			if (arguments == null)
+			{
+				list.add(new Candidate<>(this, receiverMatch, receiverType, false));
+				return;
+			}
+
+			argumentCount = arguments.size();
+			argumentStartIndex = 1;
+			matchValues = new int[1 + argumentCount];
+			matchTypes = new IType[1 + argumentCount];
+			matchValues[0] = receiverMatch;
+			matchTypes[0] = receiverType;
 		}
 
-		final int argumentCount = arguments.size();
-		final int parametersLeft = this.parameters.size() - parameterStartIndex;
+		final int parametersLeft = parameterCount - parameterStartIndex;
 		if (argumentCount > parametersLeft && !this.isVariadic())
 		{
-			return 0;
+			return;
 		}
 
+		int defaults = 0;
+		int varargs = 0;
 		for (int argumentIndex = 0; argumentIndex < parametersLeft; argumentIndex++)
 		{
-			final IParameter parameter = this.parameters.get(argumentIndex + parameterStartIndex);
-			final float valueMatch = arguments.getTypeMatch(argumentIndex, parameter);
-			if (valueMatch <= 0)
+			final IParameter parameter = parameters.get(parameterStartIndex + argumentIndex);
+			final int partialVarargs = arguments.checkMatch(matchValues, matchTypes, argumentStartIndex, argumentIndex,
+			                                                parameter, list);
+			if (partialVarargs >= 0)
 			{
-				return 0;
+				varargs += partialVarargs;
+				continue;
+			}
+			if (parameter.getValue() != null)
+			{
+				defaults++;
+				continue;
 			}
 
-			totalMatch += valueMatch;
+			return; // Mismatch
 		}
 
-		return totalMatch;
+		list.add(new Candidate<>(this, matchValues, matchTypes, defaults, varargs, invalid));
+	}
+
+	@Override
+	public void checkImplicitMatch(MatchList<IMethod> list, IValue value, IType type)
+	{
+		if (!this.isImplicitConversion())
+		{
+			// The method has to be 'implicit static'
+			return;
+		}
+		final IParameterList parameterList = this.getParameterList();
+		if (parameterList.size() != 1)
+		{
+			// and only take exactly one parameter
+			return;
+		}
+		if (type != null && !Types.isSuperType(type, this.getType()
+		                                                 .asParameterType())) // getType to ensure it is resolved by ExternalMethods
+		{
+			// The method's return type has to be a sub-type of the target type
+			return;
+		}
+
+		final IType parType = parameterList.get(0).getInternalType();
+
+		// Note: this explicitly uses IValue.getTypeMatch to avoid nested implicit conversions
+		final int match = value.getTypeMatch(parType);
+		if (match > IValue.CONVERSION_MATCH)
+		{
+			list.add(new Candidate<>(this, match, parType, false));
+		}
+	}
+
+	@Override
+	public boolean isImplicitConversion()
+	{
+		return this.modifiers != null && this.modifiers.hasIntModifier(Modifiers.IMPLICIT | Modifiers.STATIC);
 	}
 
 	@Override
@@ -507,17 +606,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue receiver, IArguments arguments, GenericData genericData)
+	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue receiver,
+		                            IArguments arguments, GenericData genericData)
 	{
-		if (this.modifiers.hasIntModifier(Modifiers.PREFIX) && !this.isStatic())
-		{
-			// TODO get rid of prefix argument swapping
-
-			IValue argument = arguments.getFirstValue();
-			arguments.setFirstValue(receiver);
-			receiver = argument;
-		}
-
 		if (receiver != null)
 		{
 			final int mod = this.modifiers.toFlags() & Modifiers.INFIX;
@@ -661,7 +752,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext)
+	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IValue instance,
+		                     IArguments arguments, ITypeContext typeContext)
 	{
 		ModifierUtil.checkVisibility(this, position, markers, context);
 
@@ -795,7 +887,24 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public Handle toHandle()
 	{
 		return new Handle(ClassFormat.insnToHandle(this.getInvokeOpcode()), this.enclosingClass.getInternalName(),
-		                  this.name.qualified, this.getDescriptor());
+		                  this.getMangledName(), this.getDescriptor());
+	}
+
+	@Override
+	public String getMangledName()
+	{
+		if (this.mangledName != null)
+		{
+			return this.mangledName;
+		}
+
+		return this.mangledName = this.name.qualified;
+	}
+
+	@Override
+	public void setMangledName(String mangledName)
+	{
+		this.mangledName = mangledName;
 	}
 
 	@Override
@@ -822,18 +931,12 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		return this.descriptor = buffer.toString();
 	}
 
-	private boolean needsSignature()
-	{
-		return this.typeParameterCount != 0 || this.type.isGenericType() || this.type.hasTypeVariables()
-			       || this.parameters.needsSignature();
-	}
-
 	@Override
 	public String getSignature()
 	{
-		if (!this.needsSignature())
+		if (this.signature != null)
 		{
-			return null;
+			return this.signature;
 		}
 
 		StringBuilder buffer = new StringBuilder();
@@ -855,7 +958,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 		buffer.append(')');
 		this.type.appendSignature(buffer);
-		return buffer.toString();
+		return this.signature = buffer.toString();
 	}
 
 	@Override
@@ -875,8 +978,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, IType targetType, int lineNumber)
-		throws BytecodeException
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext,
+		                     IType targetType, int lineNumber) throws BytecodeException
 	{
 		if (this.intrinsicData != null)
 		{
@@ -903,8 +1006,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
-		throws BytecodeException
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments,
+		                     ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
 		if (this.intrinsicData != null)
 		{
@@ -917,8 +1020,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
-		throws BytecodeException
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments,
+		                        ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
 		if (this.intrinsicData != null)
 		{
@@ -967,8 +1070,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 	}
 
-	private void writeArgumentsAndInvoke(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
-		throws BytecodeException
+	private void writeArgumentsAndInvoke(MethodWriter writer, IValue instance, IArguments arguments,
+		                                    ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
 		this.writeReceiver(writer, instance);
 		this.writeArguments(writer, instance, arguments);
@@ -976,8 +1079,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
-		throws BytecodeException
+	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext,
+		                       int lineNumber) throws BytecodeException
 	{
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
@@ -990,11 +1093,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		int opcode;
 		int modifiers = this.modifiers.toFlags();
 
-		String owner = this.enclosingClass.getInternalName();
+		final String owner = this.enclosingClass.getInternalName();
+		final String mangledName = this.getMangledName();
+
 		if ((modifiers & Modifiers.EXTENSION) == Modifiers.EXTENSION)
 		{
-			writer.visitInvokeDynamicInsn(this.name.qualified, this.getDescriptor(), EXTENSION_BSM,
-			                              new Handle(ClassFormat.H_INVOKESTATIC, owner, this.name.qualified,
+			writer.visitInvokeDynamicInsn(mangledName, this.getDescriptor(), EXTENSION_BSM,
+			                              new Handle(ClassFormat.H_INVOKESTATIC, owner, mangledName,
 			                                         this.getDescriptor()));
 			return;
 		}
@@ -1008,9 +1113,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			opcode = this.getInvokeOpcode();
 		}
 
-		String name = this.name.qualified;
-		String desc = this.getDescriptor();
-		writer.visitMethodInsn(opcode, owner, name, desc, this.enclosingClass.isInterface());
+		writer.visitMethodInsn(opcode, owner, mangledName, this.getDescriptor(), this.enclosingClass.isInterface());
 	}
 
 	@Override

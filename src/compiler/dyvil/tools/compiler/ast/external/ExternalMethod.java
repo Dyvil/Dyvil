@@ -21,6 +21,7 @@ import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
@@ -42,10 +43,22 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 
 	private int resolved;
 
-	public ExternalMethod(IClass enclosingClass, Name name, String desc, ModifierSet modifiers)
+	public ExternalMethod(IClass enclosingClass, String name, String desc, String signature, ModifierSet modifiers)
 	{
-		super(enclosingClass, name, null, modifiers);
-		this.name = name;
+		super(enclosingClass, null, null, modifiers);
+
+		final int index = name.indexOf(NAME_SEPARATOR);
+		if (index >= 0)
+		{
+			this.name = Name.fromQualified(name.substring(0, index));
+		}
+		else
+		{
+			this.name = Name.fromQualified(name);
+		}
+
+		this.mangledName = name;
+		this.signature = signature;
 		this.descriptor = desc;
 	}
 
@@ -167,6 +180,22 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
+	public IParameterList getExternalParameterList()
+	{
+		return this.parameters;
+	}
+
+	@Override
+	public IParameterList getParameterList()
+	{
+		if ((this.resolved & PARAMETERS) == 0)
+		{
+			this.resolveParameters();
+		}
+		return this.parameters;
+	}
+
+	@Override
 	public IValue getValue()
 	{
 		return null;
@@ -175,22 +204,6 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	@Override
 	public void setValue(IValue value)
 	{
-	}
-
-	@Override
-	public float getSignatureMatch(Name name, IValue receiver, IArguments arguments)
-	{
-		// Fail fast
-		if (name != this.name && name != null)
-		{
-			return 0;
-		}
-
-		if ((this.resolved & PARAMETERS) == 0)
-		{
-			this.resolveParameters();
-		}
-		return super.getSignatureMatch(name, receiver, arguments);
 	}
 
 	@Override
@@ -351,9 +364,9 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		}
 		case TypeReference.METHOD_FORMAL_PARAMETER:
 		{
-			int index = TypeReference.getFormalParameterIndex(typeRef);
-			IParameter param = this.parameters.get(index);
-			param.setType(IType.withAnnotation(param.getType(), annotation, typePath, 0, typePath.getLength()));
+			final int index = TypeReference.getFormalParameterIndex(typeRef);
+			final ExternalParameter parameter = (ExternalParameter) this.parameters.get(index);
+			parameter.addTypeAnnotation(annotation, typePath);
 			break;
 		}
 		}

@@ -20,15 +20,35 @@ import static dyvil.reflect.Opcodes.*;
 public interface ShortArray
 {
 	short[] EMPTY = new short[0];
-	
-	static short[] apply()
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static short[] empty()
 	{
 		return EMPTY;
 	}
-	
-	static short[] apply(int count)
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static short[] empty(int size)
 	{
-		return new short[count];
+		return new short[size];
+	}
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static short[] apply()
+	{
+		return new short[0];
+	}
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static short[] apply(short... values)
+	{
+		return values;
+	}
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static short[] from(short[] array)
+	{
+		return array.clone();
 	}
 	
 	static short[] repeat(int count, short repeatedValue)
@@ -47,17 +67,6 @@ public interface ShortArray
 		for (int i = 0; i < count; i++)
 		{
 			array[i] = (short) generator.applyAsInt(i);
-		}
-		return array;
-	}
-	
-	static short[] apply(short start, short end)
-	{
-		int i = 0;
-		short[] array = new short[end - start + 1];
-		for (; start <= end; start++)
-		{
-			array[i++] = start;
 		}
 		return array;
 	}

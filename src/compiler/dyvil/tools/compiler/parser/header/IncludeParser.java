@@ -2,11 +2,11 @@ package dyvil.tools.compiler.parser.header;
 
 import dyvil.tools.compiler.ast.header.IncludeDeclaration;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
-import dyvil.tools.parsing.IParserManager;
-import dyvil.tools.parsing.Parser;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;

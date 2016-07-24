@@ -148,7 +148,7 @@ public class HeaderDeclaration implements IASTNode, INamed, IModified, IAnnotate
 	@Override
 	public void read(DataInput in) throws IOException
 	{
-		this.name = Name.get(in.readUTF());
+		this.name = Name.from(in.readUTF());
 
 		this.modifiers = ModifierSet.read(in);
 		this.annotations = AnnotationList.read(in);

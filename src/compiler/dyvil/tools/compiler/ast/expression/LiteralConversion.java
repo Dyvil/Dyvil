@@ -1,17 +1,15 @@
 package dyvil.tools.compiler.ast.expression;
 
+import dyvil.tools.compiler.ast.access.AbstractCall;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
@@ -20,178 +18,123 @@ import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public final class LiteralConversion implements IValue
+public class LiteralConversion extends AbstractCall
 {
-	private IValue     literal;
-	private IArguments arguments;
-	private IType      type;
-	
-	private IMethod method;
-	
-	private Name methodName = Names.apply;
-	
+	protected IValue literal;
+	protected Name   name;
+
+	public LiteralConversion(ICodePosition position)
+	{
+		this.position = position;
+	}
+
 	public LiteralConversion(IValue literal, IAnnotation annotation)
 	{
-		this.literal = literal;
-		this.arguments = new SingleArgument(literal);
-		this.methodName = getMethodName(annotation);
+		this(literal, annotation, new SingleArgument(literal));
 	}
-	
+
 	public LiteralConversion(IValue literal, IAnnotation annotation, IArguments arguments)
 	{
+		this.position = literal.getPosition();
 		this.literal = literal;
+		this.name = getMethodName(annotation);
 		this.arguments = arguments;
-		this.methodName = getMethodName(annotation);
 	}
-	
+
 	public LiteralConversion(IValue literal, IMethod method)
 	{
-		this.literal = literal;
-		this.arguments = new SingleArgument(literal);
-		this.method = method;
+		this(literal, method, new SingleArgument(literal));
 	}
-	
+
 	public LiteralConversion(IValue literal, IMethod method, IArguments arguments)
 	{
+		this.position = literal.getPosition();
 		this.literal = literal;
 		this.arguments = arguments;
-		this.method = method;
+
+		if (method != null)
+		{
+			this.method = method;
+			this.name = method.getName();
+		}
 	}
-	
+
 	public static Name getMethodName(IAnnotation annotation)
 	{
-		IValue v = annotation.getArguments().getFirstValue();
-		if (v != null)
+		final IValue value = annotation.getArguments().getFirstValue();
+		if (value != null)
 		{
-			return Name.get(v.stringValue());
+			return Name.from(value.stringValue());
 		}
 		return Names.apply;
 	}
-	
-	@Override
-	public ICodePosition getPosition()
-	{
-		return this.literal.getPosition();
-	}
-	
-	@Override
-	public void setPosition(ICodePosition position)
-	{
-	}
-	
+
 	@Override
 	public int valueTag()
 	{
 		return LITERAL_CONVERSION;
 	}
-	
+
 	@Override
-	public boolean isPrimitive()
+	public Name getName()
 	{
-		return false;
+		return this.name;
 	}
-	
+
 	@Override
-	public boolean isResolved()
+	protected Name getReferenceName()
 	{
-		return this.method != null;
+		return this.name;
 	}
-	
-	@Override
-	public IType getType()
-	{
-		return this.type;
-	}
-	
+
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		if (this.method == null)
 		{
-			this.method = IContext.resolveMethod(type, null, this.methodName, this.arguments);
-			if (this.method == null)
+			final MatchList<IMethod> candidates = IContext.resolveMethods(type, null, this.name, this.arguments);
+			if (candidates.isEmpty())
 			{
-				StringBuilder builder = new StringBuilder();
-				this.arguments.typesToString(builder);
-				markers.add(Markers.semantic(this.literal.getPosition(), "literal.method", this.literal.getType(), type,
-				                             builder));
 				this.type = type;
-				return null;
+				this.reportResolve(markers, candidates);
+				return this;
 			}
-		}
-		
-		final GenericData genericData = this.method.getGenericData(null, null, this.arguments);
+			else if (candidates.isAmbigous())
+			{
+				this.type = type;
+				super.reportResolve(markers, candidates);
+				return this;
+			}
 
-		this.method.checkArguments(markers, this.literal.getPosition(), context, null, this.arguments, genericData);
-		this.type = this.method.getType().getConcreteType(genericData);
-		
-		final IType concrete = type.getConcreteType(typeContext).asParameterType();
-		if (!Types.isSuperType(concrete, this.type))
+			this.method = candidates.getBestMember();
+		}
+
+		this.checkArguments(markers, context);
+
+		final IType thisType = this.getType();
+		if (!Types.isSuperType(type, thisType))
 		{
-			final Marker marker = Markers.semantic(this.literal.getPosition(), "literal.type.incompatible");
-			marker.addInfo(Markers.getSemantic("type.expected", concrete));
-			marker.addInfo(Markers.getSemantic("literal.type.conversion", this.type));
+			final Marker marker = Markers.semantic(this.position, "literal.type.incompatible");
+			marker.addInfo(Markers.getSemantic("type.expected", type));
+			marker.addInfo(Markers.getSemantic("literal.type.conversion", thisType));
 
 			final StringBuilder stringBuilder = new StringBuilder();
 			Util.methodSignatureToString(this.method, typeContext, stringBuilder);
 			marker.addInfo(Markers.getSemantic("literal.type.method", stringBuilder.toString()));
-			
+
 			markers.add(marker);
 		}
-		
-		return this;
-	}
-	
-	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
-	{
-		this.arguments.resolveTypes(markers, context);
-	}
-	
-	@Override
-	public IValue resolve(MarkerList markers, IContext context)
-	{
-		this.arguments.resolve(markers, context);
-		return this;
-	}
-	
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		this.arguments.checkTypes(markers, context);
-	}
-	
-	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-		this.arguments.check(markers, context);
-	}
-	
-	@Override
-	public IValue foldConstants()
-	{
-		this.arguments.foldConstants();
-		return this;
-	}
-	
-	@Override
-	public IValue cleanup(IContext context, IClassCompilableList compilableList)
-	{
-		this.arguments.cleanup(context, compilableList);
-		return this;
-	}
-	
-	@Override
-	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
-	{
-		if (type == null)
-		{
-			type = this.type;
-		}
 
-		this.method.writeCall(writer, null, this.arguments, this.type, type, this.literal.getLineNumber());
+		return this;
 	}
-	
+
+	@Override
+	protected void reportResolve(MarkerList markers, MatchList<IMethod> matches)
+	{
+		markers.add(Markers.semanticError(this.position, "literal.method", this.literal.getType(), this.type, this.name,
+		                                  this.arguments.typesToString()));
+	}
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

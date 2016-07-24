@@ -65,28 +65,7 @@ public interface IStatement extends IValue
 
 		// Create an error
 		final Marker marker = Markers.semantic(resolvedValue.getPosition(), key);
-		marker.addInfo(Markers.getSemantic("return.type", resolvedValue.getType()));
-		markers.add(marker);
-
-		return resolvedValue;
-	}
-
-	static IValue checkCondition(MarkerList markers, IContext context, IValue resolvedValue, String key)
-	{
-		final IValue typedValue = resolvedValue.withType(Types.BOOLEAN, Types.BOOLEAN, markers, context);
-
-		if (typedValue != null)
-		{
-			return typedValue;
-		}
-
-		if (!resolvedValue.isResolved())
-		{
-			return resolvedValue;
-		}
-
-		final Marker marker = Markers.semantic(resolvedValue.getPosition(), key);
-		marker.addInfo(Markers.getSemantic("value.type", resolvedValue.getType()));
+		marker.addInfo(Markers.getSemantic("expression.type", resolvedValue.getType()));
 		markers.add(marker);
 
 		return resolvedValue;

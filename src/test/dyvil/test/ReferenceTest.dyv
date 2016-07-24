@@ -2,17 +2,17 @@ package dyvil.test
 
 public class ReferenceTest
 {
-	static void inc(int^ i) = i.set(i.get + 1)
+	public static void inc(int^ i) = *i = *i + 1
 
-	static int staticField = 0
+	public static int staticField = 0
 
-	static int staticProperty
+	public static int staticProperty
 	{
 		get: staticField
 		set: staticField = newValue
 	}
 
-	static class Holder
+	public static class Holder
 	{
 		public int instanceField = 0
 
@@ -23,11 +23,18 @@ public class ReferenceTest
 		}
 	}
 
-	static case class ImmutableHolder(public final int value)
+	@dyvil.lang.literal.IntConvertible
+	public static case class MyInt(public final int value)
 	{
-		public func +(int value): ImmutableHolder = apply(this.value + value)
+		public static implicit func apply(int i) = new MyInt(i)
 
-		public postfix func +=(ImmutableHolder^ holder, int value): void = holder.set(holder.get + value)
+		public infix func +(MyInt i, MyInt j) = MyInt(i.value + j.value)
+
+		public infix func +(MyInt i, int j): MyInt = MyInt(i.value + j)
+
+		public infix func +(int i, MyInt j): MyInt = MyInt(i + j.value)
+
+		public postfix func addInplace(MyInt^ i, int j): void = *i = *i + j
 	}
 
 	public static void main([String] args)
@@ -38,7 +45,7 @@ public class ReferenceTest
 		testReceiverReference()
 	}
 
-	private static void testFieldReference()
+	public static void testFieldReference()
 	{
 		inc staticField
 		Main.test("Static Field Reference", 1, staticField)
@@ -48,7 +55,7 @@ public class ReferenceTest
 		Main.test("Instance Field Reference", 1, holder.instanceField)
 	}
 
-	private static void testPropertyReference()
+	public static void testPropertyReference()
 	{
 		inc(&staticProperty)
 		Main.test("Static Property Reference", 2, staticField)
@@ -58,7 +65,7 @@ public class ReferenceTest
 		Main.test("Instance Property Reference", 1, holder.instanceField)
 	}
 
-	private static void testVariableReference()
+	public static void testVariableReference()
 	{
 		int variable = 0
 		inc variable
@@ -72,10 +79,10 @@ public class ReferenceTest
 		Main.test("Captured Variable Reference", 3, capturedVariable)
 	}
 
-	private static void testReceiverReference()
+	public static void testReceiverReference()
 	{
-		ImmutableHolder holder = ImmutableHolder(0)
-		holder += 1
-		Main.test("Receiver Field Reference", holder.value, 1)
+		MyInt i = MyInt(0)
+		i.addInplace 1
+		Main.test("Receiver Field Reference", i.value, 1)
 	}
 }

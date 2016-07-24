@@ -20,17 +20,37 @@ import static dyvil.reflect.Opcodes.*;
 public interface BooleanArray
 {
 	boolean[] EMPTY = new boolean[0];
-	
-	static boolean[] apply()
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static boolean[] empty()
 	{
 		return EMPTY;
 	}
-	
-	static boolean[] apply(int count)
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static boolean[] empty(int size)
 	{
-		return new boolean[count];
+		return new boolean[size];
 	}
-	
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static boolean[] apply()
+	{
+		return new boolean[0];
+	}
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static boolean[] apply(boolean... values)
+	{
+		return values;
+	}
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static boolean[] from(boolean[] array)
+	{
+		return array.clone();
+	}
+
 	static boolean[] repeat(int count, boolean repeatedValue)
 	{
 		boolean[] array = new boolean[count];

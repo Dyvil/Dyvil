@@ -177,7 +177,7 @@ public class MatchTest
 
 	private static void objects()
 	{
-		Option<int> option = nil
+		int? option = nil
 		int value = _
 
 		option match {

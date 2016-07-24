@@ -2,6 +2,7 @@ package dyvil.tools.parsing;
 
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;
 
 public interface IParserManager
@@ -36,7 +37,7 @@ public interface IParserManager
 
 	void splitReparse(IToken token, int length);
 
-	void report(IToken token, String message);
+	void report(ICodePosition position, String message);
 
 	void report(Marker error);
 
@@ -48,7 +49,7 @@ public interface IParserManager
 
 	void reparse();
 
-	void jump(IToken token);
+	void setNext(IToken token);
 
 	void setParser(Parser parser);
 

@@ -166,6 +166,35 @@ public class FloatRange implements Range<Float>
 		return value >= this.start && (this.halfOpen ? value < this.end : value <= this.end);
 	}
 
+	public float[] toFloatArray()
+	{
+		final float[] result = new float[this.count()];
+
+		int index = 0;
+		if (this.halfOpen)
+		{
+			for (float i = this.start; i < this.end; i += this.increment)
+			{
+				result[index++] = i;
+			}
+			return result;
+		}
+
+		for (float i = this.start; i <= this.end; i += this.increment)
+		{
+			result[index++] = i;
+		}
+		return result;
+	}
+
+	@Override
+	public Float[] toArray()
+	{
+		final Float[] result = new Float[this.count()];
+		this.toArray(0, result);
+		return result;
+	}
+
 	@Override
 	public void toArray(int index, Object[] store)
 	{

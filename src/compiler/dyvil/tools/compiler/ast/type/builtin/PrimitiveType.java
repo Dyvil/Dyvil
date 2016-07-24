@@ -6,14 +6,14 @@ import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.*;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -335,29 +335,6 @@ public final class PrimitiveType implements IType
 		return this.theClass == type.getTheClass();
 	}
 
-	@Override
-	public int getSuperTypeDistance(IType superType)
-	{
-		if (this.theClass == superType.getTheClass())
-		{
-			return 1;
-		}
-		if (superType.isArrayType())
-		{
-			return 0;
-		}
-		if (superType.isPrimitive() && isPromotable(this.typecode, superType.getTypecode()))
-		{
-			return 2;
-		}
-		int m = this.theClass.getSuperTypeDistance(superType);
-		if (m <= 0)
-		{
-			return 0;
-		}
-		return m + 1;
-	}
-
 	private static long bitMask(int from, int to)
 	{
 		return 1L << ((from - 1) | ((to - 1) << 3));
@@ -447,17 +424,27 @@ public final class PrimitiveType implements IType
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
-		Types.PRIMITIVES_CLASS.getMethodMatches(list, instance, name, arguments);
 		if (this.theClass != null)
 		{
-			this.theClass.getMethodMatches(list, instance, name, arguments);
+			this.theClass.getMethodMatches(list, receiver, name, arguments);
+			if (!list.isEmpty())
+			{
+				return;
+			}
 		}
+		Types.PRIMITIVES_CLASS.getMethodMatches(list, receiver, name, arguments);
 	}
 
 	@Override
-	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
+	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
+	{
+		Types.PRIMITIVES_CLASS.getImplicitMatches(list, value, targetType);
+	}
+
+	@Override
+	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
 	{
 	}
 

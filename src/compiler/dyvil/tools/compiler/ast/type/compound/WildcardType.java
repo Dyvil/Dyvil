@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.type.compound;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -30,9 +30,9 @@ import java.io.IOException;
 
 public final class WildcardType implements IRawType, ITyped
 {
-	public    ICodePosition position;
-	protected IType         bound;
-	protected Variance      variance;
+	public ICodePosition position;
+	protected IType bound = Types.ANY;
+	protected Variance variance;
 
 	public WildcardType()
 	{
@@ -49,9 +49,10 @@ public final class WildcardType implements IRawType, ITyped
 		this.bound = bound;
 	}
 
-	public WildcardType(ICodePosition position)
+	public WildcardType(ICodePosition position, Variance variance)
 	{
 		this.position = position;
+		this.variance = variance;
 	}
 
 	@Override
@@ -91,6 +92,7 @@ public final class WildcardType implements IRawType, ITyped
 		this.variance = variance;
 	}
 
+	@Override
 	public Variance getVariance()
 	{
 		return this.variance;
@@ -117,13 +119,13 @@ public final class WildcardType implements IRawType, ITyped
 	@Override
 	public IClass getTheClass()
 	{
-		return this.bound != null ? this.bound.getTheClass() : Types.OBJECT_CLASS;
+		return this.bound.getTheClass();
 	}
 
 	@Override
 	public IType asReturnType()
 	{
-		if (this.bound == null || this.variance == Variance.CONTRAVARIANT)
+		if (this.variance == Variance.CONTRAVARIANT)
 		{
 			return Types.ANY;
 		}
@@ -148,15 +150,39 @@ public final class WildcardType implements IRawType, ITyped
 	}
 
 	@Override
-	public boolean isSameType(IType type)
+	public int subTypeCheckLevel()
 	{
-		return this.bound == null || this.variance.checkCompatible(this.bound, type);
+		return this.bound.subTypeCheckLevel();
 	}
 
 	@Override
-	public boolean isSuperTypeOf(IType type)
+	public boolean isSameType(IType type)
 	{
-		return this.isSameType(type);
+		return this.bound.isSameType(type);
+	}
+
+	@Override
+	public boolean isSuperClassOf(IType subType)
+	{
+		return this.bound.isSuperClassOf(subType);
+	}
+
+	@Override
+	public boolean isSuperTypeOf(IType subType)
+	{
+		return this.bound.isSuperTypeOf(subType);
+	}
+
+	@Override
+	public boolean isSubClassOf(IType superType)
+	{
+		return this.bound.isSubClassOf(superType);
+	}
+
+	@Override
+	public boolean isSubTypeOf(IType superType)
+	{
+		return this.bound.isSubTypeOf(superType);
 	}
 
 	@Override
@@ -168,10 +194,7 @@ public final class WildcardType implements IRawType, ITyped
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
-		if (this.bound != null)
-		{
-			this.bound = this.bound.resolveType(markers, context);
-		}
+		this.bound = this.bound.resolveType(markers, context);
 
 		return this;
 	}
@@ -179,19 +202,13 @@ public final class WildcardType implements IRawType, ITyped
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		if (this.bound != null)
-		{
-			this.bound.resolve(markers, context);
-		}
+		this.bound.resolve(markers, context);
 	}
 
 	@Override
 	public void checkType(MarkerList markers, IContext context, TypePosition position)
 	{
-		if (this.bound != null)
-		{
-			this.bound.checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
-		}
+		this.bound.checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
 
 		if (position != TypePosition.GENERIC_ARGUMENT)
 		{
@@ -202,63 +219,42 @@ public final class WildcardType implements IRawType, ITyped
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		if (this.bound != null)
-		{
-			this.bound.check(markers, context);
-		}
+		this.bound.check(markers, context);
 	}
 
 	@Override
 	public void foldConstants()
 	{
-		if (this.bound != null)
-		{
-			this.bound.foldConstants();
-		}
+		this.bound.foldConstants();
 	}
 
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		if (this.bound != null)
-		{
-			this.bound.cleanup(context, compilableList);
-		}
+		this.bound.cleanup(context, compilableList);
 	}
 
 	@Override
 	public IType resolveType(ITypeParameter typeParameter)
 	{
-		if (this.bound != null)
-		{
-			return this.bound.resolveType(typeParameter);
-		}
-		return null;
+		return this.bound.resolveType(typeParameter);
 	}
 
 	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
-		if (this.bound != null)
-		{
-			this.bound.inferTypes(concrete, typeContext);
-		}
+		this.bound.inferTypes(concrete, typeContext);
 	}
 
 	@Override
 	public boolean hasTypeVariables()
 	{
-		return this.bound != null && this.bound.hasTypeVariables();
+		return this.bound.hasTypeVariables();
 	}
 
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
-		if (this.bound == null)
-		{
-			return this;
-		}
-
 		final IType concreteBound = this.bound.getConcreteType(context);
 		if (concreteBound == this.bound)
 		{
@@ -270,8 +266,7 @@ public final class WildcardType implements IRawType, ITyped
 			return concreteBound;
 		}
 
-		final WildcardType copy = new WildcardType(this.position);
-		copy.variance = this.variance;
+		final WildcardType copy = new WildcardType(this.position, this.variance);
 		copy.bound = concreteBound;
 		return copy;
 	}
@@ -279,7 +274,7 @@ public final class WildcardType implements IRawType, ITyped
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		if (this.bound != null && this.variance == Variance.COVARIANT)
+		if (this.variance != Variance.CONTRAVARIANT)
 		{
 			return this.bound.resolveField(name);
 		}
@@ -288,16 +283,25 @@ public final class WildcardType implements IRawType, ITyped
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
-		if (this.bound != null && this.variance == Variance.COVARIANT)
+		if (this.variance != Variance.CONTRAVARIANT)
 		{
-			this.bound.getMethodMatches(list, instance, name, arguments);
+			this.bound.getMethodMatches(list, receiver, name, arguments);
 		}
 	}
 
 	@Override
-	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
+	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
+	{
+		if (this.variance != Variance.CONTRAVARIANT)
+		{
+			this.bound.getImplicitMatches(list, value, targetType);
+		}
+	}
+
+	@Override
+	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
 	{
 	}
 
@@ -310,7 +314,7 @@ public final class WildcardType implements IRawType, ITyped
 	@Override
 	public String getInternalName()
 	{
-		if (this.variance == Variance.CONTRAVARIANT || this.bound == null)
+		if (this.variance == Variance.CONTRAVARIANT)
 		{
 			return "java/lang/Object";
 		}
@@ -326,7 +330,7 @@ public final class WildcardType implements IRawType, ITyped
 	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
-		if (this.bound != null)
+		if (!Types.isSameType(this.bound, Types.OBJECT))
 		{
 			this.variance.appendPrefix(buffer);
 			this.bound.appendSignature(buffer);
@@ -391,22 +395,14 @@ public final class WildcardType implements IRawType, ITyped
 	public void write(DataOutput out) throws IOException
 	{
 		Variance.write(this.variance, out);
-
-		if (this.variance != Variance.INVARIANT)
-		{
-			IType.writeType(this.bound, out);
-		}
+		IType.writeType(this.bound, out);
 	}
 
 	@Override
 	public void read(DataInput in) throws IOException
 	{
 		this.variance = Variance.read(in);
-
-		if (this.variance != Variance.INVARIANT)
-		{
-			this.bound = IType.readType(in);
-		}
+		this.bound = IType.readType(in);
 	}
 
 	@Override
@@ -440,8 +436,7 @@ public final class WildcardType implements IRawType, ITyped
 	@Override
 	public WildcardType clone()
 	{
-		WildcardType clone = new WildcardType(this.position);
-		clone.variance = this.variance;
+		WildcardType clone = new WildcardType(this.position, this.variance);
 		clone.bound = this.bound;
 		return clone;
 	}

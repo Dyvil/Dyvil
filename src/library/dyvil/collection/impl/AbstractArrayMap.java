@@ -57,7 +57,7 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 
 	private static final long serialVersionUID = -4958236535555733690L;
 
-	protected static final int DEFAULT_CAPACITY = 10;
+	protected static final int DEFAULT_CAPACITY = 16;
 
 	protected transient int      size;
 	protected transient Object[] keys;

@@ -6,7 +6,7 @@ import dyvil.io.FileUtils;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.IDataMember;
@@ -15,11 +15,13 @@ import dyvil.tools.compiler.ast.header.ImportDeclaration;
 import dyvil.tools.compiler.ast.header.IncludeDeclaration;
 import dyvil.tools.compiler.ast.header.PackageDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.operator.IOperator;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 import dyvil.tools.compiler.backend.IClassCompilable;
@@ -105,7 +107,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		String name = input.getAbsolutePath();
 		int start = name.lastIndexOf(File.separatorChar);
 		int end = name.lastIndexOf('.');
-		this.name = Name.get(name.substring(start + 1, end));
+		this.name = Name.from(name.substring(start + 1, end));
 
 		name = output.getPath();
 		start = name.lastIndexOf(File.separatorChar);
@@ -687,21 +689,35 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 
 	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
 		for (int i = 0; i < this.usingCount; i++)
 		{
-			this.usingDeclarations[i].getMethodMatches(list, instance, name, arguments);
+			this.usingDeclarations[i].getMethodMatches(list, receiver, name, arguments);
 		}
 
 		for (int i = 0; i < this.includeCount; i++)
 		{
-			this.includes[i].getMethodMatches(list, instance, name, arguments);
+			this.includes[i].getMethodMatches(list, receiver, name, arguments);
 		}
 	}
 
 	@Override
-	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
+	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
+	{
+		for (int i = 0; i < this.usingCount; i++)
+		{
+			this.usingDeclarations[i].getImplicitMatches(list, value, targetType);
+		}
+
+		for (int i = 0; i < this.includeCount; i++)
+		{
+			this.includes[i].getImplicitMatches(list, value, targetType);
+		}
+	}
+
+	@Override
+	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
 	{
 	}
 

@@ -5,15 +5,16 @@ import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
+import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IMemberContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -197,18 +198,14 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	void setExtension(boolean extension);
 
-	// Super Type
+	// Wildcard Types
 
-	default int getSuperTypeDistance(IType superType)
+	default Variance getVariance()
 	{
-		if (this == superType)
-		{
-			return 1;
-		}
-
-		final IClass thisClass = this.getTheClass();
-		return thisClass == null ? 0 : thisClass.getSuperTypeDistance(superType);
+		return null;
 	}
+
+	// Super Type
 
 	/**
 	 * Returns {@code true} iff this type is a super type of the given {@code type}, {@code false otherwise}.
@@ -253,14 +250,15 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		return false;
 	}
 
+	int SUBTYPE_BASE               = 0;
+	int SUBTYPE_UNION_INTERSECTION = 1;
+	int SUBTYPE_TYPEVAR            = 2;
+	int SUBTYPE_COVARIANT_TYPEVAR  = 3;
+	int SUBTYPE_WILDCARD           = 4;
+
 	default int subTypeCheckLevel()
 	{
-		return 0;
-	}
-
-	default int getSubTypeDistance(IType subType)
-	{
-		throw new UnsupportedOperationException(this.getClass().getName() + ".getSubTypeDistance");
+		return SUBTYPE_BASE;
 	}
 
 	default boolean isSubClassOf(IType superType)
@@ -370,10 +368,10 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	IDataMember resolveField(Name name);
 
 	@Override
-	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
+	void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments);
 
 	@Override
-	void getConstructorMatches(ConstructorMatchList list, IArguments arguments);
+	void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments);
 
 	IMethod getFunctionalMethod();
 

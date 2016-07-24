@@ -37,13 +37,13 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 	}
 
 	@Override
-	public MutableSet<? extends E> difference(Collection<?> collection)
+	public MutableSet<E> difference(Collection<?> collection)
 	{
 		return new MapBasedSet<>(this.map.keyDifference(collection));
 	}
 
 	@Override
-	public MutableSet<? extends E> intersection(Collection<? extends E> collection)
+	public MutableSet<E> intersection(Collection<? extends E> collection)
 	{
 		MutableMap<E, Boolean> map = this.map.emptyCopy();
 		for (Entry<E, ?> entry : this.map)
@@ -58,7 +58,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 	}
 
 	@Override
-	public MutableSet<? extends E> union(Collection<? extends E> collection)
+	public MutableSet<E> union(Collection<? extends E> collection)
 	{
 		MutableMap<E, Boolean> map = this.map.copy();
 		for (E element : collection)
@@ -69,7 +69,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 	}
 
 	@Override
-	public MutableSet<? extends E> symmetricDifference(Collection<? extends E> collection)
+	public MutableSet<E> symmetricDifference(Collection<? extends E> collection)
 	{
 		MutableMap<E, Boolean> map = this.map.emptyCopy();
 		for (Entry<E, ?> entry : this.map)

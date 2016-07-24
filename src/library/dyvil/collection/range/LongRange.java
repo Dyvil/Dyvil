@@ -172,6 +172,35 @@ public class LongRange implements Range<Long>
 		return value >= this.start && (this.halfOpen ? value < this.end : value <= this.end);
 	}
 
+	public long[] toLongArray()
+	{
+		final long[] result = new long[this.count()];
+
+		int index = 0;
+		if (this.halfOpen)
+		{
+			for (long i = this.start; i < this.end; i += this.increment)
+			{
+				result[index++] = i;
+			}
+			return result;
+		}
+
+		for (long i = this.start; i <= this.end; i += this.increment)
+		{
+			result[index++] = i;
+		}
+		return result;
+	}
+
+	@Override
+	public Long[] toArray()
+	{
+		final Long[] result = new Long[this.count()];
+		this.toArray(0, result);
+		return result;
+	}
+
 	@Override
 	public void toArray(int index, Object[] store)
 	{

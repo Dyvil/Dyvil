@@ -51,7 +51,7 @@ public class AnonymousClass extends CodeClass
 		String outerName = this.enclosingClass.getName().qualified;
 		String indexString = Integer.toString(index);
 
-		this.name = Name.getQualified(outerName + '$' + indexString);
+		this.name = Name.fromRaw(outerName + '$' + indexString);
 		this.fullName = this.enclosingClass.getFullName() + '$' + indexString;
 		this.internalName = this.enclosingClass.getInternalName() + '$' + indexString;
 	}

@@ -279,7 +279,7 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	@Override
 	public void read(DataInput in) throws IOException
 	{
-		this.name = Name.getQualified(in.readUTF());
+		this.name = Name.fromRaw(in.readUTF());
 		this.type = IType.readType(in);
 
 		this.typeVariableCount = in.readShort();

@@ -7,7 +7,6 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.dynamic.DynamicType;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -139,24 +138,24 @@ public final class Types
 
 		final IClassBody primitivesBody = PRIMITIVES_CLASS.getBody();
 
-		VOID.boxMethod = primitivesBody.getMethod(Name.getQualified("Void"));
-		VOID.unboxMethod = primitivesBody.getMethod(Name.getQualified("toVoid"));
-		BOOLEAN.boxMethod = primitivesBody.getMethod(Name.getQualified("Boolean"));
-		BOOLEAN.unboxMethod = primitivesBody.getMethod(Name.getQualified("toBoolean"));
-		BYTE.boxMethod = primitivesBody.getMethod(Name.getQualified("Byte"));
-		BYTE.unboxMethod = primitivesBody.getMethod(Name.getQualified("toByte"));
-		SHORT.boxMethod = primitivesBody.getMethod(Name.getQualified("Short"));
-		SHORT.unboxMethod = primitivesBody.getMethod(Name.getQualified("toShort"));
-		CHAR.boxMethod = primitivesBody.getMethod(Name.getQualified("Char"));
-		CHAR.unboxMethod = primitivesBody.getMethod(Name.getQualified("toChar"));
-		INT.boxMethod = primitivesBody.getMethod(Name.getQualified("Int"));
-		INT.unboxMethod = primitivesBody.getMethod(Name.getQualified("toInt"));
-		LONG.boxMethod = primitivesBody.getMethod(Name.getQualified("Long"));
-		LONG.unboxMethod = primitivesBody.getMethod(Name.getQualified("toLong"));
-		FLOAT.boxMethod = primitivesBody.getMethod(Name.getQualified("Float"));
-		FLOAT.unboxMethod = primitivesBody.getMethod(Name.getQualified("toFloat"));
-		DOUBLE.boxMethod = primitivesBody.getMethod(Name.getQualified("Double"));
-		DOUBLE.unboxMethod = primitivesBody.getMethod(Name.getQualified("toDouble"));
+		VOID.boxMethod = primitivesBody.getMethod(Name.fromRaw("Void"));
+		VOID.unboxMethod = primitivesBody.getMethod(Name.fromRaw("toVoid"));
+		BOOLEAN.boxMethod = primitivesBody.getMethod(Name.fromRaw("Boolean"));
+		BOOLEAN.unboxMethod = primitivesBody.getMethod(Name.fromRaw("toBoolean"));
+		BYTE.boxMethod = primitivesBody.getMethod(Name.fromRaw("Byte"));
+		BYTE.unboxMethod = primitivesBody.getMethod(Name.fromRaw("toByte"));
+		SHORT.boxMethod = primitivesBody.getMethod(Name.fromRaw("Short"));
+		SHORT.unboxMethod = primitivesBody.getMethod(Name.fromRaw("toShort"));
+		CHAR.boxMethod = primitivesBody.getMethod(Name.fromRaw("Char"));
+		CHAR.unboxMethod = primitivesBody.getMethod(Name.fromRaw("toChar"));
+		INT.boxMethod = primitivesBody.getMethod(Name.fromRaw("Int"));
+		INT.unboxMethod = primitivesBody.getMethod(Name.fromRaw("toInt"));
+		LONG.boxMethod = primitivesBody.getMethod(Name.fromRaw("Long"));
+		LONG.unboxMethod = primitivesBody.getMethod(Name.fromRaw("toLong"));
+		FLOAT.boxMethod = primitivesBody.getMethod(Name.fromRaw("Float"));
+		FLOAT.unboxMethod = primitivesBody.getMethod(Name.fromRaw("toFloat"));
+		DOUBLE.boxMethod = primitivesBody.getMethod(Name.fromRaw("Double"));
+		DOUBLE.unboxMethod = primitivesBody.getMethod(Name.fromRaw("toDouble"));
 	}
 
 	public static IType fromASMType(dyvil.tools.asm.Type type)
@@ -261,31 +260,6 @@ public final class Types
 	public static boolean isAssignable(IType fromType, IType toType)
 	{
 		return isSuperType(toType, fromType) || isConvertible(fromType, toType);
-	}
-
-	public static int getDistance(IType superType, IType subType)
-	{
-		if (superType == subType)
-		{
-			return 1;
-		}
-
-		final int distance;
-		if (superType.subTypeCheckLevel() > subType.subTypeCheckLevel())
-		{
-			distance = superType.getSubTypeDistance(subType);
-		}
-		else
-		{
-			distance = subType.getSuperTypeDistance(superType);
-		}
-
-		if (distance != 0)
-		{
-			return distance;
-		}
-
-		return isConvertible(subType, superType) ? IValue.CONVERSION_MATCH : 0;
 	}
 
 	public static boolean isConvertible(IType fromType, IType toType)

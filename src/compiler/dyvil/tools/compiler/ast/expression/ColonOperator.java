@@ -89,7 +89,7 @@ public class ColonOperator implements IValue
 	@Override
 	public boolean isResolved()
 	{
-		return this.type != null;
+		return this.left.isResolved() && this.right.isResolved();
 	}
 
 	@Override
@@ -149,12 +149,16 @@ public class ColonOperator implements IValue
 	@Override
 	public int getTypeMatch(IType type)
 	{
+		final int i = IValue.super.getTypeMatch(type);
+		if (i != MISMATCH)
+		{
+			return i;
+		}
 		if (type.getAnnotation(LazyFields.COLON_CONVERTIBLE) != null)
 		{
-			return IValue.CONVERSION_MATCH;
+			return CONVERSION_MATCH;
 		}
-
-		return Types.getDistance(type, this.getType());
+		return MISMATCH;
 	}
 
 	@Override

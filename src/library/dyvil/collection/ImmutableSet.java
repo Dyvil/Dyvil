@@ -99,25 +99,25 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 	 * {@inheritDoc} This operator represents the 'union' ImmutableSet operation.
 	 */
 	@Override
-	ImmutableSet<? extends E> union(Collection<? extends E> collection);
+	ImmutableSet<E> union(Collection<? extends E> collection);
 
 	/**
 	 * {@inheritDoc} This operator represents the 'subtract' ImmutableSet operation.
 	 */
 	@Override
-	ImmutableSet<? extends E> difference(Collection<?> collection);
+	ImmutableSet<E> difference(Collection<?> collection);
 
 	/**
 	 * {@inheritDoc} This operator represents the 'intersect' ImmutableSet operation.
 	 */
 	@Override
-	ImmutableSet<? extends E> intersection(Collection<? extends E> collection);
+	ImmutableSet<E> intersection(Collection<? extends E> collection);
 
 	/**
 	 * {@inheritDoc} This operator represents the 'exclusive OR' ImmutableSet operation.
 	 */
 	@Override
-	ImmutableSet<? extends E> symmetricDifference(Collection<? extends E> collection);
+	ImmutableSet<E> symmetricDifference(Collection<? extends E> collection);
 	
 	@Override
 	<R> ImmutableSet<R> mapped(Function<? super E, ? extends R> mapper);

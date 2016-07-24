@@ -169,7 +169,7 @@ public class HashSet<E> extends AbstractHashSet<E> implements ImmutableSet<E>
 	}
 
 	@Override
-	public ImmutableSet<? extends E> difference(Collection<?> collection)
+	public ImmutableSet<E> difference(Collection<?> collection)
 	{
 		HashSet<E> newSet = new HashSet<>(this.size);
 
@@ -185,7 +185,7 @@ public class HashSet<E> extends AbstractHashSet<E> implements ImmutableSet<E>
 	}
 
 	@Override
-	public ImmutableSet<? extends E> intersection(Collection<? extends E> collection)
+	public ImmutableSet<E> intersection(Collection<? extends E> collection)
 	{
 		HashSet<E> newSet = new HashSet<>(this.size);
 
@@ -201,7 +201,7 @@ public class HashSet<E> extends AbstractHashSet<E> implements ImmutableSet<E>
 	}
 
 	@Override
-	public ImmutableSet<? extends E> union(Collection<? extends E> collection)
+	public ImmutableSet<E> union(Collection<? extends E> collection)
 	{
 		HashSet<E> newSet = new HashSet<>(this);
 		newSet.ensureCapacity(this.size + collection.size());
@@ -213,7 +213,7 @@ public class HashSet<E> extends AbstractHashSet<E> implements ImmutableSet<E>
 	}
 
 	@Override
-	public ImmutableSet<? extends E> symmetricDifference(Collection<? extends E> collection)
+	public ImmutableSet<E> symmetricDifference(Collection<? extends E> collection)
 	{
 		HashSet<E> newSet = new HashSet<>(this.size + collection.size());
 

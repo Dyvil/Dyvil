@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -14,9 +15,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.TypeChecker;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SemanticError;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -174,25 +173,29 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	{
 		if (DISALLOW_EXPRESSIONS)
 		{
-			return 0;
+			return MISMATCH;
 		}
 
-		int total = this.action.getTypeMatch(type);
-		if (total <= 0F)
+		int min = this.action.getTypeMatch(type);
+		if (min == MISMATCH)
 		{
-			return 0;
+			return MISMATCH;
 		}
+
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
 			final int blockMatch = this.catchBlocks[i].action.getTypeMatch(type);
-			if (blockMatch <= 0F)
+			if (blockMatch == MISMATCH)
 			{
-				return 0;
+				return MISMATCH;
 			}
-			total += blockMatch;
+			if (blockMatch < min)
+			{
+				min = blockMatch;
+			}
 		}
 
-		return total / (1 + this.catchBlockCount);
+		return min;
 	}
 
 	public void addCatchBlock(CatchBlock block)
@@ -265,19 +268,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 		if (this.finallyBlock != null)
 		{
 			this.finallyBlock = this.finallyBlock.resolve(markers, context);
-
-			final IValue typedFinally = this.finallyBlock.withType(Types.VOID, Types.VOID, markers, context);
-			if (typedFinally != null && typedFinally.isUsableAsStatement())
-			{
-				this.finallyBlock = typedFinally;
-			}
-			else if (this.finallyBlock.isResolved())
-			{
-				final Marker marker = Markers
-					                      .semanticError(this.finallyBlock.getPosition(), "try.finally.type.invalid");
-				marker.addInfo(Markers.getSemantic("try.finally.type", this.finallyBlock.getType().toString()));
-				markers.add(marker);
-			}
+			this.finallyBlock = IStatement.checkStatement(markers, context, this.finallyBlock, "try.finally.type");
 		}
 
 		if (DISALLOW_EXPRESSIONS && this.commonType != null && this.commonType != Types.VOID)

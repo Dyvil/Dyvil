@@ -3,10 +3,10 @@ package dyvil.tools.compiler.ast.access;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -37,21 +37,21 @@ public class SubscriptAccess extends AbstractCall
 	}
 
 	@Override
-	public IArguments getArguments()
+	public Name getName()
 	{
-		return this.arguments;
+		return Names.subscript;
+	}
+
+	@Override
+	protected Name getReferenceName()
+	{
+		return Names.subscript_$amp;
 	}
 
 	@Override
 	public IValue toAssignment(IValue rhs, ICodePosition position)
 	{
 		return new SubscriptAssignment(this.position.to(position), this.receiver, this.arguments, rhs);
-	}
-
-	@Override
-	public IValue toReferenceValue(MarkerList markers, IContext context)
-	{
-		return toReferenceValue(this, Names.subscript_$amp, markers, context);
 	}
 
 	@Override
@@ -76,7 +76,7 @@ public class SubscriptAccess extends AbstractCall
 
 			call.setArguments(oldArgs.withLastValue(Names.subscript, array));
 
-			IValue resolvedCall = call.resolveCall(markers, context);
+			IValue resolvedCall = call.resolveCall(markers, context, false);
 			if (resolvedCall != null)
 			{
 				return resolvedCall;
@@ -85,38 +85,11 @@ public class SubscriptAccess extends AbstractCall
 			// Revert
 			call.setArguments(oldArgs);
 
-			this.receiver = call.resolveCall(markers, context);
-			resolvedCall = this.resolveCall(markers, context);
-			if (resolvedCall != null)
-			{
-				return resolvedCall;
-			}
-
-			this.reportResolve(markers, context);
-			return this;
+			this.receiver = call.resolveCall(markers, context, true);
+			return this.resolveCall(markers, context, true);
 		}
 
 		return super.resolve(markers, context);
-	}
-
-	@Override
-	public IValue resolveCall(MarkerList markers, IContext context)
-	{
-		IMethod m = ICall.resolveMethod(context, this.receiver, Names.subscript, this.arguments);
-		if (m != null)
-		{
-			this.method = m;
-			this.checkArguments(markers, context);
-			return this;
-		}
-
-		return null;
-	}
-
-	@Override
-	public void reportResolve(MarkerList markers, IContext context)
-	{
-		ICall.addResolveMarker(markers, this.position, this.receiver, Names.subscript, this.arguments);
 	}
 
 	@Override

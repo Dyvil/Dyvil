@@ -4,6 +4,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.reference.PropertyReference;
@@ -64,6 +65,12 @@ public class MethodCall extends AbstractCall implements INamed
 	}
 
 	@Override
+	protected Name getReferenceName()
+	{
+		return Name.from(this.name.unqualified + "_&", this.name.qualified + "_$amp");
+	}
+
+	@Override
 	public IValue toAnnotationConstant(MarkerList markers, IContext context, int depth)
 	{
 		final IValue value = this.foldConstants().foldConstants();
@@ -94,17 +101,11 @@ public class MethodCall extends AbstractCall implements INamed
 	}
 
 	@Override
-	public IValue toReferenceValue(MarkerList markers, IContext context)
-	{
-		final Name newName = Name.get(this.name.unqualified + "_&", this.name.qualified + "_$amp");
-		return AbstractCall.toReferenceValue(this, newName, markers, context);
-	}
-
-	@Override
-	public IValue resolveCall(MarkerList markers, IContext context)
+	public IValue resolveCall(MarkerList markers, IContext context, boolean report)
 	{
 		// Normal Method Resolution
-		if (this.resolveMethodCall(markers, context))
+		final MatchList<IMethod> ambigousCandidates = this.resolveMethodCall(markers, context);
+		if (ambigousCandidates == null)
 		{
 			return this;
 		}
@@ -116,26 +117,29 @@ public class MethodCall extends AbstractCall implements INamed
 		}
 
 		// Apply Method Resolution
-		return ApplyMethodCall.resolveApply(markers, context, this.position, this.receiver, this.name, this.arguments,
-		                                    this.genericData);
-	}
-
-	protected boolean resolveMethodCall(MarkerList markers, IContext context)
-	{
-		final IMethod method = ICall.resolveMethod(context, this.receiver, this.name, this.arguments);
-		if (method != null)
+		final IValue fieldAccess = new FieldAccess(this.position, this.receiver, this.name)
+			                           .resolveFieldAccess(markers, context);
+		if (fieldAccess != null)
 		{
-			this.method = method;
-			this.checkArguments(markers, context);
-			return true;
+			// Field Access available, try to resolve an apply method
+
+			final ApplyMethodCall call = new ApplyMethodCall(this.position, fieldAccess, this.arguments);
+			call.genericData = this.genericData;
+			return call.resolveCall(markers, context, report);
 		}
-		return false;
+
+		if (report)
+		{
+			this.reportResolve(markers, ambigousCandidates);
+			return this;
+		}
+		return null;
 	}
 
 	protected boolean resolveImplicitCall(MarkerList markers, IContext context)
 	{
 		final IValue implicit = context.getImplicit();
-		if ((implicit) == null)
+		if (implicit == null)
 		{
 			return false;
 		}
@@ -149,12 +153,6 @@ public class MethodCall extends AbstractCall implements INamed
 			return true;
 		}
 		return false;
-	}
-
-	@Override
-	public void reportResolve(MarkerList markers, IContext context)
-	{
-		ICall.addResolveMarker(markers, this.position, this.receiver, this.name, this.arguments);
 	}
 
 	@Override

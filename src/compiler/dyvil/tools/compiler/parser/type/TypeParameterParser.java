@@ -22,11 +22,12 @@ import dyvil.tools.parsing.token.IToken;
 public final class TypeParameterParser extends Parser implements ITyped
 {
 	public static final int ANNOTATIONS = 0;
-	public static final int NAME        = 1;
-	public static final int TYPE_BOUNDS = 2;
+	public static final int VARIANCE    = 1;
+	public static final int NAME        = 2;
+	public static final int TYPE_BOUNDS = 3;
 
-	public static final int UPPER = 1;
-	public static final int LOWER = 2;
+	private static final int UPPER_BOUND = 1;
+	private static final int LOWER_BOUND = 2;
 
 	protected ITypeParametric typeParameterized;
 
@@ -55,6 +56,13 @@ public final class TypeParameterParser extends Parser implements ITyped
 				pm.pushParser(new AnnotationParser(annotation));
 				return;
 			}
+			if (type == DyvilKeywords.TYPE)
+			{
+				this.mode = VARIANCE;
+				return;
+			}
+			// Fallthrough
+		case VARIANCE:
 			if (ParserUtil.isIdentifier(type))
 			{
 				final Name name = token.nameValue();
@@ -103,13 +111,13 @@ public final class TypeParameterParser extends Parser implements ITyped
 				if (type == DyvilKeywords.EXTENDS)
 				{
 					pm.pushParser(this.newTypeParser());
-					this.boundMode = UPPER;
+					this.boundMode = UPPER_BOUND;
 					return;
 				}
 				if (type == DyvilKeywords.SUPER)
 				{
 					pm.pushParser(this.newTypeParser());
-					this.boundMode = LOWER;
+					this.boundMode = LOWER_BOUND;
 					return;
 				}
 			}
@@ -121,17 +129,17 @@ public final class TypeParameterParser extends Parser implements ITyped
 					if (name == Names.ltcolon) // <: - Upper Bounds
 					{
 						pm.pushParser(this.newTypeParser());
-						this.boundMode = UPPER;
+						this.boundMode = UPPER_BOUND;
 						return;
 					}
 					if (name == Names.gtcolon) // >: - Lower Bound
 					{
 						pm.pushParser(this.newTypeParser());
-						this.boundMode = LOWER;
+						this.boundMode = LOWER_BOUND;
 						return;
 					}
 				}
-				else if (this.boundMode == UPPER && name == Names.amp)
+				else if (this.boundMode == UPPER_BOUND && name == Names.amp)
 				{
 					pm.pushParser(this.newTypeParser());
 					return;
@@ -172,11 +180,11 @@ public final class TypeParameterParser extends Parser implements ITyped
 	@Override
 	public void setType(IType type)
 	{
-		if (this.boundMode == UPPER)
+		if (this.boundMode == UPPER_BOUND)
 		{
 			this.typeParameter.addUpperBound(type);
 		}
-		else if (this.boundMode == LOWER)
+		else if (this.boundMode == LOWER_BOUND)
 		{
 			this.typeParameter.setLowerBound(type);
 		}

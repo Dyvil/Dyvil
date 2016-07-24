@@ -116,7 +116,7 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 				final ExpressionParser parser = new ExpressionParser(this.variable);
 				if (!this.parenthesis)
 				{
-					parser.addFlag(IGNORE_COLON | IGNORE_CLOSURE);
+					parser.addFlags(IGNORE_COLON | IGNORE_CLOSURE);
 				}
 				pm.pushParser(parser);
 				return;
@@ -157,7 +157,7 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 				final ExpressionParser parser = new ExpressionParser(this);
 				if (!this.parenthesis)
 				{
-					parser.addFlag(IGNORE_COLON | IGNORE_CLOSURE);
+					parser.addFlags(IGNORE_COLON | IGNORE_CLOSURE);
 				}
 				pm.pushParser(parser);
 			}

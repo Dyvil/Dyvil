@@ -1,10 +1,8 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.context.IMemberContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
@@ -18,11 +16,9 @@ import dyvil.tools.compiler.ast.reference.InstanceFieldReference;
 import dyvil.tools.compiler.ast.reference.StaticFieldReference;
 import dyvil.tools.compiler.ast.reference.VariableReference;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.structure.RootPackage;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.ast.type.raw.PackageType;
+import dyvil.tools.compiler.ast.type.raw.NamedType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
@@ -204,10 +200,9 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	{
 		if (this.field == null)
 		{
-			return 0;
+			return MISMATCH;
 		}
-
-		return Types.getDistance(type, this.getType());
+		return IValue.super.getTypeMatch(type);
 	}
 
 	@Override
@@ -297,7 +292,13 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 			return this;
 		}
 
-		ICall.addResolveMarker(markers, this.position, this.receiver, this.name, EmptyArguments.INSTANCE);
+		final Marker marker = Markers.semanticError(this.position, "method.access.resolve.field", this.name);
+		if (this.receiver != null)
+		{
+			marker.addInfo(Markers.getSemantic("receiver.type", this.receiver.getType()));
+		}
+
+		markers.add(marker);
 		return this;
 	}
 
@@ -356,41 +357,27 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 
 		// Qualified Type Name Resolution
 
-		return this.resolveType(context);
+		return this.resolveTypeAccess(context);
 	}
 
-	private IValue resolveType(IContext context)
+	private IValue resolveTypeAccess(IContext context)
 	{
-		final IMemberContext typeContext;
-		final IMemberContext packageContext;
+		final IType type;
 
 		if (this.receiver == null)
 		{
-			typeContext = context;
-			packageContext = RootPackage.rootPackage;
+			type = NamedType.resolveTopLevel(context, this.name, this.position);
 		}
 		else if (this.receiver.valueTag() == IValue.CLASS_ACCESS)
 		{
-			packageContext = typeContext = this.receiver.getType();
+			type = NamedType.resolveWithParent(this.receiver.getType(), this.name, this.position);
 		}
 		else
 		{
 			return null;
 		}
 
-		final IClass iclass = IContext.resolveClass(typeContext, this.name);
-		if (iclass != null)
-		{
-			return new ClassAccess(this.position, iclass.getType());
-		}
-
-		final Package thePackage = packageContext.resolvePackage(this.name);
-		if (thePackage != null)
-		{
-			return new ClassAccess(this.position, new PackageType(thePackage));
-		}
-
-		return null;
+		return type != null ? new ClassAccess(this.position, type) : null;
 	}
 
 	private IValue resolveField(IValue receiver, IContext context)

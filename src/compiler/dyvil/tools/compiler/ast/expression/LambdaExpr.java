@@ -439,9 +439,9 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	{
 		if (type.getTheClass() == Types.OBJECT_CLASS)
 		{
-			return 2;
+			return SUBTYPE_MATCH;
 		}
-		return this.isType(type) ? 1 : 0;
+		return this.isType(type) ? EXACT_MATCH : MISMATCH;
 	}
 
 	@Override

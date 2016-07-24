@@ -1,36 +1,25 @@
 package dyvil.tools.compiler.ast.classes.metadata;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.access.*;
-import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.access.ClassParameterSetter;
+import dyvil.tools.compiler.ast.access.InitializerCall;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
-import dyvil.tools.compiler.ast.constant.StringValue;
 import dyvil.tools.compiler.ast.constructor.CodeConstructor;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.NilExpr;
-import dyvil.tools.compiler.ast.field.Field;
-import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
-import dyvil.tools.compiler.ast.intrinsic.NullCheckOperator;
-import dyvil.tools.compiler.ast.method.CodeMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.parameter.*;
-import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public class ClassMetadata implements IClassMetadata
@@ -40,8 +29,6 @@ public class ClassMetadata implements IClassMetadata
 	protected static final int EQUALS      = 1 << 2;
 	protected static final int HASHCODE    = 1 << 3;
 	protected static final int TOSTRING    = 1 << 4;
-	protected static final int NULLVALUE   = 1 << 5;
-	protected static final int NILVALUE    = 1 << 6;
 
 	protected static final int READ_RESOLVE  = 1 << 7;
 	protected static final int WRITE_REPLACE = 1 << 8;
@@ -49,13 +36,6 @@ public class ClassMetadata implements IClassMetadata
 	// protected static final int READ_OBJECT   = 1 << 10;
 
 	protected static final int INSTANCE_FIELD = 1 << 16;
-	protected static final int NULL_FIELD     = 1 << 17;
-	protected static final int NIL_FIELD      = 1 << 18;
-
-	public static final Name NULL      = Name.getQualified("NULL");
-	public static final Name nullValue = Name.getQualified("nullValue");
-	public static final Name NIL       = Name.getQualified("NIL");
-	public static final Name nilValue  = Name.getQualified("nilValue");
 
 	protected final IClass theClass;
 
@@ -63,11 +43,6 @@ public class ClassMetadata implements IClassMetadata
 
 	protected IConstructor    constructor;
 	protected InitializerCall superInitializer;
-
-	protected IField  nullField;
-	protected IMethod nullValueMethod;
-	protected IField  nilField;
-	protected IMethod nilValueMethod;
 
 	public ClassMetadata(IClass iclass)
 	{
@@ -116,17 +91,8 @@ public class ClassMetadata implements IClassMetadata
 
 	private void checkField(IField field)
 	{
-		switch (field.getName().qualified)
+		if ("instance".equals(field.getName().qualified))
 		{
-		case "NULL":
-			this.members |= NULL_FIELD;
-			this.nullField = field;
-			return;
-		case "NIL":
-			this.members |= NIL_FIELD;
-			this.nilField = field;
-			return;
-		case "instance":
 			this.members |= INSTANCE_FIELD;
 			this.setInstanceField(field);
 		}
@@ -171,18 +137,6 @@ public class ClassMetadata implements IClassMetadata
 			if (parameters.isEmpty())
 			{
 				this.members |= WRITE_REPLACE;
-			}
-			return;
-		case "nullValue":
-			if (parameters.isEmpty())
-			{
-				this.members |= NULLVALUE;
-			}
-			return;
-		case "nilValue":
-			if (parameters.isEmpty())
-			{
-				this.members |= NILVALUE;
 			}
 		}
 	}
@@ -246,83 +200,6 @@ public class ClassMetadata implements IClassMetadata
 			constructor.resolveTypes(markers, context);
 			this.constructor = constructor;
 		}
-
-		if (this.theClass.hasModifier(Modifiers.NIL_CLASS))
-		{
-			this.generateNilMembers(markers);
-		}
-
-		if (this.theClass.hasModifier(Modifiers.NULL_CLASS))
-		{
-			this.generateNullMembers(markers);
-		}
-	}
-
-	private void generateNilMembers(MarkerList markers)
-	{
-		// Generate the NilConvertible annotation
-		if (this.theClass.getAnnotation(NilExpr.LazyFields.NIL_CONVERTIBLE_CLASS) == null)
-		{
-			final Annotation annotation = new Annotation(this.theClass.getPosition(),
-			                                             NilExpr.LazyFields.NIL_CONVERTIBLE_CLASS.getClassType());
-			annotation.setArguments(new SingleArgument(new StringValue("nilValue")));
-			this.theClass.addAnnotation(annotation); // @NilConvertible("nilValue")
-		}
-
-		// Generate the NULL field
-		if ((this.members & NIL_FIELD) == 0)
-		{
-			this.nilField = new Field(this.theClass, NIL, this.theClass.getClassType(),
-			                          new FlagModifierSet(Modifiers.PRIVATE | Modifiers.STATIC));
-		}
-		else
-		{
-			markers.add(Markers.semanticError(this.nilField.getPosition(), "class.nil.field", this.theClass.getName()));
-		}
-
-		if ((this.members & NILVALUE) == 0)
-		{
-			// Generate the nilValue() method
-
-			// public static TypeName nilValue()
-
-			this.nilValueMethod = new CodeMethod(this.theClass, nilValue, this.theClass.getClassType(),
-			                                     new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC));
-		}
-	}
-
-	private void generateNullMembers(MarkerList markers)
-	{
-		// Generate the NilConvertible annotation
-		if (this.theClass.getAnnotation(NilExpr.LazyFields.NIL_CONVERTIBLE_CLASS) == null)
-		{
-			final Annotation annotation = new Annotation(this.theClass.getPosition(),
-			                                             NilExpr.LazyFields.NIL_CONVERTIBLE_CLASS.getClassType());
-			annotation.setArguments(new SingleArgument(new StringValue("nullValue")));
-			this.theClass.addAnnotation(annotation); // @NilConvertible("nullValue")
-		}
-
-		// Generate the NULL field
-		if ((this.members & NULL_FIELD) == 0)
-		{
-			this.nullField = new Field(this.theClass, NULL, this.theClass.getClassType(),
-			                           new FlagModifierSet(Modifiers.PRIVATE | Modifiers.STATIC));
-		}
-		else
-		{
-			markers
-				.add(Markers.semanticError(this.nullField.getPosition(), "class.null.field", this.theClass.getName()));
-		}
-
-		if ((this.members & NULLVALUE) == 0)
-		{
-			// Generate the nullValue() method
-
-			// public static TypeName nullValue()
-
-			this.nullValueMethod = new CodeMethod(this.theClass, nullValue, this.theClass.getClassType(),
-			                                      new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC));
-		}
 	}
 
 	protected void copyClassParameters(IParametric constructor)
@@ -352,29 +229,6 @@ public class ClassMetadata implements IClassMetadata
 	}
 
 	@Override
-	public IDataMember resolveField(Name name)
-	{
-		if (name == NULL && this.nullField != null)
-		{
-			return this.nullField;
-		}
-		return null;
-	}
-
-	@Override
-	public void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments)
-	{
-		if (name == nullValue && this.nullValueMethod != null)
-		{
-			IContext.getMethodMatch(list, instance, name, arguments, this.nullValueMethod);
-		}
-		if (name == nilValue && this.nilValueMethod != null)
-		{
-			IContext.getMethodMatch(list, instance, name, arguments, this.nilValueMethod);
-		}
-	}
-
-	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
 		final IType superType = this.theClass.getSuperType();
@@ -395,49 +249,6 @@ public class ClassMetadata implements IClassMetadata
 			}
 
 			this.constructor.setValue(constructorBody);
-		}
-
-		if ((this.members & NULLVALUE) == 0 && this.nullField != null)
-		{
-			// Generate the nullValue body
-
-			// public static TypeName nullValue() = if (NULL != null) NULL else NULL = new TypeName(0, false, null, ...)
-
-			final ArgumentList arguments = new ArgumentList();
-			final IParameterList parameters = this.theClass.getParameterList();
-
-			for (int i = 0, count = parameters.size(); i < count; i++)
-			{
-				arguments.addValue(parameters.get(i).getInternalType().getDefaultValue());
-			}
-
-			final FieldAccess fieldAccess = new FieldAccess(this.nullField);
-			final IValue value = new ConstructorCall(this.constructor, arguments);
-			this.nullValueMethod.setValue(new IfStatement(new NullCheckOperator(fieldAccess, false), fieldAccess,
-			                                              new FieldAssignment(this.nullField, value)));
-		}
-
-		if ((this.members & NILVALUE) == 0 && this.nilField != null)
-		{
-			// Generate the nilValue body
-
-			// public static TypeName nilValue() = if (NIL != null) NIL else NIL = new TypeName(0, false, nil, ...)
-
-			final ArgumentList arguments = new ArgumentList();
-			final IParameterList parameters = this.theClass.getParameterList();
-
-			for (int i = 0, count = parameters.size(); i < count; i++)
-			{
-				final IParameter parameter = parameters.get(i);
-
-				arguments.addValue(
-					NilExpr.nilOrDefault(parameter.getPosition(), parameter.getInternalType(), null, markers, context));
-			}
-
-			final FieldAccess fieldAccess = new FieldAccess(this.nilField);
-			final IValue value = new ConstructorCall(this.constructor, arguments);
-			this.nilValueMethod.setValue(new IfStatement(new NullCheckOperator(fieldAccess, false), fieldAccess,
-			                                             new FieldAssignment(this.nilField, value)));
 		}
 	}
 
@@ -478,18 +289,14 @@ public class ClassMetadata implements IClassMetadata
 	}
 
 	@Override
-	public void getConstructorMatches(ConstructorMatchList list, IArguments arguments)
+	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
 	{
 		if ((this.members & CONSTRUCTOR) != 0)
 		{
 			return;
 		}
 
-		float match = this.constructor.getSignatureMatch(arguments);
-		if (match > 0)
-		{
-			list.add(this.constructor, match);
-		}
+		this.constructor.checkMatch(list, arguments);
 	}
 
 	@Override
@@ -498,23 +305,6 @@ public class ClassMetadata implements IClassMetadata
 		if ((this.members & CONSTRUCTOR) == 0)
 		{
 			this.constructor.write(writer);
-		}
-
-		if (this.nullField != null && (this.members & NULL_FIELD) == 0)
-		{
-			this.nullField.write(writer);
-		}
-		if (this.nullValueMethod != null && (this.members & NULLVALUE) == 0)
-		{
-			this.nullValueMethod.write(writer);
-		}
-		if (this.nilField != null && (this.members & NIL_FIELD) == 0)
-		{
-			this.nilField.write(writer);
-		}
-		if (this.nilValueMethod != null && (this.members & NILVALUE) == 0)
-		{
-			this.nilValueMethod.write(writer);
 		}
 	}
 }

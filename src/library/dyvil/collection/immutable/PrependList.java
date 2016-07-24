@@ -104,7 +104,7 @@ public class PrependList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public ImmutableList<? extends E> union(Collection<? extends E> collection)
+	public ImmutableList<E> union(Collection<? extends E> collection)
 	{
 		return new PrependList<>(this.head, (ImmutableList<E>) this.tail.union(collection));
 	}
@@ -120,7 +120,7 @@ public class PrependList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public ImmutableList<? extends E> difference(Collection<?> collection)
+	public ImmutableList<E> difference(Collection<?> collection)
 	{
 		if (collection.contains(this.head))
 		{
@@ -130,7 +130,7 @@ public class PrependList<E> implements ImmutableList<E>
 	}
 	
 	@Override
-	public ImmutableList<? extends E> intersection(Collection<? extends E> collection)
+	public ImmutableList<E> intersection(Collection<? extends E> collection)
 	{
 		if (!collection.contains(this.head))
 		{

@@ -3,12 +3,12 @@ package dyvil.tools.compiler.parser.header;
 import dyvil.tools.compiler.ast.operator.IOperator;
 import dyvil.tools.compiler.ast.operator.IOperatorMap;
 import dyvil.tools.compiler.ast.operator.Operator;
-import dyvil.tools.parsing.IParserManager;
-import dyvil.tools.parsing.Parser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
@@ -24,11 +24,11 @@ public final class OperatorParser extends Parser
 	private static final int ASSOCIATIVITY   = 32;
 	private static final int COMMA           = 64;
 
-	public static final Name associativity = Name.getQualified("associativity");
-	public static final Name precedence    = Name.getQualified("precedence");
-	public static final Name none          = Name.getQualified("none");
-	public static final Name left          = Name.getQualified("left");
-	public static final Name right         = Name.getQualified("right");
+	public static final Name associativity = Name.fromRaw("associativity");
+	public static final Name precedence    = Name.fromRaw("precedence");
+	public static final Name none          = Name.fromRaw("none");
+	public static final Name left          = Name.fromRaw("left");
+	public static final Name right         = Name.fromRaw("right");
 
 	protected IOperatorMap map;
 	private   byte         type;
@@ -209,7 +209,7 @@ public final class OperatorParser extends Parser
 		}
 		if ((type & Tokens.SYMBOL) != 0)
 		{
-			return Name.get(DyvilSymbols.INSTANCE.toString(type));
+			return Name.from(DyvilSymbols.INSTANCE.toString(type));
 		}
 		return null;
 	}

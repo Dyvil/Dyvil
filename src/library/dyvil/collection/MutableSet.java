@@ -72,7 +72,7 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	}
 
 	@Override
-	default MutableSet<? extends E> union(Collection<? extends E> collection)
+	default MutableSet<E> union(Collection<? extends E> collection)
 	{
 		MutableSet<E> copy = this.copy();
 		copy.addAll(collection);
@@ -80,7 +80,7 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	}
 
 	@Override
-	default MutableSet<? extends E> difference(Collection<?> collection)
+	default MutableSet<E> difference(Collection<?> collection)
 	{
 		MutableSet<E> copy = this.copy();
 		copy.removeAll(collection);
@@ -88,7 +88,7 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	}
 
 	@Override
-	default MutableSet<? extends E> intersection(Collection<? extends E> collection)
+	default MutableSet<E> intersection(Collection<? extends E> collection)
 	{
 		MutableSet<E> copy = this.copy();
 		copy.retainAll(collection);
@@ -96,7 +96,7 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	}
 	
 	@Override
-	default MutableSet<? extends E> symmetricDifference(Collection<? extends E> collection)
+	default MutableSet<E> symmetricDifference(Collection<? extends E> collection)
 	{
 		MutableSet<E> copy = this.copy();
 		copy.symmetricDifferenceInplace(collection);

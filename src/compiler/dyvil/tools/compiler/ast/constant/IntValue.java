@@ -117,15 +117,16 @@ public final class IntValue implements IConstantValue
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		if (type == Types.INT)
+		final int i = IConstantValue.super.getTypeMatch(type);
+		if (i != MISMATCH)
 		{
-			return 1;
+			return i;
 		}
 		if (type.getAnnotation(Types.INT_CONVERTIBLE_CLASS) != null)
 		{
 			return CONVERSION_MATCH;
 		}
-		return Types.getDistance(type, Types.INT);
+		return MISMATCH;
 	}
 
 	@Override

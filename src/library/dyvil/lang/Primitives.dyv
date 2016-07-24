@@ -1,6 +1,7 @@
 package dyvil.lang
 
 using	dyvil.reflect.Opcodes._
+import  dyvil.collection.range.{ IntRange, LongRange, FloatRange, DoubleRange }
 
 public final class Primitives
 {
@@ -57,7 +58,7 @@ public final class Primitives
 	// Boolean Operators
 	
 	@Intrinsic([ LOAD_0, BNOT ])
-	public static func !(boolean v): boolean = !v
+	public prefix func !(boolean v): boolean = !v
 	
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
 	public infix func ==(boolean v1, boolean v2): boolean = v1 == v2
@@ -96,13 +97,13 @@ public final class Primitives
 	// Int Operators
 
 	@Intrinsic([ LOAD_0 ])
-	public static func +(int value): int = value
+	public prefix func +(int value): int = value
 
 	@Intrinsic([ LOAD_0, INEG ])
-	public static func -(int value): int = -value
+	public prefix func -(int value): int = -value
 
 	@Intrinsic([ LOAD_0, INOT ])
-    public static func ~(int value): int = ~value
+    public prefix func ~(int value): int = ~value
 
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
 	public infix func ==(int v1, int v2): boolean = v1 == v2
@@ -131,6 +132,8 @@ public final class Primitives
 	@Intrinsic([ LOAD_0, LOAD_1, IMUL ])
 	public infix func *(int v1, int v2): int = v1 * v2
 
+	public infix func **(int v1, int v2): long = dyvil.math.PowImpl.pow(v1, v2)
+
 	@Intrinsic([ LOAD_0, I2F, LOAD_1, I2F, FDIV ])
 	public infix func /(int v1, int v2): float = v1 / v2
 
@@ -157,6 +160,10 @@ public final class Primitives
 
 	@Intrinsic([ LOAD_0, LOAD_1, IUSHR ])
 	public infix func >>>(int v1, int v2): int = v1 >>> v2
+
+	public infix func ..(int start, int end): IntRange = IntRange(start, end)
+
+	public infix func ..<(int start, int end): IntRange = IntRange.halfOpen(start, end)
 
 	// Int Methods
 
@@ -198,13 +205,13 @@ public final class Primitives
 	// Long Operators
 
 	@Intrinsic([ LOAD_0 ])
-	public static func +(long value): long = value
+	public prefix func +(long value): long = value
 
 	@Intrinsic([ LOAD_0, LNEG ])
-	public static func -(long value): long = -value
+	public prefix func -(long value): long = -value
 
 	@Intrinsic([ LOAD_0, LNOT ])
-	public static func ~(long value): long = ~value
+	public prefix func ~(long value): long = ~value
 
 	@Intrinsic([ LOAD_0, LOAD_1, LCMPEQ ])
 	public infix func ==(long v1, long v2): boolean = v1 == v2
@@ -232,6 +239,8 @@ public final class Primitives
 
 	@Intrinsic([ LOAD_0, LOAD_1, LMUL ])
 	public infix func *(long v1, long v2): long = v1 * v2
+
+	public infix func **(long v1, int v2): long = dyvil.math.PowImpl.pow(v1, v2)
 
 	@Intrinsic([ LOAD_0, L2D, LOAD_1, L2D, DDIV ])
 	public infix func /(long v1, long v2): double = v1 / v2
@@ -287,13 +296,17 @@ public final class Primitives
 	@Intrinsic([ LOAD_0, DUP2, BIPUSH, 32, LUSHR, LXOR, L2I ])
 	public postfix int hashCode(long value) = value.hashCode
 
+	public infix func ..(long start, long end): LongRange = LongRange(start, end)
+
+	public infix func ..<(long start, long end): LongRange = LongRange.halfOpen(start, end)
+
 	// Float Operators
 
 	@Intrinsic([ LOAD_0 ])
-	public static func +(float value): float = value
+	public prefix func +(float value): float = value
 
 	@Intrinsic([ LOAD_0, FNEG ])
-	public static func -(float value): float = -value
+	public prefix func -(float value): float = -value
 
 	@Intrinsic([ LOAD_0, LOAD_1, FCMPEQ ])
 	public infix func ==(float v1, float v2): boolean = v1 == v2
@@ -322,11 +335,18 @@ public final class Primitives
 	@Intrinsic([ LOAD_0, LOAD_1, FMUL ])
 	public infix func *(float v1, float v2): float = v1 * v2
 
+	@Intrinsic([ LOAD_0, F2D, LOAD_1, F2D, INVOKESTATIC, 0, 1, 2, D2F], strings: [ "java/lang/MathUtils", "pow", "(DD)D" ])
+	public infix func **(float v1, float v2): double = Math.pow(v1, v2)
+
 	@Intrinsic([ LOAD_0, LOAD_1, FDIV ])
 	public infix func /(float v1, float v2): float = v1 / v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, FREM ])
 	public infix func %(float v1, float v2): float = v1 % v2
+
+	public infix func ..(float start, float end): FloatRange = FloatRange(start, end)
+
+	public infix func ..<(float start, float end): FloatRange = FloatRange.halfOpen(start, end)
 
 	// Float Methods
 
@@ -345,10 +365,10 @@ public final class Primitives
 	// Double Operators
 
 	@Intrinsic([ LOAD_0 ])
-	public static func +(double value): double = value
+	public prefix func +(double value): double = value
 
 	@Intrinsic([ LOAD_0, DNEG ])
-	public static func -(double value): double = -value
+	public prefix func -(double value): double = -value
 
 	@Intrinsic([ LOAD_0, LOAD_1, DCMPEQ ])
 	public infix func ==(double v1, double v2): boolean = v1 == v2
@@ -377,11 +397,18 @@ public final class Primitives
 	@Intrinsic([ LOAD_0, LOAD_1, DMUL ])
 	public infix func *(double v1, double v2): double = v1 * v2
 
+	@Intrinsic([ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2], strings: [ "java/lang/Math", "pow", "(DD)D" ])
+	public infix func **(double v1, double v2): double = Math.pow(v1, v2)
+
 	@Intrinsic([ LOAD_0, LOAD_1, DDIV ])
 	public infix func /(double v1, double v2): double = v1 / v2
 
 	@Intrinsic([ LOAD_0, LOAD_1, DREM ])
 	public infix func %(double v1, double v2): double = v1 % v2
+
+	public infix func ..(double start, double end): DoubleRange = DoubleRange(start, end)
+
+	public infix func ..<(double start, double end): DoubleRange = DoubleRange.halfOpen(start, end)
 
 	// Double Methods
 

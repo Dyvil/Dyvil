@@ -2,16 +2,16 @@ package dyvil.tools.compiler.ast.context;
 
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.constructor.ConstructorMatchList;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IImportContext;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MethodMatchList;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.operator.IOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
@@ -22,10 +22,9 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.ast.type.raw.PackageType;
 import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
-import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.parsing.Name;
 
-public interface IContext extends IMemberContext
+public interface IContext extends IMemberContext, IImportContext
 {
 	byte VISIBLE   = 0;
 	byte INVISIBLE = 1;
@@ -80,10 +79,13 @@ public interface IContext extends IMemberContext
 	IDataMember resolveField(Name name);
 
 	@Override
-	void getMethodMatches(MethodMatchList list, IValue instance, Name name, IArguments arguments);
+	void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments);
 
 	@Override
-	void getConstructorMatches(ConstructorMatchList list, IArguments arguments);
+	void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType);
+
+	@Override
+	void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments);
 
 	byte checkException(IType type);
 
@@ -96,19 +98,6 @@ public interface IContext extends IMemberContext
 	IAccessible getAccessibleThis(IClass type);
 
 	IValue getImplicit();
-
-	static void addCompilable(IContext context, IClassCompilable compilable)
-	{
-		IClass iclass = context.getThisClass();
-		if (iclass != null)
-		{
-			iclass.addCompilable(compilable);
-			return;
-		}
-
-		IDyvilHeader header = context.getHeader();
-		header.addInnerClass(compilable);
-	}
 
 	static IClass resolveClass(IMemberContext context, Name name)
 	{
@@ -164,27 +153,46 @@ public interface IContext extends IMemberContext
 		return operator;
 	}
 
-	static IConstructor resolveConstructor(IMemberContext context, IArguments arguments)
+	static IConstructor resolveConstructor(IImplicitContext implicitContext, IMemberContext type, IArguments arguments)
 	{
-		ConstructorMatchList matches = new ConstructorMatchList();
-		context.getConstructorMatches(matches, arguments);
-		return matches.getBestConstructor();
+		return resolveConstructors(implicitContext, type, arguments).getBestMember();
 	}
 
-	static IMethod resolveMethod(IMemberContext context, IValue instance, Name name, IArguments arguments)
+	static MatchList<IConstructor> resolveConstructors(IImplicitContext implicitContext, IMemberContext type, IArguments arguments)
 	{
-		MethodMatchList matches = new MethodMatchList();
-		context.getMethodMatches(matches, instance, name, arguments);
-		return matches.getBestMethod();
+		MatchList<IConstructor> matches = new MatchList<>(implicitContext);
+		type.getConstructorMatches(matches, arguments);
+		return matches;
 	}
 
-	static void getMethodMatch(MethodMatchList list, IValue receiver, Name name, IArguments arguments, IMethod method)
+	static IMethod resolveMethod(IMemberContext context, IValue receiver, Name name, IArguments arguments)
 	{
-		float match = method.getSignatureMatch(name, receiver, arguments);
-		if (match > 0)
+		return resolveMethods(context, receiver, name, arguments).getBestMember();
+	}
+
+	static MatchList<IMethod> resolveMethods(IMemberContext context, IValue receiver, Name name, IArguments arguments)
+	{
+		MatchList<IMethod> matches = new MatchList<>(context);
+		context.getMethodMatches(matches, receiver, name, arguments);
+		return matches;
+	}
+
+	static IMethod resolveImplicit(IImplicitContext context, IValue value, IType targetType)
+	{
+		return resolveImplicits(context, value, targetType).getBestMember();
+	}
+
+	static MatchList<IMethod> resolveImplicits(IImplicitContext context, IValue value, IType targetType)
+	{
+		MatchList<IMethod> matches = new MatchList<>(null);
+		context.getImplicitMatches(matches, value, targetType);
+		if (!matches.isEmpty() || targetType == null)
 		{
-			list.add(method, match);
+			return matches;
 		}
+
+		targetType.getImplicitMatches(matches, value, targetType);
+		return matches;
 	}
 
 	static byte getVisibility(IContext context, IClassMember member)

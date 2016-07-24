@@ -172,6 +172,35 @@ public class DoubleRange implements Range<Double>
 		return value >= this.start && (this.halfOpen ? value < this.end : value <= this.end);
 	}
 
+	public double[] toDoubleArray()
+	{
+		final double[] result = new double[this.count()];
+
+		int index = 0;
+		if (this.halfOpen)
+		{
+			for (double i = this.start; i < this.end; i += this.increment)
+			{
+				result[index++] = i;
+			}
+			return result;
+		}
+
+		for (double i = this.start; i <= this.end; i += this.increment)
+		{
+			result[index++] = i;
+		}
+		return result;
+	}
+
+	@Override
+	public Double[] toArray()
+	{
+		final Double[] result = new Double[this.count()];
+		this.toArray(0, result);
+		return result;
+	}
+
 	@Override
 	public void toArray(int index, Object[] store)
 	{

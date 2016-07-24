@@ -95,6 +95,8 @@ public class CodeMethod extends AbstractMethod
 
 		super.resolveTypes(markers, context);
 
+		this.unmangleName();
+
 		if (this.receiverType != null)
 		{
 			this.receiverType = this.receiverType.resolveType(markers, context);
@@ -141,6 +143,24 @@ public class CodeMethod extends AbstractMethod
 		}
 
 		context.pop();
+	}
+
+	private void unmangleName()
+	{
+		final Name name = this.name;
+		final String unqualified = name.unqualified;
+		final int index = unqualified.indexOf(NAME_SEPARATOR);
+
+		if (index < 0)
+		{
+			return;
+		}
+
+		final String qualified = name.qualified;
+		final String newUnqualified = unqualified.substring(0, index);
+		final String newQualified = qualified.substring(0, qualified.indexOf(NAME_SEPARATOR));
+		this.mangledName = qualified;
+		this.name = Name.from(newUnqualified, newQualified);
 	}
 
 	@Override
@@ -275,7 +295,7 @@ public class CodeMethod extends AbstractMethod
 
 		if (!this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{
-			this.checkOverride(markers);
+			this.checkOverrideMethods(markers);
 		}
 
 		// Check for duplicate methods
@@ -292,36 +312,119 @@ public class CodeMethod extends AbstractMethod
 			return;
 		}
 
-		final String desc = this.getDescriptor();
+		final String descriptor = this.getDescriptor();
+		final String signature = this.getSignature();
+		final int parameterCount = this.parameters.size();
+
+		String mangledName = this.getMangledName();
+		boolean thisMangled = mangledName.contains(NAME_SEPARATOR);
+
 		for (int i = body.methodCount() - 1; i >= 0; i--)
 		{
-			// TODO Extract method for duplicate check
-
 			final IMethod method = body.getMethod(i);
-			if (method == this || method.getName() != this.name || method.getParameterList().size() != this.parameters
-				                                                                                           .size())
+			if (method == this || method.getName() != this.name // common cases
+				    || method.getParameterList().size() != parameterCount // optimization
+				    || !method.getDescriptor().equals(descriptor))
 			{
 				continue;
 			}
 
-			if (method.getDescriptor().equals(desc))
+			final String otherMangledName = method.getMangledName();
+			if (!mangledName.equals(otherMangledName))
 			{
-				markers.add(Markers.semantic(this.position, "method.duplicate", this.name, desc));
+				continue;
+			}
+
+			// Name mangling required
+
+			if (!thisMangled)
+			{
+				// ensure this method gets name-mangled
+				this.mangledName = mangledName = createMangledName(this);
+				thisMangled = true;
+
+				final Marker marker = Markers.semantic(this.position, "method.name_mangled", this.name);
+				marker.addInfo(Markers.getSemantic("method.name_mangled.1", this.name));
+				marker.addInfo(Markers.getSemantic("method.name_mangled.2", this.name));
+				marker.addInfo(Markers.getSemantic("name.mangled", mangledName));
+				markers.add(marker);
+			}
+
+			if (mangledName.equals(otherMangledName))
+			{
+				// also true if this.getSignature equals method.getSignature
+				markers.add(Markers.semanticError(this.position, "method.duplicate", this.name, signature));
 			}
 		}
+	}
+
+	private static String createMangledName(IMethod method)
+	{
+		final String qualifiedName = method.getName().qualified;
+		final String signature = method.getSignature();
+
+		final StringBuilder builder = new StringBuilder(qualifiedName.length() + NAME_SEPARATOR.length() + signature
+			                                                                                                   .length());
+		builder.append(qualifiedName).append(NAME_SEPARATOR);
+
+		for (int i = 0, length = signature.length(); i < length; i++)
+		{
+			// Replace special chars with dollar signs
+			final char c = signature.charAt(i);
+			switch (c)
+			{
+			case '(':
+			case ')':
+				// strip opening and closing paren
+				continue;
+			case '<':
+				if (i == 0)
+				{
+					// strip opening angle bracket if at first position
+					continue;
+				}
+				builder.append("$_");
+				continue;
+			case '>':
+				if (signature.charAt(i + 1) == ';')
+				{
+					// the next token is a semicolon, so '_$' will be appended
+					builder.append('_');
+					continue;
+				}
+				// double separator between type and value parameter lists
+				builder.append("__");
+				continue;
+			case '+':
+			case ';':
+			case ':':
+			case '-':
+			case '*':
+				builder.append('$');
+				continue;
+			case '/':
+				builder.append('_');
+				continue;
+			default:
+				builder.append(c);
+			}
+		}
+		return builder.toString();
 	}
 
 	@Override
 	public void addOverride(IMethod candidate)
 	{
-		if (this.enclosingClass.isSubClassOf(candidate.getEnclosingClass().getClassType()))
+		if (!this.enclosingClass.isSubClassOf(candidate.getEnclosingClass().getClassType()))
 		{
-			if (this.overrideMethods == null)
-			{
-				this.overrideMethods = new IdentityHashSet<>();
-			}
-			this.overrideMethods.add(candidate);
+			return;
 		}
+
+		if (this.overrideMethods == null)
+		{
+			this.overrideMethods = new IdentityHashSet<>();
+		}
+		this.overrideMethods.add(candidate);
 	}
 
 	@Override
@@ -330,7 +433,7 @@ public class CodeMethod extends AbstractMethod
 		return this.overrideMethods != null && this.overrideMethods.contains(candidate);
 	}
 
-	private void checkOverride(MarkerList markers)
+	private void checkOverrideMethods(MarkerList markers)
 	{
 		if (this.overrideMethods == null)
 		{
@@ -489,15 +592,18 @@ public class CodeMethod extends AbstractMethod
 			modifiers = modifiers & ~3 | Modifiers.PUBLIC;
 		}
 
-		final String internalThisClassName = this.enclosingClass.getInternalName();
+		final String ownerClassName = this.enclosingClass.getInternalName();
+		final String mangledName = this.getMangledName();
+		final String descriptor = this.getDescriptor();
+		final String signature = this.needsSignature() ? this.getSignature() : null;
 		final String[] exceptionTypes = this.getInternalExceptions();
+
 		MethodWriter methodWriter = new MethodWriterImpl(writer, writer.visitMethod(
-			modifiers & ModifierUtil.JAVA_MODIFIER_MASK, this.name.qualified, this.getDescriptor(), this.getSignature(),
-			exceptionTypes));
+			modifiers & ModifierUtil.JAVA_MODIFIER_MASK, mangledName, descriptor, signature, exceptionTypes));
 
 		if ((modifiers & Modifiers.STATIC) == 0)
 		{
-			methodWriter.setThisType(internalThisClassName);
+			methodWriter.setThisType(ownerClassName);
 		}
 
 		this.writeAnnotations(methodWriter, modifiers);
@@ -528,7 +634,7 @@ public class CodeMethod extends AbstractMethod
 			return;
 		}
 
-		methodWriter.visitLocalVariable("this", 'L' + internalThisClassName + ';', null, start, end, 0);
+		methodWriter.visitLocalVariable("this", 'L' + ownerClassName + ';', null, start, end, 0);
 
 		if (this.overrideMethods == null)
 		{
@@ -536,30 +642,37 @@ public class CodeMethod extends AbstractMethod
 		}
 
 		final int lineNumber = this.getLineNumber();
+		final int opcode =
+			(modifiers & Modifiers.ABSTRACT) != 0 && interfaceClass ? Opcodes.INVOKEINTERFACE : Opcodes.INVOKEVIRTUAL;
 
+		/**
+		 * Contains entries in the format 'mangledName(paramTypes)returnType'
+		 * Used to ensure unique bridge methods
+		 */
 		final Set<String> descriptors = new HashSet<>(1 + this.overrideMethods.size());
-		descriptors.add(this.descriptor);
+		descriptors.add(mangledName + descriptor);
 
 		for (IMethod overrideMethod : this.overrideMethods)
 		{
-			final String desc = overrideMethod.getDescriptor();
+			final String overrideDescriptor = overrideMethod.getDescriptor();
+			final String overrideMangledName = overrideMethod.getMangledName();
+			final String overrideEntry = overrideMangledName + overrideDescriptor;
 
 			// Check if a bridge method for the descriptor has not yet been
 			// generated
-			if (descriptors.contains(desc))
+			if (descriptors.contains(overrideEntry))
 			{
 				continue;
 			}
-
-			descriptors.add(desc);
+			descriptors.add(overrideEntry);
 
 			// Generate a bridge method
 			methodWriter = new MethodWriterImpl(writer, writer.visitMethod(
-				Modifiers.PUBLIC | Modifiers.SYNTHETIC | Modifiers.BRIDGE, this.name.qualified, desc, null,
-				exceptionTypes));
+				Modifiers.PUBLIC | Modifiers.SYNTHETIC | Modifiers.BRIDGE, overrideMangledName, overrideDescriptor,
+				null, exceptionTypes));
 
 			methodWriter.visitCode();
-			methodWriter.setThisType(internalThisClassName);
+			methodWriter.setThisType(ownerClassName);
 
 			methodWriter.visitVarInsn(Opcodes.ALOAD, 0);
 
@@ -579,13 +692,17 @@ public class CodeMethod extends AbstractMethod
 			IType overrideReturnType = overrideMethod.getType();
 
 			methodWriter.visitLineNumber(lineNumber);
-			methodWriter.visitMethodInsn((modifiers & Modifiers.ABSTRACT) != 0 && interfaceClass ?
-				                             Opcodes.INVOKEINTERFACE :
-				                             Opcodes.INVOKEVIRTUAL, internalThisClassName, this.name.qualified, this.getDescriptor(), interfaceClass);
+			methodWriter.visitMethodInsn(opcode, ownerClassName, mangledName, descriptor, interfaceClass);
 			this.type.writeCast(methodWriter, overrideReturnType, lineNumber);
 			methodWriter.visitInsn(overrideReturnType.getReturnOpcode());
 			methodWriter.visitEnd();
 		}
+	}
+
+	private boolean needsSignature()
+	{
+		return this.typeParameterCount != 0 || this.type.isGenericType() || this.type.hasTypeVariables()
+			       || this.parameters.needsSignature();
 	}
 
 	protected void writeAnnotations(MethodWriter writer, int modifiers)
@@ -659,7 +776,7 @@ public class CodeMethod extends AbstractMethod
 	{
 		this.readAnnotations(in);
 
-		this.name = Name.get(in.readUTF());
+		this.name = Name.from(in.readUTF());
 		this.type = IType.readType(in);
 		this.parameters = ParameterList.read(in);
 	}

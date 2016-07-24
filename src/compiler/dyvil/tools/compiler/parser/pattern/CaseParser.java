@@ -57,7 +57,7 @@ public class CaseParser extends Parser implements IValueConsumer
 			if (type == DyvilKeywords.IF)
 			{
 				this.mode = ACTION;
-				pm.pushParser(new ExpressionParser(this).withFlag(IGNORE_COLON | IGNORE_CLOSURE | IGNORE_LAMBDA));
+				pm.pushParser(new ExpressionParser(this).withFlags(IGNORE_COLON | IGNORE_CLOSURE | IGNORE_LAMBDA));
 				return;
 			}
 			// Fallthrough

@@ -5,11 +5,12 @@ import dyvil.collection.range.Rangeable
 
 public class RangeTest
 {
-	case class RangeableInt(final int value) implements Rangeable<RangeableInt>
+	@dyvil.lang.literal.IntConvertible
+	public case class RangeableInt(final int value) implements Rangeable<RangeableInt>
 	{
-		public override RangeableInt next() = RangeableInt(this.value + 1)
+		public override RangeableInt next() = apply(this.value + 1)
 
-		public override RangeableInt previous() = RangeableInt(this.value - 1)
+		public override RangeableInt previous() = apply(this.value - 1)
 
 		public override int distanceTo(RangeableInt other) = Math.abs(this.value - other.value)
 
@@ -22,7 +23,7 @@ public class RangeTest
 		testRangeable()
 	}
 	
-	private static void testInts()
+	public static void testInts()
 	{
 		var range1 = 1 .. 4
 		var range2 = 1 ..< 4
@@ -56,10 +57,10 @@ public class RangeTest
 		Main.test("Int Range For (exclusive)", List(1, 2, 3), forExclusive)
 	}
 	
-	private static void testRangeable()
+	public static void testRangeable()
 	{
-		final RangeableInt one = RangeableInt 1
-		final RangeableInt four = RangeableInt 4
+		final RangeableInt one = 1
+		final RangeableInt four = 4
 
 		var range1 = one .. four
 		var range2 = one ..< four
@@ -69,27 +70,27 @@ public class RangeTest
 		{
 			rangeInclusive += i
 		}
-		Main.test("Rangeable Range (inclusive)", List(RangeableInt 1, RangeableInt 2, RangeableInt 3, RangeableInt 4), rangeInclusive)
+		Main.test("Rangeable Range (inclusive)", List<RangeableInt>(1, 2, 3, 4), rangeInclusive)
 
 		var rangeExclusive = List<RangeableInt>
 		for (var i <- range2)
 		{
 			rangeExclusive += i
 		}
-		Main.test("Rangeable Range (exclusive)", List(RangeableInt 1, RangeableInt 2, RangeableInt 3), rangeExclusive)
+		Main.test("Rangeable Range (exclusive)", List<RangeableInt>(1, 2, 3), rangeExclusive)
 
 		var forInclusive = List<RangeableInt>
 		for (var i <- one .. four)
 		{
 			forInclusive += i
 		}
-		Main.test("Rangeable Range For (inclusive)", List(RangeableInt 1, RangeableInt 2, RangeableInt 3, RangeableInt 4), forInclusive)
+		Main.test("Rangeable Range For (inclusive)", List<RangeableInt>(1, 2, 3, 4), forInclusive)
 
 		var forExclusive = List<RangeableInt>
 		for (var i <- one ..< four)
 		{
 			forExclusive += i
 		}
-		Main.test("Rangeable Range For (exclusive)", List(RangeableInt 1, RangeableInt 2, RangeableInt 3), forExclusive)
+		Main.test("Rangeable Range For (exclusive)", List<RangeableInt>(1, 2, 3), forExclusive)
 	}
 }

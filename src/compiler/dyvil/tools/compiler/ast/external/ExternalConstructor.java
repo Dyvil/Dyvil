@@ -16,6 +16,7 @@ import dyvil.tools.compiler.ast.method.IExternalCallableMember;
 import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
@@ -114,6 +115,12 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 	}
 
 	@Override
+	public IParameterList getExternalParameterList()
+	{
+		return this.parameters;
+	}
+
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 	}
@@ -158,9 +165,10 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 		}
 		case TypeReference.METHOD_FORMAL_PARAMETER:
 		{
-			int index = TypeReference.getFormalParameterIndex(typeRef);
-			IParameter param = this.parameters.get(index);
-			param.setType(IType.withAnnotation(param.getType(), annotation, typePath, 0, typePath.getLength()));
+			final int index = TypeReference.getFormalParameterIndex(typeRef);
+			final ExternalParameter parameter = (ExternalParameter) this.parameters.get(index);
+			parameter.addTypeAnnotation(annotation, typePath);
+			break;
 		}
 		}
 		return new AnnotationReader(null, annotation);

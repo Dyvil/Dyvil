@@ -42,16 +42,16 @@ public interface MutableCollection<E> extends Collection<E>
 	MutableCollection<E> added(E element);
 	
 	@Override
-	MutableCollection<? extends E> union(Collection<? extends E> collection);
+	MutableCollection<E> union(Collection<? extends E> collection);
 	
 	@Override
 	MutableCollection<E> removed(Object element);
 	
 	@Override
-	MutableCollection<? extends E> difference(Collection<?> collection);
+	MutableCollection<E> difference(Collection<?> collection);
 	
 	@Override
-	MutableCollection<? extends E> intersection(Collection<? extends E> collection);
+	MutableCollection<E> intersection(Collection<? extends E> collection);
 	
 	@Override
 	<R> MutableCollection<R> mapped(Function<? super E, ? extends R> mapper);

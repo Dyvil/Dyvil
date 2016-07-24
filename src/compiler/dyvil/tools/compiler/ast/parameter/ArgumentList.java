@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
@@ -13,6 +14,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.parsing.marker.MarkerList;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 public final class ArgumentList implements IArguments, IValueList
@@ -171,59 +173,72 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 
 	@Override
-	public float getTypeMatch(int index, IParameter param)
+	public int checkMatch(int[] values, IType[] types, int matchStartIndex, int argumentIndex, IParameter param, IImplicitContext implicitContext)
 	{
+		if (argumentIndex > this.size)
+		{
+			return -1;
+		}
+		if (argumentIndex == this.size)
+		{
+			return param.isVarargs() ? 0 : -1;
+		}
+
 		if (param.isVarargs())
 		{
-			if (index == this.size)
-			{
-				return VARARGS_MATCH;
-			}
-			if (index > this.size)
-			{
-				return 0;
-			}
-
-			return getVarargsTypeMatch(this.values, index, this.size, param);
+			return checkVarargsMatch(values, types, matchStartIndex, this.values, argumentIndex, this.size, param,
+			                         implicitContext);
 		}
-
-		if (index >= this.size)
-		{
-			return param.getValue() != null ? DEFAULT_MATCH : 0;
-		}
-
-		final IValue argument = this.values[index];
-		return IArguments.getTypeMatch(argument, param.getInternalType());
+		return checkMatch(values, types, matchStartIndex + argumentIndex, this.values[argumentIndex],
+		                  param.getInternalType(), implicitContext) ? 0 : -1;
 	}
 
-	protected static float getVarargsTypeMatch(IValue[] values, int startIndex, int endIndex, IParameter param)
+	protected static boolean checkMatch(int[] matchValues, IType[] matchTypes, int matchIndex, IValue argument, IType type, IImplicitContext implicitContext)
+	{
+		return !argument.checkVarargs(false) && checkMatch_(matchValues, matchTypes, matchIndex, argument, type,
+		                                                    implicitContext);
+	}
+
+	private static boolean checkMatch_(int[] matchValues, IType[] matchTypes, int matchIndex, IValue argument, IType type, IImplicitContext implicitContext)
+	{
+		final int result = TypeChecker.getTypeMatch(argument, type, implicitContext);
+		if (result == 0)
+		{
+			return false;
+		}
+
+		matchValues[matchIndex] = result;
+		matchTypes[matchIndex] = type;
+		return true;
+	}
+
+	protected static int checkVarargsMatch(int[] matchValues, IType[] matchTypes, int matchStartIndex, //
+		                                      IValue[] values, int startIndex, int endIndex, //
+		                                      IParameter param, IImplicitContext implicitContext)
 	{
 		final IValue argument = values[startIndex];
 		final IType arrayType = param.getInternalType();
 		if (argument.checkVarargs(false))
 		{
-			return IArguments.getDirectTypeMatch(argument, arrayType);
+			return checkMatch_(matchValues, matchTypes, matchStartIndex, argument, arrayType, implicitContext) ? 0 : -1;
 		}
 
 		if (startIndex == endIndex)
 		{
-			return VARARGS_MATCH;
+			return 0;
 		}
 
-		float totalMatch = 0;
+		final int count = endIndex - startIndex;
 		final IType elementType = arrayType.getElementType();
 		for (; startIndex < endIndex; startIndex++)
 		{
-			final float valueMatch = IArguments.getTypeMatch(values[startIndex], elementType);
-			if (valueMatch <= 0)
+			if (!checkMatch(matchValues, matchTypes, matchStartIndex + startIndex, values[startIndex], elementType,
+			                implicitContext))
 			{
-				return 0F;
+				return -1;
 			}
-			totalMatch += valueMatch;
 		}
-		totalMatch /= endIndex - startIndex;
-
-		return totalMatch > 0F ? totalMatch + VARARGS_MATCH : 0;
+		return count;
 	}
 
 	@Override
@@ -356,6 +371,12 @@ public final class ArgumentList implements IArguments, IValueList
 		{
 			this.values[i] = this.values[i].cleanup(context, compilableList);
 		}
+	}
+
+	@Override
+	public IArguments copy()
+	{
+		return new ArgumentList(Arrays.copyOf(this.values, this.size), this.size);
 	}
 
 	@Override

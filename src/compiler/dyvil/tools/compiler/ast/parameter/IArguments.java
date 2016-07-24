@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -19,27 +20,6 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 	{
 		return TypeChecker.markerSupplier("method.access.argument_type", parameter.getName());
 	}
-
-	static float getDirectTypeMatch(IValue value, IType type)
-	{
-		return value.getTypeMatch(type);
-		// TODO Automatic Conversion
-	}
-
-	static float getTypeMatch(IValue value, IType type)
-	{
-		if (value.checkVarargs(false))
-		{
-			// Varargs Expansion Operator in place of non-varargs parameter
-
-			return 0F;
-		}
-
-		return getDirectTypeMatch(value, type);
-	}
-
-	float DEFAULT_MATCH = 1000;
-	float VARARGS_MATCH = 100;
 
 	@Override
 	default ICodePosition getPosition()
@@ -83,7 +63,7 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 
 	IValue getValue(int index, IParameter param);
 
-	float getTypeMatch(int index, IParameter param);
+	int checkMatch(int[] values, IType[] types, int matchStartIndex, int argumentIndex, IParameter param, IImplicitContext implicitContext);
 
 	void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context);
 
@@ -105,8 +85,17 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 
 	void cleanup(IContext context, IClassCompilableList compilableList);
 
+	IArguments copy();
+
 	@Override
 	void toString(String prefix, StringBuilder buffer);
+
+	default String typesToString()
+	{
+		final StringBuilder builder = new StringBuilder();
+		this.typesToString(builder);
+		return builder.toString();
+	}
 
 	void typesToString(StringBuilder buffer);
 }

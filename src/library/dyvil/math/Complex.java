@@ -1,8 +1,6 @@
 package dyvil.math;
 
-import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.lang.literal.TupleConvertible;
-import dyvil.reflect.Modifiers;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -36,10 +34,9 @@ public class Complex implements Serializable
 		return this.imag;
 	}
 	
-	@DyvilModifiers(Modifiers.PREFIX)
-	public Complex $tilde()
+	public static Complex $tilde(Complex x)
 	{
-		return apply(-this.real, this.imag);
+		return apply(-x.real, x.imag);
 	}
 	
 	public Complex sqr()
