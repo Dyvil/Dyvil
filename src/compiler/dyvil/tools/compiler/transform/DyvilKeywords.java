@@ -35,6 +35,7 @@ public class DyvilKeywords
 	public static final int INTERFACE    = Tokens.KEYWORD | 0x001D0000;
 	public static final int INTERNAL     = Tokens.KEYWORD | 0x001E0000;
 	public static final int IS           = Tokens.KEYWORD | 0x001F0000;
+	public static final int LABEL        = Tokens.KEYWORD | 0x00410000;
 	public static final int LAZY         = Tokens.KEYWORD | 0x00200000;
 	public static final int LET          = Tokens.KEYWORD | 0x00210000;
 	public static final int MACRO        = Tokens.KEYWORD | 0x00220000; // unused
@@ -105,6 +106,7 @@ public class DyvilKeywords
 		case "interface": return INTERFACE;
 		case "internal": return INTERNAL;
 		case "is": return IS;
+		case "label": return LABEL;
 		case "lazy": return LAZY;
 		case "let": return LET;
 		case "macro": return MACRO;
@@ -179,6 +181,7 @@ public class DyvilKeywords
 		case INTERFACE: return "interface";
 		case INTERNAL: return "internal";
 		case IS: return "is";
+		case LABEL: return "label";
 		case LAZY: return "lazy";
 		case LET :  return "let";
 		case MACRO: return "macro";
