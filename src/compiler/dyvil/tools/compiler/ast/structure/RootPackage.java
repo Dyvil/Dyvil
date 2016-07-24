@@ -16,15 +16,16 @@ public final class RootPackage extends Package
 	private final Map<String, IClass> internalClass = new HashMap<>();
 
 	public DyvilCompiler compiler;
-	
+
 	public RootPackage(DyvilCompiler compiler)
 	{
 		this.compiler = compiler;
 
-		this.setInternalName(this.fullName = ""); // Assignment intentional
+		this.internalName = "";
+		this.fullName = "";
 		this.name = Name.fromRaw("");
 	}
-	
+
 	@Override
 	public void check(PackageDeclaration packageDecl, MarkerList markers)
 	{
@@ -33,20 +34,7 @@ public final class RootPackage extends Package
 			markers.add(Markers.semantic(packageDecl.getPosition(), "package.default"));
 		}
 	}
-	
-	@Override
-	public Package resolvePackage(String name)
-	{
-		Package pack = super.resolvePackage(name);
-		if (pack != null)
-		{
-			return pack;
-		}
-		
-		String internal = ClassFormat.internalToPackage(name);
-		return this.resolvePackageInternal(internal);
-	}
-	
+
 	public Package resolvePackageInternal(String internal)
 	{
 		for (Library library : this.compiler.config.libraries)
@@ -57,16 +45,16 @@ public final class RootPackage extends Package
 				return pack;
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public IClass resolveClass(String name)
 	{
 		return this.resolveInternalClass(ClassFormat.packageToInternal(name));
 	}
-	
+
 	public IClass resolveInternalClass(String internal)
 	{
 		IClass iclass = this.internalClass.get(internal);
@@ -74,13 +62,13 @@ public final class RootPackage extends Package
 		{
 			return iclass;
 		}
-		
+
 		iclass = this.resolveInternalClass_(internal);
 		this.internalClass.put(internal, iclass);
-		
+
 		return iclass;
 	}
-	
+
 	private IClass resolveInternalClass_(String internal)
 	{
 		final int index = internal.lastIndexOf('/');
@@ -88,7 +76,7 @@ public final class RootPackage extends Package
 		{
 			return super.resolveClass(internal);
 		}
-		
+
 		final String packageName = internal.substring(0, index);
 		final String className = internal.substring(index + 1);
 
@@ -106,7 +94,7 @@ public final class RootPackage extends Package
 		}
 		return null;
 	}
-	
+
 	@Override
 	public String toString()
 	{

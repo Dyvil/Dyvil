@@ -99,23 +99,12 @@ public class CodeClass extends AbstractClass
 	public void setHeader(IDyvilHeader unit)
 	{
 		this.unit = unit;
-
-		if (this.name != null)
-		{
-			this.internalName = unit.getInternalName(this.name);
-			this.fullName = unit.getFullName(this.name);
-		}
 	}
 
 	@Override
 	public void setName(Name name)
 	{
 		this.name = name;
-		if (this.unit != null)
-		{
-			this.internalName = this.unit.getInternalName(name);
-			this.fullName = this.unit.getFullName(name);
-		}
 	}
 
 	@Override

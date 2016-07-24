@@ -53,13 +53,13 @@ import java.io.IOException;
 
 public final class ExternalClass extends AbstractClass
 {
-	private static final int METADATA          = 1;
-	private static final int SUPER_TYPES       = 1 << 1;
-	private static final int GENERICS          = 1 << 2;
-	private static final int BODY_METHOD_CACHE = 1 << 3;
+	private static final int METADATA            = 1;
+	private static final int SUPER_TYPES         = 1 << 1;
+	private static final int GENERICS            = 1 << 2;
+	private static final int BODY_METHOD_CACHE   = 1 << 3;
 	private static final int BODY_IMPLICIT_CACHE = 1 << 4;
-	private static final int ANNOTATIONS       = 1 << 5;
-	private static final int INNER_TYPES       = 1 << 6;
+	private static final int ANNOTATIONS         = 1 << 5;
+	private static final int INNER_TYPES         = 1 << 6;
 
 	protected Package thePackage;
 
@@ -190,6 +190,24 @@ public final class ExternalClass extends AbstractClass
 	public void setClassParameters(String[] classParameters)
 	{
 		this.classParameters = ArraySet.apply(classParameters);
+	}
+
+	@Override
+	public String getFullName()
+	{
+		if (this.fullName != null)
+		{
+			return this.fullName;
+		}
+		if (this.enclosingClass != null)
+		{
+			return this.fullName = this.enclosingClass.getFullName() + '.' + this.getName();
+		}
+		if (this.thePackage != null)
+		{
+			return this.fullName = this.thePackage.getFullName() + '.' + this.getName();
+		}
+		return this.fullName = this.getName().toString();
 	}
 
 	@Override
@@ -568,8 +586,8 @@ public final class ExternalClass extends AbstractClass
 		else
 		{
 			this.name = Name.fromQualified(name.substring(index + 1));
-			this.fullName = name.replace('/', '.');
-			this.thePackage = Package.rootPackage.resolvePackage(Name.fromQualified(this.fullName.substring(0, index)));
+			// Do not set 'fullName' here
+			this.thePackage = Package.rootPackage.resolvePackageInternal(name.substring(0, index));
 		}
 
 		if (signature != null)
