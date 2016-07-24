@@ -201,6 +201,7 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 		case LABEL_NAME:
 			if (ParserUtil.isIdentifier(type))
 			{
+				this.label = token.nameValue();
 				this.mode = LABEL_END;
 				return;
 			}
