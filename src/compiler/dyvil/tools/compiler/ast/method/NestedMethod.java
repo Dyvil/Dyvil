@@ -127,9 +127,9 @@ public class NestedMethod extends CodeMethod
 	}
 
 	@Override
-	protected void writeArguments(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
+	protected void writeArguments(MethodWriter writer, IValue receiver, IArguments arguments) throws BytecodeException
 	{
-		super.writeArguments(writer, instance, arguments);
+		super.writeArguments(writer, receiver, arguments);
 		this.captureHelper.writeCaptures(writer);
 	}
 }

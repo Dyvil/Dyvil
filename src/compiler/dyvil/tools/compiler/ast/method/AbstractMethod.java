@@ -1053,21 +1053,15 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 	}
 
-	protected void writeArguments(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
+	protected void writeArguments(MethodWriter writer, IValue receiver, IArguments arguments) throws BytecodeException
 	{
-		if (instance != null && this.hasModifier(Modifiers.INFIX))
+		if (receiver != null && this.hasModifier(Modifiers.INFIX))
 		{
-			for (int i = 0, count = this.parameters.size() - 1; i < count; i++)
-			{
-				arguments.writeValue(i, this.parameters.get(i + 1), writer);
-			}
+			arguments.writeValues(writer, this.parameters, 1);
 			return;
 		}
 
-		for (int i = 0, count = this.parameters.size(); i < count; i++)
-		{
-			arguments.writeValue(i, this.parameters.get(i), writer);
-		}
+		arguments.writeValues(writer, this.parameters, 0);
 	}
 
 	private void writeArgumentsAndInvoke(MethodWriter writer, IValue instance, IArguments arguments,

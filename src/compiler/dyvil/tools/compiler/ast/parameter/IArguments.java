@@ -63,9 +63,29 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 
 	IValue getValue(int index, IParameter param);
 
-	int checkMatch(int[] values, IType[] types, int matchStartIndex, int argumentIndex, IParameter param, IImplicitContext implicitContext);
+	int checkMatch(int[] values, IType[] types, int matchStartIndex, int argumentIndex, IParameter param,
+		              IImplicitContext implicitContext);
 
 	void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context);
+
+	/**
+	 * Returns {@code true} if the arguments of this list are in the order of the parameters. {@link NamedArgumentList}s
+	 * can have arbitrary order, so they must return {@code false}.
+	 *
+	 * @return true if the arguments of this list are in the order of the parameters.
+	 */
+	default boolean hasParameterOrder()
+	{
+		return true;
+	}
+
+	default void writeValues(MethodWriter writer, IParameterList parameters, int startIndex) throws BytecodeException
+	{
+		for (int i = 0, count = parameters.size() - startIndex; i < count; i++)
+		{
+			this.writeValue(i, parameters.get(i + startIndex), writer);
+		}
+	}
 
 	void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException;
 
