@@ -264,7 +264,7 @@ public abstract class Member implements IMember
 	public void read(DataInput in) throws IOException
 	{
 		this.readSignature(in);
-		this.name = Name.from(in.readUTF());
+		this.name = Name.read(in);
 		this.readAnnotations(in);
 	}
 

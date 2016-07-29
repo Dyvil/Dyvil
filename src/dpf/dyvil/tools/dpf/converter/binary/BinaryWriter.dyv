@@ -39,7 +39,7 @@ public class BinaryWriter
 	{
 		try
 		{
-			this.dataOutput.writeUTF(name == null ? "" : name.unqualified);
+			Name.write(name, this.dataOutput)
 		}
 		catch (IOException ex)
 		{
@@ -67,7 +67,7 @@ public class BinaryWriter
 	private void writeTagAndNameThrowing(int tag, Name name) throws IOException
 	{
 		this.writeTagThrowing(tag);
-		this.writeNameThrowing(name);
+		Name.write(name, this.dataOutput);
 	}
 
 	private static void throwEx(Exception ex)

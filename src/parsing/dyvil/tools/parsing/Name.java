@@ -5,6 +5,10 @@ import dyvil.collection.mutable.HashMap;
 import dyvil.lang.literal.StringConvertible;
 import dyvil.tools.parsing.name.Qualifier;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 @StringConvertible
 public final class Name
 {
@@ -59,10 +63,22 @@ public final class Name
 		return from(Qualifier.unqualify(value), Qualifier.qualify(value));
 	}
 
-	@Deprecated
 	public static Name fromUnqualified(String unqualified)
 	{
-		return from(unqualified);
+		Name name = CACHE.get(unqualified);
+		if (name != null)
+		{
+			return name;
+		}
+
+		final String qualified = Qualifier.qualify(unqualified);
+		name = CACHE.get(qualified);
+		if (name != null)
+		{
+			return name;
+		}
+
+		return new Name(unqualified, qualified);
 	}
 
 	public static Name fromQualified(String qualified)
@@ -75,7 +91,8 @@ public final class Name
 
 		final String unqualified = Qualifier.unqualify(qualified);
 		name = CACHE.get(unqualified);
-		if (name != null) {
+		if (name != null)
+		{
 			return name;
 		}
 
@@ -102,6 +119,26 @@ public final class Name
 		}
 
 		return new Name(unqualified, qualified);
+	}
+
+	public static Name read(DataInput input) throws IOException
+	{
+		final String unqualified = input.readUTF();
+		if (unqualified.isEmpty())
+		{
+			return null;
+		}
+		return fromUnqualified(unqualified);
+	}
+
+	public static void write(Name name, DataOutput output) throws IOException
+	{
+		output.writeUTF(name == null ? "" : name.unqualified);
+	}
+
+	public final void write(DataOutput output) throws IOException
+	{
+		output.writeUTF(this.unqualified);
 	}
 
 	public boolean equals(String name)
