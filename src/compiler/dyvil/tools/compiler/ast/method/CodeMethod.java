@@ -701,8 +701,7 @@ public class CodeMethod extends AbstractMethod
 
 	private boolean needsSignature()
 	{
-		return this.typeParameterCount != 0 || this.type.isGenericType() || this.type.hasTypeVariables()
-			       || this.parameters.needsSignature();
+		return this.typeParameterCount != 0 || this.type.needsSignature() || this.parameters.needsSignature();
 	}
 
 	protected void writeAnnotations(MethodWriter writer, int modifiers)

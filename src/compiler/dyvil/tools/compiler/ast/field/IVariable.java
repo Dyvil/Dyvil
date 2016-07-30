@@ -60,6 +60,18 @@ public interface IVariable extends IDataMember
 		return capture == null ? this : capture;
 	}
 
+	@Override
+	default String getDescriptor()
+	{
+		return this.getInternalType().getExtendedName();
+	}
+
+	@Override
+	default String getSignature()
+	{
+		return this.getInternalType().getSignature();
+	}
+
 	default void appendDescription(StringBuilder buf)
 	{
 		buf.append(this.getDescriptor());
@@ -70,7 +82,14 @@ public interface IVariable extends IDataMember
 		buf.append(this.getSignature());
 	}
 
-	void writeLocal(MethodWriter writer, Label start, Label end);
+	default void writeLocal(MethodWriter writer, Label start, Label end)
+	{
+		final IType internalType = this.getInternalType();
+		final String signature = internalType.needsSignature() ? internalType.getSignature() : null;
+
+		writer.visitLocalVariable(this.getName().qualified, this.getDescriptor(), signature, start, end,
+		                          this.getLocalIndex());
+	}
 
 	default void writeInit(MethodWriter writer) throws BytecodeException
 	{

@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.parameter;
 
-import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -8,7 +7,6 @@ import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
@@ -122,12 +120,5 @@ public class CodeParameter extends AbstractParameter
 		{
 			this.defaultValue = this.defaultValue.cleanup(context, compilableList);
 		}
-	}
-
-	@Override
-	public void writeLocal(MethodWriter writer, Label start, Label end)
-	{
-		writer.visitLocalVariable(this.name.qualified, this.getDescriptor(), this.getSignature(), start, end,
-		                          this.localIndex);
 	}
 }

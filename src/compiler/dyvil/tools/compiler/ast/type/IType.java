@@ -140,6 +140,11 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	boolean isGenericType();
 
+	default boolean needsSignature()
+	{
+		return this.isGenericType() || this.hasTypeVariables();
+	}
+
 	ITypeParameter getTypeVariable();
 
 	Name getName();

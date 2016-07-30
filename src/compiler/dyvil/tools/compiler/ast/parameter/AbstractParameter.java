@@ -192,18 +192,6 @@ public abstract class AbstractParameter extends Member implements IParameter
 	}
 
 	@Override
-	public String getDescriptor()
-	{
-		return this.getInternalType().getExtendedName();
-	}
-
-	@Override
-	public String getSignature()
-	{
-		return this.getInternalType().getSignature();
-	}
-
-	@Override
 	public boolean addRawAnnotation(String type, IAnnotation annotation)
 	{
 		return true;

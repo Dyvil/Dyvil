@@ -140,12 +140,6 @@ public class Field extends Member implements IField
 	}
 
 	@Override
-	public String getSignature()
-	{
-		return this.type.getSignature();
-	}
-
-	@Override
 	public boolean addRawAnnotation(String type, IAnnotation annotation)
 	{
 		switch (type)
@@ -414,10 +408,12 @@ public class Field extends Member implements IField
 			value = null;
 		}
 
-		final String descriptor = this.getDescriptor();
 		final String name = this.name.qualified;
+		final String descriptor = this.getDescriptor();
+		final String signature = this.type.needsSignature() ? this.getSignature() : null;
 
-		final FieldVisitor fieldVisitor = writer.visitField(modifiers, name, descriptor, this.getSignature(), value);
+		final FieldVisitor fieldVisitor = writer.visitField(modifiers, name, descriptor,
+		                                                    signature, value);
 
 		IField.writeAnnotations(fieldVisitor, this.modifiers, this.annotations, this.type);
 		fieldVisitor.visitEnd();

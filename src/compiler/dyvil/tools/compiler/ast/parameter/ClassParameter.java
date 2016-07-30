@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -209,12 +208,5 @@ public class ClassParameter extends Field implements IParameter
 		}
 
 		AbstractParameter.writeInitImpl(this, writer);
-	}
-
-	@Override
-	public void writeLocal(MethodWriter writer, Label start, Label end)
-	{
-		writer.visitLocalVariable(this.name.qualified, this.getDescriptor(), this.getSignature(), start, end,
-		                          this.localIndex);
 	}
 }
