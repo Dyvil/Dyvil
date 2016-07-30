@@ -629,13 +629,13 @@ public final class TypeParameter implements ITypeParameter
 		{
 			if (this.upperBounds[0] != Types.OBJECT || this.upperBoundCount == 1)
 			{
-				this.upperBounds[0].appendSignature(buffer);
+				this.upperBounds[0].appendSignature(buffer, false);
 			}
 
 			for (int i = 1; i < this.upperBoundCount; i++)
 			{
 				buffer.append(':');
-				this.upperBounds[i].appendSignature(buffer);
+				this.upperBounds[i].appendSignature(buffer, false);
 			}
 		}
 		else

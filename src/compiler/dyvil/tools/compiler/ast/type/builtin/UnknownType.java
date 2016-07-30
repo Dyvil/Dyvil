@@ -123,7 +123,7 @@ public class UnknownType implements IRawType
 	}
 	
 	@Override
-	public void appendSignature(StringBuilder buffer)
+	public void appendSignature(StringBuilder buffer, boolean genericArg)
 	{
 	}
 

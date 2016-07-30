@@ -577,11 +577,11 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 
 		if (this.superType != null)
 		{
-			this.superType.appendSignature(buffer);
+			this.superType.appendSignature(buffer, false);
 		}
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			this.interfaces[i].appendSignature(buffer);
+			this.interfaces[i].appendSignature(buffer, false);
 		}
 		return buffer.toString();
 	}

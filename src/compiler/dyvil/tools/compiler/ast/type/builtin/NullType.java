@@ -100,7 +100,7 @@ public class NullType implements IRawType
 	}
 	
 	@Override
-	public void appendSignature(StringBuilder buffer)
+	public void appendSignature(StringBuilder buffer, boolean genericArg)
 	{
 		buffer.append("Ldyvil/lang/Null;");
 	}

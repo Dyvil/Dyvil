@@ -392,10 +392,10 @@ public class ArrayType implements IObjectType, ITyped
 	}
 
 	@Override
-	public void appendSignature(StringBuilder buffer)
+	public void appendSignature(StringBuilder buffer, boolean genericArg)
 	{
 		buffer.append('[');
-		this.type.appendSignature(buffer);
+		this.type.appendSignature(buffer, false);
 	}
 
 	@Override

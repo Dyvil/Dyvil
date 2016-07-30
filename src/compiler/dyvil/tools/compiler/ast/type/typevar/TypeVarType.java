@@ -213,7 +213,7 @@ public class TypeVarType implements IRawType
 	}
 	
 	@Override
-	public void appendSignature(StringBuilder buffer)
+	public void appendSignature(StringBuilder buffer, boolean genericArg)
 	{
 		buffer.append('T').append(this.typeParameter.getName().qualified).append(';');
 	}

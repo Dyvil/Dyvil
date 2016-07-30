@@ -11,6 +11,9 @@ public final class AnnotationUtil
 	public static final String IMPLICITLY_UNWRAPPED_INTERNAL = "dyvil/annotation/_internal/ImplicitlyUnwrapped";
 	public static final String IMPLICITLY_UNWRAPPED          = "L" + IMPLICITLY_UNWRAPPED_INTERNAL + ";";
 
+	public static final String PRIMITIVE_INTERNAL = "dyvil/annotation/_internal/Primitive";
+	public static final String PRIMITIVE          = "L" + PRIMITIVE_INTERNAL + ";";
+
 	private AnnotationUtil()
 	{
 		// no instances

@@ -248,7 +248,7 @@ public class ParameterList implements IParameterList
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].getInternalType().appendSignature(builder);
+			this.parameters[i].getInternalType().appendSignature(builder, false);
 		}
 	}
 

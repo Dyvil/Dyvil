@@ -328,12 +328,12 @@ public final class WildcardType implements IRawType, ITyped
 	}
 
 	@Override
-	public void appendSignature(StringBuilder buffer)
+	public void appendSignature(StringBuilder buffer, boolean genericArg)
 	{
 		if (!Types.isSameType(this.bound, Types.OBJECT))
 		{
 			this.variance.appendPrefix(buffer);
-			this.bound.appendSignature(buffer);
+			this.bound.appendSignature(buffer, true);
 		}
 		else
 		{

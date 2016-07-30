@@ -268,11 +268,11 @@ public class MapType implements IObjectType
 	}
 
 	@Override
-	public void appendSignature(StringBuilder buffer)
+	public void appendSignature(StringBuilder buffer, boolean genericArg)
 	{
 		buffer.append('L').append(this.theClass.getInternalName()).append('<');
-		this.keyType.appendSignature(buffer);
-		this.valueType.appendSignature(buffer);
+		this.keyType.appendSignature(buffer, true);
+		this.valueType.appendSignature(buffer, true);
 		buffer.append('>').append(';');
 	}
 

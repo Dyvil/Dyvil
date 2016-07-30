@@ -256,10 +256,10 @@ public class OptionType implements IObjectType
 	}
 
 	@Override
-	public void appendSignature(StringBuilder buffer)
+	public void appendSignature(StringBuilder buffer, boolean genericArg)
 	{
 		buffer.append("Ldyvil/util/Option<");
-		this.type.appendSignature(buffer);
+		this.type.appendSignature(buffer, true);
 		buffer.append(">;");
 	}
 

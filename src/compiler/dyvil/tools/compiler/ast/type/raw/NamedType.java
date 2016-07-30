@@ -239,7 +239,7 @@ public class NamedType implements IRawType, ITypeConsumer
 	}
 
 	@Override
-	public void appendSignature(StringBuilder buffer)
+	public void appendSignature(StringBuilder buffer, boolean genericArg)
 	{
 		buffer.append(this.name.qualified);
 	}

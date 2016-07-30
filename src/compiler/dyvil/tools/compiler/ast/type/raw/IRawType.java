@@ -82,7 +82,7 @@ public interface IRawType extends IObjectType
 	}
 
 	@Override
-	default void appendSignature(StringBuilder buffer)
+	default void appendSignature(StringBuilder buffer, boolean genericArg)
 	{
 		this.appendExtendedName(buffer);
 	}

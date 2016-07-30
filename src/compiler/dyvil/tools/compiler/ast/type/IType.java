@@ -396,11 +396,11 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	default String getSignature()
 	{
 		final StringBuilder builder = new StringBuilder();
-		this.appendSignature(builder);
+		this.appendSignature(builder, false);
 		return builder.toString();
 	}
 
-	void appendSignature(StringBuilder buffer);
+	void appendSignature(StringBuilder buffer, boolean genericArg);
 
 	int getLoadOpcode();
 

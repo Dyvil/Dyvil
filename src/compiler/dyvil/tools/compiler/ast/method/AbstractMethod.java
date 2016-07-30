@@ -957,7 +957,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			this.typeParameters[i].appendParameterSignature(buffer);
 		}
 		buffer.append(')');
-		this.type.appendSignature(buffer);
+		this.type.appendSignature(buffer, false);
 		return this.signature = buffer.toString();
 	}
 

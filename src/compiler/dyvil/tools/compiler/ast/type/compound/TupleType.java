@@ -406,13 +406,13 @@ public final class TupleType implements IObjectType, ITypeList
 	}
 
 	@Override
-	public void appendSignature(StringBuilder buf)
+	public void appendSignature(StringBuilder buf, boolean genericArg)
 	{
 		buf.append('L').append(this.getInternalName());
 		buf.append('<');
-		for (IType t : this.types)
+		for (int i = 0; i < this.typeCount; i++)
 		{
-			t.appendSignature(buf);
+			this.types[i].appendSignature(buf, true);
 		}
 		buf.append('>').append(';');
 	}
