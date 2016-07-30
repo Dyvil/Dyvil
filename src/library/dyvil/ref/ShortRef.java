@@ -1,6 +1,7 @@
 package dyvil.ref;
 
 import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.ref.boxed.BoxedShortRef;
 import dyvil.reflect.Modifiers;
 
 public interface ShortRef
@@ -19,5 +20,11 @@ public interface ShortRef
 	static void $times_$eq(ShortRef ref, short value)
 	{
 		ref.set(value);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	static ObjectRef<Short> boxed(ShortRef shortRef)
+	{
+		return new BoxedShortRef(shortRef);
 	}
 }
