@@ -199,11 +199,7 @@ public class TypeVarType implements IRawType
 	@Override
 	public String getInternalName()
 	{
-		if (this.typeParameter.upperBoundCount() > 0)
-		{
-			return this.typeParameter.getUpperBound(0).getInternalName();
-		}
-		return "java/lang/Object";
+		return this.typeParameter.getErasure().getInternalName();
 	}
 	
 	@Override

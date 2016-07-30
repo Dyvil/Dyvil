@@ -372,8 +372,8 @@ public final class ClassFormat
 		TypeParameter typeVar = new TypeParameter(generic, name);
 		if (desc.charAt(index + 1) == ':')
 		{
+			// name::
 			index++;
-			typeVar.addUpperBound(Types.OBJECT);
 		}
 		while (desc.charAt(index) == ':')
 		{

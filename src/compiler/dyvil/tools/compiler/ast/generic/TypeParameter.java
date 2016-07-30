@@ -60,6 +60,7 @@ public final class TypeParameter implements ITypeParameter
 	private ITypeParametric generic;
 	private ReifiedKind reifiedKind = ReifiedKind.NOT_REIFIED;
 
+	private IType erasure       = Types.OBJECT;
 	private IType defaultType   = Types.OBJECT;
 	private IType covariantType = new CovariantTypeVarType(this);
 
@@ -209,6 +210,12 @@ public final class TypeParameter implements ITypeParameter
 	{
 		this.upperBounds[index] = IType.withAnnotation(this.upperBounds[index], annotation, typePath, 0,
 		                                               typePath.getLength());
+	}
+
+	@Override
+	public IType getErasure()
+	{
+		return this.erasure;
 	}
 
 	@Override
@@ -469,48 +476,40 @@ public final class TypeParameter implements ITypeParameter
 		{
 			// The first upper bound is meant to be a class bound.
 			IType type = this.upperBounds[0] = this.upperBounds[0].resolveType(markers, context);
-			IClass iclass = type.getTheClass();
-			if (iclass != null && iclass.hasModifier(Modifiers.INTERFACE_CLASS))
-			{
-				// shift the entire array one to the right and insert
-				// Types.OBJECT at index 0
-				if (++this.upperBoundCount > this.upperBounds.length)
-				{
-					IType[] temp = new IType[this.upperBoundCount];
-					type = temp[0] = Types.OBJECT;
-					System.arraycopy(this.upperBounds, 0, temp, 1, this.upperBoundCount - 1);
-					this.upperBounds = temp;
-				}
-				else
-				{
-					System.arraycopy(this.upperBounds, 0, this.upperBounds, 1, this.upperBoundCount - 1);
-					type = this.upperBounds[0] = Types.OBJECT;
-				}
-			}
+			IType defaultType = type;
 
-			this.defaultType = type;
+			IClass typeClass = type.getTheClass();
+			if (typeClass != null && !typeClass.isInterface())
+			{
+				// If the first type is a class type (not an interface), it becomes the erasure type.
+				this.erasure = type;
+			}
 
 			// Check if the remaining upper bounds are interfaces
 			for (int i = 1; i < this.upperBoundCount; i++)
 			{
 				type = this.upperBounds[i] = this.upperBounds[i].resolveType(markers, context);
-				this.defaultType = IntersectionType.combine(this.defaultType, type, null);
+				typeClass = type.getTheClass();
 
-				iclass = type.getTheClass();
-				if (iclass != null && !iclass.hasModifier(Modifiers.INTERFACE_CLASS))
+				// The default type is accumulated to an intersection of all upper bounds
+				defaultType = IntersectionType.combine(defaultType, type, null);
+
+				if (typeClass != null && !typeClass.hasModifier(Modifiers.INTERFACE_CLASS))
 				{
 					final Marker marker = Markers.semanticError(type.getPosition(), "typeparameter.bound.class");
-					marker.addInfo(Markers.getSemantic("class.declaration", Util.classSignatureToString(iclass)));
+					marker.addInfo(Markers.getSemantic("class.declaration", Util.classSignatureToString(typeClass)));
 					markers.add(marker);
 				}
 			}
+
+			this.defaultType = defaultType;
 		}
 
 		if (this.annotations != null)
 		{
 			this.annotations.resolveTypes(markers, context, this);
 
-			IAnnotation reifiedAnnotation = this.annotations.getAnnotation(Types.REIFIED_CLASS);
+			final IAnnotation reifiedAnnotation = this.annotations.getAnnotation(Types.REIFIED_CLASS);
 			if (reifiedAnnotation != null)
 			{
 				final IValue erasure = reifiedAnnotation.getArguments().getFirstValue();
@@ -625,22 +624,22 @@ public final class TypeParameter implements ITypeParameter
 	public void appendSignature(StringBuilder buffer)
 	{
 		buffer.append(this.name).append(':');
-		if (this.upperBoundCount > 0)
-		{
-			if (this.upperBounds[0] != Types.OBJECT || this.upperBoundCount == 1)
-			{
-				this.upperBounds[0].appendSignature(buffer, false);
-			}
-
-			for (int i = 1; i < this.upperBoundCount; i++)
-			{
-				buffer.append(':');
-				this.upperBounds[i].appendSignature(buffer, false);
-			}
-		}
-		else
+		if (this.upperBoundCount <= 0)
 		{
 			buffer.append("Ljava/lang/Object;");
+			return;
+		}
+
+		if (this.upperBounds[0].getTheClass().isInterface())
+		{
+			// If the first type is not an interface type, we append two colons
+			buffer.append(':');
+		}
+		this.upperBounds[0].appendSignature(buffer, false);
+		for (int i = 1; i < this.upperBoundCount; i++)
+		{
+			buffer.append(':');
+			this.upperBounds[i].appendSignature(buffer, false);
 		}
 	}
 
