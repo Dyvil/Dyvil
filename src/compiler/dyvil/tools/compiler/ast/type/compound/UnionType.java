@@ -346,14 +346,6 @@ public class UnionType implements IObjectType
 	}
 
 	@Override
-	public String getSignature()
-	{
-		final StringBuilder stringBuilder = new StringBuilder();
-		this.appendSignature(stringBuilder);
-		return stringBuilder.toString();
-	}
-
-	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
 		buffer.append('L').append(this.getTheClass().getInternalName()).append(';');

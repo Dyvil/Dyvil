@@ -256,14 +256,6 @@ public class OptionType implements IObjectType
 	}
 
 	@Override
-	public String getSignature()
-	{
-		StringBuilder sb = new StringBuilder();
-		this.appendSignature(sb);
-		return sb.toString();
-	}
-
-	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
 		buffer.append("Ldyvil/util/Option<");

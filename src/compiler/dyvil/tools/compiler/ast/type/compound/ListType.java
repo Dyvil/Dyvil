@@ -222,12 +222,6 @@ public class ListType implements IObjectType
 	}
 
 	@Override
-	public String getSignature()
-	{
-		return IType.getSignature(this);
-	}
-
-	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
 		buffer.append('L').append(this.theClass.getInternalName()).append('<');

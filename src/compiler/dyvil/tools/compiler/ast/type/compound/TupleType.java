@@ -406,14 +406,6 @@ public final class TupleType implements IObjectType, ITypeList
 	}
 
 	@Override
-	public String getSignature()
-	{
-		StringBuilder buf = new StringBuilder();
-		this.appendSignature(buf);
-		return buf.toString();
-	}
-
-	@Override
 	public void appendSignature(StringBuilder buf)
 	{
 		buf.append('L').append(this.getInternalName());

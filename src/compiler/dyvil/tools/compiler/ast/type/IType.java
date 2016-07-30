@@ -388,12 +388,10 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	void appendExtendedName(StringBuilder buffer);
 
-	String getSignature();
-
-	static String getSignature(IType type)
+	default String getSignature()
 	{
 		final StringBuilder builder = new StringBuilder();
-		type.appendSignature(builder);
+		this.appendSignature(builder);
 		return builder.toString();
 	}
 

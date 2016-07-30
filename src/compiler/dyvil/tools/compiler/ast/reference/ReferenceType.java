@@ -269,19 +269,6 @@ public class ReferenceType implements IObjectType
 	}
 
 	@Override
-	public String getSignature()
-	{
-		if (this.theClass != LazyFields.OBJECT_REF_CLASS)
-		{
-			return null;
-		}
-
-		StringBuilder stringBuilder = new StringBuilder();
-		this.appendSignature(stringBuilder);
-		return stringBuilder.toString();
-	}
-
-	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
 		buffer.append('L').append(this.getInternalName());
