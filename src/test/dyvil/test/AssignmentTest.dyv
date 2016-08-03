@@ -1,0 +1,92 @@
+package dyvil.test
+
+public class AssignmentTest
+{
+	public static void main([String] args)
+	{
+		localIntTest()
+		localLongTest()
+		staticTest()
+		instanceTest()
+		testCompound()
+	}
+
+	public static void localIntTest()
+	{
+		int i = 0
+        i += 2
+        int result = i += 1
+
+        Main.test("Local Int Increment", 3, result)
+	}
+
+	public static void localLongTest()
+	{
+		long l = 0
+    	l += 3
+    	int result = l += 1
+
+    	Main.test("Local Long Increment", 4, result)
+	}
+
+	private static int counter = 0
+
+	public static void staticTest()
+	{
+		counter = 0
+		counter += 4
+		int result = counter += 1
+
+		Main.test("Static Increment", 5, counter)
+	}
+
+	public static class Counter
+	{
+		public int value = 0
+		public [int] applyArray = [ 0, 0, 0 ]
+		public [int] subscriptArray = [ 0, 0, 0 ]
+
+		public int apply(int i) = this.applyArray[i]
+		public void update(int i, int value) = this.applyArray[i] = value
+
+		public int subscript(int i) = this.subscriptArray[i]
+		public void subscript_$eq(int i, int value) = this.subscriptArray[i] = value
+	}
+
+	public static void instanceTest()
+	{
+		instanceStatementTest(new Counter)
+		instanceExpressionTest(new Counter)
+	}
+
+	public static void instanceStatementTest(Counter counter)
+	{
+		counter.value += 2
+
+		Main.test("Instance Statement Increment", 2, counter.value)
+	}
+
+	public static void instanceExpressionTest(Counter counter)
+	{
+		int result = counter.value += 5
+
+		Main.test("Instance Expression Increment", 5, counter.value)
+	}
+
+	// Compound Assignment
+
+	public static void testCompound()
+	{
+		let counter = new Counter
+		var modCount = 0
+
+		counter(modCount++) += modCount++ // apply/update
+		// counter.applyArray[0] = 1
+		counter[modCount++] += modCount++ // subscript/subscript_=
+		// counter.subscriptArray[2] = 3
+
+		Main.test("Compound Test Mod Count", 4, modCount)
+		Main.test("Compound Test Apply Array", [ 1, 0, 0 ].toString, counter.applyArray.toString)
+		Main.test("Compound Test Subscript Array", [ 0, 0, 3 ].toString, counter.subscriptArray.toString)
+	}
+}

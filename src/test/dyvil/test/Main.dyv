@@ -13,6 +13,7 @@ public class Main
 	private static void runTests([String] args)
 	{
 		AnnotationTest.main(args)
+		AssignmentTest.main(args)
 		ArrayTest.main(args)
 		BridgeTest.main(args)
 		BuilderTest.main(args)
@@ -23,7 +24,6 @@ public class Main
 		ExtensionTest.main(args)
 		ForTest.main(args)
 		HanoiTest.main(args)
-		IncTest.main(args)
 		InheritanceTest.main(args)
 		IntrinsicTest.main(args)
 		LambdaTest.main(args)
