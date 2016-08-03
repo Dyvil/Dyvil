@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.statement.Closure;
 import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.compiler.transform.SideEffectHelper;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -61,6 +62,23 @@ public class ApplyMethodCall extends AbstractCall
 	public IValue toAssignment(IValue rhs, ICodePosition position)
 	{
 		return new UpdateMethodCall(this.position.to(position), this.receiver, this.arguments, rhs);
+	}
+
+	@Override
+	public IValue toCompoundAssignment(IValue rhs, ICodePosition position, MarkerList markers, IContext context,
+		                                  SideEffectHelper helper)
+	{
+		// x(y...) op= z
+		// -> x(y...) = x(y...).op(z)
+		// -> x.update(y..., x.apply(y...).op(z))
+
+		final IValue applyReceiver = helper.processValue(this.receiver);
+		final IArguments applyArguments = helper.processArguments(this.arguments);
+
+		this.arguments = applyArguments;
+		this.receiver = applyReceiver;
+
+		return new UpdateMethodCall(position, applyReceiver, applyArguments, rhs).resolveCall(markers, context, true);
 	}
 
 	@Override

@@ -21,6 +21,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.raw.NamedType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.transform.SideEffectHelper;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
@@ -128,6 +129,18 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	public IValue toAssignment(IValue rhs, ICodePosition position)
 	{
 		return new FieldAssignment(this.position.to(position), this.receiver, this.name, rhs);
+	}
+
+	@Override
+	public IValue toCompoundAssignment(IValue rhs, ICodePosition position, MarkerList markers, IContext context,
+		                                  SideEffectHelper helper)
+	{
+		// x op= z
+		// -> x = x.op(z)
+
+		final IValue fieldReceiver = helper.processValue(this.receiver);
+		this.receiver = fieldReceiver;
+		return new FieldAssignment(position, fieldReceiver, this.field, rhs);
 	}
 
 	@Override

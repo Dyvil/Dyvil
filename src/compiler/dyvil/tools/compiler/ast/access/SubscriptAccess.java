@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.compiler.transform.SideEffectHelper;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -52,6 +53,23 @@ public class SubscriptAccess extends AbstractCall
 	public IValue toAssignment(IValue rhs, ICodePosition position)
 	{
 		return new SubscriptAssignment(this.position.to(position), this.receiver, this.arguments, rhs);
+	}
+
+	@Override
+	public IValue toCompoundAssignment(IValue rhs, ICodePosition position, MarkerList markers, IContext context,
+		                                  SideEffectHelper helper)
+	{
+		// x[y...] op= z
+		// -> x[y...] = x[y...].op(z)
+		// -> x.subscript_=(y..., x.subscript(y...).op(z))
+
+		final IValue subscriptReceiver = helper.processValue(this.receiver);
+		final IArguments subscriptArguments = helper.processArguments(this.arguments);
+
+		this.receiver = subscriptReceiver;
+		this.arguments = subscriptArguments;
+		return new SubscriptAssignment(position, subscriptReceiver, subscriptArguments, rhs)
+			       .resolveCall(markers, context, true);
 	}
 
 	@Override

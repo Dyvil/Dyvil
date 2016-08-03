@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.transform.SideEffectHelper;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.Marker;
@@ -183,6 +184,12 @@ public interface IValue extends IASTNode, ITyped
 	}
 
 	default IValue toAssignment(IValue rhs, ICodePosition position)
+	{
+		return null;
+	}
+
+	default IValue toCompoundAssignment(IValue rhs, ICodePosition position, MarkerList markers, IContext context,
+		                                   SideEffectHelper helper)
 	{
 		return null;
 	}
