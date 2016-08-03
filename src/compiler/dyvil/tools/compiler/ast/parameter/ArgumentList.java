@@ -173,7 +173,8 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 
 	@Override
-	public int checkMatch(int[] values, IType[] types, int matchStartIndex, int argumentIndex, IParameter param, IImplicitContext implicitContext)
+	public int checkMatch(int[] values, IType[] types, int matchStartIndex, int argumentIndex, IParameter param,
+		                     IImplicitContext implicitContext)
 	{
 		if (argumentIndex > this.size)
 		{
@@ -193,13 +194,15 @@ public final class ArgumentList implements IArguments, IValueList
 		                  param.getInternalType(), implicitContext) ? 0 : -1;
 	}
 
-	protected static boolean checkMatch(int[] matchValues, IType[] matchTypes, int matchIndex, IValue argument, IType type, IImplicitContext implicitContext)
+	protected static boolean checkMatch(int[] matchValues, IType[] matchTypes, int matchIndex, IValue argument,
+		                                   IType type, IImplicitContext implicitContext)
 	{
 		return !argument.checkVarargs(false) && checkMatch_(matchValues, matchTypes, matchIndex, argument, type,
 		                                                    implicitContext);
 	}
 
-	private static boolean checkMatch_(int[] matchValues, IType[] matchTypes, int matchIndex, IValue argument, IType type, IImplicitContext implicitContext)
+	private static boolean checkMatch_(int[] matchValues, IType[] matchTypes, int matchIndex, IValue argument,
+		                                  IType type, IImplicitContext implicitContext)
 	{
 		final int result = TypeChecker.getTypeMatch(argument, type, implicitContext);
 		if (result == 0)
@@ -264,7 +267,8 @@ public final class ArgumentList implements IArguments, IValueList
 		                                              IArguments.argumentMarkerSupplier(param));
 	}
 
-	protected static boolean checkVarargsValue(IValue[] values, int startIndex, int endIndex, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
+	protected static boolean checkVarargsValue(IValue[] values, int startIndex, int endIndex, IParameter param,
+		                                          ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		final IType arrayType = param.getInternalType();
 
@@ -276,21 +280,14 @@ public final class ArgumentList implements IArguments, IValueList
 			return false;
 		}
 
-		final IType elementType = arrayType.getElementType();
 		final int varargsArguments = endIndex - startIndex;
 		final IValue[] arrayValues = new IValue[varargsArguments];
 		final ArrayExpr arrayExpr = new ArrayExpr(arrayValues, varargsArguments);
 
-		arrayExpr.setType(arrayType);
+		System.arraycopy(values, startIndex, arrayValues, 0, varargsArguments);
 
-		for (int i = 0; i < varargsArguments; i++)
-		{
-			arrayValues[i] = TypeChecker
-				                 .convertValue(values[i + startIndex], elementType, typeContext, markers, context,
-				                               IArguments.argumentMarkerSupplier(param));
-		}
-
-		values[startIndex] = arrayExpr;
+		values[startIndex] = TypeChecker.convertValue(arrayExpr, arrayType, typeContext, markers, context,
+		                                              IArguments.argumentMarkerSupplier(param));
 		return true;
 	}
 
