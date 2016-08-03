@@ -844,7 +844,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		int includes = in.readShort();
 		for (int i = 0; i < includes; i++)
 		{
-			IncludeDeclaration id = new IncludeDeclaration(null);
+			IncludeDeclaration id = new IncludeDeclaration();
 			id.read(in);
 			this.addInclude(id);
 		}

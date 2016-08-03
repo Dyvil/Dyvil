@@ -25,16 +25,31 @@ import java.io.IOException;
 
 public class IncludeDeclaration implements IASTNode
 {
-	private ICodePosition position;
-
 	private Name[] nameParts = new Name[3];
 	private int namePartCount;
 
-	private IDyvilHeader header;
+	// Metadata
+	private ICodePosition position;
+	private IDyvilHeader  header;
+
+	public IncludeDeclaration()
+	{
+	}
 
 	public IncludeDeclaration(ICodePosition position)
 	{
 		this.position = position;
+	}
+
+	public IncludeDeclaration(IDyvilHeader header)
+	{
+		this.header = header;
+	}
+
+	public IncludeDeclaration(ICodePosition position, IDyvilHeader header)
+	{
+		this.position = position;
+		this.header = header;
 	}
 
 	@Override
@@ -51,7 +66,7 @@ public class IncludeDeclaration implements IASTNode
 
 	public void addNamePart(Name name)
 	{
-		int index = this.namePartCount++;
+		final int index = this.namePartCount++;
 		if (index >= this.nameParts.length)
 		{
 			Name[] temp = new Name[index + 1];
@@ -100,18 +115,22 @@ public class IncludeDeclaration implements IASTNode
 	public void resolve(MarkerList markers, IContext context)
 	{
 		Package pack = Package.rootPackage;
-		int count = this.namePartCount - 1;
-		for (int i = 0; i < count; i++)
+		final int lastIndex = this.namePartCount - 1;
+
+		for (int i = 0; i < lastIndex; i++)
 		{
-			pack = pack.resolvePackage(this.nameParts[i]);
+			final Name namePart = this.nameParts[i];
+
+			pack = pack.resolvePackage(namePart);
 			if (pack == null)
 			{
-				markers.add(Markers.semantic(this.position, "resolve.package", this.nameParts[i]));
+				markers.add(Markers.semanticError(this.position, "resolve.package", namePart));
 				return;
 			}
 		}
 
-		this.header = pack.resolveHeader(this.nameParts[count].qualified);
+		final Name headerName = this.nameParts[lastIndex];
+		this.header = pack.resolveHeader(headerName.qualified);
 
 		if (markers == null)
 		{
@@ -120,19 +139,19 @@ public class IncludeDeclaration implements IASTNode
 
 		if (this.header == null)
 		{
-			markers.add(Markers.semantic(this.position, "resolve.header", this.nameParts[count]));
+			markers.add(Markers.semanticError(this.position, "resolve.header", headerName));
 			return;
 		}
 
 		// Check if the included Unit is a Header or has a Header Declaration
 		if (!this.getHeader().isHeader())
 		{
-			markers.add(Markers.semantic(this.position, "include.unit", this.header.getName()));
+			markers.add(Markers.semanticError(this.position, "include.unit", this.header.getName()));
 			return;
 		}
 
 		// Check if the Header has a Header Declaration
-		HeaderDeclaration headerDeclaration = this.header.getHeaderDeclaration();
+		final HeaderDeclaration headerDeclaration = this.header.getHeaderDeclaration();
 		if (headerDeclaration == null)
 		{
 			return;
@@ -149,16 +168,18 @@ public class IncludeDeclaration implements IASTNode
 			accessLevel &= 0b1111;
 		}
 
-		if (accessLevel == Modifiers.PRIVATE)
+		switch (accessLevel)
 		{
+		case Modifiers.PRIVATE:
 			markers.add(Markers.semanticError(this.position, "include.invisible", this.header.getName()));
-		}
-		if (accessLevel == Modifiers.PACKAGE || accessLevel == Modifiers.PROTECTED)
-		{
+			break;
+		case Modifiers.PACKAGE:
+		case Modifiers.PROTECTED:
 			if (this.header.getPackage() != context.getHeader().getPackage())
 			{
 				markers.add(Markers.semanticError(this.position, "include.invisible", this.header.getName()));
 			}
+			break;
 		}
 	}
 
@@ -167,7 +188,7 @@ public class IncludeDeclaration implements IASTNode
 		out.writeShort(this.namePartCount);
 		for (int i = 0; i < this.namePartCount; i++)
 		{
-			out.writeUTF(this.nameParts[i].qualified);
+			this.nameParts[i].write(out);
 		}
 	}
 
@@ -177,7 +198,7 @@ public class IncludeDeclaration implements IASTNode
 		this.nameParts = new Name[this.namePartCount];
 		for (int i = 0; i < this.namePartCount; i++)
 		{
-			this.nameParts[i] = Name.fromRaw(in.readUTF());
+			this.nameParts[i] = Name.read(in);
 		}
 	}
 
