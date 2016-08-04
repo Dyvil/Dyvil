@@ -3,6 +3,8 @@ package dyvil.collection.impl;
 import dyvil.array.ObjectArray;
 import dyvil.collection.*;
 import dyvil.math.MathUtils;
+import dyvil.ref.InvalidReferenceException;
+import dyvil.ref.ObjectRef;
 import dyvil.util.None;
 import dyvil.util.Option;
 import dyvil.util.Some;
@@ -16,7 +18,7 @@ import java.util.function.Consumer;
 
 public abstract class AbstractHashMap<K, V> implements Map<K, V>
 {
-	protected static final class HashEntry<K, V> implements Entry<K, V>
+	protected static final class HashEntry<K, V> implements Entry<K, V>, ObjectRef<V>
 	{
 		private static final long serialVersionUID = 6421167357975687099L;
 
@@ -41,6 +43,28 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		}
 
 		@Override
+		public V get()
+		{
+			this.validateReference();
+			return this.value;
+		}
+
+		@Override
+		public void set(V value)
+		{
+			this.validateReference();
+			this.value = value;
+		}
+
+		private void validateReference()
+		{
+			if (this.isInvalid())
+			{
+				throw new InvalidReferenceException("Entry was removed from Map");
+			}
+		}
+
+		@Override
 		public K getKey()
 		{
 			return this.key;
@@ -51,6 +75,16 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		{
 			return this.value;
 		}
+
+		public void invalidate()
+		{
+			this.key = null;
+			this.value = null;
+			this.hash = -1;
+			this.next = null;
+		}
+
+		private boolean isInvalid() {return this.hash == -1 && this.key == null;}
 
 		@Override
 		public String toString()
@@ -196,7 +230,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	{
 		this(iterable.size());
 		// Call the putAllInternal(Iterable) method to avoid redundant ensureCapacity call
-		this.putAllInternal((Iterable<? extends Entry<? extends K,? extends V>>) iterable);
+		this.putAllInternal((Iterable<? extends Entry<? extends K, ? extends V>>) iterable);
 	}
 
 	public AbstractHashMap(Set<? extends Entry<? extends K, ? extends V>> set)
@@ -329,7 +363,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	protected void putAllInternal(SizedIterable<? extends Entry<? extends K, ? extends V>> map)
 	{
 		this.ensureCapacity(this.size + map.size());
-		this.putAllInternal((Iterable<? extends Entry<? extends K,? extends V>>) map);
+		this.putAllInternal((Iterable<? extends Entry<? extends K, ? extends V>>) map);
 	}
 
 	private void loadDistinct(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
@@ -355,6 +389,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		AbstractHashMap.this.size--;
 		int index = index(entry.hash, AbstractHashMap.this.entries.length);
 		HashEntry<K, V> e = AbstractHashMap.this.entries[index];
+
 		if (e == entry)
 		{
 			AbstractHashMap.this.entries[index] = entry.next;
@@ -371,6 +406,8 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 
 			prev.next = entry.next;
 		}
+
+		entry.invalidate();
 	}
 
 	@Override

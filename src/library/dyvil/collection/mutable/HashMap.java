@@ -5,6 +5,7 @@ import dyvil.collection.impl.AbstractHashMap;
 import dyvil.lang.literal.ArrayConvertible;
 import dyvil.lang.literal.ColonConvertible;
 import dyvil.lang.literal.NilConvertible;
+import dyvil.ref.ObjectRef;
 
 import java.util.Objects;
 import java.util.function.BiFunction;
@@ -164,6 +165,12 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements MutableMap<K
 	public void subscript_$eq(K key, V value)
 	{
 		this.putInternal(key, value);
+	}
+
+	@Override
+	public ObjectRef<V> subscript_$amp(K key)
+	{
+		return this.getEntry(key);
 	}
 
 	@Override
