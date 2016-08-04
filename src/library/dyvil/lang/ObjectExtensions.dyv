@@ -36,7 +36,7 @@ public final class ObjectExtensions
 	public infix func ===(Object o1, Object o2): boolean = o1 === o2
 
 	// Structural Inequality (!equals)
-	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2, BNOT ], strings: [ "dyvil/lang/Predef", "$eq$eq", "(Ljava/lang/Object;Ljava/lang/Object;)Z" ])
+	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2, BNOT ], strings: [ "dyvil/lang/ObjectExtensions", "$eq$eq", "(Ljava/lang/Object;Ljava/lang/Object;)Z" ])
 	public infix func !=(Object o1, Object o2): boolean = !(o1 == o2)
 
 	// Reference Inequality
