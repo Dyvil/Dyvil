@@ -2,28 +2,65 @@ package dyvil.test
 
 public class ExtensionTest
 {
-	class SuperClass
-	
-	class SubClass extends SuperClass
+	class A
+	class B extends A
+	class C extends B
 	{
-		public String foo() = "SubClass.foo"
+		public func custom: String = "custom"
 	}
-	
-	public extension String foo(SuperClass superClass) = "extension.foo"
+
+	class D extends C
+
+	extension func custom(A a) = "fallback"
 
 	public static void main([String] args)
 	{
-		SuperClass sup = new SuperClass
-		SubClass sub = new SubClass
-		SuperClass sub1 = sub
+		A a = new A
+		B b = new B
+		C c = new C
+		D d = new D
 
-		Main.test("Super Class Extension", "extension.foo", sup.foo)
-		Main.test("Sub Class Extension", "SubClass.foo", sub.foo)
-		Main.test("Sub Class Extension (Compile-Time Super Class)", "SubClass.foo", sub1.foo)
+		A cA = c
+		B cB = c
 
-		sub.name = "Sub Class"
+		Main.test("Dynamic Test 1", "fallback", a.custom)
+		Main.test("Dynamic Test 2", "fallback", b.custom)
+		Main.test("Dynamic Test 3", "custom", c.custom)
+		Main.test("Dynamic Test 4", "custom", cA.custom)
+		Main.test("Dynamic Test 5", "custom", cB.custom)
+		Main.test("Dynamic Test 6", "custom", d.custom)
 
-		Main.test("Name Extension", "Sub Class", sub.name)
+		let random = Random()
+		let count = 1_000_000
+		var totalTime = 0L
+		var success = true
+		for (int i <- 0 .. count)
+		{
+			A current = null
+			String expected = null
+			match random.nextInt(4)
+			{
+				case 0 { current = a; expected = "fallback" }
+				case 1 { current = b; expected = "fallback" }
+				case 2 { current = c; expected = "custom" }
+				case 3 { current = d; expected = "custom" }
+			}
+
+			let now = System.nanoTime
+			let actual = current.custom
+
+			totalTime += System.nanoTime - now
+			if (expected != actual)
+			{
+				Main.test("Dynamic Test 7 for \(current.getClass.getSimpleName)", expected, actual)
+				break
+			}
+		}
+
+		// println("Dynamic Dispatch Speed: \(totalTime / count) ns / invocation")
+
+		a.name = "foo"
+		Main.test("Name Extension", "foo", a.name)
 	}
 
 	private static Map<any, String> nameMap = dyvil.collection.mutable.IdentityHashMap<any, String>
