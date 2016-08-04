@@ -139,7 +139,7 @@ public class AnnotationValue implements IValue, IAnnotationConsumer
 			final IParameter parameter = parameterList.get(i);
 			final IType parameterType = parameter.getType();
 
-			parameterNames[i] = parameter.getName().qualified;
+			parameterNames[i] = parameter.getInternalName();
 			parameterType.appendExtendedName(descBuilder);
 
 			arguments.writeValue(i, parameter, writer);

@@ -20,7 +20,6 @@ public class StaticFieldReference implements IReference, IClassCompilable
 	// Metadata
 	private boolean isUnique;
 	private String  className;
-	private String  fieldName;
 	private String  fieldOriginClassName;
 	private String  refFieldName;
 	private String  refFieldType;
@@ -39,9 +38,6 @@ public class StaticFieldReference implements IReference, IClassCompilable
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
-		final String fieldClassName = this.getFieldOriginClassName();
-		final String fieldName = this.getFieldName();
-
 		this.isUnique = true;
 		for (int i = 0, count = compilableList.compilableCount(); i < count; i++)
 		{
@@ -52,8 +48,7 @@ public class StaticFieldReference implements IReference, IClassCompilable
 			}
 
 			final StaticFieldReference staticFieldReference = (StaticFieldReference) compilable;
-			if (fieldClassName.equals(staticFieldReference.getFieldOriginClassName()) // same owner class
-				    && fieldName.equals(staticFieldReference.getFieldName())) // same field name
+			if (this.field == staticFieldReference.field)
 			{
 				this.isUnique = false;
 				break;
@@ -63,16 +58,6 @@ public class StaticFieldReference implements IReference, IClassCompilable
 	}
 
 	// Lazy Field Getters
-
-	public String getFieldName()
-	{
-		if (this.fieldName != null)
-		{
-			return this.fieldName;
-		}
-
-		return this.fieldName = this.field.getName().qualified;
-	}
 
 	private String getFieldOriginClassName()
 	{
@@ -92,8 +77,8 @@ public class StaticFieldReference implements IReference, IClassCompilable
 		}
 
 		// Format: $staticRef$[originClassName]$[fieldName]
-		return this.refFieldName =
-			       "$staticRef$" + this.getFieldOriginClassName().replace('/', '$') + '$' + this.getFieldName();
+		return this.refFieldName = "$staticRef$" + this.getFieldOriginClassName().replace('/', '$') + '$' + this.field
+			                                                                                                    .getInternalName();
 	}
 
 	private String getRefFieldType()
@@ -137,7 +122,7 @@ public class StaticFieldReference implements IReference, IClassCompilable
 			return;
 		}
 
-		final String fieldName = this.getFieldName();
+		final String fieldName = this.field.getInternalName();
 		final String fieldOriginClassName = this.getFieldOriginClassName();
 
 		final String refFieldName = this.getRefFieldName();

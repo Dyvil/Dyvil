@@ -57,7 +57,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 			this.name = Name.fromQualified(name);
 		}
 
-		this.mangledName = name;
+		this.internalName = name;
 		this.signature = signature;
 		this.descriptor = desc;
 	}

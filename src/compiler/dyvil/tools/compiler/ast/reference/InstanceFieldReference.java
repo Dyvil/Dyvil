@@ -47,7 +47,7 @@ public class InstanceFieldReference implements IReference
 
 		final IType fieldType = this.field.getType();
 		final String fieldClassName = this.field.getEnclosingClass().getInternalName();
-		final String fieldName = this.field.getName().qualified;
+		final String fieldName = this.field.getInternalName();
 		final String factoryMethodName = ReferenceType.LazyFields.getReferenceFactoryName(fieldType, "");
 		final String factoryMethodType =
 			"(Ljava/lang/Object;Ljava/lang/Class;Ljava/lang/String;)L" + ReferenceType.LazyFields

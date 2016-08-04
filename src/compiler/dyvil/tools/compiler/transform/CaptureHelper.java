@@ -124,7 +124,7 @@ public class CaptureHelper
 			final CaptureDataMember capture = this.capturedFields[i];
 			capture.setLocalIndex(index);
 			index = writer
-					.visitParameter(index, capture.getName().qualified, capture.getVariable().getInternalType(), 0);
+					.visitParameter(index, capture.getInternalName(), capture.getVariable().getInternalType(), 0);
 		}
 
 		return index;
@@ -146,8 +146,8 @@ public class CaptureHelper
 			final CaptureField field = (CaptureField) this.capturedFields[i];
 			writer.visitVarInsn(Opcodes.ALOAD, 0);
 			writer.visitVarInsn(field.getInternalType().getLoadOpcode(), field.getLocalIndex());
-			writer.visitFieldInsn(Opcodes.PUTFIELD, field.enclosingClass.getInternalName(), field.name,
-			                      field.getInternalType().getExtendedName());
+			writer.visitFieldInsn(Opcodes.PUTFIELD, field.enclosingClass.getInternalName(), field.getInternalName(),
+			                      field.getDescriptor());
 		}
 	}
 }

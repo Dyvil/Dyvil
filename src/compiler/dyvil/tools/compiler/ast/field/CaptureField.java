@@ -21,7 +21,7 @@ import java.util.function.Function;
 public final class CaptureField extends CaptureDataMember implements IField
 {
 	public IClass enclosingClass;
-	public String name;
+	public String internalName;
 
 	public static Function<? super IVariable, ? extends CaptureDataMember> factory(IClass theClass)
 	{
@@ -38,7 +38,7 @@ public final class CaptureField extends CaptureDataMember implements IField
 		super(variable);
 		this.enclosingClass = iclass;
 
-		this.name = "this$" + variable.getName().qualified;
+		this.internalName = "this$" + variable.getInternalName();
 	}
 
 	@Override
@@ -72,10 +72,16 @@ public final class CaptureField extends CaptureDataMember implements IField
 	}
 
 	@Override
+	public String getInternalName()
+	{
+		return this.internalName;
+	}
+
+	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		writer
-			.visitField(Modifiers.MANDATED | Modifiers.SYNTHETIC, this.name, this.getDescriptor(), this.getSignature(),
+			.visitField(Modifiers.MANDATED | Modifiers.SYNTHETIC, this.internalName, this.getDescriptor(), this.getSignature(),
 			            null).visitEnd();
 	}
 
@@ -85,7 +91,7 @@ public final class CaptureField extends CaptureDataMember implements IField
 		// { int i = 0; new => int() { override int apply() = i++ } }
 
 		String owner = this.enclosingClass.getInternalName();
-		String name = this.name;
+		String name = this.internalName;
 		String desc = this.getDescriptor();
 		writer.visitFieldInsn(Opcodes.GETFIELD, owner, name, desc);
 	}
@@ -96,7 +102,7 @@ public final class CaptureField extends CaptureDataMember implements IField
 		if (!this.variable.isReferenceType())
 		{
 			String owner = this.enclosingClass.getInternalName();
-			String name = this.name;
+			String name = this.internalName;
 			String desc = this.variable.getInternalType().getExtendedName();
 			writer.visitFieldInsn(Opcodes.PUTFIELD, owner, name, desc);
 		}

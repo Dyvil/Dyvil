@@ -701,7 +701,7 @@ public class CodeClass extends AbstractClass
 		{
 			final IParameter parameter = this.parameters.get(i);
 			parameter.write(writer);
-			arrayVisitor.visit("", parameter.getName().qualified);
+			arrayVisitor.visit("", parameter.getInternalName());
 		}
 
 		arrayVisitor.visitEnd();
@@ -822,7 +822,7 @@ public class CodeClass extends AbstractClass
 				modifiers &= ~Modifiers.STATIC;
 			}
 			final String outerName = this.enclosingClass.getInternalName();
-			writer.visitInnerClass(this.getInternalName(), outerName, this.name.qualified, modifiers);
+			writer.visitInnerClass(this.getInternalName(), outerName, this.getInternalName(), modifiers);
 
 			writer.visitOuterClass(outerName, null, null);
 		}

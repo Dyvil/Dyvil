@@ -95,7 +95,7 @@ public class NestedMethod extends CodeMethod
 		final int modifiers = this.modifiers.toFlags() & ModifierUtil.JAVA_MODIFIER_MASK;
 
 		final MethodWriter methodWriter = new MethodWriterImpl(writer, writer
-			                                                               .visitMethod(modifiers, this.name.qualified,
+			                                                               .visitMethod(modifiers, this.getInternalName(),
 			                                                                            this.getDescriptor(),
 			                                                                            this.getSignature(),
 			                                                                            this.getInternalExceptions()));

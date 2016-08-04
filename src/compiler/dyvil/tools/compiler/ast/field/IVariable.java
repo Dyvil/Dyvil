@@ -87,7 +87,7 @@ public interface IVariable extends IDataMember
 		final IType internalType = this.getInternalType();
 		final String signature = internalType.needsSignature() ? internalType.getSignature() : null;
 
-		writer.visitLocalVariable(this.getName().qualified, this.getDescriptor(), signature, start, end,
+		writer.visitLocalVariable(this.getInternalName(), this.getDescriptor(), signature, start, end,
 		                          this.getLocalIndex());
 	}
 

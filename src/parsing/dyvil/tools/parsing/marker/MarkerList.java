@@ -63,6 +63,11 @@ public final class MarkerList implements Iterable<Marker>
 
 	public void add(Marker marker)
 	{
+		if (marker == null)
+		{
+			return;
+		}
+
 		if (marker.isError())
 		{
 			this.errors++;
@@ -72,7 +77,7 @@ public final class MarkerList implements Iterable<Marker>
 			this.warnings++;
 		}
 
-		int index = this.markerCount++;
+		final int index = this.markerCount++;
 		if (index >= this.markers.length)
 		{
 			Marker[] temp = new Marker[this.markerCount << 1];

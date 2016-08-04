@@ -161,6 +161,12 @@ public abstract class Member implements IMember
 	}
 
 	@Override
+	public String getInternalName()
+	{
+		return this.name.qualified;
+	}
+
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.type != null)

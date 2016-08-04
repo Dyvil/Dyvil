@@ -342,7 +342,7 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 
 	@Override
-	public String getMangledName()
+	public String getInternalName()
 	{
 		return this.name.qualified;
 	}
@@ -391,7 +391,7 @@ public class DynamicMethod implements IMethod, IDefaultContext
 		desc.append(')');
 		desc.append("Ljava/lang/Object;");
 		
-		writer.visitInvokeDynamicInsn(this.name.qualified, desc.toString(), BOOTSTRAP, ObjectArray.EMPTY);
+		writer.visitInvokeDynamicInsn(this.getInternalName(), desc.toString(), BOOTSTRAP, ObjectArray.EMPTY);
 
 		Types.OBJECT.writeCast(writer, targetType, lineNumber);
 	}

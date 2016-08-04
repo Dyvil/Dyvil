@@ -282,7 +282,7 @@ public abstract class AbstractParameter extends Member implements IParameter
 		final int index = parameter.getIndex();
 
 		parameter.setLocalIndex(writer.localCount());
-		writer.visitParameter(parameter.getLocalIndex(), parameter.getName().qualified, parameter.getInternalType(),
+		writer.visitParameter(parameter.getLocalIndex(), parameter.getInternalName(), parameter.getInternalType(),
 		                      intModifiers);
 
 		// Annotations

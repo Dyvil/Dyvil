@@ -159,7 +159,7 @@ public class CodeMethod extends AbstractMethod
 		final String qualified = name.qualified;
 		final String newUnqualified = unqualified.substring(0, index);
 		final String newQualified = qualified.substring(0, qualified.indexOf(NAME_SEPARATOR));
-		this.mangledName = qualified;
+		this.internalName = qualified;
 		this.name = Name.from(newUnqualified, newQualified);
 	}
 
@@ -316,7 +316,7 @@ public class CodeMethod extends AbstractMethod
 		final String signature = this.getSignature();
 		final int parameterCount = this.parameters.size();
 
-		String mangledName = this.getMangledName();
+		String mangledName = this.getInternalName();
 		boolean thisMangled = mangledName.contains(NAME_SEPARATOR);
 
 		for (int i = body.methodCount() - 1; i >= 0; i--)
@@ -329,7 +329,7 @@ public class CodeMethod extends AbstractMethod
 				continue;
 			}
 
-			final String otherMangledName = method.getMangledName();
+			final String otherMangledName = method.getInternalName();
 			if (!mangledName.equals(otherMangledName))
 			{
 				continue;
@@ -340,7 +340,7 @@ public class CodeMethod extends AbstractMethod
 			if (!thisMangled)
 			{
 				// ensure this method gets name-mangled
-				this.mangledName = mangledName = createMangledName(this);
+				this.internalName = mangledName = createMangledName(this);
 				thisMangled = true;
 
 				final Marker marker = Markers.semantic(this.position, "method.name_mangled", this.name);
@@ -593,7 +593,7 @@ public class CodeMethod extends AbstractMethod
 		}
 
 		final String ownerClassName = this.enclosingClass.getInternalName();
-		final String mangledName = this.getMangledName();
+		final String mangledName = this.getInternalName();
 		final String descriptor = this.getDescriptor();
 		final String signature = this.needsSignature() ? this.getSignature() : null;
 		final String[] exceptionTypes = this.getInternalExceptions();
@@ -655,7 +655,7 @@ public class CodeMethod extends AbstractMethod
 		for (IMethod overrideMethod : this.overrideMethods)
 		{
 			final String overrideDescriptor = overrideMethod.getDescriptor();
-			final String overrideMangledName = overrideMethod.getMangledName();
+			final String overrideMangledName = overrideMethod.getInternalName();
 			final String overrideEntry = overrideMangledName + overrideDescriptor;
 
 			// Check if a bridge method for the descriptor has not yet been

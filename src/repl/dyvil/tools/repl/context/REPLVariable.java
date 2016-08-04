@@ -26,7 +26,6 @@ public class REPLVariable extends Field
 {
 	private REPLContext context;
 
-	protected String   bytecodeName;
 	private   Class<?> runtimeClass;
 	private   Object   displayValue;
 
@@ -54,7 +53,7 @@ public class REPLVariable extends Field
 		{
 			try
 			{
-				final java.lang.reflect.Method method = this.runtimeClass.getDeclaredMethod(this.getBytecodeName());
+				final java.lang.reflect.Method method = this.runtimeClass.getDeclaredMethod(this.getInternalName());
 				method.setAccessible(true);
 				result = method.invoke(null);
 			}
@@ -77,7 +76,7 @@ public class REPLVariable extends Field
 		{
 			try
 			{
-				final java.lang.reflect.Field field = this.runtimeClass.getDeclaredField(this.getBytecodeName());
+				final java.lang.reflect.Field field = this.runtimeClass.getDeclaredField(this.getInternalName());
 				field.setAccessible(true);
 				result = field.get(null);
 			}
@@ -105,15 +104,6 @@ public class REPLVariable extends Field
 		return tag >= 0 && tag != IValue.NIL && tag < IValue.STRING;
 	}
 
-	public String getBytecodeName()
-	{
-		if (this.bytecodeName != null)
-		{
-			return this.bytecodeName;
-		}
-		return this.bytecodeName = this.name.qualified;
-	}
-
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
@@ -131,7 +121,7 @@ public class REPLVariable extends Field
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		final String name = this.getBytecodeName();
+		final String name = this.getInternalName();
 		final String descriptor = this.getDescriptor();
 
 		if (!Types.isVoid(this.type))
@@ -151,7 +141,7 @@ public class REPLVariable extends Field
 	public void writeStaticInit(MethodWriter writer) throws BytecodeException
 	{
 		final String owner = this.enclosingClass.getInternalName();
-		final String name = this.getBytecodeName();
+		final String name = this.getInternalName();
 		final String descriptor = this.getDescriptor();
 
 		this.value.writeExpression(writer, this.type);
@@ -176,14 +166,14 @@ public class REPLVariable extends Field
 			return;
 		}
 
-		writer.visitFieldInsn(Opcodes.GETSTATIC, this.enclosingClass.getInternalName(), this.getBytecodeName(),
+		writer.visitFieldInsn(Opcodes.GETSTATIC, this.enclosingClass.getInternalName(), this.getInternalName(),
 		                      this.getDescriptor());
 	}
 
 	@Override
 	public void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
-		writer.visitFieldInsn(Opcodes.PUTSTATIC, this.enclosingClass.getInternalName(), this.getBytecodeName(),
+		writer.visitFieldInsn(Opcodes.PUTSTATIC, this.enclosingClass.getInternalName(), this.getInternalName(),
 		                      this.getDescriptor());
 	}
 

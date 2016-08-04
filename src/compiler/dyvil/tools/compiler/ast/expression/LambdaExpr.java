@@ -709,7 +709,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		}
 
 		final String desc = this.getTargetDescriptor();
-		final String invokedName = this.method.getName().qualified;
+		final String invokedName = this.method.getInternalName();
 		final String invokedType = this.getInvokeDescriptor();
 
 		final dyvil.tools.asm.Type methodDescriptorType = dyvil.tools.asm.Type

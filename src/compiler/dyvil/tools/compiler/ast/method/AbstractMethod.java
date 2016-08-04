@@ -73,7 +73,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 	// Metadata
 	protected IClass        enclosingClass;
-	protected String        mangledName;
+	protected String        internalName;
 	protected String        descriptor;
 	protected String        signature;
 	protected IntrinsicData intrinsicData;
@@ -887,24 +887,18 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public Handle toHandle()
 	{
 		return new Handle(ClassFormat.insnToHandle(this.getInvokeOpcode()), this.enclosingClass.getInternalName(),
-		                  this.getMangledName(), this.getDescriptor());
+		                  this.getInternalName(), this.getDescriptor());
 	}
 
 	@Override
-	public String getMangledName()
+	public String getInternalName()
 	{
-		if (this.mangledName != null)
+		if (this.internalName != null)
 		{
-			return this.mangledName;
+			return this.internalName;
 		}
 
-		return this.mangledName = this.name.qualified;
-	}
-
-	@Override
-	public void setMangledName(String mangledName)
-	{
-		this.mangledName = mangledName;
+		return this.internalName = this.name.qualified;
 	}
 
 	@Override
@@ -1088,7 +1082,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		int modifiers = this.modifiers.toFlags();
 
 		final String owner = this.enclosingClass.getInternalName();
-		final String mangledName = this.getMangledName();
+		final String mangledName = this.getInternalName();
 
 		if ((modifiers & Modifiers.EXTENSION) == Modifiers.EXTENSION)
 		{

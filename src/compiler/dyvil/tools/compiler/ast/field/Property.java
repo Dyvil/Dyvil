@@ -263,7 +263,6 @@ public class Property extends Member implements IProperty
 		if (this.setter != null)
 		{
 			this.setter.check(markers, context);
-
 		}
 
 		// No setter and no getter
@@ -338,72 +337,84 @@ public class Property extends Member implements IProperty
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		String extended = this.type.getExtendedName();
-		String signature = this.type.getSignature();
+		final String descriptorBase = this.type.getExtendedName();
+		final String signatureBase = this.type.needsSignature() ? this.type.getSignature() : null;
+		final String nameBase = this.name.qualified;
+
 		if (this.getter != null)
 		{
-			final IValue getterValue = this.getter.getValue();
-			final ModifierSet getterModifiers = this.getter.getModifiers();
-
-			int modifiers = this.modifiers.toFlags();
-
-			if (getterModifiers != null)
-			{
-				modifiers |= getterModifiers.toFlags();
-			}
-
-			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name.qualified,
-			                                                                  "()" + extended, signature == null ?
-				                                                                                   null :
-				                                                                                   "()" + signature,
-			                                                                  null));
-
-			if ((modifiers & Modifiers.STATIC) == 0)
-			{
-				mw.setThisType(this.enclosingClass.getInternalName());
-			}
-
-			this.writeAnnotations(mw, modifiers);
-
-			if (getterValue != null)
-			{
-				mw.visitCode();
-				getterValue.writeExpression(mw, this.type);
-				mw.visitEnd(this.type);
-			}
+			this.writeGetter(writer, descriptorBase, signatureBase, nameBase);
 		}
 		if (this.setter != null)
 		{
-			final IValue setterValue = this.setter.getValue();
-			final ModifierSet setterModifiers = this.setter.getModifiers();
+			this.writeSetter(writer, descriptorBase, signatureBase, nameBase);
+		}
+	}
 
-			int modifiers = this.modifiers.toFlags();
-			if (setterModifiers != null)
-			{
-				modifiers |= setterModifiers.toFlags();
-			}
+	private void writeSetter(ClassWriter writer, String descriptorBase, String signatureBase, String nameBase)
+	{
+		final IValue setterValue = this.setter.getValue();
+		final ModifierSet setterModifiers = this.setter.getModifiers();
 
-			MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name.qualified + "_$eq",
-			                                                                  "(" + extended + ")V", signature == null ?
-				                                                                                         null :
-				                                                                                         "(" + signature
-					                                                                                         + ")V",
-			                                                                  null));
+		int modifiers = this.modifiers.toFlags();
+		if (setterModifiers != null)
+		{
+			modifiers |= setterModifiers.toFlags();
+		}
 
-			if ((modifiers & Modifiers.STATIC) == 0)
-			{
-				mw.setThisType(this.enclosingClass.getInternalName());
-			}
+		final String name = nameBase + "_$eq";
+		final String descriptor = "(" + descriptorBase + ")V";
+		final String signature = signatureBase == null ? null : "(" + signatureBase + ")V";
 
-			this.writeAnnotations(mw, modifiers);
-			this.setter.getParameterList().get(0).writeInit(mw);
+		final MethodWriter mw = new MethodWriterImpl(writer,
+		                                             writer.visitMethod(modifiers, name, descriptor, signature, null));
 
-			if (setterValue != null)
-			{
-				mw.visitCode();
-				setterValue.writeExpression(mw, Types.VOID);
-				mw.visitEnd(Types.VOID);
-			}
+		if ((modifiers & Modifiers.STATIC) == 0)
+		{
+			mw.setThisType(this.enclosingClass.getInternalName());
+		}
+
+		this.writeAnnotations(mw, modifiers);
+		this.setter.getParameterList().get(0).writeInit(mw);
+
+		if (setterValue != null)
+		{
+			mw.visitCode();
+			setterValue.writeExpression(mw, Types.VOID);
+			mw.visitEnd(Types.VOID);
+		}
+	}
+
+	private void writeGetter(ClassWriter writer, String descriptorBase, String signatureBase, String nameBase)
+	{
+		final IValue getterValue = this.getter.getValue();
+		final ModifierSet getterModifiers = this.getter.getModifiers();
+
+		int modifiers = this.modifiers.toFlags();
+
+		if (getterModifiers != null)
+		{
+			modifiers |= getterModifiers.toFlags();
+		}
+
+		final String descriptor = "()" + descriptorBase;
+		final String signature = signatureBase == null ? null : "()" + signatureBase;
+
+		final MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, nameBase, descriptor,
+		                                                                        signature, null));
+
+		if ((modifiers & Modifiers.STATIC) == 0)
+		{
+			mw.setThisType(this.enclosingClass.getInternalName());
+		}
+
+		this.writeAnnotations(mw, modifiers);
+
+		if (getterValue != null)
+		{
+			mw.visitCode();
+			getterValue.writeExpression(mw, this.type);
+			mw.visitEnd(this.type);
 		}
 	}
 
