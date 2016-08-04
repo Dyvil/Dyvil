@@ -360,56 +360,18 @@ public class CodeMethod extends AbstractMethod
 
 	private static String createMangledName(IMethod method)
 	{
-		final String qualifiedName = method.getName().qualified;
-		final String signature = method.getSignature();
+		// append the qualified name plus the name separator
+		final StringBuilder builder = new StringBuilder(method.getName().qualified).append(NAME_SEPARATOR);
 
-		final StringBuilder builder = new StringBuilder(qualifiedName.length() + NAME_SEPARATOR.length() + signature
-			                                                                                                   .length());
-		builder.append(qualifiedName).append(NAME_SEPARATOR);
-
-		for (int i = 0, length = signature.length(); i < length; i++)
+		final IParameterList params = method.getParameterList();
+		for (int i = 0, count = params.size(); i < count; i++)
 		{
-			// Replace special chars with dollar signs
-			final char c = signature.charAt(i);
-			switch (c)
-			{
-			case '(':
-			case ')':
-				// strip opening and closing paren
-				continue;
-			case '<':
-				if (i == 0)
-				{
-					// strip opening angle bracket if at first position
-					continue;
-				}
-				builder.append("$_");
-				continue;
-			case '>':
-				if (signature.charAt(i + 1) == ';')
-				{
-					// the next token is a semicolon, so '_$' will be appended
-					builder.append('_');
-					continue;
-				}
-				// double separator between type and value parameter lists
-				builder.append("__");
-				continue;
-			case '+':
-			case ';':
-			case ':':
-			case '-':
-			case '*':
-				builder.append('$');
-				continue;
-			case '/':
-				builder.append('_');
-				continue;
-			default:
-				builder.append(c);
-			}
+			// append all param names followed by an underscore
+			builder.append(params.get(i).getInternalName()).append('_');
 		}
-		return builder.toString();
+
+		// strip the trailing _
+		return builder.deleteCharAt(builder.length() - 1).toString();
 	}
 
 	@Override
