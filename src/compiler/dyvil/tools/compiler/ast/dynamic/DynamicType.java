@@ -19,6 +19,12 @@ public final class DynamicType extends UnknownType
 	}
 
 	@Override
+	public boolean isResolved()
+	{
+		return true;
+	}
+
+	@Override
 	public Name getName()
 	{
 		return Names.dynamic;
