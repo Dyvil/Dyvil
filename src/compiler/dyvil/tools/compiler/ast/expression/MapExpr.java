@@ -329,6 +329,8 @@ public class MapExpr implements IValue
 			writer.visitInsn(Opcodes.AASTORE);
 		}
 
+		writer.visitVarInsn(Opcodes.ALOAD, varIndex);
+		writer.visitVarInsn(Opcodes.ALOAD, varIndex + 1);
 		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/collection/ImmutableMap", "apply",
 		                       "([Ljava/lang/Object;[Ljava/lang/Object;)Ldyvil/collection/ImmutableMap;", true);
 
