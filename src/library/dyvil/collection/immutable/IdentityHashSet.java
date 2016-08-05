@@ -3,12 +3,12 @@ package dyvil.collection.immutable;
 import dyvil.annotation.Immutable;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractIdentityHashSet;
-import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.LiteralConvertible;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@ArrayConvertible
+@LiteralConvertible.FromArray
 @Immutable
 public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements ImmutableSet<E>
 {

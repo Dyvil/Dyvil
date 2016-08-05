@@ -1,16 +1,15 @@
 package dyvil.collection;
 
 import dyvil.annotation._internal.DyvilModifiers;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.reflect.Modifiers;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@NilConvertible(methodName = "empty")
-@ArrayConvertible
+@LiteralConvertible.FromNil(methodName = "empty")
+@LiteralConvertible.FromArray
 public interface Set<E> extends Collection<E>
 {
 	static <E> ImmutableSet<E> empty()

@@ -1,10 +1,10 @@
 package dyvil.collection.mutable;
 
-import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.LiteralConvertible;
 
 import java.util.Comparator;
 
-@ArrayConvertible
+@LiteralConvertible.FromArray
 public class TreeSet<E> extends MapBasedSet<E>
 {
 	private static final long serialVersionUID = 3616255313908232391L;

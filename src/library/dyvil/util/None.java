@@ -2,7 +2,7 @@ package dyvil.util;
 
 import dyvil.annotation.Immutable;
 import dyvil.annotation._internal.DyvilModifiers;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.reflect.Modifiers;
 
 import java.util.NoSuchElementException;
@@ -11,7 +11,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-@NilConvertible
+@LiteralConvertible.FromNil
 @DyvilModifiers(Modifiers.OBJECT_CLASS)
 @Immutable
 public final class None implements Option

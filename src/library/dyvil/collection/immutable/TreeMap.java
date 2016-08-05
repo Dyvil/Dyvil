@@ -3,9 +3,7 @@ package dyvil.collection.immutable;
 import dyvil.annotation.Immutable;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractTreeMap;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.ColonConvertible;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,9 +11,9 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-@NilConvertible
-@ArrayConvertible
-@ColonConvertible(methodName = "singleton")
+@LiteralConvertible.FromNil
+@LiteralConvertible.FromArray
+@LiteralConvertible.FromColonOperator(methodName = "singleton")
 @Immutable
 public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap<K, V>
 {

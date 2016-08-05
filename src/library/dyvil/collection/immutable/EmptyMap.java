@@ -5,7 +5,7 @@ import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.array.ObjectArray;
 import dyvil.collection.*;
 import dyvil.collection.iterator.EmptyIterator;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.reflect.Modifiers;
 import dyvil.util.None;
 import dyvil.util.Option;
@@ -17,7 +17,7 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
-@NilConvertible
+@LiteralConvertible.FromNil
 @DyvilModifiers(Modifiers.OBJECT_CLASS)
 @Immutable
 public final class EmptyMap<K, V> implements ImmutableMap<K, V>

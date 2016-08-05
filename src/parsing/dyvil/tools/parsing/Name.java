@@ -2,14 +2,14 @@ package dyvil.tools.parsing;
 
 import dyvil.collection.Map;
 import dyvil.collection.mutable.HashMap;
-import dyvil.lang.literal.StringConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.tools.parsing.name.Qualifier;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-@StringConvertible
+@LiteralConvertible.FromString
 public final class Name
 {
 	/**

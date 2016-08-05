@@ -2,8 +2,7 @@ package dyvil.collection.mutable;
 
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractArrayList;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -11,8 +10,8 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@NilConvertible
-@ArrayConvertible
+@LiteralConvertible.FromNil
+@LiteralConvertible.FromArray
 public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 {
 	private static final long serialVersionUID = 5286872411535856904L;

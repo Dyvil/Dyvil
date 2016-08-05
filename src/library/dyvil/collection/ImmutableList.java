@@ -7,8 +7,7 @@ import dyvil.collection.immutable.AppendList;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.collection.immutable.EmptyList;
 import dyvil.collection.immutable.SingletonList;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.ref.ObjectRef;
 import dyvil.util.ImmutableException;
 
@@ -20,8 +19,8 @@ import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
 
-@NilConvertible
-@ArrayConvertible
+@LiteralConvertible.FromNil
+@LiteralConvertible.FromArray
 @Immutable
 public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollection<E>
 {

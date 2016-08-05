@@ -5,10 +5,7 @@ import dyvil.collection.Entry;
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractEnumMap;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.ClassConvertible;
-import dyvil.lang.literal.ColonConvertible;
-import dyvil.lang.literal.TypeConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.reflect.Modifiers;
 import dyvilx.lang.model.type.Type;
 
@@ -17,10 +14,10 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-@ClassConvertible
-@TypeConvertible
-@ColonConvertible(methodName = "singleton")
-@ArrayConvertible
+@LiteralConvertible.FromClass
+@LiteralConvertible.FromType
+@LiteralConvertible.FromColonOperator(methodName = "singleton")
+@LiteralConvertible.FromArray
 public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> implements MutableMap<K, V>
 {
 	private static final long serialVersionUID = 1734016065128722262L;
