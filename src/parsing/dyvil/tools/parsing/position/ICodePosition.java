@@ -6,19 +6,26 @@ public interface ICodePosition
 
 	static ICodePosition between(ICodePosition start, ICodePosition end)
 	{
-		return new CodePosition(start.endLine(), end.startLine(), start.endIndex(), end.startIndex());
+		int startIndex = start.endIndex();
+		int endIndex = end.startIndex();
+		if (startIndex == endIndex)
+		{
+			startIndex--;
+			endIndex++;
+		}
+		return new CodePosition(start.endLine(), end.startLine(), startIndex, endIndex);
 	}
-	
+
 	int startIndex();
-	
+
 	int endIndex();
-	
+
 	int startLine();
-	
+
 	int endLine();
-	
+
 	ICodePosition raw();
-	
+
 	ICodePosition to(ICodePosition end);
 
 	default boolean before(ICodePosition position)
