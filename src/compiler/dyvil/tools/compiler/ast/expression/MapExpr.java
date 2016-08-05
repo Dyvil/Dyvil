@@ -88,7 +88,26 @@ public class MapExpr implements IValue
 	@Override
 	public boolean isResolved()
 	{
-		return this.type != null && this.type.isResolved();
+		if (this.type != null)
+		{
+			return this.type.isResolved();
+		}
+		if (this.keyType != null && this.valueType != null)
+		{
+			return this.keyType.isResolved() && this.valueType.isResolved();
+		}
+		for (int i = 0; i < this.count; i++)
+		{
+			if (!this.keys[i].isResolved())
+			{
+				return false;
+			}
+			if (!this.values[i].isResolved())
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override
