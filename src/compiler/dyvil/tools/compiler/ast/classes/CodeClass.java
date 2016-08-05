@@ -520,26 +520,20 @@ public class CodeClass extends AbstractClass
 		if (this.enclosingClass != null)
 		{
 			writer.visitOuterClass(this.enclosingClass.getInternalName(), null, null);
+			this.writeInnerClassInfo(writer);
 		}
 
 		// Annotations
 
 		this.writeAnnotations(writer, modifiers);
 
-		// Inner Class Info
-
-		if (this.enclosingClass != null)
-		{
-			this.writeInnerClassInfo(writer);
-		}
-
-		// Super Types
-
 		if ((modifiers & Modifiers.ANNOTATION) == Modifiers.ANNOTATION)
 		{
 			this.metadata.write(writer);
 			return;
 		}
+
+		// Super Types
 
 		if (this.superType != null)
 		{
@@ -574,6 +568,10 @@ public class CodeClass extends AbstractClass
 
 		// Class Body
 
+		for (int i = 0; i < this.compilableCount; i++)
+		{
+			this.compilables[i].write(writer);
+		}
 		this.metadata.write(writer);
 
 		this.writeClassParameters(writer);
@@ -610,11 +608,6 @@ public class CodeClass extends AbstractClass
 			{
 				this.body.getMethod(i).write(writer);
 			}
-		}
-
-		for (int i = 0; i < this.compilableCount; i++)
-		{
-			this.compilables[i].write(writer);
 		}
 
 		// Create the static <clinit> method
@@ -730,54 +723,58 @@ public class CodeClass extends AbstractClass
 			// Invoke the virtual <traitinit> method of this class
 		}
 
-		this.metadata.writeClassInit(writer);
-
-		if (this.body != null)
-		{
-			for (int i = 0, count = this.body.fieldCount(); i < count; i++)
-			{
-				this.body.getField(i).writeClassInit(writer);
-			}
-			for (int i = 0, count = this.body.propertyCount(); i < count; i++)
-			{
-				this.body.getProperty(i).writeClassInit(writer);
-			}
-			for (int i = 0, count = this.body.initializerCount(); i < count; i++)
-			{
-				this.body.getInitializer(i).writeClassInit(writer);
-			}
-		}
-
 		for (int i = 0; i < this.compilableCount; i++)
 		{
 			this.compilables[i].writeClassInit(writer);
+		}
+
+		this.metadata.writeClassInit(writer);
+
+		if (this.body == null)
+		{
+			return;
+		}
+
+		for (int i = 0, count = this.body.fieldCount(); i < count; i++)
+		{
+			this.body.getField(i).writeClassInit(writer);
+		}
+		for (int i = 0, count = this.body.propertyCount(); i < count; i++)
+		{
+			this.body.getProperty(i).writeClassInit(writer);
+		}
+		for (int i = 0, count = this.body.initializerCount(); i < count; i++)
+		{
+			this.body.getInitializer(i).writeClassInit(writer);
 		}
 	}
 
 	@Override
 	public void writeStaticInit(MethodWriter writer) throws BytecodeException
 	{
-		this.metadata.writeStaticInit(writer);
-
-		if (this.body != null)
-		{
-			for (int i = 0, count = this.body.fieldCount(); i < count; i++)
-			{
-				this.body.getField(i).writeStaticInit(writer);
-			}
-			for (int i = 0, count = this.body.propertyCount(); i < count; i++)
-			{
-				this.body.getProperty(i).writeStaticInit(writer);
-			}
-			for (int i = 0, count = this.body.initializerCount(); i < count; i++)
-			{
-				this.body.getInitializer(i).writeStaticInit(writer);
-			}
-		}
-
 		for (int i = 0; i < this.compilableCount; i++)
 		{
 			this.compilables[i].writeStaticInit(writer);
+		}
+
+		this.metadata.writeStaticInit(writer);
+
+		if (this.body == null)
+		{
+			return;
+		}
+
+		for (int i = 0, count = this.body.fieldCount(); i < count; i++)
+		{
+			this.body.getField(i).writeStaticInit(writer);
+		}
+		for (int i = 0, count = this.body.propertyCount(); i < count; i++)
+		{
+			this.body.getProperty(i).writeStaticInit(writer);
+		}
+		for (int i = 0, count = this.body.initializerCount(); i < count; i++)
+		{
+			this.body.getInitializer(i).writeStaticInit(writer);
 		}
 	}
 
@@ -815,27 +812,6 @@ public class CodeClass extends AbstractClass
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
 			this.interfaces[i].writeAnnotations(writer, TypeReference.newSuperTypeReference(i), "");
-		}
-	}
-
-	@Override
-	public void writeInnerClassInfo(ClassWriter writer)
-	{
-		if (this.enclosingClass != null)
-		{
-			int modifiers = this.modifiers.toFlags() & 0x761F;
-			if ((modifiers & Modifiers.INTERFACE_CLASS) != Modifiers.INTERFACE_CLASS)
-			{
-				modifiers |= Modifiers.STATIC;
-			}
-			else
-			{
-				modifiers &= ~Modifiers.STATIC;
-			}
-			final String outerName = this.enclosingClass.getInternalName();
-			writer.visitInnerClass(this.getInternalName(), outerName, this.name.qualified, modifiers);
-
-			writer.visitOuterClass(outerName, null, null);
 		}
 	}
 

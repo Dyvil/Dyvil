@@ -23,6 +23,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
+import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Deprecation;
@@ -919,6 +920,27 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		}
 		// Strip the package/ part
 		return internalName.substring(slashIndex + 1);
+	}
+
+	@Override
+	public void writeInnerClassInfo(ClassWriter writer)
+	{
+		if (this.enclosingClass != null)
+		{
+			int modifiers = this.modifiers.toFlags() & 0x761F;
+			if ((modifiers & Modifiers.INTERFACE_CLASS) != Modifiers.INTERFACE_CLASS)
+			{
+				modifiers |= Modifiers.STATIC;
+			}
+			else
+			{
+				modifiers &= ~Modifiers.STATIC;
+			}
+			final String outerName = this.enclosingClass.getInternalName();
+			writer.visitInnerClass(this.getInternalName(), outerName, this.name.qualified, modifiers);
+
+			writer.visitOuterClass(outerName, null, null);
+		}
 	}
 
 	@Override
