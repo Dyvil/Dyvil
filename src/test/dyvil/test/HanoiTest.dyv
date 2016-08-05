@@ -15,7 +15,7 @@ public class HanoiTest
 
 	public static int requiredMoves(int n) = (1 << n) - 1
 
-	@dyvil.lang.literal.StringConvertible
+	@LiteralConvertible.FromString
 	class Tower(public final String id) extends dyvil.collection.mutable.LinkedList<int>
 	{
 		public static Tower apply(String id) = new Tower(id)
