@@ -775,11 +775,6 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public void writeInnerClassInfo(ClassWriter writer)
-	{
-	}
-
-	@Override
 	public void writeSignature(DataOutput out) throws IOException
 	{
 	}
