@@ -629,8 +629,9 @@ public final class TypeParameter implements ITypeParameter
 			buffer.append("Ljava/lang/Object;");
 			return;
 		}
-
-		if (this.upperBounds[0].getTheClass().isInterface())
+		
+		final IClass theClass = this.upperBounds[0].getTheClass();
+		if (theClass != null && theClass.isInterface())
 		{
 			// If the first type is not an interface type, we append two colons
 			buffer.append(':');
