@@ -1,12 +1,10 @@
 package dyvilx.lang.model.type;
 
-import dyvil.lang.literal.ClassConvertible;
-import dyvil.lang.literal.NilConvertible;
-import dyvil.lang.literal.StringConvertible;
+import dyvil.lang.LiteralConvertible;
 
-@NilConvertible
-@StringConvertible
-@ClassConvertible
+@LiteralConvertible.FromNil
+@LiteralConvertible.FromString
+@LiteralConvertible.FromClass
 public interface Type<T>
 {
 	static <T> Type<T> apply()

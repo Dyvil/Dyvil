@@ -1,9 +1,9 @@
 package dyvil.ref.simple;
 
-import dyvil.lang.literal.IntConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.ref.ByteRef;
 
-@IntConvertible
+@LiteralConvertible.FromInt
 public class SimpleByteRef implements ByteRef
 {
 	public byte value;

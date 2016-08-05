@@ -85,7 +85,7 @@ public class FloatValue implements IConstantValue
 			return this;
 		}
 
-		final IAnnotation annotation = type.getAnnotation(Types.FLOAT_CONVERTIBLE_CLASS);
+		final IAnnotation annotation = type.getAnnotation(Types.FROMFLOAT_CLASS);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
@@ -96,7 +96,7 @@ public class FloatValue implements IConstantValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return Types.isSuperType(type, Types.FLOAT) || type.getAnnotation(Types.FLOAT_CONVERTIBLE_CLASS) != null;
+		return Types.isSuperType(type, Types.FLOAT) || type.getAnnotation(Types.FROMFLOAT_CLASS) != null;
 	}
 
 	@Override
@@ -107,7 +107,7 @@ public class FloatValue implements IConstantValue
 		{
 			return i;
 		}
-		if (type.getAnnotation(Types.FLOAT_CONVERTIBLE_CLASS) != null)
+		if (type.getAnnotation(Types.FROMFLOAT_CLASS) != null)
 		{
 			return CONVERSION_MATCH;
 		}

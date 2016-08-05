@@ -2,9 +2,9 @@ package dyvilx.lang.model.type;
 
 import dyvil.annotation._internal.ClassParameters;
 import dyvil.array.ObjectArray;
-import dyvil.lang.literal.TypeConvertible;
+import dyvil.lang.LiteralConvertible;
 
-@TypeConvertible
+@LiteralConvertible.FromType
 @ClassParameters(names = { "componentType" })
 public class ArrayType<T> implements Type<T[]>
 {

@@ -2,14 +2,14 @@ package dyvil.collection;
 
 import dyvil.annotation._internal.Covariant;
 import dyvil.collection.immutable.ArrayMatrix;
-import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.tuple.Tuple2;
 import dyvil.util.ImmutableException;
 
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-@ArrayConvertible
+@LiteralConvertible.FromArray
 public interface ImmutableMatrix<@Covariant E> extends Matrix<E>
 {
 	static <E> ImmutableMatrix<E> apply(E[]... elements)

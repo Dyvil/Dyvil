@@ -1,7 +1,5 @@
 package dyvil.runtime;
 
-import dyvil.lang.Void;
-
 public enum Wrapper
 {
 	BOOLEAN('Z', boolean.class, Boolean.class, 1),

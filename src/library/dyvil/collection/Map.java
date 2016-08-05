@@ -2,10 +2,7 @@ package dyvil.collection;
 
 import dyvil.collection.impl.MapKeys;
 import dyvil.collection.impl.MapValues;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.ColonConvertible;
-import dyvil.lang.literal.MapConvertible;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.ref.ObjectRef;
 import dyvil.util.None;
 import dyvil.util.Option;
@@ -18,10 +15,10 @@ import java.util.function.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-@NilConvertible(methodName = "empty")
-@ColonConvertible(methodName = "singleton")
-@ArrayConvertible
-@MapConvertible
+@LiteralConvertible.FromNil(methodName = "empty")
+@LiteralConvertible.FromColonOperator(methodName = "singleton")
+@LiteralConvertible.FromArray
+@LiteralConvertible.FromMap
 public interface Map<K, V> extends SizedIterable<Entry<K, V>>, Serializable
 {
 	static <K, V> ImmutableMap<K, V> empty()

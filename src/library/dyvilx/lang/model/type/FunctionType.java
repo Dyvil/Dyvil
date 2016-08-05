@@ -1,9 +1,9 @@
 package dyvilx.lang.model.type;
 
 import dyvil.annotation._internal.ClassParameters;
-import dyvil.lang.literal.TupleConvertible;
+import dyvil.lang.LiteralConvertible;
 
-@TupleConvertible
+@LiteralConvertible.FromTuple
 @ClassParameters(names = { "returnType", "parameterTypes" })
 public class FunctionType<F> implements Type<F>
 {

@@ -2,18 +2,16 @@ package dyvil.collection.mutable;
 
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractTupleMap;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.ColonConvertible;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.tuple.Tuple2;
 
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-@NilConvertible
-@ColonConvertible(methodName = "singleton")
-@ArrayConvertible
+@LiteralConvertible.FromNil
+@LiteralConvertible.FromColonOperator(methodName = "singleton")
+@LiteralConvertible.FromArray
 public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements MutableMap<K, V>
 {
 	private static final long serialVersionUID = 5771226814337471265L;

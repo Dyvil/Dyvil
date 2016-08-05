@@ -1,9 +1,9 @@
 package dyvil.ref.simple;
 
-import dyvil.lang.literal.BooleanConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.ref.BooleanRef;
 
-@BooleanConvertible
+@LiteralConvertible.FromBoolean
 public class SimpleBooleanRef implements BooleanRef
 {
 	public boolean value;

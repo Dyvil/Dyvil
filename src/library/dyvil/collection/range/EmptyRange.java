@@ -4,13 +4,13 @@ import dyvil.annotation.Immutable;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.collection.Range;
 import dyvil.collection.iterator.EmptyIterator;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.reflect.Modifiers;
 
 import java.util.Iterator;
 import java.util.function.Consumer;
 
-@NilConvertible
+@LiteralConvertible.FromNil
 @DyvilModifiers(Modifiers.OBJECT_CLASS)
 @Immutable
 public final class EmptyRange<T> implements Range<T>

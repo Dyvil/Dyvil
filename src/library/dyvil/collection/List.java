@@ -2,8 +2,7 @@ package dyvil.collection;
 
 import dyvil.collection.immutable.EmptyList;
 import dyvil.collection.mutable.ArrayList;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.ref.ObjectRef;
 
 import java.util.Comparator;
@@ -26,7 +25,7 @@ import java.util.function.Predicate;
  * mutable} and {@linkplain ImmutableList immutable} data. For the latter, the <i>Dyvil Collection Framework</i>
  * provides various memory-efficient implementations specialized for lists with zero, one or multiple elements.
  * <p>
- * Since this interface is both {@link NilConvertible} and {@link ArrayConvertible}, it is possible to initialize both
+ * Since this interface is both {@link LiteralConvertible.FromNil} and {@link LiteralConvertible.FromArray}, it is possible to initialize both
  * mutable and immutable lists with simple expressions, as shown in the below example.
  * <p>
  * <pre>
@@ -39,8 +38,8 @@ import java.util.function.Predicate;
  *
  * @author Clashsoft
  */
-@NilConvertible(methodName = "empty")
-@ArrayConvertible
+@LiteralConvertible.FromNil(methodName = "empty")
+@LiteralConvertible.FromArray
 public interface List<E> extends Collection<E>, BidiQueryable<E>
 {
 	/**

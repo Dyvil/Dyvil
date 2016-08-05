@@ -1,14 +1,13 @@
 package dyvil.collection;
 
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 
 import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@NilConvertible
-@ArrayConvertible
+@LiteralConvertible.FromNil
+@LiteralConvertible.FromArray
 public interface MutableCollection<E> extends Collection<E>
 {
 	static <E> MutableCollection<E> apply()

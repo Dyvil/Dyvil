@@ -1,11 +1,10 @@
 package dyvilx.lang.model.type;
 
 import dyvil.annotation._internal.ClassParameters;
-import dyvil.lang.literal.ClassConvertible;
-import dyvil.lang.literal.StringConvertible;
+import dyvil.lang.LiteralConvertible;
 
-@StringConvertible
-@ClassConvertible
+@LiteralConvertible.FromString
+@LiteralConvertible.FromClass
 @ClassParameters(names = { "theClass" })
 public class NamedType<T> implements Type<T>
 {

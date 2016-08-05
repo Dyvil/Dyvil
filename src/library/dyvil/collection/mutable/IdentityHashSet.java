@@ -6,16 +6,15 @@ import dyvil.collection.Set;
 import dyvil.collection.SizedIterable;
 import dyvil.collection.impl.AbstractHashMap;
 import dyvil.collection.impl.AbstractIdentityHashSet;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static dyvil.collection.impl.AbstractIdentityHashMap.*;
 
-@NilConvertible
-@ArrayConvertible
+@LiteralConvertible.FromNil
+@LiteralConvertible.FromArray
 public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements MutableSet<E>
 {
 	private static final long serialVersionUID = 5634688694810236366L;

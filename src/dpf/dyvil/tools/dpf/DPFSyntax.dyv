@@ -7,7 +7,7 @@ import dyvil.tools.dpf.ast.value._
 
 public class DPFSyntax
 {
-	@dyvil.lang.literal.ColonConvertible
+	@LiteralConvertible.FromColonOperator
 	public static class PropertyPair(public Name name, public Value value)
 	{
 		public static PropertyPair apply(Name name, any value)

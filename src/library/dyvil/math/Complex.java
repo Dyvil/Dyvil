@@ -1,11 +1,11 @@
 package dyvil.math;
 
-import dyvil.lang.literal.TupleConvertible;
+import dyvil.lang.LiteralConvertible;
 
 import java.io.IOException;
 import java.io.Serializable;
 
-@TupleConvertible
+@LiteralConvertible.FromTuple
 public class Complex implements Serializable
 {
 	private static final long serialVersionUID = 9178132461719363395L;

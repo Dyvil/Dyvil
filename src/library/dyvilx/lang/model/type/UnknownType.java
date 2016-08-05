@@ -1,10 +1,10 @@
 package dyvilx.lang.model.type;
 
 import dyvil.annotation._internal.DyvilModifiers;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.reflect.Modifiers;
 
-@NilConvertible
+@LiteralConvertible.FromNil
 @DyvilModifiers(Modifiers.OBJECT_CLASS)
 public class UnknownType<T> implements Type<T>
 {

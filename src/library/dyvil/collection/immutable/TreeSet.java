@@ -2,11 +2,11 @@ package dyvil.collection.immutable;
 
 import dyvil.annotation.Immutable;
 import dyvil.collection.ImmutableSet;
-import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.LiteralConvertible;
 
 import java.util.Comparator;
 
-@ArrayConvertible
+@LiteralConvertible.FromArray
 @Immutable
 public class TreeSet<E> extends MapBasedSet<E>
 {

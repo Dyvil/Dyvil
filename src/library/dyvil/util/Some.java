@@ -2,7 +2,7 @@ package dyvil.util;
 
 import dyvil.annotation.Immutable;
 import dyvil.annotation._internal.ClassParameters;
-import dyvil.lang.literal.TupleConvertible;
+import dyvil.lang.LiteralConvertible;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -10,7 +10,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-@TupleConvertible
+@LiteralConvertible.FromTuple
 @ClassParameters(names = { "value" })
 @Immutable
 public final class Some<T> implements Option<T>

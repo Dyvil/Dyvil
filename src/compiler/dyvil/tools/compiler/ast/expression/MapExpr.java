@@ -88,7 +88,26 @@ public class MapExpr implements IValue
 	@Override
 	public boolean isResolved()
 	{
-		return this.type != null && this.type.isResolved();
+		if (this.type != null)
+		{
+			return this.type.isResolved();
+		}
+		if (this.keyType != null && this.valueType != null)
+		{
+			return this.keyType.isResolved() && this.valueType.isResolved();
+		}
+		for (int i = 0; i < this.count; i++)
+		{
+			if (!this.keys[i].isResolved())
+			{
+				return false;
+			}
+			if (!this.values[i].isResolved())
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override
@@ -286,31 +305,32 @@ public class MapExpr implements IValue
 			return;
 		}
 
-		IType keyObject = this.keyType.getObjectType();
-		IType valueObject = this.valueType.getObjectType();
+		final IType keyObject = this.keyType.getObjectType();
+		final IType valueObject = this.valueType.getObjectType();
+		final int varIndex = writer.localCount();
 
 		writer.visitLdcInsn(this.count);
 		writer.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object");
+		writer.visitVarInsn(Opcodes.ASTORE, varIndex);
+		writer.visitLdcInsn(this.count);
+		writer.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object");
+		writer.visitVarInsn(Opcodes.ASTORE, varIndex + 1);
 
 		for (int i = 0; i < this.count; i++)
 		{
-			writer.visitInsn(Opcodes.DUP);
+			writer.visitVarInsn(Opcodes.ALOAD, varIndex);
 			writer.visitLdcInsn(i);
 			this.keys[i].writeExpression(writer, keyObject);
 			writer.visitInsn(Opcodes.AASTORE);
-		}
 
-		writer.visitLdcInsn(this.count);
-		writer.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object");
-
-		for (int i = 0; i < this.count; i++)
-		{
-			writer.visitInsn(Opcodes.DUP);
+			writer.visitVarInsn(Opcodes.ALOAD, varIndex + 1);
 			writer.visitLdcInsn(i);
 			this.values[i].writeExpression(writer, valueObject);
 			writer.visitInsn(Opcodes.AASTORE);
 		}
 
+		writer.visitVarInsn(Opcodes.ALOAD, varIndex);
+		writer.visitVarInsn(Opcodes.ALOAD, varIndex + 1);
 		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/collection/ImmutableMap", "apply",
 		                       "([Ljava/lang/Object;[Ljava/lang/Object;)Ldyvil/collection/ImmutableMap;", true);
 

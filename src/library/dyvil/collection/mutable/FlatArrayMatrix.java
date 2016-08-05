@@ -5,13 +5,13 @@ import dyvil.collection.List;
 import dyvil.collection.MutableList;
 import dyvil.collection.MutableMatrix;
 import dyvil.collection.impl.AbstractFlatArrayMatrix;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 
 import java.util.BitSet;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-@NilConvertible
+@LiteralConvertible.FromNil
 public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements MutableMatrix<E>
 {
 	private static final long serialVersionUID = -2034131178592900520L;

@@ -8,7 +8,7 @@ import dyvil.collection.ImmutableList;
 import dyvil.collection.List;
 import dyvil.collection.MutableList;
 import dyvil.collection.iterator.EmptyIterator;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.reflect.Modifiers;
 
 import java.util.*;
@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@NilConvertible
+@LiteralConvertible.FromNil
 @DyvilModifiers(Modifiers.OBJECT_CLASS)
 @Immutable
 public final class EmptyList<E> implements ImmutableList<E>

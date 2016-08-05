@@ -6,10 +6,7 @@ import dyvil.collection.immutable.ArrayMap;
 import dyvil.collection.immutable.EmptyMap;
 import dyvil.collection.immutable.SingletonMap;
 import dyvil.collection.immutable.TupleMap;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.ColonConvertible;
-import dyvil.lang.literal.MapConvertible;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.util.ImmutableException;
 import dyvil.util.Option;
 
@@ -21,10 +18,10 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@NilConvertible
-@ArrayConvertible
-@ColonConvertible(methodName = "singleton")
-@MapConvertible
+@LiteralConvertible.FromNil
+@LiteralConvertible.FromArray
+@LiteralConvertible.FromColonOperator(methodName = "singleton")
+@LiteralConvertible.FromMap
 public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 {
 	interface Builder<K, V>

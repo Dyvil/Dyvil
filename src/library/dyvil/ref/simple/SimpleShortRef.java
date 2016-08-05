@@ -1,9 +1,9 @@
 package dyvil.ref.simple;
 
-import dyvil.lang.literal.IntConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.ref.ShortRef;
 
-@IntConvertible
+@LiteralConvertible.FromInt
 public class SimpleShortRef implements ShortRef
 {
 	public short value;

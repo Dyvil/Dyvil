@@ -1,7 +1,6 @@
 package dyvil.collection;
 
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.tuple.Tuple2;
 
 import java.io.Serializable;
@@ -15,8 +14,8 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-@NilConvertible
-@ArrayConvertible
+@LiteralConvertible.FromNil
+@LiteralConvertible.FromArray
 public interface Matrix<E> extends Iterable<E>, Serializable
 {
 	static <E> MutableMatrix<E> apply()

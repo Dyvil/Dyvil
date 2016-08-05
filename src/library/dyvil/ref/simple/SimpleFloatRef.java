@@ -1,9 +1,9 @@
 package dyvil.ref.simple;
 
-import dyvil.lang.literal.FloatConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.ref.FloatRef;
 
-@FloatConvertible
+@LiteralConvertible.FromFloat
 public class SimpleFloatRef implements FloatRef
 {
 	public float value;

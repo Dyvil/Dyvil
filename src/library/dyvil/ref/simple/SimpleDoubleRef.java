@@ -1,9 +1,9 @@
 package dyvil.ref.simple;
 
-import dyvil.lang.literal.DoubleConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.ref.DoubleRef;
 
-@DoubleConvertible
+@LiteralConvertible.FromDouble
 public class SimpleDoubleRef implements DoubleRef
 {
 	public double value;

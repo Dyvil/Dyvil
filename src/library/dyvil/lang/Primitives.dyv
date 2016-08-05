@@ -9,8 +9,9 @@ public final class Primitives
 	
 	// Wrapper and Unwrapper Methods
 
-	@Intrinsic(value: [ INVOKESTATIC, 0, 1, 2 ], strings : [ "dyvil/lang/Void", "apply", "()Ldyvil/lang/Void;" ])
-	public static Void Void() = Void()
+	// @Intrinsic(value: [ INVOKESTATIC, 0, 1, 2 ], strings : [ "dyvil/lang/Void", "apply", "()Ldyvil/lang/Void;" ])
+	@Intrinsic([ ACONST_NULL ])
+	public static Void Void() = null
 
 	@Intrinsic([ /* NOOP */ ])
 	public static void toVoid(Void value) = ()

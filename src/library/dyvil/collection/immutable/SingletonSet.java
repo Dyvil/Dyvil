@@ -3,7 +3,7 @@ package dyvil.collection.immutable;
 import dyvil.annotation.Immutable;
 import dyvil.collection.*;
 import dyvil.collection.iterator.SingletonIterator;
-import dyvil.lang.literal.TupleConvertible;
+import dyvil.lang.LiteralConvertible;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@TupleConvertible
+@LiteralConvertible.FromTuple
 @Immutable
 public class SingletonSet<E> implements ImmutableSet<E>
 {

@@ -2,18 +2,16 @@ package dyvil.collection.mutable;
 
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractHashMap;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.ColonConvertible;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.ref.ObjectRef;
 
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-@NilConvertible
-@ColonConvertible(methodName = "singleton")
-@ArrayConvertible
+@LiteralConvertible.FromNil
+@LiteralConvertible.FromColonOperator(methodName = "singleton")
+@LiteralConvertible.FromArray
 public class HashMap<K, V> extends AbstractHashMap<K, V> implements MutableMap<K, V>
 {
 	private static final long serialVersionUID = -5390749229591621243L;

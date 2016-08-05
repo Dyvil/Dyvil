@@ -2,8 +2,7 @@ package dyvil.util;
 
 import dyvil.annotation.Immutable;
 import dyvil.annotation._internal.DyvilModifiers;
-import dyvil.lang.literal.NilConvertible;
-import dyvil.lang.literal.TupleConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.reflect.Modifiers;
 
 import java.io.Serializable;
@@ -12,8 +11,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-@NilConvertible
-@TupleConvertible
+@LiteralConvertible.FromNil
+@LiteralConvertible.FromTuple
 @DyvilModifiers(Modifiers.SEALED)
 @Immutable
 public interface Option<T> extends Serializable

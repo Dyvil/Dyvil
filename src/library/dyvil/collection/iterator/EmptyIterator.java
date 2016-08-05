@@ -2,13 +2,13 @@ package dyvil.collection.iterator;
 
 import dyvil.annotation.Immutable;
 import dyvil.annotation.Mutating;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
-@NilConvertible
+@LiteralConvertible.FromNil
 @Immutable
 public final class EmptyIterator<E> implements Iterator<E>
 {

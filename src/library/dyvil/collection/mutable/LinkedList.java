@@ -6,8 +6,7 @@ import dyvil.collection.*;
 import dyvil.collection.List;
 import dyvil.collection.Set;
 import dyvil.collection.immutable.AppendList;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 
 import java.io.IOException;
 import java.util.*;
@@ -15,8 +14,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@NilConvertible
-@ArrayConvertible
+@LiteralConvertible.FromNil
+@LiteralConvertible.FromArray
 public class LinkedList<E> implements MutableList<E>, Deque<E>
 {
 	private static final long serialVersionUID = 7185956993705123890L;

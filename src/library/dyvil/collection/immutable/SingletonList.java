@@ -6,7 +6,7 @@ import dyvil.collection.ImmutableList;
 import dyvil.collection.List;
 import dyvil.collection.MutableList;
 import dyvil.collection.iterator.SingletonIterator;
-import dyvil.lang.literal.TupleConvertible;
+import dyvil.lang.LiteralConvertible;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@TupleConvertible
+@LiteralConvertible.FromTuple
 @Immutable
 public class SingletonList<E> implements ImmutableList<E>
 {

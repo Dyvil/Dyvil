@@ -100,7 +100,7 @@ public final class IntValue implements IConstantValue
 			return this;
 		}
 
-		final IAnnotation annotation = type.getAnnotation(Types.INT_CONVERTIBLE_CLASS);
+		final IAnnotation annotation = type.getAnnotation(Types.FROMINT_CLASS);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
@@ -111,7 +111,7 @@ public final class IntValue implements IConstantValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return Types.isSuperType(type, Types.INT) || type.getAnnotation(Types.INT_CONVERTIBLE_CLASS) != null;
+		return Types.isSuperType(type, Types.INT) || type.getAnnotation(Types.FROMINT_CLASS) != null;
 	}
 
 	@Override
@@ -122,7 +122,7 @@ public final class IntValue implements IConstantValue
 		{
 			return i;
 		}
-		if (type.getAnnotation(Types.INT_CONVERTIBLE_CLASS) != null)
+		if (type.getAnnotation(Types.FROMINT_CLASS) != null)
 		{
 			return CONVERSION_MATCH;
 		}

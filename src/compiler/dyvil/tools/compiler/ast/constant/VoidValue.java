@@ -77,7 +77,8 @@ public class VoidValue implements IConstantValue
 			return;
 		}
 
-		writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvil/lang/Void", "instance", "Ldyvil/lang/Void;");
+		// writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvil/lang/Void", "instance", "Ldyvil/lang/Void;");
+		writer.visitInsn(Opcodes.ACONST_NULL);
 	}
 
 	@Override

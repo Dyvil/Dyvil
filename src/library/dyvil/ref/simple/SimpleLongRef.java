@@ -1,9 +1,9 @@
 package dyvil.ref.simple;
 
-import dyvil.lang.literal.LongConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.ref.LongRef;
 
-@LongConvertible
+@LiteralConvertible.FromLong
 public class SimpleLongRef implements LongRef
 {
 	public long value;

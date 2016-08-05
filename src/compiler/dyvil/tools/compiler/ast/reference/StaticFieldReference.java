@@ -5,24 +5,15 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Type;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IField;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.backend.ClassWriter;
-import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class StaticFieldReference implements IReference, IClassCompilable
+public class StaticFieldReference extends AbstractFieldReference
 {
-	protected IField field;
-
-	// Metadata
-	private boolean isUnique;
-	private String  className;
-	private String  fieldOriginClassName;
-	private String  refFieldName;
-	private String  refFieldType;
+	private String refFieldType;
 
 	public StaticFieldReference(IField field)
 	{
@@ -35,53 +26,9 @@ public class StaticFieldReference implements IReference, IClassCompilable
 		InstanceFieldReference.checkFinalAccess(this.field, position, markers);
 	}
 
-	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
-	{
-		this.isUnique = true;
-		for (int i = 0, count = compilableList.compilableCount(); i < count; i++)
-		{
-			final IClassCompilable compilable = compilableList.getCompilable(i);
-			if (!(compilable instanceof StaticFieldReference))
-			{
-				continue;
-			}
+	// IClassCompilable callback implementations
 
-			final StaticFieldReference staticFieldReference = (StaticFieldReference) compilable;
-			if (this.field == staticFieldReference.field)
-			{
-				this.isUnique = false;
-				break;
-			}
-		}
-		compilableList.addCompilable(this);
-	}
-
-	// Lazy Field Getters
-
-	private String getFieldOriginClassName()
-	{
-		if (this.fieldOriginClassName != null)
-		{
-			return this.fieldOriginClassName;
-		}
-
-		return this.fieldOriginClassName = this.field.getEnclosingClass().getInternalName();
-	}
-
-	private String getRefFieldName()
-	{
-		if (this.refFieldName != null)
-		{
-			return this.refFieldName;
-		}
-
-		// Format: $staticRef$[originClassName]$[fieldName]
-		return this.refFieldName = "$staticRef$" + this.getFieldOriginClassName().replace('/', '$') + '$' + this.field
-			                                                                                                    .getInternalName();
-	}
-
-	private String getRefFieldType()
+	protected String getRefFieldType()
 	{
 		if (this.refFieldType != null)
 		{
@@ -89,14 +36,6 @@ public class StaticFieldReference implements IReference, IClassCompilable
 		}
 
 		return this.refFieldType = 'L' + ReferenceType.LazyFields.getInternalRef(this.field.getType(), "") + ';';
-	}
-
-	// IClassCompilable callback implementations
-
-	@Override
-	public void setInnerIndex(String internalName, int index)
-	{
-		this.className = internalName;
 	}
 
 	@Override
@@ -109,9 +48,7 @@ public class StaticFieldReference implements IReference, IClassCompilable
 
 		String refFieldName = this.getRefFieldName();
 		String refFieldType = this.getRefFieldType();
-
-		final int modifiers = Modifiers.PRIVATE | Modifiers.STATIC | Modifiers.SYNTHETIC;
-		writer.visitField(modifiers, refFieldName, refFieldType, null, null);
+		writer.visitField(CACHE_FIELD_MODIFIERS, refFieldName, refFieldType, null, null);
 	}
 
 	@Override

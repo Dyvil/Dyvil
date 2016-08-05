@@ -2,14 +2,14 @@ package dyvil.collection.range;
 
 import dyvil.annotation.Immutable;
 import dyvil.collection.Range;
-import dyvil.lang.literal.TupleConvertible;
+import dyvil.lang.LiteralConvertible;
 
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
-@TupleConvertible
+@LiteralConvertible.FromTuple
 @Immutable
 public class HalfOpenRange<T extends Rangeable<T>> implements Range<T>
 {
