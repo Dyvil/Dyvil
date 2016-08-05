@@ -6,6 +6,7 @@ import dyvil.collection.mutable.ArrayList;
 import dyvil.collection.mutable.HashMap;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.consumer.IClassConsumer;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.external.ExternalHeader;
@@ -22,7 +23,7 @@ import dyvil.tools.parsing.position.CodePosition;
 
 import java.io.InputStream;
 
-public class Package implements INamed, IDefaultContext
+public class Package implements INamed, IDefaultContext, IClassConsumer
 {
 	public static RootPackage rootPackage;
 
@@ -161,6 +162,12 @@ public class Package implements INamed, IDefaultContext
 		this.subPackages.put(pack.name.qualified, pack);
 	}
 
+	@Override
+	public void addClass(IClass theClass)
+	{
+		this.classes.add(theClass);
+	}
+
 	public Package createSubPackage(String name)
 	{
 		Package pack = this.subPackages.get(name);
@@ -263,17 +270,19 @@ public class Package implements INamed, IDefaultContext
 
 		String qualifiedName = name.qualified;
 		// Check for inner / nested / anonymous classes
-		int cashIndex = qualifiedName.indexOf('$');
-		if (cashIndex >= 0)
+		final int cashIndex = qualifiedName.lastIndexOf('$');
+		if (cashIndex < 0)
 		{
-			Name firstName = Name.fromRaw(qualifiedName.substring(0, cashIndex));
-			Name lastName = Name.fromRaw(qualifiedName.substring(cashIndex + 1));
+			return this.loadClass(name, qualifiedName);
+		}
 
-			IClass c = this.resolveClass(firstName);
-			if (c != null)
-			{
-				return c.resolveClass(lastName);
-			}
+		final Name outerName = Name.fromRaw(qualifiedName.substring(0, cashIndex));
+		final Name innerName = Name.fromRaw(qualifiedName.substring(cashIndex + 1));
+
+		final IClass outerClass = this.resolveClass(outerName);
+		if (outerClass != null)
+		{
+			return outerClass.resolveClass(innerName);
 		}
 
 		return this.loadClass(name, qualifiedName);
@@ -282,16 +291,22 @@ public class Package implements INamed, IDefaultContext
 	private IClass loadClass(Name name, String qualifiedName)
 	{
 		final String fileName = this.getInternalName() + qualifiedName + DyvilFileType.CLASS_EXTENSION;
+		return loadClass(fileName, name, this);
+	}
 
-		for (Library library : rootPackage.compiler.config.libraries)
+	public static IClass loadClass(String fileName, Name name, IClassConsumer consumer)
+	{
+		final DyvilCompiler compiler = rootPackage.compiler;
+		for (Library library : compiler.config.libraries)
 		{
-			final IClass iclass = this.loadClass(fileName, name, library);
-			if (iclass != null)
+			final InputStream inputStream = library.getInputStream(fileName);
+			if (inputStream != null)
 			{
-				return iclass;
+				final ExternalClass externalClass = new ExternalClass(name);
+				consumer.addClass(externalClass);
+				return ClassReader.loadClass(compiler, externalClass, inputStream);
 			}
 		}
-
 		return null;
 	}
 
@@ -307,32 +322,6 @@ public class Package implements INamed, IDefaultContext
 			}
 		}
 
-		return null;
-	}
-
-	public static IClass loadClass(String fileName, Name name)
-	{
-		for (Library library : rootPackage.compiler.config.libraries)
-		{
-			final InputStream inputStream = library.getInputStream(fileName);
-			if (inputStream != null)
-			{
-				final ExternalClass externalClass = new ExternalClass(name);
-				return ClassReader.loadClass(rootPackage.compiler, externalClass, inputStream);
-			}
-		}
-		return null;
-	}
-
-	private IClass loadClass(String fileName, Name name, Library library)
-	{
-		final InputStream inputStream = library.getInputStream(fileName);
-		if (inputStream != null)
-		{
-			final ExternalClass externalClass = new ExternalClass(name);
-			this.classes.add(externalClass);
-			return ClassReader.loadClass(rootPackage.compiler, externalClass, inputStream);
-		}
 		return null;
 	}
 

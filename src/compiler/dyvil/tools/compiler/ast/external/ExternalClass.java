@@ -408,13 +408,7 @@ public final class ExternalClass extends AbstractClass
 
 		// Resolve the class name
 		final String fileName = internal + DyvilFileType.CLASS_EXTENSION;
-		final IClass loadedClass = Package.loadClass(fileName, name);
-		if (loadedClass != null)
-		{
-			loadedClass.setEnclosingClass(this);
-			this.body.addClass(loadedClass);
-		}
-		return loadedClass;
+		return Package.loadClass(fileName, name, this.body);
 	}
 
 	@Override
