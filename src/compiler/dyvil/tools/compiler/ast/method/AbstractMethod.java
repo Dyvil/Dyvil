@@ -640,6 +640,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			if ((mod & Modifiers.STATIC) != 0)
 			{
 				// static method or infix, extension method with explicit declaring class
+				receiver.setClassAccessIgnored(true);
 
 				if (receiver.valueTag() != IValue.CLASS_ACCESS)
 				{
@@ -654,7 +655,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 					markers.add(Markers.semantic(position, "method.access.static.type", this.name,
 					                             this.enclosingClass.getFullName()));
 				}
-				receiver = null; // TODO don't hide the receiver
 			}
 			else if (receiver.valueTag() == IValue.CLASS_ACCESS)
 			{
@@ -1029,27 +1029,23 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 	protected void writeReceiver(MethodWriter writer, IValue receiver) throws BytecodeException
 	{
-		if (receiver != null)
+		if (receiver == null || receiver.isClassAccessIgnored())
 		{
-			if (this.modifiers.hasIntModifier(Modifiers.INFIX))
-			{
-				receiver.writeExpression(writer, this.parameters.get(0).getType());
-				return;
-			}
-
-			if (receiver.isPrimitive() && this.intrinsicData != null)
-			{
-				receiver.writeExpression(writer, null);
-				return;
-			}
-
-			receiver.writeExpression(writer, this.enclosingClass.getType());
+			return;
 		}
+
+		if (this.modifiers.hasIntModifier(Modifiers.INFIX))
+		{
+			receiver.writeExpression(writer, this.parameters.get(0).getInternalType());
+			return;
+		}
+
+		receiver.writeExpression(writer, this.enclosingClass.getType());
 	}
 
 	protected void writeArguments(MethodWriter writer, IValue receiver, IArguments arguments) throws BytecodeException
 	{
-		if (receiver != null && this.hasModifier(Modifiers.INFIX))
+		if (receiver != null && !receiver.isClassAccessIgnored() && this.hasModifier(Modifiers.INFIX))
 		{
 			arguments.writeValues(writer, this.parameters, 1);
 			return;

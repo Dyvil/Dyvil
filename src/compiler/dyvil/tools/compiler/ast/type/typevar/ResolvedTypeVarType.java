@@ -43,18 +43,16 @@ public class ResolvedTypeVarType extends TypeVarType
 			{
 				return;
 			}
+			// Fallthrough
 		case TYPE:
 			if (this.typeParameter.getReifiedKind() == ITypeParameter.ReifiedKind.REIFIED_TYPE)
 			{
 				return;
 			}
-			markers.add(Markers.semantic(this.position, "type.class.typevar"));
+			markers.add(Markers.semanticError(this.position, "type.class.typevar"));
 			return;
 		case SUPER_TYPE:
-			markers.add(Markers.semantic(this.position, "type.super.typevar"));
-			return;
-		default:
-			return;
+			markers.add(Markers.semanticError(this.position, "type.super.typevar"));
 		}
 	}
 }

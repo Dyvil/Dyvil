@@ -22,12 +22,12 @@ public interface IntrinsicData
 	void writeInvIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
 			throws BytecodeException;
 	
-	static IType writeArgument(MethodWriter writer, IMethod method, int index, IValue instance, IArguments arguments)
+	static IType writeArgument(MethodWriter writer, IMethod method, int index, IValue receiver, IArguments arguments)
 			throws BytecodeException
 	{
 		final IParameterList parameterList = method.getParameterList();
 
-		if (instance == null)
+		if (receiver == null)
 		{
 			final IParameter parameter = parameterList.get(index);
 			arguments.writeValue(index, parameter, writer);
@@ -36,19 +36,19 @@ public interface IntrinsicData
 		
 		if (index == 0)
 		{
-			if (method.hasModifier(Modifiers.INFIX))
+			if (receiver.isClassAccessIgnored() || method.hasModifier(Modifiers.INFIX))
 			{
 				final IType internalParameterType = parameterList.get(0).getInternalType();
-				instance.writeExpression(writer, internalParameterType);
+				receiver.writeExpression(writer, internalParameterType);
 				return internalParameterType;
 			}
 
 			final IType type = method.getEnclosingClass().getType();
-			instance.writeExpression(writer, type);
+			receiver.writeExpression(writer, type);
 			return type;
 		}
 		
-		if (method.hasModifier(Modifiers.INFIX))
+		if (receiver.isClassAccessIgnored() || method.hasModifier(Modifiers.INFIX))
 		{
 			final IParameter parameter = parameterList.get(index);
 			arguments.writeValue(index - 1, parameter, writer);

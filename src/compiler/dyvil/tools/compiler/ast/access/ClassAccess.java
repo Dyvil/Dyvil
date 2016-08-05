@@ -23,6 +23,7 @@ public final class ClassAccess implements IValue
 
 	// Metadata
 	protected ICodePosition position;
+	protected boolean       ignored;
 	protected boolean       withTyped;
 
 	public ClassAccess(IType type)
@@ -52,6 +53,18 @@ public final class ClassAccess implements IValue
 	public int valueTag()
 	{
 		return CLASS_ACCESS;
+	}
+
+	@Override
+	public boolean isClassAccessIgnored()
+	{
+		return this.ignored;
+	}
+
+	@Override
+	public void setClassAccessIgnored(boolean ignored)
+	{
+		this.ignored = ignored;
 	}
 
 	@Override
@@ -99,7 +112,7 @@ public final class ClassAccess implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.type.checkType(markers, context, TypePosition.TYPE);
+		this.type.checkType(markers, context, TypePosition.CLASS);
 
 		if (!this.type.isResolved())
 		{
@@ -150,6 +163,11 @@ public final class ClassAccess implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
+		if (this.ignored)
+		{
+			return;
+		}
+
 		IClass iclass = this.type.getTheClass();
 		if (iclass != null)
 		{
