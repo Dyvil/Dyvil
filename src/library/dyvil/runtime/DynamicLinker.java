@@ -47,6 +47,7 @@ public class DynamicLinker
 
 			INVOKE_CLASSMETHOD = lookup.findStatic(DynamicLinker.class, "invokeClassMethod", MethodType.methodType(
 				Object.class, InliningCacheCallSite.class, Object[].class));
+
 			CHECK_ISCLASS = lookup.findStatic(DynamicLinker.class, "checkIsClass",
 			                                  MethodType.methodType(boolean.class, Class.class, Class.class));
 		}
@@ -152,16 +153,19 @@ public class DynamicLinker
 			return invokeVirtual(callSite, args, type);
 		}
 
-		final Class<?> receiver = (Class<?>) args[0];
-
-		final Method implementationMethod = findMethod(receiver, callSite.name,
-		                                               type.dropParameterTypes(0, 1).parameterArray());
+		final int count = args.length;
+		final Class<?> receiver = (Class<?>) args[count - 1];
+		final MethodType targetType = type.dropParameterTypes(count - 1, count);
+		final Class<?>[] argumentTypes = targetType.parameterArray();
+		final Method implementationMethod = findMethod(receiver, callSite.name, argumentTypes);
 
 		if (implementationMethod != null)
 		{
 			// Convert the implementation to a MethodHandle with the desired type
-			final MethodHandle target = callSite.lookup.unreflect(implementationMethod).asType(type);
-			return invokeWith(callSite, args, type, receiver, target, CHECK_ISCLASS);
+			final MethodHandle target = callSite.lookup.unreflect(implementationMethod).asType(targetType);
+			return invokeWith(callSite, args, type, receiver,
+			                  MethodHandles.dropArguments(target, count - 1, Class.class),
+			                  MethodHandles.dropArguments(CHECK_ISCLASS, count - 1, argumentTypes));
 		}
 
 		throw new NoSuchMethodError(callSite.name);
