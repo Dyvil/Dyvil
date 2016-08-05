@@ -194,6 +194,15 @@ public interface IValue extends IASTNode, ITyped
 		return null;
 	}
 
+	default boolean isClassAccessIgnored()
+	{
+		return false;
+	}
+
+	default void setClassAccessIgnored(boolean ignored)
+	{
+	}
+
 	default boolean checkVarargs(boolean typeCheck)
 	{
 		return false;

@@ -30,6 +30,9 @@ public class DynamicLinker
 	private static final MethodHandle CHECK_CLASS;
 	private static final MethodHandle INVOKE_DYNAMIC;
 
+	private static final MethodHandle CHECK_ISCLASS;
+	private static final MethodHandle INVOKE_CLASSMETHOD;
+
 	static
 	{
 		Lookup lookup = MethodHandles.lookup();
@@ -38,13 +41,19 @@ public class DynamicLinker
 			CHECK_CLASS = lookup.findStatic(DynamicLinker.class, "checkClass",
 			                                MethodType.methodType(boolean.class, Class.class, Object.class));
 
-			INVOKE_DYNAMIC = lookup.findStatic(DynamicLinker.class, "invokeDynamic", MethodType.methodType(Object.class,
-			                                                                                               InliningCacheCallSite.class,
-			                                                                                               Object[].class));
+			INVOKE_DYNAMIC = lookup.findStatic(DynamicLinker.class, "invokeDynamic", //
+			                                   MethodType.methodType(Object.class, InliningCacheCallSite.class,
+			                                                         Object[].class));
+
+			INVOKE_CLASSMETHOD = lookup.findStatic(DynamicLinker.class, "invokeClassMethod", MethodType.methodType(
+				Object.class, InliningCacheCallSite.class, Object[].class));
+
+			CHECK_ISCLASS = lookup.findStatic(DynamicLinker.class, "checkIsClass",
+			                                  MethodType.methodType(boolean.class, Class.class, Class.class));
 		}
 		catch (ReflectiveOperationException e)
 		{
-			throw new AssertionError("", e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -57,6 +66,11 @@ public class DynamicLinker
 		                                    MethodHandle fallbackImplementation)
 	{
 		return link(lookup, name, type, fallbackImplementation, INVOKE_DYNAMIC);
+	}
+
+	public static CallSite linkClassMethod(Lookup lookup, String name, MethodType type)
+	{
+		return link(lookup, name, type, null, INVOKE_CLASSMETHOD);
 	}
 
 	private static CallSite link(Lookup lookup, String name, MethodType type, MethodHandle fallbackImplementation,
@@ -76,6 +90,11 @@ public class DynamicLinker
 	public static boolean checkClass(Class<?> clazz, Object receiver)
 	{
 		return receiver.getClass() == clazz;
+	}
+
+	public static boolean checkIsClass(Class<?> clazz, Class<?> receiver)
+	{
+		return receiver == clazz;
 	}
 
 	public static Method findMethod(Class<?> receiver, String name, Class[] parameterTypes) throws Throwable
@@ -120,6 +139,33 @@ public class DynamicLinker
 		if (fallbackMethod != null)
 		{
 			return invokeWith(callSite, args, type, receiverClass, fallbackMethod, CHECK_CLASS);
+		}
+
+		throw new NoSuchMethodError(callSite.name);
+	}
+
+	public static Object invokeClassMethod(InliningCacheCallSite callSite, Object[] args) throws Throwable
+	{
+		final MethodType type = callSite.type();
+		if (callSite.depth >= InliningCacheCallSite.MAX_DEPTH)
+		{
+			// revert to a vtable call
+			return invokeVirtual(callSite, args, type);
+		}
+
+		final int count = args.length;
+		final Class<?> receiver = (Class<?>) args[count - 1];
+		final MethodType targetType = type.dropParameterTypes(count - 1, count);
+		final Class<?>[] argumentTypes = targetType.parameterArray();
+		final Method implementationMethod = findMethod(receiver, callSite.name, argumentTypes);
+
+		if (implementationMethod != null)
+		{
+			// Convert the implementation to a MethodHandle with the desired type
+			final MethodHandle target = callSite.lookup.unreflect(implementationMethod).asType(targetType);
+			return invokeWith(callSite, args, type, receiver,
+			                  MethodHandles.dropArguments(target, count - 1, Class.class),
+			                  MethodHandles.dropArguments(CHECK_ISCLASS, count - 1, argumentTypes));
 		}
 
 		throw new NoSuchMethodError(callSite.name);
