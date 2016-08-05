@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.external;
 
-import dyvil.collection.Entry;
 import dyvil.collection.Map;
 import dyvil.collection.Set;
 import dyvil.collection.immutable.ArraySet;
@@ -33,7 +32,6 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
@@ -59,7 +57,6 @@ public final class ExternalClass extends AbstractClass
 	private static final int BODY_METHOD_CACHE   = 1 << 3;
 	private static final int BODY_IMPLICIT_CACHE = 1 << 4;
 	private static final int ANNOTATIONS         = 1 << 5;
-	private static final int INNER_TYPES         = 1 << 6;
 
 	protected Package thePackage;
 
@@ -160,33 +157,6 @@ public final class ExternalClass extends AbstractClass
 		}
 	}
 
-	private void resolveInnerTypes()
-	{
-		this.resolved |= INNER_TYPES;
-
-		if (this.innerTypes == null)
-		{
-			return;
-		}
-
-		for (Entry<String, String> entry : this.innerTypes)
-		{
-			Name name = Name.fromQualified(entry.getKey());
-			String internal = entry.getValue();
-
-			// Resolve the class name
-			String fileName = internal + DyvilFileType.CLASS_EXTENSION;
-			IClass c = Package.loadClass(fileName, name);
-			if (c != null)
-			{
-				c.setEnclosingClass(this);
-				this.body.addClass(c);
-			}
-		}
-
-		this.innerTypes = null;
-	}
-
 	public void setClassParameters(String[] classParameters)
 	{
 		this.classParameters = ArraySet.apply(classParameters);
@@ -249,16 +219,6 @@ public final class ExternalClass extends AbstractClass
 			this.resolveSuperTypes();
 		}
 		return this.superType;
-	}
-
-	@Override
-	public IClass getEnclosingClass()
-	{
-		if ((this.resolved & INNER_TYPES) == 0)
-		{
-			this.resolveInnerTypes();
-		}
-		return super.getEnclosingClass();
 	}
 
 	@Override
@@ -434,23 +394,27 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		if ((this.resolved & INNER_TYPES) == 0)
+		final IClass bodyClass = this.body.getClass(name);
+		if (bodyClass != null)
 		{
-			this.resolveInnerTypes();
+			return bodyClass;
 		}
 
-		return this.body.getClass(name);
-	}
-
-	@Override
-	public ITypeAlias resolveTypeAlias(Name name, int arity)
-	{
-		if ((this.resolved & INNER_TYPES) == 0)
+		String internal = this.innerTypes.get(name.qualified);
+		if (internal == null)
 		{
-			this.resolveInnerTypes();
+			return null;
 		}
 
-		return super.resolveTypeAlias(name, arity);
+		// Resolve the class name
+		final String fileName = internal + DyvilFileType.CLASS_EXTENSION;
+		final IClass loadedClass = Package.loadClass(fileName, name);
+		if (loadedClass != null)
+		{
+			loadedClass.setEnclosingClass(this);
+			this.body.addClass(loadedClass);
+		}
+		return loadedClass;
 	}
 
 	@Override
