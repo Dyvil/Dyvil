@@ -49,10 +49,10 @@ public class ResolvedTypeVarType extends TypeVarType
 			{
 				return;
 			}
-			markers.add(Markers.semanticError(this.position, "type.class.typevar"));
+			markers.add(Markers.semanticError(this.position, "type.class.typevar", this.typeParameter.getName()));
 			return;
 		case SUPER_TYPE:
-			markers.add(Markers.semanticError(this.position, "type.super.typevar"));
+			markers.add(Markers.semanticError(this.position, "type.super.typevar", this.typeParameter.getName()));
 		}
 	}
 }
