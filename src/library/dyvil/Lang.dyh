@@ -43,7 +43,7 @@ using	dyvil.lang.{
 // ---------------------------------------- Type Aliases ----------------------------------------
 
 // Primitive Type Aliases
-type	Void	= dyvil.lang.Void
+type	Void	= java.lang.Void
 type	Byte	= java.lang.Byte
 type	Short	= java.lang.Short
 type	Char	= java.lang.Character

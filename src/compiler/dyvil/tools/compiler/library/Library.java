@@ -35,7 +35,7 @@ public abstract class Library
 	static
 	{
 		javaLibraryLocation = getFileLocation(java.lang.String.class);
-		dyvilLibraryLocation = getFileLocation(dyvil.lang.Void.class);
+		dyvilLibraryLocation = getFileLocation(dyvil.util.Version.class);
 
 		dyvilLibrary = tryLoad(dyvilLibraryLocation);
 		javaLibrary = tryLoad(javaLibraryLocation);

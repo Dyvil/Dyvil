@@ -101,7 +101,7 @@ public final class Types
 
 	public static void initTypes()
 	{
-		VOID.theClass = VOID_CLASS = Package.dyvilLang.resolveClass("Void");
+		VOID.theClass = VOID_CLASS = Package.javaLang.resolveClass("Void");
 		BOOLEAN.theClass = BOOLEAN_CLASS = Package.javaLang.resolveClass("Boolean");
 		BYTE.theClass = BYTE_CLASS = Package.javaLang.resolveClass("Byte");
 		SHORT.theClass = SHORT_CLASS = Package.javaLang.resolveClass("Short");

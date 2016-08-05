@@ -190,11 +190,6 @@ public class TypeConverter
 			{
 				return;
 			}
-			if (target == Object.class || target == dyvil.lang.Void.class)
-			{
-				mv.visitFieldInsn(Opcodes.GETSTATIC, "dyvil/lang/Void", "instance", "Ldyvil/lang/Void;");
-				return;
-			}
 			if (target != Void.TYPE)
 			{
 				mv.visitInsn(Opcodes.ACONST_NULL);

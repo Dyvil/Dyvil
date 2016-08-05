@@ -104,7 +104,7 @@ public final class PrimitiveType implements IType
 	{
 		switch (internalClassName)
 		{
-		case "dyvil/lang/Void":
+		case "java/lang/Void":
 			return Types.VOID;
 		case "java/lang/Boolean":
 			return Types.BOOLEAN;

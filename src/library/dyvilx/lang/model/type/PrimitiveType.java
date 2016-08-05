@@ -138,31 +138,31 @@ public final class PrimitiveType implements Type
 		switch (this.id)
 		{
 		case VOID_CODE:
-			builder.append("Ldyvil/lang/Void;");
+			builder.append("Ljava/lang/Void;");
 			return;
 		case BOOLEAN_CODE:
-			builder.append("Ldyvil/lang/Boolean;");
+			builder.append("Ljava/lang/Boolean;");
 			return;
 		case BYTE_CODE:
-			builder.append("Ldyvil/lang/Byte;");
+			builder.append("Ljava/lang/Byte;");
 			return;
 		case SHORT_CODE:
-			builder.append("Ldyvil/lang/Short;");
+			builder.append("Ljava/lang/Short;");
 			return;
 		case CHAR_CODE:
-			builder.append("Ldyvil/lang/Char;");
+			builder.append("Ljava/lang/Char;");
 			return;
 		case INT_CODE:
-			builder.append("Ldyvil/lang/Int;");
+			builder.append("Ljava/lang/Integer;");
 			return;
 		case LONG_CODE:
-			builder.append("Ldyvil/lang/Long;");
+			builder.append("Ljava/lang/Long;");
 			return;
 		case FLOAT_CODE:
-			builder.append("Ldyvil/lang/Float;");
+			builder.append("Ljava/lang/Float;");
 			return;
 		case DOUBLE_CODE:
-			builder.append("Ldyvil/lang/Double;");
+			builder.append("Ljava/lang/Double;");
 			return;
 		}
 	}
