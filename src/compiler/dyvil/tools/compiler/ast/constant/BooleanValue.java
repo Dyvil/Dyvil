@@ -77,7 +77,7 @@ public final class BooleanValue implements IConstantValue
 			return this;
 		}
 
-		final IAnnotation annotation = type.getTheClass().getAnnotation(Types.BOOLEAN_CONVERTIBLE_CLASS);
+		final IAnnotation annotation = type.getTheClass().getAnnotation(Types.FROMBOOLEAN_CLASS);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
@@ -88,7 +88,7 @@ public final class BooleanValue implements IConstantValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return Types.isSuperType(type, Types.BOOLEAN) || type.getAnnotation(Types.BOOLEAN_CONVERTIBLE_CLASS) != null;
+		return Types.isSuperType(type, Types.BOOLEAN) || type.getAnnotation(Types.FROMBOOLEAN_CLASS) != null;
 	}
 
 	@Override
@@ -99,7 +99,7 @@ public final class BooleanValue implements IConstantValue
 		{
 			return i;
 		}
-		if (type.getAnnotation(Types.BOOLEAN_CONVERTIBLE_CLASS) != null)
+		if (type.getAnnotation(Types.FROMBOOLEAN_CLASS) != null)
 		{
 			return CONVERSION_MATCH;
 		}

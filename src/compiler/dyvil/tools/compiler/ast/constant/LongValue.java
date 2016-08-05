@@ -92,7 +92,7 @@ public class LongValue implements IConstantValue
 			return this;
 		}
 
-		final IAnnotation annotation = type.getAnnotation(Types.LONG_CONVERTIBLE_CLASS);
+		final IAnnotation annotation = type.getAnnotation(Types.FROMLONG_CLASS);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
@@ -103,7 +103,7 @@ public class LongValue implements IConstantValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return Types.isSuperType(type, Types.LONG) || type.getAnnotation(Types.LONG_CONVERTIBLE_CLASS) != null;
+		return Types.isSuperType(type, Types.LONG) || type.getAnnotation(Types.FROMLONG_CLASS) != null;
 	}
 
 	@Override
@@ -114,7 +114,7 @@ public class LongValue implements IConstantValue
 		{
 			return i;
 		}
-		if (type.getAnnotation(Types.LONG_CONVERTIBLE_CLASS) != null)
+		if (type.getAnnotation(Types.FROMLONG_CLASS) != null)
 		{
 			return CONVERSION_MATCH;
 		}

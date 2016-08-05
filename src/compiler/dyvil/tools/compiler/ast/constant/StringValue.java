@@ -63,7 +63,7 @@ public final class StringValue implements IConstantValue
 			return this;
 		}
 
-		final IAnnotation annotation = type.getAnnotation(Types.STRING_CONVERTIBLE_CLASS);
+		final IAnnotation annotation = type.getAnnotation(Types.FROMSTRING_CLASS);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
@@ -74,7 +74,7 @@ public final class StringValue implements IConstantValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return Types.isSuperType(type, Types.STRING) || type.getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null;
+		return Types.isSuperType(type, Types.STRING) || type.getAnnotation(Types.FROMSTRING_CLASS) != null;
 	}
 
 	@Override
@@ -85,7 +85,7 @@ public final class StringValue implements IConstantValue
 		{
 			return i;
 		}
-		if (type.getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null)
+		if (type.getAnnotation(Types.FROMSTRING_CLASS) != null)
 		{
 			return CONVERSION_MATCH;
 		}

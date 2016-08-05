@@ -84,13 +84,14 @@ public final class Types
 	public static IClass IMMUTABLE_CLASS;
 	public static IClass REIFIED_CLASS;
 
-	public static IClass BOOLEAN_CONVERTIBLE_CLASS;
-	public static IClass CHAR_CONVERTIBLE_CLASS;
-	public static IClass INT_CONVERTIBLE_CLASS;
-	public static IClass LONG_CONVERTIBLE_CLASS;
-	public static IClass FLOAT_CONVERTIBLE_CLASS;
-	public static IClass DOUBLE_CONVERTIBLE_CLASS;
-	public static IClass STRING_CONVERTIBLE_CLASS;
+	public static IClass LITERALCONVERTIBLE_CLASS;
+	public static IClass FROMBOOLEAN_CLASS;
+	public static IClass FROMCHAR_CLASS;
+	public static IClass FROMINT_CLASS;
+	public static IClass FROMLONG_CLASS;
+	public static IClass FROMFLOAT_CLASS;
+	public static IClass FROMDOUBLE_CLASS;
+	public static IClass FROMSTRING_CLASS;
 
 	private static IClass OBJECT_ARRAY_CLASS;
 
@@ -128,13 +129,14 @@ public final class Types
 		IMMUTABLE_CLASS = Package.dyvilAnnotation.resolveClass("Immutable");
 		REIFIED_CLASS = Package.dyvilAnnotation.resolveClass("Reified");
 
-		INT_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("IntConvertible");
-		BOOLEAN_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("BooleanConvertible");
-		CHAR_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("CharConvertible");
-		LONG_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("LongConvertible");
-		FLOAT_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("FloatConvertible");
-		DOUBLE_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("DoubleConvertible");
-		STRING_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("StringConvertible");
+		LITERALCONVERTIBLE_CLASS = Package.dyvilLang.resolveClass("LiteralConvertible");
+		FROMINT_CLASS = LITERALCONVERTIBLE_CLASS.resolveClass(Name.fromRaw("FromInt"));
+		FROMBOOLEAN_CLASS = LITERALCONVERTIBLE_CLASS.resolveClass(Name.fromRaw("FromBoolean"));
+		FROMCHAR_CLASS = LITERALCONVERTIBLE_CLASS.resolveClass(Name.fromRaw("FromChar"));
+		FROMLONG_CLASS = LITERALCONVERTIBLE_CLASS.resolveClass(Name.fromRaw("FromLong"));
+		FROMFLOAT_CLASS = LITERALCONVERTIBLE_CLASS.resolveClass(Name.fromRaw("FromFloat"));
+		FROMDOUBLE_CLASS = LITERALCONVERTIBLE_CLASS.resolveClass(Name.fromRaw("FromDouble"));
+		FROMSTRING_CLASS = LITERALCONVERTIBLE_CLASS.resolveClass(Name.fromRaw("FromString"));
 
 		final IClassBody primitivesBody = PRIMITIVES_CLASS.getBody();
 

@@ -18,6 +18,7 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Mutability;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.raw.IObjectType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -35,7 +36,8 @@ public class MapType implements IObjectType
 		public static final IClass MAP_CLASS             = Package.dyvilCollection.resolveClass("Map");
 		public static final IClass MUTABLE_MAP_CLASS     = Package.dyvilCollection.resolveClass("MutableMap");
 		public static final IClass IMMUTABLE_MAP_CLASS   = Package.dyvilCollection.resolveClass("ImmutableMap");
-		public static final IClass MAP_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("MapConvertible");
+		public static final IClass MAP_CONVERTIBLE_CLASS = Types.LITERALCONVERTIBLE_CLASS
+			                                                   .resolveClass(Name.fromRaw("FromMap"));
 
 		public static final ITypeParameter KEY_VARIABLE   = MapTypes.MAP_CLASS.getTypeParameter(0);
 		public static final ITypeParameter VALUE_VARIABLE = MapTypes.MAP_CLASS.getTypeParameter(1);
@@ -121,7 +123,8 @@ public class MapType implements IObjectType
 	@Override
 	public IType asParameterType()
 	{
-		return new MapType(this.keyType.asParameterType(), this.valueType.asParameterType(), this.mutability, this.theClass);
+		return new MapType(this.keyType.asParameterType(), this.valueType.asParameterType(), this.mutability,
+		                   this.theClass);
 	}
 
 	@Override
@@ -205,7 +208,7 @@ public class MapType implements IObjectType
 	public void checkType(MarkerList markers, IContext context, TypePosition position)
 	{
 		final TypePosition argumentPosition =
-				position == TypePosition.SUPER_TYPE ? TypePosition.SUPER_TYPE_ARGUMENT : TypePosition.GENERIC_ARGUMENT;
+			position == TypePosition.SUPER_TYPE ? TypePosition.SUPER_TYPE_ARGUMENT : TypePosition.GENERIC_ARGUMENT;
 
 		this.keyType.checkType(markers, context, argumentPosition);
 		this.valueType.checkType(markers, context, argumentPosition);
