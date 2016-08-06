@@ -295,7 +295,7 @@ public abstract class AbstractParameter extends Member implements IParameter
 
 		ModifierUtil.writeModifiers(visitor, modifiers);
 
-		type.writeAnnotations(writer, TypeReference.newFormalParameterReference(index), "");
+		IType.writeAnnotations(type, writer, TypeReference.newFormalParameterReference(index), "");
 
 		// Default Value
 		if (defaultValue == null)

@@ -239,7 +239,7 @@ public abstract class GenericType implements IObjectType, ITypeList
 	{
 		for (int i = 0; i < this.typeArgumentCount; i++)
 		{
-			this.typeArguments[i].writeAnnotations(visitor, typeRef, typePath + i + ';');
+			IType.writeAnnotations(this.typeArguments[i], visitor, typeRef, typePath + i + ';');
 		}
 	}
 	

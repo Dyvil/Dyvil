@@ -578,9 +578,9 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameterTypes[i].writeAnnotations(visitor, typeRef, typePath + i + ';');
+			IType.writeAnnotations(this.parameterTypes[i], visitor, typeRef, typePath + i + ';');
 		}
-		this.returnType.writeAnnotations(visitor, typeRef, typePath + this.parameterCount + ';');
+		IType.writeAnnotations(this.returnType, visitor, typeRef, typePath + this.parameterCount + ';');
 	}
 
 	@Override

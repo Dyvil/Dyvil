@@ -358,8 +358,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		case TypeReference.EXCEPTION_PARAMETER:
 		{
 			int index = TypeReference.getExceptionIndex(typeRef);
-			this.exceptions[index] = IType.withAnnotation(this.exceptions[index], annotation, typePath, 0,
-			                                              typePath.getLength());
+			this.exceptions[index] = IType.withAnnotation(this.exceptions[index], annotation, typePath);
 			break;
 		}
 		case TypeReference.METHOD_FORMAL_PARAMETER:

@@ -158,7 +158,8 @@ public class ArrayType implements IObjectType, ITyped
 	}
 
 	@Override
-	public IValue convertValueTo(IValue value, IType targetType, ITypeContext typeContext, MarkerList markers, IContext context)
+	public IValue convertValueTo(IValue value, IType targetType, ITypeContext typeContext, MarkerList markers,
+		                            IContext context)
 	{
 		if (!this.isConvertibleTo(targetType))
 		{
@@ -425,7 +426,11 @@ public class ArrayType implements IObjectType, ITyped
 	@Override
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
-		this.type.writeAnnotations(visitor, typeRef, typePath.concat("["));
+		if (this.mutability != Mutability.UNDEFINED)
+		{
+			this.mutability.writeAnnotation(visitor, typeRef, typePath);
+		}
+		IType.writeAnnotations(this.type, visitor, typeRef, typePath.concat("["));
 	}
 
 	@Override

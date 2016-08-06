@@ -451,7 +451,7 @@ public final class TupleType implements IObjectType, ITypeList
 	{
 		for (int i = 0; i < this.typeCount; i++)
 		{
-			this.types[i].writeAnnotations(visitor, typeRef, typePath + i + ';');
+			IType.writeAnnotations(this.types[i], visitor, typeRef, typePath + i + ';');
 		}
 	}
 

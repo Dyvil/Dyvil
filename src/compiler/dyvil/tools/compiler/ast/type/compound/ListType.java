@@ -251,7 +251,7 @@ public class ListType implements IObjectType
 	@Override
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
-		this.elementType.writeAnnotations(visitor, typeRef, typePath + "0;");
+		IType.writeAnnotations(this.elementType, visitor, typeRef, typePath + "0;");
 	}
 
 	@Override

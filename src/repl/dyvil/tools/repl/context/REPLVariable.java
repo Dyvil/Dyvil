@@ -4,10 +4,12 @@ import dyvil.array.ObjectArray;
 import dyvil.io.Console;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.FieldVisitor;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
+import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -127,7 +129,9 @@ public class REPLVariable extends Field
 		if (!Types.isVoid(this.type))
 		{
 			// Generate the field holding the value
-			writer.visitField(this.modifiers.toFlags(), name, descriptor, null, null);
+			final FieldVisitor fieldVisitor = writer.visitField(this.modifiers.toFlags(), name, descriptor, null, null);
+			IField.writeAnnotations(fieldVisitor, this.modifiers, this.annotations, this.type);
+			fieldVisitor.visitEnd();
 		}
 
 		// Write the property, if necessary

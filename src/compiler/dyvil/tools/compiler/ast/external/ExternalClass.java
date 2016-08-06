@@ -609,15 +609,14 @@ public final class ExternalClass extends AbstractClass
 		{
 		case TypeReference.CLASS_EXTENDS:
 		{
-			int steps = typePath.getLength();
 			int index = TypeReference.getSuperTypeIndex(typeRef);
 			if (index == -1)
 			{
-				this.superType = IType.withAnnotation(this.superType, annotation, typePath, 0, steps);
+				this.superType = IType.withAnnotation(this.superType, annotation, typePath);
 			}
 			else
 			{
-				this.interfaces[index] = IType.withAnnotation(this.interfaces[index], annotation, typePath, 0, steps);
+				this.interfaces[index] = IType.withAnnotation(this.interfaces[index], annotation, typePath);
 			}
 			break;
 		}

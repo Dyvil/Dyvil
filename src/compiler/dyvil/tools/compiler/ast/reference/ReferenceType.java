@@ -316,7 +316,7 @@ public class ReferenceType implements IObjectType
 	@Override
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
-		this.type.writeAnnotations(visitor, typeRef, typePath + "0;");
+		IType.writeAnnotations(this.type, visitor, typeRef, typePath + "0;");
 	}
 
 	@Override

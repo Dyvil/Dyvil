@@ -208,8 +208,7 @@ public final class TypeParameter implements ITypeParameter
 	@Override
 	public void addBoundAnnotation(IAnnotation annotation, int index, TypePath typePath)
 	{
-		this.upperBounds[index] = IType.withAnnotation(this.upperBounds[index], annotation, typePath, 0,
-		                                               typePath.getLength());
+		this.upperBounds[index] = IType.withAnnotation(this.upperBounds[index], annotation, typePath);
 	}
 
 	@Override
@@ -629,7 +628,7 @@ public final class TypeParameter implements ITypeParameter
 			buffer.append("Ljava/lang/Object;");
 			return;
 		}
-		
+
 		final IClass theClass = this.upperBounds[0].getTheClass();
 		if (theClass != null && theClass.isInterface())
 		{
@@ -725,7 +724,7 @@ public final class TypeParameter implements ITypeParameter
 			final int boundTypeRef = TypeReference.newTypeParameterBoundReference(
 				method ? TypeReference.METHOD_TYPE_PARAMETER_BOUND : TypeReference.CLASS_TYPE_PARAMETER_BOUND,
 				this.index, i);
-			this.upperBounds[i].writeAnnotations(visitor, boundTypeRef, "");
+			IType.writeAnnotations(this.upperBounds[i], visitor, boundTypeRef, "");
 		}
 	}
 

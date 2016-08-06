@@ -424,21 +424,25 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	void writeDefaultValue(MethodWriter writer) throws BytecodeException;
 
+	static IType withAnnotation(IType type, IAnnotation annotation, TypePath typePath)
+	{
+		return withAnnotation(type, annotation, typePath, 0, typePath == null ? 0 : typePath.getLength());
+	}
+
 	static IType withAnnotation(IType type, IAnnotation annotation, TypePath typePath, int step, int steps)
 	{
-		if (typePath == null || step >= steps)
+		if (typePath != null && step < steps)
 		{
-			final IType customType = type.withAnnotation(annotation);
-			if (customType != null)
-			{
-				return customType;
-			}
-
-			return new AnnotatedType(type, annotation);
+			type.addAnnotation(annotation, typePath, step, steps);
+			return type;
 		}
 
-		type.addAnnotation(annotation, typePath, step, steps);
-		return type;
+		final IType customType = type.withAnnotation(annotation);
+		if (customType != null)
+		{
+			return customType;
+		}
+		return new AnnotatedType(type, annotation);
 	}
 
 	default IType withAnnotation(IAnnotation annotation)
@@ -447,6 +451,17 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	}
 
 	void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps);
+
+	static void writeAnnotations(IType type, TypeAnnotatableVisitor visitor, int typeRef, String typePath)
+	{
+		if (type.useNonNullAnnotation())
+		{
+			visitor.visitTypeAnnotation(typeRef, TypePath.fromString(typePath), AnnotationUtil.NOTNULL, false)
+			       .visitEnd();
+		}
+
+		type.writeAnnotations(visitor, typeRef, typePath);
+	}
 
 	void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath);
 

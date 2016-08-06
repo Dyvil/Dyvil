@@ -37,7 +37,7 @@ public class ExternalParameter extends AbstractParameter
 
 	public void addTypeAnnotation(IAnnotation annotation, TypePath path)
 	{
-		this.type = IType.withAnnotation(this.type, annotation, path, 0, path.getLength());
+		this.type = IType.withAnnotation(this.type, annotation, path);
 	}
 
 	@Override
