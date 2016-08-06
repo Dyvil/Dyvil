@@ -145,7 +145,31 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	{
 		this.threshold = (int) (newCapacity * this.loadFactor);
 	}
-	
+
+	@Override
+	public Entry<K, V> getEntry(Object key)
+	{
+		if (!this.containsKey(key))
+		{
+			return null;
+		}
+		return new Entry<K, V>()
+		{
+			@Override
+			public K getKey()
+			{
+				return (K) key;
+			}
+
+			@Override
+			public V getValue()
+			{
+				final int index = IdentityHashMap.this.getIndex(key);
+				return (V) IdentityHashMap.this.table[index];
+			}
+		};
+	}
+
 	@Override
 	public void clear()
 	{

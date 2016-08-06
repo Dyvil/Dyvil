@@ -168,7 +168,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements MutableMap<K
 	@Override
 	public ObjectRef<V> subscript_$amp(K key)
 	{
-		return this.getEntry(key);
+		return this.getEntryInternal(key);
 	}
 
 	@Override

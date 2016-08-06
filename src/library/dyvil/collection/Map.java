@@ -350,7 +350,22 @@ public interface Map<K, V> extends SizedIterable<Entry<K, V>>, Serializable
 	 *
 	 * @return the value
 	 */
-	V get(Object key);
+	default V get(Object key)
+	{
+		final Entry<? extends K, ? extends V> entry = this.getEntry(key);
+		return entry == null ? null : entry.getValue();
+	}
+
+	/**
+	 * Returns the corresponding Map {@link Entry} for the given {@code key}. If the given {@code key} is not present in
+	 * this Map at the time of calling the {@code getEntry(Object)} method, {@code null} is returned.
+	 *
+	 * @param key
+	 * 	the key
+	 *
+	 * @return the Map Entry for the given key, or {@code null} if no mapping exists for the key.
+	 */
+	Entry<K, V> getEntry(Object key);
 
 	/**
 	 * Gets and returns an optional value for the given {@code key}. If no mapping for the {@code key} exists, {@link
@@ -649,7 +664,8 @@ public interface Map<K, V> extends SizedIterable<Entry<K, V>>, Serializable
 		return builder.toString();
 	}
 
-	default void toString(StringBuilder builder, String prefix, String entrySeparator, String keyValueSeparator, String postfix)
+	default void toString(StringBuilder builder, String prefix, String entrySeparator, String keyValueSeparator,
+		                     String postfix)
 	{
 		builder.append(prefix);
 		if (this.isEmpty())

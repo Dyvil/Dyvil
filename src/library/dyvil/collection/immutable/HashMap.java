@@ -164,7 +164,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	{
 		return new ObjectRef<V>()
 		{
-			private final HashEntry<K, V> entry = HashMap.this.getEntry(key);
+			private final HashEntry<K, V> entry = HashMap.this.getEntryInternal(key);
 
 			@Override
 			public V get()

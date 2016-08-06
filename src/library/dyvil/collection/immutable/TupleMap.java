@@ -184,6 +184,17 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 	// Implementation Methods
 
 	@Override
+	public Entry<K, V> getEntry(Object key)
+	{
+		final int index = this.getIndex(key);
+		if (index < 0)
+		{
+			return null;
+		}
+		return new Tuple2<>((K) key, this.entries[index]._2);
+	}
+
+	@Override
 	protected void removeAt(int index)
 	{
 		throw new ImmutableException("Iterator.remove() on Immutable Map");

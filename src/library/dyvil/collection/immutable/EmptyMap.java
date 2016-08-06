@@ -98,7 +98,13 @@ public final class EmptyMap<K, V> implements ImmutableMap<K, V>
 	{
 		return null;
 	}
-	
+
+	@Override
+	public Entry<K, V> getEntry(Object key)
+	{
+		return null;
+	}
+
 	@Override
 	public Option<V> getOption(Object key)
 	{

@@ -531,11 +531,24 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	@Override
 	public boolean contains(Object key, Object value)
 	{
-		HashEntry<K, V> entry = this.getEntry(key);
+		HashEntry<K, V> entry = this.getEntryInternal(key);
 		return entry != null && Objects.equals(entry.value, value);
 	}
 
-	protected HashEntry<K, V> getEntry(Object key)
+	@Override
+	public V get(Object key)
+	{
+		HashEntry<K, V> entry = this.getEntryInternal(key);
+		return entry == null ? null : entry.value;
+	}
+
+	@Override
+	public Entry<K, V> getEntry(Object key)
+	{
+		return this.getEntryInternal(key);
+	}
+
+	protected HashEntry<K, V> getEntryInternal(Object key)
 	{
 		if (key == null)
 		{
@@ -562,16 +575,9 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	}
 
 	@Override
-	public V get(Object key)
-	{
-		HashEntry<K, V> entry = this.getEntry(key);
-		return entry == null ? null : entry.value;
-	}
-
-	@Override
 	public Option<V> getOption(Object key)
 	{
-		HashEntry<K, V> entry = this.getEntry(key);
+		HashEntry<K, V> entry = this.getEntryInternal(key);
 		return entry == null ? None.instance : new Some<>(entry.value);
 	}
 

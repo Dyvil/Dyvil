@@ -74,6 +74,9 @@ public interface MutableMap<K, V> extends Map<K, V>
 	V get(Object key);
 
 	@Override
+	Entry<K, V> getEntry(Object key);
+
+	@Override
 	Option<V> getOption(Object key);
 
 	// Non-mutating Operations

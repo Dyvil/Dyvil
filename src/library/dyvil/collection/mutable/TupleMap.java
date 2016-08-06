@@ -142,6 +142,30 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements MutableMap
 	// Implementation Methods
 
 	@Override
+	public Entry<K, V> getEntry(Object key)
+	{
+		if (!this.containsKey(key))
+		{
+			return null;
+		}
+		return new Entry<K, V>()
+		{
+			@Override
+			public K getKey()
+			{
+				return (K) key;
+			}
+
+			@Override
+			public V getValue()
+			{
+				final int index = TupleMap.this.getIndex(key);
+				return TupleMap.this.entries[index]._2;
+			}
+		};
+	}
+
+	@Override
 	public void clear()
 	{
 		for (int i = 0; i < this.size; i++)

@@ -140,6 +140,30 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements MutableMap
 	}
 
 	@Override
+	public Entry<K, V> getEntry(Object key)
+	{
+		final int index = this.getIndex(key);
+		if (index < 0)
+		{
+			return null;
+		}
+		return new Entry<K, V>()
+		{
+			@Override
+			public K getKey()
+			{
+				return (K) key;
+			}
+
+			@Override
+			public V getValue()
+			{
+				return (V) ArrayMap.this.values[ArrayMap.this.getIndex(key)];
+			}
+		};
+	}
+
+	@Override
 	public V put(K key, V value)
 	{
 		return this.putInternal(key, value);

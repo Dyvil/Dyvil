@@ -112,7 +112,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 	@Override
 	public V putIfAbsent(K key, V value)
 	{
-		final TreeEntry<K, V> entry = this.getEntry(key);
+		final TreeEntry<K, V> entry = this.getEntryInternal(key);
 		if (entry != null)
 		{
 			return entry.value;
@@ -125,7 +125,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 	@Override
 	public boolean replace(K key, V oldValue, V newValue)
 	{
-		TreeEntry<K, V> p = this.getEntry(key);
+		TreeEntry<K, V> p = this.getEntryInternal(key);
 		if (p != null && Objects.equals(oldValue, p.value))
 		{
 			p.value = newValue;
@@ -137,7 +137,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 	@Override
 	public V replace(K key, V value)
 	{
-		TreeEntry<K, V> p = this.getEntry(key);
+		TreeEntry<K, V> p = this.getEntryInternal(key);
 		if (p != null)
 		{
 			V oldValue = p.value;
@@ -150,7 +150,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 	@Override
 	public V removeKey(Object key)
 	{
-		TreeEntry<K, V> entry = this.getEntry(key);
+		TreeEntry<K, V> entry = this.getEntryInternal(key);
 		if (entry == null)
 		{
 			return null;
@@ -178,7 +178,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 	@Override
 	public boolean remove(Object key, Object value)
 	{
-		TreeEntry<K, V> entry = this.getEntry(key);
+		TreeEntry<K, V> entry = this.getEntryInternal(key);
 		if (entry == null || !Objects.equals(value, entry.value))
 		{
 			return false;

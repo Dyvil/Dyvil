@@ -339,15 +339,21 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 	@Override
 	public V get(Object key)
 	{
+		final int index = this.getIndex(key);
+		return index < 0 ? null : this.entries[index]._2;
+	}
+
+	public int getIndex(Object key)
+	{
 		for (int i = 0; i < this.size; i++)
 		{
 			Tuple2<K, V> entry = this.entries[i];
 			if (key == entry._1 || key != null && key.equals(entry._1))
 			{
-				return entry._2;
+				return i;
 			}
 		}
-		return null;
+		return -1;
 	}
 
 	@Override
