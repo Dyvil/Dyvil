@@ -162,6 +162,7 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 				this.type = Types.UNKNOWN;
 				return;
 			case DyvilKeywords.FUNC:
+			case DyvilKeywords.OPERATOR:
 				this.mode = METHOD_NAME;
 				this.type = Types.UNKNOWN;
 				return;
