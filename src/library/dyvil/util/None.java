@@ -61,15 +61,15 @@ public final class None implements Option
 	}
 	
 	@Override
-	public Object orElse(Object other)
+	public Object orElse(Object value)
 	{
-		return other;
+		return value;
 	}
 	
 	@Override
-	public Object orElse(Supplier other)
+	public Object orElse(Supplier supplier)
 	{
-		return other.get();
+		return supplier.get();
 	}
 	
 	@Override

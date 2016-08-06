@@ -71,13 +71,13 @@ public final class Some<T> implements Option<T>
 	}
 	
 	@Override
-	public T orElse(T other)
+	public T orElse(T value)
 	{
 		return this.value;
 	}
 	
 	@Override
-	public T orElse(Supplier<? extends T> other)
+	public T orElse(Supplier<? extends T> supplier)
 	{
 		return this.value;
 	}
@@ -85,13 +85,13 @@ public final class Some<T> implements Option<T>
 	@Override
 	public String toString()
 	{
-		return this.value == null ? "Some(null)" : "Some(" + this.value.toString() + ')';
+		return "Some(" + this.value + ')';
 	}
 
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (obj == null || !(obj instanceof Some))
+		if (!(obj instanceof Some))
 		{
 			return false;
 		}
