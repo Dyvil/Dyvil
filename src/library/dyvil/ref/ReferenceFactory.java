@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
 
 public final class ReferenceFactory
 {
+	private static final MethodType STATIC_CONSTRUCTOR_TYPE   = MethodType.methodType(void.class, Field.class);
 	private static final MethodType INSTANCE_CONSTRUCTOR_TYPE = MethodType
 		                                                            .methodType(void.class, Object.class, long.class);
 
@@ -32,11 +33,25 @@ public final class ReferenceFactory
 
 	// Bootstrap Factories
 
+	public static CallSite instanceRefMetafactory(MethodHandles.Lookup caller, String fieldName, MethodType methodType)
+		throws Throwable
+	{
+		final Class<?> enclosingClass = methodType.parameterType(0);
+		final Class<?> targetType = methodType.returnType();
+		// The field to reference and its offset
+		final Field field = getField(enclosingClass, fieldName);
+		final long offset = ReflectUtils.UNSAFE.objectFieldOffset(field);
+		// The Unsafe*Ref constructor
+		final MethodHandle constructor = caller.findConstructor(targetType, INSTANCE_CONSTRUCTOR_TYPE);
+		// Insert the offset argument, returning a method of type (enclosingClass)Unsafe*Ref
+		return new ConstantCallSite(MethodHandles.insertArguments(constructor, 1, offset).asType(methodType));
+	}
+
 	public static CallSite staticRefMetafactory(MethodHandles.Lookup caller, String fieldName, MethodType methodType,
 		                                           Class<?> enclosingClass) throws Throwable
 	{
 		final Class<?> targetType = methodType.returnType();
-		// The field getter
+		// The field to reference
 		final Field field = getField(enclosingClass, fieldName);
 		// The Unsafe*Ref(Field) constructor
 		final MethodHandle constructor = caller.findConstructor(targetType, STATIC_CONSTRUCTOR_TYPE);

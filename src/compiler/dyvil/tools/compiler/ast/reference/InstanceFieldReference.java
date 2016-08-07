@@ -1,22 +1,26 @@
 package dyvil.tools.compiler.ast.reference;
 
 import dyvil.reflect.Modifiers;
-import dyvil.reflect.Opcodes;
-import dyvil.tools.asm.Type;
+import dyvil.tools.asm.Handle;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.backend.ClassWriter;
+import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class InstanceFieldReference extends AbstractFieldReference
+public class InstanceFieldReference implements IReference
 {
+	private static final Handle BOOTSTRAP = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/ref/ReferenceFactory",
+	                                                   "instanceRefMetafactory",
+	                                                   ClassFormat.BSM_HEAD + ClassFormat.BSM_TAIL);
+
+	private final IField field;
 	private final IValue receiver;
 
 	public InstanceFieldReference(IValue receiver, IField field)
@@ -40,57 +44,16 @@ public class InstanceFieldReference extends AbstractFieldReference
 	}
 
 	@Override
-	public void write(ClassWriter writer) throws BytecodeException
-	{
-		if (!this.isUnique)
-		{
-			return;
-		}
-
-		writer.visitField(CACHE_FIELD_MODIFIERS, this.getRefFieldName(), "J", null, null);
-	}
-
-	@Override
-	public void writeStaticInit(MethodWriter writer) throws BytecodeException
-	{
-		if (!this.isUnique)
-		{
-			return;
-		}
-
-		final String fieldName = this.field.getInternalName();
-		final String fieldOriginClassName = this.getFieldOriginClassName();
-
-		final String refFieldName = this.getRefFieldName();
-
-		// Load the field class
-		writer.visitLdcInsn(Type.getObjectType(fieldOriginClassName));
-		// Load the field name
-		writer.visitLdcInsn(fieldName);
-
-		// Invoke the factory method
-		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/ref/ReferenceFactory", "getObjectFieldOffset",
-		                       "(Ljava/lang/Class;Ljava/lang/String;)J", false);
-
-		// Assign the reference field
-		writer.visitFieldInsn(Opcodes.PUTSTATIC, this.className, refFieldName, "J");
-	}
-
-	@Override
 	public void writeReference(MethodWriter writer) throws BytecodeException
 	{
 		// Write the receiver
 		this.receiver.writeExpression(writer, null);
 
+		final String internalClassName = this.field.getEnclosingClass().getInternalName();
 		final IType fieldType = this.field.getType();
-		final String factoryMethodName = ReferenceType.LazyFields.getReferenceFactoryName(fieldType, "");
-		final String factoryMethodType =
-			"(Ljava/lang/Object;J)L" + ReferenceType.LazyFields.getInternalRef(fieldType, "") + ';';
 
-		writer.visitFieldInsn(Opcodes.GETSTATIC, this.className, this.getRefFieldName(), "J");
-
-		// Write a call to the access factory method
-		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/ref/ReferenceFactory", factoryMethodName, factoryMethodType,
-		                       false);
+		final String desc =
+			"(L" + internalClassName + ";)L" + ReferenceType.LazyFields.getInternalRef(fieldType, "unsafe/Unsafe") + ';';
+		writer.visitInvokeDynamicInsn(this.field.getInternalName(), desc, BOOTSTRAP);
 	}
 }
