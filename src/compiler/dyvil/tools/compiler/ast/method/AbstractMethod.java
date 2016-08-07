@@ -57,11 +57,12 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 {
 	protected static final Handle EXTENSION_BSM = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/DynamicLinker",
 	                                                         "linkExtension",
-	                                                         "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;)Ljava/lang/invoke/CallSite;");
+	                                                         ClassFormat.BSM_HEAD + "Ljava/lang/invoke/MethodHandle;"
+		                                                         + ClassFormat.BSM_TAIL);
 
 	protected static final Handle STATICVIRTUAL_BSM = new Handle(ClassFormat.H_INVOKESTATIC,
 	                                                             "dyvil/runtime/DynamicLinker", "linkClassMethod",
-	                                                             "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;");
+	                                                             ClassFormat.BSM_HEAD + ClassFormat.BSM_TAIL);
 
 	protected static final String NAME_SEPARATOR = "_$_";
 
@@ -1106,7 +1107,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				if ((modifiers & Modifiers.STATIC) != 0 && type.getTypeVariable() != null)
 				{
 					type.writeClassExpression(writer);
-					writer.visitInvokeDynamicInsn(mangledName, descriptor.replace(")", "Ljava/lang/Class;)"), STATICVIRTUAL_BSM);
+					writer.visitInvokeDynamicInsn(mangledName, descriptor.replace(")", "Ljava/lang/Class;)"),
+					                              STATICVIRTUAL_BSM);
 					return;
 				}
 				// Fallthrough

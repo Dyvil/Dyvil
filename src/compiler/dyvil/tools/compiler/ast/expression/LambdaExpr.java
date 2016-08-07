@@ -35,12 +35,9 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 {
 	public static final Handle BOOTSTRAP = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/LambdaMetafactory",
 	                                                  "metafactory",
-	                                                  "(Ljava/lang/invoke/MethodHandles$Lookup;" + "Ljava/lang/String;"
-		                                                  + "Ljava/lang/invoke/MethodType;"
-		                                                  + "Ljava/lang/invoke/MethodType;"
+	                                                  ClassFormat.BSM_HEAD + "Ljava/lang/invoke/MethodType;"
 		                                                  + "Ljava/lang/invoke/MethodHandle;"
-		                                                  + "Ljava/lang/invoke/MethodType;)"
-		                                                  + "Ljava/lang/invoke/CallSite;");
+		                                                  + "Ljava/lang/invoke/MethodType;" + ClassFormat.BSM_TAIL);
 
 	public static final TypeChecker.MarkerSupplier LAMBDA_MARKER_SUPPLIER = TypeChecker.markerSupplier(
 		"lambda.value.type.incompatible", "return.type", "value.type");
