@@ -67,6 +67,11 @@ public class Main
 		test(testName, expected, actual, expected == actual)
 	}
 
+	public static void testString(String testName, any expected, any actual)
+	{
+		test(testName, expected, actual, expected.toString == actual.toString)
+	}
+
 	public static void test(String testName, any expected, any actual, boolean condition)
 	{
 		if (!condition)
