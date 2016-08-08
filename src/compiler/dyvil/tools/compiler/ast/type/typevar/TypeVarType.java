@@ -223,7 +223,7 @@ public class TypeVarType implements IRawType
 		final Reified.Type reifiedKind = this.typeParameter.getReifiedKind();
 		if (reifiedKind == null)
 		{
-			throw new Error("Type Variable Types cannot be used in Class Operators");
+			throw new Error("Non-reified Type Parameter");
 		}
 
 		final int parameterIndex = this.typeParameter.getParameterIndex();
@@ -245,14 +245,27 @@ public class TypeVarType implements IRawType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		if (this.typeParameter.getReifiedKind() == Reified.Type.TYPE)
+		final Reified.Type reifiedKind = this.typeParameter.getReifiedKind();
+		if (reifiedKind == null)
 		{
-			final int parameterIndex = this.typeParameter.getParameterIndex();
-			writer.visitVarInsn(Opcodes.ALOAD, parameterIndex);
+			throw new Error("Non-reified Type Parameter");
+		}
+
+		final int parameterIndex = this.typeParameter.getParameterIndex();
+		writer.visitVarInsn(Opcodes.ALOAD, parameterIndex);
+
+		if (reifiedKind == Reified.Type.TYPE)
+		{
 			return;
 		}
 
-		throw new Error("Type Variable Types cannot be used in Type Operators");
+		if (reifiedKind == Reified.Type.OBJECT_CLASS)
+		{
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/runtime/Wrapper", "referenceType",
+			                       "(Ljava/lang/Class;)Ljava/lang/Class;", false);
+		}
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/Type", "apply",
+		                       "(Ljava/lang/Class;)Ldyvilx/lang/model/type/Type;", true);
 	}
 
 	@Override
