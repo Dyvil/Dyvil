@@ -14,22 +14,22 @@ public class ReifyTest
 	}
 
 	// Reify Type
-	private static Type<T> typeOf<@Reified T>() = type T
+	private static Type<T> typeOf<@Reified(Reified.Type.TYPE) T>() = type T
 
 	// Reify Type, with Argument
-	private static Type<T> typeOf<@Reified T>(T value) = type T
+	private static Type<T> typeOf<@Reified(Reified.Type.TYPE) T>(T value) = type T
 
 	// Reify Class
-	private static Class<T> classOf<@Reified T>() = class T
+	private static Class<T> classOf<@Reified(Reified.Type.TYPE) T>() = class T
 
 	// Reify Class, with Argument
-	private static Class<T> classOf<@Reified T>(T value) = class T
+	private static Class<T> classOf<@Reified(Reified.Type.TYPE) T>(T value) = class T
 
 	// Reify Class from Erasure
-	private static Class<T> classOfErasure<@Reified(erasure: true) T>() = class T
+	private static Class<T> classOfErasure<@Reified(Reified.Type.ANY_CLASS) T>() = class T
 
 	// Reify Class from Erasure, with Argument
-	private static Class<T> classOfErasure<@Reified(erasure: true) T>(T value) = class T
+	private static Class<T> classOfErasure<@Reified(Reified.Type.ANY_CLASS) T>(T value) = class T
 
 	private static void typeTest()
 	{

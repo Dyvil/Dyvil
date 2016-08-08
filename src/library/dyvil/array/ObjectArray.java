@@ -27,20 +27,17 @@ public interface ObjectArray
 {
 	Object[] EMPTY = new Object[0];
 
-	@DyvilModifiers(Modifiers.INLINE)
-	static <@Reified(erasure = true) T> T[] empty(Class<T> type)
+	static <@Reified(Reified.Type.OBJECT_CLASS) T> T[] empty(Class<T> type)
 	{
 		return empty(0, type);
 	}
 
-	@DyvilModifiers(Modifiers.INLINE)
-	static <@Reified(erasure = true) T> T[] empty(int size, Class<T> type)
+	static <@Reified(Reified.Type.OBJECT_CLASS) T> T[] empty(int size, Class<T> type)
 	{
 		return (T[]) Array.newInstance(type, size);
 	}
 
-	@DyvilModifiers(Modifiers.INLINE)
-	static <@Reified(erasure = true) T> T[] apply(Class<T> type)
+	static <@Reified(Reified.Type.OBJECT_CLASS) T> T[] apply_$_empty(Class<T> type)
 	{
 		return empty(0, type);
 	}
@@ -59,12 +56,12 @@ public interface ObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.IMPLICIT)
-	static <@Reified(erasure = true) T extends Rangeable<T>> T[] from(Range<T> range, Class<T> type)
+	static <@Reified(Reified.Type.OBJECT_CLASS) T extends Rangeable<T>> T[] from(Range<T> range, Class<T> type)
 	{
 		return range.toArray(type);
 	}
 	
-	static <@Reified(erasure = true) T> T[] repeat(int count, T repeatedValue, Class<T> type)
+	static <@Reified(Reified.Type.OBJECT_CLASS) T> T[] repeat(int count, T repeatedValue, Class<T> type)
 	{
 		T[] array = (T[]) Array.newInstance(type, count);
 		for (int i = 0; i < count; i++)
@@ -74,7 +71,7 @@ public interface ObjectArray
 		return array;
 	}
 	
-	static <@Reified(erasure = true) T> T[] generate(int count, IntFunction<T> generator, Class<T> type)
+	static <@Reified(Reified.Type.OBJECT_CLASS) T> T[] generate(int count, IntFunction<T> generator, Class<T> type)
 	{
 		T[] array = (T[]) Array.newInstance(type, count);
 		for (int i = 0; i < count; i++)
@@ -84,7 +81,7 @@ public interface ObjectArray
 		return array;
 	}
 	
-	static <@Reified(erasure = true) T extends Rangeable<T>> T[] range(T start, T end, Class<T> type)
+	static <@Reified(Reified.Type.OBJECT_CLASS) T extends Rangeable<T>> T[] range(T start, T end, Class<T> type)
 	{
 		int i = 0;
 		T[] array = (T[]) Array.newInstance(type, start.distanceTo(end) + 1);
@@ -95,7 +92,7 @@ public interface ObjectArray
 		return array;
 	}
 	
-	static <@Reified(erasure = true) T extends Rangeable<T>> T[] rangeOpen(T start, T end, Class<T> type)
+	static <@Reified(Reified.Type.OBJECT_CLASS) T extends Rangeable<T>> T[] rangeOpen(T start, T end, Class<T> type)
 	{
 		int i = 0;
 		T[] array = (T[]) Array.newInstance(type, start.distanceTo(end));
@@ -274,7 +271,7 @@ public interface ObjectArray
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T, @Reified(erasure = true) U> U[] mapped(T[] array, Function<T, U> mapper, Class<U> type)
+	static <T, @Reified(Reified.Type.OBJECT_CLASS) U> U[] mapped(T[] array, Function<T, U> mapper, Class<U> type)
 	{
 		int len = array.length;
 		U[] res = (U[]) Array.newInstance(type.isPrimitive() ? Wrapper.forPrimitiveType(type).wrapperType() : type, len);
@@ -286,7 +283,7 @@ public interface ObjectArray
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T, @Reified(erasure = true) U> U[] flatMapped(T[] array, Function<T, U[]> mapper, Class<U> type)
+	static <T, @Reified(Reified.Type.OBJECT_CLASS) U> U[] flatMapped(T[] array, Function<T, U[]> mapper, Class<U> type)
 	{
 		int size = 0;
 		final Class classType = type.isPrimitive() ? Wrapper.forPrimitiveType(type).wrapperType() : type;
@@ -440,11 +437,11 @@ public interface ObjectArray
 	@DyvilModifiers(Modifiers.INFIX)
 	static <T> T[] copy(T[] array, int newLength)
 	{
-		return copy(array, newLength, (Class<T>) array.getClass().getComponentType());
+		return copyAs(array, newLength, (Class<T>) array.getClass().getComponentType());
 	}
 	
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T extends N, N> N[] copy(T[] array, int newLength, Class<N> type)
+	static <@Reified(Reified.Type.OBJECT_CLASS) N, T extends N> N[] copyAs(T[] array, int newLength, Class<N> type)
 	{
 		N[] newArray = (N[]) Array.newInstance(type, newLength);
 		System.arraycopy(array, 0, newArray, 0, newLength);

@@ -1,7 +1,5 @@
 package dyvil.annotation;
 
-import dyvilx.lang.model.type.Type;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -9,22 +7,27 @@ import java.lang.annotation.Target;
 
 /**
  * Marks that a Class or Method Type Parameter is <b>reified</b>. If a Method Parameter is annotated with this
- * annotation, it receives an additional mandated parameter that holds a {@link Type} or {@link Class} instance
- * representing the Type Argument. For classes, an additional field is generated that holds this instance. The {@link
- * #erasure()} annotation parameter defines whether the full type or only the erasure is needed.<p/> If the full generic
- * type is reified, it is retrievable and usable using the {@code type(T)} operator. In both cases, the erasure is
- * available using the {@code class(T)} operator.
+ * annotation, it receives an additional mandated parameter that holds a {@link dyvilx.lang.model.type.Type Type} or
+ * {@link Class} instance representing the Type Argument. The {@link #value()} annotation parameter defines whether the
+ * full generic type or only the erasure is needed.<p/>If the full generic type is reified, it is retrievable and usable
+ * with the {@code type<T>} operator. In both cases, the erasure is available using the {@code class<T>} operator.<p/>
+ * When using the {@link Reified.Type#ANY_CLASS} enum constant, primitive types are passed to the {@link Class}
+ * parameter as their primitive type {@link Class} instance. The {@link Reified.Type#OBJECT_CLASS} ensures that the
+ * passed {@link Class} instance refers to a reference type, i.e. a wrapper type for primitives.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE_PARAMETER)
 public @interface Reified
 {
+	enum Type
+	{
+		ANY_CLASS, OBJECT_CLASS, TYPE;
+	}
+
 	/**
-	 * Marks that only the erasure needs to be available at the declaration site. This improves performance in that no
-	 * {@link Type Type} instances need to be created at the call site. If this flag is set, the mandated parameter will
-	 * have the type {@link Class}. Otherwise, the mandated parameter type will have the type {@link Type Type}.
+	 * @return The reified parameter type
 	 *
-	 * @return true, if only the erasure {@link Class} is needed.
+	 * @see Reified.Type
 	 */
-	boolean erasure() default false;
+	Type value() default Type.ANY_CLASS;
 }
