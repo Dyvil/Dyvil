@@ -304,7 +304,7 @@ public class ArrayType implements IObjectType, ITyped
 		final ITypeParameter typeParameter = this.type.getTypeVariable();
 		if (typeParameter != null)
 		{
-			if (!this.type.isPrimitive() && concrete.isPrimitive())
+			if (concrete.isPrimitive() && !typeParameter.isAny())
 			{
 				concrete = concrete.getObjectType();
 			}
