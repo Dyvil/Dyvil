@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.type.typevar;
 
+import dyvil.annotation.Reified;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
@@ -26,22 +27,22 @@ import java.io.IOException;
 public class TypeVarType implements IRawType
 {
 	protected ITypeParameter typeParameter;
-	
+
 	public TypeVarType()
 	{
 	}
-	
+
 	public TypeVarType(ITypeParameter typeParameter)
 	{
 		this.typeParameter = typeParameter;
 	}
-	
+
 	@Override
 	public int typeTag()
 	{
 		return TYPE_VAR_TYPE;
 	}
-	
+
 	@Override
 	public Name getName()
 	{
@@ -59,13 +60,13 @@ public class TypeVarType implements IRawType
 	{
 		return this.typeParameter;
 	}
-	
+
 	@Override
 	public boolean isGenericType()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public IClass getTheClass()
 	{
@@ -125,7 +126,7 @@ public class TypeVarType implements IRawType
 	{
 		return true;
 	}
-	
+
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
@@ -137,42 +138,44 @@ public class TypeVarType implements IRawType
 		final IType concreteType = context.resolveType(this.typeParameter);
 		return concreteType != null ? concreteType : this;
 	}
-	
+
 	@Override
 	public IType resolveType(ITypeParameter typeParameter)
 	{
-		return this.typeParameter == typeParameter ? this : this.typeParameter.getDefaultType().resolveType(typeParameter);
+		return this.typeParameter == typeParameter ?
+			       this :
+			       this.typeParameter.getDefaultType().resolveType(typeParameter);
 	}
-	
+
 	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
 		typeContext.addMapping(this.typeParameter, concrete);
 	}
-	
+
 	@Override
 	public boolean isResolved()
 	{
 		return true;
 	}
-	
+
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
 		return this;
 	}
-	
+
 	@Override
 	public void checkType(MarkerList markers, IContext context, TypePosition position)
 	{
 	}
-	
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
 		return this.typeParameter.resolveField(name);
 	}
-	
+
 	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
@@ -189,25 +192,25 @@ public class TypeVarType implements IRawType
 	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
 	{
 	}
-	
+
 	@Override
 	public IMethod getFunctionalMethod()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public String getInternalName()
 	{
 		return this.typeParameter.getErasure().getInternalName();
 	}
-	
+
 	@Override
 	public void appendExtendedName(StringBuilder buffer)
 	{
 		buffer.append('L').append(this.getInternalName()).append(';');
 	}
-	
+
 	@Override
 	public void appendSignature(StringBuilder buffer, boolean genericArg)
 	{
@@ -215,31 +218,34 @@ public class TypeVarType implements IRawType
 	}
 
 	@Override
-	public void writeClassExpression(MethodWriter writer) throws BytecodeException
+	public void writeClassExpression(MethodWriter writer, boolean wrapPrimitives) throws BytecodeException
 	{
-		final ITypeParameter.ReifiedKind reifiedKind = this.typeParameter.getReifiedKind();
-		if (reifiedKind != ITypeParameter.ReifiedKind.NOT_REIFIED)
+		final Reified.Type reifiedKind = this.typeParameter.getReifiedKind();
+		if (reifiedKind == null)
 		{
-			// Get the parameter
-			final int parameterIndex = this.typeParameter.getParameterIndex();
-			writer.visitVarInsn(Opcodes.ALOAD, parameterIndex);
-
-			// The generic Type is reified -> extract erasure class
-			if (reifiedKind == ITypeParameter.ReifiedKind.REIFIED_TYPE)
-			{
-				writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, "dyvilx/lang/model/type/Type", "erasure",
-				                       "()Ljava/lang/Class;", true);
-			}
-			return;
+			throw new Error("Type Variable Types cannot be used in Class Operators");
 		}
 
-		throw new Error("Type Variable Types cannot be used in Class Operators");
+		final int parameterIndex = this.typeParameter.getParameterIndex();
+		writer.visitVarInsn(Opcodes.ALOAD, parameterIndex);
+
+		// The generic Type is reified -> extract erasure class
+		if (reifiedKind == Reified.Type.TYPE)
+		{
+			writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, "dyvilx/lang/model/type/Type", "erasure",
+			                       "()Ljava/lang/Class;", true);
+		}
+		if (wrapPrimitives && reifiedKind == Reified.Type.ANY_CLASS)
+		{
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/runtime/Wrapper", "referenceType",
+			                       "(Ljava/lang/Class;)Ljava/lang/Class;", false);
+		}
 	}
 
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		if (this.typeParameter.getReifiedKind() == ITypeParameter.ReifiedKind.REIFIED_TYPE)
+		if (this.typeParameter.getReifiedKind() == Reified.Type.TYPE)
 		{
 			final int parameterIndex = this.typeParameter.getParameterIndex();
 			writer.visitVarInsn(Opcodes.ALOAD, parameterIndex);
@@ -248,32 +254,32 @@ public class TypeVarType implements IRawType
 
 		throw new Error("Type Variable Types cannot be used in Type Operators");
 	}
-	
+
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
 		out.writeUTF(this.typeParameter.getName().qualified);
 	}
-	
+
 	@Override
 	public void read(DataInput in) throws IOException
 	{
 		in.readUTF();
 		throw new Error("Cannot decode Type Variable Type");
 	}
-	
+
 	@Override
 	public IType clone()
 	{
 		return new TypeVarType(this.typeParameter);
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return this.typeParameter.getName().toString();
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

@@ -1106,7 +1106,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				final IType type = receiver.getType();
 				if ((modifiers & Modifiers.STATIC) != 0 && type.getTypeVariable() != null)
 				{
-					type.writeClassExpression(writer);
+					type.writeClassExpression(writer, true);
 					writer.visitInvokeDynamicInsn(mangledName, descriptor.replace(")", "Ljava/lang/Class;)"),
 					                              STATICVIRTUAL_BSM);
 					return;

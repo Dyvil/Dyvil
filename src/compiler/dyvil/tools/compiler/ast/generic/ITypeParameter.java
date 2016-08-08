@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.generic;
 
+import dyvil.annotation.Reified;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.IAnnotated;
@@ -24,13 +25,6 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public interface ITypeParameter extends IASTNode, INamed, IAnnotated, IObjectCompilable
 {
-	enum ReifiedKind
-	{
-		NOT_REIFIED,
-		REIFIED_ERASURE,
-		REIFIED_TYPE
-	}
-
 	ITypeParametric getGeneric();
 	
 	void setIndex(int index);
@@ -43,7 +37,7 @@ public interface ITypeParameter extends IASTNode, INamed, IAnnotated, IObjectCom
 	
 	Variance getVariance();
 
-	ReifiedKind getReifiedKind();
+	Reified.Type getReifiedKind();
 	
 	int getParameterIndex();
 

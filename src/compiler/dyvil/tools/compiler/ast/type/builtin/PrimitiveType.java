@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.type.builtin;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.Type;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
@@ -594,7 +595,7 @@ public final class PrimitiveType implements IType
 	}
 
 	@Override
-	public void writeClassExpression(MethodWriter writer) throws BytecodeException
+	public void writeClassExpression(MethodWriter writer, boolean wrapPrimitives) throws BytecodeException
 	{
 		String owner;
 
@@ -629,6 +630,12 @@ public final class PrimitiveType implements IType
 		default:
 			owner = "java/lang/Void";
 			break;
+		}
+
+		if (wrapPrimitives)
+		{
+			writer.visitLdcInsn(Type.getObjectType(owner));
+			return;
 		}
 
 		writer.visitFieldInsn(Opcodes.GETSTATIC, owner, "TYPE", "Ljava/lang/Class;");
