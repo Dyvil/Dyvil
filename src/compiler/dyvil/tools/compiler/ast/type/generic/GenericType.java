@@ -1,10 +1,10 @@
 package dyvil.tools.compiler.ast.type.generic;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.Type;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
-import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
@@ -203,8 +203,7 @@ public abstract class GenericType implements IObjectType, ITypeList
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		IClass iclass = this.getTheClass();
-		writer.visitLdcInsn(iclass == null ? this.getName().qualified : iclass.getFullName());
+		writer.visitLdcInsn(Type.getObjectType(this.getTheClass().getInternalName()));
 		
 		writer.visitLdcInsn(this.typeArgumentCount);
 		writer.visitTypeInsn(Opcodes.ANEWARRAY, "dyvilx/lang/model/type/Type");
@@ -217,7 +216,7 @@ public abstract class GenericType implements IObjectType, ITypeList
 		}
 		
 		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/GenericType", "apply",
-		                       "(Ljava/lang/String;[Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/GenericType;",
+		                       "(Ljava/lang/Class;[Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/GenericType;",
 		                       false);
 	}
 	
