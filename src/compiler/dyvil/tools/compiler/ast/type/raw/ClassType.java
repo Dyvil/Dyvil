@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.type.raw;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.Type;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -153,9 +154,9 @@ public class ClassType implements IRawType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.visitLdcInsn(this.theClass.getFullName());
+		writer.visitLdcInsn(Type.getObjectType(this.theClass.getInternalName()));
 		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/Type", "apply",
-		                       "(Ljava/lang/String;)Ldyvilx/lang/model/type/Type;", true);
+		                       "(Ljava/lang/Class;)Ldyvilx/lang/model/type/Type;", true);
 	}
 
 	@Override
