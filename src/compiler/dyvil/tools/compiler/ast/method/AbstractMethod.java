@@ -1036,8 +1036,18 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 	protected void writeReceiver(MethodWriter writer, IValue receiver) throws BytecodeException
 	{
-		if (receiver == null || receiver.isClassAccessIgnored())
+		if (receiver == null)
 		{
+			return;
+		}
+		if (receiver.isClassAccessIgnored())
+		{
+			final IType type = receiver.getType();
+			if (type.getTypeVariable() != null)
+			{
+				// Static virtual call
+				type.writeClassExpression(writer, true);
+			}
 			return;
 		}
 
@@ -1103,11 +1113,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				opcode = Opcodes.INVOKESPECIAL;
 				break;
 			case IValue.CLASS_ACCESS:
-				final IType type = receiver.getType();
-				if ((modifiers & Modifiers.STATIC) != 0 && type.getTypeVariable() != null)
+				if (receiver.isClassAccessIgnored() && receiver.getType().getTypeVariable() != null)
 				{
-					type.writeClassExpression(writer, true);
-					writer.visitInvokeDynamicInsn(mangledName, descriptor.replace(")", "Ljava/lang/Class;)"),
+					writer.visitInvokeDynamicInsn(mangledName, descriptor.replace("(", "(Ljava/lang/Class;"),
 					                              STATICVIRTUAL_BSM);
 					return;
 				}

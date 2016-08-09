@@ -153,9 +153,8 @@ public class DynamicLinker
 			return invokeVirtual(callSite, args, type);
 		}
 
-		final int count = args.length;
-		final Class<?> receiver = (Class<?>) args[count - 1];
-		final MethodType targetType = type.dropParameterTypes(count - 1, count);
+		final Class<?> receiver = (Class<?>) args[0];
+		final MethodType targetType = type.dropParameterTypes(0, 1);
 		final Class<?>[] argumentTypes = targetType.parameterArray();
 		final Method implementationMethod = findMethod(receiver, callSite.name, argumentTypes);
 
@@ -164,8 +163,8 @@ public class DynamicLinker
 			// Convert the implementation to a MethodHandle with the desired type
 			final MethodHandle target = callSite.lookup.unreflect(implementationMethod).asType(targetType);
 			return invokeWith(callSite, args, type, receiver,
-			                  MethodHandles.dropArguments(target, count - 1, Class.class),
-			                  MethodHandles.dropArguments(CHECK_ISCLASS, count - 1, argumentTypes));
+			                  MethodHandles.dropArguments(target, 0, Class.class),
+			                  CHECK_ISCLASS);
 		}
 
 		throw new NoSuchMethodError(callSite.name);
