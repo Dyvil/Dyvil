@@ -74,24 +74,24 @@ public abstract class LongArray
 		return array;
 	}
 
-	public static long[] apply(long start, long end)
+	public static long[] apply_$_closed(long from, long to)
 	{
 		int i = 0;
-		final long[] array = new long[(int) (end - start + 1)];
-		for (; start <= end; start++)
+		final long[] array = new long[(int) (to - from + 1)];
+		for (; from <= to; from++)
 		{
-			array[i++] = start;
+			array[i++] = from;
 		}
 		return array;
 	}
 
-	public static long[] apply_$_rangeOpen(long start, long end)
+	public static long[] apply_$_halfOpen(long from, long toExclusive)
 	{
 		int i = 0;
-		final long[] array = new long[(int) (end - start)];
-		for (; start < end; start++)
+		final long[] array = new long[(int) (toExclusive - from)];
+		for (; from < toExclusive; from++)
 		{
-			array[i++] = start;
+			array[i++] = from;
 		}
 		return array;
 	}
@@ -112,6 +112,13 @@ public abstract class LongArray
 		return array.length;
 	}
 
+	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean isEmpty(long[] array)
+	{
+		return array.length == 0;
+	}
+
 	@Intrinsic( { LOAD_0, LOAD_1, LALOAD })
 	@DyvilModifiers(Modifiers.INFIX)
 	public static long subscript(long[] array, int index)
@@ -122,10 +129,10 @@ public abstract class LongArray
 	@DyvilModifiers(Modifiers.INFIX)
 	public static long[] subscript(long[] array, Range<@Primitive Integer> range)
 	{
-		final int count = range.count();
-		final long[] slice = new long[count];
-		System.arraycopy(array, range.first(), slice, 0, count);
-		return slice;
+		final int size = range.count();
+		final long[] result = new long[size];
+		System.arraycopy(array, range.first(), result, 0, size);
+		return result;
 	}
 
 	@Intrinsic( { LOAD_0, LOAD_1, LOAD_2, LASTORE })
@@ -138,7 +145,7 @@ public abstract class LongArray
 
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	public static void subscript_$eq(long[] array, Range<Integer> range, long[] newValues)
+	public static void subscript_$eq(long[] array, Range<@Primitive Integer> range, long[] newValues)
 	{
 		System.arraycopy(newValues, 0, array, range.first(), range.count());
 	}
@@ -150,19 +157,12 @@ public abstract class LongArray
 		return new LongArrayRef(array, index);
 	}
 
-	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })
 	@DyvilModifiers(Modifiers.INFIX)
-	public static boolean isEmpty(int[] array)
+	public static void forEach(long[] array, LongConsumer action)
 	{
-		return array.length == 0;
-	}
-
-	@DyvilModifiers(Modifiers.INFIX)
-	public static void forEach(int[] array, IntConsumer action)
-	{
-		for (int v : array)
+		for (long value : array)
 		{
-			action.accept(v);
+			action.accept(value);
 		}
 	}
 

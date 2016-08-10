@@ -82,7 +82,7 @@ public abstract class ObjectArray
 		return range.toArray(_type);
 	}
 
-	public static <@Reified(OBJECT_CLASS) T extends Rangeable<T>> T[] apply(T from, T to, Class<T> _type)
+	public static <@Reified(OBJECT_CLASS) T extends Rangeable<T>> T[] apply_$_closed(T from, T to, Class<T> _type)
 	{
 		int i = 0;
 		final T[] array = apply(from.distanceTo(to) + 1, _type);
@@ -93,7 +93,8 @@ public abstract class ObjectArray
 		return array;
 	}
 
-	public static <@Reified(OBJECT_CLASS) T extends Rangeable<T>> T[] apply_$_halfOpen(T from, T toExclusive, Class<T> _type)
+	public static <@Reified(OBJECT_CLASS) T extends Rangeable<T>> T[] apply_$_halfOpen(T from, T toExclusive,
+		                                                                                  Class<T> _type)
 	{
 		int i = 0;
 		final T[] array = apply(from.distanceTo(toExclusive), _type);
@@ -135,11 +136,10 @@ public abstract class ObjectArray
 	@DyvilModifiers(Modifiers.INFIX)
 	public static <T> T[] subscript(T[] array, Range<@Primitive Integer> range)
 	{
-		final int start = range.first();
-		final int count = range.count();
-		final T[] slice = apply(count, getComponentType(array));
-		System.arraycopy(array, start, slice, 0, count);
-		return slice;
+		final int size = range.count();
+		final T[] result = apply(size, getComponentType(array));
+		System.arraycopy(array, range.first(), result, 0, size);
+		return result;
 	}
 
 	@Intrinsic( { LOAD_0, LOAD_1, LOAD_2, AASTORE })

@@ -105,11 +105,10 @@ public abstract class BooleanArray
 	@DyvilModifiers(Modifiers.INFIX)
 	public static boolean[] subscript(boolean[] array, Range<@Primitive Integer> range)
 	{
-		final int start = range.first();
-		final int count = range.count();
-		final boolean[] slice = new boolean[count];
-		System.arraycopy(array, start, slice, 0, count);
-		return slice;
+		final int size = range.count();
+		final boolean[] result = new boolean[size];
+		System.arraycopy(array, range.first(), result, 0, size);
+		return result;
 	}
 
 	@Intrinsic( { LOAD_0, LOAD_1, LOAD_2, BASTORE })

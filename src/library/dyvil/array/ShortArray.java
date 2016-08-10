@@ -67,7 +67,7 @@ public abstract class ShortArray
 		return array;
 	}
 
-	public static short[] apply(short from, short to)
+	public static short[] apply_$_closed(short from, short to)
 	{
 		int i = 0;
 		final short[] array = new short[to - from + 1];
@@ -78,7 +78,7 @@ public abstract class ShortArray
 		return array;
 	}
 
-	public static short[] apply_$_rangeOpen(short from, short toExclusive)
+	public static short[] apply_$_halfOpen(short from, short toExclusive)
 	{
 		int i = 0;
 		final short[] array = new short[toExclusive - from];
@@ -122,11 +122,10 @@ public abstract class ShortArray
 	@DyvilModifiers(Modifiers.INFIX)
 	public static short[] subscript(short[] array, Range<@Primitive Integer> range)
 	{
-		final int start = (range.first());
-		final int count = range.count();
-		final short[] slice = new short[count];
-		System.arraycopy(array, start, slice, 0, count);
-		return slice;
+		final int size = range.count();
+		final short[] result = new short[size];
+		System.arraycopy(array, range.first(), result, 0, size);
+		return result;
 	}
 
 	@Intrinsic( { LOAD_0, LOAD_1, LOAD_2, SASTORE })
@@ -141,9 +140,7 @@ public abstract class ShortArray
 	@Mutating
 	public static void subscript_$eq(short[] array, Range<@Primitive Integer> range, short[] newValues)
 	{
-		final int start = (range.first());
-		final int count = range.count();
-		System.arraycopy(newValues, 0, array, start, count);
+		System.arraycopy(newValues, 0, array, range.first(), range.count());
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
@@ -167,7 +164,7 @@ public abstract class ShortArray
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	public static boolean $qmark(short[] array, short value)
 	{
-		return Arrays.binarySearch(array, value) >= 0;
+		return indexOf(array, value, 0) >= 0;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)

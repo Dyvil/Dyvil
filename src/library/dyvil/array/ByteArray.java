@@ -47,27 +47,27 @@ public abstract class ByteArray
 		return array;
 	}
 
-	public static byte[] apply(int count, IntSupplier valueSupplier)
+	public static byte[] apply(int size, IntSupplier valueSupplier)
 	{
-		final byte[] array = new byte[count];
-		for (int i = 0; i < count; i++)
+		final byte[] array = new byte[size];
+		for (int i = 0; i < size; i++)
 		{
 			array[i] = (byte) valueSupplier.getAsInt();
 		}
 		return array;
 	}
 
-	public static byte[] apply(int count, IntUnaryOperator valueMapper)
+	public static byte[] apply(int size, IntUnaryOperator valueMapper)
 	{
-		final byte[] array = new byte[count];
-		for (int i = 0; i < count; i++)
+		final byte[] array = new byte[size];
+		for (int i = 0; i < size; i++)
 		{
 			array[i] = (byte) valueMapper.applyAsInt(i);
 		}
 		return array;
 	}
 
-	public static byte[] apply(byte from, byte to)
+	public static byte[] apply_$_closed(byte from, byte to)
 	{
 		int i = 0;
 		final byte[] array = new byte[to - from + 1];
@@ -122,11 +122,10 @@ public abstract class ByteArray
 	@DyvilModifiers(Modifiers.INFIX)
 	public static byte[] subscript(byte[] array, Range<@Primitive Integer> range)
 	{
-		final int start = range.first();
-		final int count = range.count();
-		final byte[] slice = new byte[count];
-		System.arraycopy(array, start, slice, 0, count);
-		return slice;
+		final int size = range.count();
+		final byte[] result = new byte[size];
+		System.arraycopy(array, range.first(), result, 0, size);
+		return result;
 	}
 
 	@Intrinsic( { LOAD_0, LOAD_1, LOAD_2, BASTORE })
@@ -141,9 +140,7 @@ public abstract class ByteArray
 	@Mutating
 	public static void subscript_$eq(byte[] array, Range<@Primitive Integer> range, byte[] newValues)
 	{
-		final int start = range.first();
-		final int count = range.count();
-		System.arraycopy(newValues, 0, array, start, count);
+		System.arraycopy(newValues, 0, array, range.first(), range.count());
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)

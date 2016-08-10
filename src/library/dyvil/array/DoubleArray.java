@@ -74,24 +74,24 @@ public abstract class DoubleArray
 		return array;
 	}
 
-	public static double[] apply(double start, double end)
+	public static double[] apply_$_closed(double from, double to)
 	{
 		int i = 0;
-		final double[] array = new double[(int) (end - start + 1)];
-		for (; start <= end; start++)
+		final double[] array = new double[(int) (to - from + 1)];
+		for (; from <= to; from++)
 		{
-			array[i++] = start;
+			array[i++] = from;
 		}
 		return array;
 	}
 
-	public static double[] apply_$_rangeOpen(double start, double end)
+	public static double[] apply_$_halfOpen(double from, double toExclusive)
 	{
 		int i = 0;
-		final double[] array = new double[(int) (end - start)];
-		for (; start < end; start++)
+		final double[] array = new double[(int) (toExclusive - from)];
+		for (; from < toExclusive; from++)
 		{
-			array[i++] = start;
+			array[i++] = from;
 		}
 		return array;
 	}
@@ -114,7 +114,7 @@ public abstract class DoubleArray
 
 	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })
 	@DyvilModifiers(Modifiers.INFIX)
-	public static boolean isEmpty(int[] array)
+	public static boolean isEmpty(double[] array)
 	{
 		return array.length == 0;
 	}
@@ -129,11 +129,10 @@ public abstract class DoubleArray
 	@DyvilModifiers(Modifiers.INFIX)
 	public static double[] subscript(double[] array, Range<@Primitive Integer> range)
 	{
-		final int start = (range.first());
-		final int count = range.count();
-		final double[] slice = new double[count];
-		System.arraycopy(array, start, slice, 0, count);
-		return slice;
+		final int size = range.count();
+		final double[] result = new double[size];
+		System.arraycopy(array, range.first(), result, 0, size);
+		return result;
 	}
 
 	@Intrinsic( { LOAD_0, LOAD_1, LOAD_2, DASTORE })
@@ -146,11 +145,9 @@ public abstract class DoubleArray
 
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	public static void subscript_$eq(double[] array, Range<Integer> range, double[] newValues)
+	public static void subscript_$eq(double[] array, Range<@Primitive Integer> range, double[] newValues)
 	{
-		final int start = (range.first());
-		final int count = range.count();
-		System.arraycopy(newValues, 0, array, start, count);
+		System.arraycopy(newValues, 0, array, range.first(), range.count());
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)

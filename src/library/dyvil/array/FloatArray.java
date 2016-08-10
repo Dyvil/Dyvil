@@ -20,7 +20,6 @@ public abstract class FloatArray
 {
 	public static final float[] EMPTY = new float[0];
 
-
 	@DyvilModifiers(Modifiers.INLINE)
 	public static float[] apply()
 	{
@@ -44,7 +43,7 @@ public abstract class FloatArray
 	{
 		return range.toFloatArray();
 	}
-	
+
 	public static float[] apply(int size, float repeatedValue)
 	{
 		final float[] array = new float[size];
@@ -64,7 +63,7 @@ public abstract class FloatArray
 		}
 		return array;
 	}
-	
+
 	public static float[] apply(int size, DoubleUnaryOperator valueMapper)
 	{
 		final float[] array = new float[size];
@@ -74,31 +73,31 @@ public abstract class FloatArray
 		}
 		return array;
 	}
-	
-	public static float[] apply(float start, float end)
+
+	public static float[] apply_$_closed(float from, float to)
 	{
 		int i = 0;
-		final float[] array = new float[(int) (end - start + 1)];
-		for (; start <= end; start++)
+		final float[] array = new float[(int) (to - from + 1)];
+		for (; from <= to; from++)
 		{
-			array[i++] = start;
+			array[i++] = from;
 		}
 		return array;
 	}
-	
-	public static float[] apply_$_rangeOpen(float start, float end)
+
+	public static float[] apply_$_halfOpen(float from, float toExclusive)
 	{
 		int i = 0;
-		final float[] array = new float[(int) (end - start)];
-		for (; start < end; start++)
+		final float[] array = new float[(int) (toExclusive - from)];
+		for (; from < toExclusive; from++)
 		{
-			array[i++] = start;
+			array[i++] = from;
 		}
 		return array;
 	}
-	
+
 	// Basic Array Operations
-	
+
 	@Intrinsic( { LOAD_0, ARRAYLENGTH })
 	@DyvilModifiers(Modifiers.INFIX)
 	public static int length(float[] array)
@@ -115,7 +114,7 @@ public abstract class FloatArray
 
 	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })
 	@DyvilModifiers(Modifiers.INFIX)
-	public static boolean isEmpty(int[] array)
+	public static boolean isEmpty(float[] array)
 	{
 		return array.length == 0;
 	}
@@ -130,11 +129,10 @@ public abstract class FloatArray
 	@DyvilModifiers(Modifiers.INFIX)
 	public static float[] subscript(float[] array, Range<@Primitive Integer> range)
 	{
-		final int start = (range.first());
-		final int count = range.count();
-		final float[] slice = new float[count];
-		System.arraycopy(array, start, slice, 0, count);
-		return slice;
+		final int size = range.count();
+		final float[] result = new float[size];
+		System.arraycopy(array, range.first(), result, 0, size);
+		return result;
 	}
 
 	@Intrinsic( { LOAD_0, LOAD_1, LOAD_2, FASTORE })
@@ -149,9 +147,7 @@ public abstract class FloatArray
 	@Mutating
 	public static void subscript_$eq(float[] array, Range<@Primitive Integer> range, float[] newValues)
 	{
-		final int start = (range.first());
-		final int count = range.count();
-		System.arraycopy(newValues, 0, array, start, count);
+		System.arraycopy(newValues, 0, array, range.first(), range.count());
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
@@ -169,27 +165,27 @@ public abstract class FloatArray
 			action.accept(v);
 		}
 	}
-	
+
 	// Operators
-	
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	public static boolean $qmark(float[] array, float value)
 	{
 		return indexOf(array, value, 0) >= 0;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	public static boolean $eq$eq(float[] array1, float[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	public static boolean $bang$eq(float[] array1, float[] array2)
 	{
 		return !Arrays.equals(array1, array2);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static float[] $plus(float[] array, float value)
 	{
@@ -199,7 +195,7 @@ public abstract class FloatArray
 		res[len] = value;
 		return res;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static float[] $plus$plus(float[] array1, float[] array2)
 	{
@@ -210,7 +206,7 @@ public abstract class FloatArray
 		System.arraycopy(array2, 0, res, len1, len2);
 		return res;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static float[] $minus(float[] array, float value)
 	{
@@ -219,7 +215,7 @@ public abstract class FloatArray
 		{
 			return array;
 		}
-		
+
 		final int len = array.length;
 		final float[] res = new float[len - 1];
 		if (index > 0)
@@ -234,14 +230,14 @@ public abstract class FloatArray
 		}
 		return res;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static float[] $minus$minus(float[] array1, float[] array2)
 	{
 		int index = 0;
 		final int len = array1.length;
 		final float[] res = new float[len];
-		
+
 		for (float v : array1)
 		{
 			if (indexOf(array2, v, 0) < 0)
@@ -249,18 +245,18 @@ public abstract class FloatArray
 				res[index++] = v;
 			}
 		}
-		
+
 		// Return a resized copy of the temporary array
 		return Arrays.copyOf(res, index);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static float[] $amp(float[] array1, float[] array2)
 	{
 		int index = 0;
 		final int len = array1.length;
 		final float[] res = new float[len];
-		
+
 		for (float v : array1)
 		{
 			if (indexOf(array2, v, 0) >= 0)
@@ -268,11 +264,11 @@ public abstract class FloatArray
 				res[index++] = v;
 			}
 		}
-		
+
 		// Return a resized copy of the temporary array
 		return Arrays.copyOf(res, index);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static float[] mapped(float[] array, DoubleUnaryOperator mapper)
 	{
@@ -284,13 +280,13 @@ public abstract class FloatArray
 		}
 		return res;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static float[] flatMapped(float[] array, DoubleFunction<float[]> mapper)
 	{
 		int size = 0;
 		float[] res = EMPTY;
-		
+
 		for (float v : array)
 		{
 			final float[] a = mapper.apply(v);
@@ -301,14 +297,14 @@ public abstract class FloatArray
 				System.arraycopy(res, 0, newRes, 0, res.length);
 				res = newRes;
 			}
-			
+
 			System.arraycopy(a, 0, res, size, alen);
 			size += alen;
 		}
-		
+
 		return res;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static float[] filtered(float[] array, DoublePredicate condition)
 	{
@@ -322,11 +318,11 @@ public abstract class FloatArray
 				res[index++] = v;
 			}
 		}
-		
+
 		// Return a resized copy of the temporary array
 		return Arrays.copyOf(res, index);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static float[] sorted(float[] array)
 	{
@@ -334,15 +330,15 @@ public abstract class FloatArray
 		Arrays.sort(res);
 		return res;
 	}
-	
+
 	// Search Operations
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static int indexOf(float[] array, float value)
 	{
 		return indexOf(array, value, 0);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static int indexOf(float[] array, float value, int startIndex)
 	{
@@ -355,13 +351,13 @@ public abstract class FloatArray
 		}
 		return -1;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static int lastIndexOf(float[] array, float value)
 	{
 		return lastIndexOf(array, value, array.length - 1);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static int lastIndexOf(float[] array, float value, int startIndex)
 	{
@@ -374,27 +370,27 @@ public abstract class FloatArray
 		}
 		return -1;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	public static boolean contains(float[] array, float value)
 	{
 		return indexOf(array, value, 0) >= 0;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	public static boolean in(float value, float[] array)
 	{
 		return indexOf(array, value, 0) >= 0;
 	}
-	
+
 	// Copying
-	
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	public static float[] copy(float[] array)
 	{
 		return array.clone();
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static Float[] boxed(float[] array)
 	{
@@ -406,27 +402,27 @@ public abstract class FloatArray
 		}
 		return boxed;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static Iterable<Float> toIterable(float[] array)
 	{
 		return new ArrayList<>(boxed(array), true);
 	}
-	
+
 	// equals, hashCode and toString
-	
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	public static boolean equals(float[] array1, float[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	public static int hashCode(float[] array)
 	{
 		return Arrays.hashCode(array);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static String toString(float[] array)
 	{
@@ -434,13 +430,13 @@ public abstract class FloatArray
 		{
 			return "null";
 		}
-		
+
 		final int len = array.length;
 		if (len <= 0)
 		{
 			return "[]";
 		}
-		
+
 		final StringBuilder buf = new StringBuilder(len * 3 + 4);
 		buf.append('[').append(array[0]);
 		for (int i = 1; i < len; i++)
@@ -450,7 +446,7 @@ public abstract class FloatArray
 		}
 		return buf.append(']').toString();
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static void toString(float[] array, StringBuilder builder)
 	{
@@ -459,14 +455,14 @@ public abstract class FloatArray
 			builder.append("null");
 			return;
 		}
-		
+
 		final int len = array.length;
 		if (len <= 0)
 		{
 			builder.append("[]");
 			return;
 		}
-		
+
 		builder.append('[').append(array[0]);
 		for (int i = 1; i < len; i++)
 		{
