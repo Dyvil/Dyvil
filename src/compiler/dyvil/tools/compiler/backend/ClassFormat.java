@@ -186,9 +186,9 @@ public final class ClassFormat
 	private static ITypeConsumer parameterTypeConsumer(IExternalCallableMember methodSignature)
 	{
 		final IParameterList parameterList = methodSignature.getExternalParameterList();
-		return type -> {
-			final ExternalParameter parameter = new ExternalParameter(Name.fromRaw("par" + parameterList.size()),
-			                                                          type);
+		return type ->
+		{
+			final ExternalParameter parameter = new ExternalParameter(null, type);
 			parameter.setMethod(methodSignature);
 			parameterList.addParameter(parameter);
 		};
