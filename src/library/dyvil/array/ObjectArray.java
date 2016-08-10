@@ -85,7 +85,7 @@ public abstract class ObjectArray
 	public static <@Reified(OBJECT_CLASS) T extends Rangeable<T>> T[] apply(T from, T to, Class<T> _type)
 	{
 		int i = 0;
-		T[] array = apply(from.distanceTo(to) + 1, _type);
+		final T[] array = apply(from.distanceTo(to) + 1, _type);
 		for (T current = from; current.compareTo(to) <= 0; current = current.next())
 		{
 			array[i++] = current;
@@ -590,13 +590,13 @@ public abstract class ObjectArray
 			return "null";
 		}
 
-		int len = array.length;
+		final int len = array.length;
 		if (len <= 0)
 		{
 			return "[]";
 		}
 
-		StringBuilder buf = new StringBuilder(len * 10);
+		final StringBuilder buf = new StringBuilder(len * 10);
 		buf.append('[').append(array[0]);
 		for (int i = 1; i < len; i++)
 		{
@@ -615,7 +615,7 @@ public abstract class ObjectArray
 			return;
 		}
 
-		int len = array.length;
+		final int len = array.length;
 		if (len <= 0)
 		{
 			builder.append("[]");
@@ -639,13 +639,13 @@ public abstract class ObjectArray
 			return "null";
 		}
 
-		int len = array.length;
+		final int len = array.length;
 		if (len <= 0)
 		{
 			return "[]";
 		}
 
-		StringBuilder buf = new StringBuilder(len * 10);
+		final StringBuilder buf = new StringBuilder(len * 10);
 		buf.append('[');
 		toString(array[0], buf);
 		for (int i = 1; i < len; i++)
@@ -665,7 +665,7 @@ public abstract class ObjectArray
 			return;
 		}
 
-		int len = array.length;
+		final int len = array.length;
 		if (len <= 0)
 		{
 			builder.append("[]");
