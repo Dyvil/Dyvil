@@ -27,7 +27,7 @@ public interface IntrinsicData
 	{
 		final IParameterList parameterList = method.getParameterList();
 
-		if (receiver == null || receiver.isClassAccessIgnored())
+		if (receiver == null || receiver.isIgnoredClassAccess())
 		{
 			final IParameter parameter = parameterList.get(index);
 			arguments.writeValue(index, parameter, writer);

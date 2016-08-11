@@ -173,7 +173,7 @@ public class Field extends Member implements IField
 		{
 			if (this.modifiers.hasIntModifier(Modifiers.STATIC))
 			{
-				if (receiver.valueTag() != IValue.CLASS_ACCESS)
+				if (receiver.isClassAccess())
 				{
 					markers.add(Markers.semantic(position, "field.access.static", this.name));
 				}
@@ -184,7 +184,7 @@ public class Field extends Member implements IField
 				}
 				receiver = null;
 			}
-			else if (receiver.valueTag() == IValue.CLASS_ACCESS)
+			else if (receiver.isClassAccess())
 			{
 				if (!receiver.getType().getTheClass().isObject())
 				{

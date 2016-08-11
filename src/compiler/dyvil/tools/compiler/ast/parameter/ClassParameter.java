@@ -133,13 +133,13 @@ public class ClassParameter extends Field implements IParameter
 		{
 			if (this.hasModifier(Modifiers.STATIC))
 			{
-				if (receiver.valueTag() != IValue.CLASS_ACCESS)
+				if (receiver.isClassAccess())
 				{
 					markers.add(Markers.semantic(position, "classparameter.access.static", this.name.unqualified));
 					return null;
 				}
 			}
-			else if (receiver.valueTag() == IValue.CLASS_ACCESS)
+			else if (receiver.isClassAccess())
 			{
 				markers.add(Markers.semantic(position, "classparameter.access.instance", this.name.unqualified));
 			}

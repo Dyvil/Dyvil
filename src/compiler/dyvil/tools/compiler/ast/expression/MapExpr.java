@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.access.ClassAccess;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -108,6 +109,19 @@ public class MapExpr implements IValue
 			}
 		}
 		return true;
+	}
+
+	@Override
+	public boolean isClassAccess()
+	{
+		return this.count == 1 && this.keys[0].isClassAccess() && this.values[0].isClassAccess();
+	}
+
+	@Override
+	public IValue asIgnoredClassAccess()
+	{
+		return new ClassAccess(this.position, new MapType(this.keys[0].getType(), this.values[0].getType()))
+			       .asIgnoredClassAccess();
 	}
 
 	@Override

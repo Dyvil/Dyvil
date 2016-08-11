@@ -463,7 +463,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			argumentStartIndex = 0;
 			parameterStartIndex = 0;
 		}
-		else if ((mod = this.modifiers.toFlags() & Modifiers.INFIX) != 0 && receiver.valueTag() == IValue.CLASS_ACCESS)
+		else if ((mod = this.modifiers.toFlags() & Modifiers.INFIX) != 0 && receiver.isClassAccess())
 		{
 			// Static access to static method
 
@@ -487,7 +487,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 		else
 		{
-			if (mod == Modifiers.STATIC && receiver.valueTag() != IValue.CLASS_ACCESS)
+			if (mod == Modifiers.STATIC && !receiver.isClassAccess())
 			{
 				// Disallow non-static access to static method
 				invalid = true;
@@ -619,7 +619,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		if (receiver != null)
 		{
 			final int mod = this.modifiers.toFlags() & Modifiers.INFIX;
-			if (mod == Modifiers.INFIX && receiver.valueTag() != IValue.CLASS_ACCESS)
+			if (mod == Modifiers.INFIX && !receiver.isClassAccess())
 			{
 				// infix or extension method, declaring class implicit
 
@@ -647,9 +647,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			if ((mod & Modifiers.STATIC) != 0)
 			{
 				// static method or infix, extension method with explicit declaring class
-				receiver.setClassAccessIgnored(true);
 
-				if (receiver.valueTag() != IValue.CLASS_ACCESS)
+				if (!receiver.isClassAccess())
 				{
 					// static method called like instance method -> warning
 
@@ -662,8 +661,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 					markers.add(Markers.semantic(position, "method.access.static.type", this.name,
 					                             this.enclosingClass.getFullName()));
 				}
+				receiver = receiver.asIgnoredClassAccess();
 			}
-			else if (receiver.valueTag() == IValue.CLASS_ACCESS)
+			else if (receiver.isClassAccess())
 			{
 				// instance method, accessed via declaring class
 
@@ -1040,7 +1040,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			return;
 		}
-		if (receiver.isClassAccessIgnored())
+		if (receiver.isIgnoredClassAccess())
 		{
 			final IType type = receiver.getType();
 			if (type.getTypeVariable() != null)
@@ -1062,7 +1062,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 	protected void writeArguments(MethodWriter writer, IValue receiver, IArguments arguments) throws BytecodeException
 	{
-		if (receiver != null && !receiver.isClassAccessIgnored() && this.hasModifier(Modifiers.INFIX))
+		if (receiver != null && !receiver.isIgnoredClassAccess() && this.hasModifier(Modifiers.INFIX))
 		{
 			arguments.writeValues(writer, this.parameters, 1);
 			return;
@@ -1105,25 +1105,19 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return;
 		}
 
-		if (receiver != null)
+		if (receiver == null)
 		{
-			switch (receiver.valueTag())
-			{
-			case IValue.SUPER:
-				opcode = Opcodes.INVOKESPECIAL;
-				break;
-			case IValue.CLASS_ACCESS:
-				if (receiver.isClassAccessIgnored() && receiver.getType().getTypeVariable() != null)
-				{
-					writer.visitInvokeDynamicInsn(mangledName, descriptor.replace("(", "(Ljava/lang/Class;"),
-					                              STATICVIRTUAL_BSM);
-					return;
-				}
-				// Fallthrough
-			default:
-				opcode = this.getInvokeOpcode();
-				break;
-			}
+			opcode = this.getInvokeOpcode();
+		}
+		else if (receiver.valueTag() == IValue.SUPER)
+		{
+			opcode = Opcodes.INVOKESPECIAL;
+		}
+		else if (receiver.isIgnoredClassAccess() && receiver.getType().getTypeVariable() != null)
+		{
+			writer
+				.visitInvokeDynamicInsn(mangledName, descriptor.replace("(", "(Ljava/lang/Class;"), STATICVIRTUAL_BSM);
+			return;
 		}
 		else
 		{

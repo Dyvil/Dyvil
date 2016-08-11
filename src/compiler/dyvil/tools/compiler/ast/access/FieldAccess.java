@@ -376,7 +376,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	private IValue resolveTypeAccess(IContext context)
 	{
 		final IType parentType =
-			this.receiver != null && this.receiver.valueTag() == IValue.CLASS_ACCESS ? this.receiver.getType() : null;
+			this.receiver != null && this.receiver.isClassAccess() ? this.receiver.getType() : null;
 		final IType type = new NamedType(this.position, this.name, parentType).resolveType(null, context);
 		return type != null ? new ClassAccess(this.position, type) : null;
 	}

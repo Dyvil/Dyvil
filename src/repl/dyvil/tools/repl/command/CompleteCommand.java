@@ -151,7 +151,7 @@ public class CompleteCommand implements ICommand
 	private void printCompletions(DyvilREPL repl, String memberStart, IValue value)
 	{
 		final IType type = value.getType();
-		final boolean statics = value.valueTag() == IValue.CLASS_ACCESS;
+		final boolean statics = value.isClassAccess();
 		final Set<IField> fields = new TreeSet<>(MemberSorter.MEMBER_COMPARATOR);
 		final Set<IProperty> properties = new TreeSet<>(MemberSorter.MEMBER_COMPARATOR);
 		final Set<IMethod> methods = new TreeSet<>(MemberSorter.METHOD_COMPARATOR);
