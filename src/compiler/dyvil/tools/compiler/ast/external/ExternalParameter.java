@@ -63,6 +63,13 @@ public class ExternalParameter extends AbstractParameter
 	}
 
 	@Override
+	public int getLocalSlots()
+	{
+		// Do not perform type resolution
+		return this.type.getLocalSlots();
+	}
+
+	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
 	}

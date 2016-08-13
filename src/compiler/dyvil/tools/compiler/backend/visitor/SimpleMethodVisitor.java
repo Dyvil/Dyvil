@@ -261,7 +261,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 				param.setName(this.getName(i, localIndex));
 			}
 
-			localIndex += param.getInternalType().getLocalSlots();
+			localIndex += param.getLocalSlots();
 		}
 	}
 
@@ -270,11 +270,8 @@ public final class SimpleMethodVisitor implements MethodVisitor
 		final String localName;
 		if (this.localNames == null || (localName = this.localNames[localIndex]) == null)
 		{
-			return (Name.fromRaw("par" + index));
+			return Name.fromRaw("par" + index);
 		}
-		else
-		{
-			return (Name.fromQualified(localName));
-		}
+		return Name.fromQualified(localName);
 	}
 }

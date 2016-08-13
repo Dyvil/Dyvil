@@ -21,7 +21,7 @@ public interface IVariable extends IDataMember
 	{
 		return false;
 	}
-	
+
 	@Override
 	default boolean isVariable()
 	{
@@ -29,30 +29,35 @@ public interface IVariable extends IDataMember
 	}
 
 	boolean isAssigned();
-	
+
+	default int getLocalSlots()
+	{
+		return this.getInternalType().getLocalSlots();
+	}
+
 	int getLocalIndex();
-	
+
 	void setLocalIndex(int index);
-	
+
 	default boolean isReferenceCapturable()
 	{
 		return false;
 	}
-	
+
 	default boolean isReferenceType()
 	{
 		return false;
 	}
-	
+
 	default void setReferenceType()
 	{
 	}
-	
+
 	default IType getInternalType()
 	{
 		return this.getType();
 	}
-	
+
 	@Override
 	default IDataMember capture(IContext context)
 	{
@@ -76,7 +81,7 @@ public interface IVariable extends IDataMember
 	{
 		buf.append(this.getDescriptor());
 	}
-	
+
 	default void appendSignature(StringBuilder buf)
 	{
 		buf.append(this.getSignature());
