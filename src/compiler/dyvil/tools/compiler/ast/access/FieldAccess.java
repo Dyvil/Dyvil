@@ -438,14 +438,23 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	@Override
 	public IValue foldConstants()
 	{
-		if (this.field != null && this.field.hasModifier(Modifiers.CONST))
-		{
-			final IValue value = this.field.getValue();
-			return value != null && value.isConstantOrField() ? value : this;
-		}
 		if (this.receiver != null)
 		{
 			this.receiver = this.receiver.foldConstants();
+		}
+		if (this.field != null && this.field.hasModifier(Modifiers.CONST))
+		{
+			if (this.receiver != null && this.receiver.valueTag() == IValue.POP_EXPR)
+			{
+				// Cannot constant-fold
+				return this;
+			}
+
+			final IValue value = this.field.getValue();
+			if (value != null && value.isConstantOrField())
+			{
+				return value;
+			}
 		}
 		return this;
 	}

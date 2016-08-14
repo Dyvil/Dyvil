@@ -1040,16 +1040,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			return;
 		}
-		if (receiver.isIgnoredClassAccess())
-		{
-			final IType type = receiver.getType();
-			if (type.getTypeVariable() != null)
-			{
-				// Static virtual call
-				type.writeClassExpression(writer, true);
-			}
-			return;
-		}
 
 		if (this.modifiers.hasIntModifier(Modifiers.INFIX))
 		{
@@ -1058,6 +1048,16 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 
 		receiver.writeExpression(writer, this.enclosingClass.getType());
+
+		if (receiver.isIgnoredClassAccess())
+		{
+			final IType type = receiver.getType();
+			if (type.getTypeVariable() != null)
+			{
+				// Static virtual call
+				type.writeClassExpression(writer, true);
+			}
+		}
 	}
 
 	protected void writeArguments(MethodWriter writer, IValue receiver, IArguments arguments) throws BytecodeException
