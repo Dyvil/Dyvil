@@ -1,23 +1,32 @@
 package dyvil.lang
 
-using	dyvil.reflect.Opcodes._
+using   dyvil.reflect.Opcodes._
+using   dyvil.reflect.ReflectUtils._
 
 public final class StringExtensions
 {
+	private static final long STRING_VALUE_OFFSET = UNSAFE.objectFieldOffset(class<String>.getDeclaredField("value"))
+
 	private init() {}
 
-	public static inline char char(char c) = c
+	public static inline func char(char c): char = c
 
 	/**
 	 * This method only exists to provide the user with a useful warning message when trying to pass an double-quoted
 	 * String or a single-quoted String with zero or more than one character to the `char` method.
 	 */
 	@UsageInfo(value: "Multi-character Literal or String passed to 'char' method", level: dyvil.util.MarkerLevel.WARNING)
-	public static char char(String c) = c.charAt 0
+	public static inline func char(String c): char = c.charAt 0
 
-	public extension void toString(Object o, StringBuilder builder) = builder.append(o)
+	public extension func toString(Object o, StringBuilder builder): void = builder.append(o)
 
-	public infix inline char subscript(String s, int index) = s.charAt index
+	public static func String([final char] fromShared): String
+		= JAVA_LANG_ACCESS.newStringUnsafe(fromShared)
 
-	public infix inline String subscript(String s, Range<int> range) = s.substring(range.first, range.last)
+	public static postfix func getCharArray(String s): [final char]
+		= UNSAFE.getObject(s, STRING_VALUE_OFFSET) as [final char]
+
+	public infix inline func subscript(String s, int index): char = s.charAt index
+
+	public infix inline func subscript(String s, Range<int> range): String = s.substring(range.first, range.last)
 }

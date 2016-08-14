@@ -51,15 +51,15 @@ public class BinaryReader
 				return;
 			}
 			case NAME: {
-				valueVisitor.visitName(this.readName());
+				valueVisitor.visitName(Name.read(this.dataInput));
 				return;
 			}
 			case NAME_ACCESS {
-				this.readValue(valueVisitor.visitValueAccess(this.readName()));
+				this.readValue(valueVisitor.visitValueAccess(Name.read(this.dataInput)));
 				return;
 			}
 			case BUILDER {
-				this.readBuilder(valueVisitor.visitBuilder(this.readName()));
+				this.readBuilder(valueVisitor.visitBuilder(Name.read(this.dataInput)));
 				return;
 			}
 			case LIST {
@@ -71,11 +71,6 @@ public class BinaryReader
 				return
 			}
 		}
-	}
-
-	private Name readName() throws IOException
-	{
-		return Name.fromUnqualified(this.dataInput.readUTF());
 	}
 
 	private void readStringInterpolation(StringInterpolationVisitor stringInterpolationVisitor) throws IOException
@@ -127,8 +122,7 @@ public class BinaryReader
 	{
 		while (true)
 		{
-			final String param = this.dataInput.readUTF();
-			final Name paramName = param.isEmpty() ? null : Name.fromUnqualified(param);
+			final Name paramName = Name.read(this.dataInput);
 
 			final int tag = this.dataInput.readByte();
 			if (tag == END)
@@ -167,16 +161,16 @@ public class BinaryReader
 		tag match
 		{
 			case NODE {
-				this.readNodes(nodeVisitor.visitNode(this.readName()));
+				this.readNodes(nodeVisitor.visitNode(Name.read(this.dataInput)));
 				//           ^ note the s
 				return;
 			}
 			case NODE_ACCESS {
-				this.readNode(nodeVisitor.visitNodeAccess(this.readName()));
+				this.readNode(nodeVisitor.visitNodeAccess(Name.read(this.dataInput)));
 				return;
 			}
 			case PROPERTY {
-				this.readValue(nodeVisitor.visitProperty(this.readName()));
+				this.readValue(nodeVisitor.visitProperty(Name.read(this.dataInput)));
 				return;
 			}
 		}

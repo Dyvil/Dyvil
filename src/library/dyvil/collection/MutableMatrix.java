@@ -2,15 +2,14 @@ package dyvil.collection;
 
 import dyvil.collection.mutable.FlatArrayMatrix;
 import dyvil.collection.view.MatrixView;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.tuple.Tuple2;
 
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-@NilConvertible
-@ArrayConvertible
+@LiteralConvertible.FromNil
+@LiteralConvertible.FromArray
 public interface MutableMatrix<E> extends Matrix<E>
 {
 	static <E> MutableMatrix<E> apply()

@@ -44,6 +44,7 @@ public class Field extends Member implements IField
 
 	// Metadata
 	protected IClass enclosingClass;
+	protected String internalName;
 	protected String descriptor;
 
 	public Field(IClass enclosingClass)
@@ -69,7 +70,8 @@ public class Field extends Member implements IField
 		this.enclosingClass = enclosingClass;
 	}
 
-	public Field(IClass enclosingClass, ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public Field(IClass enclosingClass, ICodePosition position, Name name, IType type, ModifierSet modifiers,
+		            AnnotationList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
 		this.enclosingClass = enclosingClass;
@@ -140,12 +142,6 @@ public class Field extends Member implements IField
 	}
 
 	@Override
-	public String getSignature()
-	{
-		return this.type.getSignature();
-	}
-
-	@Override
 	public boolean addRawAnnotation(String type, IAnnotation annotation)
 	{
 		switch (type)
@@ -177,7 +173,7 @@ public class Field extends Member implements IField
 		{
 			if (this.modifiers.hasIntModifier(Modifiers.STATIC))
 			{
-				if (receiver.valueTag() != IValue.CLASS_ACCESS)
+				if (!receiver.isClassAccess())
 				{
 					markers.add(Markers.semantic(position, "field.access.static", this.name));
 				}
@@ -186,9 +182,9 @@ public class Field extends Member implements IField
 					markers.add(Markers.semantic(position, "field.access.static.type", this.name,
 					                             this.enclosingClass.getFullName()));
 				}
-				receiver = null;
+				receiver = receiver.asIgnoredClassAccess();
 			}
-			else if (receiver.valueTag() == IValue.CLASS_ACCESS)
+			else if (receiver.isClassAccess())
 			{
 				if (!receiver.getType().getTheClass().isObject())
 				{
@@ -400,6 +396,16 @@ public class Field extends Member implements IField
 	}
 
 	@Override
+	public String getInternalName()
+	{
+		if (this.internalName != null)
+		{
+			return this.internalName;
+		}
+		return this.internalName = this.name.qualified;
+	}
+
+	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		final int modifiers = this.modifiers.toFlags() & ModifierUtil.JAVA_MODIFIER_MASK;
@@ -414,10 +420,11 @@ public class Field extends Member implements IField
 			value = null;
 		}
 
+		final String name = this.getInternalName();
 		final String descriptor = this.getDescriptor();
-		final String name = this.name.qualified;
+		final String signature = this.type.needsSignature() ? this.getSignature() : null;
 
-		final FieldVisitor fieldVisitor = writer.visitField(modifiers, name, descriptor, this.getSignature(), value);
+		final FieldVisitor fieldVisitor = writer.visitField(modifiers, name, descriptor, signature, value);
 
 		IField.writeAnnotations(fieldVisitor, this.modifiers, this.annotations, this.type);
 		fieldVisitor.visitEnd();
@@ -508,7 +515,7 @@ public class Field extends Member implements IField
 		{
 			writer.visitVarInsn(Opcodes.ALOAD, 0);
 			this.value.writeExpression(writer, this.type);
-			writer.visitFieldInsn(Opcodes.PUTFIELD, this.enclosingClass.getInternalName(), this.name.qualified,
+			writer.visitFieldInsn(Opcodes.PUTFIELD, this.enclosingClass.getInternalName(), this.getInternalName(),
 			                      this.getDescriptor());
 		}
 
@@ -529,7 +536,7 @@ public class Field extends Member implements IField
 		if (this.value != null && !this.hasConstantValue() && !this.hasModifier(Modifiers.LAZY))
 		{
 			this.value.writeExpression(writer, this.type);
-			writer.visitFieldInsn(Opcodes.PUTSTATIC, this.enclosingClass.getInternalName(), this.name.qualified,
+			writer.visitFieldInsn(Opcodes.PUTSTATIC, this.enclosingClass.getInternalName(), this.getInternalName(),
 			                      this.getDescriptor());
 		}
 
@@ -543,7 +550,7 @@ public class Field extends Member implements IField
 	public void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
 		String owner = this.enclosingClass.getInternalName();
-		String name = this.name.qualified;
+		String name = this.getInternalName();
 		String desc = this.getDescriptor();
 
 		writer.visitLineNumber(lineNumber);
@@ -569,7 +576,7 @@ public class Field extends Member implements IField
 	public void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
 		String owner = this.enclosingClass.getInternalName();
-		String name = this.name.qualified;
+		String name = this.getInternalName();
 		String desc = this.getDescriptor();
 
 		if (this.modifiers.hasIntModifier(Modifiers.STATIC))

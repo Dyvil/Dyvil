@@ -179,34 +179,21 @@ public abstract class GenericType implements IObjectType, ITypeList
 	}
 	
 	@Override
-	public String getSignature()
-	{
-		if (this.typeArgumentCount <= 0)
-		{
-			return null;
-		}
-		
-		StringBuilder buf = new StringBuilder();
-		this.appendSignature(buf);
-		return buf.toString();
-	}
-	
-	@Override
 	public void appendExtendedName(StringBuilder buffer)
 	{
 		buffer.append('L').append(this.getInternalName()).append(';');
 	}
 	
 	@Override
-	public void appendSignature(StringBuilder buf)
+	public void appendSignature(StringBuilder buf, boolean genericArg)
 	{
 		buf.append('L').append(this.getInternalName());
-		if (this.typeArguments != null)
+		if (this.typeArgumentCount > 0)
 		{
 			buf.append('<');
 			for (int i = 0; i < this.typeArgumentCount; i++)
 			{
-				this.typeArguments[i].appendSignature(buf);
+				this.typeArguments[i].appendSignature(buf, true);
 			}
 			buf.append('>');
 		}

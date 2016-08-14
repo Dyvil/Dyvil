@@ -322,6 +322,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			}
 			if (type == DyvilSymbols.ELLIPSIS)
 			{
+				pm.report(Markers.syntaxWarning(token, "type.list.deprecated", this.type.getElementType()));
 				this.type = new ListType(this.type.getElementType(), this.type.getMutability());
 				this.mode = ARRAY_END;
 				return;
@@ -362,15 +363,53 @@ public final class TypeParser extends Parser implements ITypeConsumer
 		}
 	}
 
+	/**
+	 * Returns {@code true} iff the given token is a symbol token that starts with {@code <}.
+	 * This includes the special left-arrow token {@code <-}.
+	 */
 	public static boolean isGenericStart(IToken token, int type)
 	{
-		return type == DyvilSymbols.ARROW_LEFT
-			       || ParserUtil.isIdentifier(type) && token.nameValue().unqualified.charAt(0) == '<';
+		switch (type) {
+		case DyvilSymbols.ARROW_LEFT:
+			return true;
+		case Tokens.SYMBOL_IDENTIFIER:
+		case Tokens.LETTER_IDENTIFIER:
+			return token.nameValue().unqualified.charAt(0) == '<';
+		}
+		return false;
 	}
 
+	/**
+	 * Returns {@code true} iff the given token is a symbol token that starts with {@code >}.
+	 */
 	public static boolean isGenericEnd(IToken token, int type)
 	{
-		return ParserUtil.isIdentifier(type) && token.nameValue().unqualified.charAt(0) == '>';
+		switch (type)
+		{
+		case Tokens.SYMBOL_IDENTIFIER:
+		case Tokens.LETTER_IDENTIFIER:
+			return token.nameValue().unqualified.charAt(0) == '>';
+		}
+		return false;
+	}
+
+	/**
+	 * Returns {@code true} iff the given token is a symbol token that ends with {@code >}.
+	 * This includes the special right-arrow {@code ->} and double-right-arrow {@code =>} tokens.
+	 */
+	public static boolean isGenericEnd2(IToken token, int type)
+	{
+		switch (type)
+		{
+		case DyvilSymbols.ARROW_RIGHT:
+		case DyvilSymbols.DOUBLE_ARROW_RIGHT:
+			return true;
+		// case Tokens.LETTER_IDENTIFIER: // if it is a LETTER_IDENTIFIER token, the last token cannot be a '>'
+		case Tokens.SYMBOL_IDENTIFIER:
+			final String unqualified = token.nameValue().unqualified;
+			return unqualified.charAt(unqualified.length() - 1) == '>';
+		}
+		return false;
 	}
 
 	@Override

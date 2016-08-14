@@ -2,7 +2,7 @@ package dyvil.collection.iterator;
 
 import dyvil.annotation.Immutable;
 import dyvil.annotation.Mutating;
-import dyvil.lang.literal.TupleConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.util.ImmutableException;
 
 import java.util.Iterator;
@@ -10,7 +10,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-@TupleConvertible
+@LiteralConvertible.FromTuple
 @Immutable
 public class SingletonIterator<E> implements Iterator<E>
 {

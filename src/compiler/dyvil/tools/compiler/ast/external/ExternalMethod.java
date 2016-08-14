@@ -57,7 +57,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 			this.name = Name.fromQualified(name);
 		}
 
-		this.mangledName = name;
+		this.internalName = name;
 		this.signature = signature;
 		this.descriptor = desc;
 	}
@@ -118,7 +118,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		int parametersToRemove = 0;
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			if (this.typeParameters[i].getReifiedKind() != ITypeParameter.ReifiedKind.NOT_REIFIED)
+			if (this.typeParameters[i].getReifiedKind() != null)
 			{
 				parametersToRemove++;
 			}

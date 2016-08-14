@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.operator;
 
-import dyvil.tools.compiler.ast.access.*;
+import dyvil.tools.compiler.ast.access.FieldAccess;
+import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.intrinsic.IncOperator;
@@ -20,6 +21,11 @@ public class InfixCall extends MethodCall
 	public InfixCall(ICodePosition position, IValue lhs, Name name, IValue rhs)
 	{
 		super(position, lhs, name, new SingleArgument(rhs));
+	}
+
+	public InfixCall(ICodePosition position, IValue receiver, Name name, IArguments arguments)
+	{
+		super(position, receiver, name, arguments);
 	}
 
 	@Override
@@ -68,107 +74,53 @@ public class InfixCall extends MethodCall
 		return null;
 	}
 
-	protected static IValue resolveCompound(MarkerList markers, IContext context, ICodePosition position, IValue receiver, Name name, IArguments arguments)
+	protected static IValue resolveCompound(MarkerList markers, IContext context, ICodePosition position, IValue lhs,
+		                                       Name name, IArguments arguments)
 	{
-		int type = receiver.valueTag();
-		if (type == APPLY_CALL)
+		IValue op = getIncOperator(name, lhs, arguments.getLastValue());
+		if (op != null)
 		{
-			final ApplyMethodCall applyCall = (ApplyMethodCall) receiver;
-
-			// x(y...) op= z
-			// -> x(y...) = x(y...).op(z)
-			// -> x.update(y..., x.apply(y...).op(z))
-
-			final SideEffectHelper helper = new SideEffectHelper();
-
-			final IValue applyReceiver = helper.processValue(applyCall.getReceiver());
-			final IArguments applyArguments = helper.processArguments(applyCall.getArguments());
-
-			final IValue op = new MethodCall(position, receiver, name, arguments).resolveCall(markers, context, false);
-			if (op == null)
-			{
-				return null;
-			}
-
-			applyCall.setArguments(applyArguments);
-			applyCall.setReceiver(applyReceiver);
-			final IValue update = new UpdateMethodCall(position, applyReceiver, applyArguments, op)
-				                      .resolveCall(markers, context, true);
-
-			return helper.finish(update);
+			return op;
 		}
-		else if (type == SUBSCRIPT_GET)
+
+		op = new InfixCall(position, lhs, name, arguments).resolveCall(markers, context, false);
+		if (op == null)
 		{
-			final SubscriptAccess subscriptAccess = (SubscriptAccess) receiver;
-
-			// x[y...] op= z
-			// -> x[y...] = x[y...].op(z)
-			// -> x.subscript_=(y..., x.subscript(y...).op(z))
-
-			final SideEffectHelper helper = new SideEffectHelper();
-
-			final IValue subscriptReceiver = helper.processValue(subscriptAccess.getReceiver());
-			final IArguments subscriptArguments = helper.processArguments(subscriptAccess.getArguments());
-
-			final IValue op = new MethodCall(position, receiver, name, arguments).resolveCall(markers, context, false);
-			if (op == null)
-			{
-				return null;
-			}
-
-			subscriptAccess.setReceiver(subscriptReceiver);
-			subscriptAccess.setArguments(subscriptArguments);
-			final IValue subscript = new SubscriptAssignment(position, subscriptReceiver, subscriptArguments, op)
-				                         .resolveCall(markers, context, true);
-
-			return helper.finish(subscript);
+			return null;
 		}
-		else if (type == FIELD_ACCESS)
+
+		final SideEffectHelper helper = new SideEffectHelper();
+		final IValue assignment = lhs.toCompoundAssignment(op, position, markers, context, helper);
+		if (assignment != null)
 		{
-			final FieldAccess fieldAccess = (FieldAccess) receiver;
-
-			final IncOperator incOp = getIncOperator(name, arguments, fieldAccess);
-			if (incOp != null)
-			{
-				incOp.setPosition(position);
-				return incOp.resolveOperator(markers, context);
-			}
-
-			// x op= z
-			// -> x = x.op(z)
-
-			final SideEffectHelper helper = new SideEffectHelper();
-
-			final IValue fieldReceiver = helper.processValue(fieldAccess.getReceiver());
-
-			final IValue op = new MethodCall(position, receiver, name, arguments).resolveCall(markers, context, false);
-			if (op == null)
-			{
-				return null;
-			}
-
-			fieldAccess.setReceiver(fieldReceiver);
-			final FieldAssignment assignment = new FieldAssignment(position, fieldReceiver, fieldAccess.getField(), op);
 			return helper.finish(assignment);
 		}
 
 		return null;
 	}
 
-	private static IncOperator getIncOperator(Name name, IArguments arguments, FieldAccess fieldAccess)
+	private static IncOperator getIncOperator(Name name, IValue lhs, IValue rhs)
 	{
-		if ((name != Names.plus && name != Names.minus) || !IncOperator.isIncConvertible(fieldAccess.getType()))
+		// Operator has to be either + or -
+		if (name != Names.plus && name != Names.minus)
 		{
 			return null;
 		}
 
-		final IValue value = arguments.getLastValue();
-		if (value.valueTag() != INT)
+		// Right-hand operand must be of type int
+		if (rhs.valueTag() != INT)
 		{
 			return null;
 		}
 
-		int intValue = value.intValue();
+		// Left-hand operand must be a field access and inc-convertible
+		if (lhs.valueTag() != IValue.FIELD_ACCESS || !IncOperator.isIncConvertible(lhs.getType()))
+		{
+			return null;
+		}
+
+		final FieldAccess fieldAccess = (FieldAccess) lhs;
+		int intValue = rhs.intValue();
 		if (name == Names.minus)
 		{
 			intValue = -intValue;
@@ -182,10 +134,14 @@ public class InfixCall extends MethodCall
 		if (this.receiver != null)
 		{
 			this.receiver.toString(prefix, buffer);
+			buffer.append(' ');
 		}
-		buffer.append(' ').append(this.name.unqualified).append(' ');
+
+		buffer.append(this.name.unqualified);
+
 		if (!this.arguments.isEmpty())
 		{
+			buffer.append(' ');
 			this.arguments.getFirstValue().toString(prefix, buffer);
 		}
 	}

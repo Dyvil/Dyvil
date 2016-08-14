@@ -3,7 +3,7 @@ package dyvil.collection.immutable;
 import dyvil.annotation.Immutable;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractArraySet;
-import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.util.ImmutableException;
 
 import java.util.Collections;
@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@ArrayConvertible
+@LiteralConvertible.FromArray
 @Immutable
 public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 {

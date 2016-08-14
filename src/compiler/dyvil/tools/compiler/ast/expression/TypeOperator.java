@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -24,7 +25,8 @@ public final class TypeOperator extends AbstractValue
 		public static final IClass    TYPE_CLASS = Package.dyvilxLangModelType.resolveClass("Type");
 		public static final ClassType TYPE       = new ClassType(TYPE_CLASS);
 
-		public static final IClass TYPE_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("TypeConvertible");
+		public static final IClass TYPE_CONVERTIBLE = Types.LITERALCONVERTIBLE_CLASS
+			                                              .resolveClass(Name.fromRaw("FromType"));
 
 		private LazyFields()
 		{

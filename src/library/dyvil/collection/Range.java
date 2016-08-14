@@ -3,8 +3,7 @@ package dyvil.collection;
 import dyvil.annotation.Immutable;
 import dyvil.annotation._internal.Covariant;
 import dyvil.collection.range.*;
-import dyvil.lang.literal.NilConvertible;
-import dyvil.lang.literal.TupleConvertible;
+import dyvil.lang.LiteralConvertible;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;
@@ -13,8 +12,8 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Consumer;
 
-@NilConvertible
-@TupleConvertible
+@LiteralConvertible.FromNil
+@LiteralConvertible.FromTuple
 public @Immutable interface Range<@Covariant T> extends Iterable<T>, Serializable
 {
 	static <T> Range<T> apply()

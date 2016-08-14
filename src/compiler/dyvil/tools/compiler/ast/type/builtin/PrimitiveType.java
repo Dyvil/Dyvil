@@ -1,8 +1,10 @@
 package dyvil.tools.compiler.ast.type.builtin;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.Type;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.*;
@@ -99,51 +101,35 @@ public final class PrimitiveType implements IType
 		this.frameType = frameType;
 	}
 
-	public static IType getPrimitiveType(IType type)
+	public static IType getPrimitiveType(String internalClassName)
 	{
-		if (type.isArrayType())
+		switch (internalClassName)
 		{
-			return type;
-		}
-
-		final IClass iclass = type.getTheClass();
-		if (iclass == Types.VOID_CLASS)
-		{
+		case "java/lang/Void":
 			return Types.VOID;
-		}
-		if (iclass == Types.BOOLEAN_CLASS)
-		{
+		case "java/lang/Boolean":
 			return Types.BOOLEAN;
-		}
-		if (iclass == Types.BYTE_CLASS)
-		{
+		case "java/lang/Byte":
 			return Types.BYTE;
-		}
-		if (iclass == Types.SHORT_CLASS)
-		{
+		case "java/lang/Short":
 			return Types.SHORT;
-		}
-		if (iclass == Types.CHAR_CLASS)
-		{
+		case "java/lang/Character":
 			return Types.CHAR;
-		}
-		if (iclass == Types.INT_CLASS)
-		{
+		case "java/lang/Integer":
 			return Types.INT;
-		}
-		if (iclass == Types.LONG_CLASS)
-		{
+		case "java/lang/Long":
 			return Types.LONG;
-		}
-		if (iclass == Types.FLOAT_CLASS)
-		{
+		case "java/lang/Float":
 			return Types.FLOAT;
-		}
-		if (iclass == Types.DOUBLE_CLASS)
-		{
+		case "java/lang/Double":
 			return Types.DOUBLE;
 		}
-		return type;
+		return null;
+	}
+
+	public static IType getPrimitiveType(IType type)
+	{
+		return getPrimitiveType(type.getInternalName());
 	}
 
 	public static PrimitiveType fromTypecode(int typecode)
@@ -473,9 +459,14 @@ public final class PrimitiveType implements IType
 	}
 
 	@Override
-	public void appendSignature(StringBuilder buf)
+	public void appendSignature(StringBuilder buf, boolean genericArg)
 	{
-		buf.append(this.typeChar);
+		if (!genericArg)
+		{
+			buf.append(this.typeChar);
+			return;
+		}
+		buf.append('L').append(this.theClass.getInternalName()).append(';');
 	}
 
 	@Override
@@ -568,7 +559,7 @@ public final class PrimitiveType implements IType
 			primitiveTarget = getPrimitiveType(target);
 
 			// Target is not a primitive type
-			if (primitiveTarget == target)
+			if (primitiveTarget == null)
 			{
 				this.boxMethod.writeInvoke(writer, null, EmptyArguments.INSTANCE, ITypeContext.DEFAULT, lineNumber);
 				return;
@@ -604,7 +595,7 @@ public final class PrimitiveType implements IType
 	}
 
 	@Override
-	public void writeClassExpression(MethodWriter writer) throws BytecodeException
+	public void writeClassExpression(MethodWriter writer, boolean wrapPrimitives) throws BytecodeException
 	{
 		String owner;
 
@@ -639,6 +630,12 @@ public final class PrimitiveType implements IType
 		default:
 			owner = "java/lang/Void";
 			break;
+		}
+
+		if (wrapPrimitives)
+		{
+			writer.visitLdcInsn(Type.getObjectType(owner));
+			return;
 		}
 
 		writer.visitFieldInsn(Opcodes.GETSTATIC, owner, "TYPE", "Ljava/lang/Class;");
@@ -786,6 +783,17 @@ public final class PrimitiveType implements IType
 	@Override
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
+		final int length = typePath.length();
+		if (length <= 0)
+		{
+			return;
+		}
+
+		final char lastChar = typePath.charAt(length - 1);
+		if (lastChar == ';' || lastChar >= '0' && lastChar <= '9')
+		{
+			visitor.visitTypeAnnotation(typeRef, TypePath.fromString(typePath), AnnotationUtil.PRIMITIVE, true);
+		}
 	}
 
 	@Override

@@ -51,7 +51,7 @@ public class InternalTypeVarType extends InternalType
 	}
 	
 	@Override
-	public void appendSignature(StringBuilder buffer)
+	public void appendSignature(StringBuilder buffer, boolean genericArg)
 	{
 		buffer.append('T').append(this.internalName).append(';');
 	}

@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.intrinsic.PopExpr;
 import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -15,6 +16,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.transform.SideEffectHelper;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.Marker;
@@ -117,6 +119,7 @@ public interface IValue extends IASTNode, ITyped
 	int REFERENCE          = 240;
 	int LITERAL_CONVERSION = 241;
 	int OPERATOR_CHAIN     = 242;
+	int POP_EXPR           = 243;
 
 	// --- Other Constants ---
 
@@ -185,6 +188,31 @@ public interface IValue extends IASTNode, ITyped
 	default IValue toAssignment(IValue rhs, ICodePosition position)
 	{
 		return null;
+	}
+
+	default IValue toCompoundAssignment(IValue rhs, ICodePosition position, MarkerList markers, IContext context,
+		                                   SideEffectHelper helper)
+	{
+		return null;
+	}
+
+	default boolean isClassAccess()
+	{
+		return false;
+	}
+
+	default boolean isIgnoredClassAccess()
+	{
+		return false;
+	}
+
+	default IValue asIgnoredClassAccess()
+	{
+		if (!this.hasSideEffects())
+		{
+			return null;
+		}
+		return new PopExpr(this);
 	}
 
 	default boolean checkVarargs(boolean typeCheck)

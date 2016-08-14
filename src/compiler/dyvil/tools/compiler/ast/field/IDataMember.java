@@ -128,9 +128,15 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 		this.writeSet_Set(writer, lineNumber);
 	}
 
-	String getDescriptor();
+	default String getDescriptor()
+	{
+		return this.getType().getExtendedName();
+	}
 
-	String getSignature();
+	default String getSignature()
+	{
+		return this.getType().getSignature();
+	}
 
 	default IDataMember capture(IContext context)
 	{

@@ -10,7 +10,7 @@ public class DyvilKeywords
 	public static final int CASE         = Tokens.KEYWORD | 0x00040000;
 	public static final int CATCH        = Tokens.KEYWORD | 0x00050000;
 	public static final int CLASS        = Tokens.KEYWORD | 0x00060000;
-	public static final int CONST        = Tokens.KEYWORD | 0x00070000; // TODO use for expression templates
+	public static final int CONST        = Tokens.KEYWORD | 0x00070000; // unused
 	public static final int CONTINUE     = Tokens.KEYWORD | 0x00080000;
 	public static final int DO           = Tokens.KEYWORD | 0x00090000; // unused
 	public static final int ELSE         = Tokens.KEYWORD | 0x000A0000;
@@ -35,40 +35,42 @@ public class DyvilKeywords
 	public static final int INTERFACE    = Tokens.KEYWORD | 0x001D0000;
 	public static final int INTERNAL     = Tokens.KEYWORD | 0x001E0000;
 	public static final int IS           = Tokens.KEYWORD | 0x001F0000;
-	public static final int LABEL        = Tokens.KEYWORD | 0x00410000;
-	public static final int LAZY         = Tokens.KEYWORD | 0x00200000;
-	public static final int LET          = Tokens.KEYWORD | 0x00210000;
-	public static final int MACRO        = Tokens.KEYWORD | 0x00220000; // unused
-	public static final int MATCH        = Tokens.KEYWORD | 0x00230000;
-	public static final int NEW          = Tokens.KEYWORD | 0x00240000;
-	public static final int NIL          = Tokens.KEYWORD | 0x00250000;
-	public static final int NULL         = Tokens.KEYWORD | 0x00260000;
-	public static final int OBJECT       = Tokens.KEYWORD | 0x00270000;
-	public static final int OVERRIDE     = Tokens.KEYWORD | 0x00280000;
-	public static final int OPERATOR     = Tokens.KEYWORD | 0x00290000;
-	public static final int PACKAGE      = Tokens.KEYWORD | 0x002A0000;
-	public static final int POSTFIX      = Tokens.KEYWORD | 0x002B0000;
-	public static final int PREFIX       = Tokens.KEYWORD | 0x002C0000;
-	public static final int PRIVATE      = Tokens.KEYWORD | 0x002D0000;
-	public static final int PROTECTED    = Tokens.KEYWORD | 0x002E0000;
-	public static final int PUBLIC       = Tokens.KEYWORD | 0x002F0000;
-	public static final int REPEAT       = Tokens.KEYWORD | 0x00400000;
-	public static final int RETURN       = Tokens.KEYWORD | 0x00300000;
-	public static final int SEALED       = Tokens.KEYWORD | 0x00310000; // unused
-	public static final int STATIC       = Tokens.KEYWORD | 0x00320000;
-	public static final int SUPER        = Tokens.KEYWORD | 0x00330000;
-	public static final int SYNCHRONIZED = Tokens.KEYWORD | 0x00340000;
-	public static final int THIS         = Tokens.KEYWORD | 0x00350000;
-	public static final int THROW        = Tokens.KEYWORD | 0x00360000;
-	public static final int THROWS       = Tokens.KEYWORD | 0x00370000;
-	public static final int TRAIT        = Tokens.KEYWORD | 0x00380000;
-	public static final int TRUE         = Tokens.KEYWORD | 0x00390000;
-	public static final int TRY          = Tokens.KEYWORD | 0x003A0000;
-	public static final int TYPE         = Tokens.KEYWORD | 0x003B0000;
-	public static final int USING        = Tokens.KEYWORD | 0x003C0000;
-	public static final int VAR          = Tokens.KEYWORD | 0x003D0000;
-	public static final int WHERE        = Tokens.KEYWORD | 0x003E0000; // unused
-	public static final int WHILE        = Tokens.KEYWORD | 0x003F0000;
+	public static final int LABEL        = Tokens.KEYWORD | 0x00200000;
+	public static final int LAZY         = Tokens.KEYWORD | 0x00210000;
+	public static final int LET          = Tokens.KEYWORD | 0x00220000;
+	public static final int MACRO        = Tokens.KEYWORD | 0x00230000; // unused
+	public static final int MATCH        = Tokens.KEYWORD | 0x00240000;
+	public static final int NEW          = Tokens.KEYWORD | 0x00250000;
+	public static final int NIL          = Tokens.KEYWORD | 0x00260000;
+	public static final int NULL         = Tokens.KEYWORD | 0x00270000;
+	public static final int OBJECT       = Tokens.KEYWORD | 0x00280000;
+	public static final int OVERRIDE     = Tokens.KEYWORD | 0x00290000;
+	public static final int OPERATOR     = Tokens.KEYWORD | 0x002A0000;
+	public static final int PACKAGE      = Tokens.KEYWORD | 0x002B0000;
+	public static final int POSTFIX      = Tokens.KEYWORD | 0x002C0000;
+	public static final int PREFIX       = Tokens.KEYWORD | 0x002D0000;
+	public static final int PRIVATE      = Tokens.KEYWORD | 0x002E0000;
+	public static final int PROTECTED    = Tokens.KEYWORD | 0x002F0000;
+	public static final int PUBLIC       = Tokens.KEYWORD | 0x00300000;
+	public static final int REPEAT       = Tokens.KEYWORD | 0x00310000;
+	public static final int RETURN       = Tokens.KEYWORD | 0x00320000;
+	public static final int SEALED       = Tokens.KEYWORD | 0x00330000; // unused
+	public static final int STATIC       = Tokens.KEYWORD | 0x00340000;
+	public static final int STRUCT       = Tokens.KEYWORD | 0x00350000; // unused
+	public static final int SUPER        = Tokens.KEYWORD | 0x00360000;
+	public static final int SYNCHRONIZED = Tokens.KEYWORD | 0x00370000;
+	public static final int TEMPLATE     = Tokens.KEYWORD | 0x00380000; // unused
+	public static final int THIS         = Tokens.KEYWORD | 0x00390000;
+	public static final int THROW        = Tokens.KEYWORD | 0x003A0000;
+	public static final int THROWS       = Tokens.KEYWORD | 0x003B0000;
+	public static final int TRAIT        = Tokens.KEYWORD | 0x003C0000;
+	public static final int TRUE         = Tokens.KEYWORD | 0x003D0000;
+	public static final int TRY          = Tokens.KEYWORD | 0x003E0000;
+	public static final int TYPE         = Tokens.KEYWORD | 0x003F0000;
+	public static final int USING        = Tokens.KEYWORD | 0x00400000;
+	public static final int VAR          = Tokens.KEYWORD | 0x00410000;
+	public static final int WHERE        = Tokens.KEYWORD | 0x00420000; // unused
+	public static final int WHILE        = Tokens.KEYWORD | 0x00430000;
 
 	public static int getKeywordType(String s)
 	{
@@ -127,8 +129,10 @@ public class DyvilKeywords
 		case "return": return RETURN;
 		case "sealed": return SEALED;
 		case "static": return STATIC;
+		case "struct": return STRUCT;
 		case "super": return SUPER;
 		case "synchronized": return SYNCHRONIZED;
+		case "template": return TEMPLATE;
 		case "this": return THIS;
 		case "throw": return THROW;
 		case "throws": return THROWS;
@@ -202,8 +206,10 @@ public class DyvilKeywords
 		case RETURN: return "return";
 		case SEALED: return "sealed";
 		case STATIC: return "static";
+		case STRUCT: return "struct";
 		case SUPER: return "super";
 		case SYNCHRONIZED: return "synchronized";
+		case TEMPLATE: return "template";
 		case THIS: return "this";
 		case THROW: return "throw";
 		case THROWS: return "throws";

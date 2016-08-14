@@ -1,13 +1,13 @@
 package dyvil.tools.compiler.ast.reference;
 
 import dyvil.reflect.Modifiers;
-import dyvil.reflect.Opcodes;
-import dyvil.tools.asm.Type;
+import dyvil.tools.asm.Handle;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
@@ -16,8 +16,12 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class InstanceFieldReference implements IReference
 {
-	private final IValue receiver;
+	private static final Handle BOOTSTRAP = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/ref/ReferenceFactory",
+	                                                   "instanceRefMetafactory",
+	                                                   ClassFormat.BSM_HEAD + ClassFormat.BSM_TAIL);
+
 	private final IField field;
+	private final IValue receiver;
 
 	public InstanceFieldReference(IValue receiver, IField field)
 	{
@@ -45,19 +49,11 @@ public class InstanceFieldReference implements IReference
 		// Write the receiver
 		this.receiver.writeExpression(writer, null);
 
+		final String internalClassName = this.field.getEnclosingClass().getInternalName();
 		final IType fieldType = this.field.getType();
-		final String fieldClassName = this.field.getEnclosingClass().getInternalName();
-		final String fieldName = this.field.getName().qualified;
-		final String factoryMethodName = ReferenceType.LazyFields.getReferenceFactoryName(fieldType, "");
-		final String factoryMethodType =
-			"(Ljava/lang/Object;Ljava/lang/Class;Ljava/lang/String;)L" + ReferenceType.LazyFields
-				                                                             .getInternalRef(fieldType, "") + ';';
 
-		writer.visitLdcInsn(Type.getObjectType(fieldClassName));
-		writer.visitLdcInsn(fieldName);
-
-		// Write a call to the access factory method
-		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/ref/ReferenceFactory", factoryMethodName, factoryMethodType,
-		                       false);
+		final String desc =
+			"(L" + internalClassName + ";)L" + ReferenceType.LazyFields.getInternalRef(fieldType, "unsafe/Unsafe") + ';';
+		writer.visitInvokeDynamicInsn(this.field.getInternalName(), desc, BOOTSTRAP);
 	}
 }

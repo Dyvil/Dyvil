@@ -130,6 +130,7 @@ public interface IClass extends IClassMember, ITypeParametric, IContext, IParame
 	
 	// Compilation
 	
+	@Override
 	String getInternalName();
 	
 	String getSignature();

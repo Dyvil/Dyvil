@@ -11,25 +11,26 @@ public class ReifyTest
 		typeTest()
 		classTest()
 		classErasureTest()
+		overrideTest()
 	}
 
 	// Reify Type
-	private static Type<T> typeOf<@Reified T>() = type T
+	private static Type<T> typeOf<@Reified(Reified.Type.TYPE) T>() = type T
 
 	// Reify Type, with Argument
-	private static Type<T> typeOf<@Reified T>(T value) = type T
+	private static Type<T> typeOf<@Reified(Reified.Type.TYPE) T>(T value) = type T
 
 	// Reify Class
-	private static Class<T> classOf<@Reified T>() = class T
+	private static Class<T> classOf<@Reified(Reified.Type.TYPE) T>() = class T
 
 	// Reify Class, with Argument
-	private static Class<T> classOf<@Reified T>(T value) = class T
+	private static Class<T> classOf<@Reified(Reified.Type.TYPE) T>(T value) = class T
 
 	// Reify Class from Erasure
-	private static Class<T> classOfErasure<@Reified(erasure: true) T>() = class T
+	private static Class<T> classOfErasure<@Reified(Reified.Type.ANY_CLASS) T>() = class T
 
 	// Reify Class from Erasure, with Argument
-	private static Class<T> classOfErasure<@Reified(erasure: true) T>(T value) = class T
+	private static Class<T> classOfErasure<@Reified(Reified.Type.ANY_CLASS) T>(T value) = class T
 
 	private static void typeTest()
 	{
@@ -62,5 +63,50 @@ public class ReifyTest
 
 		Main.test("Reify Erasure Class Test", class1, stringClass)
 		Main.test("Reify Erasure Class Test with Argument", class2, stringClass)
+	}
+
+	class Base
+	{
+		func foo<@Reified(Reified.Type.TYPE)         T> : Object = type<T>
+		func bar<@Reified(Reified.Type.ANY_CLASS)    T> : Object = class<T>
+		func baz<@Reified(Reified.Type.OBJECT_CLASS) T> : Object = class<T>
+
+		func moo: Object = null
+	}
+
+	class Derived1 extends Base
+	{
+		override func foo<@Reified(Reified.Type.ANY_CLASS) T> : Object = class<T>
+		override func bar<@Reified(Reified.Type.TYPE)      T> : Object = type<T>
+		override func baz<@Reified(Reified.Type.TYPE)      T> : Object = type<T>
+
+		// T should become Object when called from super
+		override func moo<@Reified(Reified.Type.TYPE)      T> : Object = type<T>
+	}
+
+	class Derived2 extends Base
+	{
+		override func foo<@Reified(Reified.Type.OBJECT_CLASS) T> : Object = class<T>
+		override func bar<@Reified(Reified.Type.OBJECT_CLASS) T> : Object = class<T>
+		override func baz<@Reified(Reified.Type.ANY_CLASS)    T> : Object = class<T>
+
+		// T should become Object when called from super
+		override func moo<@Reified(Reified.Type.ANY_CLASS)    T> : Object = class<T>
+	}
+
+	private static void overrideTest()
+	{
+		Base b1 = new Derived1
+		Base b2 = new Derived2
+
+		Main.testString("Reify Override Test 1.1", class<String>, b1.foo<String>)
+		Main.testString("Reify Override Test 1.2", type<String>,  b1.bar<String>)
+		Main.testString("Reify Override Test 1.3", type<String>,  b1.baz<String>)
+		Main.testString("Reify Override Test 1.4", type<Object>,  b1.moo)
+
+		Main.testString("Reify Override Test 2.1", class<String>, b2.foo<String>)
+		Main.testString("Reify Override Test 2.2", class<String>, b2.bar<String>)
+		Main.testString("Reify Override Test 2.3", class<String>, b2.baz<String>)
+		Main.testString("Reify Override Test 2.4", class<Object>, b2.moo)
 	}
 }

@@ -11,7 +11,7 @@ import java.net.URL;
 
 public final class ReflectUtils
 {
-	protected static final JavaLangAccess JAVA_LANG_ACCESS = SharedSecrets.getJavaLangAccess();
+	public static final JavaLangAccess JAVA_LANG_ACCESS = SharedSecrets.getJavaLangAccess();
 	public static final sun.misc.Unsafe UNSAFE;
 	
 	static

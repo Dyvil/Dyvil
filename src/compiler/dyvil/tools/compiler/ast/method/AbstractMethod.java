@@ -57,9 +57,16 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 {
 	protected static final Handle EXTENSION_BSM = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/DynamicLinker",
 	                                                         "linkExtension",
-	                                                         "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;)Ljava/lang/invoke/CallSite;");
+	                                                         ClassFormat.BSM_HEAD + "Ljava/lang/invoke/MethodHandle;"
+		                                                         + ClassFormat.BSM_TAIL);
+
+	protected static final Handle STATICVIRTUAL_BSM = new Handle(ClassFormat.H_INVOKESTATIC,
+	                                                             "dyvil/runtime/DynamicLinker", "linkClassMethod",
+	                                                             ClassFormat.BSM_HEAD + ClassFormat.BSM_TAIL);
 
 	protected static final String NAME_SEPARATOR = "_$_";
+
+	// --------------------------------------------------
 
 	protected ITypeParameter[] typeParameters;
 	protected int              typeParameterCount;
@@ -73,7 +80,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 	// Metadata
 	protected IClass        enclosingClass;
-	protected String        mangledName;
+	protected String        internalName;
 	protected String        descriptor;
 	protected String        signature;
 	protected IntrinsicData intrinsicData;
@@ -456,7 +463,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			argumentStartIndex = 0;
 			parameterStartIndex = 0;
 		}
-		else if ((mod = this.modifiers.toFlags() & Modifiers.INFIX) != 0 && receiver.valueTag() == IValue.CLASS_ACCESS)
+		else if ((mod = this.modifiers.toFlags() & Modifiers.INFIX) != 0 && receiver.isClassAccess())
 		{
 			// Static access to static method
 
@@ -480,7 +487,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 		else
 		{
-			if (mod == Modifiers.STATIC && receiver.valueTag() != IValue.CLASS_ACCESS)
+			if (mod == Modifiers.STATIC && !receiver.isClassAccess())
 			{
 				// Disallow non-static access to static method
 				invalid = true;
@@ -612,7 +619,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		if (receiver != null)
 		{
 			final int mod = this.modifiers.toFlags() & Modifiers.INFIX;
-			if (mod == Modifiers.INFIX && receiver.valueTag() != IValue.CLASS_ACCESS)
+			if (mod == Modifiers.INFIX && !receiver.isClassAccess())
 			{
 				// infix or extension method, declaring class implicit
 
@@ -641,7 +648,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			{
 				// static method or infix, extension method with explicit declaring class
 
-				if (receiver.valueTag() != IValue.CLASS_ACCESS)
+				if (!receiver.isClassAccess())
 				{
 					// static method called like instance method -> warning
 
@@ -654,9 +661,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 					markers.add(Markers.semantic(position, "method.access.static.type", this.name,
 					                             this.enclosingClass.getFullName()));
 				}
-				receiver = null; // TODO don't hide the receiver
+				receiver = receiver.asIgnoredClassAccess();
 			}
-			else if (receiver.valueTag() == IValue.CLASS_ACCESS)
+			else if (receiver.isClassAccess())
 			{
 				// instance method, accessed via declaring class
 
@@ -887,24 +894,18 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public Handle toHandle()
 	{
 		return new Handle(ClassFormat.insnToHandle(this.getInvokeOpcode()), this.enclosingClass.getInternalName(),
-		                  this.getMangledName(), this.getDescriptor());
+		                  this.getInternalName(), this.getDescriptor());
 	}
 
 	@Override
-	public String getMangledName()
+	public String getInternalName()
 	{
-		if (this.mangledName != null)
+		if (this.internalName != null)
 		{
-			return this.mangledName;
+			return this.internalName;
 		}
 
-		return this.mangledName = this.name.qualified;
-	}
-
-	@Override
-	public void setMangledName(String mangledName)
-	{
-		this.mangledName = mangledName;
+		return this.internalName = this.name.qualified;
 	}
 
 	@Override
@@ -957,7 +958,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			this.typeParameters[i].appendParameterSignature(buffer);
 		}
 		buffer.append(')');
-		this.type.appendSignature(buffer);
+		this.type.appendSignature(buffer, false);
 		return this.signature = buffer.toString();
 	}
 
@@ -1035,39 +1036,39 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 	protected void writeReceiver(MethodWriter writer, IValue receiver) throws BytecodeException
 	{
-		if (receiver != null)
+		if (receiver == null)
 		{
-			if (this.modifiers.hasIntModifier(Modifiers.INFIX))
-			{
-				receiver.writeExpression(writer, this.parameters.get(0).getType());
-				return;
-			}
-
-			if (receiver.isPrimitive() && this.intrinsicData != null)
-			{
-				receiver.writeExpression(writer, null);
-				return;
-			}
-
-			receiver.writeExpression(writer, this.enclosingClass.getType());
-		}
-	}
-
-	protected void writeArguments(MethodWriter writer, IValue instance, IArguments arguments) throws BytecodeException
-	{
-		if (instance != null && this.hasModifier(Modifiers.INFIX))
-		{
-			for (int i = 0, count = this.parameters.size() - 1; i < count; i++)
-			{
-				arguments.writeValue(i, this.parameters.get(i + 1), writer);
-			}
 			return;
 		}
 
-		for (int i = 0, count = this.parameters.size(); i < count; i++)
+		if (this.modifiers.hasIntModifier(Modifiers.INFIX))
 		{
-			arguments.writeValue(i, this.parameters.get(i), writer);
+			receiver.writeExpression(writer, this.parameters.get(0).getInternalType());
+			return;
 		}
+
+		receiver.writeExpression(writer, this.enclosingClass.getType());
+
+		if (receiver.isIgnoredClassAccess())
+		{
+			final IType type = receiver.getType();
+			if (type.getTypeVariable() != null)
+			{
+				// Static virtual call
+				type.writeClassExpression(writer, true);
+			}
+		}
+	}
+
+	protected void writeArguments(MethodWriter writer, IValue receiver, IArguments arguments) throws BytecodeException
+	{
+		if (receiver != null && !receiver.isIgnoredClassAccess() && this.hasModifier(Modifiers.INFIX))
+		{
+			arguments.writeValues(writer, this.parameters, 1);
+			return;
+		}
+
+		arguments.writeValues(writer, this.parameters, 0);
 	}
 
 	private void writeArgumentsAndInvoke(MethodWriter writer, IValue instance, IArguments arguments,
@@ -1079,7 +1080,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext,
+	public void writeInvoke(MethodWriter writer, IValue receiver, IArguments arguments, ITypeContext typeContext,
 		                       int lineNumber) throws BytecodeException
 	{
 		for (int i = 0; i < this.typeParameterCount; i++)
@@ -1094,26 +1095,36 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		int modifiers = this.modifiers.toFlags();
 
 		final String owner = this.enclosingClass.getInternalName();
-		final String mangledName = this.getMangledName();
+		final String mangledName = this.getInternalName();
+		final String descriptor = this.getDescriptor();
 
 		if ((modifiers & Modifiers.EXTENSION) == Modifiers.EXTENSION)
 		{
-			writer.visitInvokeDynamicInsn(mangledName, this.getDescriptor(), EXTENSION_BSM,
-			                              new Handle(ClassFormat.H_INVOKESTATIC, owner, mangledName,
-			                                         this.getDescriptor()));
+			writer.visitInvokeDynamicInsn(mangledName, descriptor, EXTENSION_BSM,
+			                              new Handle(ClassFormat.H_INVOKESTATIC, owner, mangledName, descriptor));
 			return;
 		}
 
-		if (instance != null && instance.valueTag() == IValue.SUPER)
+		if (receiver == null)
+		{
+			opcode = this.getInvokeOpcode();
+		}
+		else if (receiver.valueTag() == IValue.SUPER)
 		{
 			opcode = Opcodes.INVOKESPECIAL;
+		}
+		else if (receiver.isIgnoredClassAccess() && receiver.getType().getTypeVariable() != null)
+		{
+			writer
+				.visitInvokeDynamicInsn(mangledName, descriptor.replace("(", "(Ljava/lang/Class;"), STATICVIRTUAL_BSM);
+			return;
 		}
 		else
 		{
 			opcode = this.getInvokeOpcode();
 		}
 
-		writer.visitMethodInsn(opcode, owner, mangledName, this.getDescriptor(), this.enclosingClass.isInterface());
+		writer.visitMethodInsn(opcode, owner, mangledName, descriptor, this.enclosingClass.isInterface());
 	}
 
 	@Override

@@ -8,13 +8,13 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.CaseClasses;
 import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.lexer.LexerUtil;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -24,8 +24,8 @@ public final class StringInterpolationExpr implements IValue
 {
 	public static final class LazyFields
 	{
-		public static final IClass STRING_INTERPOLATION_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass(
-			"StringInterpolationConvertible");
+		public static final IClass STRING_INTERPOLATION_CONVERTIBLE = Types.LITERALCONVERTIBLE_CLASS.resolveClass(
+			Name.fromRaw("FromStringInterpolation"));
 
 		private LazyFields()
 		{
@@ -107,7 +107,7 @@ public final class StringInterpolationExpr implements IValue
 		}
 
 		IAnnotation annotation;
-		if ((annotation = type.getAnnotation(Types.STRING_CONVERTIBLE_CLASS)) != null)
+		if ((annotation = type.getAnnotation(Types.FROMSTRING_CLASS)) != null)
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
 		}
@@ -152,7 +152,7 @@ public final class StringInterpolationExpr implements IValue
 
 	private boolean isConvertible(IType type)
 	{
-		return type.getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null
+		return type.getAnnotation(Types.FROMSTRING_CLASS) != null
 			       || type.getAnnotation(LazyFields.STRING_INTERPOLATION_CONVERTIBLE) != null;
 	}
 
@@ -233,6 +233,30 @@ public final class StringInterpolationExpr implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
+		this.writeExpression(writer);
+
+		if (type != null)
+		{
+			Types.STRING.writeCast(writer, type, this.getLineNumber());
+		}
+	}
+
+	private void writeExpression(MethodWriter writer)
+	{
+		switch (this.valueCount)
+		{
+		case 0:
+			writer.visitLdcInsn(this.strings[0]);
+			return;
+		case 1:
+			if (this.strings[0].isEmpty() && this.strings[1].isEmpty())
+			{
+				// "\(someValue)"
+				CaseClasses.writeToString(writer, this.values[0]);
+				return;
+			}
+		}
+
 		String string = this.strings[0];
 
 		int estSize = string.length();
@@ -261,11 +285,6 @@ public final class StringInterpolationExpr implements IValue
 
 		writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;",
 		                       false);
-
-		if (type != null)
-		{
-			Types.STRING.writeCast(writer, type, this.getLineNumber());
-		}
 	}
 
 	@Override

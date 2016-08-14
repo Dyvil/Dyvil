@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.field;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -253,26 +252,6 @@ public final class Variable extends Member implements IVariable
 		{
 			this.value = this.value.cleanup(context, compilableList);
 		}
-	}
-
-	@Override
-	public String getDescriptor()
-	{
-		return this.type.getExtendedName();
-	}
-
-	@Override
-	public String getSignature()
-	{
-		return this.type.getSignature();
-	}
-
-	@Override
-	public void writeLocal(MethodWriter writer, Label start, Label end)
-	{
-		final IType type = this.refType != null ? this.refType : this.type;
-		writer.visitLocalVariable(this.name.qualified, type.getExtendedName(), type.getSignature(), start, end,
-		                          this.localIndex);
 	}
 
 	@Override

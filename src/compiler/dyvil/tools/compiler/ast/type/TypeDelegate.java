@@ -372,9 +372,9 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
-	public void appendSignature(StringBuilder buffer)
+	public void appendSignature(StringBuilder buffer, boolean genericArg)
 	{
-		this.type.appendSignature(buffer);
+		this.type.appendSignature(buffer, genericArg);
 	}
 
 	@Override
@@ -426,9 +426,9 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
-	public void writeClassExpression(MethodWriter writer) throws BytecodeException
+	public void writeClassExpression(MethodWriter writer, boolean wrapPrimitives) throws BytecodeException
 	{
-		this.type.writeClassExpression(writer);
+		this.type.writeClassExpression(writer, wrapPrimitives);
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package dyvil.ref;
 
 import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.ref.boxed.BoxedBooleanRef;
 import dyvil.reflect.Modifiers;
 
 public interface BooleanRef
@@ -19,5 +20,11 @@ public interface BooleanRef
 	static void $times_$eq(BooleanRef ref, boolean value)
 	{
 		ref.set(value);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	static ObjectRef<Boolean> boxed(BooleanRef booleanRef)
+	{
+		return new BoxedBooleanRef(booleanRef);
 	}
 }

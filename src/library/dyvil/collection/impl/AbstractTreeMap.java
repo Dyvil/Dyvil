@@ -637,7 +637,7 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 	@Override
 	public boolean containsKey(Object key)
 	{
-		return this.getEntry(key) != null;
+		return this.getEntryInternal(key) != null;
 	}
 
 	@Override
@@ -656,21 +656,27 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 	@Override
 	public boolean contains(Object key, Object value)
 	{
-		final TreeEntry<K, V> entry = this.getEntry(key);
+		final TreeEntry<K, V> entry = this.getEntryInternal(key);
 		return entry != null && Objects.equals(value, entry.value);
 	}
 
 	@Override
 	public V get(Object key)
 	{
-		TreeEntry<K, V> p = this.getEntry(key);
-		return p == null ? null : p.value;
+		final TreeEntry<K, V> entry = this.getEntryInternal(key);
+		return entry == null ? null : entry.value;
+	}
+
+	@Override
+	public Entry<K, V> getEntry(Object key)
+	{
+		return this.getEntryInternal(key);
 	}
 
 	@Override
 	public Option<V> getOption(Object key)
 	{
-		TreeEntry<K, V> p = this.getEntry(key);
+		TreeEntry<K, V> p = this.getEntryInternal(key);
 		return p == null ? None.instance : new Some<>(p.value);
 	}
 
@@ -762,16 +768,15 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 		}
 	}
 
-	protected final TreeEntry<K, V> getEntry(Object key)
+	protected final TreeEntry<K, V> getEntryInternal(Object key)
 	{
 		if (this.comparator != null)
 		{
 			K k = (K) key;
-			Comparator<? super K> cpr = this.comparator;
 			TreeEntry<K, V> p = this.root;
 			while (p != null)
 			{
-				int cmp = cpr.compare(k, p.key);
+				int cmp = this.comparator.compare(k, p.key);
 				if (cmp < 0)
 				{
 					p = p.left;

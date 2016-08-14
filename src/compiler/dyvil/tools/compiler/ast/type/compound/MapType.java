@@ -18,11 +18,13 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Mutability;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.raw.IObjectType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -35,7 +37,8 @@ public class MapType implements IObjectType
 		public static final IClass MAP_CLASS             = Package.dyvilCollection.resolveClass("Map");
 		public static final IClass MUTABLE_MAP_CLASS     = Package.dyvilCollection.resolveClass("MutableMap");
 		public static final IClass IMMUTABLE_MAP_CLASS   = Package.dyvilCollection.resolveClass("ImmutableMap");
-		public static final IClass MAP_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("MapConvertible");
+		public static final IClass MAP_CONVERTIBLE_CLASS = Types.LITERALCONVERTIBLE_CLASS
+			                                                   .resolveClass(Name.fromRaw("FromMap"));
 
 		public static final ITypeParameter KEY_VARIABLE   = MapTypes.MAP_CLASS.getTypeParameter(0);
 		public static final ITypeParameter VALUE_VARIABLE = MapTypes.MAP_CLASS.getTypeParameter(1);
@@ -49,14 +52,23 @@ public class MapType implements IObjectType
 	// Metadata
 	private IClass theClass;
 
-	public MapType()
+	public static MapType base(IType keyType, IType valueType)
 	{
+		return new MapType(keyType, valueType, Mutability.UNDEFINED, MapTypes.MAP_CLASS);
 	}
 
-	public MapType(IType keyType, IType valueType)
+	public static MapType mutable(IType keyType, IType valueType)
 	{
-		this.keyType = keyType;
-		this.valueType = valueType;
+		return new MapType(keyType, valueType, Mutability.MUTABLE, MapTypes.MUTABLE_MAP_CLASS);
+	}
+
+	public static MapType immutable(IType keyType, IType valueType)
+	{
+		return new MapType(keyType, valueType, Mutability.IMMUTABLE, MapTypes.IMMUTABLE_MAP_CLASS);
+	}
+
+	public MapType()
+	{
 	}
 
 	public MapType(IType keyType, IType valueType, Mutability mutability)
@@ -66,7 +78,7 @@ public class MapType implements IObjectType
 		this.valueType = valueType;
 	}
 
-	public MapType(IType keyType, IType valueType, Mutability mutability, IClass theClass)
+	protected MapType(IType keyType, IType valueType, Mutability mutability, IClass theClass)
 	{
 		this.keyType = keyType;
 		this.valueType = valueType;
@@ -81,9 +93,12 @@ public class MapType implements IObjectType
 	}
 
 	@Override
-	public boolean isGenericType()
+	public ICodePosition getPosition()
 	{
-		return true;
+		final ICodePosition keyPos = this.keyType.getPosition();
+		final ICodePosition valuePos = this.valueType.getPosition();
+
+		return keyPos != null && valuePos != null ? keyPos.to(valuePos) : null;
 	}
 
 	public void setKeyType(IType keyType)
@@ -113,6 +128,12 @@ public class MapType implements IObjectType
 	}
 
 	@Override
+	public boolean isGenericType()
+	{
+		return true;
+	}
+
+	@Override
 	public IClass getTheClass()
 	{
 		return this.theClass;
@@ -121,7 +142,8 @@ public class MapType implements IObjectType
 	@Override
 	public IType asParameterType()
 	{
-		return new MapType(this.keyType.asParameterType(), this.valueType.asParameterType(), this.mutability, this.theClass);
+		return new MapType(this.keyType.asParameterType(), this.valueType.asParameterType(), this.mutability,
+		                   this.theClass);
 	}
 
 	@Override
@@ -205,7 +227,7 @@ public class MapType implements IObjectType
 	public void checkType(MarkerList markers, IContext context, TypePosition position)
 	{
 		final TypePosition argumentPosition =
-				position == TypePosition.SUPER_TYPE ? TypePosition.SUPER_TYPE_ARGUMENT : TypePosition.GENERIC_ARGUMENT;
+			position == TypePosition.SUPER_TYPE ? TypePosition.SUPER_TYPE_ARGUMENT : TypePosition.GENERIC_ARGUMENT;
 
 		this.keyType.checkType(markers, context, argumentPosition);
 		this.valueType.checkType(markers, context, argumentPosition);
@@ -268,17 +290,11 @@ public class MapType implements IObjectType
 	}
 
 	@Override
-	public String getSignature()
-	{
-		return IType.getSignature(this);
-	}
-
-	@Override
-	public void appendSignature(StringBuilder buffer)
+	public void appendSignature(StringBuilder buffer, boolean genericArg)
 	{
 		buffer.append('L').append(this.theClass.getInternalName()).append('<');
-		this.keyType.appendSignature(buffer);
-		this.valueType.appendSignature(buffer);
+		this.keyType.appendSignature(buffer, true);
+		this.valueType.appendSignature(buffer, true);
 		buffer.append('>').append(';');
 	}
 
@@ -322,6 +338,7 @@ public class MapType implements IObjectType
 	{
 		IType.writeType(this.keyType, out);
 		IType.writeType(this.valueType, out);
+		this.mutability.write(out);
 	}
 
 	@Override
@@ -329,6 +346,8 @@ public class MapType implements IObjectType
 	{
 		this.keyType = IType.readType(in);
 		this.valueType = IType.readType(in);
+		this.mutability = Mutability.read(in);
+		this.theClass = getClass(this.mutability);
 	}
 
 	@Override

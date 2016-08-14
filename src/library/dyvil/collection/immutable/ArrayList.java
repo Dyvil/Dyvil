@@ -3,7 +3,7 @@ package dyvil.collection.immutable;
 import dyvil.annotation.Immutable;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractArrayList;
-import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.LiteralConvertible;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,7 +11,7 @@ import java.util.Comparator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@ArrayConvertible
+@LiteralConvertible.FromArray
 @Immutable
 public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<E>
 {

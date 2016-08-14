@@ -63,7 +63,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 		if (body != null && body.constructorCount() > 0)
 		{
 			markers.add(Markers.semantic(this.theClass.getPosition(), "class.object.constructor",
-			                             this.theClass.getName().qualified));
+			                             this.theClass.getName()));
 		}
 
 		if ((this.members & INSTANCE_FIELD) == 0)

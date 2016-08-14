@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.method;
 
+import dyvil.annotation.Reified;
 import dyvil.collection.Set;
 import dyvil.collection.mutable.HashSet;
 import dyvil.collection.mutable.IdentityHashSet;
@@ -16,6 +17,7 @@ import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -27,6 +29,7 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
@@ -159,7 +162,7 @@ public class CodeMethod extends AbstractMethod
 		final String qualified = name.qualified;
 		final String newUnqualified = unqualified.substring(0, index);
 		final String newQualified = qualified.substring(0, qualified.indexOf(NAME_SEPARATOR));
-		this.mangledName = qualified;
+		this.internalName = qualified;
 		this.name = Name.from(newUnqualified, newQualified);
 	}
 
@@ -316,7 +319,7 @@ public class CodeMethod extends AbstractMethod
 		final String signature = this.getSignature();
 		final int parameterCount = this.parameters.size();
 
-		String mangledName = this.getMangledName();
+		String mangledName = this.getInternalName();
 		boolean thisMangled = mangledName.contains(NAME_SEPARATOR);
 
 		for (int i = body.methodCount() - 1; i >= 0; i--)
@@ -329,7 +332,7 @@ public class CodeMethod extends AbstractMethod
 				continue;
 			}
 
-			final String otherMangledName = method.getMangledName();
+			final String otherMangledName = method.getInternalName();
 			if (!mangledName.equals(otherMangledName))
 			{
 				continue;
@@ -340,7 +343,7 @@ public class CodeMethod extends AbstractMethod
 			if (!thisMangled)
 			{
 				// ensure this method gets name-mangled
-				this.mangledName = mangledName = createMangledName(this);
+				this.internalName = mangledName = createMangledName(this);
 				thisMangled = true;
 
 				final Marker marker = Markers.semantic(this.position, "method.name_mangled", this.name);
@@ -360,56 +363,18 @@ public class CodeMethod extends AbstractMethod
 
 	private static String createMangledName(IMethod method)
 	{
-		final String qualifiedName = method.getName().qualified;
-		final String signature = method.getSignature();
+		// append the qualified name plus the name separator
+		final StringBuilder builder = new StringBuilder(method.getName().qualified).append(NAME_SEPARATOR);
 
-		final StringBuilder builder = new StringBuilder(qualifiedName.length() + NAME_SEPARATOR.length() + signature
-			                                                                                                   .length());
-		builder.append(qualifiedName).append(NAME_SEPARATOR);
-
-		for (int i = 0, length = signature.length(); i < length; i++)
+		final IParameterList params = method.getParameterList();
+		for (int i = 0, count = params.size(); i < count; i++)
 		{
-			// Replace special chars with dollar signs
-			final char c = signature.charAt(i);
-			switch (c)
-			{
-			case '(':
-			case ')':
-				// strip opening and closing paren
-				continue;
-			case '<':
-				if (i == 0)
-				{
-					// strip opening angle bracket if at first position
-					continue;
-				}
-				builder.append("$_");
-				continue;
-			case '>':
-				if (signature.charAt(i + 1) == ';')
-				{
-					// the next token is a semicolon, so '_$' will be appended
-					builder.append('_');
-					continue;
-				}
-				// double separator between type and value parameter lists
-				builder.append("__");
-				continue;
-			case '+':
-			case ';':
-			case ':':
-			case '-':
-			case '*':
-				builder.append('$');
-				continue;
-			case '/':
-				builder.append('_');
-				continue;
-			default:
-				builder.append(c);
-			}
+			// append all param names followed by an underscore
+			builder.append(params.get(i).getInternalName()).append('_');
 		}
-		return builder.toString();
+
+		// strip the trailing _
+		return builder.deleteCharAt(builder.length() - 1).toString();
 	}
 
 	@Override
@@ -593,7 +558,7 @@ public class CodeMethod extends AbstractMethod
 		}
 
 		final String ownerClassName = this.enclosingClass.getInternalName();
-		final String mangledName = this.getMangledName();
+		final String mangledName = this.getInternalName();
 		final String descriptor = this.getDescriptor();
 		final String signature = this.needsSignature() ? this.getSignature() : null;
 		final String[] exceptionTypes = this.getInternalExceptions();
@@ -645,7 +610,7 @@ public class CodeMethod extends AbstractMethod
 		final int opcode =
 			(modifiers & Modifiers.ABSTRACT) != 0 && interfaceClass ? Opcodes.INVOKEINTERFACE : Opcodes.INVOKEVIRTUAL;
 
-		/**
+		/*
 		 * Contains entries in the format 'mangledName(paramTypes)returnType'
 		 * Used to ensure unique bridge methods
 		 */
@@ -655,7 +620,7 @@ public class CodeMethod extends AbstractMethod
 		for (IMethod overrideMethod : this.overrideMethods)
 		{
 			final String overrideDescriptor = overrideMethod.getDescriptor();
-			final String overrideMangledName = overrideMethod.getMangledName();
+			final String overrideMangledName = overrideMethod.getInternalName();
 			final String overrideEntry = overrideMangledName + overrideDescriptor;
 
 			// Check if a bridge method for the descriptor has not yet been
@@ -678,6 +643,7 @@ public class CodeMethod extends AbstractMethod
 
 			final IParameterList overrideParameterList = overrideMethod.getParameterList();
 
+			// Generate Parameters and load arguments
 			for (int p = 0, count = this.parameters.size(); p < count; p++)
 			{
 				final IParameter overrideParameter = overrideParameterList.get(p);
@@ -687,6 +653,22 @@ public class CodeMethod extends AbstractMethod
 				overrideParameter.writeInit(methodWriter);
 				methodWriter.visitVarInsn(overrideParameterType.getLoadOpcode(), overrideParameter.getLocalIndex());
 				overrideParameterType.writeCast(methodWriter, parameterType, lineNumber);
+			}
+			// Generate Type Parameters and load reified type arguments
+			for (int i = 0, count = this.typeParameterCount, overrideCount = overrideMethod.typeParameterCount();
+			     i < count; i++)
+			{
+				final ITypeParameter thisParameter = this.typeParameters[i];
+				final Reified.Type reifiedType = thisParameter.getReifiedKind();
+				if (reifiedType == null)
+				{
+					continue;
+				}
+
+				final ITypeParameter overrideParameter = i < overrideCount ? overrideMethod.getTypeParameter(i) : null;
+				this.writeReifyArgument(methodWriter, thisParameter, reifiedType, overrideParameter);
+
+				// Extra type parameters from the overriden method are ignored
 			}
 
 			IType overrideReturnType = overrideMethod.getType();
@@ -699,10 +681,46 @@ public class CodeMethod extends AbstractMethod
 		}
 	}
 
+	private void writeReifyArgument(MethodWriter writer, ITypeParameter thisParameter, Reified.Type reifiedType,
+		                               ITypeParameter overrideParameter)
+	{
+		if (overrideParameter == null)
+		{
+			this.writeDefaultReifyArgument(writer, thisParameter, reifiedType);
+			return;
+		}
+
+		overrideParameter.writeParameter(writer);
+		if (overrideParameter.getReifiedKind() == null)
+		{
+			this.writeDefaultReifyArgument(writer, thisParameter, reifiedType);
+			return;
+		}
+
+		// Delegate to the TypeVarType implementation
+		final TypeVarType typeVarType = new TypeVarType(overrideParameter);
+
+		if (reifiedType == Reified.Type.TYPE)
+		{
+			typeVarType.writeTypeExpression(writer);
+			return;
+		}
+		typeVarType.writeClassExpression(writer, reifiedType == Reified.Type.OBJECT_CLASS);
+	}
+
+	private void writeDefaultReifyArgument(MethodWriter writer, ITypeParameter thisParameter, Reified.Type reifiedType)
+	{
+		if (reifiedType == Reified.Type.TYPE)
+		{
+			thisParameter.getDefaultType().writeTypeExpression(writer);
+			return;
+		}
+		thisParameter.getDefaultType().writeClassExpression(writer, reifiedType == Reified.Type.OBJECT_CLASS);
+	}
+
 	private boolean needsSignature()
 	{
-		return this.typeParameterCount != 0 || this.type.isGenericType() || this.type.hasTypeVariables()
-			       || this.parameters.needsSignature();
+		return this.typeParameterCount != 0 || this.type.needsSignature() || this.parameters.needsSignature();
 	}
 
 	protected void writeAnnotations(MethodWriter writer, int modifiers)
@@ -776,7 +794,7 @@ public class CodeMethod extends AbstractMethod
 	{
 		this.readAnnotations(in);
 
-		this.name = Name.from(in.readUTF());
+		this.name = Name.read(in);
 		this.type = IType.readType(in);
 		this.parameters = ParameterList.read(in);
 	}

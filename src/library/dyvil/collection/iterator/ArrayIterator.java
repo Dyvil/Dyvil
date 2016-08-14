@@ -3,12 +3,12 @@ package dyvil.collection.iterator;
 import dyvil.annotation.Immutable;
 import dyvil.annotation.Mutating;
 import dyvil.array.ObjectArray;
-import dyvil.lang.literal.ArrayConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.util.ImmutableException;
 
 import java.util.Iterator;
 
-@ArrayConvertible
+@LiteralConvertible.FromArray
 @Immutable
 public class ArrayIterator<E> implements Iterator<E>
 {

@@ -2,16 +2,15 @@ package dyvil.collection;
 
 import dyvil.collection.mutable.ArrayList;
 import dyvil.collection.view.ListView;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@NilConvertible
-@ArrayConvertible
+@LiteralConvertible.FromNil
+@LiteralConvertible.FromArray
 public interface MutableList<E> extends List<E>, MutableCollection<E>
 {
 	static <E> MutableList<E> apply()

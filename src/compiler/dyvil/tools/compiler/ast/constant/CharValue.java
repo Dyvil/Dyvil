@@ -77,7 +77,7 @@ public final class CharValue implements IConstantValue
 				return this;
 			}
 
-			final IAnnotation annotation = type.getAnnotation(Types.CHAR_CONVERTIBLE_CLASS);
+			final IAnnotation annotation = type.getAnnotation(Types.FROMCHAR_CLASS);
 			if (annotation != null)
 			{
 				this.type = TYPE_CHAR;
@@ -96,7 +96,7 @@ public final class CharValue implements IConstantValue
 			return this;
 		}
 
-		final IAnnotation annotation = type.getAnnotation(Types.STRING_CONVERTIBLE_CLASS);
+		final IAnnotation annotation = type.getAnnotation(Types.FROMSTRING_CLASS);
 		if (annotation != null)
 		{
 			this.type = TYPE_STRING;
@@ -111,7 +111,7 @@ public final class CharValue implements IConstantValue
 	{
 		if (this.value.length() == 1 && this.type != TYPE_STRING)
 		{
-			if (Types.isSuperType(type, Types.CHAR) || type.getAnnotation(Types.CHAR_CONVERTIBLE_CLASS) != null)
+			if (Types.isSuperType(type, Types.CHAR) || type.getAnnotation(Types.FROMCHAR_CLASS) != null)
 			{
 				return true;
 			}
@@ -121,7 +121,7 @@ public final class CharValue implements IConstantValue
 			return false;
 		}
 
-		return Types.isSuperType(type, Types.STRING) || (type.getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null);
+		return Types.isSuperType(type, Types.STRING) || (type.getAnnotation(Types.FROMSTRING_CLASS) != null);
 	}
 
 	@Override
@@ -137,7 +137,7 @@ public final class CharValue implements IConstantValue
 			{
 				return SUBTYPE_MATCH;
 			}
-			if (type.getAnnotation(Types.CHAR_CONVERTIBLE_CLASS) != null)
+			if (type.getAnnotation(Types.FROMCHAR_CLASS) != null)
 			{
 				return CONVERSION_MATCH;
 			}
@@ -155,7 +155,7 @@ public final class CharValue implements IConstantValue
 		{
 			return SECONDARY_SUBTYPE_MATCH;
 		}
-		if (type.getAnnotation(Types.STRING_CONVERTIBLE_CLASS) != null)
+		if (type.getAnnotation(Types.FROMSTRING_CLASS) != null)
 		{
 			return CONVERSION_MATCH;
 		}

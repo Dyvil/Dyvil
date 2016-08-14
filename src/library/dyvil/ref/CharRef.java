@@ -1,6 +1,7 @@
 package dyvil.ref;
 
 import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.ref.boxed.BoxedCharRef;
 import dyvil.reflect.Modifiers;
 
 public interface CharRef
@@ -19,5 +20,11 @@ public interface CharRef
 	static void $times_$eq(CharRef ref, char value)
 	{
 		ref.set(value);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	static ObjectRef<Character> boxed(CharRef charRef)
+	{
+		return new BoxedCharRef(charRef);
 	}
 }

@@ -5,14 +5,13 @@ import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
 import dyvil.collection.Set;
 import dyvil.collection.impl.AbstractArraySet;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 
 import java.util.Objects;
 import java.util.function.Function;
 
-@NilConvertible
-@ArrayConvertible
+@LiteralConvertible.FromNil
+@LiteralConvertible.FromArray
 public class ArraySet<E> extends AbstractArraySet<E> implements MutableSet<E>
 {
 	private static final long serialVersionUID = -6676561653968567088L;

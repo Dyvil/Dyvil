@@ -99,23 +99,12 @@ public class CodeClass extends AbstractClass
 	public void setHeader(IDyvilHeader unit)
 	{
 		this.unit = unit;
-
-		if (this.name != null)
-		{
-			this.internalName = unit.getInternalName(this.name);
-			this.fullName = unit.getFullName(this.name);
-		}
 	}
 
 	@Override
 	public void setName(Name name)
 	{
 		this.name = name;
-		if (this.unit != null)
-		{
-			this.internalName = this.unit.getInternalName(name);
-			this.fullName = this.unit.getFullName(name);
-		}
 	}
 
 	@Override
@@ -705,7 +694,7 @@ public class CodeClass extends AbstractClass
 		{
 			final IParameter parameter = this.parameters.get(i);
 			parameter.write(writer);
-			arrayVisitor.visit("", parameter.getName().qualified);
+			arrayVisitor.visit("", parameter.getInternalName());
 		}
 
 		arrayVisitor.visitEnd();
@@ -875,7 +864,7 @@ public class CodeClass extends AbstractClass
 		this.modifiers = ModifierSet.read(in);
 		this.annotations = AnnotationList.read(in);
 
-		this.name = Name.from(in.readUTF());
+		this.name = Name.read(in);
 
 		this.readTypes(in);
 

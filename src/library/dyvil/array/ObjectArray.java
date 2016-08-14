@@ -4,224 +4,227 @@ import dyvil.annotation.Intrinsic;
 import dyvil.annotation.Mutating;
 import dyvil.annotation.Reified;
 import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation._internal.Primitive;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.collection.range.Rangeable;
 import dyvil.ref.ObjectRef;
 import dyvil.ref.array.ObjectArrayRef;
 import dyvil.reflect.Modifiers;
-import dyvil.runtime.Wrapper;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.IntFunction;
-import java.util.function.Predicate;
+import java.util.function.*;
 
+import static dyvil.annotation.Reified.Type.OBJECT_CLASS;
 import static dyvil.reflect.Opcodes.*;
 
-public interface ObjectArray
+public abstract class ObjectArray
 {
-	Object[] EMPTY = new Object[0];
+	public static final Object[] EMPTY = new Object[0];
 
-	@DyvilModifiers(Modifiers.INLINE)
-	static <@Reified(erasure = true) T> T[] empty(Class<T> type)
+	private ObjectArray()
 	{
-		return empty(0, type);
+		// no instances
 	}
 
-	@DyvilModifiers(Modifiers.INLINE)
-	static <@Reified(erasure = true) T> T[] empty(int size, Class<T> type)
+	public static <@Reified(OBJECT_CLASS) T> T[] apply(Class<T> _type)
 	{
-		return (T[]) Array.newInstance(type, size);
+		return apply(0, _type);
 	}
 
-	@DyvilModifiers(Modifiers.INLINE)
-	static <@Reified(erasure = true) T> T[] apply(Class<T> type)
+	public static <@Reified(OBJECT_CLASS) T> T[] apply(int size, Class<T> _type)
 	{
-		return empty(0, type);
+		return (T[]) Array.newInstance(_type, size);
 	}
 
-	@SafeVarargs
-	@DyvilModifiers(Modifiers.INLINE)
-	static <T> T[] apply(T... values)
+	public static <@Reified(OBJECT_CLASS) T> T[] apply(int size, T repeatedValue, Class<T> _type)
 	{
-		return values;
-	}
-
-	@DyvilModifiers(Modifiers.INLINE)
-	static <T> T[] from(T[] array)
-	{
-		return array.clone();
-	}
-
-	@DyvilModifiers(Modifiers.IMPLICIT)
-	static <@Reified(erasure = true) T extends Rangeable<T>> T[] from(Range<T> range, Class<T> type)
-	{
-		return range.toArray(type);
-	}
-	
-	static <@Reified(erasure = true) T> T[] repeat(int count, T repeatedValue, Class<T> type)
-	{
-		T[] array = (T[]) Array.newInstance(type, count);
-		for (int i = 0; i < count; i++)
+		final T[] array = apply(size, _type);
+		for (int i = 0; i < size; i++)
 		{
 			array[i] = repeatedValue;
 		}
 		return array;
 	}
-	
-	static <@Reified(erasure = true) T> T[] generate(int count, IntFunction<T> generator, Class<T> type)
+
+	public static <@Reified(OBJECT_CLASS) T> T[] apply(int size, Supplier<T> valueSupplier, Class<T> _type)
 	{
-		T[] array = (T[]) Array.newInstance(type, count);
-		for (int i = 0; i < count; i++)
+		final T[] array = apply(size, _type);
+		for (int i = 0; i < size; i++)
 		{
-			array[i] = generator.apply(i);
+			array[i] = valueSupplier.get();
 		}
 		return array;
 	}
-	
-	static <@Reified(erasure = true) T extends Rangeable<T>> T[] range(T start, T end, Class<T> type)
+
+	public static <@Reified(OBJECT_CLASS) T> T[] apply(int size, IntFunction<T> valueMapper, Class<T> _type)
+	{
+		final T[] array = apply(size, _type);
+		for (int i = 0; i < size; i++)
+		{
+			array[i] = valueMapper.apply(i);
+		}
+		return array;
+	}
+
+	@DyvilModifiers(Modifiers.INLINE)
+	public static <T> T[] apply(T[] array)
+	{
+		return array.clone();
+	}
+
+	@DyvilModifiers(Modifiers.IMPLICIT)
+	public static <@Reified(OBJECT_CLASS) T extends Rangeable<T>> T[] apply(Range<T> range, Class<T> _type)
+	{
+		return range.toArray(_type);
+	}
+
+	public static <@Reified(OBJECT_CLASS) T extends Rangeable<T>> T[] apply_$_closed(T from, T to, Class<T> _type)
 	{
 		int i = 0;
-		T[] array = (T[]) Array.newInstance(type, start.distanceTo(end) + 1);
-		for (T current = start; current.compareTo(end) <= 0; current = current.next())
+		final T[] array = apply(from.distanceTo(to) + 1, _type);
+		for (T current = from; current.compareTo(to) <= 0; current = current.next())
 		{
 			array[i++] = current;
 		}
 		return array;
 	}
-	
-	static <@Reified(erasure = true) T extends Rangeable<T>> T[] rangeOpen(T start, T end, Class<T> type)
+
+	public static <@Reified(OBJECT_CLASS) T extends Rangeable<T>> T[] apply_$_halfOpen(T from, T toExclusive,
+		                                                                                  Class<T> _type)
 	{
 		int i = 0;
-		T[] array = (T[]) Array.newInstance(type, start.distanceTo(end));
-		for (T current = start; current.compareTo(end) < 0; current = current.next())
+		final T[] array = apply(from.distanceTo(toExclusive), _type);
+		for (T current = from; current.compareTo(toExclusive) < 0; current = current.next())
 		{
 			array[i++] = current;
 		}
 		return array;
 	}
-	
+
 	@Intrinsic( { LOAD_0, ARRAYLENGTH })
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T> int length(T[] array)
+	public static <T> int length(T[] array)
 	{
 		return array.length;
 	}
-	
+
+	@Intrinsic( { LOAD_0, ARRAYLENGTH })
+	@DyvilModifiers(Modifiers.INFIX)
+	public static <T> int size(T[] array)
+	{
+		return array.length;
+	}
+
+	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })
+	@DyvilModifiers(Modifiers.INFIX)
+	public static <T> boolean isEmpty(T[] array)
+	{
+		return array.length == 0;
+	}
+
 	@Intrinsic( { LOAD_0, LOAD_1, AALOAD })
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T> T subscript(T[] array, int i)
+	public static <T> T subscript(T[] array, int index)
 	{
-		return array[i];
+		return array[index];
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T> T[] subscript(T[] array, Range<Integer> range)
+	public static <T> T[] subscript(T[] array, Range<@Primitive Integer> range)
 	{
-		int start = (range.first());
-		int count = range.count();
-		T[] slice = (T[]) Array.newInstance(array.getClass().getComponentType(), count);
-		System.arraycopy(array, start, slice, 0, count);
-		return slice;
+		final int size = range.count();
+		final T[] result = apply(size, getComponentType(array));
+		System.arraycopy(array, range.first(), result, 0, size);
+		return result;
 	}
-	
+
 	@Intrinsic( { LOAD_0, LOAD_1, LOAD_2, AASTORE })
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	static <T> void subscript_$eq(T[] array, int i, T v)
+	public static <T> void subscript_$eq(T[] array, int index, T newValue)
 	{
-		array[i] = v;
-	}
-	
-	@DyvilModifiers(Modifiers.INFIX)
-	@Mutating
-	static <T> void subscript_$eq(T[] array, Range<Integer> range, T[] values)
-	{
-		int start = (range.first());
-		int count = range.count();
-		System.arraycopy(values, 0, array, start, count);
+		array[index] = newValue;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	static <T> ObjectRef<T> subscript_$amp(T[] array, int index)
+	public static <T> void subscript_$eq(T[] array, Range<@Primitive Integer> range, T[] newValues)
+	{
+		System.arraycopy(newValues, 0, array, range.first(), range.count());
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	@Mutating
+	public static <T> ObjectRef<T> subscript_$amp(T[] array, int index)
 	{
 		return new ObjectArrayRef<>(array, index);
 	}
-	
-	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static boolean isEmpty(int[] array)
-	{
-		return array.length == 0;
-	}
-	
-	@DyvilModifiers(Modifiers.INFIX)
-	static <T> void forEach(T[] array, Consumer<? super T> action)
+	public static <T> void forEach(T[] array, Consumer<? super T> action)
 	{
 		for (T v : array)
 		{
 			action.accept(v);
 		}
 	}
-	
+
 	// Operators
-	
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static <T> boolean $qmark(T[] array, T v)
+	public static <T> boolean $qmark(T[] array, T value)
 	{
-		return indexOf(array, v, 0) != -1;
+		return indexOf(array, value, 0) >= 0;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static <T> boolean $eq$eq(T[] array1, T[] array2)
+	public static <T> boolean $eq$eq(T[] array1, T[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static <T> boolean $bang$eq(T[] array1, T[] array2)
+	public static <T> boolean $bang$eq(T[] array1, T[] array2)
 	{
 		return !Arrays.equals(array1, array2);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T> T[] $plus(T[] array, T v)
+	public static <T> T[] $plus(T[] array, T value)
 	{
-		int len = array.length;
-		T[] res = (T[]) Array.newInstance(array.getClass().getComponentType(), len + 1);
+		final int len = array.length;
+		final T[] res = apply(len + 1, getComponentType(array));
 		System.arraycopy(array, 0, res, 0, len);
-		res[len] = v;
+		res[len] = value;
 		return res;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T> T[] $plus$plus(T[] array1, T[] array2)
+	public static <T> T[] $plus$plus(T[] array1, T[] array2)
 	{
-		int len1 = array1.length;
-		int len2 = array2.length;
-		T[] res = (T[]) Array.newInstance(array1.getClass().getComponentType(), len1 + len2);
+		final int len1 = array1.length;
+		final int len2 = array2.length;
+		final T[] res = apply(len1 + len2, getComponentType(array1));
 		System.arraycopy(array1, 0, res, 0, len1);
 		System.arraycopy(array2, 0, res, len1, len2);
 		return res;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T> T[] $minus(T[] array, T v)
+	public static <T> T[] $minus(T[] array, T value)
 	{
-		int index = indexOf(array, v, 0);
+		final int index = indexOf(array, value, 0);
 		if (index < 0)
 		{
 			return array;
 		}
-		
-		int len = array.length;
-		T[] res = (T[]) Array.newInstance(array.getClass().getComponentType(), len - 1);
+
+		final int len = array.length;
+		final T[] res = apply(len - 1, getComponentType(array));
 		if (index > 0)
 		{
 			// copy the first part before the index
@@ -234,14 +237,14 @@ public interface ObjectArray
 		}
 		return res;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T> T[] $minus$minus(T[] array1, T[] array2)
+	public static <T> T[] $minus$minus(T[] array1, T[] array2)
 	{
 		int index = 0;
 		// We can safely use clone here because no data will be leaked
-		T[] res = array1.clone();
-		
+		final T[] res = array1.clone();
+
 		for (T v : array1)
 		{
 			if (indexOf(array2, v, 0) < 0)
@@ -249,18 +252,18 @@ public interface ObjectArray
 				res[index++] = v;
 			}
 		}
-		
+
 		// Return a resized copy of the temporary array
 		return Arrays.copyOf(res, index);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T> T[] $amp(T[] array1, T[] array2)
+	public static <T> T[] $amp(T[] array1, T[] array2)
 	{
 		int index = 0;
 		// We can safely use clone here because no data will be leaked
-		T[] res = array1.clone();
-		
+		final T[] res = array1.clone();
+
 		for (T v : array1)
 		{
 			if (indexOf(array2, v, 0) >= 0)
@@ -268,54 +271,54 @@ public interface ObjectArray
 				res[index++] = v;
 			}
 		}
-		
+
 		// Return a resized copy of the temporary array
 		return Arrays.copyOf(res, index);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T, @Reified(erasure = true) U> U[] mapped(T[] array, Function<T, U> mapper, Class<U> type)
+	public static <T, @Reified(OBJECT_CLASS) U> U[] mapped(T[] array, Function<T, U> mapper, Class<U> _type)
 	{
-		int len = array.length;
-		U[] res = (U[]) Array.newInstance(type.isPrimitive() ? Wrapper.forPrimitiveType(type).wrapperType() : type, len);
+		final int len = array.length;
+		final U[] res = apply(len, _type);
 		for (int i = 0; i < len; i++)
 		{
 			res[i] = mapper.apply(array[i]);
 		}
 		return res;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T, @Reified(erasure = true) U> U[] flatMapped(T[] array, Function<T, U[]> mapper, Class<U> type)
+	public static <T, @Reified(OBJECT_CLASS) U> U[] flatMapped(T[] array, Function<T, U[]> mapper, Class<U> _type)
 	{
 		int size = 0;
-		final Class classType = type.isPrimitive() ? Wrapper.forPrimitiveType(type).wrapperType() : type;
 		U[] res = (U[]) EMPTY;
-		
-		for (T v : array)
+
+		for (T value : array)
 		{
-			U[] a = mapper.apply(v);
-			int alen = a.length;
-			if (size + alen >= res.length)
+			final U[] result = mapper.apply(value);
+			final int resultLen = result.length;
+			if (size + resultLen >= res.length)
 			{
-				U[] newRes = (U[]) Array.newInstance(classType, size + alen);
+				final U[] newRes = apply(size + resultLen, _type);
 				System.arraycopy(res, 0, newRes, 0, res.length);
 				res = newRes;
 			}
-			
-			System.arraycopy(a, 0, res, size, alen);
-			size += alen;
+
+			System.arraycopy(result, 0, res, size, resultLen);
+			size += resultLen;
 		}
-		
+
 		return res;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T> T[] filtered(T[] array, Predicate<T> condition)
+	public static <T> T[] filtered(T[] array, Predicate<T> condition)
 	{
 		int index = 0;
 		// We can safely use clone here because no data will be leaked
-		T[] res = array.clone();
+		final T[] res = array.clone();
+
 		for (T v : array)
 		{
 			if (condition.test(v))
@@ -323,46 +326,46 @@ public interface ObjectArray
 				res[index++] = v;
 			}
 		}
-		
+
 		// Return a resized copy of the temporary array
 		return Arrays.copyOf(res, index);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T> T[] sorted(T[] array)
+	public static <T> T[] sorted(T[] array)
 	{
-		T[] res = array.clone();
+		final T[] res = array.clone();
 		Arrays.sort(res);
 		return res;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T> T[] sorted(T[] array, Comparator<? super T> comparator)
+	public static <T> T[] sorted(T[] array, Comparator<? super T> comparator)
 	{
-		T[] res = array.clone();
+		final T[] res = array.clone();
 		Arrays.sort(array, comparator);
 		return res;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T> T[] newArray(Class<T> type, int size)
+	public static <T> T[] newArray(Class<T> type, int size)
 	{
-		return (T[]) Array.newInstance(type, size);
+		return apply(size, type);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static <T> Class<T> getComponentType(T[] array)
+	public static <T> Class<T> getComponentType(T[] array)
 	{
 		return (Class<T>) array.getClass().getComponentType();
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T> Class getDeepComponentType(T[] array)
+	public static <T> Class<?> getDeepComponentType(T[] array)
 	{
-		Class ret = array.getClass();
+		Class<?> ret = array.getClass();
 		while (true)
 		{
-			Class c = ret.getComponentType();
+			final Class<?> c = ret.getComponentType();
 			if (c == null)
 			{
 				return ret;
@@ -370,230 +373,230 @@ public interface ObjectArray
 			ret = c;
 		}
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T> Class<T[]> getArrayType(Class<T> componentType)
+	public static <T> Class<T[]> getArrayType(Class<T> componentType)
 	{
-		return (Class<T[]>) Array.newInstance(componentType, 0).getClass();
+		return (Class<T[]>) apply(componentType).getClass();
 	}
-	
+
 	// Search Operations
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T> int indexOf(T[] array, T v)
+	public static <T> int indexOf(T[] array, T value)
 	{
-		return indexOf(array, v, 0);
+		return indexOf(array, value, 0);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T> int indexOf(T[] array, T v, int start)
+	public static <T> int indexOf(T[] array, T value, int startIndex)
 	{
-		for (; start < array.length; start++)
+		for (; startIndex < array.length; startIndex++)
 		{
-			if (Objects.equals(v, array[start]))
+			if (Objects.equals(value, array[startIndex]))
 			{
-				return start;
+				return startIndex;
 			}
 		}
 		return -1;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T> int lastIndexOf(T[] array, T v)
+	public static <T> int lastIndexOf(T[] array, T value)
 	{
-		return lastIndexOf(array, v, array.length - 1);
+		return lastIndexOf(array, value, array.length - 1);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T> int lastIndexOf(T[] array, T v, int start)
+	public static <T> int lastIndexOf(T[] array, T value, int startIndex)
 	{
-		for (; start >= 0; start--)
+		for (; startIndex >= 0; startIndex--)
 		{
-			if (Objects.equals(v, array[start]))
+			if (Objects.equals(value, array[startIndex]))
 			{
-				return start;
+				return startIndex;
 			}
 		}
 		return -1;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static <T> boolean contains(T[] array, T v)
+	public static <T> boolean contains(T[] array, T value)
 	{
-		return indexOf(array, v, 0) != -1;
+		return indexOf(array, value, 0) > 0;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static <T> boolean in(T v, T[] array)
+	public static <T> boolean in(T value, T[] array)
 	{
-		return indexOf(array, v, 0) != -1;
+		return indexOf(array, value, 0) > 0;
 	}
-	
+
 	// Copying
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T> T[] copy(T[] array)
+	public static <T> T[] copy(T[] array)
 	{
 		return array.clone();
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T> T[] copy(T[] array, int newLength)
+	public static <T> T[] copy(T[] array, int newLength)
 	{
-		return copy(array, newLength, (Class<T>) array.getClass().getComponentType());
+		return copyAs(array, newLength, (Class<T>) array.getClass().getComponentType());
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T extends N, N> N[] copy(T[] array, int newLength, Class<N> type)
+	public static <@Reified(OBJECT_CLASS) N, T extends N> N[] copyAs(T[] array, int newSize, Class<N> type)
 	{
-		N[] newArray = (N[]) Array.newInstance(type, newLength);
-		System.arraycopy(array, 0, newArray, 0, newLength);
+		final N[] newArray = apply(newSize, type);
+		System.arraycopy(array, 0, newArray, 0, newSize);
 		return newArray;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static boolean[] unboxed(Boolean[] array)
+	public static boolean[] unboxed(Boolean[] array)
 	{
-		int len = array.length;
-		boolean[] unboxed = new boolean[len];
+		final int len = array.length;
+		final boolean[] unboxed = new boolean[len];
 		for (int i = 0; i < len; i++)
 		{
 			unboxed[i] = array[i];
 		}
 		return unboxed;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static byte[] unboxed(Byte[] array)
+	public static byte[] unboxed(Byte[] array)
 	{
-		int len = array.length;
-		byte[] unboxed = new byte[len];
+		final int len = array.length;
+		final byte[] unboxed = new byte[len];
 		for (int i = 0; i < len; i++)
 		{
-			unboxed[i] = (array[i]);
+			unboxed[i] = array[i];
 		}
 		return unboxed;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static short[] unboxed(Short[] array)
+	public static short[] unboxed(Short[] array)
 	{
-		int len = array.length;
-		short[] unboxed = new short[len];
+		final int len = array.length;
+		final short[] unboxed = new short[len];
 		for (int i = 0; i < len; i++)
 		{
-			unboxed[i] = (array[i]);
+			unboxed[i] = array[i];
 		}
 		return unboxed;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static char[] unboxed(Character[] array)
+	public static char[] unboxed(Character[] array)
 	{
-		int len = array.length;
-		char[] unboxed = new char[len];
+		final int len = array.length;
+		final char[] unboxed = new char[len];
 		for (int i = 0; i < len; i++)
 		{
-			unboxed[i] = (array[i]);
+			unboxed[i] = array[i];
 		}
 		return unboxed;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static int[] unboxed(Integer[] array)
+	public static int[] unboxed(Integer[] array)
 	{
-		int len = array.length;
-		int[] unboxed = new int[len];
+		final int len = array.length;
+		final int[] unboxed = new int[len];
 		for (int i = 0; i < len; i++)
 		{
-			unboxed[i] = (array[i]);
+			unboxed[i] = array[i];
 		}
 		return unboxed;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static long[] unboxed(Long[] array)
+	public static long[] unboxed(Long[] array)
 	{
-		int len = array.length;
-		long[] unboxed = new long[len];
+		final int len = array.length;
+		final long[] unboxed = new long[len];
 		for (int i = 0; i < len; i++)
 		{
-			unboxed[i] = (array[i]);
+			unboxed[i] = array[i];
 		}
 		return unboxed;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static float[] unboxed(Float[] array)
+	public static float[] unboxed(Float[] array)
 	{
-		int len = array.length;
-		float[] unboxed = new float[len];
+		final int len = array.length;
+		final float[] unboxed = new float[len];
 		for (int i = 0; i < len; i++)
 		{
-			unboxed[i] = (array[i]);
+			unboxed[i] = array[i];
 		}
 		return unboxed;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static double[] unboxed(Double[] array)
+	public static double[] unboxed(Double[] array)
 	{
-		int len = array.length;
-		double[] unboxed = new double[len];
+		final int len = array.length;
+		final double[] unboxed = new double[len];
 		for (int i = 0; i < len; i++)
 		{
-			unboxed[i] = (array[i]);
+			unboxed[i] = array[i];
 		}
 		return unboxed;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T> Iterable<T> toIterable(T[] array)
+	public static <T> Iterable<T> toIterable(T[] array)
 	{
 		return new ArrayList<>(array, true);
 	}
-	
+
 	// toString, equals and hashCode
-	
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static <T> boolean equals(T[] array1, T[] array2)
+	public static <T> boolean equals(T[] array1, T[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static <T> boolean deepEquals(T[] array1, T[] array2)
+	public static <T> boolean deepEquals(T[] array1, T[] array2)
 	{
 		return Arrays.deepEquals(array1, array2);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static <T> int hashCode(T[] array)
+	public static <T> int hashCode(T[] array)
 	{
 		return Arrays.hashCode(array);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static <T> int deepHashCode(T[] array)
+	public static <T> int deepHashCode(T[] array)
 	{
 		return Arrays.deepHashCode(array);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static <T> String toString(T[] array)
+	public static <T> String toString(T[] array)
 	{
 		if (array == null)
 		{
 			return "null";
 		}
-		
-		int len = array.length;
+
+		final int len = array.length;
 		if (len <= 0)
 		{
 			return "[]";
 		}
-		
-		StringBuilder buf = new StringBuilder(len * 10);
+
+		final StringBuilder buf = new StringBuilder(len * 10);
 		buf.append('[').append(array[0]);
 		for (int i = 1; i < len; i++)
 		{
@@ -602,23 +605,23 @@ public interface ObjectArray
 		}
 		return buf.append(']').toString();
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static void toString(Object[] array, StringBuilder builder)
+	public static void toString(Object[] array, StringBuilder builder)
 	{
 		if (array == null)
 		{
 			builder.append("null");
 			return;
 		}
-		
-		int len = array.length;
+
+		final int len = array.length;
 		if (len <= 0)
 		{
 			builder.append("[]");
 			return;
 		}
-		
+
 		builder.append('[').append(array[0]);
 		for (int i = 1; i < len; i++)
 		{
@@ -627,22 +630,22 @@ public interface ObjectArray
 		}
 		builder.append(']');
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static String deepToString(Object[] array)
+	public static String deepToString(Object[] array)
 	{
 		if (array == null)
 		{
 			return "null";
 		}
-		
-		int len = array.length;
+
+		final int len = array.length;
 		if (len <= 0)
 		{
 			return "[]";
 		}
-		
-		StringBuilder buf = new StringBuilder(len * 10);
+
+		final StringBuilder buf = new StringBuilder(len * 10);
 		buf.append('[');
 		toString(array[0], buf);
 		for (int i = 1; i < len; i++)
@@ -652,23 +655,23 @@ public interface ObjectArray
 		}
 		return buf.append(']').toString();
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static void deepToString(Object[] array, StringBuilder builder)
+	public static void deepToString(Object[] array, StringBuilder builder)
 	{
 		if (array == null)
 		{
 			builder.append("null");
 			return;
 		}
-		
-		int len = array.length;
+
+		final int len = array.length;
 		if (len <= 0)
 		{
 			builder.append("[]");
 			return;
 		}
-		
+
 		builder.append('[');
 		toString(array[0], builder);
 		for (int i = 1; i < len; i++)
@@ -678,68 +681,63 @@ public interface ObjectArray
 		}
 		builder.append(']');
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static void toString(Object o, StringBuilder builder)
+	public static void toString(Object object, StringBuilder builder)
 	{
-		if (o == null)
+		if (object == null)
 		{
 			builder.append("null");
 			return;
 		}
-		
-		Class c = o.getClass();
-		if (c == String.class)
+
+		final Class objectClass = object.getClass();
+		if (objectClass == boolean[].class)
 		{
-			builder.append((String) o);
+			BooleanArray.toString((boolean[]) object, builder);
 			return;
 		}
-		if (c == boolean[].class)
+		if (objectClass == byte[].class)
 		{
-			BooleanArray.toString((boolean[]) o, builder);
+			ByteArray.toString((byte[]) object, builder);
 			return;
 		}
-		if (c == byte[].class)
+		if (objectClass == short[].class)
 		{
-			ByteArray.toString((byte[]) o, builder);
+			ShortArray.toString((short[]) object, builder);
 			return;
 		}
-		if (c == short[].class)
+		if (objectClass == char[].class)
 		{
-			ShortArray.toString((short[]) o, builder);
+			CharArray.toString((char[]) object, builder);
 			return;
 		}
-		if (c == char[].class)
+		if (objectClass == int[].class)
 		{
-			CharArray.toString((char[]) o, builder);
+			IntArray.toString((int[]) object, builder);
 			return;
 		}
-		if (c == int[].class)
+		if (objectClass == long[].class)
 		{
-			IntArray.toString((int[]) o, builder);
+			LongArray.toString((long[]) object, builder);
 			return;
 		}
-		if (c == long[].class)
+		if (objectClass == float[].class)
 		{
-			LongArray.toString((long[]) o, builder);
+			FloatArray.toString((float[]) object, builder);
 			return;
 		}
-		if (c == float[].class)
+		if (objectClass == double[].class)
 		{
-			FloatArray.toString((float[]) o, builder);
+			DoubleArray.toString((double[]) object, builder);
 			return;
 		}
-		if (c == double[].class)
+		if (objectClass.isArray())
 		{
-			DoubleArray.toString((double[]) o, builder);
+			deepToString((Object[]) object, builder);
 			return;
 		}
-		if (c.isArray())
-		{
-			deepToString((Object[]) o, builder);
-			return;
-		}
-		
-		builder.append(o.toString());
+
+		builder.append(object.toString());
 	}
 }

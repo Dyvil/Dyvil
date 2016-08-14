@@ -1,6 +1,6 @@
 package dyvil.tools.dpf.ast.value
 
-import dyvil.lang.literal._
+import dyvil.lang.LiteralConvertible
 
 import dyvil.tools.dpf.DPFConvertible
 
@@ -16,16 +16,16 @@ import dyvil.tools.parsing.position.ICodePosition
 
 import java.lang.reflect.Array;
 
-@IntConvertible
-@LongConvertible
-@FloatConvertible
-@DoubleConvertible
-@CharConvertible
-@StringConvertible
-@BooleanConvertible
-@StringInterpolationConvertible
-@ArrayConvertible
-@MapConvertible
+@LiteralConvertible.FromInt
+@LiteralConvertible.FromLong
+@LiteralConvertible.FromFloat
+@LiteralConvertible.FromDouble
+@LiteralConvertible.FromChar
+@LiteralConvertible.FromString
+@LiteralConvertible.FromBoolean
+@LiteralConvertible.FromStringInterpolation
+@LiteralConvertible.FromArray
+@LiteralConvertible.FromMap
 public interface Value extends IASTNode
 {
 	// Conversion Methods

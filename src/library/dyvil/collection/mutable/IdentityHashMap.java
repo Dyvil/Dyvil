@@ -3,17 +3,15 @@ package dyvil.collection.mutable;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractHashMap;
 import dyvil.collection.impl.AbstractIdentityHashMap;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.ColonConvertible;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 
 import java.util.Arrays;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-@NilConvertible
-@ColonConvertible(methodName = "singleton")
-@ArrayConvertible
+@LiteralConvertible.FromNil
+@LiteralConvertible.FromColonOperator(methodName = "singleton")
+@LiteralConvertible.FromArray
 public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> implements MutableMap<K, V>
 {
 	private static final long serialVersionUID = -2508405537563871840L;
@@ -147,7 +145,31 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	{
 		this.threshold = (int) (newCapacity * this.loadFactor);
 	}
-	
+
+	@Override
+	public Entry<K, V> getEntry(Object key)
+	{
+		if (!this.containsKey(key))
+		{
+			return null;
+		}
+		return new Entry<K, V>()
+		{
+			@Override
+			public K getKey()
+			{
+				return (K) key;
+			}
+
+			@Override
+			public V getValue()
+			{
+				final int index = IdentityHashMap.this.getIndex(key);
+				return (V) IdentityHashMap.this.table[index];
+			}
+		};
+	}
+
 	@Override
 	public void clear()
 	{

@@ -21,7 +21,7 @@ public interface IVariable extends IDataMember
 	{
 		return false;
 	}
-	
+
 	@Override
 	default boolean isVariable()
 	{
@@ -29,30 +29,35 @@ public interface IVariable extends IDataMember
 	}
 
 	boolean isAssigned();
-	
+
+	default int getLocalSlots()
+	{
+		return this.getInternalType().getLocalSlots();
+	}
+
 	int getLocalIndex();
-	
+
 	void setLocalIndex(int index);
-	
+
 	default boolean isReferenceCapturable()
 	{
 		return false;
 	}
-	
+
 	default boolean isReferenceType()
 	{
 		return false;
 	}
-	
+
 	default void setReferenceType()
 	{
 	}
-	
+
 	default IType getInternalType()
 	{
 		return this.getType();
 	}
-	
+
 	@Override
 	default IDataMember capture(IContext context)
 	{
@@ -60,17 +65,36 @@ public interface IVariable extends IDataMember
 		return capture == null ? this : capture;
 	}
 
+	@Override
+	default String getDescriptor()
+	{
+		return this.getInternalType().getExtendedName();
+	}
+
+	@Override
+	default String getSignature()
+	{
+		return this.getInternalType().getSignature();
+	}
+
 	default void appendDescription(StringBuilder buf)
 	{
 		buf.append(this.getDescriptor());
 	}
-	
+
 	default void appendSignature(StringBuilder buf)
 	{
 		buf.append(this.getSignature());
 	}
 
-	void writeLocal(MethodWriter writer, Label start, Label end);
+	default void writeLocal(MethodWriter writer, Label start, Label end)
+	{
+		final IType internalType = this.getInternalType();
+		final String signature = internalType.needsSignature() ? internalType.getSignature() : null;
+
+		writer.visitLocalVariable(this.getInternalName(), this.getDescriptor(), signature, start, end,
+		                          this.getLocalIndex());
+	}
 
 	default void writeInit(MethodWriter writer) throws BytecodeException
 	{

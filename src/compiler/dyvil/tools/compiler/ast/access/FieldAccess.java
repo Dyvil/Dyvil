@@ -21,6 +21,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.raw.NamedType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.transform.SideEffectHelper;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
@@ -128,6 +129,18 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	public IValue toAssignment(IValue rhs, ICodePosition position)
 	{
 		return new FieldAssignment(this.position.to(position), this.receiver, this.name, rhs);
+	}
+
+	@Override
+	public IValue toCompoundAssignment(IValue rhs, ICodePosition position, MarkerList markers, IContext context,
+		                                  SideEffectHelper helper)
+	{
+		// x op= z
+		// -> x = x.op(z)
+
+		final IValue fieldReceiver = helper.processValue(this.receiver);
+		this.receiver = fieldReceiver;
+		return new FieldAssignment(position, fieldReceiver, this.field, rhs);
 	}
 
 	@Override
@@ -362,21 +375,9 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 
 	private IValue resolveTypeAccess(IContext context)
 	{
-		final IType type;
-
-		if (this.receiver == null)
-		{
-			type = NamedType.resolveTopLevel(context, this.name, this.position);
-		}
-		else if (this.receiver.valueTag() == IValue.CLASS_ACCESS)
-		{
-			type = NamedType.resolveWithParent(this.receiver.getType(), this.name, this.position);
-		}
-		else
-		{
-			return null;
-		}
-
+		final IType parentType =
+			this.receiver != null && this.receiver.isClassAccess() ? this.receiver.getType() : null;
+		final IType type = new NamedType(this.position, this.name, parentType).resolveType(null, context);
 		return type != null ? new ClassAccess(this.position, type) : null;
 	}
 
@@ -437,14 +438,23 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	@Override
 	public IValue foldConstants()
 	{
-		if (this.field != null && this.field.hasModifier(Modifiers.CONST))
-		{
-			final IValue value = this.field.getValue();
-			return value != null && value.isConstantOrField() ? value : this;
-		}
 		if (this.receiver != null)
 		{
 			this.receiver = this.receiver.foldConstants();
+		}
+		if (this.field != null && this.field.hasModifier(Modifiers.CONST))
+		{
+			if (this.receiver != null && this.receiver.valueTag() == IValue.POP_EXPR)
+			{
+				// Cannot constant-fold
+				return this;
+			}
+
+			final IValue value = this.field.getValue();
+			if (value != null && value.isConstantOrField())
+			{
+				return value;
+			}
 		}
 		return this;
 	}

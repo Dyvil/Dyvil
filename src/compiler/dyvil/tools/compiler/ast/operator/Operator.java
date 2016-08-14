@@ -179,7 +179,7 @@ public final class Operator implements IOperator
 	@Override
 	public void readData(DataInput in) throws IOException
 	{
-		this.name = Name.from(in.readUTF());
+		this.name = Name.read(in);
 
 		this.id = in.readByte();
 		if (this.id != ID_PREFIX && this.id != ID_POSTFIX)
@@ -188,7 +188,7 @@ public final class Operator implements IOperator
 		}
 		if (this.id == ID_TERNARY)
 		{
-			this.ternaryName = Name.from(in.readUTF());
+			this.ternaryName = Name.read(in);
 		}
 	}
 

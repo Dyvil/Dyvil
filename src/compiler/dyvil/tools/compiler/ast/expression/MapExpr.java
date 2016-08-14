@@ -1,13 +1,13 @@
 package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.access.ClassAccess;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Mutability;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.MapType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -111,12 +111,28 @@ public class MapExpr implements IValue
 	}
 
 	@Override
+	public boolean isClassAccess()
+	{
+		return this.count == 1 && this.keys[0].isClassAccess() && this.values[0].isClassAccess();
+	}
+
+	@Override
+	public IValue asIgnoredClassAccess()
+	{
+		if (!this.isClassAccess())
+		{
+			return IValue.super.asIgnoredClassAccess();
+		}
+		return new ClassAccess(this.position, MapType.base(this.keys[0].getType(), this.values[0].getType()))
+			       .asIgnoredClassAccess();
+	}
+
+	@Override
 	public IType getType()
 	{
 		if (this.type == null)
 		{
-			return this.type = new MapType(this.getKeyType(), this.getValueType(), Mutability.IMMUTABLE,
-			                               MapType.MapTypes.IMMUTABLE_MAP_CLASS);
+			return this.type = MapType.immutable(this.getKeyType(), this.getValueType());
 		}
 		return this.type;
 	}
@@ -305,31 +321,32 @@ public class MapExpr implements IValue
 			return;
 		}
 
-		IType keyObject = this.keyType.getObjectType();
-		IType valueObject = this.valueType.getObjectType();
+		final IType keyObject = this.keyType.getObjectType();
+		final IType valueObject = this.valueType.getObjectType();
+		final int varIndex = writer.localCount();
 
 		writer.visitLdcInsn(this.count);
 		writer.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object");
+		writer.visitVarInsn(Opcodes.ASTORE, varIndex);
+		writer.visitLdcInsn(this.count);
+		writer.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object");
+		writer.visitVarInsn(Opcodes.ASTORE, varIndex + 1);
 
 		for (int i = 0; i < this.count; i++)
 		{
-			writer.visitInsn(Opcodes.DUP);
+			writer.visitVarInsn(Opcodes.ALOAD, varIndex);
 			writer.visitLdcInsn(i);
 			this.keys[i].writeExpression(writer, keyObject);
 			writer.visitInsn(Opcodes.AASTORE);
-		}
 
-		writer.visitLdcInsn(this.count);
-		writer.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object");
-
-		for (int i = 0; i < this.count; i++)
-		{
-			writer.visitInsn(Opcodes.DUP);
+			writer.visitVarInsn(Opcodes.ALOAD, varIndex + 1);
 			writer.visitLdcInsn(i);
 			this.values[i].writeExpression(writer, valueObject);
 			writer.visitInsn(Opcodes.AASTORE);
 		}
 
+		writer.visitVarInsn(Opcodes.ALOAD, varIndex);
+		writer.visitVarInsn(Opcodes.ALOAD, varIndex + 1);
 		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/collection/ImmutableMap", "apply",
 		                       "([Ljava/lang/Object;[Ljava/lang/Object;)Ldyvil/collection/ImmutableMap;", true);
 

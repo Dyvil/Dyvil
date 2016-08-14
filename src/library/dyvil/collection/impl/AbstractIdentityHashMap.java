@@ -479,45 +479,14 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 	@Override
 	public boolean containsKey(Object key)
 	{
-		Object k = maskNull(key);
-		Object[] tab = this.table;
-		int len = tab.length;
-		int i = index(k, len);
-		while (true)
-		{
-			Object item = tab[i];
-			if (item == k)
-			{
-				return true;
-			}
-			if (item == null)
-			{
-				return false;
-			}
-			i = nextKeyIndex(i, len);
-		}
+		return this.getIndex(key) >= 0;
 	}
 
 	@Override
 	public boolean contains(Object key, Object value)
 	{
-		Object k = maskNull(key);
-		Object[] tab = this.table;
-		int len = tab.length;
-		int i = index(k, len);
-		while (true)
-		{
-			Object item = tab[i];
-			if (item == k)
-			{
-				return tab[i + 1] == value;
-			}
-			if (item == null)
-			{
-				return false;
-			}
-			i = nextKeyIndex(i, len);
-		}
+		final int index = this.getIndex(key);
+		return index >= 0 && this.table[index + 1] == value;
 	}
 
 	@Override
@@ -535,8 +504,7 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 		return false;
 	}
 
-	@Override
-	public V get(Object key)
+	protected int getIndex(Object key)
 	{
 		Object k = maskNull(key);
 		Object[] tab = this.table;
@@ -547,37 +515,36 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 			Object item = tab[i];
 			if (item == k)
 			{
-				return (V) tab[i + 1];
+				return i;
 			}
 			if (item == null)
 			{
-				return null;
+				return -1;
 			}
 			i = nextKeyIndex(i, len);
 		}
 	}
 
 	@Override
+	public V get(Object key)
+	{
+		final int index = this.getIndex(key);
+		if (index < 0)
+		{
+			return null;
+		}
+		return (V) this.table[index + 1];
+	}
+
+	@Override
 	public Option<V> getOption(Object key)
 	{
-		final Object maskedKey = maskNull(key);
-		final Object[] table = this.table;
-		final int len = table.length;
-
-		int i = index(maskedKey, len);
-		while (true)
+		final int index = this.getIndex(key);
+		if (index < 0)
 		{
-			Object item = table[i];
-			if (item == maskedKey)
-			{
-				return new Some<>((V) table[i + 1]);
-			}
-			if (item == null)
-			{
-				return (Option<V>) None.instance;
-			}
-			i = nextKeyIndex(i, len);
+			return (Option<V>) None.instance;
 		}
+		return new Some<>((V) this.table[index + 1]);
 	}
 
 	@Override

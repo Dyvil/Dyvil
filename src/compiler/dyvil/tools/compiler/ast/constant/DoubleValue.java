@@ -77,7 +77,7 @@ public class DoubleValue implements IConstantValue
 			return this;
 		}
 
-		final IAnnotation annotation = type.getAnnotation(Types.DOUBLE_CONVERTIBLE_CLASS);
+		final IAnnotation annotation = type.getAnnotation(Types.FROMDOUBLE_CLASS);
 		if (annotation != null)
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
@@ -88,7 +88,7 @@ public class DoubleValue implements IConstantValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return Types.isSuperType(type, Types.DOUBLE) || type.getAnnotation(Types.DOUBLE_CONVERTIBLE_CLASS) != null;
+		return Types.isSuperType(type, Types.DOUBLE) || type.getAnnotation(Types.FROMDOUBLE_CLASS) != null;
 	}
 
 	@Override
@@ -99,7 +99,7 @@ public class DoubleValue implements IConstantValue
 		{
 			return i;
 		}
-		if (type.getAnnotation(Types.DOUBLE_CONVERTIBLE_CLASS) != null)
+		if (type.getAnnotation(Types.FROMDOUBLE_CLASS) != null)
 		{
 			return CONVERSION_MATCH;
 		}

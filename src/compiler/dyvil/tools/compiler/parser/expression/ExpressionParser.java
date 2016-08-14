@@ -538,6 +538,8 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 	{
 		if (!TypeParser.isGenericStart(token, tokenType))
 		{
+			// Identifier not followed by an opening angle bracket
+			// IDENTIFIER
 			return false;
 		}
 
@@ -546,28 +548,62 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		final IToken endToken = ParserUtil.findMatch(token, true);
 		if (endToken == null)
 		{
+			// No closing angle bracket found
+			// IDENTIFIER < ...
 			return false;
 		}
-
-		// IDENTIFIER < ... >
+		final int endTokenType = endToken.type();
 		final IToken endTokenNext = endToken.next();
 		final int endTokenNextType = endTokenNext.type();
 
+		// IDENTIFIER < ... >
+		// IDENTIFIER < ... >SYMBOL
+		// IDENTIFIER < ... SYMBOL>
+		// IDENTIFIER < ... SYMBOL>SYMBOL
+
+		if (!TypeParser.isGenericEnd2(endToken, endTokenType))
+		{
+			// The end token ends with more symbols
+			// IDENTIFIER < ... SYMBOL>SYMBOL
+			// IDENTIFIER < ... >SYMBOL
+
+			// Return true iff the end token and the next token are NOT separated by whitespace
+			return neighboring(endToken, endTokenNext);
+		}
+
+		// IDENTIFIER < ... >
+		// IDENTIFIER < ... SYMBOL>
+
+		// Check the token after the end token
+
 		if (isExpressionEnd(endTokenNextType))
 		{
+			// The end token is followed by a token that ends an expression (e.g. ',', ';', ')', ']', '}')
 			// IDENTIFIER < ... > END
+			// IDENTIFIER < ... SYMBOL> END
 			return true;
 		}
 		switch (endTokenNextType)
 		{
+		case Tokens.SYMBOL:
+		case Tokens.SYMBOL_IDENTIFIER:
+			// The end token is followed by another symbol token, but they are separated by whitespace
+			// IDENTIFIER < ... > SYMBOL
+			// IDENTIFIER < ... SYMBOL> SYMBOL
+
+			// Return true iff the symbol token is either followed by a token that ends an expression
+			// or separated from the next token via whitespace.
+			final IToken endTokenNextNext = endTokenNext.next();
+			return isExpressionEnd(endTokenNextNext.type()) || !neighboring(endTokenNext, endTokenNextNext);
 		case BaseSymbols.OPEN_CURLY_BRACKET:
 			// IDENTIFIER < ... > {
 			return true;
 		case BaseSymbols.OPEN_PARENTHESIS:
 		case BaseSymbols.OPEN_SQUARE_BRACKET:
+			// The end token is followed by an opening or closing parentheses.
+			// Return true iff they are NOT separated by whitespace
 			// IDENTIFIER < ... >(
 			// IDENTIFIER < ... >[
-			//                  ^^ note the spacing
 			return neighboring(endToken, endTokenNext);
 		}
 		return false;

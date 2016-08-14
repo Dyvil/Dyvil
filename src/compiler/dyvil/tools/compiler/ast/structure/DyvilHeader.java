@@ -107,7 +107,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		String name = input.getAbsolutePath();
 		int start = name.lastIndexOf(File.separatorChar);
 		int end = name.lastIndexOf('.');
-		this.name = Name.from(name.substring(start + 1, end));
+		this.name = Name.fromQualified(name.substring(start + 1, end));
 
 		name = output.getPath();
 		start = name.lastIndexOf(File.separatorChar);
@@ -844,7 +844,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		int includes = in.readShort();
 		for (int i = 0; i < includes; i++)
 		{
-			IncludeDeclaration id = new IncludeDeclaration(null);
+			IncludeDeclaration id = new IncludeDeclaration();
 			id.read(in);
 			this.addInclude(id);
 		}

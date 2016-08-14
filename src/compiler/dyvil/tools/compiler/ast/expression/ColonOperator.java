@@ -8,7 +8,6 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.TupleType;
@@ -17,6 +16,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -25,7 +25,8 @@ public class ColonOperator implements IValue
 {
 	public static final class LazyFields
 	{
-		public static final IClass COLON_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("ColonConvertible");
+		public static final IClass COLON_CONVERTIBLE = Types.LITERALCONVERTIBLE_CLASS.resolveClass(
+			Name.fromRaw("FromColonOperator"));
 
 		private LazyFields()
 		{

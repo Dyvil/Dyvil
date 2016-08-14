@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.generic;
 
+import dyvil.annotation.Reified;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.IAnnotated;
@@ -14,6 +15,7 @@ import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.backend.IObjectCompilable;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -23,13 +25,6 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public interface ITypeParameter extends IASTNode, INamed, IAnnotated, IObjectCompilable
 {
-	enum ReifiedKind
-	{
-		NOT_REIFIED,
-		REIFIED_ERASURE,
-		REIFIED_TYPE
-	}
-
 	ITypeParametric getGeneric();
 	
 	void setIndex(int index);
@@ -42,9 +37,16 @@ public interface ITypeParameter extends IASTNode, INamed, IAnnotated, IObjectCom
 	
 	Variance getVariance();
 
-	ReifiedKind getReifiedKind();
+	Reified.Type getReifiedKind();
 	
 	int getParameterIndex();
+
+	default boolean isAny()
+	{
+		return this.getGeneric() instanceof ITypeAlias;
+	}
+
+	IType getErasure();
 
 	IType getDefaultType();
 

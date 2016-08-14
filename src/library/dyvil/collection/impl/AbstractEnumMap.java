@@ -20,50 +20,50 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 	protected class EnumEntry implements Entry<K, V>
 	{
 		private static final long serialVersionUID = 4125489955668261409L;
-		
+
 		int index;
-		
+
 		EnumEntry(int index)
 		{
 			this.index = index;
 		}
-		
+
 		@Override
 		public K getKey()
 		{
 			return AbstractEnumMap.this.keys[this.index];
 		}
-		
+
 		@Override
 		public V getValue()
 		{
 			return (V) AbstractEnumMap.this.values[this.index];
 		}
-		
+
 		@Override
 		public String toString()
 		{
 			return AbstractEnumMap.this.keys[this.index] + " -> " + AbstractEnumMap.this.values[this.index];
 		}
-		
+
 		@Override
 		public boolean equals(Object obj)
 		{
 			return Entry.entryEquals(this, obj);
 		}
-		
+
 		@Override
 		public int hashCode()
 		{
 			return Entry.entryHashCode(this);
 		}
 	}
-	
+
 	protected abstract class EnumIterator<E> implements Iterator<E>
 	{
 		private int     index;
 		private boolean indexValid;
-		
+
 		@Override
 		public boolean hasNext()
 		{
@@ -80,18 +80,18 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 			this.index = tab.length;
 			return false;
 		}
-		
+
 		protected int nextIndex()
 		{
 			if (!this.indexValid && !this.hasNext())
 			{
 				throw new NoSuchElementException();
 			}
-			
+
 			this.indexValid = false;
 			return this.index++;
 		}
-		
+
 		@Override
 		public void remove()
 		{
@@ -99,20 +99,20 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 			{
 				throw new IllegalStateException();
 			}
-			
+
 			AbstractEnumMap.this.removeAt(--this.index);
 		}
 	}
-	
+
 	private static final long serialVersionUID = 7946242151088885999L;
-	
+
 	protected transient Class<K> type;
 	protected transient K[]      keys;
 	protected transient Object[] values;
 	protected transient int      size;
 
 	// Constructors
-	
+
 	protected AbstractEnumMap(Class<K> type, K[] keys, V[] values, int size)
 	{
 		this.type = type;
@@ -120,12 +120,12 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		this.values = values;
 		this.size = size;
 	}
-	
+
 	public AbstractEnumMap(Type<K> type)
 	{
 		this(type.erasure());
 	}
-	
+
 	public AbstractEnumMap(Class<K> type)
 	{
 		this.keys = EnumReflection.getEnumConstants(type);
@@ -180,10 +180,10 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 				return key.getDeclaringClass();
 			}
 		}
-		
+
 		throw new IllegalArgumentException("Invalid Enum Map - Could not get Enum type");
 	}
-	
+
 	protected static <K extends Enum<K>> Class<K> getKeyType(Iterable<? extends Entry<? extends K, ?>> iterable)
 	{
 		for (Entry<? extends K, ?> entry : iterable)
@@ -196,11 +196,11 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		}
 		throw new IllegalArgumentException("Invalid Enum Map - Could not get Enum type");
 	}
-	
+
 	protected void putInternal(K key, V value)
 	{
 		int index = key.ordinal();
-		
+
 		if (this.values[index] == null)
 		{
 			this.size++;
@@ -215,23 +215,23 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 			this.putInternal(entry.getKey(), entry.getValue());
 		}
 	}
-	
+
 	protected static boolean checkType(Class<?> type, Object key)
 	{
 		return key != null && key.getClass() == type;
 	}
-	
+
 	protected static int index(Object key)
 	{
 		return ((Enum) key).ordinal();
 	}
-	
+
 	@Override
 	public int size()
 	{
 		return this.size;
 	}
-	
+
 	@Override
 	public Iterator<Entry<K, V>> iterator()
 	{
@@ -242,7 +242,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 			{
 				return new EnumEntry(this.nextIndex());
 			}
-			
+
 			@Override
 			public String toString()
 			{
@@ -250,7 +250,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 			}
 		};
 	}
-	
+
 	@Override
 	public Iterator<K> keyIterator()
 	{
@@ -261,7 +261,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 			{
 				return AbstractEnumMap.this.keys[this.nextIndex()];
 			}
-			
+
 			@Override
 			public String toString()
 			{
@@ -269,7 +269,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 			}
 		};
 	}
-	
+
 	@Override
 	public Iterator<V> valueIterator()
 	{
@@ -280,7 +280,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 			{
 				return (V) AbstractEnumMap.this.values[this.nextIndex()];
 			}
-			
+
 			@Override
 			public String toString()
 			{
@@ -288,15 +288,15 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 			}
 		};
 	}
-	
+
 	protected abstract void removeAt(int index);
-	
+
 	@Override
 	public boolean containsKey(Object key)
 	{
 		return checkType(this.type, key) && this.values[index(key)] != null;
 	}
-	
+
 	@Override
 	public boolean contains(Object key, Object value)
 	{
@@ -304,11 +304,11 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		{
 			return false;
 		}
-		
+
 		Object v = this.values[((Enum) key).ordinal()];
 		return Objects.equals(v, value);
 	}
-	
+
 	@Override
 	public boolean containsValue(Object value)
 	{
@@ -321,7 +321,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		}
 		return false;
 	}
-	
+
 	@Override
 	public V get(Object key)
 	{
@@ -329,10 +329,39 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		{
 			return null;
 		}
-		
+
 		return (V) this.values[index(key)];
 	}
-	
+
+	@Override
+	public Entry<K, V> getEntry(Object key)
+	{
+		if (!checkType(this.type, key))
+		{
+			return null;
+		}
+
+		final int index = index(key);
+		if (this.values[index] == null)
+		{
+			return null;
+		}
+		return new Entry<K, V>()
+		{
+			@Override
+			public K getKey()
+			{
+				return (K) key;
+			}
+
+			@Override
+			public V getValue()
+			{
+				return (V) AbstractEnumMap.this.values[index];
+			}
+		};
+	}
+
 	@Override
 	public Option<V> getOption(Object key)
 	{
@@ -340,7 +369,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		{
 			return (Option<V>) None.instance;
 		}
-		
+
 		return new Some<>((V) this.values[index(key)]);
 	}
 
@@ -394,32 +423,32 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		}
 		return map;
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return Map.mapToString(this);
 	}
-	
+
 	@Override
 	public boolean equals(Object obj)
 	{
 		return Map.mapEquals(this, obj);
 	}
-	
+
 	@Override
 	public int hashCode()
 	{
 		return Map.mapHashCode(this);
 	}
-	
+
 	private void writeObject(java.io.ObjectOutputStream out) throws IOException
 	{
 		out.defaultWriteObject();
-		
+
 		out.writeObject(this.type);
 		out.writeInt(this.size);
-		
+
 		int entriesToBeWritten = this.size;
 		for (int i = 0; entriesToBeWritten > 0; i++)
 		{
@@ -431,17 +460,17 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 			}
 		}
 	}
-	
+
 	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
 	{
 		in.defaultReadObject();
-		
+
 		this.type = (Class<K>) in.readObject();
 		this.keys = EnumReflection.getEnumConstants(this.type);
 		this.values = new Object[this.keys.length];
-		
+
 		int size = in.readInt();
-		
+
 		for (int i = 0; i < size; i++)
 		{
 			K key = (K) in.readObject();

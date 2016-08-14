@@ -2,13 +2,13 @@ package dyvil.tools.compiler.ast.expression;
 
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.access.ClassAccess;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Mutability;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -19,6 +19,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -29,7 +30,8 @@ public final class ArrayExpr implements IValue, IValueList
 {
 	public static final class LazyFields
 	{
-		public static final IClass ARRAY_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("ArrayConvertible");
+		public static final IClass ARRAY_CONVERTIBLE = Types.LITERALCONVERTIBLE_CLASS
+			                                               .resolveClass(Name.fromRaw("FromArray"));
 
 		private static final TypeChecker.MarkerSupplier ELEMENT_MARKER_SUPPLIER = TypeChecker.markerSupplier(
 			"array.element.type.incompatible", "array.element.type.expected", "array.element.type.actual");
@@ -114,6 +116,22 @@ public final class ArrayExpr implements IValue, IValueList
 	public boolean isPrimitive()
 	{
 		return false;
+	}
+
+	@Override
+	public boolean isClassAccess()
+	{
+		return this.valueCount == 1 && this.values[0].isClassAccess();
+	}
+
+	@Override
+	public IValue asIgnoredClassAccess()
+	{
+		if (!this.isClassAccess())
+		{
+			return IValue.super.asIgnoredClassAccess();
+		}
+		return new ClassAccess(this.position, new ArrayType(this.values[0].getType())).asIgnoredClassAccess();
 	}
 
 	public IType getElementType()

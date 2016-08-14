@@ -3,6 +3,7 @@ package dyvil.array;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.Mutating;
 import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation._internal.Primitive;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.collection.range.FloatRange;
@@ -11,213 +12,212 @@ import dyvil.ref.array.FloatArrayRef;
 import dyvil.reflect.Modifiers;
 
 import java.util.Arrays;
-import java.util.function.DoubleFunction;
-import java.util.function.DoublePredicate;
-import java.util.function.DoubleUnaryOperator;
-import java.util.function.IntConsumer;
+import java.util.function.*;
 
 import static dyvil.reflect.Opcodes.*;
 
-public interface FloatArray
+public abstract class FloatArray
 {
-	float[] EMPTY = new float[0];
+	public static final float[] EMPTY = new float[0];
 
 	@DyvilModifiers(Modifiers.INLINE)
-	static float[] empty()
-	{
-		return EMPTY;
-	}
-
-	@DyvilModifiers(Modifiers.INLINE)
-	static float[] empty(int size)
-	{
-		return new float[size];
-	}
-
-	@DyvilModifiers(Modifiers.INLINE)
-	static float[] apply()
+	public static float[] apply()
 	{
 		return new float[0];
 	}
 
 	@DyvilModifiers(Modifiers.INLINE)
-	static float[] apply(float... values)
+	public static float[] apply(int size)
 	{
-		return values;
+		return new float[size];
 	}
 
 	@DyvilModifiers(Modifiers.INLINE)
-	static float[] from(float[] array)
+	public static float[] apply(float[] array)
 	{
 		return array.clone();
 	}
 
 	@DyvilModifiers(Modifiers.IMPLICIT | Modifiers.INLINE)
-	static float[] from(FloatRange range)
+	public static float[] apply(FloatRange range)
 	{
 		return range.toFloatArray();
 	}
-	
-	static float[] repeat(int count, float repeatedValue)
+
+	public static float[] apply(int size, float repeatedValue)
 	{
-		float[] array = new float[count];
-		for (int i = 0; i < count; i++)
+		final float[] array = new float[size];
+		for (int i = 0; i < size; i++)
 		{
 			array[i] = repeatedValue;
 		}
 		return array;
 	}
-	
-	static float[] generate(int count, DoubleUnaryOperator generator)
+
+	public static float[] apply(int size, DoubleSupplier valueSupplier)
 	{
-		float[] array = new float[count];
-		for (int i = 0; i < count; i++)
+		final float[] array = new float[size];
+		for (int i = 0; i < size; i++)
 		{
-			array[i] = (float) generator.applyAsDouble(i);
+			array[i] = (float) valueSupplier.getAsDouble();
 		}
 		return array;
 	}
-	
-	static float[] range(float start, float end)
+
+	public static float[] apply(int size, DoubleUnaryOperator valueMapper)
+	{
+		final float[] array = new float[size];
+		for (int i = 0; i < size; i++)
+		{
+			array[i] = (float) valueMapper.applyAsDouble(i);
+		}
+		return array;
+	}
+
+	public static float[] apply_$_closed(float from, float to)
 	{
 		int i = 0;
-		float[] array = new float[(int) (end - start + 1)];
-		for (; start <= end; start++)
+		final float[] array = new float[(int) (to - from + 1)];
+		for (; from <= to; from++)
 		{
-			array[i++] = start;
+			array[i++] = from;
 		}
 		return array;
 	}
-	
-	static float[] rangeOpen(float start, float end)
+
+	public static float[] apply_$_halfOpen(float from, float toExclusive)
 	{
 		int i = 0;
-		float[] array = new float[(int) (end - start)];
-		for (; start < end; start++)
+		final float[] array = new float[(int) (toExclusive - from)];
+		for (; from < toExclusive; from++)
 		{
-			array[i++] = start;
+			array[i++] = from;
 		}
 		return array;
 	}
-	
+
 	// Basic Array Operations
-	
+
 	@Intrinsic( { LOAD_0, ARRAYLENGTH })
 	@DyvilModifiers(Modifiers.INFIX)
-	static int length(float[] array)
+	public static int length(float[] array)
 	{
 		return array.length;
 	}
-	
+
+	@Intrinsic( { LOAD_0, ARRAYLENGTH })
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int size(float[] array)
+	{
+		return array.length;
+	}
+
+	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean isEmpty(float[] array)
+	{
+		return array.length == 0;
+	}
+
 	@Intrinsic( { LOAD_0, LOAD_1, FALOAD })
 	@DyvilModifiers(Modifiers.INFIX)
-	static float subscript(float[] array, int i)
+	public static float subscript(float[] array, int index)
 	{
-		return array[i];
+		return array[index];
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static float[] subscript(float[] array, Range<Integer> range)
+	public static float[] subscript(float[] array, Range<@Primitive Integer> range)
 	{
-		int start = (range.first());
-		int count = range.count();
-		float[] slice = new float[count];
-		System.arraycopy(array, start, slice, 0, count);
-		return slice;
+		final int size = range.count();
+		final float[] result = new float[size];
+		System.arraycopy(array, range.first(), result, 0, size);
+		return result;
 	}
-	
+
 	@Intrinsic( { LOAD_0, LOAD_1, LOAD_2, FASTORE })
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	static void subscript_$eq(float[] array, int i, float v)
+	public static void subscript_$eq(float[] array, int index, float newValue)
 	{
-		array[i] = v;
-	}
-	
-	@DyvilModifiers(Modifiers.INFIX)
-	@Mutating
-	static void subscript_$eq(float[] array, Range<Integer> range, float[] values)
-	{
-		int start = (range.first());
-		int count = range.count();
-		System.arraycopy(values, 0, array, start, count);
+		array[index] = newValue;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	static FloatRef subscript_$amp(float[] array, int index)
+	public static void subscript_$eq(float[] array, Range<@Primitive Integer> range, float[] newValues)
+	{
+		System.arraycopy(newValues, 0, array, range.first(), range.count());
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	@Mutating
+	public static FloatRef subscript_$amp(float[] array, int index)
 	{
 		return new FloatArrayRef(array, index);
 	}
-	
-	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static boolean isEmpty(int[] array)
+	public static void forEach(float[] array, DoubleConsumer action)
 	{
-		return array.length == 0;
-	}
-	
-	@DyvilModifiers(Modifiers.INFIX)
-	static void forEach(int[] array, IntConsumer action)
-	{
-		for (int v : array)
+		for (float v : array)
 		{
 			action.accept(v);
 		}
 	}
-	
+
 	// Operators
-	
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static boolean $qmark(float[] array, float v)
+	public static boolean $qmark(float[] array, float value)
 	{
-		return Arrays.binarySearch(array, v) >= 0;
+		return indexOf(array, value, 0) >= 0;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static boolean $eq$eq(float[] array1, float[] array2)
+	public static boolean $eq$eq(float[] array1, float[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static boolean $bang$eq(float[] array1, float[] array2)
+	public static boolean $bang$eq(float[] array1, float[] array2)
 	{
 		return !Arrays.equals(array1, array2);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static float[] $plus(float[] array, float v)
+	public static float[] $plus(float[] array, float value)
 	{
-		int len = array.length;
-		float[] res = new float[len + 1];
+		final int len = array.length;
+		final float[] res = new float[len + 1];
 		System.arraycopy(array, 0, res, 0, len);
-		res[len] = v;
+		res[len] = value;
 		return res;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static float[] $plus$plus(float[] array1, float[] array2)
+	public static float[] $plus$plus(float[] array1, float[] array2)
 	{
-		int len1 = array1.length;
-		int len2 = array2.length;
-		float[] res = new float[len1 + len2];
+		final int len1 = array1.length;
+		final int len2 = array2.length;
+		final float[] res = new float[len1 + len2];
 		System.arraycopy(array1, 0, res, 0, len1);
 		System.arraycopy(array2, 0, res, len1, len2);
 		return res;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static float[] $minus(float[] array, float v)
+	public static float[] $minus(float[] array, float value)
 	{
-		int index = indexOf(array, v, 0);
+		final int index = indexOf(array, value, 0);
 		if (index < 0)
 		{
 			return array;
 		}
-		
-		int len = array.length;
-		float[] res = new float[len - 1];
+
+		final int len = array.length;
+		final float[] res = new float[len - 1];
 		if (index > 0)
 		{
 			// copy the first part before the index
@@ -230,14 +230,14 @@ public interface FloatArray
 		}
 		return res;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static float[] $minus$minus(float[] array1, float[] array2)
+	public static float[] $minus$minus(float[] array1, float[] array2)
 	{
 		int index = 0;
-		int len = array1.length;
-		float[] res = new float[len];
-		
+		final int len = array1.length;
+		final float[] res = new float[len];
+
 		for (float v : array1)
 		{
 			if (indexOf(array2, v, 0) < 0)
@@ -245,18 +245,18 @@ public interface FloatArray
 				res[index++] = v;
 			}
 		}
-		
+
 		// Return a resized copy of the temporary array
 		return Arrays.copyOf(res, index);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static float[] $amp(float[] array1, float[] array2)
+	public static float[] $amp(float[] array1, float[] array2)
 	{
 		int index = 0;
-		int len = array1.length;
-		float[] res = new float[len];
-		
+		final int len = array1.length;
+		final float[] res = new float[len];
+
 		for (float v : array1)
 		{
 			if (indexOf(array2, v, 0) >= 0)
@@ -264,53 +264,53 @@ public interface FloatArray
 				res[index++] = v;
 			}
 		}
-		
+
 		// Return a resized copy of the temporary array
 		return Arrays.copyOf(res, index);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static float[] mapped(float[] array, DoubleUnaryOperator mapper)
+	public static float[] mapped(float[] array, DoubleUnaryOperator mapper)
 	{
-		int len = array.length;
-		float[] res = new float[len];
+		final int len = array.length;
+		final float[] res = new float[len];
 		for (int i = 0; i < len; i++)
 		{
 			res[i] = (float) mapper.applyAsDouble(array[i]);
 		}
 		return res;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static float[] flatMapped(float[] array, DoubleFunction<float[]> mapper)
+	public static float[] flatMapped(float[] array, DoubleFunction<float[]> mapper)
 	{
 		int size = 0;
 		float[] res = EMPTY;
-		
+
 		for (float v : array)
 		{
-			float[] a = mapper.apply(v);
-			int alen = a.length;
+			final float[] a = mapper.apply(v);
+			final int alen = a.length;
 			if (size + alen >= res.length)
 			{
-				float[] newRes = new float[size + alen];
+				final float[] newRes = new float[size + alen];
 				System.arraycopy(res, 0, newRes, 0, res.length);
 				res = newRes;
 			}
-			
+
 			System.arraycopy(a, 0, res, size, alen);
 			size += alen;
 		}
-		
+
 		return res;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static float[] filtered(float[] array, DoublePredicate condition)
+	public static float[] filtered(float[] array, DoublePredicate condition)
 	{
 		int index = 0;
-		int len = array.length;
-		float[] res = new float[len];
+		final int len = array.length;
+		final float[] res = new float[len];
 		for (float v : array)
 		{
 			if (condition.test(v))
@@ -318,126 +318,126 @@ public interface FloatArray
 				res[index++] = v;
 			}
 		}
-		
+
 		// Return a resized copy of the temporary array
 		return Arrays.copyOf(res, index);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static float[] sorted(float[] array)
+	public static float[] sorted(float[] array)
 	{
-		float[] res = array.clone();
+		final float[] res = array.clone();
 		Arrays.sort(res);
 		return res;
 	}
-	
+
 	// Search Operations
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static int indexOf(float[] array, float v)
+	public static int indexOf(float[] array, float value)
 	{
-		return indexOf(array, v, 0);
+		return indexOf(array, value, 0);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static int indexOf(float[] array, float v, int start)
+	public static int indexOf(float[] array, float value, int startIndex)
 	{
-		for (; start < array.length; start++)
+		for (; startIndex < array.length; startIndex++)
 		{
-			if (array[start] == v)
+			if (array[startIndex] == value)
 			{
-				return start;
+				return startIndex;
 			}
 		}
 		return -1;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static int lastIndexOf(float[] array, float v)
+	public static int lastIndexOf(float[] array, float value)
 	{
-		return lastIndexOf(array, v, array.length - 1);
+		return lastIndexOf(array, value, array.length - 1);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static int lastIndexOf(float[] array, float v, int start)
+	public static int lastIndexOf(float[] array, float value, int startIndex)
 	{
-		for (; start >= 0; start--)
+		for (; startIndex >= 0; startIndex--)
 		{
-			if (array[start] == v)
+			if (array[startIndex] == value)
 			{
-				return start;
+				return startIndex;
 			}
 		}
 		return -1;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static boolean contains(float[] array, float v)
+	public static boolean contains(float[] array, float value)
 	{
-		return indexOf(array, v, 0) >= 0;
+		return indexOf(array, value, 0) >= 0;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static boolean in(float v, float[] array)
+	public static boolean in(float value, float[] array)
 	{
-		return indexOf(array, v, 0) >= 0;
+		return indexOf(array, value, 0) >= 0;
 	}
-	
+
 	// Copying
-	
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static float[] copy(float[] array)
+	public static float[] copy(float[] array)
 	{
 		return array.clone();
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static Float[] boxed(float[] array)
+	public static Float[] boxed(float[] array)
 	{
-		int len = array.length;
-		Float[] boxed = new Float[len];
+		final int len = array.length;
+		final Float[] boxed = new Float[len];
 		for (int i = 0; i < len; i++)
 		{
-			boxed[i] = (array[i]);
+			boxed[i] = array[i];
 		}
 		return boxed;
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static Iterable<Float> toIterable(float[] array)
+	public static Iterable<Float> toIterable(float[] array)
 	{
 		return new ArrayList<>(boxed(array), true);
 	}
-	
+
 	// equals, hashCode and toString
-	
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static boolean equals(float[] array1, float[] array2)
+	public static boolean equals(float[] array1, float[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static int hashCode(float[] array)
+	public static int hashCode(float[] array)
 	{
 		return Arrays.hashCode(array);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static String toString(float[] array)
+	public static String toString(float[] array)
 	{
 		if (array == null)
 		{
 			return "null";
 		}
-		
-		int len = array.length;
+
+		final int len = array.length;
 		if (len <= 0)
 		{
 			return "[]";
 		}
-		
-		StringBuilder buf = new StringBuilder(len * 3 + 4);
+
+		final StringBuilder buf = new StringBuilder(len * 3 + 4);
 		buf.append('[').append(array[0]);
 		for (int i = 1; i < len; i++)
 		{
@@ -446,23 +446,23 @@ public interface FloatArray
 		}
 		return buf.append(']').toString();
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	static void toString(float[] array, StringBuilder builder)
+	public static void toString(float[] array, StringBuilder builder)
 	{
 		if (array == null)
 		{
 			builder.append("null");
 			return;
 		}
-		
-		int len = array.length;
+
+		final int len = array.length;
 		if (len <= 0)
 		{
 			builder.append("[]");
 			return;
 		}
-		
+
 		builder.append('[').append(array[0]);
 		for (int i = 1; i < len; i++)
 		{

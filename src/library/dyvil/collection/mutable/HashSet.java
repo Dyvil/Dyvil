@@ -5,8 +5,7 @@ import dyvil.collection.MutableSet;
 import dyvil.collection.Set;
 import dyvil.collection.SizedIterable;
 import dyvil.collection.impl.AbstractHashSet;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.math.MathUtils;
 
 import java.util.Objects;
@@ -14,8 +13,8 @@ import java.util.function.Function;
 
 import static dyvil.collection.impl.AbstractHashMap.*;
 
-@NilConvertible
-@ArrayConvertible
+@LiteralConvertible.FromNil
+@LiteralConvertible.FromArray
 public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 {
 	private static final long serialVersionUID = -993127062150101200L;

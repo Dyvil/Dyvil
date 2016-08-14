@@ -212,15 +212,21 @@ public abstract class CaptureDataMember implements IDataMember
 	}
 
 	@Override
+	public String getInternalName()
+	{
+		return this.variable.getInternalName();
+	}
+
+	@Override
 	public String getDescriptor()
 	{
-		return this.variable.getInternalType().getExtendedName();
+		return this.variable.getDescriptor();
 	}
 
 	@Override
 	public String getSignature()
 	{
-		return this.variable.getInternalType().getSignature();
+		return this.variable.getSignature();
 	}
 
 	@Override

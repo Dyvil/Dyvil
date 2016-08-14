@@ -69,11 +69,8 @@ public interface IMethod extends IClassMember, ICallableMember, ICallableSignatu
 
 	Handle toHandle();
 
-	String getMangledName();
-
-	default void setMangledName(String mangledName)
-	{
-	}
+	@Override
+	String getInternalName();
 
 	String getDescriptor();
 	

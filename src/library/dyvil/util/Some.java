@@ -2,7 +2,7 @@ package dyvil.util;
 
 import dyvil.annotation.Immutable;
 import dyvil.annotation._internal.ClassParameters;
-import dyvil.lang.literal.TupleConvertible;
+import dyvil.lang.LiteralConvertible;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -10,7 +10,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-@TupleConvertible
+@LiteralConvertible.FromTuple
 @ClassParameters(names = { "value" })
 @Immutable
 public final class Some<T> implements Option<T>
@@ -71,13 +71,13 @@ public final class Some<T> implements Option<T>
 	}
 	
 	@Override
-	public T orElse(T other)
+	public T orElse(T value)
 	{
 		return this.value;
 	}
 	
 	@Override
-	public T orElse(Supplier<? extends T> other)
+	public T orElse(Supplier<? extends T> supplier)
 	{
 		return this.value;
 	}
@@ -85,13 +85,13 @@ public final class Some<T> implements Option<T>
 	@Override
 	public String toString()
 	{
-		return this.value == null ? "Some(null)" : "Some(" + this.value.toString() + ')';
+		return "Some(" + this.value + ')';
 	}
 
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (obj == null || !(obj instanceof Some))
+		if (!(obj instanceof Some))
 		{
 			return false;
 		}

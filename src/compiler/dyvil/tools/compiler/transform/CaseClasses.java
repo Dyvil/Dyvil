@@ -3,6 +3,7 @@ package dyvil.tools.compiler.transform;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -389,6 +390,53 @@ public interface CaseClasses
 		writer.visitInsn(ARETURN);
 	}
 
+	static void writeToString(MethodWriter writer, IValue value) throws BytecodeException
+	{
+		final IType type = value.getType();
+		// If someValue is a String, write it as is
+		if (Types.isSuperType(Types.STRING, type))
+		{
+			value.writeExpression(writer, Types.STRING);
+			return;
+		}
+
+		// Otherwise, generate an appropriate call to String.valueOf or ObjectArray.toString
+		value.writeExpression(writer, type);
+
+		switch (type.getTypecode())
+		{
+		case PrimitiveType.BOOLEAN_CODE:
+			writer
+				.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Boolean", "toString", "(Z)Ljava/lang/String;", false);
+			return;
+		case PrimitiveType.BYTE_CODE:
+		case PrimitiveType.SHORT_CODE:
+		case PrimitiveType.CHAR_CODE:
+		case PrimitiveType.INT_CODE:
+			writer
+				.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Integer", "toString", "(I)Ljava/lang/String;", false);
+			return;
+		case PrimitiveType.LONG_CODE:
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Long", "toString", "(J)Ljava/lang/String;", false);
+			return;
+		case PrimitiveType.FLOAT_CODE:
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Float", "toString", "(F)Ljava/lang/String;", false);
+			return;
+		case PrimitiveType.DOUBLE_CODE:
+			writer
+				.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Double", "toString", "(D)Ljava/lang/String;", false);
+			return;
+		}
+		if (type.isArrayType())
+		{
+			writeArrayToString(writer, type);
+			return;
+		}
+
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/String", "valueOf",
+		                       "(Ljava/lang/Object;)Ljava/lang/String;", false);
+	}
+
 	static void writeStringAppend(MethodWriter writer, String string) throws BytecodeException
 	{
 		switch (string.length())
@@ -440,55 +488,87 @@ public interface CaseClasses
 		writer.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", desc.toString(), false);
 	}
 
+	static void writeArrayToString(MethodWriter writer, IType type) throws BytecodeException
+	{
+		switch (type.getTypecode())
+		{
+		case PrimitiveType.BOOLEAN_CODE:
+			writer
+				.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/BooleanArray", "toString", "([Z)Ljava/lang/String;",
+				                 true);
+			return;
+		case PrimitiveType.BYTE_CODE:
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/ByteArray", "toString", "([B)Ljava/lang/String;",
+			                       true);
+			return;
+		case PrimitiveType.SHORT_CODE:
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/ShortArray", "toString", "([S)Ljava/lang/String;",
+			                       true);
+			return;
+		case PrimitiveType.CHAR_CODE:
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/CharArray", "toString", "([C)Ljava/lang/String;",
+			                       true);
+			return;
+		case PrimitiveType.INT_CODE:
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/IntArray", "toString", "([I)Ljava/lang/String;",
+			                       true);
+			return;
+		case PrimitiveType.LONG_CODE:
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/LongArray", "toString", "([J)Ljava/lang/String;",
+			                       true);
+			return;
+		case PrimitiveType.FLOAT_CODE:
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/FloatArray", "toString", "([F)Ljava/lang/String;",
+			                       true);
+			return;
+		case PrimitiveType.DOUBLE_CODE:
+			writer
+				.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/DoubleArray", "toString", "([D)Ljava/lang/String;",
+				                 true);
+			return;
+		}
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", "deepToString",
+		                       "([Ljava/lang/Object;)Ljava/lang/String;", true);
+	}
+
 	static void writeArrayStringAppend(MethodWriter writer, IType type) throws BytecodeException
 	{
-		switch (type.typeTag())
+		switch (type.getTypecode())
 		{
-		case IType.PRIMITIVE:
-			switch (type.getTypecode())
-			{
-			case PrimitiveType.BOOLEAN_CODE:
-				writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/BooleanArray", "toString",
-				                       "([ZLjava/lang/StringBuilder;)V", true);
-				return;
-			case PrimitiveType.BYTE_CODE:
-				writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/ByteArray", "toString",
-				                       "([BLjava/lang/StringBuilder;)V", true);
-				return;
-			case PrimitiveType.SHORT_CODE:
-				writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/ShortArray", "toString",
-				                       "([SLjava/lang/StringBuilder;)V", true);
-				return;
-			case PrimitiveType.CHAR_CODE:
-				writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/CharArray", "toString",
-				                       "([CLjava/lang/StringBuilder;)V", true);
-				return;
-			case PrimitiveType.INT_CODE:
-				writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/IntArray", "toString",
-				                       "([ILjava/lang/StringBuilder;)V", true);
-				return;
-			case PrimitiveType.LONG_CODE:
-				writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/LongArray", "toString",
-				                       "([JLjava/lang/StringBuilder;)V", true);
-				return;
-			case PrimitiveType.FLOAT_CODE:
-				writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/FloatArray", "toString",
-				                       "([FLjava/lang/StringBuilder;)V", true);
-				return;
-			case PrimitiveType.DOUBLE_CODE:
-				writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/DoubleArray", "toString",
-				                       "([DLjava/lang/StringBuilder;)V", true);
-				return;
-			default:
-				return;
-			}
-		case IType.ARRAY:
-			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", "deepToString",
-			                       "([Ljava/lang/Object;Ljava/lang/StringBuilder;)V", true);
+		case PrimitiveType.BOOLEAN_CODE:
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/BooleanArray", "toString",
+			                       "([ZLjava/lang/StringBuilder;)V", true);
 			return;
-		default:
-			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", "toString",
-			                       "([Ljava/lang/Object;Ljava/lang/StringBuilder;)V", true);
+		case PrimitiveType.BYTE_CODE:
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/ByteArray", "toString",
+			                       "([BLjava/lang/StringBuilder;)V", true);
+			return;
+		case PrimitiveType.SHORT_CODE:
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/ShortArray", "toString",
+			                       "([SLjava/lang/StringBuilder;)V", true);
+			return;
+		case PrimitiveType.CHAR_CODE:
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/CharArray", "toString",
+			                       "([CLjava/lang/StringBuilder;)V", true);
+			return;
+		case PrimitiveType.INT_CODE:
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/IntArray", "toString",
+			                       "([ILjava/lang/StringBuilder;)V", true);
+			return;
+		case PrimitiveType.LONG_CODE:
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/LongArray", "toString",
+			                       "([JLjava/lang/StringBuilder;)V", true);
+			return;
+		case PrimitiveType.FLOAT_CODE:
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/FloatArray", "toString",
+			                       "([FLjava/lang/StringBuilder;)V", true);
+			return;
+		case PrimitiveType.DOUBLE_CODE:
+			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/DoubleArray", "toString",
+			                       "([DLjava/lang/StringBuilder;)V", true);
+			return;
 		}
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/array/ObjectArray", "deepToString",
+		                       "([Ljava/lang/Object;Ljava/lang/StringBuilder;)V", true);
 	}
 }

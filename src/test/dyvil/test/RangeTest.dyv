@@ -5,7 +5,7 @@ import dyvil.collection.range.Rangeable
 
 public class RangeTest
 {
-	@dyvil.lang.literal.IntConvertible
+	@LiteralConvertible.FromInt
 	public case class RangeableInt(final int value) implements Rangeable<RangeableInt>
 	{
 		public override RangeableInt next() = apply(this.value + 1)

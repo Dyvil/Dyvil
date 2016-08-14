@@ -3,15 +3,14 @@ package dyvil.collection;
 import dyvil.collection.mutable.ArraySet;
 import dyvil.collection.mutable.HashSet;
 import dyvil.collection.view.SetView;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 
 import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@NilConvertible
-@ArrayConvertible
+@LiteralConvertible.FromNil
+@LiteralConvertible.FromArray
 public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 {
 	static <E> MutableSet<E> apply()

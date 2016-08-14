@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.type.typevar;
 
+import dyvil.annotation.Reified;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.util.Markers;
@@ -39,22 +40,20 @@ public class ResolvedTypeVarType extends TypeVarType
 		switch (position)
 		{
 		case CLASS:
-			if (this.typeParameter.getReifiedKind() != ITypeParameter.ReifiedKind.NOT_REIFIED)
+			if (this.typeParameter.getReifiedKind() != null)
 			{
 				return;
 			}
+			// Fallthrough
 		case TYPE:
-			if (this.typeParameter.getReifiedKind() == ITypeParameter.ReifiedKind.REIFIED_TYPE)
+			if (this.typeParameter.getReifiedKind() == Reified.Type.TYPE)
 			{
 				return;
 			}
-			markers.add(Markers.semantic(this.position, "type.class.typevar"));
+			markers.add(Markers.semanticError(this.position, "type.class.typevar", this.typeParameter.getName()));
 			return;
 		case SUPER_TYPE:
-			markers.add(Markers.semantic(this.position, "type.super.typevar"));
-			return;
-		default:
-			return;
+			markers.add(Markers.semanticError(this.position, "type.super.typevar", this.typeParameter.getName()));
 		}
 	}
 }

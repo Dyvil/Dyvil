@@ -1,6 +1,7 @@
 package dyvil.ref;
 
 import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.ref.boxed.BoxedLongRef;
 import dyvil.reflect.Modifiers;
 
 public interface LongRef
@@ -19,5 +20,11 @@ public interface LongRef
 	static void $times_$eq(LongRef ref, long value)
 	{
 		ref.set(value);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	static ObjectRef<Long> boxed(LongRef longRef)
+	{
+		return new BoxedLongRef(longRef);
 	}
 }

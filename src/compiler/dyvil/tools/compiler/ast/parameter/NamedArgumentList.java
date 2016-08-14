@@ -188,7 +188,8 @@ public final class NamedArgumentList implements IArguments
 	}
 
 	@Override
-	public int checkMatch(int[] values, IType[] types, int matchStartIndex, int argumentIndex, IParameter param, IImplicitContext implicitContext)
+	public int checkMatch(int[] values, IType[] types, int matchStartIndex, int argumentIndex, IParameter param,
+		                     IImplicitContext implicitContext)
 	{
 		final int argIndex = this.findIndex(argumentIndex, param.getName());
 		if (argIndex < 0)
@@ -240,6 +241,104 @@ public final class NamedArgumentList implements IArguments
 			}
 			this.size = argIndex + moved + 1;
 		}
+	}
+
+	@Override
+	public boolean hasParameterOrder()
+	{
+		return this.size <= 1;
+	}
+
+	@Override
+	public void writeValues(MethodWriter writer, IParameterList parameters, int startIndex) throws BytecodeException
+	{
+		if (this.hasParameterOrder())
+		{
+			IArguments.super.writeValues(writer, parameters, startIndex);
+			return;
+		}
+
+		final int locals = writer.localCount();
+
+		final int paramCount = parameters.size() - startIndex;
+
+		// Step 1: Associate parameters to arguments
+		final IParameter[] params = new IParameter[this.size];
+		for (int i = 0; i < paramCount; i++)
+		{
+			final IParameter param = parameters.get(i + startIndex);
+			final int argIndex = this.findIndex(i, param.getName());
+			if (argIndex >= 0)
+			{
+				params[argIndex] = param;
+			}
+		}
+
+		// Save the local indices in the targets array for later use
+		// Maps parameter index -> local index of stored argument
+		final int[] targets = new int[paramCount];
+		// Fill the array with -1s to mark missing values
+		Arrays.fill(targets, -1);
+
+		// Step 2: Write all arguments that already have parameter order
+		int argStartIndex = 0;
+		for (int i = 0; i < this.size; i++)
+		{
+			IParameter param = params[i];
+			if (param.getIndex() == startIndex + i)
+			{
+				this.values[i].writeExpression(writer, param.getInternalType());
+				targets[i] = -2;
+				argStartIndex = i + 1;
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		// Step 3: Write the remaining arguments in order and save them in local variables
+
+		if (argStartIndex < this.size)
+		{
+			for (int i = argStartIndex; i < this.size; i++)
+			{
+				final IParameter parameter = params[i];
+				final IType parameterType = parameter.getInternalType();
+				final IValue value = this.values[i];
+
+				final int localIndex = writer.localCount();
+				writer.setLocalType(localIndex, parameterType.getFrameType());
+
+				targets[parameter.getIndex() - startIndex] = localIndex;
+
+				value.writeExpression(writer, parameterType);
+				writer.visitVarInsn(parameterType.getStoreOpcode(), localIndex);
+			}
+
+			// Step 4: Load the local variables in order
+			for (int i = 0; i < paramCount; i++)
+			{
+				final IParameter parameter = parameters.get(i + startIndex);
+				final int target = targets[parameter.getIndex() - startIndex];
+
+				switch (target)
+				{
+				case -1:
+					// Value for parameter does not exist -> write default value
+					EmptyArguments.writeArguments(writer, parameter);
+					continue;
+				case -2:
+					// Value for parameter was already written in Step 2
+					continue;
+				default:
+					// Value for parameter exists -> load the variable
+					writer.visitVarInsn(parameter.getInternalType().getLoadOpcode(), target);
+				}
+			}
+		}
+
+		writer.resetLocals(locals);
 	}
 
 	@Override

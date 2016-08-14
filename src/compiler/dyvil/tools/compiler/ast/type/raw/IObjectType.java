@@ -201,7 +201,7 @@ public interface IObjectType extends IType
 	}
 
 	@Override
-	default void writeClassExpression(MethodWriter writer) throws BytecodeException
+	default void writeClassExpression(MethodWriter writer, boolean wrapPrimitives) throws BytecodeException
 	{
 		writer.visitLdcInsn(Type.getObjectType(this.getInternalName()));
 	}

@@ -1,7 +1,6 @@
 package dyvil.collection;
 
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.util.ImmutableException;
 
 import java.io.Serializable;
@@ -15,7 +14,7 @@ import java.util.function.Predicate;
  * methods for processing, mutating, querying and converting collections. There is a clear distinction between mutable
  * and immutable collections, as there is an (im)mutable counterpart for almost every method in this base class.
  * <p>
- * This interface supports the {@link NilConvertible} annotation, meaning that a declaration like
+ * This interface supports the {@link LiteralConvertible.FromNil} annotation, meaning that a declaration like
  * <p>
  * <pre>
  * Collection[String] c = nil
@@ -23,7 +22,7 @@ import java.util.function.Predicate;
  * <p>
  * Would create an empty list by calling {@link #apply()} and assign it to the variable {@code c}.
  * <p>
- * Furthermore, since this interface also supports the {@link ArrayConvertible} annotation, it is possible to create a
+ * Furthermore, since this interface also supports the {@link LiteralConvertible.FromArray} annotation, it is possible to create a
  * collection using <i>Array Expressions</i> in <i>Dyvil</i>, as shown in the below example.
  * <p>
  * <pre>
@@ -35,8 +34,8 @@ import java.util.function.Predicate;
  *
  * @author Clashsoft
  */
-@NilConvertible(methodName = "empty")
-@ArrayConvertible
+@LiteralConvertible.FromNil(methodName = "empty")
+@LiteralConvertible.FromArray
 public interface Collection<E> extends Queryable<E>, Serializable
 {
 	/**

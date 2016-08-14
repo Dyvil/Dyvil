@@ -161,6 +161,12 @@ public abstract class Member implements IMember
 	}
 
 	@Override
+	public String getInternalName()
+	{
+		return this.name.qualified;
+	}
+
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.type != null)
@@ -264,7 +270,7 @@ public abstract class Member implements IMember
 	public void read(DataInput in) throws IOException
 	{
 		this.readSignature(in);
-		this.name = Name.from(in.readUTF());
+		this.name = Name.read(in);
 		this.readAnnotations(in);
 	}
 

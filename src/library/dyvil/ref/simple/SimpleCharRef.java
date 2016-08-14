@@ -1,9 +1,9 @@
 package dyvil.ref.simple;
 
-import dyvil.lang.literal.CharConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.ref.CharRef;
 
-@CharConvertible
+@LiteralConvertible.FromChar
 public class SimpleCharRef implements CharRef
 {
 	public char value;

@@ -13,18 +13,20 @@ public interface IMember extends IASTNode, INamed, ITyped, IModified, IAnnotated
 	MemberKind getKind();
 
 	int getAccessLevel();
-	
+
 	// States
-	
+
 	void resolveTypes(MarkerList markers, IContext context);
-	
+
 	void resolve(MarkerList markers, IContext context);
-	
+
 	void checkTypes(MarkerList markers, IContext context);
-	
+
 	void check(MarkerList markers, IContext context);
-	
+
 	void foldConstants();
-	
+
 	void cleanup(IContext context, IClassCompilableList compilableList);
+
+	String getInternalName();
 }

@@ -91,7 +91,7 @@ public class ClassMetadata implements IClassMetadata
 
 	private void checkField(IField field)
 	{
-		if ("instance".equals(field.getName().qualified))
+		if ("instance".equals(field.getInternalName()))
 		{
 			this.members |= INSTANCE_FIELD;
 			this.setInstanceField(field);

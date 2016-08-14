@@ -23,7 +23,7 @@ public class ReferenceTest
 		}
 	}
 
-	@dyvil.lang.literal.IntConvertible
+	@LiteralConvertible.FromInt
 	public static case class MyInt(public final int value)
 	{
 		public static implicit func apply(int i) = new MyInt(i)

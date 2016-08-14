@@ -111,7 +111,7 @@ public class AnyType implements IRawType
 	}
 	
 	@Override
-	public void appendSignature(StringBuilder buffer)
+	public void appendSignature(StringBuilder buffer, boolean genericArg)
 	{
 		buffer.append("Ljava/lang/Object;");
 	}

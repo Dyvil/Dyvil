@@ -1,8 +1,7 @@
 package dyvil.util;
 
 import dyvil.annotation.Immutable;
-import dyvil.lang.literal.StringConvertible;
-import dyvil.lang.literal.TupleConvertible;
+import dyvil.lang.LiteralConvertible;
 
 import java.io.Serializable;
 import java.util.regex.Matcher;
@@ -12,8 +11,8 @@ import java.util.regex.Pattern;
  * The <b>Version</b> class represents a {@link Comparable comparable} model for the <a
  * href="http://semver.org">Semantic Versioning</a> format.
  */
-@StringConvertible
-@TupleConvertible
+@LiteralConvertible.FromString
+@LiteralConvertible.FromTuple
 @Immutable
 public final class Version implements Comparable<Version>, Serializable
 {

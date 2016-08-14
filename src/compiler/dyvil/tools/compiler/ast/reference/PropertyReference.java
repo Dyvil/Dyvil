@@ -64,7 +64,7 @@ public class PropertyReference implements IReference
 		}
 
 		final IType methodType = this.getterMethod.getType();
-		final String getterName = this.getterMethod.getName().qualified;
+		final String getterName = this.getterMethod.getInternalName();
 
 		desc.append(')').append('L').append(ReferenceType.LazyFields.getInternalRef(methodType, "")).append(';');
 

@@ -89,7 +89,13 @@ public class MapView<K, V> implements ImmutableMap<K, V>
 	{
 		return this.map.get(key);
 	}
-	
+
+	@Override
+	public Entry<K, V> getEntry(Object key)
+	{
+		return this.map.getEntry(key);
+	}
+
 	@Override
 	public Option<V> getOption(Object key)
 	{

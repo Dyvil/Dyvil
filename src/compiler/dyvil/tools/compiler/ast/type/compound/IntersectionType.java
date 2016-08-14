@@ -50,7 +50,7 @@ public class IntersectionType implements IObjectType
 	@Override
 	public int typeTag()
 	{
-		return UNION;
+		return INTERSECTION;
 	}
 
 	@Override
@@ -329,15 +329,7 @@ public class IntersectionType implements IObjectType
 	}
 
 	@Override
-	public String getSignature()
-	{
-		final StringBuilder stringBuilder = new StringBuilder();
-		this.appendSignature(stringBuilder);
-		return stringBuilder.toString();
-	}
-
-	@Override
-	public void appendSignature(StringBuilder buffer)
+	public void appendSignature(StringBuilder buffer, boolean genericArg)
 	{
 		buffer.append('L').append(this.getTheClass().getInternalName()).append(';');
 	}

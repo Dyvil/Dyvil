@@ -5,9 +5,6 @@ using	dyvil.reflect.Opcodes._
 
 infix operator +- { precedence 100, associativity left }
 
-/**
- * A test for annotations and intrinsic methods
- */
 public class IntrinsicTest
 {
 	private static int value
@@ -28,6 +25,19 @@ public class IntrinsicTest
 		setValue 7
 
 		Main.test("Special Intrinsic Test", 7, value)
+
+		orderTest()
+	}
+
+	public static func orderTest(): void
+	{
+		var order = MutableList<int>
+		var order1 = orderTest(first: { order.add 1; 1 }, second: { order.add 2; 2 })
+		var order2 = orderTest(second: { order.add 2; 2 }, first: { order.add 1; 1 })
+
+		Main.test("Argument Order Test 1", "1 2", order1)
+		Main.test("Argument Order Test 2", "1 2", order1)
+		Main.test("Argument Order Test 3", List(1, 2, 2, 1), order)
 	}
 	
 	@Intrinsic([ LOAD_0, LOAD_1, INEG, IADD ])
@@ -35,4 +45,6 @@ public class IntrinsicTest
 	
 	@Intrinsic(value: [ LOAD_0, PUTSTATIC, 0, 1, 2 ], strings: [ "dyvil/test/IntrinsicTest", "value", "I" ])
 	private static void setValue(int value) = throw new RuntimeException("Not Intrinsic!")
+
+	public static String orderTest(int first, int second) = first + " " + second
 }

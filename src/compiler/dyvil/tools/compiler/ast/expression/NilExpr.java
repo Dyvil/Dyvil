@@ -6,9 +6,10 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -16,7 +17,8 @@ public class NilExpr extends LiteralConversion
 {
 	public static final class LazyFields
 	{
-		public static final IClass NIL_CONVERTIBLE_CLASS = Package.dyvilLangLiteral.resolveClass("NilConvertible");
+		public static final IClass NIL_CONVERTIBLE_CLASS = Types.LITERALCONVERTIBLE_CLASS
+			                                                   .resolveClass(Name.fromRaw("FromNil"));
 
 		private LazyFields()
 		{

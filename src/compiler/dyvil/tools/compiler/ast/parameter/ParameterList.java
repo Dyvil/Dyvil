@@ -248,7 +248,7 @@ public class ParameterList implements IParameterList
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].getInternalType().appendSignature(builder);
+			this.parameters[i].getInternalType().appendSignature(builder, false);
 		}
 	}
 
@@ -286,6 +286,7 @@ public class ParameterList implements IParameterList
 		out.writeByte(this.parameterCount);
 		for (int i = 0; i < this.parameterCount; i++)
 		{
+			this.parameters[i].getName().write(out);
 			IType.writeType(this.parameters[i].getType(), out);
 		}
 	}
@@ -307,21 +308,22 @@ public class ParameterList implements IParameterList
 
 	public void readSignature(DataInput in) throws IOException
 	{
-		int parameterCount = in.readByte();
+		final int parameterCount = in.readByte();
 		if (this.parameterCount == parameterCount)
 		{
 			for (int i = 0; i < parameterCount; i++)
 			{
-				this.parameters[i].setType(IType.readType(in));
+				final IParameter parameter = this.parameters[i];
+				parameter.setName(Name.read(in));
+				parameter.setType(IType.readType(in));
 			}
-			this.parameterCount = parameterCount;
 			return;
 		}
 
 		this.parameters = new IParameter[parameterCount];
 		for (int i = 0; i < parameterCount; i++)
 		{
-			this.parameters[i] = new CodeParameter(Name.fromRaw("par" + i), IType.readType(in));
+			this.parameters[i] = new CodeParameter(Name.read(in), IType.readType(in));
 		}
 	}
 
@@ -343,11 +345,16 @@ public class ParameterList implements IParameterList
 
 		if (this.parameterCount > 0)
 		{
-			Util.typeToString(this.parameters[0].getType(), typeContext, buffer);
+			IParameter parameter = this.parameters[0];
+
+			buffer.append(parameter.getName()).append(": ");
+			Util.typeToString(parameter.getType(), typeContext, buffer);
 			for (int i = 1; i < this.parameterCount; i++)
 			{
 				buffer.append(", ");
-				Util.typeToString(this.parameters[i].getType(), typeContext, buffer);
+				parameter = this.parameters[i];
+				buffer.append(parameter.getName()).append(": ");
+				Util.typeToString(parameter.getType(), typeContext, buffer);
 			}
 		}
 

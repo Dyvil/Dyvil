@@ -4,10 +4,7 @@ import dyvil.collection.mutable.ArrayMap;
 import dyvil.collection.mutable.HashMap;
 import dyvil.collection.mutable.TupleMap;
 import dyvil.collection.view.MapView;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.ColonConvertible;
-import dyvil.lang.literal.MapConvertible;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 import dyvil.util.Option;
 
 import java.util.Iterator;
@@ -16,10 +13,10 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@NilConvertible
-@ArrayConvertible
-@ColonConvertible(methodName = "singleton")
-@MapConvertible
+@LiteralConvertible.FromNil
+@LiteralConvertible.FromArray
+@LiteralConvertible.FromColonOperator(methodName = "singleton")
+@LiteralConvertible.FromMap
 public interface MutableMap<K, V> extends Map<K, V>
 {
 	static <K, V> MutableMap<K, V> apply()
@@ -75,6 +72,9 @@ public interface MutableMap<K, V> extends Map<K, V>
 
 	@Override
 	V get(Object key);
+
+	@Override
+	Entry<K, V> getEntry(Object key);
 
 	@Override
 	Option<V> getOption(Object key);

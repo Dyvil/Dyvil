@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -25,7 +26,8 @@ public final class ClassOperator extends AbstractValue implements IConstantValue
 		public static final IClass    CLASS_CLASS = Package.javaLang.resolveClass("Class");
 		public static final ClassType CLASS       = new ClassType(CLASS_CLASS);
 
-		public static final IClass CLASS_CONVERTIBLE = Package.dyvilLangLiteral.resolveClass("ClassConvertible");
+		public static final IClass CLASS_CONVERTIBLE = Types.LITERALCONVERTIBLE_CLASS
+			                                               .resolveClass(Name.fromRaw("FromClass"));
 		
 		private LazyFields()
 		{
@@ -213,7 +215,7 @@ public final class ClassOperator extends AbstractValue implements IConstantValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		this.type.writeClassExpression(writer);
+		this.type.writeClassExpression(writer, false);
 
 		if (type != null)
 		{

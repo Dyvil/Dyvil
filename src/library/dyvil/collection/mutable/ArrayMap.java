@@ -2,17 +2,15 @@ package dyvil.collection.mutable;
 
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractArrayMap;
-import dyvil.lang.literal.ArrayConvertible;
-import dyvil.lang.literal.ColonConvertible;
-import dyvil.lang.literal.NilConvertible;
+import dyvil.lang.LiteralConvertible;
 
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-@NilConvertible
-@ColonConvertible(methodName = "singleton")
-@ArrayConvertible
+@LiteralConvertible.FromNil
+@LiteralConvertible.FromColonOperator(methodName = "singleton")
+@LiteralConvertible.FromArray
 public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements MutableMap<K, V>
 {
 	private static final long serialVersionUID = 5171722024919718041L;
@@ -139,6 +137,30 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements MutableMap
 			this.keys[i] = this.values[i] = null;
 		}
 		this.size = 0;
+	}
+
+	@Override
+	public Entry<K, V> getEntry(Object key)
+	{
+		final int index = this.getIndex(key);
+		if (index < 0)
+		{
+			return null;
+		}
+		return new Entry<K, V>()
+		{
+			@Override
+			public K getKey()
+			{
+				return (K) key;
+			}
+
+			@Override
+			public V getValue()
+			{
+				return (V) ArrayMap.this.values[ArrayMap.this.getIndex(key)];
+			}
+		};
 	}
 
 	@Override

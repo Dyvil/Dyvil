@@ -543,22 +543,14 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	}
 
 	@Override
-	public String getSignature()
-	{
-		StringBuilder sb = new StringBuilder();
-		this.appendSignature(sb);
-		return sb.toString();
-	}
-
-	@Override
-	public void appendSignature(StringBuilder buffer)
+	public void appendSignature(StringBuilder buffer, boolean genericArg)
 	{
 		buffer.append("Ldyvil/function/Function").append(this.parameterCount).append('<');
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameterTypes[i].appendSignature(buffer);
+			this.parameterTypes[i].appendSignature(buffer, true);
 		}
-		this.returnType.appendSignature(buffer);
+		this.returnType.appendSignature(buffer, true);
 		buffer.append(">;");
 	}
 

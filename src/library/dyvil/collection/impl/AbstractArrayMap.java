@@ -398,8 +398,7 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		return false;
 	}
 
-	@Override
-	public V get(Object key)
+	protected int getIndex(Object key)
 	{
 		if (key == null)
 		{
@@ -407,19 +406,30 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 			{
 				if (this.keys[i] == null)
 				{
-					return (V) this.values[i];
+					return i;
 				}
 			}
-			return null;
+			return -1;
 		}
 		for (int i = 0; i < this.size; i++)
 		{
 			if (key.equals(this.keys[i]))
 			{
-				return (V) this.values[i];
+				return i;
 			}
 		}
-		return null;
+		return -1;
+	}
+
+	@Override
+	public V get(Object key)
+	{
+		final int index = this.getIndex(key);
+		if (index < 0)
+		{
+			return null;
+		}
+		return (V) this.values[index];
 	}
 
 	@Override
