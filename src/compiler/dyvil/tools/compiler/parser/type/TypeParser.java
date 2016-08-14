@@ -322,6 +322,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			}
 			if (type == DyvilSymbols.ELLIPSIS)
 			{
+				pm.report(Markers.syntaxWarning(token, "type.list.deprecated", this.type.getElementType()));
 				this.type = new ListType(this.type.getElementType(), this.type.getMutability());
 				this.mode = ARRAY_END;
 				return;
