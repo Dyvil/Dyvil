@@ -8,7 +8,6 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.Mutability;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.MapType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -120,7 +119,11 @@ public class MapExpr implements IValue
 	@Override
 	public IValue asIgnoredClassAccess()
 	{
-		return new ClassAccess(this.position, new MapType(this.keys[0].getType(), this.values[0].getType()))
+		if (!this.isClassAccess())
+		{
+			return IValue.super.asIgnoredClassAccess();
+		}
+		return new ClassAccess(this.position, MapType.base(this.keys[0].getType(), this.values[0].getType()))
 			       .asIgnoredClassAccess();
 	}
 
@@ -129,8 +132,7 @@ public class MapExpr implements IValue
 	{
 		if (this.type == null)
 		{
-			return this.type = new MapType(this.getKeyType(), this.getValueType(), Mutability.IMMUTABLE,
-			                               MapType.MapTypes.IMMUTABLE_MAP_CLASS);
+			return this.type = MapType.immutable(this.getKeyType(), this.getValueType());
 		}
 		return this.type;
 	}
