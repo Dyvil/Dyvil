@@ -215,6 +215,10 @@ public class NamedGenericType extends GenericType
 			markers.add(marker);
 		}
 
+		if (type == null)
+		{
+			return null;
+		}
 		return type.getConcreteType(typeParameter ->
 		                            {
 			                            final int index = typeParameter.getIndex();
