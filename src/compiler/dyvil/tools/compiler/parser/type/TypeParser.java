@@ -320,13 +320,6 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				pm.pushParser(new TypeParser(mapType::setValueType));
 				return;
 			}
-			if (type == DyvilSymbols.ELLIPSIS)
-			{
-				pm.report(Markers.syntaxWarning(token, "type.list.deprecated", this.type.getElementType()));
-				this.type = new ListType(this.type.getElementType(), this.type.getMutability());
-				this.mode = ARRAY_END;
-				return;
-			}
 			// Fallthrough
 		case ARRAY_END:
 			this.type.expandPosition(token);

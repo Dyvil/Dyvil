@@ -96,7 +96,6 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	int LAMBDA = 33;
 
 	int ARRAY = 34;
-	int LIST  = 35;
 	int MAP   = 37;
 
 	int OPTIONAL  = 48;
@@ -498,9 +497,6 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 			break;
 		case ARRAY:
 			type = new ArrayType();
-			break;
-		case LIST:
-			type = new ListType();
 			break;
 		case MAP:
 			type = new MapType();
