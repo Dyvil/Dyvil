@@ -127,6 +127,10 @@ public final class ArrayExpr implements IValue, IValueList
 	@Override
 	public IValue asIgnoredClassAccess()
 	{
+		if (!this.isClassAccess())
+		{
+			return IValue.super.asIgnoredClassAccess();
+		}
 		return new ClassAccess(this.position, new ArrayType(this.values[0].getType())).asIgnoredClassAccess();
 	}
 
