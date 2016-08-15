@@ -292,12 +292,12 @@ public class CodeClass extends AbstractClass
 				final int modifiers = superClass.getModifiers().toFlags();
 				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != 0)
 				{
-					markers.add(Markers.semantic(this.position, "class.extend.type",
-					                             ModifierUtil.classTypeToString(modifiers), superClass.getName()));
+					markers.add(Markers.semanticError(this.position, "class.extend.type",
+					                                  ModifierUtil.classTypeToString(modifiers), superClass.getName()));
 				}
 				else if ((modifiers & Modifiers.FINAL) != 0)
 				{
-					markers.add(Markers.semantic(this.position, "class.extend.final", superClass.getName()));
+					markers.add(Markers.semanticError(this.position, "class.extend.final", superClass.getName()));
 				}
 			}
 		}
@@ -307,17 +307,22 @@ public class CodeClass extends AbstractClass
 			final IType type = this.interfaces[i];
 			type.check(markers, context);
 
-			final IClass iclass = type.getTheClass();
-			if (iclass == null)
+			if (!type.isResolved())
 			{
 				continue;
 			}
 
-			final int modifiers = iclass.getModifiers().toFlags();
-			if ((modifiers & Modifiers.INTERFACE_CLASS) != Modifiers.INTERFACE_CLASS)
+			final IClass theClass = type.getTheClass();
+			if (theClass == null)
 			{
-				markers.add(Markers.semantic(this.position, "class.implement.type",
-				                             ModifierUtil.classTypeToString(modifiers), iclass.getName()));
+				continue;
+			}
+
+			if (!theClass.isInterface())
+			{
+				final String classType = ModifierUtil.classTypeToString(theClass.getModifiers().toFlags());
+				markers
+					.add(Markers.semanticError(this.position, "class.implement.type", classType, theClass.getName()));
 			}
 		}
 
