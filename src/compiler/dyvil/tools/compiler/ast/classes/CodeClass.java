@@ -12,7 +12,6 @@ import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.classes.metadata.TraitMetadata;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -120,6 +119,27 @@ public class CodeClass extends AbstractClass
 	}
 
 	@Override
+	public IType getType()
+	{
+		if (this.thisType != null)
+		{
+			return this.thisType;
+		}
+
+		if (this.typeParameterCount <= 0)
+		{
+			return this.thisType = new ClassType(this);
+		}
+
+		final ClassGenericType type = new ClassGenericType(this);
+		for (int i = 0; i < this.typeParameterCount; i++)
+		{
+			type.addType(new TypeVarType(this.typeParameters[i]));
+		}
+		return this.thisType = type;
+	}
+
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		context = context.push(this);
@@ -129,27 +149,14 @@ public class CodeClass extends AbstractClass
 			this.metadata = IClass.getClassMetadata(this, this.modifiers.toFlags());
 		}
 
-		if (this.typeParameterCount > 0)
-		{
-			ClassGenericType type = new ClassGenericType(this);
-
-			for (int i = 0; i < this.typeParameterCount; i++)
-			{
-				ITypeParameter var = this.typeParameters[i];
-				var.resolveTypes(markers, context);
-				type.addType(new TypeVarType(var));
-			}
-
-			this.thisType = type;
-		}
-		else
-		{
-			this.thisType = new ClassType(this);
-		}
-
 		if (this.annotations != null)
 		{
 			this.annotations.resolveTypes(markers, context, this);
+		}
+
+		for (int i = 0; i < this.typeParameterCount; i++)
+		{
+			this.typeParameters[i].resolveTypes(markers, context);
 		}
 
 		this.parameters.resolveTypes(markers, context);
