@@ -44,7 +44,12 @@ public interface IClass extends IClassMember, ITypeParametric, IContext, IParame
 	IClass getEnclosingClass();
 	
 	// Modifiers
-	
+
+	default boolean isAnonymous()
+	{
+		return false;
+	}
+
 	boolean isAbstract();
 	
 	boolean isInterface();

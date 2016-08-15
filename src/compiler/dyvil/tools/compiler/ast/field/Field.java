@@ -206,8 +206,12 @@ public class Field extends Member implements IField
 			}
 			else
 			{
-				markers.add(Markers.semantic(position, "field.access.unqualified", this.name.unqualified));
 				receiver = new ThisExpr(position, this.enclosingClass.getType(), context, markers);
+
+				if (!this.enclosingClass.isAnonymous())
+				{
+					markers.add(Markers.semantic(position, "field.access.unqualified", this.name.unqualified));
+				}
 			}
 		}
 
