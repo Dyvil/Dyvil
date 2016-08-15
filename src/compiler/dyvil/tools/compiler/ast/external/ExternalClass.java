@@ -102,6 +102,8 @@ public final class ExternalClass extends AbstractClass
 		this.resolved |= GENERICS;
 		if (this.typeParameterCount <= 0)
 		{
+			this.thisType = new ClassType(this);
+
 			return;
 		}
 

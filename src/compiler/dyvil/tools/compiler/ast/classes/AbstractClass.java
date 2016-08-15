@@ -74,13 +74,13 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	protected IType classType = new ClassType(this);
 
 	@Override
+	public abstract IDyvilHeader getHeader();
+
+	@Override
 	public IClass getEnclosingClass()
 	{
 		return this.enclosingClass;
 	}
-
-	@Override
-	public abstract IDyvilHeader getHeader();
 
 	@Override
 	public void setEnclosingClass(IClass enclosingClass)
@@ -89,14 +89,14 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public void setType(IType type)
-	{
-	}
-
-	@Override
 	public IType getType()
 	{
 		return this.thisType;
+	}
+
+	@Override
+	public void setType(IType type)
+	{
 	}
 
 	@Override
@@ -640,7 +640,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public IType getThisType()
 	{
-		return this.thisType;
+		return this.getType();
 	}
 
 	@Override

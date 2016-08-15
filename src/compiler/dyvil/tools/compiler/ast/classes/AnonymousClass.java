@@ -35,6 +35,12 @@ public class AnonymousClass extends CodeClass
 		this.modifiers = EmptyModifiers.INSTANCE;
 	}
 
+	@Override
+	public boolean isAnonymous()
+	{
+		return true;
+	}
+
 	public IConstructor getConstructor()
 	{
 		return this.constructor;

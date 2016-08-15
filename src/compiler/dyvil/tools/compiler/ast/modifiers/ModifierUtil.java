@@ -163,7 +163,7 @@ public final class ModifierUtil
 	{
 		StringBuilder stringBuilder = new StringBuilder();
 		writeClassType(mod, stringBuilder);
-		return stringBuilder.toString();
+		return stringBuilder.deleteCharAt(stringBuilder.length() - 1).toString();
 	}
 
 	public static void writeClassType(int mod, StringBuilder sb)

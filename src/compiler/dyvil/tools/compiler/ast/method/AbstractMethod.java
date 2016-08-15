@@ -698,14 +698,16 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			else
 			{
 				// unqualified call
-
-				markers.add(Markers.semantic(position, "method.access.unqualified", this.name.unqualified));
-
 				final IType receiverType = this.enclosingClass.getType();
 				receiver = new ThisExpr(position, receiverType, context, markers);
 				if (genericData != null)
 				{
 					genericData.setFallbackTypeContext(receiverType);
+				}
+
+				if (!this.enclosingClass.isAnonymous())
+				{
+					markers.add(Markers.semantic(position, "method.access.unqualified", this.name.unqualified));
 				}
 			}
 		}

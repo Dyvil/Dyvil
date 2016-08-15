@@ -109,6 +109,10 @@ public final class ThisExpr implements IValue
 		{
 			this.type = thisType;
 		}
+		else
+		{
+			markers.add(Markers.semanticError(this.position, "this.access.unresolved"));
+		}
 	}
 
 	@Override
