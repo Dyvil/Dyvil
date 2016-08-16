@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.header;
 
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.util.Markers;
@@ -14,7 +13,7 @@ import java.io.IOException;
 
 public final class WildcardImport extends Import
 {
-	private IContext context;
+	private IImportContext context;
 
 	public WildcardImport()
 	{
@@ -33,7 +32,7 @@ public final class WildcardImport extends Import
 	}
 
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context, boolean using)
+	public void resolveTypes(MarkerList markers, IImportContext context, boolean mask)
 	{
 		if (this.parent != null)
 		{
@@ -69,13 +68,13 @@ public final class WildcardImport extends Import
 	}
 
 	@Override
-	public IContext asContext()
+	public IImportContext asContext()
 	{
 		return this.context;
 	}
 
 	@Override
-	public IContext asParentContext()
+	public IImportContext asParentContext()
 	{
 		return null;
 	}

@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.header;
 
-import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -59,11 +58,11 @@ public interface IImport extends IASTNode
 
 	void setParent(IImport parent);
 
-	IContext asContext();
+	IImportContext asContext();
 
-	IContext asParentContext();
+	IImportContext asParentContext();
 
-	void resolveTypes(MarkerList markers, IContext context, boolean using);
+	void resolveTypes(MarkerList markers, IImportContext context, boolean using);
 
 	// Compilation
 	

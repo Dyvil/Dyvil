@@ -4,7 +4,6 @@ import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
-import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
@@ -23,7 +22,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public final class SingleImport extends Import implements IDefaultContext
+public final class SingleImport extends Import implements IImportContext
 {
 	protected Name name;
 	protected Name alias;
@@ -79,7 +78,7 @@ public final class SingleImport extends Import implements IDefaultContext
 	}
 
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context, boolean using)
+	public void resolveTypes(MarkerList markers, IImportContext context, boolean using)
 	{
 		if (this.parent != null)
 		{
@@ -146,13 +145,13 @@ public final class SingleImport extends Import implements IDefaultContext
 	}
 
 	@Override
-	public IContext asContext()
+	public IImportContext asContext()
 	{
 		return this;
 	}
 
 	@Override
-	public IContext asParentContext()
+	public IImportContext asParentContext()
 	{
 		return this.theClass == null ? this.thePackage : this.theClass;
 	}

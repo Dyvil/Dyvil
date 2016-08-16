@@ -1,8 +1,6 @@
 package dyvil.tools.compiler.ast.header;
 
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -20,7 +18,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public final class MultiImport extends Import implements IDefaultContext, IImportList
+public final class MultiImport extends Import implements IImportContext, IImportList
 {
 	private IImport[] imports = new IImport[2];
 	private int importCount;
@@ -73,7 +71,7 @@ public final class MultiImport extends Import implements IDefaultContext, IImpor
 	}
 
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context, boolean using)
+	public void resolveTypes(MarkerList markers, IImportContext context, boolean using)
 	{
 		if (this.parent != null)
 		{
@@ -93,13 +91,13 @@ public final class MultiImport extends Import implements IDefaultContext, IImpor
 	}
 
 	@Override
-	public IContext asContext()
+	public IImportContext asContext()
 	{
 		return this;
 	}
 
 	@Override
-	public IContext asParentContext()
+	public IImportContext asParentContext()
 	{
 		return null;
 	}

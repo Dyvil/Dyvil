@@ -64,7 +64,7 @@ public final class ImportDeclaration implements IASTNode, IObjectCompilable
 
 	// Context
 
-	public IContext getContext()
+	public IImportContext getContext()
 	{
 		return this.theImport.asContext();
 	}
