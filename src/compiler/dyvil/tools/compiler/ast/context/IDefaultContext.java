@@ -15,6 +15,8 @@ import dyvil.tools.parsing.Name;
 
 public interface IDefaultContext extends IStaticContext
 {
+	IDefaultContext DEFAULT = new IDefaultContext() {};
+
 	@Override
 	default byte checkStatic()
 	{
@@ -32,25 +34,25 @@ public interface IDefaultContext extends IStaticContext
 	{
 		return null;
 	}
-	
+
 	@Override
 	default Package resolvePackage(Name name)
 	{
 		return null;
 	}
-	
+
 	@Override
 	default IClass resolveClass(Name name)
 	{
 		return null;
 	}
-	
+
 	@Override
 	default ITypeAlias resolveTypeAlias(Name name, int arity)
 	{
 		return null;
 	}
-	
+
 	@Override
 	default IDataMember resolveField(Name name)
 	{
