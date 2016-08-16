@@ -10,7 +10,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public interface IImport extends IASTNode, IImportContext
+public interface IImport extends IASTNode
 {
 	int SINGLE   = 1;
 	int WILDCARD = 2;
@@ -53,7 +53,9 @@ public interface IImport extends IASTNode, IImportContext
 		return null;
 	}
 	
-	IContext getContext();
+	IContext asContext();
+
+	IContext asParentContext();
 	
 	// Compilation
 	

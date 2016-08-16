@@ -641,7 +641,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		// Imported Classes
 		for (int i = 0; i < this.importCount; i++)
 		{
-			iclass = this.importDeclarations[i].resolveClass(name);
+			iclass = this.importDeclarations[i].getContext().resolveClass(name);
 			if (iclass != null)
 			{
 				return iclass;
@@ -670,7 +670,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	{
 		for (int i = 0; i < this.usingCount; i++)
 		{
-			IDataMember field = this.usingDeclarations[i].resolveField(name);
+			IDataMember field = this.usingDeclarations[i].getContext().resolveField(name);
 			if (field != null)
 			{
 				return field;
@@ -693,7 +693,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	{
 		for (int i = 0; i < this.usingCount; i++)
 		{
-			this.usingDeclarations[i].getMethodMatches(list, receiver, name, arguments);
+			this.usingDeclarations[i].getContext().getMethodMatches(list, receiver, name, arguments);
 		}
 
 		for (int i = 0; i < this.includeCount; i++)
@@ -707,7 +707,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	{
 		for (int i = 0; i < this.usingCount; i++)
 		{
-			this.usingDeclarations[i].getImplicitMatches(list, value, targetType);
+			this.usingDeclarations[i].getContext().getImplicitMatches(list, value, targetType);
 		}
 
 		for (int i = 0; i < this.includeCount; i++)

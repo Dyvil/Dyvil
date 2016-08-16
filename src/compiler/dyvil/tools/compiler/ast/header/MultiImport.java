@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.header;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -19,7 +20,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public final class MultiImport extends Import implements IImportList
+public final class MultiImport extends Import implements IDefaultContext, IImportList
 {
 	private IImport[] imports = new IImport[2];
 	private int importCount;
@@ -77,7 +78,7 @@ public final class MultiImport extends Import implements IImportList
 		if (this.parent != null)
 		{
 			this.parent.resolveTypes(markers, context, false);
-			context = this.parent.getContext();
+			context = this.parent.asParentContext();
 
 			if (context == null)
 			{
@@ -92,7 +93,13 @@ public final class MultiImport extends Import implements IImportList
 	}
 	
 	@Override
-	public IContext getContext()
+	public IContext asContext()
+	{
+		return this;
+	}
+
+	@Override
+	public IContext asParentContext()
 	{
 		return null;
 	}
@@ -102,7 +109,7 @@ public final class MultiImport extends Import implements IImportList
 	{
 		for (int i = 0; i < this.importCount; i++)
 		{
-			Package pack = this.imports[i].resolvePackage(name);
+			Package pack = this.imports[i].asContext().resolvePackage(name);
 			if (pack != null)
 			{
 				return pack;
@@ -116,7 +123,7 @@ public final class MultiImport extends Import implements IImportList
 	{
 		for (int i = 0; i < this.importCount; i++)
 		{
-			IClass iclass = this.imports[i].resolveClass(name);
+			IClass iclass = this.imports[i].asContext().resolveClass(name);
 			if (iclass != null)
 			{
 				return iclass;
@@ -130,7 +137,7 @@ public final class MultiImport extends Import implements IImportList
 	{
 		for (int i = 0; i < this.importCount; i++)
 		{
-			IDataMember match = this.imports[i].resolveField(name);
+			IDataMember match = this.imports[i].asContext().resolveField(name);
 			if (match != null)
 			{
 				return match;
@@ -144,7 +151,7 @@ public final class MultiImport extends Import implements IImportList
 	{
 		for (int i = 0; i < this.importCount; i++)
 		{
-			this.imports[i].getMethodMatches(list, receiver, name, arguments);
+			this.imports[i].asContext().getMethodMatches(list, receiver, name, arguments);
 		}
 	}
 
@@ -153,7 +160,7 @@ public final class MultiImport extends Import implements IImportList
 	{
 		for (int i = 0; i < this.importCount; i++)
 		{
-			this.imports[i].getImplicitMatches(list, value, targetType);
+			this.imports[i].asContext().getImplicitMatches(list, value, targetType);
 		}
 	}
 

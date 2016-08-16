@@ -2,16 +2,9 @@ package dyvil.tools.compiler.ast.header;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -45,7 +38,7 @@ public final class WildcardImport extends Import
 		if (this.parent != null)
 		{
 			this.parent.resolveTypes(markers, context, false);
-			context = this.parent.getContext();
+			context = this.parent.asParentContext();
 
 			if (context == null)
 			{
@@ -76,64 +69,15 @@ public final class WildcardImport extends Import
 	}
 
 	@Override
-	public IContext getContext()
+	public IContext asContext()
 	{
 		return this.context;
 	}
 
 	@Override
-	public Package resolvePackage(Name name)
+	public IContext asParentContext()
 	{
-		if (this.context == null)
-		{
-			return null;
-		}
-
-		return this.context.resolvePackage(name);
-	}
-
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		if (this.context == null)
-		{
-			return null;
-		}
-
-		return this.context.resolveClass(name);
-	}
-
-	@Override
-	public IDataMember resolveField(Name name)
-	{
-		if (this.context == null)
-		{
-			return null;
-		}
-
-		return this.context.resolveField(name);
-	}
-
-	@Override
-	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
-	{
-		if (this.context == null)
-		{
-			return;
-		}
-
-		this.context.getMethodMatches(list, receiver, name, arguments);
-	}
-
-	@Override
-	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
-	{
-		if (this.context == null)
-		{
-			return;
-		}
-
-		this.context.getImplicitMatches(list, value, targetType);
+		return null;
 	}
 
 	@Override
