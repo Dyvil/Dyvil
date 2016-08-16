@@ -80,7 +80,7 @@ public final class SingleImport extends Import implements IImportContext
 	{
 		if (this.parent != null)
 		{
-			this.parent.resolveTypes(markers, context, KindedImport.parent(mask));
+			this.parent.resolveTypes(markers, context, KindedImport.PARENT);
 			context = this.parent.asParentContext();
 		}
 

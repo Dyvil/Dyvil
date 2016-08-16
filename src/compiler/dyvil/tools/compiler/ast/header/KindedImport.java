@@ -61,31 +61,6 @@ public class KindedImport implements IImport
 		return 0;
 	}
 
-	public static int parent(int mask)
-	{
-		if (mask == ANY)
-		{
-			return PARENT;
-		}
-		int result = 0;
-		if ((mask & STATIC) != 0)
-		{
-			// The parent of a static member can be a class
-			result |= CLASS;
-		}
-		if ((mask & (CLASS | HEADER | PACKAGE)) != 0)
-		{
-			// The parent of a class, header or package can be a package
-			result |= PACKAGE;
-		}
-		if ((mask & (CLASS | TYPE | OPERATOR)) != 0)
-		{
-			// The parent of a class, type or operator can be a header
-			result |= HEADER;
-		}
-		return result;
-	}
-
 	@Override
 	public int importTag()
 	{
