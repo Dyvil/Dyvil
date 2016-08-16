@@ -402,6 +402,11 @@ public final class ExternalClass extends AbstractClass
 			return bodyClass;
 		}
 
+		if (this.innerTypes == null)
+		{
+			return null;
+		}
+
 		String internal = this.innerTypes.get(name.qualified);
 		if (internal == null)
 		{
