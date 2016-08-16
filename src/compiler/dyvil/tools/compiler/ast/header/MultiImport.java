@@ -29,24 +29,36 @@ public final class MultiImport extends Import implements IDefaultContext, IImpor
 	{
 		super(null);
 	}
-	
+
 	public MultiImport(ICodePosition position)
 	{
 		super(position);
 	}
-	
+
 	@Override
 	public int importTag()
 	{
 		return MULTI;
 	}
-	
+
 	@Override
 	public int importCount()
 	{
 		return this.importCount;
 	}
-	
+
+	@Override
+	public IImport getImport(int index)
+	{
+		return this.imports[index];
+	}
+
+	@Override
+	public void setImport(int index, IImport iimport)
+	{
+		this.imports[index] = iimport;
+	}
+
 	@Override
 	public void addImport(IImport iimport)
 	{
@@ -59,19 +71,7 @@ public final class MultiImport extends Import implements IDefaultContext, IImpor
 		}
 		this.imports[index] = iimport;
 	}
-	
-	@Override
-	public void setImport(int index, IImport iimport)
-	{
-		this.imports[index] = iimport;
-	}
-	
-	@Override
-	public IImport getImport(int index)
-	{
-		return this.imports[index];
-	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context, boolean using)
 	{
@@ -85,13 +85,13 @@ public final class MultiImport extends Import implements IDefaultContext, IImpor
 				return;
 			}
 		}
-		
+
 		for (int i = 0; i < this.importCount; i++)
 		{
 			this.imports[i].resolveTypes(markers, context, using);
 		}
 	}
-	
+
 	@Override
 	public IContext asContext()
 	{
@@ -117,7 +117,7 @@ public final class MultiImport extends Import implements IDefaultContext, IImpor
 		}
 		return null;
 	}
-	
+
 	@Override
 	public IClass resolveClass(Name name)
 	{
@@ -131,7 +131,7 @@ public final class MultiImport extends Import implements IDefaultContext, IImpor
 		}
 		return null;
 	}
-	
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
@@ -145,7 +145,7 @@ public final class MultiImport extends Import implements IDefaultContext, IImpor
 		}
 		return null;
 	}
-	
+
 	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
@@ -168,19 +168,19 @@ public final class MultiImport extends Import implements IDefaultContext, IImpor
 	public void writeData(DataOutput out) throws IOException
 	{
 		IImport.writeImport(this.parent, out);
-		
+
 		out.writeShort(this.importCount);
 		for (int i = 0; i < this.importCount; i++)
 		{
 			IImport.writeImport(this.imports[i], out);
 		}
 	}
-	
+
 	@Override
 	public void readData(DataInput in) throws IOException
 	{
 		this.parent = IImport.readImport(in);
-		
+
 		this.importCount = in.readShort();
 		this.imports = new IImport[this.importCount];
 		for (int i = 0; i < this.importCount; i++)
@@ -188,7 +188,7 @@ public final class MultiImport extends Import implements IDefaultContext, IImpor
 			this.imports[i] = IImport.readImport(in);
 		}
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

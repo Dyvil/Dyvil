@@ -15,6 +15,7 @@ public interface IImport extends IASTNode
 	int SINGLE   = 1;
 	int WILDCARD = 2;
 	int MULTI    = 3;
+	int KINDED = 4;
 
 	static IImport fromTag(int tag)
 	{
@@ -26,6 +27,8 @@ public interface IImport extends IASTNode
 			return new WildcardImport();
 		case MULTI:
 			return new MultiImport();
+		case KINDED:
+			return new KindedImport();
 		}
 		return null;
 	}
@@ -35,28 +38,33 @@ public interface IImport extends IASTNode
 	{
 		return null;
 	}
-	
-	int importTag();
-	
-	void resolveTypes(MarkerList markers, IContext context, boolean using);
-	
-	void setParent(IImport parent);
-	
-	IImport getParent();
-	
-	default void setAlias(Name alias)
+
+	@Override
+	default void setPosition(ICodePosition position)
 	{
 	}
-	
+
+	int importTag();
+
 	default Name getAlias()
 	{
 		return null;
 	}
-	
+
+	default void setAlias(Name alias)
+	{
+	}
+
+	IImport getParent();
+
+	void setParent(IImport parent);
+
 	IContext asContext();
 
 	IContext asParentContext();
-	
+
+	void resolveTypes(MarkerList markers, IContext context, boolean using);
+
 	// Compilation
 	
 	static void writeImport(IImport theImport, DataOutput out) throws IOException
