@@ -1,12 +1,9 @@
 package dyvil.tools.compiler.ast.header;
 
-import dyvil.collection.List;
-import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.classes.IClassBody;
-import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.method.Candidate;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -30,8 +27,8 @@ public final class SingleImport extends Import implements IImportContext
 	private IClass  theClass;
 	private Package thePackage;
 
-	private IDataMember   field;
-	private List<IMethod> methods;
+	private IDataMember        field;
+	private MatchList<IMethod> methods;
 
 	public SingleImport()
 	{
@@ -78,11 +75,11 @@ public final class SingleImport extends Import implements IImportContext
 	}
 
 	@Override
-	public void resolveTypes(MarkerList markers, IImportContext context, boolean using)
+	public void resolveTypes(MarkerList markers, IImportContext context, int mask)
 	{
 		if (this.parent != null)
 		{
-			this.parent.resolveTypes(markers, context, false);
+			this.parent.resolveTypes(markers, context, KindedImport.PARENT);
 			context = this.parent.asParentContext();
 
 			if (context == null)
@@ -91,57 +88,51 @@ public final class SingleImport extends Import implements IImportContext
 			}
 		}
 
-		if (using)
+		boolean found = false;
+		if ((mask & KindedImport.VAR) != 0)
 		{
-			if (!(context instanceof IClass))
-			{
-				markers.add(Markers.semantic(this.position, "using.class.invalid"));
-				return;
-			}
-
-			IClassBody body = ((IClass) context).getBody();
-
-			IDataMember field = body.getField(this.name);
+			final IDataMember field = context.resolveField(this.name);
 			if (field != null)
 			{
 				this.field = field;
-				return;
+				found = true;
 			}
-
-			this.methods = new ArrayList<>();
-			int len = body.methodCount();
-			for (int i = 0; i < len; i++)
-			{
-				IMethod m = body.getMethod(i);
-				if (m.getName() == this.name)
-				{
-					this.methods.add(m);
-				}
-			}
-			if (!this.methods.isEmpty())
-			{
-				return;
-			}
-
-			markers.add(Markers.semantic(this.position, "method.access.resolve.field", this.name.qualified));
-			return;
 		}
 
-		Package pack = context.resolvePackage(this.name);
-		if (pack != null)
+		if ((mask & KindedImport.FUNC) != 0)
 		{
-			this.thePackage = pack;
-			return;
+			this.methods = new MatchList<>(null);
+			context.getMethodMatches(this.methods, null, this.name, null);
+			if (!found && !this.methods.isEmpty())
+			{
+				found = true;
+			}
 		}
 
-		IClass iclass = context.resolveClass(this.name);
-		if (iclass != null)
+		if ((mask & KindedImport.CLASS) != 0)
 		{
-			this.theClass = iclass;
-			return;
+			final IClass theClass = context.resolveClass(this.name);
+			if (theClass != null)
+			{
+				this.theClass = theClass;
+				found = true;
+			}
 		}
 
-		markers.add(Markers.semantic(this.position, "resolve.package", this.name.qualified));
+		if ((mask & KindedImport.PACKAGE) != 0)
+		{
+			final Package thePackage = context.resolvePackage(this.name);
+			if (thePackage != null)
+			{
+				this.thePackage = thePackage;
+				found = true;
+			}
+		}
+
+		if (!found)
+		{
+			markers.add(Markers.semantic(this.position, "import.resolve", this.name.qualified));
+		}
 	}
 
 	@Override
@@ -198,9 +189,9 @@ public final class SingleImport extends Import implements IImportContext
 			return;
 		}
 
-		for (IMethod method : this.methods)
+		for (Candidate<IMethod> candidate : this.methods)
 		{
-			method.checkMatch(list, receiver, null, arguments);
+			candidate.getMember().checkMatch(list, receiver, null, arguments);
 		}
 	}
 
@@ -212,9 +203,9 @@ public final class SingleImport extends Import implements IImportContext
 			return;
 		}
 
-		for (IMethod method : this.methods)
+		for (Candidate<IMethod> method : this.methods)
 		{
-			method.checkImplicitMatch(list, value, targetType);
+			method.getMember().checkImplicitMatch(list, value, targetType);
 		}
 	}
 

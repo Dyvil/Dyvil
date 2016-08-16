@@ -83,7 +83,7 @@ public class DyvilHeaderParser extends Parser
 		}
 		case DyvilKeywords.USING:
 		{
-			final ImportDeclaration declaration = new ImportDeclaration(token, true);
+			final ImportDeclaration declaration = new ImportDeclaration(token);
 			pm.pushParser(new ImportParser(im ->
 			                               {
 				                               declaration.setImport(im);

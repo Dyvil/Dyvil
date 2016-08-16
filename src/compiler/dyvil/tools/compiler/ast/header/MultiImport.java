@@ -71,11 +71,11 @@ public final class MultiImport extends Import implements IImportContext, IImport
 	}
 
 	@Override
-	public void resolveTypes(MarkerList markers, IImportContext context, boolean using)
+	public void resolveTypes(MarkerList markers, IImportContext context, int mask)
 	{
 		if (this.parent != null)
 		{
-			this.parent.resolveTypes(markers, context, false);
+			this.parent.resolveTypes(markers, context, KindedImport.PARENT);
 			context = this.parent.asParentContext();
 
 			if (context == null)
@@ -86,7 +86,7 @@ public final class MultiImport extends Import implements IImportContext, IImport
 
 		for (int i = 0; i < this.importCount; i++)
 		{
-			this.imports[i].resolveTypes(markers, context, using);
+			this.imports[i].resolveTypes(markers, context, mask);
 		}
 	}
 

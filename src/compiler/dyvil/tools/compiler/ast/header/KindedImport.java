@@ -21,6 +21,8 @@ public class KindedImport implements IImport
 	public static final int VAR      = 0x40;
 
 	public static final int STATIC = VAR | FUNC;
+	public static final int PARENT = PACKAGE | HEADER | CLASS;
+	public static final int ANY    = -1;
 
 	public KindedImport()
 	{
@@ -88,9 +90,9 @@ public class KindedImport implements IImport
 	}
 
 	@Override
-	public void resolveTypes(MarkerList markers, IImportContext context, boolean using)
+	public void resolveTypes(MarkerList markers, IImportContext context, int mask)
 	{
-		this.child.resolveTypes(markers, context, using || (this.mask & STATIC) != 0);
+		this.child.resolveTypes(markers, context, this.mask == ANY ? this.mask : this.mask | mask);
 	}
 
 	@Override

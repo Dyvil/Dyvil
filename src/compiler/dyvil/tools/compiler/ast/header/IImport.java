@@ -62,7 +62,7 @@ public interface IImport extends IASTNode
 
 	IImportContext asParentContext();
 
-	void resolveTypes(MarkerList markers, IImportContext context, boolean using);
+	void resolveTypes(MarkerList markers, IImportContext context, int mask);
 
 	// Compilation
 	

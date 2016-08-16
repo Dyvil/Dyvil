@@ -861,7 +861,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		int staticImports = in.readShort();
 		for (int i = 0; i < staticImports; i++)
 		{
-			ImportDeclaration id = new ImportDeclaration(null, true);
+			ImportDeclaration id = new ImportDeclaration(null);
 			id.read(in);
 			this.addUsing(id);
 		}

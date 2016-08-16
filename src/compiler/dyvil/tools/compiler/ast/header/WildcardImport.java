@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.header;
 
-import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.util.Markers;
@@ -32,11 +31,11 @@ public final class WildcardImport extends Import
 	}
 
 	@Override
-	public void resolveTypes(MarkerList markers, IImportContext context, boolean mask)
+	public void resolveTypes(MarkerList markers, IImportContext context, int mask)
 	{
 		if (this.parent != null)
 		{
-			this.parent.resolveTypes(markers, context, false);
+			this.parent.resolveTypes(markers, context, KindedImport.PARENT);
 			context = this.parent.asParentContext();
 
 			if (context == null)
@@ -45,15 +44,8 @@ public final class WildcardImport extends Import
 			}
 		}
 
-		if (using)
+		if ((mask & KindedImport.STATIC) != 0 && context != null)
 		{
-			if (!(context instanceof IClass))
-			{
-				markers.add(Markers.semanticError(this.position, "using.wildcard.invalid"));
-				this.context = IDefaultContext.DEFAULT;
-				return;
-			}
-
 			this.context = context;
 			return;
 		}

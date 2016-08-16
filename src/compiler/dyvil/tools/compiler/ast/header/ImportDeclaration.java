@@ -16,17 +16,10 @@ public final class ImportDeclaration implements IASTNode, IObjectCompilable
 {
 	protected ICodePosition position;
 	protected IImport       theImport;
-	protected boolean       isStatic;
 
 	public ImportDeclaration(ICodePosition position)
 	{
 		this.position = position;
-	}
-
-	public ImportDeclaration(ICodePosition position, boolean isStatic)
-	{
-		this.position = position;
-		this.isStatic = isStatic;
 	}
 
 	@Override
@@ -55,11 +48,11 @@ public final class ImportDeclaration implements IASTNode, IObjectCompilable
 	{
 		if (this.theImport == null)
 		{
-			markers.add(Markers.semanticError(this.position, this.isStatic ? "using.invalid" : "import.invalid"));
+			markers.add(Markers.semanticError(this.position, "import.invalid"));
 			return;
 		}
 
-		this.theImport.resolveTypes(markers, Package.rootPackage, this.isStatic);
+		this.theImport.resolveTypes(markers, Package.rootPackage, KindedImport.ANY);
 	}
 
 	// Context
@@ -94,14 +87,7 @@ public final class ImportDeclaration implements IASTNode, IObjectCompilable
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.isStatic)
-		{
-			buffer.append("using ");
-		}
-		else
-		{
-			buffer.append("import ");
-		}
+		buffer.append("import ");
 
 		if (this.theImport != null)
 		{
