@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.header;
 
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.Candidate;
@@ -81,14 +82,38 @@ public final class SingleImport extends Import implements IImportContext
 		{
 			this.parent.resolveTypes(markers, context, KindedImport.parent(mask));
 			context = this.parent.asParentContext();
+		}
 
-			if (context == null)
+		if ((mask & KindedImport.PACKAGE) != 0)
+		{
+			final Package thePackage = context.resolvePackage(this.name);
+			if (thePackage != null)
 			{
-				return;
+				this.thePackage = thePackage;
 			}
 		}
 
-		boolean found = false;
+		if ((mask & KindedImport.CLASS) != 0)
+		{
+			final IClass theClass = context.resolveClass(this.name);
+			if (theClass != null)
+			{
+				this.theClass = theClass;
+			}
+		}
+
+		// error later
+	}
+
+	@Override
+	public void resolve(MarkerList markers, IImportContext context, int mask)
+	{
+		if (this.parent != null)
+		{
+			context = this.parent.asParentContext();
+		}
+
+		boolean found = this.theClass != null || this.thePackage != null;
 		if ((mask & KindedImport.VAR) != 0)
 		{
 			final IDataMember field = context.resolveField(this.name);
@@ -109,26 +134,6 @@ public final class SingleImport extends Import implements IImportContext
 			}
 		}
 
-		if ((mask & KindedImport.CLASS) != 0)
-		{
-			final IClass theClass = context.resolveClass(this.name);
-			if (theClass != null)
-			{
-				this.theClass = theClass;
-				found = true;
-			}
-		}
-
-		if ((mask & KindedImport.PACKAGE) != 0)
-		{
-			final Package thePackage = context.resolvePackage(this.name);
-			if (thePackage != null)
-			{
-				this.thePackage = thePackage;
-				found = true;
-			}
-		}
-
 		if (!found)
 		{
 			markers.add(Markers.semantic(this.position, "import.resolve", this.name.qualified));
@@ -144,7 +149,15 @@ public final class SingleImport extends Import implements IImportContext
 	@Override
 	public IImportContext asParentContext()
 	{
-		return this.theClass == null ? this.thePackage : this.theClass;
+		if (this.theClass != null)
+		{
+			return this.theClass;
+		}
+		if (this.thePackage != null)
+		{
+			return this.thePackage;
+		}
+		return IDefaultContext.DEFAULT;
 	}
 
 	@Override

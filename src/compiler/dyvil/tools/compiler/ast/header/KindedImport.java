@@ -115,10 +115,21 @@ public class KindedImport implements IImport
 		return null; // never viewed by children as a parent
 	}
 
+	private int orMask(int mask)
+	{
+		return mask == ANY ? this.mask : this.mask | mask;
+	}
+
 	@Override
 	public void resolveTypes(MarkerList markers, IImportContext context, int mask)
 	{
-		this.child.resolveTypes(markers, context, this.mask == ANY ? this.mask : this.mask | mask);
+		this.child.resolveTypes(markers, context, this.orMask(mask));
+	}
+
+	@Override
+	public void resolve(MarkerList markers, IImportContext context, int mask)
+	{
+		this.child.resolve(markers, context, this.orMask(mask));
 	}
 
 	@Override

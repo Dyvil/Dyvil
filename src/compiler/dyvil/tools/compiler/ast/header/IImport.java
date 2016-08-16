@@ -64,6 +64,8 @@ public interface IImport extends IASTNode
 
 	void resolveTypes(MarkerList markers, IImportContext context, int mask);
 
+	void resolve(MarkerList markers, IImportContext context, int mask);
+
 	// Compilation
 	
 	static void writeImport(IImport theImport, DataOutput out) throws IOException

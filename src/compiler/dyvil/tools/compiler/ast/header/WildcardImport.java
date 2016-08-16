@@ -37,11 +37,6 @@ public final class WildcardImport extends Import
 		{
 			this.parent.resolveTypes(markers, context, KindedImport.parent(mask));
 			context = this.parent.asParentContext();
-
-			if (context == null)
-			{
-				return;
-			}
 		}
 
 		if ((mask & KindedImport.STATIC) != 0 && context != null)
@@ -57,6 +52,11 @@ public final class WildcardImport extends Import
 			return;
 		}
 		this.context = context;
+	}
+
+	@Override
+	public void resolve(MarkerList markers, IImportContext context, int mask)
+	{
 	}
 
 	@Override

@@ -575,6 +575,16 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			this.headerDeclaration = new HeaderDeclaration(this, ICodePosition.ORIGIN, this.name,
 			                                               new FlagModifierSet(Modifiers.PUBLIC), null);
 		}
+
+		for (int i = 0; i < this.importCount; i++)
+		{
+			this.importDeclarations[i].resolve(this.markers, this);
+		}
+
+		for (int i = 0; i < this.usingCount; i++)
+		{
+			this.usingDeclarations[i].resolve(this.markers, this);
+		}
 	}
 
 	@Override

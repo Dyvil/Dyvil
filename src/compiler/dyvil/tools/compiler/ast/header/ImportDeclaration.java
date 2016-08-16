@@ -55,6 +55,14 @@ public final class ImportDeclaration implements IASTNode, IObjectCompilable
 		this.theImport.resolveTypes(markers, Package.rootPackage, KindedImport.ANY);
 	}
 
+	public void resolve(MarkerList markers, IContext context)
+	{
+		if (this.theImport != null)
+		{
+			this.theImport.resolve(markers, Package.rootPackage, KindedImport.ANY);
+		}
+	}
+
 	// Context
 
 	public IImportContext getContext()
