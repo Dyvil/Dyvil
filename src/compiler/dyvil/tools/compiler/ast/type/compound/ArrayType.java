@@ -81,7 +81,7 @@ public class ArrayType implements IObjectType, ITyped
 	@Override
 	public ICodePosition getPosition()
 	{
-		return this.type.getPosition();
+		return this.type == null ? null : this.type.getPosition();
 	}
 
 	@Override
