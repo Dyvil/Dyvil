@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.structure;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassList;
-import dyvil.tools.compiler.ast.context.IStaticContext;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.header.HeaderDeclaration;
 import dyvil.tools.compiler.ast.header.ImportDeclaration;
 import dyvil.tools.compiler.ast.header.IncludeDeclaration;
@@ -17,7 +17,7 @@ import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.IObjectCompilable;
 import dyvil.tools.parsing.Name;
 
-public interface IDyvilHeader extends IObjectCompilable, IStaticContext, IClassList, IOperatorMap, ITypeAliasMap
+public interface IDyvilHeader extends IObjectCompilable, IContext, IClassList, IOperatorMap, ITypeAliasMap
 {
 	default boolean isHeader()
 	{
@@ -26,6 +26,8 @@ public interface IDyvilHeader extends IObjectCompilable, IStaticContext, IClassL
 
 	@Override
 	DyvilCompiler getCompilationContext();
+
+	IContext getContext();
 
 	void setName(Name name);
 	

@@ -6,7 +6,8 @@ import dyvil.io.FileUtils;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.constructor.IConstructor;
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.IDataMember;
@@ -46,7 +47,7 @@ import java.io.DataOutput;
 import java.io.File;
 import java.io.IOException;
 
-public class DyvilHeader implements ICompilationUnit, IDyvilHeader
+public class DyvilHeader implements ICompilationUnit, IDyvilHeader, IDefaultContext
 {
 	protected final DyvilCompiler compiler;
 
@@ -115,15 +116,21 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 
 	@Override
+	public boolean isHeader()
+	{
+		return true;
+	}
+
+	@Override
 	public DyvilCompiler getCompilationContext()
 	{
 		return this.compiler;
 	}
 
 	@Override
-	public boolean isHeader()
+	public IContext getContext()
 	{
-		return true;
+		return new HeaderContext(this);
 	}
 
 	@Override
@@ -276,47 +283,6 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 
 	@Override
-	public IOperator resolveOperator(Name name, int type)
-	{
-		if (type == IOperator.INFIX && this.infixOperatorMap != null)
-		{
-			final IOperator operator = this.infixOperatorMap.get(name);
-			if (operator != null)
-			{
-				return operator;
-			}
-		}
-
-		IOperator candidate = null;
-		for (int i = 0; i < this.operatorCount; i++)
-		{
-			final IOperator operator = this.operators[i];
-			if (operator.getName() == name)
-			{
-				if (operator.getType() == type)
-				{
-					return operator;
-				}
-				candidate = operator;
-			}
-		}
-		if (candidate != null && candidate.getType() == type)
-		{
-			return candidate;
-		}
-
-		for (int i = 0; i < this.includeCount; i++)
-		{
-			final IOperator operator = this.includes[i].getHeader().resolveOperator(name, type);
-			if (operator != null)
-			{
-				return operator;
-			}
-		}
-		return candidate;
-	}
-
-	@Override
 	public void setOperator(int index, IOperator operator)
 	{
 		this.operators[index] = operator;
@@ -379,42 +345,6 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	public ITypeAlias getTypeAlias(int index)
 	{
 		return this.typeAliases[index];
-	}
-
-	@Override
-	public ITypeAlias resolveTypeAlias(Name name, int arity)
-	{
-		ITypeAlias candidate = null;
-		for (int i = 0; i < this.typeAliasCount; i++)
-		{
-			final ITypeAlias typeAlias = this.typeAliases[i];
-			if (typeAlias.getName() == name)
-			{
-				if (typeAlias.typeParameterCount() == arity)
-				{
-					return typeAlias;
-				}
-
-				if (candidate == null)
-				{
-					candidate = typeAlias;
-				}
-			}
-		}
-		if (candidate != null)
-		{
-			return candidate;
-		}
-
-		for (int i = 0; i < this.includeCount; i++)
-		{
-			final ITypeAlias includedTypeAlias = this.includes[i].resolveTypeAlias(name, arity);
-			if (includedTypeAlias != null)
-			{
-				return includedTypeAlias;
-			}
-		}
-		return null;
 	}
 
 	@Override
@@ -519,19 +449,21 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public void resolveTypes()
 	{
+		final IContext context = this.getContext();
+
 		for (int i = 0; i < this.includeCount; i++)
 		{
-			this.includes[i].resolve(this.markers, this);
+			this.includes[i].resolveTypes(this.markers, this);
 		}
 
 		for (int i = 0; i < this.importCount; i++)
 		{
-			this.importDeclarations[i].resolveTypes(this.markers, this);
+			this.importDeclarations[i].resolveTypes(this.markers);
 		}
 
 		for (int i = 0; i < this.typeAliasCount; i++)
 		{
-			this.typeAliases[i].resolveTypes(this.markers, this);
+			this.typeAliases[i].resolveTypes(this.markers, context);
 		}
 	}
 
@@ -551,7 +483,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	{
 		for (int i = 0; i < this.importCount; i++)
 		{
-			this.importDeclarations[i].resolve(this.markers, this);
+			this.importDeclarations[i].resolve(this.markers);
 		}
 	}
 
@@ -599,6 +531,8 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		ObjectFormat.write(this.compiler, this.outputFile, this);
 	}
 
+	// IContext override implementations
+
 	@Override
 	public IDyvilHeader getHeader()
 	{
@@ -606,97 +540,67 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 
 	@Override
-	public Package resolvePackage(Name name)
+	public IDyvilHeader resolveHeader(Name name)
 	{
-		return null;
+		return name == this.name ? this : null;
 	}
 
 	@Override
-	public IClass resolveClass(Name name)
+	public ITypeAlias resolveTypeAlias(Name name, int arity)
 	{
-		IClass iclass;
-
-		// Imported Classes
-		for (int i = 0; i < this.importCount; i++)
+		ITypeAlias candidate = null;
+		for (int i = 0; i < this.typeAliasCount; i++)
 		{
-			iclass = this.importDeclarations[i].getContext().resolveClass(name);
-			if (iclass != null)
+			final ITypeAlias typeAlias = this.typeAliases[i];
+			if (typeAlias.getName() != name)
 			{
-				return iclass;
+				continue;
+			}
+
+			if (typeAlias.typeParameterCount() == arity)
+			{
+				return typeAlias;
+			}
+			if (candidate == null)
+			{
+				candidate = typeAlias;
+			}
+		}
+		return candidate;
+	}
+
+	@Override
+	public IOperator resolveOperator(Name name, int type)
+	{
+		if (type == IOperator.INFIX && this.infixOperatorMap != null)
+		{
+			final IOperator operator = this.infixOperatorMap.get(name);
+			if (operator != null)
+			{
+				return operator;
 			}
 		}
 
-		// Included Headers
-		for (int i = 0; i < this.includeCount; i++)
+		IOperator candidate = null;
+		for (int i = 0; i < this.operatorCount; i++)
 		{
-			iclass = this.includes[i].resolveClass(name);
-			if (iclass != null)
+			final IOperator operator = this.operators[i];
+			if (operator.getName() != name)
 			{
-				return iclass;
+				continue;
+			}
+
+			if (operator.getType() == type)
+			{
+				return operator;
+			}
+			if (candidate == null)
+			{
+				candidate = operator;
 			}
 		}
 
-		if (this.pack != null)
-		{
-			return this.pack.resolveClass(name);
-		}
-		return null;
-	}
-
-	@Override
-	public IDataMember resolveField(Name name)
-	{
-		for (int i = 0; i < this.importCount; i++)
-		{
-			IDataMember field = this.importDeclarations[i].getContext().resolveField(name);
-			if (field != null)
-			{
-				return field;
-			}
-		}
-
-		for (int i = 0; i < this.includeCount; i++)
-		{
-			IDataMember field = this.includes[i].resolveField(name);
-			if (field != null)
-			{
-				return field;
-			}
-		}
-		return null;
-	}
-
-	@Override
-	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
-	{
-		for (int i = 0; i < this.importCount; i++)
-		{
-			this.importDeclarations[i].getContext().getMethodMatches(list, receiver, name, arguments);
-		}
-
-		for (int i = 0; i < this.includeCount; i++)
-		{
-			this.includes[i].getMethodMatches(list, receiver, name, arguments);
-		}
-	}
-
-	@Override
-	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
-	{
-		for (int i = 0; i < this.importCount; i++)
-		{
-			this.importDeclarations[i].getContext().getImplicitMatches(list, value, targetType);
-		}
-
-		for (int i = 0; i < this.includeCount; i++)
-		{
-			this.includes[i].getImplicitMatches(list, value, targetType);
-		}
-	}
-
-	@Override
-	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
-	{
+		return candidate;
 	}
 
 	@Override
@@ -729,6 +633,8 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 		}
 		return INVISIBLE;
 	}
+
+	// Compilation
 
 	@Override
 	public String getFullName()
@@ -922,6 +828,157 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			this.headerDeclaration.toString(prefix, buffer);
 			buffer.append('\n');
 			buffer.append('\n');
+		}
+	}
+}
+
+class HeaderContext implements IDefaultContext
+{
+	private DyvilHeader header;
+
+	public HeaderContext(DyvilHeader header)
+	{
+		this.header = header;
+	}
+
+	@Override
+	public IDyvilHeader resolveHeader(Name name)
+	{
+		return this.header.resolveHeader(name);
+	}
+
+	@Override
+	public ITypeAlias resolveTypeAlias(Name name, int arity)
+	{
+		final ITypeAlias candidate = this.header.resolveTypeAlias(name, arity);
+		if (candidate != null)
+		{
+			return candidate;
+		}
+
+		for (int i = 0; i < this.header.includeCount; i++)
+		{
+			final ITypeAlias includedTypeAlias = this.header.includes[i].getContext().resolveTypeAlias(name, arity);
+			if (includedTypeAlias != null)
+			{
+				return includedTypeAlias;
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public IOperator resolveOperator(Name name, int type)
+	{
+		final IOperator candidate = this.header.resolveOperator(name, type);
+		if (candidate != null && candidate.getType() == type)
+		{
+			return candidate;
+		}
+
+		for (int i = 0; i < this.header.includeCount; i++)
+		{
+			final IOperator operator = this.header.includes[i].getContext().resolveOperator(name, type);
+			if (operator != null)
+			{
+				return operator;
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	public IClass resolveClass(Name name)
+	{
+		IClass theClass = this.header.resolveClass(name);
+		if (theClass != null)
+		{
+			return theClass;
+		}
+
+		// Imported Classes
+		for (int i = 0; i < this.header.importCount; i++)
+		{
+			theClass = this.header.importDeclarations[i].getContext().resolveClass(name);
+			if (theClass != null)
+			{
+				return theClass;
+			}
+		}
+
+		// Included Headers
+		for (int i = 0; i < this.header.includeCount; i++)
+		{
+			theClass = this.header.includes[i].getContext().resolveClass(name);
+			if (theClass != null)
+			{
+				return theClass;
+			}
+		}
+
+		if (this.header.pack != null)
+		{
+			return this.header.pack.resolveClass(name);
+		}
+		return null;
+	}
+
+	@Override
+	public IDataMember resolveField(Name name)
+	{
+		IDataMember field = this.header.resolveField(name);
+		if (field != null)
+		{
+			return field;
+		}
+
+		for (int i = 0; i < this.header.importCount; i++)
+		{
+			field = this.header.importDeclarations[i].getContext().resolveField(name);
+			if (field != null)
+			{
+				return field;
+			}
+		}
+
+		for (int i = 0; i < this.header.includeCount; i++)
+		{
+			field = this.header.includes[i].getContext().resolveField(name);
+			if (field != null)
+			{
+				return field;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
+	{
+		for (int i = 0; i < this.header.importCount; i++)
+		{
+			this.header.importDeclarations[i].getContext().getMethodMatches(list, receiver, name, arguments);
+		}
+
+		for (int i = 0; i < this.header.includeCount; i++)
+		{
+			this.header.includes[i].getContext().getMethodMatches(list, receiver, name, arguments);
+		}
+	}
+
+	@Override
+	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
+	{
+		for (int i = 0; i < this.header.importCount; i++)
+		{
+			this.header.importDeclarations[i].getContext().getImplicitMatches(list, value, targetType);
+		}
+
+		for (int i = 0; i < this.header.includeCount; i++)
+		{
+			this.header.includes[i].getContext().getImplicitMatches(list, value, targetType);
 		}
 	}
 }

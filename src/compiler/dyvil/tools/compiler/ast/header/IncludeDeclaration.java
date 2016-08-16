@@ -1,18 +1,11 @@
 package dyvil.tools.compiler.ast.header;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.external.ExternalHeader;
-import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
@@ -31,6 +24,7 @@ public class IncludeDeclaration implements IASTNode
 	// Metadata
 	private ICodePosition position;
 	private IDyvilHeader  header;
+	private IContext context = IDefaultContext.DEFAULT;
 
 	public IncludeDeclaration()
 	{
@@ -81,38 +75,12 @@ public class IncludeDeclaration implements IASTNode
 		return this.header;
 	}
 
-	public IClass resolveClass(Name name)
+	public IContext getContext()
 	{
-		return this.header == null ? null : this.header.resolveClass(name);
+		return this.context;
 	}
 
-	public ITypeAlias resolveTypeAlias(Name name, int arity)
-	{
-		return this.header == null ? null : this.header.resolveTypeAlias(name, arity);
-	}
-
-	public IDataMember resolveField(Name name)
-	{
-		return this.header == null ? null : this.header.resolveField(name);
-	}
-
-	public void getMethodMatches(MatchList<IMethod> list, IValue instance, Name name, IArguments arguments)
-	{
-		if (this.header != null)
-		{
-			this.header.getMethodMatches(list, instance, name, arguments);
-		}
-	}
-
-	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
-	{
-		if (this.header != null)
-		{
-			this.header.getImplicitMatches(list, value, targetType);
-		}
-	}
-
-	public void resolve(MarkerList markers, IContext context)
+	public void resolveTypes(MarkerList markers, IDyvilHeader enclosingHeader)
 	{
 		Package pack = Package.rootPackage;
 		final int lastIndex = this.namePartCount - 1;
@@ -164,6 +132,7 @@ public class IncludeDeclaration implements IASTNode
 			if (this.header instanceof ExternalHeader)
 			{
 				markers.add(Markers.semanticError(this.position, "include.internal", this.header.getName()));
+				return;
 			}
 			accessLevel &= 0b1111;
 		}
@@ -172,15 +141,17 @@ public class IncludeDeclaration implements IASTNode
 		{
 		case Modifiers.PRIVATE:
 			markers.add(Markers.semanticError(this.position, "include.invisible", this.header.getName()));
-			break;
+			return;
 		case Modifiers.PACKAGE:
 		case Modifiers.PROTECTED:
-			if (this.header.getPackage() != context.getHeader().getPackage())
+			if (this.header.getPackage() != enclosingHeader.getPackage())
 			{
 				markers.add(Markers.semanticError(this.position, "include.invisible", this.header.getName()));
 			}
-			break;
 		}
+
+		// All checks passed
+		this.context = this.header.getContext();
 	}
 
 	public void write(DataOutput out) throws IOException
