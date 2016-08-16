@@ -75,7 +75,7 @@ public final class MultiImport extends Import implements IImportContext, IImport
 	{
 		if (this.parent != null)
 		{
-			this.parent.resolveTypes(markers, context, KindedImport.PARENT);
+			this.parent.resolveTypes(markers, context, KindedImport.parent(mask));
 			context = this.parent.asParentContext();
 
 			if (context == null)

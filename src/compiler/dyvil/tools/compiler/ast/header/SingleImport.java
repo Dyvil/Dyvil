@@ -79,7 +79,7 @@ public final class SingleImport extends Import implements IImportContext
 	{
 		if (this.parent != null)
 		{
-			this.parent.resolveTypes(markers, context, KindedImport.PARENT);
+			this.parent.resolveTypes(markers, context, KindedImport.parent(mask));
 			context = this.parent.asParentContext();
 
 			if (context == null)
@@ -213,30 +213,16 @@ public final class SingleImport extends Import implements IImportContext
 	public void writeData(DataOutput out) throws IOException
 	{
 		IImport.writeImport(this.parent, out);
-
-		out.writeUTF(this.name.qualified);
-		if (this.alias != null)
-		{
-			out.writeUTF(this.alias.qualified);
-		}
-		else
-		{
-			out.writeUTF("");
-		}
+		this.name.write(out); // non-null
+		Name.write(this.alias, out); // nullable
 	}
 
 	@Override
 	public void readData(DataInput in) throws IOException
 	{
 		this.parent = IImport.readImport(in);
-
-		this.name = Name.fromRaw(in.readUTF());
-
-		String alias = in.readUTF();
-		if (!alias.isEmpty())
-		{
-			this.alias = Name.fromRaw(alias);
-		}
+		this.name = Name.read(in);
+		this.alias = Name.read(in);
 	}
 
 	@Override

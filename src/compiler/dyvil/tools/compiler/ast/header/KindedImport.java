@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.header;
 
 import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 
 import java.io.DataInput;
@@ -60,6 +61,31 @@ public class KindedImport implements IImport
 		return 0;
 	}
 
+	public static int parent(int mask)
+	{
+		if (mask == ANY)
+		{
+			return PARENT;
+		}
+		int result = 0;
+		if ((mask & STATIC) != 0)
+		{
+			// The parent of a static member can be a class
+			result |= CLASS;
+		}
+		if ((mask & (CLASS | HEADER | PACKAGE)) != 0)
+		{
+			// The parent of a class, header or package can be a package
+			result |= PACKAGE;
+		}
+		if ((mask & (CLASS | TYPE | OPERATOR)) != 0)
+		{
+			// The parent of a class, type or operator can be a header
+			result |= HEADER;
+		}
+		return result;
+	}
+
 	@Override
 	public int importTag()
 	{
@@ -108,6 +134,12 @@ public class KindedImport implements IImport
 	{
 		this.mask = in.readUnsignedByte();
 		this.child = IImport.readImport(in);
+	}
+
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
 	}
 
 	@Override
