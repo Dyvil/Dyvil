@@ -2,6 +2,7 @@ package dyvil.tools.compiler.parser.header;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
+import dyvil.tools.compiler.ast.consumer.IImportConsumer;
 import dyvil.tools.compiler.ast.header.*;
 import dyvil.tools.compiler.ast.modifiers.Modifier;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
@@ -67,28 +68,28 @@ public class DyvilHeaderParser extends Parser
 		return false;
 	}
 
+	private IImportConsumer importConsumer(IToken token)
+	{
+		final ImportDeclaration declaration = new ImportDeclaration(token.raw());
+		return im ->
+		{
+			declaration.setImport(im);
+			this.unit.addImport(declaration);
+		};
+	}
+
 	protected boolean parseImport(IParserManager pm, IToken token, int type)
 	{
 		switch (type)
 		{
 		case DyvilKeywords.IMPORT:
 		{
-			final ImportDeclaration declaration = new ImportDeclaration(token.raw());
-			pm.pushParser(new ImportParser(im ->
-			                               {
-				                               declaration.setImport(im);
-				                               this.unit.addImport(declaration);
-			                               }));
+			pm.pushParser(new ImportParser(this.importConsumer(token)));
 			return true;
 		}
 		case DyvilKeywords.USING:
 		{
-			final ImportDeclaration declaration = new ImportDeclaration(token);
-			pm.pushParser(new ImportParser(im ->
-			                               {
-				                               declaration.setImport(im);
-				                               this.unit.addUsing(declaration);
-			                               }, KindedImport.STATIC));
+			pm.pushParser(new ImportParser(this.importConsumer(token), KindedImport.STATIC));
 			return true;
 		}
 		case DyvilKeywords.INCLUDE:

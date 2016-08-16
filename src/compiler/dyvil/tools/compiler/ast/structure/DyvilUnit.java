@@ -130,6 +130,8 @@ public class DyvilUnit extends DyvilHeader implements IClassConsumer
 	@Override
 	public void resolve()
 	{
+		this.resolveImports();
+
 		for (int i = 0; i < this.classCount; i++)
 		{
 			this.classes[i].resolve(this.markers, this);

@@ -64,10 +64,8 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 
 	protected PackageDeclaration packageDeclaration;
 
-	protected ImportDeclaration[] importDeclarations = new ImportDeclaration[5];
-	protected int importCount;
-	protected ImportDeclaration[] usingDeclarations = new ImportDeclaration[5];
-	protected int                  usingCount;
+	protected ImportDeclaration[] importDeclarations = new ImportDeclaration[8];
+	protected int                  importCount;
 	protected IncludeDeclaration[] includes;
 	protected int                  includeCount;
 	protected ITypeAlias[]         typeAliases;
@@ -225,31 +223,6 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	}
 
 	@Override
-	public int usingCount()
-	{
-		return this.usingCount;
-	}
-
-	@Override
-	public void addUsing(ImportDeclaration usingDeclaration)
-	{
-		final int index = this.usingCount++;
-		if (index >= this.usingDeclarations.length)
-		{
-			ImportDeclaration[] temp = new ImportDeclaration[index * 2];
-			System.arraycopy(this.usingDeclarations, 0, temp, 0, this.usingDeclarations.length);
-			this.usingDeclarations = temp;
-		}
-		this.usingDeclarations[index] = usingDeclaration;
-	}
-
-	@Override
-	public ImportDeclaration getUsing(int index)
-	{
-		return this.usingDeclarations[index];
-	}
-
-	@Override
 	public int includeCount()
 	{
 		return this.includeCount;
@@ -285,7 +258,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public boolean hasMemberImports()
 	{
-		return this.usingCount > 0 || this.includeCount > 0;
+		return this.importCount > 0 || this.includeCount > 0;
 	}
 
 	// Operators
@@ -556,11 +529,6 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			this.importDeclarations[i].resolveTypes(this.markers, this);
 		}
 
-		for (int i = 0; i < this.usingCount; i++)
-		{
-			this.usingDeclarations[i].resolveTypes(this.markers, this);
-		}
-
 		for (int i = 0; i < this.typeAliasCount; i++)
 		{
 			this.typeAliases[i].resolveTypes(this.markers, this);
@@ -576,14 +544,14 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			                                               new FlagModifierSet(Modifiers.PUBLIC), null);
 		}
 
+		this.resolveImports();
+	}
+
+	protected void resolveImports()
+	{
 		for (int i = 0; i < this.importCount; i++)
 		{
 			this.importDeclarations[i].resolve(this.markers, this);
-		}
-
-		for (int i = 0; i < this.usingCount; i++)
-		{
-			this.usingDeclarations[i].resolve(this.markers, this);
 		}
 	}
 
@@ -678,9 +646,9 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		for (int i = 0; i < this.usingCount; i++)
+		for (int i = 0; i < this.importCount; i++)
 		{
-			IDataMember field = this.usingDeclarations[i].getContext().resolveField(name);
+			IDataMember field = this.importDeclarations[i].getContext().resolveField(name);
 			if (field != null)
 			{
 				return field;
@@ -701,9 +669,9 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
-		for (int i = 0; i < this.usingCount; i++)
+		for (int i = 0; i < this.importCount; i++)
 		{
-			this.usingDeclarations[i].getContext().getMethodMatches(list, receiver, name, arguments);
+			this.importDeclarations[i].getContext().getMethodMatches(list, receiver, name, arguments);
 		}
 
 		for (int i = 0; i < this.includeCount; i++)
@@ -715,9 +683,9 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 	@Override
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
-		for (int i = 0; i < this.usingCount; i++)
+		for (int i = 0; i < this.importCount; i++)
 		{
-			this.usingDeclarations[i].getContext().getImplicitMatches(list, value, targetType);
+			this.importDeclarations[i].getContext().getImplicitMatches(list, value, targetType);
 		}
 
 		for (int i = 0; i < this.includeCount; i++)
@@ -816,14 +784,6 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			this.importDeclarations[i].write(out);
 		}
 
-		// Using Declarations
-		int staticImports = this.usingCount;
-		out.writeShort(staticImports);
-		for (int i = 0; i < staticImports; i++)
-		{
-			this.usingDeclarations[i].write(out);
-		}
-
 		// Operators Definitions
 		out.writeShort(this.operatorCount);
 		for (int i = 0; i < this.operatorCount; i++)
@@ -866,14 +826,6 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			ImportDeclaration id = new ImportDeclaration(null);
 			id.read(in);
 			this.addImport(id);
-		}
-
-		int staticImports = in.readShort();
-		for (int i = 0; i < staticImports; i++)
-		{
-			ImportDeclaration id = new ImportDeclaration(null);
-			id.read(in);
-			this.addUsing(id);
 		}
 
 		int operators = in.readShort();
@@ -929,20 +881,6 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader
 			{
 				buffer.append(prefix);
 				this.importDeclarations[i].toString(prefix, buffer);
-				buffer.append(";\n");
-			}
-			if (Formatting.getBoolean("import.newline"))
-			{
-				buffer.append('\n');
-			}
-		}
-
-		if (this.usingCount > 0)
-		{
-			for (int i = 0; i < this.usingCount; i++)
-			{
-				buffer.append(prefix);
-				this.usingDeclarations[i].toString(prefix, buffer);
 				buffer.append(";\n");
 			}
 			if (Formatting.getBoolean("import.newline"))

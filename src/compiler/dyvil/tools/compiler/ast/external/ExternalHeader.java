@@ -4,6 +4,7 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.header.ImportDeclaration;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -14,8 +15,7 @@ import dyvil.tools.parsing.Name;
 
 public class ExternalHeader extends DyvilHeader
 {
-	private static final int IMPORT_DECLARATIONS  = 1;
-	private static final int USING_DECLARATIONS   = 1 << 1;
+	private static final int IMPORTS              = 1;
 	private static final int INCLUDE_DECLARATIONS = 1 << 2;
 	private static final int TYPE_ALIASES         = 1 << 3;
 
@@ -41,33 +41,21 @@ public class ExternalHeader extends DyvilHeader
 		}
 	}
 
-	private void resolveImportDeclarations()
+	@Override
+	protected void resolveImports()
 	{
 		if ((this.resolved & INCLUDE_DECLARATIONS) == 0)
 		{
 			this.resolveIncludeDeclarations();
 		}
 
-		this.resolved |= IMPORT_DECLARATIONS;
+		this.resolved |= IMPORTS;
 
 		for (int i = 0; i < this.importCount; i++)
 		{
-			this.importDeclarations[i].resolveTypes(null, this);
-		}
-	}
-
-	private void resolveUsingDeclarations()
-	{
-		if ((this.resolved & INCLUDE_DECLARATIONS) == 0)
-		{
-			this.resolveIncludeDeclarations();
-		}
-
-		this.resolved |= USING_DECLARATIONS;
-
-		for (int i = 0; i < this.usingCount; i++)
-		{
-			this.usingDeclarations[i].resolveTypes(null, this);
+			final ImportDeclaration declaration = this.importDeclarations[i];
+			declaration.resolveTypes(null, this);
+			declaration.resolve(null, this);
 		}
 	}
 
@@ -84,9 +72,9 @@ public class ExternalHeader extends DyvilHeader
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		if ((this.resolved & IMPORT_DECLARATIONS) == 0)
+		if ((this.resolved & IMPORTS) == 0)
 		{
-			this.resolveImportDeclarations();
+			this.resolveImports();
 		}
 		return super.resolveClass(name);
 	}
@@ -94,9 +82,9 @@ public class ExternalHeader extends DyvilHeader
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		if ((this.resolved & USING_DECLARATIONS) == 0)
+		if ((this.resolved & IMPORTS) == 0)
 		{
-			this.resolveUsingDeclarations();
+			this.resolveImports();
 		}
 		return super.resolveField(name);
 	}
@@ -115,9 +103,9 @@ public class ExternalHeader extends DyvilHeader
 	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
-		if ((this.resolved & USING_DECLARATIONS) == 0)
+		if ((this.resolved & IMPORTS) == 0)
 		{
-			this.resolveUsingDeclarations();
+			this.resolveImports();
 		}
 		super.getMethodMatches(list, receiver, name, arguments);
 	}
@@ -125,9 +113,9 @@ public class ExternalHeader extends DyvilHeader
 	@Override
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
-		if ((this.resolved & USING_DECLARATIONS) == 0)
+		if ((this.resolved & IMPORTS) == 0)
 		{
-			this.resolveUsingDeclarations();
+			this.resolveImports();
 		}
 		super.getImplicitMatches(list, value, targetType);
 	}

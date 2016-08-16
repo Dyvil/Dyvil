@@ -50,23 +50,15 @@ public interface IDyvilHeader extends IObjectCompilable, IStaticContext, IClassL
 	HeaderDeclaration getHeaderDeclaration();
 	
 	// Import
-	
-	int importCount();
-	
-	void addImport(ImportDeclaration component);
-	
-	ImportDeclaration getImport(int index);
-	
-	// Using
-	
+
 	boolean hasMemberImports();
-	
-	int usingCount();
-	
-	void addUsing(ImportDeclaration component);
-	
-	ImportDeclaration getUsing(int index);
-	
+
+	int importCount();
+
+	void addImport(ImportDeclaration component);
+
+	ImportDeclaration getImport(int index);
+
 	// Include
 	
 	int includeCount();

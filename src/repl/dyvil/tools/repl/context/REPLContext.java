@@ -287,6 +287,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 	public void addImport(ImportDeclaration declaration)
 	{
 		declaration.resolveTypes(this.markers, this);
+		declaration.resolve(this.markers, this);
 
 		if (this.hasErrors())
 		{
@@ -295,20 +296,6 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 
 		super.addImport(declaration);
 		this.compiler.getOutput().println("Imported " + declaration.getImport());
-	}
-
-	@Override
-	public void addUsing(ImportDeclaration usingDeclaration)
-	{
-		usingDeclaration.resolveTypes(this.markers, this);
-
-		if (this.hasErrors())
-		{
-			return;
-		}
-
-		super.addUsing(usingDeclaration);
-		this.compiler.getOutput().println("Imported " + usingDeclaration.getImport());
 	}
 
 	@Override
