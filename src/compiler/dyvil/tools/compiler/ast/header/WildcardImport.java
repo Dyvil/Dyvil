@@ -22,6 +22,11 @@ public final class WildcardImport extends Import
 {
 	private IContext context;
 
+	public WildcardImport()
+	{
+		super(null);
+	}
+
 	public WildcardImport(ICodePosition position)
 	{
 		super(position);

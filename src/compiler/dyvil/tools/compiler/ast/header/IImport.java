@@ -15,17 +15,17 @@ public interface IImport extends IASTNode, IImportContext
 	int SINGLE   = 1;
 	int WILDCARD = 2;
 	int MULTI    = 3;
-	
+
 	static IImport fromTag(int tag)
 	{
 		switch (tag)
 		{
 		case SINGLE:
-			return new SingleImport(null);
+			return new SingleImport();
 		case WILDCARD:
-			return new WildcardImport(null);
+			return new WildcardImport();
 		case MULTI:
-			return new MultiImport(null);
+			return new MultiImport();
 		}
 		return null;
 	}
@@ -57,31 +57,31 @@ public interface IImport extends IASTNode, IImportContext
 	
 	// Compilation
 	
-	static void writeImport(IImport iimport, DataOutput dos) throws IOException
+	static void writeImport(IImport theImport, DataOutput out) throws IOException
 	{
-		if (iimport == null)
+		if (theImport == null)
 		{
-			dos.writeByte(0);
+			out.writeByte(0);
 			return;
 		}
 		
-		dos.writeByte(iimport.importTag());
-		iimport.writeData(dos);
+		out.writeByte(theImport.importTag());
+		theImport.writeData(out);
 	}
 	
-	static IImport readImport(DataInput dis) throws IOException
+	static IImport readImport(DataInput in) throws IOException
 	{
-		final byte type = dis.readByte();
+		final byte type = in.readByte();
 		if (type == 0)
 		{
 			return null;
 		}
 
-		final IImport iimport = fromTag(type);
-		assert iimport != null;
+		final IImport theImport = fromTag(type);
+		assert theImport != null;
 
-		iimport.readData(dis);
-		return iimport;
+		theImport.readData(in);
+		return theImport;
 	}
 	
 	void writeData(DataOutput out) throws IOException;

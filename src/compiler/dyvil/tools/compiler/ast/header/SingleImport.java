@@ -24,14 +24,19 @@ import java.io.IOException;
 
 public final class SingleImport extends Import
 {
-	public Name name;
-	public Name alias;
+	protected Name name;
+	protected Name alias;
 
 	private IClass  theClass;
 	private Package thePackage;
 
 	private IDataMember   field;
 	private List<IMethod> methods;
+
+	public SingleImport()
+	{
+		super(null);
+	}
 
 	public SingleImport(ICodePosition position)
 	{
@@ -50,16 +55,26 @@ public final class SingleImport extends Import
 		return SINGLE;
 	}
 
-	@Override
-	public void setAlias(Name alias)
+	public Name getName()
 	{
-		this.alias = alias;
+		return this.name;
+	}
+
+	public void setName(Name name)
+	{
+		this.name = name;
 	}
 
 	@Override
 	public Name getAlias()
 	{
 		return this.alias;
+	}
+
+	@Override
+	public void setAlias(Name alias)
+	{
+		this.alias = alias;
 	}
 
 	@Override

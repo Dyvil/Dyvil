@@ -23,6 +23,11 @@ public final class MultiImport extends Import implements IImportList
 {
 	private IImport[] imports = new IImport[2];
 	private int importCount;
+
+	public MultiImport()
+	{
+		super(null);
+	}
 	
 	public MultiImport(ICodePosition position)
 	{
@@ -91,7 +96,7 @@ public final class MultiImport extends Import implements IImportList
 	{
 		return null;
 	}
-	
+
 	@Override
 	public Package resolvePackage(Name name)
 	{
