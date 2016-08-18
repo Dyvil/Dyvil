@@ -42,6 +42,12 @@ public interface IDefaultContext extends IStaticContext
 	}
 
 	@Override
+	default IDyvilHeader resolveHeader(Name name)
+	{
+		return null;
+	}
+
+	@Override
 	default IClass resolveClass(Name name)
 	{
 		return null;

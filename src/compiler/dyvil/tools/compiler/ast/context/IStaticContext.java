@@ -48,7 +48,10 @@ public interface IStaticContext extends IContext
 
 	@Override
 	Package resolvePackage(Name name);
-	
+
+	@Override
+	IDyvilHeader resolveHeader(Name name);
+
 	@Override
 	IClass resolveClass(Name name);
 	

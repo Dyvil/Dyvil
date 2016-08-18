@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IImportContext;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
@@ -20,7 +21,7 @@ import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.parsing.Name;
 
-public interface IContext extends IMemberContext
+public interface IContext extends IMemberContext, IImportContext
 {
 	byte VISIBLE   = 0;
 	byte INVISIBLE = 1;
@@ -62,13 +63,18 @@ public interface IContext extends IMemberContext
 	Package resolvePackage(Name name);
 
 	@Override
+	IDyvilHeader resolveHeader(Name name);
+
+	@Override
 	IClass resolveClass(Name name);
 
+	@Override
 	ITypeAlias resolveTypeAlias(Name name, int arity);
 
 	@Override
 	ITypeParameter resolveTypeParameter(Name name);
 
+	@Override
 	IOperator resolveOperator(Name name, int type);
 
 	@Override

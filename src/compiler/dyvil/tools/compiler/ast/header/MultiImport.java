@@ -5,9 +5,12 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
+import dyvil.tools.compiler.ast.operator.IOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -126,14 +129,56 @@ public final class MultiImport extends Import implements IImportContext, IImport
 	}
 
 	@Override
+	public IDyvilHeader resolveHeader(Name name)
+	{
+		for (int i = 0; i < this.importCount; i++)
+		{
+			final IDyvilHeader result = this.imports[i].asContext().resolveHeader(name);
+			if (result != null)
+			{
+				return result;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public ITypeAlias resolveTypeAlias(Name name, int arity)
+	{
+		for (int i = 0; i < this.importCount; i++)
+		{
+			final ITypeAlias result = this.imports[i].asContext().resolveTypeAlias(name, arity);
+			if (result != null)
+			{
+				return result;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public IOperator resolveOperator(Name name, int type)
+	{
+		for (int i = 0; i < this.importCount; i++)
+		{
+			final IOperator result = this.imports[i].asContext().resolveOperator(name, type);
+			if (result != null)
+			{
+				return result;
+			}
+		}
+		return null;
+	}
+
+	@Override
 	public IClass resolveClass(Name name)
 	{
 		for (int i = 0; i < this.importCount; i++)
 		{
-			IClass iclass = this.imports[i].asContext().resolveClass(name);
-			if (iclass != null)
+			final IClass result = this.imports[i].asContext().resolveClass(name);
+			if (result != null)
 			{
-				return iclass;
+				return result;
 			}
 		}
 		return null;
@@ -144,10 +189,10 @@ public final class MultiImport extends Import implements IImportContext, IImport
 	{
 		for (int i = 0; i < this.importCount; i++)
 		{
-			IDataMember match = this.imports[i].asContext().resolveField(name);
-			if (match != null)
+			final IDataMember field = this.imports[i].asContext().resolveField(name);
+			if (field != null)
 			{
-				return match;
+				return field;
 			}
 		}
 		return null;
