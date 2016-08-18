@@ -172,7 +172,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 			return match;
 		}
 
-		return Types.LANG_HEADER.resolveField(name);
+		return Types.BASE_CONTEXT.resolveField(name);
 	}
 
 	static IMethod resolveMethod(IContext context, IValue receiver, Name name, IArguments arguments)
@@ -228,7 +228,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 		}
 
 		// Methods available through the Lang Header
-		Types.LANG_HEADER.getMethodMatches(matches, receiver, name, arguments);
+		Types.BASE_CONTEXT.getMethodMatches(matches, receiver, name, arguments);
 		return matches;
 	}
 }

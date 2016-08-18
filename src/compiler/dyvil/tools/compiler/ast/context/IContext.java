@@ -106,7 +106,7 @@ public interface IContext extends IMemberContext, IImportContext
 		final IOperator operator = context.resolveOperator(name, type);
 		if (operator == null || operator.getType() != type)
 		{
-			return Types.LANG_HEADER.resolveOperator(name, type);
+			return Types.BASE_CONTEXT.resolveOperator(name, type);
 		}
 		return operator;
 	}

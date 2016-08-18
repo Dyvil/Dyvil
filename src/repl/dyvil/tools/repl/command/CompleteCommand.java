@@ -295,7 +295,7 @@ public class CompleteCommand implements ICommand
 		MatchList<IMethod> matchList = new MatchList<>(repl.getContext());
 		type.getMethodMatches(matchList, value, null, null);
 		repl.getContext().getMethodMatches(matchList, value, null, null);
-		Types.LANG_HEADER.getMethodMatches(matchList, value, null, null);
+		Types.BASE_CONTEXT.getMethodMatches(matchList, value, null, null);
 
 		for (int i = 0, count = matchList.size(); i < count; i++)
 		{
@@ -308,7 +308,7 @@ public class CompleteCommand implements ICommand
 		MatchList<IMethod> matchList = new MatchList<>(null);
 		type.getImplicitMatches(matchList, value, null);
 		repl.getContext().getImplicitMatches(matchList, value, null);
-		Types.LANG_HEADER.getImplicitMatches(matchList, value, null);
+		Types.BASE_CONTEXT.getImplicitMatches(matchList, value, null);
 
 		for (int i = 0, count = matchList.size(); i < count; i++)
 		{

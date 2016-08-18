@@ -6,6 +6,7 @@ import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.dynamic.DynamicType;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.structure.IDyvilHeader;
@@ -22,6 +23,7 @@ import dyvil.tools.parsing.Name;
 public final class Types
 {
 	public static IDyvilHeader LANG_HEADER;
+	public static IContext BASE_CONTEXT;
 
 	public static final PrimitiveType VOID    = new PrimitiveType(Names._void, PrimitiveType.VOID_CODE, 'V',
 	                                                              Opcodes.ILOAD + Opcodes.RETURN - Opcodes.IRETURN,
@@ -98,6 +100,7 @@ public final class Types
 	public static void initHeaders()
 	{
 		LANG_HEADER = Package.dyvil.resolveHeader("Lang");
+		BASE_CONTEXT = LANG_HEADER.getContext();
 	}
 
 	public static void initTypes()
