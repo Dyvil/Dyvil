@@ -125,7 +125,7 @@ public class NamedType implements IRawType, ITypeConsumer
 		this.parent = this.parent.resolveType(markers, context);
 		if (!this.parent.isResolved())
 		{
-			return null;
+			return this;
 		}
 
 		return this.resolveWithParent(markers);
