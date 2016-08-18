@@ -83,21 +83,14 @@ public class DyvilHeaderParser extends Parser
 		switch (type)
 		{
 		case DyvilKeywords.IMPORT:
-		{
 			pm.pushParser(new ImportParser(this.importConsumer(token)));
 			return true;
-		}
 		case DyvilKeywords.USING:
-		{
-			pm.pushParser(new ImportParser(this.importConsumer(token), KindedImport.STATIC));
+			pm.pushParser(new ImportParser(this.importConsumer(token), KindedImport.USING_DECLARATION));
 			return true;
-		}
 		case DyvilKeywords.INCLUDE:
-		{
-			final IncludeDeclaration declaration = new IncludeDeclaration(token.raw());
-			pm.pushParser(new IncludeParser(this.unit, declaration));
+			pm.pushParser(new ImportParser(this.importConsumer(token), KindedImport.INCLUDE_DECLARATION));
 			return true;
-		}
 		case DyvilKeywords.OPERATOR:
 			pm.pushParser(new OperatorParser(this.unit, Operator.INFIX), true);
 			return true;

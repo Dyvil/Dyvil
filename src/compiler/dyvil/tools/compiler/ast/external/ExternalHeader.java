@@ -29,11 +29,6 @@ public class ExternalHeader extends DyvilHeader
 	{
 		this.resolved |= IMPORTS;
 
-		for (int i = 0; i < this.includeCount; i++)
-		{
-			this.includes[i].resolveTypes(null, this);
-		}
-
 		for (int i = 0; i < this.importCount; i++)
 		{
 			final ImportDeclaration declaration = this.importDeclarations[i];

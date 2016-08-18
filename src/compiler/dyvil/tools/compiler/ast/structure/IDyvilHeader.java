@@ -6,7 +6,6 @@ import dyvil.tools.compiler.ast.classes.IClassList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.header.HeaderDeclaration;
 import dyvil.tools.compiler.ast.header.ImportDeclaration;
-import dyvil.tools.compiler.ast.header.IncludeDeclaration;
 import dyvil.tools.compiler.ast.header.PackageDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.operator.IOperator;
@@ -60,14 +59,6 @@ public interface IDyvilHeader extends IObjectCompilable, IContext, IClassList, I
 	void addImport(ImportDeclaration component);
 
 	ImportDeclaration getImport(int index);
-
-	// Include
-	
-	int includeCount();
-	
-	void addInclude(IncludeDeclaration component);
-	
-	IncludeDeclaration getInclude(int index);
 	
 	// Operators
 	

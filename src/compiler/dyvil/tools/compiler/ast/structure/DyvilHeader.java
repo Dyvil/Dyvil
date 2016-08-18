@@ -14,7 +14,6 @@ import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.header.HeaderDeclaration;
 import dyvil.tools.compiler.ast.header.ImportDeclaration;
-import dyvil.tools.compiler.ast.header.IncludeDeclaration;
 import dyvil.tools.compiler.ast.header.PackageDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -67,13 +66,11 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader, IDefaultCont
 	protected PackageDeclaration packageDeclaration;
 
 	protected ImportDeclaration[] importDeclarations = new ImportDeclaration[8];
-	protected int                  importCount;
-	protected IncludeDeclaration[] includes;
-	protected int                  includeCount;
-	protected ITypeAlias[]         typeAliases;
-	protected int                  typeAliasCount;
-	protected IOperator[]          operators;
-	protected int                  operatorCount;
+	protected int          importCount;
+	protected ITypeAlias[] typeAliases;
+	protected int          typeAliasCount;
+	protected IOperator[]  operators;
+	protected int          operatorCount;
 
 	protected Map<Name, IOperator> infixOperatorMap;
 
@@ -231,42 +228,9 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader, IDefaultCont
 	}
 
 	@Override
-	public int includeCount()
-	{
-		return this.includeCount;
-	}
-
-	@Override
-	public void addInclude(IncludeDeclaration includeDeclaration)
-	{
-		if (this.includes == null)
-		{
-			this.includes = new IncludeDeclaration[2];
-			this.includes[0] = includeDeclaration;
-			this.includeCount = 1;
-			return;
-		}
-
-		final int index = this.includeCount++;
-		if (index >= this.includes.length)
-		{
-			IncludeDeclaration[] temp = new IncludeDeclaration[index * 2];
-			System.arraycopy(this.includes, 0, temp, 0, this.includes.length);
-			this.includes = temp;
-		}
-		this.includes[index] = includeDeclaration;
-	}
-
-	@Override
-	public IncludeDeclaration getInclude(int index)
-	{
-		return this.includes[index];
-	}
-
-	@Override
 	public boolean hasMemberImports()
 	{
-		return this.importCount > 0 || this.includeCount > 0;
+		return this.importCount > 0;
 	}
 
 	// Operators
@@ -451,11 +415,6 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader, IDefaultCont
 	public void resolveTypes()
 	{
 		final IContext context = this.getContext();
-
-		for (int i = 0; i < this.includeCount; i++)
-		{
-			this.includes[i].resolveTypes(this.markers, this);
-		}
 
 		for (int i = 0; i < this.importCount; i++)
 		{
@@ -675,14 +634,6 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader, IDefaultCont
 		// Header Name
 		this.headerDeclaration.write(out);
 
-		// Include Declarations
-		int includes = this.includeCount;
-		out.writeShort(includes);
-		for (int i = 0; i < includes; i++)
-		{
-			this.includes[i].write(out);
-		}
-
 		// Import Declarations
 		int imports = this.importCount;
 		out.writeShort(imports);
@@ -716,15 +667,6 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader, IDefaultCont
 		this.headerDeclaration.read(in);
 
 		this.name = this.headerDeclaration.getName();
-
-		// Include Declarations
-		int includes = in.readShort();
-		for (int i = 0; i < includes; i++)
-		{
-			IncludeDeclaration id = new IncludeDeclaration();
-			id.read(in);
-			this.addInclude(id);
-		}
 
 		// Import Declarations
 		int imports = in.readShort();
@@ -769,17 +711,6 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader, IDefaultCont
 			{
 				buffer.append('\n');
 			}
-		}
-
-		if (this.includeCount > 0)
-		{
-			for (int i = 0; i < this.includeCount; i++)
-			{
-				buffer.append(prefix);
-				this.includes[i].toString(prefix, buffer);
-				buffer.append(";\n");
-			}
-			buffer.append('\n');
 		}
 
 		if (this.importCount > 0)
@@ -875,9 +806,10 @@ class HeaderContext implements IStaticContext
 			return candidate;
 		}
 
-		for (int i = 0; i < this.header.includeCount; i++)
+		for (int i = 0; i < this.header.importCount; i++)
 		{
-			final ITypeAlias includedTypeAlias = this.header.includes[i].getContext().resolveTypeAlias(name, arity);
+			final ITypeAlias includedTypeAlias = this.header.importDeclarations[i].getContext()
+			                                                                      .resolveTypeAlias(name, arity);
 			if (includedTypeAlias != null && includedTypeAlias.typeParameterCount() == arity)
 			{
 				return includedTypeAlias;
@@ -896,9 +828,9 @@ class HeaderContext implements IStaticContext
 			return candidate;
 		}
 
-		for (int i = 0; i < this.header.includeCount; i++)
+		for (int i = 0; i < this.header.importCount; i++)
 		{
-			final IOperator operator = this.header.includes[i].getContext().resolveOperator(name, type);
+			final IOperator operator = this.header.importDeclarations[i].getContext().resolveOperator(name, type);
 			if (operator != null && operator.getType() == type)
 			{
 				return operator;
@@ -921,16 +853,6 @@ class HeaderContext implements IStaticContext
 		for (int i = 0; i < this.header.importCount; i++)
 		{
 			theClass = this.header.importDeclarations[i].getContext().resolveClass(name);
-			if (theClass != null)
-			{
-				return theClass;
-			}
-		}
-
-		// Included Headers
-		for (int i = 0; i < this.header.includeCount; i++)
-		{
-			theClass = this.header.includes[i].getContext().resolveClass(name);
 			if (theClass != null)
 			{
 				return theClass;
@@ -962,14 +884,6 @@ class HeaderContext implements IStaticContext
 			}
 		}
 
-		for (int i = 0; i < this.header.includeCount; i++)
-		{
-			field = this.header.includes[i].getContext().resolveField(name);
-			if (field != null)
-			{
-				return field;
-			}
-		}
 		return null;
 	}
 
@@ -980,11 +894,6 @@ class HeaderContext implements IStaticContext
 		{
 			this.header.importDeclarations[i].getContext().getMethodMatches(list, receiver, name, arguments);
 		}
-
-		for (int i = 0; i < this.header.includeCount; i++)
-		{
-			this.header.includes[i].getContext().getMethodMatches(list, receiver, name, arguments);
-		}
 	}
 
 	@Override
@@ -993,11 +902,6 @@ class HeaderContext implements IStaticContext
 		for (int i = 0; i < this.header.importCount; i++)
 		{
 			this.header.importDeclarations[i].getContext().getImplicitMatches(list, value, targetType);
-		}
-
-		for (int i = 0; i < this.header.includeCount; i++)
-		{
-			this.header.includes[i].getContext().getImplicitMatches(list, value, targetType);
 		}
 	}
 }

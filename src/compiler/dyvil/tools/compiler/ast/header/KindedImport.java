@@ -22,12 +22,13 @@ public class KindedImport implements IImport
 	public static final int VAR      = 0x40;
 
 	public static final int IMPLICIT = 0x1000;
+	public static final int INLINE   = 0x2000;
 
 	public static final int STATIC = VAR | FUNC;
 	public static final int PARENT = PACKAGE | HEADER | CLASS;
 	public static final int ANY    = -1;
 
-	public static final int USING_DECLARATION   = STATIC ;// | INLINE | HEADER;
+	public static final int USING_DECLARATION   = STATIC | INLINE | HEADER;
 	public static final int INCLUDE_DECLARATION = INLINE | HEADER;
 
 	public KindedImport()
@@ -56,6 +57,7 @@ public class KindedImport implements IImport
 		case DyvilKeywords.LET: return VAR;
 		case DyvilKeywords.FUNC: return FUNC;
 
+		case DyvilKeywords.INLINE: return INLINE | HEADER;
 		case DyvilKeywords.IMPLICIT: return IMPLICIT | FUNC;
 		// @formatter:on
 		}

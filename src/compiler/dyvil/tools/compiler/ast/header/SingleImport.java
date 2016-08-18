@@ -1,10 +1,12 @@
 package dyvil.tools.compiler.ast.header;
 
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.external.ExternalHeader;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
@@ -131,6 +133,10 @@ public final class SingleImport extends Import implements IDefaultContext
 			final IDyvilHeader header = context.resolveHeader(this.name);
 			if (header != null)
 			{
+				if ((mask & KindedImport.INLINE) != 0 && this.checkInline(markers, context, header))
+				{
+					this.asContext = new CombiningContext(this, header.getContext());
+				}
 				this.asParentContext = !resolved ? header : new CombiningContext(header, this.asParentContext);
 				resolved = true;
 			}
@@ -189,6 +195,45 @@ public final class SingleImport extends Import implements IDefaultContext
 		}
 
 		markers.add(Markers.semanticError(this.position, "import.resolve", this.name.qualified));
+	}
+
+	private boolean checkInline(MarkerList markers, IImportContext context, IDyvilHeader header)
+	{
+		// Check if the Header has a Header Declaration
+		final HeaderDeclaration headerDeclaration = header.getHeaderDeclaration();
+		if (headerDeclaration == null)
+		{
+			return header.isHeader();
+		}
+
+		// Header Access Check
+		int accessLevel = headerDeclaration.getModifiers().toFlags() & Modifiers.ACCESS_MODIFIERS;
+		if ((accessLevel & Modifiers.INTERNAL) != 0)
+		{
+			if (header instanceof ExternalHeader)
+			{
+				markers.add(Markers.semanticError(this.position, "include.internal", header.getName()));
+				return false;
+			}
+			accessLevel &= 0b1111;
+		}
+
+		switch (accessLevel)
+		{
+		case Modifiers.PACKAGE:
+		case Modifiers.PROTECTED:
+			// TODO if (header.getPackage() == context.getHeader().getPackage())
+			{
+				return true;
+			}
+			// Fallthrough
+		case Modifiers.PRIVATE:
+			markers.add(Markers.semanticError(this.position, "include.invisible", header.getName()));
+			return false;
+		}
+
+		// All checks passed
+		return true;
 	}
 
 	@Override

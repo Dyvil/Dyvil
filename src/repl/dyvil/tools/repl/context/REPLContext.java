@@ -19,7 +19,6 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.header.ImportDeclaration;
-import dyvil.tools.compiler.ast.header.IncludeDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -299,20 +298,6 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 
 		super.addImport(declaration);
 		this.compiler.getOutput().println("Imported " + declaration.getImport());
-	}
-
-	@Override
-	public void addInclude(IncludeDeclaration includeDeclaration)
-	{
-		includeDeclaration.resolveTypes(this.markers, this);
-
-		if (this.hasErrors())
-		{
-			return;
-		}
-
-		super.addInclude(includeDeclaration);
-		this.compiler.getOutput().println("Included " + includeDeclaration.getHeader().getFullName());
 	}
 
 	@Override
