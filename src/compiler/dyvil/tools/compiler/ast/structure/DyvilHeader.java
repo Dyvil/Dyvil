@@ -8,6 +8,7 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
+import dyvil.tools.compiler.ast.context.IStaticContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.IDataMember;
@@ -832,13 +833,31 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader, IDefaultCont
 	}
 }
 
-class HeaderContext implements IDefaultContext
+class HeaderContext implements IStaticContext
 {
 	private DyvilHeader header;
 
 	public HeaderContext(DyvilHeader header)
 	{
 		this.header = header;
+	}
+
+	@Override
+	public DyvilCompiler getCompilationContext()
+	{
+		return this.header.getCompilationContext();
+	}
+
+	@Override
+	public IDyvilHeader getHeader()
+	{
+		return this.header;
+	}
+
+	@Override
+	public Package resolvePackage(Name name)
+	{
+		return this.header.resolvePackage(name);
 	}
 
 	@Override
@@ -851,7 +870,7 @@ class HeaderContext implements IDefaultContext
 	public ITypeAlias resolveTypeAlias(Name name, int arity)
 	{
 		final ITypeAlias candidate = this.header.resolveTypeAlias(name, arity);
-		if (candidate != null)
+		if (candidate != null && candidate.typeParameterCount() == arity)
 		{
 			return candidate;
 		}
@@ -859,13 +878,13 @@ class HeaderContext implements IDefaultContext
 		for (int i = 0; i < this.header.includeCount; i++)
 		{
 			final ITypeAlias includedTypeAlias = this.header.includes[i].getContext().resolveTypeAlias(name, arity);
-			if (includedTypeAlias != null)
+			if (includedTypeAlias != null && includedTypeAlias.typeParameterCount() == arity)
 			{
 				return includedTypeAlias;
 			}
 		}
 
-		return null;
+		return candidate;
 	}
 
 	@Override
@@ -880,13 +899,13 @@ class HeaderContext implements IDefaultContext
 		for (int i = 0; i < this.header.includeCount; i++)
 		{
 			final IOperator operator = this.header.includes[i].getContext().resolveOperator(name, type);
-			if (operator != null)
+			if (operator != null && operator.getType() == type)
 			{
 				return operator;
 			}
 		}
 
-		return null;
+		return candidate;
 	}
 
 	@Override
