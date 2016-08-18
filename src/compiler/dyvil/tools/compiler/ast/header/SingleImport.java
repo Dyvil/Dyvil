@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.header;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -23,14 +24,31 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public final class SingleImport extends Import implements IImportContext
+public final class SingleImport extends Import implements IDefaultContext
 {
 	protected Name name;
 	protected Name alias;
 
-	private IImportContext parentContext;
-	private IContext       thisContext;
-	private int            mask;
+	// Metadata
+
+	/**
+	 * The context that will be used to resolve fields, methods, etc.
+	 */
+	private IImportContext resolver;
+
+	/**
+	 * The context that is returned by {@link #asContext()}. Can be either {@code this} object or a context that first
+	 * searches {@code this} and then the {@code inline}d header.
+	 */
+	private IContext asContext = this;
+
+	/**
+	 * The context that is returned by {@link #asParentContext()}. Will be a chain that searches the class, header and
+	 * package with this name, in that order.
+	 */
+	private IContext asParentContext;
+
+	private int mask;
 
 	public SingleImport()
 	{
@@ -96,7 +114,7 @@ public final class SingleImport extends Import implements IImportContext
 		}
 
 		boolean resolved = false;
-		this.parentContext = context;
+		this.resolver = context;
 		this.mask = mask;
 
 		if ((mask & KindedImport.CLASS) != 0)
@@ -104,7 +122,7 @@ public final class SingleImport extends Import implements IImportContext
 			final IClass theClass = context.resolveClass(this.name);
 			if (theClass != null)
 			{
-				this.thisContext = theClass;
+				this.asParentContext = theClass;
 				resolved = true;
 			}
 		}
@@ -113,7 +131,7 @@ public final class SingleImport extends Import implements IImportContext
 			final IDyvilHeader header = context.resolveHeader(this.name);
 			if (header != null)
 			{
-				this.thisContext = !resolved ? header : new CombiningContext(header, this.thisContext);
+				this.asParentContext = !resolved ? header : new CombiningContext(header, this.asParentContext);
 				resolved = true;
 			}
 		}
@@ -122,9 +140,14 @@ public final class SingleImport extends Import implements IImportContext
 			final Package thePackage = context.resolvePackage(this.name);
 			if (thePackage != null)
 			{
-				this.thisContext = !resolved ? thePackage : new CombiningContext(thePackage, this.thisContext);
+				this.asParentContext = !resolved ? thePackage : new CombiningContext(thePackage, this.asParentContext);
 				resolved = true;
 			}
+		}
+
+		if (!resolved)
+		{
+			this.asParentContext = IDefaultContext.DEFAULT;
 		}
 
 		// error later
@@ -133,13 +156,13 @@ public final class SingleImport extends Import implements IImportContext
 	@Override
 	public void resolve(MarkerList markers, IImportContext context, int mask)
 	{
-		if (this.thisContext != null)
+		if (this.asParentContext != null)
 		{
 			// A class, package or type was found with this name
 			return;
 		}
 
-		context = this.parentContext;
+		context = this.resolver;
 		if ((mask & KindedImport.VAR) != 0 && context.resolveField(this.name) != null)
 		{
 			return;
@@ -171,13 +194,13 @@ public final class SingleImport extends Import implements IImportContext
 	@Override
 	public IImportContext asContext()
 	{
-		return this;
+		return this.asContext;
 	}
 
 	@Override
 	public IImportContext asParentContext()
 	{
-		return this.thisContext;
+		return this.asParentContext;
 	}
 
 	@Override
@@ -185,7 +208,7 @@ public final class SingleImport extends Import implements IImportContext
 	{
 		if (this.checkName(KindedImport.PACKAGE, name))
 		{
-			return this.parentContext.resolvePackage(this.name);
+			return this.resolver.resolvePackage(this.name);
 		}
 		return null;
 	}
@@ -195,7 +218,7 @@ public final class SingleImport extends Import implements IImportContext
 	{
 		if (this.checkName(KindedImport.HEADER, name))
 		{
-			return this.parentContext.resolveHeader(this.name);
+			return this.resolver.resolveHeader(this.name);
 		}
 		return null;
 	}
@@ -205,7 +228,7 @@ public final class SingleImport extends Import implements IImportContext
 	{
 		if (this.checkName(KindedImport.TYPE, name))
 		{
-			return this.parentContext.resolveTypeAlias(this.name, arity);
+			return this.resolver.resolveTypeAlias(this.name, arity);
 		}
 		return null;
 	}
@@ -215,7 +238,7 @@ public final class SingleImport extends Import implements IImportContext
 	{
 		if (this.checkName(KindedImport.OPERATOR, name))
 		{
-			return this.parentContext.resolveOperator(this.name, type);
+			return this.resolver.resolveOperator(this.name, type);
 		}
 		return null;
 	}
@@ -225,7 +248,7 @@ public final class SingleImport extends Import implements IImportContext
 	{
 		if (this.checkName(KindedImport.CLASS, name))
 		{
-			return this.parentContext.resolveClass(this.name);
+			return this.resolver.resolveClass(this.name);
 		}
 		return null;
 	}
@@ -235,7 +258,7 @@ public final class SingleImport extends Import implements IImportContext
 	{
 		if (this.checkName(KindedImport.VAR, name))
 		{
-			return this.parentContext.resolveField(this.name);
+			return this.resolver.resolveField(this.name);
 		}
 		return null;
 	}
@@ -245,16 +268,16 @@ public final class SingleImport extends Import implements IImportContext
 	{
 		if (this.checkName(KindedImport.FUNC, name))
 		{
-			this.parentContext.getMethodMatches(list, receiver, this.name, arguments);
+			this.resolver.getMethodMatches(list, receiver, this.name, arguments);
 		}
 	}
 
 	@Override
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
-		if (this.hasMask(KindedImport.FUNC))
+		if (this.hasMask(KindedImport.IMPLICIT))
 		{
-			this.parentContext.getImplicitMatches(list, value, targetType);
+			this.resolver.getImplicitMatches(list, value, targetType);
 		}
 	}
 

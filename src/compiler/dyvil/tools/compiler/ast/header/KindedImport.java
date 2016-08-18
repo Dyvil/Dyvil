@@ -21,9 +21,14 @@ public class KindedImport implements IImport
 	public static final int FUNC     = 0x20;
 	public static final int VAR      = 0x40;
 
+	public static final int IMPLICIT = 0x1000;
+
 	public static final int STATIC = VAR | FUNC;
 	public static final int PARENT = PACKAGE | HEADER | CLASS;
 	public static final int ANY    = -1;
+
+	public static final int USING_DECLARATION   = STATIC ;// | INLINE | HEADER;
+	public static final int INCLUDE_DECLARATION = INLINE | HEADER;
 
 	public KindedImport()
 	{
@@ -39,24 +44,20 @@ public class KindedImport implements IImport
 	{
 		switch (type)
 		{
-		case DyvilKeywords.PACKAGE:
-			return KindedImport.PACKAGE;
-		case DyvilKeywords.HEADER:
-			return KindedImport.HEADER;
-		case DyvilKeywords.OPERATOR:
-			return KindedImport.OPERATOR;
-		case DyvilKeywords.TYPE:
-			return KindedImport.TYPE;
-		case DyvilKeywords.CLASS:
-			return KindedImport.CLASS;
-		case DyvilKeywords.STATIC:
-			return KindedImport.STATIC;
+		// @formatter:off
+		case DyvilKeywords.PACKAGE: return PACKAGE;
+		case DyvilKeywords.HEADER: return HEADER;
+		case DyvilKeywords.OPERATOR: return OPERATOR;
+		case DyvilKeywords.TYPE: return TYPE;
+		case DyvilKeywords.CLASS: return CLASS;
+		case DyvilKeywords.STATIC: return STATIC;
 		case DyvilKeywords.VAR:
 		case DyvilKeywords.CONST:
-		case DyvilKeywords.LET:
-			return KindedImport.VAR;
-		case DyvilKeywords.FUNC:
-			return KindedImport.FUNC;
+		case DyvilKeywords.LET: return VAR;
+		case DyvilKeywords.FUNC: return FUNC;
+
+		case DyvilKeywords.IMPLICIT: return IMPLICIT | FUNC;
+		// @formatter:on
 		}
 		return 0;
 	}
@@ -111,14 +112,14 @@ public class KindedImport implements IImport
 	public void writeData(DataOutput out) throws IOException
 	{
 		// currently, only 7 bits are used, so a byte is sufficient
-		out.writeByte(this.mask);
+		out.writeShort(this.mask);
 		IImport.writeImport(this.child, out);
 	}
 
 	@Override
 	public void readData(DataInput in) throws IOException
 	{
-		this.mask = in.readUnsignedByte();
+		this.mask = in.readUnsignedShort();
 		this.child = IImport.readImport(in);
 	}
 
