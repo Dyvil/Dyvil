@@ -96,6 +96,7 @@ public final class SingleImport extends Import implements IImportContext
 		}
 
 		boolean resolved = false;
+		this.parentContext = context;
 		this.mask = mask;
 
 		if ((mask & KindedImport.CLASS) != 0)
@@ -126,29 +127,22 @@ public final class SingleImport extends Import implements IImportContext
 			}
 		}
 
-		if (resolved)
-		{
-			this.parentContext = context;
-		}
 		// error later
 	}
 
 	@Override
 	public void resolve(MarkerList markers, IImportContext context, int mask)
 	{
-		if (this.parentContext != null)
+		if (this.thisContext != null)
 		{
+			// A class, package or type was found with this name
 			return;
 		}
 
-		if ((mask & KindedImport.VAR) != 0)
+		context = this.parentContext;
+		if ((mask & KindedImport.VAR) != 0 && context.resolveField(this.name) != null)
 		{
-			final IDataMember field = context.resolveField(this.name);
-			if (field != null)
-			{
-				this.parentContext = context;
-				return;
-			}
+			return;
 		}
 
 		if ((mask & KindedImport.FUNC) != 0)
@@ -157,12 +151,21 @@ public final class SingleImport extends Import implements IImportContext
 			context.getMethodMatches(methods, null, this.name, null);
 			if (!methods.isEmpty())
 			{
-				this.parentContext = context;
 				return;
 			}
 		}
 
-		markers.add(Markers.semantic(this.position, "import.resolve", this.name.qualified));
+		if ((mask & KindedImport.OPERATOR) != 0 && context.resolveOperator(this.name, -1) != null)
+		{
+			return;
+		}
+
+		if ((mask & KindedImport.TYPE) != 0 && context.resolveTypeAlias(this.name, -1) != null)
+		{
+			return;
+		}
+
+		markers.add(Markers.semanticError(this.position, "import.resolve", this.name.qualified));
 	}
 
 	@Override
