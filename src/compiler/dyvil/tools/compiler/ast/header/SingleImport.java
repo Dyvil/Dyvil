@@ -212,7 +212,7 @@ public final class SingleImport extends Import implements IDefaultContext
 		{
 			if (header instanceof ExternalHeader)
 			{
-				markers.add(Markers.semanticError(this.position, "include.internal", header.getName()));
+				markers.add(Markers.semanticError(this.position, "import.inline_header.internal", header.getName()));
 				return false;
 			}
 			accessLevel &= 0b1111;
@@ -228,7 +228,7 @@ public final class SingleImport extends Import implements IDefaultContext
 			}
 			// Fallthrough
 		case Modifiers.PRIVATE:
-			markers.add(Markers.semanticError(this.position, "include.invisible", header.getName()));
+			markers.add(Markers.semanticError(this.position, "import.inline_header.invisible", header.getName()));
 			return false;
 		}
 
