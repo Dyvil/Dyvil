@@ -1,6 +1,6 @@
 package dyvil.test
 
-include dyvil.Collections
+using dyvil.Collections
 
 public class FibonacciTest
 {
