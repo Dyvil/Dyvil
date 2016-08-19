@@ -1,7 +1,7 @@
 Dyvil v0.24.0
 =============
 
-- Added support for virtual dispatch for static methods called on type variable types.
+- Added support for virtual dispatch for static methods called on type variable types. #296
 - Added the `struct` and `template` keywords.
 - Deprecated the `[Type...]` syntax for `List<Type>`.
 - Dropped support for the old C-Style Statement Label syntax.
@@ -33,7 +33,7 @@ Dyvil v0.24.0
 - Made the `ReflectUtils.JAVA_LANG_ACCESS` field `public`.
 - Moved the `dyvil.lang.literal.*Convertible` classes as inner classes to `dyvil.lang.LiteralConvertible.From*`.
 - Removed the `Option.?` operator.
-- Removed the `dyvil.lang.Void` class.
+- Removed the `dyvil.lang.Void` class. #297
 - Un-deprecated the `Name.fromUnqualified(String)` method.
 - Updated references to the former `*Convertible` classes in Dyvil source code.
 - Updated the `@Reified` annotation to take a `Reified.Type` enum argument.
@@ -46,7 +46,7 @@ Dyvil v0.24.0
 
 ## Dyvil Compiler v0.24.0
 
-- Named Argument Lists now ensure their Arguments to be evaluated in source order.
+- Named Argument Lists now ensure their Arguments to be evaluated in source order. #279
 - Added an additional `genericArg` parameter to the `IType.appendSignature(StringBuilder)` method.
 - Added the `AnnotationUtil.getEnumValue(IArguments, IParameter, Class)` and `.getStringValue(IArguments, IParameter)` methods.
 - Added the `ArrayType.getPosition` method.
@@ -89,7 +89,7 @@ Dyvil v0.24.0
 - Renamed the `AbstractMethod.mangledName` field to `internalName`.
 - Renamed the `CaptureField.name` field to `internalName`.
 - Renamed the `IMethod.getMangledName()` method to `getInternalName`.
-- Replaced references to `dyvil.lang.Void` with `java.lang.Void`.
+- Replaced references to `dyvil.lang.Void` with `java.lang.Void`. #297
 - Updated Compound Assignment AST Conversion.
 - Updated External Classes to load inner classes on demand instead of all at once.
 - Updated Instance Field References to generate `invokedynamic` calls.
