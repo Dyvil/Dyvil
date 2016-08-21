@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.header;
 
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.util.Markers;
@@ -31,31 +32,31 @@ public final class WildcardImport extends Import
 	}
 
 	@Override
-	public void resolveTypes(MarkerList markers, IImportContext context, int mask)
+	public void resolveTypes(MarkerList markers, IContext context, IImportContext parentContext, int mask)
 	{
 		if (this.parent != null)
 		{
-			this.parent.resolveTypes(markers, context, KindedImport.PARENT);
-			context = this.parent.asParentContext();
+			this.parent.resolveTypes(markers, context, parentContext, KindedImport.PARENT);
+			parentContext = this.parent.asParentContext();
 		}
 
-		if ((mask & KindedImport.STATIC) != 0 && context != null)
+		if ((mask & KindedImport.STATIC) != 0 && parentContext != null)
 		{
-			this.context = context;
+			this.context = parentContext;
 			return;
 		}
 
-		if (!(context instanceof Package))
+		if (!(parentContext instanceof Package))
 		{
 			markers.add(Markers.semanticError(this.position, "import.wildcard.invalid"));
 			this.context = IDefaultContext.DEFAULT;
 			return;
 		}
-		this.context = context;
+		this.context = parentContext;
 	}
 
 	@Override
-	public void resolve(MarkerList markers, IImportContext context, int mask)
+	public void resolve(MarkerList markers, IContext context, IImportContext parentContext, int mask)
 	{
 	}
 

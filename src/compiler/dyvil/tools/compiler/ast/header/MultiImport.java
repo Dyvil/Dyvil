@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.header;
 
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -74,31 +75,31 @@ public final class MultiImport extends Import implements IImportContext, IImport
 	}
 
 	@Override
-	public void resolveTypes(MarkerList markers, IImportContext context, int mask)
+	public void resolveTypes(MarkerList markers, IContext context, IImportContext parentContext, int mask)
 	{
 		if (this.parent != null)
 		{
-			this.parent.resolveTypes(markers, context, KindedImport.PARENT);
-			context = this.parent.asParentContext();
+			this.parent.resolveTypes(markers, context, parentContext, KindedImport.PARENT);
+			parentContext = this.parent.asParentContext();
 		}
 
 		for (int i = 0; i < this.importCount; i++)
 		{
-			this.imports[i].resolveTypes(markers, context, mask);
+			this.imports[i].resolveTypes(markers, context, parentContext, mask);
 		}
 	}
 
 	@Override
-	public void resolve(MarkerList markers, IImportContext context, int mask)
+	public void resolve(MarkerList markers, IContext context, IImportContext parentContext, int mask)
 	{
 		if (this.parent != null)
 		{
-			context = this.parent.asParentContext();
+			parentContext = this.parent.asParentContext();
 		}
 
 		for (int i = 0; i < this.importCount; i++)
 		{
-			this.imports[i].resolve(markers, context, mask);
+			this.imports[i].resolve(markers, context, parentContext, mask);
 		}
 	}
 

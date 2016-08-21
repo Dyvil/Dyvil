@@ -414,12 +414,12 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader, IDefaultCont
 	@Override
 	public void resolveTypes()
 	{
-		final IContext context = this.getContext();
-
 		for (int i = 0; i < this.importCount; i++)
 		{
-			this.importDeclarations[i].resolveTypes(this.markers);
+			this.importDeclarations[i].resolveTypes(this.markers, this);
 		}
+
+		final IContext context = this.getContext();
 
 		for (int i = 0; i < this.typeAliasCount; i++)
 		{
@@ -443,7 +443,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader, IDefaultCont
 	{
 		for (int i = 0; i < this.importCount; i++)
 		{
-			this.importDeclarations[i].resolve(this.markers);
+			this.importDeclarations[i].resolve(this.markers, this);
 		}
 	}
 

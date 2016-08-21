@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.header;
 
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -99,15 +100,15 @@ public class KindedImport implements IImport
 	}
 
 	@Override
-	public void resolveTypes(MarkerList markers, IImportContext context, int mask)
+	public void resolveTypes(MarkerList markers, IContext context, IImportContext parentContext, int mask)
 	{
-		this.child.resolveTypes(markers, context, this.orMask(mask));
+		this.child.resolveTypes(markers, context, parentContext, this.orMask(mask));
 	}
 
 	@Override
-	public void resolve(MarkerList markers, IImportContext context, int mask)
+	public void resolve(MarkerList markers, IContext context, IImportContext parentContext, int mask)
 	{
-		this.child.resolve(markers, context, this.orMask(mask));
+		this.child.resolve(markers, context, parentContext, this.orMask(mask));
 	}
 
 	@Override

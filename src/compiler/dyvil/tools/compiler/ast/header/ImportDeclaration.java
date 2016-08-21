@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.header;
 
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.IObjectCompilable;
 import dyvil.tools.compiler.util.Markers;
@@ -43,7 +44,7 @@ public final class ImportDeclaration implements IASTNode, IObjectCompilable
 		return this.theImport;
 	}
 
-	public void resolveTypes(MarkerList markers)
+	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		if (this.theImport == null)
 		{
@@ -51,14 +52,14 @@ public final class ImportDeclaration implements IASTNode, IObjectCompilable
 			return;
 		}
 
-		this.theImport.resolveTypes(markers, Package.rootPackage, KindedImport.ANY);
+		this.theImport.resolveTypes(markers, context, Package.rootPackage, KindedImport.ANY);
 	}
 
-	public void resolve(MarkerList markers)
+	public void resolve(MarkerList markers, IContext context)
 	{
 		if (this.theImport != null)
 		{
-			this.theImport.resolve(markers, Package.rootPackage, KindedImport.ANY);
+			this.theImport.resolve(markers, context, Package.rootPackage, KindedImport.ANY);
 		}
 	}
 

@@ -107,21 +107,21 @@ public final class SingleImport extends Import implements IDefaultContext
 	}
 
 	@Override
-	public void resolveTypes(MarkerList markers, IImportContext context, int mask)
+	public void resolveTypes(MarkerList markers, IContext context, IImportContext parentContext, int mask)
 	{
 		if (this.parent != null)
 		{
-			this.parent.resolveTypes(markers, context, KindedImport.PARENT);
-			context = this.parent.asParentContext();
+			this.parent.resolveTypes(markers, context, parentContext, KindedImport.PARENT);
+			parentContext = this.parent.asParentContext();
 		}
 
 		boolean resolved = false;
-		this.resolver = context;
+		this.resolver = parentContext;
 		this.mask = mask;
 
 		if ((mask & KindedImport.CLASS) != 0)
 		{
-			final IClass theClass = context.resolveClass(this.name);
+			final IClass theClass = parentContext.resolveClass(this.name);
 			if (theClass != null)
 			{
 				this.asParentContext = theClass;
@@ -130,7 +130,7 @@ public final class SingleImport extends Import implements IDefaultContext
 		}
 		if ((mask & KindedImport.HEADER) != 0)
 		{
-			final IDyvilHeader header = context.resolveHeader(this.name);
+			final IDyvilHeader header = parentContext.resolveHeader(this.name);
 			if (header != null)
 			{
 				if ((mask & KindedImport.INLINE) != 0 && this.checkInline(markers, context, header))
@@ -143,7 +143,7 @@ public final class SingleImport extends Import implements IDefaultContext
 		}
 		if ((mask & KindedImport.PACKAGE) != 0)
 		{
-			final Package thePackage = context.resolvePackage(this.name);
+			final Package thePackage = parentContext.resolvePackage(this.name);
 			if (thePackage != null)
 			{
 				this.asParentContext = !resolved ? thePackage : new CombiningContext(thePackage, this.asParentContext);
@@ -160,7 +160,7 @@ public final class SingleImport extends Import implements IDefaultContext
 	}
 
 	@Override
-	public void resolve(MarkerList markers, IImportContext context, int mask)
+	public void resolve(MarkerList markers, IContext context, IImportContext parentContext, int mask)
 	{
 		if (this.asParentContext != null)
 		{
@@ -168,8 +168,8 @@ public final class SingleImport extends Import implements IDefaultContext
 			return;
 		}
 
-		context = this.resolver;
-		if ((mask & KindedImport.VAR) != 0 && context.resolveField(this.name) != null)
+		parentContext = this.resolver;
+		if ((mask & KindedImport.VAR) != 0 && parentContext.resolveField(this.name) != null)
 		{
 			return;
 		}
@@ -177,19 +177,19 @@ public final class SingleImport extends Import implements IDefaultContext
 		if ((mask & KindedImport.FUNC) != 0)
 		{
 			final MatchList<IMethod> methods = new MatchList<>(null);
-			context.getMethodMatches(methods, null, this.name, null);
+			parentContext.getMethodMatches(methods, null, this.name, null);
 			if (!methods.isEmpty())
 			{
 				return;
 			}
 		}
 
-		if ((mask & KindedImport.OPERATOR) != 0 && context.resolveOperator(this.name, -1) != null)
+		if ((mask & KindedImport.OPERATOR) != 0 && parentContext.resolveOperator(this.name, -1) != null)
 		{
 			return;
 		}
 
-		if ((mask & KindedImport.TYPE) != 0 && context.resolveTypeAlias(this.name, -1) != null)
+		if ((mask & KindedImport.TYPE) != 0 && parentContext.resolveTypeAlias(this.name, -1) != null)
 		{
 			return;
 		}
@@ -197,7 +197,7 @@ public final class SingleImport extends Import implements IDefaultContext
 		markers.add(Markers.semanticError(this.position, "import.resolve", this.name.qualified));
 	}
 
-	private boolean checkInline(MarkerList markers, IImportContext context, IDyvilHeader header)
+	private boolean checkInline(MarkerList markers, IContext context, IDyvilHeader header)
 	{
 		// Check if the Header has a Header Declaration
 		final HeaderDeclaration headerDeclaration = header.getHeaderDeclaration();
@@ -222,7 +222,7 @@ public final class SingleImport extends Import implements IDefaultContext
 		{
 		case Modifiers.PACKAGE:
 		case Modifiers.PROTECTED:
-			// TODO if (header.getPackage() == context.getHeader().getPackage())
+			if (header.getPackage() == context.getHeader().getPackage())
 			{
 				return true;
 			}
