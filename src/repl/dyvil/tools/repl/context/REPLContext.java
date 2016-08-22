@@ -13,12 +13,12 @@ import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.consumer.IMemberConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.header.ImportDeclaration;
-import dyvil.tools.compiler.ast.header.IncludeDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -116,10 +116,12 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 
 	public void endEvaluation()
 	{
-		this.currentClass.resolveTypes(this.markers, this);
-		this.currentClass.resolve(this.markers, this);
-		this.currentClass.checkTypes(this.markers, this);
-		this.currentClass.check(this.markers, this);
+		final IContext context = this.getContext();
+
+		this.currentClass.resolveTypes(this.markers, context);
+		this.currentClass.resolve(this.markers, context);
+		this.currentClass.checkTypes(this.markers, context);
+		this.currentClass.check(this.markers, context);
 
 		if (this.markers.getErrors() > 0)
 		{
@@ -133,7 +135,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 			this.currentClass.foldConstants();
 		}
 
-		this.currentClass.cleanup(this, this.currentClass);
+		this.currentClass.cleanup(context, this.currentClass);
 
 		final Class<?> theClass = this.compileAndLoad();
 
@@ -287,6 +289,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 	public void addImport(ImportDeclaration declaration)
 	{
 		declaration.resolveTypes(this.markers, this);
+		declaration.resolve(this.markers, this);
 
 		if (this.hasErrors())
 		{
@@ -295,34 +298,6 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 
 		super.addImport(declaration);
 		this.compiler.getOutput().println("Imported " + declaration.getImport());
-	}
-
-	@Override
-	public void addUsing(ImportDeclaration usingDeclaration)
-	{
-		usingDeclaration.resolveTypes(this.markers, this);
-
-		if (this.hasErrors())
-		{
-			return;
-		}
-
-		super.addUsing(usingDeclaration);
-		this.compiler.getOutput().println("Imported " + usingDeclaration.getImport());
-	}
-
-	@Override
-	public void addInclude(IncludeDeclaration includeDeclaration)
-	{
-		includeDeclaration.resolve(this.markers, this);
-
-		if (this.hasErrors())
-		{
-			return;
-		}
-
-		super.addInclude(includeDeclaration);
-		this.compiler.getOutput().println("Included " + includeDeclaration.getHeader().getFullName());
 	}
 
 	@Override

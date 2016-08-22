@@ -1,7 +1,7 @@
 package dyvil
 
-include	dyvil.Strings
-include	dyvil.IO
+using dyvil.Strings
+using dyvil.IO
 
-using	dyvil.math.MathUtils._
-using	dyvil.random.JavaRandoms._
+using dyvil.math.MathUtils._
+using dyvil.random.JavaRandoms._

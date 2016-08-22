@@ -4,6 +4,7 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.consumer.IClassConsumer;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.ObjectFormat;
@@ -114,34 +115,32 @@ public class DyvilUnit extends DyvilHeader implements IClassConsumer
 	{
 		super.resolveTypes();
 
+		final IContext context = this.getContext();
 		for (int i = 0; i < this.classCount; i++)
 		{
-			IClass iclass = this.classes[i];
-			if (iclass.getName() == null)
-			{
-				this.classes[i] = null;
-				this.classCount = i;
-				return;
-			}
-			this.classes[i].resolveTypes(this.markers, this);
+			this.classes[i].resolveTypes(this.markers, context);
 		}
 	}
 
 	@Override
 	public void resolve()
 	{
+		this.resolveImports();
+
+		final IContext context = this.getContext();
 		for (int i = 0; i < this.classCount; i++)
 		{
-			this.classes[i].resolve(this.markers, this);
+			this.classes[i].resolve(this.markers, context);
 		}
 	}
 
 	@Override
 	public void checkTypes()
 	{
+		final IContext context = this.getContext();
 		for (int i = 0; i < this.classCount; i++)
 		{
-			this.classes[i].checkTypes(this.markers, this);
+			this.classes[i].checkTypes(this.markers, context);
 		}
 	}
 
@@ -154,9 +153,10 @@ public class DyvilUnit extends DyvilHeader implements IClassConsumer
 			this.headerDeclaration.check(this.markers);
 		}
 
+		final IContext context = this.getContext();
 		for (int i = 0; i < this.classCount; i++)
 		{
-			this.classes[i].check(this.markers, this);
+			this.classes[i].check(this.markers, context);
 		}
 	}
 
@@ -172,9 +172,10 @@ public class DyvilUnit extends DyvilHeader implements IClassConsumer
 	@Override
 	public void cleanup()
 	{
+		final IContext context = this.getContext();
 		for (int i = 0; i < this.classCount; i++)
 		{
-			this.classes[i].cleanup(this, null);
+			this.classes[i].cleanup(context, null);
 		}
 	}
 
@@ -252,7 +253,7 @@ public class DyvilUnit extends DyvilHeader implements IClassConsumer
 			}
 		}
 
-		return super.resolveClass(name);
+		return null;
 	}
 
 	@Override

@@ -1,16 +1,9 @@
 package dyvil.tools.compiler.ast.header;
 
-import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -20,7 +13,12 @@ import java.io.IOException;
 
 public final class WildcardImport extends Import
 {
-	private IContext context;
+	private IImportContext context;
+
+	public WildcardImport()
+	{
+		super(null);
+	}
 
 	public WildcardImport(ICodePosition position)
 	{
@@ -34,98 +32,44 @@ public final class WildcardImport extends Import
 	}
 
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context, boolean using)
+	public void resolveTypes(MarkerList markers, IContext context, IImportContext parentContext, int mask)
 	{
 		if (this.parent != null)
 		{
-			this.parent.resolveTypes(markers, context, false);
-			context = this.parent.getContext();
-
-			if (context == null)
-			{
-				return;
-			}
+			this.parent.resolveTypes(markers, context, parentContext, KindedImport.PARENT);
+			parentContext = this.parent.asParentContext();
 		}
 
-		if (using)
+		if ((mask & KindedImport.STATIC) != 0 && parentContext != null)
 		{
-			if (!(context instanceof IClass))
-			{
-				markers.add(Markers.semantic(this.position, "using.wildcard.invalid"));
-				return;
-			}
-
-			this.context = context;
+			this.context = parentContext;
 			return;
 		}
 
-		if (!(context instanceof Package))
+		if (!(parentContext instanceof Package))
 		{
-			markers.add(Markers.semantic(this.position, "import.wildcard.invalid"));
+			markers.add(Markers.semanticError(this.position, "import.wildcard.invalid"));
+			this.context = IDefaultContext.DEFAULT;
 			return;
 		}
-		this.context = context;
+		this.context = parentContext;
 	}
 
 	@Override
-	public IContext getContext()
+	public void resolve(MarkerList markers, IContext context, IImportContext parentContext, int mask)
+	{
+	}
+
+	@Override
+	public IImportContext asContext()
 	{
 		return this.context;
 	}
 
 	@Override
-	public Package resolvePackage(Name name)
+	public IImportContext asParentContext()
 	{
-		if (this.context == null)
-		{
-			return null;
-		}
-
-		return this.context.resolvePackage(name);
-	}
-
-	@Override
-	public IClass resolveClass(Name name)
-	{
-		if (this.context == null)
-		{
-			return null;
-		}
-
-		return this.context.resolveClass(name);
-	}
-
-	@Override
-	public IDataMember resolveField(Name name)
-	{
-		if (this.context == null)
-		{
-			return null;
-		}
-
-		return this.context.resolveField(name);
-	}
-
-	@Override
-	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
-	{
-		if (this.context == null)
-		{
-			return;
-		}
-
-		this.context.getMethodMatches(list, receiver, name, arguments);
-	}
-
-	@Override
-	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
-	{
-		if (this.context == null)
-		{
-			return;
-		}
-
-		this.context.getImplicitMatches(list, value, targetType);
+		return null;
 	}
 
 	@Override

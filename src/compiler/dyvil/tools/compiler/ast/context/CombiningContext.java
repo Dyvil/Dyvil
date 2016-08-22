@@ -82,6 +82,13 @@ public class CombiningContext implements IContext
 	}
 
 	@Override
+	public IDyvilHeader resolveHeader(Name name)
+	{
+		final IDyvilHeader inner = this.inner.resolveHeader(name);
+		return inner != null ? inner : this.outer.resolveHeader(name);
+	}
+
+	@Override
 	public IClass resolveClass(Name name)
 	{
 		IClass iclass = this.inner.resolveClass(name);
