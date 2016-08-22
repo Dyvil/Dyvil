@@ -21,6 +21,11 @@ public final class AnnotationUtil
 	public static final String PRIMITIVE_INTERNAL = "dyvil/annotation/_internal/Primitive";
 	public static final String PRIMITIVE          = "L" + PRIMITIVE_INTERNAL + ";";
 
+	public static final String NOTNULL_INTERNAL  = "dyvil/annotation/analysis/NotNull";
+	public static final String NOTNULL           = 'L' + NOTNULL_INTERNAL + ';';
+	public static final String NULLABLE_INTERNAL = "dyvil/annotation/analysis/Nullable";
+	public static final String NULLABLE          = 'L' + NULLABLE_INTERNAL + ';';
+
 	private AnnotationUtil()
 	{
 		// no instances
