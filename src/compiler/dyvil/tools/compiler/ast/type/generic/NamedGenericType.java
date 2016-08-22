@@ -7,15 +7,19 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.ast.type.raw.ClassType;
-import dyvil.tools.compiler.ast.type.raw.NamedType;
+import dyvil.tools.compiler.ast.type.raw.PackageType;
+import dyvil.tools.compiler.ast.type.typevar.ResolvedTypeVarType;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -100,45 +104,130 @@ public class NamedGenericType extends GenericType
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
-		// resolveType0 is used to avoid Type Variable -> Default Value replacement done by resolveType
-		final IType resolved = NamedType.resolveType(markers, context, this.name, this.position, this.parent);
-
 		this.resolveTypeArguments(markers, context);
 
-		if (resolved == null || !resolved.isResolved())
+		if (this.parent == null)
 		{
-			return this;
+			return this.resolveTopLevel(markers, context);
 		}
 
-		final IClass iClass = resolved.getTheClass();
-		final IType concrete;
-
-		// Convert the non-generic class type to a generic one
-		if (!resolved.isGenericType())
+		this.parent = this.parent.resolveType(markers, context);
+		if (!this.parent.isResolved())
 		{
-			if (!iClass.isTypeParametric())
-			{
-				markers
-					.add(Markers.semanticError(this.position, "type.generic.class_not_generic", iClass.getFullName()));
-				return new ClassType(iClass);
-			}
-
-			concrete = new ResolvedGenericType(this.position, iClass, this.typeArguments, this.typeArgumentCount);
+			return null;
 		}
-		else
+		return this.resolveWithParent(markers);
+	}
+
+	private IType resolveTopLevel(MarkerList markers, IContext context)
+	{
+		final IType primitive = Types.resolvePrimitive(this.name);
+		if (primitive != null)
 		{
-			// Create a concrete type and save Type Variables in the above array
-			concrete = resolved.getConcreteType(typeParameter -> {
-				final int index = typeParameter.getIndex();
-				if (index >= this.typeArgumentCount)
-				{
-					return null;
-				}
-				return this.typeArguments[index];
-			});
+			markers.add(Markers.semanticError(this.position, "type.generic.class.not_generic", primitive.getName()));
+			return primitive.atPosition(this.position);
 		}
 
-		return concrete;
+		IType type = this.resolveTopLevelWith(markers, context);
+		if (type != null)
+		{
+			return type;
+		}
+
+		type = this.resolveTopLevelWith(markers, Types.BASE_CONTEXT);
+		if (type != null)
+		{
+			return type;
+		}
+
+		final Package thePackage = context.resolvePackage(this.name);
+		if (thePackage != null)
+		{
+			markers.add(Markers.semanticError(this.position, "type.generic.package.not_generic", thePackage.getName()));
+			return new PackageType(thePackage).atPosition(this.position);
+		}
+
+		markers.add(Markers.semanticError(this.position, "resolve.type", this.name));
+		return this;
+	}
+
+	private IType resolveTopLevelWith(MarkerList markers, IContext context)
+	{
+		final IClass theClass = context.resolveClass(this.name);
+		if (theClass != null)
+		{
+			final IType classType = theClass.getType();
+			return this.checkCount(markers, theClass, "class", classType);
+		}
+
+		final ITypeParameter typeParameter = context.resolveTypeParameter(this.name);
+		if (typeParameter != null)
+		{
+			markers.add(Markers.semanticError(this.position, "type.generic.type_parameter.not_generic",
+			                                  typeParameter.getName()));
+			return new ResolvedTypeVarType(typeParameter, this.position);
+		}
+
+		final ITypeAlias typeAlias = context.resolveTypeAlias(this.name, this.typeArgumentCount);
+		if (typeAlias != null)
+		{
+			final IType type = typeAlias.getType();
+			return this.checkCount(markers, typeAlias, "type_alias", type);
+		}
+		return null;
+	}
+
+	private IType resolveWithParent(MarkerList markers)
+	{
+		final IClass theClass = this.parent.resolveClass(this.name);
+		if (theClass != null)
+		{
+			final IType classType = theClass.getType();
+			return this.checkCount(markers, theClass, "class", classType);
+		}
+
+		final Package thePackage = this.parent.resolvePackage(this.name);
+		if (thePackage != null)
+		{
+			markers.add(Markers.semanticError(this.position, "type.generic.package.not_generic", thePackage.getName()));
+			return new PackageType(thePackage).atPosition(this.position);
+		}
+
+		markers.add(Markers.semanticError(this.position, "resolve.type.package", this.name, this.parent));
+		return this;
+	}
+
+	private IType checkCount(MarkerList markers, ITypeParametric generic, String kind, IType type)
+	{
+		final int parameterCount = generic.typeParameterCount();
+
+		if (parameterCount <= 0)
+		{
+			markers.add(Markers.semanticError(this.position, "type.generic." + kind + ".not_generic", type));
+			return type.atPosition(this.position);
+		}
+		if (parameterCount != this.typeArgumentCount)
+		{
+			final Marker marker = Markers
+				                      .semanticError(this.position, "type.generic." + kind + ".count_mismatch", type);
+			marker.addInfo(Markers.getSemantic("type.generic.argument_count", this.typeArgumentCount));
+			marker.addInfo(Markers.getSemantic("type.generic.parameter_count", parameterCount));
+			markers.add(marker);
+		}
+
+		if (type == null)
+		{
+			return null;
+		}
+		return type.getConcreteType(typeParameter ->
+		                            {
+			                            final int index = typeParameter.getIndex();
+			                            if (index >= this.typeArgumentCount)
+			                            {
+				                            return null;
+			                            }
+			                            return this.typeArguments[index];
+		                            }).atPosition(this.position);
 	}
 
 	@Override

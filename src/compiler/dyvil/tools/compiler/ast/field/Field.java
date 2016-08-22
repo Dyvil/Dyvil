@@ -173,7 +173,7 @@ public class Field extends Member implements IField
 		{
 			if (this.modifiers.hasIntModifier(Modifiers.STATIC))
 			{
-				if (receiver.valueTag() != IValue.CLASS_ACCESS)
+				if (!receiver.isClassAccess())
 				{
 					markers.add(Markers.semantic(position, "field.access.static", this.name));
 				}
@@ -182,9 +182,9 @@ public class Field extends Member implements IField
 					markers.add(Markers.semantic(position, "field.access.static.type", this.name,
 					                             this.enclosingClass.getFullName()));
 				}
-				receiver = null;
+				receiver = receiver.asIgnoredClassAccess();
 			}
-			else if (receiver.valueTag() == IValue.CLASS_ACCESS)
+			else if (receiver.isClassAccess())
 			{
 				if (!receiver.getType().getTheClass().isObject())
 				{
@@ -206,8 +206,12 @@ public class Field extends Member implements IField
 			}
 			else
 			{
-				markers.add(Markers.semantic(position, "field.access.unqualified", this.name.unqualified));
 				receiver = new ThisExpr(position, this.enclosingClass.getType(), context, markers);
+
+				if (!this.enclosingClass.isAnonymous())
+				{
+					markers.add(Markers.semantic(position, "field.access.unqualified", this.name.unqualified));
+				}
 			}
 		}
 

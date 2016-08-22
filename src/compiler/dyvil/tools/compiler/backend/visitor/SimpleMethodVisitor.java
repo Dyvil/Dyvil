@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.method.IExternalCallableMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.intrinsic.InlineIntrinsicData;
 import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.raw.InternalType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.parsing.Name;
@@ -19,6 +20,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	private       InlineIntrinsicData     intrinsicData;
 	private       boolean                 unsupportedInline;
 	private       int                     parameterIndex;
+	private       String[]                localNames;
 
 	public SimpleMethodVisitor(IExternalCallableMember method)
 	{
@@ -59,19 +61,18 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	@Override
 	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
-		if (AnnotationUtil.DYVIL_MODIFIERS.equals(type))
+		switch (type)
 		{
+		case AnnotationUtil.DYVIL_MODIFIERS:
 			return new ModifierVisitor(this.method.getModifiers());
-		}
-		if (AnnotationUtil.RECEIVER_TYPE.equals(type))
-		{
+		case AnnotationUtil.RECEIVER_TYPE:
 			return new ReceiverTypeVisitor((IMethod) this.method);
 		}
 
-		String internal = ClassFormat.extendedToInternal(type);
+		final String internal = ClassFormat.extendedToInternal(type);
 		if (this.method.addRawAnnotation(internal, null))
 		{
-			Annotation annotation = new Annotation(new InternalType(internal));
+			final Annotation annotation = new Annotation(new InternalType(internal));
 			return new AnnotationReader(this.method, annotation);
 		}
 		return null;
@@ -92,6 +93,10 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	@Override
 	public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index)
 	{
+		if (this.localNames != null)
+		{
+			this.localNames[index] = name;
+		}
 	}
 
 	@Override
@@ -217,7 +222,8 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	}
 
 	@Override
-	public AnnotationVisitor visitLocalVariableAnnotation(int typeRef, TypePath typePath, Label[] start, Label[] end, int[] index, String desc, boolean visible)
+	public AnnotationVisitor visitLocalVariableAnnotation(int typeRef, TypePath typePath, Label[] start, Label[] end,
+		                                                     int[] index, String desc, boolean visible)
 	{
 		return null;
 	}
@@ -230,6 +236,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	@Override
 	public void visitMaxs(int maxStack, int maxLocals)
 	{
+		this.localNames = new String[maxLocals];
 		this.intrinsicData.setMaxLocals(maxLocals);
 	}
 
@@ -240,5 +247,31 @@ public final class SimpleMethodVisitor implements MethodVisitor
 		{
 			this.method.setIntrinsicData(this.intrinsicData);
 		}
+
+		int localIndex = this.method.hasModifier(Modifiers.STATIC) ? 0 : 1;
+
+		final IParameterList parameters = this.method.getExternalParameterList();
+		for (int i = 0, count = parameters.size(); i < count; i++)
+		{
+			final IParameter param = parameters.get(i);
+			param.setLocalIndex(localIndex);
+
+			if (param.getName() == null)
+			{
+				param.setName(this.getName(i, localIndex));
+			}
+
+			localIndex += param.getLocalSlots();
+		}
+	}
+
+	private Name getName(int index, int localIndex)
+	{
+		final String localName;
+		if (this.localNames == null || (localName = this.localNames[localIndex]) == null)
+		{
+			return Name.fromRaw("par" + index);
+		}
+		return Name.fromQualified(localName);
 	}
 }

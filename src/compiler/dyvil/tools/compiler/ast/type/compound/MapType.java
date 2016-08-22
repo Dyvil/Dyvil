@@ -24,6 +24,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -51,14 +52,23 @@ public class MapType implements IObjectType
 	// Metadata
 	private IClass theClass;
 
-	public MapType()
+	public static MapType base(IType keyType, IType valueType)
 	{
+		return new MapType(keyType, valueType, Mutability.UNDEFINED, MapTypes.MAP_CLASS);
 	}
 
-	public MapType(IType keyType, IType valueType)
+	public static MapType mutable(IType keyType, IType valueType)
 	{
-		this.keyType = keyType;
-		this.valueType = valueType;
+		return new MapType(keyType, valueType, Mutability.MUTABLE, MapTypes.MUTABLE_MAP_CLASS);
+	}
+
+	public static MapType immutable(IType keyType, IType valueType)
+	{
+		return new MapType(keyType, valueType, Mutability.IMMUTABLE, MapTypes.IMMUTABLE_MAP_CLASS);
+	}
+
+	public MapType()
+	{
 	}
 
 	public MapType(IType keyType, IType valueType, Mutability mutability)
@@ -68,7 +78,7 @@ public class MapType implements IObjectType
 		this.valueType = valueType;
 	}
 
-	public MapType(IType keyType, IType valueType, Mutability mutability, IClass theClass)
+	protected MapType(IType keyType, IType valueType, Mutability mutability, IClass theClass)
 	{
 		this.keyType = keyType;
 		this.valueType = valueType;
@@ -83,9 +93,12 @@ public class MapType implements IObjectType
 	}
 
 	@Override
-	public boolean isGenericType()
+	public ICodePosition getPosition()
 	{
-		return true;
+		final ICodePosition keyPos = this.keyType.getPosition();
+		final ICodePosition valuePos = this.valueType.getPosition();
+
+		return keyPos != null && valuePos != null ? keyPos.to(valuePos) : null;
 	}
 
 	public void setKeyType(IType keyType)
@@ -112,6 +125,12 @@ public class MapType implements IObjectType
 	public Name getName()
 	{
 		return this.theClass.getName();
+	}
+
+	@Override
+	public boolean isGenericType()
+	{
+		return true;
 	}
 
 	@Override
@@ -319,6 +338,7 @@ public class MapType implements IObjectType
 	{
 		IType.writeType(this.keyType, out);
 		IType.writeType(this.valueType, out);
+		this.mutability.write(out);
 	}
 
 	@Override
@@ -326,6 +346,8 @@ public class MapType implements IObjectType
 	{
 		this.keyType = IType.readType(in);
 		this.valueType = IType.readType(in);
+		this.mutability = Mutability.read(in);
+		this.theClass = getClass(this.mutability);
 	}
 
 	@Override

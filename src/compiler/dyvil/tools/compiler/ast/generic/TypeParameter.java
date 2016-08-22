@@ -1,10 +1,12 @@
 package dyvil.tools.compiler.ast.generic;
 
+import dyvil.annotation.Reified;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.asm.TypeReference;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -15,6 +17,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
@@ -58,7 +61,7 @@ public final class TypeParameter implements ITypeParameter
 	private int parameterIndex;
 
 	private ITypeParametric generic;
-	private ReifiedKind reifiedKind = ReifiedKind.NOT_REIFIED;
+	private Reified.Type    reifiedKind; // defaults to null (not reified)
 
 	private IType erasure       = Types.OBJECT;
 	private IType defaultType   = Types.OBJECT;
@@ -120,7 +123,7 @@ public final class TypeParameter implements ITypeParameter
 	}
 
 	@Override
-	public ReifiedKind getReifiedKind()
+	public Reified.Type getReifiedKind()
 	{
 		return this.reifiedKind;
 	}
@@ -507,31 +510,13 @@ public final class TypeParameter implements ITypeParameter
 		if (this.annotations != null)
 		{
 			this.annotations.resolveTypes(markers, context, this);
-
-			final IAnnotation reifiedAnnotation = this.annotations.getAnnotation(Types.REIFIED_CLASS);
-			if (reifiedAnnotation != null)
-			{
-				final IValue erasure = reifiedAnnotation.getArguments().getFirstValue();
-				if (erasure != null && erasure.booleanValue())
-				{
-					this.reifiedKind = ReifiedKind.REIFIED_ERASURE;
-				}
-				else
-				{
-					this.reifiedKind = ReifiedKind.REIFIED_TYPE;
-				}
-			}
+			this.computeReifiedType();
 		}
 	}
 
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		if (this.annotations != null)
-		{
-			this.annotations.resolve(markers, context);
-		}
-
 		if (this.lowerBound != null)
 		{
 			this.lowerBound.resolve(markers, context);
@@ -540,6 +525,23 @@ public final class TypeParameter implements ITypeParameter
 		for (int i = 0; i < this.upperBoundCount; i++)
 		{
 			this.upperBounds[i].resolve(markers, context);
+		}
+
+		if (this.annotations != null)
+		{
+			this.annotations.resolve(markers, context);
+			this.computeReifiedType();
+		}
+	}
+
+	private void computeReifiedType()
+	{
+		final IAnnotation reifiedAnnotation = this.annotations.getAnnotation(Types.REIFIED_CLASS);
+		if (reifiedAnnotation != null)
+		{
+			final IParameter parameter = Types.REIFIED_CLASS.getParameterList().get(0);
+			this.reifiedKind = AnnotationUtil
+				                   .getEnumValue(reifiedAnnotation.getArguments(), parameter, Reified.Type.class);
 		}
 	}
 
@@ -646,13 +648,13 @@ public final class TypeParameter implements ITypeParameter
 	@Override
 	public void appendParameterDescriptor(StringBuilder buffer)
 	{
-		if (this.reifiedKind == ReifiedKind.REIFIED_ERASURE)
-		{
-			buffer.append("Ljava/lang/Class;");
-		}
-		else if (this.reifiedKind == ReifiedKind.REIFIED_TYPE)
+		if (this.reifiedKind == Reified.Type.TYPE)
 		{
 			buffer.append("Ldyvilx/lang/model/type/Type;");
+		}
+		else if (this.reifiedKind != null) // OBJECT_CLASS or ANY_CLASS
+		{
+			buffer.append("Ljava/lang/Class;");
 		}
 	}
 
@@ -666,13 +668,13 @@ public final class TypeParameter implements ITypeParameter
 	public void writeParameter(MethodWriter writer) throws BytecodeException
 	{
 		final IType type;
-		if (this.reifiedKind == ReifiedKind.REIFIED_ERASURE)
-		{
-			type = ClassOperator.LazyFields.CLASS;
-		}
-		else if (this.reifiedKind == ReifiedKind.REIFIED_TYPE)
+		if (this.reifiedKind == Reified.Type.TYPE)
 		{
 			type = TypeOperator.LazyFields.TYPE;
+		}
+		else if (this.reifiedKind != null)
+		{
+			type = ClassOperator.LazyFields.CLASS;
 		}
 		else
 		{
@@ -686,13 +688,21 @@ public final class TypeParameter implements ITypeParameter
 	@Override
 	public void writeArgument(MethodWriter writer, IType type) throws BytecodeException
 	{
-		if (this.reifiedKind == ReifiedKind.REIFIED_ERASURE)
+		if (this.reifiedKind == Reified.Type.ANY_CLASS)
 		{
-			type.writeClassExpression(writer);
+			type.writeClassExpression(writer, false);
 		}
-		else if (this.reifiedKind == ReifiedKind.REIFIED_TYPE)
+		else if (this.reifiedKind == Reified.Type.OBJECT_CLASS)
 		{
-			type.writeTypeExpression(writer);
+			// Convert primitive types to their reference counterpart
+			type.writeClassExpression(writer, true);
+		}
+		else
+		{
+			if (this.reifiedKind == Reified.Type.TYPE)
+			{
+				type.writeTypeExpression(writer);
+			}
 		}
 	}
 

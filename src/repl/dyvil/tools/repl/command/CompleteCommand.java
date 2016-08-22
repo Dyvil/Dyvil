@@ -151,7 +151,7 @@ public class CompleteCommand implements ICommand
 	private void printCompletions(DyvilREPL repl, String memberStart, IValue value)
 	{
 		final IType type = value.getType();
-		final boolean statics = value.valueTag() == IValue.CLASS_ACCESS;
+		final boolean statics = value.isClassAccess();
 		final Set<IField> fields = new TreeSet<>(MemberSorter.MEMBER_COMPARATOR);
 		final Set<IProperty> properties = new TreeSet<>(MemberSorter.MEMBER_COMPARATOR);
 		final Set<IMethod> methods = new TreeSet<>(MemberSorter.METHOD_COMPARATOR);
@@ -295,7 +295,7 @@ public class CompleteCommand implements ICommand
 		MatchList<IMethod> matchList = new MatchList<>(repl.getContext());
 		type.getMethodMatches(matchList, value, null, null);
 		repl.getContext().getMethodMatches(matchList, value, null, null);
-		Types.LANG_HEADER.getMethodMatches(matchList, value, null, null);
+		Types.BASE_CONTEXT.getMethodMatches(matchList, value, null, null);
 
 		for (int i = 0, count = matchList.size(); i < count; i++)
 		{
@@ -308,7 +308,7 @@ public class CompleteCommand implements ICommand
 		MatchList<IMethod> matchList = new MatchList<>(null);
 		type.getImplicitMatches(matchList, value, null);
 		repl.getContext().getImplicitMatches(matchList, value, null);
-		Types.LANG_HEADER.getImplicitMatches(matchList, value, null);
+		Types.BASE_CONTEXT.getImplicitMatches(matchList, value, null);
 
 		for (int i = 0, count = matchList.size(); i < count; i++)
 		{

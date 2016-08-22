@@ -16,8 +16,8 @@ public class VirtualStaticTest
 		public static String bar(String s) = s + "_Derived"
 	}
 
-	public static String getFoo<@Reified(true) T extends Base>() = T.foo
-	public static String getBar<@Reified(true) T extends Base>(String s) = T.bar(s)
+	public static String getFoo<@Reified(Reified.Type.ANY_CLASS) T extends Base>() = T.foo
+	public static String getBar<@Reified(Reified.Type.OBJECT_CLASS) T extends Base>(String s) = T.bar(s)
 
 	interface IntConstructible
 	{
@@ -26,7 +26,7 @@ public class VirtualStaticTest
 	case class CustomInt(public final int value) implements IntConstructible
 	case class MyInt    (public final int value) implements IntConstructible
 
-	public static T create<@Reified(true) T extends IntConstructible>(int i) = T<T>(i)
+	public static T create<@Reified(Reified.Type.TYPE) T extends IntConstructible>(int i) = T<T>(i)
 
 	public static void main([String] args)
 	{

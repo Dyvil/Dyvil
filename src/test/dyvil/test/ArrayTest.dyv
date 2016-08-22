@@ -15,7 +15,7 @@ public class ArrayTest
 		Main.test("Nested Array Element Type Test 4", class String, [["a"]].nestedElementType)
 	}
 
-	postfix Class<T> elementType <@Reified(true) T>([T] array) = class T
+	postfix Class<T> elementType <@Reified(Reified.Type.ANY_CLASS) T>([T] array) = class T
 
-	postfix Class<T> nestedElementType <@Reified(true) T>([[T]] array) = class T
+	postfix Class<T> nestedElementType <@Reified(Reified.Type.ANY_CLASS) T>([[T]] array) = class T
 }

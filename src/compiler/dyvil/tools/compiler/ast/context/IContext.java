@@ -19,9 +19,6 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.ast.type.raw.ClassType;
-import dyvil.tools.compiler.ast.type.raw.PackageType;
-import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
 import dyvil.tools.parsing.Name;
 
 public interface IContext extends IMemberContext, IImportContext
@@ -30,9 +27,9 @@ public interface IContext extends IMemberContext, IImportContext
 	byte INVISIBLE = 1;
 	byte INTERNAL  = 2;
 
-	byte TRUE  = 0;
-	byte FALSE = 1;
-	byte PASS  = 2;
+	byte PASS  = -1;
+	byte FALSE = 0;
+	byte TRUE  = 1;
 
 	default boolean isStatic()
 	{
@@ -66,13 +63,18 @@ public interface IContext extends IMemberContext, IImportContext
 	Package resolvePackage(Name name);
 
 	@Override
+	IDyvilHeader resolveHeader(Name name);
+
+	@Override
 	IClass resolveClass(Name name);
 
+	@Override
 	ITypeAlias resolveTypeAlias(Name name, int arity);
 
 	@Override
 	ITypeParameter resolveTypeParameter(Name name);
 
+	@Override
 	IOperator resolveOperator(Name name, int type);
 
 	@Override
@@ -99,56 +101,12 @@ public interface IContext extends IMemberContext, IImportContext
 
 	IValue getImplicit();
 
-	static IClass resolveClass(IMemberContext context, Name name)
-	{
-		final IClass theClass = context.resolveClass(name);
-		if (theClass != null)
-		{
-			return theClass;
-		}
-
-		return Types.LANG_HEADER.resolveClass(name);
-	}
-
-	static IType resolveType(IContext context, Name name)
-	{
-		final IClass theClass = context.resolveClass(name);
-		if (theClass != null)
-		{
-			return new ClassType(theClass);
-		}
-
-		final ITypeParameter typeParameter = context.resolveTypeParameter(name);
-		if (typeParameter != null)
-		{
-			return new TypeVarType(typeParameter);
-		}
-
-		final Package thePackage = Package.rootPackage.resolvePackage(name);
-		if (thePackage != null)
-		{
-			return new PackageType(thePackage);
-		}
-
-		final ITypeAlias type = context.resolveTypeAlias(name, 0);
-		if (type != null)
-		{
-			return type.getType();
-		}
-
-		if (context != Types.LANG_HEADER)
-		{
-			return resolveType(Types.LANG_HEADER, name);
-		}
-		return null;
-	}
-
 	static IOperator resolveOperator(IContext context, Name name, int type)
 	{
 		final IOperator operator = context.resolveOperator(name, type);
 		if (operator == null || operator.getType() != type)
 		{
-			return Types.LANG_HEADER.resolveOperator(name, type);
+			return Types.BASE_CONTEXT.resolveOperator(name, type);
 		}
 		return operator;
 	}
@@ -158,7 +116,8 @@ public interface IContext extends IMemberContext, IImportContext
 		return resolveConstructors(implicitContext, type, arguments).getBestMember();
 	}
 
-	static MatchList<IConstructor> resolveConstructors(IImplicitContext implicitContext, IMemberContext type, IArguments arguments)
+	static MatchList<IConstructor> resolveConstructors(IImplicitContext implicitContext, IMemberContext type,
+		                                                  IArguments arguments)
 	{
 		MatchList<IConstructor> matches = new MatchList<>(implicitContext);
 		type.getConstructorMatches(matches, arguments);

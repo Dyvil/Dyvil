@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.expression;
 
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.access.ClassAccess;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -115,6 +116,22 @@ public final class ArrayExpr implements IValue, IValueList
 	public boolean isPrimitive()
 	{
 		return false;
+	}
+
+	@Override
+	public boolean isClassAccess()
+	{
+		return this.valueCount == 1 && this.values[0].isClassAccess();
+	}
+
+	@Override
+	public IValue asIgnoredClassAccess()
+	{
+		if (!this.isClassAccess())
+		{
+			return IValue.super.asIgnoredClassAccess();
+		}
+		return new ClassAccess(this.position, new ArrayType(this.values[0].getType())).asIgnoredClassAccess();
 	}
 
 	public IType getElementType()

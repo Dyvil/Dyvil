@@ -56,15 +56,22 @@ public final class ClassAccess implements IValue
 	}
 
 	@Override
-	public boolean isClassAccessIgnored()
+	public boolean isClassAccess()
+	{
+		return true;
+	}
+
+	@Override
+	public boolean isIgnoredClassAccess()
 	{
 		return this.ignored;
 	}
 
 	@Override
-	public void setClassAccessIgnored(boolean ignored)
+	public IValue asIgnoredClassAccess()
 	{
-		this.ignored = ignored;
+		this.ignored = true;
+		return this;
 	}
 
 	@Override

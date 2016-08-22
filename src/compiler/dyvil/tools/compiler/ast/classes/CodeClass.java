@@ -12,7 +12,6 @@ import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.classes.metadata.TraitMetadata;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -120,6 +119,27 @@ public class CodeClass extends AbstractClass
 	}
 
 	@Override
+	public IType getType()
+	{
+		if (this.thisType != null)
+		{
+			return this.thisType;
+		}
+
+		if (this.typeParameterCount <= 0)
+		{
+			return this.thisType = new ClassType(this);
+		}
+
+		final ClassGenericType type = new ClassGenericType(this);
+		for (int i = 0; i < this.typeParameterCount; i++)
+		{
+			type.addType(new TypeVarType(this.typeParameters[i]));
+		}
+		return this.thisType = type;
+	}
+
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		context = context.push(this);
@@ -129,27 +149,14 @@ public class CodeClass extends AbstractClass
 			this.metadata = IClass.getClassMetadata(this, this.modifiers.toFlags());
 		}
 
-		if (this.typeParameterCount > 0)
-		{
-			ClassGenericType type = new ClassGenericType(this);
-
-			for (int i = 0; i < this.typeParameterCount; i++)
-			{
-				ITypeParameter var = this.typeParameters[i];
-				var.resolveTypes(markers, context);
-				type.addType(new TypeVarType(var));
-			}
-
-			this.thisType = type;
-		}
-		else
-		{
-			this.thisType = new ClassType(this);
-		}
-
 		if (this.annotations != null)
 		{
 			this.annotations.resolveTypes(markers, context, this);
+		}
+
+		for (int i = 0; i < this.typeParameterCount; i++)
+		{
+			this.typeParameters[i].resolveTypes(markers, context);
 		}
 
 		this.parameters.resolveTypes(markers, context);
@@ -285,12 +292,12 @@ public class CodeClass extends AbstractClass
 				final int modifiers = superClass.getModifiers().toFlags();
 				if ((modifiers & Modifiers.CLASS_TYPE_MODIFIERS) != 0)
 				{
-					markers.add(Markers.semantic(this.position, "class.extend.type",
-					                             ModifierUtil.classTypeToString(modifiers), superClass.getName()));
+					markers.add(Markers.semanticError(this.position, "class.extend.type",
+					                                  ModifierUtil.classTypeToString(modifiers), superClass.getName()));
 				}
 				else if ((modifiers & Modifiers.FINAL) != 0)
 				{
-					markers.add(Markers.semantic(this.position, "class.extend.final", superClass.getName()));
+					markers.add(Markers.semanticError(this.position, "class.extend.final", superClass.getName()));
 				}
 			}
 		}
@@ -300,17 +307,22 @@ public class CodeClass extends AbstractClass
 			final IType type = this.interfaces[i];
 			type.check(markers, context);
 
-			final IClass iclass = type.getTheClass();
-			if (iclass == null)
+			if (!type.isResolved())
 			{
 				continue;
 			}
 
-			final int modifiers = iclass.getModifiers().toFlags();
-			if ((modifiers & Modifiers.INTERFACE_CLASS) != Modifiers.INTERFACE_CLASS)
+			final IClass theClass = type.getTheClass();
+			if (theClass == null)
 			{
-				markers.add(Markers.semantic(this.position, "class.implement.type",
-				                             ModifierUtil.classTypeToString(modifiers), iclass.getName()));
+				continue;
+			}
+
+			if (!theClass.isInterface())
+			{
+				final String classType = ModifierUtil.classTypeToString(theClass.getModifiers().toFlags());
+				markers
+					.add(Markers.semanticError(this.position, "class.implement.type", classType, theClass.getName()));
 			}
 		}
 

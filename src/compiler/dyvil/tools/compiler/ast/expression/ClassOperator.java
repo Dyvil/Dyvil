@@ -215,7 +215,7 @@ public final class ClassOperator extends AbstractValue implements IConstantValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		this.type.writeClassExpression(writer);
+		this.type.writeClassExpression(writer, false);
 
 		if (type != null)
 		{

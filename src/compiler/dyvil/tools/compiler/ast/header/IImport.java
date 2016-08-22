@@ -10,22 +10,25 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public interface IImport extends IASTNode, IImportContext
+public interface IImport extends IASTNode
 {
 	int SINGLE   = 1;
 	int WILDCARD = 2;
 	int MULTI    = 3;
-	
+	int KINDED = 4;
+
 	static IImport fromTag(int tag)
 	{
 		switch (tag)
 		{
 		case SINGLE:
-			return new SingleImport(null);
+			return new SingleImport();
 		case WILDCARD:
-			return new WildcardImport(null);
+			return new WildcardImport();
 		case MULTI:
-			return new MultiImport(null);
+			return new MultiImport();
+		case KINDED:
+			return new KindedImport();
 		}
 		return null;
 	}
@@ -35,53 +38,62 @@ public interface IImport extends IASTNode, IImportContext
 	{
 		return null;
 	}
-	
-	int importTag();
-	
-	void resolveTypes(MarkerList markers, IContext context, boolean using);
-	
-	void setParent(IImport parent);
-	
-	IImport getParent();
-	
-	default void setAlias(Name alias)
+
+	@Override
+	default void setPosition(ICodePosition position)
 	{
 	}
-	
+
+	int importTag();
+
 	default Name getAlias()
 	{
 		return null;
 	}
-	
-	IContext getContext();
-	
+
+	default void setAlias(Name alias)
+	{
+	}
+
+	IImport getParent();
+
+	void setParent(IImport parent);
+
+	IImportContext asContext();
+
+	IImportContext asParentContext();
+
+	void resolveTypes(MarkerList markers, IContext context, IImportContext parentContext, int mask);
+
+	void resolve(MarkerList markers, IContext context, IImportContext parentContext, int mask);
+
 	// Compilation
 	
-	static void writeImport(IImport iimport, DataOutput dos) throws IOException
+	static void writeImport(IImport theImport, DataOutput out) throws IOException
 	{
-		if (iimport == null)
+		if (theImport == null)
 		{
-			dos.writeByte(0);
+			out.writeByte(0);
 			return;
 		}
 		
-		dos.writeByte(iimport.importTag());
-		iimport.writeData(dos);
+		out.writeByte(theImport.importTag());
+		theImport.writeData(out);
 	}
 	
-	static IImport readImport(DataInput dis) throws IOException
+	static IImport readImport(DataInput in) throws IOException
 	{
-		final byte type = dis.readByte();
+		final byte type = in.readByte();
 		if (type == 0)
 		{
 			return null;
 		}
 
-		final IImport iimport = fromTag(type);
-		assert iimport != null;
+		final IImport theImport = fromTag(type);
+		assert theImport != null;
 
-		iimport.readData(dis);
-		return iimport;
+		theImport.readData(in);
+		return theImport;
 	}
 	
 	void writeData(DataOutput out) throws IOException;

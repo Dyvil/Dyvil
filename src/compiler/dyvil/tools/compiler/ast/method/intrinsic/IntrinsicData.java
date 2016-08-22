@@ -14,29 +14,29 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 public interface IntrinsicData
 {
 	void writeIntrinsic(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber)
-			throws BytecodeException;
-	
+		throws BytecodeException;
+
 	void writeIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
-			throws BytecodeException;
-	
+		throws BytecodeException;
+
 	void writeInvIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
-			throws BytecodeException;
-	
+		throws BytecodeException;
+
 	static IType writeArgument(MethodWriter writer, IMethod method, int index, IValue receiver, IArguments arguments)
-			throws BytecodeException
+		throws BytecodeException
 	{
 		final IParameterList parameterList = method.getParameterList();
 
-		if (receiver == null)
+		if (receiver == null || receiver.isIgnoredClassAccess())
 		{
 			final IParameter parameter = parameterList.get(index);
 			arguments.writeValue(index, parameter, writer);
 			return parameter.getInternalType();
 		}
-		
+
 		if (index == 0)
 		{
-			if (receiver.isClassAccessIgnored() || method.hasModifier(Modifiers.INFIX))
+			if (method.hasModifier(Modifiers.INFIX))
 			{
 				final IType internalParameterType = parameterList.get(0).getInternalType();
 				receiver.writeExpression(writer, internalParameterType);
@@ -47,8 +47,8 @@ public interface IntrinsicData
 			receiver.writeExpression(writer, type);
 			return type;
 		}
-		
-		if (receiver.isClassAccessIgnored() || method.hasModifier(Modifiers.INFIX))
+
+		if (method.hasModifier(Modifiers.INFIX))
 		{
 			final IParameter parameter = parameterList.get(index);
 			arguments.writeValue(index - 1, parameter, writer);

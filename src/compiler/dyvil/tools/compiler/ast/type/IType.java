@@ -88,26 +88,25 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	// Generic Types
 	int GENERIC          = 24;
-	int GENERIC_NAMED    = 25;
-	int GENERIC_INTERNAL = 26;
+	int GENERIC_NAMED    = 25; // no deserialization
+	int GENERIC_INTERNAL = 26; // no deserialization
 
 	// Compound Types
 	int TUPLE  = 32;
 	int LAMBDA = 33;
 
 	int ARRAY = 34;
-	int LIST  = 35;
 	int MAP   = 37;
 
 	int OPTIONAL  = 48;
 	int REFERENCE = 50;
 
-	int UNION = 51;
-	// int INTERSECTION = 52;
+	int UNION        = 51; // no deserialization
+	int INTERSECTION = 52; // no deserialization
 
 	// Type Variable Types
 	int TYPE_VAR_TYPE     = 64;
-	int INTERNAL_TYPE_VAR = 65;
+	int INTERNAL_TYPE_VAR = 65; // no deserialization
 
 	int WILDCARD_TYPE = 80;
 
@@ -291,7 +290,8 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		return value.withType(this, typeContext, markers, context);
 	}
 
-	default IValue convertValueTo(IValue value, IType targetType, ITypeContext typeContext, MarkerList markers, IContext context)
+	default IValue convertValueTo(IValue value, IType targetType, ITypeContext typeContext, MarkerList markers,
+		                             IContext context)
 	{
 		return null;
 	}
@@ -418,7 +418,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	void writeCast(MethodWriter writer, IType target, int lineNumber) throws BytecodeException;
 
-	void writeClassExpression(MethodWriter writer) throws BytecodeException;
+	void writeClassExpression(MethodWriter writer, boolean wrapPrimitives) throws BytecodeException;
 
 	void writeTypeExpression(MethodWriter writer) throws BytecodeException;
 
@@ -512,9 +512,6 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 			break;
 		case ARRAY:
 			type = new ArrayType();
-			break;
-		case LIST:
-			type = new ListType();
 			break;
 		case MAP:
 			type = new MapType();

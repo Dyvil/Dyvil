@@ -80,7 +80,7 @@ public class FloatValue implements IConstantValue
 		{
 			return new DoubleValue(this.position, this.value);
 		}
-		if (Types.isExactType(type, Types.FLOAT))
+		if (Types.isSuperType(type, Types.FLOAT))
 		{
 			return this;
 		}

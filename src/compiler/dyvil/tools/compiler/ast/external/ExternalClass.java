@@ -102,6 +102,8 @@ public final class ExternalClass extends AbstractClass
 		this.resolved |= GENERICS;
 		if (this.typeParameterCount <= 0)
 		{
+			this.thisType = new ClassType(this);
+
 			return;
 		}
 
@@ -398,6 +400,11 @@ public final class ExternalClass extends AbstractClass
 		if (bodyClass != null)
 		{
 			return bodyClass;
+		}
+
+		if (this.innerTypes == null)
+		{
+			return null;
 		}
 
 		String internal = this.innerTypes.get(name.qualified);

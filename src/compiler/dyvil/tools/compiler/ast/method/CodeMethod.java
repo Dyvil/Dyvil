@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.method;
 
+import dyvil.annotation.Reified;
 import dyvil.collection.Set;
 import dyvil.collection.mutable.HashSet;
 import dyvil.collection.mutable.IdentityHashSet;
@@ -16,6 +17,7 @@ import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -27,6 +29,7 @@ import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
@@ -607,7 +610,7 @@ public class CodeMethod extends AbstractMethod
 		final int opcode =
 			(modifiers & Modifiers.ABSTRACT) != 0 && interfaceClass ? Opcodes.INVOKEINTERFACE : Opcodes.INVOKEVIRTUAL;
 
-		/**
+		/*
 		 * Contains entries in the format 'mangledName(paramTypes)returnType'
 		 * Used to ensure unique bridge methods
 		 */
@@ -640,6 +643,7 @@ public class CodeMethod extends AbstractMethod
 
 			final IParameterList overrideParameterList = overrideMethod.getParameterList();
 
+			// Generate Parameters and load arguments
 			for (int p = 0, count = this.parameters.size(); p < count; p++)
 			{
 				final IParameter overrideParameter = overrideParameterList.get(p);
@@ -650,6 +654,22 @@ public class CodeMethod extends AbstractMethod
 				methodWriter.visitVarInsn(overrideParameterType.getLoadOpcode(), overrideParameter.getLocalIndex());
 				overrideParameterType.writeCast(methodWriter, parameterType, lineNumber);
 			}
+			// Generate Type Parameters and load reified type arguments
+			for (int i = 0, count = this.typeParameterCount, overrideCount = overrideMethod.typeParameterCount();
+			     i < count; i++)
+			{
+				final ITypeParameter thisParameter = this.typeParameters[i];
+				final Reified.Type reifiedType = thisParameter.getReifiedKind();
+				if (reifiedType == null)
+				{
+					continue;
+				}
+
+				final ITypeParameter overrideParameter = i < overrideCount ? overrideMethod.getTypeParameter(i) : null;
+				this.writeReifyArgument(methodWriter, thisParameter, reifiedType, overrideParameter);
+
+				// Extra type parameters from the overriden method are ignored
+			}
 
 			IType overrideReturnType = overrideMethod.getType();
 
@@ -659,6 +679,43 @@ public class CodeMethod extends AbstractMethod
 			methodWriter.visitInsn(overrideReturnType.getReturnOpcode());
 			methodWriter.visitEnd();
 		}
+	}
+
+	private void writeReifyArgument(MethodWriter writer, ITypeParameter thisParameter, Reified.Type reifiedType,
+		                               ITypeParameter overrideParameter)
+	{
+		if (overrideParameter == null)
+		{
+			this.writeDefaultReifyArgument(writer, thisParameter, reifiedType);
+			return;
+		}
+
+		overrideParameter.writeParameter(writer);
+		if (overrideParameter.getReifiedKind() == null)
+		{
+			this.writeDefaultReifyArgument(writer, thisParameter, reifiedType);
+			return;
+		}
+
+		// Delegate to the TypeVarType implementation
+		final TypeVarType typeVarType = new TypeVarType(overrideParameter);
+
+		if (reifiedType == Reified.Type.TYPE)
+		{
+			typeVarType.writeTypeExpression(writer);
+			return;
+		}
+		typeVarType.writeClassExpression(writer, reifiedType == Reified.Type.OBJECT_CLASS);
+	}
+
+	private void writeDefaultReifyArgument(MethodWriter writer, ITypeParameter thisParameter, Reified.Type reifiedType)
+	{
+		if (reifiedType == Reified.Type.TYPE)
+		{
+			thisParameter.getDefaultType().writeTypeExpression(writer);
+			return;
+		}
+		thisParameter.getDefaultType().writeClassExpression(writer, reifiedType == Reified.Type.OBJECT_CLASS);
 	}
 
 	private boolean needsSignature()

@@ -27,6 +27,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -34,8 +35,6 @@ import java.io.IOException;
 
 public class ArrayType implements IObjectType, ITyped
 {
-	public static final int OBJECT_DISTANCE = 2;
-
 	protected IType type;
 	protected Mutability mutability = Mutability.UNDEFINED;
 
@@ -80,15 +79,9 @@ public class ArrayType implements IObjectType, ITyped
 	}
 
 	@Override
-	public boolean isGenericType()
+	public ICodePosition getPosition()
 	{
-		return false;
-	}
-
-	@Override
-	public void setType(IType type)
-	{
-		this.type = type;
+		return this.type == null ? null : this.type.getPosition();
 	}
 
 	@Override
@@ -98,9 +91,21 @@ public class ArrayType implements IObjectType, ITyped
 	}
 
 	@Override
+	public void setType(IType type)
+	{
+		this.type = type;
+	}
+
+	@Override
 	public Name getName()
 	{
 		return this.type.getName();
+	}
+
+	@Override
+	public boolean isGenericType()
+	{
+		return false;
 	}
 
 	@Override
@@ -251,7 +256,7 @@ public class ArrayType implements IObjectType, ITyped
 
 		if (Types.isVoid(this.type))
 		{
-			markers.add(Markers.semanticError(this.type.getPosition(), "type.array.void"));
+			markers.add(Markers.semanticError(this.getPosition(), "type.array.void"));
 		}
 		return this;
 	}
@@ -267,7 +272,7 @@ public class ArrayType implements IObjectType, ITyped
 	{
 		if (position == TypePosition.SUPER_TYPE)
 		{
-			markers.add(Markers.semantic(this.type.getPosition(), "type.super.array"));
+			markers.add(Markers.semantic(this.getPosition(), "type.super.array"));
 		}
 
 		this.type.checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
@@ -305,7 +310,7 @@ public class ArrayType implements IObjectType, ITyped
 		final ITypeParameter typeParameter = this.type.getTypeVariable();
 		if (typeParameter != null)
 		{
-			if (!this.type.isPrimitive() && concrete.isPrimitive())
+			if (concrete.isPrimitive() && !typeParameter.isAny())
 			{
 				concrete = concrete.getObjectType();
 			}

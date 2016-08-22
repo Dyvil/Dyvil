@@ -12,25 +12,25 @@ public enum Wrapper
 	DOUBLE('D', double.class, Double.class, 8 | 1 << 5),
 	OBJECT('L', Object.class, Object.class, 8 | 1 << 6),
 	VOID('V', void.class, Void.class, 1 << 6);
-	
+
 	private static final int SIZE_MASK = (1 << 4) - 1;
 	private static final int UNSIGNED  = 1 << 4;
 	private static final int FLOATING  = 1 << 5;
 	private static final int OTHER     = 1 << 6;
-	
+
 	private final char   basicTypeChar;
 	private final Class  primitiveClass;
 	private final Class  wrapperClass;
 	private final String primitiveSimpleName;
 	private final String wrapperSimpleName;
-	
+
 	// 0 OTHER FLOATING SIGNED SIZE3 SIZE2 SIZE1 SIZE0
 	private final byte flags;
-	
+
 	private static final Wrapper[] FROM_PRIMITIVE = new Wrapper[16];
 	private static final Wrapper[] FROM_WRAPPER   = new Wrapper[16];
 	private static final Wrapper[] FROM_CHAR      = new Wrapper[16];
-	
+
 	static
 	{
 		for (Wrapper localWrapper : values())
@@ -46,7 +46,7 @@ public enum Wrapper
 			FROM_CHAR[charHash] = localWrapper;
 		}
 	}
-	
+
 	Wrapper(char basicTypeChar, Class<?> primitive, Class<?> wrapper, int flags)
 	{
 		this.basicTypeChar = basicTypeChar;
@@ -56,28 +56,37 @@ public enum Wrapper
 		this.wrapperSimpleName = wrapper.getSimpleName();
 		this.flags = (byte) flags;
 	}
-	
+
+	public static Class<?> referenceType(Class<?> forClass)
+	{
+		if (forClass.isPrimitive())
+		{
+			return forPrimitiveType(forClass).wrapperClass;
+		}
+		return forClass;
+	}
+
 	public static Wrapper forBasicType(char c)
 	{
 		return FROM_CHAR[hashChar(c)];
 	}
-	
+
 	public static Wrapper forPrimitiveType(Class<?> c)
 	{
 		return FROM_PRIMITIVE[hashPrimitive(c)];
 	}
-	
+
 	public static Wrapper forWrapperType(Class<?> c)
 	{
 		return FROM_WRAPPER[hashWrapper(c)];
 	}
-	
+
 	public static boolean isWrapperType(Class<?> wrapperClass)
 	{
 		final Wrapper wrapper = FROM_WRAPPER[hashWrapper(wrapperClass)];
 		return wrapper != null && wrapper.wrapperClass == wrapperClass;
 	}
-	
+
 	private static int hashPrimitive(Class<?> primitiveClass)
 	{
 		final String className = primitiveClass.getName();
@@ -88,7 +97,7 @@ public enum Wrapper
 		}
 		return (className.charAt(0) + className.charAt(2)) & 0xF;
 	}
-	
+
 	private static int hashWrapper(Class<?> wrapperClass)
 	{
 		final String className = wrapperClass.getName();
@@ -98,37 +107,37 @@ public enum Wrapper
 		}
 		return (3 * className.charAt(11) + className.charAt(12)) & 0xF;
 	}
-	
+
 	private static int hashChar(char typeChar)
 	{
 		return (typeChar + (typeChar >> 1)) & 15;
 	}
-	
+
 	public char basicTypeChar()
 	{
 		return this.basicTypeChar;
 	}
-	
+
 	public Class primitiveType()
 	{
 		return this.primitiveClass;
 	}
-	
+
 	public Class wrapperType()
 	{
 		return this.wrapperClass;
 	}
-	
+
 	public String primitiveSimpleName()
 	{
 		return this.primitiveSimpleName;
 	}
-	
+
 	public String wrapperSimpleName()
 	{
 		return this.wrapperSimpleName;
 	}
-	
+
 	public boolean isConvertibleFrom(Wrapper wrapper)
 	{
 		if (this == wrapper)
@@ -153,15 +162,15 @@ public enum Wrapper
 			// no other conversions are classified as widening
 			return wrapper == CHAR;
 		}
-		
+
 		return true;
 	}
-	
+
 	public boolean isSigned()
 	{
 		return (this.flags & UNSIGNED) == 0;
 	}
-	
+
 	public boolean isFloating()
 	{
 		return (this.flags & FLOATING) != 0;

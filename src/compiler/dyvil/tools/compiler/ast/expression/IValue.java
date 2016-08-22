@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.intrinsic.PopExpr;
 import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -118,6 +119,7 @@ public interface IValue extends IASTNode, ITyped
 	int REFERENCE          = 240;
 	int LITERAL_CONVERSION = 241;
 	int OPERATOR_CHAIN     = 242;
+	int POP_EXPR           = 243;
 
 	// --- Other Constants ---
 
@@ -194,13 +196,23 @@ public interface IValue extends IASTNode, ITyped
 		return null;
 	}
 
-	default boolean isClassAccessIgnored()
+	default boolean isClassAccess()
 	{
 		return false;
 	}
 
-	default void setClassAccessIgnored(boolean ignored)
+	default boolean isIgnoredClassAccess()
 	{
+		return false;
+	}
+
+	default IValue asIgnoredClassAccess()
+	{
+		if (!this.hasSideEffects())
+		{
+			return null;
+		}
+		return new PopExpr(this);
 	}
 
 	default boolean checkVarargs(boolean typeCheck)

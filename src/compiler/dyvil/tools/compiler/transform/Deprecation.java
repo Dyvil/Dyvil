@@ -4,6 +4,7 @@ import dyvil.annotation.Deprecated.Reason;
 import dyvil.annotation.Experimental.Stage;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.EnumValue;
@@ -94,15 +95,15 @@ public final class Deprecation
 		IArguments arguments = annotation.getArguments();
 
 		// General Description / Marker Message
-		MarkerLevel markerLevel = getEnumValue(arguments, DEP_MARKER_TYPE_PARAM, MarkerLevel.class);
+		MarkerLevel markerLevel = AnnotationUtil.getEnumValue(arguments, DEP_MARKER_TYPE_PARAM, MarkerLevel.class);
 		if (markerLevel == null || markerLevel == MarkerLevel.IGNORE)
 		{
 			return;
 		}
 
-		String value = getStringValue(arguments, DEP_VALUE_PARAM);
-		String description = getStringValue(arguments, DEP_DESCRIPTION_PARAM);
-		String since = getStringValue(arguments, DEP_SINCE_PARAM);
+		String value = AnnotationUtil.getStringValue(arguments, DEP_VALUE_PARAM);
+		String description = AnnotationUtil.getStringValue(arguments, DEP_DESCRIPTION_PARAM);
+		String since = AnnotationUtil.getStringValue(arguments, DEP_SINCE_PARAM);
 
 		value = replaceMember(member, value).replace(SINCE, since);
 
@@ -171,15 +172,15 @@ public final class Deprecation
 	{
 		IArguments arguments = annotation.getArguments();
 
-		MarkerLevel markerLevel = getEnumValue(arguments, EXP_MARKER_TYPE_PARAM, MarkerLevel.class);
+		MarkerLevel markerLevel = AnnotationUtil.getEnumValue(arguments, EXP_MARKER_TYPE_PARAM, MarkerLevel.class);
 		if (markerLevel == null || markerLevel == MarkerLevel.IGNORE)
 		{
 			return;
 		}
 
-		String value = getStringValue(arguments, EXP_VALUE_PARAM);
-		String description = getStringValue(arguments, EXP_DESCRIPTION_PARAM);
-		Stage stage = getEnumValue(arguments, EXP_STAGE_PARAM, Stage.class);
+		String value = AnnotationUtil.getStringValue(arguments, EXP_VALUE_PARAM);
+		String description = AnnotationUtil.getStringValue(arguments, EXP_DESCRIPTION_PARAM);
+		Stage stage = AnnotationUtil.getEnumValue(arguments, EXP_STAGE_PARAM, Stage.class);
 		assert stage != null;
 
 		value = replaceMember(member, value).replace(STAGE, stage.toString());
@@ -203,14 +204,14 @@ public final class Deprecation
 	{
 		IArguments arguments = annotation.getArguments();
 
-		MarkerLevel markerLevel = getEnumValue(arguments, INF_MARKER_TYPE_PARAM, MarkerLevel.class);
+		MarkerLevel markerLevel = AnnotationUtil.getEnumValue(arguments, INF_MARKER_TYPE_PARAM, MarkerLevel.class);
 		if (markerLevel == null || markerLevel == MarkerLevel.IGNORE)
 		{
 			return;
 		}
 
-		String value = getStringValue(arguments, INF_VALUE_PARAM);
-		String description = getStringValue(arguments, INF_DESCRIPTION_PARAM);
+		String value = AnnotationUtil.getStringValue(arguments, INF_VALUE_PARAM);
+		String description = AnnotationUtil.getStringValue(arguments, INF_DESCRIPTION_PARAM);
 
 		value = replaceMember(member, value);
 
@@ -224,34 +225,6 @@ public final class Deprecation
 		}
 
 		markers.add(marker);
-	}
-
-	private static <T extends Enum<T>> T getEnumValue(IArguments arguments, IParameter parameter, Class<T> type)
-	{
-		IValue value = arguments.getValue(parameter.getIndex(), parameter);
-		if (value == null)
-		{
-			value = parameter.getValue();
-		}
-
-		if (value.valueTag() == IValue.ENUM_ACCESS)
-		{
-			EnumValue enumValue = (EnumValue) value;
-			return Enum.valueOf(type, enumValue.name.qualified);
-		}
-		return null;
-	}
-
-	private static String getStringValue(IArguments arguments, IParameter parameter)
-	{
-		IValue value = arguments.getValue(parameter.getIndex(), parameter);
-		if (value == null)
-		{
-			value = parameter.getValue();
-		}
-
-		assert value.valueTag() == IValue.STRING;
-		return value.stringValue();
 	}
 
 	private static Reason[] getReasons(IArguments arguments)

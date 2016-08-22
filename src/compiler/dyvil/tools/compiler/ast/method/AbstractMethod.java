@@ -57,11 +57,12 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 {
 	protected static final Handle EXTENSION_BSM = new Handle(ClassFormat.H_INVOKESTATIC, "dyvil/runtime/DynamicLinker",
 	                                                         "linkExtension",
-	                                                         "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;)Ljava/lang/invoke/CallSite;");
+	                                                         ClassFormat.BSM_HEAD + "Ljava/lang/invoke/MethodHandle;"
+		                                                         + ClassFormat.BSM_TAIL);
 
 	protected static final Handle STATICVIRTUAL_BSM = new Handle(ClassFormat.H_INVOKESTATIC,
 	                                                             "dyvil/runtime/DynamicLinker", "linkClassMethod",
-	                                                             "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;");
+	                                                             ClassFormat.BSM_HEAD + ClassFormat.BSM_TAIL);
 
 	protected static final String NAME_SEPARATOR = "_$_";
 
@@ -462,7 +463,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			argumentStartIndex = 0;
 			parameterStartIndex = 0;
 		}
-		else if ((mod = this.modifiers.toFlags() & Modifiers.INFIX) != 0 && receiver.valueTag() == IValue.CLASS_ACCESS)
+		else if ((mod = this.modifiers.toFlags() & Modifiers.INFIX) != 0 && receiver.isClassAccess())
 		{
 			// Static access to static method
 
@@ -486,7 +487,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 		else
 		{
-			if (mod == Modifiers.STATIC && receiver.valueTag() != IValue.CLASS_ACCESS)
+			if (mod == Modifiers.STATIC && !receiver.isClassAccess())
 			{
 				// Disallow non-static access to static method
 				invalid = true;
@@ -618,7 +619,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		if (receiver != null)
 		{
 			final int mod = this.modifiers.toFlags() & Modifiers.INFIX;
-			if (mod == Modifiers.INFIX && receiver.valueTag() != IValue.CLASS_ACCESS)
+			if (mod == Modifiers.INFIX && !receiver.isClassAccess())
 			{
 				// infix or extension method, declaring class implicit
 
@@ -646,9 +647,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			if ((mod & Modifiers.STATIC) != 0)
 			{
 				// static method or infix, extension method with explicit declaring class
-				receiver.setClassAccessIgnored(true);
 
-				if (receiver.valueTag() != IValue.CLASS_ACCESS)
+				if (!receiver.isClassAccess())
 				{
 					// static method called like instance method -> warning
 
@@ -661,8 +661,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 					markers.add(Markers.semantic(position, "method.access.static.type", this.name,
 					                             this.enclosingClass.getFullName()));
 				}
+				receiver = receiver.asIgnoredClassAccess();
 			}
-			else if (receiver.valueTag() == IValue.CLASS_ACCESS)
+			else if (receiver.isClassAccess())
 			{
 				// instance method, accessed via declaring class
 
@@ -697,14 +698,16 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			else
 			{
 				// unqualified call
-
-				markers.add(Markers.semantic(position, "method.access.unqualified", this.name.unqualified));
-
 				final IType receiverType = this.enclosingClass.getType();
 				receiver = new ThisExpr(position, receiverType, context, markers);
 				if (genericData != null)
 				{
 					genericData.setFallbackTypeContext(receiverType);
+				}
+
+				if (!this.enclosingClass.isAnonymous())
+				{
+					markers.add(Markers.semantic(position, "method.access.unqualified", this.name.unqualified));
 				}
 			}
 		}
@@ -1035,7 +1038,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 	protected void writeReceiver(MethodWriter writer, IValue receiver) throws BytecodeException
 	{
-		if (receiver == null || receiver.isClassAccessIgnored())
+		if (receiver == null)
 		{
 			return;
 		}
@@ -1047,11 +1050,21 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 
 		receiver.writeExpression(writer, this.enclosingClass.getType());
+
+		if (receiver.isIgnoredClassAccess())
+		{
+			final IType type = receiver.getType();
+			if (type.getTypeVariable() != null)
+			{
+				// Static virtual call
+				type.writeClassExpression(writer, true);
+			}
+		}
 	}
 
 	protected void writeArguments(MethodWriter writer, IValue receiver, IArguments arguments) throws BytecodeException
 	{
-		if (receiver != null && !receiver.isClassAccessIgnored() && this.hasModifier(Modifiers.INFIX))
+		if (receiver != null && !receiver.isIgnoredClassAccess() && this.hasModifier(Modifiers.INFIX))
 		{
 			arguments.writeValues(writer, this.parameters, 1);
 			return;
@@ -1094,26 +1107,19 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return;
 		}
 
-		if (receiver != null)
+		if (receiver == null)
 		{
-			switch (receiver.valueTag())
-			{
-			case IValue.SUPER:
-				opcode = Opcodes.INVOKESPECIAL;
-				break;
-			case IValue.CLASS_ACCESS:
-				final IType type = receiver.getType();
-				if ((modifiers & Modifiers.STATIC) != 0 && type.getTypeVariable() != null)
-				{
-					type.writeClassExpression(writer);
-					writer.visitInvokeDynamicInsn(mangledName, descriptor.replace(")", "Ljava/lang/Class;)"), STATICVIRTUAL_BSM);
-					return;
-				}
-				// Fallthrough
-			default:
-				opcode = this.getInvokeOpcode();
-				break;
-			}
+			opcode = this.getInvokeOpcode();
+		}
+		else if (receiver.valueTag() == IValue.SUPER)
+		{
+			opcode = Opcodes.INVOKESPECIAL;
+		}
+		else if (receiver.isIgnoredClassAccess() && receiver.getType().getTypeVariable() != null)
+		{
+			writer
+				.visitInvokeDynamicInsn(mangledName, descriptor.replace("(", "(Ljava/lang/Class;"), STATICVIRTUAL_BSM);
+			return;
 		}
 		else
 		{

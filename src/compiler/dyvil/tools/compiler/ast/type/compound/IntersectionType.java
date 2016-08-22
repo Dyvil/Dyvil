@@ -50,7 +50,7 @@ public class IntersectionType implements IObjectType
 	@Override
 	public int typeTag()
 	{
-		return UNION;
+		return INTERSECTION;
 	}
 
 	@Override

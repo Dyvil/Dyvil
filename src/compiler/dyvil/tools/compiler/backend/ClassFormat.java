@@ -28,6 +28,9 @@ public final class ClassFormat
 	public static final int CLASS_VERSION = ASMConstants.V1_8;
 	public static final int ASM_VERSION   = ASMConstants.ASM5;
 
+	public static final String BSM_HEAD = "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;";
+	public static final String BSM_TAIL = ")Ljava/lang/invoke/CallSite;";
+
 	public static final int H_GETFIELD         = ASMConstants.H_GETFIELD;
 	public static final int H_GETSTATIC        = ASMConstants.H_GETSTATIC;
 	public static final int H_PUTFIELD         = ASMConstants.H_PUTFIELD;
@@ -183,9 +186,9 @@ public final class ClassFormat
 	private static ITypeConsumer parameterTypeConsumer(IExternalCallableMember methodSignature)
 	{
 		final IParameterList parameterList = methodSignature.getExternalParameterList();
-		return type -> {
-			final ExternalParameter parameter = new ExternalParameter(Name.fromRaw("par" + parameterList.size()),
-			                                                          type);
+		return type ->
+		{
+			final ExternalParameter parameter = new ExternalParameter(null, type);
 			parameter.setMethod(methodSignature);
 			parameterList.addParameter(parameter);
 		};

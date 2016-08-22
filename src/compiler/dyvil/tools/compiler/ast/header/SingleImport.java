@@ -1,17 +1,21 @@
 package dyvil.tools.compiler.ast.header;
 
-import dyvil.collection.List;
-import dyvil.collection.mutable.ArrayList;
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.classes.IClassBody;
+import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.external.ExternalHeader;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
+import dyvil.tools.compiler.ast.operator.IOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
@@ -22,16 +26,36 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public final class SingleImport extends Import
+public final class SingleImport extends Import implements IDefaultContext
 {
-	public Name name;
-	public Name alias;
+	protected Name name;
+	protected Name alias;
 
-	private IClass  theClass;
-	private Package thePackage;
+	// Metadata
 
-	private IDataMember   field;
-	private List<IMethod> methods;
+	/**
+	 * The context that will be used to resolve fields, methods, etc.
+	 */
+	private IImportContext resolver;
+
+	/**
+	 * The context that is returned by {@link #asContext()}. Can be either {@code this} object or a context that first
+	 * searches {@code this} and then the {@code inline}d header.
+	 */
+	private IContext asContext = this;
+
+	/**
+	 * The context that is returned by {@link #asParentContext()}. Will be a chain that searches the class, header and
+	 * package with this name, in that order.
+	 */
+	private IContext asParentContext;
+
+	private int mask;
+
+	public SingleImport()
+	{
+		super(null);
+	}
 
 	public SingleImport(ICodePosition position)
 	{
@@ -50,10 +74,14 @@ public final class SingleImport extends Import
 		return SINGLE;
 	}
 
-	@Override
-	public void setAlias(Name alias)
+	public Name getName()
 	{
-		this.alias = alias;
+		return this.name;
+	}
+
+	public void setName(Name name)
+	{
+		this.name = name;
 	}
 
 	@Override
@@ -63,84 +91,199 @@ public final class SingleImport extends Import
 	}
 
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context, boolean using)
+	public void setAlias(Name alias)
 	{
-		if (this.parent != null)
-		{
-			this.parent.resolveTypes(markers, context, false);
-			context = this.parent.getContext();
+		this.alias = alias;
+	}
 
-			if (context == null)
-			{
-				return;
-			}
-		}
+	private boolean hasMask(int mask)
+	{
+		return (this.mask & mask) != 0;
+	}
 
-		if (using)
-		{
-			if (!(context instanceof IClass))
-			{
-				markers.add(Markers.semantic(this.position, "using.class.invalid"));
-				return;
-			}
-
-			IClassBody body = ((IClass) context).getBody();
-
-			IDataMember field = body.getField(this.name);
-			if (field != null)
-			{
-				this.field = field;
-				return;
-			}
-
-			this.methods = new ArrayList<>();
-			int len = body.methodCount();
-			for (int i = 0; i < len; i++)
-			{
-				IMethod m = body.getMethod(i);
-				if (m.getName() == this.name)
-				{
-					this.methods.add(m);
-				}
-			}
-			if (!this.methods.isEmpty())
-			{
-				return;
-			}
-
-			markers.add(Markers.semantic(this.position, "method.access.resolve.field", this.name.qualified));
-			return;
-		}
-
-		Package pack = context.resolvePackage(this.name);
-		if (pack != null)
-		{
-			this.thePackage = pack;
-			return;
-		}
-
-		IClass iclass = context.resolveClass(this.name);
-		if (iclass != null)
-		{
-			this.theClass = iclass;
-			return;
-		}
-
-		markers.add(Markers.semantic(this.position, "resolve.package", this.name.qualified));
+	private boolean checkName(int mask, Name name)
+	{
+		return this.hasMask(mask) && (name == this.name || name == this.alias);
 	}
 
 	@Override
-	public IContext getContext()
+	public void resolveTypes(MarkerList markers, IContext context, IImportContext parentContext, int mask)
 	{
-		return this.theClass != null ? this.theClass : this.thePackage;
+		if (this.parent != null)
+		{
+			this.parent.resolveTypes(markers, context, parentContext, KindedImport.PARENT);
+			parentContext = this.parent.asParentContext();
+		}
+
+		boolean resolved = false;
+		this.resolver = parentContext;
+		this.mask = mask;
+
+		if ((mask & KindedImport.CLASS) != 0)
+		{
+			final IClass theClass = parentContext.resolveClass(this.name);
+			if (theClass != null)
+			{
+				this.asParentContext = theClass;
+				resolved = true;
+			}
+		}
+		if ((mask & KindedImport.HEADER) != 0)
+		{
+			final IDyvilHeader header = parentContext.resolveHeader(this.name);
+			if (header != null)
+			{
+				if ((mask & KindedImport.INLINE) != 0 && this.checkInline(markers, context, header))
+				{
+					this.asContext = new CombiningContext(this, header.getContext());
+				}
+				this.asParentContext = !resolved ? header : new CombiningContext(header, this.asParentContext);
+				resolved = true;
+			}
+		}
+		if ((mask & KindedImport.PACKAGE) != 0)
+		{
+			final Package thePackage = parentContext.resolvePackage(this.name);
+			if (thePackage != null)
+			{
+				this.asParentContext = !resolved ? thePackage : new CombiningContext(thePackage, this.asParentContext);
+				resolved = true;
+			}
+		}
+
+		if (!resolved)
+		{
+			this.asParentContext = IDefaultContext.DEFAULT;
+		}
+
+		// error later
+	}
+
+	@Override
+	public void resolve(MarkerList markers, IContext context, IImportContext parentContext, int mask)
+	{
+		if (this.asParentContext != null)
+		{
+			// A class, package or type was found with this name
+			return;
+		}
+
+		parentContext = this.resolver;
+		if ((mask & KindedImport.VAR) != 0 && parentContext.resolveField(this.name) != null)
+		{
+			return;
+		}
+
+		if ((mask & KindedImport.FUNC) != 0)
+		{
+			final MatchList<IMethod> methods = new MatchList<>(null);
+			parentContext.getMethodMatches(methods, null, this.name, null);
+			if (!methods.isEmpty())
+			{
+				return;
+			}
+		}
+
+		if ((mask & KindedImport.OPERATOR) != 0 && parentContext.resolveOperator(this.name, -1) != null)
+		{
+			return;
+		}
+
+		if ((mask & KindedImport.TYPE) != 0 && parentContext.resolveTypeAlias(this.name, -1) != null)
+		{
+			return;
+		}
+
+		markers.add(Markers.semanticError(this.position, "import.resolve", this.name.qualified));
+	}
+
+	private boolean checkInline(MarkerList markers, IContext context, IDyvilHeader header)
+	{
+		// Check if the Header has a Header Declaration
+		final HeaderDeclaration headerDeclaration = header.getHeaderDeclaration();
+		if (headerDeclaration == null)
+		{
+			return header.isHeader();
+		}
+
+		// Header Access Check
+		int accessLevel = headerDeclaration.getModifiers().toFlags() & Modifiers.ACCESS_MODIFIERS;
+		if ((accessLevel & Modifiers.INTERNAL) != 0)
+		{
+			if (header instanceof ExternalHeader)
+			{
+				markers.add(Markers.semanticError(this.position, "import.inline_header.internal", header.getName()));
+				return false;
+			}
+			accessLevel &= 0b1111;
+		}
+
+		switch (accessLevel)
+		{
+		case Modifiers.PACKAGE:
+		case Modifiers.PROTECTED:
+			if (header.getPackage() == context.getHeader().getPackage())
+			{
+				return true;
+			}
+			// Fallthrough
+		case Modifiers.PRIVATE:
+			markers.add(Markers.semanticError(this.position, "import.inline_header.invisible", header.getName()));
+			return false;
+		}
+
+		// All checks passed
+		return true;
+	}
+
+	@Override
+	public IImportContext asContext()
+	{
+		return this.asContext;
+	}
+
+	@Override
+	public IImportContext asParentContext()
+	{
+		return this.asParentContext;
 	}
 
 	@Override
 	public Package resolvePackage(Name name)
 	{
-		if (name == this.name || name == this.alias)
+		if (this.checkName(KindedImport.PACKAGE, name))
 		{
-			return this.thePackage;
+			return this.resolver.resolvePackage(this.name);
+		}
+		return null;
+	}
+
+	@Override
+	public IDyvilHeader resolveHeader(Name name)
+	{
+		if (this.checkName(KindedImport.HEADER, name))
+		{
+			return this.resolver.resolveHeader(this.name);
+		}
+		return null;
+	}
+
+	@Override
+	public ITypeAlias resolveTypeAlias(Name name, int arity)
+	{
+		if (this.checkName(KindedImport.TYPE, name))
+		{
+			return this.resolver.resolveTypeAlias(this.name, arity);
+		}
+		return null;
+	}
+
+	@Override
+	public IOperator resolveOperator(Name name, int type)
+	{
+		if (this.checkName(KindedImport.OPERATOR, name))
+		{
+			return this.resolver.resolveOperator(this.name, type);
 		}
 		return null;
 	}
@@ -148,9 +291,9 @@ public final class SingleImport extends Import
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		if (name == this.name || name == this.alias)
+		if (this.checkName(KindedImport.CLASS, name))
 		{
-			return this.theClass;
+			return this.resolver.resolveClass(this.name);
 		}
 		return null;
 	}
@@ -158,9 +301,9 @@ public final class SingleImport extends Import
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		if (name == null || name == this.name || name == this.alias)
+		if (this.checkName(KindedImport.VAR, name))
 		{
-			return this.field;
+			return this.resolver.resolveField(this.name);
 		}
 		return null;
 	}
@@ -168,32 +311,18 @@ public final class SingleImport extends Import
 	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
-		if (this.methods == null)
+		if (this.checkName(KindedImport.FUNC, name))
 		{
-			return;
-		}
-		if (name != null && name != this.name && name != this.alias)
-		{
-			return;
-		}
-
-		for (IMethod method : this.methods)
-		{
-			method.checkMatch(list, receiver, null, arguments);
+			this.resolver.getMethodMatches(list, receiver, this.name, arguments);
 		}
 	}
 
 	@Override
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
-		if (this.methods == null)
+		if (this.hasMask(KindedImport.IMPLICIT))
 		{
-			return;
-		}
-
-		for (IMethod method : this.methods)
-		{
-			method.checkImplicitMatch(list, value, targetType);
+			this.resolver.getImplicitMatches(list, value, targetType);
 		}
 	}
 
@@ -201,30 +330,16 @@ public final class SingleImport extends Import
 	public void writeData(DataOutput out) throws IOException
 	{
 		IImport.writeImport(this.parent, out);
-
-		out.writeUTF(this.name.qualified);
-		if (this.alias != null)
-		{
-			out.writeUTF(this.alias.qualified);
-		}
-		else
-		{
-			out.writeUTF("");
-		}
+		this.name.write(out); // non-null
+		Name.write(this.alias, out); // nullable
 	}
 
 	@Override
 	public void readData(DataInput in) throws IOException
 	{
 		this.parent = IImport.readImport(in);
-
-		this.name = Name.fromRaw(in.readUTF());
-
-		String alias = in.readUTF();
-		if (!alias.isEmpty())
-		{
-			this.alias = Name.fromRaw(alias);
-		}
+		this.name = Name.read(in);
+		this.alias = Name.read(in);
 	}
 
 	@Override

@@ -426,9 +426,9 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
-	public void writeClassExpression(MethodWriter writer) throws BytecodeException
+	public void writeClassExpression(MethodWriter writer, boolean wrapPrimitives) throws BytecodeException
 	{
-		this.type.writeClassExpression(writer);
+		this.type.writeClassExpression(writer, wrapPrimitives);
 	}
 
 	@Override

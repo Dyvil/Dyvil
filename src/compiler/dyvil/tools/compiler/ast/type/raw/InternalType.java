@@ -80,13 +80,16 @@ public class InternalType implements IRawType
 			return Types.DOUBLE.getRefType();
 		case "dyvil/ref/StringRef":
 			return Types.STRING.getRefType();
-
 		case "dyvil/lang/Null":
 			return Types.NULL;
 		}
 
-		IClass iclass = Package.rootPackage.resolveInternalClass(this.internalName);
-		return new ClassType(iclass);
+		final IClass resolvedClass = Package.rootPackage.resolveInternalClass(this.internalName);
+		if (resolvedClass == null)
+		{
+			return Types.UNKNOWN;
+		}
+		return resolvedClass.getClassType();
 	}
 
 	@Override

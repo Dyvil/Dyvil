@@ -24,9 +24,9 @@ public final class LanguageFeatures
 	@Intrinsic([ LOAD_0 ])
 	public static T convert<T>(T value) = value
 
-	public static Class<T> classOf<@Reified(true) T>(T value) = class T
+	public static Class<T> classOf<@Reified(Reified.Type.ANY_CLASS) T>(T value) = class T
 
-	public static Type<T> typeOf<@Reified T>(T value) = type T
+	public static Type<T> typeOf<@Reified(Reified.Type.TYPE) T>(T value) = type T
 
 	// Increments
 
