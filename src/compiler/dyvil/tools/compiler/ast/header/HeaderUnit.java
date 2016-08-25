@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.structure;
+package dyvil.tools.compiler.ast.header;
 
 import dyvil.collection.Map;
 import dyvil.collection.mutable.IdentityHashMap;
@@ -12,9 +12,7 @@ import dyvil.tools.compiler.ast.context.IStaticContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.header.HeaderDeclaration;
-import dyvil.tools.compiler.ast.header.ImportDeclaration;
-import dyvil.tools.compiler.ast.header.PackageDeclaration;
+import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
@@ -22,6 +20,7 @@ import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.operator.IOperator;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
@@ -47,7 +46,7 @@ import java.io.DataOutput;
 import java.io.File;
 import java.io.IOException;
 
-public class DyvilHeader implements ICompilationUnit, IDyvilHeader, IDefaultContext
+public class HeaderUnit implements ICompilationUnit, IHeaderUnit, IDefaultContext
 {
 	protected final DyvilCompiler compiler;
 
@@ -76,7 +75,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader, IDefaultCont
 
 	protected HeaderDeclaration headerDeclaration;
 
-	public DyvilHeader(DyvilCompiler compiler)
+	public HeaderUnit(DyvilCompiler compiler)
 	{
 		this.compiler = compiler;
 		this.inputFile = null;
@@ -84,7 +83,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader, IDefaultCont
 		this.outputFile = null;
 	}
 
-	public DyvilHeader(DyvilCompiler compiler, Name name)
+	public HeaderUnit(DyvilCompiler compiler, Name name)
 	{
 		this.compiler = compiler;
 
@@ -94,7 +93,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader, IDefaultCont
 		this.name = name;
 	}
 
-	public DyvilHeader(DyvilCompiler compiler, Package pack, File input, File output)
+	public HeaderUnit(DyvilCompiler compiler, Package pack, File input, File output)
 	{
 		this.compiler = compiler;
 
@@ -494,13 +493,13 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader, IDefaultCont
 	// IContext override implementations
 
 	@Override
-	public IDyvilHeader getHeader()
+	public IHeaderUnit getHeader()
 	{
 		return this;
 	}
 
 	@Override
-	public IDyvilHeader resolveHeader(Name name)
+	public IHeaderUnit resolveHeader(Name name)
 	{
 		return name == this.name ? this : null;
 	}
@@ -585,7 +584,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader, IDefaultCont
 		}
 		if (access == Modifiers.PROTECTED || access == Modifiers.PACKAGE)
 		{
-			IDyvilHeader header = iclass.getHeader();
+			IHeaderUnit header = iclass.getHeader();
 			if (header != null && (header == this || this.pack == header.getPackage()))
 			{
 				return VISIBLE;
@@ -599,7 +598,7 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader, IDefaultCont
 	@Override
 	public String getFullName()
 	{
-		return this.pack.fullName + '.' + this.name;
+		return this.pack.getFullName() + '.' + this.name;
 	}
 
 	@Override
@@ -607,9 +606,9 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader, IDefaultCont
 	{
 		if (name != this.name)
 		{
-			return this.pack.fullName + '.' + this.name.qualified + '.' + name.qualified;
+			return this.pack.getFullName() + '.' + this.name.qualified + '.' + name.qualified;
 		}
-		return this.pack.fullName + '.' + name.qualified;
+		return this.pack.getFullName() + '.' + name.qualified;
 	}
 
 	@Override
@@ -766,9 +765,9 @@ public class DyvilHeader implements ICompilationUnit, IDyvilHeader, IDefaultCont
 
 class HeaderContext implements IStaticContext
 {
-	private DyvilHeader header;
+	private HeaderUnit header;
 
-	public HeaderContext(DyvilHeader header)
+	public HeaderContext(HeaderUnit header)
 	{
 		this.header = header;
 	}
@@ -780,7 +779,7 @@ class HeaderContext implements IStaticContext
 	}
 
 	@Override
-	public IDyvilHeader getHeader()
+	public IHeaderUnit getHeader()
 	{
 		return this.header;
 	}
@@ -792,7 +791,7 @@ class HeaderContext implements IStaticContext
 	}
 
 	@Override
-	public IDyvilHeader resolveHeader(Name name)
+	public IHeaderUnit resolveHeader(Name name)
 	{
 		return this.header.resolveHeader(name);
 	}

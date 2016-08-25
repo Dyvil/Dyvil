@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.constant;
 
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public interface IConstantValue extends IValue

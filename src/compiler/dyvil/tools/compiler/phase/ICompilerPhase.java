@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.ICompilationUnit;
+import dyvil.tools.compiler.ast.header.ICompilationUnit;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.parsing.lexer.DyvilLexer;

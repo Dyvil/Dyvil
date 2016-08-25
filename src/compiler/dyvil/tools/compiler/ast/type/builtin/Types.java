@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.dynamic.DynamicType;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
@@ -22,8 +22,8 @@ import dyvil.tools.parsing.Name;
 
 public final class Types
 {
-	public static IDyvilHeader LANG_HEADER;
-	public static IContext BASE_CONTEXT;
+	public static IHeaderUnit LANG_HEADER;
+	public static IContext    BASE_CONTEXT;
 
 	public static final PrimitiveType VOID    = new PrimitiveType(Names._void, PrimitiveType.VOID_CODE, 'V',
 	                                                              Opcodes.ILOAD + Opcodes.RETURN - Opcodes.IRETURN,

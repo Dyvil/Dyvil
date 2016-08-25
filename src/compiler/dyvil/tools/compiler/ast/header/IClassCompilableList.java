@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.structure;
+package dyvil.tools.compiler.ast.header;
 
 import dyvil.tools.compiler.backend.IClassCompilable;
 

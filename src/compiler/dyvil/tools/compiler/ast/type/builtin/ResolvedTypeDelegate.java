@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.type.builtin;
 
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.TypeDelegate;
 import dyvil.tools.parsing.marker.MarkerList;

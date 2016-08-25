@@ -1,9 +1,9 @@
 package dyvil.tools.compiler.sources;
 
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.structure.DyvilHeader;
-import dyvil.tools.compiler.ast.structure.DyvilUnit;
-import dyvil.tools.compiler.ast.structure.ICompilationUnit;
+import dyvil.tools.compiler.ast.header.HeaderUnit;
+import dyvil.tools.compiler.ast.header.ClassUnit;
+import dyvil.tools.compiler.ast.header.ICompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.lang.I18n;
 
@@ -14,14 +14,14 @@ public class DyvilFileType implements IFileType
 	@FunctionalInterface
 	interface HeaderSupplier
 	{
-		DyvilHeader newHeader(DyvilCompiler compiler, Package pack, File inputFile, File outputFile);
+		HeaderUnit newHeader(DyvilCompiler compiler, Package pack, File inputFile, File outputFile);
 	}
 	
 	public static final String CLASS_EXTENSION  = ".class";
 	public static final String OBJECT_EXTENSION = ".dyo";
 	
-	public static final IFileType DYVIL_UNIT   = new DyvilFileType("unit", "dyv", DyvilUnit::new);
-	public static final IFileType DYVIL_HEADER = new DyvilFileType("header", "dyh", DyvilHeader::new);
+	public static final IFileType DYVIL_UNIT   = new DyvilFileType("unit", "dyv", ClassUnit::new);
+	public static final IFileType DYVIL_HEADER = new DyvilFileType("header", "dyh", HeaderUnit::new);
 
 	public static void setupFileFinder(FileFinder fileFinder)
 	{
@@ -57,7 +57,7 @@ public class DyvilFileType implements IFileType
 	@Override
 	public ICompilationUnit createUnit(DyvilCompiler compiler, Package pack, File inputFile, File outputFile)
 	{
-		DyvilHeader header = this.headerSupplier.newHeader(compiler, pack, inputFile, outputFile);
+		HeaderUnit header = this.headerSupplier.newHeader(compiler, pack, inputFile, outputFile);
 		pack.addHeader(header);
 		return header;
 	}

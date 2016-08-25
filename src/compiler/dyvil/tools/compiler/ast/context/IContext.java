@@ -8,13 +8,13 @@ import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.header.IImportContext;
+import dyvil.tools.compiler.ast.imports.IImportContext;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.operator.IOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
@@ -53,7 +53,7 @@ public interface IContext extends IMemberContext, IImportContext
 		return this.getHeader().getCompilationContext();
 	}
 
-	IDyvilHeader getHeader();
+	IHeaderUnit getHeader();
 
 	IClass getThisClass();
 
@@ -63,7 +63,7 @@ public interface IContext extends IMemberContext, IImportContext
 	Package resolvePackage(Name name);
 
 	@Override
-	IDyvilHeader resolveHeader(Name name);
+	IHeaderUnit resolveHeader(Name name);
 
 	@Override
 	IClass resolveClass(Name name);

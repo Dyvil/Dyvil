@@ -14,8 +14,8 @@ import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParametric;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.IClassCompilable;
@@ -32,10 +32,10 @@ public interface IClass extends IClassMember, ITypeParametric, IContext, IParame
 		return MemberKind.CLASS;
 	}
 
-	void setHeader(IDyvilHeader unit);
+	void setHeader(IHeaderUnit unit);
 
 	@Override
-	IDyvilHeader getHeader();
+	IHeaderUnit getHeader();
 	
 	@Override
 	void setEnclosingClass(IClass enclosingClass);

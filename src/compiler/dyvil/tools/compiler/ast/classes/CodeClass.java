@@ -20,8 +20,8 @@ import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -48,7 +48,7 @@ public class CodeClass extends AbstractClass
 	protected IArguments superConstructorArguments = EmptyArguments.INSTANCE;
 
 	// Metadata
-	protected IDyvilHeader  unit;
+	protected IHeaderUnit   unit;
 	protected ICodePosition position;
 
 	protected boolean traitInit;
@@ -67,7 +67,7 @@ public class CodeClass extends AbstractClass
 		this.interfaces = new IType[1];
 	}
 
-	public CodeClass(IDyvilHeader unit, Name name)
+	public CodeClass(IHeaderUnit unit, Name name)
 	{
 		this.unit = unit;
 		this.name = name;
@@ -89,13 +89,13 @@ public class CodeClass extends AbstractClass
 	}
 
 	@Override
-	public IDyvilHeader getHeader()
+	public IHeaderUnit getHeader()
 	{
 		return this.unit;
 	}
 
 	@Override
-	public void setHeader(IDyvilHeader unit)
+	public void setHeader(IHeaderUnit unit)
 	{
 		this.unit = unit;
 	}

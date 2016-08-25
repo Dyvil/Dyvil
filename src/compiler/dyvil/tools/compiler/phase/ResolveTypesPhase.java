@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.phase;
 
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.structure.ICompilationUnit;
+import dyvil.tools.compiler.ast.header.ICompilationUnit;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.lang.I18n;
 import dyvil.tools.compiler.util.Util;

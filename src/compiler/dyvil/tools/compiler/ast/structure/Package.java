@@ -10,6 +10,8 @@ import dyvil.tools.compiler.ast.consumer.IClassConsumer;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.external.ExternalHeader;
+import dyvil.tools.compiler.ast.header.HeaderUnit;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.header.PackageDeclaration;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.backend.ClassReader;
@@ -55,7 +57,7 @@ public class Package implements INamed, IDefaultContext, IClassConsumer
 	protected String internalName;
 
 	protected List<IClass>         classes     = new ArrayList<>();
-	protected List<IDyvilHeader>   headers     = new ArrayList<>();
+	protected List<IHeaderUnit>    headers     = new ArrayList<>();
 	protected Map<String, Package> subPackages = new HashMap<>();
 
 	protected Package()
@@ -152,7 +154,7 @@ public class Package implements INamed, IDefaultContext, IClassConsumer
 
 	// Units
 
-	public void addHeader(IDyvilHeader unit)
+	public void addHeader(IHeaderUnit unit)
 	{
 		this.headers.add(unit);
 	}
@@ -227,14 +229,15 @@ public class Package implements INamed, IDefaultContext, IClassConsumer
 		return null;
 	}
 
-	public IDyvilHeader resolveHeader(String name)
+	public IHeaderUnit resolveHeader(String name)
 	{
 		return this.resolveHeader(Name.fromRaw(name));
 	}
 
-	public IDyvilHeader resolveHeader(Name name)
+	@Override
+	public IHeaderUnit resolveHeader(Name name)
 	{
-		for (IDyvilHeader unit : this.headers)
+		for (IHeaderUnit unit : this.headers)
 		{
 			if (unit.getName() == name)
 			{
@@ -252,7 +255,7 @@ public class Package implements INamed, IDefaultContext, IClassConsumer
 	@Override
 	public IClass resolveClass(Name name)
 	{
-		for (IDyvilHeader c : this.headers)
+		for (IHeaderUnit c : this.headers)
 		{
 			if (c.getName() == name)
 			{
@@ -310,12 +313,12 @@ public class Package implements INamed, IDefaultContext, IClassConsumer
 		return null;
 	}
 
-	private IDyvilHeader loadHeader(Name name)
+	private IHeaderUnit loadHeader(Name name)
 	{
 		String fileName = this.getInternalName() + name.qualified + DyvilFileType.OBJECT_EXTENSION;
 		for (Library library : rootPackage.compiler.config.libraries)
 		{
-			IDyvilHeader header = this.loadHeader(fileName, name, library);
+			IHeaderUnit header = this.loadHeader(fileName, name, library);
 			if (header != null)
 			{
 				return header;
@@ -325,13 +328,12 @@ public class Package implements INamed, IDefaultContext, IClassConsumer
 		return null;
 	}
 
-	private IDyvilHeader loadHeader(String fileName, Name name, Library library)
+	private IHeaderUnit loadHeader(String fileName, Name name, Library library)
 	{
 		InputStream inputStream = library.getInputStream(fileName);
 		if (inputStream != null)
 		{
-			final DyvilHeader header = new ExternalHeader(rootPackage.compiler, name);
-			header.pack = this;
+			final HeaderUnit header = new ExternalHeader(rootPackage.compiler, name, this);
 			this.headers.add(header);
 			return ObjectFormat.read(rootPackage.compiler, inputStream, header);
 		}

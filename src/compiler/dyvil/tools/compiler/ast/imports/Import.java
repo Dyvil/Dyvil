@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.header;
+package dyvil.tools.compiler.ast.imports;
 
 import dyvil.tools.parsing.position.ICodePosition;
 

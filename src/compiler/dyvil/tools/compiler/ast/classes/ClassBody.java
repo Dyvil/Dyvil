@@ -16,8 +16,8 @@ import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
@@ -610,7 +610,7 @@ public class ClassBody implements IClassBody
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		final IDyvilHeader header = this.theClass.getHeader();
+		final IHeaderUnit header = this.theClass.getHeader();
 
 		/*
 		 * The cache size is calculated as follows: We sum the number of methods assuming they all have unique names, add

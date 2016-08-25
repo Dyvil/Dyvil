@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.header;
+package dyvil.tools.compiler.ast.imports;
 
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.structure.Package;

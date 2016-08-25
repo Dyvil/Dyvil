@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
@@ -30,7 +30,7 @@ public interface IDefaultContext extends IStaticContext
 	}
 
 	@Override
-	default IDyvilHeader getHeader()
+	default IHeaderUnit getHeader()
 	{
 		return null;
 	}
@@ -42,7 +42,7 @@ public interface IDefaultContext extends IStaticContext
 	}
 
 	@Override
-	default IDyvilHeader resolveHeader(Name name)
+	default IHeaderUnit resolveHeader(Name name)
 	{
 		return null;
 	}

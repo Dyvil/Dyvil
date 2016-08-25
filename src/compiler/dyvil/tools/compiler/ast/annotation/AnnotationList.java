@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.annotation;
 import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.parsing.marker.MarkerList;
 
 import java.io.DataInput;

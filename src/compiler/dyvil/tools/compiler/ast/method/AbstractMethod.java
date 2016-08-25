@@ -29,7 +29,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Mutability;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -328,7 +328,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public IDyvilHeader getHeader()
+	public IHeaderUnit getHeader()
 	{
 		return this.enclosingClass.getHeader();
 	}

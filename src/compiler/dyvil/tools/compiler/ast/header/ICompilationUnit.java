@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.structure;
+package dyvil.tools.compiler.ast.header;
 
 import dyvil.io.Console;
 import dyvil.tools.compiler.DyvilCompiler;

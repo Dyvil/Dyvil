@@ -1,10 +1,11 @@
-package dyvil.tools.compiler.ast.structure;
+package dyvil.tools.compiler.ast.header;
 
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.consumer.IClassConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.ObjectFormat;
@@ -16,14 +17,14 @@ import dyvil.tools.parsing.ParserManager;
 
 import java.io.File;
 
-public class DyvilUnit extends DyvilHeader implements IClassConsumer
+public class ClassUnit extends HeaderUnit implements IClassConsumer
 {
 	private IClass[] classes = new IClass[1];
 	private int classCount;
 	private IClassCompilable[] innerClasses = new IClassCompilable[2];
 	private int innerClassCount;
 
-	public DyvilUnit(DyvilCompiler compiler, Package pack, File input, File output)
+	public ClassUnit(DyvilCompiler compiler, Package pack, File input, File output)
 	{
 		super(compiler, pack, input, output);
 	}

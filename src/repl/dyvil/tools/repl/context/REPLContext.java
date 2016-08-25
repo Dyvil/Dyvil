@@ -18,7 +18,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
-import dyvil.tools.compiler.ast.header.ImportDeclaration;
+import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -28,7 +28,7 @@ import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.operator.IOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.DyvilHeader;
+import dyvil.tools.compiler.ast.header.HeaderUnit;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -42,7 +42,7 @@ import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.repl.DyvilREPL;
 
-public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberConsumer<REPLVariable>
+public class REPLContext extends HeaderUnit implements IValueConsumer, IMemberConsumer<REPLVariable>
 {
 	private static final String REPL$CLASSES = "repl$classes/";
 

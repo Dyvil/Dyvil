@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.header;
+package dyvil.tools.compiler.ast.imports;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -8,11 +8,12 @@ import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.external.ExternalHeader;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.header.HeaderDeclaration;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.operator.IOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
@@ -130,7 +131,7 @@ public final class SingleImport extends Import implements IDefaultContext
 		}
 		if ((mask & KindedImport.HEADER) != 0)
 		{
-			final IDyvilHeader header = parentContext.resolveHeader(this.name);
+			final IHeaderUnit header = parentContext.resolveHeader(this.name);
 			if (header != null)
 			{
 				if ((mask & KindedImport.INLINE) != 0 && this.checkInline(markers, context, header))
@@ -197,7 +198,7 @@ public final class SingleImport extends Import implements IDefaultContext
 		markers.add(Markers.semanticError(this.position, "import.resolve", this.name.qualified));
 	}
 
-	private boolean checkInline(MarkerList markers, IContext context, IDyvilHeader header)
+	private boolean checkInline(MarkerList markers, IContext context, IHeaderUnit header)
 	{
 		// Check if the Header has a Header Declaration
 		final HeaderDeclaration headerDeclaration = header.getHeaderDeclaration();
@@ -259,7 +260,7 @@ public final class SingleImport extends Import implements IDefaultContext
 	}
 
 	@Override
-	public IDyvilHeader resolveHeader(Name name)
+	public IHeaderUnit resolveHeader(Name name)
 	{
 		if (this.checkName(KindedImport.HEADER, name))
 		{

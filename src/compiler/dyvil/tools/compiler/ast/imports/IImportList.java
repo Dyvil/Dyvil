@@ -1,4 +1,4 @@
-package dyvil.tools.compiler.ast.header;
+package dyvil.tools.compiler.ast.imports;
 
 public interface IImportList
 {
