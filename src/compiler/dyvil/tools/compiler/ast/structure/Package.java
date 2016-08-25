@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.consumer.IClassConsumer;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.external.ExternalHeader;
-import dyvil.tools.compiler.ast.header.HeaderUnit;
+import dyvil.tools.compiler.ast.header.AbstractHeader;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.header.PackageDeclaration;
 import dyvil.tools.compiler.ast.member.INamed;
@@ -333,7 +333,7 @@ public class Package implements INamed, IDefaultContext, IClassConsumer
 		InputStream inputStream = library.getInputStream(fileName);
 		if (inputStream != null)
 		{
-			final HeaderUnit header = new ExternalHeader(rootPackage.compiler, name, this);
+			final AbstractHeader header = new ExternalHeader(name, this);
 			this.headers.add(header);
 			return ObjectFormat.read(rootPackage.compiler, inputStream, header);
 		}

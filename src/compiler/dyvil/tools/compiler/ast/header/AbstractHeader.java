@@ -2,12 +2,10 @@ package dyvil.tools.compiler.ast.header;
 
 import dyvil.collection.Map;
 import dyvil.collection.mutable.IdentityHashMap;
-import dyvil.io.FileUtils;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.context.IStaticContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.external.ExternalClass;
@@ -16,7 +14,6 @@ import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.operator.IOperator;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -25,103 +22,48 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 import dyvil.tools.compiler.backend.IClassCompilable;
-import dyvil.tools.compiler.backend.ObjectFormat;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.lang.I18n;
-import dyvil.tools.compiler.parser.header.DyvilHeaderParser;
-import dyvil.tools.compiler.sources.DyvilFileType;
-import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.compiler.transform.SemicolonInference;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ParserManager;
-import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.ast.IASTNode;
-import dyvil.tools.parsing.lexer.DyvilLexer;
-import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
-import java.io.File;
 import java.io.IOException;
 
-public class HeaderUnit implements ICompilationUnit, IHeaderUnit, IDefaultContext
+public abstract class AbstractHeader implements IHeaderUnit, IContext
 {
-	protected final DyvilCompiler compiler;
-
-	public final File inputFile;
-	public final File outputDirectory;
-	public final File outputFile;
-
-	protected String code;
-
-	protected Name    name;
-	protected Package pack;
-
-	protected TokenIterator tokens;
-	protected MarkerList markers = new MarkerList(Markers.INSTANCE);
-
 	protected PackageDeclaration packageDeclaration;
+	protected HeaderDeclaration headerDeclaration;
 
 	protected ImportDeclaration[] importDeclarations = new ImportDeclaration[8];
 	protected int          importCount;
+
 	protected ITypeAlias[] typeAliases;
 	protected int          typeAliasCount;
+
 	protected IOperator[]  operators;
 	protected int          operatorCount;
 
+	// Metadata
+	protected Name    name;
+	protected Package pack;
+
 	protected Map<Name, IOperator> infixOperatorMap;
 
-	protected HeaderDeclaration headerDeclaration;
-
-	public HeaderUnit(DyvilCompiler compiler)
+	public AbstractHeader()
 	{
-		this.compiler = compiler;
-		this.inputFile = null;
-		this.outputDirectory = null;
-		this.outputFile = null;
 	}
 
-	public HeaderUnit(DyvilCompiler compiler, Name name)
+	public AbstractHeader(Name name)
 	{
-		this.compiler = compiler;
-
-		this.inputFile = null;
-		this.outputDirectory = null;
-		this.outputFile = null;
 		this.name = name;
-	}
-
-	public HeaderUnit(DyvilCompiler compiler, Package pack, File input, File output)
-	{
-		this.compiler = compiler;
-
-		this.pack = pack;
-		this.inputFile = input;
-
-		String name = input.getAbsolutePath();
-		int start = name.lastIndexOf(File.separatorChar);
-		int end = name.lastIndexOf('.');
-		this.name = Name.fromQualified(name.substring(start + 1, end));
-
-		name = output.getPath();
-		start = name.lastIndexOf(File.separatorChar);
-		end = name.lastIndexOf('.');
-		this.outputDirectory = new File(name.substring(0, start));
-		this.outputFile = new File(name.substring(0, end) + DyvilFileType.OBJECT_EXTENSION);
 	}
 
 	@Override
 	public boolean isHeader()
 	{
 		return true;
-	}
-
-	@Override
-	public DyvilCompiler getCompilationContext()
-	{
-		return this.compiler;
 	}
 
 	@Override
@@ -142,33 +84,15 @@ public class HeaderUnit implements ICompilationUnit, IHeaderUnit, IDefaultContex
 	}
 
 	@Override
-	public void setName(Name name)
-	{
-		this.name = name;
-	}
-
-	@Override
 	public Name getName()
 	{
 		return this.name;
 	}
 
 	@Override
-	public File getInputFile()
+	public void setName(Name name)
 	{
-		return this.inputFile;
-	}
-
-	@Override
-	public File getOutputFile()
-	{
-		return this.outputFile;
-	}
-
-	@Override
-	public void setPackage(Package pack)
-	{
-		this.pack = pack;
+		this.name = name;
 	}
 
 	@Override
@@ -178,15 +102,21 @@ public class HeaderUnit implements ICompilationUnit, IHeaderUnit, IDefaultContex
 	}
 
 	@Override
-	public void setPackageDeclaration(PackageDeclaration packageDecl)
+	public void setPackage(Package pack)
 	{
-		this.packageDeclaration = packageDecl;
+		this.pack = pack;
 	}
 
 	@Override
 	public PackageDeclaration getPackageDeclaration()
 	{
 		return this.packageDeclaration;
+	}
+
+	@Override
+	public void setPackageDeclaration(PackageDeclaration packageDecl)
+	{
+		this.packageDeclaration = packageDecl;
 	}
 
 	@Override
@@ -378,116 +308,6 @@ public class HeaderUnit implements ICompilationUnit, IHeaderUnit, IDefaultContex
 	public IClassCompilable getInnerClass(int index)
 	{
 		return null;
-	}
-
-	protected boolean load()
-	{
-		try
-		{
-			this.code = FileUtils.read(this.inputFile);
-			return true;
-		}
-		catch (IOException ex)
-		{
-			this.compiler.error(I18n.get("source.error", this.inputFile), ex);
-			return false;
-		}
-	}
-
-	@Override
-	public void tokenize()
-	{
-		if (this.load())
-		{
-			this.tokens = new DyvilLexer(this.markers, DyvilSymbols.INSTANCE).tokenize(this.code);
-			SemicolonInference.inferSemicolons(this.tokens.first());
-		}
-	}
-
-	@Override
-	public void parse()
-	{
-		new ParserManager(DyvilSymbols.INSTANCE, this.tokens, this.markers).parse(new DyvilHeaderParser(this));
-	}
-
-	@Override
-	public void resolveTypes()
-	{
-		for (int i = 0; i < this.importCount; i++)
-		{
-			this.importDeclarations[i].resolveTypes(this.markers, this);
-		}
-
-		final IContext context = this.getContext();
-
-		for (int i = 0; i < this.typeAliasCount; i++)
-		{
-			this.typeAliases[i].resolveTypes(this.markers, context);
-		}
-	}
-
-	@Override
-	public void resolve()
-	{
-		if (this.headerDeclaration == null)
-		{
-			this.headerDeclaration = new HeaderDeclaration(this, ICodePosition.ORIGIN, this.name,
-			                                               new FlagModifierSet(Modifiers.PUBLIC), null);
-		}
-
-		this.resolveImports();
-	}
-
-	protected void resolveImports()
-	{
-		for (int i = 0; i < this.importCount; i++)
-		{
-			this.importDeclarations[i].resolve(this.markers, this);
-		}
-	}
-
-	@Override
-	public void checkTypes()
-	{
-	}
-
-	@Override
-	public void check()
-	{
-		this.pack.check(this.packageDeclaration, this.markers);
-
-		if (this.headerDeclaration != null)
-		{
-			this.headerDeclaration.check(this.markers);
-		}
-	}
-
-	@Override
-	public void foldConstants()
-	{
-	}
-
-	@Override
-	public void cleanup()
-	{
-	}
-
-	protected boolean printMarkers()
-	{
-		return ICompilationUnit
-			       .printMarkers(this.compiler, this.markers, DyvilFileType.DYVIL_HEADER, this.name, this.inputFile,
-			                     this.code);
-	}
-
-	@Override
-	public void compile()
-	{
-		if (this.printMarkers())
-		{
-			return;
-		}
-
-		ObjectFormat.write(this.compiler, this.outputFile, this);
 	}
 
 	// IContext override implementations
@@ -765,9 +585,9 @@ public class HeaderUnit implements ICompilationUnit, IHeaderUnit, IDefaultContex
 
 class HeaderContext implements IStaticContext
 {
-	private HeaderUnit header;
+	private AbstractHeader header;
 
-	public HeaderContext(HeaderUnit header)
+	public HeaderContext(AbstractHeader header)
 	{
 		this.header = header;
 	}

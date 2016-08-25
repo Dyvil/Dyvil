@@ -13,11 +13,6 @@ import java.io.File;
 
 public interface ICompilationUnit extends IASTNode
 {
-	default boolean isHeader()
-	{
-		return false;
-	}
-
 	File getInputFile();
 
 	File getOutputFile();

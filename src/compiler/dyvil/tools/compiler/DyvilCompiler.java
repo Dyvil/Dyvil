@@ -4,7 +4,7 @@ import dyvil.io.AppendablePrintStream;
 import dyvil.io.BasicPrintStream;
 import dyvil.io.Console;
 import dyvil.io.FileUtils;
-import dyvil.tools.compiler.ast.header.HeaderUnit;
+import dyvil.tools.compiler.ast.external.ExternalHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.config.CompilerConfig;
@@ -454,7 +454,7 @@ public final class DyvilCompiler implements Tool
 		{
 			this.error(I18n.get("library.lang_header", this.config.libraries));
 
-			Types.LANG_HEADER = new HeaderUnit(this);
+			Types.LANG_HEADER = new ExternalHeader();
 		}
 	}
 

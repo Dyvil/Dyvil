@@ -4,7 +4,7 @@ import dyvil.io.FileUtils;
 import dyvil.io.StringPoolReader;
 import dyvil.io.StringPoolWriter;
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.header.HeaderUnit;
+import dyvil.tools.compiler.ast.header.AbstractHeader;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.lang.I18n;
 
@@ -38,7 +38,7 @@ public final class ObjectFormat
 		}
 	}
 
-	public static HeaderUnit read(DyvilCompiler compiler, InputStream is, HeaderUnit header)
+	public static AbstractHeader read(DyvilCompiler compiler, InputStream is, AbstractHeader header)
 	{
 		try (StringPoolReader reader = new StringPoolReader(is))
 		{

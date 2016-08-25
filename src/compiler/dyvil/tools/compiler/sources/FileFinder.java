@@ -36,6 +36,7 @@ public class FileFinder
 	
 	private void processDirectory(DyvilCompiler compiler, File source, File output, Package pack)
 	{
+		//noinspection ConstantConditions
 		for (String fileName : source.list())
 		{
 			final File sourceFile = new File(source, fileName);
@@ -75,13 +76,6 @@ public class FileFinder
 			return; // Skip: Not a compilation unit
 		}
 		
-		if (unit.isHeader())
-		{
-			this.units.insert(0, unit);
-		}
-		else
-		{
-			this.units.add(unit);
-		}
+		this.units.add(unit);
 	}
 }

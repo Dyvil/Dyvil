@@ -5,6 +5,7 @@ import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.CodeClass;
@@ -14,10 +15,12 @@ import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.consumer.IMemberConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
+import dyvil.tools.compiler.ast.header.AbstractHeader;
 import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.IMember;
@@ -28,7 +31,6 @@ import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.operator.IOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.header.HeaderUnit;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -42,7 +44,8 @@ import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.repl.DyvilREPL;
 
-public class REPLContext extends HeaderUnit implements IValueConsumer, IMemberConsumer<REPLVariable>
+public class REPLContext extends AbstractHeader
+	implements IDefaultContext, IValueConsumer, IMemberConsumer<REPLVariable>
 {
 	private static final String REPL$CLASSES = "repl$classes/";
 
@@ -68,7 +71,7 @@ public class REPLContext extends HeaderUnit implements IValueConsumer, IMemberCo
 
 	public REPLContext(DyvilREPL repl)
 	{
-		super(repl.getCompiler(), Name.fromRaw("REPL"));
+		super(Name.fromRaw("REPL"));
 		this.repl = repl;
 	}
 
@@ -130,7 +133,7 @@ public class REPLContext extends HeaderUnit implements IValueConsumer, IMemberCo
 			return;
 		}
 
-		for (int i = this.compiler.config.getConstantFolding() - 1; i >= 0; i--)
+		for (int i = this.getCompilationContext().config.getConstantFolding() - 1; i >= 0; i--)
 		{
 			this.currentClass.foldConstants();
 		}
@@ -161,7 +164,7 @@ public class REPLContext extends HeaderUnit implements IValueConsumer, IMemberCo
 			}
 			catch (Throwable t)
 			{
-				t.printStackTrace(this.compiler.getErrorOutput());
+				t.printStackTrace(this.repl.getErrorOutput());
 			}
 		}
 
@@ -206,7 +209,6 @@ public class REPLContext extends HeaderUnit implements IValueConsumer, IMemberCo
 		this.repl.getOutput().println(member);
 	}
 
-	@Override
 	public void cleanup()
 	{
 		this.innerClassList.clear();
@@ -221,7 +223,7 @@ public class REPLContext extends HeaderUnit implements IValueConsumer, IMemberCo
 			return;
 		}
 
-		boolean colors = this.compiler.config.useAnsiColors();
+		boolean colors = this.getCompilationContext().config.useAnsiColors();
 		StringBuilder buf = new StringBuilder();
 		this.markers.sort();
 		for (Marker m : this.markers)
@@ -229,7 +231,7 @@ public class REPLContext extends HeaderUnit implements IValueConsumer, IMemberCo
 			m.log(this.currentCode, buf, colors);
 		}
 
-		this.compiler.getOutput().println(buf.toString());
+		this.repl.getOutput().println(buf.toString());
 	}
 
 	private static void getClassName(StringBuilder builder, IType type)
@@ -282,7 +284,7 @@ public class REPLContext extends HeaderUnit implements IValueConsumer, IMemberCo
 	public void addOperator(IOperator operator)
 	{
 		super.addOperator(operator);
-		this.compiler.getOutput().println("Defined " + operator);
+		this.repl.getOutput().println("Defined " + operator);
 	}
 
 	@Override
@@ -297,7 +299,7 @@ public class REPLContext extends HeaderUnit implements IValueConsumer, IMemberCo
 		}
 
 		super.addImport(declaration);
-		this.compiler.getOutput().println("Imported " + declaration.getImport());
+		this.repl.getOutput().println("Imported " + declaration.getImport());
 	}
 
 	@Override
@@ -317,7 +319,7 @@ public class REPLContext extends HeaderUnit implements IValueConsumer, IMemberCo
 		typeAlias.cleanup(this, this.currentClass);
 
 		super.addTypeAlias(typeAlias);
-		this.compiler.getOutput().println(typeAlias);
+		this.repl.getOutput().println(typeAlias);
 	}
 
 	@Override
@@ -393,7 +395,7 @@ public class REPLContext extends HeaderUnit implements IValueConsumer, IMemberCo
 
 		buf.append('\'');
 		Util.methodSignatureToString(method, null, buf);
-		this.compiler.getOutput().println(buf.append('\'').toString());
+		this.repl.getOutput().println(buf.append('\'').toString());
 	}
 
 	@Override
@@ -409,27 +411,21 @@ public class REPLContext extends HeaderUnit implements IValueConsumer, IMemberCo
 	// region IContext overrides
 
 	@Override
+	public DyvilCompiler getCompilationContext()
+	{
+		return this.repl.getCompiler();
+	}
+
+	@Override
 	public IClass resolveClass(Name name)
 	{
-		IClass c = this.classes.get(name);
-		if (c != null)
-		{
-			return c;
-		}
-
-		return super.resolveClass(name);
+		return this.classes.get(name);
 	}
 
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		IField f = this.fields.get(name);
-		if (f != null)
-		{
-			return f;
-		}
-
-		return super.resolveField(name);
+		return this.fields.get(name);
 	}
 
 	@Override
@@ -440,33 +436,28 @@ public class REPLContext extends HeaderUnit implements IValueConsumer, IMemberCo
 			method.checkMatch(list, receiver, name, arguments);
 		}
 
-		if (name != null)
-		{
-			final Name removeEq = Util.removeEq(name);
-
-			IProperty property = this.properties.get(removeEq);
-			if (property != null)
-			{
-				property.checkMatch(list, receiver, name, arguments);
-			}
-
-			final IField field = this.fields.get(removeEq);
-			if (field != null)
-			{
-				property = field.getProperty();
-				if (property != null)
-				{
-					property.checkMatch(list, receiver, name, arguments);
-				}
-			}
-		}
-
-		if (!list.isEmpty() && name != null)
+		if (name == null)
 		{
 			return;
 		}
 
-		super.getMethodMatches(list, receiver, name, arguments);
+		final Name removeEq = Util.removeEq(name);
+
+		IProperty property = this.properties.get(removeEq);
+		if (property != null)
+		{
+			property.checkMatch(list, receiver, name, arguments);
+		}
+
+		final IField field = this.fields.get(removeEq);
+		if (field != null)
+		{
+			property = field.getProperty();
+			if (property != null)
+			{
+				property.checkMatch(list, receiver, name, arguments);
+			}
+		}
 	}
 
 	@Override
@@ -476,13 +467,6 @@ public class REPLContext extends HeaderUnit implements IValueConsumer, IMemberCo
 		{
 			method.checkImplicitMatch(list, value, targetType);
 		}
-
-		if (!list.isEmpty())
-		{
-			return;
-		}
-
-		super.getImplicitMatches(list, value, targetType);
 	}
 
 	@Override

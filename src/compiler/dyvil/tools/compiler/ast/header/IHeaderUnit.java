@@ -4,9 +4,7 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassList;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.header.HeaderDeclaration;
 import dyvil.tools.compiler.ast.imports.ImportDeclaration;
-import dyvil.tools.compiler.ast.header.PackageDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.operator.IOperator;
 import dyvil.tools.compiler.ast.operator.IOperatorMap;
@@ -16,13 +14,11 @@ import dyvil.tools.compiler.ast.type.alias.ITypeAliasMap;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.IObjectCompilable;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.ast.IASTNode;
 
-public interface IHeaderUnit extends IObjectCompilable, IContext, IClassList, IOperatorMap, ITypeAliasMap
+public interface IHeaderUnit extends IASTNode, IObjectCompilable, IContext, IClassList, IOperatorMap, ITypeAliasMap
 {
-	default boolean isHeader()
-	{
-		return true;
-	}
+	boolean isHeader();
 
 	@Override
 	DyvilCompiler getCompilationContext();

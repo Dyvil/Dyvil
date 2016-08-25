@@ -17,7 +17,7 @@ import dyvil.tools.parsing.ParserManager;
 
 import java.io.File;
 
-public class ClassUnit extends HeaderUnit implements IClassConsumer
+public class ClassUnit extends SourceHeader implements IClassConsumer
 {
 	private IClass[] classes = new IClass[1];
 	private int classCount;
