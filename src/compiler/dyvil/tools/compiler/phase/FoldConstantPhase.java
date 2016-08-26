@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.phase;
 
+import dyvil.annotation.analysis.NotNull;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.header.ICompilationUnit;
 
@@ -25,7 +26,7 @@ public class FoldConstantPhase implements ICompilerPhase
 	}
 	
 	@Override
-	public int compareTo(ICompilerPhase o)
+	public int compareTo(@NotNull ICompilerPhase o)
 	{
 		return Integer.compare(this.id, o.getID());
 	}

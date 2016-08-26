@@ -3,16 +3,13 @@ package dyvil.tools.compiler.phase;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.header.ICompilationUnit;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.lang.I18n;
-import dyvil.tools.compiler.util.Util;
 
-public class ResolveTypesPhase implements ICompilerPhase
+public class ResolveHeaderPhase implements ICompilerPhase
 {
-	private static final String NAME = "RESOLVE_TYPES";
-
+	private static final String NAME = "RESOLVE_HEADERS";
 	private final int id;
 
-	public ResolveTypesPhase(int id)
+	public ResolveHeaderPhase(int id)
 	{
 		this.id = id;
 	}
@@ -32,19 +29,12 @@ public class ResolveTypesPhase implements ICompilerPhase
 	@Override
 	public void apply(DyvilCompiler compiler)
 	{
-		final long now = System.nanoTime();
-
-		// Loads primitive data types
-		Types.initTypes();
-
-		if (compiler.config.isDebug())
-		{
-			compiler.log(I18n.get("library.types.loaded", Util.toTime(System.nanoTime() - now)));
-		}
+		Types.initHeaders();
+		compiler.checkLibraries();
 
 		for (ICompilationUnit unit : compiler.fileFinder.units)
 		{
-			unit.resolveTypes();
+			unit.resolveHeaders();
 		}
 	}
 

@@ -154,6 +154,7 @@ public final class DyvilCompiler implements Tool
 		case "compile":
 			this.phases.add(ICompilerPhase.TOKENIZE);
 			this.phases.add(ICompilerPhase.PARSE);
+			this.phases.add(ICompilerPhase.RESOLVE_HEADERS);
 			this.phases.add(ICompilerPhase.RESOLVE_TYPES);
 			this.phases.add(ICompilerPhase.RESOLVE);
 			this.phases.add(ICompilerPhase.CHECK_TYPES);
@@ -184,7 +185,7 @@ public final class DyvilCompiler implements Tool
 			this.phases.add(ICompilerPhase.TEST);
 			return;
 		case "--debug":
-			this.phases.add(ICompilerPhase.PRINT);
+			this.phases.add(ICompilerPhase.PRINT); // print after parse
 			this.phases.add(ICompilerPhase.TEST);
 			this.config.setDebug(true);
 			return;

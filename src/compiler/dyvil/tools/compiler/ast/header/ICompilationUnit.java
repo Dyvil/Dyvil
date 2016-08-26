@@ -21,6 +21,8 @@ public interface ICompilationUnit extends IASTNode
 
 	void parse();
 
+	void resolveHeaders();
+
 	void resolveTypes();
 
 	void resolve();

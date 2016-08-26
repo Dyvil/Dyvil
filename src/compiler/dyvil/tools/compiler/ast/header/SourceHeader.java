@@ -105,13 +105,17 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	}
 
 	@Override
-	public void resolveTypes()
+	public void resolveHeaders()
 	{
 		for (int i = 0; i < this.importCount; i++)
 		{
 			this.importDeclarations[i].resolveTypes(this.markers, this);
 		}
+	}
 
+	@Override
+	public void resolveTypes()
+	{
 		final IContext context = this.getContext();
 
 		for (int i = 0; i < this.typeAliasCount; i++)
