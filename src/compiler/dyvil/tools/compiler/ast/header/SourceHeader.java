@@ -57,6 +57,12 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	}
 
 	@Override
+	public MarkerList getMarkers()
+	{
+		return this.markers;
+	}
+
+	@Override
 	public DyvilCompiler getCompilationContext()
 	{
 		return this.compiler;

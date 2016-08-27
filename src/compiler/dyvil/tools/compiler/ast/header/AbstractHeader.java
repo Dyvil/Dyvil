@@ -245,11 +245,14 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	public void setTypeAlias(int index, ITypeAlias typeAlias)
 	{
 		this.typeAliases[index] = typeAlias;
+		typeAlias.setEnclosingHeader(this);
 	}
 
 	@Override
 	public void addTypeAlias(ITypeAlias typeAlias)
 	{
+		typeAlias.setEnclosingHeader(this);
+
 		if (this.typeAliases == null)
 		{
 			this.typeAliases = new ITypeAlias[8];

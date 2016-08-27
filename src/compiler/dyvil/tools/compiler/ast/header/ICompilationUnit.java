@@ -17,6 +17,8 @@ public interface ICompilationUnit extends IASTNode
 
 	File getOutputFile();
 
+	MarkerList getMarkers();
+
 	void tokenize();
 
 	void parse();
