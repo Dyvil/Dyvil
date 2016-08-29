@@ -25,8 +25,6 @@ import	dyvil.annotation.{
 	Immutable => immutable
 	Mutating  => mutating
 	Reified	  => reified
-
-	_internal.DyvilName => BytecodeName
 }
 
 import	java.lang._
@@ -55,6 +53,7 @@ type Float  = java.lang.Float
 type Double = java.lang.Double
 
 type Configure<T> = T.() -> void
+type BytecodeName = dyvil.annotation._internal.DyvilName
 
 // ---------------------------------------- Operator Definitions ----------------------------------------
 
