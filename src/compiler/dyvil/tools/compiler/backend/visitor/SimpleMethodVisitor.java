@@ -65,8 +65,10 @@ public final class SimpleMethodVisitor implements MethodVisitor
 		{
 		case AnnotationUtil.DYVIL_MODIFIERS:
 			return new ModifierVisitor(this.method.getModifiers());
+		case AnnotationUtil.DYVIL_NAME:
+			return new DyvilNameVisitor(this.method);
 		case AnnotationUtil.RECEIVER_TYPE:
-			return new ReceiverTypeVisitor((IMethod) this.method);
+			return new ReceiverTypeVisitor(this.method);
 		}
 
 		final String internal = ClassFormat.extendedToInternal(type);

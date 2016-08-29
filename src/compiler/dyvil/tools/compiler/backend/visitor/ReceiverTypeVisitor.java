@@ -1,15 +1,15 @@
 package dyvil.tools.compiler.backend.visitor;
 
 import dyvil.tools.asm.AnnotationVisitor;
-import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.parameter.IParametric;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
 
 public class ReceiverTypeVisitor implements AnnotationVisitor
 {
-	private final IMethod method;
+	private final IParametric method;
 
-	public ReceiverTypeVisitor(IMethod method)
+	public ReceiverTypeVisitor(IParametric method)
 	{
 		this.method = method;
 	}
