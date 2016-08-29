@@ -29,4 +29,8 @@ public interface IMember extends IASTNode, INamed, ITyped, IModified, IAnnotated
 	void cleanup(IContext context, IClassCompilableList compilableList);
 
 	String getInternalName();
+
+	default void setInternalName(String internalName)
+	{
+	}
 }
