@@ -230,6 +230,13 @@ task copyTestDyvil(type: Sync) {
 
 // ---------------------------------------- Compilation Tasks ----------------------------------------
 
+tasks.withType(JavaCompile) {
+	options.compilerArgs.addAll(
+			'-parameters',          // generates parameter attributes and names
+			'-XDignore.symbol.file' // disables "proprietary API" warnings
+	)
+}
+
 /**
  * Compiles the Dyvil Classes and Headers in the Dyvil Library by running the freshly-compiled compiler
  */
