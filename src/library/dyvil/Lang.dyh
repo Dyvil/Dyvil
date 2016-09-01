@@ -10,13 +10,15 @@ import	dyvil.collection._
 import	dyvil.io.Console
 import	dyvil.random.Random
 import	dyvil.function.PartialFunction
-import	dyvil.util.{ Option, None, Some }
-import  dyvil.util.Configurable
-import	dyvil.util.Version
+
+import	dyvil.util.{
+	Option, None, Some
+
+	Configurable
+	Version
+}
 
 // Import useful annotation classes
-import	dyvil.annotation.Intrinsic
-import	dyvil.annotation.{ Deprecated, Experimental, UsageInfo }
 
 import	dyvil.annotation.{
 	Native		=> native,
@@ -25,8 +27,13 @@ import	dyvil.annotation.{
 	Immutable	=> immutable,
 	Mutating	=> mutating,
 	Reified		=> reified
+
+	Intrinsic
+	OverloadPriority
+	Deprecated, Experimental, UsageInfo
 }
 
+// Import Java base classes
 import	java.lang._
 
 // ---------------------------------------- Using Declarations ----------------------------------------
