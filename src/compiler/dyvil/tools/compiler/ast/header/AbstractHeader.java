@@ -34,16 +34,16 @@ import java.io.IOException;
 public abstract class AbstractHeader implements IHeaderUnit, IContext
 {
 	protected PackageDeclaration packageDeclaration;
-	protected HeaderDeclaration headerDeclaration;
+	protected HeaderDeclaration  headerDeclaration;
 
 	protected ImportDeclaration[] importDeclarations = new ImportDeclaration[8];
-	protected int          importCount;
+	protected int importCount;
 
 	protected ITypeAlias[] typeAliases;
 	protected int          typeAliasCount;
 
-	protected IOperator[]  operators;
-	protected int          operatorCount;
+	protected IOperator[] operators;
+	protected int         operatorCount;
 
 	// Metadata
 	protected Name    name;
@@ -712,6 +712,14 @@ class HeaderContext implements IStaticContext
 	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
+		// For ordinary headers, this is a no-op, since they (currently) cannot host any free-standing functions
+		// The REPL however can, so we need this call
+		this.header.getMethodMatches(list, receiver, name, arguments);
+		if (!list.isEmpty())
+		{
+			return;
+		}
+
 		for (int i = 0; i < this.header.importCount; i++)
 		{
 			this.header.importDeclarations[i].getContext().getMethodMatches(list, receiver, name, arguments);
@@ -721,6 +729,13 @@ class HeaderContext implements IStaticContext
 	@Override
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
+		// See comment in getMethodMatches for rationale
+		this.header.getImplicitMatches(list, value, targetType);
+		if (!list.isEmpty())
+		{
+			return;
+		}
+
 		for (int i = 0; i < this.header.importCount; i++)
 		{
 			this.header.importDeclarations[i].getContext().getImplicitMatches(list, value, targetType);
