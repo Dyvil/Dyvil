@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.method;
 
+import dyvil.annotation.analysis.NotNull;
 import dyvil.array.IntArray;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.util.MemberSorter;
@@ -71,7 +72,7 @@ public final class Candidate<T extends ICallableSignature> implements Comparable
 	}
 
 	@Override
-	public int compareTo(Candidate<T> that)
+	public int compareTo(@NotNull Candidate<T> that)
 	{
 		int better = 0;
 		int worse = 0;
@@ -138,7 +139,8 @@ public final class Candidate<T extends ICallableSignature> implements Comparable
 			return -1;
 		}
 
-		return 0;
+		// Compare overload priority (more is better)
+		return Integer.compare(that.member.getOverloadPriority(), this.member.getOverloadPriority());
 	}
 
 	private static int compare(int value1, IType type1, int value2, IType type2)
