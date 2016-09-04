@@ -99,7 +99,14 @@ public final class SemicolonInference
 			// Check if the first token on the next line is a symbol
 			if ((nextType & Tokens.SYMBOL) != 0)
 			{
-				return;
+				switch (nextType)
+				{
+				case DyvilSymbols.AT:
+				case DyvilSymbols.HASH:
+					break; // continue inference checking
+				default:
+					return; // don't infer a semicolon
+				}
 			}
 
 			// Check for other token types
