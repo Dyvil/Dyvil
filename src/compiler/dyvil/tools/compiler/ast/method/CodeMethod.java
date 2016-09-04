@@ -18,6 +18,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -25,7 +26,6 @@ import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -98,7 +98,7 @@ public class CodeMethod extends AbstractMethod
 
 		super.resolveTypes(markers, context);
 
-		this.unmangleName();
+		this.unmangleName(markers);
 
 		if (this.receiverType != null)
 		{
@@ -148,7 +148,7 @@ public class CodeMethod extends AbstractMethod
 		context.pop();
 	}
 
-	private void unmangleName()
+	private void unmangleName(MarkerList markers)
 	{
 		final Name name = this.name;
 		final String unqualified = name.unqualified;
@@ -164,6 +164,8 @@ public class CodeMethod extends AbstractMethod
 		final String newQualified = qualified.substring(0, qualified.indexOf(NAME_SEPARATOR));
 		this.internalName = qualified;
 		this.name = Name.from(newUnqualified, newQualified);
+
+		markers.add(Markers.semanticWarning(this.position, "method.name_mangled.deprecated", this.name));
 	}
 
 	@Override
@@ -349,7 +351,7 @@ public class CodeMethod extends AbstractMethod
 				final Marker marker = Markers.semantic(this.position, "method.name_mangled", this.name);
 				marker.addInfo(Markers.getSemantic("method.name_mangled.1", this.name));
 				marker.addInfo(Markers.getSemantic("method.name_mangled.2", this.name));
-				marker.addInfo(Markers.getSemantic("name.mangled", mangledName));
+				marker.addInfo(Markers.getSemantic("method.name_mangled.bytecode_name", mangledName));
 				markers.add(marker);
 			}
 
@@ -730,15 +732,23 @@ public class CodeMethod extends AbstractMethod
 			this.annotations.write(writer);
 		}
 
-		if (this.receiverType != null && this.receiverType != this.enclosingClass.getType())
+		// Write DyvilName annotation if it differs from the mangled name
+		final String qualifiedName = this.name.qualified;
+		if (!this.getInternalName().equals(qualifiedName))
+		{
+			final AnnotationVisitor annotationVisitor = writer.visitAnnotation(AnnotationUtil.DYVIL_NAME, false);
+			annotationVisitor.visit("value", qualifiedName);
+			annotationVisitor.visitEnd();
+		}
+
+		// Write receiver type signature
+		if (this.receiverType != null && this.receiverType != this.enclosingClass.getType() && this.receiverType
+			                                                                                       .needsSignature())
 		{
 			final String signature = this.receiverType.getSignature();
-			if (signature != null)
-			{
-				AnnotationVisitor annotationVisitor = writer.visitAnnotation(AnnotationUtil.RECEIVER_TYPE, false);
-				annotationVisitor.visit("value", signature);
-				annotationVisitor.visitEnd();
-			}
+			final AnnotationVisitor annotationVisitor = writer.visitAnnotation(AnnotationUtil.RECEIVER_TYPE, false);
+			annotationVisitor.visit("value", signature);
+			annotationVisitor.visitEnd();
 		}
 
 		ModifierUtil.writeModifiers(writer, this.modifiers);

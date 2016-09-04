@@ -1,17 +1,16 @@
 package dyvil.tools.compiler.backend.visitor;
 
 import dyvil.tools.asm.AnnotationVisitor;
-import dyvil.tools.compiler.ast.parameter.IParametric;
-import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.backend.ClassFormat;
+import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.parsing.Name;
 
-public class ReceiverTypeVisitor implements AnnotationVisitor
+public class DyvilNameVisitor implements AnnotationVisitor
 {
-	private final IParametric method;
+	private final IMember member;
 
-	public ReceiverTypeVisitor(IParametric method)
+	public DyvilNameVisitor(IMember member)
 	{
-		this.method = method;
+		this.member = member;
 	}
 
 	@Override
@@ -19,8 +18,7 @@ public class ReceiverTypeVisitor implements AnnotationVisitor
 	{
 		if ("value".equals(name) && value instanceof String)
 		{
-			final IType receiverType = ClassFormat.extendedToType((String) value);
-			this.method.setReceiverType(receiverType);
+			this.member.setName(Name.fromQualified(value.toString()));
 		}
 	}
 
