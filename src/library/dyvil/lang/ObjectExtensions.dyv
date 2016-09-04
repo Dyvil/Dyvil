@@ -1,10 +1,34 @@
 package dyvil.lang
 
-using	dyvil.reflect.Opcodes._
+import const dyvil.reflect.Opcodes._
 
 public final class ObjectExtensions
 {
 	private init() { }
+
+	// Class and Type conversions and utilities
+
+	@Intrinsic([ LOAD_0 ])
+	public static T cast<T>(any value) = value as T
+
+	@Intrinsic([ LOAD_0 ])
+	public static T convert<T>(T value) = value
+
+	public static Class<T> classOf<@Reified(Reified.Type.ANY_CLASS) T>(T value) = class T
+
+	public static Type<T> typeOf<@Reified(Reified.Type.TYPE) T>(T value) = type T
+
+	// Useful globals
+
+	public static inline R run<R>(-> R f) = f()
+
+	public static infix inline R run<T, R>(T self, T.() -> R f) = f(self)
+
+	public static infix inline T use<T>(T self, T.() -> void f) = self.{ f $0; $0 }
+
+	public static inline R with<T, R>(T receiver, T -> R f) = f(receiver)
+
+	// Object Extensions
 
 	/**
 	 * Tests if the given value is `null`.

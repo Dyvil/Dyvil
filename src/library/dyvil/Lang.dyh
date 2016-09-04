@@ -3,15 +3,15 @@ package dyvil
 // ---------------------------------------- Import Declarations ----------------------------------------
 
 // Base imports for language features
-import	dyvil.lang._
+import dyvil.lang._
 
 // Import useful utility classes
-import	dyvil.collection._
-import	dyvil.io.Console
-import	dyvil.random.Random
-import	dyvil.function.PartialFunction
+import dyvil.collection._
+import dyvil.io.Console
+import dyvil.random.Random
+import dyvil.function.PartialFunction
 
-import	dyvil.util.{
+import dyvil.util.{
 	Option, None, Some
 
 	Configurable
@@ -20,13 +20,13 @@ import	dyvil.util.{
 
 // Import useful annotation classes
 
-import	dyvil.annotation.{
+import dyvil.annotation.{
 	Native    => native
 	Transient => transient
 	Volatile  => volatile
 	Immutable => immutable
 	Mutating  => mutating
-	Reified	  => reified
+	Reified   => reified
 
 	Intrinsic
 	OverloadPriority
@@ -34,17 +34,18 @@ import	dyvil.annotation.{
 }
 
 // Import Java base classes
-import	java.lang._
+import java.lang._
 
 // ---------------------------------------- Using Declarations ----------------------------------------
 
 // Import the methods from former Predef classes
-using	dyvil.lang.{
+using dyvil.lang.{
 	Primitives._
-	LanguageCommons._
-	LanguageFeatures._
+	Output._
+	Assert._
 	ObjectExtensions._
 	StringExtensions._
+	Misc._
 }
 
 // ---------------------------------------- Type Aliases ----------------------------------------
@@ -65,10 +66,10 @@ type BytecodeName = dyvil.annotation._internal.DyvilName
 // ---------------------------------------- Operator Definitions ----------------------------------------
 
 // Postfix Operators
-postfix operator !	 // unwrap operator
-postfix	operator ++
-postfix	operator --
-postfix	operator ... // varargs expansion operator
+postfix operator !   // unwrap operator
+postfix operator ++
+postfix operator --
+postfix operator ... // varargs expansion operator
 
 // Prefix Operators
 prefix  operator +
