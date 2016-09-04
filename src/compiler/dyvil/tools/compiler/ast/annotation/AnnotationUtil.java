@@ -12,7 +12,9 @@ public final class AnnotationUtil
 	public static final String RECEIVER_TYPE = "Ldyvil/annotation/_internal/ReceiverType;";
 
 	public static final String DYVIL_MODIFIERS = "Ldyvil/annotation/_internal/DyvilModifiers;";
-	public static final String DYVIL_NAME      = "Ldyvil/annotation/_internal/DyvilName;";
+
+	public static final String DYVIL_NAME_INTERNAL = "dyvil/annotation/_internal/DyvilName";
+	public static final String DYVIL_NAME          = "L" + DYVIL_NAME_INTERNAL + ";";
 
 	public static final String CLASS_PARAMETERS = "Ldyvil/annotation/_internal/ClassParameters;";
 
@@ -21,6 +23,11 @@ public final class AnnotationUtil
 
 	public static final String PRIMITIVE_INTERNAL = "dyvil/annotation/_internal/Primitive";
 	public static final String PRIMITIVE          = "L" + PRIMITIVE_INTERNAL + ";";
+
+	public static final String OVERRIDE = "java/lang/Override";
+	public static final String INRINSIC = "dyvil/annotation/Intrinsic";
+	public static final String STRICT   = "dyvil/annotation/Strict";
+	public static final String NATIVE   = "dyvil/annotation/Native";
 
 	private AnnotationUtil()
 	{

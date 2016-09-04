@@ -7,6 +7,7 @@ import dyvil.tools.asm.Handle;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -20,6 +21,7 @@ import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
@@ -29,7 +31,6 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
-import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Mutability;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -223,26 +224,43 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		switch (type)
 		{
-		case "dyvil/annotation/Native":
+		case AnnotationUtil.NATIVE:
 			this.modifiers.addIntModifier(Modifiers.NATIVE);
 			return false;
-		case "dyvil/annotation/Strict":
+		case AnnotationUtil.STRICT:
 			this.modifiers.addIntModifier(Modifiers.STRICT);
 			return false;
 		case Deprecation.JAVA_INTERNAL:
 		case Deprecation.DYVIL_INTERNAL:
 			this.modifiers.addIntModifier(Modifiers.DEPRECATED);
 			return true;
-		case "java/lang/Override":
+		case AnnotationUtil.OVERRIDE:
 			this.modifiers.addIntModifier(Modifiers.OVERRIDE);
 			return false;
-		case "dyvil/annotation/Intrinsic":
-			if (annotation != null)
+		case AnnotationUtil.INRINSIC:
+			if (annotation == null)
 			{
-				this.intrinsicData = Intrinsics.readAnnotation(this, annotation);
-				return this.getClass() != ExternalMethod.class;
+				return true;
 			}
-			return true;
+
+			this.intrinsicData = Intrinsics.readAnnotation(this, annotation);
+			// retain the annotation if this method is not external
+			return this.getClass() != ExternalMethod.class;
+		case AnnotationUtil.DYVIL_NAME_INTERNAL:
+			if (annotation == null)
+			{
+				return true;
+			}
+
+			final IValue firstValue = annotation.getArguments().getFirstValue();
+			if (firstValue != null)
+			{
+				// In Dyvil source code, the @DyvilName is called @BytecodeName,
+				// and it sets the name to be used in the bytecode
+				this.internalName = firstValue.stringValue();
+			}
+			// do not retain the annotation
+			return false;
 		}
 		return true;
 	}
