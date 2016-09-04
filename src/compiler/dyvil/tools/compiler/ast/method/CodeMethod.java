@@ -730,15 +730,23 @@ public class CodeMethod extends AbstractMethod
 			this.annotations.write(writer);
 		}
 
-		if (this.receiverType != null && this.receiverType != this.enclosingClass.getType())
+		// Write DyvilName annotation if it differs from the mangled name
+		final String qualifiedName = this.name.qualified;
+		if (!this.getInternalName().equals(qualifiedName))
+		{
+			final AnnotationVisitor annotationVisitor = writer.visitAnnotation(AnnotationUtil.DYVIL_NAME, false);
+			annotationVisitor.visit("value", qualifiedName);
+			annotationVisitor.visitEnd();
+		}
+
+		// Write receiver type signature
+		if (this.receiverType != null && this.receiverType != this.enclosingClass.getType() && this.receiverType
+			                                                                                       .needsSignature())
 		{
 			final String signature = this.receiverType.getSignature();
-			if (signature != null)
-			{
-				AnnotationVisitor annotationVisitor = writer.visitAnnotation(AnnotationUtil.RECEIVER_TYPE, false);
-				annotationVisitor.visit("value", signature);
-				annotationVisitor.visitEnd();
-			}
+			final AnnotationVisitor annotationVisitor = writer.visitAnnotation(AnnotationUtil.RECEIVER_TYPE, false);
+			annotationVisitor.visit("value", signature);
+			annotationVisitor.visitEnd();
 		}
 
 		ModifierUtil.writeModifiers(writer, this.modifiers);
