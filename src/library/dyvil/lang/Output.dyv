@@ -1,5 +1,6 @@
 package dyvil.lang
 
+import dyvil.util.AutoPrinter
 import java.io.PrintStream
 
 import const java.lang.System.out

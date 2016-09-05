@@ -1,5 +1,7 @@
 package dyvil.lang
 
+import dyvilx.lang.model.`type`.Type
+
 import const dyvil.reflect.Opcodes._
 
 public final class ObjectExtensions

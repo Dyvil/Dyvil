@@ -1,7 +1,5 @@
 package dyvil.lang
 
-import dyvilx.lang.model.`type`.Type
-
 import const dyvil.reflect.Opcodes._
 import func java.lang.System.{
 	currentTimeMillis => milliTime
