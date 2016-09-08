@@ -136,7 +136,7 @@ public abstract class ObjectArray
 	@DyvilModifiers(Modifiers.INFIX)
 	public static <T> T[] subscript(T[] array, Range<@Primitive Integer> range)
 	{
-		final int size = range.count();
+		final int size = range.size();
 		final T[] result = apply(size, getComponentType(array));
 		System.arraycopy(array, range.first(), result, 0, size);
 		return result;
@@ -154,7 +154,7 @@ public abstract class ObjectArray
 	@Mutating
 	public static <T> void subscript_$eq(T[] array, Range<@Primitive Integer> range, T[] newValues)
 	{
-		System.arraycopy(newValues, 0, array, range.first(), range.count());
+		System.arraycopy(newValues, 0, array, range.first(), range.size());
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)

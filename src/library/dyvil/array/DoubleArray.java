@@ -6,7 +6,7 @@ import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.annotation._internal.Primitive;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
-import dyvil.collection.range.DoubleRange;
+import dyvil.collection.range.closed.DoubleRange;
 import dyvil.ref.DoubleRef;
 import dyvil.ref.array.DoubleArrayRef;
 import dyvil.reflect.Modifiers;
@@ -129,7 +129,7 @@ public abstract class DoubleArray
 	@DyvilModifiers(Modifiers.INFIX)
 	public static double[] subscript(double[] array, Range<@Primitive Integer> range)
 	{
-		final int size = range.count();
+		final int size = range.size();
 		final double[] result = new double[size];
 		System.arraycopy(array, range.first(), result, 0, size);
 		return result;
@@ -147,7 +147,7 @@ public abstract class DoubleArray
 	@Mutating
 	public static void subscript_$eq(double[] array, Range<@Primitive Integer> range, double[] newValues)
 	{
-		System.arraycopy(newValues, 0, array, range.first(), range.count());
+		System.arraycopy(newValues, 0, array, range.first(), range.size());
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)

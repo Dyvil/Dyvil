@@ -162,9 +162,9 @@ public final class Primitives
 	@Intrinsic([ LOAD_0, LOAD_1, IUSHR ])
 	public infix func >>>(int v1, int v2): int = v1 >>> v2
 
-	public infix func ..(int start, int end): IntRange = IntRange(start, end)
+	public infix func ..(int start, int end): IntRange = IntRange(start, to: end)
 
-	public infix func ..<(int start, int end): IntRange = IntRange.halfOpen(start, end)
+	public infix func ..<(int start, int end): IntRange = IntRange(start, toExclusive: end)
 
 	// Int Methods
 
@@ -297,9 +297,9 @@ public final class Primitives
 	@Intrinsic([ LOAD_0, DUP2, BIPUSH, 32, LUSHR, LXOR, L2I ])
 	public postfix int hashCode(long value) = value.hashCode
 
-	public infix func ..(long start, long end): LongRange = LongRange(start, end)
+	public infix func ..(long start, long end): LongRange = LongRange(start, to: end)
 
-	public infix func ..<(long start, long end): LongRange = LongRange.halfOpen(start, end)
+	public infix func ..<(long start, long end): LongRange = LongRange(start, toExclusive: end)
 
 	// Float Operators
 
@@ -345,9 +345,9 @@ public final class Primitives
 	@Intrinsic([ LOAD_0, LOAD_1, FREM ])
 	public infix func %(float v1, float v2): float = v1 % v2
 
-	public infix func ..(float start, float end): FloatRange = FloatRange(start, end)
+	public infix func ..(float start, float end): FloatRange = FloatRange(start, to: end)
 
-	public infix func ..<(float start, float end): FloatRange = FloatRange.halfOpen(start, end)
+	public infix func ..<(float start, float end): FloatRange = FloatRange(start, toExclusive: end)
 
 	// Float Methods
 
@@ -407,9 +407,9 @@ public final class Primitives
 	@Intrinsic([ LOAD_0, LOAD_1, DREM ])
 	public infix func %(double v1, double v2): double = v1 % v2
 
-	public infix func ..(double start, double end): DoubleRange = DoubleRange(start, end)
+	public infix func ..(double start, double end): DoubleRange = DoubleRange(start, to: end)
 
-	public infix func ..<(double start, double end): DoubleRange = DoubleRange.halfOpen(start, end)
+	public infix func ..<(double start, double end): DoubleRange = DoubleRange(start, toExclusive: end)
 
 	// Double Methods
 

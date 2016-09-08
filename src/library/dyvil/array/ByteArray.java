@@ -122,7 +122,7 @@ public abstract class ByteArray
 	@DyvilModifiers(Modifiers.INFIX)
 	public static byte[] subscript(byte[] array, Range<@Primitive Integer> range)
 	{
-		final int size = range.count();
+		final int size = range.size();
 		final byte[] result = new byte[size];
 		System.arraycopy(array, range.first(), result, 0, size);
 		return result;
@@ -140,7 +140,7 @@ public abstract class ByteArray
 	@Mutating
 	public static void subscript_$eq(byte[] array, Range<@Primitive Integer> range, byte[] newValues)
 	{
-		System.arraycopy(newValues, 0, array, range.first(), range.count());
+		System.arraycopy(newValues, 0, array, range.first(), range.size());
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)

@@ -6,7 +6,7 @@ import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.annotation._internal.Primitive;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
-import dyvil.collection.range.LongRange;
+import dyvil.collection.range.closed.LongRange;
 import dyvil.ref.LongRef;
 import dyvil.ref.array.LongArrayRef;
 import dyvil.reflect.Modifiers;
@@ -129,7 +129,7 @@ public abstract class LongArray
 	@DyvilModifiers(Modifiers.INFIX)
 	public static long[] subscript(long[] array, Range<@Primitive Integer> range)
 	{
-		final int size = range.count();
+		final int size = range.size();
 		final long[] result = new long[size];
 		System.arraycopy(array, range.first(), result, 0, size);
 		return result;
@@ -147,7 +147,7 @@ public abstract class LongArray
 	@Mutating
 	public static void subscript_$eq(long[] array, Range<@Primitive Integer> range, long[] newValues)
 	{
-		System.arraycopy(newValues, 0, array, range.first(), range.count());
+		System.arraycopy(newValues, 0, array, range.first(), range.size());
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)

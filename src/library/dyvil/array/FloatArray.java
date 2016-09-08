@@ -6,7 +6,7 @@ import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.annotation._internal.Primitive;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
-import dyvil.collection.range.FloatRange;
+import dyvil.collection.range.closed.FloatRange;
 import dyvil.ref.FloatRef;
 import dyvil.ref.array.FloatArrayRef;
 import dyvil.reflect.Modifiers;
@@ -129,7 +129,7 @@ public abstract class FloatArray
 	@DyvilModifiers(Modifiers.INFIX)
 	public static float[] subscript(float[] array, Range<@Primitive Integer> range)
 	{
-		final int size = range.count();
+		final int size = range.size();
 		final float[] result = new float[size];
 		System.arraycopy(array, range.first(), result, 0, size);
 		return result;
@@ -147,7 +147,7 @@ public abstract class FloatArray
 	@Mutating
 	public static void subscript_$eq(float[] array, Range<@Primitive Integer> range, float[] newValues)
 	{
-		System.arraycopy(newValues, 0, array, range.first(), range.count());
+		System.arraycopy(newValues, 0, array, range.first(), range.size());
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)

@@ -145,9 +145,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 
 	default List<E> subscript(Range<Integer> range)
 	{
-		int start = range.first();
-		int length = range.count();
-		return this.subList(start, length);
+		return this.subList(range.first(), range.size());
 	}
 
 	/**
@@ -306,21 +304,19 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 
 	default void subscript_$eq(Range<Integer> range, E[] elements)
 	{
-		int start = range.first();
-		int length = range.count();
-		for (int i = 0; i < length; i++)
+		int elementIndex = 0;
+		for (int rangeIndex : range)
 		{
-			this.subscript_$eq(start, elements[i]);
+			this.subscript_$eq(rangeIndex, elements[elementIndex++]);
 		}
 	}
 
 	default void subscript_$eq(Range<Integer> range, List<? extends E> elements)
 	{
-		int start = range.first();
-		int length = range.last() - start + 1;
-		for (int i = 0; i < length; i++)
+		int elementIndex = 0;
+		for (int rangeIndex : range)
 		{
-			this.subscript_$eq(start, elements.subscript(i));
+			this.subscript_$eq(rangeIndex, elements.subscript(elementIndex++));
 		}
 	}
 

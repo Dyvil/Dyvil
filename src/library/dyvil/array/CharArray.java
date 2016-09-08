@@ -122,7 +122,7 @@ public abstract class CharArray
 	@DyvilModifiers(Modifiers.INFIX)
 	public static char[] subscript(char[] array, Range<@Primitive Integer> range)
 	{
-		final int size = range.count();
+		final int size = range.size();
 		final char[] result = new char[size];
 		System.arraycopy(array, range.first(), result, 0, size);
 		return result;
@@ -140,7 +140,7 @@ public abstract class CharArray
 	@Mutating
 	public static void subscript_$eq(char[] array, Range<@Primitive Integer> range, char[] newValues)
 	{
-		System.arraycopy(newValues, 0, array, range.first(), range.count());
+		System.arraycopy(newValues, 0, array, range.first(), range.size());
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)

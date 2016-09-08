@@ -105,7 +105,7 @@ public abstract class BooleanArray
 	@DyvilModifiers(Modifiers.INFIX)
 	public static boolean[] subscript(boolean[] array, Range<@Primitive Integer> range)
 	{
-		final int size = range.count();
+		final int size = range.size();
 		final boolean[] result = new boolean[size];
 		System.arraycopy(array, range.first(), result, 0, size);
 		return result;
@@ -123,7 +123,7 @@ public abstract class BooleanArray
 	@Mutating
 	public static void subscript_$eq(boolean[] array, Range<@Primitive Integer> range, boolean[] newValue)
 	{
-		System.arraycopy(newValue, 0, array, range.first(), range.count());
+		System.arraycopy(newValue, 0, array, range.first(), range.size());
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)

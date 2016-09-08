@@ -122,7 +122,7 @@ public abstract class ShortArray
 	@DyvilModifiers(Modifiers.INFIX)
 	public static short[] subscript(short[] array, Range<@Primitive Integer> range)
 	{
-		final int size = range.count();
+		final int size = range.size();
 		final short[] result = new short[size];
 		System.arraycopy(array, range.first(), result, 0, size);
 		return result;
@@ -140,7 +140,7 @@ public abstract class ShortArray
 	@Mutating
 	public static void subscript_$eq(short[] array, Range<@Primitive Integer> range, short[] newValues)
 	{
-		System.arraycopy(newValues, 0, array, range.first(), range.count());
+		System.arraycopy(newValues, 0, array, range.first(), range.size());
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
