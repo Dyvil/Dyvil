@@ -336,7 +336,7 @@ public final class Primitives
 	@Intrinsic([ LOAD_0, LOAD_1, FMUL ])
 	public infix func *(float v1, float v2): float = v1 * v2
 
-	@Intrinsic([ LOAD_0, F2D, LOAD_1, F2D, INVOKESTATIC, 0, 1, 2, D2F], strings: [ "java/lang/MathUtils", "pow", "(DD)D" ])
+	@Intrinsic([ LOAD_0, F2D, LOAD_1, F2D, INVOKESTATIC, 0, 1, 2, D2F], strings: [ "java/lang/Math", "pow", "(DD)D" ])
 	public infix func **(float v1, float v2): double = Math.pow(v1, v2)
 
 	@Intrinsic([ LOAD_0, LOAD_1, FDIV ])
