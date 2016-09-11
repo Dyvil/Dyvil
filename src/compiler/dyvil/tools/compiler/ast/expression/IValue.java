@@ -251,12 +251,7 @@ public interface IValue extends IASTNode, ITyped
 	 */
 	default int getTypeMatch(IType type)
 	{
-		final IType thisType = this.getType();
-		if (Types.isSameType(type, thisType))
-		{
-			return EXACT_MATCH;
-		}
-		return Types.isSuperType(type, thisType) ? SUBTYPE_MATCH : MISMATCH;
+		return Types.getTypeMatch(type, this.getType());
 	}
 
 	void resolveTypes(MarkerList markers, IContext context);

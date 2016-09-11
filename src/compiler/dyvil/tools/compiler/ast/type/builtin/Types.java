@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.dynamic.DynamicType;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -202,6 +203,15 @@ public final class Types
 			return OBJECT_ARRAY_CLASS = Package.dyvilArray.resolveClass("ObjectArray");
 		}
 		return OBJECT_ARRAY_CLASS;
+	}
+
+	public static int getTypeMatch(IType superType, IType subType)
+	{
+		if (Types.isSameType(superType, subType))
+		{
+			return IValue.EXACT_MATCH;
+		}
+		return Types.isSuperType(superType, subType) ? IValue.SUBTYPE_MATCH :IValue. MISMATCH;
 	}
 
 	public static boolean isSameClass(IType type1, IType type2)
