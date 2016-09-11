@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.intrinsic.PopExpr;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -213,6 +214,15 @@ public interface IValue extends IASTNode, ITyped
 			return null;
 		}
 		return new PopExpr(this);
+	}
+
+	default boolean isPartialWildcard()
+	{
+		return false;
+	}
+
+	default void setLambdaParameter(IParameter parameter)
+	{
 	}
 
 	default boolean checkVarargs(boolean typeCheck)
