@@ -204,6 +204,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			return this.type;
 		}
 
+		this.flags |= LAMBDA_TYPE_INFERRED;
 		return this.type = this.makeType();
 	}
 
@@ -308,7 +309,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 	public void inferReturnType(IType type, IType valueType)
 	{
-		if (this.returnType == null)
+		if (this.hasImplicitReturnType())
 		{
 			this.returnType = valueType;
 		}
@@ -330,7 +331,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 	private void checkReturnType(MarkerList markers, IType expectedReturnType)
 	{
-		if (this.returnType == null)
+		if (this.hasImplicitReturnType())
 		{
 			this.returnType = expectedReturnType;
 			return;
@@ -341,6 +342,11 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			markers.add(TypeChecker.typeError(this.returnType.getPosition(), expectedReturnType, this.returnType,
 			                                  "lambda.return_type.incompatible", "return.type", "lambda.return_type"));
 		}
+	}
+
+	private boolean hasImplicitReturnType()
+	{
+		return this.returnType == null || (this.flags & EXPLICIT_RETURN) == 0;
 	}
 
 	private void inferTypes(MarkerList markers)
