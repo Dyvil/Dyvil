@@ -64,6 +64,10 @@ public class WildcardValue implements IConstantValue
 	@Override
 	public IType getType()
 	{
+		if (this.lambdaParameter != null)
+		{
+			return this.lambdaParameter.getType();
+		}
 		return this.type;
 	}
 
@@ -146,7 +150,13 @@ public class WildcardValue implements IConstantValue
 
 		if (this.lambdaParameter != null)
 		{
-			this.lambdaParameter.writeGet(writer, null, this.getLineNumber());
+			final int lineNumber = this.getLineNumber();
+
+			this.lambdaParameter.writeGet(writer, null, lineNumber);
+			if (type != null)
+			{
+				this.lambdaParameter.getInternalType().writeCast(writer, type, lineNumber);
+			}
 			return;
 		}
 
