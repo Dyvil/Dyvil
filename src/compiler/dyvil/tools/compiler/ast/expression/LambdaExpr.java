@@ -208,7 +208,9 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		return this.type = this.makeType();
 	}
 
-	private @NotNull LambdaType makeType()
+	private
+	@NotNull
+	LambdaType makeType()
 	{
 		final int count = this.parameters.size();
 		final LambdaType lambdaType = new LambdaType(count);
@@ -277,10 +279,13 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			type = this.getType();
 		}
 
+		if (type != this.type)
+		{
+			// If this is not the type initially created and returned by getType(), remove the LAMBDA_TYPE_INFERRED flag
+			this.flags &= ~LAMBDA_TYPE_INFERRED;
+		}
 		this.type = type;
 		this.method = type.getFunctionalMethod();
-
-		assert this.method != null; // Otherwise isType would have returns false
 
 		this.inferTypes(markers);
 
@@ -322,7 +327,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		final ITypeContext tempContext = new MapTypeContext();
 		this.method.getType().inferTypes(valueType, tempContext);
 
-		final IType concreteType = this.method.getEnclosingClass().getType().getConcreteType(tempContext);
+		final IType concreteType = this.method.getEnclosingClass().getThisType().getConcreteType(tempContext);
 
 		type.inferTypes(concreteType, tempContext);
 
@@ -497,7 +502,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	{
 		this.parameters.resolveTypes(markers, context);
 
-		if (this.returnType != null && (this.flags & EXPLICIT_RETURN) != 0)
+		if (!this.hasImplicitReturnType())
 		{
 			this.returnType = this.returnType.resolveType(markers, context);
 		}
@@ -539,7 +544,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			}
 		}
 
-		if (this.returnType != null && (this.flags & EXPLICIT_RETURN) != 0)
+		if (!this.hasImplicitReturnType())
 		{
 			this.returnType.resolve(markers, context);
 		}
@@ -556,7 +561,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		context.pop();
 
 		this.flags |= VALUE_RESOLVED;
-		if (this.returnType == null)
+		if (this.hasImplicitReturnType())
 		{
 			this.returnType = this.value.getType();
 		}
