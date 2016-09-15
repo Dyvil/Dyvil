@@ -90,17 +90,6 @@ public abstract class GenericType implements IObjectType, ITypeList
 	}
 
 	@Override
-	public IType asParameterType()
-	{
-		final GenericType copy = this.clone();
-		for (int i = 0; i < this.typeArgumentCount; i++)
-		{
-			copy.typeArguments[i] = this.typeArguments[i].asParameterType();
-		}
-		return copy;
-	}
-
-	@Override
 	public boolean hasTypeVariables()
 	{
 		for (int i = 0; i < this.typeArgumentCount; i++)
@@ -112,18 +101,50 @@ public abstract class GenericType implements IObjectType, ITypeList
 		}
 		return false;
 	}
-	
+
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
-		GenericType copy = this.clone();
-		for (int i = 0; i < this.typeArgumentCount; i++)
+		final IType[] types = getConcreteTypes(this.typeArguments, this.typeArgumentCount, context);
+		if (types == this.typeArguments)
 		{
-			copy.typeArguments[i] = this.typeArguments[i].getConcreteType(context);
+			// Nothing changed, no need to create a new instance
+			return this;
 		}
+
+		final GenericType copy = this.copyName();
+		copy.typeArguments = types;
+		copy.typeArgumentCount = this.typeArgumentCount;
 		return copy;
 	}
-	
+
+	public static IType[] getConcreteTypes(IType[] types, int count, ITypeContext context)
+	{
+		IType[] newTypes = null;
+		boolean changed = false;
+
+		for (int i = 0; i < count; i++)
+		{
+			final IType original = types[i];
+			final IType concrete = original.getConcreteType(context);
+			if (changed)
+			{
+				// As soon as changed is true, the array is initialized and we have to copy all elements
+				newTypes[i] = concrete;
+			}
+			else if (concrete != original)
+			{
+				// If there is a single mismatch, create the array and copy previous elements
+				changed = true;
+				newTypes = new IType[count];
+				newTypes[i] = concrete;
+				System.arraycopy(types, 0, newTypes, 0, i);
+			}
+		}
+
+		return changed ? newTypes : types;
+	}
+
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{

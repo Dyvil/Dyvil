@@ -21,6 +21,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.generic.GenericType;
 import dyvil.tools.compiler.ast.type.raw.IObjectType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -217,25 +218,6 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	// IType Overrides
 
 	@Override
-	public IType asParameterType()
-	{
-		if (!this.hasTypeVariables())
-		{
-			return this;
-		}
-
-		final IType[] parameterTypes = new IType[this.parameterCount];
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			parameterTypes[i] = this.parameterTypes[i].asParameterType();
-		}
-		final IType returnType = this.returnType.asParameterType();
-		final LambdaType lambdaType = new LambdaType(parameterTypes, this.parameterCount, returnType);
-		lambdaType.setExtension(this.extension);
-		return lambdaType;
-	}
-
-	@Override
 	public IClass getTheClass()
 	{
 		return getLambdaClass(this.parameterCount);
@@ -356,13 +338,18 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
-		final LambdaType lt = new LambdaType(this.parameterCount);
-		lt.parameterCount = this.parameterCount;
-		for (int i = 0; i < this.parameterCount; i++)
+		final IType[] parameterTypes = GenericType.getConcreteTypes(this.parameterTypes, this.parameterCount, context);
+		final boolean parametersChanged = parameterTypes != this.parameterTypes;
+
+		final IType returnType = this.returnType.getConcreteType(context);
+		if (!parametersChanged && returnType == this.returnType)
 		{
-			lt.parameterTypes[i] = this.parameterTypes[i].getConcreteType(context);
+			// Nothing changed, no need to create a new instance
+			return this;
 		}
-		lt.returnType = this.returnType.getConcreteType(context);
+
+		// Create a defensive copy of the parameter types in case the array has not changed
+		final LambdaType lt = new LambdaType(parametersChanged ? parameterTypes : parameterTypes.clone(), this.parameterCount, returnType);
 		lt.extension = this.extension;
 		return lt;
 	}

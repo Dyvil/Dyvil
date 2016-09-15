@@ -20,6 +20,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.generic.GenericType;
 import dyvil.tools.compiler.ast.type.raw.IObjectType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -152,22 +153,6 @@ public final class TupleType implements IObjectType, ITypeList
 	}
 
 	@Override
-	public IType asParameterType()
-	{
-		if (!this.hasTypeVariables())
-		{
-			return this;
-		}
-
-		final IType[] types = new IType[this.typeCount];
-		for (int i = 0; i < this.typeCount; i++)
-		{
-			types[i] = this.types[i].asParameterType();
-		}
-		return new TupleType(types, this.typeCount);
-	}
-
-	@Override
 	public Name getName()
 	{
 		return Names.Tuple;
@@ -263,13 +248,13 @@ public final class TupleType implements IObjectType, ITypeList
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
-		TupleType tt = new TupleType(this.typeCount);
-		tt.typeCount = this.typeCount;
-		for (int i = 0; i < this.typeCount; i++)
+		final IType[] types = GenericType.getConcreteTypes(this.types, this.typeCount, context);
+		if (types == this.types)
 		{
-			tt.types[i] = this.types[i].getConcreteType(context);
+			// Nothing changed, no need to create a new instance
+			return this;
 		}
-		return tt;
+		return new TupleType(types, this.typeCount);
 	}
 
 	@Override
