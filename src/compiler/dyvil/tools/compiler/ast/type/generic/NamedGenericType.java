@@ -156,7 +156,7 @@ public class NamedGenericType extends GenericType
 		final IClass theClass = context.resolveClass(this.name);
 		if (theClass != null)
 		{
-			final IType classType = theClass.getType();
+			final IType classType = theClass.getThisType();
 			return this.checkCount(markers, theClass, "class", classType);
 		}
 
@@ -182,7 +182,7 @@ public class NamedGenericType extends GenericType
 		final IClass theClass = this.parent.resolveClass(this.name);
 		if (theClass != null)
 		{
-			final IType classType = theClass.getType();
+			final IType classType = theClass.getThisType();
 			return this.checkCount(markers, theClass, "class", classType);
 		}
 

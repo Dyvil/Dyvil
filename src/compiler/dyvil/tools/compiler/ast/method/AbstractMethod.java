@@ -716,7 +716,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			else
 			{
 				// unqualified call
-				final IType receiverType = this.enclosingClass.getType();
+				final IType receiverType = this.enclosingClass.getThisType();
 				receiver = new ThisExpr(position, receiverType, context, markers);
 				if (genericData != null)
 				{
@@ -1067,7 +1067,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return;
 		}
 
-		receiver.writeExpression(writer, this.enclosingClass.getType());
+		receiver.writeExpression(writer, this.enclosingClass.getReceiverType());
 
 		if (receiver.isIgnoredClassAccess())
 		{

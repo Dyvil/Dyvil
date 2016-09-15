@@ -107,7 +107,7 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 	{
 		if (receiver != null)
 		{
-			receiver.writeExpression(writer, this.getEnclosingClass().getType());
+			receiver.writeExpression(writer, this.getEnclosingClass().getReceiverType());
 		}
 
 		this.writeGet_Get(writer, lineNumber);
@@ -118,7 +118,7 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 	{
 		if (receiver != null)
 		{
-			receiver.writeExpression(writer, this.getEnclosingClass().getType());
+			receiver.writeExpression(writer, this.getEnclosingClass().getReceiverType());
 		}
 
 		this.writeSet_PreValue(writer, lineNumber);

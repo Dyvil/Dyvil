@@ -81,24 +81,23 @@ public final class SuperExpr implements IValue
 			return;
 		}
 
-		final IClass enclosingClass = context.getThisClass();
-		final IType enclosingType = enclosingClass.getType();
-		if (this.type == Types.UNKNOWN)
+		if (this.type != Types.UNKNOWN)
 		{
-			final IType superType = enclosingClass.getSuperType();
-			if (superType == null)
-			{
-				Marker marker = Markers.semantic(this.position, "super.access.type");
-				marker.addInfo(Markers.getSemantic("type.enclosing", enclosingType));
-				markers.add(marker);
-				return;
-			}
-
-			this.type = superType;
+			this.type = this.type.resolveType(markers, context);
 			return;
 		}
 
-		this.type = this.type.resolveType(markers, context);
+		final IClass enclosingClass = context.getThisClass();
+		final IType superType = enclosingClass.getSuperType();
+		if (superType == null)
+		{
+			final Marker marker = Markers.semantic(this.position, "super.access.type");
+			marker.addInfo(Markers.getSemantic("type.enclosing", enclosingClass.getClassType()));
+			markers.add(marker);
+			return;
+		}
+
+		this.type = superType;
 	}
 
 	@Override

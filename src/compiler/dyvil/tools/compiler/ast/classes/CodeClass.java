@@ -12,6 +12,8 @@ import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.classes.metadata.TraitMetadata;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -20,14 +22,9 @@ import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
-import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
-import dyvil.tools.compiler.ast.type.raw.ClassType;
-import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -116,27 +113,6 @@ public class CodeClass extends AbstractClass
 	public void setSuperConstructorArguments(IArguments superConstructorArguments)
 	{
 		this.superConstructorArguments = superConstructorArguments;
-	}
-
-	@Override
-	public IType getType()
-	{
-		if (this.thisType != null)
-		{
-			return this.thisType;
-		}
-
-		if (this.typeParameterCount <= 0)
-		{
-			return this.thisType = new ClassType(this);
-		}
-
-		final ClassGenericType type = new ClassGenericType(this);
-		for (int i = 0; i < this.typeParameterCount; i++)
-		{
-			type.addType(new TypeVarType(this.typeParameters[i]));
-		}
-		return this.thisType = type;
 	}
 
 	@Override
@@ -259,7 +235,7 @@ public class CodeClass extends AbstractClass
 			this.body.checkTypes(markers, context);
 		}
 
-		this.checkSuperMethods(markers, this, this.getType(), new IdentityHashSet<>());
+		this.checkSuperMethods(markers, this, this.getThisType(), new IdentityHashSet<>());
 
 		context.pop();
 	}

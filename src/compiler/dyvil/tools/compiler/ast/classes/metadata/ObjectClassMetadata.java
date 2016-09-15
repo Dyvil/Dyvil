@@ -68,7 +68,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 
 		if ((this.members & INSTANCE_FIELD) == 0)
 		{
-			final Field field = new Field(this.theClass, Names.instance, this.theClass.getType(),
+			final Field field = new Field(this.theClass, Names.instance, this.theClass.getClassType(),
 			                              new FlagModifierSet(Modifiers.PUBLIC | Modifiers.CONST));
 			this.instanceField = field;
 

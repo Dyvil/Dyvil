@@ -273,10 +273,10 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 			return type;
 		}
 
-		final IType theClassType = theClass.getType();
+		final IType classType = theClass.getThisType();
 		final GenericData genericData = new GenericData(theClass);
 
-		theClassType.inferTypes(type, genericData);
+		classType.inferTypes(type, genericData);
 		genericData.lock(genericData.typeCount());
 
 		// Check Values and infer Types
@@ -310,7 +310,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 			}
 		}
 
-		return theClassType.getConcreteType(genericData);
+		return classType.getConcreteType(genericData);
 	}
 
 	@Override

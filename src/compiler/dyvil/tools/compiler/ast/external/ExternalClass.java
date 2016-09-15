@@ -102,8 +102,7 @@ public final class ExternalClass extends AbstractClass
 		this.resolved |= GENERICS;
 		if (this.typeParameterCount <= 0)
 		{
-			this.thisType = new ClassType(this);
-
+			this.thisType = this.getClassType();
 			return;
 		}
 
@@ -194,16 +193,6 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public IType getType()
-	{
-		if ((this.resolved & GENERICS) == 0)
-		{
-			this.resolveGenerics();
-		}
-		return this.thisType;
-	}
-
-	@Override
 	public IClass getThisClass()
 	{
 		if ((this.resolved & GENERICS) == 0)
@@ -211,6 +200,16 @@ public final class ExternalClass extends AbstractClass
 			this.resolveGenerics();
 		}
 		return this;
+	}
+
+	@Override
+	public IType getThisType()
+	{
+		if ((this.resolved & GENERICS) == 0)
+		{
+			this.resolveGenerics();
+		}
+		return this.thisType;
 	}
 
 	@Override

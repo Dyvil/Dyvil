@@ -66,7 +66,7 @@ public final class CaptureField extends CaptureDataMember implements IField
 
 		if (receiver == null)
 		{
-			return new ThisExpr(this.getPosition(), this.enclosingClass.getType(), context, markers);
+			return new ThisExpr(this.getPosition(), this.enclosingClass.getThisType(), context, markers);
 		}
 		return receiver;
 	}

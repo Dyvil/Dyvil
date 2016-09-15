@@ -112,7 +112,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 
 		if (this.receiverType == null)
 		{
-			this.receiverType = this.enclosingClass.getType();
+			this.receiverType = this.enclosingClass.getReceiverType();
 		}
 
 		int parametersToRemove = 0;
@@ -132,7 +132,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		}
 		else if (!this.isStatic())
 		{
-			this.receiverType = this.enclosingClass.getType();
+			this.receiverType = this.enclosingClass.getReceiverType();
 		}
 	}
 

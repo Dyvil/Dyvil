@@ -9,13 +9,13 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.ITypeParametric;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParametric;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
-import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.IClassCompilable;
@@ -36,13 +36,13 @@ public interface IClass extends IClassMember, ITypeParametric, IContext, IParame
 
 	@Override
 	IHeaderUnit getHeader();
-	
+
 	@Override
 	void setEnclosingClass(IClass enclosingClass);
-	
+
 	@Override
 	IClass getEnclosingClass();
-	
+
 	// Modifiers
 
 	default boolean isAnonymous()
@@ -51,30 +51,46 @@ public interface IClass extends IClassMember, ITypeParametric, IContext, IParame
 	}
 
 	boolean isAbstract();
-	
+
 	boolean isInterface();
 
 	boolean isAnnotation();
-	
+
 	boolean isObject();
-	
+
 	// Full Name
-	
+
 	void setFullName(String name);
-	
+
 	String getFullName();
-	
+
 	// Super Types
-	
+
 	@Override
-	IType getType();
-	
+	@Deprecated
+	@dyvil.annotation.Deprecated(replacements = { "getThisType", "getReceiverType", "getClassType" })
+	default IType getType()
+	{
+		return this.getThisType();
+	}
+
+	@Override
+	@Deprecated
+	default void setType(IType type)
+	{
+	}
+
+	default IType getReceiverType()
+	{
+		return this.getThisType().asParameterType();
+	}
+
 	IType getClassType();
-	
+
 	void setSuperType(IType type);
-	
+
 	IType getSuperType();
-	
+
 	boolean isSubClassOf(IType type);
 
 	default IArguments getSuperConstructorArguments()
@@ -85,69 +101,69 @@ public interface IClass extends IClassMember, ITypeParametric, IContext, IParame
 	default void setSuperConstructorArguments(IArguments arguments)
 	{
 	}
-	
+
 	// Interfaces
-	
+
 	int interfaceCount();
-	
+
 	void setInterface(int index, IType type);
-	
+
 	void addInterface(IType type);
-	
+
 	IType getInterface(int index);
-	
+
 	// Generics
-	
+
 	IType resolveType(ITypeParameter typeVar, IType concrete);
-	
+
 	// Body
-	
+
 	void setBody(IClassBody body);
-	
+
 	IClassBody getBody();
-	
+
 	void setMetadata(IClassMetadata metadata);
-	
+
 	IClassMetadata getMetadata();
-	
+
 	IMethod getFunctionalMethod();
-	
+
 	IDataMember getSuperField(Name name);
-	
+
 	boolean isMember(IClassMember member);
-	
+
 	byte getVisibility(IClassMember member);
-	
+
 	boolean checkImplements(IMethod candidate, ITypeContext typeContext);
-	
+
 	void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext, Set<IClass> checkedClasses);
-	
+
 	// Other Compilables (Lambda Expressions, ...)
-	
+
 	@Override
 	int compilableCount();
-	
+
 	@Override
 	void addCompilable(IClassCompilable compilable);
-	
+
 	@Override
 	IClassCompilable getCompilable(int index);
-	
+
 	// Compilation
-	
+
 	@Override
 	String getInternalName();
-	
+
 	String getSignature();
-	
+
 	String[] getInterfaceArray();
-	
+
 	@Override
 	default boolean hasSeparateFile()
 	{
 		return true;
 	}
-	
+
 	@Override
 	void write(ClassWriter writer) throws BytecodeException;
 

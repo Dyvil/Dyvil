@@ -206,7 +206,7 @@ public class Field extends Member implements IField
 			}
 			else
 			{
-				receiver = new ThisExpr(position, this.enclosingClass.getType(), context, markers);
+				receiver = new ThisExpr(position, this.enclosingClass.getThisType(), context, markers);
 
 				if (!this.enclosingClass.isAnonymous())
 				{
@@ -290,7 +290,7 @@ public class Field extends Member implements IField
 
 		final IValue receiver = this.hasModifier(Modifiers.STATIC) ?
 			                        null :
-			                        new ThisExpr(this.enclosingClass.getType(), VariableThis.DEFAULT);
+			                        new ThisExpr(this.enclosingClass.getThisType(), VariableThis.DEFAULT);
 		if (getter != null)
 		{
 			getter.setType(this.type);

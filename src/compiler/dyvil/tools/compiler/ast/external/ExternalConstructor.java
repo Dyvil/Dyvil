@@ -37,7 +37,7 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 	public ExternalConstructor(IClass enclosingClass)
 	{
 		super(enclosingClass);
-		this.type = enclosingClass.getType();
+		this.type = enclosingClass.getThisType();
 	}
 
 	@Override

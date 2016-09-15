@@ -117,7 +117,7 @@ public class CodeMethod extends AbstractMethod
 		}
 		else if (!this.isStatic())
 		{
-			this.receiverType = this.enclosingClass.getType();
+			this.receiverType = this.enclosingClass.getReceiverType();
 		}
 
 		for (int i = 0; i < this.typeParameterCount; i++)
@@ -418,7 +418,7 @@ public class CodeMethod extends AbstractMethod
 
 		final boolean thisTypeResolved = this.type.isResolved();
 		final int accessLevel = this.getAccessLevel() & ~Modifiers.INTERNAL;
-		final ITypeContext typeContext = this.enclosingClass.getType();
+		final ITypeContext typeContext = this.enclosingClass.getThisType();
 
 		for (IMethod overrideMethod : this.overrideMethods)
 		{
@@ -742,10 +742,10 @@ public class CodeMethod extends AbstractMethod
 		}
 
 		// Write receiver type signature
-		if (this.receiverType != null && this.receiverType != this.enclosingClass.getType() && this.receiverType
-			                                                                                       .needsSignature())
+		final IType receiverType = this.receiverType;
+		if (receiverType != null && receiverType != this.enclosingClass.getThisType() && receiverType.needsSignature())
 		{
-			final String signature = this.receiverType.getSignature();
+			final String signature = receiverType.getSignature();
 			final AnnotationVisitor annotationVisitor = writer.visitAnnotation(AnnotationUtil.RECEIVER_TYPE, false);
 			annotationVisitor.visit("value", signature);
 			annotationVisitor.visitEnd();
