@@ -296,13 +296,20 @@ public abstract class GenericType implements IObjectType, ITypeList
 		}
 	}
 	
-	protected final void copyTypeArguments(GenericType agt)
-	{
-		agt.typeArgumentCount = this.typeArgumentCount;
-		agt.typeArguments = new IType[this.typeArgumentCount];
-		System.arraycopy(this.typeArguments, 0, agt.typeArguments, 0, this.typeArgumentCount);
-	}
-	
 	@Override
-	public abstract GenericType clone();
+	public GenericType clone()
+	{
+		GenericType type = this.copyName();
+		this.copyArgumentsTo(type);
+		return type;
+	}
+
+	protected abstract GenericType copyName();
+
+	private void copyArgumentsTo(GenericType target)
+	{
+		target.typeArgumentCount = this.typeArgumentCount;
+		target.typeArguments = new IType[this.typeArgumentCount];
+		System.arraycopy(this.typeArguments, 0, target.typeArguments, 0, this.typeArgumentCount);
+	}
 }

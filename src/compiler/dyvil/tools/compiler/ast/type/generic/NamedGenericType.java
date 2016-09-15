@@ -284,10 +284,8 @@ public class NamedGenericType extends GenericType
 	}
 
 	@Override
-	public GenericType clone()
+	protected GenericType copyName()
 	{
-		NamedGenericType copy = new NamedGenericType(this.position, this.name);
-		this.copyTypeArguments(copy);
-		return copy;
+		return new NamedGenericType(this.position, this.name);
 	}
 }
