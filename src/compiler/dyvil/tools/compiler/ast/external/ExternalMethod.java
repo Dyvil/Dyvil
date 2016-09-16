@@ -110,11 +110,6 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 
 		this.resolved |= PARAMETERS;
 
-		if (this.receiverType == null)
-		{
-			this.receiverType = this.enclosingClass.getReceiverType();
-		}
-
 		int parametersToRemove = 0;
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
@@ -126,13 +121,14 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 
 		this.parameters.remove(parametersToRemove);
 
-		if (this.receiverType != null)
+		if (this.thisType != null)
 		{
-			this.receiverType = this.receiverType.resolveType(null, context);
+			this.thisType = this.thisType.resolveType(null, context).asParameterType();
 		}
-		else if (!this.isStatic())
+		else
 		{
-			this.receiverType = this.enclosingClass.getReceiverType();
+			// For external methods, the this type is actually the receiver type
+			this.thisType = this.enclosingClass.getReceiverType();
 		}
 	}
 
@@ -204,6 +200,12 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	@Override
 	public void setValue(IValue value)
 	{
+	}
+
+	@Override
+	public IType getReceiverType()
+	{
+		return this.thisType;
 	}
 
 	@Override

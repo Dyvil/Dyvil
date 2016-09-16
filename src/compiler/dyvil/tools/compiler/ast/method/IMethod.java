@@ -56,7 +56,12 @@ public interface IMethod extends IClassMember, ICallableMember, ICallableSignatu
 	void addOverride(IMethod method);
 	
 	// Generics
-	
+
+	default IType getReceiverType()
+	{
+		return this.getThisType().asParameterType();
+	}
+
 	GenericData getGenericData(GenericData data, IValue instance, IArguments arguments);
 	
 	boolean hasTypeVariables();

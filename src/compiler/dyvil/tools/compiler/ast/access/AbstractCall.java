@@ -104,7 +104,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 	@Override
 	public boolean isPrimitive()
 	{
-		return this.method != null && (this.method.isIntrinsic() || this.getType().isPrimitive());
+		return this.method != null && this.getType().isPrimitive();
 	}
 
 	@Override

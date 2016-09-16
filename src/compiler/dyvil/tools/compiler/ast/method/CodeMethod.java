@@ -52,6 +52,7 @@ public class CodeMethod extends AbstractMethod
 	protected IValue value;
 
 	// Metadata
+	protected IType        receiverType;
 	protected Set<IMethod> overrideMethods;
 
 	public CodeMethod(IClass iclass)
@@ -92,6 +93,24 @@ public class CodeMethod extends AbstractMethod
 	}
 
 	@Override
+	public IType getReceiverType()
+	{
+		if (this.receiverType != null)
+		{
+			return this.receiverType;
+		}
+
+		final IType thisType = this.getThisType();
+		if (thisType == this.enclosingClass.getThisType())
+		{
+			// If the this type was inherited from the enclosing class and not explicit, we can use the enclosing class'
+			// receiverType to avoid a type copying operation
+			return this.receiverType = this.enclosingClass.getReceiverType();
+		}
+		return this.receiverType = thisType.asParameterType();
+	}
+
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		context = context.push(this);
@@ -100,24 +119,24 @@ public class CodeMethod extends AbstractMethod
 
 		this.unmangleName(markers);
 
-		if (this.receiverType != null)
+		if (this.thisType != null)
 		{
-			this.receiverType = this.receiverType.resolveType(markers, context);
+			this.thisType = this.thisType.resolveType(markers, context);
 
 			// Check the self type for compatibility
-			final IClass selfTypeClass = this.receiverType.getTheClass();
+			final IClass selfTypeClass = this.thisType.getTheClass();
 			if (selfTypeClass != null && selfTypeClass != this.enclosingClass)
 			{
-				final Marker marker = Markers.semanticError(this.receiverType.getPosition(),
+				final Marker marker = Markers.semanticError(this.thisType.getPosition(),
 				                                            "method.receivertype.incompatible", this.getName());
-				marker.addInfo(Markers.getSemantic("method.receivertype", this.receiverType));
+				marker.addInfo(Markers.getSemantic("method.receivertype", this.thisType));
 				marker.addInfo(Markers.getSemantic("method.classtype", this.enclosingClass.getFullName()));
 				markers.add(marker);
 			}
 		}
-		else if (!this.isStatic())
+		else
 		{
-			this.receiverType = this.enclosingClass.getReceiverType();
+			this.thisType = this.enclosingClass.getThisType();
 		}
 
 		for (int i = 0; i < this.typeParameterCount; i++)
@@ -180,9 +199,9 @@ public class CodeMethod extends AbstractMethod
 			this.typeParameters[i].resolve(markers, context);
 		}
 
-		if (this.receiverType != null)
+		if (this.thisType != null)
 		{
-			this.receiverType.resolve(markers, context);
+			this.thisType.resolve(markers, context);
 		}
 
 		this.parameters.resolve(markers, context);
@@ -233,9 +252,9 @@ public class CodeMethod extends AbstractMethod
 
 		super.checkTypes(markers, context);
 
-		if (this.receiverType != null)
+		if (this.thisType != null)
 		{
-			this.receiverType.checkType(markers, context, TypePosition.PARAMETER_TYPE);
+			this.thisType.checkType(markers, context, TypePosition.PARAMETER_TYPE);
 		}
 
 		for (int i = 0; i < this.typeParameterCount; i++)
@@ -271,9 +290,9 @@ public class CodeMethod extends AbstractMethod
 			this.typeParameters[i].check(markers, this);
 		}
 
-		if (this.receiverType != null)
+		if (this.thisType != null)
 		{
-			this.receiverType.check(markers, context);
+			this.thisType.check(markers, context);
 		}
 
 		this.parameters.check(markers, context);
@@ -485,9 +504,9 @@ public class CodeMethod extends AbstractMethod
 			this.typeParameters[i].foldConstants();
 		}
 
-		if (this.receiverType != null)
+		if (this.thisType != null)
 		{
-			this.receiverType.foldConstants();
+			this.thisType.foldConstants();
 		}
 
 		this.parameters.foldConstants();
@@ -519,9 +538,9 @@ public class CodeMethod extends AbstractMethod
 			}
 		}
 
-		if (this.receiverType != null)
+		if (this.thisType != null)
 		{
-			this.receiverType.cleanup(context, compilableList);
+			this.thisType.cleanup(context, compilableList);
 		}
 
 		for (int i = 0; i < this.typeParameterCount; i++)
@@ -742,7 +761,7 @@ public class CodeMethod extends AbstractMethod
 		}
 
 		// Write receiver type signature
-		final IType receiverType = this.receiverType;
+		final IType receiverType = this.thisType;
 		if (receiverType != null && receiverType != this.enclosingClass.getThisType() && receiverType.needsSignature())
 		{
 			final String signature = receiverType.getSignature();

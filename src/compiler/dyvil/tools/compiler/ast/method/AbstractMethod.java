@@ -72,7 +72,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	protected ITypeParameter[] typeParameters;
 	protected int              typeParameterCount;
 
-	protected IType receiverType;
+	protected IType thisType;
 
 	protected ParameterList parameters = new ParameterList();
 
@@ -209,7 +209,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public boolean setReceiverType(IType receiverType)
 	{
-		this.receiverType = receiverType;
+		this.thisType = receiverType;
 		return true;
 	}
 
@@ -360,8 +360,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public IType getThisType()
 	{
-		return this.receiverType;
+		return this.thisType;
 	}
+
+	@Override
+	public abstract IType getReceiverType();
 
 	@Override
 	public ITypeParameter resolveTypeParameter(Name name)
@@ -697,7 +700,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				// normal instance method access
 
 				updateReceiverType(receiver, genericData);
-				receiver = TypeChecker.convertValue(receiver, this.receiverType, genericData, markers, context,
+				receiver = TypeChecker.convertValue(receiver, this.getReceiverType(), genericData, markers, context,
 				                                    TypeChecker
 					                                    .markerSupplier("method.access.receiver_type", this.name));
 				updateReceiverType(receiver, genericData);
