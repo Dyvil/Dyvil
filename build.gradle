@@ -52,6 +52,7 @@ sourceSets {
 			srcDir 'src/library'
 			srcDir 'src/asm'
 			srcDir 'src/parsing'
+			srcDir 'gen/library'
 		}
 		resources {
 			srcDir 'src/library'
@@ -149,7 +150,7 @@ dependencies {
 
 // Library
 
-task copyLibraryJava(type: Sync) {
+task copyLibraryJava(type: Sync, dependsOn: 'genLibrary') {
 	from sourceSets.library.java
 	into "${ buildDir }/src/java/library"
 	
@@ -243,6 +244,10 @@ tasks.withType(JavaCompile) {
 	)
 }
 
+task genLibrary(type: JavaExec, dependsOn: [ gensrcClasses ]) { JavaExec exec ->
+	runGenSrc exec, 'src/library/', 'gen/library/'
+}
+
 /**
  * Compiles the Dyvil Classes and Headers in the Dyvil Library by running the freshly-compiled compiler
  */
@@ -273,6 +278,17 @@ private void runCompiler(JavaExec exec, String config, String src, String bin)
 	exec.args = [ "@$config", 'compile' ]
 
 	if (System.console() != null) exec.args += "--ansi";
+}
+
+private void runGenSrc(JavaExec exec, String src, String dest)
+{
+	exec.inputs.dir 'src/library'
+	exec.outputs.dir 'gen/library'
+	exec.outputs.upToDateSpec = new AndSpec<>()
+	
+	exec.main = 'dyvil.tools.gensrc.GenSources'
+	exec.classpath = sourceSets.gensrc.runtimeClasspath
+	exec.args = [ "source=$src", "target=$dest" ]
 }
 
 // ---------------------------------------- Test Tasks ----------------------------------------
