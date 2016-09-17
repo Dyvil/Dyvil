@@ -1,3 +1,5 @@
+// GENERATED SOURCE - DOT NOT EDIT
+
 package dyvil.array;
 
 import dyvil.annotation.Immutable;
@@ -9,8 +11,8 @@ import dyvil.annotation._internal.Primitive;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
-import dyvil.ref.ByteRef;
-import dyvil.ref.array.ByteArrayRef;
+import dyvil.ref.CharRef;
+import dyvil.ref.array.CharArrayRef;
 import dyvil.reflect.Modifiers;
 
 import java.util.Arrays;
@@ -18,31 +20,32 @@ import java.util.function.*;
 
 import static dyvil.reflect.Opcodes.*;
 
-public abstract class ByteArray
+@SuppressWarnings({ "cast", "RedundantCast" })
+public abstract class CharArray
 {
-	public static final byte[] EMPTY = new byte[0];
+	public static final char[] EMPTY = new char[0];
 
 	@DyvilModifiers(Modifiers.INLINE)
-	public static byte[] apply()
+	public static char[] apply()
 	{
-		return new byte[0];
+		return new char[0];
 	}
 
 	@DyvilModifiers(Modifiers.INLINE)
-	public static byte[] apply(int size)
+	public static char[] apply(int size)
 	{
-		return new byte[size];
+		return new char[size];
 	}
 
 	@DyvilModifiers(Modifiers.INLINE)
-	public static byte[] apply(byte[] array)
+	public static char[] apply(char[] array)
 	{
 		return array.clone();
 	}
 
-	public static byte[] apply(int size, byte repeatedValue)
+	public static char[] apply(int size, char repeatedValue)
 	{
-		final byte[] array = new byte[size];
+		final char[] array = new char[size];
 		for (int i = 0; i < size; i++)
 		{
 			array[i] = repeatedValue;
@@ -50,46 +53,46 @@ public abstract class ByteArray
 		return array;
 	}
 
-	public static byte[] apply(int size, IntSupplier valueSupplier)
+	public static char[] apply(int size, IntSupplier valueSupplier)
 	{
-		final byte[] array = new byte[size];
+		final char[] array = new char[size];
 		for (int i = 0; i < size; i++)
 		{
-			array[i] = (byte) valueSupplier.getAsInt();
+			array[i] = (char) valueSupplier.getAsInt();
 		}
 		return array;
 	}
 
-	public static byte[] apply(int size, IntUnaryOperator valueMapper)
+	public static char[] apply(int size, IntUnaryOperator valueMapper)
 	{
-		final byte[] array = new byte[size];
+		final char[] array = new char[size];
 		for (int i = 0; i < size; i++)
 		{
-			array[i] = (byte) valueMapper.applyAsInt(i);
+			array[i] = (char) valueMapper.applyAsInt(i);
 		}
 		return array;
 	}
 
 	@DyvilName("apply")
-	public static byte[] rangeClosed(byte from, byte to)
+	public static char[] rangeClosed(char from, char to)
 	{
-		int i = 0;
-		final byte[] array = new byte[to - from + 1];
+		int index = 0;
+		final char[] array = new char[(int) (to - from + 1)];
 		for (; from <= to; from++)
 		{
-			array[i++] = from;
+			array[index++] = from;
 		}
 		return array;
 	}
 
 	@DyvilName("apply")
-	public static byte[] range(byte from, byte toExclusive)
+	public static char[] range(char from, char toExclusive)
 	{
-		int i = 0;
-		final byte[] array = new byte[toExclusive - from];
+		int index = 0;
+		final char[] array = new char[(int) (toExclusive - from)];
 		for (; from < toExclusive; from++)
 		{
-			array[i++] = from;
+			array[index++] = from;
 		}
 		return array;
 	}
@@ -98,67 +101,67 @@ public abstract class ByteArray
 
 	@Intrinsic( { LOAD_0, ARRAYLENGTH })
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int length(byte[] array)
+	public static int length(char[] array)
 	{
 		return array.length;
 	}
 
 	@Intrinsic( { LOAD_0, ARRAYLENGTH })
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int size(byte[] array)
+	public static int size(char[] array)
 	{
 		return array.length;
 	}
 
 	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })
 	@DyvilModifiers(Modifiers.INFIX)
-	public static boolean isEmpty(byte[] array)
+	public static boolean isEmpty(char[] array)
 	{
 		return array.length == 0;
 	}
 
-	@Intrinsic( { LOAD_0, LOAD_1, BALOAD })
+	@Intrinsic( { LOAD_0, LOAD_1, CALOAD })
 	@DyvilModifiers(Modifiers.INFIX)
-	public static byte subscript(byte[] array, int index)
+	public static char subscript(char[] array, int index)
 	{
 		return array[index];
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static byte[] subscript(byte[] array, Range<@Primitive Integer> range)
+	public static char[] subscript(char[] array, Range<@Primitive Integer> range)
 	{
 		final int size = range.size();
-		final byte[] result = new byte[size];
+		final char[] result = new char[size];
 		System.arraycopy(array, range.first(), result, 0, size);
 		return result;
 	}
 
-	@Intrinsic( { LOAD_0, LOAD_1, LOAD_2, BASTORE })
+	@Intrinsic( { LOAD_0, LOAD_1, LOAD_2, CASTORE })
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	public static void subscript_$eq(byte[] array, int index, byte newValue)
+	public static void subscript_$eq(char[] array, int index, char newValue)
 	{
 		array[index] = newValue;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	public static void subscript_$eq(byte[] array, Range<@Primitive Integer> range, byte[] newValues)
+	public static void subscript_$eq(char[] array, Range<@Primitive Integer> range, char[] newValues)
 	{
 		System.arraycopy(newValues, 0, array, range.first(), range.size());
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	public static ByteRef subscript_$amp(byte[] array, int index)
+	public static CharRef subscript_$amp(char[] array, int index)
 	{
-		return new ByteArrayRef(array, index);
+		return new CharArrayRef(array, index);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static void forEach(byte[] array, IntConsumer action)
+	public static void forEach(char[] array, IntConsumer action)
 	{
-		for (final byte value : array)
+		for (char value : array)
 		{
 			action.accept(value);
 		}
@@ -167,46 +170,46 @@ public abstract class ByteArray
 	// Operators
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static boolean $qmark(byte[] array, byte value)
+	public static boolean $qmark(char[] array, char value)
 	{
 		return indexOf(array, value, 0) >= 0;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static boolean $eq$eq(byte[] array1, byte[] array2)
+	public static boolean $eq$eq(char[] array1, char[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static boolean $bang$eq(byte[] array1, byte[] array2)
+	public static boolean $bang$eq(char[] array1, char[] array2)
 	{
 		return !Arrays.equals(array1, array2);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static byte[] $plus(byte[] array, byte value)
+	public static char[] $plus(char[] array, char value)
 	{
-		final int len = array.length;
-		final byte[] res = new byte[len + 1];
-		System.arraycopy(array, 0, res, 0, len);
-		res[len] = value;
+		final int size = array.length;
+		final char[] res = new char[size + 1];
+		System.arraycopy(array, 0, res, 0, size);
+		res[size] = value;
 		return res;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static byte[] $plus$plus(byte[] array1, byte[] array2)
+	public static char[] $plus$plus(char[] array1, char[] array2)
 	{
 		final int len1 = array1.length;
 		final int len2 = array2.length;
-		final byte[] res = new byte[len1 + len2];
+		final char[] res = new char[len1 + len2];
 		System.arraycopy(array1, 0, res, 0, len1);
 		System.arraycopy(array2, 0, res, len1, len2);
 		return res;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static byte[] $minus(byte[] array, byte value)
+	public static char[] $minus(char[] array, char value)
 	{
 		final int index = indexOf(array, value, 0);
 		if (index < 0)
@@ -214,29 +217,29 @@ public abstract class ByteArray
 			return array;
 		}
 
-		final int len = array.length;
-		final byte[] res = new byte[len - 1];
+		final int size = array.length;
+		final char[] res = new char[size - 1];
 		if (index > 0)
 		{
 			// copy the first part before the index
 			System.arraycopy(array, 0, res, 0, index);
 		}
-		if (index < len)
+		if (index < size)
 		{
 			// copy the second part after the index
-			System.arraycopy(array, index + 1, res, index, len - index - 1);
+			System.arraycopy(array, index + 1, res, index, size - index - 1);
 		}
 		return res;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static byte[] $minus$minus(byte[] array1, byte[] array2)
+	public static char[] $minus$minus(char[] array1, char[] array2)
 	{
 		int index = 0;
-		final int len = array1.length;
-		final byte[] res = new byte[len];
+		final int size = array1.length;
+		final char[] res = new char[size];
 
-		for (final byte v : array1)
+		for (char v : array1)
 		{
 			if (indexOf(array2, v, 0) < 0)
 			{
@@ -249,13 +252,13 @@ public abstract class ByteArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static byte[] $amp(byte[] array1, byte[] array2)
+	public static char[] $amp(char[] array1, char[] array2)
 	{
 		int index = 0;
-		final int len = array1.length;
-		final byte[] res = new byte[len];
+		final int size = array1.length;
+		final char[] res = new char[size];
 
-		for (final byte v : array1)
+		for (char v : array1)
 		{
 			if (indexOf(array2, v, 0) >= 0)
 			{
@@ -268,30 +271,30 @@ public abstract class ByteArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static byte[] mapped(byte[] array, IntUnaryOperator mapper)
+	public static char[] mapped(char[] array, IntUnaryOperator mapper)
 	{
-		final int len = array.length;
-		final byte[] res = new byte[len];
-		for (int i = 0; i < len; i++)
+		final int size = array.length;
+		final char[] res = new char[size];
+		for (int i = 0; i < size; i++)
 		{
-			res[i] = (byte) mapper.applyAsInt(array[i]);
+			res[i] = (char) mapper.applyAsInt(array[i]);
 		}
 		return res;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static byte[] flatMapped(byte[] array, IntFunction<byte[]> mapper)
+	public static char[] flatMapped(char[] array, IntFunction<char[]> mapper)
 	{
 		int size = 0;
-		byte[] res = EMPTY;
+		char[] res = EMPTY;
 
-		for (final byte v : array)
+		for (char v : array)
 		{
-			final byte[] a = mapper.apply(v);
+			final char[] a = mapper.apply(v);
 			final int alen = a.length;
 			if (size + alen >= res.length)
 			{
-				final byte[] newRes = new byte[size + alen];
+				final char[] newRes = new char[size + alen];
 				System.arraycopy(res, 0, newRes, 0, res.length);
 				res = newRes;
 			}
@@ -304,12 +307,12 @@ public abstract class ByteArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static byte[] filtered(byte[] array, IntPredicate condition)
+	public static char[] filtered(char[] array, IntPredicate condition)
 	{
 		int index = 0;
-		final int len = array.length;
-		final byte[] res = new byte[len];
-		for (final byte v : array)
+		final int size = array.length;
+		final char[] res = new char[size];
+		for (char v : array)
 		{
 			if (condition.test(v))
 			{
@@ -322,9 +325,9 @@ public abstract class ByteArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static byte[] sorted(byte[] array)
+	public static char[] sorted(char[] array)
 	{
-		final byte[] res = array.clone();
+		final char[] res = array.clone();
 		Arrays.sort(res);
 		return res;
 	}
@@ -332,51 +335,51 @@ public abstract class ByteArray
 	// Search Operations
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int indexOf(byte[] array, byte value)
+	public static int indexOf(char[] array, char value)
 	{
 		return indexOf(array, value, 0);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int indexOf(byte[] array, byte value, int start)
+	public static int indexOf(char[] array, char value, int startIndex)
 	{
-		for (; start < array.length; start++)
+		for (; startIndex < array.length; startIndex++)
 		{
-			if (array[start] == value)
+			if (array[startIndex] == value)
 			{
-				return start;
+				return startIndex;
 			}
 		}
 		return -1;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int lastIndexOf(byte[] array, byte value)
+	public static int lastIndexOf(char[] array, char value)
 	{
 		return lastIndexOf(array, value, array.length - 1);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int lastIndexOf(byte[] array, byte value, int start)
+	public static int lastIndexOf(char[] array, char value, int startIndex)
 	{
-		for (; start >= 0; start--)
+		for (; startIndex >= 0; startIndex--)
 		{
-			if (array[start] == value)
+			if (array[startIndex] == value)
 			{
-				return start;
+				return startIndex;
 			}
 		}
 		return -1;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static boolean contains(byte[] array, byte value)
+	public static boolean contains(char[] array, char value)
 	{
 		return indexOf(array, value, 0) >= 0;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static boolean in(byte value, byte[] array)
+	public static boolean in(char value, char[] array)
 	{
 		return indexOf(array, value, 0) >= 0;
 	}
@@ -384,17 +387,17 @@ public abstract class ByteArray
 	// Copying
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static byte[] copy(byte[] array)
+	public static char[] copy(char[] array)
 	{
 		return array.clone();
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static Byte[] boxed(byte[] array)
+	public static Character[] boxed(char[] array)
 	{
-		final int len = array.length;
-		final Byte[] boxed = new Byte[len];
-		for (int i = 0; i < len; i++)
+		final int size = array.length;
+		final Character[] boxed = new Character[size];
+		for (int i = 0; i < size; i++)
 		{
 			boxed[i] = array[i];
 		}
@@ -402,19 +405,19 @@ public abstract class ByteArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
-	public static Iterable<@Primitive Byte> asIterable(byte[] array)
+	public static Iterable<@Primitive Character> asIterable(char[] array)
 	{
 		return toList(array);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
-	public static ImmutableList<@Primitive Byte> asList(byte @Immutable [] array)
+	public static ImmutableList<@Primitive Character> asList(char @Immutable [] array)
 	{
 		return toList(array);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static ImmutableList<@Primitive Byte> toList(byte[] array)
+	public static ImmutableList<@Primitive Character> toList(char[] array)
 	{
 		return new ArrayList<>(boxed(array), true);
 	}
@@ -422,34 +425,34 @@ public abstract class ByteArray
 	// equals, hashCode and toString
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static boolean equals(byte[] array1, byte[] array2)
+	public static boolean equals(char[] array1, char[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static int hashCode(byte[] array)
+	public static int hashCode(char[] array)
 	{
 		return Arrays.hashCode(array);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static String toString(byte[] array)
+	public static String toString(char[] array)
 	{
 		if (array == null)
 		{
 			return "null";
 		}
 
-		final int len = array.length;
-		if (len <= 0)
+		final int size = array.length;
+		if (size <= 0)
 		{
 			return "[]";
 		}
 
-		final StringBuilder buf = new StringBuilder(len * 3 + 4);
+		final StringBuilder buf = new StringBuilder(size * 3 + 4);
 		buf.append('[').append(array[0]);
-		for (int i = 1; i < len; i++)
+		for (int i = 1; i < size; i++)
 		{
 			buf.append(", ");
 			buf.append(array[i]);
@@ -458,7 +461,7 @@ public abstract class ByteArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static void toString(byte[] array, StringBuilder builder)
+	public static void toString(char[] array, StringBuilder builder)
 	{
 		if (array == null)
 		{
@@ -466,15 +469,15 @@ public abstract class ByteArray
 			return;
 		}
 
-		final int len = array.length;
-		if (len <= 0)
+		final int size = array.length;
+		if (size <= 0)
 		{
 			builder.append("[]");
 			return;
 		}
 
 		builder.append('[').append(array[0]);
-		for (int i = 1; i < len; i++)
+		for (int i = 1; i < size; i++)
 		{
 			builder.append(", ");
 			builder.append(array[i]);

@@ -1,3 +1,5 @@
+// GENERATED SOURCE - DOT NOT EDIT
+
 package dyvil.array;
 
 import dyvil.annotation.Immutable;
@@ -9,8 +11,9 @@ import dyvil.annotation._internal.Primitive;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
-import dyvil.ref.CharRef;
-import dyvil.ref.array.CharArrayRef;
+import dyvil.collection.range.closed.FloatRange;
+import dyvil.ref.FloatRef;
+import dyvil.ref.array.FloatArrayRef;
 import dyvil.reflect.Modifiers;
 
 import java.util.Arrays;
@@ -18,31 +21,38 @@ import java.util.function.*;
 
 import static dyvil.reflect.Opcodes.*;
 
-public abstract class CharArray
+@SuppressWarnings({ "cast", "RedundantCast" })
+public abstract class FloatArray
 {
-	public static final char[] EMPTY = new char[0];
+	public static final float[] EMPTY = new float[0];
 
 	@DyvilModifiers(Modifiers.INLINE)
-	public static char[] apply()
+	public static float[] apply()
 	{
-		return new char[0];
+		return new float[0];
 	}
 
 	@DyvilModifiers(Modifiers.INLINE)
-	public static char[] apply(int size)
+	public static float[] apply(int size)
 	{
-		return new char[size];
+		return new float[size];
 	}
 
 	@DyvilModifiers(Modifiers.INLINE)
-	public static char[] apply(char[] array)
+	public static float[] apply(float[] array)
 	{
 		return array.clone();
 	}
 
-	public static char[] apply(int size, char repeatedValue)
+	@DyvilModifiers(Modifiers.IMPLICIT | Modifiers.INLINE)
+	public static float[] apply(FloatRange range)
 	{
-		final char[] array = new char[size];
+		return range.toFloatArray();
+	}
+
+	public static float[] apply(int size, float repeatedValue)
+	{
+		final float[] array = new float[size];
 		for (int i = 0; i < size; i++)
 		{
 			array[i] = repeatedValue;
@@ -50,46 +60,46 @@ public abstract class CharArray
 		return array;
 	}
 
-	public static char[] apply(int size, IntSupplier valueSupplier)
+	public static float[] apply(int size, DoubleSupplier valueSupplier)
 	{
-		final char[] array = new char[size];
+		final float[] array = new float[size];
 		for (int i = 0; i < size; i++)
 		{
-			array[i] = (char) valueSupplier.getAsInt();
+			array[i] = (float) valueSupplier.getAsDouble();
 		}
 		return array;
 	}
 
-	public static char[] apply(int size, IntUnaryOperator valueMapper)
+	public static float[] apply(int size, DoubleUnaryOperator valueMapper)
 	{
-		final char[] array = new char[size];
+		final float[] array = new float[size];
 		for (int i = 0; i < size; i++)
 		{
-			array[i] = (char) valueMapper.applyAsInt(i);
+			array[i] = (float) valueMapper.applyAsDouble(i);
 		}
 		return array;
 	}
 
 	@DyvilName("apply")
-	public static char[] rangeClosed(char from, char to)
+	public static float[] rangeClosed(float from, float to)
 	{
-		int i = 0;
-		final char[] array = new char[to - from + 1];
+		int index = 0;
+		final float[] array = new float[(int) (to - from + 1)];
 		for (; from <= to; from++)
 		{
-			array[i++] = from;
+			array[index++] = from;
 		}
 		return array;
 	}
 
 	@DyvilName("apply")
-	public static char[] range(char from, char toExclusive)
+	public static float[] range(float from, float toExclusive)
 	{
-		int i = 0;
-		final char[] array = new char[toExclusive - from];
+		int index = 0;
+		final float[] array = new float[(int) (toExclusive - from)];
 		for (; from < toExclusive; from++)
 		{
-			array[i++] = from;
+			array[index++] = from;
 		}
 		return array;
 	}
@@ -98,67 +108,67 @@ public abstract class CharArray
 
 	@Intrinsic( { LOAD_0, ARRAYLENGTH })
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int length(char[] array)
+	public static int length(float[] array)
 	{
 		return array.length;
 	}
 
 	@Intrinsic( { LOAD_0, ARRAYLENGTH })
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int size(char[] array)
+	public static int size(float[] array)
 	{
 		return array.length;
 	}
 
 	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })
 	@DyvilModifiers(Modifiers.INFIX)
-	public static boolean isEmpty(char[] array)
+	public static boolean isEmpty(float[] array)
 	{
 		return array.length == 0;
 	}
 
-	@Intrinsic( { LOAD_0, LOAD_1, CALOAD })
+	@Intrinsic( { LOAD_0, LOAD_1, FALOAD })
 	@DyvilModifiers(Modifiers.INFIX)
-	public static char subscript(char[] array, int index)
+	public static float subscript(float[] array, int index)
 	{
 		return array[index];
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static char[] subscript(char[] array, Range<@Primitive Integer> range)
+	public static float[] subscript(float[] array, Range<@Primitive Integer> range)
 	{
 		final int size = range.size();
-		final char[] result = new char[size];
+		final float[] result = new float[size];
 		System.arraycopy(array, range.first(), result, 0, size);
 		return result;
 	}
 
-	@Intrinsic( { LOAD_0, LOAD_1, LOAD_2, CASTORE })
+	@Intrinsic( { LOAD_0, LOAD_1, LOAD_2, FASTORE })
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	public static void subscript_$eq(char[] array, int index, char value)
+	public static void subscript_$eq(float[] array, int index, float newValue)
 	{
-		array[index] = value;
+		array[index] = newValue;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	public static void subscript_$eq(char[] array, Range<@Primitive Integer> range, char[] newValues)
+	public static void subscript_$eq(float[] array, Range<@Primitive Integer> range, float[] newValues)
 	{
 		System.arraycopy(newValues, 0, array, range.first(), range.size());
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	public static CharRef subscript_$amp(char[] array, int index)
+	public static FloatRef subscript_$amp(float[] array, int index)
 	{
-		return new CharArrayRef(array, index);
+		return new FloatArrayRef(array, index);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static void forEach(char[] array, IntConsumer action)
+	public static void forEach(float[] array, DoubleConsumer action)
 	{
-		for (char value : array)
+		for (float value : array)
 		{
 			action.accept(value);
 		}
@@ -167,46 +177,46 @@ public abstract class CharArray
 	// Operators
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static boolean $qmark(char[] array, char value)
+	public static boolean $qmark(float[] array, float value)
 	{
 		return indexOf(array, value, 0) >= 0;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static boolean $eq$eq(char[] array1, char[] array2)
+	public static boolean $eq$eq(float[] array1, float[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static boolean $bang$eq(char[] array1, char[] array2)
+	public static boolean $bang$eq(float[] array1, float[] array2)
 	{
 		return !Arrays.equals(array1, array2);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static char[] $plus(char[] array, char value)
+	public static float[] $plus(float[] array, float value)
 	{
-		final int len = array.length;
-		final char[] res = new char[len + 1];
-		System.arraycopy(array, 0, res, 0, len);
-		res[len] = value;
+		final int size = array.length;
+		final float[] res = new float[size + 1];
+		System.arraycopy(array, 0, res, 0, size);
+		res[size] = value;
 		return res;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static char[] $plus$plus(char[] array1, char[] array2)
+	public static float[] $plus$plus(float[] array1, float[] array2)
 	{
 		final int len1 = array1.length;
 		final int len2 = array2.length;
-		final char[] res = new char[len1 + len2];
+		final float[] res = new float[len1 + len2];
 		System.arraycopy(array1, 0, res, 0, len1);
 		System.arraycopy(array2, 0, res, len1, len2);
 		return res;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static char[] $minus(char[] array, char value)
+	public static float[] $minus(float[] array, float value)
 	{
 		final int index = indexOf(array, value, 0);
 		if (index < 0)
@@ -214,33 +224,33 @@ public abstract class CharArray
 			return array;
 		}
 
-		final int len = array.length;
-		final char[] res = new char[len - 1];
+		final int size = array.length;
+		final float[] res = new float[size - 1];
 		if (index > 0)
 		{
 			// copy the first part before the index
 			System.arraycopy(array, 0, res, 0, index);
 		}
-		if (index < len)
+		if (index < size)
 		{
 			// copy the second part after the index
-			System.arraycopy(array, index + 1, res, index, len - index - 1);
+			System.arraycopy(array, index + 1, res, index, size - index - 1);
 		}
 		return res;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static char[] $minus$minus(char[] array1, char[] array2)
+	public static float[] $minus$minus(float[] array1, float[] array2)
 	{
 		int index = 0;
-		final int len = array1.length;
-		final char[] res = new char[len];
+		final int size = array1.length;
+		final float[] res = new float[size];
 
-		for (char value : array1)
+		for (float v : array1)
 		{
-			if (indexOf(array2, value, 0) < 0)
+			if (indexOf(array2, v, 0) < 0)
 			{
-				res[index++] = value;
+				res[index++] = v;
 			}
 		}
 
@@ -249,17 +259,17 @@ public abstract class CharArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static char[] $amp(char[] array1, char[] array2)
+	public static float[] $amp(float[] array1, float[] array2)
 	{
 		int index = 0;
-		final int len = array1.length;
-		final char[] res = new char[len];
+		final int size = array1.length;
+		final float[] res = new float[size];
 
-		for (char value : array1)
+		for (float v : array1)
 		{
-			if (indexOf(array2, value, 0) >= 0)
+			if (indexOf(array2, v, 0) >= 0)
 			{
-				res[index++] = value;
+				res[index++] = v;
 			}
 		}
 
@@ -268,30 +278,30 @@ public abstract class CharArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static char[] mapped(char[] array, IntUnaryOperator mapper)
+	public static float[] mapped(float[] array, DoubleUnaryOperator mapper)
 	{
-		final int len = array.length;
-		final char[] res = new char[len];
-		for (int i = 0; i < len; i++)
+		final int size = array.length;
+		final float[] res = new float[size];
+		for (int i = 0; i < size; i++)
 		{
-			res[i] = (char) mapper.applyAsInt(array[i]);
+			res[i] = (float) mapper.applyAsDouble(array[i]);
 		}
 		return res;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static char[] flatMapped(char[] array, IntFunction<char[]> mapper)
+	public static float[] flatMapped(float[] array, DoubleFunction<float[]> mapper)
 	{
 		int size = 0;
-		char[] res = EMPTY;
+		float[] res = EMPTY;
 
-		for (char value : array)
+		for (float v : array)
 		{
-			final char[] a = mapper.apply(value);
+			final float[] a = mapper.apply(v);
 			final int alen = a.length;
 			if (size + alen >= res.length)
 			{
-				final char[] newRes = new char[size + alen];
+				final float[] newRes = new float[size + alen];
 				System.arraycopy(res, 0, newRes, 0, res.length);
 				res = newRes;
 			}
@@ -304,16 +314,16 @@ public abstract class CharArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static char[] filtered(char[] array, IntPredicate condition)
+	public static float[] filtered(float[] array, DoublePredicate condition)
 	{
 		int index = 0;
-		final int len = array.length;
-		final char[] res = new char[len];
-		for (char value : array)
+		final int size = array.length;
+		final float[] res = new float[size];
+		for (float v : array)
 		{
-			if (condition.test(value))
+			if (condition.test(v))
 			{
-				res[index++] = value;
+				res[index++] = v;
 			}
 		}
 
@@ -322,9 +332,9 @@ public abstract class CharArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static char[] sorted(char[] array)
+	public static float[] sorted(float[] array)
 	{
-		final char[] res = array.clone();
+		final float[] res = array.clone();
 		Arrays.sort(res);
 		return res;
 	}
@@ -332,13 +342,13 @@ public abstract class CharArray
 	// Search Operations
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int indexOf(char[] array, char value)
+	public static int indexOf(float[] array, float value)
 	{
 		return indexOf(array, value, 0);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int indexOf(char[] array, char value, int startIndex)
+	public static int indexOf(float[] array, float value, int startIndex)
 	{
 		for (; startIndex < array.length; startIndex++)
 		{
@@ -351,13 +361,13 @@ public abstract class CharArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int lastIndexOf(char[] array, char value)
+	public static int lastIndexOf(float[] array, float value)
 	{
 		return lastIndexOf(array, value, array.length - 1);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int lastIndexOf(char[] array, char value, int startIndex)
+	public static int lastIndexOf(float[] array, float value, int startIndex)
 	{
 		for (; startIndex >= 0; startIndex--)
 		{
@@ -370,31 +380,31 @@ public abstract class CharArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static boolean contains(char[] array, char value)
+	public static boolean contains(float[] array, float value)
 	{
-		return indexOf(array, value, 0) != -1;
+		return indexOf(array, value, 0) >= 0;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static boolean in(char value, char[] array)
+	public static boolean in(float value, float[] array)
 	{
-		return indexOf(array, value, 0) != -1;
+		return indexOf(array, value, 0) >= 0;
 	}
 
 	// Copying
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static char[] copy(char[] array)
+	public static float[] copy(float[] array)
 	{
 		return array.clone();
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static Character[] boxed(char[] array)
+	public static Float[] boxed(float[] array)
 	{
-		final int len = array.length;
-		final Character[] boxed = new Character[len];
-		for (int i = 0; i < len; i++)
+		final int size = array.length;
+		final Float[] boxed = new Float[size];
+		for (int i = 0; i < size; i++)
 		{
 			boxed[i] = array[i];
 		}
@@ -402,19 +412,19 @@ public abstract class CharArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
-	public static Iterable<@Primitive Character> asIterable(char[] array)
+	public static Iterable<@Primitive Float> asIterable(float[] array)
 	{
 		return toList(array);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
-	public static ImmutableList<@Primitive Character> asList(char @Immutable [] array)
+	public static ImmutableList<@Primitive Float> asList(float @Immutable [] array)
 	{
 		return toList(array);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static ImmutableList<@Primitive Character> toList(char[] array)
+	public static ImmutableList<@Primitive Float> toList(float[] array)
 	{
 		return new ArrayList<>(boxed(array), true);
 	}
@@ -422,40 +432,34 @@ public abstract class CharArray
 	// equals, hashCode and toString
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static boolean equals(char[] array1, char[] array2)
+	public static boolean equals(float[] array1, float[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static int hashCode(char[] array)
+	public static int hashCode(float[] array)
 	{
 		return Arrays.hashCode(array);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static String asString(char[] array)
-	{
-		return new String(array);
-	}
-
-	@DyvilModifiers(Modifiers.INFIX)
-	public static String toString(char[] array)
+	public static String toString(float[] array)
 	{
 		if (array == null)
 		{
 			return "null";
 		}
 
-		final int len = array.length;
-		if (len <= 0)
+		final int size = array.length;
+		if (size <= 0)
 		{
 			return "[]";
 		}
 
-		final StringBuilder buf = new StringBuilder(len * 3 + 4);
+		final StringBuilder buf = new StringBuilder(size * 3 + 4);
 		buf.append('[').append(array[0]);
-		for (int i = 1; i < len; i++)
+		for (int i = 1; i < size; i++)
 		{
 			buf.append(", ");
 			buf.append(array[i]);
@@ -464,7 +468,7 @@ public abstract class CharArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static void toString(char[] array, StringBuilder builder)
+	public static void toString(float[] array, StringBuilder builder)
 	{
 		if (array == null)
 		{
@@ -472,15 +476,15 @@ public abstract class CharArray
 			return;
 		}
 
-		final int len = array.length;
-		if (len <= 0)
+		final int size = array.length;
+		if (size <= 0)
 		{
 			builder.append("[]");
 			return;
 		}
 
 		builder.append('[').append(array[0]);
-		for (int i = 1; i < len; i++)
+		for (int i = 1; i < size; i++)
 		{
 			builder.append(", ");
 			builder.append(array[i]);

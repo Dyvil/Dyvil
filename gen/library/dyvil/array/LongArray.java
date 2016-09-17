@@ -1,3 +1,5 @@
+// GENERATED SOURCE - DOT NOT EDIT
+
 package dyvil.array;
 
 import dyvil.annotation.Immutable;
@@ -9,9 +11,9 @@ import dyvil.annotation._internal.Primitive;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
-import dyvil.collection.range.closed.IntRange;
-import dyvil.ref.IntRef;
-import dyvil.ref.array.IntArrayRef;
+import dyvil.collection.range.closed.LongRange;
+import dyvil.ref.LongRef;
+import dyvil.ref.array.LongArrayRef;
 import dyvil.reflect.Modifiers;
 
 import java.util.Arrays;
@@ -19,37 +21,38 @@ import java.util.function.*;
 
 import static dyvil.reflect.Opcodes.*;
 
-public abstract class IntArray
+@SuppressWarnings({ "cast", "RedundantCast" })
+public abstract class LongArray
 {
-	public static final int[] EMPTY = new int[0];
+	public static final long[] EMPTY = new long[0];
 
 	@DyvilModifiers(Modifiers.INLINE)
-	public static int[] apply()
+	public static long[] apply()
 	{
-		return new int[0];
+		return new long[0];
 	}
 
 	@DyvilModifiers(Modifiers.INLINE)
-	public static int[] apply(int size)
+	public static long[] apply(int size)
 	{
-		return new int[size];
+		return new long[size];
 	}
 
 	@DyvilModifiers(Modifiers.INLINE)
-	public static int[] apply(int[] array)
+	public static long[] apply(long[] array)
 	{
 		return array.clone();
 	}
 
 	@DyvilModifiers(Modifiers.IMPLICIT | Modifiers.INLINE)
-	public static int[] apply(IntRange range)
+	public static long[] apply(LongRange range)
 	{
-		return range.toIntArray();
+		return range.toLongArray();
 	}
 
-	public static int[] apply(int size, int repeatedValue)
+	public static long[] apply(int size, long repeatedValue)
 	{
-		final int[] array = new int[size];
+		final long[] array = new long[size];
 		for (int i = 0; i < size; i++)
 		{
 			array[i] = repeatedValue;
@@ -57,46 +60,46 @@ public abstract class IntArray
 		return array;
 	}
 
-	public static int[] apply(int size, IntSupplier valueSupplier)
+	public static long[] apply(int size, LongSupplier valueSupplier)
 	{
-		final int[] array = new int[size];
+		final long[] array = new long[size];
 		for (int i = 0; i < size; i++)
 		{
-			array[i] = valueSupplier.getAsInt();
+			array[i] = (long) valueSupplier.getAsLong();
 		}
 		return array;
 	}
 
-	public static int[] apply(int size, IntUnaryOperator valueMapper)
+	public static long[] apply(int size, LongUnaryOperator valueMapper)
 	{
-		final int[] array = new int[size];
+		final long[] array = new long[size];
 		for (int i = 0; i < size; i++)
 		{
-			array[i] = valueMapper.applyAsInt(i);
+			array[i] = (long) valueMapper.applyAsLong(i);
 		}
 		return array;
 	}
 
 	@DyvilName("apply")
-	public static int[] rangeClosed(int from, int to)
+	public static long[] rangeClosed(long from, long to)
 	{
-		int i = 0;
-		final int[] array = new int[to - from + 1];
+		int index = 0;
+		final long[] array = new long[(int) (to - from + 1)];
 		for (; from <= to; from++)
 		{
-			array[i++] = from;
+			array[index++] = from;
 		}
 		return array;
 	}
 
 	@DyvilName("apply")
-	public static int[] range(int from, int toExclusive)
+	public static long[] range(long from, long toExclusive)
 	{
-		int i = 0;
-		final int[] array = new int[toExclusive - from];
+		int index = 0;
+		final long[] array = new long[(int) (toExclusive - from)];
 		for (; from < toExclusive; from++)
 		{
-			array[i++] = from;
+			array[index++] = from;
 		}
 		return array;
 	}
@@ -105,68 +108,67 @@ public abstract class IntArray
 
 	@Intrinsic( { LOAD_0, ARRAYLENGTH })
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int length(int[] array)
+	public static int length(long[] array)
 	{
 		return array.length;
 	}
 
 	@Intrinsic( { LOAD_0, ARRAYLENGTH })
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int size(int[] array)
+	public static int size(long[] array)
 	{
 		return array.length;
 	}
 
 	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })
 	@DyvilModifiers(Modifiers.INFIX)
-	public static boolean isEmpty(int[] array)
+	public static boolean isEmpty(long[] array)
 	{
 		return array.length == 0;
 	}
 
-	@Intrinsic( { LOAD_0, LOAD_1, IALOAD })
+	@Intrinsic( { LOAD_0, LOAD_1, LALOAD })
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int subscript(int[] array, int index)
+	public static long subscript(long[] array, int index)
 	{
 		return array[index];
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int[] subscript(int[] array, Range<@Primitive Integer> range)
+	public static long[] subscript(long[] array, Range<@Primitive Integer> range)
 	{
 		final int size = range.size();
-		final int[] result = new int[size];
+		final long[] result = new long[size];
 		System.arraycopy(array, range.first(), result, 0, size);
 		return result;
 	}
 
-	@Intrinsic( { LOAD_0, LOAD_1, LOAD_2, IASTORE })
+	@Intrinsic( { LOAD_0, LOAD_1, LOAD_2, LASTORE })
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	public static void subscript_$eq(int[] array, int index, int newValue)
+	public static void subscript_$eq(long[] array, int index, long newValue)
 	{
 		array[index] = newValue;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	public static void subscript_$eq(int[] array, Range<@Primitive Integer> range, int[] newValues)
+	public static void subscript_$eq(long[] array, Range<@Primitive Integer> range, long[] newValues)
 	{
-		final int size = range.size();
-		System.arraycopy(newValues, 0, array, range.first(), size);
+		System.arraycopy(newValues, 0, array, range.first(), range.size());
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	public static IntRef subscript_$amp(int[] array, int index)
+	public static LongRef subscript_$amp(long[] array, int index)
 	{
-		return new IntArrayRef(array, index);
+		return new LongArrayRef(array, index);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static void forEach(int[] array, IntConsumer action)
+	public static void forEach(long[] array, LongConsumer action)
 	{
-		for (int value : array)
+		for (long value : array)
 		{
 			action.accept(value);
 		}
@@ -175,46 +177,46 @@ public abstract class IntArray
 	// Operators
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static boolean $qmark(int[] array, int value)
+	public static boolean $qmark(long[] array, long value)
 	{
 		return indexOf(array, value, 0) >= 0;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static boolean $eq$eq(int[] array1, int[] array2)
+	public static boolean $eq$eq(long[] array1, long[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static boolean $bang$eq(int[] array1, int[] array2)
+	public static boolean $bang$eq(long[] array1, long[] array2)
 	{
 		return !Arrays.equals(array1, array2);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int[] $plus(int[] array, int value)
+	public static long[] $plus(long[] array, long value)
 	{
-		final int len = array.length;
-		final int[] res = new int[len + 1];
-		System.arraycopy(array, 0, res, 0, len);
-		res[len] = value;
+		final int size = array.length;
+		final long[] res = new long[size + 1];
+		System.arraycopy(array, 0, res, 0, size);
+		res[size] = value;
 		return res;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int[] $plus$plus(int[] array1, int[] array2)
+	public static long[] $plus$plus(long[] array1, long[] array2)
 	{
 		final int len1 = array1.length;
 		final int len2 = array2.length;
-		final int[] res = new int[len1 + len2];
+		final long[] res = new long[len1 + len2];
 		System.arraycopy(array1, 0, res, 0, len1);
 		System.arraycopy(array2, 0, res, len1, len2);
 		return res;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int[] $minus(int[] array, int value)
+	public static long[] $minus(long[] array, long value)
 	{
 		final int index = indexOf(array, value, 0);
 		if (index < 0)
@@ -222,29 +224,29 @@ public abstract class IntArray
 			return array;
 		}
 
-		final int len = array.length;
-		final int[] res = new int[len - 1];
+		final int size = array.length;
+		final long[] res = new long[size - 1];
 		if (index > 0)
 		{
 			// copy the first part before the index
 			System.arraycopy(array, 0, res, 0, index);
 		}
-		if (index < len)
+		if (index < size)
 		{
 			// copy the second part after the index
-			System.arraycopy(array, index + 1, res, index, len - index - 1);
+			System.arraycopy(array, index + 1, res, index, size - index - 1);
 		}
 		return res;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int[] $minus$minus(int[] array1, int[] array2)
+	public static long[] $minus$minus(long[] array1, long[] array2)
 	{
 		int index = 0;
-		final int len = array1.length;
-		final int[] res = new int[len];
+		final int size = array1.length;
+		final long[] res = new long[size];
 
-		for (int v : array1)
+		for (long v : array1)
 		{
 			if (indexOf(array2, v, 0) < 0)
 			{
@@ -257,13 +259,13 @@ public abstract class IntArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int[] $amp(int[] array1, int[] array2)
+	public static long[] $amp(long[] array1, long[] array2)
 	{
 		int index = 0;
-		final int len = array1.length;
-		final int[] res = new int[len];
+		final int size = array1.length;
+		final long[] res = new long[size];
 
-		for (int v : array1)
+		for (long v : array1)
 		{
 			if (indexOf(array2, v, 0) >= 0)
 			{
@@ -276,30 +278,30 @@ public abstract class IntArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int[] mapped(int[] array, IntUnaryOperator mapper)
+	public static long[] mapped(long[] array, LongUnaryOperator mapper)
 	{
-		final int len = array.length;
-		final int[] res = new int[len];
-		for (int i = 0; i < len; i++)
+		final int size = array.length;
+		final long[] res = new long[size];
+		for (int i = 0; i < size; i++)
 		{
-			res[i] = mapper.applyAsInt(array[i]);
+			res[i] = (long) mapper.applyAsLong(array[i]);
 		}
 		return res;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int[] flatMapped(int[] array, IntFunction<int[]> mapper)
+	public static long[] flatMapped(long[] array, LongFunction<long[]> mapper)
 	{
 		int size = 0;
-		int[] res = EMPTY;
+		long[] res = EMPTY;
 
-		for (int v : array)
+		for (long v : array)
 		{
-			final int[] a = mapper.apply(v);
+			final long[] a = mapper.apply(v);
 			final int alen = a.length;
 			if (size + alen >= res.length)
 			{
-				final int[] newRes = new int[size + alen];
+				final long[] newRes = new long[size + alen];
 				System.arraycopy(res, 0, newRes, 0, res.length);
 				res = newRes;
 			}
@@ -312,12 +314,12 @@ public abstract class IntArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int[] filtered(int[] array, IntPredicate condition)
+	public static long[] filtered(long[] array, LongPredicate condition)
 	{
 		int index = 0;
-		final int len = array.length;
-		final int[] res = new int[len];
-		for (int v : array)
+		final int size = array.length;
+		final long[] res = new long[size];
+		for (long v : array)
 		{
 			if (condition.test(v))
 			{
@@ -330,9 +332,9 @@ public abstract class IntArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int[] sorted(int[] array)
+	public static long[] sorted(long[] array)
 	{
-		final int[] res = array.clone();
+		final long[] res = array.clone();
 		Arrays.sort(res);
 		return res;
 	}
@@ -340,13 +342,13 @@ public abstract class IntArray
 	// Search Operations
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int indexOf(int[] array, int value)
+	public static int indexOf(long[] array, long value)
 	{
 		return indexOf(array, value, 0);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int indexOf(int[] array, int value, int startIndex)
+	public static int indexOf(long[] array, long value, int startIndex)
 	{
 		for (; startIndex < array.length; startIndex++)
 		{
@@ -359,13 +361,13 @@ public abstract class IntArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int lastIndexOf(int[] array, int value)
+	public static int lastIndexOf(long[] array, long value)
 	{
 		return lastIndexOf(array, value, array.length - 1);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int lastIndexOf(int[] array, int value, int startIndex)
+	public static int lastIndexOf(long[] array, long value, int startIndex)
 	{
 		for (; startIndex >= 0; startIndex--)
 		{
@@ -378,13 +380,13 @@ public abstract class IntArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static boolean contains(int[] array, int value)
+	public static boolean contains(long[] array, long value)
 	{
 		return indexOf(array, value, 0) >= 0;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static boolean in(int value, int[] array)
+	public static boolean in(long value, long[] array)
 	{
 		return indexOf(array, value, 0) >= 0;
 	}
@@ -392,17 +394,17 @@ public abstract class IntArray
 	// Copying
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static int[] copy(int[] array)
+	public static long[] copy(long[] array)
 	{
 		return array.clone();
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static Integer[] boxed(int[] array)
+	public static Long[] boxed(long[] array)
 	{
-		final int len = array.length;
-		final Integer[] boxed = new Integer[len];
-		for (int i = 0; i < len; i++)
+		final int size = array.length;
+		final Long[] boxed = new Long[size];
+		for (int i = 0; i < size; i++)
 		{
 			boxed[i] = array[i];
 		}
@@ -410,19 +412,19 @@ public abstract class IntArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
-	public static Iterable<@Primitive Integer> asIterable(int[] array)
+	public static Iterable<@Primitive Long> asIterable(long[] array)
 	{
 		return toList(array);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
-	public static ImmutableList<@Primitive Integer> asList(int @Immutable [] array)
+	public static ImmutableList<@Primitive Long> asList(long @Immutable [] array)
 	{
 		return toList(array);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static ImmutableList<@Primitive Integer> toList(int[] array)
+	public static ImmutableList<@Primitive Long> toList(long[] array)
 	{
 		return new ArrayList<>(boxed(array), true);
 	}
@@ -430,34 +432,34 @@ public abstract class IntArray
 	// equals, hashCode and toString
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static boolean equals(int[] array1, int[] array2)
+	public static boolean equals(long[] array1, long[] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static int hashCode(int[] array)
+	public static int hashCode(long[] array)
 	{
 		return Arrays.hashCode(array);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static String toString(int[] array)
+	public static String toString(long[] array)
 	{
 		if (array == null)
 		{
 			return "null";
 		}
 
-		final int len = array.length;
-		if (len <= 0)
+		final int size = array.length;
+		if (size <= 0)
 		{
 			return "[]";
 		}
 
-		final StringBuilder buf = new StringBuilder(len * 3 + 4);
+		final StringBuilder buf = new StringBuilder(size * 3 + 4);
 		buf.append('[').append(array[0]);
-		for (int i = 1; i < len; i++)
+		for (int i = 1; i < size; i++)
 		{
 			buf.append(", ");
 			buf.append(array[i]);
@@ -466,7 +468,7 @@ public abstract class IntArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static void toString(int[] array, StringBuilder builder)
+	public static void toString(long[] array, StringBuilder builder)
 	{
 		if (array == null)
 		{
@@ -474,15 +476,15 @@ public abstract class IntArray
 			return;
 		}
 
-		final int len = array.length;
-		if (len <= 0)
+		final int size = array.length;
+		if (size <= 0)
 		{
 			builder.append("[]");
 			return;
 		}
 
 		builder.append('[').append(array[0]);
-		for (int i = 1; i < len; i++)
+		for (int i = 1; i < size; i++)
 		{
 			builder.append(", ");
 			builder.append(array[i]);
