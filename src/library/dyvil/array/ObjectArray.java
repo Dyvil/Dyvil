@@ -556,19 +556,19 @@ public abstract class ObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
-	public static <T> Iterable<@Primitive T> asIterable(T[] array)
+	public static <T> Iterable<T> asIterable(T[] array)
 	{
 		return asList(array);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
-	public static <T> ImmutableList<@Primitive T> asList(T @Immutable [] array)
+	public static <T> ImmutableList<T> asList(T @Immutable [] array)
 	{
 		return new ArrayList<>(array, true);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> ImmutableList<@Primitive T> toList(T[] array)
+	public static <T> ImmutableList<T> toList(T[] array)
 	{
 		return new ArrayList<>(array);
 	}
