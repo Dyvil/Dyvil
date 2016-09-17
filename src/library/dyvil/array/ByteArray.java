@@ -1,9 +1,12 @@
 package dyvil.array;
 
+import dyvil.annotation.Immutable;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.Mutating;
 import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation._internal.DyvilName;
 import dyvil.annotation._internal.Primitive;
+import dyvil.collection.ImmutableList;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.ref.ByteRef;
@@ -67,7 +70,8 @@ public abstract class ByteArray
 		return array;
 	}
 
-	public static byte[] apply_$_closed(byte from, byte to)
+	@DyvilName("apply")
+	public static byte[] rangeClosed(byte from, byte to)
 	{
 		int i = 0;
 		final byte[] array = new byte[to - from + 1];
@@ -78,7 +82,8 @@ public abstract class ByteArray
 		return array;
 	}
 
-	public static byte[] apply_$_halfOpen(byte from, byte toExclusive)
+	@DyvilName("apply")
+	public static byte[] range(byte from, byte toExclusive)
 	{
 		int i = 0;
 		final byte[] array = new byte[toExclusive - from];
@@ -396,8 +401,20 @@ public abstract class ByteArray
 		return boxed;
 	}
 
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
+	public static Iterable<@Primitive Byte> asIterable(byte[] array)
+	{
+		return toList(array);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
+	public static ImmutableList<@Primitive Byte> asList(byte @Immutable [] array)
+	{
+		return toList(array);
+	}
+
 	@DyvilModifiers(Modifiers.INFIX)
-	public static Iterable<Byte> toIterable(byte[] array)
+	public static ImmutableList<@Primitive Byte> toList(byte[] array)
 	{
 		return new ArrayList<>(boxed(array), true);
 	}

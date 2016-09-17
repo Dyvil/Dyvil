@@ -1,9 +1,12 @@
 package dyvil.array;
 
+import dyvil.annotation.Immutable;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.Mutating;
 import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation._internal.DyvilName;
 import dyvil.annotation._internal.Primitive;
+import dyvil.collection.ImmutableList;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.ref.ShortRef;
@@ -67,7 +70,8 @@ public abstract class ShortArray
 		return array;
 	}
 
-	public static short[] apply_$_closed(short from, short to)
+	@DyvilName("apply")
+	public static short[] rangeClosed(short from, short to)
 	{
 		int i = 0;
 		final short[] array = new short[to - from + 1];
@@ -78,7 +82,8 @@ public abstract class ShortArray
 		return array;
 	}
 
-	public static short[] apply_$_halfOpen(short from, short toExclusive)
+	@DyvilName("apply")
+	public static short[] range(short from, short toExclusive)
 	{
 		int i = 0;
 		final short[] array = new short[toExclusive - from];
@@ -396,8 +401,20 @@ public abstract class ShortArray
 		return boxed;
 	}
 
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
+	public static Iterable<@Primitive Short> asIterable(short[] array)
+	{
+		return toList(array);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
+	public static ImmutableList<@Primitive Short> asList(short @Immutable [] array)
+	{
+		return toList(array);
+	}
+
 	@DyvilModifiers(Modifiers.INFIX)
-	public static Iterable<Short> toIterable(short[] array)
+	public static ImmutableList<@Primitive Short> toList(short[] array)
 	{
 		return new ArrayList<>(boxed(array), true);
 	}

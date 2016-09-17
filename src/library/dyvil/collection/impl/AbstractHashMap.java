@@ -217,7 +217,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	public AbstractHashMap(Entry<? extends K, ? extends V>[] entries)
 	{
 		this(entries.length);
-		this.putAllInternal(ObjectArray.toIterable(entries));
+		this.putAllInternal(ObjectArray.asIterable(entries));
 	}
 
 	public AbstractHashMap(Iterable<? extends Entry<? extends K, ? extends V>> iterable)

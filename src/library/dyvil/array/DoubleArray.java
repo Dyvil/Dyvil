@@ -1,9 +1,12 @@
 package dyvil.array;
 
+import dyvil.annotation.Immutable;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.Mutating;
 import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation._internal.DyvilName;
 import dyvil.annotation._internal.Primitive;
+import dyvil.collection.ImmutableList;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.collection.range.closed.DoubleRange;
@@ -74,7 +77,8 @@ public abstract class DoubleArray
 		return array;
 	}
 
-	public static double[] apply_$_closed(double from, double to)
+	@DyvilName("apply")
+	public static double[] rangeClosed(double from, double to)
 	{
 		int i = 0;
 		final double[] array = new double[(int) (to - from + 1)];
@@ -85,7 +89,8 @@ public abstract class DoubleArray
 		return array;
 	}
 
-	public static double[] apply_$_halfOpen(double from, double toExclusive)
+	@DyvilName("apply")
+	public static double[] range(double from, double toExclusive)
 	{
 		int i = 0;
 		final double[] array = new double[(int) (toExclusive - from)];
@@ -403,8 +408,20 @@ public abstract class DoubleArray
 		return boxed;
 	}
 
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
+	public static Iterable<@Primitive Double> asIterable(double[] array)
+	{
+		return toList(array);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
+	public static ImmutableList<@Primitive Double> asList(double @Immutable [] array)
+	{
+		return toList(array);
+	}
+
 	@DyvilModifiers(Modifiers.INFIX)
-	public static Iterable<Double> toIterable(double[] array)
+	public static ImmutableList<@Primitive Double> toList(double[] array)
 	{
 		return new ArrayList<>(boxed(array), true);
 	}

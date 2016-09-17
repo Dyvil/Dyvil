@@ -1,9 +1,12 @@
 package dyvil.array;
 
+import dyvil.annotation.Immutable;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.Mutating;
 import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation._internal.DyvilName;
 import dyvil.annotation._internal.Primitive;
+import dyvil.collection.ImmutableList;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.collection.range.closed.LongRange;
@@ -74,7 +77,8 @@ public abstract class LongArray
 		return array;
 	}
 
-	public static long[] apply_$_closed(long from, long to)
+	@DyvilName("apply")
+	public static long[] rangeClosed(long from, long to)
 	{
 		int i = 0;
 		final long[] array = new long[(int) (to - from + 1)];
@@ -85,7 +89,8 @@ public abstract class LongArray
 		return array;
 	}
 
-	public static long[] apply_$_halfOpen(long from, long toExclusive)
+	@DyvilName("apply")
+	public static long[] range(long from, long toExclusive)
 	{
 		int i = 0;
 		final long[] array = new long[(int) (toExclusive - from)];
@@ -403,8 +408,20 @@ public abstract class LongArray
 		return boxed;
 	}
 
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
+	public static Iterable<@Primitive Long> asIterable(long[] array)
+	{
+		return toList(array);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
+	public static ImmutableList<@Primitive Long> asList(long @Immutable [] array)
+	{
+		return toList(array);
+	}
+
 	@DyvilModifiers(Modifiers.INFIX)
-	public static Iterable<Long> toIterable(long[] array)
+	public static ImmutableList<@Primitive Long> toList(long[] array)
 	{
 		return new ArrayList<>(boxed(array), true);
 	}

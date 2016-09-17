@@ -1,9 +1,12 @@
 package dyvil.array;
 
+import dyvil.annotation.Immutable;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.Mutating;
 import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation._internal.DyvilName;
 import dyvil.annotation._internal.Primitive;
+import dyvil.collection.ImmutableList;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.collection.range.closed.FloatRange;
@@ -74,7 +77,8 @@ public abstract class FloatArray
 		return array;
 	}
 
-	public static float[] apply_$_closed(float from, float to)
+	@DyvilName("apply")
+	public static float[] rangeClosed(float from, float to)
 	{
 		int i = 0;
 		final float[] array = new float[(int) (to - from + 1)];
@@ -85,7 +89,8 @@ public abstract class FloatArray
 		return array;
 	}
 
-	public static float[] apply_$_halfOpen(float from, float toExclusive)
+	@DyvilName("apply")
+	public static float[] range(float from, float toExclusive)
 	{
 		int i = 0;
 		final float[] array = new float[(int) (toExclusive - from)];
@@ -403,8 +408,20 @@ public abstract class FloatArray
 		return boxed;
 	}
 
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
+	public static Iterable<@Primitive Float> asIterable(float[] array)
+	{
+		return toList(array);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
+	public static ImmutableList<@Primitive Float> asList(float @Immutable [] array)
+	{
+		return toList(array);
+	}
+
 	@DyvilModifiers(Modifiers.INFIX)
-	public static Iterable<Float> toIterable(float[] array)
+	public static ImmutableList<@Primitive Float> toList(float[] array)
 	{
 		return new ArrayList<>(boxed(array), true);
 	}

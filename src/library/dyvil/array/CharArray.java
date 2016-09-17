@@ -1,9 +1,12 @@
 package dyvil.array;
 
+import dyvil.annotation.Immutable;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.Mutating;
 import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation._internal.DyvilName;
 import dyvil.annotation._internal.Primitive;
+import dyvil.collection.ImmutableList;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.ref.CharRef;
@@ -67,7 +70,8 @@ public abstract class CharArray
 		return array;
 	}
 
-	public static char[] apply_$_closed(char from, char to)
+	@DyvilName("apply")
+	public static char[] rangeClosed(char from, char to)
 	{
 		int i = 0;
 		final char[] array = new char[to - from + 1];
@@ -78,7 +82,8 @@ public abstract class CharArray
 		return array;
 	}
 
-	public static char[] apply_$_halfOpen(char from, char toExclusive)
+	@DyvilName("apply")
+	public static char[] range(char from, char toExclusive)
 	{
 		int i = 0;
 		final char[] array = new char[toExclusive - from];
@@ -396,8 +401,20 @@ public abstract class CharArray
 		return boxed;
 	}
 
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
+	public static Iterable<@Primitive Character> asIterable(char[] array)
+	{
+		return toList(array);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
+	public static ImmutableList<@Primitive Character> asList(char @Immutable [] array)
+	{
+		return toList(array);
+	}
+
 	@DyvilModifiers(Modifiers.INFIX)
-	public static Iterable<Character> toIterable(char[] array)
+	public static ImmutableList<@Primitive Character> toList(char[] array)
 	{
 		return new ArrayList<>(boxed(array), true);
 	}
