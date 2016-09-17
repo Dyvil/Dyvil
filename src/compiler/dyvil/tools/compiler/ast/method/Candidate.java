@@ -25,30 +25,17 @@ public final class Candidate<T extends ICallableSignature> implements Comparable
 
 	public Candidate(T member, int value1, IType type1, boolean invalid)
 	{
-		this.member = member;
-		this.values = new int[] { value1 };
-		this.types = new IType[] { type1 };
-		this.defaults = this.varargs = 0;
-		this.invalid = invalid;
+		this(member, new int[] { value1 }, new IType[] { type1 });
 	}
 
 	public Candidate(T member, int[] values, IType[] types)
 	{
-		this.member = member;
-		this.values = values;
-		this.types = types;
-		this.defaults = this.varargs = 0;
-		this.invalid = false;
+		this(member, values, types, 0, 0);
 	}
 
 	public Candidate(T member, int[] values, IType[] types, int defaults, int varargs)
 	{
-		this.member = member;
-		this.values = values;
-		this.types = types;
-		this.defaults = defaults;
-		this.varargs = varargs;
-		this.invalid = false;
+		this(member, values, types, defaults, varargs, false);
 	}
 
 	public Candidate(T member, int[] values, IType[] types, int defaults, int varargs, boolean invalid)

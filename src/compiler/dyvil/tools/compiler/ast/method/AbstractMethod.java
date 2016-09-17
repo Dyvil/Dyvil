@@ -488,7 +488,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			// Static access to static method
 
-			if (!Types.isSuperType(this.enclosingClass.getClassType(), receiver.getType()))
+			final IType receiverType = receiver.getType();
+			if (!Types.isSuperType(this.enclosingClass.getClassType(), receiverType))
 			{
 				// Disallow access from the wrong type
 				return;
@@ -505,6 +506,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			matchValues = new int[1 + argumentCount];
 			matchTypes = new IType[1 + argumentCount];
 			matchValues[0] = 1;
+			matchTypes[0] = receiverType;
 		}
 		else
 		{
