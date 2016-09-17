@@ -8,15 +8,13 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.LiteralConversion;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.statement.loop.IterableForStatement;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Mutability;
@@ -163,18 +161,6 @@ public class ArrayType implements IObjectType, ITyped
 	}
 
 	@Override
-	public IValue convertValueTo(IValue value, IType targetType, ITypeContext typeContext, MarkerList markers, IContext context)
-	{
-		if (!this.isConvertibleTo(targetType))
-		{
-			return null;
-		}
-
-		final IMethod toIterableMethod = this.getTheClass().getBody().getMethod(Name.fromRaw("toIterable"));
-		return new LiteralConversion(value, toIterableMethod).withType(targetType, typeContext, markers, context);
-	}
-
-	@Override
 	public boolean isSameType(IType type)
 	{
 		return type.isArrayType() && this.mutability == type.getMutability() && Types.isSameType(this.type,
@@ -191,12 +177,6 @@ public class ArrayType implements IObjectType, ITyped
 
 		final IType elementType = type.getElementType();
 		return this.checkPrimitiveType(elementType) && this.type.isSameClass(elementType);
-	}
-
-	@Override
-	public boolean isConvertibleTo(IType type)
-	{
-		return Types.isSuperType(type, IterableForStatement.LazyFields.ITERABLE);
 	}
 
 	@Override
