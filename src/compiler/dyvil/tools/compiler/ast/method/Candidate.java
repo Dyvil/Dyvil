@@ -92,8 +92,7 @@ public final class Candidate<T extends ICallableSignature> implements Comparable
 
 		for (int i = 0, length = this.values.length; i < length; i++)
 		{
-			int conversion = compare(this.values[i], this.types[i], that.values[i], that.types[i]);
-
+			final int conversion = compare(this.values[i], this.types[i], that.values[i], that.types[i]);
 			if (conversion > 0)
 			{
 				worse++;
@@ -110,6 +109,13 @@ public final class Candidate<T extends ICallableSignature> implements Comparable
 		if (better < worse)
 		{
 			return 1;
+		}
+
+		// Compare return types (more specific is better)
+		final int returnType = MemberSorter.compareTypes(this.member.getType(), that.member.getType());
+		if (returnType != 0)
+		{
+			return returnType;
 		}
 
 		// Compare number of defaulted parameters (less is better)
