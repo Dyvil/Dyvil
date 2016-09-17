@@ -1,0 +1,32 @@
+// GENERATED SOURCE - DO NOT EDIT
+
+package dyvil.ref;
+
+import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.ref.boxed.Boxed$className$;
+import dyvil.reflect.Modifiers;
+
+public interface $className$
+{
+	$primitive$ get();
+
+	void set($primitive$ value);
+
+	@DyvilModifiers(Modifiers.INLINE)
+	static $primitive$ $times($className$ ref)
+	{
+		return ref.get();
+	}
+
+	@DyvilModifiers(Modifiers.INLINE | Modifiers.INFIX)
+	static void $times_$eq($className$ ref, $primitive$ value)
+	{
+		ref.set(value);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	static ObjectRef<$wrapper$> boxed($className$ floatRef)
+	{
+		return new Boxed$className$(floatRef);
+	}
+}

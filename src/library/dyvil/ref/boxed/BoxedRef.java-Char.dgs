@@ -1,0 +1,5 @@
+fileName=BoxedCharRef.java
+className=BoxedCharRef
+refClassName=CharRef
+primitive=char
+wrapper=Character

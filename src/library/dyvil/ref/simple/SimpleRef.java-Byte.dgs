@@ -1,0 +1,5 @@
+fileName=SimpleByteRef.java
+className=SimpleByteRef
+refClassName=ByteRef
+primitive=byte
+fromLiteral=FromInt

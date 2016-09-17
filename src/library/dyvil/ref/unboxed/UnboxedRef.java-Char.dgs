@@ -1,0 +1,5 @@
+fileName=UnboxedCharRef.java
+className=UnboxedCharRef
+refClassName=CharRef
+primitive=char
+wrapper=Character

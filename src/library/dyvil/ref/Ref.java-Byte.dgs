@@ -1,0 +1,5 @@
+fileName=ByteRef.java
+
+className=ByteRef
+primitive=byte
+wrapper=Byte

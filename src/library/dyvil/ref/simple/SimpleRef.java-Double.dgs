@@ -1,0 +1,5 @@
+fileName=SimpleDoubleRef.java
+className=SimpleDoubleRef
+refClassName=DoubleRef
+primitive=double
+fromLiteral=FromDouble

@@ -1,0 +1,5 @@
+fileName=UnboxedBooleanRef.java
+className=UnboxedBooleanRef
+refClassName=BooleanRef
+primitive=boolean
+wrapper=Boolean

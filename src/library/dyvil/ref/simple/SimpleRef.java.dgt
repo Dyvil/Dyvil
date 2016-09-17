@@ -1,0 +1,32 @@
+package dyvil.ref.simple;
+
+import dyvil.lang.LiteralConvertible;
+import dyvil.ref.$refClassName$;
+
+@LiteralConvertible.$fromLiteral$
+public class $className$ implements $refClassName$
+{
+	public $primitive$ value;
+
+	public static $className$ apply($primitive$ value)
+	{
+		return new $className$(value);
+	}
+
+	public $className$($primitive$ value)
+	{
+		this.value = value;
+	}
+
+	@Override
+	public $primitive$ get()
+	{
+		return this.value;
+	}
+
+	@Override
+	public void set($primitive$ value)
+	{
+		this.value = value;
+	}
+}

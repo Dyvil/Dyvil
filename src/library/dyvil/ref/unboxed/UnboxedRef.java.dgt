@@ -1,0 +1,26 @@
+package dyvil.ref.unboxed;
+
+import dyvil.ref.$refClassName$;
+import dyvil.ref.ObjectRef;
+
+public class $className$ implements $refClassName$
+{
+	private final ObjectRef<$wrapper$> objectRef;
+
+	public $className$(ObjectRef<$wrapper$> objectRef)
+	{
+		this.objectRef = objectRef;
+	}
+
+	@Override
+	public $primitive$ get()
+	{
+		return this.objectRef.get();
+	}
+
+	@Override
+	public void set($primitive$ value)
+	{
+		this.objectRef.set(value);
+	}
+}

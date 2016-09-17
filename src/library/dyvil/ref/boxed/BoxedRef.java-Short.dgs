@@ -1,0 +1,5 @@
+fileName=BoxedShortRef.java
+className=BoxedShortRef
+refClassName=ShortRef
+primitive=short
+wrapper=Short

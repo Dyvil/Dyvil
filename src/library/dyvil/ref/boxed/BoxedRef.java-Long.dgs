@@ -1,0 +1,5 @@
+fileName=BoxedLongRef.java
+className=BoxedLongRef
+refClassName=LongRef
+primitive=long
+wrapper=Long

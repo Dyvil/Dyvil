@@ -1,0 +1,5 @@
+fileName=UnsafeBooleanRef.java
+className=UnsafeBooleanRef
+refClassName=BooleanRef
+primitive=boolean
+accessType=Boolean

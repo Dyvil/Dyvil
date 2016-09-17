@@ -1,0 +1,5 @@
+fileName=BoxedBooleanRef.java
+className=BoxedBooleanRef
+refClassName=BooleanRef
+primitive=boolean
+wrapper=Boolean

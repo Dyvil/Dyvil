@@ -1,0 +1,5 @@
+fileName=BoxedFloatRef.java
+className=BoxedFloatRef
+refClassName=FloatRef
+primitive=float
+wrapper=Float

@@ -1,0 +1,5 @@
+fileName=UnsafeLongRef.java
+className=UnsafeLongRef
+refClassName=LongRef
+primitive=long
+accessType=Long

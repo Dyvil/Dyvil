@@ -1,0 +1,26 @@
+package dyvil.ref.boxed;
+
+import dyvil.ref.$refClassName$;
+import dyvil.ref.ObjectRef;
+
+public class $className$ implements ObjectRef<$wrapper$>
+{
+	private final $refClassName$ booleanRef;
+
+	public $className$($refClassName$ booleanRef)
+	{
+		this.booleanRef = booleanRef;
+	}
+
+	@Override
+	public $wrapper$ get()
+	{
+		return this.booleanRef.get();
+	}
+
+	@Override
+	public void set($wrapper$ value)
+	{
+		this.booleanRef.set(value);
+	}
+}

@@ -1,0 +1,5 @@
+fileName=UnboxedByteRef.java
+className=UnboxedByteRef
+refClassName=ByteRef
+primitive=byte
+wrapper=Byte

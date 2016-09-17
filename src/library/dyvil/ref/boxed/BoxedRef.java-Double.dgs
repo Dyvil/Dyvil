@@ -1,0 +1,5 @@
+fileName=BoxedDoubleRef.java
+className=BoxedDoubleRef
+refClassName=DoubleRef
+primitive=double
+wrapper=Double
