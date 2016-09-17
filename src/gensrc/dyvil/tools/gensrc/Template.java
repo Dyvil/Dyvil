@@ -35,6 +35,12 @@ public class Template
 
 	public void specialize(File targetDirectory)
 	{
+		if (!targetDirectory.exists() && !targetDirectory.mkdirs())
+		{
+			System.out.println("Could not create directory '" + targetDirectory + "'");
+			return;
+		}
+
 		try
 		{
 			final List<String> lines = Files.readAllLines(this.sourceFile.toPath());

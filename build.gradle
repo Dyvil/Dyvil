@@ -47,8 +47,6 @@ if (droneBuild)
 
 //noinspection GroovyAssignabilityCheck
 sourceSets {
-	gensrc.java.srcDir 'src/gensrc'
-	
 	library {
 		java {
 			srcDir 'src/library'
@@ -95,7 +93,13 @@ sourceSets {
 			include resourceFilters
 		}
 	}
-
+	
+	gensrc {
+		java {
+			srcDir 'src/gensrc'
+		}
+	}
+	
 	test {
 		java {
 			srcDir 'src/test'
