@@ -1,0 +1,11 @@
+
+
+line without substitution
+
+$ at beginning
+line ending with $
+line with $ in the middle
+
+line with $count$ $substitution$s
+line ending with $substitution$
+$substitution$ at the beginning
