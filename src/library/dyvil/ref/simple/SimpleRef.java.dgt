@@ -1,19 +1,22 @@
+// $genNotice$
+// Timestamp: $timeStamp$
+
 package dyvil.ref.simple;
 
 import dyvil.lang.LiteralConvertible;
-import dyvil.ref.$refClassName$;
+import dyvil.ref.$type$Ref;
 
 @LiteralConvertible.$fromLiteral$
-public class $className$ implements $refClassName$
+public class Simple$type$Ref implements $type$Ref
 {
 	public $primitive$ value;
 
-	public static $className$ apply($primitive$ value)
+	public static Simple$type$Ref apply($primitive$ value)
 	{
-		return new $className$(value);
+		return new Simple$type$Ref(value);
 	}
 
-	public $className$($primitive$ value)
+	public Simple$type$Ref($primitive$ value)
 	{
 		this.value = value;
 	}

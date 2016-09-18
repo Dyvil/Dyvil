@@ -1,5 +1,2 @@
 fileName=UnsafeByteRef.java
-className=UnsafeByteRef
-refClassName=ByteRef
-primitive=byte
-accessType=Byte
+inheritFrom=Base-Byte.dgs

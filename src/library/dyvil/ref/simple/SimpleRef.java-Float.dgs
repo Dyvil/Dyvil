@@ -1,5 +1,2 @@
 fileName=SimpleFloatRef.java
-className=SimpleFloatRef
-refClassName=FloatRef
-primitive=float
-fromLiteral=FromFloat
+inheritFrom=Base-Float.dgs

@@ -1,5 +1,2 @@
 fileName=UnsafeBooleanRef.java
-className=UnsafeBooleanRef
-refClassName=BooleanRef
-primitive=boolean
-accessType=Boolean
+inheritFrom=Base-Boolean.dgs

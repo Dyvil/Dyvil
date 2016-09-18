@@ -1,5 +1,2 @@
 fileName=CharRef.java
-
-className=CharRef
-primitive=char
-wrapper=Character
+inheritFrom=Base-Char.dgs

@@ -1,5 +1,2 @@
 fileName=BoxedByteRef.java
-className=BoxedByteRef
-refClassName=ByteRef
-primitive=byte
-wrapper=Byte
+inheritFrom=Base-Byte.dgs

@@ -1,5 +1,2 @@
 fileName=SimpleBooleanRef.java
-className=SimpleBooleanRef
-refClassName=BooleanRef
-primitive=boolean
-fromLiteral=FromBoolean
+inheritFrom=Base-Boolean.dgs

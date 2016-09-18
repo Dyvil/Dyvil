@@ -1,5 +1,2 @@
 fileName=IntRef.java
-
-className=IntRef
-primitive=int
-wrapper=Integer
+inheritFrom=Base-Int.dgs

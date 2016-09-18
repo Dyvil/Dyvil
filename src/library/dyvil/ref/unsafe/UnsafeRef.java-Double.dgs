@@ -1,5 +1,2 @@
 fileName=UnsafeDoubleRef.java
-className=UnsafeDoubleRef
-refClassName=DoubleRef
-primitive=double
-accessType=Double
+inheritFrom=Base-Double.dgs

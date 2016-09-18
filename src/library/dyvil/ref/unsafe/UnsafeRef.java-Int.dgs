@@ -1,5 +1,3 @@
 fileName=UnsafeIntRef.java
 className=UnsafeIntRef
-refClassName=IntRef
-primitive=int
-accessType=Int
+inheritFrom=Base-Int.dgs

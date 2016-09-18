@@ -1,5 +1,3 @@
 fileName=SimpleIntRef.java
 className=SimpleIntRef
-refClassName=IntRef
-primitive=int
-fromLiteral=FromInt
+inheritFrom=Base-Int.dgs

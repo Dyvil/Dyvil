@@ -1,4 +1,5 @@
-// GENERATED SOURCE - DOT NOT EDIT
+// $genNotice$
+// Timestamp: $timeStamp$
 
 package dyvil.array;
 
@@ -12,8 +13,8 @@ import dyvil.collection.ImmutableList;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.collection.range.closed.$range$;
-import dyvil.ref.$ref$;
-import dyvil.ref.array.$ref_array$;
+import dyvil.ref.$type$Ref;
+import dyvil.ref.array.$type$ArrayRef;
 import dyvil.reflect.Modifiers;
 
 import java.util.Arrays;
@@ -22,7 +23,7 @@ import java.util.function.*;
 import static dyvil.reflect.Opcodes.*;
 
 @SuppressWarnings({ "cast", "RedundantCast" })
-public abstract class $className$
+public abstract class $type$Array
 {
 	public static final $primitive$[] EMPTY = new $primitive$[0];
 
@@ -160,9 +161,9 @@ public abstract class $className$
 
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	public static $ref$ subscript_$amp($primitive$[] array, int index)
+	public static $type$Ref subscript_$amp($primitive$[] array, int index)
 	{
-		return new $ref_array$(array, index);
+		return new $type$ArrayRef(array, index);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)

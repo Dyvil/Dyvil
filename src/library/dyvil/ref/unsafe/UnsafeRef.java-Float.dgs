@@ -1,5 +1,2 @@
 fileName=UnsafeFloatRef.java
-className=UnsafeFloatRef
-refClassName=FloatRef
-primitive=float
-accessType=Float
+inheritFrom=Base-Float.dgs

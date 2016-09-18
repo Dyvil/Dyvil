@@ -1,4 +1,2 @@
 fileName=DoubleArrayRef.java
-className=DoubleArrayRef
-refClassName=DoubleRef
-primitive=double
+inheritFrom=Base-Double.dgs

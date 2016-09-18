@@ -1,5 +1,2 @@
 fileName=BoxedIntRef.java
-className=BoxedIntRef
-refClassName=IntRef
-primitive=int
-wrapper=Integer
+inheritFrom=Base-Int.dgs

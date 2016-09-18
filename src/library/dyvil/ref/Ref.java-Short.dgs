@@ -1,5 +1,2 @@
 fileName=ShortRef.java
-
-className=ShortRef
-primitive=short
-wrapper=Short
+inheritFrom=Base-Short.dgs

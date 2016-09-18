@@ -1,13 +1,16 @@
+// $genNotice$
+// Timestamp: $timeStamp$
+
 package dyvil.ref.boxed;
 
-import dyvil.ref.$refClassName$;
+import dyvil.ref.$type$Ref;
 import dyvil.ref.ObjectRef;
 
-public class $className$ implements ObjectRef<$wrapper$>
+public class Boxed$type$Ref implements ObjectRef<$wrapper$>
 {
-	private final $refClassName$ booleanRef;
+	private final $type$Ref booleanRef;
 
-	public $className$($refClassName$ booleanRef)
+	public Boxed$type$Ref($type$Ref booleanRef)
 	{
 		this.booleanRef = booleanRef;
 	}

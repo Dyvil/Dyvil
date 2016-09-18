@@ -1,13 +1,16 @@
+// $genNotice$
+// Timestamp: $timeStamp$
+
 package dyvil.ref.array;
 
-import dyvil.ref.$refClassName$;
+import dyvil.ref.$type$Ref;
 
-public class $className$ implements $refClassName$
+public class $type$ArrayRef implements $type$Ref
 {
 	protected final $primitive$[] array;
 	protected final int index;
 
-	public $className$($primitive$[] array, int index)
+	public $type$ArrayRef($primitive$[] array, int index)
 	{
 		this.array = array;
 		this.index = index;

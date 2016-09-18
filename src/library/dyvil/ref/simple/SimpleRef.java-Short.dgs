@@ -1,5 +1,2 @@
 fileName=SimpleShortRef.java
-className=SimpleShortRef
-refClassName=ShortRef
-primitive=short
-fromLiteral=FromInt
+inheritFrom=Base-Short.dgs

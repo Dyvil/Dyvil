@@ -1,5 +1,2 @@
 fileName=BoxedBooleanRef.java
-className=BoxedBooleanRef
-refClassName=BooleanRef
-primitive=boolean
-wrapper=Boolean
+inheritFrom=Base-Boolean.dgs

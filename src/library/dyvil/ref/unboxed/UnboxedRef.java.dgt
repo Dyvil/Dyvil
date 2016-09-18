@@ -1,13 +1,16 @@
+// $genNotice$
+// Timestamp: $timeStamp$
+
 package dyvil.ref.unboxed;
 
-import dyvil.ref.$refClassName$;
+import dyvil.ref.$type$Ref;
 import dyvil.ref.ObjectRef;
 
-public class $className$ implements $refClassName$
+public class Unboxed$type$Ref implements $type$Ref
 {
 	private final ObjectRef<$wrapper$> objectRef;
 
-	public $className$(ObjectRef<$wrapper$> objectRef)
+	public Unboxed$type$Ref(ObjectRef<$wrapper$> objectRef)
 	{
 		this.objectRef = objectRef;
 	}

@@ -1,5 +1,2 @@
 fileName=UnsafeShortRef.java
-className=UnsafeShortRef
-refClassName=ShortRef
-primitive=short
-accessType=Short
+inheritFrom=Base-Short.dgs

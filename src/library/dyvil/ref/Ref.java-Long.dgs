@@ -1,5 +1,2 @@
 fileName=LongRef.java
-
-className=LongRef
-primitive=long
-wrapper=Long
+inheritFrom=Base-Long.dgs
