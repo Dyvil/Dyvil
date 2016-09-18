@@ -3,18 +3,21 @@ package dyvil.tools.gensrc;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Template
 {
 	private final File   sourceFile;
+	private final File targetDirectory;
 	private final String fileName;
 
 	private List<Specialization> specializations = new ArrayList<>();
 
-	public Template(File sourceFile, String fileName)
+	public Template(File sourceFile, File targetDir, String fileName)
 	{
 		this.sourceFile = sourceFile;
+		this.targetDirectory = targetDir;
 		this.fileName = fileName;
 	}
 
@@ -33,12 +36,21 @@ public class Template
 		this.specializations.add(spec);
 	}
 
-	public void specialize(File targetDirectory)
+	public void specialize()
 	{
-		if (!targetDirectory.exists() && !targetDirectory.mkdirs())
+		if (!this.targetDirectory.exists() && !this.targetDirectory.mkdirs())
 		{
-			System.out.println("Could not create directory '" + targetDirectory + "'");
+			System.out.println("Could not create directory '" + this.targetDirectory + "'");
 			return;
+		}
+
+		// Remove disabled specs
+		for (Iterator<Specialization> iterator = this.specializations.iterator(); iterator.hasNext(); )
+		{
+			if (!iterator.next().isEnabled())
+			{
+				iterator.remove();
+			}
 		}
 
 		try
@@ -47,8 +59,10 @@ public class Template
 
 			for (Specialization spec : this.specializations)
 			{
-				this.specialize(targetDirectory, lines, spec);
+				this.specialize(lines, spec);
 			}
+
+			System.out.printf("Applied %d specializations for template '%s'\n", this.specializations.size(), this.getSourceFile());
 		}
 		catch (IOException ex)
 		{
@@ -56,7 +70,7 @@ public class Template
 		}
 	}
 
-	private void specialize(File targetDirectory, List<String> lines, Specialization spec)
+	private void specialize(List<String> lines, Specialization spec)
 	{
 		final String fileName = spec.getFileName();
 		if (fileName == null)
@@ -66,7 +80,7 @@ public class Template
 			return;
 		}
 
-		final File outputFile = new File(targetDirectory, fileName);
+		final File outputFile = new File(this.targetDirectory, fileName);
 
 		try (final PrintStream writer = new PrintStream(new BufferedOutputStream(new FileOutputStream(outputFile))))
 		{

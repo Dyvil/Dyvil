@@ -2,14 +2,17 @@ package dyvil.tools.gensrc;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 public class GenSources
 {
 	public static final String TARGET_PREFIX = "target=";
 	public static final String SOURCE_PREFIX = "source=";
+
+	private static List<Template>            templates       = new ArrayList<>();
+	private static Map<File, Specialization> specializations = new HashMap<>();
 
 	public static void main(String[] args)
 	{
@@ -55,7 +58,17 @@ public class GenSources
 			return;
 		}
 
-		processSources(new File(sourceDir), new File(targetDir));
+		final File sourceRoot = new File(sourceDir);
+		processSources(sourceRoot, new File(targetDir));
+
+		for (Specialization spec : specializations.values())
+		{
+			spec.read(sourceRoot, specializations);
+		}
+		for (Template template : templates)
+		{
+			template.specialize();
+		}
 	}
 
 	private static void processSources(File sourceDir, File targetDir)
@@ -66,7 +79,7 @@ public class GenSources
 			return;
 		}
 
-		Map<String, Template> templates = new TreeMap<>();
+		Map<String, Template> templates = new HashMap<>();
 		List<Specialization> specializations = new ArrayList<>();
 
 		for (String subFile : subFiles)
@@ -82,7 +95,7 @@ public class GenSources
 			if (subFile.endsWith(".dgt"))
 			{
 				final String fileName = subFile.substring(0, endIndex);
-				templates.put(fileName, new Template(sourceFile, fileName));
+				templates.put(fileName, new Template(sourceFile, targetDir, fileName));
 			}
 			else if (subFile.endsWith(".dgs"))
 			{
@@ -94,9 +107,10 @@ public class GenSources
 			}
 		}
 
-		int specCount = 0;
 		for (Specialization spec : specializations)
 		{
+			GenSources.specializations.put(spec.getSourceFile(), spec);
+
 			final Template template = templates.get(spec.getTemplateName());
 			if (template == null)
 			{
@@ -104,28 +118,9 @@ public class GenSources
 				continue;
 			}
 
-			spec.read();
-			if (!spec.isEnabled())
-			{
-				continue;
-			}
-
-			specCount++;
 			template.addSpecialization(spec);
 		}
 
-		for (Template template : templates.values())
-		{
-			template.specialize(targetDir);
-		}
-
-		final int templateCount = templates.size();
-
-		if (templateCount != 0)
-		{
-			System.out
-				.printf("Applied %d specializations for %d templates from '%s' to '%s'\n", specCount, templateCount,
-				        sourceDir, targetDir);
-		}
+		GenSources.templates.addAll(templates.values());
 	}
 }

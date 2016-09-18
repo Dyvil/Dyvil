@@ -5,12 +5,17 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 public class Specialization
 {
-	private Properties substitutions;
+	private Properties substitutions = new Properties();
+
+	private Specialization parent;
 
 	private final File   sourceFile;
 	private final String templateName;
@@ -51,12 +56,18 @@ public class Specialization
 
 	public String getSubstitution(String key)
 	{
-		return this.substitutions.getProperty(key);
+		final String sub = this.substitutions.getProperty(key);
+		if (sub != null || this.parent == null)
+		{
+			return sub;
+		}
+		return this.parent.getSubstitution(key);
 	}
 
-	public void read()
+	public void read(File sourceRoot, Map<File, Specialization> specs)
 	{
-		this.substitutions = new Properties();
+		initDefaults(this.substitutions);
+
 		try (BufferedReader reader = Files.newBufferedReader(this.sourceFile.toPath()))
 		{
 			this.substitutions.load(reader);
@@ -66,6 +77,32 @@ public class Specialization
 			// TODO better error handling
 			e.printStackTrace();
 		}
+
+		final String inherited = this.getSubstitution("inheritFrom");
+		if (inherited == null)
+		{
+			return;
+		}
+
+		// If the referenced file starts with '.', it is relative to the parent directory of this spec file
+		// Otherwise, it is relative to the source root
+		final File specFile = inherited.startsWith(".") ?
+			                      new File(this.getSourceFile().getParent(), inherited) :
+			                      new File(sourceRoot, inherited);
+		final Specialization spec = specs.get(specFile);
+		if (spec == null)
+		{
+			System.out.printf("Unable to resolve and inherit specialization '%s'\n", specFile);
+			return;
+		}
+
+		this.parent = spec;
+	}
+
+	private static void initDefaults(Properties substitutions)
+	{
+		substitutions.put("genNotice", "GENERATED SOURCE - DO NOT EDIT");
+		substitutions.put("timeStamp", DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now()));
 	}
 
 	public void processLines(List<String> lines, PrintStream writer)
