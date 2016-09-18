@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.method;
 
+import dyvil.annotation.analysis.NotNull;
 import dyvil.array.IntArray;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.util.MemberSorter;
@@ -24,30 +25,17 @@ public final class Candidate<T extends ICallableSignature> implements Comparable
 
 	public Candidate(T member, int value1, IType type1, boolean invalid)
 	{
-		this.member = member;
-		this.values = new int[] { value1 };
-		this.types = new IType[] { type1 };
-		this.defaults = this.varargs = 0;
-		this.invalid = invalid;
+		this(member, new int[] { value1 }, new IType[] { type1 });
 	}
 
 	public Candidate(T member, int[] values, IType[] types)
 	{
-		this.member = member;
-		this.values = values;
-		this.types = types;
-		this.defaults = this.varargs = 0;
-		this.invalid = false;
+		this(member, values, types, 0, 0);
 	}
 
 	public Candidate(T member, int[] values, IType[] types, int defaults, int varargs)
 	{
-		this.member = member;
-		this.values = values;
-		this.types = types;
-		this.defaults = defaults;
-		this.varargs = varargs;
-		this.invalid = false;
+		this(member, values, types, defaults, varargs, false);
 	}
 
 	public Candidate(T member, int[] values, IType[] types, int defaults, int varargs, boolean invalid)
@@ -71,7 +59,7 @@ public final class Candidate<T extends ICallableSignature> implements Comparable
 	}
 
 	@Override
-	public int compareTo(Candidate<T> that)
+	public int compareTo(@NotNull Candidate<T> that)
 	{
 		int better = 0;
 		int worse = 0;
@@ -91,8 +79,7 @@ public final class Candidate<T extends ICallableSignature> implements Comparable
 
 		for (int i = 0, length = this.values.length; i < length; i++)
 		{
-			int conversion = compare(this.values[i], this.types[i], that.values[i], that.types[i]);
-
+			final int conversion = compare(this.values[i], this.types[i], that.values[i], that.types[i]);
 			if (conversion > 0)
 			{
 				worse++;
@@ -109,6 +96,13 @@ public final class Candidate<T extends ICallableSignature> implements Comparable
 		if (better < worse)
 		{
 			return 1;
+		}
+
+		// Compare return types (more specific is better)
+		final int returnType = MemberSorter.compareTypes(this.member.getType(), that.member.getType());
+		if (returnType != 0)
+		{
+			return returnType;
 		}
 
 		// Compare number of defaulted parameters (less is better)
@@ -138,7 +132,8 @@ public final class Candidate<T extends ICallableSignature> implements Comparable
 			return -1;
 		}
 
-		return 0;
+		// Compare overload priority (more is better)
+		return Integer.compare(that.member.getOverloadPriority(), this.member.getOverloadPriority());
 	}
 
 	private static int compare(int value1, IType type1, int value2, IType type2)

@@ -5,12 +5,88 @@ import java.math.RoundingMode;
 
 public final class PowImpl
 {
+	private static final byte[] HIGHEST_SET_BIT = { 0, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5,
+		5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+		6, 6, 6 };
+
 	private PowImpl()
 	{
 		// No instances
 	}
 
 	public static long pow(long base, int exponent)
+	{
+		if (exponent > 63)
+		{
+			if (base == 1)
+			{
+				return 1;
+			}
+
+			if (base == -1)
+			{
+				// -1 if exponent is even, 1 if it's odd
+				return 1 - 2 * (exponent & 1);
+			}
+
+			return 0;
+		}
+
+		int result = 1;
+		switch (HIGHEST_SET_BIT[exponent])
+		{
+		case 6:
+			if ((exponent & 1) != 0)
+			{
+				result *= base;
+			}
+			exponent >>= 1;
+			base *= base;
+			// Fallthrough
+		case 5:
+			if ((exponent & 1) != 0)
+			{
+				result *= base;
+			}
+			exponent >>= 1;
+			base *= base;
+			// Fallthrough
+		case 4:
+			if ((exponent & 1) != 0)
+			{
+				result *= base;
+			}
+			exponent >>= 1;
+			base *= base;
+			// Fallthrough
+		case 3:
+			if ((exponent & 1) != 0)
+			{
+				result *= base;
+			}
+			exponent >>= 1;
+			base *= base;
+			// Fallthrough
+		case 2:
+			if ((exponent & 1) != 0)
+			{
+				result *= base;
+			}
+			exponent >>= 1;
+			base *= base;
+			// Fallthrough
+		case 1:
+			if ((exponent & 1) != 0)
+			{
+				result *= base;
+			}
+			// Fallthrough
+		default:
+			return result;
+		}
+	}
+
+	public static long pow_rec(long base, int exponent)
 	{
 		switch (exponent)
 		{
@@ -27,11 +103,11 @@ public final class PowImpl
 		// Use recursive pow definition, with time complexity O(log n)
 		if ((exponent & 1) == 0) // the exponent is even
 		{
-			return pow(base * base, exponent / 2);
+			return pow_rec(base * base, exponent / 2);
 		}
 		else
 		{
-			return base * pow(base * base, exponent / 2);
+			return base * pow_rec(base * base, exponent / 2);
 		}
 	}
 

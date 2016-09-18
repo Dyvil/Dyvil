@@ -24,12 +24,12 @@ public class HandlerEntry
 
 	public Object getEventHandler()
 	{
-		return eventHandler;
+		return this.eventHandler;
 	}
 
 	public Class<?> getType()
 	{
-		return type;
+		return this.type;
 	}
 
 	public Method getTargetMethod(Class<?> type)

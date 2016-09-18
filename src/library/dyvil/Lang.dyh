@@ -3,121 +3,130 @@ package dyvil
 // ---------------------------------------- Import Declarations ----------------------------------------
 
 // Base imports for language features
-import	dyvil.lang._
+import dyvil.lang._
 
 // Import useful utility classes
-import	dyvil.collection._
-import	dyvil.io.Console
-import	dyvil.random.Random
-import	dyvil.function.PartialFunction
-import	dyvil.util.{ Option, None, Some }
-import  dyvil.util.Configurable
-import	dyvil.util.Version
+import dyvil.collection._
+import dyvil.io.Console
+import dyvil.random.Random
+import dyvil.function.PartialFunction
 
-// Import useful annotation classes
-import	dyvil.annotation.Intrinsic
-import	dyvil.annotation.{ Deprecated, Experimental, UsageInfo }
+import dyvil.util.{
+	Option, None, Some
 
-import	dyvil.annotation.{
-	Native		=> native,
-	Transient	=> transient,
-	Volatile	=> volatile,
-	Immutable	=> immutable,
-	Mutating	=> mutating,
-	Reified		=> reified
+	Configurable
+	Version
 }
 
-import	java.lang._
+// Import useful annotation classes
+
+import dyvil.annotation.{
+	Native    => native
+	Transient => transient
+	Volatile  => volatile
+	Immutable => immutable
+	Mutating  => mutating
+	Reified   => reified
+
+	Intrinsic
+	OverloadPriority
+	Deprecated, Experimental, UsageInfo
+}
+
+// Import Java base classes
+import java.lang._
 
 // ---------------------------------------- Using Declarations ----------------------------------------
 
 // Import the methods from former Predef classes
-using	dyvil.lang.{
+using dyvil.lang.{
 	Primitives._
-	LanguageCommons._
-	LanguageFeatures._
+	Output._
+	Assert._
 	ObjectExtensions._
 	StringExtensions._
+	Misc._
 }
 
 // ---------------------------------------- Type Aliases ----------------------------------------
 
 // Primitive Type Aliases
-type	Void	= java.lang.Void
-type	Byte	= java.lang.Byte
-type	Short	= java.lang.Short
-type	Char	= java.lang.Character
-type	Int		= java.lang.Integer
-type	Long	= java.lang.Long
-type	Float	= java.lang.Float
-type	Double	= java.lang.Double
+type Void   = java.lang.Void
+type Byte   = java.lang.Byte
+type Short  = java.lang.Short
+type Char   = java.lang.Character
+type Int    = java.lang.Integer
+type Long   = java.lang.Long
+type Float  = java.lang.Float
+type Double = java.lang.Double
 
-type	Configure<T> = T.() -> void
+type Configure<T> = T.() -> void
+type BytecodeName = dyvil.annotation._internal.DyvilName
 
 // ---------------------------------------- Operator Definitions ----------------------------------------
 
 // Postfix Operators
-postfix operator !	// unwrap operator
-postfix	operator ++
-postfix	operator --
-postfix	operator ... // varargs expansion operator
+postfix operator !   // unwrap operator
+postfix operator ++
+postfix operator --
+postfix operator ... // varargs expansion operator
 
 // Prefix Operators
-prefix	operator +
-prefix	operator -
-prefix	operator ~
-prefix	operator !
-prefix	operator &	// reference operator
-prefix	operator *	// de-reference operator
-prefix	operator ++
-prefix	operator --
+prefix  operator +
+prefix  operator -
+prefix  operator ~
+prefix  operator !
+prefix  operator &   // reference operator
+prefix  operator *   // de-reference operator
+prefix  operator ++
+prefix  operator --
 
 // Assignment Operator
-infix	operator =		{ right, 100 }
+infix   operator =   { right, 100 }
 
 // Ternary Conditional Operator
-infix	operator ? :	{ precedence 125 }
+infix   operator ? : { precedence 125 }
 
 // Colon Operator
-infix	operator :		{ right, 150 }
+infix   operator :   { right, 150 }
 
 // Boolean and Bitwise Operators
-infix	operator ||		{ left, 200 }
-infix	operator &&		{ left, 300 }
-infix	operator |		{ left, 400 }
-infix	operator ^		{ left, 500 }
-infix	operator &		{ left, 600 }
+infix   operator ||  { left, 200 }
+infix   operator &&  { left, 300 }
+infix   operator |   { left, 400 }
+infix   operator ^   { left, 500 }
+infix   operator &   { left, 600 }
 
 // Equality and Identity Operators
-infix	operator ==		{ left, 700 }
-infix	operator !=		{ left, 700 }
-infix	operator ===	{ left, 700 }
-infix	operator !==	{ left, 700 }
+infix   operator ==  { left, 700 }
+infix   operator !=  { left, 700 }
+infix   operator === { left, 700 }
+infix   operator !== { left, 700 }
 
 // Numeric Comparison Operators
-infix	operator <		{ left, 800 }
-infix	operator <=		{ left, 800 }
-infix	operator >		{ left, 800 }
-infix	operator >=		{ left, 800 }
+infix   operator <   { left, 800 }
+infix   operator <=  { left, 800 }
+infix   operator >   { left, 800 }
+infix   operator >=  { left, 800 }
 
 // Range Operators
-infix	operator .. 	{ none, 900 }
-infix	operator ..<	{ none, 900 }
+infix   operator ..  { none, 900 }
+infix   operator ..< { none, 900 }
 
 // Shift Operators
-infix	operator <<		{ left, 1000 }
-infix	operator >>		{ left, 1000 }
-infix	operator >>>	{ left, 1000 }
+infix   operator <<  { left, 1000 }
+infix   operator >>  { left, 1000 }
+infix   operator >>> { left, 1000 }
 
 // Additive Operators
-infix	operator +		{ left, 1100 }
-infix	operator -		{ left, 1100 }
+infix   operator +   { left, 1100 }
+infix   operator -   { left, 1100 }
 
 // Multiplicative Operators
-infix	operator *		{ left, 1200 }
-infix	operator /		{ left, 1200 }
-infix	operator \		{ left, 1200 }
-infix	operator %		{ left, 1200 }
+infix   operator *   { left, 1200 }
+infix   operator /   { left, 1200 }
+infix   operator \   { left, 1200 }
+infix   operator %   { left, 1200 }
 
 // Exponentiation Operators
-infix   operator **     { right, 1300 }
+infix   operator **  { right, 1300 }

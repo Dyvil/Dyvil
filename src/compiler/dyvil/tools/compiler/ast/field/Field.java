@@ -19,7 +19,7 @@ import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -206,7 +206,7 @@ public class Field extends Member implements IField
 			}
 			else
 			{
-				receiver = new ThisExpr(position, this.enclosingClass.getType(), context, markers);
+				receiver = new ThisExpr(position, this.enclosingClass.getThisType(), context, markers);
 
 				if (!this.enclosingClass.isAnonymous())
 				{
@@ -290,7 +290,7 @@ public class Field extends Member implements IField
 
 		final IValue receiver = this.hasModifier(Modifiers.STATIC) ?
 			                        null :
-			                        new ThisExpr(this.enclosingClass.getType(), VariableThis.DEFAULT);
+			                        new ThisExpr(this.enclosingClass.getThisType(), VariableThis.DEFAULT);
 		if (getter != null)
 		{
 			getter.setType(this.type);

@@ -1,10 +1,13 @@
 package dyvil.array;
 
+import dyvil.annotation.Immutable;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.Mutating;
 import dyvil.annotation.Reified;
 import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation._internal.DyvilName;
 import dyvil.annotation._internal.Primitive;
+import dyvil.collection.ImmutableList;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.collection.range.Rangeable;
@@ -82,7 +85,8 @@ public abstract class ObjectArray
 		return range.toArray(_type);
 	}
 
-	public static <@Reified(OBJECT_CLASS) T extends Rangeable<T>> T[] apply_$_closed(T from, T to, Class<T> _type)
+	@DyvilName("apply")
+	public static <@Reified(OBJECT_CLASS) T extends Rangeable<T>> T[] rangeClosed(T from, T to, Class<T> _type)
 	{
 		int i = 0;
 		final T[] array = apply(from.distanceTo(to) + 1, _type);
@@ -93,7 +97,8 @@ public abstract class ObjectArray
 		return array;
 	}
 
-	public static <@Reified(OBJECT_CLASS) T extends Rangeable<T>> T[] apply_$_halfOpen(T from, T toExclusive,
+	@DyvilName("apply")
+	public static <@Reified(OBJECT_CLASS) T extends Rangeable<T>> T[] range(T from, T toExclusive,
 		                                                                                  Class<T> _type)
 	{
 		int i = 0;
@@ -136,7 +141,7 @@ public abstract class ObjectArray
 	@DyvilModifiers(Modifiers.INFIX)
 	public static <T> T[] subscript(T[] array, Range<@Primitive Integer> range)
 	{
-		final int size = range.count();
+		final int size = range.size();
 		final T[] result = apply(size, getComponentType(array));
 		System.arraycopy(array, range.first(), result, 0, size);
 		return result;
@@ -154,7 +159,7 @@ public abstract class ObjectArray
 	@Mutating
 	public static <T> void subscript_$eq(T[] array, Range<@Primitive Integer> range, T[] newValues)
 	{
-		System.arraycopy(newValues, 0, array, range.first(), range.count());
+		System.arraycopy(newValues, 0, array, range.first(), range.size());
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
@@ -550,10 +555,22 @@ public abstract class ObjectArray
 		return unboxed;
 	}
 
-	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> Iterable<T> toIterable(T[] array)
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
+	public static <T> Iterable<T> asIterable(T[] array)
+	{
+		return asList(array);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
+	public static <T> ImmutableList<T> asList(T @Immutable [] array)
 	{
 		return new ArrayList<>(array, true);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static <T> ImmutableList<T> toList(T[] array)
+	{
+		return new ArrayList<>(array);
 	}
 
 	// toString, equals and hashCode

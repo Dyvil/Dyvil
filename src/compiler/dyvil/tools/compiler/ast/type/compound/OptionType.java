@@ -20,7 +20,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -110,13 +110,6 @@ public class OptionType implements IObjectType
 	public IClass getTheClass()
 	{
 		return LazyFields.OPTION_CLASS;
-	}
-
-	@Override
-	public IType asParameterType()
-	{
-		final IType type = this.type.asParameterType();
-		return type != this.type ? type : new OptionType(this.type);
 	}
 
 	@Override

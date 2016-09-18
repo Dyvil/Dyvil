@@ -1,6 +1,7 @@
 package dyvil.collection.range;
 
 import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation.analysis.NotNull;
 import dyvil.collection.Range;
 import dyvil.reflect.Modifiers;
 
@@ -10,10 +11,10 @@ public interface Rangeable<T extends Rangeable<T>> extends Comparable<T>
 	
 	T previous();
 	
-	int distanceTo(T o);
+	int distanceTo(T other);
 	
 	@Override
-	int compareTo(T o);
+	int compareTo(@NotNull T other);
 
 	@Override
 	boolean equals(Object o);
@@ -22,14 +23,14 @@ public interface Rangeable<T extends Rangeable<T>> extends Comparable<T>
 	int hashCode();
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static <T extends Rangeable<T>> Range<T> $dot$dot(T start, T end)
+	static <T extends Rangeable<T>> Range<T> $dot$dot(T from, T to)
 	{
-		return Range.apply(start, end);
+		return Range.closed(from, to);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static <T extends Rangeable<T>> Range<T> $dot$dot$lt(T start, T end)
+	static <T extends Rangeable<T>> Range<T> $dot$dot$lt(T from, T to)
 	{
-		return Range.halfOpen(start, end);
+		return Range.halfOpen(from, to);
 	}
 }

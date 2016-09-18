@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
@@ -15,6 +15,8 @@ import dyvil.tools.parsing.Name;
 
 public interface IDefaultContext extends IStaticContext
 {
+	IDefaultContext DEFAULT = new IDefaultContext() {};
+
 	@Override
 	default byte checkStatic()
 	{
@@ -28,29 +30,35 @@ public interface IDefaultContext extends IStaticContext
 	}
 
 	@Override
-	default IDyvilHeader getHeader()
+	default IHeaderUnit getHeader()
 	{
 		return null;
 	}
-	
+
 	@Override
 	default Package resolvePackage(Name name)
 	{
 		return null;
 	}
-	
+
+	@Override
+	default IHeaderUnit resolveHeader(Name name)
+	{
+		return null;
+	}
+
 	@Override
 	default IClass resolveClass(Name name)
 	{
 		return null;
 	}
-	
+
 	@Override
 	default ITypeAlias resolveTypeAlias(Name name, int arity)
 	{
 		return null;
 	}
-	
+
 	@Override
 	default IDataMember resolveField(Name name)
 	{

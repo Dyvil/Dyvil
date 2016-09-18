@@ -1,0 +1,495 @@
+// $genNotice$
+// Timestamp: $timeStamp$
+
+package dyvil.array;
+
+import dyvil.annotation.Immutable;
+import dyvil.annotation.Intrinsic;
+import dyvil.annotation.Mutating;
+import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation._internal.DyvilName;
+import dyvil.annotation._internal.Primitive;
+import dyvil.collection.ImmutableList;
+import dyvil.collection.Range;
+import dyvil.collection.immutable.ArrayList;
+import dyvil.collection.range.closed.$range$;
+import dyvil.ref.$type$Ref;
+import dyvil.ref.array.$type$ArrayRef;
+import dyvil.reflect.Modifiers;
+
+import java.util.Arrays;
+import java.util.function.*;
+
+import static dyvil.reflect.Opcodes.*;
+
+@SuppressWarnings({ "cast", "RedundantCast" })
+public abstract class $type$Array
+{
+	public static final $primitive$[] EMPTY = new $primitive$[0];
+
+	@DyvilModifiers(Modifiers.INLINE)
+	public static $primitive$[] apply()
+	{
+		return new $primitive$[0];
+	}
+
+	@DyvilModifiers(Modifiers.INLINE)
+	public static $primitive$[] apply(int size)
+	{
+		return new $primitive$[size];
+	}
+
+	@DyvilModifiers(Modifiers.INLINE)
+	public static $primitive$[] apply($primitive$[] array)
+	{
+		return array.clone();
+	}
+
+	@DyvilModifiers(Modifiers.IMPLICIT | Modifiers.INLINE)
+	public static $primitive$[] apply($range$ range)
+	{
+		return range.$range_array$();
+	}
+
+	public static $primitive$[] apply(int size, $primitive$ repeatedValue)
+	{
+		final $primitive$[] array = new $primitive$[size];
+		for (int i = 0; i < size; i++)
+		{
+			array[i] = repeatedValue;
+		}
+		return array;
+	}
+
+	public static $primitive$[] apply(int size, $supplier$ valueSupplier)
+	{
+		final $primitive$[] array = new $primitive$[size];
+		for (int i = 0; i < size; i++)
+		{
+			array[i] = ($primitive$) valueSupplier.$supplier_get$();
+		}
+		return array;
+	}
+
+	public static $primitive$[] apply(int size, $mapper$ valueMapper)
+	{
+		final $primitive$[] array = new $primitive$[size];
+		for (int i = 0; i < size; i++)
+		{
+			array[i] = ($primitive$) valueMapper.$mapper_apply$(i);
+		}
+		return array;
+	}
+
+	@DyvilName("apply")
+	public static $primitive$[] rangeClosed($primitive$ from, $primitive$ to)
+	{
+		int index = 0;
+		final $primitive$[] array = new $primitive$[(int) (to - from + 1)];
+		for (; from <= to; from++)
+		{
+			array[index++] = from;
+		}
+		return array;
+	}
+
+	@DyvilName("apply")
+	public static $primitive$[] range($primitive$ from, $primitive$ toExclusive)
+	{
+		int index = 0;
+		final $primitive$[] array = new $primitive$[(int) (toExclusive - from)];
+		for (; from < toExclusive; from++)
+		{
+			array[index++] = from;
+		}
+		return array;
+	}
+
+	// Basic Array Operations
+
+	@Intrinsic( { LOAD_0, ARRAYLENGTH })
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int length($primitive$[] array)
+	{
+		return array.length;
+	}
+
+	@Intrinsic( { LOAD_0, ARRAYLENGTH })
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int size($primitive$[] array)
+	{
+		return array.length;
+	}
+
+	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })
+	@DyvilModifiers(Modifiers.INFIX)
+	public static boolean isEmpty($primitive$[] array)
+	{
+		return array.length == 0;
+	}
+
+	@Intrinsic( { LOAD_0, LOAD_1, $loadInsn$ })
+	@DyvilModifiers(Modifiers.INFIX)
+	public static $primitive$ subscript($primitive$[] array, int index)
+	{
+		return array[index];
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static $primitive$[] subscript($primitive$[] array, Range<@Primitive Integer> range)
+	{
+		final int size = range.size();
+		final $primitive$[] result = new $primitive$[size];
+		System.arraycopy(array, range.first(), result, 0, size);
+		return result;
+	}
+
+	@Intrinsic( { LOAD_0, LOAD_1, LOAD_2, $storeInsn$ })
+	@DyvilModifiers(Modifiers.INFIX)
+	@Mutating
+	public static void subscript_$eq($primitive$[] array, int index, $primitive$ newValue)
+	{
+		array[index] = newValue;
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	@Mutating
+	public static void subscript_$eq($primitive$[] array, Range<@Primitive Integer> range, $primitive$[] newValues)
+	{
+		System.arraycopy(newValues, 0, array, range.first(), range.size());
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	@Mutating
+	public static $type$Ref subscript_$amp($primitive$[] array, int index)
+	{
+		return new $type$ArrayRef(array, index);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static void forEach($primitive$[] array, $consumer$ action)
+	{
+		for ($primitive$ value : array)
+		{
+			action.$consumer_accept$(value);
+		}
+	}
+
+	// Operators
+
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
+	public static boolean $qmark($primitive$[] array, $primitive$ value)
+	{
+		return indexOf(array, value, 0) >= 0;
+	}
+
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
+	public static boolean $eq$eq($primitive$[] array1, $primitive$[] array2)
+	{
+		return Arrays.equals(array1, array2);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
+	public static boolean $bang$eq($primitive$[] array1, $primitive$[] array2)
+	{
+		return !Arrays.equals(array1, array2);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static $primitive$[] $plus($primitive$[] array, $primitive$ value)
+	{
+		final int size = array.length;
+		final $primitive$[] res = new $primitive$[size + 1];
+		System.arraycopy(array, 0, res, 0, size);
+		res[size] = value;
+		return res;
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static $primitive$[] $plus$plus($primitive$[] array1, $primitive$[] array2)
+	{
+		final int len1 = array1.length;
+		final int len2 = array2.length;
+		final $primitive$[] res = new $primitive$[len1 + len2];
+		System.arraycopy(array1, 0, res, 0, len1);
+		System.arraycopy(array2, 0, res, len1, len2);
+		return res;
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static $primitive$[] $minus($primitive$[] array, $primitive$ value)
+	{
+		final int index = indexOf(array, value, 0);
+		if (index < 0)
+		{
+			return array;
+		}
+
+		final int size = array.length;
+		final $primitive$[] res = new $primitive$[size - 1];
+		if (index > 0)
+		{
+			// copy the first part before the index
+			System.arraycopy(array, 0, res, 0, index);
+		}
+		if (index < size)
+		{
+			// copy the second part after the index
+			System.arraycopy(array, index + 1, res, index, size - index - 1);
+		}
+		return res;
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static $primitive$[] $minus$minus($primitive$[] array1, $primitive$[] array2)
+	{
+		int index = 0;
+		final int size = array1.length;
+		final $primitive$[] res = new $primitive$[size];
+
+		for ($primitive$ v : array1)
+		{
+			if (indexOf(array2, v, 0) < 0)
+			{
+				res[index++] = v;
+			}
+		}
+
+		// Return a resized copy of the temporary array
+		return Arrays.copyOf(res, index);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static $primitive$[] $amp($primitive$[] array1, $primitive$[] array2)
+	{
+		int index = 0;
+		final int size = array1.length;
+		final $primitive$[] res = new $primitive$[size];
+
+		for ($primitive$ v : array1)
+		{
+			if (indexOf(array2, v, 0) >= 0)
+			{
+				res[index++] = v;
+			}
+		}
+
+		// Return a resized copy of the temporary array
+		return Arrays.copyOf(res, index);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static $primitive$[] mapped($primitive$[] array, $mapper$ mapper)
+	{
+		final int size = array.length;
+		final $primitive$[] res = new $primitive$[size];
+		for (int i = 0; i < size; i++)
+		{
+			res[i] = ($primitive$) mapper.$mapper_apply$(array[i]);
+		}
+		return res;
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static $primitive$[] flatMapped($primitive$[] array, $flatMapper$ mapper)
+	{
+		int size = 0;
+		$primitive$[] res = EMPTY;
+
+		for ($primitive$ v : array)
+		{
+			final $primitive$[] a = mapper.apply(v);
+			final int alen = a.length;
+			if (size + alen >= res.length)
+			{
+				final $primitive$[] newRes = new $primitive$[size + alen];
+				System.arraycopy(res, 0, newRes, 0, res.length);
+				res = newRes;
+			}
+
+			System.arraycopy(a, 0, res, size, alen);
+			size += alen;
+		}
+
+		return res;
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static $primitive$[] filtered($primitive$[] array, $predicate$ condition)
+	{
+		int index = 0;
+		final int size = array.length;
+		final $primitive$[] res = new $primitive$[size];
+		for ($primitive$ v : array)
+		{
+			if (condition.test(v))
+			{
+				res[index++] = v;
+			}
+		}
+
+		// Return a resized copy of the temporary array
+		return Arrays.copyOf(res, index);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static $primitive$[] sorted($primitive$[] array)
+	{
+		final $primitive$[] res = array.clone();
+		Arrays.sort(res);
+		return res;
+	}
+
+	// Search Operations
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int indexOf($primitive$[] array, $primitive$ value)
+	{
+		return indexOf(array, value, 0);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int indexOf($primitive$[] array, $primitive$ value, int startIndex)
+	{
+		for (; startIndex < array.length; startIndex++)
+		{
+			if (array[startIndex] == value)
+			{
+				return startIndex;
+			}
+		}
+		return -1;
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int lastIndexOf($primitive$[] array, $primitive$ value)
+	{
+		return lastIndexOf(array, value, array.length - 1);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static int lastIndexOf($primitive$[] array, $primitive$ value, int startIndex)
+	{
+		for (; startIndex >= 0; startIndex--)
+		{
+			if (array[startIndex] == value)
+			{
+				return startIndex;
+			}
+		}
+		return -1;
+	}
+
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
+	public static boolean contains($primitive$[] array, $primitive$ value)
+	{
+		return indexOf(array, value, 0) >= 0;
+	}
+
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
+	public static boolean in($primitive$ value, $primitive$[] array)
+	{
+		return indexOf(array, value, 0) >= 0;
+	}
+
+	// Copying
+
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
+	public static $primitive$[] copy($primitive$[] array)
+	{
+		return array.clone();
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static $wrapper$[] boxed($primitive$[] array)
+	{
+		final int size = array.length;
+		final $wrapper$[] boxed = new $wrapper$[size];
+		for (int i = 0; i < size; i++)
+		{
+			boxed[i] = array[i];
+		}
+		return boxed;
+	}
+
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
+	public static Iterable<@Primitive $wrapper$> asIterable($primitive$[] array)
+	{
+		return toList(array);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
+	public static ImmutableList<@Primitive $wrapper$> asList($primitive$ @Immutable [] array)
+	{
+		return toList(array);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static ImmutableList<@Primitive $wrapper$> toList($primitive$[] array)
+	{
+		return new ArrayList<>(boxed(array), true);
+	}
+
+	// equals, hashCode and toString
+
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
+	public static boolean equals($primitive$[] array1, $primitive$[] array2)
+	{
+		return Arrays.equals(array1, array2);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
+	public static int hashCode($primitive$[] array)
+	{
+		return Arrays.hashCode(array);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static String toString($primitive$[] array)
+	{
+		if (array == null)
+		{
+			return "null";
+		}
+
+		final int size = array.length;
+		if (size <= 0)
+		{
+			return "[]";
+		}
+
+		final StringBuilder buf = new StringBuilder(size * 3 + 4);
+		buf.append('[').append(array[0]);
+		for (int i = 1; i < size; i++)
+		{
+			buf.append(", ");
+			buf.append(array[i]);
+		}
+		return buf.append(']').toString();
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static void toString($primitive$[] array, StringBuilder builder)
+	{
+		if (array == null)
+		{
+			builder.append("null");
+			return;
+		}
+
+		final int size = array.length;
+		if (size <= 0)
+		{
+			builder.append("[]");
+			return;
+		}
+
+		builder.append('[').append(array[0]);
+		for (int i = 1; i < size; i++)
+		{
+			builder.append(", ");
+			builder.append(array[i]);
+		}
+		builder.append(']');
+	}
+}

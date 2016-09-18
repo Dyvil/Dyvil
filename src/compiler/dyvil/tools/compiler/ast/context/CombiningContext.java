@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.operator.IOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
@@ -54,9 +54,9 @@ public class CombiningContext implements IContext
 	}
 
 	@Override
-	public IDyvilHeader getHeader()
+	public IHeaderUnit getHeader()
 	{
-		IDyvilHeader header = this.inner.getHeader();
+		IHeaderUnit header = this.inner.getHeader();
 		return header == null ? this.outer.getHeader() : header;
 	}
 
@@ -79,6 +79,13 @@ public class CombiningContext implements IContext
 	{
 		Package pack = this.inner.resolvePackage(name);
 		return pack == null ? this.outer.resolvePackage(name) : pack;
+	}
+
+	@Override
+	public IHeaderUnit resolveHeader(Name name)
+	{
+		final IHeaderUnit inner = this.inner.resolveHeader(name);
+		return inner != null ? inner : this.outer.resolveHeader(name);
 	}
 
 	@Override

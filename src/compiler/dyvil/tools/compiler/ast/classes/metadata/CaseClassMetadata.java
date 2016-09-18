@@ -54,7 +54,7 @@ public final class CaseClassMetadata extends ClassMetadata
 
 		// Generate the apply method signature
 
-		final CodeMethod applyMethod = new CodeMethod(this.theClass, Names.apply, this.theClass.getType(),
+		final CodeMethod applyMethod = new CodeMethod(this.theClass, Names.apply, this.theClass.getThisType(),
 		                                              new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC));
 		applyMethod.setTypeParameters(this.theClass.getTypeParameters(), this.theClass.typeParameterCount());
 
@@ -98,7 +98,7 @@ public final class CaseClassMetadata extends ClassMetadata
 			                                                     this.applyMethod.getDescriptor(),
 			                                                     this.applyMethod.getSignature(), null));
 			mw.visitCode();
-			mw.visitTypeInsn(Opcodes.NEW, this.theClass.getType().getInternalName());
+			mw.visitTypeInsn(Opcodes.NEW, this.theClass.getInternalName());
 			mw.visitInsn(Opcodes.DUP);
 
 			final IParameterList parameterList = this.theClass.getParameterList();
@@ -110,7 +110,7 @@ public final class CaseClassMetadata extends ClassMetadata
 			}
 			this.constructor.writeInvoke(mw, 0);
 			mw.visitInsn(Opcodes.ARETURN);
-			mw.visitEnd(this.theClass.getType());
+			mw.visitEnd(this.theClass.getThisType());
 		}
 
 		String internal = this.theClass.getInternalName();

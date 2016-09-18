@@ -7,7 +7,7 @@ import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.consumer.IArgumentsConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.backend.IObjectCompilable;
 import dyvil.tools.parsing.ast.IASTNode;

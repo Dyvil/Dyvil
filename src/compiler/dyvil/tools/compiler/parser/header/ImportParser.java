@@ -1,10 +1,7 @@
 package dyvil.tools.compiler.parser.header;
 
 import dyvil.tools.compiler.ast.consumer.IImportConsumer;
-import dyvil.tools.compiler.ast.header.IImport;
-import dyvil.tools.compiler.ast.header.MultiImport;
-import dyvil.tools.compiler.ast.header.SingleImport;
-import dyvil.tools.compiler.ast.header.WildcardImport;
+import dyvil.tools.compiler.ast.imports.*;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
@@ -28,26 +25,32 @@ public final class ImportParser extends Parser
 	protected IImportConsumer consumer;
 	protected IImport         theImport;
 
+	private int masks;
+
 	public ImportParser(IImportConsumer consumer)
 	{
 		this.consumer = consumer;
 		this.mode = IMPORT;
 	}
 
+	public ImportParser(IImportConsumer consumer, int masks)
+	{
+		this(consumer);
+		this.masks = masks;
+	}
+
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
 		final int type = token.type();
-		if (type == Tokens.EOF)
+		switch (type)
 		{
-			this.consumer.setImport(this.theImport);
+		case BaseSymbols.COMMA:
+			pm.reparse();
+			// Fallthrough
+		case Tokens.EOF:
+			this.end();
 			pm.popParser();
-			return;
-		}
-		if (type == BaseSymbols.COMMA || this.mode == END)
-		{
-			this.consumer.setImport(this.theImport);
-			pm.popParser(true);
 			return;
 		}
 
@@ -61,14 +64,17 @@ public final class ImportParser extends Parser
 				final MultiImport multiImport = new MultiImport(token);
 				multiImport.setParent(this.theImport);
 				this.theImport = multiImport;
-				if (token.next().type() != BaseSymbols.CLOSE_CURLY_BRACKET)
+
+				if (token.next().type() == BaseSymbols.CLOSE_CURLY_BRACKET)
 				{
-					pm.pushParser(new ImportListParser(multiImport));
-					this.mode = MULTI_IMPORT_END;
+					// Fast-path; import ... { }
+					this.mode = END;
+					pm.skip();
 					return;
 				}
-				this.mode = END;
-				pm.skip();
+
+				pm.pushParser(new ImportListParser(multiImport));
+				this.mode = MULTI_IMPORT_END;
 				return;
 			}
 			case DyvilSymbols.UNDERSCORE:
@@ -90,6 +96,13 @@ public final class ImportParser extends Parser
 				this.mode = DOT_ALIAS;
 				return;
 			}
+			}
+
+			final int mask = KindedImport.parseMask(type);
+			if (mask != 0)
+			{
+				this.masks |= mask;
+				return;
 			}
 
 			pm.report(token, "import.identifier");
@@ -132,7 +145,7 @@ public final class ImportParser extends Parser
 				return;
 			case BaseSymbols.SEMICOLON:
 			case BaseSymbols.CLOSE_CURLY_BRACKET:
-				this.consumer.setImport(this.theImport);
+				this.end();
 				pm.popParser(true);
 				return;
 			}
@@ -140,7 +153,7 @@ public final class ImportParser extends Parser
 			return;
 		case MULTI_IMPORT_END:
 			this.theImport.expandPosition(token);
-			this.consumer.setImport(this.theImport);
+			this.end();
 			pm.popParser();
 			if (type != BaseSymbols.CLOSE_CURLY_BRACKET)
 			{
@@ -148,7 +161,20 @@ public final class ImportParser extends Parser
 				pm.report(token, "import.multi.close_brace");
 			}
 			return;
+		case END:
+			this.end();
+			pm.popParser(true);
 		}
+	}
+
+	private void end()
+	{
+		if (this.masks != 0)
+		{
+			this.consumer.setImport(new KindedImport(this.theImport, this.masks));
+			return;
+		}
+		this.consumer.setImport(this.theImport);
 	}
 
 	@Override

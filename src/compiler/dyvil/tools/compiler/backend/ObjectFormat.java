@@ -4,8 +4,8 @@ import dyvil.io.FileUtils;
 import dyvil.io.StringPoolReader;
 import dyvil.io.StringPoolWriter;
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.structure.DyvilHeader;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.header.AbstractHeader;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.lang.I18n;
 
 import java.io.BufferedOutputStream;
@@ -17,7 +17,7 @@ public final class ObjectFormat
 {
 	private static final int FILE_VERSION = 1;
 
-	public static void write(DyvilCompiler compiler, File file, IDyvilHeader header)
+	public static void write(DyvilCompiler compiler, File file, IHeaderUnit header)
 	{
 		try
 		{
@@ -38,7 +38,7 @@ public final class ObjectFormat
 		}
 	}
 
-	public static DyvilHeader read(DyvilCompiler compiler, InputStream is, DyvilHeader header)
+	public static AbstractHeader read(DyvilCompiler compiler, InputStream is, AbstractHeader header)
 	{
 		try (StringPoolReader reader = new StringPoolReader(is))
 		{

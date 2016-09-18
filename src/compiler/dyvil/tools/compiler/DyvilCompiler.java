@@ -4,7 +4,7 @@ import dyvil.io.AppendablePrintStream;
 import dyvil.io.BasicPrintStream;
 import dyvil.io.Console;
 import dyvil.io.FileUtils;
-import dyvil.tools.compiler.ast.structure.DyvilHeader;
+import dyvil.tools.compiler.ast.external.ExternalHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.config.CompilerConfig;
@@ -154,6 +154,7 @@ public final class DyvilCompiler implements Tool
 		case "compile":
 			this.phases.add(ICompilerPhase.TOKENIZE);
 			this.phases.add(ICompilerPhase.PARSE);
+			this.phases.add(ICompilerPhase.RESOLVE_HEADERS);
 			this.phases.add(ICompilerPhase.RESOLVE_TYPES);
 			this.phases.add(ICompilerPhase.RESOLVE);
 			this.phases.add(ICompilerPhase.CHECK_TYPES);
@@ -184,7 +185,7 @@ public final class DyvilCompiler implements Tool
 			this.phases.add(ICompilerPhase.TEST);
 			return;
 		case "--debug":
-			this.phases.add(ICompilerPhase.PRINT);
+			this.phases.add(ICompilerPhase.PRINT); // print after parse
 			this.phases.add(ICompilerPhase.TEST);
 			this.config.setDebug(true);
 			return;
@@ -454,7 +455,7 @@ public final class DyvilCompiler implements Tool
 		{
 			this.error(I18n.get("library.lang_header", this.config.libraries));
 
-			Types.LANG_HEADER = new DyvilHeader(this);
+			Types.LANG_HEADER = new ExternalHeader();
 		}
 	}
 

@@ -18,6 +18,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -25,7 +26,6 @@ import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -52,6 +52,7 @@ public class CodeMethod extends AbstractMethod
 	protected IValue value;
 
 	// Metadata
+	protected IType        receiverType;
 	protected Set<IMethod> overrideMethods;
 
 	public CodeMethod(IClass iclass)
@@ -92,32 +93,50 @@ public class CodeMethod extends AbstractMethod
 	}
 
 	@Override
+	public IType getReceiverType()
+	{
+		if (this.receiverType != null)
+		{
+			return this.receiverType;
+		}
+
+		final IType thisType = this.getThisType();
+		if (thisType == this.enclosingClass.getThisType())
+		{
+			// If the this type was inherited from the enclosing class and not explicit, we can use the enclosing class'
+			// receiverType to avoid a type copying operation
+			return this.receiverType = this.enclosingClass.getReceiverType();
+		}
+		return this.receiverType = thisType.asParameterType();
+	}
+
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		context = context.push(this);
 
 		super.resolveTypes(markers, context);
 
-		this.unmangleName();
+		this.unmangleName(markers);
 
-		if (this.receiverType != null)
+		if (this.thisType != null)
 		{
-			this.receiverType = this.receiverType.resolveType(markers, context);
+			this.thisType = this.thisType.resolveType(markers, context);
 
 			// Check the self type for compatibility
-			final IClass selfTypeClass = this.receiverType.getTheClass();
+			final IClass selfTypeClass = this.thisType.getTheClass();
 			if (selfTypeClass != null && selfTypeClass != this.enclosingClass)
 			{
-				final Marker marker = Markers.semanticError(this.receiverType.getPosition(),
+				final Marker marker = Markers.semanticError(this.thisType.getPosition(),
 				                                            "method.receivertype.incompatible", this.getName());
-				marker.addInfo(Markers.getSemantic("method.receivertype", this.receiverType));
+				marker.addInfo(Markers.getSemantic("method.receivertype", this.thisType));
 				marker.addInfo(Markers.getSemantic("method.classtype", this.enclosingClass.getFullName()));
 				markers.add(marker);
 			}
 		}
-		else if (!this.isStatic())
+		else
 		{
-			this.receiverType = this.enclosingClass.getType();
+			this.thisType = this.enclosingClass.getThisType();
 		}
 
 		for (int i = 0; i < this.typeParameterCount; i++)
@@ -148,7 +167,7 @@ public class CodeMethod extends AbstractMethod
 		context.pop();
 	}
 
-	private void unmangleName()
+	private void unmangleName(MarkerList markers)
 	{
 		final Name name = this.name;
 		final String unqualified = name.unqualified;
@@ -164,6 +183,8 @@ public class CodeMethod extends AbstractMethod
 		final String newQualified = qualified.substring(0, qualified.indexOf(NAME_SEPARATOR));
 		this.internalName = qualified;
 		this.name = Name.from(newUnqualified, newQualified);
+
+		markers.add(Markers.semanticWarning(this.position, "method.name_mangled.deprecated", this.name));
 	}
 
 	@Override
@@ -178,9 +199,9 @@ public class CodeMethod extends AbstractMethod
 			this.typeParameters[i].resolve(markers, context);
 		}
 
-		if (this.receiverType != null)
+		if (this.thisType != null)
 		{
-			this.receiverType.resolve(markers, context);
+			this.thisType.resolve(markers, context);
 		}
 
 		this.parameters.resolve(markers, context);
@@ -231,9 +252,9 @@ public class CodeMethod extends AbstractMethod
 
 		super.checkTypes(markers, context);
 
-		if (this.receiverType != null)
+		if (this.thisType != null)
 		{
-			this.receiverType.checkType(markers, context, TypePosition.PARAMETER_TYPE);
+			this.thisType.checkType(markers, context, TypePosition.PARAMETER_TYPE);
 		}
 
 		for (int i = 0; i < this.typeParameterCount; i++)
@@ -269,9 +290,9 @@ public class CodeMethod extends AbstractMethod
 			this.typeParameters[i].check(markers, this);
 		}
 
-		if (this.receiverType != null)
+		if (this.thisType != null)
 		{
-			this.receiverType.check(markers, context);
+			this.thisType.check(markers, context);
 		}
 
 		this.parameters.check(markers, context);
@@ -349,7 +370,7 @@ public class CodeMethod extends AbstractMethod
 				final Marker marker = Markers.semantic(this.position, "method.name_mangled", this.name);
 				marker.addInfo(Markers.getSemantic("method.name_mangled.1", this.name));
 				marker.addInfo(Markers.getSemantic("method.name_mangled.2", this.name));
-				marker.addInfo(Markers.getSemantic("name.mangled", mangledName));
+				marker.addInfo(Markers.getSemantic("method.name_mangled.bytecode_name", mangledName));
 				markers.add(marker);
 			}
 
@@ -416,7 +437,7 @@ public class CodeMethod extends AbstractMethod
 
 		final boolean thisTypeResolved = this.type.isResolved();
 		final int accessLevel = this.getAccessLevel() & ~Modifiers.INTERNAL;
-		final ITypeContext typeContext = this.enclosingClass.getType();
+		final ITypeContext typeContext = this.enclosingClass.getThisType();
 
 		for (IMethod overrideMethod : this.overrideMethods)
 		{
@@ -483,9 +504,9 @@ public class CodeMethod extends AbstractMethod
 			this.typeParameters[i].foldConstants();
 		}
 
-		if (this.receiverType != null)
+		if (this.thisType != null)
 		{
-			this.receiverType.foldConstants();
+			this.thisType.foldConstants();
 		}
 
 		this.parameters.foldConstants();
@@ -517,9 +538,9 @@ public class CodeMethod extends AbstractMethod
 			}
 		}
 
-		if (this.receiverType != null)
+		if (this.thisType != null)
 		{
-			this.receiverType.cleanup(context, compilableList);
+			this.thisType.cleanup(context, compilableList);
 		}
 
 		for (int i = 0; i < this.typeParameterCount; i++)
@@ -730,15 +751,23 @@ public class CodeMethod extends AbstractMethod
 			this.annotations.write(writer);
 		}
 
-		if (this.receiverType != null && this.receiverType != this.enclosingClass.getType())
+		// Write DyvilName annotation if it differs from the mangled name
+		final String qualifiedName = this.name.qualified;
+		if (!this.getInternalName().equals(qualifiedName))
 		{
-			final String signature = this.receiverType.getSignature();
-			if (signature != null)
-			{
-				AnnotationVisitor annotationVisitor = writer.visitAnnotation(AnnotationUtil.RECEIVER_TYPE, false);
-				annotationVisitor.visit("value", signature);
-				annotationVisitor.visitEnd();
-			}
+			final AnnotationVisitor annotationVisitor = writer.visitAnnotation(AnnotationUtil.DYVIL_NAME, false);
+			annotationVisitor.visit("value", qualifiedName);
+			annotationVisitor.visitEnd();
+		}
+
+		// Write receiver type signature
+		final IType receiverType = this.thisType;
+		if (receiverType != null && receiverType != this.enclosingClass.getThisType() && receiverType.needsSignature())
+		{
+			final String signature = receiverType.getSignature();
+			final AnnotationVisitor annotationVisitor = writer.visitAnnotation(AnnotationUtil.RECEIVER_TYPE, false);
+			annotationVisitor.visit("value", signature);
+			annotationVisitor.visitEnd();
 		}
 
 		ModifierUtil.writeModifiers(writer, this.modifiers);

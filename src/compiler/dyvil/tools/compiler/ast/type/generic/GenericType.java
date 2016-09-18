@@ -7,7 +7,7 @@ import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.raw.IObjectType;
@@ -90,17 +90,6 @@ public abstract class GenericType implements IObjectType, ITypeList
 	}
 
 	@Override
-	public IType asParameterType()
-	{
-		final GenericType copy = this.clone();
-		for (int i = 0; i < this.typeArgumentCount; i++)
-		{
-			copy.typeArguments[i] = this.typeArguments[i].asParameterType();
-		}
-		return copy;
-	}
-
-	@Override
 	public boolean hasTypeVariables()
 	{
 		for (int i = 0; i < this.typeArgumentCount; i++)
@@ -112,18 +101,50 @@ public abstract class GenericType implements IObjectType, ITypeList
 		}
 		return false;
 	}
-	
+
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
-		GenericType copy = this.clone();
-		for (int i = 0; i < this.typeArgumentCount; i++)
+		final IType[] types = getConcreteTypes(this.typeArguments, this.typeArgumentCount, context);
+		if (types == this.typeArguments)
 		{
-			copy.typeArguments[i] = this.typeArguments[i].getConcreteType(context);
+			// Nothing changed, no need to create a new instance
+			return this;
 		}
+
+		final GenericType copy = this.copyName();
+		copy.typeArguments = types;
+		copy.typeArgumentCount = this.typeArgumentCount;
 		return copy;
 	}
-	
+
+	public static IType[] getConcreteTypes(IType[] types, int count, ITypeContext context)
+	{
+		IType[] newTypes = null;
+		boolean changed = false;
+
+		for (int i = 0; i < count; i++)
+		{
+			final IType original = types[i];
+			final IType concrete = original.getConcreteType(context);
+			if (changed)
+			{
+				// As soon as changed is true, the array is initialized and we have to copy all elements
+				newTypes[i] = concrete;
+			}
+			else if (concrete != original)
+			{
+				// If there is a single mismatch, create the array and copy previous elements
+				changed = true;
+				newTypes = new IType[count];
+				newTypes[i] = concrete;
+				System.arraycopy(types, 0, newTypes, 0, i);
+			}
+		}
+
+		return changed ? newTypes : types;
+	}
+
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
@@ -296,13 +317,20 @@ public abstract class GenericType implements IObjectType, ITypeList
 		}
 	}
 	
-	protected final void copyTypeArguments(GenericType agt)
-	{
-		agt.typeArgumentCount = this.typeArgumentCount;
-		agt.typeArguments = new IType[this.typeArgumentCount];
-		System.arraycopy(this.typeArguments, 0, agt.typeArguments, 0, this.typeArgumentCount);
-	}
-	
 	@Override
-	public abstract GenericType clone();
+	public GenericType clone()
+	{
+		GenericType type = this.copyName();
+		this.copyArgumentsTo(type);
+		return type;
+	}
+
+	protected abstract GenericType copyName();
+
+	private void copyArgumentsTo(GenericType target)
+	{
+		target.typeArgumentCount = this.typeArgumentCount;
+		target.typeArguments = new IType[this.typeArgumentCount];
+		System.arraycopy(this.typeArguments, 0, target.typeArguments, 0, this.typeArgumentCount);
+	}
 }

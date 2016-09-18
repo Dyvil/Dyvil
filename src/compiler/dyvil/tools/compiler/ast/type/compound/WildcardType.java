@@ -9,10 +9,10 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.Variance;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -123,6 +123,12 @@ public final class WildcardType implements IRawType, ITyped
 	}
 
 	@Override
+	public boolean hasTypeVariables()
+	{
+		return this.bound.hasTypeVariables();
+	}
+
+	@Override
 	public IType asReturnType()
 	{
 		if (this.variance == Variance.CONTRAVARIANT)
@@ -147,6 +153,42 @@ public final class WildcardType implements IRawType, ITyped
 		}
 
 		return bound == this.bound ? this : new WildcardType(this.variance, bound);
+	}
+
+	@Override
+	public IType getConcreteType(ITypeContext context)
+	{
+		if (context == ITypeContext.COVARIANT)
+		{
+			return this.asParameterType();
+		}
+
+		final IType concreteBound = this.bound.getConcreteType(context);
+		if (concreteBound == this.bound)
+		{
+			return this;
+		}
+
+		if (concreteBound.typeTag() == WILDCARD_TYPE)
+		{
+			return concreteBound;
+		}
+
+		final WildcardType copy = new WildcardType(this.position, this.variance);
+		copy.bound = concreteBound;
+		return copy;
+	}
+
+	@Override
+	public IType resolveType(ITypeParameter typeParameter)
+	{
+		return this.bound.resolveType(typeParameter);
+	}
+
+	@Override
+	public void inferTypes(IType concrete, ITypeContext typeContext)
+	{
+		this.bound.inferTypes(concrete, typeContext);
 	}
 
 	@Override
@@ -232,43 +274,6 @@ public final class WildcardType implements IRawType, ITyped
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
 		this.bound.cleanup(context, compilableList);
-	}
-
-	@Override
-	public IType resolveType(ITypeParameter typeParameter)
-	{
-		return this.bound.resolveType(typeParameter);
-	}
-
-	@Override
-	public void inferTypes(IType concrete, ITypeContext typeContext)
-	{
-		this.bound.inferTypes(concrete, typeContext);
-	}
-
-	@Override
-	public boolean hasTypeVariables()
-	{
-		return this.bound.hasTypeVariables();
-	}
-
-	@Override
-	public IType getConcreteType(ITypeContext context)
-	{
-		final IType concreteBound = this.bound.getConcreteType(context);
-		if (concreteBound == this.bound)
-		{
-			return this;
-		}
-
-		if (concreteBound.typeTag() == WILDCARD_TYPE)
-		{
-			return concreteBound;
-		}
-
-		final WildcardType copy = new WildcardType(this.position, this.variance);
-		copy.bound = concreteBound;
-		return copy;
 	}
 
 	@Override

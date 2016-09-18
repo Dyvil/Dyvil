@@ -43,7 +43,7 @@ public class ForTest
 	private static void testIterable()
 	{
 		[int] ints = [ 1, 2, 3 ]
-		Iterable<int> iterable = ints.toIterable
+		Iterable<int> iterable = ints.asIterable
 		[int] array = []
 
 		for (var i <- iterable)
@@ -57,7 +57,7 @@ public class ForTest
 	private static void testIterator()
 	{
 		[int] ints = [ 1, 2, 3 ]
-		Iterator<int> iterator = ints.toIterable.iterator
+		Iterator<int> iterator = ints.asIterable.iterator
 		[int] array = []
 
 		for (var i <- iterator)

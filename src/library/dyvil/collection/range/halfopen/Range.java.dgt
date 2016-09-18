@@ -1,0 +1,157 @@
+// $genNotice$
+// Timestamp: $timeStamp$
+
+package dyvil.collection.range.halfopen;
+
+import dyvil.annotation.Immutable;
+import dyvil.collection.Range;
+import dyvil.lang.LiteralConvertible;
+
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.function.Consumer;
+
+@Immutable
+@LiteralConvertible.FromTuple
+public class $type$Range implements dyvil.collection.range.$type$Range
+{
+	private final $primitive$ start;
+	private final $primitive$ end;
+
+	public static dyvil.collection.range.$type$Range apply($primitive$ from, $primitive$ to)
+	{
+		return new $type$Range(from, to);
+	}
+
+	public $type$Range($primitive$ from, $primitive$ to)
+	{
+		this.start = from;
+		this.end = to;
+	}
+
+	@Override
+	public boolean isHalfOpen()
+	{
+		return true;
+	}
+
+	@Override
+	public dyvil.collection.range.$type$Range asHalfOpen()
+	{
+		return this;
+	}
+
+	@Override
+	public dyvil.collection.range.$type$Range asClosed()
+	{
+		return new dyvil.collection.range.closed.$type$Range(this.start, this.end);
+	}
+
+	@Override
+	public $wrapper$ first()
+	{
+		return this.start;
+	}
+
+	@Override
+	public $wrapper$ last()
+	{
+		return this.end - 1;
+	}
+
+	@Override
+	@SuppressWarnings({ "cast", "RedundantCast" })
+	public int size()
+	{
+		return (int) (this.end - this.start);
+	}
+
+	@Override
+	public Iterator<$wrapper$> iterator()
+	{
+		return new Iterator<$wrapper$>()
+		{
+			private $primitive$ value = $type$Range.this.start;
+
+			@Override
+			public boolean hasNext()
+			{
+				return this.value < $type$Range.this.end;
+			}
+
+			@Override
+			public $wrapper$ next()
+			{
+				final $primitive$ value = this.value;
+				if (value >= $type$Range.this.end)
+				{
+					throw new NoSuchElementException();
+				}
+
+				this.value++;
+				return value;
+			}
+		};
+	}
+
+	@Override
+	public void forEach(Consumer<? super $wrapper$> action)
+	{
+		for ($primitive$ i = this.start; i < this.end; i++)
+		{
+			action.accept(i);
+		}
+	}
+
+	@Override
+	public boolean contains($primitive$ value)
+	{
+		return value >= this.start && value < this.end;
+	}
+
+	@Override
+	public $primitive$[] to$type$Array()
+	{
+		final $primitive$[] result = new $primitive$[this.size()];
+		int index = 0;
+
+		for ($primitive$ i = this.start; i < this.end; i++)
+		{
+			result[index++] = i;
+		}
+		return result;
+	}
+
+	@Override
+	public void toArray(int index, Object[] store)
+	{
+		for ($primitive$ i = this.start; i < this.end; i++)
+		{
+			store[index++] = i;
+		}
+	}
+
+	@Override
+	public dyvil.collection.range.$type$Range copy()
+	{
+		return new $type$Range(this.start, this.end);
+	}
+
+	@Override
+	public String toString()
+	{
+		return this.start + " ..< " + this.end;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		return Range.rangeEquals(this, obj);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Range.rangeHashCode(this);
+	}
+}

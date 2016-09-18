@@ -18,11 +18,13 @@ import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.*;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
+import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.config.Formatting;
@@ -74,7 +76,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	protected IType classType = new ClassType(this);
 
 	@Override
-	public abstract IDyvilHeader getHeader();
+	public abstract IHeaderUnit getHeader();
 
 	@Override
 	public IClass getEnclosingClass()
@@ -86,17 +88,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	public void setEnclosingClass(IClass enclosingClass)
 	{
 		this.enclosingClass = enclosingClass;
-	}
-
-	@Override
-	public IType getType()
-	{
-		return this.thisType;
-	}
-
-	@Override
-	public void setType(IType type)
-	{
 	}
 
 	@Override
@@ -640,7 +631,22 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public IType getThisType()
 	{
-		return this.getType();
+		if (this.thisType != null)
+		{
+			return this.thisType;
+		}
+
+		if (this.typeParameterCount <= 0)
+		{
+			return this.thisType = new ClassType(this);
+		}
+
+		final ClassGenericType type = new ClassGenericType(this);
+		for (int i = 0; i < this.typeParameterCount; i++)
+		{
+			type.addType(new TypeVarType(this.typeParameters[i]));
+		}
+		return this.thisType = type;
 	}
 
 	@Override
@@ -897,8 +903,8 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		}
 		if (level == Modifiers.PROTECTED || level == Modifiers.PACKAGE)
 		{
-			IDyvilHeader unit1 = this.getHeader();
-			IDyvilHeader unit2 = iclass.getHeader();
+			IHeaderUnit unit1 = this.getHeader();
+			IHeaderUnit unit2 = iclass.getHeader();
 			if (unit1 != null && unit2 != null && unit1.getPackage() == unit2.getPackage())
 			{
 				return VISIBLE;

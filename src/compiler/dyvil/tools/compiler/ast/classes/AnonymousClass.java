@@ -182,7 +182,7 @@ class AnonymousClassMetadata implements IClassMetadata
 		if (thisField != null)
 		{
 			thisField.writeField(writer);
-			index = initWriter.visitParameter(index, thisField.getName(), thisField.getTheClass().getType(),
+			index = initWriter.visitParameter(index, thisField.getName(), thisField.getTheClass().getThisType(),
 			                                  Modifiers.MANDATED);
 		}
 

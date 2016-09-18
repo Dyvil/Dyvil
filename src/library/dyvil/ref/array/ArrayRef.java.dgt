@@ -1,0 +1,30 @@
+// $genNotice$
+// Timestamp: $timeStamp$
+
+package dyvil.ref.array;
+
+import dyvil.ref.$type$Ref;
+
+public class $type$ArrayRef implements $type$Ref
+{
+	protected final $primitive$[] array;
+	protected final int index;
+
+	public $type$ArrayRef($primitive$[] array, int index)
+	{
+		this.array = array;
+		this.index = index;
+	}
+
+	@Override
+	public $primitive$ get()
+	{
+		return this.array[this.index];
+	}
+
+	@Override
+	public void set($primitive$ value)
+	{
+		this.array[this.index] = value;
+	}
+}

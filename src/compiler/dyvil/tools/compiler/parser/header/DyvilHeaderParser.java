@@ -2,16 +2,16 @@ package dyvil.tools.compiler.parser.header;
 
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
-import dyvil.tools.compiler.ast.header.HeaderDeclaration;
-import dyvil.tools.compiler.ast.header.ImportDeclaration;
-import dyvil.tools.compiler.ast.header.IncludeDeclaration;
-import dyvil.tools.compiler.ast.header.PackageDeclaration;
+import dyvil.tools.compiler.ast.consumer.IImportConsumer;
+import dyvil.tools.compiler.ast.header.*;
+import dyvil.tools.compiler.ast.imports.ImportDeclaration;
+import dyvil.tools.compiler.ast.imports.KindedImport;
 import dyvil.tools.compiler.ast.modifiers.Modifier;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.operator.Operator;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
@@ -23,7 +23,6 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
-import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.IToken;
 
 public class DyvilHeaderParser extends Parser
@@ -39,7 +38,7 @@ public class DyvilHeaderParser extends Parser
 
 	// -----
 
-	protected IDyvilHeader unit;
+	protected IHeaderUnit unit;
 
 	// Parser data
 	protected ModifierSet    modifiers;
@@ -47,7 +46,7 @@ public class DyvilHeaderParser extends Parser
 
 	protected int flags;
 
-	public DyvilHeaderParser(IDyvilHeader unit)
+	public DyvilHeaderParser(IHeaderUnit unit)
 	{
 		this.unit = unit;
 		this.mode = PACKAGE;
@@ -71,34 +70,30 @@ public class DyvilHeaderParser extends Parser
 		return false;
 	}
 
+	private IImportConsumer importConsumer(IToken token)
+	{
+		final ImportDeclaration declaration = new ImportDeclaration(token.raw());
+		return im ->
+		{
+			declaration.setImport(im);
+			this.unit.addImport(declaration);
+		};
+	}
+
 	protected boolean parseImport(IParserManager pm, IToken token, int type)
 	{
 		switch (type)
 		{
 		case DyvilKeywords.IMPORT:
-		{
-			final IToken next = token.next();
-			if (next.type() == DyvilKeywords.STATIC)
-			{
-				pm.report(Markers.syntaxWarning(next, "import.using.static"));
-				pm.skip();
-				this.createUsingDeclaration(pm, token.to(next));
-				return true;
-			}
-
-			ImportDeclaration i = new ImportDeclaration(token.raw());
-			pm.pushParser(new ImportParser(im ->
-			                               {
-				                               i.setImport(im);
-				                               this.unit.addImport(i);
-			                               }));
+			pm.pushParser(new ImportParser(this.importConsumer(token)));
 			return true;
-		}
 		case DyvilKeywords.USING:
-		{
-			this.createUsingDeclaration(pm, token);
+			pm.pushParser(new ImportParser(this.importConsumer(token), KindedImport.USING_DECLARATION));
 			return true;
-		}
+		case DyvilKeywords.INCLUDE:
+			pm.report(Markers.syntaxWarning(token, "import.include.deprecated"));
+			pm.pushParser(new ImportParser(this.importConsumer(token), KindedImport.INCLUDE_DECLARATION));
+			return true;
 		case DyvilKeywords.OPERATOR:
 			pm.pushParser(new OperatorParser(this.unit, Operator.INFIX), true);
 			return true;
@@ -115,12 +110,6 @@ public class DyvilHeaderParser extends Parser
 			}
 
 			return false;
-		case DyvilKeywords.INCLUDE:
-		{
-			IncludeDeclaration i = new IncludeDeclaration(token.raw());
-			pm.pushParser(new IncludeParser(this.unit, i));
-			return true;
-		}
 		case DyvilKeywords.TYPE:
 		{
 			TypeAlias typeAlias = new TypeAlias();
@@ -129,16 +118,6 @@ public class DyvilHeaderParser extends Parser
 		}
 		}
 		return false;
-	}
-
-	private void createUsingDeclaration(IParserManager pm, ICodePosition position)
-	{
-		ImportDeclaration i = new ImportDeclaration(position, true);
-		pm.pushParser(new ImportParser(im ->
-		                               {
-			                               i.setImport(im);
-			                               this.unit.addUsing(i);
-		                               }));
 	}
 
 	protected boolean parseMetadata(IParserManager pm, IToken token, int type)

@@ -1,0 +1,29 @@
+// $genNotice$
+// Timestamp: $timeStamp$
+
+package dyvil.ref.boxed;
+
+import dyvil.ref.$type$Ref;
+import dyvil.ref.ObjectRef;
+
+public class Boxed$type$Ref implements ObjectRef<$wrapper$>
+{
+	private final $type$Ref booleanRef;
+
+	public Boxed$type$Ref($type$Ref booleanRef)
+	{
+		this.booleanRef = booleanRef;
+	}
+
+	@Override
+	public $wrapper$ get()
+	{
+		return this.booleanRef.get();
+	}
+
+	@Override
+	public void set($wrapper$ value)
+	{
+		this.booleanRef.set(value);
+	}
+}

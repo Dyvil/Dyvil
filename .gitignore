@@ -7,6 +7,8 @@ temp/
 build/
 .gradle/
 
+**/.DS_Store
+
 *.log*
 *.log
 

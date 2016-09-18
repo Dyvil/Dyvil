@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
+import dyvil.annotation.analysis.NotNull;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.Handle;
 import dyvil.tools.compiler.ast.access.AbstractCall;
@@ -13,9 +14,9 @@ import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.MapTypeContext;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.*;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.LambdaType;
@@ -44,10 +45,11 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 	// Flags
 
-	private static final int HANDLE_TYPE_MASK    = 0b00001111;
-	private static final int VALUE_RESOLVED      = 0b00010000;
-	public static final  int IMPLICIT_PARAMETERS = 0b00100000;
-	private static final int EXPLICIT_RETURN     = 0b01000000;
+	private static final int HANDLE_TYPE_MASK     = 0b00001111;
+	private static final int VALUE_RESOLVED       = 0b00010000;
+	public static final  int IMPLICIT_PARAMETERS  = 0b00100000;
+	private static final int EXPLICIT_RETURN      = 0b01000000;
+	private static final int LAMBDA_TYPE_INFERRED = 0b10000000;
 
 	protected ParameterList parameters;
 
@@ -202,6 +204,14 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			return this.type;
 		}
 
+		this.flags |= LAMBDA_TYPE_INFERRED;
+		return this.type = this.makeType();
+	}
+
+	private
+	@NotNull
+	LambdaType makeType()
+	{
 		final int count = this.parameters.size();
 		final LambdaType lambdaType = new LambdaType(count);
 		for (int i = 0; i < count; i++)
@@ -210,7 +220,8 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		}
 		lambdaType.setType(this.returnType != null ? this.returnType : Types.UNKNOWN);
 
-		return this.type = lambdaType;
+		this.flags |= LAMBDA_TYPE_INFERRED;
+		return lambdaType;
 	}
 
 	@Override
@@ -268,10 +279,13 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			type = this.getType();
 		}
 
+		if (type != this.type)
+		{
+			// If this is not the type initially created and returned by getType(), remove the LAMBDA_TYPE_INFERRED flag
+			this.flags &= ~LAMBDA_TYPE_INFERRED;
+		}
 		this.type = type;
 		this.method = type.getFunctionalMethod();
-
-		assert this.method != null; // Otherwise isType would have returns false
 
 		this.inferTypes(markers);
 
@@ -283,7 +297,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			this.flags |= VALUE_RESOLVED;
 		}
 
-		if (this.returnType == Types.UNKNOWN)
+		if (this.returnType.isUninferred())
 		{
 			this.returnType = this.value.getType();
 		}
@@ -300,24 +314,29 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 	public void inferReturnType(IType type, IType valueType)
 	{
-		final ITypeContext tempContext = new MapTypeContext();
-		this.method.getType().inferTypes(valueType, tempContext);
-
-		final IType concreteType = this.method.getEnclosingClass().getType().getConcreteType(tempContext);
-
-		type.inferTypes(concreteType, tempContext);
-
-		if (this.returnType == null)
+		if (this.hasImplicitReturnType())
 		{
 			this.returnType = valueType;
 		}
+		if ((this.flags & LAMBDA_TYPE_INFERRED) != 0)
+		{
+			this.type = this.makeType();
+			return;
+		}
+
+		final ITypeContext tempContext = new MapTypeContext();
+		this.method.getType().inferTypes(valueType, tempContext);
+
+		final IType concreteType = this.method.getEnclosingClass().getThisType().getConcreteType(tempContext);
+
+		type.inferTypes(concreteType, tempContext);
 
 		this.type = type.getConcreteType(tempContext);
 	}
 
 	private void checkReturnType(MarkerList markers, IType expectedReturnType)
 	{
-		if (this.returnType == null)
+		if (this.hasImplicitReturnType())
 		{
 			this.returnType = expectedReturnType;
 			return;
@@ -330,6 +349,11 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		}
 	}
 
+	private boolean hasImplicitReturnType()
+	{
+		return this.returnType == null || (this.flags & EXPLICIT_RETURN) == 0;
+	}
+
 	private void inferTypes(MarkerList markers)
 	{
 		if (!this.method.hasTypeVariables())
@@ -337,7 +361,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			for (int i = 0, count = this.parameters.size(); i < count; i++)
 			{
 				final IParameter parameter = this.parameters.get(i);
-				if (parameter.getType() == Types.UNKNOWN)
+				if (parameter.getType().isUninferred())
 				{
 					final IType type = this.method.getParameterList().get(i).getType()
 					                              .atPosition(parameter.getPosition());
@@ -352,26 +376,22 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		for (int i = 0, count = this.parameters.size(); i < count; i++)
 		{
 			final IParameter parameter = this.parameters.get(i);
-			if (parameter.getType() != Types.UNKNOWN)
+			if (!parameter.getType().isUninferred())
 			{
 				continue;
 			}
 
 			final ICodePosition position = parameter.getPosition();
 			final IType methodParamType = this.method.getParameterList().get(i).getType();
-			IType concreteType = methodParamType.getConcreteType(this.type);
+			final IType concreteType = methodParamType.getConcreteType(this.type);
 
 			// Can't infer parameter type
-			if (this.type.isUninferred())
+			if ((this.flags & IMPLICIT_PARAMETERS) == 0 && concreteType.isUninferred())
 			{
-				if ((this.flags & IMPLICIT_PARAMETERS) != 0)
-				{
-					markers.add(Markers.semanticError(position, "lambda.parameter.implicit"));
-				}
-				else
-				{
-					markers.add(Markers.semanticError(position, "lambda.parameter.type", parameter.getName()));
-				}
+				// markers.add(Markers.semanticError(position, "lambda.parameter.implicit"));
+				markers.add(Markers.semanticError(position, "lambda.parameter.type", parameter.getName()));
+
+				continue;
 			}
 
 			// asReturnType is required for Wildcard Types
@@ -416,7 +436,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		for (int i = 0; i < parameterCount; i++)
 		{
 			final IType lambdaParameterType = this.parameters.get(i).getInternalType();
-			if (lambdaParameterType == Types.UNKNOWN)
+			if (lambdaParameterType.isUninferred())
 			{
 				continue;
 			}
@@ -482,7 +502,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	{
 		this.parameters.resolveTypes(markers, context);
 
-		if (this.returnType != null && (this.flags & EXPLICIT_RETURN) != 0)
+		if (!this.hasImplicitReturnType())
 		{
 			this.returnType = this.returnType.resolveType(markers, context);
 		}
@@ -503,26 +523,35 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
+		boolean delayResolve = false;
+
 		for (int i = 0, count = this.parameters.size(); i < count; i++)
 		{
 			final IParameter parameter = this.parameters.get(i);
 
-			if (parameter.getType() == Types.UNKNOWN)
+			if (parameter.getType().isUninferred())
 			{
 				parameter.setType(null); // avoid missing parameter type error
 				parameter.resolve(markers, context);
 				parameter.setType(Types.UNKNOWN);
 
 				// Resolving the value happens in withType
-				return this;
+				delayResolve = true;
 			}
-
-			parameter.resolve(markers, context);
+			else
+			{
+				parameter.resolve(markers, context);
+			}
 		}
 
-		if (this.returnType != null && (this.flags & EXPLICIT_RETURN) != 0)
+		if (!this.hasImplicitReturnType())
 		{
 			this.returnType.resolve(markers, context);
+		}
+
+		if (delayResolve)
+		{
+			return this;
 		}
 
 		// All parameter types are known, we can actually resolve the return value now
@@ -532,7 +561,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		context.pop();
 
 		this.flags |= VALUE_RESOLVED;
-		if (this.returnType == null)
+		if (this.hasImplicitReturnType())
 		{
 			this.returnType = this.value.getType();
 		}
@@ -838,7 +867,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		IParameter parameter;
 		final int parameterCount = this.parameters.size();
 
-		if (parameterCount == 1 && (parameter = this.parameters.get(0)).getType() == Types.UNKNOWN // single parameter
+		if (parameterCount == 1 && (parameter = this.parameters.get(0)).getType().isUninferred() // single parameter
 			    && !Formatting.getBoolean("lambda.single.wrap"))
 		{
 			buffer.append(parameter.getName());

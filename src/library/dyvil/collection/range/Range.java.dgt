@@ -1,0 +1,53 @@
+// $genNotice$
+// Timestamp: $timeStamp$
+
+package dyvil.collection.range;
+
+import dyvil.annotation.Immutable;
+import dyvil.annotation._internal.DyvilName;
+import dyvil.collection.Range;
+import dyvil.lang.LiteralConvertible;
+
+@LiteralConvertible.FromTuple
+@Immutable
+public interface $type$Range extends Range<$wrapper$>
+{
+	@DyvilName("apply")
+	static $type$Range closed($primitive$ from, $primitive$ to)
+	{
+		return new dyvil.collection.range.closed.$type$Range(from, to);
+	}
+
+	@DyvilName("apply")
+	static $type$Range halfOpen($primitive$ from, $primitive$ toExclusive)
+	{
+		return new dyvil.collection.range.halfopen.$type$Range(from, toExclusive);
+	}
+
+	@Override
+	$type$Range asClosed();
+
+	@Override
+	$type$Range asHalfOpen();
+
+	boolean contains($primitive$ value);
+
+	@Override
+	default boolean contains(Object value)
+	{
+		return value instanceof Number && this.contains(((Number) value).$primitive$Value());
+	}
+
+	@Override
+	default $wrapper$[] toArray()
+	{
+		final $wrapper$[] result = new $wrapper$[this.size()];
+		this.toArray(0, result);
+		return result;
+	}
+
+	$primitive$[] to$type$Array();
+
+	@Override
+	$type$Range copy();
+}

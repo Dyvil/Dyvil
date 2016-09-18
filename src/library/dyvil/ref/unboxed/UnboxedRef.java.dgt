@@ -1,0 +1,29 @@
+// $genNotice$
+// Timestamp: $timeStamp$
+
+package dyvil.ref.unboxed;
+
+import dyvil.ref.$type$Ref;
+import dyvil.ref.ObjectRef;
+
+public class Unboxed$type$Ref implements $type$Ref
+{
+	private final ObjectRef<$wrapper$> objectRef;
+
+	public Unboxed$type$Ref(ObjectRef<$wrapper$> objectRef)
+	{
+		this.objectRef = objectRef;
+	}
+
+	@Override
+	public $primitive$ get()
+	{
+		return this.objectRef.get();
+	}
+
+	@Override
+	public void set($primitive$ value)
+	{
+		this.objectRef.set(value);
+	}
+}

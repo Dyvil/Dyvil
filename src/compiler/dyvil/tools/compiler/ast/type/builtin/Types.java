@@ -6,9 +6,11 @@ import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.dynamic.DynamicType;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
@@ -21,7 +23,8 @@ import dyvil.tools.parsing.Name;
 
 public final class Types
 {
-	public static IDyvilHeader LANG_HEADER;
+	public static IHeaderUnit LANG_HEADER;
+	public static IContext    BASE_CONTEXT;
 
 	public static final PrimitiveType VOID    = new PrimitiveType(Names._void, PrimitiveType.VOID_CODE, 'V',
 	                                                              Opcodes.ILOAD + Opcodes.RETURN - Opcodes.IRETURN,
@@ -83,6 +86,7 @@ public final class Types
 	public static IClass MUTABLE_CLASS;
 	public static IClass IMMUTABLE_CLASS;
 	public static IClass REIFIED_CLASS;
+	public static IClass OVERLOADPRIORITY_CLASS;
 
 	public static IClass LITERALCONVERTIBLE_CLASS;
 	public static IClass FROMBOOLEAN_CLASS;
@@ -98,6 +102,7 @@ public final class Types
 	public static void initHeaders()
 	{
 		LANG_HEADER = Package.dyvil.resolveHeader("Lang");
+		BASE_CONTEXT = LANG_HEADER.getContext();
 	}
 
 	public static void initTypes()
@@ -128,6 +133,7 @@ public final class Types
 		MUTABLE_CLASS = Package.dyvilAnnotation.resolveClass("Mutable");
 		IMMUTABLE_CLASS = Package.dyvilAnnotation.resolveClass("Immutable");
 		REIFIED_CLASS = Package.dyvilAnnotation.resolveClass("Reified");
+		OVERLOADPRIORITY_CLASS = Package.dyvilAnnotation.resolveClass("OverloadPriority");
 
 		LITERALCONVERTIBLE_CLASS = Package.dyvilLang.resolveClass("LiteralConvertible");
 		FROMINT_CLASS = LITERALCONVERTIBLE_CLASS.resolveClass(Name.fromRaw("FromInt"));
@@ -197,6 +203,15 @@ public final class Types
 			return OBJECT_ARRAY_CLASS = Package.dyvilArray.resolveClass("ObjectArray");
 		}
 		return OBJECT_ARRAY_CLASS;
+	}
+
+	public static int getTypeMatch(IType superType, IType subType)
+	{
+		if (Types.isSameType(superType, subType))
+		{
+			return IValue.EXACT_MATCH;
+		}
+		return Types.isSuperType(superType, subType) ? IValue.SUBTYPE_MATCH :IValue. MISMATCH;
 	}
 
 	public static boolean isSameClass(IType type1, IType type2)

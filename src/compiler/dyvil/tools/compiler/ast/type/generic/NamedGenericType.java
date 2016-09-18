@@ -134,7 +134,7 @@ public class NamedGenericType extends GenericType
 			return type;
 		}
 
-		type = this.resolveTopLevelWith(markers, Types.LANG_HEADER);
+		type = this.resolveTopLevelWith(markers, Types.BASE_CONTEXT);
 		if (type != null)
 		{
 			return type;
@@ -156,7 +156,7 @@ public class NamedGenericType extends GenericType
 		final IClass theClass = context.resolveClass(this.name);
 		if (theClass != null)
 		{
-			final IType classType = theClass.getType();
+			final IType classType = theClass.getThisType();
 			return this.checkCount(markers, theClass, "class", classType);
 		}
 
@@ -182,7 +182,7 @@ public class NamedGenericType extends GenericType
 		final IClass theClass = this.parent.resolveClass(this.name);
 		if (theClass != null)
 		{
-			final IType classType = theClass.getType();
+			final IType classType = theClass.getThisType();
 			return this.checkCount(markers, theClass, "class", classType);
 		}
 
@@ -284,10 +284,8 @@ public class NamedGenericType extends GenericType
 	}
 
 	@Override
-	public GenericType clone()
+	protected GenericType copyName()
 	{
-		NamedGenericType copy = new NamedGenericType(this.position, this.name);
-		this.copyTypeArguments(copy);
-		return copy;
+		return new NamedGenericType(this.position, this.name);
 	}
 }

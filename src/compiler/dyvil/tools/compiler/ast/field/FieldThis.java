@@ -50,7 +50,7 @@ public class FieldThis implements IAccessible
 	@Override
 	public IType getType()
 	{
-		return this.theClass.getType();
+		return this.theClass.getThisType();
 	}
 	
 	public void writeField(ClassWriter writer)

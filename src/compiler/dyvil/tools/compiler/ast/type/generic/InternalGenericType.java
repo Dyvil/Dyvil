@@ -158,10 +158,8 @@ public class InternalGenericType extends GenericType
 	}
 
 	@Override
-	public GenericType clone()
+	protected GenericType copyName()
 	{
-		InternalGenericType copy = new InternalGenericType(this.internalName);
-		this.copyTypeArguments(copy);
-		return copy;
+		return new InternalGenericType(this.internalName);
 	}
 }

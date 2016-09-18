@@ -4,7 +4,9 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.TypeParameter;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
+import dyvil.tools.compiler.ast.header.ISourceHeader;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -28,7 +30,9 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	protected int              typeVariableCount;
 
 	// Metadata
+	protected IHeaderUnit   enclosingHeader;
 	protected ICodePosition position;
+	protected boolean       resolved;
 
 	public TypeAlias()
 	{
@@ -50,41 +54,98 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 		this.name = name;
 		this.type = type;
 	}
-	
+
+	@Override
+	public IHeaderUnit getEnclosingHeader()
+	{
+		return this.enclosingHeader;
+	}
+
+	@Override
+	public void setEnclosingHeader(IHeaderUnit enclosingHeader)
+	{
+		this.enclosingHeader = enclosingHeader;
+	}
+
 	@Override
 	public ICodePosition getPosition()
 	{
 		return this.position;
 	}
-	
+
 	@Override
 	public void setPosition(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
-	@Override
-	public void setName(Name name)
-	{
-		this.name = name;
-	}
-	
+
 	@Override
 	public Name getName()
 	{
 		return this.name;
 	}
-	
+
+	@Override
+	public void setName(Name name)
+	{
+		this.name = name;
+	}
+
+	@Override
+	public IType getType()
+	{
+		this.ensureResolved();
+		return this.type;
+	}
+
 	@Override
 	public void setType(IType type)
 	{
 		this.type = type;
 	}
-	
+
 	@Override
-	public IType getType()
+	public boolean isTypeParametric()
 	{
-		return this.type;
+		return this.typeVariables != null;
+	}
+
+	@Override
+	public void setTypeParametric()
+	{
+		this.typeVariables = new ITypeParameter[2];
+	}
+
+	@Override
+	public int typeParameterCount()
+	{
+		return this.typeVariableCount;
+	}
+
+	@Override
+	public ITypeParameter[] getTypeParameters()
+	{
+		return this.typeVariables;
+	}
+
+	@Override
+	public void setTypeParameters(ITypeParameter[] typeParameters, int count)
+	{
+		this.typeVariables = typeParameters;
+		this.typeVariableCount = count;
+	}
+
+	@Override
+	public ITypeParameter getTypeParameter(int index)
+	{
+		return this.typeVariables[index];
+	}
+
+	@Override
+	public void setTypeParameter(int index, ITypeParameter typeParameter)
+	{
+		typeParameter.setIndex(index);
+		this.typeVariables[index] = typeParameter;
 	}
 
 	@Override
@@ -112,50 +173,6 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	}
 
 	@Override
-	public int typeParameterCount()
-	{
-		return this.typeVariableCount;
-	}
-
-	@Override
-	public ITypeParameter getTypeParameter(int index)
-	{
-		return this.typeVariables[index];
-	}
-
-	@Override
-	public ITypeParameter[] getTypeParameters()
-	{
-		return this.typeVariables;
-	}
-
-	@Override
-	public boolean isTypeParametric()
-	{
-		return this.typeVariables != null;
-	}
-
-	@Override
-	public void setTypeParametric()
-	{
-		this.typeVariables = new ITypeParameter[2];
-	}
-
-	@Override
-	public void setTypeParameter(int index, ITypeParameter typeParameter)
-	{
-		typeParameter.setIndex(index);
-		this.typeVariables[index] = typeParameter;
-	}
-
-	@Override
-	public void setTypeParameters(ITypeParameter[] typeParameters, int count)
-	{
-		this.typeVariables = typeParameters;
-		this.typeVariableCount = count;
-	}
-
-	@Override
 	public ITypeParameter resolveTypeParameter(Name name)
 	{
 		for (int i = 0; i < this.typeVariableCount; i++)
@@ -168,6 +185,20 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 		}
 
 		return null;
+	}
+
+	private void ensureResolved()
+	{
+		if (this.resolved)
+		{
+			return;
+		}
+		this.resolved = true;
+
+		final MarkerList markers = this.enclosingHeader instanceof ISourceHeader ?
+			                           ((ISourceHeader) this.enclosingHeader).getMarkers() :
+			                           null;
+		this.resolveTypes(markers, this.enclosingHeader.getContext());
 	}
 
 	@Override
@@ -190,7 +221,7 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 
 		context.pop();
 	}
-	
+
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
@@ -205,7 +236,7 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 
 		context.pop();
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
@@ -220,7 +251,7 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 
 		context.pop();
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
@@ -235,7 +266,7 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 
 		context.pop();
 	}
-	
+
 	@Override
 	public void foldConstants()
 	{
@@ -246,7 +277,7 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 			this.typeVariables[i].foldConstants();
 		}
 	}
-	
+
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
@@ -261,7 +292,7 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 
 		context.pop();
 	}
-	
+
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
@@ -275,7 +306,7 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 			this.typeVariables[i].write(out);
 		}
 	}
-	
+
 	@Override
 	public void read(DataInput in) throws IOException
 	{
@@ -292,13 +323,13 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 			this.typeVariables[i] = typeVariable;
 		}
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return IASTNode.toString(this);
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

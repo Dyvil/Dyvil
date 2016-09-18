@@ -28,8 +28,8 @@ import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
@@ -102,8 +102,7 @@ public final class ExternalClass extends AbstractClass
 		this.resolved |= GENERICS;
 		if (this.typeParameterCount <= 0)
 		{
-			this.thisType = new ClassType(this);
-
+			this.thisType = this.getClassType();
 			return;
 		}
 
@@ -183,24 +182,14 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public IDyvilHeader getHeader()
+	public IHeaderUnit getHeader()
 	{
 		return null;
 	}
 
 	@Override
-	public void setHeader(IDyvilHeader unit)
+	public void setHeader(IHeaderUnit unit)
 	{
-	}
-
-	@Override
-	public IType getType()
-	{
-		if ((this.resolved & GENERICS) == 0)
-		{
-			this.resolveGenerics();
-		}
-		return this.thisType;
 	}
 
 	@Override
@@ -211,6 +200,16 @@ public final class ExternalClass extends AbstractClass
 			this.resolveGenerics();
 		}
 		return this;
+	}
+
+	@Override
+	public IType getThisType()
+	{
+		if ((this.resolved & GENERICS) == 0)
+		{
+			this.resolveGenerics();
+		}
+		return this.thisType;
 	}
 
 	@Override

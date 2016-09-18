@@ -3,10 +3,11 @@ package dyvil.tools.compiler.ast.expression;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.access.ClassAccess;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.MapType;
@@ -14,11 +15,18 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.TypeChecker;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public class MapExpr implements IValue
 {
+	public static final class LazyTypes
+	{
+		public static final IClass MAP_CONVERTIBLE_CLASS = dyvil.tools.compiler.ast.type.builtin.Types.LITERALCONVERTIBLE_CLASS
+			                                                   .resolveClass(Name.fromRaw("FromMap"));
+	}
+
 	private static final TypeChecker.MarkerSupplier KEY_MARKER_SUPPLIER   = TypeChecker.markerSupplier(
 		"map.key.type.incompatible", "map.key.type.expected", "map.key.type.actual");
 	private static final TypeChecker.MarkerSupplier VALUE_MARKER_SUPPLIER = TypeChecker.markerSupplier(
@@ -148,7 +156,7 @@ public class MapExpr implements IValue
 	{
 		if (!MapType.MapTypes.MAP_CLASS.isSubClassOf(mapType))
 		{
-			IAnnotation annotation = mapType.getTheClass().getAnnotation(MapType.MapTypes.MAP_CONVERTIBLE_CLASS);
+			IAnnotation annotation = mapType.getTheClass().getAnnotation(LazyTypes.MAP_CONVERTIBLE_CLASS);
 			if (annotation != null)
 			{
 				ArgumentList arguments = new ArgumentList(new IValue[] { new ArrayExpr(this.keys, this.count),
@@ -202,7 +210,7 @@ public class MapExpr implements IValue
 
 	private boolean isConvertibleFrom(IType type)
 	{
-		return type.getAnnotation(MapType.MapTypes.MAP_CONVERTIBLE_CLASS) != null;
+		return type.getAnnotation(LazyTypes.MAP_CONVERTIBLE_CLASS) != null;
 	}
 
 	@Override

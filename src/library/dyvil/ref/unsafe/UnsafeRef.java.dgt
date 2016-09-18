@@ -1,0 +1,45 @@
+// $genNotice$
+// Timestamp: $timeStamp$
+
+package dyvil.ref.unsafe;
+
+import dyvil.ref.$type$Ref;
+import dyvil.reflect.ReflectUtils;
+
+import java.lang.reflect.Field;
+
+public final class Unsafe$type$Ref implements $type$Ref
+{
+	private final Object base;
+	private final long   offset;
+
+	public Unsafe$type$Ref(Field staticField)
+	{
+		this.base = ReflectUtils.UNSAFE.staticFieldBase(staticField);
+		this.offset = ReflectUtils.UNSAFE.staticFieldOffset(staticField);
+	}
+
+	public Unsafe$type$Ref(Object instance, Field field)
+	{
+		this.base = instance;
+		this.offset = ReflectUtils.UNSAFE.objectFieldOffset(field);
+	}
+
+	public Unsafe$type$Ref(Object base, long offset)
+	{
+		this.base = base;
+		this.offset = offset;
+	}
+
+	@Override
+	public $primitive$ get()
+	{
+		return ReflectUtils.UNSAFE.get$type$(this.base, this.offset);
+	}
+
+	@Override
+	public void set($primitive$ value)
+	{
+		ReflectUtils.UNSAFE.put$type$(this.base, this.offset, value);
+	}
+}

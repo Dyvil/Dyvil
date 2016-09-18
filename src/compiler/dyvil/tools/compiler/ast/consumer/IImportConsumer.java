@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.consumer;
 
-import dyvil.tools.compiler.ast.header.IImport;
+import dyvil.tools.compiler.ast.imports.IImport;
 
 public interface IImportConsumer
 {

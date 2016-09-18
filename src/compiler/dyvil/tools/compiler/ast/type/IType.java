@@ -17,7 +17,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvil.tools.compiler.ast.type.builtin.ResolvedTypeDelegate;
@@ -96,7 +96,6 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	int LAMBDA = 33;
 
 	int ARRAY = 34;
-	int LIST  = 35;
 	int MAP   = 37;
 
 	int OPTIONAL  = 48;
@@ -498,9 +497,6 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 			break;
 		case ARRAY:
 			type = new ArrayType();
-			break;
-		case LIST:
-			type = new ListType();
 			break;
 		case MAP:
 			type = new MapType();

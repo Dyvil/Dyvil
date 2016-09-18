@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.operator.IOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
@@ -32,7 +32,7 @@ public interface IStaticContext extends IContext
 	}
 
 	@Override
-	IDyvilHeader getHeader();
+	IHeaderUnit getHeader();
 	
 	@Override
 	default IClass getThisClass()
@@ -48,7 +48,10 @@ public interface IStaticContext extends IContext
 
 	@Override
 	Package resolvePackage(Name name);
-	
+
+	@Override
+	IHeaderUnit resolveHeader(Name name);
+
 	@Override
 	IClass resolveClass(Name name);
 	

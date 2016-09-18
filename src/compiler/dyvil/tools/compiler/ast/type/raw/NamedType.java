@@ -168,7 +168,7 @@ public class NamedType implements IRawType, ITypeConsumer
 			return type;
 		}
 
-		type = this.resolveTopLevelWith(markers, Types.LANG_HEADER);
+		type = this.resolveTopLevelWith(markers, Types.BASE_CONTEXT);
 		if (type != null)
 		{
 			return type;

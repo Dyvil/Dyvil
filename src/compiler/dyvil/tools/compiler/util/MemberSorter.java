@@ -40,6 +40,10 @@ public class MemberSorter
 
 	public static int compareTypes(IType type1, IType type2)
 	{
+		// TODO implement a faster alternative to avoid useless type copying
+		type1 = type1.asParameterType();
+		type2 = type2.asParameterType();
+
 		if (Types.isSuperType(type1, type2))
 		{
 			if (Types.isSuperType(type2, type1))

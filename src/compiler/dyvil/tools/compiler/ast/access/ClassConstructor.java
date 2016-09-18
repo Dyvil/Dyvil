@@ -8,8 +8,8 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -102,7 +102,7 @@ public class ClassConstructor extends ConstructorCall
 		this.nestedClass.setConstructor(this.constructor);
 		this.nestedClass.setEnclosingClass(enclosingClass);
 
-		final IDyvilHeader header = enclosingClass.getHeader();
+		final IHeaderUnit header = enclosingClass.getHeader();
 		assert header != null;
 
 		this.nestedClass.setHeader(header);

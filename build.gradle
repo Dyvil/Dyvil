@@ -5,6 +5,8 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'application'
 
+import groovy.transform.Field
+
 // ---------------------------------------- Main Settings ----------------------------------------
 
 group = 'dyvil-team'
@@ -18,12 +20,14 @@ String dpfVersion = '0.6.2'
 
 boolean nightly = false
 
-String replMainClass = 'dyvil.tools.repl.Main'
-String compilerMainClass = 'dyvil.tools.compiler.Main'
+@Field static final String replMainClass = 'dyvil.tools.repl.Main'
+@Field static final String compilerMainClass = 'dyvil.tools.compiler.Main'
+@Field static final String genSrcMainClass = 'dyvil.tools.gensrc.GenSources'
 
-List<String> dyvilFilters = [ '**/*.dyv', '**/*.dyh', '**/*.dyvil', '**/*.dyvilh' ]
-List<String> javaFilters = [ '**/*.java' ]
-List<String> resourceFilters = [ '**/*.dyo', '**/*.class', '**/*.properties' ]
+@Field static final List<String> dyvilFilters = [ '**/*.dyv', '**/*.dyh', '**/*.dyvil', '**/*.dyvilh' ]
+@Field static final List<String> javaFilters = [ '**/*.java' ]
+@Field static final List<String> genSrcFilters = [ '**/*.dgt', '**/*.dgs' ]
+@Field static final List<String> resourceFilters = [ '**/*.dyo', '**/*.class', '**/*.properties' ]
 
 // ---------------------------------------- Nightly Versioning ----------------------------------------
 
@@ -33,13 +37,13 @@ String droneBuild = env['DRONE_BUILD_NUMBER']
 if (droneBuild)
 {
 	String snapshot = "+nightly." + droneBuild
-
+	
 	version += snapshot
 	libraryVersion += snapshot
 	compilerVersion += snapshot
 	replVersion += snapshot
 	dpfVersion += snapshot
-
+	
 	nightly = true
 }
 
@@ -52,48 +56,56 @@ sourceSets {
 			srcDir 'src/library'
 			srcDir 'src/asm'
 			srcDir 'src/parsing'
+			srcDir "$buildDir/gensrc/library"
 		}
+		
 		resources {
 			srcDir 'src/library'
 			srcDir 'src/parsing'
-
+			
 			include resourceFilters
 		}
 	}
-
+	
 	dpf {
 		java {
 			srcDir 'src/dpf'
 		}
 		resources {
 			srcDir 'src/dpf'
-
+			
 			include resourceFilters
 		}
 	}
-
+	
 	compiler {
 		java {
 			srcDir 'src/compiler'
 		}
 		resources {
 			srcDir 'src/compiler'
-
+			
 			include resourceFilters
 		}
 	}
-
+	
 	repl {
 		java {
 			srcDir 'src/repl'
 		}
 		resources {
 			srcDir 'src/repl'
-
+			
 			include resourceFilters
 		}
 	}
-
+	
+	gensrc {
+		java {
+			srcDir 'src/gensrc'
+		}
+	}
+	
 	test {
 		java {
 			srcDir 'src/test'
@@ -114,7 +126,7 @@ repositories {
 
 dependencies {
 	// Runtime Dependencies (Resources)
-
+	
 	def libraryFiles = files("$buildDir/dyvilbin") {
 		builtBy 'compileLibraryDyvil'
 	}
@@ -124,17 +136,17 @@ dependencies {
 	def testFiles = files("$buildDir/dyviltestbin") {
 		builtBy 'compileTestDyvil'
 	}
-
+	
 	libraryRuntime libraryFiles
-
+	
 	compilerCompile sourceSets.library.output
-
+	
 	dpfCompile sourceSets.library.output
 	dpfRuntime dpfFiles
-
+	
 	replCompile sourceSets.library.output, sourceSets.compiler.output
 	replRuntime libraryFiles, dpfFiles, testFiles
-
+	
 	testCompile 'junit:junit:4.12', sourceSets.library.output
 	testRuntime libraryFiles, dpfFiles, testFiles
 }
@@ -143,11 +155,12 @@ dependencies {
 
 // Library
 
-task copyLibraryJava(type: Sync) {
+task copyLibraryJava(type: Sync, dependsOn: 'genLibrary') {
 	from sourceSets.library.java
-	into "${ buildDir }/src/java/library"
+	into "$buildDir/src/java/library"
 	
 	include javaFilters
+	includeEmptyDirs = false
 }
 
 compileLibraryJava.dependsOn copyLibraryJava
@@ -157,8 +170,8 @@ task copyLibraryDyvil(type: Sync) {
 	from 'src/library'
 	into "$buildDir/src/dyvil/library"
 	
-	includeEmptyDirs = false
 	include dyvilFilters
+	includeEmptyDirs = false
 }
 
 // Compiler
@@ -168,8 +181,8 @@ task copyCompilerJava(type: Sync) {
 	into "$buildDir/src/java/compiler"
 	
 	include javaFilters
-
 	includeEmptyDirs = false
+	
 	filter {
 		it.replace('$$version$$', version)
 				.replace('$$libraryVersion$$', libraryVersion)
@@ -185,10 +198,10 @@ compileCompilerJava.source = "$buildDir/src/java/compiler"
 task copyReplJava(type: Sync) {
 	from sourceSets.repl.java
 	into "$buildDir/src/java/repl"
-
-	includeEmptyDirs = false
+	
 	include javaFilters
-
+	includeEmptyDirs = false
+	
 	filter {
 		it.replace('$$replVersion$$', replVersion)
 	}
@@ -202,7 +215,7 @@ compileReplJava.source = "$buildDir/src/java/repl"
 task copyDpfJava(type: Sync) {
 	from sourceSets.dpf.java
 	into "$buildDir/src/java/dpf"
-
+	
 	includeEmptyDirs = false
 	include javaFilters
 }
@@ -213,7 +226,7 @@ compileDpfJava.source = "$buildDir/src/java/dpf"
 task copyDPFDyvil(type: Sync) {
 	from 'src/dpf'
 	into "$buildDir/src/dyvil/dpf"
-
+	
 	includeEmptyDirs = false
 	include dyvilFilters
 }
@@ -223,12 +236,23 @@ task copyDPFDyvil(type: Sync) {
 task copyTestDyvil(type: Sync) {
 	from 'src/test'
 	into "$buildDir/src/dyvil/test"
-
+	
 	includeEmptyDirs = false
 	include dyvilFilters
 }
 
 // ---------------------------------------- Compilation Tasks ----------------------------------------
+
+tasks.withType(JavaCompile) {
+	options.compilerArgs.addAll(
+			'-parameters',          // generates parameter attributes and names
+			'-XDignore.symbol.file' // disables "proprietary API" warnings
+	)
+}
+
+task genLibrary(type: JavaExec, dependsOn: [ gensrcClasses ]) { JavaExec exec ->
+	runGenSrc exec, 'src/library/', "$buildDir/gensrc/library/"
+}
 
 /**
  * Compiles the Dyvil Classes and Headers in the Dyvil Library by running the freshly-compiled compiler
@@ -248,18 +272,35 @@ task compileTestDyvil(type: JavaExec, dependsOn: [ 'compileDPFDyvil', 'copyTestD
 private void runCompiler(JavaExec exec, String config, String src, String bin)
 {
 	// Required to make UP-TO-DATE work
-	exec.outputs.upToDateSpec = new AndSpec<>()
-
+	
 	// All Dyvil Class and Header files
-	exec.inputs.dir src
+	exec.inputs.files.add fileTree(src) {
+		include dyvilFilters
+	}
+	
 	// All possible Output Files (.class, .dyo)
 	exec.outputs.dir bin
-
-	exec.main = 'dyvil.tools.compiler.Main'
+	exec.outputs.upToDateSpec = new AndSpec<>()
+	
+	exec.main = compilerMainClass
 	exec.classpath = sourceSets.compiler.runtimeClasspath
 	exec.args = [ "@$config", 'compile' ]
-
+	
 	if (System.console() != null) exec.args += "--ansi";
+}
+
+private void runGenSrc(JavaExec exec, String src, String dest)
+{
+	exec.inputs.files.add fileTree(src) {
+		include genSrcFilters
+	}
+	
+	exec.outputs.dir dest
+	exec.outputs.upToDateSpec = new AndSpec<>()
+	
+	exec.main = genSrcMainClass
+	exec.classpath = sourceSets.gensrc.runtimeClasspath
+	exec.args = [ "source=$src", "target=$dest" ]
 }
 
 // ---------------------------------------- Test Tasks ----------------------------------------
@@ -279,7 +320,7 @@ test.dependsOn 'testDyvil'
 task buildLibrary(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil' ]) {
 	from sourceSets.main.resources
 	from sourceSets.library.output
-
+	
 	from("$buildDir/dyvilbin") {
 		include resourceFilters
 	}
@@ -289,7 +330,7 @@ task buildLibrary(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil
 
 task buildDPF(type: Jar, dependsOn: [ 'dpfClasses', 'compileDPFDyvil' ]) {
 	from sourceSets.dpf.output
-
+	
 	from("$buildDir/dpfbin") {
 		include resourceFilters
 	}
@@ -331,14 +372,14 @@ task buildAll(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil', '
 	from sourceSets.compiler.resources
 	from sourceSets.repl.output
 	from sourceSets.dpf.output
-
+	
 	from("$buildDir/dyvilbin") {
 		include resourceFilters
 	}
 	from("$buildDir/dpfbin") {
 		include resourceFilters
 	}
-
+	
 	archiveName = "dyvil-${ version }.jar"
 	
 	manifest.attributes.put("Main-Class", replMainClass)
@@ -350,7 +391,7 @@ build.setDependsOn([ 'buildAll', 'buildLibrary', 'buildCompiler', 'buildREPL', '
 
 task prepareRelease(type: Copy) {
 	outputs.upToDateWhen { return false }
-
+	
 	from 'versions/'
 	
 	if (nightly)
@@ -365,13 +406,6 @@ task prepareRelease(type: Copy) {
 		include 'template.dyp'
 		rename 'template\\.dyp', "v${ version }.dyp"
 	}
-
-	println("Release v$version")
-	println()
-	println("Dyvil Library v$libraryVersion")
-	println("Dyvil Compiler v$compilerVersion")
-	println("Dyvil REPL v$replVersion")
-	println("Dyvil Property Format v$dpfVersion")
 	
 	filter {
 		it.replace('$$version$$', version)
@@ -379,6 +413,15 @@ task prepareRelease(type: Copy) {
 				.replace('$$compilerVersion$$', compilerVersion)
 				.replace('$$replVersion$$', replVersion)
 				.replace('$$dpfVersion$$', dpfVersion)
+	}
+	
+	doLast {
+		println("Release v$version")
+		println()
+		println("Dyvil Library v$libraryVersion")
+		println("Dyvil Compiler v$compilerVersion")
+		println("Dyvil REPL v$replVersion")
+		println("Dyvil Property Format v$dpfVersion")
 	}
 }
 
@@ -400,19 +443,23 @@ task wrapper(type: Wrapper) {
  * Re-create the build/dyvilbin directory after cleaning to avoid Eclipse Build Path errors
  */
 clean.doLast {
-	file('build/dyvilbin').mkdirs()
-	file('build/dpfbin').mkdirs()
+	file("$buildDir/dyvilbin").mkdirs()
+	file("$buildDir/dpfbin").mkdirs()
+	file("$buildDir/gensrc").mkdirs()
 }
 
 /**
  * Removes temporary folders from the build dir, leaving only the 'build/libs' folder.
  */
 task cleanTemps(type: Delete) {
-	delete file("${ buildDir }/src/")
-	delete file("${ buildDir }/classes/")
-	delete file("${ buildDir }/dependency-cache/")
-	delete file("${ buildDir }/tmp/")
-	delete file("${ buildDir }/resources/")
+	delete file("$buildDir/src/")
+	delete file("$buildDir/classes/")
+	delete file("$buildDir/dependency-cache/")
+	delete file("$buildDir/tmp/")
+	delete file("$buildDir/resources/")
+	
+	// Delete contents, but not the directory itself
 	delete fileTree("$buildDir/dyvilbin")
 	delete fileTree("$buildDir/dpfbin")
+	delete fileTree("$buildDir/gensrc")
 }
