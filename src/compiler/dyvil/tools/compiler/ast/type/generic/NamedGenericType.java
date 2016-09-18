@@ -46,6 +46,13 @@ public class NamedGenericType extends GenericType
 		this.parent = parent;
 	}
 
+	public NamedGenericType(ICodePosition position, Name name, IType[] typeArguments, int typeArgumentCount)
+	{
+		super(typeArguments, typeArgumentCount);
+		this.position = position;
+		this.name = name;
+	}
+
 	@Override
 	public int typeTag()
 	{
