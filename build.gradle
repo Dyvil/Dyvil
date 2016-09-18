@@ -11,12 +11,12 @@ import groovy.transform.Field
 
 group = 'dyvil-team'
 
-version = '0.24.0'
+version = '0.25.0'
 
-String libraryVersion = '0.24.0'
-String compilerVersion = '0.24.0'
-String replVersion = '0.16.1'
-String dpfVersion = '0.6.2'
+String libraryVersion = '0.25.0'
+String compilerVersion = '0.25.0'
+String replVersion = '0.16.2'
+String dpfVersion = '0.6.3'
 
 boolean nightly = false
 
