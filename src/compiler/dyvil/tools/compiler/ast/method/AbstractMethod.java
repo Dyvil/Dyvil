@@ -65,8 +65,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	                                                             "dyvil/runtime/DynamicLinker", "linkClassMethod",
 	                                                             ClassFormat.BSM_HEAD + ClassFormat.BSM_TAIL);
 
-	protected static final String NAME_SEPARATOR = "_$_";
-
 	// --------------------------------------------------
 
 	protected ITypeParameter[] typeParameters;

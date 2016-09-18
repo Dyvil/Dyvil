@@ -46,17 +46,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	public ExternalMethod(IClass enclosingClass, String name, String desc, String signature, ModifierSet modifiers)
 	{
 		super(enclosingClass, null, null, modifiers);
-
-		final int index = name.indexOf(NAME_SEPARATOR);
-		if (index >= 0)
-		{
-			this.name = Name.fromQualified(name.substring(0, index));
-		}
-		else
-		{
-			this.name = Name.fromQualified(name);
-		}
-
+		this.name = Name.fromQualified(name);
 		this.internalName = name;
 		this.signature = signature;
 		this.descriptor = desc;
@@ -170,7 +160,8 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	public IParameter createParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public IParameter createParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers,
+		                                 AnnotationList annotations)
 	{
 		return new ExternalParameter(name, type, modifiers, annotations);
 	}
@@ -219,7 +210,8 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue receiver, IArguments arguments, GenericData genericData)
+	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue receiver,
+		                            IArguments arguments, GenericData genericData)
 	{
 		if ((this.resolved & ANNOTATIONS) == 0)
 		{
@@ -294,8 +286,8 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, IType targetType, int lineNumber)
-		throws BytecodeException
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext,
+		                     IType targetType, int lineNumber) throws BytecodeException
 	{
 		if ((this.resolved & ANNOTATIONS) == 0)
 		{
@@ -305,8 +297,8 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
-		throws BytecodeException
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments,
+		                     ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
 		if ((this.resolved & ANNOTATIONS) == 0)
 		{
@@ -316,8 +308,8 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
-		throws BytecodeException
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments,
+		                        ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
 		if ((this.resolved & ANNOTATIONS) == 0)
 		{
