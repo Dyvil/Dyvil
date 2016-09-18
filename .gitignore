@@ -3,7 +3,6 @@
 .settings/
 .idea/
 temp/
-gen/
 *bin/
 build/
 .gradle/

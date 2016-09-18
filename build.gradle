@@ -56,7 +56,7 @@ sourceSets {
 			srcDir 'src/library'
 			srcDir 'src/asm'
 			srcDir 'src/parsing'
-			srcDir 'gen/library'
+			srcDir "$buildDir/gensrc/library"
 		}
 		
 		resources {
@@ -157,9 +157,10 @@ dependencies {
 
 task copyLibraryJava(type: Sync, dependsOn: 'genLibrary') {
 	from sourceSets.library.java
-	into "${ buildDir }/src/java/library"
+	into "$buildDir/src/java/library"
 	
 	include javaFilters
+	includeEmptyDirs = false
 }
 
 compileLibraryJava.dependsOn copyLibraryJava
@@ -169,8 +170,8 @@ task copyLibraryDyvil(type: Sync) {
 	from 'src/library'
 	into "$buildDir/src/dyvil/library"
 	
-	includeEmptyDirs = false
 	include dyvilFilters
+	includeEmptyDirs = false
 }
 
 // Compiler
@@ -180,8 +181,8 @@ task copyCompilerJava(type: Sync) {
 	into "$buildDir/src/java/compiler"
 	
 	include javaFilters
-	
 	includeEmptyDirs = false
+	
 	filter {
 		it.replace('$$version$$', version)
 				.replace('$$libraryVersion$$', libraryVersion)
@@ -198,8 +199,8 @@ task copyReplJava(type: Sync) {
 	from sourceSets.repl.java
 	into "$buildDir/src/java/repl"
 	
-	includeEmptyDirs = false
 	include javaFilters
+	includeEmptyDirs = false
 	
 	filter {
 		it.replace('$$replVersion$$', replVersion)
@@ -250,7 +251,7 @@ tasks.withType(JavaCompile) {
 }
 
 task genLibrary(type: JavaExec, dependsOn: [ gensrcClasses ]) { JavaExec exec ->
-	runGenSrc exec, 'src/library/', 'gen/library/'
+	runGenSrc exec, 'src/library/', "$buildDir/gensrc/library/"
 }
 
 /**
@@ -442,8 +443,9 @@ task wrapper(type: Wrapper) {
  * Re-create the build/dyvilbin directory after cleaning to avoid Eclipse Build Path errors
  */
 clean.doLast {
-	file('build/dyvilbin').mkdirs()
-	file('build/dpfbin').mkdirs()
+	file("$buildDir/dyvilbin").mkdirs()
+	file("$buildDir/dpfbin").mkdirs()
+	file("$buildDir/gensrc").mkdirs()
 }
 
 /**
@@ -455,6 +457,9 @@ task cleanTemps(type: Delete) {
 	delete file("$buildDir/dependency-cache/")
 	delete file("$buildDir/tmp/")
 	delete file("$buildDir/resources/")
+	
+	// Delete contents, but not the directory itself
 	delete fileTree("$buildDir/dyvilbin")
 	delete fileTree("$buildDir/dpfbin")
+	delete fileTree("$buildDir/gensrc")
 }
