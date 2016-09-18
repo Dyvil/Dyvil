@@ -6,6 +6,11 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class PrefixType extends NamedGenericType
 {
+	public PrefixType(ICodePosition position, Name name)
+	{
+		super(position, name);
+	}
+
 	public PrefixType(ICodePosition position, Name name, IType rhs)
 	{
 		super(position, name, new IType[] { rhs }, 1);

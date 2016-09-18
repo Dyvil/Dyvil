@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.*;
 import dyvil.tools.compiler.ast.type.generic.GenericType;
 import dyvil.tools.compiler.ast.type.generic.NamedGenericType;
+import dyvil.tools.compiler.ast.type.generic.PrefixType;
 import dyvil.tools.compiler.ast.type.raw.NamedType;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
@@ -39,9 +40,10 @@ public final class TypeParser extends Parser implements ITypeConsumer
 
 	// Flags
 
-	public static final int NAMED_ONLY    = 1;
-	public static final int IGNORE_LAMBDA = 2;
-	public static final int CLOSE_ANGLE   = 4;
+	public static final int NAMED_ONLY      = 1;
+	public static final int IGNORE_LAMBDA   = 2;
+	public static final int CLOSE_ANGLE     = 4;
+	public static final int IGNORE_OPERATOR = 8;
 
 	protected ITypeConsumer consumer;
 
@@ -92,66 +94,8 @@ public final class TypeParser extends Parser implements ITypeConsumer
 		final int type = token.type();
 		switch (this.mode)
 		{
-		case END:
-		{
-			if ((this.flags & NAMED_ONLY) == 0)
-			{
-				if (ParserUtil.isIdentifier(type))
-				{
-					switch (token.stringValue().charAt(0))
-					{
-					case '?':
-						this.type = new OptionType(this.type);
-						pm.splitJump(token, 1);
-						return;
-					case '!':
-						this.type = new ImplicitOptionType(this.type);
-						pm.splitJump(token, 1);
-						return;
-					case '*':
-						this.type = new ReferenceType(this.type);
-						pm.splitJump(token, 1);
-						return;
-					case '^':
-						this.type = new ImplicitReferenceType(this.type);
-						pm.splitJump(token, 1);
-						return;
-					}
-				}
-				else if (type == DyvilSymbols.ARROW_RIGHT && this.parentType == null
-					         && (this.flags & IGNORE_LAMBDA) == 0)
-				{
-					final LambdaType lambdaType = new LambdaType(token.raw(), this.type);
-					this.type = lambdaType;
-					this.mode = LAMBDA_END;
-					pm.pushParser(this.subParser(lambdaType));
-					return;
-				}
-			}
-			switch (type)
-			{
-			case BaseSymbols.DOT:
-				pm.pushParser(new TypeParser(this, this.type, this.flags));
-				return;
-			case BaseSymbols.OPEN_SQUARE_BRACKET:
-				final IToken next = token.next();
-				if (next.type() == BaseSymbols.CLOSE_SQUARE_BRACKET)
-				{
-					this.type = new ArrayType(this.type);
-					pm.report(Markers.syntaxWarning(token.to(next), "type.array.java"));
-					pm.skip();
-					return;
-				}
-			}
-
-			if (this.type != null)
-			{
-				this.consumer.setType(this.type);
-			}
-			pm.popParser(true);
-			return;
-		}
 		case NAME:
+		{
 			if ((this.flags & NAMED_ONLY) == 0)
 			{
 				switch (type)
@@ -213,22 +157,27 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					return;
 				case Tokens.SYMBOL_IDENTIFIER:
 					final Name name = token.nameValue();
-					if (name == Names.plus)
+
+					if (name == Names.plus || name == Names.minus)
 					{
-						final WildcardType wildcardType = new WildcardType(token.raw(), Variance.COVARIANT);
+						// + type
+						// - type
+
+						final WildcardType wildcardType = new WildcardType(token.raw(), name == Names.plus ?
+							                                                                Variance.COVARIANT :
+							                                                                Variance.CONTRAVARIANT);
 						pm.pushParser(this.subParser(wildcardType));
 						this.type = wildcardType;
 						this.mode = END;
 						return;
 					}
-					if (name == Names.minus)
-					{
-						final WildcardType wildcardType = new WildcardType(token.raw(), Variance.CONTRAVARIANT);
-						pm.pushParser(this.subParser(wildcardType));
-						this.type = wildcardType;
-						this.mode = END;
-						return;
-					}
+
+					// SYMBOL_IDENTIFIER type
+					final PrefixType prefixType = new PrefixType(token.raw(), name);
+					pm.pushParser(this.subParser(prefixType).withFlags(IGNORE_OPERATOR | IGNORE_LAMBDA));
+					this.type = prefixType;
+					this.mode = END;
+					return;
 				}
 			}
 
@@ -278,6 +227,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			this.type = new NamedType(token.raw(), name, this.parentType);
 			this.mode = END;
 			return;
+		}
 		case TUPLE_END:
 		{
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
@@ -353,6 +303,65 @@ public final class TypeParser extends Parser implements ITypeConsumer
 		case ANNOTATION_END:
 			this.mode = END;
 			pm.pushParser(this.subParser((ITyped) this.type), true);
+			return;
+		case END:
+		{
+			if ((this.flags & NAMED_ONLY) == 0 && (this.flags & IGNORE_OPERATOR) == 0)
+			{
+				if (ParserUtil.isIdentifier(type))
+				{
+					switch (token.stringValue().charAt(0))
+					{
+					case '?':
+						this.type = new OptionType(this.type);
+						pm.splitJump(token, 1);
+						return;
+					case '!':
+						this.type = new ImplicitOptionType(this.type);
+						pm.splitJump(token, 1);
+						return;
+					case '*':
+						this.type = new ReferenceType(this.type);
+						pm.splitJump(token, 1);
+						return;
+					case '^':
+						this.type = new ImplicitReferenceType(this.type);
+						pm.splitJump(token, 1);
+						return;
+					}
+				}
+				else if (type == DyvilSymbols.ARROW_RIGHT && this.parentType == null
+					         && (this.flags & IGNORE_LAMBDA) == 0)
+				{
+					final LambdaType lambdaType = new LambdaType(token.raw(), this.type);
+					this.type = lambdaType;
+					this.mode = LAMBDA_END;
+					pm.pushParser(this.subParser(lambdaType));
+					return;
+				}
+			}
+			switch (type)
+			{
+			case BaseSymbols.DOT:
+				pm.pushParser(new TypeParser(this, this.type, this.flags));
+				return;
+			case BaseSymbols.OPEN_SQUARE_BRACKET:
+				final IToken next = token.next();
+				if (next.type() == BaseSymbols.CLOSE_SQUARE_BRACKET)
+				{
+					this.type = new ArrayType(this.type);
+					pm.report(Markers.syntaxWarning(token.to(next), "type.array.java"));
+					pm.skip();
+					return;
+				}
+			}
+
+			if (this.type != null)
+			{
+				this.consumer.setType(this.type);
+			}
+			pm.popParser(true);
+		}
 		}
 	}
 
@@ -362,7 +371,8 @@ public final class TypeParser extends Parser implements ITypeConsumer
 	 */
 	public static boolean isGenericStart(IToken token, int type)
 	{
-		switch (type) {
+		switch (type)
+		{
 		case DyvilSymbols.ARROW_LEFT:
 			return true;
 		case Tokens.SYMBOL_IDENTIFIER:
