@@ -14,14 +14,14 @@ public class OperatorTest
 		infix (int, int) apply(int i, int j) = (i, j)
 		postfix func ++(int i): int = i
 
-		int i = 1							 // Canonical Representation:
-		(int, int) j = i -i					 // i.apply(-i)
-		[int] k = [ i - i, i-i, i- i ]		 // i - i
-		[int] l = [ i- -i, i - -i, i - - i ] // i - (-i)
-		[int] m = [ i++ , i++, i ++ ]		 // i++
-		int n = i++ + i						 // (i++) + i
-		int o = i++ + ++ i					 // (i++) + (++i)
-		int p = i++ + + ++ i				 // (i++) + (+ (++i))
+		int i = 1                               // Canonical Representation:
+		[(int, int)] j = [ i -i, i++ i, i++ -i ]// i.apply(-i), (i++).apply(i), (i++).apply(-i)
+		[int] k = [ i - i, i-i ]                // i - i
+		[int] l = [ i - -i, i - - i ]           // i - (-i)
+		[int] m = [ i++ , i++, i ++ ]           // i++
+		int n = i++ + i                         // (i++) + i
+		int o = i++ + ++ i                      // (i++) + (++i)
+		int p = i++ + + ++ i                    // (i++) + (+ (++i))
 
 		// don't care about values, resolution pass is sufficient
 	}
