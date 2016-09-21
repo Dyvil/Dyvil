@@ -3,8 +3,6 @@ package dyvil.tools.compiler.parser.type;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.generic.Variance;
-import dyvil.tools.compiler.ast.reference.ImplicitReferenceType;
-import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Mutability;
@@ -12,13 +10,13 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.*;
 import dyvil.tools.compiler.ast.type.generic.GenericType;
 import dyvil.tools.compiler.ast.type.generic.NamedGenericType;
+import dyvil.tools.compiler.ast.type.generic.PostfixType;
 import dyvil.tools.compiler.ast.type.generic.PrefixType;
 import dyvil.tools.compiler.ast.type.raw.NamedType;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Name;
@@ -26,6 +24,9 @@ import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
+
+import static dyvil.tools.compiler.parser.ParserUtil.isTerminator;
+import static dyvil.tools.compiler.parser.ParserUtil.neighboring;
 
 public final class TypeParser extends Parser implements ITypeConsumer
 {
@@ -186,7 +187,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 
 			if (!ParserUtil.isIdentifier(type))
 			{
-				if (ParserUtil.isTerminator(type))
+				if (isTerminator(type))
 				{
 					pm.popParser(true);
 					return;
@@ -270,6 +271,10 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				return;
 			}
 			return;
+		case ANNOTATION_END:
+			this.mode = END;
+			pm.pushParser(this.subParser((ITyped) this.type), true);
+			return;
 		case GENERICS_END:
 			this.mode = END;
 			if (isGenericEnd(token, type))
@@ -278,55 +283,17 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				return;
 			}
 
-			pm.reparse();
 			pm.report(token, "type.generic.close_angle");
-			return;
-		case ANNOTATION_END:
-			this.mode = END;
-			pm.pushParser(this.subParser((ITyped) this.type), true);
-			return;
+			// Fallthrough
 		case END:
 		{
-			if ((this.flags & NAMED_ONLY) == 0 && (this.flags & IGNORE_OPERATOR) == 0)
-			{
-				if (ParserUtil.isIdentifier(type))
-				{
-					switch (token.stringValue().charAt(0))
-					{
-					case '?':
-						this.type = new OptionType(this.type);
-						pm.splitJump(token, 1);
-						return;
-					case '!':
-						this.type = new ImplicitOptionType(this.type);
-						pm.splitJump(token, 1);
-						return;
-					case '*':
-						this.type = new ReferenceType(this.type);
-						pm.splitJump(token, 1);
-						return;
-					case '^':
-						this.type = new ImplicitReferenceType(this.type);
-						pm.splitJump(token, 1);
-						return;
-					}
-				}
-				else if (type == DyvilSymbols.ARROW_RIGHT && this.parentType == null
-					         && (this.flags & IGNORE_LAMBDA) == 0)
-				{
-					final LambdaType lambdaType = new LambdaType(token.raw(), this.type);
-					this.type = lambdaType;
-					this.mode = LAMBDA_END;
-					pm.pushParser(this.subParser(lambdaType));
-					return;
-				}
-			}
 			switch (type)
 			{
 			case BaseSymbols.DOT:
 				pm.pushParser(new TypeParser(this, this.type, this.flags));
 				return;
 			case BaseSymbols.OPEN_SQUARE_BRACKET:
+			{
 				final IToken next = token.next();
 				if (next.type() == BaseSymbols.CLOSE_SQUARE_BRACKET)
 				{
@@ -335,6 +302,59 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					pm.skip();
 					return;
 				}
+				break;
+			}
+			case Tokens.SYMBOL_IDENTIFIER:
+			{
+				if ((this.flags & NAMED_ONLY) != 0)
+				{
+					break;
+				}
+
+				if ((this.flags & CLOSE_ANGLE) != 0)
+				{
+					final String string = token.stringValue();
+					int index = string.indexOf('>');
+					if (index == 0)
+					{
+						// ... >
+
+						pm.splitJump(token, 1);
+						break;
+					}
+					else if (index > 0)
+					{
+						// ... SYMBOL>
+
+						pm.splitJump(token, index);
+						this.type = new PostfixType(token.raw(), Name.fromUnqualified(string.substring(0, index)),
+						                            this.type);
+						return;
+					}
+				}
+
+				final IToken next = token.next();
+				if (isTerminator(next.type()) || neighboring(token.prev(), token) && !neighboring(token, next))
+				{
+					// type_OPERATOR
+					this.type = new PostfixType(token.raw(), token.nameValue(), this.type);
+					// move stays END
+					return;
+				}
+
+				break;
+			}
+			case DyvilSymbols.ARROW_RIGHT:
+				// all these flags have to be unset
+				if (this.parentType == null && (this.flags & (NAMED_ONLY | IGNORE_OPERATOR | IGNORE_LAMBDA)) == 0)
+				{
+					final LambdaType lambdaType = new LambdaType(token.raw(), this.type);
+					this.type = lambdaType;
+					this.mode = LAMBDA_END;
+					pm.pushParser(this.subParser(lambdaType));
+					return;
+				}
+				break;
 			}
 
 			if (this.type != null)
