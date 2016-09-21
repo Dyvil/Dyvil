@@ -158,25 +158,28 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				case Tokens.SYMBOL_IDENTIFIER:
 					final Name name = token.nameValue();
 
-					if (name == Names.plus || name == Names.minus)
+					final int closeAngleIndex;
+					if ((this.flags & CLOSE_ANGLE) == 0 || (closeAngleIndex = name.unqualified.indexOf('>')) < 0)
 					{
-						// + type
-						// - type
-
-						final WildcardType wildcardType = new WildcardType(token.raw(), name == Names.plus ?
-							                                                                Variance.COVARIANT :
-							                                                                Variance.CONTRAVARIANT);
-						pm.pushParser(this.subParser(wildcardType));
-						this.type = wildcardType;
+						// SYMBOL_IDENTIFIER type
+						final PrefixType prefixType = new PrefixType(token.raw(), name);
+						pm.pushParser(this.subParser(prefixType).withFlags(IGNORE_OPERATOR | IGNORE_LAMBDA));
+						this.type = prefixType;
 						this.mode = END;
 						return;
 					}
+					if (closeAngleIndex == 0)
+					{
+						// Token starts with a >
+						// Handles Type< > gracefully
 
-					// SYMBOL_IDENTIFIER type
-					final PrefixType prefixType = new PrefixType(token.raw(), name);
-					pm.pushParser(this.subParser(prefixType).withFlags(IGNORE_OPERATOR | IGNORE_LAMBDA));
-					this.type = prefixType;
-					this.mode = END;
+						pm.popParser(true);
+						return;
+					}
+
+					// strip the trailing > and reparse the first part of the token
+					// Handles Type<_> gracefully
+					pm.splitReparse(token, closeAngleIndex);
 					return;
 				}
 			}
@@ -193,28 +196,6 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			}
 
 			final Name name = token.nameValue();
-
-			final int closeAngleIndex;
-			if ((this.flags & CLOSE_ANGLE) != 0 && type == Tokens.SYMBOL_IDENTIFIER
-				    && (closeAngleIndex = name.unqualified.indexOf('>')) >= 0)
-			{
-				// Token contains a > and is not backticked
-
-				if (closeAngleIndex == 0)
-				{
-					// Token is a single >
-					// Handles Type< > gracefully
-
-					pm.popParser(true);
-					return;
-				}
-
-				// strip the trailing > and reparse the first part of the token
-				// Handles Type<?> gracefully
-				pm.splitReparse(token, closeAngleIndex);
-				return;
-			}
-
 			final IToken next = token.next();
 
 			if (isGenericStart(next, next.type()))

@@ -55,6 +55,13 @@ public final class WildcardType implements IRawType, ITyped
 		this.variance = variance;
 	}
 
+	public WildcardType(ICodePosition position, IType bound, Variance variance)
+	{
+		this.position = position;
+		this.bound = bound;
+		this.variance = variance;
+	}
+
 	@Override
 	public ICodePosition getPosition()
 	{
