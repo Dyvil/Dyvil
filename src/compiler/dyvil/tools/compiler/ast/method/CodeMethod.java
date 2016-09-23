@@ -711,10 +711,10 @@ public class CodeMethod extends AbstractMethod
 	{
 		if (reifiedType == Reified.Type.TYPE)
 		{
-			thisParameter.getDefaultType().writeTypeExpression(writer);
+			thisParameter.getUpperBound().writeTypeExpression(writer);
 			return;
 		}
-		thisParameter.getDefaultType().writeClassExpression(writer, reifiedType == Reified.Type.OBJECT_CLASS);
+		thisParameter.getUpperBound().writeClassExpression(writer, reifiedType == Reified.Type.OBJECT_CLASS);
 	}
 
 	private boolean needsSignature()

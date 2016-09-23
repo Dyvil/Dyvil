@@ -74,8 +74,8 @@ public interface ITypeAlias extends IASTNode, INamed, ITyped, ITypeParametric, I
 	void cleanup(IContext context, IClassCompilableList compilableList);
 	
 	@Override
-	void write(DataOutput dos) throws IOException;
+	void write(DataOutput out) throws IOException;
 	
 	@Override
-	void read(DataInput dis) throws IOException;
+	void read(DataInput in) throws IOException;
 }

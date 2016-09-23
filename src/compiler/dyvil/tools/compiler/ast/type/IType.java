@@ -428,6 +428,11 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	void writeDefaultValue(MethodWriter writer) throws BytecodeException;
 
+	static IType withAnnotation(IType type, IAnnotation annotation, TypePath typePath)
+	{
+		return withAnnotation(type, annotation, typePath, 0, typePath.getLength());
+	}
+
 	static IType withAnnotation(IType type, IAnnotation annotation, TypePath typePath, int step, int steps)
 	{
 		if (typePath == null || step >= steps)

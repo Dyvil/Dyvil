@@ -37,9 +37,8 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 {
 	private static final int ANNOTATIONS = 1;
 	private static final int RETURN_TYPE = 1 << 1;
-	private static final int GENERICS    = 1 << 2;
-	private static final int PARAMETERS  = 1 << 3;
-	private static final int EXCEPTIONS  = 1 << 4;
+	private static final int PARAMETERS  = 1 << 2;
+	private static final int EXCEPTIONS  = 1 << 3;
 
 	private int resolved;
 
@@ -69,33 +68,12 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 
 	private void resolveReturnType()
 	{
-		if ((this.resolved & GENERICS) == 0)
-		{
-			this.resolveGenerics();
-		}
-
 		this.resolved |= RETURN_TYPE;
 		this.type = this.type.resolveType(null, this.getExternalContext());
 	}
 
-	private void resolveGenerics()
-	{
-		this.resolved |= GENERICS;
-
-		final IContext context = this.getExternalContext();
-		for (int i = 0; i < this.typeParameterCount; i++)
-		{
-			this.typeParameters[i].resolveTypes(null, context);
-		}
-	}
-
 	private void resolveParameters()
 	{
-		if ((this.resolved & GENERICS) == 0)
-		{
-			this.resolveGenerics();
-		}
-
 		final IContext context = this.getExternalContext();
 
 		this.resolved |= PARAMETERS;
@@ -330,7 +308,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		switch (TypeReference.getSort(typeRef))
 		{
 		case TypeReference.METHOD_RETURN:
-			this.type = IType.withAnnotation(this.type, annotation, typePath, 0, typePath.getLength());
+			this.type = IType.withAnnotation(this.type, annotation, typePath);
 			break;
 		case TypeReference.METHOD_TYPE_PARAMETER:
 		{

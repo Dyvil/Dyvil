@@ -6,8 +6,8 @@ import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.external.ExternalConstructor;
 import dyvil.tools.compiler.ast.external.ExternalMethod;
 import dyvil.tools.compiler.ast.external.ExternalParameter;
+import dyvil.tools.compiler.ast.external.ExternalTypeParameter;
 import dyvil.tools.compiler.ast.generic.ITypeParametric;
-import dyvil.tools.compiler.ast.generic.TypeParameter;
 import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.method.IExceptionList;
 import dyvil.tools.compiler.ast.method.IExternalCallableMember;
@@ -371,8 +371,9 @@ public final class ClassFormat
 	private static int readGeneric(String desc, int start, ITypeParametric generic)
 	{
 		int index = desc.indexOf(':', start);
-		Name name = Name.fromRaw(desc.substring(start, index));
-		TypeParameter typeVar = new TypeParameter(generic, name);
+		final Name name = Name.fromRaw(desc.substring(start, index));
+		final ExternalTypeParameter typeVar = new ExternalTypeParameter(generic, name);
+
 		if (desc.charAt(index + 1) == ':')
 		{
 			// name::

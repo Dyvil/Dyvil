@@ -382,6 +382,6 @@ public final class Types
 	public static IType resolveTypeSafely(IType type, ITypeParameter typeVar)
 	{
 		final IType resolved = type.resolveType(typeVar);
-		return resolved != null ? resolved : typeVar.getDefaultType();
+		return resolved != null ? resolved : typeVar.getUpperBound();
 	}
 }

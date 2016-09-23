@@ -144,7 +144,7 @@ public class TypeVarType implements IRawType
 	{
 		return this.typeParameter == typeParameter ?
 			       this :
-			       this.typeParameter.getDefaultType().resolveType(typeParameter);
+			       this.typeParameter.getUpperBound().resolveType(typeParameter);
 	}
 
 	@Override

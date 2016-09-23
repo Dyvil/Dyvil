@@ -4,7 +4,10 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.operator.OperatorElement;
 import dyvil.tools.compiler.ast.operator.OperatorStack;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.compound.IntersectionType;
+import dyvil.tools.compiler.ast.type.compound.UnionType;
 import dyvil.tools.compiler.ast.type.raw.IUnresolvedType;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -17,6 +20,15 @@ public class InfixTypeChain extends OperatorStack<IType> implements IUnresolvedT
 	@Override
 	protected IType binaryOp(IType lhs, OperatorElement operator, IType rhs)
 	{
+		if (operator.name == Names.amp)
+		{
+			return new IntersectionType(lhs, rhs);
+		}
+		if (operator.name == Names.bar)
+		{
+			return new UnionType(lhs, rhs);
+		}
+
 		return new InfixType(operator.position, lhs, operator.name, rhs);
 	}
 

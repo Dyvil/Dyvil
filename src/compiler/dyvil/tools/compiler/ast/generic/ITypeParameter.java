@@ -27,15 +27,15 @@ public interface ITypeParameter extends IASTNode, INamed, IAnnotated, IObjectCom
 {
 	ITypeParametric getGeneric();
 	
-	void setIndex(int index);
-	
 	int getIndex();
-	
+
+	void setIndex(int index);
+
 	// Variance
-	
-	void setVariance(Variance variance);
-	
+
 	Variance getVariance();
+
+	void setVariance(Variance variance);
 
 	Reified.Type getReifiedKind();
 	
@@ -48,29 +48,21 @@ public interface ITypeParameter extends IASTNode, INamed, IAnnotated, IObjectCom
 
 	IType getErasure();
 
-	IType getDefaultType();
-
 	IType getCovariantType();
 
 	// Upper Bounds
 
-	int upperBoundCount();
+	IType getUpperBound();
 
-	void setUpperBound(int index, IType bound);
-
-	void addUpperBound(IType bound);
-
-	IType getUpperBound(int index);
-
-	IType[] getUpperBounds();
+	void setUpperBound(IType bound);
 
 	void addBoundAnnotation(IAnnotation annotation, int index, TypePath typePath);
 
 	// Lower Bounds
 
-	void setLowerBound(IType bound);
-
 	IType getLowerBound();
+
+	void setLowerBound(IType bound);
 
 	// Super Types
 

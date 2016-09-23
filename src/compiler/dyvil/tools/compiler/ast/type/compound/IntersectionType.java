@@ -53,6 +53,16 @@ public class IntersectionType implements IObjectType
 		return INTERSECTION;
 	}
 
+	public IType getLeft()
+	{
+		return this.left;
+	}
+
+	public IType getRight()
+	{
+		return this.right;
+	}
+
 	@Override
 	public boolean isGenericType()
 	{

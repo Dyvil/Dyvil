@@ -765,7 +765,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 			if (typeArgument == null)
 			{
-				final IType inferredType = typeParameter.getDefaultType();
+				final IType inferredType = typeParameter.getUpperBound();
 				markers.add(Markers.semantic(position, "method.typevar.infer", this.name, typeParameter.getName(),
 				                             inferredType));
 				genericData.addMapping(typeParameter, inferredType);
