@@ -20,11 +20,11 @@ public interface IRawType extends IObjectType
 	}
 
 	@Override
-	default IType getConcreteType(ITypeContext context)
+	default boolean hasTypeVariables()
 	{
-		return this;
+		return false;
 	}
-	
+
 	@Override
 	default boolean isGenericType()
 	{
@@ -32,11 +32,11 @@ public interface IRawType extends IObjectType
 	}
 
 	@Override
-	default boolean hasTypeVariables()
+	default IType getConcreteType(ITypeContext context)
 	{
-		return false;
+		return this;
 	}
-	
+
 	@Override
 	default void inferTypes(IType concrete, ITypeContext typeContext)
 	{

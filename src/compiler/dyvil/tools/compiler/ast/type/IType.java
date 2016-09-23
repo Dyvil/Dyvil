@@ -13,11 +13,11 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.Variance;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvil.tools.compiler.ast.type.builtin.ResolvedTypeDelegate;
@@ -90,6 +90,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	int GENERIC          = 24;
 	int GENERIC_NAMED    = 25; // no deserialization
 	int GENERIC_INTERNAL = 26; // no deserialization
+	int INFIX_CHAIN      = 27; // no deserialization
 
 	// Compound Types
 	int TUPLE  = 32;
@@ -374,6 +375,9 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	@Override
 	void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments);
+
+	@Override
+	void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType);
 
 	@Override
 	void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments);

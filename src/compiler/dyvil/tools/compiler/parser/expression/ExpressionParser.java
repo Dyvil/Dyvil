@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.annotation.AnnotationValue;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.*;
-import dyvil.tools.compiler.ast.operator.OperatorChain;
+import dyvil.tools.compiler.ast.operator.InfixCallChain;
 import dyvil.tools.compiler.ast.operator.PostfixCall;
 import dyvil.tools.compiler.ast.operator.PrefixCall;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -164,7 +164,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				// EXPRESSION as
 
 				final CastOperator castOperator = new CastOperator(token.raw(), this.value);
-				pm.pushParser(new TypeParser(castOperator));
+				pm.pushParser(new TypeParser(castOperator).withFlags(TypeParser.IGNORE_OPERATOR));
 				this.value = castOperator;
 				return;
 			}
@@ -173,7 +173,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				// EXPRESSION is
 
 				final InstanceOfOperator instanceOfOperator = new InstanceOfOperator(token.raw(), this.value);
-				pm.pushParser(new TypeParser(instanceOfOperator));
+				pm.pushParser(new TypeParser(instanceOfOperator).withFlags(TypeParser.IGNORE_OPERATOR));
 				this.value = instanceOfOperator;
 				return;
 			}
@@ -216,17 +216,10 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 					return;
 				}
 
-				this.parseInfixAccess(pm, token, Names.colon);
+				this.parseInfixAccess(pm, token, Names.colon, true);
 				return;
 			case BaseSymbols.EQUALS:
-				if (this.value == null)
-				{
-					pm.report(Markers.syntaxError(token, "expression.assignment.invalid", token));
-					this.mode = VALUE;
-					return;
-				}
-
-				this.parseInfixAccess(pm, token, Names.eq);
+				this.parseInfixAccess(pm, token, Names.eq, true);
 				return;
 			}
 
@@ -253,18 +246,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				// EXPRESSION EXPRESSION -> EXPRESSION ( EXPRESSION )
 				// Juxtaposition
 
-				if (this.hasFlag(IGNORE_APPLY) || this.ignoreClosure(type))
-				{
-					this.end(pm, true);
-					return;
-				}
-
-				final ApplyMethodCall applyCall = new ApplyMethodCall(ICodePosition.between(token.prev(), token),
-				                                                      this.value, EmptyArguments.VISIBLE);
-
-				this.value = applyCall;
-				this.parseApply(pm, token, applyCall);
-				pm.reparse();
+				this.parseApply(pm, token);
 				return;
 			}
 
@@ -368,10 +350,15 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		{
 			name = Name.from(token.stringValue());
 		}
-		this.parseInfixAccess(pm, token, name);
+		this.parseInfixAccess(pm, token, name, false);
 	}
 
 	private void parseInfixAccess(IParserManager pm, IToken token, Name name)
+	{
+		this.parseInfixAccess(pm, token, name, false);
+	}
+
+	private void parseInfixAccess(IParserManager pm, IToken token, Name name, boolean forceInfix)
 	{
 		final int type = token.type();
 		final IToken next = token.next();
@@ -380,9 +367,17 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		if (isSymbol(type))
 		{
 			// Identifier is an operator
+			final IToken prev = token.prev();
+			final boolean leftNeighbor = neighboring(prev, token);
+			final boolean rightNeighbor = neighboring(token, next);
 
 			if (this.value == null) // prefix
 			{
+				if (forceInfix) // only true iff this.value == null
+				{
+					pm.report(ICodePosition.before(token), "expression.infix.before");
+				}
+
 				// OPERATOR EXPRESSION
 				// token    next
 
@@ -392,15 +387,26 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 				if (this.isOperatorEnd(nextType))
 				{
-					pm.report(ICodePosition.between(token, next), "expression.prefix.expression");
+					pm.report(ICodePosition.between(token, next), "expression.prefix.after");
 					return;
 				}
 				this.parseApply(pm, next, call);
 				return;
 			}
-			if (this.isOperatorEnd(nextType) || isSymbol(nextType) && neighboring(token.prev(), token) && !neighboring(
-				next, next.next()))
+			else if (!forceInfix && !leftNeighbor && rightNeighbor)
 			{
+				// Revert to Juxtaposition
+
+				this.parseApply(pm, token);
+				return;
+			}
+			if (this.isOperatorEnd(nextType) || !forceInfix && leftNeighbor && !rightNeighbor)
+			{
+				if (forceInfix) // only true iff this.isOperatorEnd(nextType)
+				{
+					pm.report(ICodePosition.after(token), "expression.infix.after");
+				}
+
 				// EXPRESSION_OPERATOR EXPRESSION
 				// EXPRESSION OPERATOR EOF
 				//            token    next
@@ -420,15 +426,15 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			// EXPRESSION OPERATOR EXPRESSION
 			//            token    next
 
-			final OperatorChain chain;
+			final InfixCallChain chain;
 
 			if (this.value.valueTag() == IValue.OPERATOR_CHAIN)
 			{
-				chain = (OperatorChain) this.value;
+				chain = (InfixCallChain) this.value;
 			}
 			else
 			{
-				chain = new OperatorChain();
+				chain = new InfixCallChain();
 				chain.addOperand(this.value);
 				this.value = chain;
 			}
@@ -607,6 +613,22 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			return neighboring(endToken, endTokenNext);
 		}
 		return false;
+	}
+
+	private void parseApply(IParserManager pm, IToken token)
+	{
+		if (this.hasFlag(IGNORE_APPLY) || this.ignoreClosure(token.type()))
+		{
+			this.end(pm, true);
+			return;
+		}
+
+		final ApplyMethodCall applyCall = new ApplyMethodCall(ICodePosition.between(token.prev(), token), this.value,
+		                                                      EmptyArguments.VISIBLE);
+
+		this.value = applyCall;
+		this.parseApply(pm, token, applyCall);
+		pm.reparse();
 	}
 
 	/**
