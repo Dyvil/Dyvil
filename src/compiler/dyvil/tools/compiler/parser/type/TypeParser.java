@@ -8,10 +8,7 @@ import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Mutability;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.*;
-import dyvil.tools.compiler.ast.type.generic.GenericType;
-import dyvil.tools.compiler.ast.type.generic.NamedGenericType;
-import dyvil.tools.compiler.ast.type.generic.PostfixType;
-import dyvil.tools.compiler.ast.type.generic.PrefixType;
+import dyvil.tools.compiler.ast.type.generic.*;
 import dyvil.tools.compiler.ast.type.raw.NamedType;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
@@ -334,15 +331,38 @@ public final class TypeParser extends Parser implements ITypeConsumer
 				}
 
 				final IToken next = token.next();
-				if (isTerminator(next.type()) || neighboring(token.prev(), token) && !neighboring(token, next))
+				final boolean leftNeighbor = neighboring(token.prev(), token);
+				final boolean rightNeighbor = neighboring(token, next);
+				if (isTerminator(next.type()) || leftNeighbor && !rightNeighbor)
 				{
 					// type_OPERATOR
 					this.type = new PostfixType(token.raw(), token.nameValue(), this.type);
 					// move stays END
 					return;
 				}
+				if (leftNeighbor != rightNeighbor || (this.flags & IGNORE_OPERATOR) != 0)
+				{
+					break; // type end
+				}
 
-				break;
+				// Parse part of an infix operator
+				// type SYMBOL type
+				// type_SYMBOL_type
+				final InfixTypeChain chain;
+				if (this.type.typeTag() == IType.INFIX_CHAIN)
+				{
+					chain = (InfixTypeChain) this.type;
+				}
+				else
+				{
+					chain = new InfixTypeChain();
+					chain.addOperand(this.type);
+					this.type = chain;
+				}
+
+				chain.addOperator(token.nameValue(), token.raw());
+				pm.pushParser(this.subParser(chain::addOperand).withFlags(IGNORE_OPERATOR));
+				return;
 			}
 			case DyvilSymbols.ARROW_RIGHT:
 				// all these flags have to be unset
