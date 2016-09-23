@@ -164,7 +164,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				// EXPRESSION as
 
 				final CastOperator castOperator = new CastOperator(token.raw(), this.value);
-				pm.pushParser(new TypeParser(castOperator));
+				pm.pushParser(new TypeParser(castOperator).withFlags(TypeParser.IGNORE_OPERATOR));
 				this.value = castOperator;
 				return;
 			}
@@ -173,7 +173,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				// EXPRESSION is
 
 				final InstanceOfOperator instanceOfOperator = new InstanceOfOperator(token.raw(), this.value);
-				pm.pushParser(new TypeParser(instanceOfOperator));
+				pm.pushParser(new TypeParser(instanceOfOperator).withFlags(TypeParser.IGNORE_OPERATOR));
 				this.value = instanceOfOperator;
 				return;
 			}
