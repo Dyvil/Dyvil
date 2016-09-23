@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.annotation.AnnotationValue;
 import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.*;
-import dyvil.tools.compiler.ast.operator.OperatorChain;
+import dyvil.tools.compiler.ast.operator.InfixCallChain;
 import dyvil.tools.compiler.ast.operator.PostfixCall;
 import dyvil.tools.compiler.ast.operator.PrefixCall;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -426,15 +426,15 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			// EXPRESSION OPERATOR EXPRESSION
 			//            token    next
 
-			final OperatorChain chain;
+			final InfixCallChain chain;
 
 			if (this.value.valueTag() == IValue.OPERATOR_CHAIN)
 			{
-				chain = (OperatorChain) this.value;
+				chain = (InfixCallChain) this.value;
 			}
 			else
 			{
-				chain = new OperatorChain();
+				chain = new InfixCallChain();
 				chain.addOperand(this.value);
 				this.value = chain;
 			}

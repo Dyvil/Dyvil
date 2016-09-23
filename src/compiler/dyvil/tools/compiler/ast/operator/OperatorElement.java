@@ -10,9 +10,9 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class OperatorElement
 {
-	protected final Name          name;
-	protected final ICodePosition position;
-	protected       IOperator     operator;
+	public final Name          name;
+	public final ICodePosition position;
+	protected    IOperator     operator;
 
 	public OperatorElement(Name name, ICodePosition position)
 	{
