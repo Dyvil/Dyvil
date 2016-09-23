@@ -376,6 +376,9 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments);
 
 	@Override
+	void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType);
+
+	@Override
 	void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments);
 
 	IMethod getFunctionalMethod();

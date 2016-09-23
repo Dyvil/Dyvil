@@ -1,20 +1,14 @@
 package dyvil.tools.compiler.ast.type.generic;
 
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.ITypeParametric;
-import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.raw.IUnresolvedType;
 import dyvil.tools.compiler.ast.type.raw.PackageType;
 import dyvil.tools.compiler.ast.type.typevar.ResolvedTypeVarType;
 import dyvil.tools.compiler.util.Markers;
@@ -27,7 +21,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public class NamedGenericType extends GenericType
+public class NamedGenericType extends GenericType implements IUnresolvedType
 {
 	protected IType         parent;
 	protected ICodePosition position;
@@ -63,41 +57,6 @@ public class NamedGenericType extends GenericType
 	public Name getName()
 	{
 		return this.name;
-	}
-
-	@Override
-	public IClass getTheClass()
-	{
-		return Types.OBJECT_CLASS;
-	}
-
-	@Override
-	public void inferTypes(IType concrete, ITypeContext typeContext)
-	{
-	}
-
-	@Override
-	public IType resolveType(ITypeParameter typeParameter)
-	{
-		return null;
-	}
-
-	@Override
-	public boolean isSuperClassOf(IType subType)
-	{
-		return false;
-	}
-
-	@Override
-	public boolean isSuperTypeOf(IType type)
-	{
-		return false;
-	}
-
-	@Override
-	public boolean isResolved()
-	{
-		return false;
 	}
 
 	private void resolveTypeArguments(MarkerList markers, IContext context)
@@ -235,39 +194,6 @@ public class NamedGenericType extends GenericType
 			                            }
 			                            return this.typeArguments[index];
 		                            }).atPosition(this.position);
-	}
-
-	@Override
-	public IDataMember resolveField(Name name)
-	{
-		return null;
-	}
-
-	@Override
-	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
-	{
-	}
-
-	@Override
-	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
-	{
-	}
-
-	@Override
-	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
-	{
-	}
-
-	@Override
-	public IMethod getFunctionalMethod()
-	{
-		return null;
-	}
-
-	@Override
-	public String getInternalName()
-	{
-		return this.name.qualified;
 	}
 
 	@Override
