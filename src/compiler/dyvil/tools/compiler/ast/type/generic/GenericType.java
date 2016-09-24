@@ -25,29 +25,29 @@ public abstract class GenericType implements IObjectType, ITypeList
 {
 	protected IType[] typeArguments;
 	protected int     typeArgumentCount;
-	
+
 	public GenericType()
 	{
 		this.typeArguments = new IType[2];
 	}
-	
+
 	public GenericType(int typeArgumentCount)
 	{
 		this.typeArguments = new IType[typeArgumentCount];
 	}
-	
+
 	public GenericType(IType[] typeArguments, int typeArgumentCount)
 	{
 		this.typeArguments = typeArguments;
 		this.typeArgumentCount = typeArgumentCount;
 	}
-	
+
 	@Override
 	public int typeCount()
 	{
 		return this.typeArgumentCount;
 	}
-	
+
 	@Override
 	public boolean isGenericType()
 	{
@@ -150,7 +150,7 @@ public abstract class GenericType implements IObjectType, ITypeList
 	{
 		return this;
 	}
-	
+
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
@@ -159,19 +159,18 @@ public abstract class GenericType implements IObjectType, ITypeList
 			this.typeArguments[i].resolve(markers, context);
 		}
 	}
-	
+
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
-		final TypePosition argumentPosition =
-				position == TypePosition.SUPER_TYPE ? TypePosition.SUPER_TYPE_ARGUMENT : TypePosition.GENERIC_ARGUMENT;
+		final int argumentPosition = TypePosition.genericArgument(position);
 
 		for (int i = 0; i < this.typeArgumentCount; i++)
 		{
 			this.typeArguments[i].checkType(markers, context, argumentPosition);
 		}
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
@@ -180,7 +179,7 @@ public abstract class GenericType implements IObjectType, ITypeList
 			this.typeArguments[i].check(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void foldConstants()
 	{
@@ -189,7 +188,7 @@ public abstract class GenericType implements IObjectType, ITypeList
 			this.typeArguments[i].foldConstants();
 		}
 	}
-	
+
 	@Override
 	public void cleanup(IContext context, IClassCompilableList compilableList)
 	{
@@ -198,34 +197,34 @@ public abstract class GenericType implements IObjectType, ITypeList
 			this.typeArguments[i].cleanup(context, compilableList);
 		}
 	}
-	
+
 	@Override
 	public void appendExtendedName(StringBuilder buffer)
 	{
 		buffer.append('L').append(this.getInternalName()).append(';');
 	}
-	
+
 	@Override
-	public void appendSignature(StringBuilder buf, boolean genericArg)
+	public void appendSignature(StringBuilder buffer, boolean genericArg)
 	{
-		buf.append('L').append(this.getInternalName());
+		buffer.append('L').append(this.getInternalName());
 		if (this.typeArgumentCount > 0)
 		{
-			buf.append('<');
+			buffer.append('<');
 			for (int i = 0; i < this.typeArgumentCount; i++)
 			{
-				this.typeArguments[i].appendSignature(buf, true);
+				this.typeArguments[i].appendSignature(buffer, true);
 			}
-			buf.append('>');
+			buffer.append('>');
 		}
-		buf.append(';');
+		buffer.append(';');
 	}
-	
+
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		writer.visitLdcInsn(Type.getObjectType(this.getTheClass().getInternalName()));
-		
+
 		writer.visitLdcInsn(this.typeArgumentCount);
 		writer.visitTypeInsn(Opcodes.ANEWARRAY, "dyvilx/lang/model/type/Type");
 		for (int i = 0; i < this.typeArgumentCount; i++)
@@ -235,12 +234,12 @@ public abstract class GenericType implements IObjectType, ITypeList
 			this.typeArguments[i].writeTypeExpression(writer);
 			writer.visitInsn(Opcodes.AASTORE);
 		}
-		
+
 		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/GenericType", "apply",
 		                       "(Ljava/lang/Class;[Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/GenericType;",
 		                       false);
 	}
-	
+
 	@Override
 	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
 	{
@@ -248,12 +247,12 @@ public abstract class GenericType implements IObjectType, ITypeList
 		{
 			return;
 		}
-		
+
 		int index = typePath.getStepArgument(step);
-		this.typeArguments[index] = IType
-				.withAnnotation(this.typeArguments[index], annotation, typePath, step + 1, steps);
+		this.typeArguments[index] = IType.withAnnotation(this.typeArguments[index], annotation, typePath, step + 1,
+		                                                 steps);
 	}
-	
+
 	@Override
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
@@ -262,7 +261,7 @@ public abstract class GenericType implements IObjectType, ITypeList
 			this.typeArguments[i].writeAnnotations(visitor, typeRef, typePath + i + ';');
 		}
 	}
-	
+
 	protected final void appendFullTypes(StringBuilder builder)
 	{
 		if (this.typeArgumentCount > 0)
@@ -275,7 +274,7 @@ public abstract class GenericType implements IObjectType, ITypeList
 			builder.append('>');
 		}
 	}
-	
+
 	protected final void writeTypeArguments(DataOutput dos) throws IOException
 	{
 		dos.writeShort(this.typeArgumentCount);
@@ -284,7 +283,7 @@ public abstract class GenericType implements IObjectType, ITypeList
 			IType.writeType(this.typeArguments[i], dos);
 		}
 	}
-	
+
 	protected final void readTypeArguments(DataInput dis) throws IOException
 	{
 		int len = this.typeArgumentCount = dis.readShort();
@@ -316,7 +315,7 @@ public abstract class GenericType implements IObjectType, ITypeList
 			buffer.append('>');
 		}
 	}
-	
+
 	@Override
 	public GenericType clone()
 	{

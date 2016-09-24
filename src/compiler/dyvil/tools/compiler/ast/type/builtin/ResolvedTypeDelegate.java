@@ -55,7 +55,7 @@ public class ResolvedTypeDelegate extends TypeDelegate
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 		this.type.checkType(markers, context, position);
 	}

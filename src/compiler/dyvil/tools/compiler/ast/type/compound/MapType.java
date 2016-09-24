@@ -33,9 +33,9 @@ public class MapType implements IObjectType
 {
 	public static final class MapTypes
 	{
-		public static final IClass MAP_CLASS             = Package.dyvilCollection.resolveClass("Map");
-		public static final IClass MUTABLE_MAP_CLASS     = Package.dyvilCollection.resolveClass("MutableMap");
-		public static final IClass IMMUTABLE_MAP_CLASS   = Package.dyvilCollection.resolveClass("ImmutableMap");
+		public static final IClass MAP_CLASS           = Package.dyvilCollection.resolveClass("Map");
+		public static final IClass MUTABLE_MAP_CLASS   = Package.dyvilCollection.resolveClass("MutableMap");
+		public static final IClass IMMUTABLE_MAP_CLASS = Package.dyvilCollection.resolveClass("ImmutableMap");
 
 		public static final ITypeParameter KEY_VARIABLE   = MapTypes.MAP_CLASS.getTypeParameter(0);
 		public static final ITypeParameter VALUE_VARIABLE = MapTypes.MAP_CLASS.getTypeParameter(1);
@@ -214,10 +214,9 @@ public class MapType implements IObjectType
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
-		final TypePosition argumentPosition =
-			position == TypePosition.SUPER_TYPE ? TypePosition.SUPER_TYPE_ARGUMENT : TypePosition.GENERIC_ARGUMENT;
+		final int argumentPosition = TypePosition.genericArgument(position);
 
 		this.keyType.checkType(markers, context, argumentPosition);
 		this.valueType.checkType(markers, context, argumentPosition);

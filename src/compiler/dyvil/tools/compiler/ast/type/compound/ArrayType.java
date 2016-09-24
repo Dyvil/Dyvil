@@ -247,11 +247,11 @@ public class ArrayType implements IObjectType, ITyped
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 		if (position == TypePosition.SUPER_TYPE)
 		{
-			markers.add(Markers.semantic(this.getPosition(), "type.super.array"));
+			markers.add(Markers.semantic(this.getPosition(), "type.array.super"));
 		}
 
 		this.type.checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);

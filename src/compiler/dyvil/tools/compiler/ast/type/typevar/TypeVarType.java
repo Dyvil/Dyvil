@@ -98,9 +98,9 @@ public class TypeVarType implements IRawType
 	}
 
 	@Override
-	public boolean isSuperTypeOf(IType type)
+	public boolean isSuperTypeOf(IType subType)
 	{
-		return this.isSameType(type);
+		return this.isSameType(subType);
 	}
 
 	@Override
@@ -166,7 +166,7 @@ public class TypeVarType implements IRawType
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 	}
 

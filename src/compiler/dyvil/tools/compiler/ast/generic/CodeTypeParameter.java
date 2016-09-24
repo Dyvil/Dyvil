@@ -90,7 +90,7 @@ public class CodeTypeParameter extends TypeParameter
 
 			if (typeClass != null && !typeClass.hasModifier(Modifiers.INTERFACE_CLASS))
 			{
-				final Marker marker = Markers.semanticError(type.getPosition(), "typeparameter.bound.class");
+				final Marker marker = Markers.semanticError(type.getPosition(), "type_parameter.bound.class");
 				marker.addInfo(Markers.getSemantic("class.declaration", Util.classSignatureToString(typeClass)));
 				markers.add(marker);
 			}

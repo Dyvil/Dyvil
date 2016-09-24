@@ -269,7 +269,7 @@ public class IntersectionType implements IObjectType
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 		this.left.checkType(markers, context, position);
 		this.right.checkType(markers, context, position);

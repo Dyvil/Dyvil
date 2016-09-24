@@ -93,7 +93,7 @@ public class InternalType implements IRawType
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 	}
 

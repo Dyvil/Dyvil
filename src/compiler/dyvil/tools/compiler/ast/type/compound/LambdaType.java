@@ -424,11 +424,11 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 		if (position == TypePosition.CLASS)
 		{
-			markers.add(Markers.semantic(this.position, "type.class.lambda"));
+			markers.add(Markers.semantic(this.position, "type.lambda.class"));
 		}
 
 		for (int i = 0; i < this.parameterCount; i++)

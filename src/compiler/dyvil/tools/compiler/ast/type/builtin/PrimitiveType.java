@@ -366,7 +366,7 @@ public final class PrimitiveType implements IType
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 	}
 

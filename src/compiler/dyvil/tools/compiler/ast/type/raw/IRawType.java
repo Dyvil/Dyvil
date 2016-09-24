@@ -50,7 +50,7 @@ public interface IRawType extends IObjectType
 	}
 	
 	@Override
-	default void checkType(MarkerList markers, IContext context, IType.TypePosition position)
+	default void checkType(MarkerList markers, IContext context, int position)
 	{
 	}
 	

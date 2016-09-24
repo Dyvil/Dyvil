@@ -83,9 +83,9 @@ public final class WildcardType implements IRawType, ITyped
 	}
 
 	@Override
-	public void setType(IType upperBound)
+	public void setType(IType type)
 	{
-		this.bound = upperBound;
+		this.bound = type;
 	}
 
 	@Override
@@ -255,14 +255,14 @@ public final class WildcardType implements IRawType, ITyped
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
-		this.bound.checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
-
-		if (position != TypePosition.GENERIC_ARGUMENT)
+		if ((position & TypePosition.WILDCARD_FLAG) == 0)
 		{
 			markers.add(Markers.semantic(this.position, "type.wildcard.invalid"));
 		}
+
+		this.bound.checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
 	}
 
 	@Override

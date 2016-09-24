@@ -308,7 +308,7 @@ public final class TupleType implements IObjectType, ITypeList
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 		if (position == TypePosition.CLASS)
 		{
