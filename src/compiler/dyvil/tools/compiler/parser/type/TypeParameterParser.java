@@ -66,37 +66,40 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 			}
 			// Fallthrough
 		case VARIANCE:
-			if (ParserUtil.isIdentifier(type))
+		{
+			if (!ParserUtil.isIdentifier(type))
 			{
-				final Name name = token.nameValue();
-				if (ParserUtil.isIdentifier(token.next().type()))
-				{
-					if (name == Names.plus)
-					{
-						this.mode = NAME;
-						this.variance = Variance.COVARIANT;
-						return;
-					}
-					if (name == Names.minus)
-					{
-						this.mode = NAME;
-						this.variance = Variance.CONTRAVARIANT;
-						return;
-					}
-				}
-
-				this.createTypeParameter(token, this.variance);
+				pm.report(token, "type_parameter.identifier");
 				return;
 			}
-			pm.report(token, "typeparameter.identifier");
+
+			final Name name = token.nameValue();
+			if (ParserUtil.isIdentifier(token.next().type()))
+			{
+				if (name == Names.plus)
+				{
+					this.mode = NAME;
+					this.variance = Variance.COVARIANT;
+					return;
+				}
+				if (name == Names.minus)
+				{
+					this.mode = NAME;
+					this.variance = Variance.CONTRAVARIANT;
+					return;
+				}
+			}
+
+			this.createTypeParameter(token, this.variance);
 			return;
+		}
 		case NAME:
 			if (ParserUtil.isIdentifier(type))
 			{
 				this.createTypeParameter(token, this.variance);
 				return;
 			}
-			pm.report(token, "typeparameter.identifier");
+			pm.report(token, "type_parameter.identifier");
 			return;
 		case TYPE_BOUNDS:
 			if (ParserUtil.isTerminator(type) || TypeParser.isGenericEnd(token, type))
@@ -124,14 +127,14 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 
 				if (name == Names.ltcolon) // <: - Upper Bounds
 				{
-					pm.report(Markers.syntaxWarning(token, "typeparameter.upper_bound.symbol.deprecated"));
+					pm.report(Markers.syntaxWarning(token, "type_parameter.upper_bound.symbol.deprecated"));
 					pm.pushParser(this.newTypeParser());
 					this.setBoundMode(UPPER_BOUND);
 					return;
 				}
 				if (name == Names.gtcolon) // >: - Lower Bound
 				{
-					pm.report(Markers.syntaxWarning(token, "typeparameter.lower_bound.symbol.deprecated"));
+					pm.report(Markers.syntaxWarning(token, "type_parameter.lower_bound.symbol.deprecated"));
 					pm.pushParser(this.newTypeParser());
 					this.setBoundMode(UPPER_BOUND);
 					return;
@@ -144,7 +147,7 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 				this.typeParameterized.addTypeParameter(this.typeParameter);
 			}
 			pm.popParser(true);
-			pm.report(token, "typeparameter.bound.invalid");
+			pm.report(token, "type_parameter.bound.invalid");
 		}
 	}
 
