@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.external.ExternalTypeParameter;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.header.ISourceHeader;
 import dyvil.tools.compiler.ast.type.IType;
@@ -279,18 +280,14 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		context = context.push(this);
-
-		this.type.cleanup(context, compilableList);
+		this.type.cleanup(compilableList, classCompilableList);
 
 		for (int i = 0; i < this.typeVariableCount; i++)
 		{
-			this.typeVariables[i].cleanup(context, compilableList);
+			this.typeVariables[i].cleanup(compilableList, classCompilableList);
 		}
-
-		context.pop();
 	}
 
 	@Override

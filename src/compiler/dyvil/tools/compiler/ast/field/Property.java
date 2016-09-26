@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.CodeMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -104,10 +105,10 @@ public class Property extends Member implements IProperty
 	}
 
 	@Override
-	public void setSetterParameterName(Name setterParameterName)
+	public void setSetterParameterName(Name name)
 	{
 		this.initSetter();
-		this.setterParameter.setName(setterParameterName);
+		this.setterParameter.setName(name);
 	}
 
 	@Override
@@ -297,21 +298,21 @@ public class Property extends Member implements IProperty
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		super.cleanup(context, compilableList);
+		super.cleanup(compilableList, classCompilableList);
 
 		if (this.getter != null)
 		{
-			this.getter.cleanup(context, compilableList);
+			this.getter.cleanup(compilableList, classCompilableList);
 		}
 		if (this.setter != null)
 		{
-			this.setter.cleanup(context, compilableList);
+			this.setter.cleanup(compilableList, classCompilableList);
 		}
 		if (this.initializer != null)
 		{
-			this.initializer = this.initializer.cleanup(context, compilableList);
+			this.initializer = this.initializer.cleanup(compilableList, classCompilableList);
 		}
 	}
 

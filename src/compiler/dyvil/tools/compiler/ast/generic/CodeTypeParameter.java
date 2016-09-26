@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.ClassOperator;
 import dyvil.tools.compiler.ast.expression.TypeOperator;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -167,19 +168,19 @@ public class CodeTypeParameter extends TypeParameter
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 		if (this.annotations != null)
 		{
-			this.annotations.cleanup(context, compilableList);
+			this.annotations.cleanup(compilableList, classCompilableList);
 		}
 		if (this.lowerBound != null)
 		{
-			this.lowerBound.cleanup(context, compilableList);
+			this.lowerBound.cleanup(compilableList, classCompilableList);
 		}
 		if (this.upperBound != null)
 		{
-			this.upperBound.cleanup(context, compilableList);
+			this.upperBound.cleanup(compilableList, classCompilableList);
 		}
 	}
 

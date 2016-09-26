@@ -1,14 +1,16 @@
 package dyvil.tools.compiler.ast.type.alias;
 
+import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
+import dyvil.tools.compiler.ast.header.IObjectCompilable;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
-import dyvil.tools.compiler.backend.IObjectCompilable;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -17,7 +19,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public interface ITypeAlias extends IASTNode, INamed, ITyped, ITypeParametric, IObjectCompilable
+public interface ITypeAlias extends IASTNode, IResolvable, INamed, ITyped, ITypeParametric, IObjectCompilable
 {
 	IHeaderUnit getEnclosingHeader();
 
@@ -61,18 +63,24 @@ public interface ITypeAlias extends IASTNode, INamed, ITyped, ITypeParametric, I
 
 	// Phases
 	
+	@Override
 	void resolveTypes(MarkerList markers, IContext context);
 	
+	@Override
 	void resolve(MarkerList markers, IContext context);
 	
+	@Override
 	void checkTypes(MarkerList markers, IContext context);
 	
+	@Override
 	void check(MarkerList markers, IContext context);
 	
+	@Override
 	void foldConstants();
-	
-	void cleanup(IContext context, IClassCompilableList compilableList);
-	
+
+	@Override
+	void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList);
+
 	@Override
 	void write(DataOutput out) throws IOException;
 	

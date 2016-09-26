@@ -1,12 +1,10 @@
 package dyvil.tools.compiler.ast.header;
 
-import dyvil.tools.compiler.backend.IClassCompilable;
-
 public interface IClassCompilableList
 {
-	int compilableCount();
+	String getInternalName();
+
+	int classCompilableCount();
 	
-	void addCompilable(IClassCompilable compilable);
-	
-	IClassCompilable getCompilable(int index);
+	void addClassCompilable(IClassCompilable compilable);
 }

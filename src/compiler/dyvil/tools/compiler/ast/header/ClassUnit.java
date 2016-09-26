@@ -2,12 +2,10 @@ package dyvil.tools.compiler.ast.header;
 
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.consumer.IClassConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.backend.ClassWriter;
-import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.ObjectFormat;
 import dyvil.tools.compiler.parser.header.DyvilUnitParser;
 import dyvil.tools.compiler.sources.DyvilFileType;
@@ -21,7 +19,7 @@ public class ClassUnit extends SourceHeader implements IClassConsumer
 {
 	private IClass[] classes = new IClass[1];
 	private int classCount;
-	private IClassCompilable[] innerClasses = new IClassCompilable[2];
+	private ICompilable[] innerClasses = new ICompilable[2];
 	private int innerClassCount;
 
 	public ClassUnit(DyvilCompiler compiler, Package pack, File input, File output)
@@ -68,40 +66,32 @@ public class ClassUnit extends SourceHeader implements IClassConsumer
 	{
 		for (int i = 0; i < this.classCount; i++)
 		{
-			IClass c = this.classes[i];
-			if (c.getName() == name)
+			final IClass theClass = this.classes[i];
+			if (theClass.getName() == name)
 			{
-				return c;
+				return theClass;
 			}
 		}
 		return null;
 	}
 
 	@Override
-	public int innerClassCount()
+	public int compilableCount()
 	{
 		return this.innerClassCount;
 	}
 
 	@Override
-	public void addInnerClass(IClassCompilable iclass)
+	public void addCompilable(ICompilable compilable)
 	{
 		int index = this.innerClassCount++;
 		if (index >= this.innerClasses.length)
 		{
-			IClassCompilable[] temp = new IClassCompilable[this.innerClassCount];
+			ICompilable[] temp = new ICompilable[this.innerClassCount];
 			System.arraycopy(this.innerClasses, 0, temp, 0, this.innerClasses.length);
 			this.innerClasses = temp;
 		}
-		this.innerClasses[index] = iclass;
-
-		iclass.setInnerIndex(this.getInternalName(), index);
-	}
-
-	@Override
-	public IClassCompilable getInnerClass(int index)
-	{
-		return this.innerClasses[index];
+		this.innerClasses[index] = compilable;
 	}
 
 	@Override
@@ -173,10 +163,9 @@ public class ClassUnit extends SourceHeader implements IClassConsumer
 	@Override
 	public void cleanup()
 	{
-		final IContext context = this.getContext();
 		for (int i = 0; i < this.classCount; i++)
 		{
-			this.classes[i].cleanup(context, null);
+			this.classes[i].cleanup(this, null);
 		}
 	}
 
@@ -198,46 +187,22 @@ public class ClassUnit extends SourceHeader implements IClassConsumer
 
 		if (this.headerDeclaration != null)
 		{
-			ObjectFormat.write(this.compiler, new File(this.outputDirectory, this.name.qualified + ".dyo"), this);
+			final File file = new File(this.outputDirectory, this.name.qualified + DyvilFileType.OBJECT_EXTENSION);
+			ObjectFormat.write(this.compiler, file, this);
 		}
 
 		for (int i = 0; i < this.classCount; i++)
 		{
-			IClass iclass = this.classes[i];
-			Name name = iclass.getName();
-			String name1;
-			if (name != this.name)
-			{
-				name1 = this.name.qualified + "$" + name.qualified + DyvilFileType.CLASS_EXTENSION;
-			}
-			else
-			{
-				name1 = name.qualified + DyvilFileType.CLASS_EXTENSION;
-			}
-
-			File file = new File(this.outputDirectory, name1);
-			ClassWriter.compile(this.compiler, file, iclass);
-
-			IClassBody body = iclass.getBody();
-			if (body != null)
-			{
-				int len = body.classCount();
-				for (int j = 0; j < len; j++)
-				{
-					IClass iclass1 = body.getClass(j);
-					name1 = this.name.qualified + "$" + iclass1.getName().qualified + DyvilFileType.CLASS_EXTENSION;
-					file = new File(this.outputDirectory, name1);
-					ClassWriter.compile(this.compiler, file, iclass1);
-				}
-			}
+			final IClass theClass = this.classes[i];
+			final File file = new File(this.outputDirectory, theClass.getFileName());
+			ClassWriter.compile(this.compiler, file, theClass);
 		}
 
 		for (int i = 0; i < this.innerClassCount; i++)
 		{
-			IClassCompilable iclass = this.innerClasses[i];
-			String name = iclass.getFileName() + DyvilFileType.CLASS_EXTENSION;
-			File file = new File(this.outputDirectory, name);
-			ClassWriter.compile(this.compiler, file, iclass);
+			final ICompilable compilable = this.innerClasses[i];
+			final File file = new File(this.outputDirectory, compilable.getFileName());
+			ClassWriter.compile(this.compiler, file, compilable);
 		}
 	}
 
@@ -247,10 +212,10 @@ public class ClassUnit extends SourceHeader implements IClassConsumer
 		// Own classes
 		for (int i = 0; i < this.classCount; i++)
 		{
-			IClass c = this.classes[i];
-			if (c.getName() == name)
+			final IClass iclass = this.classes[i];
+			if (iclass.getName() == name)
 			{
-				return c;
+				return iclass;
 			}
 		}
 

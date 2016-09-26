@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisExpr;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
@@ -379,18 +380,18 @@ public class Field extends Member implements IField
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		super.cleanup(context, compilableList);
+		super.cleanup(compilableList, classCompilableList);
 
 		if (this.value != null)
 		{
-			this.value = this.value.cleanup(context, compilableList);
+			this.value = this.value.cleanup(compilableList, classCompilableList);
 		}
 
 		if (this.property != null)
 		{
-			this.property.cleanup(context, compilableList);
+			this.property.cleanup(compilableList, classCompilableList);
 		}
 	}
 

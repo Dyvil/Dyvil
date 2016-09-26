@@ -8,12 +8,13 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.statement.StatementList;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -69,9 +70,9 @@ public class CodeConstructor extends AbstractConstructor
 	}
 
 	@Override
-	public void setValue(IValue statement)
+	public void setValue(IValue value)
 	{
-		this.value = statement;
+		this.value = value;
 	}
 
 	@Override
@@ -272,29 +273,25 @@ public class CodeConstructor extends AbstractConstructor
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		context = context.push(this);
+		super.cleanup(compilableList, classCompilableList);
 
-		super.cleanup(context, compilableList);
-
-		this.parameters.cleanup(context, compilableList);
+		this.parameters.cleanup(compilableList, classCompilableList);
 
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			this.exceptions[i].cleanup(context, compilableList);
+			this.exceptions[i].cleanup(compilableList, classCompilableList);
 		}
 
 		if (this.initializerCall != null)
 		{
-			this.initializerCall.cleanup(context, compilableList);
+			this.initializerCall.cleanup(compilableList, classCompilableList);
 		}
 		if (this.value != null)
 		{
-			this.value = this.value.cleanup(context, compilableList);
+			this.value = this.value.cleanup(compilableList, classCompilableList);
 		}
-
-		context.pop();
 	}
 
 	@Override

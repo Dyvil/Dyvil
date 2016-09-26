@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.constant.StringValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -167,11 +168,11 @@ public class StringConcatExpr implements IValue
 	}
 
 	@Override
-	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			this.values[i] = this.values[i].cleanup(context, compilableList);
+			this.values[i] = this.values[i].cleanup(compilableList, classCompilableList);
 		}
 
 		return this;

@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -340,11 +341,11 @@ public final class TupleType implements IObjectType, ITypeList
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 		for (int i = 0; i < this.typeCount; i++)
 		{
-			this.types[i].cleanup(context, compilableList);
+			this.types[i].cleanup(compilableList, classCompilableList);
 		}
 	}
 

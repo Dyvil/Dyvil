@@ -19,6 +19,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -501,11 +502,9 @@ public class CodeMethod extends AbstractMethod
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		context = context.push(this);
-
-		super.cleanup(context, compilableList);
+		super.cleanup(compilableList, classCompilableList);
 
 		if (this.annotations != null)
 		{
@@ -518,27 +517,25 @@ public class CodeMethod extends AbstractMethod
 
 		if (this.thisType != null)
 		{
-			this.thisType.cleanup(context, compilableList);
+			this.thisType.cleanup(compilableList, classCompilableList);
 		}
 
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.typeParameters[i].cleanup(context, compilableList);
+			this.typeParameters[i].cleanup(compilableList, classCompilableList);
 		}
 
-		this.parameters.cleanup(context, compilableList);
+		this.parameters.cleanup(compilableList, classCompilableList);
 
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			this.exceptions[i].cleanup(context, compilableList);
+			this.exceptions[i].cleanup(compilableList, classCompilableList);
 		}
 
 		if (this.value != null)
 		{
-			this.value = this.value.cleanup(context, compilableList);
+			this.value = this.value.cleanup(compilableList, classCompilableList);
 		}
-
-		context.pop();
 	}
 
 	@Override

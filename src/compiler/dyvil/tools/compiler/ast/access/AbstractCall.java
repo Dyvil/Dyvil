@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.Candidate;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
@@ -47,9 +48,9 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 	}
 
 	@Override
-	public void setReceiver(IValue value)
+	public void setReceiver(IValue receiver)
 	{
-		this.receiver = value;
+		this.receiver = receiver;
 	}
 
 	@Override
@@ -362,18 +363,18 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 	}
 
 	@Override
-	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 		if (this.receiver != null)
 		{
-			this.receiver = this.receiver.cleanup(context, compilableList);
+			this.receiver = this.receiver.cleanup(compilableList, classCompilableList);
 		}
 
-		this.arguments.cleanup(context, compilableList);
+		this.arguments.cleanup(compilableList, classCompilableList);
 
 		if (this.genericData != null)
 		{
-			this.genericData.cleanup(context, compilableList);
+			this.genericData.cleanup(compilableList, classCompilableList);
 		}
 		return this;
 	}

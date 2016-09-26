@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.ast.member;
 
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.backend.IClassCompilable;
-import dyvil.tools.compiler.backend.IObjectCompilable;
+import dyvil.tools.compiler.ast.header.IClassCompilable;
+import dyvil.tools.compiler.ast.header.IObjectCompilable;
 
 import java.io.DataInput;
 import java.io.DataOutput;

@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -237,10 +238,10 @@ public class MapType implements IObjectType
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.keyType.cleanup(context, compilableList);
-		this.valueType.cleanup(context, compilableList);
+		this.keyType.cleanup(compilableList, classCompilableList);
+		this.valueType.cleanup(compilableList, classCompilableList);
 	}
 
 	@Override

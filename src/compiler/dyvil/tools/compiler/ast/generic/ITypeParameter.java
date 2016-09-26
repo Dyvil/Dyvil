@@ -3,27 +3,29 @@ package dyvil.tools.compiler.ast.generic;
 import dyvil.annotation.Reified;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
+import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.compiler.ast.annotation.IAnnotated;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
+import dyvil.tools.compiler.ast.header.IObjectCompilable;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
-import dyvil.tools.compiler.backend.IObjectCompilable;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public interface ITypeParameter extends IASTNode, INamed, IAnnotated, IObjectCompilable
+public interface ITypeParameter extends IASTNode, IResolvable, INamed, IAnnotated, IObjectCompilable
 {
 	ITypeParametric getGeneric();
 	
@@ -92,17 +94,23 @@ public interface ITypeParameter extends IASTNode, INamed, IAnnotated, IObjectCom
 
 	// Phases
 
+	@Override
 	void resolveTypes(MarkerList markers, IContext context);
 
+	@Override
 	void resolve(MarkerList markers, IContext context);
 
+	@Override
 	void checkTypes(MarkerList markers, IContext context);
 
+	@Override
 	void check(MarkerList markers, IContext context);
 
+	@Override
 	void foldConstants();
 
-	void cleanup(IContext context, IClassCompilableList compilableList);
+	@Override
+	void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList);
 
 	// Compilation
 

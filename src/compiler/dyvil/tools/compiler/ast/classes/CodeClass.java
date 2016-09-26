@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.classes.metadata.TraitMetadata;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
@@ -410,40 +411,36 @@ public class CodeClass extends AbstractClass
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		context = context.push(this);
-
 		if (this.annotations != null)
 		{
-			this.annotations.cleanup(context, this);
+			this.annotations.cleanup(compilableList, this);
 		}
 
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.typeParameters[i].cleanup(context, this);
+			this.typeParameters[i].cleanup(compilableList, this);
 		}
 
-		this.parameters.cleanup(context, this);
+		this.parameters.cleanup(compilableList, this);
 
 		if (this.superType != null)
 		{
-			this.superType.cleanup(context, this);
+			this.superType.cleanup(compilableList, this);
 		}
 
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			this.interfaces[i].cleanup(context, this);
+			this.interfaces[i].cleanup(compilableList, this);
 		}
 
-		this.metadata.cleanup(context, this);
+		this.metadata.cleanup(compilableList, this);
 
 		if (this.body != null)
 		{
-			this.body.cleanup(context);
+			this.body.cleanup(compilableList, this);
 		}
-
-		context.pop();
 	}
 
 	@Override
@@ -452,6 +449,10 @@ public class CodeClass extends AbstractClass
 		if (this.fullName != null)
 		{
 			return this.fullName;
+		}
+		if (this.enclosingClass != null)
+		{
+			return this.enclosingClass.getFullName() + '$' + this.name;
 		}
 		return this.fullName = this.unit.getFullName(this.name);
 	}
@@ -462,6 +463,10 @@ public class CodeClass extends AbstractClass
 		if (this.internalName != null)
 		{
 			return this.internalName;
+		}
+		if (this.enclosingClass != null)
+		{
+			return this.enclosingClass.getInternalName() + '$' + this.name;
 		}
 		return this.internalName = this.unit.getInternalName(this.name);
 	}

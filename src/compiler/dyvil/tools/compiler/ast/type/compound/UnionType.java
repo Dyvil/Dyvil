@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -296,10 +297,10 @@ public class UnionType implements IObjectType
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.left.cleanup(context, compilableList);
-		this.right.cleanup(context, compilableList);
+		this.left.cleanup(compilableList, classCompilableList);
+		this.right.cleanup(compilableList, classCompilableList);
 	}
 
 	@Override

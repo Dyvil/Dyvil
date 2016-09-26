@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.raw.IObjectType;
@@ -190,11 +191,11 @@ public abstract class GenericType implements IObjectType, ITypeList
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 		for (int i = 0; i < this.typeArgumentCount; i++)
 		{
-			this.typeArguments[i].cleanup(context, compilableList);
+			this.typeArguments[i].cleanup(compilableList, classCompilableList);
 		}
 	}
 

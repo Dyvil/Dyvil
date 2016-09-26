@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -277,7 +278,7 @@ public class IfStatement implements IValue
 	}
 
 	@Override
-	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 		if (this.condition != null)
 		{
@@ -286,13 +287,13 @@ public class IfStatement implements IValue
 				if (this.condition.booleanValue())
 				{
 					// Condition is true -> Return the action
-					return this.then.cleanup(context, compilableList);
+					return this.then.cleanup(compilableList, classCompilableList);
 				}
 				else if (this.elseThen != null)
 				{
 					// Condition is false, else clause exists -> Return else
 					// clause
-					return this.elseThen.cleanup(context, compilableList);
+					return this.elseThen.cleanup(compilableList, classCompilableList);
 				}
 				else
 				{
@@ -301,16 +302,16 @@ public class IfStatement implements IValue
 				}
 			}
 
-			this.condition = this.condition.cleanup(context, compilableList);
+			this.condition = this.condition.cleanup(compilableList, classCompilableList);
 		}
 
 		if (this.then != null)
 		{
-			this.then = this.then.cleanup(context, compilableList);
+			this.then = this.then.cleanup(compilableList, classCompilableList);
 		}
 		if (this.elseThen != null)
 		{
-			this.elseThen = this.elseThen.cleanup(context, compilableList);
+			this.elseThen = this.elseThen.cleanup(compilableList, classCompilableList);
 		}
 
 		return this;

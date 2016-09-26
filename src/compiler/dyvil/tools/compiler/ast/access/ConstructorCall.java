@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.Candidate;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
@@ -344,9 +345,9 @@ public class ConstructorCall implements ICall
 	}
 
 	@Override
-	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.arguments.cleanup(context, compilableList);
+		this.arguments.cleanup(compilableList, classCompilableList);
 		return this;
 	}
 

@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -65,7 +66,7 @@ public interface IRawType extends IObjectType
 	}
 	
 	@Override
-	default void cleanup(IContext context, IClassCompilableList compilableList)
+	default void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 	}
 	

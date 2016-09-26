@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -120,10 +121,10 @@ public final class SyncStatement extends AbstractValue implements IStatement
 	}
 	
 	@Override
-	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.lock = this.lock.cleanup(context, compilableList);
-		this.action = this.action.cleanup(context, compilableList);
+		this.lock = this.lock.cleanup(compilableList, classCompilableList);
+		this.action = this.action.cleanup(compilableList, classCompilableList);
 		return this;
 	}
 	

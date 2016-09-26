@@ -4,6 +4,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -79,9 +80,9 @@ public final class FieldInitializer implements IStatement
 	}
 	
 	@Override
-	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.variable.cleanup(context, compilableList);
+		this.variable.cleanup(compilableList, classCompilableList);
 		return this;
 	}
 	

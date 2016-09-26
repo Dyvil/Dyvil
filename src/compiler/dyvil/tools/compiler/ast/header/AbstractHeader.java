@@ -21,7 +21,6 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
-import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
@@ -114,9 +113,9 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	}
 
 	@Override
-	public void setPackageDeclaration(PackageDeclaration packageDecl)
+	public void setPackageDeclaration(PackageDeclaration pack)
 	{
-		this.packageDeclaration = packageDecl;
+		this.packageDeclaration = pack;
 	}
 
 	@Override
@@ -297,20 +296,14 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	}
 
 	@Override
-	public int innerClassCount()
+	public int compilableCount()
 	{
 		return 0;
 	}
 
 	@Override
-	public void addInnerClass(IClassCompilable iclass)
+	public void addCompilable(ICompilable compilable)
 	{
-	}
-
-	@Override
-	public IClassCompilable getInnerClass(int index)
-	{
-		return null;
 	}
 
 	// IContext override implementations
@@ -425,13 +418,13 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	}
 
 	@Override
-	public String getFullName(Name name)
+	public String getFullName(Name subClass)
 	{
-		if (name != this.name)
+		if (subClass != this.name)
 		{
-			return this.pack.getFullName() + '.' + this.name.qualified + '.' + name.qualified;
+			return this.pack.getFullName() + '.' + this.name.qualified + '.' + subClass.qualified;
 		}
-		return this.pack.getFullName() + '.' + name.qualified;
+		return this.pack.getFullName() + '.' + subClass.qualified;
 	}
 
 	@Override
@@ -441,13 +434,13 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	}
 
 	@Override
-	public String getInternalName(Name name)
+	public String getInternalName(Name subClass)
 	{
-		if (name != this.name)
+		if (subClass != this.name)
 		{
-			return this.pack.getInternalName() + this.name.qualified + '$' + name;
+			return this.pack.getInternalName() + this.name.qualified + '$' + subClass;
 		}
-		return this.pack.getInternalName() + name.qualified;
+		return this.pack.getInternalName() + subClass.qualified;
 	}
 
 	@Override

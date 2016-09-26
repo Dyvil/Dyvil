@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -226,9 +227,9 @@ public final class Annotation implements IAnnotation
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.arguments.cleanup(context, compilableList);
+		this.arguments.cleanup(compilableList, classCompilableList);
 	}
 
 	private RetentionPolicy getRetention()
@@ -248,19 +249,19 @@ public final class Annotation implements IAnnotation
 	}
 
 	@Override
-	public void write(TypeAnnotatableVisitor writer, int typeRef, TypePath typePath)
+	public void write(TypeAnnotatableVisitor writer, int typeRef, TypePath path)
 	{
 		RetentionPolicy retention = this.getRetention();
 		if (retention != RetentionPolicy.SOURCE)
 		{
-			this.write(writer.visitTypeAnnotation(typeRef, typePath,
+			this.write(writer.visitTypeAnnotation(typeRef, path,
 			                                      ClassFormat.internalToExtended(this.type.getInternalName()),
 			                                      retention == RetentionPolicy.RUNTIME));
 		}
 	}
 
 	@Override
-	public void write(AnnotationVisitor visitor)
+	public void write(AnnotationVisitor writer)
 	{
 		final IClass iclass = this.type.getTheClass();
 		final IParameterList parameterList = iclass.getParameterList();
@@ -271,10 +272,10 @@ public final class Annotation implements IAnnotation
 			final IValue argument = this.arguments.getValue(i, parameter);
 			if (argument != null)
 			{
-				visitValue(visitor, parameter.getName().qualified, argument);
+				visitValue(writer, parameter.getName().qualified, argument);
 			}
 		}
-		visitor.visitEnd();
+		writer.visitEnd();
 	}
 
 	public static void visitValue(AnnotationVisitor visitor, String key, IValue value)
