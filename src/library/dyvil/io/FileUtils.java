@@ -88,7 +88,7 @@ public final class FileUtils
 		{
 			return create(file);
 		}
-		catch (IOException ex)
+		catch (IOException ignored)
 		{
 			return false;
 		}
@@ -107,8 +107,8 @@ public final class FileUtils
 		{
 			return false;
 		}
-		final boolean newFile = file.createNewFile();
-		return !newFile;
+		// return true if the file was created successfully
+		return !file.createNewFile();
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
@@ -124,14 +124,14 @@ public final class FileUtils
 		{
 			return write(file, bytes);
 		}
-		catch (IOException ex)
+		catch (IOException ignored)
 		{
 			return false;
 		}
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	private static boolean write(File file, byte[] bytes) throws IOException
+	public static boolean write(File file, byte[] bytes) throws IOException
 	{
 		if (!create(file))
 		{
@@ -149,7 +149,7 @@ public final class FileUtils
 		{
 			return writeLines(file, lines);
 		}
-		catch (IOException ex)
+		catch (IOException ignored)
 		{
 			return false;
 		}
@@ -188,7 +188,7 @@ public final class FileUtils
 		{
 			return read(file);
 		}
-		catch (IOException ex)
+		catch (IOException ignored)
 		{
 			return null;
 		}
@@ -212,7 +212,7 @@ public final class FileUtils
 		{
 			return readLines(file);
 		}
-		catch (IOException ex)
+		catch (IOException ignored)
 		{
 			return null;
 		}
@@ -254,9 +254,9 @@ public final class FileUtils
 			File[] files = file.listFiles();
 			if (files != null)
 			{
-				for (File f : files)
+				for (File subFile : files)
 				{
-					delete(f);
+					delete(subFile);
 				}
 			}
 		}
@@ -283,9 +283,9 @@ public final class FileUtils
 			File[] files = file.listFiles();
 			if (files != null)
 			{
-				for (File f : files)
+				for (File subFile : files)
 				{
-					delete(f, maxDepth - 1);
+					delete(subFile, maxDepth - 1);
 				}
 			}
 		}
