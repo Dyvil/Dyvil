@@ -86,7 +86,8 @@ public final class FileUtils
 	{
 		try
 		{
-			return create(file);
+			create(file);
+			return true;
 		}
 		catch (IOException ignored)
 		{
@@ -95,20 +96,20 @@ public final class FileUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static boolean create(File file) throws IOException
+	public static void create(File file) throws IOException
 	{
 		if (file.exists())
 		{
-			return true;
+			return;
 		}
 
 		final File parent = file.getParentFile();
 		if (parent != null && !parent.exists() && !parent.mkdirs())
 		{
-			return false;
+			throw new IOException("Could not create parent directory: " + parent);
 		}
-		// return true if the file was created successfully
-		return !file.createNewFile();
+		//noinspection ResultOfMethodCallIgnored
+		file.createNewFile();
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
@@ -122,7 +123,8 @@ public final class FileUtils
 	{
 		try
 		{
-			return write(file, bytes);
+			write(file, bytes);
+			return true;
 		}
 		catch (IOException ignored)
 		{
@@ -131,15 +133,10 @@ public final class FileUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static boolean write(File file, byte[] bytes) throws IOException
+	public static void write(File file, byte[] bytes) throws IOException
 	{
-		if (!create(file))
-		{
-			return false;
-		}
-
+		create(file);
 		Files.write(file.toPath(), bytes);
-		return true;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
@@ -147,7 +144,8 @@ public final class FileUtils
 	{
 		try
 		{
-			return writeLines(file, lines);
+			writeLines(file, lines);
+			return true;
 		}
 		catch (IOException ignored)
 		{
@@ -156,15 +154,10 @@ public final class FileUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static boolean writeLines(File file, List<String> lines) throws IOException
+	public static void writeLines(File file, List<String> lines) throws IOException
 	{
-		if (!create(file))
-		{
-			return false;
-		}
-
+		create(file);
 		Files.write(file.toPath(), lines, Charset.defaultCharset());
-		return true;
 	}
 
 	/**
@@ -290,31 +283,5 @@ public final class FileUtils
 			}
 		}
 		return file.delete();
-	}
-
-	/**
-	 * Returns the user application data directory of the host OS. Common paths are: <ul> <li>Windows: {@code
-	 * %appdata%/} <li>Mac OS: {@code $username$/Library/Application Support/} <li>Linux: {@code $username$} <li>Every
-	 * other OS: System Property {@code user.dir} </ul> The {@code $username$} variable is acquired via the system
-	 * property {@code user.home}.
-	 *
-	 * @return the user application data directory
-	 */
-	public static String getAppdataDirectory()
-	{
-		String os = System.getProperty("os.name").toUpperCase();
-		if (os.contains("WIN"))
-		{
-			return System.getenv("APPDATA");
-		}
-		else if (os.contains("MAC"))
-		{
-			return System.getProperty("user.home") + "/Library/Application Support";
-		}
-		else if (os.contains("NUX"))
-		{
-			return System.getProperty("user.home");
-		}
-		return System.getProperty("user.dir");
 	}
 }
