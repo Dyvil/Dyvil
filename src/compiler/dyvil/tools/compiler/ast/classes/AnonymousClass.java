@@ -119,7 +119,7 @@ public class AnonymousClass extends CodeClass
 		FieldThis thisField = this.thisField;
 		if (thisField != null)
 		{
-			buf.append(thisField.getDescription());
+			buf.append(thisField.getDescriptor());
 		}
 
 		this.captureHelper.appendCaptureTypes(buf);
@@ -139,7 +139,7 @@ public class AnonymousClass extends CodeClass
 		final FieldThis thisField = this.thisField;
 		if (thisField != null)
 		{
-			thisField.getOuter().writeGet(writer);
+			thisField.getTargetAccess().writeGet(writer);
 		}
 
 		this.captureHelper.writeCaptures(writer);
@@ -188,7 +188,7 @@ class AnonymousClassMetadata implements IClassMetadata
 		if (thisField != null)
 		{
 			thisField.writeField(writer);
-			index = initWriter.visitParameter(index, thisField.getName(), thisField.getTheClass().getThisType(),
+			index = initWriter.visitParameter(index, thisField.getName(), thisField.getTargetClass().getThisType(),
 			                                  Modifiers.MANDATED);
 		}
 
@@ -209,7 +209,7 @@ class AnonymousClassMetadata implements IClassMetadata
 			initWriter.visitVarInsn(Opcodes.ALOAD, 0);
 			initWriter.visitVarInsn(Opcodes.ALOAD, thisIndex);
 			initWriter.visitFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), thisField.getName(),
-			                          thisField.getDescription());
+			                          thisField.getDescriptor());
 		}
 
 		captureHelper.writeFieldAssignments(initWriter);

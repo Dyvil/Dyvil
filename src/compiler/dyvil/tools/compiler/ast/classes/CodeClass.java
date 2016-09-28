@@ -111,9 +111,9 @@ public class CodeClass extends AbstractClass
 	}
 
 	@Override
-	public void setSuperConstructorArguments(IArguments superConstructorArguments)
+	public void setSuperConstructorArguments(IArguments arguments)
 	{
-		this.superConstructorArguments = superConstructorArguments;
+		this.superConstructorArguments = arguments;
 	}
 
 	@Override
