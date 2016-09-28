@@ -15,6 +15,7 @@ import dyvil.tools.parsing.lexer.DyvilLexer;
 import dyvil.tools.parsing.lexer.LexerUtil;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.repl.command.*;
+import dyvil.tools.repl.context.REPLClassLoader;
 import dyvil.tools.repl.context.REPLContext;
 import dyvil.tools.repl.input.REPLParser;
 import dyvil.tools.repl.lang.I18n;
@@ -30,6 +31,7 @@ public final class DyvilREPL
 
 	protected REPLContext context = new REPLContext(this);
 	protected REPLParser  parser  = new REPLParser(this.context);
+	protected REPLClassLoader classLoader = new REPLClassLoader(this);
 
 	protected File dumpDir;
 
@@ -64,6 +66,11 @@ public final class DyvilREPL
 	public DyvilCompiler getCompiler()
 	{
 		return this.compiler;
+	}
+
+	public REPLClassLoader getClassLoader()
+	{
+		return this.classLoader;
 	}
 
 	public REPLContext getContext()
