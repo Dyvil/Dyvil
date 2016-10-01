@@ -11,17 +11,22 @@ public class GenSources
 	public static final String TARGET_PREFIX = "target=";
 	public static final String SOURCE_PREFIX = "source=";
 
-	private static List<Template>            templates       = new ArrayList<>();
-	private static Map<File, Specialization> specializations = new HashMap<>();
+	private List<Template>            templates       = new ArrayList<>();
+	private Map<File, Specialization> specializations = new HashMap<>();
+
+	private File sourceDir;
+	private File targetDir;
 
 	public static void main(String[] args)
 	{
-		if (args.length < 2)
-		{
-			System.out.println("Not enough arguments. Source and target directory expected");
-			return;
-		}
+		final GenSources instance = new GenSources();
+		instance.processArguments(args);
+		instance.findFiles();
+		instance.processTemplates();
+	}
 
+	private void processArguments(String[] args)
+	{
 		String sourceDir = null;
 		String targetDir = null;
 		for (String s : args)
@@ -47,6 +52,7 @@ public class GenSources
 				System.out.println("Invalid Argument: " + s);
 			}
 		}
+
 		if (sourceDir == null)
 		{
 			System.out.println("Missing Source Directory");
@@ -58,20 +64,16 @@ public class GenSources
 			return;
 		}
 
-		final File sourceRoot = new File(sourceDir);
-		processSources(sourceRoot, new File(targetDir));
-
-		for (Specialization spec : specializations.values())
-		{
-			spec.read(sourceRoot, specializations);
-		}
-		for (Template template : templates)
-		{
-			template.specialize();
-		}
+		this.sourceDir = new File(sourceDir);
+		this.targetDir = new File(targetDir);
 	}
 
-	private static void processSources(File sourceDir, File targetDir)
+	private void findFiles()
+	{
+		this.findFiles(this.sourceDir, this.targetDir);
+	}
+
+	private void findFiles(File sourceDir, File targetDir)
 	{
 		final String[] subFiles = sourceDir.list();
 		if (subFiles == null)
@@ -87,7 +89,7 @@ public class GenSources
 			final File sourceFile = new File(sourceDir, subFile);
 			if (sourceFile.isDirectory())
 			{
-				processSources(sourceFile, new File(targetDir, subFile));
+				this.findFiles(sourceFile, new File(targetDir, subFile));
 				continue;
 			}
 
@@ -109,7 +111,7 @@ public class GenSources
 
 		for (Specialization spec : specializations)
 		{
-			GenSources.specializations.put(spec.getSourceFile(), spec);
+			this.specializations.put(spec.getSourceFile(), spec);
 
 			final Template template = templates.get(spec.getTemplateName());
 			if (template == null)
@@ -121,6 +123,18 @@ public class GenSources
 			template.addSpecialization(spec);
 		}
 
-		GenSources.templates.addAll(templates.values());
+		this.templates.addAll(templates.values());
+	}
+
+	private void processTemplates()
+	{
+		for (Specialization spec : this.specializations.values())
+		{
+			spec.read(this.sourceDir, this.specializations);
+		}
+		for (Template template : this.templates)
+		{
+			template.specialize();
+		}
 	}
 }
