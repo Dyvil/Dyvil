@@ -9,7 +9,7 @@ import java.util.List;
 public class Template
 {
 	private final File   sourceFile;
-	private final File targetDirectory;
+	private final File   targetDirectory;
 	private final String fileName;
 
 	private List<Specialization> specializations = new ArrayList<>();
@@ -62,7 +62,8 @@ public class Template
 				this.specialize(lines, spec);
 			}
 
-			System.out.printf("Applied %d specializations for template '%s'\n", this.specializations.size(), this.getSourceFile());
+			System.out.printf("Applied %d specializations for template '%s'\n", this.specializations.size(),
+			                  this.getSourceFile());
 		}
 		catch (IOException ex)
 		{

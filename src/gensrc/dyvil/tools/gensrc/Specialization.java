@@ -21,6 +21,8 @@ public class Specialization
 	private final String templateName;
 	private final String name;
 
+	private Template template;
+
 	public Specialization(File sourceFile, String templateName, String specName)
 	{
 		this.sourceFile = sourceFile;
@@ -36,6 +38,16 @@ public class Specialization
 	public String getTemplateName()
 	{
 		return this.templateName;
+	}
+
+	public Template getTemplate()
+	{
+		return this.template;
+	}
+
+	public void setTemplate(Template template)
+	{
+		this.template = template;
 	}
 
 	public String getName()

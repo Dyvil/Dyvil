@@ -143,6 +143,7 @@ public class GenSources
 				continue;
 			}
 
+			spec.setTemplate(template);
 			template.addSpecialization(spec);
 		}
 
