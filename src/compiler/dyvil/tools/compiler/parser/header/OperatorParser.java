@@ -104,14 +104,14 @@ public final class OperatorParser extends Parser
 			return;
 		}
 		case SEPARATOR:
-			if (type == BaseSymbols.SEMICOLON)
+			switch (type)
 			{
+			case BaseSymbols.SEMICOLON:
+			case Tokens.EOF:
 				pm.popParser();
 				this.map.addOperator(this.operator);
 				return;
-			}
-			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
-			{
+			case BaseSymbols.OPEN_CURLY_BRACKET:
 				this.mode = PROPERTY;
 				return;
 			}
@@ -121,9 +121,10 @@ public final class OperatorParser extends Parser
 			pm.report(token, "operator.separator");
 			return;
 		case PROPERTY:
-			if (type == Tokens.LETTER_IDENTIFIER)
+			switch (type)
 			{
-				Name name = token.nameValue();
+			case Tokens.LETTER_IDENTIFIER:
+				final Name name = token.nameValue();
 				if (name == precedence)
 				{
 					this.mode = PRECEDENCE;
@@ -139,17 +140,16 @@ public final class OperatorParser extends Parser
 					this.mode = COMMA;
 					return;
 				}
+				break;
+			case BaseSymbols.CLOSE_CURLY_BRACKET:
+				pm.popParser();
+				this.map.addOperator(this.operator);
+				return;
 			}
 			if ((type & Tokens.INT) != 0)
 			{
 				this.setPrecedence(pm, token, token.intValue());
 				this.mode = COMMA;
-				return;
-			}
-			if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
-			{
-				pm.popParser();
-				this.map.addOperator(this.operator);
 				return;
 			}
 			pm.report(Markers.syntaxError(token, "operator.property.invalid", token));
@@ -183,7 +183,7 @@ public final class OperatorParser extends Parser
 			this.mode = COMMA;
 			if (type == Tokens.LETTER_IDENTIFIER)
 			{
-				Name name = token.nameValue();
+				final Name name = token.nameValue();
 				if (this.parseAssociativity(pm, token, name))
 				{
 					return;
