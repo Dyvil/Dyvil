@@ -29,27 +29,50 @@ public class GenSources
 	{
 		String sourceDir = null;
 		String targetDir = null;
-		for (String s : args)
+		for (int i = 0, size = args.length; i < size; i++)
 		{
-			if (s.startsWith(SOURCE_PREFIX))
+			final String arg = args[i];
+
+			switch (arg)
 			{
-				sourceDir = s.substring(SOURCE_PREFIX.length());
+			case "-s":
+			case "--source":
+				if (++i == size)
+				{
+					System.out.println("Invalid -s argument: Source Directory expected");
+				}
+				else
+				{
+					sourceDir = args[i];
+				}
+				continue;
+			case "-t":
+			case "--target":
+				if (++i == size)
+				{
+					System.out.println("Invalid -t argument: Target Directory expected");
+				}
+				continue;
 			}
-			else if (s.startsWith(TARGET_PREFIX))
+			if (arg.startsWith(SOURCE_PREFIX))
 			{
-				targetDir = s.substring(TARGET_PREFIX.length());
+				sourceDir = arg.substring(SOURCE_PREFIX.length());
+			}
+			else if (arg.startsWith(TARGET_PREFIX))
+			{
+				targetDir = arg.substring(TARGET_PREFIX.length());
 			}
 			else if (sourceDir == null)
 			{
-				sourceDir = s;
+				sourceDir = arg;
 			}
 			else if (targetDir == null)
 			{
-				targetDir = s;
+				targetDir = arg;
 			}
 			else
 			{
-				System.out.println("Invalid Argument: " + s);
+				System.out.println("Invalid Argument: " + arg);
 			}
 		}
 
