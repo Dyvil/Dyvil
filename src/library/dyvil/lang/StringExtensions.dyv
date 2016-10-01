@@ -2,6 +2,7 @@ package dyvil.lang
 
 using dyvil.reflect.Opcodes._
 using dyvil.reflect.ReflectUtils._
+import dyvil.string.StringUtils
 
 public final class StringExtensions
 {
