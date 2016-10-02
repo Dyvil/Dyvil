@@ -106,6 +106,8 @@ public final class PrimitiveType implements IType
 	{
 		switch (internalClassName)
 		{
+		case "java/lang/Object":
+			return Types.ANY;
 		case "java/lang/Void":
 			return Types.VOID;
 		case "java/lang/Boolean":
@@ -553,7 +555,7 @@ public final class PrimitiveType implements IType
 			primitiveTarget = getPrimitiveType(target);
 
 			// Target is not a primitive type
-			if (primitiveTarget == null)
+			if (primitiveTarget == null || primitiveTarget.getTypecode() < 0)
 			{
 				this.boxMethod.writeInvoke(writer, null, EmptyArguments.INSTANCE, ITypeContext.DEFAULT, lineNumber);
 				return;
@@ -786,7 +788,9 @@ public final class PrimitiveType implements IType
 		final char lastChar = typePath.charAt(length - 1);
 		if (lastChar == ';' || lastChar >= '0' && lastChar <= '9')
 		{
-			visitor.visitTypeAnnotation(typeRef, TypePath.fromString(typePath), AnnotationUtil.PRIMITIVE, true);
+			// Argument of a parametric type
+			visitor.visitTypeAnnotation(typeRef, TypePath.fromString(typePath), AnnotationUtil.PRIMITIVE,
+			                            AnnotationUtil.PRIMITIVE_VISIBLE);
 		}
 	}
 
