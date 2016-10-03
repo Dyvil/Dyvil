@@ -414,25 +414,10 @@ public class Field extends Member implements IField
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		final int modifiers = this.modifiers.toFlags() & ModifierUtil.JAVA_MODIFIER_MASK;
-
-		final Object value;
-		if (this.value != null && this.hasModifier(Modifiers.STATIC) && this.hasConstantValue())
-		{
-			value = this.value.toObject();
-		}
-		else
-		{
-			value = null;
-		}
-
 		final String name = this.getInternalName();
 		final String descriptor = this.getDescriptor();
-		final String signature = this.type.needsSignature() ? this.getSignature() : null;
 
-		final FieldVisitor fieldVisitor = writer.visitField(modifiers, name, descriptor, signature, value);
-
-		IField.writeAnnotations(fieldVisitor, this.modifiers, this.annotations, this.type);
-		fieldVisitor.visitEnd();
+		this.writeField(writer, modifiers, name, descriptor);
 
 		if (this.property != null)
 		{
@@ -444,6 +429,29 @@ public class Field extends Member implements IField
 			return;
 		}
 
+		this.writeLazy(writer, modifiers, name, descriptor);
+	}
+
+	protected void writeField(ClassWriter writer, int modifiers, String name, String descriptor)
+	{
+		final String signature = this.type.needsSignature() ? this.getSignature() : null;
+		final Object value;
+		if (this.value != null && this.hasModifier(Modifiers.STATIC) && this.hasConstantValue())
+		{
+			value = this.value.toObject();
+		}
+		else
+		{
+			value = null;
+		}
+		final FieldVisitor fieldVisitor = writer.visitField(modifiers, name, descriptor, signature, value);
+
+		IField.writeAnnotations(fieldVisitor, this.modifiers, this.annotations, this.type);
+		fieldVisitor.visitEnd();
+	}
+
+	protected void writeLazy(ClassWriter writer, int modifiers, String name, String descriptor)
+	{
 		final String lazyName = name + "$lazy";
 		final String ownerClass = this.enclosingClass.getInternalName();
 		final boolean isStatic = (modifiers & Modifiers.STATIC) != 0;

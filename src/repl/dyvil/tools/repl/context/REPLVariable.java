@@ -121,19 +121,9 @@ public class REPLVariable extends Field
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		final String name = this.getInternalName();
-		final String descriptor = this.getDescriptor();
-
 		if (!Types.isVoid(this.type))
 		{
-			// Generate the field holding the value
-			writer.visitField(this.modifiers.toFlags(), name, descriptor, null, null);
-		}
-
-		// Write the property, if necessary
-		if (this.property != null)
-		{
-			this.property.write(writer);
+			super.write(writer);
 		}
 	}
 
