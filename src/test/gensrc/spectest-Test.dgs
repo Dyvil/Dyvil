@@ -1,5 +1,5 @@
-fileName=spectest.txt
-enabled=true
+@fileName=spectest.txt
+@enabled=true
 
 substitution=Substitution
 count=2

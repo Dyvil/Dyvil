@@ -13,6 +13,8 @@ import java.util.Properties;
 
 public class Specialization
 {
+	public static final String FILE_NAME_PROPERTY  = "@fileName";
+	public static final String ENABLED_PROPERTY    = "@enabled";
 	private Properties substitutions = new Properties();
 
 	private Specialization parent;
@@ -57,12 +59,12 @@ public class Specialization
 
 	public String getFileName()
 	{
-		return this.getSubstitution("fileName");
+		return this.getSubstitution(FILE_NAME_PROPERTY);
 	}
 
 	public boolean isEnabled()
 	{
-		final String enabled = this.getSubstitution("enabled");
+		final String enabled = this.getSubstitution(ENABLED_PROPERTY);
 		return enabled == null || "true".equals(enabled);
 	}
 
