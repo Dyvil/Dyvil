@@ -1,5 +1,5 @@
-// $genNotice$
-// Timestamp: $timeStamp$
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
 
 package dyvil.collection.range.closed;
 
@@ -13,17 +13,17 @@ import java.util.function.Consumer;
 
 @Immutable
 @LiteralConvertible.FromTuple
-public class $type$Range implements dyvil.collection.range.$type$Range
+public class TYPE_NAME##Range implements dyvil.collection.range.TYPE_NAME##Range
 {
-	private final $primitive$ start;
-	private final $primitive$ end;
+	private final PRIMITIVE start;
+	private final PRIMITIVE end;
 
-	public static dyvil.collection.range.$type$Range apply($primitive$ from, $primitive$ to)
+	public static dyvil.collection.range.TYPE_NAME##Range apply(PRIMITIVE from, PRIMITIVE to)
 	{
-		return new $type$Range(from, to);
+		return new TYPE_NAME##Range(from, to);
 	}
 
-	public $type$Range($primitive$ from, $primitive$ to)
+	public TYPE_NAME##Range(PRIMITIVE from, PRIMITIVE to)
 	{
 		this.start = from;
 		this.end = to;
@@ -36,25 +36,25 @@ public class $type$Range implements dyvil.collection.range.$type$Range
 	}
 
 	@Override
-	public dyvil.collection.range.$type$Range asHalfOpen()
+	public dyvil.collection.range.TYPE_NAME##Range asHalfOpen()
 	{
 		return this;
 	}
 
 	@Override
-	public dyvil.collection.range.$type$Range asClosed()
+	public dyvil.collection.range.TYPE_NAME##Range asClosed()
 	{
-		return new dyvil.collection.range.halfopen.$type$Range(this.start, this.end);
+		return new dyvil.collection.range.halfopen.TYPE_NAME##Range(this.start, this.end);
 	}
 
 	@Override
-	public $wrapper$ first()
+	public WRAPPER first()
 	{
 		return this.start;
 	}
 
 	@Override
-	public $wrapper$ last()
+	public WRAPPER last()
 	{
 		return this.end;
 	}
@@ -67,23 +67,23 @@ public class $type$Range implements dyvil.collection.range.$type$Range
 	}
 
 	@Override
-	public Iterator<$wrapper$> iterator()
+	public Iterator<WRAPPER> iterator()
 	{
-		return new Iterator<$wrapper$>()
+		return new Iterator<WRAPPER>()
 		{
-			private $primitive$ value = $type$Range.this.start;
+			private PRIMITIVE value = TYPE_NAME##Range.this.start;
 
 			@Override
 			public boolean hasNext()
 			{
-				return this.value <= $type$Range.this.end;
+				return this.value <= TYPE_NAME##Range.this.end;
 			}
 
 			@Override
-			public $wrapper$ next()
+			public WRAPPER next()
 			{
-				final $primitive$ value = this.value;
-				if (value > $type$Range.this.end)
+				final PRIMITIVE value = this.value;
+				if (value > TYPE_NAME##Range.this.end)
 				{
 					throw new NoSuchElementException();
 				}
@@ -95,27 +95,27 @@ public class $type$Range implements dyvil.collection.range.$type$Range
 	}
 
 	@Override
-	public void forEach(Consumer<? super $wrapper$> action)
+	public void forEach(Consumer<? super WRAPPER> action)
 	{
-		for ($primitive$ i = this.start; i <= this.end; i++)
+		for (PRIMITIVE i = this.start; i <= this.end; i++)
 		{
 			action.accept(i);
 		}
 	}
 
 	@Override
-	public boolean contains($primitive$ value)
+	public boolean contains(PRIMITIVE value)
 	{
 		return value >= this.start && value <= this.end;
 	}
 
 	@Override
-	public $primitive$[] to$type$Array()
+	public PRIMITIVE[] to##TYPE_NAME##Array()
 	{
-		final $primitive$[] result = new $primitive$[this.size()];
+		final PRIMITIVE[] result = new PRIMITIVE[this.size()];
 
 		int index = 0;
-		for ($primitive$ i = this.start; i <= this.end; i++)
+		for (PRIMITIVE i = this.start; i <= this.end; i++)
 		{
 			result[index++] = i;
 		}
@@ -125,16 +125,16 @@ public class $type$Range implements dyvil.collection.range.$type$Range
 	@Override
 	public void toArray(int index, Object[] store)
 	{
-		for ($primitive$ i = this.start; i <= this.end; i++)
+		for (PRIMITIVE i = this.start; i <= this.end; i++)
 		{
 			store[index++] = i;
 		}
 	}
 
 	@Override
-	public dyvil.collection.range.$type$Range copy()
+	public dyvil.collection.range.TYPE_NAME##Range copy()
 	{
-		return new $type$Range(this.start, this.end);
+		return new TYPE_NAME##Range(this.start, this.end);
 	}
 
 	@Override

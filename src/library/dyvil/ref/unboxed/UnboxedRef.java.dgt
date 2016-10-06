@@ -1,28 +1,28 @@
-// $genNotice$
-// Timestamp: $timeStamp$
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
 
 package dyvil.ref.unboxed;
 
-import dyvil.ref.$type$Ref;
+import dyvil.ref.TYPE_NAME##Ref;
 import dyvil.ref.ObjectRef;
 
-public class Unboxed$type$Ref implements $type$Ref
+public class Unboxed##TYPE_NAME##Ref implements TYPE_NAME##Ref
 {
-	private final ObjectRef<$wrapper$> objectRef;
+	private final ObjectRef<WRAPPER> objectRef;
 
-	public Unboxed$type$Ref(ObjectRef<$wrapper$> objectRef)
+	public Unboxed##TYPE_NAME##Ref(ObjectRef<WRAPPER> objectRef)
 	{
 		this.objectRef = objectRef;
 	}
 
 	@Override
-	public $primitive$ get()
+	public PRIMITIVE get()
 	{
 		return this.objectRef.get();
 	}
 
 	@Override
-	public void set($primitive$ value)
+	public void set(PRIMITIVE value)
 	{
 		this.objectRef.set(value);
 	}

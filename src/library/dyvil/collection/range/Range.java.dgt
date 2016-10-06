@@ -1,5 +1,5 @@
-// $genNotice$
-// Timestamp: $timeStamp$
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
 
 package dyvil.collection.range;
 
@@ -10,44 +10,44 @@ import dyvil.lang.LiteralConvertible;
 
 @LiteralConvertible.FromTuple
 @Immutable
-public interface $type$Range extends Range<$wrapper$>
+public interface TYPE_NAME##Range extends Range<WRAPPER>
 {
 	@DyvilName("apply")
-	static $type$Range closed($primitive$ from, $primitive$ to)
+	static TYPE_NAME##Range closed(PRIMITIVE from, PRIMITIVE to)
 	{
-		return new dyvil.collection.range.closed.$type$Range(from, to);
+		return new dyvil.collection.range.closed.TYPE_NAME##Range(from, to);
 	}
 
 	@DyvilName("apply")
-	static $type$Range halfOpen($primitive$ from, $primitive$ toExclusive)
+	static TYPE_NAME##Range halfOpen(PRIMITIVE from, PRIMITIVE toExclusive)
 	{
-		return new dyvil.collection.range.halfopen.$type$Range(from, toExclusive);
+		return new dyvil.collection.range.halfopen.TYPE_NAME##Range(from, toExclusive);
 	}
 
 	@Override
-	$type$Range asClosed();
+	TYPE_NAME##Range asClosed();
 
 	@Override
-	$type$Range asHalfOpen();
+	TYPE_NAME##Range asHalfOpen();
 
-	boolean contains($primitive$ value);
+	boolean contains(PRIMITIVE value);
 
 	@Override
 	default boolean contains(Object value)
 	{
-		return value instanceof Number && this.contains(((Number) value).$primitive$Value());
+		return value instanceof Number && this.contains(((Number) value).PRIMITIVE##Value());
 	}
 
 	@Override
-	default $wrapper$[] toArray()
+	default WRAPPER[] toArray()
 	{
-		final $wrapper$[] result = new $wrapper$[this.size()];
+		final WRAPPER[] result = new WRAPPER[this.size()];
 		this.toArray(0, result);
 		return result;
 	}
 
-	$primitive$[] to$type$Array();
+	PRIMITIVE[] to##TYPE_NAME##Array();
 
 	@Override
-	$type$Range copy();
+	TYPE_NAME##Range copy();
 }

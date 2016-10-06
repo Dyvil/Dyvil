@@ -1,24 +1,23 @@
-type=Byte
-primitive=byte
-wrapper=Byte
+TYPE_NAME=Byte
+PRIMITIVE=byte
+WRAPPER=Byte
 
-loadInsn=BALOAD
-storeInsn=BASTORE
+ARRAY_LOAD_INSN=BALOAD
+ARRAY_STORE_INSN=BASTORE
 
-fromLiteral=FromInt
+FROM_LITERAL=FromInt
 
-mapper=IntUnaryOperator
-mapper_apply=applyAsInt
+MAPPER=IntUnaryOperator
+MAPPER_APPLY=applyAsInt
 
-flatMapper=IntFunction<byte[]>
-flatMapper_apply=applyAsInt
+FLAT_MAPPER=IntFunction<byte[]>
+FLAT_MAPPER_APPLY=applyAsInt
 
-predicate=IntPredicate
-predicate.test=test
+PREDICATE=IntPredicate
+PREDICATE_TEST=test
 
-supplier=IntSupplier
-supplier_get=getAsInt
+SUPPLIER=IntSupplier
+SUPPLIER_GET=getAsInt
 
-consumer=IntConsumer
-consumer_accept=accept
-
+CONSUMER=IntConsumer
+CONSUMER_ACCEPT=accept

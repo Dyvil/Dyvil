@@ -1,30 +1,24 @@
-type=Long
-primitive=long
-wrapper=Long
+TYPE_NAME=Long
+PRIMITIVE=long
+WRAPPER=Long
 
-loadInsn=LALOAD
-storeInsn=LASTORE
+ARRAY_LOAD_INSN=LALOAD
+ARRAY_STORE_INSN=LASTORE
 
-fromLiteral=FromLong
+FROM_LITERAL=FromLong
 
-ref=LongRef
-ref_array=LongArrayRef
+MAPPER=LongUnaryOperator
+MAPPER_APPLY=applyAsLong
 
-range=LongRange
-range_array=toLongArray
+FLAT_MAPPER=LongFunction<long[]>
+FLAT_MAPPER_APPLY=applyAsLong
 
-mapper=LongUnaryOperator
-mapper_apply=applyAsLong
+PREDICATE=LongPredicate
+PREDICATE_TEST=test
 
-flatMapper=LongFunction<long[]>
-flatMapper_apply=applyAsLong
+SUPPLIER=LongSupplier
+SUPPLIER_GET=getAsLong
 
-predicate=LongPredicate
-predicate_test=test
-
-supplier=LongSupplier
-supplier_get=getAsLong
-
-consumer=LongConsumer
-consumer_accept=accept
+CONSUMER=LongConsumer
+CONSUMER_ACCEPT=accept
 

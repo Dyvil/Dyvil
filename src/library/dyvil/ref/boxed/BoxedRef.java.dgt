@@ -1,28 +1,28 @@
-// $genNotice$
-// Timestamp: $timeStamp$
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
 
 package dyvil.ref.boxed;
 
-import dyvil.ref.$type$Ref;
+import dyvil.ref.TYPE_NAME##Ref;
 import dyvil.ref.ObjectRef;
 
-public class Boxed$type$Ref implements ObjectRef<$wrapper$>
+public class Boxed##TYPE_NAME##Ref implements ObjectRef<WRAPPER>
 {
-	private final $type$Ref booleanRef;
+	private final TYPE_NAME##Ref booleanRef;
 
-	public Boxed$type$Ref($type$Ref booleanRef)
+	public Boxed##TYPE_NAME##Ref(TYPE_NAME##Ref booleanRef)
 	{
 		this.booleanRef = booleanRef;
 	}
 
 	@Override
-	public $wrapper$ get()
+	public WRAPPER get()
 	{
 		return this.booleanRef.get();
 	}
 
 	@Override
-	public void set($wrapper$ value)
+	public void set(WRAPPER value)
 	{
 		this.booleanRef.set(value);
 	}

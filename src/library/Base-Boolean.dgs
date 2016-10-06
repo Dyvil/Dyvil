@@ -1,13 +1,8 @@
-type=Boolean
-primitive=boolean
-wrapper=Boolean
+TYPE_NAME=Boolean
+PRIMITIVE=boolean
+WRAPPER=Boolean
 
-loadInsn=BALOAD
-storeInsn=BASTORE
+ARRAY_LOAD_INSN=BALOAD
+ARRAY_STORE_INSN=BASTORE
 
-fromLiteral=FromBoolean
-
-ref=BooleanRef
-ref_array=BooleanArrayRef
-
-
+FROM_LITERAL=FromBoolean

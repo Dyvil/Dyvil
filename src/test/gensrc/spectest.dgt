@@ -2,10 +2,13 @@
 
 line without substitution
 
-$ at beginning
-line ending with $
-line with $ in the middle
+line with COUNT SUBSTITUTION##s
+line ending with SUBSTITUTION
+SUBSTITUTION at the beginning
 
-line with $count$ $substitution$s
-line ending with $substitution$
-$substitution$ at the beginning
+#at the beginning
+##nothing at the beginning
+line ending##
+line ending with #
+line with #in the middle
+line with nothing ##in the middle

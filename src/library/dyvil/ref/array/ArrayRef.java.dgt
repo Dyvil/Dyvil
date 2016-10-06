@@ -1,29 +1,29 @@
-// $genNotice$
-// Timestamp: $timeStamp$
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
 
 package dyvil.ref.array;
 
-import dyvil.ref.$type$Ref;
+import dyvil.ref.TYPE_NAME##Ref;
 
-public class $type$ArrayRef implements $type$Ref
+public class TYPE_NAME##ArrayRef implements TYPE_NAME##Ref
 {
-	protected final $primitive$[] array;
+	protected final PRIMITIVE[] array;
 	protected final int index;
 
-	public $type$ArrayRef($primitive$[] array, int index)
+	public TYPE_NAME##ArrayRef(PRIMITIVE[] array, int index)
 	{
 		this.array = array;
 		this.index = index;
 	}
 
 	@Override
-	public $primitive$ get()
+	public PRIMITIVE get()
 	{
 		return this.array[this.index];
 	}
 
 	@Override
-	public void set($primitive$ value)
+	public void set(PRIMITIVE value)
 	{
 		this.array[this.index] = value;
 	}

@@ -1,27 +1,23 @@
-type=Char
-primitive=char
-wrapper=Character
+TYPE_NAME=Char
+PRIMITIVE=char
+WRAPPER=Character
 
-loadInsn=CALOAD
-storeInsn=CASTORE
+ARRAY_LOAD_INSN=CALOAD
+ARRAY_STORE_INSN=CASTORE
 
-fromLiteral=FromChar
+FROM_LITERAL=FromChar
 
-ref=CharRef
-ref_array=CharArrayRef
+MAPPER=IntUnaryOperator
+MAPPER_APPLY=applyAsInt
 
-mapper=IntUnaryOperator
-mapper_apply=applyAsInt
+FLAT_MAPPER=IntFunction<char[]>
+FLAT_MAPPER_APPLY=applyAsInt
 
-flatMapper=IntFunction<char[]>
-flatMapper_apply=applyAsInt
+PREDICATE=IntPredicate
+PREDICATE_TEST=test
 
-predicate=IntPredicate
-predicate.test=test
+SUPPLIER=IntSupplier
+SUPPLIER_GET=getAsInt
 
-supplier=IntSupplier
-supplier_get=getAsInt
-
-consumer=IntConsumer
-consumer_accept=accept
-
+CONSUMER=IntConsumer
+CONSUMER_ACCEPT=accept
