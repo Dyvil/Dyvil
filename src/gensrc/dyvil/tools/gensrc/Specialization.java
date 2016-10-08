@@ -138,44 +138,63 @@ public class Specialization
 		{
 			final String line = iterator.next();
 			final int length = line.length();
-			final int startIndex;
-			if (length >= 2 && (startIndex = skipWhitespace(line, 0, length)) < length
-				    && line.charAt(startIndex) == '#')
+
+			final int hashIndex;
+			if (length < 2 || (hashIndex = skipWhitespace(line, 0, length)) >= length || line.charAt(hashIndex) != '#')
 			{
-				final int directiveEnd = findIdentifierEnd(line, startIndex + 1, length);
-				final String directive = line.substring(startIndex + 1, directiveEnd);
-				switch (directive)
+				// no leading directive
+
+				if (outerCondition && thisCondition)
 				{
-				case "if":
-					// nested if
-					final boolean condition = this.evaluate(line, directiveEnd, length);
-					this.processLines(iterator, writer, true, outerCondition && thisCondition, condition);
-					continue;
-				case "else":
-					if (ifStatement)
-					{
-						if (!hasElse)
-						{
-							thisCondition = !thisCondition;
-							hasElse = true;
-						}
-						continue;
-					}
-					break;
-				case "endif":
-					if (ifStatement)
-					{
-						return;
-					}
-					break;
+					writer.println(this.processLine(line));
 				}
+				continue;
 			}
 
-			if (outerCondition && thisCondition)
+			final int directiveStart = hashIndex + 1; // TODO ignore whitespace between # and identifier?
+			final int directiveEnd = findIdentifierEnd(line, directiveStart, length);
+			final String directive = line.substring(directiveStart, directiveEnd);
+			switch (directive)
 			{
-				final String processed = this.processLine(line);
-				writer.println(processed);
+			case "if":
+				// nested if
+				final boolean condition = this.evaluate(line, directiveEnd, length);
+				this.processLines(iterator, writer, true, outerCondition && thisCondition, condition);
+				continue;
+			case "else":
+				if (ifStatement && !hasElse)
+				{
+					thisCondition = !thisCondition;
+					hasElse = true;
+				}
+				continue;
+			case "endif":
+				if (ifStatement)
+				{
+					return;
+				}
+				continue;
+			case "process":
+				if (outerCondition && thisCondition)
+				{
+					// process the remainder of the line
+					final String remainder = line.substring(skipWhitespace(line, directiveEnd, length));
+					writer.println(this.processLine(remainder));
+				}
+				continue;
+			case "literal":
+				if (outerCondition && thisCondition)
+				{
+					// simply append the remainder of the line verbatim
+					final String remainder = line.substring(skipWhitespace(line, directiveEnd, length));
+					writer.println(remainder);
+				}
+				continue;
+			case "comment":
+				continue;
 			}
+
+			// TODO invalid directive error/warning
 		}
 	}
 

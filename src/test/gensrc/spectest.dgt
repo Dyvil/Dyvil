@@ -1,4 +1,7 @@
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
 
+// tests for substitutions
 
 line without substitution
 
@@ -6,29 +9,27 @@ line with COUNT SUBSTITUTION##s
 line ending with SUBSTITUTION
 SUBSTITUTION at the beginning
 
-#at the beginning
-##nothing at the beginning
-line ending##
-line ending with #
+// tests for the token concat operator
+
+line ending with nothing ##
+line ending with a #
 line with #in the middle
 line with nothing ##in the middle
 
+// tests for the processor directives
+
 #if ENABLED
-enabled set to true
-
+	#process enabled set to ENABLED
 	#if  NESTED
-	and nested set to true
+		#literal and NESTED set to true
 	#else
-	but nested set to false
+		#literal but NESTED set to false
 	#endif
-
 #else
-enabled set to false
-
+	#process enabled set to ENABLED
 	#if NESTED
-	but nested set to true
+		#literal but NESTED set to true
 	#else
-	and nested set to false
+		#literal and NESTED set to false
 	#endif
-
 #endif
