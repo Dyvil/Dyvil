@@ -129,8 +129,8 @@ public class Specialization
 		this.processLines(lines.iterator(), writer, false, true, true);
 	}
 
-	private void processLines(Iterator<String> iterator, PrintStream writer, boolean ifStatement, boolean outerCondition,
-		                      boolean thisCondition)
+	private void processLines(Iterator<String> iterator, PrintStream writer, boolean ifStatement,
+		                         boolean outerCondition, boolean thisCondition)
 	{
 		boolean hasElse = false;
 
@@ -138,15 +138,17 @@ public class Specialization
 		{
 			final String line = iterator.next();
 			final int length = line.length();
-			if (length >= 2 && line.charAt(0) == '#')
+			final int startIndex;
+			if (length >= 2 && (startIndex = skipWhitespace(line, 0, length)) < length
+				    && line.charAt(startIndex) == '#')
 			{
-				final int nextIndex = findNextIndex(line, 2, length);
-				final String directive = line.substring(1, nextIndex);
+				final int directiveEnd = findIdentifierEnd(line, startIndex + 1, length);
+				final String directive = line.substring(startIndex + 1, directiveEnd);
 				switch (directive)
 				{
 				case "if":
 					// nested if
-					final boolean condition = this.evaluate(line.substring(nextIndex).trim());
+					final boolean condition = this.evaluate(line, directiveEnd, length);
 					this.processLines(iterator, writer, true, outerCondition && thisCondition, condition);
 					continue;
 				case "else":
@@ -175,6 +177,14 @@ public class Specialization
 				writer.println(processed);
 			}
 		}
+	}
+
+	private boolean evaluate(String line, int start, int end)
+	{
+		final int conditionStart = skipWhitespace(line, start, end);
+		final int conditionEnd = findIdentifierEnd(line, conditionStart, end);
+		final String conditionString = line.substring(conditionStart, conditionEnd);
+		return this.evaluate(conditionString);
 	}
 
 	private boolean evaluate(String expression)
@@ -231,7 +241,7 @@ public class Specialization
 			builder.append(line, prev, i);
 
 			// index of the first character that is not part of this identifier
-			final int nextIndex = findNextIndex(line, i + 1, length);
+			final int nextIndex = findIdentifierEnd(line, i + 1, length);
 			final String key = line.substring(i, nextIndex);
 			final String replacement = this.getSubstitution(key);
 
@@ -251,15 +261,41 @@ public class Specialization
 		return builder.toString();
 	}
 
-	private static int findNextIndex(String line, int startIndex, int length)
+	private static int findIdentifierEnd(String line, int start, int end)
 	{
-		for (; startIndex < length; startIndex++)
+		for (; start < end; start++)
 		{
-			if (!Character.isJavaIdentifierPart(line.charAt(startIndex)))
+			if (!Character.isJavaIdentifierPart(line.charAt(start)))
 			{
-				return startIndex;
+				return start;
 			}
 		}
-		return length;
+		return end;
+	}
+
+	/**
+	 * Returns the first index greater than or equal to {@code start} where the character in {@code line} is NOT
+	 * whitespace. If no such index is found, {@code end} is returned.
+	 *
+	 * @param line
+	 * 	the string to check
+	 * @param start
+	 * 	the first index (inclusive) to check
+	 * @param end
+	 * 	the last index (exclusive) to check
+	 *
+	 * @return the first index {@code >= start} and {@code < end} where the character in the {@code string} is
+	 * non-whitespace, or {@code end}.
+	 */
+	private static int skipWhitespace(String line, int start, int end)
+	{
+		for (; start < end; start++)
+		{
+			if (!Character.isWhitespace(line.charAt(start)))
+			{
+				return start;
+			}
+		}
+		return end;
 	}
 }
