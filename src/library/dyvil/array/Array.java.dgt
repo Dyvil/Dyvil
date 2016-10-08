@@ -12,7 +12,11 @@ import dyvil.annotation._internal.Primitive;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
+
+#if HAS_RANGE
 import dyvil.collection.range.closed.TYPE_NAME##Range;
+#endif
+
 import dyvil.ref.TYPE_NAME##Ref;
 import dyvil.ref.array.TYPE_NAME##ArrayRef;
 import dyvil.reflect.Modifiers;
@@ -45,11 +49,13 @@ public abstract class TYPE_NAME##Array
 		return array.clone();
 	}
 
+#if HAS_RANGE
 	@DyvilModifiers(Modifiers.IMPLICIT | Modifiers.INLINE)
 	public static PRIMITIVE[] apply(TYPE_NAME##Range range)
 	{
 		return range.to##TYPE_NAME##Array();
 	}
+#endif
 
 	public static PRIMITIVE[] apply(int size, PRIMITIVE repeatedValue)
 	{
