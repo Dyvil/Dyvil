@@ -7,7 +7,7 @@ import java.io.PrintStream;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
@@ -124,12 +124,75 @@ public class Specialization
 		substitutions.put(TIME_STAMP_PROPERTY, DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now()));
 	}
 
-	public void processLines(List<String> lines, PrintStream writer)
+	public void processLines(Iterable<String> lines, PrintStream writer)
 	{
-		for (String line : lines)
+		this.processLines(lines.iterator(), writer, false, true, true);
+	}
+
+	private void processLines(Iterator<String> iterator, PrintStream writer, boolean ifStatement, boolean outerCondition,
+		                      boolean thisCondition)
+	{
+		boolean hasElse = false;
+
+		while (iterator.hasNext())
 		{
-			writer.println(this.processLine(line));
+			final String line = iterator.next();
+			final int length = line.length();
+			if (length >= 2 && line.charAt(0) == '#')
+			{
+				final int nextIndex = findNextIndex(line, 2, length);
+				final String directive = line.substring(1, nextIndex);
+				switch (directive)
+				{
+				case "if":
+					// nested if
+					final boolean condition = this.evaluate(line.substring(nextIndex).trim());
+					this.processLines(iterator, writer, true, outerCondition && thisCondition, condition);
+					continue;
+				case "else":
+					if (ifStatement)
+					{
+						if (!hasElse)
+						{
+							thisCondition = !thisCondition;
+							hasElse = true;
+						}
+						continue;
+					}
+					break;
+				case "endif":
+					if (ifStatement)
+					{
+						return;
+					}
+					break;
+				}
+			}
+
+			if (outerCondition && thisCondition)
+			{
+				final String processed = this.processLine(line);
+				writer.println(processed);
+			}
 		}
+	}
+
+	private boolean evaluate(String expression)
+	{
+		final String substitution = this.getSubstitution(expression);
+		if (substitution == null)
+		{
+			return false;
+		}
+
+		switch (substitution)
+		{
+		case "0":
+		case "false":
+		case "null":
+			return false;
+		}
+		return true;
 	}
 
 	private String processLine(String line)

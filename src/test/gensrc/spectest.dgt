@@ -12,3 +12,23 @@ line ending##
 line ending with #
 line with #in the middle
 line with nothing ##in the middle
+
+#if ENABLED
+enabled set to true
+
+#if NESTED
+and nested set to true
+#else
+but nested set to false
+#endif
+
+#else
+enabled set to false
+
+#if NESTED
+but nested set to true
+#else
+and nested set to false
+#endif
+
+#endif

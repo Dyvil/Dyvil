@@ -8,7 +8,12 @@ Substitution at the beginning
 
 #at the beginning
 nothing at the beginning
-line ending with nothing
+line ending
 line ending with #
 line with #in the middle
-line with in the middle
+line with nothing in the middle
+
+enabled set to false
+
+and nested set to false
+

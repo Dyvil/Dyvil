@@ -4,4 +4,5 @@
 SUBSTITUTION=Substitution
 MACRO=Macro Substitution
 COUNT=2
-
+ENABLED=false
+NESTED=false
