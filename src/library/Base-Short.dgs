@@ -1,3 +1,5 @@
+@base=true
+
 TYPE_NAME=Short
 PRIMITIVE=short
 WRAPPER=Short

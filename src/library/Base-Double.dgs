@@ -1,3 +1,5 @@
+@base=true
+
 TYPE_NAME=Double
 PRIMITIVE=double
 WRAPPER=Double

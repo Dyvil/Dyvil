@@ -1,5 +1,9 @@
 package dyvil.tools.gensrc;
 
+import dyvil.tools.gensrc.lang.I18n;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,11 +15,24 @@ public class GenSources
 	public static final String TARGET_PREFIX = "target=";
 	public static final String SOURCE_PREFIX = "source=";
 
-	private List<Template>            templates       = new ArrayList<>();
-	private Map<File, Specialization> specializations = new HashMap<>();
+	private List<Template>            templates                   = new ArrayList<>();
+	private Map<File, Specialization> specializations             = new HashMap<>();
+	private List<Specialization>      unassociatedSpecializations = new ArrayList<>();
 
 	private File sourceDir;
 	private File targetDir;
+
+	private boolean ansiColors;
+
+	public File getSourceRoot()
+	{
+		return this.sourceDir;
+	}
+
+	public Specialization getSpecialization(File file)
+	{
+		return this.specializations.get(file);
+	}
 
 	public static void main(String[] args)
 	{
@@ -52,6 +69,9 @@ public class GenSources
 				{
 					System.out.println("Invalid -t argument: Target Directory expected");
 				}
+				continue;
+			case "--ansi":
+				this.ansiColors = true;
 				continue;
 			}
 			if (arg.startsWith(SOURCE_PREFIX))
@@ -139,7 +159,7 @@ public class GenSources
 			final Template template = templates.get(spec.getTemplateName());
 			if (template == null)
 			{
-				System.out.println("Unassociated Specialization: " + spec.getSourceFile());
+				this.unassociatedSpecializations.add(spec);
 				continue;
 			}
 
@@ -152,13 +172,36 @@ public class GenSources
 
 	private void processTemplates()
 	{
-		for (Specialization spec : this.specializations.values())
+		for (Specialization spec : this.unassociatedSpecializations)
 		{
-			spec.read(this.sourceDir, this.specializations);
+			this.loadSpecialization(spec);
 		}
+
 		for (Template template : this.templates)
 		{
+			template.load(this);
 			template.specialize();
 		}
+	}
+
+	public void loadSpecialization(Specialization spec)
+	{
+		final MarkerList markers = new MarkerList(I18n.INSTANCE);
+		spec.load(this, markers);
+
+		if (markers.isEmpty())
+		{
+			return;
+		}
+
+		final StringBuilder builder = new StringBuilder(I18n.get("spec.problems", spec.getName(), spec.getSourceFile()))
+			                              .append("\n\n");
+
+		markers.sort();
+		for (Marker marker : markers)
+		{
+			marker.log(null, builder, this.ansiColors);
+		}
+		System.out.println(builder.toString());
 	}
 }

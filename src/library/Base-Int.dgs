@@ -1,3 +1,5 @@
+@base=true
+
 TYPE_NAME=Int
 PRIMITIVE=int
 WRAPPER=Integer

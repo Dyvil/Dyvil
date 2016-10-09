@@ -1,3 +1,5 @@
+@base=true
+
 TYPE_NAME=Char
 PRIMITIVE=char
 WRAPPER=Character

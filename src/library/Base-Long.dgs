@@ -1,3 +1,5 @@
+@base=true
+
 TYPE_NAME=Long
 PRIMITIVE=long
 WRAPPER=Long

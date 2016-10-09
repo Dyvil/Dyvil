@@ -1,3 +1,5 @@
+@base=true
+
 TYPE_NAME=Boolean
 PRIMITIVE=boolean
 WRAPPER=Boolean

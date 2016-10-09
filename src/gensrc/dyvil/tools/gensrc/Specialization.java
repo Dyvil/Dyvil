@@ -1,5 +1,11 @@
 package dyvil.tools.gensrc;
 
+import dyvil.tools.gensrc.lang.I18n;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.marker.SemanticError;
+import dyvil.tools.parsing.marker.SyntaxError;
+import dyvil.tools.parsing.position.ICodePosition;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -8,7 +14,6 @@ import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Properties;
 
 public class Specialization
@@ -16,11 +21,12 @@ public class Specialization
 	public static final String FILE_NAME_PROPERTY    = "@fileName";
 	public static final String ENABLED_PROPERTY      = "@enabled";
 	public static final String INHERIT_FROM_PROPERTY = "@inheritFrom";
+	public static final String BASE_PROPERTY         = "@base";
 
 	public static final String GEN_NOTICE_PROPERTY = "GEN_NOTICE";
 	public static final String TIME_STAMP_PROPERTY = "TIME_STAMP";
 
-	public static final String GEN_NOTICE = "GENERATED SOURCE - DO NOT EDIT";
+	public static final String GEN_NOTICE = I18n.get("genNotice");
 
 	private Properties substitutions = new Properties();
 
@@ -31,6 +37,8 @@ public class Specialization
 	private final String name;
 
 	private Template template;
+
+	private boolean enabled = true;
 
 	public Specialization(File sourceFile, String templateName, String specName)
 	{
@@ -71,8 +79,30 @@ public class Specialization
 
 	public boolean isEnabled()
 	{
-		final String enabled = this.getSubstitution(ENABLED_PROPERTY);
-		return enabled == null || "true".equals(enabled);
+		return this.enabled;
+	}
+
+	private boolean isBase()
+	{
+		return this.getBoolean(BASE_PROPERTY);
+	}
+
+	private boolean getBoolean(String expression)
+	{
+		final String substitution = this.getSubstitution(expression);
+		if (substitution == null)
+		{
+			return false;
+		}
+
+		switch (substitution)
+		{
+		case "0":
+		case "false":
+		case "null":
+			return false;
+		}
+		return true;
 	}
 
 	public String getSubstitution(String key)
@@ -85,7 +115,7 @@ public class Specialization
 		return this.parent.getSubstitution(key);
 	}
 
-	public void read(File sourceRoot, Map<File, Specialization> specs)
+	public void load(GenSources gensrc, MarkerList markers)
 	{
 		initDefaults(this.substitutions);
 
@@ -99,6 +129,25 @@ public class Specialization
 			e.printStackTrace();
 		}
 
+		if (!this.isBase())
+		{
+			if (this.template == null)
+			{
+				markers.add(new SemanticError(ICodePosition.ORIGIN, I18n.get("spec.unassociated", this.templateName)));
+				this.enabled = false;
+			}
+			if (this.getFileName() == null)
+			{
+				markers.add(new SemanticError(ICodePosition.ORIGIN, I18n.get("spec.fileName.missing")));
+				this.enabled = false;
+			}
+		}
+		final String enabled = this.getSubstitution(ENABLED_PROPERTY);
+		if (enabled != null && !"true".equals(enabled))
+		{
+			this.enabled = false;
+		}
+
 		final String inherited = this.getSubstitution(INHERIT_FROM_PROPERTY);
 		if (inherited == null)
 		{
@@ -109,11 +158,11 @@ public class Specialization
 		// Otherwise, it is relative to the source root
 		final File specFile = inherited.startsWith(".") ?
 			                      new File(this.getSourceFile().getParent(), inherited) :
-			                      new File(sourceRoot, inherited);
-		final Specialization spec = specs.get(specFile);
+			                      new File(gensrc.getSourceRoot(), inherited);
+		final Specialization spec = gensrc.getSpecialization(specFile);
 		if (spec == null)
 		{
-			System.out.printf("Unable to resolve and inherit specialization '%s'\n", specFile);
+			markers.add(new SyntaxError(ICodePosition.ORIGIN, I18n.get("spec.inheritFrom.unresolved", specFile)));
 			return;
 		}
 
@@ -205,25 +254,7 @@ public class Specialization
 		final int conditionStart = skipWhitespace(line, start, end);
 		final int conditionEnd = findIdentifierEnd(line, conditionStart, end);
 		final String conditionString = line.substring(conditionStart, conditionEnd);
-		return this.evaluate(conditionString);
-	}
-
-	private boolean evaluate(String expression)
-	{
-		final String substitution = this.getSubstitution(expression);
-		if (substitution == null)
-		{
-			return false;
-		}
-
-		switch (substitution)
-		{
-		case "0":
-		case "false":
-		case "null":
-			return false;
-		}
-		return true;
+		return this.getBoolean(conditionString);
 	}
 
 	private String processLine(String line)

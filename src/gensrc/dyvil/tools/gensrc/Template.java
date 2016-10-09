@@ -1,9 +1,10 @@
 package dyvil.tools.gensrc;
 
+import dyvil.tools.gensrc.lang.I18n;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class Template
@@ -36,6 +37,14 @@ public class Template
 		this.specializations.add(spec);
 	}
 
+	public void load(GenSources gensrc)
+	{
+		for (Specialization spec : this.specializations)
+		{
+			gensrc.loadSpecialization(spec);
+		}
+	}
+
 	public void specialize()
 	{
 		if (!this.targetDirectory.exists() && !this.targetDirectory.mkdirs())
@@ -44,26 +53,21 @@ public class Template
 			return;
 		}
 
-		// Remove disabled specs
-		for (Iterator<Specialization> iterator = this.specializations.iterator(); iterator.hasNext(); )
-		{
-			if (!iterator.next().isEnabled())
-			{
-				iterator.remove();
-			}
-		}
-
 		try
 		{
 			final List<String> lines = Files.readAllLines(this.sourceFile.toPath());
+			int count = 0;
 
 			for (Specialization spec : this.specializations)
 			{
-				this.specialize(lines, spec);
+				if (spec.isEnabled())
+				{
+					this.specialize(lines, spec);
+					count++;
+				}
 			}
 
-			System.out.printf("Applied %d specializations for template '%s'\n", this.specializations.size(),
-			                  this.getSourceFile());
+			System.out.println(I18n.get("template.specialized", count, this.getSourceFile()));
 		}
 		catch (IOException ex)
 		{
@@ -76,8 +80,6 @@ public class Template
 		final String fileName = spec.getFileName();
 		if (fileName == null)
 		{
-			System.out.printf("Invalid Specialization '%s' (%s): Missing 'fileName' property'\n", spec.getName(),
-			                  spec.getSourceFile());
 			return;
 		}
 

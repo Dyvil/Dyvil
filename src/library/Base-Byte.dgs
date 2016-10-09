@@ -1,3 +1,5 @@
+@base=true
+
 TYPE_NAME=Byte
 PRIMITIVE=byte
 WRAPPER=Byte

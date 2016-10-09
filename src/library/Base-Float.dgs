@@ -1,3 +1,5 @@
+@base=true
+
 TYPE_NAME=Float
 PRIMITIVE=float
 WRAPPER=Float

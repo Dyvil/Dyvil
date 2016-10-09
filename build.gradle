@@ -104,6 +104,11 @@ sourceSets {
 		java {
 			srcDir 'src/gensrc'
 		}
+		
+		resources {
+			srcDir 'src/gensrc'
+			include resourceFilters
+		}
 	}
 	
 	test {
@@ -149,6 +154,8 @@ dependencies {
 	
 	testCompile 'junit:junit:4.12', sourceSets.library.output
 	testRuntime libraryFiles, dpfFiles, testFiles
+	
+	gensrcCompile sourceSets.library.output
 }
 
 // ---------------------------------------- Copy Tasks ----------------------------------------
