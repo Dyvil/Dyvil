@@ -1,2 +1,2 @@
 @fileName=UnsafeByteRef.java
-inheritFrom=Base-Byte.dgs
+@inheritFrom=Base-Byte.dgs

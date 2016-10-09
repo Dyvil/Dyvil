@@ -13,8 +13,10 @@ import java.util.Properties;
 
 public class Specialization
 {
-	public static final String FILE_NAME_PROPERTY  = "@fileName";
-	public static final String ENABLED_PROPERTY    = "@enabled";
+	public static final String FILE_NAME_PROPERTY    = "@fileName";
+	public static final String ENABLED_PROPERTY      = "@enabled";
+	public static final String INHERIT_FROM_PROPERTY = "@inheritFrom";
+
 	public static final String GEN_NOTICE_PROPERTY = "GEN_NOTICE";
 	public static final String TIME_STAMP_PROPERTY = "TIME_STAMP";
 
@@ -97,7 +99,7 @@ public class Specialization
 			e.printStackTrace();
 		}
 
-		final String inherited = this.getSubstitution("inheritFrom");
+		final String inherited = this.getSubstitution(INHERIT_FROM_PROPERTY);
 		if (inherited == null)
 		{
 			return;

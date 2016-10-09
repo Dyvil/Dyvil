@@ -1,2 +1,2 @@
 @fileName=IntRef.java
-inheritFrom=Base-Int.dgs
+@inheritFrom=Base-Int.dgs

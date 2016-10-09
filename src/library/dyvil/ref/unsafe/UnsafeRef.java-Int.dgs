@@ -1,3 +1,2 @@
 @fileName=UnsafeIntRef.java
-className=UnsafeIntRef
-inheritFrom=Base-Int.dgs
+@inheritFrom=Base-Int.dgs

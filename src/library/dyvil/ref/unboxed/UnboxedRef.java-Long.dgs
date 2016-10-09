@@ -1,2 +1,2 @@
 @fileName=UnboxedLongRef.java
-inheritFrom=Base-Long.dgs
+@inheritFrom=Base-Long.dgs

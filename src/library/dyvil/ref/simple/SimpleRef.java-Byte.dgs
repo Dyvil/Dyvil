@@ -1,2 +1,2 @@
 @fileName=SimpleByteRef.java
-inheritFrom=Base-Byte.dgs
+@inheritFrom=Base-Byte.dgs
