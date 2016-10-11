@@ -1,10 +1,6 @@
 package dyvil.tools.gensrc;
 
 import dyvil.tools.gensrc.lang.I18n;
-import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.marker.SemanticError;
-import dyvil.tools.parsing.marker.SyntaxError;
-import dyvil.tools.parsing.position.ICodePosition;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,6 +10,7 @@ import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 
 public class Specialization
@@ -115,7 +112,7 @@ public class Specialization
 		return this.parent.getSubstitution(key);
 	}
 
-	public void load(GenSources gensrc, MarkerList markers)
+	public void load(GenSources gensrc, List<String> markers)
 	{
 		initDefaults(this.substitutions);
 
@@ -133,12 +130,12 @@ public class Specialization
 		{
 			if (this.template == null)
 			{
-				markers.add(new SemanticError(ICodePosition.ORIGIN, I18n.get("spec.unassociated", this.templateName)));
+				markers.add(I18n.get("spec.unassociated", this.templateName));
 				this.enabled = false;
 			}
 			if (this.getFileName() == null)
 			{
-				markers.add(new SemanticError(ICodePosition.ORIGIN, I18n.get("spec.fileName.missing")));
+				markers.add(I18n.get("spec.fileName.missing"));
 				this.enabled = false;
 			}
 		}
@@ -162,7 +159,7 @@ public class Specialization
 		final Specialization spec = gensrc.getSpecialization(specFile);
 		if (spec == null)
 		{
-			markers.add(new SyntaxError(ICodePosition.ORIGIN, I18n.get("spec.inheritFrom.unresolved", specFile)));
+			markers.add(I18n.get("spec.inheritFrom.unresolved", specFile));
 			return;
 		}
 

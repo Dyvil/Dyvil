@@ -1,8 +1,6 @@
 package dyvil.tools.gensrc;
 
 import dyvil.tools.gensrc.lang.I18n;
-import dyvil.tools.parsing.marker.Marker;
-import dyvil.tools.parsing.marker.MarkerList;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -186,7 +184,7 @@ public class GenSources
 
 	public void loadSpecialization(Specialization spec)
 	{
-		final MarkerList markers = new MarkerList(I18n.INSTANCE);
+		final List<String> markers = new ArrayList<>();
 		spec.load(this, markers);
 
 		if (markers.isEmpty())
@@ -196,12 +194,21 @@ public class GenSources
 
 		final StringBuilder builder = new StringBuilder(I18n.get("spec.problems", spec.getName(), spec.getSourceFile()))
 			                              .append("\n\n");
-
-		markers.sort();
-		for (Marker marker : markers)
+		if (this.ansiColors)
 		{
-			marker.log(null, builder, this.ansiColors);
+			builder.append("\u001B[31m"); // ANSI_RED
 		}
-		System.out.println(builder.toString());
+
+		for (String marker : markers)
+		{
+			builder.append(marker).append('\n');
+		}
+
+		if (this.ansiColors)
+		{
+			builder.append("\u001B[0m"); // ANSI_RESET
+		}
+
+		System.out.println(builder.append('\n').toString());
 	}
 }
