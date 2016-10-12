@@ -166,6 +166,18 @@ dependencies {
 
 // Library
 
+task copyLibraryJava(type: Sync, dependsOn: 'genLibrary') {
+	from sourceSets.library.java
+	into "$buildDir/src/java/library"
+	
+	include javaFilters
+	includeEmptyDirs = false
+}
+
+compileLibraryJava.dependsOn copyLibraryJava
+compileLibraryJava.source = "$buildDir/src/java/library"
+
+
 task copyLibraryDyvil(type: Sync) {
 	from 'src/library'
 	into "$buildDir/src/dyvil/library"
@@ -239,7 +251,7 @@ tasks.withType(JavaCompile) {
 	)
 }
 
-task genLibrary(type: JavaExec, dependsOn: [ gensrcClasses ]) { JavaExec exec ->
+task genLibrary(type: JavaExec, dependsOn: [ 'gensrcClasses' ]) { JavaExec exec ->
 	runGenSrc exec, 'src/library/', "$buildDir/gensrc/library/"
 }
 
