@@ -87,7 +87,7 @@ public class Template
 
 		try (final PrintStream writer = new PrintStream(new BufferedOutputStream(new FileOutputStream(outputFile))))
 		{
-			spec.processLines(lines, writer);
+			Specializer.processLines(lines, writer, spec);
 		}
 		catch (IOException ex)
 		{

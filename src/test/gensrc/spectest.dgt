@@ -19,14 +19,18 @@ line with nothing ##in the middle
 // tests for the processor directives
 
 #if ENABLED
-	#process enabled set to ENABLED
+	#comment ENABLED is no longer defined in the scope of the enclosing #if
+	#undefine ENABLED
+	#process ENABLED set to false
 	#if  NESTED
 		#literal and NESTED set to true
 	#else
 		#literal but NESTED set to false
 	#endif
 #else
-	#process enabled set to ENABLED
+	#comment the replacement of a #define directive is not processed
+	#define _ENABLED ENABLED
+	#process _ENABLED set to ENABLED
 	#if NESTED
 		#literal but NESTED set to true
 	#else
