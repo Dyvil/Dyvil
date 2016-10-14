@@ -10,8 +10,14 @@ public class Specializer
 		processLines(lines.iterator(), writer, new LazyReplacementMap(replacements), false, true, true);
 	}
 
+	private static void processIf(Iterator<String> iterator, PrintStream writer, LazyReplacementMap replacements,
+		                             boolean outer, boolean condition)
+	{
+		processLines(iterator, writer, new LazyReplacementMap(replacements), true, outer, condition);
+	}
+
 	private static void processLines(Iterator<String> iterator, PrintStream writer, LazyReplacementMap replacements,
-		                                boolean ifStatement, boolean outerCondition, boolean thisCondition)
+		                                boolean ifStatement, boolean processOuter, boolean ifCondition)
 	{
 		boolean hasElse = false;
 
@@ -25,32 +31,38 @@ public class Specializer
 			{
 				// no leading directive
 
-				if (outerCondition && thisCondition)
+				if (processOuter && ifCondition)
 				{
 					writer.println(processLine(line, replacements));
 				}
 				continue;
 			}
 
-			final int directiveStart = hashIndex + 1; // TODO ignore whitespace between # and identifier?
+			final int directiveStart = hashIndex + 1;
 			final int directiveEnd = findIdentifierEnd(line, directiveStart, length);
 			final String directive = line.substring(directiveStart, directiveEnd);
 			switch (directive)
 			{
-			case "if":
-				// nested if
-				final int conditionStart = skipWhitespace(line, directiveEnd, length);
-				final int conditionEnd = findIdentifierEnd(line, conditionStart, length);
-				final String conditionString = line.substring(conditionStart, conditionEnd);
-				final boolean condition = replacements.getBoolean(conditionString);
+			case "if": // TODO proper expression handling for #if directives
+			case "ifdef":
+			{
+				final boolean innerCondition = replacements.getBoolean(parseIdentifier(line, directiveEnd, length));
 
-				processLines(iterator, writer, new LazyReplacementMap(replacements), true,
-				             outerCondition && thisCondition, condition);
+				processIf(iterator, writer, replacements, processOuter && ifCondition, innerCondition);
 				continue;
+			}
+			case "ifndef":
+			{
+				// note the '!'
+				final boolean innerCondition = !replacements.getBoolean(parseIdentifier(line, directiveEnd, length));
+
+				processIf(iterator, writer, replacements, processOuter && ifCondition, innerCondition);
+				continue;
+			}
 			case "else":
 				if (ifStatement && !hasElse)
 				{
-					thisCondition = !thisCondition;
+					ifCondition = !ifCondition;
 					hasElse = true;
 				}
 				continue;
@@ -61,7 +73,7 @@ public class Specializer
 				}
 				continue;
 			case "process":
-				if (outerCondition && thisCondition)
+				if (processOuter && ifCondition)
 				{
 					// process the remainder of the line
 					final String remainder = line.substring(skipWhitespace(line, directiveEnd, length));
@@ -69,7 +81,7 @@ public class Specializer
 				}
 				continue;
 			case "literal":
-				if (outerCondition && thisCondition)
+				if (processOuter && ifCondition)
 				{
 					// simply append the remainder of the line verbatim
 					final String remainder = line.substring(skipWhitespace(line, directiveEnd, length));
@@ -79,7 +91,7 @@ public class Specializer
 			case "comment":
 				continue;
 			case "define":
-				if (outerCondition && thisCondition)
+				if (processOuter && ifCondition)
 				{
 					final int keyStart = skipWhitespace(line, directiveEnd, length);
 					final int keyEnd = findIdentifierEnd(line, keyStart, length);
@@ -92,12 +104,9 @@ public class Specializer
 				continue;
 			case "undef":
 			case "undefine":
-				if (outerCondition && thisCondition)
+				if (processOuter && ifCondition)
 				{
-					final int keyStart = skipWhitespace(line, directiveEnd, length);
-					final int keyEnd = findIdentifierEnd(line, keyStart, length);
-
-					final String key = line.substring(keyStart, keyEnd);
+					final String key = parseIdentifier(line, directiveEnd, length);
 					replacements.undefine(key);
 				}
 				continue;
@@ -105,6 +114,13 @@ public class Specializer
 
 			// TODO invalid directive error/warning
 		}
+	}
+
+	private static String parseIdentifier(String line, int start, int end)
+	{
+		final int keyStart = skipWhitespace(line, start, end);
+		final int keyEnd = findIdentifierEnd(line, keyStart, end);
+		return line.substring(keyStart, keyEnd);
 	}
 
 	private static String processLine(String line, ReplacementMap replacements)
