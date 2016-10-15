@@ -91,25 +91,40 @@ public class Specializer
 			case "comment":
 				continue;
 			case "define":
-				if (processOuter && ifCondition)
+			{
+				if (!processOuter || !ifCondition)
 				{
-					final int keyStart = skipWhitespace(line, directiveEnd, length);
-					final int keyEnd = findIdentifierEnd(line, keyStart, length);
-					final int valueStart = skipWhitespace(line, keyEnd, length);
-
-					final String key = line.substring(keyStart, keyEnd);
-					final String value = line.substring(valueStart, length);
-					replacements.define(key, value);
+					continue;
 				}
+
+				final int keyStart = skipWhitespace(line, directiveEnd, length);
+				final int keyEnd = findIdentifierEnd(line, keyStart, length);
+				if (keyStart == keyEnd) // missing key
+				{
+					continue;
+				}
+
+				final int valueStart = skipWhitespace(line, keyEnd, length);
+
+				final String key = line.substring(keyStart, keyEnd);
+				final String value = line.substring(valueStart, length);
+				replacements.define(key, value);
 				continue;
+			}
 			case "undef":
 			case "undefine":
-				if (processOuter && ifCondition)
+			{
+				if (!processOuter || !ifCondition)
 				{
-					final String key = parseIdentifier(line, directiveEnd, length);
+					continue;
+				}
+				final String key = parseIdentifier(line, directiveEnd, length);
+				if (!key.isEmpty()) // missing key
+				{
 					replacements.undefine(key);
 				}
 				continue;
+			}
 			}
 
 			// TODO invalid directive error/warning
