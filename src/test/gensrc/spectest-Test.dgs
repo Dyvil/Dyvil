@@ -1,6 +1,8 @@
-fileName=spectest.txt
-enabled=true
+@fileName=spectest.txt
+@enabled=true
 
-substitution=Substitution
-count=2
-
+SUBSTITUTION=Substitution
+MACRO=Macro Substitution
+COUNT=2
+ENABLED=false
+NESTED=false

@@ -1,16 +1,18 @@
 package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.compiler.ast.consumer.IParameterConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public interface IParameterList extends IParameterConsumer
+public interface IParameterList extends IParameterConsumer, IResolvable
 {
 	IParameterList EMPTY = new ParameterList(0);
 
@@ -47,17 +49,23 @@ public interface IParameterList extends IParameterConsumer
 
 	// Compiler Phases
 
+	@Override
 	void resolveTypes(MarkerList markers, IContext context);
 
+	@Override
 	void resolve(MarkerList markers, IContext context);
 
+	@Override
 	void checkTypes(MarkerList markers, IContext context);
 
+	@Override
 	void check(MarkerList markers, IContext context);
 
+	@Override
 	void foldConstants();
 
-	void cleanup(IContext context, IClassCompilableList compilableList);
+	@Override
+	void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList);
 
 	// Compilation
 

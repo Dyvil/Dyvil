@@ -7,8 +7,9 @@ import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
+import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -341,23 +342,21 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	}
 
 	@Override
-	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 		if (this.action != null)
 		{
-			context = context.push(this);
-			this.action = this.action.cleanup(context, compilableList);
-			context = context.pop();
+			this.action = this.action.cleanup(compilableList, classCompilableList);
 		}
 
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
-			this.catchBlocks[i].cleanup(context, compilableList);
+			this.catchBlocks[i].cleanup(compilableList, classCompilableList);
 		}
 
 		if (this.finallyBlock != null)
 		{
-			this.finallyBlock = this.finallyBlock.cleanup(context, compilableList);
+			this.finallyBlock = this.finallyBlock.cleanup(compilableList, classCompilableList);
 		}
 		return this;
 	}

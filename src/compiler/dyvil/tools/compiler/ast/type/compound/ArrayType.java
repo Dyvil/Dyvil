@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -247,11 +248,11 @@ public class ArrayType implements IObjectType, ITyped
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 		if (position == TypePosition.SUPER_TYPE)
 		{
-			markers.add(Markers.semantic(this.getPosition(), "type.super.array"));
+			markers.add(Markers.semantic(this.getPosition(), "type.array.super"));
 		}
 
 		this.type.checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
@@ -270,9 +271,9 @@ public class ArrayType implements IObjectType, ITyped
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.type.cleanup(context, compilableList);
+		this.type.cleanup(compilableList, classCompilableList);
 	}
 
 	@Override

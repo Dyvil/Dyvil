@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.expression.LambdaExpr;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -424,11 +425,11 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 		if (position == TypePosition.CLASS)
 		{
-			markers.add(Markers.semantic(this.position, "type.class.lambda"));
+			markers.add(Markers.semantic(this.position, "type.lambda.class"));
 		}
 
 		for (int i = 0; i < this.parameterCount; i++)
@@ -459,13 +460,13 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameterTypes[i].cleanup(context, compilableList);
+			this.parameterTypes[i].cleanup(compilableList, classCompilableList);
 		}
-		this.returnType.cleanup(context, compilableList);
+		this.returnType.cleanup(compilableList, classCompilableList);
 	}
 
 	@Override

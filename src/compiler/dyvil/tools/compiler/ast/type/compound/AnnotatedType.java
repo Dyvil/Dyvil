@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.TypeDelegate;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -79,7 +80,7 @@ public class AnnotatedType extends TypeDelegate
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 		this.type.checkType(markers, context, position);
 		this.annotation.checkTypes(markers, context);
@@ -100,10 +101,10 @@ public class AnnotatedType extends TypeDelegate
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.type.cleanup(context, compilableList);
-		this.annotation.cleanup(context, compilableList);
+		this.type.cleanup(compilableList, classCompilableList);
+		this.annotation.cleanup(compilableList, classCompilableList);
 	}
 
 	@Override

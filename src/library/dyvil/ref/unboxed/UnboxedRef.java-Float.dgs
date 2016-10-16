@@ -1,2 +1,2 @@
-fileName=UnboxedFloatRef.java
-inheritFrom=Base-Float.dgs
+@fileName=UnboxedFloatRef.java
+@inheritFrom=Base-Float.dgs

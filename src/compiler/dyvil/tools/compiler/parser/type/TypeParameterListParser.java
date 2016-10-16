@@ -39,7 +39,7 @@ public class TypeParameterListParser extends Parser
 			this.mode = TYPE_VARIABLE;
 			if (type != BaseSymbols.COMMA)
 			{
-				pm.report(token, "typeparameter.list.comma");
+				pm.report(token, "type_parameter.list.comma");
 				pm.reparse();
 			}
 		}

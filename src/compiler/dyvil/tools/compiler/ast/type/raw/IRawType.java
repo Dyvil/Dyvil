@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -20,11 +21,11 @@ public interface IRawType extends IObjectType
 	}
 
 	@Override
-	default IType getConcreteType(ITypeContext context)
+	default boolean hasTypeVariables()
 	{
-		return this;
+		return false;
 	}
-	
+
 	@Override
 	default boolean isGenericType()
 	{
@@ -32,11 +33,11 @@ public interface IRawType extends IObjectType
 	}
 
 	@Override
-	default boolean hasTypeVariables()
+	default IType getConcreteType(ITypeContext context)
 	{
-		return false;
+		return this;
 	}
-	
+
 	@Override
 	default void inferTypes(IType concrete, ITypeContext typeContext)
 	{
@@ -50,7 +51,7 @@ public interface IRawType extends IObjectType
 	}
 	
 	@Override
-	default void checkType(MarkerList markers, IContext context, IType.TypePosition position)
+	default void checkType(MarkerList markers, IContext context, int position)
 	{
 	}
 	
@@ -65,7 +66,7 @@ public interface IRawType extends IObjectType
 	}
 	
 	@Override
-	default void cleanup(IContext context, IClassCompilableList compilableList)
+	default void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 	}
 	

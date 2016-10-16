@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.intrinsic.PopExpr;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.reference.IReference;
@@ -284,7 +285,7 @@ public interface IValue extends IASTNode, ITyped
 
 	IValue foldConstants();
 
-	IValue cleanup(IContext context, IClassCompilableList compilableList);
+	IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList);
 
 	default IValue toAnnotationConstant(MarkerList markers, IContext context, int depth)
 	{

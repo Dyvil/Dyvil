@@ -1,2 +1,2 @@
-fileName=BoxedByteRef.java
-inheritFrom=Base-Byte.dgs
+@fileName=BoxedByteRef.java
+@inheritFrom=Base-Byte.dgs

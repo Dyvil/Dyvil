@@ -103,9 +103,9 @@ public interface IStaticContext extends IContext
 	}
 	
 	@Override
-	default IDataMember capture(IVariable capture)
+	default IDataMember capture(IVariable variable)
 	{
-		return capture;
+		return variable;
 	}
 	
 	@Override

@@ -1,2 +1,2 @@
-fileName=LongArray.java
-inheritFrom=Base-Long.dgs
+@fileName=LongArray.java
+@inheritFrom=Base-Long.dgs

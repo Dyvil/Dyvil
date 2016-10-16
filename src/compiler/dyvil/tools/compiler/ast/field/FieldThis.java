@@ -10,58 +10,63 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 
 public class FieldThis implements IAccessible
 {
-	protected       IClass      owner;
-	protected final IAccessible outer;
-	protected final IClass      theClass;
-	
+	protected final IClass      owner;
+	protected final IAccessible targetAccess;
+	protected final IClass      targetClass;
+
 	private String name;
 	private String desc;
-	
-	public FieldThis(IClass owner, IAccessible outer, IClass theClass)
+
+	public FieldThis(IClass owner, IAccessible targetAccess, IClass targetClass)
 	{
 		this.owner = owner;
-		this.theClass = theClass;
-		this.outer = outer;
-		
-		this.name = "this$" + theClass.getName().qualified;
-		this.desc = 'L' + this.theClass.getInternalName() + ';';
+		this.targetClass = targetClass;
+		this.targetAccess = targetAccess;
 	}
-	
-	public IClass getTheClass()
+
+	public IClass getTargetClass()
 	{
-		return this.theClass;
+		return this.targetClass;
 	}
-	
-	public IAccessible getOuter()
+
+	public IAccessible getTargetAccess()
 	{
-		return this.outer;
+		return this.targetAccess;
 	}
-	
+
 	public String getName()
 	{
-		return this.name;
+		if (this.name != null)
+		{
+			return this.name;
+		}
+		return this.name = "this$" + this.targetClass.getName().qualified;
 	}
-	
-	public String getDescription()
+
+	public String getDescriptor()
 	{
-		return this.desc;
+		if (this.desc != null)
+		{
+			return this.desc;
+		}
+		return this.desc = 'L' + this.targetClass.getInternalName() + ';';
 	}
-	
+
 	@Override
 	public IType getType()
 	{
-		return this.theClass.getThisType();
+		return this.targetClass.getThisType();
 	}
-	
+
 	public void writeField(ClassWriter writer)
 	{
-		writer.visitField(Modifiers.PRIVATE | Modifiers.SYNTHETIC, this.name, this.desc, null, null);
+		writer.visitField(Modifiers.PRIVATE | Modifiers.SYNTHETIC, this.getName(), this.getDescriptor(), null, null);
 	}
-	
+
 	@Override
 	public void writeGet(MethodWriter writer) throws BytecodeException
 	{
 		writer.visitVarInsn(Opcodes.ALOAD, 0);
-		writer.visitFieldInsn(Opcodes.GETFIELD, this.owner.getInternalName(), this.name, this.desc);
+		writer.visitFieldInsn(Opcodes.GETFIELD, this.owner.getInternalName(), this.getName(), this.getDescriptor());
 	}
 }

@@ -1,3 +1,2 @@
-fileName=IntArrayRef.java
-className=IntArrayRef
-inheritFrom=Base-Int.dgs
+@fileName=IntArrayRef.java
+@inheritFrom=Base-Int.dgs

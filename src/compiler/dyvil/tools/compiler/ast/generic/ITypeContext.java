@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.type.IType;
 public interface ITypeContext
 {
 	ITypeContext NULL      = typeParameter -> null;
-	ITypeContext DEFAULT   = ITypeParameter::getDefaultType;
+	ITypeContext DEFAULT   = ITypeParameter::getUpperBound;
 	ITypeContext COVARIANT = ITypeParameter::getCovariantType;
 
 	static IType apply(ITypeContext typeContext, IType type)

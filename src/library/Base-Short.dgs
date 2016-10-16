@@ -1,24 +1,26 @@
-type=Short
-primitive=short
-wrapper=Short
+@base=true
 
-loadInsn=SALOAD
-storeInsn=SASTORE
+TYPE_NAME=Short
+PRIMITIVE=short
+WRAPPER=Short
 
-fromLiteral=FromInt
+ARRAY_LOAD_INSN=SALOAD
+ARRAY_STORE_INSN=SASTORE
 
-mapper=IntUnaryOperator
-mapper_apply=applyAsInt
+FROM_LITERAL=FromInt
 
-flatMapper=IntFunction<short[]>
-flatMapper_apply=applyAsInt
+MAPPER=IntUnaryOperator
+MAPPER_APPLY=applyAsInt
 
-predicate=IntPredicate
-predicate.test=test
+FLAT_MAPPER=IntFunction<short[]>
+FLAT_MAPPED_APPLY=applyAsInt
 
-supplier=IntSupplier
-supplier_get=getAsInt
+PREDICATE=IntPredicate
+PREDICATE_TEST=test
 
-consumer=IntConsumer
-consumer_accept=accept
+SUPPLIER=IntSupplier
+SUPPLIER_GET=getAsInt
+
+CONSUMER=IntConsumer
+CONSUMER_ACCEPT=accept
 

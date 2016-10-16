@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
@@ -106,7 +107,7 @@ public class ClassConstructor extends ConstructorCall
 		assert header != null;
 
 		this.nestedClass.setHeader(header);
-		header.addInnerClass(this.nestedClass);
+		header.addCompilable(this.nestedClass);
 
 		this.nestedClass.resolve(markers, context);
 		return this;
@@ -138,10 +139,10 @@ public class ClassConstructor extends ConstructorCall
 	}
 
 	@Override
-	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.arguments.cleanup(context, compilableList);
-		this.nestedClass.cleanup(context, compilableList);
+		this.arguments.cleanup(compilableList, classCompilableList);
+		this.nestedClass.cleanup(compilableList, classCompilableList);
 
 		return this;
 	}

@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -51,6 +52,16 @@ public class IntersectionType implements IObjectType
 	public int typeTag()
 	{
 		return INTERSECTION;
+	}
+
+	public IType getLeft()
+	{
+		return this.left;
+	}
+
+	public IType getRight()
+	{
+		return this.right;
 	}
 
 	@Override
@@ -259,7 +270,7 @@ public class IntersectionType implements IObjectType
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 		this.left.checkType(markers, context, position);
 		this.right.checkType(markers, context, position);
@@ -280,10 +291,10 @@ public class IntersectionType implements IObjectType
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.left.cleanup(context, compilableList);
-		this.right.cleanup(context, compilableList);
+		this.left.cleanup(compilableList, classCompilableList);
+		this.right.cleanup(compilableList, classCompilableList);
 	}
 
 	@Override

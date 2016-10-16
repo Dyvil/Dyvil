@@ -95,7 +95,7 @@ public interface IContext extends IMemberContext, IImportContext
 
 	boolean isMember(IVariable variable);
 
-	IDataMember capture(IVariable capture);
+	IDataMember capture(IVariable variable);
 
 	IAccessible getAccessibleThis(IClass type);
 

@@ -1,30 +1,27 @@
-type=Float
-primitive=float
-wrapper=Float
+@base=true
 
-loadInsn=FALOAD
-storeInsn=FASTORE
+TYPE_NAME=Float
+PRIMITIVE=float
+WRAPPER=Float
 
-fromLiteral=FromFloat
+HAS_RANGE=true
 
-ref=FloatRef
-ref_array=FloatArrayRef
+ARRAY_LOAD_INSN=FALOAD
+ARRAY_STORE_INSN=FASTORE
 
-range=FloatRange
-range_array=toFloatArray
+FROM_LITERAL=FromFloat
 
-mapper=DoubleUnaryOperator
-mapper_apply=applyAsDouble
+MAPPER=DoubleUnaryOperator
+MAPPER_APPLY=applyAsDouble
 
-flatMapper=DoubleFunction<float[]>
-flatMapper_apply=applyAsDouble
+FLAT_MAPPER=DoubleFunction<float[]>
+FLAT_MAPPER_APPLY=applyAsDouble
 
-predicate=DoublePredicate
-predicate_test=test
+PREDICATE=DoublePredicate
+PREDICATE_TEST=test
 
-supplier=DoubleSupplier
-supplier_get=getAsDouble
+SUPPLIER=DoubleSupplier
+SUPPLIER_GET=getAsDouble
 
-consumer=DoubleConsumer
-consumer_accept=accept
-
+CONSUMER=DoubleConsumer
+CONSUMER_ACCEPT=accept

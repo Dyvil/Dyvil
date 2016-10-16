@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
@@ -292,11 +293,11 @@ public final class TupleExpr implements IValue, IValueList
 	}
 
 	@Override
-	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			this.values[i] = this.values[i].cleanup(context, compilableList);
+			this.values[i] = this.values[i].cleanup(compilableList, classCompilableList);
 		}
 		return this;
 	}

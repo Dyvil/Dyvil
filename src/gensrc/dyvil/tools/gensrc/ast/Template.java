@@ -1,15 +1,17 @@
-package dyvil.tools.gensrc;
+package dyvil.tools.gensrc.ast;
+
+import dyvil.tools.gensrc.GenSrc;
+import dyvil.tools.gensrc.lang.I18n;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class Template
 {
 	private final File   sourceFile;
-	private final File targetDirectory;
+	private final File   targetDirectory;
 	private final String fileName;
 
 	private List<Specialization> specializations = new ArrayList<>();
@@ -36,47 +38,41 @@ public class Template
 		this.specializations.add(spec);
 	}
 
-	public void specialize()
+	public void specialize(GenSrc gensrc)
 	{
 		if (!this.targetDirectory.exists() && !this.targetDirectory.mkdirs())
 		{
-			System.out.println("Could not create directory '" + this.targetDirectory + "'");
+			gensrc.getOutput().println("Could not create directory '" + this.targetDirectory + "'");
 			return;
-		}
-
-		// Remove disabled specs
-		for (Iterator<Specialization> iterator = this.specializations.iterator(); iterator.hasNext(); )
-		{
-			if (!iterator.next().isEnabled())
-			{
-				iterator.remove();
-			}
 		}
 
 		try
 		{
 			final List<String> lines = Files.readAllLines(this.sourceFile.toPath());
+			int count = 0;
 
 			for (Specialization spec : this.specializations)
 			{
-				this.specialize(lines, spec);
+				if (spec.isEnabled())
+				{
+					this.specialize(gensrc, lines, spec);
+					count++;
+				}
 			}
 
-			System.out.printf("Applied %d specializations for template '%s'\n", this.specializations.size(), this.getSourceFile());
+			gensrc.getOutput().println(I18n.get("template.specialized", count, this.getSourceFile()));
 		}
 		catch (IOException ex)
 		{
-			ex.printStackTrace();
+			ex.printStackTrace(gensrc.getErrorOutput());
 		}
 	}
 
-	private void specialize(List<String> lines, Specialization spec)
+	private void specialize(GenSrc gensrc, List<String> lines, Specialization spec)
 	{
 		final String fileName = spec.getFileName();
 		if (fileName == null)
 		{
-			System.out.printf("Invalid Specialization '%s' (%s): Missing 'fileName' property'\n", spec.getName(),
-			                  spec.getSourceFile());
 			return;
 		}
 
@@ -84,11 +80,11 @@ public class Template
 
 		try (final PrintStream writer = new PrintStream(new BufferedOutputStream(new FileOutputStream(outputFile))))
 		{
-			spec.processLines(lines, writer);
+			Specializer.processLines(lines, writer, spec);
 		}
 		catch (IOException ex)
 		{
-			ex.printStackTrace();
+			ex.printStackTrace(gensrc.getErrorOutput());
 		}
 	}
 }

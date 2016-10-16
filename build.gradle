@@ -22,12 +22,13 @@ boolean nightly = false
 
 @Field static final String replMainClass = 'dyvil.tools.repl.Main'
 @Field static final String compilerMainClass = 'dyvil.tools.compiler.Main'
-@Field static final String genSrcMainClass = 'dyvil.tools.gensrc.GenSources'
+@Field static final String genSrcMainClass = 'dyvil.tools.gensrc.Main'
 
 @Field static final List<String> dyvilFilters = [ '**/*.dyv', '**/*.dyh', '**/*.dyvil', '**/*.dyvilh' ]
 @Field static final List<String> javaFilters = [ '**/*.java' ]
 @Field static final List<String> genSrcFilters = [ '**/*.dgt', '**/*.dgs' ]
-@Field static final List<String> resourceFilters = [ '**/*.dyo', '**/*.class', '**/*.properties' ]
+@Field static final List<String> resourceFilters = [ '**/*.properties' ]
+@Field static final List<String> binaryFilters = [ '**/*.dyo', '**/*.class' ]
 
 // ---------------------------------------- Nightly Versioning ----------------------------------------
 
@@ -56,6 +57,7 @@ sourceSets {
 			srcDir 'src/library'
 			srcDir 'src/asm'
 			srcDir 'src/parsing'
+			
 			srcDir "$buildDir/gensrc/library"
 		}
 		
@@ -71,9 +73,9 @@ sourceSets {
 		java {
 			srcDir 'src/dpf'
 		}
+		
 		resources {
 			srcDir 'src/dpf'
-			
 			include resourceFilters
 		}
 	}
@@ -82,9 +84,9 @@ sourceSets {
 		java {
 			srcDir 'src/compiler'
 		}
+		
 		resources {
 			srcDir 'src/compiler'
-			
 			include resourceFilters
 		}
 	}
@@ -93,9 +95,9 @@ sourceSets {
 		java {
 			srcDir 'src/repl'
 		}
+		
 		resources {
 			srcDir 'src/repl'
-			
 			include resourceFilters
 		}
 	}
@@ -103,6 +105,11 @@ sourceSets {
 	gensrc {
 		java {
 			srcDir 'src/gensrc'
+		}
+		
+		resources {
+			srcDir 'src/gensrc'
+			include resourceFilters
 		}
 	}
 	
@@ -139,15 +146,19 @@ dependencies {
 	
 	libraryRuntime libraryFiles
 	
+	// compiler -> library
 	compilerCompile sourceSets.library.output
 	
+	// dpf -> library
 	dpfCompile sourceSets.library.output
 	dpfRuntime dpfFiles
 	
+	// repl -> library, compiler
 	replCompile sourceSets.library.output, sourceSets.compiler.output
 	replRuntime libraryFiles, dpfFiles, testFiles
 	
-	testCompile 'junit:junit:4.12', sourceSets.library.output
+	// test -> library, junit
+	testCompile sourceSets.library.output, 'junit:junit:4.12'
 	testRuntime libraryFiles, dpfFiles, testFiles
 }
 
@@ -165,6 +176,7 @@ task copyLibraryJava(type: Sync, dependsOn: 'genLibrary') {
 
 compileLibraryJava.dependsOn copyLibraryJava
 compileLibraryJava.source = "$buildDir/src/java/library"
+
 
 task copyLibraryDyvil(type: Sync) {
 	from 'src/library'
@@ -212,17 +224,6 @@ compileReplJava.source = "$buildDir/src/java/repl"
 
 // DPF
 
-task copyDpfJava(type: Sync) {
-	from sourceSets.dpf.java
-	into "$buildDir/src/java/dpf"
-	
-	includeEmptyDirs = false
-	include javaFilters
-}
-
-compileDpfJava.dependsOn(copyDpfJava)
-compileDpfJava.source = "$buildDir/src/java/dpf"
-
 task copyDPFDyvil(type: Sync) {
 	from 'src/dpf'
 	into "$buildDir/src/dyvil/dpf"
@@ -250,7 +251,7 @@ tasks.withType(JavaCompile) {
 	)
 }
 
-task genLibrary(type: JavaExec, dependsOn: [ gensrcClasses ]) { JavaExec exec ->
+task genLibrary(type: JavaExec, dependsOn: [ 'gensrcClasses' ]) { JavaExec exec ->
 	runGenSrc exec, 'src/library/', "$buildDir/gensrc/library/"
 }
 
@@ -318,11 +319,10 @@ test.dependsOn 'testDyvil'
  * Creates a Jar file that contains all library classes (from src/library), including ASM
  */
 task buildLibrary(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil' ]) {
-	from sourceSets.main.resources
 	from sourceSets.library.output
 	
 	from("$buildDir/dyvilbin") {
-		include resourceFilters
+		include binaryFilters
 	}
 	
 	archiveName = "dyvil-library-${ libraryVersion }.jar"
@@ -332,7 +332,7 @@ task buildDPF(type: Jar, dependsOn: [ 'dpfClasses', 'compileDPFDyvil' ]) {
 	from sourceSets.dpf.output
 	
 	from("$buildDir/dpfbin") {
-		include resourceFilters
+		include binaryFilters
 	}
 	
 	archiveName = "dyvil-property-format-${ dpfVersion }.jar"
@@ -374,10 +374,10 @@ task buildAll(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil', '
 	from sourceSets.dpf.output
 	
 	from("$buildDir/dyvilbin") {
-		include resourceFilters
+		include binaryFilters
 	}
 	from("$buildDir/dpfbin") {
-		include resourceFilters
+		include binaryFilters
 	}
 	
 	archiveName = "dyvil-${ version }.jar"

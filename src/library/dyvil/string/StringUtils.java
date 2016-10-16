@@ -6,7 +6,6 @@ import dyvil.collection.List;
 import dyvil.collection.immutable.EmptyList;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.math.MathUtils;
-import dyvil.random.JavaRandoms;
 import dyvil.reflect.Modifiers;
 
 import java.lang.reflect.Field;
@@ -31,15 +30,9 @@ public final class StringUtils
 	{
 		// no instances
 	}
-	
-	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static String $times(int count, String string)
-	{
-		return $times(string, count);
-	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static String $times(String string, int count)
+	public static String repeated(String string, int count)
 	{
 		switch (count)
 		{
@@ -67,23 +60,6 @@ public final class StringUtils
 		}
 
 		return builder.toString();
-	}
-
-	/**
-	 * Formats the given {@link String} {@code format} with the given {@code Object[] args} using {@link
-	 * String#format(String, Object...)}.
-	 *
-	 * @param format
-	 * 		the format String
-	 * @param args
-	 * 		the format arguments
-	 *
-	 * @return the formatted String
-	 */
-	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static String format(String format, Object... args)
-	{
-		return String.format(format, args);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
@@ -128,14 +104,14 @@ public final class StringUtils
 		}
 		return string.split("\\s");
 	}
-	
+
 	/**
 	 * Returns a list of words contained in the given {@code string}. A 'word' is described as a sequence of letter
 	 * characters, which are themselves described in terms of {@link CharUtils#isLetter(char)}. Every other non-etter
 	 * character is simply ommitted from the list of words.
 	 *
 	 * @param string
-	 * 		the string to split
+	 * 	the string to split
 	 *
 	 * @return a list of words in the given string
 	 */
@@ -149,13 +125,13 @@ public final class StringUtils
 		}
 		return List.apply(words(string));
 	}
-	
+
 	/**
 	 * Splits the given {@code string} into an array of lines separated by newline ({@code \n}) characters using it's
 	 * {@link String#split(String) split(String)} method
 	 *
 	 * @param string
-	 * 		the string to split
+	 * 	the string to split
 	 *
 	 * @return an array of lines
 	 */
@@ -168,13 +144,13 @@ public final class StringUtils
 		}
 		return split(string, '\n');
 	}
-	
+
 	/**
 	 * Splits the given {@code string} into a {@link List} of lines separated by newline ({@code \n}) characters using
 	 * it's {@link String#split(String) split(String)} method
 	 *
 	 * @param string
-	 * 		the string to split
+	 * 	the string to split
 	 *
 	 * @return a List of lines
 	 */
@@ -188,14 +164,14 @@ public final class StringUtils
 
 		return List.apply(lines(string));
 	}
-	
+
 	/**
 	 * Returns the Levenshtein distance between the given {@link String Strings} {@code s1} and {@code s2}.
 	 *
 	 * @param s1
-	 * 		the first string
+	 * 	the first string
 	 * @param s2
-	 * 		the second string
+	 * 	the second string
 	 *
 	 * @return the Levenshtein distance between the two strings
 	 */
@@ -216,13 +192,13 @@ public final class StringUtils
 		{
 			return len1;
 		}
-		
+
 		int i;
 		int j;
 		int alen = len2 + 1;
 		int[] a1 = new int[alen];
 		int[] a2 = new int[alen];
-		
+
 		for (i = 0; i < alen; i++)
 		{
 			a1[i] = i;
@@ -233,20 +209,20 @@ public final class StringUtils
 			for (j = 0; j < len2; j++)
 			{
 				a2[j + 1] = s1.charAt(i) == s2.charAt(j) ?
-						MathUtils.min(a2[j] + 1, a1[j + 1] + 1, a1[j]) :
-						MathUtils.min(a2[j] + 1, a1[j + 1] + 1, a1[j] + 1);
+					            MathUtils.min(a2[j] + 1, a1[j + 1] + 1, a1[j]) :
+					            MathUtils.min(a2[j] + 1, a1[j + 1] + 1, a1[j] + 1);
 			}
 			System.arraycopy(a2, 0, a1, 0, alen);
 		}
 		return a2[len2];
 	}
-	
+
 	/**
 	 * Converts the given {@code string} to a valid lower-case identifier. This is done by replacing all whitespace
 	 * characters in the string with underscores ({@code _}) and converting all other characters to lower-case.
 	 *
 	 * @param string
-	 * 		the string to convert
+	 * 	the string to convert
 	 *
 	 * @return the string converted to a valid identifier
 	 */
@@ -255,11 +231,11 @@ public final class StringUtils
 	{
 		int len = string.length();
 		StringBuilder result = new StringBuilder(len);
-		
+
 		for (int i = 0; i < len; i++)
 		{
 			char c = string.charAt(i);
-			
+
 			if (CharUtils.isWhitespace(c))
 			{
 				c = '_';
@@ -268,110 +244,13 @@ public final class StringUtils
 			{
 				c = CharUtils.toLowerCase(c);
 			}
-			
+
 			result.append(c);
 		}
-		
+
 		return result.toString();
 	}
-	
-	/**
-	 * Converts the given {@code string} to an acronym by removing all characters but those at the beginning of a new
-	 * word.
-	 * <p>
-	 * Example:<br> {@code getAcronym("Hello World")} returns "HW"; {@code getAcronym("Half-Life 3")} returns "HL3"
-	 *
-	 * @param string
-	 * 		the string
-	 *
-	 * @return the acronym of the string
-	 */
-	@DyvilModifiers(Modifiers.INFIX)
-	public static String toAcronym(String string)
-	{
-		if (string == null)
-		{
-			return null;
-		}
-		
-		int len = string.length();
-		if (len <= 0)
-		{
-			return "";
-		}
-		
-		StringBuilder builder = new StringBuilder(len >> 2);
-		
-		boolean separator = true;
-		for (int i = 0; i < len; i++)
-		{
-			char c = string.charAt(i);
-			if (!CharUtils.isLetter(c))
-			{
-				if (CharUtils.isDigit(c))
-				{
-					builder.append(c);
-				}
-				separator = true;
-				continue;
-			}
-			
-			if (separator)
-			{
-				builder.append(c);
-				separator = false;
-			}
-		}
-		
-		return builder.toString();
-	}
-	
-	/**
-	 * Removes the vowels of the given {@code string} in such a way that it is still readable and identifiable. This is
-	 * done by only removing vowels that have a consonant to the left <i>and</i> to the right.
-	 * <p>
-	 * Vowels are defined in terms of {@link CharUtils#isVowel(char)}<br> Consonants are defined in terms of {@link
-	 * CharUtils#isConsonant(char)}
-	 *
-	 * @param string
-	 * 		the string to remove the vowels from
-	 *
-	 * @return a readable acronym-like version of the string with most vowels removed
-	 */
-	@DyvilModifiers(Modifiers.INFIX)
-	public static String removeVowels(String string)
-	{
-		if (string == null)
-		{
-			return null;
-		}
-		
-		int len = string.length();
-		if (len <= 0)
-		{
-			return "";
-		}
-		
-		StringBuilder builder = new StringBuilder(len);
 
-		char prev;
-		char curr = 0;
-		char next = string.charAt(0);
-		for (int i = 1; i < len; i++)
-		{
-			prev = curr;
-			curr = next;
-			next = string.charAt(i);
-			
-			if (CharUtils.isVowel(curr) && CharUtils.isConsonant(prev) && CharUtils.isConsonant(next))
-			{
-				continue;
-			}
-			builder.append(curr);
-		}
-		return builder.append(next).toString();
-	}
-	
 	@DyvilModifiers(Modifiers.INFIX)
 	public static String toTitleCase(String s)
 	{
@@ -379,15 +258,15 @@ public final class StringUtils
 		{
 			return null;
 		}
-		
+
 		int len = s.length();
 		if (len <= 0)
 		{
 			return "";
 		}
-		
+
 		StringBuilder builder = new StringBuilder(len);
-		
+
 		boolean seperator = true;
 		for (int i = 0; i < len; i++)
 		{
@@ -398,7 +277,7 @@ public final class StringUtils
 				builder.append(c);
 				continue;
 			}
-			
+
 			if (seperator)
 			{
 				seperator = false;
@@ -407,10 +286,10 @@ public final class StringUtils
 			}
 			builder.append(CharUtils.toLowerCase(c));
 		}
-		
+
 		return builder.toString();
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static String toLowerCamelCase(String s)
 	{
@@ -418,15 +297,15 @@ public final class StringUtils
 		{
 			return null;
 		}
-		
+
 		int len = s.length();
 		if (len <= 0)
 		{
 			return "";
 		}
-		
+
 		StringBuilder builder = new StringBuilder(len);
-		
+
 		boolean seperator = true;
 		for (int i = 0; i < len; i++)
 		{
@@ -437,7 +316,7 @@ public final class StringUtils
 				builder.append(c);
 				continue;
 			}
-			
+
 			if (seperator)
 			{
 				seperator = false;
@@ -446,10 +325,10 @@ public final class StringUtils
 			}
 			builder.append(c);
 		}
-		
+
 		return builder.toString();
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static String toUpperCamelCase(String s)
 	{
@@ -457,15 +336,15 @@ public final class StringUtils
 		{
 			return null;
 		}
-		
+
 		int len = s.length();
 		if (len <= 0)
 		{
 			return "";
 		}
-		
+
 		StringBuilder builder = new StringBuilder(len);
-		
+
 		boolean seperator = true;
 		for (int i = 0; i < len; i++)
 		{
@@ -476,7 +355,7 @@ public final class StringUtils
 				builder.append(c);
 				continue;
 			}
-			
+
 			if (seperator)
 			{
 				seperator = false;
@@ -485,10 +364,10 @@ public final class StringUtils
 			}
 			builder.append(c);
 		}
-		
+
 		return builder.toString();
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static String toInvertedCase(String s)
 	{
@@ -515,23 +394,23 @@ public final class StringUtils
 	}
 
 	/**
-	 * Counts the number of times the given {@code char c} appears in the given {@link String} {@code text}.
+	 * Counts the number of times the given {@code char character} appears in the given {@link String} {@code text}.
 	 *
 	 * @param string
-	 * 		the input string
-	 * @param c
-	 * 		the character to search for
+	 * 	the input string
+	 * @param character
+	 * 	the character to search for
 	 *
 	 * @return the number of times the character appears in the string
 	 */
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int count(String string, char c)
+	public static int count(String string, char character)
 	{
 		int count = 0;
 		int len = string.length();
 		for (int i = 0; i < len; i++)
 		{
-			if (string.charAt(i) == c)
+			if (string.charAt(i) == character)
 			{
 				count++;
 			}
@@ -540,29 +419,29 @@ public final class StringUtils
 	}
 
 	/**
-	 * Checks if the given {@link String} {@code text} contains the given {@code char c}.
+	 * Checks if the given {@link String} {@code text} contains the given {@code char character}.
 	 *
 	 * @param string
-	 * 		the string
-	 * @param c
-	 * 		the character
+	 * 	the string
+	 * @param character
+	 * 	the character
 	 *
 	 * @return true, if the string contains the character
 	 */
 	@DyvilModifiers(Modifiers.INFIX)
-	public static boolean contains(String string, char c)
+	public static boolean contains(String string, char character)
 	{
-		return string.indexOf(c) != -1;
+		return string.indexOf(character) != -1;
 	}
-	
+
 	/**
 	 * Checks if the given {@link String} {@code text} contains the regular expression given by the {@link String}
 	 * {@code regex}.
 	 *
 	 * @param string
-	 * 		the string
+	 * 	the string
 	 * @param regex
-	 * 		the regular expression
+	 * 	the regular expression
 	 *
 	 * @return true, if the string contains the regular expression
 	 *
@@ -582,101 +461,40 @@ public final class StringUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int indexOfRange(String string, String regex, int min, int max)
+	public static int indexOfBounded(String string, String pattern, int startIndex, int endIndex)
 	{
-		int index = string.indexOf(regex, min);
-		return index < max ? index : -1;
+		final int index = string.indexOf(pattern, startIndex);
+		return index + pattern.length() <= endIndex ? index : -1;
 	}
-	
-	/**
-	 * Returns a new random name.
-	 *
-	 * @param random
-	 * 		the random
-	 * @param minLength
-	 * 		the min length
-	 * @param maxLength
-	 * 		the max length
-	 *
-	 * @return the next random name
-	 */
-	@DyvilModifiers(Modifiers.INFIX)
-	public static String nextNoun(java.util.Random random, int minLength, int maxLength)
-	{
-		int len = JavaRandoms.nextInt(random, minLength, maxLength);
-		StringBuilder buf = new StringBuilder(len);
-		
-		char prev = CharUtils.nextUppercaseLetter(random);
-		buf.append(prev);
-		for (int i = 1; i < len; i++)
-		{
-			char c;
-			
-			if (CharUtils.isVowel(prev))
-			{
-				// Always add a consonant after a vowel
-				c = CharUtils.nextConsonant(random);
-			}
-			else
-			{
-				int rnd = random.nextInt(6);
-				if (rnd < 2)
-				{
-					// Add a consonant
-					c = CharUtils.nextConsonant(random);
-					int i1 = 0;
-					while (!CharUtils.isCombinable(prev, c) && i1++ <= 21)
-					{
-						c = CharUtils.nextConsonant(random);
-					}
-					
-					if (i1 > 21)
-					{
-						c = CharUtils.nextVowel(random);
-					}
-				}
-				else
-				{
-					// Add a vowel
-					c = CharUtils.nextVowel(random);
-				}
-			}
-			
-			prev = c;
-			buf.append(c);
-		}
-		
-		return buf.toString();
-	}
-	
+
 	public static <T> void prettyPrint(T value, Class<T> type, StringBuilder builder, boolean fieldNames)
 	{
 		Field[] fields = type.getFields();
 		builder.append(type.getName());
-		
+
 		builder.append('(');
 		int count = 0;
-		for (Field f : fields)
+		for (Field field : fields)
 		{
-			if ((f.getModifiers() & Modifiers.STATIC) != 0)
+			if ((field.getModifiers() & Modifiers.STATIC) != 0)
 			{
 				continue;
 			}
-			
+
 			if (count++ > 0)
 			{
 				builder.append(", ");
 			}
-			
+
 			if (fieldNames)
 			{
-				builder.append(f.getName()).append(": ");
+				builder.append(field.getName()).append(": ");
 			}
-			
+
 			try
 			{
-				f.setAccessible(true);
-				builder.append(f.get(value));
+				field.setAccessible(true);
+				builder.append(field.get(value));
 			}
 			catch (IllegalArgumentException | IllegalAccessException ex)
 			{
@@ -684,7 +502,7 @@ public final class StringUtils
 				builder.append("<error>");
 			}
 		}
-		
+
 		builder.append(')');
 	}
 }

@@ -1,45 +1,45 @@
-// $genNotice$
-// Timestamp: $timeStamp$
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
 
 package dyvil.ref.unsafe;
 
-import dyvil.ref.$type$Ref;
+import dyvil.ref.TYPE_NAME##Ref;
 import dyvil.reflect.ReflectUtils;
 
 import java.lang.reflect.Field;
 
-public final class Unsafe$type$Ref implements $type$Ref
+public final class Unsafe##TYPE_NAME##Ref implements TYPE_NAME##Ref
 {
 	private final Object base;
 	private final long   offset;
 
-	public Unsafe$type$Ref(Field staticField)
+	public Unsafe##TYPE_NAME##Ref(Field staticField)
 	{
 		this.base = ReflectUtils.UNSAFE.staticFieldBase(staticField);
 		this.offset = ReflectUtils.UNSAFE.staticFieldOffset(staticField);
 	}
 
-	public Unsafe$type$Ref(Object instance, Field field)
+	public Unsafe##TYPE_NAME##Ref(Object instance, Field field)
 	{
 		this.base = instance;
 		this.offset = ReflectUtils.UNSAFE.objectFieldOffset(field);
 	}
 
-	public Unsafe$type$Ref(Object base, long offset)
+	public Unsafe##TYPE_NAME##Ref(Object base, long offset)
 	{
 		this.base = base;
 		this.offset = offset;
 	}
 
 	@Override
-	public $primitive$ get()
+	public PRIMITIVE get()
 	{
-		return ReflectUtils.UNSAFE.get$type$(this.base, this.offset);
+		return ReflectUtils.UNSAFE.get##TYPE_NAME(this.base, this.offset);
 	}
 
 	@Override
-	public void set($primitive$ value)
+	public void set(PRIMITIVE value)
 	{
-		ReflectUtils.UNSAFE.put$type$(this.base, this.offset, value);
+		ReflectUtils.UNSAFE.put##TYPE_NAME(this.base, this.offset, value);
 	}
 }

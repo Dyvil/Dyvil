@@ -1,29 +1,27 @@
-type=Int
-primitive=int
-wrapper=Integer
+@base=true
 
-loadInsn=IALOAD
-storeInsn=IASTORE
+TYPE_NAME=Int
+PRIMITIVE=int
+WRAPPER=Integer
 
-fromLiteral=FromInt
+HAS_RANGE=true
 
-ref=IntRef
-ref_array=IntArrayRef
+ARRAY_LOAD_INSN=IALOAD
+ARRAY_STORE_INSN=IASTORE
 
-range=IntRange
-range_array=toIntArray
+FROM_LITERAL=FromInt
 
-mapper=IntUnaryOperator
-mapper_apply=applyAsInt
+MAPPER=IntUnaryOperator
+MAPPER_APPLY=applyAsInt
 
-flatMapper=IntFunction<int[]>
-flatMapper_apply=applyAsInt
+FLAT_MAPPER=IntFunction<int[]>
+FLAT_MAPPER_APPLY=applyAsInt
 
-predicate=IntPredicate
-predicate.test=test
+PREDICATE=IntPredicate
+PREDICATE_TEST=test
 
-supplier=IntSupplier
-supplier_get=getAsInt
+SUPPLIER=IntSupplier
+SUPPLIER_GET=getAsInt
 
-consumer=IntConsumer
-consumer_accept=accept
+CONSUMER=IntConsumer
+CONSUMER_ACCEPT=accept

@@ -19,6 +19,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -117,8 +118,6 @@ public class CodeMethod extends AbstractMethod
 
 		super.resolveTypes(markers, context);
 
-		this.unmangleName(markers);
-
 		if (this.thisType != null)
 		{
 			this.thisType = this.thisType.resolveType(markers, context);
@@ -165,26 +164,6 @@ public class CodeMethod extends AbstractMethod
 		}
 
 		context.pop();
-	}
-
-	private void unmangleName(MarkerList markers)
-	{
-		final Name name = this.name;
-		final String unqualified = name.unqualified;
-		final int index = unqualified.indexOf(NAME_SEPARATOR);
-
-		if (index < 0)
-		{
-			return;
-		}
-
-		final String qualified = name.qualified;
-		final String newUnqualified = unqualified.substring(0, index);
-		final String newQualified = qualified.substring(0, qualified.indexOf(NAME_SEPARATOR));
-		this.internalName = qualified;
-		this.name = Name.from(newUnqualified, newQualified);
-
-		markers.add(Markers.semanticWarning(this.position, "method.name_mangled.deprecated", this.name));
 	}
 
 	@Override
@@ -341,7 +320,7 @@ public class CodeMethod extends AbstractMethod
 		final int parameterCount = this.parameters.size();
 
 		String mangledName = this.getInternalName();
-		boolean thisMangled = mangledName.contains(NAME_SEPARATOR);
+		boolean thisMangled = !this.name.qualified.equals(mangledName);
 
 		for (int i = body.methodCount() - 1; i >= 0; i--)
 		{
@@ -385,7 +364,7 @@ public class CodeMethod extends AbstractMethod
 	private static String createMangledName(IMethod method)
 	{
 		// append the qualified name plus the name separator
-		final StringBuilder builder = new StringBuilder(method.getName().qualified).append(NAME_SEPARATOR);
+		final StringBuilder builder = new StringBuilder(method.getName().qualified).append('_');
 
 		final IParameterList params = method.getParameterList();
 		for (int i = 0, count = params.size(); i < count; i++)
@@ -523,11 +502,9 @@ public class CodeMethod extends AbstractMethod
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		context = context.push(this);
-
-		super.cleanup(context, compilableList);
+		super.cleanup(compilableList, classCompilableList);
 
 		if (this.annotations != null)
 		{
@@ -540,27 +517,25 @@ public class CodeMethod extends AbstractMethod
 
 		if (this.thisType != null)
 		{
-			this.thisType.cleanup(context, compilableList);
+			this.thisType.cleanup(compilableList, classCompilableList);
 		}
 
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.typeParameters[i].cleanup(context, compilableList);
+			this.typeParameters[i].cleanup(compilableList, classCompilableList);
 		}
 
-		this.parameters.cleanup(context, compilableList);
+		this.parameters.cleanup(compilableList, classCompilableList);
 
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			this.exceptions[i].cleanup(context, compilableList);
+			this.exceptions[i].cleanup(compilableList, classCompilableList);
 		}
 
 		if (this.value != null)
 		{
-			this.value = this.value.cleanup(context, compilableList);
+			this.value = this.value.cleanup(compilableList, classCompilableList);
 		}
-
-		context.pop();
 	}
 
 	@Override
@@ -733,10 +708,10 @@ public class CodeMethod extends AbstractMethod
 	{
 		if (reifiedType == Reified.Type.TYPE)
 		{
-			thisParameter.getDefaultType().writeTypeExpression(writer);
+			thisParameter.getUpperBound().writeTypeExpression(writer);
 			return;
 		}
-		thisParameter.getDefaultType().writeClassExpression(writer, reifiedType == Reified.Type.OBJECT_CLASS);
+		thisParameter.getUpperBound().writeClassExpression(writer, reifiedType == Reified.Type.OBJECT_CLASS);
 	}
 
 	private boolean needsSignature()

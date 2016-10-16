@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.statement.control.Label;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
@@ -284,29 +285,25 @@ public class ForStatement implements IForStatement, IDefaultContext
 	}
 
 	@Override
-	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 		if (this.variable != null)
 		{
-			this.variable.cleanup(context, compilableList);
+			this.variable.cleanup(compilableList, classCompilableList);
 		}
-
-		context = context.push(this);
 
 		if (this.update != null)
 		{
-			this.update.cleanup(context, compilableList);
+			this.update.cleanup(compilableList, classCompilableList);
 		}
 		if (this.condition != null)
 		{
-			this.condition.cleanup(context, compilableList);
+			this.condition.cleanup(compilableList, classCompilableList);
 		}
 		if (this.action != null)
 		{
-			this.action.cleanup(context, compilableList);
+			this.action.cleanup(compilableList, classCompilableList);
 		}
-
-		context.pop();
 
 		return this;
 	}

@@ -26,8 +26,9 @@ import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
 import dyvil.tools.compiler.backend.ClassWriter;
-import dyvil.tools.compiler.backend.IClassCompilable;
+import dyvil.tools.compiler.ast.header.IClassCompilable;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.sources.DyvilFileType;
 import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -385,16 +386,14 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public int compilableCount()
+	public int classCompilableCount()
 	{
 		return this.compilableCount;
 	}
 
 	@Override
-	public void addCompilable(IClassCompilable compilable)
+	public void addClassCompilable(IClassCompilable compilable)
 	{
-		compilable.setInnerIndex(this.getInternalName(), this.compilableCount);
-
 		if (this.compilables == null)
 		{
 			this.compilables = new IClassCompilable[2];
@@ -411,12 +410,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			this.compilables = temp;
 		}
 		this.compilables[index] = compilable;
-	}
-
-	@Override
-	public IClassCompilable getCompilable(int index)
-	{
-		return this.compilables[index];
 	}
 
 	@Override
@@ -791,26 +784,25 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	{
 		if (this.superType != null)
 		{
-			IClass iclass = this.superType.getTheClass();
-			if (iclass != null)
+			final IClass superClass = this.superType.getTheClass();
+			if (superClass != null)
 			{
-				IDataMember m = iclass.resolveField(name);
-				if (m != null)
+				final IDataMember field = superClass.resolveField(name);
+				if (field != null)
 				{
-					return m;
+					return field;
 				}
 			}
 		}
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			IType type = this.interfaces[i];
-			IClass iclass = type.getTheClass();
-			if (iclass != null)
+			final IClass superInterface = this.interfaces[i].getTheClass();
+			if (superInterface != null)
 			{
-				IDataMember m = iclass.resolveField(name);
-				if (m != null)
+				final IDataMember field = superInterface.resolveField(name);
+				if (field != null)
 				{
-					return m;
+					return field;
 				}
 			}
 		}
@@ -922,10 +914,10 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 
 		if (slashIndex < 0)
 		{
-			return internalName;
+			return internalName + DyvilFileType.CLASS_EXTENSION;
 		}
 		// Strip the package/ part
-		return internalName.substring(slashIndex + 1);
+		return internalName.substring(slashIndex + 1) + DyvilFileType.CLASS_EXTENSION;
 	}
 
 	@Override

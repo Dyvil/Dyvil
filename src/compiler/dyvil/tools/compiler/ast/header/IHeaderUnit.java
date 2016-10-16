@@ -11,12 +11,10 @@ import dyvil.tools.compiler.ast.operator.IOperatorMap;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.alias.ITypeAliasMap;
-import dyvil.tools.compiler.backend.IClassCompilable;
-import dyvil.tools.compiler.backend.IObjectCompilable;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 
-public interface IHeaderUnit extends IASTNode, IObjectCompilable, IContext, IClassList, IOperatorMap, ITypeAliasMap
+public interface IHeaderUnit extends IASTNode, IObjectCompilable, IContext, IClassList, ICompilableList, IOperatorMap, ITypeAliasMap
 {
 	boolean isHeader();
 
@@ -69,7 +67,7 @@ public interface IHeaderUnit extends IASTNode, IObjectCompilable, IContext, ICla
 	void setOperator(int index, IOperator operator);
 
 	@Override
-	void addOperator(IOperator op);
+	void addOperator(IOperator operator);
 
 	// Type Aliases
 
@@ -99,11 +97,11 @@ public interface IHeaderUnit extends IASTNode, IObjectCompilable, IContext, ICla
 	@Override
 	IClass getClass(Name name);
 	
-	int innerClassCount();
+	@Override
+	int compilableCount();
 	
-	void addInnerClass(IClassCompilable iclass);
-	
-	IClassCompilable getInnerClass(int index);
+	@Override
+	void addCompilable(ICompilable compilable);
 	
 	byte getVisibility(IClassMember member);
 	

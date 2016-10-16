@@ -1,34 +1,34 @@
-// $genNotice$
-// Timestamp: $timeStamp$
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
 
 package dyvil.ref.simple;
 
 import dyvil.lang.LiteralConvertible;
-import dyvil.ref.$type$Ref;
+import dyvil.ref.TYPE_NAME##Ref;
 
-@LiteralConvertible.$fromLiteral$
-public class Simple$type$Ref implements $type$Ref
+@LiteralConvertible.FROM_LITERAL
+public class Simple##TYPE_NAME##Ref implements TYPE_NAME##Ref
 {
-	public $primitive$ value;
+	public PRIMITIVE value;
 
-	public static Simple$type$Ref apply($primitive$ value)
+	public static Simple##TYPE_NAME##Ref apply(PRIMITIVE value)
 	{
-		return new Simple$type$Ref(value);
+		return new Simple##TYPE_NAME##Ref(value);
 	}
 
-	public Simple$type$Ref($primitive$ value)
+	public Simple##TYPE_NAME##Ref(PRIMITIVE value)
 	{
 		this.value = value;
 	}
 
 	@Override
-	public $primitive$ get()
+	public PRIMITIVE get()
 	{
 		return this.value;
 	}
 
 	@Override
-	public void set($primitive$ value)
+	public void set(PRIMITIVE value)
 	{
 		this.value = value;
 	}

@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.imports;
 
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.structure.Package;
-import dyvil.tools.compiler.backend.IObjectCompilable;
+import dyvil.tools.compiler.ast.header.IObjectCompilable;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;

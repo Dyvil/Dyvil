@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -379,13 +380,13 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	}
 
 	@Override
-	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 		if (this.receiver != null)
 		{
-			this.receiver = this.receiver.cleanup(context, compilableList);
+			this.receiver = this.receiver.cleanup(compilableList, classCompilableList);
 		}
-		this.value = this.value.cleanup(context, compilableList);
+		this.value = this.value.cleanup(compilableList, classCompilableList);
 		return this;
 	}
 

@@ -5,6 +5,8 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.metadata.IClassMetadata;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.field.*;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
@@ -52,14 +54,18 @@ public class AnonymousClass extends CodeClass
 	}
 
 	@Override
-	public void setInnerIndex(String internalName, int index)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		String outerName = this.enclosingClass.getName().qualified;
-		String indexString = Integer.toString(index);
+		final String outerName = this.enclosingClass.getName().qualified;
+		final String indexString = Integer.toString(compilableList.compilableCount());
 
 		this.name = Name.fromRaw(outerName + '$' + indexString);
 		this.fullName = this.enclosingClass.getFullName() + '$' + indexString;
 		this.internalName = this.enclosingClass.getInternalName() + '$' + indexString;
+
+		compilableList.addCompilable(this);
+
+		super.cleanup(compilableList, classCompilableList);
 	}
 
 	@Override
@@ -113,7 +119,7 @@ public class AnonymousClass extends CodeClass
 		FieldThis thisField = this.thisField;
 		if (thisField != null)
 		{
-			buf.append(thisField.getDescription());
+			buf.append(thisField.getDescriptor());
 		}
 
 		this.captureHelper.appendCaptureTypes(buf);
@@ -133,7 +139,7 @@ public class AnonymousClass extends CodeClass
 		final FieldThis thisField = this.thisField;
 		if (thisField != null)
 		{
-			thisField.getOuter().writeGet(writer);
+			thisField.getTargetAccess().writeGet(writer);
 		}
 
 		this.captureHelper.writeCaptures(writer);
@@ -182,7 +188,7 @@ class AnonymousClassMetadata implements IClassMetadata
 		if (thisField != null)
 		{
 			thisField.writeField(writer);
-			index = initWriter.visitParameter(index, thisField.getName(), thisField.getTheClass().getThisType(),
+			index = initWriter.visitParameter(index, thisField.getName(), thisField.getTargetClass().getThisType(),
 			                                  Modifiers.MANDATED);
 		}
 
@@ -203,7 +209,7 @@ class AnonymousClassMetadata implements IClassMetadata
 			initWriter.visitVarInsn(Opcodes.ALOAD, 0);
 			initWriter.visitVarInsn(Opcodes.ALOAD, thisIndex);
 			initWriter.visitFieldInsn(Opcodes.PUTFIELD, this.theClass.getInternalName(), thisField.getName(),
-			                          thisField.getDescription());
+			                          thisField.getDescriptor());
 		}
 
 		captureHelper.writeFieldAssignments(initWriter);

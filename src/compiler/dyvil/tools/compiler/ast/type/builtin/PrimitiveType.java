@@ -14,11 +14,12 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Mutability;
@@ -80,8 +81,8 @@ public final class PrimitiveType implements IType
 	private final int  typecode;
 	private final char typeChar;
 
-	private final int    opcodeOffset1;
-	private final int    opcodeOffset2;
+	private final int    opcodeOffset;
+	private final int    arrayOpcodeOffset;
 	private final Object frameType;
 
 	protected IMethod boxMethod;
@@ -96,8 +97,8 @@ public final class PrimitiveType implements IType
 		this.name = name;
 		this.typecode = typecode;
 		this.typeChar = typeChar;
-		this.opcodeOffset1 = loadOpcode - Opcodes.ILOAD;
-		this.opcodeOffset2 = aloadOpcode - Opcodes.IALOAD;
+		this.opcodeOffset = loadOpcode - Opcodes.ILOAD;
+		this.arrayOpcodeOffset = aloadOpcode - Opcodes.IALOAD;
 		this.frameType = frameType;
 	}
 
@@ -105,6 +106,8 @@ public final class PrimitiveType implements IType
 	{
 		switch (internalClassName)
 		{
+		case "java/lang/Object":
+			return Types.ANY;
 		case "java/lang/Void":
 			return Types.VOID;
 		case "java/lang/Boolean":
@@ -366,7 +369,7 @@ public final class PrimitiveType implements IType
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 	}
 
@@ -381,7 +384,7 @@ public final class PrimitiveType implements IType
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 	}
 
@@ -447,56 +450,50 @@ public final class PrimitiveType implements IType
 	}
 
 	@Override
-	public void appendExtendedName(StringBuilder buf)
+	public void appendExtendedName(StringBuilder buffer)
 	{
-		buf.append(this.typeChar);
+		buffer.append(this.typeChar);
 	}
 
 	@Override
-	public String getSignature()
-	{
-		return null;
-	}
-
-	@Override
-	public void appendSignature(StringBuilder buf, boolean genericArg)
+	public void appendSignature(StringBuilder buffer, boolean genericArg)
 	{
 		if (!genericArg)
 		{
-			buf.append(this.typeChar);
+			buffer.append(this.typeChar);
 			return;
 		}
-		buf.append('L').append(this.theClass.getInternalName()).append(';');
+		buffer.append('L').append(this.theClass.getInternalName()).append(';');
 	}
 
 	@Override
 	public int getLoadOpcode()
 	{
-		return Opcodes.ILOAD + this.opcodeOffset1;
+		return Opcodes.ILOAD + this.opcodeOffset;
 	}
 
 	@Override
 	public int getArrayLoadOpcode()
 	{
-		return Opcodes.IALOAD + this.opcodeOffset2;
+		return Opcodes.IALOAD + this.arrayOpcodeOffset;
 	}
 
 	@Override
 	public int getStoreOpcode()
 	{
-		return Opcodes.ISTORE + this.opcodeOffset1;
+		return Opcodes.ISTORE + this.opcodeOffset;
 	}
 
 	@Override
 	public int getArrayStoreOpcode()
 	{
-		return Opcodes.IASTORE + this.opcodeOffset2;
+		return Opcodes.IASTORE + this.arrayOpcodeOffset;
 	}
 
 	@Override
 	public int getReturnOpcode()
 	{
-		return Opcodes.IRETURN + this.opcodeOffset1;
+		return Opcodes.IRETURN + this.opcodeOffset;
 	}
 
 	@Override
@@ -520,9 +517,8 @@ public final class PrimitiveType implements IType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.visitLdcInsn(this.typecode);
-		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/PrimitiveType", "apply",
-		                       "(I)Ldyvilx/lang/model/type/PrimitiveType;", false);
+		writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvilx/lang/model/type/PrimitiveType",
+		                      this.name.qualified.toUpperCase(), "Ldyvilx/lang/model/type/PrimitiveType;");
 	}
 
 	@Override
@@ -559,7 +555,7 @@ public final class PrimitiveType implements IType
 			primitiveTarget = getPrimitiveType(target);
 
 			// Target is not a primitive type
-			if (primitiveTarget == null)
+			if (primitiveTarget == null || primitiveTarget.getTypecode() < 0)
 			{
 				this.boxMethod.writeInvoke(writer, null, EmptyArguments.INSTANCE, ITypeContext.DEFAULT, lineNumber);
 				return;
@@ -792,7 +788,9 @@ public final class PrimitiveType implements IType
 		final char lastChar = typePath.charAt(length - 1);
 		if (lastChar == ';' || lastChar >= '0' && lastChar <= '9')
 		{
-			visitor.visitTypeAnnotation(typeRef, TypePath.fromString(typePath), AnnotationUtil.PRIMITIVE, true);
+			// Argument of a parametric type
+			visitor.visitTypeAnnotation(typeRef, TypePath.fromString(typePath), AnnotationUtil.PRIMITIVE,
+			                            AnnotationUtil.PRIMITIVE_VISIBLE);
 		}
 	}
 

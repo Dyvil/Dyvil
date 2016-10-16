@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.constant;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public interface IConstantValue extends IValue
@@ -53,7 +54,7 @@ public interface IConstantValue extends IValue
 	}
 	
 	@Override
-	default IValue cleanup(IContext context, IClassCompilableList compilableList)
+	default IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 		return this;
 	}

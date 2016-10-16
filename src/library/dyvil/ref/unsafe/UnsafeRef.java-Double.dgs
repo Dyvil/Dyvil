@@ -1,2 +1,2 @@
-fileName=UnsafeDoubleRef.java
-inheritFrom=Base-Double.dgs
+@fileName=UnsafeDoubleRef.java
+@inheritFrom=Base-Double.dgs

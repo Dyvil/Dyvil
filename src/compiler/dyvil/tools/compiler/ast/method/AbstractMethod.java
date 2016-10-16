@@ -65,8 +65,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	                                                             "dyvil/runtime/DynamicLinker", "linkClassMethod",
 	                                                             ClassFormat.BSM_HEAD + ClassFormat.BSM_TAIL);
 
-	protected static final String NAME_SEPARATOR = "_$_";
-
 	// --------------------------------------------------
 
 	protected ITypeParameter[] typeParameters;
@@ -767,7 +765,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 			if (typeArgument == null)
 			{
-				final IType inferredType = typeParameter.getDefaultType();
+				final IType inferredType = typeParameter.getUpperBound();
 				markers.add(Markers.semantic(position, "method.typevar.infer", this.name, typeParameter.getName(),
 				                             inferredType));
 				genericData.addMapping(typeParameter, inferredType);
@@ -776,8 +774,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			{
 				final Marker marker = Markers.semanticError(position, "method.typevar.incompatible", this.name,
 				                                            typeParameter.getName());
-				marker.addInfo(Markers.getSemantic("generic.type", typeArgument));
-				marker.addInfo(Markers.getSemantic("typeparameter.declaration", typeParameter));
+				marker.addInfo(Markers.getSemantic("type.generic", typeArgument));
+				marker.addInfo(Markers.getSemantic("type_parameter.declaration", typeParameter));
 				markers.add(marker);
 			}
 		}

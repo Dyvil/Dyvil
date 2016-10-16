@@ -80,7 +80,7 @@ public final class Formatting
 			final ICodePosition memberPosition = member.getPosition();
 			final ICodePosition typePosition = member.getType().getPosition();
 			return memberPosition == null || typePosition == null || member.getPosition()
-			                                                               .before(member.getType().getPosition());
+			                                                               .isBefore(member.getType().getPosition());
 		case "true":
 			return true;
 		}

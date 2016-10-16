@@ -5,9 +5,10 @@ import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.parsing.Name;
@@ -237,15 +238,15 @@ public abstract class Member implements IMember
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 		if (this.annotations != null)
 		{
-			this.annotations.cleanup(context, compilableList);
+			this.annotations.cleanup(compilableList, classCompilableList);
 		}
 		if (this.type != null)
 		{
-			this.type.cleanup(context, compilableList);
+			this.type.cleanup(compilableList, classCompilableList);
 		}
 	}
 

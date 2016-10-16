@@ -1,2 +1,2 @@
-fileName=DoubleRange.java
-inheritFrom=Base-Double.dgs
+@fileName=DoubleRange.java
+@inheritFrom=Base-Double.dgs

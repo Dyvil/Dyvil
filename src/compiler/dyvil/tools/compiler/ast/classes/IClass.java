@@ -9,7 +9,9 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.ITypeParametric;
+import dyvil.tools.compiler.ast.header.IClassCompilable;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilable;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.MemberKind;
@@ -18,13 +20,12 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParametric;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
-import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public interface IClass extends IClassMember, ITypeParametric, IContext, IParametric, IClassCompilableList
+public interface IClass extends IClassMember, ICompilable, ITypeParametric, IContext, IParametric, IClassCompilableList
 {
 	@Override
 	default MemberKind getKind()
@@ -141,13 +142,10 @@ public interface IClass extends IClassMember, ITypeParametric, IContext, IParame
 	// Other Compilables (Lambda Expressions, ...)
 
 	@Override
-	int compilableCount();
+	int classCompilableCount();
 
 	@Override
-	void addCompilable(IClassCompilable compilable);
-
-	@Override
-	IClassCompilable getCompilable(int index);
+	void addClassCompilable(IClassCompilable compilable);
 
 	// Compilation
 
@@ -157,12 +155,6 @@ public interface IClass extends IClassMember, ITypeParametric, IContext, IParame
 	String getSignature();
 
 	String[] getInterfaceArray();
-
-	@Override
-	default boolean hasSeparateFile()
-	{
-		return true;
-	}
 
 	@Override
 	void write(ClassWriter writer) throws BytecodeException;

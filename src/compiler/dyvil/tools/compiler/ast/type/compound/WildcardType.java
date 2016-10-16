@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -55,6 +56,13 @@ public final class WildcardType implements IRawType, ITyped
 		this.variance = variance;
 	}
 
+	public WildcardType(ICodePosition position, IType bound, Variance variance)
+	{
+		this.position = position;
+		this.bound = bound;
+		this.variance = variance;
+	}
+
 	@Override
 	public ICodePosition getPosition()
 	{
@@ -76,9 +84,9 @@ public final class WildcardType implements IRawType, ITyped
 	}
 
 	@Override
-	public void setType(IType upperBound)
+	public void setType(IType type)
 	{
-		this.bound = upperBound;
+		this.bound = type;
 	}
 
 	@Override
@@ -248,14 +256,14 @@ public final class WildcardType implements IRawType, ITyped
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
-		this.bound.checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
-
-		if (position != TypePosition.GENERIC_ARGUMENT)
+		if ((position & TypePosition.WILDCARD_FLAG) == 0)
 		{
 			markers.add(Markers.semantic(this.position, "type.wildcard.invalid"));
 		}
+
+		this.bound.checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
 	}
 
 	@Override
@@ -271,9 +279,9 @@ public final class WildcardType implements IRawType, ITyped
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.bound.cleanup(context, compilableList);
+		this.bound.cleanup(compilableList, classCompilableList);
 	}
 
 	@Override

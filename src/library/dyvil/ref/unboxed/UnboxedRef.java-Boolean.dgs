@@ -1,2 +1,2 @@
-fileName=UnboxedBooleanRef.java
-inheritFrom=Base-Boolean.dgs
+@fileName=UnboxedBooleanRef.java
+@inheritFrom=Base-Boolean.dgs

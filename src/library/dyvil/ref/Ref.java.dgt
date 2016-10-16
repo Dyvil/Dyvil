@@ -1,33 +1,33 @@
-// $genNotice$
-// Timestamp: $timeStamp$
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
 
 package dyvil.ref;
 
 import dyvil.annotation._internal.DyvilModifiers;
-import dyvil.ref.boxed.Boxed$type$Ref;
+import dyvil.ref.boxed.Boxed##TYPE_NAME##Ref;
 import dyvil.reflect.Modifiers;
 
-public interface $type$Ref
+public interface TYPE_NAME##Ref
 {
-	$primitive$ get();
+	PRIMITIVE get();
 
-	void set($primitive$ value);
+	void set(PRIMITIVE value);
 
 	@DyvilModifiers(Modifiers.INLINE)
-	static $primitive$ $times($type$Ref ref)
+	static PRIMITIVE $times(TYPE_NAME##Ref ref)
 	{
 		return ref.get();
 	}
 
 	@DyvilModifiers(Modifiers.INLINE | Modifiers.INFIX)
-	static void $times_$eq($type$Ref ref, $primitive$ value)
+	static void $times_$eq(TYPE_NAME##Ref ref, PRIMITIVE value)
 	{
 		ref.set(value);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	static ObjectRef<$wrapper$> boxed($type$Ref floatRef)
+	static ObjectRef<WRAPPER> boxed(TYPE_NAME##Ref floatRef)
 	{
-		return new Boxed$type$Ref(floatRef);
+		return new Boxed##TYPE_NAME##Ref(floatRef);
 	}
 }

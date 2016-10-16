@@ -21,6 +21,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.header.AbstractHeader;
+import dyvil.tools.compiler.ast.header.ICompilable;
 import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.IMember;
@@ -34,8 +35,6 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.backend.ClassWriter;
-import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -47,7 +46,8 @@ import dyvil.tools.repl.DyvilREPL;
 public class REPLContext extends AbstractHeader
 	implements IDefaultContext, IValueConsumer, IMemberConsumer<REPLVariable>
 {
-	private static final String REPL$CLASSES = "repl$classes/";
+	private static final String CLASS_PACKAGE = "repl_classes";
+	public static final  String CLASS_PREFIX  = "Result_";
 
 	protected final DyvilREPL repl;
 
@@ -66,7 +66,7 @@ public class REPLContext extends AbstractHeader
 
 	// Cleared for every input
 	protected final MarkerList             markers        = new MarkerList(Markers.INSTANCE);
-	protected final List<IClassCompilable> innerClassList = new ArrayList<>();
+	protected final List<ICompilable> innerClassList = new ArrayList<>();
 	protected final List<IMember>          members        = new ArrayList<>();
 
 	public REPLContext(DyvilREPL repl)
@@ -101,7 +101,7 @@ public class REPLContext extends AbstractHeader
 
 	public void startEvaluation(String code)
 	{
-		final String className = "REPL$Result" + this.classIndex++;
+		final String className = CLASS_PREFIX + this.classIndex++;
 		this.currentClass = new CodeClass(this, Name.fromRaw(className));
 		this.currentClass.setBody(new ClassBody(this.currentClass));
 		this.currentCode = code;
@@ -138,7 +138,7 @@ public class REPLContext extends AbstractHeader
 			this.currentClass.foldConstants();
 		}
 
-		this.currentClass.cleanup(context, this.currentClass);
+		this.currentClass.cleanup(this, this.currentClass);
 
 		final Class<?> theClass = this.compileAndLoad();
 
@@ -153,22 +153,21 @@ public class REPLContext extends AbstractHeader
 
 	private Class<?> compileAndLoad()
 	{
-		// Compile all inner class
-		for (IClassCompilable innerClass : this.innerClassList)
-		{
-			try
-			{
-				final String fileName = innerClass.getFileName();
-				final byte[] bytes = ClassWriter.compile(innerClass);
-				REPLCompiler.loadClass(this.repl, REPL$CLASSES.concat(fileName), bytes);
-			}
-			catch (Throwable t)
-			{
-				t.printStackTrace(this.repl.getErrorOutput());
-			}
-		}
+		final REPLClassLoader classLoader = this.repl.getClassLoader();
+		final List<Class<?>> classes = new ArrayList<>(this.innerClassList.size() + 1);
 
-		return REPLCompiler.compile(this.repl, this.currentClass);
+		// Compile all inner class
+		for (ICompilable innerClass : this.innerClassList)
+		{
+			classLoader.register(innerClass);
+		}
+		classLoader.register(this.currentClass);
+
+		for (ICompilable innerClass : this.innerClassList)
+		{
+			classLoader.initialize(innerClass);
+		}
+		return classLoader.initialize(this.currentClass);
 	}
 
 	public void processMember(IMember member, Class<?> theClass)
@@ -200,8 +199,6 @@ public class REPLContext extends AbstractHeader
 		case CLASS:
 			// Compile and load the inner class
 			final IClass innerClass = (IClass) member;
-			REPLCompiler.compile(this.repl, innerClass);
-
 			this.classes.put(member.getName(), innerClass);
 			break;
 		}
@@ -226,30 +223,12 @@ public class REPLContext extends AbstractHeader
 		boolean colors = this.getCompilationContext().config.useAnsiColors();
 		StringBuilder buf = new StringBuilder();
 		this.markers.sort();
-		for (Marker m : this.markers)
+		for (Marker marker : this.markers)
 		{
-			m.log(this.currentCode, buf, colors);
+			marker.log(this.currentCode, buf, colors);
 		}
 
 		this.repl.getOutput().println(buf.toString());
-	}
-
-	private static void getClassName(StringBuilder builder, IType type)
-	{
-		if (type.isArrayType())
-		{
-			getClassName(builder, type.getElementType());
-			builder.append("Array");
-			return;
-		}
-		if (type.typeTag() == IType.REFERENCE)
-		{
-			getClassName(builder, type.getElementType());
-			builder.append("Ref");
-			return;
-		}
-
-		builder.append(type.getName().unqualified);
 	}
 
 	private void initMember(IClassMember member)
@@ -288,18 +267,18 @@ public class REPLContext extends AbstractHeader
 	}
 
 	@Override
-	public void addImport(ImportDeclaration declaration)
+	public void addImport(ImportDeclaration component)
 	{
-		declaration.resolveTypes(this.markers, this);
-		declaration.resolve(this.markers, this);
+		component.resolveTypes(this.markers, this);
+		component.resolve(this.markers, this);
 
 		if (this.hasErrors())
 		{
 			return;
 		}
 
-		super.addImport(declaration);
-		this.repl.getOutput().println("Imported " + declaration.getImport());
+		super.addImport(component);
+		this.repl.getOutput().println("Imported " + component.getImport());
 	}
 
 	@Override
@@ -331,10 +310,9 @@ public class REPLContext extends AbstractHeader
 	}
 
 	@Override
-	public void addInnerClass(IClassCompilable iclass)
+	public void addCompilable(ICompilable compilable)
 	{
-		iclass.setInnerIndex(this.currentClass.getInternalName(), this.innerClassList.size());
-		this.innerClassList.add(iclass);
+		this.innerClassList.add(compilable);
 	}
 
 	@Override
@@ -345,11 +323,11 @@ public class REPLContext extends AbstractHeader
 	}
 
 	@Override
-	public void addDataMember(REPLVariable variable)
+	public void addDataMember(REPLVariable field)
 	{
-		this.initMember(variable);
-		this.currentClass.getBody().addDataMember(variable);
-		this.members.add(variable);
+		this.initMember(field);
+		this.currentClass.getBody().addDataMember(field);
+		this.members.add(field);
 	}
 
 	@Override
@@ -502,9 +480,9 @@ public class REPLContext extends AbstractHeader
 	}
 
 	@Override
-	public String getFullName(Name name)
+	public String getFullName(Name subClass)
 	{
-		return "repl$classes." + name.qualified;
+		return CLASS_PACKAGE + '.' + subClass.qualified;
 	}
 
 	@Override
@@ -514,8 +492,8 @@ public class REPLContext extends AbstractHeader
 	}
 
 	@Override
-	public String getInternalName(Name name)
+	public String getInternalName(Name subClass)
 	{
-		return REPL$CLASSES + name.qualified;
+		return CLASS_PACKAGE + '/' + subClass.qualified;
 	}
 }

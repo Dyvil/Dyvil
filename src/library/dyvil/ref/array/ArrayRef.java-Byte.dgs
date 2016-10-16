@@ -1,2 +1,2 @@
-fileName=ByteArrayRef.java
-inheritFrom=Base-Byte.dgs
+@fileName=ByteArrayRef.java
+@inheritFrom=Base-Byte.dgs

@@ -20,7 +20,7 @@ public class CovariantTypeVarType extends TypeVarType
 	@Override
 	public IType asReturnType()
 	{
-		return this.typeParameter.getDefaultType();
+		return this.typeParameter.getUpperBound();
 	}
 
 	@Override

@@ -1,2 +1,2 @@
-fileName=BoxedDoubleRef.java
-inheritFrom=Base-Double.dgs
+@fileName=BoxedDoubleRef.java
+@inheritFrom=Base-Double.dgs

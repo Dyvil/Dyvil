@@ -14,13 +14,18 @@ import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.MapTypeContext;
+import dyvil.tools.compiler.ast.header.IClassCompilable;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.LambdaType;
-import dyvil.tools.compiler.backend.*;
+import dyvil.tools.compiler.backend.ClassFormat;
+import dyvil.tools.compiler.backend.ClassWriter;
+import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.CaptureHelper;
@@ -175,13 +180,6 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	{
 		this.returnType = returnType;
 		this.flags |= EXPLICIT_RETURN;
-	}
-
-	@Override
-	public void setInnerIndex(String internalName, int index)
-	{
-		this.owner = internalName;
-		this.name = "lambda$" + index;
 	}
 
 	@Override
@@ -619,18 +617,16 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	}
 
 	@Override
-	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.parameters.cleanup(context, compilableList);
+		this.parameters.cleanup(compilableList, classCompilableList);
 
 		if (this.returnType != null && (this.flags & EXPLICIT_RETURN) != 0)
 		{
-			this.returnType.cleanup(context, compilableList);
+			this.returnType.cleanup(compilableList, classCompilableList);
 		}
 
-		context = context.push(this);
-		this.value = this.value.cleanup(context, compilableList);
-		context.pop();
+		this.value = this.value.cleanup(compilableList, classCompilableList);
 
 		if (this.captureHelper == null || !this.captureHelper.hasCaptures())
 		{
@@ -666,7 +662,9 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			}
 		}
 
-		compilableList.addCompilable(this);
+		this.owner = classCompilableList.getInternalName();
+		this.name = "lambda$" + classCompilableList.classCompilableCount();
+		classCompilableList.addClassCompilable(this);
 
 		return this;
 	}

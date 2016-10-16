@@ -1,38 +1,27 @@
 package dyvil.tools.compiler.ast.generic;
 
 import dyvil.annotation.Reified;
-import dyvil.reflect.Modifiers;
+import dyvil.collection.List;
+import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
-import dyvil.tools.asm.TypePath;
 import dyvil.tools.asm.TypeReference;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.ClassOperator;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.TypeOperator;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.IntersectionType;
 import dyvil.tools.compiler.ast.type.typevar.CovariantTypeVarType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.marker.Marker;
-import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -42,30 +31,25 @@ import java.lang.annotation.ElementType;
 import static dyvil.tools.compiler.ast.type.builtin.Types.isSuperClass;
 import static dyvil.tools.compiler.ast.type.builtin.Types.isSuperType;
 
-public final class TypeParameter implements ITypeParameter
+public abstract class TypeParameter implements ITypeParameter
 {
-	protected ICodePosition position;
-
-	private AnnotationList annotations;
-
+	protected AnnotationList annotations;
 	protected Variance variance = Variance.INVARIANT;
 
 	protected Name name;
 
-	protected IType[] upperBounds = new IType[1];
-	protected int   upperBoundCount;
+	protected IType upperBound;
 	protected IType lowerBound;
 
 	// Metadata
-	private int index;
-	private int parameterIndex;
+	protected int index;
+	protected IType erasure = Types.OBJECT;
+	protected IType[] upperBounds;
 
-	private ITypeParametric generic;
-	private Reified.Type    reifiedKind; // defaults to null (not reified)
+	private   ITypeParametric generic;
+	protected Reified.Type    reifiedKind; // defaults to null (not reified)
 
-	private IType erasure       = Types.OBJECT;
-	private IType defaultType   = Types.OBJECT;
-	private IType covariantType = new CovariantTypeVarType(this);
+	private final IType covariantType = new CovariantTypeVarType(this);
 
 	public TypeParameter(ITypeParametric generic)
 	{
@@ -78,15 +62,8 @@ public final class TypeParameter implements ITypeParameter
 		this.generic = generic;
 	}
 
-	public TypeParameter(ICodePosition position, ITypeParametric generic)
+	public TypeParameter(ITypeParametric generic, Name name, Variance variance)
 	{
-		this.position = position;
-		this.generic = generic;
-	}
-
-	public TypeParameter(ICodePosition position, ITypeParametric generic, Name name, Variance variance)
-	{
-		this.position = position;
 		this.name = name;
 		this.generic = generic;
 		this.variance = variance;
@@ -129,12 +106,6 @@ public final class TypeParameter implements ITypeParameter
 	}
 
 	@Override
-	public int getParameterIndex()
-	{
-		return this.parameterIndex;
-	}
-
-	@Override
 	public void setName(Name name)
 	{
 		this.name = name;
@@ -144,18 +115,6 @@ public final class TypeParameter implements ITypeParameter
 	public Name getName()
 	{
 		return this.name;
-	}
-
-	@Override
-	public void setPosition(ICodePosition position)
-	{
-		this.position = position;
-	}
-
-	@Override
-	public ICodePosition getPosition()
-	{
-		return this.position;
 	}
 
 	@Override
@@ -196,6 +155,22 @@ public final class TypeParameter implements ITypeParameter
 		return true;
 	}
 
+	protected void computeReifiedKind()
+	{
+		if (this.reifiedKind != null)
+		{
+			return;
+		}
+
+		final IAnnotation reifiedAnnotation = this.annotations.getAnnotation(Types.REIFIED_CLASS);
+		if (reifiedAnnotation != null)
+		{
+			final IParameter parameter = Types.REIFIED_CLASS.getParameterList().get(0);
+			this.reifiedKind = AnnotationUtil
+				                   .getEnumValue(reifiedAnnotation.getArguments(), parameter, Reified.Type.class);
+		}
+	}
+
 	@Override
 	public IAnnotation getAnnotation(IClass type)
 	{
@@ -209,22 +184,9 @@ public final class TypeParameter implements ITypeParameter
 	}
 
 	@Override
-	public void addBoundAnnotation(IAnnotation annotation, int index, TypePath typePath)
-	{
-		this.upperBounds[index] = IType.withAnnotation(this.upperBounds[index], annotation, typePath, 0,
-		                                               typePath.getLength());
-	}
-
-	@Override
 	public IType getErasure()
 	{
-		return this.erasure;
-	}
-
-	@Override
-	public IType getDefaultType()
-	{
-		return this.defaultType;
+		return this.upperBounds[0];
 	}
 
 	@Override
@@ -233,42 +195,21 @@ public final class TypeParameter implements ITypeParameter
 		return this.covariantType;
 	}
 
+	// Upper Bound
+
 	@Override
-	public int upperBoundCount()
+	public IType getUpperBound()
 	{
-		return this.upperBoundCount;
+		return this.upperBound;
 	}
 
 	@Override
-	public void setUpperBound(int index, IType bound)
+	public void setUpperBound(IType bound)
 	{
-		this.upperBounds[index] = bound;
+		this.upperBound = bound;
 	}
 
-	@Override
-	public void addUpperBound(IType bound)
-	{
-		int index = this.upperBoundCount++;
-		if (index >= this.upperBounds.length)
-		{
-			IType[] temp = new IType[this.upperBoundCount];
-			System.arraycopy(this.upperBounds, 0, temp, 0, index);
-			this.upperBounds = temp;
-		}
-		this.upperBounds[index] = bound;
-	}
-
-	@Override
-	public IType getUpperBound(int index)
-	{
-		return this.upperBounds[index];
-	}
-
-	@Override
-	public IType[] getUpperBounds()
-	{
-		return this.upperBounds;
-	}
+	// Lower Bound
 
 	@Override
 	public void setLowerBound(IType bound)
@@ -285,86 +226,55 @@ public final class TypeParameter implements ITypeParameter
 	@Override
 	public IClass getTheClass()
 	{
-		if (this.lowerBound != null || this.upperBoundCount == 0)
-		{
-			return Types.OBJECT_CLASS;
-		}
-		return this.upperBounds[0].getTheClass();
+		return this.getUpperBound().getTheClass();
 	}
 
 	@Override
 	public boolean isAssignableFrom(IType type, ITypeContext typeContext)
 	{
-		for (int i = 0; i < this.upperBoundCount; i++)
+		if (!isSuperType(this.getUpperBound().getConcreteType(typeContext), type))
 		{
-			if (!isSuperType(this.upperBounds[i].getConcreteType(typeContext), type))
-			{
-				return false;
-			}
+			return false;
 		}
-		if (this.lowerBound != null)
-		{
-			if (!isSuperType(type, this.lowerBound.getConcreteType(typeContext)))
-			{
-				return false;
-			}
-		}
-		return true;
+		final IType lowerBound = this.getLowerBound();
+		return lowerBound == null || isSuperType(type, lowerBound.getConcreteType(typeContext));
 	}
 
 	@Override
-	public boolean isSameType(IType superType)
+	public boolean isSameType(IType type)
 	{
-		for (int i = 0; i < this.upperBoundCount; i++)
+		if (Types.isSameType(type, this.getUpperBound()))
 		{
-			if (Types.isSameType(superType, this.upperBounds[i]))
-			{
-				return true;
-			}
+			return true;
 		}
-		if (this.lowerBound != null)
-		{
-			if (Types.isSameType(this.lowerBound, superType))
-			{
-				return true;
-			}
-		}
-		return false;
+
+		final IType lowerBound = this.getLowerBound();
+		return lowerBound != null && Types.isSameType(lowerBound, type);
 	}
 
 	@Override
-	public boolean isSameClass(IType superType)
+	public boolean isSameClass(IType type)
 	{
-		for (int i = 0; i < this.upperBoundCount; i++)
+		if (Types.isSameClass(type, this.getUpperBound()))
 		{
-			if (Types.isSameClass(superType, this.upperBounds[i]))
-			{
-				return true;
-			}
+			return true;
 		}
-		if (this.lowerBound != null)
-		{
-			if (Types.isSameClass(this.lowerBound, superType))
-			{
-				return true;
-			}
-		}
-		return false;
+
+		final IType lowerBound = this.getLowerBound();
+		return lowerBound != null && Types.isSameClass(lowerBound, type);
 	}
 
 	@Override
 	public boolean isSuperTypeOf(IType subType)
 	{
-		for (int i = 0; i < this.upperBoundCount; i++)
+		if (!isSuperType(this.getUpperBound(), subType))
 		{
-			if (!isSuperType(this.upperBounds[i], subType))
-			{
-				return false;
-			}
+			return false;
 		}
-		if (this.lowerBound != null)
+		final IType lowerBound = this.getLowerBound();
+		if (lowerBound != null)
 		{
-			if (!isSuperType(subType, this.lowerBound))
+			if (!isSuperType(subType, lowerBound))
 			{
 				return false;
 			}
@@ -375,258 +285,82 @@ public final class TypeParameter implements ITypeParameter
 	@Override
 	public boolean isSuperClassOf(IType subType)
 	{
-		for (int i = 0; i < this.upperBoundCount; i++)
+		if (!isSuperClass(this.getUpperBound(), subType))
 		{
-			if (!isSuperClass(this.upperBounds[i], subType))
-			{
-				return false;
-			}
+			return false;
 		}
-		if (this.lowerBound != null)
-		{
-			if (!isSuperClass(subType, this.lowerBound))
-			{
-				return false;
-			}
-		}
-		return true;
+
+		final IType lowerBound = this.getLowerBound();
+		return lowerBound == null || isSuperClass(subType, lowerBound);
 	}
 
 	@Override
 	public boolean isSubTypeOf(IType superType)
 	{
-		for (int i = 0; i < this.upperBoundCount; i++)
+		if (isSuperType(superType, this.getUpperBound()))
 		{
-			if (isSuperType(superType, this.upperBounds[i]))
-			{
-				return true;
-			}
+			return true;
 		}
-		if (this.lowerBound != null)
-		{
-			if (isSuperType(this.lowerBound, superType))
-			{
-				return true;
-			}
-		}
-		return Types.isExactType(superType, Types.OBJECT);
+
+		final IType lowerBound = this.getLowerBound();
+		return lowerBound != null && isSuperType(lowerBound, superType) || Types.isExactType(superType, Types.OBJECT);
 	}
 
 	@Override
 	public boolean isSubClassOf(IType superType)
 	{
-		for (int i = 0; i < this.upperBoundCount; i++)
+		if (isSuperClass(superType, this.getUpperBound()))
 		{
-			if (isSuperClass(superType, this.upperBounds[i]))
-			{
-				return true;
-			}
+			return true;
 		}
-		if (this.lowerBound != null)
-		{
-			if (isSuperClass(this.lowerBound, superType))
-			{
-				return true;
-			}
-		}
-		return Types.isSameClass(superType, Types.OBJECT);
+		final IType lowerBound = this.getLowerBound();
+		return lowerBound != null && isSuperClass(lowerBound, superType) || Types.isSameClass(superType, Types.OBJECT);
 	}
 
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		IDataMember field;
-
-		for (int i = 0; i < this.upperBoundCount; i++)
-		{
-			field = this.upperBounds[i].resolveField(name);
-			if (field != null)
-			{
-				return field;
-			}
-		}
-
-		return null;
+		return this.getUpperBound().resolveField(name);
 	}
 
 	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue instance, Name name, IArguments arguments)
 	{
-		for (int i = 0; i < this.upperBoundCount; i++)
-		{
-			this.upperBounds[i].getMethodMatches(list, instance, name, arguments);
-		}
+		this.getUpperBound().getMethodMatches(list, instance, name, arguments);
 	}
 
 	@Override
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
-		for (int i = 0; i < this.upperBoundCount; i++)
-		{
-			this.upperBounds[i].getImplicitMatches(list, value, targetType);
-		}
+		this.getUpperBound().getImplicitMatches(list, value, targetType);
 	}
 
-	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
+	protected static IType[] getUpperBounds(IType upperBound)
 	{
-		if (this.lowerBound != null)
-		{
-			this.lowerBound = this.lowerBound.resolveType(markers, context);
-		}
-
-		if (this.upperBoundCount > 0)
-		{
-			// The first upper bound is meant to be a class bound.
-			IType type = this.upperBounds[0] = this.upperBounds[0].resolveType(markers, context);
-			IType defaultType = type;
-
-			IClass typeClass = type.getTheClass();
-			if (typeClass != null && !typeClass.isInterface())
-			{
-				// If the first type is a class type (not an interface), it becomes the erasure type.
-				this.erasure = type;
-			}
-
-			// Check if the remaining upper bounds are interfaces
-			for (int i = 1; i < this.upperBoundCount; i++)
-			{
-				type = this.upperBounds[i] = this.upperBounds[i].resolveType(markers, context);
-				typeClass = type.getTheClass();
-
-				// The default type is accumulated to an intersection of all upper bounds
-				defaultType = IntersectionType.combine(defaultType, type, null);
-
-				if (typeClass != null && !typeClass.hasModifier(Modifiers.INTERFACE_CLASS))
-				{
-					final Marker marker = Markers.semanticError(type.getPosition(), "typeparameter.bound.class");
-					marker.addInfo(Markers.getSemantic("class.declaration", Util.classSignatureToString(typeClass)));
-					markers.add(marker);
-				}
-			}
-
-			this.defaultType = defaultType;
-		}
-
-		if (this.annotations != null)
-		{
-			this.annotations.resolveTypes(markers, context, this);
-			this.computeReifiedType();
-		}
+		// Flatten the tree-like upperBound structure into a list
+		final List<IType> list = new ArrayList<>();
+		getUpperBounds(list, upperBound);
+		return list.toArray(IType.class);
 	}
 
-	@Override
-	public void resolve(MarkerList markers, IContext context)
+	private static void getUpperBounds(List<IType> list, IType upperBound)
 	{
-		if (this.lowerBound != null)
+		if (upperBound.typeTag() != IType.INTERSECTION)
 		{
-			this.lowerBound.resolve(markers, context);
+			list.add(upperBound);
+			return;
 		}
 
-		for (int i = 0; i < this.upperBoundCount; i++)
-		{
-			this.upperBounds[i].resolve(markers, context);
-		}
-
-		if (this.annotations != null)
-		{
-			this.annotations.resolve(markers, context);
-			this.computeReifiedType();
-		}
-	}
-
-	private void computeReifiedType()
-	{
-		final IAnnotation reifiedAnnotation = this.annotations.getAnnotation(Types.REIFIED_CLASS);
-		if (reifiedAnnotation != null)
-		{
-			final IParameter parameter = Types.REIFIED_CLASS.getParameterList().get(0);
-			this.reifiedKind = AnnotationUtil
-				                   .getEnumValue(reifiedAnnotation.getArguments(), parameter, Reified.Type.class);
-		}
-	}
-
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		if (this.annotations != null)
-		{
-			this.annotations.checkTypes(markers, context);
-		}
-
-		if (this.lowerBound != null)
-		{
-			this.lowerBound.checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
-		}
-
-		for (int i = 0; i < this.upperBoundCount; i++)
-		{
-			this.upperBounds[i].checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
-		}
-	}
-
-	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-		if (this.annotations != null)
-		{
-			this.annotations.check(markers, context, ElementType.TYPE_PARAMETER);
-		}
-
-		if (this.lowerBound != null)
-		{
-			this.lowerBound.check(markers, context);
-		}
-
-		for (int i = 0; i < this.upperBoundCount; i++)
-		{
-			this.upperBounds[i].check(markers, context);
-		}
-	}
-
-	@Override
-	public void foldConstants()
-	{
-		if (this.annotations != null)
-		{
-			this.annotations.foldConstants();
-		}
-
-		if (this.lowerBound != null)
-		{
-			this.lowerBound.foldConstants();
-		}
-
-		for (int i = 0; i < this.upperBoundCount; i++)
-		{
-			this.upperBounds[i].foldConstants();
-		}
-	}
-
-	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
-	{
-		if (this.annotations != null)
-		{
-			this.annotations.cleanup(context, compilableList);
-		}
-
-		if (this.lowerBound != null)
-		{
-			this.lowerBound.cleanup(context, compilableList);
-		}
-
-		for (int i = 0; i < this.upperBoundCount; i++)
-		{
-			this.upperBounds[i].cleanup(context, compilableList);
-		}
+		final IntersectionType intersection = (IntersectionType) upperBound;
+		getUpperBounds(list, intersection.getLeft());
+		getUpperBounds(list, intersection.getRight());
 	}
 
 	@Override
 	public void appendSignature(StringBuilder buffer)
 	{
 		buffer.append(this.name).append(':');
-		if (this.upperBoundCount <= 0)
+		if (this.upperBounds == null)
 		{
 			buffer.append("Ljava/lang/Object;");
 			return;
@@ -639,7 +373,7 @@ public final class TypeParameter implements ITypeParameter
 			buffer.append(':');
 		}
 		this.upperBounds[0].appendSignature(buffer, false);
-		for (int i = 1; i < this.upperBoundCount; i++)
+		for (int i = 1, count = this.upperBounds.length; i < count; i++)
 		{
 			buffer.append(':');
 			this.upperBounds[i].appendSignature(buffer, false);
@@ -663,27 +397,6 @@ public final class TypeParameter implements ITypeParameter
 	public void appendParameterSignature(StringBuilder buffer)
 	{
 		this.appendParameterDescriptor(buffer);
-	}
-
-	@Override
-	public void writeParameter(MethodWriter writer) throws BytecodeException
-	{
-		final IType type;
-		if (this.reifiedKind == Reified.Type.TYPE)
-		{
-			type = TypeOperator.LazyFields.TYPE;
-		}
-		else if (this.reifiedKind != null)
-		{
-			type = ClassOperator.LazyFields.CLASS;
-		}
-		else
-		{
-			return;
-		}
-
-		this.parameterIndex = writer.localCount();
-		writer.visitParameter(this.parameterIndex, "reify$" + this.getName().qualified, type, Modifiers.MANDATED);
 	}
 
 	@Override
@@ -730,7 +443,12 @@ public final class TypeParameter implements ITypeParameter
 			}
 		}
 
-		for (int i = 0; i < this.upperBoundCount; i++)
+		if (this.upperBounds == null)
+		{
+			return;
+		}
+
+		for (int i = 0, size = this.upperBounds.length; i < size; i++)
 		{
 			final int boundTypeRef = TypeReference.newTypeParameterBoundReference(
 				method ? TypeReference.METHOD_TYPE_PARAMETER_BOUND : TypeReference.CLASS_TYPE_PARAMETER_BOUND,
@@ -747,13 +465,7 @@ public final class TypeParameter implements ITypeParameter
 		Variance.write(this.variance, out);
 
 		IType.writeType(this.lowerBound, out);
-
-		out.writeShort(this.upperBoundCount);
-
-		for (int i = 0; i < this.upperBoundCount; i++)
-		{
-			IType.writeType(this.upperBounds[i], out);
-		}
+		IType.writeType(this.upperBound, out);
 	}
 
 	@Override
@@ -764,13 +476,7 @@ public final class TypeParameter implements ITypeParameter
 		this.variance = Variance.read(in);
 
 		this.lowerBound = IType.readType(in);
-
-		this.upperBoundCount = in.readShort();
-
-		for (int i = 0; i < this.upperBoundCount; i++)
-		{
-			this.upperBounds[i] = IType.readType(in);
-		}
+		this.upperBound = IType.readType(in);
 	}
 
 	@Override
@@ -786,8 +492,7 @@ public final class TypeParameter implements ITypeParameter
 	{
 		if (this.annotations != null)
 		{
-			int count = this.annotations.annotationCount();
-			for (int i = 0; i < count; i++)
+			for (int i = 0, size = this.annotations.annotationCount(); i < size; i++)
 			{
 				this.annotations.getAnnotation(i).toString(prefix, buffer);
 				buffer.append(' ');
@@ -797,20 +502,18 @@ public final class TypeParameter implements ITypeParameter
 		this.variance.appendPrefix(buffer);
 		buffer.append(this.name);
 
-		if (this.lowerBound != null)
+		final IType lowerBound = this.getLowerBound();
+		if (lowerBound != null)
 		{
-			Formatting.appendSeparator(buffer, "type.bound", ">:");
-			this.lowerBound.toString(prefix, buffer);
+			buffer.append(" super ");
+			lowerBound.toString(prefix, buffer);
 		}
-		if (this.upperBoundCount > 0)
+
+		final IType upperBound = this.getUpperBound();
+		if (upperBound != null)
 		{
-			Formatting.appendSeparator(buffer, "type.bound", "<:");
-			this.upperBounds[0].toString(prefix, buffer);
-			for (int i = 1; i < this.upperBoundCount; i++)
-			{
-				Formatting.appendSeparator(buffer, "type.bound.separator", '&');
-				this.upperBounds[i].toString(prefix, buffer);
-			}
+			buffer.append(" extends ");
+			upperBound.toString(prefix, buffer);
 		}
 	}
 }

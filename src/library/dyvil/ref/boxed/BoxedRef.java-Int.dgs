@@ -1,2 +1,2 @@
-fileName=BoxedIntRef.java
-inheritFrom=Base-Int.dgs
+@fileName=BoxedIntRef.java
+@inheritFrom=Base-Int.dgs

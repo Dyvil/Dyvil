@@ -45,7 +45,7 @@ public class ResolvedGenericType extends ClassGenericType
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 		ModifierUtil.checkVisibility(this.theClass, this.position, markers, context);
 
@@ -58,28 +58,17 @@ public class ResolvedGenericType extends ClassGenericType
 
 			if (type.isResolved() && !typeVariable.isSuperTypeOf(type))
 			{
-				final Marker marker = Markers.semantic(type.getPosition(), "generic.type.incompatible",
+				final Marker marker = Markers.semantic(type.getPosition(), "type.generic.incompatible",
 				                                       typeVariable.getName().qualified, this.theClass.getFullName());
-				marker.addInfo(Markers.getSemantic("generic.type", type));
-				marker.addInfo(Markers.getSemantic("typeparameter.declaration", typeVariable));
+				marker.addInfo(Markers.getSemantic("type.generic", type));
+				marker.addInfo(Markers.getSemantic("type_parameter.declaration", typeVariable));
 				markers.add(marker);
 			}
 		}
 
-		if (position == TypePosition.CLASS)
+		if ((position & TypePosition.GENERIC_FLAG) == 0)
 		{
-			markers.add(Markers.semanticError(this.position, "type.class.generic"));
-		}
-
-		// If the position is a SUPER_TYPE position
-		if (position == TypePosition.SUPER_TYPE || position == TypePosition.SUPER_TYPE_ARGUMENT)
-		{
-			position = TypePosition.SUPER_TYPE_ARGUMENT;
-		}
-		else
-		{
-			// Otherwise, resolve the type arguments with a GENERIC_ARGUMENT position
-			position = TypePosition.GENERIC_ARGUMENT;
+			markers.add(Markers.semanticError(this.position, "type.generic.class"));
 		}
 
 		super.checkType(markers, context, position);

@@ -2,9 +2,10 @@ package dyvil.tools.compiler.ast.type.alias;
 
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
+import dyvil.tools.compiler.ast.external.ExternalTypeParameter;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.generic.TypeParameter;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.header.ISourceHeader;
 import dyvil.tools.compiler.ast.type.IType;
@@ -62,9 +63,9 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	}
 
 	@Override
-	public void setEnclosingHeader(IHeaderUnit enclosingHeader)
+	public void setEnclosingHeader(IHeaderUnit header)
 	{
-		this.enclosingHeader = enclosingHeader;
+		this.enclosingHeader = header;
 	}
 
 	@Override
@@ -279,18 +280,14 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		context = context.push(this);
-
-		this.type.cleanup(context, compilableList);
+		this.type.cleanup(compilableList, classCompilableList);
 
 		for (int i = 0; i < this.typeVariableCount; i++)
 		{
-			this.typeVariables[i].cleanup(context, compilableList);
+			this.typeVariables[i].cleanup(compilableList, classCompilableList);
 		}
-
-		context.pop();
 	}
 
 	@Override
@@ -318,7 +315,7 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 
 		for (int i = 0; i < this.typeVariableCount; i++)
 		{
-			ITypeParameter typeVariable = new TypeParameter(this);
+			ITypeParameter typeVariable = new ExternalTypeParameter(this);
 			typeVariable.read(in);
 			this.typeVariables[i] = typeVariable;
 		}

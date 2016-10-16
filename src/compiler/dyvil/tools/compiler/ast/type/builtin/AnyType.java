@@ -1,6 +1,9 @@
 package dyvil.tools.compiler.ast.type.builtin;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.TypeAnnotatableVisitor;
+import dyvil.tools.asm.TypePath;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -42,7 +45,7 @@ public class AnyType implements IRawType
 	}
 	
 	@Override
-	public boolean isSuperTypeOf(IType type)
+	public boolean isSuperTypeOf(IType subType)
 	{
 		return true;
 	}
@@ -66,7 +69,7 @@ public class AnyType implements IRawType
 	}
 	
 	@Override
-	public void checkType(MarkerList markers, IContext context, IType.TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 	}
 	
@@ -115,7 +118,14 @@ public class AnyType implements IRawType
 	{
 		buffer.append("Ljava/lang/Object;");
 	}
-	
+
+	@Override
+	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
+	{
+		visitor.visitTypeAnnotation(typeRef, TypePath.fromString(typePath), AnnotationUtil.PRIMITIVE,
+		                            AnnotationUtil.PRIMITIVE_VISIBLE);
+	}
+
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
