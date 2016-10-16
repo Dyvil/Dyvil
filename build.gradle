@@ -18,6 +18,8 @@ String compilerVersion = '0.25.0'
 String replVersion = '0.16.2'
 String dpfVersion = '0.6.3'
 
+String devStage = 'gamma'
+
 boolean nightly = false
 
 @Field static final String replMainClass = 'dyvil.tools.repl.Main'
@@ -402,7 +404,7 @@ task prepareRelease(type: Copy) {
 	}
 	else
 	{
-		into 'versions/pre'
+		into "versions/$devStage"
 		include 'template.dyp'
 		rename 'template\\.dyp', "v${ version }.dyp"
 	}
