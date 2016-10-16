@@ -1,4 +1,4 @@
-package dyvil.tools.gensrc;
+package dyvil.tools.gensrc.ast;
 
 public interface ReplacementMap
 {

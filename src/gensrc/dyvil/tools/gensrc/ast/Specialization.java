@@ -1,5 +1,6 @@
-package dyvil.tools.gensrc;
+package dyvil.tools.gensrc.ast;
 
+import dyvil.tools.gensrc.GenSrc;
 import dyvil.tools.gensrc.lang.I18n;
 
 import java.io.BufferedReader;
@@ -93,7 +94,7 @@ public class Specialization implements ReplacementMap
 		return this.parent.getReplacement(key);
 	}
 
-	public void load(GenSources gensrc, List<String> markers)
+	public void load(GenSrc gensrc, List<String> markers)
 	{
 		initDefaults(this.substitutions);
 
@@ -104,7 +105,7 @@ public class Specialization implements ReplacementMap
 		catch (IOException e)
 		{
 			// TODO better error handling
-			e.printStackTrace();
+			e.printStackTrace(gensrc.getErrorOutput());
 		}
 
 		if (!this.isBase())

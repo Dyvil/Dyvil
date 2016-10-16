@@ -1,4 +1,4 @@
-package dyvil.tools.gensrc;
+package dyvil.tools.gensrc.ast;
 
 import java.util.HashMap;
 import java.util.Map;

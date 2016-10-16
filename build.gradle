@@ -22,7 +22,7 @@ boolean nightly = false
 
 @Field static final String replMainClass = 'dyvil.tools.repl.Main'
 @Field static final String compilerMainClass = 'dyvil.tools.compiler.Main'
-@Field static final String genSrcMainClass = 'dyvil.tools.gensrc.GenSources'
+@Field static final String genSrcMainClass = 'dyvil.tools.gensrc.Main'
 
 @Field static final List<String> dyvilFilters = [ '**/*.dyv', '**/*.dyh', '**/*.dyvil', '**/*.dyvilh' ]
 @Field static final List<String> javaFilters = [ '**/*.java' ]

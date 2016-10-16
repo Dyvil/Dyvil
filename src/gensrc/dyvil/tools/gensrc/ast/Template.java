@@ -1,5 +1,6 @@
-package dyvil.tools.gensrc;
+package dyvil.tools.gensrc.ast;
 
+import dyvil.tools.gensrc.GenSrc;
 import dyvil.tools.gensrc.lang.I18n;
 
 import java.io.*;
@@ -37,19 +38,11 @@ public class Template
 		this.specializations.add(spec);
 	}
 
-	public void load(GenSources gensrc)
-	{
-		for (Specialization spec : this.specializations)
-		{
-			gensrc.loadSpecialization(spec);
-		}
-	}
-
-	public void specialize()
+	public void specialize(GenSrc gensrc)
 	{
 		if (!this.targetDirectory.exists() && !this.targetDirectory.mkdirs())
 		{
-			System.out.println("Could not create directory '" + this.targetDirectory + "'");
+			gensrc.getOutput().println("Could not create directory '" + this.targetDirectory + "'");
 			return;
 		}
 
@@ -62,20 +55,20 @@ public class Template
 			{
 				if (spec.isEnabled())
 				{
-					this.specialize(lines, spec);
+					this.specialize(gensrc, lines, spec);
 					count++;
 				}
 			}
 
-			System.out.println(I18n.get("template.specialized", count, this.getSourceFile()));
+			gensrc.getOutput().println(I18n.get("template.specialized", count, this.getSourceFile()));
 		}
 		catch (IOException ex)
 		{
-			ex.printStackTrace();
+			ex.printStackTrace(gensrc.getErrorOutput());
 		}
 	}
 
-	private void specialize(List<String> lines, Specialization spec)
+	private void specialize(GenSrc gensrc, List<String> lines, Specialization spec)
 	{
 		final String fileName = spec.getFileName();
 		if (fileName == null)
@@ -91,7 +84,7 @@ public class Template
 		}
 		catch (IOException ex)
 		{
-			ex.printStackTrace();
+			ex.printStackTrace(gensrc.getErrorOutput());
 		}
 	}
 }
