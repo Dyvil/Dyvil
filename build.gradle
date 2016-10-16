@@ -11,12 +11,13 @@ import groovy.transform.Field
 
 group = 'dyvil-team'
 
-version = '0.25.0'
+version = '0.26.0'
 
-String libraryVersion = '0.25.0'
-String compilerVersion = '0.25.0'
-String replVersion = '0.16.2'
-String dpfVersion = '0.6.3'
+String libraryVersion = '0.26.0'
+String compilerVersion = '0.26.0'
+String replVersion = '0.17.0'
+String dpfVersion = '0.6.4'
+String genSrcVersion = '0.1.0'
 
 String devStage = 'gamma'
 
@@ -46,6 +47,7 @@ if (droneBuild)
 	compilerVersion += snapshot
 	replVersion += snapshot
 	dpfVersion += snapshot
+	genSrcVersion += snapshot
 	
 	nightly = true
 }
@@ -322,6 +324,7 @@ test.dependsOn 'testDyvil'
  */
 task buildLibrary(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil' ]) {
 	from sourceSets.library.output
+	from sourceSets.library.resources
 	
 	from("$buildDir/dyvilbin") {
 		include binaryFilters
@@ -357,23 +360,36 @@ task buildCompiler(type: Jar, dependsOn: 'compilerClasses') {
  */
 task buildREPL(type: Jar, dependsOn: 'replClasses') {
 	from sourceSets.repl.output
+	from sourceSets.repl.resources
 	
 	archiveName = "dyvil-repl-${ replVersion }.jar"
 	
 	manifest.attributes.put("Main-Class", replMainClass)
 }
 
+task buildGenSrc(type: Jar, dependsOn: 'gensrcClasses') {
+	from sourceSets.gensrc.output
+	from sourceSets.gensrc.resources
+	
+	archiveName = "dyvil-gensrc-${ genSrcVersion }.jar"
+	
+	manifest.attributes.put("Main-Class", genSrcMainClass)
+}
+
 /**
  * Creates a Jar file that combines all classes from library, compiler and REPL.
  */
 task buildAll(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil', 'compilerClasses', 'replClasses',
-                                      'dpfClasses' ]) {
+                                      'dpfClasses', 'gensrcClasses' ]) {
 	from sourceSets.library.output
 	from sourceSets.library.resources
 	from sourceSets.compiler.output
 	from sourceSets.compiler.resources
 	from sourceSets.repl.output
+	from sourceSets.repl.resources
 	from sourceSets.dpf.output
+	from sourceSets.gensrc.output
+	from sourceSets.gensrc.resources
 	
 	from("$buildDir/dyvilbin") {
 		include binaryFilters
@@ -387,7 +403,7 @@ task buildAll(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil', '
 	manifest.attributes.put("Main-Class", replMainClass)
 }
 
-build.setDependsOn([ 'buildAll', 'buildLibrary', 'buildCompiler', 'buildREPL', 'buildDPF' ])
+build.setDependsOn([ 'buildAll', 'buildLibrary', 'buildCompiler', 'buildREPL', 'buildDPF', 'buildGenSrc' ])
 
 // ---------------------------------------- Version Files ----------------------------------------
 
