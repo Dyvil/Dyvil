@@ -4,6 +4,11 @@ public interface ReplacementMap
 {
 	String getReplacement(String key);
 
+	default boolean isDefined(String key)
+	{
+		return this.getReplacement(key) != null;
+	}
+
 	default boolean getBoolean(String key)
 	{
 		final String substitution = this.getReplacement(key);

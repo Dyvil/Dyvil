@@ -43,10 +43,18 @@ public class Specializer
 			final String directive = line.substring(directiveStart, directiveEnd);
 			switch (directive)
 			{
-			case "if": // TODO proper expression handling for #if directives
+			case "if":
+			{
+				// TODO proper expression handling for #if directives
+				final boolean innerCondition = replacements.getBoolean(parseIdentifier(line, directiveEnd, length));
+
+				processIf(iterator, writer, replacements, processOuter && ifCondition, innerCondition);
+				continue;
+			}
 			case "ifdef":
 			{
-				final boolean innerCondition = replacements.getBoolean(parseIdentifier(line, directiveEnd, length));
+				// using isDefined instead of getBoolean
+				final boolean innerCondition = replacements.isDefined(parseIdentifier(line, directiveEnd, length));
 
 				processIf(iterator, writer, replacements, processOuter && ifCondition, innerCondition);
 				continue;
@@ -54,7 +62,7 @@ public class Specializer
 			case "ifndef":
 			{
 				// note the '!'
-				final boolean innerCondition = !replacements.getBoolean(parseIdentifier(line, directiveEnd, length));
+				final boolean innerCondition = !replacements.isDefined(parseIdentifier(line, directiveEnd, length));
 
 				processIf(iterator, writer, replacements, processOuter && ifCondition, innerCondition);
 				continue;
