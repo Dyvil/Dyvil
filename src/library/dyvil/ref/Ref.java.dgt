@@ -26,8 +26,8 @@ public interface TYPE_NAME##Ref
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	static ObjectRef<WRAPPER> boxed(TYPE_NAME##Ref floatRef)
+	static ObjectRef<WRAPPER> boxed(TYPE_NAME##Ref ref)
 	{
-		return new Boxed##TYPE_NAME##Ref(floatRef);
+		return new Boxed##TYPE_NAME##Ref(ref);
 	}
 }
