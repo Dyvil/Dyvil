@@ -133,11 +133,7 @@ public class Specialization implements ReplacementMap
 			return;
 		}
 
-		// If the referenced file starts with '.', it is relative to the parent directory of this spec file
-		// Otherwise, it is relative to the source root
-		final File specFile = inherited.startsWith(".") ?
-			                      new File(this.getSourceFile().getParent(), inherited) :
-			                      new File(gensrc.getSourceRoot(), inherited);
+		final File specFile = resolveSpecFile(gensrc, inherited, this.getSourceFile());
 		final Specialization spec = gensrc.getSpecialization(specFile);
 		if (spec == null)
 		{
@@ -146,6 +142,21 @@ public class Specialization implements ReplacementMap
 		}
 
 		this.parent = spec;
+	}
+
+	public static File resolveSpecFile(GenSrc gensrc, String reference, File sourceFile)
+	{
+		// If the referenced file starts with '.', it is relative to the parent directory of this spec file
+		// Otherwise, it is relative to the source root
+
+		return reference.startsWith(".") ?
+			       new File(sourceFile.getParent(), reference) :
+			       new File(gensrc.getSourceRoot(), reference);
+	}
+
+	public static Specialization resolveSpec(GenSrc gensrc, String reference, File sourceFile)
+	{
+		return gensrc.getSpecialization(resolveSpecFile(gensrc, reference, sourceFile));
 	}
 
 	private static void initDefaults(Properties substitutions)

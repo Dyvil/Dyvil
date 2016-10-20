@@ -1,29 +1,50 @@
 package dyvil.tools.gensrc.ast;
 
+import dyvil.tools.gensrc.GenSrc;
+
+import java.io.File;
 import java.io.PrintStream;
-import java.util.Iterator;
+import java.util.List;
 
 public class Specializer
 {
-	public static void processLines(Iterable<String> lines, PrintStream writer, ReplacementMap replacements)
+	private static final int IF_BLOCK  = 1;
+	private static final int FOR_BLOCK = 2;
+
+	private final GenSrc         gensrc;
+	private final File           sourceFile;
+	private final List<String>   lines;
+	private final PrintStream    writer;
+	private final ReplacementMap replacements;
+
+	public Specializer(GenSrc gensrc, File sourceFile, List<String> lines, PrintStream writer,
+		                  ReplacementMap replacements)
 	{
-		processLines(lines.iterator(), writer, new LazyReplacementMap(replacements), false, true, true);
+		this.gensrc = gensrc;
+		this.sourceFile = sourceFile;
+		this.lines = lines;
+		this.writer = writer;
+		this.replacements = replacements;
 	}
 
-	private static void processIf(Iterator<String> iterator, PrintStream writer, LazyReplacementMap replacements,
-		                             boolean outer, boolean condition)
+	public void processLines()
 	{
-		processLines(iterator, writer, new LazyReplacementMap(replacements), true, outer, condition);
+		this.processLines(0, this.lines.size(), new LazyReplacementMap(this.replacements), 0, true, true);
 	}
 
-	private static void processLines(Iterator<String> iterator, PrintStream writer, LazyReplacementMap replacements,
-		                                boolean ifStatement, boolean processOuter, boolean ifCondition)
+	private int processIf(int start, int end, LazyReplacementMap replacements, boolean outer, boolean condition)
+	{
+		return this.processLines(start, end, new LazyReplacementMap(replacements), IF_BLOCK, outer, condition);
+	}
+
+	private int processLines(int start, int end, LazyReplacementMap replacements, int enclosingBlock,
+		                        boolean processOuter, boolean ifCondition)
 	{
 		boolean hasElse = false;
 
-		while (iterator.hasNext())
+		for (; start < end; start++)
 		{
-			final String line = iterator.next();
+			final String line = this.lines.get(start);
 			final int length = line.length();
 
 			final int hashIndex;
@@ -33,7 +54,7 @@ public class Specializer
 
 				if (processOuter && ifCondition)
 				{
-					writer.println(processLine(line, replacements));
+					this.writer.println(processLine(line, replacements));
 				}
 				continue;
 			}
@@ -48,7 +69,7 @@ public class Specializer
 				// TODO proper expression handling for #if directives
 				final boolean innerCondition = replacements.getBoolean(parseIdentifier(line, directiveEnd, length));
 
-				processIf(iterator, writer, replacements, processOuter && ifCondition, innerCondition);
+				start = this.processIf(start + 1, end, replacements, processOuter && ifCondition, innerCondition);
 				continue;
 			}
 			case "ifdef":
@@ -56,7 +77,7 @@ public class Specializer
 				// using isDefined instead of getBoolean
 				final boolean innerCondition = replacements.isDefined(parseIdentifier(line, directiveEnd, length));
 
-				processIf(iterator, writer, replacements, processOuter && ifCondition, innerCondition);
+				start = this.processIf(start + 1, end, replacements, processOuter && ifCondition, innerCondition);
 				continue;
 			}
 			case "ifndef":
@@ -64,20 +85,45 @@ public class Specializer
 				// note the '!'
 				final boolean innerCondition = !replacements.isDefined(parseIdentifier(line, directiveEnd, length));
 
-				processIf(iterator, writer, replacements, processOuter && ifCondition, innerCondition);
+				start = this.processIf(start + 1, end, replacements, processOuter && ifCondition, innerCondition);
 				continue;
 			}
 			case "else":
-				if (ifStatement && !hasElse)
+				if (enclosingBlock == IF_BLOCK && !hasElse)
 				{
 					ifCondition = !ifCondition;
 					hasElse = true;
 				}
 				continue;
 			case "endif":
-				if (ifStatement)
+				if (enclosingBlock == IF_BLOCK)
 				{
-					return;
+					return start;
+				}
+				continue;
+			case "for":
+			{
+				if (processOuter && ifCondition)
+				{
+					final String remainder = line.substring(skipWhitespace(line, directiveEnd, length));
+					final String[] files = parseSpecFiles(remainder);
+
+					final int forEnd = this.processFor(start, end, replacements, files);
+					if (forEnd >= 0)
+					{
+						start = forEnd;
+						continue;
+					}
+				}
+
+				// skip ahead to the line after #endfor
+				start = this.processLines(start + 1, end, replacements, FOR_BLOCK, false, false);
+				continue;
+			}
+			case "endfor":
+				if (enclosingBlock == FOR_BLOCK)
+				{
+					return start;
 				}
 				continue;
 			case "process":
@@ -85,7 +131,7 @@ public class Specializer
 				{
 					// process the remainder of the line
 					final String remainder = line.substring(skipWhitespace(line, directiveEnd, length));
-					writer.println(processLine(remainder, replacements));
+					this.writer.println(processLine(remainder, replacements));
 				}
 				continue;
 			case "literal":
@@ -93,7 +139,7 @@ public class Specializer
 				{
 					// simply append the remainder of the line verbatim
 					final String remainder = line.substring(skipWhitespace(line, directiveEnd, length));
-					writer.println(remainder);
+					this.writer.println(remainder);
 				}
 				continue;
 			case "comment":
@@ -137,6 +183,37 @@ public class Specializer
 
 			// TODO invalid directive error/warning
 		}
+
+		return end;
+	}
+
+	private int processFor(int start, int end, LazyReplacementMap replacements, String[] files)
+	{
+		int forEnd = -1;
+
+		// repeat processing the following lines once for each specified specialization
+		for (String file : files)
+		{
+			final Specialization spec = Specialization.resolveSpec(this.gensrc, file, this.sourceFile);
+			if (spec != null)
+			{
+				forEnd = this.processLines(start + 1, end, new ForReplacementMap(spec, replacements), FOR_BLOCK, true,
+				                           true);
+			}
+		}
+		return forEnd;
+	}
+
+	private static String[] parseSpecFiles(String remainder)
+	{
+		final String[] split = remainder.split(File.pathSeparator); // split by path separator (e.g. ':' on *nix)
+
+		for (int i = 0; i < split.length; i++)
+		{
+			split[i] = split[i].trim();
+		}
+
+		return split;
 	}
 
 	private static String parseIdentifier(String line, int start, int end)

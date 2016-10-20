@@ -80,7 +80,7 @@ public class Template
 
 		try (final PrintStream writer = new PrintStream(new BufferedOutputStream(new FileOutputStream(outputFile))))
 		{
-			Specializer.processLines(lines, writer, spec);
+			new Specializer(gensrc, this.sourceFile, lines, writer, spec).processLines();
 		}
 		catch (IOException ex)
 		{
