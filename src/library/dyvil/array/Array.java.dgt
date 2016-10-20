@@ -13,7 +13,7 @@ import dyvil.collection.ImmutableList;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 
-#if HAS_RANGE
+#if HAS_RANGE_CLASS
 import dyvil.collection.range.closed.TYPE_NAME##Range;
 #endif
 
@@ -49,7 +49,7 @@ public abstract class TYPE_NAME##Array
 		return array.clone();
 	}
 
-#if HAS_RANGE
+#if HAS_RANGE_CLASS
 	@DyvilModifiers(Modifiers.IMPLICIT | Modifiers.INLINE)
 	public static PRIMITIVE[] apply(TYPE_NAME##Range range)
 	{
@@ -77,16 +77,17 @@ public abstract class TYPE_NAME##Array
 		return array;
 	}
 
-	public static PRIMITIVE[] apply(int size, MAPPER valueMapper)
+	public static PRIMITIVE[] apply(int size, INDEXED_SUPPLIER valueMapper)
 	{
 		final PRIMITIVE[] array = new PRIMITIVE[size];
 		for (int i = 0; i < size; i++)
 		{
-			array[i] = (PRIMITIVE) valueMapper.MAPPER_APPLY(i);
+			array[i] = (PRIMITIVE) valueMapper.INDEXED_SUPPLIER_APPLY(i);
 		}
 		return array;
 	}
 
+#if IS_RANGEABLE
 	@DyvilName("apply")
 	public static PRIMITIVE[] rangeClosed(PRIMITIVE from, PRIMITIVE to)
 	{
@@ -110,31 +111,32 @@ public abstract class TYPE_NAME##Array
 		}
 		return array;
 	}
+#endif
 
 	// Basic Array Operations
 
-	@Intrinsic( { LOAD_0, ARRAYLENGTH })
+	@Intrinsic({ LOAD_0, ARRAYLENGTH })
 	@DyvilModifiers(Modifiers.INFIX)
 	public static int length(PRIMITIVE[] array)
 	{
 		return array.length;
 	}
 
-	@Intrinsic( { LOAD_0, ARRAYLENGTH })
+	@Intrinsic({ LOAD_0, ARRAYLENGTH })
 	@DyvilModifiers(Modifiers.INFIX)
 	public static int size(PRIMITIVE[] array)
 	{
 		return array.length;
 	}
 
-	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })
+	@Intrinsic({ LOAD_0, ARRAYLENGTH, EQ0 })
 	@DyvilModifiers(Modifiers.INFIX)
 	public static boolean isEmpty(PRIMITIVE[] array)
 	{
 		return array.length == 0;
 	}
 
-	@Intrinsic( { LOAD_0, LOAD_1, ARRAY_LOAD_INSN })
+	@Intrinsic({ LOAD_0, LOAD_1, ARRAY_LOAD_INSN })
 	@DyvilModifiers(Modifiers.INFIX)
 	public static PRIMITIVE subscript(PRIMITIVE[] array, int index)
 	{
@@ -150,7 +152,7 @@ public abstract class TYPE_NAME##Array
 		return result;
 	}
 
-	@Intrinsic( { LOAD_0, LOAD_1, LOAD_2, ARRAY_STORE_INSN })
+	@Intrinsic({ LOAD_0, LOAD_1, LOAD_2, ARRAY_STORE_INSN })
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
 	public static void subscript_$eq(PRIMITIVE[] array, int index, PRIMITIVE newValue)
@@ -341,9 +343,29 @@ public abstract class TYPE_NAME##Array
 	@DyvilModifiers(Modifiers.INFIX)
 	public static PRIMITIVE[] sorted(PRIMITIVE[] array)
 	{
+#if USE_BOOL_SORT
+		final int size = array.length;
+		final boolean[] res = new boolean[size];
+
+		// Count the number of 'false' entries in the array
+		int falseEntries = 0;
+
+		for (boolean value : array)
+		{
+			if (!value) falseEntries++;
+		}
+
+		// Make the remaining elements of the result true
+		for (; falseEntries < size; falseEntries++)
+		{
+			res[falseEntries] = true;
+		}
+		return res;
+#else
 		final PRIMITIVE[] res = array.clone();
 		Arrays.sort(res);
 		return res;
+#endif
 	}
 
 	// Search Operations
