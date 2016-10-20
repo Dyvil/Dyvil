@@ -19,6 +19,8 @@ public abstract class AbstractArrayList<E> implements List<E>
 	protected transient Object[] elements;
 	protected transient int      size;
 
+	// test
+
 	public AbstractArrayList()
 	{
 		this.elements = new Object[DEFAULT_CAPACITY];
