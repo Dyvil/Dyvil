@@ -238,6 +238,8 @@ public class Field extends Member implements IField
 
 			this.property.getModifiers().addIntModifier(modifiers);
 			this.property.setEnclosingClass(this.enclosingClass);
+
+			this.property.setType(this.type);
 			this.property.resolveTypes(markers, context);
 		}
 	}
