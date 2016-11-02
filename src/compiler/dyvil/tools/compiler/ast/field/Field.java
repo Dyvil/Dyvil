@@ -230,18 +230,34 @@ public class Field extends Member implements IField
 			this.value.resolveTypes(markers, context);
 		}
 
-		if (this.property != null)
+		if (this.property == null)
 		{
-			final int modifiers =
-				this.modifiers.toFlags() & (Modifiers.STATIC | Modifiers.PUBLIC | Modifiers.PROTECTED);
-			// only transfer public, static and protected modifiers to the property
-
-			this.property.getModifiers().addIntModifier(modifiers);
-			this.property.setEnclosingClass(this.enclosingClass);
-
-			this.property.setType(this.type);
-			this.property.resolveTypes(markers, context);
+			return;
 		}
+
+		copyModifiers(this.modifiers, this.property.getModifiers());
+		this.property.setEnclosingClass(this.enclosingClass);
+
+		this.property.setType(this.type);
+		this.property.resolveTypes(markers, context);
+	}
+
+	public static void copyModifiers(ModifierSet from, ModifierSet to)
+	{
+		final int exisiting = to.toFlags();
+		final int newModifiers;
+		if ((exisiting & Modifiers.ACCESS_MODIFIERS) != 0)
+		{
+			// only transfer static modifiers to the property
+			newModifiers = from.toFlags() & Modifiers.STATIC;
+		}
+		else
+		{
+			// only transfer public, static and protected modifiers to the property
+			newModifiers = from.toFlags() & (Modifiers.STATIC | Modifiers.PUBLIC | Modifiers.PROTECTED);
+		}
+
+		to.addIntModifier(newModifiers);
 	}
 
 	@Override
