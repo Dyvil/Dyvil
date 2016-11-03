@@ -10,25 +10,36 @@ public class DPFSyntax
 	@LiteralConvertible.FromColonOperator
 	public static class PropertyPair(public Name name, public Value value)
 	{
-		public static PropertyPair apply(Name name, any value)
-		{
-			return new PropertyPair(name, Value.wrap(value))
-		}
+		public static func apply(Name name, any value): PropertyPair = new PropertyPair(name, Value.wrap(value))
 
-		public static PropertyPair apply(Name name, Value value)
-		{
-			return new PropertyPair(name, value)
-		}
+		public static func apply(Name name, Value value): PropertyPair = new PropertyPair(name, value)
 	}
 
-	public static RootNode dpf(Configure<RootNode> configure) = new RootNode().use(configure)
+	@LiteralConvertible.FromColonOperator
+	public static class BuilderParameter extends PropertyPair
+	{
+		public static func apply(Name name, any value): BuilderParameter = new BuilderParameter(name, Value.wrap(value))
+
+		public static func apply(Name name, Value value): BuilderParameter = new BuilderParameter(name, value)
+
+        public static implicit func apply(any value): BuilderParameter = new BuilderParameter(null, Value.wrap(value))
+
+		public static implicit func apply(Value value): BuilderParameter = new BuilderParameter(null, value)
+
+        public init(Name name, Value value)
+        {
+            super.init(name, value)
+        }
+	}
+
+	public static func dpf(Configure<RootNode> configure): RootNode = new RootNode().use(configure)
 
 	/**
 	 * Node creation:
 	 *
 	 * "name" { ... }
 	 */
-	public infix Node apply(Name name, Configure<Node> configure) = new Node(name).use(configure)
+	public infix func apply(Name name, Configure<Node> configure): Node = new Node(name).use(configure)
 
 	/**
 	 * Nested Node creation
@@ -37,62 +48,29 @@ public class DPFSyntax
 	 *     "child" { ... }
 	 * }
 	 */
-	public infix void applyStatement(Node base, Node node) = base.addNode(node)
+	public infix func applyStatement(Node base, Node node): void = base.add(node)
 
 	/**
 	 * Property creation with Colon
 	 * "name": value
 	 */
-	public infix void applyStatement(Node base, PropertyPair property)
+	public infix func applyStatement(Node base, PropertyPair property): void
 	{
-		base.addProperty(new Property(property.name, property.value))
+		base.add(new Property(property.name, property.value))
 	}
 
-	public infix Builder apply(Builder builder, Configure<Node> configure)
+	public infix func apply(Builder builder, Configure<Node> configure): void
 	{
-		builder.makeNode.use(configure)
-		return builder
+		builder.makeNode().use(configure)
 	}
 
-	public infix Builder apply(Name name, PropertyPair... parameters)
+	public infix func apply(Name name, BuilderParameter... parameters): Builder
 	{
 		let builder = new Builder(name)
 
 		for (var pair <- parameters)
 		{
-			builder.addParameter(Parameter(pair.name, pair.value))
-		}
-
-		return builder
-	}
-
-	public infix Builder apply(Name name, Value... parameters)
-	{
-		let builder = new Builder(name)
-
-		for (var value <- parameters)
-		{
-			builder.addParameter(Parameter(null, value))
-		}
-
-		return builder
-	}
-
-	public infix Builder apply(Name name, any... parameters)
-	{
-		let builder = new Builder(name)
-
-		for (var value <- parameters)
-		{
-			if (value is dyvil.tuple.Tuple2)
-			{
-				let tuple = value as dyvil.tuple.Tuple2
-				builder.addParameter(Parameter(Name.wrap(tuple._1), Value.wrap(tuple._2)))
-			}
-			else
-			{
-				builder.addParameter(Parameter(Value.wrap(value)))
-			}
+			builder.add(Parameter(pair.name, pair.value))
 		}
 
 		return builder

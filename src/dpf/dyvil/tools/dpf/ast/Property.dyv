@@ -41,51 +41,39 @@ public class Property extends DPFValueVisitor implements NodeElement, Expandable
 		this.value = value
 	}
 
-	public override void setPosition(ICodePosition position)
-	{
-		this.position = position
-	}
-	
-	public override ICodePosition getPosition()
-	{
-		return this.position
-	}
-	
-	public override Name getName()
-	{
-		return this.name
-	}
-	
-	@Override
-	protected void visitValue(Value value)
+	public override func getPosition(): ICodePosition = this.position
+
+	public override func setPosition(ICodePosition position): void = this.position = position;
+
+	protected override func visitValue(Value value): void
 	{
 		this.value = value
 	}
 	
-	public override void accept(NodeVisitor visitor)
+	public override func accept(NodeVisitor visitor): void
 	{
 		this.value.accept(visitor.visitProperty(this.name))
 	}
 
-	public override Property expand(Map<String, Object> mappings, boolean mutate)
+	public override func expand(Map<String, Object> mappings, boolean mutate): Property
 	{
 		Property property = mutate ? this : new Property(this.name, this.position)
 		property.value = Value.wrap(Expandable.expand(this.value, mappings, mutate))
 		return property
 	}
 
-	public override String toString()
+	public override func toString(): String
 	{
 		return IASTNode.toString(this)
 	}
 	
-	public override void toString(String indent, StringBuilder buffer)
+	public override func toString(String indent, StringBuilder buffer): void
 	{
 		buffer.append(this.name).append(" = ")
 		this.value.toString(indent, buffer)
 	}
 
-	public override boolean equals(Object obj)
+	public override func equals(Object obj): boolean
 	{
 		if (obj === this) return true
 		if (!(obj is Property)) return false
@@ -94,5 +82,5 @@ public class Property extends DPFValueVisitor implements NodeElement, Expandable
 		return this.name === that.name && this.value == that.value
 	}
 
-	public override int hashCode() = 31 * this.name.hashCode + this.value.hashCode
+	public override func hashCode(): int = 31 * this.name.hashCode + this.value.hashCode
 }

@@ -1,47 +1,38 @@
-package dyvil.tools.dpf.ast;
+package dyvil.tools.dpf.ast
 
-import dyvil.collection.Collection;
-import dyvil.collection.Map;
-import dyvil.tuple.Tuple2;
+import dyvil.collection.Collection
+import dyvil.collection.Map
+import dyvil.tuple.Tuple2
 
 public interface Expandable
 {
-	Object expand(Map<String, Object> mappings, boolean mutate);
+	Object expand(Map<String, Object> mappings, boolean mutate)
 
-	static Object expand(Object o, Map<String, Object> mappings, boolean mutate)
+	infix func expand(Object obj, Map<String, Object> mappings, boolean mutate): Object
 	{
-		if (o is Expandable)
-		{
-			return (o as Expandable).expand(mappings, mutate);
-		}
-		if (o is Collection)
-		{
-			return expandCollection(o as Collection<_>, mappings, mutate);
-		}
-		if (o is Map)
-		{
-			return expandMap(o as Map<_, _>, mappings, mutate);
-		}
-		return o;
+		if (obj is Expandable) return (obj as Expandable).expand(mappings, mutate)
+		if (obj is Collection) return expand(obj as Collection<_>, mappings, mutate)
+		if (obj is Map) return expand(obj as Map<_, _>, mappings, mutate)
+		return obj
 	}
 
-	static Collection<_> expandCollection(Collection<_> collection, Map<String, Object> mappings, boolean mutate)
+	infix func expand(Collection<_> collection, Map<String, Object> mappings, boolean mutate): Collection<_>
 	{
-		if (!mutate || collection.isImmutable)
+		if (!mutate || collection.isImmutable())
 		{
-			return collection.mapped(e => expand(e, mappings, mutate));
+			return collection.mapped(e => expand(e, mappings, mutate))
 		}
-		collection.map(e => expand(e, mappings, true));
-		return collection;
+		collection.map(e => expand(e, mappings, true))
+		return collection
 	}
 
-	static Map<_, _> expandMap(Map<_, _> map, Map<String, Object> mappings, boolean mutate)
+	infix func expand(Map<_, _> map, Map<String, Object> mappings, boolean mutate): Map<_, _>
 	{
 		if (!mutate || map.isImmutable())
 		{
-			return map.entryMapped((k, v) => (expand(k, mappings, mutate), expand(v, mappings, mutate)));
+			return map.entryMapped((k, v) => (expand(k, mappings, mutate), expand(v, mappings, mutate)))
 		}
-		map.mapEntries((k, v) => (expand(k, mappings, true), expand(v, mappings, true)));
-		return map;
+		map.mapEntries((k, v) => (expand(k, mappings, true), expand(v, mappings, true)))
+		return map
 	}
 }

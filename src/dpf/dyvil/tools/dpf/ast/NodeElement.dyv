@@ -6,7 +6,7 @@ import dyvil.tools.parsing.ast.IASTNode;
 
 public interface NodeElement extends IASTNode
 {
-	Name getName();
+	func name: Name
 	
-	void accept(NodeVisitor visitor);
+	func accept(NodeVisitor visitor): void
 }
