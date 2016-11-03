@@ -1,84 +1,88 @@
-package dyvil.tools.dpf.ast;
+package dyvil.tools.dpf.ast
 
-import dyvil.collection.Map;
-import dyvil.tools.dpf.ast.value.Value;
-import dyvil.tools.dpf.converter.DPFValueVisitor;
-import dyvil.tools.dpf.visitor.NodeVisitor;
-import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.collection.Map
+import dyvil.tools.dpf.ast.value.Value
+import dyvil.tools.dpf.converter.DPFValueVisitor
+import dyvil.tools.dpf.visitor.NodeVisitor
+import dyvil.tools.parsing.Name
+import dyvil.tools.parsing.ast.IASTNode
+import dyvil.tools.parsing.position.ICodePosition
 
 public class Property extends DPFValueVisitor implements NodeElement, Expandable
 {
-	protected Name  name;
-	protected Value value;
+	protected Name  name = null
+	{
+		public get
+		public set
+	}
+
+	protected Value value = null
+	{
+		public get
+		public set
+	}
 	
-	private ICodePosition position;
+	private ICodePosition position
 	
 	public init(Name name)
 	{
-		this.name = name;
+		this.name = name
 	}
 
 	public init(Name name, ICodePosition position)
 	{
-		this.name = name;
-		this.position = position;
+		this.name = name
+		this.position = position
 	}
 
 	public init(Name name, Value value)
 	{
-		this.name = name;
-		this.value = value;
+		this.name = name
+		this.value = value
 	}
 
 	public override void setPosition(ICodePosition position)
 	{
-		this.position = position;
+		this.position = position
 	}
 	
 	public override ICodePosition getPosition()
 	{
-		return this.position;
+		return this.position
 	}
 	
 	public override Name getName()
 	{
-		return this.name;
-	}
-	
-	public Value getValue()
-	{
-		return this.value;
+		return this.name
 	}
 	
 	@Override
-	protected void setValue(Value value)
+	protected void visitValue(Value value)
 	{
-		this.value = value;
+		this.value = value
 	}
 	
 	public override void accept(NodeVisitor visitor)
 	{
-		this.value.accept(visitor.visitProperty(this.name));
+		this.value.accept(visitor.visitProperty(this.name))
 	}
 
 	public override Property expand(Map<String, Object> mappings, boolean mutate)
 	{
-		Property property = mutate ? this : new Property(this.name, this.position);
-		property.value = Value.wrap(Expandable.expand(this.value, mappings, mutate));
-		return property;
+		Property property = mutate ? this : new Property(this.name, this.position)
+		property.value = Value.wrap(Expandable.expand(this.value, mappings, mutate))
+		return property
 	}
 
 	public override String toString()
 	{
-		return IASTNode.toString(this);
+		return IASTNode.toString(this)
 	}
 	
 	public override void toString(String indent, StringBuilder buffer)
 	{
-		buffer.append(this.name).append(" = ");
-		this.value.toString(indent, buffer);
+		buffer.append(this.name).append(" = ")
+		this.value.toString(indent, buffer)
 	}
 
 	public override boolean equals(Object obj)

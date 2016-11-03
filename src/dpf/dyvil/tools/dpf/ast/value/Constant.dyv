@@ -4,7 +4,7 @@ public interface Constant extends Value
 {
 	boolean isConstant() = true
 
-	Object toObject();
+	Object toObject()
 
-	void appendString(StringBuilder builder);
+	void appendString(StringBuilder builder)
 }

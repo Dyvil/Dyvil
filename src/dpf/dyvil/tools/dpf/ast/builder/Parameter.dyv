@@ -12,14 +12,10 @@ public case class Parameter
 	(
 		Name name { get; set }
 		Value value { get; set }
-	) extends DPFValueVisitor implements IASTNode, Expandable
+	)
+	extends DPFValueVisitor implements IASTNode, Expandable
 {
 	// Constructors
-
-	public init(Name name)
-	{
-		this.name = name
-	}
 
 	public static Parameter apply(Name name)
 	{
@@ -36,13 +32,14 @@ public case class Parameter
 		return new Parameter(null, value)
 	}
 
-	// Accessors
-	
-	public Name getName() = this.name
-	
-	public Value getValue() = this.value
+	public init(Name name)
+	{
+		this.name = name
+	}
 
-	public override void setValue(Value value) = this.value = value
+	// Accessors
+
+	protected override void visitValue(Value value) = this.value = value
 
 	public override ICodePosition getPosition() = null
 

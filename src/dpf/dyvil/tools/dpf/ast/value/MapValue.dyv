@@ -1,23 +1,26 @@
-package dyvil.tools.dpf.ast.value;
+package dyvil.tools.dpf.ast.value
 
-import dyvil.collection.Entry;
-import dyvil.collection.Map;
-import dyvil.collection.mutable.ArrayMap;
-import dyvil.tools.dpf.ast.Expandable;
-import dyvil.tools.dpf.converter.DPFValueVisitor;
-import dyvil.tools.dpf.visitor.MapVisitor;
-import dyvil.tools.dpf.visitor.ValueVisitor;
-import dyvil.tuple.Tuple2;
+import dyvil.collection.Entry
+import dyvil.collection.Map
+import dyvil.collection.mutable.ArrayMap
+import dyvil.tools.dpf.ast.Expandable
+import dyvil.tools.dpf.converter.DPFValueVisitor
+import dyvil.tools.dpf.visitor.MapVisitor
+import dyvil.tools.dpf.visitor.ValueVisitor
+import dyvil.tuple.Tuple2
 
-import java.util.function.BiFunction;
+import java.util.function.BiFunction
 
 public class MapValue extends DPFValueVisitor implements Value, MapVisitor, Expandable
 {
-	protected Map<Value, Value> entries = new ArrayMap<Value, Value>
+	protected Map<Value, Value> entries
 
-	private Value tempKey;
+	private Value tempKey
 	
-	public init() { }
+	public init()
+	{
+		this.entries = new ArrayMap<Value, Value>
+	}
 
 	public init(Map<_, _> map)
 	{
@@ -26,11 +29,11 @@ public class MapValue extends DPFValueVisitor implements Value, MapVisitor, Expa
 
 		for (Entry<_, _> entry <- map)
 		{
-			this.entries.put(Value.wrap(entry.getKey), Value.wrap(entry.getValue));
+			this.entries.put(Value.wrap(entry.getKey), Value.wrap(entry.getValue))
 		}
 	}
 
-	protected override void setValue(Value value)
+	protected override void visitValue(Value value)
 	{
 		if (this.tempKey == null)
 		{
@@ -62,15 +65,16 @@ public class MapValue extends DPFValueVisitor implements Value, MapVisitor, Expa
 
 	public override MapValue expand(Map<String, Object> mappings, boolean mutate)
 	{
-		final BiFunction<Value, Value, Entry<+Value, +Value>> entryBiFunction = (k, v) => (
-				Value.wrap(Expandable.expand(k, mappings, true)),
+		let entryBiFunction: BiFunction<Value, Value, Entry<+Value, +Value>>
+			= (k, v) => (
+				Value.wrap(Expandable.expand(k, mappings, mutate)),
 				Value.wrap(Expandable.expand(v, mappings, mutate))
 			)
 
 		if (mutate)
 		{
 			this.entries.mapEntries(entryBiFunction)
-			return this;
+			return this
 		}
 		else
 		{
@@ -86,13 +90,13 @@ public class MapValue extends DPFValueVisitor implements Value, MapVisitor, Expa
 		if (len <= 0)
 		{
 			buffer.append("{}")
-			return;
+			return
 		}
 
 		[Value] keys = this.entries.toKeyArray(class Value)
 		[Value] values = this.entries.toValueArray(class Value)
 		
-		String indent1 = indent + "\t";
+		String indent1 = indent + "\t"
 		
 		buffer.append("{\n").append(indent1)
 		keys[0].toString(indent1, buffer)

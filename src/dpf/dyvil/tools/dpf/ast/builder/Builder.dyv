@@ -15,9 +15,18 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class Builder implements Value, BuilderVisitor, Expandable
 {
-	private Name name
+	private Name name = null
+	{
+		public get
+		public set
+	}
+
 	private List<Parameter> parameters
-	private Node node
+
+	private Node node = null
+	{
+		public get
+	}
 
 	public static Builder apply(Name name)
 	{
@@ -46,16 +55,22 @@ public class Builder implements Value, BuilderVisitor, Expandable
 		this.parameters = parameters
 	}
 
-	public Builder withNode(Node node)
+	@BytecodeName("withNode")
+	public Builder with(Node node)
 	{
 		this.node = node
 		return this
 	}
 
-	public void addParameter(Parameter parameter)
+	@BytecodeName("withParameter")
+	public Builder with(Parameter parameter)
 	{
-		this.parameters.add(parameter)
+		this.add(parameter)
+		return this
 	}
+
+	@BytecodeName("addParameter")
+	public void add(Parameter parameter) = this.parameters.add(parameter)
 
 	public Node makeNode()
 	{
@@ -65,14 +80,14 @@ public class Builder implements Value, BuilderVisitor, Expandable
 
 	public override ValueVisitor visitParameter(Name name)
 	{
-		Parameter parameter = new Parameter(name)
+		let parameter = new Parameter(name)
 		this.parameters.add(parameter)
 		return parameter
 	}
 
 	public override NodeVisitor visitNode()
 	{
-		Node node = new Node(this.name)
+		let node = new Node(this.name)
 		this.node = node
 		return node
 	}
@@ -84,7 +99,7 @@ public class Builder implements Value, BuilderVisitor, Expandable
 		final BuilderVisitor builderVisitor = visitor.visitBuilder(this.name)
 		for (Parameter parameter <- this.parameters)
 		{
-			parameter.getValue().accept(builderVisitor.visitParameter(parameter.getName()))
+			parameter.value.accept(builderVisitor.visitParameter(parameter.name))
 		}
 		if (this.node != null)
 		{
