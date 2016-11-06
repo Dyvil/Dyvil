@@ -27,9 +27,9 @@ public class DPFSyntax
 		public static implicit func apply(Value value): BuilderParameter = new BuilderParameter(null, value)
 
         public init(Name name, Value value)
-        {
-            super.init(name, value)
-        }
+		{
+			super.init(name, value)
+		}
 	}
 
 	public static func dpf(Configure<RootNode> configure): RootNode = new RootNode().use(configure)
@@ -59,9 +59,10 @@ public class DPFSyntax
 		base.add(new Property(property.name, property.value))
 	}
 
-	public infix func apply(Builder builder, Configure<Node> configure): void
+	public infix func apply(Builder builder, Configure<Node> configure): Builder
 	{
 		builder.makeNode().use(configure)
+		return builder
 	}
 
 	public infix func apply(Name name, BuilderParameter... parameters): Builder

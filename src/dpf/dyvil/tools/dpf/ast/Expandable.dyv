@@ -8,12 +8,12 @@ public interface Expandable
 {
 	Object expand(Map<String, Object> mappings, boolean mutate)
 
-	infix func expand(Object obj, Map<String, Object> mappings, boolean mutate): Object
+	infix func expand(Object obj, Map<String, Object> mappings, boolean mutate): Object = obj match
 	{
-		if (obj is Expandable) return (obj as Expandable).expand(mappings, mutate)
-		if (obj is Collection) return expand(obj as Collection<_>, mappings, mutate)
-		if (obj is Map) return expand(obj as Map<_, _>, mappings, mutate)
-		return obj
+		case Expandable    exp => exp.expand(mappings, mutate)
+		case Collection<_> col => expand(collection: col, mappings: mappings, mutate: mutate)
+		case Map<_, _>     map => expand(map: map, mappings: mappings, mutate: mutate)
+		case _ => obj
 	}
 
 	infix func expand(Collection<_> collection, Map<String, Object> mappings, boolean mutate): Collection<_>

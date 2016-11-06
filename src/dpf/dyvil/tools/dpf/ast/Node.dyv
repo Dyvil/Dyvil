@@ -21,16 +21,10 @@ public class Node implements NodeElement, NodeVisitor, Expandable
 	protected List<Property>   properties   = new ArrayList<Property>
 	protected List<NodeAccess> nodeAccesses = new ArrayList<NodeAccess>
 	
-	protected ICodePosition position
-	
 	public init(Name name)
 	{
 		this.name = name
 	}
-
-	public override func getPosition(): ICodePosition = this.position
-
-	public override func setPosition(ICodePosition position): void = this.position = position
 
 	@BytecodeName("addNode")
 	public func add(Node node): void = this.nodes.add(node)

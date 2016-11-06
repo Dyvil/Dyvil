@@ -14,24 +14,21 @@ public class NodeAccess implements NodeVisitor, NodeElement, Expandable
 		public get
 	}
 
-	protected NodeElement element
-	
-	private ICodePosition position
+	protected NodeElement element = null
+	{
+		public get
+	}
 	
 	public init(Name name)
 	{
 		this.name = name
 	}
 
-	public init(Name name, ICodePosition position)
+	public init(Name name, NodeElement element)
 	{
 		this.name = name
-		this.position = position
+		this.element = element
 	}
-
-	public override func getPosition(): ICodePosition = this.position
-
-	public override func setPosition(ICodePosition position): void = this.position = position
 
 	public override func visitNode(Name name): NodeVisitor
 	{
@@ -61,7 +58,7 @@ public class NodeAccess implements NodeVisitor, NodeElement, Expandable
 
 	public override func expand(Map<String, Object> mappings, boolean mutate): NodeAccess
 	{
-		NodeAccess nodeAccess = mutate ? this : new NodeAccess(this.name, this.position)
+		let nodeAccess = mutate ? this : new NodeAccess(this.name)
 		nodeAccess.element = Expandable.expand(this.element, mappings, mutate) as NodeElement
 		return nodeAccess
 	}

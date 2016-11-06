@@ -22,17 +22,9 @@ public class Property extends DPFValueVisitor implements NodeElement, Expandable
 		public set
 	}
 	
-	private ICodePosition position
-	
 	public init(Name name)
 	{
 		this.name = name
-	}
-
-	public init(Name name, ICodePosition position)
-	{
-		this.name = name
-		this.position = position
 	}
 
 	public init(Name name, Value value)
@@ -40,10 +32,6 @@ public class Property extends DPFValueVisitor implements NodeElement, Expandable
 		this.name = name
 		this.value = value
 	}
-
-	public override func getPosition(): ICodePosition = this.position
-
-	public override func setPosition(ICodePosition position): void = this.position = position;
 
 	protected override func visitValue(Value value): void
 	{
@@ -57,7 +45,7 @@ public class Property extends DPFValueVisitor implements NodeElement, Expandable
 
 	public override func expand(Map<String, Object> mappings, boolean mutate): Property
 	{
-		Property property = mutate ? this : new Property(this.name, this.position)
+		let property = mutate ? this : new Property(this.name)
 		property.value = Value.wrap(Expandable.expand(this.value, mappings, mutate))
 		return property
 	}
