@@ -418,7 +418,7 @@ public final class PrimitiveType implements IType
 		if (this.theClass != null)
 		{
 			this.theClass.getMethodMatches(list, receiver, name, arguments);
-			if (!list.isEmpty())
+			if (list.hasCandidate())
 			{
 				return;
 			}

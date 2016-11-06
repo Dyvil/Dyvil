@@ -470,7 +470,7 @@ public final class ExternalClass extends AbstractClass
 		this.body.getMethodMatches(list, receiver, name, arguments);
 		// The same applies for the Metadata
 
-		if (!list.isEmpty())
+		if (list.hasCandidate())
 		{
 			return;
 		}
@@ -485,7 +485,7 @@ public final class ExternalClass extends AbstractClass
 			this.superType.getMethodMatches(list, receiver, name, arguments);
 		}
 
-		if (!list.isEmpty())
+		if (list.hasCandidate())
 		{
 			return;
 		}

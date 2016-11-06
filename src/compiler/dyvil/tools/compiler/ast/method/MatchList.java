@@ -32,6 +32,11 @@ public class MatchList<T extends ICallableSignature> implements IImplicitContext
 		return this.size <= 0;
 	}
 
+	public boolean hasCandidate()
+	{
+		return !this.isEmpty() && !this.isAmbigous() && !this.getBestCandidate().invalid;
+	}
+
 	public void ensureCapacity(int capacity)
 	{
 		if (capacity <= this.candidates.length)

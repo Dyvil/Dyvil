@@ -191,7 +191,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 		if (receiver != null)
 		{
 			receiver.getType().getMethodMatches(matches, receiver, name, arguments);
-			if (!matches.isEmpty())
+			if (matches.hasCandidate())
 			{
 				return matches;
 			}
@@ -201,7 +201,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 		if (arguments.size() == 1)
 		{
 			arguments.getFirstValue().getType().getMethodMatches(matches, receiver, name, arguments);
-			if (!matches.isEmpty())
+			if (matches.hasCandidate())
 			{
 				return matches;
 			}
@@ -209,7 +209,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 
 		// Methods available in the current context
 		context.getMethodMatches(matches, receiver, name, arguments);
-		if (!matches.isEmpty())
+		if (matches.hasCandidate())
 		{
 			return matches;
 		}
@@ -221,7 +221,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 			for (Candidate<IMethod> candidate : implicits)
 			{
 				candidate.getMember().getType().getMethodMatches(matches, receiver, name, arguments);
-				if (!matches.isEmpty())
+				if (matches.hasCandidate())
 				{
 					return matches;
 				}

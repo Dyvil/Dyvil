@@ -133,7 +133,7 @@ public class CombiningContext implements IContext
 	{
 		this.inner.getMethodMatches(list, receiver, name, arguments);
 
-		if (list.isEmpty())
+		if (!list.hasCandidate())
 		{
 			this.outer.getMethodMatches(list, receiver, name, arguments);
 		}
@@ -144,7 +144,7 @@ public class CombiningContext implements IContext
 	{
 		this.inner.getImplicitMatches(list, value, targetType);
 
-		if (list.isEmpty())
+		if (!list.hasCandidate())
 		{
 			this.outer.getImplicitMatches(list, value, targetType);
 		}
@@ -155,7 +155,7 @@ public class CombiningContext implements IContext
 	{
 		this.inner.getConstructorMatches(list, arguments);
 
-		if (list.isEmpty())
+		if (!list.hasCandidate())
 		{
 			this.outer.getConstructorMatches(list, arguments);
 		}

@@ -736,7 +736,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 
 		this.metadata.getMethodMatches(list, receiver, name, arguments);
 
-		if (!list.isEmpty())
+		if (list.hasCandidate())
 		{
 			return;
 		}
@@ -746,7 +746,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			this.superType.getMethodMatches(list, receiver, name, arguments);
 		}
 
-		if (!list.isEmpty())
+		if (list.hasCandidate())
 		{
 			return;
 		}
