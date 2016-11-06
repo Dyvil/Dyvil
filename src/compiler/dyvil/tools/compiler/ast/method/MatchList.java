@@ -53,6 +53,10 @@ public class MatchList<T extends ICallableSignature> implements IImplicitContext
 
 	public void add(Candidate<T> candidate)
 	{
+		// TODO Maybe insert the candidate at correct position if this list is already sorted?
+
+		this.sorted = false;
+
 		final int index = this.size;
 		this.ensureCapacity(index + 1);
 		this.candidates[index] = candidate;
