@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
+import dyvil.collection.mutable.HashSet;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.access.ClassAccess;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -16,6 +17,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.TypeChecker;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -153,23 +155,23 @@ public class MapExpr implements IValue
 	}
 
 	@Override
-	public IValue withType(IType mapType, ITypeContext typeContext, MarkerList markers, IContext context)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (!MapType.MapTypes.MAP_CLASS.isSubClassOf(mapType))
+		if (!Types.isSuperClass(MapType.MapTypes.MAP_CLASS.getClassType(), type))
 		{
-			IAnnotation annotation = mapType.getTheClass().getAnnotation(LazyTypes.MAP_CONVERTIBLE_CLASS);
+			IAnnotation annotation = type.getTheClass().getAnnotation(LazyTypes.MAP_CONVERTIBLE_CLASS);
 			if (annotation != null)
 			{
 				ArgumentList arguments = new ArgumentList(new IValue[] { new ArrayExpr(this.keys, this.count),
 					new ArrayExpr(this.values, this.count) }, 2);
 				return new LiteralConversion(this, annotation, arguments)
-					       .withType(mapType, typeContext, markers, context);
+					       .withType(type, typeContext, markers, context);
 			}
 			return null;
 		}
 
-		final IType keyType = this.keyType = Types.resolveTypeSafely(mapType, MapType.MapTypes.KEY_VARIABLE);
-		final IType valueType = this.valueType = Types.resolveTypeSafely(mapType, MapType.MapTypes.VALUE_VARIABLE);
+		final IType keyType = this.keyType = Types.resolveTypeSafely(type, MapType.MapTypes.KEY_VARIABLE);
+		final IType valueType = this.valueType = Types.resolveTypeSafely(type, MapType.MapTypes.VALUE_VARIABLE);
 
 		for (int i = 0; i < this.count; i++)
 		{
@@ -291,9 +293,22 @@ public class MapExpr implements IValue
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		final HashSet<Object> keys = new HashSet<>();
+
 		for (int i = 0; i < this.count; i++)
 		{
-			this.keys[i].check(markers, context);
+			final IValue key = this.keys[i];
+			key.check(markers, context);
+
+			if (key.isConstantOrField())
+			{
+				final Object value = key.toObject();
+				if (value != null && !keys.add(value))
+				{
+					markers.add(Markers.semantic(key.getPosition(), "map.key.duplicate", value));
+				}
+			}
+
 			this.values[i].check(markers, context);
 		}
 	}
