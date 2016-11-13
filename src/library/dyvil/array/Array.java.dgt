@@ -227,23 +227,26 @@ public abstract class TYPE_NAME##Array
 	@DyvilModifiers(Modifiers.INFIX)
 	public static PRIMITIVE[] $minus(PRIMITIVE[] array, PRIMITIVE value)
 	{
-		final int index = indexOf(array, value, 0);
-		if (index < 0)
+		int newSize = array.length;
+
+		// Calculate number of element in new array
+		for (PRIMITIVE element : array)
 		{
-			return array;
+			if (element == value)
+			{
+				newSize--;
+			}
 		}
 
-		final int size = array.length;
-		final PRIMITIVE[] res = new PRIMITIVE[size - 1];
-		if (index > 0)
+		final PRIMITIVE[] res = new PRIMITIVE[newSize];
+		int resIndex = 0;
+
+		for (PRIMITIVE element : array)
 		{
-			// copy the first part before the index
-			System.arraycopy(array, 0, res, 0, index);
-		}
-		if (index < size)
-		{
-			// copy the second part after the index
-			System.arraycopy(array, index + 1, res, index, size - index - 1);
+			if (element != value)
+			{
+				res[resIndex++] = element;
+			}
 		}
 		return res;
 	}

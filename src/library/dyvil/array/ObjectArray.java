@@ -222,23 +222,26 @@ public abstract class ObjectArray
 	@DyvilModifiers(Modifiers.INFIX)
 	public static <T> T[] $minus(T[] array, T value)
 	{
-		final int index = indexOf(array, value, 0);
-		if (index < 0)
+		int newSize = array.length;
+
+		// Calculate number of element in new array
+		for (T element : array)
 		{
-			return array;
+			if (Objects.equals(element, value))
+			{
+				newSize--;
+			}
 		}
 
-		final int len = array.length;
-		final T[] res = apply(len - 1, getComponentType(array));
-		if (index > 0)
+		final T[] res = apply(newSize, getComponentType(array));
+		int resIndex = 0;
+
+		for (T element : array)
 		{
-			// copy the first part before the index
-			System.arraycopy(array, 0, res, 0, index);
-		}
-		if (index < len)
-		{
-			// copy the second part after the index
-			System.arraycopy(array, index + 1, res, index, len - index - 1);
+			if (!Objects.equals(element, value))
+			{
+				res[resIndex++] = element;
+			}
 		}
 		return res;
 	}
