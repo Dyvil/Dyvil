@@ -57,6 +57,6 @@ public class MemberSorter
 		{
 			return -1; // type2 is less specific than type1
 		}
-		return 0;
+		return compareNames(type1.getName(), type2.getName());
 	}
 }
