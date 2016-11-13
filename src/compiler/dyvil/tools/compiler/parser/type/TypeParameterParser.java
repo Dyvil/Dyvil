@@ -14,11 +14,10 @@ import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.transform.Names;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.Parser;
-import dyvil.tools.parsing.lexer.Tokens;
+import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
 public final class TypeParameterParser extends Parser implements ITypeConsumer
@@ -52,15 +51,17 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 		switch (this.mode)
 		{
 		case ANNOTATIONS:
-			if (type == DyvilSymbols.AT)
+			switch (type)
 			{
+			case DyvilSymbols.AT:
 				final IAnnotation annotation = new Annotation();
 				this.addAnnotation(annotation);
 				pm.pushParser(new AnnotationParser(annotation));
 				return;
-			}
-			if (type == DyvilKeywords.TYPE)
-			{
+			case DyvilKeywords.TYPE:
+				// type IDENTIFIER
+				// type +IDENTIFIER
+				// type -IDENTIFIER
 				this.mode = VARIANCE;
 				return;
 			}
@@ -115,6 +116,9 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 			switch (type)
 			{
 			case DyvilKeywords.EXTENDS:
+			case BaseSymbols.COLON:
+				// type T: Super
+				// type T extends Super
 				pm.pushParser(this.newTypeParser());
 				this.setBoundMode(UPPER_BOUND);
 				return;
@@ -122,24 +126,6 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 				pm.pushParser(this.newTypeParser());
 				this.setBoundMode(UPPER_BOUND);
 				return;
-			case Tokens.SYMBOL_IDENTIFIER:
-				final Name name = token.nameValue();
-
-				if (name == Names.ltcolon) // <: - Upper Bounds
-				{
-					pm.report(Markers.syntaxWarning(token, "type_parameter.upper_bound.symbol.deprecated"));
-					pm.pushParser(this.newTypeParser());
-					this.setBoundMode(UPPER_BOUND);
-					return;
-				}
-				if (name == Names.gtcolon) // >: - Lower Bound
-				{
-					pm.report(Markers.syntaxWarning(token, "type_parameter.lower_bound.symbol.deprecated"));
-					pm.pushParser(this.newTypeParser());
-					this.setBoundMode(UPPER_BOUND);
-					return;
-				}
-				break;
 			}
 
 			if (this.typeParameter != null)
