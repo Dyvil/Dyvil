@@ -48,6 +48,14 @@ public class Specialization implements ReplacementMap
 		this.name = specName;
 	}
 
+	public static Specialization createDefault(String templateName)
+	{
+		Specialization spec = new Specialization(null, templateName);
+		initDefaults(spec.substitutions);
+		spec.substitutions.put(FILE_NAME_PROPERTY, templateName);
+		return spec;
+	}
+
 	public File getSourceFile()
 	{
 		return this.sourceFile;

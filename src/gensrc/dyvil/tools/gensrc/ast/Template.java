@@ -49,16 +49,7 @@ public class Template
 		try
 		{
 			final List<String> lines = Files.readAllLines(this.sourceFile.toPath());
-			int count = 0;
-
-			for (Specialization spec : this.specializations)
-			{
-				if (spec.isEnabled())
-				{
-					this.specialize(gensrc, lines, spec);
-					count++;
-				}
-			}
+			int count = this.specialize(gensrc, lines);
 
 			gensrc.getOutput().println(I18n.get("template.specialized", count, this.getSourceFile()));
 		}
@@ -66,6 +57,26 @@ public class Template
 		{
 			ex.printStackTrace(gensrc.getErrorOutput());
 		}
+	}
+
+	private int specialize(GenSrc gensrc, List<String> lines)
+	{
+		if (this.specializations.isEmpty())
+		{
+			this.specialize(gensrc, lines, Specialization.createDefault(this.fileName));
+			return 1;
+		}
+
+		int count = 0;
+		for (Specialization spec : this.specializations)
+		{
+			if (spec.isEnabled())
+			{
+				this.specialize(gensrc, lines, spec);
+				count++;
+			}
+		}
+		return count;
 	}
 
 	private void specialize(GenSrc gensrc, List<String> lines, Specialization spec)
