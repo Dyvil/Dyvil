@@ -6,15 +6,20 @@ package dyvil.array;
 import dyvil.annotation.Immutable;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.Mutating;
+import dyvil.annotation.Reified;
 import dyvil.annotation._internal.DyvilModifiers;
-import dyvil.annotation._internal.DyvilName;
 import dyvil.annotation._internal.Primitive;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 
-#if HAS_RANGE_CLASS
+#if IS_RANGEABLE
+import dyvil.annotation._internal.DyvilName;
+
+	#if HAS_RANGE_CLASS
 import dyvil.collection.range.closed.TYPE_NAME##Range;
+	#endif
+
 #endif
 
 import dyvil.ref.TYPE_NAME##Ref;
@@ -23,6 +28,7 @@ import dyvil.reflect.Modifiers;
 
 import java.util.Arrays;
 import java.util.function.*;
+import java.lang.reflect.Array;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -302,24 +308,35 @@ public abstract class TYPE_NAME##Array
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static PRIMITIVE[] flatMapped(PRIMITIVE[] array, FLAT_MAPPER mapper)
+	public static <@Reified(Reified.Type.OBJECT_CLASS) T> T[] mapped(PRIMITIVE[] array, TO_MAPPER T TO_MAPPER_END mapper, Class<T> _type)
+	{
+		final int size = array.length;
+		final T[] res = (T[]) Array.newInstance(_type, size);
+		for (int i = 0; i < size; i++)
+		{
+			res[i] = (T) mapper.TO_MAPPER_APPLY(array[i]);
+		}
+		return res;
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static PRIMITIVE[] flatMapped(PRIMITIVE[] array, TO_MAPPER PRIMITIVE[] TO_MAPPER_END mapper)
 	{
 		int size = 0;
 		PRIMITIVE[] res = EMPTY;
 
 		for (PRIMITIVE v : array)
 		{
-			final PRIMITIVE[] a = mapper.apply(v);
-			final int alen = a.length;
-			if (size + alen >= res.length)
+			final PRIMITIVE[] a = mapper.TO_MAPPER_APPLY(v);
+			final int newSize = a.length;
+
+			if (size + newSize >= res.length)
 			{
-				final PRIMITIVE[] newRes = new PRIMITIVE[size + alen];
-				System.arraycopy(res, 0, newRes, 0, res.length);
-				res = newRes;
+				res = Arrays.copyOf(res, size + newSize);
 			}
 
-			System.arraycopy(a, 0, res, size, alen);
-			size += alen;
+			System.arraycopy(a, 0, res, size, newSize);
+			size += newSize;
 		}
 
 		return res;

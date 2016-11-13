@@ -15,8 +15,9 @@ FROM_LITERAL=FromInt
 MAPPER=IntUnaryOperator
 MAPPER_APPLY=applyAsInt
 
-FLAT_MAPPER=IntFunction<int[]>
-FLAT_MAPPER_APPLY=applyAsInt
+TO_MAPPER=IntFunction<
+TO_MAPPER_END=>
+TO_MAPPER_APPLY=apply
 
 PREDICATE=IntPredicate
 PREDICATE_TEST=test

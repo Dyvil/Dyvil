@@ -19,6 +19,10 @@ MAPPER_APPLY=test
 FLAT_MAPPER=Function<Boolean, boolean[]>
 FLAT_MAPPER_APPLY=apply
 
+TO_MAPPER=Function<Boolean,
+TO_MAPPER_END=>
+TO_MAPPER_APPLY=apply
+
 PREDICATE=Predicate<Boolean>
 PREDICATE_TEST=test
 

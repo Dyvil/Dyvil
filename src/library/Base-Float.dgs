@@ -15,8 +15,9 @@ FROM_LITERAL=FromFloat
 MAPPER=DoubleUnaryOperator
 MAPPER_APPLY=applyAsDouble
 
-FLAT_MAPPER=DoubleFunction<float[]>
-FLAT_MAPPER_APPLY=applyAsDouble
+TO_MAPPER=DoubleFunction<
+TO_MAPPER_END=>
+TO_MAPPER_APPLY=apply
 
 PREDICATE=DoublePredicate
 PREDICATE_TEST=test
