@@ -1,0 +1,54 @@
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
+
+package dyvil.array;
+
+import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.reflect.Modifiers;
+
+public abstract class PrimitiveObjectArray
+{
+	PrimitiveObjectArray()
+	{
+		// no instances from outside this package
+	}
+
+#for Base-Boolean.dgs : Base-Byte.dgs : Base-Short.dgs : Base-Char.dgs : Base-Int.dgs : Base-Long.dgs : Base-Float.dgs : Base-Double.dgs
+	// TYPE wrapper array methods
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static PRIMITIVE[] flatten(PRIMITIVE[][] array)
+	{
+		int size = 0;
+		for (PRIMITIVE[] nested : array)
+		{
+			size += nested.length;
+		}
+
+		final PRIMITIVE[] res = new PRIMITIVE[size];
+
+		int index = 0;
+		for (PRIMITIVE[] nested : array)
+		{
+			final int nestedSize = nested.length;
+			System.arraycopy(nested, 0, res, index, nestedSize);
+			index += nestedSize;
+		}
+
+		return res;
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static PRIMITIVE[] unboxed(WRAPPER[] array)
+	{
+		final int size = array.length;
+		final PRIMITIVE[] unboxed = new PRIMITIVE[size];
+		for (int i = 0; i < size; i++)
+		{
+			unboxed[i] = array[i];
+		}
+		return unboxed;
+	}
+
+#endfor
+}

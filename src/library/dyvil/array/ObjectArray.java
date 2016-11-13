@@ -24,7 +24,7 @@ import java.util.function.*;
 import static dyvil.annotation.Reified.Type.OBJECT_CLASS;
 import static dyvil.reflect.Opcodes.*;
 
-public abstract class ObjectArray
+public abstract class ObjectArray extends PrimitiveObjectArray
 {
 	public static final Object[] EMPTY = new Object[0];
 
@@ -321,6 +321,28 @@ public abstract class ObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
+	public static <T> T[] flatten(T[][] array)
+	{
+		int size = 0;
+		for (T[] nested : array)
+		{
+			size += nested.length;
+		}
+
+		final T[] res = apply(size, (Class<T>) getComponentType(array).getComponentType());
+
+		int index = 0;
+		for (T[] nested : array)
+		{
+			final int nestedSize = nested.length;
+			System.arraycopy(nested, 0, res, index, nestedSize);
+			index += nestedSize;
+		}
+
+		return res;
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
 	public static <T> T[] filtered(T[] array, Predicate<T> condition)
 	{
 		int index = 0;
@@ -355,12 +377,6 @@ public abstract class ObjectArray
 		return res;
 	}
 
-	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> T[] newArray(Class<T> type, int size)
-	{
-		return apply(size, type);
-	}
-
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	public static <T> Class<T> getComponentType(T[] array)
 	{
@@ -373,12 +389,12 @@ public abstract class ObjectArray
 		Class<?> ret = array.getClass();
 		while (true)
 		{
-			final Class<?> c = ret.getComponentType();
-			if (c == null)
+			final Class<?> componentType = ret.getComponentType();
+			if (componentType == null)
 			{
 				return ret;
 			}
-			ret = c;
+			ret = componentType;
 		}
 	}
 
@@ -460,102 +476,6 @@ public abstract class ObjectArray
 		final N[] newArray = apply(newSize, type);
 		System.arraycopy(array, 0, newArray, 0, newSize);
 		return newArray;
-	}
-
-	@DyvilModifiers(Modifiers.INFIX)
-	public static boolean[] unboxed(Boolean[] array)
-	{
-		final int len = array.length;
-		final boolean[] unboxed = new boolean[len];
-		for (int i = 0; i < len; i++)
-		{
-			unboxed[i] = array[i];
-		}
-		return unboxed;
-	}
-
-	@DyvilModifiers(Modifiers.INFIX)
-	public static byte[] unboxed(Byte[] array)
-	{
-		final int len = array.length;
-		final byte[] unboxed = new byte[len];
-		for (int i = 0; i < len; i++)
-		{
-			unboxed[i] = array[i];
-		}
-		return unboxed;
-	}
-
-	@DyvilModifiers(Modifiers.INFIX)
-	public static short[] unboxed(Short[] array)
-	{
-		final int len = array.length;
-		final short[] unboxed = new short[len];
-		for (int i = 0; i < len; i++)
-		{
-			unboxed[i] = array[i];
-		}
-		return unboxed;
-	}
-
-	@DyvilModifiers(Modifiers.INFIX)
-	public static char[] unboxed(Character[] array)
-	{
-		final int len = array.length;
-		final char[] unboxed = new char[len];
-		for (int i = 0; i < len; i++)
-		{
-			unboxed[i] = array[i];
-		}
-		return unboxed;
-	}
-
-	@DyvilModifiers(Modifiers.INFIX)
-	public static int[] unboxed(Integer[] array)
-	{
-		final int len = array.length;
-		final int[] unboxed = new int[len];
-		for (int i = 0; i < len; i++)
-		{
-			unboxed[i] = array[i];
-		}
-		return unboxed;
-	}
-
-	@DyvilModifiers(Modifiers.INFIX)
-	public static long[] unboxed(Long[] array)
-	{
-		final int len = array.length;
-		final long[] unboxed = new long[len];
-		for (int i = 0; i < len; i++)
-		{
-			unboxed[i] = array[i];
-		}
-		return unboxed;
-	}
-
-	@DyvilModifiers(Modifiers.INFIX)
-	public static float[] unboxed(Float[] array)
-	{
-		final int len = array.length;
-		final float[] unboxed = new float[len];
-		for (int i = 0; i < len; i++)
-		{
-			unboxed[i] = array[i];
-		}
-		return unboxed;
-	}
-
-	@DyvilModifiers(Modifiers.INFIX)
-	public static double[] unboxed(Double[] array)
-	{
-		final int len = array.length;
-		final double[] unboxed = new double[len];
-		for (int i = 0; i < len; i++)
-		{
-			unboxed[i] = array[i];
-		}
-		return unboxed;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
