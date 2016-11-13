@@ -109,10 +109,23 @@ public class GenSrc
 			else if (subFile.endsWith(".dgs"))
 			{
 				final int dashIndex = subFile.lastIndexOf('-', endIndex);
-				final String fileName = subFile.substring(0, dashIndex);
-				final String specName = subFile.substring(dashIndex + 1, endIndex);
+				final Specialization spec;
 
-				specializations.add(new Specialization(sourceFile, fileName, specName));
+				if (dashIndex < 0)
+				{
+					// Spec name "default"
+					spec = new Specialization(sourceFile, subFile.substring(0, endIndex));
+				}
+				else
+				{
+					// Custom spec name
+					final String fileName = subFile.substring(0, dashIndex);
+					final String specName = subFile.substring(dashIndex + 1, endIndex);
+					spec = new Specialization(sourceFile, fileName, specName);
+				}
+
+
+				specializations.add(spec);
 			}
 		}
 

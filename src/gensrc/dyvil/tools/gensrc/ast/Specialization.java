@@ -36,6 +36,11 @@ public class Specialization implements ReplacementMap
 
 	private boolean enabled = true;
 
+	public Specialization(File sourceFile, String templateName)
+	{
+		this(sourceFile, templateName, "default");
+	}
+
 	public Specialization(File sourceFile, String templateName, String specName)
 	{
 		this.sourceFile = sourceFile;
