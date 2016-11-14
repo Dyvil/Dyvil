@@ -1,0 +1,57 @@
+package dyvil.lang
+
+using   dyvil.reflect.Opcodes._
+import  dyvil.collection.range.DoubleRange
+
+public abstract class DoubleExtensions
+{
+	private init() {}
+
+	// Double Operators
+
+	@Intrinsic([ LOAD_0 ])
+	public prefix func +(double value): double = value
+
+	@Intrinsic([ LOAD_0, DNEG ])
+	public prefix func -(double value): double = -value
+
+	@Intrinsic([ LOAD_0, LOAD_1, DCMPEQ ])
+	public infix func ==(double v1, double v2): boolean = v1 == v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, DCMPNE ])
+	public infix func !=(double v1, double v2): boolean = v1 != v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, DCMPLT ])
+	public infix func <(double v1, double v2): boolean = v1 < v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, DCMPLE ])
+	public infix func <=(double v1, double v2): boolean = v1 <= v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, DCMPGT ])
+	public infix func >(double v1, double v2): boolean = v1 > v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, DCMPGE ])
+	public infix func >=(double v1, double v2): boolean = v1 >= v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, DADD ])
+	public infix func +(double v1, double v2): double = v1 + v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, DSUB ])
+	public infix func -(double v1, double v2): double = v1 - v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, DMUL ])
+	public infix func *(double v1, double v2): double = v1 * v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2], strings: [ "java/lang/Math", "pow", "(DD)D" ])
+	public infix func **(double v1, double v2): double = Math.pow(v1, v2)
+
+	@Intrinsic([ LOAD_0, LOAD_1, DDIV ])
+	public infix func /(double v1, double v2): double = v1 / v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, DREM ])
+	public infix func %(double v1, double v2): double = v1 % v2
+
+	public infix func ..(double start, double end): DoubleRange = DoubleRange(start, to: end)
+
+	public infix func ..<(double start, double end): DoubleRange = DoubleRange(start, toExclusive: end)
+}

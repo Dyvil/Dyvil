@@ -1,0 +1,80 @@
+package dyvil.lang
+
+using   dyvil.reflect.Opcodes._
+import  dyvil.collection.range.IntRange
+
+public abstract class IntExtensions
+{
+	private init() {}
+
+	// Int Operators
+
+	@Intrinsic([ LOAD_0 ])
+	public prefix func +(int value): int = value
+
+	@Intrinsic([ LOAD_0, INEG ])
+	public prefix func -(int value): int = -value
+
+	@Intrinsic([ LOAD_0, INOT ])
+    public prefix func ~(int value): int = ~value
+
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
+	public infix func ==(int v1, int v2): boolean = v1 == v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPNE ])
+	public infix func !=(int v1, int v2): boolean = v1 != v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPLT ])
+	public infix func <(int v1, int v2): boolean = v1 < v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPLE ])
+	public infix func <=(int v1, int v2): boolean = v1 <= v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPGT ])
+	public infix func >(int v1, int v2): boolean = v1 > v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPGE ])
+	public infix func >=(int v1, int v2): boolean = v1 >= v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, IADD ])
+	public infix func +(int v1, int v2): int = v1 + v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, ISUB ])
+	public infix func -(int v1, int v2): int = v1 - v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, IMUL ])
+	public infix func *(int v1, int v2): int = v1 * v2
+
+	public infix func **(int v1, int v2): long = dyvil.math.PowImpl.pow(v1, v2)
+
+	@Intrinsic([ LOAD_0, I2F, LOAD_1, I2F, FDIV ])
+	public infix func /(int v1, int v2): float = v1 / v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, IREM ])
+	public infix func %(int v1, int v2): int = v1 % v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, IDIV ])
+	public infix func \(int v1, int v2): int = v1 \ v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, IAND ])
+	public infix func &(int v1, int v2): int = v1 & v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, IOR ])
+	public infix func |(int v1, int v2): int = v1 | v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, IXOR ])
+	public infix func ^(int v1, int v2): int = v1 ^ v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, ISHL ])
+	public infix func <<(int v1, int v2): int = v1 << v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, ISHR ])
+	public infix func >>(int v1, int v2): int = v1 >> v2
+
+	@Intrinsic([ LOAD_0, LOAD_1, IUSHR ])
+	public infix func >>>(int v1, int v2): int = v1 >>> v2
+
+	public infix func ..(int start, int end): IntRange = IntRange(start, to: end)
+
+	public infix func ..<(int start, int end): IntRange = IntRange(start, toExclusive: end)
+}
