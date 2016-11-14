@@ -1,5 +1,7 @@
 package dyvil.test
 
+using dyvil.Collections
+
 public class MatchTest
 {
 	public static void main([String] args)
@@ -237,20 +239,19 @@ public class MatchTest
 
 	private static void orPatterns()
 	{
-		[int] array = []
+		let list = List<int>
 
 		for (int i <- 0 .. 10)
 		{
 			i match {
-				case 1 | 2 | 3 => array += 0
-				case 4 | 5 | 6 => array += 1
-				case 7 | 8 | 9 => array += 2
-				case 0 | 10	   => array += 3
+				case 1 | 2 | 3 => list += 0
+				case 4 | 5 | 6 => list += 1
+				case 7 | 8 | 9 => list += 2
+				case 0 | 10	   => list += 3
 			}
 		}
 
-		final [int] expected = [ 3, 0, 0, 0, 1, 1, 1, 2, 2, 2, 3 ]
-		Main.test("Match OR Patterns", array, expected, array == expected)
+		Main.test("Match OR Patterns", List(3, 0, 0, 0, 1, 1, 1, 2, 2, 2, 3), list)
 	}
 
 	private static void andPatterns()
