@@ -28,7 +28,7 @@ public class FileFinder
 		{
 			this.processDirectory(compiler, source, output, pack);
 		}
-		else
+		else if (source.exists())
 		{
 			this.processFile(compiler, source, output, pack);
 		}
@@ -56,7 +56,7 @@ public class FileFinder
 	private void processFile(DyvilCompiler compiler, File source, File output, Package pack)
 	{
 		final String fileName = source.getPath();
-		if (!compiler.config.isExcluded(fileName))
+		if (!compiler.config.isIncluded(fileName))
 		{
 			return;
 		}

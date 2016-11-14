@@ -18,20 +18,20 @@ public class CompilerConfig
 	private DyvilCompiler compiler;
 
 	private String baseDirectory;
-	
+
 	private String jarName;
 	private String jarVendor;
 	private String jarVersion;
 	private String jarNameFormat = "%1$s-%2$s.jar";
-	
+
 	private File logFile;
-	private File sourceDir;
+	public final List<File> sourceDirs = new ArrayList<>();
 	private File outputDir;
 	public final List<Library> libraries = new ArrayList<>();
-	
-	public final List<String>  includedFiles     = new ArrayList<>();
-	public final List<Pattern> exclusionPatterns = new ArrayList<>();
-	
+
+	public final List<Pattern> include = new ArrayList<>();
+	public final List<Pattern> exclude = new ArrayList<>();
+
 	private String mainType;
 	public final List<String> mainArgs = new ArrayList<>();
 
@@ -41,7 +41,7 @@ public class CompilerConfig
 	private int constantFolding = 2;
 
 	private int maxConstantDepth = 10;
-	
+
 	public CompilerConfig(DyvilCompiler compiler)
 	{
 		this.compiler = compiler;
@@ -49,92 +49,87 @@ public class CompilerConfig
 		this.libraries.add(Library.dyvilLibrary);
 		this.libraries.add(Library.javaLibrary);
 	}
-	
+
 	public void setBaseDirectory(String baseDirectory)
 	{
 		this.baseDirectory = baseDirectory;
 	}
-	
+
 	public void setConfigFile(File configFile)
 	{
 		this.baseDirectory = configFile.getParent();
 	}
-	
+
 	public void setJarName(String jarName)
 	{
 		this.jarName = jarName;
 	}
-	
+
 	public String getJarVendor()
 	{
 		return this.jarVendor;
 	}
-	
+
 	public void setJarVendor(String jarVendor)
 	{
 		this.jarVendor = jarVendor;
 	}
-	
+
 	public String getJarVersion()
 	{
 		return this.jarVersion;
 	}
-	
+
 	public void setJarVersion(String jarVersion)
 	{
 		this.jarVersion = jarVersion;
 	}
-	
+
 	public String getJarNameFormat()
 	{
 		return this.jarNameFormat;
 	}
-	
+
 	public void setJarNameFormat(String jarNameFormat)
 	{
 		this.jarNameFormat = jarNameFormat;
 	}
-	
+
 	public String getMainType()
 	{
 		return this.mainType;
 	}
-	
+
 	public void setMainType(String mainType)
 	{
 		this.mainType = mainType;
 	}
-	
+
 	public File getOutputDir()
 	{
 		return this.outputDir;
 	}
-	
+
 	public void setOutputDir(String outputDir)
 	{
 		this.outputDir = this.resolveFile(outputDir);
 	}
-	
-	public File getSourceDir()
+
+	public void addSourceDir(String sourceDir)
 	{
-		return this.sourceDir;
+		this.sourceDirs.add(this.resolveFile(sourceDir));
 	}
-	
-	public void setSourceDir(String sourceDir)
-	{
-		this.sourceDir = this.resolveFile(sourceDir);
-	}
-	
+
 	public File getLogFile()
 	{
 		return this.logFile;
 	}
-	
+
 	public void setLogFile(String logFile)
 	{
 		this.logFile = this.resolveFile(logFile);
 	}
-	
+
 	public void addLibraryFile(String file)
 	{
 		try
@@ -146,20 +141,20 @@ public class CompilerConfig
 			this.compiler.error(I18n.get("library.not_found", file), ex);
 		}
 	}
-	
+
 	public void addLibrary(Library library)
 	{
 		this.libraries.add(library);
 	}
-	
-	public void includeFile(String fileName)
+
+	public void includeFile(String pattern)
 	{
-		this.includedFiles.add(fileName);
+		this.include.add(FileUtils.antToRegex(pattern));
 	}
-	
+
 	public void excludeFile(String pattern)
 	{
-		this.exclusionPatterns.add(FileUtils.antToRegex(pattern));
+		this.exclude.add(FileUtils.antToRegex(pattern));
 	}
 
 	public boolean isDebug()
@@ -215,37 +210,42 @@ public class CompilerConfig
 		return new File(this.baseDirectory, fileName);
 	}
 
-	public boolean isExcluded(String name)
+	public boolean isIncluded(String name)
 	{
-		for (Pattern p : this.exclusionPatterns)
+		// All match
+		for (Pattern p : this.exclude)
 		{
 			if (p.matcher(name).find())
 			{
 				return false;
 			}
 		}
-		
-		return true;
+
+		if (this.include.isEmpty())
+		{
+			return true;
+		}
+
+		// Any match
+		for (Pattern p : this.include)
+		{
+			if (p.matcher(name).find())
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
-	
+
 	public void findUnits(FileFinder fileFinder)
 	{
-		if (!this.includedFiles.isEmpty())
+		for (File sourceDir : this.sourceDirs)
 		{
-			for (String included : this.includedFiles)
-			{
-				File source = new File(this.sourceDir, included);
-				File output = new File(this.outputDir, included);
-				Package pack = packageFromFile(included, source.isDirectory());
-				
-				fileFinder.process(this.compiler, source, output, pack);
-			}
-			return;
+			fileFinder.process(this.compiler, sourceDir, this.outputDir, Package.rootPackage);
 		}
-		
-		fileFinder.process(this.compiler, this.sourceDir, this.outputDir, Package.rootPackage);
 	}
-	
+
 	private static Package packageFromFile(String file, boolean isDirectory)
 	{
 		int index = 0;
@@ -257,35 +257,30 @@ public class CompilerConfig
 			{
 				return isDirectory ? pack.resolvePackage(file.substring(index)) : pack;
 			}
-			
+
 			pack = pack.createSubPackage(file.substring(index, nextIndex));
 			index = nextIndex + 1;
 		}
 		while (index < file.length());
-		
+
 		return pack;
 	}
-	
+
 	public String getJarName()
 	{
 		return String.format(this.jarNameFormat, this.jarName, this.jarVersion);
 	}
-	
+
 	public String[] getMainArgs()
 	{
 		return this.mainArgs.toArray(String.class);
 	}
-	
+
 	@Override
 	public String toString()
 	{
-		return "CompilerConfig [jarName=" + this.getJarName() +
-				", sourceDir=" + this.sourceDir +
-				", outputDir=" + this.outputDir +
-				", libraryFiles=" + this.libraries +
-				", includedFiles=" + this.includedFiles +
-				", exclusionPatterns=" + this.exclusionPatterns +
-				", mainType=" + this.mainType +
-				", mainArgs=" + this.mainArgs + "]";
+		return "CompilerConfig(jarName: " + this.getJarName() + ", sourceDirs: " + this.sourceDirs + ", outputDir: "
+			       + this.outputDir + ", libraries: " + this.libraries + ", include: " + this.include + ", exclude: "
+			       + this.exclude + ", mainType: " + this.mainType + ", mainArgs: " + this.mainArgs + ")";
 	}
 }
