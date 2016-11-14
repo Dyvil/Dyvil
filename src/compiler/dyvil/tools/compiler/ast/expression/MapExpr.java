@@ -157,15 +157,14 @@ public class MapExpr implements IValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (!Types.isSuperClass(MapType.MapTypes.MAP_CLASS.getClassType(), type))
+		if (!Types.isSuperClass(type, MapType.MapTypes.IMMUTABLE_MAP_CLASS.getClassType()))
 		{
 			IAnnotation annotation = type.getTheClass().getAnnotation(LazyTypes.MAP_CONVERTIBLE_CLASS);
 			if (annotation != null)
 			{
-				ArgumentList arguments = new ArgumentList(new IValue[] { new ArrayExpr(this.keys, this.count),
+				final ArgumentList arguments = new ArgumentList(new IValue[] { new ArrayExpr(this.keys, this.count),
 					new ArrayExpr(this.values, this.count) }, 2);
-				return new LiteralConversion(this, annotation, arguments)
-					       .withType(type, typeContext, markers, context);
+				return new LiteralConversion(this, annotation, arguments).withType(type, typeContext, markers, context);
 			}
 			return null;
 		}
