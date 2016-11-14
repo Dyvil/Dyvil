@@ -181,12 +181,6 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	// Operators
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static <T> boolean $qmark(T[] array, T value)
-	{
-		return indexOf(array, value, 0) >= 0;
-	}
-
-	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	public static <T> boolean $eq$eq(T[] array1, T[] array2)
 	{
 		return Arrays.equals(array1, array2);
@@ -199,7 +193,7 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> T[] $plus(T[] array, T value)
+	public static <T> T[] added(T[] array, T value)
 	{
 		final int len = array.length;
 		final T[] res = apply(len + 1, getComponentType(array));
@@ -209,7 +203,7 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> T[] $plus$plus(T[] array1, T[] array2)
+	public static <T> T[] union(T[] array1, T[] array2)
 	{
 		final int len1 = array1.length;
 		final int len2 = array2.length;
@@ -220,7 +214,7 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> T[] $minus(T[] array, T value)
+	public static <T> T[] removed(T[] array, T value)
 	{
 		int newSize = array.length;
 
@@ -247,7 +241,7 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> T[] $minus$minus(T[] array1, T[] array2)
+	public static <T> T[] difference(T[] array1, T[] array2)
 	{
 		int index = 0;
 		// We can safely use clone here because no data will be leaked
@@ -266,7 +260,7 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> T[] $amp(T[] array1, T[] array2)
+	public static <T> T[] intersection(T[] array1, T[] array2)
 	{
 		int index = 0;
 		// We can safely use clone here because no data will be leaked
@@ -446,12 +440,6 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	public static <T> boolean contains(T[] array, T value)
-	{
-		return indexOf(array, value, 0) > 0;
-	}
-
-	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static <T> boolean in(T value, T[] array)
 	{
 		return indexOf(array, value, 0) > 0;
 	}
