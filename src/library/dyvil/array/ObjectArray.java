@@ -390,6 +390,12 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 
 	// Search Operations
 
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
+	public static <T> boolean contains(T[] array, T value)
+	{
+		return indexOf(array, value, 0) > 0;
+	}
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static <T> int indexOf(T[] array, T value)
 	{
@@ -426,12 +432,6 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 			}
 		}
 		return -1;
-	}
-
-	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static <T> boolean contains(T[] array, T value)
-	{
-		return indexOf(array, value, 0) > 0;
 	}
 
 	// Copying
@@ -508,20 +508,15 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 			return "null";
 		}
 
-		final int len = array.length;
-		if (len <= 0)
+		final int size = array.length;
+		if (size <= 0)
 		{
 			return "[]";
 		}
 
-		final StringBuilder buf = new StringBuilder(len * 10);
-		buf.append('[').append(array[0]);
-		for (int i = 1; i < len; i++)
-		{
-			buf.append(", ");
-			buf.append(array[i]);
-		}
-		return buf.append(']').toString();
+		final StringBuilder builder = new StringBuilder(size * 10);
+		append(array, size, builder);
+		return builder.toString();
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
@@ -540,8 +535,13 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 			return;
 		}
 
+		append(array, len, builder);
+	}
+
+	private static void append(Object[] array, int size, StringBuilder builder)
+	{
 		builder.append('[').append(array[0]);
-		for (int i = 1; i < len; i++)
+		for (int i = 1; i < size; i++)
 		{
 			builder.append(", ");
 			builder.append(array[i]);
@@ -557,21 +557,15 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 			return "null";
 		}
 
-		final int len = array.length;
-		if (len <= 0)
+		final int size = array.length;
+		if (size <= 0)
 		{
 			return "[]";
 		}
 
-		final StringBuilder buf = new StringBuilder(len * 10);
-		buf.append('[');
-		toString(array[0], buf);
-		for (int i = 1; i < len; i++)
-		{
-			buf.append(", ");
-			toString(array[i], buf);
-		}
-		return buf.append(']').toString();
+		final StringBuilder builder = new StringBuilder(size * 10);
+		deepAppend(array, size, builder);
+		return builder.toString();
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
@@ -583,25 +577,30 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 			return;
 		}
 
-		final int len = array.length;
-		if (len <= 0)
+		final int size = array.length;
+		if (size <= 0)
 		{
 			builder.append("[]");
 			return;
 		}
 
+		deepAppend(array, size, builder);
+	}
+
+	private static void deepAppend(Object[] array, int size, StringBuilder builder)
+	{
 		builder.append('[');
-		toString(array[0], builder);
-		for (int i = 1; i < len; i++)
+		deepToString(array[0], builder);
+		for (int i = 1; i < size; i++)
 		{
 			builder.append(", ");
-			toString(array[i], builder);
+			deepToString(array[i], builder);
 		}
 		builder.append(']');
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static void toString(Object object, StringBuilder builder)
+	public static void deepToString(Object object, StringBuilder builder)
 	{
 		if (object == null)
 		{

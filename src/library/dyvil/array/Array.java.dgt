@@ -405,6 +405,12 @@ public abstract class TYPE_NAME##Array
 
 	// Search Operations
 
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
+	public static boolean contains(PRIMITIVE[] array, PRIMITIVE value)
+	{
+		return indexOf(array, value, 0) >= 0;
+	}
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static int indexOf(PRIMITIVE[] array, PRIMITIVE value)
 	{
@@ -443,18 +449,20 @@ public abstract class TYPE_NAME##Array
 		return -1;
 	}
 
-	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static boolean contains(PRIMITIVE[] array, PRIMITIVE value)
-	{
-		return indexOf(array, value, 0) >= 0;
-	}
-
 	// Copying
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	public static PRIMITIVE[] copy(PRIMITIVE[] array)
 	{
 		return array.clone();
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static PRIMITIVE[] copy(PRIMITIVE[] array, int size)
+	{
+		final PRIMITIVE[] newArray = new PRIMITIVE[size];
+		System.arraycopy(array, 0, newArray, 0, array.length);
+		return newArray;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
