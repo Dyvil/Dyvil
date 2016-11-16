@@ -22,8 +22,8 @@ import java.util.function.Predicate;
  * <p>
  * Would create an empty list by calling {@link #apply()} and assign it to the variable {@code c}.
  * <p>
- * Furthermore, since this interface also supports the {@link LiteralConvertible.FromArray} annotation, it is possible to create a
- * collection using <i>Array Expressions</i> in <i>Dyvil</i>, as shown in the below example.
+ * Furthermore, since this interface also supports the {@link LiteralConvertible.FromArray} annotation, it is possible
+ * to create a collection using <i>Array Expressions</i> in <i>Dyvil</i>, as shown in the below example.
  * <p>
  * <pre>
  * Collection[String] c = [ 1, 2, 3 ]
@@ -303,6 +303,28 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	boolean add(E element);
 
 	/**
+	 * Adds all elements of the given {@code iterable} to this collection. This method should throw an {@link
+	 * ImmutableException} if this is an immutable collection.
+	 *
+	 * @param iterable
+	 * 	the iterable collection of elements to be added
+	 *
+	 * @return {@code true} iff any elements have been removed from this collection, {@code false} otherwise
+	 */
+	default boolean addAll(Iterable<? extends E> iterable)
+	{
+		boolean added = false;
+		for (E element : iterable)
+		{
+			if (this.add(element))
+			{
+				added = true;
+			}
+		}
+		return added;
+	}
+
+	/**
 	 * Adds all elements of the given {@code collection} to this collection. This method should throw an {@link
 	 * ImmutableException} if this is an immutable collection.
 	 *
@@ -313,15 +335,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 */
 	default boolean addAll(Collection<? extends E> collection)
 	{
-		boolean added = false;
-		for (E element : collection)
-		{
-			if (this.add(element))
-			{
-				added = true;
-			}
-		}
-		return added;
+		return this.addAll((Iterable<E>) collection);
 	}
 
 	/**
@@ -337,6 +351,28 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	boolean remove(Object element);
 
 	/**
+	 * Removes all elements of the given {@code iterable} from this collection. This method should throw an {@link
+	 * ImmutableException} if the callee is an immutable collection.
+	 *
+	 * @param iterable
+	 * 	the iterable collection of elements to be removed
+	 *
+	 * @return {@code true} iff any elements have been removed from this collection, {@code false} otherwise
+	 */
+	default boolean removeAll(Iterable<?> iterable)
+	{
+		boolean removed = false;
+		for (Object o : iterable)
+		{
+			if (this.remove(o))
+			{
+				removed = true;
+			}
+		}
+		return removed;
+	}
+
+	/**
 	 * Removes all elements of the given {@code collection} from this collection. This method should throw an {@link
 	 * ImmutableException} if the callee is an immutable collection.
 	 *
@@ -347,15 +383,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 */
 	default boolean removeAll(Collection<?> collection)
 	{
-		boolean removed = false;
-		for (Object o : collection)
-		{
-			if (this.remove(o))
-			{
-				removed = true;
-			}
-		}
-		return removed;
+		return this.removeAll((Iterable<?>) collection);
 	}
 
 	/**
