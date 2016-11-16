@@ -8,6 +8,7 @@ import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.annotation._internal.DyvilName;
 import dyvil.annotation._internal.Primitive;
 import dyvil.collection.ImmutableList;
+import dyvil.collection.List;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.collection.range.Rangeable;
@@ -279,7 +280,7 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T, @Reified(OBJECT_CLASS) U> U[] mapped(T[] array, Function<T, U> mapper, Class<U> _type)
+	public static <T, @Reified(OBJECT_CLASS) U> U[] mapped(T[] array, Function<? super T, ? extends U> mapper, Class<U> _type)
 	{
 		final int len = array.length;
 		final U[] res = apply(len, _type);
@@ -291,27 +292,16 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T, @Reified(OBJECT_CLASS) U> U[] flatMapped(T[] array, Function<T, U[]> mapper, Class<U> _type)
+	public static <T, @Reified(OBJECT_CLASS) U> U[] flatMapped(T[] array, Function<? super T, ? extends Iterable<? extends U>> mapper, Class<U> _type)
 	{
-		int size = 0;
-		U[] res = (U[]) EMPTY;
+		final List<U> list = new dyvil.collection.mutable.ArrayList<>(array.length << 2);
 
 		for (T value : array)
 		{
-			final U[] result = mapper.apply(value);
-			final int resultLen = result.length;
-			if (size + resultLen >= res.length)
-			{
-				final U[] newRes = apply(size + resultLen, _type);
-				System.arraycopy(res, 0, newRes, 0, res.length);
-				res = newRes;
-			}
-
-			System.arraycopy(result, 0, res, size, resultLen);
-			size += resultLen;
+			list.addAll(mapper.apply(value));
 		}
 
-		return res;
+		return list.toArray(_type);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)

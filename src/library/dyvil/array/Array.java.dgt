@@ -7,8 +7,10 @@ import dyvil.annotation.Immutable;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.Mutating;
 import dyvil.annotation.Reified;
+import dyvil.annotation.OverloadPriority;
 import dyvil.annotation._internal.DyvilModifiers;
 import dyvil.annotation._internal.Primitive;
+import dyvil.collection.List;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
@@ -302,6 +304,7 @@ public abstract class TYPE_NAME##Array
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
+	@OverloadPriority
 	public static <@Reified(Reified.Type.OBJECT_CLASS) T> T[] mapped(PRIMITIVE[] array, TO_MAPPER T TO_MAPPER_END mapper, Class<T> _type)
 	{
 		final int size = array.length;
@@ -317,7 +320,7 @@ public abstract class TYPE_NAME##Array
 	public static PRIMITIVE[] flatMapped(PRIMITIVE[] array, TO_MAPPER PRIMITIVE[] TO_MAPPER_END mapper)
 	{
 		int size = 0;
-		PRIMITIVE[] res = EMPTY;
+		PRIMITIVE[] res = new PRIMITIVE[array.length << 2];
 
 		for (PRIMITIVE v : array)
 		{
@@ -326,14 +329,32 @@ public abstract class TYPE_NAME##Array
 
 			if (size + newSize >= res.length)
 			{
-				res = Arrays.copyOf(res, size + newSize);
+				res = Arrays.copyOf(res, (size + newSize) << 1);
 			}
 
 			System.arraycopy(a, 0, res, size, newSize);
 			size += newSize;
 		}
 
-		return res;
+		if (size == res.length)
+		{
+			return res;
+		}
+		return Arrays.copyOf(res, size);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	@OverloadPriority
+	public static <@Reified(Reified.Type.OBJECT_CLASS) T> T[] flatMapped(PRIMITIVE[] array, TO_MAPPER ? extends Iterable<? extends T> TO_MAPPER_END mapper, Class<T> _type)
+	{
+		final List<T> list = new dyvil.collection.mutable.ArrayList<>(array.length << 2);
+
+		for (PRIMITIVE value : array)
+		{
+			list.addAll(mapper.TO_MAPPER_APPLY(value));
+		}
+
+		return list.toArray(_type);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
