@@ -28,7 +28,7 @@ public abstract class ArrayOperators
 
 	opfunc -- <T>([T] lhs, [T] rhs): [T] = lhs.difference(rhs)
 
-#for Base-Boolean.dgs : Base-Byte.dgs : Base-Short.dgs : Base-Char.dgs : Base-Int.dgs : Base-Long.dgs : Base-Float.dgs : Base-Double.dgs
+#foreach Base-Boolean.dgs, Base-Byte.dgs, Base-Short.dgs, Base-Char.dgs, Base-Int.dgs, Base-Long.dgs, Base-Float.dgs, Base-Double.dgs
 
 	// TYPE_NAME array operators
 

@@ -101,12 +101,12 @@ public class Specializer
 					return start;
 				}
 				continue;
-			case "for":
+			case "foreach":
 			{
 				if (processOuter && ifCondition)
 				{
 					final String remainder = line.substring(skipWhitespace(line, directiveEnd, length));
-					final String[] files = parseSpecFiles(remainder);
+					final String[] files = processLine(remainder, replacements).split("\\s*,\\s*");
 
 					final int forEnd = this.processFor(start, end, replacements, files);
 					if (forEnd >= 0)
@@ -122,6 +122,12 @@ public class Specializer
 			}
 			case "endfor":
 				if (enclosingBlock == FOR_BLOCK)
+				{
+					return start;
+				}
+				continue;
+			case "end":
+				if (enclosingBlock != 0)
 				{
 					return start;
 				}
@@ -202,18 +208,6 @@ public class Specializer
 			}
 		}
 		return forEnd;
-	}
-
-	private static String[] parseSpecFiles(String remainder)
-	{
-		final String[] split = remainder.split(File.pathSeparator); // split by path separator (e.g. ':' on *nix)
-
-		for (int i = 0; i < split.length; i++)
-		{
-			split[i] = split[i].trim();
-		}
-
-		return split;
 	}
 
 	private static String parseIdentifier(String line, int start, int end)

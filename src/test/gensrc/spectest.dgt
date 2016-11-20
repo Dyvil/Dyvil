@@ -38,7 +38,7 @@ line with nothing ##in the middle
 	#endif
 #endif
 
-#for ./spectest-Test.dgs : ./spectest-Base.dgs
+#foreach ./spectest-Test.dgs, ./spectest-Base.dgs
 	#define _COUNT COUNT
 	#process the value of _COUNT in SPEC_NAME is COUNT
 #endfor
