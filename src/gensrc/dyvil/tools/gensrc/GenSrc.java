@@ -5,6 +5,7 @@ import dyvil.tools.gensrc.ast.Template;
 import dyvil.tools.gensrc.lang.I18n;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +15,7 @@ import java.util.Map;
 public class GenSrc
 {
 	private List<Template>            templates = new ArrayList<>();
-	private Map<File, Specialization> specs     = new HashMap<>();
+	private Map<String, Specialization> specs     = new HashMap<>();
 
 	private File sourceRoot;
 	private File targetRoot;
@@ -72,7 +73,14 @@ public class GenSrc
 
 	public Specialization getSpecialization(File file)
 	{
-		return this.specs.get(file);
+		try
+		{
+			return this.specs.get(file.getCanonicalPath());
+		}
+		catch (IOException ignored)
+		{
+			return null;
+		}
 	}
 
 	public void findFiles()
@@ -131,7 +139,13 @@ public class GenSrc
 
 		for (Specialization spec : specializations)
 		{
-			this.specs.put(spec.getSourceFile(), spec);
+			try
+			{
+				this.specs.put(spec.getSourceFile().getCanonicalPath(), spec);
+			}
+			catch (IOException ignored)
+			{
+			}
 
 			final Template template = templates.get(spec.getTemplateName());
 			if (template == null)
