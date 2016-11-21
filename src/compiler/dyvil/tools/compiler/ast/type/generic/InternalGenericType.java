@@ -77,7 +77,7 @@ public class InternalGenericType extends GenericType
 			this.typeArguments[i] = this.typeArguments[i].resolveType(markers, context);
 		}
 
-		if (this.internalName.startsWith("dyvil/tuple/Tuple"))
+		if (this.internalName.startsWith("dyvil/tuple/Tuple$Of"))
 		{
 			return new TupleType(this.typeArguments, this.typeArgumentCount);
 		}

@@ -1,7 +1,7 @@
 package dyvil.collection;
 
 import dyvil.lang.LiteralConvertible;
-import dyvil.tuple.Tuple2;
+import dyvil.tuple.Tuple;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;
@@ -129,7 +129,7 @@ public interface Matrix<E> extends Iterable<E>, Serializable
 	
 	int columnOf(Object element);
 	
-	Tuple2<Integer, Integer> cellOf(Object element);
+	Tuple.Of2<Integer, Integer> cellOf(Object element);
 	
 	// toArray
 	

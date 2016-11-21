@@ -4,7 +4,7 @@ import dyvil.annotation.Immutable;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractTupleMap;
 import dyvil.lang.LiteralConvertible;
-import dyvil.tuple.Tuple2;
+import dyvil.tuple.Tuple;
 import dyvil.util.ImmutableException;
 
 import java.util.Collections;
@@ -40,7 +40,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 				throw new IllegalStateException("Already built");
 			}
 
-			this.map.putInternal(new Tuple2<>(key, value));
+			this.map.putInternal(new Tuple.Of2<>(key, value));
 		}
 
 		@Override
@@ -51,7 +51,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 				throw new IllegalStateException("Already built");
 			}
 
-			this.map.putInternal((Tuple2<K, V>) entry.toTuple());
+			this.map.putInternal((Tuple.Of2<K, V>) entry.toTuple());
 		}
 
 		@Override
@@ -69,7 +69,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 
 	public static <K, V> TupleMap<K, V> singleton(K key, V value)
 	{
-		return apply(new Tuple2<>(key, value));
+		return apply(new Tuple.Of2<>(key, value));
 	}
 
 	public static <K, V> TupleMap<K, V> apply()
@@ -84,7 +84,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 	}
 
 	@SafeVarargs
-	public static <K, V> TupleMap<K, V> apply(Tuple2<? extends K, ? extends V>... entries)
+	public static <K, V> TupleMap<K, V> apply(Tuple.Of2<? extends K, ? extends V>... entries)
 	{
 		return new TupleMap<>(entries, true);
 	}
@@ -94,7 +94,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 		return new TupleMap<>(array);
 	}
 
-	public static <K, V> TupleMap<K, V> from(Tuple2<? extends K, ? extends V>[] array)
+	public static <K, V> TupleMap<K, V> from(Tuple.Of2<? extends K, ? extends V>[] array)
 	{
 		return new TupleMap<>(array);
 	}
@@ -136,22 +136,22 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 		super(entries);
 	}
 
-	public TupleMap(Tuple2<? extends K, ? extends V>[] entries)
+	public TupleMap(Tuple.Of2<? extends K, ? extends V>[] entries)
 	{
 		super(entries);
 	}
 
-	public TupleMap(Tuple2<? extends K, ? extends V>[] entries, int size)
+	public TupleMap(Tuple.Of2<? extends K, ? extends V>[] entries, int size)
 	{
 		super(entries, size);
 	}
 
-	public TupleMap(Tuple2<? extends K, ? extends V>[] entries, boolean trusted)
+	public TupleMap(Tuple.Of2<? extends K, ? extends V>[] entries, boolean trusted)
 	{
 		super(entries, trusted);
 	}
 
-	public TupleMap(Tuple2<? extends K, ? extends V>[] entries, int size, boolean trusted)
+	public TupleMap(Tuple.Of2<? extends K, ? extends V>[] entries, int size, boolean trusted)
 	{
 		super(entries, size, trusted);
 	}
@@ -191,7 +191,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 		{
 			return null;
 		}
-		return new Tuple2<>((K) key, this.entries[index]._2);
+		return new Tuple.Of2<>((K) key, this.entries[index]._2);
 	}
 
 	@Override
@@ -204,7 +204,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 	public ImmutableMap<K, V> withEntry(K key, V value)
 	{
 		TupleMap<K, V> copy = new TupleMap<>(this);
-		copy.putInternal(new Tuple2<>(key, value));
+		copy.putInternal(new Tuple.Of2<>(key, value));
 		return copy;
 	}
 
@@ -214,7 +214,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 		TupleMap<K, V> copy = new TupleMap<>(this);
 		for (Entry<? extends K, ? extends V> entry : map)
 		{
-			copy.putInternal((Tuple2<K, V>) entry.toTuple());
+			copy.putInternal((Tuple.Of2<K, V>) entry.toTuple());
 		}
 		return copy;
 	}
@@ -222,12 +222,12 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 	@Override
 	public ImmutableMap<K, V> keyRemoved(Object key)
 	{
-		Tuple2<K, V>[] entries = (Tuple2<K, V>[]) new Tuple2[this.size];
+		Tuple.Of2<K, V>[] entries = (Tuple.Of2<K, V>[]) new Tuple.Of2[this.size];
 
 		int index = 0;
 		for (int i = 0; i < this.size; i++)
 		{
-			Tuple2<K, V> entry = this.entries[i];
+			Tuple.Of2<K, V> entry = this.entries[i];
 			if (Objects.equals(key, entry._1))
 			{
 				continue;
@@ -241,12 +241,12 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 	@Override
 	public ImmutableMap<K, V> removed(Object key, Object value)
 	{
-		Tuple2<K, V>[] entries = (Tuple2<K, V>[]) new Tuple2[this.size];
+		Tuple.Of2<K, V>[] entries = (Tuple.Of2<K, V>[]) new Tuple.Of2[this.size];
 
 		int index = 0;
 		for (int i = 0; i < this.size; i++)
 		{
-			Tuple2<K, V> entry = this.entries[i];
+			Tuple.Of2<K, V> entry = this.entries[i];
 			if (Objects.equals(key, entry._1) && Objects.equals(value, entry._2))
 			{
 				continue;
@@ -260,12 +260,12 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 	@Override
 	public ImmutableMap<K, V> valueRemoved(Object value)
 	{
-		Tuple2<K, V>[] entries = (Tuple2<K, V>[]) new Tuple2[this.size];
+		Tuple.Of2<K, V>[] entries = (Tuple.Of2<K, V>[]) new Tuple.Of2[this.size];
 
 		int index = 0;
 		for (int i = 0; i < this.size; i++)
 		{
-			Tuple2<K, V> entry = this.entries[i];
+			Tuple.Of2<K, V> entry = this.entries[i];
 			if (Objects.equals(value, entry._2))
 			{
 				continue;
@@ -279,12 +279,12 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 	@Override
 	public ImmutableMap<K, V> difference(Map<?, ?> map)
 	{
-		Tuple2<K, V>[] entries = (Tuple2<K, V>[]) new Tuple2[this.size];
+		Tuple.Of2<K, V>[] entries = (Tuple.Of2<K, V>[]) new Tuple.Of2[this.size];
 
 		int index = 0;
 		for (int i = 0; i < this.size; i++)
 		{
-			Tuple2<K, V> entry = this.entries[i];
+			Tuple.Of2<K, V> entry = this.entries[i];
 			if (map.contains(entry))
 			{
 				continue;
@@ -298,12 +298,12 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 	@Override
 	public ImmutableMap<K, V> keyDifference(Collection<?> keys)
 	{
-		Tuple2<K, V>[] entries = (Tuple2<K, V>[]) new Tuple2[this.size];
+		Tuple.Of2<K, V>[] entries = (Tuple.Of2<K, V>[]) new Tuple.Of2[this.size];
 
 		int index = 0;
 		for (int i = 0; i < this.size; i++)
 		{
-			Tuple2<K, V> entry = this.entries[i];
+			Tuple.Of2<K, V> entry = this.entries[i];
 			if (keys.contains(entry._1))
 			{
 				continue;
@@ -321,9 +321,9 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 		TupleMap<NK, V> copy = new TupleMap<>(len);
 		for (int i = 0; i < len; i++)
 		{
-			Tuple2<K, V> entry = this.entries[i];
+			Tuple.Of2<K, V> entry = this.entries[i];
 			V value = entry._2;
-			copy.putInternal(new Tuple2<>(mapper.apply(entry._1, value), value));
+			copy.putInternal(new Tuple.Of2<>(mapper.apply(entry._1, value), value));
 		}
 		return copy;
 	}
@@ -331,12 +331,12 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 	@Override
 	public <NV> ImmutableMap<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper)
 	{
-		Tuple2<K, NV>[] entries = (Tuple2<K, NV>[]) new Tuple2[this.size];
+		Tuple.Of2<K, NV>[] entries = (Tuple.Of2<K, NV>[]) new Tuple.Of2[this.size];
 		for (int i = 0; i < this.size; i++)
 		{
-			Tuple2<K, V> entry = this.entries[i];
+			Tuple.Of2<K, V> entry = this.entries[i];
 			K key = entry._1;
-			entries[i] = new Tuple2<>(key, mapper.apply(key, entry._2));
+			entries[i] = new Tuple.Of2<>(key, mapper.apply(key, entry._2));
 		}
 		return new TupleMap<>(entries, this.size, true);
 	}
@@ -348,11 +348,11 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 		TupleMap<NK, NV> copy = new TupleMap<>(len);
 		for (int i = 0; i < len; i++)
 		{
-			Tuple2<K, V> entry = this.entries[i];
+			Tuple.Of2<K, V> entry = this.entries[i];
 			Entry<? extends NK, ? extends NV> newEntry = mapper.apply(entry._1, entry._2);
 			if (newEntry != null)
 			{
-				copy.putInternal((Tuple2<NK, NV>) newEntry.toTuple());
+				copy.putInternal((Tuple.Of2<NK, NV>) newEntry.toTuple());
 			}
 		}
 		return copy;
@@ -365,10 +365,10 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 		TupleMap<NK, NV> copy = new TupleMap<>(len);
 		for (int i = 0; i < len; i++)
 		{
-			Tuple2<K, V> entry = this.entries[i];
+			Tuple.Of2<K, V> entry = this.entries[i];
 			for (Entry<? extends NK, ? extends NV> newEntry : mapper.apply(entry._1, entry._2))
 			{
-				copy.putInternal((Tuple2<NK, NV>) newEntry.toTuple());
+				copy.putInternal((Tuple.Of2<NK, NV>) newEntry.toTuple());
 			}
 		}
 		return copy;
@@ -377,12 +377,12 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 	@Override
 	public ImmutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition)
 	{
-		Tuple2<K, V>[] entries = (Tuple2<K, V>[]) new Tuple2[this.size];
+		Tuple.Of2<K, V>[] entries = (Tuple.Of2<K, V>[]) new Tuple.Of2[this.size];
 
 		int index = 0;
 		for (int i = 0; i < this.size; i++)
 		{
-			Tuple2<K, V> entry = this.entries[i];
+			Tuple.Of2<K, V> entry = this.entries[i];
 			if (condition.test(entry._1, entry._2))
 			{
 				entries[index++] = entry;
@@ -398,8 +398,8 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 		TupleMap<V, K> copy = new TupleMap<>(len);
 		for (int i = 0; i < len; i++)
 		{
-			Tuple2<K, V> entry = this.entries[i];
-			copy.putInternal(new Tuple2<>(entry._2, entry._1));
+			Tuple.Of2<K, V> entry = this.entries[i];
+			copy.putInternal(new Tuple.Of2<>(entry._2, entry._1));
 		}
 		return copy;
 	}

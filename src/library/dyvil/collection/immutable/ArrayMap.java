@@ -4,7 +4,7 @@ import dyvil.annotation.Immutable;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractArrayMap;
 import dyvil.lang.LiteralConvertible;
-import dyvil.tuple.Tuple2;
+import dyvil.tuple.Tuple;
 import dyvil.util.ImmutableException;
 
 import java.util.Collections;
@@ -193,7 +193,7 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 			return null;
 		}
 
-		return new Tuple2<>((K) key, (V) this.values[index]);
+		return new Tuple.Of2<>((K) key, (V) this.values[index]);
 	}
 
 	@Override

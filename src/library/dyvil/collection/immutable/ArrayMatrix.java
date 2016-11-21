@@ -5,7 +5,7 @@ import dyvil.collection.ImmutableList;
 import dyvil.collection.ImmutableMatrix;
 import dyvil.collection.Matrix;
 import dyvil.collection.MutableMatrix;
-import dyvil.tuple.Tuple2;
+import dyvil.tuple.Tuple;
 
 import java.util.Iterator;
 import java.util.Objects;
@@ -317,7 +317,7 @@ public class ArrayMatrix<E> implements ImmutableMatrix<E>
 	}
 	
 	@Override
-	public Tuple2<Integer, Integer> cellOf(Object element)
+	public Tuple.Of2<Integer, Integer> cellOf(Object element)
 	{
 		for (int row = 0; row < this.rows; row++)
 		{
@@ -326,7 +326,7 @@ public class ArrayMatrix<E> implements ImmutableMatrix<E>
 			{
 				if (Objects.equals(rowArray[column], element))
 				{
-					return new Tuple2<>(row, column);
+					return new Tuple.Of2<>(row, column);
 				}
 			}
 		}

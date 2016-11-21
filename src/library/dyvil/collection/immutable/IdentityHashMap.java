@@ -4,7 +4,7 @@ import dyvil.annotation.Immutable;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractIdentityHashMap;
 import dyvil.lang.LiteralConvertible;
-import dyvil.tuple.Tuple2;
+import dyvil.tuple.Tuple;
 
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
@@ -158,7 +158,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		{
 			return null;
 		}
-		return new Tuple2<>((K) key, (V) this.table[index + 1]);
+		return new Tuple.Of2<>((K) key, (V) this.table[index + 1]);
 	}
 
 	@Override

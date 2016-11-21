@@ -1,7 +1,7 @@
 package dyvil.collection;
 
 import dyvil.annotation._internal.Covariant;
-import dyvil.tuple.Tuple2;
+import dyvil.tuple.Tuple;
 
 import java.io.Serializable;
 import java.util.Comparator;
@@ -33,13 +33,13 @@ public interface Entry<@Covariant K, @Covariant V> extends Serializable
 	V getValue();
 	
 	/**
-	 * Converts this entry to a {@link Tuple2 Tuple}.
+	 * Converts this entry to a {@link Tuple.Of2 Tuple}.
 	 *
 	 * @return a tuple with this entry's key and value
 	 */
-	default Tuple2<K, V> toTuple()
+	default Tuple.Of2<K, V> toTuple()
 	{
-		return new Tuple2<>(this.getKey(), this.getValue());
+		return new Tuple.Of2<>(this.getKey(), this.getValue());
 	}
 	
 	/**

@@ -39,8 +39,10 @@ import java.io.IOException;
 
 public final class TupleType implements IObjectType, ITypeList
 {
-	public static final IClass[] tupleClasses = new IClass[22];
-	public static final String[] descriptors  = new String[22];
+	public static final int MAX_ARITY = 10;
+
+	public static final IClass[] tupleClasses = new IClass[MAX_ARITY];
+	public static final String[] descriptors  = new String[MAX_ARITY];
 
 	protected IType[] types;
 	protected int     typeCount;
@@ -91,7 +93,7 @@ public final class TupleType implements IObjectType, ITypeList
 			return iclass;
 		}
 
-		iclass = Package.dyvilTuple.resolveClass("Tuple" + count);
+		iclass = Package.dyvilTuple.resolveClass(Names.Tuple).resolveClass(Name.fromQualified("Of" + count));
 		tupleClasses[count] = iclass;
 		return iclass;
 	}

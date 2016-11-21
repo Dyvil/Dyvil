@@ -2,7 +2,7 @@ package dyvil.collection.impl;
 
 import dyvil.collection.Matrix;
 import dyvil.collection.iterator.ArrayIterator;
-import dyvil.tuple.Tuple2;
+import dyvil.tuple.Tuple;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -210,10 +210,10 @@ public abstract class AbstractFlatArrayMatrix<E> implements Matrix<E>
 	}
 	
 	@Override
-	public Tuple2<Integer, Integer> cellOf(Object element)
+	public Tuple.Of2<Integer, Integer> cellOf(Object element)
 	{
 		final int index = this.indexOf(element);
-		return index == -1 ? null : new Tuple2<>(index / this.columns, index % this.rows);
+		return index == -1 ? null : new Tuple.Of2<>(index / this.columns, index % this.rows);
 	}
 	
 	@Override
