@@ -64,6 +64,16 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 				// type -IDENTIFIER
 				this.mode = VARIANCE;
 				return;
+			case BaseSymbols.SEMICOLON:
+				if (token.isInferred())
+				{
+					return;
+				}
+			}
+			if (TypeParser.isGenericEnd(token, type))
+			{
+				pm.popParser(true);
+				return;
 			}
 			// Fallthrough
 		case VARIANCE:
