@@ -237,11 +237,17 @@ public final class DyvilCompiler implements Tool
 
 	public void loadLibraries()
 	{
-		final int libs = this.config.libraries.size();
+		final List<Library> libraries = this.config.libraries;
+
+		// Make sure to add the dyvil and java libraries at the end
+		libraries.add(Library.dyvilLibrary);
+		libraries.add(Library.javaLibrary);
+
+		final int libs = libraries.size();
 		final long startTime = System.nanoTime();
 
 		// Loads libraries
-		for (Library library : this.config.libraries)
+		for (Library library : libraries)
 		{
 			library.loadLibrary();
 		}

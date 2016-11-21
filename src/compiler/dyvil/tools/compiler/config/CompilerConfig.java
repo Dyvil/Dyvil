@@ -45,9 +45,6 @@ public class CompilerConfig
 	public CompilerConfig(DyvilCompiler compiler)
 	{
 		this.compiler = compiler;
-
-		this.libraries.add(Library.dyvilLibrary);
-		this.libraries.add(Library.javaLibrary);
 	}
 
 	public void setBaseDirectory(String baseDirectory)
