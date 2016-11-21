@@ -101,14 +101,10 @@ public class Specializer
 					return start;
 				}
 				continue;
-			case "foreach":
-			{
+			case "for":
 				if (processOuter && ifCondition)
 				{
-					final String remainder = line.substring(skipWhitespace(line, directiveEnd, length));
-					final String[] files = processLine(remainder, replacements).split("\\s*,\\s*");
-
-					final int forEnd = this.processFor(start, end, replacements, files);
+					final int forEnd = this.processFor(start, end, replacements, line, directiveEnd, length);
 					if (forEnd >= 0)
 					{
 						start = forEnd;
@@ -119,7 +115,20 @@ public class Specializer
 				// skip ahead to the line after #endfor
 				start = this.processLines(start + 1, end, replacements, FOR_BLOCK, false, false);
 				continue;
-			}
+			case "foreach":
+				if (processOuter && ifCondition)
+				{
+					final int forEnd = this.processForEach(start, end, replacements, line, directiveEnd, length);
+					if (forEnd >= 0)
+					{
+						start = forEnd;
+						continue;
+					}
+				}
+
+				// skip ahead to the line after #endfor
+				start = this.processLines(start + 1, end, replacements, FOR_BLOCK, false, false);
+				continue;
 			case "endfor":
 				if (enclosingBlock == FOR_BLOCK)
 				{
@@ -193,8 +202,49 @@ public class Specializer
 		return end;
 	}
 
-	private int processFor(int start, int end, LazyReplacementMap replacements, String[] files)
+	private int processFor(int start, int end, LazyReplacementMap replacements, String line, int directiveEnd,
+		                      int length)
 	{
+		final String remainder = line.substring(skipWhitespace(line, directiveEnd, length));
+		final String[] parts = processLine(remainder, replacements).split("\\s*;\\s*");
+
+		if (parts.length < 3)
+		{
+			return -1;
+		}
+
+		final String varName = parts[0];
+		final int from;
+		final int to;
+
+		try
+		{
+			from = Integer.parseInt(parts[1]);
+			to = Integer.parseInt(parts[2]);
+		}
+		catch (NumberFormatException ignored)
+		{
+			return -1;
+		}
+
+		final LazyReplacementMap scope = new LazyReplacementMap(replacements);
+		int forEnd = -1;
+
+		for (int i = from; i <= to; i++)
+		{
+			scope.define(varName, Integer.toString(i));
+			forEnd = this.processLines(start + 1, end, scope, FOR_BLOCK, true, true);
+		}
+
+		return forEnd;
+	}
+
+	private int processForEach(int start, int end, LazyReplacementMap replacements, String line, int directiveEnd,
+		                          int length)
+	{
+		final String remainder = line.substring(skipWhitespace(line, directiveEnd, length));
+		final String[] files = processLine(remainder, replacements).split("\\s*,\\s*");
+
 		int forEnd = -1;
 
 		// repeat processing the following lines once for each specified specialization
@@ -278,6 +328,18 @@ public class Specializer
 		for (; start < end; start++)
 		{
 			if (!Character.isJavaIdentifierPart(line.charAt(start)))
+			{
+				return start;
+			}
+		}
+		return end;
+	}
+
+	private static int findWhitespace(String line, int start, int end)
+	{
+		for (; start < end; start++)
+		{
+			if (Character.isWhitespace(line.charAt(start)))
 			{
 				return start;
 			}
