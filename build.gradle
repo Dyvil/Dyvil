@@ -148,6 +148,7 @@ dependencies {
 		builtBy 'compileTestDyvil'
 	}
 	
+	libraryCompile fileTree('libs/')
 	libraryRuntime libraryFiles
 	
 	// compiler -> library
@@ -316,6 +317,26 @@ task testDyvil(type: JavaExec, dependsOn: [ 'compileTestDyvil' ]) {
 test.dependsOn 'testDyvil'
 
 // ---------------------------------------- Build Tasks ----------------------------------------
+
+/**
+ * Creates a Jar file that contains all library classes generated from Dyvil source code and saves it in libs/
+ */
+task bootstrap(type: Jar, dependsOn: [ 'compileLibraryDyvil' ]) {
+	from("$buildDir/dyvilbin") {
+		include '**/*.class'
+	}
+	
+	destinationDir file('libs')
+	
+	archiveName = "dyvil-bootstrap-${ libraryVersion }.jar"
+	
+	doFirst {
+		// Rename old bootstrap file to '*.old', just in case
+		fileTree(dir: destinationDir, include: "**/$archiveName").forEach {
+			it.renameTo it.absolutePath + '.old'
+		}
+	}
+}
 
 /**
  * Creates a Jar file that contains all library classes (from src/library), including ASM
