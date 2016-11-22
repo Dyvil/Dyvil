@@ -138,7 +138,6 @@ public abstract class Marker implements Comparable<Marker>
 			return;
 		}
 
-		// Compute newline locations
 		int startIndex = this.position.startIndex();
 		int endIndex = this.position.endIndex();
 		final int codeLength = code.length();
@@ -152,28 +151,17 @@ public abstract class Marker implements Comparable<Marker>
 			endIndex = codeLength;
 		}
 
-		final int prevNL = prevNL(code, startIndex);
-		final int nextNL = nextNL(code, endIndex);
-
-		// Append Line
-		buf.append('\n');
-
-		for (int i = prevNL; i < nextNL; i++)
-		{
-			final char c = code.charAt(i);
-			if (c != '\n')
-			{
-				buf.append(c);
-			}
-		}
+		final int prevNL = prevNL(code, startIndex) + 1;
+		final int nextNL = nextNL(code, startIndex);
 
 		buf.append('\n');
+		buf.append(code, prevNL, nextNL);
+		buf.append('\n');
 
-		// Append ^
+		// Append Spaces
 		for (int i = prevNL; i < startIndex; i++)
 		{
-			char c = code.charAt(i);
-			if (c == '\t')
+			if (code.charAt(i) == '\t')
 			{
 				buf.append('\t');
 			}

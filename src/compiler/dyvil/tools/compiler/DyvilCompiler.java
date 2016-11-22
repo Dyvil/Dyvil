@@ -527,7 +527,7 @@ public final class DyvilCompiler implements Tool
 
 	public void warn(String message)
 	{
-		if (this.config.useAnsiColors())
+		if (this.config.useAnsiColors() && !message.isEmpty())
 		{
 			this.output.println(Console.ANSI_YELLOW + message + Console.ANSI_RESET);
 		}

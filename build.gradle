@@ -289,9 +289,7 @@ private void runCompiler(JavaExec exec, String config, String src, String bin)
 	
 	exec.main = compilerMainClass
 	exec.classpath = sourceSets.compiler.runtimeClasspath
-	exec.args = [ "@$config", 'compile' ]
-	
-	if (System.console() != null) exec.args += "--ansi";
+	exec.args = [ "@$config", 'compile', '--ansi' ]
 }
 
 private void runGenSrc(JavaExec exec, String src, String dest)
