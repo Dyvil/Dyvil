@@ -503,7 +503,6 @@ public class CodeClass extends AbstractClass
 
 		if (this.enclosingClass != null)
 		{
-			writer.visitOuterClass(this.enclosingClass.getInternalName(), null, null);
 			this.writeInnerClassInfo(writer);
 		}
 
