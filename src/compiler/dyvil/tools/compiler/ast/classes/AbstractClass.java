@@ -977,8 +977,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			}
 			final String outerName = this.enclosingClass.getInternalName();
 			writer.visitInnerClass(this.getInternalName(), outerName, this.name.qualified, modifiers);
-
-			writer.visitOuterClass(outerName, null, null);
 		}
 	}
 

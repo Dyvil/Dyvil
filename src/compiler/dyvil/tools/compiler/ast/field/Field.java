@@ -452,7 +452,7 @@ public class Field extends Member implements IField
 
 	protected void writeField(ClassWriter writer, int modifiers, String name, String descriptor)
 	{
-		final String signature = this.type.needsSignature() ? this.getSignature() : null;
+		final String signature = this.getType().needsSignature() ? this.getSignature() : null;
 		final Object value;
 		if (this.value != null && this.hasModifier(Modifiers.STATIC) && this.hasConstantValue())
 		{

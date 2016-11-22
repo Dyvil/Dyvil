@@ -69,12 +69,6 @@ public interface IRawType extends IObjectType
 	default void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 	}
-	
-	@Override
-	default String getSignature()
-	{
-		return null;
-	}
 
 	@Override
 	default void appendExtendedName(StringBuilder buffer)
