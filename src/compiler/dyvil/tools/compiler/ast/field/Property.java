@@ -95,7 +95,9 @@ public class Property extends Member implements IProperty
 		{
 			return this.getter;
 		}
-		return this.getter = new CodeMethod(this.enclosingClass, this.name, this.type, this.modifiers);
+		final CodeMethod getter = new CodeMethod(this.enclosingClass, this.name, this.type, this.modifiers);
+		getter.setPosition(this.position);
+		return this.getter = getter;
 	}
 
 	@Override
@@ -121,6 +123,7 @@ public class Property extends Member implements IProperty
 
 		final Name name = Name.from(this.name.unqualified + "_=", this.name.qualified + "_$eq");
 		this.setter = new CodeMethod(this.enclosingClass, name, Types.VOID, this.modifiers);
+		this.setter.setPosition(this.position);
 		this.setterParameter = new CodeParameter(this.position, Names.newValue, this.type, EmptyModifiers.INSTANCE,
 		                                         null);
 		this.setter.getParameterList().addParameter(this.setterParameter);

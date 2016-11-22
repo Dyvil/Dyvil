@@ -372,7 +372,7 @@ public class Field extends Member implements IField
 
 		if (this.property != null)
 		{
-			this.property.checkTypes(markers, context);
+			this.property.check(markers, context);
 		}
 
 		if (Types.isVoid(this.type))
