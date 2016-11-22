@@ -81,7 +81,7 @@ public class InternalGenericType extends GenericType
 		{
 			return new TupleType(this.typeArguments, this.typeArgumentCount);
 		}
-		if (this.internalName.startsWith("dyvil/function/Function"))
+		if (this.internalName.startsWith("dyvil/function/Function$Of"))
 		{
 			final int parameterCount = this.typeArgumentCount - 1;
 			final IType returnType = this.typeArguments[parameterCount];
