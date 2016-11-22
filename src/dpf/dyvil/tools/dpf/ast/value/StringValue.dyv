@@ -6,12 +6,6 @@ import dyvil.tools.parsing.lexer.LexerUtil;
 
 public case class StringValue(protected String value) implements Constant
 {
-	public var value: String
-	{
-		get: this.value
-		set(newValue): this.value = newValue
-	}
-	
 	public override void accept(ValueVisitor visitor) = visitor.visitString(this.value)
 
 	public override Object toObject() = this.value

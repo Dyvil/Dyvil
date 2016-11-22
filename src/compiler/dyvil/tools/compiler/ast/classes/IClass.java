@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.classes;
 
+import dyvil.collection.Collection;
 import dyvil.collection.Set;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationMetadata;
@@ -134,6 +135,8 @@ public interface IClass extends IClassMember, ICompilable, ITypeParametric, ICon
 	boolean isMember(IClassMember member);
 
 	byte getVisibility(IClassMember member);
+
+	Collection<IMethod> getMethods(Name name);
 
 	boolean checkImplements(IMethod candidate, ITypeContext typeContext);
 
