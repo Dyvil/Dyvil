@@ -9,12 +9,10 @@ public abstract class Tuple
 {
 	private init() {} // no instances
 
-	public case class Of2 <
-		type +T1
-		type +T2
-		> (
-		let _1: T1
-		let _2: T2
+	public case class Of2<type +T1, type +T2>
+		(
+			public let _1: T1
+			public let _2: T2
 		) implements Entry<T1, T2>
 	{
 		public override func getKey(): T1 = this._1
@@ -28,14 +26,11 @@ public abstract class Tuple
 		public override func hashCode(): int = Entry.entryHashCode(this)
 	}
 
-	public case class Of3 <
-		type +T1
-		type +T2
-		type +T3
-		> (
-		let _1: T1
-		let _2: T2
-		let _3: T3
+	public case class Of3<type +T1, type +T2, type +T3>
+		(
+			public let _1: T1
+			public let _2: T2
+			public let _3: T3
 		) implements Cell<T1, T2, T3>
 	{
 		public override func getRow(): T1 = this._1
@@ -61,7 +56,7 @@ public abstract class Tuple
 		#end
 		> (
 		#for INDEX; 1; ARITY
-			let _##INDEX: T##INDEX
+			public let _##INDEX: T##INDEX
 		#end
 		)
 	{
