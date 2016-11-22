@@ -1,7 +1,7 @@
 package dyvil.collection.immutable;
 
 import dyvil.annotation.Immutable;
-import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation.internal.DyvilModifiers;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractEnumMap;
 import dyvil.lang.LiteralConvertible;

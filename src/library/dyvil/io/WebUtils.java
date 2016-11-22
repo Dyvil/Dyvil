@@ -1,7 +1,7 @@
 package dyvil.io;
 
 import dyvil.annotation.Utility;
-import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation.internal.DyvilModifiers;
 import dyvil.array.ByteArray;
 import dyvil.reflect.Modifiers;
 

@@ -145,10 +145,10 @@ public abstract class TypeParameter implements ITypeParameter
 	{
 		switch (type)
 		{
-		case "Ldyvil/annotation/_internal/Covariant;":
+		case "Ldyvil/annotation/internal/Covariant;":
 			this.variance = Variance.COVARIANT;
 			return false;
-		case "Ldyvil/annotation/_internal/Contravariant;":
+		case "Ldyvil/annotation/internal/Contravariant;":
 			this.variance = Variance.CONTRAVARIANT;
 			return false;
 		}
@@ -430,8 +430,8 @@ public abstract class TypeParameter implements ITypeParameter
 		if (this.variance != Variance.INVARIANT)
 		{
 			String type = this.variance == Variance.CONTRAVARIANT ?
-				              "Ldyvil/annotation/_internal/Contravariant;" :
-				              "Ldyvil/annotation/_internal/Covariant;";
+				              "Ldyvil/annotation/internal/Contravariant;" :
+				              "Ldyvil/annotation/internal/Covariant;";
 			visitor.visitTypeAnnotation(typeRef, null, type, true).visitEnd();
 		}
 

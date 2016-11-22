@@ -1,6 +1,6 @@
 package dyvil.random;
 
-import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation.internal.DyvilModifiers;
 import dyvil.reflect.Modifiers;
 
 @DyvilModifiers(Modifiers.INTERNAL)

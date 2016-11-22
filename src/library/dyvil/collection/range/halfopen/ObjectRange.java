@@ -1,7 +1,7 @@
 package dyvil.collection.range.halfopen;
 
 import dyvil.annotation.Immutable;
-import dyvil.annotation._internal.Covariant;
+import dyvil.annotation.internal.Covariant;
 import dyvil.collection.range.Rangeable;
 import dyvil.lang.LiteralConvertible;
 

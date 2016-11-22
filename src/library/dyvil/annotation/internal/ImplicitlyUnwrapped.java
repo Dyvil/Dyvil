@@ -1,13 +1,11 @@
-package dyvil.annotation._internal;
+package dyvil.annotation.internal;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE_USE)
-public @interface DyvilType
-{
-	String value();
-}
+@Retention(RetentionPolicy.CLASS)
+public @interface ImplicitlyUnwrapped
+{}

@@ -3,7 +3,7 @@
 
 package dyvil.array;
 
-import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation.internal.DyvilModifiers;
 import dyvil.reflect.Modifiers;
 
 public abstract class PrimitiveObjectArray

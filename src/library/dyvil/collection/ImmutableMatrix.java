@@ -1,6 +1,6 @@
 package dyvil.collection;
 
-import dyvil.annotation._internal.Covariant;
+import dyvil.annotation.internal.Covariant;
 import dyvil.collection.immutable.ArrayMatrix;
 import dyvil.lang.LiteralConvertible;
 import dyvil.tuple.Tuple;

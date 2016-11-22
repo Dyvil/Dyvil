@@ -8,15 +8,15 @@ import dyvil.annotation.Intrinsic;
 import dyvil.annotation.Mutating;
 import dyvil.annotation.Reified;
 import dyvil.annotation.OverloadPriority;
-import dyvil.annotation._internal.DyvilModifiers;
-import dyvil.annotation._internal.Primitive;
+import dyvil.annotation.internal.DyvilModifiers;
+import dyvil.annotation.internal.Primitive;
 import dyvil.collection.List;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 
 #if IS_RANGEABLE
-import dyvil.annotation._internal.DyvilName;
+import dyvil.annotation.internal.DyvilName;
 
 	#if HAS_RANGE_CLASS
 import dyvil.collection.range.closed.TYPE_NAME##Range;

@@ -1,7 +1,7 @@
 package dyvil.string;
 
 import dyvil.annotation.Utility;
-import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation.internal.DyvilModifiers;
 import dyvil.collection.List;
 import dyvil.collection.immutable.EmptyList;
 import dyvil.collection.mutable.ArrayList;

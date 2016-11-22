@@ -1,7 +1,7 @@
 package dyvil.util;
 
 import dyvil.annotation.Immutable;
-import dyvil.annotation._internal.ClassParameters;
+import dyvil.annotation.internal.ClassParameters;
 import dyvil.lang.LiteralConvertible;
 
 import java.util.Objects;

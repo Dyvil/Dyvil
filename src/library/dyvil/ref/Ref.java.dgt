@@ -3,7 +3,7 @@
 
 package dyvil.ref;
 
-import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation.internal.DyvilModifiers;
 import dyvil.ref.boxed.Boxed##TYPE_NAME##Ref;
 import dyvil.reflect.Modifiers;
 

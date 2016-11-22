@@ -1,7 +1,7 @@
 package dyvil.string;
 
 import dyvil.annotation.Utility;
-import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation.internal.DyvilModifiers;
 import dyvil.reflect.Modifiers;
 
 import java.util.Random;
