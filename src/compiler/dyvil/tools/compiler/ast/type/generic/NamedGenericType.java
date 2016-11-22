@@ -137,8 +137,14 @@ public class NamedGenericType extends GenericType implements IUnresolvedType
 		final ITypeAlias typeAlias = context.resolveTypeAlias(this.name, this.typeArgumentCount);
 		if (typeAlias != null)
 		{
-			final IType type = typeAlias.getType();
-			return this.checkCount(markers, typeAlias, "type_alias", type);
+			final IType aliasType = typeAlias.getType();
+			if (!aliasType.isResolved())
+			{
+				markers.add(Markers.semanticError(this.position, "type.alias.unresolved", this.name));
+				return aliasType.atPosition(this.position);
+			}
+
+			return this.checkCount(markers, typeAlias, "type_alias", aliasType);
 		}
 		return null;
 	}

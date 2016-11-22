@@ -234,7 +234,8 @@ public final class Annotation implements IAnnotation
 
 	private RetentionPolicy getRetention()
 	{
-		return this.type.getTheClass().getMetadata().getRetention();
+		final IClass type = this.type.getTheClass();
+		return type == null ? null : type.getMetadata().getRetention();
 	}
 
 	@Override
