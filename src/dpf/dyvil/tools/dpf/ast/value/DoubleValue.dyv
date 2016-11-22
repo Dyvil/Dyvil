@@ -4,12 +4,6 @@ import dyvil.tools.dpf.visitor.ValueVisitor;
 
 public case class DoubleValue(protected double value) implements Constant
 {
-	public var value: double
-	{
-		get: this.value
-		set(newValue): this.value = newValue
-	}
-	
 	public override void accept(ValueVisitor visitor) = visitor.visitDouble(this.value)
 
 	public override Object toObject() = this.value

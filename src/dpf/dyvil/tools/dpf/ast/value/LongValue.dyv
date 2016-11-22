@@ -4,12 +4,6 @@ import dyvil.tools.dpf.visitor.ValueVisitor;
 
 public case class LongValue(protected long value) implements Constant
 {
-	public long value
-	{
-		get: this.value
-		set(newValue): this.value = newValue
-	}
-
 	public override void accept(ValueVisitor visitor) = visitor.visitLong(this.value)
 
 	public override Object toObject() = this.value

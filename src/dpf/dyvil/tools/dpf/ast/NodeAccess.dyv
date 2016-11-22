@@ -11,7 +11,7 @@ public class NodeAccess implements NodeVisitor, NodeElement, Expandable
 {
 	protected Name name = null
 	{
-		public get
+		public override get
 	}
 
 	protected NodeElement element = null

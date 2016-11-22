@@ -155,7 +155,7 @@ dependencies {
 	
 	// dpf -> library
 	dpfCompile sourceSets.library.output
-	dpfRuntime dpfFiles
+	dpfRuntime libraryFiles, dpfFiles
 	
 	// repl -> library, compiler
 	replCompile sourceSets.library.output, sourceSets.compiler.output

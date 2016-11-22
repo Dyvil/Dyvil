@@ -12,7 +12,7 @@ public class Property extends DPFValueVisitor implements NodeElement, Expandable
 {
 	protected Name  name = null
 	{
-		public get
+		public override get
 		public set
 	}
 

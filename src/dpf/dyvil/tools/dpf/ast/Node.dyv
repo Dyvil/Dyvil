@@ -14,7 +14,7 @@ public class Node implements NodeElement, NodeVisitor, Expandable
 {
 	protected Name name = null
 	{
-		public get
+		public override get
 	}
 
 	protected List<Node>       nodes        = new ArrayList<Node>

@@ -4,12 +4,6 @@ import dyvil.tools.dpf.visitor.ValueVisitor;
 
 public case class FloatValue(protected float value) implements Constant
 {
-	public var value: float
-	{
-		get: this.value
-		set(newValue): this.value = newValue
-	}
-	
 	public override void accept(ValueVisitor visitor) = visitor.visitFloat(this.value)
 
 	public override Object toObject() = this.value
