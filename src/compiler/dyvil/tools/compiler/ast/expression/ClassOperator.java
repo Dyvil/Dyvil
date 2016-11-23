@@ -60,7 +60,7 @@ public final class ClassOperator extends AbstractValue implements IConstantValue
 	@Override
 	public Object toObject()
 	{
-		return dyvil.tools.asm.Type.getType(this.type.getExtendedName());
+		return null;
 	}
 	
 	@Override
