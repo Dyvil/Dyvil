@@ -35,7 +35,7 @@ public abstract class Primitives
 
 	// TYPE_NAME equals
 
-	public infix inline boolean equals(PRIMITIVE v1, PRIMITIVE v2) = v1 == v2
+	public infix inline boolean equals(PRIMITIVE lhs, PRIMITIVE rhs) = lhs == rhs
 #endfor
 
 	// END OF GENERATED CODE

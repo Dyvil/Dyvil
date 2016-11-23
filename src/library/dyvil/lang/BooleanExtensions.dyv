@@ -12,26 +12,26 @@ public abstract class BooleanExtensions
 	public prefix func !(boolean v): boolean = !v
 
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
-	public infix func ==(boolean v1, boolean v2): boolean = v1 == v2
+	public infix func ==(boolean lhs, boolean rhs): boolean = lhs == rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPNE ])
-	public infix func !=(boolean v1, boolean v2): boolean = v1 != v2
+	public infix func !=(boolean lhs, boolean rhs): boolean = lhs != rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, IAND ])
-	public infix func &(boolean v1, boolean v2): boolean = v1 && v2
+	public infix func &(boolean lhs, boolean rhs): boolean = lhs && rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, IOR ])
-	public infix func |(boolean v1, boolean v2): boolean = v1 || v2
+	public infix func |(boolean lhs, boolean rhs): boolean = lhs || rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, IXOR ])
-	public infix func ^(boolean v1, boolean v2): boolean = v1 ^ v2
+	public infix func ^(boolean lhs, boolean rhs): boolean = lhs ^ rhs
 
 	@Intrinsic([ LOAD_0, BNOT, LOAD_1, IOR ])
-	public infix func ==>(boolean v1, boolean v2): boolean = !v1 || v2
+	public infix func ==>(boolean lhs, boolean rhs): boolean = !lhs || rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, BNOT, IOR ])
-	public infix func <==(boolean v1, boolean v2): boolean = v1 || !v2
+	public infix func <==(boolean lhs, boolean rhs): boolean = lhs || !rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
-	public infix func <=>(boolean v1, boolean v2): boolean = v1 == v2
+	public infix func <=>(boolean lhs, boolean rhs): boolean = lhs == rhs
 }
