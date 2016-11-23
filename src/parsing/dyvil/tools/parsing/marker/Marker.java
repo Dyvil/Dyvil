@@ -151,8 +151,8 @@ public abstract class Marker implements Comparable<Marker>
 			endIndex = codeLength;
 		}
 
-		final int prevNL = prevNL(code, startIndex) + 1;
-		final int nextNL = nextNL(code, startIndex);
+		final int prevNL = lineStart(code, startIndex);
+		final int nextNL = lineEnd(code, startIndex);
 
 		buf.append('\n');
 		buf.append(code, prevNL, nextNL);
@@ -187,7 +187,7 @@ public abstract class Marker implements Comparable<Marker>
 		buf.append('\n');
 	}
 
-	private static int prevNL(String code, int start)
+	private static int lineStart(String code, int start)
 	{
 		if (code.charAt(start) == '\n')
 		{
@@ -199,10 +199,10 @@ public abstract class Marker implements Comparable<Marker>
 		{
 			return 0;
 		}
-		return i;
+		return i + 1;
 	}
 
-	private static int nextNL(String code, int end)
+	private static int lineEnd(String code, int end)
 	{
 		final int i = code.indexOf('\n', end);
 		if (i < 0)
