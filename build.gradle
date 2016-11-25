@@ -37,6 +37,10 @@ boolean nightly = false
 
 Map<String, String> env = System.getenv()
 String droneBuild = env['DRONE_BUILD_NUMBER']
+if (!droneBuild)
+{
+	droneBuild = env['TRAVIS_BUILD_NUMBER']
+}
 
 if (droneBuild)
 {
