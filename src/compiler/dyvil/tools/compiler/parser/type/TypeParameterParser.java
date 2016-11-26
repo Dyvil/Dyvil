@@ -134,7 +134,7 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 				return;
 			case DyvilKeywords.SUPER:
 				pm.pushParser(this.newTypeParser());
-				this.setBoundMode(UPPER_BOUND);
+				this.setBoundMode(LOWER_BOUND);
 				return;
 			}
 

@@ -499,21 +499,23 @@ public abstract class TypeParameter implements ITypeParameter
 			}
 		}
 
+		buffer.append("type ");
+
 		this.variance.appendPrefix(buffer);
 		buffer.append(this.name);
+
+		final IType upperBound = this.getUpperBound();
+		if (upperBound != null)
+		{
+			buffer.append(": ");
+			upperBound.toString(prefix, buffer);
+		}
 
 		final IType lowerBound = this.getLowerBound();
 		if (lowerBound != null)
 		{
 			buffer.append(" super ");
 			lowerBound.toString(prefix, buffer);
-		}
-
-		final IType upperBound = this.getUpperBound();
-		if (upperBound != null)
-		{
-			buffer.append(" extends ");
-			upperBound.toString(prefix, buffer);
 		}
 	}
 }
