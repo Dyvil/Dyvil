@@ -336,13 +336,6 @@ task bootstrap(type: Jar, dependsOn: [ 'compileLibraryDyvil' ]) {
 	destinationDir file('libs')
 	
 	archiveName = "dyvil-bootstrap-${ libraryVersion }.jar"
-	
-	doFirst {
-		// Rename old bootstrap file to '*.old', just in case
-		fileTree(dir: destinationDir, include: "**/$archiveName").forEach {
-			it.renameTo it.absolutePath + '.old'
-		}
-	}
 }
 
 /**
@@ -430,6 +423,12 @@ task buildAll(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil', '
 }
 
 build.setDependsOn([ 'buildAll', 'buildLibrary', 'buildCompiler', 'buildREPL', 'buildDPF', 'buildGenSrc' ])
+
+tasks.withType(Jar).forEach {
+	it.from('.') {
+		include 'LICENSE.txt'
+	}
+}
 
 // ---------------------------------------- Version Files ----------------------------------------
 
