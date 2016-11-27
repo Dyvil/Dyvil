@@ -1,6 +1,6 @@
 package dyvil.collection;
 
-import dyvil.tuple.Tuple3;
+import dyvil.tuple.Tuple;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -29,13 +29,13 @@ public interface Cell<R, C, V> extends Serializable
 	V getValue();
 	
 	/**
-	 * Converts this entry to a {@link Tuple3 Tuple}.
+	 * Converts this entry to a {@link Tuple.Of3 Tuple}.
 	 *
 	 * @return a tuple with this cell's row, column and value
 	 */
-	default Tuple3<R, C, V> toTuple()
+	default Tuple.Of3<R, C, V> toTuple()
 	{
-		return new Tuple3<R, C, V>(this.getRow(), this.getColumn(), this.getValue());
+		return new Tuple.Of3<R, C, V>(this.getRow(), this.getColumn(), this.getValue());
 	}
 	
 	static String cellToString(Cell<?, ?, ?> cell)

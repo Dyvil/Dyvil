@@ -1,7 +1,7 @@
 package dyvil.collection.range;
 
 import dyvil.annotation.Immutable;
-import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation.internal.DyvilModifiers;
 import dyvil.collection.Range;
 import dyvil.collection.iterator.EmptyIterator;
 import dyvil.lang.LiteralConvertible;

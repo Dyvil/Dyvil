@@ -203,7 +203,7 @@ public class REPLVariable extends Field
 
 		try
 		{
-			ObjectArray.toString(this.displayValue, buffer);
+			ObjectArray.deepToString(this.displayValue, buffer);
 		}
 		catch (Throwable t)
 		{

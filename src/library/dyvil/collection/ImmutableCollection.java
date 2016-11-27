@@ -2,7 +2,7 @@ package dyvil.collection;
 
 import dyvil.annotation.Immutable;
 import dyvil.annotation.Mutating;
-import dyvil.annotation._internal.Covariant;
+import dyvil.annotation.internal.Covariant;
 import dyvil.util.ImmutableException;
 
 import java.util.Iterator;

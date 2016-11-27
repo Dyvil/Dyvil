@@ -164,8 +164,13 @@ public class ArrayType implements IObjectType, ITyped
 	@Override
 	public boolean isSameType(IType type)
 	{
-		return type.isArrayType() && this.mutability == type.getMutability() && Types.isSameType(this.type,
-		                                                                                         type.getElementType());
+		if (!type.isArrayType() || this.mutability != type.getMutability())
+		{
+			return false;
+		}
+
+		final IType elementType = type.getElementType();
+		return this.checkPrimitiveType(elementType) && Types.isSameType(this.type, type.getElementType());
 	}
 
 	@Override
@@ -181,18 +186,14 @@ public class ArrayType implements IObjectType, ITyped
 	}
 
 	@Override
-	public boolean isSuperTypeOf(IType type)
+	public boolean isSuperTypeOf(IType subType)
 	{
-		if (!type.isArrayType())
-		{
-			return false;
-		}
-		if (!checkImmutable(this, type))
+		if (!subType.isArrayType() || !checkImmutable(this, subType))
 		{
 			return false;
 		}
 
-		final IType elementType = type.getElementType();
+		final IType elementType = subType.getElementType();
 		return this.checkPrimitiveType(elementType) && Types.isSuperType(this.type, elementType);
 	}
 

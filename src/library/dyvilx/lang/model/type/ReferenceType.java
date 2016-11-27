@@ -1,6 +1,6 @@
 package dyvilx.lang.model.type;
 
-import dyvil.annotation._internal.ClassParameters;
+import dyvil.annotation.internal.ClassParameters;
 import dyvil.ref.*;
 
 @ClassParameters(names = { "type" })

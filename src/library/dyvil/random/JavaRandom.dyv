@@ -1,0 +1,24 @@
+package dyvil.random
+
+import java.util.Random
+
+public internal class JavaRandom extends Random implements dyvil.random.Random
+{
+	private const let serialVersionUID: long = -6648049590269700311L;
+
+	public init()
+	{
+		super.init()
+	}
+
+	public init(long seed)
+	{
+		super.init(seed)
+	}
+
+	public override func next(int bits): int = super<Random>.next(bits)
+
+	public override func nextGaussian(): double = super<Random>.nextGaussian()
+
+	public override func toString(): String = "Random()"
+}

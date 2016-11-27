@@ -1,6 +1,6 @@
 package dyvil.collection;
 
-import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation.internal.DyvilModifiers;
 import dyvil.collection.immutable.ArrayMap;
 import dyvil.collection.immutable.EmptyMap;
 import dyvil.collection.immutable.SingletonMap;
@@ -69,11 +69,7 @@ public interface JavaMaps
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	static <K, V> Option<V> getOption(java.util.Map<K, V> map, Object key)
 	{
-		if (!map.containsKey(key))
-		{
-			return None.instance;
-		}
-		return new Some(map.get(key));
+		return !map.containsKey(key) ? Option.apply() : new Some<>(map.get(key));
 	}
 	
 	// Mutating Operations

@@ -48,6 +48,11 @@ public class LazyReplacementMap implements ReplacementMap
 		{
 			return this.store.get(key);
 		}
+		return this.getParent(key);
+	}
+
+	public String getParent(String key)
+	{
 		return this.parent == null ? null : this.parent.getReplacement(key);
 	}
 }

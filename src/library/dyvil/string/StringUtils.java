@@ -1,7 +1,6 @@
 package dyvil.string;
 
-import dyvil.annotation.Utility;
-import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation.internal.DyvilModifiers;
 import dyvil.collection.List;
 import dyvil.collection.immutable.EmptyList;
 import dyvil.collection.mutable.ArrayList;
@@ -13,15 +12,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The {@linkplain Utility utility interface} <b>StringUtils</b> can be used for several String-related functions such
+ * The <b>StringUtils</b> class can be used for several String-related functions such
  * as splitting a string into a list of words, converting it to an identifier or acronym, converting to Title Case or
  * camelCase, counting the number of times a character appears a the string, getting the index of a Regular Expression
  * as well as several useful utility functions.
- *
- * @author Clashsoft
- * @version 1.0
  */
-@Utility(String.class)
 public final class StringUtils
 {
 	public static final String[] EMPTY_STRING_ARRAY = new String[0];

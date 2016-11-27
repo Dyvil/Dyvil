@@ -1,7 +1,7 @@
 package dyvil.ref;
 
-import dyvil.annotation._internal.DyvilModifiers;
-import dyvil.annotation._internal.DyvilName;
+import dyvil.annotation.internal.DyvilModifiers;
+import dyvil.annotation.internal.DyvilName;
 import dyvil.ref.unboxed.*;
 import dyvil.reflect.Modifiers;
 

@@ -76,7 +76,8 @@ public final class PrimitiveType implements IType
 	}
 
 	protected final Name   name;
-	protected       IClass theClass;
+	protected       IClass wrapperClass;
+	protected       IClass extClass;
 
 	private final int  typecode;
 	private final char typeChar;
@@ -193,7 +194,7 @@ public final class PrimitiveType implements IType
 	@Override
 	public final IType getObjectType()
 	{
-		return new ClassType(this.theClass);
+		return new ClassType(this.wrapperClass);
 	}
 
 	@Override
@@ -212,7 +213,7 @@ public final class PrimitiveType implements IType
 		case CHAR_CODE:
 			return "Char";
 		default:
-			return this.theClass.getName().qualified;
+			return this.wrapperClass.getName().qualified;
 		}
 	}
 
@@ -308,20 +309,20 @@ public final class PrimitiveType implements IType
 	@Override
 	public IClass getTheClass()
 	{
-		return this.theClass;
+		return this.wrapperClass;
 	}
 
 	@Override
 	public boolean isSuperClassOf(IType subType)
 	{
-		return this.theClass == subType.getTheClass() || subType.isPrimitive() && isPromotable(subType.getTypecode(),
-		                                                                                       this.typecode);
+		return this.wrapperClass == subType.getTheClass() || subType.isPrimitive() && isPromotable(
+			subType.getTypecode(), this.typecode);
 	}
 
 	@Override
 	public boolean isSameType(IType type)
 	{
-		return this.theClass == type.getTheClass();
+		return this.wrapperClass == type.getTheClass();
 	}
 
 	private static long bitMask(int from, int to)
@@ -343,7 +344,7 @@ public final class PrimitiveType implements IType
 	@Override
 	public IType resolveType(ITypeParameter typeParameter)
 	{
-		return this.theClass.resolveType(typeParameter, this);
+		return this.wrapperClass.resolveType(typeParameter, this);
 	}
 
 	@Override
@@ -415,20 +416,39 @@ public final class PrimitiveType implements IType
 	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
-		if (this.theClass != null)
+		if (this.wrapperClass != null)
 		{
-			this.theClass.getMethodMatches(list, receiver, name, arguments);
-			if (!list.isEmpty())
+			this.wrapperClass.getMethodMatches(list, receiver, name, arguments);
+			if (list.hasCandidate())
 			{
 				return;
 			}
 		}
+
+		if (this.extClass != null)
+		{
+			this.extClass.getMethodMatches(list, receiver, name, arguments);
+			if (list.hasCandidate())
+			{
+				return;
+			}
+		}
+
 		Types.PRIMITIVES_CLASS.getMethodMatches(list, receiver, name, arguments);
 	}
 
 	@Override
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
+		if (this.extClass != null)
+		{
+			this.extClass.getImplicitMatches(list, value, targetType);
+			if (list.hasCandidate())
+			{
+				return;
+			}
+		}
+
 		Types.PRIMITIVES_CLASS.getImplicitMatches(list, value, targetType);
 	}
 
@@ -446,7 +466,7 @@ public final class PrimitiveType implements IType
 	@Override
 	public String getInternalName()
 	{
-		return this.theClass.getInternalName();
+		return this.wrapperClass.getInternalName();
 	}
 
 	@Override
@@ -463,7 +483,7 @@ public final class PrimitiveType implements IType
 			buffer.append(this.typeChar);
 			return;
 		}
-		buffer.append('L').append(this.theClass.getInternalName()).append(';');
+		buffer.append('L').append(this.wrapperClass.getInternalName()).append(';');
 	}
 
 	@Override

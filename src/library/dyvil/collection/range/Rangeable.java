@@ -1,6 +1,6 @@
 package dyvil.collection.range;
 
-import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation.internal.DyvilModifiers;
 import dyvil.annotation.analysis.NotNull;
 import dyvil.collection.Range;
 import dyvil.reflect.Modifiers;

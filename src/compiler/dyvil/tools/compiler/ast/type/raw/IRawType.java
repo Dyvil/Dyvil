@@ -47,7 +47,12 @@ public interface IRawType extends IObjectType
 	default IType resolveType(ITypeParameter typeParameter)
 	{
 		final IClass theClass = this.getTheClass();
-		return theClass == null ? null : theClass.resolveType(typeParameter, this);
+		if (theClass == null || typeParameter.getGeneric() == theClass)
+		{
+			return null;
+		}
+
+		return theClass.resolveType(typeParameter, this);
 	}
 	
 	@Override
@@ -68,12 +73,6 @@ public interface IRawType extends IObjectType
 	@Override
 	default void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-	}
-	
-	@Override
-	default String getSignature()
-	{
-		return null;
 	}
 
 	@Override

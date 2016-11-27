@@ -1,181 +1,162 @@
-package dyvil.tools.dpf.ast;
+package dyvil.tools.dpf.ast
 
-import dyvil.collection.Collection;
-import dyvil.collection.List;
-import dyvil.collection.Map;
-import dyvil.collection.mutable.ArrayList;
-import dyvil.tools.dpf.visitor.NodeVisitor;
-import dyvil.tools.dpf.visitor.ValueVisitor;
-import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.collection.Collection
+import dyvil.collection.List
+import dyvil.collection.Map
+import dyvil.collection.mutable.ArrayList
+import dyvil.tools.dpf.visitor.NodeVisitor
+import dyvil.tools.dpf.visitor.ValueVisitor
+import dyvil.tools.parsing.Name
+import dyvil.tools.parsing.ast.IASTNode
+import dyvil.tools.parsing.position.ICodePosition
 
 public class Node implements NodeElement, NodeVisitor, Expandable
 {
-	protected Name name
+	protected Name name = null
+	{
+		public override get
+	}
+
 	protected List<Node>       nodes        = new ArrayList<Node>
 	protected List<Property>   properties   = new ArrayList<Property>
 	protected List<NodeAccess> nodeAccesses = new ArrayList<NodeAccess>
 	
-	protected ICodePosition position;
-	
 	public init(Name name)
 	{
-		this.name = name;
-	}
-	
-	public override void setPosition(ICodePosition position)
-	{
-		this.position = position;
-	}
-	
-	public override ICodePosition getPosition()
-	{
-		return this.position;
-	}
-	
-	public override Name getName()
-	{
-		return this.name;
+		this.name = name
 	}
 
-	public void addNode(Node node)
+	@BytecodeName("addNode")
+	public func add(Node node): void = this.nodes.add(node)
+
+	@BytecodeName("addNodeAccess")
+	public func add(NodeAccess nodeAccess): void = this.nodeAccesses.add(nodeAccess)
+
+	@BytecodeName("addProperty")
+	public func add(Property property): void = this.properties.add(property)
+	
+	public override func visitNode(Name name): NodeVisitor
 	{
-		this.nodes.add(node);
+		Node node = new Node(name)
+		this.nodes.add(node)
+		return node
+	}
+	
+	public override func visitProperty(Name name): ValueVisitor
+	{
+		Property property = new Property(name)
+		this.properties.add(property)
+		return property
+	}
+	
+	public override func visitNodeAccess(Name name): NodeVisitor
+	{
+		NodeAccess access = new NodeAccess(name)
+		this.nodeAccesses.add(access)
+		return access
+	}
+	
+	public override func accept(NodeVisitor visitor): void
+	{
+		this.acceptBody(visitor.visitNode(this.name))
 	}
 
-	public void addNodeAccess(NodeAccess nodeAccess)
+	public internal func acceptBody(NodeVisitor nodeVisitor): void
 	{
-		this.nodeAccesses.add(nodeAccess);
-	}
-
-	public void addProperty(Property property)
-	{
-		this.properties.add(property);
-	}
-	
-	public override NodeVisitor visitNode(Name name)
-	{
-		Node node = new Node(name);
-		this.nodes.add(node);
-		return node;
-	}
-	
-	public override ValueVisitor visitProperty(Name name)
-	{
-		Property property = new Property(name);
-		this.properties.add(property);
-		return property;
-	}
-	
-	public override NodeVisitor visitNodeAccess(Name name)
-	{
-		NodeAccess access = new NodeAccess(name);
-		this.nodeAccesses.add(access);
-		return access;
-	}
-	
-	public override void accept(NodeVisitor visitor)
-	{
-		this.acceptBody(visitor.visitNode(this.name));
-	}
-
-	public void acceptBody(NodeVisitor nodeVisitor)
-	{
-		for (Property element <- this.properties)
+		for (var element <- this.properties)
 		{
-			element.accept(nodeVisitor);
+			element.accept(nodeVisitor)
 		}
-		for (Node node <- this.nodes)
+		for (var node <- this.nodes)
 		{
-			node.accept(nodeVisitor);
+			node.accept(nodeVisitor)
 		}
-		for (NodeAccess nodeAccess <- this.nodeAccesses)
+		for (var nodeAccess <- this.nodeAccesses)
 		{
-			nodeAccess.accept(nodeVisitor);
+			nodeAccess.accept(nodeVisitor)
 		}
-		nodeVisitor.visitEnd();
+		nodeVisitor.visitEnd()
 	}
 
-	public override Node expand(Map<String, Object> mappings, boolean mutate)
+	public override func expand(Map<String, Object> mappings, boolean mutate): Node
 	{
 		if (mutate)
 		{
-			this.expandChildren(mappings);
-			return this;
+			this.expandChildren(mappings)
+			return this
 		}
 		else
 		{
-			Node node = new Node(this.name);
-			this.expand(node, mappings);
-			return node;
+			Node node = new Node(this.name)
+			this.expand(node, mappings)
+			return node
 		}
 	}
 
-	protected void expandChildren(Map<String, Object> mappings)
+	protected func expandChildren(Map<String, Object> mappings): void
 	{
 		for (Node node <- this.nodes)
 		{
-			node.expand(mappings, true);
+			node.expand(mappings, true)
 		}
 		for (Property property <- this.properties)
 		{
-			property.expand(mappings, true);
+			property.expand(mappings, true)
 		}
 		for (NodeAccess nodeAccess <- this.nodeAccesses)
 		{
-			nodeAccess.expand(mappings, true);
+			nodeAccess.expand(mappings, true)
 		}
 	}
 
-	protected void expand(Node node, Map<String, Object> mappings)
+	protected func expand(Node node, Map<String, Object> mappings): void
 	{
-		node.nodes = this.nodes.mapped(childNode => childNode.expand(mappings, false));
-		node.properties = this.properties.mapped(property => property.expand(mappings, false));
-		node.nodeAccesses = this.nodeAccesses.mapped(nodeAccess => nodeAccess.expand(mappings, false));
+		node.nodes = this.nodes.mapped(childNode => childNode.expand(mappings, false))
+		node.properties = this.properties.mapped(property => property.expand(mappings, false))
+		node.nodeAccesses = this.nodeAccesses.mapped(nodeAccess => nodeAccess.expand(mappings, false))
 	}
 
-	public override String toString() = IASTNode.toString(this)
+	public override func toString(): String = IASTNode.toString(this)
 	
-	public override void toString(String indent, StringBuilder buffer)
+	public override func toString(String indent, StringBuilder buffer): void
 	{
-		buffer.append(this.name).append('\n').append(indent).append('{').append('\n');
+		buffer.append(this.name).append('\n').append(indent).append('{').append('\n')
 		
-		this.bodyToString(indent + '\t', buffer);
+		this.bodyToString(indent + '\t', buffer)
 		
-		buffer.append(indent).append('}');
+		buffer.append(indent).append('}')
 	}
 	
-	public void bodyToString(String indent, StringBuilder buffer)
+	public func bodyToString(String indent, StringBuilder buffer): void
 	{
-		for (NodeElement element <- this.properties)
+		for (var element <- this.properties)
 		{
-			buffer.append(indent);
-			element.toString(indent, buffer);
-			buffer.append('\n');
+			buffer.append(indent)
+			element.toString(indent, buffer)
+			buffer.append('\n')
 		}
 		
-		for (Node node <- this.nodes)
+		for (var node <- this.nodes)
 		{
-			buffer.append(indent).append('\n').append(indent);
-			node.toString(indent, buffer);
-			buffer.append('\n');
+			buffer.append(indent).append('\n').append(indent)
+			node.toString(indent, buffer)
+			buffer.append('\n')
 		}
 
-		for (NodeAccess nodeAccess <- this.nodeAccesses)
+		for (var nodeAccess <- this.nodeAccesses)
 		{
-			buffer.append(indent).append('\n').append(indent);
-			nodeAccess.toString(indent, buffer);
-			buffer.append('\n');
+			buffer.append(indent).append('\n').append(indent)
+			nodeAccess.toString(indent, buffer)
+			buffer.append('\n')
 		}
 	}
 
-	public override boolean equals(Object obj)
+	public override func equals(Object obj): boolean
 	{
 		if (this === obj) return true
 		if (!(obj is Node)) return false
 
-		let other = obj as Node;
+		let other = obj as Node
 
 		if (this.name !== other.name) return false
 		if (!Collection.unorderedEquals(this.properties, other.properties)) return false
@@ -184,7 +165,7 @@ public class Node implements NodeElement, NodeVisitor, Expandable
 		return true
 	}
 
-	public override int hashCode()
+	public override func hashCode(): int
 	{
 		final int prime = 31
 		int result = this.name.hashCode()

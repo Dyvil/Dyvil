@@ -1,0 +1,80 @@
+package dyvil.lang
+
+using   dyvil.reflect.Opcodes._
+import  dyvil.collection.range.LongRange
+
+public abstract class LongExtensions
+{
+	private init() {}
+
+	// Long Operators
+
+	@Intrinsic([ LOAD_0 ])
+	public prefix func +(long value): long = value
+
+	@Intrinsic([ LOAD_0, LNEG ])
+	public prefix func -(long value): long = -value
+
+	@Intrinsic([ LOAD_0, LNOT ])
+	public prefix func ~(long value): long = ~value
+
+	@Intrinsic([ LOAD_0, LOAD_1, LCMPEQ ])
+	public infix func ==(long lhs, long rhs): boolean = lhs == rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, LCMPNE ])
+	public infix func !=(long lhs, long rhs): boolean = lhs != rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, LCMPLT ])
+	public infix func <(long lhs, long rhs): boolean = lhs < rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, LCMPLE ])
+	public infix func <=(long lhs, long rhs): boolean = lhs <= rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, LCMPGT ])
+	public infix func >(long lhs, long rhs): boolean = lhs > rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, LCMPGE ])
+	public infix func >=(long lhs, long rhs): boolean = lhs >= rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, LADD ])
+	public infix func +(long lhs, long rhs): long = lhs + rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, LSUB ])
+	public infix func -(long lhs, long rhs): long = lhs - rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, LMUL ])
+	public infix func *(long lhs, long rhs): long = lhs * rhs
+
+	public infix func **(long lhs, int rhs): long = dyvil.math.PowImpl.pow(lhs, rhs)
+
+	@Intrinsic([ LOAD_0, L2D, LOAD_1, L2D, DDIV ])
+	public infix func /(long lhs, long rhs): double = lhs / rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, LREM ])
+	public infix func %(long lhs, long rhs): long = lhs % rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, LDIV ])
+	public infix func \(long lhs, long rhs): long = lhs \ rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, LAND ])
+	public infix func &(long lhs, long rhs): long = lhs & rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, LOR ])
+	public infix func |(long lhs, long rhs): long = lhs | rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, LXOR ])
+	public infix func ^(long lhs, long rhs): long = lhs ^ rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, L2I, LSHL ])
+	public infix func <<(long lhs, long rhs): long = lhs << rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, L2I, LSHR ])
+	public infix func >>(long lhs, long rhs): long = lhs >> rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, L2I, LUSHR ])
+	public infix func >>>(long lhs, long rhs): long = lhs >>> rhs
+
+	public infix func ..(long start, long end): LongRange = LongRange(start, to: end)
+
+	public infix func ..<(long start, long end): LongRange = LongRange(start, toExclusive: end)
+}

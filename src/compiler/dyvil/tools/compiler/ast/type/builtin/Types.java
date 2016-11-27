@@ -59,16 +59,6 @@ public final class Types
 	public static final ClassType RUNTIME_EXCEPTION = new ClassType();
 	public static final ClassType SERIALIZABLE      = new ClassType();
 
-	public static IClass VOID_CLASS;
-	public static IClass BOOLEAN_CLASS;
-	public static IClass BYTE_CLASS;
-	public static IClass SHORT_CLASS;
-	public static IClass CHAR_CLASS;
-	public static IClass INT_CLASS;
-	public static IClass LONG_CLASS;
-	public static IClass FLOAT_CLASS;
-	public static IClass DOUBLE_CLASS;
-
 	public static IClass PRIMITIVES_CLASS;
 
 	public static IClass OBJECT_CLASS;
@@ -107,15 +97,25 @@ public final class Types
 
 	public static void initTypes()
 	{
-		VOID.theClass = VOID_CLASS = Package.javaLang.resolveClass("Void");
-		BOOLEAN.theClass = BOOLEAN_CLASS = Package.javaLang.resolveClass("Boolean");
-		BYTE.theClass = BYTE_CLASS = Package.javaLang.resolveClass("Byte");
-		SHORT.theClass = SHORT_CLASS = Package.javaLang.resolveClass("Short");
-		CHAR.theClass = CHAR_CLASS = Package.javaLang.resolveClass("Character");
-		INT.theClass = INT_CLASS = Package.javaLang.resolveClass("Integer");
-		LONG.theClass = LONG_CLASS = Package.javaLang.resolveClass("Long");
-		FLOAT.theClass = FLOAT_CLASS = Package.javaLang.resolveClass("Float");
-		DOUBLE.theClass = DOUBLE_CLASS = Package.javaLang.resolveClass("Double");
+		VOID.wrapperClass = Package.javaLang.resolveClass("Void");
+		BOOLEAN.wrapperClass = Package.javaLang.resolveClass("Boolean");
+		BOOLEAN.extClass = Package.dyvilLang.resolveClass("BooleanExtensions");
+
+		INT.wrapperClass = Package.javaLang.resolveClass("Integer");
+		INT.extClass = Package.dyvilLang.resolveClass("IntExtensions");
+		LONG.wrapperClass = Package.javaLang.resolveClass("Long");
+		LONG.extClass = Package.dyvilLang.resolveClass("LongExtensions");
+		FLOAT.wrapperClass = Package.javaLang.resolveClass("Float");
+		FLOAT.extClass = Package.dyvilLang.resolveClass("FloatExtensions");
+		DOUBLE.wrapperClass = Package.javaLang.resolveClass("Double");
+		DOUBLE.extClass = Package.dyvilLang.resolveClass("DoubleExtensions");
+
+		BYTE.wrapperClass = Package.javaLang.resolveClass("Byte");
+		BYTE.extClass = INT.extClass;
+		SHORT.wrapperClass = Package.javaLang.resolveClass("Short");
+		SHORT.extClass = INT.extClass;
+		CHAR.wrapperClass = Package.javaLang.resolveClass("Character");
+		CHAR.extClass = INT.extClass;
 
 		PRIMITIVES_CLASS = Package.dyvilLang.resolveClass("Primitives");
 
@@ -211,7 +211,7 @@ public final class Types
 		{
 			return IValue.EXACT_MATCH;
 		}
-		return Types.isSuperType(superType, subType) ? IValue.SUBTYPE_MATCH :IValue. MISMATCH;
+		return Types.isSuperType(superType, subType) ? IValue.SUBTYPE_MATCH : IValue.MISMATCH;
 	}
 
 	public static boolean isSameClass(IType type1, IType type2)

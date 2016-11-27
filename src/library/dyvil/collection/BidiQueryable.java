@@ -1,6 +1,5 @@
 package dyvil.collection;
 
-import dyvil.util.None;
 import dyvil.util.Option;
 import dyvil.util.Some;
 
@@ -69,7 +68,7 @@ public interface BidiQueryable<E> extends Queryable<E>
 				return new Some<E>(element);
 			}
 		}
-		return None.instance;
+		return Option.apply();
 	}
 	
 	@Override
@@ -140,7 +139,7 @@ public interface BidiQueryable<E> extends Queryable<E>
 	{
 		if (this.isEmpty())
 		{
-			return None.instance;
+			return Option.apply();
 		}
 
 		return new Some<>(this.reduceLeft(reducer));
@@ -150,7 +149,7 @@ public interface BidiQueryable<E> extends Queryable<E>
 	{
 		if (this.isEmpty())
 		{
-			return None.instance;
+			return Option.apply();
 		}
 
 		return new Some<>(this.reduceRight(reducer));

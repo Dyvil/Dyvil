@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.method;
 
 import dyvil.annotation.Reified;
+import dyvil.collection.Collection;
 import dyvil.collection.Set;
 import dyvil.collection.mutable.HashSet;
 import dyvil.collection.mutable.IdentityHashSet;
@@ -13,7 +14,6 @@ import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -309,8 +309,8 @@ public class CodeMethod extends AbstractMethod
 
 	private void checkDuplicates(MarkerList markers)
 	{
-		final IClassBody body = this.enclosingClass.getBody();
-		if (body == null)
+		final Collection<IMethod> candidates = this.enclosingClass.getMethods(this.name);
+		if (candidates.isEmpty())
 		{
 			return;
 		}
@@ -319,46 +319,50 @@ public class CodeMethod extends AbstractMethod
 		final String signature = this.getSignature();
 		final int parameterCount = this.parameters.size();
 
-		String mangledName = this.getInternalName();
-		boolean thisMangled = !this.name.qualified.equals(mangledName);
+		boolean thisMangled = !this.name.qualified.equals(this.getInternalName());
 
-		for (int i = body.methodCount() - 1; i >= 0; i--)
+		for (IMethod method : candidates)
 		{
-			final IMethod method = body.getMethod(i);
-			if (method == this || method.getName() != this.name // common cases
-				    || method.getParameterList().size() != parameterCount // optimization
-				    || !method.getDescriptor().equals(descriptor))
-			{
-				continue;
-			}
-
-			final String otherMangledName = method.getInternalName();
-			if (!mangledName.equals(otherMangledName))
-			{
-				continue;
-			}
-
-			// Name mangling required
-
-			if (!thisMangled)
-			{
-				// ensure this method gets name-mangled
-				this.internalName = mangledName = createMangledName(this);
-				thisMangled = true;
-
-				final Marker marker = Markers.semantic(this.position, "method.name_mangled", this.name);
-				marker.addInfo(Markers.getSemantic("method.name_mangled.1", this.name));
-				marker.addInfo(Markers.getSemantic("method.name_mangled.2", this.name));
-				marker.addInfo(Markers.getSemantic("method.name_mangled.bytecode_name", mangledName));
-				markers.add(marker);
-			}
-
-			if (mangledName.equals(otherMangledName))
-			{
-				// also true if this.getSignature equals method.getSignature
-				markers.add(Markers.semanticError(this.position, "method.duplicate", this.name, signature));
-			}
+			thisMangled = this.checkDuplicate(markers, descriptor, signature, parameterCount, thisMangled, method);
 		}
+	}
+
+	private boolean checkDuplicate(MarkerList markers, String descriptor, String signature, int parameterCount,
+		                              boolean thisMangled, IMethod method)
+	{
+		if (method == this // common cases
+			    || method.getParameterList().size() != parameterCount // optimization
+			    || !method.getDescriptor().equals(descriptor))
+		{
+			return thisMangled;
+		}
+
+		final String otherMangledName = method.getInternalName();
+		if (!this.internalName.equals(otherMangledName))
+		{
+			return thisMangled;
+		}
+
+		// Name mangling required
+
+		if (!thisMangled)
+		{
+			// ensure this method gets name-mangled
+			this.internalName = createMangledName(this);
+		}
+
+		if (this.internalName.equals(otherMangledName))
+		{
+			markers.add(Markers.semanticError(this.position, "method.duplicate", this.name, signature));
+			return true;
+		}
+
+		final Marker marker = Markers.semantic(this.position, "method.name_mangled", this.name);
+		marker.addInfo(Markers.getSemantic("method.name_mangled.1", this.name));
+		marker.addInfo(Markers.getSemantic("method.name_mangled.2", this.name));
+		marker.addInfo(Markers.getSemantic("method.name_mangled.bytecode_name", this.internalName));
+		markers.add(marker);
+		return true;
 	}
 
 	private static String createMangledName(IMethod method)

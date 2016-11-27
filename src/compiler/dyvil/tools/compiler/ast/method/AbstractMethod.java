@@ -1040,6 +1040,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 
 		this.writeArgumentsAndInvoke(writer, instance, arguments, typeContext, lineNumber);
+		this.type.writeCast(writer, Types.BOOLEAN, 0);
 		writer.visitJumpInsn(IFNE, dest);
 	}
 
@@ -1054,6 +1055,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 
 		this.writeArgumentsAndInvoke(writer, instance, arguments, typeContext, lineNumber);
+		this.type.writeCast(writer, Types.BOOLEAN, 0);
 		writer.visitJumpInsn(IFEQ, dest);
 	}
 

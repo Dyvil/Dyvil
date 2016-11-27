@@ -2,8 +2,8 @@ package dyvil.collection;
 
 import dyvil.annotation.Immutable;
 import dyvil.annotation.Mutating;
-import dyvil.annotation._internal.Covariant;
-import dyvil.annotation._internal.DyvilName;
+import dyvil.annotation.internal.Covariant;
+import dyvil.annotation.internal.DyvilName;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.collection.range.*;
 import dyvil.lang.LiteralConvertible;

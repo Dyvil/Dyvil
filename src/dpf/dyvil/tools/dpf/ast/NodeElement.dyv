@@ -1,12 +1,17 @@
-package dyvil.tools.dpf.ast;
+package dyvil.tools.dpf.ast
 
-import dyvil.tools.dpf.visitor.NodeVisitor;
-import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.dpf.visitor.NodeVisitor
+import dyvil.tools.parsing.Name
+import dyvil.tools.parsing.position.ICodePosition
+import dyvil.tools.parsing.ast.IASTNode
 
 public interface NodeElement extends IASTNode
 {
-	Name getName();
+	override func getPosition(): ICodePosition = null
+
+	override func setPosition(ICodePosition position) {}
+
+	func name: Name
 	
-	void accept(NodeVisitor visitor);
+	func accept(NodeVisitor visitor): void
 }

@@ -1,6 +1,6 @@
 package dyvil.reflect;
 
-import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation.internal.DyvilModifiers;
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 

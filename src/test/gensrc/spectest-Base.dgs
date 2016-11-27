@@ -1,0 +1,5 @@
+@enabled=false
+@base=true
+
+SPEC_NAME=base
+COUNT=1

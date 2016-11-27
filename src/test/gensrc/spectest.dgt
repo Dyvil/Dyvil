@@ -37,3 +37,12 @@ line with nothing ##in the middle
 		#literal and NESTED set to false
 	#endif
 #endif
+
+#foreach ./spectest-Test.dgs, ./spectest-Base.dgs
+	#define _COUNT COUNT
+	#process the value of _COUNT in SPEC_NAME is COUNT
+#endfor
+
+#for INDEX; 1; 10
+INDEX
+#endfor

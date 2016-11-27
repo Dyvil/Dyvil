@@ -2,7 +2,6 @@ package dyvil.tools.compiler.library;
 
 import dyvil.collection.Map;
 import dyvil.collection.mutable.HashMap;
-import dyvil.util.None;
 import dyvil.util.Option;
 
 import java.io.*;
@@ -29,7 +28,7 @@ public final class FileLibrary extends Library
 	private File getFile(String name)
 	{
 		Option<File> option = this.fileMap.getOption(name);
-		if (option != None.instance)
+		if (option.isPresent())
 		{
 			return option.get();
 		}

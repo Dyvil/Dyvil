@@ -1,6 +1,6 @@
 package dyvil.reflect;
 
-import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation.internal.DyvilModifiers;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

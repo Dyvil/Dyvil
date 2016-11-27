@@ -1,6 +1,6 @@
 package dyvilx.lang.model.type;
 
-import dyvil.annotation._internal.ClassParameters;
+import dyvil.annotation.internal.ClassParameters;
 import dyvil.lang.LiteralConvertible;
 
 @LiteralConvertible.FromTuple
@@ -77,7 +77,7 @@ public class TupleType<T> implements Type<T>
 	@Override
 	public String qualifiedName()
 	{
-		return "dyvil/tuple/Tuple" + this.types.length;
+		return "dyvil/tuple/Tuple$Of" + this.types.length;
 	}
 	
 	@Override
@@ -108,13 +108,13 @@ public class TupleType<T> implements Type<T>
 	@Override
 	public void appendSignature(StringBuilder builder)
 	{
-		builder.append("Ldyvil/tuple/Tuple").append(this.types.length).append(';');
+		builder.append("Ldyvil/tuple/Tuple$Of").append(this.types.length).append(';');
 	}
 	
 	@Override
 	public void appendGenericSignature(StringBuilder builder)
 	{
-		builder.append("Ldyvil/tuple/Tuple").append(this.types.length).append('<');
+		builder.append("Ldyvil/tuple/Tuple$Of").append(this.types.length).append('<');
 		int len = this.types.length;
 		if (len > 0)
 		{

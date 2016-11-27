@@ -32,66 +32,28 @@ public final class ObjectExtensions
 
 	// Object Extensions
 
-	/**
-	 * Tests if the given value is `null`.
-	 * @param o the value to check for null-ness
-	 *
-	 * @return true iff the value is `null`
-	 */
-	@Intrinsic([ LOAD_0, NULL ])
-	public infix boolean isNull(Object o) = o.isNull
-
-	/**
-	 * Tests if the given value is not `null`.
-	 * @param o the value to check for non-null-ness
-	 *
-	 * @return true iff the value is not `null`
-	 */
-	@Intrinsic([ LOAD_0, NONNULL ])
-	public infix boolean isNonNull(Object o) = o.isNonNull
-
 	// Structural Equality (equals)
-	public infix func ==(Object o1, Object o2): boolean
-	{
-		if (o1.isNull)	return o2.isNull
-		else			return o1.equals o2
-	}
+	public infix func ==(Object lhs, Object rhs): boolean = lhs == null ? rhs == null : lhs.equals(rhs)
 
 	// Reference Equality
 	@Intrinsic([ LOAD_0, LOAD_1, ACMPEQ ])
-	public infix func ===(Object o1, Object o2): boolean = o1 === o2
+	public infix func ===(Object lhs, Object rhs): boolean = lhs === rhs
 
 	// Structural Inequality (!equals)
 	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2, BNOT ], strings: [ "dyvil/lang/ObjectExtensions", "$eq$eq", "(Ljava/lang/Object;Ljava/lang/Object;)Z" ])
-	public infix func !=(Object o1, Object o2): boolean = !(o1 == o2)
+	public infix func !=(Object lhs, Object rhs): boolean = !(lhs == rhs)
 
 	// Reference Inequality
 	@Intrinsic([ LOAD_0, LOAD_1, ACMPNE ])
-	public infix func !==(Object o1, Object o2): boolean = o1 !== o2
-
-	// Hashing
-
-	public static int hash(Object... args)
-	{
-		if (args == null) return 0
-
-		var result = 1
-		for (var element <- args)
-		{
-			result = 31 * result + if (element == null) 0 else element.hashCode
-		}
-		return result;
-	}
-
-	public infix func ##(Object o): int = if (o == null) 0 else o.hashCode
+	public infix func !==(Object lhs, Object rhs): boolean = lhs !== rhs
 
 	// Comparable
 
-	public infix inline func < <T>(Comparable<T> c1, T c2): boolean = c1.compareTo(c2) < 0
+	public infix inline func < <T>(Comparable<T> lhs, T rhs): boolean = lhs.compareTo(rhs) < 0
 
-	public infix inline func <= <T>(Comparable<T> c1, T c2): boolean = c1.compareTo(c2) <= 0
+	public infix inline func <= <T>(Comparable<T> lhs, T rhs): boolean = lhs.compareTo(rhs) <= 0
 
-	public infix inline func > <T>(Comparable<T> c1, T c2): boolean = c1.compareTo(c2) > 0
+	public infix inline func > <T>(Comparable<T> lhs, T rhs): boolean = lhs.compareTo(rhs) > 0
 
-	public infix inline func >= <T>(Comparable<T> c1, T c2): boolean = c1.compareTo(c2) >= 0
+	public infix inline func >= <T>(Comparable<T> lhs, T rhs): boolean = lhs.compareTo(rhs) >= 0
 }

@@ -154,7 +154,7 @@ public interface IContext extends IMemberContext, IImportContext
 
 		// The try the surrounding context
 		context.getImplicitMatches(matches, value, targetType);
-		if (!matches.isEmpty() || targetType == null)
+		if (matches.hasCandidate() || targetType == null)
 		{
 			return matches;
 		}

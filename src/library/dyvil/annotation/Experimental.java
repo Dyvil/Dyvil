@@ -1,6 +1,6 @@
 package dyvil.annotation;
 
-import dyvil.annotation._internal.ClassParameters;
+import dyvil.annotation.internal.ClassParameters;
 import dyvil.util.MarkerLevel;
 
 import java.lang.annotation.Retention;

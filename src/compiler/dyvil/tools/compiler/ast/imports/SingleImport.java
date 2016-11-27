@@ -179,7 +179,7 @@ public final class SingleImport extends Import implements IDefaultContext
 		{
 			final MatchList<IMethod> methods = new MatchList<>(null);
 			parentContext.getMethodMatches(methods, null, this.name, null);
-			if (!methods.isEmpty())
+			if (methods.hasCandidate())
 			{
 				return;
 			}

@@ -4,7 +4,6 @@ import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Parser;
-import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
 public class TypeParameterListParser extends Parser
@@ -37,7 +36,7 @@ public class TypeParameterListParser extends Parser
 				return;
 			}
 			this.mode = TYPE_VARIABLE;
-			if (type != BaseSymbols.COMMA)
+			if (!ParserUtil.isTerminator(type))
 			{
 				pm.report(token, "type_parameter.list.comma");
 				pm.reparse();

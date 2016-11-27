@@ -124,7 +124,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 			return iclass;
 		}
 
-		iclass = Package.dyvilFunction.resolveClass("Function" + typeCount);
+		iclass = Package.dyvilFunction.resolveClass(Names.Function).resolveClass(Name.fromQualified("Of" + typeCount));
 		functionClasses[typeCount] = iclass;
 		return iclass;
 	}
@@ -521,19 +521,19 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	@Override
 	public String getInternalName()
 	{
-		return "dyvil/function/Function" + this.parameterCount;
+		return "dyvil/function/Function$Of" + this.parameterCount;
 	}
 
 	@Override
 	public void appendExtendedName(StringBuilder buffer)
 	{
-		buffer.append("Ldyvil/function/Function").append(this.parameterCount).append(';');
+		buffer.append("Ldyvil/function/Function$Of").append(this.parameterCount).append(';');
 	}
 
 	@Override
 	public void appendSignature(StringBuilder buffer, boolean genericArg)
 	{
-		buffer.append("Ldyvil/function/Function").append(this.parameterCount).append('<');
+		buffer.append("Ldyvil/function/Function$Of").append(this.parameterCount).append('<');
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameterTypes[i].appendSignature(buffer, true);

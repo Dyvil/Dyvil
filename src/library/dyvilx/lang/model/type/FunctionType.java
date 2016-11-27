@@ -1,6 +1,6 @@
 package dyvilx.lang.model.type;
 
-import dyvil.annotation._internal.ClassParameters;
+import dyvil.annotation.internal.ClassParameters;
 import dyvil.lang.LiteralConvertible;
 
 @LiteralConvertible.FromTuple
@@ -91,7 +91,7 @@ public class FunctionType<F> implements Type<F>
 	@Override
 	public String qualifiedName()
 	{
-		return "dyvil/function/Function" + this.parameterTypes.length;
+		return "dyvil/function/Function$Of" + this.parameterTypes.length;
 	}
 
 	@Override
@@ -123,13 +123,13 @@ public class FunctionType<F> implements Type<F>
 	@Override
 	public void appendSignature(StringBuilder builder)
 	{
-		builder.append('L').append("dyvil/function/Function").append(this.parameterTypes.length).append(';');
+		builder.append('L').append("dyvil/function/Function$Of").append(this.parameterTypes.length).append(';');
 	}
 
 	@Override
 	public void appendGenericSignature(StringBuilder builder)
 	{
-		builder.append('L').append("dyvil/function/Function").append(this.parameterTypes.length).append('<');
+		builder.append('L').append("dyvil/function/Function$Of").append(this.parameterTypes.length).append('<');
 		int len = this.parameterTypes.length;
 		if (len > 0)
 		{

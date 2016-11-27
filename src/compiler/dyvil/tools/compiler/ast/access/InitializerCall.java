@@ -130,17 +130,17 @@ public class InitializerCall implements ICall
 			return this;
 		}
 
-		final MatchList<IConstructor> candidates = IContext.resolveConstructors(context, targetType, this.arguments);
-		if (!candidates.isEmpty() && !candidates.isAmbigous())
+		final MatchList<IConstructor> matches = IContext.resolveConstructors(context, targetType, this.arguments);
+		if (matches.hasCandidate())
 		{
-			this.constructor = candidates.getBestMember();
+			this.constructor = matches.getBestMember();
 			this.checkArguments(markers, context);
 			return this;
 		}
 
 		if (report)
 		{
-			ConstructorCall.reportResolve(markers, candidates, this.position, targetType, this.arguments);
+			ConstructorCall.reportResolve(markers, matches, this.position, targetType, this.arguments);
 			return this;
 		}
 		return null;

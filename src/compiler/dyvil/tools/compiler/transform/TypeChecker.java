@@ -72,7 +72,7 @@ public final class TypeChecker
 			return IValue.CONVERSION_MATCH;
 		}
 
-		if (!IContext.resolveImplicits(context, value, type).isEmpty())
+		if (IContext.resolveImplicits(context, value, type).hasCandidate())
 		{
 			return IValue.IMPLICIT_CONVERSION_MATCH;
 		}

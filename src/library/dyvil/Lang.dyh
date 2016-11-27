@@ -61,7 +61,7 @@ type Float  = java.lang.Float
 type Double = java.lang.Double
 
 type Configure<T> = T.() -> void
-type BytecodeName = dyvil.annotation._internal.DyvilName
+type BytecodeName = dyvil.annotation.`internal`.DyvilName
 
 // ---------------------------------------- Operator Definitions ----------------------------------------
 

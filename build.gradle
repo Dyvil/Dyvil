@@ -37,6 +37,10 @@ boolean nightly = false
 
 Map<String, String> env = System.getenv()
 String droneBuild = env['DRONE_BUILD_NUMBER']
+if (!droneBuild)
+{
+	droneBuild = env['TRAVIS_BUILD_NUMBER']
+}
 
 if (droneBuild)
 {
@@ -138,32 +142,36 @@ repositories {
 dependencies {
 	// Runtime Dependencies (Resources)
 	
-	def libraryFiles = files("$buildDir/dyvilbin") {
+	def libRun = files("$buildDir/dyvilbin") {
 		builtBy 'compileLibraryDyvil'
 	}
-	def dpfFiles = files("$buildDir/dpfbin") {
+	def dpfRun = files("$buildDir/dpfbin") {
 		builtBy 'compileDPFDyvil'
 	}
-	def testFiles = files("$buildDir/dyviltestbin") {
+	def testRun = files("$buildDir/dyviltestbin") {
 		builtBy 'compileTestDyvil'
 	}
 	
-	libraryRuntime libraryFiles
+	def libs = fileTree('libs/')
+	def libComp = sourceSets.library.output + libs
+	
+	libraryCompile libs
+	libraryRuntime libRun
 	
 	// compiler -> library
-	compilerCompile sourceSets.library.output
+	compilerCompile libComp
 	
 	// dpf -> library
-	dpfCompile sourceSets.library.output
-	dpfRuntime dpfFiles
+	dpfCompile libComp
+	dpfRuntime libRun, dpfRun
 	
 	// repl -> library, compiler
-	replCompile sourceSets.library.output, sourceSets.compiler.output
-	replRuntime libraryFiles, dpfFiles, testFiles
+	replCompile libComp, sourceSets.compiler.output
+	replRuntime libRun, dpfRun, testRun
 	
 	// test -> library, junit
-	testCompile sourceSets.library.output, 'junit:junit:4.12'
-	testRuntime libraryFiles, dpfFiles, testFiles
+	testCompile libComp, 'junit:junit:4.12'
+	testRuntime libRun, dpfRun, testRun
 }
 
 // ---------------------------------------- Copy Tasks ----------------------------------------
@@ -289,9 +297,7 @@ private void runCompiler(JavaExec exec, String config, String src, String bin)
 	
 	exec.main = compilerMainClass
 	exec.classpath = sourceSets.compiler.runtimeClasspath
-	exec.args = [ "@$config", 'compile' ]
-	
-	if (System.console() != null) exec.args += "--ansi";
+	exec.args = [ "@$config", 'compile', '--ansi' ]
 }
 
 private void runGenSrc(JavaExec exec, String src, String dest)
@@ -318,6 +324,26 @@ task testDyvil(type: JavaExec, dependsOn: [ 'compileTestDyvil' ]) {
 test.dependsOn 'testDyvil'
 
 // ---------------------------------------- Build Tasks ----------------------------------------
+
+/**
+ * Creates a Jar file that contains all library classes generated from Dyvil source code and saves it in libs/
+ */
+task bootstrap(type: Jar, dependsOn: [ 'compileLibraryDyvil' ]) {
+	from("$buildDir/dyvilbin") {
+		include '**/*.class'
+	}
+	
+	destinationDir file('libs')
+	
+	archiveName = "dyvil-bootstrap-${ libraryVersion }.jar"
+	
+	doFirst {
+		// Rename old bootstrap file to '*.old', just in case
+		fileTree(dir: destinationDir, include: "**/$archiveName").forEach {
+			it.renameTo it.absolutePath + '.old'
+		}
+	}
+}
 
 /**
  * Creates a Jar file that contains all library classes (from src/library), including ASM

@@ -6,15 +6,22 @@ package dyvil.array;
 import dyvil.annotation.Immutable;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.Mutating;
-import dyvil.annotation._internal.DyvilModifiers;
-import dyvil.annotation._internal.DyvilName;
-import dyvil.annotation._internal.Primitive;
+import dyvil.annotation.Reified;
+import dyvil.annotation.OverloadPriority;
+import dyvil.annotation.internal.DyvilModifiers;
+import dyvil.annotation.internal.Primitive;
+import dyvil.collection.List;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.Range;
 import dyvil.collection.immutable.ArrayList;
 
-#if HAS_RANGE
+#if IS_RANGEABLE
+import dyvil.annotation.internal.DyvilName;
+
+	#if HAS_RANGE_CLASS
 import dyvil.collection.range.closed.TYPE_NAME##Range;
+	#endif
+
 #endif
 
 import dyvil.ref.TYPE_NAME##Ref;
@@ -23,6 +30,7 @@ import dyvil.reflect.Modifiers;
 
 import java.util.Arrays;
 import java.util.function.*;
+import java.lang.reflect.Array;
 
 import static dyvil.reflect.Opcodes.*;
 
@@ -49,7 +57,7 @@ public abstract class TYPE_NAME##Array
 		return array.clone();
 	}
 
-#if HAS_RANGE
+#if HAS_RANGE_CLASS
 	@DyvilModifiers(Modifiers.IMPLICIT | Modifiers.INLINE)
 	public static PRIMITIVE[] apply(TYPE_NAME##Range range)
 	{
@@ -77,16 +85,17 @@ public abstract class TYPE_NAME##Array
 		return array;
 	}
 
-	public static PRIMITIVE[] apply(int size, MAPPER valueMapper)
+	public static PRIMITIVE[] apply(int size, INDEXED_SUPPLIER valueMapper)
 	{
 		final PRIMITIVE[] array = new PRIMITIVE[size];
 		for (int i = 0; i < size; i++)
 		{
-			array[i] = (PRIMITIVE) valueMapper.MAPPER_APPLY(i);
+			array[i] = (PRIMITIVE) valueMapper.INDEXED_SUPPLIER_APPLY(i);
 		}
 		return array;
 	}
 
+#if IS_RANGEABLE
 	@DyvilName("apply")
 	public static PRIMITIVE[] rangeClosed(PRIMITIVE from, PRIMITIVE to)
 	{
@@ -110,31 +119,32 @@ public abstract class TYPE_NAME##Array
 		}
 		return array;
 	}
+#endif
 
 	// Basic Array Operations
 
-	@Intrinsic( { LOAD_0, ARRAYLENGTH })
+	@Intrinsic({ LOAD_0, ARRAYLENGTH })
 	@DyvilModifiers(Modifiers.INFIX)
 	public static int length(PRIMITIVE[] array)
 	{
 		return array.length;
 	}
 
-	@Intrinsic( { LOAD_0, ARRAYLENGTH })
+	@Intrinsic({ LOAD_0, ARRAYLENGTH })
 	@DyvilModifiers(Modifiers.INFIX)
 	public static int size(PRIMITIVE[] array)
 	{
 		return array.length;
 	}
 
-	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })
+	@Intrinsic({ LOAD_0, ARRAYLENGTH, EQ0 })
 	@DyvilModifiers(Modifiers.INFIX)
 	public static boolean isEmpty(PRIMITIVE[] array)
 	{
 		return array.length == 0;
 	}
 
-	@Intrinsic( { LOAD_0, LOAD_1, ARRAY_LOAD_INSN })
+	@Intrinsic({ LOAD_0, LOAD_1, ARRAY_LOAD_INSN })
 	@DyvilModifiers(Modifiers.INFIX)
 	public static PRIMITIVE subscript(PRIMITIVE[] array, int index)
 	{
@@ -150,7 +160,7 @@ public abstract class TYPE_NAME##Array
 		return result;
 	}
 
-	@Intrinsic( { LOAD_0, LOAD_1, LOAD_2, ARRAY_STORE_INSN })
+	@Intrinsic({ LOAD_0, LOAD_1, LOAD_2, ARRAY_STORE_INSN })
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
 	public static void subscript_$eq(PRIMITIVE[] array, int index, PRIMITIVE newValue)
@@ -184,12 +194,6 @@ public abstract class TYPE_NAME##Array
 	// Operators
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static boolean $qmark(PRIMITIVE[] array, PRIMITIVE value)
-	{
-		return indexOf(array, value, 0) >= 0;
-	}
-
-	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	public static boolean $eq$eq(PRIMITIVE[] array1, PRIMITIVE[] array2)
 	{
 		return Arrays.equals(array1, array2);
@@ -202,7 +206,7 @@ public abstract class TYPE_NAME##Array
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static PRIMITIVE[] $plus(PRIMITIVE[] array, PRIMITIVE value)
+	public static PRIMITIVE[] added(PRIMITIVE[] array, PRIMITIVE value)
 	{
 		final int size = array.length;
 		final PRIMITIVE[] res = new PRIMITIVE[size + 1];
@@ -212,7 +216,7 @@ public abstract class TYPE_NAME##Array
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static PRIMITIVE[] $plus$plus(PRIMITIVE[] array1, PRIMITIVE[] array2)
+	public static PRIMITIVE[] union(PRIMITIVE[] array1, PRIMITIVE[] array2)
 	{
 		final int len1 = array1.length;
 		final int len2 = array2.length;
@@ -223,31 +227,34 @@ public abstract class TYPE_NAME##Array
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static PRIMITIVE[] $minus(PRIMITIVE[] array, PRIMITIVE value)
+	public static PRIMITIVE[] removed(PRIMITIVE[] array, PRIMITIVE value)
 	{
-		final int index = indexOf(array, value, 0);
-		if (index < 0)
+		int newSize = array.length;
+
+		// Calculate number of element in new array
+		for (PRIMITIVE element : array)
 		{
-			return array;
+			if (element == value)
+			{
+				newSize--;
+			}
 		}
 
-		final int size = array.length;
-		final PRIMITIVE[] res = new PRIMITIVE[size - 1];
-		if (index > 0)
+		final PRIMITIVE[] res = new PRIMITIVE[newSize];
+		int resIndex = 0;
+
+		for (PRIMITIVE element : array)
 		{
-			// copy the first part before the index
-			System.arraycopy(array, 0, res, 0, index);
-		}
-		if (index < size)
-		{
-			// copy the second part after the index
-			System.arraycopy(array, index + 1, res, index, size - index - 1);
+			if (element != value)
+			{
+				res[resIndex++] = element;
+			}
 		}
 		return res;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static PRIMITIVE[] $minus$minus(PRIMITIVE[] array1, PRIMITIVE[] array2)
+	public static PRIMITIVE[] difference(PRIMITIVE[] array1, PRIMITIVE[] array2)
 	{
 		int index = 0;
 		final int size = array1.length;
@@ -266,7 +273,7 @@ public abstract class TYPE_NAME##Array
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static PRIMITIVE[] $amp(PRIMITIVE[] array1, PRIMITIVE[] array2)
+	public static PRIMITIVE[] intersection(PRIMITIVE[] array1, PRIMITIVE[] array2)
 	{
 		int index = 0;
 		final int size = array1.length;
@@ -297,27 +304,57 @@ public abstract class TYPE_NAME##Array
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static PRIMITIVE[] flatMapped(PRIMITIVE[] array, FLAT_MAPPER mapper)
+	@OverloadPriority
+	public static <@Reified(Reified.Type.OBJECT_CLASS) T> T[] mapped(PRIMITIVE[] array, TO_MAPPER T TO_MAPPER_END mapper, Class<T> _type)
+	{
+		final int size = array.length;
+		final T[] res = (T[]) Array.newInstance(_type, size);
+		for (int i = 0; i < size; i++)
+		{
+			res[i] = (T) mapper.TO_MAPPER_APPLY(array[i]);
+		}
+		return res;
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static PRIMITIVE[] flatMapped(PRIMITIVE[] array, TO_MAPPER PRIMITIVE[] TO_MAPPER_END mapper)
 	{
 		int size = 0;
-		PRIMITIVE[] res = EMPTY;
+		PRIMITIVE[] res = new PRIMITIVE[array.length << 2];
 
 		for (PRIMITIVE v : array)
 		{
-			final PRIMITIVE[] a = mapper.apply(v);
-			final int alen = a.length;
-			if (size + alen >= res.length)
+			final PRIMITIVE[] a = mapper.TO_MAPPER_APPLY(v);
+			final int newSize = a.length;
+
+			if (size + newSize >= res.length)
 			{
-				final PRIMITIVE[] newRes = new PRIMITIVE[size + alen];
-				System.arraycopy(res, 0, newRes, 0, res.length);
-				res = newRes;
+				res = Arrays.copyOf(res, (size + newSize) << 1);
 			}
 
-			System.arraycopy(a, 0, res, size, alen);
-			size += alen;
+			System.arraycopy(a, 0, res, size, newSize);
+			size += newSize;
 		}
 
-		return res;
+		if (size == res.length)
+		{
+			return res;
+		}
+		return Arrays.copyOf(res, size);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	@OverloadPriority
+	public static <@Reified(Reified.Type.OBJECT_CLASS) T> T[] flatMapped(PRIMITIVE[] array, TO_MAPPER ? extends Iterable<? extends T> TO_MAPPER_END mapper, Class<T> _type)
+	{
+		final List<T> list = new dyvil.collection.mutable.ArrayList<>(array.length << 2);
+
+		for (PRIMITIVE value : array)
+		{
+			list.addAll(mapper.TO_MAPPER_APPLY(value));
+		}
+
+		return list.toArray(_type);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
@@ -341,12 +378,38 @@ public abstract class TYPE_NAME##Array
 	@DyvilModifiers(Modifiers.INFIX)
 	public static PRIMITIVE[] sorted(PRIMITIVE[] array)
 	{
+#if USE_BOOL_SORT
+		final int size = array.length;
+		final boolean[] res = new boolean[size];
+
+		// Count the number of 'false' entries in the array
+		int falseEntries = 0;
+
+		for (boolean value : array)
+		{
+			if (!value) falseEntries++;
+		}
+
+		// Make the remaining elements of the result true
+		for (; falseEntries < size; falseEntries++)
+		{
+			res[falseEntries] = true;
+		}
+		return res;
+#else
 		final PRIMITIVE[] res = array.clone();
 		Arrays.sort(res);
 		return res;
+#endif
 	}
 
 	// Search Operations
+
+	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
+	public static boolean contains(PRIMITIVE[] array, PRIMITIVE value)
+	{
+		return indexOf(array, value, 0) >= 0;
+	}
 
 	@DyvilModifiers(Modifiers.INFIX)
 	public static int indexOf(PRIMITIVE[] array, PRIMITIVE value)
@@ -386,24 +449,20 @@ public abstract class TYPE_NAME##Array
 		return -1;
 	}
 
-	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static boolean contains(PRIMITIVE[] array, PRIMITIVE value)
-	{
-		return indexOf(array, value, 0) >= 0;
-	}
-
-	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static boolean in(PRIMITIVE value, PRIMITIVE[] array)
-	{
-		return indexOf(array, value, 0) >= 0;
-	}
-
 	// Copying
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	public static PRIMITIVE[] copy(PRIMITIVE[] array)
 	{
 		return array.clone();
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static PRIMITIVE[] copy(PRIMITIVE[] array, int size)
+	{
+		final PRIMITIVE[] newArray = new PRIMITIVE[size];
+		System.arraycopy(array, 0, newArray, 0, array.length);
+		return newArray;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
@@ -459,19 +518,14 @@ public abstract class TYPE_NAME##Array
 		}
 
 		final int size = array.length;
-		if (size <= 0)
+		if (size == 0)
 		{
 			return "[]";
 		}
 
-		final StringBuilder buf = new StringBuilder(size * 3 + 4);
-		buf.append('[').append(array[0]);
-		for (int i = 1; i < size; i++)
-		{
-			buf.append(", ");
-			buf.append(array[i]);
-		}
-		return buf.append(']').toString();
+		final StringBuilder builder = new StringBuilder();
+		append(array, size, builder);
+		return builder.toString();
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
@@ -484,12 +538,17 @@ public abstract class TYPE_NAME##Array
 		}
 
 		final int size = array.length;
-		if (size <= 0)
+		if (size == 0)
 		{
 			builder.append("[]");
 			return;
 		}
 
+		append(array, size, builder);
+	}
+
+	private static void append(PRIMITIVE[] array, int size, StringBuilder builder)
+	{
 		builder.append('[').append(array[0]);
 		for (int i = 1; i < size; i++)
 		{

@@ -88,7 +88,7 @@ public class DPFTest
 		Map<String, Object> nodeMap = new TreeMap<String, Object>
 		expandedNode.accept(new FlatMapConverter(nodeMap))
 
-		Map<String, Object> expandedMap = Expandable.expandMap(baseMap, baseMap, false)
+		Map<String, Object> expandedMap = Expandable.expand(baseMap, baseMap, false)
 
 		Main.test("DPF Expansion Test", nodeMap, expandedMap)
 	}

@@ -180,7 +180,13 @@ public class NamedType implements IUnresolvedType, ITypeConsumer
 		final ITypeAlias type = context.resolveTypeAlias(this.name, 0);
 		if (type != null)
 		{
-			return type.getType().getConcreteType(ITypeContext.DEFAULT).atPosition(this.position);
+			final IType aliasType = type.getType();
+			if (!aliasType.isResolved())
+			{
+				markers.add(Markers.semanticError(this.position, "type.alias.unresolved", this.name));
+				return aliasType.atPosition(this.position);
+			}
+			return aliasType.getConcreteType(ITypeContext.DEFAULT).atPosition(this.position);
 		}
 		return null;
 	}

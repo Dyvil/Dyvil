@@ -95,7 +95,9 @@ public class Property extends Member implements IProperty
 		{
 			return this.getter;
 		}
-		return this.getter = new CodeMethod(this.enclosingClass, this.name, this.type, this.modifiers);
+		final CodeMethod getter = new CodeMethod(this.enclosingClass, this.name, this.type, this.modifiers);
+		getter.setPosition(this.position);
+		return this.getter = getter;
 	}
 
 	@Override
@@ -121,6 +123,7 @@ public class Property extends Member implements IProperty
 
 		final Name name = Name.from(this.name.unqualified + "_=", this.name.qualified + "_$eq");
 		this.setter = new CodeMethod(this.enclosingClass, name, Types.VOID, this.modifiers);
+		this.setter.setPosition(this.position);
 		this.setterParameter = new CodeParameter(this.position, Names.newValue, this.type, EmptyModifiers.INSTANCE,
 		                                         null);
 		this.setter.getParameterList().addParameter(this.setterParameter);
@@ -173,13 +176,15 @@ public class Property extends Member implements IProperty
 
 		if (this.getter != null)
 		{
-			this.getter.getModifiers().addIntModifier(this.modifiers.toFlags());
+			Field.copyModifiers(this.modifiers, this.getter.getModifiers());
+			this.getter.setType(this.type);
 			this.getter.resolveTypes(markers, context);
 		}
 		if (this.setter != null)
 		{
-			this.setter.getModifiers().addIntModifier(this.modifiers.toFlags());
+			Field.copyModifiers(this.modifiers, this.setter.getModifiers());
 			this.setterParameter.setPosition(this.setter.getPosition());
+			this.setterParameter.setType(this.type);
 			this.setter.resolveTypes(markers, context);
 		}
 		if (this.initializer != null)
@@ -355,13 +360,7 @@ public class Property extends Member implements IProperty
 	private void writeSetter(ClassWriter writer, String descriptorBase, String signatureBase, String nameBase)
 	{
 		final IValue setterValue = this.setter.getValue();
-		final ModifierSet setterModifiers = this.setter.getModifiers();
-
-		int modifiers = this.modifiers.toFlags();
-		if (setterModifiers != null)
-		{
-			modifiers |= setterModifiers.toFlags();
-		}
+		final int modifiers = this.setter.getModifiers().toFlags();
 
 		final String name = nameBase + "_$eq";
 		final String descriptor = "(" + descriptorBase + ")V";
@@ -389,14 +388,7 @@ public class Property extends Member implements IProperty
 	private void writeGetter(ClassWriter writer, String descriptorBase, String signatureBase, String nameBase)
 	{
 		final IValue getterValue = this.getter.getValue();
-		final ModifierSet getterModifiers = this.getter.getModifiers();
-
-		int modifiers = this.modifiers.toFlags();
-
-		if (getterModifiers != null)
-		{
-			modifiers |= getterModifiers.toFlags();
-		}
+		final int modifiers = this.getter.getModifiers().toFlags();
 
 		final String descriptor = "()" + descriptorBase;
 		final String signature = signatureBase == null ? null : "()" + signatureBase;

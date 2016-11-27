@@ -5,6 +5,7 @@ import dyvil.tools.gensrc.ast.Template;
 import dyvil.tools.gensrc.lang.I18n;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +15,7 @@ import java.util.Map;
 public class GenSrc
 {
 	private List<Template>            templates = new ArrayList<>();
-	private Map<File, Specialization> specs     = new HashMap<>();
+	private Map<String, Specialization> specs     = new HashMap<>();
 
 	private File sourceRoot;
 	private File targetRoot;
@@ -72,7 +73,14 @@ public class GenSrc
 
 	public Specialization getSpecialization(File file)
 	{
-		return this.specs.get(file);
+		try
+		{
+			return this.specs.get(file.getCanonicalPath());
+		}
+		catch (IOException ignored)
+		{
+			return null;
+		}
 	}
 
 	public void findFiles()
@@ -109,16 +117,35 @@ public class GenSrc
 			else if (subFile.endsWith(".dgs"))
 			{
 				final int dashIndex = subFile.lastIndexOf('-', endIndex);
-				final String fileName = subFile.substring(0, dashIndex);
-				final String specName = subFile.substring(dashIndex + 1, endIndex);
+				final Specialization spec;
 
-				specializations.add(new Specialization(sourceFile, fileName, specName));
+				if (dashIndex < 0)
+				{
+					// Spec name "default"
+					spec = new Specialization(sourceFile, subFile.substring(0, endIndex));
+				}
+				else
+				{
+					// Custom spec name
+					final String fileName = subFile.substring(0, dashIndex);
+					final String specName = subFile.substring(dashIndex + 1, endIndex);
+					spec = new Specialization(sourceFile, fileName, specName);
+				}
+
+
+				specializations.add(spec);
 			}
 		}
 
 		for (Specialization spec : specializations)
 		{
-			this.specs.put(spec.getSourceFile(), spec);
+			try
+			{
+				this.specs.put(spec.getSourceFile().getCanonicalPath(), spec);
+			}
+			catch (IOException ignored)
+			{
+			}
 
 			final Template template = templates.get(spec.getTemplateName());
 			if (template == null)

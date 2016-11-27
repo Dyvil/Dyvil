@@ -5,7 +5,6 @@ import dyvil.collection.*;
 import dyvil.math.MathUtils;
 import dyvil.ref.InvalidReferenceException;
 import dyvil.ref.ObjectRef;
-import dyvil.util.None;
 import dyvil.util.Option;
 import dyvil.util.Some;
 
@@ -578,7 +577,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	public Option<V> getOption(Object key)
 	{
 		HashEntry<K, V> entry = this.getEntryInternal(key);
-		return entry == null ? None.instance : new Some<>(entry.value);
+		return entry == null ? Option.apply() : new Some<>(entry.value);
 	}
 
 	@Override

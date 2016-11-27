@@ -1,6 +1,9 @@
 package dyvil.tools.compiler.ast.classes;
 
+import dyvil.collection.Collection;
+import dyvil.collection.List;
 import dyvil.collection.Set;
+import dyvil.collection.mutable.ArrayList;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -12,13 +15,14 @@ import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IClassCompilable;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.*;
-import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -26,7 +30,6 @@ import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
 import dyvil.tools.compiler.backend.ClassWriter;
-import dyvil.tools.compiler.ast.header.IClassCompilable;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.sources.DyvilFileType;
 import dyvil.tools.compiler.transform.Deprecation;
@@ -425,6 +428,44 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
+	public Collection<IMethod> getMethods(Name name)
+	{
+		final List<IMethod> list = new ArrayList<>();
+
+		for (int i = 0, count = this.parameters.size(); i < count; i++)
+		{
+			final IProperty property = this.parameters.get(i).getProperty();
+			if (property != null)
+			{
+				final IMethod getter = property.getGetter();
+				if (getter != null && name == getter.getName()){
+					list.add(getter);
+				}
+
+				final IMethod setter = property.getSetter();
+				if (setter != null && name == setter.getName())
+				{
+					list.add(setter);
+				}
+			}
+		}
+
+		if (this.body != null)
+		{
+			for (int i = 0, count = this.body.methodCount(); i < count; i++)
+			{
+				final IMethod method = this.body.getMethod(i);
+				if (method != null)
+				{
+					list.add(method);
+				}
+			}
+		}
+
+		return list;
+	}
+
+	@Override
 	public boolean checkImplements(IMethod candidate, ITypeContext typeContext)
 	{
 		if (candidate.getEnclosingClass() == this)
@@ -736,7 +777,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 
 		this.metadata.getMethodMatches(list, receiver, name, arguments);
 
-		if (!list.isEmpty())
+		if (list.hasCandidate())
 		{
 			return;
 		}
@@ -746,7 +787,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			this.superType.getMethodMatches(list, receiver, name, arguments);
 		}
 
-		if (!list.isEmpty())
+		if (list.hasCandidate())
 		{
 			return;
 		}
@@ -936,8 +977,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			}
 			final String outerName = this.enclosingClass.getInternalName();
 			writer.visitInnerClass(this.getInternalName(), outerName, this.name.qualified, modifiers);
-
-			writer.visitOuterClass(outerName, null, null);
 		}
 	}
 

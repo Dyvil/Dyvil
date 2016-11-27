@@ -1,12 +1,12 @@
-package dyvil.tools.dpf.visitor;
+package dyvil.tools.dpf.visitor
 
-import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.Name
 
 public interface BuilderVisitor
 {
-	ValueVisitor visitParameter(Name name);
+	ValueVisitor visitParameter(Name name)
 	
-	NodeVisitor visitNode();
+	NodeVisitor visitNode()
 	
-	void visitEnd();
+	void visitEnd()
 }

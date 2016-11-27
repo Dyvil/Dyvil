@@ -131,6 +131,8 @@ public class CodeClass extends AbstractClass
 			this.annotations.resolveTypes(markers, context, this);
 		}
 
+		this.metadata.resolveTypesPre(markers, context);
+
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
 			this.typeParameters[i].resolveTypes(markers, context);
@@ -501,7 +503,6 @@ public class CodeClass extends AbstractClass
 
 		if (this.enclosingClass != null)
 		{
-			writer.visitOuterClass(this.enclosingClass.getInternalName(), null, null);
 			this.writeInnerClassInfo(writer);
 		}
 
@@ -762,6 +763,8 @@ public class CodeClass extends AbstractClass
 
 	private void writeAnnotations(ClassWriter writer, int modifiers)
 	{
+		ModifierUtil.writeModifiers(writer, this.modifiers);
+
 		if ((modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{
 			writer.visitAnnotation(Deprecation.DYVIL_EXTENDED, true).visitEnd();

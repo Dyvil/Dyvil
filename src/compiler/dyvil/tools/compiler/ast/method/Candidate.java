@@ -59,7 +59,7 @@ public final class Candidate<T extends ICallableSignature> implements Comparable
 	}
 
 	@Override
-	public int compareTo(@NotNull Candidate<T> that)
+	public int compareTo(@NotNull Candidate<T> o)
 	{
 		int better = 0;
 		int worse = 0;
@@ -67,19 +67,19 @@ public final class Candidate<T extends ICallableSignature> implements Comparable
 		// Compare invalidity (the valid methods are always preferred
 		if (this.invalid)
 		{
-			if (!that.invalid)
+			if (!o.invalid)
 			{
 				return 1;
 			}
 		}
-		else if (that.invalid)
+		else if (o.invalid)
 		{
 			return -1;
 		}
 
 		for (int i = 0, length = this.values.length; i < length; i++)
 		{
-			final int conversion = compare(this.values[i], this.types[i], that.values[i], that.types[i]);
+			final int conversion = compare(this.values[i], this.types[i], o.values[i], o.types[i]);
 			if (conversion > 0)
 			{
 				worse++;
@@ -99,21 +99,21 @@ public final class Candidate<T extends ICallableSignature> implements Comparable
 		}
 
 		// Compare return types (more specific is better)
-		final int returnType = MemberSorter.compareTypes(this.member.getType(), that.member.getType());
+		final int returnType = MemberSorter.compareTypes(this.member.getType(), o.member.getType());
 		if (returnType != 0)
 		{
 			return returnType;
 		}
 
 		// Compare number of defaulted parameters (less is better)
-		final int defaults = Integer.compare(this.defaults, that.defaults);
+		final int defaults = Integer.compare(this.defaults, o.defaults);
 		if (defaults != 0)
 		{
 			return defaults;
 		}
 
 		// Compare number of varargs-applied arguments (less is better)
-		final int varargsArguments = Integer.compare(this.varargs, that.varargs);
+		final int varargsArguments = Integer.compare(this.varargs, o.varargs);
 		if (varargsArguments != 0)
 		{
 			return varargsArguments;
@@ -122,18 +122,18 @@ public final class Candidate<T extends ICallableSignature> implements Comparable
 		// Compare varargs (the non-variadic method is preferred)
 		if (this.member.isVariadic())
 		{
-			if (!that.member.isVariadic())
+			if (!o.member.isVariadic())
 			{
 				return 1;
 			}
 		}
-		else if (that.member.isVariadic())
+		else if (o.member.isVariadic())
 		{
 			return -1;
 		}
 
 		// Compare overload priority (more is better)
-		return Integer.compare(that.member.getOverloadPriority(), this.member.getOverloadPriority());
+		return Integer.compare(o.member.getOverloadPriority(), this.member.getOverloadPriority());
 	}
 
 	private static int compare(int value1, IType type1, int value2, IType type2)
@@ -150,9 +150,9 @@ public final class Candidate<T extends ICallableSignature> implements Comparable
 	}
 
 	@Override
-	public boolean equals(Object o)
+	public boolean equals(Object obj)
 	{
-		return this == o || o instanceof Candidate && this.compareTo((Candidate<T>) o) == 0;
+		return this == obj || obj instanceof Candidate && this.compareTo((Candidate<T>) obj) == 0;
 	}
 
 	@Override

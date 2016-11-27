@@ -90,10 +90,6 @@ public class DyvilHeaderParser extends Parser
 		case DyvilKeywords.USING:
 			pm.pushParser(new ImportParser(this.importConsumer(token), KindedImport.USING_DECLARATION));
 			return true;
-		case DyvilKeywords.INCLUDE:
-			pm.report(Markers.syntaxWarning(token, "import.include.deprecated"));
-			pm.pushParser(new ImportParser(this.importConsumer(token), KindedImport.INCLUDE_DECLARATION));
-			return true;
 		case DyvilKeywords.OPERATOR:
 			pm.pushParser(new OperatorParser(this.unit, Operator.INFIX), true);
 			return true;

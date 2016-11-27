@@ -94,7 +94,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 	@Override
 	public boolean isResolved()
 	{
-		return this.method != null && this.method.getType().isResolved();
+		return this.method != null;
 	}
 
 	public IMethod getMethod()

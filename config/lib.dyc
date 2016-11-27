@@ -1,2 +1,2 @@
-source_dir = ../src/library
+source_dirs = [../src/library, ../build/gensrc/library]
 output_dir = ../build/dyvilbin

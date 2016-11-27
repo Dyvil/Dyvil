@@ -1,7 +1,5 @@
 package dyvil.tools.dpf.converter
 
-import dyvil.annotation._internal.DyvilModifiers
-import dyvil.reflect.Modifiers
 import dyvil.tools.dpf.visitor._
 import dyvil.tools.parsing.Name
 

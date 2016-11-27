@@ -3,7 +3,7 @@ package dyvil.collection;
 import dyvil.collection.mutable.FlatArrayMatrix;
 import dyvil.collection.view.MatrixView;
 import dyvil.lang.LiteralConvertible;
-import dyvil.tuple.Tuple2;
+import dyvil.tuple.Tuple;
 
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
@@ -119,7 +119,7 @@ public interface MutableMatrix<E> extends Matrix<E>
 	int columnOf(Object element);
 	
 	@Override
-	Tuple2<Integer, Integer> cellOf(Object element);
+	Tuple.Of2<Integer, Integer> cellOf(Object element);
 	
 	// toArray
 	

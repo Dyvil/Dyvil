@@ -708,7 +708,7 @@ class HeaderContext implements IStaticContext
 		// For ordinary headers, this is a no-op, since they (currently) cannot host any free-standing functions
 		// The REPL however can, so we need this call
 		this.header.getMethodMatches(list, receiver, name, arguments);
-		if (!list.isEmpty())
+		if (list.hasCandidate())
 		{
 			return;
 		}
@@ -724,7 +724,7 @@ class HeaderContext implements IStaticContext
 	{
 		// See comment in getMethodMatches for rationale
 		this.header.getImplicitMatches(list, value, targetType);
-		if (!list.isEmpty())
+		if (list.hasCandidate())
 		{
 			return;
 		}

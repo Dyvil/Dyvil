@@ -60,6 +60,10 @@ public interface IClassMetadata extends IClassCompilable, IResolvable
 		throw new UnsupportedOperationException();
 	}
 
+	default void resolveTypesPre(MarkerList markers, IContext context)
+	{
+	}
+
 	/**
 	 * Called before the class body goes through RESOLVE_TYPES. Super-types and -interfaces and type parameters have
 	 * already been resolved.

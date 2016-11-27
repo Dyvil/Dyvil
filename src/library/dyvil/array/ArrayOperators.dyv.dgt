@@ -1,0 +1,49 @@
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
+
+package dyvil.array
+
+public abstract class ArrayOperators
+{
+	private init()
+	{
+		// no instances
+	}
+
+	#define opfunc public infix inline func
+
+	// Generic Object array operators
+
+	opfunc in <T>(T value, [T] array): boolean = array.contains(value)
+	
+	opfunc ? <T>([T] lhs, T rhs): boolean = lhs.contains(rhs)
+
+	opfunc + <T>([T] lhs, T rhs): [T] = lhs.added(rhs)
+
+	opfunc + <T>(T lhs, [T] rhs): [T] = rhs.added(lhs)
+
+	opfunc ++ <T>([T] lhs, [T] rhs): [T] = lhs.union(rhs)
+
+	opfunc - <T>([T] lhs, T rhs): [T] = lhs.removed(rhs)
+
+	opfunc -- <T>([T] lhs, [T] rhs): [T] = lhs.difference(rhs)
+
+#foreach Base-Boolean.dgs, Base-Byte.dgs, Base-Short.dgs, Base-Char.dgs, Base-Int.dgs, Base-Long.dgs, Base-Float.dgs, Base-Double.dgs
+
+	// TYPE_NAME array operators
+
+	opfunc in(PRIMITIVE value, [PRIMITIVE] array): boolean = array.contains(value)
+
+	opfunc ? ([PRIMITIVE] lhs, PRIMITIVE rhs): boolean = lhs.contains(rhs)
+
+	opfunc + ([PRIMITIVE] lhs, PRIMITIVE rhs): [PRIMITIVE] = lhs.added(rhs)
+
+	opfunc + (PRIMITIVE lhs, [PRIMITIVE] rhs): [PRIMITIVE] = rhs.added(lhs)
+
+	opfunc ++ ([PRIMITIVE] lhs, [PRIMITIVE] rhs): [PRIMITIVE] = lhs.union(rhs)
+
+	opfunc - ([PRIMITIVE] lhs, PRIMITIVE rhs): [PRIMITIVE] = lhs.removed(rhs)
+
+	opfunc -- ([PRIMITIVE] lhs, [PRIMITIVE] rhs): [PRIMITIVE] = lhs.difference(rhs)
+#endfor
+}

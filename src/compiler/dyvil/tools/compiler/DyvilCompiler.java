@@ -1,5 +1,8 @@
 package dyvil.tools.compiler;
 
+import dyvil.collection.List;
+import dyvil.collection.Set;
+import dyvil.collection.mutable.TreeSet;
 import dyvil.io.AppendablePrintStream;
 import dyvil.io.BasicPrintStream;
 import dyvil.io.Console;
@@ -25,8 +28,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.EnumSet;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.logging.*;
 
 public final class DyvilCompiler implements Tool
@@ -49,7 +50,7 @@ public final class DyvilCompiler implements Tool
 	public final  FileFinder          fileFinder = new FileFinder();
 
 	@Override
-	public Set<SourceVersion> getSourceVersions()
+	public java.util.Set<SourceVersion> getSourceVersions()
 	{
 		return EnumSet.allOf(SourceVersion.class);
 	}
@@ -86,20 +87,23 @@ public final class DyvilCompiler implements Tool
 		// Sets up States from arguments
 		this.processArguments(args);
 
-		File sourceDir = this.config.getSourceDir();
-		if (sourceDir == null)
+		final List<File> sourceDirs = this.config.sourceDirs;
+		if (sourceDirs.isEmpty())
 		{
 			this.log(I18n.get("config.source_path.missing"));
 			return false;
 		}
 
-		if (!sourceDir.exists())
+		for (File file : sourceDirs)
 		{
-			this.log(I18n.get("config.source_path.not_found", sourceDir));
-			return false;
+			if (file.exists())
+			{
+				return true;
+			}
 		}
 
-		return true;
+		this.log(I18n.get("config.source_path.not_found", sourceDirs));
+		return false;
 	}
 
 	public void loadConfig(String[] args)
@@ -233,11 +237,17 @@ public final class DyvilCompiler implements Tool
 
 	public void loadLibraries()
 	{
-		final int libs = this.config.libraries.size();
+		final List<Library> libraries = this.config.libraries;
+
+		// Make sure to add the dyvil and java libraries at the end
+		libraries.add(Library.dyvilLibrary);
+		libraries.add(Library.javaLibrary);
+
+		final int libs = libraries.size();
 		final long startTime = System.nanoTime();
 
 		// Loads libraries
-		for (Library library : this.config.libraries)
+		for (Library library : libraries)
 		{
 			library.loadLibrary();
 		}
@@ -307,7 +317,7 @@ public final class DyvilCompiler implements Tool
 	{
 		final long startTime = System.nanoTime();
 
-		final File sourceDir = this.config.getSourceDir();
+		final List<File> sourceDir = this.config.sourceDirs;
 		final File outputDir = this.config.getOutputDir();
 
 		this.log(I18n.get("compilation.init", sourceDir, outputDir));
@@ -434,9 +444,9 @@ public final class DyvilCompiler implements Tool
 			return;
 		}
 
-		for (File s : files)
+		for (File file : files)
 		{
-			FileUtils.delete(s);
+			FileUtils.delete(file);
 		}
 	}
 
@@ -517,7 +527,7 @@ public final class DyvilCompiler implements Tool
 
 	public void warn(String message)
 	{
-		if (this.config.useAnsiColors())
+		if (this.config.useAnsiColors() && !message.isEmpty())
 		{
 			this.output.println(Console.ANSI_YELLOW + message + Console.ANSI_RESET);
 		}

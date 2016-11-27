@@ -146,8 +146,8 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					return;
 				}
 				case DyvilKeywords.NULL:
-					this.consumer.setType(Types.NULL);
-					pm.popParser();
+					this.type = Types.NULL;
+					this.mode = END;
 					return;
 				case DyvilSymbols.UNDERSCORE:
 					this.type = new WildcardType(token.raw(), Variance.COVARIANT);
