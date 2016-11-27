@@ -2,9 +2,12 @@ package dyvil.util
 
 import java.util.NoSuchElementException
 
+@LiteralConvertible.FromNil
 public object None implements Option<null>
 {
-	public static func apply<T>(): Option<T> = None
+	public static func apply(): None = None
+
+	// Accessors
 
 	public override func get(): null = throw new NoSuchElementException
 

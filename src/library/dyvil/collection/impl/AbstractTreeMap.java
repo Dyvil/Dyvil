@@ -4,7 +4,6 @@ import dyvil.collection.Entry;
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
 import dyvil.collection.MutableMap;
-import dyvil.util.None;
 import dyvil.util.Option;
 import dyvil.util.Some;
 
@@ -677,7 +676,7 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 	public Option<V> getOption(Object key)
 	{
 		TreeEntry<K, V> p = this.getEntryInternal(key);
-		return p == null ? None.apply() : new Some<>(p.value);
+		return p == null ? Option.apply() : new Some<>(p.value);
 	}
 
 	protected final V putInternal(K key, V value)

@@ -1,6 +1,5 @@
 package dyvil.collection;
 
-import dyvil.util.None;
 import dyvil.util.Option;
 import dyvil.util.Some;
 
@@ -149,7 +148,7 @@ public interface Queryable<E> extends SizedIterable<E>
 	{
 		if (this.isEmpty())
 		{
-			return None.apply();
+			return Option.apply();
 		}
 
 		return new Some<>(this.reduce(reducer));
@@ -202,7 +201,7 @@ public interface Queryable<E> extends SizedIterable<E>
 			}
 		}
 
-		return None.apply();
+		return Option.apply();
 	}
 	
 	/**

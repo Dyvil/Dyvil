@@ -69,11 +69,7 @@ public interface JavaMaps
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	static <K, V> Option<V> getOption(java.util.Map<K, V> map, Object key)
 	{
-		if (!map.containsKey(key))
-		{
-			return None.apply();
-		}
-		return new Some<>(map.get(key));
+		return !map.containsKey(key) ? Option.apply() : new Some<>(map.get(key));
 	}
 	
 	// Mutating Operations
