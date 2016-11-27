@@ -108,7 +108,7 @@ public final class EmptyMap<K, V> implements ImmutableMap<K, V>
 	@Override
 	public Option<V> getOption(Object key)
 	{
-		return None.instance;
+		return None.apply();
 	}
 	
 	@Override

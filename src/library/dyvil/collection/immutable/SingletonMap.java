@@ -130,7 +130,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	@Override
 	public Option<V> getOption(Object key)
 	{
-		return Objects.equals(key, this.key) ? new Some<>(this.value) : None.instance;
+		return Objects.equals(key, this.key) ? new Some<>(this.value) : None.apply();
 	}
 	
 	@Override

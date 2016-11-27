@@ -69,7 +69,7 @@ public interface BidiQueryable<E> extends Queryable<E>
 				return new Some<E>(element);
 			}
 		}
-		return None.instance;
+		return None.apply();
 	}
 	
 	@Override
@@ -140,7 +140,7 @@ public interface BidiQueryable<E> extends Queryable<E>
 	{
 		if (this.isEmpty())
 		{
-			return None.instance;
+			return None.apply();
 		}
 
 		return new Some<>(this.reduceLeft(reducer));
@@ -150,7 +150,7 @@ public interface BidiQueryable<E> extends Queryable<E>
 	{
 		if (this.isEmpty())
 		{
-			return None.instance;
+			return None.apply();
 		}
 
 		return new Some<>(this.reduceRight(reducer));

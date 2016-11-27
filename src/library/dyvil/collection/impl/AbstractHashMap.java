@@ -578,7 +578,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	public Option<V> getOption(Object key)
 	{
 		HashEntry<K, V> entry = this.getEntryInternal(key);
-		return entry == null ? None.instance : new Some<>(entry.value);
+		return entry == null ? None.apply() : new Some<>(entry.value);
 	}
 
 	@Override

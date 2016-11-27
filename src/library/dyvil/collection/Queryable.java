@@ -149,7 +149,7 @@ public interface Queryable<E> extends SizedIterable<E>
 	{
 		if (this.isEmpty())
 		{
-			return None.instance;
+			return None.apply();
 		}
 
 		return new Some<>(this.reduce(reducer));

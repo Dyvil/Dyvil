@@ -677,7 +677,7 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 	public Option<V> getOption(Object key)
 	{
 		TreeEntry<K, V> p = this.getEntryInternal(key);
-		return p == null ? None.instance : new Some<>(p.value);
+		return p == null ? None.apply() : new Some<>(p.value);
 	}
 
 	protected final V putInternal(K key, V value)

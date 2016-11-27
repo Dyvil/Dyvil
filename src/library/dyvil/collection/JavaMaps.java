@@ -71,9 +71,9 @@ public interface JavaMaps
 	{
 		if (!map.containsKey(key))
 		{
-			return None.instance;
+			return None.apply();
 		}
-		return new Some(map.get(key));
+		return new Some<>(map.get(key));
 	}
 	
 	// Mutating Operations
