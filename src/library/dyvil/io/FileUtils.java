@@ -1,6 +1,5 @@
 package dyvil.io;
 
-import dyvil.annotation.Utility;
 import dyvil.annotation.internal.DyvilModifiers;
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
@@ -14,13 +13,9 @@ import java.nio.file.Files;
 import java.util.regex.Pattern;
 
 /**
- * The {@linkplain Utility utility interface} <b>FileUtils</b> can be used for several {@link File} -related operations
+ * The <b>FileUtils</b> class can be used for several {@link File} -related operations
  * such as writing or reading the file both as a String or as a List of Strings or recursively deleting directories.
- *
- * @author Clashsoft
- * @version 1.0
  */
-@Utility(File.class)
 public final class FileUtils
 {
 	private FileUtils()
