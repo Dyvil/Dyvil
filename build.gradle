@@ -11,13 +11,13 @@ import groovy.transform.Field
 
 group = 'dyvil-team'
 
-version = '0.26.0'
+version = '0.27.0'
 
-String libraryVersion = '0.26.0'
-String compilerVersion = '0.26.0'
-String replVersion = '0.17.0'
-String dpfVersion = '0.6.4'
-String genSrcVersion = '0.1.0'
+String libraryVersion = '0.27.0'
+String compilerVersion = '0.27.0'
+String replVersion = '0.17.1'
+String dpfVersion = '0.8.0'
+String genSrcVersion = '0.2.0'
 
 String devStage = 'gamma'
 
