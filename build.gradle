@@ -142,33 +142,36 @@ repositories {
 dependencies {
 	// Runtime Dependencies (Resources)
 	
-	def libraryFiles = files("$buildDir/dyvilbin") {
+	def libRun = files("$buildDir/dyvilbin") {
 		builtBy 'compileLibraryDyvil'
 	}
-	def dpfFiles = files("$buildDir/dpfbin") {
+	def dpfRun = files("$buildDir/dpfbin") {
 		builtBy 'compileDPFDyvil'
 	}
-	def testFiles = files("$buildDir/dyviltestbin") {
+	def testRun = files("$buildDir/dyviltestbin") {
 		builtBy 'compileTestDyvil'
 	}
 	
-	libraryCompile fileTree('libs/')
-	libraryRuntime libraryFiles
+	def libs = fileTree('libs/')
+	def libComp = sourceSets.library.output + libs
+	
+	libraryCompile libs
+	libraryRuntime libRun
 	
 	// compiler -> library
-	compilerCompile sourceSets.library.output
+	compilerCompile libComp
 	
 	// dpf -> library
-	dpfCompile sourceSets.library.output
-	dpfRuntime libraryFiles, dpfFiles
+	dpfCompile libComp
+	dpfRuntime libRun, dpfRun
 	
 	// repl -> library, compiler
-	replCompile sourceSets.library.output, sourceSets.compiler.output
-	replRuntime libraryFiles, dpfFiles, testFiles
+	replCompile libComp, sourceSets.compiler.output
+	replRuntime libRun, dpfRun, testRun
 	
 	// test -> library, junit
-	testCompile sourceSets.library.output, 'junit:junit:4.12'
-	testRuntime libraryFiles, dpfFiles, testFiles
+	testCompile libComp, 'junit:junit:4.12'
+	testRuntime libRun, dpfRun, testRun
 }
 
 // ---------------------------------------- Copy Tasks ----------------------------------------
