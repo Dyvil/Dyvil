@@ -38,7 +38,7 @@ public class OverloadTest
 	public static String g<T extends Set<int>>(T ints) = "g(Set<int>)"
 
 	@BytecodeName("g_stringSet")
-	public static String g<T extends Set<String>>(T strings) = "g(Set<String>)"
+	public static String g<T: Set<String>>(T strings) = "g(Set<String>)"
 
 	// ----------------- h section -----------------
 

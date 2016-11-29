@@ -113,16 +113,6 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 			pm.report(token, "type_parameter.identifier");
 			return;
 		case TYPE_BOUNDS:
-			if (ParserUtil.isTerminator(type) || TypeParser.isGenericEnd(token, type))
-			{
-				if (this.typeParameter != null)
-				{
-					this.typeParameterized.addTypeParameter(this.typeParameter);
-				}
-				pm.popParser(true);
-				return;
-			}
-
 			switch (type)
 			{
 			case DyvilKeywords.EXTENDS:
@@ -135,6 +125,16 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 			case DyvilKeywords.SUPER:
 				pm.pushParser(this.newTypeParser());
 				this.setBoundMode(LOWER_BOUND);
+				return;
+			}
+
+			if (ParserUtil.isTerminator(type) || TypeParser.isGenericEnd(token, type))
+			{
+				if (this.typeParameter != null)
+				{
+					this.typeParameterized.addTypeParameter(this.typeParameter);
+				}
+				pm.popParser(true);
 				return;
 			}
 

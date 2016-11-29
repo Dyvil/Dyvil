@@ -6,7 +6,7 @@ package dyvil.util
  */
 public interface Configurable
 {
-	infix inline T apply<T extends Configurable>(T self, Configure<T> configure)
+	infix inline T apply<T: Configurable>(T self, Configure<T> configure)
 	{
 		configure self
 		return self
