@@ -93,6 +93,12 @@ public class IntersectionType implements IObjectType
 		final Set<IClass> commonClassSet = Types.commonClasses(this.left, this.right);
 		commonClassSet.remove(Types.OBJECT_CLASS);
 
+		if (commonClassSet.isEmpty())
+		{
+			this.commonClasses = OBJECT_CLASS_ARRAY;
+			return Types.OBJECT_CLASS;
+		}
+
 		this.commonClasses = new IClass[commonClassSet.size()];
 		commonClassSet.toArray(this.commonClasses);
 
@@ -102,7 +108,7 @@ public class IntersectionType implements IObjectType
 	@Override
 	public IType asParameterType()
 	{
-		return new IntersectionType(this.left.asParameterType(), this.right.asParameterType());
+		return combine(this.left.asParameterType(), this.right.asParameterType(), null);
 	}
 
 	@Override
@@ -149,7 +155,7 @@ public class IntersectionType implements IObjectType
 			return left;
 		}
 
-		return new IntersectionType(left, right);
+		return combine(left, right, null);
 	}
 
 	@Override
@@ -168,7 +174,7 @@ public class IntersectionType implements IObjectType
 			return this;
 		}
 
-		return new IntersectionType(left, right);
+		return combine(left, right, null);
 	}
 
 	@Override

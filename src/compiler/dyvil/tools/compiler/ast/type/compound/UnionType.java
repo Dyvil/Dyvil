@@ -13,11 +13,11 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.raw.IObjectType;
@@ -98,7 +98,7 @@ public class UnionType implements IObjectType
 	@Override
 	public IType asParameterType()
 	{
-		return new UnionType(this.left.asParameterType(), this.right.asParameterType());
+		return combine(this.left.asParameterType(), this.right.asParameterType(), null);
 	}
 
 	@Override
@@ -110,6 +110,10 @@ public class UnionType implements IObjectType
 	@Override
 	public boolean isSuperTypeOf(IType subType)
 	{
+		if (subType.typeTag() == IType.UNION)
+		{
+			return subType.isSubTypeOf(this);
+		}
 		return Types.isSuperType(this.left, subType) || Types.isSuperType(this.right, subType);
 	}
 
@@ -145,7 +149,7 @@ public class UnionType implements IObjectType
 			return left;
 		}
 
-		return new UnionType(left, right);
+		return combine(left, right, null);
 	}
 
 	@Override
@@ -164,7 +168,7 @@ public class UnionType implements IObjectType
 			return this;
 		}
 
-		return new UnionType(left, right);
+		return combine(left, right, null);
 	}
 
 	@Override
@@ -371,6 +375,7 @@ public class UnionType implements IObjectType
 	@Override
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
+		
 	}
 
 	@Override

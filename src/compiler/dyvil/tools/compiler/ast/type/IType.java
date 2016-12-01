@@ -280,9 +280,9 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	}
 
 	int SUBTYPE_BASE               = 0;
-	int SUBTYPE_UNION_INTERSECTION = 1;
-	int SUBTYPE_TYPEVAR            = 2;
-	int SUBTYPE_COVARIANT_TYPEVAR  = 3;
+	int SUBTYPE_TYPEVAR            = 1;
+	int SUBTYPE_COVARIANT_TYPEVAR  = 2;
+	int SUBTYPE_UNION_INTERSECTION = 3;
 	int SUBTYPE_WILDCARD           = 4;
 
 	default int subTypeCheckLevel()
