@@ -30,13 +30,13 @@ public class NullType implements IRawType
 	{
 		return NULL;
 	}
-	
+
 	@Override
 	public Name getName()
 	{
 		return Names._null;
 	}
-	
+
 	@Override
 	public IClass getTheClass()
 	{
@@ -48,24 +48,24 @@ public class NullType implements IRawType
 	{
 		return true;
 	}
-	
+
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
 		return this;
 	}
-	
+
 	@Override
 	public void checkType(MarkerList markers, IContext context, int position)
 	{
 	}
-	
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
 		return null;
 	}
-	
+
 	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
@@ -80,60 +80,59 @@ public class NullType implements IRawType
 	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
 	{
 	}
-	
+
 	@Override
 	public IMethod getFunctionalMethod()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public String getInternalName()
 	{
 		return NULL_INTERNAL;
 	}
-	
+
 	@Override
-	public void appendExtendedName(StringBuilder buffer)
+	public void appendDescriptor(StringBuilder buffer, int type)
 	{
+		if (type == NAME_FULL)
+		{
+			buffer.append('N');
+			return;
+		}
 		buffer.append("Ldyvil/lang/Null;");
 	}
-	
-	@Override
-	public void appendSignature(StringBuilder buffer, boolean genericArg)
-	{
-		buffer.append("Ldyvil/lang/Null;");
-	}
-	
+
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvilx/lang/model/type/NullType", "instance",
 		                      "Ldyvilx/lang/model/type/NullType;");
 	}
-	
+
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
 	}
-	
+
 	@Override
 	public void read(DataInput in) throws IOException
 	{
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return "null";
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append("null");
 	}
-	
+
 	@Override
 	public IType clone()
 	{

@@ -361,28 +361,10 @@ public class ArrayType implements IObjectType, ITyped
 	}
 
 	@Override
-	public void appendExtendedName(StringBuilder buffer)
+	public void appendDescriptor(StringBuilder buffer, int type)
 	{
 		buffer.append('[');
-		this.type.appendExtendedName(buffer);
-	}
-
-	@Override
-	public String getSignature()
-	{
-		String s = this.type.getSignature();
-		if (s != null)
-		{
-			return '[' + s;
-		}
-		return null;
-	}
-
-	@Override
-	public void appendSignature(StringBuilder buffer, boolean genericArg)
-	{
-		buffer.append('[');
-		this.type.appendSignature(buffer, false);
+		this.type.appendDescriptor(buffer, type == NAME_SIGNATURE_GENERIC_ARG ? NAME_SIGNATURE : type);
 	}
 
 	@Override

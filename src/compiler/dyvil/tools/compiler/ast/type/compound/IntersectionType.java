@@ -42,6 +42,10 @@ public class IntersectionType implements IObjectType
 	// Metadata
 	private IClass[] commonClasses;
 
+	public IntersectionType()
+	{
+	}
+
 	public IntersectionType(IType left, IType right)
 	{
 		this.left = left;
@@ -57,6 +61,11 @@ public class IntersectionType implements IObjectType
 	public IType getLeft()
 	{
 		return this.left;
+	}
+
+	public void setLeft(IType left)
+	{
+		this.left = left;
 	}
 
 	public IType getRight()
@@ -346,9 +355,17 @@ public class IntersectionType implements IObjectType
 	}
 
 	@Override
-	public void appendSignature(StringBuilder buffer, boolean genericArg)
+	public void appendDescriptor(StringBuilder buffer, int type)
 	{
-		buffer.append('L').append(this.getTheClass().getInternalName()).append(';');
+		if (type == NAME_FULL)
+		{
+			buffer.append('|');
+			this.left.appendDescriptor(buffer, NAME_FULL);
+			this.right.appendDescriptor(buffer, NAME_FULL);
+			return;
+		}
+
+		buffer.append('L').append(this.getInternalName()).append(';');
 	}
 
 	@Override

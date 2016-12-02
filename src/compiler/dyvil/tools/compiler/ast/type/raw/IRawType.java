@@ -76,18 +76,6 @@ public interface IRawType extends IObjectType
 	}
 
 	@Override
-	default void appendExtendedName(StringBuilder buffer)
-	{
-		buffer.append('L').append(this.getInternalName()).append(';');
-	}
-
-	@Override
-	default void appendSignature(StringBuilder buffer, boolean genericArg)
-	{
-		this.appendExtendedName(buffer);
-	}
-
-	@Override
 	default void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
 	{
 	}

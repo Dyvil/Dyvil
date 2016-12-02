@@ -270,13 +270,20 @@ public class ReferenceType implements IObjectType
 	}
 
 	@Override
-	public void appendSignature(StringBuilder buffer, boolean genericArg)
+	public void appendDescriptor(StringBuilder buffer, int type)
 	{
+		if (type == NAME_FULL)
+		{
+			buffer.append('R');
+			this.type.appendDescriptor(buffer, NAME_FULL);
+			return;
+		}
+
 		buffer.append('L').append(this.getInternalName());
-		if (this.theClass == LazyFields.OBJECT_REF_CLASS)
+		if (type != NAME_DESCRIPTOR && this.theClass == LazyFields.OBJECT_REF_CLASS)
 		{
 			buffer.append('<');
-			this.type.appendSignature(buffer, true);
+			this.type.appendDescriptor(buffer, type);
 			buffer.append('>');
 		}
 		buffer.append(';');

@@ -470,20 +470,15 @@ public final class PrimitiveType implements IType
 	}
 
 	@Override
-	public void appendExtendedName(StringBuilder buffer)
+	public void appendDescriptor(StringBuilder buffer, int type)
 	{
-		buffer.append(this.typeChar);
-	}
-
-	@Override
-	public void appendSignature(StringBuilder buffer, boolean genericArg)
-	{
-		if (!genericArg)
+		if (type == NAME_SIGNATURE_GENERIC_ARG)
 		{
-			buffer.append(this.typeChar);
+			buffer.append('L').append(this.getInternalName()).append(';');
 			return;
 		}
-		buffer.append('L').append(this.wrapperClass.getInternalName()).append(';');
+
+		buffer.append(this.typeChar);
 	}
 
 	@Override

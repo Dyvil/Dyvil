@@ -206,14 +206,14 @@ public class TypeVarType implements IRawType
 	}
 
 	@Override
-	public void appendExtendedName(StringBuilder buffer)
+	public void appendDescriptor(StringBuilder buffer, int type)
 	{
-		buffer.append('L').append(this.getInternalName()).append(';');
-	}
+		if (type == NAME_DESCRIPTOR)
+		{
+			buffer.append('L').append(this.getInternalName()).append(';');
+			return;
+		}
 
-	@Override
-	public void appendSignature(StringBuilder buffer, boolean genericArg)
-	{
 		buffer.append('T').append(this.typeParameter.getName().qualified).append(';');
 	}
 

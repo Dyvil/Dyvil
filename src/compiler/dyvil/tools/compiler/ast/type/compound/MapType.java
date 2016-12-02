@@ -280,12 +280,20 @@ public class MapType implements IObjectType
 	}
 
 	@Override
-	public void appendSignature(StringBuilder buffer, boolean genericArg)
+	public void appendDescriptor(StringBuilder buffer, int type)
 	{
-		buffer.append('L').append(this.theClass.getInternalName()).append('<');
-		this.keyType.appendSignature(buffer, true);
-		this.valueType.appendSignature(buffer, true);
-		buffer.append('>').append(';');
+		buffer.append('L').append(this.getInternalName());
+
+		if (type != NAME_DESCRIPTOR)
+		{
+			final int parType = type == NAME_FULL ? NAME_FULL : NAME_SIGNATURE_GENERIC_ARG;
+
+			buffer.append('<');
+			this.keyType.appendDescriptor(buffer, parType);
+			this.valueType.appendDescriptor(buffer, parType);
+			buffer.append('>');
+		}
+		buffer.append(';');
 	}
 
 	@Override

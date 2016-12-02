@@ -37,22 +37,4 @@ public class InternalTypeVarType extends InternalType
 		
 		return new TypeVarType(typeVar);
 	}
-	
-	@Override
-	public String getInternalName()
-	{
-		return "java/lang/Object";
-	}
-	
-	@Override
-	public void appendExtendedName(StringBuilder buffer)
-	{
-		buffer.append("Ljava/lang/Object;");
-	}
-	
-	@Override
-	public void appendSignature(StringBuilder buffer, boolean genericArg)
-	{
-		buffer.append('T').append(this.internalName).append(';');
-	}
 }

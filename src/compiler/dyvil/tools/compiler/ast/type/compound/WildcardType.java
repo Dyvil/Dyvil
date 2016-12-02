@@ -335,14 +335,14 @@ public final class WildcardType implements IRawType, ITyped
 	}
 
 	@Override
-	public void appendExtendedName(StringBuilder buffer)
+	public void appendDescriptor(StringBuilder buffer, int type)
 	{
-		buffer.append('L').append(this.getInternalName()).append(';');
-	}
+		if (type == NAME_DESCRIPTOR)
+		{
+			buffer.append('L').append(this.getInternalName()).append(';');
+			return;
+		}
 
-	@Override
-	public void appendSignature(StringBuilder buffer, boolean genericArg)
-	{
 		if (!Types.isSameType(this.bound, Types.OBJECT))
 		{
 			this.variance.appendPrefix(buffer);

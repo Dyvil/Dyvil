@@ -134,19 +134,7 @@ public class ClassType implements IRawType
 	}
 
 	@Override
-	public void appendExtendedName(StringBuilder buffer)
-	{
-		buffer.append('L').append(this.theClass.getInternalName()).append(';');
-	}
-
-	@Override
-	public String getSignature()
-	{
-		return null;
-	}
-
-	@Override
-	public void appendSignature(StringBuilder buffer, boolean genericArg)
+	public void appendDescriptor(StringBuilder buffer, int type)
 	{
 		buffer.append('L').append(this.theClass.getInternalName()).append(';');
 	}

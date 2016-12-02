@@ -62,12 +62,7 @@ public interface IUnresolvedType extends IRawType
 	}
 
 	@Override
-	default void appendExtendedName(StringBuilder buffer)
-	{
-	}
-
-	@Override
-	default void appendSignature(StringBuilder buffer, boolean genericArg)
+	default void appendDescriptor(StringBuilder buffer, int type)
 	{
 	}
 

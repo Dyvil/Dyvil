@@ -15,8 +15,6 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassFormat;
-import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -24,7 +22,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public class InternalType implements IRawType
+public class InternalType implements IRawType, IUnresolvedType
 {
 	protected String internalName;
 
@@ -122,29 +120,6 @@ public class InternalType implements IRawType
 	public IMethod getFunctionalMethod()
 	{
 		return null;
-	}
-
-	@Override
-	public String getInternalName()
-	{
-		return this.internalName;
-	}
-
-	@Override
-	public void appendExtendedName(StringBuilder buffer)
-	{
-		buffer.append('L').append(this.internalName).append(';');
-	}
-
-	@Override
-	public void appendSignature(StringBuilder buffer, boolean genericArg)
-	{
-		buffer.append('L').append(this.internalName).append(';');
-	}
-
-	@Override
-	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
-	{
 	}
 
 	@Override

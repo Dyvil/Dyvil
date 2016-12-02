@@ -410,6 +410,16 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	// Compilation
 
+	int NAME_DESCRIPTOR            = 1;
+	int NAME_SIGNATURE             = 2;
+	int NAME_SIGNATURE_GENERIC_ARG = 3;
+	int NAME_FULL                  = 4;
+
+	default int getDescriptorKind()
+	{
+		return this.needsSignature() ? NAME_SIGNATURE : NAME_DESCRIPTOR;
+	}
+
 	String getInternalName();
 
 	default String getExtendedName()
@@ -419,7 +429,10 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		return buffer.toString();
 	}
 
-	void appendExtendedName(StringBuilder buffer);
+	default void appendExtendedName(StringBuilder buffer)
+	{
+		this.appendDescriptor(buffer, NAME_DESCRIPTOR);
+	}
 
 	default String getSignature()
 	{
@@ -428,7 +441,12 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		return builder.toString();
 	}
 
-	void appendSignature(StringBuilder buffer, boolean genericArg);
+	default void appendSignature(StringBuilder buffer, boolean genericArg)
+	{
+		this.appendDescriptor(buffer, genericArg ? NAME_SIGNATURE_GENERIC_ARG : NAME_SIGNATURE);
+	}
+
+	void appendDescriptor(StringBuilder buffer, int type);
 
 	int getLoadOpcode();
 

@@ -11,11 +11,11 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
@@ -388,21 +388,23 @@ public final class TupleType implements IObjectType, ITypeList
 	}
 
 	@Override
-	public void appendExtendedName(StringBuilder buffer)
+	public void appendDescriptor(StringBuilder buffer, int type)
 	{
-		buffer.append('L').append(this.getInternalName()).append(';');
-	}
+		buffer.append('L').append(this.getInternalName());
 
-	@Override
-	public void appendSignature(StringBuilder buf, boolean genericArg)
-	{
-		buf.append('L').append(this.getInternalName());
-		buf.append('<');
-		for (int i = 0; i < this.typeCount; i++)
+		if (type != NAME_DESCRIPTOR)
 		{
-			this.types[i].appendSignature(buf, true);
+			final int parType = type == NAME_FULL ? NAME_FULL : NAME_SIGNATURE_GENERIC_ARG;
+
+			buffer.append('<');
+			for (int i = 0; i < this.typeCount; i++)
+			{
+				this.types[i].appendDescriptor(buffer, parType);
+			}
+			buffer.append('>');
 		}
-		buf.append('>').append(';');
+
+		buffer.append(';');
 	}
 
 	@Override
