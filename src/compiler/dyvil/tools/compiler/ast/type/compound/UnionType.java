@@ -42,6 +42,10 @@ public class UnionType implements IObjectType
 	// Metadata
 	private IClass[] commonClasses;
 
+	public UnionType()
+	{
+	}
+
 	public UnionType(IType left, IType right)
 	{
 		this.left = left;
@@ -52,6 +56,26 @@ public class UnionType implements IObjectType
 	public int typeTag()
 	{
 		return UNION;
+	}
+
+	public IType getLeft()
+	{
+		return this.left;
+	}
+
+	public void setLeft(IType left)
+	{
+		this.left = left;
+	}
+
+	public IType getRight()
+	{
+		return this.right;
+	}
+
+	public void setRight(IType right)
+	{
+		this.right = right;
 	}
 
 	@Override
@@ -361,7 +385,7 @@ public class UnionType implements IObjectType
 	{
 		if (type == NAME_FULL)
 		{
-			buffer.append('&');
+			buffer.append('|');
 			this.left.appendDescriptor(buffer, NAME_FULL);
 			this.right.appendDescriptor(buffer, NAME_FULL);
 			return;

@@ -73,6 +73,11 @@ public class IntersectionType implements IObjectType
 		return this.right;
 	}
 
+	public void setRight(IType right)
+	{
+		this.right = right;
+	}
+
 	@Override
 	public boolean isGenericType()
 	{

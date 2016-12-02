@@ -95,6 +95,16 @@ public class OptionType implements IObjectType
 		return OPTIONAL;
 	}
 
+	public IType getType()
+	{
+		return this.type;
+	}
+
+	public void setType(IType type)
+	{
+		this.type = type;
+	}
+
 	@Override
 	public boolean isGenericType()
 	{

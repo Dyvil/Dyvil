@@ -446,6 +446,13 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		this.appendDescriptor(buffer, genericArg ? NAME_SIGNATURE_GENERIC_ARG : NAME_SIGNATURE);
 	}
 
+	default String getDescriptor(int type)
+	{
+		final StringBuilder builder = new StringBuilder();
+		this.appendDescriptor(builder, type);
+		return builder.toString();
+	}
+
 	void appendDescriptor(StringBuilder buffer, int type);
 
 	int getLoadOpcode();
@@ -470,6 +477,10 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	void writeDefaultValue(MethodWriter writer) throws BytecodeException;
 
+	IConstantValue getDefaultValue();
+
+	// Annotations
+
 	static IType withAnnotation(IType type, IAnnotation annotation, TypePath typePath)
 	{
 		return withAnnotation(type, annotation, typePath, 0, typePath.getLength());
@@ -477,19 +488,19 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	static IType withAnnotation(IType type, IAnnotation annotation, TypePath typePath, int step, int steps)
 	{
-		if (typePath == null || step >= steps)
+		if (typePath != null && step < steps)
 		{
-			final IType customType = type.withAnnotation(annotation);
-			if (customType != null)
-			{
-				return customType;
-			}
-
-			return new AnnotatedType(type, annotation);
+			type.addAnnotation(annotation, typePath, step, steps);
+			return type;
 		}
 
-		type.addAnnotation(annotation, typePath, step, steps);
-		return type;
+		final IType customType = type.withAnnotation(annotation);
+		if (customType != null)
+		{
+			return customType;
+		}
+
+		return new AnnotatedType(type, annotation);
 	}
 
 	default IType withAnnotation(IAnnotation annotation)
@@ -501,7 +512,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath);
 
-	IConstantValue getDefaultValue();
+	// General Compilation
 
 	static void writeType(IType type, DataOutput dos) throws IOException
 	{
@@ -581,10 +592,10 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	void read(DataInput in) throws IOException;
 
+	// Misc
+
 	@Override
 	void toString(String prefix, StringBuilder buffer);
-
-	// Misc
 
 	IType clone();
 

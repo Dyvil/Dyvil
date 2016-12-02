@@ -133,6 +133,12 @@ public class InternalType implements IRawType, IUnresolvedType
 	}
 
 	@Override
+	public String getInternalName()
+	{
+		return this.internalName;
+	}
+
+	@Override
 	public void write(DataOutput out) throws IOException
 	{
 		out.writeUTF(this.internalName);

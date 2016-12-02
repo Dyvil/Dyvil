@@ -81,6 +81,16 @@ public class ReferenceType implements IObjectType
 		return REFERENCE;
 	}
 
+	public IType getType()
+	{
+		return this.type;
+	}
+
+	public void setType(IType type)
+	{
+		this.type = type;
+	}
+
 	@Override
 	public ICodePosition getPosition()
 	{
