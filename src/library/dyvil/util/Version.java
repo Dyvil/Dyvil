@@ -20,63 +20,67 @@ public final class Version implements Comparable<Version>, Serializable
 	{
 		MAJOR, MINOR, PATCH, PRERELEASE, BUILD
 	}
-	
+
 	private static final long serialVersionUID = 2514051844985966173L;
-	
-	private static final String  FORMAT  = "^(?:v)?(?:(\\d+)\\.(\\d+)\\.(\\d+))(?:-([\\dA-Za-z\\-]+(?:\\.[\\dA-Za-z\\-]+)*))?(?:\\+([\\dA-Za-z\\-]+(?:\\.[\\dA-Za-z\\-]+)*))?$";
+
+	protected static final String  INFO_FORMAT  = "[\\dA-Za-z\\-]+(?:\\.[\\dA-Za-z\\-]+)*";
+	protected static final Pattern INFO_PATTERN = Pattern.compile(INFO_FORMAT);
+
+	private static final String  FORMAT  =
+		"^v?(\\d+)\\.(\\d+)\\.(\\d+)(?:-(" + INFO_FORMAT + "))?(?:\\+(" + INFO_FORMAT + "))?$";
 	private static final Pattern PATTERN = Pattern.compile(Version.FORMAT);
-	
+
 	private final int    major;
 	private final int    minor;
 	private final int    patch;
 	private final String prerelease;
 	private final String build;
-	
+
 	public static Version apply(String version)
 	{
 		return new Version(version);
 	}
-	
+
 	public static Version apply(int major, int minor, int patch)
 	{
 		return new Version(major, minor, patch, null, null);
 	}
-	
+
 	public static Version apply(int major, int minor, int patch, String prerelease)
 	{
 		return new Version(major, minor, patch, prerelease, null);
 	}
-	
+
 	public static Version apply(int major, int minor, int patch, String prerelease, String build)
 	{
 		return new Version(major, minor, patch, prerelease, build);
 	}
-	
+
 	public Version(String version)
 	{
-		Matcher matcher = Version.PATTERN.matcher(version);
+		final Matcher matcher = PATTERN.matcher(version);
 		if (!matcher.matches())
 		{
-			throw new IllegalArgumentException("'" + version + "' does not match format " + Version.FORMAT);
+			throw new IllegalArgumentException("'" + version + "' does not match format '" + FORMAT + "'");
 		}
-		
+
 		this.major = Integer.parseInt(matcher.group(1));
 		this.minor = Integer.parseInt(matcher.group(2));
 		this.patch = Integer.parseInt(matcher.group(3));
 		this.prerelease = matcher.group(4);
 		this.build = matcher.group(5);
 	}
-	
+
 	public Version(int major, int minor, int patch)
 	{
 		this(major, minor, patch, null, null);
 	}
-	
+
 	public Version(int major, int minor, int patch, String prerelease)
 	{
 		this(major, minor, patch, prerelease, null);
 	}
-	
+
 	public Version(int major, int minor, int patch, String prerelease, String build)
 	{
 		if (major < 0)
@@ -91,21 +95,66 @@ public final class Version implements Comparable<Version>, Serializable
 		{
 			throw new IllegalArgumentException(Element.PATCH + " must be positive");
 		}
-		
+		if (prerelease != null && !INFO_PATTERN.matcher(prerelease).find())
+		{
+			throw new IllegalArgumentException(Element.PRERELEASE + " '" + prerelease + "'does not match format "
+				                                   + INFO_FORMAT + "'");
+		}
+		if (build != null && !INFO_PATTERN.matcher(build).find())
+		{
+			throw new IllegalArgumentException(Element.BUILD + " '" + build + "' does not match format " + INFO_FORMAT
+				                                   + "'");
+		}
+
 		this.major = major;
 		this.minor = minor;
 		this.patch = patch;
 		this.prerelease = prerelease;
 		this.build = build;
 	}
-	
+
+	public int major()
+	{
+		return this.major;
+	}
+
+	public int minor()
+	{
+		return this.minor;
+	}
+
+	public int patch()
+	{
+		return this.patch;
+	}
+
+	public String releaseInfo()
+	{
+		return this.prerelease;
+	}
+
+	public String buildInfo()
+	{
+		return this.build;
+	}
+
+	public boolean isInDevelopment()
+	{
+		return this.major == 0;
+	}
+
+	public boolean isStable()
+	{
+		return this.major > 0;
+	}
+
 	public Version next(Version.Element element)
 	{
 		if (element == null)
 		{
 			throw new IllegalArgumentException("Invalid Element");
 		}
-		
+
 		switch (element)
 		{
 		case MAJOR:
@@ -122,33 +171,23 @@ public final class Version implements Comparable<Version>, Serializable
 			return this;
 		}
 	}
-	
-	public boolean isInDevelopment()
-	{
-		return this.major == 0;
-	}
-	
-	public boolean isStable()
-	{
-		return this.major > 0;
-	}
-	
+
 	@Override
 	public String toString()
 	{
-		StringBuilder sb = new StringBuilder();
-		sb.append(this.major).append(".").append(this.minor).append(".").append(this.patch);
-		if (this.prerelease != null)
+		final StringBuilder result = new StringBuilder();
+		result.append(this.major).append(".").append(this.minor).append(".").append(this.patch);
+		if (this.prerelease != null && !this.prerelease.isEmpty())
 		{
-			sb.append('-').append(this.prerelease);
+			result.append('-').append(this.prerelease);
 		}
-		if (this.build != null)
+		if (this.build != null && !this.build.isEmpty())
 		{
-			sb.append('+').append(this.build);
+			result.append('+').append(this.build);
 		}
-		return sb.toString();
+		return result.toString();
 	}
-	
+
 	@Override
 	public int hashCode()
 	{
@@ -158,10 +197,9 @@ public final class Version implements Comparable<Version>, Serializable
 		result = prime * result + this.minor;
 		result = prime * result + this.patch;
 		result = prime * result + (this.prerelease == null ? 0 : this.prerelease.hashCode());
-		result = prime * result + (this.build == null ? 0 : this.build.hashCode());
 		return result;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -169,73 +207,59 @@ public final class Version implements Comparable<Version>, Serializable
 		{
 			return true;
 		}
-		if (obj == null)
+		if (obj == null || this.getClass() != obj.getClass())
 		{
 			return false;
 		}
-		if (this.getClass() != obj.getClass())
-		{
-			return false;
-		}
-		Version other = (Version) obj;
-		if (this.major != other.major || this.minor != other.minor || this.patch != other.patch)
+
+		final Version that = (Version) obj;
+		if (this.major != that.major || this.minor != that.minor || this.patch != that.patch)
 		{
 			return false;
 		}
 		if (this.prerelease == null)
 		{
-			if (other.prerelease != null)
+			if (that.prerelease != null)
 			{
 				return false;
 			}
 		}
-		else if (!this.prerelease.equals(other.prerelease))
-		{
-			return false;
-		}
-		if (this.build == null)
-		{
-			if (other.build != null)
-			{
-				return false;
-			}
-		}
-		else if (!this.build.equals(other.build))
+		else if (!this.prerelease.equals(that.prerelease))
 		{
 			return false;
 		}
 		return true;
 	}
-	
+
 	@Override
-	public int compareTo(Version other)
+	public int compareTo(Version o)
 	{
-		int cmp = this.major - other.major;
+		int cmp = this.major - o.major;
 		if (cmp != 0)
 		{
 			return cmp;
 		}
-		
-		cmp = this.minor - other.minor;
+
+		cmp = this.minor - o.minor;
 		if (cmp != 0)
 		{
 			return cmp;
 		}
-		
-		cmp = this.patch - other.patch;
+
+		cmp = this.patch - o.patch;
 		if (cmp != 0)
 		{
 			return cmp;
 		}
-		
-		if (other.prerelease != null)
+
+		if (this.prerelease == null)
 		{
-			return other.prerelease.compareTo(this.prerelease);
+			return o.prerelease != null ? -1 : 0;
 		}
-		if (this.build != null && other.build == null)
+		else if (o.prerelease == null)
 		{
-			return -1;
+			return 1;
 		}
-		return 0;
+		return this.prerelease.compareTo(o.prerelease);
 	}
 }
