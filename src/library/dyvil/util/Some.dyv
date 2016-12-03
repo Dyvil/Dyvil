@@ -16,7 +16,8 @@ public case class Some<T>(T value) implements Option<T>
 
 	public override func flatMap<U>(T -> Option<U> function): Option<U> = function(this.value)
 
-	public override func orElse(T value): T = this.value
+	@OverloadPriority
+	public func orElse<U>(U value): T = this.value
 
-	public override func orElse(-> T supplier): T = this.value
+	public override func orElse<U>(-> U supplier): T = this.value
 }

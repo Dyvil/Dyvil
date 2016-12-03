@@ -21,7 +21,8 @@ public object None implements Option<null>
 
 	public override func flatMap<U>(null -> Option<U> function): Option<U> = None
 
-	public override func orElse(null value): null = value
+	@OverloadPriority
+	public func orElse<U>(U value): U = value
 
-	public override func orElse(-> null supplier): null = supplier()
+	public override func orElse<U>(-> U supplier): U = supplier()
 }

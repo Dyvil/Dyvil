@@ -27,13 +27,11 @@ public interface Option<T> extends Serializable
 
 	func flatMap<U>(T -> Option<U> function): Option<U>
 
-	func orElse(T value): T
-
-	func orElse(-> T supplier): T
+	func orElse<U>(-> U supplier): T|U
 
 	// Operators
 
 	postfix inline func ! <T>(Option<T> lhs): T = lhs.get
 
-	infix inline func ?? <T>(Option<T> lhs, -> T rhs): T = lhs.orElse(supplier: rhs)
+	infix inline func ?? <T, U>(Option<T> lhs, -> U rhs): T|U = lhs.orElse(supplier: rhs)
 }
