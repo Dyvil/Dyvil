@@ -1,10 +1,14 @@
 package dyvil.tools.compiler.ast.annotation;
 
+import dyvil.tools.asm.AnnotationVisitor;
+import dyvil.tools.asm.TypeAnnotatableVisitor;
+import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 
 public final class AnnotationUtil
@@ -15,6 +19,9 @@ public final class AnnotationUtil
 
 	public static final String DYVIL_NAME_INTERNAL = "dyvil/annotation/internal/DyvilName";
 	public static final String DYVIL_NAME          = "L" + DYVIL_NAME_INTERNAL + ";";
+
+	public static final String DYVIL_TYPE_INTERNAL = "dyvil/annotation/internal/DyvilType";
+	public static final String DYVIL_TYPE          = "L" + DYVIL_TYPE_INTERNAL + ";";
 
 	public static final String CLASS_PARAMETERS = "Ldyvil/annotation/internal/ClassParameters;";
 
@@ -33,6 +40,20 @@ public final class AnnotationUtil
 	private AnnotationUtil()
 	{
 		// no instances
+	}
+
+	public static void visitDyvilName(IType type, TypeAnnotatableVisitor visitor, int typeRef, String typePath)
+	{
+		visitDyvilName(type, visitor, typeRef, TypePath.fromString(typePath));
+	}
+
+	public static void visitDyvilName(IType type, TypeAnnotatableVisitor visitor, int typeRef, TypePath typePath)
+	{
+		final AnnotationVisitor annotation = visitor.visitTypeAnnotation(typeRef, typePath, AnnotationUtil.DYVIL_TYPE,
+		                                                                 true);
+		annotation.visit("value", type.getDescriptor(IType.NAME_FULL));
+
+		annotation.visitEnd();
 	}
 
 	public static <T extends Enum<T>> T getEnumValue(IArguments arguments, IParameter parameter, Class<T> type)

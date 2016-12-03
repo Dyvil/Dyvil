@@ -5,6 +5,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Type;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
@@ -413,7 +414,7 @@ public class UnionType implements IObjectType
 	@Override
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
-		
+		AnnotationUtil.visitDyvilName(this, visitor, typeRef, typePath);
 	}
 
 	@Override
