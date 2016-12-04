@@ -1,20 +1,27 @@
-.classpath
-.project
-.settings/
-.idea/
-temp/
+# ----- Gradle -----
+
 *bin/
 build/
 .gradle/
+
+# ----- Misc. -----
+
+temp/
 
 **/.DS_Store
 
 *.log*
 *.log
 
+# ----- IntelliJ IDEA -----
+
+.idea/
 Dyvil.iml
-Dyvil.eml
 Dyvil.ipr
 Dyvil.iws
 
-src/test/JavaTest.java
+# ----- Eclipse -----
+
+.classpath
+.project
+.settings/
