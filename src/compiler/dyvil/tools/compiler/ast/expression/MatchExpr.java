@@ -9,9 +9,10 @@ import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.pattern.ICase;
 import dyvil.tools.compiler.ast.pattern.IPattern;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -347,15 +348,15 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 	}
 
 	@Override
-	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 		if (this.matchedValue != null)
 		{
-			this.matchedValue = this.matchedValue.cleanup(context, compilableList);
+			this.matchedValue = this.matchedValue.cleanup(compilableList, classCompilableList);
 		}
 		for (int i = 0; i < this.caseCount; i++)
 		{
-			this.cases[i].cleanup(context, compilableList);
+			this.cases[i].cleanup(compilableList, classCompilableList);
 		}
 		return this;
 	}

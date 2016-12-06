@@ -109,7 +109,7 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 			switch (type)
 			{
 			case BaseSymbols.COLON:
-				pm.report(Markers.syntaxWarning(token, "for.variable.colon.deprecated"));
+				pm.report(Markers.syntaxWarning(token, "for.variable.colon"));
 				// Fallthrough
 			case DyvilSymbols.ARROW_LEFT:
 				this.mode = FOR_EACH_END;

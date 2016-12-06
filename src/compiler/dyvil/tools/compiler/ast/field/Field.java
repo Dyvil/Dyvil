@@ -13,13 +13,14 @@ import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisExpr;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -206,7 +207,7 @@ public class Field extends Member implements IField
 			}
 			else
 			{
-				receiver = new ThisExpr(position, this.enclosingClass.getType(), context, markers);
+				receiver = new ThisExpr(position, this.enclosingClass.getThisType(), context, markers);
 
 				if (!this.enclosingClass.isAnonymous())
 				{
@@ -229,16 +230,34 @@ public class Field extends Member implements IField
 			this.value.resolveTypes(markers, context);
 		}
 
-		if (this.property != null)
+		if (this.property == null)
 		{
-			final int modifiers =
-				this.modifiers.toFlags() & (Modifiers.STATIC | Modifiers.PUBLIC | Modifiers.PROTECTED);
-			// only transfer public, static and protected modifiers to the property
-
-			this.property.getModifiers().addIntModifier(modifiers);
-			this.property.setEnclosingClass(this.enclosingClass);
-			this.property.resolveTypes(markers, context);
+			return;
 		}
+
+		copyModifiers(this.modifiers, this.property.getModifiers());
+		this.property.setEnclosingClass(this.enclosingClass);
+
+		this.property.setType(this.type);
+		this.property.resolveTypes(markers, context);
+	}
+
+	public static void copyModifiers(ModifierSet from, ModifierSet to)
+	{
+		final int exisiting = to.toFlags();
+		final int newModifiers;
+		if ((exisiting & Modifiers.ACCESS_MODIFIERS) != 0)
+		{
+			// only transfer static modifiers to the property
+			newModifiers = from.toFlags() & Modifiers.STATIC;
+		}
+		else
+		{
+			// only transfer public, static and protected modifiers to the property
+			newModifiers = from.toFlags() & (Modifiers.STATIC | Modifiers.PUBLIC | Modifiers.PROTECTED);
+		}
+
+		to.addIntModifier(newModifiers);
 	}
 
 	@Override
@@ -290,7 +309,7 @@ public class Field extends Member implements IField
 
 		final IValue receiver = this.hasModifier(Modifiers.STATIC) ?
 			                        null :
-			                        new ThisExpr(this.enclosingClass.getType(), VariableThis.DEFAULT);
+			                        new ThisExpr(this.enclosingClass.getThisType(), VariableThis.DEFAULT);
 		if (getter != null)
 		{
 			getter.setType(this.type);
@@ -353,7 +372,7 @@ public class Field extends Member implements IField
 
 		if (this.property != null)
 		{
-			this.property.checkTypes(markers, context);
+			this.property.check(markers, context);
 		}
 
 		if (Types.isVoid(this.type))
@@ -379,18 +398,18 @@ public class Field extends Member implements IField
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		super.cleanup(context, compilableList);
+		super.cleanup(compilableList, classCompilableList);
 
 		if (this.value != null)
 		{
-			this.value = this.value.cleanup(context, compilableList);
+			this.value = this.value.cleanup(compilableList, classCompilableList);
 		}
 
 		if (this.property != null)
 		{
-			this.property.cleanup(context, compilableList);
+			this.property.cleanup(compilableList, classCompilableList);
 		}
 	}
 
@@ -413,25 +432,10 @@ public class Field extends Member implements IField
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		final int modifiers = this.modifiers.toFlags() & ModifierUtil.JAVA_MODIFIER_MASK;
-
-		final Object value;
-		if (this.value != null && this.hasModifier(Modifiers.STATIC) && this.hasConstantValue())
-		{
-			value = this.value.toObject();
-		}
-		else
-		{
-			value = null;
-		}
-
 		final String name = this.getInternalName();
 		final String descriptor = this.getDescriptor();
-		final String signature = this.type.needsSignature() ? this.getSignature() : null;
 
-		final FieldVisitor fieldVisitor = writer.visitField(modifiers, name, descriptor, signature, value);
-
-		IField.writeAnnotations(fieldVisitor, this.modifiers, this.annotations, this.type);
-		fieldVisitor.visitEnd();
+		this.writeField(writer, modifiers, name, descriptor);
 
 		if (this.property != null)
 		{
@@ -443,6 +447,29 @@ public class Field extends Member implements IField
 			return;
 		}
 
+		this.writeLazy(writer, modifiers, name, descriptor);
+	}
+
+	protected void writeField(ClassWriter writer, int modifiers, String name, String descriptor)
+	{
+		final String signature = this.getType().needsSignature() ? this.getSignature() : null;
+		final Object value;
+		if (this.value != null && this.hasModifier(Modifiers.STATIC) && this.hasConstantValue())
+		{
+			value = this.value.toObject();
+		}
+		else
+		{
+			value = null;
+		}
+		final FieldVisitor fieldVisitor = writer.visitField(modifiers, name, descriptor, signature, value);
+
+		IField.writeAnnotations(fieldVisitor, this.modifiers, this.annotations, this.type);
+		fieldVisitor.visitEnd();
+	}
+
+	protected void writeLazy(ClassWriter writer, int modifiers, String name, String descriptor)
+	{
 		final String lazyName = name + "$lazy";
 		final String ownerClass = this.enclosingClass.getInternalName();
 		final boolean isStatic = (modifiers & Modifiers.STATIC) != 0;

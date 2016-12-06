@@ -21,7 +21,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -162,7 +162,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	}
 
 	@Override
-	public IDyvilHeader getHeader()
+	public IHeaderUnit getHeader()
 	{
 		return this.enclosingClass.getHeader();
 	}
@@ -273,10 +273,10 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 			return type;
 		}
 
-		final IType theClassType = theClass.getType();
+		final IType classType = theClass.getThisType();
 		final GenericData genericData = new GenericData(theClass);
 
-		theClassType.inferTypes(type, genericData);
+		classType.inferTypes(type, genericData);
 		genericData.lock(genericData.typeCount());
 
 		// Check Values and infer Types
@@ -295,7 +295,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 
 			if (typeArgument == null || typeArgument.getTypeVariable() == typeParameter)
 			{
-				final IType inferredType = typeParameter.getDefaultType();
+				final IType inferredType = typeParameter.getUpperBound();
 				markers.add(Markers.semantic(position, "constructor.typevar.infer", theClass.getName(),
 				                             typeParameter.getName(), inferredType));
 				genericData.addMapping(typeParameter, inferredType);
@@ -304,13 +304,13 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 			{
 				final Marker marker = Markers.semanticError(position, "constructor.typevar.incompatible",
 				                                            theClass.getName(), typeParameter.getName());
-				marker.addInfo(Markers.getSemantic("generic.type", typeArgument));
-				marker.addInfo(Markers.getSemantic("typeparameter.declaration", typeParameter));
+				marker.addInfo(Markers.getSemantic("type.generic", typeArgument));
+				marker.addInfo(Markers.getSemantic("type_parameter.declaration", typeParameter));
 				markers.add(marker);
 			}
 		}
 
-		return theClassType.getConcreteType(genericData);
+		return classType.getConcreteType(genericData);
 	}
 
 	@Override

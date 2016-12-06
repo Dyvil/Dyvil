@@ -13,20 +13,18 @@ public class InvariantEventBus implements EventBus
 	@Override
 	public void register(Object eventHandler, Class<?> type)
 	{
-		HandlerEntry entry = new HandlerEntry(eventHandler, type);
+		final HandlerEntry entry = new HandlerEntry(eventHandler, type);
 		this.handlers.add(entry);
 
 		for (Method method : type.getDeclaredMethods())
 		{
-			if (method.getParameterCount() != 1)
+			// Must be unary method with @EventHandler annotation
+			if (method.getParameterCount() != 1 || method.getAnnotation(EventHandler.class) == null)
 			{
 				continue;
 			}
-			if (method.getAnnotation(EventHandler.class) == null)
-			{
-				return;
-			}
-			if (((method.getModifiers() & Modifiers.STATIC) == 0) == (eventHandler == null))
+			// If the method is non-static, the event handler object must not be null
+			if ((method.getModifiers() & Modifiers.STATIC) == 0 && eventHandler == null)
 			{
 				continue;
 			}

@@ -38,15 +38,9 @@ public class StringInterpolation extends DPFValueVisitor implements Value, Strin
 		}
 	}
 
-	public override void visitStringPart(String string)
-	{
-		this.strings.add(string);
-	}
+	public override void visitStringPart(String string) = this.strings.add(string)
 
-	protected override void setValue(Value value)
-	{
-		this.values.add(value);
-	}
+	protected override void visitValue(Value value) = this.values.add(value)
 
 	public override ValueVisitor visitValue() = this
 

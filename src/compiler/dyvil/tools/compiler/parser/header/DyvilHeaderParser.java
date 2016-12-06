@@ -4,12 +4,14 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.consumer.IImportConsumer;
 import dyvil.tools.compiler.ast.header.*;
+import dyvil.tools.compiler.ast.imports.ImportDeclaration;
+import dyvil.tools.compiler.ast.imports.KindedImport;
 import dyvil.tools.compiler.ast.modifiers.Modifier;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.operator.Operator;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
@@ -36,7 +38,7 @@ public class DyvilHeaderParser extends Parser
 
 	// -----
 
-	protected IDyvilHeader unit;
+	protected IHeaderUnit unit;
 
 	// Parser data
 	protected ModifierSet    modifiers;
@@ -44,7 +46,7 @@ public class DyvilHeaderParser extends Parser
 
 	protected int flags;
 
-	public DyvilHeaderParser(IDyvilHeader unit)
+	public DyvilHeaderParser(IHeaderUnit unit)
 	{
 		this.unit = unit;
 		this.mode = PACKAGE;
@@ -87,10 +89,6 @@ public class DyvilHeaderParser extends Parser
 			return true;
 		case DyvilKeywords.USING:
 			pm.pushParser(new ImportParser(this.importConsumer(token), KindedImport.USING_DECLARATION));
-			return true;
-		case DyvilKeywords.INCLUDE:
-			pm.report(Markers.syntaxWarning(token, "include.deprecated"));
-			pm.pushParser(new ImportParser(this.importConsumer(token), KindedImport.INCLUDE_DECLARATION));
 			return true;
 		case DyvilKeywords.OPERATOR:
 			pm.pushParser(new OperatorParser(this.unit, Operator.INFIX), true);

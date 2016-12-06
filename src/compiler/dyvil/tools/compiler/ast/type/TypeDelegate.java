@@ -360,6 +360,12 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
+	public int getDescriptorKind()
+	{
+		return this.type.getDescriptorKind();
+	}
+
+	@Override
 	public void appendExtendedName(StringBuilder buffer)
 	{
 		this.type.appendExtendedName(buffer);
@@ -375,6 +381,12 @@ public abstract class TypeDelegate implements IType, ITyped
 	public void appendSignature(StringBuilder buffer, boolean genericArg)
 	{
 		this.type.appendSignature(buffer, genericArg);
+	}
+
+	@Override
+	public void appendDescriptor(StringBuilder buffer, int type)
+	{
+		this.type.appendDescriptor(buffer, type);
 	}
 
 	@Override

@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.type.typevar;
 import dyvil.annotation.Reified;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -35,25 +36,36 @@ public class ResolvedTypeVarType extends TypeVarType
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 		switch (position)
 		{
-		case CLASS:
+		// the constants in this switch are the ones that only conditionally allow type var types
+		case TypePosition.CLASS:
 			if (this.typeParameter.getReifiedKind() != null)
 			{
 				return;
 			}
 			// Fallthrough
-		case TYPE:
+		case TypePosition.TYPE:
 			if (this.typeParameter.getReifiedKind() == Reified.Type.TYPE)
 			{
 				return;
 			}
-			markers.add(Markers.semanticError(this.position, "type.class.typevar", this.typeParameter.getName()));
+			markers.add(Markers.semanticError(this.position, "type.var.class", this.typeParameter.getName()));
 			return;
-		case SUPER_TYPE:
-			markers.add(Markers.semanticError(this.position, "type.super.typevar", this.typeParameter.getName()));
+		case TypePosition.SUPER_TYPE:
+			markers.add(Markers.semanticError(this.position, "type.var.super", this.typeParameter.getName()));
+		}
+
+		final Variance variance = this.typeParameter.getVariance();
+		if ((position & TypePosition.NO_COVARIANT_FLAG) != 0 && variance == Variance.COVARIANT)
+		{
+			markers.add(Markers.semanticError(this.position, "type.var.covariant", this.typeParameter.getName()));
+		}
+		if ((position & TypePosition.NO_CONTRAVARIANT_FLAG) != 0 && variance == Variance.CONTRAVARIANT)
+		{
+			markers.add(Markers.semanticError(this.position, "type.var.contravariant", this.typeParameter.getName()));
 		}
 	}
 }

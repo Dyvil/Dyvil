@@ -8,8 +8,6 @@ import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.modifiers.IModified;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
-import dyvil.tools.compiler.backend.IObjectCompilable;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
@@ -24,7 +22,7 @@ import java.lang.annotation.ElementType;
 
 public class HeaderDeclaration implements IASTNode, INamed, IModified, IAnnotated, IObjectCompilable
 {
-	protected final IDyvilHeader header;
+	protected final IHeaderUnit header;
 	
 	protected ICodePosition position;
 	
@@ -33,19 +31,19 @@ public class HeaderDeclaration implements IASTNode, INamed, IModified, IAnnotate
 	
 	protected Name name;
 	
-	public HeaderDeclaration(IDyvilHeader header)
+	public HeaderDeclaration(IHeaderUnit header)
 	{
 		this.header = header;
 	}
 	
-	public HeaderDeclaration(IDyvilHeader header, ICodePosition position, Name name)
+	public HeaderDeclaration(IHeaderUnit header, ICodePosition position, Name name)
 	{
 		this.header = header;
 		this.position = position;
 		this.name = name;
 	}
 	
-	public HeaderDeclaration(IDyvilHeader header, ICodePosition position, Name name, ModifierSet modifiers, AnnotationList annotations)
+	public HeaderDeclaration(IHeaderUnit header, ICodePosition position, Name name, ModifierSet modifiers, AnnotationList annotations)
 	{
 		this.header = header;
 		this.position = position;

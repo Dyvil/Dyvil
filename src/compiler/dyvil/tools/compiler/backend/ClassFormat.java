@@ -6,16 +6,16 @@ import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.external.ExternalConstructor;
 import dyvil.tools.compiler.ast.external.ExternalMethod;
 import dyvil.tools.compiler.ast.external.ExternalParameter;
+import dyvil.tools.compiler.ast.external.ExternalTypeParameter;
 import dyvil.tools.compiler.ast.generic.ITypeParametric;
-import dyvil.tools.compiler.ast.generic.TypeParameter;
 import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.method.IExceptionList;
 import dyvil.tools.compiler.ast.method.IExternalCallableMember;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.ast.type.compound.ArrayType;
-import dyvil.tools.compiler.ast.type.compound.WildcardType;
+import dyvil.tools.compiler.ast.type.compound.*;
 import dyvil.tools.compiler.ast.type.generic.GenericType;
 import dyvil.tools.compiler.ast.type.generic.InternalGenericType;
 import dyvil.tools.compiler.ast.type.raw.InternalType;
@@ -244,15 +244,11 @@ public final class ClassFormat
 		}
 	}
 
-	private static IType readType(String desc, int start, int end)
+	public static IType readType(String desc, int start, int end)
 	{
-		if (desc.charAt(start) == '[')
-		{
-			return new ArrayType(readType(desc, start + 1, end));
-		}
-
 		switch (desc.charAt(start))
 		{
+		// primitives
 		case 'V':
 			return Types.VOID;
 		case 'Z':
@@ -271,10 +267,34 @@ public final class ClassFormat
 			return Types.FLOAT;
 		case 'D':
 			return Types.DOUBLE;
-		case 'T':
-			return new InternalTypeVarType(desc.substring(start + 1, end));
-		case 'L':
+		case 'L': // class type
 			return readReferenceType(desc, start + 1, end);
+		case 'R': // reference type
+			final ReferenceType rt = new ReferenceType();
+			readTyped(desc, start + 1, rt::setType);
+			return rt;
+		case 'N': // null
+			return Types.NULL;
+		case 'T': // type parameter reference
+			return new InternalTypeVarType(desc.substring(start + 1, end));
+		case '[': // array type
+			return new ArrayType(readType(desc, start + 1, end));
+		case '|': // union
+		{
+			final UnionType union = new UnionType();
+			final int end1 = readTyped(desc, start + 1, union::setLeft);
+			readTyped(desc, end1, union::setRight);
+			return union;
+		}
+		case '&': // intersection
+		{
+			final IntersectionType intersection = new IntersectionType();
+			final int end1 = readTyped(desc, start + 1, intersection::setLeft);
+			readTyped(desc, end1, intersection::setRight);
+			return intersection;
+		}
+		case '?': // option
+			return new OptionType(readType(desc, start + 1, end));
 		}
 		return null;
 	}
@@ -328,40 +348,73 @@ public final class ClassFormat
 		case 'D':
 			consumer.setType(Types.DOUBLE);
 			return start + 1;
-		case 'L':
+		case 'L': // class
 		{
 			final int end = getMatchingSemicolon(desc, start, desc.length());
 			consumer.setType(readReferenceType(desc, start + 1, end));
 			return end + 1;
 		}
-		case 'T':
+		case 'R': // reference
+		{
+			final ReferenceType reference = new ReferenceType();
+			final int end = readTyped(desc, start + 1, reference::setType);
+			consumer.setType(reference);
+			return end + 1;
+		}
+		case 'N': // null type
+			consumer.setType(Types.NULL);
+			return start + 1;
+		case 'T': // type var reference
 		{
 			final int end = desc.indexOf(';', start);
 			consumer.setType(new InternalTypeVarType(desc.substring(start + 1, end)));
 			return end + 1;
 		}
-		case '*':
+		case '*': // any wildcard
 			consumer.setType(new WildcardType(Variance.COVARIANT));
 			return start + 1;
-		case '+':
+		case '+': // covariant wildcard
 		{
 			final WildcardType var = new WildcardType(Variance.COVARIANT);
 			final int end = readTyped(desc, start + 1, var);
 			consumer.setType(var);
 			return end;
 		}
-		case '-':
+		case '-': // contravariant wildcard
 		{
 			final WildcardType var = new WildcardType(Variance.CONTRAVARIANT);
 			final int end = readTyped(desc, start + 1, var);
 			consumer.setType(var);
 			return end;
 		}
-		case '[':
+		case '[': // array
 		{
 			final ArrayType arrayType = new ArrayType();
 			final int end = readTyped(desc, start + 1, arrayType);
 			consumer.setType(arrayType);
+			return end;
+		}
+		case '|': // union
+		{
+			final UnionType union = new UnionType();
+			final int end1 = readTyped(desc, start + 1, union::setLeft);
+			final int end2 = readTyped(desc, end1, union::setRight);
+			consumer.setType(union);
+			return end2;
+		}
+		case '&': // intersection
+		{
+			final IntersectionType intersection = new IntersectionType();
+			final int end1 = readTyped(desc, start + 1, intersection::setLeft);
+			final int end2 = readTyped(desc, end1, intersection::setRight);
+			consumer.setType(intersection);
+			return end2;
+		}
+		case '?': // option
+		{
+			final OptionType option = new OptionType();
+			final int end = readTyped(desc, start + 1, option::setType);
+			consumer.setType(option);
 			return end;
 		}
 		}
@@ -371,8 +424,9 @@ public final class ClassFormat
 	private static int readGeneric(String desc, int start, ITypeParametric generic)
 	{
 		int index = desc.indexOf(':', start);
-		Name name = Name.fromRaw(desc.substring(start, index));
-		TypeParameter typeVar = new TypeParameter(generic, name);
+		final Name name = Name.fromRaw(desc.substring(start, index));
+		final ExternalTypeParameter typeVar = new ExternalTypeParameter(generic, name);
+
 		if (desc.charAt(index + 1) == ':')
 		{
 			// name::

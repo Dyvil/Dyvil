@@ -7,7 +7,8 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -20,11 +21,11 @@ public interface IRawType extends IObjectType
 	}
 
 	@Override
-	default IType getConcreteType(ITypeContext context)
+	default boolean hasTypeVariables()
 	{
-		return this;
+		return false;
 	}
-	
+
 	@Override
 	default boolean isGenericType()
 	{
@@ -32,11 +33,11 @@ public interface IRawType extends IObjectType
 	}
 
 	@Override
-	default boolean hasTypeVariables()
+	default IType getConcreteType(ITypeContext context)
 	{
-		return false;
+		return this;
 	}
-	
+
 	@Override
 	default void inferTypes(IType concrete, ITypeContext typeContext)
 	{
@@ -46,11 +47,16 @@ public interface IRawType extends IObjectType
 	default IType resolveType(ITypeParameter typeParameter)
 	{
 		final IClass theClass = this.getTheClass();
-		return theClass == null ? null : theClass.resolveType(typeParameter, this);
+		if (theClass == null || typeParameter.getGeneric() == theClass)
+		{
+			return null;
+		}
+
+		return theClass.resolveType(typeParameter, this);
 	}
 	
 	@Override
-	default void checkType(MarkerList markers, IContext context, IType.TypePosition position)
+	default void checkType(MarkerList markers, IContext context, int position)
 	{
 	}
 	
@@ -65,26 +71,8 @@ public interface IRawType extends IObjectType
 	}
 	
 	@Override
-	default void cleanup(IContext context, IClassCompilableList compilableList)
+	default void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-	}
-	
-	@Override
-	default String getSignature()
-	{
-		return null;
-	}
-
-	@Override
-	default void appendExtendedName(StringBuilder buffer)
-	{
-		buffer.append('L').append(this.getInternalName()).append(';');
-	}
-
-	@Override
-	default void appendSignature(StringBuilder buffer, boolean genericArg)
-	{
-		this.appendExtendedName(buffer);
 	}
 
 	@Override

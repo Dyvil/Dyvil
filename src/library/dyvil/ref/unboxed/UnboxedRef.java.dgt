@@ -1,0 +1,29 @@
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
+
+package dyvil.ref.unboxed;
+
+import dyvil.ref.TYPE_NAME##Ref;
+import dyvil.ref.ObjectRef;
+
+public class Unboxed##TYPE_NAME##Ref implements TYPE_NAME##Ref
+{
+	private final ObjectRef<WRAPPER> objectRef;
+
+	public Unboxed##TYPE_NAME##Ref(ObjectRef<WRAPPER> objectRef)
+	{
+		this.objectRef = objectRef;
+	}
+
+	@Override
+	public PRIMITIVE get()
+	{
+		return this.objectRef.get();
+	}
+
+	@Override
+	public void set(PRIMITIVE value)
+	{
+		this.objectRef.set(value);
+	}
+}

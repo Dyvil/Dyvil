@@ -2,35 +2,30 @@ package dyvilx.lang.model.type;
 
 public final class PrimitiveType implements Type
 {
-	public static final int VOID_CODE    = 0;
-	public static final int BOOLEAN_CODE = 1;
-	public static final int BYTE_CODE    = 2;
-	public static final int SHORT_CODE   = 3;
-	public static final int CHAR_CODE    = 4;
-	public static final int INT_CODE     = 5;
-	public static final int LONG_CODE    = 6;
-	public static final int FLOAT_CODE   = 7;
-	public static final int DOUBLE_CODE  = 8;
+	private static final int VOID_CODE    = 0;
+	private static final int BOOLEAN_CODE = 1;
+	private static final int BYTE_CODE    = 2;
+	private static final int SHORT_CODE   = 3;
+	private static final int CHAR_CODE    = 4;
+	private static final int INT_CODE     = 5;
+	private static final int LONG_CODE    = 6;
+	private static final int FLOAT_CODE   = 7;
+	private static final int DOUBLE_CODE  = 8;
 	
 	private static final PrimitiveType[] LOOKUP = new PrimitiveType[9];
 
-	public static PrimitiveType VOID    = new PrimitiveType(VOID_CODE, void.class);
-	public static PrimitiveType BOOLEAN = new PrimitiveType(BOOLEAN_CODE, boolean.class);
-	public static PrimitiveType BYTE    = new PrimitiveType(BYTE_CODE, byte.class);
-	public static PrimitiveType SHORT   = new PrimitiveType(SHORT_CODE, short.class);
-	public static PrimitiveType CHAR    = new PrimitiveType(CHAR_CODE, char.class);
-	public static PrimitiveType INT     = new PrimitiveType(INT_CODE, int.class);
-	public static PrimitiveType LONG    = new PrimitiveType(LONG_CODE, long.class);
-	public static PrimitiveType FLOAT   = new PrimitiveType(FLOAT_CODE, float.class);
-	public static PrimitiveType DOUBLE  = new PrimitiveType(DOUBLE_CODE, double.class);
+	public static final PrimitiveType VOID    = new PrimitiveType(VOID_CODE, void.class);
+	public static final PrimitiveType BOOLEAN = new PrimitiveType(BOOLEAN_CODE, boolean.class);
+	public static final PrimitiveType BYTE    = new PrimitiveType(BYTE_CODE, byte.class);
+	public static final PrimitiveType SHORT   = new PrimitiveType(SHORT_CODE, short.class);
+	public static final PrimitiveType CHAR    = new PrimitiveType(CHAR_CODE, char.class);
+	public static final PrimitiveType INT     = new PrimitiveType(INT_CODE, int.class);
+	public static final PrimitiveType LONG    = new PrimitiveType(LONG_CODE, long.class);
+	public static final PrimitiveType FLOAT   = new PrimitiveType(FLOAT_CODE, float.class);
+	public static final PrimitiveType DOUBLE  = new PrimitiveType(DOUBLE_CODE, double.class);
 
 	private final int   id;
 	private final Class theClass;
-
-	public static PrimitiveType apply(int id)
-	{
-		return LOOKUP[id];
-	}
 
 	public static PrimitiveType apply(Class<?> theClass)
 	{

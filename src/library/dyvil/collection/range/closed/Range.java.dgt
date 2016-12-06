@@ -1,0 +1,157 @@
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
+
+package dyvil.collection.range.closed;
+
+import dyvil.annotation.Immutable;
+import dyvil.collection.Range;
+import dyvil.lang.LiteralConvertible;
+
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.function.Consumer;
+
+@Immutable
+@LiteralConvertible.FromTuple
+public class TYPE_NAME##Range implements dyvil.collection.range.TYPE_NAME##Range
+{
+	private final PRIMITIVE start;
+	private final PRIMITIVE end;
+
+	public static dyvil.collection.range.TYPE_NAME##Range apply(PRIMITIVE from, PRIMITIVE to)
+	{
+		return new TYPE_NAME##Range(from, to);
+	}
+
+	public TYPE_NAME##Range(PRIMITIVE from, PRIMITIVE to)
+	{
+		this.start = from;
+		this.end = to;
+	}
+
+	@Override
+	public boolean isHalfOpen()
+	{
+		return false;
+	}
+
+	@Override
+	public dyvil.collection.range.TYPE_NAME##Range asHalfOpen()
+	{
+		return this;
+	}
+
+	@Override
+	public dyvil.collection.range.TYPE_NAME##Range asClosed()
+	{
+		return new dyvil.collection.range.halfopen.TYPE_NAME##Range(this.start, this.end);
+	}
+
+	@Override
+	public WRAPPER first()
+	{
+		return this.start;
+	}
+
+	@Override
+	public WRAPPER last()
+	{
+		return this.end;
+	}
+
+	@Override
+	@SuppressWarnings({ "cast", "RedundantCast" })
+	public int size()
+	{
+		return (int) (this.end - this.start + 1);
+	}
+
+	@Override
+	public Iterator<WRAPPER> iterator()
+	{
+		return new Iterator<WRAPPER>()
+		{
+			private PRIMITIVE value = TYPE_NAME##Range.this.start;
+
+			@Override
+			public boolean hasNext()
+			{
+				return this.value <= TYPE_NAME##Range.this.end;
+			}
+
+			@Override
+			public WRAPPER next()
+			{
+				final PRIMITIVE value = this.value;
+				if (value > TYPE_NAME##Range.this.end)
+				{
+					throw new NoSuchElementException();
+				}
+
+				this.value++;
+				return value;
+			}
+		};
+	}
+
+	@Override
+	public void forEach(Consumer<? super WRAPPER> action)
+	{
+		for (PRIMITIVE i = this.start; i <= this.end; i++)
+		{
+			action.accept(i);
+		}
+	}
+
+	@Override
+	public boolean contains(PRIMITIVE value)
+	{
+		return value >= this.start && value <= this.end;
+	}
+
+	@Override
+	public PRIMITIVE[] to##TYPE_NAME##Array()
+	{
+		final PRIMITIVE[] result = new PRIMITIVE[this.size()];
+
+		int index = 0;
+		for (PRIMITIVE i = this.start; i <= this.end; i++)
+		{
+			result[index++] = i;
+		}
+		return result;
+	}
+
+	@Override
+	public void toArray(int index, Object[] store)
+	{
+		for (PRIMITIVE i = this.start; i <= this.end; i++)
+		{
+			store[index++] = i;
+		}
+	}
+
+	@Override
+	public dyvil.collection.range.TYPE_NAME##Range copy()
+	{
+		return new TYPE_NAME##Range(this.start, this.end);
+	}
+
+	@Override
+	public String toString()
+	{
+		return this.start + " .. " + this.end;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		return Range.rangeEquals(this, obj);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Range.rangeHashCode(this);
+	}
+}

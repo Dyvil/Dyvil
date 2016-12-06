@@ -1,7 +1,7 @@
 package dyvil.collection;
 
 import dyvil.annotation.Mutating;
-import dyvil.annotation._internal.Covariant;
+import dyvil.annotation.internal.Covariant;
 import dyvil.collection.immutable.ArrayMap;
 import dyvil.collection.immutable.EmptyMap;
 import dyvil.collection.immutable.SingletonMap;

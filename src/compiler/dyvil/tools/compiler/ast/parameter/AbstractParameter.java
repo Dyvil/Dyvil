@@ -33,8 +33,8 @@ import java.lang.annotation.ElementType;
 
 public abstract class AbstractParameter extends Member implements IParameter
 {
-	public static final String DEFAULT_VALUE       = "Ldyvil/annotation/_internal/DefaultValue;";
-	public static final String DEFAULT_ARRAY_VALUE = "Ldyvil/annotation/_internal/DefaultArrayValue;";
+	public static final String DEFAULT_VALUE       = "Ldyvil/annotation/internal/DefaultValue;";
+	public static final String DEFAULT_ARRAY_VALUE = "Ldyvil/annotation/internal/DefaultArrayValue;";
 
 	protected IValue defaultValue;
 
@@ -202,9 +202,9 @@ public abstract class AbstractParameter extends Member implements IParameter
 	{
 		switch (internalType)
 		{
-		case "dyvil/annotation/_internal/DefaultValue":
+		case "dyvil/annotation/internal/DefaultValue":
 			return new AnnotationValueReader(this);
-		case "dyvil/annotation/_internal/DefaultArrayValue":
+		case "dyvil/annotation/internal/DefaultArrayValue":
 			return new AnnotationValueReader(value -> this.defaultValue = value.withType(this.type, this.type, null,
 			                                                                             null));
 		}

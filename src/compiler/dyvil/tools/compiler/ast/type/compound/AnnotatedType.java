@@ -2,13 +2,16 @@ package dyvil.tools.compiler.ast.type.compound;
 
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.TypeDelegate;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -61,14 +64,17 @@ public class AnnotatedType extends TypeDelegate
 			this.type = this.type.resolveType(markers, context);
 		}
 
+		if (AnnotationUtil.DYVIL_TYPE_INTERNAL.equals(this.annotation.getType().getInternalName()))
+		{
+			// @DyvilType annotation
+			final String desc = this.annotation.getArguments().getFirstValue().stringValue();
+			return ClassFormat.extendedToType(desc).resolveType(markers, context);
+		}
+
 		this.annotation.resolveTypes(markers, context);
 
 		final IType withAnnotation = this.type.withAnnotation(this.annotation);
-		if (withAnnotation != null)
-		{
-			return withAnnotation;
-		}
-		return this;
+		return withAnnotation != null ? withAnnotation : this;
 	}
 
 	@Override
@@ -79,7 +85,7 @@ public class AnnotatedType extends TypeDelegate
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 		this.type.checkType(markers, context, position);
 		this.annotation.checkTypes(markers, context);
@@ -100,10 +106,10 @@ public class AnnotatedType extends TypeDelegate
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.type.cleanup(context, compilableList);
-		this.annotation.cleanup(context, compilableList);
+		this.type.cleanup(compilableList, classCompilableList);
+		this.annotation.cleanup(compilableList, classCompilableList);
 	}
 
 	@Override

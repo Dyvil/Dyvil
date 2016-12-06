@@ -11,13 +11,14 @@ import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
@@ -48,7 +49,7 @@ public class ClassBody implements IClassBody
 		}
 	}
 
-	public IClass theClass;
+	public IClass enclosingClass;
 
 	public IClass[] classes;
 	public int      classCount;
@@ -74,7 +75,7 @@ public class ClassBody implements IClassBody
 
 	public ClassBody(IClass iclass)
 	{
-		this.theClass = iclass;
+		this.enclosingClass = iclass;
 	}
 
 	@Override
@@ -89,15 +90,15 @@ public class ClassBody implements IClassBody
 	}
 
 	@Override
-	public void setTheClass(IClass theClass)
+	public IClass getEnclosingClass()
 	{
-		this.theClass = theClass;
+		return this.enclosingClass;
 	}
 
 	@Override
-	public IClass getTheClass()
+	public void setEnclosingClass(IClass enclosingClass)
 	{
-		return this.theClass;
+		this.enclosingClass = enclosingClass;
 	}
 
 	// Nested Classes
@@ -111,7 +112,7 @@ public class ClassBody implements IClassBody
 	@Override
 	public void addClass(IClass iclass)
 	{
-		iclass.setEnclosingClass(this.theClass);
+		iclass.setEnclosingClass(this.enclosingClass);
 
 		if (this.classes == null)
 		{
@@ -142,10 +143,10 @@ public class ClassBody implements IClassBody
 	{
 		for (int i = 0; i < this.classCount; i++)
 		{
-			IClass c = this.classes[i];
-			if (c.getName() == name)
+			final IClass iclass = this.classes[i];
+			if (iclass.getName() == name)
 			{
-				return c;
+				return iclass;
 			}
 		}
 		return null;
@@ -162,7 +163,7 @@ public class ClassBody implements IClassBody
 	@Override
 	public void addDataMember(IField field)
 	{
-		field.setEnclosingClass(this.theClass);
+		field.setEnclosingClass(this.enclosingClass);
 
 		final int index = this.fieldCount++;
 		if (index >= this.fields.length)
@@ -178,7 +179,7 @@ public class ClassBody implements IClassBody
 	public IField createDataMember(ICodePosition position, Name name, IType type, ModifierSet modifiers,
 		                              AnnotationList annotations)
 	{
-		return new Field(this.theClass, position, name, type, modifiers, annotations);
+		return new Field(this.enclosingClass, position, name, type, modifiers, annotations);
 	}
 
 	@Override
@@ -192,10 +193,10 @@ public class ClassBody implements IClassBody
 	{
 		for (int i = 0; i < this.fieldCount; i++)
 		{
-			IField f = this.fields[i];
-			if (f.getName() == name)
+			final IField field = this.fields[i];
+			if (field.getName() == name)
 			{
-				return f;
+				return field;
 			}
 		}
 		return null;
@@ -212,7 +213,7 @@ public class ClassBody implements IClassBody
 	@Override
 	public void addProperty(IProperty property)
 	{
-		property.setEnclosingClass(this.theClass);
+		property.setEnclosingClass(this.enclosingClass);
 
 		final int index = this.propertyCount++;
 		if (index == 0)
@@ -261,7 +262,7 @@ public class ClassBody implements IClassBody
 	@Override
 	public void addMethod(IMethod method)
 	{
-		method.setEnclosingClass(this.theClass);
+		method.setEnclosingClass(this.enclosingClass);
 
 		final int index = this.methodCount++;
 		if (index >= this.methods.length)
@@ -284,10 +285,10 @@ public class ClassBody implements IClassBody
 	{
 		for (int i = 0; i < this.methodCount; i++)
 		{
-			IMethod m = this.methods[i];
-			if (m.getName() == name)
+			final IMethod method = this.methods[i];
+			if (method.getName() == name)
 			{
-				return m;
+				return method;
 			}
 		}
 		return null;
@@ -356,9 +357,9 @@ public class ClassBody implements IClassBody
 	}
 
 	@Override
-	public void setFunctionalMethod(IMethod functionalMethod)
+	public void setFunctionalMethod(IMethod method)
 	{
-		this.functionalMethod = functionalMethod;
+		this.functionalMethod = method;
 	}
 
 	@Override
@@ -484,7 +485,7 @@ public class ClassBody implements IClassBody
 	@Override
 	public void addConstructor(IConstructor constructor)
 	{
-		constructor.setEnclosingClass(this.theClass);
+		constructor.setEnclosingClass(this.enclosingClass);
 
 		final int index = this.constructorCount++;
 		if (index >= this.constructors.length)
@@ -539,7 +540,7 @@ public class ClassBody implements IClassBody
 	@Override
 	public void addInitializer(IInitializer initializer)
 	{
-		initializer.setEnclosingClass(this.theClass);
+		initializer.setEnclosingClass(this.enclosingClass);
 
 		final int index = this.initializerCount++;
 		if (index == 0)
@@ -610,7 +611,7 @@ public class ClassBody implements IClassBody
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		final IDyvilHeader header = this.theClass.getHeader();
+		final IHeaderUnit header = this.enclosingClass.getHeader();
 
 		/*
 		 * The cache size is calculated as follows: We sum the number of methods assuming they all have unique names, add
@@ -831,33 +832,34 @@ public class ClassBody implements IClassBody
 	}
 
 	@Override
-	public void cleanup(IContext context)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		final IClassCompilableList compilableList = this.theClass;
-
 		for (int i = 0; i < this.classCount; i++)
 		{
-			this.classes[i].cleanup(context, compilableList);
+			final IClass innerClass = this.classes[i];
+
+			compilableList.addCompilable(innerClass);
+			innerClass.cleanup(compilableList, classCompilableList);
 		}
 		for (int i = 0; i < this.fieldCount; i++)
 		{
-			this.fields[i].cleanup(context, compilableList);
+			this.fields[i].cleanup(compilableList, classCompilableList);
 		}
 		for (int i = 0; i < this.propertyCount; i++)
 		{
-			this.properties[i].cleanup(context, compilableList);
+			this.properties[i].cleanup(compilableList, classCompilableList);
 		}
 		for (int i = 0; i < this.methodCount; i++)
 		{
-			this.methods[i].cleanup(context, compilableList);
+			this.methods[i].cleanup(compilableList, classCompilableList);
 		}
 		for (int i = 0; i < this.constructorCount; i++)
 		{
-			this.constructors[i].cleanup(context, compilableList);
+			this.constructors[i].cleanup(compilableList, classCompilableList);
 		}
 		for (int i = 0; i < this.initializerCount; i++)
 		{
-			this.initializers[i].cleanup(context, compilableList);
+			this.initializers[i].cleanup(compilableList, classCompilableList);
 		}
 	}
 

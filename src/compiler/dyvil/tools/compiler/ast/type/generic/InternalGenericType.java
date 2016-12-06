@@ -77,11 +77,11 @@ public class InternalGenericType extends GenericType
 			this.typeArguments[i] = this.typeArguments[i].resolveType(markers, context);
 		}
 
-		if (this.internalName.startsWith("dyvil/tuple/Tuple"))
+		if (this.internalName.startsWith("dyvil/tuple/Tuple$Of"))
 		{
 			return new TupleType(this.typeArguments, this.typeArgumentCount);
 		}
-		if (this.internalName.startsWith("dyvil/function/Function"))
+		if (this.internalName.startsWith("dyvil/function/Function$Of"))
 		{
 			final int parameterCount = this.typeArgumentCount - 1;
 			final IType returnType = this.typeArguments[parameterCount];
@@ -108,7 +108,7 @@ public class InternalGenericType extends GenericType
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 	}
 
@@ -158,10 +158,8 @@ public class InternalGenericType extends GenericType
 	}
 
 	@Override
-	public GenericType clone()
+	protected GenericType copyName()
 	{
-		InternalGenericType copy = new InternalGenericType(this.internalName);
-		this.copyTypeArguments(copy);
-		return copy;
+		return new InternalGenericType(this.internalName);
 	}
 }

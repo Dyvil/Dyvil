@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.classes;
 
+import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.consumer.IMemberConsumer;
@@ -8,6 +9,8 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -17,39 +20,39 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public interface IClassBody extends IASTNode, IClassList, IMemberConsumer<IField>
+public interface IClassBody extends IASTNode, IResolvable, IClassList, IMemberConsumer<IField>
 {
-	// Associated Class
-	
-	void setTheClass(IClass iclass);
-	
-	IClass getTheClass();
-	
+	// Enclosing Class
+
+	IClass getEnclosingClass();
+
+	void setEnclosingClass(IClass enclosingClass);
+
 	// Fields
-	
+
 	int fieldCount();
-	
+
 	@Override
 	void addDataMember(IField field);
-	
+
 	IField getField(int index);
-	
+
 	IField getField(Name name);
-	
+
 	default IField getInstanceField()
 	{
 		return null;
 	}
-	
+
 	// Properties
-	
+
 	int propertyCount();
-	
+
 	@Override
 	void addProperty(IProperty property);
-	
+
 	IProperty getProperty(int index);
-	
+
 	IProperty getProperty(Name name);
 
 	// Methods
@@ -63,7 +66,7 @@ public interface IClassBody extends IASTNode, IClassList, IMemberConsumer<IField
 
 	IMethod getMethod(Name name);
 
-	void getMethodMatches(MatchList<IMethod> list, IValue instance, Name name, IArguments arguments);
+	void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments);
 
 	void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType);
 
@@ -79,18 +82,18 @@ public interface IClassBody extends IASTNode, IClassList, IMemberConsumer<IField
 	boolean checkImplements(IMethod candidate, ITypeContext typeContext);
 
 	void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext);
-	
+
 	// Constructors
-	
+
 	int constructorCount();
-	
+
 	@Override
 	void addConstructor(IConstructor constructor);
-	
+
 	IConstructor getConstructor(int index);
-	
+
 	IConstructor getConstructor(IParameterList parameters);
-	
+
 	void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments);
 
 	// Initializers
@@ -112,15 +115,21 @@ public interface IClassBody extends IASTNode, IClassList, IMemberConsumer<IField
 	{
 	}
 
+	@Override
 	void resolveTypes(MarkerList markers, IContext context);
-	
+
+	@Override
 	void resolve(MarkerList markers, IContext context);
-	
+
+	@Override
 	void checkTypes(MarkerList markers, IContext context);
-	
+
+	@Override
 	void check(MarkerList markers, IContext context);
-	
+
+	@Override
 	void foldConstants();
-	
-	void cleanup(IContext context);
+
+	@Override
+	void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList);
 }

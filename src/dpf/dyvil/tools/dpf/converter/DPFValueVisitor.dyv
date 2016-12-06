@@ -7,70 +7,54 @@ import dyvil.tools.parsing.Name
 
 public abstract class DPFValueVisitor implements ValueVisitor
 {
-	protected abstract void setValue(Value value);
-	
-	public override void visitInt(int value)
-	{
-		this.setValue(new IntValue(value));
-	}
-	
-	public override void visitLong(long value)
-	{
-		this.setValue(new LongValue(value));
-	}
-	
-	public override void visitFloat(float value)
-	{
-		this.setValue(new FloatValue(value));
-	}
-	
-	public override void visitDouble(double value)
-	{
-		this.setValue(new DoubleValue(value));
-	}
-	
-	public override void visitString(String value)
-	{
-		this.setValue(new StringValue(value));
-	}
-	
+	protected abstract void visitValue(Value value)
+
+	// Implementation Methods
+
+	public override void visitInt(int value) = this.visitValue(new IntValue(value))
+
+	public override void visitLong(long value) = this.visitValue(new LongValue(value))
+
+	public override void visitFloat(float value) = this.visitValue(new FloatValue(value))
+
+	public override void visitDouble(double value) = this.visitValue(new DoubleValue(value))
+
+	public override void visitString(String value) = this.visitValue(new StringValue(value))
+
 	public override StringInterpolationVisitor visitStringInterpolation()
 	{
-		dyvil.tools.dpf.ast.value.StringInterpolation stringInterpolation = new StringInterpolation();
-		this.setValue(stringInterpolation);
-		return stringInterpolation;
+		dyvil.tools.dpf.ast.value.StringInterpolation stringInterpolation = new StringInterpolation()
+		this.visitValue(stringInterpolation)
+		return stringInterpolation
 	}
-	
-	public override void visitName(Name name)
-	{
-		this.setValue(new dyvil.tools.dpf.ast.value.NameAccess(name));
-	}
-	
+
+	public override void visitName(Name name) = this.visitValue(new dyvil.tools.dpf.ast.value.NameAccess(name))
+
 	public override ValueVisitor visitValueAccess(Name name)
 	{
-		dyvil.tools.dpf.ast.value.NameAccess access = new NameAccess(name);
-		this.setValue(access);
-		return access;
+		dyvil.tools.dpf.ast.value.NameAccess access = new NameAccess(name)
+		this.visitValue(access)
+		return access
 	}
-	
+
 	public override ListVisitor visitList()
 	{
-		ListValue list = new ListValue();
-		this.setValue(list);
-		return list;
+		ListValue list = new ListValue()
+		this.visitValue(list)
+		return list
 	}
-	
+
 	public override MapVisitor visitMap()
 	{
-		MapValue map = new MapValue();
-		this.setValue(map);
-		return map;
+		MapValue map = new MapValue()
+		this.visitValue(map)
+		return map
 	}
-	
+
 	public override BuilderVisitor visitBuilder(Name name)
 	{
-		Builder builder = new Builder(name);
-		this.setValue(builder);
-		return builder;
+		Builder builder = new Builder(name)
+		this.visitValue(builder)
+		return builder
 	}
 }

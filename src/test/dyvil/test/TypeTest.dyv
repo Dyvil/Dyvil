@@ -18,7 +18,7 @@ public class TypeTest
 		}
 	}
 
-	infix func <<< <T, C <: Collection<T>>(C collection, T element) = collection.added(element)
+	infix func <<< <T, C extends Collection<T>>(C collection, T element) = collection.added(element)
 
 	static func voidTest<T>(T value) = "\(value)" // will error if CovariantTypeVarType.isSameType(Types.VOID) returns true
 

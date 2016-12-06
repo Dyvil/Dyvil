@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.operator.IOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
@@ -54,9 +54,9 @@ public class CombiningContext implements IContext
 	}
 
 	@Override
-	public IDyvilHeader getHeader()
+	public IHeaderUnit getHeader()
 	{
-		IDyvilHeader header = this.inner.getHeader();
+		IHeaderUnit header = this.inner.getHeader();
 		return header == null ? this.outer.getHeader() : header;
 	}
 
@@ -82,9 +82,9 @@ public class CombiningContext implements IContext
 	}
 
 	@Override
-	public IDyvilHeader resolveHeader(Name name)
+	public IHeaderUnit resolveHeader(Name name)
 	{
-		final IDyvilHeader inner = this.inner.resolveHeader(name);
+		final IHeaderUnit inner = this.inner.resolveHeader(name);
 		return inner != null ? inner : this.outer.resolveHeader(name);
 	}
 
@@ -133,7 +133,7 @@ public class CombiningContext implements IContext
 	{
 		this.inner.getMethodMatches(list, receiver, name, arguments);
 
-		if (list.isEmpty())
+		if (!list.hasCandidate())
 		{
 			this.outer.getMethodMatches(list, receiver, name, arguments);
 		}
@@ -144,7 +144,7 @@ public class CombiningContext implements IContext
 	{
 		this.inner.getImplicitMatches(list, value, targetType);
 
-		if (list.isEmpty())
+		if (!list.hasCandidate())
 		{
 			this.outer.getImplicitMatches(list, value, targetType);
 		}
@@ -155,7 +155,7 @@ public class CombiningContext implements IContext
 	{
 		this.inner.getConstructorMatches(list, arguments);
 
-		if (list.isEmpty())
+		if (!list.hasCandidate())
 		{
 			this.outer.getConstructorMatches(list, arguments);
 		}

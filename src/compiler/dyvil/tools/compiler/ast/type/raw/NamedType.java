@@ -1,23 +1,15 @@
 package dyvil.tools.compiler.ast.type.raw;
 
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.typevar.ResolvedTypeVarType;
-import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -27,7 +19,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public class NamedType implements IRawType, ITypeConsumer
+public class NamedType implements IUnresolvedType, ITypeConsumer
 {
 	protected IType         parent;
 	protected ICodePosition position;
@@ -94,24 +86,6 @@ public class NamedType implements IRawType, ITypeConsumer
 	public IClass getTheClass()
 	{
 		return null;
-	}
-
-	@Override
-	public boolean isSuperClassOf(IType subType)
-	{
-		return false;
-	}
-
-	@Override
-	public boolean isSuperTypeOf(IType type)
-	{
-		return false;
-	}
-
-	@Override
-	public boolean isResolved()
-	{
-		return false;
 	}
 
 	@Override
@@ -206,63 +180,19 @@ public class NamedType implements IRawType, ITypeConsumer
 		final ITypeAlias type = context.resolveTypeAlias(this.name, 0);
 		if (type != null)
 		{
-			return type.getType().getConcreteType(ITypeContext.DEFAULT).atPosition(this.position);
+			final IType aliasType = type.getType();
+			if (!aliasType.isResolved())
+			{
+				markers.add(Markers.semanticError(this.position, "type.alias.unresolved", this.name));
+				return aliasType.atPosition(this.position);
+			}
+			return aliasType.getConcreteType(ITypeContext.DEFAULT).atPosition(this.position);
 		}
 		return null;
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
-	{
-	}
-
-	@Override
-	public IDataMember resolveField(Name name)
-	{
-		return null;
-	}
-
-	@Override
-	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
-	{
-	}
-
-	@Override
-	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
-	{
-	}
-
-	@Override
-	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
-	{
-	}
-
-	@Override
-	public IMethod getFunctionalMethod()
-	{
-		return null;
-	}
-
-	@Override
-	public String getInternalName()
-	{
-		return this.name.qualified;
-	}
-
-	@Override
-	public void appendExtendedName(StringBuilder buffer)
-	{
-		buffer.append(this.name.qualified);
-	}
-
-	@Override
-	public void appendSignature(StringBuilder buffer, boolean genericArg)
-	{
-		buffer.append(this.name.qualified);
-	}
-
-	@Override
-	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 	}
 

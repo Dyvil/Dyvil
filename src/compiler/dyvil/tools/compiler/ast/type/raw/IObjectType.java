@@ -167,20 +167,6 @@ public interface IObjectType extends IType
 	}
 
 	@Override
-	default String getExtendedName()
-	{
-		final StringBuilder stringBuilder = new StringBuilder();
-		this.appendExtendedName(stringBuilder);
-		return stringBuilder.toString();
-	}
-
-	@Override
-	default void appendExtendedName(StringBuilder buffer)
-	{
-		buffer.append('L').append(this.getInternalName()).append(';');
-	}
-
-	@Override
 	default void writeCast(MethodWriter writer, IType target, int lineNumber) throws BytecodeException
 	{
 		if (target == this)

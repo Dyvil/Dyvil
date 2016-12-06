@@ -13,11 +13,12 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.Variance;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvil.tools.compiler.ast.type.builtin.ResolvedTypeDelegate;
@@ -40,37 +41,60 @@ import java.io.IOException;
 
 public interface IType extends IASTNode, IMemberContext, ITypeContext
 {
-	enum TypePosition
+	static class TypePosition
 	{
+		public static final int CLASS_FLAG            = 0b0000001;
+		public static final int GENERIC_FLAG          = 0b0000010;
+		public static final int TYPE_VAR_FLAG         = 0b0000100;
+		public static final int NO_CONTRAVARIANT_FLAG = 0b0001000;
+		public static final int NO_COVARIANT_FLAG     = 0b0010000;
+		public static final int WILDCARD_FLAG         = 0b0100000;
+		public static final int SUPERTYPE_FLAG        = 0b1000000;
+
 		/**
-		 * Only allows Class Types.
+		 * The parameter type of a {@code class<T>} expression. Allows class types as well as reified type variable
+		 * references.
 		 */
-		CLASS,
+		public static final int CLASS               = CLASS_FLAG;
 		/**
-		 * Allows Class Types and Parameterized Types, but the latter cannot involve any Wildcard Types.
+		 * The parameter type of a {@code type<T>} expression. Allows class types and parametric types, as well as
+		 * type-reified type variable references.
 		 */
-		SUPER_TYPE,
+		public static final int TYPE                = CLASS_FLAG | GENERIC_FLAG;
 		/**
-		 * Allows Class Types as well as Parameterized Types.
+		 * A super type or interface of a {@code class}. Allows class types and parametric types, but the latter must
+		 * not have any wildcard types.
 		 */
-		TYPE,
+		public static final int SUPER_TYPE          = CLASS_FLAG | GENERIC_FLAG | SUPERTYPE_FLAG;
 		/**
-		 * The type arguments of Parameterized Types used as SUPER_TYPE. Can be Class Types, Parameterized Types and
-		 * Type Variable Types.
+		 * The type arguments of parametric super types. Allows class types, parametric types and
+		 * type variable references.
 		 */
-		SUPER_TYPE_ARGUMENT,
+		public static final int SUPER_TYPE_ARGUMENT = CLASS_FLAG | GENERIC_FLAG | TYPE_VAR_FLAG;
 		/**
-		 * Allows Class Types, Parameterized Types and Type Variable Types, but the latter cannot be contravariant.
+		 * The return type of a method, field or property. Allows class types, parametric types and type variable
+		 * references, but the latter must not be contravariant.
 		 */
-		RETURN_TYPE,
+		public static final int RETURN_TYPE         = CLASS_FLAG | GENERIC_FLAG | TYPE_VAR_FLAG | NO_CONTRAVARIANT_FLAG;
 		/**
-		 * Allows Class Types, Parameterized Types and Type Variable Types, but the latter cannot be covariant.
+		 * The parameter type of a method. Allows class types, parametric types and type variable references, but the
+		 * latter must not be covariant.
 		 */
-		PARAMETER_TYPE,
+		public static final int PARAMETER_TYPE      = CLASS_FLAG | GENERIC_FLAG | TYPE_VAR_FLAG | NO_COVARIANT_FLAG;
 		/**
-		 * Allows all Types.
+		 * The argument type of a parametric type. Allows class types, parametric types, type variable references and
+		 * wildcard types.
 		 */
-		GENERIC_ARGUMENT
+		public static final int GENERIC_ARGUMENT    = CLASS_FLAG | GENERIC_FLAG | TYPE_VAR_FLAG | WILDCARD_FLAG;
+
+		/**
+		 * Allows all Types, including
+		 */
+
+		public static int genericArgument(int position)
+		{
+			return (position & SUPERTYPE_FLAG) != 0 ? SUPER_TYPE_ARGUMENT : GENERIC_ARGUMENT;
+		}
 	}
 
 	// Basic Types
@@ -90,6 +114,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	int GENERIC          = 24;
 	int GENERIC_NAMED    = 25; // no deserialization
 	int GENERIC_INTERNAL = 26; // no deserialization
+	int INFIX_CHAIN      = 27; // no deserialization
 
 	// Compound Types
 	int TUPLE  = 32;
@@ -255,9 +280,9 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	}
 
 	int SUBTYPE_BASE               = 0;
-	int SUBTYPE_UNION_INTERSECTION = 1;
-	int SUBTYPE_TYPEVAR            = 2;
-	int SUBTYPE_COVARIANT_TYPEVAR  = 3;
+	int SUBTYPE_TYPEVAR            = 1;
+	int SUBTYPE_COVARIANT_TYPEVAR  = 2;
+	int SUBTYPE_UNION_INTERSECTION = 3;
 	int SUBTYPE_WILDCARD           = 4;
 
 	default int subTypeCheckLevel()
@@ -333,13 +358,13 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	{
 	}
 
-	void checkType(MarkerList markers, IContext context, TypePosition position);
+	void checkType(MarkerList markers, IContext context, int position);
 
 	void check(MarkerList markers, IContext context);
 
 	void foldConstants();
 
-	void cleanup(IContext context, IClassCompilableList compilableList);
+	void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList);
 
 	// IContext
 
@@ -376,11 +401,24 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments);
 
 	@Override
+	void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType);
+
+	@Override
 	void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments);
 
 	IMethod getFunctionalMethod();
 
 	// Compilation
+
+	int NAME_DESCRIPTOR            = 1;
+	int NAME_SIGNATURE             = 2;
+	int NAME_SIGNATURE_GENERIC_ARG = 3;
+	int NAME_FULL                  = 4;
+
+	default int getDescriptorKind()
+	{
+		return this.needsSignature() ? NAME_SIGNATURE : NAME_DESCRIPTOR;
+	}
 
 	String getInternalName();
 
@@ -391,7 +429,10 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		return buffer.toString();
 	}
 
-	void appendExtendedName(StringBuilder buffer);
+	default void appendExtendedName(StringBuilder buffer)
+	{
+		this.appendDescriptor(buffer, NAME_DESCRIPTOR);
+	}
 
 	default String getSignature()
 	{
@@ -400,7 +441,19 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		return builder.toString();
 	}
 
-	void appendSignature(StringBuilder buffer, boolean genericArg);
+	default void appendSignature(StringBuilder buffer, boolean genericArg)
+	{
+		this.appendDescriptor(buffer, genericArg ? NAME_SIGNATURE_GENERIC_ARG : NAME_SIGNATURE);
+	}
+
+	default String getDescriptor(int type)
+	{
+		final StringBuilder builder = new StringBuilder();
+		this.appendDescriptor(builder, type);
+		return builder.toString();
+	}
+
+	void appendDescriptor(StringBuilder buffer, int type);
 
 	int getLoadOpcode();
 
@@ -424,6 +477,10 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	void writeDefaultValue(MethodWriter writer) throws BytecodeException;
 
+	IConstantValue getDefaultValue();
+
+	// Annotations
+
 	static IType withAnnotation(IType type, IAnnotation annotation, TypePath typePath)
 	{
 		return withAnnotation(type, annotation, typePath, 0, typePath == null ? 0 : typePath.getLength());
@@ -442,6 +499,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		{
 			return customType;
 		}
+
 		return new AnnotatedType(type, annotation);
 	}
 
@@ -454,18 +512,12 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	static void writeAnnotations(IType type, TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
-		if (type.useNonNullAnnotation())
-		{
-			visitor.visitTypeAnnotation(typeRef, TypePath.fromString(typePath), AnnotationUtil.NOTNULL, false)
-			       .visitEnd();
-		}
-
 		type.writeAnnotations(visitor, typeRef, typePath);
 	}
 
 	void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath);
 
-	IConstantValue getDefaultValue();
+	// General Compilation
 
 	static void writeType(IType type, DataOutput dos) throws IOException
 	{
@@ -545,10 +597,10 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	void read(DataInput in) throws IOException;
 
+	// Misc
+
 	@Override
 	void toString(String prefix, StringBuilder buffer);
-
-	// Misc
 
 	IType clone();
 

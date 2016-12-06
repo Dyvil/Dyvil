@@ -1,0 +1,28 @@
+package dyvil.util
+
+import java.util.NoSuchElementException
+
+@LiteralConvertible.FromNil
+public object None implements Option<null>
+{
+	public static func apply(): None = None
+
+	// Accessors
+
+	public override func get(): null = throw new NoSuchElementException
+
+	public override func isPresent(): boolean = false
+
+	public override func forEach(null -> void consumer): void {}
+
+	public override func filter(null -> boolean predicate): Option<null> = None
+
+	public override func map<U>(null -> U function): Option<U> = None
+
+	public override func flatMap<U>(null -> Option<U> function): Option<U> = None
+
+	@OverloadPriority
+	public func orElse<U>(U value): U = value
+
+	public override func orElse<U>(-> U supplier): U = supplier()
+}

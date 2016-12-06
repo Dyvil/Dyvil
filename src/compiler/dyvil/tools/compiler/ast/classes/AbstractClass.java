@@ -1,6 +1,9 @@
 package dyvil.tools.compiler.ast.classes;
 
+import dyvil.collection.Collection;
+import dyvil.collection.List;
 import dyvil.collection.Set;
+import dyvil.collection.mutable.ArrayList;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -12,20 +15,23 @@ import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IClassCompilable;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.*;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
+import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
 import dyvil.tools.compiler.backend.ClassWriter;
-import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.sources.DyvilFileType;
 import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -74,7 +80,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	protected IType classType = new ClassType(this);
 
 	@Override
-	public abstract IDyvilHeader getHeader();
+	public abstract IHeaderUnit getHeader();
 
 	@Override
 	public IClass getEnclosingClass()
@@ -86,17 +92,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	public void setEnclosingClass(IClass enclosingClass)
 	{
 		this.enclosingClass = enclosingClass;
-	}
-
-	@Override
-	public IType getType()
-	{
-		return this.thisType;
-	}
-
-	@Override
-	public void setType(IType type)
-	{
 	}
 
 	@Override
@@ -394,16 +389,14 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public int compilableCount()
+	public int classCompilableCount()
 	{
 		return this.compilableCount;
 	}
 
 	@Override
-	public void addCompilable(IClassCompilable compilable)
+	public void addClassCompilable(IClassCompilable compilable)
 	{
-		compilable.setInnerIndex(this.getInternalName(), this.compilableCount);
-
 		if (this.compilables == null)
 		{
 			this.compilables = new IClassCompilable[2];
@@ -423,12 +416,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public IClassCompilable getCompilable(int index)
-	{
-		return this.compilables[index];
-	}
-
-	@Override
 	public void setMetadata(IClassMetadata metadata)
 	{
 		this.metadata = metadata;
@@ -438,6 +425,44 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	public IClassMetadata getMetadata()
 	{
 		return this.metadata;
+	}
+
+	@Override
+	public Collection<IMethod> getMethods(Name name)
+	{
+		final List<IMethod> list = new ArrayList<>();
+
+		for (int i = 0, count = this.parameters.size(); i < count; i++)
+		{
+			final IProperty property = this.parameters.get(i).getProperty();
+			if (property != null)
+			{
+				final IMethod getter = property.getGetter();
+				if (getter != null && name == getter.getName()){
+					list.add(getter);
+				}
+
+				final IMethod setter = property.getSetter();
+				if (setter != null && name == setter.getName())
+				{
+					list.add(setter);
+				}
+			}
+		}
+
+		if (this.body != null)
+		{
+			for (int i = 0, count = this.body.methodCount(); i < count; i++)
+			{
+				final IMethod method = this.body.getMethod(i);
+				if (method != null)
+				{
+					list.add(method);
+				}
+			}
+		}
+
+		return list;
 	}
 
 	@Override
@@ -640,7 +665,22 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public IType getThisType()
 	{
-		return this.getType();
+		if (this.thisType != null)
+		{
+			return this.thisType;
+		}
+
+		if (this.typeParameterCount <= 0)
+		{
+			return this.thisType = new ClassType(this);
+		}
+
+		final ClassGenericType type = new ClassGenericType(this);
+		for (int i = 0; i < this.typeParameterCount; i++)
+		{
+			type.addType(new TypeVarType(this.typeParameters[i]));
+		}
+		return this.thisType = type;
 	}
 
 	@Override
@@ -737,7 +777,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 
 		this.metadata.getMethodMatches(list, receiver, name, arguments);
 
-		if (!list.isEmpty())
+		if (list.hasCandidate())
 		{
 			return;
 		}
@@ -747,7 +787,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			this.superType.getMethodMatches(list, receiver, name, arguments);
 		}
 
-		if (!list.isEmpty())
+		if (list.hasCandidate())
 		{
 			return;
 		}
@@ -785,26 +825,25 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	{
 		if (this.superType != null)
 		{
-			IClass iclass = this.superType.getTheClass();
-			if (iclass != null)
+			final IClass superClass = this.superType.getTheClass();
+			if (superClass != null)
 			{
-				IDataMember m = iclass.resolveField(name);
-				if (m != null)
+				final IDataMember field = superClass.resolveField(name);
+				if (field != null)
 				{
-					return m;
+					return field;
 				}
 			}
 		}
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			IType type = this.interfaces[i];
-			IClass iclass = type.getTheClass();
-			if (iclass != null)
+			final IClass superInterface = this.interfaces[i].getTheClass();
+			if (superInterface != null)
 			{
-				IDataMember m = iclass.resolveField(name);
-				if (m != null)
+				final IDataMember field = superInterface.resolveField(name);
+				if (field != null)
 				{
-					return m;
+					return field;
 				}
 			}
 		}
@@ -897,8 +936,8 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		}
 		if (level == Modifiers.PROTECTED || level == Modifiers.PACKAGE)
 		{
-			IDyvilHeader unit1 = this.getHeader();
-			IDyvilHeader unit2 = iclass.getHeader();
+			IHeaderUnit unit1 = this.getHeader();
+			IHeaderUnit unit2 = iclass.getHeader();
 			if (unit1 != null && unit2 != null && unit1.getPackage() == unit2.getPackage())
 			{
 				return VISIBLE;
@@ -916,10 +955,10 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 
 		if (slashIndex < 0)
 		{
-			return internalName;
+			return internalName + DyvilFileType.CLASS_EXTENSION;
 		}
 		// Strip the package/ part
-		return internalName.substring(slashIndex + 1);
+		return internalName.substring(slashIndex + 1) + DyvilFileType.CLASS_EXTENSION;
 	}
 
 	@Override
@@ -938,8 +977,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			}
 			final String outerName = this.enclosingClass.getInternalName();
 			writer.visitInnerClass(this.getInternalName(), outerName, this.name.qualified, modifiers);
-
-			writer.visitOuterClass(outerName, null, null);
 		}
 	}
 

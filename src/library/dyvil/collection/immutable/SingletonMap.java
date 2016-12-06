@@ -4,8 +4,7 @@ import dyvil.annotation.Immutable;
 import dyvil.collection.*;
 import dyvil.collection.iterator.SingletonIterator;
 import dyvil.lang.LiteralConvertible;
-import dyvil.tuple.Tuple2;
-import dyvil.util.None;
+import dyvil.tuple.Tuple;
 import dyvil.util.Option;
 import dyvil.util.Some;
 
@@ -130,7 +129,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	@Override
 	public Option<V> getOption(Object key)
 	{
-		return Objects.equals(key, this.key) ? new Some<>(this.value) : None.instance;
+		return Objects.equals(key, this.key) ? new Some<>(this.value) : Option.apply();
 	}
 	
 	@Override
@@ -277,7 +276,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 	@Override
 	public MutableMap<K, V> mutable()
 	{
-		return MutableMap.apply(new Tuple2<>(this.key, this.value));
+		return MutableMap.apply(new Tuple.Of2<>(this.key, this.value));
 	}
 
 	@Override

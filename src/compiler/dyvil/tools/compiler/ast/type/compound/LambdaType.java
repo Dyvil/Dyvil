@@ -12,15 +12,17 @@ import dyvil.tools.compiler.ast.expression.LambdaExpr;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.generic.GenericType;
 import dyvil.tools.compiler.ast.type.raw.IObjectType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -122,7 +124,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 			return iclass;
 		}
 
-		iclass = Package.dyvilFunction.resolveClass("Function" + typeCount);
+		iclass = Package.dyvilFunction.resolveClass(Names.Function).resolveClass(Name.fromQualified("Of" + typeCount));
 		functionClasses[typeCount] = iclass;
 		return iclass;
 	}
@@ -215,25 +217,6 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	}
 
 	// IType Overrides
-
-	@Override
-	public IType asParameterType()
-	{
-		if (!this.hasTypeVariables())
-		{
-			return this;
-		}
-
-		final IType[] parameterTypes = new IType[this.parameterCount];
-		for (int i = 0; i < this.parameterCount; i++)
-		{
-			parameterTypes[i] = this.parameterTypes[i].asParameterType();
-		}
-		final IType returnType = this.returnType.asParameterType();
-		final LambdaType lambdaType = new LambdaType(parameterTypes, this.parameterCount, returnType);
-		lambdaType.setExtension(this.extension);
-		return lambdaType;
-	}
 
 	@Override
 	public IClass getTheClass()
@@ -356,13 +339,19 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
-		final LambdaType lt = new LambdaType(this.parameterCount);
-		lt.parameterCount = this.parameterCount;
-		for (int i = 0; i < this.parameterCount; i++)
+		final IType[] parameterTypes = GenericType.getConcreteTypes(this.parameterTypes, this.parameterCount, context);
+		final boolean parametersChanged = parameterTypes != this.parameterTypes;
+
+		final IType returnType = this.returnType.getConcreteType(context);
+		if (!parametersChanged && returnType == this.returnType)
 		{
-			lt.parameterTypes[i] = this.parameterTypes[i].getConcreteType(context);
+			// Nothing changed, no need to create a new instance
+			return this;
 		}
-		lt.returnType = this.returnType.getConcreteType(context);
+
+		// Create a defensive copy of the parameter types in case the array has not changed
+		final LambdaType lt = new LambdaType(parametersChanged ? parameterTypes : parameterTypes.clone(),
+		                                     this.parameterCount, returnType);
 		lt.extension = this.extension;
 		return lt;
 	}
@@ -437,11 +426,11 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 		if (position == TypePosition.CLASS)
 		{
-			markers.add(Markers.semantic(this.position, "type.class.lambda"));
+			markers.add(Markers.semantic(this.position, "type.lambda.class"));
 		}
 
 		for (int i = 0; i < this.parameterCount; i++)
@@ -472,13 +461,13 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameterTypes[i].cleanup(context, compilableList);
+			this.parameterTypes[i].cleanup(compilableList, classCompilableList);
 		}
-		this.returnType.cleanup(context, compilableList);
+		this.returnType.cleanup(compilableList, classCompilableList);
 	}
 
 	@Override
@@ -533,25 +522,27 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	@Override
 	public String getInternalName()
 	{
-		return "dyvil/function/Function" + this.parameterCount;
+		return "dyvil/function/Function$Of" + this.parameterCount;
 	}
 
 	@Override
-	public void appendExtendedName(StringBuilder buffer)
+	public void appendDescriptor(StringBuilder buffer, int type)
 	{
-		buffer.append("Ldyvil/function/Function").append(this.parameterCount).append(';');
-	}
+		buffer.append("Ldyvil/function/Function$Of").append(this.parameterCount);
 
-	@Override
-	public void appendSignature(StringBuilder buffer, boolean genericArg)
-	{
-		buffer.append("Ldyvil/function/Function").append(this.parameterCount).append('<');
-		for (int i = 0; i < this.parameterCount; i++)
+		if (type != NAME_DESCRIPTOR)
 		{
-			this.parameterTypes[i].appendSignature(buffer, true);
+			final int parType = type != NAME_FULL ? NAME_SIGNATURE_GENERIC_ARG : NAME_FULL;
+
+			buffer.append('<');
+			for (int i = 0; i < this.parameterCount; i++)
+			{
+				this.parameterTypes[i].appendDescriptor(buffer, parType);
+			}
+			this.returnType.appendDescriptor(buffer, parType);
+			buffer.append('>');
 		}
-		this.returnType.appendSignature(buffer, true);
-		buffer.append(">;");
+		buffer.append(';');
 	}
 
 	@Override

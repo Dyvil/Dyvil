@@ -7,6 +7,7 @@ import dyvil.tools.asm.Handle;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -20,6 +21,7 @@ import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
@@ -29,7 +31,6 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Mutability;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -64,14 +65,12 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	                                                             "dyvil/runtime/DynamicLinker", "linkClassMethod",
 	                                                             ClassFormat.BSM_HEAD + ClassFormat.BSM_TAIL);
 
-	protected static final String NAME_SEPARATOR = "_$_";
-
 	// --------------------------------------------------
 
 	protected ITypeParameter[] typeParameters;
 	protected int              typeParameterCount;
 
-	protected IType receiverType;
+	protected IType thisType;
 
 	protected ParameterList parameters = new ParameterList();
 
@@ -208,7 +207,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public boolean setReceiverType(IType receiverType)
 	{
-		this.receiverType = receiverType;
+		this.thisType = receiverType;
 		return true;
 	}
 
@@ -223,26 +222,43 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		switch (type)
 		{
-		case "dyvil/annotation/Native":
+		case AnnotationUtil.NATIVE:
 			this.modifiers.addIntModifier(Modifiers.NATIVE);
 			return false;
-		case "dyvil/annotation/Strict":
+		case AnnotationUtil.STRICT:
 			this.modifiers.addIntModifier(Modifiers.STRICT);
 			return false;
 		case Deprecation.JAVA_INTERNAL:
 		case Deprecation.DYVIL_INTERNAL:
 			this.modifiers.addIntModifier(Modifiers.DEPRECATED);
 			return true;
-		case "java/lang/Override":
+		case AnnotationUtil.OVERRIDE:
 			this.modifiers.addIntModifier(Modifiers.OVERRIDE);
 			return false;
-		case "dyvil/annotation/Intrinsic":
-			if (annotation != null)
+		case AnnotationUtil.INRINSIC:
+			if (annotation == null)
 			{
-				this.intrinsicData = Intrinsics.readAnnotation(this, annotation);
-				return this.getClass() != ExternalMethod.class;
+				return true;
 			}
-			return true;
+
+			this.intrinsicData = Intrinsics.readAnnotation(this, annotation);
+			// retain the annotation if this method is not external
+			return this.getClass() != ExternalMethod.class;
+		case AnnotationUtil.DYVIL_NAME_INTERNAL:
+			if (annotation == null)
+			{
+				return true;
+			}
+
+			final IValue firstValue = annotation.getArguments().getFirstValue();
+			if (firstValue != null)
+			{
+				// In Dyvil source code, the @DyvilName is called @BytecodeName,
+				// and it sets the name to be used in the bytecode
+				this.internalName = firstValue.stringValue();
+			}
+			// do not retain the annotation
+			return false;
 		}
 		return true;
 	}
@@ -328,7 +344,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public IDyvilHeader getHeader()
+	public IHeaderUnit getHeader()
 	{
 		return this.enclosingClass.getHeader();
 	}
@@ -342,8 +358,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public IType getThisType()
 	{
-		return this.receiverType;
+		return this.thisType;
 	}
+
+	@Override
+	public abstract IType getReceiverType();
 
 	@Override
 	public ITypeParameter resolveTypeParameter(Name name)
@@ -467,7 +486,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			// Static access to static method
 
-			if (!Types.isSuperType(this.enclosingClass.getClassType(), receiver.getType()))
+			final IType receiverType = receiver.getType();
+			if (!Types.isSuperType(this.enclosingClass.getClassType(), receiverType))
 			{
 				// Disallow access from the wrong type
 				return;
@@ -484,6 +504,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			matchValues = new int[1 + argumentCount];
 			matchTypes = new IType[1 + argumentCount];
 			matchValues[0] = 1;
+			matchTypes[0] = receiverType;
 		}
 		else
 		{
@@ -679,7 +700,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				// normal instance method access
 
 				updateReceiverType(receiver, genericData);
-				receiver = TypeChecker.convertValue(receiver, this.receiverType, genericData, markers, context,
+				receiver = TypeChecker.convertValue(receiver, this.getReceiverType(), genericData, markers, context,
 				                                    TypeChecker
 					                                    .markerSupplier("method.access.receiver_type", this.name));
 				updateReceiverType(receiver, genericData);
@@ -698,7 +719,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			else
 			{
 				// unqualified call
-				final IType receiverType = this.enclosingClass.getType();
+				final IType receiverType = this.enclosingClass.getThisType();
 				receiver = new ThisExpr(position, receiverType, context, markers);
 				if (genericData != null)
 				{
@@ -744,7 +765,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 			if (typeArgument == null)
 			{
-				final IType inferredType = typeParameter.getDefaultType();
+				final IType inferredType = typeParameter.getUpperBound();
 				markers.add(Markers.semantic(position, "method.typevar.infer", this.name, typeParameter.getName(),
 				                             inferredType));
 				genericData.addMapping(typeParameter, inferredType);
@@ -753,8 +774,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			{
 				final Marker marker = Markers.semanticError(position, "method.typevar.incompatible", this.name,
 				                                            typeParameter.getName());
-				marker.addInfo(Markers.getSemantic("generic.type", typeArgument));
-				marker.addInfo(Markers.getSemantic("typeparameter.declaration", typeParameter));
+				marker.addInfo(Markers.getSemantic("type.generic", typeArgument));
+				marker.addInfo(Markers.getSemantic("type_parameter.declaration", typeParameter));
 				markers.add(marker);
 			}
 		}
@@ -1019,6 +1040,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 
 		this.writeArgumentsAndInvoke(writer, instance, arguments, typeContext, lineNumber);
+		this.type.writeCast(writer, Types.BOOLEAN, 0);
 		writer.visitJumpInsn(IFNE, dest);
 	}
 
@@ -1033,6 +1055,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 
 		this.writeArgumentsAndInvoke(writer, instance, arguments, typeContext, lineNumber);
+		this.type.writeCast(writer, Types.BOOLEAN, 0);
 		writer.visitJumpInsn(IFEQ, dest);
 	}
 
@@ -1049,7 +1072,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return;
 		}
 
-		receiver.writeExpression(writer, this.enclosingClass.getType());
+		receiver.writeExpression(writer, this.enclosingClass.getReceiverType());
 
 		if (receiver.isIgnoredClassAccess())
 		{

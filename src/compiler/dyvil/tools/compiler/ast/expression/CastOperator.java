@@ -2,7 +2,8 @@ package dyvil.tools.compiler.ast.expression;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -170,15 +171,15 @@ public final class CastOperator extends AbstractValue
 	}
 	
 	@Override
-	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 		if (this.typeHint)
 		{
-			return this.value.cleanup(context, compilableList);
+			return this.value.cleanup(compilableList, classCompilableList);
 		}
 		
-		this.type.cleanup(context, compilableList);
-		this.value = this.value.cleanup(context, compilableList);
+		this.type.cleanup(compilableList, classCompilableList);
+		this.value = this.value.cleanup(compilableList, classCompilableList);
 		return this;
 	}
 	

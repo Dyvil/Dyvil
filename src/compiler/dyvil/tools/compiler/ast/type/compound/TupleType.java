@@ -11,15 +11,17 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.generic.GenericType;
 import dyvil.tools.compiler.ast.type.raw.IObjectType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -37,8 +39,10 @@ import java.io.IOException;
 
 public final class TupleType implements IObjectType, ITypeList
 {
-	public static final IClass[] tupleClasses = new IClass[22];
-	public static final String[] descriptors  = new String[22];
+	public static final int MAX_ARITY = 10;
+
+	public static final IClass[] tupleClasses = new IClass[MAX_ARITY];
+	public static final String[] descriptors  = new String[MAX_ARITY];
 
 	protected IType[] types;
 	protected int     typeCount;
@@ -89,7 +93,7 @@ public final class TupleType implements IObjectType, ITypeList
 			return iclass;
 		}
 
-		iclass = Package.dyvilTuple.resolveClass("Tuple" + count);
+		iclass = Package.dyvilTuple.resolveClass(Names.Tuple).resolveClass(Name.fromQualified("Of" + count));
 		tupleClasses[count] = iclass;
 		return iclass;
 	}
@@ -149,22 +153,6 @@ public final class TupleType implements IObjectType, ITypeList
 	public IClass getTheClass()
 	{
 		return getTupleClass(this.typeCount);
-	}
-
-	@Override
-	public IType asParameterType()
-	{
-		if (!this.hasTypeVariables())
-		{
-			return this;
-		}
-
-		final IType[] types = new IType[this.typeCount];
-		for (int i = 0; i < this.typeCount; i++)
-		{
-			types[i] = this.types[i].asParameterType();
-		}
-		return new TupleType(types, this.typeCount);
 	}
 
 	@Override
@@ -263,13 +251,13 @@ public final class TupleType implements IObjectType, ITypeList
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
-		TupleType tt = new TupleType(this.typeCount);
-		tt.typeCount = this.typeCount;
-		for (int i = 0; i < this.typeCount; i++)
+		final IType[] types = GenericType.getConcreteTypes(this.types, this.typeCount, context);
+		if (types == this.types)
 		{
-			tt.types[i] = this.types[i].getConcreteType(context);
+			// Nothing changed, no need to create a new instance
+			return this;
 		}
-		return tt;
+		return new TupleType(types, this.typeCount);
 	}
 
 	@Override
@@ -323,7 +311,7 @@ public final class TupleType implements IObjectType, ITypeList
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 		if (position == TypePosition.CLASS)
 		{
@@ -355,11 +343,11 @@ public final class TupleType implements IObjectType, ITypeList
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 		for (int i = 0; i < this.typeCount; i++)
 		{
-			this.types[i].cleanup(context, compilableList);
+			this.types[i].cleanup(compilableList, classCompilableList);
 		}
 	}
 
@@ -400,21 +388,23 @@ public final class TupleType implements IObjectType, ITypeList
 	}
 
 	@Override
-	public void appendExtendedName(StringBuilder buffer)
+	public void appendDescriptor(StringBuilder buffer, int type)
 	{
-		buffer.append('L').append(this.getInternalName()).append(';');
-	}
+		buffer.append('L').append(this.getInternalName());
 
-	@Override
-	public void appendSignature(StringBuilder buf, boolean genericArg)
-	{
-		buf.append('L').append(this.getInternalName());
-		buf.append('<');
-		for (int i = 0; i < this.typeCount; i++)
+		if (type != NAME_DESCRIPTOR)
 		{
-			this.types[i].appendSignature(buf, true);
+			final int parType = type == NAME_FULL ? NAME_FULL : NAME_SIGNATURE_GENERIC_ARG;
+
+			buffer.append('<');
+			for (int i = 0; i < this.typeCount; i++)
+			{
+				this.types[i].appendDescriptor(buffer, parType);
+			}
+			buffer.append('>');
 		}
-		buf.append('>').append(';');
+
+		buffer.append(';');
 	}
 
 	@Override

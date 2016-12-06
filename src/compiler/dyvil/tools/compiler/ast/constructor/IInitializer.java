@@ -4,7 +4,7 @@ import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.MemberKind;
-import dyvil.tools.compiler.backend.IClassCompilable;
+import dyvil.tools.compiler.ast.header.IClassCompilable;
 
 public interface IInitializer extends IClassMember, IValueConsumer, IClassCompilable
 {

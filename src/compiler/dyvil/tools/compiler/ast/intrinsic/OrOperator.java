@@ -6,7 +6,8 @@ import dyvil.tools.compiler.ast.constant.BooleanValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -117,10 +118,10 @@ public final class OrOperator extends AbstractValue
 	}
 	
 	@Override
-	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.left = this.left.cleanup(context, compilableList);
-		this.right = this.right.cleanup(context, compilableList);
+		this.left = this.left.cleanup(compilableList, classCompilableList);
+		this.right = this.right.cleanup(compilableList, classCompilableList);
 		
 		if (this.bothFalse())
 		{

@@ -7,7 +7,8 @@ import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.raw.IObjectType;
@@ -25,29 +26,29 @@ public abstract class GenericType implements IObjectType, ITypeList
 {
 	protected IType[] typeArguments;
 	protected int     typeArgumentCount;
-	
+
 	public GenericType()
 	{
 		this.typeArguments = new IType[2];
 	}
-	
+
 	public GenericType(int typeArgumentCount)
 	{
 		this.typeArguments = new IType[typeArgumentCount];
 	}
-	
+
 	public GenericType(IType[] typeArguments, int typeArgumentCount)
 	{
 		this.typeArguments = typeArguments;
 		this.typeArgumentCount = typeArgumentCount;
 	}
-	
+
 	@Override
 	public int typeCount()
 	{
 		return this.typeArgumentCount;
 	}
-	
+
 	@Override
 	public boolean isGenericType()
 	{
@@ -90,17 +91,6 @@ public abstract class GenericType implements IObjectType, ITypeList
 	}
 
 	@Override
-	public IType asParameterType()
-	{
-		final GenericType copy = this.clone();
-		for (int i = 0; i < this.typeArgumentCount; i++)
-		{
-			copy.typeArguments[i] = this.typeArguments[i].asParameterType();
-		}
-		return copy;
-	}
-
-	@Override
 	public boolean hasTypeVariables()
 	{
 		for (int i = 0; i < this.typeArgumentCount; i++)
@@ -112,24 +102,56 @@ public abstract class GenericType implements IObjectType, ITypeList
 		}
 		return false;
 	}
-	
+
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
-		GenericType copy = this.clone();
-		for (int i = 0; i < this.typeArgumentCount; i++)
+		final IType[] types = getConcreteTypes(this.typeArguments, this.typeArgumentCount, context);
+		if (types == this.typeArguments)
 		{
-			copy.typeArguments[i] = this.typeArguments[i].getConcreteType(context);
+			// Nothing changed, no need to create a new instance
+			return this;
 		}
+
+		final GenericType copy = this.copyName();
+		copy.typeArguments = types;
+		copy.typeArgumentCount = this.typeArgumentCount;
 		return copy;
 	}
-	
+
+	public static IType[] getConcreteTypes(IType[] types, int count, ITypeContext context)
+	{
+		IType[] newTypes = null;
+		boolean changed = false;
+
+		for (int i = 0; i < count; i++)
+		{
+			final IType original = types[i];
+			final IType concrete = original.getConcreteType(context);
+			if (changed)
+			{
+				// As soon as changed is true, the array is initialized and we have to copy all elements
+				newTypes[i] = concrete;
+			}
+			else if (concrete != original)
+			{
+				// If there is a single mismatch, create the array and copy previous elements
+				changed = true;
+				newTypes = new IType[count];
+				newTypes[i] = concrete;
+				System.arraycopy(types, 0, newTypes, 0, i);
+			}
+		}
+
+		return changed ? newTypes : types;
+	}
+
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
 		return this;
 	}
-	
+
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
@@ -138,19 +160,18 @@ public abstract class GenericType implements IObjectType, ITypeList
 			this.typeArguments[i].resolve(markers, context);
 		}
 	}
-	
+
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
-		final TypePosition argumentPosition =
-				position == TypePosition.SUPER_TYPE ? TypePosition.SUPER_TYPE_ARGUMENT : TypePosition.GENERIC_ARGUMENT;
+		final int argumentPosition = TypePosition.genericArgument(position);
 
 		for (int i = 0; i < this.typeArgumentCount; i++)
 		{
 			this.typeArguments[i].checkType(markers, context, argumentPosition);
 		}
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
@@ -159,7 +180,7 @@ public abstract class GenericType implements IObjectType, ITypeList
 			this.typeArguments[i].check(markers, context);
 		}
 	}
-	
+
 	@Override
 	public void foldConstants()
 	{
@@ -168,43 +189,39 @@ public abstract class GenericType implements IObjectType, ITypeList
 			this.typeArguments[i].foldConstants();
 		}
 	}
-	
+
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 		for (int i = 0; i < this.typeArgumentCount; i++)
 		{
-			this.typeArguments[i].cleanup(context, compilableList);
+			this.typeArguments[i].cleanup(compilableList, classCompilableList);
 		}
 	}
-	
+
 	@Override
-	public void appendExtendedName(StringBuilder buffer)
+	public void appendDescriptor(StringBuilder buffer, int type)
 	{
-		buffer.append('L').append(this.getInternalName()).append(';');
-	}
-	
-	@Override
-	public void appendSignature(StringBuilder buf, boolean genericArg)
-	{
-		buf.append('L').append(this.getInternalName());
-		if (this.typeArgumentCount > 0)
+		buffer.append('L').append(this.getInternalName());
+		if (type != NAME_DESCRIPTOR && this.typeArgumentCount > 0)
 		{
-			buf.append('<');
+			final int parType = type == NAME_FULL ? NAME_FULL : NAME_SIGNATURE_GENERIC_ARG;
+
+			buffer.append('<');
 			for (int i = 0; i < this.typeArgumentCount; i++)
 			{
-				this.typeArguments[i].appendSignature(buf, true);
+				this.typeArguments[i].appendDescriptor(buffer, parType);
 			}
-			buf.append('>');
+			buffer.append('>');
 		}
-		buf.append(';');
+		buffer.append(';');
 	}
-	
+
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		writer.visitLdcInsn(Type.getObjectType(this.getTheClass().getInternalName()));
-		
+
 		writer.visitLdcInsn(this.typeArgumentCount);
 		writer.visitTypeInsn(Opcodes.ANEWARRAY, "dyvilx/lang/model/type/Type");
 		for (int i = 0; i < this.typeArgumentCount; i++)
@@ -214,12 +231,12 @@ public abstract class GenericType implements IObjectType, ITypeList
 			this.typeArguments[i].writeTypeExpression(writer);
 			writer.visitInsn(Opcodes.AASTORE);
 		}
-		
+
 		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/GenericType", "apply",
 		                       "(Ljava/lang/Class;[Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/GenericType;",
 		                       false);
 	}
-	
+
 	@Override
 	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
 	{
@@ -227,12 +244,12 @@ public abstract class GenericType implements IObjectType, ITypeList
 		{
 			return;
 		}
-		
+
 		int index = typePath.getStepArgument(step);
-		this.typeArguments[index] = IType
-				.withAnnotation(this.typeArguments[index], annotation, typePath, step + 1, steps);
+		this.typeArguments[index] = IType.withAnnotation(this.typeArguments[index], annotation, typePath, step + 1,
+		                                                 steps);
 	}
-	
+
 	@Override
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
@@ -241,7 +258,7 @@ public abstract class GenericType implements IObjectType, ITypeList
 			IType.writeAnnotations(this.typeArguments[i], visitor, typeRef, typePath + i + ';');
 		}
 	}
-	
+
 	protected final void appendFullTypes(StringBuilder builder)
 	{
 		if (this.typeArgumentCount > 0)
@@ -254,7 +271,7 @@ public abstract class GenericType implements IObjectType, ITypeList
 			builder.append('>');
 		}
 	}
-	
+
 	protected final void writeTypeArguments(DataOutput dos) throws IOException
 	{
 		dos.writeShort(this.typeArgumentCount);
@@ -263,7 +280,7 @@ public abstract class GenericType implements IObjectType, ITypeList
 			IType.writeType(this.typeArguments[i], dos);
 		}
 	}
-	
+
 	protected final void readTypeArguments(DataInput dis) throws IOException
 	{
 		int len = this.typeArgumentCount = dis.readShort();
@@ -295,14 +312,21 @@ public abstract class GenericType implements IObjectType, ITypeList
 			buffer.append('>');
 		}
 	}
-	
-	protected final void copyTypeArguments(GenericType agt)
-	{
-		agt.typeArgumentCount = this.typeArgumentCount;
-		agt.typeArguments = new IType[this.typeArgumentCount];
-		System.arraycopy(this.typeArguments, 0, agt.typeArguments, 0, this.typeArgumentCount);
-	}
-	
+
 	@Override
-	public abstract GenericType clone();
+	public GenericType clone()
+	{
+		GenericType type = this.copyName();
+		this.copyArgumentsTo(type);
+		return type;
+	}
+
+	protected abstract GenericType copyName();
+
+	private void copyArgumentsTo(GenericType target)
+	{
+		target.typeArgumentCount = this.typeArgumentCount;
+		target.typeArguments = new IType[this.typeArgumentCount];
+		System.arraycopy(this.typeArguments, 0, target.typeArguments, 0, this.typeArgumentCount);
+	}
 }

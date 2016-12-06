@@ -3,8 +3,9 @@ package dyvil.tools.compiler.ast.parameter;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.transform.TypeChecker;
@@ -112,13 +113,13 @@ public class CodeParameter extends AbstractParameter
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		super.cleanup(context, compilableList);
+		super.cleanup(compilableList, classCompilableList);
 
 		if (this.defaultValue != null)
 		{
-			this.defaultValue = this.defaultValue.cleanup(context, compilableList);
+			this.defaultValue = this.defaultValue.cleanup(compilableList, classCompilableList);
 		}
 	}
 }

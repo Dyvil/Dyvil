@@ -8,8 +8,9 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.dynamic.DynamicType;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
@@ -22,8 +23,8 @@ import dyvil.tools.parsing.Name;
 
 public final class Types
 {
-	public static IDyvilHeader LANG_HEADER;
-	public static IContext BASE_CONTEXT;
+	public static IHeaderUnit LANG_HEADER;
+	public static IContext    BASE_CONTEXT;
 
 	public static final PrimitiveType VOID    = new PrimitiveType(Names._void, PrimitiveType.VOID_CODE, 'V',
 	                                                              Opcodes.ILOAD + Opcodes.RETURN - Opcodes.IRETURN,
@@ -58,16 +59,6 @@ public final class Types
 	public static final ClassType RUNTIME_EXCEPTION = new ClassType();
 	public static final ClassType SERIALIZABLE      = new ClassType();
 
-	public static IClass VOID_CLASS;
-	public static IClass BOOLEAN_CLASS;
-	public static IClass BYTE_CLASS;
-	public static IClass SHORT_CLASS;
-	public static IClass CHAR_CLASS;
-	public static IClass INT_CLASS;
-	public static IClass LONG_CLASS;
-	public static IClass FLOAT_CLASS;
-	public static IClass DOUBLE_CLASS;
-
 	public static IClass PRIMITIVES_CLASS;
 
 	public static IClass OBJECT_CLASS;
@@ -85,6 +76,7 @@ public final class Types
 	public static IClass MUTABLE_CLASS;
 	public static IClass IMMUTABLE_CLASS;
 	public static IClass REIFIED_CLASS;
+	public static IClass OVERLOADPRIORITY_CLASS;
 
 	public static IClass LITERALCONVERTIBLE_CLASS;
 	public static IClass FROMBOOLEAN_CLASS;
@@ -105,15 +97,25 @@ public final class Types
 
 	public static void initTypes()
 	{
-		VOID.theClass = VOID_CLASS = Package.javaLang.resolveClass("Void");
-		BOOLEAN.theClass = BOOLEAN_CLASS = Package.javaLang.resolveClass("Boolean");
-		BYTE.theClass = BYTE_CLASS = Package.javaLang.resolveClass("Byte");
-		SHORT.theClass = SHORT_CLASS = Package.javaLang.resolveClass("Short");
-		CHAR.theClass = CHAR_CLASS = Package.javaLang.resolveClass("Character");
-		INT.theClass = INT_CLASS = Package.javaLang.resolveClass("Integer");
-		LONG.theClass = LONG_CLASS = Package.javaLang.resolveClass("Long");
-		FLOAT.theClass = FLOAT_CLASS = Package.javaLang.resolveClass("Float");
-		DOUBLE.theClass = DOUBLE_CLASS = Package.javaLang.resolveClass("Double");
+		VOID.wrapperClass = Package.javaLang.resolveClass("Void");
+		BOOLEAN.wrapperClass = Package.javaLang.resolveClass("Boolean");
+		BOOLEAN.extClass = Package.dyvilLang.resolveClass("BooleanExtensions");
+
+		INT.wrapperClass = Package.javaLang.resolveClass("Integer");
+		INT.extClass = Package.dyvilLang.resolveClass("IntExtensions");
+		LONG.wrapperClass = Package.javaLang.resolveClass("Long");
+		LONG.extClass = Package.dyvilLang.resolveClass("LongExtensions");
+		FLOAT.wrapperClass = Package.javaLang.resolveClass("Float");
+		FLOAT.extClass = Package.dyvilLang.resolveClass("FloatExtensions");
+		DOUBLE.wrapperClass = Package.javaLang.resolveClass("Double");
+		DOUBLE.extClass = Package.dyvilLang.resolveClass("DoubleExtensions");
+
+		BYTE.wrapperClass = Package.javaLang.resolveClass("Byte");
+		BYTE.extClass = INT.extClass;
+		SHORT.wrapperClass = Package.javaLang.resolveClass("Short");
+		SHORT.extClass = INT.extClass;
+		CHAR.wrapperClass = Package.javaLang.resolveClass("Character");
+		CHAR.extClass = INT.extClass;
 
 		PRIMITIVES_CLASS = Package.dyvilLang.resolveClass("Primitives");
 
@@ -131,6 +133,7 @@ public final class Types
 		MUTABLE_CLASS = Package.dyvilAnnotation.resolveClass("Mutable");
 		IMMUTABLE_CLASS = Package.dyvilAnnotation.resolveClass("Immutable");
 		REIFIED_CLASS = Package.dyvilAnnotation.resolveClass("Reified");
+		OVERLOADPRIORITY_CLASS = Package.dyvilAnnotation.resolveClass("OverloadPriority");
 
 		LITERALCONVERTIBLE_CLASS = Package.dyvilLang.resolveClass("LiteralConvertible");
 		FROMINT_CLASS = LITERALCONVERTIBLE_CLASS.resolveClass(Name.fromRaw("FromInt"));
@@ -200,6 +203,15 @@ public final class Types
 			return OBJECT_ARRAY_CLASS = Package.dyvilArray.resolveClass("ObjectArray");
 		}
 		return OBJECT_ARRAY_CLASS;
+	}
+
+	public static int getTypeMatch(IType superType, IType subType)
+	{
+		if (Types.isSameType(superType, subType))
+		{
+			return IValue.EXACT_MATCH;
+		}
+		return Types.isSuperType(superType, subType) ? IValue.SUBTYPE_MATCH : IValue.MISMATCH;
 	}
 
 	public static boolean isSameClass(IType type1, IType type2)
@@ -370,6 +382,6 @@ public final class Types
 	public static IType resolveTypeSafely(IType type, ITypeParameter typeVar)
 	{
 		final IType resolved = type.resolveType(typeVar);
-		return resolved != null ? resolved : typeVar.getDefaultType();
+		return resolved != null ? resolved : typeVar.getUpperBound();
 	}
 }

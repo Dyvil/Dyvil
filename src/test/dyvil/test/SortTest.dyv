@@ -27,9 +27,9 @@ public class SortTest
 		Main.test("Random Inplace Quicksort", sortedList, mutableList)
 	}
 
-	public static ImmutableList<T> quicksort<T extends Comparable>(ImmutableList<T> list)
+	public static ImmutableList<T> quicksort<T: Comparable>(ImmutableList<T> list)
 	{
-		// TODO Allow the type parameter to be <T extends Comparable<T>>
+		// TODO Allow the type parameter to be <T: Comparable<T>>
 		if (list.isEmpty) return list
 
 		let pivot = list[list.size \ 2]
@@ -47,12 +47,12 @@ public class SortTest
 		(*right) = temp
 	}
 
-	public static void quicksort<T extends Comparable>(MutableList<T> list)
+	public static void quicksort<T: Comparable>(MutableList<T> list)
 	{
 		quicksortRange(list, 0, list.size - 1)
 	}
 
-	private static void quicksortRange<T extends Comparable>(MutableList<T> list, int left, int right)
+	private static void quicksortRange<T: Comparable>(MutableList<T> list, int left, int right)
 	{
 		int i = left
 		int j = right

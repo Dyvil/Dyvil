@@ -21,7 +21,8 @@ public class CombiningImplicitContext implements IImplicitContext
 	{
 		this.inner.getImplicitMatches(list, value, targetType);
 
-		if (list.isEmpty()) {
+		if (!list.hasCandidate())
+		{
 			this.outer.getImplicitMatches(list, value, targetType);
 		}
 	}

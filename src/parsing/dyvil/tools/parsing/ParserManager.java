@@ -65,23 +65,21 @@ public class ParserManager implements IParserManager
 	public IToken split(IToken token, int length)
 	{
 		final String stringValue = token.stringValue();
-		final int line = token.startLine();
-		final int startIndex = token.startIndex();
-
-		final String part1 = stringValue.substring(0, length);
-		final String part2 = stringValue.substring(length);
-
-		if (part2.isEmpty())
+		if (length == stringValue.length())
 		{
+			// the second part would be empty, so it stays a single token
 			return token;
 		}
 
+		final int line = token.startLine();
+		final int startIndex = token.startIndex();
+
 		final IToken prev = token.prev();
-		final IToken token1 = this.toToken(part1, startIndex, line);
-		final IToken token2 = this.toToken(part2, startIndex + length, line);
+		final IToken token1 = this.toToken(stringValue.substring(0, length), startIndex, line);
+		final IToken token2 = this.toToken(stringValue.substring(length), startIndex + length, line);
 		final IToken next = token.next();
 
-		// Link the tokens
+		// Re-link the tokens
 		prev.setNext(token1);
 		token1.setPrev(prev);
 		token1.setNext(token2);

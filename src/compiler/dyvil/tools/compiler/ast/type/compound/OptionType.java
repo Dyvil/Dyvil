@@ -16,11 +16,12 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -94,6 +95,16 @@ public class OptionType implements IObjectType
 		return OPTIONAL;
 	}
 
+	public IType getType()
+	{
+		return this.type;
+	}
+
+	public void setType(IType type)
+	{
+		this.type = type;
+	}
+
 	@Override
 	public boolean isGenericType()
 	{
@@ -110,13 +121,6 @@ public class OptionType implements IObjectType
 	public IClass getTheClass()
 	{
 		return LazyFields.OPTION_CLASS;
-	}
-
-	@Override
-	public IType asParameterType()
-	{
-		final IType type = this.type.asParameterType();
-		return type != this.type ? type : new OptionType(this.type);
 	}
 
 	@Override
@@ -191,7 +195,7 @@ public class OptionType implements IObjectType
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 		this.type.checkType(markers, context, position);
 	}
@@ -209,9 +213,9 @@ public class OptionType implements IObjectType
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.type.cleanup(context, compilableList);
+		this.type.cleanup(compilableList, classCompilableList);
 	}
 
 	@Override
@@ -250,17 +254,25 @@ public class OptionType implements IObjectType
 	}
 
 	@Override
-	public void appendExtendedName(StringBuilder buffer)
+	public void appendDescriptor(StringBuilder buffer, int type)
 	{
-		buffer.append("Ldyvil/util/Option;");
-	}
+		if (type == NAME_FULL)
+		{
+			buffer.append('?');
+			this.type.appendDescriptor(buffer, NAME_FULL);
+			return;
+		}
 
-	@Override
-	public void appendSignature(StringBuilder buffer, boolean genericArg)
-	{
-		buffer.append("Ldyvil/util/Option<");
-		this.type.appendSignature(buffer, true);
-		buffer.append(">;");
+		buffer.append('L').append(this.getInternalName());
+
+		if (type != NAME_DESCRIPTOR)
+		{
+			buffer.append('<');
+			this.type.appendDescriptor(buffer, NAME_SIGNATURE_GENERIC_ARG);
+			buffer.append('>');
+		}
+
+		buffer.append(';');
 	}
 
 	@Override

@@ -1,7 +1,9 @@
 package dyvil.tools.compiler.ast.generic;
 
+import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -9,7 +11,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public final class GenericData implements ITypeList, ITypeContext
+public final class GenericData implements IResolvable, ITypeList, ITypeContext
 {
 	protected ITypeParametric typeParametric;
 	protected IType[]         generics;
@@ -189,6 +191,7 @@ public final class GenericData implements ITypeList, ITypeContext
 		this.generics[typeVar.getIndex()] = type;
 	}
 
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.genericCount; i++)
@@ -199,6 +202,7 @@ public final class GenericData implements ITypeList, ITypeContext
 		this.lockedCount = this.genericCount;
 	}
 
+	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.genericCount; i++)
@@ -207,6 +211,7 @@ public final class GenericData implements ITypeList, ITypeContext
 		}
 	}
 
+	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.genericCount; i++)
@@ -215,6 +220,7 @@ public final class GenericData implements ITypeList, ITypeContext
 		}
 	}
 
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.genericCount; i++)
@@ -223,6 +229,7 @@ public final class GenericData implements ITypeList, ITypeContext
 		}
 	}
 
+	@Override
 	public void foldConstants()
 	{
 		for (int i = 0; i < this.genericCount; i++)
@@ -231,11 +238,12 @@ public final class GenericData implements ITypeList, ITypeContext
 		}
 	}
 
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	@Override
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 		for (int i = 0; i < this.genericCount; i++)
 		{
-			this.generics[i].cleanup(context, compilableList);
+			this.generics[i].cleanup(compilableList, classCompilableList);
 		}
 	}
 

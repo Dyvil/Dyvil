@@ -7,9 +7,10 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.statement.control.Label;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -188,15 +189,15 @@ public final class RepeatStatement extends AbstractValue implements IStatement, 
 	}
 
 	@Override
-	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 		if (this.action != null)
 		{
-			this.action = this.action.cleanup(context, compilableList);
+			this.action = this.action.cleanup(compilableList, classCompilableList);
 		}
 		if (this.condition != null)
 		{
-			this.condition = this.condition.cleanup(context, compilableList);
+			this.condition = this.condition.cleanup(compilableList, classCompilableList);
 		}
 		return this;
 	}

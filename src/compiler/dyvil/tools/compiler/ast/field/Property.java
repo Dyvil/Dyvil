@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.CodeMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -13,7 +14,7 @@ import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.CodeParameter;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -94,7 +95,9 @@ public class Property extends Member implements IProperty
 		{
 			return this.getter;
 		}
-		return this.getter = new CodeMethod(this.enclosingClass, this.name, this.type, this.modifiers);
+		final CodeMethod getter = new CodeMethod(this.enclosingClass, this.name, this.type, this.modifiers);
+		getter.setPosition(this.position);
+		return this.getter = getter;
 	}
 
 	@Override
@@ -104,10 +107,10 @@ public class Property extends Member implements IProperty
 	}
 
 	@Override
-	public void setSetterParameterName(Name setterParameterName)
+	public void setSetterParameterName(Name name)
 	{
 		this.initSetter();
-		this.setterParameter.setName(setterParameterName);
+		this.setterParameter.setName(name);
 	}
 
 	@Override
@@ -120,6 +123,7 @@ public class Property extends Member implements IProperty
 
 		final Name name = Name.from(this.name.unqualified + "_=", this.name.qualified + "_$eq");
 		this.setter = new CodeMethod(this.enclosingClass, name, Types.VOID, this.modifiers);
+		this.setter.setPosition(this.position);
 		this.setterParameter = new CodeParameter(this.position, Names.newValue, this.type, EmptyModifiers.INSTANCE,
 		                                         null);
 		this.setter.getParameterList().addParameter(this.setterParameter);
@@ -172,13 +176,15 @@ public class Property extends Member implements IProperty
 
 		if (this.getter != null)
 		{
-			this.getter.getModifiers().addIntModifier(this.modifiers.toFlags());
+			Field.copyModifiers(this.modifiers, this.getter.getModifiers());
+			this.getter.setType(this.type);
 			this.getter.resolveTypes(markers, context);
 		}
 		if (this.setter != null)
 		{
-			this.setter.getModifiers().addIntModifier(this.modifiers.toFlags());
+			Field.copyModifiers(this.modifiers, this.setter.getModifiers());
 			this.setterParameter.setPosition(this.setter.getPosition());
+			this.setterParameter.setType(this.type);
 			this.setter.resolveTypes(markers, context);
 		}
 		if (this.initializer != null)
@@ -297,21 +303,21 @@ public class Property extends Member implements IProperty
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		super.cleanup(context, compilableList);
+		super.cleanup(compilableList, classCompilableList);
 
 		if (this.getter != null)
 		{
-			this.getter.cleanup(context, compilableList);
+			this.getter.cleanup(compilableList, classCompilableList);
 		}
 		if (this.setter != null)
 		{
-			this.setter.cleanup(context, compilableList);
+			this.setter.cleanup(compilableList, classCompilableList);
 		}
 		if (this.initializer != null)
 		{
-			this.initializer = this.initializer.cleanup(context, compilableList);
+			this.initializer = this.initializer.cleanup(compilableList, classCompilableList);
 		}
 	}
 
@@ -354,13 +360,7 @@ public class Property extends Member implements IProperty
 	private void writeSetter(ClassWriter writer, String descriptorBase, String signatureBase, String nameBase)
 	{
 		final IValue setterValue = this.setter.getValue();
-		final ModifierSet setterModifiers = this.setter.getModifiers();
-
-		int modifiers = this.modifiers.toFlags();
-		if (setterModifiers != null)
-		{
-			modifiers |= setterModifiers.toFlags();
-		}
+		final int modifiers = this.setter.getModifiers().toFlags();
 
 		final String name = nameBase + "_$eq";
 		final String descriptor = "(" + descriptorBase + ")V";
@@ -388,14 +388,7 @@ public class Property extends Member implements IProperty
 	private void writeGetter(ClassWriter writer, String descriptorBase, String signatureBase, String nameBase)
 	{
 		final IValue getterValue = this.getter.getValue();
-		final ModifierSet getterModifiers = this.getter.getModifiers();
-
-		int modifiers = this.modifiers.toFlags();
-
-		if (getterModifiers != null)
-		{
-			modifiers |= getterModifiers.toFlags();
-		}
+		final int modifiers = this.getter.getModifiers().toFlags();
 
 		final String descriptor = "()" + descriptorBase;
 		final String signature = signatureBase == null ? null : "()" + signatureBase;

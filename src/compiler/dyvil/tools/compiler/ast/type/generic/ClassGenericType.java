@@ -200,10 +200,8 @@ public class ClassGenericType extends GenericType
 	}
 
 	@Override
-	public ClassGenericType clone()
+	protected GenericType copyName()
 	{
-		ClassGenericType t = new ClassGenericType(this.theClass);
-		this.copyTypeArguments(t);
-		return t;
+		return new ClassGenericType(this.theClass);
 	}
 }

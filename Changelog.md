@@ -1,3 +1,345 @@
+Dyvil v0.27.1
+=============
+
+## Dyvil Library v0.27.1
+
+- Added accessor methods for `Version` fields.
+- Updated `Version` constructors to check prerelease and build info.
+- Updated library classes to use `:` instead of `extends` for Type Parameters.
+- Updated the `Version.equals`, `.hashCode` and `.compareTo` methods to disregard build info for equality.
+- Updated the `Version.toString` method.
+- Fixed the `Option.orElse` signature being conceptually incorrect and causing runtime errors when used with `None`.
+
+## Dyvil Compiler v0.27.1
+
+- Union and Intersection Types now generate `@DyvilType` annotations.
+- Added decompilation support for `@DyvilType` annotations.
+- Added the `IType.appendDescriptor` method as a generalized version of `IType.appendExtendedName` and `.appendSignature`.
+- Fixed Type Parameters with `:`-separated upper bounds being parsed incorrectly.
+- Fixed Union and Intersection Type Subtyping working incorrectly in some cases.
+- Fixed Union and Intersection Types not being reifiable from bytecode. #3s09
+- Updated the `ClassFormat` class to allow decompilation of the new Dyvil signature extensions.
+
+## Dyvil REPL v0.17.1
+
+## Dyvil Property Format v0.8.0
+
+## Dyvil GenSrc v0.2.0
+
+Dyvil v0.27.0
+=============
+
+- Upper Type Parameter Bounds can now be specified after `:` instead of `extends`.
+- Removed the `include` keyword. #299
+
+## Dyvil Library v0.27.0
+
+- Added Dyvil implementations for tuples of 2 and 3 elements.
+- Added `Array.flatten` methods for two-dimensional arrays.
+- Added a generic `Array.flatMapped` method for all primitive types. #193
+- Added a non-isomorphic version of the `map` method for primitive array.
+- Added the `Array.copy(int)` method for primitive arrays.
+- Added the `ArrayOperators` class.
+- Added the `Collection.addAll(Iterable)` method.
+- Added the `Collection.removeAll(Iterable)` method.
+- Added the `PrimitiveObjectArray` class for low-priority array infix methods.
+- Converted the `dyvil.lang.LiteralConvertible` class to Dyvil.
+- Converted the `dyvil.random.Random` and `.JavaBasedRandom` to Dyvil.
+- Converted the `dyvil.util.I18n`, `.Option`, `.Some` and `.None` classes to Dyvil.
+- Fixed an issue that sometimes caused Marker locations to be displayed incorrectly.
+- Fixed the `-` operator on arrays only removing the first occurence of the RHS.
+- Improved `ObjectArray.toString/deepToString` methods.
+- Improved the non-generic `Array.flatMapped` method implementation for primitive and Object arrays. #193
+- Made `None` `nil`-convertible.
+- Made all Funcion classes nested classes of `dyvil.function.Function`.
+- Made all Tuple classes nested classes of `dyvil.tuple.Tuple`.
+- Moved operator methods from `dyvil.lang.Primitives` to type-specific `*Extensions` classes.
+- Moved the `Array.unboxed` methods to the `PrimitiveObjectArray` class.
+- Removed `ObjectExtensions.hash` and `.##`.
+- Removed `ObjectExtensions.isNull` and `.isNonNull`.
+- Removed the `dyvil.annotation.Utility` annotation class.
+- Removed the `dyvil.math.vector.*Vector` classes.
+- Removed the temporary `Tuple.java` class.
+- Renamed `dyvil.random.JavaBasedRandom` to `JavaRandom`.
+- Renamed operator methods in Array classes.
+- Renamed the `ObjectArray.toString(Object, StringBuilder)` method to `deepToString`.
+- Renamed the `dyvil.annotation._internal` package to `internal`.
+- Replaced the `ReferenceFactory.java` class file with the `ReferenceFactory.java.dgt` template.
+- Rewrote `dyvil.math.Complex` in idiomatic Dyvil.
+- Updated most `dyvil.lang.*Extensions` classes.
+- Updated templates to use `#foreach`.
+- Updated the `Array.java.dgt` template and the `Base-Boolean.dgs` file to auto-generate the `BooleanArray` class.
+- Updated the other primitive `Base-*.dgs` files.
+
+## Dyvil Compiler v0.27.0
+
+- Added dupliate key checking for Map Literals. #117
+- Added support for multiple source directories.
+- Case Classes now automatically generate public field accessors for class parameters.
+- Dropped support for `<:` and `>:` as bound separators in Type Parameter declarations.
+- FIxed an issue that caused Lower Type Parameter Bounds to be interpreted as Upper Bounds.
+- Fixed Fields with Properties not syncing the types correctly after resolution.
+- Fixed Method Duplicate Checking disregarding Class Parameter Properties.
+- Fixed Property Modifiers being propagated incorrectly to internal method AST nodes.
+- Fixed Type Parameter Lists handling inferred semicolons incorrectly.
+- Fixed an error that was caused when unresolved type aliases where referenced from outside their enclosing unit.
+- Fixed an issue related to type argument resolution on raw types.
+- Fixed an issue that 'leaked' warning colors when the `--ansi` flag was active.
+- Fixed an issue that caused Field Properties not to go through the CHECK phase.
+- Fixed an issue that caused classes with nested classes to generate invalid class files.
+- Fixed an issue that caused fields, methods and parameters with Type Parameter types to generate invalid signature attributes.
+- Fixed an issue that caused generated Properties to have incorrect getter and setter positions.
+- Fixed an issue that caused invalid bytecode to be generated when a generic function with a return type specialized to `boolean` was called as an `if` condition.
+- Fixed an issue that caused nested classes to be compiled incorrectly.
+- Fixed an issue that caused the `null` type to be parsed incorrectly within compound types.
+- Fixed an issue that caused type relation checks to behave incorrectly for Arrays.
+- Fixed an issue that prevented Dyvil Class Modifiers from being compiled to the bytecode.
+- Fixed an issue that would produce invalid bytecode when class operators were used as constant field values.
+- Fixed incorrect handling of the `{since}` in `@Deprecated` description messages.
+- Fixed scoped method resolution sorting candidates incorrectly.
+- Fixed the `MemberSorter.compareTypes` method breaking the comparator contract.
+- Improved Library Resolution Order to search in custom libraries first.
+- Improved Type Parameter formatting.
+- Improved warning messages for Java syntax artifacts.
+- Removed the deprecation warning for `include` statements. #299
+- Updated compiler references to Function classes.
+- Updated compiler references to Tuple classes.
+- Updated references to `dyvil.annotation._internal`.
+- Updated scoped method resolution by adding the `MatchList.hasCandidate` method.
+- Updated the `FileLibrary` class.
+- Updated the compiler to recognize new primitive `*Extensions` classes.
+
+## Dyvil REPL v0.17.1
+
+- Updated the `REPLVariable` class.
+
+## Dyvil Property Format v0.7.0
+
+- Added missing `override` modifiers in the `Node`, `NodeAccess` and `Property` classes.
+- Cleaned up most AST classes by removing unnecessary semicolons and using properties instead of bean getters/setters.
+- Cleaned up most AST classes by removing unnecessary semicolons and using properties instead of bean getters/setters.
+- Fixed the `Expandable.expand(…)` implementation.
+- Removed all `position` variables from `NodeElement` subclasses.
+- Removed duplicate `value` properties from primitive DPF Value classes.
+
+## Dyvil GenSrc v0.2.0
+
+- Added support for indexed `#for` directives. #307
+- Added support for the `#for` and `#endfor` directives. #306
+- Added the `#end` directive to denote the end of the enclosing block.
+- Fixed Specialization File Resolution working incorrectly with non-canonical pathnames.
+- Fixed an error caused by specialization files without a `-` in the file name.
+- Renamed the `#for` directive to `#foreach`.
+- Templates without specializations now use a default one based on their filename.
+- The `#foreach` directive now uses `,` as the separator.
+
+Dyvil v0.26.0
+=============
+
+- Added support for infix, prefix and postfix type operators. #303
+
+## Dyvil Library v0.26.0
+
+-  Added the `@base` property for all `Base-*.dgs` files.
+-  Updated all GenSrc template and specialization files for the new syntax.
+-  Updated all `.dgs` files to use `@fileName` and `@enabled`.
+-  Updated all `.dgs` files to use `@inheritFrom`.
+-  Updated the `Array.java.dgt` file to use `#if/endif` directives for `Range` methods. #305
+-  Updated the `FileUtils` class.
+-  Updated the `FileUtils` class.
+-  Updated the `StringExtensions` class.
+-  Updated the `StringUtils` class.
+-  Fixed the `FileUtils.write(File, byte[])` method working incorrectly if the file does not exist.
+-  Removed the `SubRangeArray.java.dgt` file.
+
+## Dyvil Compiler v0.26.0
+
+-  Added parser support for infix, prefix and postfix type operators. #303
+-  Added intrinsics for the prefix `+` and `-` type operators. #303
+-  Added intrinsics for the postfix `*` and `^`, `?` and `!` type operators. #303
+-  Added intrinsics for the infix `|` and `&` type operators. #163 #164 #303
+-  Added the `CodeTypeParameter` and `ExternalTypeParameter` classes.
+-  Added the `ICompilableList` interface for headers.
+-  Added the `IResolvable` interface.
+-  Added the `IUnresolvedType` interface.
+-  Added the `InfixType`, `PrefixType` and `PostfixType` classes.
+-  Added the `NamedGenericType(ICodePosition, Name, IType[], int)` constructor.
+-  Improved Error Reporting for missing or misplaced `>` or `)` in `type` and `class` operators.
+-  Improved Operator Parsing to treat more expressions as juxtaposition.
+-  Improved Syntax errors for Colon and Assignment Operators.
+-  Improved the `ParserManager.split(IToken, int)` implementation.
+-  Improved the `type` operator for primitive type operands.
+-  Improved the distinction between `any` and `Object` by generating a `@Primitive` type annotation for the former.
+-  Updated `cleanup` methods.
+-  Updated and fixed the `FieldThis` class.
+-  Updated the `ExternalMethod` class.
+-  Updated the `ITypeParameter` interface.
+-  Updated the `TypeParameter` class to use `IntersectionType`s for their upper bound representation.
+-  Updated the `TypePosition` class to use int flags instead of an enum.
+-  Made `IUnresolvedType` a super-interface of the `NamedType`, `NamedGenericType` and `UnknownType` classes.
+-  Made the `TypeParameter` class `abstract`.
+-  Fixed the Operator Declaration Parser not accepting EOFs in REPL input.
+-  Cleaned up the `TypeParameterParser` class.
+-  Cleaned up type-related `SemanticMarkers` entries.
+-  Deprecated the `<:` and `>:` symbols for type parameter bounds.
+-  Dropped support for manual name mangling using `_$_`. #302
+-  Moved parts of `OperatorChain` functionality to the abstract `OperatorStack` class.
+-  Renamed the `OperatorChain` class to `InfixCallChain`.
+-  Separated the `ICompilable` interface from the `IClassCompilable` interface.
+
+## Dyvil REPL v0.17.0
+
+-  Updated the REPL for compiler API changes.
+-  Changed the prefix for result classes to `Result_<n>`
+-  Replaced the `REPLCompiler` class with the `REPLClassLoader` class.
+-  Fixed REPL Variables not generating bytecode for (type-) annotations.
+-  Fixed nested classes causing verification errors.
+-  Renamed the package for generated classes to `repl_classes`.
+
+## Dyvil GenSrc v0.1.0
+
+-  Initial Alpha Release.
+-  Added support for custom output streams.
+-  Added support for the `#define` and `#undefine/#undef` directives. #305
+-  Added support for the `#if`, `#else` and `#endif` directives. #305
+-  Added support for the `#ifdef` and `#ifndef` directives. #305
+-  Added support for the `#process` and `#literal` directives. #305
+-  Added support for the `-t`, `--target`, `-s` and `--source` arguments.
+-  Added support for the `@base` property for specializations that work without templates.
+-  Added a localization file and the `I18n` class.
+-  Added a scoping mechanism using the `ReplacementMap` interface and the `LazyReplacementMap` class.
+-  Added a way to construct and use the `GenSrc` class in code.
+-  Added the `##` token separator and concatenation operator.
+-  Added the `Specialization.template` property.
+-  Updated the specializer to replace all identifiers, even without leading and trailing `$`.
+-  Made the `GenSources` class instance-based instead of using only `static` methods.
+-  Moved specialization code to the new `Specializer` class.
+-  Restructured the package layout.
+-  Cleaned up the `Template` class.
+-  Renamed the `GenSources` class to `GenSrc` and added the `Main` class.
+-  Renamed the `fileName` and `enabled` properties to `@fileName` and `@enabled`.
+-  Renamed the `genNotice` and `timeStamp` properties to `GEN_NOTICE` and `TIME_STAMP`.
+-  Renamed the `inheritFrom` property to `@inheritFrom`.
+
+## Dyvil Property Format v0.6.4
+
+Dyvil v0.25.0
+=============
+
+- Added support for `import inline`. #299
+- Added support for the new `import` + declaration kind syntax. #299
+- Added the `@DyvilName` annotation to denote names used in Dyvil when present in Java files, and bytecode identifiers when present in Dyvil files. #302
+- Added support for the `OverloadPriority` annotation. #300
+- Deprecated `include` Declarations in favor of `using` or `import inline`. #299
+- Dropped support for the `[Type...]` syntax for `List<Type>`.
+
+## Dyvil Library v0.25.0
+
+- Added separate classes for `closed` and `halfopen` primitive ranges.
+- Added the `@DyvilName(String)` annotation. #302
+- Added the `@OverloadPriority(int)` annotation. #300
+- Added the `[final T].asList(): ImmutableList<T>` and `[T].toList(): ImmutableList<T>` methods.
+- Added the type-alias `BytecodeName` for the `DyvilName` annotation.
+- Fixed the `**` operator implementation for `float`s.
+- Fixed the `InvariantEventBus.register(Object, Class)` method.
+- Fixed the `List.subscript(Range<int>)` implementation.
+- Removed support for custom primitive Range `increment`s.
+- Renamed the `ObjectRef.unboxed_$_T` methods to `.unboxedT` and added a `@DyvilName("unboxed")` method.
+- Renamed the `Range.count` method to `size`.
+- Renamed the `[T].apply(T from, T to)` methods to `rangeClosed` with `@DyvilName("apply")`.
+- Renamed the `[T].apply(T from, T toExclusive)` methods to `range` with `@DyvilName("apply")`.
+- Renamed the `[T].toIterable()` method to `asIterable`.
+- Replaced `include` declarations with `using` declarations.
+- Split the `LanguageCommons` and `LanguageFeatures` classes from the `dyvil.lang` package into the `Assert`, `Output` and `Misc` classes.
+- Updated `Range` apply constructors.
+- Updated the Lang Header.
+- Updated the `PowImpl.pow(long, int)` method to use a faster implementation.
+- Updated the `Primitives` class.
+
+## Dyvil Compiler v0.25.0
+
+- Added an error for failed contextual `this` type resolution.
+- Added decompilation support for the `@DyvilName` annotation. #302
+- Added default constructors for the `SingleImport`, `MultiImport` and `WildcardImport` classes.
+- Added support for the `@BytecodeName` annotation in source code.
+- Added support for the `OverloadPriority` annotation on Methods and Constructors. #300
+- Added the `IClass.getReceiverType()` method, which returns a covariant copy of the `this` type.
+- Added the `IClass.isAnonymous` method.
+- Added the `IDefaultContext.DEFAULT` constant.
+- Added the `IImport.asContext` method.
+- Added the `IImport.resolve(MarkerList, IContext, int)` method.
+- Added the `ImportDeclaration.getContext` method.
+- Added the `KindedImport` class.
+- Added the `RESOLVE_HEADERS` phase for Import type resolution.
+- Added the `SourceHeader` class and the `ISourceHeader` interface.
+- Added the `Types.getTypeMatch(superType, subType)` method.
+- Changed the `IImport.resolveTypes(MarkerList, IImportContext, boolean using)` parameter to `int mask`.
+- Cleaned up the `IImport.readImport(DataInput)` and `.writeImport(IImport, DataOutput)` methods.
+- Cleaned up the `IImport` and `MultiImport` classes.
+- Cleaned up the `ImportDeclaration` class.
+- Cleaned up the `dyvil.tools.asm.ClassReader` class.
+- Delegate symbol resolution for Import Declarations to the `getContext` method.
+- Delegate symbol resolution for `IImport`s to the `asContext` method.
+- Deprecated manual name-mangling with the `_$_` indicator.
+- Deprecated the `IClass.getType()` method in favor of `.getThisType()`.
+- Fixed Lambda Parameter resolution stopping after the first `auto` parameter.
+- Fixed Semicolon Inference handling `@` or `#` symbols on the next line incorrectly.
+- Fixed Type Aliases mapping to unresolved types in some cases.
+- Fixed `NamedType.resolveType(MarkerList, IContext)` returning `null` when the parent type is unresolved.
+- Fixed a compiler error caused by incorrect class initialization order of Map Types and Map Expressions.
+- Fixed an error caused by Overload Candidate ordering of static calls.
+- Fixed external inner class resolution causing NPEs if the class has no inner classes.
+- Fixed extra space in error messages containing class-types.
+- Fixed float literals not being assignable to super-types of the `java.lang.Float` type, including `Object`.
+- Fixed generic type resolution failing in some rare cases.
+- Fixed the `MemberSorter.compareTypes(IType, IType)` implementation.
+- Fixed ‘implements non-interface’ error for unresolved types.
+- Fixed ‘non-qualified access’ warnings for anonymous class fields and methods.
+- Import Statements can now import Headers, Type Aliases and Operators.
+- Import Statements can now make `implicit` conversion functions available.
+- Improved Overload Candidate Comparison to favor the most specific return types.
+- Improved several `IType.getConcreteType(ITypeContext)` implementations to reduce type copying.
+- Improved the `GenericType.clone()` implementation.
+- Improved the `SingleImport.writeData(DataOutput)` and `.readData(DataInput)` method implementations.
+- Improved type inference for Lambda Expressions without explicit return type. #301
+- Improved type inference for partially applied method calls. #301
+- Made the `IImportContext` interface extend `IImplicitContext`.
+- Made the `IImport` class use `IImportContext` for the `asContext`, `asParentContext` and `resolveTypes(…)` methods.
+- Made the `IMemberContext` interface extend `IImportContext`.
+- Made use of the `IDefaultContext.DEFAULT` constant in the `WildcardImport` class.
+- Mapped `include` declarations to `import inline` statements. #299
+- Mapped `using` declarations to `import static inline` statements. #299
+- Merged the `DyvilHeader.importDeclarations` and `.usingDeclarations` arrays.
+- Methods with mangled names now generate `@DyvilName` annotations. #302
+- Moved `*Import` classes from the `d.t.c.ast.header` package to the `d.t.c.ast.imports` package.
+- Moved `include` access checks to the `SingleImport` class. #299
+- Moved all classes except `Package` and `RootPackage` from the `d.t.c.ast.structure` package to the `d.t.c.ast.header` package.
+- Remapped `using` declarations to `import static` with `KindedImport`.
+- Removed `include`-related classes and code. #299
+- Removed the Hardcoded `[T]` → `Iterable<T>` conversion in favor of implicit conversion methods.
+- Removed the `*Using*` methods from the `IDyvilHeader` interface.
+- Renamed the `DyvilHeader` class to `HeaderUnit`.
+- Renamed the `DyvilUnit` class to `ClassUnit`.
+- Renamed the `HeaderUnit` class to `AbstractHeader`.
+- Renamed the `IDyvilHeader` class to `IHeaderUnit`.
+- Renamed the `IImport.getContext` method to `asParentContext`.
+- Simplified `Candidate` constructors.
+- Split Import resolution into type-resolution and member-resolution phases.
+- Updated Implicit Conversion Method Resolution to search the original type of the value first.
+- Updated `IImport` resolution with kind masks.
+- Updated the Header Context Model to use a chain that first matches header declarations and then imported / included declarations.
+- Updated the `ExternalHeader` class.
+- Updated the `ReceiverTypeVisitor` class.
+
+## Dyvil REPL v0.16.2
+
+- Removed `include`-related input handling.
+- Updated the REPL for `IDyvilHeader` API changes.
+
+## Dyvil Property Format v0.6.3
+
+- Bump DPF version number because of binary changes.
+
 Dyvil v0.24.0
 =============
 

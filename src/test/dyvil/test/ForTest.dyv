@@ -1,6 +1,7 @@
 package dyvil.test
 
 import java.util.Iterator
+using dyvil.Collections
 
 public class ForTest
 {
@@ -16,56 +17,55 @@ public class ForTest
 	
 	private static void testIterative()
 	{
-		[int] array = []
+		let list = List<int>
 
 		for (int i = 0; i < 3; i++)
 		{
-			array += i
+			list += i
 		}
 
-		[int] expected = [ 0, 1, 2 ]
-		Main.test("Iterative For Test", expected, array, expected == array)
+		Main.test("Iterative For Test", List(0, 1, 2), list)
 	}
 	
 	private static void testArray()
 	{
-		[int] ints = [ 1, 2, 3 ]
-		[int] array = []
+		let ints = [ 1, 2, 3 ]
+		let list = List<int>
 
 		for (var i <- ints)
 		{
-			array += i
+			list += i
 		}
 
-		Main.test("Array For Test", ints, array, ints == array)
+		Main.test("Array For Test", List(1, 2, 3), list)
 	}
 	
 	private static void testIterable()
 	{
-		[int] ints = [ 1, 2, 3 ]
-		Iterable<int> iterable = ints.toIterable
-		[int] array = []
+		let ints = [ 1, 2, 3 ]
+		let iterable = ints.asIterable
+		let list = List<int>
 
 		for (var i <- iterable)
 		{
-			array += i
+			list += i
 		}
 
-		Main.test("Iterable For Test", ints, array, ints == array)
+		Main.test("Iterable For Test", List(1, 2, 3), list)
 	}
 
 	private static void testIterator()
 	{
-		[int] ints = [ 1, 2, 3 ]
-		Iterator<int> iterator = ints.toIterable.iterator
-		[int] array = []
+		let ints = [ 1, 2, 3 ]
+		let iterator = ints.asIterable.iterator
+		let list = List<int>
 
 		for (var i <- iterator)
 		{
-			array += i
+			list += i
 		}
 
-		Main.test("Iterator For Test", ints, array, ints == array)
+		Main.test("Iterator For Test", List(1, 2, 3), list)
 	}
 	
 	private static void testString()
@@ -83,16 +83,16 @@ public class ForTest
 
 	private static void testNested()
 	{
-		var results = List<(int, int)>
+		let results = List<(int, int)>
 
 		for (var i <- 0 .. 1)
 		{
 			for (var j <- 0 .. 1)
 			{
-				results.add((i, j))
+				results += (i, j)
 			}
 		}
 
-		Main.test("Nested Range For Test", [ (0, 0), (0, 1), (1, 0), (1, 1) ] as List, results)
+		Main.test("Nested Range For Test", List((0, 0), (0, 1), (1, 0), (1, 1)), results)
 	}
 }

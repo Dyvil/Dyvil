@@ -12,10 +12,11 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -78,6 +79,16 @@ public class ReferenceType implements IObjectType
 	public int typeTag()
 	{
 		return REFERENCE;
+	}
+
+	public IType getType()
+	{
+		return this.type;
+	}
+
+	public void setType(IType type)
+	{
+		this.type = type;
 	}
 
 	@Override
@@ -210,7 +221,7 @@ public class ReferenceType implements IObjectType
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 		this.type.checkType(markers, context, position);
 	}
@@ -228,9 +239,9 @@ public class ReferenceType implements IObjectType
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.type.cleanup(context, compilableList);
+		this.type.cleanup(compilableList, classCompilableList);
 	}
 
 	@Override
@@ -269,13 +280,20 @@ public class ReferenceType implements IObjectType
 	}
 
 	@Override
-	public void appendSignature(StringBuilder buffer, boolean genericArg)
+	public void appendDescriptor(StringBuilder buffer, int type)
 	{
+		if (type == NAME_FULL)
+		{
+			buffer.append('R');
+			this.type.appendDescriptor(buffer, NAME_FULL);
+			return;
+		}
+
 		buffer.append('L').append(this.getInternalName());
-		if (this.theClass == LazyFields.OBJECT_REF_CLASS)
+		if (type != NAME_DESCRIPTOR && this.theClass == LazyFields.OBJECT_REF_CLASS)
 		{
 			buffer.append('<');
-			this.type.appendSignature(buffer, true);
+			this.type.appendDescriptor(buffer, type);
 			buffer.append('>');
 		}
 		buffer.append(';');

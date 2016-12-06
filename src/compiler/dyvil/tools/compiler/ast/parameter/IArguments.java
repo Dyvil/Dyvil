@@ -1,10 +1,12 @@
 package dyvil.tools.compiler.ast.parameter;
 
+import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -14,7 +16,7 @@ import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public interface IArguments extends IASTNode, Iterable<IValue>
+public interface IArguments extends IASTNode, IResolvable, Iterable<IValue>
 {
 	static TypeChecker.MarkerSupplier argumentMarkerSupplier(IParameter parameter)
 	{
@@ -93,17 +95,23 @@ public interface IArguments extends IASTNode, Iterable<IValue>
 
 	boolean isResolved();
 
+	@Override
 	void resolveTypes(MarkerList markers, IContext context);
 
+	@Override
 	void resolve(MarkerList markers, IContext context);
 
+	@Override
 	void checkTypes(MarkerList markers, IContext context);
 
+	@Override
 	void check(MarkerList markers, IContext context);
 
+	@Override
 	void foldConstants();
 
-	void cleanup(IContext context, IClassCompilableList compilableList);
+	@Override
+	void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList);
 
 	IArguments copy();
 

@@ -1,12 +1,14 @@
 package dyvil.tools.compiler.ast.statement.exception;
 
+import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.util.Markers;
@@ -14,9 +16,9 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public class CatchBlock implements IDefaultContext, IValueConsumer
+public class CatchBlock implements IResolvable, IDefaultContext, IValueConsumer
 {
-	public IValue        action;
+	public IValue action;
 
 	protected IVariable variable;
 
@@ -72,12 +74,14 @@ public class CatchBlock implements IDefaultContext, IValueConsumer
 		return variable == this.variable;
 	}
 
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.variable.resolveTypes(markers, context);
 		this.action.resolveTypes(markers, context);
 	}
 
+	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
 		this.variable.resolve(markers, context);
@@ -89,6 +93,7 @@ public class CatchBlock implements IDefaultContext, IValueConsumer
 		context.pop();
 	}
 
+	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		this.variable.checkTypes(markers, context);
@@ -98,6 +103,7 @@ public class CatchBlock implements IDefaultContext, IValueConsumer
 		context.pop();
 	}
 
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		this.variable.check(markers, context);
@@ -115,18 +121,17 @@ public class CatchBlock implements IDefaultContext, IValueConsumer
 		context.pop();
 	}
 
+	@Override
 	public void foldConstants()
 	{
 		this.variable.foldConstants();
 		this.action = this.action.foldConstants();
 	}
 
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	@Override
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.variable.cleanup(context, compilableList);
-
-		context = context.push(this);
-		this.action = this.action.cleanup(context, compilableList);
-		context.pop();
+		this.variable.cleanup(compilableList, classCompilableList);
+		this.action = this.action.cleanup(compilableList, classCompilableList);
 	}
 }

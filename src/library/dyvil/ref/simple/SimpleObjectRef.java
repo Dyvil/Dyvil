@@ -8,7 +8,7 @@ public class SimpleObjectRef<T> implements ObjectRef<T>
 	
 	public static <T> SimpleObjectRef<T> apply(T value)
 	{
-		return new SimpleObjectRef(value);
+		return new SimpleObjectRef<>(value);
 	}
 	
 	public SimpleObjectRef(T value)

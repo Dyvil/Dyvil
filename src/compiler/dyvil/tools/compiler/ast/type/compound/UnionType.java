@@ -5,6 +5,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Type;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
@@ -13,10 +14,11 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.raw.IObjectType;
@@ -41,6 +43,10 @@ public class UnionType implements IObjectType
 	// Metadata
 	private IClass[] commonClasses;
 
+	public UnionType()
+	{
+	}
+
 	public UnionType(IType left, IType right)
 	{
 		this.left = left;
@@ -51,6 +57,26 @@ public class UnionType implements IObjectType
 	public int typeTag()
 	{
 		return UNION;
+	}
+
+	public IType getLeft()
+	{
+		return this.left;
+	}
+
+	public void setLeft(IType left)
+	{
+		this.left = left;
+	}
+
+	public IType getRight()
+	{
+		return this.right;
+	}
+
+	public void setRight(IType right)
+	{
+		this.right = right;
 	}
 
 	@Override
@@ -97,7 +123,7 @@ public class UnionType implements IObjectType
 	@Override
 	public IType asParameterType()
 	{
-		return new UnionType(this.left.asParameterType(), this.right.asParameterType());
+		return combine(this.left.asParameterType(), this.right.asParameterType(), null);
 	}
 
 	@Override
@@ -109,6 +135,10 @@ public class UnionType implements IObjectType
 	@Override
 	public boolean isSuperTypeOf(IType subType)
 	{
+		if (subType.typeTag() == IType.UNION)
+		{
+			return subType.isSubTypeOf(this);
+		}
 		return Types.isSuperType(this.left, subType) || Types.isSuperType(this.right, subType);
 	}
 
@@ -144,7 +174,7 @@ public class UnionType implements IObjectType
 			return left;
 		}
 
-		return new UnionType(left, right);
+		return combine(left, right, null);
 	}
 
 	@Override
@@ -163,7 +193,7 @@ public class UnionType implements IObjectType
 			return this;
 		}
 
-		return new UnionType(left, right);
+		return combine(left, right, null);
 	}
 
 	@Override
@@ -275,7 +305,7 @@ public class UnionType implements IObjectType
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 		this.left.checkType(markers, context, position);
 		this.right.checkType(markers, context, position);
@@ -296,10 +326,10 @@ public class UnionType implements IObjectType
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.left.cleanup(context, compilableList);
-		this.right.cleanup(context, compilableList);
+		this.left.cleanup(compilableList, classCompilableList);
+		this.right.cleanup(compilableList, classCompilableList);
 	}
 
 	@Override
@@ -346,9 +376,23 @@ public class UnionType implements IObjectType
 	}
 
 	@Override
-	public void appendSignature(StringBuilder buffer, boolean genericArg)
+	public int getDescriptorKind()
 	{
-		buffer.append('L').append(this.getTheClass().getInternalName()).append(';');
+		return NAME_FULL;
+	}
+
+	@Override
+	public void appendDescriptor(StringBuilder buffer, int type)
+	{
+		if (type == NAME_FULL)
+		{
+			buffer.append('|');
+			this.left.appendDescriptor(buffer, NAME_FULL);
+			this.right.appendDescriptor(buffer, NAME_FULL);
+			return;
+		}
+
+		buffer.append('L').append(this.getInternalName()).append(';');
 	}
 
 	@Override
@@ -370,6 +414,7 @@ public class UnionType implements IObjectType
 	@Override
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
+		AnnotationUtil.visitDyvilName(this, visitor, typeRef, typePath);
 	}
 
 	@Override

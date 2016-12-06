@@ -21,6 +21,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
@@ -28,8 +29,8 @@ import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
@@ -102,8 +103,7 @@ public final class ExternalClass extends AbstractClass
 		this.resolved |= GENERICS;
 		if (this.typeParameterCount <= 0)
 		{
-			this.thisType = new ClassType(this);
-
+			this.thisType = this.getClassType();
 			return;
 		}
 
@@ -183,24 +183,14 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public IDyvilHeader getHeader()
+	public IHeaderUnit getHeader()
 	{
 		return null;
 	}
 
 	@Override
-	public void setHeader(IDyvilHeader unit)
+	public void setHeader(IHeaderUnit unit)
 	{
-	}
-
-	@Override
-	public IType getType()
-	{
-		if ((this.resolved & GENERICS) == 0)
-		{
-			this.resolveGenerics();
-		}
-		return this.thisType;
 	}
 
 	@Override
@@ -211,6 +201,16 @@ public final class ExternalClass extends AbstractClass
 			this.resolveGenerics();
 		}
 		return this;
+	}
+
+	@Override
+	public IType getThisType()
+	{
+		if ((this.resolved & GENERICS) == 0)
+		{
+			this.resolveGenerics();
+		}
+		return this.thisType;
 	}
 
 	@Override
@@ -389,7 +389,7 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 	}
 
@@ -470,7 +470,7 @@ public final class ExternalClass extends AbstractClass
 		this.body.getMethodMatches(list, receiver, name, arguments);
 		// The same applies for the Metadata
 
-		if (!list.isEmpty())
+		if (list.hasCandidate())
 		{
 			return;
 		}
@@ -485,7 +485,7 @@ public final class ExternalClass extends AbstractClass
 			this.superType.getMethodMatches(list, receiver, name, arguments);
 		}
 
-		if (!list.isEmpty())
+		if (list.hasCandidate())
 		{
 			return;
 		}

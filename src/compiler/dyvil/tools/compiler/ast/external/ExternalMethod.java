@@ -37,26 +37,15 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 {
 	private static final int ANNOTATIONS = 1;
 	private static final int RETURN_TYPE = 1 << 1;
-	private static final int GENERICS    = 1 << 2;
-	private static final int PARAMETERS  = 1 << 3;
-	private static final int EXCEPTIONS  = 1 << 4;
+	private static final int PARAMETERS  = 1 << 2;
+	private static final int EXCEPTIONS  = 1 << 3;
 
 	private int resolved;
 
 	public ExternalMethod(IClass enclosingClass, String name, String desc, String signature, ModifierSet modifiers)
 	{
 		super(enclosingClass, null, null, modifiers);
-
-		final int index = name.indexOf(NAME_SEPARATOR);
-		if (index >= 0)
-		{
-			this.name = Name.fromQualified(name.substring(0, index));
-		}
-		else
-		{
-			this.name = Name.fromQualified(name);
-		}
-
+		this.name = Name.fromQualified(name);
 		this.internalName = name;
 		this.signature = signature;
 		this.descriptor = desc;
@@ -79,41 +68,15 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 
 	private void resolveReturnType()
 	{
-		if ((this.resolved & GENERICS) == 0)
-		{
-			this.resolveGenerics();
-		}
-
 		this.resolved |= RETURN_TYPE;
 		this.type = this.type.resolveType(null, this.getExternalContext());
 	}
 
-	private void resolveGenerics()
-	{
-		this.resolved |= GENERICS;
-
-		final IContext context = this.getExternalContext();
-		for (int i = 0; i < this.typeParameterCount; i++)
-		{
-			this.typeParameters[i].resolveTypes(null, context);
-		}
-	}
-
 	private void resolveParameters()
 	{
-		if ((this.resolved & GENERICS) == 0)
-		{
-			this.resolveGenerics();
-		}
-
 		final IContext context = this.getExternalContext();
 
 		this.resolved |= PARAMETERS;
-
-		if (this.receiverType == null)
-		{
-			this.receiverType = this.enclosingClass.getType();
-		}
 
 		int parametersToRemove = 0;
 		for (int i = 0; i < this.typeParameterCount; i++)
@@ -126,13 +89,14 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 
 		this.parameters.remove(parametersToRemove);
 
-		if (this.receiverType != null)
+		if (this.thisType != null)
 		{
-			this.receiverType = this.receiverType.resolveType(null, context);
+			this.thisType = this.thisType.resolveType(null, context).asParameterType();
 		}
-		else if (!this.isStatic())
+		else
 		{
-			this.receiverType = this.enclosingClass.getType();
+			// For external methods, the this type is actually the receiver type
+			this.thisType = this.enclosingClass.getReceiverType();
 		}
 	}
 
@@ -174,7 +138,8 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	public IParameter createParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public IParameter createParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers,
+		                                 AnnotationList annotations)
 	{
 		return new ExternalParameter(name, type, modifiers, annotations);
 	}
@@ -207,6 +172,12 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
+	public IType getReceiverType()
+	{
+		return this.thisType;
+	}
+
+	@Override
 	protected boolean checkOverride0(IMethod candidate)
 	{
 		if ((this.resolved & PARAMETERS) == 0)
@@ -217,7 +188,8 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue receiver, IArguments arguments, GenericData genericData)
+	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue receiver,
+		                            IArguments arguments, GenericData genericData)
 	{
 		if ((this.resolved & ANNOTATIONS) == 0)
 		{
@@ -292,8 +264,8 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, IType targetType, int lineNumber)
-		throws BytecodeException
+	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext,
+		                     IType targetType, int lineNumber) throws BytecodeException
 	{
 		if ((this.resolved & ANNOTATIONS) == 0)
 		{
@@ -303,8 +275,8 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
-		throws BytecodeException
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments,
+		                     ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
 		if ((this.resolved & ANNOTATIONS) == 0)
 		{
@@ -314,8 +286,8 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
-		throws BytecodeException
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments,
+		                        ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
 		if ((this.resolved & ANNOTATIONS) == 0)
 		{
@@ -336,7 +308,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		switch (TypeReference.getSort(typeRef))
 		{
 		case TypeReference.METHOD_RETURN:
-			this.type = IType.withAnnotation(this.type, annotation, typePath, 0, typePath.getLength());
+			this.type = IType.withAnnotation(this.type, annotation, typePath);
 			break;
 		case TypeReference.METHOD_TYPE_PARAMETER:
 		{

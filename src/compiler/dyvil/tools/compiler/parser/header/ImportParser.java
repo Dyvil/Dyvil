@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.parser.header;
 
 import dyvil.tools.compiler.ast.consumer.IImportConsumer;
-import dyvil.tools.compiler.ast.header.*;
+import dyvil.tools.compiler.ast.imports.*;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;

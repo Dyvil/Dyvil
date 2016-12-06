@@ -1,20 +1,20 @@
-package dyvil.tools.dpf.ast.value;
+package dyvil.tools.dpf.ast.value
 
-import dyvil.collection.Collection;
-import dyvil.collection.List;
-import dyvil.collection.Map;
-import dyvil.collection.mutable.ArrayList;
-import dyvil.tools.dpf.ast.Expandable;
-import dyvil.tools.dpf.converter.DPFValueVisitor;
-import dyvil.tools.dpf.visitor.ListVisitor;
-import dyvil.tools.dpf.visitor.ValueVisitor;
-import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.collection.Collection
+import dyvil.collection.List
+import dyvil.collection.Map
+import dyvil.collection.mutable.ArrayList
+import dyvil.tools.dpf.ast.Expandable
+import dyvil.tools.dpf.converter.DPFValueVisitor
+import dyvil.tools.dpf.visitor.ListVisitor
+import dyvil.tools.dpf.visitor.ValueVisitor
+import dyvil.tools.parsing.ast.IASTNode
 
-import java.util.function.Function;
+import java.util.function.Function
 
 public class ListValue extends DPFValueVisitor implements Value, ListVisitor, Expandable
 {
-	protected List<Value> elements;
+	protected List<Value> elements
 	
 	public init()
 	{
@@ -58,36 +58,25 @@ public class ListValue extends DPFValueVisitor implements Value, ListVisitor, Ex
 		}
 	}
 
-	public void addValue(Value value)
-	{
-		this.elements.add(value)
-	}
+	public void add(Value value) = this.elements.add(value)
 
-	protected override void setValue(Value value)
-	{
-		this.elements.add(value)
-	}
+	protected override void visitValue(Value value) = this.elements.add(value)
 
-	public override ValueVisitor visitElement()
-	{
-		return this;
-	}
+	public override ValueVisitor visitElement() = this
 
 	public override void accept(ValueVisitor visitor)
 	{
-		ListVisitor v = visitor.visitList();
+		let v: ListVisitor = visitor.visitList()
+
 		for (Value element <- this.elements)
 		{
-			element.accept(v.visitElement());
+			element.accept(v.visitElement())
 		}
 		
-		v.visitEnd();
+		v.visitEnd()
 	}
 
-	public override String toString()
-	{
-		return IASTNode.toString(this);
-	}
+	public override String toString() = IASTNode.toString(this)
 
 	public override void toString(String indent, StringBuilder buffer)
 	{
@@ -110,7 +99,7 @@ public class ListValue extends DPFValueVisitor implements Value, ListVisitor, Ex
 
 	public override ListValue expand(Map<String, Object> mappings, boolean mutate)
 	{
-		final Function<Value, Value> valueFunction = value => Value.wrap(Expandable.expand(value, mappings, mutate));
+		final Function<Value, Value> valueFunction = value => Value.wrap(Expandable.expand(value, mappings, mutate))
 		if (mutate)
 		{
 			this.elements.map(valueFunction)

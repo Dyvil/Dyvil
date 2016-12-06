@@ -1,15 +1,17 @@
 package dyvil.tools.compiler.ast.classes.metadata;
 
+import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.header.IClassCompilable;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -17,7 +19,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Set;
 
-public interface IClassMetadata extends IClassCompilable
+public interface IClassMetadata extends IClassCompilable, IResolvable
 {
 	default void setInstanceField(IField field)
 	{
@@ -51,7 +53,17 @@ public interface IClassMetadata extends IClassCompilable
 	}
 	
 	// Resolve
-	
+
+	@Override
+	default void resolveTypes(MarkerList markers, IContext context)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	default void resolveTypesPre(MarkerList markers, IContext context)
+	{
+	}
+
 	/**
 	 * Called before the class body goes through RESOLVE_TYPES. Super-types and -interfaces and type parameters have
 	 * already been resolved.
@@ -75,23 +87,28 @@ public interface IClassMetadata extends IClassCompilable
 	{
 	}
 	
+	@Override
 	default void resolve(MarkerList markers, IContext context)
 	{
 	}
 	
+	@Override
 	default void checkTypes(MarkerList markers, IContext context)
 	{
 	}
 
+	@Override
 	default void check(MarkerList markers, IContext context)
 	{
 	}
 
+	@Override
 	default void foldConstants()
 	{
 	}
 
-	default void cleanup(IContext context, IClassCompilableList compilableList)
+	@Override
+	default void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 	}
 	

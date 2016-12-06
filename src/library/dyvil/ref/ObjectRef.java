@@ -1,6 +1,7 @@
 package dyvil.ref;
 
-import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation.internal.DyvilModifiers;
+import dyvil.annotation.internal.DyvilName;
 import dyvil.ref.unboxed.*;
 import dyvil.reflect.Modifiers;
 
@@ -26,50 +27,58 @@ public interface ObjectRef<T>
 
 	// Unbox Conversion Methods
 
+	@DyvilName("unboxed")
 	@DyvilModifiers(Modifiers.INFIX)
-	static BooleanRef unboxed_$_boolean(ObjectRef<Boolean> booleanRef)
+	static BooleanRef unboxedBoolean(ObjectRef<Boolean> booleanRef)
 	{
 		return new UnboxedBooleanRef(booleanRef);
 	}
 
+	@DyvilName("unboxed")
 	@DyvilModifiers(Modifiers.INFIX)
-	static ByteRef unboxed_$_byte(ObjectRef<Byte> byteRef)
+	static ByteRef unboxedByte(ObjectRef<Byte> byteRef)
 	{
 		return new UnboxedByteRef(byteRef);
 	}
 
+	@DyvilName("unboxed")
 	@DyvilModifiers(Modifiers.INFIX)
-	static ShortRef unboxed_$_short(ObjectRef<Short> shortRef)
+	static ShortRef unboxedShort(ObjectRef<Short> shortRef)
 	{
 		return new UnboxedShortRef(shortRef);
 	}
 
+	@DyvilName("unboxed")
 	@DyvilModifiers(Modifiers.INFIX)
-	static CharRef unboxed_$_char(ObjectRef<Character> charRef)
+	static CharRef unboxedChar(ObjectRef<Character> charRef)
 	{
 		return new UnboxedCharRef(charRef);
 	}
 
+	@DyvilName("unboxed")
 	@DyvilModifiers(Modifiers.INFIX)
-	static IntRef unboxed_$_int(ObjectRef<Integer> intRef)
+	static IntRef unboxedInt(ObjectRef<Integer> intRef)
 	{
 		return new UnboxedIntRef(intRef);
 	}
 
+	@DyvilName("unboxed")
 	@DyvilModifiers(Modifiers.INFIX)
-	static LongRef unboxed_$_long(ObjectRef<Long> longRef)
+	static LongRef unboxedLong(ObjectRef<Long> longRef)
 	{
 		return new UnboxedLongRef(longRef);
 	}
 
+	@DyvilName("unboxed")
 	@DyvilModifiers(Modifiers.INFIX)
-	static FloatRef unboxed_$_float(ObjectRef<Float> floatRef)
+	static FloatRef unboxedFloat(ObjectRef<Float> floatRef)
 	{
 		return new UnboxedFloatRef(floatRef);
 	}
 
+	@DyvilName("unboxed")
 	@DyvilModifiers(Modifiers.INFIX)
-	static DoubleRef unboxed_$_double(ObjectRef<Double> doubleRef)
+	static DoubleRef unboxedDouble(ObjectRef<Double> doubleRef)
 	{
 		return new UnboxedDoubleRef(doubleRef);
 	}

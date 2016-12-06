@@ -1,0 +1,23 @@
+package dyvil.util
+
+@Immutable
+@LiteralConvertible.FromTuple
+public case class Some<T>(T value) implements Option<T>
+{
+	public override func get(): T = this.value
+
+	public override func isPresent(): boolean = true
+
+	public override func forEach(T -> void consumer): void = consumer(this.value)
+
+	public override func filter(T -> boolean predicate): Option<T> = predicate(this.value) ? this : None
+
+	public override func map<U>(T -> U function): Option<U> = Some(function(this.value))
+
+	public override func flatMap<U>(T -> Option<U> function): Option<U> = function(this.value)
+
+	@OverloadPriority
+	public func orElse<U>(U value): T = this.value
+
+	public override func orElse<U>(-> U supplier): T = this.value
+}

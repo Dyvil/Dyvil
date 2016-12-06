@@ -6,8 +6,9 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.WildcardValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.TupleType;
@@ -223,10 +224,10 @@ public class ColonOperator implements IValue
 	}
 
 	@Override
-	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.left.cleanup(context, compilableList);
-		this.right.cleanup(context, compilableList);
+		this.left.cleanup(compilableList, classCompilableList);
+		this.right.cleanup(compilableList, classCompilableList);
 		return this;
 	}
 
@@ -239,8 +240,8 @@ public class ColonOperator implements IValue
 		final int lineNumber = this.getLineNumber();
 
 		writer.visitLineNumber(lineNumber);
-		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/tuple/Tuple2", "apply",
-		                       "(Ljava/lang/Object;Ljava/lang/Object;)Ldyvil/tuple/Tuple2;", false);
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/tuple/Tuple$Of2", "apply",
+		                       "(Ljava/lang/Object;Ljava/lang/Object;)Ldyvil/tuple/Tuple$Of2;", false);
 
 		if (type != null)
 		{

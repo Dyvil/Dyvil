@@ -8,15 +8,14 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.LiteralConversion;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.statement.loop.IterableForStatement;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Mutability;
@@ -163,23 +162,15 @@ public class ArrayType implements IObjectType, ITyped
 	}
 
 	@Override
-	public IValue convertValueTo(IValue value, IType targetType, ITypeContext typeContext, MarkerList markers,
-		                            IContext context)
-	{
-		if (!this.isConvertibleTo(targetType))
-		{
-			return null;
-		}
-
-		final IMethod toIterableMethod = this.getTheClass().getBody().getMethod(Name.fromRaw("toIterable"));
-		return new LiteralConversion(value, toIterableMethod).withType(targetType, typeContext, markers, context);
-	}
-
-	@Override
 	public boolean isSameType(IType type)
 	{
-		return type.isArrayType() && this.mutability == type.getMutability() && Types.isSameType(this.type,
-		                                                                                         type.getElementType());
+		if (!type.isArrayType() || this.mutability != type.getMutability())
+		{
+			return false;
+		}
+
+		final IType elementType = type.getElementType();
+		return this.checkPrimitiveType(elementType) && Types.isSameType(this.type, type.getElementType());
 	}
 
 	@Override
@@ -195,24 +186,14 @@ public class ArrayType implements IObjectType, ITyped
 	}
 
 	@Override
-	public boolean isConvertibleTo(IType type)
+	public boolean isSuperTypeOf(IType subType)
 	{
-		return Types.isSuperType(type, IterableForStatement.LazyFields.ITERABLE);
-	}
-
-	@Override
-	public boolean isSuperTypeOf(IType type)
-	{
-		if (!type.isArrayType())
-		{
-			return false;
-		}
-		if (!checkImmutable(this, type))
+		if (!subType.isArrayType() || !checkImmutable(this, subType))
 		{
 			return false;
 		}
 
-		final IType elementType = type.getElementType();
+		final IType elementType = subType.getElementType();
 		return this.checkPrimitiveType(elementType) && Types.isSuperType(this.type, elementType);
 	}
 
@@ -268,11 +249,11 @@ public class ArrayType implements IObjectType, ITyped
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 		if (position == TypePosition.SUPER_TYPE)
 		{
-			markers.add(Markers.semantic(this.getPosition(), "type.super.array"));
+			markers.add(Markers.semantic(this.getPosition(), "type.array.super"));
 		}
 
 		this.type.checkType(markers, context, TypePosition.SUPER_TYPE_ARGUMENT);
@@ -291,9 +272,9 @@ public class ArrayType implements IObjectType, ITyped
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.type.cleanup(context, compilableList);
+		this.type.cleanup(compilableList, classCompilableList);
 	}
 
 	@Override
@@ -380,28 +361,10 @@ public class ArrayType implements IObjectType, ITyped
 	}
 
 	@Override
-	public void appendExtendedName(StringBuilder buffer)
+	public void appendDescriptor(StringBuilder buffer, int type)
 	{
 		buffer.append('[');
-		this.type.appendExtendedName(buffer);
-	}
-
-	@Override
-	public String getSignature()
-	{
-		String s = this.type.getSignature();
-		if (s != null)
-		{
-			return '[' + s;
-		}
-		return null;
-	}
-
-	@Override
-	public void appendSignature(StringBuilder buffer, boolean genericArg)
-	{
-		buffer.append('[');
-		this.type.appendSignature(buffer, false);
+		this.type.appendDescriptor(buffer, type == NAME_SIGNATURE_GENERIC_ARG ? NAME_SIGNATURE : type);
 	}
 
 	@Override

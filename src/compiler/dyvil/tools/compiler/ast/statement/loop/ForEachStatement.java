@@ -9,9 +9,10 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.statement.control.Label;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -380,17 +381,14 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 	}
 
 	@Override
-	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		context = context.push(this);
-
-		this.variable.cleanup(context, compilableList);
+		this.variable.cleanup(compilableList, classCompilableList);
 		if (this.action != null)
 		{
-			this.action = this.action.cleanup(context, compilableList);
+			this.action = this.action.cleanup(compilableList, classCompilableList);
 		}
 
-		context.pop();
 		return this;
 	}
 

@@ -62,7 +62,7 @@ public final class Deprecation
 	public static final String MEMBER_KIND = "{member.kind}";
 	public static final String MEMBER_NAME = "{member.name}";
 	public static final String STAGE       = "{stage}";
-	public static final String SINCE       = "{stage}";
+	public static final String SINCE       = "{since}";
 
 	public static void checkAnnotations(IMember member, ICodePosition position, MarkerList markers)
 	{

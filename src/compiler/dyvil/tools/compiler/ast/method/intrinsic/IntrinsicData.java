@@ -43,7 +43,7 @@ public interface IntrinsicData
 				return internalParameterType;
 			}
 
-			final IType type = method.getEnclosingClass().getType();
+			final IType type = method.getThisType();
 			receiver.writeExpression(writer, type);
 			return type;
 		}

@@ -4,32 +4,13 @@ import dyvil.tools.dpf.visitor.ValueVisitor;
 
 public case class FloatValue(protected float value) implements Constant
 {
-	public float getValue()
-	{
-		return this.value;
-	}
-	
-	public void setValue(float value)
-	{
-		this.value = value;
-	}
-	
-	public override void accept(ValueVisitor visitor)
-	{
-		visitor.visitFloat(this.value);
-	}
+	public override void accept(ValueVisitor visitor) = visitor.visitFloat(this.value)
 
 	public override Object toObject() = this.value
 
-	public override void appendString(StringBuilder builder)
-	{
-		builder.append(this);
-	}
+	public override void appendString(StringBuilder builder) = builder.append(this)
 
 	public override String toString() = this.value + "F"
 	
-	public override void toString(String indent, StringBuilder buffer)
-	{
-		buffer.append(this.value).append('F');
-	}
+	public override void toString(String indent, StringBuilder buffer) = buffer.append(this.value).append('F')
 }

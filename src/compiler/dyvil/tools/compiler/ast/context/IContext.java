@@ -8,13 +8,13 @@ import dyvil.tools.compiler.ast.field.IAccessible;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.header.IImportContext;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
+import dyvil.tools.compiler.ast.imports.IImportContext;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.operator.IOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
@@ -53,7 +53,7 @@ public interface IContext extends IMemberContext, IImportContext
 		return this.getHeader().getCompilationContext();
 	}
 
-	IDyvilHeader getHeader();
+	IHeaderUnit getHeader();
 
 	IClass getThisClass();
 
@@ -63,7 +63,7 @@ public interface IContext extends IMemberContext, IImportContext
 	Package resolvePackage(Name name);
 
 	@Override
-	IDyvilHeader resolveHeader(Name name);
+	IHeaderUnit resolveHeader(Name name);
 
 	@Override
 	IClass resolveClass(Name name);
@@ -95,7 +95,7 @@ public interface IContext extends IMemberContext, IImportContext
 
 	boolean isMember(IVariable variable);
 
-	IDataMember capture(IVariable capture);
+	IDataMember capture(IVariable variable);
 
 	IAccessible getAccessibleThis(IClass type);
 
@@ -143,13 +143,23 @@ public interface IContext extends IMemberContext, IImportContext
 
 	static MatchList<IMethod> resolveImplicits(IImplicitContext context, IValue value, IType targetType)
 	{
-		MatchList<IMethod> matches = new MatchList<>(null);
-		context.getImplicitMatches(matches, value, targetType);
-		if (!matches.isEmpty() || targetType == null)
+		final MatchList<IMethod> matches = new MatchList<>(null);
+
+		// First, search the given type for conversion methods
+		value.getType().getImplicitMatches(matches, value, targetType);
+		if (!matches.isEmpty())
 		{
 			return matches;
 		}
 
+		// The try the surrounding context
+		context.getImplicitMatches(matches, value, targetType);
+		if (matches.hasCandidate() || targetType == null)
+		{
+			return matches;
+		}
+
+		// If that doesn't yield anything either, look into the target type (given that it is not null)
 		targetType.getImplicitMatches(matches, value, targetType);
 		return matches;
 	}

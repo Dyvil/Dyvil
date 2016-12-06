@@ -5,6 +5,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Type;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
@@ -13,10 +14,11 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.raw.IObjectType;
@@ -41,6 +43,10 @@ public class IntersectionType implements IObjectType
 	// Metadata
 	private IClass[] commonClasses;
 
+	public IntersectionType()
+	{
+	}
+
 	public IntersectionType(IType left, IType right)
 	{
 		this.left = left;
@@ -51,6 +57,26 @@ public class IntersectionType implements IObjectType
 	public int typeTag()
 	{
 		return INTERSECTION;
+	}
+
+	public IType getLeft()
+	{
+		return this.left;
+	}
+
+	public void setLeft(IType left)
+	{
+		this.left = left;
+	}
+
+	public IType getRight()
+	{
+		return this.right;
+	}
+
+	public void setRight(IType right)
+	{
+		this.right = right;
 	}
 
 	@Override
@@ -82,6 +108,12 @@ public class IntersectionType implements IObjectType
 		final Set<IClass> commonClassSet = Types.commonClasses(this.left, this.right);
 		commonClassSet.remove(Types.OBJECT_CLASS);
 
+		if (commonClassSet.isEmpty())
+		{
+			this.commonClasses = OBJECT_CLASS_ARRAY;
+			return Types.OBJECT_CLASS;
+		}
+
 		this.commonClasses = new IClass[commonClassSet.size()];
 		commonClassSet.toArray(this.commonClasses);
 
@@ -91,7 +123,7 @@ public class IntersectionType implements IObjectType
 	@Override
 	public IType asParameterType()
 	{
-		return new IntersectionType(this.left.asParameterType(), this.right.asParameterType());
+		return combine(this.left.asParameterType(), this.right.asParameterType(), null);
 	}
 
 	@Override
@@ -138,7 +170,7 @@ public class IntersectionType implements IObjectType
 			return left;
 		}
 
-		return new IntersectionType(left, right);
+		return combine(left, right, null);
 	}
 
 	@Override
@@ -157,7 +189,7 @@ public class IntersectionType implements IObjectType
 			return this;
 		}
 
-		return new IntersectionType(left, right);
+		return combine(left, right, null);
 	}
 
 	@Override
@@ -259,7 +291,7 @@ public class IntersectionType implements IObjectType
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 		this.left.checkType(markers, context, position);
 		this.right.checkType(markers, context, position);
@@ -280,10 +312,10 @@ public class IntersectionType implements IObjectType
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.left.cleanup(context, compilableList);
-		this.right.cleanup(context, compilableList);
+		this.left.cleanup(compilableList, classCompilableList);
+		this.right.cleanup(compilableList, classCompilableList);
 	}
 
 	@Override
@@ -329,9 +361,17 @@ public class IntersectionType implements IObjectType
 	}
 
 	@Override
-	public void appendSignature(StringBuilder buffer, boolean genericArg)
+	public void appendDescriptor(StringBuilder buffer, int type)
 	{
-		buffer.append('L').append(this.getTheClass().getInternalName()).append(';');
+		if (type == NAME_FULL)
+		{
+			buffer.append('|');
+			this.left.appendDescriptor(buffer, NAME_FULL);
+			this.right.appendDescriptor(buffer, NAME_FULL);
+			return;
+		}
+
+		buffer.append('L').append(this.getInternalName()).append(';');
 	}
 
 	@Override
@@ -353,6 +393,7 @@ public class IntersectionType implements IObjectType
 	@Override
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
+		AnnotationUtil.visitDyvilName(this, visitor, typeRef, typePath);
 	}
 
 	@Override

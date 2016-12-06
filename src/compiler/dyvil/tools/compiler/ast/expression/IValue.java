@@ -7,9 +7,11 @@ import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.intrinsic.PopExpr;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.reference.IReference;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -215,6 +217,15 @@ public interface IValue extends IASTNode, ITyped
 		return new PopExpr(this);
 	}
 
+	default boolean isPartialWildcard()
+	{
+		return false;
+	}
+
+	default void setLambdaParameter(IParameter parameter)
+	{
+	}
+
 	default boolean checkVarargs(boolean typeCheck)
 	{
 		return false;
@@ -251,12 +262,7 @@ public interface IValue extends IASTNode, ITyped
 	 */
 	default int getTypeMatch(IType type)
 	{
-		final IType thisType = this.getType();
-		if (Types.isSameType(type, thisType))
-		{
-			return EXACT_MATCH;
-		}
-		return Types.isSuperType(type, thisType) ? SUBTYPE_MATCH : MISMATCH;
+		return Types.getTypeMatch(type, this.getType());
 	}
 
 	void resolveTypes(MarkerList markers, IContext context);
@@ -279,7 +285,7 @@ public interface IValue extends IASTNode, ITyped
 
 	IValue foldConstants();
 
-	IValue cleanup(IContext context, IClassCompilableList compilableList);
+	IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList);
 
 	default IValue toAnnotationConstant(MarkerList markers, IContext context, int depth)
 	{

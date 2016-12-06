@@ -2,8 +2,9 @@ package dyvil.tools.compiler.ast.statement;
 
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.member.IClassMember;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -80,11 +81,11 @@ public class MemberStatement implements IStatement
 	}
 	
 	@Override
-	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		compilableList.addCompilable(this.member);
+		classCompilableList.addClassCompilable(this.member);
 
-		this.member.cleanup(context, compilableList);
+		this.member.cleanup(compilableList, classCompilableList);
 		return this;
 	}
 	

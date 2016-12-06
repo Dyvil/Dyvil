@@ -1,11 +1,13 @@
 package dyvil.tools.compiler.ast.expression;
 
+import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.pattern.ICase;
 import dyvil.tools.compiler.ast.pattern.IPattern;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.config.Formatting;
@@ -15,7 +17,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public class MatchCase implements ICase, IDefaultContext
+public class MatchCase implements ICase, IResolvable, IDefaultContext
 {
 	private static final TypeChecker.MarkerSupplier CONDITION_MARKER_SUPPLIER = TypeChecker.markerSupplier(
 		"match.condition.type");
@@ -72,6 +74,7 @@ public class MatchCase implements ICase, IDefaultContext
 		return field != null ? field : null;
 	}
 
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		context = context.push(this);
@@ -84,6 +87,12 @@ public class MatchCase implements ICase, IDefaultContext
 			this.action.resolveTypes(markers, context);
 		}
 		context.pop();
+	}
+
+	@Override
+	public void resolve(MarkerList markers, IContext context)
+	{
+		this.resolve(markers, null, context);
 	}
 
 	public void resolve(MarkerList markers, IType type, IContext context)
@@ -123,6 +132,7 @@ public class MatchCase implements ICase, IDefaultContext
 		context.pop();
 	}
 
+	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		context = context.push(this);
@@ -137,6 +147,7 @@ public class MatchCase implements ICase, IDefaultContext
 		context.pop();
 	}
 
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		context = context.push(this);
@@ -151,6 +162,7 @@ public class MatchCase implements ICase, IDefaultContext
 		context.pop();
 	}
 
+	@Override
 	public void foldConstants()
 	{
 		if (this.condition != null)
@@ -163,18 +175,17 @@ public class MatchCase implements ICase, IDefaultContext
 		}
 	}
 
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	@Override
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		context = context.push(this);
 		if (this.condition != null)
 		{
-			this.condition = this.condition.cleanup(context, compilableList);
+			this.condition = this.condition.cleanup(compilableList, classCompilableList);
 		}
 		if (this.action != null)
 		{
-			this.action = this.action.cleanup(context, compilableList);
+			this.action = this.action.cleanup(compilableList, classCompilableList);
 		}
-		context.pop();
 	}
 
 	@Override

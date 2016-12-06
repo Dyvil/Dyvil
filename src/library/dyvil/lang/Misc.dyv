@@ -1,0 +1,34 @@
+package dyvil.lang
+
+import const dyvil.reflect.Opcodes._
+import func java.lang.System.{
+	currentTimeMillis => milliTime
+	nanoTime
+}
+
+@Experimental
+public final class Misc
+{
+	private init() {}
+
+	// Blackhole
+
+	@Intrinsic([ LOAD_0, AUTO_POP ])
+	public static func consume(any value): void {}
+
+	// Timing
+
+	public static inline long measureMillis(-> void f) = milliTime.{ f(); milliTime - $0 }
+
+	public static inline long measureNanos(-> void f) = nanoTime.{ f(); nanoTime - $0 }
+
+	public static inline (R, long) milliTimed<R>(-> R f) = milliTime.{ (f(), milliTime - $0) }
+
+	public static inline (R, long) nanoTimed<R>(-> R f) = nanoTime.{ (f(), nanoTime - $0) }
+
+	// Errors
+
+	public static inline void error(String message) = throw new Error(message)
+
+	public static inline func ???(): void = throw new UnsupportedOperationException("Not Implemented!")
+}

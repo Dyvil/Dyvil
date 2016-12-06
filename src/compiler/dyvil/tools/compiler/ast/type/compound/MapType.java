@@ -11,14 +11,14 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Mutability;
-import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.raw.IObjectType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -34,11 +34,9 @@ public class MapType implements IObjectType
 {
 	public static final class MapTypes
 	{
-		public static final IClass MAP_CLASS             = Package.dyvilCollection.resolveClass("Map");
-		public static final IClass MUTABLE_MAP_CLASS     = Package.dyvilCollection.resolveClass("MutableMap");
-		public static final IClass IMMUTABLE_MAP_CLASS   = Package.dyvilCollection.resolveClass("ImmutableMap");
-		public static final IClass MAP_CONVERTIBLE_CLASS = Types.LITERALCONVERTIBLE_CLASS
-			                                                   .resolveClass(Name.fromRaw("FromMap"));
+		public static final IClass MAP_CLASS           = Package.dyvilCollection.resolveClass("Map");
+		public static final IClass MUTABLE_MAP_CLASS   = Package.dyvilCollection.resolveClass("MutableMap");
+		public static final IClass IMMUTABLE_MAP_CLASS = Package.dyvilCollection.resolveClass("ImmutableMap");
 
 		public static final ITypeParameter KEY_VARIABLE   = MapTypes.MAP_CLASS.getTypeParameter(0);
 		public static final ITypeParameter VALUE_VARIABLE = MapTypes.MAP_CLASS.getTypeParameter(1);
@@ -140,13 +138,6 @@ public class MapType implements IObjectType
 	}
 
 	@Override
-	public IType asParameterType()
-	{
-		return new MapType(this.keyType.asParameterType(), this.valueType.asParameterType(), this.mutability,
-		                   this.theClass);
-	}
-
-	@Override
 	public Mutability getMutability()
 	{
 		return this.mutability;
@@ -224,10 +215,9 @@ public class MapType implements IObjectType
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
-		final TypePosition argumentPosition =
-			position == TypePosition.SUPER_TYPE ? TypePosition.SUPER_TYPE_ARGUMENT : TypePosition.GENERIC_ARGUMENT;
+		final int argumentPosition = TypePosition.genericArgument(position);
 
 		this.keyType.checkType(markers, context, argumentPosition);
 		this.valueType.checkType(markers, context, argumentPosition);
@@ -248,10 +238,10 @@ public class MapType implements IObjectType
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.keyType.cleanup(context, compilableList);
-		this.valueType.cleanup(context, compilableList);
+		this.keyType.cleanup(compilableList, classCompilableList);
+		this.valueType.cleanup(compilableList, classCompilableList);
 	}
 
 	@Override
@@ -290,12 +280,20 @@ public class MapType implements IObjectType
 	}
 
 	@Override
-	public void appendSignature(StringBuilder buffer, boolean genericArg)
+	public void appendDescriptor(StringBuilder buffer, int type)
 	{
-		buffer.append('L').append(this.theClass.getInternalName()).append('<');
-		this.keyType.appendSignature(buffer, true);
-		this.valueType.appendSignature(buffer, true);
-		buffer.append('>').append(';');
+		buffer.append('L').append(this.getInternalName());
+
+		if (type != NAME_DESCRIPTOR)
+		{
+			final int parType = type == NAME_FULL ? NAME_FULL : NAME_SIGNATURE_GENERIC_ARG;
+
+			buffer.append('<');
+			this.keyType.appendDescriptor(buffer, parType);
+			this.valueType.appendDescriptor(buffer, parType);
+			buffer.append('>');
+		}
+		buffer.append(';');
 	}
 
 	@Override

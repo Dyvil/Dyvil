@@ -1,0 +1,27 @@
+package dyvil.lang
+
+public class LiteralConvertible
+{
+	// Primitive Literals
+	public @interface FromBoolean (String methodName = "apply")
+	public @interface FromChar    (String methodName = "apply")
+	public @interface FromInt     (String methodName = "apply")
+	public @interface FromLong    (String methodName = "apply")
+	public @interface FromFloat   (String methodName = "apply")
+	public @interface FromDouble  (String methodName = "apply")
+
+	// String Literals
+	public @interface FromString              (String methodName = "apply")
+	public @interface FromStringInterpolation (String methodName = "apply")
+
+	// Compound Literals
+	public @interface FromColonOperator (String methodName = "apply")
+	public @interface FromTuple         (String methodName = "apply")
+	public @interface FromArray         (String methodName = "apply")
+	public @interface FromMap           (String methodName = "apply")
+
+	// Special Literals
+	public @interface FromNil   (String methodName = "apply")
+	public @interface FromClass (String methodName = "apply")
+	public @interface FromType  (String methodName = "apply")
+}

@@ -12,6 +12,9 @@ import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.classes.metadata.TraitMetadata;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -20,14 +23,9 @@ import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
-import dyvil.tools.compiler.ast.structure.IDyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
-import dyvil.tools.compiler.ast.type.raw.ClassType;
-import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -48,7 +46,7 @@ public class CodeClass extends AbstractClass
 	protected IArguments superConstructorArguments = EmptyArguments.INSTANCE;
 
 	// Metadata
-	protected IDyvilHeader  unit;
+	protected IHeaderUnit   unit;
 	protected ICodePosition position;
 
 	protected boolean traitInit;
@@ -67,7 +65,7 @@ public class CodeClass extends AbstractClass
 		this.interfaces = new IType[1];
 	}
 
-	public CodeClass(IDyvilHeader unit, Name name)
+	public CodeClass(IHeaderUnit unit, Name name)
 	{
 		this.unit = unit;
 		this.name = name;
@@ -89,13 +87,13 @@ public class CodeClass extends AbstractClass
 	}
 
 	@Override
-	public IDyvilHeader getHeader()
+	public IHeaderUnit getHeader()
 	{
 		return this.unit;
 	}
 
 	@Override
-	public void setHeader(IDyvilHeader unit)
+	public void setHeader(IHeaderUnit unit)
 	{
 		this.unit = unit;
 	}
@@ -113,30 +111,9 @@ public class CodeClass extends AbstractClass
 	}
 
 	@Override
-	public void setSuperConstructorArguments(IArguments superConstructorArguments)
+	public void setSuperConstructorArguments(IArguments arguments)
 	{
-		this.superConstructorArguments = superConstructorArguments;
-	}
-
-	@Override
-	public IType getType()
-	{
-		if (this.thisType != null)
-		{
-			return this.thisType;
-		}
-
-		if (this.typeParameterCount <= 0)
-		{
-			return this.thisType = new ClassType(this);
-		}
-
-		final ClassGenericType type = new ClassGenericType(this);
-		for (int i = 0; i < this.typeParameterCount; i++)
-		{
-			type.addType(new TypeVarType(this.typeParameters[i]));
-		}
-		return this.thisType = type;
+		this.superConstructorArguments = arguments;
 	}
 
 	@Override
@@ -153,6 +130,8 @@ public class CodeClass extends AbstractClass
 		{
 			this.annotations.resolveTypes(markers, context, this);
 		}
+
+		this.metadata.resolveTypesPre(markers, context);
 
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
@@ -259,7 +238,7 @@ public class CodeClass extends AbstractClass
 			this.body.checkTypes(markers, context);
 		}
 
-		this.checkSuperMethods(markers, this, this.getType(), new IdentityHashSet<>());
+		this.checkSuperMethods(markers, this, this.getThisType(), new IdentityHashSet<>());
 
 		context.pop();
 	}
@@ -434,40 +413,36 @@ public class CodeClass extends AbstractClass
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		context = context.push(this);
-
 		if (this.annotations != null)
 		{
-			this.annotations.cleanup(context, this);
+			this.annotations.cleanup(compilableList, this);
 		}
 
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
-			this.typeParameters[i].cleanup(context, this);
+			this.typeParameters[i].cleanup(compilableList, this);
 		}
 
-		this.parameters.cleanup(context, this);
+		this.parameters.cleanup(compilableList, this);
 
 		if (this.superType != null)
 		{
-			this.superType.cleanup(context, this);
+			this.superType.cleanup(compilableList, this);
 		}
 
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			this.interfaces[i].cleanup(context, this);
+			this.interfaces[i].cleanup(compilableList, this);
 		}
 
-		this.metadata.cleanup(context, this);
+		this.metadata.cleanup(compilableList, this);
 
 		if (this.body != null)
 		{
-			this.body.cleanup(context);
+			this.body.cleanup(compilableList, this);
 		}
-
-		context.pop();
 	}
 
 	@Override
@@ -476,6 +451,10 @@ public class CodeClass extends AbstractClass
 		if (this.fullName != null)
 		{
 			return this.fullName;
+		}
+		if (this.enclosingClass != null)
+		{
+			return this.enclosingClass.getFullName() + '$' + this.name;
 		}
 		return this.fullName = this.unit.getFullName(this.name);
 	}
@@ -486,6 +465,10 @@ public class CodeClass extends AbstractClass
 		if (this.internalName != null)
 		{
 			return this.internalName;
+		}
+		if (this.enclosingClass != null)
+		{
+			return this.enclosingClass.getInternalName() + '$' + this.name;
 		}
 		return this.internalName = this.unit.getInternalName(this.name);
 	}
@@ -520,7 +503,6 @@ public class CodeClass extends AbstractClass
 
 		if (this.enclosingClass != null)
 		{
-			writer.visitOuterClass(this.enclosingClass.getInternalName(), null, null);
 			this.writeInnerClassInfo(writer);
 		}
 
@@ -781,6 +763,8 @@ public class CodeClass extends AbstractClass
 
 	private void writeAnnotations(ClassWriter writer, int modifiers)
 	{
+		ModifierUtil.writeModifiers(writer, this.modifiers);
+
 		if ((modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{
 			writer.visitAnnotation(Deprecation.DYVIL_EXTENDED, true).visitEnd();

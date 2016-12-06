@@ -1,4 +1,4 @@
-/***
+/*
  * ASM: a very small and fast Java bytecode manipulation framework Copyright (c) 2000-2011 INRIA, France Telecom All
  * rights reserved.
  * <p>
@@ -24,22 +24,22 @@ import java.io.InputStream;
 
 public class ClassReader
 {
-	public static final int     SKIP_CODE     = 1;
-	public static final int     SKIP_DEBUG    = 2;
-	public static final int     SKIP_FRAMES   = 4;
-	public static final int     EXPAND_FRAMES = 8;
+	public static final int SKIP_CODE     = 1;
+	public static final int SKIP_DEBUG    = 2;
+	public static final int SKIP_FRAMES   = 4;
+	public static final int EXPAND_FRAMES = 8;
 	public final  byte[]   b;
 	private final int[]    items;
 	private final String[] strings;
 	private final int      maxStringLength;
 	public final  int      header;
-	
+
 	public ClassReader(final byte[] b)
 	{
 		this(b, 0, b.length);
 	}
-	
-	public ClassReader(final byte[] b, final int off, final int len)
+
+	public ClassReader(final byte[] b, final int off, @SuppressWarnings("UnusedParameters") final int len)
 	{
 		this.b = b;
 		// checks the class version
@@ -96,22 +96,22 @@ public class ClassReader
 		// the class header information starts just after the constant pool
 		this.header = index;
 	}
-	
+
 	public int getAccess()
 	{
 		return this.readUnsignedShort(this.header);
 	}
-	
+
 	public String getClassName()
 	{
 		return this.readClass(this.header + 2, new char[this.maxStringLength]);
 	}
-	
+
 	public String getSuperName()
 	{
 		return this.readClass(this.header + 4, new char[this.maxStringLength]);
 	}
-	
+
 	public String[] getInterfaces()
 	{
 		int index = this.header + 6;
@@ -128,7 +128,7 @@ public class ClassReader
 		}
 		return interfaces;
 	}
-	
+
 	void copyPool(final ClassWriter classWriter)
 	{
 		char[] buf = new char[this.maxStringLength];
@@ -200,19 +200,19 @@ public class ClassReader
 				item.set(tag, this.readUTF8(index, buf), null, null);
 				break;
 			}
-			
+
 			int index2 = item.hashCode % items2.length;
 			item.next = items2[index2];
 			items2[index2] = item;
 		}
-		
+
 		int off = this.items[1] - 1;
 		classWriter.pool.putByteArray(this.b, off, this.header - off);
 		classWriter.items = items2;
 		classWriter.threshold = (int) (0.75d * ll);
 		classWriter.index = ll;
 	}
-	
+
 	private void copyBootstrapMethods(final ClassWriter classWriter, final Item[] items, final char[] c)
 	{
 		// finds the "BootstrapMethods" attribute
@@ -256,17 +256,17 @@ public class ClassReader
 		classWriter.bootstrapMethodsCount = boostrapMethodCount;
 		classWriter.bootstrapMethods = bootstrapMethods;
 	}
-	
+
 	public ClassReader(final InputStream is) throws IOException
 	{
 		this(readClass(is, false));
 	}
-	
+
 	public ClassReader(final String name) throws IOException
 	{
 		this(readClass(ClassLoader.getSystemResourceAsStream(name.replace('.', '/') + ".class"), true));
 	}
-	
+
 	private static byte[] readClass(final InputStream is, boolean close) throws IOException
 	{
 		if (is == null)
@@ -313,23 +313,24 @@ public class ClassReader
 			}
 		}
 	}
-	
+
 	public void accept(final ClassVisitor classVisitor, final int flags)
 	{
 		this.accept(classVisitor, new Attribute[0], flags);
 	}
-	
+
+	@SuppressWarnings("ConstantConditions")
 	public void accept(final ClassVisitor classVisitor, final Attribute[] attrs, final int flags)
 	{
 		int u = this.header; // current offset in the class file
 		char[] c = new char[this.maxStringLength]; // buffer used to read
 		// strings
-		
+
 		Context context = new Context();
 		context.attrs = attrs;
 		context.flags = flags;
 		context.buffer = c;
-		
+
 		// reads the class declaration
 		int access = this.readUnsignedShort(u);
 		String name = this.readClass(u + 2, c);
@@ -341,7 +342,7 @@ public class ClassReader
 			interfaces[i] = this.readClass(u, c);
 			u += 2;
 		}
-		
+
 		// reads the class attributes
 		String signature = null;
 		String sourceFile = null;
@@ -355,23 +356,22 @@ public class ClassReader
 		int itanns = 0;
 		int innerClasses = 0;
 		Attribute attributes = null;
-		
+
 		u = this.getAttributes();
 		for (int i = this.readUnsignedShort(u); i > 0; --i)
 		{
 			String attrName = this.readUTF8(u + 2, c);
 			// tests are sorted in decreasing frequency order
 			// (based on frequencies observed on typical classes)
-			if ("SourceFile".equals(attrName))
+			switch (attrName)
 			{
+			case "SourceFile":
 				sourceFile = this.readUTF8(u + 8, c);
-			}
-			else if ("InnerClasses".equals(attrName))
-			{
+				break;
+			case "InnerClasses":
 				innerClasses = u + 8;
-			}
-			else if ("EnclosingMethod".equals(attrName))
-			{
+				break;
+			case "EnclosingMethod":
 				enclosingOwner = this.readClass(u + 8, c);
 				int item = this.readUnsignedShort(u + 10);
 				if (item != 0)
@@ -379,42 +379,33 @@ public class ClassReader
 					enclosingName = this.readUTF8(this.items[item], c);
 					enclosingDesc = this.readUTF8(this.items[item] + 2, c);
 				}
-			}
-			else if ("Signature".equals(attrName))
-			{
+				break;
+			case "Signature":
 				signature = this.readUTF8(u + 8, c);
-			}
-			else if ("RuntimeVisibleAnnotations".equals(attrName))
-			{
+				break;
+			case "RuntimeVisibleAnnotations":
 				anns = u + 8;
-			}
-			else if ("RuntimeVisibleTypeAnnotations".equals(attrName))
-			{
+				break;
+			case "RuntimeVisibleTypeAnnotations":
 				tanns = u + 8;
-			}
-			else if ("Deprecated".equals(attrName))
-			{
+				break;
+			case "Deprecated":
 				access |= ASMConstants.ACC_DEPRECATED;
-			}
-			else if ("Synthetic".equals(attrName))
-			{
+				break;
+			case "Synthetic":
 				access |= ASMConstants.ACC_SYNTHETIC | ClassWriter.ACC_SYNTHETIC_ATTRIBUTE;
-			}
-			else if ("SourceDebugExtension".equals(attrName))
-			{
+				break;
+			case "SourceDebugExtension":
 				int len = this.readInt(u + 4);
 				sourceDebug = this.readUTF(u + 8, len, new char[len]);
-			}
-			else if ("RuntimeInvisibleAnnotations".equals(attrName))
-			{
+				break;
+			case "RuntimeInvisibleAnnotations":
 				ianns = u + 8;
-			}
-			else if ("RuntimeInvisibleTypeAnnotations".equals(attrName))
-			{
+				break;
+			case "RuntimeInvisibleTypeAnnotations":
 				itanns = u + 8;
-			}
-			else if ("BootstrapMethods".equals(attrName))
-			{
+				break;
+			case "BootstrapMethods":
 				int[] bootstrapMethods = new int[this.readUnsignedShort(u + 8)];
 				for (int j = 0, v = u + 10; j < bootstrapMethods.length; j++)
 				{
@@ -422,34 +413,34 @@ public class ClassReader
 					v += 2 + this.readUnsignedShort(v + 2) << 1;
 				}
 				context.bootstrapMethods = bootstrapMethods;
-			}
-			else
-			{
+				break;
+			default:
 				Attribute attr = this.readAttribute(attrs, attrName, u + 8, this.readInt(u + 4), c, -1, null);
 				if (attr != null)
 				{
 					attr.next = attributes;
 					attributes = attr;
 				}
+				break;
 			}
 			u += 6 + this.readInt(u + 4);
 		}
-		
+
 		// visits the class declaration
 		classVisitor.visit(this.readInt(this.items[1] - 7), access, name, signature, superClass, interfaces);
-		
+
 		// visits the source and debug info
 		if ((flags & SKIP_DEBUG) == 0 && (sourceFile != null || sourceDebug != null))
 		{
 			classVisitor.visitSource(sourceFile, sourceDebug);
 		}
-		
+
 		// visits the outer class
 		if (enclosingOwner != null)
 		{
 			classVisitor.visitOuterClass(enclosingOwner, enclosingName, enclosingDesc);
 		}
-		
+
 		// visits the class annotations and type annotations
 		if (anns != 0)
 		{
@@ -470,8 +461,10 @@ public class ClassReader
 			for (int i = this.readUnsignedShort(tanns), v = tanns + 2; i > 0; --i)
 			{
 				v = this.readAnnotationTarget(context, v);
-				v = this.readAnnotationValues(v + 2, c, true, classVisitor
-						.visitTypeAnnotation(context.typeRef, context.typePath, this.readUTF8(v, c), true));
+				v = this.readAnnotationValues(v + 2, c, true, classVisitor.visitTypeAnnotation(context.typeRef,
+				                                                                               context.typePath,
+				                                                                               this.readUTF8(v, c),
+				                                                                               true));
 			}
 		}
 		if (itanns != 0)
@@ -479,11 +472,13 @@ public class ClassReader
 			for (int i = this.readUnsignedShort(itanns), v = itanns + 2; i > 0; --i)
 			{
 				v = this.readAnnotationTarget(context, v);
-				v = this.readAnnotationValues(v + 2, c, true, classVisitor
-						.visitTypeAnnotation(context.typeRef, context.typePath, this.readUTF8(v, c), false));
+				v = this.readAnnotationValues(v + 2, c, true, classVisitor.visitTypeAnnotation(context.typeRef,
+				                                                                               context.typePath,
+				                                                                               this.readUTF8(v, c),
+				                                                                               false));
 			}
 		}
-		
+
 		// visits the attributes
 		while (attributes != null)
 		{
@@ -492,7 +487,7 @@ public class ClassReader
 			classVisitor.visitAttribute(attributes);
 			attributes = attr;
 		}
-		
+
 		// visits the inner classes
 		if (innerClasses != 0)
 		{
@@ -504,7 +499,7 @@ public class ClassReader
 				v += 8;
 			}
 		}
-		
+
 		// visits the fields and methods
 		u = this.header + 10 + 2 * interfaces.length;
 		for (int i = this.readUnsignedShort(u - 2); i > 0; --i)
@@ -516,11 +511,11 @@ public class ClassReader
 		{
 			u = this.readMethod(classVisitor, context, u);
 		}
-		
+
 		// visits the end of the class
 		classVisitor.visitEnd();
 	}
-	
+
 	private int readField(final ClassVisitor classVisitor, final Context context, int u)
 	{
 		// reads the field declaration
@@ -529,7 +524,7 @@ public class ClassReader
 		String name = this.readUTF8(u + 2, c);
 		String desc = this.readUTF8(u + 4, c);
 		u += 6;
-		
+
 		// reads the field attributes
 		String signature = null;
 		int anns = 0;
@@ -538,65 +533,59 @@ public class ClassReader
 		int itanns = 0;
 		Object value = null;
 		Attribute attributes = null;
-		
+
 		for (int i = this.readUnsignedShort(u); i > 0; --i)
 		{
-			String attrName = this.readUTF8(u + 2, c);
+			final String attrName = this.readUTF8(u + 2, c);
 			// tests are sorted in decreasing frequency order
 			// (based on frequencies observed on typical classes)
-			if ("ConstantValue".equals(attrName))
+			switch (attrName)
 			{
+			case "ConstantValue":
 				int item = this.readUnsignedShort(u + 8);
 				value = item == 0 ? null : this.readConst(item, c);
-			}
-			else if ("Signature".equals(attrName))
-			{
+				break;
+			case "Signature":
 				signature = this.readUTF8(u + 8, c);
-			}
-			else if ("Deprecated".equals(attrName))
-			{
+				break;
+			case "Deprecated":
 				access |= ASMConstants.ACC_DEPRECATED;
-			}
-			else if ("Synthetic".equals(attrName))
-			{
+				break;
+			case "Synthetic":
 				access |= ASMConstants.ACC_SYNTHETIC | ClassWriter.ACC_SYNTHETIC_ATTRIBUTE;
-			}
-			else if ("RuntimeVisibleAnnotations".equals(attrName))
-			{
+				break;
+			case "RuntimeVisibleAnnotations":
 				anns = u + 8;
-			}
-			else if ("RuntimeVisibleTypeAnnotations".equals(attrName))
-			{
+				break;
+			case "RuntimeVisibleTypeAnnotations":
 				tanns = u + 8;
-			}
-			else if ("RuntimeInvisibleAnnotations".equals(attrName))
-			{
+				break;
+			case "RuntimeInvisibleAnnotations":
 				ianns = u + 8;
-			}
-			else if ("RuntimeInvisibleTypeAnnotations".equals(attrName))
-			{
+				break;
+			case "RuntimeInvisibleTypeAnnotations":
 				itanns = u + 8;
-			}
-			else
-			{
+				break;
+			default:
 				Attribute attr = this.readAttribute(context.attrs, attrName, u + 8, this.readInt(u + 4), c, -1, null);
 				if (attr != null)
 				{
 					attr.next = attributes;
 					attributes = attr;
 				}
+				break;
 			}
 			u += 6 + this.readInt(u + 4);
 		}
 		u += 2;
-		
+
 		// visits the field declaration
 		FieldVisitor fv = classVisitor.visitField(access, name, desc, signature, value);
 		if (fv == null)
 		{
 			return u;
 		}
-		
+
 		// visits the field annotations and type annotations
 		if (anns != 0)
 		{
@@ -630,7 +619,7 @@ public class ClassReader
 				                                                                     this.readUTF8(v, c), false));
 			}
 		}
-		
+
 		// visits the field attributes
 		while (attributes != null)
 		{
@@ -639,13 +628,14 @@ public class ClassReader
 			fv.visitAttribute(attributes);
 			attributes = attr;
 		}
-		
+
 		// visits the end of the field
 		fv.visitEnd();
-		
+
 		return u;
 	}
-	
+
+	@SuppressWarnings("ConstantConditions")
 	private int readMethod(final ClassVisitor classVisitor, final Context context, int u)
 	{
 		// reads the method declaration
@@ -654,13 +644,14 @@ public class ClassReader
 		context.name = this.readUTF8(u + 2, c);
 		context.desc = this.readUTF8(u + 4, c);
 		u += 6;
-		
+
 		// reads the method attributes
 		int code = 0;
 		int exception = 0;
 		String[] exceptions = null;
 		String signature = null;
 		int methodParameters = 0;
+		// int variables = 0;
 		int anns = 0;
 		int ianns = 0;
 		int tanns = 0;
@@ -670,21 +661,19 @@ public class ClassReader
 		int impanns = 0;
 		int firstAttribute = u;
 		Attribute attributes = null;
-		
+
 		for (int i = this.readUnsignedShort(u); i > 0; --i)
 		{
 			String attrName = this.readUTF8(u + 2, c);
-			// tests are sorted in decreasing frequency order
-			// (based on frequencies observed on typical classes)
-			if ("Code".equals(attrName))
+			switch (attrName)
 			{
+			case "Code":
 				if ((context.flags & SKIP_CODE) == 0)
 				{
 					code = u + 8;
 				}
-			}
-			else if ("Exceptions".equals(attrName))
-			{
+				break;
+			case "Exceptions":
 				exceptions = new String[this.readUnsignedShort(u + 8)];
 				exception = u + 10;
 				for (int j = 0; j < exceptions.length; ++j)
@@ -692,66 +681,56 @@ public class ClassReader
 					exceptions[j] = this.readClass(exception, c);
 					exception += 2;
 				}
-			}
-			else if ("Signature".equals(attrName))
-			{
+				break;
+			case "Signature":
 				signature = this.readUTF8(u + 8, c);
-			}
-			else if ("Deprecated".equals(attrName))
-			{
+				break;
+			case "Deprecated":
 				context.access |= ASMConstants.ACC_DEPRECATED;
-			}
-			else if ("RuntimeVisibleAnnotations".equals(attrName))
-			{
+				break;
+			case "RuntimeVisibleAnnotations":
 				anns = u + 8;
-			}
-			else if ("RuntimeVisibleTypeAnnotations".equals(attrName))
-			{
+				break;
+			case "RuntimeVisibleTypeAnnotations":
 				tanns = u + 8;
-			}
-			else if ("AnnotationDefault".equals(attrName))
-			{
+				break;
+			case "AnnotationDefault":
 				dann = u + 8;
-			}
-			else if ("Synthetic".equals(attrName))
-			{
+				break;
+			case "Synthetic":
 				context.access |= ASMConstants.ACC_SYNTHETIC | ClassWriter.ACC_SYNTHETIC_ATTRIBUTE;
-			}
-			else if ("RuntimeInvisibleAnnotations".equals(attrName))
-			{
+				break;
+			case "RuntimeInvisibleAnnotations":
 				ianns = u + 8;
-			}
-			else if ("RuntimeInvisibleTypeAnnotations".equals(attrName))
-			{
+				break;
+			case "RuntimeInvisibleTypeAnnotations":
 				itanns = u + 8;
-			}
-			else if ("RuntimeVisibleParameterAnnotations".equals(attrName))
-			{
+				break;
+			case "RuntimeVisibleParameterAnnotations":
 				mpanns = u + 8;
-			}
-			else if ("RuntimeInvisibleParameterAnnotations".equals(attrName))
-			{
+				break;
+			case "RuntimeInvisibleParameterAnnotations":
 				impanns = u + 8;
-			}
-			else if ("MethodParameters".equals(attrName))
-			{
+				break;
+			case "MethodParameters":
 				methodParameters = u + 8;
-			}
-			else
-			{
+				break;
+			default:
 				Attribute attr = this.readAttribute(context.attrs, attrName, u + 8, this.readInt(u + 4), c, -1, null);
 				if (attr != null)
 				{
 					attr.next = attributes;
 					attributes = attr;
 				}
+				break;
 			}
 			u += 6 + this.readInt(u + 4);
 		}
 		u += 2;
-		
+
 		// visits the method declaration
-		MethodVisitor mv = classVisitor.visitMethod(context.access, context.name, context.desc, signature, exceptions);
+		final MethodVisitor mv = classVisitor
+			                         .visitMethod(context.access, context.name, context.desc, signature, exceptions);
 		if (mv == null)
 		{
 			return u;
@@ -770,6 +749,7 @@ public class ClassReader
 		if (mv instanceof MethodWriter)
 		{
 			MethodWriter mw = (MethodWriter) mv;
+			//noinspection StringEquality
 			if (mw.cw.cr == this && signature == mw.signature)
 			{
 				boolean sameExceptions = false;
@@ -803,7 +783,7 @@ public class ClassReader
 				}
 			}
 		}
-		
+
 		// visit the method parameters
 		if (methodParameters != 0)
 		{
@@ -812,7 +792,19 @@ public class ClassReader
 				mv.visitParameter(this.readUTF8(v, c), this.readUnsignedShort(v + 2));
 			}
 		}
-		
+		// Make sure to read parameter names, if available
+		/* else if (variables != 0 && (context.flags & SKIP_DEBUG) == 0)
+		{
+			// First name at offset varTable + 6
+			int index = variables + 6;
+			for (int i = this.b[methodParameters] & 0xFF; i > 0; --i)
+			{
+				final String name = this.readUTF8(index, c);
+				mv.visitParameter(name, 0);
+				index += 10;
+			}
+		} */
+
 		// visits the method annotations
 		if (dann != 0)
 		{
@@ -863,7 +855,7 @@ public class ClassReader
 		{
 			this.readParameterAnnotations(mv, context, impanns, false);
 		}
-		
+
 		// visits the method attributes
 		while (attributes != null)
 		{
@@ -872,19 +864,20 @@ public class ClassReader
 			mv.visitAttribute(attributes);
 			attributes = attr;
 		}
-		
+
 		// visits the method code
 		if (code != 0 && mv.visitCode())
 		{
 			this.readCode(mv, context, code);
 		}
-		
+
 		// visits the end of the method
 		mv.visitEnd();
-		
+
 		return u;
 	}
-	
+
+	@SuppressWarnings("ConstantConditions")
 	private void readCode(final MethodVisitor mv, final Context context, int u)
 	{
 		// reads the header
@@ -894,7 +887,7 @@ public class ClassReader
 		int maxLocals = this.readUnsignedShort(u + 2);
 		int codeLength = this.readInt(u + 4);
 		u += 8;
-		
+
 		// reads the bytecode to find the labels
 		int codeStart = u;
 		int codeEnd = u + codeLength;
@@ -975,7 +968,7 @@ public class ClassReader
 				break;
 			}
 		}
-		
+
 		// reads the try catch entries to find the labels, and also visits them
 		for (int i = this.readUnsignedShort(u); i > 0; --i)
 		{
@@ -987,7 +980,7 @@ public class ClassReader
 			u += 8;
 		}
 		u += 2;
-		
+
 		// reads the code attributes
 		int[] tanns = null; // start index of each visible type annotation
 		int[] itanns = null; // start index of each invisible type annotation
@@ -1004,74 +997,73 @@ public class ClassReader
 		int frameCount = 0;
 		Context frame = null;
 		Attribute attributes = null;
-		
+
 		for (int i = this.readUnsignedShort(u); i > 0; --i)
 		{
 			String attrName = this.readUTF8(u + 2, c);
-			if ("LocalVariableTable".equals(attrName))
+			switch (attrName)
 			{
-				if ((context.flags & SKIP_DEBUG) == 0)
+			case "LocalVariableTable":
+				if ((context.flags & SKIP_DEBUG) != 0)
 				{
-					varTable = u + 8;
-					for (int j = this.readUnsignedShort(u + 8), v = u; j > 0; --j)
-					{
-						int label = this.readUnsignedShort(v + 10);
-						if (labels[label] == null)
-						{
-							this.readLabel(label, labels).status |= Label.DEBUG;
-						}
-						label += this.readUnsignedShort(v + 12);
-						if (labels[label] == null)
-						{
-							this.readLabel(label, labels).status |= Label.DEBUG;
-						}
-						v += 10;
-					}
+					break;
 				}
-			}
-			else if ("LocalVariableTypeTable".equals(attrName))
-			{
+
+				varTable = u + 8;
+				for (int j = this.readUnsignedShort(u + 8), v = u; j > 0; --j)
+				{
+					int label = this.readUnsignedShort(v + 10);
+					if (labels[label] == null)
+					{
+						this.readLabel(label, labels).status |= Label.DEBUG;
+					}
+					label += this.readUnsignedShort(v + 12);
+					if (labels[label] == null)
+					{
+						this.readLabel(label, labels).status |= Label.DEBUG;
+					}
+					v += 10;
+				}
+				break;
+			case "LocalVariableTypeTable":
 				varTypeTable = u + 8;
-			}
-			else if ("LineNumberTable".equals(attrName))
-			{
-				if ((context.flags & SKIP_DEBUG) == 0)
+				break;
+			case "LineNumberTable":
+				if ((context.flags & SKIP_DEBUG) != 0)
 				{
-					for (int j = this.readUnsignedShort(u + 8), v = u; j > 0; --j)
-					{
-						int label = this.readUnsignedShort(v + 10);
-						if (labels[label] == null)
-						{
-							this.readLabel(label, labels).status |= Label.DEBUG;
-						}
-						Label l = labels[label];
-						while (l.line > 0)
-						{
-							if (l.next == null)
-							{
-								l.next = new Label();
-							}
-							l = l.next;
-						}
-						l.line = this.readUnsignedShort(v + 12);
-						v += 4;
-					}
+					break;
 				}
-			}
-			else if ("RuntimeVisibleTypeAnnotations".equals(attrName))
-			{
+
+				for (int j = this.readUnsignedShort(u + 8), v = u; j > 0; --j)
+				{
+					int label = this.readUnsignedShort(v + 10);
+					if (labels[label] == null)
+					{
+						this.readLabel(label, labels).status |= Label.DEBUG;
+					}
+					Label l = labels[label];
+					while (l.line > 0)
+					{
+						if (l.next == null)
+						{
+							l.next = new Label();
+						}
+						l = l.next;
+					}
+					l.line = this.readUnsignedShort(v + 12);
+					v += 4;
+				}
+				break;
+			case "RuntimeVisibleTypeAnnotations":
 				tanns = this.readTypeAnnotations(mv, context, u + 8, true);
 				ntoff = tanns.length == 0 || this.readByte(tanns[0]) < 0x43 ? -1 : this.readUnsignedShort(tanns[0] + 1);
-			}
-			else if ("RuntimeInvisibleTypeAnnotations".equals(attrName))
-			{
+				break;
+			case "RuntimeInvisibleTypeAnnotations":
 				itanns = this.readTypeAnnotations(mv, context, u + 8, false);
-				nitoff = itanns.length == 0 || this.readByte(itanns[0]) < 0x43 ?
-						-1 :
-						this.readUnsignedShort(itanns[0] + 1);
-			}
-			else if ("StackMapTable".equals(attrName))
-			{
+				nitoff =
+					itanns.length == 0 || this.readByte(itanns[0]) < 0x43 ? -1 : this.readUnsignedShort(itanns[0] + 1);
+				break;
+			case "StackMapTable":
 				if ((context.flags & SKIP_FRAMES) == 0)
 				{
 					stackMap = u + 10;
@@ -1096,9 +1088,8 @@ public class ClassReader
 				 * this by parsing the stack map table without a full decoding
 				 * (see below).
 				 */
-			}
-			else if ("StackMap".equals(attrName))
-			{
+				break;
+			case "StackMap":
 				if ((context.flags & SKIP_FRAMES) == 0)
 				{
 					zip = false;
@@ -1111,26 +1102,29 @@ public class ClassReader
 				 * the StackMapTable attribute, although this is not guaranteed
 				 * by the attribute format.
 				 */
-			}
-			else
-			{
+				break;
+			default:
 				for (Attribute attr2 : context.attrs)
 				{
-					if (attr2.type.equals(attrName))
+					if (!attr2.type.equals(attrName))
 					{
-						Attribute attr = attr2.read(this, u + 8, this.readInt(u + 4), c, codeStart - 8, labels);
-						if (attr != null)
-						{
-							attr.next = attributes;
-							attributes = attr;
-						}
+						continue;
+					}
+
+					final Attribute attr = attr2.read(this, u + 8, this.readInt(u + 4), c, codeStart - 8, labels);
+					if (attr != null)
+					{
+						attr.next = attributes;
+						attributes = attr;
 					}
 				}
+				break;
 			}
 			u += 6 + this.readInt(u + 4);
 		}
+		//noinspection UnusedAssignment
 		u += 2;
-		
+
 		// generates the first (implicit) stack map frame
 		if (stackMap != 0)
 		{
@@ -1164,26 +1158,28 @@ public class ClassReader
 			 */
 			for (int i = stackMap; i < stackMap + stackMapSize - 2; ++i)
 			{
-				if (b[i] == 8)
-				{ // UNINITIALIZED FRAME TYPE
-					int v = this.readUnsignedShort(i + 1);
-					if (v >= 0 && v < codeLength)
-					{
-						if ((b[codeStart + v] & 0xFF) == ASMConstants.NEW)
-						{
-							this.readLabel(v, labels);
-						}
-					}
+				if (b[i] != 8)
+				{
+					continue;
+				}
+				final int offset = this.readUnsignedShort(i + 1);
+				if (offset < 0 || offset >= codeLength)
+				{
+					continue;
+				}
+				if ((b[codeStart + offset] & 0xFF) == ASMConstants.NEW)
+				{
+					this.readLabel(offset, labels);
 				}
 			}
 		}
-		
+
 		// visits the instructions
 		u = codeStart;
 		while (u < codeEnd)
 		{
 			int offset = u - codeStart;
-			
+
 			// visits the label and line number for this offset, if any
 			Label l = labels[offset];
 			if (l != null)
@@ -1201,7 +1197,7 @@ public class ClassReader
 					}
 				}
 			}
-			
+
 			// visits the frame for this offset, if any
 			while (frame != null && (frame.offset == offset || frame.offset == -1))
 			{
@@ -1228,7 +1224,7 @@ public class ClassReader
 					frame = null;
 				}
 			}
-			
+
 			// visits the instruction at this offset
 			int opcode = b[u] & 0xFF;
 			switch (ClassWriter.TYPE[opcode])
@@ -1389,7 +1385,7 @@ public class ClassReader
 				u += 4;
 				break;
 			}
-			
+
 			// visit the instruction annotations, if any
 			while (tanns != null && tann < tanns.length && ntoff <= offset)
 			{
@@ -1400,8 +1396,8 @@ public class ClassReader
 					                                                                 this.readUTF8(v, c), true));
 				}
 				ntoff = ++tann >= tanns.length || this.readByte(tanns[tann]) < 0x43 ?
-						-1 :
-						this.readUnsignedShort(tanns[tann] + 1);
+					        -1 :
+					        this.readUnsignedShort(tanns[tann] + 1);
 			}
 			while (itanns != null && itann < itanns.length && nitoff <= offset)
 			{
@@ -1412,15 +1408,15 @@ public class ClassReader
 					                                                                 this.readUTF8(v, c), false));
 				}
 				nitoff = ++itann >= itanns.length || this.readByte(itanns[itann]) < 0x43 ?
-						-1 :
-						this.readUnsignedShort(itanns[itann] + 1);
+					         -1 :
+					         this.readUnsignedShort(itanns[itann] + 1);
 			}
 		}
 		if (labels[codeLength] != null)
 		{
 			mv.visitLabel(labels[codeLength]);
 		}
-		
+
 		// visits the local variable tables
 		if ((context.flags & SKIP_DEBUG) == 0 && varTable != 0)
 		{
@@ -1460,52 +1456,52 @@ public class ClassReader
 				u += 10;
 			}
 		}
-		
+
 		// visits the local variables type annotations
 		if (tanns != null)
 		{
 			for (int tann2 : tanns)
 			{
-				if (this.readByte(tann2) >> 1 == 0x40 >> 1)
+				if (this.readByte(tann2) >> 1 != 0x40 >> 1)
 				{
-					int v = this.readAnnotationTarget(context, tann2);
-					v = this.readAnnotationValues(v + 2, c, true,
-					                              mv.visitLocalVariableAnnotation(context.typeRef, context.typePath,
-					                                                              context.start, context.end,
-					                                                              context.index, this.readUTF8(v, c),
-					                                                              true));
+					continue;
 				}
+				final int v = this.readAnnotationTarget(context, tann2);
+				this.readAnnotationValues(v + 2, c, true,
+				                          mv.visitLocalVariableAnnotation(context.typeRef, context.typePath,
+				                                                          context.start, context.end, context.index,
+				                                                          this.readUTF8(v, c), true));
 			}
 		}
 		if (itanns != null)
 		{
 			for (int itann2 : itanns)
 			{
-				if (this.readByte(itann2) >> 1 == 0x40 >> 1)
+				if (this.readByte(itann2) >> 1 != 0x40 >> 1)
 				{
-					int v = this.readAnnotationTarget(context, itann2);
-					v = this.readAnnotationValues(v + 2, c, true,
-					                              mv.visitLocalVariableAnnotation(context.typeRef, context.typePath,
-					                                                              context.start, context.end,
-					                                                              context.index, this.readUTF8(v, c),
-					                                                              false));
+					continue;
 				}
+				final int v = this.readAnnotationTarget(context, itann2);
+				this.readAnnotationValues(v + 2, c, true,
+				                          mv.visitLocalVariableAnnotation(context.typeRef, context.typePath,
+				                                                          context.start, context.end, context.index,
+				                                                          this.readUTF8(v, c), false));
 			}
 		}
-		
+
 		// visits the code attributes
 		while (attributes != null)
 		{
-			Attribute attr = attributes.next;
+			final Attribute attr = attributes.next;
 			attributes.next = null;
 			mv.visitAttribute(attributes);
 			attributes = attr;
 		}
-		
+
 		// visits the max stack and max locals values
 		mv.visitMaxs(maxStack, maxLocals);
 	}
-	
+
 	private int[] readTypeAnnotations(final MethodVisitor mv, final Context context, int u, boolean visible)
 	{
 		char[] c = context.buffer;
@@ -1574,7 +1570,7 @@ public class ClassReader
 		}
 		return offsets;
 	}
-	
+
 	private int readAnnotationTarget(final Context context, int u)
 	{
 		int target = this.readInt(u);
@@ -1639,7 +1635,7 @@ public class ClassReader
 		context.typePath = pathLength == 0 ? null : new TypePath(this.b, u);
 		return u + 1 + 2 * pathLength;
 	}
-	
+
 	private void readParameterAnnotations(final MethodVisitor mv, final Context context, int v, final boolean visible)
 	{
 		int i;
@@ -1673,7 +1669,7 @@ public class ClassReader
 			}
 		}
 	}
-	
+
 	private int readAnnotationValues(int v, final char[] buf, final boolean named, final AnnotationVisitor av)
 	{
 		int i = this.readUnsignedShort(v);
@@ -1698,7 +1694,7 @@ public class ClassReader
 		}
 		return v;
 	}
-	
+
 	private int readAnnotationValue(int v, final char[] buf, final String name, final AnnotationVisitor av)
 	{
 		int i;
@@ -1851,7 +1847,7 @@ public class ClassReader
 		}
 		return v;
 	}
-	
+
 	private void getImplicitFrame(final Context frame)
 	{
 		String desc = frame.desc;
@@ -1919,7 +1915,7 @@ public class ClassReader
 		}
 		frame.localCount = local;
 	}
-	
+
 	private int readFrame(int stackMap, boolean zip, boolean unzip, Context frame)
 	{
 		char[] c = frame.buffer;
@@ -2007,7 +2003,7 @@ public class ClassReader
 		this.readLabel(frame.offset, labels);
 		return stackMap;
 	}
-	
+
 	private int readFrameType(final Object[] frame, final int index, int v, final char[] buf, final Label[] labels)
 	{
 		int type = this.b[v++] & 0xFF;
@@ -2044,7 +2040,7 @@ public class ClassReader
 		}
 		return v;
 	}
-	
+
 	protected Label readLabel(int offset, Label[] labels)
 	{
 		if (labels[offset] == null)
@@ -2053,7 +2049,7 @@ public class ClassReader
 		}
 		return labels[offset];
 	}
-	
+
 	private int getAttributes()
 	{
 		// skips the header
@@ -2079,8 +2075,9 @@ public class ClassReader
 		// the attribute_info structure starts just after the methods
 		return u + 2;
 	}
-	
-	private Attribute readAttribute(final Attribute[] attrs, final String type, final int off, final int len, final char[] buf, final int codeOff, final Label[] labels)
+
+	private Attribute readAttribute(final Attribute[] attrs, final String type, final int off, final int len,
+		                               final char[] buf, final int codeOff, final Label[] labels)
 	{
 		for (Attribute attr : attrs)
 		{
@@ -2091,52 +2088,52 @@ public class ClassReader
 		}
 		return new Attribute(type).read(this, off, len, null, -1, null);
 	}
-	
+
 	public int getItemCount()
 	{
 		return this.items.length;
 	}
-	
+
 	public int getItem(final int item)
 	{
 		return this.items[item];
 	}
-	
+
 	public int getMaxStringLength()
 	{
 		return this.maxStringLength;
 	}
-	
+
 	public int readByte(final int index)
 	{
 		return this.b[index] & 0xFF;
 	}
-	
+
 	public int readUnsignedShort(final int index)
 	{
 		byte[] b = this.b;
 		return (b[index] & 0xFF) << 8 | b[index + 1] & 0xFF;
 	}
-	
+
 	public short readShort(final int index)
 	{
 		byte[] b = this.b;
 		return (short) ((b[index] & 0xFF) << 8 | b[index + 1] & 0xFF);
 	}
-	
+
 	public int readInt(final int index)
 	{
 		byte[] b = this.b;
 		return (b[index] & 0xFF) << 24 | (b[index + 1] & 0xFF) << 16 | (b[index + 2] & 0xFF) << 8 | b[index + 3] & 0xFF;
 	}
-	
+
 	public long readLong(final int index)
 	{
 		long l1 = this.readInt(index);
 		long l0 = this.readInt(index + 4) & 0xFFFFFFFFL;
 		return l1 << 32 | l0;
 	}
-	
+
 	public String readUTF8(int index, final char[] buf)
 	{
 		int item = this.readUnsignedShort(index);
@@ -2152,7 +2149,7 @@ public class ClassReader
 		index = this.items[item];
 		return this.strings[item] = this.readUTF(index + 2, this.readUnsignedShort(index), buf);
 	}
-	
+
 	private String readUTF(int index, final int utfLen, final char[] buf)
 	{
 		int endIndex = index + utfLen;
@@ -2197,7 +2194,7 @@ public class ClassReader
 		}
 		return new String(buf, 0, strLen);
 	}
-	
+
 	public String readClass(final int index, final char[] buf)
 	{
 		// computes the start index of the CONSTANT_Class item in b
@@ -2205,7 +2202,7 @@ public class ClassReader
 		// the first two bytes of this CONSTANT_Class item
 		return this.readUTF8(this.items[this.readUnsignedShort(index)], buf);
 	}
-	
+
 	public Object readConst(final int item, final char[] buf)
 	{
 		int index = this.items[item];

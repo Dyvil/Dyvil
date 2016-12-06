@@ -1,6 +1,6 @@
 package dyvilx.lang.model.type;
 
-import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation.internal.DyvilModifiers;
 import dyvil.lang.LiteralConvertible;
 import dyvil.reflect.Modifiers;
 

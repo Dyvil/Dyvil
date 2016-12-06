@@ -1,0 +1,29 @@
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
+
+package dyvil.ref.boxed;
+
+import dyvil.ref.TYPE_NAME##Ref;
+import dyvil.ref.ObjectRef;
+
+public class Boxed##TYPE_NAME##Ref implements ObjectRef<WRAPPER>
+{
+	private final TYPE_NAME##Ref booleanRef;
+
+	public Boxed##TYPE_NAME##Ref(TYPE_NAME##Ref booleanRef)
+	{
+		this.booleanRef = booleanRef;
+	}
+
+	@Override
+	public WRAPPER get()
+	{
+		return this.booleanRef.get();
+	}
+
+	@Override
+	public void set(WRAPPER value)
+	{
+		this.booleanRef.set(value);
+	}
+}

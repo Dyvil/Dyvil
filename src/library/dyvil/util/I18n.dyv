@@ -1,0 +1,10 @@
+package dyvil.util
+
+public interface I18n
+{
+	func getString(String key): String
+
+	func getString(String key, Object arg): String = String.format(this.getString(key), arg)
+
+	func getString(String key, Object... args): String = String.format(this.getString(key), args...)
+}

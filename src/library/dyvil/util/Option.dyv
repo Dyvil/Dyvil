@@ -1,0 +1,37 @@
+package dyvil.util
+
+import java.io.Serializable
+
+@LiteralConvertible.FromNil("fromNil")
+@LiteralConvertible.FromTuple
+@Immutable
+public interface Option<T> extends Serializable
+{
+	static func fromNil(): Option = None.instance
+
+	static func of<T>(T t): Option<T> = t == null ? None.instance : new Some<T>(t)
+
+	static func apply<T>(): Option<T> = None.instance
+
+	static func apply<T>(T t): Option<T> = new Some<T>(t)
+
+	func get(): T
+
+	func isPresent(): boolean
+
+	func forEach(T -> void consumer): void
+
+	func filter(T -> boolean predicate): Option<T>
+
+	func map<U>(T -> U function): Option<U>
+
+	func flatMap<U>(T -> Option<U> function): Option<U>
+
+	func orElse<U>(-> U supplier): T|U
+
+	// Operators
+
+	postfix inline func ! <T>(Option<T> lhs): T = lhs.get
+
+	infix inline func ?? <T, U>(Option<T> lhs, -> U rhs): T|U = lhs.orElse(supplier: rhs)
+}

@@ -5,12 +5,13 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.Candidate;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -47,9 +48,9 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 	}
 
 	@Override
-	public void setReceiver(IValue value)
+	public void setReceiver(IValue receiver)
 	{
-		this.receiver = value;
+		this.receiver = receiver;
 	}
 
 	@Override
@@ -93,7 +94,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 	@Override
 	public boolean isResolved()
 	{
-		return this.method != null && this.method.getType().isResolved();
+		return this.method != null;
 	}
 
 	public IMethod getMethod()
@@ -104,7 +105,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 	@Override
 	public boolean isPrimitive()
 	{
-		return this.method != null && (this.method.isIntrinsic() || this.getType().isPrimitive());
+		return this.method != null && this.getType().isPrimitive();
 	}
 
 	@Override
@@ -362,18 +363,18 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 	}
 
 	@Override
-	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 		if (this.receiver != null)
 		{
-			this.receiver = this.receiver.cleanup(context, compilableList);
+			this.receiver = this.receiver.cleanup(compilableList, classCompilableList);
 		}
 
-		this.arguments.cleanup(context, compilableList);
+		this.arguments.cleanup(compilableList, classCompilableList);
 
 		if (this.genericData != null)
 		{
-			this.genericData.cleanup(context, compilableList);
+			this.genericData.cleanup(compilableList, classCompilableList);
 		}
 		return this;
 	}

@@ -3,6 +3,7 @@ package dyvil.tools.compiler.backend;
 import dyvil.collection.List;
 import dyvil.io.FileUtils;
 import dyvil.tools.compiler.DyvilCompiler;
+import dyvil.tools.compiler.ast.header.ICompilable;
 import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.compiler.lang.I18n;
 
@@ -24,7 +25,7 @@ public class ClassWriter extends dyvil.tools.asm.ClassWriter
 		super(api);
 	}
 	
-	public static byte[] compile(IClassCompilable iclass) throws Throwable
+	public static byte[] compile(ICompilable iclass) throws Throwable
 	{
 		ClassWriter writer = new ClassWriter();
 		iclass.write(writer);
@@ -50,14 +51,14 @@ public class ClassWriter extends dyvil.tools.asm.ClassWriter
 		}
 	}
 	
-	public static void compile(DyvilCompiler compiler, File file, IClassCompilable iclass)
+	public static void compile(DyvilCompiler compiler, File file, ICompilable compilable)
 	{
 		byte[] bytes;
 		
 		// First try to compile the file to a byte array
 		try
 		{
-			bytes = compile(iclass);
+			bytes = compile(compilable);
 		}
 		catch (Throwable ex)
 		{

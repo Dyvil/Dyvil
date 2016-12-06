@@ -89,33 +89,32 @@ public class TypeClassParser extends Parser
 		case PARENTHESES_END:
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
-				pm.reparse();
-				pm.report(token, this.value.valueTag() == IValue.CLASS_OPERATOR ?
-					                 "classoperator.close_paren" :
-					                 "typeoperator.close_paren");
+				pm.report(token, this.isClassOperator() ? "classoperator.close_paren" : "typeoperator.close_paren");
+				return;
 			}
 
 			this.valueConsumer.setValue(this.value);
 			pm.popParser();
 			return;
 		case ANGLE_END:
-			this.valueConsumer.setValue(this.value);
-			pm.popParser();
-
-			if (TypeParser.isGenericEnd(token, type))
+			if (!TypeParser.isGenericEnd(token, type))
 			{
-				pm.splitJump(token, 1);
+				pm.report(token, this.isClassOperator() ? "classoperator.close_angle" : "typeoperator.close_angle");
 				return;
 			}
 
-			pm.reparse();
-			pm.report(token, this.value.valueTag() == IValue.CLASS_OPERATOR ?
-				                 "classoperator.close_angle" :
-				                 "typeoperator.close_angle");
+			this.valueConsumer.setValue(this.value);
+			pm.popParser();
+			pm.splitJump(token, 1);
 			return;
 		case END:
 			this.valueConsumer.setValue(this.value);
 			pm.popParser(true);
 		}
+	}
+
+	private boolean isClassOperator()
+	{
+		return this.value.valueTag() == IValue.CLASS_OPERATOR;
 	}
 }

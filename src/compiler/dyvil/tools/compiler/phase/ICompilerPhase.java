@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.phase;
 
+import dyvil.annotation.analysis.NotNull;
 import dyvil.io.FileUtils;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -7,7 +8,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.ICompilationUnit;
+import dyvil.tools.compiler.ast.header.ICompilationUnit;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.parsing.lexer.DyvilLexer;
@@ -44,6 +45,8 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	 */
 	ICompilerPhase FORMAT = new SequentialCompilerPhase(40, "FORMAT", unit -> FileUtils
 			.tryWrite(unit.getInputFile(), unit.toString()));
+
+	ICompilerPhase RESOLVE_HEADERS = new ResolveHeaderPhase(45);
 	
 	/**
 	 * Resolves packages, classes and types.
@@ -101,7 +104,7 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	void apply(DyvilCompiler compiler);
 	
 	@Override
-	default int compareTo(ICompilerPhase o)
+	default int compareTo(@NotNull ICompilerPhase o)
 	{
 		return Integer.compare(this.getID(), o.getID());
 	}

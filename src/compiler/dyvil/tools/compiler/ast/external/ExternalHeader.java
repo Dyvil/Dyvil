@@ -2,30 +2,31 @@ package dyvil.tools.compiler.ast.external;
 
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.header.ImportDeclaration;
-import dyvil.tools.compiler.ast.structure.DyvilHeader;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
+import dyvil.tools.compiler.ast.header.AbstractHeader;
+import dyvil.tools.compiler.ast.imports.ImportDeclaration;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.parsing.Name;
 
-public class ExternalHeader extends DyvilHeader
+public class ExternalHeader extends AbstractHeader implements IDefaultContext
 {
-	private static final int IMPORTS              = 1;
-	private static final int TYPE_ALIASES         = 1 << 1;
+	private static final int IMPORTS      = 1;
+	private static final int TYPE_ALIASES = 1 << 1;
 
 	private int resolved;
 
-	public ExternalHeader(DyvilCompiler compiler)
+	public ExternalHeader()
 	{
-		super(compiler);
 	}
 
-	public ExternalHeader(DyvilCompiler compiler, Name name)
+	public ExternalHeader(Name name, Package pack)
 	{
-		super(compiler, name);
+		super(name);
+		this.pack = pack;
 	}
 
-	@Override
-	protected void resolveImports()
+	private void resolveImports()
 	{
 		this.resolved |= IMPORTS;
 
@@ -45,6 +46,12 @@ public class ExternalHeader extends DyvilHeader
 		{
 			this.typeAliases[i].resolveTypes(null, this);
 		}
+	}
+
+	@Override
+	public DyvilCompiler getCompilationContext()
+	{
+		return Package.rootPackage.compiler;
 	}
 
 	@Override

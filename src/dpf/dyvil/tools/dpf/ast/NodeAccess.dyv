@@ -1,87 +1,77 @@
-package dyvil.tools.dpf.ast;
+package dyvil.tools.dpf.ast
 
-import dyvil.collection.Map;
-import dyvil.tools.dpf.visitor.NodeVisitor;
-import dyvil.tools.dpf.visitor.ValueVisitor;
-import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.collection.Map
+import dyvil.tools.dpf.visitor.NodeVisitor
+import dyvil.tools.dpf.visitor.ValueVisitor
+import dyvil.tools.parsing.Name
+import dyvil.tools.parsing.ast.IASTNode
+import dyvil.tools.parsing.position.ICodePosition
 
 public class NodeAccess implements NodeVisitor, NodeElement, Expandable
 {
-	protected Name        name;
-	protected NodeElement element;
-	
-	private ICodePosition position;
+	protected Name name = null
+	{
+		public override get
+	}
+
+	protected NodeElement element = null
+	{
+		public get
+	}
 	
 	public init(Name name)
 	{
-		this.name = name;
+		this.name = name
 	}
 
-	public init(Name name, ICodePosition position)
+	public init(Name name, NodeElement element)
 	{
-		this.name = name;
-		this.position = position;
+		this.name = name
+		this.element = element
 	}
 
-	public override void setPosition(ICodePosition position)
+	public override func visitNode(Name name): NodeVisitor
 	{
-		this.position = position;
+		Node node = new Node(name)
+		this.element = node
+		return node
 	}
 	
-	public override ICodePosition getPosition()
+	public override func visitProperty(Name name): ValueVisitor
 	{
-		return this.position;
+		Property property = new Property(name)
+		this.element = property
+		return property
 	}
 	
-	public override Name getName()
+	public override func visitNodeAccess(Name name): NodeVisitor
 	{
-		return this.name;
+		NodeAccess access = new NodeAccess(name)
+		this.element = access
+		return access
 	}
 	
-	public override NodeVisitor visitNode(Name name)
+	public override func accept(NodeVisitor visitor): void
 	{
-		Node node = new Node(name);
-		this.element = node;
-		return node;
-	}
-	
-	public override ValueVisitor visitProperty(Name name)
-	{
-		Property property = new Property(name);
-		this.element = property;
-		return property;
-	}
-	
-	public override NodeVisitor visitNodeAccess(Name name)
-	{
-		NodeAccess access = new NodeAccess(name);
-		this.element = access;
-		return access;
-	}
-	
-	public override void accept(NodeVisitor visitor)
-	{
-		this.element.accept(visitor.visitNodeAccess(this.name));
+		this.element.accept(visitor.visitNodeAccess(this.name))
 	}
 
-	public override NodeAccess expand(Map<String, Object> mappings, boolean mutate)
+	public override func expand(Map<String, Object> mappings, boolean mutate): NodeAccess
 	{
-		NodeAccess nodeAccess = mutate ? this : new NodeAccess(this.name, this.position)
+		let nodeAccess = mutate ? this : new NodeAccess(this.name)
 		nodeAccess.element = Expandable.expand(this.element, mappings, mutate) as NodeElement
 		return nodeAccess
 	}
 
-	public override String toString() = IASTNode.toString(this)
+	public override func toString(): String = IASTNode.toString(this)
 	
-	public override void toString(String indent, StringBuilder buffer)
+	public override func toString(String indent, StringBuilder buffer): void
 	{
-		buffer.append(this.name).append('.');
-		this.element.toString(indent, buffer);
+		buffer.append(this.name).append('.')
+		this.element.toString(indent, buffer)
 	}
 
-	public override boolean equals(Object obj)
+	public override func equals(Object obj): boolean
 	{
 		if (obj === this) return true
 		if (!(obj is NodeAccess)) return false
@@ -92,5 +82,5 @@ public class NodeAccess implements NodeVisitor, NodeElement, Expandable
 		return true
 	}
 
-	public override int hashCode() = 31 * this.name.hashCode + this.element.hashCode
+	public override func hashCode(): int = 31 * this.name.hashCode + this.element.hashCode
 }

@@ -1,0 +1,90 @@
+package dyvil.random
+
+public interface Random
+{
+	static func apply(): Random = new JavaRandom()
+	
+	static func apply(long seed): Random = new JavaRandom(seed)
+	
+	func next(int bits): int
+	
+	func nextBoolean(): boolean = this.next(1) > 0
+	
+	func nextBoolean(float f): boolean = this.nextFloat() < f
+	
+	func nextByte(): byte = this.next(7) as byte
+	
+	func nextByte(byte max): byte = this.nextInt(max) as byte
+	
+	func nextByte(byte min, byte max): byte = (min + this.nextInt(max - min + 1)) as byte
+	
+	func nextShort(): short = this.next(15) as short
+	
+	func nextShort(short max): short = this.nextInt(max) as short
+	
+	func nextShort(short min, short max): short = (min + this.nextInt(max - min + 1)) as short
+	
+	func nextChar(): char = this.next(16) as char
+	
+	func nextChar(char max): char = this.nextInt(max) as char
+	
+	func nextChar(char min, char max): char = (min + this.nextInt(max - min + 1)) as char
+	
+	func nextInt(): int = this.next(31)
+	
+	func nextInt(int max): int
+	{
+		var r = this.next(31)
+		let m = max - 1
+		if ((max & m) == 0)
+		{
+			return (max * (r as long) >> 31) as int
+		}
+
+		var u = r
+		while (u - (r = u % max) + m < 0)
+		{
+			u = this.next(31)
+		}
+		return r
+	}
+	
+	func nextInt(int min, int max): int = min + this.nextInt(max - min + 1)
+	
+	func nextInt(float f): int = (f + (this.nextFloat() < f ? 0 : 1)) as int
+	
+	func nextLong(): long = ((this.next(32) as long) << 32) + this.next(32)
+	
+	func nextLong(long max): long
+	{
+		var r = this.nextLong()
+		let m = max - 1
+		if ((max & m) == 0L)
+		{
+			return r & m
+		}
+
+		var u = r >>> 1
+		while (u + m - (r = u % max) < 0L)
+		{
+			u = this.nextLong() >>> 1
+		}
+		return r
+	}
+	
+	func nextLong(long min, long max): long = min + this.nextLong(max - min + 1)
+	
+	func nextFloat(): float = this.next(24) / (1 << 24)
+	
+	func nextFloat(float max): float = this.nextFloat() * max
+	
+	func nextFloat(float min, float max): float = min + this.nextFloat() * (max - min)
+	
+	func nextDouble(): double = (((this.next(26) as long) << 27) + this.next(27)) / (1L << 52)
+	
+	func nextDouble(double max): double = this.nextDouble() * max
+	
+	func nextDouble(double min, double max): double = min + this.nextDouble() * (max - min)
+	
+	func nextGaussian(): double
+}

@@ -4,7 +4,7 @@ package dyvil.reflect;
  * The <b>Modifiers</b> interface declares all (visible and invisible) modifiers that can be used <i>Dyvil</i> source
  * code and that can appear in class files. Note that only modifiers less than {@code 0xFFFF} will actually appear in
  * the Bytecode, other modifiers such Dyvil-specific ones will be stored in {@link
- * dyvil.annotation._internal.DyvilModifiers DyvilModifiers} annotations.
+ * dyvil.annotation.internal.DyvilModifiers DyvilModifiers} annotations.
  *
  * @author Clashsoft
  */

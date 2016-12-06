@@ -36,69 +36,6 @@ public interface ICall extends IValue, IArgumentsConsumer
 
 	IArguments getArguments();
 
-	default int wildcardCount()
-	{
-		int count = 0;
-
-		IValue receiver = this.getReceiver();
-		if (receiver != null && receiver.valueTag() == IValue.WILDCARD)
-		{
-			count = 1;
-		}
-
-		for (IValue value : this.getArguments())
-		{
-			if (value.valueTag() == IValue.WILDCARD)
-			{
-				count++;
-			}
-		}
-
-		return count;
-	}
-
-	default IValue toLambda(MarkerList markers, IContext context, int wildcards)
-	{
-		ICodePosition position = this.getPosition();
-
-		IParameter[] parameters = new IParameter[wildcards];
-		for (int i = 0; i < wildcards; i++)
-		{
-			parameters[i] = new CodeParameter(position, Name.fromRaw("wildcard$" + i), Types.UNKNOWN,
-			                                  EmptyModifiers.INSTANCE, null);
-		}
-
-		int index = 0;
-
-		IValue receiver = this.getReceiver();
-		if (receiver != null && receiver.valueTag() == IValue.WILDCARD)
-		{
-			this.setReceiver(convertWildcardValue(receiver, parameters[index++]));
-		}
-
-		IArguments arguments = this.getArguments();
-		for (int i = 0, size = arguments.size(); i < size; i++)
-		{
-			IValue value = arguments.getValue(i, null);
-			if (value.valueTag() == IValue.WILDCARD)
-			{
-				arguments.setValue(i, null, convertWildcardValue(value, parameters[index++]));
-			}
-		}
-
-		LambdaExpr lambdaExpr = new LambdaExpr(position, parameters, wildcards);
-		lambdaExpr.setImplicitParameters(true);
-		lambdaExpr.setValue(this);
-		return lambdaExpr.resolve(markers, context);
-	}
-
-	static IValue convertWildcardValue(IValue value, IParameter parameter)
-	{
-		ICodePosition valuePosition = value.getPosition();
-		parameter.setPosition(valuePosition);
-		return new FieldAccess(valuePosition, null, parameter);
-	}
-
 	@Override
 	default boolean isUsableAsStatement()
 	{
@@ -132,6 +69,70 @@ public interface ICall extends IValue, IArgumentsConsumer
 		}
 
 		return this.resolveCall(markers, context, true);
+	}
+
+	default int wildcardCount()
+	{
+		int count = 0;
+
+		IValue receiver = this.getReceiver();
+		if (receiver != null && receiver.isPartialWildcard())
+		{
+			count = 1;
+		}
+
+		for (IValue value : this.getArguments())
+		{
+			if (value.isPartialWildcard())
+			{
+				count++;
+			}
+		}
+
+		return count;
+	}
+
+	default IValue toLambda(MarkerList markers, IContext context, int wildcards)
+	{
+		ICodePosition position = this.getPosition();
+
+		final IParameter[] parameters = new IParameter[wildcards];
+		for (int i = 0; i < wildcards; i++)
+		{
+			parameters[i] = new CodeParameter(position, Name.fromRaw("wildcard$" + i), Types.UNKNOWN,
+			                                  EmptyModifiers.INSTANCE, null);
+		}
+
+		int index = 0;
+
+		IValue receiver = this.getReceiver();
+		if (receiver != null && receiver.isPartialWildcard())
+		{
+			this.setReceiver(convertWildcardValue(receiver, parameters[index++]));
+		}
+
+		IArguments arguments = this.getArguments();
+		for (int i = 0, size = arguments.size(); i < size; i++)
+		{
+			final IValue argument = arguments.getValue(i, null);
+			if (argument.isPartialWildcard())
+			{
+				arguments.setValue(i, null, convertWildcardValue(argument, parameters[index++]));
+			}
+		}
+
+		final LambdaExpr lambdaExpr = new LambdaExpr(position, parameters, wildcards);
+		lambdaExpr.setImplicitParameters(true);
+		lambdaExpr.setValue(this);
+		return lambdaExpr.resolve(markers, context);
+	}
+
+	static IValue convertWildcardValue(IValue value, IParameter parameter)
+	{
+		final ICodePosition valuePosition = value.getPosition();
+		parameter.setPosition(valuePosition);
+		value.setLambdaParameter(parameter);
+		return value;
 	}
 
 	default void resolveReceiver(MarkerList markers, IContext context)
@@ -190,7 +191,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 		if (receiver != null)
 		{
 			receiver.getType().getMethodMatches(matches, receiver, name, arguments);
-			if (!matches.isEmpty())
+			if (matches.hasCandidate())
 			{
 				return matches;
 			}
@@ -200,7 +201,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 		if (arguments.size() == 1)
 		{
 			arguments.getFirstValue().getType().getMethodMatches(matches, receiver, name, arguments);
-			if (!matches.isEmpty())
+			if (matches.hasCandidate())
 			{
 				return matches;
 			}
@@ -208,7 +209,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 
 		// Methods available in the current context
 		context.getMethodMatches(matches, receiver, name, arguments);
-		if (!matches.isEmpty())
+		if (matches.hasCandidate())
 		{
 			return matches;
 		}
@@ -220,7 +221,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 			for (Candidate<IMethod> candidate : implicits)
 			{
 				candidate.getMember().getType().getMethodMatches(matches, receiver, name, arguments);
-				if (!matches.isEmpty())
+				if (matches.hasCandidate())
 				{
 					return matches;
 				}

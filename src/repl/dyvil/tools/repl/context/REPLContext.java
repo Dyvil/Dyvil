@@ -5,6 +5,7 @@ import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.collection.mutable.IdentityHashMap;
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.CodeClass;
@@ -14,11 +15,14 @@ import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.consumer.IMemberConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
-import dyvil.tools.compiler.ast.header.ImportDeclaration;
+import dyvil.tools.compiler.ast.header.AbstractHeader;
+import dyvil.tools.compiler.ast.header.ICompilable;
+import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -28,12 +32,9 @@ import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.operator.IOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.DyvilHeader;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.backend.ClassWriter;
-import dyvil.tools.compiler.backend.IClassCompilable;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -42,9 +43,11 @@ import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.repl.DyvilREPL;
 
-public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberConsumer<REPLVariable>
+public class REPLContext extends AbstractHeader
+	implements IDefaultContext, IValueConsumer, IMemberConsumer<REPLVariable>
 {
-	private static final String REPL$CLASSES = "repl$classes/";
+	private static final String CLASS_PACKAGE = "repl_classes";
+	public static final  String CLASS_PREFIX  = "Result_";
 
 	protected final DyvilREPL repl;
 
@@ -63,12 +66,12 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 
 	// Cleared for every input
 	protected final MarkerList             markers        = new MarkerList(Markers.INSTANCE);
-	protected final List<IClassCompilable> innerClassList = new ArrayList<>();
+	protected final List<ICompilable> innerClassList = new ArrayList<>();
 	protected final List<IMember>          members        = new ArrayList<>();
 
 	public REPLContext(DyvilREPL repl)
 	{
-		super(repl.getCompiler(), Name.fromRaw("REPL"));
+		super(Name.fromRaw("REPL"));
 		this.repl = repl;
 	}
 
@@ -98,7 +101,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 
 	public void startEvaluation(String code)
 	{
-		final String className = "REPL$Result" + this.classIndex++;
+		final String className = CLASS_PREFIX + this.classIndex++;
 		this.currentClass = new CodeClass(this, Name.fromRaw(className));
 		this.currentClass.setBody(new ClassBody(this.currentClass));
 		this.currentCode = code;
@@ -130,12 +133,12 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 			return;
 		}
 
-		for (int i = this.compiler.config.getConstantFolding() - 1; i >= 0; i--)
+		for (int i = this.getCompilationContext().config.getConstantFolding() - 1; i >= 0; i--)
 		{
 			this.currentClass.foldConstants();
 		}
 
-		this.currentClass.cleanup(context, this.currentClass);
+		this.currentClass.cleanup(this, this.currentClass);
 
 		final Class<?> theClass = this.compileAndLoad();
 
@@ -150,22 +153,21 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 
 	private Class<?> compileAndLoad()
 	{
-		// Compile all inner class
-		for (IClassCompilable innerClass : this.innerClassList)
-		{
-			try
-			{
-				final String fileName = innerClass.getFileName();
-				final byte[] bytes = ClassWriter.compile(innerClass);
-				REPLCompiler.loadClass(this.repl, REPL$CLASSES.concat(fileName), bytes);
-			}
-			catch (Throwable t)
-			{
-				t.printStackTrace(this.compiler.getErrorOutput());
-			}
-		}
+		final REPLClassLoader classLoader = this.repl.getClassLoader();
+		final List<Class<?>> classes = new ArrayList<>(this.innerClassList.size() + 1);
 
-		return REPLCompiler.compile(this.repl, this.currentClass);
+		// Compile all inner class
+		for (ICompilable innerClass : this.innerClassList)
+		{
+			classLoader.register(innerClass);
+		}
+		classLoader.register(this.currentClass);
+
+		for (ICompilable innerClass : this.innerClassList)
+		{
+			classLoader.initialize(innerClass);
+		}
+		return classLoader.initialize(this.currentClass);
 	}
 
 	public void processMember(IMember member, Class<?> theClass)
@@ -197,8 +199,6 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 		case CLASS:
 			// Compile and load the inner class
 			final IClass innerClass = (IClass) member;
-			REPLCompiler.compile(this.repl, innerClass);
-
 			this.classes.put(member.getName(), innerClass);
 			break;
 		}
@@ -206,7 +206,6 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 		this.repl.getOutput().println(member);
 	}
 
-	@Override
 	public void cleanup()
 	{
 		this.innerClassList.clear();
@@ -221,33 +220,15 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 			return;
 		}
 
-		boolean colors = this.compiler.config.useAnsiColors();
+		boolean colors = this.getCompilationContext().config.useAnsiColors();
 		StringBuilder buf = new StringBuilder();
 		this.markers.sort();
-		for (Marker m : this.markers)
+		for (Marker marker : this.markers)
 		{
-			m.log(this.currentCode, buf, colors);
+			marker.log(this.currentCode, buf, colors);
 		}
 
-		this.compiler.getOutput().println(buf.toString());
-	}
-
-	private static void getClassName(StringBuilder builder, IType type)
-	{
-		if (type.isArrayType())
-		{
-			getClassName(builder, type.getElementType());
-			builder.append("Array");
-			return;
-		}
-		if (type.typeTag() == IType.REFERENCE)
-		{
-			getClassName(builder, type.getElementType());
-			builder.append("Ref");
-			return;
-		}
-
-		builder.append(type.getName().unqualified);
+		this.repl.getOutput().println(buf.toString());
 	}
 
 	private void initMember(IClassMember member)
@@ -282,22 +263,22 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 	public void addOperator(IOperator operator)
 	{
 		super.addOperator(operator);
-		this.compiler.getOutput().println("Defined " + operator);
+		this.repl.getOutput().println("Defined " + operator);
 	}
 
 	@Override
-	public void addImport(ImportDeclaration declaration)
+	public void addImport(ImportDeclaration component)
 	{
-		declaration.resolveTypes(this.markers, this);
-		declaration.resolve(this.markers, this);
+		component.resolveTypes(this.markers, this);
+		component.resolve(this.markers, this);
 
 		if (this.hasErrors())
 		{
 			return;
 		}
 
-		super.addImport(declaration);
-		this.compiler.getOutput().println("Imported " + declaration.getImport());
+		super.addImport(component);
+		this.repl.getOutput().println("Imported " + component.getImport());
 	}
 
 	@Override
@@ -317,7 +298,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 		typeAlias.cleanup(this, this.currentClass);
 
 		super.addTypeAlias(typeAlias);
-		this.compiler.getOutput().println(typeAlias);
+		this.repl.getOutput().println(typeAlias);
 	}
 
 	@Override
@@ -329,10 +310,9 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 	}
 
 	@Override
-	public void addInnerClass(IClassCompilable iclass)
+	public void addCompilable(ICompilable compilable)
 	{
-		iclass.setInnerIndex(this.currentClass.getInternalName(), this.innerClassList.size());
-		this.innerClassList.add(iclass);
+		this.innerClassList.add(compilable);
 	}
 
 	@Override
@@ -343,11 +323,11 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 	}
 
 	@Override
-	public void addDataMember(REPLVariable variable)
+	public void addDataMember(REPLVariable field)
 	{
-		this.initMember(variable);
-		this.currentClass.getBody().addDataMember(variable);
-		this.members.add(variable);
+		this.initMember(field);
+		this.currentClass.getBody().addDataMember(field);
+		this.members.add(field);
 	}
 
 	@Override
@@ -393,7 +373,7 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 
 		buf.append('\'');
 		Util.methodSignatureToString(method, null, buf);
-		this.compiler.getOutput().println(buf.append('\'').toString());
+		this.repl.getOutput().println(buf.append('\'').toString());
 	}
 
 	@Override
@@ -409,27 +389,21 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 	// region IContext overrides
 
 	@Override
+	public DyvilCompiler getCompilationContext()
+	{
+		return this.repl.getCompiler();
+	}
+
+	@Override
 	public IClass resolveClass(Name name)
 	{
-		IClass c = this.classes.get(name);
-		if (c != null)
-		{
-			return c;
-		}
-
-		return super.resolveClass(name);
+		return this.classes.get(name);
 	}
 
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		IField f = this.fields.get(name);
-		if (f != null)
-		{
-			return f;
-		}
-
-		return super.resolveField(name);
+		return this.fields.get(name);
 	}
 
 	@Override
@@ -440,33 +414,28 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 			method.checkMatch(list, receiver, name, arguments);
 		}
 
-		if (name != null)
-		{
-			final Name removeEq = Util.removeEq(name);
-
-			IProperty property = this.properties.get(removeEq);
-			if (property != null)
-			{
-				property.checkMatch(list, receiver, name, arguments);
-			}
-
-			final IField field = this.fields.get(removeEq);
-			if (field != null)
-			{
-				property = field.getProperty();
-				if (property != null)
-				{
-					property.checkMatch(list, receiver, name, arguments);
-				}
-			}
-		}
-
-		if (!list.isEmpty() && name != null)
+		if (name == null)
 		{
 			return;
 		}
 
-		super.getMethodMatches(list, receiver, name, arguments);
+		final Name removeEq = Util.removeEq(name);
+
+		IProperty property = this.properties.get(removeEq);
+		if (property != null)
+		{
+			property.checkMatch(list, receiver, name, arguments);
+		}
+
+		final IField field = this.fields.get(removeEq);
+		if (field != null)
+		{
+			property = field.getProperty();
+			if (property != null)
+			{
+				property.checkMatch(list, receiver, name, arguments);
+			}
+		}
 	}
 
 	@Override
@@ -476,13 +445,6 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 		{
 			method.checkImplicitMatch(list, value, targetType);
 		}
-
-		if (!list.isEmpty())
-		{
-			return;
-		}
-
-		super.getImplicitMatches(list, value, targetType);
 	}
 
 	@Override
@@ -518,9 +480,9 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 	}
 
 	@Override
-	public String getFullName(Name name)
+	public String getFullName(Name subClass)
 	{
-		return "repl$classes." + name.qualified;
+		return CLASS_PACKAGE + '.' + subClass.qualified;
 	}
 
 	@Override
@@ -530,8 +492,8 @@ public class REPLContext extends DyvilHeader implements IValueConsumer, IMemberC
 	}
 
 	@Override
-	public String getInternalName(Name name)
+	public String getInternalName(Name subClass)
 	{
-		return REPL$CLASSES + name.qualified;
+		return CLASS_PACKAGE + '/' + subClass.qualified;
 	}
 }

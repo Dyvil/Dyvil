@@ -5,10 +5,12 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.method.CodeMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
+import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
@@ -24,11 +26,31 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public final class CaseClassMetadata extends ClassMetadata
 {
-	protected IMethod applyMethod;
+	protected IMethod   applyMethod;
+	protected IMethod[] unapplyMethods;
 
 	public CaseClassMetadata(IClass iclass)
 	{
 		super(iclass);
+	}
+
+	@Override
+	public void resolveTypesPre(MarkerList markers, IContext context)
+	{
+		super.resolveTypesPre(markers, context);
+
+		final IParameterList parameters = this.theClass.getParameterList();
+		for (int i = 0, count = parameters.size(); i < count; i++)
+		{
+			final ClassParameter classParameter = (ClassParameter) parameters.get(i);
+			final IProperty property = classParameter.createProperty();
+			property.initGetter();
+
+			if (!classParameter.hasModifier(Modifiers.FINAL))
+			{
+				property.initSetter();
+			}
+		}
 	}
 
 	@Override
@@ -54,7 +76,7 @@ public final class CaseClassMetadata extends ClassMetadata
 
 		// Generate the apply method signature
 
-		final CodeMethod applyMethod = new CodeMethod(this.theClass, Names.apply, this.theClass.getType(),
+		final CodeMethod applyMethod = new CodeMethod(this.theClass, Names.apply, this.theClass.getThisType(),
 		                                              new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC));
 		applyMethod.setTypeParameters(this.theClass.getTypeParameters(), this.theClass.typeParameterCount());
 
@@ -98,7 +120,7 @@ public final class CaseClassMetadata extends ClassMetadata
 			                                                     this.applyMethod.getDescriptor(),
 			                                                     this.applyMethod.getSignature(), null));
 			mw.visitCode();
-			mw.visitTypeInsn(Opcodes.NEW, this.theClass.getType().getInternalName());
+			mw.visitTypeInsn(Opcodes.NEW, this.theClass.getInternalName());
 			mw.visitInsn(Opcodes.DUP);
 
 			final IParameterList parameterList = this.theClass.getParameterList();
@@ -110,7 +132,7 @@ public final class CaseClassMetadata extends ClassMetadata
 			}
 			this.constructor.writeInvoke(mw, 0);
 			mw.visitInsn(Opcodes.ARETURN);
-			mw.visitEnd(this.theClass.getType());
+			mw.visitEnd(this.theClass.getThisType());
 		}
 
 		String internal = this.theClass.getInternalName();

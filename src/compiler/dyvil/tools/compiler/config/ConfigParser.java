@@ -134,7 +134,8 @@ public final class ConfigParser
 			config.setLogFile(value);
 			return;
 		case "source_dir":
-			config.setSourceDir(value);
+		case "source_dirs":
+			config.addSourceDir(value);
 			return;
 		case "output_dir":
 			config.setOutputDir(value);

@@ -5,7 +5,7 @@ import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.collection.mutable.HashMap;
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.structure.ICompilationUnit;
+import dyvil.tools.compiler.ast.header.ICompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 
 import java.io.File;
@@ -28,7 +28,7 @@ public class FileFinder
 		{
 			this.processDirectory(compiler, source, output, pack);
 		}
-		else
+		else if (source.exists())
 		{
 			this.processFile(compiler, source, output, pack);
 		}
@@ -36,6 +36,7 @@ public class FileFinder
 	
 	private void processDirectory(DyvilCompiler compiler, File source, File output, Package pack)
 	{
+		//noinspection ConstantConditions
 		for (String fileName : source.list())
 		{
 			final File sourceFile = new File(source, fileName);
@@ -55,7 +56,7 @@ public class FileFinder
 	private void processFile(DyvilCompiler compiler, File source, File output, Package pack)
 	{
 		final String fileName = source.getPath();
-		if (!compiler.config.isExcluded(fileName))
+		if (!compiler.config.isIncluded(fileName))
 		{
 			return;
 		}
@@ -75,13 +76,6 @@ public class FileFinder
 			return; // Skip: Not a compilation unit
 		}
 		
-		if (unit.isHeader())
-		{
-			this.units.insert(0, unit);
-		}
-		else
-		{
-			this.units.add(unit);
-		}
+		this.units.add(unit);
 	}
 }

@@ -1,37 +1,32 @@
 package dyvil.string;
 
-import dyvil.annotation.Utility;
-import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation.internal.DyvilModifiers;
 import dyvil.reflect.Modifiers;
 
 /**
- * The {@linkplain Utility utility class} <b>StringVonersions</b> can be used for several String-conversions such as
+ * The <b>StringConversions</b> class can be used for several String-conversions such as
  * parsing {@code boolean}s, {@code int}s or {@code float}s or converting integers to roman numeral representations.
- *
- * @author Clashsoft
- * @version 1.0
  */
-@Utility(String.class)
 public final class StringConversions
 {
 	private static final String[] ROMANDIGIT  = { "M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV",
-			"I" };
+		"I" };
 	private static final int[]    ROMANNUMBER = { 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1 };
-	
+
 	private static final String[] ROMANCACHE = { "0", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI",
-			"XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX" };
+		"XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX" };
 
 	private StringConversions()
 	{
 		// no instances
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static boolean toBoolean(String s)
 	{
 		return s != null && s.equalsIgnoreCase("true");
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static byte toByte(String s)
 	{
@@ -44,7 +39,7 @@ public final class StringConversions
 			return 0;
 		}
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static byte toByte(String s, byte _default)
 	{
@@ -57,7 +52,7 @@ public final class StringConversions
 			return _default;
 		}
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static byte toByte(String s, byte _default, int radix)
 	{
@@ -70,7 +65,7 @@ public final class StringConversions
 			return _default;
 		}
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static short toShort(String s)
 	{
@@ -83,7 +78,7 @@ public final class StringConversions
 			return 0;
 		}
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static short toShort(String s, short _default)
 	{
@@ -96,7 +91,7 @@ public final class StringConversions
 			return _default;
 		}
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static short toShort(String s, short _default, int radix)
 	{
@@ -109,7 +104,7 @@ public final class StringConversions
 			return _default;
 		}
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static int toInt(String s)
 	{
@@ -122,7 +117,7 @@ public final class StringConversions
 			return 0;
 		}
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static int toInt(String s, int _default)
 	{
@@ -135,7 +130,7 @@ public final class StringConversions
 			return _default;
 		}
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static int toInt(String s, int _default, int radix)
 	{
@@ -148,7 +143,7 @@ public final class StringConversions
 			return _default;
 		}
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static long toLong(String s)
 	{
@@ -161,7 +156,7 @@ public final class StringConversions
 			return 0;
 		}
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static long toLong(String s, long _default)
 	{
@@ -174,7 +169,7 @@ public final class StringConversions
 			return _default;
 		}
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static long toLong(String s, long _default, int radix)
 	{
@@ -187,7 +182,7 @@ public final class StringConversions
 			return _default;
 		}
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static float toFloat(String s)
 	{
@@ -200,7 +195,7 @@ public final class StringConversions
 			return 0;
 		}
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static float toFloat(String s, float _default)
 	{
@@ -213,7 +208,7 @@ public final class StringConversions
 			return _default;
 		}
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static double toDouble(String s)
 	{
@@ -226,7 +221,7 @@ public final class StringConversions
 			return 0;
 		}
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static double toDouble(String s, double _default)
 	{
@@ -239,7 +234,7 @@ public final class StringConversions
 			return _default;
 		}
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static String toRomanString(int number)
 	{
@@ -253,12 +248,12 @@ public final class StringConversions
 		}
 		else if (number >= 4000)
 		{
-			throw new NumberFormatException(
-					"Invalid Roman Conversion: Value outside Roman numeral range: " + number + " >= 4000");
+			throw new NumberFormatException("Invalid Roman Conversion: Value outside Roman numeral range: " + number
+				                                + " >= 4000");
 		}
-		
+
 		StringBuilder builder = new StringBuilder();
-		
+
 		for (int i = 0; i < 13; i++)
 		{
 			while (number >= ROMANNUMBER[i])
@@ -269,7 +264,7 @@ public final class StringConversions
 		}
 		return builder.toString();
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static String toRomanString(long number)
 	{
@@ -283,12 +278,12 @@ public final class StringConversions
 		}
 		else if (number >= 4000L)
 		{
-			throw new NumberFormatException(
-					"Invalid Roman Conversion: Value outside Roman numeral range: " + number + " >= 4000");
+			throw new NumberFormatException("Invalid Roman Conversion: Value outside Roman numeral range: " + number
+				                                + " >= 4000");
 		}
-		
+
 		StringBuilder builder = new StringBuilder();
-		
+
 		for (int i = 0; i < 13; i++)
 		{
 			while (number >= ROMANNUMBER[i])

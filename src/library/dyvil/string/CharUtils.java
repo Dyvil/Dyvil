@@ -1,58 +1,56 @@
 package dyvil.string;
 
-import dyvil.annotation.Utility;
-import dyvil.annotation._internal.DyvilModifiers;
+import dyvil.annotation.internal.DyvilModifiers;
 import dyvil.reflect.Modifiers;
 
 import java.util.Random;
 
 /**
- * The {@linkplain Utility utility class} <b>CharUtils</b> can be used for several character-related functions such as
+ * The <b>CharUtils</b> class can be used for several character-related functions such as
  * checking if a character is a letter, a digit or a whitespace, converting it to upper- or lowercase, generating a
  * random letter, consonant or vowel among others.
  *
  * @author Clashsoft
  * @version 1.0
  */
-@Utility(char.class)
 public final class CharUtils
 {
 	private static final char[] LOWER_ALPHABET = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-			'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
+		'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
 	private static final char[] UPPER_ALPHABET = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-			'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
+		'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
 	private static final char[] LOWER_VOWELS   = { 'a', 'e', 'i', 'o', 'u' };
 	private static final char[] UPPER_VOWELS   = { 'A', 'E', 'I', 'O', 'U' };
-	
+
 	private static final char[] LOWER_CONSONANTS = { 'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q',
-			'r', 's', 't', 'v', 'w', 'x', 'y', 'z' };
-	
+		'r', 's', 't', 'v', 'w', 'x', 'y', 'z' };
+
 	private static final char[] UPPER_CONSONANTS = { 'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q',
-			'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z' };
-	
+		'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z' };
+
 	private static final String[] CONSONANTS = { "bl", "br", "bs", "by", "ch", "ck", "cl", "cr", "ct", "db", "dl", "dn",
-			"dr", "ds", "dt", "dy", "fl", "fr", "ft", "gh", "gl", "gn", "gr", "gs", "hd", "hl", "hr", "ht", "hy", "kl",
-			"kn", "ks", "lc", "ld", "lf", "lk", "ls", "lt", "ly", "mb", "mn", "mp", "ms", "nc", "nd", "ng", "nk", "nl",
-			"ns", "nt", "ny", "ph", "pl", "pr", "ps", "rb", "rc", "rd", "rf", "rh", "rk", "rm", "rn", "rp", "rs", "rt",
-			"rw", "ry", "sh", "sk", "sl", "sn", "sp", "st", "tc", "th", "tl", "tm", "tr", "ts", "tw", "ty", "wh", "wl",
-			"wn", "wt", "xc", "xp", "yh", "yn", "ys", "yt" };
+		"dr", "ds", "dt", "dy", "fl", "fr", "ft", "gh", "gl", "gn", "gr", "gs", "hd", "hl", "hr", "ht", "hy", "kl",
+		"kn", "ks", "lc", "ld", "lf", "lk", "ls", "lt", "ly", "mb", "mn", "mp", "ms", "nc", "nd", "ng", "nk", "nl",
+		"ns", "nt", "ny", "ph", "pl", "pr", "ps", "rb", "rc", "rd", "rf", "rh", "rk", "rm", "rn", "rp", "rs", "rt",
+		"rw", "ry", "sh", "sk", "sl", "sn", "sp", "st", "tc", "th", "tl", "tm", "tr", "ts", "tw", "ty", "wh", "wl",
+		"wn", "wt", "xc", "xp", "yh", "yn", "ys", "yt" };
 
 	private CharUtils()
 	{
 		// no instances
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static boolean isAsciiDigit(char c)
 	{
 		return c >= '0' && c <= '9';
 	}
-	
+
 	/**
 	 * Returns true if the given {@code char c} is a digit (0-9)
 	 *
 	 * @param c
-	 * 		the character
+	 * 	the character
 	 *
 	 * @return true, if the character is a digit
 	 *
@@ -67,18 +65,18 @@ public final class CharUtils
 		}
 		return Character.isDigit((int) c);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static boolean isAsciiLetter(char c)
 	{
 		return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
 	}
-	
+
 	/**
 	 * Returns true if the given {@code char c} is a letter (a-zA-Z)
 	 *
 	 * @param c
-	 * 		the character
+	 * 	the character
 	 *
 	 * @return true, if the character is a letter
 	 *
@@ -93,14 +91,14 @@ public final class CharUtils
 		}
 		return Character.isLetter((int) c);
 	}
-	
+
 	/**
 	 * Returns true if the given {@code char c} is an identifier character, i.e. a letter (as defined by {@link
 	 * #isLetter(char) isLetter}), a digit (as defined by {@link #isDigit(char) isDigit}), the currency symbol '$' or
 	 * the underscore '_'.
 	 *
 	 * @param c
-	 * 		the character
+	 * 	the character
 	 *
 	 * @return true, if the character is an identifier character
 	 */
@@ -109,12 +107,12 @@ public final class CharUtils
 	{
 		return isLetter(c) || isDigit(c) || c == '$' || c == '_';
 	}
-	
+
 	/**
 	 * Returns true if the given {@code char c} is a whitespace character.
 	 *
 	 * @param c
-	 * 		the character
+	 * 	the character
 	 *
 	 * @return true, if the character is a whitespace character
 	 *
@@ -129,12 +127,12 @@ public final class CharUtils
 		}
 		return Character.isWhitespace((int) c);
 	}
-	
+
 	/**
 	 * Returns true if the given {@code char c} is a lowercase character.
 	 *
 	 * @param c
-	 * 		the character
+	 * 	the character
 	 *
 	 * @return true, if the character is a lowercase character
 	 *
@@ -149,12 +147,12 @@ public final class CharUtils
 		}
 		return Character.isLowerCase(c);
 	}
-	
+
 	/**
 	 * Returns true if the given {@code char c} is an uppercase character.
 	 *
 	 * @param c
-	 * 		the character
+	 * 	the character
 	 *
 	 * @return true, if the character is an uppercase character
 	 *
@@ -169,12 +167,12 @@ public final class CharUtils
 		}
 		return Character.isUpperCase(c);
 	}
-	
+
 	/**
 	 * Returns the lowercase representation of the given {@code char c}.
 	 *
 	 * @param c
-	 * 		the character
+	 * 	the character
 	 *
 	 * @return the lowercase representation
 	 *
@@ -193,12 +191,12 @@ public final class CharUtils
 		}
 		return (char) Character.toLowerCase((int) c);
 	}
-	
+
 	/**
 	 * Returns the uppercase representation of the given {@code char c}.
 	 *
 	 * @param c
-	 * 		the character
+	 * 	the character
 	 *
 	 * @return the uppercase representation
 	 *
@@ -217,7 +215,7 @@ public final class CharUtils
 		}
 		return (char) Character.toUpperCase((int) c);
 	}
-	
+
 	/**
 	 * Returns the inverted case representation of the given {@code char c}. That is, if {@code c} is an uppercase
 	 * character as defined by {@link #isUpperCase(char) isUpperCase} , the lowercase representation (as defined by
@@ -225,7 +223,7 @@ public final class CharUtils
 	 * #toUpperCase(char) toUpperCase}) otherwise.
 	 *
 	 * @param c
-	 * 		the character
+	 * 	the character
 	 *
 	 * @return the inverted case representation
 	 *
@@ -252,12 +250,12 @@ public final class CharUtils
 		int ch = c;
 		return (char) (Character.isUpperCase(ch) ? Character.toLowerCase(ch) : Character.toUpperCase(ch));
 	}
-	
+
 	/**
 	 * Returns true if the given {@code char c} is a vowel.
 	 *
 	 * @param c
-	 * 		the character
+	 * 	the character
 	 *
 	 * @return true, if the character is a vowel
 	 */
@@ -271,12 +269,12 @@ public final class CharUtils
 		}
 		return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u';
 	}
-	
+
 	/**
 	 * Returns true if the given {@code char c} is a consonant.
 	 *
 	 * @param c
-	 * 		the character
+	 * 	the character
 	 *
 	 * @return true, if the character is a consonant
 	 */
@@ -290,12 +288,12 @@ public final class CharUtils
 		}
 		return c > 'a' && c <= 'z' && c != 'e' && c != 'i' && c != 'o' && c != 'u';
 	}
-	
+
 	/**
 	 * Returns a random lowercase letter using the given {@link Random} {@code random}.
 	 *
 	 * @param random
-	 * 		the random number generator
+	 * 	the random number generator
 	 *
 	 * @return the random letter
 	 */
@@ -304,12 +302,12 @@ public final class CharUtils
 	{
 		return LOWER_ALPHABET[random.nextInt(26)];
 	}
-	
+
 	/**
 	 * Returns a random lowercase letter using the given {@link Random} {@code random}.
 	 *
 	 * @param random
-	 * 		the random number generator
+	 * 	the random number generator
 	 *
 	 * @return the random letter
 	 */
@@ -318,12 +316,12 @@ public final class CharUtils
 	{
 		return UPPER_ALPHABET[random.nextInt(26)];
 	}
-	
+
 	/**
 	 * Returns a random lowercase vowel using the given {@link Random} {@code random}.
 	 *
 	 * @param random
-	 * 		the random number generator
+	 * 	the random number generator
 	 *
 	 * @return the random vowel
 	 */
@@ -332,12 +330,12 @@ public final class CharUtils
 	{
 		return LOWER_VOWELS[random.nextInt(5)];
 	}
-	
+
 	/**
 	 * Returns a random uppercase vowel using the given {@link Random} {@code random}.
 	 *
 	 * @param random
-	 * 		the random number generator
+	 * 	the random number generator
 	 *
 	 * @return the random vowel
 	 */
@@ -346,12 +344,12 @@ public final class CharUtils
 	{
 		return UPPER_VOWELS[random.nextInt(5)];
 	}
-	
+
 	/**
 	 * Returns a random lowercase consonant using the given {@link Random} {@code random}.
 	 *
 	 * @param random
-	 * 		the random number generator
+	 * 	the random number generator
 	 *
 	 * @return the random consonant
 	 */
@@ -360,12 +358,12 @@ public final class CharUtils
 	{
 		return LOWER_CONSONANTS[random.nextInt(21)];
 	}
-	
+
 	/**
 	 * Returns a random uppercase consonant using the given {@link Random} {@code random}.
 	 *
 	 * @param random
-	 * 		the random number generator
+	 * 	the random number generator
 	 *
 	 * @return the random consonant
 	 */
@@ -374,7 +372,7 @@ public final class CharUtils
 	{
 		return UPPER_CONSONANTS[random.nextInt(21)];
 	}
-	
+
 	static boolean isCombinable(char c1, char c2)
 	{
 		if (c1 > 256 || c2 > 256)
@@ -385,7 +383,7 @@ public final class CharUtils
 		{
 			return true;
 		}
-		
+
 		c1 = toLowerCase(c1);
 		c2 = toLowerCase(c2);
 		for (String s : CONSONANTS)
@@ -395,7 +393,7 @@ public final class CharUtils
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 }

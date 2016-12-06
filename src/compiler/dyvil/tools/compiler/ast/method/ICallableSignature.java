@@ -5,4 +5,8 @@ import dyvil.tools.compiler.ast.type.ITyped;
 
 public interface ICallableSignature extends ITyped, IParametric, IExceptionList
 {
+	default int getOverloadPriority()
+	{
+		return 0;
+	}
 }

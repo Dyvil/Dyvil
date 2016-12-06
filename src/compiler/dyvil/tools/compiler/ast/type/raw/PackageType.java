@@ -110,6 +110,12 @@ public class PackageType implements IRawType
 	}
 
 	@Override
+	public void appendDescriptor(StringBuilder buffer, int type)
+	{
+		buffer.append('L').append(this.getInternalName()).append(';');
+	}
+
+	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		writer.visitLdcInsn(this.thePackage.getInternalName());

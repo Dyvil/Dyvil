@@ -3,7 +3,8 @@ package dyvil.tools.compiler.ast.expression;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -81,24 +82,23 @@ public final class SuperExpr implements IValue
 			return;
 		}
 
-		final IClass enclosingClass = context.getThisClass();
-		final IType enclosingType = enclosingClass.getType();
-		if (this.type == Types.UNKNOWN)
+		if (this.type != Types.UNKNOWN)
 		{
-			final IType superType = enclosingClass.getSuperType();
-			if (superType == null)
-			{
-				Marker marker = Markers.semantic(this.position, "super.access.type");
-				marker.addInfo(Markers.getSemantic("type.enclosing", enclosingType));
-				markers.add(marker);
-				return;
-			}
-
-			this.type = superType;
+			this.type = this.type.resolveType(markers, context);
 			return;
 		}
 
-		this.type = this.type.resolveType(markers, context);
+		final IClass enclosingClass = context.getThisClass();
+		final IType superType = enclosingClass.getSuperType();
+		if (superType == null)
+		{
+			final Marker marker = Markers.semantic(this.position, "super.access.type");
+			marker.addInfo(Markers.getSemantic("type.enclosing", enclosingClass.getClassType()));
+			markers.add(marker);
+			return;
+		}
+
+		this.type = superType;
 	}
 
 	@Override
@@ -189,9 +189,9 @@ public final class SuperExpr implements IValue
 	}
 
 	@Override
-	public IValue cleanup(IContext context, IClassCompilableList compilableList)
+	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.type.cleanup(context, compilableList);
+		this.type.cleanup(compilableList, classCompilableList);
 		return this;
 	}
 

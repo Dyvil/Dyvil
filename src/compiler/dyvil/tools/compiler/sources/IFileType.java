@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.sources;
 
 import dyvil.tools.compiler.DyvilCompiler;
-import dyvil.tools.compiler.ast.structure.ICompilationUnit;
+import dyvil.tools.compiler.ast.header.ICompilationUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 
 import java.io.File;
