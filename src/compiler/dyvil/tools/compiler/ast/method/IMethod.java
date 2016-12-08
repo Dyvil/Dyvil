@@ -83,15 +83,15 @@ public interface IMethod extends IClassMember, ICallableMember, ICallableSignatu
 	
 	String[] getInternalExceptions();
 	
-	void writeCall(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, IType targetType, int lineNumber)
+	void writeCall(MethodWriter writer, IValue receiver, IArguments arguments, ITypeContext typeContext, IType targetType, int lineNumber)
 			throws BytecodeException;
 	
-	void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
+	void writeInvoke(MethodWriter writer, IValue receiver, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException;
 	
-	void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
+	void writeJump(MethodWriter writer, Label dest, IValue receiver, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException;
 	
-	void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
+	void writeInvJump(MethodWriter writer, Label dest, IValue receiver, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException;
 }

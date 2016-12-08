@@ -220,24 +220,8 @@ public class IntersectionType implements IObjectType
 			// either type is void -> result void
 			return Types.VOID;
 		}
-		if (left.isArrayType())
-		{
-			if (!right.isArrayType())
-			{
-				return Types.ANY;
-			}
-			return arrayElementCombine(left.getElementType(), right.getElementType());
-		}
-		if (right.isArrayType())
-		{
-			if (!left.isArrayType())
-			{
-				return Types.ANY;
-			}
-			return arrayElementCombine(left.getElementType(), right.getElementType());
-		}
 
-		if (left.getTypeVariable() == null)
+		if (!left.hasTag(IType.TYPE_VAR))
 		{
 			IClass leftClass = left.getTheClass();
 			if (leftClass == null)
@@ -252,7 +236,7 @@ public class IntersectionType implements IObjectType
 			}
 		}
 
-		if (right.getTypeVariable() == null)
+		if (!right.hasTag(IType.TYPE_VAR))
 		{
 			final IClass rightClass = right.getTheClass();
 			if (rightClass == null)

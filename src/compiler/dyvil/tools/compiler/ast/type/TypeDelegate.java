@@ -11,7 +11,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -58,9 +57,25 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
-	public ITypeParameter getTypeVariable()
+	public boolean hasTag(int tag)
 	{
-		return this.type.getTypeVariable();
+		return IType.super.hasTag(tag) || this.type.hasTag(tag);
+	}
+
+	@Override
+	public boolean canExtract(Class<? extends IType> type)
+	{
+		return IType.super.canExtract(type) || this.type.canExtract(type);
+	}
+
+	@Override
+	public <T extends IType> T extract(Class<T> type)
+	{
+		if (IType.super.canExtract(type))
+		{
+			return (T) this;
+		}
+		return this.type.extract(type);
 	}
 
 	@Override
@@ -132,45 +147,9 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
-	public boolean isArrayType()
-	{
-		return this.type.isArrayType();
-	}
-
-	@Override
-	public int getArrayDimensions()
-	{
-		return this.type.getArrayDimensions();
-	}
-
-	@Override
-	public IType getElementType()
-	{
-		return this.type.getElementType();
-	}
-
-	@Override
 	public IClass getArrayClass()
 	{
 		return this.type.getArrayClass();
-	}
-
-	@Override
-	public boolean isExtension()
-	{
-		return this.type.isExtension();
-	}
-
-	@Override
-	public void setExtension(boolean extension)
-	{
-		this.type.setExtension(extension);
-	}
-
-	@Override
-	public Variance getVariance()
-	{
-		return this.type.getVariance();
 	}
 
 	@Override
@@ -221,9 +200,9 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
-	public boolean isSuperTypeOf(IType type)
+	public boolean isSuperTypeOf(IType subType)
 	{
-		return this.type.isSuperTypeOf(type);
+		return this.type.isSuperTypeOf(subType);
 	}
 
 	@Override

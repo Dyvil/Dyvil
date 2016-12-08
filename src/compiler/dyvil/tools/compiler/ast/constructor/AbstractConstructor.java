@@ -293,7 +293,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 			final ITypeParameter typeParameter = theClass.getTypeParameter(i);
 			final IType typeArgument = genericData.resolveType(typeParameter);
 
-			if (typeArgument == null || typeArgument.getTypeVariable() == typeParameter)
+			if (typeArgument == null)
 			{
 				final IType inferredType = typeParameter.getUpperBound();
 				markers.add(Markers.semantic(position, "constructor.typevar.infer", theClass.getName(),

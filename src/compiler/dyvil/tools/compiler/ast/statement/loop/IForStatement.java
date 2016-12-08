@@ -21,5 +21,5 @@ public interface IForStatement extends IStatement, ILoop
 	IValue getAction();
 
 	@Override
-	void setAction(IValue value);
+	void setAction(IValue action);
 }

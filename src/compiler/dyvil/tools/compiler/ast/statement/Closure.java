@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.LambdaType;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -70,7 +71,8 @@ public class Closure extends StatementList
 			parameters[i] = new CodeParameter(this.position, Name.fromRaw("$" + i), Types.UNKNOWN);
 		}
 
-		if (type.isExtension() && parameterCount > 0)
+		final LambdaType functionType = type.extract(LambdaType.class);
+		if (functionType.isExtension() && parameterCount > 0)
 		{
 			this.implicitValue = new FieldAccess(parameters[0]);
 		}

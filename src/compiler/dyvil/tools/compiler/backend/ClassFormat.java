@@ -390,7 +390,7 @@ public final class ClassFormat
 		case '[': // array
 		{
 			final ArrayType arrayType = new ArrayType();
-			final int end = readTyped(desc, start + 1, arrayType);
+			final int end = readTyped(desc, start + 1, arrayType::setElementType);
 			consumer.setType(arrayType);
 			return end;
 		}

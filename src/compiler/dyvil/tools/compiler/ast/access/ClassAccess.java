@@ -124,8 +124,7 @@ public final class ClassAccess implements IValue
 
 		if (!this.type.isResolved())
 		{
-			markers.add(Markers.semantic(this.position, this.type.isArrayType() ? "resolve.type" : "resolve.any",
-			                             this.type.toString()));
+			markers.add(Markers.semanticError(this.position, "resolve.type", this.type));
 		}
 	}
 

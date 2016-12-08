@@ -9,12 +9,13 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.statement.control.Label;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -226,13 +227,14 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 				return rangeForStatement;
 			}
 		}
-		if (valueType.isArrayType())
+		final ArrayType arrayType = valueType.extract(ArrayType.class);
+		if (arrayType != null)
 		{
 			if (varType == Types.UNKNOWN)
 			{
-				this.inferVariableType(markers, valueType.getElementType());
+				this.inferVariableType(markers, arrayType.getElementType());
 			}
-			else if (!Types.isSuperType(varType, valueType.getElementType()))
+			else if (!Types.isSuperType(varType, arrayType.getElementType()))
 			{
 				final Marker marker = Markers.semantic(value.getPosition(), "for.array.type");
 				marker.addInfo(Markers.getSemantic("array.type", valueType));
@@ -240,7 +242,7 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 				markers.add(marker);
 			}
 
-			final ArrayForStatement arrayForStatement = new ArrayForStatement(this.position, this.variable, valueType);
+			final ArrayForStatement arrayForStatement = new ArrayForStatement(this.position, this.variable, arrayType);
 			arrayForStatement.resolveAction(this.action, markers, context);
 			return arrayForStatement;
 		}

@@ -14,6 +14,10 @@ import dyvil.tools.parsing.Name;
 
 public class ImplicitNullableType extends NullableType
 {
+	public ImplicitNullableType()
+	{
+	}
+
 	public ImplicitNullableType(IType type)
 	{
 		this.type = type;
@@ -40,31 +44,22 @@ public class ImplicitNullableType extends NullableType
 	@Override
 	public boolean isSameType(IType type)
 	{
-		if (type.isNullable())
-		{
-			return Types.isSameType(this.type, type.getElementType());
-		}
-		return Types.isSameType(this.type, type);
+		final NullableType nullable = type.extract(NullableType.class);
+		return Types.isSameType(this.type, nullable != null ? nullable.getElementType() : type);
 	}
 
 	@Override
 	public boolean isSubTypeOf(IType superType)
 	{
-		if (superType.isNullable())
-		{
-			return Types.isSuperType(superType.getElementType(), this.type);
-		}
-		return Types.isSuperType(superType, this.type);
+		final NullableType nullable = superType.extract(NullableType.class);
+		return Types.isSuperType(nullable != null ? nullable.getElementType() : superType, this.type);
 	}
 
 	@Override
-	public boolean isSuperTypeOf(IType type)
+	public boolean isSuperTypeOf(IType subType)
 	{
-		if (type.isNullable())
-		{
-			return Types.isSuperType(this.type, type.getElementType());
-		}
-		return Types.isSuperType(this.type, type);
+		final NullableType nullable = subType.extract(NullableType.class);
+		return Types.isSuperType(this.type, nullable != null ? nullable.getElementType() : subType);
 	}
 
 	@Override

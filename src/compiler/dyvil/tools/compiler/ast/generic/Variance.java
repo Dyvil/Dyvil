@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.generic;
 
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.WildcardType;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -58,23 +59,24 @@ public enum Variance
 			}
 		};
 
-	public abstract boolean checkCompatible(IType type1, IType type2);
+	public abstract boolean checkCompatible(IType a, IType b);
 
-	public static boolean checkCompatible(Variance base, IType type1, IType type2)
+	public static boolean checkCompatible(Variance base, IType a, IType b)
 	{
-		Variance variance = type1.getVariance();
-		if (variance != null && variance.checkCompatible(type1, type2))
+		final WildcardType wildcard1 = a.extract(WildcardType.class);
+
+		if (wildcard1 != null && wildcard1.getVariance().checkCompatible(a, b))
 		{
 			return true;
 		}
 
-		variance = type2.getVariance();
-		if (variance != null && variance.checkCompatible(type2, type1))
+		final WildcardType wildcard2 = b.extract(WildcardType.class);
+		if (wildcard2 != null && wildcard2.getVariance().checkCompatible(b, a))
 		{
 			return true;
 		}
 		//
-		return base.checkCompatible(type1, type2);
+		return base.checkCompatible(a, b);
 	}
 
 	public static void write(Variance variance, DataOutput out) throws IOException

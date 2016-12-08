@@ -84,26 +84,25 @@ public final class WildcardType implements IRawType, ITyped
 	}
 
 	@Override
-	public void setType(IType type)
-	{
-		this.bound = type;
-	}
-
-	@Override
 	public IType getType()
 	{
 		return this.bound;
 	}
 
-	public void setVariance(Variance variance)
+	@Override
+	public void setType(IType type)
 	{
-		this.variance = variance;
+		this.bound = type;
 	}
 
-	@Override
 	public Variance getVariance()
 	{
 		return this.variance;
+	}
+
+	public void setVariance(Variance variance)
+	{
+		this.variance = variance;
 	}
 
 	@Override

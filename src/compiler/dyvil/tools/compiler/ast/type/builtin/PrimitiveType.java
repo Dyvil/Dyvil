@@ -186,12 +186,6 @@ public final class PrimitiveType implements IType
 	}
 
 	@Override
-	public ITypeParameter getTypeVariable()
-	{
-		return null;
-	}
-
-	@Override
 	public final IType getObjectType()
 	{
 		return new ClassType(this.wrapperClass);
@@ -251,35 +245,6 @@ public final class PrimitiveType implements IType
 	public IMethod getUnboxMethod()
 	{
 		return this.unboxMethod;
-	}
-
-	@Override
-	public boolean isArrayType()
-	{
-		return false;
-	}
-
-	@Override
-	public int getArrayDimensions()
-	{
-		return 0;
-	}
-
-	@Override
-	public IType getElementType()
-	{
-		return null;
-	}
-
-	@Override
-	public boolean isExtension()
-	{
-		return false;
-	}
-
-	@Override
-	public void setExtension(boolean extension)
-	{
 	}
 
 	@Override

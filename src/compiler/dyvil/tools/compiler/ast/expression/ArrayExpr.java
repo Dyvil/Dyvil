@@ -204,7 +204,7 @@ public final class ArrayExpr implements IValue, IValueList
 	public void setType(IType type)
 	{
 		this.arrayType = type;
-		this.elementType = type.getElementType();
+		this.elementType = type.extract(ArrayType.class).getElementType();
 	}
 
 	@Override
@@ -228,19 +228,21 @@ public final class ArrayExpr implements IValue, IValueList
 	}
 
 	@Override
-	public IValue withType(IType arrayType, ITypeContext typeContext, MarkerList markers, IContext context)
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		final IType elementType;
 		final Mutability mutability;
-		if (!arrayType.isArrayType())
+
+		final ArrayType arrayType = type.extract(ArrayType.class);
+		if (arrayType == null)
 		{
 			final IAnnotation annotation;
-			if ((annotation = arrayType.getAnnotation(LazyFields.ARRAY_CONVERTIBLE)) != null)
+			if ((annotation = type.getAnnotation(LazyFields.ARRAY_CONVERTIBLE)) != null)
 			{
 				return new LiteralConversion(this, annotation, new ArgumentList(this.values, this.valueCount))
-					       .withType(arrayType, typeContext, markers, context);
+					       .withType(type, typeContext, markers, context);
 			}
-			if (arrayType.getTheClass() != Types.OBJECT_CLASS)
+			if (type.getTheClass() != Types.OBJECT_CLASS)
 			{
 				return null;
 			}
@@ -254,7 +256,7 @@ public final class ArrayExpr implements IValue, IValueList
 			// If the type is an array type, get it's element type
 
 			elementType = arrayType.getElementType();
-			mutability = arrayType.getMutability();
+			mutability = type.getMutability();
 		}
 
 		if (this.valueCount == 0)
@@ -293,7 +295,8 @@ public final class ArrayExpr implements IValue, IValueList
 	@Override
 	public boolean isType(IType type)
 	{
-		if (!type.isArrayType())
+		final ArrayType arrayType = type.extract(ArrayType.class);
+		if (arrayType == null)
 		{
 			return type.getTheClass() == Types.OBJECT_CLASS || type.getAnnotation(LazyFields.ARRAY_CONVERTIBLE) != null;
 		}
@@ -305,7 +308,7 @@ public final class ArrayExpr implements IValue, IValueList
 		}
 
 		// If the type is an array type, get it's element type
-		final IType elementType = type.getElementType();
+		final IType elementType = arrayType.getElementType();
 
 		// Check for every value if it is the element type
 		for (int i = 0; i < this.valueCount; i++)
@@ -323,7 +326,8 @@ public final class ArrayExpr implements IValue, IValueList
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		if (!type.isArrayType())
+		final ArrayType arrayType = type.extract(ArrayType.class);
+		if (arrayType == null)
 		{
 			if (type.getTheClass() == Types.OBJECT_CLASS)
 			{
@@ -343,7 +347,7 @@ public final class ArrayExpr implements IValue, IValueList
 		}
 
 		// If the type is an array type, get it's element type
-		final IType elementType = type.getElementType();
+		final IType elementType = arrayType.getElementType();
 
 		int min = Integer.MAX_VALUE;
 		for (int i = 0; i < this.valueCount; i++)

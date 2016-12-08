@@ -12,10 +12,11 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.raw.IObjectType;
@@ -37,6 +38,16 @@ public class NullableType implements IObjectType
 	}
 
 	public NullableType(IType type)
+	{
+		this.type = type;
+	}
+
+	public IType getElementType()
+	{
+		return this.type;
+	}
+
+	public void setElementType(IType type)
 	{
 		this.type = type;
 	}
@@ -72,18 +83,6 @@ public class NullableType implements IObjectType
 	}
 
 	@Override
-	public boolean isNullable()
-	{
-		return true;
-	}
-
-	@Override
-	public IType getElementType()
-	{
-		return this.type;
-	}
-
-	@Override
 	public int subTypeCheckLevel()
 	{
 		return SUBTYPE_NULLABLE;
@@ -92,7 +91,8 @@ public class NullableType implements IObjectType
 	@Override
 	public boolean isSubTypeOf(IType superType)
 	{
-		return superType.isNullable() && Types.isSuperType(superType, this.type);
+		final NullableType nullable = superType.extract(NullableType.class);
+		return nullable != null && Types.isSuperType(nullable.getElementType(), this.type);
 	}
 
 	@Override
@@ -102,9 +102,10 @@ public class NullableType implements IObjectType
 	}
 
 	@Override
-	public boolean isSuperTypeOf(IType type)
+	public boolean isSuperTypeOf(IType subType)
 	{
-		return type.isNullable() && Types.isSuperType(this.type, type.getElementType());
+		final NullableType nullable = subType.extract(NullableType.class);
+		return nullable != null && Types.isSuperType(this.type, nullable.getElementType());
 	}
 
 	@Override
@@ -116,10 +117,6 @@ public class NullableType implements IObjectType
 	@Override
 	public IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (value.getType().isNullable())
-		{
-			return value.withType(this, typeContext, markers, context);
-		}
 		return this.type.convertValue(value, typeContext, markers, context);
 	}
 
@@ -164,9 +161,10 @@ public class NullableType implements IObjectType
 	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
-		if (concrete.isNullable())
+		final NullableType nullable = concrete.extract(NullableType.class);
+		if (nullable != null)
 		{
-			concrete = concrete.getElementType();
+			concrete = nullable.getElementType();
 		}
 		this.type.inferTypes(concrete, typeContext);
 	}
@@ -191,7 +189,7 @@ public class NullableType implements IObjectType
 	}
 
 	@Override
-	public void checkType(MarkerList markers, IContext context, TypePosition position)
+	public void checkType(MarkerList markers, IContext context, int position)
 	{
 		this.type.checkType(markers, context, position);
 	}
@@ -209,9 +207,9 @@ public class NullableType implements IObjectType
 	}
 
 	@Override
-	public void cleanup(IContext context, IClassCompilableList compilableList)
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.type.cleanup(context, compilableList);
+		this.type.cleanup(compilableList, classCompilableList);
 	}
 
 	@Override
@@ -248,9 +246,16 @@ public class NullableType implements IObjectType
 	}
 
 	@Override
-	public void appendSignature(StringBuilder buffer, boolean genericArg)
+	public void appendDescriptor(StringBuilder buffer, int type)
 	{
-		this.type.appendSignature(buffer, genericArg);
+		if (type == NAME_FULL)
+		{
+			buffer.append('?');
+			this.type.appendDescriptor(buffer, NAME_FULL);
+			return;
+		}
+
+		this.type.appendDescriptor(buffer, type);
 	}
 
 	@Override
