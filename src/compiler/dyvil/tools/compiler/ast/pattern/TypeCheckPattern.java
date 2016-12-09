@@ -117,21 +117,33 @@ public class TypeCheckPattern implements IPattern
 	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
 		throws BytecodeException
 	{
-		varIndex = IPattern.ensureVar(writer, varIndex, matchedType);
-
-		if (!this.fromType.isPrimitive())
+		if (this.fromType.isPrimitive())
 		{
+			if (this.pattern.getPatternType() == WILDCARD)
+			{
+				return;
+			}
+
+			IPattern.loadVar(writer, varIndex, matchedType);
+		}
+		else
+		{
+			varIndex = IPattern.ensureVar(writer, varIndex, matchedType);
+
 			writer.visitVarInsn(Opcodes.ALOAD, varIndex);
 			writer.visitTypeInsn(Opcodes.INSTANCEOF, this.type.getInternalName());
 			writer.visitJumpInsn(Opcodes.IFEQ, elseLabel);
+
+			if (this.pattern.getPatternType() == WILDCARD)
+			{
+				return;
+			}
+
+			writer.visitVarInsn(Opcodes.ALOAD, varIndex);
 		}
 
-		if (this.pattern.getPatternType() != WILDCARD)
-		{
-			writer.visitVarInsn(Opcodes.ALOAD, varIndex);
-			this.fromType.writeCast(writer, this.type, this.getLineNumber());
-			this.pattern.writeInvJump(writer, -1, this.type, elseLabel);
-		}
+		this.fromType.writeCast(writer, this.type, this.getLineNumber());
+		this.pattern.writeInvJump(writer, -1, this.type, elseLabel);
 	}
 
 	@Override
