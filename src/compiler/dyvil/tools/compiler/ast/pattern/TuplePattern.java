@@ -67,8 +67,14 @@ public final class TuplePattern extends Pattern implements IPatternList
 	@Override
 	public IPattern withType(IType type, MarkerList markers)
 	{
-		IClass tupleClass = TupleType.getTupleClass(this.patternCount);
-		if (tupleClass == null || !tupleClass.isSubClassOf(type))
+		final IClass tupleClass = TupleType.getTupleClass(this.patternCount);
+		if (tupleClass == null)
+		{
+			return null;
+		}
+
+		final IType tupleType = tupleClass.getClassType();
+		if (!Types.isSuperClass(type, tupleType))
 		{
 			return null;
 		}
@@ -76,20 +82,26 @@ public final class TuplePattern extends Pattern implements IPatternList
 		this.tupleType = type;
 		for (int i = 0; i < this.patternCount; i++)
 		{
-			IType elementType = Types.resolveTypeSafely(type, tupleClass.getTypeParameter(i));
-			IPattern pattern = this.patterns[i];
-			IPattern typedPattern = pattern.withType(elementType, markers);
+			final IType elementType = Types.resolveTypeSafely(type, tupleClass.getTypeParameter(i));
+			final IPattern pattern = this.patterns[i];
+			final IPattern typedPattern = pattern.withType(elementType, markers);
+
 			if (typedPattern == null)
 			{
-				Marker m = Markers.semantic(pattern.getPosition(), "pattern.tuple.element.type");
-				m.addInfo(Markers.getSemantic("pattern.type", pattern.getType()));
-				m.addInfo(Markers.getSemantic("tuple.element.type", elementType));
-				markers.add(m);
+				final Marker marker = Markers.semanticError(pattern.getPosition(), "pattern.tuple.element.type");
+				marker.addInfo(Markers.getSemantic("pattern.type", pattern.getType()));
+				marker.addInfo(Markers.getSemantic("tuple.element.type", elementType));
+				markers.add(marker);
 			}
 			else
 			{
 				this.patterns[i] = typedPattern;
 			}
+		}
+
+		if (!Types.isSuperClass(tupleType, type))
+		{
+			return new TypeCheckPattern(this, type, tupleType);
 		}
 		return this;
 	}
@@ -181,7 +193,6 @@ public final class TuplePattern extends Pattern implements IPatternList
 			}
 
 			writer.visitVarInsn(Opcodes.ALOAD, varIndex);
-			matchedType.writeCast(writer, this.tupleType, lineNumber);
 			writer.visitFieldInsn(Opcodes.GETFIELD, internalTupleClassName, "_" + (i + 1), "Ljava/lang/Object;");
 			final IType targetType = Types.resolveTypeSafely(this.tupleType, tupleClass.getTypeParameter(i));
 

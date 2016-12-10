@@ -93,7 +93,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 		final int paramCount = parameters.size();
 		if (this.patternCount != paramCount)
 		{
-			final Marker marker = Markers.semantic(this.position, "pattern.class.count", this.type.toString());
+			final Marker marker = Markers.semanticError(this.position, "pattern.class.count", this.type.toString());
 			marker.addInfo(Markers.getSemantic("pattern.class.count.pattern", this.patternCount));
 			marker.addInfo(Markers.getSemantic("pattern.class.count.class", paramCount));
 			markers.add(marker);
@@ -119,7 +119,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 
 			if (typedPattern == null)
 			{
-				final Marker marker = Markers.semantic(this.position, "pattern.class.type", param.getName());
+				final Marker marker = Markers.semanticError(this.position, "pattern.class.type", param.getName());
 				marker.addInfo(Markers.getSemantic("pattern.type", pattern.getType()));
 				marker.addInfo(Markers.getSemantic("classparameter.type", paramType));
 				markers.add(marker);
@@ -130,15 +130,16 @@ public class CaseClassPattern extends Pattern implements IPatternList
 			}
 		}
 
-		if (Types.isExactType(type, this.type))
+		if (!Types.isSuperClass(this.type, type))
 		{
-			// No additional type check required
-			return this;
+			return new TypeCheckPattern(this, type, this.type);
 		}
-		return new TypeCheckPattern(this, type, this.type);
+		// No additional type check required
+		return this;
 	}
 
-	public void checkMethodAccess(MarkerList markers, IClass caseClass, IParameter param, int paramIndex, int paramCount, IPattern pattern)
+	public void checkMethodAccess(MarkerList markers, IClass caseClass, IParameter param, int paramIndex,
+		                             int paramCount, IPattern pattern)
 	{
 		final IMethod accessMethod = IContext.resolveMethod(caseClass, null, param.getName(), null); // find by name
 		if (accessMethod != null)
@@ -236,7 +237,6 @@ public class CaseClassPattern extends Pattern implements IPatternList
 
 			// Load the instance
 			writer.visitVarInsn(Opcodes.ALOAD, varIndex);
-			matchedType.writeCast(writer, this.type, lineNumber);
 
 			final IMethod method = this.getterMethods[i];
 			final IType targetType = this.paramTypes[i];
