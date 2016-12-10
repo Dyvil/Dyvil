@@ -1,12 +1,10 @@
 package dyvil.tools.compiler.ast.pattern.operator;
 
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public class OrPattern extends BinaryPattern
@@ -29,26 +27,16 @@ public class OrPattern extends BinaryPattern
 	}
 
 	@Override
-	public IPattern resolve(MarkerList markers, IContext context)
+	protected IPattern withType()
 	{
-		super.resolveChildren(markers, context);
-
-		if (this.left.isExhaustive())
+		if (this.left.isWildcard())
 		{
 			return this.left;
 		}
-		if (this.right.isExhaustive())
+		if (this.right.isWildcard())
 		{
 			return this.right;
 		}
-		return this;
-	}
-
-	@Override
-	public IPattern withType(IType type, MarkerList markers)
-	{
-		this.left = this.left.withType(type, markers);
-		this.right = this.right.withType(type, markers);
 		return this;
 	}
 
@@ -95,16 +83,23 @@ public class OrPattern extends BinaryPattern
 
 	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-			throws BytecodeException
+		throws BytecodeException
 	{
+		final int locals = writer.localCount();
+
 		varIndex = IPattern.ensureVar(writer, varIndex, matchedType);
 
 		final Label targetLabel = new Label();
 
 		this.left.writeJump(writer, varIndex, matchedType, targetLabel);
+
+		writer.resetLocals(locals);
+
 		this.right.writeInvJump(writer, varIndex, matchedType, elseLabel);
 
 		writer.visitLabel(targetLabel);
+
+		writer.resetLocals(locals);
 	}
 
 	@Override
