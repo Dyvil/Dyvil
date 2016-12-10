@@ -23,18 +23,31 @@ public final class TuplePattern extends Pattern implements IPatternList
 	private IPattern[] patterns = new IPattern[3];
 	private int   patternCount;
 	private IType tupleType;
-	
+
 	public TuplePattern(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
 	@Override
 	public int getPatternType()
 	{
 		return TUPLE;
 	}
-	
+
+	@Override
+	public boolean isExhaustive()
+	{
+		for (int i = 0; i < this.patternCount; i++)
+		{
+			if (!this.patterns[i].isExhaustive())
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
 	@Override
 	public IType getType()
 	{
@@ -42,7 +55,7 @@ public final class TuplePattern extends Pattern implements IPatternList
 		{
 			return this.tupleType;
 		}
-		
+
 		TupleType t = new TupleType(this.patternCount);
 		for (int i = 0; i < this.patternCount; i++)
 		{
@@ -50,7 +63,7 @@ public final class TuplePattern extends Pattern implements IPatternList
 		}
 		return this.tupleType = t;
 	}
-	
+
 	@Override
 	public IPattern withType(IType type, MarkerList markers)
 	{
@@ -59,7 +72,7 @@ public final class TuplePattern extends Pattern implements IPatternList
 		{
 			return null;
 		}
-		
+
 		this.tupleType = type;
 		for (int i = 0; i < this.patternCount; i++)
 		{
@@ -80,25 +93,25 @@ public final class TuplePattern extends Pattern implements IPatternList
 		}
 		return this;
 	}
-	
+
 	@Override
 	public boolean isType(IType type)
 	{
 		return TupleType.isSuperType(type, this.patterns, this.patternCount);
 	}
-	
+
 	@Override
 	public int patternCount()
 	{
 		return this.patternCount;
 	}
-	
+
 	@Override
 	public void setPattern(int index, IPattern pattern)
 	{
 		this.patterns[index] = pattern;
 	}
-	
+
 	@Override
 	public void addPattern(IPattern pattern)
 	{
@@ -111,13 +124,13 @@ public final class TuplePattern extends Pattern implements IPatternList
 		}
 		this.patterns[index] = pattern;
 	}
-	
+
 	@Override
 	public IPattern getPattern(int index)
 	{
 		return this.patterns[index];
 	}
-	
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
@@ -129,10 +142,10 @@ public final class TuplePattern extends Pattern implements IPatternList
 				return f;
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public IPattern resolve(MarkerList markers, IContext context)
 	{
@@ -145,13 +158,13 @@ public final class TuplePattern extends Pattern implements IPatternList
 		{
 			this.patterns[i] = this.patterns[i].resolve(markers, context);
 		}
-		
+
 		return this;
 	}
-	
+
 	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-			throws BytecodeException
+		throws BytecodeException
 	{
 		varIndex = IPattern.ensureVar(writer, varIndex, matchedType);
 
@@ -161,7 +174,7 @@ public final class TuplePattern extends Pattern implements IPatternList
 
 		for (int i = 0; i < this.patternCount; i++)
 		{
-			if (this.patterns[i].getPatternType() == WILDCARD)
+			if (this.patterns[i].isWildcard())
 			{
 				// Skip wildcard patterns
 				continue;
@@ -176,7 +189,7 @@ public final class TuplePattern extends Pattern implements IPatternList
 			this.patterns[i].writeInvJump(writer, -1, targetType, elseLabel);
 		}
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

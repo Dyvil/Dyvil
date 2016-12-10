@@ -151,7 +151,7 @@ public class MatchTest
 		// ------------------------------------------------------------
 
 		{
-			Some<String> option = Some "abc"
+			Option<String> option = Some "abc"
 			String value = _
 
 			option match {
@@ -165,7 +165,7 @@ public class MatchTest
 		// ------------------------------------------------------------
 
 		{
-			Some<int> option = Some 2
+			Option<int> option = Some 2
 			int value = _
 
 			option match {
