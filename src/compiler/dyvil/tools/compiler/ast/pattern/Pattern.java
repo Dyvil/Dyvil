@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.pattern;
 
+import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public abstract class Pattern implements IPattern
@@ -16,5 +17,11 @@ public abstract class Pattern implements IPattern
 	public void setPosition(ICodePosition position)
 	{
 		this.position = position;
+	}
+
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
 	}
 }
