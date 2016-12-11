@@ -294,7 +294,7 @@ public final class ClassFormat
 			return intersection;
 		}
 		case '?': // option
-			return new OptionType(readType(desc, start + 1, end));
+			return new NullableType(readType(desc, start + 1, end));
 		}
 		return null;
 	}
@@ -412,9 +412,9 @@ public final class ClassFormat
 		}
 		case '?': // option
 		{
-			final OptionType option = new OptionType();
-			final int end = readTyped(desc, start + 1, option::setType);
-			consumer.setType(option);
+			final NullableType nullableType = new NullableType();
+			final int end = readTyped(desc, start + 1, nullableType::setElementType);
+			consumer.setType(nullableType);
 			return end;
 		}
 		}

@@ -4,8 +4,8 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.reference.ImplicitReferenceType;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.compound.ImplicitOptionType;
-import dyvil.tools.compiler.ast.type.compound.OptionType;
+import dyvil.tools.compiler.ast.type.compound.ImplicitNullableType;
+import dyvil.tools.compiler.ast.type.compound.NullableType;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -26,9 +26,9 @@ public class PostfixType extends NamedGenericType
 			switch (unqualified.charAt(0))
 			{
 			case '?':
-				return new OptionType(this.typeArguments[0]).resolveType(markers, context);
+				return new NullableType(this.typeArguments[0]).resolveType(markers, context);
 			case '!':
-				return new ImplicitOptionType(this.typeArguments[0]).resolveType(markers, context);
+				return new ImplicitNullableType(this.typeArguments[0]).resolveType(markers, context);
 			case '*':
 				return new ReferenceType(this.typeArguments[0]).resolveType(markers, context);
 			case '^':
