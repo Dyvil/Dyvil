@@ -8,6 +8,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+@SuppressWarnings("StandardVariableNames")
 public enum Variance
 {
 	INVARIANT
@@ -17,7 +18,7 @@ public enum Variance
 			{
 				return Types.isSameType(a, b);
 			}
-		},
+		}, //
 	COVARIANT
 		{
 			@Override
@@ -31,13 +32,7 @@ public enum Variance
 			{
 				builder.append('+');
 			}
-
-			@Override
-			public void appendInfix(StringBuilder builder)
-			{
-				builder.append(" <: ");
-			}
-		},
+		}, //
 	CONTRAVARIANT
 		{
 			@Override
@@ -51,12 +46,6 @@ public enum Variance
 			{
 				builder.append('-');
 			}
-
-			@Override
-			public void appendInfix(StringBuilder builder)
-			{
-				builder.append(" >: ");
-			}
 		};
 
 	public abstract boolean checkCompatible(IType a, IType b);
@@ -65,17 +54,23 @@ public enum Variance
 	{
 		final WildcardType wildcard1 = a.extract(WildcardType.class);
 
-		if (wildcard1 != null && wildcard1.getVariance().checkCompatible(a, b))
+		if (wildcard1 != null)
 		{
-			return true;
+			final WildcardType wildcard2 = b.extract(WildcardType.class);
+			if (wildcard2 != null)
+			{
+				return wildcard1.getVariance().checkCompatible(wildcard1.getType(), wildcard2.getType());
+			}
+
+			return wildcard1.getVariance().checkCompatible(wildcard1.getType(), b);
 		}
 
 		final WildcardType wildcard2 = b.extract(WildcardType.class);
-		if (wildcard2 != null && wildcard2.getVariance().checkCompatible(b, a))
+		if (wildcard2 != null)
 		{
-			return true;
+			return wildcard2.getVariance().checkCompatible(wildcard2.getType(), a);
 		}
-		//
+
 		return base.checkCompatible(a, b);
 	}
 
@@ -99,10 +94,6 @@ public enum Variance
 	}
 
 	public void appendPrefix(StringBuilder builder)
-	{
-	}
-
-	public void appendInfix(StringBuilder builder)
 	{
 	}
 }
