@@ -274,9 +274,9 @@ public final class Types
 		return superType.isSuperTypeOf(subType);
 	}
 
-	public static boolean isAssignable(IType fromType, IType toType)
+	public static boolean isAssignable(IType targetType, IType fromType)
 	{
-		return isSuperType(toType, fromType) || isConvertible(fromType, toType);
+		return isSuperType(targetType, fromType) || isConvertible(fromType, targetType);
 	}
 
 	public static boolean isConvertible(IType fromType, IType toType)
