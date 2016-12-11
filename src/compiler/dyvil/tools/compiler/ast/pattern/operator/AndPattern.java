@@ -1,14 +1,12 @@
 package dyvil.tools.compiler.ast.pattern.operator;
 
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public class AndPattern extends BinaryPattern implements IPattern
@@ -31,26 +29,16 @@ public class AndPattern extends BinaryPattern implements IPattern
 	}
 
 	@Override
-	public IPattern resolve(MarkerList markers, IContext context)
+	protected IPattern withType()
 	{
-		super.resolveChildren(markers, context);
-
-		if (this.left.isExhaustive())
+		if (this.left.isWildcard())
 		{
 			return this.right;
 		}
-		if (this.right.isExhaustive())
+		if (this.right.isWildcard())
 		{
 			return this.left;
 		}
-		return this;
-	}
-
-	@Override
-	public IPattern withType(IType type, MarkerList markers)
-	{
-		this.left = this.left.withType(type, markers);
-		this.right = this.right.withType(type, markers);
 		return this;
 	}
 
@@ -103,7 +91,7 @@ public class AndPattern extends BinaryPattern implements IPattern
 
 	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-			throws BytecodeException
+		throws BytecodeException
 	{
 		varIndex = IPattern.ensureVar(writer, varIndex, matchedType);
 

@@ -4,6 +4,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -43,15 +44,21 @@ public abstract class BinaryPattern implements IPattern
 	}
 
 	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
+	}
+
+	@Override
 	public void setPosition(ICodePosition position)
 	{
 		this.position = position;
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public boolean isWildcard()
 	{
-		return this.position;
+		return this.left.isWildcard() && this.right.isWildcard();
 	}
 
 	@Override
@@ -70,9 +77,39 @@ public abstract class BinaryPattern implements IPattern
 		return this.left.isType(type) && this.right.isType(type);
 	}
 
-	protected void resolveChildren(MarkerList markers, IContext context)
+	@Override
+	public IPattern withType(IType type, MarkerList markers)
+	{
+		final IPattern left = this.left.withType(type, markers);
+		if (left == null)
+		{
+			return null;
+		}
+
+		final IPattern right = this.right.withType(type, markers);
+		if (right == null)
+		{
+			return null;
+		}
+
+		this.left = left;
+		this.right = right;
+		return this.withType();
+	}
+
+	protected abstract IPattern withType();
+
+	@Override
+	public IPattern resolve(MarkerList markers, IContext context)
 	{
 		this.left = this.left.resolve(markers, context);
 		this.right = this.right.resolve(markers, context);
+		return this;
+	}
+
+	@Override
+	public String toString()
+	{
+		return IASTNode.toString(this);
 	}
 }
