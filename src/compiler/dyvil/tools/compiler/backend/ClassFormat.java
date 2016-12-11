@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.backend;
 
+import dyvil.annotation.analysis.NotNull;
 import dyvil.tools.asm.ASMConstants;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
@@ -154,12 +155,17 @@ public final class ClassFormat
 
 	public static IType extendedToType(String extended)
 	{
-		return readType(extended, 0, extended.length() - 1);
+		return readType(extended, 0, extended.length() - 1, false);
+	}
+
+	public static IType readFieldType(String desc)
+	{
+		return readType(desc, 0, desc.length() - 1, true);
 	}
 
 	public static IType readReturnType(String desc)
 	{
-		return readType(desc, desc.lastIndexOf(')') + 1, desc.length() - 1);
+		return readType(desc, desc.lastIndexOf(')') + 1, desc.length() - 1, true);
 	}
 
 	public static void readClassSignature(String desc, IClass iclass)
@@ -176,10 +182,10 @@ public final class ClassFormat
 		}
 
 		int len = desc.length();
-		i = readTyped(desc, i, iclass::setSuperType);
+		i = readTyped(desc, i, iclass::setSuperType, false);
 		while (i < len)
 		{
-			i = readTyped(desc, i, iclass::addInterface);
+			i = readTyped(desc, i, iclass::addInterface, false);
 		}
 	}
 
@@ -207,10 +213,10 @@ public final class ClassFormat
 		}
 		while (desc.charAt(i) != ')')
 		{
-			i = readTyped(desc, i, parameterTypeConsumer(method));
+			i = readTyped(desc, i, parameterTypeConsumer(method), true);
 		}
 		i++;
-		i = readTyped(desc, i, method);
+		i = readTyped(desc, i, method, true);
 
 		// Throwables
 		int len = desc.length();
@@ -225,7 +231,7 @@ public final class ClassFormat
 		int i = 1;
 		while (desc.charAt(i) != ')')
 		{
-			i = readTyped(desc, i, parameterTypeConsumer(constructor));
+			i = readTyped(desc, i, parameterTypeConsumer(constructor), true);
 		}
 		i += 2;
 
@@ -244,7 +250,7 @@ public final class ClassFormat
 		}
 	}
 
-	public static IType readType(String desc, int start, int end)
+	public static IType readType(String desc, int start, int end, boolean nullables)
 	{
 		switch (desc.charAt(start))
 		{
@@ -268,48 +274,55 @@ public final class ClassFormat
 		case 'D':
 			return Types.DOUBLE;
 		case 'L': // class type
-			return readReferenceType(desc, start + 1, end);
+			return readReferenceType(desc, start + 1, end, nullables);
 		case 'R': // reference type
 			final ReferenceType rt = new ReferenceType();
-			readTyped(desc, start + 1, rt::setType);
+			readTyped(desc, start + 1, rt::setType, true);
 			return rt;
 		case 'N': // null
 			return Types.NULL;
 		case 'T': // type parameter reference
 			return new InternalTypeVarType(desc.substring(start + 1, end));
 		case '[': // array type
-			return new ArrayType(readType(desc, start + 1, end));
+			return new ArrayType(readType(desc, start + 1, end, true));
 		case '|': // union
 		{
 			final UnionType union = new UnionType();
-			final int end1 = readTyped(desc, start + 1, union::setLeft);
-			readTyped(desc, end1, union::setRight);
+			final int end1 = readTyped(desc, start + 1, union::setLeft, nullables);
+			readTyped(desc, end1, union::setRight, nullables);
 			return union;
 		}
 		case '&': // intersection
 		{
 			final IntersectionType intersection = new IntersectionType();
-			final int end1 = readTyped(desc, start + 1, intersection::setLeft);
-			readTyped(desc, end1, intersection::setRight);
+			final int end1 = readTyped(desc, start + 1, intersection::setLeft, nullables);
+			readTyped(desc, end1, intersection::setRight, nullables);
 			return intersection;
 		}
 		case '?': // option
-			return new NullableType(readType(desc, start + 1, end));
+			return new NullableType(readType(desc, start + 1, end, false));
 		}
 		return null;
 	}
 
+	private static IType readReferenceType(String desc, int start, int end, boolean nullables)
+	{
+		final IType result = readReferenceType(desc, start, end);
+		return nullables ? new ImplicitNullableType(result) : result;
+	}
+
+	@NotNull
 	private static IType readReferenceType(String desc, int start, int end)
 	{
 		int index = desc.indexOf('<', start);
 		if (index >= 0 && index < end)
 		{
-			GenericType type = new InternalGenericType(desc.substring(start, index));
+			final GenericType type = new InternalGenericType(desc.substring(start, index));
 			index++;
 
 			while (desc.charAt(index) != '>')
 			{
-				index = readTyped(desc, index, type);
+				index = readTyped(desc, index, type, true);
 			}
 			return type;
 		}
@@ -317,7 +330,7 @@ public final class ClassFormat
 		return new InternalType(desc.substring(start, end));
 	}
 
-	private static int readTyped(String desc, int start, ITypeConsumer consumer)
+	private static int readTyped(String desc, int start, ITypeConsumer consumer, boolean nullables)
 	{
 		switch (desc.charAt(start))
 		{
@@ -351,13 +364,13 @@ public final class ClassFormat
 		case 'L': // class
 		{
 			final int end = getMatchingSemicolon(desc, start, desc.length());
-			consumer.setType(readReferenceType(desc, start + 1, end));
+			consumer.setType(readReferenceType(desc, start + 1, end, nullables));
 			return end + 1;
 		}
 		case 'R': // reference
 		{
 			final ReferenceType reference = new ReferenceType();
-			final int end = readTyped(desc, start + 1, reference::setType);
+			final int end = readTyped(desc, start + 1, reference::setType, true);
 			consumer.setType(reference);
 			return end + 1;
 		}
@@ -376,44 +389,44 @@ public final class ClassFormat
 		case '+': // covariant wildcard
 		{
 			final WildcardType var = new WildcardType(Variance.COVARIANT);
-			final int end = readTyped(desc, start + 1, var);
+			final int end = readTyped(desc, start + 1, var, nullables);
 			consumer.setType(var);
 			return end;
 		}
 		case '-': // contravariant wildcard
 		{
 			final WildcardType var = new WildcardType(Variance.CONTRAVARIANT);
-			final int end = readTyped(desc, start + 1, var);
+			final int end = readTyped(desc, start + 1, var, nullables);
 			consumer.setType(var);
 			return end;
 		}
 		case '[': // array
 		{
 			final ArrayType arrayType = new ArrayType();
-			final int end = readTyped(desc, start + 1, arrayType::setElementType);
+			final int end = readTyped(desc, start + 1, arrayType::setElementType, true);
 			consumer.setType(arrayType);
 			return end;
 		}
 		case '|': // union
 		{
 			final UnionType union = new UnionType();
-			final int end1 = readTyped(desc, start + 1, union::setLeft);
-			final int end2 = readTyped(desc, end1, union::setRight);
+			final int end1 = readTyped(desc, start + 1, union::setLeft, nullables);
+			final int end2 = readTyped(desc, end1, union::setRight, nullables);
 			consumer.setType(union);
 			return end2;
 		}
 		case '&': // intersection
 		{
 			final IntersectionType intersection = new IntersectionType();
-			final int end1 = readTyped(desc, start + 1, intersection::setLeft);
-			final int end2 = readTyped(desc, end1, intersection::setRight);
+			final int end1 = readTyped(desc, start + 1, intersection::setLeft, nullables);
+			final int end2 = readTyped(desc, end1, intersection::setRight, nullables);
 			consumer.setType(intersection);
 			return end2;
 		}
 		case '?': // option
 		{
 			final NullableType nullableType = new NullableType();
-			final int end = readTyped(desc, start + 1, nullableType::setElementType);
+			final int end = readTyped(desc, start + 1, nullableType::setElementType, false);
 			consumer.setType(nullableType);
 			return end;
 		}
@@ -434,7 +447,7 @@ public final class ClassFormat
 		}
 		while (desc.charAt(index) == ':')
 		{
-			index = readTyped(desc, index + 1, typeVar::addUpperBound);
+			index = readTyped(desc, index + 1, typeVar::addUpperBound, true);
 		}
 		generic.addTypeParameter(typeVar);
 		return index;
@@ -442,24 +455,7 @@ public final class ClassFormat
 
 	private static int readException(String desc, int start, IExceptionList list)
 	{
-		switch (desc.charAt(start))
-		{
-		case 'L':
-		{
-			int end1 = getMatchingSemicolon(desc, start, desc.length());
-			IType type = readReferenceType(desc, start + 1, end1);
-			list.addException(type);
-			return end1 + 1;
-		}
-		case 'T':
-		{
-			int end1 = desc.indexOf(';', start);
-			IType type = new InternalTypeVarType(desc.substring(start + 1, end1));
-			list.addException(type);
-			return end1 + 1;
-		}
-		}
-		return start;
+		return readTyped(desc, start, list::addException, false);
 	}
 
 	private static int getMatchingSemicolon(String s, int start, int end)
