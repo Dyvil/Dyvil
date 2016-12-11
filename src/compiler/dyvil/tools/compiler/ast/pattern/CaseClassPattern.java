@@ -32,7 +32,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 	// Metadata
 	private IMethod[] getterMethods;
 	private IType[]   paramTypes;
-	
+
 	public CaseClassPattern(ICodePosition position)
 	{
 		this.position = position;
@@ -49,19 +49,32 @@ public class CaseClassPattern extends Pattern implements IPatternList
 	{
 		return CASE_CLASS;
 	}
-	
+
+	@Override
+	public boolean isExhaustive()
+	{
+		for (int i = 0; i < this.patternCount; i++)
+		{
+			if (!this.patterns[i].isExhaustive())
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
 	@Override
 	public void setType(IType type)
 	{
 		this.type = type;
 	}
-	
+
 	@Override
 	public IType getType()
 	{
 		return this.type;
 	}
-	
+
 	@Override
 	public IPattern withType(IType type, MarkerList markers)
 	{
@@ -69,7 +82,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 		{
 			return null;
 		}
-		
+
 		final IClass caseClass = this.type.getTheClass();
 		if (caseClass == null)
 		{
@@ -80,7 +93,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 		final int paramCount = parameters.size();
 		if (this.patternCount != paramCount)
 		{
-			final Marker marker = Markers.semantic(this.position, "pattern.class.count", this.type.toString());
+			final Marker marker = Markers.semanticError(this.position, "pattern.class.count", this.type.toString());
 			marker.addInfo(Markers.getSemantic("pattern.class.count.pattern", this.patternCount));
 			marker.addInfo(Markers.getSemantic("pattern.class.count.class", paramCount));
 			markers.add(marker);
@@ -88,7 +101,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 		}
 
 		this.paramTypes = new IType[paramCount];
-		
+
 		for (int i = 0; i < paramCount; i++)
 		{
 			final IPattern pattern = this.patterns[i];
@@ -106,7 +119,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 
 			if (typedPattern == null)
 			{
-				final Marker marker = Markers.semantic(this.position, "pattern.class.type", param.getName());
+				final Marker marker = Markers.semanticError(this.position, "pattern.class.type", param.getName());
 				marker.addInfo(Markers.getSemantic("pattern.type", pattern.getType()));
 				marker.addInfo(Markers.getSemantic("classparameter.type", paramType));
 				markers.add(marker);
@@ -117,15 +130,16 @@ public class CaseClassPattern extends Pattern implements IPatternList
 			}
 		}
 
-		if (Types.isExactType(type, this.type))
+		if (!Types.isSuperClass(this.type, type))
 		{
-			// No additional type check required
-			return this;
+			return new TypeCheckPattern(this, type, this.type);
 		}
-		return new TypeCheckPattern(this, type, this.type);
+		// No additional type check required
+		return this;
 	}
 
-	public void checkMethodAccess(MarkerList markers, IClass caseClass, IParameter param, int paramIndex, int paramCount, IPattern pattern)
+	public void checkMethodAccess(MarkerList markers, IClass caseClass, IParameter param, int paramIndex,
+		                             int paramCount, IPattern pattern)
 	{
 		final IMethod accessMethod = IContext.resolveMethod(caseClass, null, param.getName(), null); // find by name
 		if (accessMethod != null)
@@ -144,19 +158,19 @@ public class CaseClassPattern extends Pattern implements IPatternList
 			markers.add(marker);
 		}
 	}
-	
+
 	@Override
 	public int patternCount()
 	{
 		return 0;
 	}
-	
+
 	@Override
 	public void setPattern(int index, IPattern pattern)
 	{
 		this.patterns[index] = pattern;
 	}
-	
+
 	@Override
 	public void addPattern(IPattern pattern)
 	{
@@ -169,13 +183,13 @@ public class CaseClassPattern extends Pattern implements IPatternList
 		}
 		this.patterns[index] = pattern;
 	}
-	
+
 	@Override
 	public IPattern getPattern(int index)
 	{
 		return this.patterns[index];
 	}
-	
+
 	@Override
 	public IDataMember resolveField(Name name)
 	{
@@ -189,23 +203,23 @@ public class CaseClassPattern extends Pattern implements IPatternList
 		}
 		return null;
 	}
-	
+
 	@Override
 	public IPattern resolve(MarkerList markers, IContext context)
 	{
 		this.type = this.type.resolveType(markers, context);
-		
+
 		for (int i = 0; i < this.patternCount; i++)
 		{
 			this.patterns[i] = this.patterns[i].resolve(markers, context);
 		}
-		
+
 		return this;
 	}
-	
+
 	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-			throws BytecodeException
+		throws BytecodeException
 	{
 		varIndex = IPattern.ensureVar(writer, varIndex, matchedType);
 
@@ -215,7 +229,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 
 		for (int i = 0; i < this.patternCount; i++)
 		{
-			if (this.patterns[i].getPatternType() == WILDCARD)
+			if (this.patterns[i].isWildcard())
 			{
 				// Skip wildcard patterns
 				continue;
@@ -223,7 +237,6 @@ public class CaseClassPattern extends Pattern implements IPatternList
 
 			// Load the instance
 			writer.visitVarInsn(Opcodes.ALOAD, varIndex);
-			matchedType.writeCast(writer, this.type, lineNumber);
 
 			final IMethod method = this.getterMethods[i];
 			final IType targetType = this.paramTypes[i];

@@ -29,7 +29,13 @@ public final class WildcardPattern extends Pattern
 	{
 		return true;
 	}
-	
+
+	@Override
+	public boolean isWildcard()
+	{
+		return true;
+	}
+
 	@Override
 	public IType getType()
 	{

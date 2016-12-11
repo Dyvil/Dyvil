@@ -37,7 +37,6 @@ public interface IPattern extends IASTNode, ITyped
 	
 	int BINDING   = 32;
 	int WILDCARD  = 33;
-	int UNBOX     = 34;
 	int TYPECHECK = 35;
 
 	int OR  = 48;
@@ -46,6 +45,11 @@ public interface IPattern extends IASTNode, ITyped
 	int getPatternType();
 	
 	default boolean isExhaustive()
+	{
+		return false;
+	}
+
+	default boolean isWildcard()
 	{
 		return false;
 	}
