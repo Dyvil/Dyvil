@@ -278,6 +278,12 @@ public final class PrimitiveType implements IType
 	}
 
 	@Override
+	public boolean useNonNullAnnotation()
+	{
+		return false;
+	}
+
+	@Override
 	public boolean isSuperClassOf(IType subType)
 	{
 		return this.wrapperClass == subType.getTheClass() || subType.isPrimitive() && isPromotable(

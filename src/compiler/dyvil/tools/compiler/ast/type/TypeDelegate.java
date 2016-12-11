@@ -57,6 +57,12 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
+	public boolean useNonNullAnnotation()
+	{
+		return this.type.useNonNullAnnotation();
+	}
+
+	@Override
 	public boolean hasTag(int tag)
 	{
 		return IType.super.hasTag(tag) || this.type.hasTag(tag);
