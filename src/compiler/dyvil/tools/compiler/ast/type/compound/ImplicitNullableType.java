@@ -3,14 +3,17 @@ package dyvil.tools.compiler.ast.type.compound;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
 
 public class ImplicitNullableType extends NullableType
 {
@@ -42,24 +45,15 @@ public class ImplicitNullableType extends NullableType
 	}
 
 	@Override
-	public boolean isSameType(IType type)
+	public IValue convertValueTo(IValue value, IType targetType, ITypeContext typeContext, MarkerList markers,
+		                            IContext context)
 	{
-		final NullableType nullable = type.extract(NullableType.class);
-		return Types.isSameType(this.type, nullable != null ? nullable.getElementType() : type);
-	}
+		if (this.isConvertibleTo(targetType))
+		{
+			return value.withType(this, typeContext, markers, context);
+		}
 
-	@Override
-	public boolean isSubTypeOf(IType superType)
-	{
-		final NullableType nullable = superType.extract(NullableType.class);
-		return Types.isSuperType(nullable != null ? nullable.getElementType() : superType, this.type);
-	}
-
-	@Override
-	public boolean isSuperTypeOf(IType subType)
-	{
-		final NullableType nullable = subType.extract(NullableType.class);
-		return Types.isSuperType(this.type, nullable != null ? nullable.getElementType() : subType);
+		return null;
 	}
 
 	@Override

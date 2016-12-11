@@ -102,22 +102,27 @@ public class NullableType implements IObjectType
 	}
 
 	@Override
-	public boolean isSuperTypeOf(IType subType)
+	public boolean isSuperClassOf(IType subType)
 	{
-		final NullableType nullable = subType.extract(NullableType.class);
-		return nullable != null && Types.isSuperType(this.type, nullable.getElementType());
+		return Types.isSuperClass(this.type, subType);
 	}
 
 	@Override
-	public boolean isConvertibleFrom(IType type)
+	public boolean isSuperTypeOf(IType subType)
 	{
-		return Types.isSuperType(this.type, type);
+		final NullableType nullable = subType.extract(NullableType.class);
+		return Types.isSuperType(this.type, nullable != null ? nullable.getElementType() : subType);
 	}
 
 	@Override
 	public IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		return this.type.convertValue(value, typeContext, markers, context);
+		if (!Types.isSuperType(this, value.getType()))
+		{
+			return this.type.convertValue(value, typeContext, markers, context);
+		}
+
+		return IObjectType.super.convertValue(value, typeContext, markers, context);
 	}
 
 	@Override
