@@ -48,12 +48,7 @@ public class ImplicitNullableType extends NullableType
 	public IValue convertValueTo(IValue value, IType targetType, ITypeContext typeContext, MarkerList markers,
 		                            IContext context)
 	{
-		if (this.isConvertibleTo(targetType))
-		{
-			return value.withType(this, typeContext, markers, context);
-		}
-
-		return null;
+		return this.isConvertibleTo(targetType) ? value : null;
 	}
 
 	@Override
@@ -91,7 +86,7 @@ public class ImplicitNullableType extends NullableType
 			return new NullableType(this.type);
 		}
 
-		return null;
+		return this.type.withAnnotation(annotation);
 	}
 
 	@Override
