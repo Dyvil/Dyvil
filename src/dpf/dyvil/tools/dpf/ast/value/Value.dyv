@@ -54,12 +54,12 @@ public interface Value extends IASTNode
 
 	static StringInterpolation apply(String base, Value... values)
 	{
-		return new StringInterpolation(base.split(@"\\\d+"), values)
+		return new StringInterpolation(base.split(@"\\\d+") as [String], values)
 	}
 
 	static StringInterpolation apply(String base, Object... values)
 	{
-		return new StringInterpolation(base.split(@"\\\d+"), values)
+		return new StringInterpolation(base.split(@"\\\d+") as [String], values)
 	}
 
 	// Override Methods
