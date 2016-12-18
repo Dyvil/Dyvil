@@ -292,7 +292,7 @@ public class CompleteCommand implements ICommand
 
 	private static void findExtensions(DyvilREPL repl, IType type, IValue value, Set<IMethod> methods, String start)
 	{
-		MatchList<IMethod> matchList = new MatchList<>(repl.getContext());
+		MatchList<IMethod> matchList = new MatchList<>(repl.getContext(), true);
 		type.getMethodMatches(matchList, value, null, null);
 		repl.getContext().getMethodMatches(matchList, value, null, null);
 		Types.BASE_CONTEXT.getMethodMatches(matchList, value, null, null);
@@ -305,7 +305,7 @@ public class CompleteCommand implements ICommand
 
 	private static void findConversions(DyvilREPL repl, IType type, IValue value, Set<IMethod> methods)
 	{
-		MatchList<IMethod> matchList = new MatchList<>(null);
+		MatchList<IMethod> matchList = new MatchList<>(null, true);
 		type.getImplicitMatches(matchList, value, null);
 		repl.getContext().getImplicitMatches(matchList, value, null);
 		Types.BASE_CONTEXT.getImplicitMatches(matchList, value, null);

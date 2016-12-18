@@ -163,4 +163,12 @@ public final class Candidate<T extends ICallableMember> implements Comparable<Ca
 		// we cannot provide a meaningful hashCode without breaking the equality contract
 		return 0;
 	}
+
+	@Override
+	public String toString()
+	{
+		return "Candidate(" + "member: " + this.member + ", values: " + Arrays.toString(this.values) + ", types: "
+			       + Arrays.toString(this.types) + ", defaults: " + this.defaults + ", varargs: " + this.varargs
+			       + ", invalid: " + this.invalid + ')';
+	}
 }
