@@ -5,7 +5,9 @@ import dyvil.array.IntArray;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.util.MemberSorter;
 
-public final class Candidate<T extends ICallableSignature> implements Comparable<Candidate<T>>
+import java.util.Arrays;
+
+public final class Candidate<T extends ICallableMember> implements Comparable<Candidate<T>>
 {
 	protected final T       member;
 	protected final int[]   values;
