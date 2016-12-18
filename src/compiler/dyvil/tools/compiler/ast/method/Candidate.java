@@ -5,6 +5,8 @@ import dyvil.array.IntArray;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.util.MemberSorter;
 
+import java.util.Arrays;
+
 public final class Candidate<T extends ICallableSignature> implements Comparable<Candidate<T>>
 {
 	protected final T       member;
@@ -160,5 +162,13 @@ public final class Candidate<T extends ICallableSignature> implements Comparable
 	{
 		// we cannot provide a meaningful hashCode without breaking the equality contract
 		return 0;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "Candidate(" + "member: " + this.member + ", values: " + Arrays.toString(this.values) + ", types: "
+			       + Arrays.toString(this.types) + ", defaults: " + this.defaults + ", varargs: " + this.varargs
+			       + ", invalid: " + this.invalid + ')';
 	}
 }

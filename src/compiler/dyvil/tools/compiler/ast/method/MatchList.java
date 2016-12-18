@@ -10,16 +10,29 @@ import java.util.Iterator;
 
 public class MatchList<T extends ICallableSignature> implements IImplicitContext, Iterable<Candidate<T>>
 {
+	private static final byte SORTED    = 1;
+	private static final byte SKIP_SORT = 2;
+
 	private Candidate<T>[] candidates = (Candidate<T>[]) new Candidate[4];
 	private int size;
 
-	private boolean sorted;
+	private byte sorted = SORTED;
 
 	private final IImplicitContext implicitContext;
 
 	public MatchList(IImplicitContext implicitContext)
 	{
 		this.implicitContext = implicitContext;
+	}
+
+	public MatchList(IImplicitContext implicitContext, boolean skipSort)
+	{
+		this.implicitContext = implicitContext;
+
+		if (skipSort)
+		{
+			this.sorted |= SKIP_SORT;
+		}
 	}
 
 	public int size()
@@ -34,7 +47,8 @@ public class MatchList<T extends ICallableSignature> implements IImplicitContext
 
 	public boolean hasCandidate()
 	{
-		return !this.isEmpty() && !this.isAmbigous() && !this.getBestCandidate().invalid;
+		return (this.sorted & SKIP_SORT) == 0 && !this.isEmpty() && !this.isAmbigous()
+			       && !this.getBestCandidate().invalid;
 	}
 
 	public void ensureCapacity(int capacity)
@@ -55,7 +69,7 @@ public class MatchList<T extends ICallableSignature> implements IImplicitContext
 	{
 		// TODO Maybe insert the candidate at correct position if this list is already sorted?
 
-		this.sorted = false;
+		this.sorted &= ~SORTED;
 
 		final int index = this.size;
 		this.ensureCapacity(index + 1);
@@ -70,7 +84,7 @@ public class MatchList<T extends ICallableSignature> implements IImplicitContext
 
 	public boolean isAmbigous()
 	{
-		if (this.size <= 1)
+		if (this.size <= 1 || (this.sorted & SKIP_SORT) != 0)
 		{
 			return false;
 		}
@@ -118,13 +132,13 @@ public class MatchList<T extends ICallableSignature> implements IImplicitContext
 
 	private void sort()
 	{
-		if (this.sorted || this.size <= 1)
+		if (this.sorted != 0 || this.size <= 1)
 		{
 			return;
 		}
 
 		Arrays.sort(this.candidates, 0, this.size);
-		this.sorted = true;
+		this.sorted |= SORTED;
 	}
 
 	@Override
