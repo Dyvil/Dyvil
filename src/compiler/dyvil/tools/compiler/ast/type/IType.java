@@ -483,7 +483,9 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	static IType withAnnotation(IType type, IAnnotation annotation, TypePath typePath)
 	{
-		return withAnnotation(type, annotation, typePath, 0, typePath.getLength());
+		return typePath == null ?
+			       withAnnotation(type, annotation) :
+			       withAnnotation(type, annotation, typePath, 0, typePath.getLength());
 	}
 
 	static IType withAnnotation(IType type, IAnnotation annotation, TypePath typePath, int step, int steps)
@@ -494,6 +496,11 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 			return type;
 		}
 
+		return withAnnotation(type, annotation);
+	}
+
+	static IType withAnnotation(IType type, IAnnotation annotation)
+	{
 		final IType customType = type.withAnnotation(annotation);
 		if (customType != null)
 		{
