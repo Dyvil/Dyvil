@@ -502,6 +502,12 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	static IType withAnnotation(IType type, IAnnotation annotation)
 	{
+		if (type.useNonNullAnnotation() && AnnotationUtil.NULLABLE_INTERNAL
+			                                   .equals(annotation.getType().getInternalName()))
+		{
+			return new NullableType(type);
+		}
+
 		final IType customType = type.withAnnotation(annotation);
 		return customType != null ? customType : new AnnotatedType(type, annotation);
 	}

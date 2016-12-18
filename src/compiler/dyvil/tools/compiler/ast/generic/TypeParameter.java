@@ -239,12 +239,12 @@ public abstract class TypeParameter implements ITypeParameter
 	@Override
 	public boolean isAssignableFrom(IType type, ITypeContext typeContext)
 	{
-		if (!isSuperType(this.getUpperBound().getConcreteType(typeContext), type))
+		if (!Types.isAssignable(this.getUpperBound().getConcreteType(typeContext), type))
 		{
 			return false;
 		}
 		final IType lowerBound = this.getLowerBound();
-		return lowerBound == null || isSuperType(type, lowerBound.getConcreteType(typeContext));
+		return lowerBound == null || Types.isAssignable(type, lowerBound.getConcreteType(typeContext));
 	}
 
 	@Override
