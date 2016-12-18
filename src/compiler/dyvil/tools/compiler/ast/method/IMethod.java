@@ -17,7 +17,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public interface IMethod extends IClassMember, ICallableMember, ICallableSignature, ITypeParametric, IContext
+public interface IMethod extends IClassMember, ICallableMember, ITypeParametric, IContext
 {
 	@Override
 	default MemberKind getKind()

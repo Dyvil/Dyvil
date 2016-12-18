@@ -616,8 +616,8 @@ public final class ExternalClass extends AbstractClass
 		{
 		case TypeReference.CLASS_EXTENDS:
 		{
-			int index = TypeReference.getSuperTypeIndex(typeRef);
-			if (index == -1)
+			final int index = TypeReference.getSuperTypeIndex(typeRef);
+			if (index < 0)
 			{
 				this.superType = IType.withAnnotation(this.superType, annotation, typePath);
 			}

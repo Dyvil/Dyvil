@@ -5,7 +5,6 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.method.ICallableMember;
-import dyvil.tools.compiler.ast.method.ICallableSignature;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
@@ -14,7 +13,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public interface IConstructor extends IClassMember, ICallableMember, ICallableSignature, IContext
+public interface IConstructor extends IClassMember, ICallableMember, IContext
 {
 	@Override
 	default MemberKind getKind()
