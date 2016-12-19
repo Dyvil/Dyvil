@@ -47,6 +47,18 @@ public final class ObjectExtensions
 	@Intrinsic([ LOAD_0, LOAD_1, ACMPNE ])
 	public infix func !==(Object lhs, Object rhs): boolean = lhs !== rhs
 
+	// Optionals
+
+	// @Intrinsic
+	public postfix func ! <T>(T? optional): T
+	{
+		if (optional == null) throw new NullPointerException("Unwrapped Optional was null")
+		return optional as T
+	}
+
+	// @Intrinsic
+	public infix func ?? <T, U> (T? lhs, U rhs): T|U = lhs == null ? rhs : (lhs as T)
+
 	// Comparable
 
 	public infix inline func < <T>(Comparable<T> lhs, T rhs): boolean = lhs.compareTo(rhs) < 0

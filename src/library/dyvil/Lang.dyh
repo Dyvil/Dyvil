@@ -90,6 +90,9 @@ infix   operator ? : { precedence 125 }
 // Colon Operator
 infix   operator :   { right, 150 }
 
+// Nil Coalescing Operator
+infix   operator ??  { left, 175 }
+
 // Boolean and Bitwise Operators
 infix   operator ||  { left, 200 }
 infix   operator &&  { left, 300 }
