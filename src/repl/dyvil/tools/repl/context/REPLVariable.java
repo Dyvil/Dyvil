@@ -128,22 +128,21 @@ public class REPLVariable extends Field
 	}
 
 	@Override
+	public void writeClassInit(MethodWriter writer) throws BytecodeException
+	{
+	}
+
+	@Override
 	public void writeStaticInit(MethodWriter writer) throws BytecodeException
 	{
-		final String owner = this.enclosingClass.getInternalName();
-		final String name = this.getInternalName();
-		final String descriptor = this.getDescriptor();
-
-		this.value.writeExpression(writer, this.type);
 		if (!Types.isVoid(this.type))
 		{
-			// Store the value to the field
-			writer.visitFieldInsn(Opcodes.PUTSTATIC, owner, name, descriptor);
+			super.writeStaticInit(writer);
+			return;
 		}
-
-		if (this.property != null)
+		if (this.value != null)
 		{
-			this.property.writeStaticInit(writer);
+			this.value.writeExpression(writer, Types.VOID);
 		}
 	}
 

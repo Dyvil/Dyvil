@@ -461,7 +461,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		if (variable.getValue() == null)
 		{
 			variable.setValue(variable.getType().getDefaultValue());
-			markers.add(Markers.semanticError(this.position, "variable.value", variableName));
+			markers.add(Markers.semanticError(variable.getPosition(), "variable.uninitialized", variableName));
 		}
 
 		// Variable Name Shadowing
