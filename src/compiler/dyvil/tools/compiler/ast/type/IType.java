@@ -103,6 +103,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	int ANY       = 2;
 	int DYNAMIC   = 3;
 	int PRIMITIVE = 4;
+	int NONE      = 5;
 
 	// Class Types
 	int CLASS    = 16;
@@ -556,6 +557,8 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 			return Types.UNKNOWN;
 		case NULL:
 			return Types.NULL;
+		case NONE:
+			return Types.NONE;
 		case ANY:
 			return Types.ANY;
 		case DYNAMIC:

@@ -50,6 +50,7 @@ public final class Types
 	public static final UnknownType UNKNOWN = new UnknownType();
 	public static final NullType    NULL    = new NullType();
 	public static final AnyType     ANY     = new AnyType();
+	public static final NoneType    NONE    = new NoneType();
 
 	public static final ClassType OBJECT = new ClassType();
 	public static final ClassType STRING = new ClassType();
@@ -62,8 +63,9 @@ public final class Types
 	public static IClass PRIMITIVES_CLASS;
 
 	public static IClass OBJECT_CLASS;
-	public static IClass STRING_CLASS;
 	public static IClass NULL_CLASS;
+	public static IClass NONE_CLASS;
+	public static IClass STRING_CLASS;
 
 	public static IClass THROWABLE_CLASS;
 	public static IClass EXCEPTION_CLASS;
@@ -120,6 +122,7 @@ public final class Types
 		PRIMITIVES_CLASS = Package.dyvilLang.resolveClass("Primitives");
 
 		NULL_CLASS = Package.dyvilLang.resolveClass("Null");
+		NONE_CLASS = Package.dyvilLang.resolveClass("None");
 		OBJECT.theClass = OBJECT_CLASS = Package.javaLang.resolveClass("Object");
 		STRING.theClass = STRING_CLASS = Package.javaLang.resolveClass("String");
 		THROWABLE.theClass = THROWABLE_CLASS = Package.javaLang.resolveClass("Throwable");
@@ -367,6 +370,10 @@ public final class Types
 		if (name == Names.any)
 		{
 			return ANY;
+		}
+		if (name == Names.none)
+		{
+			return NONE;
 		}
 		if (name == Names.dynamic)
 		{

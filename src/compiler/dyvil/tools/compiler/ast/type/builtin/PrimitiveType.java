@@ -109,6 +109,10 @@ public final class PrimitiveType implements IType
 		{
 		case "java/lang/Object":
 			return Types.ANY;
+		case "dyvil/lang/Null":
+			return Types.NULL;
+		case "dyvil/lang/None":
+			return Types.NONE;
 		case "java/lang/Void":
 			return Types.VOID;
 		case "java/lang/Boolean":
