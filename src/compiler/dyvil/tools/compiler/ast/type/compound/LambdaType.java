@@ -680,15 +680,4 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 
 		this.returnType.toString("", buffer);
 	}
-
-	@Override
-	public IType clone()
-	{
-		final LambdaType lt = new LambdaType(this.parameterCount);
-		lt.parameterCount = this.parameterCount;
-		System.arraycopy(this.parameterTypes, 0, lt.parameterTypes, 0, this.parameterCount);
-		lt.returnType = this.returnType;
-		lt.extension = this.extension;
-		return lt;
-	}
 }

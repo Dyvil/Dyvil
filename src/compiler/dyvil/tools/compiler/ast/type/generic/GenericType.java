@@ -313,14 +313,6 @@ public abstract class GenericType implements IObjectType, ITypeList
 		}
 	}
 
-	@Override
-	public GenericType clone()
-	{
-		GenericType type = this.copyName();
-		this.copyArgumentsTo(type);
-		return type;
-	}
-
 	protected abstract GenericType copyName();
 
 	private void copyArgumentsTo(GenericType target)

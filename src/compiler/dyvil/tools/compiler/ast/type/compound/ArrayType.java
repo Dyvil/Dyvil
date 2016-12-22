@@ -397,10 +397,4 @@ public class ArrayType implements IObjectType
 		this.type.toString(prefix, buffer);
 		buffer.append(']');
 	}
-
-	@Override
-	public IType clone()
-	{
-		return new ArrayType(this.type, this.mutability);
-	}
 }

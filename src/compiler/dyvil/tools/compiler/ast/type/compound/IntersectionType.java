@@ -407,10 +407,4 @@ public class IntersectionType implements IObjectType
 		buffer.append(" & ");
 		this.right.toString(prefix, buffer);
 	}
-
-	@Override
-	public IType clone()
-	{
-		return new IntersectionType(this.left.clone(), this.right.clone());
-	}
 }

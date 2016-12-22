@@ -389,10 +389,4 @@ public class ReferenceType implements IObjectType
 		this.type.toString(prefix, buffer);
 		buffer.append('*');
 	}
-
-	@Override
-	public IType clone()
-	{
-		return new ReferenceType(this.theClass, this.type.clone());
-	}
 }

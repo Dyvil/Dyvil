@@ -428,10 +428,4 @@ public class UnionType implements IObjectType
 		buffer.append(" | ");
 		this.right.toString(prefix, buffer);
 	}
-
-	@Override
-	public IType clone()
-	{
-		return new UnionType(this.left.clone(), this.right.clone());
-	}
 }

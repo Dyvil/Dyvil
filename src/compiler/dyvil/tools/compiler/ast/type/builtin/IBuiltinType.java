@@ -82,10 +82,4 @@ public interface IBuiltinType extends IRawType
 	{
 		buffer.append(this.toString());
 	}
-
-	@Override
-	default IType clone()
-	{
-		return this;
-	}
 }

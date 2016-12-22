@@ -78,9 +78,7 @@ public final class WildcardType implements IRawType, ITyped
 	@Override
 	public IType atPosition(ICodePosition position)
 	{
-		final WildcardType clone = this.clone();
-		clone.position = position;
-		return clone;
+		return new WildcardType(position, this.bound, this.variance);
 	}
 
 	@Override
@@ -443,13 +441,5 @@ public final class WildcardType implements IRawType, ITyped
 		{
 			buffer.append('_');
 		}
-	}
-
-	@Override
-	public WildcardType clone()
-	{
-		WildcardType clone = new WildcardType(this.position, this.variance);
-		clone.bound = this.bound;
-		return clone;
 	}
 }

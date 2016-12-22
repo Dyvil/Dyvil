@@ -228,10 +228,4 @@ public class NamedType implements IUnresolvedType, ITypeConsumer
 		}
 		buffer.append(this.name);
 	}
-
-	@Override
-	public IType clone()
-	{
-		return new NamedType(this.position, this.name, this.parent);
-	}
 }

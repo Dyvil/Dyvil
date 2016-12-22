@@ -475,10 +475,4 @@ public abstract class TypeDelegate implements IType, ITyped
 	{
 		return IASTNode.toString(this);
 	}
-
-	@Override
-	public IType clone()
-	{
-		return this.wrap(this.type.clone());
-	}
 }

@@ -282,12 +282,6 @@ public class TypeVarType implements IRawType
 	}
 
 	@Override
-	public IType clone()
-	{
-		return new TypeVarType(this.typeParameter);
-	}
-
-	@Override
 	public String toString()
 	{
 		return this.typeParameter.getName().toString();

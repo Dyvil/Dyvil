@@ -322,10 +322,4 @@ public class NullableType implements IObjectType
 		this.type.toString(prefix, buffer);
 		buffer.append('?');
 	}
-
-	@Override
-	public IType clone()
-	{
-		return this.wrap(this.type);
-	}
 }

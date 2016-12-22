@@ -808,12 +808,6 @@ public final class PrimitiveType implements IType
 	}
 
 	@Override
-	public PrimitiveType clone()
-	{
-		return this; // no clones
-	}
-
-	@Override
 	public boolean equals(Object obj)
 	{
 		return this == obj;

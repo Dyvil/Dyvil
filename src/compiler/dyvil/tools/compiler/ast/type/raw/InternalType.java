@@ -161,10 +161,4 @@ public class InternalType implements IRawType, IUnresolvedType
 	{
 		buffer.append(ClassFormat.internalToPackage(this.internalName));
 	}
-
-	@Override
-	public IType clone()
-	{
-		return new InternalType(this.internalName);
-	}
 }

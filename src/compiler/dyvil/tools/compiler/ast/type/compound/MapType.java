@@ -370,10 +370,4 @@ public class MapType implements IObjectType
 		this.valueType.toString(prefix, builder);
 		builder.append(']');
 	}
-
-	@Override
-	public IType clone()
-	{
-		return new MapType(this.keyType, this.valueType, this.mutability, this.theClass);
-	}
 }

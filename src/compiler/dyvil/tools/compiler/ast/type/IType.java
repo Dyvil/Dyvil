@@ -623,8 +623,6 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	@Override
 	void toString(String prefix, StringBuilder buffer);
 
-	IType clone();
-
 	@Override
 	boolean equals(Object obj);
 
