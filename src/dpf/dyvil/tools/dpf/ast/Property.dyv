@@ -10,13 +10,13 @@ import dyvil.tools.parsing.position.ICodePosition
 
 public class Property extends DPFValueVisitor implements NodeElement, Expandable
 {
-	protected Name  name = null
+	protected Name! name = null
 	{
 		public override get
 		public set
 	}
 
-	protected Value value = null
+	protected Value! value = null
 	{
 		public get
 		public set

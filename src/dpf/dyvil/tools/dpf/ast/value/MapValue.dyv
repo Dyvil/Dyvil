@@ -13,9 +13,9 @@ import java.util.function.BiFunction
 
 public class MapValue extends DPFValueVisitor implements Value, MapVisitor, Expandable
 {
-	protected Map<Value, Value> entries
+	protected Map<Value, Value>! entries
 
-	private Value tempKey
+	private Value! tempKey
 	
 	public init()
 	{

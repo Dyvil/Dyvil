@@ -64,7 +64,7 @@ public interface Value extends IASTNode
 
 	// Override Methods
 
-	override ICodePosition getPosition() = null
+	override ICodePosition getPosition() = ICodePosition.ORIGIN
 
 	override void setPosition(ICodePosition position) { }
 
@@ -76,9 +76,8 @@ public interface Value extends IASTNode
 
 	// Value Conversions
 
-	static Value wrap(any value)
+	static Value wrap(any! value)
 	{
-		if (value == null) return null
 		if (value is Value) return value as Value
 
 		let valueClass = value.getClass()

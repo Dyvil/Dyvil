@@ -12,7 +12,7 @@ import dyvil.tools.parsing.position.ICodePosition
 
 public class Node implements NodeElement, NodeVisitor, Expandable
 {
-	protected Name name = null
+	protected Name! name = null
 	{
 		public override get
 	}
@@ -87,7 +87,7 @@ public class Node implements NodeElement, NodeVisitor, Expandable
 		}
 		else
 		{
-			Node node = new Node(this.name)
+			let node = new Node(this.name)
 			this.expand(node, mappings)
 			return node
 		}

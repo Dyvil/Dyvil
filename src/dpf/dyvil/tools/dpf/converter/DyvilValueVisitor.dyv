@@ -21,7 +21,7 @@ import dyvil.tools.parsing.Name
  */
 public abstract class DyvilValueVisitor implements ValueVisitor
 {
-	protected abstract void visitObject(Object o)
+	protected abstract void visitObject(Object! o)
 	
 	public override void visitInt(int v)
 	{

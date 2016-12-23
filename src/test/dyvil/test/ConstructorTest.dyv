@@ -35,7 +35,7 @@ public class ConstructorTest
 	{
 		List<String> order = MutableList<String>
 
-		String s = { this.order += "init s" ; null }
+		String! s = { this.order += "init s" ; null }
 		int i
 
 		init

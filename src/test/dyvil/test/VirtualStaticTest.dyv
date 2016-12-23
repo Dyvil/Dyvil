@@ -21,8 +21,9 @@ public class VirtualStaticTest
 
 	interface IntConstructible
 	{
-		static T apply<T>(int i) = null
+		static T apply<T>(int i) = throw new AbstractMethodError
 	}
+
 	case class CustomInt(public final int value) implements IntConstructible
 	case class MyInt    (public final int value) implements IntConstructible
 
