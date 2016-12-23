@@ -12,6 +12,8 @@ public class AnyType implements IBuiltinType
 {
 	public static final String OBJECT_INTERNAL = "java/lang/Object";
 
+	public static final char ANY_DESC = 'a';
+
 	@Override
 	public int typeTag()
 	{
@@ -57,7 +59,7 @@ public class AnyType implements IBuiltinType
 	{
 		if (type == NAME_FULL)
 		{
-			buffer.append("a");
+			buffer.append(ANY_DESC);
 			return;
 		}
 		buffer.append("L" + OBJECT_INTERNAL + ";");

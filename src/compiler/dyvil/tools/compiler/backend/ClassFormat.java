@@ -15,6 +15,9 @@ import dyvil.tools.compiler.ast.method.IExternalCallableMember;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.AnyType;
+import dyvil.tools.compiler.ast.type.builtin.NoneType;
+import dyvil.tools.compiler.ast.type.builtin.NullType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.*;
 import dyvil.tools.compiler.ast.type.generic.GenericType;
@@ -279,8 +282,12 @@ public final class ClassFormat
 			final ReferenceType rt = new ReferenceType();
 			readTyped(desc, start + 1, rt::setType, true);
 			return rt;
-		case 'N': // null
+		case NullType.NULL_DESC: // null
 			return Types.NULL;
+		case NoneType.NONE_DESC: // none
+			return Types.NONE;
+		case AnyType.ANY_DESC: // any
+			return Types.ANY;
 		case 'T': // type parameter reference
 			return new InternalTypeVarType(desc.substring(start + 1, end));
 		case '[': // array type
@@ -374,8 +381,14 @@ public final class ClassFormat
 			consumer.setType(reference);
 			return end + 1;
 		}
-		case 'N': // null type
+		case NullType.NULL_DESC: // null type
 			consumer.setType(Types.NULL);
+			return start + 1;
+		case NoneType.NONE_DESC:
+			consumer.setType(Types.NONE);
+			return start + 1;
+		case AnyType.ANY_DESC:
+			consumer.setType(Types.ANY);
 			return start + 1;
 		case 'T': // type var reference
 		{

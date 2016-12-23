@@ -36,12 +36,12 @@ public class NoneType implements Type<Object>
 	@Override
 	public String qualifiedName()
 	{
-		return "dyvil/lang/None";
+		return "dyvil/lang/internal/None";
 	}
 	
 	@Override
 	public void appendSignature(StringBuilder builder)
 	{
-		builder.append("Ldyvil/lang/None;");
+		builder.append("Ldyvil/lang/internal/None;");
 	}
 }

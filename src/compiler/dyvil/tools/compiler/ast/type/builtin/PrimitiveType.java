@@ -107,11 +107,11 @@ public final class PrimitiveType implements IType
 	{
 		switch (internalClassName)
 		{
-		case "java/lang/Object":
+		case AnyType.OBJECT_INTERNAL:
 			return Types.ANY;
-		case "dyvil/lang/Null":
+		case NullType.NULL_INTERNAL:
 			return Types.NULL;
-		case "dyvil/lang/None":
+		case NoneType.NONE_INTERNAL:
 			return Types.NONE;
 		case "java/lang/Void":
 			return Types.VOID;

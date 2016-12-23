@@ -10,7 +10,9 @@ import dyvil.tools.parsing.Name;
 
 public class NoneType implements IBuiltinType
 {
-	public static final String NONE_INTERNAL = "dyvil/lang/None";
+	public static final String NONE_INTERNAL = "dyvil/lang/internal/None";
+
+	public static final char NONE_DESC = 'b';
 
 	@Override
 	public int typeTag()
@@ -45,6 +47,18 @@ public class NoneType implements IBuiltinType
 	}
 
 	@Override
+	public boolean isSuperTypeOf(IType subType)
+	{
+		return subType.hasTag(NONE);
+	}
+
+	@Override
+	public boolean isSuperClassOf(IType subType)
+	{
+		return subType.hasTag(NONE);
+	}
+
+	@Override
 	public boolean isSubTypeOf(IType superType)
 	{
 		return true;
@@ -69,7 +83,7 @@ public class NoneType implements IBuiltinType
 	{
 		if (type == NAME_FULL)
 		{
-			buffer.append('b');
+			buffer.append(NONE_DESC);
 			return;
 		}
 		buffer.append("L" + NONE_INTERNAL + ";");

@@ -121,8 +121,8 @@ public final class Types
 
 		PRIMITIVES_CLASS = Package.dyvilLang.resolveClass("Primitives");
 
-		NULL_CLASS = Package.dyvilLang.resolveClass("Null");
-		NONE_CLASS = Package.dyvilLang.resolveClass("None");
+		NULL_CLASS = Package.dyvilLangInternal.resolveClass("Null");
+		NONE_CLASS = Package.dyvilLangInternal.resolveClass("None");
 		OBJECT.theClass = OBJECT_CLASS = Package.javaLang.resolveClass("Object");
 		STRING.theClass = STRING_CLASS = Package.javaLang.resolveClass("String");
 		THROWABLE.theClass = THROWABLE_CLASS = Package.javaLang.resolveClass("Throwable");

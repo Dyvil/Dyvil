@@ -11,7 +11,9 @@ import dyvil.tools.parsing.Name;
 
 public class NullType implements IBuiltinType
 {
-	public static final String NULL_INTERNAL = "dyvil/lang/Null";
+	public static final String NULL_INTERNAL = "dyvil/lang/internal/Null";
+
+	public static final char NULL_DESC = 'n';
 
 	@Override
 	public int typeTag()
@@ -70,7 +72,7 @@ public class NullType implements IBuiltinType
 	{
 		if (type == NAME_FULL)
 		{
-			buffer.append('n');
+			buffer.append(NULL_DESC);
 			return;
 		}
 		buffer.append("L" + NULL_INTERNAL + ";");

@@ -1,4 +1,4 @@
-package dyvil.lang
+package dyvil.lang.`internal`
 
 public final object None
 {
