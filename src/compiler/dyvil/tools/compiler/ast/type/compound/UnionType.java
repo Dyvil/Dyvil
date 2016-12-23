@@ -20,6 +20,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.NullType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.raw.IObjectType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -219,50 +220,16 @@ public class UnionType implements IObjectType
 
 	public static IType combine(IType left, IType right, UnionType unionType)
 	{
-		if (Types.isVoid(left) || Types.isVoid(right))
+		if (left.canExtract(NullType.class))
 		{
-			// either type is void -> result void
-			return Types.VOID;
+			// left type is null -> result reference right type
+			return NullableType.apply(right);
 		}
 
-		if (!left.hasTag(IType.TYPE_VAR))
+		if (right.canExtract(NullType.class))
 		{
-			IClass leftClass = left.getTheClass();
-			if (leftClass == null)
-			{
-				// left type unresolved -> result right type
-				return right;
-			}
-			if (leftClass == Types.NULL_CLASS)
-			{
-				// left type is null -> result reference right type
-				return right.getObjectType();
-			}
-			if (leftClass == Types.OBJECT_CLASS)
-			{
-				// left type is Object -> result Object
-				return Types.ANY;
-			}
-		}
-
-		if (!right.hasTag(IType.TYPE_VAR))
-		{
-			final IClass rightClass = right.getTheClass();
-			if (rightClass == null)
-			{
-				// right type unresolved -> result left type
-				return left;
-			}
-			if (rightClass == Types.NULL_CLASS)
-			{
-				// right type is null -> result reference left type
-				return left.getObjectType();
-			}
-			if (rightClass == Types.OBJECT_CLASS)
-			{
-				// right type is Object -> result Object
-				return Types.ANY;
-			}
+			// right type is null -> result reference left type
+			return NullableType.apply(left);
 		}
 
 		if (Types.isSameType(left, right) || Types.isSuperType(left, right))

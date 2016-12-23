@@ -30,6 +30,12 @@ public class NoneType implements IBuiltinType
 		return Types.NONE_CLASS;
 	}
 
+	@Override
+	public boolean useNonNullAnnotation()
+	{
+		return false;
+	}
+
 	// Subtyping
 
 	@Override

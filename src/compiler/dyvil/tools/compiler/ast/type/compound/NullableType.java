@@ -42,6 +42,11 @@ public class NullableType implements IObjectType
 		this.type = type;
 	}
 
+	public static NullableType apply(IType type)
+	{
+		return new NullableType(type);
+	}
+
 	public IType getElementType()
 	{
 		return this.type;

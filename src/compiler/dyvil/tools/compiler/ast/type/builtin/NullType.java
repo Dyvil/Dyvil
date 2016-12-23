@@ -31,6 +31,12 @@ public class NullType implements IBuiltinType
 		return Types.NULL_CLASS;
 	}
 
+	@Override
+	public boolean useNonNullAnnotation()
+	{
+		return false;
+	}
+
 	// Subtyping
 
 	@Override

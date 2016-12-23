@@ -215,42 +215,6 @@ public class IntersectionType implements IObjectType
 
 	public static IType combine(IType left, IType right, IntersectionType intersectionType)
 	{
-		if (Types.isVoid(left) || Types.isVoid(right))
-		{
-			// either type is void -> result void
-			return Types.VOID;
-		}
-
-		if (!left.hasTag(IType.TYPE_VAR))
-		{
-			IClass leftClass = left.getTheClass();
-			if (leftClass == null)
-			{
-				// left type unresolved -> result right type
-				return right;
-			}
-			if (leftClass == Types.NULL_CLASS || leftClass == Types.OBJECT_CLASS)
-			{
-				// left type is null or Object -> result reference right type
-				return right.getObjectType();
-			}
-		}
-
-		if (!right.hasTag(IType.TYPE_VAR))
-		{
-			final IClass rightClass = right.getTheClass();
-			if (rightClass == null)
-			{
-				// right type unresolved -> result left type
-				return left;
-			}
-			if (rightClass == Types.NULL_CLASS || rightClass == Types.OBJECT_CLASS)
-			{
-				// right type is null or Object -> result reference left type
-				return left.getObjectType();
-			}
-		}
-
 		if (Types.isSameType(left, right) || Types.isSuperType(left, right))
 		{
 			// same type, or left type is a super type of right type -> result left type
