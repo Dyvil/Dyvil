@@ -8,15 +8,8 @@ import java.io.IOException
 
 using dyvil.tools.dpf.converter.binary.BinaryConstants._
 
-public class BinaryReader
+public class BinaryReader(private DataInput dataInput)
 {
-	private DataInput dataInput
-
-	public init(DataInput dataInput)
-	{
-		this.dataInput = dataInput
-	}
-
 	public void readValue(ValueVisitor valueVisitor) throws IOException
 	{
 		this.readValue(this.dataInput.readByte(), valueVisitor)

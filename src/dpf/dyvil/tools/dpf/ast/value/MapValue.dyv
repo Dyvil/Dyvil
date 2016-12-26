@@ -11,26 +11,25 @@ import dyvil.tuple.Tuple2
 
 import java.util.function.BiFunction
 
-public class MapValue extends DPFValueVisitor implements Value, MapVisitor, Expandable
+public class MapValue(
+	protected let entries: Map<Value, Value> { public get }
+	)
+	extends DPFValueVisitor implements Value, MapVisitor, Expandable
 {
-	protected Map<Value, Value>! entries
-
 	private Value! tempKey
-	
-	public init()
-	{
-		this.entries = new ArrayMap<Value, Value>
-	}
 
-	public init(Map<_, _> map)
-	{
-		let size = map.size
-		this.entries = new ArrayMap<Value, Value>(size)
+	public static func apply(): MapValue = new MapValue(new ArrayMap<Value, Value>)
 
+	public static func apply(int capacity): MapValue = new MapValue(new ArrayMap<Value, Value>(capacity))
+
+	public static func apply(Map<_, _> map): MapValue
+	{
+		let mapValue = MapValue(map.size)
 		for (Entry<_, _> entry <- map)
 		{
-			this.entries.put(Value.wrap(entry.getKey), Value.wrap(entry.getValue))
+			mapValue.entries.put(Value.wrap(entry.getKey()), Value.wrap(entry.getValue()))
 		}
+		return mapValue
 	}
 
 	protected override void visitValue(Value value)
@@ -52,12 +51,12 @@ public class MapValue extends DPFValueVisitor implements Value, MapVisitor, Expa
 
 	public override void accept(ValueVisitor visitor)
 	{
-		MapVisitor mapVisitor = visitor.visitMap()
+		let mapVisitor = visitor.visitMap()
 
-		for (Entry<Value, Value> entry <- this.entries)
+		for (entry <- this.entries)
 		{
-			entry.getKey.accept(mapVisitor.visitKey())
-			entry.getValue.accept(mapVisitor.visitValue())
+			entry.getKey().accept(mapVisitor.visitKey())
+			entry.getValue().accept(mapVisitor.visitValue())
 		}
 		
 		mapVisitor.visitEnd()
@@ -76,12 +75,8 @@ public class MapValue extends DPFValueVisitor implements Value, MapVisitor, Expa
 			this.entries.mapEntries(entryBiFunction)
 			return this
 		}
-		else
-		{
-			MapValue copy = new MapValue
-			copy.entries = this.entries.entryMapped(entryBiFunction)
-			return copy
-		}
+
+		return new MapValue(this.entries.entryMapped(entryBiFunction))
 	}
 
 	public override void toString(String indent, StringBuilder buffer)
@@ -93,26 +88,28 @@ public class MapValue extends DPFValueVisitor implements Value, MapVisitor, Expa
 			return
 		}
 
-		[Value] keys = this.entries.toKeyArray(class Value)
-		[Value] values = this.entries.toValueArray(class Value)
+		let keys = this.entries.toKeyArray(class Value)
+		let values = this.entries.toValueArray(class Value)
 		
-		String indent1 = indent + "\t"
+		let indent1 = indent + "\t"
 		
 		buffer.append("{\n").append(indent1)
 		keys[0].toString(indent1, buffer)
 		buffer.append(" : ")
 		values[0].toString(indent1, buffer)
-		for (int i <- 1 ..< len)
+
+		for (i <- 1 ..< len)
 		{
 			buffer.append(",\n").append(indent1)
 			keys[i].toString(indent1, buffer)
 			buffer.append(" : ")
 			values[i].toString(indent1, buffer)
 		}
+
 		buffer.append('\n').append(indent).append('}')
 	}
 
-	public override boolean equals(Object o)
+	public override boolean equals(Object! o)
 	{
 		if (this === o) return true
 		if (!(o is MapValue)) return false

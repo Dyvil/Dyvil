@@ -6,23 +6,15 @@ import dyvil.tools.dpf.visitor.NodeVisitor
 import dyvil.tools.dpf.visitor.ValueVisitor
 import dyvil.tools.parsing.Name
 
-public class FlatMapConverter implements NodeVisitor
+public class FlatMapConverter(protected let map: Map<String, Object>
+                              protected let name: String)
+	implements NodeVisitor
 {
-	protected Map<String, Object> map
-	protected String              name
-
 	public init(Map<String, Object> map)
 	{
-		this.map = map
-		this.name = ""
+		this.init(map, "")
 	}
-	
-	private init(Map<String, Object> map, String name)
-	{
-		this.map = map
-		this.name = name
-	}
-	
+
 	protected String getName(Name name)
 	{
 		if (this.name.isEmpty)
@@ -31,20 +23,20 @@ public class FlatMapConverter implements NodeVisitor
 		}
 		return this.name + '.' + name.qualified
 	}
-	
+
 	public override NodeVisitor visitNode(Name name)
 	{
 		return new FlatMapConverter(this.map, this.getName(name))
 	}
-	
+
 	public override NodeVisitor visitNodeAccess(Name name)
 	{
 		return new FlatMapConverter(this.map, this.getName(name))
 	}
-	
+
 	public override ValueVisitor visitProperty(Name name) = new DyvilValueVisitor()
 	{
-		String propertyName = this<FlatMapConverter>.getName(name)
+		let propertyName = this<FlatMapConverter>.getName(name)
 
 		protected override void visitObject(Object o)
 		{
