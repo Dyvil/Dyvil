@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.phase;
 
-import dyvil.annotation.analysis.NotNull;
+import dyvil.annotation.internal.NonNull;
 import dyvil.tools.compiler.DyvilCompiler;
 
 import java.util.function.Consumer;
@@ -37,7 +37,7 @@ public class CompilerPhase implements ICompilerPhase
 	}
 	
 	@Override
-	public int compareTo(@NotNull ICompilerPhase o)
+	public int compareTo(@NonNull ICompilerPhase o)
 	{
 		return Integer.compare(this.id, o.getID());
 	}

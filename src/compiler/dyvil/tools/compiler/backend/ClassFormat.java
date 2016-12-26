@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.backend;
 
-import dyvil.annotation.analysis.NotNull;
+import dyvil.annotation.internal.NonNull;
 import dyvil.tools.asm.ASMConstants;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
@@ -318,7 +318,7 @@ public final class ClassFormat
 		return nullables ? new ImplicitNullableType(result) : result;
 	}
 
-	@NotNull
+	@NonNull
 	private static IType readReferenceType(String desc, int start, int end)
 	{
 		int index = desc.indexOf('<', start);

@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.statement.loop;
 
-import dyvil.annotation.analysis.NotNull;
+import dyvil.annotation.internal.NonNull;
 import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.context.CombiningLabelContext;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -269,7 +269,7 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 		return this;
 	}
 
-	@NotNull
+	@NonNull
 	public IValue toIteratorLoop(MarkerList markers, IContext context, IType varType, IValue value, IType valueType)
 	{
 		final IType iteratorType = Types.resolveTypeSafely(valueType, IterableForStatement.LazyFields.ITERATOR_TYPE)
@@ -293,7 +293,7 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 		return iterableForStatement;
 	}
 
-	@NotNull
+	@NonNull
 	public IValue toStringLoop(MarkerList markers, IContext context, IType varType, IValue value)
 	{
 		if (varType == Types.UNKNOWN)
@@ -313,7 +313,7 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 		return stringForStatement;
 	}
 
-	@NotNull
+	@NonNull
 	public IValue toIterable(MarkerList markers, IContext context, IType varType, IValue value, IType valueType)
 	{
 		final IType iterableType = Types.resolveTypeSafely(valueType, IterableForStatement.LazyFields.ITERABLE_TYPE)

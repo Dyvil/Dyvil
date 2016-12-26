@@ -1,4 +1,4 @@
-package dyvil.annotation.analysis;
+package dyvil.annotation.internal;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,5 +7,5 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.TYPE_USE)
-public @interface NotNull
+public @interface NonNull
 {}

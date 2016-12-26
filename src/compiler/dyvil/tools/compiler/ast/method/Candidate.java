@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.method;
 
-import dyvil.annotation.analysis.NotNull;
+import dyvil.annotation.internal.NonNull;
 import dyvil.array.IntArray;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.util.MemberSorter;
@@ -61,7 +61,7 @@ public final class Candidate<T extends ICallableMember> implements Comparable<Ca
 	}
 
 	@Override
-	public int compareTo(@NotNull Candidate<T> o)
+	public int compareTo(@NonNull Candidate<T> o)
 	{
 		int better = 0;
 		int worse = 0;
