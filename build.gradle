@@ -335,7 +335,7 @@ task bootstrap(type: Jar, dependsOn: [ 'compileLibraryDyvil' ]) {
 	
 	destinationDir file('libs')
 	
-	archiveName = "dyvil-bootstrap-${ libraryVersion }.jar"
+	archiveName = "dyvil-bootstrap.jar"
 }
 
 /**
