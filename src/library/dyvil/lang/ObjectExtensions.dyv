@@ -33,31 +33,44 @@ public final class ObjectExtensions
 	// Object Extensions
 
 	// Structural Equality (equals)
-	public infix func ==(Object lhs, Object rhs): boolean = lhs == null ? rhs == null : lhs.equals(rhs)
+	@BytecodeName("$eq$eq_nonnull")
+	@Intrinsic([ LOAD_0, LOAD_1, INVOKEVIRTUAL, 0, 1, 2 ]
+	  strings: [ "java/lang/Object", "equals", "(Ljava/lang/Object;)Z" ])
+	public infix func ==(Object lhs, Object! rhs): boolean = lhs.equals(rhs)
+
+	public infix func ==(Object! lhs, Object! rhs): boolean = lhs == null ? rhs == null : unsafeUnwrap(lhs).equals(rhs)
 
 	// Reference Equality
 	@Intrinsic([ LOAD_0, LOAD_1, ACMPEQ ])
-	public infix func ===(Object lhs, Object rhs): boolean = lhs === rhs
+	public infix func ===(Object! lhs, Object! rhs): boolean = lhs === rhs
 
 	// Structural Inequality (!equals)
-	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2, BNOT ], strings: [ "dyvil/lang/ObjectExtensions", "$eq$eq", "(Ljava/lang/Object;Ljava/lang/Object;)Z" ])
-	public infix func !=(Object lhs, Object rhs): boolean = !(lhs == rhs)
+	@BytecodeName("$bang$eq_nonnull")
+	@Intrinsic([ LOAD_0, LOAD_1, INVOKEVIRTUAL, 0, 1, 2, BNOT ]
+	  strings: [ "java/lang/Object", "equals", "(Ljava/lang/Object;)Z" ])
+	public infix func !=(Object lhs, Object! rhs): boolean = !lhs.equals(rhs)
+
+	@Intrinsic([ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2, BNOT ]
+	  strings: [ "dyvil/lang/ObjectExtensions", "$eq$eq", "(Ljava/lang/Object;Ljava/lang/Object;)Z" ])
+	public infix func !=(Object! lhs, Object! rhs): boolean = !(lhs == rhs)
 
 	// Reference Inequality
 	@Intrinsic([ LOAD_0, LOAD_1, ACMPNE ])
-	public infix func !==(Object lhs, Object rhs): boolean = lhs !== rhs
+	public infix func !==(Object! lhs, Object! rhs): boolean = lhs !== rhs
 
 	// Optionals
 
-	// @Intrinsic
+	@Intrinsic([ LOAD_0 ])
+	public static func unsafeUnwrap<T>(T? optional): T = optional as T
+
+	// Compiler-Intrinsic
 	public postfix func ! <T>(T? optional): T
 	{
 		if (optional == null) throw new NullPointerException("Unwrapped Optional was null")
-		return optional as T
+		return unsafeUnwrap(optional)
 	}
 
-	// @Intrinsic
-	public infix func ?? <T, U> (T? lhs, U rhs): T|U = lhs == null ? rhs : (lhs as T)
+	public infix func ?? <T, U> (T? lhs, U rhs): T|U = lhs != null ? unsafeUnwrap(lhs) : rhs
 
 	// Comparable
 
