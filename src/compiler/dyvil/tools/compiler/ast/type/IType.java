@@ -477,9 +477,19 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	void writeTypeExpression(MethodWriter writer) throws BytecodeException;
 
-	void writeDefaultValue(MethodWriter writer) throws BytecodeException;
+	default void writeDefaultValue(MethodWriter writer) throws BytecodeException
+	{
+	}
 
-	IConstantValue getDefaultValue();
+	default boolean hasDefaultValue()
+	{
+		return this.getDefaultValue() != null;
+	}
+
+	default IConstantValue getDefaultValue()
+	{
+		return null;
+	}
 
 	// Annotations
 

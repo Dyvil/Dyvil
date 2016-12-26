@@ -6,6 +6,8 @@ import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.constant.IConstantValue;
+import dyvil.tools.compiler.ast.constant.NullValue;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -274,6 +276,18 @@ public class NullableType implements IObjectType
 		this.type.writeTypeExpression(writer);
 		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/OptionType", "apply",
 		                       "(Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/OptionType;", false);
+	}
+
+	@Override
+	public void writeDefaultValue(MethodWriter writer) throws BytecodeException
+	{
+		writer.visitInsn(Opcodes.ACONST_NULL);
+	}
+
+	@Override
+	public IConstantValue getDefaultValue()
+	{
+		return NullValue.NULL;
 	}
 
 	@Override

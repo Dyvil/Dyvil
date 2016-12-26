@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -50,9 +51,9 @@ public class WildcardValue implements IConstantValue
 	}
 
 	@Override
-	public void setLambdaParameter(IParameter lambdaParameter)
+	public void setLambdaParameter(IParameter parameter)
 	{
-		this.lambdaParameter = lambdaParameter;
+		this.lambdaParameter = parameter;
 	}
 
 	@Override
@@ -123,15 +124,21 @@ public class WildcardValue implements IConstantValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.type == Types.UNKNOWN)
-		{
-			markers.add(Markers.semantic(this.position, "wildcard.type"));
-		}
 	}
 
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		if (!this.type.isResolved())
+		{
+			markers.add(Markers.semanticError(this.position, "wildcard.type.unresolved"));
+		}
+		if (this.lambdaParameter == null && !this.type.hasDefaultValue())
+		{
+			final Marker marker = Markers.semanticError(this.position, "wildcard.type.no_default");
+			marker.addInfo(Markers.getSemantic("wildcard.type", this.type));
+			markers.add(marker);
+		}
 	}
 
 	@Override
