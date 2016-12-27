@@ -1,1 +1,2 @@
+@base=true
 PRIMITIVE_SPECS=Base-Boolean.dgs, Base-Byte.dgs, Base-Short.dgs, Base-Char.dgs, Base-Int.dgs, Base-Long.dgs, Base-Float.dgs, Base-Double.dgs

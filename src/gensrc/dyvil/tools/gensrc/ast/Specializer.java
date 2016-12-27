@@ -146,7 +146,10 @@ public class Specializer
 				final Specialization[] specs = this.parseSpecs(line, directiveEnd, length, replacements);
 				for (Specialization spec : specs)
 				{
-					replacements.importFrom(spec);
+					if (spec != null)
+					{
+						replacements.importFrom(spec);
+					}
 				}
 				continue;
 			}
@@ -256,11 +259,14 @@ public class Specializer
 		// repeat processing the following lines once for each specified specialization
 		for (Specialization spec : specs)
 		{
-			if (spec != null)
+			if (spec == null)
 			{
-				forEnd = this.processLines(start + 1, end, new ForReplacementMap(spec, replacements), FOR_BLOCK, true,
-				                           true);
+				continue;
 			}
+
+			final LazyReplacementMap innerReplacements = new LazyReplacementMap(replacements);
+			innerReplacements.importFrom(spec);
+			forEnd = this.processLines(startLine + 1, endLine, innerReplacements, FOR_BLOCK, true, true);
 		}
 		return forEnd;
 	}
@@ -302,7 +308,7 @@ public class Specializer
 
 		final StringBuilder builder = new StringBuilder(end - start);
 
-		int prev = 0;
+		int prev = start;
 
 		for (int i = start; i < end; )
 		{
