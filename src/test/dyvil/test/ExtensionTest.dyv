@@ -36,8 +36,8 @@ public class ExtensionTest
 		var success = true
 		for (int i <- 0 .. count)
 		{
-			A current = null
-			String expected = null
+			A! current = null
+			String! expected = null
 			match random.nextInt(4)
 			{
 				case 0 { current = a; expected = "fallback" }

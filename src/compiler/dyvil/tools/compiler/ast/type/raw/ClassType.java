@@ -173,12 +173,4 @@ public class ClassType implements IRawType
 	{
 		buffer.append(this.theClass.getName());
 	}
-
-	@Override
-	public ClassType clone()
-	{
-		ClassType t = new ClassType();
-		t.theClass = this.theClass;
-		return t;
-	}
 }

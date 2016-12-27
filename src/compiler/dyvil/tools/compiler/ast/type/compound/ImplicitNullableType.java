@@ -1,27 +1,41 @@
 package dyvil.tools.compiler.ast.type.compound;
 
 import dyvil.tools.asm.TypeAnnotatableVisitor;
-import dyvil.tools.asm.TypePath;
-import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public class ImplicitOptionType extends OptionType
+public class ImplicitNullableType extends NullableType
 {
-	public ImplicitOptionType(IType type)
+	public ImplicitNullableType()
 	{
-		super(type);
+	}
+
+	public ImplicitNullableType(IType type)
+	{
+		this.type = type;
+	}
+
+	@Override
+	public int typeTag()
+	{
+		return IMPLICIT_OPTIONAL;
+	}
+
+	@Override
+	protected NullableType wrap(IType type)
+	{
+		return new ImplicitNullableType(type);
 	}
 
 	@Override
@@ -31,25 +45,10 @@ public class ImplicitOptionType extends OptionType
 	}
 
 	@Override
-	public IValue convertValueTo(IValue value, IType targetType, ITypeContext typeContext, MarkerList markers, IContext context)
+	public IValue convertValueTo(IValue value, IType targetType, ITypeContext typeContext, MarkerList markers,
+		                            IContext context)
 	{
-		if (!this.isConvertibleTo(targetType))
-		{
-			return null;
-		}
-
-		return new MethodCall(value.getPosition(), value, LazyFields.GET_METHOD, EmptyArguments.INSTANCE);
-	}
-
-	@Override
-	public IType getConcreteType(ITypeContext context)
-	{
-		final IType type = this.type.getConcreteType(context);
-		if (type != this.type)
-		{
-			return new ImplicitOptionType(type);
-		}
-		return this;
+		return this.isConvertibleTo(targetType) ? value : null;
 	}
 
 	@Override
@@ -62,13 +61,38 @@ public class ImplicitOptionType extends OptionType
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
 		this.type.getMethodMatches(list, receiver, name, arguments);
-		super.getMethodMatches(list, receiver, name, arguments);
+	}
+
+	@Override
+	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
+	{
+		this.type.getImplicitMatches(list, value, targetType);
+	}
+
+	@Override
+	public IMethod getFunctionalMethod()
+	{
+		return this.type.getFunctionalMethod();
+	}
+
+	@Override
+	public IType withAnnotation(IAnnotation annotation)
+	{
+		switch (annotation.getType().getInternalName())
+		{
+		case AnnotationUtil.NOTNULL_INTERNAL:
+			return this.type;
+		case AnnotationUtil.NULLABLE_INTERNAL:
+			return new NullableType(this.type);
+		}
+
+		return this.type.withAnnotation(annotation);
 	}
 
 	@Override
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
-		visitor.visitTypeAnnotation(typeRef, TypePath.fromString(typePath), AnnotationUtil.IMPLICITLY_UNWRAPPED, false).visitEnd();
+		this.type.writeAnnotations(visitor, typeRef, typePath);
 	}
 
 	@Override

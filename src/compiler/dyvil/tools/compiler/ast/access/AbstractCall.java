@@ -137,7 +137,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 	@Override
 	public boolean isType(IType type)
 	{
-		return Types.isVoid(type) || this.method != null && Types.isAssignable(this.getType(), type);
+		return Types.isVoid(type) || this.method != null && Types.isSuperType(type, this.getType());
 	}
 
 	protected abstract Name getReferenceName();

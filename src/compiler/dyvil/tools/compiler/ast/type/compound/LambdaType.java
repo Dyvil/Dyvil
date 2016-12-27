@@ -171,13 +171,11 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		return this.position;
 	}
 
-	@Override
 	public void setExtension(boolean extension)
 	{
 		this.extension = extension;
 	}
 
-	@Override
 	public boolean isExtension()
 	{
 		return this.extension;
@@ -225,9 +223,9 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	}
 
 	@Override
-	public boolean isSuperTypeOf(IType type)
+	public boolean isSuperTypeOf(IType subType)
 	{
-		if (!IObjectType.super.isSuperTypeOf(type))
+		if (!IObjectType.super.isSuperTypeOf(subType))
 		{
 			return false;
 		}
@@ -235,7 +233,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		final IClass functionClass = this.getTheClass();
 
 		ITypeParameter typeVar = functionClass.getTypeParameter(this.parameterCount);
-		IType resolvedType = Types.resolveTypeSafely(type, typeVar);
+		IType resolvedType = Types.resolveTypeSafely(subType, typeVar);
 
 		// Return Type is Covariant
 		if (!Types.isSuperType(this.returnType, resolvedType))
@@ -246,7 +244,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			typeVar = functionClass.getTypeParameter(i);
-			resolvedType = type.resolveType(typeVar);
+			resolvedType = subType.resolveType(typeVar);
 
 			// Parameter Types are Contravariant
 			if (!Types.isSuperType(resolvedType, this.parameterTypes[i]))
@@ -569,9 +567,9 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameterTypes[i].writeAnnotations(visitor, typeRef, typePath + i + ';');
+			IType.writeAnnotations(this.parameterTypes[i], visitor, typeRef, typePath + i + ';');
 		}
-		this.returnType.writeAnnotations(visitor, typeRef, typePath + this.parameterCount + ';');
+		IType.writeAnnotations(this.returnType, visitor, typeRef, typePath + this.parameterCount + ';');
 	}
 
 	@Override
@@ -681,16 +679,5 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		}
 
 		this.returnType.toString("", buffer);
-	}
-
-	@Override
-	public IType clone()
-	{
-		final LambdaType lt = new LambdaType(this.parameterCount);
-		lt.parameterCount = this.parameterCount;
-		System.arraycopy(this.parameterTypes, 0, lt.parameterTypes, 0, this.parameterCount);
-		lt.returnType = this.returnType;
-		lt.extension = this.extension;
-		return lt;
 	}
 }

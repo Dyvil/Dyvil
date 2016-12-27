@@ -71,10 +71,4 @@ public class InfixTypeChain extends OperatorStack<IType> implements IUnresolvedT
 	{
 		// TODO
 	}
-
-	@Override
-	public IType clone()
-	{
-		return this;
-	}
 }

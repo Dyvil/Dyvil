@@ -16,52 +16,43 @@ using dyvil.tools.parsing.token.IToken.`type` as ttype
 
 import java.io.File
 
-public class Parser
+public class Parser(
+	private let markers: MarkerList
+	private let tokens:  TokenIterator
+	)
 {
-	private TokenIterator tokens
-	private MarkerList    markers
+	public static func apply(String code): Parser = Parser(new MarkerList(BaseMarkers.INSTANCE), code)
 
-	public init(String code)
+	public static func apply(MarkerList markers, String code): Parser
 	{
-		this.init(new MarkerList(BaseMarkers.INSTANCE), code)
+		let tokens = new DyvilLexer(markers, BaseSymbols.INSTANCE).tokenize(code)
+		return Parser(markers, tokens)
 	}
-	
-	public init(MarkerList markers, String code)
-	{
-		this.markers = markers
 
-		final DyvilLexer lexer = new DyvilLexer(markers, BaseSymbols.INSTANCE)
-		this.tokens = lexer.tokenize(code)
-	}
-	
+	public static func apply(MarkerList markers, TokenIterator tokens): Parser = new Parser(markers, tokens)
+
 	public static RootNode parse(File file)
 	{
 		return parse(FileUtils.tryRead(file))
 	}
-	
+
 	public static RootNode parse(String code)
 	{
-		RootNode file = new RootNode()
-		new Parser(code).parseNodeBody(file)
-		return file
+		let root = new RootNode()
+		Parser(code).parseNodeBody(root)
+		return root
 	}
-	
+
 	public void parseNodeBody(NodeVisitor visitor)
 	{
-		while (this.tokens.hasNext())
-		{
-			if (!this.parseNodeElement(visitor))
-			{
-				break
-			}
-		}
+		while (this.tokens.hasNext() && this.parseNodeElement(visitor))
 
 		visitor.visitEnd()
 	}
-	
+
 	public boolean parseNodeElement(NodeVisitor visitor)
 	{
-		IToken token = this.tokens.next()
+		let token = this.tokens.next()
 		match token.ttype
 		{
 			case Tokens.LETTER_IDENTIFIER
@@ -94,14 +85,14 @@ public class Parser
 			case BaseSymbols.CLOSE_CURLY_BRACKET: return false
 			case _ {}
 		}
-		
+
 		this.markers.add(new SyntaxError(token, "Invalid Node Element - Invalid " + token))
 		return true
 	}
-	
+
 	public void parseValue(ValueVisitor valueVisitor)
 	{
-		IToken token = this.tokens.next()
+		let token = this.tokens.next()
 		match token.ttype
 		{
 			case Tokens.INT
@@ -136,7 +127,7 @@ public class Parser
 			}
 			case Tokens.IDENTIFIER | Tokens.LETTER_IDENTIFIER | Tokens.SYMBOL_IDENTIFIER | Tokens.SPECIAL_IDENTIFIER
 			{
-				IToken next = token.next()
+				let next = token.next()
 				next.ttype match
 				{
 					case BaseSymbols.DOT
@@ -151,7 +142,7 @@ public class Parser
 					}
 					case _ {}
 				}
-				if ("-".equals token.nameValue.unqualified)
+				if ("-" == token.nameValue.unqualified)
 				{
 					next.ttype match
 					{
@@ -197,10 +188,10 @@ public class Parser
 			}
 			case _ {}
 		}
-		
+
 		this.markers.add(new SyntaxError(token, "Invalid Value - Invalid " + token))
 	}
-	
+
 	private void parseList(ListVisitor visitor)
 	{
 		if (this.tokens.lastReturned.ttype == BaseSymbols.CLOSE_SQUARE_BRACKET)
@@ -209,15 +200,15 @@ public class Parser
 			visitor.visitEnd()
 			return
 		}
-		
+
 		while (this.tokens.hasNext())
 		{
 			this.parseValue(visitor.visitElement())
-			
+
 			IToken token = this.tokens.next()
 			match token.ttype
 			{
-				case BaseSymbols.COMMA: continue
+				case BaseSymbols.COMMA => continue
 				case BaseSymbols.CLOSE_SQUARE_BRACKET
 				{
 					visitor.visitEnd()
@@ -225,11 +216,11 @@ public class Parser
 				}
 				case _ {}
 			}
-			
+
 			this.markers.add(new SyntaxError(token, "Invalid List - ',' expected"))
 		}
 	}
-	
+
 	private void parseMap(MapVisitor visitor)
 	{
 		if (this.tokens.lastReturned.next.ttype == BaseSymbols.CLOSE_SQUARE_BRACKET)
@@ -238,19 +229,19 @@ public class Parser
 			visitor.visitEnd()
 			return
 		}
-		
+
 		while (this.tokens.hasNext())
 		{
 			this.parseValue(visitor.visitKey())
-			
-			IToken token = this.tokens.next()
+
+			var token = this.tokens.next()
 			if (token.ttype != BaseSymbols.COLON)
 			{
 				this.markers.add(new SyntaxError(token, "Invalid Map - ':' expected"))
 			}
-			
+
 			this.parseValue(visitor.visitValue())
-			
+
 			token = this.tokens.lastReturned.next
 			token.ttype match
 			{
@@ -269,16 +260,16 @@ public class Parser
 			}
 		}
 	}
-	
+
 	public void parseStringInterpolation(StringInterpolationVisitor visitor)
 	{
-		IToken token = this.tokens.lastReturned
+		var token = this.tokens.lastReturned
 		visitor.visitStringPart(token.stringValue)
-		
+
 		while (this.tokens.hasNext())
 		{
 			this.parseValue(visitor.visitValue())
-			
+
 			token = this.tokens.next()
 			token.ttype match
 			{
@@ -295,35 +286,35 @@ public class Parser
 				}
 				case _ {}
 			}
-			
+
 			this.markers.add(new SyntaxError(token, "Invalid String Interpolation - String expected"))
 		}
 	}
-	
+
 	private void parseAccessSequence(ValueVisitor visitor)
 	{
-		IToken token = this.tokens.lastReturned()
+		var token = this.tokens.lastReturned()
 		while (token.hasNext() && token.next.ttype == BaseSymbols.DOT)
 		{
 			token = token.next.next
 		}
-		
+
 		this.tokens.setNext(token.next())
 		while (token.prev.ttype == BaseSymbols.DOT)
 		{
 			visitor = visitor.visitValueAccess(token.nameValue)
-			
+
 			token = token.prev.prev
 		}
-		
+
 		visitor.visitName(token.nameValue)
 	}
-	
+
 	public void parseBuilder(BuilderVisitor visitor)
 	{
 		// button = Button(text: 'Hello') { visible = false }
-		
-		final IToken token = this.tokens.next()
+
+		let token = this.tokens.next()
 		token.ttype match
 		{
 			case BaseSymbols.OPEN_PARENTHESIS
@@ -345,27 +336,27 @@ public class Parser
 			case _ {}
 		}
 	}
-	
+
 	private void parseBuilderNode(BuilderVisitor visitor)
 	{
 		this.parseNodeBody(visitor.visitNode())
-		
-		final IToken token = this.tokens.lastReturned()
+
+		let token = this.tokens.lastReturned()
 		if (token.ttype != BaseSymbols.CLOSE_CURLY_BRACKET)
 		{
 			this.markers.add(new SyntaxError(token, "Invalid Builder - '}' expected"))
 		}
 	}
-	
+
 	private void parseParameters(BuilderVisitor visitor)
 	{
-		IToken token = this.tokens.lastReturned().next()
+		var token = this.tokens.lastReturned().next()
 		if (token.ttype == BaseSymbols.CLOSE_PARENTHESIS)
 		{
 			this.tokens.next()
 			return
 		}
-		
+
 		while (this.tokens.hasNext())
 		{
 			if (token.next.ttype == BaseSymbols.COLON)
@@ -378,7 +369,7 @@ public class Parser
 			{
 				this.parseValue(visitor.visitParameter(null))
 			}
-			
+
 			token = this.tokens.next()
 			match token.ttype
 			{

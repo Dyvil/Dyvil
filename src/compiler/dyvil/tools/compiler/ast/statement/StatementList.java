@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.MemberKind;
@@ -22,7 +23,6 @@ import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.statement.control.Label;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -41,6 +41,10 @@ import java.util.Iterator;
 
 public class StatementList implements IValue, IValueList, IDefaultContext, ILabelContext
 {
+	private static final TypeChecker.MarkerSupplier RETURN_MARKER_SUPPLIER = TypeChecker
+		                                                                         .markerSupplier("statementlist.return",
+		                                                                                         "type.expected",
+		                                                                                         "return.type");
 	protected ICodePosition position;
 
 	protected IValue[] values;
@@ -147,7 +151,8 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 			}
 		}
 
-		final IValue typed = value.withType(type, typeContext, markers, context);
+		final IValue typed = TypeChecker
+			                     .convertValue(value, type, typeContext, markers, context, RETURN_MARKER_SUPPLIER);
 
 		context.pop();
 
@@ -155,12 +160,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		{
 			this.values[this.valueCount - 1] = typed;
 			this.returnType = typed.getType();
-			return this;
 		}
-
-		markers.add(TypeChecker
-			            .typeError(value.getPosition(), type, value.getType(), "statementlist.return", "type.expected",
-			                       "return.type"));
 
 		return this;
 	}

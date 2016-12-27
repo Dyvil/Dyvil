@@ -3,34 +3,33 @@ package dyvil.tools.compiler.ast.type.builtin;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.compound.NullableType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
 
-public class NullType implements IBuiltinType
+public class NoneType implements IBuiltinType
 {
-	public static final String NULL_INTERNAL = "dyvil/lang/internal/Null";
+	public static final String NONE_INTERNAL = "dyvil/lang/internal/None";
 
-	public static final char NULL_DESC = 'n';
+	public static final char NONE_DESC = 'b';
 
 	@Override
 	public int typeTag()
 	{
-		return NULL;
+		return NONE;
 	}
 
 	@Override
 	public Name getName()
 	{
-		return Names._null;
+		return Names.none;
 	}
 
 	@Override
 	public IClass getTheClass()
 	{
-		return Types.NULL_CLASS;
+		return Types.NONE_CLASS;
 	}
 
 	@Override
@@ -48,9 +47,21 @@ public class NullType implements IBuiltinType
 	}
 
 	@Override
+	public boolean isSuperTypeOf(IType subType)
+	{
+		return subType.hasTag(NONE);
+	}
+
+	@Override
+	public boolean isSuperClassOf(IType subType)
+	{
+		return subType.hasTag(NONE);
+	}
+
+	@Override
 	public boolean isSubTypeOf(IType superType)
 	{
-		return superType.canExtract(NullableType.class);
+		return true;
 	}
 
 	@Override
@@ -64,7 +75,7 @@ public class NullType implements IBuiltinType
 	@Override
 	public String getInternalName()
 	{
-		return NULL_INTERNAL;
+		return NONE_INTERNAL;
 	}
 
 	@Override
@@ -72,22 +83,22 @@ public class NullType implements IBuiltinType
 	{
 		if (type == NAME_FULL)
 		{
-			buffer.append(NULL_DESC);
+			buffer.append(NONE_DESC);
 			return;
 		}
-		buffer.append("L" + NULL_INTERNAL + ";");
+		buffer.append("L" + NONE_INTERNAL + ";");
 	}
 
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvilx/lang/model/type/NullType", "instance",
-		                      "Ldyvilx/lang/model/type/NullType;");
+		writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvilx/lang/model/type/NoneType", "instance",
+		                      "Ldyvilx/lang/model/type/NoneType;");
 	}
 
 	@Override
 	public String toString()
 	{
-		return "null";
+		return "none";
 	}
 }

@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisExpr;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -20,7 +21,6 @@ import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -32,6 +32,7 @@ import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -369,6 +370,12 @@ public class Field extends Member implements IField
 		{
 			this.value.check(markers, context);
 		}
+		else if (!this.hasDefaultInit())
+		{
+			final Marker marker = Markers.semanticError(this.position, "field.type.no_default", this.name);
+			marker.addInfo(Markers.getSemantic("field.type", this.type));
+			markers.add(marker);
+		}
 
 		if (this.property != null)
 		{
@@ -377,8 +384,13 @@ public class Field extends Member implements IField
 
 		if (Types.isVoid(this.type))
 		{
-			markers.add(Markers.semantic(this.position, "field.type.void"));
+			markers.add(Markers.semanticError(this.position, "field.type.void"));
 		}
+	}
+
+	protected boolean hasDefaultInit()
+	{
+		return this.type.hasDefaultValue();
 	}
 
 	@Override

@@ -3,17 +3,15 @@ package dyvil.tools.compiler.ast.type.compound;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
-import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
+import dyvil.tools.compiler.ast.constant.NullValue;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.NilExpr;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
@@ -21,14 +19,11 @@ import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.SingleArgument;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.raw.IObjectType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -36,55 +31,30 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public class OptionType implements IObjectType
+public class NullableType implements IObjectType
 {
-	public static final class LazyFields
-	{
-		public static final IClass         OPTION_CLASS          = Package.dyvilUtil.resolveClass("Option");
-		public static final ITypeParameter OPTION_TYPE_PARAMETER = OPTION_CLASS.getTypeParameter(0);
-
-		public static final IClass SOME_CLASS = Package.dyvilUtil.resolveClass("Some");
-
-		public static final IMethod APPLY_METHOD = SOME_CLASS.getBody().getMethod(Names.apply);
-
-		public static final IMethod GET_METHOD = OPTION_CLASS.getBody().getMethod(Names.get);
-
-		private LazyFields()
-		{
-			// no instances
-		}
-	}
-
-	private static class NoneValue extends NilExpr implements IConstantValue
-	{
-		public static final NoneValue instance = (NoneValue) new NoneValue().withType(new OptionType(Types.ANY),
-		                                                                              ITypeContext.DEFAULT, null, null);
-
-		private NoneValue()
-		{
-		}
-
-		@Override
-		public int stringSize()
-		{
-			return "None".length();
-		}
-
-		@Override
-		public boolean toStringBuilder(StringBuilder builder)
-		{
-			builder.append("None");
-			return true;
-		}
-	}
-
 	protected IType type;
 
-	public OptionType()
+	public NullableType()
 	{
 	}
 
-	public OptionType(IType type)
+	public NullableType(IType type)
+	{
+		this.type = type;
+	}
+
+	public static NullableType apply(IType type)
+	{
+		return new NullableType(type);
+	}
+
+	public IType getElementType()
+	{
+		return this.type;
+	}
+
+	public void setElementType(IType type)
 	{
 		this.type = type;
 	}
@@ -95,20 +65,10 @@ public class OptionType implements IObjectType
 		return OPTIONAL;
 	}
 
-	public IType getType()
-	{
-		return this.type;
-	}
-
-	public void setType(IType type)
-	{
-		this.type = type;
-	}
-
 	@Override
 	public boolean isGenericType()
 	{
-		return true;
+		return this.type.isGenericType();
 	}
 
 	@Override
@@ -120,41 +80,62 @@ public class OptionType implements IObjectType
 	@Override
 	public IClass getTheClass()
 	{
-		return LazyFields.OPTION_CLASS;
+		return this.type.getTheClass();
 	}
 
 	@Override
-	public boolean isConvertibleFrom(IType type)
+	public boolean useNonNullAnnotation()
 	{
-		return Types.isSuperType(type, this.type);
+		return false;
+	}
+
+	@Override
+	public int subTypeCheckLevel()
+	{
+		return SUBTYPE_NULLABLE;
+	}
+
+	@Override
+	public boolean isSubTypeOf(IType superType)
+	{
+		final NullableType nullable = superType.extract(NullableType.class);
+		return nullable != null && Types.isSuperType(nullable.getElementType(), this.type);
+	}
+
+	@Override
+	public boolean isSubClassOf(IType superType)
+	{
+		return Types.isSuperClass(superType, this.type);
+	}
+
+	@Override
+	public boolean isSuperClassOf(IType subType)
+	{
+		return Types.isSuperClass(this.type, subType);
+	}
+
+	@Override
+	public boolean isSuperTypeOf(IType subType)
+	{
+		final NullableType nullable = subType.extract(NullableType.class);
+		return Types.isSuperType(this.type, nullable != null ? nullable.getElementType() : subType);
 	}
 
 	@Override
 	public IValue convertValue(IValue value, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		final IType valueType = value.getType();
-		if (valueType == Types.UNKNOWN || IObjectType.super.isSuperTypeOf(valueType))
+		if (!Types.isSuperType(this, value.getType()))
 		{
-			return value.withType(this, typeContext, markers, context);
+			return this.type.convertValue(value, typeContext, markers, context);
 		}
 
-		final IValue typedReturnValue = value.withType(this.type, typeContext, markers, context);
-		if (typedReturnValue == null)
-		{
-			return null;
-		}
-
-		// Wrap the argument in a call to Some.[T]apply(x)
-		final MethodCall methodCall = new MethodCall(value.getPosition(), null, LazyFields.APPLY_METHOD,
-		                                             new SingleArgument(value));
-		methodCall.setGenericData(new GenericData(LazyFields.APPLY_METHOD, this.type));
-		return methodCall;
+		return IObjectType.super.convertValue(value, typeContext, markers, context);
 	}
 
 	@Override
 	public IType resolveType(ITypeParameter typeParameter)
 	{
-		return typeParameter == LazyFields.OPTION_TYPE_PARAMETER ? this.type : null;
+		return this.type.resolveType(typeParameter);
 	}
 
 	@Override
@@ -163,28 +144,47 @@ public class OptionType implements IObjectType
 		return this.type.hasTypeVariables();
 	}
 
+	protected NullableType wrap(IType type)
+	{
+		return new NullableType(type);
+	}
+
+	@Override
+	public IType asReturnType()
+	{
+		final IType type = this.type.asReturnType();
+		return type == this.type ? this : this.wrap(type);
+	}
+
+	@Override
+	public IType asParameterType()
+	{
+		final IType type = this.type.asParameterType();
+		return type == this.type ? this : this.wrap(type);
+	}
+
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
 		final IType type = this.type.getConcreteType(context);
-		if (type != this.type)
-		{
-			return new OptionType(type);
-		}
-		return this;
+		return type == this.type ? this : this.wrap(type);
 	}
 
 	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
-		final IType type = concrete.resolveType(LazyFields.OPTION_TYPE_PARAMETER);
-		this.type.inferTypes(type, typeContext);
+		final NullableType nullable = concrete.extract(NullableType.class);
+		if (nullable != null)
+		{
+			concrete = nullable.getElementType();
+		}
+		this.type.inferTypes(concrete, typeContext);
 	}
 
 	@Override
 	public boolean isResolved()
 	{
-		return true;
+		return this.type.isResolved();
 	}
 
 	@Override
@@ -192,6 +192,12 @@ public class OptionType implements IObjectType
 	{
 		this.type = this.type.resolveType(markers, context);
 		return this;
+	}
+
+	@Override
+	public void resolve(MarkerList markers, IContext context)
+	{
+		this.type.resolve(markers, context);
 	}
 
 	@Override
@@ -227,13 +233,11 @@ public class OptionType implements IObjectType
 	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
-		LazyFields.OPTION_CLASS.getMethodMatches(list, receiver, name, arguments);
 	}
 
 	@Override
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
-		LazyFields.OPTION_CLASS.getImplicitMatches(list, value, targetType);
 	}
 
 	@Override
@@ -250,7 +254,7 @@ public class OptionType implements IObjectType
 	@Override
 	public String getInternalName()
 	{
-		return "dyvil/util/Option";
+		return this.type.getInternalName();
 	}
 
 	@Override
@@ -263,16 +267,7 @@ public class OptionType implements IObjectType
 			return;
 		}
 
-		buffer.append('L').append(this.getInternalName());
-
-		if (type != NAME_DESCRIPTOR)
-		{
-			buffer.append('<');
-			this.type.appendDescriptor(buffer, NAME_SIGNATURE_GENERIC_ARG);
-			buffer.append('>');
-		}
-
-		buffer.append(';');
+		this.type.appendDescriptor(buffer, type);
 	}
 
 	@Override
@@ -286,43 +281,40 @@ public class OptionType implements IObjectType
 	@Override
 	public void writeDefaultValue(MethodWriter writer) throws BytecodeException
 	{
-		writer.visitFieldInsn(Opcodes.INVOKESTATIC, "dyvil/util/Option", "apply", "()Ldyvil/util/Option;");
+		writer.visitInsn(Opcodes.ACONST_NULL);
+	}
+
+	@Override
+	public IConstantValue getDefaultValue()
+	{
+		return NullValue.NULL;
 	}
 
 	@Override
 	public IType withAnnotation(IAnnotation annotation)
 	{
-		if (AnnotationUtil.IMPLICITLY_UNWRAPPED_INTERNAL.equals(annotation.getType().getInternalName()))
+		switch (annotation.getType().getInternalName())
 		{
-			return new ImplicitOptionType(this.type);
+		case AnnotationUtil.NOTNULL_INTERNAL:
+			return this.type;
+		case AnnotationUtil.NULLABLE_INTERNAL:
+			return this;
 		}
+
 		return null;
 	}
 
 	@Override
 	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
 	{
-		if (typePath.getStep(step) != TypePath.TYPE_ARGUMENT)
-		{
-			return;
-		}
-
-		if (typePath.getStepArgument(step) == 0)
-		{
-			this.type = IType.withAnnotation(this.type, annotation, typePath, step + 1, steps);
-		}
+		this.type = IType.withAnnotation(this.type, annotation, typePath, step, steps);
 	}
 
 	@Override
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
-		this.type.writeAnnotations(visitor, typeRef, typePath + "0;");
-	}
-
-	@Override
-	public IConstantValue getDefaultValue()
-	{
-		return NoneValue.instance;
+		visitor.visitTypeAnnotation(typeRef, TypePath.fromString(typePath), AnnotationUtil.NULLABLE, false).visitEnd();
+		this.type.writeAnnotations(visitor, typeRef, typePath);
 	}
 
 	@Override
@@ -348,11 +340,5 @@ public class OptionType implements IObjectType
 	{
 		this.type.toString(prefix, buffer);
 		buffer.append('?');
-	}
-
-	@Override
-	public IType clone()
-	{
-		return new OptionType(this.type);
 	}
 }

@@ -2,10 +2,12 @@ package dyvil.test
 
 public class BuilderTest
 {
-	public case class Buildable(int myInt		{ get; set }
-    							double myDouble	{ get; set }
-    							String myString	{ get; set }
-    							)
+	public case class Buildable
+	(
+		int myInt        { get; set }
+    	double myDouble  { get; set }
+    	String! myString { get; set }
+    )
     {
 		public static Buildable apply() = new Buildable(0, 0D, null)
 

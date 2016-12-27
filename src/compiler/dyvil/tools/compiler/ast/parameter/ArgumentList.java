@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.TypeChecker;
@@ -233,7 +234,7 @@ public final class ArgumentList implements IArguments, IValueList
 		}
 
 		final int count = endIndex - startIndex;
-		final IType elementType = arrayType.getElementType();
+		final IType elementType = arrayType.extract(ArrayType.class).getElementType();
 		for (; startIndex < endIndex; startIndex++)
 		{
 			if (!checkMatch(matchValues, matchTypes, matchStartIndex + startIndex, values[startIndex], elementType,

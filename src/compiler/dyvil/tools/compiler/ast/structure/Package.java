@@ -36,6 +36,7 @@ public class Package implements INamed, IDefaultContext, IClassConsumer
 	public static Package dyvilCollectionRange;
 	public static Package dyvilFunction;
 	public static Package dyvilLang;
+	public static Package dyvilLangInternal;
 	public static Package dyvilRef;
 	public static Package dyvilRefSimple;
 	public static Package dyvilTuple;
@@ -101,6 +102,7 @@ public class Package implements INamed, IDefaultContext, IClassConsumer
 		dyvilCollectionRange = dyvilCollection.resolvePackage("range");
 		dyvilFunction = dyvil.resolvePackage("function");
 		dyvilLang = dyvil.resolvePackage("lang");
+		dyvilLangInternal = dyvilLang.resolvePackage("internal");
 		dyvilRef = dyvil.resolvePackage("ref");
 		dyvilRefSimple = dyvilRef.resolvePackage("simple");
 		dyvilTuple = dyvil.resolvePackage("tuple");

@@ -107,23 +107,30 @@ public class LiteralConversion extends AbstractCall
 			}
 
 			this.method = candidates.getBestMember();
+			this.checkArguments(markers, context);
 		}
-
-		this.checkArguments(markers, context);
 
 		final IType thisType = this.getType();
-		if (!Types.isSuperType(type, thisType))
+		if (Types.isSuperType(type, thisType))
 		{
-			final Marker marker = Markers.semantic(this.position, "literal.type.incompatible");
-			marker.addInfo(Markers.getSemantic("type.expected", type));
-			marker.addInfo(Markers.getSemantic("literal.type.conversion", thisType));
-
-			final StringBuilder stringBuilder = new StringBuilder();
-			Util.methodSignatureToString(this.method, typeContext, stringBuilder);
-			marker.addInfo(Markers.getSemantic("literal.type.method", stringBuilder.toString()));
-
-			markers.add(marker);
+			return this;
 		}
+
+		// T! -> T, if necessary
+		final IValue value = thisType.convertValueTo(this, type, typeContext, markers, context);
+		if (value != null)
+		{
+			return value;
+		}
+
+		final Marker marker = Markers.semanticError(this.position, "literal.type.incompatible");
+		marker.addInfo(Markers.getSemantic("type.expected", type));
+		marker.addInfo(Markers.getSemantic("literal.type.conversion", thisType));
+
+		marker.addInfo(
+			Markers.getSemantic("literal.type.method", Util.methodSignatureToString(this.method, typeContext)));
+
+		markers.add(marker);
 
 		return this;
 	}

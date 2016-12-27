@@ -9,12 +9,12 @@ import dyvil.tools.parsing.position.ICodePosition
 
 public class NodeAccess implements NodeVisitor, NodeElement, Expandable
 {
-	protected Name name = null
+	protected Name! name = null
 	{
 		public override get
 	}
 
-	protected NodeElement element = null
+	protected NodeElement! element = null
 	{
 		public get
 	}

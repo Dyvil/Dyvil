@@ -327,8 +327,8 @@ public class MapType implements IObjectType
 	@Override
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
-		this.keyType.writeAnnotations(visitor, typeRef, typePath + "0;");
-		this.valueType.writeAnnotations(visitor, typeRef, typePath + "1;");
+		IType.writeAnnotations(this.keyType, visitor, typeRef, typePath + "0;");
+		IType.writeAnnotations(this.valueType, visitor, typeRef, typePath + "1;");
 	}
 
 	@Override
@@ -369,11 +369,5 @@ public class MapType implements IObjectType
 		builder.append(':');
 		this.valueType.toString(prefix, builder);
 		builder.append(']');
-	}
-
-	@Override
-	public IType clone()
-	{
-		return new MapType(this.keyType, this.valueType, this.mutability, this.theClass);
 	}
 }

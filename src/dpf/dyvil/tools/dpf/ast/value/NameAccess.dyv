@@ -9,30 +9,19 @@ import dyvil.tools.parsing.ast.IASTNode
 
 import java.util.Objects
 
-public class NameAccess extends DPFValueVisitor implements Value, Expandable
+public class NameAccess(
+	protected var value: Value? { public get; private set }
+	protected let name: Name { public get }
+	)
+	extends DPFValueVisitor implements Value, Expandable
 {
-	protected Name  name
-	protected Value value
+	public static func apply(Name name): NameAccess = new NameAccess(null, name)
 
-	public init(Name name)
-	{
-		this.name = name
-	}
-	
-	public Name getName()
-	{
-		return this.name
-	}
-	
-	@Override
-	protected void visitValue(Value value)
+	public static func apply(Value value, Name name): NameAccess = new NameAccess(value, name)
+
+	protected override void visitValue(Value value)
 	{
 		this.value = value
-	}
-	
-	public Value getValue()
-	{
-		return this.value
 	}
 	
 	public override void accept(ValueVisitor visitor)
@@ -43,30 +32,28 @@ public class NameAccess extends DPFValueVisitor implements Value, Expandable
 			return
 		}
 
-		this.value.accept(visitor.visitValueAccess(this.name))
+		this.value!.accept(visitor.visitValueAccess(this.name))
 	}
 
 	public override Object expand(Map<String, Object> mappings, boolean mutate)
 	{
-		StringBuilder builder = new StringBuilder()
+		let builder = new StringBuilder()
 
-		Value value = this.value
+		var value = this.value
 		while (value != null)
 		{
 			if (value is NameAccess)
 			{
 				let nameAccess = value as NameAccess
 				builder.insert(0, '.').insert(0, nameAccess.name)
-				value = nameAccess.getValue()
+				value = nameAccess.value
 				continue
 			}
 			break
 		}
 
 		builder.append(this.name)
-
-		Object result = mappings.get(builder.toString())
-		return result == null ? this : result
+		return mappings.get(builder.toString()) ?? this
 	}
 
 	public override String toString() = IASTNode.toString(this)
@@ -75,13 +62,13 @@ public class NameAccess extends DPFValueVisitor implements Value, Expandable
 	{
 		if (this.value != null)
 		{
-			this.value.toString(indent, buffer)
+			this.value!.toString(indent, buffer)
 			buffer.append('.')
 		}
 		buffer.append(this.name)
 	}
 
-	public override boolean equals(Object o)
+	public override boolean equals(Object! o)
 	{
 		if (this === o) return true
 		if (!(o is NameAccess)) return false
@@ -90,5 +77,5 @@ public class NameAccess extends DPFValueVisitor implements Value, Expandable
 		return this.name === that.name && this.value == that.value
 	}
 
-	public override int hashCode() = 31 * this.name.hashCode + this.value.hashCode
+	public override int hashCode() = 31 * this.name.hashCode + (this.value == null ? 0 : this.value!.hashCode)
 }

@@ -12,50 +12,42 @@ import dyvil.tools.parsing.ast.IASTNode
 
 import java.util.function.Function
 
-public class ListValue extends DPFValueVisitor implements Value, ListVisitor, Expandable
+public class ListValue(protected let elements: List<Value>) extends DPFValueVisitor implements Value, ListVisitor, Expandable
 {
-	protected List<Value> elements
-	
-	public init()
-	{
-		this.elements = new ArrayList<Value>
-	}
+	public static func apply(): ListValue = new ListValue(new ArrayList<Value>)
 
-	public init(int capacity)
-	{
-		this.elements = new ArrayList<Value>(capacity)
-	}
+	public static func apply(int capacity): ListValue = new ListValue(new ArrayList<Value>(capacity))
 
-	public init([Value] values)
-	{
-		this.elements = new ArrayList<Value>(values)
-	}
+	public static func apply([Value] values): ListValue = new ListValue(new ArrayList(values))
 
-	public init([Object] values)
+	public static func apply([any] values): ListValue
 	{
-		this.elements = new ArrayList<Value>(values.length)
-		for (Object element <- values)
+		let list = new ArrayList<Value>(values.length)
+		for (element <- values)
 		{
-			this.elements.add(Value.wrap(element))
+			list.add(Value.wrap(element))
 		}
+		return new ListValue(list)
 	}
 
-	public init(Iterable<_> iterable)
+	public static func apply(Iterable<_> iterable): ListValue
 	{
-		this.elements = new ArrayList<Value>
-		for (Object element <- iterable)
+		let list = new ArrayList<Value>
+		for (element <- iterable)
 		{
-			this.elements.add(Value.wrap(element))
+			list.add(Value.wrap(element))
 		}
+		return new ListValue(list)
 	}
 
-	public init(Collection<_> collection)
+	public static func apply(SizedIterable<_> iterable): ListValue
 	{
-		this.elements = new ArrayList<Value>(collection.size())
-		for (Object element <- collection)
+		let list = new ArrayList<Value>(iterable.size())
+		for (element <- iterable)
 		{
-			this.elements.add(Value.wrap(element))
+			list.add(Value.wrap(element))
 		}
+		return new ListValue(list)
 	}
 
 	public void add(Value value) = this.elements.add(value)
@@ -105,15 +97,11 @@ public class ListValue extends DPFValueVisitor implements Value, ListVisitor, Ex
 			this.elements.map(valueFunction)
 			return this
 		}
-		else
-		{
-			let copy = new ListValue
-			copy.elements = this.elements.mapped(valueFunction)
-			return copy
-		}
+
+		return new ListValue(this.elements.mapped(valueFunction))
 	}
 
-	public override boolean equals(Object o)
+	public override boolean equals(Object! o)
 	{
 		if (this === o) return true
 		if (!(o is ListValue)) return false

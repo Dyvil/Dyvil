@@ -1077,7 +1077,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		if (receiver.isIgnoredClassAccess())
 		{
 			final IType type = receiver.getType();
-			if (type.getTypeVariable() != null)
+			if (type.hasTag(IType.TYPE_VAR))
 			{
 				// Static virtual call
 				type.writeClassExpression(writer, true);
@@ -1138,7 +1138,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			opcode = Opcodes.INVOKESPECIAL;
 		}
-		else if (receiver.isIgnoredClassAccess() && receiver.getType().getTypeVariable() != null)
+		else if (receiver.isIgnoredClassAccess() && receiver.getType().hasTag(IType.TYPE_VAR))
 		{
 			writer
 				.visitInvokeDynamicInsn(mangledName, descriptor.replace("(", "(Ljava/lang/Class;"), STATICVIRTUAL_BSM);

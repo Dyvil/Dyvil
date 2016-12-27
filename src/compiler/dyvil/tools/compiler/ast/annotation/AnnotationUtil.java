@@ -37,6 +37,11 @@ public final class AnnotationUtil
 	public static final String STRICT   = "dyvil/annotation/Strict";
 	public static final String NATIVE   = "dyvil/annotation/Native";
 
+	public static final String NOTNULL_INTERNAL  = "dyvil/annotation/internal/NonNull";
+	public static final String NOTNULL           = 'L' + NOTNULL_INTERNAL + ';';
+	public static final String NULLABLE_INTERNAL = "dyvil/annotation/internal/Nullable";
+	public static final String NULLABLE          = 'L' + NULLABLE_INTERNAL + ';';
+
 	private AnnotationUtil()
 	{
 		// no instances

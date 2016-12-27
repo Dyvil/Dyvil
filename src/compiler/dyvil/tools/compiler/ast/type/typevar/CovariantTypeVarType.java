@@ -50,9 +50,9 @@ public class CovariantTypeVarType extends TypeVarType
 	}
 
 	@Override
-	public boolean isSuperTypeOf(IType type)
+	public boolean isSuperTypeOf(IType subType)
 	{
-		return this.typeParameter.isAssignableFrom(type, ITypeContext.COVARIANT);
+		return this.typeParameter.isAssignableFrom(subType, ITypeContext.COVARIANT);
 	}
 
 	@Override
@@ -65,10 +65,8 @@ public class CovariantTypeVarType extends TypeVarType
 	public IType getConcreteType(ITypeContext context)
 	{
 		IType type = super.getConcreteType(context);
-		if (type.getTypeVariable() == this.typeParameter)
-		{
-			return this;
-		}
-		return type;
+
+		final TypeVarType typeVar = type.extract(TypeVarType.class);
+		return typeVar != null && typeVar.getTypeVariable() == this.typeParameter ? this : type;
 	}
 }

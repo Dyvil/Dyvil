@@ -11,7 +11,7 @@ using dyvil.tools.dpf.converter.binary.BinaryConstants._
 public class BinaryWriter
 		implements NodeVisitor, ValueVisitor, ListVisitor, MapVisitor, StringInterpolationVisitor, BuilderVisitor
 {
-	private DataOutput dataOutput
+	private DataOutput! dataOutput
 
 	public init(DataOutput dataOutput)
 	{
@@ -35,7 +35,7 @@ public class BinaryWriter
 		this.dataOutput.writeByte(tag as byte);
 	}
 
-	private void writeName(Name name)
+	private void writeName(Name! name)
 	{
 		try
 		{

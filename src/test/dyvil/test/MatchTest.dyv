@@ -23,7 +23,7 @@ public class MatchTest
 	
 	private static void table()
 	{
-		String value = _
+		var value: String! = null
 
 		1 match {
 			case 0 => value = "zero"
@@ -37,7 +37,7 @@ public class MatchTest
 	
 	private static void tableHoles()
 	{
-		String value = _
+		var value: String! = null
 
 		2 match {
 			case 0 => value = "null"
@@ -52,7 +52,7 @@ public class MatchTest
 	
 	private static void lookup()
 	{
-		String value = _
+		var value: String! = null
 
 		10 match {
 			case 1   => value = "1"
@@ -66,7 +66,7 @@ public class MatchTest
 
 	private static void stringTable()
 	{
-		String value = _
+		var value: String! = null
 
 		"a" match {
 			case "a" => value = "A"
@@ -80,7 +80,7 @@ public class MatchTest
 	
 	private static void stringLookup()
 	{
-		String value = _
+		var value: String! = null
 
 		"abc" match {
 			case "abc" => value = "ABC"
@@ -93,7 +93,7 @@ public class MatchTest
 	
 	private static void stringCollision()
 	{
-		int value = 0
+		var value = 0
 
 		"AaBB" match {
 			case "Aa"   => value = 1
@@ -111,7 +111,7 @@ public class MatchTest
 	
 	private static void expression()
 	{
-		var result = 10 match {
+		let result = 10 match {
 			case 0     => "a"
 			case 1     => "b"
 			case var x => x.toString
@@ -122,7 +122,7 @@ public class MatchTest
 
 	private static void tuples()
 	{
-		String value = _
+		var value: String! = null
 		var tuple = (1, 2)
 
 		tuple match {
@@ -137,8 +137,8 @@ public class MatchTest
 	private static void caseClasses()
 	{
 		{
-			Option<int> option = Some 1
-			int value = _
+			let option = Option 1
+			var value = 0
 
 			option match {
 				case Some(int i) => value = i
@@ -151,8 +151,8 @@ public class MatchTest
 		// ------------------------------------------------------------
 
 		{
-			Option<String> option = Some "abc"
-			String value = _
+			let option = Option "abc"
+			var value: String! = null
 
 			option match {
 				case Some(String s) => value = s
@@ -165,8 +165,8 @@ public class MatchTest
 		// ------------------------------------------------------------
 
 		{
-			Option<int> option = Some 2
-			int value = _
+			let option = Option 2
+			var value = 0
 
 			option match {
 				case Some(int i) => value = i
@@ -179,8 +179,8 @@ public class MatchTest
 
 	private static void objects()
 	{
-		int? option = nil
-		int value = _
+		let option = Option<int>()
+		var value = 0
 
 		option match {
 			case None => value = 1
@@ -197,7 +197,7 @@ public class MatchTest
 
 	private static void fields()
 	{
-		int value = _
+		var value = 0
 
 		// ------------------------------------------------------------
 
@@ -239,7 +239,7 @@ public class MatchTest
 
 	private static void orPatterns()
 	{
-		let list = List<int>
+		let list = List<int>()
 
 		for (int i <- 0 .. 10)
 		{
@@ -256,8 +256,8 @@ public class MatchTest
 
 	private static void andPatterns()
 	{
-		var tuple = (1, 2)
-		boolean success = false
+		let tuple = (1, 2)
+		var success = false
 
 		tuple match {
 			case (_, 2) & (1, _) => success = true
@@ -267,4 +267,4 @@ public class MatchTest
 
 		Main.test("Match AND Patterns", success, true)
 	}
-}	
+}

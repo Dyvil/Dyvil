@@ -50,6 +50,7 @@ public final class Types
 	public static final UnknownType UNKNOWN = new UnknownType();
 	public static final NullType    NULL    = new NullType();
 	public static final AnyType     ANY     = new AnyType();
+	public static final NoneType    NONE    = new NoneType();
 
 	public static final ClassType OBJECT = new ClassType();
 	public static final ClassType STRING = new ClassType();
@@ -62,8 +63,9 @@ public final class Types
 	public static IClass PRIMITIVES_CLASS;
 
 	public static IClass OBJECT_CLASS;
-	public static IClass STRING_CLASS;
 	public static IClass NULL_CLASS;
+	public static IClass NONE_CLASS;
+	public static IClass STRING_CLASS;
 
 	public static IClass THROWABLE_CLASS;
 	public static IClass EXCEPTION_CLASS;
@@ -119,7 +121,8 @@ public final class Types
 
 		PRIMITIVES_CLASS = Package.dyvilLang.resolveClass("Primitives");
 
-		NULL_CLASS = Package.dyvilLang.resolveClass("Null");
+		NULL_CLASS = Package.dyvilLangInternal.resolveClass("Null");
+		NONE_CLASS = Package.dyvilLangInternal.resolveClass("None");
 		OBJECT.theClass = OBJECT_CLASS = Package.javaLang.resolveClass("Object");
 		STRING.theClass = STRING_CLASS = Package.javaLang.resolveClass("String");
 		THROWABLE.theClass = THROWABLE_CLASS = Package.javaLang.resolveClass("Throwable");
@@ -274,9 +277,9 @@ public final class Types
 		return superType.isSuperTypeOf(subType);
 	}
 
-	public static boolean isAssignable(IType fromType, IType toType)
+	public static boolean isAssignable(IType targetType, IType fromType)
 	{
-		return isSuperType(toType, fromType) || isConvertible(fromType, toType);
+		return isSuperType(targetType, fromType) || isConvertible(fromType, targetType);
 	}
 
 	public static boolean isConvertible(IType fromType, IType toType)
@@ -367,6 +370,10 @@ public final class Types
 		if (name == Names.any)
 		{
 			return ANY;
+		}
+		if (name == Names.none)
+		{
+			return NONE;
 		}
 		if (name == Names.dynamic)
 		{

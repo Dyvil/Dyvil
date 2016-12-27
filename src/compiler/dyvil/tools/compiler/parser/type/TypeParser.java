@@ -128,7 +128,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 
 					this.mode = ARRAY_COLON;
 					this.type = arrayType;
-					pm.pushParser(new TypeParser(arrayType));
+					pm.pushParser(new TypeParser(arrayType::setElementType));
 					return;
 				}
 				case DyvilSymbols.ARROW_RIGHT:
@@ -243,7 +243,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 		case ARRAY_COLON:
 			if (type == BaseSymbols.COLON)
 			{
-				final MapType mapType = new MapType(this.type.getElementType(), null, this.type.getMutability());
+				final MapType mapType = new MapType(((ArrayType) this.type).getElementType(), null, this.type.getMutability());
 				this.type = mapType;
 				this.mode = ARRAY_END;
 				pm.pushParser(new TypeParser(mapType::setValueType));

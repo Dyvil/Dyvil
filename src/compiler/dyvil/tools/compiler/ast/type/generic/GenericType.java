@@ -255,7 +255,7 @@ public abstract class GenericType implements IObjectType, ITypeList
 	{
 		for (int i = 0; i < this.typeArgumentCount; i++)
 		{
-			this.typeArguments[i].writeAnnotations(visitor, typeRef, typePath + i + ';');
+			IType.writeAnnotations(this.typeArguments[i], visitor, typeRef, typePath + i + ';');
 		}
 	}
 
@@ -311,14 +311,6 @@ public abstract class GenericType implements IObjectType, ITypeList
 			}
 			buffer.append('>');
 		}
-	}
-
-	@Override
-	public GenericType clone()
-	{
-		GenericType type = this.copyName();
-		this.copyArgumentsTo(type);
-		return type;
 	}
 
 	protected abstract GenericType copyName();

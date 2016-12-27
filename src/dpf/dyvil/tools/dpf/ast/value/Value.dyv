@@ -44,27 +44,27 @@ public interface Value extends IASTNode
 
 	static StringValue apply(String literal) = StringValue(literal)
 
-	static NameAccess apply(Name literal) = new NameAccess(literal)
+	static NameAccess apply(Name literal) = NameAccess(literal)
 
-	static NameAccess apply(boolean literal) = new NameAccess(Name.fromRaw(literal.toString))
+	static NameAccess apply(boolean literal) = NameAccess(Name.fromRaw(literal.toString))
 
-	static ListValue apply(Value... elements) = new ListValue(elements)
+	static ListValue apply(Value... elements) = ListValue(elements)
 
 	static MapValue apply(Value... keys, Value... values) = new MapValue(new ArrayMap(keys, values))
 
 	static StringInterpolation apply(String base, Value... values)
 	{
-		return new StringInterpolation(base.split(@"\\\d+"), values)
+		return new StringInterpolation(base.split(@"\\\d+") as [String], values)
 	}
 
 	static StringInterpolation apply(String base, Object... values)
 	{
-		return new StringInterpolation(base.split(@"\\\d+"), values)
+		return new StringInterpolation(base.split(@"\\\d+") as [String], values)
 	}
 
 	// Override Methods
 
-	override ICodePosition getPosition() = null
+	override ICodePosition getPosition() = ICodePosition.ORIGIN
 
 	override void setPosition(ICodePosition position) { }
 
@@ -76,9 +76,8 @@ public interface Value extends IASTNode
 
 	// Value Conversions
 
-	static Value wrap(any value)
+	static Value wrap(any! value)
 	{
-		if (value == null) return null
 		if (value is Value) return value as Value
 
 		let valueClass = value.getClass()
@@ -88,17 +87,17 @@ public interface Value extends IASTNode
 		if (valueClass === class Long) return new LongValue(value as Long) 
 		if (valueClass === class Float) return new FloatValue(value as Float) 
 		if (valueClass === class Double) return new DoubleValue(value as Double)
-		if (valueClass === class Name) return new NameAccess(value as Name)
+		if (valueClass === class Name) return NameAccess(value as Name)
 		if (valueClass === class Boolean) return Value(value as boolean)
 
 		if (value is DPFConvertible) return (value as DPFConvertible).toPropertyValue()
-		if (value is Collection) return new ListValue(value as Collection)
-		if (value is Map) return new MapValue(value as Map)
+		if (value is Collection) return ListValue(value as Collection)
+		if (value is Map) return MapValue(value as Map)
 		if (value.getClass.isArray)
 		{
 			// Convert Arrays using Reflection
 			let size = Array.getLength(value)
-			let listValue = new ListValue(size)
+			let listValue = ListValue(size)
 
 			for var i <- 0 ..< size
 			{

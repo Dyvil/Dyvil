@@ -650,7 +650,7 @@ public final class ExternalClass extends AbstractClass
 
 	public FieldVisitor visitField(int access, String name, String desc, String signature, Object value)
 	{
-		IType type = ClassFormat.extendedToType(signature == null ? desc : signature);
+		IType type = ClassFormat.readFieldType(signature == null ? desc : signature);
 
 		if (this.classParameters != null && this.classParameters.contains(name))
 		{

@@ -21,32 +21,17 @@ import dyvil.tools.parsing.Name
  */
 public abstract class DyvilValueVisitor implements ValueVisitor
 {
-	protected abstract void visitObject(Object o)
+	protected abstract void visitObject(Object! o)
 	
-	public override void visitInt(int v)
-	{
-		this.visitObject(v);
-	}
+	public override void visitInt(int v) = this.visitObject(v)
 	
-	public override void visitLong(long v)
-	{
-		this.visitObject(v);
-	}
+	public override void visitLong(long v) = this.visitObject(v)
 	
-	public override void visitFloat(float v)
-	{
-		this.visitObject(v);
-	}
+	public override void visitFloat(float v) = this.visitObject(v)
 	
-	public override void visitDouble(double v)
-	{
-		this.visitObject(v);
-	}
+	public override void visitDouble(double v) = this.visitObject(v)
 	
-	public override void visitString(String v)
-	{
-		this.visitObject(v);
-	}
+	public override void visitString(String v) = this.visitObject(v)
 	
 	public override void visitName(Name v)
 	{
@@ -66,12 +51,12 @@ public abstract class DyvilValueVisitor implements ValueVisitor
 			}
 		}
 
-		this.visitObject(new NameAccess(v.qualified))
+		this.visitObject(NameAccess(v.qualified))
 	}
 	
 	public override ListVisitor visitList()
 	{
-		List<Object> list = new ArrayList<Object>
+		let list = new ArrayList<Object>
 		return new ListVisitor
 		{
 			public override ValueVisitor visitElement() = new DyvilValueVisitor()
@@ -91,10 +76,10 @@ public abstract class DyvilValueVisitor implements ValueVisitor
 	
 	public override MapVisitor visitMap()
 	{
-		Map<Object, Object> map = new HashMap<Object, Object>
+		let map = new HashMap<Object, Object>
 		return new MapVisitor
 		{
-			protected Object key
+			protected Object! key
 			
 			public override ValueVisitor visitKey() = new DyvilValueVisitor
 			{
@@ -121,7 +106,7 @@ public abstract class DyvilValueVisitor implements ValueVisitor
 	
 	public override StringInterpolationVisitor visitStringInterpolation()
 	{
-		StringInterpolation interpolation = new StringInterpolation
+		let interpolation = new StringInterpolation
 		this.visitObject(interpolation)
 		return interpolation
 	}
@@ -131,7 +116,7 @@ public abstract class DyvilValueVisitor implements ValueVisitor
 	
 	public override ValueVisitor visitValueAccess(Name v)
 	{
-		NameAccess access = new NameAccess(v.qualified)
+		let access = NameAccess(v.qualified)
 		this.visitObject(access)
 		return access
 	}

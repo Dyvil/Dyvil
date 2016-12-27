@@ -762,10 +762,10 @@ public class CodeMethod extends AbstractMethod
 			this.typeParameters[i].write(writer);
 		}
 
-		this.type.writeAnnotations(writer, TypeReference.newTypeReference(TypeReference.METHOD_RETURN), "");
+		IType.writeAnnotations(this.type, writer, TypeReference.newTypeReference(TypeReference.METHOD_RETURN), "");
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
-			this.exceptions[i].writeAnnotations(writer, TypeReference.newExceptionReference(i), "");
+			IType.writeAnnotations(this.exceptions[i], writer, TypeReference.newExceptionReference(i), "");
 		}
 	}
 

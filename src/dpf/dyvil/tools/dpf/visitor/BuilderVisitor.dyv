@@ -4,7 +4,7 @@ import dyvil.tools.parsing.Name
 
 public interface BuilderVisitor
 {
-	ValueVisitor visitParameter(Name name)
+	ValueVisitor visitParameter(Name? name)
 	
 	NodeVisitor visitNode()
 	

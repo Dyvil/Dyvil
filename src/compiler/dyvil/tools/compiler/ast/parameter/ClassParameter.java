@@ -177,6 +177,12 @@ public class ClassParameter extends Field implements IParameter
 	}
 
 	@Override
+	protected boolean hasDefaultInit()
+	{
+		return true;
+	}
+
+	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		if (this.isVarargs())

@@ -62,9 +62,9 @@ public class OverloadTest
 
 	public static void main([String] args)
 	{
-		Object o = null
-		String s = ""
-		int i = 0
+		let o = new Object
+		let s = ""
+		let i = 0
 
 		Main.test("Overload Test 0.1", "f()", f())
 

@@ -3,10 +3,7 @@ package dyvil.tools.compiler.ast.type.raw;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Type;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.constant.IConstantValue;
-import dyvil.tools.compiler.ast.constant.NullValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
@@ -27,12 +24,6 @@ public interface IObjectType extends IType
 	default int getTypecode()
 	{
 		return -1;
-	}
-
-	@Override
-	default ITypeParameter getTypeVariable()
-	{
-		return null;
 	}
 
 	@Override
@@ -57,35 +48,6 @@ public interface IObjectType extends IType
 	default IClass getRefClass()
 	{
 		return ReferenceType.LazyFields.OBJECT_REF_CLASS;
-	}
-
-	@Override
-	default boolean isArrayType()
-	{
-		return false;
-	}
-
-	@Override
-	default int getArrayDimensions()
-	{
-		return 0;
-	}
-
-	@Override
-	default IType getElementType()
-	{
-		return this;
-	}
-
-	@Override
-	default boolean isExtension()
-	{
-		return false;
-	}
-
-	@Override
-	default void setExtension(boolean extension)
-	{
 	}
 
 	@Override
@@ -190,17 +152,5 @@ public interface IObjectType extends IType
 	default void writeClassExpression(MethodWriter writer, boolean wrapPrimitives) throws BytecodeException
 	{
 		writer.visitLdcInsn(Type.getObjectType(this.getInternalName()));
-	}
-
-	@Override
-	default void writeDefaultValue(MethodWriter writer) throws BytecodeException
-	{
-		writer.visitInsn(Opcodes.ACONST_NULL);
-	}
-
-	@Override
-	default IConstantValue getDefaultValue()
-	{
-		return NullValue.getNull();
 	}
 }

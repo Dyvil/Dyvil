@@ -4,6 +4,8 @@ using   dyvil.reflect.Opcodes._
 
 public abstract class Primitives
 {
+	private const let VOID_INSTANCE: Void = dyvil.reflect.ReflectUtils.UNSAFE.allocateInstance(class Void) as Void
+
 	private init() {}
 
 	#define LOAD_CALL [ LOAD_0, INVOKESTATIC, 0, 1, 2 ]
@@ -12,8 +14,7 @@ public abstract class Primitives
 
 	// Void Methods
 
-	@Intrinsic([ ACONST_NULL ])
-	public static Void Void() = null
+	public static Void Void() = VOID_INSTANCE
 
 	@Intrinsic([ /* NOOP */ ])
 	public static void toVoid(Void value) = ()

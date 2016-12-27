@@ -12,8 +12,8 @@ import dyvil.tools.parsing.lexer.LexerUtil;
 
 public class StringInterpolation extends DPFValueVisitor implements Value, StringInterpolationVisitor, Expandable
 {
-	protected List<String> strings
-	protected List<Value>  values
+	protected List<String>! strings
+	protected List<Value>!  values
 
 	public init()
 	{
@@ -66,31 +66,18 @@ public class StringInterpolation extends DPFValueVisitor implements Value, Strin
 	{
 		// StringInterpolation stringInterpolation = mutate ? this : new StringInterpolation();
 
-		StringBuilder builder = new StringBuilder
+		let builder = new StringBuilder
 
-		int index = 0
-		for (Value value <- this.values)
+		var index = 0
+		for (value <- this.values)
 		{
-			Object o = Expandable.expand(value, mappings, mutate);
-
 			builder.append(this.strings[index++])
-			Constant constant = null
 
-			if (o is String)
-			{
-				builder.append(o.toString)
-			}
-			else if (o is Constant && (constant = o as Constant).isConstant)
-			{
-				constant.appendString(builder)
-			}
-			else if (o is Value)
-			{
-				return this
-			}
-			else
-			{
-				builder.append(o)
+			Expandable.expand(value, mappings, mutate) match {
+				case String s => builder.append(s)
+				case Constant c if c.isConstant => c.appendString(builder)
+				case _ as Value => return this
+				case var o => builder.append(o)
 			}
 		}
 

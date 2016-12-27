@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.type;
 
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
+import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
@@ -12,7 +13,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -41,7 +41,7 @@ import java.io.IOException;
 
 public interface IType extends IASTNode, IMemberContext, ITypeContext
 {
-	static class TypePosition
+	class TypePosition
 	{
 		public static final int CLASS_FLAG            = 0b0000001;
 		public static final int GENERIC_FLAG          = 0b0000010;
@@ -103,6 +103,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	int ANY       = 2;
 	int DYNAMIC   = 3;
 	int PRIMITIVE = 4;
+	int NONE      = 5;
 
 	// Class Types
 	int CLASS    = 16;
@@ -123,14 +124,15 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	int ARRAY = 34;
 	int MAP   = 37;
 
-	int OPTIONAL  = 48;
-	int REFERENCE = 50;
+	int OPTIONAL          = 48;
+	int IMPLICIT_OPTIONAL = 49;
+	int REFERENCE         = 50;
 
 	int UNION        = 51; // no deserialization
 	int INTERSECTION = 52; // no deserialization
 
 	// Type Variable Types
-	int TYPE_VAR_TYPE     = 64;
+	int TYPE_VAR          = 64;
 	int INTERNAL_TYPE_VAR = 65; // no deserialization
 
 	int WILDCARD_TYPE = 80;
@@ -169,8 +171,6 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		return this.isGenericType() || this.hasTypeVariables();
 	}
 
-	ITypeParameter getTypeVariable();
-
 	Name getName();
 
 	// Container Class
@@ -202,13 +202,20 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	IType getSimpleRefType();
 
-	// Arrays
+	default boolean hasTag(int tag)
+	{
+		return this.typeTag() == tag;
+	}
 
-	boolean isArrayType();
+	default boolean canExtract(Class<? extends IType> type)
+	{
+		return type.isInstance(this);
+	}
 
-	int getArrayDimensions();
-
-	IType getElementType();
+	default <T extends IType> T extract(Class<T> type)
+	{
+		return this.canExtract(type) ? (T) this : null;
+	}
 
 	IClass getArrayClass();
 
@@ -221,17 +228,11 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		return Mutability.UNDEFINED;
 	}
 
-	// Lambda Types
+	// Nullability
 
-	boolean isExtension();
-
-	void setExtension(boolean extension);
-
-	// Wildcard Types
-
-	default Variance getVariance()
+	default boolean useNonNullAnnotation()
 	{
-		return null;
+		return true;
 	}
 
 	// Super Type
@@ -280,10 +281,11 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	}
 
 	int SUBTYPE_BASE               = 0;
-	int SUBTYPE_TYPEVAR            = 1;
-	int SUBTYPE_COVARIANT_TYPEVAR  = 2;
-	int SUBTYPE_UNION_INTERSECTION = 3;
-	int SUBTYPE_WILDCARD           = 4;
+	int SUBTYPE_NULLABLE           = 1;
+	int SUBTYPE_TYPEVAR            = 3;
+	int SUBTYPE_COVARIANT_TYPEVAR  = 4;
+	int SUBTYPE_UNION_INTERSECTION = 5;
+	int SUBTYPE_NULL               = 6;
 
 	default int subTypeCheckLevel()
 	{
@@ -475,9 +477,19 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	void writeTypeExpression(MethodWriter writer) throws BytecodeException;
 
-	void writeDefaultValue(MethodWriter writer) throws BytecodeException;
+	default void writeDefaultValue(MethodWriter writer) throws BytecodeException
+	{
+	}
 
-	IConstantValue getDefaultValue();
+	default boolean hasDefaultValue()
+	{
+		return this.getDefaultValue() != null;
+	}
+
+	default IConstantValue getDefaultValue()
+	{
+		return null;
+	}
 
 	// Annotations
 
@@ -501,13 +513,14 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	static IType withAnnotation(IType type, IAnnotation annotation)
 	{
-		final IType customType = type.withAnnotation(annotation);
-		if (customType != null)
+		if (type.useNonNullAnnotation() && AnnotationUtil.NULLABLE_INTERNAL
+			                                   .equals(annotation.getType().getInternalName()))
 		{
-			return customType;
+			return new NullableType(type);
 		}
 
-		return new AnnotatedType(type, annotation);
+		final IType customType = type.withAnnotation(annotation);
+		return customType != null ? customType : new AnnotatedType(type, annotation);
 	}
 
 	default IType withAnnotation(IAnnotation annotation)
@@ -516,6 +529,17 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	}
 
 	void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps);
+
+	static void writeAnnotations(IType type, TypeAnnotatableVisitor visitor, int typeRef, String typePath)
+	{
+		if (type.useNonNullAnnotation())
+		{
+			visitor.visitTypeAnnotation(typeRef, TypePath.fromString(typePath), AnnotationUtil.NOTNULL, false)
+			       .visitEnd();
+		}
+
+		type.writeAnnotations(visitor, typeRef, typePath);
+	}
 
 	void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath);
 
@@ -543,6 +567,8 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 			return Types.UNKNOWN;
 		case NULL:
 			return Types.NULL;
+		case NONE:
+			return Types.NONE;
 		case ANY:
 			return Types.ANY;
 		case DYNAMIC:
@@ -571,7 +597,10 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 			type = new MapType();
 			break;
 		case OPTIONAL:
-			type = new OptionType();
+			type = new NullableType();
+			break;
+		case IMPLICIT_OPTIONAL:
+			type = new ImplicitNullableType();
 			break;
 		case REFERENCE:
 			type = new ReferenceType();
@@ -579,7 +608,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 		case ANNOTATED:
 			type = new AnnotatedType();
 			break;
-		case TYPE_VAR_TYPE:
+		case TYPE_VAR:
 			type = new NamedType();
 			break;
 		case WILDCARD_TYPE:
@@ -603,8 +632,6 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	@Override
 	void toString(String prefix, StringBuilder buffer);
-
-	IType clone();
 
 	@Override
 	boolean equals(Object obj);
