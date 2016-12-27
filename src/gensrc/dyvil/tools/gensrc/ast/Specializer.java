@@ -54,7 +54,7 @@ public class Specializer
 
 				if (processOuter && ifCondition)
 				{
-					this.writer.println(processLine(line, replacements));
+					this.writer.println(processLine(line, 0, length, replacements));
 				}
 				continue;
 			}
@@ -118,7 +118,7 @@ public class Specializer
 			case "foreach":
 				if (processOuter && ifCondition)
 				{
-					final int forEnd = this.processForEach(start, end, replacements, line, directiveEnd, length);
+					final int forEnd = this.processForEach(start, end, line, directiveEnd, length, replacements);
 					if (forEnd >= 0)
 					{
 						start = forEnd;
@@ -141,19 +141,27 @@ public class Specializer
 					return start;
 				}
 				continue;
+			case "import":
+			{
+				final Specialization[] specs = this.parseSpecs(line, directiveEnd, length, replacements);
+				for (Specialization spec : specs)
+				{
+					replacements.importFrom(spec);
+				}
+				continue;
+			}
 			case "process":
 				if (processOuter && ifCondition)
 				{
 					// process the remainder of the line
-					final String remainder = line.substring(skipWhitespace(line, directiveEnd, length));
-					this.writer.println(processLine(remainder, replacements));
+					this.writer.println(getProcessedArgument(line, directiveEnd, length, replacements));
 				}
 				continue;
 			case "literal":
 				if (processOuter && ifCondition)
 				{
 					// simply append the remainder of the line verbatim
-					final String remainder = line.substring(skipWhitespace(line, directiveEnd, length));
+					final String remainder = getArgument(line, directiveEnd, length);
 					this.writer.println(remainder);
 				}
 				continue;
@@ -205,8 +213,7 @@ public class Specializer
 	private int processFor(int start, int end, LazyReplacementMap replacements, String line, int directiveEnd,
 		                      int length)
 	{
-		final String remainder = line.substring(skipWhitespace(line, directiveEnd, length));
-		final String[] parts = processLine(remainder, replacements).split("\\s*;\\s*");
+		final String[] parts = getProcessedArgument(line, directiveEnd, length, replacements).split("\\s*;\\s*");
 
 		if (parts.length < 3)
 		{
@@ -239,18 +246,16 @@ public class Specializer
 		return forEnd;
 	}
 
-	private int processForEach(int start, int end, LazyReplacementMap replacements, String line, int directiveEnd,
-		                          int length)
+	private int processForEach(int startLine, int endLine, String line, int start, int end,
+		                          LazyReplacementMap replacements)
 	{
-		final String remainder = line.substring(skipWhitespace(line, directiveEnd, length));
-		final String[] files = processLine(remainder, replacements).split("\\s*,\\s*");
+		final Specialization[] specs = this.parseSpecs(line, start, end, replacements);
 
 		int forEnd = -1;
 
 		// repeat processing the following lines once for each specified specialization
-		for (String file : files)
+		for (Specialization spec : specs)
 		{
-			final Specialization spec = Specialization.resolveSpec(this.gensrc, file, this.sourceFile);
 			if (spec != null)
 			{
 				forEnd = this.processLines(start + 1, end, new ForReplacementMap(spec, replacements), FOR_BLOCK, true,
@@ -260,6 +265,27 @@ public class Specializer
 		return forEnd;
 	}
 
+	private static String getArgument(String line, int start, int end)
+	{
+		return line.substring(skipWhitespace(line, start, end));
+	}
+
+	private static String getProcessedArgument(String line, int start, int end, LazyReplacementMap replacements)
+	{
+		return processLine(line, skipWhitespace(line, start, end), end, replacements);
+	}
+
+	private Specialization[] parseSpecs(String line, int start, int end, LazyReplacementMap replacements)
+	{
+		final String[] files = getProcessedArgument(line, start, end, replacements).split("\\s*,\\s*");
+		final Specialization[] specs = new Specialization[files.length];
+		for (int i = 0; i < files.length; i++)
+		{
+			specs[i] = Specialization.resolveSpec(this.gensrc, files[i], this.sourceFile);
+		}
+		return specs;
+	}
+
 	private static String parseIdentifier(String line, int start, int end)
 	{
 		final int keyStart = skipWhitespace(line, start, end);
@@ -267,23 +293,22 @@ public class Specializer
 		return line.substring(keyStart, keyEnd);
 	}
 
-	private static String processLine(String line, ReplacementMap replacements)
+	private static String processLine(String line, int start, int end, ReplacementMap replacements)
 	{
-		final int length = line.length();
-		if (length == 0)
+		if (start == end)
 		{
 			return line;
 		}
 
-		final StringBuilder builder = new StringBuilder(length);
+		final StringBuilder builder = new StringBuilder(end - start);
 
 		int prev = 0;
 
-		for (int i = 0; i < length; )
+		for (int i = start; i < end; )
 		{
 			final char c = line.charAt(i);
 
-			if (c == '#' && i + 1 < length && line.charAt(i + 1) == '#')
+			if (c == '#' && i + 1 < end && line.charAt(i + 1) == '#')
 			{
 				// two consecutive ## are stripped
 
@@ -303,7 +328,7 @@ public class Specializer
 			builder.append(line, prev, i);
 
 			// index of the first character that is not part of this identifier
-			final int nextIndex = findIdentifierEnd(line, i + 1, length);
+			final int nextIndex = findIdentifierEnd(line, i + 1, end);
 			final String key = line.substring(i, nextIndex);
 			final String replacement = replacements.getReplacement(key);
 
@@ -319,7 +344,7 @@ public class Specializer
 		}
 
 		// append remaining characters on line
-		builder.append(line, prev, length);
+		builder.append(line, prev, end);
 		return builder.toString();
 	}
 

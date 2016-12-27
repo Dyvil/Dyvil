@@ -13,7 +13,8 @@ public abstract class PrimitiveObjectArray
 		// no instances from outside this package
 	}
 
-#foreach Base-Boolean.dgs, Base-Byte.dgs, Base-Short.dgs, Base-Char.dgs, Base-Int.dgs, Base-Long.dgs, Base-Float.dgs, Base-Double.dgs
+#import Base.dgs
+#foreach PRIMITIVE_SPECS
 
 	// TYPE_NAME wrapper array methods
 
