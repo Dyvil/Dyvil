@@ -425,24 +425,26 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	{
 		final SingleArgument argument = new SingleArgument(resolvedValue);
 
-		IMethod method = ICall.resolveMethod(context, null, Names.applyStatement, argument);
-		if (method != null)
-		{
-			final MethodCall call = new MethodCall(resolvedValue.getPosition(), null, method, argument);
-			call.checkArguments(markers, context);
-			return call;
-		}
-
 		final IValue implicitValue = context.getImplicit();
-		if (implicitValue == null)
+		if (implicitValue != null)
 		{
-			return null;
+			final IValue call = resolveApplyStatement(markers, context, argument, implicitValue);
+			if (call != null)
+			{
+				return call;
+			}
 		}
 
-		method = ICall.resolveMethod(context, implicitValue, Names.applyStatement, argument);
+		return resolveApplyStatement(markers, context, argument, null);
+	}
+
+	private static IValue resolveApplyStatement(MarkerList markers, IContext context, SingleArgument argument,
+		                                           IValue receiver)
+	{
+		final IMethod method = ICall.resolveMethod(context, receiver, Names.applyStatement, argument);
 		if (method != null)
 		{
-			final MethodCall call = new MethodCall(resolvedValue.getPosition(), implicitValue, method, argument);
+			final MethodCall call = new MethodCall(argument.getFirstValue().getPosition(), receiver, method, argument);
 			call.checkArguments(markers, context);
 			return call;
 		}
