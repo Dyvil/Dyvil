@@ -29,7 +29,7 @@ public interface IMethod extends IClassMember, ICallableMember, ITypeParametric,
 
 	void checkImplicitMatch(MatchList<IMethod> list, IValue value, IType type);
 	
-	IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, GenericData genericData);
+	IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue receiver, IArguments arguments, GenericData genericData);
 	
 	void checkCall(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext);
 	

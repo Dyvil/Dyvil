@@ -14,11 +14,11 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 public class SpecialIntrinsicData implements IntrinsicData
 {
 	private IMethod method;
-	
+
 	private int[]    instructions;
 	private String[] strings;
 	private Label[]  targets;
-	
+
 	public SpecialIntrinsicData(IMethod method, int[] instructions, String[] strings, Label[] targets)
 	{
 		this.method = method;
@@ -26,23 +26,23 @@ public class SpecialIntrinsicData implements IntrinsicData
 		this.strings = strings;
 		this.targets = targets;
 	}
-	
+
 	@Override
-	public void writeIntrinsic(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber)
-			throws BytecodeException
+	public void writeIntrinsic(MethodWriter writer, IValue receiver, IArguments arguments, int lineNumber)
+		throws BytecodeException
 	{
-		int[] ints = this.instructions;
-		int insn = 0;
-		
-		int length = this.instructions.length;
+		final int[] ints = this.instructions;
+		final int length = ints.length;
+		int insnIndex = 0;
+
 		for (int i = 0; i < length; i++)
 		{
-			Label label = this.targets[insn++];
+			final Label label = this.targets[insnIndex++];
 			if (label != null)
 			{
 				writer.visitTargetLabel(label);
 			}
-			
+
 			final int opcode = ints[i];
 			if (Opcodes.isFieldOpcode(opcode))
 			{
@@ -50,6 +50,7 @@ public class SpecialIntrinsicData implements IntrinsicData
 				final String name = this.strings[ints[i + 2]];
 				final String desc = this.strings[ints[i + 3]];
 				writer.visitFieldInsn(opcode, owner, name, desc);
+
 				i += 3;
 				continue;
 			}
@@ -58,9 +59,11 @@ public class SpecialIntrinsicData implements IntrinsicData
 				final String owner = this.strings[ints[i + 1]];
 				final String name = this.strings[ints[i + 2]];
 				final String desc = this.strings[ints[i + 3]];
-				
+
 				final IClass iclass = Package.rootPackage.resolveInternalClass(owner);
 				final boolean isInterface = iclass != null && iclass.isInterface();
+
+				writer.visitLineNumber(lineNumber);
 				writer.visitMethodInsn(opcode, owner, name, desc, isInterface);
 
 				i += 3;
@@ -73,18 +76,9 @@ public class SpecialIntrinsicData implements IntrinsicData
 				i += 1;
 				continue;
 			}
-			
+
 			switch (opcode)
 			{
-			case Opcodes.LOAD_0:
-				IntrinsicData.writeArgument(writer, this.method, 0, instance, arguments);
-				continue;
-			case Opcodes.LOAD_1:
-				IntrinsicData.writeArgument(writer, this.method, 1, instance, arguments);
-				continue;
-			case Opcodes.LOAD_2:
-				IntrinsicData.writeArgument(writer, this.method, 2, instance, arguments);
-				continue;
 			case Opcodes.BIPUSH:
 			case Opcodes.SIPUSH:
 				writer.visitLdcInsn(ints[i + 1]);
@@ -96,27 +90,27 @@ public class SpecialIntrinsicData implements IntrinsicData
 				i++;
 				continue;
 			}
-			
-			writer.visitInsnAtLine(opcode, lineNumber);
+
+			IntrinsicData.writeInsn(writer, this.method, opcode, receiver, arguments, lineNumber);
 		}
 	}
-	
+
 	@Override
-	public void writeIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
-			throws BytecodeException
+	public void writeIntrinsic(MethodWriter writer, Label dest, IValue receiver, IArguments arguments, int lineNumber)
+		throws BytecodeException
 	{
-		this.writeIntrinsic(writer, instance, arguments, lineNumber);
+		this.writeIntrinsic(writer, receiver, arguments, lineNumber);
 		writer.visitJumpInsn(Opcodes.IFNE, dest);
 	}
-	
+
 	@Override
-	public void writeInvIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
-			throws BytecodeException
+	public void writeInvIntrinsic(MethodWriter writer, Label dest, IValue receiver, IArguments arguments,
+		                             int lineNumber) throws BytecodeException
 	{
-		this.writeIntrinsic(writer, instance, arguments, lineNumber);
+		this.writeIntrinsic(writer, receiver, arguments, lineNumber);
 		writer.visitJumpInsn(Opcodes.IFEQ, dest);
 	}
-	
+
 	private static void writeLDC(MethodWriter writer, String constant)
 	{
 		switch (constant.charAt(0))

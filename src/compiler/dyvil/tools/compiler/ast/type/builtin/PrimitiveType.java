@@ -538,6 +538,12 @@ public final class PrimitiveType implements IType
 	@Override
 	public void writeCast(MethodWriter writer, IType target, int lineNumber) throws BytecodeException
 	{
+		if (Types.isVoid(target) && this.typecode != VOID_CODE)
+		{
+			writer.visitInsn(this.getLocalSlots() == 2 ? Opcodes.POP2 : Opcodes.POP);
+			return;
+		}
+
 		IType primitiveTarget = target;
 		if (!target.isPrimitive())
 		{

@@ -13,14 +13,27 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 
 public interface IntrinsicData
 {
-	void writeIntrinsic(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber)
+	void writeIntrinsic(MethodWriter writer, IValue receiver, IArguments arguments, int lineNumber)
 		throws BytecodeException;
 
-	void writeIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+	void writeIntrinsic(MethodWriter writer, Label dest, IValue receiver, IArguments arguments, int lineNumber)
 		throws BytecodeException;
 
-	void writeInvIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+	void writeInvIntrinsic(MethodWriter writer, Label dest, IValue receiver, IArguments arguments, int lineNumber)
 		throws BytecodeException;
+
+	static void writeInsn(MethodWriter writer, IMethod method, int insn, IValue receiver, IArguments arguments,
+		                     int lineNumber) throws BytecodeException
+	{
+		if (insn < 0)
+		{
+			IntrinsicData.writeArgument(writer, method, ~insn, // = -insn+1
+			                            receiver, arguments);
+			return;
+		}
+
+		writer.visitInsnAtLine(insn, lineNumber);
+	}
 
 	static IType writeArgument(MethodWriter writer, IMethod method, int index, IValue receiver, IArguments arguments)
 		throws BytecodeException

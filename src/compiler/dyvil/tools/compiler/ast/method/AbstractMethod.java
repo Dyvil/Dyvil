@@ -205,9 +205,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public boolean setReceiverType(IType receiverType)
+	public boolean setReceiverType(IType type)
 	{
-		this.thisType = receiverType;
+		this.thisType = type;
 		return true;
 	}
 
@@ -615,22 +615,22 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public GenericData getGenericData(GenericData genericData, IValue instance, IArguments arguments)
+	public GenericData getGenericData(GenericData data, IValue instance, IArguments arguments)
 	{
 		if (!this.hasTypeVariables())
 		{
-			return genericData;
+			return data;
 		}
 
-		if (genericData == null)
+		if (data == null)
 		{
 			return new GenericData(this, this.typeParameterCount);
 		}
 
-		genericData.setTypeParametric(this);
-		genericData.setTypeCount(this.typeParameterCount);
+		data.setTypeParametric(this);
+		data.setTypeCount(this.typeParameterCount);
 
-		return genericData;
+		return data;
 	}
 
 	@Override
@@ -878,7 +878,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void addOverride(IMethod candidate)
+	public void addOverride(IMethod method)
 	{
 	}
 
@@ -1002,59 +1002,56 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext,
+	public void writeCall(MethodWriter writer, IValue receiver, IArguments arguments, ITypeContext typeContext,
 		                     IType targetType, int lineNumber) throws BytecodeException
 	{
 		if (this.intrinsicData != null)
 		{
-			this.intrinsicData.writeIntrinsic(writer, instance, arguments, lineNumber);
+			this.intrinsicData.writeIntrinsic(writer, receiver, arguments, lineNumber);
+
+			if (targetType == null || this.getType().hasTag(IType.TYPE_VAR))
+			{
+				// Optimization: avoid creating a CHECKCAST instruction for intrinsic methods with type parameter return
+				return;
+			}
 		}
 		else
 		{
-			this.writeArgumentsAndInvoke(writer, instance, arguments, typeContext, lineNumber);
-		}
-
-		if (Types.isVoid(targetType))
-		{
-			if (!Types.isVoid(this.type))
-			{
-				writer.visitInsn(Opcodes.AUTO_POP);
-			}
-			return;
+			this.writeArgumentsAndInvoke(writer, receiver, arguments, typeContext, lineNumber);
 		}
 
 		if (targetType != null)
 		{
-			this.type.writeCast(writer, targetType, lineNumber);
+			this.getType().writeCast(writer, targetType, lineNumber);
 		}
 	}
 
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments,
+	public void writeJump(MethodWriter writer, Label dest, IValue receiver, IArguments arguments,
 		                     ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
 		if (this.intrinsicData != null)
 		{
-			this.intrinsicData.writeIntrinsic(writer, dest, instance, arguments, lineNumber);
+			this.intrinsicData.writeIntrinsic(writer, dest, receiver, arguments, lineNumber);
 			return;
 		}
 
-		this.writeArgumentsAndInvoke(writer, instance, arguments, typeContext, lineNumber);
+		this.writeArgumentsAndInvoke(writer, receiver, arguments, typeContext, lineNumber);
 		this.type.writeCast(writer, Types.BOOLEAN, 0);
 		writer.visitJumpInsn(IFNE, dest);
 	}
 
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments,
+	public void writeInvJump(MethodWriter writer, Label dest, IValue receiver, IArguments arguments,
 		                        ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
 		if (this.intrinsicData != null)
 		{
-			this.intrinsicData.writeInvIntrinsic(writer, dest, instance, arguments, lineNumber);
+			this.intrinsicData.writeInvIntrinsic(writer, dest, receiver, arguments, lineNumber);
 			return;
 		}
 
-		this.writeArgumentsAndInvoke(writer, instance, arguments, typeContext, lineNumber);
+		this.writeArgumentsAndInvoke(writer, receiver, arguments, typeContext, lineNumber);
 		this.type.writeCast(writer, Types.BOOLEAN, 0);
 		writer.visitJumpInsn(IFEQ, dest);
 	}

@@ -135,6 +135,11 @@ public interface IObjectType extends IType
 		{
 			return;
 		}
+		if (Types.isVoid(target))
+		{
+			writer.visitInsn(Opcodes.POP);
+			return;
+		}
 
 		if (!Types.isSuperClass(target, this))
 		{
