@@ -87,6 +87,17 @@ public class LiteralConversion extends AbstractCall
 		return this.name;
 	}
 
+	public IValue getLiteral()
+	{
+		return this.literal;
+	}
+
+	@Override
+	public void setType(IType type)
+	{
+		this.type = type;
+	}
+
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
