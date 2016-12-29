@@ -29,7 +29,7 @@ boolean nightly = false
 
 @Field static final List<String> dyvilFilters = [ '**/*.dyv', '**/*.dyh', '**/*.dyvil', '**/*.dyvilh' ]
 @Field static final List<String> javaFilters = [ '**/*.java' ]
-@Field static final List<String> genSrcFilters = [ '**/*.dgt', '**/*.dgs' ]
+@Field static final List<String> genSrcFilters = [ '**.dgt', '**.dgs' ]
 @Field static final List<String> resourceFilters = [ '**/*.properties' ]
 @Field static final List<String> binaryFilters = [ '**/*.dyo', '**/*.class' ]
 

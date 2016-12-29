@@ -61,12 +61,14 @@ type Float  = java.lang.Float
 type Double = java.lang.Double
 
 type Configure<T> = T.() -> void
+type Optional<T>  = T?
 type BytecodeName = dyvil.annotation.`internal`.DyvilName
 
 // ---------------------------------------- Operator Definitions ----------------------------------------
 
 // Postfix Operators
 postfix operator !   // unwrap operator
+postfix operator !!  // unsafe unwrap operator
 postfix operator ++
 postfix operator --
 postfix operator ... // varargs expansion operator
@@ -90,7 +92,7 @@ infix   operator ? : { precedence 125 }
 // Colon Operator
 infix   operator :   { right, 150 }
 
-// Nil Coalescing Operator
+// Nullable Coalescing Operator
 infix   operator ??  { left, 175 }
 
 // Boolean and Bitwise Operators

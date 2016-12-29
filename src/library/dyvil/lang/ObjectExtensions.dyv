@@ -38,7 +38,7 @@ public final class ObjectExtensions
 	  strings: [ "java/lang/Object", "equals", "(Ljava/lang/Object;)Z" ])
 	public infix func ==(Object lhs, Object! rhs): boolean = lhs.equals(rhs)
 
-	public infix func ==(Object! lhs, Object! rhs): boolean = lhs == null ? rhs == null : unsafeUnwrap(lhs).equals(rhs)
+	public infix func ==(Object! lhs, Object! rhs): boolean = lhs == null ? rhs == null : lhs!!.equals(rhs)
 
 	// Reference Equality
 	@Intrinsic([ LOAD_0, LOAD_1, ACMPEQ ])
@@ -52,7 +52,7 @@ public final class ObjectExtensions
 
 	@Intrinsic([ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2, BNOT ]
 	  strings: [ "dyvil/lang/ObjectExtensions", "$eq$eq", "(Ljava/lang/Object;Ljava/lang/Object;)Z" ])
-	public infix func !=(Object! lhs, Object! rhs): boolean = !(lhs == rhs)
+	public infix func !=(Object! lhs, Object! rhs): boolean = lhs != rhs
 
 	// Reference Inequality
 	@Intrinsic([ LOAD_0, LOAD_1, ACMPNE ])
@@ -61,16 +61,41 @@ public final class ObjectExtensions
 	// Optionals
 
 	@Intrinsic([ LOAD_0 ])
-	public static func unsafeUnwrap<T>(T? optional): T = optional as T
+	public static func Optional<T>(T value): T? = value
 
-	// Compiler-Intrinsic
-	public postfix func ! <T>(T? optional): T
+	/*
+	 * The Optional Unwrap Operator
+	 *
+	 * Attempts to unwrap an optional value. If the given parameter has the value `null` at runtime, a
+	 * `NullPointerException` is thrown.
+	 */
+	@Intrinsic([ LOAD_0, DUP, INVOKESTATIC, 0, 1, 2 ]
+	  strings: [ "dyvil/lang/ObjectExtensions", "unwrapNullCheck", "(Ljava/lang/Object;)V" ])
+	public postfix func ! <T>(T? optional): T = optional!
+
+	/**
+	 * Checks if the given optional value is null and throws a NullPointerException in that case.
+	 */
+	public static func unwrapNullCheck<T>(T? optional): void
 	{
 		if (optional == null) throw new NullPointerException("Unwrapped Optional was null")
-		return unsafeUnwrap(optional)
 	}
 
-	public infix func ?? <T, U> (T? lhs, U rhs): T|U = lhs != null ? unsafeUnwrap(lhs) : rhs
+	/**
+	 * The Unsafe Unwrap Operator
+	 *
+	 * Unwraps an optional value in an unsafe manner, i.e. without a null check. Use this only if you are sure that
+	 * parameter is never actually null.
+	 */
+	@Intrinsic([ LOAD_0 ])
+	public postfix func !! <T>(T? optional): T = optional!!
+
+	/**
+	 * The Nullable Coalescing Operator
+	 *
+	 * Returns the left-hand argument if it is not `null` at runtime, and the right-hand argument otherwise.
+	 */
+	public infix func ?? <T, U> (T? lhs, U rhs): T|U = lhs != null ? lhs!! : rhs
 
 	// Comparable
 
