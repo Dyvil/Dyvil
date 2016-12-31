@@ -1,6 +1,9 @@
 package dyvil.tools.compiler.ast.type.compound;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.TypeAnnotatableVisitor;
+import dyvil.tools.asm.TypePath;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -406,6 +409,34 @@ public final class WildcardType implements IRawType, ITyped
 	{
 		Variance.write(this.variance, out);
 		IType.writeType(this.bound, out);
+	}
+
+	@Override
+	public IType withAnnotation(IAnnotation annotation)
+	{
+		final IType a = this.bound.withAnnotation(annotation);
+		if (a == null)
+		{
+			return null;
+		}
+
+		this.bound = a;
+		return this;
+	}
+
+	@Override
+	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
+	{
+		if (typePath.getStep(step) == TypePath.WILDCARD_BOUND)
+		{
+			this.bound = IType.withAnnotation(this.bound, annotation, typePath, step + 1, steps);
+		}
+	}
+
+	@Override
+	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
+	{
+		this.bound.writeAnnotations(visitor, typeRef, typePath + '*');
 	}
 
 	@Override
