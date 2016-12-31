@@ -41,7 +41,7 @@ public class NullableType implements IObjectType
 
 	public NullableType(IType type)
 	{
-		this.type = type;
+		this.type = type.getObjectType();
 	}
 
 	public static NullableType apply(IType type)
@@ -93,6 +93,13 @@ public class NullableType implements IObjectType
 	public int subTypeCheckLevel()
 	{
 		return SUBTYPE_NULLABLE;
+	}
+
+	@Override
+	public boolean isSameType(IType type)
+	{
+		final NullableType nullable = type.extract(NullableType.class);
+		return nullable != null && Types.isSameType(this.type, nullable.getElementType());
 	}
 
 	@Override
