@@ -7,12 +7,12 @@ import dyvil.reflect.Modifiers;
 
 public interface Rangeable<T extends Rangeable<T>> extends Comparable<T>
 {
-	T next();
-	
-	T previous();
-	
+	@NonNull T next();
+
+	@NonNull T previous();
+
 	int distanceTo(T other);
-	
+
 	@Override
 	int compareTo(@NonNull T other);
 

@@ -97,6 +97,8 @@ public final class ObjectExtensions
 	 */
 	public infix func ?? <T, U> (T? lhs, U rhs): T|U = lhs != null ? lhs!! : rhs
 
+	public postfix func hashCode<T>(T? optional): int = optional == null ? 0 : optional!!.hashCode
+
 	// Comparable
 
 	public infix inline func < <T>(Comparable<T> lhs, T rhs): boolean = lhs.compareTo(rhs) < 0

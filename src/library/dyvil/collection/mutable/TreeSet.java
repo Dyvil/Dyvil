@@ -1,5 +1,6 @@
 package dyvil.collection.mutable;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.lang.LiteralConvertible;
 
 import java.util.Comparator;
@@ -9,23 +10,27 @@ public class TreeSet<E> extends MapBasedSet<E>
 {
 	private static final long serialVersionUID = 3616255313908232391L;
 
+	@NonNull
 	public static <E> TreeSet<E> apply()
 	{
 		return new TreeSet<>();
 	}
 
+	@NonNull
 	@SafeVarargs
-	public static <E> TreeSet<E> apply(E... elements)
+	public static <E> TreeSet<E> apply(@NonNull E... elements)
 	{
 		return new TreeSet<>(elements);
 	}
 
-	public static <E> TreeSet<E> from(E[] array)
+	@NonNull
+	public static <E> TreeSet<E> from(E @NonNull [] array)
 	{
 		return new TreeSet<>(array);
 	}
 
-	public static <E> TreeSet<E> from(Iterable<? extends E> iterable)
+	@NonNull
+	public static <E> TreeSet<E> from(@NonNull Iterable<? extends E> iterable)
 	{
 		return new TreeSet<>(iterable);
 	}
@@ -40,7 +45,7 @@ public class TreeSet<E> extends MapBasedSet<E>
 		super(new TreeMap<>(comparator));
 	}
 
-	public TreeSet(E[] elements)
+	public TreeSet(E @NonNull [] elements)
 	{
 		this();
 
@@ -50,7 +55,7 @@ public class TreeSet<E> extends MapBasedSet<E>
 		}
 	}
 
-	public TreeSet(Iterable<? extends E> iterable)
+	public TreeSet(@NonNull Iterable<? extends E> iterable)
 	{
 		this();
 

@@ -1,6 +1,7 @@
 package dyvil.annotation;
 
 import dyvil.annotation.internal.ClassParameters;
+import dyvil.annotation.internal.NonNull;
 import dyvil.util.MarkerLevel;
 
 import java.lang.annotation.Retention;
@@ -10,9 +11,9 @@ import java.lang.annotation.RetentionPolicy;
 @ClassParameters(names = { "value", "description", "level" })
 public @interface UsageInfo
 {
-	String value();
+	@NonNull String value();
 
-	String description() default "";
+	@NonNull String description() default "";
 
-	MarkerLevel level() default MarkerLevel.INFO;
+	@NonNull MarkerLevel level() default MarkerLevel.INFO;
 }

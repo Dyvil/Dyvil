@@ -1,6 +1,7 @@
 package dyvil.annotation;
 
 import dyvil.annotation.internal.ClassParameters;
+import dyvil.annotation.internal.NonNull;
 import dyvil.util.MarkerLevel;
 
 import java.lang.annotation.Retention;
@@ -14,16 +15,16 @@ public @interface Deprecated
 	{
 		UNSPECIFIED, DANGEROUS, CONDEMNED, SUPERSEDED, UNIMPLEMENTED
 	}
-	
-	String value() default "The {member.kind} '{member.name}' is deprecated";
 
-	String description() default "";
-	
-	String since() default "";
-	
-	Reason[] reasons() default { Reason.UNSPECIFIED };
-	
-	String[] replacements() default {};
-	
-	MarkerLevel level() default MarkerLevel.WARNING;
+	@NonNull String value() default "The {member.kind} '{member.name}' is deprecated";
+
+	@NonNull String description() default "";
+
+	@NonNull String since() default "";
+
+	@NonNull Reason @NonNull [] reasons() default { Reason.UNSPECIFIED };
+
+	@NonNull String @NonNull [] replacements() default {};
+
+	@NonNull MarkerLevel level() default MarkerLevel.WARNING;
 }

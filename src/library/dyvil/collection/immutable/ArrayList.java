@@ -1,6 +1,7 @@
 package dyvil.collection.immutable;
 
 import dyvil.annotation.Immutable;
+import dyvil.annotation.internal.NonNull;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractArrayList;
 import dyvil.lang.LiteralConvertible;
@@ -53,37 +54,44 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 
 	// Factory Methods
 
+	@NonNull
 	@SafeVarargs
-	public static <E> ArrayList<E> apply(E... elements)
+	public static <E> ArrayList<E> apply(@NonNull E... elements)
 	{
 		return new ArrayList<>(elements, true);
 	}
 
-	public static <E> ArrayList<E> from(E[] array)
+	@NonNull
+	public static <E> ArrayList<E> from(E @NonNull [] array)
 	{
 		return new ArrayList<>(array);
 	}
 
-	public static <E> ArrayList<E> from(Iterable<? extends E> iterable)
+	@NonNull
+	public static <E> ArrayList<E> from(@NonNull Iterable<? extends E> iterable)
 	{
 		return new ArrayList<>(iterable);
 	}
 
-	public static <E> ArrayList<E> from(Collection<? extends E> collection)
+	@NonNull
+	public static <E> ArrayList<E> from(@NonNull Collection<? extends E> collection)
 	{
 		return new ArrayList<>(collection);
 	}
 
-	public static <E> ArrayList<E> from(AbstractArrayList<? extends E> arrayList)
+	@NonNull
+	public static <E> ArrayList<E> from(@NonNull AbstractArrayList<? extends E> arrayList)
 	{
 		return new ArrayList<>(arrayList);
 	}
 
+	@NonNull
 	public static <E> Builder<E> builder()
 	{
 		return new Builder<>();
 	}
 
+	@NonNull
 	public static <E> Builder<E> builder(int capacity)
 	{
 		return new Builder<>(capacity);
@@ -101,17 +109,17 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 		super(capacity);
 	}
 
-	public ArrayList(E[] elements)
+	public ArrayList(E @NonNull [] elements)
 	{
 		super(elements);
 	}
 
-	public ArrayList(E[] elements, boolean trusted)
+	public ArrayList(E @NonNull [] elements, boolean trusted)
 	{
 		super(elements, elements.length, trusted);
 	}
 
-	public ArrayList(E[] elements, int size)
+	public ArrayList(E @NonNull [] elements, int size)
 	{
 		super(elements, size);
 	}
@@ -121,23 +129,24 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 		super(elements, size, trusted);
 	}
 
-	public ArrayList(Iterable<? extends E> iterable)
+	public ArrayList(@NonNull Iterable<? extends E> iterable)
 	{
 		super(iterable);
 	}
 
-	public ArrayList(Collection<? extends E> collection)
+	public ArrayList(@NonNull Collection<? extends E> collection)
 	{
 		super(collection);
 	}
 
-	public ArrayList(AbstractArrayList<? extends E> arrayList)
+	public ArrayList(@NonNull AbstractArrayList<? extends E> arrayList)
 	{
 		super(arrayList);
 	}
 
 	// Implementation Methods
 
+	@NonNull
 	@Override
 	public ImmutableList<E> subList(int startIndex, int length)
 	{
@@ -149,6 +158,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 		return new ArrayList<>((E[]) array, length, true);
 	}
 
+	@NonNull
 	@Override
 	public ImmutableList<E> added(E element)
 	{
@@ -158,8 +168,9 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 		return new ArrayList<>((E[]) array, this.size + 1, true);
 	}
 
+	@NonNull
 	@Override
-	public ImmutableList<E> union(Collection<? extends E> collection)
+	public ImmutableList<E> union(@NonNull Collection<? extends E> collection)
 	{
 		int len = collection.size();
 		Object[] array = new Object[this.size + len];
@@ -170,6 +181,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 		return new ArrayList<>((E[]) array, this.size + len, true);
 	}
 
+	@NonNull
 	@Override
 	public ImmutableList<E> removed(Object element)
 	{
@@ -193,8 +205,9 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 		return new ArrayList<>((E[]) array, this.size - 1, true);
 	}
 
+	@NonNull
 	@Override
-	public ImmutableList<E> difference(Collection<?> collection)
+	public ImmutableList<E> difference(@NonNull Collection<?> collection)
 	{
 		int index = 0;
 		Object[] array = new Object[this.size];
@@ -210,8 +223,9 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 		return new ArrayList<>((E[]) array, index, true);
 	}
 
+	@NonNull
 	@Override
-	public ImmutableList<E> intersection(Collection<? extends E> collection)
+	public ImmutableList<E> intersection(@NonNull Collection<? extends E> collection)
 	{
 		int index = 0;
 		Object[] array = new Object[this.size];
@@ -227,8 +241,9 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 		return new ArrayList<>((E[]) array, index, true);
 	}
 
+	@NonNull
 	@Override
-	public <R> ImmutableList<R> mapped(Function<? super E, ? extends R> mapper)
+	public <R> ImmutableList<R> mapped(@NonNull Function<? super E, ? extends R> mapper)
 	{
 		Object[] array = new Object[this.size];
 		for (int i = 0; i < this.size; i++)
@@ -238,8 +253,9 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 		return new ArrayList<>((R[]) array, this.size, true);
 	}
 
+	@NonNull
 	@Override
-	public <R> ImmutableList<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
+	public <R> ImmutableList<R> flatMapped(@NonNull Function<? super E, ? extends @NonNull Iterable<? extends R>> mapper)
 	{
 		Builder<R> builder = new Builder<>(this.size << 2);
 		for (int i = 0; i < this.size; i++)
@@ -252,8 +268,9 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 		return builder.build();
 	}
 
+	@NonNull
 	@Override
-	public ImmutableList<E> filtered(Predicate<? super E> condition)
+	public ImmutableList<E> filtered(@NonNull Predicate<? super E> condition)
 	{
 		int index = 0;
 		Object[] array = new Object[this.size];
@@ -268,6 +285,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 		return new ArrayList<>((E[]) array, index, true);
 	}
 
+	@NonNull
 	@Override
 	public ImmutableList<E> reversed()
 	{
@@ -280,6 +298,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 		return new ArrayList<>((E[]) newArray, this.size, true);
 	}
 
+	@NonNull
 	@Override
 	public ImmutableList<E> sorted()
 	{
@@ -289,8 +308,9 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 		return new SortedArrayList<>((E[]) array, this.size, true, null);
 	}
 
+	@NonNull
 	@Override
-	public ImmutableList<E> sorted(Comparator<? super E> comparator)
+	public ImmutableList<E> sorted(@NonNull Comparator<? super E> comparator)
 	{
 		Object[] array = new Object[this.size];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
@@ -298,6 +318,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 		return new SortedArrayList<>((E[]) array, this.size, true, comparator);
 	}
 
+	@NonNull
 	@Override
 	public ImmutableList<E> distinct()
 	{
@@ -307,8 +328,10 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 		return new ArrayList<>((E[]) array, size, true);
 	}
 
+	@SuppressWarnings("unchecked")
+	@NonNull
 	@Override
-	public ImmutableList<E> distinct(Comparator<? super E> comparator)
+	public ImmutableList<E> distinct(@NonNull Comparator<? super E> comparator)
 	{
 		Object[] array = new Object[this.size];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
@@ -316,12 +339,15 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 		return new SortedArrayList<>((E[]) array, size, true, comparator);
 	}
 
+	@SuppressWarnings("unchecked")
+	@NonNull
 	@Override
 	public ImmutableList<E> copy()
 	{
 		return new ArrayList<>((E[]) this.elements, this.size, true);
 	}
 
+	@NonNull
 	@Override
 	public MutableList<E> mutable()
 	{
@@ -329,7 +355,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 	}
 
 	@Override
-	public java.util.List<E> toJava()
+	public java.util.@NonNull List<E> toJava()
 	{
 		return Collections.unmodifiableList(super.toJava());
 	}

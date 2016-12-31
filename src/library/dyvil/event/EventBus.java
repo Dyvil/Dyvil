@@ -1,14 +1,16 @@
 package dyvil.event;
 
+import dyvil.annotation.internal.NonNull;
+
 public interface EventBus
 {
 	/**
 	 * Registers an event handler.
 	 *
 	 * @param eventHandler
-	 * 		the event handler to register
+	 * 	the event handler to register
 	 */
-	default void register(Object eventHandler)
+	default void register(@NonNull Object eventHandler)
 	{
 		this.register(eventHandler, eventHandler.getClass());
 	}
@@ -17,7 +19,7 @@ public interface EventBus
 	 * Registers a static event handler. Events will only be dispatched to static methods of this handler.
 	 *
 	 * @param type
-	 * 		the event handler type
+	 * 	the event handler type
 	 */
 	default void register(Class<?> type)
 	{
@@ -29,9 +31,9 @@ public interface EventBus
 	 * can be null, in which case only dispatch to static handler methods will be enabled.
 	 *
 	 * @param eventHandler
-	 * 		the event handler to register. May be null.
+	 * 	the event handler to register. May be null.
 	 * @param type
-	 * 		the type of the event handler
+	 * 	the type of the event handler
 	 */
 	void register(Object eventHandler, Class<?> type);
 
@@ -39,7 +41,7 @@ public interface EventBus
 	 * Dispatches the given <code>event</code> to all event handlers.
 	 *
 	 * @param event
-	 * 		the event to dispatch to all handlers.
+	 * 	the event to dispatch to all handlers.
 	 */
 	void dispatch(Object event);
 }

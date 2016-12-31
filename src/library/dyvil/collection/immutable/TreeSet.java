@@ -1,6 +1,8 @@
 package dyvil.collection.immutable;
 
 import dyvil.annotation.Immutable;
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.collection.ImmutableSet;
 import dyvil.lang.LiteralConvertible;
 
@@ -41,30 +43,38 @@ public class TreeSet<E> extends MapBasedSet<E>
 
 	// Factory Methods
 
+	@NonNull
 	public static <E> TreeSet<E> apply()
 	{
 		return new TreeSet<>();
 	}
 
+	@NonNull
 	@SafeVarargs
-	public static <E> TreeSet<E> apply(E... elements)
+	public static <E> TreeSet<E> apply(@NonNull E... elements)
 	{
 		return new TreeSet<>(elements);
 	}
 
-	public static <E> TreeSet<E> from(E[] array) { return new TreeSet<>(array);
+	@NonNull
+	public static <E> TreeSet<E> from(E @NonNull [] array)
+	{
+		return new TreeSet<>(array);
 	}
 
-	public static <E> TreeSet<E> from(Iterable<? extends E> iterable)
+	@NonNull
+	public static <E> TreeSet<E> from(@NonNull Iterable<? extends E> iterable)
 	{
 		return new TreeSet<>(buildMap(iterable));
 	}
 
+	@NonNull
 	public static <E> Builder<E> builder()
 	{
 		return new Builder<>();
 	}
 
+	@NonNull
 	public static <E> Builder<E> builder(Comparator<? super E> comparator)
 	{
 		return new Builder<>(comparator);
@@ -76,30 +86,31 @@ public class TreeSet<E> extends MapBasedSet<E>
 	{
 		super(new TreeMap<>());
 	}
-	
+
 	public TreeSet(Comparator<? super E> comparator)
 	{
 		super(new TreeMap<>(comparator));
 	}
 
-	public TreeSet(E[] elements)
+	public TreeSet(E @NonNull [] elements)
 	{
 		super(buildMap(elements));
 	}
 
-	public TreeSet(Iterable<? extends E> iterable)
+	public TreeSet(@NonNull Iterable<? extends E> iterable)
 	{
 		super(buildMap(iterable));
 	}
 
 	// Implementation Methods
-	
+
 	protected TreeSet(TreeMap<E, Boolean> map)
 	{
 		super(map);
 	}
 
-	private static <E> TreeMap<E, Boolean> buildMap(E[] array)
+	@Nullable
+	private static <E> TreeMap<E, Boolean> buildMap(E @NonNull [] array)
 	{
 		final TreeMap.Builder<E, Boolean> builder = new TreeMap.Builder<>();
 		for (E element : array)
@@ -109,7 +120,8 @@ public class TreeSet<E> extends MapBasedSet<E>
 		return builder.build();
 	}
 
-	private static <E> TreeMap<E, Boolean> buildMap(Iterable<? extends E> iterable)
+	@Nullable
+	private static <E> TreeMap<E, Boolean> buildMap(@NonNull Iterable<? extends E> iterable)
 	{
 		final TreeMap.Builder<E, Boolean> builder = new TreeMap.Builder<>();
 		for (E element : iterable)

@@ -1,5 +1,7 @@
 package dyvil.collection.impl;
 
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.collection.*;
 import dyvil.math.MathUtils;
 
@@ -54,7 +56,7 @@ public abstract class AbstractHashSet<E> implements Set<E>
 		this.elements = (HashElement<E>[]) new HashElement[MathUtils.powerOfTwo(AbstractHashMap.grow(capacity))];
 	}
 
-	public AbstractHashSet(E[] elements)
+	public AbstractHashSet(E @NonNull [] elements)
 	{
 		this(elements.length);
 		for (E element : elements)
@@ -63,25 +65,25 @@ public abstract class AbstractHashSet<E> implements Set<E>
 		}
 	}
 
-	public AbstractHashSet(Iterable<? extends E> iterable)
+	public AbstractHashSet(@NonNull Iterable<? extends E> iterable)
 	{
 		this();
 		this.addAllInternal(iterable);
 	}
 
-	public AbstractHashSet(SizedIterable<? extends E> iterable)
+	public AbstractHashSet(@NonNull SizedIterable<? extends E> iterable)
 	{
 		this(iterable.size());
 		this.addAllInternal((Iterable<? extends E>) iterable);
 	}
 
-	public AbstractHashSet(Set<? extends E> set)
+	public AbstractHashSet(@NonNull Set<? extends E> set)
 	{
 		this(set.size());
 		this.loadDistinct(set);
 	}
 
-	public AbstractHashSet(AbstractHashSet<? extends E> elements)
+	public AbstractHashSet(@NonNull AbstractHashSet<? extends E> elements)
 	{
 		this(elements.size);
 		this.size = elements.size;
@@ -159,8 +161,8 @@ public abstract class AbstractHashSet<E> implements Set<E>
 		int i = index(hash, this.elements.length);
 		for (HashElement<E> e = this.elements[i]; e != null; e = e.next)
 		{
-			Object k;
-			if (e.hash == hash && ((k = e.element) == element || Objects.equals(element, k)))
+			Object key;
+			if (e.hash == hash && ((key = e.element) == element || Objects.equals(element, key)))
 			{
 				return false;
 			}
@@ -172,7 +174,7 @@ public abstract class AbstractHashSet<E> implements Set<E>
 
 	protected abstract void addElement(int hash, E element, int index);
 
-	protected void addAllInternal(Iterable<? extends E> iterable)
+	protected void addAllInternal(@NonNull Iterable<? extends E> iterable)
 	{
 		for (E element : iterable)
 		{
@@ -180,13 +182,13 @@ public abstract class AbstractHashSet<E> implements Set<E>
 		}
 	}
 
-	protected void addAllInternal(SizedIterable<? extends E> iterable)
+	protected void addAllInternal(@NonNull SizedIterable<? extends E> iterable)
 	{
 		this.ensureCapacity(this.size + iterable.size());
 		this.addAllInternal((Iterable<? extends E>) iterable);
 	}
 
-	private void loadDistinct(Iterable<? extends E> iterable)
+	private void loadDistinct(@NonNull Iterable<? extends E> iterable)
 	{
 		final HashElement<E>[] hashElements = this.elements;
 		final int length = hashElements.length;
@@ -209,13 +211,14 @@ public abstract class AbstractHashSet<E> implements Set<E>
 		return this.size;
 	}
 
+	@NonNull
 	@Override
 	public Iterator<E> iterator()
 	{
 		return new Iterator<E>()
 		{
-			HashElement<E> next; // next entry to return
-			HashElement<E> current; // current entry
+			@Nullable HashElement<E> next; // next entry to return
+			@Nullable HashElement<E> current; // current entry
 			int index; // current slot
 
 			{
@@ -252,15 +255,10 @@ public abstract class AbstractHashSet<E> implements Set<E>
 				return e.element;
 			}
 
-			private void advance(HashElement<E>[] t)
+			private void advance(HashElement<E> @NonNull [] t)
 			{
-				while (true)
-				{
-					if (!(this.index < t.length && (this.next = t[this.index++]) == null))
-					{
-						break;
-					}
-				}
+				//noinspection StatementWithEmptyBody
+				while (this.index < t.length && (this.next = t[this.index++]) == null);
 			}
 
 			@Override
@@ -278,7 +276,7 @@ public abstract class AbstractHashSet<E> implements Set<E>
 		};
 	}
 
-	protected void removeElement(HashElement<E> element)
+	protected void removeElement(@NonNull HashElement<E> element)
 	{
 		this.size--;
 		int index = index(element.hash, this.elements.length);
@@ -302,7 +300,7 @@ public abstract class AbstractHashSet<E> implements Set<E>
 	}
 
 	@Override
-	public void forEach(Consumer<? super E> action)
+	public void forEach(@NonNull Consumer<? super E> action)
 	{
 		for (HashElement<E> hashElement : this.elements)
 		{
@@ -314,7 +312,7 @@ public abstract class AbstractHashSet<E> implements Set<E>
 	}
 
 	@Override
-	public boolean contains(Object element)
+	public boolean contains(@Nullable Object element)
 	{
 		if (element == null)
 		{
@@ -341,24 +339,28 @@ public abstract class AbstractHashSet<E> implements Set<E>
 		return false;
 	}
 
+	@NonNull
 	@Override
 	public MutableSet<E> mutableCopy()
 	{
 		return new dyvil.collection.mutable.HashSet<>(this);
 	}
 
+	@NonNull
 	@Override
 	public <R> MutableSet<R> emptyCopy()
 	{
 		return new dyvil.collection.mutable.HashSet<>();
 	}
 
+	@NonNull
 	@Override
 	public <RE> MutableSet<RE> emptyCopy(int capacity)
 	{
 		return new dyvil.collection.mutable.HashSet<>(capacity);
 	}
 
+	@NonNull
 	@Override
 	public ImmutableSet<E> immutableCopy()
 	{
@@ -388,6 +390,7 @@ public abstract class AbstractHashSet<E> implements Set<E>
 		return set;
 	}
 
+	@NonNull
 	@Override
 	public String toString()
 	{
@@ -406,7 +409,7 @@ public abstract class AbstractHashSet<E> implements Set<E>
 		return Set.setHashCode(this);
 	}
 
-	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	private void writeObject(java.io.@NonNull ObjectOutputStream out) throws IOException
 	{
 		out.defaultWriteObject();
 
@@ -425,7 +428,7 @@ public abstract class AbstractHashSet<E> implements Set<E>
 		}
 	}
 
-	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	private void readObject(java.io.@NonNull ObjectInputStream in) throws IOException, ClassNotFoundException
 	{
 		in.defaultReadObject();
 

@@ -2,6 +2,7 @@ package dyvil.collection.iterator;
 
 import dyvil.annotation.Immutable;
 import dyvil.annotation.Mutating;
+import dyvil.annotation.internal.NonNull;
 import dyvil.lang.LiteralConvertible;
 import dyvil.util.ImmutableException;
 
@@ -16,23 +17,24 @@ public class SingletonIterator<E> implements Iterator<E>
 {
 	private       boolean returned;
 	private final E       element;
-	
+
+	@NonNull
 	public static <E> SingletonIterator<E> apply(E element)
 	{
 		return new SingletonIterator(element);
 	}
-	
+
 	public SingletonIterator(E element)
 	{
 		this.element = element;
 	}
-	
+
 	@Override
 	public boolean hasNext()
 	{
 		return !this.returned;
 	}
-	
+
 	@Override
 	public E next()
 	{
@@ -43,14 +45,14 @@ public class SingletonIterator<E> implements Iterator<E>
 		}
 		throw new NoSuchElementException("Singleton Iterator already returned the element");
 	}
-	
+
 	@Override
 	@Mutating
 	public void remove()
 	{
 		throw new ImmutableException();
 	}
-	
+
 	@Override
 	public void forEachRemaining(Consumer<? super E> action)
 	{
@@ -61,7 +63,8 @@ public class SingletonIterator<E> implements Iterator<E>
 			this.returned = true;
 		}
 	}
-	
+
+	@NonNull
 	@Override
 	public String toString()
 	{

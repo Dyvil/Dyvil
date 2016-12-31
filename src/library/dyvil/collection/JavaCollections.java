@@ -1,7 +1,7 @@
 package dyvil.collection;
 
 import dyvil.annotation.internal.DyvilModifiers;
-import dyvil.collection.mutable.ArrayList;
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
 
 import java.util.Collections;
@@ -13,77 +13,57 @@ import java.util.function.Predicate;
 public interface JavaCollections
 {
 	// Access Operations
-	
+
 	/**
 	 * @see Collection#contains(Object)
 	 */
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static boolean $qmark(java.util.Collection<?> collection, Object o)
+	static boolean $qmark(java.util.@NonNull Collection<?> collection, Object o)
 	{
 		return collection.contains(o);
 	}
-	
-	/**
-	 * @see List#subscript(Object)
-	 */
+
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static <E> E subscript(java.util.List<E> list, int index)
+	static <E> E subscript(java.util.@NonNull List<E> list, int index)
 	{
 		return list.get(index);
 	}
 
 	// Mutating Operations
 
-	/**
-	 * @see List#subscript_$eq(int, Object)
-	 */
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static <E> void subscript_$eq(java.util.List<E> list, int index, E element)
+	static <E> void subscript_$eq(java.util.@NonNull List<E> list, int index, E element)
 	{
 		list.set(index, element);
 	}
 
-	/**
-	 * @see Collection#$plus$eq(Object)
-	 */
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static <E> void $plus$eq(java.util.Collection<E> collection, E element)
+	static <E> void $plus$eq(java.util.@NonNull Collection<E> collection, E element)
 	{
 		collection.add(element);
 	}
 
-	/**
-	 * @see Collection#$plus$plus$eq(Collection)
-	 */
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static <E> void $plus$plus$eq(java.util.Collection<? super E> collection, java.util.Collection<? extends E> iterable)
+	static <E> void $plus$plus$eq(java.util.@NonNull Collection<? super E> collection,
+		                             java.util.@NonNull Collection<? extends E> iterable)
 	{
 		collection.addAll(iterable);
 	}
 
-	/**
-	 * @see Collection#$minus$eq(Entry)
-	 */
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static void $minus$eq(java.util.Collection<?> collection, Object element)
+	static void $minus$eq(java.util.@NonNull Collection<?> collection, Object element)
 	{
 		collection.remove(element);
 	}
 
-	/**
-	 * @see Collection#$minus$minus$eq(Map)
-	 */
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static void $minus$minus$eq(java.util.Collection<?> collection, java.util.Collection<?> remove)
+	static void $minus$minus$eq(java.util.@NonNull Collection<?> collection, java.util.@NonNull Collection<?> remove)
 	{
 		collection.removeAll(remove);
 	}
 
-	/**
-	 * @see Collection#$amp$eq(Collection)
-	 */
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static void $amp$eq(java.util.Collection<?> collection, java.util.Collection<?> retain)
+	static void $amp$eq(java.util.@NonNull Collection<?> collection, java.util.@NonNull Collection<?> retain)
 	{
 		collection.retainAll(retain);
 	}
@@ -92,7 +72,7 @@ public interface JavaCollections
 	 * @see Collection#map(Function)
 	 */
 	@DyvilModifiers(Modifiers.INFIX)
-	static <E> void map(java.util.Collection<E> collection, Function<? super E, ? extends E> mapper)
+	static <E> void map(java.util.@NonNull Collection<E> collection, @NonNull Function<? super E, ? extends E> mapper)
 	{
 		int size = collection.size();
 		java.util.Collection<E> list = new java.util.ArrayList(size);
@@ -105,10 +85,11 @@ public interface JavaCollections
 	}
 
 	/**
-	 * @see Collection#flatMap(Function)
+	 * @see Queryable#flatMap(Function)
 	 */
 	@DyvilModifiers(Modifiers.INFIX)
-	static <E> void flatMap(java.util.Collection<E> collection, Function<? super E, ? extends Iterable<? extends E>> mapper)
+	static <E> void flatMap(java.util.@NonNull Collection<E> collection,
+		                       @NonNull Function<? super E, ? extends @NonNull Iterable<? extends E>> mapper)
 	{
 		java.util.Collection<E> list = new java.util.LinkedList<>();
 		for (E element : collection)
@@ -126,7 +107,7 @@ public interface JavaCollections
 	 * @see Collection#filter(Predicate)
 	 */
 	@DyvilModifiers(Modifiers.INFIX)
-	static <E> void filter(java.util.Collection<E> collection, Predicate<? super E> condition)
+	static <E> void filter(java.util.@NonNull Collection<E> collection, @NonNull Predicate<? super E> condition)
 	{
 		Iterator<E> iterator = collection.iterator();
 		while (iterator.hasNext())
@@ -142,7 +123,7 @@ public interface JavaCollections
 	 * @see List#sort()
 	 */
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static <E extends Comparable> void sort(java.util.List<E> list)
+	static <E extends Comparable<E>> void sort(java.util.@NonNull List<E> list)
 	{
 		Collections.sort(list);
 	}
@@ -151,9 +132,9 @@ public interface JavaCollections
 	 * @see List#sort(Comparator)
 	 */
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static <E> void sort(java.util.List<E> list, Comparator<? super E> comparator)
+	static <E> void sort(java.util.@NonNull List<E> list, Comparator<? super E> comparator)
 	{
-		Collections.sort(list, comparator);
+		list.sort(comparator);
 	}
 
 	// Copying
@@ -161,17 +142,19 @@ public interface JavaCollections
 	/**
 	 * @see List#mutable()
 	 */
+	@NonNull
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static <E> MutableList<E> mutable(java.util.List<E> list)
+	static <E> MutableList<E> mutable(java.util.@NonNull List<E> list)
 	{
-		return new ArrayList(list.toArray(), true);
+		return new dyvil.collection.mutable.ArrayList(list.toArray(), true);
 	}
 
 	/**
 	 * @see List#immutable()
 	 */
+	@NonNull
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	static <E> ImmutableList<E> immutable(java.util.List<E> list)
+	static <E> ImmutableList<E> immutable(java.util.@NonNull List<E> list)
 	{
 		return new dyvil.collection.immutable.ArrayList(list.toArray(), true);
 	}

@@ -1,5 +1,6 @@
 package dyvil.collection.mutable;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
 import dyvil.collection.Set;
@@ -24,38 +25,45 @@ public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 
 	// Factory Methods
 
+	@NonNull
 	public static <E> HashSet<E> apply()
 	{
 		return new HashSet<>();
 	}
 
+	@NonNull
 	@SafeVarargs
-	public static <E> HashSet<E> apply(E... elements)
+	public static <E> HashSet<E> apply(@NonNull E... elements)
 	{
 		return new HashSet<>(elements);
 	}
 
-	public static <E> HashSet<E> from(E[] array)
+	@NonNull
+	public static <E> HashSet<E> from(E @NonNull [] array)
 	{
 		return new HashSet<>(array);
 	}
 
-	public static <E> HashSet<E> from(Iterable<? extends E> iterable)
+	@NonNull
+	public static <E> HashSet<E> from(@NonNull Iterable<? extends E> iterable)
 	{
 		return new HashSet<>(iterable);
 	}
 
-	public static <E> HashSet<E> from(SizedIterable<? extends E> iterable)
+	@NonNull
+	public static <E> HashSet<E> from(@NonNull SizedIterable<? extends E> iterable)
 	{
 		return new HashSet<>(iterable);
 	}
 
-	public static <E> HashSet<E> from(Set<? extends E> set)
+	@NonNull
+	public static <E> HashSet<E> from(@NonNull Set<? extends E> set)
 	{
 		return new HashSet<>(set);
 	}
 
-	public static <E> HashSet<E> from(AbstractHashSet<? extends E> hashSet)
+	@NonNull
+	public static <E> HashSet<E> from(@NonNull AbstractHashSet<? extends E> hashSet)
 	{
 		return new HashSet<>(hashSet);
 	}
@@ -89,31 +97,31 @@ public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 		this.threshold = (int) (capacity * this.loadFactor);
 	}
 
-	public HashSet(E[] elements)
+	public HashSet(E @NonNull [] elements)
 	{
 		super(elements);
 		this.defaultThreshold();
 	}
 
-	public HashSet(Iterable<? extends E> iterable)
+	public HashSet(@NonNull Iterable<? extends E> iterable)
 	{
 		super(iterable);
 		this.defaultThreshold();
 	}
 
-	public HashSet(SizedIterable<? extends E> iterable)
+	public HashSet(@NonNull SizedIterable<? extends E> iterable)
 	{
 		super(iterable);
 		this.defaultThreshold();
 	}
 
-	public HashSet(Set<? extends E> set)
+	public HashSet(@NonNull Set<? extends E> set)
 	{
 		super(set);
 		this.defaultThreshold();
 	}
 
-	public HashSet(AbstractHashSet<? extends E> hashSet)
+	public HashSet(@NonNull AbstractHashSet<? extends E> hashSet)
 	{
 		super(hashSet);
 		this.defaultThreshold();
@@ -202,7 +210,7 @@ public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 	}
 
 	@Override
-	public void map(Function<? super E, ? extends E> mapper)
+	public void map(@NonNull Function<? super E, ? extends E> mapper)
 	{
 		// Other than flatMap, map allows us to inline the implementation,
 		// because we can be sure that the size will not grow, and no re-hash /
@@ -240,7 +248,7 @@ public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 	}
 
 	@Override
-	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper)
+	public void flatMap(@NonNull Function<? super E, ? extends @NonNull Iterable<? extends E>> mapper)
 	{
 		// To simplify the implementation of this method, we create a temporary
 		// copy that is used to collect all new elements produced by the mapper.
@@ -260,12 +268,14 @@ public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 		this.threshold = copy.threshold;
 	}
 
+	@NonNull
 	@Override
 	public MutableSet<E> copy()
 	{
 		return this.mutableCopy();
 	}
 
+	@NonNull
 	@Override
 	public ImmutableSet<E> immutable()
 	{

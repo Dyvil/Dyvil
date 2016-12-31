@@ -1,6 +1,8 @@
 package dyvil.collection.immutable;
 
 import dyvil.annotation.Immutable;
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.collection.*;
 import dyvil.collection.iterator.AppendIterator;
 import dyvil.collection.iterator.PrependIterator;
@@ -41,14 +43,15 @@ public class AppendList<E> implements ImmutableList<E>
 	}
 
 	private static final long serialVersionUID = 2683270385507677394L;
-	
+
 	private transient ImmutableList<E> head;
 	private transient E                tail;
-	
+
 	private transient int size;
 
+	@NonNull
 	@SafeVarargs
-	public static <E> ImmutableList<E> apply(E... elements)
+	public static <E> ImmutableList<E> apply(@NonNull E... elements)
 	{
 		ImmutableList<E> list = EmptyList.apply();
 		for (E element : elements)
@@ -58,7 +61,8 @@ public class AppendList<E> implements ImmutableList<E>
 		return list;
 	}
 
-	public static <E> ImmutableList<E> from(Iterable<? extends E> iterable)
+	@NonNull
+	public static <E> ImmutableList<E> from(@NonNull Iterable<? extends E> iterable)
 	{
 		ImmutableList<E> list = EmptyList.apply();
 		for (E element : iterable)
@@ -68,48 +72,53 @@ public class AppendList<E> implements ImmutableList<E>
 		return list;
 	}
 
+	@NonNull
 	public static <E> ImmutableList<E> from(Collection<? extends E> collection)
 	{
 		return from((Iterable<E>) collection);
 	}
 
+	@NonNull
 	public static <E> Builder<E> builder()
 	{
 		return new Builder<>();
 	}
-	
+
 	public AppendList(E element)
 	{
 		this.head = (ImmutableList<E>) EmptyList.instance;
 		this.tail = element;
 		this.size = 1;
 	}
-	
-	public AppendList(ImmutableList<E> head, E tail)
+
+	public AppendList(@NonNull ImmutableList<E> head, E tail)
 	{
 		this.head = head;
 		this.tail = tail;
 		this.size = 1 + head.size();
 	}
-	
+
 	@Override
 	public int size()
 	{
 		return this.size;
 	}
-	
+
+	@NonNull
 	@Override
 	public Iterator<E> iterator()
 	{
 		return new AppendIterator<>(this.head.iterator(), this.tail);
 	}
-	
+
+	@NonNull
 	@Override
 	public Iterator<E> reverseIterator()
 	{
 		return new PrependIterator<>(this.tail, this.head.reverseIterator());
 	}
-	
+
+	@Nullable
 	@Override
 	public E subscript(int index)
 	{
@@ -119,7 +128,7 @@ public class AppendList<E> implements ImmutableList<E>
 		}
 		return index == this.size - 1 ? this.tail : null;
 	}
-	
+
 	@Override
 	public E get(int index)
 	{
@@ -133,7 +142,8 @@ public class AppendList<E> implements ImmutableList<E>
 		}
 		throw new IndexOutOfBoundsException(index + " >= " + this.size);
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableList<E> subList(int startIndex, int length)
 	{
@@ -143,15 +153,17 @@ public class AppendList<E> implements ImmutableList<E>
 		}
 		return this.head.subList(startIndex, length - 1);
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableList<E> added(E element)
 	{
 		return new AppendList<>(this, element);
 	}
-	
+
+	@NonNull
 	@Override
-	public ImmutableList<E> union(Collection<? extends E> collection)
+	public ImmutableList<E> union(@NonNull Collection<? extends E> collection)
 	{
 		AppendList<E> ll = this;
 		for (E element : collection)
@@ -160,7 +172,8 @@ public class AppendList<E> implements ImmutableList<E>
 		}
 		return ll;
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableList<E> removed(Object element)
 	{
@@ -170,9 +183,10 @@ public class AppendList<E> implements ImmutableList<E>
 		}
 		return new AppendList<>(this.head.removed(element), this.tail);
 	}
-	
+
+	@NonNull
 	@Override
-	public ImmutableList<E> difference(Collection<?> collection)
+	public ImmutableList<E> difference(@NonNull Collection<?> collection)
 	{
 		if (collection.contains(this.tail))
 		{
@@ -180,9 +194,10 @@ public class AppendList<E> implements ImmutableList<E>
 		}
 		return new AppendList<>((ImmutableList<E>) this.head.difference(collection), this.tail);
 	}
-	
+
+	@NonNull
 	@Override
-	public ImmutableList<E> intersection(Collection<? extends E> collection)
+	public ImmutableList<E> intersection(@NonNull Collection<? extends E> collection)
 	{
 		if (!collection.contains(this.tail))
 		{
@@ -190,15 +205,17 @@ public class AppendList<E> implements ImmutableList<E>
 		}
 		return new AppendList<>((ImmutableList<E>) this.head.intersection(collection), this.tail);
 	}
-	
+
+	@NonNull
 	@Override
-	public <R> ImmutableList<R> mapped(Function<? super E, ? extends R> mapper)
+	public <R> ImmutableList<R> mapped(@NonNull Function<? super E, ? extends R> mapper)
 	{
 		return new AppendList<>(this.head.mapped(mapper), mapper.apply(this.tail));
 	}
-	
+
+	@NonNull
 	@Override
-	public <R> ImmutableList<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
+	public <R> ImmutableList<R> flatMapped(@NonNull Function<? super E, ? extends @NonNull Iterable<? extends R>> mapper)
 	{
 		ImmutableList<R> head = this.head.flatMapped(mapper);
 		for (R element : mapper.apply(this.tail))
@@ -207,9 +224,10 @@ public class AppendList<E> implements ImmutableList<E>
 		}
 		return head;
 	}
-	
+
+	@NonNull
 	@Override
-	public ImmutableList<E> filtered(Predicate<? super E> condition)
+	public ImmutableList<E> filtered(@NonNull Predicate<? super E> condition)
 	{
 		if (!condition.test(this.tail))
 		{
@@ -217,13 +235,15 @@ public class AppendList<E> implements ImmutableList<E>
 		}
 		return new AppendList<>(this.head.filtered(condition), this.tail);
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableList<E> reversed()
 	{
 		return new PrependList<>(this.tail, this.head.reversed());
 	}
-	
+
+	@NonNull
 	private static <E> ImmutableList<E> fromArray(Object[] array, int length)
 	{
 		ImmutableList<E> list = (ImmutableList<E>) EmptyList.instance;
@@ -233,7 +253,8 @@ public class AppendList<E> implements ImmutableList<E>
 		}
 		return list;
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableList<E> sorted()
 	{
@@ -241,15 +262,17 @@ public class AppendList<E> implements ImmutableList<E>
 		Arrays.sort(array);
 		return fromArray(array, this.size);
 	}
-	
+
+	@NonNull
 	@Override
-	public ImmutableList<E> sorted(Comparator<? super E> comparator)
+	public ImmutableList<E> sorted(@NonNull Comparator<? super E> comparator)
 	{
 		Object[] array = this.toArray();
 		Arrays.sort((E[]) array, comparator);
 		return fromArray(array, this.size);
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableList<E> distinct()
 	{
@@ -257,15 +280,16 @@ public class AppendList<E> implements ImmutableList<E>
 		int size = Set.distinct(array, this.size);
 		return fromArray(array, size);
 	}
-	
+
+	@NonNull
 	@Override
-	public ImmutableList<E> distinct(Comparator<? super E> comparator)
+	public ImmutableList<E> distinct(@NonNull Comparator<? super E> comparator)
 	{
 		Object[] array = this.toArray();
 		int size = Set.sortDistinct((E[]) array, this.size, comparator);
 		return fromArray(array, size);
 	}
-	
+
 	@Override
 	public int indexOf(Object element)
 	{
@@ -276,7 +300,7 @@ public class AppendList<E> implements ImmutableList<E>
 		}
 		return i;
 	}
-	
+
 	@Override
 	public int lastIndexOf(Object element)
 	{
@@ -286,32 +310,36 @@ public class AppendList<E> implements ImmutableList<E>
 		}
 		return this.head.lastIndexOf(element);
 	}
-	
+
 	@Override
 	public void toArray(int index, Object[] store)
 	{
 		this.head.toArray(index, store);
 		store[index + this.size - 1] = this.tail;
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableList<E> copy()
 	{
 		return new AppendList<>(this.head.copy(), this.tail);
 	}
 
+	@NonNull
 	@Override
 	public <RE> MutableList<RE> emptyCopy()
 	{
 		return MutableList.apply();
 	}
 
+	@NonNull
 	@Override
 	public <RE> MutableList<RE> emptyCopy(int capacity)
 	{
 		return MutableList.withCapacity(capacity);
 	}
-	
+
+	@NonNull
 	@Override
 	public MutableList<E> mutable()
 	{
@@ -322,19 +350,19 @@ public class AppendList<E> implements ImmutableList<E>
 	}
 
 	@Override
-	public <RE> ImmutableList.Builder<RE> immutableBuilder()
+	public <RE> ImmutableList.@NonNull Builder<RE> immutableBuilder()
 	{
 		return builder();
 	}
 
 	@Override
-	public <RE> ImmutableList.Builder<RE> immutableBuilder(int capacity)
+	public <RE> ImmutableList.@NonNull Builder<RE> immutableBuilder(int capacity)
 	{
 		return builder();
 	}
-	
+
 	@Override
-	public java.util.List<E> toJava()
+	public java.util.@NonNull List<E> toJava()
 	{
 		java.util.LinkedList<E> list = new java.util.LinkedList<>();
 		for (E element : this.head)
@@ -344,37 +372,38 @@ public class AppendList<E> implements ImmutableList<E>
 		list.addLast(this.tail);
 		return list;
 	}
-	
+
+	@NonNull
 	@Override
 	public String toString()
 	{
 		return Collection.collectionToString(this);
 	}
-	
+
 	@Override
 	public boolean equals(Object obj)
 	{
 		return List.listEquals(this, obj);
 	}
-	
+
 	@Override
 	public int hashCode()
 	{
 		return List.listHashCode(this);
 	}
-	
-	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+
+	private void writeObject(java.io.@NonNull ObjectOutputStream out) throws IOException
 	{
 		out.defaultWriteObject();
-		
+
 		out.writeObject(this.head);
 		out.writeObject(this.tail);
 	}
-	
-	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+
+	private void readObject(java.io.@NonNull ObjectInputStream in) throws IOException, ClassNotFoundException
 	{
 		in.defaultReadObject();
-		
+
 		this.head = (ImmutableList<E>) in.readObject();
 		this.tail = (E) in.readObject();
 		this.size = this.head.size() + 1;

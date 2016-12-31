@@ -1,6 +1,7 @@
 package dyvil.string;
 
 import dyvil.annotation.internal.DyvilModifiers;
+import dyvil.annotation.internal.NonNull;
 import dyvil.collection.List;
 import dyvil.collection.immutable.EmptyList;
 import dyvil.collection.mutable.ArrayList;
@@ -17,9 +18,10 @@ import java.util.regex.Pattern;
  * camelCase, counting the number of times a character appears a the string, getting the index of a Regular Expression
  * as well as several useful utility functions.
  */
+@SuppressWarnings("unused")
 public final class StringUtils
 {
-	public static final String[] EMPTY_STRING_ARRAY = new String[0];
+	public static final @NonNull String @NonNull [] EMPTY_STRING_ARRAY = new String[0];
 
 	private StringUtils()
 	{
@@ -27,7 +29,7 @@ public final class StringUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static String repeated(String string, int count)
+	public static @NonNull String repeated(@NonNull String string, int count)
 	{
 		switch (count)
 		{
@@ -36,19 +38,10 @@ public final class StringUtils
 		case 1:
 			return string;
 		case 2:
-			if (string == null)
-			{
-				return "nullnull";
-			}
 			return string.concat(string);
 		}
 
-		if (string == null)
-		{
-			string = "null";
-		}
-
-		StringBuilder builder = new StringBuilder(string.length() * count);
+		final StringBuilder builder = new StringBuilder(string.length() * count);
 		for (int i = 0; i < count; i++)
 		{
 			builder.append(string);
@@ -58,15 +51,15 @@ public final class StringUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static String[] split(String string, char character)
+	public static String @NonNull [] split(@NonNull String string, char character)
 	{
-		if (string == null || string.isEmpty())
+		if (string.isEmpty())
 		{
 			return EMPTY_STRING_ARRAY;
 		}
 
-		int len = string.length();
-		ArrayList<String> list = new ArrayList<>(len >> 4);
+		final int len = string.length();
+		final ArrayList<String> list = new ArrayList<>(len >> 4);
 
 		int startIndex = 0;
 		for (int i = 0; i < len; i++)
@@ -91,13 +84,9 @@ public final class StringUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static String[] words(String string)
+	public static String @NonNull [] words(@NonNull String string)
 	{
-		if (string == null || string.isEmpty())
-		{
-			return EMPTY_STRING_ARRAY;
-		}
-		return string.split("\\s");
+		return string.isEmpty() ? EMPTY_STRING_ARRAY : string.split("\\s");
 	}
 
 	/**
@@ -110,15 +99,10 @@ public final class StringUtils
 	 *
 	 * @return a list of words in the given string
 	 */
-
 	@DyvilModifiers(Modifiers.INFIX)
-	public static List<String> wordList(String string)
+	public static @NonNull List<String> wordList(@NonNull String string)
 	{
-		if (string == null || string.isEmpty())
-		{
-			return EmptyList.apply();
-		}
-		return List.apply(words(string));
+		return string.isEmpty() ? EmptyList.apply() : List.apply(words(string));
 	}
 
 	/**
@@ -131,13 +115,9 @@ public final class StringUtils
 	 * @return an array of lines
 	 */
 	@DyvilModifiers(Modifiers.INFIX)
-	public static String[] lines(String string)
+	public static String @NonNull [] lines(@NonNull String string)
 	{
-		if (string == null || string.isEmpty())
-		{
-			return EMPTY_STRING_ARRAY;
-		}
-		return split(string, '\n');
+		return string.isEmpty() ? EMPTY_STRING_ARRAY : split(string, '\n');
 	}
 
 	/**
@@ -150,14 +130,9 @@ public final class StringUtils
 	 * @return a List of lines
 	 */
 	@DyvilModifiers(Modifiers.INFIX)
-	public static List<String> lineList(String string)
+	public static @NonNull List<String> lineList(String string)
 	{
-		if (string == null || string.isEmpty())
-		{
-			return EmptyList.apply();
-		}
-
-		return List.apply(lines(string));
+		return string.isEmpty() ? EmptyList.apply() : List.apply(lines(string));
 	}
 
 	/**
@@ -171,7 +146,7 @@ public final class StringUtils
 	 * @return the Levenshtein distance between the two strings
 	 */
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int distanceTo(String s1, String s2)
+	public static int distanceTo(@NonNull String s1, @NonNull String s2)
 	{
 		if (s1.equals(s2))
 		{
@@ -222,10 +197,10 @@ public final class StringUtils
 	 * @return the string converted to a valid identifier
 	 */
 	@DyvilModifiers(Modifiers.INFIX)
-	public static String toIdentifier(String string)
+	public static @NonNull String toIdentifier(@NonNull String string)
 	{
-		int len = string.length();
-		StringBuilder result = new StringBuilder(len);
+		final int len = string.length();
+		final StringBuilder result = new StringBuilder(len);
 
 		for (int i = 0; i < len; i++)
 		{
@@ -247,20 +222,15 @@ public final class StringUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static String toTitleCase(String s)
+	public static @NonNull String toTitleCase(@NonNull String s)
 	{
-		if (s == null)
-		{
-			return null;
-		}
-
-		int len = s.length();
+		final int len = s.length();
 		if (len <= 0)
 		{
 			return "";
 		}
 
-		StringBuilder builder = new StringBuilder(len);
+		final StringBuilder builder = new StringBuilder(len);
 
 		boolean seperator = true;
 		for (int i = 0; i < len; i++)
@@ -286,20 +256,15 @@ public final class StringUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static String toLowerCamelCase(String s)
+	public static @NonNull String toLowerCamelCase(@NonNull String s)
 	{
-		if (s == null)
-		{
-			return null;
-		}
-
-		int len = s.length();
+		final int len = s.length();
 		if (len <= 0)
 		{
 			return "";
 		}
 
-		StringBuilder builder = new StringBuilder(len);
+		final StringBuilder builder = new StringBuilder(len);
 
 		boolean seperator = true;
 		for (int i = 0; i < len; i++)
@@ -325,20 +290,15 @@ public final class StringUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static String toUpperCamelCase(String s)
+	public static @NonNull String toUpperCamelCase(@NonNull String s)
 	{
-		if (s == null)
-		{
-			return null;
-		}
-
 		int len = s.length();
 		if (len <= 0)
 		{
 			return "";
 		}
 
-		StringBuilder builder = new StringBuilder(len);
+		final StringBuilder builder = new StringBuilder(len);
 
 		boolean seperator = true;
 		for (int i = 0; i < len; i++)
@@ -364,27 +324,19 @@ public final class StringUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static String toInvertedCase(String s)
+	public static @NonNull String toInvertedCase(@NonNull String s)
 	{
-		if (s == null)
-		{
-			return null;
-		}
-
-		int len = s.length();
+		final int len = s.length();
 		if (len <= 0)
 		{
 			return "";
 		}
 
-		StringBuilder builder = new StringBuilder(len);
-
+		final StringBuilder builder = new StringBuilder(len);
 		for (int i = 0; i < len; i++)
 		{
-			char c = s.charAt(i);
-			builder.append(CharUtils.invertCase(c));
+			builder.append(CharUtils.invertCase(s.charAt(i)));
 		}
-
 		return builder.toString();
 	}
 
@@ -399,7 +351,7 @@ public final class StringUtils
 	 * @return the number of times the character appears in the string
 	 */
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int count(String string, char character)
+	public static int count(@NonNull String string, char character)
 	{
 		int count = 0;
 		int len = string.length();
@@ -424,7 +376,7 @@ public final class StringUtils
 	 * @return true, if the string contains the character
 	 */
 	@DyvilModifiers(Modifiers.INFIX)
-	public static boolean contains(String string, char character)
+	public static boolean contains(@NonNull String string, char character)
 	{
 		return string.indexOf(character) != -1;
 	}
@@ -444,25 +396,26 @@ public final class StringUtils
 	 * @see Matcher#find()
 	 */
 	@DyvilModifiers(Modifiers.INFIX)
-	public static boolean containsRegex(String string, String regex)
+	public static boolean containsRegex(@NonNull String string, @NonNull String regex)
 	{
 		return Pattern.compile(regex).matcher(string).find();
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int indexOfRegex(String string, String regex)
+	public static int indexOfRegex(@NonNull String string, @NonNull String regex)
 	{
 		return Pattern.compile(regex).matcher(string).start();
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int indexOfBounded(String string, String pattern, int startIndex, int endIndex)
+	public static int indexOfBounded(@NonNull String string, @NonNull String pattern, int startIndex, int endIndex)
 	{
 		final int index = string.indexOf(pattern, startIndex);
 		return index + pattern.length() <= endIndex ? index : -1;
 	}
 
-	public static <T> void prettyPrint(T value, Class<T> type, StringBuilder builder, boolean fieldNames)
+	public static <T> void prettyPrint(T value, @NonNull Class<T> type, @NonNull StringBuilder builder,
+		                                  boolean fieldNames)
 	{
 		Field[] fields = type.getFields();
 		builder.append(type.getName());
@@ -491,7 +444,7 @@ public final class StringUtils
 				field.setAccessible(true);
 				builder.append(field.get(value));
 			}
-			catch (IllegalArgumentException | IllegalAccessException ex)
+			catch (@NonNull IllegalArgumentException | IllegalAccessException ex)
 			{
 				ex.printStackTrace();
 				builder.append("<error>");

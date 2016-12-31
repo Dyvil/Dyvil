@@ -2,6 +2,8 @@ package dyvil.collection.range.closed;
 
 import dyvil.annotation.Immutable;
 import dyvil.annotation.internal.Covariant;
+import dyvil.annotation.internal.NonNull;
+import dyvil.collection.Range;
 import dyvil.collection.range.Rangeable;
 import dyvil.lang.LiteralConvertible;
 
@@ -19,6 +21,7 @@ public class ObjectRange<@Covariant T extends Rangeable<T>> implements dyvil.col
 	protected transient T first;
 	protected transient T last;
 
+	@NonNull
 	public static <T extends Rangeable<T>> ObjectRange apply(T from, T to)
 	{
 		return new ObjectRange<>(from, to);
@@ -31,13 +34,13 @@ public class ObjectRange<@Covariant T extends Rangeable<T>> implements dyvil.col
 	}
 
 	@Override
-	public dyvil.collection.Range asClosed()
+	public @NonNull Range<T> asClosed()
 	{
 		return this;
 	}
 
 	@Override
-	public dyvil.collection.Range asHalfOpen()
+	public @NonNull Range<T> asHalfOpen()
 	{
 		return new dyvil.collection.range.halfopen.ObjectRange<>(this.first, this.last);
 	}
@@ -66,6 +69,7 @@ public class ObjectRange<@Covariant T extends Rangeable<T>> implements dyvil.col
 		return false;
 	}
 
+	@NonNull
 	@Override
 	public Iterator<T> iterator()
 	{
@@ -92,6 +96,7 @@ public class ObjectRange<@Covariant T extends Rangeable<T>> implements dyvil.col
 				return this.current.compareTo(ObjectRange.this.last) <= 0;
 			}
 
+			@NonNull
 			@Override
 			public String toString()
 			{
@@ -101,7 +106,7 @@ public class ObjectRange<@Covariant T extends Rangeable<T>> implements dyvil.col
 	}
 
 	@Override
-	public void forEach(Consumer<? super T> action)
+	public void forEach(@NonNull Consumer<? super T> action)
 	{
 		for (T current = this.first; current.compareTo(this.last) <= 0; current = current.next())
 		{
@@ -110,7 +115,7 @@ public class ObjectRange<@Covariant T extends Rangeable<T>> implements dyvil.col
 	}
 
 	@Override
-	public void toArray(int index, Object[] store)
+	public void toArray(int index, Object @NonNull [] store)
 	{
 		for (T current = this.first; current.compareTo(this.last) <= 0; current = current.next())
 		{
@@ -118,6 +123,7 @@ public class ObjectRange<@Covariant T extends Rangeable<T>> implements dyvil.col
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean contains(Object o)
 	{
@@ -132,11 +138,12 @@ public class ObjectRange<@Covariant T extends Rangeable<T>> implements dyvil.col
 	}
 
 	@Override
-	public dyvil.collection.Range copy()
+	public @NonNull Range<T> copy()
 	{
 		return new ObjectRange<>(this.first, this.last);
 	}
 
+	@NonNull
 	@Override
 	public String toString()
 	{
@@ -155,7 +162,7 @@ public class ObjectRange<@Covariant T extends Rangeable<T>> implements dyvil.col
 		return dyvil.collection.Range.rangeHashCode(this);
 	}
 
-	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	private void writeObject(java.io.@NonNull ObjectOutputStream out) throws IOException
 	{
 		out.defaultWriteObject();
 
@@ -163,7 +170,8 @@ public class ObjectRange<@Covariant T extends Rangeable<T>> implements dyvil.col
 		out.writeObject(this.last);
 	}
 
-	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	@SuppressWarnings("unchecked")
+	private void readObject(java.io.@NonNull ObjectInputStream in) throws IOException, ClassNotFoundException
 	{
 		in.defaultReadObject();
 

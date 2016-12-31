@@ -1,5 +1,7 @@
 package dyvil.io;
 
+import dyvil.annotation.internal.NonNull;
+
 import java.io.PrintStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,8 +19,9 @@ public class LoggerPrintStream extends BasicPrintStream
 	private Level  level;
 	private Logger logger;
 
+	@NonNull
 	private StringBuilder buffer = new StringBuilder();
-	
+
 	public LoggerPrintStream(Logger logger, Level level)
 	{
 		super(System.out);
@@ -31,11 +34,11 @@ public class LoggerPrintStream extends BasicPrintStream
 		this(logger, Level.INFO);
 	}
 
-	public LoggerPrintStream(Logger logger, String name)
+	public LoggerPrintStream(Logger logger, @NonNull String name)
 	{
 		this(logger, new LoggerLevel(name, 1000));
 	}
-	
+
 	@Override
 	protected void writeln(String s)
 	{

@@ -1,5 +1,7 @@
 package dyvil.io;
 
+import dyvil.annotation.internal.NonNull;
+
 import java.io.*;
 import java.util.function.BooleanSupplier;
 
@@ -17,9 +19,10 @@ public final class Console
 	public static final String ANSI_CYAN   = "\u001B[36m";
 	public static final String ANSI_WHITE  = "\u001B[37m";
 
+	@NonNull
 	private static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 	private static PrintStream    out    = System.out;
-	
+
 	private Console()
 	{
 
@@ -29,36 +32,36 @@ public final class Console
 	{
 		return System.console() != null;
 	}
-	
+
 	public static void setOut(PrintStream out)
 	{
 		Console.out = out;
 	}
-	
-	public static void setIn(InputStream in)
+
+	public static void setIn(@NonNull InputStream in)
 	{
 		Console.reader = new BufferedReader(new InputStreamReader(in));
 	}
-	
+
 	// Write
-	
+
 	public static void writeLine()
 	{
 		out.println();
 	}
-	
+
 	public static void writeLine(Object o)
 	{
 		out.println(o);
 	}
-	
+
 	public static void writeLine(String s)
 	{
 		out.println(s);
 	}
-	
+
 	// Read
-	
+
 	public static String readLine()
 	{
 		try
@@ -70,7 +73,7 @@ public final class Console
 			return null;
 		}
 	}
-	
+
 	public static String read(int count)
 	{
 		char[] chars = new char[count];
@@ -84,8 +87,8 @@ public final class Console
 		}
 		return new String(chars);
 	}
-	
-	public static String read(BooleanSupplier predicate)
+
+	public static String read(@NonNull BooleanSupplier predicate)
 	{
 		try
 		{
@@ -101,17 +104,17 @@ public final class Console
 			return null;
 		}
 	}
-	
+
 	public static byte readByte()
 	{
 		return (byte) java.lang.Integer.parseInt(readLine());
 	}
-	
+
 	public static short readShort()
 	{
 		return (short) java.lang.Integer.parseInt(readLine());
 	}
-	
+
 	public static char readChar()
 	{
 		try
@@ -123,7 +126,7 @@ public final class Console
 			return 0;
 		}
 	}
-	
+
 	public static int readCodePoint()
 	{
 		try
@@ -135,22 +138,22 @@ public final class Console
 			return 0;
 		}
 	}
-	
+
 	public static int readInt()
 	{
 		return java.lang.Integer.parseInt(readLine());
 	}
-	
+
 	public static long readLong()
 	{
 		return java.lang.Long.parseLong(readLine());
 	}
-	
+
 	public static float readFloat()
 	{
 		return java.lang.Float.parseFloat(readLine());
 	}
-	
+
 	public static double readDouble()
 	{
 		return java.lang.Double.parseDouble(readLine());

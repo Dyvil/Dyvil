@@ -1,6 +1,8 @@
 package dyvil.reflect;
 
 import dyvil.annotation.internal.DyvilModifiers;
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 
@@ -9,12 +11,13 @@ import java.util.Arrays;
 
 public class FieldReflection
 {
+	@Nullable
 	private static final Field modifiersField;
-	
+
 	static
 	{
 		Field modField;
-		
+
 		try
 		{
 			modField = Field.class.getDeclaredField("modifiers");
@@ -26,23 +29,23 @@ public class FieldReflection
 		{
 			modField = null;
 		}
-		
+
 		modifiersField = modField;
 	}
-	
+
 	/**
 	 * Adds the modifiers {@code mod} to the given {@link Field} {@code field} if {@code flag} is true, and removed them
 	 * otherwise.
 	 *
 	 * @param field
-	 * 		the field
+	 * 	the field
 	 * @param mod
-	 * 		the modifiers
+	 * 	the modifiers
 	 * @param flag
-	 * 		add or remove
+	 * 	add or remove
 	 */
 	@DyvilModifiers(Modifiers.INFIX)
-	public static void setModifier(Field field, int mod, boolean flag)
+	public static void setModifier(@NonNull Field field, int mod, boolean flag)
 	{
 		try
 		{
@@ -65,7 +68,7 @@ public class FieldReflection
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static void setAssignable(Field field)
+	public static void setAssignable(@NonNull Field field)
 	{
 		try
 		{
@@ -76,19 +79,22 @@ public class FieldReflection
 		{
 		}
 	}
-	
+
 	// Fields
-	
-	public static <T> T[] getStaticObjects(Class clazz, Class<T> fieldType, boolean subtypes)
+
+	@NonNull
+	public static <T> T[] getStaticObjects(@NonNull Class clazz, @NonNull Class<T> fieldType, boolean subtypes)
 	{
 		return getObjects(clazz, null, fieldType, subtypes);
 	}
-	
-	public static <T> T[] getObjects(Class clazz, Object instance, Class<T> fieldType, boolean subtypes)
+
+	@NonNull
+	public static <T> T[] getObjects(@NonNull Class clazz, Object instance, @NonNull Class<T> fieldType,
+		                                boolean subtypes)
 	{
 		List list = new ArrayList();
 		Field[] fields = clazz.getDeclaredFields();
-		
+
 		for (Field field : fields)
 		{
 			try
@@ -104,23 +110,23 @@ public class FieldReflection
 			{
 			}
 		}
-		
+
 		return (T[]) list.toArray();
 	}
-	
+
 	// Fields
-	
+
 	/**
 	 * Returns the {@link Field} of the given {@link Class} {@code clazz} with the name {@code name}.
 	 *
 	 * @param clazz
-	 * 		the clazz
+	 * 	the clazz
 	 * @param name
-	 * 		the field name
+	 * 	the field name
 	 *
 	 * @return the field
 	 */
-	public static Field getField(Class clazz, String name)
+	public static Field getField(@NonNull Class clazz, @NonNull String name)
 	{
 		Field[] fields = clazz.getDeclaredFields();
 		for (Field field : fields)
@@ -132,18 +138,18 @@ public class FieldReflection
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Returns the {@link Field} of the given {@link Class} {@code clazz} with a name contained in {@code fieldNames}.
 	 *
 	 * @param clazz
-	 * 		the clazz
+	 * 	the clazz
 	 * @param fieldNames
-	 * 		the possible field names
+	 * 	the possible field names
 	 *
 	 * @return the field
 	 */
-	public static Field getField(Class clazz, String... fieldNames)
+	public static Field getField(@NonNull Class clazz, @NonNull String... fieldNames)
 	{
 		Field[] fields = clazz.getDeclaredFields();
 		for (String fieldName : fieldNames)
@@ -156,75 +162,82 @@ public class FieldReflection
 				}
 			}
 		}
-		System.err.println(new NoSuchFieldException(
-				"Field not found! (Class: " + clazz + "; Expected field names: " + Arrays.toString(fieldNames)));
+		System.err.println(
+			new NoSuchFieldException("Field not found! (Class: " + clazz + "; Expected field names: " + Arrays.toString(
+				fieldNames)));
 		return null;
 	}
-	
+
 	/**
 	 * Returns the {@link Field} of the given {@link Class} {@code clazz} with the field ID {@code fieldID}
 	 *
 	 * @param clazz
-	 * 		the clazz
+	 * 	the clazz
 	 * @param fieldID
-	 * 		the field ID
+	 * 	the field ID
 	 *
 	 * @return the field
 	 */
-	public static Field getField(Class clazz, int fieldID)
+	public static Field getField(@NonNull Class clazz, int fieldID)
 	{
 		return clazz.getDeclaredFields()[fieldID];
 	}
-	
+
 	// Field getters
-	
+
 	// Reference
-	
-	public static <T, R> R getStaticValue(Class<? super T> clazz, String... fieldNames)
+
+	@Nullable
+	public static <T, R> R getStaticValue(@NonNull Class<? super T> clazz, String... fieldNames)
 	{
 		return getValue(clazz, null, fieldNames);
 	}
-	
-	public static <T, R> R getValue(T instance, String... fieldNames)
+
+	@Nullable
+	public static <T, R> R getValue(@NonNull T instance, String... fieldNames)
 	{
 		return getValue((Class<T>) instance.getClass(), instance, fieldNames);
 	}
-	
-	public static <T, R> R getValue(Class<? super T> clazz, T instance, String... fieldNames)
+
+	@Nullable
+	public static <T, R> R getValue(@NonNull Class<? super T> clazz, T instance, String... fieldNames)
 	{
 		Field f = getField(clazz, fieldNames);
 		return getValue(f, instance);
 	}
-	
+
 	// Field ID
-	
-	public static <T, R> R getStaticValue(Class<? super T> clazz, int fieldID)
+
+	@Nullable
+	public static <T, R> R getStaticValue(@NonNull Class<? super T> clazz, int fieldID)
 	{
 		return getValue(clazz, null, fieldID);
 	}
-	
-	public static <T, R> R getValue(T instance, int fieldID)
+
+	@Nullable
+	public static <T, R> R getValue(@NonNull T instance, int fieldID)
 	{
 		return getValue((Class<? super T>) instance.getClass(), instance, fieldID);
 	}
-	
-	public static <T, R> R getValue(Class<? super T> clazz, T instance, int fieldID)
+
+	@Nullable
+	public static <T, R> R getValue(@NonNull Class<? super T> clazz, T instance, int fieldID)
 	{
 		Field f = getField(clazz, fieldID);
 		return getValue(f, instance);
 	}
-	
+
 	/**
 	 * Directly gets the value of the given {@link Field} on the given {@link Object} {@code instance}.
 	 *
 	 * @param field
-	 * 		the field to get
+	 * 	the field to get
 	 * @param instance
-	 * 		the instance
+	 * 	the instance
 	 *
 	 * @return the value
 	 */
-	public static <R> R getValue(Field field, Object instance)
+	public static <R> R getValue(@NonNull Field field, Object instance)
 	{
 		try
 		{
@@ -237,57 +250,57 @@ public class FieldReflection
 			return null;
 		}
 	}
-	
+
 	// Field setters
-	
+
 	// Reference
-	
-	public static <T, V> void setStaticValue(Class<? super T> clazz, V value, String... fieldNames)
+
+	public static <T, V> void setStaticValue(@NonNull Class<? super T> clazz, V value, String... fieldNames)
 	{
 		setValue(clazz, null, value, fieldNames);
 	}
-	
-	public static <T, V> void setValue(T instance, V value, String... fieldNames)
+
+	public static <T, V> void setValue(@NonNull T instance, V value, String... fieldNames)
 	{
 		setValue((Class<? super T>) instance.getClass(), instance, value, fieldNames);
 	}
-	
-	public static <T, V> void setValue(Class<? super T> clazz, T instance, V value, String... fieldNames)
+
+	public static <T, V> void setValue(@NonNull Class<? super T> clazz, T instance, V value, String... fieldNames)
 	{
 		Field f = getField(clazz, fieldNames);
 		setField(f, instance, value);
 	}
-	
+
 	// Field ID
-	
-	public static <T, V> void setStaticValue(Class<? super T> clazz, V value, int fieldID)
+
+	public static <T, V> void setStaticValue(@NonNull Class<? super T> clazz, V value, int fieldID)
 	{
 		setValue(clazz, null, value, fieldID);
 	}
-	
-	public static <T, V> void setValue(T instance, V value, int fieldID)
+
+	public static <T, V> void setValue(@NonNull T instance, V value, int fieldID)
 	{
 		setValue((Class<? super T>) instance.getClass(), instance, value, fieldID);
 	}
-	
-	public static <T, V> void setValue(Class<? super T> clazz, T instance, V value, int fieldID)
+
+	public static <T, V> void setValue(@NonNull Class<? super T> clazz, T instance, V value, int fieldID)
 	{
 		Field f = getField(clazz, fieldID);
 		setField(f, instance, value);
 	}
-	
+
 	/**
 	 * Directly sets the value of the given {@link Field} on the given {@link Object} {@code instance} to the given
 	 * {@link Object} {@code value} .
 	 *
 	 * @param field
-	 * 		the field to set
+	 * 	the field to set
 	 * @param instance
-	 * 		the instance
+	 * 	the instance
 	 * @param value
-	 * 		the new value
+	 * 	the new value
 	 */
-	public static <T, V> void setField(Field field, T instance, V value)
+	public static <T, V> void setField(@NonNull Field field, T instance, V value)
 	{
 		try
 		{

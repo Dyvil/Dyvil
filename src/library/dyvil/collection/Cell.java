@@ -1,5 +1,6 @@
 package dyvil.collection;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.tuple.Tuple;
 
 import java.io.Serializable;
@@ -12,54 +13,49 @@ public interface Cell<R, C, V> extends Serializable
 	 *
 	 * @return the row
 	 */
-	R getRow();
-	
+	@NonNull R getRow();
+
 	/**
 	 * Returns the column stored by this cell
 	 *
 	 * @return the column
 	 */
-	C getColumn();
-	
+	@NonNull C getColumn();
+
 	/**
 	 * Returns the value stored by this cell
 	 *
 	 * @return the value
 	 */
-	V getValue();
-	
+	@NonNull V getValue();
+
 	/**
 	 * Converts this entry to a {@link Tuple.Of3 Tuple}.
 	 *
 	 * @return a tuple with this cell's row, column and value
 	 */
-	default Tuple.Of3<R, C, V> toTuple()
+	default Tuple.@NonNull Of3<R, C, V> toTuple()
 	{
-		return new Tuple.Of3<R, C, V>(this.getRow(), this.getColumn(), this.getValue());
+		return new Tuple.Of3<>(this.getRow(), this.getColumn(), this.getValue());
 	}
-	
-	static String cellToString(Cell<?, ?, ?> cell)
+
+	static @NonNull String cellToString(@NonNull Cell<?, ?, ?> cell)
 	{
 		return "(" + cell.getRow() + ", " + cell.getColumn() + ") -> " + cell.getValue();
 	}
-	
-	static boolean cellEquals(Cell<?, ?, ?> cell, Object obj)
+
+	static boolean cellEquals(@NonNull Cell<?, ?, ?> cell, Object obj)
 	{
-		if (!(obj instanceof Cell))
-		{
-			return false;
-		}
-		
-		return cellEquals(cell, (Cell) obj);
+		return obj instanceof Cell && cellEquals(cell, (Cell) obj);
 	}
-	
-	static boolean cellEquals(Cell<?, ?, ?> cell1, Cell<?, ?, ?> cell2)
+
+	static boolean cellEquals(@NonNull Cell<?, ?, ?> cell1, @NonNull Cell<?, ?, ?> cell2)
 	{
 		return Objects.equals(cell1.getRow(), cell2.getRow()) && Objects.equals(cell1.getColumn(), cell2.getColumn())
-				&& Objects.equals(cell1.getValue(), cell2.getValue());
+			       && Objects.equals(cell1.getValue(), cell2.getValue());
 	}
-	
-	static int cellHashCode(Cell<?, ?, ?> cell)
+
+	static int cellHashCode(@NonNull Cell<?, ?, ?> cell)
 	{
 		Object row = cell.getRow();
 		Object column = cell.getColumn();

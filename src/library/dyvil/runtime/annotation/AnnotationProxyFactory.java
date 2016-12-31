@@ -1,5 +1,6 @@
 package dyvil.runtime.annotation;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.MethodReflection;
 import dyvil.reflect.Opcodes;
 import dyvil.runtime.BytecodeDump;
@@ -40,26 +41,30 @@ public final class AnnotationProxyFactory
 	/**
 	 * Generated names for the constructor arguments
 	 */
+	@NonNull
 	private final String[] argNames;
 
 	/**
 	 * Type descriptors for the constructor arguments
 	 */
+	@NonNull
 	private final String[] argDescs;
 
 	/**
 	 * Generated name for the generated class
 	 */
+	@NonNull
 	private final String className;
 
 	private final Class targetClass;
 
+	@NonNull
 	private final MethodType invokedType;
 
 	private final Class annotationType;
 
-	public AnnotationProxyFactory(MethodHandles.Lookup caller, MethodType invokedType, Object... argumentNames)
-		throws Exception
+	public AnnotationProxyFactory(MethodHandles.@NonNull Lookup caller, @NonNull MethodType invokedType,
+		                             @NonNull Object... argumentNames) throws Exception
 	{
 		this.invokedType = invokedType;
 		this.constructorType = invokedType.changeReturnType(Void.TYPE);
@@ -86,12 +91,14 @@ public final class AnnotationProxyFactory
 		}
 	}
 
+	@NonNull
 	public CallSite buildCallSite() throws Exception
 	{
 		final Class<?> innerClass = this.spinInnerClass();
 		if (this.parameterCount == 0)
 		{
-			final Constructor[] ctrs = AccessController.doPrivileged((PrivilegedAction<Constructor[]>) () -> {
+			final Constructor[] ctrs = AccessController.doPrivileged((PrivilegedAction<Constructor[]>) () ->
+			{
 				Constructor<?>[] ctrs1 = innerClass.getDeclaredConstructors();
 				if (ctrs1.length == 1)
 				{
@@ -166,7 +173,7 @@ public final class AnnotationProxyFactory
 		return UNSAFE.defineAnonymousClass(this.targetClass, bytes, null);
 	}
 
-	private void generateFactory(ClassWriter classWriter)
+	private void generateFactory(@NonNull ClassWriter classWriter)
 	{
 		final MethodVisitor factory = classWriter.visitMethod(PRIVATE | STATIC, NAME_FACTORY,
 		                                                      this.invokedType.toMethodDescriptorString(), null, null);
@@ -189,7 +196,7 @@ public final class AnnotationProxyFactory
 		factory.visitEnd();
 	}
 
-	private void generateConstructor(ClassWriter classWriter)
+	private void generateConstructor(@NonNull ClassWriter classWriter)
 	{
 		// Generate constructor
 		final MethodVisitor ctor = classWriter
@@ -214,7 +221,7 @@ public final class AnnotationProxyFactory
 		ctor.visitEnd();
 	}
 
-	private void generateMethods(ClassWriter classWriter)
+	private void generateMethods(@NonNull ClassWriter classWriter)
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
@@ -230,7 +237,7 @@ public final class AnnotationProxyFactory
 		}
 	}
 
-	private void generateAnnotationType(ClassWriter classWriter)
+	private void generateAnnotationType(@NonNull ClassWriter classWriter)
 	{
 		final MethodVisitor annotationType = classWriter
 			                                     .visitMethod(PUBLIC, "annotationType", "()Ljava/lang/Class;", null,
@@ -242,7 +249,7 @@ public final class AnnotationProxyFactory
 		annotationType.visitEnd();
 	}
 
-	private void generateToString(ClassWriter classWriter)
+	private void generateToString(@NonNull ClassWriter classWriter)
 	{
 		final MethodVisitor toString = classWriter.visitMethod(PUBLIC, "toString", "()Ljava/lang/String;", null, null);
 

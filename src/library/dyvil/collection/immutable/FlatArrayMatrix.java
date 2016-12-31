@@ -1,6 +1,7 @@
 package dyvil.collection.immutable;
 
 import dyvil.annotation.Immutable;
+import dyvil.annotation.internal.NonNull;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.ImmutableMatrix;
 import dyvil.collection.MutableMatrix;
@@ -12,37 +13,38 @@ import java.util.function.Function;
 public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements ImmutableMatrix<E>
 {
 	private static final long serialVersionUID = 7265281981107132533L;
-	
+
 	public FlatArrayMatrix()
 	{
 		super();
 	}
-	
-	public FlatArrayMatrix(int rows, int columns, E[] cells)
+
+	public FlatArrayMatrix(int rows, int columns, E @NonNull [] cells)
 	{
 		super(rows, columns, cells);
 	}
-	
+
 	public FlatArrayMatrix(int rows, int columns, Object[] cells, boolean trusted)
 	{
 		super(rows, columns, cells, trusted);
 	}
-	
+
 	public FlatArrayMatrix(int rows, int columns, Object[][] cells)
 	{
 		super(rows, columns, cells);
 	}
-	
+
 	public FlatArrayMatrix(int rows, int columns)
 	{
 		super(rows, columns);
 	}
-	
+
 	public FlatArrayMatrix(Object[]... cells)
 	{
 		super(cells);
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableMatrix<E> subMatrix(int row, int rows, int column, int columns)
 	{
@@ -55,7 +57,8 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Im
 		}
 		return new FlatArrayMatrix(rows, columns, newCells, true);
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableList<E> row(int row)
 	{
@@ -64,7 +67,8 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Im
 		System.arraycopy(this.cells, row * this.columns, array, 0, this.columns);
 		return new ArrayList(array, this.columns, true);
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableList<E> column(int column)
 	{
@@ -76,7 +80,8 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Im
 		}
 		return new ArrayList(array, this.rows, true);
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableList<E> flatten()
 	{
@@ -85,7 +90,8 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Im
 		System.arraycopy(this.cells, 0, array, 0, len);
 		return new ArrayList(array, len, true);
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableMatrix<E> transposed()
 	{
@@ -101,9 +107,10 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Im
 		}
 		return new FlatArrayMatrix(this.columns, this.rows, newArray, true);
 	}
-	
+
+	@NonNull
 	@Override
-	public <R> ImmutableMatrix<R> mapped(Function<? super E, ? extends R> mapper)
+	public <R> ImmutableMatrix<R> mapped(@NonNull Function<? super E, ? extends R> mapper)
 	{
 		int len = this.rows * this.columns;
 		Object[] array = new Object[len];
@@ -113,13 +120,15 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Im
 		}
 		return new FlatArrayMatrix(this.rows, this.columns, array, true);
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableMatrix<E> copy()
 	{
 		return new FlatArrayMatrix(this.rows, this.columns, this.cells);
 	}
-	
+
+	@NonNull
 	@Override
 	public MutableMatrix<E> mutable()
 	{

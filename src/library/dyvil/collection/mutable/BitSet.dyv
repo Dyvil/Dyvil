@@ -73,7 +73,7 @@ public class BitSet extends AbstractBitSet implements MutableSet<int>
 		return true
 	}
 
-	public override boolean remove(Object element)
+	public override boolean remove(Object! element)
 	{
 		if (!(element is Int)) return false
 

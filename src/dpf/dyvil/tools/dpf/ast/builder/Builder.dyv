@@ -78,7 +78,7 @@ public class Builder implements Value, BuilderVisitor, Expandable
 		return this.node = new Node(this.name)
 	}
 
-	public override ValueVisitor visitParameter(Name name)
+	public override ValueVisitor visitParameter(Name! name)
 	{
 		let parameter = new Parameter(name)
 		this.parameters.add(parameter)

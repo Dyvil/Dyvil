@@ -1,12 +1,15 @@
 package dyvil.io;
 
+import dyvil.annotation.internal.NonNull;
+
 import java.io.*;
 
 public class StringPoolReader extends FilterInputStream implements DataInput
 {
+	@NonNull
 	private final DataInput input;
 	private       String[]  constantPool;
-	
+
 	public StringPoolReader(InputStream input) throws IOException
 	{
 		super(input);
@@ -31,7 +34,7 @@ public class StringPoolReader extends FilterInputStream implements DataInput
 			this.constantPool[i] = this.input.readUTF();
 		}
 	}
-	
+
 	@Override
 	public void readFully(byte[] b) throws IOException
 	{
@@ -116,6 +119,7 @@ public class StringPoolReader extends FilterInputStream implements DataInput
 		return this.input.readLine();
 	}
 
+	@NonNull
 	@Override
 	public String readUTF() throws IOException
 	{

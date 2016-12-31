@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface ReceiverType
 {
-	String value();
+	@NonNull String value();
 }

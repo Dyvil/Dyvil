@@ -1,5 +1,6 @@
 package dyvil.reflect;
 
+import dyvil.annotation.internal.NonNull;
 import sun.misc.JavaLangAccess;
 import sun.misc.SharedSecrets;
 
@@ -13,7 +14,7 @@ public final class ReflectUtils
 {
 	public static final JavaLangAccess JAVA_LANG_ACCESS = SharedSecrets.getJavaLangAccess();
 	public static final sun.misc.Unsafe UNSAFE;
-	
+
 	static
 	{
 		try
@@ -27,14 +28,14 @@ public final class ReflectUtils
 			throw new Error("Cannot find Unsafe.theUnsafe", ex);
 		}
 	}
-	
+
 	private ReflectUtils()
 	{
 		throw new Error("No instances");
 	}
-	
+
 	// Classes
-	
+
 	@Deprecated
 	public static boolean checkClass(String name)
 	{
@@ -48,7 +49,7 @@ public final class ReflectUtils
 			return false;
 		}
 	}
-	
+
 	@Deprecated
 	public static Class getClass(String name)
 	{
@@ -62,7 +63,8 @@ public final class ReflectUtils
 		}
 	}
 
-	public static File getFileLocation(Class<?> klass) throws ClassNotFoundException
+	@NonNull
+	public static File getFileLocation(@NonNull Class<?> klass) throws ClassNotFoundException
 	{
 		final String classLocation = '/' + klass.getName().replace('.', '/') + ".class";
 		final URL url = klass.getResource(classLocation);

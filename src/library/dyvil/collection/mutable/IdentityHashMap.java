@@ -1,5 +1,7 @@
 package dyvil.collection.mutable;
 
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractHashMap;
 import dyvil.collection.impl.AbstractIdentityHashMap;
@@ -15,10 +17,11 @@ import java.util.function.BiPredicate;
 public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> implements MutableMap<K, V>
 {
 	private static final long serialVersionUID = -2508405537563871840L;
-	
+
 	private           float loadFactor;
 	private transient int   threshold;
 
+	@NonNull
 	public static <K, V> IdentityHashMap<K, V> singleton(K key, V value)
 	{
 		final IdentityHashMap<K, V> result = new IdentityHashMap<>(1);
@@ -26,64 +29,72 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		return result;
 	}
 
+	@NonNull
 	public static <K, V> IdentityHashMap<K, V> apply()
 	{
 		return new IdentityHashMap<>();
 	}
 
+	@NonNull
 	@SafeVarargs
-	public static <K, V> IdentityHashMap<K, V> apply(Entry<? extends K, ? extends V>... entries)
+	public static <K, V> IdentityHashMap<K, V> apply(@NonNull Entry<? extends K, ? extends V>... entries)
 	{
 		return new IdentityHashMap<>(entries);
 	}
 
-	public static <K, V> IdentityHashMap<K, V> from(Entry<? extends K, ? extends V>[] entries)
+	@NonNull
+	public static <K, V> IdentityHashMap<K, V> from(Entry<? extends K, ? extends V> @NonNull [] entries)
 	{
 		return new IdentityHashMap<>(entries);
 	}
 
-	public static <K, V> IdentityHashMap<K, V> from(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	@NonNull
+	public static <K, V> IdentityHashMap<K, V> from(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
 	{
 		return new IdentityHashMap<>(iterable);
 	}
 
+	@NonNull
 	public static <K, V> IdentityHashMap<K, V> from(SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
 	{
 		return new IdentityHashMap<>(iterable);
 	}
 
-	public static <K, V> IdentityHashMap<K, V> from(Set<? extends Entry<? extends K, ? extends V>> set)
+	@NonNull
+	public static <K, V> IdentityHashMap<K, V> from(@NonNull Set<? extends Entry<? extends K, ? extends V>> set)
 	{
 		return new IdentityHashMap<>(set);
 	}
 
-	public static <K, V> IdentityHashMap<K, V> from(Map<? extends K, ? extends V> map)
+	@NonNull
+	public static <K, V> IdentityHashMap<K, V> from(@NonNull Map<? extends K, ? extends V> map)
 	{
 		return new IdentityHashMap<>(map);
 	}
 
-	public static <K, V> IdentityHashMap<K, V> from(AbstractIdentityHashMap<? extends K, ? extends V> identityHashMap)
+	@NonNull
+	public static <K, V> IdentityHashMap<K, V> from(@NonNull AbstractIdentityHashMap<? extends K, ? extends V> identityHashMap)
 	{
 		return new IdentityHashMap<>(identityHashMap);
 	}
 
 	// Constructors
-	
+
 	public IdentityHashMap()
 	{
 		this(DEFAULT_CAPACITY, DEFAULT_LOAD_FACTOR);
 	}
-	
+
 	public IdentityHashMap(int capacity)
 	{
 		this(capacity, DEFAULT_LOAD_FACTOR);
 	}
-	
+
 	public IdentityHashMap(float loadFactor)
 	{
 		this(DEFAULT_CAPACITY, loadFactor);
 	}
-	
+
 	public IdentityHashMap(int capacity, float loadFactor)
 	{
 		super(capacity);
@@ -91,18 +102,18 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		{
 			throw new IllegalArgumentException("Invalid Load Factor: " + loadFactor);
 		}
-		
+
 		this.loadFactor = loadFactor;
 		this.threshold = (int) Math.min(capacity * loadFactor, AbstractHashMap.MAX_ARRAY_SIZE + 1);
 	}
 
-	public IdentityHashMap(Entry<? extends K, ? extends V>[] entries)
+	public IdentityHashMap(Entry<? extends K, ? extends V> @NonNull [] entries)
 	{
 		super(entries);
 		this.defaultLoadFactor();
 	}
 
-	public IdentityHashMap(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public IdentityHashMap(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
 	{
 		super(iterable);
 		this.defaultLoadFactor();
@@ -114,19 +125,19 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		this.defaultLoadFactor();
 	}
 
-	public IdentityHashMap(Set<? extends Entry<? extends K, ? extends V>> set)
+	public IdentityHashMap(@NonNull Set<? extends Entry<? extends K, ? extends V>> set)
 	{
 		super(set);
 		this.defaultLoadFactor();
 	}
 
-	public IdentityHashMap(Map<? extends K, ? extends V> map)
+	public IdentityHashMap(@NonNull Map<? extends K, ? extends V> map)
 	{
 		super(map);
 		this.defaultLoadFactor();
 	}
 
-	public IdentityHashMap(AbstractIdentityHashMap<? extends K, ? extends V> identityHashMap)
+	public IdentityHashMap(@NonNull AbstractIdentityHashMap<? extends K, ? extends V> identityHashMap)
 	{
 		super(identityHashMap);
 		this.defaultLoadFactor();
@@ -146,6 +157,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		this.threshold = (int) (newCapacity * this.loadFactor);
 	}
 
+	@Nullable
 	@Override
 	public Entry<K, V> getEntry(Object key)
 	{
@@ -155,12 +167,14 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		}
 		return new Entry<K, V>()
 		{
+			@NonNull
 			@Override
 			public K getKey()
 			{
 				return (K) key;
 			}
 
+			@NonNull
 			@Override
 			public V getValue()
 			{
@@ -176,7 +190,8 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		this.size = 0;
 		Arrays.fill(this.table, null);
 	}
-	
+
+	@Nullable
 	@Override
 	public V put(K key, V value)
 	{
@@ -184,7 +199,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	}
 
 	@Override
-	public void putAll(Map<? extends K, ? extends V> map)
+	public void putAll(@NonNull Map<? extends K, ? extends V> map)
 	{
 		this.putAllInternal(map);
 	}
@@ -194,13 +209,13 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	{
 		this.table[index] = key;
 		this.table[index + 1] = value;
-		
+
 		if (++this.size >= this.threshold)
 		{
 			this.flatten();
 		}
 	}
-	
+
 	@Override
 	public V putIfAbsent(K key, V value)
 	{
@@ -208,7 +223,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		final Object[] table = this.table;
 		final int len = table.length;
 		int i = index(maskedKey, len);
-		
+
 		Object item;
 		while ((item = table[i]) != null)
 		{
@@ -218,11 +233,11 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 			}
 			i = nextKeyIndex(i, len);
 		}
-		
+
 		this.addEntry(i, maskedKey, value);
 		return value;
 	}
-	
+
 	@Override
 	public boolean replace(K key, V oldValue, V newValue)
 	{
@@ -230,7 +245,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		Object[] tab = this.table;
 		int len = tab.length;
 		int i = index(k, len);
-		
+
 		Object item;
 		while ((item = tab[i]) != null)
 		{
@@ -245,10 +260,11 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 			}
 			i = nextKeyIndex(i, len);
 		}
-		
+
 		return false;
 	}
-	
+
+	@Nullable
 	@Override
 	public V replace(K key, V newValue)
 	{
@@ -256,7 +272,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		Object[] tab = this.table;
 		int len = tab.length;
 		int i = index(k, len);
-		
+
 		Object item;
 		while ((item = tab[i]) != null)
 		{
@@ -268,15 +284,15 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 			}
 			i = nextKeyIndex(i, len);
 		}
-		
+
 		return null;
 	}
-	
+
 	private void closeDeletion(int index)
 	{
 		Object[] tab = this.table;
 		int len = tab.length;
-		
+
 		Object item;
 		for (int i = nextKeyIndex(index, len); (item = tab[i]) != null; i = nextKeyIndex(i, len))
 		{
@@ -291,7 +307,8 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 			}
 		}
 	}
-	
+
+	@Nullable
 	@Override
 	public V removeKey(Object key)
 	{
@@ -299,7 +316,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		Object[] tab = this.table;
 		int len = tab.length;
 		int i = index(k, len);
-		
+
 		while (true)
 		{
 			Object item = tab[i];
@@ -319,7 +336,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 			i = nextKeyIndex(i, len);
 		}
 	}
-	
+
 	@Override
 	public boolean removeValue(Object value)
 	{
@@ -336,7 +353,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		}
 		return removed;
 	}
-	
+
 	@Override
 	public boolean remove(Object key, Object value)
 	{
@@ -344,7 +361,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		Object[] tab = this.table;
 		int len = tab.length;
 		int i = index(k, len);
-		
+
 		while (true)
 		{
 			Object item = tab[i];
@@ -367,9 +384,9 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 			i = nextKeyIndex(i, len);
 		}
 	}
-	
+
 	@Override
-	public void mapValues(BiFunction<? super K, ? super V, ? extends V> mapper)
+	public void mapValues(@NonNull BiFunction<? super K, ? super V, ? extends V> mapper)
 	{
 		Object[] tab = this.table;
 		for (int i = 0; i < tab.length; i += 2)
@@ -381,9 +398,9 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 			}
 		}
 	}
-	
+
 	@Override
-	public void filter(BiPredicate<? super K, ? super V> condition)
+	public void filter(@NonNull BiPredicate<? super K, ? super V> condition)
 	{
 		Object[] tab = this.table;
 		for (int i = 0; i < tab.length; i += 2)
@@ -400,13 +417,15 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 			}
 		}
 	}
-	
+
+	@NonNull
 	@Override
 	public MutableMap<K, V> copy()
 	{
 		return this.mutableCopy();
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableMap<K, V> immutable()
 	{

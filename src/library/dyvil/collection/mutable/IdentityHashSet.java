@@ -1,5 +1,6 @@
 package dyvil.collection.mutable;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
 import dyvil.collection.Set;
@@ -18,60 +19,66 @@ import static dyvil.collection.impl.AbstractIdentityHashMap.*;
 public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements MutableSet<E>
 {
 	private static final long serialVersionUID = 5634688694810236366L;
-	
+
 	private           float loadFactor;
 	private transient int   threshold;
 
 	// Factory Methods
-	
+
+	@NonNull
 	public static <E> IdentityHashSet<E> apply()
 	{
 		return new IdentityHashSet<>();
 	}
-	
+
+	@NonNull
 	@SafeVarargs
-	public static <E> IdentityHashSet<E> apply(E... elements)
+	public static <E> IdentityHashSet<E> apply(@NonNull E... elements)
 	{
 		return new IdentityHashSet<>(elements);
 	}
 
-	public static <E> IdentityHashSet<E> from(Iterable<? extends E> iterable)
+	@NonNull
+	public static <E> IdentityHashSet<E> from(@NonNull Iterable<? extends E> iterable)
 	{
 		return new IdentityHashSet<>(iterable);
 	}
 
-	public static <E> IdentityHashSet<E> from(SizedIterable<? extends E> iterable)
+	@NonNull
+	public static <E> IdentityHashSet<E> from(@NonNull SizedIterable<? extends E> iterable)
 	{
 		return new IdentityHashSet<>(iterable);
 	}
 
-	public static <E> IdentityHashSet<E> from(Set<? extends E> iterable)
+	@NonNull
+	public static <E> IdentityHashSet<E> from(@NonNull Set<? extends E> iterable)
 	{
 		return new IdentityHashSet<>(iterable);
 	}
 
-	public static <E> IdentityHashSet<E> from(AbstractIdentityHashSet<? extends E> iterable)
+	@NonNull
+	public static <E> IdentityHashSet<E> from(@NonNull AbstractIdentityHashSet<? extends E> iterable)
 	{
 		return new IdentityHashSet<>(iterable);
 	}
 
 	// Constructors
-	
+
 	public IdentityHashSet()
 	{
 		this(DEFAULT_CAPACITY, DEFAULT_LOAD_FACTOR);
 	}
-	
+
 	public IdentityHashSet(int capacity)
 	{
 		this(capacity, DEFAULT_LOAD_FACTOR);
 	}
-	
+
 	public IdentityHashSet(float loadFactor)
 	{
 		this(DEFAULT_CAPACITY, loadFactor);
 	}
-	
+
 	public IdentityHashSet(int capacity, float loadFactor)
 	{
 		super(capacity);
@@ -79,36 +86,36 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Mu
 		{
 			throw new IllegalArgumentException("Invalid Load Factor: " + loadFactor);
 		}
-		
+
 		this.loadFactor = loadFactor;
 		this.threshold = (int) Math.min(capacity * loadFactor, AbstractHashMap.MAX_ARRAY_SIZE + 1);
 	}
 
-	public IdentityHashSet(E[] elements)
+	public IdentityHashSet(E @NonNull [] elements)
 	{
 		super(elements);
 		this.defaultLoadFactor();
 	}
 
-	public IdentityHashSet(Iterable<? extends E> iterable)
+	public IdentityHashSet(@NonNull Iterable<? extends E> iterable)
 	{
 		super(iterable);
 		this.defaultLoadFactor();
 	}
 
-	public IdentityHashSet(SizedIterable<? extends E> iterable)
+	public IdentityHashSet(@NonNull SizedIterable<? extends E> iterable)
 	{
 		super(iterable);
 		this.defaultLoadFactor();
 	}
 
-	public IdentityHashSet(Set<? extends E> set)
+	public IdentityHashSet(@NonNull Set<? extends E> set)
 	{
 		super(set);
 		this.defaultLoadFactor();
 	}
 
-	public IdentityHashSet(AbstractIdentityHashSet<? extends E> identityHashSet)
+	public IdentityHashSet(@NonNull AbstractIdentityHashSet<? extends E> identityHashSet)
 	{
 		super(identityHashSet);
 		this.defaultLoadFactor();
@@ -121,13 +128,13 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Mu
 	}
 
 	// Implementation Methods
-	
+
 	@Override
 	protected void updateThreshold(int newCapacity)
 	{
 		this.threshold = (int) (newCapacity * this.loadFactor);
 	}
-	
+
 	@Override
 	public void clear()
 	{
@@ -137,13 +144,13 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Mu
 			this.table[i] = null;
 		}
 	}
-	
+
 	@Override
 	public boolean add(E element)
 	{
 		return this.addInternal(element);
 	}
-	
+
 	@Override
 	protected void addElement(int index, Object element)
 	{
@@ -153,7 +160,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Mu
 			this.flatten();
 		}
 	}
-	
+
 	@Override
 	public boolean remove(Object key)
 	{
@@ -161,7 +168,7 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Mu
 		Object[] tab = this.table;
 		int len = tab.length;
 		int i = index(k, len);
-		
+
 		while (true)
 		{
 			Object item = tab[i];
@@ -179,12 +186,12 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Mu
 			i = nextIndex(i, len);
 		}
 	}
-	
+
 	private void closeDeletion(int index)
 	{
 		Object[] tab = this.table;
 		int len = tab.length;
-		
+
 		Object item;
 		for (int i = nextIndex(index, len); (item = tab[i]) != null; i = nextIndex(i, len))
 		{
@@ -197,9 +204,9 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Mu
 			}
 		}
 	}
-	
+
 	@Override
-	public void map(Function<? super E, ? extends E> mapper)
+	public void map(@NonNull Function<? super E, ? extends E> mapper)
 	{
 		for (int i = 0; i < this.table.length; i++)
 		{
@@ -210,9 +217,9 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Mu
 			}
 		}
 	}
-	
+
 	@Override
-	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper)
+	public void flatMap(@NonNull Function<? super E, ? extends @NonNull Iterable<? extends E>> mapper)
 	{
 		IdentityHashSet<E> copy = new IdentityHashSet<>(this.size, this.loadFactor);
 		for (E element : this)
@@ -222,14 +229,14 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Mu
 				copy.addInternal(result);
 			}
 		}
-		
+
 		this.table = copy.table;
 		this.size = copy.size;
 		this.threshold = copy.threshold;
 	}
-	
+
 	@Override
-	public void filter(Predicate<? super E> condition)
+	public void filter(@NonNull Predicate<? super E> condition)
 	{
 		for (int i = 0; i < this.table.length; i++)
 		{
@@ -240,13 +247,15 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Mu
 			}
 		}
 	}
-	
+
+	@NonNull
 	@Override
 	public MutableSet<E> copy()
 	{
 		return this.mutableCopy();
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableSet<E> immutable()
 	{

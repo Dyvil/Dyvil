@@ -1,9 +1,7 @@
 package dyvil.collection.impl;
 
-import dyvil.collection.Collection;
-import dyvil.collection.Map;
-import dyvil.collection.Queryable;
-import dyvil.collection.Set;
+import dyvil.annotation.internal.NonNull;
+import dyvil.collection.*;
 
 import java.util.Iterator;
 import java.util.function.Function;
@@ -24,6 +22,7 @@ public class MapValues<V> implements Queryable<V>
 		return this.entries.size();
 	}
 
+	@NonNull
 	@Override
 	public Iterator<V> iterator()
 	{
@@ -31,42 +30,46 @@ public class MapValues<V> implements Queryable<V>
 	}
 
 	@Override
-	public void map(Function<? super V, ? extends V> mapper)
+	public void map(@NonNull Function<? super V, ? extends V> mapper)
 	{
 		this.entries.mapValues(mapper);
 	}
 
 	@Override
-	public void flatMap(Function<? super V, ? extends Iterable<? extends V>> mapper)
+	public void flatMap(@NonNull Function<? super V, ? extends @NonNull Iterable<? extends V>> mapper)
 	{
 		throw new UnsupportedOperationException("flatMap() on Map Values");
 	}
 
 	@Override
-	public void filter(Predicate<? super V> condition)
+	public void filter(@NonNull Predicate<? super V> condition)
 	{
 		this.entries.filterByValue(condition);
 	}
 
+	@NonNull
 	@Override
-	public <R> Queryable<R> mapped(Function<? super V, ? extends R> mapper)
+	public <R> Queryable<R> mapped(@NonNull Function<? super V, ? extends R> mapper)
 	{
 		final Map<?, R> entries = this.entries.valueMapped(mapper);
 		return entries.values();
 	}
 
+	@NonNull
 	@Override
-	public <R> Queryable<R> flatMapped(Function<? super V, ? extends Iterable<? extends R>> mapper)
+	public <R> Queryable<R> flatMapped(@NonNull Function<? super V, ? extends @NonNull Iterable<? extends R>> mapper)
 	{
 		throw new UnsupportedOperationException("flatMapped() on Map Values");
 	}
 
+	@NonNull
 	@Override
-	public Queryable<V> filtered(Predicate<? super V> condition)
+	public Queryable<V> filtered(@NonNull Predicate<? super V> condition)
 	{
 		return this.entries.filteredByValue(condition).values();
 	}
 
+	@NonNull
 	@Override
 	public String toString()
 	{

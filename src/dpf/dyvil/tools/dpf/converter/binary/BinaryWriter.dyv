@@ -227,9 +227,9 @@ public class BinaryWriter
 
 	// BuilderVisitor
 
-	public override ValueVisitor visitParameter(Name name)
+	public override ValueVisitor visitParameter(Name? name)
 	{
-		this.writeName(name);
+		this.writeName(name ?? Name(""));
 		return this;
 	}
 

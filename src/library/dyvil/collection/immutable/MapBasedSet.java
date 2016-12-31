@@ -1,6 +1,7 @@
 package dyvil.collection.immutable;
 
 import dyvil.annotation.Immutable;
+import dyvil.annotation.internal.NonNull;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractMapBasedSet;
 
@@ -35,38 +36,42 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 
 	private static final long serialVersionUID = 2820007412138106503L;
 
-	protected ImmutableMap<E, Boolean> map;
+	protected @NonNull ImmutableMap<E, Boolean> map;
 
-	public static <E> ImmutableSet.Builder<E> builder(ImmutableMap.Builder<E, Boolean> mapBuilder)
+	public static <E> ImmutableSet.@NonNull Builder<E> builder(ImmutableMap.@NonNull Builder<E, Boolean> mapBuilder)
 	{
 		return new Builder<>(mapBuilder);
 	}
 
-	public MapBasedSet(ImmutableMap<E, Boolean> map)
+	public MapBasedSet(@NonNull ImmutableMap<E, Boolean> map)
 	{
 		this.map = map;
 	}
 
 	@Override
+	@NonNull
 	protected Map<E, Boolean> map()
 	{
 		return this.map;
 	}
 
+	@NonNull
 	@Override
 	public ImmutableSet<E> added(E element)
 	{
 		return new MapBasedSet<>(this.map.withEntry(element, true));
 	}
 
+	@NonNull
 	@Override
 	public ImmutableSet<E> removed(Object element)
 	{
 		return new MapBasedSet<>(this.map.keyRemoved(element));
 	}
 
+	@NonNull
 	@Override
-	public ImmutableSet<E> difference(Collection<?> collection)
+	public ImmutableSet<E> difference(@NonNull Collection<?> collection)
 	{
 		ImmutableMap.Builder<E, Boolean> builder = this.map.immutableBuilder();
 		for (Entry<E, ?> entry : this.map)
@@ -80,8 +85,9 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 		return new MapBasedSet<>(builder.build());
 	}
 
+	@NonNull
 	@Override
-	public ImmutableSet<E> intersection(Collection<? extends E> collection)
+	public ImmutableSet<E> intersection(@NonNull Collection<? extends E> collection)
 	{
 		ImmutableMap.Builder<E, Boolean> builder = this.map.immutableBuilder();
 		for (Entry<E, ?> entry : this.map)
@@ -95,8 +101,9 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 		return new MapBasedSet<>(builder.build());
 	}
 
+	@NonNull
 	@Override
-	public ImmutableSet<E> union(Collection<? extends E> collection)
+	public ImmutableSet<E> union(@NonNull Collection<? extends E> collection)
 	{
 		ImmutableMap.Builder<E, Boolean> builder = this.map.immutableBuilder();
 		builder.putAll(this.map);
@@ -107,8 +114,9 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 		return new MapBasedSet<>(builder.build());
 	}
 
+	@NonNull
 	@Override
-	public ImmutableSet<E> symmetricDifference(Collection<? extends E> collection)
+	public ImmutableSet<E> symmetricDifference(@NonNull Collection<? extends E> collection)
 	{
 		ImmutableMap.Builder<E, Boolean> builder = this.map.immutableBuilder();
 		for (Entry<E, ?> entry : this.map)
@@ -129,8 +137,9 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 		return new MapBasedSet<>(builder.build());
 	}
 
+	@NonNull
 	@Override
-	public <R> ImmutableSet<R> mapped(Function<? super E, ? extends R> mapper)
+	public <R> ImmutableSet<R> mapped(@NonNull Function<? super E, ? extends R> mapper)
 	{
 		ImmutableMap.Builder<R, Boolean> builder = this.map.immutableBuilder();
 		for (Entry<E, ?> entry : this.map)
@@ -140,8 +149,9 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 		return new MapBasedSet<>(builder.build());
 	}
 
+	@NonNull
 	@Override
-	public <R> ImmutableSet<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
+	public <R> ImmutableSet<R> flatMapped(@NonNull Function<? super E, ? extends @NonNull Iterable<? extends R>> mapper)
 	{
 		ImmutableMap.Builder<R, Boolean> builder = this.map.immutableBuilder();
 		for (Entry<E, ?> entry : this.map)
@@ -154,8 +164,9 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 		return new MapBasedSet<>(builder.build());
 	}
 
+	@NonNull
 	@Override
-	public ImmutableSet<E> filtered(Predicate<? super E> condition)
+	public ImmutableSet<E> filtered(@NonNull Predicate<? super E> condition)
 	{
 		ImmutableMap.Builder<E, Boolean> builder = this.map.immutableBuilder();
 		for (Entry<E, ?> entry : this.map)
@@ -169,12 +180,14 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 		return new MapBasedSet<>(builder.build());
 	}
 
+	@NonNull
 	@Override
 	public ImmutableSet<E> copy()
 	{
 		return new MapBasedSet<>(this.map.copy());
 	}
 
+	@NonNull
 	@Override
 	public MutableSet<E> mutable()
 	{
@@ -182,7 +195,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 	}
 
 	@Override
-	public java.util.Set<E> toJava()
+	public java.util.@NonNull Set<E> toJava()
 	{
 		return Collections.unmodifiableSet(super.toJava());
 	}

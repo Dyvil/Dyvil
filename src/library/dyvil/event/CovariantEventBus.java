@@ -1,11 +1,13 @@
 package dyvil.event;
 
+import dyvil.annotation.internal.NonNull;
+
 import java.lang.reflect.Method;
 
 public class CovariantEventBus extends InvariantEventBus
 {
 	@Override
-	public void dispatch(Object event)
+	public void dispatch(@NonNull Object event)
 	{
 		Class<?> type = event.getClass();
 
@@ -17,7 +19,7 @@ public class CovariantEventBus extends InvariantEventBus
 		}
 	}
 
-	private void invokeRecursively(HandlerEntry entry, Object handler, Class<?> type, Object event)
+	private void invokeRecursively(@NonNull HandlerEntry entry, Object handler, @NonNull Class<?> type, Object event)
 	{
 		Method handlerMethod = entry.getTargetMethod(type);
 		if (handlerMethod != null)

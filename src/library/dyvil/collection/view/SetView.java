@@ -1,7 +1,11 @@
 package dyvil.collection.view;
 
 import dyvil.annotation.Immutable;
-import dyvil.collection.*;
+import dyvil.annotation.internal.NonNull;
+import dyvil.collection.Collection;
+import dyvil.collection.ImmutableSet;
+import dyvil.collection.MutableSet;
+import dyvil.collection.Set;
 import dyvil.collection.iterator.ImmutableIterator;
 
 import java.util.Collections;
@@ -14,86 +18,97 @@ import java.util.function.Predicate;
 public class SetView<E> implements ImmutableSet<E>
 {
 	private static final long serialVersionUID = 816522991709785465L;
-	
+
 	protected final Set<E> set;
-	
+
 	public SetView(Set<E> collection)
 	{
 		this.set = collection;
 	}
-	
+
 	@Override
 	public int size()
 	{
 		return this.set.size();
 	}
-	
+
+	@NonNull
 	@Override
 	public Iterator<E> iterator()
 	{
 		return this.set.isImmutable() ? this.set.iterator() : new ImmutableIterator<>(this.set.iterator());
 	}
-	
+
 	@Override
-	public void forEach(Consumer<? super E> action)
+	public void forEach(@NonNull Consumer<? super E> action)
 	{
 		this.set.forEach(action);
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableSet<E> added(E element)
 	{
 		return new SetView<>(this.set.added(element));
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableSet<E> removed(Object element)
 	{
 		return new SetView<>(this.set.removed(element));
 	}
 
+	@NonNull
 	@Override
-	public ImmutableSet<E> union(Collection<? extends E> collection)
+	public ImmutableSet<E> union(@NonNull Collection<? extends E> collection)
 	{
 		return new SetView<>(this.set.union(collection));
 	}
 
+	@NonNull
 	@Override
-	public ImmutableSet<E> difference(Collection<?> collection)
+	public ImmutableSet<E> difference(@NonNull Collection<?> collection)
 	{
 		return new SetView<>(this.set.difference(collection));
 	}
-	
+
+	@NonNull
 	@Override
-	public ImmutableSet<E> intersection(Collection<? extends E> collection)
+	public ImmutableSet<E> intersection(@NonNull Collection<? extends E> collection)
 	{
 		return new SetView<>(this.set.intersection(collection));
 	}
-	
+
+	@NonNull
 	@Override
-	public ImmutableSet<E> symmetricDifference(Collection<? extends E> collection)
+	public ImmutableSet<E> symmetricDifference(@NonNull Collection<? extends E> collection)
 	{
 		return new SetView<>(this.set.symmetricDifference(collection));
 	}
-	
+
+	@NonNull
 	@Override
-	public <R> ImmutableSet<R> mapped(Function<? super E, ? extends R> mapper)
+	public <R> ImmutableSet<R> mapped(@NonNull Function<? super E, ? extends R> mapper)
 	{
 		return new SetView<>(this.set.mapped(mapper));
 	}
-	
+
+	@NonNull
 	@Override
-	public <R> ImmutableSet<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
+	public <R> ImmutableSet<R> flatMapped(@NonNull Function<? super E, ? extends @NonNull Iterable<? extends R>> mapper)
 	{
 		return new SetView<>(this.set.flatMapped(mapper));
 	}
-	
+
+	@NonNull
 	@Override
-	public ImmutableSet<E> filtered(Predicate<? super E> condition)
+	public ImmutableSet<E> filtered(@NonNull Predicate<? super E> condition)
 	{
 		return new SetView<>(this.set.filtered(condition));
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableSet<E> copy()
 	{
@@ -111,7 +126,7 @@ public class SetView<E> implements ImmutableSet<E>
 	{
 		return this.set.emptyCopy(capacity);
 	}
-	
+
 	@Override
 	public MutableSet<E> mutable()
 	{
@@ -129,25 +144,26 @@ public class SetView<E> implements ImmutableSet<E>
 	{
 		return this.set.immutableBuilder(capacity);
 	}
-	
+
 	@Override
-	public java.util.Set<E> toJava()
+	public java.util.@NonNull Set<E> toJava()
 	{
 		return this.set.isImmutable() ? this.set.toJava() : Collections.unmodifiableSet(this.set.toJava());
 	}
-	
+
+	@NonNull
 	@Override
 	public String toString()
 	{
 		return "view " + this.set.toString();
 	}
-	
+
 	@Override
 	public boolean equals(Object obj)
 	{
 		return this.set.equals(obj);
 	}
-	
+
 	@Override
 	public int hashCode()
 	{

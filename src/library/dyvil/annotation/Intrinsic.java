@@ -1,5 +1,7 @@
 package dyvil.annotation;
 
+import dyvil.annotation.internal.NonNull;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -23,7 +25,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.CLASS)
 public @interface Intrinsic
 {
-	int[] value();
-	
-	String[] strings() default {};
+	int @NonNull [] value();
+
+	@NonNull String @NonNull [] strings() default {};
 }

@@ -22,11 +22,6 @@ public case class Parameter
 		return new Parameter(name, null)
 	}
 
-	public static Parameter apply(Name name, Value value)
-	{
-		return new Parameter(name, value)
-	}
-
 	public static Parameter apply(Value value)
 	{
 		return new Parameter(null, value)

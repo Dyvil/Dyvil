@@ -1,5 +1,7 @@
 package dyvil.collection.impl;
 
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.collection.Entry;
 import dyvil.collection.ImmutableMap;
 import dyvil.collection.Map;
@@ -34,12 +36,14 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 			return AbstractEnumMap.this.keys[this.index];
 		}
 
+		@NonNull
 		@Override
 		public V getValue()
 		{
 			return (V) AbstractEnumMap.this.values[this.index];
 		}
 
+		@NonNull
 		@Override
 		public String toString()
 		{
@@ -121,7 +125,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		this.size = size;
 	}
 
-	public AbstractEnumMap(Type<K> type)
+	public AbstractEnumMap(@NonNull Type<K> type)
 	{
 		this(type.erasure());
 	}
@@ -133,7 +137,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		this.type = type;
 	}
 
-	public AbstractEnumMap(Entry<? extends K, ? extends V>[] entries)
+	public AbstractEnumMap(Entry<? extends K, ? extends V> @NonNull [] entries)
 	{
 		this(getKeyType(entries));
 
@@ -143,7 +147,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		}
 	}
 
-	public AbstractEnumMap(Iterable<? extends Entry<? extends K, ? extends V>> map)
+	public AbstractEnumMap(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> map)
 	{
 		this(getKeyType(map));
 
@@ -151,7 +155,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 	}
 
 	@SuppressWarnings("unchecked")
-	public AbstractEnumMap(AbstractEnumMap<? extends K, ? extends V> map)
+	public AbstractEnumMap(@NonNull AbstractEnumMap<? extends K, ? extends V> map)
 	{
 		this.keys = map.keys;
 		this.type = (Class<K>) map.type;
@@ -161,7 +165,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 
 	// Implementation Methods
 
-	protected static <K extends Enum<K>> Class<K> getKeyType(K key)
+	protected static <K extends Enum<K>> Class<K> getKeyType(@Nullable K key)
 	{
 		if (key != null)
 		{
@@ -170,7 +174,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		throw new IllegalArgumentException("Invalid Enum Map - Could not get Enum type");
 	}
 
-	protected static <K extends Enum<K>> Class<K> getKeyType(Entry<? extends K, ?>[] array)
+	protected static <K extends Enum<K>> Class<K> getKeyType(Entry<? extends K, ?> @NonNull [] array)
 	{
 		for (Entry<? extends K, ?> entry : array)
 		{
@@ -184,7 +188,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		throw new IllegalArgumentException("Invalid Enum Map - Could not get Enum type");
 	}
 
-	protected static <K extends Enum<K>> Class<K> getKeyType(Iterable<? extends Entry<? extends K, ?>> iterable)
+	protected static <K extends Enum<K>> Class<K> getKeyType(@NonNull Iterable<? extends Entry<? extends K, ?>> iterable)
 	{
 		for (Entry<? extends K, ?> entry : iterable)
 		{
@@ -197,7 +201,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		throw new IllegalArgumentException("Invalid Enum Map - Could not get Enum type");
 	}
 
-	protected void putInternal(K key, V value)
+	protected void putInternal(@NonNull K key, V value)
 	{
 		int index = key.ordinal();
 
@@ -208,7 +212,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		this.values[index] = value;
 	}
 
-	private void putAllInternal(Iterable<? extends Entry<? extends K, ? extends V>> map)
+	private void putAllInternal(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> map)
 	{
 		for (Entry<? extends K, ? extends V> entry : map)
 		{
@@ -216,12 +220,12 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		}
 	}
 
-	protected static boolean checkType(Class<?> type, Object key)
+	protected static boolean checkType(Class<?> type, @Nullable Object key)
 	{
 		return key != null && key.getClass() == type;
 	}
 
-	protected static int index(Object key)
+	protected static int index(@NonNull Object key)
 	{
 		return ((Enum) key).ordinal();
 	}
@@ -232,17 +236,20 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		return this.size;
 	}
 
+	@NonNull
 	@Override
 	public Iterator<Entry<K, V>> iterator()
 	{
 		return new EnumIterator<Entry<K, V>>()
 		{
+			@NonNull
 			@Override
 			public Entry<K, V> next()
 			{
 				return new EnumEntry(this.nextIndex());
 			}
 
+			@NonNull
 			@Override
 			public String toString()
 			{
@@ -251,6 +258,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		};
 	}
 
+	@NonNull
 	@Override
 	public Iterator<K> keyIterator()
 	{
@@ -262,6 +270,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 				return AbstractEnumMap.this.keys[this.nextIndex()];
 			}
 
+			@NonNull
 			@Override
 			public String toString()
 			{
@@ -270,17 +279,20 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		};
 	}
 
+	@NonNull
 	@Override
 	public Iterator<V> valueIterator()
 	{
 		return new EnumIterator<V>()
 		{
+			@NonNull
 			@Override
 			public V next()
 			{
 				return (V) AbstractEnumMap.this.values[this.nextIndex()];
 			}
 
+			@NonNull
 			@Override
 			public String toString()
 			{
@@ -292,13 +304,13 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 	protected abstract void removeAt(int index);
 
 	@Override
-	public boolean containsKey(Object key)
+	public boolean containsKey(@NonNull Object key)
 	{
 		return checkType(this.type, key) && this.values[index(key)] != null;
 	}
 
 	@Override
-	public boolean contains(Object key, Object value)
+	public boolean contains(@NonNull Object key, Object value)
 	{
 		if (!checkType(this.type, key))
 		{
@@ -322,8 +334,9 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		return false;
 	}
 
+	@Nullable
 	@Override
-	public V get(Object key)
+	public V get(@NonNull Object key)
 	{
 		if (!checkType(this.type, key))
 		{
@@ -333,8 +346,9 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		return (V) this.values[index(key)];
 	}
 
+	@Nullable
 	@Override
-	public Entry<K, V> getEntry(Object key)
+	public Entry<K, V> getEntry(@NonNull Object key)
 	{
 		if (!checkType(this.type, key))
 		{
@@ -348,12 +362,14 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		}
 		return new Entry<K, V>()
 		{
+			@NonNull
 			@Override
 			public K getKey()
 			{
 				return (K) key;
 			}
 
+			@NonNull
 			@Override
 			public V getValue()
 			{
@@ -362,8 +378,9 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		};
 	}
 
+	@NonNull
 	@Override
-	public Option<V> getOption(Object key)
+	public Option<V> getOption(@NonNull Object key)
 	{
 		if (!checkType(this.type, key))
 		{
@@ -373,6 +390,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		return new Some<>((V) this.values[index(key)]);
 	}
 
+	@NonNull
 	@Override
 	public <RK, RV> MutableMap<RK, RV> emptyCopy()
 	{
@@ -385,12 +403,14 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		return MutableMap.withCapacity(capacity);
 	}
 
+	@NonNull
 	@Override
 	public MutableMap<K, V> mutableCopy()
 	{
 		return new dyvil.collection.mutable.EnumMap<>(this);
 	}
 
+	@NonNull
 	@Override
 	public ImmutableMap<K, V> immutableCopy()
 	{
@@ -442,7 +462,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		return Map.mapHashCode(this);
 	}
 
-	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	private void writeObject(java.io.@NonNull ObjectOutputStream out) throws IOException
 	{
 		out.defaultWriteObject();
 
@@ -461,7 +481,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		}
 	}
 
-	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	private void readObject(java.io.@NonNull ObjectInputStream in) throws IOException, ClassNotFoundException
 	{
 		in.defaultReadObject();
 

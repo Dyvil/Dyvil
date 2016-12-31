@@ -1,0 +1,92 @@
+package dyvil.collection
+
+import java.util.Comparator
+import java.util.Map
+
+/**
+ * An <b>Entry</b> is a combination of a Key and Value, as used in {@linkplain Map maps}.
+ *
+ * @param <K>
+ * 		the type of the key
+ * @param <V>
+ * 		the type of the value
+ */
+public interface Entry<type +K, type +V> extends java.io.Serializable
+{
+	/**
+	 * Returns the key stored by this entry
+	 *
+	 * @return the key
+	 */
+	func getKey(): K
+
+	/**
+	 * Returns the value stored by this entry
+	 *
+	 * @return the value
+	 */
+	func getValue(): V
+
+	/**
+	 * Converts this entry to a {@link Tuple.Of2 Tuple}.
+	 *
+	 * @return a tuple with this entry's key and value
+	 */
+	func toTuple(): (K, V) = (this.getKey, this.getValue)
+
+	/**
+	 * Returns a comparator that compares entries by key. The ordering is defined by the <i>natural order</i> of the
+	 * key, i.e. the ordering given by {@link Comparable#compareTo(Object)}.
+	 *
+	 * @return a comparator that compares entries by key.
+	 */
+	static func comparingByKey<K extends Comparable<-K>, V>(): Comparator<Entry<K, V>>
+		= (e1, e2) => e1.getKey.compareTo(e2.getKey)
+
+	/**
+	 * Returns a comparator that compares entries by value. The ordering is defined by the <i>natural order</i> of the
+	 * value, i.e. the ordering given by {@link Comparable#compareTo(Object)}.
+	 *
+	 * @return a comparator that compares entries by value.
+	 */
+	static func comparingByValue<K, V extends Comparable<-V>>(): Comparator<Entry<K, V>>
+		= (e1, e2) => e1.getValue.compareTo(e2.getValue)
+
+	/**
+	 * Returns a comparator that compares entries by key. The ordering is defined by the given {@code comparator}.
+	 *
+	 * @param cmp
+	 * 		the comparator the defines the ordering of the keys
+	 *
+	 * @return a comparator that compares entries by key.
+	 */
+	static func comparingByKey<K, V>(Comparator<-K> cmp): Comparator<Entry<K, V>>
+		= (c1, c2) => cmp.compare(c1.getKey, c2.getKey)
+
+	/**
+	 * Returns a comparator that compares entries by value. The ordering is defined by the given {@code comparator}.
+	 *
+	 * @param cmp
+	 * 		the comparator the defines the ordering of the values
+	 *
+	 * @return a comparator that compares entries by value.
+	 */
+	static func comparingByValue<K, V>(Comparator<-V> cmp): Comparator<Entry<K, V>>
+		= (c1, c2) => cmp.compare(c1.getValue, c2.getValue)
+
+	static func entryToString(Entry<_, _> entry): String = entry.getKey + " -> " + entry.getValue
+
+	static func entryEquals(Entry<_, _> entry, Object? o): boolean = o is Entry && entryEquals(entry, o as Entry)
+
+	static func entryEquals(Entry<_, _> entry1, Entry<_, _> entry2): boolean
+		= entry1.getKey == entry2.getKey && entry1.getValue == entry2.getValue
+
+	static func entryHashCode(Entry<_, _> entry): int
+	{
+		let key = entry.getKey
+		let value = entry.getValue
+		let hash = key.hashCode + value.hashCode
+		// To achieve the same hash code as if this were a SingletonMap
+		return hash * 31 + hash
+	}
+}

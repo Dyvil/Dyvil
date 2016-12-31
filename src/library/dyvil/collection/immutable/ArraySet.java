@@ -1,7 +1,11 @@
 package dyvil.collection.immutable;
 
 import dyvil.annotation.Immutable;
-import dyvil.collection.*;
+import dyvil.annotation.internal.NonNull;
+import dyvil.collection.Collection;
+import dyvil.collection.ImmutableSet;
+import dyvil.collection.MutableSet;
+import dyvil.collection.Set;
 import dyvil.collection.impl.AbstractArraySet;
 import dyvil.lang.LiteralConvertible;
 import dyvil.util.ImmutableException;
@@ -53,42 +57,50 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 
 	// Factory Methods
 
+	@NonNull
 	@SafeVarargs
-	public static <E> ArraySet<E> apply(E... elements)
+	public static <E> ArraySet<E> apply(@NonNull E... elements)
 	{
 		return new ArraySet<>(elements, true);
 	}
 
+	@NonNull
 	public static <E> ArraySet<E> from(E[] array)
 	{
 		return new ArraySet<>(array);
 	}
 
-	public static <E> ArraySet<E> from(Iterable<? extends E> iterable)
+	@NonNull
+	public static <E> ArraySet<E> from(@NonNull Iterable<? extends E> iterable)
 	{
 		return new ArraySet<>(iterable);
 	}
 
-	public static <E> ArraySet<E> from(Collection<? extends E> collection)
+	@NonNull
+	public static <E> ArraySet<E> from(@NonNull Collection<? extends E> collection)
 	{
 		return new ArraySet<>(collection);
 	}
 
-	public static <E> ArraySet<E> from(Set<? extends E> set)
+	@NonNull
+	public static <E> ArraySet<E> from(@NonNull Set<? extends E> set)
 	{
 		return new ArraySet<>(set);
 	}
 
-	public static <E> ArraySet<E> from(AbstractArraySet<E> arraySet)
+	@NonNull
+	public static <E> ArraySet<E> from(@NonNull AbstractArraySet<E> arraySet)
 	{
 		return new ArraySet<>(arraySet);
 	}
 
+	@NonNull
 	public static <E> Builder<E> builder()
 	{
 		return new Builder<>();
 	}
 
+	@NonNull
 	public static <E> Builder<E> builder(int capacity)
 	{
 		return new Builder<>(capacity);
@@ -111,12 +123,12 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 		super(elements);
 	}
 
-	public ArraySet(E[] elements, int size)
+	public ArraySet(E @NonNull [] elements, int size)
 	{
 		super(elements, size);
 	}
 
-	public ArraySet(E[] elements, boolean trusted)
+	public ArraySet(E @NonNull [] elements, boolean trusted)
 	{
 		super(elements, trusted);
 	}
@@ -126,22 +138,22 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 		super(elements, size, trusted);
 	}
 
-	public ArraySet(Iterable<? extends E> iterable)
+	public ArraySet(@NonNull Iterable<? extends E> iterable)
 	{
 		super(iterable);
 	}
 
-	public ArraySet(Collection<? extends E> collection)
+	public ArraySet(@NonNull Collection<? extends E> collection)
 	{
 		super(collection);
 	}
 
-	public ArraySet(Set<? extends E> set)
+	public ArraySet(@NonNull Set<? extends E> set)
 	{
 		super(set);
 	}
 
-	public ArraySet(AbstractArraySet<E> arraySet)
+	public ArraySet(@NonNull AbstractArraySet<E> arraySet)
 	{
 		super(arraySet);
 	}
@@ -154,6 +166,7 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 		throw new ImmutableException("removeAt() on Immutable Set");
 	}
 
+	@NonNull
 	@Override
 	public ImmutableSet<E> added(E element)
 	{
@@ -168,6 +181,7 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 		return new ArraySet<>((E[]) newArray, this.size + 1, true);
 	}
 
+	@NonNull
 	@Override
 	public ImmutableSet<E> removed(Object element)
 	{
@@ -184,8 +198,9 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 		return new ArraySet<>((E[]) newArray, index, true);
 	}
 
+	@NonNull
 	@Override
-	public ImmutableSet<E> difference(Collection<?> collection)
+	public ImmutableSet<E> difference(@NonNull Collection<?> collection)
 	{
 		Object[] newArray = new Object[this.size];
 		int index = 0;
@@ -200,8 +215,9 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 		return new ArraySet<>((E[]) newArray, index, true);
 	}
 
+	@NonNull
 	@Override
-	public ImmutableSet<E> intersection(Collection<? extends E> collection)
+	public ImmutableSet<E> intersection(@NonNull Collection<? extends E> collection)
 	{
 		Object[] newArray = new Object[Math.min(this.size, collection.size())];
 		int index = 0;
@@ -216,8 +232,9 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 		return new ArraySet<>((E[]) newArray, index, true);
 	}
 
+	@NonNull
 	@Override
-	public ImmutableSet<E> union(Collection<? extends E> collection)
+	public ImmutableSet<E> union(@NonNull Collection<? extends E> collection)
 	{
 		int size = this.size;
 		Object[] newArray = new Object[size + collection.size()];
@@ -232,8 +249,9 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 		return new ArraySet<>((E[]) newArray, size, true);
 	}
 
+	@NonNull
 	@Override
-	public ImmutableSet<E> symmetricDifference(Collection<? extends E> collection)
+	public ImmutableSet<E> symmetricDifference(@NonNull Collection<? extends E> collection)
 	{
 		Object[] newArray = new Object[this.size + collection.size()];
 		int index = 0;
@@ -255,26 +273,29 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 		return new ArraySet<>((E[]) newArray, index, true);
 	}
 
+	@NonNull
 	@Override
 	@SuppressWarnings("unchecked")
-	public <R> ImmutableSet<R> mapped(Function<? super E, ? extends R> mapper)
+	public <R> ImmutableSet<R> mapped(@NonNull Function<? super E, ? extends R> mapper)
 	{
 		ArraySet<R> copy = (ArraySet<R>) this.copy();
 		copy.mapImpl((Function) mapper);
 		return copy;
 	}
 
+	@NonNull
 	@Override
 	@SuppressWarnings("unchecked")
-	public <R> ImmutableSet<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
+	public <R> ImmutableSet<R> flatMapped(@NonNull Function<? super E, ? extends @NonNull Iterable<? extends R>> mapper)
 	{
 		ArraySet<R> copy = (ArraySet<R>) this.copy();
 		copy.flatMapImpl((Function) mapper);
 		return copy;
 	}
 
+	@NonNull
 	@Override
-	public ImmutableSet<E> filtered(Predicate<? super E> condition)
+	public ImmutableSet<E> filtered(@NonNull Predicate<? super E> condition)
 	{
 		Object[] newArray = new Object[this.size];
 		int index = 0;
@@ -289,12 +310,14 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 		return new ArraySet<>((E[]) newArray, index, true);
 	}
 
+	@NonNull
 	@Override
 	public ImmutableSet<E> copy()
 	{
 		return this.immutableCopy();
 	}
 
+	@NonNull
 	@Override
 	public MutableSet<E> mutable()
 	{
@@ -302,7 +325,7 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 	}
 
 	@Override
-	public java.util.Set<E> toJava()
+	public java.util.@NonNull Set<E> toJava()
 	{
 		return Collections.unmodifiableSet(super.toJava());
 	}

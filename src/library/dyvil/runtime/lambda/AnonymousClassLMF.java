@@ -1,5 +1,6 @@
 package dyvil.runtime.lambda;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.runtime.BytecodeDump;
@@ -34,6 +35,7 @@ public final class AnonymousClassLMF extends AbstractLMF
 	/**
 	 * Name of type containing implementation "CC"
 	 */
+	@NonNull
 	private final String implMethodClassName;
 
 	/**
@@ -59,21 +61,25 @@ public final class AnonymousClassLMF extends AbstractLMF
 	/**
 	 * ASM class writer
 	 */
+	@NonNull
 	private final ClassWriter cw;
 
 	/**
 	 * Generated names for the constructor arguments
 	 */
+	@NonNull
 	private final String[] argNames;
 
 	/**
 	 * Type descriptors for the constructor arguments
 	 */
+	@NonNull
 	private final String[] argDescs;
 
 	/**
 	 * Generated name for the generated class "X$Lambda$1"
 	 */
+	@NonNull
 	private final String lambdaClassName;
 
 	/**
@@ -82,8 +88,9 @@ public final class AnonymousClassLMF extends AbstractLMF
 	 */
 	private String toString;
 
-	public AnonymousClassLMF(MethodHandles.Lookup caller, MethodType invokedType, String samMethodName, MethodType samMethodType, MethodHandle implMethod, MethodType instantiatedMethodType, String toString)
-		throws LambdaConversionException
+	public AnonymousClassLMF(MethodHandles.@NonNull Lookup caller, @NonNull MethodType invokedType,
+		                        String samMethodName, MethodType samMethodType, @NonNull MethodHandle implMethod,
+		                        MethodType instantiatedMethodType, String toString) throws LambdaConversionException
 	{
 		super(caller, invokedType, samMethodName, samMethodType, implMethod, instantiatedMethodType);
 		this.implMethodClassName = TypeConverter.getInternalName(this.implDefiningClass);
@@ -116,13 +123,15 @@ public final class AnonymousClassLMF extends AbstractLMF
 		this.toString = toString;
 	}
 
+	@NonNull
 	@Override
 	public CallSite buildCallSite() throws LambdaConversionException
 	{
 		final Class<?> innerClass = this.spinInnerClass();
 		if (this.parameterCount == 0)
 		{
-			final Constructor[] ctrs = AccessController.doPrivileged((PrivilegedAction<Constructor[]>) () -> {
+			final Constructor[] ctrs = AccessController.doPrivileged((PrivilegedAction<Constructor[]>) () ->
+			{
 				Constructor<?>[] ctrs1 = innerClass.getDeclaredConstructors();
 				if (ctrs1.length == 1)
 				{
@@ -166,9 +175,8 @@ public final class AnonymousClassLMF extends AbstractLMF
 	{
 		String samIntf = TypeConverter.getInternalName(this.samBase);
 
-		this.cw
-			.visit(CLASSFILE_VERSION, ASMConstants.ACC_SUPER | FINAL | SYNTHETIC, this.lambdaClassName, null,
-			       "java/lang/Object", new String[] { samIntf });
+		this.cw.visit(CLASSFILE_VERSION, ASMConstants.ACC_SUPER | FINAL | SYNTHETIC, this.lambdaClassName, null,
+		              "java/lang/Object", new String[] { samIntf });
 
 		// Generate final fields to be filled in by constructor
 		for (int i = 0; i < this.argDescs.length; i++)
@@ -287,7 +295,7 @@ public final class AnonymousClassLMF extends AbstractLMF
 		mv.visitEnd();
 	}
 
-	private void convertArgumentTypes(MethodVisitor mv, MethodType samType)
+	private void convertArgumentTypes(@NonNull MethodVisitor mv, @NonNull MethodType samType)
 	{
 		int lvIndex = 0;
 		int samReceiverLength;

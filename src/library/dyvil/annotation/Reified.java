@@ -1,5 +1,7 @@
 package dyvil.annotation;
 
+import dyvil.annotation.internal.NonNull;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -29,5 +31,5 @@ public @interface Reified
 	 *
 	 * @see Reified.Type
 	 */
-	Type value() default Type.ANY_CLASS;
+	@NonNull Type value() default Type.ANY_CLASS;
 }

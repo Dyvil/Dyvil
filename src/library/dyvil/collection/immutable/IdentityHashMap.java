@@ -1,6 +1,8 @@
 package dyvil.collection.immutable;
 
 import dyvil.annotation.Immutable;
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractIdentityHashMap;
 import dyvil.lang.LiteralConvertible;
@@ -53,6 +55,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 
 	// Factory Methods
 
+	@NonNull
 	public static <K, V> IdentityHashMap<K, V> singleton(K key, V value)
 	{
 		final IdentityHashMap<K, V> result = new IdentityHashMap<>(1);
@@ -60,47 +63,56 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		return result;
 	}
 
+	@NonNull
 	@SafeVarargs
-	public static <K, V> IdentityHashMap<K, V> apply(Entry<? extends K, ? extends V>... entries)
+	public static <K, V> IdentityHashMap<K, V> apply(@NonNull Entry<? extends K, ? extends V>... entries)
 	{
 		return new IdentityHashMap<>(entries);
 	}
 
-	public static <K, V> IdentityHashMap<K, V> from(Entry<? extends K, ? extends V>[] entries)
+	@NonNull
+	public static <K, V> IdentityHashMap<K, V> from(@NonNull Entry<? extends K, ? extends V> @NonNull [] entries)
 	{
 		return new IdentityHashMap<>(entries);
 	}
 
-	public static <K, V> IdentityHashMap<K, V> from(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	@NonNull
+	public static <K, V> IdentityHashMap<K, V> from(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		return new IdentityHashMap<>(iterable);
 	}
 
-	public static <K, V> IdentityHashMap<K, V> from(SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	@NonNull
+	public static <K, V> IdentityHashMap<K, V> from(SizedIterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		return new IdentityHashMap<>(iterable);
 	}
 
-	public static <K, V> IdentityHashMap<K, V> from(Set<? extends Entry<? extends K, ? extends V>> set)
+	@NonNull
+	public static <K, V> IdentityHashMap<K, V> from(@NonNull Set<? extends @NonNull Entry<? extends K, ? extends V>> set)
 	{
 		return new IdentityHashMap<>(set);
 	}
 
-	public static <K, V> IdentityHashMap<K, V> from(Map<? extends K, ? extends V> map)
+	@NonNull
+	public static <K, V> IdentityHashMap<K, V> from(@NonNull Map<? extends K, ? extends V> map)
 	{
 		return new IdentityHashMap<>(map);
 	}
 
-	public static <K, V> IdentityHashMap<K, V> from(AbstractIdentityHashMap<? extends K, ? extends V> identityHashMap)
+	@NonNull
+	public static <K, V> IdentityHashMap<K, V> from(@NonNull AbstractIdentityHashMap<? extends K, ? extends V> identityHashMap)
 	{
 		return new IdentityHashMap<>(identityHashMap);
 	}
 
+	@NonNull
 	public static <K, V> Builder<K, V> builder()
 	{
 		return new Builder<>();
 	}
 
+	@NonNull
 	public static <K, V> Builder<K, V> builder(int capacity)
 	{
 		return new Builder<>(capacity);
@@ -118,38 +130,39 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		super(capacity);
 	}
 
-	public IdentityHashMap(Entry<? extends K, ? extends V>[] entries)
+	public IdentityHashMap(@NonNull Entry<? extends K, ? extends V> @NonNull [] entries)
 	{
 		super(entries);
 	}
 
-	public IdentityHashMap(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public IdentityHashMap(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		super(iterable);
 	}
 
-	public IdentityHashMap(SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public IdentityHashMap(SizedIterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		super(iterable);
 	}
 
-	public IdentityHashMap(Set<? extends Entry<? extends K, ? extends V>> set)
+	public IdentityHashMap(@NonNull Set<? extends @NonNull Entry<? extends K, ? extends V>> set)
 	{
 		super(set);
 	}
 
-	public IdentityHashMap(Map<? extends K, ? extends V> map)
+	public IdentityHashMap(@NonNull Map<? extends K, ? extends V> map)
 	{
 		super(map);
 	}
 
-	public IdentityHashMap(AbstractIdentityHashMap<? extends K, ? extends V> identityHashMap)
+	public IdentityHashMap(@NonNull AbstractIdentityHashMap<? extends K, ? extends V> identityHashMap)
 	{
 		super(identityHashMap);
 	}
 
 	// Implementation Methods
 
+	@Nullable
 	@Override
 	public Entry<K, V> getEntry(Object key)
 	{
@@ -161,6 +174,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		return new Tuple.Of2<>((K) key, (V) this.table[index + 1]);
 	}
 
+	@NonNull
 	@Override
 	public ImmutableMap<K, V> withEntry(K key, V value)
 	{
@@ -169,46 +183,50 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		map.putInternal(key, value);
 		return map;
 	}
-	
+
+	@NonNull
 	@Override
-	public ImmutableMap<K, V> union(Map<? extends K, ? extends V> map)
+	public ImmutableMap<K, V> union(@NonNull Map<? extends K, ? extends V> map)
 	{
 		final IdentityHashMap<K, V> copy = new IdentityHashMap<>(this);
 		copy.putAllInternal(map);
 		return copy;
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableMap<K, V> keyRemoved(Object key)
 	{
-		IdentityHashMap<K, V> copy = new IdentityHashMap<>(this.size);
+		final IdentityHashMap<K, V> copy = new IdentityHashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
-			K k = entry.getKey();
-			if (k != key)
+			final K entryKey = entry.getKey();
+			if (entryKey != key)
 			{
-				copy.putInternal(k, entry.getValue());
+				copy.putInternal(entryKey, entry.getValue());
 			}
 		}
 		return copy;
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableMap<K, V> removed(Object key, Object value)
 	{
 		IdentityHashMap<K, V> copy = new IdentityHashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
-			K k = entry.getKey();
-			V v = entry.getValue();
-			if (k != key && v != value)
+			K entryKey = entry.getKey();
+			V entryValue = entry.getValue();
+			if (entryKey != key && entryValue != value)
 			{
-				copy.putInternal(k, v);
+				copy.putInternal(entryKey, entryValue);
 			}
 		}
 		return copy;
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableMap<K, V> valueRemoved(Object value)
 	{
@@ -223,40 +241,43 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		}
 		return copy;
 	}
-	
+
+	@NonNull
 	@Override
-	public ImmutableMap<K, V> difference(Map<?, ?> map)
+	public ImmutableMap<K, V> difference(@NonNull Map<?, ?> map)
 	{
 		IdentityHashMap<K, V> copy = new IdentityHashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
-			K k = entry.getKey();
-			V v = entry.getValue();
-			if (!map.contains(k, v))
+			K entryKey = entry.getKey();
+			V entryValue = entry.getValue();
+			if (!map.contains(entryKey, entryValue))
 			{
-				copy.putInternal(k, v);
+				copy.putInternal(entryKey, entryValue);
 			}
 		}
 		return copy;
 	}
-	
+
+	@NonNull
 	@Override
-	public ImmutableMap<K, V> keyDifference(Collection<?> keys)
+	public ImmutableMap<K, V> keyDifference(@NonNull Collection<?> keys)
 	{
 		IdentityHashMap<K, V> copy = new IdentityHashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
-			K k = entry.getKey();
-			if (!keys.contains(k))
+			K entryKey = entry.getKey();
+			if (!keys.contains(entryKey))
 			{
-				copy.putInternal(k, entry.getValue());
+				copy.putInternal(entryKey, entry.getValue());
 			}
 		}
 		return copy;
 	}
-	
+
+	@NonNull
 	@Override
-	public <NK> ImmutableMap<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper)
+	public <NK> ImmutableMap<NK, V> keyMapped(@NonNull BiFunction<? super K, ? super V, ? extends NK> mapper)
 	{
 		IdentityHashMap<NK, V> copy = new IdentityHashMap<>(this.size);
 		for (Entry<K, V> entry : this)
@@ -266,9 +287,10 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		}
 		return copy;
 	}
-	
+
+	@NonNull
 	@Override
-	public <NV> ImmutableMap<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper)
+	public <NV> ImmutableMap<K, NV> valueMapped(@NonNull BiFunction<? super K, ? super V, ? extends NV> mapper)
 	{
 		IdentityHashMap<K, NV> copy = new IdentityHashMap<>(this.size);
 		for (Entry<K, V> entry : this)
@@ -278,9 +300,10 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		}
 		return copy;
 	}
-	
+
+	@NonNull
 	@Override
-	public <NK, NV> ImmutableMap<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> entryMapped(@NonNull BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
 	{
 		IdentityHashMap<NK, NV> copy = new IdentityHashMap<>(this.size);
 		for (Entry<K, V> entry : this)
@@ -293,9 +316,10 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		}
 		return copy;
 	}
-	
+
+	@NonNull
 	@Override
-	public <NK, NV> ImmutableMap<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> flatMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
 	{
 		IdentityHashMap<NK, NV> copy = new IdentityHashMap<>(this.size);
 		for (Entry<K, V> entry : this)
@@ -307,9 +331,10 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		}
 		return copy;
 	}
-	
+
+	@NonNull
 	@Override
-	public ImmutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition)
+	public ImmutableMap<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> condition)
 	{
 		IdentityHashMap<K, V> copy = new IdentityHashMap<>(this.size);
 		for (Entry<K, V> entry : this)
@@ -323,7 +348,8 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		}
 		return copy;
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableMap<V, K> inverted()
 	{
@@ -334,13 +360,15 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		}
 		return copy;
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableMap<K, V> copy()
 	{
 		return this.immutableCopy();
 	}
-	
+
+	@NonNull
 	@Override
 	public MutableMap<K, V> mutable()
 	{

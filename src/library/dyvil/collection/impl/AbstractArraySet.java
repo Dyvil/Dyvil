@@ -1,5 +1,6 @@
 package dyvil.collection.impl;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.collection.Collection;
 import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
@@ -32,20 +33,20 @@ public abstract class AbstractArraySet<E> implements Set<E>
 	}
 
 	@SafeVarargs
-	public AbstractArraySet(E... elements)
+	public AbstractArraySet(@NonNull E... elements)
 	{
 		this.elements = elements.clone();
 		this.size = Set.distinct(this.elements, elements.length);
 	}
 
-	public AbstractArraySet(E[] elements, int size)
+	public AbstractArraySet(E @NonNull [] elements, int size)
 	{
 		this.elements = new Object[size];
 		System.arraycopy(elements, 0, this.elements, 0, size);
 		this.size = Set.distinct(this.elements, size);
 	}
 
-	public AbstractArraySet(E[] elements, @SuppressWarnings("UnusedParameters") boolean trusted)
+	public AbstractArraySet(E @NonNull [] elements, @SuppressWarnings("UnusedParameters") boolean trusted)
 	{
 		this.elements = elements;
 		this.size = Set.distinct(elements, elements.length);
@@ -57,25 +58,25 @@ public abstract class AbstractArraySet<E> implements Set<E>
 		this.size = size;
 	}
 
-	public AbstractArraySet(Iterable<? extends E> iterable)
+	public AbstractArraySet(@NonNull Iterable<? extends E> iterable)
 	{
 		this();
 		this.addAllInternal(iterable);
 	}
 
-	public AbstractArraySet(Collection<? extends E> collection)
+	public AbstractArraySet(@NonNull Collection<? extends E> collection)
 	{
 		this(collection.size());
 		this.addAllInternal(collection);
 	}
 
-	public AbstractArraySet(Set<? extends E> set)
+	public AbstractArraySet(@NonNull Set<? extends E> set)
 	{
 		this(set.size());
 		this.addAllInternal(set);
 	}
 
-	public AbstractArraySet(AbstractArraySet<? extends E> arraySet)
+	public AbstractArraySet(@NonNull AbstractArraySet<? extends E> arraySet)
 	{
 		this.elements = arraySet.elements.clone();
 		this.size = arraySet.size;
@@ -91,7 +92,6 @@ public abstract class AbstractArraySet<E> implements Set<E>
 			}
 		}
 
-
 		final int index = this.size;
 		this.ensureCapacityInternal(index + 1);
 		this.elements[index] = element;
@@ -99,7 +99,7 @@ public abstract class AbstractArraySet<E> implements Set<E>
 		return true;
 	}
 
-	protected void addAllInternal(Iterable<? extends E> iterable)
+	protected void addAllInternal(@NonNull Iterable<? extends E> iterable)
 	{
 		for (E element : iterable)
 		{
@@ -107,7 +107,7 @@ public abstract class AbstractArraySet<E> implements Set<E>
 		}
 	}
 
-	protected void addAllInternal(Set<? extends E> set)
+	protected void addAllInternal(@NonNull Set<? extends E> set)
 	{
 		this.ensureCapacityInternal(this.size + set.size());
 		set.toArray(this.size, this.elements);
@@ -148,11 +148,12 @@ public abstract class AbstractArraySet<E> implements Set<E>
 	}
 
 	@Override
-	public boolean isSorted(Comparator<? super E> comparator)
+	public boolean isSorted(@NonNull Comparator<? super E> comparator)
 	{
 		return Collection.isSorted((E[]) this.elements, this.size, comparator);
 	}
 
+	@NonNull
 	@Override
 	public Iterator<E> iterator()
 	{
@@ -166,6 +167,7 @@ public abstract class AbstractArraySet<E> implements Set<E>
 				return this.index < AbstractArraySet.this.size;
 			}
 
+			@NonNull
 			@Override
 			public E next()
 			{
@@ -182,6 +184,7 @@ public abstract class AbstractArraySet<E> implements Set<E>
 				AbstractArraySet.this.removeAt(--this.index);
 			}
 
+			@NonNull
 			@Override
 			public String toString()
 			{
@@ -205,7 +208,7 @@ public abstract class AbstractArraySet<E> implements Set<E>
 		return false;
 	}
 
-	protected void mapImpl(Function<? super E, ? extends E> mapper)
+	protected void mapImpl(@NonNull Function<? super E, ? extends E> mapper)
 	{
 		int index = 0;
 		outer:
@@ -228,7 +231,7 @@ public abstract class AbstractArraySet<E> implements Set<E>
 		this.size = index;
 	}
 
-	protected void flatMapImpl(Function<? super E, ? extends Iterable<? extends E>> mapper)
+	protected void flatMapImpl(@NonNull Function<? super E, ? extends @NonNull Iterable<? extends E>> mapper)
 	{
 		Object[] newArray = new Object[this.size << 2];
 		int index = 0;
@@ -263,29 +266,33 @@ public abstract class AbstractArraySet<E> implements Set<E>
 	}
 
 	@Override
-	public void toArray(int index, Object[] store)
+	public void toArray(int index, Object @NonNull [] store)
 	{
 		System.arraycopy(this.elements, 0, store, index, this.size);
 	}
 
+	@NonNull
 	@Override
 	public <R> MutableSet<R> emptyCopy()
 	{
 		return new dyvil.collection.mutable.ArraySet<>();
 	}
 
+	@NonNull
 	@Override
 	public <RE> MutableSet<RE> emptyCopy(int capacity)
 	{
 		return new dyvil.collection.mutable.ArraySet<>(capacity);
 	}
 
+	@NonNull
 	@Override
 	public MutableSet<E> mutableCopy()
 	{
 		return new dyvil.collection.mutable.ArraySet<>((E[]) this.elements, this.size);
 	}
 
+	@NonNull
 	@Override
 	public ImmutableSet<E> immutableCopy()
 	{
@@ -293,13 +300,13 @@ public abstract class AbstractArraySet<E> implements Set<E>
 	}
 
 	@Override
-	public <RE> ImmutableSet.Builder<RE> immutableBuilder()
+	public <RE> ImmutableSet.@NonNull Builder<RE> immutableBuilder()
 	{
 		return dyvil.collection.immutable.ArraySet.builder();
 	}
 
 	@Override
-	public <RE> ImmutableSet.Builder<RE> immutableBuilder(int capacity)
+	public <RE> ImmutableSet.@NonNull Builder<RE> immutableBuilder(int capacity)
 	{
 		return dyvil.collection.immutable.ArraySet.builder(capacity);
 	}
@@ -344,7 +351,7 @@ public abstract class AbstractArraySet<E> implements Set<E>
 		return Set.setHashCode(this);
 	}
 
-	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	private void writeObject(java.io.@NonNull ObjectOutputStream out) throws IOException
 	{
 		out.defaultWriteObject();
 
@@ -355,7 +362,7 @@ public abstract class AbstractArraySet<E> implements Set<E>
 		}
 	}
 
-	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	private void readObject(java.io.@NonNull ObjectInputStream in) throws IOException, ClassNotFoundException
 	{
 		in.defaultReadObject();
 

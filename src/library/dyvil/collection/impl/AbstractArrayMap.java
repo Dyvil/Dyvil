@@ -1,5 +1,7 @@
 package dyvil.collection.impl;
 
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.collection.*;
 import dyvil.util.None;
 import dyvil.util.Option;
@@ -11,6 +13,7 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+@SuppressWarnings("unchecked")
 public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 {
 	protected class ArrayMapEntry implements Entry<K, V>
@@ -59,9 +62,9 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 
 	protected static final int DEFAULT_CAPACITY = 16;
 
-	protected transient int      size;
-	protected transient Object[] keys;
-	protected transient Object[] values;
+	protected transient int                size;
+	protected transient Object @NonNull [] keys;
+	protected transient Object @NonNull [] values;
 
 	public AbstractArrayMap()
 	{
@@ -75,7 +78,7 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		this.values = new Object[capacity];
 	}
 
-	public AbstractArrayMap(K[] keys, V[] values)
+	public AbstractArrayMap(K @NonNull [] keys, V @NonNull [] values)
 	{
 		int size = keys.length;
 		if (size != values.length)
@@ -90,7 +93,7 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		this.size = size;
 	}
 
-	public AbstractArrayMap(K[] keys, V[] values, int size)
+	public AbstractArrayMap(K @NonNull [] keys, V @NonNull [] values, int size)
 	{
 		if (keys.length < size)
 		{
@@ -108,21 +111,23 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		this.size = size;
 	}
 
-	public AbstractArrayMap(K[] keys, V[] values, @SuppressWarnings("UnusedParameters") boolean trusted)
+	public AbstractArrayMap(K @NonNull [] keys, V @NonNull [] values,
+		                       @SuppressWarnings("UnusedParameters") boolean trusted)
 	{
 		this.keys = keys;
 		this.values = values;
 		this.size = keys.length;
 	}
 
-	public AbstractArrayMap(K[] keys, V[] values, int size, @SuppressWarnings("UnusedParameters") boolean trusted)
+	public AbstractArrayMap(K @NonNull [] keys, V @NonNull [] values, int size,
+		                       @SuppressWarnings("UnusedParameters") boolean trusted)
 	{
 		this.keys = keys;
 		this.values = values;
 		this.size = size;
 	}
 
-	public AbstractArrayMap(Entry<? extends K, ? extends V>[] entries)
+	public AbstractArrayMap(Entry<? extends K, ? extends V> @NonNull [] entries)
 	{
 		this(entries.length);
 		for (Entry<? extends K, ? extends V> entry : entries)
@@ -131,38 +136,38 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		}
 	}
 
-	public AbstractArrayMap(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public AbstractArrayMap(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
 	{
 		this();
 		this.loadEntries(iterable);
 	}
 
-	public AbstractArrayMap(SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public AbstractArrayMap(@NonNull SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
 	{
 		this(iterable.size());
 		this.loadEntries(iterable);
 	}
 
-	public AbstractArrayMap(Set<? extends Entry<? extends K, ? extends V>> set)
+	public AbstractArrayMap(@NonNull Set<? extends Entry<? extends K, ? extends V>> set)
 	{
 		this(set.size());
 		this.loadDistinctEntries(set);
 	}
 
-	public AbstractArrayMap(Map<? extends K, ? extends V> map)
+	public AbstractArrayMap(@NonNull Map<? extends K, ? extends V> map)
 	{
 		this(map.size());
 		this.loadDistinctEntries(map);
 	}
 
-	public AbstractArrayMap(AbstractArrayMap<? extends K, ? extends V> map)
+	public AbstractArrayMap(@NonNull AbstractArrayMap<? extends K, ? extends V> map)
 	{
 		this.size = map.size;
 		this.keys = map.keys.clone();
 		this.values = map.values.clone();
 	}
 
-	private void loadEntries(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	private void loadEntries(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
 	{
 		for (Entry<? extends K, ? extends V> entry : iterable)
 		{
@@ -170,7 +175,7 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		}
 	}
 
-	private void loadDistinctEntries(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	private void loadDistinctEntries(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
 	{
 		int index = 0;
 		for (Entry<? extends K, ? extends V> entry : iterable)
@@ -216,11 +221,13 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		}
 	}
 
+	@NonNull
 	@Override
 	public Iterator<Entry<K, V>> iterator()
 	{
 		return new ArrayIterator<Entry<K, V>>()
 		{
+			@NonNull
 			@Override
 			public Entry<K, V> next()
 			{
@@ -229,6 +236,7 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		};
 	}
 
+	@NonNull
 	@Override
 	public Iterator<K> keyIterator()
 	{
@@ -242,11 +250,13 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		};
 	}
 
+	@NonNull
 	@Override
 	public Iterator<V> valueIterator()
 	{
 		return new ArrayIterator<V>()
 		{
+			@NonNull
 			@Override
 			public V next()
 			{
@@ -272,6 +282,7 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		this.values[index] = value;
 	}
 
+	@Nullable
 	protected V putInternal(K key, V value)
 	{
 		for (int i = 0; i < this.size; i++)
@@ -291,7 +302,7 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 	protected abstract void removeAt(int index);
 
 	@Override
-	public void forEach(Consumer<? super Entry<K, V>> action)
+	public void forEach(@NonNull Consumer<? super Entry<K, V>> action)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -300,7 +311,7 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 	}
 
 	@Override
-	public void forEach(BiConsumer<? super K, ? super V> action)
+	public void forEach(@NonNull BiConsumer<? super K, ? super V> action)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -309,7 +320,7 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 	}
 
 	@Override
-	public void forEachKey(Consumer<? super K> action)
+	public void forEachKey(@NonNull Consumer<? super K> action)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -318,7 +329,7 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 	}
 
 	@Override
-	public void forEachValue(Consumer<? super V> action)
+	public void forEachValue(@NonNull Consumer<? super V> action)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -327,7 +338,7 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 	}
 
 	@Override
-	public boolean containsKey(Object key)
+	public boolean containsKey(@Nullable Object key)
 	{
 		if (key == null)
 		{
@@ -351,7 +362,7 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 	}
 
 	@Override
-	public boolean contains(Object key, Object value)
+	public boolean contains(@Nullable Object key, @Nullable Object value)
 	{
 		if (key == null)
 		{
@@ -375,7 +386,7 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 	}
 
 	@Override
-	public boolean containsValue(Object value)
+	public boolean containsValue(@Nullable Object value)
 	{
 		if (value == null)
 		{
@@ -398,7 +409,7 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		return false;
 	}
 
-	protected int getIndex(Object key)
+	protected int getIndex(@Nullable Object key)
 	{
 		if (key == null)
 		{
@@ -421,6 +432,7 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		return -1;
 	}
 
+	@Nullable
 	@Override
 	public V get(Object key)
 	{
@@ -432,8 +444,9 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		return (V) this.values[index];
 	}
 
+	@NonNull
 	@Override
-	public Option<V> getOption(Object key)
+	public Option<V> getOption(@Nullable Object key)
 	{
 		if (key == null)
 		{
@@ -457,7 +470,7 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 	}
 
 	@Override
-	public void toArray(int index, Entry<K, V>[] store)
+	public void toArray(int index, @NonNull Entry<K, V> @NonNull [] store)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -466,35 +479,39 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 	}
 
 	@Override
-	public void toKeyArray(int index, Object[] store)
+	public void toKeyArray(int index, Object @NonNull [] store)
 	{
 		System.arraycopy(this.keys, 0, store, index, this.size);
 	}
 
 	@Override
-	public void toValueArray(int index, Object[] store)
+	public void toValueArray(int index, Object @NonNull [] store)
 	{
 		System.arraycopy(this.values, 0, store, index, this.size);
 	}
 
+	@NonNull
 	@Override
 	public <RK, RV> MutableMap<RK, RV> emptyCopy()
 	{
 		return new dyvil.collection.mutable.ArrayMap<>();
 	}
 
+	@NonNull
 	@Override
 	public <RK, RV> MutableMap<RK, RV> emptyCopy(int capacity)
 	{
 		return new dyvil.collection.mutable.ArrayMap<>(capacity);
 	}
 
+	@NonNull
 	@Override
 	public MutableMap<K, V> mutableCopy()
 	{
 		return new dyvil.collection.mutable.ArrayMap<>(this);
 	}
 
+	@NonNull
 	@Override
 	public ImmutableMap<K, V> immutableCopy()
 	{
@@ -554,7 +571,7 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		return Map.mapHashCode(this);
 	}
 
-	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	private void writeObject(java.io.@NonNull ObjectOutputStream out) throws IOException
 	{
 		out.defaultWriteObject();
 
@@ -567,7 +584,7 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		}
 	}
 
-	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	private void readObject(java.io.@NonNull ObjectInputStream in) throws IOException, ClassNotFoundException
 	{
 		in.defaultReadObject();
 

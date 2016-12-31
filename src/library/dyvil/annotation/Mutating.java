@@ -1,5 +1,7 @@
 package dyvil.annotation;
 
+import dyvil.annotation.internal.NonNull;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -18,7 +20,7 @@ import java.lang.annotation.Target;
 public @interface Mutating
 {
 	String VALUE_DEFAULT = "Invalid invocation of mutating method {method} on immutable type {type}";
-	
+
 	/**
 	 * Returns the error to be reported by the compiler when a mutating method is called on an immutable callee.
 	 * <p>
@@ -27,5 +29,5 @@ public @interface Mutating
 	 *
 	 * @return the error to be reported by the compiler
 	 */
-	String value() default VALUE_DEFAULT;
+	@NonNull String value() default VALUE_DEFAULT;
 }

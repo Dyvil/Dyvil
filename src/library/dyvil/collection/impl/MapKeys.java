@@ -1,9 +1,7 @@
 package dyvil.collection.impl;
 
-import dyvil.collection.Collection;
-import dyvil.collection.Map;
-import dyvil.collection.Queryable;
-import dyvil.collection.Set;
+import dyvil.annotation.internal.NonNull;
+import dyvil.collection.*;
 
 import java.util.Iterator;
 import java.util.function.Function;
@@ -24,6 +22,7 @@ public class MapKeys<K> implements Queryable<K>
 		return this.entries.size();
 	}
 
+	@NonNull
 	@Override
 	public Iterator<K> iterator()
 	{
@@ -31,42 +30,46 @@ public class MapKeys<K> implements Queryable<K>
 	}
 
 	@Override
-	public void map(Function<? super K, ? extends K> mapper)
+	public void map(@NonNull Function<? super K, ? extends K> mapper)
 	{
 		this.entries.mapKeys(mapper);
 	}
 
 	@Override
-	public void flatMap(Function<? super K, ? extends Iterable<? extends K>> mapper)
+	public void flatMap(@NonNull Function<? super K, ? extends @NonNull Iterable<? extends K>> mapper)
 	{
 		throw new UnsupportedOperationException("flatMap() on Map Keys");
 	}
 
 	@Override
-	public void filter(Predicate<? super K> condition)
+	public void filter(@NonNull Predicate<? super K> condition)
 	{
 		this.entries.filterByKey(condition);
 	}
 
+	@NonNull
 	@Override
-	public <R> Queryable<R> mapped(Function<? super K, ? extends R> mapper)
+	public <R> Queryable<R> mapped(@NonNull Function<? super K, ? extends R> mapper)
 	{
 		final Map<R, ?> entries = this.entries.keyMapped(mapper);
 		return entries.keys();
 	}
 
+	@NonNull
 	@Override
-	public <R> Queryable<R> flatMapped(Function<? super K, ? extends Iterable<? extends R>> mapper)
+	public <R> Queryable<R> flatMapped(@NonNull Function<? super K, ? extends @NonNull Iterable<? extends R>> mapper)
 	{
 		throw new UnsupportedOperationException("flatMapped() on Map Keys");
 	}
 
+	@NonNull
 	@Override
-	public Queryable<K> filtered(Predicate<? super K> condition)
+	public Queryable<K> filtered(@NonNull Predicate<? super K> condition)
 	{
 		return this.entries.filteredByKey(condition).keys();
 	}
 
+	@NonNull
 	@Override
 	public String toString()
 	{

@@ -1,6 +1,7 @@
 package dyvil.io;
 
 import dyvil.annotation.internal.DyvilModifiers;
+import dyvil.annotation.internal.NonNull;
 import dyvil.array.ByteArray;
 import dyvil.reflect.Modifiers;
 
@@ -40,7 +41,7 @@ public final class WebUtils
 	 * @throws IOException
 	 * 	if an IOException occurred.
 	 */
-	public static boolean isAvailable(String url)
+	public static boolean isAvailable(@NonNull String url)
 	{
 		try
 		{
@@ -65,7 +66,7 @@ public final class WebUtils
 	 * 	if an IOException occurred.
 	 */
 	@DyvilModifiers(Modifiers.INFIX)
-	public static boolean isAvailable(URL url) throws IOException
+	public static boolean isAvailable(@NonNull URL url) throws IOException
 	{
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setInstanceFollowRedirects(false);
@@ -86,7 +87,7 @@ public final class WebUtils
 	 * @throws IOException
 	 * 	if an IOException occurred.
 	 */
-	public static byte[] download(String url)
+	public static byte[] download(@NonNull String url)
 	{
 		try
 		{
@@ -112,7 +113,7 @@ public final class WebUtils
 	 * @throws IOException
 	 * 	if an IOException occurred.
 	 */
-	public static byte[] download(URL url) throws IOException
+	public static byte[] download(@NonNull URL url) throws IOException
 	{
 		ReadableByteChannel rbc = Channels.newChannel(url.openStream());
 		ByteBuffer bytebuf = ByteBuffer.allocate(1024);
@@ -131,7 +132,7 @@ public final class WebUtils
 	 * @throws IOException
 	 * 	if an IOException occurred.
 	 */
-	public static boolean download(String url, File output)
+	public static boolean download(@NonNull String url, @NonNull File output)
 	{
 		try (ReadableByteChannel rbc = Channels.newChannel(new URL(url).openStream());
 		     FileOutputStream fos = new FileOutputStream(output))
@@ -156,7 +157,7 @@ public final class WebUtils
 	 * @throws IOException
 	 * 	if an IOException occurred.
 	 */
-	public static boolean download(URL url, File output)
+	public static boolean download(@NonNull URL url, @NonNull File output)
 	{
 		try (ReadableByteChannel rbc = Channels.newChannel(url.openStream());
 		     FileOutputStream fos = new FileOutputStream(output))

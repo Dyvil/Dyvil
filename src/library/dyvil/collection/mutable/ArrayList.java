@@ -1,5 +1,7 @@
 package dyvil.collection.mutable;
 
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractArrayList;
 import dyvil.lang.LiteralConvertible;
@@ -18,92 +20,99 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 
 	// Factory Methods
 
+	@NonNull
 	public static <E> ArrayList<E> apply()
 	{
 		return new ArrayList<>();
 	}
-	
+
+	@NonNull
 	@SafeVarargs
-	public static <E> ArrayList<E> apply(E... elements)
+	public static <E> ArrayList<E> apply(@NonNull E... elements)
 	{
 		return new ArrayList<>(elements, true);
 	}
-	
-	public static <E> ArrayList<E> from(E[] array)
+
+	@NonNull
+	public static <E> ArrayList<E> from(E @NonNull [] array)
 	{
 		return new ArrayList<>(array);
 	}
 
-	public static <E> ArrayList<E> from(Iterable<? extends E> iterable)
+	@NonNull
+	public static <E> ArrayList<E> from(@NonNull Iterable<? extends E> iterable)
 	{
 		return new ArrayList<>(iterable);
 	}
 
-	public static <E> ArrayList<E> from(Collection<? extends E> collection)
+	@NonNull
+	public static <E> ArrayList<E> from(@NonNull Collection<? extends E> collection)
 	{
 		return new ArrayList<>(collection);
 	}
 
 	// Constructors
-	
+
 	public ArrayList()
 	{
 		super();
 	}
-	
+
 	public ArrayList(int capacity)
 	{
 		super(capacity);
 	}
 
-	public ArrayList(E[] elements)
+	public ArrayList(E @NonNull [] elements)
 	{
 		super(elements);
 	}
-	
-	public ArrayList(E[] elements, boolean trusted)
+
+	public ArrayList(E @NonNull [] elements, boolean trusted)
 	{
 		super(elements, elements.length, trusted);
 	}
-	
-	public ArrayList(E[] elements, int size)
+
+	public ArrayList(E @NonNull [] elements, int size)
 	{
 		super(elements, size);
 	}
-	
+
 	public ArrayList(E[] elements, int size, boolean trusted)
 	{
 		super(elements, size, trusted);
 	}
 
-	public ArrayList(Iterable<? extends E> iterable)
+	public ArrayList(@NonNull Iterable<? extends E> iterable)
 	{
 		super(iterable);
 	}
 
-	public ArrayList(Collection<? extends E> collection)
+	public ArrayList(@NonNull Collection<? extends E> collection)
 	{
 		super(collection);
 	}
 
-	public ArrayList(AbstractArrayList<? extends E> arrayList)
+	public ArrayList(@NonNull AbstractArrayList<? extends E> arrayList)
 	{
 		super(arrayList);
 	}
 
 	// Implementation Methods
-	
+
+	@NonNull
 	@Override
 	public MutableList<E> subList(int startIndex, int length)
 	{
 		List.rangeCheck(startIndex, this.size);
 		List.rangeCheck(startIndex + length - 1, this.size);
-		
+
 		Object[] array = new Object[length];
 		System.arraycopy(this.elements, startIndex, array, 0, length);
 		return new ArrayList<>((E[]) array, length, true);
 	}
-	
+
+	@NonNull
 	@Override
 	public MutableList<E> copy(int capacity)
 	{
@@ -111,7 +120,8 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		System.arraycopy(this.elements, 0, newArray, 0, this.size);
 		return new ArrayList<>((E[]) newArray, this.size, true);
 	}
-	
+
+	@NonNull
 	@Override
 	public MutableList<E> reversed()
 	{
@@ -123,13 +133,13 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		}
 		return new ArrayList<>((E[]) newArray, this.size, true);
 	}
-	
+
 	@Override
 	public void addElement(E element)
 	{
 		this.addInternal(element);
 	}
-	
+
 	@Override
 	public void clear()
 	{
@@ -137,10 +147,10 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		{
 			this.elements[i] = null;
 		}
-		
+
 		this.size = 0;
 	}
-	
+
 	protected void resize(int newLength)
 	{
 		if (newLength < this.size)
@@ -156,13 +166,13 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		this.ensureCapacityInternal(newLength);
 		this.size = newLength;
 	}
-	
+
 	@Override
 	public void ensureCapacity(int minSize)
 	{
 		this.ensureCapacityInternal(minSize);
 	}
-	
+
 	@Override
 	public void subscript_$eq(int index, E element)
 	{
@@ -170,6 +180,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		this.elements[index] = element;
 	}
 
+	@NonNull
 	@Override
 	public E set(int index, E element)
 	{
@@ -179,6 +190,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		return oldValue;
 	}
 
+	@Nullable
 	@Override
 	public E setResizing(int index, E element)
 	{
@@ -191,12 +203,12 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		{
 			this.resize(index + 1);
 		}
-		
+
 		E e = (E) this.elements[index];
 		this.elements[index] = element;
 		return e;
 	}
-	
+
 	@Override
 	public void insert(int index, E element)
 	{
@@ -206,15 +218,15 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 			return;
 		}
 		List.rangeCheck(index, this.size);
-		
+
 		this.ensureCapacityInternal(this.size + 1);
 		System.arraycopy(this.elements, index, this.elements, index + 1, this.size - index);
 		this.elements[index] = element;
 		this.size++;
 	}
-	
+
 	@Override
-	public boolean addAll(Collection<? extends E> collection)
+	public boolean addAll(@NonNull Collection<? extends E> collection)
 	{
 		if (collection.isEmpty())
 		{
@@ -224,7 +236,7 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		this.addAllInternal(collection);
 		return true;
 	}
-	
+
 	@Override
 	public boolean remove(Object element)
 	{
@@ -243,10 +255,10 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 				this.elements[this.size] = null;
 			}
 		}
-		
+
 		return removed;
 	}
-	
+
 	@Override
 	public void removeAt(int index)
 	{
@@ -258,9 +270,9 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		}
 		this.elements[this.size] = null;
 	}
-	
+
 	@Override
-	public boolean removeAll(Collection<?> collection)
+	public boolean removeAll(@NonNull Collection<?> collection)
 	{
 		boolean removed = false;
 		int index = 0;
@@ -281,9 +293,9 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		this.size = index;
 		return removed;
 	}
-	
+
 	@Override
-	public boolean retainAll(Collection<? extends E> collection)
+	public boolean retainAll(@NonNull Collection<? extends E> collection)
 	{
 		boolean removed = false;
 		int index = 0;
@@ -304,9 +316,9 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		this.size = index;
 		return removed;
 	}
-	
+
 	@Override
-	public void filter(Predicate<? super E> condition)
+	public void filter(@NonNull Predicate<? super E> condition)
 	{
 		int index = 0;
 		Object[] array = new Object[this.size];
@@ -321,18 +333,18 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 		this.elements = array;
 		this.size = index;
 	}
-	
+
 	@Override
-	public void map(Function<? super E, ? extends E> mapper)
+	public void map(@NonNull Function<? super E, ? extends E> mapper)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
 			this.elements[i] = mapper.apply((E) this.elements[i]);
 		}
 	}
-	
+
 	@Override
-	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper)
+	public void flatMap(@NonNull Function<? super E, ? extends @NonNull Iterable<? extends E>> mapper)
 	{
 		Object[] array = new Object[this.size << 2];
 		int index = 0;
@@ -349,11 +361,11 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 				array[index++] = e;
 			}
 		}
-		
+
 		this.elements = array;
 		this.size = index;
 	}
-	
+
 	@Override
 	public void reverse()
 	{
@@ -364,37 +376,39 @@ public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 			this.elements[end] = temp;
 		}
 	}
-	
+
 	@Override
 	public void sort()
 	{
 		Arrays.sort(this.elements, 0, this.size);
 	}
-	
+
 	@Override
-	public void sort(Comparator<? super E> comparator)
+	public void sort(@NonNull Comparator<? super E> comparator)
 	{
 		Arrays.sort((E[]) this.elements, 0, this.size, comparator);
 	}
-	
+
 	@Override
 	public void distinguish()
 	{
 		this.size = Set.distinct(this.elements, this.size);
 	}
-	
+
 	@Override
-	public void distinguish(Comparator<? super E> comparator)
+	public void distinguish(@NonNull Comparator<? super E> comparator)
 	{
 		this.size = Set.sortDistinct((E[]) this.elements, this.size, comparator);
 	}
-	
+
+	@NonNull
 	@Override
 	public MutableList<E> copy()
 	{
 		return this.mutableCopy();
 	}
 
+	@NonNull
 	@Override
 	public ImmutableList<E> immutable()
 	{

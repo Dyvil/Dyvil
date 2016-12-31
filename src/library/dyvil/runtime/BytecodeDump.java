@@ -1,15 +1,17 @@
 package dyvil.runtime;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.io.FileUtils;
 
 import java.io.File;
 
 public class BytecodeDump
 {
+	// TODO add system property
 	private static final File dumpDirectory = new File("runtimebin");
 
 	@SuppressWarnings("ConstantConditions")
-	public static void dump(byte[] bytes, String className)
+	public static void dump(byte @NonNull [] bytes, @NonNull String className)
 	{
 		if (dumpDirectory != null)
 		{
