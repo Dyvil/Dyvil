@@ -55,6 +55,12 @@ public class TypeVarType implements IRawType
 	}
 
 	@Override
+	public boolean useNonNullAnnotation()
+	{
+		return false;
+	}
+
+	@Override
 	public Name getName()
 	{
 		return this.typeParameter.getName();
