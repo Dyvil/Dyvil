@@ -1,0 +1,19 @@
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
+
+package dyvil.ref
+
+import dyvil.ref.boxed.Boxed##TYPE_NAME##Ref
+
+public interface TYPE_NAME##Ref
+{
+	func get(): PRIMITIVE
+
+	func set(PRIMITIVE value): void
+
+	infix inline func *(TYPE_NAME##Ref ref): PRIMITIVE = ref.get
+
+	infix inline func *_=(TYPE_NAME##Ref ref, PRIMITIVE value): void = ref.set(value)
+
+	postfix func boxed(TYPE_NAME##Ref ref): ObjectRef<WRAPPER> = new Boxed##TYPE_NAME##Ref(ref)
+}

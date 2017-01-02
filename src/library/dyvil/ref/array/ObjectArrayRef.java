@@ -18,7 +18,7 @@ public class ObjectArrayRef<T> implements ObjectRef<T>
 	{
 		return this.array[this.index];
 	}
-	
+
 	@Override
 	public void set(T value)
 	{

@@ -1,0 +1,28 @@
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
+
+package dyvil.ref
+
+import dyvil.ref.unboxed._
+
+public interface ObjectRef<T>
+{
+	func get(): T
+
+	func set(T value): void
+
+	// Operators
+
+	static inline func * <T>(ObjectRef<T> ref): T = ref.get
+
+	static inline func *_= <T>(ObjectRef<T> ref, T value): void = ref.set(value)
+
+	// Unbox Conversion Methods
+#import Base.dgs
+#foreach PRIMITIVE_SPECS
+
+	@BytecodeName("unbox##TYPE_NAME")
+	static postfix func unboxed(ObjectRef<WRAPPER> ref): TYPE_NAME##Ref
+		= new Unboxed##TYPE_NAME##Ref(ref)
+#endfor
+}
