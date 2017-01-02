@@ -2,7 +2,6 @@ package dyvil.collection.immutable;
 
 import dyvil.annotation.Immutable;
 import dyvil.annotation.internal.NonNull;
-import dyvil.annotation.internal.Nullable;
 import dyvil.collection.Collection;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.List;
@@ -112,7 +111,6 @@ public class SingletonList<E> implements ImmutableList<E>
 		throw new IndexOutOfBoundsException("Index out of bounds for Singleton List");
 	}
 
-	@Nullable
 	@Override
 	public E get(int index)
 	{

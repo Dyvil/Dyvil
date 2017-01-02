@@ -689,7 +689,6 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 		return entry != null && Objects.equals(value, entry.value);
 	}
 
-	@Nullable
 	@Override
 	public V get(Object key)
 	{

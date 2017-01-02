@@ -334,7 +334,6 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		return false;
 	}
 
-	@Nullable
 	@Override
 	public V get(@NonNull Object key)
 	{

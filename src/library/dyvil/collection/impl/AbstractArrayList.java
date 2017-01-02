@@ -306,7 +306,6 @@ public abstract class AbstractArrayList<E> implements List<E>
 		return false;
 	}
 
-	@NonNull
 	@Override
 	public E get(int index)
 	{

@@ -83,7 +83,6 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 	@Override
 	Iterator<E> reverseIterator();
 
-	@Nullable
 	@Override
 	E get(int index);
 

@@ -142,7 +142,6 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 		return Spliterators.spliterator(this.valueIterator(), this.size(), Spliterator.IMMUTABLE);
 	}
 
-	@Nullable
 	@Override
 	V get(Object key);
 

@@ -432,7 +432,6 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		return -1;
 	}
 
-	@Nullable
 	@Override
 	public V get(Object key)
 	{

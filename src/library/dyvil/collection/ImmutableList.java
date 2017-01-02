@@ -4,7 +4,6 @@ import dyvil.annotation.Immutable;
 import dyvil.annotation.Mutating;
 import dyvil.annotation.internal.Covariant;
 import dyvil.annotation.internal.NonNull;
-import dyvil.annotation.internal.Nullable;
 import dyvil.collection.immutable.AppendList;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.collection.immutable.EmptyList;
@@ -150,7 +149,6 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.SIZED | Spliterator.IMMUTABLE);
 	}
 
-	@Nullable
 	@Override
 	E get(int index);
 

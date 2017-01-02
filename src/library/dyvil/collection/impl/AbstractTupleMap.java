@@ -347,7 +347,6 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 		return false;
 	}
 
-	@Nullable
 	@Override
 	public V get(Object key)
 	{

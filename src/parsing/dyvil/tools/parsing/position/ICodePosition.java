@@ -1,10 +1,12 @@
 package dyvil.tools.parsing.position;
 
+import dyvil.annotation.internal.NonNull;
+
 public interface ICodePosition
 {
-	ICodePosition ORIGIN = new CodePosition(1, 0, 1);
+	@NonNull ICodePosition ORIGIN = new CodePosition(1, 0, 1);
 
-	static ICodePosition before(ICodePosition next)
+	static @NonNull ICodePosition before(@NonNull ICodePosition next)
 	{
 		final int startLine = next.startLine();
 		int startIndex = next.startIndex();
@@ -15,14 +17,14 @@ public interface ICodePosition
 		return new CodePosition(startLine, startLine, startIndex - 1, startIndex);
 	}
 
-	static ICodePosition after(ICodePosition prev)
+	static @NonNull ICodePosition after(@NonNull ICodePosition prev)
 	{
 		final int endLine = prev.endLine();
 		final int endIndex = prev.endIndex();
 		return new CodePosition(endLine, endLine, endIndex, endIndex + 1);
 	}
 
-	static ICodePosition between(ICodePosition start, ICodePosition end)
+	static @NonNull ICodePosition between(@NonNull ICodePosition start, @NonNull ICodePosition end)
 	{
 		int startIndex = start.endIndex();
 		int endIndex = end.startIndex();
@@ -42,16 +44,16 @@ public interface ICodePosition
 
 	int endLine();
 
-	ICodePosition raw();
+	@NonNull ICodePosition raw();
 
-	ICodePosition to(ICodePosition end);
+	@NonNull ICodePosition to(@NonNull ICodePosition end);
 
-	default boolean isBefore(ICodePosition position)
+	default boolean isBefore(@NonNull ICodePosition position)
 	{
 		return this.endIndex() < position.startIndex();
 	}
 
-	default boolean isAfter(ICodePosition position)
+	default boolean isAfter(@NonNull ICodePosition position)
 	{
 		return this.startIndex() > position.endIndex();
 	}

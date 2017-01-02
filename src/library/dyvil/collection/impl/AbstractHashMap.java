@@ -556,7 +556,6 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		return entry != null && Objects.equals(entry.value, value);
 	}
 
-	@Nullable
 	@Override
 	public V get(Object key)
 	{

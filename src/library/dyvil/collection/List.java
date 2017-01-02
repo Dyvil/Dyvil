@@ -153,7 +153,6 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * @throws IndexOutOfBoundsException
 	 * 	if the index is out of the bounds of this list
 	 */
-	@Nullable
 	default E subscript(int index)
 	{
 		return this.get(index);
@@ -206,7 +205,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 	 * @throws IndexOutOfBoundsException
 	 * 	if the index is out of the bounds of this list
 	 */
-	@Nullable E get(int index);
+	E get(int index);
 
 	// Non-mutating Operations
 

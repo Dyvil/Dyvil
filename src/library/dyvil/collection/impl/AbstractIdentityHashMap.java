@@ -541,7 +541,6 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 		}
 	}
 
-	@Nullable
 	@Override
 	public V get(Object key)
 	{

@@ -102,7 +102,6 @@ public final class EmptyMap<K, V> implements ImmutableMap<K, V>
 		return false;
 	}
 
-	@Nullable
 	@Override
 	public V get(Object key)
 	{

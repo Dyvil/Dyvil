@@ -81,7 +81,6 @@ public interface MutableMap<K, V> extends Map<K, V>
 	@Override
 	Iterator<V> valueIterator();
 
-	@Nullable
 	@Override
 	V get(Object key);
 

@@ -19,9 +19,9 @@ public interface Deque<E> extends BidiQueryable<E>, Queue<E>, Stack<E>
 	// Collection Methods
 
 	@Override
-	default boolean contains(Object o)
+	default boolean contains(Object element)
 	{
-		return Collection.iterableContains(this, o);
+		return Collection.iterableContains(this, element);
 	}
 
 	/**
@@ -51,18 +51,18 @@ public interface Deque<E> extends BidiQueryable<E>, Queue<E>, Stack<E>
 	/**
 	 * Adds the given element to the front of this deque.
 	 *
-	 * @param e
+	 * @param element
 	 * 	the element to add.
 	 */
-	void addFirst(E e);
+	void addFirst(E element);
 
 	/**
 	 * Adds the given element to the end of this deque.
 	 *
-	 * @param e
+	 * @param element
 	 * 	the element to add.
 	 */
-	void addLast(E e);
+	void addLast(E element);
 
 	/**
 	 * Removes and returns the first element in this deque.
@@ -148,9 +148,9 @@ public interface Deque<E> extends BidiQueryable<E>, Queue<E>, Stack<E>
 	// Stack Methods
 
 	@Override
-	default void push(E e)
+	default void push(E element)
 	{
-		this.addFirst(e);
+		this.addFirst(element);
 	}
 
 	@Nullable

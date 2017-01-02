@@ -115,7 +115,6 @@ public final class EmptyList<E> implements ImmutableList<E>
 		throw new IndexOutOfBoundsException("Empty List.apply()");
 	}
 
-	@Nullable
 	@Override
 	public E get(int index)
 	{

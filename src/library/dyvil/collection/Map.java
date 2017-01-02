@@ -339,7 +339,6 @@ public interface Map<K, V> extends SizedIterable<Entry<K, V>>, Serializable
 	 *
 	 * @return the value
 	 */
-	@Nullable
 	default V subscript(Object key)
 	{
 		return this.get(key);
@@ -374,7 +373,6 @@ public interface Map<K, V> extends SizedIterable<Entry<K, V>>, Serializable
 	 *
 	 * @return the value
 	 */
-	@Nullable
 	default V get(Object key)
 	{
 		final Entry<? extends K, ? extends V> entry = this.getEntry(key);
