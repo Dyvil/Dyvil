@@ -235,7 +235,7 @@ public class ParameterList implements IParameterList
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			final IType parameterType = this.parameters[i].getInternalType();
+			final IType parameterType = this.parameters[i].getType();
 			if (parameterType.isGenericType() || parameterType.hasTypeVariables())
 			{
 				return true;
@@ -249,7 +249,7 @@ public class ParameterList implements IParameterList
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].getInternalType().appendSignature(builder, false);
+			this.parameters[i].getType().appendSignature(builder, false);
 		}
 	}
 
