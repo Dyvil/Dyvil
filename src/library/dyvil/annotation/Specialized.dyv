@@ -7,7 +7,9 @@ import java.lang.annotation.ElementType
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target([ ElementType.TYPE_PARAMETER ])
-public @interface Specialized([Class] value = COMMONS)
+public @interface Specialized(
+	let value: [Class<_>] = DEFAULT_CLASSES
+)
 {
-	public static final [Class] COMMONS = [ class int, class long, class float, class double ];
+	public const let DEFAULT_CLASSES: [Class<_>] = [ class int, class long, class float, class double ]
 }

@@ -818,7 +818,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 
 		final IValue value = mutatingAnnotation.getArguments().getValue(0, Annotation.VALUE);
-		final String stringValue = value != null ? value.stringValue() : Mutating.VALUE_DEFAULT;
+		final String stringValue = value != null ? value.stringValue() : Mutating.DEFAULT_MESSAGE;
 		StringBuilder builder = new StringBuilder(stringValue);
 
 		int index = builder.indexOf("{method}");

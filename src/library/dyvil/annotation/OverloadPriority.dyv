@@ -4,7 +4,9 @@ import java.lang.annotation._
 
 @Target([ ElementType.METHOD, ElementType.CONSTRUCTOR ])
 @Retention(RetentionPolicy.CLASS)
-public @interface OverloadPriority(let value: int = DEFAULT_PRIORITY)
+public @interface OverloadPriority(
+	let value: int = DEFAULT_PRIORITY
+)
 {
-	const let DEFAULT_PRIORITY: int = 1
+	public const let DEFAULT_PRIORITY: int = 1
 }
