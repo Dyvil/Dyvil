@@ -66,7 +66,7 @@ public final class ThrowStatement extends AbstractValue implements IValueConsume
 	@Override
 	public IType getType()
 	{
-		return Types.VOID;
+		return Types.NONE;
 	}
 
 	@Override
@@ -84,7 +84,7 @@ public final class ThrowStatement extends AbstractValue implements IValueConsume
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		return 1;
+		return IValue.SECONDARY_SUBTYPE_MATCH;
 	}
 
 	@Override

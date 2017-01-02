@@ -95,11 +95,6 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	@Override
 	public IType getType()
 	{
-		if (DISALLOW_EXPRESSIONS)
-		{
-			return Types.VOID;
-		}
-
 		if (this.commonType != null)
 		{
 			return this.commonType;
@@ -126,11 +121,6 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (DISALLOW_EXPRESSIONS && !Types.isVoid(type))
-		{
-			return null;
-		}
-
 		if (this.action != null)
 		{
 			this.action = TypeChecker
