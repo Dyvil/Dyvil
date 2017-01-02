@@ -62,7 +62,7 @@ public class Main
 		errors.add message
 	}
 
-	public static void test(String testName, any expected, any actual)
+	public static void test(String testName, any! expected, any! actual)
 	{
 		test(testName, expected, actual, expected == actual)
 	}

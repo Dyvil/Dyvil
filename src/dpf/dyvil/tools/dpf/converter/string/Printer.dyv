@@ -118,7 +118,7 @@ public class Printer implements NodeVisitor, ValueVisitor, ListVisitor, MapVisit
 		return this
 	}
 
-	public override ValueVisitor visitParameter(Name name)
+	public override ValueVisitor visitParameter(Name! name)
 	{
 		this.holder(name == null ? "Parameter:" : "Parameter '\(name)':")
 		return this

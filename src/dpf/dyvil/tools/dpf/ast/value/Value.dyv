@@ -64,11 +64,9 @@ public interface Value extends IASTNode
 
 	// Override Methods
 
-	override ICodePosition getPosition() = ICodePosition.ORIGIN
+	override ICodePosition! getPosition() = null
 
-	override void setPosition(ICodePosition position) { }
-
-	override void expandPosition(ICodePosition position) { }
+	override void setPosition(ICodePosition! position) { }
 
 	override void toString(String indent, StringBuilder buffer)
 

@@ -36,9 +36,9 @@ public case class Parameter
 
 	protected override void visitValue(Value value) = this.value = value
 
-	public override ICodePosition getPosition() = ICodePosition.ORIGIN
+	public override ICodePosition! getPosition() = null
 
-	public override void setPosition(ICodePosition position) { }
+	public override void setPosition(ICodePosition! position) { }
 
 	public override Parameter expand(Map<String, Object> mappings, boolean mutate)
 	{

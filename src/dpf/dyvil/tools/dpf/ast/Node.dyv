@@ -151,7 +151,7 @@ public class Node implements NodeElement, NodeVisitor, Expandable
 		}
 	}
 
-	public override func equals(Object obj): boolean
+	public override func equals(Object! obj): boolean
 	{
 		if (this === obj) return true
 		if (!(obj is Node)) return false

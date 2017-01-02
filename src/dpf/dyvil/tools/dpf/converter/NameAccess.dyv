@@ -12,12 +12,9 @@ public class NameAccess(
 
 	public static func apply(Object value, String name): NameAccess = new NameAccess(value, name)
 
-	protected override void visitObject(Object o)
-	{
-		this.value = o;
-	}
+	protected override void visitObject(Object! o) = this.value = o
 	
-	public override Object expand(Map<String, Object> mappings, boolean mutate) = mappings[this.toString]
+	public override Object expand(Map<String, Object> mappings, boolean mutate) = mappings[this.toString] ?? this
 
 	public override String toString()
 	{

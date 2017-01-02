@@ -162,7 +162,7 @@ public class Builder implements Value, BuilderVisitor, Expandable
 		}
 	}
 
-	public override boolean equals(Object o)
+	public override boolean equals(Object! o)
 	{
 		if (this === o) return true
 		if (!(o is Builder)) return false

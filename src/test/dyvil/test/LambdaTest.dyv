@@ -43,8 +43,8 @@ public class LambdaTest
 		let nullary4 = { -> float => 2 }
 		// Make sure these compile without errors
 
-		var expected = [ 1 : "A" ]
-		var actual = expected.flatMapped((i, s) => [ (i, s) ])
+		let expected = [ 1 : "A" ]
+		let actual = expected.flatMapped<int, String>((i, s) => [ (i, s) ])
 
 		Main.test("Basic Lambda", expected, actual)
 	}
@@ -54,7 +54,7 @@ public class LambdaTest
 		let fun1 = (int i) -> int => i + 1
 		let fun2 = (int i) -> int => i * 2
 		let fun12 = fun1.andThen fun2
-		let result = (fun12(7))
+		let result = fun12(7)
 
 		Main.test("Function Chain", 16, result)
 	}

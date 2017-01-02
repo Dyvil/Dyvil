@@ -6,8 +6,9 @@ import dyvil.tools.dpf.visitor.NodeVisitor
 import dyvil.tools.dpf.visitor.ValueVisitor
 import dyvil.tools.parsing.Name
 
-public class FlatMapConverter(protected let map: Map<String, Object>
-                              protected let name: String)
+public class FlatMapConverter(
+	protected let map: Map<String, Object>
+	protected let name: String)
 	implements NodeVisitor
 {
 	public init(Map<String, Object> map)
@@ -38,7 +39,7 @@ public class FlatMapConverter(protected let map: Map<String, Object>
 	{
 		let propertyName = this<FlatMapConverter>.getName(name)
 
-		protected override void visitObject(Object o)
+		protected override void visitObject(Object! o)
 		{
 			this<FlatMapConverter>.map.put(this.propertyName, o)
 		}

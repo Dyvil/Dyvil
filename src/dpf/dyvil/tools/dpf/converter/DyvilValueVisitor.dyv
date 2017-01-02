@@ -56,12 +56,12 @@ public abstract class DyvilValueVisitor implements ValueVisitor
 	
 	public override ListVisitor visitList()
 	{
-		let list = new ArrayList<Object>
+		let list = new ArrayList<Object!>
 		return new ListVisitor
 		{
 			public override ValueVisitor visitElement() = new DyvilValueVisitor()
 			{
-				protected override void visitObject(Object o)
+				protected override void visitObject(Object! o)
 				{
 					list.add(o);
 				}
@@ -83,7 +83,7 @@ public abstract class DyvilValueVisitor implements ValueVisitor
 			
 			public override ValueVisitor visitKey() = new DyvilValueVisitor
 			{
-				protected override void visitObject(Object o)
+				protected override void visitObject(Object! o)
 				{
 					key = o
 				}
@@ -91,7 +91,7 @@ public abstract class DyvilValueVisitor implements ValueVisitor
 			
 			public override ValueVisitor visitValue() = new DyvilValueVisitor
 			{
-				protected override void visitObject(Object o)
+				protected override void visitObject(Object! o)
 				{
 				    map.put(key, o)
 				}

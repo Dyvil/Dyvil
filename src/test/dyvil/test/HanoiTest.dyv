@@ -4,21 +4,21 @@ public class HanoiTest
 {
 	private List<String> moves = List<String>
 
-	public static void main([String] args)
+	public static func main([String] args): void
 	{
-		for (int i <- 1 .. 10)
+		for (i <- 1 .. 10)
 		{
 			let test = new HanoiTest(i)
 			Main.test("Hanoi Test \(i)", requiredMoves(i), test.moves.size)
 		}
 	}
 
-	public static int requiredMoves(int n) = (1 << n) - 1
+	public static func requiredMoves(int n): int = (1 << n) - 1
 
 	@LiteralConvertible.FromString
 	class Tower(public final String id) extends dyvil.collection.mutable.LinkedList<int>
 	{
-		public static Tower apply(String id) = new Tower(id)
+		public static func apply(String id): Tower = new Tower(id)
 	}
 
 	public init() { }
@@ -28,30 +28,33 @@ public class HanoiTest
 		this.run(n)
 	}
 
-	public void run(int n)
+	public func run(int n): void
 	{
 		this.moves.clear()
 
-		Tower source = 'source'
-		for (var i <- 1 .. n) source.push(i)	// fill the tower
+		let source: Tower = 'source'
+		for (i <- 1 .. n) source.push(i) // fill the tower
 
 		this.move(n, source, 'helper', 'target')
 	}
 
-	public void move(Tower from, Tower to)
+	public func move(Tower from, Tower to): void
 	{
-		int item = from.pop()
-		this.moves.add "Move \(item) from \(from.id) to \(to.id)"
-		to.push(item)
+		let item = from.pop()
+		if (item != null)
+		{
+			this.moves.add "Move \(item) from \(from.id) to \(to.id)"
+			to.push(item!!)
+		}
 	}
 
-	public void move(int n, Tower from, Tower helper, Tower to)
+	public func move(int n, Tower from, Tower helper, Tower to): void
 	{
 		if n > 0
 		{
-			this.move(n - 1, from, to, helper)	// from -> helper
-			this.move(from, to)			// from -> to
-			this.move(n - 1, helper, from, to)	// helper -> to
+			this.move(n - 1, from, to, helper) // from -> helper
+			this.move(from, to)			       // from -> to
+			this.move(n - 1, helper, from, to) // helper -> to
 		}
 	}
 }
