@@ -8,6 +8,7 @@ import dyvil.annotation.Intrinsic;
 import dyvil.annotation.Mutating;
 import dyvil.annotation.Reified;
 import dyvil.annotation.OverloadPriority;
+import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.DyvilModifiers;
 import dyvil.annotation.internal.Primitive;
 import dyvil.collection.List;
