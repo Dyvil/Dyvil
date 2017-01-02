@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.expression;
 
+import dyvil.tools.asm.AnnotationVisitor;
+import dyvil.tools.asm.Type;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.IConstantValue;
@@ -56,13 +58,7 @@ public final class ClassOperator extends AbstractValue implements IConstantValue
 	{
 		return CLASS_OPERATOR;
 	}
-	
-	@Override
-	public Object toObject()
-	{
-		return null;
-	}
-	
+
 	@Override
 	public IType getType()
 	{
@@ -223,7 +219,13 @@ public final class ClassOperator extends AbstractValue implements IConstantValue
 			this.genericType.writeCast(writer, type, this.getLineNumber());
 		}
 	}
-	
+
+	@Override
+	public void writeAnnotationValue(AnnotationVisitor visitor, String key)
+	{
+		visitor.visit(key, Type.getObjectType(this.type.getInternalName()));
+	}
+
 	@Override
 	public String toString()
 	{

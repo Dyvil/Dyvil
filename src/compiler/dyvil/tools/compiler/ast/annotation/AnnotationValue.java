@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.annotation;
 
+import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.Handle;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.IAnnotationConsumer;
@@ -152,6 +153,14 @@ public class AnnotationValue implements IValue, IAnnotationConsumer
 		{
 			this.annotation.getType().writeCast(writer, type, this.getLineNumber());
 		}
+	}
+
+	@Override
+	public void writeAnnotationValue(AnnotationVisitor visitor, String key)
+	{
+		final AnnotationVisitor av = visitor.visitAnnotation(key, this.annotation.getType().getExtendedName());
+		this.annotation.write(av);
+		av.visitEnd();
 	}
 
 	@Override

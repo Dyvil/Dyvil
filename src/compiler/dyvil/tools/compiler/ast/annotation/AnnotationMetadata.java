@@ -142,15 +142,20 @@ public final class AnnotationMetadata implements IClassMetadata
 
 			final StringBuilder desc = new StringBuilder("()");
 			parameter.getType().appendExtendedName(desc);
-			MethodVisitor mw = writer.visitMethod(Modifiers.PUBLIC | Modifiers.ABSTRACT, parameter.getInternalName(),
-			                                      desc.toString(), null, null);
+
+			final MethodVisitor methodVisitor = writer.visitMethod(Modifiers.PUBLIC | Modifiers.ABSTRACT,
+			                                                       parameter.getInternalName(), desc.toString(), null,
+			                                                       null);
 
 			final IValue argument = parameter.getValue();
 			if (argument != null)
 			{
-				AnnotationVisitor av = mw.visitAnnotationDefault();
-				Annotation.visitValue(av, null, argument);
+				final AnnotationVisitor av = methodVisitor.visitAnnotationDefault();
+				argument.writeAnnotationValue(av, parameter.getInternalName());
+				av.visitEnd();
 			}
+
+			methodVisitor.visitEnd();
 		}
 	}
 }

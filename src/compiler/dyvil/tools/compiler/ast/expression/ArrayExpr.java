@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.expression;
 
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.compiler.ast.access.ClassAccess;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -499,6 +500,17 @@ public final class ArrayExpr implements IValue, IValueList
 			this.values[i].writeExpression(writer, elementType);
 			writer.visitInsn(arrayStoreOpcode);
 		}
+	}
+
+	@Override
+	public void writeAnnotationValue(AnnotationVisitor visitor, String key)
+	{
+		final AnnotationVisitor arrayVisitor = visitor.visitArray(key);
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			this.values[i].writeAnnotationValue(arrayVisitor, null);
+		}
+		arrayVisitor.visitEnd();
 	}
 
 	@Override

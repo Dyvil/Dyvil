@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.constant;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -16,52 +17,64 @@ public class EnumValue implements IConstantValue, INamed
 {
 	public IType type;
 	public Name  name;
-	
+
 	public EnumValue()
 	{
 	}
-	
+
 	public EnumValue(IType type, Name name)
 	{
 		this.type = type;
 		this.name = name;
 	}
-	
-	@Override
-	public ICodePosition getPosition()
-	{
-		return null;
-	}
-	
-	@Override
-	public void setPosition(ICodePosition position)
-	{
-	}
-	
+
 	@Override
 	public int valueTag()
 	{
 		return ENUM_ACCESS;
 	}
-	
+
 	@Override
-	public boolean isPrimitive()
+	public ICodePosition getPosition()
 	{
-		return false;
+		return null;
 	}
-	
+
 	@Override
-	public void setType(IType type)
+	public void setPosition(ICodePosition position)
 	{
-		this.type = type;
 	}
-	
+
+	@Override
+	public boolean isAnnotationConstant()
+	{
+		return true;
+	}
+
 	@Override
 	public IType getType()
 	{
 		return this.type;
 	}
-	
+
+	@Override
+	public void setType(IType type)
+	{
+		this.type = type;
+	}
+
+	@Override
+	public Name getName()
+	{
+		return this.name;
+	}
+
+	@Override
+	public void setName(Name name)
+	{
+		this.name = name;
+	}
+
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
@@ -71,37 +84,25 @@ public class EnumValue implements IConstantValue, INamed
 		}
 		return this.isType(type) ? this : null;
 	}
-	
-	@Override
-	public void setName(Name name)
-	{
-		this.name = name;
-	}
-	
-	@Override
-	public Name getName()
-	{
-		return this.name;
-	}
-	
+
 	@Override
 	public Object toObject()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public int stringSize()
 	{
 		return this.name.qualified.length();
 	}
-	
+
 	@Override
 	public boolean toStringBuilder(StringBuilder builder)
 	{
 		return false;
 	}
-	
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
@@ -115,7 +116,13 @@ public class EnumValue implements IConstantValue, INamed
 			this.type.writeCast(writer, type, this.getLineNumber());
 		}
 	}
-	
+
+	@Override
+	public void writeAnnotationValue(AnnotationVisitor visitor, String key)
+	{
+		visitor.visitEnum(key, this.type.getExtendedName(), this.name.qualified);
+	}
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

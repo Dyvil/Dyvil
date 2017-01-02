@@ -7,11 +7,11 @@ import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.intrinsic.PopExpr;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.reference.IReference;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -476,6 +476,10 @@ public interface IValue extends IASTNode, ITyped
 
 	default void writeAnnotationValue(AnnotationVisitor visitor, String key)
 	{
-		visitor.visit(key, this.toObject());
+		final Object value = this.toObject();
+		if (value != null)
+		{
+			visitor.visit(key, value);
+		}
 	}
 }

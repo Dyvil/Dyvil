@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.annotation;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.asm.AnnotationVisitor;
@@ -7,13 +8,11 @@ import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.metadata.IClassMetadata;
-import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.parameter.*;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
@@ -273,41 +272,10 @@ public final class Annotation implements IAnnotation
 			final IValue argument = this.arguments.getValue(i, parameter);
 			if (argument != null)
 			{
-				visitValue(writer, parameter.getName().qualified, argument);
+				argument.writeAnnotationValue(writer, parameter.getName().qualified);
 			}
 		}
 		writer.visitEnd();
-	}
-
-	public static void visitValue(AnnotationVisitor visitor, String key, IValue value)
-	{
-		int valueType = value.valueTag();
-		if (valueType == IValue.ARRAY)
-		{
-			AnnotationVisitor arrayVisitor = visitor.visitArray(key);
-			ArrayExpr array = (ArrayExpr) value;
-			int count = array.valueCount();
-			for (int i = 0; i < count; i++)
-			{
-				visitValue(arrayVisitor, null, array.getValue(i));
-			}
-			arrayVisitor.visitEnd();
-		}
-		else if (valueType == IValue.ENUM_ACCESS)
-		{
-			EnumValue enumValue = (EnumValue) value;
-			visitor.visitEnum(key, enumValue.type.getExtendedName(), enumValue.name.qualified);
-		}
-		else if (valueType == IValue.ANNOTATION)
-		{
-			IAnnotation annotation = ((AnnotationValue) value).annotation;
-			AnnotationVisitor av = visitor.visitAnnotation(key, annotation.getType().getExtendedName());
-			annotation.write(av);
-		}
-		else if (value.isAnnotationConstant())
-		{
-			visitor.visit(key, value.toObject());
-		}
 	}
 
 	@Override
@@ -331,7 +299,7 @@ public final class Annotation implements IAnnotation
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String prefix, @NonNull StringBuilder buffer)
 	{
 		buffer.append('@');
 		this.type.toString(prefix, buffer);
