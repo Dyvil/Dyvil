@@ -1,26 +1,15 @@
-package dyvil.annotation;
+package dyvil.annotation
 
-import dyvil.annotation.internal.NonNull;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation._
 
 /**
  * Marks a mutating method, i.e. a method that mutates the members of a mutable type. If a method annotated as {@code
  * mutating} is called on any instance of the {@link Immutable} interface, the compiler should report the error
  * specified by {@link #value()}.
- *
- * @author Clashsoft
- * @version 1.0
  */
-@Target(ElementType.METHOD)
+@Target([ ElementType.METHOD ])
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Mutating
-{
-	String VALUE_DEFAULT = "Invalid invocation of mutating method {method} on immutable type {type}";
-
+public @interface Mutating(
 	/**
 	 * Returns the error to be reported by the compiler when a mutating method is called on an immutable callee.
 	 * <p>
@@ -29,5 +18,7 @@ public @interface Mutating
 	 *
 	 * @return the error to be reported by the compiler
 	 */
-	@NonNull String value() default VALUE_DEFAULT;
+	String value = VALUE_DEFAULT)
+{
+	const let VALUE_DEFAULT: String = "Invalid invocation of mutating method {method} on immutable type {type}"
 }

@@ -20,18 +20,7 @@ import dyvil.util.{
 
 // Import useful annotation classes
 
-import dyvil.annotation.{
-	Native    => native
-	Transient => transient
-	Volatile  => volatile
-	Immutable => immutable
-	Mutating  => mutating
-	Reified   => reified
-
-	Intrinsic
-	OverloadPriority
-	Deprecated, Experimental, UsageInfo
-}
+import class dyvil.annotation._
 
 // Import Java base classes
 import java.lang._
