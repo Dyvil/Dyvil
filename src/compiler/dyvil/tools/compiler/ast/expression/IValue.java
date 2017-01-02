@@ -294,7 +294,7 @@ public interface IValue extends IASTNode, ITyped
 
 	default Marker getAnnotationError()
 	{
-		return Markers.semantic(this.getPosition(), "value.constant");
+		return Markers.semanticError(this.getPosition(), "value.constant");
 	}
 
 	static IValue toAnnotationConstant(IValue value, MarkerList markers, IContext context)
@@ -309,7 +309,7 @@ public interface IValue extends IASTNode, ITyped
 		final Marker marker = value.getAnnotationError();
 		marker.addInfo(Markers.getSemantic("value.constant.depth", depth));
 		markers.add(marker);
-		return value.getType().getDefaultValue();
+		return value;
 	}
 
 	default int stringSize()

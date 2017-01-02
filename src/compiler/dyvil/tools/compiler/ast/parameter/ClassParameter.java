@@ -185,6 +185,11 @@ public class ClassParameter extends Field implements IParameter
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
+		if (this.enclosingClass.hasModifier(Modifiers.ANNOTATION))
+		{
+			return;
+		}
+
 		if (this.isVarargs())
 		{
 			this.modifiers.removeIntModifier(Modifiers.VARARGS);

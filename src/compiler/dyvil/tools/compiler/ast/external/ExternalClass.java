@@ -21,7 +21,9 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
@@ -29,8 +31,6 @@ import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
-import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
@@ -680,8 +680,11 @@ public final class ExternalClass extends AbstractClass
 			return null;
 		}
 
-		if ("<init>".equals(name))
+		switch (name)
 		{
+		case "<clinit>":
+			return null;
+		case "<init>":
 			ExternalConstructor constructor = new ExternalConstructor(this);
 			constructor.setModifiers(new FlagModifierSet(access));
 
@@ -710,7 +713,7 @@ public final class ExternalClass extends AbstractClass
 			return new SimpleMethodVisitor(constructor);
 		}
 
-		if (this.isAnnotation())
+		if (this.isAnnotation() && (access & Modifiers.STATIC) == 0)
 		{
 			final ClassParameter param = new ExternalClassParameter(this, Name.fromQualified(name),
 			                                                        ClassFormat.readReturnType(desc),

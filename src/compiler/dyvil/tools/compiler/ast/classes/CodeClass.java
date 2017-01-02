@@ -510,12 +510,6 @@ public class CodeClass extends AbstractClass
 
 		this.writeAnnotations(writer, modifiers);
 
-		if ((modifiers & Modifiers.ANNOTATION) == Modifiers.ANNOTATION)
-		{
-			this.metadata.write(writer);
-			return;
-		}
-
 		// Super Types
 
 		if (this.superType != null)
