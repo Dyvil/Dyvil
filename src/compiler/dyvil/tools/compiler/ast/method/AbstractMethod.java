@@ -34,6 +34,7 @@ import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Mutability;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.typevar.CovariantTypeVarType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -763,12 +764,12 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			final ITypeParameter typeParameter = this.typeParameters[i];
 			final IType typeArgument = genericData.getType(typeParameter.getIndex());
 
-			if (typeArgument == null)
+			if (typeArgument == null || typeArgument instanceof CovariantTypeVarType)
 			{
 				final IType inferredType = typeParameter.getUpperBound();
 				markers.add(Markers.semantic(position, "method.typevar.infer", this.name, typeParameter.getName(),
 				                             inferredType));
-				genericData.addMapping(typeParameter, inferredType);
+				genericData.setType(typeParameter.getIndex(), inferredType);
 			}
 			else if (!typeParameter.isAssignableFrom(typeArgument, genericData))
 			{
@@ -1008,12 +1009,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		if (this.intrinsicData != null)
 		{
 			this.intrinsicData.writeIntrinsic(writer, receiver, arguments, lineNumber);
-
-			if (targetType == null || this.getType().hasTag(IType.TYPE_VAR))
-			{
-				// Optimization: avoid creating a CHECKCAST instruction for intrinsic methods with type parameter return
-				return;
-			}
 		}
 		else
 		{
