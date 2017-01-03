@@ -11,11 +11,11 @@ public class Specializer
 	private static final int IF_BLOCK  = 1;
 	private static final int FOR_BLOCK = 2;
 
-	private final GenSrc         gensrc;
-	private final File           sourceFile;
-	private final List<String>   lines;
-	private final PrintStream    writer;
-	private final ReplacementMap replacements;
+	private final GenSrc             gensrc;
+	private final File               sourceFile;
+	private final List<String>       lines;
+	private final PrintStream        writer;
+	private final LazyReplacementMap replacements;
 
 	public Specializer(GenSrc gensrc, File sourceFile, List<String> lines, PrintStream writer,
 		                  ReplacementMap replacements)
@@ -24,17 +24,12 @@ public class Specializer
 		this.sourceFile = sourceFile;
 		this.lines = lines;
 		this.writer = writer;
-		this.replacements = replacements;
+		this.replacements = new LazyReplacementMap(replacements);
 	}
 
 	public void processLines()
 	{
 		this.processLines(0, this.lines.size(), new LazyReplacementMap(this.replacements), 0, true, true);
-	}
-
-	private int processIf(int start, int end, LazyReplacementMap replacements, boolean outer, boolean condition)
-	{
-		return this.processLines(start, end, new LazyReplacementMap(replacements), IF_BLOCK, outer, condition);
 	}
 
 	private int processLines(int start, int end, LazyReplacementMap replacements, int enclosingBlock,
@@ -170,7 +165,8 @@ public class Specializer
 				continue;
 			case "comment":
 				continue;
-			case "define":
+			case "define": // define in file scope
+			case "local": // define in local scope
 			{
 				if (!processOuter || !ifCondition)
 				{
@@ -188,11 +184,14 @@ public class Specializer
 
 				final String key = line.substring(keyStart, keyEnd);
 				final String value = line.substring(valueStart, length);
-				replacements.define(key, value);
+				final LazyReplacementMap map = directive.equals("local") ? replacements : this.replacements;
+
+				map.define(key, value);
 				continue;
 			}
 			case "undef":
-			case "undefine":
+			case "undefine": // undefine in file scope
+			case "delete": // undefine in local scope
 			{
 				if (!processOuter || !ifCondition)
 				{
@@ -201,7 +200,8 @@ public class Specializer
 				final String key = parseIdentifier(line, directiveEnd, length);
 				if (!key.isEmpty()) // missing key
 				{
-					replacements.undefine(key);
+					final LazyReplacementMap map = directive.equals("delete") ? replacements : this.replacements;
+					map.undefine(key);
 				}
 				continue;
 			}
@@ -211,6 +211,11 @@ public class Specializer
 		}
 
 		return end;
+	}
+
+	private int processIf(int start, int end, LazyReplacementMap replacements, boolean outer, boolean condition)
+	{
+		return this.processLines(start, end, new LazyReplacementMap(replacements), IF_BLOCK, outer, condition);
 	}
 
 	private int processFor(int start, int end, LazyReplacementMap replacements, String line, int directiveEnd,
