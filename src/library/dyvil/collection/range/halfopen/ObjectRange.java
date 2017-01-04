@@ -60,7 +60,7 @@ public class ObjectRange<@Covariant T extends Rangeable<T>> implements dyvil.col
 	@Override
 	public T last()
 	{
-		return this.last.previous();
+		return this.last.prev();
 	}
 
 	@Override
