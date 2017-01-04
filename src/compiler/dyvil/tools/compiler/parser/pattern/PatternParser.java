@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.pattern.operator.AndPattern;
 import dyvil.tools.compiler.ast.pattern.operator.OrPattern;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.parser.ParserUtil;
+import dyvil.tools.compiler.parser.classes.DataMemberParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
@@ -24,7 +25,6 @@ public class PatternParser extends Parser implements ITypeConsumer
 {
 	private static final int PATTERN         = 0;
 	private static final int NEGATIVE_NUMBER = 1;
-	private static final int VAR_IDENTIFIER  = 2;
 	private static final int TYPE_END        = 4;
 	private static final int TUPLE_END       = 8;
 	private static final int CASE_CLASS_END  = 16;
@@ -106,7 +106,11 @@ public class PatternParser extends Parser implements ITypeConsumer
 				this.mode = END;
 				return;
 			case DyvilKeywords.VAR:
-				this.mode = VAR_IDENTIFIER;
+			case DyvilKeywords.LET:
+				final BindingPattern pattern = new BindingPattern();
+				pm.pushParser(new DataMemberParser<>(pattern), true);
+				this.pattern = pattern;
+				this.mode = END;
 				return;
 			case BaseSymbols.OPEN_PARENTHESIS:
 				final TuplePattern tuplePattern = new TuplePattern(token);
@@ -171,7 +175,7 @@ public class PatternParser extends Parser implements ITypeConsumer
 			case Tokens.LETTER_IDENTIFIER:
 			case Tokens.SPECIAL_IDENTIFIER:
 				// Do NOT create a BindingPattern for Symbol Identifiers (like | or &)
-				this.pattern = new BindingPattern(token.raw(), this.type, token.nameValue());
+				this.pattern = new BindingPattern(token.raw(), token.nameValue(), this.type);
 				this.mode = END;
 				return;
 			}
@@ -179,15 +183,6 @@ public class PatternParser extends Parser implements ITypeConsumer
 			this.pattern = new ObjectPattern(this.type.getPosition(), this.type);
 			this.mode = END;
 			pm.reparse();
-			return;
-		case VAR_IDENTIFIER:
-			if (!ParserUtil.isIdentifier(type))
-			{
-				pm.report(token, "pattern.binding.identifier");
-				return;
-			}
-			this.pattern = new BindingPattern(token.raw(), token.nameValue());
-			this.mode = END;
 			return;
 		case TUPLE_END:
 			this.mode = END;
