@@ -7,16 +7,17 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
@@ -308,7 +309,7 @@ public final class Variable extends Member implements IVariable
 		if (this.refType != null)
 		{
 			final IClass refClass = this.refType.getTheClass();
-			final IDataMember refField = refClass.getBody().getField(0);
+			final IDataMember refField = refClass.resolveField(Names.value);
 			refField.writeGet_Get(writer, lineNumber);
 
 			if (refClass == ReferenceType.LazyFields.OBJECT_SIMPLE_REF_CLASS)
@@ -334,7 +335,7 @@ public final class Variable extends Member implements IVariable
 	{
 		if (this.refType != null)
 		{
-			final IDataMember refField = this.refType.getTheClass().getBody().getField(0);
+			final IDataMember refField = this.refType.getTheClass().resolveField(Names.value);
 			refField.writeSet_Set(writer, lineNumber);
 		}
 	}

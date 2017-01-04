@@ -15,7 +15,7 @@ public final class Names
 	public static final Name subscript      = Name.fromRaw("subscript");
 	public static final Name subscript_$amp = Name.from("subscript_&", "subscript_$amp");
 	public static final Name subscript_$eq  = Name.from("subscript_=", "subscript_$eq");
-	public static final Name in             = Name.fromRaw("in");
+	public static final Name value          = Name.fromRaw("value");
 	public static final Name length         = Name.fromRaw("length");
 	public static final Name equals         = Name.fromRaw("equals");
 	public static final Name hashCode       = Name.fromRaw("hashCode");
@@ -41,7 +41,7 @@ public final class Names
 
 	public static final Name dynamic = Name.fromRaw("dynamic");
 	public static final Name any     = Name.fromRaw("any");
-	public static final Name none     = Name.fromRaw("none");
+	public static final Name none    = Name.fromRaw("none");
 	public static final Name auto    = Name.fromRaw("auto");
 
 	public static final Name eq    = Name.from("=", "$eq");
