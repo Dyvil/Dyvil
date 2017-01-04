@@ -190,10 +190,10 @@ public class MatchTest
 		Main.test("Match Objects", 1, value)
 	}
 
-	private const int ERROR = 0
-	private const int SUCCESS = 1
+	private const ERROR: int = 0
+	private const SUCCESS: int = 1
 
-	private const Int ERROR_BOXED = ERROR
+	private const ERROR_BOXED: Int = ERROR
 
 	private static void fields()
 	{

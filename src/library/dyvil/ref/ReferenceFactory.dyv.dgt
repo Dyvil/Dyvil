@@ -13,8 +13,8 @@ import java.lang.reflect.Field
 
 public final class ReferenceFactory
 {
-	private const let STATIC_CONSTRUCTOR_TYPE:   MethodType = MethodType.methodType(class void, class Field)
-	private const let INSTANCE_CONSTRUCTOR_TYPE: MethodType = MethodType.methodType(class void, class Object, class long)
+	private const STATIC_CONSTRUCTOR_TYPE:   MethodType = MethodType.methodType(class void, class Field)
+	private const INSTANCE_CONSTRUCTOR_TYPE: MethodType = MethodType.methodType(class void, class Object, class long)
 
 	private static func getField(Class<_> _type, String fieldName): Field throws NoSuchFieldException
 		= _type.getDeclaredField(fieldName)

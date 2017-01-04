@@ -153,6 +153,10 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 				this.setMemberKind(CONSTRUCTOR);
 				this.mode = CONSTRUCTOR_PARAMETERS;
 				return;
+			case DyvilKeywords.CONST:
+				this.modifiers.addIntModifier(Modifiers.CONST);
+				this.setMemberKind(FIELD);
+				// Fallthrough
 			case DyvilKeywords.LET:
 				this.modifiers.addIntModifier(Modifiers.FINAL);
 				this.setMemberKind(FIELD);
@@ -332,7 +336,6 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 			}
 			}
 
-			pm.popParser(true);
 			pm.report(token, "field.separator");
 			return;
 		}
@@ -420,7 +423,6 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 			}
 
 			pm.report(token, this.mode != METHOD_VALUE ? "method.declaration.separator" : "method.body.separator");
-			pm.popParser(true);
 			return;
 		case GENERICS_END:
 			this.mode = PARAMETERS;

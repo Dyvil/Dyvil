@@ -11,5 +11,5 @@ public @interface Specialized(
 	let value: [Class<_>] = DEFAULT_CLASSES
 )
 {
-	public const let DEFAULT_CLASSES: [Class<_>] = [ class int, class long, class float, class double ]
+	public const DEFAULT_CLASSES: [Class<_>] = [ class int, class long, class float, class double ]
 }

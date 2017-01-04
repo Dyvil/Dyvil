@@ -8,5 +8,5 @@ public @interface OverloadPriority(
 	let value: int = DEFAULT_PRIORITY
 )
 {
-	public const let DEFAULT_PRIORITY: int = 1
+	public const DEFAULT_PRIORITY: int = 1
 }

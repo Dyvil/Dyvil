@@ -7,7 +7,7 @@ using   dyvil.reflect.Opcodes._
 
 public abstract class Primitives
 {
-	private const let VOID_INSTANCE: Void = dyvil.reflect.ReflectUtils.UNSAFE.allocateInstance(class Void) as Void
+	private const VOID_INSTANCE: Void = dyvil.reflect.ReflectUtils.UNSAFE.allocateInstance(class Void) as Void
 
 	private init() {}
 
