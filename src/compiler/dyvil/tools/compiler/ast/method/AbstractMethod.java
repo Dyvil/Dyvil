@@ -839,8 +839,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public boolean checkOverride(IMethod candidate, ITypeContext typeContext)
 	{
-		// Check Name
-		if (candidate.getName() != this.name)
+		// Check Name and number of type parameters
+		if (candidate.getName() != this.name || this.typeParameterCount != candidate.typeParameterCount())
 		{
 			return false;
 		}

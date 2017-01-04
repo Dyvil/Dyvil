@@ -382,9 +382,9 @@ public class CodeMethod extends AbstractMethod
 	}
 
 	@Override
-	public void addOverride(IMethod candidate)
+	public void addOverride(IMethod method)
 	{
-		if (!this.enclosingClass.isSubClassOf(candidate.getEnclosingClass().getClassType()))
+		if (!this.enclosingClass.isSubClassOf(method.getEnclosingClass().getClassType()))
 		{
 			return;
 		}
@@ -393,7 +393,7 @@ public class CodeMethod extends AbstractMethod
 		{
 			this.overrideMethods = new IdentityHashSet<>();
 		}
-		this.overrideMethods.add(candidate);
+		this.overrideMethods.add(method);
 	}
 
 	@Override
@@ -655,7 +655,7 @@ public class CodeMethod extends AbstractMethod
 				overrideParameterType.writeCast(methodWriter, parameterType, lineNumber);
 			}
 			// Generate Type Parameters and load reified type arguments
-			for (int i = 0, count = this.typeParameterCount, overrideCount = overrideMethod.typeParameterCount();
+			for (int i = 0, count = this.typeParameterCount;
 			     i < count; i++)
 			{
 				final ITypeParameter thisParameter = this.typeParameters[i];
@@ -665,10 +665,10 @@ public class CodeMethod extends AbstractMethod
 					continue;
 				}
 
-				final ITypeParameter overrideParameter = i < overrideCount ? overrideMethod.getTypeParameter(i) : null;
+				final ITypeParameter overrideParameter = overrideMethod.getTypeParameter(i);
 				this.writeReifyArgument(methodWriter, thisParameter, reifiedType, overrideParameter);
 
-				// Extra type parameters from the overriden method are ignored
+				// Extra type parameters from the overridden method are ignored
 			}
 
 			IType overrideReturnType = overrideMethod.getType();
@@ -684,12 +684,6 @@ public class CodeMethod extends AbstractMethod
 	private void writeReifyArgument(MethodWriter writer, ITypeParameter thisParameter, Reified.Type reifiedType,
 		                               ITypeParameter overrideParameter)
 	{
-		if (overrideParameter == null)
-		{
-			this.writeDefaultReifyArgument(writer, thisParameter, reifiedType);
-			return;
-		}
-
 		overrideParameter.writeParameter(writer);
 		if (overrideParameter.getReifiedKind() == null)
 		{
