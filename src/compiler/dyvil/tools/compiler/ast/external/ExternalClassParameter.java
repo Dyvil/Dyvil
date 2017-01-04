@@ -18,9 +18,10 @@ public class ExternalClassParameter extends ClassParameter
 
 	private int resolved;
 
-	public ExternalClassParameter(IClass enclosingClass, Name name, IType type, ModifierSet modifiers)
+	public ExternalClassParameter(IClass enclosingClass, Name name, String desc, IType type, ModifierSet modifiers)
 	{
 		super(enclosingClass, name, type);
+		this.descriptor = desc;
 		if (modifiers != null)
 		{
 			this.modifiers = modifiers;

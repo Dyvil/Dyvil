@@ -654,7 +654,7 @@ public final class ExternalClass extends AbstractClass
 
 		if (this.classParameters != null && this.classParameters.contains(name))
 		{
-			final ClassParameter param = new ExternalClassParameter(this, Name.fromQualified(name), type,
+			final ClassParameter param = new ExternalClassParameter(this, Name.fromQualified(name), desc, type,
 			                                                        new FlagModifierSet(access));
 			this.parameters.addParameter(param);
 			return new SimpleFieldVisitor(param);
@@ -715,7 +715,7 @@ public final class ExternalClass extends AbstractClass
 
 		if (this.isAnnotation() && (access & Modifiers.STATIC) == 0)
 		{
-			final ClassParameter param = new ExternalClassParameter(this, Name.fromQualified(name),
+			final ClassParameter param = new ExternalClassParameter(this, Name.fromQualified(name), desc.substring(2),
 			                                                        ClassFormat.readReturnType(desc),
 			                                                        new FlagModifierSet(access));
 			this.parameters.addParameter(param);
