@@ -407,13 +407,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
-		this.checkMatch(list, receiver, name, arguments);
+		// Handled by enclosing class
 	}
 
 	@Override
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
-		this.checkImplicitMatch(list, value, targetType);
+		// Handled by enclosing class
 	}
 
 	@Override

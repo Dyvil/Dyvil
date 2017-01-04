@@ -76,10 +76,11 @@ public interface Entry<type +K, type +V> extends java.io.Serializable
 
 	static func entryToString(Entry<_, _> entry): String = entry.getKey + " -> " + entry.getValue
 
-	static func entryEquals(Entry<_, _> entry, Object? o): boolean = o is Entry && entryEquals(entry, o as Entry)
+	static func entryEquals(Entry<_, _> entry, Object! obj): boolean
+		= obj is Entry && entryEquals(entry, other: obj as Entry)
 
-	static func entryEquals(Entry<_, _> entry1, Entry<_, _> entry2): boolean
-		= entry1.getKey == entry2.getKey && entry1.getValue == entry2.getValue
+	static func entryEquals(Entry<_, _> entry, Entry<_, _> other): boolean
+		= entry.getKey == other.getKey && entry.getValue == other.getValue
 
 	static func entryHashCode(Entry<_, _> entry): int
 	{
