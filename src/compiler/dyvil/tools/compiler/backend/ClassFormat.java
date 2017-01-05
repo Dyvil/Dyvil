@@ -291,7 +291,8 @@ public final class ClassFormat
 		case 'T': // type parameter reference
 			return new InternalTypeVarType(desc.substring(start + 1, end));
 		case '[': // array type
-			return new ArrayType(readType(desc, start + 1, end, true));
+			final ArrayType arrayType = new ArrayType(readType(desc, start + 1, end, true));
+			return nullable(arrayType, nullables);
 		case '|': // union
 		{
 			final UnionType union = new UnionType();
@@ -314,8 +315,7 @@ public final class ClassFormat
 
 	private static IType readReferenceType(String desc, int start, int end, boolean nullables)
 	{
-		final IType result = readReferenceType(desc, start, end);
-		return nullables ? new ImplicitNullableType(result) : result;
+		return nullable(readReferenceType(desc, start, end), nullables);
 	}
 
 	@NonNull
@@ -417,7 +417,7 @@ public final class ClassFormat
 		{
 			final ArrayType arrayType = new ArrayType();
 			final int end = readTyped(desc, start + 1, arrayType::setElementType, true);
-			consumer.setType(arrayType);
+			consumer.setType(nullable(arrayType, nullables));
 			return end;
 		}
 		case '|': // union
@@ -445,6 +445,11 @@ public final class ClassFormat
 		}
 		}
 		return start;
+	}
+
+	private static IType nullable(IType type, boolean nullables)
+	{
+		return nullables ? new ImplicitNullableType(type) : type;
 	}
 
 	private static int readGeneric(String desc, int start, ITypeParametric generic)

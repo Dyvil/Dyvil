@@ -49,6 +49,11 @@ public class NullableType implements IObjectType
 		return new NullableType(type);
 	}
 
+	protected NullableType wrap(IType type)
+	{
+		return new NullableType(type);
+	}
+
 	public IType getElementType()
 	{
 		return this.type;
@@ -151,11 +156,6 @@ public class NullableType implements IObjectType
 		return this.type.hasTypeVariables();
 	}
 
-	protected NullableType wrap(IType type)
-	{
-		return new NullableType(type);
-	}
-
 	@Override
 	public IType asReturnType()
 	{
@@ -168,6 +168,28 @@ public class NullableType implements IObjectType
 	{
 		final IType type = this.type.asParameterType();
 		return type == this.type ? this : this.wrap(type);
+	}
+
+	@Override
+	public boolean hasTag(int tag)
+	{
+		return IObjectType.super.hasTag(tag) || this.type.hasTag(tag);
+	}
+
+	@Override
+	public boolean canExtract(Class<? extends IType> type)
+	{
+		return IObjectType.super.canExtract(type) || this.type.canExtract(type);
+	}
+
+	@Override
+	public <T extends IType> T extract(Class<T> type)
+	{
+		if (IObjectType.super.canExtract(type))
+		{
+			return (T) this;
+		}
+		return this.type.extract(type);
 	}
 
 	@Override
