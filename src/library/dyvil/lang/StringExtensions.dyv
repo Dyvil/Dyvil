@@ -52,7 +52,7 @@ public final class StringExtensions
 
 	public infix inline func split(String s, char delimiter): [String] = StringUtils.split(s, delimiter) as [String]
 
-	public infix inline func format(String s, Object... args): String = String.format(s, args...)
+	public infix inline func format(String s, Object! ... args): String = String.format(s, args...)
 
 	public extension func toString(Object o, StringBuilder builder): void = builder.append o
 }

@@ -217,7 +217,6 @@ public class ClassMetadata implements IClassMetadata
 			if (classParameter.isVarargs())
 			{
 				modifiers |= Modifiers.VARARGS;
-				constructor.setVariadic();
 			}
 
 			parameters[i] = new CodeParameter(classParameter.getPosition(), classParameter.getName(),

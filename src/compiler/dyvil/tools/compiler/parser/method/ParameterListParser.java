@@ -195,7 +195,6 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			if (this.hasFlag(VARARGS))
 			{
 				this.type = new ArrayType(this.type);
-				this.consumer.setVariadic();
 			}
 
 			this.parameter = this.createParameter(token);

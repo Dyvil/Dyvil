@@ -163,6 +163,25 @@ public class ParameterList implements IParameterList
 		return true;
 	}
 
+	@Override
+	public boolean isVariadic()
+	{
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			if (this.parameters[i].isVarargs())
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean isLastVariadic()
+	{
+		return this.parameterCount > 0 && this.parameters[this.parameterCount - 1].isVarargs();
+	}
+
 	// Compiler Phases
 
 	@Override

@@ -56,6 +56,10 @@ public interface IParameterList extends Iterable<IParameter>, IParameterConsumer
 
 	boolean matches(IParameterList other);
 
+	boolean isLastVariadic();
+
+	boolean isVariadic();
+
 	// Compiler Phases
 
 	@Override

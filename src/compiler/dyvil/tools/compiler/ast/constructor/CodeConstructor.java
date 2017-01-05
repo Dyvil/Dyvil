@@ -83,6 +83,10 @@ public class CodeConstructor extends AbstractConstructor
 		super.resolveTypes(markers, context);
 
 		this.parameters.resolveTypes(markers, context);
+		if (this.parameters.isLastVariadic())
+		{
+			this.modifiers.addIntModifier(Modifiers.VARARGS);
+		}
 
 		for (int i = 0; i < this.exceptionCount; i++)
 		{

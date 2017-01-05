@@ -225,7 +225,7 @@ public final class ArgumentList implements IArguments, IValueList
 		final IType arrayType = param.getInternalType();
 		if (argument.checkVarargs(false))
 		{
-			return checkMatch_(matchValues, matchTypes, matchStartIndex, argument, arrayType, implicitContext) ? 0 : -1;
+			return checkMatch_(matchValues, matchTypes, matchStartIndex + startIndex, argument, arrayType, implicitContext) ? 0 : -1;
 		}
 
 		if (startIndex == endIndex)

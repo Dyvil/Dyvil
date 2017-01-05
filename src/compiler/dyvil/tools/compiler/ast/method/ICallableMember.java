@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.method;
 
 import dyvil.annotation.OverloadPriority;
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -15,6 +16,12 @@ public interface ICallableMember extends IMember, IValueConsumer, ITyped, IParam
 
 	@Override
 	void setValue(IValue value);
+
+	@Override
+	default boolean isVariadic()
+	{
+		return this.hasModifier(Modifiers.VARARGS) || this.getParameterList().isVariadic();
+	}
 
 	default int getOverloadPriority()
 	{

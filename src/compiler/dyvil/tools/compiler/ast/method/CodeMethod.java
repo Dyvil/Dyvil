@@ -144,6 +144,10 @@ public class CodeMethod extends AbstractMethod
 		}
 
 		this.parameters.resolveTypes(markers, context);
+		if (this.parameters.isLastVariadic())
+		{
+			this.modifiers.addIntModifier(Modifiers.VARARGS);
+		}
 
 		for (int i = 0; i < this.exceptionCount; i++)
 		{
@@ -607,8 +611,7 @@ public class CodeMethod extends AbstractMethod
 		}
 
 		final int lineNumber = this.getLineNumber();
-		final int opcode =
-			interfaceClass ? Opcodes.INVOKEINTERFACE : Opcodes.INVOKEVIRTUAL;
+		final int opcode = interfaceClass ? Opcodes.INVOKEINTERFACE : Opcodes.INVOKEVIRTUAL;
 
 		/*
 		 * Contains entries in the format 'mangledName(paramTypes)returnType'
@@ -655,8 +658,7 @@ public class CodeMethod extends AbstractMethod
 				overrideParameterType.writeCast(methodWriter, parameterType, lineNumber);
 			}
 			// Generate Type Parameters and load reified type arguments
-			for (int i = 0, count = this.typeParameterCount;
-			     i < count; i++)
+			for (int i = 0, count = this.typeParameterCount; i < count; i++)
 			{
 				final ITypeParameter thisParameter = this.typeParameters[i];
 				final Reified.Type reifiedType = thisParameter.getReifiedKind();

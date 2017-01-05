@@ -194,18 +194,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void setVariadic()
-	{
-		this.modifiers.addIntModifier(Modifiers.VARARGS);
-	}
-
-	@Override
-	public boolean isVariadic()
-	{
-		return this.modifiers.hasIntModifier(Modifiers.VARARGS);
-	}
-
-	@Override
 	public boolean setReceiverType(IType type)
 	{
 		this.thisType = type;
@@ -575,6 +563,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return; // Mismatch
 		}
 
+		for (int matchValue : matchValues)
+		{
+			if (matchValue == IValue.MISMATCH)
+			{
+				return; // Mismatch
+			}
+		}
 		list.add(new Candidate<>(this, matchValues, matchTypes, defaults, varargs, invalid));
 	}
 
