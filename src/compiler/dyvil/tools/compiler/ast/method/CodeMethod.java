@@ -608,7 +608,7 @@ public class CodeMethod extends AbstractMethod
 
 		final int lineNumber = this.getLineNumber();
 		final int opcode =
-			(modifiers & Modifiers.ABSTRACT) != 0 && interfaceClass ? Opcodes.INVOKEINTERFACE : Opcodes.INVOKEVIRTUAL;
+			interfaceClass ? Opcodes.INVOKEINTERFACE : Opcodes.INVOKEVIRTUAL;
 
 		/*
 		 * Contains entries in the format 'mangledName(paramTypes)returnType'

@@ -19,18 +19,6 @@ public final class ReferenceFactory
 	private static func getField(Class<_> _type, String fieldName): Field throws NoSuchFieldException
 		= _type.getDeclaredField(fieldName)
 
-	public static func getObjectFieldOffset(Class<_> _type, String fieldName): long
-	{
-		try
-		{
-			return ReflectUtils.UNSAFE.objectFieldOffset(_type.getDeclaredField(fieldName))
-		}
-		catch (NoSuchFieldException ex)
-		{
-			throw new RuntimeException(ex)
-		}
-	}
-
 	// Bootstrap Factories
 
 	public static func instanceRefMetafactory(
@@ -65,7 +53,7 @@ public final class ReferenceFactory
 		let constructor: MethodHandle = caller.findConstructor(targetType, STATIC_CONSTRUCTOR_TYPE)
 
 		// The resulting Unsafe*Ref
-		let result = constructor.invoke(field)
+		let result = constructor.invokeWithArguments(field)
 		return new ConstantCallSite(MethodHandles.constant(targetType, result))
 	}
 
