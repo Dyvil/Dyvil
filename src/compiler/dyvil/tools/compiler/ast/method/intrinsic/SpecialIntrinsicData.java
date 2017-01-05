@@ -60,11 +60,8 @@ public class SpecialIntrinsicData implements IntrinsicData
 				final String name = this.strings[ints[i + 2]];
 				final String desc = this.strings[ints[i + 3]];
 
-				final IClass iclass = Package.rootPackage.resolveInternalClass(owner);
-				final boolean isInterface = iclass != null && iclass.isInterface();
-
 				writer.visitLineNumber(lineNumber);
-				writer.visitMethodInsn(opcode, owner, name, desc, isInterface);
+				visitMethodInsn(writer, opcode, owner, name, desc);
 
 				i += 3;
 				continue;
@@ -93,6 +90,29 @@ public class SpecialIntrinsicData implements IntrinsicData
 
 			IntrinsicData.writeInsn(writer, this.method, opcode, receiver, arguments, lineNumber);
 		}
+	}
+
+	private static void visitMethodInsn(MethodWriter writer, int opcode, String owner, String name,
+		                                   String desc)
+	{
+		final boolean isInterface;
+		switch (opcode)
+		{
+		case Opcodes.INVOKEINTERFACE: // invokeINTERFACE -> definitely an interface
+			isInterface = true;
+			break;
+		case Opcodes.INVOKESPECIAL:
+		case Opcodes.INVOKEVIRTUAL: // private or virtual -> can't be an interface
+			isInterface = false;
+			break;
+		case Opcodes.INVOKESTATIC: // check the class
+		default:
+			final IClass iclass = Package.rootPackage.resolveInternalClass(owner);
+			isInterface = iclass != null && iclass.isInterface();
+			break;
+		}
+
+		writer.visitMethodInsn(opcode, owner, name, desc, isInterface);
 	}
 
 	@Override
