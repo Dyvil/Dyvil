@@ -499,19 +499,19 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static <T> int hashCode(T @NonNull [] array)
+	public static int hashCode(Object @NonNull [] array)
 	{
 		return Arrays.hashCode(array);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static <T> int deepHashCode(T @NonNull [] array)
+	public static int deepHashCode(Object @NonNull [] array)
 	{
 		return Arrays.deepHashCode(array);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> @NonNull String toString(T @NonNull [] array)
+	public static @NonNull String toString(Object @NonNull [] array)
 	{
 		final int size = array.length;
 		if (size <= 0)
@@ -588,7 +588,56 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static void deepToString(@Nullable Object object, @NonNull StringBuilder builder)
+	public static String deepToString(Object object)
+	{
+		if (object == null)
+		{
+			return "null";
+		}
+
+		final Class objectClass = object.getClass();
+		if (!objectClass.isArray())
+		{
+			return object.toString();
+		}
+
+		if (objectClass == boolean[].class)
+		{
+			return BooleanArray.toString((boolean[]) object);
+		}
+		if (objectClass == byte[].class)
+		{
+			return ByteArray.toString((byte[]) object);
+		}
+		if (objectClass == short[].class)
+		{
+			return ShortArray.toString((short[]) object);
+		}
+		if (objectClass == char[].class)
+		{
+			return CharArray.toString((char[]) object);
+		}
+		if (objectClass == int[].class)
+		{
+			return IntArray.toString((int[]) object);
+		}
+		if (objectClass == long[].class)
+		{
+			return LongArray.toString((long[]) object);
+		}
+		if (objectClass == float[].class)
+		{
+			return FloatArray.toString((float[]) object);
+		}
+		if (objectClass == double[].class)
+		{
+			return DoubleArray.toString((double[]) object);
+		}
+		return deepToString((Object[]) object);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static void deepToString(Object object, @NonNull StringBuilder builder)
 	{
 		if (object == null)
 		{
@@ -597,6 +646,12 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 		}
 
 		final Class objectClass = object.getClass();
+		if (!objectClass.isArray())
+		{
+			builder.append(object.toString());
+			return;
+		}
+
 		if (objectClass == boolean[].class)
 		{
 			BooleanArray.toString((boolean[]) object, builder);
@@ -637,12 +692,7 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 			DoubleArray.toString((double[]) object, builder);
 			return;
 		}
-		if (objectClass.isArray())
-		{
-			deepToString((Object[]) object, builder);
-			return;
-		}
 
-		builder.append(object.toString());
+		deepToString((Object[]) object, builder);
 	}
 }
