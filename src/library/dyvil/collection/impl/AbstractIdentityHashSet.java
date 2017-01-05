@@ -311,7 +311,7 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 	}
 
 	@Override
-	public void toArray(int index, Object[] store)
+	public void toArray(int index, Object @NonNull [] store)
 	{
 		for (Object o : this.table)
 		{

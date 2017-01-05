@@ -266,7 +266,7 @@ public abstract class AbstractArraySet<E> implements Set<E>
 	}
 
 	@Override
-	public void toArray(int index, Object @NonNull [] store)
+	public void toArray(int index, @NonNull Object @NonNull [] store)
 	{
 		System.arraycopy(this.elements, 0, store, index, this.size);
 	}
@@ -322,6 +322,7 @@ public abstract class AbstractArraySet<E> implements Set<E>
 		return set;
 	}
 
+	@NonNull
 	@Override
 	public String toString()
 	{

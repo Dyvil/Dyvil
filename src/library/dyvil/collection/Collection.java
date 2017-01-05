@@ -470,8 +470,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return an array of this collection's elements
 	 */
-	@NonNull
-	default Object[] toArray()
+	default Object @NonNull [] toArray()
 	{
 		Object[] array = new Object[this.size()];
 		this.toArray(0, array);
@@ -489,8 +488,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return an array containing this collection's elements
 	 */
-	@NonNull
-	default E[] toArray(Class<E> type)
+	default E @NonNull [] toArray(@NonNull Class<E> type)
 	{
 		@SuppressWarnings("unchecked") final E[] array = (E[]) Array.newInstance(type, this.size());
 		this.toArray(0, array);
@@ -507,7 +505,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 * @param store
 	 * 	the array to store the elements in
 	 */
-	default void toArray(Object[] store)
+	default void toArray(Object @NonNull [] store)
 	{
 		this.toArray(0, store);
 	}
@@ -518,13 +516,11 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 * this collection's {@link #iterator()}. Note that this method usually doesn't do boundary checking on the array,
 	 * so passing an array of insufficient size to hold all elements of this collection will likely result in an {@link
 	 * ArrayIndexOutOfBoundsException}.
-	 *
 	 * @param index
 	 * 	the index in the array at which the first element of this collection should be placed
 	 * @param store
-	 * 	the array to store the elements in
 	 */
-	default void toArray(int index, Object[] store)
+	default void toArray(int index, Object @NonNull [] store)
 	{
 		for (E e : this)
 		{
@@ -544,11 +540,11 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return a copy of this collection
 	 */
-	Collection<E> copy();
+	@NonNull Collection<E> copy();
 
-	<RE> MutableCollection<RE> emptyCopy();
+	<RE> @NonNull MutableCollection<RE> emptyCopy();
 
-	@Nullable <RE> MutableCollection<RE> emptyCopy(int capacity);
+	@NonNull <RE> MutableCollection<RE> emptyCopy(int capacity);
 
 	/**
 	 * Returns a mutable collection that contains the exact same elements as this collection. Already mutable
@@ -557,7 +553,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return a mutable collection with the same elements as this collection
 	 */
-	MutableCollection<E> mutable();
+	@NonNull MutableCollection<E> mutable();
 
 	/**
 	 * Returns a mutable copy of this collection. For mutable collections, this method has the same result as the {@link
@@ -566,7 +562,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return a mutable copy of this collection
 	 */
-	MutableCollection<E> mutableCopy();
+	@NonNull MutableCollection<E> mutableCopy();
 
 	/**
 	 * Returns an immutable collection that contains the exact same elements as this collection. Already immutable
@@ -575,7 +571,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return a immutable collection with the same elements as this collection
 	 */
-	ImmutableCollection<E> immutable();
+	@NonNull ImmutableCollection<E> immutable();
 
 	/**
 	 * Returns a immutable copy of this collection. For immutable collections, this method has the same result as the
@@ -584,11 +580,11 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return an immutable copy of this collection
 	 */
-	ImmutableCollection<E> immutableCopy();
+	@NonNull ImmutableCollection<E> immutableCopy();
 
-	<RE> ImmutableCollection.Builder<RE> immutableBuilder();
+	<RE> ImmutableCollection.@NonNull Builder<RE> immutableBuilder();
 
-	<RE> ImmutableCollection.Builder<RE> immutableBuilder(int capacity);
+	<RE> ImmutableCollection.@NonNull Builder<RE> immutableBuilder(int capacity);
 
 	/**
 	 * Returns a view on the elements of this collection. Immutable collections return themselves, as they are already
@@ -597,7 +593,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return a view on the elements of this collection
 	 */
-	ImmutableCollection<E> view();
+	@NonNull ImmutableCollection<E> view();
 
 	/**
 	 * Returns the Java Collection Framework equivalent of this collection. The returned collection is not a view of
@@ -607,7 +603,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return a java collection containing the elements of this collection
 	 */
-	java.util.Collection<E> toJava();
+	java.util.@NonNull Collection<E> toJava();
 
 	// toString, equals and hashCode
 
@@ -617,7 +613,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	String ELEMENT_SEPARATOR_STRING = ", ";
 
 	@Override
-	String toString();
+	@NonNull String toString();
 
 	default void toString(@NonNull StringBuilder builder)
 	{
@@ -660,7 +656,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 		return false;
 	}
 
-	static <E> String collectionToString(@NonNull Queryable<E> collection)
+	static <E> @NonNull String collectionToString(@NonNull Queryable<E> collection)
 	{
 		if (collection.isEmpty())
 		{

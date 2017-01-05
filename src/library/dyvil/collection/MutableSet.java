@@ -187,7 +187,7 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 	@Override
 	<R> MutableSet<R> emptyCopy();
 
-	@Nullable
+	@NonNull
 	@Override
 	<RE> MutableSet<RE> emptyCopy(int capacity);
 

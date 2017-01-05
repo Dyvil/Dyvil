@@ -147,12 +147,15 @@ public interface ImmutableCollection<@Covariant E> extends Collection<E>
 
 	// Copying
 
+	@NonNull
 	@Override
 	ImmutableCollection<E> copy();
 
+	@NonNull
 	@Override
 	MutableCollection<E> mutable();
 
+	@NonNull
 	@Override
 	default MutableCollection<E> mutableCopy()
 	{
@@ -166,6 +169,7 @@ public interface ImmutableCollection<@Covariant E> extends Collection<E>
 		return this;
 	}
 
+	@NonNull
 	@Override
 	default ImmutableCollection<E> immutableCopy()
 	{

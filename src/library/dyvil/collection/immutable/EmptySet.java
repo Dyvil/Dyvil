@@ -139,22 +139,20 @@ public final class EmptySet<E> implements ImmutableSet<E>
 		return this;
 	}
 
-	@NonNull
 	@Override
 	public Object[] toArray()
 	{
 		return ObjectArray.EMPTY;
 	}
 
-	@NonNull
 	@Override
-	public E[] toArray(Class<E> type)
+	public E @NonNull [] toArray(@NonNull Class<E> type)
 	{
 		return (E[]) ObjectArray.EMPTY;
 	}
 
 	@Override
-	public void toArray(int index, Object[] store)
+	public void toArray(int index, Object @NonNull [] store)
 	{
 	}
 
@@ -171,12 +169,14 @@ public final class EmptySet<E> implements ImmutableSet<E>
 		return MutableSet.apply();
 	}
 
+	@NonNull
 	@Override
 	public <RE> MutableSet<RE> emptyCopy(int capacity)
 	{
 		return MutableSet.withCapacity(capacity);
 	}
 
+	@NonNull
 	@Override
 	public MutableSet<E> mutable()
 	{
@@ -201,6 +201,7 @@ public final class EmptySet<E> implements ImmutableSet<E>
 		return (java.util.Set<E>) Collections.EMPTY_SET;
 	}
 
+	@NonNull
 	@Override
 	public String toString()
 	{

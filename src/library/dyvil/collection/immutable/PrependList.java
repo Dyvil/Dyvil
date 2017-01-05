@@ -263,7 +263,7 @@ public class PrependList<E> implements ImmutableList<E>
 	}
 
 	@Override
-	public void toArray(int index, Object[] store)
+	public void toArray(int index, Object @NonNull [] store)
 	{
 		store[index] = this.head;
 		this.tail.toArray(index + 1, store);

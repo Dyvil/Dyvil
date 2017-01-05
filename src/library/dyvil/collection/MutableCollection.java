@@ -101,7 +101,7 @@ public interface MutableCollection<E> extends Collection<E>
 	@Override
 	<R> MutableCollection<R> emptyCopy();
 
-	@Nullable
+	@NonNull
 	@Override
 	<RE> MutableCollection<RE> emptyCopy(int capacity);
 

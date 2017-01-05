@@ -312,7 +312,7 @@ public class AppendList<E> implements ImmutableList<E>
 	}
 
 	@Override
-	public void toArray(int index, Object[] store)
+	public void toArray(int index, Object @NonNull [] store)
 	{
 		this.head.toArray(index, store);
 		store[index + this.size - 1] = this.tail;

@@ -33,7 +33,7 @@ public abstract class AbstractMapBasedSet<E> implements Set<E>
 	}
 
 	@Override
-	public void toArray(int index, Object[] store)
+	public void toArray(int index, Object @NonNull [] store)
 	{
 		for (Entry<E, ?> e : this.map())
 		{
@@ -48,7 +48,7 @@ public abstract class AbstractMapBasedSet<E> implements Set<E>
 		return new dyvil.collection.mutable.MapBasedSet<>(this.map().emptyCopy());
 	}
 
-	@Nullable
+	@NonNull
 	@Override
 	public <RE> MutableSet<RE> emptyCopy(int capacity)
 	{
@@ -88,6 +88,7 @@ public abstract class AbstractMapBasedSet<E> implements Set<E>
 		return Collections.newSetFromMap(map);
 	}
 
+	@NonNull
 	@Override
 	public String toString()
 	{

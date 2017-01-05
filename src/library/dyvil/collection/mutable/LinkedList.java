@@ -742,7 +742,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	}
 
 	@Override
-	public void toArray(int index, Object[] store)
+	public void toArray(int index, Object @NonNull [] store)
 	{
 		for (Node<E> node = this.first; node != null; node = node.next)
 		{

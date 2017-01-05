@@ -363,18 +363,16 @@ public abstract class AbstractArrayList<E> implements List<E>
 		return -1;
 	}
 
-	@NonNull
 	@Override
-	public Object[] toArray()
+	public Object @NonNull [] toArray()
 	{
 		Object[] array = new Object[this.size];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
 		return array;
 	}
 
-	@NonNull
 	@Override
-	public E[] toArray(@NonNull Class<E> type)
+	public E @NonNull [] toArray(@NonNull Class<E> type)
 	{
 		E[] array = (E[]) Array.newInstance(type, this.size);
 		for (int i = 0; i < this.size; i++)
@@ -399,9 +397,9 @@ public abstract class AbstractArrayList<E> implements List<E>
 
 	@NonNull
 	@Override
-	public <R> MutableList<R> emptyCopy(int newCapacity)
+	public <R> MutableList<R> emptyCopy(int capacity)
 	{
-		return new dyvil.collection.mutable.ArrayList<>(newCapacity);
+		return new dyvil.collection.mutable.ArrayList<>(capacity);
 	}
 
 	@NonNull
@@ -441,6 +439,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 		return list;
 	}
 
+	@NonNull
 	@Override
 	public String toString()
 	{

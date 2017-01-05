@@ -2,7 +2,6 @@ package dyvil.collection;
 
 import dyvil.annotation.internal.DyvilModifiers;
 import dyvil.annotation.internal.NonNull;
-import dyvil.annotation.internal.Nullable;
 import dyvil.lang.LiteralConvertible;
 import dyvil.reflect.Modifiers;
 
@@ -183,25 +182,30 @@ public interface Set<E> extends Collection<E>
 
 	// Copying and Views
 
+	@NonNull
 	@Override
 	Set<E> copy();
 
 	@Override
 	<RE> MutableSet<RE> emptyCopy();
 
-	@Nullable
+	@NonNull
 	@Override
 	<RE> MutableSet<RE> emptyCopy(int capacity);
 
+	@NonNull
 	@Override
 	MutableSet<E> mutable();
 
+	@NonNull
 	@Override
 	MutableSet<E> mutableCopy();
 
+	@NonNull
 	@Override
 	ImmutableSet<E> immutable();
 
+	@NonNull
 	@Override
 	ImmutableSet<E> immutableCopy();
 
@@ -211,6 +215,7 @@ public interface Set<E> extends Collection<E>
 	@Override
 	<RE> ImmutableSet.Builder<RE> immutableBuilder(int capacity);
 
+	@NonNull
 	@Override
 	ImmutableSet<E> view();
 

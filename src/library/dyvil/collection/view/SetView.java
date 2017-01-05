@@ -121,12 +121,14 @@ public class SetView<E> implements ImmutableSet<E>
 		return this.set.emptyCopy();
 	}
 
+	@NonNull
 	@Override
 	public <RE> MutableSet<RE> emptyCopy(int capacity)
 	{
 		return this.set.emptyCopy(capacity);
 	}
 
+	@NonNull
 	@Override
 	public MutableSet<E> mutable()
 	{

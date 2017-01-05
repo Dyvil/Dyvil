@@ -235,22 +235,20 @@ public final class EmptyList<E> implements ImmutableList<E>
 		return this;
 	}
 
-	@NonNull
 	@Override
-	public Object[] toArray()
+	public Object @NonNull [] toArray()
 	{
 		return ObjectArray.EMPTY;
 	}
 
-	@NonNull
 	@Override
-	public E[] toArray(Class<E> type)
+	public E @NonNull [] toArray(@NonNull Class<E> type)
 	{
 		return (E[]) ObjectArray.EMPTY;
 	}
 
 	@Override
-	public void toArray(int index, Object[] store)
+	public void toArray(int index, Object @NonNull [] store)
 	{
 	}
 
@@ -300,6 +298,7 @@ public final class EmptyList<E> implements ImmutableList<E>
 		return (java.util.List<E>) Collections.EMPTY_LIST;
 	}
 
+	@NonNull
 	@Override
 	public String toString()
 	{

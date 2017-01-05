@@ -186,16 +186,14 @@ public class SingletonSet<E> implements ImmutableSet<E>
 		return ImmutableSet.apply();
 	}
 
-	@NonNull
 	@Override
-	public Object[] toArray()
+	public Object @NonNull [] toArray()
 	{
 		return new Object[] { this.element };
 	}
 
-	@NonNull
 	@Override
-	public E[] toArray(@NonNull Class<E> type)
+	public E @NonNull [] toArray(@NonNull Class<E> type)
 	{
 		E[] array = (E[]) Array.newInstance(type, 1);
 		array[0] = type.cast(this.element);
@@ -203,11 +201,12 @@ public class SingletonSet<E> implements ImmutableSet<E>
 	}
 
 	@Override
-	public void toArray(int index, Object[] store)
+	public void toArray(int index, Object @NonNull [] store)
 	{
 		store[index] = this.element;
 	}
 
+	@NonNull
 	@Override
 	public ImmutableSet<E> copy()
 	{
@@ -220,12 +219,14 @@ public class SingletonSet<E> implements ImmutableSet<E>
 		return MutableSet.apply();
 	}
 
+	@NonNull
 	@Override
 	public <RE> MutableSet<RE> emptyCopy(int capacity)
 	{
 		return MutableSet.withCapacity(capacity);
 	}
 
+	@NonNull
 	@Override
 	public MutableSet<E> mutable()
 	{

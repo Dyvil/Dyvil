@@ -247,16 +247,14 @@ public class SingletonList<E> implements ImmutableList<E>
 		return this;
 	}
 
-	@NonNull
 	@Override
-	public Object[] toArray()
+	public Object @NonNull [] toArray()
 	{
 		return new Object[] { this.element };
 	}
 
-	@NonNull
 	@Override
-	public E[] toArray(@NonNull Class<E> type)
+	public E @NonNull [] toArray(@NonNull Class<E> type)
 	{
 		E[] array = (E[]) Array.newInstance(type, 1);
 		array[0] = type.cast(this.element);
@@ -264,7 +262,7 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 
 	@Override
-	public void toArray(int index, Object[] store)
+	public void toArray(int index, Object @NonNull [] store)
 	{
 		store[index] = this.element;
 	}

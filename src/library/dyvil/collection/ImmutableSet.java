@@ -211,19 +211,22 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 
 	// Copying
 
+	@NonNull
 	@Override
 	ImmutableSet<E> copy();
 
 	@Override
 	<RE> MutableSet<RE> emptyCopy();
 
-	@Nullable
+	@NonNull
 	@Override
 	<RE> MutableSet<RE> emptyCopy(int capacity);
 
+	@NonNull
 	@Override
 	MutableSet<E> mutable();
 
+	@NonNull
 	@Override
 	default MutableSet<E> mutableCopy()
 	{
@@ -237,6 +240,7 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 		return this;
 	}
 
+	@NonNull
 	@Override
 	default ImmutableSet<E> immutableCopy()
 	{
