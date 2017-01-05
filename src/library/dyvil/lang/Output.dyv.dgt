@@ -1,0 +1,98 @@
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
+
+package dyvil.lang
+
+import dyvil.util.AutoPrinter
+import java.io.PrintStream
+
+import const java.lang.System.out
+import func dyvil.array.ObjectArray.deepToString
+
+public abstract class Output
+{
+	private init()
+	{
+		// no instances
+	}
+
+	// C++ style output
+
+	public const ENDL: String = System.lineSeparator
+
+	public infix inline func <<(PrintStream stream, any value): PrintStream = stream.{ print value; $0 }
+
+	// println functions
+
+	public static inline func println(): void = out.println()
+
+	// byte and short specializations are omitted
+#define LIGHT_PRIMITIVE_SPECS Base-Boolean.dgs, Base-Char.dgs, Base-Int.dgs, Base-Long.dgs, Base-Float.dgs, Base-Double.dgs
+#foreach LIGHT_PRIMITIVE_SPECS
+
+	@Deprecated(replacements: [ "print(PRIMITIVE): void" ])
+	public static inline func println(PRIMITIVE value): void = out.println(value)
+#end
+
+	@Deprecated(replacements: [ "print(AutoPrinter.() -> void): void" ])
+	public static inline func println(AutoPrinter.() -> void closure): void = closure(AutoPrinter)
+
+	@Deprecated(replacements: [ "print(String): void" ])
+	public static inline func println(String value): void = out.println(value)
+
+	@Deprecated(replacements: [ "print(Object!): void" ])
+	public static inline func println(Object! value): void = out.println(value)
+
+#import Base.dgs
+#foreach PRIMITIVE_SPECS
+	@Deprecated(replacements: [ "print([PRIMITIVE]): void" ])
+	public static inline func println([PRIMITIVE] array): void = out.println(array.toString)
+
+#end
+	@Deprecated(replacements: [ "print([Object!]): void" ])
+	public static inline func println([Object!] array): void = out.println(array.deepToString)
+
+	// print functions
+
+#for LIGHT_PRIMITIVE_SPECS
+	public static inline func print(PRIMITIVE value): void = out.println(value)
+
+#end
+	public static inline func print(AutoPrinter.() -> void closure): void = closure(AutoPrinter)
+
+	public static inline func print(String value): void = out.println(value)
+
+	public static inline func print(Object! value): void = out.println(value)
+
+#import Base.dgs
+#foreach PRIMITIVE_SPECS
+	public static inline func print([PRIMITIVE] array): void = out.println(array.toString)
+
+#end
+	public static inline func print([Object!] array): void = out.println(array.deepToString)
+
+	// print(All) functions
+
+	@BytecodeName("printAll")
+	public static inline func print(Object! ... values): void = print(values, end: '\n')
+
+	@BytecodeName("printAll")
+	public static inline func print(Object! ... values, String end): void = print(values, separator: ' ', end: '\n')
+
+	@BytecodeName("printAll")
+	public static func print(Object! ... values, String separator, String end): void
+	{
+		if (values.isEmpty)
+		{
+			return
+		}
+
+		out.print(values[0].deepToString)
+		for (i <- 1 ..< values.size)
+		{
+			out.print(separator)
+			out.print(values[i].deepToString)
+		}
+		out.print(end)
+	}
+}

@@ -2,7 +2,7 @@ package dyvil.util
 
 public object AutoPrinter
 {
-	public static void apply(AutoPrinter.() -> void closure) = closure(AutoPrinter)
+	public static func apply(AutoPrinter.() -> void closure): void = closure(AutoPrinter)
 
-	public void applyStatement(any value) = println value
+	public func applyStatement(any value): void = print value
 }
