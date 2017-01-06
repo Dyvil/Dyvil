@@ -30,6 +30,7 @@ public class SideEffectHelper
 		variable.setValue(value);
 
 		this.statementList.addValue(new FieldInitializer(variable));
+		this.statementList.addVariable(variable);
 		this.registered++;
 
 		return new FieldAccess(value.getPosition(), null, variable);

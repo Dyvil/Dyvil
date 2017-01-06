@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.statement;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.collection.List;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.collection.mutable.ArrayList;
@@ -262,16 +263,18 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		if (this.variables != null)
+		if (this.variables == null)
 		{
-			// Intentionally start at the last variable
-			for (int i = this.variables.size() - 1; i >= 0; i--)
+			return null;
+		}
+
+		// Intentionally start at the last variable
+		for (int i = this.variables.size() - 1; i >= 0; i--)
+		{
+			final IVariable variable = this.variables.get(i);
+			if (variable.getName() == name)
 			{
-				final IVariable variable = this.variables.get(i);
-				if (variable.getName() == name)
-				{
-					return variable;
-				}
+				return variable;
 			}
 		}
 
@@ -469,6 +472,11 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 
 		// Actually add the Variable to the List (this has to happen after checking for shadowed variables)
 
+		this.addVariable(variable);
+	}
+
+	public void addVariable(IVariable variable)
+	{
 		if (this.variables == null)
 		{
 			this.variables = new ArrayList<>();
