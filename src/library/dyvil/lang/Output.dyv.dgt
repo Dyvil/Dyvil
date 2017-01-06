@@ -54,7 +54,7 @@ public abstract class Output
 
 	// print functions
 
-#for LIGHT_PRIMITIVE_SPECS
+#foreach LIGHT_PRIMITIVE_SPECS
 	public static inline func print(PRIMITIVE value): void = out.println(value)
 
 #end
@@ -74,25 +74,30 @@ public abstract class Output
 	// print(All) functions
 
 	@BytecodeName("printAll")
-	public static inline func print(Object! ... values): void = print(values, end: '\n')
+	public static inline func print(Object! ... values): void
+		= print(values..., end: '\n')
 
-	@BytecodeName("printAll")
-	public static inline func print(Object! ... values, String end): void = print(values, separator: ' ', end: '\n')
+	@BytecodeName("printAll_separator")
+	public static inline func print(Object! ... values, String separator): void
+		= print(values..., separator: separator, end: '\n')
+
+	@BytecodeName("printAll_end")
+	public static inline func print(Object! ... values, String end): void
+		= print(values..., separator: ' ', end: end)
 
 	@BytecodeName("printAll")
 	public static func print(Object! ... values, String separator, String end): void
 	{
-		if (values.isEmpty)
+		if (!values.isEmpty)
 		{
-			return
+			out.print(values[0].deepToString)
+			for (i <- 1 ..< values.size)
+			{
+				out.print(separator)
+				out.print(values[i].deepToString)
+			}
 		}
 
-		out.print(values[0].deepToString)
-		for (i <- 1 ..< values.size)
-		{
-			out.print(separator)
-			out.print(values[i].deepToString)
-		}
 		out.print(end)
 	}
 }
