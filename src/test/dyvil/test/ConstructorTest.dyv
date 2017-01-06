@@ -4,22 +4,22 @@ using dyvil.Collections
 
 public class ConstructorTest
 {
-	case class A(public int i
-				 public int j)
+	case class A(public let i: int
+				 public let j: int)
 	{
-		static boolean classInitialized
+		static var classInitialized: boolean
 
 		static init
 		{
 			classInitialized = true
 		}
 
-		static void initClass() { /* noop, forces static initializer */ }
+		static func initClass(): void { /* noop, forces static initializer */ }
 	}
 
-	case class B(public int i) extends A(i, 0)
+	case class B(public let i: int { override get }) extends A(i, 0)
 	{
-		boolean initialized
+		public var initialized: boolean
 
 		init
 		{
@@ -27,16 +27,15 @@ public class ConstructorTest
 		}
 	}
 
-	case class C(public int j) extends A(0, j)
+	case class C(public let j: int { override get }) extends A(0, j)
 
 	case object O extends A(1, 1)
 
 	class InitOrder
 	{
-		List<String> order = MutableList<String>
+		public var order: List<String> = MutableList<String>
 
-		String! s = { this.order += "init s" ; null }
-		int i
+		let i: int = { this.order += "init s" ; 0 }
 
 		init
 		{
@@ -59,20 +58,20 @@ public class ConstructorTest
 	{
 	}
 
-	public static void main([String] args)
+	public static func main([String] args): void
 	{
 		A.initClass
 
 		Main.test("A.classInitialized", true, A.classInitialized)
 
-		A a = A(1, 2)
-		B b = B(1)
-		C c = C(2)
-		O o = O
+		let a = A(1, 2)
+		let b = B(1)
+		let c = C(2)
+		let o = O
 
-		A ba = b // B -> A
-		A ca = c // C -> A
-		A oa = o // O -> A
+		let ba: A = b // B -> A
+		let ca: A = c // C -> A
+		let oa: A = o // O -> A
 
 		Main.test("A", a, A(1, 2))
 		Main.test("A.i", a.i, 1)
@@ -92,6 +91,6 @@ public class ConstructorTest
 		Main.test("O.j", oa.j, 1)
 
 		var initOrder = new InitOrder
-		Main.test("Initialization Order", [ "init s", "init block", "init(int) body", "init() body" ] as List, initOrder.order)
+		Main.test("Initialization Order", List("init s", "init block", "init(int) body", "init() body"), initOrder.order)
 	}
 }
