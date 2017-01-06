@@ -22,7 +22,7 @@ public class ImplicitNullableType extends NullableType
 {
 	public static class LazyTypes
 	{
-		public static final IMethod UNWRAP = Package.dyvilLang.resolveClass("ObjectExtensions").getBody()
+		public static final IMethod UNWRAP = Package.dyvilLang.resolveClass("Optionals").getBody()
 		                                                      .getMethod(Names.bang);
 	}
 

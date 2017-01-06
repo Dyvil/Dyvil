@@ -1,0 +1,74 @@
+package dyvil.lang
+
+import const dyvil.reflect.Opcodes._
+
+public abstract class Optionals
+{
+	private init()
+	{
+		// no instances
+	}
+
+	// Wrapping
+
+	@Intrinsic([ LOAD_0 ])
+	public static func Optional<T>(T value): T? = value
+
+	// Unwrapping
+
+	/*
+	 * The Optional Unwrap Operator
+	 *
+	 * Attempts to unwrap an optional value. If the given parameter has the value `null` at runtime, a
+	 * `NullPointerException` is thrown.
+	 */
+	@Intrinsic([ LOAD_0, DUP, INVOKESTATIC, 0, 1, 2 ]
+	  strings: [ "dyvil/lang/ObjectExtensions", "unwrapNullCheck", "(Ljava/lang/Object;)V" ])
+	public postfix func ! <T>(T? optional): T = optional!
+
+	/**
+	 * Checks if the given optional value is null and throws a NullPointerException in that case.
+	 */
+	public static func unwrapNullCheck<T>(T? optional): void
+	{
+		if (optional == null) throw new NullPointerException("Unwrapped Optional was null")
+	}
+
+	/**
+	 * The Unsafe Unwrap Operator
+	 *
+	 * Unwraps an optional value in an unsafe manner, i.e. without a null check. Use this only if you are sure that
+	 * parameter is never actually null.
+	 */
+	@Intrinsic([ LOAD_0 ])
+	public postfix func !! <T>(T? optional): T = optional!!
+
+	// Nullable Coalescing
+
+	/**
+	 * The Nullable Coalescing Operator
+	 *
+	 * Returns the left-hand argument if it is not `null` at runtime, and the right-hand argument otherwise.
+	 */
+	@Intrinsic([ /* 0 */ LOAD_0
+	             /* 1 */ DUP
+	             /* 2 */ ASTORE, 0
+	             /* 3 */ IFNULL, 6
+	             /* 4 */ ALOAD,  0
+	             /* 5 */ GOTO,   7
+	             /* 6 */ LOAD_1
+	             /* 7 */ ])
+	public infix func ?? <T, U> (T? lhs, U rhs): T|U = lhs ?? rhs
+
+	// Equality
+
+	public infix func ==(Object! lhs, Object! rhs): boolean = lhs === rhs || lhs != null && lhs!!.equals(rhs)
+
+	@Intrinsic([ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2, BNOT ]
+	  strings: [ "dyvil/lang/Optionals", "$eq$eq", "(Ljava/lang/Object;Ljava/lang/Object;)Z" ])
+	public infix func !=(Object! lhs, Object! rhs): boolean = lhs != rhs
+
+	// Hash Code
+
+	public postfix func hashCode<T>(T? optional): int = optional == null ? 0 : optional!!.hashCode
+}
