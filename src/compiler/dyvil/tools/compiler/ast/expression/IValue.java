@@ -451,6 +451,11 @@ public interface IValue extends IASTNode, ITyped
 
 	void writeExpression(MethodWriter writer, IType type) throws BytecodeException;
 
+	default void writeNullCheckedExpression(MethodWriter writer, IType type) throws BytecodeException
+	{
+		this.writeExpression(writer, type);
+	}
+
 	default void writeJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
 		this.writeExpression(writer, Types.BOOLEAN);

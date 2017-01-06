@@ -20,7 +20,7 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public class ImplicitNullableType extends NullableType
 {
-	private static class LazyTypes
+	public static class LazyTypes
 	{
 		public static final IMethod UNWRAP = Package.dyvilLang.resolveClass("ObjectExtensions").getBody()
 		                                                      .getMethod(Names.bang);

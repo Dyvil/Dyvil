@@ -10,6 +10,9 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.ImplicitNullableType;
+import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
@@ -151,6 +154,19 @@ public class LiteralConversion extends AbstractCall
 	{
 		markers.add(Markers.semanticError(this.position, "literal.method", this.literal.getType(), this.type, this.name,
 		                                  this.arguments.typesToString()));
+	}
+
+	@Override
+	public void writeNullCheckedExpression(MethodWriter writer, IType type) throws BytecodeException
+	{
+		if (this.method == ImplicitNullableType.LazyTypes.UNWRAP)
+		{
+			this.literal.writeExpression(writer, type);
+		}
+		else
+		{
+			this.writeExpression(writer, type);
+		}
 	}
 
 	@Override

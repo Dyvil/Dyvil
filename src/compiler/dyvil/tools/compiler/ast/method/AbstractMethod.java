@@ -1053,13 +1053,23 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return;
 		}
 
-		if (this.modifiers.hasIntModifier(Modifiers.INFIX))
+		final int modifiers = this.modifiers.toFlags();
+		if ((modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
 			receiver.writeExpression(writer, this.parameters.get(0).getInternalType());
 			return;
 		}
 
-		receiver.writeExpression(writer, this.enclosingClass.getReceiverType());
+		final IType receiverType = this.enclosingClass.getReceiverType();
+
+		if ((modifiers & Modifiers.STATIC) == 0)
+		{
+			receiver.writeNullCheckedExpression(writer, receiverType);
+		}
+		else
+		{
+			receiver.writeExpression(writer, receiverType);
+		}
 
 		if (receiver.isIgnoredClassAccess())
 		{
