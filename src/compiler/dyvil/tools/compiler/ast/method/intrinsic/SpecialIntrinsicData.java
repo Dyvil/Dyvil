@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.method.intrinsic;
 
+import dyvil.annotation.internal.Nullable;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
 import dyvil.tools.asm.Type;
@@ -15,11 +16,11 @@ public class SpecialIntrinsicData implements IntrinsicData
 {
 	private IMethod method;
 
-	private int[]    instructions;
-	private String[] strings;
-	private Label[]  targets;
+	private int[]     instructions;
+	private String[]  strings;
+	private boolean[] targets;
 
-	public SpecialIntrinsicData(IMethod method, int[] instructions, String[] strings, Label[] targets)
+	public SpecialIntrinsicData(IMethod method, int[] instructions, String[] strings, boolean[] targets)
 	{
 		this.method = method;
 		this.instructions = instructions;
@@ -31,14 +32,17 @@ public class SpecialIntrinsicData implements IntrinsicData
 	public void writeIntrinsic(MethodWriter writer, IValue receiver, IArguments arguments, int lineNumber)
 		throws BytecodeException
 	{
+		final int varIndex = writer.localCount();
+
 		final int[] ints = this.instructions;
-		final int length = ints.length;
 		int insnIndex = 0;
 
-		for (int i = 0; i < length; i++)
+		final Label[] labels = this.getLabels();
+		Label label;
+
+		for (int i = 0, length = ints.length; i < length; i++)
 		{
-			final Label label = this.targets[insnIndex++];
-			if (label != null)
+			if (labels != null && (label = labels[insnIndex++]) != null)
 			{
 				writer.visitTargetLabel(label);
 			}
@@ -68,7 +72,15 @@ public class SpecialIntrinsicData implements IntrinsicData
 			}
 			if (Opcodes.isJumpOpcode(opcode))
 			{
-				writer.visitJumpInsn(opcode, this.targets[ints[i + 1]]);
+				//noinspection ConstantConditions
+				writer.visitJumpInsn(opcode, labels[ints[i + 1]]);
+
+				i += 1;
+				continue;
+			}
+			if (Opcodes.isLoadOpcode(opcode) || Opcodes.isStoreOpcode(opcode))
+			{
+				writer.visitVarInsn(opcode, varIndex + ints[i + 1]);
 
 				i += 1;
 				continue;
@@ -90,10 +102,41 @@ public class SpecialIntrinsicData implements IntrinsicData
 
 			IntrinsicData.writeInsn(writer, this.method, opcode, receiver, arguments, lineNumber);
 		}
+
+		if (labels != null && (label = labels[insnIndex]) != null)
+		{
+			writer.visitTargetLabel(label);
+		}
+
+		writer.resetLocals(varIndex);
 	}
 
-	private static void visitMethodInsn(MethodWriter writer, int opcode, String owner, String name,
-		                                   String desc)
+	@Nullable
+	public Label[] getLabels()
+	{
+		if (this.targets == null)
+		{
+			return null;
+		}
+
+		final int length = this.targets.length;
+		if (length <= 0)
+		{
+			return null;
+		}
+
+		final Label[] labels = new Label[length];
+		for (int i = 0; i < length; i++)
+		{
+			if (this.targets[i])
+			{
+				labels[i] = new Label();
+			}
+		}
+		return labels;
+	}
+
+	private static void visitMethodInsn(MethodWriter writer, int opcode, String owner, String name, String desc)
 	{
 		final boolean isInterface;
 		switch (opcode)

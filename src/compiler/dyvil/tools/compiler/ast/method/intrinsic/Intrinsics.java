@@ -17,7 +17,7 @@ public class Intrinsics
 {
 	private static final CodeParameter STRINGS = new CodeParameter(Name.fromRaw("strings"),
 	                                                               new ArrayType(Types.STRING));
-	
+
 	public static IntrinsicData readAnnotation(IMethod method, IAnnotation annotation)
 	{
 		IArguments arguments = annotation.getArguments();
@@ -26,21 +26,21 @@ public class Intrinsics
 		{
 			return null;
 		}
-		
+
 		ArrayExpr values = (ArrayExpr) value;
-		
+
 		int length = values.valueCount();
-		int count = 0;
-		
+		int insnCount = 0;
+
 		int[] ints = new int[length];
-		
+
 		for (int i = 0; i < length; i++)
 		{
 			int opcode = values.getValue(i).intValue();
 			ints[i] = opcode;
-			
-			count++;
-			
+
+			insnCount++;
+
 			if (Opcodes.isFieldOrMethodOpcode(opcode))
 			{
 				ints[i + 1] = values.getValue(i + 1).intValue();
@@ -48,33 +48,34 @@ public class Intrinsics
 				ints[i + 3] = values.getValue(i + 3).intValue();
 				i += 3;
 			}
-			else if (Opcodes.isJumpOpcode(opcode) || opcode == Opcodes.LDC || opcode == Opcodes.BIPUSH
-					|| opcode == Opcodes.SIPUSH)
+			else if (Opcodes.isJumpOpcode(opcode) || Opcodes.isLoadOpcode(opcode) || Opcodes.isStoreOpcode(opcode)
+				         || opcode == Opcodes.LDC || opcode == Opcodes.BIPUSH || opcode == Opcodes.SIPUSH)
 			{
 				ints[i + 1] = values.getValue(i + 1).intValue();
 				i += 1;
 			}
 		}
-		
-		if (length > count)
+
+		if (length > insnCount)
 		{
 			IValue stringValue = arguments.getValue(1, STRINGS);
 			ArrayExpr strings = (ArrayExpr) stringValue;
-			
-			return readComplex(method, count, ints, strings);
+
+			return readComplex(method, insnCount, ints, strings);
 		}
 
 		return new SimpleIntrinsicData(method, ints);
 	}
-	
-	private static IntrinsicData readComplex(IMethod method, int count, int[] ints, ArrayExpr stringArray)
+
+	private static IntrinsicData readComplex(IMethod method, int insnCount, int[] ints, ArrayExpr stringArray)
 	{
 		String[] strings;
-		
+
 		if (stringArray != null)
 		{
 			// Convert string constants to an array
-			int stringCount = stringArray.valueCount();
+			final int stringCount = stringArray.valueCount();
+
 			strings = new String[stringCount];
 			for (int i = 0; i < stringCount; i++)
 			{
@@ -85,26 +86,25 @@ public class Intrinsics
 		{
 			strings = null;
 		}
-		
+
 		// Convert jump instructions into a label array
-		int length = ints.length;
-		Label[] labels = new Label[count];
-		for (int i = 0; i < length; i++)
+		final boolean[] labels = new boolean[insnCount + 1];
+		for (int i = 0, length = ints.length; i < length; i++)
 		{
-			int opcode = ints[i];
-			
+			final int opcode = ints[i];
+
 			if (Opcodes.isFieldOrMethodOpcode(opcode))
 			{
 				i += 3;
 			}
 			else if (Opcodes.isJumpOpcode(opcode))
 			{
+				final int target = ints[i + 1];
+				labels[target] = true;
 				i += 1;
-				int target = ints[i + 1];
-				labels[target] = new Label();
 			}
 		}
-		
+
 		return new SpecialIntrinsicData(method, ints, strings, labels);
 	}
 }
