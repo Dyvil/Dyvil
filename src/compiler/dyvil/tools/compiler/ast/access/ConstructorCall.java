@@ -85,12 +85,6 @@ public class ConstructorCall implements ICall
 		return CONSTRUCTOR_CALL;
 	}
 
-	@Override
-	public boolean isPrimitive()
-	{
-		return false;
-	}
-
 	public IConstructor getConstructor()
 	{
 		return this.constructor;

@@ -160,11 +160,6 @@ public interface IValue extends IASTNode, ITyped
 		return !this.isConstantOrField();
 	}
 
-	default boolean isPrimitive()
-	{
-		return this.getType().isPrimitive();
-	}
-
 	default boolean isStatement()
 	{
 		return Types.isVoid(this.getType());

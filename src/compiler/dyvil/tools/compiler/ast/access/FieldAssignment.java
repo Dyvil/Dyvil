@@ -100,12 +100,6 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	}
 
 	@Override
-	public boolean isPrimitive()
-	{
-		return this.field != null && this.field.getType().isPrimitive();
-	}
-
-	@Override
 	public boolean isUsableAsStatement()
 	{
 		return true;

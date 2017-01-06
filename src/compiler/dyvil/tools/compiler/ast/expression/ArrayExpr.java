@@ -115,12 +115,6 @@ public final class ArrayExpr implements IValue, IValueList
 	}
 
 	@Override
-	public boolean isPrimitive()
-	{
-		return false;
-	}
-
-	@Override
 	public boolean isClassAccess()
 	{
 		return this.valueCount == 1 && this.values[0].isClassAccess();

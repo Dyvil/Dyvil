@@ -183,12 +183,6 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	}
 
 	@Override
-	public boolean isPrimitive()
-	{
-		return false;
-	}
-
-	@Override
 	public boolean isResolved()
 	{
 		return true;

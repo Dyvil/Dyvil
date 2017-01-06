@@ -42,12 +42,6 @@ public final class NullValue implements IConstantValue
 	}
 
 	@Override
-	public boolean isPrimitive()
-	{
-		return false;
-	}
-
-	@Override
 	public IType getType()
 	{
 		return Types.NULL;

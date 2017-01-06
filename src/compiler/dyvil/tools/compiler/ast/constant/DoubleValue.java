@@ -58,12 +58,6 @@ public class DoubleValue implements IConstantValue
 	}
 
 	@Override
-	public boolean isPrimitive()
-	{
-		return true;
-	}
-
-	@Override
 	public IType getType()
 	{
 		return Types.DOUBLE;

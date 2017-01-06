@@ -59,12 +59,6 @@ public class LongValue implements IConstantValue
 	}
 
 	@Override
-	public boolean isPrimitive()
-	{
-		return true;
-	}
-
-	@Override
 	public IType getType()
 	{
 		return Types.LONG;

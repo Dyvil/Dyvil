@@ -99,20 +99,6 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 	}
 
 	@Override
-	public boolean isPrimitive()
-	{
-		for (int i = 0; i < this.caseCount; i++)
-		{
-			IValue v = this.cases[i].action;
-			if (v != null && !v.isPrimitive())
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
-	@Override
 	public boolean isUsableAsStatement()
 	{
 		for (int i = 0; i < this.caseCount; i++)

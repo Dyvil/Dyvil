@@ -38,13 +38,7 @@ public final class OrOperator extends AbstractValue
 	{
 		return BOOLEAN_OR;
 	}
-	
-	@Override
-	public boolean isPrimitive()
-	{
-		return true;
-	}
-	
+
 	@Override
 	public boolean isResolved()
 	{

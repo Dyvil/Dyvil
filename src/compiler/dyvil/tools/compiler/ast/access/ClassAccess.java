@@ -76,12 +76,6 @@ public final class ClassAccess implements IValue
 	}
 
 	@Override
-	public boolean isPrimitive()
-	{
-		return false;
-	}
-
-	@Override
 	public boolean isResolved()
 	{
 		return this.type.isResolved();

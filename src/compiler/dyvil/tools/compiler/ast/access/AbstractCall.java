@@ -103,12 +103,6 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 	}
 
 	@Override
-	public boolean isPrimitive()
-	{
-		return this.method != null && this.getType().isPrimitive();
-	}
-
-	@Override
 	public boolean hasSideEffects()
 	{
 		return true;

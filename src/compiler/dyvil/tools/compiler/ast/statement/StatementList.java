@@ -80,7 +80,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	}
 
 	@Override
-	public void expandPosition(ICodePosition position)
+	public void expandPosition(@NonNull ICodePosition position)
 	{
 		this.position = this.position.to(position);
 	}
@@ -89,12 +89,6 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	public int valueTag()
 	{
 		return STATEMENT_LIST;
-	}
-
-	@Override
-	public boolean isPrimitive()
-	{
-		return this.returnType != null && this.returnType.isPrimitive();
 	}
 
 	@Override
