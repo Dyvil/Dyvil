@@ -1,4 +1,6 @@
-package dyvil.test
+package dyvil.tests
+
+using dyvil.Test
 
 public class SuperTest
 {
@@ -31,12 +33,11 @@ public class SuperTest
 		public func jFoo: String = super<J>.foo
 	}
 
-	public static void main([String] args)
-	{
+	public static func apply(): Test = test "Super Calls" {
 		let it = new C
 		// Main.test("Super Call Test A", "A", it.aFoo)
 		// Main.test("Super Call Test I", "I", it.iFoo)
-		Main.test("Super Call Test B", "B", it.bFoo)
-		Main.test("Super Call Test J", "J", it.jFoo)
+		test "B" { it.bFoo =?= "B" }
+		test "J" { it.jFoo =?= "J" }
 	}
 }

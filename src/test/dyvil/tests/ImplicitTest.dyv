@@ -1,4 +1,6 @@
-package dyvil.test
+package dyvil.tests
+
+using dyvil.Test
 
 public class ImplicitTest
 {
@@ -16,16 +18,14 @@ public class ImplicitTest
 
 	public static implicit func b2s(boolean b): String = b.toString
 
-	public static void main([String] args)
-	{
-		String s = 123
+	public static func apply(): Test = test "Implicit Conversions" {
+		let s: String = 123
 
-		Main.test("Implicit Assignment Test", "123", s)
-
-		Main.test("Implicit Method Call Test", "TRUE", true.toUpperCase)
+		test "Assignment" { s =?= "123" }
+		test "Method Call" { true.toUpperCase =?= "TRUE" }
 
 		// Type Check is enough
-		DebugPrintable debug = "abc"
+		var debug: DebugPrintable = "abc"
 		debug = 123
 	}
 }

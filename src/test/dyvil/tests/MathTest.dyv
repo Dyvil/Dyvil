@@ -1,14 +1,14 @@
-package dyvil.test
+package dyvil.tests
 
+using dyvil.Test
 using dyvil.math.MathUtils.sqrt
 
 public class MathTest
 {
-	public static void main([String] args)
-	{
+	public static func apply(): Test = test "Math" {
 	}
 
-	private static boolean isPrime(int value)
+	private static func isPrime(int value): boolean
 	{
 		for var j <- 2 .. value.sqrt
 		{
@@ -20,19 +20,19 @@ public class MathTest
 		return true
 	}
 
-	private static List<int> primeFactors(int value)
+	private static func primeFactors(int value): List<int>
 	{
 		if value <= 1
 		{
 			return List(1)
 		}
 
-		var res = List<int>
+		let res = List<int>
 
 		label outer:
 		while value > 1
 		{
-			for var prime <- 2 .. value
+			for prime <- 2 .. value
 			{
 				if value % prime == 0 && isPrime(prime)
 				{

@@ -1,22 +1,24 @@
-package dyvil.test
+package dyvil.tests
+
+using dyvil.Test
 
 public class HanoiTest
 {
 	private List<String> moves = List<String>
 
-	public static func main([String] args): void
+	public static func apply(): Test = test "Hanoi"
 	{
 		for (i <- 1 .. 10)
 		{
 			let test = new HanoiTest(i)
-			Main.test("Hanoi Test \(i)", requiredMoves(i), test.moves.size)
+			test "#\(i)" { requiredMoves(i) =?= test.moves.size }
 		}
 	}
 
 	public static func requiredMoves(int n): int = (1 << n) - 1
 
 	@LiteralConvertible.FromString
-	class Tower(public final String id) extends dyvil.collection.mutable.LinkedList<int>
+	class Tower(public let id: String) extends dyvil.collection.mutable.LinkedList<int>
 	{
 		public static func apply(String id): Tower = new Tower(id)
 	}

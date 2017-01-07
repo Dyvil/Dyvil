@@ -1,17 +1,18 @@
-package dyvil.test
+package dyvil.tests
+
+using dyvil.Test
 
 public class PrimitiveTest
 {
-	public static void main([String] args)
-	{
-		boolean z = false
-		byte	b = 0 as byte
-		short	s = 0 as short
-		char	c = 0 as char
-		int		i = 0
-		long	l = 0L
-		float	f = 0F
-		double	d = 0D
+	public static func apply(): Test = test "Primitives" {
+		var z = false
+		var b = 0 as byte
+		var s = 0 as short
+		var c = 0 as char
+		var i = 0
+		var l = 0L
+		var f = 0F
+		var d = 0D
 
 		// Byte
 

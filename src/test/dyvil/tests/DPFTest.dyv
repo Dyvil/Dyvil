@@ -1,8 +1,9 @@
-package dyvil.test
+package dyvil.tests
 
 import java.io._
 
-import dyvil.collection.Map
+using dyvil.Test
+
 import dyvil.collection.mutable.TreeMap
 
 import dyvil.tools.parsing.Name
@@ -15,29 +16,29 @@ import dyvil.tools.dpf.DPFConvertible
 
 public class DPFTest
 {
-	public case class Button(String text, int x, int y) implements DPFConvertible
+	public case class Button(var text: String, var x: int, var y: int) implements DPFConvertible
 	{
-		private boolean visible = false
+		private var visible: boolean = false
 		{
 			public get
 			public set
 		}
 
-		public override Value toPropertyValue()
+		public override func toPropertyValue(): Value
 		{
 			return "Button"(this.text, "x": this.x, "y": this.y) {
 				"visible": this.visible
 			}
 		}
 
-		public Button apply(Configure<Button> configure)
+		public func apply(Configure<Button> configure): Button
 		{
 			configure this
 			return this
 		}
 	}
 
-	public static final RootNode TEST_NODE = (dpf {
+	public static let TEST_NODE: RootNode = (dpf {
 		"node1" {
 			"intProperty": 10
 			"stringProperty": "abc"
@@ -65,36 +66,35 @@ public class DPFTest
 		}
 	})
 
-	public static final String TEST_STRING = TEST_NODE.toString
+	public static let TEST_STRING: String = TEST_NODE.toString
 
-	public static void main([String] args)
-	{
-		Main.test("DPF Parser", TEST_NODE, Parser.parse(TEST_STRING))
+	public static func apply(): Test = test "DPF" {
+		test "DPF Parser" {
+			Parser.parse(TEST_STRING) =?= TEST_NODE
+		}
 
 		testExpand()
 		testBinary()
 	}
 
-	private static void testExpand()
-	{
+	private static func testExpand(): Test = test "Expand" {
 		// Parse as a Map
-		Map<String, Object> baseMap = new TreeMap<String, Object>
+		let baseMap = new TreeMap<String, Object>
 		TEST_NODE.accept(new FlatMapConverter(baseMap))
 
 		// Expand the Node structure
-		RootNode expandedNode = TEST_NODE.expand(baseMap, false)
+		let expandedNode: RootNode = TEST_NODE.expand(baseMap, false)
 
 		// Convert the Node structure to a Map
-		Map<String, Object> nodeMap = new TreeMap<String, Object>
+		let nodeMap = new TreeMap<String, Object>
 		expandedNode.accept(new FlatMapConverter(nodeMap))
 
-		Map<String, Object> expandedMap = Expandable.expand(baseMap, baseMap, false)
+		let expandedMap: Map<String, Object> = Expandable.expand(baseMap, baseMap, false)
 
-		Main.test("DPF Expansion Test", nodeMap, expandedMap)
+		nodeMap =?= expandedMap
 	}
 
-	private static void testBinary()
-	{
+	private static func testBinary(): Test = test "Binary" {
 		let newNode = new RootNode
 
 		try
@@ -117,6 +117,6 @@ public class DPFTest
 			ex.printStackTrace
 		}
 
-		Main.test("DPF Binary Conversion", TEST_NODE, newNode)
+		newNode =?= TEST_NODE
 	}
 }
