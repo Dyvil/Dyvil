@@ -42,15 +42,15 @@ public class BraceAccessExpr implements IValue, IDefaultContext
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
-	{
-		this.position = position;
-	}
-
-	@Override
 	public ICodePosition getPosition()
 	{
 		return this.position;
+	}
+
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
 	}
 
 	public IValue getValue()
@@ -83,6 +83,12 @@ public class BraceAccessExpr implements IValue, IDefaultContext
 	public IDataMember resolveField(Name name)
 	{
 		return name == Names.$0 ? this.variable : null;
+	}
+
+	@Override
+	public boolean isMember(IVariable variable)
+	{
+		return variable == this.variable;
 	}
 
 	@Override
