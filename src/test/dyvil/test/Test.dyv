@@ -2,13 +2,20 @@ package dyvil.test
 
 public interface Test
 {
+	public interface TestContainerBase
+	{
+		func addTest(Test test): void
+
+		func applyStatement(Test test): void = this.addTest(test)
+	}
+
 	public case class TestContainer(
 		public let name: String
-	) implements Test
+	) implements Test, TestContainerBase
 	{
 		protected let subTests: List<Test> = MutableList<Test>
 
-		public func applyStatement(Test test): void = this.subTests.add(test)
+		public override func addTest(Test test): void = this.subTests.add(test)
 
 		public override func passes(): boolean = this.subTests.allMatch(t => t.passes)
 
@@ -34,7 +41,7 @@ public interface Test
 		}
 	}
 
-	static func test(String name, Configure<TestContainer> configure): TestContainer
+	static func test(String name, Configure<TestContainerBase> configure): TestContainer
 	{
 		let container = new TestContainer(name)
 		configure container

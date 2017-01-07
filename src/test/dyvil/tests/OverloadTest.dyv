@@ -1,0 +1,118 @@
+package dyvil.tests
+
+using dyvil.Test
+
+public class OverloadTest
+{
+	public interface A
+	public interface B
+	public class C implements A, B
+
+	// ----------------- f section -----------------
+
+	public static func f(int i): String = "f(int)"
+	public static func f(Object o): String = "f(Object)"
+	public static func f(String s): String = "f(String)"
+
+	public static func f(Object o, Object o): String = "f(Object, Object)"
+	public static func f(Object o, String s): String = "f(Object, String)"
+	public static func f(String s, Object o): String = "f(String, Object)"
+	public static func f(String s1, String s2): String = "f(String, String)"
+
+	public static func f(): String = "f()"
+	public static func f(Object... os): String = "f(Object...)"
+
+	public static func f(String s, String... ss): String = "f(String, String...)"
+	public static func f(String s, Object... os): String = "f(String, Object...)"
+
+	public static func f(Object o, Object... os): String = "f(Object, Object...)"
+	public static func f(Object o, String... ss): String = "f(Object, String...)"
+
+	// ----------------- g section -----------------
+
+	// @BytecodeName("g_ints") // will be automatically name-mangled
+	public static func g(List<int> ints): String = "g(List<int>)"
+
+	// @BytecodeName("g_strings")
+	public static func g(List<String> strings): String = "g(List<String>)"
+
+	@BytecodeName("g_intSet")
+	public static func g<T: Set<int>>(T ints): String = "g(Set<int>)"
+
+	@BytecodeName("g_stringSet")
+	public static func g<T: Set<String>>(T strings): String = "g(Set<String>)"
+
+	// ----------------- h section -----------------
+
+	@BytecodeName("h_ints")
+	public static func h(List<int> ints): String = "h(List<int>)"
+
+	@BytecodeName("h_longs")
+	public static func h(List<long> longs): String = "h(List<long>)"
+
+	@BytecodeName("h_floats")
+	public static func h(List<float> floats): String = "h(List<float>)"
+
+	@BytecodeName("h_doubles")
+	public static func h(List<double> doubles): String = "h(List<double>)"
+
+	// ----------------- main test -----------------
+
+	@OverloadPriority
+	public static func i(A a): String = "i(A)"
+	public static func i(B b): String = "i(B)"
+
+	public static func apply(): Test = test "Overload" {
+		let o = new Object
+		let s = ""
+		let i = 0
+
+		test "Nullary" {
+			f() =?= "f()"
+		}
+
+		test "Unary" {
+			f(o) =?= "f(Object)"
+			f(s) =?= "f(String)"
+			f(i) =?= "f(int)"
+		}
+
+		test "Binary" {
+			f(o, o) =?= "f(Object, Object)"
+			f(o, s) =?= "f(Object, String)"
+			f(s, o) =?= "f(String, Object)"
+			f(s, s) =?= "f(String, String)"
+		}
+
+		test "Binary Varargs" {
+			f(o, o, o) =?= "f(Object, Object...)"
+			f(o, o, s) =?= "f(Object, Object...)"
+			f(o, s, o) =?= "f(Object, Object...)"
+			f(o, s, s) =?= "f(Object, String...)"
+			f(s, s, o) =?= "f(String, Object...)"
+			f(s, s, s) =?= "f(String, String...)"
+			f(s, o, o) =?= "f(String, Object...)"
+			f(s, o, s) =?= "f(String, Object...)"
+		}
+
+		test "Generic" {
+			g(List<int>)    =?= "g(List<int>)"
+			g(List<String>) =?= "g(List<String>)"
+			g(Set<int>)     =?= "g(Set<int>)"
+			g(Set<String>)  =?= "g(Set<String>)"
+
+			h(List<int>)    =?= "h(List<int>)"
+			h(List<long>)   =?= "h(List<long>)"
+			h(List<float>)  =?= "h(List<float>)"
+			h(List<double>) =?= "h(List<double>)"
+		}
+
+		test "Priority" {
+			let c = new C
+
+			i(c)    =?= "i(A)" // i(A) has priority
+			i(a: c) =?= "i(A)"
+			i(b: c) =?= "i(B)"
+		}
+	}
+}
