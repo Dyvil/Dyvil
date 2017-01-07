@@ -1,0 +1,80 @@
+package dyvil.test
+
+public interface Test
+{
+	public case class TestContainer(
+		public let name: String
+	) implements Test
+	{
+		protected let subTests: List<Test> = MutableList<Test>
+
+		public func applyStatement(Test test): void = this.subTests.add(test)
+
+		public override func passes(): boolean = this.subTests.allMatch(t => t.passes)
+
+		public override func addErrors(List<String> errors): void
+		{
+			let subErrors = MutableList<String>
+			for (subTest <- this.subTests)
+			{
+				if (!subTest.passes)
+				{
+					subTest.addErrors(subErrors)
+				}
+			}
+
+			if (!subErrors.isEmpty)
+			{
+				errors.add("Test Collection '\(this.name)' failed:")
+				for (subError <- subErrors)
+				{
+					errors.add('\t' + subError)
+				}
+			}
+		}
+	}
+
+	static func test(String name, Configure<TestContainer> configure): TestContainer
+	{
+		let container = new TestContainer(name)
+		configure container
+		return container
+	}
+
+	public static case class RequireTest(
+		public let predicate: -> boolean
+	) implements Test
+	{
+		public override func passes(): boolean = this.predicate.apply
+
+		public override func addErrors(List<String> errors): void
+		{
+			errors.add("Generic Requirement failed")
+		}
+	}
+
+	static func require(-> boolean predicate): RequireTest = RequireTest(predicate)
+
+	public static case class EqualityTest(
+		public let actual: Object!
+		public let expected: Object!
+	) implements Test
+	{
+		public override func passes(): boolean = [this.actual].deepEquals([this.expected])
+
+		public override func addErrors(List<String> errors): void
+		{
+			if (this.passes) return
+
+			errors.add("Equality Requirement failed")
+			errors.add("\texpected: \(this.expected)")
+			errors.add("\tactual:   \(this.actual)")
+		}
+	}
+
+	infix func =?=(Object! lhs, Object! rhs): EqualityTest = EqualityTest(lhs, rhs)
+
+	func passes(): boolean
+
+	func addErrors(List<String> errors): void
+}

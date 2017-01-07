@@ -1,0 +1,6 @@
+package dyvil
+
+using dyvil.test.Test._
+
+infix operator =?= { associativity none, precedence 1 }
+infix operator =!= { associativity none, precedence 1 }
