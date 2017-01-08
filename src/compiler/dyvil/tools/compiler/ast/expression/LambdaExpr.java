@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
-import dyvil.annotation.analysis.NotNull;
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.Handle;
 import dyvil.tools.compiler.ast.access.AbstractCall;
@@ -183,12 +183,6 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	}
 
 	@Override
-	public boolean isPrimitive()
-	{
-		return false;
-	}
-
-	@Override
 	public boolean isResolved()
 	{
 		return true;
@@ -207,7 +201,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	}
 
 	private
-	@NotNull
+	@NonNull
 	LambdaType makeType()
 	{
 		final int count = this.parameters.size();

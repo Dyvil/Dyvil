@@ -19,7 +19,7 @@ public @interface DefaultValue
 
 	double doubleValue() default 1D;
 
-	String stringValue() default "";
+	@NonNull String stringValue() default "";
 
-	Class classValue() default Object.class;
+	@NonNull Class classValue() default Object.class;
 }

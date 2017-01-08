@@ -23,37 +23,37 @@ public abstract class DPFValueVisitor implements ValueVisitor
 
 	public override StringInterpolationVisitor visitStringInterpolation()
 	{
-		dyvil.tools.dpf.ast.value.StringInterpolation stringInterpolation = new StringInterpolation()
+		let stringInterpolation = new StringInterpolation()
 		this.visitValue(stringInterpolation)
 		return stringInterpolation
 	}
 
-	public override void visitName(Name name) = this.visitValue(new dyvil.tools.dpf.ast.value.NameAccess(name))
+	public override void visitName(Name name) = this.visitValue(NameAccess(name))
 
 	public override ValueVisitor visitValueAccess(Name name)
 	{
-		dyvil.tools.dpf.ast.value.NameAccess access = new NameAccess(name)
+		let access = NameAccess(name)
 		this.visitValue(access)
 		return access
 	}
 
 	public override ListVisitor visitList()
 	{
-		ListValue list = new ListValue()
+		let list = ListValue()
 		this.visitValue(list)
 		return list
 	}
 
 	public override MapVisitor visitMap()
 	{
-		MapValue map = new MapValue()
+		let map = MapValue()
 		this.visitValue(map)
 		return map
 	}
 
 	public override BuilderVisitor visitBuilder(Name name)
 	{
-		Builder builder = new Builder(name)
+		let builder = Builder(name)
 		this.visitValue(builder)
 		return builder
 	}

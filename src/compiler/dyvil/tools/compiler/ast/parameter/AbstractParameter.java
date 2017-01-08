@@ -20,6 +20,8 @@ import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.ArrayType;
+import dyvil.tools.compiler.ast.type.compound.LambdaType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -237,15 +239,16 @@ public abstract class AbstractParameter extends Member implements IParameter
 
 		this.internalType = null;
 
-		if (this.type != null)
+		final LambdaType functionType;
+		if (this.type != null && (functionType = this.type.extract(LambdaType.class)) != null)
 		{
-			if (this.type.isExtension())
+			if (functionType.isExtension())
 			{
 				this.getModifiers().addIntModifier(Modifiers.INFIX_FLAG);
 			}
 			else if (this.modifiers != null && this.modifiers.hasIntModifier(Modifiers.INFIX_FLAG))
 			{
-				this.type.setExtension(true);
+				functionType.setExtension(true);
 			}
 		}
 	}
@@ -295,7 +298,7 @@ public abstract class AbstractParameter extends Member implements IParameter
 
 		ModifierUtil.writeModifiers(visitor, modifiers);
 
-		type.writeAnnotations(writer, TypeReference.newFormalParameterReference(index), "");
+		IType.writeAnnotations(type, writer, TypeReference.newFormalParameterReference(index), "");
 
 		// Default Value
 		if (defaultValue == null)
@@ -303,7 +306,8 @@ public abstract class AbstractParameter extends Member implements IParameter
 			return;
 		}
 
-		if (type.isArrayType())
+		final ArrayType arrayType = type.extract(ArrayType.class);
+		if (arrayType != null)
 		{
 			final AnnotationVisitor annotationVisitor = writer
 				                                            .visitParameterAnnotation(index, DEFAULT_ARRAY_VALUE, false)
@@ -311,7 +315,7 @@ public abstract class AbstractParameter extends Member implements IParameter
 
 			ArrayExpr arrayExpr = (ArrayExpr) defaultValue;
 			int count = arrayExpr.valueCount();
-			IType elementType = type.getElementType();
+			IType elementType = arrayType.getElementType();
 
 			for (int i = 0; i < count; i++)
 			{
@@ -431,7 +435,7 @@ public abstract class AbstractParameter extends Member implements IParameter
 	{
 		if (this.isVarargs())
 		{
-			this.type.getElementType().toString(prefix, buffer);
+			this.type.extract(ArrayType.class).getElementType().toString(prefix, buffer);
 			buffer.append("...");
 		}
 		else

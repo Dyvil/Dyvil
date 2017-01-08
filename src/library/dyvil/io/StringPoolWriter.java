@@ -1,5 +1,6 @@
 package dyvil.io;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.HashMap;
 
@@ -7,20 +8,20 @@ import java.io.*;
 
 public class StringPoolWriter extends FilterOutputStream implements DataOutput
 {
-	private int constantPoolSize;
+	private int      constantPoolSize;
 	private String[] constantPool;
 
 	private Map<String, Integer> poolIndices;
-	
+
 	private ByteArrayOutputStream dataBytes;
 	private DataOutputStream      dataOutputStream;
-	
-	public StringPoolWriter(OutputStream target)
+
+	public StringPoolWriter(@NonNull OutputStream target)
 	{
 		this(target, 16);
 	}
 
-	public StringPoolWriter(OutputStream target, int constantPoolSize)
+	public StringPoolWriter(@NonNull OutputStream target, int constantPoolSize)
 	{
 		super(target);
 
@@ -28,79 +29,79 @@ public class StringPoolWriter extends FilterOutputStream implements DataOutput
 		this.constantPool = new String[constantPoolSize];
 		this.poolIndices = new HashMap<>(constantPoolSize);
 	}
-	
+
 	@Override
 	public void write(int b) throws IOException
 	{
 		this.dataOutputStream.write(b);
 	}
-	
+
 	@Override
 	public void write(byte[] b) throws IOException
 	{
 		this.dataOutputStream.write(b);
 	}
-	
+
 	@Override
 	public void write(byte[] b, int off, int len) throws IOException
 	{
 		this.dataOutputStream.write(b, off, len);
 	}
-	
+
 	@Override
 	public void writeBoolean(boolean v) throws IOException
 	{
 		this.dataOutputStream.writeBoolean(v);
 	}
-	
+
 	@Override
 	public void writeByte(int v) throws IOException
 	{
 		this.dataOutputStream.writeByte(v);
 	}
-	
+
 	@Override
 	public void writeShort(int v) throws IOException
 	{
 		this.dataOutputStream.writeShort(v);
 	}
-	
+
 	@Override
 	public void writeChar(int v) throws IOException
 	{
 		this.dataOutputStream.writeChar(v);
 	}
-	
+
 	@Override
 	public void writeInt(int v) throws IOException
 	{
 		this.dataOutputStream.writeInt(v);
 	}
-	
+
 	@Override
 	public void writeLong(long v) throws IOException
 	{
 		this.dataOutputStream.writeLong(v);
 	}
-	
+
 	@Override
 	public void writeFloat(float v) throws IOException
 	{
 		this.dataOutputStream.writeFloat(v);
 	}
-	
+
 	@Override
 	public void writeDouble(double v) throws IOException
 	{
 		this.dataOutputStream.writeDouble(v);
 	}
-	
+
 	@Override
 	public void writeBytes(String s) throws IOException
 	{
 		this.dataOutputStream.writeBytes(s);
 	}
-	
+
 	@Override
 	public void writeChars(String s) throws IOException
 	{

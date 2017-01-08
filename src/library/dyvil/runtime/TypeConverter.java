@@ -1,5 +1,6 @@
 package dyvil.runtime;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.asm.Type;
@@ -12,22 +13,22 @@ import static dyvil.runtime.Wrapper.*;
 public class TypeConverter
 {
 	private static final int NUM_WRAPPERS = Wrapper.values().length;
-	
+
 	private static final String NAME_OBJECT    = "java/lang/Object";
 	private static final String WRAPPER_PREFIX = "Ljava/lang/";
-	
+
 	// Same for all primitives; name of the boxing method
 	private static final String NAME_BOX_METHOD   = "valueOf";
 	private static final String NAME_UNBOX_METHOD = "Value";
-	
+
 	// Table of opcodes for widening primitive conversions
 	private static final int[][] wideningOpcodes = new int[NUM_WRAPPERS][NUM_WRAPPERS];
-	
+
 	private static final Wrapper[] FROM_WRAPPER_NAME = new Wrapper[16];
-	
+
 	// Table of wrappers for primitives, indexed by ASM type sorts
 	private static final Wrapper[] FROM_TYPE_SORT = new Wrapper[16];
-	
+
 	static
 	{
 		for (Wrapper w : Wrapper.values())
@@ -39,7 +40,7 @@ public class TypeConverter
 				FROM_WRAPPER_NAME[wi] = w;
 			}
 		}
-		
+
 		initWidening(LONG, Opcodes.I2L, BYTE, SHORT, INT, CHAR);
 		initWidening(LONG, Opcodes.F2L, FLOAT);
 		initWidening(FLOAT, Opcodes.I2F, BYTE, SHORT, INT, CHAR);
@@ -47,7 +48,7 @@ public class TypeConverter
 		initWidening(DOUBLE, Opcodes.I2D, BYTE, SHORT, INT, CHAR);
 		initWidening(DOUBLE, Opcodes.F2D, FLOAT);
 		initWidening(DOUBLE, Opcodes.L2D, LONG);
-		
+
 		FROM_TYPE_SORT[Type.BYTE] = Wrapper.BYTE;
 		FROM_TYPE_SORT[Type.SHORT] = Wrapper.SHORT;
 		FROM_TYPE_SORT[Type.INT] = Wrapper.INT;
@@ -57,16 +58,16 @@ public class TypeConverter
 		FROM_TYPE_SORT[Type.DOUBLE] = Wrapper.DOUBLE;
 		FROM_TYPE_SORT[Type.BOOLEAN] = Wrapper.BOOLEAN;
 	}
-	
-	private static void initWidening(Wrapper to, int opcode, Wrapper... from)
+
+	private static void initWidening(@NonNull Wrapper to, int opcode, @NonNull Wrapper... from)
 	{
 		for (Wrapper f : from)
 		{
 			wideningOpcodes[f.ordinal()][to.ordinal()] = opcode;
 		}
 	}
-	
-	private static int hashWrapperName(String xn)
+
+	private static int hashWrapperName(@NonNull String xn)
 	{
 		if (xn.length() < 3)
 		{
@@ -74,8 +75,8 @@ public class TypeConverter
 		}
 		return (3 * xn.charAt(1) + xn.charAt(2)) % 16;
 	}
-	
-	private static Wrapper wrapperOrNullFromDescriptor(String desc)
+
+	private static Wrapper wrapperOrNullFromDescriptor(@NonNull String desc)
 	{
 		if (!desc.startsWith(WRAPPER_PREFIX))
 		{
@@ -93,23 +94,26 @@ public class TypeConverter
 		}
 		return null;
 	}
-	
-	private static String wrapperName(Wrapper w)
+
+	@NonNull
+	private static String wrapperName(@NonNull Wrapper w)
 	{
 		return "java/lang/" + w.wrapperSimpleName();
 	}
-	
-	private static String boxingDescriptor(Wrapper w)
+
+	@NonNull
+	private static String boxingDescriptor(@NonNull Wrapper w)
 	{
 		return "(" + w.basicTypeChar() + ")Ljava/lang/" + w.wrapperSimpleName() + ";";
 	}
-	
-	private static String unboxingDescriptor(Wrapper w)
+
+	@NonNull
+	private static String unboxingDescriptor(@NonNull Wrapper w)
 	{
 		return "()" + w.basicTypeChar();
 	}
-	
-	static void boxIfTypePrimitive(MethodVisitor mv, Type t)
+
+	static void boxIfTypePrimitive(@NonNull MethodVisitor mv, @NonNull Type t)
 	{
 		Wrapper w = FROM_TYPE_SORT[t.getSort()];
 		if (w != null)
@@ -117,8 +121,8 @@ public class TypeConverter
 			box(mv, w);
 		}
 	}
-	
-	static void widen(MethodVisitor mv, Wrapper ws, Wrapper wt)
+
+	static void widen(@NonNull MethodVisitor mv, @NonNull Wrapper ws, @NonNull Wrapper wt)
 	{
 		if (ws != wt)
 		{
@@ -129,19 +133,20 @@ public class TypeConverter
 			}
 		}
 	}
-	
-	static void box(MethodVisitor mv, Wrapper w)
+
+	static void box(@NonNull MethodVisitor mv, @NonNull Wrapper w)
 	{
 		mv.visitMethodInsn(Opcodes.INVOKESTATIC, wrapperName(w), NAME_BOX_METHOD, boxingDescriptor(w), false);
 	}
-	
-	static void unbox(MethodVisitor mv, String wrapperClassName, Wrapper wt)
+
+	static void unbox(@NonNull MethodVisitor mv, String wrapperClassName, @NonNull Wrapper wt)
 	{
 		mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, wrapperClassName, wt.primitiveSimpleName() + NAME_UNBOX_METHOD,
 		                   unboxingDescriptor(wt), false);
 	}
-	
-	private static String descriptorToName(String desc)
+
+	@NonNull
+	private static String descriptorToName(@NonNull String desc)
 	{
 		int last = desc.length() - 1;
 		if (desc.charAt(0) == 'L' && desc.charAt(last) == ';')
@@ -152,8 +157,8 @@ public class TypeConverter
 		// Already in internal name form
 		return desc;
 	}
-	
-	static void cast(MethodVisitor mv, String ds, String dt)
+
+	static void cast(@NonNull MethodVisitor mv, @NonNull String ds, @NonNull String dt)
 	{
 		String ns = descriptorToName(ds);
 		String nt = descriptorToName(dt);
@@ -162,13 +167,13 @@ public class TypeConverter
 			mv.visitTypeInsn(Opcodes.CHECKCAST, nt);
 		}
 	}
-	
+
 	private boolean isPrimitive(Wrapper w)
 	{
 		return w != OBJECT;
 	}
-	
-	private static Wrapper toWrapper(String desc)
+
+	private static Wrapper toWrapper(@NonNull String desc)
 	{
 		char first = desc.charAt(0);
 		if (first == '[' || first == '(')
@@ -177,8 +182,9 @@ public class TypeConverter
 		}
 		return Wrapper.forBasicType(first);
 	}
-	
-	public static void convertType(MethodVisitor mv, Class<?> arg, Class<?> target, Class<?> functional)
+
+	public static void convertType(@NonNull MethodVisitor mv, @NonNull Class<?> arg, @NonNull Class<?> target,
+		                              @NonNull Class<?> functional)
 	{
 		if (arg.equals(target) && arg.equals(functional))
 		{
@@ -206,7 +212,7 @@ public class TypeConverter
 			mv.visitInsn(Opcodes.POP);
 			return;
 		}
-		
+
 		if (arg.isPrimitive())
 		{
 			Wrapper wArg = Wrapper.forPrimitiveType(arg);
@@ -306,7 +312,7 @@ public class TypeConverter
 		}
 	}
 
-	public static String getInternalName(Class<?> c)
+	public static String getInternalName(@NonNull Class<?> c)
 	{
 		return c.getName().replace('.', '/');
 	}
@@ -324,7 +330,7 @@ public class TypeConverter
 		return 1;
 	}
 
-	public static int getLoadOpcode(Class<?> c)
+	public static int getLoadOpcode(@NonNull Class<?> c)
 	{
 		if (c == Void.TYPE)
 		{
@@ -333,7 +339,7 @@ public class TypeConverter
 		return ILOAD + getOpcodeOffset(c);
 	}
 
-	public static int getReturnOpcode(Class<?> c)
+	public static int getReturnOpcode(@NonNull Class<?> c)
 	{
 		if (c == Void.TYPE)
 		{
@@ -342,7 +348,7 @@ public class TypeConverter
 		return IRETURN + getOpcodeOffset(c);
 	}
 
-	private static int getOpcodeOffset(Class<?> c)
+	private static int getOpcodeOffset(@NonNull Class<?> c)
 	{
 		if (c.isPrimitive())
 		{

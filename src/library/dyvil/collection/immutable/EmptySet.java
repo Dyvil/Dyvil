@@ -2,8 +2,12 @@ package dyvil.collection.immutable;
 
 import dyvil.annotation.Immutable;
 import dyvil.annotation.internal.DyvilModifiers;
+import dyvil.annotation.internal.NonNull;
 import dyvil.array.ObjectArray;
-import dyvil.collection.*;
+import dyvil.collection.Collection;
+import dyvil.collection.ImmutableSet;
+import dyvil.collection.MutableSet;
+import dyvil.collection.Set;
 import dyvil.collection.iterator.EmptyIterator;
 import dyvil.lang.LiteralConvertible;
 import dyvil.reflect.Modifiers;
@@ -22,124 +26,137 @@ import java.util.function.Predicate;
 public final class EmptySet<E> implements ImmutableSet<E>
 {
 	private static final long serialVersionUID = -6445525479912514756L;
-	
+
 	public static final EmptySet instance = new EmptySet();
-	
+
+	@NonNull
 	public static <E> EmptySet<E> apply()
 	{
 		return (EmptySet<E>) instance;
 	}
-	
+
 	private EmptySet()
 	{
 	}
-	
+
 	@Override
 	public int size()
 	{
 		return 0;
 	}
-	
+
 	@Override
 	public boolean isEmpty()
 	{
 		return true;
 	}
-	
+
+	@NonNull
 	@Override
 	public Iterator<E> iterator()
 	{
 		return (Iterator<E>) EmptyIterator.instance;
 	}
-	
+
+	@NonNull
 	@Override
 	public Spliterator<E> spliterator()
 	{
 		return Spliterators.emptySpliterator();
 	}
-	
+
 	@Override
-	public void forEach(Consumer<? super E> action)
+	public void forEach(@NonNull Consumer<? super E> action)
 	{
 	}
-	
+
 	@Override
 	public boolean contains(Object element)
 	{
 		return false;
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableSet<E> added(E element)
 	{
 		return new SingletonSet<>(element);
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableSet<E> removed(Object element)
 	{
 		return this;
 	}
-	
+
+	@NonNull
 	@Override
-	public ImmutableSet<E> difference(Collection<?> collection)
+	public ImmutableSet<E> difference(@NonNull Collection<?> collection)
 	{
 		return this;
 	}
-	
+
+	@NonNull
 	@Override
-	public ImmutableSet<E> intersection(Collection<? extends E> collection)
+	public ImmutableSet<E> intersection(@NonNull Collection<? extends E> collection)
 	{
 		return this;
 	}
-	
+
+	@NonNull
 	@Override
-	public ImmutableSet<E> union(Collection<? extends E> collection)
+	public ImmutableSet<E> union(@NonNull Collection<? extends E> collection)
 	{
 		return ImmutableSet.from(collection);
 	}
-	
+
+	@NonNull
 	@Override
-	public ImmutableSet<E> symmetricDifference(Collection<? extends E> collection)
+	public ImmutableSet<E> symmetricDifference(@NonNull Collection<? extends E> collection)
 	{
 		return ImmutableSet.from(collection);
 	}
-	
+
+	@NonNull
 	@Override
-	public <R> ImmutableSet<R> mapped(Function<? super E, ? extends R> mapper)
+	public <R> ImmutableSet<R> mapped(@NonNull Function<? super E, ? extends R> mapper)
 	{
 		return (ImmutableSet<R>) this;
 	}
-	
+
+	@NonNull
 	@Override
-	public <R> ImmutableSet<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
+	public <R> ImmutableSet<R> flatMapped(@NonNull Function<? super E, ? extends @NonNull Iterable<? extends R>> mapper)
 	{
 		return (ImmutableSet<R>) this;
 	}
-	
+
+	@NonNull
 	@Override
-	public ImmutableSet<E> filtered(Predicate<? super E> condition)
+	public ImmutableSet<E> filtered(@NonNull Predicate<? super E> condition)
 	{
 		return this;
 	}
-	
+
 	@Override
 	public Object[] toArray()
 	{
 		return ObjectArray.EMPTY;
 	}
-	
+
 	@Override
-	public E[] toArray(Class<E> type)
+	public E @NonNull [] toArray(@NonNull Class<E> type)
 	{
 		return (E[]) ObjectArray.EMPTY;
 	}
-	
+
 	@Override
-	public void toArray(int index, Object[] store)
+	public void toArray(int index, Object @NonNull [] store)
 	{
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableSet<E> copy()
 	{
@@ -152,12 +169,14 @@ public final class EmptySet<E> implements ImmutableSet<E>
 		return MutableSet.apply();
 	}
 
+	@NonNull
 	@Override
 	public <RE> MutableSet<RE> emptyCopy(int capacity)
 	{
 		return MutableSet.withCapacity(capacity);
 	}
-	
+
+	@NonNull
 	@Override
 	public MutableSet<E> mutable()
 	{
@@ -175,36 +194,39 @@ public final class EmptySet<E> implements ImmutableSet<E>
 	{
 		return ImmutableSet.builder(capacity);
 	}
-	
+
 	@Override
-	public java.util.Set<E> toJava()
+	public java.util.@NonNull Set<E> toJava()
 	{
 		return (java.util.Set<E>) Collections.EMPTY_SET;
 	}
-	
+
+	@NonNull
 	@Override
 	public String toString()
 	{
 		return Collection.EMPTY_STRING;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj)
 	{
 		return Set.setEquals(this, obj);
 	}
-	
+
 	@Override
 	public int hashCode()
 	{
 		return Set.setHashCode(this);
 	}
-	
+
+	@NonNull
 	private Object writeReplace() throws java.io.ObjectStreamException
 	{
 		return instance;
 	}
-	
+
+	@NonNull
 	private Object readResolve() throws java.io.ObjectStreamException
 	{
 		return instance;

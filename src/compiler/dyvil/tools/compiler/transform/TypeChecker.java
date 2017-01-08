@@ -120,7 +120,7 @@ public final class TypeChecker
 		final IValue newValue = convertValueDirect(value, concreteType, typeContext, markers, context);
 		if (newValue != null)
 		{
-			if (typeContext != null && !typeContext.isReadonly())
+			if (typeContext != null && !typeContext.isReadonly() && type.hasTypeVariables())
 			{
 				type.inferTypes(newValue.getType(), typeContext);
 			}

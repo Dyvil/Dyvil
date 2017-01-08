@@ -28,13 +28,7 @@ public final class NotOperator extends AbstractValue
 	{
 		return BOOLEAN_NOT;
 	}
-	
-	@Override
-	public boolean isPrimitive()
-	{
-		return true;
-	}
-	
+
 	@Override
 	public boolean isResolved()
 	{

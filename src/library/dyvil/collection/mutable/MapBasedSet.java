@@ -1,5 +1,6 @@
 package dyvil.collection.mutable;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractMapBasedSet;
 
@@ -24,26 +25,30 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 		return this.map;
 	}
 
+	@NonNull
 	@Override
 	public MutableSet<E> added(E element)
 	{
 		return new MapBasedSet<>(this.map.withEntry(element, true));
 	}
 
+	@NonNull
 	@Override
 	public MutableSet<E> removed(Object element)
 	{
 		return new MapBasedSet<>(this.map.keyRemoved(element));
 	}
 
+	@NonNull
 	@Override
-	public MutableSet<E> difference(Collection<?> collection)
+	public MutableSet<E> difference(@NonNull Collection<?> collection)
 	{
 		return new MapBasedSet<>(this.map.keyDifference(collection));
 	}
 
+	@NonNull
 	@Override
-	public MutableSet<E> intersection(Collection<? extends E> collection)
+	public MutableSet<E> intersection(@NonNull Collection<? extends E> collection)
 	{
 		MutableMap<E, Boolean> map = this.map.emptyCopy();
 		for (Entry<E, ?> entry : this.map)
@@ -57,8 +62,9 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 		return new MapBasedSet<>(map);
 	}
 
+	@NonNull
 	@Override
-	public MutableSet<E> union(Collection<? extends E> collection)
+	public MutableSet<E> union(@NonNull Collection<? extends E> collection)
 	{
 		MutableMap<E, Boolean> map = this.map.copy();
 		for (E element : collection)
@@ -68,8 +74,9 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 		return new MapBasedSet<>(map);
 	}
 
+	@NonNull
 	@Override
-	public MutableSet<E> symmetricDifference(Collection<? extends E> collection)
+	public MutableSet<E> symmetricDifference(@NonNull Collection<? extends E> collection)
 	{
 		MutableMap<E, Boolean> map = this.map.emptyCopy();
 		for (Entry<E, ?> entry : this.map)
@@ -90,8 +97,9 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 		return new MapBasedSet<>(map);
 	}
 
+	@NonNull
 	@Override
-	public <R> MutableSet<R> mapped(Function<? super E, ? extends R> mapper)
+	public <R> MutableSet<R> mapped(@NonNull Function<? super E, ? extends R> mapper)
 	{
 		MutableMap<R, Boolean> map = this.map.emptyCopy();
 		for (Entry<E, ?> entry : this.map)
@@ -101,8 +109,9 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 		return new MapBasedSet<>(map);
 	}
 
+	@NonNull
 	@Override
-	public <R> MutableSet<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
+	public <R> MutableSet<R> flatMapped(@NonNull Function<? super E, ? extends @NonNull Iterable<? extends R>> mapper)
 	{
 		MutableMap<R, Boolean> map = this.map.emptyCopy();
 		for (Entry<E, ?> entry : this.map)
@@ -115,8 +124,9 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 		return new MapBasedSet<>(map);
 	}
 
+	@NonNull
 	@Override
-	public MutableSet<E> filtered(Predicate<? super E> condition)
+	public MutableSet<E> filtered(@NonNull Predicate<? super E> condition)
 	{
 		MutableMap<E, Boolean> map = this.map.emptyCopy();
 		for (Entry<E, ?> entry : this.map)
@@ -150,7 +160,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 	}
 
 	@Override
-	public boolean addAll(Collection<? extends E> collection)
+	public boolean addAll(@NonNull Collection<? extends E> collection)
 	{
 		boolean added = false;
 		for (E element : collection)
@@ -164,7 +174,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 	}
 
 	@Override
-	public boolean retainAll(Collection<? extends E> collection)
+	public boolean retainAll(@NonNull Collection<? extends E> collection)
 	{
 		boolean removed = false;
 		Iterator<? extends Entry<E, ?>> iterator = this.map.iterator();
@@ -181,7 +191,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 	}
 
 	@Override
-	public boolean symmetricDifferenceInplace(Collection<? extends E> collection)
+	public boolean symmetricDifferenceInplace(@NonNull Collection<? extends E> collection)
 	{
 		boolean changed = false;
 		MutableMap<E, Boolean> newMap = this.map.emptyCopy();
@@ -207,7 +217,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 	}
 
 	@Override
-	public void map(Function<? super E, ? extends E> mapper)
+	public void map(@NonNull Function<? super E, ? extends E> mapper)
 	{
 		MutableMap<E, Boolean> newMap = this.map.emptyCopy();
 		for (Entry<E, ?> entry : this.map)
@@ -218,7 +228,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 	}
 
 	@Override
-	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper)
+	public void flatMap(@NonNull Function<? super E, ? extends @NonNull Iterable<? extends E>> mapper)
 	{
 		MutableMap<E, Boolean> newMap = this.map.emptyCopy();
 		for (Entry<E, ?> entry : this.map)
@@ -231,12 +241,14 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 		this.map = newMap;
 	}
 
+	@NonNull
 	@Override
 	public MutableSet<E> copy()
 	{
 		return this.mutableCopy();
 	}
 
+	@NonNull
 	@Override
 	public ImmutableSet<E> immutable()
 	{

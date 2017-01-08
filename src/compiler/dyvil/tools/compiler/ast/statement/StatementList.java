@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.statement;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.collection.List;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.collection.mutable.ArrayList;
@@ -14,6 +15,7 @@ import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.MemberKind;
@@ -22,7 +24,6 @@ import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.statement.control.Label;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -41,6 +42,10 @@ import java.util.Iterator;
 
 public class StatementList implements IValue, IValueList, IDefaultContext, ILabelContext
 {
+	private static final TypeChecker.MarkerSupplier RETURN_MARKER_SUPPLIER = TypeChecker
+		                                                                         .markerSupplier("statementlist.return",
+		                                                                                         "type.expected",
+		                                                                                         "return.type");
 	protected ICodePosition position;
 
 	protected IValue[] values;
@@ -76,7 +81,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	}
 
 	@Override
-	public void expandPosition(ICodePosition position)
+	public void expandPosition(@NonNull ICodePosition position)
 	{
 		this.position = this.position.to(position);
 	}
@@ -85,12 +90,6 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	public int valueTag()
 	{
 		return STATEMENT_LIST;
-	}
-
-	@Override
-	public boolean isPrimitive()
-	{
-		return this.returnType != null && this.returnType.isPrimitive();
 	}
 
 	@Override
@@ -147,7 +146,8 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 			}
 		}
 
-		final IValue typed = value.withType(type, typeContext, markers, context);
+		final IValue typed = TypeChecker
+			                     .convertValue(value, type, typeContext, markers, context, RETURN_MARKER_SUPPLIER);
 
 		context.pop();
 
@@ -155,12 +155,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		{
 			this.values[this.valueCount - 1] = typed;
 			this.returnType = typed.getType();
-			return this;
 		}
-
-		markers.add(TypeChecker
-			            .typeError(value.getPosition(), type, value.getType(), "statementlist.return", "type.expected",
-			                       "return.type"));
 
 		return this;
 	}
@@ -268,16 +263,18 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		if (this.variables != null)
+		if (this.variables == null)
 		{
-			// Intentionally start at the last variable
-			for (int i = this.variables.size() - 1; i >= 0; i--)
+			return null;
+		}
+
+		// Intentionally start at the last variable
+		for (int i = this.variables.size() - 1; i >= 0; i--)
+		{
+			final IVariable variable = this.variables.get(i);
+			if (variable.getName() == name)
 			{
-				final IVariable variable = this.variables.get(i);
-				if (variable.getName() == name)
-				{
-					return variable;
-				}
+				return variable;
 			}
 		}
 
@@ -425,24 +422,26 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	{
 		final SingleArgument argument = new SingleArgument(resolvedValue);
 
-		IMethod method = ICall.resolveMethod(context, null, Names.applyStatement, argument);
-		if (method != null)
-		{
-			final MethodCall call = new MethodCall(resolvedValue.getPosition(), null, method, argument);
-			call.checkArguments(markers, context);
-			return call;
-		}
-
 		final IValue implicitValue = context.getImplicit();
-		if (implicitValue == null)
+		if (implicitValue != null)
 		{
-			return null;
+			final IValue call = resolveApplyStatement(markers, context, argument, implicitValue);
+			if (call != null)
+			{
+				return call;
+			}
 		}
 
-		method = ICall.resolveMethod(context, implicitValue, Names.applyStatement, argument);
+		return resolveApplyStatement(markers, context, argument, null);
+	}
+
+	private static IValue resolveApplyStatement(MarkerList markers, IContext context, SingleArgument argument,
+		                                           IValue receiver)
+	{
+		final IMethod method = ICall.resolveMethod(context, receiver, Names.applyStatement, argument);
 		if (method != null)
 		{
-			final MethodCall call = new MethodCall(resolvedValue.getPosition(), implicitValue, method, argument);
+			final MethodCall call = new MethodCall(argument.getFirstValue().getPosition(), receiver, method, argument);
 			call.checkArguments(markers, context);
 			return call;
 		}
@@ -461,7 +460,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		if (variable.getValue() == null)
 		{
 			variable.setValue(variable.getType().getDefaultValue());
-			markers.add(Markers.semanticError(this.position, "variable.value", variableName));
+			markers.add(Markers.semanticError(variable.getPosition(), "variable.uninitialized", variableName));
 		}
 
 		// Variable Name Shadowing
@@ -473,6 +472,11 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 
 		// Actually add the Variable to the List (this has to happen after checking for shadowed variables)
 
+		this.addVariable(variable);
+	}
+
+	public void addVariable(IVariable variable)
+	{
 		if (this.variables == null)
 		{
 			this.variables = new ArrayList<>();

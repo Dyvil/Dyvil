@@ -1,0 +1,40 @@
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
+
+package dyvil.ref.unsafe
+
+import dyvil.ref.TYPE_NAME##Ref
+import dyvil.reflect.ReflectUtils
+
+import java.lang.reflect.Field
+
+#if IS_GENERIC
+public class Unsafe##TYPE_NAME##Ref<type T>(
+	protected let base: Object!
+	protected let offset: long
+) implements TYPE_NAME##Ref<T>
+#else
+public class Unsafe##TYPE_NAME##Ref(
+	protected let base: Object!
+	protected let offset: long
+) implements TYPE_NAME##Ref
+#end
+{
+	public init(Field staticField)
+	{
+		this.init(ReflectUtils.UNSAFE.staticFieldBase(staticField), ReflectUtils.UNSAFE.staticFieldOffset(staticField))
+	}
+
+	public init(Object! receiver, Field field)
+	{
+		this.init(receiver, ReflectUtils.UNSAFE.objectFieldOffset(field))
+	}
+
+#if IS_GENERIC
+	public override func get(): T = ReflectUtils.UNSAFE.get##TYPE_NAME(this.base, this.offset) as T
+#else
+	public override func get(): PRIMITIVE = ReflectUtils.UNSAFE.get##TYPE_NAME(this.base, this.offset)
+#end
+
+	public override func set(PRIMITIVE value): void = ReflectUtils.UNSAFE.put##TYPE_NAME(this.base, this.offset, value)
+}

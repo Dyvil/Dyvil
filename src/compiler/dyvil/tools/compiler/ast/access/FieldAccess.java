@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -16,7 +17,6 @@ import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.reference.InstanceFieldReference;
 import dyvil.tools.compiler.ast.reference.StaticFieldReference;
 import dyvil.tools.compiler.ast.reference.VariableReference;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.raw.NamedType;
@@ -318,34 +318,32 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 
 	protected IValue resolveFieldAccess(MarkerList markers, IContext context)
 	{
+		// Duplicate in FieldAssignment
+
+		IValue value;
+
 		if (ICall.privateAccess(context, this.receiver))
 		{
-			// Also true when receiver == null
+			final IValue implicit;
+			if (this.receiver == null && (implicit = context.getImplicit()) != null)
+			{
+				value = this.resolveMethod(implicit, markers, context);
+				if (value != null)
+				{
+					return value;
+				}
 
-			IValue value = this.resolveField(this.receiver, context);
+				value = this.resolveField(implicit, context);
+				if (value != null)
+				{
+					return value;
+				}
+			}
+
+			value = this.resolveField(this.receiver, context);
 			if (value != null)
 			{
 				return value;
-			}
-
-			// Duplicate in FieldAssignment
-			if (this.receiver == null)
-			{
-				final IValue implicit = context.getImplicit();
-				if (implicit != null)
-				{
-					value = this.resolveMethod(implicit, markers, context);
-					if (value != null)
-					{
-						return value;
-					}
-
-					value = this.resolveField(implicit, context);
-					if (value != null)
-					{
-						return value;
-					}
-				}
 			}
 
 			value = this.resolveMethod(this.receiver, markers, context);
@@ -356,7 +354,7 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 		}
 		else
 		{
-			IValue value = this.resolveMethod(this.receiver, markers, context);
+			value = this.resolveMethod(this.receiver, markers, context);
 			if (value != null)
 			{
 				return value;

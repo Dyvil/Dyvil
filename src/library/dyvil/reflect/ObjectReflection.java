@@ -1,6 +1,8 @@
 package dyvil.reflect;
 
 import dyvil.annotation.internal.DyvilModifiers;
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -11,7 +13,7 @@ public class ObjectReflection
 	{
 		return ReflectUtils.JAVA_LANG_ACCESS.newStringUnsafe(values);
 	}
-	
+
 	public static <T> T createInstance(String className)
 	{
 		try
@@ -24,9 +26,9 @@ public class ObjectReflection
 			return null;
 		}
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> T createInstance(Class<T> c)
+	public static <T> T createInstance(@NonNull Class<T> c)
 	{
 		try
 		{
@@ -37,9 +39,10 @@ public class ObjectReflection
 			return null;
 		}
 	}
-	
+
+	@Nullable
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> T createInstance(Class<T> c, Object... parameters)
+	public static <T> T createInstance(@NonNull Class<T> c, @NonNull Object... parameters)
 	{
 		Class[] parameterTypes = new Class[parameters.length];
 		for (int i = 0; i < parameters.length; i++)
@@ -49,12 +52,12 @@ public class ObjectReflection
 				parameterTypes[i] = parameters[i].getClass();
 			}
 		}
-		
+
 		return createInstance(c, parameterTypes, parameters);
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> T createInstance(Class<T> c, Class[] parameterTypes, Object... parameters)
+	public static <T> T createInstance(Class<T> c, Class @NonNull [] parameterTypes, Object... parameters)
 	{
 		try
 		{
@@ -66,7 +69,7 @@ public class ObjectReflection
 			return null;
 		}
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
 	public static <T> T allocateInstance(Class<T> c)
 	{
@@ -79,9 +82,9 @@ public class ObjectReflection
 			return null;
 		}
 	}
-	
+
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> void copyFields(T from, T to)
+	public static <T> void copyFields(@NonNull T from, T to)
 	{
 		try
 		{
@@ -96,7 +99,7 @@ public class ObjectReflection
 						f.set(to, f.get(from));
 					}
 				}
-				
+
 				c = c.getSuperclass();
 			}
 			while (c != null);

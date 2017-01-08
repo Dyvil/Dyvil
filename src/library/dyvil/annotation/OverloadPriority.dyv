@@ -1,0 +1,12 @@
+package dyvil.annotation
+
+import java.lang.annotation._
+
+@Target([ ElementType.METHOD, ElementType.CONSTRUCTOR ])
+@Retention(RetentionPolicy.CLASS)
+public @interface OverloadPriority(
+	let value: int = DEFAULT_PRIORITY
+)
+{
+	public const DEFAULT_PRIORITY: int = 1
+}

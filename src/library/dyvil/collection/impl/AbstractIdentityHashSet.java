@@ -1,5 +1,7 @@
 package dyvil.collection.impl;
 
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.collection.*;
 import dyvil.math.MathUtils;
 import dyvil.util.ImmutableException;
@@ -36,7 +38,7 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 		this.table = new Object[MathUtils.powerOfTwo(AbstractHashMap.grow(capacity)) << 1];
 	}
 
-	public AbstractIdentityHashSet(E[] elements)
+	public AbstractIdentityHashSet(E @NonNull [] elements)
 	{
 		this(elements.length);
 		for (E element : elements)
@@ -45,25 +47,25 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 		}
 	}
 
-	public AbstractIdentityHashSet(Iterable<? extends E> iterable)
+	public AbstractIdentityHashSet(@NonNull Iterable<? extends E> iterable)
 	{
 		this();
 		this.addAllInternal(iterable);
 	}
 
-	public AbstractIdentityHashSet(SizedIterable<? extends E> iterable)
+	public AbstractIdentityHashSet(@NonNull SizedIterable<? extends E> iterable)
 	{
 		this(iterable.size());
 		this.addAllInternal(iterable);
 	}
 
-	public AbstractIdentityHashSet(Set<? extends E> set)
+	public AbstractIdentityHashSet(@NonNull Set<? extends E> set)
 	{
 		this(set.size());
 		this.addAllInternal(set);
 	}
 
-	public AbstractIdentityHashSet(AbstractIdentityHashSet<? extends E> set)
+	public AbstractIdentityHashSet(@NonNull AbstractIdentityHashSet<? extends E> set)
 	{
 		this.table = set.table.clone();
 		this.size = set.size;
@@ -155,9 +157,10 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 		}
 	}
 
-	protected void addAllInternal(Iterable<? extends E> iterable)
+	protected void addAllInternal(@NonNull Iterable<? extends E> iterable)
 	{
-		for (E element : iterable) {
+		for (E element : iterable)
+		{
 			this.addInternal(element);
 		}
 	}
@@ -168,6 +171,7 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 		return this.size;
 	}
 
+	@NonNull
 	@Override
 	public Iterator<E> iterator()
 	{
@@ -195,6 +199,7 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 				return false;
 			}
 
+			@Nullable
 			@Override
 			public E next()
 			{
@@ -269,7 +274,7 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 	}
 
 	@Override
-	public void forEach(Consumer<? super E> action)
+	public void forEach(@NonNull Consumer<? super E> action)
 	{
 		for (Object element : this.table)
 		{
@@ -281,7 +286,7 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 	}
 
 	@Override
-	public boolean contains(Object element)
+	public boolean contains(@Nullable Object element)
 	{
 		if (element == null)
 		{
@@ -306,7 +311,7 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 	}
 
 	@Override
-	public void toArray(int index, Object[] store)
+	public void toArray(int index, Object @NonNull [] store)
 	{
 		for (Object o : this.table)
 		{
@@ -317,24 +322,28 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 		}
 	}
 
+	@NonNull
 	@Override
 	public <R> MutableSet<R> emptyCopy()
 	{
 		return new dyvil.collection.mutable.IdentityHashSet<>();
 	}
 
+	@NonNull
 	@Override
 	public <RE> MutableSet<RE> emptyCopy(int capacity)
 	{
 		return new dyvil.collection.mutable.IdentityHashSet<>(capacity);
 	}
 
+	@NonNull
 	@Override
 	public MutableSet<E> mutableCopy()
 	{
 		return new dyvil.collection.mutable.IdentityHashSet<>(this);
 	}
 
+	@NonNull
 	@Override
 	public ImmutableSet<E> immutableCopy()
 	{
@@ -354,7 +363,7 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 	}
 
 	@Override
-	public java.util.Set<E> toJava()
+	public java.util.@NonNull Set<E> toJava()
 	{
 		java.util.IdentityHashMap<E, Boolean> map = new java.util.IdentityHashMap<>(this.size);
 		for (E element : this)
@@ -364,6 +373,7 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 		return Collections.newSetFromMap(map);
 	}
 
+	@NonNull
 	@Override
 	public String toString()
 	{
@@ -382,7 +392,7 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 		return Set.setHashCode(this);
 	}
 
-	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	private void writeObject(java.io.@NonNull ObjectOutputStream out) throws IOException
 	{
 		out.defaultWriteObject();
 
@@ -399,7 +409,7 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 		}
 	}
 
-	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	private void readObject(java.io.@NonNull ObjectInputStream in) throws IOException, ClassNotFoundException
 	{
 		in.defaultReadObject();
 

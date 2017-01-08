@@ -17,7 +17,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public interface IMethod extends IClassMember, ICallableMember, ICallableSignature, ITypeParametric, IContext
+public interface IMethod extends IClassMember, ICallableMember, ITypeParametric, IContext
 {
 	@Override
 	default MemberKind getKind()
@@ -29,7 +29,7 @@ public interface IMethod extends IClassMember, ICallableMember, ICallableSignatu
 
 	void checkImplicitMatch(MatchList<IMethod> list, IValue value, IType type);
 	
-	IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, GenericData genericData);
+	IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue receiver, IArguments arguments, GenericData genericData);
 	
 	void checkCall(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext);
 	
@@ -83,15 +83,15 @@ public interface IMethod extends IClassMember, ICallableMember, ICallableSignatu
 	
 	String[] getInternalExceptions();
 	
-	void writeCall(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, IType targetType, int lineNumber)
+	void writeCall(MethodWriter writer, IValue receiver, IArguments arguments, ITypeContext typeContext, IType targetType, int lineNumber)
 			throws BytecodeException;
 	
-	void writeInvoke(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
+	void writeInvoke(MethodWriter writer, IValue receiver, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException;
 	
-	void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
+	void writeJump(MethodWriter writer, Label dest, IValue receiver, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException;
 	
-	void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments, ITypeContext typeContext, int lineNumber)
+	void writeInvJump(MethodWriter writer, Label dest, IValue receiver, IArguments arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException;
 }

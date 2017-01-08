@@ -83,10 +83,6 @@ public final class CaseClassMetadata extends ClassMetadata
 		if (this.constructor != null && (this.members & CONSTRUCTOR) == 0)
 		{
 			this.constructor.getParameterList().copyTo(applyMethod.getParameterList());
-			if (this.constructor.isVariadic())
-			{
-				applyMethod.setVariadic();
-			}
 		}
 		else
 		{

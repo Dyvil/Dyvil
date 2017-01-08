@@ -1,5 +1,7 @@
 package dyvil.collection.impl;
 
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.collection.*;
 
 import java.io.IOException;
@@ -31,13 +33,13 @@ public abstract class AbstractArrayList<E> implements List<E>
 		this.elements = new Object[capacity];
 	}
 
-	public AbstractArrayList(E[] elements)
+	public AbstractArrayList(E @NonNull [] elements)
 	{
 		this.elements = elements.clone();
 		this.size = elements.length;
 	}
 
-	public AbstractArrayList(E[] elements, int size)
+	public AbstractArrayList(E @NonNull [] elements, int size)
 	{
 		this.elements = new Object[size];
 		System.arraycopy(elements, 0, this.elements, 0, size);
@@ -50,19 +52,19 @@ public abstract class AbstractArrayList<E> implements List<E>
 		this.size = size;
 	}
 
-	public AbstractArrayList(Iterable<? extends E> iterable)
+	public AbstractArrayList(@NonNull Iterable<? extends E> iterable)
 	{
 		this();
 		this.addAllInternal(iterable);
 	}
 
-	public AbstractArrayList(Collection<? extends E> collection)
+	public AbstractArrayList(@NonNull Collection<? extends E> collection)
 	{
 		this(collection.size());
 		this.addAllInternal(collection);
 	}
 
-	public AbstractArrayList(AbstractArrayList<? extends E> arrayList)
+	public AbstractArrayList(@NonNull AbstractArrayList<? extends E> arrayList)
 	{
 		this.size = arrayList.size;
 		this.elements = arrayList.elements.clone();
@@ -76,7 +78,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 		this.size++;
 	}
 
-	protected void addAllInternal(Iterable<? extends E> iterable)
+	protected void addAllInternal(@NonNull Iterable<? extends E> iterable)
 	{
 		for (E element : iterable)
 		{
@@ -84,7 +86,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 		}
 	}
 
-	protected void addAllInternal(Collection<? extends E> collection)
+	protected void addAllInternal(@NonNull Collection<? extends E> collection)
 	{
 		this.ensureCapacityInternal(this.size + collection.size());
 		collection.toArray(this.size, this.elements);
@@ -125,7 +127,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 	}
 
 	@Override
-	public boolean isSorted(Comparator<? super E> comparator)
+	public boolean isSorted(@NonNull Comparator<? super E> comparator)
 	{
 		return Collection.isSorted((E[]) this.elements, this.size, comparator);
 	}
@@ -137,7 +139,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 	}
 
 	@Override
-	public void forEach(Consumer<? super E> action)
+	public void forEach(@NonNull Consumer<? super E> action)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -145,6 +147,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 		}
 	}
 
+	@NonNull
 	@Override
 	public Iterator<E> iterator()
 	{
@@ -158,6 +161,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 				return this.index < AbstractArrayList.this.size;
 			}
 
+			@NonNull
 			@Override
 			public E next()
 			{
@@ -174,6 +178,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 				AbstractArrayList.this.removeAt(--this.index);
 			}
 
+			@NonNull
 			@Override
 			public String toString()
 			{
@@ -182,6 +187,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 		};
 	}
 
+	@NonNull
 	@Override
 	public Iterator<E> reverseIterator()
 	{
@@ -195,6 +201,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 				return this.index >= 0;
 			}
 
+			@NonNull
 			@Override
 			public E next()
 			{
@@ -211,6 +218,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 				AbstractArrayList.this.removeAt(++this.index);
 			}
 
+			@NonNull
 			@Override
 			public String toString()
 			{
@@ -220,7 +228,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 	}
 
 	@Override
-	public <R> R foldLeft(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
+	public <R> R foldLeft(R initialValue, @NonNull BiFunction<? super R, ? super E, ? extends R> reducer)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -230,7 +238,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 	}
 
 	@Override
-	public <R> R foldRight(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
+	public <R> R foldRight(R initialValue, @NonNull BiFunction<? super R, ? super E, ? extends R> reducer)
 	{
 		for (int i = this.size - 1; i >= 0; i--)
 		{
@@ -239,8 +247,9 @@ public abstract class AbstractArrayList<E> implements List<E>
 		return initialValue;
 	}
 
+	@Nullable
 	@Override
-	public E reduceLeft(BiFunction<? super E, ? super E, ? extends E> reducer)
+	public E reduceLeft(@NonNull BiFunction<? super E, ? super E, ? extends E> reducer)
 	{
 		if (this.size == 0)
 		{
@@ -255,8 +264,9 @@ public abstract class AbstractArrayList<E> implements List<E>
 		return initialValue;
 	}
 
+	@Nullable
 	@Override
-	public E reduceRight(BiFunction<? super E, ? super E, ? extends E> reducer)
+	public E reduceRight(@NonNull BiFunction<? super E, ? super E, ? extends E> reducer)
 	{
 		if (this.size == 0)
 		{
@@ -272,7 +282,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 	}
 
 	@Override
-	public boolean contains(Object element)
+	public boolean contains(@Nullable Object element)
 	{
 		if (element == null)
 		{
@@ -304,7 +314,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 	}
 
 	@Override
-	public int indexOf(Object element)
+	public int indexOf(@Nullable Object element)
 	{
 		if (element == null)
 		{
@@ -329,7 +339,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 	}
 
 	@Override
-	public int lastIndexOf(Object element)
+	public int lastIndexOf(@Nullable Object element)
 	{
 		if (element == null)
 		{
@@ -354,7 +364,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 	}
 
 	@Override
-	public Object[] toArray()
+	public Object @NonNull [] toArray()
 	{
 		Object[] array = new Object[this.size];
 		System.arraycopy(this.elements, 0, array, 0, this.size);
@@ -362,7 +372,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 	}
 
 	@Override
-	public E[] toArray(Class<E> type)
+	public E @NonNull [] toArray(@NonNull Class<E> type)
 	{
 		E[] array = (E[]) Array.newInstance(type, this.size);
 		for (int i = 0; i < this.size; i++)
@@ -373,29 +383,33 @@ public abstract class AbstractArrayList<E> implements List<E>
 	}
 
 	@Override
-	public void toArray(int index, Object[] store)
+	public void toArray(int index, Object @NonNull [] store)
 	{
 		System.arraycopy(this.elements, 0, store, index, this.size);
 	}
 
+	@NonNull
 	@Override
 	public <R> MutableList<R> emptyCopy()
 	{
 		return new dyvil.collection.mutable.ArrayList<>();
 	}
 
+	@NonNull
 	@Override
-	public <R> MutableList<R> emptyCopy(int newCapacity)
+	public <R> MutableList<R> emptyCopy(int capacity)
 	{
-		return new dyvil.collection.mutable.ArrayList<>(newCapacity);
+		return new dyvil.collection.mutable.ArrayList<>(capacity);
 	}
 
+	@NonNull
 	@Override
 	public MutableList<E> mutableCopy()
 	{
 		return new dyvil.collection.mutable.ArrayList<>((E[]) this.elements, this.size);
 	}
 
+	@NonNull
 	@Override
 	public ImmutableList<E> immutableCopy()
 	{
@@ -425,6 +439,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 		return list;
 	}
 
+	@NonNull
 	@Override
 	public String toString()
 	{
@@ -455,7 +470,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 		return List.listHashCode(this);
 	}
 
-	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	private void writeObject(java.io.@NonNull ObjectOutputStream out) throws IOException
 	{
 		out.defaultWriteObject();
 
@@ -466,7 +481,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 		}
 	}
 
-	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	private void readObject(java.io.@NonNull ObjectInputStream in) throws IOException, ClassNotFoundException
 	{
 		in.defaultReadObject();
 

@@ -7,4 +7,4 @@ notifications:
       - https://webhooks.gitter.im/e/d003c26687bb4fbd481f
 
 install: true
-script: ./gradlew build
+script: ./gradlew build test

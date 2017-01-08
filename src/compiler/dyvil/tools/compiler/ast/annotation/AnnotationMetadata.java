@@ -10,7 +10,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -130,27 +129,37 @@ public final class AnnotationMetadata implements IClassMetadata
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		for (IParameter parameter : this.theClass.getParameterList())
+		{
+			final IValue value = parameter.getValue();
+			if (value != null)
+			{
+				parameter.setValue(IValue.toAnnotationConstant(value, markers, context));
+			}
+		}
 	}
 
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		final IParameterList parameterList = this.theClass.getParameterList();
-		for (int i = 0, count = parameterList.size(); i < count; i++)
+		for (IParameter parameter : this.theClass.getParameterList())
 		{
-			final IParameter parameter = parameterList.get(i);
-
 			final StringBuilder desc = new StringBuilder("()");
 			parameter.getType().appendExtendedName(desc);
-			MethodVisitor mw = writer.visitMethod(Modifiers.PUBLIC | Modifiers.ABSTRACT, parameter.getInternalName(),
-			                                      desc.toString(), null, null);
+
+			final MethodVisitor methodVisitor = writer.visitMethod(Modifiers.PUBLIC | Modifiers.ABSTRACT,
+			                                                       parameter.getInternalName(), desc.toString(), null,
+			                                                       null);
 
 			final IValue argument = parameter.getValue();
-			if (argument != null)
+			if (argument != null && argument.isAnnotationConstant())
 			{
-				AnnotationVisitor av = mw.visitAnnotationDefault();
-				Annotation.visitValue(av, null, argument);
+				final AnnotationVisitor av = methodVisitor.visitAnnotationDefault();
+				argument.writeAnnotationValue(av, parameter.getInternalName());
+				av.visitEnd();
 			}
+
+			methodVisitor.visitEnd();
 		}
 	}
 }

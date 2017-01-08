@@ -1,0 +1,82 @@
+package dyvil.tests
+
+using dyvil.Test
+
+public class InheritanceTest
+{
+	public trait IFoo<T>
+	{
+		func onFooInit(): void
+
+		init { this.onFooInit }
+	}
+
+	public trait IBar<T>
+	{
+		func bar(): T
+	}
+
+	public interface IFooBar<T> extends IFoo, IBar<T>
+
+	public class FooBar implements IFooBar<String>
+	{
+		public override func bar(): String = "FooBar.bar"
+
+		public override func onFooInit(): void {}
+	}
+
+	// Double-Layer Trait Initialization
+
+	public class Foo1 implements IFoo
+	{
+		public var fooInit: boolean
+
+		public override func onFooInit(): void = this.fooInit = true
+	}
+
+	public class Foo2 extends Foo1 implements IFoo
+	{
+		public var foo2Init: int
+
+		public override func onFooInit(): void = this.foo2Init++
+	}
+
+	// Trait Constructor Test
+
+	public trait Named
+	{
+		var name: String
+		{
+			abstract get
+			abstract set
+
+			init
+			{
+				this.name = "" // calls the setter
+			}
+		}
+	}
+
+	public class Person(
+		private var name: String { public override get; public override set }
+	) implements Named
+
+	public static func apply(): Test = test "Inheritance" {
+		let foo1 = new Foo1
+		let foo2 = new Foo2
+		let fooBar = new FooBar
+
+		test "Double-Layer Interface" { fooBar.bar =?= "FooBar.bar" }
+		test "Trait Init" { foo1.fooInit =?= true }
+
+		test "Double-Layer Trait Init" {
+			// Check that Foo2.onFooInit has only been called once
+			foo2.foo2Init =?= 1
+		}
+
+		test "Trait Constructor" {
+			let person: Named = new Person("Test Subject")
+			person.name =?= "Test Subject"
+		}
+	}
+}

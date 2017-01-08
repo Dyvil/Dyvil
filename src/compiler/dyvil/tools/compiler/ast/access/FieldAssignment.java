@@ -100,12 +100,6 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	}
 
 	@Override
-	public boolean isPrimitive()
-	{
-		return this.field != null && this.field.getType().isPrimitive();
-	}
-
-	@Override
 	public boolean isUsableAsStatement()
 	{
 		return true;
@@ -176,9 +170,9 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	}
 
 	@Override
-	public void setReceiver(IValue value)
+	public void setReceiver(IValue receiver)
 	{
-		this.value = value;
+		this.value = receiver;
 	}
 
 	@Override
@@ -242,7 +236,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 			return this;
 		}
 
-		Marker marker = Markers.semantic(this.position, "resolve.field", this.name.unqualified);
+		Marker marker = Markers.semanticError(this.position, "resolve.field", this.name.unqualified);
 		if (this.receiver != null)
 		{
 			marker.addInfo(Markers.getSemantic("receiver.type", this.receiver.getType()));
@@ -254,32 +248,31 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 
 	protected IValue resolveFieldAssignment(MarkerList markers, IContext context)
 	{
+		// Duplicate in FieldAccess
+		IValue value;
+
 		if (ICall.privateAccess(context, this.receiver))
 		{
-			IValue value = this.resolveField(this.receiver, context);
+			final IValue implicit;
+			if (this.receiver == null && (implicit = context.getImplicit()) != null)
+			{
+				value = this.resolveMethod(implicit, markers, context);
+				if (value != null)
+				{
+					return value;
+				}
+
+				value = this.resolveField(implicit, context);
+				if (value != null)
+				{
+					return value;
+				}
+			}
+
+			value = this.resolveField(this.receiver, context);
 			if (value != null)
 			{
 				return value;
-			}
-
-			// Duplicate in FieldAccess
-			if (this.receiver == null)
-			{
-				final IValue implicit = context.getImplicit();
-				if (implicit != null)
-				{
-					value = this.resolveMethod(implicit, markers, context);
-					if (value != null)
-					{
-						return value;
-					}
-
-					value = this.resolveField(implicit, context);
-					if (value != null)
-					{
-						return value;
-					}
-				}
 			}
 
 			value = this.resolveMethod(this.receiver, markers, context);
@@ -290,7 +283,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 		}
 		else
 		{
-			IValue value = this.resolveMethod(this.receiver, markers, context);
+			value = this.resolveMethod(this.receiver, markers, context);
 			if (value != null)
 			{
 				return value;
@@ -307,14 +300,15 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 
 	private IValue resolveField(IValue receiver, IContext context)
 	{
-		IDataMember field = ICall.resolveField(context, receiver, this.name);
-		if (field != null)
+		final IDataMember field = ICall.resolveField(context, receiver, this.name);
+		if (field == null)
 		{
-			this.field = field;
-			this.receiver = receiver;
-			return this;
+			return null;
 		}
-		return null;
+
+		this.field = field;
+		this.receiver = receiver;
+		return this;
 	}
 
 	private IValue resolveMethod(IValue receiver, MarkerList markers, IContext context)

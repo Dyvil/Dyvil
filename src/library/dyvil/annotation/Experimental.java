@@ -1,6 +1,7 @@
 package dyvil.annotation;
 
 import dyvil.annotation.internal.ClassParameters;
+import dyvil.annotation.internal.NonNull;
 import dyvil.util.MarkerLevel;
 
 import java.lang.annotation.Retention;
@@ -14,12 +15,12 @@ public @interface Experimental
 	{
 		DANGEROUS, UNSTABLE, UNRECOMMENDED, BETA, ALPHA, PRERELEASE
 	}
-	
-	String value() default "The {member.kind} '{member.name}' is an experimental feature";
 
-	String description() default "";
-	
-	Stage stage() default Stage.UNRECOMMENDED;
-	
-	MarkerLevel level() default MarkerLevel.WARNING;
+	@NonNull String value() default "The {member.kind} '{member.name}' is an experimental feature";
+
+	@NonNull String description() default "";
+
+	@NonNull Stage stage() default Stage.UNRECOMMENDED;
+
+	@NonNull MarkerLevel level() default MarkerLevel.WARNING;
 }

@@ -10,6 +10,9 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.ImplicitNullableType;
+import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
@@ -87,6 +90,17 @@ public class LiteralConversion extends AbstractCall
 		return this.name;
 	}
 
+	public IValue getLiteral()
+	{
+		return this.literal;
+	}
+
+	@Override
+	public void setType(IType type)
+	{
+		this.type = type;
+	}
+
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
@@ -107,23 +121,30 @@ public class LiteralConversion extends AbstractCall
 			}
 
 			this.method = candidates.getBestMember();
+			this.checkArguments(markers, context);
 		}
-
-		this.checkArguments(markers, context);
 
 		final IType thisType = this.getType();
-		if (!Types.isSuperType(type, thisType))
+		if (Types.isSuperType(type, thisType))
 		{
-			final Marker marker = Markers.semantic(this.position, "literal.type.incompatible");
-			marker.addInfo(Markers.getSemantic("type.expected", type));
-			marker.addInfo(Markers.getSemantic("literal.type.conversion", thisType));
-
-			final StringBuilder stringBuilder = new StringBuilder();
-			Util.methodSignatureToString(this.method, typeContext, stringBuilder);
-			marker.addInfo(Markers.getSemantic("literal.type.method", stringBuilder.toString()));
-
-			markers.add(marker);
+			return this;
 		}
+
+		// T! -> T, if necessary
+		final IValue value = thisType.convertValueTo(this, type, typeContext, markers, context);
+		if (value != null)
+		{
+			return value;
+		}
+
+		final Marker marker = Markers.semanticError(this.position, "literal.type.incompatible");
+		marker.addInfo(Markers.getSemantic("type.expected", type));
+		marker.addInfo(Markers.getSemantic("literal.type.conversion", thisType));
+
+		marker.addInfo(
+			Markers.getSemantic("literal.type.method", Util.methodSignatureToString(this.method, typeContext)));
+
+		markers.add(marker);
 
 		return this;
 	}
@@ -133,6 +154,19 @@ public class LiteralConversion extends AbstractCall
 	{
 		markers.add(Markers.semanticError(this.position, "literal.method", this.literal.getType(), this.type, this.name,
 		                                  this.arguments.typesToString()));
+	}
+
+	@Override
+	public void writeNullCheckedExpression(MethodWriter writer, IType type) throws BytecodeException
+	{
+		if (this.method == ImplicitNullableType.LazyTypes.UNWRAP)
+		{
+			this.literal.writeExpression(writer, type);
+		}
+		else
+		{
+			this.writeExpression(writer, type);
+		}
 	}
 
 	@Override

@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.Candidate;
 import dyvil.tools.compiler.ast.method.MatchList;
@@ -21,7 +22,6 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
-import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -75,18 +75,6 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	public IClass getEnclosingClass()
 	{
 		return this.enclosingClass;
-	}
-
-	@Override
-	public void setVariadic()
-	{
-		this.modifiers.addIntModifier(Modifiers.VARARGS);
-	}
-
-	@Override
-	public boolean isVariadic()
-	{
-		return this.modifiers.hasIntModifier(Modifiers.VARARGS);
 	}
 
 	// Parameters
@@ -256,11 +244,19 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 			return; // Mismatch
 		}
 
+		for (int matchValue : matchValues)
+		{
+			if (matchValue == IValue.MISMATCH)
+			{
+				return;
+			}
+		}
 		list.add(new Candidate<>(this, matchValues, matchTypes, defaults, varargs));
 	}
 
 	@Override
-	public IType checkArguments(MarkerList markers, ICodePosition position, IContext context, IType type, IArguments arguments)
+	public IType checkArguments(MarkerList markers, ICodePosition position, IContext context, IType type,
+		                           IArguments arguments)
 	{
 		final IClass theClass = this.enclosingClass;
 
@@ -293,7 +289,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 			final ITypeParameter typeParameter = theClass.getTypeParameter(i);
 			final IType typeArgument = genericData.resolveType(typeParameter);
 
-			if (typeArgument == null || typeArgument.getTypeVariable() == typeParameter)
+			if (typeArgument == null)
 			{
 				final IType inferredType = typeParameter.getUpperBound();
 				markers.add(Markers.semantic(position, "constructor.typevar.infer", theClass.getName(),

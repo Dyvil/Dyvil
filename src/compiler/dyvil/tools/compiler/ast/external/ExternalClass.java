@@ -21,7 +21,9 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
@@ -29,8 +31,6 @@ import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
-import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
@@ -616,15 +616,14 @@ public final class ExternalClass extends AbstractClass
 		{
 		case TypeReference.CLASS_EXTENDS:
 		{
-			int steps = typePath.getLength();
-			int index = TypeReference.getSuperTypeIndex(typeRef);
-			if (index == -1)
+			final int index = TypeReference.getSuperTypeIndex(typeRef);
+			if (index < 0)
 			{
-				this.superType = IType.withAnnotation(this.superType, annotation, typePath, 0, steps);
+				this.superType = IType.withAnnotation(this.superType, annotation, typePath);
 			}
 			else
 			{
-				this.interfaces[index] = IType.withAnnotation(this.interfaces[index], annotation, typePath, 0, steps);
+				this.interfaces[index] = IType.withAnnotation(this.interfaces[index], annotation, typePath);
 			}
 			break;
 		}
@@ -651,11 +650,11 @@ public final class ExternalClass extends AbstractClass
 
 	public FieldVisitor visitField(int access, String name, String desc, String signature, Object value)
 	{
-		IType type = ClassFormat.extendedToType(signature == null ? desc : signature);
+		IType type = ClassFormat.readFieldType(signature == null ? desc : signature);
 
 		if (this.classParameters != null && this.classParameters.contains(name))
 		{
-			final ClassParameter param = new ExternalClassParameter(this, Name.fromQualified(name), type,
+			final ClassParameter param = new ExternalClassParameter(this, Name.fromQualified(name), desc, type,
 			                                                        new FlagModifierSet(access));
 			this.parameters.addParameter(param);
 			return new SimpleFieldVisitor(param);
@@ -681,8 +680,11 @@ public final class ExternalClass extends AbstractClass
 			return null;
 		}
 
-		if ("<init>".equals(name))
+		switch (name)
 		{
+		case "<clinit>":
+			return null;
+		case "<init>":
 			ExternalConstructor constructor = new ExternalConstructor(this);
 			constructor.setModifiers(new FlagModifierSet(access));
 
@@ -711,9 +713,9 @@ public final class ExternalClass extends AbstractClass
 			return new SimpleMethodVisitor(constructor);
 		}
 
-		if (this.isAnnotation())
+		if (this.isAnnotation() && (access & Modifiers.STATIC) == 0)
 		{
-			final ClassParameter param = new ExternalClassParameter(this, Name.fromQualified(name),
+			final ClassParameter param = new ExternalClassParameter(this, Name.fromQualified(name), desc.substring(2),
 			                                                        ClassFormat.readReturnType(desc),
 			                                                        new FlagModifierSet(access));
 			this.parameters.addParameter(param);

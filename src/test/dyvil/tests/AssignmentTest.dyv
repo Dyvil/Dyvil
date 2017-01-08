@@ -1,0 +1,85 @@
+package dyvil.tests
+
+using dyvil.Test
+
+public class AssignmentTest
+{
+	public static func apply(): Test = test "Assignment" {
+		local()
+		staticField()
+		instanceField()
+		compound()
+	}
+
+	public static func local(): Test = test "Local" {
+		test "Int" {
+			var i = 0
+	        i += 2
+	        let result = i += 1
+
+	        result =?= 3
+		}
+
+		test "Long" {
+			var l = 0
+			l += 3
+			let result = l += 1
+
+			result =?= 4
+		}
+	}
+
+	private static var counter: int = 0
+
+	public static func staticField(): Test = test "Static Fields" {
+		counter = 0
+		counter += 4
+		let result = counter += 1
+
+		counter =?= 5
+	}
+
+	public static class Counter
+	{
+		public int value = 0
+		public [int] applyArray = [ 0, 0, 0 ]
+		public [int] subscriptArray = [ 0, 0, 0 ]
+
+		public int apply(int i) = this.applyArray[i]
+		public void update(int i, int value) = this.applyArray[i] = value
+
+		public int subscript(int i) = this.subscriptArray[i]
+		public void subscript_$eq(int i, int value) = this.subscriptArray[i] = value
+	}
+
+	public static func instanceField(): Test = test "Instance Fields" {
+		test "Statements" {
+			let counter = new Counter
+			counter.value += 2
+
+			counter.value =?= 2
+		}
+
+		test "Expressions" {
+			let counter = new Counter
+			let result = counter.value += 5
+
+			counter.value =?= 5
+			result        =?= 5
+		}
+	}
+
+	public static func compound(): Test = test "Compound Assignment" {
+		let counter = new Counter
+		var modCount = 0
+
+		counter(modCount++) += modCount++ // apply/update
+		// counter.applyArray[0] = 1
+		counter[modCount++] += modCount++ // subscript/subscript_=
+		// counter.subscriptArray[2] = 3
+
+		test "Mod Count"       { modCount =?= 4 }
+		test "Apply Array"     { counter.applyArray     =?= [ 1, 0, 0 ]}
+		test "Subscript Array" { counter.subscriptArray =?= [ 0, 0, 3 ]}
+	}
+}

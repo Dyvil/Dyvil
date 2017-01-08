@@ -10,8 +10,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public case class Parameter
 	(
-		Name name { get; set }
-		Value value { get; set }
+		Name? name { get; set }
+		Value! value { get; set }
 	)
 	extends DPFValueVisitor implements IASTNode, Expandable
 {
@@ -22,17 +22,12 @@ public case class Parameter
 		return new Parameter(name, null)
 	}
 
-	public static Parameter apply(Name name, Value value)
-	{
-		return new Parameter(name, value)
-	}
-
 	public static Parameter apply(Value value)
 	{
 		return new Parameter(null, value)
 	}
 
-	public init(Name name)
+	public init(Name? name)
 	{
 		this.name = name
 	}
@@ -41,13 +36,13 @@ public case class Parameter
 
 	protected override void visitValue(Value value) = this.value = value
 
-	public override ICodePosition getPosition() = null
+	public override ICodePosition! getPosition() = null
 
-	public override void setPosition(ICodePosition position) { }
+	public override void setPosition(ICodePosition! position) { }
 
 	public override Parameter expand(Map<String, Object> mappings, boolean mutate)
 	{
-		Parameter parameter = mutate ? this : new Parameter(this.name)
+		let parameter = mutate ? this : new Parameter(this.name)
 		parameter.value = Value.wrap(Expandable.expand(this.value, mappings, mutate))
 		return parameter
 	}

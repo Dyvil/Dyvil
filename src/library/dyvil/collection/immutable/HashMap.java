@@ -1,6 +1,7 @@
 package dyvil.collection.immutable;
 
 import dyvil.annotation.Immutable;
+import dyvil.annotation.internal.NonNull;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractHashMap;
 import dyvil.lang.LiteralConvertible;
@@ -57,6 +58,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 
 	// Factory Methods
 
+	@NonNull
 	public static <K, V> HashMap<K, V> singleton(K key, V value)
 	{
 		final HashMap<K, V> result = new HashMap<>(1);
@@ -64,52 +66,62 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 		return result;
 	}
 
+	@NonNull
 	public static <K, V> HashMap<K, V> apply()
 	{
 		return new HashMap<>(0);
 	}
 
+	@NonNull
 	@SafeVarargs
-	public static <K, V> HashMap<K, V> apply(Entry<K, V>... entries)
+	public static <K, V> HashMap<K, V> apply(@NonNull Entry<K, V>... entries)
 	{
 		return new HashMap<>(entries);
 	}
 
-	public static <K, V> HashMap<K, V> from(Entry<? extends K, ? extends V>[] array)
+	@NonNull
+	public static <K, V> HashMap<K, V> from(@NonNull Entry<? extends K, ? extends V> @NonNull [] array)
 	{
 		return new HashMap<>(array);
 	}
 
-	public static <K, V> HashMap<K, V> from(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	@NonNull
+	public static <K, V> HashMap<K, V> from(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		return new HashMap<>(iterable);
 	}
 
-	public static <K, V> HashMap<K, V> from(SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	@NonNull
+	public static <K, V> HashMap<K, V> from(@NonNull SizedIterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		return new HashMap<>(iterable);
 	}
 
-	public static <K, V> HashMap<K, V> from(Set<? extends Entry<? extends K, ? extends V>> set)
+	@NonNull
+	public static <K, V> HashMap<K, V> from(@NonNull Set<? extends @NonNull Entry<? extends K, ? extends V>> set)
 	{
 		return new HashMap<>(set);
 	}
 
-	public static <K, V> HashMap<K, V> from(Map<? extends K, ? extends V> map)
+	@NonNull
+	public static <K, V> HashMap<K, V> from(@NonNull Map<? extends K, ? extends V> map)
 	{
 		return new HashMap<>(map);
 	}
 
-	public static <K, V> HashMap<K, V> from(AbstractHashMap<? extends K, ? extends V> hashMap)
+	@NonNull
+	public static <K, V> HashMap<K, V> from(@NonNull AbstractHashMap<? extends K, ? extends V> hashMap)
 	{
 		return new HashMap<>(hashMap);
 	}
 
+	@NonNull
 	public static <K, V> Builder<K, V> builder()
 	{
 		return new Builder<>();
 	}
 
+	@NonNull
 	public static <K, V> Builder<K, V> builder(int capacity)
 	{
 		return new Builder<>(capacity);
@@ -127,38 +139,39 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 		super(capacity);
 	}
 
-	public HashMap(Entry<? extends K, ? extends V>[] entries)
+	public HashMap(@NonNull Entry<? extends K, ? extends V> @NonNull [] entries)
 	{
 		super(entries);
 	}
 
-	public HashMap(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public HashMap(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		super(iterable);
 	}
 
-	public HashMap(SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public HashMap(@NonNull SizedIterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		super(iterable);
 	}
 
-	public HashMap(Set<? extends Entry<? extends K, ? extends V>> set)
+	public HashMap(@NonNull Set<? extends @NonNull Entry<? extends K, ? extends V>> set)
 	{
 		super(set);
 	}
 
-	public HashMap(Map<? extends K, ? extends V> map)
+	public HashMap(@NonNull Map<? extends K, ? extends V> map)
 	{
 		super(map);
 	}
 
-	public HashMap(AbstractHashMap<? extends K, ? extends V> hashMap)
+	public HashMap(@NonNull AbstractHashMap<? extends K, ? extends V> hashMap)
 	{
 		super(hashMap);
 	}
 
 	// Implementation Methods
 
+	@NonNull
 	@Override
 	public ObjectRef<V> subscript_$amp(K key)
 	{
@@ -188,11 +201,12 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	}
 
 	@Override
-	protected void removeEntry(HashEntry<K, V> entry)
+	protected void removeEntry(@NonNull HashEntry<K, V> entry)
 	{
 		throw new ImmutableException("Iterator.remove() on Immutable Map");
 	}
 
+	@NonNull
 	@Override
 	public ImmutableMap<K, V> withEntry(K key, V value)
 	{
@@ -202,14 +216,16 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 		return copy;
 	}
 
+	@NonNull
 	@Override
-	public ImmutableMap<K, V> union(Map<? extends K, ? extends V> map)
+	public ImmutableMap<K, V> union(@NonNull Map<? extends K, ? extends V> map)
 	{
 		HashMap<K, V> copy = new HashMap<>(this);
 		copy.putAllInternal(map);
 		return copy;
 	}
 
+	@NonNull
 	@Override
 	public ImmutableMap<K, V> keyRemoved(Object key)
 	{
@@ -225,6 +241,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 		return copy;
 	}
 
+	@NonNull
 	@Override
 	public ImmutableMap<K, V> removed(Object key, Object value)
 	{
@@ -241,6 +258,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 		return copy;
 	}
 
+	@NonNull
 	@Override
 	public ImmutableMap<K, V> valueRemoved(Object value)
 	{
@@ -256,8 +274,9 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 		return copy;
 	}
 
+	@NonNull
 	@Override
-	public ImmutableMap<K, V> difference(Map<?, ?> map)
+	public ImmutableMap<K, V> difference(@NonNull Map<?, ?> map)
 	{
 		HashMap<K, V> copy = new HashMap<>(this.size);
 		for (Entry<K, V> entry : this)
@@ -272,8 +291,9 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 		return copy;
 	}
 
+	@NonNull
 	@Override
-	public ImmutableMap<K, V> keyDifference(Collection<?> keys)
+	public ImmutableMap<K, V> keyDifference(@NonNull Collection<?> keys)
 	{
 		HashMap<K, V> copy = new HashMap<>(this.size);
 		for (Entry<K, V> entry : this)
@@ -287,8 +307,9 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 		return copy;
 	}
 
+	@NonNull
 	@Override
-	public <NK> ImmutableMap<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper)
+	public <NK> ImmutableMap<NK, V> keyMapped(@NonNull BiFunction<? super K, ? super V, ? extends NK> mapper)
 	{
 		HashMap<NK, V> copy = new HashMap<>(this.size);
 		for (Entry<K, V> entry : this)
@@ -299,8 +320,9 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 		return copy;
 	}
 
+	@NonNull
 	@Override
-	public <NV> ImmutableMap<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper)
+	public <NV> ImmutableMap<K, NV> valueMapped(@NonNull BiFunction<? super K, ? super V, ? extends NV> mapper)
 	{
 		HashMap<K, NV> copy = new HashMap<>(this.size);
 		for (Entry<K, V> entry : this)
@@ -311,8 +333,9 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 		return copy;
 	}
 
+	@NonNull
 	@Override
-	public <NK, NV> ImmutableMap<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> entryMapped(@NonNull BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
 	{
 		HashMap<NK, NV> copy = new HashMap<>(this.size);
 		for (Entry<K, V> entry : this)
@@ -326,8 +349,9 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 		return copy;
 	}
 
+	@NonNull
 	@Override
-	public <NK, NV> ImmutableMap<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> flatMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
 	{
 		HashMap<NK, NV> copy = new HashMap<>(this.size);
 		for (Entry<K, V> entry : this)
@@ -341,8 +365,9 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 		return copy;
 	}
 
+	@NonNull
 	@Override
-	public ImmutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition)
+	public ImmutableMap<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> condition)
 	{
 		HashMap<K, V> copy = new HashMap<>(this.size);
 		for (Entry<K, V> entry : this)
@@ -357,6 +382,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 		return copy;
 	}
 
+	@NonNull
 	@Override
 	public ImmutableMap<V, K> inverted()
 	{
@@ -368,12 +394,14 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 		return copy;
 	}
 
+	@NonNull
 	@Override
 	public ImmutableMap<K, V> copy()
 	{
 		return this.immutableCopy();
 	}
 
+	@NonNull
 	@Override
 	public MutableMap<K, V> mutable()
 	{
@@ -381,19 +409,19 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 	}
 
 	@Override
-	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder()
+	public <RK, RV> ImmutableMap.@NonNull Builder<RK, RV> immutableBuilder()
 	{
 		return builder();
 	}
 
 	@Override
-	public <RK, RV> ImmutableMap.Builder<RK, RV> immutableBuilder(int capacity)
+	public <RK, RV> ImmutableMap.@NonNull Builder<RK, RV> immutableBuilder(int capacity)
 	{
 		return builder(capacity);
 	}
 
 	@Override
-	public java.util.Map<K, V> toJava()
+	public java.util.@NonNull Map<K, V> toJava()
 	{
 		return Collections.unmodifiableMap(super.toJava());
 	}

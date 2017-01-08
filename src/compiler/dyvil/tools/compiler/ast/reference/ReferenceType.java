@@ -75,12 +75,6 @@ public class ReferenceType implements IObjectType
 		this.type = type;
 	}
 
-	@Override
-	public int typeTag()
-	{
-		return REFERENCE;
-	}
-
 	public IType getType()
 	{
 		return this.type;
@@ -89,6 +83,12 @@ public class ReferenceType implements IObjectType
 	public void setType(IType type)
 	{
 		this.type = type;
+	}
+
+	@Override
+	public int typeTag()
+	{
+		return REFERENCE;
 	}
 
 	@Override
@@ -104,15 +104,9 @@ public class ReferenceType implements IObjectType
 	}
 
 	@Override
-	public IType getElementType()
+	public boolean isSuperTypeOf(IType subType)
 	{
-		return this.type;
-	}
-
-	@Override
-	public boolean isSuperTypeOf(IType type)
-	{
-		return IObjectType.super.isSuperTypeOf(type) && this.isSameBaseType(type);
+		return IObjectType.super.isSuperTypeOf(subType) && this.isSameBaseType(subType);
 	}
 
 	private boolean isSameBaseType(IType type)
@@ -334,7 +328,7 @@ public class ReferenceType implements IObjectType
 	@Override
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
-		this.type.writeAnnotations(visitor, typeRef, typePath + "0;");
+		IType.writeAnnotations(this.type, visitor, typeRef, typePath + "0;");
 	}
 
 	@Override
@@ -394,11 +388,5 @@ public class ReferenceType implements IObjectType
 	{
 		this.type.toString(prefix, buffer);
 		buffer.append('*');
-	}
-
-	@Override
-	public IType clone()
-	{
-		return new ReferenceType(this.theClass, this.type.clone());
 	}
 }

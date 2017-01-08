@@ -1,5 +1,7 @@
 package dyvil.runtime;
 
+import dyvil.annotation.internal.NonNull;
+
 public enum Wrapper
 {
 	BOOLEAN('Z', boolean.class, Boolean.class, 1),
@@ -19,9 +21,13 @@ public enum Wrapper
 	private static final int OTHER     = 1 << 6;
 
 	private final char   basicTypeChar;
+	@NonNull
 	private final Class  primitiveClass;
+	@NonNull
 	private final Class  wrapperClass;
+	@NonNull
 	private final String primitiveSimpleName;
+	@NonNull
 	private final String wrapperSimpleName;
 
 	// 0 OTHER FLOATING SIGNED SIZE3 SIZE2 SIZE1 SIZE0
@@ -47,7 +53,7 @@ public enum Wrapper
 		}
 	}
 
-	Wrapper(char basicTypeChar, Class<?> primitive, Class<?> wrapper, int flags)
+	Wrapper(char basicTypeChar, @NonNull Class<?> primitive, @NonNull Class<?> wrapper, int flags)
 	{
 		this.basicTypeChar = basicTypeChar;
 		this.primitiveClass = primitive;
@@ -57,7 +63,8 @@ public enum Wrapper
 		this.flags = (byte) flags;
 	}
 
-	public static Class<?> referenceType(Class<?> forClass)
+	@NonNull
+	public static Class<?> referenceType(@NonNull Class<?> forClass)
 	{
 		if (forClass.isPrimitive())
 		{
@@ -71,23 +78,23 @@ public enum Wrapper
 		return FROM_CHAR[hashChar(c)];
 	}
 
-	public static Wrapper forPrimitiveType(Class<?> c)
+	public static Wrapper forPrimitiveType(@NonNull Class<?> c)
 	{
 		return FROM_PRIMITIVE[hashPrimitive(c)];
 	}
 
-	public static Wrapper forWrapperType(Class<?> c)
+	public static Wrapper forWrapperType(@NonNull Class<?> c)
 	{
 		return FROM_WRAPPER[hashWrapper(c)];
 	}
 
-	public static boolean isWrapperType(Class<?> wrapperClass)
+	public static boolean isWrapperType(@NonNull Class<?> wrapperClass)
 	{
 		final Wrapper wrapper = FROM_WRAPPER[hashWrapper(wrapperClass)];
 		return wrapper != null && wrapper.wrapperClass == wrapperClass;
 	}
 
-	private static int hashPrimitive(Class<?> primitiveClass)
+	private static int hashPrimitive(@NonNull Class<?> primitiveClass)
 	{
 		final String className = primitiveClass.getName();
 
@@ -98,7 +105,7 @@ public enum Wrapper
 		return (className.charAt(0) + className.charAt(2)) & 0xF;
 	}
 
-	private static int hashWrapper(Class<?> wrapperClass)
+	private static int hashWrapper(@NonNull Class<?> wrapperClass)
 	{
 		final String className = wrapperClass.getName();
 		if (className.length() < 13)
@@ -118,27 +125,31 @@ public enum Wrapper
 		return this.basicTypeChar;
 	}
 
+	@NonNull
 	public Class primitiveType()
 	{
 		return this.primitiveClass;
 	}
 
+	@NonNull
 	public Class wrapperType()
 	{
 		return this.wrapperClass;
 	}
 
+	@NonNull
 	public String primitiveSimpleName()
 	{
 		return this.primitiveSimpleName;
 	}
 
+	@NonNull
 	public String wrapperSimpleName()
 	{
 		return this.wrapperSimpleName;
 	}
 
-	public boolean isConvertibleFrom(Wrapper wrapper)
+	public boolean isConvertibleFrom(@NonNull Wrapper wrapper)
 	{
 		if (this == wrapper)
 		{

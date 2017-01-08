@@ -40,13 +40,7 @@ public final class CastOperator extends AbstractValue
 	{
 		return CAST_OPERATOR;
 	}
-	
-	@Override
-	public boolean isPrimitive()
-	{
-		return this.type.isPrimitive();
-	}
-	
+
 	@Override
 	public boolean isResolved()
 	{
@@ -125,7 +119,7 @@ public final class CastOperator extends AbstractValue
 		}
 		
 		final boolean primitiveType = this.type.isPrimitive();
-		final boolean primitiveValue = this.value.isPrimitive();
+		final boolean primitiveValue = valueType.isPrimitive();
 		
 		if (typedValue == null && !(primitiveType && primitiveValue) && !Types.isSuperClass(valueType, this.type))
 		{

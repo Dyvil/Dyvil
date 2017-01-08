@@ -7,11 +7,11 @@ import dyvil.tools.parsing.ast.IASTNode
 
 public interface NodeElement extends IASTNode
 {
-	override func getPosition(): ICodePosition = null
+	override func getPosition(): ICodePosition! = null
 
-	override func setPosition(ICodePosition position) {}
+	override func setPosition(ICodePosition! position) {}
 
-	func name: Name
+	func name: Name!
 	
 	func accept(NodeVisitor visitor): void
 }

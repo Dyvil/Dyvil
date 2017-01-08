@@ -43,12 +43,6 @@ public class ReturnStatement extends AbstractValue implements IValueConsumer
 	}
 
 	@Override
-	public boolean isPrimitive()
-	{
-		return this.value.isPrimitive();
-	}
-
-	@Override
 	public boolean isUsableAsStatement()
 	{
 		return true;

@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.CLASS)
 public @interface DefaultArrayValue
 {
-	DefaultValue[] value();
+	@NonNull DefaultValue @NonNull [] value();
 }

@@ -6,7 +6,7 @@ import dyvil.tools.parsing.Name
 public final object IgnoreVisitor
 	implements NodeVisitor, ValueVisitor, ListVisitor, MapVisitor, StringInterpolationVisitor, BuilderVisitor
 {
-	public override ValueVisitor visitParameter(Name name) = this
+	public override ValueVisitor visitParameter(Name! name) = this
 
 	public override NodeVisitor visitNode() = this
 

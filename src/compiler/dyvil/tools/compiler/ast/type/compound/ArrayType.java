@@ -17,10 +17,10 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Mutability;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.raw.IObjectType;
+import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
@@ -32,7 +32,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public class ArrayType implements IObjectType, ITyped
+public class ArrayType implements IObjectType
 {
 	protected IType type;
 	protected Mutability mutability = Mutability.UNDEFINED;
@@ -72,6 +72,27 @@ public class ArrayType implements IObjectType, ITyped
 	}
 
 	@Override
+	public Mutability getMutability()
+	{
+		return this.mutability;
+	}
+
+	public void setMutability(Mutability mutability)
+	{
+		this.mutability = mutability;
+	}
+
+	public IType getElementType()
+	{
+		return this.type;
+	}
+
+	public void setElementType(IType type)
+	{
+		this.type = type;
+	}
+
+	@Override
 	public int typeTag()
 	{
 		return ARRAY;
@@ -81,18 +102,6 @@ public class ArrayType implements IObjectType, ITyped
 	public ICodePosition getPosition()
 	{
 		return this.type == null ? null : this.type.getPosition();
-	}
-
-	@Override
-	public IType getType()
-	{
-		return this.type;
-	}
-
-	@Override
-	public void setType(IType type)
-	{
-		this.type = type;
 	}
 
 	@Override
@@ -121,91 +130,54 @@ public class ArrayType implements IObjectType, ITyped
 	}
 
 	@Override
-	public boolean isArrayType()
-	{
-		return true;
-	}
-
-	@Override
-	public int getArrayDimensions()
-	{
-		return 1 + this.type.getArrayDimensions();
-	}
-
-	@Override
-	public Mutability getMutability()
-	{
-		return this.mutability;
-	}
-
-	public void setMutability(Mutability mutability)
-	{
-		this.mutability = mutability;
-	}
-
-	@Override
-	public IType getElementType()
-	{
-		return this.type;
-	}
-
-	@Override
-	public IMethod getBoxMethod()
-	{
-		return null;
-	}
-
-	@Override
-	public IMethod getUnboxMethod()
-	{
-		return null;
-	}
-
-	@Override
 	public boolean isSameType(IType type)
 	{
-		if (!type.isArrayType() || this.mutability != type.getMutability())
+		final ArrayType arrayType = type.extract(ArrayType.class);
+		if (arrayType == null || this.mutability != type.getMutability())
 		{
 			return false;
 		}
 
-		final IType elementType = type.getElementType();
-		return this.checkPrimitiveType(elementType) && Types.isSameType(this.type, type.getElementType());
+		final IType elementType = arrayType.getElementType();
+		return this.checkPrimitiveType(elementType) && Types.isSameType(this.type, elementType);
 	}
 
 	@Override
 	public boolean isSameClass(IType type)
 	{
-		if (!type.isArrayType())
+		final ArrayType arrayType = type.extract(ArrayType.class);
+		if (arrayType == null)
 		{
 			return false;
 		}
 
-		final IType elementType = type.getElementType();
+		final IType elementType = arrayType.getElementType();
 		return this.checkPrimitiveType(elementType) && this.type.isSameClass(elementType);
 	}
 
 	@Override
 	public boolean isSuperTypeOf(IType subType)
 	{
-		if (!subType.isArrayType() || !checkImmutable(this, subType))
+		final ArrayType arrayType = subType.extract(ArrayType.class);
+		if (arrayType == null || !checkImmutable(this, subType))
 		{
 			return false;
 		}
 
-		final IType elementType = subType.getElementType();
+		final IType elementType = arrayType.getElementType();
 		return this.checkPrimitiveType(elementType) && Types.isSuperType(this.type, elementType);
 	}
 
 	@Override
 	public boolean isSuperClassOf(IType subType)
 	{
-		if (!subType.isArrayType())
+		final ArrayType arrayType = subType.extract(ArrayType.class);
+		if (arrayType == null)
 		{
 			return false;
 		}
 
-		final IType elementType = subType.getElementType();
+		final IType elementType = arrayType.getElementType();
 		return this.checkPrimitiveType(elementType) && Types.isSuperClass(this.type, elementType);
 	}
 
@@ -288,18 +260,10 @@ public class ArrayType implements IObjectType, ITyped
 	{
 		IType concrete = this.type.getConcreteType(context);
 
-		final ITypeParameter typeParameter = this.type.getTypeVariable();
-		if (typeParameter != null)
+		final TypeVarType typeVar = this.type.extract(TypeVarType.class);
+		if (typeVar != null && concrete.isPrimitive() && !typeVar.getTypeVariable().isAny())
 		{
-			if (concrete.isPrimitive() && !typeParameter.isAny())
-			{
-				concrete = concrete.getObjectType();
-			}
-			if (concrete != null && concrete != this.type)
-			{
-				return new ArrayType(concrete, this.mutability);
-			}
-			return this;
+			concrete = concrete.getObjectType();
 		}
 
 		if (concrete != null && concrete != this.type)
@@ -319,9 +283,10 @@ public class ArrayType implements IObjectType, ITyped
 	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
-		if (concrete.isArrayType())
+		final ArrayType arrayType = concrete.extract(ArrayType.class);
+		if (arrayType != null)
 		{
-			this.type.inferTypes(concrete.getElementType(), typeContext);
+			this.type.inferTypes(arrayType.getElementType(), typeContext);
 		}
 	}
 
@@ -394,7 +359,11 @@ public class ArrayType implements IObjectType, ITyped
 	@Override
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
-		this.type.writeAnnotations(visitor, typeRef, typePath.concat("["));
+		if (this.mutability != Mutability.UNDEFINED)
+		{
+			this.mutability.writeAnnotation(visitor, typeRef, typePath);
+		}
+		IType.writeAnnotations(this.type, visitor, typeRef, typePath.concat("["));
 	}
 
 	@Override
@@ -427,11 +396,5 @@ public class ArrayType implements IObjectType, ITyped
 		this.mutability.appendKeyword(buffer);
 		this.type.toString(prefix, buffer);
 		buffer.append(']');
-	}
-
-	@Override
-	public IType clone()
-	{
-		return new ArrayType(this.type, this.mutability);
 	}
 }

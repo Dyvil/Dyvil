@@ -510,12 +510,6 @@ public class CodeClass extends AbstractClass
 
 		this.writeAnnotations(writer, modifiers);
 
-		if ((modifiers & Modifiers.ANNOTATION) == Modifiers.ANNOTATION)
-		{
-			this.metadata.write(writer);
-			return;
-		}
-
 		// Super Types
 
 		if (this.superType != null)
@@ -792,11 +786,11 @@ public class CodeClass extends AbstractClass
 		// Super Type Variable Annotations
 		if (this.superType != null)
 		{
-			this.superType.writeAnnotations(writer, TypeReference.newSuperTypeReference(-1), "");
+			IType.writeAnnotations(this.superType, writer, TypeReference.newSuperTypeReference(-1), "");
 		}
 		for (int i = 0; i < this.interfaceCount; i++)
 		{
-			this.interfaces[i].writeAnnotations(writer, TypeReference.newSuperTypeReference(i), "");
+			IType.writeAnnotations(this.interfaces[i], writer, TypeReference.newSuperTypeReference(i), "");
 		}
 	}
 

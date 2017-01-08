@@ -1,0 +1,379 @@
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
+
+package dyvil.array
+
+#if HAS_RANGE_CLASS
+import dyvil.collection.range.closed.TYPE_NAME##Range
+#endif
+
+import dyvil.ref.TYPE_NAME##Ref
+import dyvil.ref.array.TYPE_NAME##ArrayRef
+
+import java.util.Arrays
+import java.util.function._
+import java.lang.reflect.Array
+
+import static dyvil.reflect.Opcodes._
+
+public abstract class TYPE_NAME##Array
+{
+	public static let EMPTY: [final PRIMITIVE] = new [PRIMITIVE](0)
+
+	public static inline func apply(): [PRIMITIVE] = new [PRIMITIVE](0)
+
+	public static inline func apply(int size): [PRIMITIVE] = new [PRIMITIVE](size)
+
+	public static inline func apply([PRIMITIVE] array): [PRIMITIVE] = array.copy
+
+	#if HAS_RANGE_CLASS
+	public static func apply(TYPE_NAME##Range range): [PRIMITIVE] = range.to##TYPE_NAME##Array()
+	#endif
+
+	public static func apply(int size, PRIMITIVE repeatedValue): [PRIMITIVE]
+	{
+		let array = new [PRIMITIVE](size)
+		for (i <- 0 ..< size) array[i] = repeatedValue
+		return array
+	}
+
+	public static func apply(int size, SUPPLIER valueSupplier): [PRIMITIVE]
+	{
+		let array = new [PRIMITIVE](size)
+
+		#if SUPPLIER_CAST
+		for (i <- 0 ..< size) array[i] = valueSupplier.SUPPLIER_GET() as PRIMITIVE
+		#else
+		for (i <- 0 ..< size) array[i] = valueSupplier.SUPPLIER_GET()
+		#end
+
+		return array
+	}
+
+	public static func apply(int size, INDEXED_SUPPLIER valueMapper): [PRIMITIVE]
+	{
+		let array = new [PRIMITIVE](size)
+
+		#if INDEXED_SUPPLIER_CAST
+		for (i <- 0 ..< size) array[i] = valueMapper.INDEXED_SUPPLIER_APPLY(i) as PRIMITIVE
+		#else
+		for (i <- 0 ..< size) array[i] = valueMapper.INDEXED_SUPPLIER_APPLY(i)
+		#end
+
+		return array
+	}
+
+	#if IS_RANGEABLE
+	@BytecodeName("rangeClosed")
+	public static func apply(PRIMITIVE from, PRIMITIVE to): [PRIMITIVE]
+	{
+		#if RANGE_CAST
+		let array = new [PRIMITIVE]((to - from + 1) as int)
+		#else
+		let array = new [PRIMITIVE](to - from + 1)
+		#end
+		var index = 0
+
+		for (i <- from .. to) array[index++] = i
+		return array
+	}
+
+	@BytecodeName("rangeOpen")
+	public static func range(PRIMITIVE from, PRIMITIVE toExclusive): [PRIMITIVE]
+	{
+		#if RANGE_CAST
+		let array = new [PRIMITIVE]((toExclusive - from) as int)
+		#else
+		let array = new [PRIMITIVE](toExclusive - from)
+		#end
+		var index = 0
+
+		for (i <- from ..< toExclusive) array[index++] = from
+		return array
+	}
+	#endif
+
+	// Basic Array Operations
+
+	@Deprecated(replacements: [ "[PRIMITIVE].size(): int" ])
+	@Intrinsic([ LOAD_0, ARRAYLENGTH ])
+	public postfix func length([PRIMITIVE] array): int = array.size
+
+	@Intrinsic([ LOAD_0, ARRAYLENGTH ])
+	public postfix func size([PRIMITIVE] array): int = array.size
+
+	@Intrinsic([ LOAD_0, ARRAYLENGTH, EQ0 ])
+	public postfix func isEmpty([PRIMITIVE] array): boolean = array.isEmpty
+
+	@Intrinsic([ LOAD_0, LOAD_1, ARRAY_LOAD_INSN ])
+	public infix func subscript([PRIMITIVE] array, int index): PRIMITIVE = array[index]
+
+	public infix func subscript([PRIMITIVE] array, Range<int> range): [PRIMITIVE]
+	{
+		let size = range.size
+		let result = new [PRIMITIVE](size)
+		System.arraycopy(array, range.first, result, 0, size)
+		return result
+	}
+
+	@Mutating
+	@Intrinsic([ LOAD_0, LOAD_1, LOAD_2, ARRAY_STORE_INSN ])
+	public infix func subscript_$eq([PRIMITIVE] array, int index, PRIMITIVE newValue): void
+		= array[index] = newValue
+
+	@Mutating
+	public infix func subscript_$eq([PRIMITIVE] array, Range<int> range, [PRIMITIVE] newValues): void
+		= System.arraycopy(newValues, 0, array, range.first, range.size)
+
+	@Mutating
+	public static func subscript_$amp([PRIMITIVE] array, int index): TYPE_NAME##Ref
+		= new TYPE_NAME##ArrayRef(array, index)
+
+	public infix func forEach([PRIMITIVE] array,  CONSUMER action): void
+		= for (value <- array) action.CONSUMER_ACCEPT(value)
+
+	// Operators
+
+	public infix inline func ==([PRIMITIVE] lhs, [PRIMITIVE] rhs): boolean = Arrays.equals(lhs, rhs)
+
+	public infix inline func !=([PRIMITIVE] lhs, [PRIMITIVE] rhs): boolean = !Arrays.equals(lhs, rhs)
+
+	public infix func added([PRIMITIVE] array, PRIMITIVE value): [PRIMITIVE]
+	{
+		let size = array.size
+		let res = new [PRIMITIVE](size + 1)
+		System.arraycopy(array, 0, res, 0, size)
+		res[size] = value
+		return res
+	}
+
+	public infix func union([PRIMITIVE] array, [PRIMITIVE] with): [PRIMITIVE]
+	{
+		let size1 = array.size
+		let size2 = with.size
+		let res = new [PRIMITIVE](size1 + size2)
+		System.arraycopy(array, 0, res, 0, size1)
+		System.arraycopy(with, 0, res, size1, size2)
+		return res
+	}
+
+	public infix func removed([PRIMITIVE] array, PRIMITIVE value): [PRIMITIVE]
+	{
+		var newSize = array.size
+
+		// Calculate number of element in new array
+		for (element <- array) if (element == value) newSize--
+
+		let res = new [PRIMITIVE](newSize)
+		var index = 0
+
+		for (element <- array) if (element != value) res[index++] = element
+		return res
+	}
+
+	public infix func difference([PRIMITIVE] array, [PRIMITIVE] from): [PRIMITIVE]
+	{
+		let size = array.size
+		let res = new [PRIMITIVE](size)
+		var index = 0
+
+		for (v <- array) if (!from.contains(v)) res[index++] = v
+		return res.trim(index)
+	}
+
+	public infix func intersection([PRIMITIVE] array, [PRIMITIVE] with): [PRIMITIVE]
+	{
+		let size = array.size
+		let res = new [PRIMITIVE](size)
+		var index = 0
+
+		for (v <- array) if (with.contains(v)) res[index++] = v
+		return res.trim(index)
+	}
+
+	public infix func mapped([PRIMITIVE] array, MAPPER mapper): [PRIMITIVE]
+	{
+		let size = array.size
+		let res = new [PRIMITIVE](size)
+
+		#if MAPPER_CAST
+		for (i <- 0 ..< size) res[i] = mapper.MAPPER_APPLY(array[i]) as PRIMITIVE
+		#else
+		for (i <- 0 ..< size) res[i] = mapper.MAPPER_APPLY(array[i])
+		#end
+		return res
+	}
+
+	@OverloadPriority
+	public infix func mapped<@Reified(Reified.Type.OBJECT_CLASS) T>([PRIMITIVE] array, TO_MAPPER T TO_MAPPER_END mapper): [T]
+	{
+		let size = array.size
+		let res = ObjectArray<T>(size)
+		for (i <- 0 ..< size) res[i] = mapper.TO_MAPPER_APPLY(array[i])
+		return res
+	}
+
+	public infix func flatMapped([PRIMITIVE] array, TO_MAPPER [PRIMITIVE] TO_MAPPER_END mapper): [PRIMITIVE]
+	{
+		var size = 0
+		var res = new [PRIMITIVE](array.size << 2)
+
+		for (v <- array)
+		{
+			let inner = mapper.TO_MAPPER_APPLY(v)
+			let newSize = inner.size
+
+			if (size + newSize >= res.size)
+			{
+				res = res.copy((size + newSize) << 1)
+			}
+
+			System.arraycopy(inner, 0, res, size, newSize)
+			size += newSize
+		}
+
+		return res.trim(size)
+	}
+
+	@OverloadPriority
+	public infix func flatMapped<@Reified(Reified.Type.OBJECT_CLASS) T>([PRIMITIVE] array, TO_MAPPER +Iterable<+T> TO_MAPPER_END mapper): [T]
+	{
+		let list = new dyvil.collection.mutable.ArrayList<T>(array.size << 2)
+
+		for (value <- array) list.addAll(mapper.TO_MAPPER_APPLY(value))
+		return list.toArray<T>(class T)
+	}
+
+	public infix func filtered([PRIMITIVE] array, PREDICATE condition): [PRIMITIVE]
+	{
+		let size = array.size
+		let res = new [PRIMITIVE](size)
+		var index = 0
+
+		for (v <- array) if (condition.PREDICATE_TEST(v)) res[index++] = v
+		return res.trim(index)
+	}
+
+	public infix func sorted([PRIMITIVE] array): [PRIMITIVE]
+	{
+#if USE_BOOL_SORT
+		let size = array.size
+		let res = new [boolean](size)
+
+		// Count the number of 'false' entries in the array
+		var falseEntries = 0
+
+		for (value <- array) if (!value) falseEntries++
+
+		// Make the remaining elements of the result true
+		for (i <- falseEntries ..< size) res[i] = true
+		return res
+#else
+		let res = array.copy
+		Arrays.sort(res)
+		return res
+#endif
+	}
+
+	// Search Operations
+
+	public infix inline func contains([PRIMITIVE] array, PRIMITIVE value): boolean = indexOf(array, value, 0) >= 0
+
+	public infix inline func indexOf([PRIMITIVE] array, PRIMITIVE value): int = indexOf(array, value, 0)
+
+	public infix func indexOf([PRIMITIVE] array, PRIMITIVE value, int startIndex): int
+	{
+		while (startIndex < array.size)
+		{
+			if (array[startIndex] == value)
+			{
+				return startIndex
+			}
+			startIndex++
+		}
+		return -1
+	}
+
+	public infix func lastIndexOf([PRIMITIVE] array, PRIMITIVE value): int = lastIndexOf(array, value, array.size - 1)
+
+	public infix func lastIndexOf([PRIMITIVE] array, PRIMITIVE value, int startIndex): int
+	{
+		while (startIndex >= 0)
+		{
+			if (array[startIndex] == value) return startIndex
+			startIndex--
+		}
+		return -1
+	}
+
+	// Copying
+
+	@Deprecated(replacements: [ "[PRIMITIVE].copy(): [PRIMITIVE]" ])
+	public infix inline func clone([PRIMITIVE] array): [PRIMITIVE] = array.copy
+
+	public infix inline func copy([PRIMITIVE] array): [PRIMITIVE] = (array as Object).clone as [PRIMITIVE]
+
+	public infix func copy([PRIMITIVE] array, int withSize): [PRIMITIVE]
+	{
+		let newArray = new [PRIMITIVE](withSize)
+		System.arraycopy(array, 0, newArray, 0, array.size)
+		return newArray
+	}
+
+	public infix func trim([PRIMITIVE] array, int toSize): [PRIMITIVE]
+		= array.size == toSize ? array : array.copy(toSize)
+
+	public infix func boxed([PRIMITIVE] array): [WRAPPER]
+	{
+		let size = array.size
+		let boxed = new [WRAPPER](size)
+
+		for (i <- 0 ..< size) boxed[i] = array[i]
+		return boxed
+	}
+
+	public implicit infix func asIterable([PRIMITIVE] array): Iterable<PRIMITIVE> = toList(array)
+
+	public implicit infix func asList([final PRIMITIVE] array): ImmutableList<PRIMITIVE> = toList(array)
+
+	public infix func toList([PRIMITIVE] array): ImmutableList<PRIMITIVE>
+		= new dyvil.collection.immutable.ArrayList<WRAPPER>(boxed(array), trusted: true)
+
+	// equals, hashCode and toString
+
+	public infix inline func equals([PRIMITIVE] array1, [PRIMITIVE] array2): boolean = Arrays.equals(array1, array2)
+
+	public infix inline func hashCode([PRIMITIVE] array): int = Arrays.hashCode(array)
+
+	public infix func toString([PRIMITIVE] array): String
+	{
+		let size = array.size
+		if (size == 0)
+		{
+			return "[]"
+		}
+
+		final StringBuilder builder = new StringBuilder()
+		append(array, size, builder)
+		return builder.toString()
+	}
+
+	public infix func toString([PRIMITIVE] array, StringBuilder builder): void
+	{
+		let size = array.size
+		if (size == 0)
+		{
+			builder.append("[]")
+			return
+		}
+
+		append(array, size, builder)
+	}
+
+	private static func append([PRIMITIVE] array, int size, StringBuilder builder): void
+	{
+		builder.append('[').append(array[0])
+		for (i <- 1 ..< size) builder.append(", ").append(array[i])
+		builder.append(']')
+	}
+}

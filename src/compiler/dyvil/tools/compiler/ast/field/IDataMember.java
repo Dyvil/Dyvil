@@ -103,12 +103,25 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 
 	void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException;
 
-	default void writeGet(MethodWriter writer, IValue receiver, int lineNumber) throws BytecodeException
+	default void writeReceiver(MethodWriter writer, IValue receiver)
 	{
 		if (receiver != null)
 		{
-			receiver.writeExpression(writer, this.getEnclosingClass().getReceiverType());
+			final IType receiverType = this.getEnclosingClass().getReceiverType();
+			if (this.hasModifier(Modifiers.STATIC))
+			{
+				receiver.writeNullCheckedExpression(writer, receiverType);
+			}
+			else
+			{
+				receiver.writeExpression(writer, receiverType);
+			}
 		}
+	}
+
+	default void writeGet(MethodWriter writer, IValue receiver, int lineNumber) throws BytecodeException
+	{
+		this.writeReceiver(writer, receiver);
 
 		this.writeGet_Get(writer, lineNumber);
 		this.writeGet_Unwrap(writer, lineNumber);
@@ -116,10 +129,7 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 
 	default void writeSet(MethodWriter writer, IValue receiver, IValue value, int lineNumber) throws BytecodeException
 	{
-		if (receiver != null)
-		{
-			receiver.writeExpression(writer, this.getEnclosingClass().getReceiverType());
-		}
+		this.writeReceiver(writer, receiver);
 
 		this.writeSet_PreValue(writer, lineNumber);
 		value.writeExpression(writer, this.getType());

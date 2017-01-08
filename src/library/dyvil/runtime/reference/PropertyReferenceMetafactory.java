@@ -1,5 +1,7 @@
 package dyvil.runtime.reference;
 
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.reflect.Opcodes;
 import dyvil.runtime.BytecodeDump;
 import dyvil.runtime.TypeConverter;
@@ -32,18 +34,26 @@ public class PropertyReferenceMetafactory
 
 	private final Class<?> targetClass;
 
+	@NonNull
 	private final MethodHandleInfo getterInfo;
+	@NonNull
 	private final MethodHandleInfo setterInfo;
 
+	@NonNull
 	private final String     className;
 	private final Class<?>   refClass;
+	@NonNull
 	private final Class<?>   refTargetClass;
+	@NonNull
 	private final String     refTargetType;
+	@Nullable
 	private final String     receiverType;
+	@NonNull
 	private final MethodType factoryType;
 	private final MethodType constructorType;
 
-	public PropertyReferenceMetafactory(MethodHandles.Lookup caller, MethodType invokedType, MethodHandle getter, MethodHandle setter)
+	public PropertyReferenceMetafactory(MethodHandles.@NonNull Lookup caller, @NonNull MethodType invokedType,
+		                                   @NonNull MethodHandle getter, @NonNull MethodHandle setter)
 	{
 		this.targetClass = caller.lookupClass();
 		this.factoryType = invokedType;
@@ -104,13 +114,15 @@ public class PropertyReferenceMetafactory
 		this.className = TypeConverter.getInternalName(this.targetClass) + "$PropertyRef$" + counter.incrementAndGet();
 	}
 
+	@NonNull
 	public CallSite buildCallSite() throws Exception
 	{
 		final Class<?> innerClass = this.spinInnerClass();
 
 		if (this.receiverType == null)
 		{
-			final Constructor[] ctrs = AccessController.doPrivileged((PrivilegedAction<Constructor[]>) () -> {
+			final Constructor[] ctrs = AccessController.doPrivileged((PrivilegedAction<Constructor[]>) () ->
+			{
 				Constructor<?>[] ctrs1 = innerClass.getDeclaredConstructors();
 				if (ctrs1.length == 1)
 				{
@@ -182,7 +194,7 @@ public class PropertyReferenceMetafactory
 		return UNSAFE.defineAnonymousClass(this.targetClass, bytes, null);
 	}
 
-	private void generateFactory(ClassWriter classWriter)
+	private void generateFactory(@NonNull ClassWriter classWriter)
 	{
 		final MethodVisitor factory = classWriter.visitMethod(PRIVATE | STATIC, FACTORY_NAME,
 		                                                      this.factoryType.toMethodDescriptorString(), null, null);
@@ -201,7 +213,7 @@ public class PropertyReferenceMetafactory
 		factory.visitEnd();
 	}
 
-	private void generateConstructor(ClassWriter classWriter)
+	private void generateConstructor(@NonNull ClassWriter classWriter)
 	{
 		final MethodVisitor ctor = classWriter
 			                           .visitMethod(PRIVATE, "<init>", this.constructorType.toMethodDescriptorString(),
@@ -222,7 +234,7 @@ public class PropertyReferenceMetafactory
 		ctor.visitEnd();
 	}
 
-	private void writeReceiver(MethodVisitor setter)
+	private void writeReceiver(@NonNull MethodVisitor setter)
 	{
 		if (this.receiverType != null)
 		{
@@ -231,7 +243,7 @@ public class PropertyReferenceMetafactory
 		}
 	}
 
-	private void writeMethod(MethodVisitor setter, MethodHandleInfo handleInfo)
+	private void writeMethod(@NonNull MethodVisitor setter, @NonNull MethodHandleInfo handleInfo)
 	{
 		setter.visitMethodInsn(invocationOpcode(handleInfo.getReferenceKind()),
 		                       TypeConverter.getInternalName(handleInfo.getDeclaringClass()), handleInfo.getName(),
@@ -239,7 +251,7 @@ public class PropertyReferenceMetafactory
 		                       handleInfo.getDeclaringClass().isInterface());
 	}
 
-	private void generateGetter(ClassWriter classWriter)
+	private void generateGetter(@NonNull ClassWriter classWriter)
 	{
 		MethodVisitor getter = classWriter.visitMethod(PUBLIC, "get", "()" + this.refTargetType, null, null);
 
@@ -256,7 +268,7 @@ public class PropertyReferenceMetafactory
 		getter.visitEnd();
 	}
 
-	private void generateSetter(ClassWriter classWriter)
+	private void generateSetter(@NonNull ClassWriter classWriter)
 	{
 		final MethodType setterType = this.setterInfo.getMethodType();
 		final Class<?> setterParamType = setterType.parameterType(0);
@@ -290,7 +302,7 @@ public class PropertyReferenceMetafactory
 		setter.visitEnd();
 	}
 
-	private void generateToString(ClassWriter classWriter)
+	private void generateToString(@NonNull ClassWriter classWriter)
 	{
 		MethodVisitor toString = classWriter.visitMethod(PUBLIC, "toString", "()Ljava/lang/String;", null, null);
 		toString.visitCode();

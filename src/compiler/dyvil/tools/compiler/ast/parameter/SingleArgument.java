@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -124,7 +125,8 @@ public final class SingleArgument implements IArguments, IValueConsumer
 			                               implicitContext) ? 0 : -1;
 		}
 
-		final IType elementType = param.getInternalType().getElementType();
+		final ArrayType arrayType = param.getInternalType().extract(ArrayType.class);
+		final IType elementType = arrayType.getElementType();
 		if (ArgumentList.checkMatch(values, types, matchStartIndex + argumentIndex, this.value, elementType, implicitContext))
 		{
 			// One argument applied as varargs
@@ -162,7 +164,7 @@ public final class SingleArgument implements IArguments, IValueConsumer
 			return;
 		}
 
-		final IType elementType = arrayType.getElementType();
+		final IType elementType = arrayType.extract(ArrayType.class).getElementType();
 		this.value = TypeChecker.convertValue(this.value, elementType, typeContext, markers, context,
 		                                      IArguments.argumentMarkerSupplier(param));
 
@@ -179,7 +181,7 @@ public final class SingleArgument implements IArguments, IValueConsumer
 			return;
 		}
 
-		param.getInternalType().getElementType().inferTypes(type, typeContext);
+		param.getInternalType().extract(ArrayType.class).getElementType().inferTypes(type, typeContext);
 	}
 
 	@Override

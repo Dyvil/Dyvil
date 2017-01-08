@@ -1,6 +1,8 @@
 package dyvil.util;
 
 import dyvil.annotation.Immutable;
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.lang.LiteralConvertible;
 
 import java.io.Serializable;
@@ -33,30 +35,36 @@ public final class Version implements Comparable<Version>, Serializable
 	private final int    major;
 	private final int    minor;
 	private final int    patch;
+	@Nullable
 	private final String prerelease;
+	@Nullable
 	private final String build;
 
-	public static Version apply(String version)
+	@NonNull
+	public static Version apply(@NonNull String version)
 	{
 		return new Version(version);
 	}
 
+	@Nullable
 	public static Version apply(int major, int minor, int patch)
 	{
 		return new Version(major, minor, patch, null, null);
 	}
 
+	@Nullable
 	public static Version apply(int major, int minor, int patch, String prerelease)
 	{
 		return new Version(major, minor, patch, prerelease, null);
 	}
 
+	@NonNull
 	public static Version apply(int major, int minor, int patch, String prerelease, String build)
 	{
 		return new Version(major, minor, patch, prerelease, build);
 	}
 
-	public Version(String version)
+	public Version(@NonNull String version)
 	{
 		final Matcher matcher = PATTERN.matcher(version);
 		if (!matcher.matches())
@@ -81,7 +89,7 @@ public final class Version implements Comparable<Version>, Serializable
 		this(major, minor, patch, prerelease, null);
 	}
 
-	public Version(int major, int minor, int patch, String prerelease, String build)
+	public Version(int major, int minor, int patch, @Nullable String prerelease, @Nullable String build)
 	{
 		if (major < 0)
 		{
@@ -128,11 +136,13 @@ public final class Version implements Comparable<Version>, Serializable
 		return this.patch;
 	}
 
+	@Nullable
 	public String releaseInfo()
 	{
 		return this.prerelease;
 	}
 
+	@Nullable
 	public String buildInfo()
 	{
 		return this.build;
@@ -148,7 +158,8 @@ public final class Version implements Comparable<Version>, Serializable
 		return this.major > 0;
 	}
 
-	public Version next(Version.Element element)
+	@NonNull
+	public Version next(Version.@Nullable Element element)
 	{
 		if (element == null)
 		{
@@ -201,7 +212,7 @@ public final class Version implements Comparable<Version>, Serializable
 	}
 
 	@Override
-	public boolean equals(Object obj)
+	public boolean equals(@Nullable Object obj)
 	{
 		if (this == obj)
 		{

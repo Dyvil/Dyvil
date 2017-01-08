@@ -1,6 +1,7 @@
 package dyvil.string;
 
 import dyvil.annotation.internal.DyvilModifiers;
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
 
 import java.util.Random;
@@ -298,7 +299,7 @@ public final class CharUtils
 	 * @return the random letter
 	 */
 	@DyvilModifiers(Modifiers.INFIX)
-	public static char nextLetter(Random random)
+	public static char nextLetter(@NonNull Random random)
 	{
 		return LOWER_ALPHABET[random.nextInt(26)];
 	}
@@ -312,7 +313,7 @@ public final class CharUtils
 	 * @return the random letter
 	 */
 	@DyvilModifiers(Modifiers.INFIX)
-	public static char nextUppercaseLetter(Random random)
+	public static char nextUppercaseLetter(@NonNull Random random)
 	{
 		return UPPER_ALPHABET[random.nextInt(26)];
 	}
@@ -326,7 +327,7 @@ public final class CharUtils
 	 * @return the random vowel
 	 */
 	@DyvilModifiers(Modifiers.INFIX)
-	public static char nextVowel(Random random)
+	public static char nextVowel(@NonNull Random random)
 	{
 		return LOWER_VOWELS[random.nextInt(5)];
 	}
@@ -340,7 +341,7 @@ public final class CharUtils
 	 * @return the random vowel
 	 */
 	@DyvilModifiers(Modifiers.INFIX)
-	public static char nextUppercaseVowel(Random random)
+	public static char nextUppercaseVowel(@NonNull Random random)
 	{
 		return UPPER_VOWELS[random.nextInt(5)];
 	}
@@ -354,7 +355,7 @@ public final class CharUtils
 	 * @return the random consonant
 	 */
 	@DyvilModifiers(Modifiers.INFIX)
-	public static char nextConsonant(Random random)
+	public static char nextConsonant(@NonNull Random random)
 	{
 		return LOWER_CONSONANTS[random.nextInt(21)];
 	}
@@ -368,7 +369,7 @@ public final class CharUtils
 	 * @return the random consonant
 	 */
 	@DyvilModifiers(Modifiers.INFIX)
-	public static char nextUppercaseConsonant(Random random)
+	public static char nextUppercaseConsonant(@NonNull Random random)
 	{
 		return UPPER_CONSONANTS[random.nextInt(21)];
 	}

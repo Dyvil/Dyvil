@@ -1,44 +1,54 @@
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
+
 package dyvil.lang
 
 using   dyvil.reflect.Opcodes._
 
 public abstract class Primitives
 {
+	private const VOID_INSTANCE: Void = dyvil.reflect.ReflectUtils.UNSAFE.allocateInstance(class Void) as Void
+
 	private init() {}
 
-	#define LOAD_CALL [ LOAD_0, INVOKESTATIC, 0, 1, 2 ]
+#define LOAD_CALL [ LOAD_0, INVOKESTATIC, 0, 1, 2 ]
 
 	// --- Conversion Methods ---
 
 	// Void Methods
 
-	@Intrinsic([ ACONST_NULL ])
-	public static Void Void() = null
+	public static Void Void() = VOID_INSTANCE
 
 	@Intrinsic([ /* NOOP */ ])
-	public static void toVoid(Void value) = ()
+	public static void toVoid(Void? value) {}
 
-	// GEN_NOTICE
-	// Timestamp: TIME_STAMP
-#foreach Base-Boolean.dgs, Base-Byte.dgs, Base-Short.dgs, Base-Char.dgs, Base-Int.dgs, Base-Long.dgs, Base-Float.dgs, Base-Double.dgs
+#import Base.dgs
+#foreach PRIMITIVE_SPECS
 
 	// TYPE_NAME Conversions
 
-	@Intrinsic(value: LOAD_CALL, strings : [ "java/lang/WRAPPER", "valueOf", "(DESC_CHAR)Ljava/lang/WRAPPER;" ])
-	public static WRAPPER TYPE_NAME(PRIMITIVE value) = TYPE_NAME(value)
+	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/WRAPPER", "valueOf", "(DESC_CHAR)Ljava/lang/WRAPPER;" ])
+	public static WRAPPER TYPE_NAME(PRIMITIVE value) = TYPE_NAME.valueOf(value)
 
-	public postfix PRIMITIVE to##TYPE_NAME(WRAPPER value) = if (value == null) DEFAULT_VALUE else value.PRIMITIVE##Value
+	@Intrinsic([ LOAD_0, INVOKEVIRTUAL, 0, 1, 2 ]
+	  strings: [ "java/lang/WRAPPER", "PRIMITIVE##Value", "()DESC_CHAR" ])
+	public postfix PRIMITIVE to##TYPE_NAME(WRAPPER value) = value.PRIMITIVE##Value
+
+	@BytecodeName("nullableTo##TYPE_NAME")
+	public postfix PRIMITIVE to##TYPE_NAME(WRAPPER? optional)
+	{
+		if (optional == null) DEFAULT_VALUE
+		else optional!!.PRIMITIVE##Value
+	}
 #endfor
 
 	// --- equals Methods ---
-#foreach Base-Boolean.dgs, Base-Byte.dgs, Base-Short.dgs, Base-Char.dgs, Base-Int.dgs, Base-Long.dgs, Base-Float.dgs, Base-Double.dgs
+#foreach PRIMITIVE_SPECS
 
 	// TYPE_NAME equals
 
 	public infix inline boolean equals(PRIMITIVE lhs, PRIMITIVE rhs) = lhs == rhs
 #endfor
-
-	// END OF GENERATED CODE
 
 	public infix int compareTo(boolean b1, boolean b2) = if (b1 == b2) 0 else if (b1) 1 else -1
 

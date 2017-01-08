@@ -1,6 +1,9 @@
 package dyvil.tools.compiler.ast.type.compound;
 
 import dyvil.reflect.Opcodes;
+import dyvil.tools.asm.TypeAnnotatableVisitor;
+import dyvil.tools.asm.TypePath;
+import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -78,15 +81,7 @@ public final class WildcardType implements IRawType, ITyped
 	@Override
 	public IType atPosition(ICodePosition position)
 	{
-		final WildcardType clone = this.clone();
-		clone.position = position;
-		return clone;
-	}
-
-	@Override
-	public void setType(IType type)
-	{
-		this.bound = type;
+		return new WildcardType(position, this.bound, this.variance);
 	}
 
 	@Override
@@ -95,15 +90,20 @@ public final class WildcardType implements IRawType, ITyped
 		return this.bound;
 	}
 
-	public void setVariance(Variance variance)
+	@Override
+	public void setType(IType type)
 	{
-		this.variance = variance;
+		this.bound = type;
 	}
 
-	@Override
 	public Variance getVariance()
 	{
 		return this.variance;
+	}
+
+	public void setVariance(Variance variance)
+	{
+		this.variance = variance;
 	}
 
 	@Override
@@ -412,6 +412,34 @@ public final class WildcardType implements IRawType, ITyped
 	}
 
 	@Override
+	public IType withAnnotation(IAnnotation annotation)
+	{
+		final IType a = this.bound.withAnnotation(annotation);
+		if (a == null)
+		{
+			return null;
+		}
+
+		this.bound = a;
+		return this;
+	}
+
+	@Override
+	public void addAnnotation(IAnnotation annotation, TypePath typePath, int step, int steps)
+	{
+		if (typePath.getStep(step) == TypePath.WILDCARD_BOUND)
+		{
+			this.bound = IType.withAnnotation(this.bound, annotation, typePath, step + 1, steps);
+		}
+	}
+
+	@Override
+	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
+	{
+		this.bound.writeAnnotations(visitor, typeRef, typePath + '*');
+	}
+
+	@Override
 	public void read(DataInput in) throws IOException
 	{
 		this.variance = Variance.read(in);
@@ -444,13 +472,5 @@ public final class WildcardType implements IRawType, ITyped
 		{
 			buffer.append('_');
 		}
-	}
-
-	@Override
-	public WildcardType clone()
-	{
-		WildcardType clone = new WildcardType(this.position, this.variance);
-		clone.bound = this.bound;
-		return clone;
 	}
 }

@@ -37,16 +37,9 @@ public class TypeVarType implements IRawType
 		this.typeParameter = typeParameter;
 	}
 
-	@Override
-	public int typeTag()
+	public ITypeParameter getTypeVariable()
 	{
-		return TYPE_VAR_TYPE;
-	}
-
-	@Override
-	public Name getName()
-	{
-		return this.typeParameter.getName();
+		return this.typeParameter;
 	}
 
 	@Override
@@ -56,9 +49,21 @@ public class TypeVarType implements IRawType
 	}
 
 	@Override
-	public ITypeParameter getTypeVariable()
+	public int typeTag()
 	{
-		return this.typeParameter;
+		return TYPE_VAR;
+	}
+
+	@Override
+	public boolean useNonNullAnnotation()
+	{
+		return false;
+	}
+
+	@Override
+	public Name getName()
+	{
+		return this.typeParameter.getName();
 	}
 
 	@Override
@@ -88,7 +93,8 @@ public class TypeVarType implements IRawType
 	@Override
 	public boolean isSameType(IType type)
 	{
-		return this.typeParameter == type.asReturnType().getTypeVariable();
+		final TypeVarType typeVar = type.extract(TypeVarType.class);
+		return typeVar != null && this.typeParameter == typeVar.typeParameter;
 	}
 
 	@Override
@@ -279,12 +285,6 @@ public class TypeVarType implements IRawType
 	{
 		in.readUTF();
 		throw new Error("Cannot decode Type Variable Type");
-	}
-
-	@Override
-	public IType clone()
-	{
-		return new TypeVarType(this.typeParameter);
 	}
 
 	@Override

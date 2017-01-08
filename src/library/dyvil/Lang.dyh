@@ -20,18 +20,7 @@ import dyvil.util.{
 
 // Import useful annotation classes
 
-import dyvil.annotation.{
-	Native    => native
-	Transient => transient
-	Volatile  => volatile
-	Immutable => immutable
-	Mutating  => mutating
-	Reified   => reified
-
-	Intrinsic
-	OverloadPriority
-	Deprecated, Experimental, UsageInfo
-}
+import class dyvil.annotation._
 
 // Import Java base classes
 import java.lang._
@@ -45,6 +34,7 @@ using dyvil.lang.{
 	Assert._
 	ObjectExtensions._
 	StringExtensions._
+	Optionals._
 	Misc._
 }
 
@@ -61,12 +51,14 @@ type Float  = java.lang.Float
 type Double = java.lang.Double
 
 type Configure<T> = T.() -> void
+type Optional<T>  = T?
 type BytecodeName = dyvil.annotation.`internal`.DyvilName
 
 // ---------------------------------------- Operator Definitions ----------------------------------------
 
 // Postfix Operators
 postfix operator !   // unwrap operator
+postfix operator !!  // unsafe unwrap operator
 postfix operator ++
 postfix operator --
 postfix operator ... // varargs expansion operator
@@ -89,6 +81,9 @@ infix   operator ? : { precedence 125 }
 
 // Colon Operator
 infix   operator :   { right, 150 }
+
+// Nullable Coalescing Operator
+infix   operator ??  { left, 175 }
 
 // Boolean and Bitwise Operators
 infix   operator ||  { left, 200 }

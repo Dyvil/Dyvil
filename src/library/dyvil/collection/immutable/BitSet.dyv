@@ -67,7 +67,7 @@ public class BitSet extends AbstractBitSet implements ImmutableSet<int>
 		return copy
 	}
 
-	public override BitSet removed(Object element)
+	public override BitSet removed(Object! element)
 	{
 		if (!(element is Int)) return this
 

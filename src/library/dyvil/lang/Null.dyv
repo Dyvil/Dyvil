@@ -1,6 +1,0 @@
-package dyvil.lang
-
-public final object Null
-{
-	public static inline Null apply() = instance
-}

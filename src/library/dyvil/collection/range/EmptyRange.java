@@ -2,6 +2,7 @@ package dyvil.collection.range;
 
 import dyvil.annotation.Immutable;
 import dyvil.annotation.internal.DyvilModifiers;
+import dyvil.annotation.internal.NonNull;
 import dyvil.collection.Range;
 import dyvil.collection.iterator.EmptyIterator;
 import dyvil.lang.LiteralConvertible;
@@ -19,6 +20,7 @@ public final class EmptyRange<T> implements Range<T>
 
 	public static final EmptyRange instance = new EmptyRange();
 
+	@NonNull
 	public static <E> EmptyRange<E> apply()
 	{
 		return (EmptyRange<E>) instance;
@@ -28,12 +30,14 @@ public final class EmptyRange<T> implements Range<T>
 	{
 	}
 
+	@NonNull
 	@Override
 	public Range<T> asHalfOpen()
 	{
 		return this;
 	}
 
+	@NonNull
 	@Override
 	public Range<T> asClosed()
 	{
@@ -64,6 +68,7 @@ public final class EmptyRange<T> implements Range<T>
 		return false;
 	}
 
+	@NonNull
 	@Override
 	public Iterator<T> iterator()
 	{
@@ -71,7 +76,7 @@ public final class EmptyRange<T> implements Range<T>
 	}
 
 	@Override
-	public void forEach(Consumer<? super T> action)
+	public void forEach(@NonNull Consumer<? super T> action)
 	{
 	}
 
@@ -86,12 +91,14 @@ public final class EmptyRange<T> implements Range<T>
 	{
 	}
 
+	@NonNull
 	@Override
 	public Range<T> copy()
 	{
 		return this;
 	}
 
+	@NonNull
 	@Override
 	public String toString()
 	{
@@ -110,11 +117,13 @@ public final class EmptyRange<T> implements Range<T>
 		return 0;
 	}
 
+	@NonNull
 	private Object writeReplace() throws java.io.ObjectStreamException
 	{
 		return instance;
 	}
 
+	@NonNull
 	private Object readResolve() throws java.io.ObjectStreamException
 	{
 		return instance;

@@ -5,6 +5,7 @@ import dyvil.tools.asm.*;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
+import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 
 import static dyvil.reflect.Opcodes.*;
@@ -719,13 +720,15 @@ public final class MethodWriterImpl implements MethodWriter
 	}
 	
 	@Override
-	public void visitMultiANewArrayInsn(IType arrayType, int dims) throws BytecodeException
+	public void visitMultiANewArrayInsn(IType type, int dims) throws BytecodeException
 	{
 		this.insnCallback();
 
 		if (dims == 1)
 		{
+			final ArrayType arrayType = type.extract(ArrayType.class);
 			final IType elementType = arrayType.getElementType();
+
 			if (elementType.isPrimitive())
 			{
 				this.visitIntInsn(Opcodes.NEWARRAY, getNewArrayCode(elementType.getTypecode()));
@@ -736,7 +739,7 @@ public final class MethodWriterImpl implements MethodWriter
 			return;
 		}
 
-		final String extended = arrayType.getExtendedName();
+		final String extended = type.getExtendedName();
 		this.frame.visitNewArray(extended, dims);
 		
 		this.mv.visitMultiANewArrayInsn(extended, dims);

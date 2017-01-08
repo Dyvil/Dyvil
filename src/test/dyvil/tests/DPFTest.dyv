@@ -1,0 +1,122 @@
+package dyvil.tests
+
+import java.io._
+
+using dyvil.Test
+
+import dyvil.collection.mutable.TreeMap
+
+import dyvil.tools.parsing.Name
+import dyvil.tools.dpf.ast._
+import dyvil.tools.dpf.ast.value.Value
+import dyvil.tools.dpf.converter.{ binary._, string._, flatmap._ }
+
+using dyvil.tools.dpf.DPFSyntax._
+import dyvil.tools.dpf.DPFConvertible
+
+public class DPFTest
+{
+	public case class Button(var text: String, var x: int, var y: int) implements DPFConvertible
+	{
+		private var visible: boolean = false
+		{
+			public get
+			public set
+		}
+
+		public override func toPropertyValue(): Value
+		{
+			return "Button"(this.text, "x": this.x, "y": this.y) {
+				"visible": this.visible
+			}
+		}
+
+		public func apply(Configure<Button> configure): Button
+		{
+			configure this
+			return this
+		}
+	}
+
+	public static let TEST_NODE: RootNode = (dpf {
+		"node1" {
+			"intProperty": 10
+			"stringProperty": "abc"
+			"stringProperty2":
+				"String Interpolation: \("node1.stringProperty") where intProperty = \("node1.intProperty")"
+			"listProperty": [ 1, "a", true ]
+			"mapProperty": [ 1 : "a", 2 : "B" ]
+
+			// Typesafe Builder, with automatic Conversion
+			"builderProperty1": Button(text: "Click Me", x: 10, y: 20) {
+				visible = true
+			}
+
+			// DSL Builder
+			"builderProperty2": "TextField"("Hello World", "x": 100, "y": 200) {
+				"visible": false
+			}
+		}
+
+		"node2" {
+			"subProperty1": 42
+			"subNode1" {
+				"subProperty2": 13
+			}
+		}
+	})
+
+	public static let TEST_STRING: String = TEST_NODE.toString
+
+	public static func apply(): Test = test "DPF" {
+		test "DPF Parser" {
+			Parser.parse(TEST_STRING) =?= TEST_NODE
+		}
+
+		testExpand()
+		testBinary()
+	}
+
+	private static func testExpand(): Test = test "Expand" {
+		// Parse as a Map
+		let baseMap = new TreeMap<String, Object>
+		TEST_NODE.accept(new FlatMapConverter(baseMap))
+
+		// Expand the Node structure
+		let expandedNode: RootNode = TEST_NODE.expand(baseMap, false)
+
+		// Convert the Node structure to a Map
+		let nodeMap = new TreeMap<String, Object>
+		expandedNode.accept(new FlatMapConverter(nodeMap))
+
+		let expandedMap: Map<String, Object> = Expandable.expand(baseMap, baseMap, false)
+
+		nodeMap =?= expandedMap
+	}
+
+	private static func testBinary(): Test = test "Binary" {
+		let newNode = new RootNode
+
+		try
+		{
+			let byteArrayOutputStream = new ByteArrayOutputStream()
+			let dataOutputStream = new DataOutputStream(byteArrayOutputStream)
+
+			TEST_NODE.accept(new BinaryWriter(dataOutputStream))
+
+			let bytes = byteArrayOutputStream.toByteArray
+			let byteArrayInputStream = new ByteArrayInputStream(bytes)
+			let dataInputStream = new DataInputStream(byteArrayInputStream)
+
+			let binaryReader = new BinaryReader(dataInputStream)
+
+			binaryReader.readNodes(newNode)
+		}
+		catch (Throwable ex)
+		{
+			ex.printStackTrace
+		}
+
+		newNode =?= TEST_NODE
+	}
+}

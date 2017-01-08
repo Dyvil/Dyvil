@@ -36,12 +36,12 @@ public class NullType implements Type<Object>
 	@Override
 	public String qualifiedName()
 	{
-		return "dyvil/lang/Null";
+		return "dyvil/lang/internal/Null";
 	}
 	
 	@Override
 	public void appendSignature(StringBuilder builder)
 	{
-		builder.append("Ldyvil/lang/Null;");
+		builder.append("Ldyvil/lang/internal/Null;");
 	}
 }

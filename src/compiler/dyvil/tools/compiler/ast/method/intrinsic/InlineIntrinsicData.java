@@ -94,7 +94,8 @@ public class InlineIntrinsicData extends InstructionList implements IntrinsicDat
 		this.storedParameters = lastStoredIndex + 1;
 	}
 
-	private void writeInstruction(IInstruction instruction, MethodWriter writer, IValue instance, IArguments arguments, int localCount)
+	private void writeInstruction(IInstruction instruction, MethodWriter writer, IValue instance, IArguments arguments,
+		                             int localCount)
 	{
 		final int opcode = instruction.getOpcode();
 		if (Opcodes.isLoadOpcode(opcode))
@@ -121,32 +122,32 @@ public class InlineIntrinsicData extends InstructionList implements IntrinsicDat
 	}
 
 	@Override
-	public void writeIntrinsic(MethodWriter writer, IValue instance, IArguments arguments, int lineNumber)
+	public void writeIntrinsic(MethodWriter writer, IValue receiver, IArguments arguments, int lineNumber)
 		throws BytecodeException
 	{
 		final int localCount = writer.localCount();
-		this.preWrite(writer, instance, arguments, localCount);
+		this.preWrite(writer, receiver, arguments, localCount);
 
 		for (int i = 0; i < this.returnIndex; i++)
 		{
-			this.writeInstruction(this.instructions[i], writer, instance, arguments, localCount);
+			this.writeInstruction(this.instructions[i], writer, receiver, arguments, localCount);
 		}
 
 		writer.resetLocals(localCount);
 	}
 
 	@Override
-	public void writeIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
+	public void writeIntrinsic(MethodWriter writer, Label dest, IValue receiver, IArguments arguments, int lineNumber)
 		throws BytecodeException
 	{
 		final int localCount = writer.localCount();
-		this.preWrite(writer, instance, arguments, localCount);
+		this.preWrite(writer, receiver, arguments, localCount);
 
 		// Write all except the last Instruction
 		final int lastIndex = this.returnIndex - 1;
 		for (int i = 0; i < lastIndex; i++)
 		{
-			this.writeInstruction(this.instructions[i], writer, instance, arguments, localCount);
+			this.writeInstruction(this.instructions[i], writer, receiver, arguments, localCount);
 		}
 
 		// Write the last Instruction as a jump instruction
@@ -158,7 +159,7 @@ public class InlineIntrinsicData extends InstructionList implements IntrinsicDat
 		}
 		else
 		{
-			this.writeInstruction(lastInstruction, writer, instance, arguments, localCount);
+			this.writeInstruction(lastInstruction, writer, receiver, arguments, localCount);
 			writer.visitJumpInsn(Opcodes.IFNE, dest);
 		}
 
@@ -166,17 +167,17 @@ public class InlineIntrinsicData extends InstructionList implements IntrinsicDat
 	}
 
 	@Override
-	public void writeInvIntrinsic(MethodWriter writer, Label dest, IValue instance, IArguments arguments, int lineNumber)
-		throws BytecodeException
+	public void writeInvIntrinsic(MethodWriter writer, Label dest, IValue receiver, IArguments arguments,
+		                             int lineNumber) throws BytecodeException
 	{
 		final int localCount = writer.localCount();
-		this.preWrite(writer, instance, arguments, localCount);
+		this.preWrite(writer, receiver, arguments, localCount);
 
 		// Write all except the last Instruction
 		final int lastIndex = this.returnIndex - 1;
 		for (int i = 0; i < lastIndex; i++)
 		{
-			this.writeInstruction(this.instructions[i], writer, instance, arguments, localCount);
+			this.writeInstruction(this.instructions[i], writer, receiver, arguments, localCount);
 		}
 
 		// Write the last Instruction as an inverse jump instruction
@@ -188,7 +189,7 @@ public class InlineIntrinsicData extends InstructionList implements IntrinsicDat
 		}
 		else
 		{
-			this.writeInstruction(lastInstruction, writer, instance, arguments, localCount);
+			this.writeInstruction(lastInstruction, writer, receiver, arguments, localCount);
 			writer.visitJumpInsn(Opcodes.IFEQ, dest);
 		}
 

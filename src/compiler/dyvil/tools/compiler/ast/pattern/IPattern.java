@@ -26,24 +26,24 @@ public interface IPattern extends IASTNode, ITyped
 	int FLOAT   = 7;
 	int DOUBLE  = 8;
 	int STRING  = 9;
-	
+
 	int ARRAY = 16;
 	int TUPLE = 17;
 	int LIST  = 18;
-	
+
 	int CASE_CLASS = 24;
 	int OBJECT     = 25;
 	int FIELD      = 26;
-	
+
 	int BINDING   = 32;
 	int WILDCARD  = 33;
 	int TYPECHECK = 35;
 
 	int OR  = 48;
 	int AND = 49;
-	
+
 	int getPatternType();
-	
+
 	default boolean isExhaustive()
 	{
 		return false;
@@ -53,17 +53,20 @@ public interface IPattern extends IASTNode, ITyped
 	{
 		return false;
 	}
-	
+
 	@Override
 	IType getType();
-	
+
 	@Override
 	default void setType(IType type)
 	{
 	}
-	
-	IPattern withType(IType type, MarkerList markers);
-	
+
+	default IPattern withType(IType type, MarkerList markers)
+	{
+		return this.isType(type) ? this : null;
+	}
+
 	static IPattern primitiveWithType(IPattern pattern, IType type, PrimitiveType primitiveType)
 	{
 		if (type == primitiveType)
@@ -88,37 +91,37 @@ public interface IPattern extends IASTNode, ITyped
 	{
 		return null;
 	}
-	
+
 	default IPattern resolve(MarkerList markers, IContext context)
 	{
 		return this;
 	}
-	
+
 	default boolean isSwitchable()
 	{
 		return false;
 	}
-	
+
 	default int subPatterns()
 	{
 		return 1;
 	}
-	
+
 	default boolean switchCheck()
 	{
 		return false;
 	}
-	
+
 	default int switchValue()
 	{
 		return -1;
 	}
-	
+
 	default int minValue()
 	{
 		return -1;
 	}
-	
+
 	default int maxValue()
 	{
 		return -1;
@@ -148,13 +151,13 @@ public interface IPattern extends IASTNode, ITyped
 	}
 
 	default void writeJump(MethodWriter writer, int varIndex, IType matchedType, Label targetLabel)
-			throws BytecodeException
+		throws BytecodeException
 	{
 		final Label rightLabel = new Label();
 		this.writeInvJump(writer, varIndex, matchedType, rightLabel);
 		writer.visitJumpInsn(Opcodes.GOTO, targetLabel);
 		writer.visitLabel(rightLabel);
 	}
-	
+
 	void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel) throws BytecodeException;
 }

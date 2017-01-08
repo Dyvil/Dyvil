@@ -163,6 +163,25 @@ public class ParameterList implements IParameterList
 		return true;
 	}
 
+	@Override
+	public boolean isVariadic()
+	{
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			if (this.parameters[i].isVarargs())
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean isLastVariadic()
+	{
+		return this.parameterCount > 0 && this.parameters[this.parameterCount - 1].isVarargs();
+	}
+
 	// Compiler Phases
 
 	@Override
@@ -235,7 +254,7 @@ public class ParameterList implements IParameterList
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			final IType parameterType = this.parameters[i].getInternalType();
+			final IType parameterType = this.parameters[i].getType();
 			if (parameterType.isGenericType() || parameterType.hasTypeVariables())
 			{
 				return true;
@@ -249,7 +268,7 @@ public class ParameterList implements IParameterList
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].getInternalType().appendSignature(builder, false);
+			this.parameters[i].getType().appendSignature(builder, false);
 		}
 	}
 

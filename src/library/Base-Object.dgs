@@ -1,0 +1,7 @@
+@base=true
+
+TYPE_NAME=Object
+PRIMITIVE=T
+WRAPPER=Object
+
+IS_GENERIC=true

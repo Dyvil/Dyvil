@@ -1,6 +1,8 @@
 package dyvil.collection.immutable;
 
 import dyvil.annotation.Immutable;
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractArrayMap;
 import dyvil.lang.LiteralConvertible;
@@ -57,6 +59,7 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 
 	// Factory Methods
 
+	@NonNull
 	public static <K, V> ArrayMap<K, V> singleton(K key, V value)
 	{
 		final ArrayMap<K, V> result = new ArrayMap<>(1);
@@ -64,52 +67,62 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 		return result;
 	}
 
+	@NonNull
 	public static <K, V> ArrayMap<K, V> apply()
 	{
 		return new ArrayMap<>(0);
 	}
 
+	@NonNull
 	@SafeVarargs
-	public static <K, V> ArrayMap<K, V> apply(Entry<? extends K, ? extends V>... entries)
+	public static <K, V> ArrayMap<K, V> apply(@NonNull Entry<? extends K, ? extends V>... entries)
 	{
 		return new ArrayMap<>(entries);
 	}
 
-	public static <K, V> ArrayMap<K, V> from(Entry<? extends K, ? extends V>[] array)
+	@NonNull
+	public static <K, V> ArrayMap<K, V> from(@NonNull Entry<? extends K, ? extends V> @NonNull [] array)
 	{
 		return new ArrayMap<>(array);
 	}
 
-	public static <K, V> ArrayMap<K, V> from(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	@NonNull
+	public static <K, V> ArrayMap<K, V> from(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		return new ArrayMap<>(iterable);
 	}
 
-	public static <K, V> ArrayMap<K, V> from(SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	@NonNull
+	public static <K, V> ArrayMap<K, V> from(@NonNull SizedIterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		return new ArrayMap<>(iterable);
 	}
 
-	public static <K, V> ArrayMap<K, V> from(Set<? extends Entry<? extends K, ? extends V>> set)
+	@NonNull
+	public static <K, V> ArrayMap<K, V> from(@NonNull Set<? extends @NonNull Entry<? extends K, ? extends V>> set)
 	{
 		return new ArrayMap<>(set);
 	}
 
-	public static <K, V> ArrayMap<K, V> from(Map<? extends K, ? extends V> map)
+	@NonNull
+	public static <K, V> ArrayMap<K, V> from(@NonNull Map<? extends K, ? extends V> map)
 	{
 		return new ArrayMap<>(map);
 	}
 
-	public static <K, V> ArrayMap<K, V> from(AbstractArrayMap<? extends K, ? extends V> arrayMap)
+	@NonNull
+	public static <K, V> ArrayMap<K, V> from(@NonNull AbstractArrayMap<? extends K, ? extends V> arrayMap)
 	{
 		return new ArrayMap<>(arrayMap);
 	}
 
+	@NonNull
 	public static <K, V> Builder<K, V> builder()
 	{
 		return new Builder<>();
 	}
 
+	@NonNull
 	public static <K, V> Builder<K, V> builder(int capacity)
 	{
 		return new Builder<>(capacity);
@@ -117,7 +130,8 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 
 	// Constructors
 
-	protected ArrayMap(){
+	protected ArrayMap()
+	{
 		super();
 	}
 
@@ -126,52 +140,52 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 		super(capacity);
 	}
 
-	public ArrayMap(K[] keys, V[] values)
+	public ArrayMap(K @NonNull [] keys, V @NonNull [] values)
 	{
 		super(keys, values);
 	}
 
-	public ArrayMap(K[] keys, V[] values, int size)
+	public ArrayMap(K @NonNull [] keys, V @NonNull [] values, int size)
 	{
 		super(keys, values, size);
 	}
 
-	public ArrayMap(K[] keys, V[] values, boolean trusted)
+	public ArrayMap(K @NonNull [] keys, V @NonNull [] values, boolean trusted)
 	{
 		super(keys, values, trusted);
 	}
 
-	public ArrayMap(K[] keys, V[] values, int size, boolean trusted)
+	public ArrayMap(K @NonNull [] keys, V @NonNull [] values, int size, boolean trusted)
 	{
 		super(keys, values, size, trusted);
 	}
 
-	public ArrayMap(Entry<? extends K, ? extends V>[] entries)
+	public ArrayMap(@NonNull Entry<? extends K, ? extends V> @NonNull [] entries)
 	{
 		super(entries);
 	}
 
-	public ArrayMap(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public ArrayMap(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		super(iterable);
 	}
 
-	public ArrayMap(SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public ArrayMap(@NonNull SizedIterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		super(iterable);
 	}
 
-	public ArrayMap(Set<? extends Entry<? extends K, ? extends V>> set)
+	public ArrayMap(@NonNull Set<? extends @NonNull Entry<? extends K, ? extends V>> set)
 	{
 		super(set);
 	}
 
-	public ArrayMap(Map<? extends K, ? extends V> map)
+	public ArrayMap(@NonNull Map<? extends K, ? extends V> map)
 	{
 		super(map);
 	}
 
-	public ArrayMap(AbstractArrayMap<? extends K, ? extends V> arrayMap)
+	public ArrayMap(@NonNull AbstractArrayMap<? extends K, ? extends V> arrayMap)
 	{
 		super(arrayMap);
 	}
@@ -184,6 +198,7 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 		throw new ImmutableException("Iterator.remove() on Immutable Map");
 	}
 
+	@Nullable
 	@Override
 	public Entry<K, V> getEntry(Object key)
 	{
@@ -196,6 +211,7 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 		return new Tuple.Of2<>((K) key, (V) this.values[index]);
 	}
 
+	@NonNull
 	@Override
 	public ImmutableMap<K, V> withEntry(K key, V value)
 	{
@@ -203,16 +219,17 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 		copy.putInternal(key, value);
 		return copy;
 	}
-	
+
+	@NonNull
 	@Override
-	public ImmutableMap<K, V> union(Map<? extends K, ? extends V> map)
+	public ImmutableMap<K, V> union(@NonNull Map<? extends K, ? extends V> map)
 	{
 		ArrayMap<K, V> copy = new ArrayMap<>(this.size + map.size());
-		
+
 		// Copy our keys and values
 		System.arraycopy(this.keys, 0, copy.keys, 0, this.size);
 		System.arraycopy(this.values, 0, copy.values, 0, this.size);
-		
+
 		// Put the new keys and values
 		for (Entry<? extends K, ? extends V> entry : map)
 		{
@@ -220,13 +237,14 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 		}
 		return copy;
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableMap<K, V> keyRemoved(Object key)
 	{
 		K[] keys = (K[]) new Object[this.size];
 		V[] values = (V[]) new Object[this.size];
-		
+
 		int index = 0;
 		for (int i = 0; i < this.size; i++)
 		{
@@ -235,19 +253,20 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 			{
 				continue;
 			}
-			
+
 			keys[index] = k;
 			values[index++] = (V) this.values[i];
 		}
 		return new ArrayMap<>(keys, values, index, true);
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableMap<K, V> removed(Object key, Object value)
 	{
 		K[] keys = (K[]) new Object[this.size];
 		V[] values = (V[]) new Object[this.size];
-		
+
 		int index = 0;
 		for (int i = 0; i < this.size; i++)
 		{
@@ -266,13 +285,14 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 		}
 		return new ArrayMap<>(keys, values, index, true);
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableMap<K, V> valueRemoved(Object value)
 	{
 		K[] keys = (K[]) new Object[this.size];
 		V[] values = (V[]) new Object[this.size];
-		
+
 		int index = 0;
 		for (int i = 0; i < this.size; i++)
 		{
@@ -281,19 +301,20 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 			{
 				continue;
 			}
-			
+
 			keys[index] = (K) this.keys[i];
 			values[index++] = v;
 		}
 		return new ArrayMap<>(keys, values, index, true);
 	}
-	
+
+	@NonNull
 	@Override
-	public ImmutableMap<K, V> difference(Map<?, ?> map)
+	public ImmutableMap<K, V> difference(@NonNull Map<?, ?> map)
 	{
 		K[] keys = (K[]) new Object[this.size];
 		V[] values = (V[]) new Object[this.size];
-		
+
 		int index = 0;
 		for (int i = 0; i < this.size; i++)
 		{
@@ -303,19 +324,20 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 			{
 				continue;
 			}
-			
+
 			keys[index] = k;
 			values[index++] = v;
 		}
 		return new ArrayMap<>(keys, values, index, true);
 	}
-	
+
+	@NonNull
 	@Override
-	public ImmutableMap<K, V> keyDifference(Collection<?> collection)
+	public ImmutableMap<K, V> keyDifference(@NonNull Collection<?> collection)
 	{
 		K[] keys = (K[]) new Object[this.size];
 		V[] values = (V[]) new Object[this.size];
-		
+
 		int index = 0;
 		for (int i = 0; i < this.size; i++)
 		{
@@ -324,15 +346,16 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 			{
 				continue;
 			}
-			
+
 			keys[index] = k;
 			values[index++] = (V) this.values[i];
 		}
 		return new ArrayMap<>(keys, values, index, true);
 	}
-	
+
+	@NonNull
 	@Override
-	public <NK> ImmutableMap<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper)
+	public <NK> ImmutableMap<NK, V> keyMapped(@NonNull BiFunction<? super K, ? super V, ? extends NK> mapper)
 	{
 		ArrayMap<NK, V> copy = new ArrayMap<>(this.size);
 		for (int i = 0; i < this.size; i++)
@@ -342,13 +365,14 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 		}
 		return copy;
 	}
-	
+
+	@NonNull
 	@Override
-	public <NV> ImmutableMap<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper)
+	public <NV> ImmutableMap<K, NV> valueMapped(@NonNull BiFunction<? super K, ? super V, ? extends NV> mapper)
 	{
 		K[] keys = (K[]) new Object[this.size];
 		NV[] values = (NV[]) new Object[this.size];
-		
+
 		System.arraycopy(this.keys, 0, keys, 0, this.size);
 		for (int i = 0; i < this.size; i++)
 		{
@@ -356,9 +380,10 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 		}
 		return new ArrayMap<>(keys, values, this.size, true);
 	}
-	
+
+	@NonNull
 	@Override
-	public <NK, NV> ImmutableMap<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> entryMapped(@NonNull BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
 	{
 		ArrayMap<NK, NV> copy = new ArrayMap<>(this.size);
 		for (int i = 0; i < this.size; i++)
@@ -368,14 +393,15 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 			{
 				continue;
 			}
-			
+
 			copy.putInternal(entry.getKey(), entry.getValue());
 		}
 		return copy;
 	}
-	
+
+	@NonNull
 	@Override
-	public <NK, NV> ImmutableMap<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> flatMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
 	{
 		ArrayMap<NK, NV> copy = new ArrayMap<>(this.size);
 		for (int i = 0; i < this.size; i++)
@@ -387,13 +413,14 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 		}
 		return copy;
 	}
-	
+
+	@NonNull
 	@Override
-	public ImmutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition)
+	public ImmutableMap<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> condition)
 	{
 		K[] keys = (K[]) new Object[this.size];
 		V[] values = (V[]) new Object[this.size];
-		
+
 		int index = 0;
 		for (int i = 0; i < this.size; i++)
 		{
@@ -403,14 +430,15 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 			{
 				continue;
 			}
-			
+
 			keys[index] = k;
 			values[index] = v;
 			index++;
 		}
 		return new ArrayMap<>(keys, values, index, true);
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableMap<V, K> inverted()
 	{
@@ -420,13 +448,15 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 		System.arraycopy(this.values, 0, keys, 0, this.size);
 		return new ArrayMap<>(keys, values, this.size, true);
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableMap<K, V> copy()
 	{
 		return this.immutableCopy();
 	}
 
+	@NonNull
 	@Override
 	public MutableMap<K, V> mutable()
 	{
@@ -434,7 +464,7 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 	}
 
 	@Override
-	public java.util.Map<K, V> toJava()
+	public java.util.@NonNull Map<K, V> toJava()
 	{
 		return Collections.unmodifiableMap(super.toJava());
 	}

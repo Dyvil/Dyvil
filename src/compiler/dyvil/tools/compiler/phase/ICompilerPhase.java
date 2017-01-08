@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.phase;
 
-import dyvil.annotation.analysis.NotNull;
+import dyvil.annotation.internal.NonNull;
 import dyvil.io.FileUtils;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -104,7 +104,7 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	void apply(DyvilCompiler compiler);
 	
 	@Override
-	default int compareTo(@NotNull ICompilerPhase o)
+	default int compareTo(@NonNull ICompilerPhase o)
 	{
 		return Integer.compare(this.getID(), o.getID());
 	}

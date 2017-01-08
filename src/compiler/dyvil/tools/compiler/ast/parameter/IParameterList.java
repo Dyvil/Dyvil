@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.parameter;
 
+import dyvil.collection.iterator.ArrayIterator;
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.compiler.ast.consumer.IParameterConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IVariable;
@@ -9,12 +9,21 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public interface IParameterList extends IParameterConsumer, IResolvable
+import java.util.Iterator;
+
+public interface IParameterList extends Iterable<IParameter>, IParameterConsumer, IResolvable
 {
 	IParameterList EMPTY = new ParameterList(0);
+
+	@Override
+	default Iterator<IParameter> iterator()
+	{
+		return new ArrayIterator<>(this.getParameterArray(), this.size());
+	}
 
 	int size();
 
@@ -46,6 +55,10 @@ public interface IParameterList extends IParameterConsumer, IResolvable
 	boolean isParameter(IVariable variable);
 
 	boolean matches(IParameterList other);
+
+	boolean isLastVariadic();
+
+	boolean isVariadic();
 
 	// Compiler Phases
 

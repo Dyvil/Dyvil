@@ -1,6 +1,8 @@
 package dyvil.collection.immutable;
 
 import dyvil.annotation.Immutable;
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.collection.*;
 import dyvil.collection.impl.AbstractHashSet;
 import dyvil.lang.LiteralConvertible;
@@ -51,42 +53,50 @@ public class HashSet<E> extends AbstractHashSet<E> implements ImmutableSet<E>
 
 	// Factory Methods
 
+	@NonNull
 	@SafeVarargs
-	public static <E> HashSet<E> apply(E... elements)
+	public static <E> HashSet<E> apply(@NonNull E... elements)
 	{
 		return new HashSet<>(elements);
 	}
 
-	public static <E> HashSet<E> from(E[] array)
+	@NonNull
+	public static <E> HashSet<E> from(E @NonNull [] array)
 	{
 		return new HashSet<>(array);
 	}
 
-	public static <E> HashSet<E> from(Iterable<? extends E> iterable)
+	@NonNull
+	public static <E> HashSet<E> from(@NonNull Iterable<? extends E> iterable)
 	{
 		return new HashSet<>(iterable);
 	}
 
-	public static <E> HashSet<E> from(SizedIterable<? extends E> iterable)
+	@NonNull
+	public static <E> HashSet<E> from(@NonNull SizedIterable<? extends E> iterable)
 	{
 		return new HashSet<>(iterable);
 	}
 
-	public static <E> HashSet<E> from(Set<? extends E> set)
+	@NonNull
+	public static <E> HashSet<E> from(@NonNull Set<? extends E> set)
 	{
 		return new HashSet<>(set);
 	}
 
-	public static <E> HashSet<E> from(AbstractHashSet<? extends E> hashSet)
+	@NonNull
+	public static <E> HashSet<E> from(@NonNull AbstractHashSet<? extends E> hashSet)
 	{
 		return new HashSet<>(hashSet);
 	}
 
+	@NonNull
 	public static <E> Builder<E> builder()
 	{
 		return new Builder<>();
 	}
 
+	@NonNull
 	public static <E> Builder<E> builder(int capacity)
 	{
 		return new Builder<>(capacity);
@@ -104,27 +114,27 @@ public class HashSet<E> extends AbstractHashSet<E> implements ImmutableSet<E>
 		super(capacity);
 	}
 
-	public HashSet(E[] elements)
+	public HashSet(E @NonNull [] elements)
 	{
 		super(elements);
 	}
 
-	public HashSet(Iterable<? extends E> iterable)
+	public HashSet(@NonNull Iterable<? extends E> iterable)
 	{
 		super(iterable);
 	}
 
-	public HashSet(SizedIterable<? extends E> iterable)
+	public HashSet(@NonNull SizedIterable<? extends E> iterable)
 	{
 		super(iterable);
 	}
 
-	public HashSet(Set<? extends E> set)
+	public HashSet(@NonNull Set<? extends E> set)
 	{
 		super(set);
 	}
 
-	public HashSet(AbstractHashSet<? extends E> hashSet)
+	public HashSet(@NonNull AbstractHashSet<? extends E> hashSet)
 	{
 		super(hashSet);
 	}
@@ -139,11 +149,12 @@ public class HashSet<E> extends AbstractHashSet<E> implements ImmutableSet<E>
 	}
 
 	@Override
-	protected void removeElement(HashElement<E> element)
+	protected void removeElement(@NonNull HashElement<E> element)
 	{
 		throw new ImmutableException("Iterator.remove() on Immutable Set");
 	}
 
+	@NonNull
 	@Override
 	public ImmutableSet<E> added(E element)
 	{
@@ -153,8 +164,9 @@ public class HashSet<E> extends AbstractHashSet<E> implements ImmutableSet<E>
 		return newSet;
 	}
 
+	@NonNull
 	@Override
-	public ImmutableSet<E> removed(Object element)
+	public ImmutableSet<E> removed(@Nullable Object element)
 	{
 		HashSet<E> newSet = new HashSet<>(this.size);
 
@@ -168,8 +180,9 @@ public class HashSet<E> extends AbstractHashSet<E> implements ImmutableSet<E>
 		return newSet;
 	}
 
+	@NonNull
 	@Override
-	public ImmutableSet<E> difference(Collection<?> collection)
+	public ImmutableSet<E> difference(@NonNull Collection<?> collection)
 	{
 		HashSet<E> newSet = new HashSet<>(this.size);
 
@@ -184,8 +197,9 @@ public class HashSet<E> extends AbstractHashSet<E> implements ImmutableSet<E>
 		return newSet;
 	}
 
+	@NonNull
 	@Override
-	public ImmutableSet<E> intersection(Collection<? extends E> collection)
+	public ImmutableSet<E> intersection(@NonNull Collection<? extends E> collection)
 	{
 		HashSet<E> newSet = new HashSet<>(this.size);
 
@@ -200,8 +214,9 @@ public class HashSet<E> extends AbstractHashSet<E> implements ImmutableSet<E>
 		return newSet;
 	}
 
+	@NonNull
 	@Override
-	public ImmutableSet<E> union(Collection<? extends E> collection)
+	public ImmutableSet<E> union(@NonNull Collection<? extends E> collection)
 	{
 		HashSet<E> newSet = new HashSet<>(this);
 		newSet.ensureCapacity(this.size + collection.size());
@@ -212,8 +227,9 @@ public class HashSet<E> extends AbstractHashSet<E> implements ImmutableSet<E>
 		return newSet;
 	}
 
+	@NonNull
 	@Override
-	public ImmutableSet<E> symmetricDifference(Collection<? extends E> collection)
+	public ImmutableSet<E> symmetricDifference(@NonNull Collection<? extends E> collection)
 	{
 		HashSet<E> newSet = new HashSet<>(this.size + collection.size());
 
@@ -235,8 +251,9 @@ public class HashSet<E> extends AbstractHashSet<E> implements ImmutableSet<E>
 		return newSet;
 	}
 
+	@NonNull
 	@Override
-	public <R> ImmutableSet<R> mapped(Function<? super E, ? extends R> mapper)
+	public <R> ImmutableSet<R> mapped(@NonNull Function<? super E, ? extends R> mapper)
 	{
 		HashSet<R> newSet = new HashSet<>(this.size);
 
@@ -247,8 +264,9 @@ public class HashSet<E> extends AbstractHashSet<E> implements ImmutableSet<E>
 		return newSet;
 	}
 
+	@NonNull
 	@Override
-	public <R> ImmutableSet<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper)
+	public <R> ImmutableSet<R> flatMapped(@NonNull Function<? super E, ? extends @NonNull Iterable<? extends R>> mapper)
 	{
 		HashSet<R> newSet = new HashSet<>(this.size << 2);
 
@@ -263,8 +281,9 @@ public class HashSet<E> extends AbstractHashSet<E> implements ImmutableSet<E>
 		return newSet;
 	}
 
+	@NonNull
 	@Override
-	public ImmutableSet<E> filtered(Predicate<? super E> condition)
+	public ImmutableSet<E> filtered(@NonNull Predicate<? super E> condition)
 	{
 		HashSet<E> newSet = new HashSet<>(this.size);
 
@@ -278,12 +297,14 @@ public class HashSet<E> extends AbstractHashSet<E> implements ImmutableSet<E>
 		return newSet;
 	}
 
+	@NonNull
 	@Override
 	public ImmutableSet<E> copy()
 	{
 		return new HashSet<>(this);
 	}
 
+	@NonNull
 	@Override
 	public MutableSet<E> mutable()
 	{
@@ -291,7 +312,7 @@ public class HashSet<E> extends AbstractHashSet<E> implements ImmutableSet<E>
 	}
 
 	@Override
-	public java.util.Set<E> toJava()
+	public java.util.@NonNull Set<E> toJava()
 	{
 		return java.util.Collections.unmodifiableSet(super.toJava());
 	}

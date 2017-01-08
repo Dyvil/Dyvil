@@ -34,6 +34,7 @@ import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Mutability;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.typevar.CovariantTypeVarType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -193,21 +194,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void setVariadic()
+	public boolean setReceiverType(IType type)
 	{
-		this.modifiers.addIntModifier(Modifiers.VARARGS);
-	}
-
-	@Override
-	public boolean isVariadic()
-	{
-		return this.modifiers.hasIntModifier(Modifiers.VARARGS);
-	}
-
-	@Override
-	public boolean setReceiverType(IType receiverType)
-	{
-		this.thisType = receiverType;
+		this.thisType = type;
 		return true;
 	}
 
@@ -406,13 +395,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
-		this.checkMatch(list, receiver, name, arguments);
+		// Handled by enclosing class
 	}
 
 	@Override
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
-		this.checkImplicitMatch(list, value, targetType);
+		// Handled by enclosing class
 	}
 
 	@Override
@@ -574,6 +563,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return; // Mismatch
 		}
 
+		for (int matchValue : matchValues)
+		{
+			if (matchValue == IValue.MISMATCH)
+			{
+				return; // Mismatch
+			}
+		}
 		list.add(new Candidate<>(this, matchValues, matchTypes, defaults, varargs, invalid));
 	}
 
@@ -615,22 +611,22 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public GenericData getGenericData(GenericData genericData, IValue instance, IArguments arguments)
+	public GenericData getGenericData(GenericData data, IValue instance, IArguments arguments)
 	{
 		if (!this.hasTypeVariables())
 		{
-			return genericData;
+			return data;
 		}
 
-		if (genericData == null)
+		if (data == null)
 		{
 			return new GenericData(this, this.typeParameterCount);
 		}
 
-		genericData.setTypeParametric(this);
-		genericData.setTypeCount(this.typeParameterCount);
+		data.setTypeParametric(this);
+		data.setTypeCount(this.typeParameterCount);
 
-		return genericData;
+		return data;
 	}
 
 	@Override
@@ -763,12 +759,12 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			final ITypeParameter typeParameter = this.typeParameters[i];
 			final IType typeArgument = genericData.getType(typeParameter.getIndex());
 
-			if (typeArgument == null)
+			if (typeArgument == null || typeArgument instanceof CovariantTypeVarType)
 			{
 				final IType inferredType = typeParameter.getUpperBound();
 				markers.add(Markers.semantic(position, "method.typevar.infer", this.name, typeParameter.getName(),
 				                             inferredType));
-				genericData.addMapping(typeParameter, inferredType);
+				genericData.setType(typeParameter.getIndex(), inferredType);
 			}
 			else if (!typeParameter.isAssignableFrom(typeArgument, genericData))
 			{
@@ -817,7 +813,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 
 		final IValue value = mutatingAnnotation.getArguments().getValue(0, Annotation.VALUE);
-		final String stringValue = value != null ? value.stringValue() : Mutating.VALUE_DEFAULT;
+		final String stringValue = value != null ? value.stringValue() : Mutating.DEFAULT_MESSAGE;
 		StringBuilder builder = new StringBuilder(stringValue);
 
 		int index = builder.indexOf("{method}");
@@ -838,8 +834,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public boolean checkOverride(IMethod candidate, ITypeContext typeContext)
 	{
-		// Check Name
-		if (candidate.getName() != this.name)
+		// Check Name and number of type parameters
+		if (candidate.getName() != this.name || this.typeParameterCount != candidate.typeParameterCount())
 		{
 			return false;
 		}
@@ -878,7 +874,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void addOverride(IMethod candidate)
+	public void addOverride(IMethod method)
 	{
 	}
 
@@ -1002,59 +998,50 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext,
+	public void writeCall(MethodWriter writer, IValue receiver, IArguments arguments, ITypeContext typeContext,
 		                     IType targetType, int lineNumber) throws BytecodeException
 	{
 		if (this.intrinsicData != null)
 		{
-			this.intrinsicData.writeIntrinsic(writer, instance, arguments, lineNumber);
+			this.intrinsicData.writeIntrinsic(writer, receiver, arguments, lineNumber);
 		}
 		else
 		{
-			this.writeArgumentsAndInvoke(writer, instance, arguments, typeContext, lineNumber);
-		}
-
-		if (Types.isVoid(targetType))
-		{
-			if (!Types.isVoid(this.type))
-			{
-				writer.visitInsn(Opcodes.AUTO_POP);
-			}
-			return;
+			this.writeArgumentsAndInvoke(writer, receiver, arguments, typeContext, lineNumber);
 		}
 
 		if (targetType != null)
 		{
-			this.type.writeCast(writer, targetType, lineNumber);
+			this.getType().writeCast(writer, targetType, lineNumber);
 		}
 	}
 
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments,
+	public void writeJump(MethodWriter writer, Label dest, IValue receiver, IArguments arguments,
 		                     ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
 		if (this.intrinsicData != null)
 		{
-			this.intrinsicData.writeIntrinsic(writer, dest, instance, arguments, lineNumber);
+			this.intrinsicData.writeIntrinsic(writer, dest, receiver, arguments, lineNumber);
 			return;
 		}
 
-		this.writeArgumentsAndInvoke(writer, instance, arguments, typeContext, lineNumber);
+		this.writeArgumentsAndInvoke(writer, receiver, arguments, typeContext, lineNumber);
 		this.type.writeCast(writer, Types.BOOLEAN, 0);
 		writer.visitJumpInsn(IFNE, dest);
 	}
 
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments,
+	public void writeInvJump(MethodWriter writer, Label dest, IValue receiver, IArguments arguments,
 		                        ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
 		if (this.intrinsicData != null)
 		{
-			this.intrinsicData.writeInvIntrinsic(writer, dest, instance, arguments, lineNumber);
+			this.intrinsicData.writeInvIntrinsic(writer, dest, receiver, arguments, lineNumber);
 			return;
 		}
 
-		this.writeArgumentsAndInvoke(writer, instance, arguments, typeContext, lineNumber);
+		this.writeArgumentsAndInvoke(writer, receiver, arguments, typeContext, lineNumber);
 		this.type.writeCast(writer, Types.BOOLEAN, 0);
 		writer.visitJumpInsn(IFEQ, dest);
 	}
@@ -1066,18 +1053,28 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return;
 		}
 
-		if (this.modifiers.hasIntModifier(Modifiers.INFIX))
+		final int modifiers = this.modifiers.toFlags();
+		if ((modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
 			receiver.writeExpression(writer, this.parameters.get(0).getInternalType());
 			return;
 		}
 
-		receiver.writeExpression(writer, this.enclosingClass.getReceiverType());
+		final IType receiverType = this.enclosingClass.getReceiverType();
+
+		if ((modifiers & Modifiers.STATIC) == 0)
+		{
+			receiver.writeNullCheckedExpression(writer, receiverType);
+		}
+		else
+		{
+			receiver.writeExpression(writer, receiverType);
+		}
 
 		if (receiver.isIgnoredClassAccess())
 		{
 			final IType type = receiver.getType();
-			if (type.getTypeVariable() != null)
+			if (type.hasTag(IType.TYPE_VAR))
 			{
 				// Static virtual call
 				type.writeClassExpression(writer, true);
@@ -1138,7 +1135,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		{
 			opcode = Opcodes.INVOKESPECIAL;
 		}
-		else if (receiver.isIgnoredClassAccess() && receiver.getType().getTypeVariable() != null)
+		else if (receiver.isIgnoredClassAccess() && receiver.getType().hasTag(IType.TYPE_VAR))
 		{
 			writer
 				.visitInvokeDynamicInsn(mangledName, descriptor.replace("(", "(Ljava/lang/Class;"), STATICVIRTUAL_BSM);

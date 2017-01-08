@@ -1,0 +1,51 @@
+package dyvil.tests
+
+using dyvil.Test
+
+public class OperatorTest
+{
+	public static func apply(): Test = test "Operators" {
+		unary()
+		binary()
+		ternary()
+	}
+
+	public static func unary(): Test = test "Unary" {
+		infix func apply(int i, int j): (int, int) = (i, j)
+		postfix func ++(int i): int = i
+
+		var i = 1                       // Canonical Representation:
+		let j = [ i -i, i++ i, i++ -i ] // i.apply(-i), (i++).apply(i), (i++).apply(-i)
+		let k = [ i - i, i-i ]          // i - i
+		let l = [ i - -i, i - - i ]     // i - (-i)
+		let m = [ i++ , i++, i ++ ]     // i++
+		let n = i++ + i                 // (i++) + i
+		let o = i++ + ++ i              // (i++) + (++i)
+		let p = i++ + + ++ i            // (i++) + (+ (++i))
+
+		// don't care about values, resolution pass is sufficient
+
+		require true
+	}
+
+	public static func binary(): Test = test "Binary" {
+		let i = 1 + 2 * 3 + 4
+		let k = 1 : 2 : 3
+
+		test "Precedence" {
+			i =?= 11
+		}
+		test "Associativity" {
+			k =?= (1, (2, 3))
+		}
+	}
+
+	public static func ternary(): Test = test "Ternary" {
+		let i = true ? 1 : 2
+		let j = true ? 1 : true ? 2 : 3
+		let k = true ? true ? 1 : 2 : 3
+		let l = true ? 1+1 : true ? true ? 2+2 : 3+3 : 4+4
+
+		// don't care about values, type check pass is sufficient
+	}
+}

@@ -3,6 +3,7 @@ package dyvil.collection;
 import dyvil.annotation.Immutable;
 import dyvil.annotation.Mutating;
 import dyvil.annotation.internal.Covariant;
+import dyvil.annotation.internal.NonNull;
 import dyvil.collection.immutable.AppendList;
 import dyvil.collection.immutable.ArrayList;
 import dyvil.collection.immutable.EmptyList;
@@ -29,48 +30,58 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 		@Override
 		ImmutableList<E> build();
 	}
-	
+
+	@NonNull
 	static <E> ImmutableList<E> apply()
 	{
 		return EmptyList.apply();
 	}
-	
+
+	@NonNull
 	static <E> ImmutableList<E> apply(E element)
 	{
 		return SingletonList.apply(element);
 	}
-	
+
+	@NonNull
 	static <E> ImmutableList<E> apply(E e1, E e2)
 	{
 		return ArrayList.apply(e1, e2);
 	}
-	
+
+	@NonNull
 	static <E> ImmutableList<E> apply(E e1, E e2, E e3)
 	{
 		return ArrayList.apply(e1, e2, e3);
 	}
-	
+
+	@NonNull
 	@SafeVarargs
 	static <E> ImmutableList<E> apply(E... elements)
 	{
 		return ArrayList.apply(elements);
 	}
-	
-	static <E> ImmutableList<E> from(E[] array)
+
+	@NonNull
+	static <E> ImmutableList<E> from(E @NonNull [] array)
 	{
 		return ArrayList.from(array);
 	}
 
-	static <E> ImmutableList<E> from(Iterable<? extends E> iterable)
+	@SuppressWarnings("LambdaUnfriendlyMethodOverload")
+	@NonNull
+	static <E> ImmutableList<E> from(@NonNull Iterable<? extends E> iterable)
 	{
 		return ArrayList.from(iterable);
 	}
 
-	static <E> ImmutableList<E> from(Collection<? extends E> collection)
+	@NonNull
+	static <E> ImmutableList<E> from(@NonNull Collection<? extends E> collection)
 	{
 		return ArrayList.from(collection);
 	}
 
+	@NonNull
 	static <E> ImmutableList<E> repeat(int count, E repeatedValue)
 	{
 		E[] elements = (E[]) new Object[count];
@@ -81,7 +92,9 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 		return new ArrayList<>(elements, count, true);
 	}
 
-	static <E> ImmutableList<E> generate(int count, IntFunction<E> generator)
+	@SuppressWarnings("LambdaUnfriendlyMethodOverload")
+	@NonNull
+	static <E> ImmutableList<E> generate(int count, @NonNull IntFunction<E> generator)
 	{
 		E[] elements = (E[]) new Object[count];
 		for (int i = 0; i < count; i++)
@@ -91,90 +104,111 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 		return new ArrayList<>(elements, count, true);
 	}
 
+	@NonNull
 	@SafeVarargs
 	static <E> ImmutableList<E> linked(E... elements)
 	{
 		return AppendList.apply(elements);
 	}
-	
+
+	@NonNull
 	static <E> Builder<E> builder()
 	{
 		return ArrayList.builder();
 	}
-	
+
+	@NonNull
 	static <E> Builder<E> builder(int capacity)
 	{
 		return ArrayList.builder(capacity);
 	}
 
+	@NonNull
 	static <E> Builder<E> linkedBuilder()
 	{
 		return AppendList.builder();
 	}
-	
+
 	// Accessors
-	
+
 	@Override
 	int size();
-	
+
+	@NonNull
 	@Override
 	Iterator<E> iterator();
-	
+
+	@NonNull
 	@Override
 	Iterator<E> reverseIterator();
-	
+
+	@NonNull
 	@Override
 	default Spliterator<E> spliterator()
 	{
 		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.SIZED | Spliterator.IMMUTABLE);
 	}
-	
+
 	@Override
 	E get(int index);
-	
+
 	// Non-mutating Operations
-	
+
+	@NonNull
 	@Override
 	ImmutableList<E> subList(int startIndex, int length);
-	
+
+	@NonNull
 	@Override
 	ImmutableList<E> added(E element);
-	
+
+	@NonNull
 	@Override
-	ImmutableList<E> union(Collection<? extends E> collection);
-	
+	ImmutableList<E> union(@NonNull Collection<? extends E> collection);
+
+	@NonNull
 	@Override
 	ImmutableList<E> removed(Object element);
-	
+
+	@NonNull
 	@Override
-	ImmutableList<E> difference(Collection<?> collection);
-	
+	ImmutableList<E> difference(@NonNull Collection<?> collection);
+
+	@NonNull
 	@Override
-	ImmutableList<E> intersection(Collection<? extends E> collection);
-	
+	ImmutableList<E> intersection(@NonNull Collection<? extends E> collection);
+
+	@NonNull
 	@Override
-	<R> ImmutableList<R> mapped(Function<? super E, ? extends R> mapper);
-	
+	<R> ImmutableList<R> mapped(@NonNull Function<? super E, ? extends R> mapper);
+
+	@NonNull
 	@Override
-	<R> ImmutableList<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper);
-	
+	<R> ImmutableList<R> flatMapped(@NonNull Function<? super E, ? extends @NonNull Iterable<? extends R>> mapper);
+
+	@NonNull
 	@Override
-	ImmutableList<E> filtered(Predicate<? super E> condition);
-	
+	ImmutableList<E> filtered(@NonNull Predicate<? super E> condition);
+
+	@NonNull
 	@Override
 	ImmutableList<E> reversed();
-	
+
+	@NonNull
 	@Override
 	ImmutableList<E> sorted();
-	
+
+	@NonNull
 	@Override
-	ImmutableList<E> sorted(Comparator<? super E> comparator);
-	
+	ImmutableList<E> sorted(@NonNull Comparator<? super E> comparator);
+
+	@NonNull
 	@Override
 	ImmutableList<E> distinct();
-	
+
+	@NonNull
 	@Override
-	ImmutableList<E> distinct(Comparator<? super E> comparator);
+	ImmutableList<E> distinct(@NonNull Comparator<? super E> comparator);
 
 	// Mutating Operations
 
@@ -198,27 +232,29 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 		throw new ImmutableException("subscript() on Immutable List");
 	}
 
+	@NonNull
 	@Override
 	@Mutating
-	default List<E> subscript(Range<Integer> range)
+	default List<E> subscript(@NonNull Range<Integer> range)
 	{
 		throw new ImmutableException("subscript() on Immutable List");
 	}
 
 	@Override
 	@Mutating
-	default void subscript_$eq(Range<Integer> range, E[] elements)
+	default void subscript_$eq(@NonNull Range<Integer> range, E @NonNull [] elements)
 	{
 		throw new ImmutableException("subscript_=() on Immutable List");
 	}
 
 	@Override
 	@Mutating
-	default void subscript_$eq(Range<Integer> range, List<? extends E> elements)
+	default void subscript_$eq(@NonNull Range<Integer> range, @NonNull List<? extends E> elements)
 	{
 		throw new ImmutableException("subscript_=() on Immutable List");
 	}
 
+	@NonNull
 	@Override
 	@Mutating
 	default ObjectRef<E> subscript_$amp(int index)
@@ -226,6 +262,7 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 		throw new ImmutableException("subscript_&() on Immutable List");
 	}
 
+	@NonNull
 	@Override
 	@Mutating
 	default E set(int index, E element)
@@ -233,6 +270,7 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 		throw new ImmutableException("set() on Immutable List");
 	}
 
+	@NonNull
 	@Override
 	@Mutating
 	default E setResizing(int index, E element)
@@ -270,143 +308,150 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 
 	@Override
 	@Mutating
-	default boolean addAll(Collection<? extends E> collection)
+	default boolean addAll(@NonNull Collection<? extends E> collection)
 	{
 		throw new ImmutableException("addAll() on Immutable List");
 	}
-	
+
 	@Override
 	@Mutating
 	default boolean remove(Object element)
 	{
 		throw new ImmutableException("remove() on Immutable List");
 	}
-	
+
 	@Override
 	@Mutating
 	default boolean removeFirst(Object element)
 	{
 		throw new ImmutableException("removeFirst() on Immutable List");
 	}
-	
+
 	@Override
 	@Mutating
 	default boolean removeLast(Object element)
 	{
 		throw new ImmutableException("removeLast() on Immutable List");
 	}
-	
+
 	@Override
 	@Mutating
 	default void removeAt(int index)
 	{
 		throw new ImmutableException("removeAt() on Immutable List");
 	}
-	
+
 	@Override
 	@Mutating
-	default boolean removeAll(Collection<?> collection)
+	default boolean removeAll(@NonNull Collection<?> collection)
 	{
 		throw new ImmutableException("removeAll() on Immutable List");
 	}
-	
+
 	@Override
 	@Mutating
-	default boolean retainAll(Collection<? extends E> collection)
+	default boolean retainAll(@NonNull Collection<? extends E> collection)
 	{
 		throw new ImmutableException("intersect() on Immutable List");
 	}
-	
+
 	@Override
 	@Mutating
-	default void filter(Predicate<? super E> condition)
+	default void filter(@NonNull Predicate<? super E> condition)
 	{
 		throw new ImmutableException("filter() on Immutable List");
 	}
-	
+
 	@Override
 	@Mutating
-	default void map(Function<? super E, ? extends E> mapper)
+	default void map(@NonNull Function<? super E, ? extends E> mapper)
 	{
 		throw new ImmutableException("map() on Immutable List");
 	}
-	
+
 	@Override
 	@Mutating
-	default void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper)
+	default void flatMap(@NonNull Function<? super E, ? extends @NonNull Iterable<? extends E>> mapper)
 	{
 		throw new ImmutableException("flatMap() on Immutable List");
 	}
-	
+
 	@Override
 	@Mutating
 	default void reverse()
 	{
 		throw new ImmutableException("reverse() on Immutable List");
 	}
-	
+
 	@Override
 	@Mutating
 	default void sort()
 	{
 		throw new ImmutableException("sort() on Immutable List");
 	}
-	
+
 	@Override
 	@Mutating
-	default void sort(Comparator<? super E> comparator)
+	default void sort(@NonNull Comparator<? super E> comparator)
 	{
 		throw new ImmutableException("sort() on Immutable List");
 	}
-	
+
 	@Override
 	@Mutating
 	default void distinguish()
 	{
 		throw new ImmutableException("distinguish() on Immutable List");
 	}
-	
+
 	@Override
 	@Mutating
-	default void distinguish(Comparator<? super E> comparator)
+	default void distinguish(@NonNull Comparator<? super E> comparator)
 	{
 		throw new ImmutableException("disinguish() on Immutable List");
 	}
-	
+
 	// Searching
-	
+
 	@Override
 	int indexOf(Object element);
-	
+
 	@Override
 	int lastIndexOf(Object element);
-	
+
 	// Copying and Views
-	
+
+	@NonNull
 	@Override
 	ImmutableList<E> copy();
 
+	@NonNull
 	@Override
 	<RE> MutableList<RE> emptyCopy();
 
+	@NonNull
 	@Override
 	<RE> MutableList<RE> emptyCopy(int capacity);
 
+	@NonNull
 	@Override
 	MutableList<E> mutable();
-	
+
+	@NonNull
 	@Override
 	default MutableList<E> mutableCopy()
 	{
 		return this.mutable();
 	}
-	
+
+	@NonNull
 	@Override
 	default ImmutableList<E> immutable()
 	{
 		return this;
 	}
-	
+
+	@NonNull
 	@Override
 	default ImmutableList<E> immutableCopy()
 	{
@@ -419,6 +464,7 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 	@Override
 	<RE> Builder<RE> immutableBuilder(int capacity);
 
+	@NonNull
 	@Override
 	default ImmutableList<E> view()
 	{

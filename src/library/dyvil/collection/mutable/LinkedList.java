@@ -1,5 +1,7 @@
 package dyvil.collection.mutable;
 
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.collection.Collection;
 import dyvil.collection.Deque;
 import dyvil.collection.*;
@@ -22,11 +24,11 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 
 	protected static class Node<E>
 	{
-		E       item;
-		Node<E> next;
-		Node<E> prev;
+		E item;
+		@Nullable Node<E> next;
+		@Nullable Node<E> prev;
 
-		Node(Node<E> prev, E element, Node<E> next)
+		Node(@Nullable Node<E> prev, E element, @Nullable Node<E> next)
 		{
 			this.item = element;
 			this.next = next;
@@ -35,16 +37,20 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	}
 
 	protected transient int     size;
+	@Nullable
 	protected transient Node<E> first;
+	@Nullable
 	protected transient Node<E> last;
 
+	@NonNull
 	public static <E> LinkedList<E> apply()
 	{
 		return new LinkedList<>();
 	}
 
+	@NonNull
 	@SafeVarargs
-	public static <E> LinkedList<E> apply(E... elements)
+	public static <E> LinkedList<E> apply(@NonNull E... elements)
 	{
 		LinkedList<E> list = new LinkedList<>();
 		for (E element : elements)
@@ -58,7 +64,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	{
 	}
 
-	LinkedList(Node<E> first, Node<E> last, int size)
+	LinkedList(@Nullable Node<E> first, @Nullable Node<E> last, int size)
 	{
 		this.first = first;
 		this.last = last;
@@ -71,13 +77,14 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		return this.size;
 	}
 
+	@NonNull
 	@Override
 	public Iterator<E> iterator()
 	{
 		return new Iterator<E>()
 		{
-			Node<E> lastReturned;
-			Node<E> next = LinkedList.this.first;
+			@Nullable Node<E> lastReturned;
+			@Nullable Node<E> next = LinkedList.this.first;
 
 			@Override
 			public boolean hasNext()
@@ -85,6 +92,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 				return this.next != null;
 			}
 
+			@Nullable
 			@Override
 			public E next()
 			{
@@ -115,6 +123,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 				this.lastReturned = null;
 			}
 
+			@NonNull
 			@Override
 			public String toString()
 			{
@@ -123,13 +132,14 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		};
 	}
 
+	@NonNull
 	@Override
 	public Iterator<E> reverseIterator()
 	{
 		return new Iterator<E>()
 		{
-			Node<E> lastReturned;
-			Node<E> prev = LinkedList.this.last;
+			@Nullable Node<E> lastReturned;
+			@Nullable Node<E> prev = LinkedList.this.last;
 
 			@Override
 			public boolean hasNext()
@@ -163,7 +173,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 			}
 
 			@Override
-			public String toString()
+			public @NonNull String toString()
 			{
 				return "LinkedListDescendingIterator(" + LinkedList.this + ")";
 			}
@@ -171,7 +181,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	}
 
 	@Override
-	public <R> R foldLeft(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
+	public <R> R foldLeft(R initialValue, @NonNull BiFunction<? super R, ? super E, ? extends R> reducer)
 	{
 		for (Node<E> node = this.first; node != null; node = node.next)
 		{
@@ -181,7 +191,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	}
 
 	@Override
-	public <R> R foldRight(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
+	public <R> R foldRight(R initialValue, @NonNull BiFunction<? super R, ? super E, ? extends R> reducer)
 	{
 		for (Node<E> node = this.last; node != null; node = node.prev)
 		{
@@ -190,8 +200,9 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		return initialValue;
 	}
 
+	@Nullable
 	@Override
-	public E reduceLeft(BiFunction<? super E, ? super E, ? extends E> reducer)
+	public E reduceLeft(@NonNull BiFunction<? super E, ? super E, ? extends E> reducer)
 	{
 		if (this.size == 0)
 		{
@@ -199,7 +210,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		}
 
 		Node<E> node = this.first;
-		E initialValue = node.item;
+		@SuppressWarnings("ConstantConditions") E initialValue = node.item;
 		do
 		{
 			if ((node = node.next) == null)
@@ -211,8 +222,9 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		while (true);
 	}
 
+	@Nullable
 	@Override
-	public E reduceRight(BiFunction<? super E, ? super E, ? extends E> reducer)
+	public E reduceRight(@NonNull BiFunction<? super E, ? super E, ? extends E> reducer)
 	{
 		if (this.size == 0)
 		{
@@ -220,7 +232,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		}
 
 		Node<E> node = this.last;
-		E initialValue = node.item;
+		@SuppressWarnings("ConstantConditions") E initialValue = node.item;
 		do
 		{
 			if ((node = node.prev) == null)
@@ -245,13 +257,19 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		return false;
 	}
 
-	protected Node<E> nodeAt(int index)
+	protected @NonNull Node<E> nodeAt(int index)
 	{
+		List.rangeCheck(index, this.size);
+
 		Node<E> node = this.first;
 		for (; index > 0; index--)
 		{
+			assert node != null;
+
 			node = node.next;
 		}
+
+		//noinspection ConstantConditions
 		return node;
 	}
 
@@ -262,28 +280,34 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		return this.nodeAt(index).item;
 	}
 
+	@Nullable
 	@Override
 	public E getFirst()
 	{
 		return this.first == null ? null : this.first.item;
 	}
 
+	@Nullable
 	@Override
 	public E getLast()
 	{
 		return this.last == null ? null : this.last.item;
 	}
 
+	@NonNull
 	@Override
 	public MutableList<E> subList(int startIndex, int length)
 	{
 		List.rangeCheck(startIndex, this.size);
 		List.rangeCheck(startIndex + length - 1, this.size);
 
-		LinkedList<E> copy = new LinkedList<>();
+		final LinkedList<E> copy = new LinkedList<>();
+
 		Node<E> node = this.nodeAt(startIndex);
 		for (; length > 0; length--)
 		{
+			assert node != null;
+
 			copy.addLast(node.item);
 			node = node.next;
 		}
@@ -291,6 +315,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		return copy;
 	}
 
+	@NonNull
 	@Override
 	public List<E> reversed()
 	{
@@ -303,6 +328,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		return ll;
 	}
 
+	@NonNull
 	@Override
 	public MutableList<E> sorted()
 	{
@@ -314,8 +340,9 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		return copy;
 	}
 
+	@NonNull
 	@Override
-	public MutableList<E> sorted(Comparator<? super E> comparator)
+	public MutableList<E> sorted(@NonNull Comparator<? super E> comparator)
 	{
 		LinkedList<E> copy = new LinkedList<>();
 		Object[] array = this.toArray();
@@ -324,6 +351,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		return copy;
 	}
 
+	@NonNull
 	@Override
 	public MutableList<E> distinct()
 	{
@@ -333,8 +361,9 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		return copy;
 	}
 
+	@NonNull
 	@Override
-	public MutableList<E> distinct(Comparator<? super E> comparator)
+	public MutableList<E> distinct(@NonNull Comparator<? super E> comparator)
 	{
 		LinkedList<E> copy = new LinkedList<>();
 		Object[] array = this.toArray();
@@ -348,6 +377,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		this.addLast(element);
 	}
 
+	@Nullable
 	@Override
 	public E set(int index, E element)
 	{
@@ -360,37 +390,38 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	}
 
 	@Override
-	public void addFirst(E e)
+	public void addFirst(E element)
 	{
 		this.size++;
-		Node<E> n = new Node<>(null, e, this.first);
+		final Node<E> node = new Node<>(null, element, this.first);
 		if (this.first != null)
 		{
-			this.first.prev = n;
+			this.first.prev = node;
 		}
 		else
 		{
-			this.last = n;
+			this.last = node;
 		}
-		this.first = n;
+		this.first = node;
 	}
 
 	@Override
 	public void addLast(E element)
 	{
 		this.size++;
-		Node<E> n = new Node<>(this.last, element, null);
+		final Node<E> node = new Node<>(this.last, element, null);
 		if (this.last != null)
 		{
-			this.last.next = n;
+			this.last.next = node;
 		}
 		else
 		{
-			this.first = n;
+			this.first = node;
 		}
-		this.last = n;
+		this.last = node;
 	}
 
+	@Nullable
 	@Override
 	public E setResizing(int index, E element)
 	{
@@ -398,9 +429,11 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		{
 			this.addLast(null);
 		}
+		List.rangeCheck(index, this.size);
 
-		Node<E> node = this.nodeAt(index);
-		E e = node.item;
+		final Node<E> node = this.nodeAt(index);
+
+		final E e = node.item;
 		node.item = element;
 		return e;
 	}
@@ -408,6 +441,11 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	@Override
 	public void insert(int index, E element)
 	{
+		if (index == 0)
+		{
+			this.addFirst(element);
+			return;
+		}
 		if (index == this.size)
 		{
 			this.addLast(element);
@@ -415,20 +453,24 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		}
 
 		List.rangeCheck(index, this.size);
-		Node<E> node = this.nodeAt(index);
-		Node<E> n = new Node<>(node.prev, element, node);
-		node.prev.next = n;
-		node.prev = n;
+		final Node<E> nodeAt = this.nodeAt(index);
+
+		assert nodeAt.prev != null;
+
+		final Node<E> newNode = new Node<>(nodeAt.prev, element, nodeAt);
+		nodeAt.prev.next = newNode;
+		nodeAt.prev = newNode;
 	}
 
 	@Override
 	public void removeAt(int index)
 	{
 		List.rangeCheck(index, this.size);
+		//noinspection ConstantConditions
 		this.unlink(this.nodeAt(index));
 	}
 
-	protected void unlink(Node<E> node)
+	protected void unlink(@NonNull Node<E> node)
 	{
 		final Node<E> next = node.next;
 		final Node<E> prev = node.prev;
@@ -457,17 +499,29 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		this.size--;
 	}
 
+	@Nullable
 	@Override
 	public E removeFirst()
 	{
+		if (this.first == null)
+		{
+			return null;
+		}
+
 		E e = this.first.item;
 		this.unlink(this.first);
 		return e;
 	}
 
+	@Nullable
 	@Override
 	public E removeLast()
 	{
+		if (this.last == null)
+		{
+			return null;
+		}
+
 		E e = this.last.item;
 		this.unlink(this.last);
 		return e;
@@ -523,6 +577,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		return false;
 	}
 
+	@Nullable
 	@Override
 	public E peek(int index)
 	{
@@ -550,7 +605,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	}
 
 	@Override
-	public void map(Function<? super E, ? extends E> mapper)
+	public void map(@NonNull Function<? super E, ? extends E> mapper)
 	{
 		for (Node<E> node = this.first; node != null; node = node.next)
 		{
@@ -559,7 +614,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	}
 
 	@Override
-	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper)
+	public void flatMap(@NonNull Function<? super E, ? extends @NonNull Iterable<? extends E>> mapper)
 	{
 		int size = 0;
 		Node<E> first = null;
@@ -570,16 +625,16 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 			for (E e : mapper.apply(node.item))
 			{
 				size++;
-				Node<E> n = new Node<>(first, e, null);
+				final Node<E> current = new Node<>(first, e, null);
 				if (last != null)
 				{
-					last.next = n;
+					last.next = current;
 				}
 				else
 				{
-					first = n;
+					first = current;
 				}
-				last = n;
+				last = current;
 			}
 		}
 
@@ -589,7 +644,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	}
 
 	@Override
-	public void filter(Predicate<? super E> condition)
+	public void filter(@NonNull Predicate<? super E> condition)
 	{
 		Node<E> node = this.first;
 		while (node != null)
@@ -627,7 +682,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	}
 
 	@Override
-	public void sort(Comparator<? super E> comparator)
+	public void sort(@NonNull Comparator<? super E> comparator)
 	{
 		Object[] array = this.toArray();
 		Arrays.sort((E[]) array, comparator);
@@ -642,7 +697,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	}
 
 	@Override
-	public void distinguish(Comparator<? super E> comparator)
+	public void distinguish(@NonNull Comparator<? super E> comparator)
 	{
 		Object[] array = this.toArray();
 		this.fromArray(array, Set.distinct(array, this.size));
@@ -687,7 +742,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	}
 
 	@Override
-	public void toArray(int index, Object[] store)
+	public void toArray(int index, Object @NonNull [] store)
 	{
 		for (Node<E> node = this.first; node != null; node = node.next)
 		{
@@ -695,18 +750,21 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		}
 	}
 
+	@NonNull
 	@Override
 	public <R> MutableList<R> emptyCopy()
 	{
 		return new LinkedList<>();
 	}
 
+	@NonNull
 	@Override
 	public <R> MutableList<R> emptyCopy(int newCapacity)
 	{
 		return this.emptyCopy();
 	}
 
+	@NonNull
 	@Override
 	public ImmutableList<E> immutable()
 	{
@@ -725,6 +783,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		return AppendList.builder();
 	}
 
+	@NonNull
 	@Override
 	public LinkedList<E> copy()
 	{
@@ -737,7 +796,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	}
 
 	@Override
-	public java.util.List<E> toJava()
+	public java.util.@NonNull List<E> toJava()
 	{
 		java.util.LinkedList<E> list = new java.util.LinkedList<>();
 		for (Node<E> node = this.first; node != null; node = node.next)
@@ -747,6 +806,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		return list;
 	}
 
+	@NonNull
 	@Override
 	public String toString()
 	{
@@ -765,7 +825,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		return List.listHashCode(this);
 	}
 
-	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	private void writeObject(java.io.@NonNull ObjectOutputStream out) throws IOException
 	{
 		out.defaultWriteObject();
 
@@ -777,7 +837,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 		}
 	}
 
-	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	private void readObject(java.io.@NonNull ObjectInputStream in) throws IOException, ClassNotFoundException
 	{
 		in.defaultReadObject();
 

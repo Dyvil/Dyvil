@@ -15,15 +15,15 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class Builder implements Value, BuilderVisitor, Expandable
 {
-	private Name name = null
+	private Name! name = null
 	{
 		public get
 		public set
 	}
 
-	private List<Parameter> parameters
+	private List<Parameter>! parameters
 
-	private Node node = null
+	private Node! node = null
 	{
 		public get
 	}
@@ -38,7 +38,7 @@ public class Builder implements Value, BuilderVisitor, Expandable
 		return new Builder(name, ArrayList(parameters...))
 	}
 
-	public static Builder apply(Name name, List<Parameter> parameters, Node node = null)
+	public static Builder apply(Name name, List<Parameter> parameters, Node? node = null)
 	{
 		return new Builder(name, parameters, node)
 	}
@@ -49,7 +49,7 @@ public class Builder implements Value, BuilderVisitor, Expandable
 		this.parameters = new ArrayList<Parameter>
 	}
 
-	public init(Name name, List<Parameter> parameters, Node node = null)
+	public init(Name name, List<Parameter> parameters, Node? node = null)
 	{
 		this.name = name
 		this.parameters = parameters
@@ -78,7 +78,7 @@ public class Builder implements Value, BuilderVisitor, Expandable
 		return this.node = new Node(this.name)
 	}
 
-	public override ValueVisitor visitParameter(Name name)
+	public override ValueVisitor visitParameter(Name! name)
 	{
 		let parameter = new Parameter(name)
 		this.parameters.add(parameter)
@@ -162,7 +162,7 @@ public class Builder implements Value, BuilderVisitor, Expandable
 		}
 	}
 
-	public override boolean equals(Object o)
+	public override boolean equals(Object! o)
 	{
 		if (this === o) return true
 		if (!(o is Builder)) return false

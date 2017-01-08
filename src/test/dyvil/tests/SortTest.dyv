@@ -1,0 +1,81 @@
+package dyvil.tests
+
+using dyvil.Collections
+using dyvil.Test
+import java.util.Random
+
+public class SortTest
+{
+	public static func apply(): Test = test "Sorting" {
+		let random = new Random
+
+		test "Quicksort" {
+			let list          = List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+			let reversed      = list.reversed
+			let fewUnique     = List(1, 2, 3, 1, 4, 2, 3, 4, 1, 2, 3, 4, 1, 2)
+			let randoms       = List.generate(100, i => random.nextInt 100)
+			let sortedRandoms = randoms.sorted
+
+			test "Sorted" { quicksort(list) =?= list }
+
+			test "Reverse" { quicksort(reversed) =?= list }
+
+			test "Few Unique" { quicksort(fewUnique) =?= fewUnique.sorted }
+
+			test "Random" { quicksort(randoms) =?= sortedRandoms }
+
+			test "Random Inplace" {
+				var mutable = randoms.mutable
+				quicksort(mutable)
+				mutable =?= sortedRandoms
+			}
+		}
+	}
+
+	public static func quicksort<T: Comparable>(ImmutableList<T> list): ImmutableList<T>
+	{
+		if (list.isEmpty) return list
+
+		let pivot = list[list.size \ 2]
+		let less = quicksort(list.filtered(_ < pivot))
+		let equal = list.filtered(_ == pivot)
+		let greater = quicksort(list.filtered(_ > pivot))
+
+		return less ++ equal ++ greater
+	}
+
+	public static func swap<T>(T* left, T* right): void
+	{
+		let temp = *left
+		*left = *right
+		*right = temp
+	}
+
+	public static func quicksort<T: Comparable>(MutableList<T> list): void
+	{
+		quicksortRange(list, 0, list.size - 1)
+	}
+
+	private static func quicksortRange<T: Comparable>(MutableList<T> list, int left, int right): void
+	{
+		var i = left
+		var j = right
+		let pivot = list[left + (right - left) \ 2]
+
+		while i <= j
+		{
+			while (list[i] < pivot) i++
+			while (list[j] > pivot) j--
+
+			if i <= j
+			{
+				swap(&list[i], &list[j])
+				i++
+				j--
+			}
+		}
+
+		if (left < j)  quicksortRange(list, left, j)
+		if (i < right) quicksortRange(list, i, right)
+	}
+}

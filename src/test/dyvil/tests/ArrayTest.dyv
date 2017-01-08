@@ -1,0 +1,26 @@
+package dyvil.tests
+
+using dyvil.Test
+
+public class ArrayTest
+{
+	public static func apply(): Test = test "Arrays" {
+		test "Element Types" {
+			[]   .elementType =?= class any
+			[[]] .elementType =?= class [any]
+			[1]  .elementType =?= class int
+			["a"].elementType =?= class String
+		}
+
+		test "Nested Element Types" {
+			[]     .nestedElementType =?= class any
+			[[]]   .nestedElementType =?= class any
+			[[1]]  .nestedElementType =?= class int
+			[["a"]].nestedElementType =?= class String
+		}
+	}
+
+	public postfix func elementType <@Reified(Reified.Type.ANY_CLASS) T>([T] array): Class<T> = class T
+
+	public postfix func nestedElementType <@Reified(Reified.Type.ANY_CLASS) T>([[T]] array): Class<T> = class T
+}

@@ -78,9 +78,9 @@ public final class NullCheckOperator implements IValue
 	{
 		this.value.checkTypes(markers, context);
 		
-		if (this.value.isPrimitive())
+		if (this.value.getType().isPrimitive())
 		{
-			markers.add(Markers.semantic(this.value.getPosition(), "nullcheck.primitive"));
+			markers.add(Markers.semanticError(this.value.getPosition(), "nullcheck.primitive"));
 		}
 	}
 	

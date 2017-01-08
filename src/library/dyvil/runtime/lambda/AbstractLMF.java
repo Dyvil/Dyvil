@@ -1,5 +1,6 @@
 package dyvil.runtime.lambda;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.runtime.Wrapper;
 
 import java.lang.invoke.*;
@@ -47,6 +48,7 @@ public abstract class AbstractLMF
 	/**
 	 * The type of the invoked method "(CC)II"
 	 */
+	@NonNull
 	protected final MethodType       invokedType;
 	protected final int              parameterCount;
 	/**
@@ -64,10 +66,12 @@ public abstract class AbstractLMF
 	/**
 	 * Raw method handle for the implementation method
 	 */
+	@NonNull
 	protected final MethodHandle     implMethod;
 	/**
 	 * Info about the implementation method handle "MethodHandleInfo[5 CC.impl(int)String]"
 	 */
+	@NonNull
 	protected final MethodHandleInfo implInfo;
 	/**
 	 * Invocation kind for implementation "5"=invokevirtual
@@ -90,8 +94,9 @@ public abstract class AbstractLMF
 	 */
 	protected final MethodType       instantiatedMethodType;
 
-	protected AbstractLMF(MethodHandles.Lookup caller, MethodType invokedType, String samMethodName, MethodType samMethodType, MethodHandle implMethod, MethodType instantiatedMethodType)
-		throws LambdaConversionException
+	protected AbstractLMF(MethodHandles.@NonNull Lookup caller, @NonNull MethodType invokedType, String samMethodName,
+		                     MethodType samMethodType, @NonNull MethodHandle implMethod,
+		                     MethodType instantiatedMethodType) throws LambdaConversionException
 	{
 		if ((caller.lookupModes() & MethodHandles.Lookup.PRIVATE) == 0)
 		{
@@ -251,7 +256,7 @@ public abstract class AbstractLMF
 		}
 	}
 
-	private static boolean isAdaptableTo(Class<?> fromType, Class<?> toType, boolean strict)
+	private static boolean isAdaptableTo(@NonNull Class<?> fromType, @NonNull Class<?> toType, boolean strict)
 	{
 		if (fromType.equals(toType))
 		{
@@ -287,12 +292,12 @@ public abstract class AbstractLMF
 		return !strict || toType.isAssignableFrom(fromType);
 	}
 
-	private static boolean isAdaptableToAsReturn(Class<?> fromType, Class<?> toType)
+	private static boolean isAdaptableToAsReturn(@NonNull Class<?> fromType, @NonNull Class<?> toType)
 	{
 		return toType.equals(void.class) || isAdaptableTo(fromType, toType, false);
 	}
 
-	private static boolean isAdaptableToAsReturnStrict(Class<?> fromType, Class<?> toType)
+	private static boolean isAdaptableToAsReturnStrict(@NonNull Class<?> fromType, @NonNull Class<?> toType)
 	{
 		return isAdaptableTo(fromType, toType, true);
 	}

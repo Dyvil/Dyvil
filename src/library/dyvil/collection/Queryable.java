@@ -1,5 +1,7 @@
 package dyvil.collection;
 
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.util.Option;
 import dyvil.util.Some;
 
@@ -19,7 +21,7 @@ import java.util.stream.StreamSupport;
  * #reduce(BiFunction)}, {@link #map(Function)}, {@link #flatMap(Function)} and {@link #filter(Predicate)}.
  *
  * @param <E>
- * 		the element type
+ * 	the element type
  */
 public interface Queryable<E> extends SizedIterable<E>
 {
@@ -30,7 +32,7 @@ public interface Queryable<E> extends SizedIterable<E>
 	 */
 	@Override
 	int size();
-	
+
 	/**
 	 * Returns true iff this query is empty, i.e. the number of elements as returned by {@link #size()} is {@code 0}.
 	 *
@@ -40,57 +42,60 @@ public interface Queryable<E> extends SizedIterable<E>
 	{
 		return this.size() == 0;
 	}
-	
+
 	/**
 	 * Creates and returns an {@link Iterator} over the elements of this query.
 	 *
 	 * @return an iterator over the elements of this query
 	 */
 	@Override
-	Iterator<E> iterator();
-	
+	@NonNull Iterator<E> iterator();
+
 	/**
 	 * Creates and returns a {@link Spliterator} over the elements of this query.
 	 *
 	 * @return a spliterator over the elements of this query
 	 */
 	@Override
+	@NonNull
 	default Spliterator<E> spliterator()
 	{
 		return Spliterators.spliterator(this.iterator(), this.size(), 0);
 	}
-	
+
 	/**
 	 * Creates and returns a sequential {@link Stream} of this query, based on the {@link Spliterator} returned by
 	 * {@link #spliterator()}.
 	 *
 	 * @return a stream of this query
 	 */
+	@NonNull
 	default Stream<E> stream()
 	{
 		return StreamSupport.stream(this.spliterator(), false);
 	}
-	
+
 	/**
 	 * Creates and returns a parallel {@link Stream} of this query, based on the {@link Spliterator} returned by {@link
 	 * #spliterator()}.
 	 *
 	 * @return a parallel stream of this query
 	 */
+	@NonNull
 	default Stream<E> parallelStream()
 	{
 		return StreamSupport.stream(this.spliterator(), true);
 	}
-	
+
 	@Override
-	default void forEach(Consumer<? super E> action)
+	default void forEach(@NonNull Consumer<? super E> action)
 	{
 		for (E element : this)
 		{
 			action.accept(element);
 		}
 	}
-	
+
 	/**
 	 * Folds this entire query into a single value by repeatedly reducing the elements of this query and the initial
 	 * value using the given {@code reducer}. If this query does not contain any elements, the initial value is simply
@@ -98,13 +103,13 @@ public interface Queryable<E> extends SizedIterable<E>
 	 * for every element in this query.
 	 *
 	 * @param initialValue
-	 * 		the initial value
+	 * 	the initial value
 	 * @param reducer
-	 * 		the reducer function
+	 * 	the reducer function
 	 *
 	 * @return the folded value
 	 */
-	default <R> R fold(R initialValue, BiFunction<? super R, ? super E, ? extends R> reducer)
+	default <R> R fold(R initialValue, @NonNull BiFunction<? super R, ? super E, ? extends R> reducer)
 	{
 		for (E element : this)
 		{
@@ -112,13 +117,13 @@ public interface Queryable<E> extends SizedIterable<E>
 		}
 		return initialValue;
 	}
-	
+
 	/**
 	 * Reduces this entire query into a single value by repeatedly reducing the elements using the given {@code reducer}
 	 * binary operator.
 	 *
 	 * @param reducer
-	 * 		the reducer binary operator
+	 * 	the reducer binary operator
 	 *
 	 * @return the reduced value
 	 */
@@ -127,24 +132,25 @@ public interface Queryable<E> extends SizedIterable<E>
 	 * lower-bounded type variable 'R' that is used as the return type. Java
 	 * doesn't support this, so we had to introduce a limitation with E.
 	 */
-	default E reduce(BiFunction<? super E, ? super E, ? extends E> reducer)
+	default E reduce(@NonNull BiFunction<? super E, ? super E, ? extends E> reducer)
 	{
 		if (this.isEmpty())
 		{
 			return null;
 		}
-		
+
 		Iterator<E> iterator = this.iterator();
 		E first = iterator.next();
 		while (iterator.hasNext())
 		{
 			first = reducer.apply(first, iterator.next());
 		}
-		
+
 		return first;
 	}
 
-	default Option<E> reduceOption(BiFunction<? super E, ? super E, ? extends E> reducer)
+	@NonNull
+	default Option<E> reduceOption(@NonNull BiFunction<? super E, ? super E, ? extends E> reducer)
 	{
 		if (this.isEmpty())
 		{
@@ -153,8 +159,8 @@ public interface Queryable<E> extends SizedIterable<E>
 
 		return new Some<>(this.reduce(reducer));
 	}
-	
-	default boolean allMatch(Predicate<? super E> condition)
+
+	default boolean allMatch(@NonNull Predicate<? super E> condition)
 	{
 		for (E element : this)
 		{
@@ -165,8 +171,8 @@ public interface Queryable<E> extends SizedIterable<E>
 		}
 		return true;
 	}
-	
-	default boolean exists(Predicate<? super E> condition)
+
+	default boolean exists(@NonNull Predicate<? super E> condition)
 	{
 		for (E element : this)
 		{
@@ -178,7 +184,8 @@ public interface Queryable<E> extends SizedIterable<E>
 		return false;
 	}
 
-	default E find(Predicate<? super E> condition)
+	@Nullable
+	default E find(@NonNull Predicate<? super E> condition)
 	{
 		for (E element : this)
 		{
@@ -191,43 +198,44 @@ public interface Queryable<E> extends SizedIterable<E>
 		return null;
 	}
 
-	default Option<E> findOption(Predicate<? super E> condition)
+	@NonNull
+	default Option<E> findOption(@NonNull Predicate<? super E> condition)
 	{
 		for (E element : this)
 		{
 			if (condition.test(element))
 			{
-				return new Some<E>(element);
+				return new Some<>(element);
 			}
 		}
 
 		return Option.apply();
 	}
-	
+
 	/**
 	 * Returns true if and if only this query contains the given {@code element} . By default, 'contains' in defined
 	 * such that any element in this query matches the given element in a way so that {@code
 	 * element.equals(this.element)}.
 	 *
 	 * @param element
-	 * 		the element to find
+	 * 	the element to find
 	 *
 	 * @return true, iff this query contains the element
 	 */
-	default boolean contains(Object element)
+	default boolean contains(@Nullable Object element)
 	{
 		return Collection.iterableContains(this, element);
 	}
-	
+
 	/**
 	 * Maps all elements in this query using the given {@code mapper} function by supplying them to the function and
 	 * replacing them with the result of the call {mapper.apply(element)}.
 	 *
 	 * @param mapper
-	 * 		the mapping function
+	 * 	the mapping function
 	 */
-	void map(Function<? super E, ? extends E> mapper);
-	
+	void map(@NonNull Function<? super E, ? extends E> mapper);
+
 	/**
 	 * Maps all elements in this query using the given {@code mapper} function by supplying them to the function and
 	 * replacing them with all results of the call {@code mapper.apply(element)}. If the mapper returns multiple results
@@ -240,33 +248,34 @@ public interface Queryable<E> extends SizedIterable<E>
 	 * </pre>
 	 *
 	 * @param mapper
-	 * 		the mapping function
+	 * 	the mapping function
 	 */
-	void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
-	
+	void flatMap(@NonNull Function<? super E, ? extends @NonNull Iterable<? extends E>> mapper);
+
 	/**
 	 * Removes all elements from the query that do not fulfill the requirement given by the {@code condition}, i.e. if
 	 * {@code condition.test(element)} returns {@code false}.
 	 *
 	 * @param condition
-	 * 		the condition
+	 * 	the condition
 	 */
-	void filter(Predicate<? super E> condition);
+	void filter(@NonNull Predicate<? super E> condition);
 
-	<R> Queryable<R> mapped(Function<? super E, ? extends R> mapper);
+	<R> @NonNull Queryable<R> mapped(@NonNull Function<? super E, ? extends R> mapper);
 
-	<R> Queryable<R> flatMapped(Function<? super E, ? extends Iterable<? extends R>> mapper);
+	<R> @NonNull Queryable<R> flatMapped(@NonNull Function<? super E, ? extends @NonNull Iterable<? extends R>> mapper);
 
-	Queryable<E> filtered(Predicate<? super E> condition);
-	
+	@NonNull Queryable<E> filtered(@NonNull Predicate<? super E> condition);
+
+	@NonNull
 	default String toString(String prefix, String separator, String postfix)
 	{
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		this.toString(builder, prefix, separator, postfix);
 		return builder.toString();
 	}
-	
-	default void toString(StringBuilder builder, String prefix, String separator, String postfix)
+
+	default void toString(@NonNull StringBuilder builder, String prefix, String separator, String postfix)
 	{
 		builder.append(prefix);
 		if (this.isEmpty())
@@ -274,7 +283,7 @@ public interface Queryable<E> extends SizedIterable<E>
 			builder.append(postfix);
 			return;
 		}
-		
+
 		Iterator<E> iterator = this.iterator();
 		E first = iterator.next();
 		builder.append(first);

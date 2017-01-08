@@ -1,12 +1,16 @@
 package dyvil.io;
 
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
+
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Locale;
 
 public abstract class BasicPrintStream extends PrintStream
 {
-	public static PrintStream apply(OutputStream outputStream, PrintStream defaultNull)
+	@Nullable
+	public static PrintStream apply(@Nullable OutputStream outputStream, PrintStream defaultNull)
 	{
 		if (outputStream == null)
 		{
@@ -19,7 +23,7 @@ public abstract class BasicPrintStream extends PrintStream
 		return new PrintStream(outputStream);
 	}
 
-	public BasicPrintStream(OutputStream out)
+	public BasicPrintStream(@NonNull OutputStream out)
 	{
 		super(out);
 	}
@@ -76,7 +80,7 @@ public abstract class BasicPrintStream extends PrintStream
 	}
 
 	@Override
-	public void print(String s)
+	public void print(@Nullable String s)
 	{
 		if (s == null)
 		{
@@ -145,7 +149,7 @@ public abstract class BasicPrintStream extends PrintStream
 	}
 
 	@Override
-	public void println(String s)
+	public void println(@Nullable String s)
 	{
 		if (s == null)
 		{
@@ -160,6 +164,7 @@ public abstract class BasicPrintStream extends PrintStream
 		this.writeln(String.valueOf(obj));
 	}
 
+	@NonNull
 	@Override
 	public PrintStream printf(String format, Object... args)
 	{
@@ -167,6 +172,7 @@ public abstract class BasicPrintStream extends PrintStream
 		return this;
 	}
 
+	@NonNull
 	@Override
 	public PrintStream printf(Locale l, String format, Object... args)
 	{
@@ -174,6 +180,7 @@ public abstract class BasicPrintStream extends PrintStream
 		return this;
 	}
 
+	@NonNull
 	@Override
 	public PrintStream format(String format, Object... args)
 	{
@@ -181,6 +188,7 @@ public abstract class BasicPrintStream extends PrintStream
 		return this;
 	}
 
+	@NonNull
 	@Override
 	public PrintStream format(Locale l, String format, Object... args)
 	{
@@ -188,8 +196,9 @@ public abstract class BasicPrintStream extends PrintStream
 		return this;
 	}
 
+	@NonNull
 	@Override
-	public PrintStream append(CharSequence csq)
+	public PrintStream append(@Nullable CharSequence csq)
 	{
 		if (csq == null)
 		{
@@ -202,14 +211,16 @@ public abstract class BasicPrintStream extends PrintStream
 		return this;
 	}
 
+	@NonNull
 	@Override
-	public PrintStream append(CharSequence csq, int start, int end)
+	public PrintStream append(@Nullable CharSequence csq, int start, int end)
 	{
 		CharSequence cs = csq == null ? "null" : csq;
 		this.write(cs.subSequence(start, end).toString());
 		return this;
 	}
 
+	@NonNull
 	@Override
 	public PrintStream append(char c)
 	{

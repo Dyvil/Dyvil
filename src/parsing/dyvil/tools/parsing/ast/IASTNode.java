@@ -1,22 +1,24 @@
 package dyvil.tools.parsing.ast;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.tools.parsing.position.ICodePosition;
 
+@SuppressWarnings("NullableProblems")
 public interface IASTNode
 {
 	void setPosition(ICodePosition position);
-	
+
 	ICodePosition getPosition();
-	
+
 	default int getLineNumber()
 	{
 		ICodePosition position = this.getPosition();
 		return position == null ? 0 : position.startLine();
 	}
-	
-	default void expandPosition(ICodePosition position)
+
+	default void expandPosition(@NonNull ICodePosition position)
 	{
-		ICodePosition pos = this.getPosition();
+		final ICodePosition pos = this.getPosition();
 		if (pos == null)
 		{
 			this.setPosition(position);
@@ -24,13 +26,13 @@ public interface IASTNode
 		}
 		this.setPosition(pos.to(position));
 	}
-	
-	static String toString(IASTNode node)
+
+	static @NonNull String toString(@NonNull IASTNode node)
 	{
-		StringBuilder s = new StringBuilder();
-		node.toString("", s);
-		return s.toString();
+		final StringBuilder builder = new StringBuilder();
+		node.toString("", builder);
+		return builder.toString();
 	}
-	
-	void toString(String prefix, StringBuilder buffer);
+
+	void toString(@NonNull String prefix, @NonNull StringBuilder buffer);
 }

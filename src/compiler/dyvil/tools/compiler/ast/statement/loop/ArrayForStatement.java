@@ -4,26 +4,27 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public class ArrayForStatement extends ForEachStatement
 {
-	protected IType arrayType;
-	
+	protected ArrayType arrayType;
+
 	public ArrayForStatement(ICodePosition position, IVariable var)
 	{
-		this(position, var, var.getValue().getType());
+		this(position, var, var.getValue().getType().extract(ArrayType.class));
 	}
-	
-	public ArrayForStatement(ICodePosition position, IVariable var, IType arrayType)
+
+	public ArrayForStatement(ICodePosition position, IVariable var, ArrayType arrayType)
 	{
 		super(position, var);
 
 		this.arrayType = arrayType;
 	}
-	
+
 	@Override
 	public void writeStatement(MethodWriter writer) throws BytecodeException
 	{
@@ -76,13 +77,13 @@ public class ArrayForStatement extends ForEachStatement
 		elementType.writeCast(writer, var.getType(), lineNumber);
 		// Store variable
 		var.writeInit(writer, null);
-		
+
 		// Action
 		if (this.action != null)
 		{
 			this.action.writeExpression(writer, Types.VOID);
 		}
-		
+
 		writer.visitLabel(updateLabel);
 		// Increment index
 		writer.visitIincInsn(indexVarIndex, 1);
@@ -90,11 +91,11 @@ public class ArrayForStatement extends ForEachStatement
 		writer.visitVarInsn(Opcodes.ILOAD, indexVarIndex);
 		writer.visitVarInsn(Opcodes.ILOAD, lengthVarIndex);
 		writer.visitJumpInsn(Opcodes.IF_ICMPLT, startLabel);
-		
+
 		// Local Variables
 		writer.resetLocals(localCount);
 		writer.visitLabel(endLabel);
-		
+
 		var.writeLocal(writer, scopeLabel, endLabel);
 	}
 }

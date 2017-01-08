@@ -1,6 +1,8 @@
 package dyvil.string;
 
 import dyvil.annotation.internal.DyvilModifiers;
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.reflect.Modifiers;
 
 /**
@@ -22,13 +24,13 @@ public final class StringConversions
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static boolean toBoolean(String s)
+	public static boolean toBoolean(@Nullable String s)
 	{
 		return s != null && s.equalsIgnoreCase("true");
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static byte toByte(String s)
+	public static byte toByte(@NonNull String s)
 	{
 		try
 		{
@@ -41,7 +43,7 @@ public final class StringConversions
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static byte toByte(String s, byte _default)
+	public static byte toByte(@NonNull String s, byte _default)
 	{
 		try
 		{
@@ -54,7 +56,7 @@ public final class StringConversions
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static byte toByte(String s, byte _default, int radix)
+	public static byte toByte(@NonNull String s, byte _default, int radix)
 	{
 		try
 		{
@@ -67,7 +69,7 @@ public final class StringConversions
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static short toShort(String s)
+	public static short toShort(@NonNull String s)
 	{
 		try
 		{
@@ -80,7 +82,7 @@ public final class StringConversions
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static short toShort(String s, short _default)
+	public static short toShort(@NonNull String s, short _default)
 	{
 		try
 		{
@@ -93,7 +95,7 @@ public final class StringConversions
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static short toShort(String s, short _default, int radix)
+	public static short toShort(@NonNull String s, short _default, int radix)
 	{
 		try
 		{
@@ -106,7 +108,7 @@ public final class StringConversions
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int toInt(String s)
+	public static int toInt(@NonNull String s)
 	{
 		try
 		{
@@ -119,7 +121,7 @@ public final class StringConversions
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int toInt(String s, int _default)
+	public static int toInt(@NonNull String s, int _default)
 	{
 		try
 		{
@@ -132,7 +134,7 @@ public final class StringConversions
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int toInt(String s, int _default, int radix)
+	public static int toInt(@NonNull String s, int _default, int radix)
 	{
 		try
 		{
@@ -145,7 +147,7 @@ public final class StringConversions
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static long toLong(String s)
+	public static long toLong(@NonNull String s)
 	{
 		try
 		{
@@ -158,7 +160,7 @@ public final class StringConversions
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static long toLong(String s, long _default)
+	public static long toLong(@NonNull String s, long _default)
 	{
 		try
 		{
@@ -171,7 +173,7 @@ public final class StringConversions
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static long toLong(String s, long _default, int radix)
+	public static long toLong(@NonNull String s, long _default, int radix)
 	{
 		try
 		{
@@ -184,7 +186,7 @@ public final class StringConversions
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static float toFloat(String s)
+	public static float toFloat(@NonNull String s)
 	{
 		try
 		{
@@ -197,7 +199,7 @@ public final class StringConversions
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static float toFloat(String s, float _default)
+	public static float toFloat(@NonNull String s, float _default)
 	{
 		try
 		{
@@ -210,7 +212,7 @@ public final class StringConversions
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static double toDouble(String s)
+	public static double toDouble(@NonNull String s)
 	{
 		try
 		{
@@ -223,7 +225,7 @@ public final class StringConversions
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static double toDouble(String s, double _default)
+	public static double toDouble(@NonNull String s, double _default)
 	{
 		try
 		{

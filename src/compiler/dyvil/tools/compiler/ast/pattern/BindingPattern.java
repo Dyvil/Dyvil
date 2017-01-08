@@ -1,10 +1,14 @@
 package dyvil.tools.compiler.ast.pattern;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
+import dyvil.tools.compiler.ast.consumer.IDataMemberConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.Variable;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -13,25 +17,20 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public final class BindingPattern extends Pattern
+public final class BindingPattern implements IPattern, IDataMemberConsumer<Variable>
 {
-	protected IType type = Types.UNKNOWN;
-	protected Name name;
-
-	// Metadata
 	private Variable variable;
 
-	public BindingPattern(ICodePosition position, Name name)
+	// Metadata
+	private boolean variableRequested;
+
+	public BindingPattern()
 	{
-		this.name = name;
-		this.position = position;
 	}
 
-	public BindingPattern(ICodePosition position, IType type, Name name)
+	public BindingPattern(ICodePosition position, Name name, IType type)
 	{
-		this.position = position;
-		this.name = name;
-		this.type = type;
+		this.variable = new Variable(position, name, type);
 	}
 
 	@Override
@@ -39,92 +38,109 @@ public final class BindingPattern extends Pattern
 	{
 		return BINDING;
 	}
-	
+
 	@Override
 	public boolean isExhaustive()
 	{
 		return true;
 	}
-	
+
 	@Override
 	public IType getType()
 	{
-		return this.type;
+		return this.variable.getType();
 	}
 
 	@Override
 	public void setType(IType type)
 	{
-		this.type = type;
+		this.variable.setType(type);
+	}
+
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.variable.getPosition();
+	}
+
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.variable.setPosition(position);
+	}
+
+	@Override
+	public void addDataMember(Variable dataMember)
+	{
+		this.variable = dataMember;
+	}
+
+	@Override
+	public Variable createDataMember(ICodePosition position, Name name, IType type, ModifierSet modifiers,
+		                                AnnotationList annotations)
+	{
+		return new Variable(position, name, type, modifiers, annotations);
 	}
 
 	@Override
 	public IPattern withType(IType type, MarkerList markers)
 	{
-		if (this.type == Types.UNKNOWN)
+		final IType thisType = this.getType();
+		if (!thisType.isResolved())
 		{
-			this.type = type;
+			this.setType(type);
 			return this;
 		}
-		if (Types.isExactType(type, this.type))
+		if (Types.isExactType(type, thisType))
 		{
 			return this;
 		}
-		if (Types.isSuperType(type, this.type))
-		{
-			return new TypeCheckPattern(this, type, this.type);
-		}
-
-		return null;
+		return Types.isSuperType(type, thisType) ? new TypeCheckPattern(this, type, thisType) : null;
 	}
-	
+
 	@Override
 	public boolean isType(IType type)
 	{
-		return this.type == Types.UNKNOWN || Types.isSuperType(type, this.type);
+		final IType thisType = this.getType();
+		return !thisType.isResolved() || Types.isSuperType(type, thisType);
 	}
 
 	@Override
 	public IPattern resolve(MarkerList markers, IContext context)
 	{
-		this.type = this.type.resolveType(markers, context);
+		this.setType(this.getType().resolveType(markers, context));
 		return this;
 	}
 
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		if (name != this.name)
+		if (name != this.variable.getName())
 		{
 			return null;
 		}
-		
-		if (this.variable != null)
-		{
-			return this.variable;
-		}
-		
-		this.variable = new Variable(this.position, this.name, this.type);
+
+		this.variableRequested = true;
 		return this.variable;
 	}
-	
+
 	@Override
 	public boolean isSwitchable()
 	{
 		return true;
 	}
-	
+
 	@Override
 	public boolean switchCheck()
 	{
-		return this.variable != null;
+		return this.variableRequested;
 	}
-	
+
 	@Override
 	public void writeInvJump(MethodWriter writer, int varIndex, IType matchedType, Label elseLabel)
-			throws BytecodeException
+		throws BytecodeException
 	{
-		if (this.variable != null)
+		if (this.variableRequested)
 		{
 			IPattern.loadVar(writer, varIndex, matchedType);
 			this.variable.writeInit(writer, null);
@@ -134,19 +150,10 @@ public final class BindingPattern extends Pattern
 			writer.visitInsn(Opcodes.AUTO_POP);
 		}
 	}
-	
+
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String prefix, @NonNull StringBuilder buffer)
 	{
-		if (this.type == Types.UNKNOWN)
-		{
-			buffer.append("var ");
-		}
-		else
-		{
-			this.type.toString(prefix, buffer);
-			buffer.append(' ');
-		}
-		buffer.append(this.name);
+		this.variable.toString(prefix, buffer);
 	}
 }

@@ -1,0 +1,47 @@
+package dyvil.tests
+
+using dyvil.Test
+
+public class BuilderTest
+{
+	public case class Buildable
+	(
+		var myInt: int        { get; set }
+    	var myDouble: double  { get; set }
+    	var myString: String! { get; set }
+    )
+    {
+		public static func apply(): Buildable = new Buildable(0, 0D, null)
+
+		public static func apply(Configure<Buildable> configure): Buildable = Buildable().{
+			configure $0
+			$0
+		}
+    }
+
+	public static func apply(): Test = test "Builders" {
+		testInline()
+		testClosure()
+	}
+
+	public static func testInline(): Test = test "Inline" {
+		let buildable = Buildable().{
+			myInt = -42
+			myDouble = 2.5
+			myString = 'Test'
+			$0
+		}
+
+		buildable =?= Buildable(-42, 2.5D, "Test")
+	}
+
+	private static func testClosure(): Test = test "Closure" {
+		let buildable = Buildable {
+			myInt = 10
+			myString = 'Hello World'
+			myDouble = 1.1
+		}
+
+		buildable =?= Buildable(10, 1.1D, "Hello World")
+	}
+}

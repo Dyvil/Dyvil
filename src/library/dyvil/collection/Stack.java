@@ -1,5 +1,8 @@
 package dyvil.collection;
 
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
+
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.function.Function;
@@ -11,7 +14,7 @@ import java.util.function.Predicate;
  * that was added will be the last element to be removed, and vice-versa.
  *
  * @param <E>
- * 		the element type of the stack
+ * 	the element type of the stack
  *
  * @author Clashsoft
  * @see Queue
@@ -26,15 +29,16 @@ public interface Stack<E> extends Queryable<E>, Serializable
 	 */
 	@Override
 	int size();
-	
+
+	@NonNull
 	@Override
 	Iterator<E> iterator();
-	
+
 	/**
 	 * Returns true if and if only this stack contains the given {@code element} .
 	 *
 	 * @param element
-	 * 		the element to find
+	 * 	the element to find
 	 *
 	 * @return true iff this stack contains the element
 	 */
@@ -43,49 +47,49 @@ public interface Stack<E> extends Queryable<E>, Serializable
 	{
 		return Collection.iterableContains(this, element);
 	}
-	
+
 	/**
 	 * Removes all elements from this stack.
 	 */
 	void clear();
-	
+
 	/**
 	 * Adds the given element to the top of this stack, so that it becomes the first element in the stack.
 	 *
 	 * @param element
-	 * 		the element to add
+	 * 	the element to add
 	 */
 	void push(E element);
-	
+
 	/**
 	 * Adds all elements in the given collection of {@code elements} to the top of this stack in the order in which they
 	 * appear in the collection.
 	 *
 	 * @param elements
-	 * 		the elements to add
+	 * 	the elements to add
 	 */
-	default void pushAll(Iterable<? extends E> elements)
+	default void pushAll(@NonNull Iterable<? extends E> elements)
 	{
 		for (E e : elements)
 		{
 			this.push(e);
 		}
 	}
-	
+
 	/**
 	 * Removes and returns the first element from the top of this stack. If this stack is empty, {@code null} is
 	 * returned.
 	 *
 	 * @return the top element of this stack.
 	 */
-	E pop();
-	
+	@Nullable E pop();
+
 	/**
 	 * Removes the given number of elements from the top of this stack, as if by calling {@link #pop()} {@code count}
 	 * times.
 	 *
 	 * @param count
-	 * 		the number of elements to remove
+	 * 	the number of elements to remove
 	 */
 	default void pop(int count)
 	{
@@ -94,30 +98,30 @@ public interface Stack<E> extends Queryable<E>, Serializable
 			this.pop();
 		}
 	}
-	
+
 	/**
 	 * Returns the top element of this stack. Unlike {@link #pop()}, this method does not remove the element from the
 	 * top.
 	 *
 	 * @return the top element of this stack.
 	 */
-	E peek();
+	@Nullable E peek();
 
-	E peek(int index);
-	
+	@Nullable E peek(int index);
+
 	@Override
-	void map(Function<? super E, ? extends E> mapper);
-	
+	void map(@NonNull Function<? super E, ? extends E> mapper);
+
 	@Override
-	void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper);
-	
+	void flatMap(@NonNull Function<? super E, ? extends @NonNull Iterable<? extends E>> mapper);
+
 	@Override
-	void filter(Predicate<? super E> condition);
-	
+	void filter(@NonNull Predicate<? super E> condition);
+
 	/**
 	 * Returns a copy of this stack that contains the same elements as this stack in the same order.
 	 *
 	 * @return a copy of this stack.
 	 */
-	Stack<E> copy();
+	@NonNull Stack<E> copy();
 }

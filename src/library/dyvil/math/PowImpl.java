@@ -1,5 +1,7 @@
 package dyvil.math;
 
+import dyvil.annotation.internal.NonNull;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -111,7 +113,7 @@ public final class PowImpl
 		}
 	}
 
-	public static BigDecimal pow(BigDecimal base, double exponent)
+	public static BigDecimal pow(@NonNull BigDecimal base, double exponent)
 	{
 		// Performs X^(A+B)=X^A*X^B (B = remainder)
 
@@ -143,7 +145,7 @@ public final class PowImpl
 		return result;
 	}
 
-	public static BigDecimal pow(BigDecimal base, BigDecimal exponent)
+	public static BigDecimal pow(@NonNull BigDecimal base, @NonNull BigDecimal exponent)
 	{
 		// Performs X^(A+B)=X^A*X^B (B = remainder)
 

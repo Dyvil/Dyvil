@@ -52,12 +52,6 @@ public final class BooleanValue implements IConstantValue
 	}
 
 	@Override
-	public boolean isPrimitive()
-	{
-		return true;
-	}
-
-	@Override
 	public boolean booleanValue()
 	{
 		return this.value;

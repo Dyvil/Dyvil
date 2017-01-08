@@ -2,6 +2,8 @@ package dyvil.collection;
 
 import dyvil.annotation.Mutating;
 import dyvil.annotation.internal.Covariant;
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.collection.immutable.ArrayMap;
 import dyvil.collection.immutable.EmptyMap;
 import dyvil.collection.immutable.SingletonMap;
@@ -28,12 +30,12 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 	{
 		void put(K key, V value);
 
-		default void put(Entry<? extends K, ? extends V> entry)
+		default void put(@NonNull Entry<? extends K, ? extends V> entry)
 		{
 			this.put(entry.getKey(), entry.getValue());
 		}
 
-		default void putAll(Map<? extends K, ? extends V> map)
+		default void putAll(@NonNull Map<? extends K, ? extends V> map)
 		{
 			for (Entry<? extends K, ? extends V> entry : map)
 			{
@@ -44,23 +46,27 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 		ImmutableMap<K, V> build();
 	}
 
+	@NonNull
 	static <K, V> ImmutableMap<K, V> apply()
 	{
 		return EmptyMap.apply();
 	}
 
+	@NonNull
 	static <K, V> ImmutableMap<K, V> singleton(K key, V value)
 	{
 		return new SingletonMap<>(key, value);
 	}
 
-	static <K, V> ImmutableMap<K, V> apply(Entry<K, V> entry)
+	@NonNull
+	static <K, V> ImmutableMap<K, V> apply(@NonNull Entry<K, V> entry)
 	{
 		return SingletonMap.apply(entry.getKey(), entry.getValue());
 	}
 
+	@NonNull
 	@SafeVarargs
-	static <K, V> ImmutableMap<K, V> apply(Entry<? extends K, ? extends V>... entries)
+	static <K, V> ImmutableMap<K, V> apply(@NonNull Entry<? extends K, ? extends V>... entries)
 	{
 		switch (entries.length)
 		{
@@ -74,16 +80,19 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 		}
 	}
 
-	static <K, V> ImmutableMap<K, V> apply(K[] keys, V[] values)
+	@NonNull
+	static <K, V> ImmutableMap<K, V> apply(K @NonNull [] keys, V[] values)
 	{
 		return new ArrayMap<>(keys, values, true);
 	}
 
+	@NonNull
 	static <K, V> Builder<K, V> builder()
 	{
 		return new ArrayMap.Builder<>();
 	}
 
+	@NonNull
 	static <K, V> Builder<K, V> builder(int capacity)
 	{
 		return new ArrayMap.Builder<>(capacity);
@@ -100,27 +109,33 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 	@Override
 	int size();
 
+	@NonNull
 	@Override
 	Iterator<Entry<K, V>> iterator();
 
+	@NonNull
 	@Override
 	default Spliterator<Entry<K, V>> spliterator()
 	{
 		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.IMMUTABLE);
 	}
 
+	@NonNull
 	@Override
 	Iterator<K> keyIterator();
 
+	@NonNull
 	@Override
 	default Spliterator<K> keySpliterator()
 	{
 		return Spliterators.spliterator(this.keyIterator(), this.size(), Spliterator.IMMUTABLE);
 	}
 
+	@NonNull
 	@Override
 	Iterator<V> valueIterator();
 
+	@NonNull
 	@Override
 	default Spliterator<V> valueSpliterator()
 	{
@@ -130,86 +145,104 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 	@Override
 	V get(Object key);
 
+	@Nullable
 	@Override
 	Entry<K, V> getEntry(Object key);
 
+	@NonNull
 	@Override
 	Option<V> getOption(Object key);
 
 	// Non-mutating Operations
 
+	@NonNull
 	@Override
 	ImmutableMap<K, V> withEntry(K key, V value);
 
+	@NonNull
 	@Override
-	default ImmutableMap<K, V> withEntry(Entry<? extends K, ? extends V> entry)
+	default ImmutableMap<K, V> withEntry(@NonNull Entry<? extends K, ? extends V> entry)
 	{
 		return this.withEntry(entry.getKey(), entry.getValue());
 	}
 
+	@NonNull
 	@Override
-	ImmutableMap<K, V> union(Map<? extends K, ? extends V> map);
+	ImmutableMap<K, V> union(@NonNull Map<? extends K, ? extends V> map);
 
+	@NonNull
 	@Override
 	ImmutableMap<K, V> keyRemoved(Object key);
 
+	@NonNull
 	@Override
 	ImmutableMap<K, V> removed(Object key, Object value);
 
+	@NonNull
 	@Override
-	default ImmutableMap<K, V> removed(Entry<?, ?> entry)
+	default ImmutableMap<K, V> removed(@NonNull Entry<?, ?> entry)
 	{
 		return this.removed(entry.getKey(), entry.getValue());
 	}
 
+	@NonNull
 	@Override
 	ImmutableMap<K, V> valueRemoved(Object value);
 
+	@NonNull
 	@Override
-	ImmutableMap<K, V> difference(Map<?, ?> map);
+	ImmutableMap<K, V> difference(@NonNull Map<?, ?> map);
+
+	@NonNull
+	@Override
+	ImmutableMap<K, V> keyDifference(@NonNull Collection<?> keys);
 
 	@Override
-	ImmutableMap<K, V> keyDifference(Collection<?> keys);
-
-	@Override
-	default <NK> ImmutableMap<NK, V> keyMapped(Function<? super K, ? extends NK> mapper)
+	default <NK> ImmutableMap<NK, V> keyMapped(@NonNull Function<? super K, ? extends NK> mapper)
 	{
 		return this.keyMapped((k, v) -> mapper.apply(k));
 	}
 
 	@Override
-	<NK> ImmutableMap<NK, V> keyMapped(BiFunction<? super K, ? super V, ? extends NK> mapper);
+	<NK> ImmutableMap<NK, V> keyMapped(@NonNull BiFunction<? super K, ? super V, ? extends NK> mapper);
 
+	@Nullable
 	@Override
-	default <NV> Map<K, NV> valueMapped(Function<? super V, ? extends NV> mapper)
+	default <NV> Map<K, NV> valueMapped(@NonNull Function<? super V, ? extends NV> mapper)
 	{
 		return this.valueMapped((k, v) -> mapper.apply(v));
 	}
 
+	@Nullable
 	@Override
-	<NV> ImmutableMap<K, NV> valueMapped(BiFunction<? super K, ? super V, ? extends NV> mapper);
+	<NV> ImmutableMap<K, NV> valueMapped(@NonNull BiFunction<? super K, ? super V, ? extends NV> mapper);
 
 	@Override
-	<NK, NV> ImmutableMap<NK, NV> entryMapped(BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper);
+	<NK, NV> ImmutableMap<NK, NV> entryMapped(@NonNull BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper);
 
+	@Nullable
 	@Override
-	<NK, NV> ImmutableMap<NK, NV> flatMapped(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper);
+	<NK, NV> ImmutableMap<NK, NV> flatMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper);
 
+	@NonNull
 	@Override
-	ImmutableMap<K, V> filtered(BiPredicate<? super K, ? super V> condition);
+	ImmutableMap<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> condition);
 
+	@NonNull
 	@Override
-	default ImmutableMap<K, V> filteredByKey(Predicate<? super K> condition)
+	default ImmutableMap<K, V> filteredByKey(@NonNull Predicate<? super K> condition)
 	{
 		return this.filtered(((k, v) -> condition.test(k)));
 	}
 
+	@NonNull
 	@Override
-	default ImmutableMap<K, V> filteredByValue(Predicate<? super V> condition)
+	default ImmutableMap<K, V> filteredByValue(@NonNull Predicate<? super V> condition)
 	{
 		return this.filtered(((k, v) -> condition.test(v)));
 	}
 
+	@NonNull
 	@Override
 	ImmutableMap<V, K> inverted();
 
@@ -229,6 +262,7 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 		throw new ImmutableException("() on Immutable Map");
 	}
 
+	@NonNull
 	@Override
 	@Mutating
 	default V put(K key, V value)
@@ -236,20 +270,22 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 		throw new ImmutableException("put() on Immutable Map");
 	}
 
+	@NonNull
 	@Override
 	@Mutating
-	default V put(Entry<? extends K, ? extends V> entry)
+	default V put(@NonNull Entry<? extends K, ? extends V> entry)
 	{
 		throw new ImmutableException("put() on Immutable Map");
 	}
 
 	@Override
 	@Mutating
-	default void putAll(Map<? extends K, ? extends V> map)
+	default void putAll(@NonNull Map<? extends K, ? extends V> map)
 	{
 		throw new ImmutableException("putAll() on Immutable Map");
 	}
 
+	@NonNull
 	@Override
 	@Mutating
 	default V putIfAbsent(K key, V value)
@@ -257,9 +293,10 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 		throw new ImmutableException("putIfAbsent() on Immutable Map");
 	}
 
+	@NonNull
 	@Override
 	@Mutating
-	default V putIfAbsent(Entry<? extends K, ? extends V> entry)
+	default V putIfAbsent(@NonNull Entry<? extends K, ? extends V> entry)
 	{
 		throw new ImmutableException("putIfAbsent() on Immutable Map");
 	}
@@ -271,13 +308,15 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 		throw new ImmutableException("replace() on Immutable Map");
 	}
 
+	@NonNull
 	@Override
 	@Mutating
-	default V replace(Entry<? extends K, ? extends V> entry)
+	default V replace(@NonNull Entry<? extends K, ? extends V> entry)
 	{
 		throw new ImmutableException("replace() on Immutable Map");
 	}
 
+	@NonNull
 	@Override
 	@Mutating
 	default V replace(K key, V newValue)
@@ -285,6 +324,7 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 		throw new ImmutableException("replace() on Immutable Map");
 	}
 
+	@NonNull
 	@Override
 	@Mutating
 	default V remap(Object key, K newKey)
@@ -292,6 +332,7 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 		throw new ImmutableException("remap() on Immutable Map");
 	}
 
+	@NonNull
 	@Override
 	@Mutating
 	default V removeKey(Object key)
@@ -315,90 +356,91 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 
 	@Override
 	@Mutating
-	default boolean remove(Entry<?, ?> entry)
+	default boolean remove(@NonNull Entry<?, ?> entry)
 	{
 		throw new ImmutableException("remove() on Immutable Map");
 	}
 
 	@Override
 	@Mutating
-	default boolean removeKeys(Collection<?> keys)
+	default boolean removeKeys(@NonNull Collection<?> keys)
 	{
 		throw new ImmutableException("removeKeys() on Immutable Map");
 	}
 
 	@Override
 	@Mutating
-	default boolean removeAll(Map<?, ?> map)
+	default boolean removeAll(@NonNull Map<?, ?> map)
 	{
 		throw new ImmutableException("removeAll() on Immutable Map");
 	}
 
 	@Override
 	@Mutating
-	default void mapKeys(Function<? super K, ? extends K> mapper)
+	default void mapKeys(@NonNull Function<? super K, ? extends K> mapper)
 	{
 		throw new ImmutableException("mapKeys() on Immutable Map");
 	}
 
 	@Override
 	@Mutating
-	default void mapKeys(BiFunction<? super K, ? super V, ? extends K> mapper)
+	default void mapKeys(@NonNull BiFunction<? super K, ? super V, ? extends K> mapper)
 	{
 		throw new ImmutableException("mapKeys() on Immutable Map");
 	}
 
 	@Override
 	@Mutating
-	default void mapValues(Function<? super V, ? extends V> mapper)
+	default void mapValues(@NonNull Function<? super V, ? extends V> mapper)
 	{
 		throw new ImmutableException("mapValues() on Immutable Map");
 	}
 
 	@Override
 	@Mutating
-	default void mapValues(BiFunction<? super K, ? super V, ? extends V> mapper)
+	default void mapValues(@NonNull BiFunction<? super K, ? super V, ? extends V> mapper)
 	{
 		throw new ImmutableException("mapValues() on Immutable Map");
 	}
 
 	@Override
 	@Mutating
-	default void mapEntries(BiFunction<? super K, ? super V, ? extends Entry<? extends K, ? extends V>> mapper)
+	default void mapEntries(@NonNull BiFunction<? super K, ? super V, ? extends Entry<? extends K, ? extends V>> mapper)
 	{
 		throw new ImmutableException("mapEntries() on Immutable Map");
 	}
 
 	@Override
 	@Mutating
-	default void flatMap(BiFunction<? super K, ? super V, ? extends Iterable<? extends Entry<? extends K, ? extends V>>> mapper)
+	default void flatMap(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends Entry<? extends K, ? extends V>>> mapper)
 	{
 		throw new ImmutableException("flatMap() on Immutable Map");
 	}
 
 	@Override
 	@Mutating
-	default void filter(BiPredicate<? super K, ? super V> condition)
+	default void filter(@NonNull BiPredicate<? super K, ? super V> condition)
 	{
 		throw new ImmutableException("filter() on Immutable Map");
 	}
 
 	@Override
 	@Mutating
-	default void filterByKey(Predicate<? super K> condition)
+	default void filterByKey(@NonNull Predicate<? super K> condition)
 	{
 		throw new ImmutableException("filterByKey() on Immutable Map");
 	}
 
 	@Override
 	@Mutating
-	default void filterByValue(Predicate<? super V> condition)
+	default void filterByValue(@NonNull Predicate<? super V> condition)
 	{
 		throw new ImmutableException("filterByValue() on Immutable Map");
 	}
 
 	// Copying
 
+	@NonNull
 	@Override
 	ImmutableMap<K, V> copy();
 
@@ -411,9 +453,11 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 		return this.emptyCopy();
 	}
 
+	@NonNull
 	@Override
 	MutableMap<K, V> mutable();
 
+	@NonNull
 	@Override
 	default MutableMap<K, V> mutableCopy()
 	{
@@ -429,18 +473,21 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 		return this.immutableBuilder();
 	}
 
+	@NonNull
 	@Override
 	default ImmutableMap<K, V> immutable()
 	{
 		return this;
 	}
 
+	@NonNull
 	@Override
 	default ImmutableMap<K, V> immutableCopy()
 	{
 		return this.copy();
 	}
 
+	@NonNull
 	@Override
 	default ImmutableMap<K, V> view()
 	{

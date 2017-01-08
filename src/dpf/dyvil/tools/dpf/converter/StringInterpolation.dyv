@@ -10,7 +10,7 @@ import dyvil.tools.dpf.visitor.ValueVisitor;
 public class StringInterpolation implements StringInterpolationVisitor, Expandable
 {
 	protected List<String> strings = new ArrayList<String>
-	protected List<Object> values  = new ArrayList<Object>
+	protected List<Object!> values  = new ArrayList<Object!>
 
 	public override void visitStringPart(String string)
 	{
@@ -21,7 +21,7 @@ public class StringInterpolation implements StringInterpolationVisitor, Expandab
 	{
 		return new DyvilValueVisitor
 		{
-			protected override void visitObject(Object o) = this<StringInterpolation>.values.add(o)
+			protected override void visitObject(Object! o) = this<StringInterpolation>.values.add(o)
 		}
 	}
 

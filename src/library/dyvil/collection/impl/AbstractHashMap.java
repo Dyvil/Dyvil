@@ -1,5 +1,7 @@
 package dyvil.collection.impl;
 
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.array.ObjectArray;
 import dyvil.collection.*;
 import dyvil.math.MathUtils;
@@ -21,9 +23,12 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	{
 		private static final long serialVersionUID = 6421167357975687099L;
 
+		@Nullable
 		public transient K               key;
+		@Nullable
 		public transient V               value;
 		public transient int             hash;
+		@Nullable
 		public transient HashEntry<K, V> next;
 
 		public HashEntry(K key, V value, int hash)
@@ -41,6 +46,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 			this.next = next;
 		}
 
+		@Nullable
 		@Override
 		public V get()
 		{
@@ -63,12 +69,14 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 			}
 		}
 
+		@Nullable
 		@Override
 		public K getKey()
 		{
 			return this.key;
 		}
 
+		@Nullable
 		@Override
 		public V getValue()
 		{
@@ -83,8 +91,12 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 			this.next = null;
 		}
 
-		private boolean isInvalid() {return this.hash == -1 && this.key == null;}
+		private boolean isInvalid()
+		{
+			return this.hash == -1 && this.key == null;
+		}
 
+		@Nullable
 		@Override
 		public String toString()
 		{
@@ -103,7 +115,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 			return Entry.entryHashCode(this);
 		}
 
-		private void writeObject(java.io.ObjectOutputStream out) throws IOException
+		private void writeObject(java.io.@NonNull ObjectOutputStream out) throws IOException
 		{
 			out.defaultWriteObject();
 
@@ -112,7 +124,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 			out.writeObject(this.next);
 		}
 
-		private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+		private void readObject(java.io.@NonNull ObjectInputStream in) throws IOException, ClassNotFoundException
 		{
 			in.defaultReadObject();
 
@@ -125,9 +137,9 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 
 	protected abstract class EntryIterator<E> implements Iterator<E>
 	{
-		HashEntry<K, V> next;        // next entry to return
-		HashEntry<K, V> current;    // current entry
-		int             index;        // current slot
+		@Nullable HashEntry<K, V> next;        // next entry to return
+		@Nullable HashEntry<K, V> current;    // current entry
+		int index;        // current slot
 
 		EntryIterator()
 		{
@@ -141,7 +153,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 			}
 		}
 
-		private void advance(HashEntry<K, V>[] t)
+		private void advance(HashEntry<K, V> @NonNull [] t)
 		{
 			while (true)
 			{
@@ -158,6 +170,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 			return this.next != null;
 		}
 
+		@Nullable
 		final HashEntry<K, V> nextEntry()
 		{
 			HashEntry<K, V>[] t;
@@ -213,38 +226,38 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		this.entries = (HashEntry<K, V>[]) new HashEntry[MathUtils.powerOfTwo(grow(capacity))];
 	}
 
-	public AbstractHashMap(Entry<? extends K, ? extends V>[] entries)
+	public AbstractHashMap(Entry<? extends K, ? extends V> @NonNull [] entries)
 	{
 		this(entries.length);
 		this.putAllInternal(ObjectArray.asIterable(entries));
 	}
 
-	public AbstractHashMap(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public AbstractHashMap(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
 	{
 		this();
 		this.putAllInternal(iterable);
 	}
 
-	public AbstractHashMap(SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public AbstractHashMap(@NonNull SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
 	{
 		this(iterable.size());
 		// Call the putAllInternal(Iterable) method to avoid redundant ensureCapacity call
 		this.putAllInternal((Iterable<? extends Entry<? extends K, ? extends V>>) iterable);
 	}
 
-	public AbstractHashMap(Set<? extends Entry<? extends K, ? extends V>> set)
+	public AbstractHashMap(@NonNull Set<? extends Entry<? extends K, ? extends V>> set)
 	{
 		this(set.size());
 		this.loadDistinct(set);
 	}
 
-	public AbstractHashMap(Map<? extends K, ? extends V> map)
+	public AbstractHashMap(@NonNull Map<? extends K, ? extends V> map)
 	{
 		this(map.size());
 		this.loadDistinct(map);
 	}
 
-	public AbstractHashMap(AbstractHashMap<? extends K, ? extends V> map)
+	public AbstractHashMap(@NonNull AbstractHashMap<? extends K, ? extends V> map)
 	{
 		this(map.size);
 		this.size = map.size;
@@ -265,7 +278,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 
 	// Implementation Methods
 
-	public static int hash(Object key)
+	public static int hash(@Nullable Object key)
 	{
 		int h = key == null ? 0 : key.hashCode();
 		h ^= h >>> 20 ^ h >>> 12;
@@ -332,7 +345,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	{
 	}
 
-	protected void putInternal(K key, V value)
+	protected void putInternal(@Nullable K key, V value)
 	{
 		int hash = hash(key);
 		int i = index(hash, this.entries.length);
@@ -351,7 +364,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 
 	protected abstract void addEntry(int hash, K key, V value, int index);
 
-	private void putAllInternal(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	private void putAllInternal(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
 	{
 		for (Entry<? extends K, ? extends V> entry : iterable)
 		{
@@ -359,13 +372,13 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		}
 	}
 
-	protected void putAllInternal(SizedIterable<? extends Entry<? extends K, ? extends V>> map)
+	protected void putAllInternal(@NonNull SizedIterable<? extends Entry<? extends K, ? extends V>> map)
 	{
 		this.ensureCapacity(this.size + map.size());
 		this.putAllInternal((Iterable<? extends Entry<? extends K, ? extends V>>) map);
 	}
 
-	private void loadDistinct(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	private void loadDistinct(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
 	{
 		final HashEntry<K, V>[] entries = this.entries;
 		final int length = this.entries.length;
@@ -383,7 +396,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		this.size = size;
 	}
 
-	protected void removeEntry(HashEntry<K, V> entry)
+	protected void removeEntry(@NonNull HashEntry<K, V> entry)
 	{
 		AbstractHashMap.this.size--;
 		int index = index(entry.hash, AbstractHashMap.this.entries.length);
@@ -421,17 +434,20 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		return this.size == 0;
 	}
 
+	@NonNull
 	@Override
 	public Iterator<Entry<K, V>> iterator()
 	{
 		return new EntryIterator<Entry<K, V>>()
 		{
+			@Nullable
 			@Override
 			public HashEntry<K, V> next()
 			{
 				return this.nextEntry();
 			}
 
+			@NonNull
 			@Override
 			public String toString()
 			{
@@ -440,17 +456,20 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		};
 	}
 
+	@NonNull
 	@Override
 	public Iterator<K> keyIterator()
 	{
 		return new EntryIterator<K>()
 		{
+			@Nullable
 			@Override
 			public K next()
 			{
 				return this.nextEntry().key;
 			}
 
+			@NonNull
 			@Override
 			public String toString()
 			{
@@ -459,17 +478,20 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		};
 	}
 
+	@NonNull
 	@Override
 	public Iterator<V> valueIterator()
 	{
 		return new EntryIterator<V>()
 		{
+			@Nullable
 			@Override
 			public V next()
 			{
 				return this.nextEntry().value;
 			}
 
+			@NonNull
 			@Override
 			public String toString()
 			{
@@ -479,7 +501,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	}
 
 	@Override
-	public void forEach(Consumer<? super Entry<K, V>> action)
+	public void forEach(@NonNull Consumer<? super Entry<K, V>> action)
 	{
 		for (HashEntry<K, V> e : this.entries)
 		{
@@ -492,7 +514,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	}
 
 	@Override
-	public void forEach(BiConsumer<? super K, ? super V> action)
+	public void forEach(@NonNull BiConsumer<? super K, ? super V> action)
 	{
 		for (HashEntry<K, V> e : this.entries)
 		{
@@ -541,13 +563,15 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		return entry == null ? null : entry.value;
 	}
 
+	@Nullable
 	@Override
 	public Entry<K, V> getEntry(Object key)
 	{
 		return this.getEntryInternal(key);
 	}
 
-	protected HashEntry<K, V> getEntryInternal(Object key)
+	@Nullable
+	protected HashEntry<K, V> getEntryInternal(@Nullable Object key)
 	{
 		if (key == null)
 		{
@@ -573,6 +597,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		return null;
 	}
 
+	@NonNull
 	@Override
 	public Option<V> getOption(Object key)
 	{
@@ -580,24 +605,28 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		return entry == null ? Option.apply() : new Some<>(entry.value);
 	}
 
+	@NonNull
 	@Override
 	public <RK, RV> MutableMap<RK, RV> emptyCopy()
 	{
 		return new dyvil.collection.mutable.HashMap<>();
 	}
 
+	@NonNull
 	@Override
 	public <RK, RV> MutableMap<RK, RV> emptyCopy(int capacity)
 	{
 		return new dyvil.collection.mutable.HashMap<>(capacity);
 	}
 
+	@NonNull
 	@Override
 	public MutableMap<K, V> mutableCopy()
 	{
 		return new dyvil.collection.mutable.HashMap<>(this);
 	}
 
+	@NonNull
 	@Override
 	public ImmutableMap<K, V> immutableCopy()
 	{
@@ -662,7 +691,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		return Map.mapHashCode(this);
 	}
 
-	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	private void writeObject(java.io.@NonNull ObjectOutputStream out) throws IOException
 	{
 		out.defaultWriteObject();
 
@@ -682,7 +711,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		}
 	}
 
-	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	private void readObject(java.io.@NonNull ObjectInputStream in) throws IOException, ClassNotFoundException
 	{
 		in.defaultReadObject();
 

@@ -1,0 +1,71 @@
+package dyvil.tests
+
+using dyvil.Test
+
+public class ExtensionTest
+{
+	public static class A
+	public static class B extends A
+	public static class C extends B
+	{
+		public func custom: String = "custom"
+	}
+
+	public static class D extends C
+
+	public extension func custom(A a) = "fallback"
+
+	public static func apply(): Test = test "Extension Methods" {
+		let a = new A
+		let b = new B
+		let c = new C
+		let d = new D
+
+		let cA: A = c
+		let cB: B = c
+
+		test "Fallback" {
+			a.custom =?= "fallback"
+			b.custom =?= "fallback"
+		}
+
+		test "Override" {
+			c.custom =?= "custom"
+			cA.custom =?= "custom"
+			cB.custom =?= "custom"
+			d.custom =?= "custom"
+		}
+
+		a.name = "foo"
+
+		test "Name Method" {
+			a.name =?= "foo"
+		}
+	}
+
+	public static func testSpeed(): void
+	{
+		let values = [ new A, new B, new C, new D ]
+		let random = Random()
+		let count = 1_000_000
+		var totalTime = 0L
+
+		for (i <- 0 ..< count)
+		{
+			let current = values[random.nextInt(values.size)]
+
+			let now = System.nanoTime
+			let actual = current.custom
+
+			totalTime += System.nanoTime - now
+		}
+
+		print "Dynamic Dispatch Speed: \(totalTime / count) ns / invocation"
+	}
+
+	private static var nameMap: Map<any, String> = dyvil.collection.mutable.IdentityHashMap<any, String>
+
+	public postfix func name(any value): String = nameMap[value]
+
+	public infix func name_=(any value, String newName): void = nameMap[value] = newName
+}

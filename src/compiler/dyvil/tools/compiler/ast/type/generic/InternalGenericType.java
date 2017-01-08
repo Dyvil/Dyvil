@@ -16,7 +16,6 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.LambdaType;
 import dyvil.tools.compiler.ast.type.compound.MapType;
-import dyvil.tools.compiler.ast.type.compound.OptionType;
 import dyvil.tools.compiler.ast.type.compound.TupleType;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -93,8 +92,6 @@ public class InternalGenericType extends GenericType
 		{
 		case "dyvil/ref/ObjectRef":
 			return new ReferenceType(ReferenceType.LazyFields.OBJECT_REF_CLASS, this.typeArguments[0]);
-		case "dyvil/util/Option":
-			return new OptionType(this.typeArguments[0]);
 		case "dyvil/collection/Map":
 			return MapType.base(this.typeArguments[0], this.typeArguments[1]);
 		case "dyvil/collection/MutableMap":

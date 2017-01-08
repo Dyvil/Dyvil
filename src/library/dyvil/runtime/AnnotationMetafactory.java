@@ -1,5 +1,6 @@
 package dyvil.runtime;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.runtime.annotation.AnnotationProxyFactory;
 
 import java.lang.invoke.CallSite;
@@ -8,8 +9,9 @@ import java.lang.invoke.MethodType;
 
 public class AnnotationMetafactory
 {
-	public static CallSite metafactory(MethodHandles.Lookup caller, String invokedName, MethodType invokedType, Object... values)
-			throws Exception
+	@NonNull
+	public static CallSite metafactory(MethodHandles.@NonNull Lookup caller, String invokedName,
+		                                  @NonNull MethodType invokedType, Object... values) throws Exception
 	{
 		AnnotationProxyFactory factory = new AnnotationProxyFactory(caller, invokedType, values);
 		return factory.buildCallSite();

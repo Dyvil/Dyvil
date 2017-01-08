@@ -1,5 +1,6 @@
 package dyvil.collection.mutable;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.collection.ImmutableMatrix;
 import dyvil.collection.List;
 import dyvil.collection.MutableList;
@@ -15,48 +16,50 @@ import java.util.function.UnaryOperator;
 public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements MutableMatrix<E>
 {
 	private static final long serialVersionUID = -2034131178592900520L;
-	
+
+	@NonNull
 	public static <E> FlatArrayMatrix<E> apply()
 	{
 		return new FlatArrayMatrix();
 	}
-	
+
 	public FlatArrayMatrix()
 	{
 		super();
 	}
-	
-	public FlatArrayMatrix(int rows, int columns, E[] cells)
+
+	public FlatArrayMatrix(int rows, int columns, E @NonNull [] cells)
 	{
 		super(rows, columns, cells);
 	}
-	
+
 	public FlatArrayMatrix(int rows, int columns, Object[] cells, boolean trusted)
 	{
 		super(rows, columns, cells, trusted);
 	}
-	
+
 	public FlatArrayMatrix(int rows, int columns, Object[][] cells)
 	{
 		super(rows, columns, cells);
 	}
-	
+
 	public FlatArrayMatrix(int rows, int columns)
 	{
 		super(rows, columns);
 	}
-	
+
 	public FlatArrayMatrix(Object[]... cells)
 	{
 		super(cells);
 	}
-	
+
+	@NonNull
 	@Override
 	public MutableMatrix<E> subMatrix(int row, int rows, int column, int columns)
 	{
 		this.rangeCheck(row, column);
 		this.rangeCheck(row + rows - 1, column + columns - 1);
-		
+
 		Object[] newCells = new Object[rows * columns];
 		for (int i = 0; i < rows; i++)
 		{
@@ -64,7 +67,8 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Mu
 		}
 		return new FlatArrayMatrix(rows, columns, newCells, true);
 	}
-	
+
+	@NonNull
 	@Override
 	public MutableList<E> row(int row)
 	{
@@ -73,7 +77,8 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Mu
 		System.arraycopy(this.cells, row * this.columns, array, 0, this.columns);
 		return new ArrayList(array, this.columns, true);
 	}
-	
+
+	@NonNull
 	@Override
 	public MutableList<E> column(int column)
 	{
@@ -85,7 +90,8 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Mu
 		}
 		return new ArrayList(array, this.rows, true);
 	}
-	
+
+	@NonNull
 	@Override
 	public MutableList<E> flatten()
 	{
@@ -94,7 +100,8 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Mu
 		System.arraycopy(this.cells, 0, array, 0, len);
 		return new ArrayList(array, len, true);
 	}
-	
+
+	@NonNull
 	@Override
 	public MutableMatrix<E> transposed()
 	{
@@ -110,9 +117,10 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Mu
 		}
 		return new FlatArrayMatrix(this.columns, this.rows, newArray, true);
 	}
-	
+
+	@NonNull
 	@Override
-	public <R> MutableMatrix<R> mapped(Function<? super E, ? extends R> mapper)
+	public <R> MutableMatrix<R> mapped(@NonNull Function<? super E, ? extends R> mapper)
 	{
 		int len = this.rows * this.columns;
 		Object[] array = new Object[len];
@@ -122,7 +130,7 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Mu
 		}
 		return new FlatArrayMatrix(this.rows, this.columns, array, true);
 	}
-	
+
 	@Override
 	public void resize(int rows, int columns)
 	{
@@ -134,7 +142,7 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Mu
 			this.rows = rows;
 			return;
 		}
-		
+
 		Object[] newArray = new Object[rows * columns];
 		for (int i = 0; i < this.rows; i++)
 		{
@@ -145,9 +153,9 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Mu
 		this.columns = columns;
 		this.rows = rows;
 	}
-	
+
 	@Override
-	public void addRow(List<E> row)
+	public void addRow(@NonNull List<E> row)
 	{
 		int size = row.size();
 		if (this.columns == 0 || this.rows == 0)
@@ -159,16 +167,16 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Mu
 		{
 			throw new IllegalArgumentException("Invalid Row: " + size + " > " + this.columns);
 		}
-		
+
 		int oldRows = this.rows;
 		this.resize(this.rows + 1, this.columns);
-		
+
 		// Let the row do it's thing, but with the base offset.
 		row.toArray(oldRows * this.columns, this.cells);
 	}
-	
+
 	@Override
-	public void addColumn(List<E> column)
+	public void addColumn(@NonNull List<E> column)
 	{
 		int size = column.size();
 		if (this.columns == 0 || this.rows == 0)
@@ -180,25 +188,25 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Mu
 		{
 			throw new IllegalArgumentException("Invalid Column: " + size + " > " + this.rows);
 		}
-		
+
 		int oldColumns = this.columns;
 		this.resize(this.rows, this.columns + 1);
-		
+
 		for (int i = 0; i < size; i++)
 		{
 			this.cells[oldColumns + i * this.columns] = column.get(i);
 		}
 	}
-	
+
 	@Override
-	public void insertRow(int index, List<E> row)
+	public void insertRow(int index, @NonNull List<E> row)
 	{
 		if (index == this.rows)
 		{
 			this.addRow(row);
 			return;
 		}
-		
+
 		this.rowRangeCheck(index);
 		int size = row.size();
 		if (this.columns == 0 || this.rows == 0)
@@ -210,24 +218,24 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Mu
 		{
 			throw new IllegalArgumentException("Invalid Row: " + size + " > " + this.columns);
 		}
-		
+
 		int oldRows = this.rows;
 		int cellIndex = this.columns * index;
 		this.resize(this.rows + 1, this.columns);
-		System.arraycopy(this.cells, cellIndex, this.cells, cellIndex + this.columns,
-		                 oldRows * this.columns - cellIndex);
+		System
+			.arraycopy(this.cells, cellIndex, this.cells, cellIndex + this.columns, oldRows * this.columns - cellIndex);
 		row.toArray(cellIndex, this.cells);
 	}
-	
+
 	@Override
-	public void insertColumn(int index, List<E> column)
+	public void insertColumn(int index, @NonNull List<E> column)
 	{
 		if (index == this.columns)
 		{
 			this.addColumn(column);
 			return;
 		}
-		
+
 		this.columnRangeCheck(index);
 		int size = column.size();
 		if (this.columns == 0 || this.rows == 0)
@@ -239,7 +247,7 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Mu
 		{
 			throw new IllegalArgumentException("Invalid Column: " + size + " > " + this.rows);
 		}
-		
+
 		int newColumns = this.columns + 1;
 		Object[] newCells = new Object[this.rows * newColumns];
 		for (int i = 0; i < this.rows; i++)
@@ -255,14 +263,15 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Mu
 		this.columns = newColumns;
 		this.cells = newCells;
 	}
-	
+
 	@Override
 	public void subscript_$eq(int row, int column, E element)
 	{
 		this.rangeCheck(row, column);
 		this.cells[this.index(row, column)] = element;
 	}
-	
+
+	@NonNull
 	@Override
 	public E set(int row, int column, E element)
 	{
@@ -271,12 +280,12 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Mu
 		this.cells[index] = element;
 		return prev;
 	}
-	
+
 	@Override
 	public void removeRow(int index)
 	{
 		this.rowRangeCheck(index);
-		
+
 		int start = (index + 1) * this.columns;
 		int end = index * this.columns;
 		int cells = this.rows * this.columns;
@@ -288,12 +297,12 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Mu
 		}
 		this.rows--;
 	}
-	
+
 	@Override
 	public void removeColumn(int column)
 	{
 		this.columnRangeCheck(column);
-		
+
 		int newColumns = this.columns - 1;
 		Object[] newCells = new Object[this.rows * newColumns];
 		for (int i = 0; i < this.rows; i++)
@@ -308,20 +317,20 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Mu
 		this.columns = newColumns;
 		this.cells = newCells;
 	}
-	
+
 	@Override
 	public void clear()
 	{
 		this.rows = this.columns = 0;
 	}
-	
+
 	private void swap(int i, int j)
 	{
 		Object o = this.cells[i];
 		this.cells[i] = this.cells[j];
 		this.cells[j] = o;
 	}
-	
+
 	@Override
 	public void transpose()
 	{
@@ -335,10 +344,10 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Mu
 					this.swap(this.index(i, j), this.index(j, i));
 				}
 			}
-			
+
 			return;
 		}
-		
+
 		int rows = this.rows;
 		int size = rows * this.columns - 1;
 		// holds element to be replaced, eventually becomes next element to move
@@ -350,7 +359,7 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Mu
 		BitSet cycle = new BitSet(size); // hash to mark moved elements
 		cycle.set(0);
 		cycle.set(size);
-		
+
 		for (int i = 1; i < size; )
 		{
 			cycleBegin = i;
@@ -358,24 +367,24 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Mu
 			do
 			{
 				next = i * rows % size;
-				
+
 				this.swap(next, prev);
 				cycle.set(i);
 				i = next;
 			}
 			while (i != cycleBegin);
-			
+
 			for (i = 1; i < size && cycle.get(i); i++)
 			{
 			}
 		}
-		
+
 		this.rows = this.columns;
 		this.columns = rows;
 	}
-	
+
 	@Override
-	public void map(UnaryOperator<E> mapper)
+	public void map(@NonNull UnaryOperator<E> mapper)
 	{
 		int cells = this.rows * this.columns;
 		for (int i = 0; i < cells; i++)
@@ -383,13 +392,15 @@ public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements Mu
 			this.cells[i] = mapper.apply((E) this.cells[i]);
 		}
 	}
-	
+
+	@NonNull
 	@Override
 	public MutableMatrix<E> copy()
 	{
 		return new FlatArrayMatrix(this.rows, this.columns, this.cells);
 	}
-	
+
+	@NonNull
 	@Override
 	public ImmutableMatrix<E> immutable()
 	{

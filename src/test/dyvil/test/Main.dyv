@@ -1,5 +1,8 @@
 package dyvil.test
 
+import dyvil.tests._
+using dyvil.Test
+
 public class Main
 {
 	private static var errors = List<String>
@@ -8,41 +11,47 @@ public class Main
 	{
 		runTests(args)
 		verify()
-	}	
+	}
 		
 	private static void runTests([String] args)
 	{
-		AnnotationTest.main(args)
-		AssignmentTest.main(args)
-		ArrayTest.main(args)
-		BridgeTest.main(args)
-		BuilderTest.main(args)
-		CaptureTest.main(args)
-		CaseClassTest.main(args)
-		ConstructorTest.main(args)
-		DPFTest.main(args)
-		ExtensionTest.main(args)
+		let test = test "Main" {
+			AnnotationTest()
+			ArrayTest()
+			AssignmentTest()
+			BridgeTest()
+			BuilderTest()
+			CaptureTest()
+			CaseClassTest()
+			ConstructorTest()
+			DPFTest()
+			ExtensionTest()
+			FibonacciTest()
+			HanoiTest()
+			ImplicitTest()
+			InheritanceTest()
+			MathTest()
+			NestedMethodTest()
+			ObjectTest()
+			OperatorTest()
+			OverloadTest()
+			PrimitiveTest()
+			PropertyTest()
+			SortTest()
+			SuperTest()
+			SymbolTest()
+			TypeTest()
+			VirtualStaticTest()
+		}
+		test.addErrors(errors)
+
 		ForTest.main(args)
-		HanoiTest.main(args)
-		InheritanceTest.main(args)
 		IntrinsicTest.main(args)
 		LambdaTest.main(args)
 		MatchTest.main(args)
-		MathTest.main(args)
-		NestedMethodTest.main(args)
-		FibonacciTest.main(args)
-		ObjectTest.main(args)
-		OperatorTest.main(args)
-		OverloadTest.main(args)
-		PrimitiveTest.main(args)
-		PropertyTest.main(args)
 		RangeTest.main(args)
 		ReferenceTest.main(args)
 		ReifyTest.main(args)
-		SortTest.main(args)
-		SuperTest.main(args)
-		VirtualStaticTest.main(args)
-		TypeTest.main(args)
 		VarargsTest.main(args)
 	}
 
@@ -53,7 +62,7 @@ public class Main
 			return
 		}
 
-		errors.forEach(println _)
+		errors.forEach(print _)
 		throw new AssertionError()
 	}
 
@@ -62,7 +71,7 @@ public class Main
 		errors.add message
 	}
 
-	public static void test(String testName, any expected, any actual)
+	public static void test(String testName, any! expected, any! actual)
 	{
 		test(testName, expected, actual, expected == actual)
 	}

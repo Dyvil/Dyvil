@@ -103,15 +103,15 @@ public class MethodCall extends AbstractCall implements INamed
 	@Override
 	public IValue resolveCall(MarkerList markers, IContext context, boolean report)
 	{
-		// Normal Method Resolution
-		final MatchList<IMethod> ambigousCandidates = this.resolveMethodCall(markers, context);
-		if (ambigousCandidates == null)
+		// Implicit Resolution
+		if (this.receiver == null && this.resolveImplicitCall(markers, context))
 		{
 			return this;
 		}
 
-		// Implicit Resolution
-		if (this.receiver == null && this.resolveImplicitCall(markers, context))
+		// Normal Method Resolution
+		final MatchList<IMethod> ambigousCandidates = this.resolveMethodCall(markers, context);
+		if (ambigousCandidates == null)
 		{
 			return this;
 		}
@@ -145,14 +145,15 @@ public class MethodCall extends AbstractCall implements INamed
 		}
 
 		final IMethod method = ICall.resolveMethod(context, implicit, this.name, this.arguments);
-		if (method != null)
+		if (method == null)
 		{
-			this.receiver = implicit;
-			this.method = method;
-			this.checkArguments(markers, context);
-			return true;
+			return false;
 		}
-		return false;
+
+		this.receiver = implicit;
+		this.method = method;
+		this.checkArguments(markers, context);
+		return true;
 	}
 
 	@Override

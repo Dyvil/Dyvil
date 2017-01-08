@@ -6,16 +6,16 @@ import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.Candidate;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.TypeChecker;
@@ -83,12 +83,6 @@ public class ConstructorCall implements ICall
 	public int valueTag()
 	{
 		return CONSTRUCTOR_CALL;
-	}
-
-	@Override
-	public boolean isPrimitive()
-	{
-		return false;
 	}
 
 	public IConstructor getConstructor()
@@ -173,9 +167,10 @@ public class ConstructorCall implements ICall
 			return this;
 		}
 
-		if (this.type.isArrayType())
+		final ArrayType arrayType = this.type.extract(ArrayType.class);
+		if (arrayType != null)
 		{
-			this.resolveArrayConstructor(markers, context);
+			this.resolveArrayConstructor(markers, context, arrayType);
 			return this;
 		}
 
@@ -205,16 +200,16 @@ public class ConstructorCall implements ICall
 		return null;
 	}
 
-	private void resolveArrayConstructor(MarkerList markers, IContext context)
+	private void resolveArrayConstructor(MarkerList markers, IContext context, ArrayType arrayType)
 	{
-		final ITypeParameter typeVar = this.type.getElementType().getTypeVariable();
-		if (typeVar != null)
+		final IType elementType = arrayType.getElementType();
+		if (elementType.hasTag(IType.TYPE_VAR))
 		{
-			markers.add(Markers.semanticError(this.position, "constructor.access.array.typevar", typeVar.getName()));
+			markers.add(Markers.semanticError(this.position, "constructor.access.array.typevar", elementType));
 		}
 
 		final int len = this.arguments.size();
-		final int dims = this.type.getArrayDimensions();
+		final int dims = 1 + getDimensions(arrayType.getElementType());
 		if (len > dims)
 		{
 			final Marker marker = Markers.semanticError(this.position, "constructor.access.array.length");
@@ -231,6 +226,16 @@ public class ConstructorCall implements ICall
 			                                              TypeChecker.markerSupplier("constructor.access.array.type"));
 			this.arguments.setValue(i, null, typed);
 		}
+	}
+
+	private static int getDimensions(IType type)
+	{
+		final ArrayType arrayType = type.extract(ArrayType.class);
+		if (arrayType != null)
+		{
+			return 1 + getDimensions(arrayType.getElementType());
+		}
+		return 0;
 	}
 
 	protected MatchList<IConstructor> resolveConstructor(MarkerList markers, IContext context, IType type)
@@ -320,7 +325,7 @@ public class ConstructorCall implements ICall
 		this.type.check(markers, context);
 		this.arguments.check(markers, context);
 
-		if (this.type.isArrayType())
+		if (this.type.hasTag(IType.ARRAY))
 		{
 			return;
 		}
@@ -354,7 +359,7 @@ public class ConstructorCall implements ICall
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		if (!this.type.isArrayType())
+		if (!this.type.hasTag(IType.ARRAY))
 		{
 			this.constructor.writeCall(writer, this.arguments, type, this.getLineNumber());
 			return;

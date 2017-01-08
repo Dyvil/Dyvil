@@ -1,6 +1,8 @@
 package dyvil.io;
 
 import dyvil.annotation.internal.DyvilModifiers;
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.reflect.Modifiers;
@@ -31,7 +33,7 @@ public final class FileUtils
 	 *
 	 * @return the Regular Expression pattern
 	 */
-	public static Pattern antToRegex(String pattern)
+	public static @NonNull Pattern antToRegex(@NonNull String pattern)
 	{
 		final int length = pattern.length();
 		StringBuilder builder = new StringBuilder(length);
@@ -71,13 +73,13 @@ public final class FileUtils
 		return Pattern.compile(builder.toString());
 	}
 
-	public static boolean matches(String filename, String pattern)
+	public static boolean matches(@NonNull String filename, @NonNull String pattern)
 	{
 		return antToRegex(pattern).matcher(filename).find();
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static boolean tryCreate(File file)
+	public static boolean tryCreate(@NonNull File file)
 	{
 		try
 		{
@@ -91,7 +93,7 @@ public final class FileUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static void create(File file) throws IOException
+	public static void create(@NonNull File file) throws IOException
 	{
 		if (file.exists())
 		{
@@ -108,13 +110,13 @@ public final class FileUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static boolean tryWrite(File file, String text)
+	public static boolean tryWrite(@NonNull File file, @NonNull String text)
 	{
 		return tryWrite(file, text.getBytes());
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static boolean tryWrite(File file, byte[] bytes)
+	public static boolean tryWrite(@NonNull File file, byte @NonNull [] bytes)
 	{
 		try
 		{
@@ -128,14 +130,14 @@ public final class FileUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static void write(File file, byte[] bytes) throws IOException
+	public static void write(@NonNull File file, byte @NonNull [] bytes) throws IOException
 	{
 		create(file);
 		Files.write(file.toPath(), bytes);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static boolean tryWriteLines(File file, List<String> lines)
+	public static boolean tryWriteLines(@NonNull File file, @NonNull List<@NonNull String> lines)
 	{
 		try
 		{
@@ -149,7 +151,7 @@ public final class FileUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static void writeLines(File file, List<String> lines) throws IOException
+	public static void writeLines(@NonNull File file, @NonNull List<@NonNull String> lines) throws IOException
 	{
 		create(file);
 		Files.write(file.toPath(), lines, Charset.defaultCharset());
@@ -166,7 +168,7 @@ public final class FileUtils
 	 * @return the file content
 	 */
 	@DyvilModifiers(Modifiers.INFIX)
-	public static String tryRead(File file)
+	public static @Nullable String tryRead(@NonNull File file)
 	{
 		if (!file.exists())
 		{
@@ -183,14 +185,14 @@ public final class FileUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static String read(File file) throws IOException
+	public static @NonNull String read(@NonNull File file) throws IOException
 	{
 		byte[] bytes = Files.readAllBytes(file.toPath());
 		return new String(bytes);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static List<String> tryReadLines(File file)
+	public static @Nullable List<@NonNull String> tryReadLines(@NonNull File file)
 	{
 		if (!file.exists())
 		{
@@ -207,7 +209,7 @@ public final class FileUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static List<String> readLines(File file) throws IOException
+	public static @NonNull List<@NonNull String> readLines(@NonNull File file) throws IOException
 	{
 		try (BufferedReader reader = Files.newBufferedReader(file.toPath()))
 		{
@@ -235,7 +237,7 @@ public final class FileUtils
 	 *
 	 * @return {@code true} iff the file was successfully deleted, {@code false} otherwise
 	 */
-	public static boolean delete(File file)
+	public static boolean delete(@NonNull File file)
 	{
 		if (file.isDirectory())
 		{
@@ -264,7 +266,7 @@ public final class FileUtils
 	 *
 	 * @return {@code true} iff the file was successfully deleted, {@code false} otherwise
 	 */
-	public static boolean delete(File file, int maxDepth)
+	public static boolean delete(@NonNull File file, int maxDepth)
 	{
 		if (maxDepth > 0 && file.isDirectory())
 		{

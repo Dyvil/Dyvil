@@ -107,8 +107,12 @@ public final class PrimitiveType implements IType
 	{
 		switch (internalClassName)
 		{
-		case "java/lang/Object":
+		case AnyType.OBJECT_INTERNAL:
 			return Types.ANY;
+		case NullType.NULL_INTERNAL:
+			return Types.NULL;
+		case NoneType.NONE_INTERNAL:
+			return Types.NONE;
 		case "java/lang/Void":
 			return Types.VOID;
 		case "java/lang/Boolean":
@@ -186,12 +190,6 @@ public final class PrimitiveType implements IType
 	}
 
 	@Override
-	public ITypeParameter getTypeVariable()
-	{
-		return null;
-	}
-
-	@Override
 	public final IType getObjectType()
 	{
 		return new ClassType(this.wrapperClass);
@@ -254,35 +252,6 @@ public final class PrimitiveType implements IType
 	}
 
 	@Override
-	public boolean isArrayType()
-	{
-		return false;
-	}
-
-	@Override
-	public int getArrayDimensions()
-	{
-		return 0;
-	}
-
-	@Override
-	public IType getElementType()
-	{
-		return null;
-	}
-
-	@Override
-	public boolean isExtension()
-	{
-		return false;
-	}
-
-	@Override
-	public void setExtension(boolean extension)
-	{
-	}
-
-	@Override
 	public IClass getArrayClass()
 	{
 		IClass iclass = this.arrayClass;
@@ -310,6 +279,12 @@ public final class PrimitiveType implements IType
 	public IClass getTheClass()
 	{
 		return this.wrapperClass;
+	}
+
+	@Override
+	public boolean useNonNullAnnotation()
+	{
+		return false;
 	}
 
 	@Override
@@ -563,6 +538,12 @@ public final class PrimitiveType implements IType
 	@Override
 	public void writeCast(MethodWriter writer, IType target, int lineNumber) throws BytecodeException
 	{
+		if (Types.isVoid(target) && this.typecode != VOID_CODE)
+		{
+			writer.visitInsn(this.getLocalSlots() == 2 ? Opcodes.POP2 : Opcodes.POP);
+			return;
+		}
+
 		IType primitiveTarget = target;
 		if (!target.isPrimitive())
 		{
@@ -830,12 +811,6 @@ public final class PrimitiveType implements IType
 	public void toString(String prefix, StringBuilder buffer)
 	{
 		buffer.append(this.name);
-	}
-
-	@Override
-	public PrimitiveType clone()
-	{
-		return this; // no clones
 	}
 
 	@Override

@@ -15,10 +15,6 @@ public interface IParametric
 
 	IParameterList getParameterList();
 
-	default void setVariadic()
-	{
-	}
-
 	default boolean isVariadic()
 	{
 		return false;

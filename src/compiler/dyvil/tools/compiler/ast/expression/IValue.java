@@ -7,11 +7,11 @@ import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.intrinsic.PopExpr;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.reference.IReference;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -160,11 +160,6 @@ public interface IValue extends IASTNode, ITyped
 		return !this.isConstantOrField();
 	}
 
-	default boolean isPrimitive()
-	{
-		return this.getType().isPrimitive();
-	}
-
 	default boolean isStatement()
 	{
 		return Types.isVoid(this.getType());
@@ -294,7 +289,7 @@ public interface IValue extends IASTNode, ITyped
 
 	default Marker getAnnotationError()
 	{
-		return Markers.semantic(this.getPosition(), "value.constant");
+		return Markers.semanticError(this.getPosition(), "value.constant");
 	}
 
 	static IValue toAnnotationConstant(IValue value, MarkerList markers, IContext context)
@@ -309,7 +304,7 @@ public interface IValue extends IASTNode, ITyped
 		final Marker marker = value.getAnnotationError();
 		marker.addInfo(Markers.getSemantic("value.constant.depth", depth));
 		markers.add(marker);
-		return value.getType().getDefaultValue();
+		return value;
 	}
 
 	default int stringSize()
@@ -451,6 +446,11 @@ public interface IValue extends IASTNode, ITyped
 
 	void writeExpression(MethodWriter writer, IType type) throws BytecodeException;
 
+	default void writeNullCheckedExpression(MethodWriter writer, IType type) throws BytecodeException
+	{
+		this.writeExpression(writer, type);
+	}
+
 	default void writeJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
 		this.writeExpression(writer, Types.BOOLEAN);
@@ -476,6 +476,10 @@ public interface IValue extends IASTNode, ITyped
 
 	default void writeAnnotationValue(AnnotationVisitor visitor, String key)
 	{
-		visitor.visit(key, this.toObject());
+		final Object value = this.toObject();
+		if (value != null)
+		{
+			visitor.visit(key, value);
+		}
 	}
 }

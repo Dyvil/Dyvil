@@ -1,0 +1,86 @@
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
+
+package dyvil.ref
+
+import dyvil.ref.array._
+import dyvil.ref.unsafe._
+import dyvil.reflect.ReflectUtils
+import dyvil.runtime.reference.PropertyReferenceMetafactory
+
+import java.lang.invoke._
+import java.lang.reflect.Field
+
+public final class ReferenceFactory
+{
+	private const STATIC_CONSTRUCTOR_TYPE:   MethodType = MethodType.methodType(class void, class Field)
+	private const INSTANCE_CONSTRUCTOR_TYPE: MethodType = MethodType.methodType(class void, class Object, class long)
+
+	private static func getField(Class<_> _type, String fieldName): Field throws NoSuchFieldException
+		= _type.getDeclaredField(fieldName)
+
+	// Bootstrap Factories
+
+	public static func instanceRefMetafactory(
+		MethodHandles.Lookup caller, String fieldName, MethodType methodType
+	): CallSite throws Throwable
+	{
+		let enclosingClass = methodType.parameterType(0)
+		let targetType = methodType.returnType()
+
+		// The field to reference and its offset
+		let field = getField(enclosingClass, fieldName)
+		let offset: long = ReflectUtils.UNSAFE.objectFieldOffset(field)
+
+		// The Unsafe*Ref constructor
+		let constructor: MethodHandle = caller.findConstructor(targetType, INSTANCE_CONSTRUCTOR_TYPE)
+
+		// Insert the offset argument, returning a method of type (enclosingClass)Unsafe*Ref
+		return new ConstantCallSite(MethodHandles.insertArguments(constructor, 1, offset).asType(methodType))
+	}
+
+	public static func staticRefMetafactory(
+		MethodHandles.Lookup caller, String fieldName, MethodType methodType,
+		Class<_> enclosingClass
+	): CallSite throws Throwable
+	{
+		let targetType = methodType.returnType()
+
+		// The field to reference
+		let field = getField(enclosingClass, fieldName)
+
+		// The Unsafe*Ref(Field) constructor
+		let constructor: MethodHandle = caller.findConstructor(targetType, STATIC_CONSTRUCTOR_TYPE)
+
+		// The resulting Unsafe*Ref
+		let result = constructor.invokeWithArguments(field)
+		return new ConstantCallSite(MethodHandles.constant(targetType, result))
+	}
+
+	public static func propertyRefMetafactory(
+		MethodHandles.Lookup caller, String invokedName, MethodType invokedType,
+		MethodHandle getter, MethodHandle setter
+	): CallSite throws Exception
+	{
+		let prm = new PropertyReferenceMetafactory(caller, invokedType, getter, setter)
+		return prm.buildCallSite()
+	}
+
+#import Base.dgs
+#foreach PRIMITIVE_SPECS
+
+	// TYPE_NAME
+
+	public static func new##TYPE_NAME##Ref(Object base, long offset): TYPE_NAME##Ref
+		= new Unsafe##TYPE_NAME##Ref(base, offset)
+
+	public static func new##TYPE_NAME##Ref(Object base, Class<_> _type, String fieldName): TYPE_NAME##Ref throws NoSuchFieldException
+		= new Unsafe##TYPE_NAME##Ref(base, getField(_type, fieldName))
+
+	public static func newStatic##TYPE_NAME##Ref(Class<_> _type, String fieldName): TYPE_NAME##Ref throws NoSuchFieldException
+		= new Unsafe##TYPE_NAME##Ref(getField(_type, fieldName))
+
+	public static func new##TYPE_NAME##ArrayRef([PRIMITIVE] array, int index): TYPE_NAME##Ref
+		= new TYPE_NAME##ArrayRef(array, index)
+#endfor
+}

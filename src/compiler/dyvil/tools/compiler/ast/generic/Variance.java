@@ -2,11 +2,13 @@ package dyvil.tools.compiler.ast.generic;
 
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.WildcardType;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+@SuppressWarnings("StandardVariableNames")
 public enum Variance
 {
 	INVARIANT
@@ -16,7 +18,7 @@ public enum Variance
 			{
 				return Types.isSameType(a, b);
 			}
-		},
+		}, //
 	COVARIANT
 		{
 			@Override
@@ -30,13 +32,7 @@ public enum Variance
 			{
 				builder.append('+');
 			}
-
-			@Override
-			public void appendInfix(StringBuilder builder)
-			{
-				builder.append(" <: ");
-			}
-		},
+		}, //
 	CONTRAVARIANT
 		{
 			@Override
@@ -50,31 +46,32 @@ public enum Variance
 			{
 				builder.append('-');
 			}
-
-			@Override
-			public void appendInfix(StringBuilder builder)
-			{
-				builder.append(" >: ");
-			}
 		};
 
-	public abstract boolean checkCompatible(IType type1, IType type2);
+	public abstract boolean checkCompatible(IType a, IType b);
 
-	public static boolean checkCompatible(Variance base, IType type1, IType type2)
+	public static boolean checkCompatible(Variance base, IType a, IType b)
 	{
-		Variance variance = type1.getVariance();
-		if (variance != null && variance.checkCompatible(type1, type2))
+		final WildcardType wildcard1 = a.extract(WildcardType.class);
+
+		if (wildcard1 != null)
 		{
-			return true;
+			final WildcardType wildcard2 = b.extract(WildcardType.class);
+			if (wildcard2 != null)
+			{
+				return wildcard1.getVariance().checkCompatible(wildcard1.getType(), wildcard2.getType());
+			}
+
+			return wildcard1.getVariance().checkCompatible(wildcard1.getType(), b);
 		}
 
-		variance = type2.getVariance();
-		if (variance != null && variance.checkCompatible(type2, type1))
+		final WildcardType wildcard2 = b.extract(WildcardType.class);
+		if (wildcard2 != null)
 		{
-			return true;
+			return wildcard2.getVariance().checkCompatible(wildcard2.getType(), a);
 		}
-		//
-		return base.checkCompatible(type1, type2);
+
+		return base.checkCompatible(a, b);
 	}
 
 	public static void write(Variance variance, DataOutput out) throws IOException
@@ -97,10 +94,6 @@ public enum Variance
 	}
 
 	public void appendPrefix(StringBuilder builder)
-	{
-	}
-
-	public void appendInfix(StringBuilder builder)
 	{
 	}
 }

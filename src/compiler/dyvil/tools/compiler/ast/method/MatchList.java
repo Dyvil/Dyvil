@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import java.util.Arrays;
 import java.util.Iterator;
 
-public class MatchList<T extends ICallableSignature> implements IImplicitContext, Iterable<Candidate<T>>
+public class MatchList<T extends ICallableMember> implements IImplicitContext, Iterable<Candidate<T>>
 {
 	private static final byte SORTED    = 1;
 	private static final byte SKIP_SORT = 2;

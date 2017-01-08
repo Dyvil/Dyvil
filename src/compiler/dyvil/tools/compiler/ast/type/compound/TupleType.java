@@ -441,7 +441,7 @@ public final class TupleType implements IObjectType, ITypeList
 	{
 		for (int i = 0; i < this.typeCount; i++)
 		{
-			this.types[i].writeAnnotations(visitor, typeRef, typePath + i + ';');
+			IType.writeAnnotations(this.types[i], visitor, typeRef, typePath + i + ';');
 		}
 	}
 
@@ -513,14 +513,5 @@ public final class TupleType implements IObjectType, ITypeList
 			buffer.append(' ');
 		}
 		buffer.append(')');
-	}
-
-	@Override
-	public IType clone()
-	{
-		TupleType tt = new TupleType(this.typeCount);
-		tt.typeCount = this.typeCount;
-		System.arraycopy(this.types, 0, tt.types, 0, this.typeCount);
-		return tt;
 	}
 }

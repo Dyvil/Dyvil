@@ -36,13 +36,7 @@ public final class InstanceOfOperator extends AbstractValue
 	{
 		return ISOF_OPERATOR;
 	}
-	
-	@Override
-	public boolean isPrimitive()
-	{
-		return true;
-	}
-	
+
 	@Override
 	public boolean isResolved()
 	{
@@ -137,14 +131,13 @@ public final class InstanceOfOperator extends AbstractValue
 		{
 			return;
 		}
-
-		if (this.value.isPrimitive())
+		
+		final IType valueType = this.value.getType();
+		if (valueType.isPrimitive())
 		{
 			markers.add(Markers.semanticError(this.position, "instanceof.value.primitive"));
 			return;
 		}
-		
-		final IType valueType = this.value.getType();
 		if (Types.isExactType(this.type, valueType))
 		{
 			markers.add(Markers.semantic(this.position, "instanceof.type.equal", valueType));

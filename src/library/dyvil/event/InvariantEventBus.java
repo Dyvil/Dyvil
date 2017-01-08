@@ -1,5 +1,7 @@
 package dyvil.event;
 
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.reflect.Modifiers;
@@ -8,10 +10,11 @@ import java.lang.reflect.Method;
 
 public class InvariantEventBus implements EventBus
 {
+	@NonNull
 	protected List<HandlerEntry> handlers = new ArrayList<>();
 
 	@Override
-	public void register(Object eventHandler, Class<?> type)
+	public void register(@Nullable Object eventHandler, @NonNull Class<?> type)
 	{
 		final HandlerEntry entry = new HandlerEntry(eventHandler, type);
 		this.handlers.add(entry);
@@ -35,7 +38,7 @@ public class InvariantEventBus implements EventBus
 	}
 
 	@Override
-	public void dispatch(Object event)
+	public void dispatch(@NonNull Object event)
 	{
 		Class<?> type = event.getClass();
 
@@ -51,7 +54,7 @@ public class InvariantEventBus implements EventBus
 		}
 	}
 
-	protected final void invoke(Method method, Object eventHandler, Object event)
+	protected final void invoke(@NonNull Method method, Object eventHandler, Object event)
 	{
 		try
 		{

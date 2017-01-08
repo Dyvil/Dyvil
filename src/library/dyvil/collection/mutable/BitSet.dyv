@@ -59,7 +59,7 @@ public class BitSet extends AbstractBitSet implements MutableSet<int>
 	public override void clear()
 	{
 		this.size = 0
-		for (int i <- 0 ..< this.words.length)
+		for (i <- 0 ..< this.words.size)
 		{
 			this.words[i] = 0L
 		}
@@ -73,7 +73,7 @@ public class BitSet extends AbstractBitSet implements MutableSet<int>
 		return true
 	}
 
-	public override boolean remove(Object element)
+	public override boolean remove(Object! element)
 	{
 		if (!(element is Int)) return false
 

@@ -147,10 +147,4 @@ public class PackageType implements IRawType
 	{
 		buffer.append(this.thePackage.getName());
 	}
-
-	@Override
-	public IType clone()
-	{
-		return new PackageType(this.thePackage);
-	}
 }

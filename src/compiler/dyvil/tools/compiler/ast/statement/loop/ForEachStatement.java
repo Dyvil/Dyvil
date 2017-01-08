@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.statement.loop;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.context.CombiningLabelContext;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -9,12 +10,13 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.statement.IStatement;
 import dyvil.tools.compiler.ast.statement.control.Label;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
@@ -212,9 +214,9 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 				{
 					this.inferVariableType(markers, elementType);
 				}
-				else if (!Types.isSuperType(varType, elementType))
+				else if (!Types.isAssignable(varType, elementType))
 				{
-					final Marker marker = Markers.semantic(value.getPosition(), "for.range.type");
+					final Marker marker = Markers.semanticError(value.getPosition(), "for.range.type");
 					marker.addInfo(Markers.getSemantic("range.type", valueType));
 					marker.addInfo(Markers.getSemantic("variable.type", varType));
 					markers.add(marker);
@@ -226,92 +228,113 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 				return rangeForStatement;
 			}
 		}
-		if (valueType.isArrayType())
+		final ArrayType arrayType = valueType.extract(ArrayType.class);
+		if (arrayType != null)
 		{
 			if (varType == Types.UNKNOWN)
 			{
-				this.inferVariableType(markers, valueType.getElementType());
+				this.inferVariableType(markers, arrayType.getElementType());
 			}
-			else if (!Types.isSuperType(varType, valueType.getElementType()))
+			else if (!Types.isAssignable(varType, arrayType.getElementType()))
 			{
-				final Marker marker = Markers.semantic(value.getPosition(), "for.array.type");
+				final Marker marker = Markers.semanticError(value.getPosition(), "for.array.type");
 				marker.addInfo(Markers.getSemantic("array.type", valueType));
 				marker.addInfo(Markers.getSemantic("variable.type", varType));
 				markers.add(marker);
 			}
 
-			final ArrayForStatement arrayForStatement = new ArrayForStatement(this.position, this.variable, valueType);
+			final ArrayForStatement arrayForStatement = new ArrayForStatement(this.position, this.variable, arrayType);
 			arrayForStatement.resolveAction(this.action, markers, context);
 			return arrayForStatement;
 		}
-		if (Types.isSuperType(IterableForStatement.LazyFields.ITERATOR, valueType))
+		if (Types.isAssignable(IterableForStatement.LazyFields.ITERATOR, valueType))
 		{
-			final IType iteratorType = Types.resolveTypeSafely(valueType, IterableForStatement.LazyFields.ITERATOR_TYPE)
-			                                .asReturnType();
-			if (varType == Types.UNKNOWN)
-			{
-				this.inferVariableType(markers, iteratorType);
-			}
-			else if (!Types.isSuperType(varType, iteratorType))
-			{
-				final Marker marker = Markers.semantic(value.getPosition(), "for.iterator.type");
-				marker.addInfo(Markers.getSemantic("iterator.type", iteratorType));
-				marker.addInfo(Markers.getSemantic("variable.type", varType));
-				markers.add(marker);
-			}
-
-			final IterableForStatement iterableForStatement = new IterableForStatement(this.position, this.variable,
-			                                                                           true);
-			iterableForStatement.resolveAction(this.action, markers, context);
-			return iterableForStatement;
+			return this.toIteratorLoop(markers, context, varType, value, valueType);
 		}
-		if (Types.isSuperType(IterableForStatement.LazyFields.ITERABLE, valueType))
+		if (Types.isAssignable(IterableForStatement.LazyFields.ITERABLE, valueType))
 		{
-			final IType iterableType = Types.resolveTypeSafely(valueType, IterableForStatement.LazyFields.ITERABLE_TYPE)
-			                                .asReturnType();
-			if (varType == Types.UNKNOWN)
-			{
-				this.inferVariableType(markers, iterableType);
-			}
-			else if (!Types.isSuperType(varType, iterableType))
-			{
-				final Marker marker = Markers.semantic(value.getPosition(), "for.iterable.type");
-				marker.addInfo(Markers.getSemantic("iterable.type", iterableType));
-				marker.addInfo(Markers.getSemantic("variable.type", varType));
-				markers.add(marker);
-			}
-
-			final IterableForStatement iterableForStatement = new IterableForStatement(this.position, this.variable,
-			                                                                           false);
-			iterableForStatement.resolveAction(this.action, markers, context);
-			return iterableForStatement;
+			return this.toIterable(markers, context, varType, value, valueType);
 		}
-		if (Types.isSuperType(Types.STRING, valueType))
+		if (Types.isAssignable(Types.STRING, valueType))
 		{
-			if (varType == Types.UNKNOWN)
-			{
-				this.variable.setType(Types.CHAR);
-			}
-			else if (!Types.isSuperType(varType, Types.CHAR))
-			{
-				final Marker marker = Markers.semantic(value.getPosition(), "for.string.type");
-				marker.addInfo(Markers.getSemantic("variable.type", varType));
-				markers.add(marker);
-			}
-
-			final StringForStatement stringForStatement = new StringForStatement(this.position, this.variable);
-			stringForStatement.resolveAction(this.action, markers, context);
-			return stringForStatement;
+			return this.toStringLoop(markers, context, varType, value);
 		}
 
-		final Marker marker = Markers.semantic(this.variable.getPosition(), "for.each.invalid");
-		marker.addInfo(Markers.getSemantic("variable.type", varType));
+		final Marker marker = Markers.semanticError(this.variable.getPosition(), "for.each.invalid");
 		marker.addInfo(Markers.getSemantic("value.type", valueType));
 		markers.add(marker);
 
 		this.resolveAction(this.action, markers, context);
 
 		return this;
+	}
+
+	@NonNull
+	public IValue toIteratorLoop(MarkerList markers, IContext context, IType varType, IValue value, IType valueType)
+	{
+		final IType iteratorType = Types.resolveTypeSafely(valueType, IterableForStatement.LazyFields.ITERATOR_TYPE)
+		                                .asReturnType();
+		if (varType == Types.UNKNOWN)
+		{
+			this.inferVariableType(markers, iteratorType);
+		}
+		else if (!Types.isAssignable(varType, iteratorType))
+		{
+			final Marker marker = Markers.semanticError(value.getPosition(), "for.iterator.type");
+			marker.addInfo(Markers.getSemantic("iterator.type", iteratorType));
+			marker.addInfo(Markers.getSemantic("variable.type", varType));
+			markers.add(marker);
+		}
+
+		this.variable.setValue(
+			TypeChecker.convertValue(value, IterableForStatement.LazyFields.ITERATOR, null, markers, context, null));
+		final IterableForStatement iterableForStatement = new IterableForStatement(this.position, this.variable, true);
+		iterableForStatement.resolveAction(this.action, markers, context);
+		return iterableForStatement;
+	}
+
+	@NonNull
+	public IValue toStringLoop(MarkerList markers, IContext context, IType varType, IValue value)
+	{
+		if (varType == Types.UNKNOWN)
+		{
+			this.variable.setType(Types.CHAR);
+		}
+		else if (!Types.isAssignable(varType, Types.CHAR))
+		{
+			final Marker marker = Markers.semanticError(value.getPosition(), "for.string.type");
+			marker.addInfo(Markers.getSemantic("variable.type", varType));
+			markers.add(marker);
+		}
+
+		this.variable.setValue(TypeChecker.convertValue(value, Types.STRING, null, markers, context, null));
+		final StringForStatement stringForStatement = new StringForStatement(this.position, this.variable);
+		stringForStatement.resolveAction(this.action, markers, context);
+		return stringForStatement;
+	}
+
+	@NonNull
+	public IValue toIterable(MarkerList markers, IContext context, IType varType, IValue value, IType valueType)
+	{
+		final IType iterableType = Types.resolveTypeSafely(valueType, IterableForStatement.LazyFields.ITERABLE_TYPE)
+		                                .asReturnType();
+		if (varType == Types.UNKNOWN)
+		{
+			this.inferVariableType(markers, iterableType);
+		}
+		else if (!Types.isAssignable(varType, iterableType))
+		{
+			final Marker marker = Markers.semanticError(value.getPosition(), "for.iterable.type");
+			marker.addInfo(Markers.getSemantic("iterable.type", iterableType));
+			marker.addInfo(Markers.getSemantic("variable.type", varType));
+			markers.add(marker);
+		}
+
+		this.variable.setValue(
+			TypeChecker.convertValue(value, IterableForStatement.LazyFields.ITERABLE, null, markers, context, null));
+		final IterableForStatement iterableForStatement = new IterableForStatement(this.position, this.variable, false);
+		iterableForStatement.resolveAction(this.action, markers, context);
+		return iterableForStatement;
 	}
 
 	public void inferVariableType(MarkerList markers, IType type)

@@ -59,12 +59,6 @@ public final class IntValue implements IConstantValue
 	}
 
 	@Override
-	public boolean isPrimitive()
-	{
-		return true;
-	}
-
-	@Override
 	public IType getType()
 	{
 		return Types.INT;

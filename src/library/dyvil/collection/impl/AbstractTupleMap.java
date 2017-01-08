@@ -1,5 +1,7 @@
 package dyvil.collection.impl;
 
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.collection.*;
 import dyvil.math.MathUtils;
 import dyvil.tuple.Tuple;
@@ -19,8 +21,8 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 
 	protected static final int DEFAULT_CAPACITY = 16;
 
-	protected transient int               size;
-	protected transient Tuple.Of2<K, V>[] entries;
+	protected transient int                                  size;
+	protected transient Tuple.@NonNull Of2<K, V> @NonNull [] entries;
 
 	public AbstractTupleMap()
 	{
@@ -32,7 +34,7 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 		this.entries = (Tuple.Of2<K, V>[]) new Tuple.Of2[MathUtils.powerOfTwo(capacity)];
 	}
 
-	public AbstractTupleMap(Entry<? extends K, ? extends V>[] entries)
+	public AbstractTupleMap(@NonNull Entry<? extends K, ? extends V> @NonNull [] entries)
 	{
 		this(entries.length);
 		this.size = entries.length;
@@ -42,63 +44,67 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 		}
 	}
 
-	public AbstractTupleMap(Tuple.Of2<? extends K, ? extends V>[] entries)
+	@SuppressWarnings("SuspiciousSystemArraycopy")
+	public AbstractTupleMap(Tuple.@NonNull Of2<? extends K, ? extends V> @NonNull [] entries)
 	{
 		this.size = entries.length;
 		this.entries = (Tuple.Of2<K, V>[]) new Tuple.Of2[this.size];
 		System.arraycopy(entries, 0, this.entries, 0, this.size);
 	}
 
-	public AbstractTupleMap(Tuple.Of2<? extends K, ? extends V>[] entries, int size)
+	@SuppressWarnings("SuspiciousSystemArraycopy")
+	public AbstractTupleMap(Tuple.@NonNull Of2<? extends K, ? extends V> @NonNull [] entries, int size)
 	{
 		this.size = size;
 		this.entries = (Tuple.Of2<K, V>[]) new Tuple.Of2[size];
 		System.arraycopy(entries, 0, this.entries, 0, size);
 	}
 
-	public AbstractTupleMap(Tuple.Of2<? extends K, ? extends V>[] entries, @SuppressWarnings("UnusedParameters") boolean trusted)
+	public AbstractTupleMap(Tuple.@NonNull Of2<? extends K, ? extends V> @NonNull [] entries,
+		                       @SuppressWarnings("UnusedParameters") boolean trusted)
 	{
 		this.size = entries.length;
 		this.entries = (Tuple.Of2<K, V>[]) entries;
 	}
 
-	public AbstractTupleMap(Tuple.Of2<? extends K, ? extends V>[] entries, int size, @SuppressWarnings("UnusedParameters") boolean trusted)
+	public AbstractTupleMap(Tuple.@NonNull Of2<? extends K, ? extends V> @NonNull [] entries, int size,
+		                       @SuppressWarnings("UnusedParameters") boolean trusted)
 	{
 		this.size = size;
 		this.entries = (Tuple.Of2<K, V>[]) entries;
 	}
 
-	public AbstractTupleMap(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public AbstractTupleMap(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		this();
 		this.loadEntries(iterable);
 	}
 
-	public AbstractTupleMap(SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public AbstractTupleMap(@NonNull SizedIterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		this(iterable.size());
 		this.loadEntries(iterable);
 	}
 
-	public AbstractTupleMap(Set<? extends Entry<? extends K, ? extends V>> set)
+	public AbstractTupleMap(@NonNull Set<? extends @NonNull Entry<? extends K, ? extends V>> set)
 	{
 		this(set.size());
 		this.loadDistinctEntries(set);
 	}
 
-	public AbstractTupleMap(Map<? extends K, ? extends V> map)
+	public AbstractTupleMap(@NonNull Map<? extends K, ? extends V> map)
 	{
 		this(map.size());
 		this.loadDistinctEntries(map);
 	}
 
-	public AbstractTupleMap(AbstractTupleMap<? extends K, ? extends V> tupleMap)
+	public AbstractTupleMap(@NonNull AbstractTupleMap<? extends K, ? extends V> tupleMap)
 	{
 		this.size = tupleMap.size;
 		this.entries = (Tuple.Of2<K, V>[]) tupleMap.entries.clone();
 	}
 
-	private void loadEntries(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	private void loadEntries(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		for (Entry<? extends K, ? extends V> entry : iterable)
 		{
@@ -106,7 +112,7 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 		}
 	}
 
-	private void loadDistinctEntries(Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	private void loadDistinctEntries(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		int index = 0;
 		for (Entry<? extends K, ? extends V> entry : iterable)
@@ -128,6 +134,7 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 		return this.size == 0;
 	}
 
+	@NonNull
 	@Override
 	public Iterator<Entry<K, V>> iterator()
 	{
@@ -159,6 +166,7 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 		};
 	}
 
+	@NonNull
 	@Override
 	public Iterator<K> keyIterator()
 	{
@@ -172,6 +180,7 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 				return this.index < AbstractTupleMap.this.size;
 			}
 
+			@NonNull
 			@Override
 			public K next()
 			{
@@ -190,6 +199,7 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 		};
 	}
 
+	@NonNull
 	@Override
 	public Iterator<V> valueIterator()
 	{
@@ -203,6 +213,7 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 				return this.index < AbstractTupleMap.this.size;
 			}
 
+			@NonNull
 			@Override
 			public V next()
 			{
@@ -223,7 +234,7 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 
 	protected abstract void removeAt(int index);
 
-	protected final V putInternal(Tuple.Of2<K, V> tuple)
+	protected final V putInternal(Tuple.@NonNull Of2<K, V> tuple)
 	{
 		K key = tuple._1;
 		for (int i = 0; i < this.size; i++)
@@ -255,7 +266,7 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 	}
 
 	@Override
-	public void forEach(Consumer<? super Entry<K, V>> action)
+	public void forEach(@NonNull Consumer<? super Entry<K, V>> action)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -264,7 +275,7 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 	}
 
 	@Override
-	public void forEach(BiConsumer<? super K, ? super V> action)
+	public void forEach(@NonNull BiConsumer<? super K, ? super V> action)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -274,7 +285,7 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 	}
 
 	@Override
-	public void forEachKey(Consumer<? super K> action)
+	public void forEachKey(@NonNull Consumer<? super K> action)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -283,7 +294,7 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 	}
 
 	@Override
-	public void forEachValue(Consumer<? super V> action)
+	public void forEachValue(@NonNull Consumer<? super V> action)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -292,7 +303,7 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 	}
 
 	@Override
-	public boolean containsKey(Object key)
+	public boolean containsKey(@Nullable Object key)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -306,7 +317,7 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 	}
 
 	@Override
-	public boolean contains(Object key, Object value)
+	public boolean contains(@Nullable Object key, @Nullable Object value)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -323,7 +334,7 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 	}
 
 	@Override
-	public boolean containsValue(Object value)
+	public boolean containsValue(@Nullable Object value)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -343,7 +354,7 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 		return index < 0 ? null : this.entries[index]._2;
 	}
 
-	public int getIndex(Object key)
+	public int getIndex(@Nullable Object key)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -356,8 +367,9 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 		return -1;
 	}
 
+	@NonNull
 	@Override
-	public Option<V> getOption(Object key)
+	public Option<V> getOption(@Nullable Object key)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -371,7 +383,7 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 	}
 
 	@Override
-	public Entry<K, V>[] toArray()
+	public Entry<K, V> @NonNull [] toArray()
 	{
 		final Tuple.Of2<K, V>[] array = (Tuple.Of2<K, V>[]) new Tuple.Of2[this.size];
 		System.arraycopy(this.entries, 0, array, 0, this.size);
@@ -379,13 +391,13 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 	}
 
 	@Override
-	public void toArray(int index, Entry<K, V>[] store)
+	public void toArray(int index, @NonNull Entry<K, V> @NonNull [] store)
 	{
 		System.arraycopy(this.entries, 0, store, index, this.size);
 	}
 
 	@Override
-	public void toKeyArray(int index, Object[] store)
+	public void toKeyArray(int index, Object @NonNull [] store)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -394,7 +406,7 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 	}
 
 	@Override
-	public void toValueArray(int index, Object[] store)
+	public void toValueArray(int index, Object @NonNull [] store)
 	{
 		for (int i = 0; i < this.size; i++)
 		{
@@ -402,24 +414,28 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 		}
 	}
 
+	@NonNull
 	@Override
 	public <RK, RV> MutableMap<RK, RV> emptyCopy()
 	{
 		return new dyvil.collection.mutable.TupleMap<>();
 	}
 
+	@NonNull
 	@Override
 	public <RK, RV> MutableMap<RK, RV> emptyCopy(int capacity)
 	{
 		return new dyvil.collection.mutable.TupleMap<>(capacity);
 	}
 
+	@NonNull
 	@Override
 	public MutableMap<K, V> mutableCopy()
 	{
 		return new dyvil.collection.mutable.TupleMap<>(this);
 	}
 
+	@NonNull
 	@Override
 	public ImmutableMap<K, V> immutableCopy()
 	{
@@ -483,7 +499,7 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 		return Map.mapHashCode(this);
 	}
 
-	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	private void writeObject(java.io.@NonNull ObjectOutputStream out) throws IOException
 	{
 		out.defaultWriteObject();
 
@@ -494,7 +510,7 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 		}
 	}
 
-	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	private void readObject(java.io.@NonNull ObjectInputStream in) throws IOException, ClassNotFoundException
 	{
 		in.defaultReadObject();
 

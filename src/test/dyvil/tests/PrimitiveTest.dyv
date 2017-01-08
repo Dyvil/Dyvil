@@ -1,0 +1,92 @@
+package dyvil.tests
+
+using dyvil.Test
+
+public class PrimitiveTest
+{
+	public static func apply(): Test = test "Primitives" {
+		var z = false
+		var b = 0 as byte
+		var s = 0 as short
+		var c = 0 as char
+		var i = 0
+		var l = 0L
+		var f = 0F
+		var d = 0D
+
+		// Byte
+
+		/*
+		b = s
+		b = c
+		b = i
+		b = l
+		b = f
+		b = d
+		// */
+
+		// Short
+
+		s = b
+		/*
+		s = c
+		s = i
+		s = l
+		s = f
+		s = d
+		// */
+
+		// Char
+
+		c = b
+		c = s
+		/*
+		c = i
+		c = l
+		c = f
+		c = d
+		// */
+
+		// Int
+
+		i = b
+		i = s
+		i = c
+		/*
+		i = l
+		i = f
+		i = d
+		// */
+
+		// Long
+
+		l = b
+		l = s
+		l = c
+		l = i
+		/*
+		l = f
+		l = d
+		// */
+
+		// Float
+
+		f = b
+		f = s
+		f = c
+		f = i
+		/*
+		f = l
+		f = d
+		// */
+
+		// Double
+
+		d = b
+		d = s
+		d = c
+		d = i
+		d = l
+		d = f
+	}
+}

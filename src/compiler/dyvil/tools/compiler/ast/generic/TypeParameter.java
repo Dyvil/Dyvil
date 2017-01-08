@@ -4,6 +4,7 @@ import dyvil.annotation.Reified;
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
+import dyvil.tools.asm.TypePath;
 import dyvil.tools.asm.TypeReference;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
@@ -184,6 +185,12 @@ public abstract class TypeParameter implements ITypeParameter
 	}
 
 	@Override
+	public void addBoundAnnotation(IAnnotation annotation, int index, TypePath typePath)
+	{
+		this.upperBounds[index] = IType.withAnnotation(this.upperBounds[index], annotation, typePath);
+	}
+
+	@Override
 	public IType getErasure()
 	{
 		return this.upperBounds[0];
@@ -232,12 +239,12 @@ public abstract class TypeParameter implements ITypeParameter
 	@Override
 	public boolean isAssignableFrom(IType type, ITypeContext typeContext)
 	{
-		if (!isSuperType(this.getUpperBound().getConcreteType(typeContext), type))
+		if (!Types.isAssignable(this.getUpperBound().getConcreteType(typeContext), type))
 		{
 			return false;
 		}
 		final IType lowerBound = this.getLowerBound();
-		return lowerBound == null || isSuperType(type, lowerBound.getConcreteType(typeContext));
+		return lowerBound == null || Types.isAssignable(type, lowerBound.getConcreteType(typeContext));
 	}
 
 	@Override
@@ -453,7 +460,7 @@ public abstract class TypeParameter implements ITypeParameter
 			final int boundTypeRef = TypeReference.newTypeParameterBoundReference(
 				method ? TypeReference.METHOD_TYPE_PARAMETER_BOUND : TypeReference.CLASS_TYPE_PARAMETER_BOUND,
 				this.index, i);
-			this.upperBounds[i].writeAnnotations(visitor, boundTypeRef, "");
+			IType.writeAnnotations(this.upperBounds[i], visitor, boundTypeRef, "");
 		}
 	}
 

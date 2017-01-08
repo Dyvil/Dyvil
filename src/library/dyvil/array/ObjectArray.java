@@ -4,9 +4,7 @@ import dyvil.annotation.Immutable;
 import dyvil.annotation.Intrinsic;
 import dyvil.annotation.Mutating;
 import dyvil.annotation.Reified;
-import dyvil.annotation.internal.DyvilModifiers;
-import dyvil.annotation.internal.DyvilName;
-import dyvil.annotation.internal.Primitive;
+import dyvil.annotation.internal.*;
 import dyvil.collection.ImmutableList;
 import dyvil.collection.List;
 import dyvil.collection.Range;
@@ -34,17 +32,17 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 		// no instances
 	}
 
-	public static <@Reified(OBJECT_CLASS) T> T[] apply(Class<T> _type)
+	public static <@Reified(OBJECT_CLASS) T> T @NonNull [] apply(Class<T> _type)
 	{
 		return apply(0, _type);
 	}
 
-	public static <@Reified(OBJECT_CLASS) T> T[] apply(int size, Class<T> _type)
+	public static <@Reified(OBJECT_CLASS) T> T @NonNull [] apply(int size, @NonNull Class<T> _type)
 	{
 		return (T[]) Array.newInstance(_type, size);
 	}
 
-	public static <@Reified(OBJECT_CLASS) T> T[] apply(int size, T repeatedValue, Class<T> _type)
+	public static <@Reified(OBJECT_CLASS) T> T @NonNull [] apply(int size, T repeatedValue, @NonNull Class<T> _type)
 	{
 		final T[] array = apply(size, _type);
 		for (int i = 0; i < size; i++)
@@ -54,7 +52,8 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 		return array;
 	}
 
-	public static <@Reified(OBJECT_CLASS) T> T[] apply(int size, Supplier<T> valueSupplier, Class<T> _type)
+	public static <@Reified(OBJECT_CLASS) T> T @NonNull [] apply(int size, @NonNull Supplier<T> valueSupplier,
+		                                                            @NonNull Class<T> _type)
 	{
 		final T[] array = apply(size, _type);
 		for (int i = 0; i < size; i++)
@@ -64,7 +63,8 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 		return array;
 	}
 
-	public static <@Reified(OBJECT_CLASS) T> T[] apply(int size, IntFunction<T> valueMapper, Class<T> _type)
+	public static <@Reified(OBJECT_CLASS) T> T @NonNull [] apply(int size, @NonNull IntFunction<T> valueMapper,
+		                                                            @NonNull Class<T> _type)
 	{
 		final T[] array = apply(size, _type);
 		for (int i = 0; i < size; i++)
@@ -75,19 +75,22 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INLINE)
-	public static <T> T[] apply(T[] array)
+	public static <T> T[] apply(T @NonNull [] array)
 	{
 		return array.clone();
 	}
 
 	@DyvilModifiers(Modifiers.IMPLICIT)
-	public static <@Reified(OBJECT_CLASS) T extends Rangeable<T>> T[] apply(Range<T> range, Class<T> _type)
+	public static <@Reified(OBJECT_CLASS) T extends Rangeable<T>> T @NonNull [] apply(@NonNull Range<T> range,
+		                                                                                 @NonNull Class<T> _type)
 	{
 		return range.toArray(_type);
 	}
 
 	@DyvilName("apply")
-	public static <@Reified(OBJECT_CLASS) T extends Rangeable<T>> T[] rangeClosed(T from, T to, Class<T> _type)
+	public static <@Reified(OBJECT_CLASS) T extends Rangeable<T>> T @NonNull [] rangeClosed(@NonNull T from,
+		                                                                                       @NonNull T to,
+		                                                                                       @NonNull Class<T> _type)
 	{
 		int i = 0;
 		final T[] array = apply(from.distanceTo(to) + 1, _type);
@@ -99,8 +102,9 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilName("apply")
-	public static <@Reified(OBJECT_CLASS) T extends Rangeable<T>> T[] range(T from, T toExclusive,
-		                                                                                  Class<T> _type)
+	public static <@Reified(OBJECT_CLASS) T extends Rangeable<T>> T @NonNull [] range(@NonNull T from,
+		                                                                                 @NonNull T toExclusive,
+		                                                                                 @NonNull Class<T> _type)
 	{
 		int i = 0;
 		final T[] array = apply(from.distanceTo(toExclusive), _type);
@@ -113,21 +117,21 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 
 	@Intrinsic( { LOAD_0, ARRAYLENGTH })
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> int length(T[] array)
+	public static <T> int length(T @NonNull [] array)
 	{
 		return array.length;
 	}
 
 	@Intrinsic( { LOAD_0, ARRAYLENGTH })
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> int size(T[] array)
+	public static <T> int size(T @NonNull [] array)
 	{
 		return array.length;
 	}
 
 	@Intrinsic( { LOAD_0, ARRAYLENGTH, EQ0 })
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> boolean isEmpty(T[] array)
+	public static <T> boolean isEmpty(T @NonNull [] array)
 	{
 		return array.length == 0;
 	}
@@ -140,7 +144,7 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> T[] subscript(T[] array, Range<@Primitive Integer> range)
+	public static <T> T @NonNull [] subscript(T @NonNull [] array, @NonNull Range<@Primitive Integer> range)
 	{
 		final int size = range.size();
 		final T[] result = apply(size, getComponentType(array));
@@ -151,27 +155,28 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	@Intrinsic( { LOAD_0, LOAD_1, LOAD_2, AASTORE })
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	public static <T> void subscript_$eq(T[] array, int index, T newValue)
+	public static <T> void subscript_$eq(T @NonNull [] array, int index, T newValue)
 	{
 		array[index] = newValue;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	public static <T> void subscript_$eq(T[] array, Range<@Primitive Integer> range, T[] newValues)
+	public static <T> void subscript_$eq(T @NonNull [] array, @NonNull Range<@Primitive Integer> range,
+		                                    T @NonNull [] newValues)
 	{
 		System.arraycopy(newValues, 0, array, range.first(), range.size());
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
 	@Mutating
-	public static <T> ObjectRef<T> subscript_$amp(T[] array, int index)
+	public static <T> ObjectRef<T> subscript_$amp(T @NonNull [] array, int index)
 	{
 		return new ObjectArrayRef<>(array, index);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> void forEach(T[] array, Consumer<? super T> action)
+	public static <T> void forEach(T @NonNull [] array, @NonNull Consumer<? super T> action)
 	{
 		for (T v : array)
 		{
@@ -182,19 +187,19 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	// Operators
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static <T> boolean $eq$eq(T[] array1, T[] array2)
+	public static <T> boolean $eq$eq(T @NonNull [] array1, T @NonNull [] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static <T> boolean $bang$eq(T[] array1, T[] array2)
+	public static <T> boolean $bang$eq(T @NonNull [] array1, T @NonNull [] array2)
 	{
 		return !Arrays.equals(array1, array2);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> T[] added(T[] array, T value)
+	public static <T> T @NonNull [] added(T @NonNull [] array, T value)
 	{
 		final int len = array.length;
 		final T[] res = apply(len + 1, getComponentType(array));
@@ -204,7 +209,7 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> T[] union(T[] array1, T[] array2)
+	public static <T> T @NonNull [] union(T @NonNull [] array1, T @NonNull [] array2)
 	{
 		final int len1 = array1.length;
 		final int len2 = array2.length;
@@ -215,7 +220,7 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> T[] removed(T[] array, T value)
+	public static <T> T @NonNull [] removed(T @NonNull [] array, T value)
 	{
 		int newSize = array.length;
 
@@ -242,7 +247,7 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> T[] difference(T[] array1, T[] array2)
+	public static <T> T @NonNull [] difference(T @NonNull [] array1, T @NonNull [] array2)
 	{
 		int index = 0;
 		// We can safely use clone here because no data will be leaked
@@ -261,7 +266,7 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> T[] intersection(T[] array1, T[] array2)
+	public static <T> T @NonNull [] intersection(T @NonNull [] array1, T @NonNull [] array2)
 	{
 		int index = 0;
 		// We can safely use clone here because no data will be leaked
@@ -280,7 +285,9 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T, @Reified(OBJECT_CLASS) U> U[] mapped(T[] array, Function<? super T, ? extends U> mapper, Class<U> _type)
+	public static <T, @Reified(OBJECT_CLASS) U> U @NonNull [] mapped(T @NonNull [] array,
+		                                                                @NonNull Function<? super T, ? extends U> mapper,
+		                                                                @NonNull Class<U> _type)
 	{
 		final int len = array.length;
 		final U[] res = apply(len, _type);
@@ -292,7 +299,9 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T, @Reified(OBJECT_CLASS) U> U[] flatMapped(T[] array, Function<? super T, ? extends Iterable<? extends U>> mapper, Class<U> _type)
+	public static <T, @Reified(OBJECT_CLASS) U> U @NonNull [] flatMapped(T @NonNull [] array,
+		                                                                    @NonNull Function<? super T, ? extends @NonNull Iterable<? extends U>> mapper,
+		                                                                    @NonNull Class<U> _type)
 	{
 		final List<U> list = new dyvil.collection.mutable.ArrayList<>(array.length << 2);
 
@@ -305,7 +314,7 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> T[] flatten(T[][] array)
+	public static <T> T @NonNull [] flatten(T @NonNull [] @NonNull [] array)
 	{
 		int size = 0;
 		for (T[] nested : array)
@@ -327,7 +336,7 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> T[] filtered(T[] array, Predicate<T> condition)
+	public static <T> T @NonNull [] filtered(T @NonNull [] array, @NonNull Predicate<? super T> condition)
 	{
 		int index = 0;
 		// We can safely use clone here because no data will be leaked
@@ -346,7 +355,7 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> T[] sorted(T[] array)
+	public static <T> T @NonNull [] sorted(T @NonNull [] array)
 	{
 		final T[] res = array.clone();
 		Arrays.sort(res);
@@ -354,7 +363,7 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> T[] sorted(T[] array, Comparator<? super T> comparator)
+	public static <T> T @NonNull [] sorted(T @NonNull [] array, Comparator<? super T> comparator)
 	{
 		final T[] res = array.clone();
 		Arrays.sort(array, comparator);
@@ -362,13 +371,13 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static <T> Class<T> getComponentType(T[] array)
+	public static <T> @NonNull Class<T> getComponentType(T @NonNull [] array)
 	{
 		return (Class<T>) array.getClass().getComponentType();
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> Class<?> getDeepComponentType(T[] array)
+	public static <T> @NonNull Class<?> getDeepComponentType(T @NonNull [] array)
 	{
 		Class<?> ret = array.getClass();
 		while (true)
@@ -383,7 +392,7 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> Class<T[]> getArrayType(Class<T> componentType)
+	public static <T> @NonNull Class<T @NonNull []> getArrayType(@NonNull Class<T> componentType)
 	{
 		return (Class<T[]>) apply(componentType).getClass();
 	}
@@ -391,19 +400,19 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	// Search Operations
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static <T> boolean contains(T[] array, T value)
+	public static <T> boolean contains(T @NonNull [] array, T value)
 	{
 		return indexOf(array, value, 0) > 0;
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> int indexOf(T[] array, T value)
+	public static <T> int indexOf(T @NonNull [] array, T value)
 	{
 		return indexOf(array, value, 0);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> int indexOf(T[] array, T value, int startIndex)
+	public static <T> int indexOf(T @NonNull [] array, T value, int startIndex)
 	{
 		for (; startIndex < array.length; startIndex++)
 		{
@@ -416,13 +425,13 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> int lastIndexOf(T[] array, T value)
+	public static <T> int lastIndexOf(T @NonNull [] array, T value)
 	{
 		return lastIndexOf(array, value, array.length - 1);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> int lastIndexOf(T[] array, T value, int startIndex)
+	public static <T> int lastIndexOf(T @NonNull [] array, T value, int startIndex)
 	{
 		for (; startIndex >= 0; startIndex--)
 		{
@@ -437,19 +446,20 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	// Copying
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> T[] copy(T[] array)
+	public static <T> T @NonNull [] copy(T @NonNull [] array)
 	{
 		return array.clone();
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> T[] copy(T[] array, int newLength)
+	public static <T> T @NonNull [] copy(T @NonNull [] array, int newLength)
 	{
 		return copyAs(array, newLength, (Class<T>) array.getClass().getComponentType());
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <@Reified(OBJECT_CLASS) N, T extends N> N[] copyAs(T[] array, int newSize, Class<N> type)
+	public static <@Reified(OBJECT_CLASS) N, T extends N> N @NonNull [] copyAs(T @NonNull [] array, int newSize,
+		                                                                          @NonNull Class<N> type)
 	{
 		final N[] newArray = apply(newSize, type);
 		System.arraycopy(array, 0, newArray, 0, newSize);
@@ -457,19 +467,19 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
-	public static <T> Iterable<T> asIterable(T[] array)
+	public static <T> @NonNull Iterable<T> asIterable(T @NonNull [] array)
 	{
 		return asList(array);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.IMPLICIT)
-	public static <T> ImmutableList<T> asList(T @Immutable [] array)
+	public static <T> @NonNull ImmutableList<T> asList(T @NonNull @Immutable [] array)
 	{
 		return new ArrayList<>(array, true);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> ImmutableList<T> toList(T[] array)
+	public static <T> @NonNull ImmutableList<T> toList(T @NonNull [] array)
 	{
 		return new ArrayList<>(array);
 	}
@@ -477,37 +487,32 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	// toString, equals and hashCode
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static <T> boolean equals(T[] array1, T[] array2)
+	public static <T> boolean equals(T @NonNull [] array1, T @NonNull [] array2)
 	{
 		return Arrays.equals(array1, array2);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static <T> boolean deepEquals(T[] array1, T[] array2)
+	public static <T> boolean deepEquals(T @NonNull [] array1, T @NonNull [] array2)
 	{
 		return Arrays.deepEquals(array1, array2);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static <T> int hashCode(T[] array)
+	public static int hashCode(Object @NonNull [] array)
 	{
 		return Arrays.hashCode(array);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
-	public static <T> int deepHashCode(T[] array)
+	public static int deepHashCode(Object @NonNull [] array)
 	{
 		return Arrays.deepHashCode(array);
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static <T> String toString(T[] array)
+	public static @NonNull String toString(Object @NonNull [] array)
 	{
-		if (array == null)
-		{
-			return "null";
-		}
-
 		final int size = array.length;
 		if (size <= 0)
 		{
@@ -520,14 +525,8 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static void toString(Object[] array, StringBuilder builder)
+	public static void toString(Object @NonNull [] array, @NonNull StringBuilder builder)
 	{
-		if (array == null)
-		{
-			builder.append("null");
-			return;
-		}
-
 		final int len = array.length;
 		if (len <= 0)
 		{
@@ -538,7 +537,7 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 		append(array, len, builder);
 	}
 
-	private static void append(Object[] array, int size, StringBuilder builder)
+	private static void append(Object @NonNull [] array, int size, @NonNull StringBuilder builder)
 	{
 		builder.append('[').append(array[0]);
 		for (int i = 1; i < size; i++)
@@ -550,13 +549,8 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static String deepToString(Object[] array)
+	public static @NonNull String deepToString(Object @NonNull [] array)
 	{
-		if (array == null)
-		{
-			return "null";
-		}
-
 		final int size = array.length;
 		if (size <= 0)
 		{
@@ -569,14 +563,8 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static void deepToString(Object[] array, StringBuilder builder)
+	public static void deepToString(Object @NonNull [] array, @NonNull StringBuilder builder)
 	{
-		if (array == null)
-		{
-			builder.append("null");
-			return;
-		}
-
 		final int size = array.length;
 		if (size <= 0)
 		{
@@ -587,7 +575,7 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 		deepAppend(array, size, builder);
 	}
 
-	private static void deepAppend(Object[] array, int size, StringBuilder builder)
+	private static void deepAppend(Object @NonNull [] array, int size, @NonNull StringBuilder builder)
 	{
 		builder.append('[');
 		deepToString(array[0], builder);
@@ -600,7 +588,56 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static void deepToString(Object object, StringBuilder builder)
+	public static String deepToString(Object object)
+	{
+		if (object == null)
+		{
+			return "null";
+		}
+
+		final Class objectClass = object.getClass();
+		if (!objectClass.isArray())
+		{
+			return object.toString();
+		}
+
+		if (objectClass == boolean[].class)
+		{
+			return BooleanArray.toString((boolean[]) object);
+		}
+		if (objectClass == byte[].class)
+		{
+			return ByteArray.toString((byte[]) object);
+		}
+		if (objectClass == short[].class)
+		{
+			return ShortArray.toString((short[]) object);
+		}
+		if (objectClass == char[].class)
+		{
+			return CharArray.toString((char[]) object);
+		}
+		if (objectClass == int[].class)
+		{
+			return IntArray.toString((int[]) object);
+		}
+		if (objectClass == long[].class)
+		{
+			return LongArray.toString((long[]) object);
+		}
+		if (objectClass == float[].class)
+		{
+			return FloatArray.toString((float[]) object);
+		}
+		if (objectClass == double[].class)
+		{
+			return DoubleArray.toString((double[]) object);
+		}
+		return deepToString((Object[]) object);
+	}
+
+	@DyvilModifiers(Modifiers.INFIX)
+	public static void deepToString(Object object, @NonNull StringBuilder builder)
 	{
 		if (object == null)
 		{
@@ -609,6 +646,12 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 		}
 
 		final Class objectClass = object.getClass();
+		if (!objectClass.isArray())
+		{
+			builder.append(object.toString());
+			return;
+		}
+
 		if (objectClass == boolean[].class)
 		{
 			BooleanArray.toString((boolean[]) object, builder);
@@ -649,12 +692,7 @@ public abstract class ObjectArray extends PrimitiveObjectArray
 			DoubleArray.toString((double[]) object, builder);
 			return;
 		}
-		if (objectClass.isArray())
-		{
-			deepToString((Object[]) object, builder);
-			return;
-		}
 
-		builder.append(object.toString());
+		deepToString((Object[]) object, builder);
 	}
 }

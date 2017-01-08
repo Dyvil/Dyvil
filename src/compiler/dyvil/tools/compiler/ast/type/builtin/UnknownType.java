@@ -62,12 +62,6 @@ public class UnknownType implements IUnresolvedType
 	}
 
 	@Override
-	public IType clone()
-	{
-		return this;
-	}
-
-	@Override
 	public void read(DataInput in) throws IOException
 	{
 	}

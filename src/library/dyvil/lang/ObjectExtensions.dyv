@@ -26,26 +26,29 @@ public final class ObjectExtensions
 
 	public static infix inline R run<T, R>(T self, T.() -> R f) = f(self)
 
-	public static infix inline T use<T>(T self, T.() -> void f) = self.{ f $0; $0 }
+	public static infix inline T use<T>(T self, T.() -> void f) { f self; self }
 
 	public static inline R with<T, R>(T receiver, T -> R f) = f(receiver)
 
 	// Object Extensions
 
 	// Structural Equality (equals)
-	public infix func ==(Object lhs, Object rhs): boolean = lhs == null ? rhs == null : lhs.equals(rhs)
+	@Intrinsic([ LOAD_0, LOAD_1, INVOKEVIRTUAL, 0, 1, 2 ]
+	  strings: [ "java/lang/Object", "equals", "(Ljava/lang/Object;)Z" ])
+	public infix func ==(Object lhs, Object! rhs): boolean = lhs.equals(rhs)
 
 	// Reference Equality
 	@Intrinsic([ LOAD_0, LOAD_1, ACMPEQ ])
-	public infix func ===(Object lhs, Object rhs): boolean = lhs === rhs
+	public infix func ===(Object! lhs, Object! rhs): boolean = lhs === rhs
 
 	// Structural Inequality (!equals)
-	@Intrinsic(value: [ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2, BNOT ], strings: [ "dyvil/lang/ObjectExtensions", "$eq$eq", "(Ljava/lang/Object;Ljava/lang/Object;)Z" ])
-	public infix func !=(Object lhs, Object rhs): boolean = !(lhs == rhs)
+	@Intrinsic([ LOAD_0, LOAD_1, INVOKEVIRTUAL, 0, 1, 2, BNOT ]
+	  strings: [ "java/lang/Object", "equals", "(Ljava/lang/Object;)Z" ])
+	public infix func !=(Object lhs, Object! rhs): boolean = !lhs.equals(rhs)
 
 	// Reference Inequality
 	@Intrinsic([ LOAD_0, LOAD_1, ACMPNE ])
-	public infix func !==(Object lhs, Object rhs): boolean = lhs !== rhs
+	public infix func !==(Object! lhs, Object! rhs): boolean = lhs !== rhs
 
 	// Comparable
 

@@ -1,6 +1,7 @@
 package dyvil.math;
 
 import dyvil.annotation.internal.DyvilModifiers;
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
 
 /**
@@ -110,7 +111,7 @@ public final class MathUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int min(int... ints)
+	public static int min(@NonNull int... ints)
 	{
 		int min = Integer.MAX_VALUE;
 		for (int i : ints)
@@ -124,7 +125,7 @@ public final class MathUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static long min(long... longs)
+	public static long min(@NonNull long... longs)
 	{
 		long min = Long.MAX_VALUE;
 		for (long i : longs)
@@ -138,7 +139,7 @@ public final class MathUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static float min(float... floats)
+	public static float min(@NonNull float... floats)
 	{
 		float min = Float.POSITIVE_INFINITY;
 		for (float i : floats)
@@ -152,7 +153,7 @@ public final class MathUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static double min(double... doubles)
+	public static double min(@NonNull double... doubles)
 	{
 		double min = Double.NEGATIVE_INFINITY;
 		for (double i : doubles)
@@ -190,7 +191,7 @@ public final class MathUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int max(int... ints)
+	public static int max(@NonNull int... ints)
 	{
 		int max = Integer.MIN_VALUE;
 		for (int i : ints)
@@ -204,7 +205,7 @@ public final class MathUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static long max(long... longs)
+	public static long max(@NonNull long... longs)
 	{
 		long max = Long.MIN_VALUE;
 		for (long i : longs)
@@ -218,7 +219,7 @@ public final class MathUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static float max(float... floats)
+	public static float max(@NonNull float... floats)
 	{
 		float max = Float.NEGATIVE_INFINITY;
 		for (float i : floats)
@@ -232,7 +233,7 @@ public final class MathUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static double max(double... doubles)
+	public static double max(@NonNull double... doubles)
 	{
 		double max = Double.NEGATIVE_INFINITY;
 		for (double i : doubles)
@@ -748,7 +749,7 @@ public final class MathUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static int sum(int... ints)
+	public static int sum(@NonNull int... ints)
 	{
 		int total = 0;
 		for (int i : ints)
@@ -759,7 +760,7 @@ public final class MathUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static long sum(long... longs)
+	public static long sum(@NonNull long... longs)
 	{
 		long total = 0L;
 		for (long l : longs)
@@ -770,7 +771,7 @@ public final class MathUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static float sum(float... floats)
+	public static float sum(@NonNull float... floats)
 	{
 		float total = 0L;
 		for (float f : floats)
@@ -781,7 +782,7 @@ public final class MathUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static double sum(double... doubles)
+	public static double sum(@NonNull double... doubles)
 	{
 		double total = 0L;
 		for (double d : doubles)
@@ -792,7 +793,7 @@ public final class MathUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static float average(int... ints)
+	public static float average(@NonNull int... ints)
 	{
 		int total = 0;
 		for (int i : ints)
@@ -803,7 +804,7 @@ public final class MathUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static double average(long... longs)
+	public static double average(@NonNull long... longs)
 	{
 		long total = 0L;
 		for (long l : longs)
@@ -814,7 +815,7 @@ public final class MathUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static float average(float... floats)
+	public static float average(@NonNull float... floats)
 	{
 		float total = 0L;
 		for (float f : floats)
@@ -825,7 +826,7 @@ public final class MathUtils
 	}
 
 	@DyvilModifiers(Modifiers.INFIX)
-	public static double average(double... doubles)
+	public static double average(@NonNull double... doubles)
 	{
 		double total = 0L;
 		for (double d : doubles)

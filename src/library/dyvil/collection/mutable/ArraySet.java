@@ -1,9 +1,7 @@
 package dyvil.collection.mutable;
 
-import dyvil.collection.Collection;
-import dyvil.collection.ImmutableSet;
-import dyvil.collection.MutableSet;
-import dyvil.collection.Set;
+import dyvil.annotation.internal.NonNull;
+import dyvil.collection.*;
 import dyvil.collection.impl.AbstractArraySet;
 import dyvil.lang.LiteralConvertible;
 
@@ -18,38 +16,45 @@ public class ArraySet<E> extends AbstractArraySet<E> implements MutableSet<E>
 
 	// Factory Methods
 
+	@NonNull
 	public static <E> ArraySet<E> apply()
 	{
 		return new ArraySet<>();
 	}
 
+	@NonNull
 	@SafeVarargs
-	public static <E> ArraySet<E> apply(E... elements)
+	public static <E> ArraySet<E> apply(@NonNull E... elements)
 	{
 		return new ArraySet<>(elements, true);
 	}
 
+	@NonNull
 	public static <E> ArraySet<E> from(E[] array)
 	{
 		return new ArraySet<>(array);
 	}
 
-	public static <E> ArraySet<E> from(Iterable<? extends E> iterable)
+	@NonNull
+	public static <E> ArraySet<E> from(@NonNull Iterable<? extends E> iterable)
 	{
 		return new ArraySet<>(iterable);
 	}
 
-	public static <E> ArraySet<E> from(Collection<? extends E> collection)
+	@NonNull
+	public static <E> ArraySet<E> from(@NonNull Collection<? extends E> collection)
 	{
 		return new ArraySet<>(collection);
 	}
 
-	public static <E> ArraySet<E> from(Set<? extends E> set)
+	@NonNull
+	public static <E> ArraySet<E> from(@NonNull Set<? extends E> set)
 	{
 		return new ArraySet<>(set);
 	}
 
-	public static <E> ArraySet<E> from(AbstractArraySet<? extends E> arraySet)
+	@NonNull
+	public static <E> ArraySet<E> from(@NonNull AbstractArraySet<? extends E> arraySet)
 	{
 		return new ArraySet<>(arraySet);
 	}
@@ -71,12 +76,12 @@ public class ArraySet<E> extends AbstractArraySet<E> implements MutableSet<E>
 		super(elements);
 	}
 
-	public ArraySet(E[] elements, int size)
+	public ArraySet(E @NonNull [] elements, int size)
 	{
 		super(elements, size);
 	}
 
-	public ArraySet(E[] elements, boolean trusted)
+	public ArraySet(E @NonNull [] elements, boolean trusted)
 	{
 		super(elements, trusted);
 	}
@@ -86,22 +91,22 @@ public class ArraySet<E> extends AbstractArraySet<E> implements MutableSet<E>
 		super(elements, size, trusted);
 	}
 
-	public ArraySet(Iterable<? extends E> iterable)
+	public ArraySet(@NonNull Iterable<? extends E> iterable)
 	{
 		super(iterable);
 	}
 
-	public ArraySet(Collection<? extends E> collection)
+	public ArraySet(@NonNull Collection<? extends E> collection)
 	{
 		super(collection);
 	}
 
-	public ArraySet(Set<? extends E> set)
+	public ArraySet(@NonNull Set<? extends E> set)
 	{
 		super(set);
 	}
 
-	public ArraySet(AbstractArraySet<? extends E> arraySet)
+	public ArraySet(@NonNull AbstractArraySet<? extends E> arraySet)
 	{
 		super(arraySet);
 	}
@@ -150,23 +155,25 @@ public class ArraySet<E> extends AbstractArraySet<E> implements MutableSet<E>
 	}
 
 	@Override
-	public void map(Function<? super E, ? extends E> mapper)
+	public void map(@NonNull Function<? super E, ? extends E> mapper)
 	{
 		this.mapImpl(mapper);
 	}
 
 	@Override
-	public void flatMap(Function<? super E, ? extends Iterable<? extends E>> mapper)
+	public void flatMap(@NonNull Function<? super E, ? extends @NonNull Iterable<? extends E>> mapper)
 	{
 		this.flatMapImpl(mapper);
 	}
 
+	@NonNull
 	@Override
 	public MutableSet<E> copy()
 	{
 		return this.mutableCopy();
 	}
 
+	@NonNull
 	@Override
 	public ImmutableSet<E> immutable()
 	{

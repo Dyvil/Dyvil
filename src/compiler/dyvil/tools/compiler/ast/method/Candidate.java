@@ -1,13 +1,13 @@
 package dyvil.tools.compiler.ast.method;
 
-import dyvil.annotation.analysis.NotNull;
+import dyvil.annotation.internal.NonNull;
 import dyvil.array.IntArray;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.util.MemberSorter;
 
 import java.util.Arrays;
 
-public final class Candidate<T extends ICallableSignature> implements Comparable<Candidate<T>>
+public final class Candidate<T extends ICallableMember> implements Comparable<Candidate<T>>
 {
 	protected final T       member;
 	protected final int[]   values;
@@ -61,7 +61,7 @@ public final class Candidate<T extends ICallableSignature> implements Comparable
 	}
 
 	@Override
-	public int compareTo(@NotNull Candidate<T> o)
+	public int compareTo(@NonNull Candidate<T> o)
 	{
 		int better = 0;
 		int worse = 0;
