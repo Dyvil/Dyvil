@@ -23,7 +23,7 @@ public abstract class Optionals
 	 * `NullPointerException` is thrown.
 	 */
 	@Intrinsic([ LOAD_0, DUP, INVOKESTATIC, 0, 1, 2 ]
-	  strings: [ "dyvil/lang/ObjectExtensions", "unwrapNullCheck", "(Ljava/lang/Object;)V" ])
+	  strings: [ "dyvil/lang/Optionals", "unwrapNullCheck", "(Ljava/lang/Object;)V" ])
 	public postfix func ! <T>(T? optional): T = optional!
 
 	/**
