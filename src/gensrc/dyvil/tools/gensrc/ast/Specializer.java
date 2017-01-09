@@ -57,6 +57,7 @@ public class Specializer
 			final int directiveStart = hashIndex + 1;
 			final int directiveEnd = findIdentifierEnd(line, directiveStart, length);
 			final String directive = line.substring(directiveStart, directiveEnd);
+			boolean local = false;
 			switch (directive)
 			{
 			case "if":
@@ -165,10 +166,12 @@ public class Specializer
 				continue;
 			case "comment":
 				continue;
-			case "define": // define in file scope
 			case "local": // define in local scope
+				local = true;
+				// Fallthrough
+			case "define": // define in file scope
 			{
-				if (!processOuter || !ifCondition)
+					if (!processOuter || !ifCondition)
 				{
 					continue;
 				}
@@ -180,18 +183,18 @@ public class Specializer
 					continue;
 				}
 
-				final int valueStart = skipWhitespace(line, keyEnd, length);
-
 				final String key = line.substring(keyStart, keyEnd);
-				final String value = line.substring(valueStart, length);
-				final LazyReplacementMap map = directive.equals("local") ? replacements : this.replacements;
+				final String value = getProcessedArgument(line, keyEnd, length, replacements);
+				final LazyReplacementMap map = local ? replacements : this.replacements;
 
 				map.define(key, value);
 				continue;
 			}
-			case "undef":
-			case "undefine": // undefine in file scope
 			case "delete": // undefine in local scope
+				local = true;
+				// Fallthrough
+			case "undefine": // undefine in file scope
+			case "undef":
 			{
 				if (!processOuter || !ifCondition)
 				{
@@ -200,7 +203,7 @@ public class Specializer
 				final String key = parseIdentifier(line, directiveEnd, length);
 				if (!key.isEmpty()) // missing key
 				{
-					final LazyReplacementMap map = directive.equals("delete") ? replacements : this.replacements;
+					final LazyReplacementMap map = local ? replacements : this.replacements;
 					map.undefine(key);
 				}
 				continue;
@@ -308,7 +311,7 @@ public class Specializer
 	{
 		if (start == end)
 		{
-			return line;
+			return "";
 		}
 
 		final StringBuilder builder = new StringBuilder(end - start);
