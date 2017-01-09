@@ -5,7 +5,7 @@ package dyvil.ref.array
 
 import dyvil.ref.TYPE_NAME##Ref
 
-#if IS_GENERIC
+#if IS_OBJECT
 public class TYPE_NAME##ArrayRef<type T>
 #else
 public class TYPE_NAME##ArrayRef

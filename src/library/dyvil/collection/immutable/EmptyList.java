@@ -244,7 +244,7 @@ public final class EmptyList<E> implements ImmutableList<E>
 	@Override
 	public E @NonNull [] toArray(@NonNull Class<E> type)
 	{
-		return (E[]) ObjectArray.EMPTY;
+		return ObjectArray.ofType(0, type);
 	}
 
 	@Override

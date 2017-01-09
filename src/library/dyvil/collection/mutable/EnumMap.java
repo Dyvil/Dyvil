@@ -56,7 +56,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	}
 
 	@NonNull
-	public static <K extends Enum<K>, V> EnumMap<K, V> from(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> map)
+	public static <K extends Enum<K>, V> EnumMap<K, V> from(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> map)
 	{
 		return new EnumMap<>(map);
 	}
@@ -88,7 +88,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 		super(entries);
 	}
 
-	public EnumMap(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> map)
+	public EnumMap(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> map)
 	{
 		super(map);
 	}
@@ -277,7 +277,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 
 	@NonNull
 	@Override
-	public <U, R> MutableMap<U, R> entryMapped(@NonNull BiFunction<? super K, ? super V, ? extends Entry<? extends U, ? extends R>> mapper)
+	public <U, R> MutableMap<U, R> entryMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Entry<? extends U, ? extends R>> mapper)
 	{
 		MutableMap<U, R> map = new ArrayMap<>(this.size);
 		int len = this.values.length;
@@ -297,7 +297,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	}
 
 	@Override
-	public <U, R> MutableMap<U, R> flatMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends Entry<? extends U, ? extends R>>> mapper)
+	public <U, R> MutableMap<U, R> flatMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends @NonNull Entry<? extends U, ? extends R>>> mapper)
 	{
 		MutableMap<U, R> map = MutableMap.withCapacity(this.size << 2);
 		int len = this.values.length;

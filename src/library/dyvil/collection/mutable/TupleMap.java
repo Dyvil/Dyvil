@@ -61,19 +61,19 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements MutableMap
 	}
 
 	@NonNull
-	public static <K, V> TupleMap<K, V> from(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public static <K, V> TupleMap<K, V> from(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		return new TupleMap<>(iterable);
 	}
 
 	@NonNull
-	public static <K, V> TupleMap<K, V> from(@NonNull SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public static <K, V> TupleMap<K, V> from(@NonNull SizedIterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		return new TupleMap<>(iterable);
 	}
 
 	@NonNull
-	public static <K, V> TupleMap<K, V> from(@NonNull Set<? extends Entry<? extends K, ? extends V>> set)
+	public static <K, V> TupleMap<K, V> from(@NonNull Set<? extends @NonNull Entry<? extends K, ? extends V>> set)
 	{
 		return new TupleMap<>(set);
 	}
@@ -127,17 +127,17 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements MutableMap
 		super(entries, size, trusted);
 	}
 
-	public TupleMap(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public TupleMap(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		super(iterable);
 	}
 
-	public TupleMap(@NonNull SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public TupleMap(@NonNull SizedIterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		super(iterable);
 	}
 
-	public TupleMap(@NonNull Set<? extends Entry<? extends K, ? extends V>> set)
+	public TupleMap(@NonNull Set<? extends @NonNull Entry<? extends K, ? extends V>> set)
 	{
 		super(set);
 	}

@@ -147,7 +147,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		}
 	}
 
-	public AbstractEnumMap(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> map)
+	public AbstractEnumMap(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> map)
 	{
 		this(getKeyType(map));
 
@@ -188,7 +188,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		throw new IllegalArgumentException("Invalid Enum Map - Could not get Enum type");
 	}
 
-	protected static <K extends Enum<K>> Class<K> getKeyType(@NonNull Iterable<? extends Entry<? extends K, ?>> iterable)
+	protected static <K extends Enum<K>> Class<K> getKeyType(@NonNull Iterable<? extends @NonNull Entry<? extends K, ?>> iterable)
 	{
 		for (Entry<? extends K, ?> entry : iterable)
 		{
@@ -212,7 +212,7 @@ public abstract class AbstractEnumMap<K extends Enum<K>, V> implements Map<K, V>
 		this.values[index] = value;
 	}
 
-	private void putAllInternal(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> map)
+	private void putAllInternal(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> map)
 	{
 		for (Entry<? extends K, ? extends V> entry : map)
 		{

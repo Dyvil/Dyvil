@@ -140,7 +140,7 @@ public final class EmptySet<E> implements ImmutableSet<E>
 	}
 
 	@Override
-	public Object[] toArray()
+	public Object @NonNull [] toArray()
 	{
 		return ObjectArray.EMPTY;
 	}
@@ -148,7 +148,7 @@ public final class EmptySet<E> implements ImmutableSet<E>
 	@Override
 	public E @NonNull [] toArray(@NonNull Class<E> type)
 	{
-		return (E[]) ObjectArray.EMPTY;
+		return ObjectArray.ofType(0, type);
 	}
 
 	@Override
@@ -184,13 +184,13 @@ public final class EmptySet<E> implements ImmutableSet<E>
 	}
 
 	@Override
-	public <RE> Builder<RE> immutableBuilder()
+	public <RE> @NonNull Builder<RE> immutableBuilder()
 	{
 		return ImmutableSet.builder();
 	}
 
 	@Override
-	public <RE> Builder<RE> immutableBuilder(int capacity)
+	public <RE> @NonNull Builder<RE> immutableBuilder(int capacity)
 	{
 		return ImmutableSet.builder(capacity);
 	}

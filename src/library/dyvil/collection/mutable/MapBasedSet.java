@@ -177,7 +177,7 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 	public boolean retainAll(@NonNull Collection<? extends E> collection)
 	{
 		boolean removed = false;
-		Iterator<? extends Entry<E, ?>> iterator = this.map.iterator();
+		Iterator<? extends @NonNull Entry<E, ?>> iterator = this.map.iterator();
 		while (iterator.hasNext())
 		{
 			E element = iterator.next().getKey();

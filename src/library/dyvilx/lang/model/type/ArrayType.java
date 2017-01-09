@@ -1,7 +1,7 @@
 package dyvilx.lang.model.type;
 
 import dyvil.annotation.internal.ClassParameters;
-import dyvil.array.ObjectArray;
+import dyvil.lang.ClassExtensions;
 import dyvil.lang.LiteralConvertible;
 
 @LiteralConvertible.FromType
@@ -23,7 +23,7 @@ public class ArrayType<T> implements Type<T[]>
 	@Override
 	public Class<T[]> erasure()
 	{
-		return (Class<T[]>) ObjectArray.getArrayType(this.componentType.erasure());
+		return ClassExtensions.arrayType(this.componentType.erasure());
 	}
 
 	@Override
@@ -32,6 +32,7 @@ public class ArrayType<T> implements Type<T[]>
 		return 1;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Type<T[]> typeArgument(int index)
 	{
