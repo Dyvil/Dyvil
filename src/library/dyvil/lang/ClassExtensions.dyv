@@ -1,0 +1,46 @@
+package dyvil.lang
+
+import dyvilx.LangModel
+import const dyvil.annotation.Reified.Type._
+
+public abstract class ClassExtensions
+{
+	private init()
+	{
+		// no instances
+	}
+
+	// Value to Type / Class Conversions
+
+	public postfix func staticClass<@Reified(ANY_CLASS) T>(T value): Class<T> = class T
+
+	public postfix func staticType<@Reified(TYPE) T>(T value): Type<T> = type T
+
+	public postfix func dynamicClass<T>(T value): Class<+T> = value.getClass as Class<T>
+
+	// Class Extensions
+
+	public static func arrayType<@Reified(OBJECT_CLASS) T>(): Class<[T]> = Class.forName('[L' + class<T>.getName + ';')
+
+	@BytecodeName("getArrayType")
+	public postfix func arrayType<T>(Class<T> componentType): Class<_>
+	{
+		let builder = new StringBuilder().append '['
+
+		if (componentType.isPrimitive)
+		{
+			let primitive = dyvilx.lang.model.`type`.PrimitiveType(componentType)
+			primitive.appendSignature(builder)
+		}
+		else if (componentType.isArray)
+		{
+			builder.append(componentType.getName)
+		}
+		else
+		{
+			builder.append('L').append(componentType.getName).append(';')
+		}
+
+		return Class.forName(builder.toString, false, componentType.getClassLoader)
+	}
+}

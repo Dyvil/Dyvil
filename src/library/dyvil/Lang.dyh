@@ -31,10 +31,11 @@ import java.lang._
 using dyvil.lang.{
 	Primitives._
 	Output._
+	Optionals._
 	Assert._
 	ObjectExtensions._
 	StringExtensions._
-	Optionals._
+	ClassExtensions._
 	Misc._
 }
 
