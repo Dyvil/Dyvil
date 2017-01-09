@@ -88,8 +88,8 @@ public class MapValue(
 			return
 		}
 
-		let keys = this.entries.toKeyArray(class Value)
-		let values = this.entries.toValueArray(class Value)
+		let keys: [Value] = this.entries.toKeyArray(class Value)
+		let values: [Value] = this.entries.toValueArray(class Value)
 		
 		let indent1 = indent + "\t"
 		

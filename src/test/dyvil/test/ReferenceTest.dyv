@@ -1,5 +1,7 @@
 package dyvil.test
 
+import dyvil.tests.LambdaTest
+
 public class ReferenceTest
 {
 	public static void inc(int^ i) = *i = *i + 1

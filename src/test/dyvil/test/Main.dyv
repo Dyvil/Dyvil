@@ -30,6 +30,7 @@ public class Main
 			HanoiTest()
 			ImplicitTest()
 			InheritanceTest()
+			LambdaTest()
 			MathTest()
 			NestedMethodTest()
 			ObjectTest()
@@ -47,7 +48,6 @@ public class Main
 
 		ForTest.main(args)
 		IntrinsicTest.main(args)
-		LambdaTest.main(args)
 		MatchTest.main(args)
 		RangeTest.main(args)
 		ReferenceTest.main(args)

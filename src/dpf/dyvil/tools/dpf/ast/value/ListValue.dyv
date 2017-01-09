@@ -22,7 +22,7 @@ public class ListValue(protected let elements: List<Value>) extends DPFValueVisi
 
 	public static func apply([any] values): ListValue
 	{
-		let list = new ArrayList<Value>(values.length)
+		let list = new ArrayList<Value>(values.size)
 		for (element <- values)
 		{
 			list.add(Value.wrap(element))
