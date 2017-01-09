@@ -66,6 +66,28 @@ public final class WildcardType implements IRawType, ITyped
 		this.variance = variance;
 	}
 
+	public Variance getVariance()
+	{
+		return this.variance;
+	}
+
+	public void setVariance(Variance variance)
+	{
+		this.variance = variance;
+	}
+
+	@Override
+	public IType getType()
+	{
+		return this.bound;
+	}
+
+	@Override
+	public void setType(IType type)
+	{
+		this.bound = type;
+	}
+
 	@Override
 	public ICodePosition getPosition()
 	{
@@ -85,28 +107,6 @@ public final class WildcardType implements IRawType, ITyped
 	}
 
 	@Override
-	public IType getType()
-	{
-		return this.bound;
-	}
-
-	@Override
-	public void setType(IType type)
-	{
-		this.bound = type;
-	}
-
-	public Variance getVariance()
-	{
-		return this.variance;
-	}
-
-	public void setVariance(Variance variance)
-	{
-		this.variance = variance;
-	}
-
-	@Override
 	public int typeTag()
 	{
 		return WILDCARD_TYPE;
@@ -114,6 +114,12 @@ public final class WildcardType implements IRawType, ITyped
 
 	@Override
 	public boolean isGenericType()
+	{
+		return false;
+	}
+
+	@Override
+	public boolean useNonNullAnnotation()
 	{
 		return false;
 	}

@@ -267,6 +267,8 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 				braceDepth--;
 				continue;
 			case BaseSymbols.EQUALS:
+			case DyvilKeywords.LET:
+			case DyvilKeywords.VAR:
 				if (parenDepth == 0 && bracketDepth == 0 && braceDepth == 0)
 				{
 					return null;
