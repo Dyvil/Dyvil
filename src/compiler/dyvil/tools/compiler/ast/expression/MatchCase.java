@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
+import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
@@ -72,6 +73,12 @@ public class MatchCase implements ICase, IResolvable, IDefaultContext
 	{
 		final IDataMember field = this.pattern.resolveField(name);
 		return field != null ? field : null;
+	}
+
+	@Override
+	public boolean isMember(IVariable variable)
+	{
+		return this.resolveField(variable.getName()) == variable;
 	}
 
 	@Override
