@@ -1,11 +1,11 @@
-package dyvil.test
+package dyvil.tests
 
 using dyvil.Collections
+using dyvil.Test
 
 public class MatchTest
 {
-	public static void main([String] args)
-	{
+	public static func apply(): Test = test "Match Expressions" {
 		table()
 		tableHoles()
 		lookup()
@@ -21,8 +21,7 @@ public class MatchTest
 		andPatterns()
 	}
 	
-	private static void table()
-	{
+	private static func table(): Test = test "Table Switch" {
 		var value: String! = null
 
 		1 match {
@@ -32,11 +31,10 @@ public class MatchTest
 			case _ => value = "else"
 		}
 
-		Main.test("Match -> TableSwitch", "one", value)
+		value =?= "one"
 	}
 	
-	private static void tableHoles()
-	{
+	private static func tableHoles(): Test = test "Table Switch with Holes" {
 		var value: String! = null
 
 		2 match {
@@ -47,11 +45,10 @@ public class MatchTest
 			case 6 => value = "six"
 		}
 
-		Main.test("Match -> TableSwitch (with holes)", "two", value)
+		value =?= "two"
 	}
 	
-	private static void lookup()
-	{
+	private static func lookup(): Test = test "Lookup Switch" {
 		var value: String! = null
 
 		10 match {
@@ -61,11 +58,10 @@ public class MatchTest
 			case _   => value = "something else"
 		}
 
-		Main.test("Match -> LookupSwitch", "10", value)
+		value =?= "10"
 	}
 
-	private static void stringTable()
-	{
+	private static func stringTable(): Test = test "Table Switch String" {
 		var value: String! = null
 
 		"a" match {
@@ -75,11 +71,10 @@ public class MatchTest
 			case _   => value = "..."
 		}
 
-		Main.test("Match String -> TableSwitch", "A", value)
+		value =?= "A"
 	}
 	
-	private static void stringLookup()
-	{
+	private static func stringLookup(): Test = test "Lookup Switch String" {
 		var value: String! = null
 
 		"abc" match {
@@ -87,12 +82,11 @@ public class MatchTest
 			case "def" => value = "DEF"
 			case _     => value = "..."
 		}
-		
-		Main.test("Match String -> LookupSwitch", "ABC", value)
+
+		value =?= "ABC"
 	}
 	
-	private static void stringCollision()
-	{
+	private static func stringCollision(): Test = test "String Hash Collisions" {
 		var value = 0
 
 		"AaBB" match {
@@ -106,22 +100,20 @@ public class MatchTest
 			case _      =>
 		}
 
-		Main.test("Match String -> Collision", 5, value)
+		value =?= 5
 	}
 	
-	private static void expression()
-	{
+	private static func expression(): Test = test "Expressions" {
 		let result = 10 match {
 			case 0     => "a"
 			case 1     => "b"
 			case var x => x.toString
 		}
 
-		Main.test("Match Expression", "10", result)
+		result =?= "10"
 	}
 
-	private static void tuples()
-	{
+	private static func tuples(): Test = test "Tuples" {
 		var value: String! = null
 		var tuple = (1, 2)
 
@@ -131,12 +123,11 @@ public class MatchTest
 			case _		=> value = tuple.toString
 		}
 
-		Main.test("Match Tuples", value, tuple.toString)
+		value =?= tuple.toString
 	}
 
-	private static void caseClasses()
-	{
-		{
+	private static func caseClasses(): Test = test "Case Classes" {
+		test "Primitive" {
 			let option = Option 1
 			var value = 0
 
@@ -145,12 +136,10 @@ public class MatchTest
 				case _			 => value = -1
 			}
 
-			Main.test("Match Case Classes (primitive)", 1, value)
+			value =?= 1
 		}
 
-		// ------------------------------------------------------------
-
-		{
+		test "String" {
 			let option = Option "abc"
 			var value: String! = null
 
@@ -159,27 +148,12 @@ public class MatchTest
 				case _				=> value = null
 			}
 
-			Main.test("Match Case Classes (Object)", "abc", value)
-		}
-
-		// ------------------------------------------------------------
-
-		{
-			let option = Option 2
-			var value = 0
-
-			option match {
-				case Some(int i) => value = i
-				case _			 => value = -1
-			}
-
-			Main.test("Match Case Classes (primitive 2)", 2, value)
+			value =?= "abc"
 		}
 	}
 
-	private static void objects()
-	{
-		let option = Option<int>()
+	private static func objects(): Test = test "Objects" {
+		let option = Option<int>
 		var value = 0
 
 		option match {
@@ -187,7 +161,7 @@ public class MatchTest
 			case _	  => value = -1
 		}
 
-		Main.test("Match Objects", 1, value)
+		value =?= 1
 	}
 
 	private const ERROR: int = 0
@@ -195,11 +169,8 @@ public class MatchTest
 
 	private const ERROR_BOXED: Int = ERROR
 
-	private static void fields()
-	{
+	private static func fields(): Test = test "Fields" {
 		var value = 0
-
-		// ------------------------------------------------------------
 
 		SUCCESS match {
 			case MatchTest.ERROR => value = ERROR
@@ -207,41 +178,40 @@ public class MatchTest
 			case _			 	 => value = ERROR
 		}
 
-		Main.test("Match Fields", SUCCESS, value)
+		value =?= SUCCESS
 
-		// ------------------------------------------------------------
+		test "Unboxing" {
+			ERROR_BOXED match {
+				case ERROR => value = SUCCESS
+				case _	   => value = ERROR
+			}
 
-		ERROR_BOXED match {
-			case ERROR => value = SUCCESS
-			case _	   => value = ERROR
+			value =?= SUCCESS
 		}
 
-		Main.test("Match Fields (Boxed -> Unboxed)", SUCCESS, value)
+		test "Boxing" {
+			ERROR match {
+				case ERROR_BOXED => value = SUCCESS
+				case _			 => value = ERROR
+			}
 
-		// ------------------------------------------------------------
-
-		ERROR match {
-			case ERROR_BOXED => value = SUCCESS
-			case _			 => value = ERROR
+			value =?= SUCCESS
 		}
 
-		Main.test("Match Fields (Unboxed -> Boxed)", SUCCESS, value)
+		test "Object Unboxing" {
+			(ERROR_BOXED as Object) match {
+				case ERROR => value = SUCCESS
+				case _	   => value = ERROR
+			}
 
-		// ------------------------------------------------------------
-
-		(ERROR_BOXED as Object) match {
-			case ERROR => value = SUCCESS
-			case _	   => value = ERROR
+			value =?= SUCCESS
 		}
-
-		Main.test("Match Fields (Object -> Unboxed)", SUCCESS, value)
 	}
 
-	private static void orPatterns()
-	{
+	private static func orPatterns(): Test = test "OR Patterns" {
 		let list = List<int>()
 
-		for (int i <- 0 .. 10)
+		for (i <- 0 .. 10)
 		{
 			i match {
 				case 1 | 2 | 3 => list += 0
@@ -251,11 +221,10 @@ public class MatchTest
 			}
 		}
 
-		Main.test("Match OR Patterns", List(3, 0, 0, 0, 1, 1, 1, 2, 2, 2, 3), list)
+		list =?= List(3, 0, 0, 0, 1, 1, 1, 2, 2, 2, 3)
 	}
 
-	private static void andPatterns()
-	{
+	private static func andPatterns(): Test = test "AND Patterns" {
 		let tuple = (1, 2)
 		var success = false
 
@@ -265,6 +234,6 @@ public class MatchTest
 			case _				 => success = false
 		}
 
-		Main.test("Match AND Patterns", success, true)
+		success =?= true
 	}
 }

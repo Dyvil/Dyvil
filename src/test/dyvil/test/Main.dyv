@@ -9,6 +9,8 @@ public class Main
 
 	public static void main([String] args)
 	{
+		print "Running Dyvil Tests..."
+
 		runTests(args)
 		verify()
 	}
@@ -27,10 +29,13 @@ public class Main
 			DPFTest()
 			ExtensionTest()
 			FibonacciTest()
+			ForTest()
 			HanoiTest()
 			ImplicitTest()
 			InheritanceTest()
+			IntrinsicTest()
 			LambdaTest()
+			MatchTest()
 			MathTest()
 			NestedMethodTest()
 			ObjectTest()
@@ -46,9 +51,6 @@ public class Main
 		}
 		test.addErrors(errors)
 
-		ForTest.main(args)
-		IntrinsicTest.main(args)
-		MatchTest.main(args)
 		RangeTest.main(args)
 		ReferenceTest.main(args)
 		ReifyTest.main(args)

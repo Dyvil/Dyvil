@@ -21,9 +21,9 @@ public class LambdaTest
 	}
 
 	public static func repeatClosure(int n, -> void f): void = for (i <- 0 ..< n) f()
-	
+
 	private static var staticSum: int = 0
-	
+
 	public static func apply(): Test = test "Lambdas" {
 		basic()
 		chaining()
@@ -34,7 +34,7 @@ public class LambdaTest
 		curried()
 		typeInference()
 	}
-	
+
 	public static func basic(): Test = test "Basic" {
 		let nullary1 = () => 1
 		let nullary2 = -> long => 2
@@ -47,7 +47,7 @@ public class LambdaTest
 
 		actual =?= expected
 	}
-	
+
 	public static func chaining(): Test = test "Chaining" {
 		let fun1 = (int i) -> int => i + 1
 		let fun2 = (int i) -> int => i * 2
@@ -56,17 +56,19 @@ public class LambdaTest
 
 		result =?= 16
 	}
-	
+
 	public static func compoundAssignment(): Test = test "Compound Assignment" {
 		var localSum = 0
 		let list = List(1, 2, 3)
+
+		staticSum = 0
 		list.forEach(i => localSum += i)
 		list.forEach(i => staticSum += i)
 
 		test "Local" { localSum =?= 6 }
 		test "Static" { staticSum =?= 6 }
 	}
-	
+
 	public static func customSAMType(): Test = test "Custom SAM Type" {
 		let intF: IntFunction = i => i * i
 		let result = intF(7)
