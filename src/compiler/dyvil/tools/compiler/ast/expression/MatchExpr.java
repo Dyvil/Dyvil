@@ -654,9 +654,13 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		{
 			writer.visitTargetLabel(defaultLabel);
 
+			if (defaultCase.pattern.switchCheck())
+			{
+				defaultCase.pattern.writeInvJump(writer, varIndex, matchedType, matchErrorLabel);
+			}
+
 			if (defaultCase.condition != null)
 			{
-				assert matchErrorLabel != null;
 				defaultCase.condition.writeInvJump(writer, matchErrorLabel);
 			}
 
