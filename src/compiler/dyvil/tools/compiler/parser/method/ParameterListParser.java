@@ -28,12 +28,14 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class ParameterListParser extends Parser implements ITypeConsumer
 {
-	public static final int TYPE            = 1;
+	public static final int TYPE            = 0;
+	public static final int VARARGS_1       = 1;
 	public static final int NAME            = 2;
-	public static final int TYPE_ASCRIPTION = 4;
-	public static final int DEFAULT_VALUE   = 8;
-	public static final int PROPERTY        = 16;
-	public static final int SEPARATOR       = 32;
+	public static final int TYPE_ASCRIPTION = 3;
+	public static final int VARARGS_2       = 4;
+	public static final int DEFAULT_VALUE   = 5;
+	public static final int PROPERTY        = 6;
+	public static final int SEPARATOR       = 7;
 
 	// Flags
 
@@ -105,6 +107,16 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				this.mode = NAME;
 				this.type = Types.UNKNOWN;
 				return;
+			case DyvilSymbols.AT:
+				if (this.annotations == null)
+				{
+					this.annotations = new AnnotationList();
+				}
+
+				final Annotation annotation = new Annotation(token.raw());
+				this.annotations.addAnnotation(annotation);
+				pm.pushParser(new AnnotationParser(annotation));
+				return;
 			}
 
 			final Modifier modifier;
@@ -134,40 +146,28 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				}
 			}
 
-			if (type == DyvilSymbols.AT)
-			{
-				if (this.annotations == null)
-				{
-					this.annotations = new AnnotationList();
-				}
-
-				final Annotation annotation = new Annotation(token.raw());
-				this.annotations.addAnnotation(annotation);
-				pm.pushParser(new AnnotationParser(annotation));
-				return;
-			}
 			if (ParserUtil.isCloseBracket(type))
 			{
 				pm.popParser(true);
 				return;
 			}
-			this.mode = NAME;
+			this.mode = VARARGS_1;
 			pm.pushParser(new TypeParser(this), true);
 			return;
+		case VARARGS_1:
+			if (type == DyvilSymbols.ELLIPSIS)
+			{
+				this.flags |= VARARGS;
+				this.mode = NAME;
+				return;
+			}
+			// Fallthrough
 		case NAME:
 			switch (type)
 			{
 			case Tokens.EOF:
 				pm.report(token, "parameter.identifier");
 				pm.popParser();
-				return;
-			case DyvilSymbols.ELLIPSIS:
-				if (this.hasFlag(VARARGS))
-				{
-					pm.report(token, "parameter.identifier");
-					return;
-				}
-				this.flags |= VARARGS;
 				return;
 			case DyvilKeywords.THIS:
 				this.mode = SEPARATOR;
@@ -192,12 +192,8 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				return;
 			}
 
-			if (this.hasFlag(VARARGS))
-			{
-				this.type = new ArrayType(this.type);
-			}
-
-			this.parameter = this.createParameter(token);
+			this.parameter = this.consumer.createParameter(token.raw(), token.nameValue(), this.type, this.modifiers,
+			                                               this.annotations);
 			this.mode = TYPE_ASCRIPTION;
 			return;
 		case TYPE_ASCRIPTION:
@@ -208,8 +204,16 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 					pm.report(token, "parameter.type.duplicate");
 				}
 
+				this.mode = VARARGS_2;
+				pm.pushParser(new TypeParser(this));
+				return;
+			}
+			// Fallthrough
+		case VARARGS_2:
+			if (type == DyvilSymbols.ELLIPSIS)
+			{
+				this.flags |= VARARGS;
 				this.mode = DEFAULT_VALUE;
-				pm.pushParser(new TypeParser(this.parameter));
 				return;
 			}
 			// Fallthrough
@@ -234,6 +238,12 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			this.mode = TYPE;
 			if (this.parameter != null)
 			{
+				if (this.hasFlag(VARARGS))
+				{
+					this.type = new ArrayType(this.type);
+					this.parameter.setVarargs(true);
+				}
+				this.parameter.setType(this.type);
 				this.consumer.getParameterList().addParameter(this.parameter);
 			}
 			this.reset();
@@ -262,15 +272,6 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 
 			pm.report(token, "parameter.separator");
 		}
-	}
-
-	public IParameter createParameter(IToken token)
-	{
-		final IParameter parameter = this.consumer
-			                             .createParameter(token.raw(), token.nameValue(), this.type, this.modifiers,
-			                                              this.annotations);
-		parameter.setVarargs(this.hasFlag(VARARGS));
-		return parameter;
 	}
 
 	@Override
