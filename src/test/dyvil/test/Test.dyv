@@ -81,6 +81,36 @@ public interface Test
 
 	infix func =?=(Object! lhs, Object! rhs): EqualityTest = EqualityTest(lhs, rhs)
 
+	public static case class ExpectTest(
+		public let block: -> void
+		public let errors: Class<+Throwable>...
+	) implements Test
+	{
+		public override func passes(): boolean
+		{
+			try
+			{
+				this.block()
+			}
+			catch (Throwable t)
+			{
+				for (e <- this.errors) if (e.isInstance(t)) return true
+				throw t
+			}
+			return false
+		}
+
+		public override func addErrors(List<String> errors): void
+		{
+			if (this.passes) return
+
+			errors.add("Throwable Test Failed: ")
+			errors.add("\texpected: \(this.errors)")
+		}
+	}
+
+	static func expect(Class<+Throwable>... errors, -> void from) = ExpectTest(from, errors...)
+
 	func passes(): boolean
 
 	func addErrors(List<String> errors): void
