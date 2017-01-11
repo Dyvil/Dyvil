@@ -170,7 +170,7 @@ public class REPLContext extends AbstractHeader
 		return classLoader.initialize(this.currentClass);
 	}
 
-	public void processMember(IMember member, Class<?> theClass)
+	private void processMember(IMember member, Class<?> theClass)
 	{
 		switch (member.getKind())
 		{
@@ -191,19 +191,31 @@ public class REPLContext extends AbstractHeader
 			this.fields.put(member.getName(), (IField) member);
 			break;
 		case METHOD:
-			this.methods.add((IMethod) member);
+			this.processMethod((IMethod) member);
 			break;
 		case PROPERTY:
 			this.properties.put(member.getName(), (IProperty) member);
 			break;
 		case CLASS:
-			// Compile and load the inner class
-			final IClass innerClass = (IClass) member;
-			this.classes.put(member.getName(), innerClass);
+			this.classes.put(member.getName(), (IClass) member);
 			break;
 		}
 
 		this.repl.getOutput().println(member);
+	}
+
+	private void processMethod(IMethod method)
+	{
+		int methods = this.methods.size();
+		for (int i = 0; i < methods; i++)
+		{
+			if (this.methods.get(i).checkOverride(method, null))
+			{
+				this.methods.set(i, method);
+				return;
+			}
+		}
+		this.methods.add(method);
 	}
 
 	public void cleanup()
@@ -344,36 +356,6 @@ public class REPLContext extends AbstractHeader
 		this.initMember(method);
 		this.currentClass.getBody().addMethod(method);
 		this.members.add(method);
-	}
-
-	private void registerMethod(IMethod method)
-	{
-		boolean replaced = false;
-		int methods = this.methods.size();
-		for (int i = 0; i < methods; i++)
-		{
-			if (this.methods.get(i).checkOverride(method, null))
-			{
-				this.methods.set(i, method);
-				replaced = true;
-				break;
-			}
-		}
-
-		StringBuilder buf = new StringBuilder();
-		if (!replaced)
-		{
-			this.methods.add(method);
-			buf.append("Defined method ");
-		}
-		else
-		{
-			buf.append("Re-defined method ");
-		}
-
-		buf.append('\'');
-		Util.methodSignatureToString(method, null, buf);
-		this.repl.getOutput().println(buf.append('\'').toString());
 	}
 
 	@Override
