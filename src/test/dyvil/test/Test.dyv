@@ -2,6 +2,8 @@ package dyvil.test
 
 public interface Test
 {
+	// Test Containers
+
 	public interface TestContainerBase
 	{
 		func addTest(Test test): void
@@ -24,19 +26,15 @@ public interface Test
 			let subErrors = MutableList<String>
 			for (subTest <- this.subTests)
 			{
-				if (!subTest.passes)
-				{
-					subTest.addErrors(subErrors)
-				}
+				subTest.addErrors(subErrors)
 			}
 
-			if (!subErrors.isEmpty)
+			if (subErrors.isEmpty) return
+
+			errors.add("Test Collection '\(this.name)' failed:")
+			for (subError <- subErrors)
 			{
-				errors.add("Test Collection '\(this.name)' failed:")
-				for (subError <- subErrors)
-				{
-					errors.add('\t' + subError)
-				}
+				errors.add('\t' + subError)
 			}
 		}
 	}
@@ -48,6 +46,8 @@ public interface Test
 		return container
 	}
 
+	// Boolean Requirement Tests
+
 	public static case class RequireTest(
 		public let predicate: -> boolean
 	) implements Test
@@ -56,11 +56,14 @@ public interface Test
 
 		public override func addErrors(List<String> errors): void
 		{
+			if (this.passes) return
 			errors.add("Generic Requirement failed")
 		}
 	}
 
 	static func require(-> boolean predicate): RequireTest = RequireTest(predicate)
+
+	// Equality Tests
 
 	public static case class EqualityTest(
 		public let actual: Object!
@@ -81,6 +84,8 @@ public interface Test
 
 	infix func =?=(Object! lhs, Object! rhs): EqualityTest = EqualityTest(lhs, rhs)
 
+	// Expect Throwable Tests
+
 	public static case class ExpectTest(
 		public let block: -> void
 		public let errors: Class<+Throwable>...
@@ -90,7 +95,7 @@ public interface Test
 		{
 			try
 			{
-				this.block()
+				this.block.apply()
 			}
 			catch (Throwable t)
 			{
@@ -110,6 +115,8 @@ public interface Test
 	}
 
 	static func expect(Class<+Throwable>... errors, -> void from) = ExpectTest(from, errors...)
+
+	// Test Methods
 
 	func passes(): boolean
 
