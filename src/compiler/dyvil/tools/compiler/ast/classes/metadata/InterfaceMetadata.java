@@ -79,7 +79,7 @@ public class InterfaceMetadata implements IClassMetadata
 			// Make all members public
 			member.getModifiers().addIntModifier(Modifiers.PUBLIC);
 		}
-		else if (member.getModifiers().hasModifier(BaseModifiers.PUBLIC))
+		else if (member.getModifiers().hasModifier(BaseModifiers.PUBLIC)) // has explicit public modifier
 		{
 			markers.add(Markers.semantic(member.getPosition(), "interface.member.public", member.getName()));
 		}
@@ -99,7 +99,7 @@ public class InterfaceMetadata implements IClassMetadata
 	{
 		this.processMember(method, markers);
 
-		if (!method.hasModifier(Modifiers.STATIC) && method.getValue() == null)
+		if (method.getValue() == null)
 		{
 			// Make methods without an implementation abstract
 			method.getModifiers().addIntModifier(Modifiers.ABSTRACT);
