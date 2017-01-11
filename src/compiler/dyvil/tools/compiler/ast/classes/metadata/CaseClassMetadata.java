@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IProperty;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.CodeMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
@@ -27,7 +28,6 @@ import dyvil.tools.parsing.marker.MarkerList;
 public final class CaseClassMetadata extends ClassMetadata
 {
 	protected IMethod   applyMethod;
-	protected IMethod[] unapplyMethods;
 
 	public CaseClassMetadata(IClass iclass)
 	{
@@ -91,6 +91,12 @@ public final class CaseClassMetadata extends ClassMetadata
 
 		applyMethod.resolveTypes(markers, context);
 		this.applyMethod = applyMethod;
+	}
+
+	@Override
+	public boolean checkImplements(IMethod candidate, ITypeContext typeContext)
+	{
+		return this.applyMethod != null && this.applyMethod.checkOverride(candidate, typeContext);
 	}
 
 	@Override

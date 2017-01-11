@@ -348,6 +348,10 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public boolean checkImplements(IMethod candidate, ITypeContext typeContext)
 	{
+		if ((this.resolved & METADATA) == 0)
+		{
+			this.resolveMetadata();
+		}
 		if ((this.resolved & GENERICS) == 0)
 		{
 			this.resolveGenerics();

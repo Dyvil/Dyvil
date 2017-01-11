@@ -1,17 +1,18 @@
 package dyvil.tools.compiler.ast.classes.metadata;
 
-import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.IClassCompilable;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -110,6 +111,11 @@ public interface IClassMetadata extends IClassCompilable, IResolvable
 	@Override
 	default void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
+	}
+
+	default boolean checkImplements(IMethod candidate, ITypeContext typeContext)
+	{
+		return false;
 	}
 	
 	default IDataMember resolveField(Name name)
