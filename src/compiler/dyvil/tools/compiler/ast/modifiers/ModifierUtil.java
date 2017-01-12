@@ -388,7 +388,8 @@ public final class ModifierUtil
 		{
 			if (isNative)
 			{
-				markers.add(Markers.semanticError(member.getPosition(), "modifiers.native.implemented", Util.memberNamed(member)));
+				markers.add(Markers.semanticError(member.getPosition(), "modifiers.native.implemented",
+				                                  Util.memberNamed(member)));
 			}
 
 			return;
@@ -408,9 +409,13 @@ public final class ModifierUtil
 		{
 			flags &= ~Modifiers.ABSTRACT;
 		}
-		if ((flags & Modifiers.FINAL) != 0 && method.getEnclosingClass().isInterface())
+		if ((flags & Modifiers.FINAL) != 0)
 		{
-			flags &= ~Modifiers.FINAL;
+			final IClass enclosingClass = method.getEnclosingClass();
+			if (enclosingClass != null && enclosingClass.isInterface())
+			{
+				flags &= ~Modifiers.FINAL;
+			}
 		}
 		return flags;
 	}
@@ -430,9 +435,13 @@ public final class ModifierUtil
 		{
 			dyvilModifiers |= Modifiers.ABSTRACT;
 		}
-		if ((flags & Modifiers.FINAL) != 0 && member.getEnclosingClass().isInterface())
+		if ((flags & Modifiers.FINAL) != 0)
 		{
-			dyvilModifiers |= Modifiers.FINAL;
+			final IClass enclosingClass = member.getEnclosingClass();
+			if (enclosingClass != null && enclosingClass.isInterface())
+			{
+				dyvilModifiers |= Modifiers.FINAL;
+			}
 		}
 
 		if (dyvilModifiers != 0)
