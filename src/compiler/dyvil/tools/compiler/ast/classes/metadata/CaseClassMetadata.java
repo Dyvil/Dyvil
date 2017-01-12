@@ -27,7 +27,7 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public final class CaseClassMetadata extends ClassMetadata
 {
-	protected IMethod   applyMethod;
+	protected IMethod applyMethod;
 
 	public CaseClassMetadata(IClass iclass)
 	{
@@ -77,7 +77,7 @@ public final class CaseClassMetadata extends ClassMetadata
 		// Generate the apply method signature
 
 		final CodeMethod applyMethod = new CodeMethod(this.theClass, Names.apply, this.theClass.getThisType(),
-		                                              new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC));
+		                                              new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC_FINAL));
 		applyMethod.setTypeParameters(this.theClass.getTypeParameters(), this.theClass.typeParameterCount());
 
 		if (this.constructor != null && (this.members & CONSTRUCTOR) == 0)

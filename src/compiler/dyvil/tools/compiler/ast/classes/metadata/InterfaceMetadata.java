@@ -99,7 +99,7 @@ public class InterfaceMetadata implements IClassMetadata
 	{
 		this.processMember(method, markers);
 
-		if (method.getValue() == null)
+		if (!method.hasModifier(Modifiers.STATIC_FINAL) && method.getValue() == null)
 		{
 			// Make methods without an implementation abstract
 			method.getModifiers().addIntModifier(Modifiers.ABSTRACT);

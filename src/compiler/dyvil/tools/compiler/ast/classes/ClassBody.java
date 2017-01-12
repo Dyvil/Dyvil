@@ -429,6 +429,12 @@ public class ClassBody implements IClassBody
 
 	public static void checkMethod(IMethod method, MarkerList markers, IClass checkedClass, ITypeContext typeContext)
 	{
+		if (method.hasModifier(Modifiers.STATIC_FINAL))
+		{
+			// Don't check static final methods
+			return;
+		}
+
 		// Check if the super class implements the method
 		// We cannot do the modifier checks beforehand, because methods need to know which methods they implement to
 		// generate bridges.
