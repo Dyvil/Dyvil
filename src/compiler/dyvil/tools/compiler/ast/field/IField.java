@@ -6,7 +6,6 @@ import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.MemberKind;
-import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.type.IType;
 
@@ -33,10 +32,11 @@ public interface IField extends IClassMember, IDataMember
 		return false;
 	}
 
-	static void writeAnnotations(FieldVisitor fieldVisitor, ModifierSet modifiers, AnnotationList annotations, IType type)
+	default void writeAnnotations(FieldVisitor fieldVisitor)
 	{
-		ModifierUtil.writeModifiers(fieldVisitor, modifiers);
+		ModifierUtil.writeModifiers(fieldVisitor, this);
 
+		final AnnotationList annotations = this.getAnnotations();
 		if (annotations != null)
 		{
 			int count = annotations.annotationCount();
@@ -46,6 +46,6 @@ public interface IField extends IClassMember, IDataMember
 			}
 		}
 
-		IType.writeAnnotations(type, fieldVisitor, TypeReference.newTypeReference(TypeReference.FIELD), "");
+		IType.writeAnnotations(this.getType(), fieldVisitor, TypeReference.newTypeReference(TypeReference.FIELD), "");
 	}
 }

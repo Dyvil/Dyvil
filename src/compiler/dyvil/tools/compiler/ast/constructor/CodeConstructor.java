@@ -301,14 +301,14 @@ public class CodeConstructor extends AbstractConstructor
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		final int modifiers = this.modifiers.toFlags() & ModifierUtil.JAVA_MODIFIER_MASK;
+		final int modifiers = ModifierUtil.getFlags(this);
 		final MethodWriter methodWriter = new MethodWriterImpl(writer, writer.visitMethod(modifiers, "<init>",
 		                                                                                  this.getDescriptor(),
 		                                                                                  this.getSignature(),
 		                                                                                  this.getExceptions()));
 
 		// Write Modifiers and Annotations
-		ModifierUtil.writeModifiers(methodWriter, this.modifiers);
+		ModifierUtil.writeModifiers(methodWriter, this);
 
 		if (this.annotations != null)
 		{

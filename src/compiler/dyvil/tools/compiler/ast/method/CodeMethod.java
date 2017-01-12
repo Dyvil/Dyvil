@@ -547,7 +547,7 @@ public class CodeMethod extends AbstractMethod
 	{
 		final boolean interfaceClass = this.enclosingClass.isInterface();
 
-		final int modifiers = ModifierUtil.getFlags(this.modifiers);
+		final int modifiers = ModifierUtil.getFlags(this);
 		final String ownerClassName = this.enclosingClass.getInternalName();
 		final String mangledName = this.getInternalName();
 		final String descriptor = this.getDescriptor();
@@ -742,7 +742,7 @@ public class CodeMethod extends AbstractMethod
 			annotationVisitor.visitEnd();
 		}
 
-		ModifierUtil.writeModifiers(writer, this.modifiers);
+		ModifierUtil.writeModifiers(writer, this);
 
 		if ((modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{

@@ -277,10 +277,7 @@ public abstract class AbstractParameter extends Member implements IParameter
 		final IType type = parameter.getType();
 		final IValue defaultValue = parameter.getValue();
 
-		final int intModifiers = modifiers == null ?
-			                         0 :
-			                         modifiers.toFlags() & Modifiers.PARAMETER_MODIFIERS
-				                         & ModifierUtil.JAVA_MODIFIER_MASK;
+		final int intModifiers = ModifierUtil.getFlags(parameter);
 
 		final int index = parameter.getIndex();
 
@@ -296,7 +293,7 @@ public abstract class AbstractParameter extends Member implements IParameter
 			annotations.write(visitor);
 		}
 
-		ModifierUtil.writeModifiers(visitor, modifiers);
+		ModifierUtil.writeModifiers(visitor, parameter);
 
 		IType.writeAnnotations(type, writer, TypeReference.newFormalParameterReference(index), "");
 

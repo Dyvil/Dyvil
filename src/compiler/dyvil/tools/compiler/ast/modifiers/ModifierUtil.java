@@ -401,18 +401,23 @@ public final class ModifierUtil
 		}
 	}
 
-	public static int getFlags(ModifierSet modifiers)
+	public static int getFlags(IClassMember method)
 	{
-		int flags = modifiers.toFlags();
+		int flags = method.getModifiers().toFlags();
 		if ((flags & STATIC_ABSTRACT) == STATIC_ABSTRACT)
 		{
 			flags &= ~Modifiers.ABSTRACT;
 		}
+		if ((flags & Modifiers.FINAL) != 0 && method.getEnclosingClass().isInterface())
+		{
+			flags &= ~Modifiers.FINAL;
+		}
 		return flags;
 	}
 
-	public static void writeModifiers(AnnotatableVisitor mw, ModifierSet modifiers)
+	public static void writeModifiers(AnnotatableVisitor mw, IClassMember member)
 	{
+		final ModifierSet modifiers = member.getModifiers();
 		if (modifiers == null)
 		{
 			return;
@@ -424,6 +429,10 @@ public final class ModifierUtil
 		if ((flags & STATIC_ABSTRACT) == STATIC_ABSTRACT)
 		{
 			dyvilModifiers |= Modifiers.ABSTRACT;
+		}
+		if ((flags & Modifiers.FINAL) != 0 && member.getEnclosingClass().isInterface())
+		{
+			dyvilModifiers |= Modifiers.FINAL;
 		}
 
 		if (dyvilModifiers != 0)
