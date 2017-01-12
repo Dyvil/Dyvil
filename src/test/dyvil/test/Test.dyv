@@ -114,7 +114,7 @@ public interface Test
 		}
 	}
 
-	static func expect(Class<+Throwable>... errors, -> void from) = ExpectTest(from, errors...)
+	static func expect(Class<+Throwable>... errors, -> void from): ExpectTest = ExpectTest(from, errors...)
 
 	// Test Methods
 
