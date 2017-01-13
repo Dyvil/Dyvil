@@ -5,6 +5,8 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
+import dyvil.tools.compiler.ast.member.MemberKind;
+import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -30,14 +32,15 @@ public class CodeParameter extends AbstractParameter
 		super(name, type);
 	}
 
-	public CodeParameter(ICodePosition position, Name name, IType type)
+	public CodeParameter(ICallableMember callable, ICodePosition position, Name name, IType type)
 	{
-		super(position, name, type);
+		super(callable, position, name, type);
 	}
 
-	public CodeParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public CodeParameter(ICallableMember callable, ICodePosition position, Name name, IType type, ModifierSet modifiers,
+		                    AnnotationList annotations)
 	{
-		super(position, name, type, modifiers, annotations);
+		super(callable, position, name, type, modifiers, annotations);
 	}
 
 	@Override
@@ -72,7 +75,11 @@ public class CodeParameter extends AbstractParameter
 	{
 		if (this.type != null)
 		{
-			this.type.checkType(markers, context, IType.TypePosition.PARAMETER_TYPE);
+			final boolean constructorParam = this.method != null && this.method.getKind() == MemberKind.CONSTRUCTOR;
+			final int position = constructorParam ?
+				                     IType.TypePosition.SUPER_TYPE_ARGUMENT :
+				                     IType.TypePosition.PARAMETER_TYPE;
+			this.type.checkType(markers, context, position);
 		}
 		if (this.annotations != null)
 		{

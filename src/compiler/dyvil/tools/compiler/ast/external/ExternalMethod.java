@@ -141,7 +141,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	public IParameter createParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers,
 		                                 AnnotationList annotations)
 	{
-		return new ExternalParameter(name, type, modifiers, annotations);
+		return new ExternalParameter(this, name, type, modifiers, annotations);
 	}
 
 	@Override

@@ -20,8 +20,5 @@ public interface IParametric
 		return false;
 	}
 
-	default IParameter createParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
-	{
-		return new CodeParameter(position, name, type, modifiers, annotations);
-	}
+	IParameter createParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations);
 }

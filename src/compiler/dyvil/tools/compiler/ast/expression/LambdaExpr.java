@@ -6,6 +6,7 @@ import dyvil.tools.asm.Handle;
 import dyvil.tools.compiler.ast.access.AbstractCall;
 import dyvil.tools.compiler.ast.access.ConstructorCall;
 import dyvil.tools.compiler.ast.access.FieldAccess;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
@@ -18,6 +19,7 @@ import dyvil.tools.compiler.ast.header.IClassCompilable;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -145,6 +147,13 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		return this.parameters;
 	}
 
+	@Override
+	public IParameter createParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers,
+		                                 AnnotationList annotations)
+	{
+		return new CodeParameter(null, position, name, type, modifiers, annotations);
+	}
+
 	// Return Value
 
 	@Override
@@ -200,9 +209,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		return this.type = this.makeType();
 	}
 
-	private
-	@NonNull
-	LambdaType makeType()
+	private @NonNull LambdaType makeType()
 	{
 		final int count = this.parameters.size();
 		final LambdaType lambdaType = new LambdaType(count);

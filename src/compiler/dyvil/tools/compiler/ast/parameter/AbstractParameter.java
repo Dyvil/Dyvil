@@ -61,14 +61,16 @@ public abstract class AbstractParameter extends Member implements IParameter
 		super(name, type);
 	}
 
-	public AbstractParameter(ICodePosition position, Name name, IType type)
+	public AbstractParameter(ICallableMember callable, ICodePosition position, Name name, IType type)
 	{
 		super(position, name, type);
+		this.method = callable;
 	}
 
-	public AbstractParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public AbstractParameter(ICallableMember callable, ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
+		this.method = callable;
 	}
 
 	@Override

@@ -197,7 +197,7 @@ public final class ClassFormat
 		final IParameterList parameterList = methodSignature.getExternalParameterList();
 		return type ->
 		{
-			final ExternalParameter parameter = new ExternalParameter(null, type);
+			final ExternalParameter parameter = new ExternalParameter(null, null, type);
 			parameter.setMethod(methodSignature);
 			parameterList.addParameter(parameter);
 		};
