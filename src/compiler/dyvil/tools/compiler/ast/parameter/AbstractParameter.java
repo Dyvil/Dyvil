@@ -272,21 +272,16 @@ public abstract class AbstractParameter extends Member implements IParameter
 
 	public static void writeInitImpl(IParameter parameter, MethodWriter writer)
 	{
-		final ModifierSet modifiers = parameter.getModifiers();
 		final AnnotationList annotations = parameter.getAnnotations();
 		final IType type = parameter.getType();
 		final IValue defaultValue = parameter.getValue();
-
-		final int intModifiers = modifiers == null ?
-			                         0 :
-			                         modifiers.toFlags() & Modifiers.PARAMETER_MODIFIERS
-				                         & ModifierUtil.JAVA_MODIFIER_MASK;
+		final int modifiers = ModifierUtil.getFlags(parameter);
 
 		final int index = parameter.getIndex();
 
 		parameter.setLocalIndex(writer.localCount());
 		writer.visitParameter(parameter.getLocalIndex(), parameter.getInternalName(), parameter.getInternalType(),
-		                      intModifiers);
+		                      modifiers);
 
 		// Annotations
 		final AnnotatableVisitor visitor = (desc, visible) -> writer.visitParameterAnnotation(index, desc, visible);
@@ -296,7 +291,7 @@ public abstract class AbstractParameter extends Member implements IParameter
 			annotations.write(visitor);
 		}
 
-		ModifierUtil.writeModifiers(visitor, modifiers);
+		ModifierUtil.writeModifiers(visitor, parameter);
 
 		IType.writeAnnotations(type, writer, TypeReference.newFormalParameterReference(index), "");
 

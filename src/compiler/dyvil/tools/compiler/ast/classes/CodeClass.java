@@ -757,7 +757,7 @@ public class CodeClass extends AbstractClass
 
 	private void writeAnnotations(ClassWriter writer, int modifiers)
 	{
-		ModifierUtil.writeModifiers(writer, this.modifiers);
+		ModifierUtil.writeModifiers(writer, this);
 
 		if ((modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{

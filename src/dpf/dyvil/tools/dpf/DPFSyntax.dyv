@@ -8,21 +8,24 @@ import dyvil.tools.dpf.ast.value._
 public class DPFSyntax
 {
 	@LiteralConvertible.FromColonOperator
-	public static class PropertyPair(public Name! name, public Value value)
+	public static class PropertyPair(
+		public let name: Name!
+		public let value: Value
+	)
 	{
-		public static func apply(Name! name, any value): PropertyPair = new PropertyPair(name, Value.wrap(value))
+		public static final func apply(Name! name, any value): PropertyPair = new PropertyPair(name, Value.wrap(value))
 	}
 
 	@LiteralConvertible.FromColonOperator
 	public static class BuilderParameter extends PropertyPair
 	{
-		public static func apply(Name? name, any value): BuilderParameter = new BuilderParameter(name, Value.wrap(value))
+		public static final func apply(Name? name, any value): BuilderParameter = new BuilderParameter(name, Value.wrap(value))
 
-		public static func apply(Name? name, Value value): BuilderParameter = new BuilderParameter(name, value)
+		public static final func apply(Name? name, Value value): BuilderParameter = new BuilderParameter(name, value)
 
-        public static implicit func apply(any value): BuilderParameter = new BuilderParameter(null, Value.wrap(value))
+        public implicit static func apply(any value): BuilderParameter = new BuilderParameter(null, Value.wrap(value))
 
-		public static implicit func apply(Value value): BuilderParameter = new BuilderParameter(null, value)
+		public implicit static func apply(Value value): BuilderParameter = new BuilderParameter(null, value)
 
         public init(Name? name, Value value)
 		{
@@ -59,7 +62,7 @@ public class DPFSyntax
 
 	public infix func apply(Builder builder, Configure<Node> configure): Builder
 	{
-		builder.makeNode().use(configure)
+		configure(builder.visitNode())
 		return builder
 	}
 

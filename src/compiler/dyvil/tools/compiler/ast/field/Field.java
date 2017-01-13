@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.field;
 
+import dyvil.annotation.internal.Nullable;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.FieldVisitor;
@@ -446,25 +447,27 @@ public class Field extends Member implements IField
 		final int modifiers = this.modifiers.toFlags() & ModifierUtil.JAVA_MODIFIER_MASK;
 		final String name = this.getInternalName();
 		final String descriptor = this.getDescriptor();
+		final String signature = this.getType().needsSignature() ? this.getSignature() : null;
+		final Object value = this.getObjectValue();
 
-		this.writeField(writer, modifiers, name, descriptor);
+		final FieldVisitor fieldVisitor = writer.visitField(modifiers, name, descriptor, signature, value);
+		this.writeAnnotations(fieldVisitor);
+		fieldVisitor.visitEnd();
 
 		if (this.property != null)
 		{
 			this.property.write(writer);
 		}
 
-		if (!this.hasModifier(Modifiers.LAZY))
+		if (this.hasModifier(Modifiers.LAZY))
 		{
-			return;
+			this.writeLazy(writer, modifiers, name, descriptor);
 		}
-
-		this.writeLazy(writer, modifiers, name, descriptor);
 	}
 
-	protected void writeField(ClassWriter writer, int modifiers, String name, String descriptor)
+	@Nullable
+	public Object getObjectValue()
 	{
-		final String signature = this.getType().needsSignature() ? this.getSignature() : null;
 		final Object value;
 		if (this.value != null && this.hasModifier(Modifiers.STATIC) && this.hasConstantValue())
 		{
@@ -474,10 +477,7 @@ public class Field extends Member implements IField
 		{
 			value = null;
 		}
-		final FieldVisitor fieldVisitor = writer.visitField(modifiers, name, descriptor, signature, value);
-
-		IField.writeAnnotations(fieldVisitor, this.modifiers, this.annotations, this.type);
-		fieldVisitor.visitEnd();
+		return value;
 	}
 
 	protected void writeLazy(ClassWriter writer, int modifiers, String name, String descriptor)

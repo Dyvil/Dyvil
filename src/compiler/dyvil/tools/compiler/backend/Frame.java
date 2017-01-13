@@ -704,7 +704,6 @@ public class Frame
 		switch (opcode)
 		{
 		case NEW:
-			this.push(type);
 			return;
 		case ANEWARRAY:
 			this.pop();

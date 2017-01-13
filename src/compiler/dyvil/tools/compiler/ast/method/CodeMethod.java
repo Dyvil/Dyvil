@@ -21,7 +21,6 @@ import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
-import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -298,12 +297,9 @@ public class CodeMethod extends AbstractMethod
 			this.value.check(markers, this);
 		}
 
-		ModifierList.checkMethodModifiers(markers, this, this.modifiers.toFlags());
+		ModifierUtil.checkMethodModifiers(markers, this);
 
-		if (!this.modifiers.hasIntModifier(Modifiers.STATIC))
-		{
-			this.checkOverrideMethods(markers);
-		}
+		this.checkOverrideMethods(markers);
 
 		// Check for duplicate methods
 		this.checkDuplicates(markers);
@@ -412,7 +408,7 @@ public class CodeMethod extends AbstractMethod
 		{
 			if (this.modifiers.hasIntModifier(Modifiers.OVERRIDE))
 			{
-				markers.add(Markers.semantic(this.position, "method.override.notfound", this.name));
+				markers.add(Markers.semanticError(this.position, "method.override.notfound", this.name));
 			}
 			return;
 		}
@@ -551,16 +547,7 @@ public class CodeMethod extends AbstractMethod
 	{
 		final boolean interfaceClass = this.enclosingClass.isInterface();
 
-		int modifiers = this.modifiers.toFlags();
-		if (this.value == null)
-		{
-			modifiers |= Modifiers.ABSTRACT;
-		}
-		if (interfaceClass)
-		{
-			modifiers = modifiers & ~3 | Modifiers.PUBLIC;
-		}
-
+		final int modifiers = ModifierUtil.getFlags(this);
 		final String ownerClassName = this.enclosingClass.getInternalName();
 		final String mangledName = this.getInternalName();
 		final String descriptor = this.getDescriptor();
@@ -593,6 +580,16 @@ public class CodeMethod extends AbstractMethod
 			methodWriter.visitLabel(start);
 			this.value.writeExpression(methodWriter, this.type);
 			methodWriter.visitLabel(end);
+			methodWriter.visitEnd(this.type);
+		}
+		else if ((modifiers & Modifiers.ABSTRACT) == 0)
+		{
+			methodWriter.visitCode();
+			methodWriter.visitTypeInsn(Opcodes.NEW, "java/lang/AbstractMethodError");
+			methodWriter.visitInsn(Opcodes.DUP);
+			methodWriter.visitLdcInsn(ownerClassName.replace('/', '.') + '.' + mangledName + descriptor);
+			methodWriter.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/AbstractMethodError", "<init>", "(Ljava/lang/String;)V", false);
+			methodWriter.visitInsn(Opcodes.ATHROW);
 			methodWriter.visitEnd(this.type);
 		}
 
@@ -745,7 +742,7 @@ public class CodeMethod extends AbstractMethod
 			annotationVisitor.visitEnd();
 		}
 
-		ModifierUtil.writeModifiers(writer, this.modifiers);
+		ModifierUtil.writeModifiers(writer, this);
 
 		if ((modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{

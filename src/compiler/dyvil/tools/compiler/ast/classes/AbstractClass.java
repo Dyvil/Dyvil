@@ -482,6 +482,11 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			}
 		}
 
+		if (this.metadata.checkImplements(candidate, typeContext))
+		{
+			return true;
+		}
+
 		if (this.body != null && this.body.checkImplements(candidate, typeContext))
 		{
 			return true;

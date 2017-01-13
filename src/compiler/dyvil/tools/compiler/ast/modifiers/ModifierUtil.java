@@ -4,9 +4,11 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
@@ -24,6 +26,8 @@ public final class ModifierUtil
 	private static final int MODIFIERS_MASK = ~JAVA_MODIFIER_MASK // exclude java modifiers
 		                                          & ~Modifiers.DEPRECATED & ~Modifiers.FUNCTIONAL
 		                                          & ~Modifiers.OVERRIDE; // exclude source-only modifiers
+
+	private static final int STATIC_ABSTRACT = (Modifiers.STATIC | Modifiers.ABSTRACT);
 
 	private ModifierUtil()
 	{
@@ -348,14 +352,98 @@ public final class ModifierUtil
 		}
 	}
 
-	public static void writeModifiers(AnnotatableVisitor mw, ModifierSet modifiers)
+	public static void checkMethodModifiers(MarkerList markers, IMethod member)
 	{
+		final ModifierSet modifiers = member.getModifiers();
+		final int flags = modifiers.toFlags();
+
+		final boolean hasValue = member.getValue() != null;
+		final boolean isAbstract = (flags & Modifiers.ABSTRACT) != 0;
+		final boolean isNative = (flags & Modifiers.NATIVE) != 0;
+
+		// If the method does not have an implementation and is static
+		if (isAbstract)
+		{
+			if (hasValue)
+			{
+				markers.add(Markers.semanticError(member.getPosition(), "modifiers.abstract.implemented",
+				                                  Util.memberNamed(member)));
+			}
+			if (isNative)
+			{
+				markers.add(
+					Markers.semanticError(member.getPosition(), "modifiers.native.abstract", Util.memberNamed(member)));
+			}
+
+			final IClass enclosingClass = member.getEnclosingClass();
+			if (!enclosingClass.isAbstract())
+			{
+				markers.add(Markers.semanticError(member.getPosition(), "modifiers.abstract.concrete_class",
+				                                  Util.memberNamed(member), enclosingClass.getName()));
+			}
+
+			return;
+		}
+		if (hasValue)
+		{
+			if (isNative)
+			{
+				markers.add(Markers.semanticError(member.getPosition(), "modifiers.native.implemented",
+				                                  Util.memberNamed(member)));
+			}
+
+			return;
+		}
+
+		if (!isNative)
+		{
+			markers
+				.add(Markers.semanticError(member.getPosition(), "modifiers.unimplemented", Util.memberNamed(member)));
+		}
+	}
+
+	public static int getFlags(IClassMember method)
+	{
+		int flags = method.getModifiers().toFlags();
+		if ((flags & STATIC_ABSTRACT) == STATIC_ABSTRACT)
+		{
+			flags &= ~Modifiers.ABSTRACT;
+		}
+		if ((flags & Modifiers.FINAL) != 0)
+		{
+			final IClass enclosingClass = method.getEnclosingClass();
+			if (enclosingClass != null && enclosingClass.isInterface())
+			{
+				flags &= ~Modifiers.FINAL;
+			}
+		}
+		return flags;
+	}
+
+	public static void writeModifiers(AnnotatableVisitor mw, IClassMember member)
+	{
+		final ModifierSet modifiers = member.getModifiers();
 		if (modifiers == null)
 		{
 			return;
 		}
 
-		final int dyvilModifiers = modifiers.toFlags() & MODIFIERS_MASK;
+		final int flags = modifiers.toFlags();
+		int dyvilModifiers = flags & MODIFIERS_MASK;
+
+		if ((flags & STATIC_ABSTRACT) == STATIC_ABSTRACT)
+		{
+			dyvilModifiers |= Modifiers.ABSTRACT;
+		}
+		if ((flags & Modifiers.FINAL) != 0)
+		{
+			final IClass enclosingClass = member.getEnclosingClass();
+			if (enclosingClass != null && enclosingClass.isInterface())
+			{
+				dyvilModifiers |= Modifiers.FINAL;
+			}
+		}
+
 		if (dyvilModifiers != 0)
 		{
 			final AnnotationVisitor annotationVisitor = mw.visitAnnotation(AnnotationUtil.DYVIL_MODIFIERS, true);

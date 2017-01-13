@@ -30,55 +30,51 @@ public interface Value extends IASTNode
 {
 	// Conversion Methods
 
-	static Value apply(Object value) = wrap(value)
+	static final func apply(Object value): Value = wrap(value)
 
-	static IntValue apply(int literal) = IntValue(literal)
+	static final func apply(int literal): IntValue = IntValue(literal)
 
-	static LongValue apply(long literal) = LongValue(literal)
+	static final func apply(long literal): LongValue = LongValue(literal)
 
-	static FloatValue apply(float literal) = FloatValue(literal)
+	static final func apply(float literal): FloatValue = FloatValue(literal)
 
-	static DoubleValue apply(double literal) = DoubleValue(literal)
+	static final func apply(double literal): DoubleValue = DoubleValue(literal)
 
-	static StringValue apply(char literal) = StringValue(literal.toString)
+	static final func apply(char literal): StringValue = StringValue(literal.toString)
 
-	static StringValue apply(String literal) = StringValue(literal)
+	static final func apply(String literal): StringValue = StringValue(literal)
 
-	static NameAccess apply(Name literal) = NameAccess(literal)
+	static final func apply(Name literal): NameAccess = NameAccess(literal)
 
-	static NameAccess apply(boolean literal) = NameAccess(Name.fromRaw(literal.toString))
+	static final func apply(boolean literal): NameAccess = NameAccess(Name.fromRaw(literal.toString))
 
-	static ListValue apply(Value... elements) = ListValue(elements)
+	static final func apply(Value... elements): ListValue = ListValue(elements)
 
-	static MapValue apply(Value... keys, Value... values) = new MapValue(new ArrayMap(keys, values))
+	static final func apply(Value... keys, Value... values): MapValue = new MapValue(new ArrayMap(keys, values))
 
-	static StringInterpolation apply(String base, Value... values)
-	{
-		return new StringInterpolation(base.split(@"\\\d+") as [String], values)
-	}
+	static final func apply(String base, Value... values): StringInterpolation
+		= new StringInterpolation(base.split(@"\\\d+") as [String], values)
 
-	static StringInterpolation apply(String base, Object... values)
-	{
-		return new StringInterpolation(base.split(@"\\\d+") as [String], values)
-	}
+	static final func apply(String base, Object... values): StringInterpolation
+		= new StringInterpolation(base.split(@"\\\d+") as [String], values)
 
 	// Override Methods
 
-	override ICodePosition! getPosition() = null
+	override func getPosition(): ICodePosition! = null
 
-	override void setPosition(ICodePosition! position) { }
+	override func setPosition(ICodePosition! position): void { }
 
-	override void toString(String indent, StringBuilder buffer)
+	override func toString(String indent, StringBuilder buffer): void
 
-	void accept(ValueVisitor visitor)
+	func accept(ValueVisitor visitor): void
 
 	// Value Conversions
 
-	static Value wrap(any! value)
+	static final func wrap(any! value): Value
 	{
 		if (value is Value) return value as Value
 
-		let valueClass = value.getClass()
+		let valueClass = value.dynamicClass
 
 		if (valueClass === class String) return new StringValue(value as String) 
 		if (valueClass === class Int) return new IntValue(value as Int) 
@@ -97,7 +93,7 @@ public interface Value extends IASTNode
 			let size = Array.getLength(value)
 			let listValue = ListValue(size)
 
-			for var i <- 0 ..< size
+			for (i <- 0 ..< size)
 			{
 				listValue.add(value: wrap(Array.get(value, i)))
 			}

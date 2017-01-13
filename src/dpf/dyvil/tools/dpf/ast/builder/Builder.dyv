@@ -1,136 +1,89 @@
 package dyvil.tools.dpf.ast.builder;
 
-import dyvil.collection.List;
-import dyvil.collection.Map;
-import dyvil.collection.mutable.ArrayList;
-import dyvil.tools.dpf.ast.Expandable;
-import dyvil.tools.dpf.ast.Node;
-import dyvil.tools.dpf.ast.value.Value;
-import dyvil.tools.dpf.visitor.BuilderVisitor;
-import dyvil.tools.dpf.visitor.NodeVisitor;
-import dyvil.tools.dpf.visitor.ValueVisitor;
-import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.collection.mutable.ArrayList
+import dyvil.tools.{
+	dpf.ast.{ Expandable, Node, value.Value }
+	dpf.visitor.{ BuilderVisitor, NodeVisitor, ValueVisitor }
 
-public class Builder implements Value, BuilderVisitor, Expandable
+	parsing.{ Name, ast.IASTNode, position.ICodePosition }
+}
+
+public class Builder(
+	private var name: Name! { public get; public set }
+	private var parameters: List<Parameter>
+	private var node: Node? { public get }
+) implements Value, BuilderVisitor, Expandable
 {
-	private Name! name = null
-	{
-		public get
-		public set
-	}
+	public static func apply(Name name): Builder = new Builder(name)
 
-	private List<Parameter>! parameters
+	public static func apply(Name name, Parameter... parameters): Builder = new Builder(name, ArrayList(parameters...), null)
 
-	private Node! node = null
-	{
-		public get
-	}
-
-	public static Builder apply(Name name)
-	{
-		return new Builder(name)
-	}
-
-	public static Builder apply(Name name, Parameter... parameters)
-	{
-		return new Builder(name, ArrayList(parameters...))
-	}
-
-	public static Builder apply(Name name, List<Parameter> parameters, Node? node = null)
-	{
-		return new Builder(name, parameters, node)
-	}
+	public static func apply(Name name, List<Parameter> parameters, Node! node = null): Builder = new Builder(name, parameters, node)
 	
 	public init(Name name)
 	{
-		this.name = name
-		this.parameters = new ArrayList<Parameter>
-	}
-
-	public init(Name name, List<Parameter> parameters, Node? node = null)
-	{
-		this.name = name
-		this.parameters = parameters
+		this.init(name, new ArrayList<Parameter>, null)
 	}
 
 	@BytecodeName("withNode")
-	public Builder with(Node node)
-	{
-		this.node = node
-		return this
-	}
+	public func with(Node node): Builder { this.node = node; this }
 
 	@BytecodeName("withParameter")
-	public Builder with(Parameter parameter)
-	{
-		this.add(parameter)
-		return this
-	}
+	public func with(Parameter parameter): Builder { this.add(parameter); this }
 
 	@BytecodeName("addParameter")
-	public void add(Parameter parameter) = this.parameters.add(parameter)
+	public func add(Parameter parameter): void = this.parameters.add(parameter)
 
-	public Node makeNode()
+	@Deprecated(replacements: [ "Builder.visitNode(): Node" ])
+	public func makeNode(): Node = this.visitNode
+
+	public override func visitParameter(Name! name): ValueVisitor = new Parameter(name).{ this.add($0); $0 }
+
+	public override func visitNode(): Node
 	{
-		if (this.node != null) return this.node
+		if (this.node != null) return this.node!!
 		return this.node = new Node(this.name)
 	}
-
-	public override ValueVisitor visitParameter(Name! name)
-	{
-		let parameter = new Parameter(name)
-		this.parameters.add(parameter)
-		return parameter
-	}
-
-	public override NodeVisitor visitNode()
-	{
-		let node = new Node(this.name)
-		this.node = node
-		return node
-	}
 	
-	public override void visitEnd() { }
+	public override func visitEnd(): void { }
 	
-	public override void accept(ValueVisitor visitor)
+	public override func accept(ValueVisitor visitor): void
 	{
-		final BuilderVisitor builderVisitor = visitor.visitBuilder(this.name)
-		for (Parameter parameter <- this.parameters)
+		let builderVisitor = visitor.visitBuilder(this.name)
+		for (parameter <- this.parameters)
 		{
 			parameter.value.accept(builderVisitor.visitParameter(parameter.name))
 		}
 		if (this.node != null)
 		{
-			this.node.acceptBody(builderVisitor.visitNode())
+			this.node!.acceptBody(builderVisitor.visitNode())
 		}
 		builderVisitor.visitEnd()
 	}
 
-	public override Builder expand(Map<String, Object> mappings, boolean mutate)
+	public override func expand(Map<String, Object> mappings, boolean mutate): Builder
 	{
 		if (mutate)
 		{
-			for (Parameter parameter <- this.parameters)
+			for (parameter <- this.parameters)
 			{
 				parameter.expand(mappings, true)
 			}
-			this.node = this.node.expand(mappings, true)
+			if (this.node != null)
+			{
+				this.node = this.node!.expand(mappings, true)
+			}
 			return this
 		}
-		else
-		{
-			Builder builder = new Builder(this.name)
-			builder.parameters = this.parameters.mapped(parameter => parameter.expand(mappings, false))
-			builder.node = this.node.expand(mappings, false)
-			return builder
-		}
+
+		return new Builder(this.name
+		                   this.parameters.mapped(parameter => parameter.expand(mappings, false))
+		                   this.node == null ? null : this.node!.expand(mappings, false))
 	}
 
-	public override String toString() = IASTNode.toString(this)
+	public override func toString(): String = IASTNode.toString(this)
 	
-	public override void toString(String indent, StringBuilder buffer)
+	public override func toString(String indent, StringBuilder buffer): void
 	{
 		buffer.append(this.name)
 		
@@ -140,7 +93,7 @@ public class Builder implements Value, BuilderVisitor, Expandable
 			buffer.append('(')
 			
 			this.parameters[0].toString(indent, buffer)
-			for (int i <- 1 ..< parameterCount)
+			for (i <- 1 ..< parameterCount)
 			{
 				buffer.append(", ")
 				this.parameters[i].toString(indent, buffer)
@@ -157,12 +110,12 @@ public class Builder implements Value, BuilderVisitor, Expandable
 		if (this.node != null)
 		{
 			buffer.append(" {\n")
-			this.node.bodyToString(indent + '\t', buffer)
+			this.node!.bodyToString(indent + '\t', buffer)
 			buffer.append(indent).append('}')
 		}
 	}
 
-	public override boolean equals(Object! o)
+	public override func equals(Object! o): boolean
 	{
 		if (this === o) return true
 		if (!(o is Builder)) return false
@@ -171,11 +124,11 @@ public class Builder implements Value, BuilderVisitor, Expandable
 		return this.name === that.name && this.parameters == that.parameters && this.node == that.node
 	}
 
-	public override int hashCode()
+	public override func hashCode(): int
 	{
-		int result = this.name.hashCode
+		var result = this.name.hashCode
 		result = 31 * result + this.parameters.hashCode
 		result = 31 * result + this.node.hashCode
-		return result;
+		return result
 	}
 }

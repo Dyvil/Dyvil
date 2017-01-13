@@ -48,6 +48,8 @@ public interface Modifiers
 	 */
 	int CONST = STATIC | FINAL;
 
+	int STATIC_FINAL = STATIC | FINAL;
+
 	/**
 	 * {@code synchronized} modifier.
 	 */
