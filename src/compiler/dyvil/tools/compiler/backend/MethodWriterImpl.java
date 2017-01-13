@@ -679,9 +679,18 @@ public final class MethodWriterImpl implements MethodWriter
 	public void visitTypeInsn(int opcode, String type) throws BytecodeException
 	{
 		this.insnCallback();
-		
-		this.frame.visitTypeInsn(opcode, type);
-		
+
+		if (opcode == Opcodes.NEW)
+		{
+			Label label = new Label();
+			this.mv.visitLabel(label);
+			this.frame.push(label);
+		}
+		else
+		{
+			this.frame.visitTypeInsn(opcode, type);
+		}
+
 		this.mv.visitTypeInsn(opcode, type);
 	}
 	
@@ -781,6 +790,11 @@ public final class MethodWriterImpl implements MethodWriter
 		this.insnCallback();
 		
 		this.frame.visitInvokeInsn(args, returnType);
+
+		if (opcode == Opcodes.INVOKESPECIAL && name.equals("<init>") && this.frame.stackCount > 0)
+		{
+			this.frame.set(owner);
+		}
 		
 		this.mv.visitMethodInsn(opcode, owner, name, desc, isInterface);
 	}
