@@ -8,7 +8,7 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IParametric
 {
-	default boolean setReceiverType(IType type)
+	default boolean setThisType(IType type)
 	{
 		return false;
 	}

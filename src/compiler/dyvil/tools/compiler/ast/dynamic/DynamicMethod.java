@@ -277,6 +277,17 @@ public class DynamicMethod implements IMethod, IDefaultContext
 	}
 
 	@Override
+	public IType getReceiverType()
+	{
+		return null;
+	}
+
+	@Override
+	public void setReceiverType(IType type)
+	{
+	}
+
+	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 	}

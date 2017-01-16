@@ -171,12 +171,11 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				return;
 			case DyvilKeywords.THIS:
 				this.mode = SEPARATOR;
-				this.reset();
-				if (!this.consumer.setReceiverType(this.type))
+				if (!this.consumer.setThisType(this.type))
 				{
 					pm.report(token, "parameter.receivertype.invalid");
-					return;
 				}
+				this.reset();
 				return;
 			}
 

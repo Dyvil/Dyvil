@@ -57,10 +57,9 @@ public interface IMethod extends IClassMember, ICallableMember, ITypeParametric,
 	
 	// Generics
 
-	default IType getReceiverType()
-	{
-		return this.getThisType().asParameterType();
-	}
+	IType getReceiverType();
+
+	void setReceiverType(IType type);
 
 	GenericData getGenericData(GenericData data, IValue instance, IArguments arguments);
 	

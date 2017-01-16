@@ -71,7 +71,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	protected ITypeParameter[] typeParameters;
 	protected int              typeParameterCount;
 
-	protected IType thisType;
+	protected IType receiverType;
 
 	protected ParameterList parameters = new ParameterList();
 
@@ -191,13 +191,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public ITypeParameter getTypeParameter(int index)
 	{
 		return this.typeParameters[index];
-	}
-
-	@Override
-	public boolean setReceiverType(IType type)
-	{
-		this.thisType = type;
-		return true;
 	}
 
 	@Override
@@ -347,11 +340,20 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public IType getThisType()
 	{
-		return this.thisType;
+		return this.receiverType;
 	}
 
 	@Override
-	public abstract IType getReceiverType();
+	public IType getReceiverType()
+	{
+		return this.receiverType;
+	}
+
+	@Override
+	public void setReceiverType(IType type)
+	{
+		this.receiverType = type;
+	}
 
 	@Override
 	public ITypeParameter resolveTypeParameter(Name name)
