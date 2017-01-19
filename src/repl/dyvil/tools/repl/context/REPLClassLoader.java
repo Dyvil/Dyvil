@@ -1,5 +1,6 @@
 package dyvil.tools.repl.context;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.HashMap;
 import dyvil.io.FileUtils;
@@ -21,6 +22,25 @@ public class REPLClassLoader extends ClassLoader
 	{
 		super(REPLClassLoader.class.getClassLoader());
 		this.repl = repl;
+	}
+
+	private static void dumpClass(DyvilREPL repl, ICompilable compilable, byte[] bytes)
+	{
+		final File dumpDir = repl.getDumpDir();
+		if (dumpDir == null)
+		{
+			return;
+		}
+
+		final String fileName = compilable.getFileName();
+		try
+		{
+			FileUtils.write(new File(repl.getDumpDir(), fileName), bytes);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace(repl.getErrorOutput());
+		}
 	}
 
 	@Override
@@ -45,36 +65,23 @@ public class REPLClassLoader extends ClassLoader
 		}
 	}
 
-	public void register(ICompilable iclass)
+	@NonNull
+	public static String getClassName(ICompilable compilable)
 	{
-		final String fullName = iclass.getFullName();
-		this.compilables.put(fullName, iclass);
+		return compilable.getInternalName().replace('/', '.');
 	}
 
-	private static void dumpClass(DyvilREPL repl, ICompilable compilable, byte[] bytes)
+	public void register(ICompilable iclass)
 	{
-		final File dumpDir = repl.getDumpDir();
-		if (dumpDir == null)
-		{
-			return;
-		}
-
-		final String fileName = compilable.getFileName();
-		try
-		{
-			FileUtils.write(new File(repl.getDumpDir(), fileName), bytes);
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace(repl.getErrorOutput());
-		}
+		this.compilables.put(getClassName(iclass), iclass);
 	}
 
 	public Class<?> initialize(ICompilable compilable)
 	{
 		try
 		{
-			return this.initialize(this.loadClass(compilable.getFullName()));
+			final String className = getClassName(compilable);
+			return this.initialize(this.loadClass(className));
 		}
 		catch (ClassNotFoundException ignored)
 		{

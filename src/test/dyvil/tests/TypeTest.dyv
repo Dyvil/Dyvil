@@ -8,14 +8,19 @@ public class TypeTest
 {
 	public static case class MyList<T>(T... elements)
 	{
+		@BytecodeName("sum_doubles")
 		public func sum(MyList<double> this): double
 		{
 			var result = 0D
-			for (d <- this.elements)
-			{
-				result += d as double
-			}
+			for (d <- this.elements) result += d
+			return result
+		}
 
+		@BytecodeName("sum_ints")
+		public func sum(MyList<int> this): int
+		{
+			var result = 0
+			for (i <- this.elements) result += i
 			return result
 		}
 	}
@@ -25,13 +30,23 @@ public class TypeTest
 	public static func voidTest<T>(T value) = "\(value)" // will error if CovariantTypeVarType.isSameType(Types.VOID) returns true
 
 	public static func apply(): Test = test "Types" {
-		let list = MyList(1D, 2D, 3D)
-		let result = list.sum
+		test "Receiver Type" {
+			let doubles = MyList(1D, 2D, 3D)
 
-		// var error1 = MyList(1, 2, 3).sum
-		// var error2 = MyList("a", "b", "c").sum
+			doubles.sum =?= 6D
+		}
 
-		test "Receiver Type" { result =?= 6D }
+		test "Receiver Type Overload" {
+			let ints = MyList(-1, -2, -3)
+
+			ints.sum =?= -6
+
+			/*
+			{
+				MyList("a", "b", "c").sum
+			}
+			// */
+		}
 
 		List(1, 2, 3) <<< 1
 	}

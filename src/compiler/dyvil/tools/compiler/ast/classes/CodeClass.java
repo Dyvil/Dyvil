@@ -454,7 +454,7 @@ public class CodeClass extends AbstractClass
 		}
 		if (this.enclosingClass != null)
 		{
-			return this.enclosingClass.getFullName() + '$' + this.name;
+			return this.enclosingClass.getFullName() + '.' + this.name;
 		}
 		return this.fullName = this.unit.getFullName(this.name);
 	}

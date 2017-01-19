@@ -515,7 +515,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			else
 			{
 				// Infix access to instance method
-				receiverType = this.enclosingClass.getClassType();
+				receiverType = this.getReceiverType();
 				parameterStartIndex = 0;
 			}
 

@@ -824,9 +824,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		}
 
 		final boolean thisCaptured = this.captureHelper != null && this.captureHelper.isThisCaptured();
-		final int modifiers = thisCaptured ?
-			                      Modifiers.PRIVATE | Modifiers.SYNTHETIC :
-			                      Modifiers.PRIVATE | Modifiers.STATIC | Modifiers.SYNTHETIC;
+		final int modifiers = thisCaptured ? Modifiers.PRIVATE : Modifiers.PRIVATE | Modifiers.STATIC;
 
 		final MethodWriter methodWriter = new MethodWriterImpl(writer, writer.visitMethod(modifiers, this.name,
 		                                                                                  this.getTargetDescriptor(),
