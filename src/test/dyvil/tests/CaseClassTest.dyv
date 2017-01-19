@@ -8,6 +8,15 @@ public class CaseClassTest
 {
 	public case class Person(let id: long, let name: String, let age: int, let height: double)
 
+	public case class Arrays(
+		let ints: [int]
+		let longs: [long]
+		let floats: [float]
+		let doubles: [double]
+		let strings: [String]
+		let objects: [Object]!
+	)
+
 	public static func apply(): Test = test "Case Classes" {
 		let id     = 1234567890L
 		let name   = "Peter Peterson"
@@ -17,11 +26,33 @@ public class CaseClassTest
 		let other  = Person(id, name, age, height)
 		let string = "Person(\(id), \(name), \(age), \(height))"
 
-		test "Equality"  { person          =?= other }
-		test "Hash Code" { person.hashCode =?= other.hashCode }
-		test "String"    {
+		let array1 = Arrays([0], [0L], [0F], [0D], [""], null)
+		let array2 = Arrays([0], [0L], [0F], [0D], [""], null)
+		let array3 = Arrays([0], [0L], [0F], [0D], ["a"], null)
+
+		test "Equality" {
+			person =?= other
+
+			array1 =?= array2
+			array1 =!= array3
+			array2 =!= array3
+		}
+
+		test "Hash Codes" {
+			person.hashCode =?= other.hashCode
+
+			array1.hashCode =?= array2.hashCode
+			array1.hashCode =!= array3.hashCode
+			array2.hashCode =!= array3.hashCode
+		}
+
+		test "Strings" {
 			person.toString =?= other.toString
 			person.toString =?= string
+
+			array1.toString =?= array2.toString
+			array1.toString =!= array3.toString
+			array2.toString =!= array3.toString
 		}
 
 		test "Serialization" {
