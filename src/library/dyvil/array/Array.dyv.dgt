@@ -445,42 +445,57 @@ public abstract class TYPE_NAME##Array
 	// equals, hashCode and toString
 
 	#if IS_OBJECT
-	public infix inline func equals([Object!] array, [Object!] other): boolean = Arrays.equals(array, other)
+	// equals
 
-	public infix inline func deepEquals([Object!] array, [Object!] other): boolean = Arrays.deepEquals(array, other)
+	public infix inline func equals([Object!]! array, [Object!]! other): boolean = Arrays.equals(array, other)
 
-	public infix inline func hashCode([Object!] array): int = Arrays.hashCode(array)
+	public infix inline func deepEquals([Object!]! array, [Object!]! other): boolean = Arrays.deepEquals(array, other)
 
-	public infix inline func deepHashCode([Object!] array): int = Arrays.deepHashCode(array)
+	public infix func deepEquals(Object! obj, Object! other): boolean = [obj].deepEquals([other])
+
+	// hashCode
+
+	public postfix inline func hashCode([Object!]! array): int = Arrays.hashCode(array)
+
+	public postfix inline func deepHashCode([Object!]! array): int = Arrays.deepHashCode(array)
+
+	public postfix func deepHashCode(Object! obj): int = [obj].deepHashCode
 	#else
-	public infix inline func equals([PRIMITIVE] array, [PRIMITIVE] other): boolean = Arrays.equals(array, other)
+	public infix inline func equals([PRIMITIVE]! array, [PRIMITIVE]! other): boolean = Arrays.equals(array, other)
 
-	public infix inline func hashCode([PRIMITIVE] array): int = Arrays.hashCode(array)
+	public infix inline func hashCode([PRIMITIVE]! array): int = Arrays.hashCode(array)
 	#end
 
-	public infix func toString GENERIC([PRIMITIVE] array): String
+	// toString
+
+	public infix func toString GENERIC([PRIMITIVE]! array): String
 	{
-		let size = array.size
-		if (size == 0)
-		{
-			return "[]"
-		}
+		if (array == null) return 'null'
+
+		let size = array!!.size
+		if (size == 0) return '[]'
 
 		let builder = new StringBuilder()
-		append(array, size, builder)
-		return builder.toString()
+		append(array!!, size, builder)
+		return builder.toString!!
 	}
 
-	public infix func toString GENERIC([PRIMITIVE] array, StringBuilder builder): void
+	public infix func toString GENERIC([PRIMITIVE]! array, StringBuilder builder): void
 	{
-		let size = array.size
-		if (size == 0)
+		if (array == null)
 		{
-			builder.append("[]")
+			builder.append('null')
 			return
 		}
 
-		append(array, size, builder)
+		let size = array!!.size
+		if (size == 0)
+		{
+			builder.append('[]')
+			return
+		}
+
+		append(array!!, size, builder)
 	}
 
 	private static func append GENERIC([PRIMITIVE] array, int size, StringBuilder builder): void
@@ -491,29 +506,34 @@ public abstract class TYPE_NAME##Array
 	}
 
 	#if IS_OBJECT
-	public postfix func deepToString([Object!] array): String
+	public postfix func deepToString([Object!]! array): String
 	{
-		let size = array.size
-		if (size == 0)
-		{
-			return "[]"
-		}
+		if (array == null) return 'null'
+
+		let size = array!!.size
+		if (size == 0) return '[]'
 
 		let builder = new StringBuilder()
-		deepAppend(array, size, builder)
-		return builder.toString()
+		deepAppend(array!!, size, builder)
+		return builder.toString!!
 	}
 
-	public infix func deepToString([Object!] array, StringBuilder builder): void
+	public infix func deepToString([Object!]! array, StringBuilder builder): void
 	{
-		let size = array.size
-		if (size <= 0)
+		if (array == null)
 		{
-			builder.append("[]")
+			builder.append('null')
 			return
 		}
 
-		deepAppend(array, size, builder)
+		let size = array!!.size
+		if (size <= 0)
+		{
+			builder.append('[]')
+			return
+		}
+
+		deepAppend(array!!, size, builder)
 	}
 
 	private static func deepAppend([Object!] array, int size, StringBuilder builder): void
@@ -522,7 +542,7 @@ public abstract class TYPE_NAME##Array
 		deepToString(array[0], builder)
 		for (i <- 1 ..< size)
 		{
-			builder.append(", ")
+			builder.append(', ')
 			array[i].deepToString(builder)
 		}
 		builder.append(']')
@@ -530,7 +550,7 @@ public abstract class TYPE_NAME##Array
 
 	public postfix func deepToString(Object! obj): String
 	{
-		if (obj == null) return "null"
+		if (obj == null) return 'null'
 
 		let objectClass = obj!!.dynamicClass
 		if (!objectClass.isArray) return obj!!.toString
@@ -545,11 +565,11 @@ public abstract class TYPE_NAME##Array
 		return (obj as [Object!]).deepToString
 	}
 
-	public infix func deepToString(Object obj, StringBuilder builder): void
+	public infix func deepToString(Object! obj, StringBuilder builder): void
 	{
 		if (obj == null)
 		{
-			builder.append("null")
+			builder.append('null')
 			return
 		}
 
@@ -570,5 +590,5 @@ public abstract class TYPE_NAME##Array
 
 		(obj as [Object!]).deepToString(builder)
 	}
-	#end
+	#end // IS_OBJECT
 }

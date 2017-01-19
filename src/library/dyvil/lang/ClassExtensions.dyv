@@ -1,6 +1,7 @@
 package dyvil.lang
 
 import dyvilx.LangModel
+import const dyvil.reflect.Opcodes._
 import const dyvil.annotation.Reified.Type._
 
 public abstract class ClassExtensions
@@ -16,21 +17,22 @@ public abstract class ClassExtensions
 
 	public postfix func staticType<@Reified(TYPE) T>(T value): Type<T> = type T
 
+	@Intrinsic([ LOAD_0, INVOKEVIRTUAL, 0, 1, 2 ]
+	  strings: [ "java/lang/Object", "getClass", "()Ljava/lang/Class;" ])
 	public postfix func dynamicClass<T>(T value): Class<+T> = value.getClass as Class<T>
 
 	// Class Extensions
 
-	public static func arrayType<@Reified(OBJECT_CLASS) T>(): Class<[T]> = Class.forName('[L' + class<T>.getName + ';')
+	public static func arrayType<@Reified(OBJECT_CLASS) T>(): Class<[T]> = arrayType<T>(class T)
 
-	@BytecodeName("getArrayType")
+	@BytecodeName("arrayTypeOf")
 	public postfix func arrayType<T>(Class<T> componentType): Class<_>
 	{
 		let builder = new StringBuilder().append '['
 
 		if (componentType.isPrimitive)
 		{
-			let primitive = dyvilx.lang.model.`type`.PrimitiveType(componentType)
-			primitive.appendSignature(builder)
+			dyvilx.lang.model.`type`.PrimitiveType(componentType).appendSignature(builder)
 		}
 		else if (componentType.isArray)
 		{

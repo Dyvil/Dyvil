@@ -257,10 +257,11 @@ task copyTestDyvil(type: Sync) {
 // ---------------------------------------- Compilation Tasks ----------------------------------------
 
 tasks.withType(JavaCompile) {
-	options.compilerArgs.addAll(
+	it.options.compilerArgs.addAll(
 			'-parameters',          // generates parameter attributes and names
 			'-XDignore.symbol.file' // disables "proprietary API" warnings
 	)
+	it.options.fork = true
 }
 
 task genLibrary(type: JavaExec, dependsOn: [ 'gensrcClasses' ]) { JavaExec exec ->
@@ -430,7 +431,7 @@ build.setDependsOn([ 'buildAll', 'buildLibrary', 'buildCompiler', 'buildREPL', '
 
 tasks.withType(Jar).forEach {
 	it.from('.') {
-		include 'LICENSE.txt'
+		include '*LICENSE*.txt'
 	}
 }
 
