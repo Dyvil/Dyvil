@@ -9,6 +9,11 @@ public abstract class Tuple
 {
 	private init() {} // no instances
 
+	public case class Of1<type +T1>(public let _1: T1)
+	{
+		public override func toString(): String = "Tuple(\(this._1))"
+	}
+
 	public case class Of2<type +T1, type +T2>
 		(
 			public let _1: T1
@@ -46,7 +51,7 @@ public abstract class Tuple
 		public override func hashCode(): int = Cell.cellHashCode(this)
 	}
 
-	#define MAX_ARITY 10
+	#import Base.dgs
 	#for ARITY; 4; MAX_ARITY
 
 	@Immutable

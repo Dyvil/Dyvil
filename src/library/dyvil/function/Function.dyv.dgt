@@ -30,7 +30,7 @@ public class Function
 		postfix func tupled<A, B, C>((A, B) -> C function): ((A, B)) -> C = tuple => function(tuple._1, tuple._2)
 	}
 
-	#define MAX_ARITY 10
+	#import Base.dgs
 	#for ARITY; 3; MAX_ARITY
 
 	@FunctionalInterface

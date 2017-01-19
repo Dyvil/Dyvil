@@ -18,6 +18,12 @@ import dyvil.util.{
 	Version
 }
 
+import dyvil.tuple.Tuple.{
+	Of1 => Tupled
+	Of2 => Pair
+	Of3 => Triple
+}
+
 // Import useful annotation classes
 
 import class dyvil.annotation._
@@ -51,6 +57,7 @@ type Long   = java.lang.Long
 type Float  = java.lang.Float
 type Double = java.lang.Double
 
+// Special Type Aliases
 type Configure<T> = T.() -> void
 type Optional<T>  = T?
 type BytecodeName = dyvil.annotation.`internal`.DyvilName
