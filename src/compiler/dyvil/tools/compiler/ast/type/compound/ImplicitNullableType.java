@@ -63,7 +63,7 @@ public class ImplicitNullableType extends NullableType
 		}
 
 		final LiteralConversion conversion = new LiteralConversion(value, LazyTypes.UNWRAP);
-		conversion.setType(targetType);
+		conversion.setType(this.type);
 		return conversion;
 	}
 
