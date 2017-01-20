@@ -19,7 +19,7 @@ public abstract class ClassExtensions
 
 	@Intrinsic([ LOAD_0, INVOKEVIRTUAL, 0, 1, 2 ]
 	  strings: [ "java/lang/Object", "getClass", "()Ljava/lang/Class;" ])
-	public postfix func dynamicClass<T>(T value): Class<+T> = value.getClass as Class<T>
+	public postfix func dynamicClass<T>(T value): Class<+T> = value.getClass as Class<+T>
 
 	// Class Extensions
 

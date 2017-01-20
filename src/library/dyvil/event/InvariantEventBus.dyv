@@ -1,0 +1,61 @@
+package dyvil.event
+
+import java.lang.reflect.Method
+import const dyvil.reflect.Modifiers.STATIC
+
+public class InvariantEventBus implements EventBus
+{
+	protected let handlers: List<HandlerEntry> = new dyvil.collection.mutable.ArrayList<HandlerEntry>
+
+	public override func register(Object! handler, Class<_> handlerType): void
+	{
+		let entry = HandlerEntry(handler, handlerType)
+		this.handlers.add(entry)
+
+		for (method <- handlerType.getDeclaredMethods)
+		{
+			// Must be unary method with @EventHandler annotation
+			if (method.getParameterCount() != 1 || method.getAnnotation(class<EventHandler>) == null)
+			{
+				continue
+			}
+			// If the method is non-static, the event handler object must not be null
+			if ((method.getModifiers & STATIC) == 0 && handler == null)
+			{
+				continue;
+			}
+
+			let parameterType = method.getParameterTypes()[0]
+			entry.addHandler(parameterType, method)
+		}
+	}
+
+	public override func dispatch(Object event): void
+	{
+		let eventType = event.dynamicClass
+
+		for (entry <- this.handlers)
+		{
+			let handler = entry.handler
+			let method = entry.getHandler(eventType)
+
+			if (method != null)
+			{
+				this.invoke(method!!, handler, event)
+			}
+		}
+	}
+
+	protected final func invoke(Method method, Object! handler, Object event): void
+	{
+		try
+		{
+			method.setAccessible(true)
+			method.invoke(handler, event)
+		}
+		catch (Throwable throwable)
+		{
+			throwable.printStackTrace()
+		}
+	}
+}

@@ -1,0 +1,15 @@
+package dyvil.event
+
+import java.lang.reflect.Method
+
+public case class HandlerEntry(
+	private let handler: Object! { public get }
+	private let handlerType: Class<_> { public get}
+)
+{
+	private let methods: [Class<_>: Method] = new dyvil.collection.mutable.HashMap<Class<_>, Method>
+
+	public func addHandler(Class<_> handlerType, Method target): void = this.methods.put(handlerType, target)
+
+	public func getHandler(Class<_> handlerType): Method? = this.methods.get(handlerType)
+}

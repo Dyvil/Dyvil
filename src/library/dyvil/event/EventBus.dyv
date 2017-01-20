@@ -1,0 +1,12 @@
+package dyvil.event
+
+public interface EventBus
+{
+	func register(Object handler): void = this.register(handler, handler.dynamicClass)
+
+	func register(Class<_> staticHandler): void = this.register(null, staticHandler)
+
+	func register(Object! handler, Class<_> handlerType): void
+
+	func dispatch(Object event): void
+}
