@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.access;
 
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.config.Formatting;
@@ -70,44 +69,6 @@ public class SubscriptAccess extends AbstractCall
 		this.arguments = subscriptArguments;
 		return new SubscriptAssignment(position, subscriptReceiver, subscriptArguments, rhs)
 			       .resolveCall(markers, context, true);
-	}
-
-	@Override
-	public IValue resolve(MarkerList markers, IContext context)
-	{
-		if (this.receiver instanceof ICall)
-		// false if receiver == null
-		{
-			ICall call = (ICall) this.receiver;
-
-			// Resolve Receiver if necessary
-			call.resolveReceiver(markers, context);
-			call.resolveArguments(markers, context);
-
-			IArguments oldArgs = call.getArguments();
-
-			ArrayExpr array = new ArrayExpr(this.position, this.arguments.size());
-			for (IValue v : this.arguments)
-			{
-				array.addValue(v);
-			}
-
-			call.setArguments(oldArgs.withLastValue(Names.subscript, array));
-
-			IValue resolvedCall = call.resolveCall(markers, context, false);
-			if (resolvedCall != null)
-			{
-				return resolvedCall;
-			}
-
-			// Revert
-			call.setArguments(oldArgs);
-
-			this.receiver = call.resolveCall(markers, context, true);
-			return this.resolveCall(markers, context, true);
-		}
-
-		return super.resolve(markers, context);
 	}
 
 	@Override
