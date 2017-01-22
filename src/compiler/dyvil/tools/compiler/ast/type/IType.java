@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.type;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
@@ -101,7 +102,6 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	int UNKNOWN   = 0;
 	int NULL      = 1;
 	int ANY       = 2;
-	int DYNAMIC   = 3;
 	int PRIMITIVE = 4;
 	int NONE      = 5;
 
@@ -571,8 +571,6 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 			return Types.NONE;
 		case ANY:
 			return Types.ANY;
-		case DYNAMIC:
-			return Types.DYNAMIC;
 		case PRIMITIVE:
 			return PrimitiveType.fromTypecode(dis.readByte());
 		case CLASS:
@@ -631,7 +629,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	// Misc
 
 	@Override
-	void toString(String prefix, StringBuilder buffer);
+	void toString(@NonNull String prefix, @NonNull StringBuilder buffer);
 
 	@Override
 	boolean equals(Object obj);
