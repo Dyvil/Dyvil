@@ -71,7 +71,7 @@ public interface Test
 		public let inverted: boolean = false
 	) implements Test
 	{
-		public override func passes(): boolean = [this.actual].deepEquals([this.expected]) ^ this.inverted
+		public override func passes(): boolean = [this.actual].deepEquals([this.expected]) != this.inverted
 
 		public override func addErrors(List<String> errors): void
 		{

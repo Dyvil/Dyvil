@@ -23,8 +23,9 @@ public abstract class BooleanExtensions
 	@Intrinsic([ LOAD_0, LOAD_1, IOR ])
 	public infix func |(boolean lhs, boolean rhs): boolean = lhs || rhs
 
-	@Intrinsic([ LOAD_0, LOAD_1, IXOR ])
-	public infix func ^(boolean lhs, boolean rhs): boolean = lhs ^ rhs
+	@Deprecated(replacements: [ "boolean.!=(boolean) -> boolean" ])
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
+	public infix func ^(boolean lhs, boolean rhs): boolean = lhs != rhs
 
 	@Intrinsic([ LOAD_0, BNOT, LOAD_1, IOR ])
 	public infix func ==>(boolean lhs, boolean rhs): boolean = !lhs || rhs
