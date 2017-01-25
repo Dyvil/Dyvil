@@ -130,11 +130,22 @@ public final class ModifierUtil
 		return -1;
 	}
 
+	public static String accessModifiersToString(int mod)
+	{
+		final StringBuilder builder = new StringBuilder();
+		writeAccessModifiers(mod, builder);
+		return builder.toString();
+	}
+
 	public static void writeAccessModifiers(int mod, StringBuilder sb)
 	{
 		if ((mod & Modifiers.PUBLIC) == Modifiers.PUBLIC)
 		{
 			sb.append("public ");
+		}
+		if ((mod & Modifiers.PACKAGE) == Modifiers.PACKAGE)
+		{
+			sb.append("package ");
 		}
 		if ((mod & Modifiers.PRIVATE) == Modifiers.PRIVATE)
 		{
@@ -144,19 +155,6 @@ public final class ModifierUtil
 		{
 			sb.append("protected ");
 		}
-
-		switch (mod & 3)
-		{
-		case Modifiers.PACKAGE:
-			break;
-		case Modifiers.PROTECTED:
-			sb.append("protected ");
-			break;
-		case Modifiers.PRIVATE:
-			sb.append("private ");
-			break;
-		}
-
 		if ((mod & Modifiers.INTERNAL) == Modifiers.INTERNAL)
 		{
 			sb.append("internal ");
@@ -344,10 +342,11 @@ public final class ModifierUtil
 		switch (IContext.getVisibility(context, (IClassMember) member))
 		{
 		case IContext.INTERNAL:
-			markers.add(Markers.semantic(position, "access.internal", Util.memberNamed(member)));
+			markers.add(Markers.semanticError(position, "access.internal", Util.memberNamed(member)));
 			break;
 		case IContext.INVISIBLE:
-			markers.add(Markers.semantic(position, "access.invisible", Util.memberNamed(member)));
+			markers.add(Markers.semanticError(position, "access.invisible", Util.memberNamed(member),
+			                                  accessModifiersToString(member.getAccessLevel())));
 			break;
 		}
 	}
