@@ -11,7 +11,6 @@ import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
@@ -74,15 +73,6 @@ public class InterfaceMetadata implements IClassMetadata
 
 	protected void processMember(IMember member, MarkerList markers)
 	{
-		if (!member.hasModifier(Modifiers.PUBLIC))
-		{
-			// Make all members public
-			member.getModifiers().addIntModifier(Modifiers.PUBLIC);
-		}
-		else if (member.getModifiers().hasModifier(BaseModifiers.PUBLIC)) // has explicit public modifier
-		{
-			markers.add(Markers.semantic(member.getPosition(), "interface.member.public", member.getName()));
-		}
 	}
 
 	protected void processInitializer(IInitializer initializer, MarkerList markers)
@@ -110,10 +100,7 @@ public class InterfaceMetadata implements IClassMetadata
 	{
 		this.processMember(field, markers);
 
-		if (field.isField())
-		{
-			field.getModifiers().addIntModifier(Modifiers.STATIC | Modifiers.FINAL);
-		}
+		field.getModifiers().addIntModifier(Modifiers.PUBLIC | Modifiers.STATIC | Modifiers.FINAL);
 	}
 
 	protected void processProperty(IProperty property, MarkerList markers)
