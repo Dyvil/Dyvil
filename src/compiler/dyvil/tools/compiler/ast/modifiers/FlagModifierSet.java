@@ -69,7 +69,7 @@ public class FlagModifierSet implements ModifierSet
 	}
 
 	@Override
-	public void check(IMember member, MarkerList markers)
+	public void resolveTypes(IMember member, MarkerList markers)
 	{
 	}
 
