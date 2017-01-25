@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.modifiers;
 
 import dyvil.collection.iterator.ArrayIterator;
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.util.Markers;
@@ -93,30 +94,47 @@ public class ModifierList implements ModifierSet
 	public void resolveTypes(IMember member, MarkerList markers)
 	{
 		final MemberKind memberKind = member.getKind();
-		final int allowedModifiers = memberKind.getAllowedModifiers();
-		StringBuilder stringBuilder = null;
+		final int defaultAccess = memberKind.getDefaultAccess(member);
+		StringBuilder errorBuilder = null;
+		boolean explicitVisibility = false;
 
 		for (int i = 0; i < this.count; i++)
 		{
 			final Modifier modifier = this.modifiers[i];
-			if ((modifier.intValue() & allowedModifiers) == 0)
+			if (!memberKind.isModifierAllowed(modifier))
 			{
-				if (stringBuilder == null)
+				if (errorBuilder == null)
 				{
-					stringBuilder = new StringBuilder();
+					errorBuilder = new StringBuilder();
 				}
 				else
 				{
-					stringBuilder.append(", ");
+					errorBuilder.append(", ");
 				}
-				modifier.toString(stringBuilder);
+				modifier.toString(errorBuilder);
+			}
+
+			final int visibility = modifier.intValue() & Modifiers.VISIBILITY_MODIFIERS;
+			if (visibility != 0)
+			{
+				if (visibility == defaultAccess)
+				{
+					markers.add(Markers.semantic(member.getPosition(), "modifiers.visibility.default",
+					                             Util.memberNamed(member),
+					                             ModifierUtil.accessModifiersToString(visibility)));
+				}
+				explicitVisibility = true;
 			}
 		}
 
-		if (stringBuilder != null)
+		if (errorBuilder != null)
 		{
 			markers.add(Markers.semanticError(member.getPosition(), "modifiers.illegal", Util.memberNamed(member),
-			                                  stringBuilder.toString()));
+			                                  errorBuilder.toString()));
+		}
+		if (!explicitVisibility)
+		{
+			this.intModifiers |= defaultAccess;
 		}
 	}
 
