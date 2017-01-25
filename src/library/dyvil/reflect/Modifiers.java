@@ -13,9 +13,10 @@ public interface Modifiers
 	// Access Modifiers
 
 	/**
-	 * Default (package) access modifier.
+	 * <i>Dyvil</i> {@code package} modifier. This modifier is used to mark that a member is {@code package}-private,
+	 * i.e. it may only be accessed from compilation units within the same package.
 	 */
-	int PACKAGE = 0x00000000;
+	int PACKAGE = 0x08000000;
 
 	/**
 	 * {@code public} access modifier.
@@ -204,7 +205,7 @@ public interface Modifiers
 	 */
 	int CLASS_TYPE_MODIFIERS = (INTERFACE_CLASS | ANNOTATION | ENUM | OBJECT_CLASS | TRAIT_CLASS) & ~ABSTRACT;
 
-	int VISIBILITY_MODIFIERS = PUBLIC | PROTECTED | PRIVATE;
+	int VISIBILITY_MODIFIERS = PUBLIC | PROTECTED | PRIVATE | PACKAGE;
 
 	/**
 	 * The access modifiers.

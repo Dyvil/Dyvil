@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.backend;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.ASMConstants;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
@@ -88,6 +89,10 @@ public final class ClassFormat
 
 	public static ModifierSet readModifiers(int access)
 	{
+		if ((access & Modifiers.VISIBILITY_MODIFIERS) == 0)
+		{
+			access |= Modifiers.PACKAGE;
+		}
 		return new FlagModifierSet(access);
 	}
 
