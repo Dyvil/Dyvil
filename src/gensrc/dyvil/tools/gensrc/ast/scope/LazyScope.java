@@ -1,19 +1,20 @@
-package dyvil.tools.gensrc.ast;
+package dyvil.tools.gensrc.ast.scope;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class LazyReplacementMap implements ReplacementMap
+public class LazyScope implements Scope
 {
 	private Map<String, String> store;
 
-	private List<ReplacementMap> imports;
+	private List<Scope> imports;
 
-	private final ReplacementMap parent;
+	private final Scope parent;
 
-	public LazyReplacementMap(ReplacementMap parent)
+	public LazyScope(Scope parent)
 	{
 		this.parent = parent;
 	}
@@ -45,7 +46,7 @@ public class LazyReplacementMap implements ReplacementMap
 		return this.store;
 	}
 
-	public void importFrom(ReplacementMap map)
+	public void importFrom(Scope map)
 	{
 		if (this.imports == null)
 		{
@@ -53,6 +54,18 @@ public class LazyReplacementMap implements ReplacementMap
 		}
 
 		this.imports.add(map);
+	}
+
+	@Override
+	public File getSourceFile()
+	{
+		return this.parent.getSourceFile();
+	}
+
+	@Override
+	public Scope getGlobalParent()
+	{
+		return this.parent.getGlobalParent();
 	}
 
 	@Override
@@ -64,7 +77,7 @@ public class LazyReplacementMap implements ReplacementMap
 		}
 		if (this.imports != null)
 		{
-			for (ReplacementMap map : this.imports)
+			for (Scope map : this.imports)
 			{
 				final String replacement = map.getReplacement(key);
 				if (replacement != null)

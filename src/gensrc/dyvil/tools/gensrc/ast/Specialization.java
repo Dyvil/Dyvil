@@ -1,6 +1,7 @@
 package dyvil.tools.gensrc.ast;
 
 import dyvil.tools.gensrc.GenSrc;
+import dyvil.tools.gensrc.ast.scope.Scope;
 import dyvil.tools.gensrc.lang.I18n;
 
 import java.io.BufferedReader;
@@ -12,7 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Properties;
 
-public class Specialization implements ReplacementMap
+public class Specialization implements Scope
 {
 	public static final String FILE_NAME_PROPERTY    = "@fileName";
 	public static final String ENABLED_PROPERTY      = "@enabled";
@@ -56,9 +57,16 @@ public class Specialization implements ReplacementMap
 		return spec;
 	}
 
+	@Override
 	public File getSourceFile()
 	{
 		return this.sourceFile;
+	}
+
+	@Override
+	public Scope getGlobalParent()
+	{
+		return null;
 	}
 
 	public String getTemplateName()

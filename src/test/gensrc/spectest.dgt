@@ -16,12 +16,12 @@ line ending with a #
 line with #in the middle
 line with nothing ##in the middle
 
-// tests for the processor directives
+// tests for the preprocessor directives
 
 #if ENABLED
 	#delete ENABLED
 	#comment ENABLED is no longer defined in the scope of the enclosing #if
-	#process ENABLED set to false
+	#process ENABLED set to true
 	#if  NESTED
 		#literal and NESTED set to true
 	#else
@@ -38,7 +38,7 @@ line with nothing ##in the middle
 #endif
 
 #foreach ./spectest-Test.dgs, ./spectest-Base.dgs
-	#define _COUNT COUNT
+	#define _COUNT C##OUNT
 	#process the value of _COUNT in SPEC_NAME is COUNT
 #endfor
 

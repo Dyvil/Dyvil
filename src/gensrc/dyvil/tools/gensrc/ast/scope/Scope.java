@@ -1,7 +1,13 @@
-package dyvil.tools.gensrc.ast;
+package dyvil.tools.gensrc.ast.scope;
 
-public interface ReplacementMap
+import java.io.File;
+
+public interface Scope
 {
+	File getSourceFile();
+
+	Scope getGlobalParent();
+
 	String getReplacement(String key);
 
 	default boolean isDefined(String key)

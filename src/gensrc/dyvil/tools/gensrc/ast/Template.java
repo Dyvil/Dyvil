@@ -1,7 +1,10 @@
 package dyvil.tools.gensrc.ast;
 
 import dyvil.tools.gensrc.GenSrc;
+import dyvil.tools.gensrc.ast.directive.DirectiveList;
+import dyvil.tools.gensrc.ast.scope.TemplateScope;
 import dyvil.tools.gensrc.lang.I18n;
+import dyvil.tools.gensrc.parser.Parser;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -15,6 +18,8 @@ public class Template
 	private final String fileName;
 
 	private List<Specialization> specializations = new ArrayList<>();
+
+	private DirectiveList directives;
 
 	public Template(File sourceFile, File targetDir, String fileName)
 	{
@@ -38,6 +43,26 @@ public class Template
 		this.specializations.add(spec);
 	}
 
+	private DirectiveList getDirectives(GenSrc gensrc)
+	{
+		if (this.directives != null)
+		{
+			return this.directives;
+		}
+
+		try
+		{
+			final List<String> lines = Files.readAllLines(this.sourceFile.toPath());
+			this.directives = new Parser(lines).parse();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace(gensrc.getErrorOutput());
+		}
+
+		return this.directives;
+	}
+
 	public void specialize(GenSrc gensrc)
 	{
 		if (!this.targetDirectory.exists() && !this.targetDirectory.mkdirs())
@@ -46,24 +71,16 @@ public class Template
 			return;
 		}
 
-		try
-		{
-			final List<String> lines = Files.readAllLines(this.sourceFile.toPath());
-			int count = this.specialize(gensrc, lines);
+		final int count = this.specializeAll(gensrc);
 
-			gensrc.getOutput().println(I18n.get("template.specialized", count, this.getSourceFile()));
-		}
-		catch (IOException ex)
-		{
-			ex.printStackTrace(gensrc.getErrorOutput());
-		}
+		gensrc.getOutput().println(I18n.get("template.specialized", count, this.getSourceFile()));
 	}
 
-	private int specialize(GenSrc gensrc, List<String> lines)
+	private int specializeAll(GenSrc gensrc)
 	{
 		if (this.specializations.isEmpty())
 		{
-			this.specialize(gensrc, lines, Specialization.createDefault(this.fileName));
+			this.specialize(gensrc, Specialization.createDefault(this.fileName));
 			return 1;
 		}
 
@@ -72,14 +89,14 @@ public class Template
 		{
 			if (spec.isEnabled())
 			{
-				this.specialize(gensrc, lines, spec);
+				this.specialize(gensrc, spec);
 				count++;
 			}
 		}
 		return count;
 	}
 
-	private void specialize(GenSrc gensrc, List<String> lines, Specialization spec)
+	private void specialize(GenSrc gensrc, Specialization spec)
 	{
 		final String fileName = spec.getFileName();
 		if (fileName == null)
@@ -88,10 +105,11 @@ public class Template
 		}
 
 		final File outputFile = new File(this.targetDirectory, fileName);
+		final TemplateScope scope = new TemplateScope(this.sourceFile, spec);
 
 		try (final PrintStream writer = new PrintStream(new BufferedOutputStream(new FileOutputStream(outputFile))))
 		{
-			new Specializer(gensrc, this.sourceFile, lines, writer, spec).processLines();
+			this.getDirectives(gensrc).specialize(gensrc, scope, writer);
 		}
 		catch (IOException ex)
 		{
