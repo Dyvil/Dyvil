@@ -19,8 +19,8 @@ line with nothing ##in the middle
 // tests for the processor directives
 
 #if ENABLED
+	#delete ENABLED
 	#comment ENABLED is no longer defined in the scope of the enclosing #if
-	#undefine ENABLED
 	#process ENABLED set to false
 	#if  NESTED
 		#literal and NESTED set to true
@@ -28,8 +28,7 @@ line with nothing ##in the middle
 		#literal but NESTED set to false
 	#endif
 #else
-	#comment the replacement of a #define directive is not processed
-	#define _ENABLED ENABLED
+	#define _ENABLED E##NABLED
 	#process _ENABLED set to ENABLED
 	#if NESTED
 		#literal but NESTED set to true
@@ -46,3 +45,7 @@ line with nothing ##in the middle
 #for INDEX; 1; 10
 INDEX
 #endfor
+
+----- spectest-Base.dgs -----
+#include ./spectest-Base.dgs
+-----------------------------

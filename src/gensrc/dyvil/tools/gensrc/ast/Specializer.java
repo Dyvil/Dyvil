@@ -3,7 +3,9 @@ package dyvil.tools.gensrc.ast;
 import dyvil.tools.gensrc.GenSrc;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Files;
 import java.util.List;
 
 public class Specializer
@@ -58,6 +60,7 @@ public class Specializer
 			final int directiveEnd = findIdentifierEnd(line, directiveStart, length);
 			final String directive = line.substring(directiveStart, directiveEnd);
 			boolean local = false;
+
 			switch (directive)
 			{
 			case "if":
@@ -138,17 +141,17 @@ public class Specializer
 				}
 				continue;
 			case "import":
-			{
-				final Specialization[] specs = this.parseSpecs(line, directiveEnd, length, replacements);
-				for (Specialization spec : specs)
+				if (processOuter && ifCondition)
 				{
-					if (spec != null)
-					{
-						replacements.importFrom(spec);
-					}
+					this.processImport(replacements, line, directiveEnd, length);
 				}
 				continue;
-			}
+			case "include":
+				if (processOuter && ifCondition)
+				{
+					this.processInclude(replacements, line, directiveEnd, length);
+				}
+				continue;
 			case "process":
 				if (processOuter && ifCondition)
 				{
@@ -160,8 +163,7 @@ public class Specializer
 				if (processOuter && ifCondition)
 				{
 					// simply append the remainder of the line verbatim
-					final String remainder = getArgument(line, directiveEnd, length);
-					this.writer.println(remainder);
+					this.writer.println(getArgument(line, directiveEnd, length));
 				}
 				continue;
 			case "comment":
@@ -170,44 +172,21 @@ public class Specializer
 				local = true;
 				// Fallthrough
 			case "define": // define in file scope
-			{
-					if (!processOuter || !ifCondition)
+				if (processOuter && ifCondition)
 				{
-					continue;
+					this.processDefine(replacements, local, line, directiveEnd, length);
 				}
-
-				final int keyStart = skipWhitespace(line, directiveEnd, length);
-				final int keyEnd = findIdentifierEnd(line, keyStart, length);
-				if (keyStart == keyEnd) // missing key
-				{
-					continue;
-				}
-
-				final String key = line.substring(keyStart, keyEnd);
-				final String value = getProcessedArgument(line, keyEnd, length, replacements);
-				final LazyReplacementMap map = local ? replacements : this.replacements;
-
-				map.define(key, value);
 				continue;
-			}
 			case "delete": // undefine in local scope
 				local = true;
 				// Fallthrough
 			case "undefine": // undefine in file scope
 			case "undef":
-			{
-				if (!processOuter || !ifCondition)
+				if (processOuter && ifCondition)
 				{
-					continue;
-				}
-				final String key = parseIdentifier(line, directiveEnd, length);
-				if (!key.isEmpty()) // missing key
-				{
-					final LazyReplacementMap map = local ? replacements : this.replacements;
-					map.undefine(key);
+					this.processUndefine(replacements, local, line, directiveEnd, length);
 				}
 				continue;
-			}
 			}
 
 			// TODO invalid directive error/warning
@@ -279,6 +258,62 @@ public class Specializer
 		return forEnd;
 	}
 
+	private void processDefine(LazyReplacementMap replacements, boolean local, String line, int start, int end)
+	{
+		final int keyStart = skipWhitespace(line, start, end);
+		final int keyEnd = findIdentifierEnd(line, keyStart, end);
+		if (keyStart == keyEnd) // missing key
+		{
+			return;
+		}
+
+		final String key = line.substring(keyStart, keyEnd);
+		final String value = getProcessedArgument(line, keyEnd, end, replacements);
+		final LazyReplacementMap map = local ? replacements : this.replacements;
+
+		map.define(key, value);
+	}
+
+	private void processUndefine(LazyReplacementMap replacements, boolean local, String line, int start, int end)
+	{
+		final String key = parseIdentifier(line, start, end);
+		if (!key.isEmpty()) // missing key
+		{
+			final LazyReplacementMap map = local ? replacements : this.replacements;
+			map.undefine(key);
+		}
+	}
+
+	private void processImport(LazyReplacementMap replacements, String line, int start, int end)
+	{
+		final Specialization[] specs = this.parseSpecs(line, start, end, replacements);
+		for (Specialization spec : specs)
+		{
+			if (spec != null)
+			{
+				replacements.importFrom(spec);
+			}
+		}
+	}
+
+	private void processInclude(LazyReplacementMap replacements, String line, int start, int end)
+	{
+		final String[] paths = getProcessedArguments(line, start, end, replacements);
+		for (String path : paths)
+		{
+			final File file = Specialization.resolveSpecFile(this.gensrc, path, this.sourceFile);
+			try
+			{
+				new Specializer(this.gensrc, file, Files.readAllLines(file.toPath()), this.writer, replacements);
+			}
+			catch (IOException ignored)
+			{
+			}
+		}
+	}
+
+	// Utility Methods
+
 	private static String getArgument(String line, int start, int end)
 	{
 		return line.substring(skipWhitespace(line, start, end));
@@ -289,9 +324,14 @@ public class Specializer
 		return processLine(line, skipWhitespace(line, start, end), end, replacements);
 	}
 
+	private static String[] getProcessedArguments(String line, int start, int end, LazyReplacementMap replacements)
+	{
+		return getProcessedArgument(line, start, end, replacements).split("\\s*,\\s*");
+	}
+
 	private Specialization[] parseSpecs(String line, int start, int end, LazyReplacementMap replacements)
 	{
-		final String[] files = getProcessedArgument(line, start, end, replacements).split("\\s*,\\s*");
+		final String[] files = getProcessedArguments(line, start, end, replacements);
 		final Specialization[] specs = new Specialization[files.length];
 		for (int i = 0; i < files.length; i++)
 		{
