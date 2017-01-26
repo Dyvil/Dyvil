@@ -8,8 +8,18 @@ import java.util.Arrays;
 
 public class DirectiveList implements Directive
 {
-	private Directive[] directives = new Directive[10];
-	private int directiveCount;
+	private Directive[] directives;
+	private int         directiveCount;
+
+	public DirectiveList()
+	{
+		this.directives = new Directive[8];
+	}
+
+	public DirectiveList(int capacity)
+	{
+		this.directives = new Directive[capacity];
+	}
 
 	public void add(Directive dir)
 	{

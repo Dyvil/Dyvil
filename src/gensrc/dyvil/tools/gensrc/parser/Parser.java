@@ -12,24 +12,24 @@ public class Parser
 	private static final int FOR_BLOCK  = 3;
 
 	private final List<String> lines;
-	private final int endLine;
+	private final int          lineCount;
 
 	public Parser(List<String> lines)
 	{
 		this.lines = lines;
-		this.endLine = lines.size();
+		this.lineCount = lines.size();
 	}
 
 	public DirectiveList parse()
 	{
-		DirectiveList list = new DirectiveList();
+		DirectiveList list = new DirectiveList(this.lineCount);
 		this.parse(list, 0, 0);
 		return list;
 	}
 
 	private int parse(DirectiveList list, int start, int block)
 	{
-		for (; start < this.endLine; start++)
+		for (; start < this.lineCount; start++)
 		{
 			final String line = this.lines.get(start);
 			final int length = line.length();

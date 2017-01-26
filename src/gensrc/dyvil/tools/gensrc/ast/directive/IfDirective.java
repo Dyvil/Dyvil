@@ -2,7 +2,6 @@ package dyvil.tools.gensrc.ast.directive;
 
 import dyvil.tools.gensrc.GenSrc;
 import dyvil.tools.gensrc.ast.scope.Scope;
-import dyvil.tools.gensrc.ast.Util;
 
 import java.io.PrintStream;
 
@@ -46,15 +45,14 @@ public class IfDirective implements Directive
 
 	private boolean evaluate(Scope replacements)
 	{
-		final String processed = Util.processLine(this.condition, replacements);
 		switch (this.mode)
 		{
 		case MODE_IF:
-			return replacements.getBoolean(processed);
+			return replacements.getBoolean(this.condition);
 		case MODE_IFDEF:
-			return replacements.isDefined(processed);
+			return replacements.isDefined(this.condition);
 		case MODE_IFNDEF:
-			return !replacements.isDefined(processed);
+			return !replacements.isDefined(this.condition);
 		}
 		return false;
 	}
