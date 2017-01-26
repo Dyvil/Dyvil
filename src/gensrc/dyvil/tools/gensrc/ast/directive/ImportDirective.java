@@ -33,4 +33,16 @@ public class ImportDirective implements Directive
 			lazyScope.importFrom(spec);
 		}
 	}
+
+	@Override
+	public String toString()
+	{
+		return Directive.toString(this);
+	}
+
+	@Override
+	public void toString(String indent, StringBuilder builder)
+	{
+		builder.append(indent).append("#import ").append(this.files).append('\n');
+	}
 }

@@ -39,4 +39,19 @@ public class DirectiveList implements Directive
 			this.directives[i].specialize(gensrc, scope, output);
 		}
 	}
+
+	@Override
+	public String toString()
+	{
+		return Directive.toString(this);
+	}
+
+	@Override
+	public void toString(String indent, StringBuilder builder)
+	{
+		for (int i = 0; i < this.directiveCount; i++)
+		{
+			this.directives[i].toString(indent, builder);
+		}
+	}
 }

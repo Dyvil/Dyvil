@@ -1,9 +1,9 @@
 package dyvil.tools.gensrc.ast.directive;
 
 import dyvil.tools.gensrc.GenSrc;
+import dyvil.tools.gensrc.ast.Util;
 import dyvil.tools.gensrc.ast.scope.LazyScope;
 import dyvil.tools.gensrc.ast.scope.Scope;
-import dyvil.tools.gensrc.ast.Util;
 
 import java.io.PrintStream;
 
@@ -35,5 +35,18 @@ public class DefineDirective implements Directive
 		{
 			((LazyScope) scope).define(this.key, processed);
 		}
+	}
+
+	@Override
+	public String toString()
+	{
+		return Directive.toString(this);
+	}
+
+	@Override
+	public void toString(String indent, StringBuilder builder)
+	{
+		builder.append(indent).append(this.local ? "#local " : "#define ").append(this.key).append(' ')
+		       .append(this.value).append('\n');
 	}
 }

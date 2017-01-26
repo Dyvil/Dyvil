@@ -1,9 +1,9 @@
 package dyvil.tools.gensrc.ast.directive;
 
 import dyvil.tools.gensrc.GenSrc;
+import dyvil.tools.gensrc.ast.Util;
 import dyvil.tools.gensrc.ast.scope.LazyScope;
 import dyvil.tools.gensrc.ast.scope.Scope;
-import dyvil.tools.gensrc.ast.Util;
 
 import java.io.PrintStream;
 
@@ -56,5 +56,22 @@ public class ForDirective implements Directive
 			forScope.define(this.varName, Integer.toString(i));
 			this.action.specialize(gensrc, forScope, output);
 		}
+	}
+
+	@Override
+	public String toString()
+	{
+		return Directive.toString(this);
+	}
+
+	@Override
+	public void toString(String indent, StringBuilder builder)
+	{
+		builder.append(indent).append("#for ").append(this.varName).append(' ').append(this.start).append(' ')
+		       .append(this.end).append('\n');
+
+		this.action.toString(indent + '\t', builder);
+
+		builder.append(indent).append("#end\n");
 	}
 }

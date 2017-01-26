@@ -44,4 +44,16 @@ public class IncludeDirective implements Directive
 			}
 		}
 	}
+
+	@Override
+	public String toString()
+	{
+		return Directive.toString(this);
+	}
+
+	@Override
+	public void toString(String indent, StringBuilder builder)
+	{
+		builder.append(indent).append("#include ").append(this.files).append('\n');
+	}
 }

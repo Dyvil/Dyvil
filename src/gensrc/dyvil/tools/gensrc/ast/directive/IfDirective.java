@@ -69,4 +69,42 @@ public class IfDirective implements Directive
 			this.elseBlock.specialize(gensrc, scope, output);
 		}
 	}
+
+	@Override
+	public String toString()
+	{
+		return Directive.toString(this);
+	}
+
+	@Override
+	public void toString(String indent, StringBuilder builder)
+	{
+		builder.append(indent);
+
+		switch (this.mode)
+		{
+		case MODE_IF:
+			builder.append("#if ");
+			break;
+		case MODE_IFDEF:
+			builder.append("#ifdef ");
+			break;
+		case MODE_IFNDEF:
+			builder.append("#ifndef ");
+			break;
+		}
+
+		builder.append(this.condition).append('\n');
+
+		final String newIndent = indent + '\t';
+		this.thenBlock.toString(newIndent, builder);
+
+		if (this.elseBlock != null)
+		{
+			builder.append(indent).append("#else\n");
+			this.elseBlock.toString(newIndent, builder);
+		}
+
+		builder.append(indent).append("#end\n");
+	}
 }

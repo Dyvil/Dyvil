@@ -20,4 +20,16 @@ public class ProcessedLine implements Directive
 	{
 		output.println(Util.processLine(this.text, scope));
 	}
+
+	@Override
+	public String toString()
+	{
+		return this.text;
+	}
+
+	@Override
+	public void toString(String indent, StringBuilder builder)
+	{
+		builder.append(this.text).append('\n');
+	}
 }

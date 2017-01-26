@@ -19,4 +19,16 @@ public class LiteralDirective implements Directive
 	{
 		output.println(this.text);
 	}
+
+	@Override
+	public String toString()
+	{
+		return Directive.toString(this);
+	}
+
+	@Override
+	public void toString(String indent, StringBuilder builder)
+	{
+		builder.append(indent).append("#literal ").append(this.text).append('\n');
+	}
 }

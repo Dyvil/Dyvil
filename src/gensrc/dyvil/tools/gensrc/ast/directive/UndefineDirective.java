@@ -31,4 +31,16 @@ public class UndefineDirective implements Directive
 			((LazyScope) scope).undefine(this.varName);
 		}
 	}
+
+	@Override
+	public String toString()
+	{
+		return Directive.toString(this);
+	}
+
+	@Override
+	public void toString(String indent, StringBuilder builder)
+	{
+		builder.append(indent).append(this.local ? "#delete " : "#undefine ").append(this.varName).append('\n');
+	}
 }

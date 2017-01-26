@@ -42,4 +42,20 @@ public class ForEachDirective implements Directive
 			this.action.specialize(gensrc, innerScope, output);
 		}
 	}
+
+	@Override
+	public String toString()
+	{
+		return Directive.toString(this);
+	}
+
+	@Override
+	public void toString(String indent, StringBuilder builder)
+	{
+		builder.append(indent).append("#foreach ").append(this.list).append('\n');
+
+		this.action.toString(indent + '\t', builder);
+
+		builder.append(indent).append("#end\n");
+	}
 }
