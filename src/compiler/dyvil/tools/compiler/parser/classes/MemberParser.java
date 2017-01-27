@@ -15,12 +15,12 @@ import dyvil.tools.compiler.ast.method.IExceptionList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.Modifier;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
-import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IParametric;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
+import dyvil.tools.compiler.parser.annotation.ModifierParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.header.DyvilHeaderParser;
 import dyvil.tools.compiler.parser.header.PropertyParser;
@@ -173,14 +173,14 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 			}
 
 			final Modifier modifier;
-			if ((modifier = ModifierUtil.parseModifier(token, pm)) != null)
+			if ((modifier = ModifierParser.parseModifier(token, pm)) != null)
 			{
 				this.modifiers.addModifier(modifier);
 				return;
 			}
 
 			int classType;
-			if ((classType = ModifierUtil.parseClassTypeModifier(token, pm)) >= 0)
+			if ((classType = ModifierParser.parseClassTypeModifier(token, pm)) >= 0)
 			{
 				this.modifiers.addIntModifier(classType);
 				ClassDeclarationParser parser = new ClassDeclarationParser(this.consumer, this.modifiers,

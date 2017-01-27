@@ -9,7 +9,6 @@ public enum BaseModifiers implements Modifier
 	PRIVATE(Modifiers.PRIVATE, "private"),
 	PRIVATE_PROTECTED(Modifiers.PRIVATE | Modifiers.PROTECTED, "private protected"),
 	PROTECTED(Modifiers.PROTECTED, "protected"),
-	PACKAGE_PROTECTED(Modifiers.PACKAGE | Modifiers.PROTECTED, "package protected"),
 	PUBLIC(Modifiers.PUBLIC, "public"),
 	INTERNAL(Modifiers.INTERNAL, "internal"),
 	// Access Modifiers
