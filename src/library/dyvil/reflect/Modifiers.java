@@ -33,6 +33,8 @@ public interface Modifiers
 	 */
 	int PROTECTED = 0x00000004;
 
+	int PRIVATE_PROTECTED = PRIVATE | PROTECTED;
+
 	/**
 	 * {@code static} modifier.
 	 */

@@ -117,9 +117,9 @@ public class CodeMethod extends AbstractMethod
 	}
 
 	@Override
-	public boolean setThisType(IType thisType)
+	public boolean setThisType(IType type)
 	{
-		this.thisType = thisType;
+		this.thisType = type;
 		return true;
 	}
 
@@ -170,10 +170,6 @@ public class CodeMethod extends AbstractMethod
 		if (this.value != null)
 		{
 			this.value.resolveTypes(markers, context);
-		}
-		else if (this.enclosingClass.hasModifier(Modifiers.INTERFACE_CLASS))
-		{
-			this.modifiers.addIntModifier(Modifiers.ABSTRACT | Modifiers.PUBLIC);
 		}
 		else if (this.enclosingClass.hasModifier(Modifiers.ABSTRACT))
 		{
@@ -561,22 +557,24 @@ public class CodeMethod extends AbstractMethod
 	{
 		final boolean interfaceClass = this.enclosingClass.isInterface();
 
-		final int modifiers = ModifierUtil.getFlags(this);
+		final long flags = ModifierUtil.getFlags(this);
 		final String ownerClassName = this.enclosingClass.getInternalName();
 		final String mangledName = this.getInternalName();
 		final String descriptor = this.getDescriptor();
 		final String signature = this.needsSignature() ? this.getSignature() : null;
 		final String[] exceptionTypes = this.getInternalExceptions();
 
-		MethodWriter methodWriter = new MethodWriterImpl(writer, writer.visitMethod(
-			modifiers & ModifierUtil.JAVA_MODIFIER_MASK, mangledName, descriptor, signature, exceptionTypes));
+		MethodWriter methodWriter = new MethodWriterImpl(writer, writer
+			                                                         .visitMethod(ModifierUtil.getJavaModifiers(flags),
+			                                                                      mangledName, descriptor, signature,
+			                                                                      exceptionTypes));
 
-		if ((modifiers & Modifiers.STATIC) == 0)
+		if (!this.hasModifier(Modifiers.STATIC))
 		{
 			methodWriter.setThisType(ownerClassName);
 		}
 
-		this.writeAnnotations(methodWriter, modifiers);
+		this.writeAnnotations(methodWriter, flags);
 
 		this.parameters.writeInit(methodWriter);
 
@@ -596,8 +594,10 @@ public class CodeMethod extends AbstractMethod
 			methodWriter.visitLabel(end);
 			methodWriter.visitEnd(this.type);
 		}
-		else if ((modifiers & Modifiers.ABSTRACT) == 0)
+		else if (this.hasModifier(Modifiers.STATIC | Modifiers.ABSTRACT))
 		{
+			// no value, but no abstract flag
+
 			methodWriter.visitCode();
 			methodWriter.visitTypeInsn(Opcodes.NEW, "java/lang/AbstractMethodError");
 			methodWriter.visitInsn(Opcodes.DUP);
@@ -610,7 +610,7 @@ public class CodeMethod extends AbstractMethod
 
 		this.parameters.writeLocals(methodWriter, start, end);
 
-		if ((modifiers & Modifiers.STATIC) != 0)
+		if (this.hasModifier(Modifiers.STATIC))
 		{
 			return;
 		}
@@ -731,7 +731,7 @@ public class CodeMethod extends AbstractMethod
 		return this.typeParameterCount != 0 || this.type.needsSignature() || this.parameters.needsSignature();
 	}
 
-	protected void writeAnnotations(MethodWriter writer, int modifiers)
+	protected void writeAnnotations(MethodWriter writer, long flags)
 	{
 		if (this.annotations != null)
 		{
@@ -757,9 +757,9 @@ public class CodeMethod extends AbstractMethod
 			annotationVisitor.visitEnd();
 		}
 
-		ModifierUtil.writeModifiers(writer, this);
+		ModifierUtil.writeModifiers(writer, this, flags);
 
-		if ((modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
+		if (this.hasModifier(Modifiers.DEPRECATED) && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{
 			writer.visitAnnotation(Deprecation.DYVIL_EXTENDED, true).visitEnd();
 		}

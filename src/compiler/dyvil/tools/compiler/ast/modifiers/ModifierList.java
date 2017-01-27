@@ -96,7 +96,6 @@ public class ModifierList implements ModifierSet
 		final MemberKind memberKind = member.getKind();
 		final int defaultAccess = memberKind.getDefaultAccess(member);
 		StringBuilder errorBuilder = null;
-		boolean explicitVisibility = false;
 
 		for (int i = 0; i < this.count; i++)
 		{
@@ -115,15 +114,11 @@ public class ModifierList implements ModifierSet
 			}
 
 			final int visibility = modifier.intValue() & Modifiers.VISIBILITY_MODIFIERS;
-			if (visibility != 0)
+			if (visibility != 0 && visibility == defaultAccess)
 			{
-				if (visibility == defaultAccess)
-				{
-					markers.add(Markers.semantic(member.getPosition(), "modifiers.visibility.default",
-					                             Util.memberNamed(member),
-					                             ModifierUtil.accessModifiersToString(visibility)));
-				}
-				explicitVisibility = true;
+				markers.add(Markers.semantic(member.getPosition(), "modifiers.visibility.default",
+				                             Util.memberNamed(member),
+				                             ModifierUtil.accessModifiersToString(visibility)));
 			}
 		}
 
@@ -132,8 +127,9 @@ public class ModifierList implements ModifierSet
 			markers.add(Markers.semanticError(member.getPosition(), "modifiers.illegal", Util.memberNamed(member),
 			                                  errorBuilder.toString()));
 		}
-		if (!explicitVisibility)
+		if ((this.intModifiers & Modifiers.VISIBILITY_MODIFIERS) == 0)
 		{
+			// If there is no explicit or implicit visibility modifier already, add the default one
 			this.intModifiers |= defaultAccess;
 		}
 	}

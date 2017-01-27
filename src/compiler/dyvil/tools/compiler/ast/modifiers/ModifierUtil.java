@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.modifiers;
 
-import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
@@ -10,24 +9,24 @@ import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.transform.Deprecation;
-import dyvil.tools.compiler.transform.DyvilKeywords;
-import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
-import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
-import dyvil.tools.parsing.token.IToken;
+
+import java.lang.annotation.ElementType;
+
+import static dyvil.reflect.Modifiers.*;
 
 public final class ModifierUtil
 {
 	public static final int JAVA_MODIFIER_MASK = 0xFFFF;
 
-	private static final int MODIFIERS_MASK = ~JAVA_MODIFIER_MASK // exclude java modifiers
-		                                          & ~Modifiers.DEPRECATED & ~Modifiers.FUNCTIONAL
-		                                          & ~Modifiers.OVERRIDE; // exclude source-only modifiers
+	private static final int DYVIL_MODIFIER_MASK = ~JAVA_MODIFIER_MASK // exclude java modifiers
+		                                               & ~DEPRECATED & ~FUNCTIONAL
+		                                               & ~OVERRIDE; // exclude source-only modifiers
 
-	private static final int STATIC_ABSTRACT = (Modifiers.STATIC | Modifiers.ABSTRACT);
+	private static final int STATIC_ABSTRACT = STATIC | ABSTRACT;
 
 	private ModifierUtil()
 	{
@@ -42,23 +41,23 @@ public final class ModifierUtil
 
 	public static void writeAccessModifiers(int mod, StringBuilder sb)
 	{
-		if ((mod & Modifiers.PUBLIC) == Modifiers.PUBLIC)
+		if ((mod & PUBLIC) == PUBLIC)
 		{
 			sb.append("public ");
 		}
-		if ((mod & Modifiers.PACKAGE) == Modifiers.PACKAGE)
+		if ((mod & PACKAGE) == PACKAGE)
 		{
 			sb.append("package ");
 		}
-		if ((mod & Modifiers.PRIVATE) == Modifiers.PRIVATE)
+		if ((mod & PRIVATE) == PRIVATE)
 		{
 			sb.append("private ");
 		}
-		if ((mod & Modifiers.PROTECTED) == Modifiers.PROTECTED)
+		if ((mod & PROTECTED) == PROTECTED)
 		{
 			sb.append("protected ");
 		}
-		if ((mod & Modifiers.INTERNAL) == Modifiers.INTERNAL)
+		if ((mod & INTERNAL) == INTERNAL)
 		{
 			sb.append("internal ");
 		}
@@ -78,27 +77,27 @@ public final class ModifierUtil
 			sb.append("class ");
 			return;
 		}
-		if ((mod & Modifiers.ANNOTATION) == Modifiers.ANNOTATION)
+		if ((mod & ANNOTATION) == ANNOTATION)
 		{
 			sb.append("@interface ");
 			return;
 		}
-		if ((mod & Modifiers.TRAIT_CLASS) == Modifiers.TRAIT_CLASS)
+		if ((mod & TRAIT_CLASS) == TRAIT_CLASS)
 		{
 			sb.append("trait ");
 			return;
 		}
-		if ((mod & Modifiers.INTERFACE_CLASS) == Modifiers.INTERFACE_CLASS)
+		if ((mod & INTERFACE_CLASS) == INTERFACE_CLASS)
 		{
 			sb.append("interface ");
 			return;
 		}
-		if ((mod & Modifiers.ENUM) == Modifiers.ENUM)
+		if ((mod & ENUM) == ENUM)
 		{
 			sb.append("enum ");
 			return;
 		}
-		if ((mod & Modifiers.OBJECT_CLASS) == Modifiers.OBJECT_CLASS)
+		if ((mod & OBJECT_CLASS) == OBJECT_CLASS)
 		{
 			sb.append("object ");
 			return;
@@ -109,31 +108,31 @@ public final class ModifierUtil
 
 	public static void writeClassModifiers(int mod, StringBuilder sb)
 	{
-		if ((mod & Modifiers.STATIC) == Modifiers.STATIC)
+		if ((mod & STATIC) == STATIC)
 		{
 			sb.append("static ");
 		}
-		if ((mod & Modifiers.ABSTRACT) == Modifiers.ABSTRACT)
+		if ((mod & ABSTRACT) == ABSTRACT)
 		{
 			sb.append("abstract ");
 		}
-		if ((mod & Modifiers.FINAL) == Modifiers.FINAL)
+		if ((mod & FINAL) == FINAL)
 		{
 			sb.append("final ");
 		}
-		if ((mod & Modifiers.SEALED) == Modifiers.SEALED)
+		if ((mod & SEALED) == SEALED)
 		{
 			sb.append("sealed ");
 		}
-		if ((mod & Modifiers.STRICT) == Modifiers.STRICT)
+		if ((mod & STRICT) == STRICT)
 		{
 			sb.append("@Strict ");
 		}
-		if ((mod & Modifiers.FUNCTIONAL) == Modifiers.FUNCTIONAL)
+		if ((mod & FUNCTIONAL) == FUNCTIONAL)
 		{
 			sb.append("functional ");
 		}
-		if ((mod & Modifiers.CASE_CLASS) == Modifiers.CASE_CLASS)
+		if ((mod & CASE_CLASS) == CASE_CLASS)
 		{
 			sb.append("case ");
 		}
@@ -141,31 +140,31 @@ public final class ModifierUtil
 
 	public static void writeFieldModifiers(int mod, StringBuilder sb)
 	{
-		if ((mod & Modifiers.LAZY) == Modifiers.LAZY)
+		if ((mod & LAZY) == LAZY)
 		{
 			sb.append("lazy ");
 		}
-		else if ((mod & Modifiers.CONST) == Modifiers.CONST)
+		else if ((mod & CONST) == CONST)
 		{
 			sb.append("const ");
 		}
 		else
 		{
-			if ((mod & Modifiers.STATIC) == Modifiers.STATIC)
+			if ((mod & STATIC) == STATIC)
 			{
 				sb.append("static ");
 			}
-			if ((mod & Modifiers.FINAL) == Modifiers.FINAL)
+			if ((mod & FINAL) == FINAL)
 			{
 				sb.append("final ");
 			}
 		}
 
-		if ((mod & Modifiers.TRANSIENT) == Modifiers.TRANSIENT)
+		if ((mod & TRANSIENT) == TRANSIENT)
 		{
 			sb.append("@Transient ");
 		}
-		if ((mod & Modifiers.VOLATILE) == Modifiers.VOLATILE)
+		if ((mod & VOLATILE) == VOLATILE)
 		{
 			sb.append("@Volatile ");
 		}
@@ -173,49 +172,49 @@ public final class ModifierUtil
 
 	public static void writeMethodModifiers(int mod, StringBuilder sb)
 	{
-		if ((mod & Modifiers.EXTENSION) == Modifiers.EXTENSION)
+		if ((mod & EXTENSION) == EXTENSION)
 		{
 			sb.append("extension ");
 		}
-		else if ((mod & Modifiers.INFIX) != 0 && (mod & Modifiers.INFIX) != Modifiers.STATIC)
+		else if ((mod & INFIX) != 0 && (mod & INFIX) != STATIC)
 		{
 			sb.append("infix ");
 		}
-		else if ((mod & Modifiers.STATIC) == Modifiers.STATIC)
+		else if ((mod & STATIC) == STATIC)
 		{
 			sb.append("static ");
 		}
 
-		if ((mod & Modifiers.FINAL) == Modifiers.FINAL)
+		if ((mod & FINAL) == FINAL)
 		{
 			sb.append("final ");
 		}
-		if ((mod & Modifiers.SEALED) == Modifiers.SEALED)
+		if ((mod & SEALED) == SEALED)
 		{
 			sb.append("sealed ");
 		}
 
-		if ((mod & Modifiers.SYNCHRONIZED) == Modifiers.SYNCHRONIZED)
+		if ((mod & SYNCHRONIZED) == SYNCHRONIZED)
 		{
 			sb.append("synchronized ");
 		}
-		if ((mod & Modifiers.NATIVE) == Modifiers.NATIVE)
+		if ((mod & NATIVE) == NATIVE)
 		{
 			sb.append("@Native ");
 		}
-		if ((mod & Modifiers.ABSTRACT) == Modifiers.ABSTRACT)
+		if ((mod & ABSTRACT) == ABSTRACT)
 		{
 			sb.append("abstract ");
 		}
-		if ((mod & Modifiers.STRICT) == Modifiers.STRICT)
+		if ((mod & STRICT) == STRICT)
 		{
 			sb.append("@Strict ");
 		}
-		if ((mod & Modifiers.INLINE) == Modifiers.INLINE)
+		if ((mod & INLINE) == INLINE)
 		{
 			sb.append("inline ");
 		}
-		if ((mod & Modifiers.OVERRIDE) == Modifiers.OVERRIDE)
+		if ((mod & OVERRIDE) == OVERRIDE)
 		{
 			sb.append("override ");
 		}
@@ -223,11 +222,11 @@ public final class ModifierUtil
 
 	public static void writeParameterModifier(int mod, StringBuilder sb)
 	{
-		if ((mod & Modifiers.LAZY) == Modifiers.LAZY)
+		if ((mod & LAZY) == LAZY)
 		{
 			sb.append("lazy ");
 		}
-		if ((mod & Modifiers.FINAL) == Modifiers.FINAL)
+		if ((mod & FINAL) == FINAL)
 		{
 			sb.append("final ");
 		}
@@ -260,8 +259,8 @@ public final class ModifierUtil
 		final int flags = modifiers.toFlags();
 
 		final boolean hasValue = member.getValue() != null;
-		final boolean isAbstract = (flags & Modifiers.ABSTRACT) != 0;
-		final boolean isNative = (flags & Modifiers.NATIVE) != 0;
+		final boolean isAbstract = (flags & ABSTRACT) != 0;
+		final boolean isNative = (flags & NATIVE) != 0;
 
 		// If the method does not have an implementation and is static
 		if (isAbstract)
@@ -304,25 +303,49 @@ public final class ModifierUtil
 		}
 	}
 
-	public static int getFlags(IClassMember method)
+	public static long getFlags(IClassMember member)
 	{
-		int flags = method.getModifiers().toFlags();
-		if ((flags & STATIC_ABSTRACT) == STATIC_ABSTRACT)
+		final int flags = member.getModifiers().toFlags();
+		int javaModifiers = flags & JAVA_MODIFIER_MASK;
+		int dyvilModifiers = flags & DYVIL_MODIFIER_MASK;
+
+		if ((flags & PRIVATE_PROTECTED) == PRIVATE_PROTECTED)
 		{
-			flags &= ~Modifiers.ABSTRACT;
+			// for private protected members, move the private modifier
+
+			javaModifiers &= ~PRIVATE;
+			dyvilModifiers |= PRIVATE;
 		}
-		if ((flags & Modifiers.FINAL) != 0)
+		if (member.getElementType() == ElementType.METHOD)
 		{
-			final IClass enclosingClass = method.getEnclosingClass();
-			if (enclosingClass != null && enclosingClass.isInterface())
+			if ((flags & STATIC_ABSTRACT) == STATIC_ABSTRACT)
 			{
-				flags &= ~Modifiers.FINAL;
+				// for static abstract methods, move the abstract modifier
+
+				javaModifiers &= ~ABSTRACT;
+				dyvilModifiers |= ABSTRACT;
+			}
+			if ((flags & FINAL) != 0)
+			{
+				final IClass enclosingClass = member.getEnclosingClass();
+				if (enclosingClass != null && enclosingClass.isInterface())
+				{
+					// for final interface methods, move the final modifier
+
+					javaModifiers &= ~FINAL;
+					dyvilModifiers |= FINAL;
+				}
 			}
 		}
-		return flags;
+		return (long) dyvilModifiers << 32 | javaModifiers;
 	}
 
-	public static void writeModifiers(AnnotatableVisitor mw, IClassMember member)
+	public static int getJavaModifiers(long flags)
+	{
+		return (int) flags;
+	}
+
+	public static void writeModifiers(AnnotatableVisitor mw, IClassMember member, long flags)
 	{
 		final ModifierSet modifiers = member.getModifiers();
 		if (modifiers == null)
@@ -330,22 +353,7 @@ public final class ModifierUtil
 			return;
 		}
 
-		final int flags = modifiers.toFlags();
-		int dyvilModifiers = flags & MODIFIERS_MASK;
-
-		if ((flags & STATIC_ABSTRACT) == STATIC_ABSTRACT)
-		{
-			dyvilModifiers |= Modifiers.ABSTRACT;
-		}
-		if ((flags & Modifiers.FINAL) != 0)
-		{
-			final IClass enclosingClass = member.getEnclosingClass();
-			if (enclosingClass != null && enclosingClass.isInterface())
-			{
-				dyvilModifiers |= Modifiers.FINAL;
-			}
-		}
-
+		final int dyvilModifiers = (int) (flags >> 32);
 		if (dyvilModifiers != 0)
 		{
 			final AnnotationVisitor annotationVisitor = mw.visitAnnotation(AnnotationUtil.DYVIL_MODIFIERS, true);
