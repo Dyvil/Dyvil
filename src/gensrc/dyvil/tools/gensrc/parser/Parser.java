@@ -10,6 +10,7 @@ public class Parser
 	private static final int IF_BLOCK   = 1;
 	private static final int ELSE_BLOCK = 2;
 	private static final int FOR_BLOCK  = 3;
+	private static final int SCOPE_BLOCK  = 4;
 
 	private final List<String> lines;
 	private final int          lineCount;
@@ -81,6 +82,15 @@ public class Parser
 			case "import":
 				list.add(this.parseImport(line, directiveEnd, length));
 				continue;
+			case "scope":
+				start = this.parseBlock(list, start);
+				continue;
+			case "endscope":
+				if (block == SCOPE_BLOCK)
+				{
+					return start;
+				}
+				break;
 
 				// ----- if Directives -----
 			case "if":
@@ -131,6 +141,19 @@ public class Parser
 		}
 
 		return start;
+	}
+
+	private int parseBlock(DirectiveList list, int start)
+	{
+		final ScopeDirective directive = new ScopeDirective();
+		final DirectiveList block = new DirectiveList();
+
+		final int end = this.parse(block, start + 1, SCOPE_BLOCK);
+
+		directive.setBlock(block);
+		list.add(directive);
+
+		return end;
 	}
 
 	private LiteralDirective parseLiteral(String line, int directiveEnd, int length)
