@@ -130,6 +130,7 @@ public class CodeClass extends AbstractClass
 		{
 			this.annotations.resolveTypes(markers, context, this);
 		}
+		this.modifiers.resolveTypes(this, markers);
 
 		this.metadata.resolveTypesPre(markers, context);
 
@@ -252,7 +253,6 @@ public class CodeClass extends AbstractClass
 		{
 			this.annotations.check(markers, context, this.getElementType());
 		}
-		this.modifiers.check(this, markers);
 
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{

@@ -26,7 +26,6 @@ import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -49,6 +48,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+
+import static dyvil.tools.compiler.backend.ClassFormat.*;
 
 public final class ExternalClass extends AbstractClass
 {
@@ -532,7 +533,7 @@ public final class ExternalClass extends AbstractClass
 
 	public void visit(int access, String name, String signature, String superName, String[] interfaces)
 	{
-		this.modifiers = new FlagModifierSet(access);
+		this.modifiers = readModifiers(access);
 		this.internalName = name;
 
 		this.body = new ClassBody(this);
@@ -659,13 +660,13 @@ public final class ExternalClass extends AbstractClass
 		if (this.classParameters != null && this.classParameters.contains(name))
 		{
 			final ClassParameter param = new ExternalClassParameter(this, Name.fromQualified(name), desc, type,
-			                                                        new FlagModifierSet(access));
+			                                                        readModifiers(access));
 			this.parameters.addParameter(param);
 			return new SimpleFieldVisitor(param);
 		}
 
 		final ExternalField field = new ExternalField(this, Name.fromQualified(name), desc, type,
-		                                              new FlagModifierSet(access));
+		                                              readModifiers(access));
 
 		if (value != null)
 		{
@@ -690,19 +691,19 @@ public final class ExternalClass extends AbstractClass
 			return null;
 		case "<init>":
 			ExternalConstructor constructor = new ExternalConstructor(this);
-			constructor.setModifiers(new FlagModifierSet(access));
+			constructor.setModifiers(readModifiers(access));
 
 			if (signature != null)
 			{
-				ClassFormat.readConstructorType(signature, constructor);
+				readConstructorType(signature, constructor);
 			}
 			else
 			{
-				ClassFormat.readConstructorType(desc, constructor);
+				readConstructorType(desc, constructor);
 
 				if (exceptions != null)
 				{
-					ClassFormat.readExceptions(exceptions, constructor);
+					readExceptions(exceptions, constructor);
 				}
 			}
 
@@ -720,26 +721,25 @@ public final class ExternalClass extends AbstractClass
 		if (this.isAnnotation() && (access & Modifiers.STATIC) == 0)
 		{
 			final ClassParameter param = new ExternalClassParameter(this, Name.fromQualified(name), desc.substring(2),
-			                                                        ClassFormat.readReturnType(desc),
-			                                                        new FlagModifierSet(access));
+			                                                        readReturnType(desc), readModifiers(access));
 			this.parameters.addParameter(param);
 			return new AnnotationClassVisitor(param);
 		}
 
-		final ExternalMethod method = new ExternalMethod(this, name, desc, signature, new FlagModifierSet(access));
+		final ExternalMethod method = new ExternalMethod(this, name, desc, signature, readModifiers(access));
 
 		if (signature != null)
 		{
 			method.setTypeParametric();
-			ClassFormat.readMethodType(signature, method);
+			readMethodType(signature, method);
 		}
 		else
 		{
-			ClassFormat.readMethodType(desc, method);
+			readMethodType(desc, method);
 
 			if (exceptions != null)
 			{
-				ClassFormat.readExceptions(exceptions, method);
+				readExceptions(exceptions, method);
 			}
 		}
 

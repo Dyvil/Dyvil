@@ -179,6 +179,10 @@ public abstract class Member implements IMember
 		{
 			this.annotations.resolveTypes(markers, context, this);
 		}
+		if (this.modifiers != null)
+		{
+			this.modifiers.resolveTypes(this, markers);
+		}
 	}
 
 	@Override
@@ -217,10 +221,6 @@ public abstract class Member implements IMember
 		if (this.annotations != null)
 		{
 			this.annotations.check(markers, context, this.getElementType());
-		}
-		if (this.modifiers != null)
-		{
-			this.modifiers.check(this, markers);
 		}
 	}
 
