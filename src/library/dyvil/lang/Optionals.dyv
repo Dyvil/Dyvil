@@ -60,14 +60,6 @@ public abstract class Optionals
 	             /* 7 */ ])
 	public infix func ?? <T, U> (T? lhs, U rhs): T|U = lhs ?? rhs
 
-	// Equality
-
-	public infix func ==(Object! lhs, Object! rhs): boolean = lhs === rhs || lhs != null && lhs!!.equals(rhs)
-
-	@Intrinsic([ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2, BNOT ]
-	  strings: [ "dyvil/lang/Optionals", "$eq$eq", "(Ljava/lang/Object;Ljava/lang/Object;)Z" ])
-	public infix func !=(Object! lhs, Object! rhs): boolean = lhs != rhs
-
 	// Hash Code
 
 	public postfix func hashCode<T>(T? optional): int = optional == null ? 0 : optional!!.hashCode

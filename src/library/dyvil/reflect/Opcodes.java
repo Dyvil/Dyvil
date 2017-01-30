@@ -892,8 +892,8 @@ public interface Opcodes
 	int ACMPEQ = 314;
 	int ACMPNE = 315;
 
-	int NULL    = 316;
-	int NONNULL = 317;
+	int IS_NULL    = 316;
+	int IS_NONNULL = 317;
 
 	int IF_LCMPEQ = 330;
 	int IF_LCMPNE = 331;
@@ -1118,8 +1118,8 @@ public interface Opcodes
 		case IF_ACMPEQ: return IF_ACMPNE;
 		case IF_ACMPNE: return IF_ACMPEQ;
 			
-		case NULL: return NONNULL;
-		case NONNULL: return NULL;
+		case IS_NULL: return IS_NONNULL;
+		case IS_NONNULL: return IS_NULL;
 		case IFNULL: return IFNONNULL;
 		case IFNONNULL: return IFNULL;
 		}
@@ -1170,8 +1170,8 @@ public interface Opcodes
 		case ACMPEQ: return IF_ACMPEQ;
 		case ACMPNE: return IF_ACMPNE;
 			
-		case NULL: return IFNULL;
-		case NONNULL: return IFNONNULL;
+		case IS_NULL: return IFNULL;
+		case IS_NONNULL: return IFNONNULL;
 		
 		case BNOT: return IFEQ;
 		}
@@ -1222,8 +1222,8 @@ public interface Opcodes
 		case ACMPEQ: return IF_ACMPNE;
 		case ACMPNE: return IF_ACMPEQ;
 			
-		case NULL: return IFNONNULL;
-		case NONNULL: return IFNULL;
+		case IS_NULL: return IFNONNULL;
+		case IS_NONNULL: return IFNULL;
 		
 		case BNOT: return IFNE;
 		}

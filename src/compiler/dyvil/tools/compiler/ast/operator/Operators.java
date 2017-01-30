@@ -60,34 +60,6 @@ public final class Operators
 		return getIncOperator(name, arg1, false);
 	}
 
-	public static IValue getInfix_Priority(IValue arg1, Name name, IValue arg2)
-	{
-		if (name == Names.eqeq || name == Names.eqeqeq)
-		{
-			if (arg2.valueTag() == IValue.NULL)
-			{
-				return new NullCheckOperator(arg1, true);
-			}
-			if (arg1.valueTag() == IValue.NULL)
-			{
-				return new NullCheckOperator(arg2, true);
-			}
-			return null;
-		}
-		if (name == Names.bangeq || name == Names.bangeqeq)
-		{
-			if (arg2.valueTag() == IValue.NULL)
-			{
-				return new NullCheckOperator(arg1, false);
-			}
-			if (arg1.valueTag() == IValue.NULL)
-			{
-				return new NullCheckOperator(arg2, false);
-			}
-		}
-		return null;
-	}
-
 	public static IValue getInfix(IValue arg1, Name name, IValue arg2)
 	{
 		if (name == Names.plus)

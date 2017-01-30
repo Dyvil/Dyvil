@@ -27,22 +27,70 @@ public final class ObjectExtensions
 	// Object Extensions
 
 	// Structural Equality (equals)
+
 	@Intrinsic([ LOAD_0, LOAD_1, INVOKEVIRTUAL, 0, 1, 2 ]
 	  strings: [ "java/lang/Object", "equals", "(Ljava/lang/Object;)Z" ])
 	public infix func ==(Object lhs, Object! rhs): boolean = lhs.equals(rhs)
 
+	@BytecodeName("equals")
+	public infix func ==(Object! lhs, Object! rhs): boolean = lhs === rhs || lhs != null && lhs!!.equals(rhs)
+
+	@OverloadPriority
+	// @Deprecated(replacements: [ '===(Object!, null): boolean' ])
+	@Intrinsic([ LOAD_0, IS_NULL ])
+	public infix func ==(Object! lhs, null rhs): boolean = lhs == null
+
+	@OverloadPriority
+	// @Deprecated(replacements: [ '===(null, Object!): boolean' ])
+	@Intrinsic([ LOAD_1, IS_NULL ])
+	public infix func ==(null lhs, Object! rhs): boolean = rhs == null
+
 	// Reference Equality
+
 	@Intrinsic([ LOAD_0, LOAD_1, ACMPEQ ])
 	public infix func ===(Object! lhs, Object! rhs): boolean = lhs === rhs
 
+	@OverloadPriority
+	@Intrinsic([ LOAD_0, IS_NULL ])
+	public infix func ===(Object! lhs, null rhs): boolean = lhs === null
+
+	@OverloadPriority
+	@Intrinsic([ LOAD_1, IS_NULL ])
+	public infix func ===(null lhs, Object! rhs): boolean = rhs === null
+
 	// Structural Inequality (!equals)
+
 	@Intrinsic([ LOAD_0, LOAD_1, INVOKEVIRTUAL, 0, 1, 2, BNOT ]
 	  strings: [ "java/lang/Object", "equals", "(Ljava/lang/Object;)Z" ])
 	public infix func !=(Object lhs, Object! rhs): boolean = !lhs.equals(rhs)
 
+	@BytecodeName("notEquals")
+	@Intrinsic([ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2, BNOT ]
+	  strings: [ "dyvil/lang/ObjectExtensions", "$eq$eq", "(Ljava/lang/Object;Ljava/lang/Object;)Z" ])
+	public infix func !=(Object! lhs, Object! rhs): boolean = lhs != rhs
+
+	@OverloadPriority
+	// @Deprecated(replacements: [ '!==(Object!, null): boolean' ])
+	@Intrinsic([ LOAD_0, IS_NONNULL ])
+	public infix func !=(Object! lhs, null rhs): boolean = lhs != null
+
+	@OverloadPriority
+	// @Deprecated(replacements: [ '!==(null, Object!): boolean' ])
+	@Intrinsic([ LOAD_1, IS_NONNULL ])
+	public infix func !=(null lhs, Object! rhs): boolean = rhs != null
+
 	// Reference Inequality
+
 	@Intrinsic([ LOAD_0, LOAD_1, ACMPNE ])
 	public infix func !==(Object! lhs, Object! rhs): boolean = lhs !== rhs
+
+	@OverloadPriority
+	@Intrinsic([ LOAD_0, IS_NONNULL ])
+	public infix func !==(Object! lhs, null rhs): boolean = lhs !== null
+
+	@OverloadPriority
+	@Intrinsic([ LOAD_1, IS_NONNULL ])
+	public infix func !==(null lhs, Object! rhs): boolean = rhs !== null
 
 	// Comparable
 

@@ -31,14 +31,6 @@ public class InfixCall extends MethodCall
 	@Override
 	public IValue resolveCall(MarkerList markers, IContext context, boolean report)
 	{
-		IValue op = Operators.getInfix_Priority(this.receiver, this.name, this.arguments.getFirstValue());
-		if (op != null)
-		{
-			// Intrinsic Infix Operators (namely ==, ===, != and !== for null)
-			op.setPosition(this.position);
-			return op.resolveOperator(markers, context);
-		}
-
 		// Normal Method Resolution
 		final MatchList<IMethod> ambiguousCandidates = this.resolveMethodCall(markers, context);
 		if (ambiguousCandidates == null)
@@ -47,7 +39,7 @@ public class InfixCall extends MethodCall
 		}
 
 		// Infix Operators
-		op = Operators.getInfix(this.receiver, this.name, this.arguments.getFirstValue());
+		IValue op = Operators.getInfix(this.receiver, this.name, this.arguments.getFirstValue());
 		if (op != null)
 		{
 			op.setPosition(this.position);
