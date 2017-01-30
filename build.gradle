@@ -142,13 +142,13 @@ repositories {
 dependencies {
 	// Runtime Dependencies (Resources)
 	
-	def libRun = files("$buildDir/dyvilbin") {
+	def libRun = files("$buildDir/dyvil-classes/library") {
 		builtBy 'compileLibraryDyvil'
 	}
-	def dpfRun = files("$buildDir/dpfbin") {
+	def dpfRun = files("$buildDir/dyvil-classes/dpf") {
 		builtBy 'compileDPFDyvil'
 	}
-	def testRun = files("$buildDir/dyviltestbin") {
+	def testRun = files("$buildDir/dyvil-classes/test") {
 		builtBy 'compileTestDyvil'
 	}
 	
@@ -272,15 +272,15 @@ task genLibrary(type: JavaExec, dependsOn: [ 'gensrcClasses' ]) { JavaExec exec 
  * Compiles the Dyvil Classes and Headers in the Dyvil Library by running the freshly-compiled compiler
  */
 task compileLibraryDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'copyLibraryDyvil' ]) { JavaExec exec ->
-	runCompiler exec, 'config/lib.dyc', 'src/library/', "$buildDir/dyvilbin"
+	runCompiler exec, 'config/lib.dyc', 'src/library/', "$buildDir/dyvil-classes/library"
 }
 
 task compileDPFDyvil(type: JavaExec, dependsOn: [ 'compileLibraryDyvil', 'copyDPFDyvil' ]) { JavaExec exec ->
-	runCompiler exec, 'config/dpf.dyc', 'src/dpf/', "$buildDir/dpfbin"
+	runCompiler exec, 'config/dpf.dyc', 'src/dpf/', "$buildDir/dyvil-classes/dpf"
 }
 
 task compileTestDyvil(type: JavaExec, dependsOn: [ 'compileDPFDyvil', 'copyTestDyvil' ]) { JavaExec exec ->
-	runCompiler exec, 'config/test.dyc', 'src/test/', "$buildDir/dyviltestbin"
+	runCompiler exec, 'config/test.dyc', 'src/test/', "$buildDir/dyvil-classes/test"
 }
 
 private void runCompiler(JavaExec exec, String config, String src, String bin)
@@ -288,13 +288,12 @@ private void runCompiler(JavaExec exec, String config, String src, String bin)
 	// Required to make UP-TO-DATE work
 	
 	// All Dyvil Class and Header files
-	exec.inputs.files.add fileTree(src) {
+	exec.inputs.file fileTree(src) {
 		include dyvilFilters
 	}
 	
 	// All possible Output Files (.class, .dyo)
 	exec.outputs.dir bin
-	exec.outputs.upToDateSpec = new AndSpec<>()
 	
 	exec.main = compilerMainClass
 	exec.classpath = sourceSets.compiler.runtimeClasspath
@@ -303,12 +302,11 @@ private void runCompiler(JavaExec exec, String config, String src, String bin)
 
 private void runGenSrc(JavaExec exec, String src, String dest)
 {
-	exec.inputs.files.add fileTree(src) {
+	exec.inputs.file fileTree(src) {
 		include genSrcFilters
 	}
 	
 	exec.outputs.dir dest
-	exec.outputs.upToDateSpec = new AndSpec<>()
 	
 	exec.main = genSrcMainClass
 	exec.classpath = sourceSets.gensrc.runtimeClasspath
@@ -330,7 +328,7 @@ test.dependsOn 'testDyvil'
  * Creates a Jar file that contains all library classes generated from Dyvil source code and saves it in libs/
  */
 task bootstrap(type: Jar, dependsOn: [ 'compileLibraryDyvil' ]) {
-	from("$buildDir/dyvilbin") {
+	from("$buildDir/dyvil-classes/library") {
 		include '**/*.class'
 	}
 	
@@ -350,7 +348,7 @@ task buildLibrary(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil
 	from sourceSets.library.output
 	from sourceSets.library.resources
 	
-	from("$buildDir/dyvilbin") {
+	from("$buildDir/dyvil-classes/library") {
 		include binaryFilters
 	}
 	
@@ -360,7 +358,7 @@ task buildLibrary(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil
 task buildDPF(type: Jar, dependsOn: [ 'dpfClasses', 'compileDPFDyvil' ]) {
 	from sourceSets.dpf.output
 	
-	from("$buildDir/dpfbin") {
+	from("$buildDir/dyvil-classes/dpf") {
 		include binaryFilters
 	}
 	
@@ -415,10 +413,10 @@ task buildAll(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil', '
 	from sourceSets.gensrc.output
 	from sourceSets.gensrc.resources
 	
-	from("$buildDir/dyvilbin") {
+	from("$buildDir/dyvil-classes/library") {
 		include binaryFilters
 	}
-	from("$buildDir/dpfbin") {
+	from("$buildDir/dyvil-classes/dpf") {
 		include binaryFilters
 	}
 	
@@ -479,36 +477,20 @@ if (nightly)
 	build.dependsOn 'prepareRelease'
 }
 
-// ---------------------------------------- Misc. Tasks ----------------------------------------
+// ---------------------------------------- Cleanup Tasks ----------------------------------------
 
-/**
- * Creates the Gradle Wrapper (gradlew)
- */
-task wrapper(type: Wrapper) {
-	gradleVersion = '2.7'
-}
-
-/**
- * Re-create the build/dyvilbin directory after cleaning to avoid Eclipse Build Path errors
- */
-clean.doLast {
-	file("$buildDir/dyvilbin").mkdirs()
-	file("$buildDir/dpfbin").mkdirs()
-	file("$buildDir/gensrc").mkdirs()
-}
-
-/**
- * Removes temporary folders from the build dir, leaving only the 'build/libs' folder.
- */
-task cleanTemps(type: Delete) {
-	delete file("$buildDir/src/")
-	delete file("$buildDir/classes/")
-	delete file("$buildDir/dependency-cache/")
-	delete file("$buildDir/tmp/")
-	delete file("$buildDir/resources/")
-	
-	// Delete contents, but not the directory itself
-	delete fileTree("$buildDir/dyvilbin")
-	delete fileTree("$buildDir/dpfbin")
+task cleanDyvil(type: Delete, group: 'cleanup') {
+	// Delete contents, but not the directories itself
+	delete fileTree("$buildDir/dyvil-classes")
 	delete fileTree("$buildDir/gensrc")
+}
+
+clean {
+	group = 'cleanup'
+	dependsOn 'cleanDyvil'
+	
+	delete = buildDir.listFiles().findAll({
+		def path = it.getPath()
+		!path.endsWith('dyvil-classes') && !path.endsWith('libs')
+	}).toSet()
 }
