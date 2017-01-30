@@ -302,7 +302,8 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public IParameter createParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public IParameter createParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers,
+		                                 AnnotationList annotations)
 	{
 		return new ClassParameter(this, position, name, type, modifiers, annotations);
 	}
@@ -438,7 +439,8 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			if (property != null)
 			{
 				final IMethod getter = property.getGetter();
-				if (getter != null && name == getter.getName()){
+				if (getter != null && name == getter.getName())
+				{
 					list.add(getter);
 				}
 
@@ -517,7 +519,8 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext, Set<IClass> checkedClasses)
+	public void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext,
+		                        Set<IClass> checkedClasses)
 	{
 		if (checkedClasses.contains(this))
 		{
@@ -542,7 +545,8 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		this.checkSuperMethods(markers, checkedClass, typeContext, checkedClasses);
 	}
 
-	public void checkSuperMethods(MarkerList markers, IClass thisClass, ITypeContext typeContext, Set<IClass> checkedClasses)
+	public void checkSuperMethods(MarkerList markers, IClass thisClass, ITypeContext typeContext,
+		                             Set<IClass> checkedClasses)
 	{
 		if (this.superType != null)
 		{
@@ -882,11 +886,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public IAccessible getAccessibleThis(IClass type)
 	{
-		if (type == this || Types.isSuperClass(this, type))
-		{
-			return VariableThis.DEFAULT;
-		}
-		return null;
+		return type == this || Types.isSuperClass(type, this) ? VariableThis.DEFAULT : null;
 	}
 
 	@Override
@@ -904,8 +904,8 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public byte getVisibility(IClassMember member)
 	{
-		IClass iclass = member.getEnclosingClass();
-		if (iclass == this || iclass == null)
+		final IClass enclosingClass = member.getEnclosingClass();
+		if (enclosingClass == this)
 		{
 			return VISIBLE;
 		}
@@ -913,38 +913,32 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		int level = member.getAccessLevel();
 		if ((level & Modifiers.INTERNAL) != 0)
 		{
-			if (iclass instanceof ExternalClass)
+			if (enclosingClass instanceof ExternalClass)
 			{
 				return INTERNAL;
 			}
-			// Clear the INTERNAL bit by ANDing with 0b1111
-			level &= 0b1111;
+			level &= ~Modifiers.INTERNAL;
 		}
+
 		if (level == Modifiers.PUBLIC)
 		{
 			return VISIBLE;
 		}
-		if (level == Modifiers.PROTECTED)
+		if (level == Modifiers.PROTECTED || level == Modifiers.PRIVATE_PROTECTED)
 		{
-			if (this.superType != null && this.superType.getTheClass() == iclass)
+			if (Types.isSuperClass(enclosingClass, this))
 			{
+				// The enclosing class of the member is a super class of this
 				return VISIBLE;
-			}
-
-			for (int i = 0; i < this.interfaceCount; i++)
-			{
-				if (this.interfaces[i].getTheClass() == iclass)
-				{
-					return VISIBLE;
-				}
 			}
 		}
 		if (level == Modifiers.PROTECTED || level == Modifiers.PACKAGE)
 		{
-			IHeaderUnit unit1 = this.getHeader();
-			IHeaderUnit unit2 = iclass.getHeader();
-			if (unit1 != null && unit2 != null && unit1.getPackage() == unit2.getPackage())
+			final IHeaderUnit thisUnit = this.getHeader();
+			final IHeaderUnit memberUnit = enclosingClass.getHeader();
+			if (thisUnit != null && memberUnit != null && thisUnit.getPackage() == memberUnit.getPackage())
 			{
+				// The two units are in the same package
 				return VISIBLE;
 			}
 		}

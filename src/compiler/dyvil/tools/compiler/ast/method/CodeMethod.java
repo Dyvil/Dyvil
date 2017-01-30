@@ -429,39 +429,11 @@ public class CodeMethod extends AbstractMethod
 		}
 
 		final boolean thisTypeResolved = this.type.isResolved();
-		final int accessLevel = this.getAccessLevel() & ~Modifiers.INTERNAL;
 		final ITypeContext typeContext = this.enclosingClass.getThisType();
 
 		for (IMethod overrideMethod : this.overrideMethods)
 		{
-			final ModifierSet modifiers = overrideMethod.getModifiers();
-
-			// Final Modifier Check
-			if (modifiers.hasIntModifier(Modifiers.FINAL))
-			{
-				markers.add(Markers.semanticError(this.position, "method.override.final", this.name));
-			}
-
-			// Visibility Check
-
-			switch (modifiers.toFlags() & Modifiers.VISIBILITY_MODIFIERS)
-			{
-			case Modifiers.PRIVATE:
-				markers.add(Markers.semanticError(this.position, "method.override.private", this.name));
-				break;
-			case Modifiers.PROTECTED:
-				if (accessLevel != Modifiers.PUBLIC && accessLevel != Modifiers.PROTECTED)
-				{
-					markers.add(Markers.semanticError(this.position, "method.override.protected", this.name));
-				}
-				break;
-			case Modifiers.PUBLIC:
-				if (modifiers.hasIntModifier(Modifiers.PUBLIC) && accessLevel != Modifiers.PUBLIC)
-				{
-					markers.add(Markers.semanticError(this.position, "method.override.public", this.name));
-				}
-				break;
-			}
+			ModifierUtil.checkOverride(this, overrideMethod, markers);
 
 			// Type Compatibility Check
 

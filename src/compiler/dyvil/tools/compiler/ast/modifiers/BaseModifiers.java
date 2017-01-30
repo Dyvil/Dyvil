@@ -31,7 +31,7 @@ public enum BaseModifiers implements Modifier
 	CONST(Modifiers.CONST, "const"),
 	LAZY(Modifiers.LAZY, "lazy");
 
-	public static final String VISIBILITY_MODIFIERS = "public,private,protected,";
+	public static final String VISIBILITY_MODIFIERS = "public,private,protected,private protected,package private,";
 
 	/**
 	 * The access modifiers.

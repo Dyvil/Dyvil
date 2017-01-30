@@ -38,6 +38,8 @@ public class InheritanceTest
 	{
 		public var foo2Init: int
 
+		func fooInitAvailable: boolean = fooInit
+
 		public override func onFooInit(): void = this.foo2Init++
 	}
 

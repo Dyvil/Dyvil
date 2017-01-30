@@ -394,19 +394,23 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 			access &= 0b1111;
 		}
 
-		if (access == Modifiers.PUBLIC)
+		switch (access)
 		{
+		case Modifiers.PUBLIC:
 			return VISIBLE;
-		}
-		if (access == Modifiers.PROTECTED || access == Modifiers.PACKAGE)
-		{
+		case Modifiers.PROTECTED:
+		case Modifiers.PACKAGE:
 			IHeaderUnit header = iclass.getHeader();
 			if (header != null && (header == this || this.pack == header.getPackage()))
 			{
 				return VISIBLE;
 			}
+			// Fallthrough
+		case Modifiers.PRIVATE:
+		case Modifiers.PRIVATE_PROTECTED:
+		default:
+			return INVISIBLE;
 		}
-		return INVISIBLE;
 	}
 
 	// Compilation

@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.modifiers;
 
+import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
@@ -11,6 +12,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -251,6 +253,49 @@ public final class ModifierUtil
 			                                  accessModifiersToString(member.getAccessLevel())));
 			break;
 		}
+	}
+
+	public static void checkOverride(IMethod member, IMethod overriden, MarkerList markers)
+	{
+		final int accessLevel = member.getAccessLevel() & ~Modifiers.INTERNAL;
+		final int overrideFlags = overriden.getModifiers().toFlags();
+
+		// Final Modifier Check
+		if ((overrideFlags & Modifiers.FINAL) != 0)
+		{
+			markers.add(Markers.semanticError(member.getPosition(), "method.override.final", member.getName()));
+		}
+
+		// Visibility Check
+
+		switch (overrideFlags & Modifiers.VISIBILITY_MODIFIERS)
+		{
+		case Modifiers.PRIVATE:
+			markers.add(Markers.semanticError(member.getPosition(), "method.override.private", member.getName()));
+			break;
+		case Modifiers.PRIVATE_PROTECTED:
+			if (accessLevel == Modifiers.PRIVATE_PROTECTED)
+			{
+				return;
+			}
+			// Fallthrough
+		case Modifiers.PROTECTED:
+			if (accessLevel == Modifiers.PROTECTED)
+			{
+				return;
+			}
+			// Fallthrough
+		case Modifiers.PUBLIC:
+			if (accessLevel == Modifiers.PUBLIC)
+			{
+				return;
+			}
+		}
+
+		final Marker marker = Markers.semanticError(member.getPosition(), "method.override.visibility.mismatch",
+		                                            member.getName());
+		marker.addInfo(Markers.getSemantic("method.override.visibility", accessModifiersToString(overrideFlags)));
+		markers.add(marker);
 	}
 
 	public static void checkMethodModifiers(MarkerList markers, IMethod member)
