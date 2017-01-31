@@ -153,27 +153,33 @@ public final class NamedArgumentList implements IArguments
 
 	private int findIndex(int index, Name name)
 	{
-		boolean firstName = false;
+		// First, try to match the parameter name against the argument labels
 		for (int i = 0; i < this.size; i++)
 		{
-			final Name nameAt = this.keys[i];
-			if (nameAt == null)
-			{
-				if (!firstName && i == index)
-				{
-					return i;
-				}
-				continue;
-			}
-
-			if (nameAt == name)
+			if (this.keys[i] == name)
 			{
 				return i;
 			}
-
-			firstName = true;
 		}
-		return -1;
+
+		// The specified name was not found, check the indices:
+
+		if (index >= this.size)
+		{
+			return -1;
+		}
+
+		// Require that no argument labels exists before or at the index
+		for (int i = 0; i <= index; i++)
+		{
+			if (this.keys[i] != null)
+			{
+				return -1;
+			}
+		}
+
+		// No argument labels present before the requested index
+		return index;
 	}
 
 	private int findNextName(int startIndex)

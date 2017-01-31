@@ -110,27 +110,35 @@ public class MethodCall extends AbstractCall implements INamed
 		}
 
 		// Normal Method Resolution
-		final MatchList<IMethod> ambigousCandidates = this.resolveMethodCall(markers, context);
-		if (ambigousCandidates == null)
+		final MatchList<IMethod> candidates = this.resolveCandidates(context);
+		if (!candidates.isEmpty())
 		{
-			return this;
+			final IMethod bestMember = candidates.getBestMember();
+			if (bestMember != null)
+			{
+				this.method = bestMember;
+				this.checkArguments(markers, context);
+				return this;
+			}
 		}
-
-		// Apply Method Resolution
-		final IValue fieldAccess = new FieldAccess(this.position, this.receiver, this.name)
-			                           .resolveFieldAccess(markers, context);
-		if (fieldAccess != null)
+		else
 		{
-			// Field Access available, try to resolve an apply method
+			// Apply Method Resolution
+			final IValue fieldAccess = new FieldAccess(this.position, this.receiver, this.name)
+				                           .resolveFieldAccess(markers, context);
+			if (fieldAccess != null)
+			{
+				// Field Access available, try to resolve an apply method
 
-			final ApplyMethodCall call = new ApplyMethodCall(this.position, fieldAccess, this.arguments);
-			call.genericData = this.genericData;
-			return call.resolveCall(markers, context, report);
+				final ApplyMethodCall call = new ApplyMethodCall(this.position, fieldAccess, this.arguments);
+				call.genericData = this.genericData;
+				return call.resolveCall(markers, context, report);
+			}
 		}
 
 		if (report)
 		{
-			this.reportResolve(markers, ambigousCandidates);
+			this.reportResolve(markers, candidates);
 			return this;
 		}
 		return null;

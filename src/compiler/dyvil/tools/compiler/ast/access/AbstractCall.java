@@ -204,9 +204,14 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 		return null;
 	}
 
+	protected MatchList<IMethod> resolveCandidates(IContext context)
+	{
+		return ICall.resolveMethods(context, this.receiver, this.getName(), this.arguments);
+	}
+
 	protected MatchList<IMethod> resolveMethodCall(MarkerList markers, IContext context)
 	{
-		final MatchList<IMethod> list = ICall.resolveMethods(context, this.receiver, this.getName(), this.arguments);
+		final MatchList<IMethod> list = this.resolveCandidates(context);
 		final IMethod method = list.getBestMember();
 
 		if (method != null)
