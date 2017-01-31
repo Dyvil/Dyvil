@@ -54,6 +54,8 @@ public class ModifierParser
 			return BaseModifiers.INLINE;
 		case DyvilKeywords.IMPLICIT:
 			return BaseModifiers.IMPLICIT;
+		case DyvilKeywords.EXPLICIT:
+			return BaseModifiers.EXPLICIT;
 		case DyvilKeywords.SYNCHRONIZED:
 			return BaseModifiers.SYNCHRONIZED;
 		case DyvilKeywords.CONST:

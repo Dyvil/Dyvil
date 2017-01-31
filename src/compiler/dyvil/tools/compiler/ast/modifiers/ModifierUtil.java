@@ -137,6 +137,8 @@ public final class ModifierUtil
 			if ((mod & INLINE) == INLINE) { builder.append("inline "); }
 			if ((mod & OVERRIDE) == OVERRIDE) { builder.append("override "); }
 		}
+
+		if ((mod & EXPLICIT) == EXPLICIT) { builder.append("explicit "); }
 		// @formatter:on
 	}
 

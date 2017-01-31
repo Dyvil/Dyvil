@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.collection.iterator.EmptyIterator;
 import dyvil.collection.iterator.SingletonIterator;
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IImplicitContext;
@@ -117,6 +118,10 @@ public final class SingleArgument implements IArguments, IValueConsumer
 		if (argumentIndex != 0 || this.value == null)
 		{
 			return param.isVarargs() ? 0 : -1;
+		}
+		if (param.hasModifier(Modifiers.EXPLICIT))
+		{
+			return -1;
 		}
 
 		if (!param.isVarargs() || this.value.checkVarargs(false))

@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.collection.iterator.ArrayIterator;
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
@@ -186,6 +187,10 @@ public final class ArgumentList implements IArguments, IValueList
 		{
 			return param.isVarargs() ? 0 : -1;
 		}
+		if (param.hasModifier(Modifiers.EXPLICIT))
+		{
+			return -1;
+		}
 
 		if (param.isVarargs())
 		{
@@ -225,7 +230,8 @@ public final class ArgumentList implements IArguments, IValueList
 		final IType arrayType = param.getInternalType();
 		if (argument.checkVarargs(false))
 		{
-			return checkMatch_(matchValues, matchTypes, matchStartIndex + startIndex, argument, arrayType, implicitContext) ? 0 : -1;
+			return checkMatch_(matchValues, matchTypes, matchStartIndex + startIndex, argument, arrayType,
+			                   implicitContext) ? 0 : -1;
 		}
 
 		if (startIndex == endIndex)

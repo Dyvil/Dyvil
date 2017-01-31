@@ -14,7 +14,8 @@ public class DyvilKeywords
 	public static final int CONTINUE     = Tokens.KEYWORD | 0x00080000;
 	public static final int DO           = Tokens.KEYWORD | 0x00090000; // unused
 	public static final int ELSE         = Tokens.KEYWORD | 0x000A0000;
-	public static final int ENUM         = Tokens.KEYWORD | 0x000B0000;
+	public static final int ENUM         = Tokens.KEYWORD | 0x000B0000; // unused
+	public static final int EXPLICIT     = Tokens.KEYWORD | 0x00330000;
 	public static final int EXTENDS      = Tokens.KEYWORD | 0x000C0000;
 	public static final int EXTENSION    = Tokens.KEYWORD | 0x000D0000;
 	public static final int FALSE        = Tokens.KEYWORD | 0x000E0000;
@@ -86,6 +87,7 @@ public class DyvilKeywords
 		case "do": return DO;
 		case "else": return ELSE;
 		case "enum": return ENUM;
+		case "explicit": return EXPLICIT;
 		case "extends": return EXTENDS;
 		case "extension": return EXTENSION;
 		case "false": return FALSE;
@@ -161,6 +163,7 @@ public class DyvilKeywords
 		case DO: return "do";
 		case ELSE: return "else";
 		case ENUM: return "enum";
+		case EXPLICIT: return "explicit";
 		case EXTENDS: return "extends";
 		case EXTENSION: return "extension";
 		case FALSE: return "false";

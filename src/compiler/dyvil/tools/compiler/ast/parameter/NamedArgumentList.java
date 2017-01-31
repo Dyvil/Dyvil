@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.collection.iterator.ArrayIterator;
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -198,6 +199,10 @@ public final class NamedArgumentList implements IArguments
 			// No argument for parameter name
 
 			return param.isVarargs() ? 0 : -1;
+		}
+		if (this.keys[argIndex] == null && param.hasModifier(Modifiers.EXPLICIT))
+		{
+			return -1;
 		}
 
 		if (!param.isVarargs())

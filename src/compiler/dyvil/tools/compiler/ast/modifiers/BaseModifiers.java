@@ -28,7 +28,9 @@ public enum BaseModifiers implements Modifier
 	CASE(Modifiers.CASE_CLASS, "case"),
 	// Field Modifiers
 	CONST(Modifiers.CONST, "const"),
-	LAZY(Modifiers.LAZY, "lazy");
+	LAZY(Modifiers.LAZY, "lazy"),
+	// Parameter Modifiers
+	EXPLICIT(Modifiers.EXPLICIT, "explicit");
 
 	public static final String VISIBILITY_MODIFIERS = "public,private,protected,private protected,package private,";
 
@@ -71,7 +73,7 @@ public enum BaseModifiers implements Modifier
 	/**
 	 * The modifiers that can be used on parameters.
 	 */
-	public static final String PARAMETER_MODIFIERS = VARIABLE_MODIFIERS;
+	public static final String PARAMETER_MODIFIERS = VARIABLE_MODIFIERS + "explicit,";
 
 	public static final String CONSTRUCTOR_MODIFIERS = ACCESS_MODIFIERS;
 

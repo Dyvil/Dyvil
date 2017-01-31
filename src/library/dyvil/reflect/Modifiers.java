@@ -165,11 +165,6 @@ public interface Modifiers
 
 	int EXTENSION = EXTENSION_FLAG | INFIX;
 
-	/**
-	 * <i>Dyvil</i> {@code implicit} modifier.
-	 */
-	int IMPLICIT = 0x00200000;
-
 	// Field Modifiers
 
 	/**
@@ -184,17 +179,30 @@ public interface Modifiers
 	 * <i>Dyvil</i> {@code internal} modifier. This is used to mark that a class, method or field is only visible from
 	 * inside the current library / project.
 	 */
-	int INTERNAL = 0x01000000;
+	int INTERNAL = 0x00100000;
 
 	/**
-	 * <i>Dyvil</i> {@code deprecated} modifier. This modifier is a shortcut for the {@link Deprecated} annotation.
+	 * <i>Dyvil</i> {@code implicit} modifier.
 	 */
-	int DEPRECATED = 0x02000000;
+	int IMPLICIT = 0x00200000;
+
+	/**
+	 * <i>Dyvil</i> {@code explicit} modifier.
+	 */
+	int EXPLICIT = 0x00400000;
+
+	// Compile-time only Modifiers
+
+	/**
+	 * Modifier that marks a member with an {@link java.lang.Deprecated} or {@link dyvil.annotation.Deprecated}
+	 * annotation.
+	 */
+	int DEPRECATED = 0x10000000;
 
 	/**
 	 * <i>Dyvil</i> {@code override} modifier. This modifier is a shortcut for the {@link Override} annotation.
 	 */
-	int OVERRIDE = 0x04000000;
+	int OVERRIDE = 0x20000000;
 
 	// Masks
 
@@ -215,29 +223,33 @@ public interface Modifiers
 	/**
 	 * The modifiers that can be used on any member.
 	 */
-	int MEMBER_MODIFIERS = ACCESS_MODIFIERS | STATIC | FINAL | SYNTHETIC;
+	int MEMBER_MODIFIERS = ACCESS_MODIFIERS | STATIC | FINAL // denotable
+		                       | SYNTHETIC;
 
 	/**
 	 * The modifiers that can be used on classes.
 	 */
-	int CLASS_MODIFIERS = MEMBER_MODIFIERS | CLASS_TYPE_MODIFIERS | ABSTRACT | STRICT | CASE_CLASS | FUNCTIONAL;
+	int CLASS_MODIFIERS = MEMBER_MODIFIERS | ABSTRACT | CASE_CLASS // denotable
+		                      | CLASS_TYPE_MODIFIERS | STRICT;
 
 	/**
 	 * The modifiers that can be used on fields.
 	 */
-	int FIELD_MODIFIERS = MEMBER_MODIFIERS | TRANSIENT | VOLATILE | LAZY;
+	int FIELD_MODIFIERS = MEMBER_MODIFIERS | LAZY // denotable
+		                      | TRANSIENT | VOLATILE;
 
 	/**
 	 * The modifiers that can be used on methods.
 	 */
 	int METHOD_MODIFIERS =
-		MEMBER_MODIFIERS | ABSTRACT | SYNCHRONIZED | NATIVE | STRICT | INLINE | INFIX | EXTENSION | IMPLICIT | BRIDGE
-			| VARARGS | OVERRIDE;
+		MEMBER_MODIFIERS | ABSTRACT | SYNCHRONIZED | INLINE | INFIX | EXTENSION | IMPLICIT | OVERRIDE // denotable
+			| NATIVE | STRICT | BRIDGE | VARARGS;
 
 	/**
 	 * The modifiers that can be used on parameters.
 	 */
-	int PARAMETER_MODIFIERS = FINAL | LAZY | MANDATED | EXTENSION | VARARGS | SYNTHETIC;
+	int PARAMETER_MODIFIERS = FINAL | EXPLICIT // denotable
+		                          | MANDATED | EXTENSION | VARARGS | SYNTHETIC;
 
 	/**
 	 * The modifiers that can be applied to class parameters.
