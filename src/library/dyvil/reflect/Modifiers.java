@@ -1,5 +1,7 @@
 package dyvil.reflect;
 
+import java.lang.reflect.Field;
+
 /**
  * The <b>Modifiers</b> interface declares all (visible and invisible) modifiers that can be used <i>Dyvil</i> source
  * code and that can appear in class files. Note that only modifiers less than {@code 0xFFFF} will actually appear in
@@ -159,14 +161,9 @@ public interface Modifiers
 	 */
 	int INFIX = INFIX_FLAG | STATIC;
 
-	int EXTENSION_FLAG = 0x00100000;
+	int EXTENSION_FLAG = 0x00080000;
 
 	int EXTENSION = EXTENSION_FLAG | INFIX;
-
-	/**
-	 * <i>Dyvil</i> {@code override} modifier. This modifier is a shortcut for the {@link Override} annotation.
-	 */
-	int OVERRIDE = 0x00080000;
 
 	/**
 	 * <i>Dyvil</i> {@code implicit} modifier.
@@ -195,10 +192,11 @@ public interface Modifiers
 	int DEPRECATED = 0x02000000;
 
 	/**
-	 * <i>Dyvil</i> {@code sealed} modifier. This modifier is used to mark that a class that is {@code sealed}, i.e. it
-	 * can only be extended from classes in the same library. All sub-classes are always known at compile time.
+	 * <i>Dyvil</i> {@code override} modifier. This modifier is a shortcut for the {@link Override} annotation.
 	 */
-	int SEALED = 0x04000000;
+	int OVERRIDE = 0x04000000;
+
+	// Masks
 
 	/**
 	 * The modifiers that can be used to declare the class type (i.e., {@code class}, {@code interface}, {@code trait},
@@ -222,8 +220,7 @@ public interface Modifiers
 	/**
 	 * The modifiers that can be used on classes.
 	 */
-	int CLASS_MODIFIERS =
-		MEMBER_MODIFIERS | CLASS_TYPE_MODIFIERS | ABSTRACT | STRICT | CASE_CLASS | FUNCTIONAL | SEALED;
+	int CLASS_MODIFIERS = MEMBER_MODIFIERS | CLASS_TYPE_MODIFIERS | ABSTRACT | STRICT | CASE_CLASS | FUNCTIONAL;
 
 	/**
 	 * The modifiers that can be used on fields.
@@ -255,4 +252,33 @@ public interface Modifiers
 	int CONSTRUCTOR_MODIFIERS = ACCESS_MODIFIERS;
 
 	int INITIALIZER_MODIFIERS = PRIVATE | STATIC;
+
+	static void main(String[] args)
+	{
+		int used = 0;
+		for (Field f : Modifiers.class.getDeclaredFields())
+		{
+			if (f.getType() != int.class)
+			{
+				continue;
+			}
+
+			try
+			{
+				used |= (int) f.get(null);
+			}
+			catch (IllegalAccessException ignored)
+			{
+			}
+		}
+
+		for (int i = 0; i < 32; i++)
+		{
+			int mask = 1 << i;
+			if ((used & mask) == 0)
+			{
+				System.out.printf("%#010x\n", mask);
+			}
+		}
+	}
 }

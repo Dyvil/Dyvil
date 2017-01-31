@@ -82,10 +82,6 @@ public class FlagModifierSet implements ModifierSet
 	@Override
 	public void toString(MemberKind memberKind, StringBuilder builder)
 	{
-		ModifierUtil.writeAccessModifiers(this.flags, builder);
-		ModifierUtil.writeClassModifiers(this.flags, builder);
-		ModifierUtil.writeMethodModifiers(this.flags, builder);
-		ModifierUtil.writeFieldModifiers(this.flags, builder);
-		ModifierUtil.writeParameterModifier(this.flags, builder);
+		ModifierUtil.appendModifiers(this.flags, memberKind, builder);
 	}
 }

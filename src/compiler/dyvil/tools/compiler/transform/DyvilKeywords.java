@@ -10,7 +10,7 @@ public class DyvilKeywords
 	public static final int CASE         = Tokens.KEYWORD | 0x00040000;
 	public static final int CATCH        = Tokens.KEYWORD | 0x00050000;
 	public static final int CLASS        = Tokens.KEYWORD | 0x00060000;
-	public static final int CONST        = Tokens.KEYWORD | 0x00070000; // unused
+	public static final int CONST        = Tokens.KEYWORD | 0x00070000;
 	public static final int CONTINUE     = Tokens.KEYWORD | 0x00080000;
 	public static final int DO           = Tokens.KEYWORD | 0x00090000; // unused
 	public static final int ELSE         = Tokens.KEYWORD | 0x000A0000;
@@ -53,7 +53,6 @@ public class DyvilKeywords
 	public static final int PUBLIC       = Tokens.KEYWORD | 0x00300000;
 	public static final int REPEAT       = Tokens.KEYWORD | 0x00310000;
 	public static final int RETURN       = Tokens.KEYWORD | 0x00320000;
-	public static final int SEALED       = Tokens.KEYWORD | 0x00330000; // unused
 	public static final int STATIC       = Tokens.KEYWORD | 0x00340000;
 	public static final int STRUCT       = Tokens.KEYWORD | 0x00350000; // unused
 	public static final int SUPER        = Tokens.KEYWORD | 0x00360000;
@@ -125,7 +124,6 @@ public class DyvilKeywords
 		case "public": return PUBLIC;
 		case "repeat": return REPEAT;
 		case "return": return RETURN;
-		case "sealed": return SEALED;
 		case "static": return STATIC;
 		case "struct": return STRUCT;
 		case "super": return SUPER;
@@ -201,7 +199,6 @@ public class DyvilKeywords
 		case PUBLIC: return "public";
 		case REPEAT: return "repeat";
 		case RETURN: return "return";
-		case SEALED: return "sealed";
 		case STATIC: return "static";
 		case STRUCT: return "struct";
 		case SUPER: return "super";

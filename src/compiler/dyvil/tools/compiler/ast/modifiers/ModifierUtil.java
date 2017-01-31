@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.Markers;
@@ -37,32 +38,8 @@ public final class ModifierUtil
 	public static String accessModifiersToString(int mod)
 	{
 		final StringBuilder builder = new StringBuilder();
-		writeAccessModifiers(mod, builder);
+		appendAccessModifiers(mod, builder);
 		return builder.toString();
-	}
-
-	public static void writeAccessModifiers(int mod, StringBuilder sb)
-	{
-		if ((mod & PUBLIC) == PUBLIC)
-		{
-			sb.append("public ");
-		}
-		if ((mod & PACKAGE) == PACKAGE)
-		{
-			sb.append("package ");
-		}
-		if ((mod & PRIVATE) == PRIVATE)
-		{
-			sb.append("private ");
-		}
-		if ((mod & PROTECTED) == PROTECTED)
-		{
-			sb.append("protected ");
-		}
-		if ((mod & INTERNAL) == INTERNAL)
-		{
-			sb.append("internal ");
-		}
 	}
 
 	public static String classTypeToString(int mod)
@@ -108,130 +85,59 @@ public final class ModifierUtil
 		sb.append("class ");
 	}
 
-	public static void writeClassModifiers(int mod, StringBuilder sb)
+	public static void appendAccessModifiers(int mod, StringBuilder builder)
 	{
-		if ((mod & STATIC) == STATIC)
-		{
-			sb.append("static ");
-		}
-		if ((mod & ABSTRACT) == ABSTRACT)
-		{
-			sb.append("abstract ");
-		}
-		if ((mod & FINAL) == FINAL)
-		{
-			sb.append("final ");
-		}
-		if ((mod & SEALED) == SEALED)
-		{
-			sb.append("sealed ");
-		}
-		if ((mod & STRICT) == STRICT)
-		{
-			sb.append("@Strict ");
-		}
-		if ((mod & FUNCTIONAL) == FUNCTIONAL)
-		{
-			sb.append("functional ");
-		}
-		if ((mod & CASE_CLASS) == CASE_CLASS)
-		{
-			sb.append("case ");
-		}
+		// @formatter:off
+		if ((mod & PUBLIC) == PUBLIC) { builder.append("public "); }
+		if ((mod & PACKAGE) == PACKAGE) { builder.append("package private "); }
+		if ((mod & PRIVATE) == PRIVATE) { builder.append("private "); }
+		if ((mod & PROTECTED) == PROTECTED) { builder.append("protected "); }
+		if ((mod & INTERNAL) == INTERNAL) { builder.append("internal "); }
+		// @formatter:on
 	}
 
-	public static void writeFieldModifiers(int mod, StringBuilder sb)
+	public static void appendModifiers(int mod, MemberKind memberKind, StringBuilder builder)
 	{
-		if ((mod & LAZY) == LAZY)
-		{
-			sb.append("lazy ");
-		}
-		else if ((mod & CONST) == CONST)
-		{
-			sb.append("const ");
-		}
-		else
-		{
-			if ((mod & STATIC) == STATIC)
-			{
-				sb.append("static ");
-			}
-			if ((mod & FINAL) == FINAL)
-			{
-				sb.append("final ");
-			}
-		}
+		// @formatter:off
+		if ((mod & TRANSIENT) == TRANSIENT) { builder.append("@transient "); }
+		if ((mod & VOLATILE) == VOLATILE) { builder.append("@volatile "); }
+		if ((mod & NATIVE) == NATIVE) { builder.append("@native "); }
+		if ((mod & STRICT) == STRICT) { builder.append("@strict "); }
+		if ((mod & MANDATED) == MANDATED) { builder.append("<mandated>"); }
+		if ((mod & SYNTHETIC) == SYNTHETIC) { builder.append("<synthetic> "); }
+		if ((mod & BRIDGE) == BRIDGE) { builder.append("<bridge> "); }
 
-		if ((mod & TRANSIENT) == TRANSIENT)
-		{
-			sb.append("@Transient ");
-		}
-		if ((mod & VOLATILE) == VOLATILE)
-		{
-			sb.append("@Volatile ");
-		}
-	}
+		// Access Modifiers
+		appendAccessModifiers(mod, builder);
 
-	public static void writeMethodModifiers(int mod, StringBuilder sb)
-	{
-		if ((mod & EXTENSION) == EXTENSION)
+		if (memberKind == MemberKind.METHOD)
 		{
-			sb.append("extension ");
+			if ((mod & EXTENSION) == EXTENSION) { builder.append("extension "); }
+			else if ((mod & INFIX) == INFIX) { builder.append("infix "); }
+			else if ((mod & STATIC) == STATIC) { builder.append("static "); }
 		}
-		else if ((mod & INFIX) != 0 && (mod & INFIX) != STATIC)
-		{
-			sb.append("infix ");
-		}
-		else if ((mod & STATIC) == STATIC)
-		{
-			sb.append("static ");
-		}
+		else if ((mod & STATIC) == STATIC) { builder.append("static "); }
 
-		if ((mod & FINAL) == FINAL)
-		{
-			sb.append("final ");
-		}
-		if ((mod & SEALED) == SEALED)
-		{
-			sb.append("sealed ");
-		}
+		if ((mod & ABSTRACT) == ABSTRACT) { builder.append("abstract "); }
+		if ((mod & FINAL) == FINAL) { builder.append("final "); }
 
-		if ((mod & SYNCHRONIZED) == SYNCHRONIZED)
+		if (memberKind == MemberKind.CLASS)
 		{
-			sb.append("synchronized ");
+			if ((mod & FUNCTIONAL) == FUNCTIONAL) { builder.append("functional "); }
+			if ((mod & CASE_CLASS) == CASE_CLASS) { builder.append("case "); }
 		}
-		if ((mod & NATIVE) == NATIVE)
+		else if (memberKind == MemberKind.FIELD)
 		{
-			sb.append("@Native ");
+			if ((mod & LAZY) == LAZY) { builder.append("lazy "); }
 		}
-		if ((mod & ABSTRACT) == ABSTRACT)
+		else if (memberKind == MemberKind.METHOD)
 		{
-			sb.append("abstract ");
+			if ((mod & SYNCHRONIZED) == SYNCHRONIZED) { builder.append("synchronized "); }
+			if ((mod & IMPLICIT) == IMPLICIT) { builder.append("implicit "); }
+			if ((mod & INLINE) == INLINE) { builder.append("inline "); }
+			if ((mod & OVERRIDE) == OVERRIDE) { builder.append("override "); }
 		}
-		if ((mod & STRICT) == STRICT)
-		{
-			sb.append("@Strict ");
-		}
-		if ((mod & INLINE) == INLINE)
-		{
-			sb.append("inline ");
-		}
-		if ((mod & OVERRIDE) == OVERRIDE)
-		{
-			sb.append("override ");
-		}
-	}
-
-	public static void writeParameterModifier(int mod, StringBuilder sb)
-	{
-		if ((mod & LAZY) == LAZY)
-		{
-			sb.append("lazy ");
-		}
-		if ((mod & FINAL) == FINAL)
-		{
-			sb.append("final ");
-		}
+		// @formatter:on
 	}
 
 	public static void checkVisibility(IMember member, ICodePosition position, MarkerList markers, IContext context)

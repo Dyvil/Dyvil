@@ -25,7 +25,6 @@ public enum BaseModifiers implements Modifier
 	SYNCHRONIZED(Modifiers.SYNCHRONIZED, "synchronized"),
 	EXTENSION(Modifiers.EXTENSION, "extension"),
 	// Class Modifiers
-	SEALED(Modifiers.SEALED, "sealed"),
 	CASE(Modifiers.CASE_CLASS, "case"),
 	// Field Modifiers
 	CONST(Modifiers.CONST, "const"),
