@@ -232,7 +232,13 @@ public class CompleteCommand implements ICommand
 
 	private static void findMembers(IType type, Set<IField> fields, Set<IProperty> properties, Set<IMethod> methods, String start, boolean statics)
 	{
-		final IClassBody body = type.getTheClass().getBody();
+		final IClass theClass = type.getTheClass();
+		if (theClass == null)
+		{
+			return;
+		}
+
+		final IClassBody body = theClass.getBody();
 		if (body == null)
 		{
 			return;
