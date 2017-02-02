@@ -37,11 +37,25 @@ public abstract class Optionals
 	/**
 	 * The Unsafe Unwrap Operator
 	 *
+	 * See `unsafeUnwrap` for details
+	 */
+	@Intrinsic([ LOAD_0 ])
+	public postfix func !! <T>(optional: T?) -> T = unsafeUnwrap<T>(optional)
+
+	/**
 	 * Unwraps an optional value in an unsafe manner, i.e. without a null check. Use this only if you are sure that
 	 * parameter is never actually null.
 	 */
 	@Intrinsic([ LOAD_0 ])
-	public postfix func !! <T>(T? optional): T = optional!!
+	public postfix func unsafeUnwrap<T>(optional: T?) -> T = optional!!
+
+	/**
+	 * Returns the `null` value, but with the possibly non-null type `T`. This is an unsafe operation that should
+	 * only be used for non-null fields that are guaranteed to be initialized in a constructor, initializer block or,
+	 * for static fields, in a static initializer block.
+	 */
+	@Intrinsic([ ACONST_NULL ])
+	public static func unsafeInit<T>() -> T = unsafeInit<T>
 
 	// Nullable Coalescing
 

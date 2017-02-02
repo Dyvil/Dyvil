@@ -1,0 +1,93 @@
+package dyvil.io
+
+import java.io._
+
+public abstract class Console
+{
+	private init() {}
+
+	public const ANSI_ESCAPE: char = '\u{001b}'
+
+	public const ANSI_RESET:  String = ANSI_ESCAPE + '[0m'
+	public const ANSI_BLACK:  String = ANSI_ESCAPE + '[30m'
+	public const ANSI_RED:    String = ANSI_ESCAPE + '[31m'
+	public const ANSI_GREEN:  String = ANSI_ESCAPE + '[32m'
+	public const ANSI_YELLOW: String = ANSI_ESCAPE + '[33m'
+	public const ANSI_BLUE:   String = ANSI_ESCAPE + '[34m'
+	public const ANSI_PURPLE: String = ANSI_ESCAPE + '[35m'
+	public const ANSI_CYAN:   String = ANSI_ESCAPE + '[36m'
+	public const ANSI_WHITE:  String = ANSI_ESCAPE + '[37m'
+
+	private static var reader: BufferedReader = unsafeInit<BufferedReader>
+	private static var out:    PrintStream    = unsafeInit<PrintStream>
+
+	static init
+	{
+		setOut(System.out)
+		setIn(System.in)
+	}
+
+	static func isTerminalOutput() -> boolean = System.console !== null
+
+	static func setOut(out: PrintStream) -> void = Console.out = out
+
+	static func setIn(in: InputStream) -> void = Console.reader = new BufferedReader(new InputStreamReader(in))
+
+	// Write
+
+	static func writeLine() -> void = out.println()
+
+	static func writeLine(value: Object!) -> void = out.println(value)
+
+	static func writeLine(value: String) -> void = out.println(value)
+
+	// Read
+
+	static func readLine() -> String!
+	{
+		try
+		{
+			return reader.readLine()
+		}
+		catch (ex: IOException) {}
+		return null
+	}
+
+	static func readString() -> String = readLine()
+
+	static func readString(charCount: int) -> String!
+	{
+		let chars = new [char](charCount)
+		try
+		{
+			reader.read(chars)
+			return new String(chars)
+		}
+		catch (ex: IOException) {}
+		return null
+	}
+
+	static func readByte() -> byte = Int.parseInt(readLine()) as byte
+
+	static func readShort() -> short = Int.parseInt(readLine()) as short
+
+	static func readChar() -> char = readCodePoint() as char
+
+	static func readCodePoint() -> int
+	{
+		try
+		{
+			return reader.read()
+		}
+		catch (ex: IOException) {}
+		return 0
+	}
+
+	static func readInt() -> int = Int.parseInt(readLine())
+
+	static func readLong() -> long = Long.parseLong(readLine())
+
+	static func readFloat() -> float = Float.parseFloat(readLine())
+
+	static func readDouble() -> double = Double.parseDouble(readLine())
+}
