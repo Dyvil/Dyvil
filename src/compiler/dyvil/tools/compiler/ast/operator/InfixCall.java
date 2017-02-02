@@ -32,14 +32,14 @@ public class InfixCall extends MethodCall
 	public IValue resolveCall(MarkerList markers, IContext context, boolean report)
 	{
 		// Normal Method Resolution
-		final MatchList<IMethod> ambiguousCandidates = this.resolveMethodCall(markers, context);
-		if (ambiguousCandidates == null)
+		final MatchList<IMethod> candidates = this.resolveCandidates(context);
+		if (candidates.hasCandidate())
 		{
-			return this;
+			return this.checkArguments(markers, context, candidates.getBestMember());
 		}
 
 		// Infix Operators
-		IValue op = Operators.getInfix(this.receiver, this.name, this.arguments.getFirstValue());
+		final IValue op = Operators.getInfix(this.receiver, this.name, this.arguments.getFirstValue());
 		if (op != null)
 		{
 			op.setPosition(this.position);
@@ -60,7 +60,7 @@ public class InfixCall extends MethodCall
 		// No Implicit or Apply Resolution
 		if (report)
 		{
-			this.reportResolve(markers, ambiguousCandidates);
+			this.reportResolve(markers, candidates);
 			return this;
 		}
 		return null;

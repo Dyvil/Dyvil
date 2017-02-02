@@ -87,7 +87,7 @@ public class LiteralConversion extends AbstractCall
 	@Override
 	protected Name getReferenceName()
 	{
-		return this.name;
+		return null;
 	}
 
 	public IValue getLiteral()
@@ -120,8 +120,8 @@ public class LiteralConversion extends AbstractCall
 				return this;
 			}
 
-			this.method = candidates.getBestMember();
-			this.checkArguments(markers, context);
+			return this.checkArguments(markers, context, candidates.getBestMember())
+			           .withType(type, typeContext, markers, context); // will probably recurse
 		}
 
 		final IType thisType = this.getType();

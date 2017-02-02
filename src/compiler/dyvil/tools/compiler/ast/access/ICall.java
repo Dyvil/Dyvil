@@ -143,8 +143,6 @@ public interface ICall extends IValue, IArgumentsConsumer
 
 	IValue resolveCall(MarkerList markers, IContext context, boolean report);
 
-	void checkArguments(MarkerList markers, IContext context);
-
 	static boolean privateAccess(IContext context, IValue receiver)
 	{
 		return receiver == null || context.getThisClass() == receiver.getType().getTheClass();

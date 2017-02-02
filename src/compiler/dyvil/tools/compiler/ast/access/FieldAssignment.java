@@ -6,12 +6,11 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.member.INamed;
-import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -314,18 +313,9 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	private IValue resolveMethod(IValue receiver, MarkerList markers, IContext context)
 	{
 		final Name name = Util.addEq(this.name);
-
 		final IArguments argument = new SingleArgument(this.value);
-		final IMethod method = ICall.resolveMethod(context, receiver, name, argument);
-
-		if (method == null)
-		{
-			return null;
-		}
-
-		final MethodAssignment methodAssignment = new MethodAssignment(this.position, receiver, method, argument);
-		methodAssignment.checkArguments(markers, context);
-		return methodAssignment;
+		final MethodAssignment assignment = new MethodAssignment(this.position, receiver, name, argument);
+		return assignment.resolveCall(markers, context, false);
 	}
 
 	@Override

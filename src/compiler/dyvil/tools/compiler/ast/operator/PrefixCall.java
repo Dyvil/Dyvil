@@ -63,22 +63,23 @@ public class PrefixCall extends MethodCall
 		}
 
 		// Normal Method Resolution
-		final MatchList<IMethod> ambiguousCandidates = this.resolveMethodCall(markers, context);
-		if (ambiguousCandidates == null)
+		final MatchList<IMethod> candidates = this.resolveCandidates(context);
+		if (candidates.hasCandidate())
 		{
-			return this;
+			return this.checkArguments(markers, context, candidates.getBestMember());
 		}
 
 		// Implicit Resolution
-		if (this.resolveImplicitCall(markers, context))
+		final IValue implicitCall = this.resolveImplicitCall(markers, context);
+		if (implicitCall != null)
 		{
-			return this;
+			return implicitCall;
 		}
 
 		// No apply Resolution
 		if (report)
 		{
-			this.reportResolve(markers, ambiguousCandidates);
+			this.reportResolve(markers, candidates);
 			return this;
 		}
 		return null;

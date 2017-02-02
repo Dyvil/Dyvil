@@ -104,24 +104,22 @@ public class MethodCall extends AbstractCall implements INamed
 	public IValue resolveCall(MarkerList markers, IContext context, boolean report)
 	{
 		// Implicit Resolution
-		if (this.receiver == null && this.resolveImplicitCall(markers, context))
+		if (this.receiver == null)
 		{
-			return this;
+			final IValue implicitCall = this.resolveImplicitCall(markers, context);
+			if (implicitCall != null)
+			{
+				return implicitCall;
+			}
 		}
 
 		// Normal Method Resolution
 		final MatchList<IMethod> candidates = this.resolveCandidates(context);
-		if (!candidates.isEmpty())
+		if (candidates.hasCandidate())
 		{
-			final IMethod bestMember = candidates.getBestMember();
-			if (bestMember != null)
-			{
-				this.method = bestMember;
-				this.checkArguments(markers, context);
-				return this;
-			}
+			return this.checkArguments(markers, context, candidates.getBestMember());
 		}
-		else
+		else if (candidates.isEmpty())
 		{
 			// Apply Method Resolution
 			final IValue fieldAccess = new FieldAccess(this.position, this.receiver, this.name)
@@ -144,24 +142,22 @@ public class MethodCall extends AbstractCall implements INamed
 		return null;
 	}
 
-	protected boolean resolveImplicitCall(MarkerList markers, IContext context)
+	protected IValue resolveImplicitCall(MarkerList markers, IContext context)
 	{
 		final IValue implicit = context.getImplicit();
 		if (implicit == null)
 		{
-			return false;
+			return null;
 		}
 
 		final IMethod method = ICall.resolveMethod(context, implicit, this.name, this.arguments);
 		if (method == null)
 		{
-			return false;
+			return null;
 		}
 
 		this.receiver = implicit;
-		this.method = method;
-		this.checkArguments(markers, context);
-		return true;
+		return this.checkArguments(markers, context, method);
 	}
 
 	@Override

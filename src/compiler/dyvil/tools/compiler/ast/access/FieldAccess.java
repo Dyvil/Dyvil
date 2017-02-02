@@ -11,8 +11,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.member.INamed;
-import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
+import dyvil.tools.compiler.ast.operator.PostfixCall;
 import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.reference.InstanceFieldReference;
 import dyvil.tools.compiler.ast.reference.StaticFieldReference;
@@ -80,16 +79,6 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	public void setPosition(ICodePosition position)
 	{
 		this.position = position;
-	}
-
-	public MethodCall toMethodCall(IMethod method)
-	{
-		MethodCall call = new MethodCall(this.position);
-		call.receiver = this.receiver;
-		call.name = this.name;
-		call.method = method;
-		call.arguments = EmptyArguments.INSTANCE;
-		return call;
 	}
 
 	@Override
@@ -399,15 +388,9 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 
 	private IValue resolveMethod(IValue receiver, MarkerList markers, IContext context)
 	{
-		final IMethod method = ICall.resolveMethod(context, receiver, this.name, EmptyArguments.INSTANCE);
-		if (method != null)
-		{
-			final AbstractCall mc = this.toMethodCall(method);
-			mc.setReceiver(receiver);
-			mc.checkArguments(markers, context);
-			return mc;
-		}
-		return null;
+		// We use PostfixCall because it doesn't do implicit-based resolution nor field-apply resolution
+		final PostfixCall call = new PostfixCall(this.position, receiver, this.name);
+		return call.resolveCall(markers, context, false);
 	}
 
 	@Override

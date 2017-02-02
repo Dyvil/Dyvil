@@ -186,15 +186,16 @@ public class ConstructorCall implements ICall
 			return this;
 		}
 
-		final MatchList<IConstructor> ambigousConstructors = this.resolveConstructor(markers, context, this.type);
-		if (ambigousConstructors == null)
+		final MatchList<IConstructor> candidates = this.resolveCandidates(context, this.type);
+		if (candidates.hasCandidate())
 		{
+			this.checkArguments(markers, context, candidates.getBestMember());
 			return this;
 		}
 
 		if (report)
 		{
-			reportResolve(markers, ambigousConstructors, this.position, this.type, this.arguments);
+			reportResolve(markers, candidates, this.position, this.type, this.arguments);
 			return this;
 		}
 		return null;
@@ -238,18 +239,9 @@ public class ConstructorCall implements ICall
 		return 0;
 	}
 
-	protected MatchList<IConstructor> resolveConstructor(MarkerList markers, IContext context, IType type)
+	protected MatchList<IConstructor> resolveCandidates(IContext context, IType type)
 	{
-		final MatchList<IConstructor> list = IContext.resolveConstructors(context, type, this.arguments);
-		final IConstructor constructor = list.getBestMember();
-
-		if (constructor != null)
-		{
-			this.constructor = constructor;
-			this.checkArguments(markers, context);
-			return null;
-		}
-		return list;
+		return IContext.resolveConstructors(context, type, this.arguments);
 	}
 
 	protected static void reportResolve(MarkerList markers, MatchList<IConstructor> list, ICodePosition position, IType type, IArguments arguments)
@@ -306,9 +298,9 @@ public class ConstructorCall implements ICall
 		marker.addInfo(sb.toString());
 	}
 
-	@Override
-	public void checkArguments(MarkerList markers, IContext context)
+	public void checkArguments(MarkerList markers, IContext context, IConstructor constructor)
 	{
+		this.constructor = constructor;
 		this.type = this.constructor.checkArguments(markers, this.position, context, this.type, this.arguments);
 	}
 
