@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.type.builtin;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.compound.NullableType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Names;
@@ -39,26 +38,6 @@ public class NullType implements IBuiltinType
 		return false;
 	}
 
-	// Subtyping
-
-	@Override
-	public int subTypeCheckLevel()
-	{
-		return SUBTYPE_NULL;
-	}
-
-	@Override
-	public boolean isSubTypeOf(IType superType)
-	{
-		return superType.canExtract(NullableType.class);
-	}
-
-	@Override
-	public boolean isSubClassOf(IType superType)
-	{
-		return true;
-	}
-
 	// Compilation
 
 	@Override
@@ -83,6 +62,16 @@ public class NullType implements IBuiltinType
 	{
 		writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvilx/lang/model/type/NullType", "instance",
 		                      "Ldyvilx/lang/model/type/NullType;");
+	}
+
+	@Override
+	public void writeCast(MethodWriter writer, IType target, int lineNumber) throws BytecodeException
+	{
+		if (!target.hasTag(IType.NULL))
+		{
+			writer.visitInsn(Opcodes.POP);
+			writer.visitInsn(Opcodes.ACONST_NULL);
+		}
 	}
 
 	@Override
