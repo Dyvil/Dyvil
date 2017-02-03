@@ -139,41 +139,42 @@ repositories {
 	mavenCentral()
 }
 
+
 dependencies {
 	// Runtime Dependencies (Resources)
 	
-	def libRun = files("$buildDir/dyvil-classes/library") {
-		builtBy 'compileLibraryDyvil'
-	}
-	def dpfRun = files("$buildDir/dyvil-classes/dpf") {
-		builtBy 'compileDPFDyvil'
-	}
-	def testRun = files("$buildDir/dyvil-classes/test") {
-		builtBy 'compileTestDyvil'
-	}
+	def libRun = files("$buildDir/dyvil-classes/library")
+	def dpfRun = files("$buildDir/dyvil-classes/dpf")
+	def testRun = files("$buildDir/dyvil-classes/test")
 	
-	def libs = fileTree('libs/')
-	def libComp = sourceSets.library.output + libs
+	def bootstrap = files('libs/dyvil-bootstrap.jar')
+	def libComp = sourceSets.library.output
 	
-	libraryCompile libs
+	gensrcCompile bootstrap
+	
 	libraryRuntime libRun
+	libraryCompile bootstrap
 	
 	// compiler -> library
 	compilerCompile libComp
+	compilerRuntime libRun
+	compilerCompile bootstrap
 	
 	// dpf -> library
 	dpfCompile libComp
 	dpfRuntime libRun, dpfRun
+	dpfCompile bootstrap
 	
 	// repl -> library, compiler
 	replCompile libComp, sourceSets.compiler.output
 	replRuntime libRun, dpfRun, testRun
+	replCompile bootstrap
 	
 	// test -> library, junit
 	testCompile libComp, 'junit:junit:4.12'
 	testRuntime libRun, dpfRun, testRun
+	testCompile bootstrap
 }
-
 // ---------------------------------------- Copy Tasks ----------------------------------------
 
 // Library
@@ -327,18 +328,14 @@ test.dependsOn 'testDyvil'
 /**
  * Creates a Jar file that contains all library classes generated from Dyvil source code and saves it in libs/
  */
-task bootstrap(type: Jar, dependsOn: [ 'compileLibraryDyvil' ]) {
-	from("$buildDir/dyvil-classes/library") {
-		include '**/*.class'
+task bootstrap(type: Copy, dependsOn: [ 'buildLibrary' ]) {
+	from("$buildDir/libs") {
+		include 'dyvil-library-*.jar'
 	}
 	
-	destinationDir file('libs')
+	into 'libs'
 	
-	archiveName = "dyvil-bootstrap.jar"
-	
-	outputs.upToDateWhen {
-		return false
-	}
+	rename ".*", "dyvil-bootstrap.jar"
 }
 
 /**
