@@ -33,11 +33,11 @@ public class PrintPhase implements ICompilerPhase
 		{
 			try
 			{
-				compiler.log(unit.getInputFile() + ":\n" + unit.toString());
+				compiler.log(unit.getSourceFile() + ":\n" + unit.toString());
 			}
 			catch (Throwable throwable)
 			{
-				compiler.error(I18n.get("phase.syntax_trees.error", unit.getInputFile()), throwable);
+				compiler.error(I18n.get("phase.syntax_trees.error", unit.getSourceFile()), throwable);
 			}
 		}
 	}

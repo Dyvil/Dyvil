@@ -27,6 +27,7 @@ import dyvil.tools.parsing.lexer.DyvilLexer;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.name.Qualifier;
+import dyvil.tools.parsing.source.LineSource;
 import dyvil.tools.repl.DyvilREPL;
 import dyvil.tools.repl.context.REPLContext;
 import dyvil.tools.repl.lang.I18n;
@@ -95,7 +96,7 @@ public class CompleteCommand implements ICommand
 				markers.sort();
 				for (Marker marker : markers)
 				{
-					marker.log(expression, builder, colors);
+					marker.log(new LineSource(expression), builder, colors);
 				}
 
 				repl.getOutput().println(builder);

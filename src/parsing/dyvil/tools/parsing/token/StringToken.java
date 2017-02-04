@@ -1,132 +1,108 @@
 package dyvil.tools.parsing.token;
 
 import dyvil.tools.parsing.lexer.Tokens;
-import dyvil.tools.parsing.position.CodePosition;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public final class StringToken implements IToken
 {
 	private IToken prev;
 	private IToken next;
-	
+
 	private final int type;
-	private final int lineNumber;
-	private final int start;
-	private final int end;
-	
-	private String value;
-	
-	public StringToken(IToken prev, int type, String value, int lineNumber, int start, int end)
-	{
-		this.prev = prev;
-		prev.setNext(this);
-		this.value = value;
-		
-		this.type = type;
-		this.lineNumber = lineNumber;
-		this.start = start;
-		this.end = end;
-	}
-	
-	public StringToken(String value, int type, int lineNumber, int start, int end)
+	private final int startLine;
+	private final int endLine;
+	private final int startColumn;
+	private final int endColumn;
+
+	private final String value;
+
+	public StringToken(String value, int type, int startLine, int endLine, int startColumn, int endColumn)
 	{
 		this.value = value;
-		
+
 		this.type = type;
-		this.lineNumber = lineNumber;
-		this.start = start;
-		this.end = end;
+		this.startLine = startLine;
+		this.endLine = endLine;
+		this.startColumn = startColumn;
+		this.endColumn = endColumn;
 	}
-	
+
 	@Override
 	public int type()
 	{
 		return this.type;
 	}
-	
+
 	@Override
 	public String stringValue()
 	{
 		return this.value;
 	}
-	
+
 	@Override
-	public int startIndex()
+	public int startColumn()
 	{
-		return this.start;
+		return this.startColumn;
 	}
-	
+
 	@Override
-	public int endIndex()
+	public int endColumn()
 	{
-		return this.end;
+		return this.endColumn;
 	}
-	
+
 	@Override
 	public int startLine()
 	{
-		return this.lineNumber;
+		return this.startLine;
 	}
-	
+
 	@Override
 	public int endLine()
 	{
-		return this.lineNumber;
+		return this.endLine;
 	}
-	
+
 	@Override
 	public void setPrev(IToken prev)
 	{
 		this.prev = prev;
 	}
-	
+
 	@Override
 	public void setNext(IToken next)
 	{
 		this.next = next;
 	}
-	
+
 	@Override
 	public IToken prev()
 	{
 		return this.prev;
 	}
-	
+
 	@Override
 	public IToken next()
 	{
 		return this.next;
 	}
-	
+
 	@Override
 	public boolean hasNext()
 	{
 		return this.next.type() != 0;
 	}
-	
+
 	@Override
 	public boolean hasPrev()
 	{
 		return this.prev.type() != 0;
 	}
-	
-	@Override
-	public ICodePosition raw()
-	{
-		return new CodePosition(this.lineNumber, this.start, this.endIndex());
-	}
-	
-	@Override
-	public ICodePosition to(ICodePosition end)
-	{
-		return new CodePosition(this.lineNumber, end.endLine(), this.start, end.endIndex());
-	}
-	
+
 	@Override
 	public String toString()
 	{
 		String s = '"' + this.value + '"';
-		
+
 		switch (this.type)
 		{
 		case Tokens.STRING_START:

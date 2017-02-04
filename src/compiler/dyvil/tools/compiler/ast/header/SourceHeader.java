@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.header;
 
-import dyvil.io.FileUtils;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -14,6 +13,7 @@ import dyvil.tools.compiler.sources.DyvilFileType;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.transform.SemicolonInference;
 import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.parsing.source.FileSource;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ParserManager;
 import dyvil.tools.parsing.TokenIterator;
@@ -26,14 +26,12 @@ import java.io.IOException;
 
 public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefaultContext
 {
-	protected String code;
-
 	protected TokenIterator tokens;
 	protected MarkerList markers = new MarkerList(Markers.INSTANCE);
 
-	public final File inputFile;
-	public final File outputDirectory;
-	public final File outputFile;
+	public final FileSource sourceFile;
+	public final File       outputDirectory;
+	public final File       outputFile;
 
 	protected final DyvilCompiler compiler;
 
@@ -42,7 +40,7 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 		this.compiler = compiler;
 
 		this.pack = pack;
-		this.inputFile = input;
+		this.sourceFile = new FileSource(input);
 
 		String name = input.getAbsolutePath();
 		int start = name.lastIndexOf(File.separatorChar);
@@ -69,9 +67,9 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	}
 
 	@Override
-	public File getInputFile()
+	public FileSource getSourceFile()
 	{
-		return this.inputFile;
+		return this.sourceFile;
 	}
 
 	@Override
@@ -84,12 +82,12 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	{
 		try
 		{
-			this.code = FileUtils.read(this.inputFile);
+			this.sourceFile.load();
 			return true;
 		}
 		catch (IOException ex)
 		{
-			this.compiler.error(I18n.get("source.error", this.inputFile), ex);
+			this.compiler.error(I18n.get("source.error", this.sourceFile), ex);
 			return false;
 		}
 	}
@@ -99,7 +97,7 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	{
 		if (this.load())
 		{
-			this.tokens = new DyvilLexer(this.markers, DyvilSymbols.INSTANCE).tokenize(this.code);
+			this.tokens = new DyvilLexer(this.markers, DyvilSymbols.INSTANCE).tokenize(this.sourceFile.getText());
 			SemicolonInference.inferSemicolons(this.tokens.first());
 		}
 	}
@@ -179,8 +177,7 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	protected boolean printMarkers()
 	{
 		return ICompilationUnit
-			       .printMarkers(this.compiler, this.markers, DyvilFileType.DYVIL_HEADER, this.name, this.inputFile,
-			                     this.code);
+			       .printMarkers(this.compiler, this.markers, DyvilFileType.DYVIL_HEADER, this.name, this.sourceFile);
 	}
 
 	@Override

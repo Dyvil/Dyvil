@@ -21,8 +21,10 @@ public final class DyvilLexer
 	private TokenIterator tokens;
 
 	private StringBuilder buffer = new StringBuilder();
-	private int parseIndex;
-	private int lineNumber = 1;
+
+	private int cursor;
+	private int column;
+	private int line = 1;
 	private int stringParens;
 
 	public DyvilLexer(MarkerList markers, Symbols symbols)
@@ -48,7 +50,7 @@ public final class DyvilLexer
 			this.parseCharacter(currentChar);
 		}
 
-		this.tokens.append(new EndToken(this.parseIndex, this.lineNumber));
+		this.tokens.append(new EndToken(this.cursor, this.line));
 		this.tokens.reset();
 		return this.tokens;
 	}
@@ -98,7 +100,7 @@ public final class DyvilLexer
 			{
 				this.stringParens++;
 			}
-			this.tokens.append(new SymbolToken(INSTANCE, OPEN_PARENTHESIS, this.lineNumber, this.parseIndex++));
+			this.tokens.append(new SymbolToken(INSTANCE, OPEN_PARENTHESIS, this.line, this.advance()));
 			return;
 		case ')':
 			if (this.stringParens > 0 && --this.stringParens == 0)
@@ -107,19 +109,19 @@ public final class DyvilLexer
 				return;
 			}
 
-			this.tokens.append(new SymbolToken(INSTANCE, CLOSE_PARENTHESIS, this.lineNumber, this.parseIndex++));
+			this.tokens.append(new SymbolToken(INSTANCE, CLOSE_PARENTHESIS, this.line, this.advance()));
 			return;
 		case '[':
-			this.tokens.append(new SymbolToken(INSTANCE, OPEN_SQUARE_BRACKET, this.lineNumber, this.parseIndex++));
+			this.tokens.append(new SymbolToken(INSTANCE, OPEN_SQUARE_BRACKET, this.line, this.advance()));
 			return;
 		case ']':
-			this.tokens.append(new SymbolToken(INSTANCE, CLOSE_SQUARE_BRACKET, this.lineNumber, this.parseIndex++));
+			this.tokens.append(new SymbolToken(INSTANCE, CLOSE_SQUARE_BRACKET, this.line, this.advance()));
 			return;
 		case '{':
-			this.tokens.append(new SymbolToken(INSTANCE, OPEN_CURLY_BRACKET, this.lineNumber, this.parseIndex++));
+			this.tokens.append(new SymbolToken(INSTANCE, OPEN_CURLY_BRACKET, this.line, this.advance()));
 			return;
 		case '}':
-			this.tokens.append(new SymbolToken(INSTANCE, CLOSE_CURLY_BRACKET, this.lineNumber, this.parseIndex++));
+			this.tokens.append(new SymbolToken(INSTANCE, CLOSE_CURLY_BRACKET, this.line, this.advance()));
 			return;
 		case '.':
 		{
@@ -129,14 +131,14 @@ public final class DyvilLexer
 				this.parseIdentifier('.', MOD_DOT);
 				return;
 			}
-			this.tokens.append(new SymbolToken(INSTANCE, DOT, this.lineNumber, this.parseIndex++));
+			this.tokens.append(new SymbolToken(INSTANCE, DOT, this.line, this.advance()));
 			return;
 		}
 		case ';':
-			this.tokens.append(new SymbolToken(INSTANCE, SEMICOLON, this.lineNumber, this.parseIndex++));
+			this.tokens.append(new SymbolToken(INSTANCE, SEMICOLON, this.line, this.advance()));
 			return;
 		case ',':
-			this.tokens.append(new SymbolToken(INSTANCE, COMMA, this.lineNumber, this.parseIndex++));
+			this.tokens.append(new SymbolToken(INSTANCE, COMMA, this.line, this.advance()));
 			return;
 		case '_':
 		case '$':
@@ -155,11 +157,11 @@ public final class DyvilLexer
 			this.parseNumberLiteral(currentChar);
 			return;
 		case '\n':
-			this.lineNumber++;
-			// Fallthrough
+			this.newLine();
+			return;
 		case ' ':
 		case '\t':
-			this.parseIndex++;
+			this.advance();
 			return;
 		}
 		if (LexerUtil.isIdentifierSymbol(currentChar))
@@ -180,8 +182,8 @@ public final class DyvilLexer
 	{
 		// assert this.codePoint() == '`';
 
-		final int startIndex = this.parseIndex++;
-		final int startLine = this.lineNumber;
+		final int startIndex = this.advance();
+		final int startLine = this.line;
 
 		this.clearBuffer();
 
@@ -191,9 +193,11 @@ public final class DyvilLexer
 			switch (currentChar)
 			{
 			case '\n':
-				this.lineNumber++;
+				this.newLine();
+				continue;
 			case '\t':
 			case '\b':
+				this.advance();
 				continue;
 			case EOF:
 				this.error("identifier.backtick.unclosed");
@@ -205,10 +209,9 @@ public final class DyvilLexer
 					this.buffer.append('_');
 				}
 
-				this.parseIndex++;
 				this.tokens.append(
 					new IdentifierToken(Name.from(this.buffer.toString()), SPECIAL_IDENTIFIER, startLine, startIndex,
-					                    this.parseIndex));
+					                    this.advance() + 1));
 				return;
 			}
 
@@ -221,8 +224,7 @@ public final class DyvilLexer
 	{
 		// assert this.codePoint() == '\'';
 
-		final int startIndex = this.parseIndex++;
-		final int startLine = this.lineNumber;
+		final int startColumn = this.advance();
 
 		this.clearBuffer();
 
@@ -236,19 +238,19 @@ public final class DyvilLexer
 				continue;
 			case '\t':
 			case '\b':
+				this.advance();
 				continue;
 			case '\n':
-				this.lineNumber++;
-				this.parseIndex++;
+				this.newLine();
 				this.error("string.single.newline");
 				continue;
 			case EOF:
 				this.error("string.single.unclosed");
 				// Fallthrough
 			case '\'':
-				this.parseIndex++;
-				this.tokens.append(new StringToken(this.buffer.toString(), SINGLE_QUOTED_STRING, startLine, startIndex,
-				                                   this.parseIndex));
+				this.tokens.append(
+					new StringToken(this.buffer.toString(), SINGLE_QUOTED_STRING, this.line, this.line, startColumn,
+					                this.advance() + 1));
 				return;
 			}
 
@@ -261,8 +263,8 @@ public final class DyvilLexer
 	{
 		// assert this.codePoint() == (stringPart ? ')' : '"');
 
-		final int startIndex = this.parseIndex++;
-		final int startLine = this.lineNumber;
+		final int startColumn = this.advance();
+		final int startLine = this.line;
 
 		this.clearBuffer();
 
@@ -276,17 +278,16 @@ public final class DyvilLexer
 				final int nextChar = this.nextCodePoint();
 				if (nextChar == '(')
 				{
-					this.parseIndex++;
+					this.advance();
 					if (this.stringParens > 0)
 					{
 						this.error("string.double.interpolation.nested");
 						continue; // parse the rest of the string as normal
 					}
 
-					this.parseIndex++;
 					this.tokens.append(
 						new StringToken(this.buffer.toString(), stringPart ? STRING_PART : STRING_START, startLine,
-						                startIndex, this.parseIndex));
+						                this.line, startColumn, this.advance() + 1));
 					this.stringParens = 1;
 					return;
 				}
@@ -297,16 +298,15 @@ public final class DyvilLexer
 				this.error("string.double.unclosed");
 				// Fallthrough
 			case '"':
-				this.parseIndex++;
 				this.tokens.append(
-					new StringToken(this.buffer.toString(), stringPart ? STRING_END : STRING, startLine, startIndex,
-					                this.parseIndex));
+					new StringToken(this.buffer.toString(), stringPart ? STRING_END : STRING, startLine, this.line,
+					                startColumn, this.advance() + 1));
 				return;
 			case '\n':
-				this.lineNumber++;
+				this.newLine();
 				break;
 			case '\t':
-				this.parseIndex++;
+				this.advance();
 				continue;
 			}
 
@@ -318,13 +318,12 @@ public final class DyvilLexer
 	private void parseVerbatimString()
 	{
 		// assert this.codePoint() == '@';
-
-		final int startIndex = this.parseIndex;
-		final int startLine = this.lineNumber;
-
 		// assert this.nextCodePoint() == '"';
 
-		this.parseIndex += 2;
+		final int startColumn = this.column;
+		final int startLine = this.line;
+
+		this.advance2();
 
 		this.clearBuffer();
 
@@ -338,16 +337,15 @@ public final class DyvilLexer
 				this.error("string.verbatim.unclosed");
 				// Fallthrough
 			case '"':
-				this.parseIndex++;
 				this.tokens.append(
-					new StringToken(this.buffer.toString(), VERBATIM_STRING, startLine, startIndex, this.parseIndex));
+					new StringToken(this.buffer.toString(), VERBATIM_STRING, startLine, this.line, startColumn,
+					                this.advance() + 1));
 				return;
 			case '\n':
-				this.lineNumber++;
-				this.parseIndex++;
+				this.newLine();
 				continue;
 			case '\t':
-				this.parseIndex++;
+				this.advance();
 				continue;
 			}
 
@@ -359,13 +357,12 @@ public final class DyvilLexer
 	private void parseVerbatimChar()
 	{
 		// assert this.codePoint() == '@';
-
-		final int startIndex = this.parseIndex;
-		final int startLine = this.lineNumber;
-
 		// assert this.nextCodePoint() == '\'';
 
-		this.parseIndex += 2;
+		final int startColumn = this.column;
+		final int startLine = this.line;
+
+		this.advance2();
 
 		this.clearBuffer();
 
@@ -376,9 +373,8 @@ public final class DyvilLexer
 			this.parseEscape(this.nextCodePoint());
 			break;
 		case '\n':
-			this.lineNumber++;
 			this.buffer.append('\n');
-			this.parseIndex++;
+			this.newLine();
 			break;
 		default:
 			this.buffer.appendCodePoint(currentChar);
@@ -397,14 +393,15 @@ public final class DyvilLexer
 			this.advance(currentChar);
 		}
 
-		this.parseIndex++;
-		this.tokens
-			.append(new StringToken(this.buffer.toString(), VERBATIM_CHAR, startLine, startIndex, this.parseIndex));
+		this.tokens.append(new StringToken(this.buffer.toString(), VERBATIM_CHAR, startLine, this.line, startColumn,
+		                                   this.advance() + 1));
 	}
 
 	private void parseNumberLiteral(int currentChar)
 	{
 		final int radix;
+
+		final int startColumn = this.advance();
 
 		this.clearBuffer();
 		if (currentChar == '0')
@@ -413,17 +410,17 @@ public final class DyvilLexer
 			{
 			case 'o':
 			case 'O':
-				this.parseIndex++;
+				this.advance();
 				radix = 8;
 				break;
 			case 'x':
 			case 'X':
-				this.parseIndex++;
+				this.advance();
 				radix = 16;
 				break;
 			case 'b':
 			case 'B':
-				this.parseIndex++;
+				this.advance();
 				radix = 2;
 				break;
 			default:
@@ -437,7 +434,6 @@ public final class DyvilLexer
 			radix = 10;
 		}
 
-		int startIndex = this.parseIndex++;
 		byte type = 0; // 0 -> int, 1 -> long, 2 -> float, 3 -> double
 
 		while (true)
@@ -451,7 +447,7 @@ public final class DyvilLexer
 			case '0':
 			case '1':
 				this.buffer.append((char) currentChar);
-				this.parseIndex++;
+				this.advance();
 				continue;
 			case '2':
 			case '3':
@@ -462,7 +458,7 @@ public final class DyvilLexer
 				if (radix >= 8)
 				{
 					this.buffer.append((char) currentChar);
-					this.parseIndex++;
+					this.advance();
 					continue;
 				}
 				break;
@@ -471,7 +467,7 @@ public final class DyvilLexer
 				if (radix >= 10)
 				{
 					this.buffer.append((char) currentChar);
-					this.parseIndex++;
+					this.advance();
 					continue;
 				}
 				break;
@@ -481,25 +477,25 @@ public final class DyvilLexer
 				if (radix == 16)
 				{
 					this.buffer.append((char) currentChar);
-					this.parseIndex++;
+					this.advance();
 					continue;
 				}
 				break;
 			case '_':
-				this.parseIndex++;
+				this.advance();
 				continue;
 			case 'd':
 			case 'D':
 				if (radix == 16)
 				{
 					this.buffer.append((char) currentChar);
-					this.parseIndex++;
+					this.advance();
 					continue;
 				}
 				// Fallthrough
 				if (radix >= 10 && !LexerUtil.isIdentifierPart(this.nextCodePoint()))
 				{
-					this.parseIndex++;
+					this.advance();
 					type = 3; // double
 					continue;
 				}
@@ -508,7 +504,7 @@ public final class DyvilLexer
 				if (radix == 10 && LexerUtil.isDigit(this.nextCodePoint()))
 				{
 					this.buffer.append('.');
-					this.parseIndex++;
+					this.advance();
 					type = 3; // double
 					continue;
 				}
@@ -518,7 +514,7 @@ public final class DyvilLexer
 				if (radix == 16)
 				{
 					this.buffer.append((char) currentChar);
-					this.parseIndex++;
+					this.advance();
 					continue;
 				}
 				if (radix == 10)
@@ -527,14 +523,14 @@ public final class DyvilLexer
 					if (LexerUtil.isDigit(n))
 					{
 						this.buffer.append((char) currentChar);
-						this.parseIndex++;
+						this.advance();
 						type = 3; // double
 						continue;
 					}
 					if (n == '-')
 					{
 						this.buffer.append('e').append('-');
-						this.parseIndex += 2;
+						this.advance();
 						type = 3; // double
 						continue;
 					}
@@ -545,12 +541,12 @@ public final class DyvilLexer
 				if (radix == 16)
 				{
 					this.buffer.append((char) currentChar);
-					this.parseIndex++;
+					this.advance();
 					continue;
 				}
 				if (radix >= 10 && !LexerUtil.isIdentifierPart(this.nextCodePoint()))
 				{
-					this.parseIndex++;
+					this.advance();
 					type = 2; // float
 					continue;
 				}
@@ -559,7 +555,7 @@ public final class DyvilLexer
 			case 'L':
 				if (!LexerUtil.isIdentifierPart(this.nextCodePoint()))
 				{
-					this.parseIndex++;
+					this.advance();
 					type = 1; // long
 					continue;
 				}
@@ -569,7 +565,7 @@ public final class DyvilLexer
 				if (radix == 16)
 				{
 					this.buffer.append((char) currentChar);
-					this.parseIndex++;
+					this.advance();
 					type = 3; // float
 					continue;
 				}
@@ -580,12 +576,12 @@ public final class DyvilLexer
 			{
 			case 0: // int
 			{
-				final IntToken token = new IntToken(0, this.lineNumber, startIndex, this.parseIndex);
+				final IntToken token = new IntToken(0, this.line, startColumn, this.column);
 				try
 				{
 					token.setValue(Integer.parseInt(this.buffer.toString(), radix));
 				}
-				catch (NumberFormatException ex)
+				catch (NumberFormatException ignored)
 				{
 					this.error(token, "literal.integer.invalid");
 				}
@@ -595,12 +591,12 @@ public final class DyvilLexer
 			}
 			case 1: // long
 			{
-				final LongToken token = new LongToken(0, this.lineNumber, startIndex, this.parseIndex);
+				final LongToken token = new LongToken(0, this.line, startColumn, this.column);
 				try
 				{
 					token.setValue(Long.parseLong(this.buffer.toString(), radix));
 				}
-				catch (NumberFormatException ex)
+				catch (NumberFormatException ignored)
 				{
 					this.error(token, "literal.long.invalid");
 				}
@@ -610,12 +606,12 @@ public final class DyvilLexer
 			}
 			case 2: // float
 			{
-				final FloatToken token = new FloatToken(0, this.lineNumber, startIndex, this.parseIndex);
+				final FloatToken token = new FloatToken(0, this.line, startColumn, this.column);
 				try
 				{
 					token.setValue(Float.parseFloat(this.buffer.toString()));
 				}
-				catch (NumberFormatException ex)
+				catch (NumberFormatException ignored)
 				{
 					this.error(token, "literal.float.invalid");
 				}
@@ -625,7 +621,7 @@ public final class DyvilLexer
 			}
 			case 3: // double
 			{
-				final DoubleToken token = new DoubleToken(0, this.lineNumber, startIndex, this.parseIndex);
+				final DoubleToken token = new DoubleToken(0, this.line, startColumn, this.column);
 				try
 				{
 					if (radix == 16)
@@ -634,7 +630,7 @@ public final class DyvilLexer
 					}
 					token.setValue(Double.parseDouble(this.buffer.toString()));
 				}
-				catch (NumberFormatException ex)
+				catch (NumberFormatException ignored)
 				{
 					this.error(token, "literal.double.invalid");
 				}
@@ -653,20 +649,18 @@ public final class DyvilLexer
 		// assert this.codePoint() == '/';
 		// assert this.nextCodePoint() == '/';
 
-		this.parseIndex += 2;
+		this.advance2();
 
 		while (true)
 		{
 			final int currentChar = this.codePoint();
 
-			if (currentChar == EOF)
+			switch (currentChar)
 			{
+			case EOF:
 				return;
-			}
-			if (currentChar == '\n')
-			{
-				this.parseIndex++;
-				this.lineNumber++;
+			case '\n':
+				this.newLine();
 				return;
 			}
 
@@ -680,7 +674,7 @@ public final class DyvilLexer
 		// assert this.nextCodePoint() == '*';
 
 		int level = 1;
-		this.parseIndex += 2;
+		this.advance2();
 
 		while (true)
 		{
@@ -692,23 +686,22 @@ public final class DyvilLexer
 				this.error("comment.block.unclosed");
 				return;
 			case '\n':
-				this.lineNumber++;
-				this.parseIndex++;
+				this.newLine();
 				continue;
 			case '/':
 				if (this.nextCodePoint() == '*')
 				{
 					level++;
-					this.parseIndex += 2;
+					this.advance2();
 					continue;
 				}
-				this.parseIndex++;
+				this.advance();
 				continue;
 			case '*':
 				if (this.nextCodePoint() == '/')
 				{
 					level--;
-					this.parseIndex += 2;
+					this.advance2();
 
 					if (level == 0)
 					{
@@ -717,7 +710,7 @@ public final class DyvilLexer
 					continue;
 				}
 
-				this.parseIndex++;
+				this.advance();
 				continue;
 			}
 
@@ -727,7 +720,7 @@ public final class DyvilLexer
 
 	private void parseIdentifier(int currentChar, int subtype)
 	{
-		final int startIndex = this.parseIndex;
+		final int startColumn = this.column;
 
 		this.clearBuffer();
 		this.buffer.appendCodePoint(currentChar);
@@ -745,7 +738,7 @@ public final class DyvilLexer
 				if (currentChar == '_' || currentChar == '$')
 				{
 					this.buffer.append((char) currentChar);
-					this.parseIndex++;
+					this.advance();
 					subtype = MOD_LETTER | MOD_SYMBOL;
 					continue;
 				}
@@ -760,19 +753,18 @@ public final class DyvilLexer
 				final int keyword = this.symbols.getKeywordType(id);
 				if (keyword != 0)
 				{
-					this.tokens.append(new SymbolToken(this.symbols, keyword, this.lineNumber, startIndex));
+					this.tokens.append(new SymbolToken(this.symbols, keyword, this.line, startColumn));
 					return;
 				}
 				this.tokens.append(
-					new IdentifierToken(Name.from(id), Tokens.LETTER_IDENTIFIER, this.lineNumber, startIndex,
-					                    this.parseIndex));
+					new IdentifierToken(Name.from(id), Tokens.LETTER_IDENTIFIER, this.line, startColumn, this.column));
 				return;
 			}
 			case MOD_DOT:
 				if (currentChar == '.')
 				{
 					this.buffer.append('.');
-					this.parseIndex++;
+					this.advance();
 					continue;
 				}
 				// Fallthrough
@@ -780,14 +772,14 @@ public final class DyvilLexer
 				if (currentChar == '_' || currentChar == '$')
 				{
 					this.buffer.append((char) currentChar);
-					this.parseIndex++;
+					this.advance();
 					subtype = MOD_LETTER | MOD_SYMBOL;
 					continue;
 				}
 				if (LexerUtil.isIdentifierSymbol(currentChar))
 				{
 					this.buffer.appendCodePoint(currentChar);
-					this.parseIndex++;
+					this.advance();
 					subtype = MOD_SYMBOL;
 					continue;
 				}
@@ -796,7 +788,7 @@ public final class DyvilLexer
 				if (currentChar == '_' || currentChar == '$')
 				{
 					this.buffer.append((char) currentChar);
-					this.parseIndex++;
+					this.advance();
 					continue;
 				}
 				if (LexerUtil.isIdentifierPart(currentChar))
@@ -820,11 +812,11 @@ public final class DyvilLexer
 			final int symbol = this.symbols.getSymbolType(id);
 			if (symbol != 0)
 			{
-				this.tokens.append(new SymbolToken(this.symbols, symbol, this.lineNumber, startIndex));
+				this.tokens.append(new SymbolToken(this.symbols, symbol, this.line, startColumn));
 				return;
 			}
-			this.tokens.append(new IdentifierToken(Name.from(id), Tokens.SYMBOL_IDENTIFIER, this.lineNumber, startIndex,
-			                                       this.parseIndex));
+			this.tokens.append(
+				new IdentifierToken(Name.from(id), Tokens.SYMBOL_IDENTIFIER, this.line, startColumn, this.column));
 			return;
 		}
 	}
@@ -837,47 +829,48 @@ public final class DyvilLexer
 		case '\'':
 		case '\\':
 			this.buffer.append((char) nextChar);
-			this.parseIndex += 2;
+			this.advance2();
 			return;
 		case 'n':
 			this.buffer.append('\n');
-			this.parseIndex += 2;
+			this.advance2();
 			return;
 		case 't':
 			this.buffer.append('\t');
-			this.parseIndex += 2;
+			this.advance2();
 			return;
 		case 'r':
 			this.buffer.append('\r');
-			this.parseIndex += 2;
+			this.advance2();
 			return;
 		case 'b':
 			this.buffer.append('\b');
-			this.parseIndex += 2;
+			this.advance2();
 			return;
 		case 'f':
 			this.buffer.append('\f');
-			this.parseIndex += 2;
+			this.advance2();
 			return;
 		case 'v':
 			this.buffer.append('\u000B'); // U+000B VERTICAL TABULATION
-			this.parseIndex += 2;
+			this.advance2();
 			return;
 		case 'a':
 			this.buffer.append('\u0007'); // U+0007 BELL
-			this.parseIndex += 2;
+			this.advance2();
 			return;
 		case 'e':
 			this.buffer.append('\u001B'); // U+001B ESCAPE
-			this.parseIndex += 2;
+			this.advance2();
 			return;
 		case '0':
 			this.buffer.append('\0'); // U+0000 NULL
-			this.parseIndex += 2;
+			this.advance2();
 			return;
 		case 'u':
+		{
 			int buf = 0;
-			this.parseIndex += 2;
+			this.advance2();
 
 			if (this.codePoint() != '{')
 			{
@@ -885,7 +878,7 @@ public final class DyvilLexer
 				return;
 			}
 
-			this.parseIndex++;
+			this.advance();
 			loop:
 			while (true)
 			{
@@ -894,15 +887,15 @@ public final class DyvilLexer
 				{
 				case '\n':
 					this.error("escape.unicode.newline");
-					this.lineNumber++;
-					// Fallthrough
+					this.newLine();
+					continue;
 				case ' ':
 				case '_':
 				case '\t':
-					this.parseIndex++;
+					this.advance();
 					continue;
 				case '}':
-					this.parseIndex++;
+					this.advance();
 					break loop;
 				}
 				if (!LexerUtil.isHexDigit(codePoint))
@@ -913,33 +906,54 @@ public final class DyvilLexer
 
 				buf <<= 4;
 				buf += Character.digit(codePoint, 16);
-				this.parseIndex++;
+				this.advance();
 			}
 
 			this.buffer.appendCodePoint(buf);
 			return;
 		}
+		}
 
-		this.parseIndex++;
+		this.advance();
 		this.error("escape.invalid");
-		this.parseIndex++;
+		this.advance();
 	}
 
 	// Utility Methods
 
 	private int codePoint()
 	{
-		return this.parseIndex >= this.length ? 0 : this.code.codePointAt(this.parseIndex);
+		return this.cursor >= this.length ? 0 : this.code.codePointAt(this.cursor);
 	}
 
 	private int nextCodePoint()
 	{
-		return this.parseIndex + 1 >= this.length ? 0 : this.code.codePointAt(this.parseIndex + 1);
+		return this.cursor + 1 >= this.length ? 0 : this.code.codePointAt(this.cursor + 1);
+	}
+
+	private int advance()
+	{
+		this.cursor++;
+		return this.column++;
+	}
+
+	private void advance2()
+	{
+		this.cursor += 2;
+		this.column += 2;
 	}
 
 	private void advance(int currentChar)
 	{
-		this.parseIndex += Character.charCount(currentChar);
+		this.cursor += Character.charCount(currentChar);
+		this.column++;
+	}
+
+	private void newLine()
+	{
+		this.line++;
+		this.column = 0;
+		this.cursor++;
 	}
 
 	private void clearBuffer()
@@ -949,7 +963,7 @@ public final class DyvilLexer
 
 	private void error(String key)
 	{
-		this.error(new CodePosition(this.lineNumber, this.parseIndex, this.parseIndex + 1), key);
+		this.error(new CodePosition(this.line, this.column, this.column + 1), key);
 	}
 
 	private void error(ICodePosition position, String key)

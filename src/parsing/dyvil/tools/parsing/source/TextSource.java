@@ -2,7 +2,7 @@ package dyvil.tools.parsing.source;
 
 import java.util.Arrays;
 
-public class StringSource implements Source
+public class TextSource implements Source
 {
 	protected static final int EXPECTED_LINE_LENGTH = 80;
 
@@ -10,13 +10,19 @@ public class StringSource implements Source
 	protected int[]  lineStarts;
 	protected int lineCount;
 
-	public StringSource()
+	public TextSource()
 	{
 	}
 
-	public StringSource(String text)
+	public TextSource(String text)
 	{
 		this.read(text);
+	}
+
+	@Override
+	public int lineCount()
+	{
+		return this.lineCount;
 	}
 
 	public void read(String text)
@@ -24,8 +30,9 @@ public class StringSource implements Source
 		this.text = text;
 
 		final int length = this.text.length();
+		this.lineStarts = new int[length / EXPECTED_LINE_LENGTH + 1];
+
 		this.lineCount = 1;
-		this.lineStarts = new int[length / EXPECTED_LINE_LENGTH];
 
 		for (int i = 0; i < length; i++)
 		{
@@ -62,10 +69,31 @@ public class StringSource implements Source
 	@Override
 	public String getLine(int index)
 	{
-		if (index <= this.lineCount)
+		if (index == this.lineCount)
 		{
-			return this.text.substring(this.lineStarts[index], this.lineStarts[index + 1]);
+			return this.text.substring(this.lineStarts[index - 1], this.lineEnd(this.text.length()));
+		}
+		if (index < this.lineCount)
+		{
+			return this.text.substring(this.lineStarts[index - 1], this.lineEnd(this.lineStarts[index]));
 		}
 		return null;
+	}
+
+	private int lineEnd(int index)
+	{
+		char c = this.text.charAt(index - 1);
+		switch (c)
+		{
+		case '\n':
+			if (this.text.charAt(index - 2) == '\r')
+			{
+				return index - 2;
+			}
+			// Fallthrough
+		case '\r':
+			return index - 1;
+		}
+		return index;
 	}
 }

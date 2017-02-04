@@ -122,7 +122,7 @@ public final class SemicolonInference
 			}
 		}
 		
-		final IToken semicolon = new InferredSemicolon(prevLine, prev.endIndex());
+		final IToken semicolon = new InferredSemicolon(prevLine, prev.endColumn());
 		semicolon.setNext(next);
 		semicolon.setPrev(prev);
 		next.setPrev(semicolon);

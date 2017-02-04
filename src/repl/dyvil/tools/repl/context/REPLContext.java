@@ -41,6 +41,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.tools.parsing.source.TextSource;
 import dyvil.tools.repl.DyvilREPL;
 
 public class REPLContext extends AbstractHeader
@@ -59,15 +60,15 @@ public class REPLContext extends AbstractHeader
 	private final Map<Name, IClass>    classes    = new IdentityHashMap<>();
 
 	// Updated for every input
-	private   int       resultIndex;
-	private   int       classIndex;
-	protected String    currentCode;
-	private   CodeClass currentClass;
+	private int resultIndex;
+	private int classIndex;
+	protected TextSource currentSource = new TextSource();
+	private CodeClass currentClass;
 
 	// Cleared for every input
-	protected final MarkerList             markers        = new MarkerList(Markers.INSTANCE);
+	protected final MarkerList        markers        = new MarkerList(Markers.INSTANCE);
 	protected final List<ICompilable> innerClassList = new ArrayList<>();
-	protected final List<IMember>          members        = new ArrayList<>();
+	protected final List<IMember>     members        = new ArrayList<>();
 
 	public REPLContext(DyvilREPL repl)
 	{
@@ -99,12 +100,12 @@ public class REPLContext extends AbstractHeader
 
 	// Evaluation
 
-	public void startEvaluation(String code)
+	public void startEvaluation(String text)
 	{
 		final String className = CLASS_PREFIX + this.classIndex++;
 		this.currentClass = new CodeClass(this, Name.fromRaw(className));
 		this.currentClass.setBody(new ClassBody(this.currentClass));
-		this.currentCode = code;
+		this.currentSource.read(text);
 	}
 
 	public MarkerList getMarkers()
@@ -237,7 +238,7 @@ public class REPLContext extends AbstractHeader
 		this.markers.sort();
 		for (Marker marker : this.markers)
 		{
-			marker.log(this.currentCode, buf, colors);
+			marker.log(this.currentSource, buf, colors);
 		}
 
 		this.repl.getOutput().println(buf.toString());
