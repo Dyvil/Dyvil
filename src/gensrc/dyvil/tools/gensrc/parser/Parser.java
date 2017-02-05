@@ -2,29 +2,35 @@ package dyvil.tools.gensrc.parser;
 
 import dyvil.tools.gensrc.ast.Util;
 import dyvil.tools.gensrc.ast.directive.*;
-
-import java.util.List;
+import dyvil.tools.gensrc.lang.I18n;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.marker.SemanticError;
+import dyvil.tools.parsing.marker.Warning;
+import dyvil.tools.parsing.position.CodePosition;
+import dyvil.tools.parsing.source.Source;
 
 public class Parser
 {
-	private static final int IF_BLOCK   = 1;
-	private static final int ELSE_BLOCK = 2;
-	private static final int FOR_BLOCK  = 3;
-	private static final int SCOPE_BLOCK  = 4;
+	private static final int IF_BLOCK    = 1;
+	private static final int ELSE_BLOCK  = 2;
+	private static final int FOR_BLOCK   = 3;
+	private static final int SCOPE_BLOCK = 4;
 
-	private final List<String> lines;
-	private final int          lineCount;
+	private final Source     source;
+	private final MarkerList markers;
+	private final int        lineCount;
 
-	public Parser(List<String> lines)
+	public Parser(Source source, MarkerList markers)
 	{
-		this.lines = lines;
-		this.lineCount = lines.size();
+		this.source = source;
+		this.lineCount = source.lineCount();
+		this.markers = markers;
 	}
 
 	public DirectiveList parse()
 	{
 		DirectiveList list = new DirectiveList(this.lineCount);
-		this.parse(list, 0, 0);
+		this.parse(list, 1, 0);
 		return list;
 	}
 
@@ -32,7 +38,7 @@ public class Parser
 	{
 		for (; start < this.lineCount; start++)
 		{
-			final String line = this.lines.get(start);
+			final String line = this.source.getLine(start);
 			final int length = line.length();
 
 			final int hashIndex;
@@ -86,13 +92,16 @@ public class Parser
 				start = this.parseBlock(list, start);
 				continue;
 			case "endscope":
+
 				if (block == SCOPE_BLOCK)
 				{
+					this.markers.add(new Warning(new CodePosition(start, directiveStart, directiveEnd),
+					                             I18n.get("endscope.deprecated")));
 					return start;
 				}
 				break;
 
-				// ----- if Directives -----
+			// ----- if Directives -----
 			case "if":
 				start = this.parseIf(list, start, line, directiveEnd, length, IfDirective.MODE_IF);
 				continue;
@@ -111,6 +120,8 @@ public class Parser
 			case "endif":
 				if (block == IF_BLOCK || block == ELSE_BLOCK)
 				{
+					this.markers.add(new Warning(new CodePosition(start, directiveStart, directiveEnd),
+					                             I18n.get("endif.deprecated")));
 					return start;
 				}
 				break;
@@ -125,6 +136,8 @@ public class Parser
 			case "endfor":
 				if (block == FOR_BLOCK)
 				{
+					this.markers.add(new Warning(new CodePosition(start, directiveStart, directiveEnd),
+					                             I18n.get("endfor.deprecated")));
 					return start;
 				}
 				break;
@@ -137,7 +150,8 @@ public class Parser
 				break;
 			}
 
-			// TODO Invalid Directive Error
+			this.markers.add(new SemanticError(new CodePosition(start, directiveStart, directiveEnd),
+			                                   I18n.get("directive.invalid", directive)));
 		}
 
 		return start;
@@ -209,7 +223,7 @@ public class Parser
 		directive.setThenBlock(thenBlock);
 		list.add(directive);
 
-		if (!this.lines.get(thenEnd).contains("#else"))
+		if (!this.source.getLine(thenEnd).contains("#else"))
 		{
 			return thenEnd;
 		}
@@ -226,9 +240,16 @@ public class Parser
 	{
 		final String[] parts = Util.getArgument(line, directiveEnd, length).split("\\s*;\\s*");
 
-		final String varName = parts.length > 0 ? parts[0] : "";
-		final String start = parts.length > 1 ? parts[1] : "";
-		final String end = parts.length > 2 ? parts[2] : "";
+		if (parts.length != 3)
+		{
+			this.markers
+				.add(new SemanticError(new CodePosition(lineIndex, directiveEnd, length), I18n.get("for.syntax")));
+			return this.parseBlock(list, lineIndex);
+		}
+
+		final String varName = parts[0];
+		final String start = parts[1];
+		final String end = parts[2];
 
 		final ForDirective directive = new ForDirective(varName, start, end);
 		final DirectiveList action = new DirectiveList();
