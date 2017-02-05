@@ -1,4 +1,4 @@
-package dyvil.event
+package dyvilx.event
 
 import java.lang.reflect.Method
 import const dyvil.reflect.Modifiers.STATIC

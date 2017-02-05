@@ -1,4 +1,4 @@
-package dyvil.event
+package dyvilx.event
 
 public class CovariantEventBus extends InvariantEventBus
 {
