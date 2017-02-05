@@ -311,7 +311,7 @@ private void runGenSrc(JavaExec exec, String src, String dest)
 	
 	exec.main = genSrcMainClass
 	exec.classpath = sourceSets.gensrc.runtimeClasspath
-	exec.args = [ "source=$src", "target=$dest" ]
+	exec.args = [ "source=$src", "target=$dest", '--ansi' ]
 }
 
 // ---------------------------------------- Test Tasks ----------------------------------------

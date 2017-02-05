@@ -22,7 +22,7 @@ public interface Range<+T> extends Queryable<T>, Serializable
 	static func apply<T>(): Range<T> = EmptyRange.instance
 
 #import Base.dgs
-#for PRIMITIVE_SPECS
+#foreach PRIMITIVE_SPECS
 	#if HAS_RANGE_CLASS
 	@BytecodeName("closed")
 	static func apply(PRIMITIVE from, PRIMITIVE to): TYPE_NAME##Range = TYPE_NAME##Range(from, to: to)
@@ -30,8 +30,8 @@ public interface Range<+T> extends Queryable<T>, Serializable
 	@BytecodeName("halfOpen")
 	static func apply(PRIMITIVE from, PRIMITIVE toExclusive): TYPE_NAME##Range = TYPE_NAME##Range(from, toExclusive: toExclusive)
 
-	#endif
-#endfor
+	#end
+#end
 	
 	@BytecodeName("closed")
 	static func apply<T extends Rangeable>(T from, T to): Range<T>
