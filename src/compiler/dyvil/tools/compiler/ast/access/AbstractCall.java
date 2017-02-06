@@ -10,6 +10,8 @@ import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.Candidate;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
+import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
+import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
@@ -268,25 +270,35 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 		marker.addInfo(sb.toString());
 	}
 
-	protected IValue checkArguments(MarkerList markers, IContext context, IMethod method)
+	protected final IValue checkArguments(MarkerList markers, IContext context, IMethod method)
 	{
+		final IntrinsicData intrinsicData = method.getIntrinsicData();
+		if (intrinsicData != null)
+		{
+			final int code = intrinsicData.getCompilerCode();
+			if (code != 0)
+			{
+				final IValue intrinsic = Intrinsics.getOperator(code, this.receiver, this.arguments);
+				if (intrinsic != null)
+				{
+					return intrinsic;
+				}
+			}
+		}
+
 		this.method = method;
 
-		if (this.method != null)
+		final GenericData genericData;
+		if (this.genericData != null)
 		{
-			GenericData data;
-			if (this.genericData != null)
-			{
-				data = this.genericData = this.method.getGenericData(this.genericData, this.receiver, this.arguments);
-			}
-			else
-			{
-				data = this.getGenericData();
-			}
-
-			this.receiver = this.method
-				                .checkArguments(markers, this.position, context, this.receiver, this.arguments, data);
+			genericData = this.genericData = method.getGenericData(this.genericData, this.receiver, this.arguments);
 		}
+		else
+		{
+			genericData = this.getGenericData();
+		}
+
+		this.receiver = method.checkArguments(markers, this.position, context, this.receiver, this.arguments, genericData);
 
 		this.type = null;
 		this.type = this.getType();

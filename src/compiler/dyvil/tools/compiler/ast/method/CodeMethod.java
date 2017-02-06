@@ -20,6 +20,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
+import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
@@ -404,6 +405,27 @@ public class CodeMethod extends AbstractMethod
 			this.overrideMethods = new IdentityHashSet<>();
 		}
 		this.overrideMethods.add(method);
+	}
+
+	@Override
+	public IntrinsicData getIntrinsicData()
+	{
+		final IAnnotation annotation = this.getAnnotation(Types.INTRINSIC_CLASS);
+		if (annotation == null)
+		{
+			return null;
+		}
+
+		try
+		{
+			// FIXME dirty hack. This can probably be solved by using a recursive resolution scheme instead of a phase-based one
+			annotation.resolve(null, Types.LANG_HEADER);
+			return this.intrinsicData = Intrinsics.readAnnotation(this, annotation);
+		}
+		catch (Exception ignored)
+		{
+			return super.getIntrinsicData();
+		}
 	}
 
 	@Override

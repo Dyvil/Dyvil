@@ -132,6 +132,17 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
+	public IntrinsicData getIntrinsicData()
+	{
+		if ((this.resolved & ANNOTATIONS) == 0)
+		{
+			this.resolveAnnotations();
+		}
+
+		return super.getIntrinsicData();
+	}
+
+	@Override
 	public void setIntrinsicData(IntrinsicData intrinsicData)
 	{
 		this.intrinsicData = intrinsicData;

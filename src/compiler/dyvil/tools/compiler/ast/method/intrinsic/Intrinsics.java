@@ -1,27 +1,74 @@
 package dyvil.tools.compiler.ast.method.intrinsic;
 
+import dyvil.annotation.Intrinsic;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.intrinsic.*;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.parameter.CodeParameter;
+import dyvil.tools.compiler.ast.operator.VarargsOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.reference.ReferenceOperator;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.ast.type.compound.ArrayType;
-import dyvil.tools.parsing.Name;
 
 public class Intrinsics
 {
-	private static final CodeParameter STRINGS = new CodeParameter(Name.fromRaw("strings"),
-	                                                               new ArrayType(Types.STRING));
+	private static class LazyFields
+	{
+		public static final IParameter VALUE;
+		public static final IParameter STRINGS;
+		public static final IParameter COMPILER_CODE;
+
+		static
+		{
+			final IParameterList params = Types.INTRINSIC_CLASS.getParameterList();
+			VALUE = params.get(0);
+			STRINGS = params.get(1);
+			COMPILER_CODE = params.get(2);
+		}
+	}
+
+	public static IValue getOperator(int code, IValue lhs, IArguments arguments)
+	{
+		switch (code)
+		{
+		case Intrinsic.BOOLEAN_NOT:
+			return new NotOperator(arguments.getFirstValue());
+		case Intrinsic.BOOLEAN_OR:
+			return new OrOperator(lhs, arguments.getFirstValue());
+		case Intrinsic.BOOLEAN_AND:
+			return new AndOperator(lhs, arguments.getFirstValue());
+		case Intrinsic.REFERENCE:
+			return new ReferenceOperator(arguments.getFirstValue());
+		case Intrinsic.ARRAY_SPREAD:
+			return new VarargsOperator(lhs);
+		case Intrinsic.STRING_CONCAT:
+			return StringConcatExpr.apply(lhs, arguments.getFirstValue());
+		case Intrinsic.PRE_INCREMENT:
+			return IncOperator.apply(arguments.getFirstValue(), 1, true);
+		case Intrinsic.POST_INCREMENT:
+			return IncOperator.apply(lhs, 1, false);
+		case Intrinsic.PRE_DECREMENT:
+			return IncOperator.apply(arguments.getFirstValue(), -1, true);
+		case Intrinsic.POST_DECREMENT:
+			return IncOperator.apply(lhs, -1, false);
+		}
+		return null;
+	}
 
 	public static IntrinsicData readAnnotation(IMethod method, IAnnotation annotation)
 	{
-		IArguments arguments = annotation.getArguments();
-		IValue value = arguments.getValue(0, Annotation.VALUE);
+		final IArguments arguments = annotation.getArguments();
+		final IValue compilerCode = arguments.getValue(2, LazyFields.COMPILER_CODE);
+		if (compilerCode != null && compilerCode.valueTag() == IValue.INT)
+		{
+			return new CompilerIntrinsic(compilerCode.intValue());
+		}
+
+		final IValue value = arguments.getValue(0, LazyFields.VALUE);
 		if (value == null || value.valueTag() != IValue.ARRAY)
 		{
 			return null;
@@ -58,7 +105,7 @@ public class Intrinsics
 
 		if (length > insnCount)
 		{
-			IValue stringValue = arguments.getValue(1, STRINGS);
+			IValue stringValue = arguments.getValue(1, LazyFields.STRINGS);
 			ArrayExpr strings = (ArrayExpr) stringValue;
 
 			return readComplex(method, insnCount, ints, strings);

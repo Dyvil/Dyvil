@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.operator;
 
-import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -36,14 +35,6 @@ public class InfixCall extends MethodCall
 		if (candidates.hasCandidate())
 		{
 			return this.checkArguments(markers, context, candidates.getBestMember());
-		}
-
-		// Infix Operators
-		final IValue op = Operators.getInfix(this.receiver, this.name, this.arguments.getFirstValue());
-		if (op != null)
-		{
-			op.setPosition(this.position);
-			return op.resolveOperator(markers, context);
 		}
 
 		// Compound Operators
@@ -105,19 +96,7 @@ public class InfixCall extends MethodCall
 			return null;
 		}
 
-		// Left-hand operand must be a field access and inc-convertible
-		if (lhs.valueTag() != IValue.FIELD_ACCESS || !IncOperator.isIncConvertible(lhs.getType()))
-		{
-			return null;
-		}
-
-		final FieldAccess fieldAccess = (FieldAccess) lhs;
-		int intValue = rhs.intValue();
-		if (name == Names.minus)
-		{
-			intValue = -intValue;
-		}
-		return new IncOperator(fieldAccess.getReceiver(), fieldAccess.getField(), intValue, true);
+		return IncOperator.apply(lhs, rhs.intValue(), true);
 	}
 
 	@Override
