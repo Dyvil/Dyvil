@@ -3,6 +3,7 @@ package dyvil.tools.gensrc.ast.directive;
 import dyvil.tools.gensrc.GenSrc;
 import dyvil.tools.gensrc.ast.scope.LazyScope;
 import dyvil.tools.gensrc.ast.scope.Scope;
+import dyvil.tools.parsing.marker.MarkerList;
 
 import java.io.PrintStream;
 
@@ -21,10 +22,10 @@ public class ScopeDirective implements Directive
 	}
 
 	@Override
-	public void specialize(GenSrc gensrc, Scope scope, PrintStream output)
+	public void specialize(GenSrc gensrc, Scope scope, MarkerList markers, PrintStream output)
 	{
 		final LazyScope lazyScope = new LazyScope(scope);
-		this.block.specialize(gensrc, lazyScope, output);
+		this.block.specialize(gensrc, lazyScope, markers, output);
 	}
 
 	@Override

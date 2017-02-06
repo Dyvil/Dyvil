@@ -1,7 +1,15 @@
 package dyvil.tools.gensrc.ast;
 
+import dyvil.collection.List;
+import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.gensrc.GenSrc;
 import dyvil.tools.gensrc.ast.scope.Scope;
+import dyvil.tools.gensrc.lang.I18n;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.marker.SemanticError;
+import dyvil.tools.parsing.position.ICodePosition;
+
+import java.io.File;
 
 public class Util
 {
@@ -137,18 +145,23 @@ public class Util
 		return end;
 	}
 
-	public static Specialization[] parseSpecs(String line, GenSrc gensrc, Scope replacements)
+	public static List<Specialization> parseSpecs(String line, GenSrc gensrc, Scope scope, MarkerList markers,
+		                                             ICodePosition position)
 	{
-		return parseSpecs(line, 0, line.length(), gensrc, replacements);
-	}
+		final String[] files = getProcessedArguments(line, 0, line.length(), scope);
+		final List<Specialization> specs = new ArrayList<>(files.length);
+		final File sourceFile = scope.getSourceFile();
 
-	public static Specialization[] parseSpecs(String line, int start, int end, GenSrc gensrc, Scope replacements)
-	{
-		final String[] files = getProcessedArguments(line, start, end, replacements);
-		final Specialization[] specs = new Specialization[files.length];
-		for (int i = 0; i < files.length; i++)
+		for (String file : files)
 		{
-			specs[i] = Specialization.resolveSpec(gensrc, files[i], replacements.getSourceFile());
+			final Specialization spec = Specialization.resolveSpec(gensrc, file, sourceFile);
+			if (spec != null)
+			{
+				specs.add(spec);
+				continue;
+			}
+
+			markers.add(new SemanticError(position, I18n.get("spec.resolve", file)));
 		}
 		return specs;
 	}

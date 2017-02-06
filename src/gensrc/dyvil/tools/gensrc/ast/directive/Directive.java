@@ -2,14 +2,15 @@ package dyvil.tools.gensrc.ast.directive;
 
 import dyvil.tools.gensrc.GenSrc;
 import dyvil.tools.gensrc.ast.scope.Scope;
+import dyvil.tools.parsing.marker.MarkerList;
 
 import java.io.PrintStream;
 
 public interface Directive
 {
-	void specialize(GenSrc gensrc, Scope scope, PrintStream output);
+	void specialize(GenSrc gensrc, Scope scope, MarkerList markers, PrintStream output);
 
-	public static String toString(Directive dir)
+	static String toString(Directive dir)
 	{
 		final StringBuilder builder = new StringBuilder();
 		dir.toString("", builder);

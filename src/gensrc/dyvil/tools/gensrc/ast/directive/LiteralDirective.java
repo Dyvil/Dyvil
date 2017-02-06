@@ -2,6 +2,7 @@ package dyvil.tools.gensrc.ast.directive;
 
 import dyvil.tools.gensrc.GenSrc;
 import dyvil.tools.gensrc.ast.scope.Scope;
+import dyvil.tools.parsing.marker.MarkerList;
 
 import java.io.PrintStream;
 
@@ -15,7 +16,7 @@ public class LiteralDirective implements Directive
 	}
 
 	@Override
-	public void specialize(GenSrc gensrc, Scope scope, PrintStream output)
+	public void specialize(GenSrc gensrc, Scope scope, MarkerList markers, PrintStream output)
 	{
 		output.println(this.text);
 	}

@@ -34,11 +34,11 @@ public class Parser
 		return list;
 	}
 
-	private int parse(DirectiveList list, int start, int block)
+	private int parse(DirectiveList list, int lineNumber, int block)
 	{
-		for (; start < this.lineCount; start++)
+		for (; lineNumber < this.lineCount; lineNumber++)
 		{
-			final String line = this.source.getLine(start);
+			final String line = this.source.getLine(lineNumber);
 			final int length = line.length();
 
 			final int hashIndex;
@@ -65,7 +65,7 @@ public class Parser
 				list.add(this.parseLiteral(line, directiveEnd, length));
 				continue;
 			case "include":
-				list.add(this.parseInclude(line, directiveEnd, length));
+				list.add(this.parseInclude(line, lineNumber, hashIndex, directiveEnd, length));
 				continue;
 			case "comment":
 				continue;
@@ -86,75 +86,75 @@ public class Parser
 
 				// ----- Scope Directives -----
 			case "import":
-				list.add(this.parseImport(line, directiveEnd, length));
+				list.add(this.parseImport(line, lineNumber, hashIndex, directiveEnd, length));
 				continue;
 			case "scope":
-				start = this.parseBlock(list, start);
+				lineNumber = this.parseBlock(list, lineNumber);
 				continue;
 			case "endscope":
 
 				if (block == SCOPE_BLOCK)
 				{
-					this.markers.add(new Warning(new CodePosition(start, directiveStart, directiveEnd),
+					this.markers.add(new Warning(new CodePosition(lineNumber, directiveStart, directiveEnd),
 					                             I18n.get("endscope.deprecated")));
-					return start;
+					return lineNumber;
 				}
 				break;
 
 			// ----- if Directives -----
 			case "if":
-				start = this.parseIf(list, start, line, directiveEnd, length, IfDirective.MODE_IF);
+				lineNumber = this.parseIf(list, lineNumber, line, directiveEnd, length, IfDirective.MODE_IF);
 				continue;
 			case "ifdef":
-				start = this.parseIf(list, start, line, directiveEnd, length, IfDirective.MODE_IFDEF);
+				lineNumber = this.parseIf(list, lineNumber, line, directiveEnd, length, IfDirective.MODE_IFDEF);
 				continue;
 			case "ifndef":
-				start = this.parseIf(list, start, line, directiveEnd, length, IfDirective.MODE_IFNDEF);
+				lineNumber = this.parseIf(list, lineNumber, line, directiveEnd, length, IfDirective.MODE_IFNDEF);
 				continue;
 			case "else":
 				if (block == IF_BLOCK)
 				{
-					return start;
+					return lineNumber;
 				}
 				break;
 			case "endif":
 				if (block == IF_BLOCK || block == ELSE_BLOCK)
 				{
-					this.markers.add(new Warning(new CodePosition(start, directiveStart, directiveEnd),
+					this.markers.add(new Warning(new CodePosition(lineNumber, directiveStart, directiveEnd),
 					                             I18n.get("endif.deprecated")));
-					return start;
+					return lineNumber;
 				}
 				break;
 
 			// ----- for Directives -----
 			case "for":
-				start = this.parseFor(list, start, line, directiveEnd, length);
+				lineNumber = this.parseFor(list, lineNumber, line, hashIndex, directiveEnd, length);
 				continue;
 			case "foreach":
-				start = this.parseForEach(list, start, line, directiveEnd, length);
+				lineNumber = this.parseForEach(list, lineNumber, line, hashIndex, directiveEnd, length);
 				continue;
 			case "endfor":
 				if (block == FOR_BLOCK)
 				{
-					this.markers.add(new Warning(new CodePosition(start, directiveStart, directiveEnd),
+					this.markers.add(new Warning(new CodePosition(lineNumber, directiveStart, directiveEnd),
 					                             I18n.get("endfor.deprecated")));
-					return start;
+					return lineNumber;
 				}
 				break;
 
 			case "end":
 				if (block != 0)
 				{
-					return start;
+					return lineNumber;
 				}
 				break;
 			}
 
-			this.markers.add(new SemanticError(new CodePosition(start, directiveStart, directiveEnd),
+			this.markers.add(new SemanticError(new CodePosition(lineNumber, directiveStart, directiveEnd),
 			                                   I18n.get("directive.invalid", directive)));
 		}
 
-		return start;
+		return lineNumber;
 	}
 
 	private int parseBlock(DirectiveList list, int start)
@@ -203,22 +203,22 @@ public class Parser
 		return new UndefineDirective(local, key);
 	}
 
-	private ImportDirective parseImport(String line, int directiveEnd, int length)
+	private ImportDirective parseImport(String line, int lineNumber, int hashIndex, int directiveEnd, int length)
 	{
-		return new ImportDirective(Util.getArgument(line, directiveEnd, length));
+		return new ImportDirective(new CodePosition(lineNumber, hashIndex, directiveEnd), Util.getArgument(line, directiveEnd, length));
 	}
 
-	private IncludeDirective parseInclude(String line, int directiveEnd, int length)
+	private IncludeDirective parseInclude(String line, int lineNumber, int hashIndex, int directiveEnd, int length)
 	{
-		return new IncludeDirective(Util.getArgument(line, directiveEnd, length));
+		return new IncludeDirective(new CodePosition(lineNumber, hashIndex, directiveEnd), Util.getArgument(line, directiveEnd, length));
 	}
 
-	private int parseIf(DirectiveList list, int lineIndex, String line, int directiveEnd, int length, byte mode)
+	private int parseIf(DirectiveList list, int lineNumber, String line, int directiveEnd, int length, byte mode)
 	{
 		final IfDirective directive = new IfDirective(Util.getArgument(line, directiveEnd, length), mode);
 
 		final DirectiveList thenBlock = new DirectiveList();
-		final int thenEnd = this.parse(thenBlock, lineIndex + 1, IF_BLOCK);
+		final int thenEnd = this.parse(thenBlock, lineNumber + 1, IF_BLOCK);
 
 		directive.setThenBlock(thenBlock);
 		list.add(directive);
@@ -236,25 +236,27 @@ public class Parser
 		return elseEnd;
 	}
 
-	private int parseFor(DirectiveList list, int lineIndex, String line, int directiveEnd, int length)
+	private int parseFor(DirectiveList list, int lineNumber, String line, int hashIndex, int directiveEnd, int length)
 	{
+		final CodePosition position = new CodePosition(lineNumber, hashIndex, directiveEnd);
+
 		final String[] parts = Util.getArgument(line, directiveEnd, length).split("\\s*;\\s*");
 
 		if (parts.length != 3)
 		{
 			this.markers
-				.add(new SemanticError(new CodePosition(lineIndex, directiveEnd, length), I18n.get("for.syntax")));
-			return this.parseBlock(list, lineIndex);
+				.add(new SemanticError(position, I18n.get("for.syntax")));
+			return this.parseBlock(list, lineNumber);
 		}
 
 		final String varName = parts[0];
 		final String start = parts[1];
 		final String end = parts[2];
 
-		final ForDirective directive = new ForDirective(varName, start, end);
+		final ForDirective directive = new ForDirective(position, varName, start, end);
 		final DirectiveList action = new DirectiveList();
 
-		final int endLine = this.parse(action, lineIndex + 1, FOR_BLOCK);
+		final int endLine = this.parse(action, lineNumber + 1, FOR_BLOCK);
 
 		directive.setAction(action);
 		list.add(directive);
@@ -262,12 +264,14 @@ public class Parser
 		return endLine;
 	}
 
-	private int parseForEach(DirectiveList list, int lineIndex, String line, int directiveEnd, int length)
+	private int parseForEach(DirectiveList list, int lineNumber, String line, int hashIndex, int directiveEnd,
+		                        int length)
 	{
-		final ForEachDirective directive = new ForEachDirective(Util.getArgument(line, directiveEnd, length));
+		final ForEachDirective directive = new ForEachDirective(new CodePosition(lineNumber, hashIndex, directiveEnd),
+		                                                        Util.getArgument(line, directiveEnd, length));
 		final DirectiveList action = new DirectiveList();
 
-		final int end = this.parse(action, lineIndex + 1, FOR_BLOCK);
+		final int end = this.parse(action, lineNumber + 1, FOR_BLOCK);
 
 		directive.setAction(action);
 		list.add(directive);

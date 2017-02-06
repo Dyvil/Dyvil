@@ -2,6 +2,7 @@ package dyvil.tools.gensrc.ast.directive;
 
 import dyvil.tools.gensrc.GenSrc;
 import dyvil.tools.gensrc.ast.scope.Scope;
+import dyvil.tools.parsing.marker.MarkerList;
 
 import java.io.PrintStream;
 import java.util.Arrays;
@@ -21,6 +22,11 @@ public class DirectiveList implements Directive
 		this.directives = new Directive[capacity];
 	}
 
+	public int size()
+	{
+		return this.directiveCount;
+	}
+
 	public void add(Directive dir)
 	{
 		final int index = this.directiveCount++;
@@ -32,11 +38,11 @@ public class DirectiveList implements Directive
 	}
 
 	@Override
-	public void specialize(GenSrc gensrc, Scope scope, PrintStream output)
+	public void specialize(GenSrc gensrc, Scope scope, MarkerList markers, PrintStream output)
 	{
 		for (int i = 0; i < this.directiveCount; i++)
 		{
-			this.directives[i].specialize(gensrc, scope, output);
+			this.directives[i].specialize(gensrc, scope, markers, output);
 		}
 	}
 

@@ -4,19 +4,25 @@ import dyvil.tools.gensrc.GenSrc;
 import dyvil.tools.gensrc.ast.Util;
 import dyvil.tools.gensrc.ast.scope.LazyScope;
 import dyvil.tools.gensrc.ast.scope.Scope;
+import dyvil.tools.gensrc.lang.I18n;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.marker.SemanticError;
+import dyvil.tools.parsing.position.ICodePosition;
 
 import java.io.PrintStream;
 
 public class ForDirective implements Directive
 {
-	private final String varName;
-	private final String start;
-	private final String end;
+	private final ICodePosition position;
+	private final String        varName;
+	private final String        start;
+	private final String        end;
 
 	private Directive action;
 
-	public ForDirective(String varName, String start, String end)
+	public ForDirective(ICodePosition position, String varName, String start, String end)
 	{
+		this.position = position;
 		this.varName = varName;
 		this.start = start;
 		this.end = end;
@@ -33,7 +39,7 @@ public class ForDirective implements Directive
 	}
 
 	@Override
-	public void specialize(GenSrc gensrc, Scope scope, PrintStream output)
+	public void specialize(GenSrc gensrc, Scope scope, MarkerList markers, PrintStream output)
 	{
 		final int start;
 		final int end;
@@ -45,7 +51,7 @@ public class ForDirective implements Directive
 		}
 		catch (NumberFormatException ignored)
 		{
-			// TODO Invalid For Directive Error
+			markers.add(new SemanticError(this.position, I18n.get("for.start_end.invalid")));
 			return;
 		}
 
@@ -54,7 +60,7 @@ public class ForDirective implements Directive
 		for (int i = start; i <= end; i++)
 		{
 			forScope.define(this.varName, Integer.toString(i));
-			this.action.specialize(gensrc, forScope, output);
+			this.action.specialize(gensrc, forScope, markers, output);
 		}
 	}
 

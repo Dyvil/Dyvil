@@ -123,10 +123,9 @@ public class Specialization implements Scope
 		{
 			this.substitutions.load(reader);
 		}
-		catch (IOException e)
+		catch (IOException ignored)
 		{
-			// TODO better error handling
-			e.printStackTrace(gensrc.getErrorOutput());
+			gensrc.error(I18n.get("spec.file.error"));
 		}
 
 		if (!this.isBase())

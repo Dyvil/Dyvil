@@ -1,5 +1,6 @@
 package dyvil.tools.gensrc.ast;
 
+import dyvil.io.FileUtils;
 import dyvil.tools.gensrc.GenSrc;
 import dyvil.tools.gensrc.ast.directive.DirectiveList;
 import dyvil.tools.gensrc.ast.scope.TemplateScope;
@@ -9,7 +10,10 @@ import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.source.FileSource;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,7 +81,7 @@ public class Template
 
 		if (markers.getErrors() > 0)
 		{
-			this.printMarkers(gensrc, markers);
+			this.printMarkers(gensrc, markers, null);
 			return;
 		}
 
@@ -86,10 +90,20 @@ public class Template
 		gensrc.getOutput().println(I18n.get("template.specialized", count, this.sourceFile.getInputFile()));
 	}
 
-	private void printMarkers(GenSrc gensrc, MarkerList markers)
+	private void printMarkers(GenSrc gensrc, MarkerList markers, Specialization spec)
 	{
 		final StringBuilder builder = new StringBuilder();
-		builder.append(I18n.get("template.problems", this.sourceFile.getInputFile())).append('\n').append('\n');
+
+		if (spec == null)
+		{
+			builder.append(I18n.get("template.problems", this.sourceFile.getInputFile()));
+		}
+		else
+		{
+			builder.append(I18n.get("template.problems.for_spec", this.sourceFile.getInputFile(), spec.getFileName()));
+		}
+
+		builder.append('\n').append('\n');
 
 		final boolean colors = gensrc.useAnsiColors();
 		for (Marker marker : markers)
@@ -127,16 +141,33 @@ public class Template
 			return;
 		}
 
-		final File outputFile = new File(this.targetDirectory, fileName);
-		final TemplateScope scope = new TemplateScope(this.sourceFile.getInputFile(), spec);
+		final int estSize = this.sourceFile.getText().length() * 2;
 
-		try (final PrintStream writer = new PrintStream(new BufferedOutputStream(new FileOutputStream(outputFile))))
+		final ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream(estSize);
+		final PrintStream writer = new PrintStream(byteArrayOut);
+
+		final File inputFile = this.sourceFile.getInputFile();
+		final TemplateScope scope = new TemplateScope(inputFile, spec);
+
+		// Specialize and check for errors
+		final MarkerList markers = new MarkerList(I18n.INSTANCE);
+		this.directives.specialize(gensrc, scope, markers, writer);
+
+		if (!markers.isEmpty())
 		{
-			this.directives.specialize(gensrc, scope, writer);
+			this.printMarkers(gensrc, markers, spec);
+			return;
 		}
-		catch (IOException ex)
+
+		final File outputFile = new File(this.targetDirectory, fileName);
+
+		try
 		{
-			ex.printStackTrace(gensrc.getErrorOutput());
+			FileUtils.write(outputFile, byteArrayOut.toByteArray());
+		}
+		catch (IOException ignored)
+		{
+			gensrc.error(I18n.get("template.specialize.error", outputFile));
 		}
 	}
 }

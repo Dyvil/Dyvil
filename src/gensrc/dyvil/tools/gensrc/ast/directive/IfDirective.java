@@ -2,6 +2,7 @@ package dyvil.tools.gensrc.ast.directive;
 
 import dyvil.tools.gensrc.GenSrc;
 import dyvil.tools.gensrc.ast.scope.Scope;
+import dyvil.tools.parsing.marker.MarkerList;
 
 import java.io.PrintStream;
 
@@ -58,15 +59,15 @@ public class IfDirective implements Directive
 	}
 
 	@Override
-	public void specialize(GenSrc gensrc, Scope scope, PrintStream output)
+	public void specialize(GenSrc gensrc, Scope scope, MarkerList markers, PrintStream output)
 	{
 		if (this.evaluate(scope))
 		{
-			this.thenBlock.specialize(gensrc, scope, output);
+			this.thenBlock.specialize(gensrc, scope, markers, output);
 		}
 		else if (this.elseBlock != null)
 		{
-			this.elseBlock.specialize(gensrc, scope, output);
+			this.elseBlock.specialize(gensrc, scope, markers, output);
 		}
 	}
 
