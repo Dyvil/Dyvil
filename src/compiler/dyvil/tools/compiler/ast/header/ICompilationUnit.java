@@ -99,7 +99,7 @@ public interface ICompilationUnit extends IASTNode
 		compiler.log(builder.toString());
 		if (errors > 0)
 		{
-			compiler.failCompilation();
+			compiler.fail();
 			compiler.warn(I18n.get("unit.problems.not_compiled", name));
 			compiler.warn("");
 			return true;
