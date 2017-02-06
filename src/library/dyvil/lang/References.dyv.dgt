@@ -1,0 +1,49 @@
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
+package dyvil.lang
+
+public abstract class References
+{
+	private init() {}
+
+	@Intrinsic([], compilerCode: Intrinsic.REFERENCE)
+	static func & <T>(T^ ref) -> T* = ref
+
+	// Primitive Reference Operators
+#import Base.dgs
+#foreach PRIMITIVE_SPECS
+
+	@Intrinsic([], compilerCode: Intrinsic.REFERENCE)
+	static func &(PRIMITIVE^ ref) -> PRIMITIVE* = ref
+#end
+
+#foreach PRIMITIVE_SPECS
+	#if IS_BOOLEAN
+	#else
+
+		#if IS_SUBRANGE
+			#define CAST as PRIMITIVE
+		#else
+			#define CAST
+		#end
+
+	// PRIMITIVE Increment and Decrement
+
+	@Intrinsic([], compilerCode: Intrinsic.PRE_INCREMENT)
+	@BytecodeName("incPre")
+	prefix func ++(rhs: PRIMITIVE^) -> PRIMITIVE { let v = (*rhs + 1) CAST; *rhs = v; v }
+
+	@Intrinsic([], compilerCode: Intrinsic.POST_INCREMENT)
+	@BytecodeName("incPost")
+	postfix func ++(rhs: PRIMITIVE^) -> PRIMITIVE { let v = *rhs; *rhs = (v + 1) CAST; v }
+
+	@Intrinsic([], compilerCode: Intrinsic.PRE_DECREMENT)
+	@BytecodeName("decPre")
+	prefix func --(rhs: PRIMITIVE^) -> PRIMITIVE { let v = (*rhs - 1) CAST; *rhs = v; v }
+
+	@Intrinsic([], compilerCode: Intrinsic.POST_DECREMENT)
+	@BytecodeName("decPost")
+	postfix func --(rhs: PRIMITIVE^) -> PRIMITIVE { let v = *rhs; *rhs = (v - 1) CAST; v }
+	#end
+#end
+}

@@ -38,6 +38,7 @@ using dyvil.lang.{
 	Primitives._
 	Output._
 	Optionals._
+	References._
 	Assert._
 	ObjectExtensions._
 	StringExtensions._

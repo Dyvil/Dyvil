@@ -10,6 +10,17 @@ public final class StringExtensions
 
 	private init() {}
 
+	// Concat Operators
+
+	@Intrinsic([], compilerCode: Intrinsic.STRING_CONCAT)
+	infix func +(lhs: String, rhs: any!) -> String = lhs + rhs
+
+	@Intrinsic([], compilerCode: Intrinsic.STRING_CONCAT)
+	infix func +(lhs: any!, rhs: String) -> String = lhs + rhs
+
+	@Intrinsic([], compilerCode: Intrinsic.STRING_CONCAT)
+	infix func +(lhs: String, rhs: String) -> String = lhs + rhs
+
 	// Makeshift char casts
 
 	public static inline func char(char c): char = c
