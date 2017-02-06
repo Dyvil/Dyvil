@@ -8,8 +8,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Properties;
 
@@ -19,11 +17,6 @@ public class Specialization implements Scope
 	public static final String ENABLED_PROPERTY      = "@enabled";
 	public static final String INHERIT_FROM_PROPERTY = "@inheritFrom";
 	public static final String BASE_PROPERTY         = "@base";
-
-	public static final String GEN_NOTICE_PROPERTY = "GEN_NOTICE";
-	public static final String TIME_STAMP_PROPERTY = "TIME_STAMP";
-
-	public static final String GEN_NOTICE = I18n.get("genNotice");
 
 	private Properties substitutions = new Properties();
 
@@ -52,7 +45,6 @@ public class Specialization implements Scope
 	public static Specialization createDefault(String templateName)
 	{
 		Specialization spec = new Specialization(null, templateName);
-		initDefaults(spec.substitutions);
 		spec.substitutions.put(FILE_NAME_PROPERTY, templateName);
 		return spec;
 	}
@@ -117,8 +109,6 @@ public class Specialization implements Scope
 
 	public void load(GenSrc gensrc, List<String> markers)
 	{
-		initDefaults(this.substitutions);
-
 		try (BufferedReader reader = Files.newBufferedReader(this.sourceFile.toPath()))
 		{
 			this.substitutions.load(reader);
@@ -177,11 +167,5 @@ public class Specialization implements Scope
 	public static Specialization resolveSpec(GenSrc gensrc, String reference, File sourceFile)
 	{
 		return gensrc.getSpecialization(resolveSpecFile(gensrc, reference, sourceFile));
-	}
-
-	private static void initDefaults(Properties substitutions)
-	{
-		substitutions.put(GEN_NOTICE_PROPERTY, GEN_NOTICE);
-		substitutions.put(TIME_STAMP_PROPERTY, DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now()));
 	}
 }
