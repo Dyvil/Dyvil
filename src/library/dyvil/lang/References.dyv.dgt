@@ -7,14 +7,14 @@ public abstract class References
 	private init() {}
 
 	@Intrinsic([], compilerCode: Intrinsic.REFERENCE)
-	static func & <T>(T^ ref) -> T* = ref
+	static func & <T>(rhs: T^) -> T* = rhs
 
 	// Primitive Reference Operators
 #import Base.dgs
 #foreach PRIMITIVE_SPECS
 
 	@Intrinsic([], compilerCode: Intrinsic.REFERENCE)
-	static func &(PRIMITIVE^ ref) -> PRIMITIVE* = ref
+	static func &(rhs: PRIMITIVE^) -> PRIMITIVE* = rhs
 #end
 
 #foreach PRIMITIVE_SPECS

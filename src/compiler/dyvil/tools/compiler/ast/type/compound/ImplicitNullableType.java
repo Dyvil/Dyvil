@@ -102,7 +102,14 @@ public class ImplicitNullableType extends NullableType
 			return new NullableType(this.type);
 		}
 
-		return this.type.withAnnotation(annotation);
+		final IType withAnnotation = this.type.withAnnotation(annotation);
+		if (withAnnotation == null)
+		{
+			return null;
+		}
+
+		this.type = withAnnotation;
+		return this;
 	}
 
 	@Override
