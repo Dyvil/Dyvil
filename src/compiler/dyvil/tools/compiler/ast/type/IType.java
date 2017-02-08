@@ -195,11 +195,6 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	IClass getRefClass();
 
-	default IType getRefType()
-	{
-		return new ReferenceType(this.getRefClass(), this);
-	}
-
 	IType getSimpleRefType();
 
 	default boolean hasTag(int tag)

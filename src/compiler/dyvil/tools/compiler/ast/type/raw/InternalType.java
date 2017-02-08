@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
@@ -61,23 +62,23 @@ public class InternalType implements IRawType, IUnresolvedType
 		switch (this.internalName)
 		{
 		case "dyvil/ref/BooleanRef":
-			return Types.BOOLEAN.getRefType();
+			return ReferenceType.apply(Types.BOOLEAN);
 		case "dyvil/ref/ByteRef":
-			return Types.BYTE.getRefType();
+			return ReferenceType.apply(Types.BYTE);
 		case "dyvil/ref/ShortRef":
-			return Types.SHORT.getRefType();
+			return ReferenceType.apply(Types.SHORT);
 		case "dyvil/ref/CharRef":
-			return Types.CHAR.getRefType();
+			return ReferenceType.apply(Types.CHAR);
 		case "dyvil/ref/IntRef":
-			return Types.INT.getRefType();
+			return ReferenceType.apply(Types.INT);
 		case "dyvil/ref/LongRef":
-			return Types.LONG.getRefType();
+			return ReferenceType.apply(Types.LONG);
 		case "dyvil/ref/FloatRef":
-			return Types.FLOAT.getRefType();
+			return ReferenceType.apply(Types.FLOAT);
 		case "dyvil/ref/DoubleRef":
-			return Types.DOUBLE.getRefType();
+			return ReferenceType.apply(Types.DOUBLE);
 		case "dyvil/ref/StringRef":
-			return Types.STRING.getRefType();
+			return ReferenceType.apply(Types.STRING);
 		}
 
 		final IClass resolvedClass = Package.rootPackage.resolveInternalClass(this.internalName);

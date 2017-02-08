@@ -11,7 +11,6 @@ import dyvil.tools.compiler.ast.operator.VarargsOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
-import dyvil.tools.compiler.ast.reference.ReferenceOperator;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 
 public class Intrinsics
@@ -41,8 +40,6 @@ public class Intrinsics
 			return new OrOperator(lhs, arguments.getFirstValue());
 		case Intrinsic.BOOLEAN_AND:
 			return new AndOperator(lhs, arguments.getFirstValue());
-		case Intrinsic.REFERENCE:
-			return new ReferenceOperator(arguments.getFirstValue());
 		case Intrinsic.ARRAY_SPREAD:
 			return new VarargsOperator(lhs);
 		case Intrinsic.STRING_CONCAT:

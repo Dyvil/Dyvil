@@ -264,15 +264,9 @@ public interface IValue extends IASTNode, ITyped
 
 	default void resolveStatement(ILabelContext context, MarkerList markers)
 	{
-
 	}
 
 	IValue resolve(MarkerList markers, IContext context);
-
-	default IValue resolveOperator(MarkerList markers, IContext context)
-	{
-		return this;
-	}
 
 	void checkTypes(MarkerList markers, IContext context);
 

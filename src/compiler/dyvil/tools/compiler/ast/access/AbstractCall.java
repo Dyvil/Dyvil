@@ -272,21 +272,17 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 
 	protected final IValue checkArguments(MarkerList markers, IContext context, IMethod method)
 	{
-		final IntrinsicData intrinsicData = method.getIntrinsicData();
-		if (intrinsicData != null)
-		{
-			final int code = intrinsicData.getCompilerCode();
-			if (code != 0)
-			{
-				final IValue intrinsic = Intrinsics.getOperator(code, this.receiver, this.arguments);
-				if (intrinsic != null)
-				{
-					return intrinsic;
-				}
-			}
-		}
-
 		this.method = method;
+
+		final IntrinsicData intrinsicData = method.getIntrinsicData();
+		final int code;
+		final IValue intrinsic;
+		if (intrinsicData != null // Intrinsic annotation
+			    && (code = intrinsicData.getCompilerCode()) != 0 // compilerCode argument
+			    && (intrinsic = Intrinsics.getOperator(code, this.receiver, this.arguments)) != null) // valid intrinsic
+		{
+			return intrinsic;
+		}
 
 		final GenericData genericData;
 		if (this.genericData != null)
@@ -298,7 +294,8 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 			genericData = this.getGenericData();
 		}
 
-		this.receiver = method.checkArguments(markers, this.position, context, this.receiver, this.arguments, genericData);
+		this.receiver = method.checkArguments(markers, this.position, context, this.receiver, this.arguments,
+		                                      genericData);
 
 		this.type = null;
 		this.type = this.getType();

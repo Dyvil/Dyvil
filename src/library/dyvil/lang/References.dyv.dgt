@@ -2,18 +2,20 @@
 // Timestamp: TIME_STAMP
 package dyvil.lang
 
+import dyvil.reflect.Opcodes.LOAD_0
+
 public abstract class References
 {
 	private init() {}
 
-	@Intrinsic([], compilerCode: Intrinsic.REFERENCE)
+	@Intrinsic([ LOAD_0 ])
 	static func & <T>(rhs: T^) -> T* = rhs
 
 	// Primitive Reference Operators
 #import Base.dgs
 #foreach PRIMITIVE_SPECS
 
-	@Intrinsic([], compilerCode: Intrinsic.REFERENCE)
+	@Intrinsic([ LOAD_0 ])
 	static func &(rhs: PRIMITIVE^) -> PRIMITIVE* = rhs
 #end
 
