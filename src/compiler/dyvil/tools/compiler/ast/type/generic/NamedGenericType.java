@@ -80,7 +80,7 @@ public class NamedGenericType extends GenericType implements IUnresolvedType
 		this.parent = this.parent.resolveType(markers, context);
 		if (!this.parent.isResolved())
 		{
-			return null;
+			return markers == null ? null : this;
 		}
 		return this.resolveWithParent(markers);
 	}
@@ -104,13 +104,6 @@ public class NamedGenericType extends GenericType implements IUnresolvedType
 		if (type != null)
 		{
 			return type;
-		}
-
-		final Package thePackage = context.resolvePackage(this.name);
-		if (thePackage != null)
-		{
-			markers.add(Markers.semanticError(this.position, "type.generic.package.not_generic", thePackage.getName()));
-			return new PackageType(thePackage).atPosition(this.position);
 		}
 
 		markers.add(Markers.semanticError(this.position, "resolve.type", this.name));
@@ -145,6 +138,13 @@ public class NamedGenericType extends GenericType implements IUnresolvedType
 			}
 
 			return this.checkCount(markers, typeAlias, "type_alias", aliasType);
+		}
+
+		final Package thePackage = context.resolvePackage(this.name);
+		if (thePackage != null)
+		{
+			markers.add(Markers.semanticError(this.position, "type.generic.package.not_generic", thePackage.getName()));
+			return new PackageType(thePackage).atPosition(this.position);
 		}
 		return null;
 	}

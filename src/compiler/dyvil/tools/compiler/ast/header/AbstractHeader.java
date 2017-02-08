@@ -607,6 +607,17 @@ class HeaderContext implements IStaticContext
 	@Override
 	public Package resolvePackage(Name name)
 	{
+		Package result;
+		final ImportDeclaration[] importDeclarations = this.header.importDeclarations;
+		for (int i = 0, count = this.header.importCount; i < count; i++)
+		{
+			result = importDeclarations[i].getContext().resolvePackage(name);
+			if (result != null)
+			{
+				return result;
+			}
+		}
+
 		return this.header.resolvePackage(name);
 	}
 

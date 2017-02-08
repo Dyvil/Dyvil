@@ -6,6 +6,7 @@ import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
+import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
@@ -92,7 +93,7 @@ public final class Types
 	public static void initHeaders()
 	{
 		LANG_HEADER = Package.dyvil.resolveHeader("Lang");
-		BASE_CONTEXT = LANG_HEADER.getContext();
+		BASE_CONTEXT = new CombiningContext(LANG_HEADER.getContext(), Package.rootPackage);
 	}
 
 	public static void initTypes()
