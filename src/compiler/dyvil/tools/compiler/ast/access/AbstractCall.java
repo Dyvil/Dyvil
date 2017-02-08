@@ -10,6 +10,8 @@ import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.Candidate;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
+import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
+import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
@@ -268,25 +270,32 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 		marker.addInfo(sb.toString());
 	}
 
-	protected IValue checkArguments(MarkerList markers, IContext context, IMethod method)
+	protected final IValue checkArguments(MarkerList markers, IContext context, IMethod method)
 	{
 		this.method = method;
 
-		if (this.method != null)
+		final IntrinsicData intrinsicData = method.getIntrinsicData();
+		final int code;
+		final IValue intrinsic;
+		if (intrinsicData != null // Intrinsic annotation
+			    && (code = intrinsicData.getCompilerCode()) != 0 // compilerCode argument
+			    && (intrinsic = Intrinsics.getOperator(code, this.receiver, this.arguments)) != null) // valid intrinsic
 		{
-			GenericData data;
-			if (this.genericData != null)
-			{
-				data = this.genericData = this.method.getGenericData(this.genericData, this.receiver, this.arguments);
-			}
-			else
-			{
-				data = this.getGenericData();
-			}
-
-			this.receiver = this.method
-				                .checkArguments(markers, this.position, context, this.receiver, this.arguments, data);
+			return intrinsic;
 		}
+
+		final GenericData genericData;
+		if (this.genericData != null)
+		{
+			genericData = this.genericData = method.getGenericData(this.genericData, this.receiver, this.arguments);
+		}
+		else
+		{
+			genericData = this.getGenericData();
+		}
+
+		this.receiver = method.checkArguments(markers, this.position, context, this.receiver, this.arguments,
+		                                      genericData);
 
 		this.type = null;
 		this.type = this.getType();

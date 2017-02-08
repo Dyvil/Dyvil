@@ -12,9 +12,23 @@ import java.lang.annotation._
  * jumps. Jump instructions that would require a Label as parameter can be part of the {@link #value() opcode array} ,
  * and the <i>Dyvil Compiler</i> will automatically insert the Labels after the opcode.
  */
- @Target([ ElementType.METHOD ])
- @Retention(RetentionPolicy.CLASS)
+@Target([ ElementType.METHOD ])
+@Retention(RetentionPolicy.CLASS)
 public @interface Intrinsic(
 	let value: [int]
 	let strings: [String] = []
+	let compilerCode: int = 0
 )
+{
+	// Compiler-Codes
+	const STRING_CONCAT = 1
+	const BOOLEAN_NOT   = 2
+	const BOOLEAN_AND   = 3
+	const BOOLEAN_OR    = 4
+	const ARRAY_SPREAD  = 6
+
+	const PRE_INCREMENT  = 10
+	const PRE_DECREMENT  = 11
+	const POST_INCREMENT = 12
+	const POST_DECREMENT = 13
+}

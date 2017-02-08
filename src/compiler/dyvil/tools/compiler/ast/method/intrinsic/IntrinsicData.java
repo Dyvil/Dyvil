@@ -14,6 +14,11 @@ import static dyvil.reflect.Modifiers.INFIX;
 
 public interface IntrinsicData
 {
+	default int getCompilerCode()
+	{
+		return 0;
+	}
+
 	void writeIntrinsic(MethodWriter writer, IValue receiver, IArguments arguments, int lineNumber)
 		throws BytecodeException;
 

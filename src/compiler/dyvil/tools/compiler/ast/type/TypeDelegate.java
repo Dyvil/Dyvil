@@ -141,12 +141,6 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
-	public IType getRefType()
-	{
-		return this.type.getRefType();
-	}
-
-	@Override
 	public IType getSimpleRefType()
 	{
 		return this.type.getSimpleRefType();

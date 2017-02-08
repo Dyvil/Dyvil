@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.MemberKind;
+import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -68,6 +69,8 @@ public interface IMethod extends IClassMember, ICallableMember, ITypeParametric,
 	// Compilation
 	
 	boolean isIntrinsic();
+
+	IntrinsicData getIntrinsicData();
 	
 	int getInvokeOpcode();
 

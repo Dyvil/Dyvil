@@ -895,6 +895,12 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
+	public IntrinsicData getIntrinsicData()
+	{
+		return this.intrinsicData;
+	}
+
+	@Override
 	public int getInvokeOpcode()
 	{
 		int modifiers = this.modifiers.toFlags();
@@ -1001,11 +1007,16 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		return array;
 	}
 
+	private boolean useIntrinsicBytecode()
+	{
+		return this.intrinsicData != null && this.intrinsicData.getCompilerCode() == 0;
+	}
+
 	@Override
 	public void writeCall(MethodWriter writer, IValue receiver, IArguments arguments, ITypeContext typeContext,
 		                     IType targetType, int lineNumber) throws BytecodeException
 	{
-		if (this.intrinsicData != null)
+		if (this.useIntrinsicBytecode())
 		{
 			this.intrinsicData.writeIntrinsic(writer, receiver, arguments, lineNumber);
 		}
@@ -1024,7 +1035,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public void writeJump(MethodWriter writer, Label dest, IValue receiver, IArguments arguments,
 		                     ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
-		if (this.intrinsicData != null)
+		if (this.useIntrinsicBytecode())
 		{
 			this.intrinsicData.writeIntrinsic(writer, dest, receiver, arguments, lineNumber);
 			return;
@@ -1039,7 +1050,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public void writeInvJump(MethodWriter writer, Label dest, IValue receiver, IArguments arguments,
 		                        ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
-		if (this.intrinsicData != null)
+		if (this.useIntrinsicBytecode())
 		{
 			this.intrinsicData.writeInvIntrinsic(writer, dest, receiver, arguments, lineNumber);
 			return;

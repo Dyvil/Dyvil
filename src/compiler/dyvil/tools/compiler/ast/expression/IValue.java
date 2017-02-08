@@ -92,7 +92,7 @@ public interface IValue extends IASTNode, ITyped
 	int CLASS_OPERATOR    = 132;
 	int TYPE_OPERATOR     = 133;
 	int NULLCHECK         = 134;
-	int STRINGBUILDER     = 136;
+	int STRING_CONCAT     = 136;
 	int INC               = 137;
 	int COLON             = 138;
 	int VARARGS_EXPANSION = 139;
@@ -264,15 +264,9 @@ public interface IValue extends IASTNode, ITyped
 
 	default void resolveStatement(ILabelContext context, MarkerList markers)
 	{
-
 	}
 
 	IValue resolve(MarkerList markers, IContext context);
-
-	default IValue resolveOperator(MarkerList markers, IContext context)
-	{
-		return this;
-	}
 
 	void checkTypes(MarkerList markers, IContext context);
 

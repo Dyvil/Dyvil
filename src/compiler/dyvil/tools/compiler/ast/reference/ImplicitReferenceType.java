@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.reference;
 
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.access.MethodCall;
@@ -22,20 +24,30 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public class ImplicitReferenceType extends ReferenceType
 {
-	public ImplicitReferenceType(IType type)
+	// Constructors
+
+	public ImplicitReferenceType(@NonNull IType type)
 	{
 		super(type);
 	}
 
-	public ImplicitReferenceType(IClass iclass, IType type)
+	public ImplicitReferenceType(@Nullable IClass refClass, @Nullable IType type)
 	{
-		super(iclass, type);
+		super(refClass, type);
 	}
+
+	@Override
+	protected ReferenceType wrap(@NonNull IType type)
+	{
+		return new ImplicitReferenceType(type.getRefClass(), type);
+	}
+
+	// Conversion Methods
 
 	@Override
 	public boolean isConvertibleFrom(IType type)
 	{
-		return Types.isSuperType(this.type, type);
+		return Types.isSuperType(this, new ReferenceType(type));
 	}
 
 	@Override
@@ -59,9 +71,15 @@ public class ImplicitReferenceType extends ReferenceType
 			return null;
 		}
 
-		if (!Types.isSameType(typedValue.getType(), this.type))
+		if (!this.isConvertibleFrom(typedValue.getType()))
 		{
 			return null;
+		}
+
+		final IValue referenceValue = value.toReferenceValue(markers, context);
+		if (referenceValue != null)
+		{
+			return referenceValue;
 		}
 
 		final IReference ref = value.toReference();
@@ -70,7 +88,7 @@ public class ImplicitReferenceType extends ReferenceType
 			return new ReferenceOperator(value, ref);
 		}
 
-		markers.add(Markers.semantic(value.getPosition(), "reference.expression.invalid"));
+		markers.add(Markers.semanticError(value.getPosition(), "reference.expression.invalid"));
 		return typedValue;
 	}
 

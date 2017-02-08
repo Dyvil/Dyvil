@@ -194,6 +194,9 @@ public abstract class TYPE_NAME##Array
 
 	// Operators
 
+	@Intrinsic([], compilerCode: Intrinsic.ARRAY_SPREAD)
+	public postfix func `...` GENERIC([PRIMITIVE] array): [PRIMITIVE] = array
+
 	public infix inline func == GENERIC([PRIMITIVE] lhs, [PRIMITIVE] rhs): boolean = Arrays.equals(lhs, rhs)
 
 	public infix inline func != GENERIC([PRIMITIVE] lhs, [PRIMITIVE] rhs): boolean = !Arrays.equals(lhs, rhs)
@@ -348,7 +351,7 @@ public abstract class TYPE_NAME##Array
 
 	public infix func sorted GENERIC([PRIMITIVE] array): [PRIMITIVE]
 	{
-#if USE_BOOL_SORT
+#if IS_BOOLEAN
 		let size = array.size
 		let result = new [PRIMITIVE](size)
 
