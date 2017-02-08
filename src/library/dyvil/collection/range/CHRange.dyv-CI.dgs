@@ -1,0 +1,3 @@
+@fileName=closed/IntRange.dyv
+@inheritFrom=Base-Int.dgs
+IS_HALF_OPEN=false

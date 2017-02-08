@@ -1,7 +1,7 @@
 // GEN_NOTICE
 // Timestamp: TIME_STAMP
 
-package dyvil.collection.range
+package dyvil.collection.range.specialized
 
 import dyvil.annotation.Immutable
 import dyvil.collection.Range

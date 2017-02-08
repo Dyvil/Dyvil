@@ -1,7 +1,7 @@
 package dyvil.lang
 
 using   dyvil.reflect.Opcodes._
-import  dyvil.collection.range.DoubleRange
+import  dyvil.collection.range.specialized.DoubleRange
 
 public abstract class DoubleExtensions
 {

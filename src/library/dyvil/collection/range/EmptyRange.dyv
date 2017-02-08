@@ -1,0 +1,37 @@
+package dyvil.collection.range
+
+import java.util.Iterator
+import java.util.NoSuchElementException
+import java.util.function.Consumer
+import dyvil.collection.iterator.EmptyIterator
+
+public object EmptyRange implements Range<none>
+{
+	override func asHalfOpen() -> Range<none> = this
+
+	override func asClosed() -> Range<none> = this
+
+	override func isHalfOpen() -> boolean = false
+
+	override func first() -> none = throw new NoSuchElementException
+
+	override func last() -> none = throw new NoSuchElementException
+
+	override func size() -> int = 0
+
+	override func iterator() -> Iterator<none> = EmptyIterator<none>
+
+	override func forEach(action: Consumer<-none>) -> void = {}
+
+	override func contains(element: any!) -> boolean = false
+
+	override func toArray(start: int, store: [Object!]) -> void = {}
+
+	override func copy() -> EmptyRange = this
+
+	override func toString() -> String = "EmptyRange"
+
+	override func equals(obj: Object!) -> boolean = obj is Range && (obj as Range).size == 0
+
+	override func hashCode() -> int = 0
+}

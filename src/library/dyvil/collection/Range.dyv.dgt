@@ -2,6 +2,7 @@ package dyvil.collection;
 
 import dyvil.collection.immutable.ArrayList;
 import dyvil.collection.range._
+import dyvil.collection.range.specialized._
 import dyvil.util.ImmutableException
 
 import java.io.Serializable
