@@ -4,27 +4,27 @@ public class Solver
 {
 	public interface Context
 	{
-		func resolve(String name): Expr
+		func resolve(String name) -> Expr
 	}
 
 	public interface Expr
 	{
-		func solve(Context c): Expr
+		func solve(Context c) -> Expr
 	}
 
 	public case class Var(let name: String) implements Expr
 	{
-		public override func solve(Context c): Expr = c.resolve(this.name)
+		override func solve(Context c) -> Expr = c.resolve(this.name)
 	}
 
 	public case class Const(let value: double) implements Expr
 	{
-		public override func solve(Context c): Expr = this
+		override func solve(Context c) -> Expr = this
 	}
 
 	public case class Add(let lhs: Expr, let rhs: Expr) implements Expr
 	{
-		public override func solve(Context c): Expr
+		override func solve(Context c) -> Expr
 		{
 			let l = this.lhs.solve(c)
 			let r = this.rhs.solve(c)
@@ -41,7 +41,7 @@ public class Solver
 
 	public case class Multiply(let lhs: Expr, let rhs: Expr) implements Expr
 	{
-		public override func solve(Context c): Expr
+		override func solve(Context c) -> Expr
 		{
 			let l = this.lhs.solve(c)
 			let r = this.rhs.solve(c)
@@ -59,11 +59,11 @@ public class Solver
 
 	// ---
 
-	public static implicit func d2Const(double d): Const = Const(d)
+	static implicit func d2Const(double d) -> Const = Const(d)
 
-	public static implicit func map2Context(Map<String, Expr> map): Context = s => map.get(s)
+	static implicit func map2Context(Map<String, Expr> map) -> Context = s => map.get(s)
 
-	public infix func +(Expr lhs, Expr rhs): Expr = Add(lhs, rhs)
+	infix func +(Expr lhs, Expr rhs) -> Expr = Add(lhs, rhs)
 
-	public infix func *(Expr lhs, Expr rhs): Expr = Multiply(lhs, rhs)
+	infix func *(Expr lhs, Expr rhs) -> Expr = Multiply(lhs, rhs)
 }

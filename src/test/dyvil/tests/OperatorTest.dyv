@@ -4,15 +4,15 @@ using dyvil.Test
 
 public class OperatorTest
 {
-	public static func apply(): Test = test "Operators" {
+	static func apply() -> Test = test "Operators" {
 		unary()
 		binary()
 		ternary()
 	}
 
-	public static func unary(): Test = test "Unary" {
-		infix func apply(int i, int j): (int, int) = (i, j)
-		postfix func ++(int i): int = i
+	static func unary() -> Test = test "Unary" {
+		infix func apply(i: int, j: int) -> (int, int) = (i, j)
+		postfix func ++(i: int) -> int = i
 
 		var i = 1                       // Canonical Representation:
 		let j = [ i -i, i++ i, i++ -i ] // i.apply(-i), (i++).apply(i), (i++).apply(-i)
@@ -28,7 +28,7 @@ public class OperatorTest
 		require true
 	}
 
-	public static func binary(): Test = test "Binary" {
+	static func binary() -> Test = test "Binary" {
 		let i = 1 + 2 * 3 + 4
 		let k = 1 : 2 : 3
 
@@ -40,7 +40,7 @@ public class OperatorTest
 		}
 	}
 
-	public static func ternary(): Test = test "Ternary" {
+	static func ternary() -> Test = test "Ternary" {
 		let i = true ? 1 : 2
 		let j = true ? 1 : true ? 2 : 3
 		let k = true ? true ? 1 : 2 : 3

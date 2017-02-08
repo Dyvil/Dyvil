@@ -18,11 +18,11 @@ public class MapValue(
 {
 	private Value! tempKey
 
-	public static func apply(): MapValue = new MapValue(new ArrayMap<Value, Value>)
+	static func apply() -> MapValue = new MapValue(new ArrayMap<Value, Value>)
 
-	public static func apply(int capacity): MapValue = new MapValue(new ArrayMap<Value, Value>(capacity))
+	static func apply(int capacity) -> MapValue = new MapValue(new ArrayMap<Value, Value>(capacity))
 
-	public static func apply(Map<_, _> map): MapValue
+	static func apply(Map<_, _> map) -> MapValue
 	{
 		let mapValue = MapValue(map.size)
 		for (Entry<_, _> entry <- map)

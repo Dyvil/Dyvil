@@ -2,7 +2,7 @@ package dyvilx.event
 
 public class CovariantEventBus extends InvariantEventBus
 {
-	public override func dispatch(Object event): void
+	override func dispatch(Object event) -> void
 	{
 		let eventType = event.dynamicClass
 
@@ -12,7 +12,7 @@ public class CovariantEventBus extends InvariantEventBus
 		}
 	}
 
-	private func invokeRecursively(HandlerEntry entry, Object! handler, Object event, Class<_> eventType): void
+	private func invokeRecursively(HandlerEntry entry, Object! handler, Object event, Class<_> eventType) -> void
 	{
 		let handlerMethod = entry.getHandler(eventType)
 		if (handlerMethod != null)

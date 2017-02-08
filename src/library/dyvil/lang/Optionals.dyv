@@ -12,7 +12,7 @@ public abstract class Optionals
 	// Wrapping
 
 	@Intrinsic([ LOAD_0 ])
-	public static func Optional<T>(T value): T? = value
+	static func Optional<T>(T value) -> T? = value
 
 	// Unwrapping
 
@@ -24,12 +24,12 @@ public abstract class Optionals
 	 */
 	@Intrinsic([ LOAD_0, DUP, INVOKESTATIC, 0, 1, 2 ]
 	  strings: [ "dyvil/lang/Optionals", "unwrapNullCheck", "(Ljava/lang/Object;)V" ])
-	public postfix func ! <T>(T? optional): T = optional!
+	postfix func ! <T>(T? optional) -> T = optional!
 
 	/**
 	 * Checks if the given optional value is null and throws a NullPointerException in that case.
 	 */
-	public static func unwrapNullCheck<T>(T? optional): void
+	static func unwrapNullCheck<T>(T? optional) -> void
 	{
 		if (optional == null) throw new NullPointerException("Unwrapped Optional was null")
 	}
@@ -40,14 +40,14 @@ public abstract class Optionals
 	 * See `unsafeUnwrap` for details
 	 */
 	@Intrinsic([ LOAD_0 ])
-	public postfix func !! <T>(optional: T?) -> T = unsafeUnwrap<T>(optional)
+	postfix func !! <T>(optional: T?) -> T = unsafeUnwrap<T>(optional)
 
 	/**
 	 * Unwraps an optional value in an unsafe manner, i.e. without a null check. Use this only if you are sure that
 	 * parameter is never actually null.
 	 */
 	@Intrinsic([ LOAD_0 ])
-	public postfix func unsafeUnwrap<T>(optional: T?) -> T = optional!!
+	postfix func unsafeUnwrap<T>(optional: T?) -> T = optional!!
 
 	/**
 	 * Returns the `null` value, but with the possibly non-null type `T`. This is an unsafe operation that should
@@ -55,7 +55,7 @@ public abstract class Optionals
 	 * for static fields, in a static initializer block.
 	 */
 	@Intrinsic([ ACONST_NULL ])
-	public static func unsafeInit<T>() -> T = unsafeInit<T>
+	static func unsafeInit<T>() -> T = unsafeInit<T>
 
 	// Nullable Coalescing
 
@@ -72,9 +72,9 @@ public abstract class Optionals
 	             /* 5 */ GOTO,   7
 	             /* 6 */ LOAD_1
 	             /* 7 */ ])
-	public infix func ?? <T, U> (T? lhs, U rhs): T|U = lhs ?? rhs
+	infix func ?? <T, U> (T? lhs, U rhs) -> T|U = lhs ?? rhs
 
 	// Hash Code
 
-	public postfix func hashCode<T>(T? optional): int = optional == null ? 0 : optional!!.hashCode
+	postfix func hashCode<T>(T? optional) -> int = optional == null ? 0 : optional!!.hashCode
 }

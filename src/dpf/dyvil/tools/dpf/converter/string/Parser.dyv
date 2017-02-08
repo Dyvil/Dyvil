@@ -21,15 +21,15 @@ public class Parser(
 	private let tokens:  TokenIterator
 	)
 {
-	public static func apply(String code): Parser = Parser(new MarkerList(BaseMarkers.INSTANCE), code)
+	static func apply(String code) -> Parser = Parser(new MarkerList(BaseMarkers.INSTANCE), code)
 
-	public static func apply(MarkerList markers, String code): Parser
+	static func apply(MarkerList markers, String code) -> Parser
 	{
 		let tokens = new DyvilLexer(markers, BaseSymbols.INSTANCE).tokenize(code)
 		return Parser(markers, tokens)
 	}
 
-	public static func apply(MarkerList markers, TokenIterator tokens): Parser = new Parser(markers, tokens)
+	static func apply(MarkerList markers, TokenIterator tokens) -> Parser = new Parser(markers, tokens)
 
 	public static RootNode parse(File file)
 	{

@@ -4,7 +4,7 @@ using dyvil.Test
 
 public class PrimitiveTest
 {
-	public static func apply(): Test = test "Primitives" {
+	static func apply() -> Test = test "Primitives" {
 		var z = false
 		var b = 0 as byte
 		var s = 0 as short

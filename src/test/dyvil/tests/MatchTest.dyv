@@ -5,7 +5,7 @@ using dyvil.Test
 
 public class MatchTest
 {
-	public static func apply(): Test = test "Match Expressions" {
+	static func apply() -> Test = test "Match Expressions" {
 		table()
 		tableHoles()
 		lookup()
@@ -21,7 +21,7 @@ public class MatchTest
 		andPatterns()
 	}
 	
-	private static func table(): Test = test "Table Switch" {
+	private static func table() -> Test = test "Table Switch" {
 		var value: String! = null
 
 		1 match {
@@ -34,7 +34,7 @@ public class MatchTest
 		value =?= "one"
 	}
 	
-	private static func tableHoles(): Test = test "Table Switch with Holes" {
+	private static func tableHoles() -> Test = test "Table Switch with Holes" {
 		var value: String! = null
 
 		2 match {
@@ -48,7 +48,7 @@ public class MatchTest
 		value =?= "two"
 	}
 	
-	private static func lookup(): Test = test "Lookup Switch" {
+	private static func lookup() -> Test = test "Lookup Switch" {
 		var value: String! = null
 
 		10 match {
@@ -61,7 +61,7 @@ public class MatchTest
 		value =?= "10"
 	}
 
-	private static func stringTable(): Test = test "Table Switch String" {
+	private static func stringTable() -> Test = test "Table Switch String" {
 		var value: String! = null
 
 		"a" match {
@@ -74,7 +74,7 @@ public class MatchTest
 		value =?= "A"
 	}
 	
-	private static func stringLookup(): Test = test "Lookup Switch String" {
+	private static func stringLookup() -> Test = test "Lookup Switch String" {
 		var value: String! = null
 
 		"abc" match {
@@ -86,7 +86,7 @@ public class MatchTest
 		value =?= "ABC"
 	}
 	
-	private static func stringCollision(): Test = test "String Hash Collisions" {
+	private static func stringCollision() -> Test = test "String Hash Collisions" {
 		var value = 0
 
 		"AaBB" match {
@@ -103,7 +103,7 @@ public class MatchTest
 		value =?= 5
 	}
 	
-	private static func expression(): Test = test "Expressions" {
+	private static func expression() -> Test = test "Expressions" {
 		let result = 10 match {
 			case 0     => "a"
 			case 1     => "b"
@@ -113,7 +113,7 @@ public class MatchTest
 		result =?= "10"
 	}
 
-	private static func tuples(): Test = test "Tuples" {
+	private static func tuples() -> Test = test "Tuples" {
 		var value: String! = null
 		var tuple = (1, 2)
 
@@ -126,7 +126,7 @@ public class MatchTest
 		value =?= tuple.toString
 	}
 
-	private static func caseClasses(): Test = test "Case Classes" {
+	private static func caseClasses() -> Test = test "Case Classes" {
 		test "Primitive" {
 			let option = Option 1
 			var value = 0
@@ -152,7 +152,7 @@ public class MatchTest
 		}
 	}
 
-	private static func objects(): Test = test "Objects" {
+	private static func objects() -> Test = test "Objects" {
 		let option = Option<int>
 		var value = 0
 
@@ -169,7 +169,7 @@ public class MatchTest
 
 	private const ERROR_BOXED: Int = ERROR
 
-	private static func fields(): Test = test "Fields" {
+	private static func fields() -> Test = test "Fields" {
 		var value = 0
 
 		SUCCESS match {
@@ -208,7 +208,7 @@ public class MatchTest
 		}
 	}
 
-	private static func orPatterns(): Test = test "OR Patterns" {
+	private static func orPatterns() -> Test = test "OR Patterns" {
 		let list = List<int>()
 
 		for (i <- 0 .. 10)
@@ -224,7 +224,7 @@ public class MatchTest
 		list =?= List(3, 0, 0, 0, 1, 1, 1, 2, 2, 2, 3)
 	}
 
-	private static func andPatterns(): Test = test "AND Patterns" {
+	private static func andPatterns() -> Test = test "AND Patterns" {
 		let tuple = (1, 2)
 		var success = false
 

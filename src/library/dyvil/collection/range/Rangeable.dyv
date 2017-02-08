@@ -2,19 +2,19 @@ package dyvil.collection.range
 
 public interface Rangeable<type T: Rangeable<T>> extends Comparable<T>
 {
-	func next(): T
+	func next() -> T
 
-	func prev(): T
+	func prev() -> T
 
-	func distanceTo(T other): int
+	func distanceTo(T other) -> int
 
-	override func compareTo(T other): int
+	override func compareTo(T other) -> int
 
-	override func equals(Object! other): boolean
+	override func equals(Object! other) -> boolean
 
-	override func hashCode(): int
+	override func hashCode() -> int
 
-	infix inline func .. <T: Rangeable>(T from, T to): Range<T> = Range(from, to: to)
+	infix inline func .. <T: Rangeable>(T from, T to) -> Range<T> = Range(from, to: to)
 
-	infix inline func ..< <T: Rangeable>(T from, T to): Range<T> = Range(from, toExclusive: to)
+	infix inline func ..< <T: Rangeable>(T from, T to) -> Range<T> = Range(from, toExclusive: to)
 }

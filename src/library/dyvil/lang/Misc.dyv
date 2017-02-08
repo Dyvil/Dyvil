@@ -14,7 +14,7 @@ public final class Misc
 	// Blackhole
 
 	@Intrinsic([ LOAD_0, AUTO_POP ])
-	public static func consume(any value): void {}
+	static func consume(any value) -> void {}
 
 	// Timing
 
@@ -30,5 +30,5 @@ public final class Misc
 
 	public static inline void error(String message) = throw new Error(message)
 
-	public static inline func ???(): void = throw new UnsupportedOperationException("Not Implemented!")
+	static inline func ???() -> void = throw new UnsupportedOperationException("Not Implemented!")
 }

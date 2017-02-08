@@ -18,21 +18,21 @@ public interface Entry<type +K, type +V> extends java.io.Serializable
 	 *
 	 * @return the key
 	 */
-	func getKey(): K
+	func getKey() -> K
 
 	/**
 	 * Returns the value stored by this entry
 	 *
 	 * @return the value
 	 */
-	func getValue(): V
+	func getValue() -> V
 
 	/**
 	 * Converts this entry to a {@link Tuple.Of2 Tuple}.
 	 *
 	 * @return a tuple with this entry's key and value
 	 */
-	func toTuple(): (K, V) = (this.getKey, this.getValue)
+	func toTuple() -> (K, V) = (this.getKey, this.getValue)
 
 	/**
 	 * Returns a comparator that compares entries by key. The ordering is defined by the <i>natural order</i> of the
@@ -40,7 +40,7 @@ public interface Entry<type +K, type +V> extends java.io.Serializable
 	 *
 	 * @return a comparator that compares entries by key.
 	 */
-	static func comparingByKey<K extends Comparable<-K>, V>(): Comparator<Entry<K, V>>
+	static func comparingByKey<K extends Comparable<-K>, V>() -> Comparator<Entry<K, V>>
 		= (e1, e2) => e1.getKey.compareTo(e2.getKey)
 
 	/**
@@ -49,7 +49,7 @@ public interface Entry<type +K, type +V> extends java.io.Serializable
 	 *
 	 * @return a comparator that compares entries by value.
 	 */
-	static func comparingByValue<K, V extends Comparable<-V>>(): Comparator<Entry<K, V>>
+	static func comparingByValue<K, V extends Comparable<-V>>() -> Comparator<Entry<K, V>>
 		= (e1, e2) => e1.getValue.compareTo(e2.getValue)
 
 	/**
@@ -60,7 +60,7 @@ public interface Entry<type +K, type +V> extends java.io.Serializable
 	 *
 	 * @return a comparator that compares entries by key.
 	 */
-	static func comparingByKey<K, V>(Comparator<-K> cmp): Comparator<Entry<K, V>>
+	static func comparingByKey<K, V>(Comparator<-K> cmp) -> Comparator<Entry<K, V>>
 		= (c1, c2) => cmp.compare(c1.getKey, c2.getKey)
 
 	/**
@@ -71,18 +71,18 @@ public interface Entry<type +K, type +V> extends java.io.Serializable
 	 *
 	 * @return a comparator that compares entries by value.
 	 */
-	static func comparingByValue<K, V>(Comparator<-V> cmp): Comparator<Entry<K, V>>
+	static func comparingByValue<K, V>(Comparator<-V> cmp) -> Comparator<Entry<K, V>>
 		= (c1, c2) => cmp.compare(c1.getValue, c2.getValue)
 
-	static func entryToString(Entry<_, _> entry): String = entry.getKey + " -> " + entry.getValue
+	static func entryToString(Entry<_, _> entry) -> String = entry.getKey + " -> " + entry.getValue
 
-	static func entryEquals(Entry<_, _> entry, Object! obj): boolean
+	static func entryEquals(Entry<_, _> entry, Object! obj) -> boolean
 		= obj is Entry && entryEquals(entry, other: obj as Entry)
 
-	static func entryEquals(Entry<_, _> entry, Entry<_, _> other): boolean
+	static func entryEquals(Entry<_, _> entry, Entry<_, _> other) -> boolean
 		= entry.getKey == other.getKey && entry.getValue == other.getValue
 
-	static func entryHashCode(Entry<_, _> entry): int
+	static func entryHashCode(Entry<_, _> entry) -> int
 	{
 		let key = entry.getKey
 		let value = entry.getValue

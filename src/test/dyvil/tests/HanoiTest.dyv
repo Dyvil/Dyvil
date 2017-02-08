@@ -6,7 +6,7 @@ public class HanoiTest
 {
 	private List<String> moves = List<String>
 
-	public static func apply(): Test = test "Hanoi"
+	static func apply() -> Test = test "Hanoi"
 	{
 		for (i <- 1 .. 10)
 		{
@@ -15,12 +15,12 @@ public class HanoiTest
 		}
 	}
 
-	public static func requiredMoves(int n): int = (1 << n) - 1
+	static func requiredMoves(int n) -> int = (1 << n) - 1
 
 	@LiteralConvertible.FromString
 	class Tower(public let id: String) extends dyvil.collection.mutable.LinkedList<int>
 	{
-		public static func apply(String id): Tower = new Tower(id)
+		static func apply(String id) -> Tower = new Tower(id)
 	}
 
 	public init() { }
@@ -30,7 +30,7 @@ public class HanoiTest
 		this.run(n)
 	}
 
-	public func run(int n): void
+	public func run(int n) -> void
 	{
 		this.moves.clear()
 
@@ -40,7 +40,7 @@ public class HanoiTest
 		this.move(n, source, 'helper', 'target')
 	}
 
-	public func move(Tower from, Tower to): void
+	public func move(Tower from, Tower to) -> void
 	{
 		let item = from.pop()
 		if (item != null)
@@ -50,7 +50,7 @@ public class HanoiTest
 		}
 	}
 
-	public func move(int n, Tower from, Tower helper, Tower to): void
+	public func move(int n, Tower from, Tower helper, Tower to) -> void
 	{
 		if n > 0
 		{

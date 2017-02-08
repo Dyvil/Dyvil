@@ -5,24 +5,24 @@ import java.util.NoSuchElementException
 @LiteralConvertible.FromNil
 public object None implements Option<none>
 {
-	public static func apply(): None = None
+	static func apply() -> None = None
 
 	// Accessors
 
-	public override func get(): none = throw new NoSuchElementException
+	override func get() -> none = throw new NoSuchElementException
 
-	public override func isPresent(): boolean = false
+	override func isPresent() -> boolean = false
 
-	public override func forEach(none -> void consumer): void {}
+	override func forEach(none -> void consumer) -> void {}
 
-	public override func filter(none -> boolean predicate): Option<none> = None
+	override func filter(none -> boolean predicate) -> Option<none> = None
 
-	public override func map<U>(none -> U function): Option<U> = None
+	override func map<U>(none -> U function) -> Option<U> = None
 
-	public override func flatMap<U>(none -> Option<U> function): Option<U> = None
+	override func flatMap<U>(none -> Option<U> function) -> Option<U> = None
 
 	@OverloadPriority
-	public func orElse<U>(U value): U = value
+	public func orElse<U>(U value) -> U = value
 
-	public override func orElse<U>(-> U supplier): U = supplier()
+	override func orElse<U>(-> U supplier) -> U = supplier()
 }

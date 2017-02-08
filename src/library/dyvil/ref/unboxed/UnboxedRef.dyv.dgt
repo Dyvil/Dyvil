@@ -10,7 +10,7 @@ public class Unboxed##TYPE_NAME##Ref(
 	protected let ref: ObjectRef<WRAPPER>
 ) implements TYPE_NAME##Ref
 {
-	public override func get(): PRIMITIVE = this.ref.get
+	override func get() -> PRIMITIVE = this.ref.get
 
-	public override func set(PRIMITIVE value): void = this.ref.set(value)
+	override func set(PRIMITIVE value) -> void = this.ref.set(value)
 }

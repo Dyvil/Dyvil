@@ -10,48 +10,48 @@ public abstract class FloatExtensions
 	// Float Operators
 
 	@Intrinsic([ LOAD_0 ])
-	public prefix func +(float value): float = value
+	prefix func +(float value) -> float = value
 
 	@Intrinsic([ LOAD_0, FNEG ])
-	public prefix func -(float value): float = -value
+	prefix func -(float value) -> float = -value
 
 	@Intrinsic([ LOAD_0, LOAD_1, FCMPEQ ])
-	public infix func ==(float lhs, float rhs): boolean = lhs == rhs
+	infix func ==(float lhs, float rhs) -> boolean = lhs == rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, FCMPNE ])
-	public infix func !=(float lhs, float rhs): boolean = lhs != rhs
+	infix func !=(float lhs, float rhs) -> boolean = lhs != rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, FCMPLT ])
-	public infix func <(float lhs, float rhs): boolean = lhs < rhs
+	infix func <(float lhs, float rhs) -> boolean = lhs < rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, FCMPLE ])
-	public infix func <=(float lhs, float rhs): boolean = lhs <= rhs
+	infix func <=(float lhs, float rhs) -> boolean = lhs <= rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, FCMPGT ])
-	public infix func >(float lhs, float rhs): boolean = lhs > rhs
+	infix func >(float lhs, float rhs) -> boolean = lhs > rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, FCMPGE ])
-	public infix func >=(float lhs, float rhs): boolean = lhs >= rhs
+	infix func >=(float lhs, float rhs) -> boolean = lhs >= rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, FADD ])
-	public infix func +(float lhs, float rhs): float = lhs + rhs
+	infix func +(float lhs, float rhs) -> float = lhs + rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, FSUB ])
-	public infix func -(float lhs, float rhs): float = lhs - rhs
+	infix func -(float lhs, float rhs) -> float = lhs - rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, FMUL ])
-	public infix func *(float lhs, float rhs): float = lhs * rhs
+	infix func *(float lhs, float rhs) -> float = lhs * rhs
 
 	@Intrinsic([ LOAD_0, F2D, LOAD_1, F2D, INVOKESTATIC, 0, 1, 2, D2F], strings: [ "java/lang/Math", "pow", "(DD)D" ])
-	public infix func **(float lhs, float rhs): double = Math.pow(lhs, rhs)
+	infix func **(float lhs, float rhs) -> double = Math.pow(lhs, rhs)
 
 	@Intrinsic([ LOAD_0, LOAD_1, FDIV ])
-	public infix func /(float lhs, float rhs): float = lhs / rhs
+	infix func /(float lhs, float rhs) -> float = lhs / rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, FREM ])
-	public infix func %(float lhs, float rhs): float = lhs % rhs
+	infix func %(float lhs, float rhs) -> float = lhs % rhs
 
-	public infix func ..(float start, float end): FloatRange = FloatRange(start, to: end)
+	infix func ..(float start, float end) -> FloatRange = FloatRange(start, to: end)
 
-	public infix func ..<(float start, float end): FloatRange = FloatRange(start, toExclusive: end)
+	infix func ..<(float start, float end) -> FloatRange = FloatRange(start, toExclusive: end)
 }

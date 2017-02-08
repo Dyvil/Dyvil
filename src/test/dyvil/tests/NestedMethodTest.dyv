@@ -4,10 +4,10 @@ using dyvil.Test
 
 public class NestedMethodTest
 {
-	public static func apply(): Test = test "Nested Methods" {
+	static func apply() -> Test = test "Nested Methods" {
 		var i = 0
 
-		func testI(String text, int expected): Test = test text { i =?= expected }
+		func testI(String text, int expected) -> Test = test text { i =?= expected }
 
 		testI("Before Assignment", 0)
 		i = 2

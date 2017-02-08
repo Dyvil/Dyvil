@@ -1,11 +1,7 @@
 package dyvil.tools.dpf.ast.value
 
-import dyvil.lang.LiteralConvertible
-
 import dyvil.tools.dpf.DPFConvertible
 
-import dyvil.collection.Collection
-import dyvil.collection.Map
 import dyvil.collection.immutable.ArrayMap
 
 import dyvil.tools.dpf.ast.value._
@@ -30,56 +26,56 @@ public interface Value extends IASTNode
 {
 	// Conversion Methods
 
-	static final func apply(Object value): Value = wrap(value)
+	static final func apply(value: Object) -> Value = wrap(value)
 
-	static final func apply(int literal): IntValue = IntValue(literal)
+	static final func apply(literal: int) -> IntValue = IntValue(literal)
 
-	static final func apply(long literal): LongValue = LongValue(literal)
+	static final func apply(literal: long) -> LongValue = LongValue(literal)
 
-	static final func apply(float literal): FloatValue = FloatValue(literal)
+	static final func apply(literal: float) -> FloatValue = FloatValue(literal)
 
-	static final func apply(double literal): DoubleValue = DoubleValue(literal)
+	static final func apply(literal: double) -> DoubleValue = DoubleValue(literal)
 
-	static final func apply(char literal): StringValue = StringValue(literal.toString)
+	static final func apply(literal: char) -> StringValue = StringValue(literal.toString)
 
-	static final func apply(String literal): StringValue = StringValue(literal)
+	static final func apply(literal: String) -> StringValue = StringValue(literal)
 
-	static final func apply(Name literal): NameAccess = NameAccess(literal)
+	static final func apply(literal: Name) -> NameAccess = NameAccess(literal)
 
-	static final func apply(boolean literal): NameAccess = NameAccess(Name.fromRaw(literal.toString))
+	static final func apply(literal: boolean) -> NameAccess = NameAccess(Name.fromRaw(literal.toString))
 
-	static final func apply(Value... elements): ListValue = ListValue(elements)
+	static final func apply(elements: Value...) -> ListValue = ListValue(elements)
 
-	static final func apply(Value... keys, Value... values): MapValue = new MapValue(new ArrayMap(keys, values))
+	static final func apply(keys: Value..., values: Value...) -> MapValue = new MapValue(new ArrayMap(keys, values))
 
-	static final func apply(String base, Value... values): StringInterpolation
+	static final func apply(base: String, values: Value...) -> StringInterpolation
 		= new StringInterpolation(base.split(@"\\\d+") as [String], values)
 
-	static final func apply(String base, Object... values): StringInterpolation
+	static final func apply(base: String, values: Object...) -> StringInterpolation
 		= new StringInterpolation(base.split(@"\\\d+") as [String], values)
 
 	// Override Methods
 
-	override func getPosition(): ICodePosition! = null
+	override func getPosition() -> ICodePosition! = null
 
-	override func setPosition(ICodePosition! position): void { }
+	override func setPosition(position: ICodePosition!) -> void { }
 
-	override func toString(String indent, StringBuilder buffer): void
+	override func toString(indent: String, buffer: StringBuilder) -> void
 
-	func accept(ValueVisitor visitor): void
+	func accept(visitor: ValueVisitor) -> void
 
 	// Value Conversions
 
-	static final func wrap(any! value): Value
+	static final func wrap(value: any!) -> Value
 	{
 		if (value is Value) return value as Value
 
 		let valueClass = value.dynamicClass
 
-		if (valueClass === class String) return new StringValue(value as String) 
-		if (valueClass === class Int) return new IntValue(value as Int) 
-		if (valueClass === class Long) return new LongValue(value as Long) 
-		if (valueClass === class Float) return new FloatValue(value as Float) 
+		if (valueClass === class String) return new StringValue(value as String)
+		if (valueClass === class Int) return new IntValue(value as Int)
+		if (valueClass === class Long) return new LongValue(value as Long)
+		if (valueClass === class Float) return new FloatValue(value as Float)
 		if (valueClass === class Double) return new DoubleValue(value as Double)
 		if (valueClass === class Name) return NameAccess(value as Name)
 		if (valueClass === class Boolean) return Value(value as boolean)

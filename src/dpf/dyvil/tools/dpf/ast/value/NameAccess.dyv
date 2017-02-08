@@ -15,9 +15,9 @@ public class NameAccess(
 	)
 	extends DPFValueVisitor implements Value, Expandable
 {
-	public static func apply(Name name): NameAccess = new NameAccess(null, name)
+	static func apply(Name name) -> NameAccess = new NameAccess(null, name)
 
-	public static func apply(Value value, Name name): NameAccess = new NameAccess(value, name)
+	static func apply(Value value, Name name) -> NameAccess = new NameAccess(value, name)
 
 	protected override void visitValue(Value value)
 	{

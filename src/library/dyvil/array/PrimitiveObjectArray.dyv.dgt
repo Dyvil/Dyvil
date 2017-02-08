@@ -15,7 +15,7 @@ public abstract class PrimitiveObjectArray
 
 	// TYPE_NAME wrapper array methods
 
-	public infix func flatten([[PRIMITIVE]] array): [PRIMITIVE]
+	infix func flatten([[PRIMITIVE]] array) -> [PRIMITIVE]
 	{
 		// Compute the size of the resulting array
 		var size = 0
@@ -38,7 +38,7 @@ public abstract class PrimitiveObjectArray
 		return res
 	}
 
-	public infix func unboxed([WRAPPER] array): [PRIMITIVE]
+	infix func unboxed([WRAPPER] array) -> [PRIMITIVE]
 	{
 		let size = array.size
 		let unboxed = new [PRIMITIVE](size)

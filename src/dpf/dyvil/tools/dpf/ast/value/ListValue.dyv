@@ -14,13 +14,13 @@ import java.util.function.Function
 
 public class ListValue(protected let elements: List<Value>) extends DPFValueVisitor implements Value, ListVisitor, Expandable
 {
-	public static func apply(): ListValue = new ListValue(new ArrayList<Value>)
+	static func apply() -> ListValue = new ListValue(new ArrayList<Value>)
 
-	public static func apply(int capacity): ListValue = new ListValue(new ArrayList<Value>(capacity))
+	static func apply(int capacity) -> ListValue = new ListValue(new ArrayList<Value>(capacity))
 
-	public static func apply([Value] values): ListValue = new ListValue(new ArrayList(values))
+	static func apply([Value] values) -> ListValue = new ListValue(new ArrayList(values))
 
-	public static func apply([any] values): ListValue
+	static func apply([any] values) -> ListValue
 	{
 		let list = new ArrayList<Value>(values.size)
 		for (element <- values)
@@ -30,7 +30,7 @@ public class ListValue(protected let elements: List<Value>) extends DPFValueVisi
 		return new ListValue(list)
 	}
 
-	public static func apply(Iterable<_> iterable): ListValue
+	static func apply(Iterable<_> iterable) -> ListValue
 	{
 		let list = new ArrayList<Value>
 		for (element <- iterable)
@@ -40,7 +40,7 @@ public class ListValue(protected let elements: List<Value>) extends DPFValueVisi
 		return new ListValue(list)
 	}
 
-	public static func apply(SizedIterable<_> iterable): ListValue
+	static func apply(SizedIterable<_> iterable) -> ListValue
 	{
 		let list = new ArrayList<Value>(iterable.size())
 		for (element <- iterable)

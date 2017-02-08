@@ -23,7 +23,7 @@ public final class StringExtensions
 
 	// Makeshift char casts
 
-	public static inline func char(char c): char = c
+	static inline func char(char c) -> char = c
 
 	/**
 	 * This method only exists to provide the user with a useful warning message when trying to pass an invalid char
@@ -31,39 +31,39 @@ public final class StringExtensions
 	 * with zero or more than one character to the `char` method.
 	 */
 	@UsageInfo(value: "Multi-character Literal or String passed to 'char' method", level: dyvil.util.MarkerLevel.WARNING)
-	public static inline func char(String c): char = c.charAt 0
+	static inline func char(String c) -> char = c.charAt 0
 
 	// Unsafe access
 
-	public static func String([final char] fromShared): String
+	static func String([final char] fromShared) -> String
 	{
 		return JAVA_LANG_ACCESS.newStringUnsafe(fromShared)
 	}
 
-	public static postfix func getCharArray(String s): [final char]
+	static postfix func getCharArray(String s) -> [final char]
 	{
 		return UNSAFE.getObject(s, STRING_VALUE_OFFSET) as [final char]
 	}
 
 	// Subscripts
 
-	public infix inline func subscript(String s, int index): char = s.charAt index
+	infix inline func subscript(String s, int index) -> char = s.charAt index
 
-	public infix inline func subscript(String s, Range<int> range): String = s.substring(range.first, range.last)
+	infix inline func subscript(String s, Range<int> range) -> String = s.substring(range.first, range.last)
 
 	// Repetition (*) Operator
 
-	public infix inline func *(int n, String s): String = StringUtils.repeated(s, n)
+	infix inline func *(int n, String s) -> String = StringUtils.repeated(s, n)
 
-	public infix inline func *(String s, int n): String = StringUtils.repeated(s, n)
+	infix inline func *(String s, int n) -> String = StringUtils.repeated(s, n)
 
 	// Misc. additional extensions
 
-	public infix inline func contains(String s, char character): boolean = StringUtils.contains(s, character)
+	infix inline func contains(String s, char character) -> boolean = StringUtils.contains(s, character)
 
-	public infix inline func split(String s, char delimiter): [String] = StringUtils.split(s, delimiter) as [String]
+	infix inline func split(String s, char delimiter) -> [String] = StringUtils.split(s, delimiter) as [String]
 
-	public infix inline func format(String s, Object! ... args): String = String.format(s, args...)
+	infix inline func format(String s, Object! ... args) -> String = String.format(s, args...)
 
-	public extension func toString(Object o, StringBuilder builder): void = builder.append o
+	extension func toString(Object o, StringBuilder builder) -> void = builder.append o
 }

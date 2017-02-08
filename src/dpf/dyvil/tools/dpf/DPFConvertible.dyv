@@ -4,5 +4,5 @@ import dyvil.tools.dpf.ast.value.Value
 
 public interface DPFConvertible
 {
-	func toPropertyValue(): Value
+	func toPropertyValue() -> Value
 }

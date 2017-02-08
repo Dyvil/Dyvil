@@ -6,26 +6,26 @@ public class BridgeTest
 {
 	public interface Container<T>
 	{
-		func get(): T
+		func get() -> T
 
-		func set(T value): void
+		func set(T value) -> void
 	}
 
 	public case class IntContainer(int value) implements Container<int>
 	{
-		public override func get(): int = this.value
+		override func get() -> int = this.value
 
-		public override func set(int value): void = this.value = value
+		override func set(int value) -> void = this.value = value
 	}
 
 	public case class LongContainer(long value) implements Container<long>
 	{
-		public override func get(): long = this.value
+		override func get() -> long = this.value
 
-		public override func set(long value): void = this.value = value
+		override func set(long value) -> void = this.value = value
 	}
 
-	public static func apply(): Test = test "Bridge Methods" {
+	static func apply() -> Test = test "Bridge Methods" {
 		let ic = IntContainer(1)
 
 		test "IntContainer" { ic.get =?= 1 }

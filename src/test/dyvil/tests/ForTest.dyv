@@ -6,7 +6,7 @@ using dyvil.Collections
 
 public class ForTest
 {
-	public static func apply(): Test = test "For Statements" {
+	static func apply() -> Test = test "For Statements" {
 		iterative()
 		array()
 		iterable()
@@ -15,7 +15,7 @@ public class ForTest
 		nested()
 	}
 	
-	public static func iterative(): Test = test "Iterative" {
+	static func iterative() -> Test = test "Iterative" {
 		let list = List<int>
 
 		for (int i = 0; i < 3; i++)
@@ -26,7 +26,7 @@ public class ForTest
 		list =?= List(0, 1, 2)
 	}
 	
-	public static func array(): Test = test "Array" {
+	static func array() -> Test = test "Array" {
 		let array = [ 1, 2, 3 ]
 		let list = List<int>
 
@@ -38,7 +38,7 @@ public class ForTest
 		list =?= List(1, 2, 3)
 	}
 	
-	public static func iterable(): Test = test "Iterable" {
+	static func iterable() -> Test = test "Iterable" {
 		let iterable: Iterable<int> = List(1, 2, 3)
 		let list = List<int>
 
@@ -50,7 +50,7 @@ public class ForTest
 		list =?= iterable
 	}
 
-	public static func iterator(): Test = test "Iterator" {
+	static func iterator() -> Test = test "Iterator" {
 		let iterable = List(1, 2, 3)
 		let list = List<int>
 
@@ -62,7 +62,7 @@ public class ForTest
 		list =?= iterable
 	}
 	
-	public static func string(): Test = test "String" {
+	static func string() -> Test = test "String" {
 		let testString = "abc"
 		var string = ""
 
@@ -74,7 +74,7 @@ public class ForTest
 		string =?= testString
 	}
 
-	public static func nested(): Test = test "Nested" {
+	static func nested() -> Test = test "Nested" {
 		let results = List<(int, int)>
 
 		for (i <- 0 .. 1)

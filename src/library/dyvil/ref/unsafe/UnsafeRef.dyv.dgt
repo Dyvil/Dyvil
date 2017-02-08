@@ -31,10 +31,10 @@ public class Unsafe##TYPE_NAME##Ref(
 	}
 
 #if IS_OBJECT
-	public override func get(): T = ReflectUtils.UNSAFE.get##TYPE_NAME(this.base, this.offset) as T
+	override func get() -> T = ReflectUtils.UNSAFE.get##TYPE_NAME(this.base, this.offset) as T
 #else
-	public override func get(): PRIMITIVE = ReflectUtils.UNSAFE.get##TYPE_NAME(this.base, this.offset)
+	override func get() -> PRIMITIVE = ReflectUtils.UNSAFE.get##TYPE_NAME(this.base, this.offset)
 #end
 
-	public override func set(PRIMITIVE value): void = ReflectUtils.UNSAFE.put##TYPE_NAME(this.base, this.offset, value)
+	override func set(PRIMITIVE value) -> void = ReflectUtils.UNSAFE.put##TYPE_NAME(this.base, this.offset, value)
 }

@@ -10,9 +10,9 @@ public class RootNode extends Node
 		super.init(Name.fromRaw("root"))
 	}
 	
-	public override func accept(NodeVisitor visitor): void = this.acceptBody(visitor)
+	override func accept(NodeVisitor visitor) -> void = this.acceptBody(visitor)
 
-	public override func expand(Map<String, Object> mappings, boolean mutate): RootNode
+	override func expand(Map<String, Object> mappings, boolean mutate) -> RootNode
 	{
 		if (mutate)
 		{
@@ -27,5 +27,5 @@ public class RootNode extends Node
 		}
 	}
 
-	public override func toString(String indent, StringBuilder buffer): void = this.bodyToString(indent, buffer)
+	override func toString(String indent, StringBuilder buffer) -> void = this.bodyToString(indent, buffer)
 }

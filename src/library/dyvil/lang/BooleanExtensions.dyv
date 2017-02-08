@@ -9,36 +9,36 @@ public abstract class BooleanExtensions
 	// Boolean Operators
 
 	@Intrinsic([], compilerCode: Intrinsic.BOOLEAN_NOT)
-	public prefix func !(boolean v): boolean = !v
+	prefix func !(boolean v) -> boolean = !v
 
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
-	public infix func ==(boolean lhs, boolean rhs): boolean = lhs == rhs
+	infix func ==(boolean lhs, boolean rhs) -> boolean = lhs == rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPNE ])
-	public infix func !=(boolean lhs, boolean rhs): boolean = lhs != rhs
+	infix func !=(boolean lhs, boolean rhs) -> boolean = lhs != rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, IAND ])
-	public infix func &(boolean lhs, boolean rhs): boolean = lhs & rhs
+	infix func &(boolean lhs, boolean rhs) -> boolean = lhs & rhs
 
 	@Intrinsic([], compilerCode: Intrinsic.BOOLEAN_AND)
-	public infix func &&(lhs: boolean, rhs: boolean) -> boolean = lhs && rhs
+	infix func &&(lhs: boolean, rhs: boolean) -> boolean = lhs && rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, IOR ])
-	public infix func |(boolean lhs, boolean rhs): boolean = lhs | rhs
+	infix func |(boolean lhs, boolean rhs) -> boolean = lhs | rhs
 
 	@Intrinsic([], compilerCode: Intrinsic.BOOLEAN_OR)
-	public infix func ||(lhs: boolean, rhs: boolean) -> boolean = lhs || rhs
+	infix func ||(lhs: boolean, rhs: boolean) -> boolean = lhs || rhs
 
 	@Deprecated(replacements: [ "boolean.!=(boolean) -> boolean" ])
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
-	public infix func ^(boolean lhs, boolean rhs): boolean = lhs != rhs
+	infix func ^(boolean lhs, boolean rhs) -> boolean = lhs != rhs
 
 	@Intrinsic([ LOAD_0, BNOT, LOAD_1, IOR ])
-	public infix func ==>(boolean lhs, boolean rhs): boolean = !lhs || rhs
+	infix func ==>(boolean lhs, boolean rhs) -> boolean = !lhs || rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, BNOT, IOR ])
-	public infix func <==(boolean lhs, boolean rhs): boolean = lhs || !rhs
+	infix func <==(boolean lhs, boolean rhs) -> boolean = lhs || !rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
-	public infix func <=>(boolean lhs, boolean rhs): boolean = lhs == rhs
+	infix func <=>(boolean lhs, boolean rhs) -> boolean = lhs == rhs
 }

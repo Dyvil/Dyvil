@@ -12,29 +12,29 @@ import dyvil.lang.LiteralConvertible
 public interface TYPE_NAME##Range extends Range<PRIMITIVE>
 {
 	@BytecodeName("closed")
-	static func apply(PRIMITIVE from, PRIMITIVE to): TYPE_NAME##Range
+	static func apply(PRIMITIVE from, PRIMITIVE to) -> TYPE_NAME##Range
 		= new dyvil.collection.range.closed.TYPE_NAME##Range(from, to)
 
 	@BytecodeName("halfOpen")
-	static func apply(PRIMITIVE from, PRIMITIVE toExclusive): TYPE_NAME##Range
+	static func apply(PRIMITIVE from, PRIMITIVE toExclusive) -> TYPE_NAME##Range
 		= new dyvil.collection.range.halfopen.TYPE_NAME##Range(from, toExclusive)
 
-	override func asClosed(): TYPE_NAME##Range
+	override func asClosed() -> TYPE_NAME##Range
 
-	override func asHalfOpen(): TYPE_NAME##Range
+	override func asHalfOpen() -> TYPE_NAME##Range
 
-	func contains(PRIMITIVE value): boolean
+	func contains(PRIMITIVE value) -> boolean
 
-	override func contains(Object! element): boolean = element is Number && this.contains((element as Number).PRIMITIVE##Value())
+	override func contains(Object! element) -> boolean = element is Number && this.contains((element as Number).PRIMITIVE##Value())
 
-	override func toArray(): [WRAPPER]
+	override func toArray() -> [WRAPPER]
 	{
 		let result = new [WRAPPER](this.size)
 		this.toArray(result)
 		return result
 	}
 
-	func to##TYPE_NAME##Array(): [PRIMITIVE]
+	func to##TYPE_NAME##Array() -> [PRIMITIVE]
 
-	override func copy(): TYPE_NAME##Range
+	override func copy() -> TYPE_NAME##Range
 }

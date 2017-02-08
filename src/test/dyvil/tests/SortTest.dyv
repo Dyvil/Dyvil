@@ -6,7 +6,7 @@ import java.util.Random
 
 public class SortTest
 {
-	public static func apply(): Test = test "Sorting" {
+	static func apply() -> Test = test "Sorting" {
 		let random = new Random
 
 		test "Quicksort" {
@@ -32,7 +32,7 @@ public class SortTest
 		}
 	}
 
-	public static func quicksort<T: Comparable>(ImmutableList<T> list): ImmutableList<T>
+	static func quicksort<T: Comparable>(ImmutableList<T> list) -> ImmutableList<T>
 	{
 		if (list.isEmpty) return list
 
@@ -44,19 +44,19 @@ public class SortTest
 		return less ++ equal ++ greater
 	}
 
-	public static func swap<T>(T* left, T* right): void
+	static func swap<T>(T* left, T* right) -> void
 	{
 		let temp = *left
 		*left = *right
 		*right = temp
 	}
 
-	public static func quicksort<T: Comparable>(MutableList<T> list): void
+	static func quicksort<T: Comparable>(MutableList<T> list) -> void
 	{
 		quicksortRange(list, 0, list.size - 1)
 	}
 
-	private static func quicksortRange<T: Comparable>(MutableList<T> list, int left, int right): void
+	private static func quicksortRange<T: Comparable>(MutableList<T> list, int left, int right) -> void
 	{
 		var i = left
 		var j = right

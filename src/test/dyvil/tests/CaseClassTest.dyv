@@ -17,7 +17,7 @@ public class CaseClassTest
 		let objects: [Object]!
 	)
 
-	public static func apply(): Test = test "Case Classes" {
+	static func apply() -> Test = test "Case Classes" {
 		let id     = 1234567890L
 		let name   = "Peter Peterson"
 		let age    = 20

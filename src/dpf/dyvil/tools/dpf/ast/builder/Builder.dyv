@@ -14,11 +14,11 @@ public class Builder(
 	private var node: Node? { public get }
 ) implements Value, BuilderVisitor, Expandable
 {
-	public static func apply(Name name): Builder = new Builder(name)
+	static func apply(Name name) -> Builder = new Builder(name)
 
-	public static func apply(Name name, Parameter... parameters): Builder = new Builder(name, ArrayList(parameters...), null)
+	static func apply(Name name, Parameter... parameters) -> Builder = new Builder(name, ArrayList(parameters...), null)
 
-	public static func apply(Name name, List<Parameter> parameters, Node! node = null): Builder = new Builder(name, parameters, node)
+	static func apply(Name name, List<Parameter> parameters, Node! node = null) -> Builder = new Builder(name, parameters, node)
 	
 	public init(Name name)
 	{
@@ -26,28 +26,28 @@ public class Builder(
 	}
 
 	@BytecodeName("withNode")
-	public func with(Node node): Builder { this.node = node; this }
+	public func with(Node node) -> Builder { this.node = node; this }
 
 	@BytecodeName("withParameter")
-	public func with(Parameter parameter): Builder { this.add(parameter); this }
+	public func with(Parameter parameter) -> Builder { this.add(parameter); this }
 
 	@BytecodeName("addParameter")
-	public func add(Parameter parameter): void = this.parameters.add(parameter)
+	public func add(Parameter parameter) -> void = this.parameters.add(parameter)
 
-	@Deprecated(replacements: [ "Builder.visitNode(): Node" ])
-	public func makeNode(): Node = this.visitNode
+	@Deprecated(replacements: [ "Builder.visitNode() -> Node" ])
+	public func makeNode() -> Node = this.visitNode
 
-	public override func visitParameter(Name! name): ValueVisitor = new Parameter(name).{ this.add($0); $0 }
+	override func visitParameter(Name! name) -> ValueVisitor = new Parameter(name).{ this.add($0); $0 }
 
-	public override func visitNode(): Node
+	override func visitNode() -> Node
 	{
 		if (this.node != null) return this.node!!
 		return this.node = new Node(this.name)
 	}
 	
-	public override func visitEnd(): void { }
+	override func visitEnd() -> void { }
 	
-	public override func accept(ValueVisitor visitor): void
+	override func accept(ValueVisitor visitor) -> void
 	{
 		let builderVisitor = visitor.visitBuilder(this.name)
 		for (parameter <- this.parameters)
@@ -61,7 +61,7 @@ public class Builder(
 		builderVisitor.visitEnd()
 	}
 
-	public override func expand(Map<String, Object> mappings, boolean mutate): Builder
+	override func expand(Map<String, Object> mappings, boolean mutate) -> Builder
 	{
 		if (mutate)
 		{
@@ -81,9 +81,9 @@ public class Builder(
 		                   this.node == null ? null : this.node!.expand(mappings, false))
 	}
 
-	public override func toString(): String = IASTNode.toString(this)
+	override func toString() -> String = IASTNode.toString(this)
 	
-	public override func toString(String indent, StringBuilder buffer): void
+	override func toString(String indent, StringBuilder buffer) -> void
 	{
 		buffer.append(this.name)
 		
@@ -115,7 +115,7 @@ public class Builder(
 		}
 	}
 
-	public override func equals(Object! o): boolean
+	override func equals(Object! o) -> boolean
 	{
 		if (this === o) return true
 		if (!(o is Builder)) return false
@@ -124,7 +124,7 @@ public class Builder(
 		return this.name === that.name && this.parameters == that.parameters && this.node == that.node
 	}
 
-	public override func hashCode(): int
+	override func hashCode() -> int
 	{
 		var result = this.name.hashCode
 		result = 31 * result + this.parameters.hashCode

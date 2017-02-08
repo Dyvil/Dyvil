@@ -30,48 +30,48 @@ public class NodeAccess implements NodeVisitor, NodeElement, Expandable
 		this.element = element
 	}
 
-	public override func visitNode(Name name): NodeVisitor
+	override func visitNode(Name name) -> NodeVisitor
 	{
 		Node node = new Node(name)
 		this.element = node
 		return node
 	}
 	
-	public override func visitProperty(Name name): ValueVisitor
+	override func visitProperty(Name name) -> ValueVisitor
 	{
 		Property property = new Property(name)
 		this.element = property
 		return property
 	}
 	
-	public override func visitNodeAccess(Name name): NodeVisitor
+	override func visitNodeAccess(Name name) -> NodeVisitor
 	{
 		NodeAccess access = new NodeAccess(name)
 		this.element = access
 		return access
 	}
 	
-	public override func accept(NodeVisitor visitor): void
+	override func accept(NodeVisitor visitor) -> void
 	{
 		this.element.accept(visitor.visitNodeAccess(this.name))
 	}
 
-	public override func expand(Map<String, Object> mappings, boolean mutate): NodeAccess
+	override func expand(Map<String, Object> mappings, boolean mutate) -> NodeAccess
 	{
 		let nodeAccess = mutate ? this : new NodeAccess(this.name)
 		nodeAccess.element = Expandable.expand(this.element, mappings, mutate) as NodeElement
 		return nodeAccess
 	}
 
-	public override func toString(): String = IASTNode.toString(this)
+	override func toString() -> String = IASTNode.toString(this)
 	
-	public override func toString(String indent, StringBuilder buffer): void
+	override func toString(String indent, StringBuilder buffer) -> void
 	{
 		buffer.append(this.name).append('.')
 		this.element.toString(indent, buffer)
 	}
 
-	public override func equals(Object! obj): boolean
+	override func equals(Object! obj) -> boolean
 	{
 		if (obj === this) return true
 		if (!(obj is NodeAccess)) return false
@@ -82,5 +82,5 @@ public class NodeAccess implements NodeVisitor, NodeElement, Expandable
 		return true
 	}
 
-	public override func hashCode(): int = 31 * this.name.hashCode + this.element.hashCode
+	override func hashCode() -> int = 31 * this.name.hashCode + this.element.hashCode
 }

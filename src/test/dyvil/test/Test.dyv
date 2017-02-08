@@ -6,9 +6,9 @@ public interface Test
 
 	public interface TestContainerBase
 	{
-		func addTest(Test test): void
+		func addTest(Test test) -> void
 
-		func applyStatement(Test test): void = this.addTest(test)
+		func applyStatement(Test test) -> void = this.addTest(test)
 	}
 
 	public case class TestContainer(
@@ -17,11 +17,11 @@ public interface Test
 	{
 		protected let subTests: List<Test> = MutableList<Test>
 
-		public override func addTest(Test test): void = this.subTests.add(test)
+		override func addTest(Test test) -> void = this.subTests.add(test)
 
-		public override func passes(): boolean = this.subTests.allMatch(t => t.passes)
+		override func passes() -> boolean = this.subTests.allMatch(t => t.passes)
 
-		public override func addErrors(List<String> errors): void
+		override func addErrors(List<String> errors) -> void
 		{
 			let subErrors = MutableList<String>
 			for (subTest <- this.subTests)
@@ -39,7 +39,7 @@ public interface Test
 		}
 	}
 
-	static func test(String name, Configure<TestContainerBase> configure): TestContainer
+	static func test(String name, Configure<TestContainerBase> configure) -> TestContainer
 	{
 		let container = new TestContainer(name)
 		configure container
@@ -52,16 +52,16 @@ public interface Test
 		public let predicate: -> boolean
 	) implements Test
 	{
-		public override func passes(): boolean = this.predicate.apply
+		override func passes() -> boolean = this.predicate.apply
 
-		public override func addErrors(List<String> errors): void
+		override func addErrors(List<String> errors) -> void
 		{
 			if (this.passes) return
 			errors.add("Generic Requirement failed")
 		}
 	}
 
-	static func require(-> boolean predicate): RequireTest = RequireTest(predicate)
+	static func require(-> boolean predicate) -> RequireTest = RequireTest(predicate)
 
 	// Equality Tests
 
@@ -71,9 +71,9 @@ public interface Test
 		public let inverted: boolean = false
 	) implements Test
 	{
-		public override func passes(): boolean = [this.actual].deepEquals([this.expected]) != this.inverted
+		override func passes() -> boolean = [this.actual].deepEquals([this.expected]) != this.inverted
 
-		public override func addErrors(List<String> errors): void
+		override func addErrors(List<String> errors) -> void
 		{
 			if (this.passes) return
 
@@ -90,9 +90,9 @@ public interface Test
 		}
 	}
 
-	infix func =?=(Object! lhs, Object! rhs): EqualityTest = EqualityTest(lhs, rhs, false)
+	infix func =?=(Object! lhs, Object! rhs) -> EqualityTest = EqualityTest(lhs, rhs, false)
 
-	infix func =!=(Object! lhs, Object! rhs): EqualityTest = EqualityTest(lhs, rhs, true)
+	infix func =!=(Object! lhs, Object! rhs) -> EqualityTest = EqualityTest(lhs, rhs, true)
 
 	// Expect Throwable Tests
 
@@ -101,7 +101,7 @@ public interface Test
 		public let errors: Class<+Throwable>...
 	) implements Test
 	{
-		public override func passes(): boolean
+		override func passes() -> boolean
 		{
 			try
 			{
@@ -115,7 +115,7 @@ public interface Test
 			return false
 		}
 
-		public override func addErrors(List<String> errors): void
+		override func addErrors(List<String> errors) -> void
 		{
 			if (this.passes) return
 
@@ -124,11 +124,11 @@ public interface Test
 		}
 	}
 
-	static func expect(Class<+Throwable>... errors, -> void from): ExpectTest = ExpectTest(from, errors...)
+	static func expect(Class<+Throwable>... errors, -> void from) -> ExpectTest = ExpectTest(from, errors...)
 
 	// Test Methods
 
-	func passes(): boolean
+	func passes() -> boolean
 
-	func addErrors(List<String> errors): void
+	func addErrors(List<String> errors) -> void
 }

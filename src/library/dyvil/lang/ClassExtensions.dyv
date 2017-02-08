@@ -13,20 +13,20 @@ public abstract class ClassExtensions
 
 	// Value to Type / Class Conversions
 
-	public postfix func staticClass<@Reified(ANY_CLASS) T>(T value): Class<T> = class T
+	postfix func staticClass<@Reified(ANY_CLASS) T>(T value) -> Class<T> = class T
 
-	public postfix func staticType<@Reified(TYPE) T>(T value): Type<T> = type T
+	postfix func staticType<@Reified(TYPE) T>(T value) -> Type<T> = type T
 
 	@Intrinsic([ LOAD_0, INVOKEVIRTUAL, 0, 1, 2 ]
 	  strings: [ "java/lang/Object", "getClass", "()Ljava/lang/Class;" ])
-	public postfix func dynamicClass<T>(T value): Class<+T> = value.getClass as Class<+T>
+	postfix func dynamicClass<T>(T value) -> Class<+T> = value.getClass as Class<+T>
 
 	// Class Extensions
 
-	public static func arrayType<@Reified(OBJECT_CLASS) T>(): Class<[T]> = arrayType<T>(class T)
+	static func arrayType<@Reified(OBJECT_CLASS) T>() -> Class<[T]> = arrayType<T>(class T)
 
 	@BytecodeName("arrayTypeOf")
-	public postfix func arrayType<T>(Class<T> componentType): Class<_>
+	postfix func arrayType<T>(Class<T> componentType) -> Class<_>
 	{
 		let builder = new StringBuilder().append '['
 

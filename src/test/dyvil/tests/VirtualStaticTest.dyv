@@ -8,36 +8,36 @@ public class VirtualStaticTest
 
 	public interface Interface
 	{
-		static func foo(): String
-		static func bar(String s): String
+		static func foo() -> String
+		static func bar(String s) -> String
 	}
 
 	public class Base implements Interface
 	{
-		public static override func foo(): String = "Base"
-		public static override func bar(String s): String = s + "_Base"
+		static override func foo() -> String = "Base"
+		static override func bar(String s) -> String = s + "_Base"
 	}
 
 	public class Derived extends Base
 	{
-		public static override func foo(): String = "Derived"
-		public static override func bar(String s): String = s + "_Derived"
+		static override func foo() -> String = "Derived"
+		static override func bar(String s) -> String = s + "_Derived"
 	}
 
-	public static func getFoo<@Reified(Reified.Type.ANY_CLASS) T: Interface>(): String = T.foo
-	public static func getBar<@Reified(Reified.Type.OBJECT_CLASS) T: Interface>(String s): String = T.bar(s)
+	static func getFoo<@Reified(Reified.Type.ANY_CLASS) T: Interface>() -> String = T.foo
+	static func getBar<@Reified(Reified.Type.OBJECT_CLASS) T: Interface>(String s) -> String = T.bar(s)
 
 	public interface IntConstructible
 	{
-		static func apply(int i): IntConstructible
+		static func apply(int i) -> IntConstructible
 	}
 
 	public case class CustomInt(public let value: int) implements IntConstructible
 	public case class MyInt    (public let value: int) implements IntConstructible
 
-	public static func create<@Reified(Reified.Type.TYPE) T: IntConstructible>(int i): T = T(i) as T
+	static func create<@Reified(Reified.Type.TYPE) T: IntConstructible>(int i) -> T = T(i) as T
 
-	public static func apply(): Test = test "Virtual Static Methods" {
+	static func apply() -> Test = test "Virtual Static Methods" {
 		expect(class AbstractMethodError, from: {
 			getFoo<Interface>
 			()

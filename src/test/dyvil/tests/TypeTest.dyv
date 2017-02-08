@@ -9,7 +9,7 @@ public class TypeTest
 	public static case class MyList<T>(T... elements)
 	{
 		@BytecodeName("sum_doubles")
-		public func sum(MyList<double> this): double
+		public func sum(MyList<double> this) -> double
 		{
 			var result = 0D
 			for (d <- this.elements) result += d
@@ -17,7 +17,7 @@ public class TypeTest
 		}
 
 		@BytecodeName("sum_ints")
-		public func sum(MyList<int> this): int
+		public func sum(MyList<int> this) -> int
 		{
 			var result = 0
 			for (i <- this.elements) result += i
@@ -25,11 +25,11 @@ public class TypeTest
 		}
 	}
 
-	public infix func <<< <T, C: Collection<T>>(C collection, T element) = collection.added(element)
+	infix func <<< <T, C: Collection<T>>(C collection, T element) = collection.added(element)
 
-	public static func voidTest<T>(T value) = "\(value)" // will error if CovariantTypeVarType.isSameType(Types.VOID) returns true
+	static func voidTest<T>(T value) = "\(value)" // will error if CovariantTypeVarType.isSameType(Types.VOID) returns true
 
-	public static func apply(): Test = test "Types" {
+	static func apply() -> Test = test "Types" {
 		test "Receiver Type" {
 			let doubles = MyList(1D, 2D, 3D)
 

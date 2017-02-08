@@ -28,15 +28,15 @@ public class ReferenceTest
 	@LiteralConvertible.FromInt
 	public static case class MyInt(public final int value)
 	{
-		public static implicit func apply(int i) = new MyInt(i)
+		static implicit func apply(int i) = new MyInt(i)
 
-		public infix func +(MyInt i, MyInt j) = MyInt(i.value + j.value)
+		infix func +(MyInt i, MyInt j) = MyInt(i.value + j.value)
 
-		public infix func +(MyInt i, int j): MyInt = MyInt(i.value + j)
+		infix func +(MyInt i, int j) -> MyInt = MyInt(i.value + j)
 
-		public infix func +(int i, MyInt j): MyInt = MyInt(i + j.value)
+		infix func +(int i, MyInt j) -> MyInt = MyInt(i + j.value)
 
-		public postfix func addInplace(MyInt^ i, int j): void = *i = *i + j
+		postfix func addInplace(MyInt^ i, int j) -> void = *i = *i + j
 	}
 
 	public static void main([String] args)

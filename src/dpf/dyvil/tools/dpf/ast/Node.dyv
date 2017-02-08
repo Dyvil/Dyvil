@@ -27,41 +27,41 @@ public class Node implements NodeElement, NodeVisitor, Expandable
 	}
 
 	@BytecodeName("addNode")
-	public func add(Node node): void = this.nodes.add(node)
+	public func add(Node node) -> void = this.nodes.add(node)
 
 	@BytecodeName("addNodeAccess")
-	public func add(NodeAccess nodeAccess): void = this.nodeAccesses.add(nodeAccess)
+	public func add(NodeAccess nodeAccess) -> void = this.nodeAccesses.add(nodeAccess)
 
 	@BytecodeName("addProperty")
-	public func add(Property property): void = this.properties.add(property)
+	public func add(Property property) -> void = this.properties.add(property)
 	
-	public override func visitNode(Name name): NodeVisitor
+	override func visitNode(Name name) -> NodeVisitor
 	{
 		Node node = new Node(name)
 		this.nodes.add(node)
 		return node
 	}
 	
-	public override func visitProperty(Name name): ValueVisitor
+	override func visitProperty(Name name) -> ValueVisitor
 	{
 		Property property = new Property(name)
 		this.properties.add(property)
 		return property
 	}
 	
-	public override func visitNodeAccess(Name name): NodeVisitor
+	override func visitNodeAccess(Name name) -> NodeVisitor
 	{
 		NodeAccess access = new NodeAccess(name)
 		this.nodeAccesses.add(access)
 		return access
 	}
 	
-	public override func accept(NodeVisitor visitor): void
+	override func accept(NodeVisitor visitor) -> void
 	{
 		this.acceptBody(visitor.visitNode(this.name))
 	}
 
-	public internal func acceptBody(NodeVisitor nodeVisitor): void
+	internal func acceptBody(NodeVisitor nodeVisitor) -> void
 	{
 		for (var element <- this.properties)
 		{
@@ -78,7 +78,7 @@ public class Node implements NodeElement, NodeVisitor, Expandable
 		nodeVisitor.visitEnd()
 	}
 
-	public override func expand(Map<String, Object> mappings, boolean mutate): Node
+	override func expand(Map<String, Object> mappings, boolean mutate) -> Node
 	{
 		if (mutate)
 		{
@@ -93,7 +93,7 @@ public class Node implements NodeElement, NodeVisitor, Expandable
 		}
 	}
 
-	protected func expandChildren(Map<String, Object> mappings): void
+	protected func expandChildren(Map<String, Object> mappings) -> void
 	{
 		for (Node node <- this.nodes)
 		{
@@ -109,16 +109,16 @@ public class Node implements NodeElement, NodeVisitor, Expandable
 		}
 	}
 
-	protected func expand(Node node, Map<String, Object> mappings): void
+	protected func expand(Node node, Map<String, Object> mappings) -> void
 	{
 		node.nodes = this.nodes.mapped(childNode => childNode.expand(mappings, false))
 		node.properties = this.properties.mapped(property => property.expand(mappings, false))
 		node.nodeAccesses = this.nodeAccesses.mapped(nodeAccess => nodeAccess.expand(mappings, false))
 	}
 
-	public override func toString(): String = IASTNode.toString(this)
+	override func toString() -> String = IASTNode.toString(this)
 	
-	public override func toString(String indent, StringBuilder buffer): void
+	override func toString(String indent, StringBuilder buffer) -> void
 	{
 		buffer.append(this.name).append('\n').append(indent).append('{').append('\n')
 		
@@ -127,7 +127,7 @@ public class Node implements NodeElement, NodeVisitor, Expandable
 		buffer.append(indent).append('}')
 	}
 	
-	public func bodyToString(String indent, StringBuilder buffer): void
+	public func bodyToString(String indent, StringBuilder buffer) -> void
 	{
 		for (var element <- this.properties)
 		{
@@ -151,7 +151,7 @@ public class Node implements NodeElement, NodeVisitor, Expandable
 		}
 	}
 
-	public override func equals(Object! obj): boolean
+	override func equals(Object! obj) -> boolean
 	{
 		if (this === obj) return true
 		if (!(obj is Node)) return false
@@ -165,7 +165,7 @@ public class Node implements NodeElement, NodeVisitor, Expandable
 		return true
 	}
 
-	public override func hashCode(): int
+	override func hashCode() -> int
 	{
 		final int prime = 31
 		int result = this.name.hashCode()

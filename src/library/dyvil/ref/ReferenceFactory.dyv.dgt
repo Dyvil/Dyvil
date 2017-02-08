@@ -16,14 +16,14 @@ public final class ReferenceFactory
 	private const STATIC_CONSTRUCTOR_TYPE:   MethodType = MethodType.methodType(class void, class Field)
 	private const INSTANCE_CONSTRUCTOR_TYPE: MethodType = MethodType.methodType(class void, class Object, class long)
 
-	private static func getField(Class<_> _type, String fieldName): Field throws NoSuchFieldException
+	private static func getField(Class<_> _type, String fieldName) -> Field throws NoSuchFieldException
 		= _type.getDeclaredField(fieldName)
 
 	// Bootstrap Factories
 
-	public static func instanceRefMetafactory(
+	static func instanceRefMetafactory(
 		MethodHandles.Lookup caller, String fieldName, MethodType methodType
-	): CallSite throws Throwable
+	) -> CallSite throws Throwable
 	{
 		let enclosingClass = methodType.parameterType(0)
 		let targetType = methodType.returnType()
@@ -39,10 +39,10 @@ public final class ReferenceFactory
 		return new ConstantCallSite(MethodHandles.insertArguments(constructor, 1, offset).asType(methodType))
 	}
 
-	public static func staticRefMetafactory(
+	static func staticRefMetafactory(
 		MethodHandles.Lookup caller, String fieldName, MethodType methodType,
 		Class<_> enclosingClass
-	): CallSite throws Throwable
+	) -> CallSite throws Throwable
 	{
 		let targetType = methodType.returnType()
 
@@ -57,10 +57,10 @@ public final class ReferenceFactory
 		return new ConstantCallSite(MethodHandles.constant(targetType, result))
 	}
 
-	public static func propertyRefMetafactory(
+	static func propertyRefMetafactory(
 		MethodHandles.Lookup caller, String invokedName, MethodType invokedType,
 		MethodHandle getter, MethodHandle setter
-	): CallSite throws Exception
+	) -> CallSite throws Exception
 	{
 		let prm = new PropertyReferenceMetafactory(caller, invokedType, getter, setter)
 		return prm.buildCallSite()
@@ -71,16 +71,16 @@ public final class ReferenceFactory
 
 	// TYPE_NAME
 
-	public static func new##TYPE_NAME##Ref(Object base, long offset): TYPE_NAME##Ref
+	static func new##TYPE_NAME##Ref(Object base, long offset) -> TYPE_NAME##Ref
 		= new Unsafe##TYPE_NAME##Ref(base, offset)
 
-	public static func new##TYPE_NAME##Ref(Object base, Class<_> _type, String fieldName): TYPE_NAME##Ref throws NoSuchFieldException
+	static func new##TYPE_NAME##Ref(Object base, Class<_> _type, String fieldName) -> TYPE_NAME##Ref throws NoSuchFieldException
 		= new Unsafe##TYPE_NAME##Ref(base, getField(_type, fieldName))
 
-	public static func newStatic##TYPE_NAME##Ref(Class<_> _type, String fieldName): TYPE_NAME##Ref throws NoSuchFieldException
+	static func newStatic##TYPE_NAME##Ref(Class<_> _type, String fieldName) -> TYPE_NAME##Ref throws NoSuchFieldException
 		= new Unsafe##TYPE_NAME##Ref(getField(_type, fieldName))
 
-	public static func new##TYPE_NAME##ArrayRef([PRIMITIVE] array, int index): TYPE_NAME##Ref
+	static func new##TYPE_NAME##ArrayRef([PRIMITIVE] array, int index) -> TYPE_NAME##Ref
 		= new TYPE_NAME##ArrayRef(array, index)
 #endfor
 }

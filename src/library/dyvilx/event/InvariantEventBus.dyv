@@ -7,7 +7,7 @@ public class InvariantEventBus implements EventBus
 {
 	protected let handlers: List<HandlerEntry> = new dyvil.collection.mutable.ArrayList<HandlerEntry>
 
-	public override func register(Object! handler, Class<_> handlerType): void
+	override func register(Object! handler, Class<_> handlerType) -> void
 	{
 		let entry = HandlerEntry(handler, handlerType)
 		this.handlers.add(entry)
@@ -30,7 +30,7 @@ public class InvariantEventBus implements EventBus
 		}
 	}
 
-	public override func dispatch(Object event): void
+	override func dispatch(Object event) -> void
 	{
 		let eventType = event.dynamicClass
 
@@ -46,7 +46,7 @@ public class InvariantEventBus implements EventBus
 		}
 	}
 
-	protected final func invoke(Method method, Object! handler, Object event): void
+	protected final func invoke(Method method, Object! handler, Object event) -> void
 	{
 		try
 		{

@@ -5,10 +5,10 @@ using dyvil.math.MathUtils.sqrt
 
 public class MathTest
 {
-	public static func apply(): Test = test "Math" {
+	static func apply() -> Test = test "Math" {
 	}
 
-	private static func isPrime(int value): boolean
+	private static func isPrime(int value) -> boolean
 	{
 		for var j <- 2 .. value.sqrt
 		{
@@ -20,7 +20,7 @@ public class MathTest
 		return true
 	}
 
-	private static func primeFactors(int value): List<int>
+	private static func primeFactors(int value) -> List<int>
 	{
 		if value <= 1
 		{

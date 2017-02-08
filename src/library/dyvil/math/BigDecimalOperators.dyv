@@ -4,22 +4,22 @@ import java.math.BigDecimal
 
 public class BigDecimalOperators
 {
-	public infix implicit inline func toBigDecimal(int i):    BigDecimal = BigDecimal.valueOf(i as long)
-	public infix implicit inline func toBigDecimal(long i):   BigDecimal = BigDecimal.valueOf(i)
-	public infix implicit inline func toBigDecimal(float i):  BigDecimal = BigDecimal.valueOf(i as double)
-	public infix implicit inline func toBigDecimal(double i): BigDecimal = BigDecimal.valueOf(i)
-	public infix implicit inline func toBigDecimal(java.math.BigInteger i): BigDecimal = new BigDecimal(i)
+	infix implicit inline func toBigDecimal(int i) ->    BigDecimal = BigDecimal.valueOf(i as long)
+	infix implicit inline func toBigDecimal(long i) ->   BigDecimal = BigDecimal.valueOf(i)
+	infix implicit inline func toBigDecimal(float i) ->  BigDecimal = BigDecimal.valueOf(i as double)
+	infix implicit inline func toBigDecimal(double i) -> BigDecimal = BigDecimal.valueOf(i)
+	infix implicit inline func toBigDecimal(java.math.BigInteger i) -> BigDecimal = new BigDecimal(i)
 
-	public static inline func +(BigDecimal a): BigDecimal = a
-	public static inline func -(BigDecimal a): BigDecimal = a.negate()
+	static inline func +(BigDecimal a) -> BigDecimal = a
+	static inline func -(BigDecimal a) -> BigDecimal = a.negate()
 
-	public infix inline func +(BigDecimal a, BigDecimal b): BigDecimal = a.add(b)
-	public infix inline func -(BigDecimal a, BigDecimal b): BigDecimal = a.subtract(b)
-	public infix inline func *(BigDecimal a, BigDecimal b): BigDecimal = a.multiply(b)
-	public infix inline func /(BigDecimal a, BigDecimal b): BigDecimal = a.divide(b)
-	public infix inline func %(BigDecimal a, BigDecimal b): BigDecimal = a.remainder(b)
+	infix inline func +(BigDecimal a, BigDecimal b) -> BigDecimal = a.add(b)
+	infix inline func -(BigDecimal a, BigDecimal b) -> BigDecimal = a.subtract(b)
+	infix inline func *(BigDecimal a, BigDecimal b) -> BigDecimal = a.multiply(b)
+	infix inline func /(BigDecimal a, BigDecimal b) -> BigDecimal = a.divide(b)
+	infix inline func %(BigDecimal a, BigDecimal b) -> BigDecimal = a.remainder(b)
 
-	public infix inline func **(BigDecimal a, int b): BigDecimal = a.pow(b)
-	public infix func **(BigDecimal a, double b): BigDecimal = PowImpl.pow(a, b)
-	public infix func **(BigDecimal a, BigDecimal b): BigDecimal = PowImpl.pow(a, b)
+	infix inline func **(BigDecimal a, int b) -> BigDecimal = a.pow(b)
+	infix func **(BigDecimal a, double b) -> BigDecimal = PowImpl.pow(a, b)
+	infix func **(BigDecimal a, BigDecimal b) -> BigDecimal = PowImpl.pow(a, b)
 }

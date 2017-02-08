@@ -13,9 +13,9 @@ public class ExtensionTest
 
 	public static class D extends C
 
-	public extension func custom(A a) = "fallback"
+	extension func custom(A a) = "fallback"
 
-	public static func apply(): Test = test "Extension Methods" {
+	static func apply() -> Test = test "Extension Methods" {
 		let a = new A
 		let b = new B
 		let c = new C
@@ -43,7 +43,7 @@ public class ExtensionTest
 		}
 	}
 
-	public static func testSpeed(): void
+	static func testSpeed() -> void
 	{
 		let values = [ new A, new B, new C, new D ]
 		let random = Random()
@@ -65,7 +65,7 @@ public class ExtensionTest
 
 	private static var nameMap: Map<any, String> = dyvil.collection.mutable.IdentityHashMap<any, String>
 
-	public postfix func name(any value): String = nameMap[value]
+	postfix func name(any value) -> String = nameMap[value]
 
-	public infix func name_=(any value, String newName): void = nameMap[value] = newName
+	infix func name_=(any value, String newName) -> void = nameMap[value] = newName
 }

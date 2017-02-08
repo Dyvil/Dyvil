@@ -2,93 +2,93 @@ package dyvil.collection
 
 public class MapOperators
 {
-	public infix inline func ? <K, V>(Map<K, V> map, any key, any value): void = map.contains(key, value)
+	infix inline func ? <K, V>(Map<K, V> map, any key, any value) -> void = map.contains(key, value)
 
-	public infix inline func ? <K, V>(Map<K, V> map, Entry<_, _> entry): void = map.contains(entry)
+	infix inline func ? <K, V>(Map<K, V> map, Entry<_, _> entry) -> void = map.contains(entry)
 
-	public infix inline func ?@ <K, V>(Map<K, V> map, any key): void = map.containsKey(key)
+	infix inline func ?@ <K, V>(Map<K, V> map, any key) -> void = map.containsKey(key)
 
-	public infix inline func ?: <K, V>(Map<K, V> map, any value): void = map.containsValue(value)
+	infix inline func ?: <K, V>(Map<K, V> map, any value) -> void = map.containsValue(value)
 
 	// Non-mutating Map Operators
 
-	public infix inline func + <K, V>(Map<K, V> map, K key, V value): Map<K, V> = map.withEntry(key, value)
+	infix inline func + <K, V>(Map<K, V> map, K key, V value) -> Map<K, V> = map.withEntry(key, value)
 
-	public infix inline func + <K, V>(Map<K, V> map, Entry<+K, +V> entry): void = map.put(entry)
+	infix inline func + <K, V>(Map<K, V> map, Entry<+K, +V> entry) -> void = map.put(entry)
 
-	public infix inline func ++ <K, V>(Map<K, V> map, Map<+K, +V> entries): void = map.putAll(entries)
+	infix inline func ++ <K, V>(Map<K, V> map, Map<+K, +V> entries) -> void = map.putAll(entries)
 
-	public infix inline func - <K, V>(Map<K, V> map, any key, any value): void = map.remove(key, value)
+	infix inline func - <K, V>(Map<K, V> map, any key, any value) -> void = map.remove(key, value)
 
-	public infix inline func - <K, V>(Map<K, V> map, Entry<_, _> entry): void = map.remove(entry)
+	infix inline func - <K, V>(Map<K, V> map, Entry<_, _> entry) -> void = map.remove(entry)
 
-	public infix inline func -@ <K, V>(Map<K, V> map, any key): void = map.removeKey(key)
+	infix inline func -@ <K, V>(Map<K, V> map, any key) -> void = map.removeKey(key)
 
-	public infix inline func -: <K, V>(Map<K, V> map, any value): void = map.removeValue(value)
+	infix inline func -: <K, V>(Map<K, V> map, any value) -> void = map.removeValue(value)
 
-	public infix inline func -- <K, V>(Map<K, V> map, Map<_, _> entries): void = map.removeAll(entries)
+	infix inline func -- <K, V>(Map<K, V> map, Map<_, _> entries) -> void = map.removeAll(entries)
 
-	public infix inline func -- <K, V>(Map<K, V> map, Collection<_> keys): void = map.removeKeys(keys)
+	infix inline func -- <K, V>(Map<K, V> map, Collection<_> keys) -> void = map.removeKeys(keys)
 
 	// Non-mutating MutableMap Operators
 
-	public infix inline func + <K, V>(MutableMap<K, V> map, K key, V value): MutableMap<K, V> = map.withEntry(key, value)
+	infix inline func + <K, V>(MutableMap<K, V> map, K key, V value) -> MutableMap<K, V> = map.withEntry(key, value)
 
-	public infix inline func + <K, V>(MutableMap<K, V> map, Entry<+K, +V> entry): void = map.put(entry)
+	infix inline func + <K, V>(MutableMap<K, V> map, Entry<+K, +V> entry) -> void = map.put(entry)
 
-	public infix inline func ++ <K, V>(MutableMap<K, V> map, MutableMap<+K, +V> entries): void = map.putAll(entries)
+	infix inline func ++ <K, V>(MutableMap<K, V> map, MutableMap<+K, +V> entries) -> void = map.putAll(entries)
 
-	public infix inline func - <K, V>(MutableMap<K, V> map, any key, any value): void = map.remove(key, value)
+	infix inline func - <K, V>(MutableMap<K, V> map, any key, any value) -> void = map.remove(key, value)
 
-	public infix inline func - <K, V>(MutableMap<K, V> map, Entry<_, _> entry): void = map.remove(entry)
+	infix inline func - <K, V>(MutableMap<K, V> map, Entry<_, _> entry) -> void = map.remove(entry)
 
-	public infix inline func -@ <K, V>(MutableMap<K, V> map, any key): void = map.removeKey(key)
+	infix inline func -@ <K, V>(MutableMap<K, V> map, any key) -> void = map.removeKey(key)
 
-	public infix inline func -: <K, V>(MutableMap<K, V> map, any value): void = map.removeValue(value)
+	infix inline func -: <K, V>(MutableMap<K, V> map, any value) -> void = map.removeValue(value)
 
-	public infix inline func -- <K, V>(MutableMap<K, V> map, MutableMap<_, _> entries): void = map.removeAll(entries)
+	infix inline func -- <K, V>(MutableMap<K, V> map, MutableMap<_, _> entries) -> void = map.removeAll(entries)
 
-	public infix inline func -- <K, V>(MutableMap<K, V> map, Collection<_> keys): void = map.removeKeys(keys)
+	infix inline func -- <K, V>(MutableMap<K, V> map, Collection<_> keys) -> void = map.removeKeys(keys)
 
 	// Non-mutating Immutable Map Operators
 
-	public infix inline func + <K, V>(ImmutableMap<K, V> map, K key, V value): ImmutableMap<K, V> = map.withEntry(key, value)
+	infix inline func + <K, V>(ImmutableMap<K, V> map, K key, V value) -> ImmutableMap<K, V> = map.withEntry(key, value)
 
-	public infix inline func + <K, V>(ImmutableMap<K, V> map, Entry<+K, +V> entry): void = map.put(entry)
+	infix inline func + <K, V>(ImmutableMap<K, V> map, Entry<+K, +V> entry) -> void = map.put(entry)
 
-	public infix inline func ++ <K, V>(ImmutableMap<K, V> map, ImmutableMap<+K, +V> entries): void = map.putAll(entries)
+	infix inline func ++ <K, V>(ImmutableMap<K, V> map, ImmutableMap<+K, +V> entries) -> void = map.putAll(entries)
 
-	public infix inline func - <K, V>(ImmutableMap<K, V> map, any key, any value): void = map.remove(key, value)
+	infix inline func - <K, V>(ImmutableMap<K, V> map, any key, any value) -> void = map.remove(key, value)
 
-	public infix inline func - <K, V>(ImmutableMap<K, V> map, Entry<_, _> entry): void = map.remove(entry)
+	infix inline func - <K, V>(ImmutableMap<K, V> map, Entry<_, _> entry) -> void = map.remove(entry)
 
-	public infix inline func -@ <K, V>(ImmutableMap<K, V> map, any key): void = map.removeKey(key)
+	infix inline func -@ <K, V>(ImmutableMap<K, V> map, any key) -> void = map.removeKey(key)
 
-	public infix inline func -: <K, V>(ImmutableMap<K, V> map, any value): void = map.removeValue(value)
+	infix inline func -: <K, V>(ImmutableMap<K, V> map, any value) -> void = map.removeValue(value)
 
-	public infix inline func -- <K, V>(ImmutableMap<K, V> map, ImmutableMap<_, _> entries): void = map.removeAll(entries)
+	infix inline func -- <K, V>(ImmutableMap<K, V> map, ImmutableMap<_, _> entries) -> void = map.removeAll(entries)
 
-	public infix inline func -- <K, V>(ImmutableMap<K, V> map, Collection<_> keys): void = map.removeKeys(keys)
+	infix inline func -- <K, V>(ImmutableMap<K, V> map, Collection<_> keys) -> void = map.removeKeys(keys)
 
 
 	// Mutating Operators
 
-	public infix inline func += <K, V>(Map<K, V> map, K key, V value): void = map.put(key, value)
+	infix inline func += <K, V>(Map<K, V> map, K key, V value) -> void = map.put(key, value)
 
-	public infix inline func += <K, V>(Map<K, V> map, Entry<+K, +V> entry): void = map.put(entry)
+	infix inline func += <K, V>(Map<K, V> map, Entry<+K, +V> entry) -> void = map.put(entry)
 
-	public infix inline func ++= <K, V>(Map<K, V> map, Map<+K, +V> entries): void = map.putAll(entries)
+	infix inline func ++= <K, V>(Map<K, V> map, Map<+K, +V> entries) -> void = map.putAll(entries)
 
-	public infix inline func -= <K, V>(Map<K, V> map, any key, any value): void = map.remove(key, value)
+	infix inline func -= <K, V>(Map<K, V> map, any key, any value) -> void = map.remove(key, value)
 
-	public infix inline func -= <K, V>(Map<K, V> map, Entry<_, _> entry): void = map.remove(entry)
+	infix inline func -= <K, V>(Map<K, V> map, Entry<_, _> entry) -> void = map.remove(entry)
 
-	public infix inline func -@= <K, V>(Map<K, V> map, any key): void = map.removeKey(key)
+	infix inline func -@= <K, V>(Map<K, V> map, any key) -> void = map.removeKey(key)
 
-	public infix inline func -:= <K, V>(Map<K, V> map, any value): void = map.removeValue(value)
+	infix inline func -:= <K, V>(Map<K, V> map, any value) -> void = map.removeValue(value)
 
-	public infix inline func --= <K, V>(Map<K, V> map, Map<_, _> entries): void = map.removeAll(entries)
+	infix inline func --= <K, V>(Map<K, V> map, Map<_, _> entries) -> void = map.removeAll(entries)
 
-	public infix inline func --= <K, V>(Map<K, V> map, Collection<_> keys): void = map.removeKeys(keys)
+	infix inline func --= <K, V>(Map<K, V> map, Collection<_> keys) -> void = map.removeKeys(keys)
 
 }
