@@ -1,0 +1,57 @@
+package dyvil.tests
+
+using dyvil.Test
+
+public class VarargsTest
+{
+	static func newArray(args: int...) -> [int] = args
+
+	static func newTuple(i: int..., j: int...) -> IntArrayTuple = (i, j)
+
+	static func newSet<T>(elements: T...) -> Set<T> = Set(elements...)
+
+	@LiteralConvertible.FromTuple
+	static case class IntArrayTuple(let _1: [int], let _2: [int])
+
+	static func apply() -> Test = test "Varargs" {
+		single()
+		multiple()
+		expansion()
+	}
+
+	static func single() -> Test = test "Single" {
+		test "List" {
+			newArray()        =?= [int]()
+			newArray(1)       =?= [ 1 ]
+			newArray(1, 2, 3) =?= [ 1, 2, 3 ]
+		}
+
+		test "Named" {
+			newArray(args: 1)       =?= [ 1 ]
+			newArray(args: 1, 2, 3) =?= [ 1, 2, 3 ]
+		}
+	}
+
+	static func multiple() -> Test = test "Multiple" {
+		test "List" {
+			newTuple()        =?= IntArrayTuple([], [])
+			newTuple(1)       =?= IntArrayTuple([ 1 ], [])
+			newTuple(1, 2, 3) =?= IntArrayTuple([ 1, 2, 3 ], [])
+		}
+
+		test "Named" {
+			newTuple(i: 1)                   =?= IntArrayTuple([ 1 ],       [])
+			newTuple(i: 1,       j: 2)       =?= IntArrayTuple([ 1 ],       [ 2 ])
+			newTuple(i: 1, 2,    j: 3)       =?= IntArrayTuple([ 1, 2 ],    [ 3 ])
+			newTuple(i: 1,       j: 2, 3)    =?= IntArrayTuple([ 1 ],       [ 2, 3 ])
+			newTuple(i: 1, 2, 3, j: 4, 5, 6) =?= IntArrayTuple([ 1, 2, 3 ], [ 4, 5, 6 ])
+		}
+	}
+
+	static func expansion() -> Test = test "Expansion" {
+		let array: [Int] = [ 1, 2, 3 ]
+
+		newSet(array...) =?= Set(1, 2, 3)
+		newSet(array)    =?= Set(array)
+	}
+}

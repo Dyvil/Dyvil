@@ -43,18 +43,17 @@ public class Main
 			OverloadTest()
 			PrimitiveTest()
 			PropertyTest()
+			RangeTest()
+			ReferenceTest()
+			ReifyTest()
 			SortTest()
 			SuperTest()
 			SymbolTest()
 			TypeTest()
+			VarargsTest()
 			VirtualStaticTest()
 		}
 		test.addErrors(errors)
-
-		RangeTest.main(args)
-		ReferenceTest.main(args)
-		ReifyTest.main(args)
-		VarargsTest.main(args)
 	}
 
 	private static void verify()
