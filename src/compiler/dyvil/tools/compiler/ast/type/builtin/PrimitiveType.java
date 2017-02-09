@@ -507,8 +507,8 @@ public final class PrimitiveType implements IType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvilx/lang/model/type/PrimitiveType",
-		                      this.name.qualified.toUpperCase(), "Ldyvilx/lang/model/type/PrimitiveType;");
+		writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/types/PrimitiveType",
+		                      this.name.qualified.toUpperCase(), "Ldyvil/reflect/types/PrimitiveType;");
 	}
 
 	@Override

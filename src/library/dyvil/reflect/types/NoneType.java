@@ -1,4 +1,4 @@
-package dyvilx.lang.model.type;
+package dyvil.reflect.types;
 
 import dyvil.annotation.internal.DyvilModifiers;
 import dyvil.lang.LiteralConvertible;
@@ -6,11 +6,11 @@ import dyvil.reflect.Modifiers;
 
 @LiteralConvertible.FromNil
 @DyvilModifiers(Modifiers.OBJECT_CLASS)
-public class NullType implements Type<Object>
+public class NoneType implements Type<Object>
 {
-	public static final NullType instance = new NullType();
+	public static final NoneType instance = new NoneType();
 	
-	public static NullType apply()
+	public static NoneType apply()
 	{
 		return instance;
 	}
@@ -24,24 +24,24 @@ public class NullType implements Type<Object>
 	@Override
 	public String name()
 	{
-		return "null";
+		return "none";
 	}
 	
 	@Override
 	public String toString()
 	{
-		return "null";
+		return "none";
 	}
 	
 	@Override
 	public String qualifiedName()
 	{
-		return "dyvil/lang/internal/Null";
+		return "dyvil/lang/internal/None";
 	}
 	
 	@Override
 	public void appendSignature(StringBuilder builder)
 	{
-		builder.append("Ldyvil/lang/internal/Null;");
+		builder.append("Ldyvil/lang/internal/None;");
 	}
 }

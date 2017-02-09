@@ -1,16 +1,14 @@
-package dyvilx.lang.model.type;
+package dyvil.reflect.types;
 
 import dyvil.annotation.internal.DyvilModifiers;
-import dyvil.lang.LiteralConvertible;
 import dyvil.reflect.Modifiers;
 
-@LiteralConvertible.FromNil
 @DyvilModifiers(Modifiers.OBJECT_CLASS)
-public class NoneType implements Type<Object>
+public class AnyType implements Type<Object>
 {
-	public static final NoneType instance = new NoneType();
+	public static final AnyType instance = new AnyType();
 	
-	public static NoneType apply()
+	public static AnyType apply()
 	{
 		return instance;
 	}
@@ -24,24 +22,24 @@ public class NoneType implements Type<Object>
 	@Override
 	public String name()
 	{
-		return "none";
+		return "any";
 	}
 	
 	@Override
 	public String toString()
 	{
-		return "none";
+		return "any";
 	}
 	
 	@Override
 	public String qualifiedName()
 	{
-		return "dyvil/lang/internal/None";
+		return "dyvil/lang/Any";
 	}
 	
 	@Override
 	public void appendSignature(StringBuilder builder)
 	{
-		builder.append("Ldyvil/lang/internal/None;");
+		builder.append("Ljava/lang/Object;");
 	}
 }

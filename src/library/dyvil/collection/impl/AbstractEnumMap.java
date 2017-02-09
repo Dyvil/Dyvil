@@ -10,7 +10,7 @@ import dyvil.reflect.EnumReflection;
 import dyvil.util.None;
 import dyvil.util.Option;
 import dyvil.util.Some;
-import dyvilx.lang.model.type.Type;
+import dyvil.reflect.types.Type;
 
 import java.io.IOException;
 import java.util.Iterator;

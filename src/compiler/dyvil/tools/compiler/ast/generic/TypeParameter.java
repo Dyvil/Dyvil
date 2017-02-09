@@ -392,7 +392,7 @@ public abstract class TypeParameter implements ITypeParameter
 	{
 		if (this.reifiedKind == Reified.Type.TYPE)
 		{
-			buffer.append("Ldyvilx/lang/model/type/Type;");
+			buffer.append("Ldyvil/reflect/types/Type;");
 		}
 		else if (this.reifiedKind != null) // OBJECT_CLASS or ANY_CLASS
 		{

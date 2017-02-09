@@ -62,6 +62,7 @@ type Double = java.lang.Double
 type Configure<T> = T.() -> void
 type Optional<T>  = T?
 type BytecodeName = dyvil.annotation.`internal`.DyvilName
+type Type<T>      = dyvil.reflect.types.Type<T>
 
 // ---------------------------------------- Operator Definitions ----------------------------------------
 

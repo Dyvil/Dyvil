@@ -9,7 +9,7 @@ import dyvil.collection.MutableMap;
 import dyvil.collection.impl.AbstractEnumMap;
 import dyvil.lang.LiteralConvertible;
 import dyvil.reflect.Modifiers;
-import dyvilx.lang.model.type.Type;
+import dyvil.reflect.types.Type;
 
 import java.util.Arrays;
 import java.util.Objects;

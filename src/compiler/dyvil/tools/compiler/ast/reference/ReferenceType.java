@@ -310,8 +310,8 @@ public class ReferenceType implements IObjectType
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.type.writeTypeExpression(writer);
-		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/ReferenceType", "apply",
-		                       "(Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/ReferenceType;", false);
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/ReferenceType", "apply",
+		                       "(Ldyvil/reflect/types/Type;)Ldyvil/reflect/types/ReferenceType;", false);
 	}
 
 	@Override

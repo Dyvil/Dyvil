@@ -60,8 +60,8 @@ public class NullType implements IBuiltinType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvilx/lang/model/type/NullType", "instance",
-		                      "Ldyvilx/lang/model/type/NullType;");
+		writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/types/NullType", "instance",
+		                      "Ldyvil/reflect/types/NullType;");
 	}
 
 	@Override

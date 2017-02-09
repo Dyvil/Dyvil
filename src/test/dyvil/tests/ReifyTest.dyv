@@ -1,7 +1,6 @@
 package dyvil.tests
 
 using dyvil.Test
-import dyvilx.lang.model.`type`.Type
 import const dyvil.annotation.Reified.Type._
 
 public class ReifyTest

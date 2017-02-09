@@ -9,7 +9,7 @@ import dyvil.lang.LiteralConvertible;
 import dyvil.reflect.EnumReflection;
 import dyvil.reflect.Modifiers;
 import dyvil.util.ImmutableException;
-import dyvilx.lang.model.type.Type;
+import dyvil.reflect.types.Type;
 
 import java.util.Collections;
 import java.util.Objects;

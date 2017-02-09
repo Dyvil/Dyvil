@@ -143,8 +143,8 @@ public class ClassType implements IRawType
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		writer.visitLdcInsn(Type.getObjectType(this.theClass.getInternalName()));
-		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/Type", "apply",
-		                       "(Ljava/lang/Class;)Ldyvilx/lang/model/type/Type;", true);
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/Type", "apply",
+		                       "(Ljava/lang/Class;)Ldyvil/reflect/types/Type;", true);
 	}
 
 	@Override

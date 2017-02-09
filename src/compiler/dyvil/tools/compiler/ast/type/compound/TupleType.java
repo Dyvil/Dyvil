@@ -411,7 +411,7 @@ public final class TupleType implements IObjectType, ITypeList
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		writer.visitLdcInsn(this.typeCount);
-		writer.visitTypeInsn(Opcodes.ANEWARRAY, "dyvilx/lang/model/type/Type");
+		writer.visitTypeInsn(Opcodes.ANEWARRAY, "dyvil/reflect/types/Type");
 		for (int i = 0; i < this.typeCount; i++)
 		{
 			writer.visitInsn(Opcodes.DUP);
@@ -420,8 +420,8 @@ public final class TupleType implements IObjectType, ITypeList
 			writer.visitInsn(Opcodes.AASTORE);
 		}
 
-		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/TupleType", "apply",
-		                       "([Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/TupleType;", false);
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/TupleType", "apply",
+		                       "([Ldyvil/reflect/types/Type;)Ldyvil/reflect/types/TupleType;", false);
 	}
 
 	@Override

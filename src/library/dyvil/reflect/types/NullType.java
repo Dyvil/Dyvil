@@ -1,14 +1,16 @@
-package dyvilx.lang.model.type;
+package dyvil.reflect.types;
 
 import dyvil.annotation.internal.DyvilModifiers;
+import dyvil.lang.LiteralConvertible;
 import dyvil.reflect.Modifiers;
 
+@LiteralConvertible.FromNil
 @DyvilModifiers(Modifiers.OBJECT_CLASS)
-public class AnyType implements Type<Object>
+public class NullType implements Type<Object>
 {
-	public static final AnyType instance = new AnyType();
+	public static final NullType instance = new NullType();
 	
-	public static AnyType apply()
+	public static NullType apply()
 	{
 		return instance;
 	}
@@ -22,24 +24,24 @@ public class AnyType implements Type<Object>
 	@Override
 	public String name()
 	{
-		return "any";
+		return "null";
 	}
 	
 	@Override
 	public String toString()
 	{
-		return "any";
+		return "null";
 	}
 	
 	@Override
 	public String qualifiedName()
 	{
-		return "dyvil/lang/Any";
+		return "dyvil/lang/internal/Null";
 	}
 	
 	@Override
 	public void appendSignature(StringBuilder builder)
 	{
-		builder.append("Ljava/lang/Object;");
+		builder.append("Ldyvil/lang/internal/Null;");
 	}
 }

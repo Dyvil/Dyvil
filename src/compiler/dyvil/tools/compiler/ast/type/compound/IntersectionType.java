@@ -319,8 +319,8 @@ public class IntersectionType implements IObjectType
 		writer.visitLdcInsn(Type.getObjectType(this.getTheClass().getInternalName()));
 		this.left.writeTypeExpression(writer);
 		this.right.writeTypeExpression(writer);
-		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/IntersectionType", "apply",
-		                       "(Ljava/lang/Class;Ldyvilx/lang/model/type/Type;Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/IntersectionType;",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/IntersectionType", "apply",
+		                       "(Ljava/lang/Class;Ldyvil/reflect/types/Type;Ldyvil/reflect/types/Type;)Ldyvil/reflect/types/IntersectionType;",
 		                       false);
 	}
 

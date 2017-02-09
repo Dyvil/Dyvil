@@ -1,4 +1,4 @@
-package dyvilx.lang.model.type;
+package dyvil.reflect.types;
 
 public class UnionType<T> extends NamedType<T>
 {

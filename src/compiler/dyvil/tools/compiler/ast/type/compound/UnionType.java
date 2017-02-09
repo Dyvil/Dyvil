@@ -343,8 +343,8 @@ public class UnionType implements IObjectType
 		writer.visitLdcInsn(Type.getObjectType(this.getTheClass().getInternalName()));
 		this.left.writeTypeExpression(writer);
 		this.right.writeTypeExpression(writer);
-		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/UnionType", "apply",
-		                       "(Ljava/lang/Class;Ldyvilx/lang/model/type/Type;Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/UnionType;",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/UnionType", "apply",
+		                       "(Ljava/lang/Class;Ldyvil/reflect/types/Type;Ldyvil/reflect/types/Type;)Ldyvil/reflect/types/UnionType;",
 		                       false);
 	}
 

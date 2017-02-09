@@ -308,8 +308,8 @@ public class NullableType implements IObjectType
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.type.writeTypeExpression(writer);
-		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/OptionType", "apply",
-		                       "(Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/OptionType;", false);
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/OptionType", "apply",
+		                       "(Ldyvil/reflect/types/Type;)Ldyvil/reflect/types/OptionType;", false);
 	}
 
 	@Override

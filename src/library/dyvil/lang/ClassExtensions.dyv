@@ -1,6 +1,5 @@
 package dyvil.lang
 
-import dyvilx.LangModel
 import const dyvil.reflect.Opcodes._
 import const dyvil.annotation.Reified.Type._
 
@@ -32,7 +31,7 @@ public abstract class ClassExtensions
 
 		if (componentType.isPrimitive)
 		{
-			dyvilx.lang.model.`type`.PrimitiveType(componentType).appendSignature(builder)
+			dyvil.reflect.types.PrimitiveType(componentType).appendSignature(builder)
 		}
 		else if (componentType.isArray)
 		{

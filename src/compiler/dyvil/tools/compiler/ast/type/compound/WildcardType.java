@@ -405,8 +405,8 @@ public final class WildcardType implements IRawType, ITyped
 			writer.visitInsn(Opcodes.ACONST_NULL);
 		}
 
-		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/WildcardType", "apply",
-		                       "(Ldyvil/reflect/Variance;Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/WildcardType;",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/WildcardType", "apply",
+		                       "(Ldyvil/reflect/Variance;Ldyvil/reflect/types/Type;)Ldyvil/reflect/types/WildcardType;",
 		                       false);
 	}
 
