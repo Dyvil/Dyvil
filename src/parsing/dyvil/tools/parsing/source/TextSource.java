@@ -82,11 +82,15 @@ public class TextSource implements Source
 
 	private int lineEnd(int index)
 	{
-		char c = this.text.charAt(index - 1);
-		switch (c)
+		if (index <= 0)
+		{
+			return 0;
+		}
+
+		switch (this.text.charAt(index - 1))
 		{
 		case '\n':
-			if (this.text.charAt(index - 2) == '\r')
+			if (index > 1 && this.text.charAt(index - 2) == '\r')
 			{
 				return index - 2;
 			}

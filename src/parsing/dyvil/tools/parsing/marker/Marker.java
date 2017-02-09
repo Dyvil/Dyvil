@@ -159,8 +159,6 @@ public abstract class Marker implements Comparable<Marker>
 			}
 			this.appendLine(buf, source.getLine(endLine), 0, position.endColumn(), colors, colorString);
 		}
-
-		buf.append('\n');
 	}
 
 	private void appendLine(StringBuilder buf, String line, int startColumn, int endColumn,
