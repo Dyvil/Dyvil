@@ -1,0 +1,78 @@
+package dyvil.experimental
+
+public class EnumTest
+{
+	public enum Option<T>
+	{
+		case None
+		case Some(let value: T)
+	}
+
+	// becomes
+
+	public final class Option<T> extends Enum<Option<T>>
+	{
+		const None = Option(name: "None", id: 0)
+
+		case class Some<T>(let value: T) extends Option(name: "Some", id: 1)
+
+		// --- Boilerplate ---
+
+		const $VALUES: [final Option<_>] = [None] // only non-parametric values are the "enum constants"
+
+		static func values() -> [final Option<_>] = $VALUES
+
+		@BytecodeName("valueOf")
+		static func from(name: String) -> Option<_> = Enum.valueOf(class<Option>, name)
+
+		@BytecodeName("fromID")
+		static func from(id: int) -> Option<_>
+
+		// --- Constructor ---
+
+		public init(name: String, id: int)
+		{
+			super.init(name, id)
+		}
+	}
+
+	public enum MyEnum(var value: int)
+	{
+		case Foo
+		case Bar
+		case Baz
+	}
+
+	// becomes
+
+	public enum MyEnum
+	{
+		case Foo
+		case Bar
+		case Baz
+
+		var value: int
+
+		private init(value: int)
+		{
+			this.value = value
+		}
+	}
+
+	// becomes
+
+	public class MyEnum extends ...
+	{
+		case ...
+
+		// ... Boilerplate
+
+		var value: int
+
+		private init(name: String, id: int, value: int)
+		{
+			super.init(name, id)
+			this.value = value
+		}
+	}
+}
