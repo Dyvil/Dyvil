@@ -58,9 +58,10 @@ public class ResolvedGenericType extends ClassGenericType
 
 			if (type.isResolved() && !typeVariable.isSuperTypeOf(type))
 			{
-				final Marker marker = Markers.semantic(type.getPosition(), "type.generic.incompatible",
-				                                       typeVariable.getName().qualified, this.theClass.getFullName());
-				marker.addInfo(Markers.getSemantic("type.generic", type));
+				final Marker marker = Markers.semanticError(type.getPosition(), "type.generic.incompatible",
+				                                            typeVariable.getName().qualified,
+				                                            this.theClass.getFullName());
+				marker.addInfo(Markers.getSemantic("type.generic.argument", type));
 				marker.addInfo(Markers.getSemantic("type_parameter.declaration", typeVariable));
 				markers.add(marker);
 			}

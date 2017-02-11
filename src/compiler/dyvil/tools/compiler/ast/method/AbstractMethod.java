@@ -772,7 +772,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			{
 				final Marker marker = Markers.semanticError(position, "method.typevar.incompatible", this.name,
 				                                            typeParameter.getName());
-				marker.addInfo(Markers.getSemantic("type.generic", typeArgument));
+				marker.addInfo(Markers.getSemantic("type.generic.argument", typeArgument));
 				marker.addInfo(Markers.getSemantic("type_parameter.declaration", typeParameter));
 				markers.add(marker);
 			}

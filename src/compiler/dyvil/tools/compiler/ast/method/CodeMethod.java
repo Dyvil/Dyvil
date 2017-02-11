@@ -222,7 +222,7 @@ public class CodeMethod extends AbstractMethod
 			final TypeChecker.MarkerSupplier markerSupplier = TypeChecker.markerSupplier("method.type.incompatible",
 			                                                                             "method.type", "value.type",
 			                                                                             this.name);
-			this.value = TypeChecker.convertValue(this.value, this.type, this.type, markers, context, markerSupplier);
+			this.value = TypeChecker.convertValue(this.value, this.type, null, markers, context, markerSupplier);
 
 			if (inferType)
 			{
