@@ -1,13 +1,10 @@
 package dyvil.tools.dpf.ast.value
 
-import dyvil.collection.Entry
-import dyvil.collection.Map
 import dyvil.collection.mutable.ArrayMap
 import dyvil.tools.dpf.ast.Expandable
 import dyvil.tools.dpf.converter.DPFValueVisitor
 import dyvil.tools.dpf.visitor.MapVisitor
 import dyvil.tools.dpf.visitor.ValueVisitor
-import dyvil.tuple.Tuple2
 
 import java.util.function.BiFunction
 

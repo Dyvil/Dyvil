@@ -107,8 +107,8 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	// Class Types
 	int CLASS    = 16;
-	int NAMED    = 17;
-	int INTERNAL = 18;
+	int NAMED    = 17; // no deserialization
+	int INTERNAL = 18; // no deserialization
 	int PACKAGE  = 19;
 
 	// Generic Types
@@ -280,7 +280,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	int SUBTYPE_TYPEVAR            = 3;
 	int SUBTYPE_COVARIANT_TYPEVAR  = 4;
 	int SUBTYPE_UNION_INTERSECTION = 5;
-	int SUBTYPE_NULL               = 6;
+	int SUBTYPE_NONE               = 6;
 
 	default int subTypeCheckLevel()
 	{

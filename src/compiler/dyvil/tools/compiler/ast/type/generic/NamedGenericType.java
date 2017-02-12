@@ -59,14 +59,6 @@ public class NamedGenericType extends GenericType implements IUnresolvedType
 		return this.name;
 	}
 
-	private void resolveTypeArguments(MarkerList markers, IContext context)
-	{
-		for (int i = 0; i < this.typeArgumentCount; i++)
-		{
-			this.typeArguments[i] = this.typeArguments[i].resolveType(markers, context);
-		}
-	}
-
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{

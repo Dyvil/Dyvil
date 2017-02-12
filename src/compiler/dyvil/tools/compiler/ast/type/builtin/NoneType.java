@@ -43,7 +43,7 @@ public class NoneType implements IBuiltinType
 	@Override
 	public int subTypeCheckLevel()
 	{
-		return SUBTYPE_NULL;
+		return SUBTYPE_NONE;
 	}
 
 	@Override

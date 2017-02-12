@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.type.generic;
 
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -14,6 +15,7 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
 import java.io.DataInput;
@@ -81,9 +83,10 @@ public class ClassGenericType extends GenericType
 	}
 
 	@Override
-	public boolean isSuperTypeOf(IType type)
+	public boolean isSuperTypeOf(IType subType)
 	{
-		return this == type || super.isSuperTypeOf(type) && (!type.isGenericType() || this.argumentsMatch(type));
+		return this == subType || super.isSuperTypeOf(subType) && (!subType.isGenericType() || this.argumentsMatch(
+			subType));
 	}
 
 	protected boolean argumentsMatch(IType type)
@@ -138,6 +141,13 @@ public class ClassGenericType extends GenericType
 	public boolean isResolved()
 	{
 		return true;
+	}
+
+	@Override
+	public IType resolveType(MarkerList markers, IContext context)
+	{
+		this.resolveTypeArguments(markers, context);
+		return this;
 	}
 
 	@Override

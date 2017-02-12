@@ -1,22 +1,20 @@
 package dyvil.tools.dpf.ast
 
-import dyvil.collection.Collection
-import dyvil.collection.Map
-import dyvil.tuple.Tuple2
+type Mappings = Map<String, Object>
 
 public interface Expandable
 {
-	Object expand(Map<String, Object> mappings, boolean mutate)
+	func expand(mappings: Mappings, mutate: boolean) -> Object
 
-	infix func expand(Object! obj, Map<String, Object> mappings, boolean mutate) -> Object = obj match
+	infix func expand(obj: Object!, mappings: Mappings, mutate: boolean) -> Object = obj match
 	{
-		case Expandable    exp => exp.expand(mappings, mutate)
-		case Collection<_> col => expand(collection: col, mappings: mappings, mutate: mutate)
-		case Map<_, _>     map => expand(map: map, mappings: mappings, mutate: mutate)
+		case var exp: Expandable    => exp.expand(mappings, mutate)
+		case var col: Collection<_> => col.expand(mappings, mutate)
+		case var map: Map<_, _>     => map.expand(mappings, mutate)
 		case _ => obj
 	}
 
-	infix func expand(Collection<_> collection, Map<String, Object> mappings, boolean mutate) -> Collection<_>
+	infix func expand(collection: Collection<_>, mappings: Mappings, mutate: boolean) -> Collection<_>
 	{
 		if (!mutate || collection.isImmutable())
 		{
@@ -26,13 +24,13 @@ public interface Expandable
 		return collection
 	}
 
-	infix func expand(Map<_, _> map, Map<String, Object> mappings, boolean mutate) -> Map<_, _>
+	infix func expand(map: Map<_, _>, mappings: Mappings, mutate: boolean) -> Map<_, _>
 	{
 		if (!mutate || map.isImmutable())
 		{
-			return map.entryMapped((k, v) => (expand(k, mappings, mutate), expand(v, mappings, mutate)))
+			return map.entryMapped((k, v) => (k.expand(mappings, mutate), v.expand(mappings, mutate)))
 		}
-		map.mapEntries((k, v) => (expand(k, mappings, true), expand(v, mappings, true)))
+		map.mapEntries((k, v) => (k.expand(mappings, true), v.expand(mappings, true)))
 		return map
 	}
 }

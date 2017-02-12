@@ -146,10 +146,12 @@ public abstract class GenericType implements IObjectType, ITypeList
 		return changed ? newTypes : types;
 	}
 
-	@Override
-	public IType resolveType(MarkerList markers, IContext context)
+	protected void resolveTypeArguments(MarkerList markers, IContext context)
 	{
-		return this;
+		for (int i = 0; i < this.typeArgumentCount; i++)
+		{
+			this.typeArguments[i] = this.typeArguments[i].resolveType(markers, context);
+		}
 	}
 
 	@Override
