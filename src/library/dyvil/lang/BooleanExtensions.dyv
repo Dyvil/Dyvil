@@ -8,30 +8,37 @@ public abstract class BooleanExtensions
 
 	// Boolean Operators
 
-	@Intrinsic([ LOAD_0, BNOT ])
-	public prefix func !(boolean v): boolean = !v
+	@Intrinsic([], compilerCode: Intrinsic.BOOLEAN_NOT)
+	prefix func !(boolean v) -> boolean = !v
 
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
-	public infix func ==(boolean lhs, boolean rhs): boolean = lhs == rhs
+	infix func ==(boolean lhs, boolean rhs) -> boolean = lhs == rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPNE ])
-	public infix func !=(boolean lhs, boolean rhs): boolean = lhs != rhs
+	infix func !=(boolean lhs, boolean rhs) -> boolean = lhs != rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, IAND ])
-	public infix func &(boolean lhs, boolean rhs): boolean = lhs && rhs
+	infix func &(boolean lhs, boolean rhs) -> boolean = lhs & rhs
+
+	@Intrinsic([], compilerCode: Intrinsic.BOOLEAN_AND)
+	infix func &&(lhs: boolean, rhs: boolean) -> boolean = lhs && rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, IOR ])
-	public infix func |(boolean lhs, boolean rhs): boolean = lhs || rhs
+	infix func |(boolean lhs, boolean rhs) -> boolean = lhs | rhs
 
-	@Intrinsic([ LOAD_0, LOAD_1, IXOR ])
-	public infix func ^(boolean lhs, boolean rhs): boolean = lhs ^ rhs
+	@Intrinsic([], compilerCode: Intrinsic.BOOLEAN_OR)
+	infix func ||(lhs: boolean, rhs: boolean) -> boolean = lhs || rhs
+
+	@Deprecated(replacements: [ "boolean.!=(boolean) -> boolean" ])
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
+	infix func ^(boolean lhs, boolean rhs) -> boolean = lhs != rhs
 
 	@Intrinsic([ LOAD_0, BNOT, LOAD_1, IOR ])
-	public infix func ==>(boolean lhs, boolean rhs): boolean = !lhs || rhs
+	infix func ==>(boolean lhs, boolean rhs) -> boolean = !lhs || rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, BNOT, IOR ])
-	public infix func <==(boolean lhs, boolean rhs): boolean = lhs || !rhs
+	infix func <==(boolean lhs, boolean rhs) -> boolean = lhs || !rhs
 
 	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
-	public infix func <=>(boolean lhs, boolean rhs): boolean = lhs == rhs
+	infix func <=>(boolean lhs, boolean rhs) -> boolean = lhs == rhs
 }

@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.operator;
 
-import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -31,27 +30,11 @@ public class InfixCall extends MethodCall
 	@Override
 	public IValue resolveCall(MarkerList markers, IContext context, boolean report)
 	{
-		IValue op = Operators.getInfix_Priority(this.receiver, this.name, this.arguments.getFirstValue());
-		if (op != null)
-		{
-			// Intrinsic Infix Operators (namely ==, ===, != and !== for null)
-			op.setPosition(this.position);
-			return op.resolveOperator(markers, context);
-		}
-
 		// Normal Method Resolution
-		final MatchList<IMethod> ambiguousCandidates = this.resolveMethodCall(markers, context);
-		if (ambiguousCandidates == null)
+		final MatchList<IMethod> candidates = this.resolveCandidates(context);
+		if (candidates.hasCandidate())
 		{
-			return this;
-		}
-
-		// Infix Operators
-		op = Operators.getInfix(this.receiver, this.name, this.arguments.getFirstValue());
-		if (op != null)
-		{
-			op.setPosition(this.position);
-			return op.resolveOperator(markers, context);
+			return this.checkArguments(markers, context, candidates.getBestMember());
 		}
 
 		// Compound Operators
@@ -68,7 +51,7 @@ public class InfixCall extends MethodCall
 		// No Implicit or Apply Resolution
 		if (report)
 		{
-			this.reportResolve(markers, ambiguousCandidates);
+			this.reportResolve(markers, candidates);
 			return this;
 		}
 		return null;
@@ -113,19 +96,7 @@ public class InfixCall extends MethodCall
 			return null;
 		}
 
-		// Left-hand operand must be a field access and inc-convertible
-		if (lhs.valueTag() != IValue.FIELD_ACCESS || !IncOperator.isIncConvertible(lhs.getType()))
-		{
-			return null;
-		}
-
-		final FieldAccess fieldAccess = (FieldAccess) lhs;
-		int intValue = rhs.intValue();
-		if (name == Names.minus)
-		{
-			intValue = -intValue;
-		}
-		return new IncOperator(fieldAccess.getReceiver(), fieldAccess.getField(), intValue, true);
+		return IncOperator.apply(lhs, rhs.intValue(), true);
 	}
 
 	@Override

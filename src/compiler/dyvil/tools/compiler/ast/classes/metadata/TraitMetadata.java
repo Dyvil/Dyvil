@@ -37,13 +37,12 @@ public class TraitMetadata extends InterfaceMetadata
 	@Override
 	protected void processField(IField field, MarkerList markers)
 	{
-		this.processMember(field, markers);
-
 		if (!field.hasModifier(Modifiers.STATIC) || !field.hasModifier(Modifiers.FINAL))
 		{
-			field.getModifiers().addIntModifier(Modifiers.STATIC | Modifiers.FINAL);
-			markers.add(Markers.semanticWarning(field.getPosition(), "trait.field.warning", field.getName()));
+			markers.add(Markers.semantic(field.getPosition(), "trait.field.warning", field.getName()));
 		}
+
+		super.processField(field, markers);
 	}
 
 	@Override

@@ -30,7 +30,7 @@ public class StringInterpolation extends DPFValueVisitor implements Value, Strin
 	public init([String] stringParts, [Object] values)
 	{
 		this.strings = new ArrayList(stringParts)
-		this.values = new ArrayList<Value>(values.length)
+		this.values = new ArrayList<Value>(values.size)
 
 		for (Object o <- values)
 		{

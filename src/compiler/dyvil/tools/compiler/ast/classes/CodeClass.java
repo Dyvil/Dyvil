@@ -130,6 +130,7 @@ public class CodeClass extends AbstractClass
 		{
 			this.annotations.resolveTypes(markers, context, this);
 		}
+		this.modifiers.resolveTypes(this, markers);
 
 		this.metadata.resolveTypesPre(markers, context);
 
@@ -252,7 +253,6 @@ public class CodeClass extends AbstractClass
 		{
 			this.annotations.check(markers, context, this.getElementType());
 		}
-		this.modifiers.check(this, markers);
 
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
@@ -454,7 +454,7 @@ public class CodeClass extends AbstractClass
 		}
 		if (this.enclosingClass != null)
 		{
-			return this.enclosingClass.getFullName() + '$' + this.name;
+			return this.enclosingClass.getFullName() + '.' + this.name;
 		}
 		return this.fullName = this.unit.getFullName(this.name);
 	}
@@ -487,12 +487,14 @@ public class CodeClass extends AbstractClass
 			superClass = this.superType.getInternalName();
 		}
 
-		int modifiers = this.modifiers.toFlags();
+		final long flags = ModifierUtil.getFlags(this);
+		int modifiers = ModifierUtil.getJavaModifiers(flags);
+
 		if ((modifiers & Modifiers.INTERFACE_CLASS) != Modifiers.INTERFACE_CLASS)
 		{
 			modifiers |= ASMConstants.ACC_SUPER;
 		}
-		writer.visit(ClassFormat.CLASS_VERSION, modifiers & 0x7631, this.getInternalName(), signature, superClass,
+		writer.visit(ClassFormat.CLASS_VERSION, modifiers, this.getInternalName(), signature, superClass,
 		             interfaces);
 
 		// Source
@@ -508,7 +510,7 @@ public class CodeClass extends AbstractClass
 
 		// Annotations
 
-		this.writeAnnotations(writer, modifiers);
+		this.writeAnnotations(writer, flags);
 
 		// Super Types
 
@@ -755,15 +757,15 @@ public class CodeClass extends AbstractClass
 		}
 	}
 
-	private void writeAnnotations(ClassWriter writer, int modifiers)
+	private void writeAnnotations(ClassWriter writer, long flags)
 	{
-		ModifierUtil.writeModifiers(writer, this.modifiers);
+		ModifierUtil.writeModifiers(writer, this, flags);
 
-		if ((modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
+		if (this.hasModifier(Modifiers.DEPRECATED) && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{
 			writer.visitAnnotation(Deprecation.DYVIL_EXTENDED, true).visitEnd();
 		}
-		if ((modifiers & Modifiers.FUNCTIONAL) != 0)
+		if (this.hasModifier(Modifiers.FUNCTIONAL))
 		{
 			writer.visitAnnotation("Ljava/lang/FunctionalInterface;", true).visitEnd();
 		}

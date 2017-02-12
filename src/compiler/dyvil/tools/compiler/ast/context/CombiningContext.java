@@ -23,10 +23,10 @@ public class CombiningContext implements IContext
 	private final IContext inner;
 	private final IContext outer;
 
-	public CombiningContext(IContext context1, IContext context2)
+	public CombiningContext(IContext inner, IContext outer)
 	{
-		this.inner = context1;
-		this.outer = context2;
+		this.inner = inner;
+		this.outer = outer;
 	}
 
 	@Override
@@ -115,7 +115,11 @@ public class CombiningContext implements IContext
 		final IOperator inner = this.inner.resolveOperator(name, type);
 		if (inner == null || inner.getType() != type)
 		{
-			return this.outer.resolveOperator(name, type);
+			final IOperator outer = this.outer.resolveOperator(name, type);
+			if (outer != null && outer.getType() == type)
+			{
+				return outer;
+			}
 		}
 
 		return inner;

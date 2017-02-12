@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.type.alias;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.external.ExternalTypeParameter;
@@ -194,7 +195,6 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 		{
 			return;
 		}
-		this.resolved = true;
 
 		final MarkerList markers = this.enclosingHeader instanceof ISourceHeader ?
 			                           ((ISourceHeader) this.enclosingHeader).getMarkers() :
@@ -213,6 +213,7 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 			markers.add(Markers.semanticError(this.position, "typealias.invalid"));
 		}
 
+		this.resolved = true;
 		this.type = this.type.resolveType(markers, context);
 
 		for (int i = 0; i < this.typeVariableCount; i++)
@@ -328,7 +329,7 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String prefix, @NonNull StringBuilder buffer)
 	{
 		buffer.append("type ").append(this.name);
 

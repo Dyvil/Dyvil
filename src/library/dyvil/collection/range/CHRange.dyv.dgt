@@ -1,0 +1,108 @@
+#if IS_HALF_OPEN
+package dyvil.collection.range.halfopen
+#else
+package dyvil.collection.range.closed
+#end
+
+#if IS_HALF_OPEN
+	#define LESS_OP <
+	#define RANGE_OP ..<
+#else
+	#define LESS_OP <=
+	#define RANGE_OP ..
+#end
+
+import java.util.Iterator
+import java.util.NoSuchElementException
+import java.util.function.Consumer
+
+type Base = dyvil.collection.range.specialized.TYPE_NAME##Range
+
+public class TYPE_NAME##Range(
+	package private let start: PRIMITIVE
+	package private let end:   PRIMITIVE
+) implements Base
+{
+	override func isHalfOpen() -> boolean = IS_HALF_OPEN
+
+#if IS_HALF_OPEN
+	override func asHalfOpen() -> Base = this
+
+	override func asClosed() -> Base = new dyvil.collection.range.closed.TYPE_NAME##Range(this.start, this.end)
+#else
+	override func asHalfOpen() -> Base = new dyvil.collection.range.halfopen.TYPE_NAME##Range(this.start, this.end)
+
+	override func asClosed() -> Base = this
+#end
+
+	override func first() -> PRIMITIVE = this.start
+
+#if IS_HALF_OPEN
+	override func last() -> PRIMITIVE = this.end - 1
+#else
+	override func last() -> PRIMITIVE = this.end
+#end
+
+#if IS_HALF_OPEN
+	override func size() -> int = (this.end - this.start) as int
+#else
+	override func size() -> int = (this.end - this.start + 1) as int
+#end
+
+	override func iterator() -> Iterator<PRIMITIVE> = new Iterator<PRIMITIVE>() {
+		var value = this<TYPE_NAME##Range>.start
+
+		override func hasNext() -> boolean = this.value LESS_OP this<TYPE_NAME##Range>.end
+
+		override func next() -> PRIMITIVE
+		{
+			let value = this.value
+			if (value LESS_OP this<TYPE_NAME##Range>.end)
+			{
+				this.value++
+				return value
+			}
+
+			throw new NoSuchElementException
+		}
+	}
+
+	override func forEach(action: Consumer<-PRIMITIVE>)
+	{
+		for (i <- this.start RANGE_OP this.end)
+		{
+			action.accept(i)
+		}
+	}
+
+	override func contains(value: PRIMITIVE) -> boolean = value >= this.start && value LESS_OP this.end
+
+	override func to##TYPE_NAME##Array() -> [PRIMITIVE]
+	{
+		let result = new [PRIMITIVE](this.size)
+
+		var index = 0
+		for (i <- this.start RANGE_OP this.end)
+		{
+			result[index++] = i
+		}
+
+		return result
+	}
+
+	override func toArray(index: int, store: [Object!]) -> void
+	{
+		for (i <- this.start RANGE_OP this.end)
+		{
+			store[index++] = i
+		}
+	}
+
+	override func copy() -> TYPE_NAME##Range = new TYPE_NAME##Range(this.start, this.end)
+
+	override func toString() -> String = this.start + " RANGE_OP " + this.end
+
+	override func equals(obj: Object!) -> boolean = Range.rangeEquals(this, obj)
+
+	override func hashCode() -> int = Range.rangeHashCode(this)
+}

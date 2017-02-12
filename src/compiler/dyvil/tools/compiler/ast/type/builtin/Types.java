@@ -6,8 +6,8 @@ import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
+import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.dynamic.DynamicType;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
@@ -46,7 +46,6 @@ public final class Types
 	public static final PrimitiveType DOUBLE  = new PrimitiveType(Names._double, PrimitiveType.DOUBLE_CODE, 'D',
 	                                                              Opcodes.DLOAD, Opcodes.DALOAD, ClassFormat.DOUBLE);
 
-	public static final DynamicType DYNAMIC = new DynamicType();
 	public static final UnknownType UNKNOWN = new UnknownType();
 	public static final NullType    NULL    = new NullType();
 	public static final AnyType     ANY     = new AnyType();
@@ -94,7 +93,7 @@ public final class Types
 	public static void initHeaders()
 	{
 		LANG_HEADER = Package.dyvil.resolveHeader("Lang");
-		BASE_CONTEXT = LANG_HEADER.getContext();
+		BASE_CONTEXT = new CombiningContext(LANG_HEADER.getContext(), Package.rootPackage);
 	}
 
 	public static void initTypes()
@@ -331,57 +330,22 @@ public final class Types
 
 	public static IType resolvePrimitive(Name name)
 	{
-		if (name == Names._void)
+		switch (name.qualified)
 		{
-			return VOID;
-		}
-		if (name == Names._boolean)
-		{
-			return BOOLEAN;
-		}
-		if (name == Names._byte)
-		{
-			return BYTE;
-		}
-		if (name == Names._short)
-		{
-			return SHORT;
-		}
-		if (name == Names._char)
-		{
-			return CHAR;
-		}
-		if (name == Names._int)
-		{
-			return INT;
-		}
-		if (name == Names._long)
-		{
-			return LONG;
-		}
-		if (name == Names._float)
-		{
-			return FLOAT;
-		}
-		if (name == Names._double)
-		{
-			return DOUBLE;
-		}
-		if (name == Names.any)
-		{
-			return ANY;
-		}
-		if (name == Names.none)
-		{
-			return NONE;
-		}
-		if (name == Names.dynamic)
-		{
-			return DYNAMIC;
-		}
-		if (name == Names.auto)
-		{
-			return UNKNOWN;
+		// @formatter:off
+		case "void": return VOID;
+		case "boolean": return BOOLEAN;
+		case "byte": return BYTE;
+		case "short": return SHORT;
+		case "char": return CHAR;
+		case "int": return INT;
+		case "long": return LONG;
+		case "float": return FLOAT;
+		case "double": return DOUBLE;
+		case "any": return ANY;
+		case "none": return NONE;
+		case "auto": return UNKNOWN;
+		// @formatter:on
 		}
 		return null;
 	}

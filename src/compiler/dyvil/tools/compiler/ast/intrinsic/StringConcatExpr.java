@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.intrinsic;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.constant.StringValue;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -18,23 +19,48 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class StringConcatExpr implements IValue
 {
-	private IValue[] values = new IValue[3];
-	private int valueCount;
+	private IValue @NonNull [] values; // length >= 2
+	private int                valueCount;
 
 	public StringConcatExpr()
 	{
+		this.values = new IValue[4];
+	}
+
+	public StringConcatExpr(@NonNull IValue lhs, @NonNull IValue rhs)
+	{
+		this.values = new IValue[] { lhs, rhs };
+		this.valueCount = 2;
+	}
+
+	@NonNull
+	public static IValue apply(IValue lhs, IValue rhs)
+	{
+		if (lhs.valueTag() == STRING_CONCAT)
+		{
+			((StringConcatExpr) lhs).addValue(rhs);
+			return lhs;
+		}
+		if (rhs.valueTag() == STRING_CONCAT)
+		{
+			((StringConcatExpr) rhs).addFirstValue(lhs);
+			return rhs;
+		}
+		return new StringConcatExpr(lhs, rhs);
 	}
 
 	@Override
 	public int valueTag()
 	{
-		return STRINGBUILDER;
+		return STRING_CONCAT;
 	}
 
 	@Override
 	public ICodePosition getPosition()
 	{
-		return this.values[0].getPosition();
+		final ICodePosition firstPos = this.values[0].getPosition();
+		final ICodePosition lastPos = this.values[this.valueCount - 1].getPosition();
+		return firstPos.to(lastPos);
 	}
 
 	@Override
@@ -47,7 +73,7 @@ public class StringConcatExpr implements IValue
 		final int index = this.valueCount++;
 		if (index >= this.values.length)
 		{
-			final IValue[] temp = new IValue[index + 1];
+			final IValue[] temp = new IValue[index << 1];
 			System.arraycopy(this.values, 0, temp, 1, index);
 			temp[0] = value;
 			this.values = temp;
@@ -63,7 +89,7 @@ public class StringConcatExpr implements IValue
 		final int index = this.valueCount++;
 		if (index >= this.values.length)
 		{
-			final IValue[] temp = new IValue[index + 1];
+			final IValue[] temp = new IValue[index << 1];
 			System.arraycopy(this.values, 0, temp, 0, index);
 			this.values = temp;
 		}

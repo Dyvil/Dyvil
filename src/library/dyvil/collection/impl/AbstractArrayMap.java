@@ -136,19 +136,19 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		}
 	}
 
-	public AbstractArrayMap(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public AbstractArrayMap(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		this();
 		this.loadEntries(iterable);
 	}
 
-	public AbstractArrayMap(@NonNull SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public AbstractArrayMap(@NonNull SizedIterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		this(iterable.size());
 		this.loadEntries(iterable);
 	}
 
-	public AbstractArrayMap(@NonNull Set<? extends Entry<? extends K, ? extends V>> set)
+	public AbstractArrayMap(@NonNull Set<? extends @NonNull Entry<? extends K, ? extends V>> set)
 	{
 		this(set.size());
 		this.loadDistinctEntries(set);
@@ -167,7 +167,7 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		this.values = map.values.clone();
 	}
 
-	private void loadEntries(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	private void loadEntries(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		for (Entry<? extends K, ? extends V> entry : iterable)
 		{
@@ -175,7 +175,7 @@ public abstract class AbstractArrayMap<K, V> implements Map<K, V>
 		}
 	}
 
-	private void loadDistinctEntries(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	private void loadDistinctEntries(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		int index = 0;
 		for (Entry<? extends K, ? extends V> entry : iterable)

@@ -41,10 +41,7 @@ public class Package implements INamed, IDefaultContext, IClassConsumer
 	public static Package dyvilRefSimple;
 	public static Package dyvilTuple;
 	public static Package dyvilUtil;
-	public static Package dyvilx;
-	public static Package dyvilxLang;
-	public static Package dyvilxLangModel;
-	public static Package dyvilxLangModelType;
+	public static Package dyvilReflectTypes;
 	public static Package java;
 	public static Package javaIO;
 	public static Package javaLang;
@@ -108,10 +105,7 @@ public class Package implements INamed, IDefaultContext, IClassConsumer
 		dyvilTuple = dyvil.resolvePackage("tuple");
 		dyvilUtil = dyvil.resolvePackage("util");
 
-		dyvilx = rootPackage.resolvePackage("dyvilx");
-		dyvilxLang = dyvilx.resolvePackage("lang");
-		dyvilxLangModel = dyvilxLang.resolvePackage("model");
-		dyvilxLangModelType = dyvilxLangModel.resolvePackage("type");
+		dyvilReflectTypes = dyvil.resolvePackage("reflect").resolvePackage("types");
 
 		java = rootPackage.resolvePackage("java");
 		javaIO = java.resolvePackage("io");

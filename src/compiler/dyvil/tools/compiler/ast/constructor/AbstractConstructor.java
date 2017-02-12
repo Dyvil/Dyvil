@@ -300,7 +300,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 			{
 				final Marker marker = Markers.semanticError(position, "constructor.typevar.incompatible",
 				                                            theClass.getName(), typeParameter.getName());
-				marker.addInfo(Markers.getSemantic("type.generic", typeArgument));
+				marker.addInfo(Markers.getSemantic("type.generic.argument", typeArgument));
 				marker.addInfo(Markers.getSemantic("type_parameter.declaration", typeParameter));
 				markers.add(marker);
 			}

@@ -12,10 +12,10 @@ public class AnnotationTest
 
 	@Inner(name: "inner")
 	@Outer(inner: @Inner(name: "Nested"))
-    public static func foo((@TypeAnnotation() [@TypeAnnotation String]) args): void
+    static func foo((@TypeAnnotation() [@TypeAnnotation String]) args) -> void
 	{
 	}
 
-	public static func apply(): Test = test "Annotations" {
+	static func apply() -> Test = test "Annotations" {
 	}
 }

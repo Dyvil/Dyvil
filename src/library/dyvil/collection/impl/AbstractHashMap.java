@@ -232,20 +232,20 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		this.putAllInternal(ObjectArray.asIterable(entries));
 	}
 
-	public AbstractHashMap(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public AbstractHashMap(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		this();
 		this.putAllInternal(iterable);
 	}
 
-	public AbstractHashMap(@NonNull SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public AbstractHashMap(@NonNull SizedIterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		this(iterable.size());
 		// Call the putAllInternal(Iterable) method to avoid redundant ensureCapacity call
-		this.putAllInternal((Iterable<? extends Entry<? extends K, ? extends V>>) iterable);
+		this.putAllInternal((Iterable<? extends @NonNull Entry<? extends K, ? extends V>>) iterable);
 	}
 
-	public AbstractHashMap(@NonNull Set<? extends Entry<? extends K, ? extends V>> set)
+	public AbstractHashMap(@NonNull Set<? extends @NonNull Entry<? extends K, ? extends V>> set)
 	{
 		this(set.size());
 		this.loadDistinct(set);
@@ -364,7 +364,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 
 	protected abstract void addEntry(int hash, K key, V value, int index);
 
-	private void putAllInternal(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	private void putAllInternal(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		for (Entry<? extends K, ? extends V> entry : iterable)
 		{
@@ -372,13 +372,13 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		}
 	}
 
-	protected void putAllInternal(@NonNull SizedIterable<? extends Entry<? extends K, ? extends V>> map)
+	protected void putAllInternal(@NonNull SizedIterable<? extends @NonNull Entry<? extends K, ? extends V>> map)
 	{
 		this.ensureCapacity(this.size + map.size());
-		this.putAllInternal((Iterable<? extends Entry<? extends K, ? extends V>>) map);
+		this.putAllInternal((Iterable<? extends @NonNull Entry<? extends K, ? extends V>>) map);
 	}
 
-	private void loadDistinct(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	private void loadDistinct(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		final HashEntry<K, V>[] entries = this.entries;
 		final int length = this.entries.length;

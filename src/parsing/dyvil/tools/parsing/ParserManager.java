@@ -72,7 +72,7 @@ public class ParserManager implements IParserManager
 		}
 
 		final int line = token.startLine();
-		final int startIndex = token.startIndex();
+		final int startIndex = token.startColumn();
 
 		final IToken prev = token.prev();
 		final IToken token1 = this.toToken(stringValue.substring(0, length), startIndex, line);

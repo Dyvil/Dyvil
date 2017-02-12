@@ -169,7 +169,7 @@ public interface JavaMaps
 	 */
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	static <K, V> void mapEntries(java.util.@NonNull Map<K, V> map,
-		                             @NonNull BiFunction<? super K, ? super V, ? extends Entry<? extends K, ? extends V>> mapper)
+		                             @NonNull BiFunction<? super K, ? super V, ? extends @NonNull Entry<? extends K, ? extends V>> mapper)
 	{
 		java.util.Map<K, V> temp = new LinkedHashMap<>(map.size() << 2);
 		for (java.util.Map.Entry<K, V> entry : map.entrySet())
@@ -190,7 +190,7 @@ public interface JavaMaps
 	 */
 	@DyvilModifiers(Modifiers.INFIX | Modifiers.INLINE)
 	static <K, V> void flatMap(java.util.@NonNull Map<K, V> map,
-		                          @NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends Entry<? extends K, ? extends V>>> mapper)
+		                          @NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>>> mapper)
 	{
 		java.util.Map<K, V> temp = new LinkedHashMap<>(map.size() << 2);
 		for (java.util.Map.Entry<K, V> entry : map.entrySet())

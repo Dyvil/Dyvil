@@ -4,12 +4,12 @@ using dyvil.Test
 
 public class CaptureTest
 {
-	public static func apply(): Test = test "Capture" {
+	static func apply() -> Test = test "Capture" {
 		lambdaCapture()
 		anonClassCapture()
 	}
 	
-	private static func lambdaCapture(): Test = test "Lambda" {
+	private static func lambdaCapture() -> Test = test "Lambda" {
 		var abc = -1
 		var fun = (int i) => (int j) => (int k) => (i, j, k, abc)
 		var res = fun 1 2 3
@@ -22,22 +22,22 @@ public class CaptureTest
 	class ThisCapture
 	{
 		public Object anonymous() = new Object {
-			public override func toString(): String = this<ThisCapture>.toString
+			override func toString() -> String = this<ThisCapture>.toString
 		}
 		
-		public func lambda(): -> ThisCapture = => this
+		public func lambda() -> -> ThisCapture = => this
 
-		public override func toString(): String = System.identityHashCode(this).toHexString
+		override func toString() -> String = System.identityHashCode(this).toHexString
 	}
 	
-	private static func lambdaThisCapture(): Test = test "This Capture" {
+	private static func lambdaThisCapture() -> Test = test "This Capture" {
 		let instance = new ThisCapture
 		let lambda = instance.lambda
 
 		lambda() =?= instance
 	}
 	
-	private static func anonClassCapture(): Test = test "Anonymous Classes" {
+	private static func anonClassCapture() -> Test = test "Anonymous Classes" {
 		var abc = 123
 		var obj = new Object {
 			public override String toString() = abc.toString
@@ -48,7 +48,7 @@ public class CaptureTest
 		anonClassThisCapture()
 	}
 	
-	private static func anonClassThisCapture(): Test = test "This Capture" {
+	private static func anonClassThisCapture() -> Test = test "This Capture" {
 		var instance = new ThisCapture
 		var obj = instance.anonymous
 

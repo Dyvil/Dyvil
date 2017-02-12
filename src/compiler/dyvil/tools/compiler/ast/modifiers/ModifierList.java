@@ -2,10 +2,8 @@ package dyvil.tools.compiler.ast.modifiers;
 
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.member.MemberKind;
-import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -93,91 +91,46 @@ public class ModifierList implements ModifierSet
 	}
 
 	@Override
-	public void check(IMember member, MarkerList markers)
+	public void resolveTypes(IMember member, MarkerList markers)
 	{
 		final MemberKind memberKind = member.getKind();
-		final int allowedModifiers = memberKind.getAllowedModifiers();
-		StringBuilder stringBuilder = null;
+		final int defaultAccess = memberKind.getDefaultAccess(member);
+		StringBuilder errorBuilder = null;
 
 		for (int i = 0; i < this.count; i++)
 		{
 			final Modifier modifier = this.modifiers[i];
-			if ((modifier.intValue() & allowedModifiers) == 0)
+			if (!memberKind.isModifierAllowed(modifier))
 			{
-				if (stringBuilder == null)
+				if (errorBuilder == null)
 				{
-					stringBuilder = new StringBuilder();
+					errorBuilder = new StringBuilder();
 				}
 				else
 				{
-					stringBuilder.append(", ");
+					errorBuilder.append(", ");
 				}
-				modifier.toString(stringBuilder);
+				modifier.toString(errorBuilder);
+			}
+
+			final int visibility = modifier.intValue() & Modifiers.VISIBILITY_MODIFIERS;
+			if (visibility != 0 && visibility == defaultAccess)
+			{
+				markers.add(Markers.semantic(member.getPosition(), "modifiers.visibility.default",
+				                             Util.memberNamed(member),
+				                             ModifierUtil.accessModifiersToString(visibility)));
 			}
 		}
 
-		if (stringBuilder != null)
+		if (errorBuilder != null)
 		{
 			markers.add(Markers.semanticError(member.getPosition(), "modifiers.illegal", Util.memberNamed(member),
-			                                  stringBuilder.toString()));
+			                                  errorBuilder.toString()));
 		}
-	}
-
-	public static void checkMethodModifiers(MarkerList markers, IMethod member, int modifiers)
-	{
-		boolean hasValue = member.getValue() != null;
-		boolean isStatic = (modifiers & Modifiers.STATIC) != 0;
-		boolean isAbstract = (modifiers & Modifiers.ABSTRACT) != 0;
-		boolean isNative = (modifiers & Modifiers.NATIVE) != 0;
-
-		// If the method does not have an implementation and is static
-		if (isStatic && isAbstract)
+		if ((this.intModifiers & Modifiers.VISIBILITY_MODIFIERS) == 0)
 		{
-			markers.add(
-				Markers.semanticError(member.getPosition(), "modifiers.static.abstract", Util.memberNamed(member)));
-		}
-		else if (isAbstract && isNative)
-		{
-			markers.add(
-				Markers.semanticError(member.getPosition(), "modifiers.native.abstract", Util.memberNamed(member)));
-		}
-		else
-		{
-			if (isStatic)
-			{
-				if (!hasValue)
-				{
-					markers.add(Markers.semanticError(member.getPosition(), "modifiers.static.unimplemented",
-					                                  Util.memberNamed(member)));
-				}
-			}
-			if (isNative)
-			{
-				if (!hasValue)
-				{
-					markers.add(Markers.semanticError(member.getPosition(), "modifiers.native.implemented",
-					                                  Util.memberNamed(member)));
-				}
-			}
-			if (isAbstract)
-			{
-				final IClass enclosingClass = member.getEnclosingClass();
-				if (!enclosingClass.isAbstract())
-				{
-					markers.add(Markers.semanticError(member.getPosition(), "modifiers.abstract.concrete_class",
-					                                  Util.memberNamed(member), enclosingClass.getName()));
-				}
-				if (hasValue)
-				{
-					markers.add(Markers.semanticError(member.getPosition(), "modifiers.abstract.implemented",
-					                                  Util.memberNamed(member)));
-				}
-			}
-		}
-		if (!hasValue && !isAbstract && !isNative && !isStatic)
-		{
-			markers
-				.add(Markers.semanticError(member.getPosition(), "modifiers.unimplemented", Util.memberNamed(member)));
+			// If there is no explicit or implicit visibility modifier already, add the default one
+			this.intModifiers |= defaultAccess;
 		}
 	}
 

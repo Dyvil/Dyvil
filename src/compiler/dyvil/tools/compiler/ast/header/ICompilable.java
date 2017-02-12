@@ -7,6 +7,8 @@ public interface ICompilable
 {
 	String getFileName();
 
+	String getInternalName();
+
 	String getFullName();
 
 	void write(ClassWriter writer) throws BytecodeException;

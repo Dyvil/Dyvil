@@ -4,7 +4,7 @@ using dyvil.Test
 
 public class ArrayTest
 {
-	public static func apply(): Test = test "Arrays" {
+	static func apply() -> Test = test "Arrays" {
 		test "Element Types" {
 			[]   .elementType =?= class any
 			[[]] .elementType =?= class [any]
@@ -20,7 +20,7 @@ public class ArrayTest
 		}
 	}
 
-	public postfix func elementType <@Reified(Reified.Type.ANY_CLASS) T>([T] array): Class<T> = class T
+	postfix func elementType <@Reified(Reified.Type.ANY_CLASS) T>([T] array) -> Class<T> = class T
 
-	public postfix func nestedElementType <@Reified(Reified.Type.ANY_CLASS) T>([[T]] array): Class<T> = class T
+	postfix func nestedElementType <@Reified(Reified.Type.ANY_CLASS) T>([[T]] array) -> Class<T> = class T
 }

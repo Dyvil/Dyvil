@@ -218,7 +218,7 @@ public interface MutableMap<K, V> extends Map<K, V>
 	}
 
 	@Override
-	default <NK, NV> MutableMap<NK, NV> entryMapped(@NonNull BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
+	default <NK, NV> MutableMap<NK, NV> entryMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Entry<? extends NK, ? extends NV>> mapper)
 	{
 		MutableMap<NK, NV> copy = this.emptyCopy();
 		for (Entry<K, V> entry : this)
@@ -233,7 +233,7 @@ public interface MutableMap<K, V> extends Map<K, V>
 	}
 
 	@Override
-	default <NK, NV> MutableMap<NK, NV> flatMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
+	default <NK, NV> MutableMap<NK, NV> flatMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends @NonNull Entry<? extends NK, ? extends NV>>> mapper)
 	{
 		MutableMap<NK, NV> copy = this.emptyCopy();
 		for (Entry<K, V> entry : this)
@@ -456,7 +456,7 @@ public interface MutableMap<K, V> extends Map<K, V>
 	}
 
 	@Override
-	default void mapEntries(@NonNull BiFunction<? super K, ? super V, ? extends Entry<? extends K, ? extends V>> mapper)
+	default void mapEntries(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Entry<? extends K, ? extends V>> mapper)
 	{
 		final int size = this.size();
 		final Entry<K, V>[] entries = this.toArray();
@@ -474,7 +474,7 @@ public interface MutableMap<K, V> extends Map<K, V>
 	}
 
 	@Override
-	default void flatMap(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends Entry<? extends K, ? extends V>>> mapper)
+	default void flatMap(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>>> mapper)
 	{
 		final Entry<K, V>[] entries = this.toArray();
 

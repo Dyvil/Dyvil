@@ -24,14 +24,14 @@ public class DPFTest
 			public set
 		}
 
-		public override func toPropertyValue(): Value
+		override func toPropertyValue() -> Value
 		{
 			return "Button"(this.text, "x": this.x, "y": this.y) {
 				"visible": this.visible
 			}
 		}
 
-		public func apply(Configure<Button> configure): Button
+		public func apply(Configure<Button> configure) -> Button
 		{
 			configure this
 			return this
@@ -68,7 +68,7 @@ public class DPFTest
 
 	public static let TEST_STRING: String = TEST_NODE.toString
 
-	public static func apply(): Test = test "DPF" {
+	static func apply() -> Test = test "DPF" {
 		test "DPF Parser" {
 			Parser.parse(TEST_STRING) =?= TEST_NODE
 		}
@@ -77,7 +77,7 @@ public class DPFTest
 		testBinary()
 	}
 
-	private static func testExpand(): Test = test "Expand" {
+	private static func testExpand() -> Test = test "Expand" {
 		// Parse as a Map
 		let baseMap = new TreeMap<String, Object>
 		TEST_NODE.accept(new FlatMapConverter(baseMap))
@@ -94,7 +94,7 @@ public class DPFTest
 		nodeMap =?= expandedMap
 	}
 
-	private static func testBinary(): Test = test "Binary" {
+	private static func testBinary() -> Test = test "Binary" {
 		let newNode = new RootNode
 
 		try

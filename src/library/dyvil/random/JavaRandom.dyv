@@ -16,9 +16,9 @@ public internal class JavaRandom extends Random implements dyvil.random.Random
 		super.init(seed)
 	}
 
-	public override func next(int bits): int = super<Random>.next(bits)
+	override func next(int bits) -> int = super<Random>.next(bits)
 
-	public override func nextGaussian(): double = super<Random>.nextGaussian()
+	override func nextGaussian() -> double = super<Random>.nextGaussian()
 
-	public override func toString(): String = "Random()"
+	override func toString() -> String = "Random()"
 }

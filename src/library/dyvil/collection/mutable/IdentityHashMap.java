@@ -49,19 +49,19 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	}
 
 	@NonNull
-	public static <K, V> IdentityHashMap<K, V> from(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public static <K, V> IdentityHashMap<K, V> from(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		return new IdentityHashMap<>(iterable);
 	}
 
 	@NonNull
-	public static <K, V> IdentityHashMap<K, V> from(SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public static <K, V> IdentityHashMap<K, V> from(SizedIterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		return new IdentityHashMap<>(iterable);
 	}
 
 	@NonNull
-	public static <K, V> IdentityHashMap<K, V> from(@NonNull Set<? extends Entry<? extends K, ? extends V>> set)
+	public static <K, V> IdentityHashMap<K, V> from(@NonNull Set<? extends @NonNull Entry<? extends K, ? extends V>> set)
 	{
 		return new IdentityHashMap<>(set);
 	}
@@ -113,19 +113,19 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 		this.defaultLoadFactor();
 	}
 
-	public IdentityHashMap(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public IdentityHashMap(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		super(iterable);
 		this.defaultLoadFactor();
 	}
 
-	public IdentityHashMap(SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public IdentityHashMap(SizedIterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		super(iterable);
 		this.defaultLoadFactor();
 	}
 
-	public IdentityHashMap(@NonNull Set<? extends Entry<? extends K, ? extends V>> set)
+	public IdentityHashMap(@NonNull Set<? extends @NonNull Entry<? extends K, ? extends V>> set)
 	{
 		super(set);
 		this.defaultLoadFactor();

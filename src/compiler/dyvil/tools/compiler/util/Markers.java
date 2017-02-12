@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.util;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.tools.parsing.marker.*;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.util.I18n;
@@ -10,6 +11,7 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+@SuppressWarnings( { "SameParameterValue", "unused" })
 public final class Markers
 {
 
@@ -38,6 +40,8 @@ public final class Markers
 	{
 		// do not instantiate
 	}
+
+	// Basic Key Mappers
 
 	public static String getSemantic(String key)
 	{
@@ -73,19 +77,49 @@ public final class Markers
 		return String.format(getSyntax(key), args);
 	}
 
-	static final Map<String, MarkerLevel> markerLevelMap = new HashMap<>();
+	// Message Constructors
+
+	@NonNull
+	public static String message(String key, String semantic)
+	{
+		return semantic + " [" + key + ']';
+	}
+
+	public static String semanticMessage(String key)
+	{
+		return message(key, getSemantic(key));
+	}
+
+	public static String semanticMessage(String key, Object... args)
+	{
+		return message(key, getSemantic(key, args));
+	}
+
+	public static String syntaxMessage(String key)
+	{
+		return message(key, getSyntax(key));
+	}
+
+	public static String syntaxMessage(String key, Object... args)
+	{
+		return message(key, getSyntax(key, args));
+	}
+
+	// Marker Constructors
+
+	private static final Map<String, MarkerLevel> MARKER_LEVEL_MAP = new HashMap<>();
 
 	private static MarkerLevel getMarkerLevel(String key)
 	{
-		MarkerLevel m = markerLevelMap.get(key);
-		if (m != null)
+		MarkerLevel level = MARKER_LEVEL_MAP.get(key);
+		if (level != null)
 		{
-			return m;
+			return level;
 		}
 
 		if (!MARKER_LEVEL_BUNDLE.containsKey(key))
 		{
-			markerLevelMap.put(key, MarkerLevel.ERROR);
+			MARKER_LEVEL_MAP.put(key, MarkerLevel.ERROR);
 			return MarkerLevel.ERROR;
 		}
 
@@ -94,27 +128,27 @@ public final class Markers
 			switch (MARKER_LEVEL_BUNDLE.getString(key))
 			{
 			case "info":
-				m = MarkerLevel.INFO;
+				level = MarkerLevel.INFO;
 				break;
 			case "warning":
-				m = MarkerLevel.WARNING;
+				level = MarkerLevel.WARNING;
 				break;
 			case "ignore":
-				m = MarkerLevel.IGNORE;
+				level = MarkerLevel.IGNORE;
 				break;
 			default:
-				m = MarkerLevel.ERROR;
+				level = MarkerLevel.ERROR;
 				break;
 			}
 		}
 		catch (MissingResourceException ex)
 		{
 			// Should never happen - we check for 'containsKey' above
-			m = MarkerLevel.ERROR;
+			level = MarkerLevel.ERROR;
 		}
 
-		markerLevelMap.put(key, m);
-		return m;
+		MARKER_LEVEL_MAP.put(key, level);
+		return level;
 	}
 
 	public static Marker withText(ICodePosition position, MarkerLevel level, String text)
@@ -134,61 +168,61 @@ public final class Markers
 
 	public static Marker semantic(ICodePosition position, String key)
 	{
-		return withText(position, getMarkerLevel(key), getSemantic(key));
-	}
-
-	public static Marker semantic(ICodePosition position, MarkerLevel level, String key)
-	{
-		return withText(position, level, getSemantic(key));
+		return withText(position, getMarkerLevel(key), semanticMessage(key));
 	}
 
 	public static Marker semantic(ICodePosition position, String key, Object... args)
 	{
-		return withText(position, getMarkerLevel(key), getSemantic(key, args));
+		return withText(position, getMarkerLevel(key), semanticMessage(key, args));
+	}
+
+	public static Marker semantic(ICodePosition position, MarkerLevel level, String key)
+	{
+		return withText(position, level, semanticMessage(key));
 	}
 
 	public static Marker semantic(ICodePosition position, MarkerLevel level, String key, Object... args)
 	{
-		return withText(position, level, getSemantic(key, args));
+		return withText(position, level, semanticMessage(key, args));
 	}
 
 	public static Marker semanticError(ICodePosition position, String key)
 	{
-		return new SemanticError(position, getSemantic(key));
+		return new SemanticError(position, semanticMessage(key));
 	}
 
 	public static Marker semanticError(ICodePosition position, String key, Object... args)
 	{
-		return new SemanticError(position, getSemantic(key, args));
+		return new SemanticError(position, semanticMessage(key, args));
 	}
 
 	public static Marker semanticWarning(ICodePosition position, String key)
 	{
-		return new Warning(position, getSemantic(key));
+		return new Warning(position, semanticMessage(key));
 	}
 
 	public static Marker semanticWarning(ICodePosition position, String key, Object... args)
 	{
-		return new Warning(position, getSemantic(key, args));
+		return new Warning(position, semanticMessage(key, args));
 	}
 
 	public static Marker syntaxWarning(ICodePosition position, String key)
 	{
-		return new Warning(position, getSyntax(key));
+		return new Warning(position, syntaxMessage(key));
 	}
 
 	public static Marker syntaxWarning(ICodePosition position, String key, Object... args)
 	{
-		return new Warning(position, getSyntax(key, args));
+		return new Warning(position, syntaxMessage(key, args));
 	}
 
 	public static Marker syntaxError(ICodePosition position, String key)
 	{
-		return new SyntaxError(position, getSyntax(key));
+		return new SyntaxError(position, syntaxMessage(key));
 	}
 
 	public static Marker syntaxError(ICodePosition position, String key, Object... args)
 	{
-		return new SyntaxError(position, getSyntax(key, args));
+		return new SyntaxError(position, syntaxMessage(key, args));
 	}
 }

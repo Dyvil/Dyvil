@@ -68,7 +68,7 @@ public class ParserUtil
 
 	public static boolean neighboring(IToken first, IToken next)
 	{
-		return next.startIndex() == first.endIndex();
+		return next.startColumn() == first.endColumn();
 	}
 
 	public static IToken findMatch(IToken token)

@@ -10,13 +10,16 @@ import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
-import dyvil.tools.compiler.ast.parameter.*;
+import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.IParametric;
 import dyvil.tools.compiler.ast.statement.StatementList;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -219,9 +222,9 @@ public class ClassMetadata implements IClassMetadata
 				modifiers |= Modifiers.VARARGS;
 			}
 
-			parameters[i] = new CodeParameter(classParameter.getPosition(), classParameter.getName(),
-			                                  classParameter.getType(), new FlagModifierSet(modifiers),
-			                                  classParameter.getAnnotations());
+			parameters[i] = constructor.createParameter(classParameter.getPosition(), classParameter.getName(),
+			                                            classParameter.getType(), new FlagModifierSet(modifiers),
+			                                            classParameter.getAnnotations());
 			parameters[i].setIndex(i);
 		}
 

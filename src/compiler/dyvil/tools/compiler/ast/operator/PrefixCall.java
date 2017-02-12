@@ -49,36 +49,24 @@ public class PrefixCall extends MethodCall
 	@Override
 	public IValue resolveCall(MarkerList markers, IContext context, boolean report)
 	{
-		final IValue operand = this.arguments.getFirstValue();
-
-		if (operand != null)
-		{
-			final IValue op = Operators.getPrefix(this.name, operand);
-			if (op != null)
-			{
-				// Intrinsic Prefix Operators (! and *)
-				op.setPosition(this.position);
-				return op.resolveOperator(markers, context);
-			}
-		}
-
 		// Normal Method Resolution
-		final MatchList<IMethod> ambiguousCandidates = this.resolveMethodCall(markers, context);
-		if (ambiguousCandidates == null)
+		final MatchList<IMethod> candidates = this.resolveCandidates(context);
+		if (candidates.hasCandidate())
 		{
-			return this;
+			return this.checkArguments(markers, context, candidates.getBestMember());
 		}
 
 		// Implicit Resolution
-		if (this.resolveImplicitCall(markers, context))
+		final IValue implicitCall = this.resolveImplicitCall(markers, context);
+		if (implicitCall != null)
 		{
-			return this;
+			return implicitCall;
 		}
 
 		// No apply Resolution
 		if (report)
 		{
-			this.reportResolve(markers, ambiguousCandidates);
+			this.reportResolve(markers, candidates);
 			return this;
 		}
 		return null;

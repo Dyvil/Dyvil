@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.imports;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.parsing.ast.IASTNode;
@@ -29,8 +30,7 @@ public class KindedImport implements IImport
 	public static final int PARENT = PACKAGE | HEADER | CLASS;
 	public static final int ANY    = -1;
 
-	public static final int USING_DECLARATION   = STATIC | INLINE | HEADER;
-	public static final int INCLUDE_DECLARATION = INLINE | HEADER;
+	public static final int USING_DECLARATION = STATIC | INLINE | HEADER;
 
 	public KindedImport()
 	{
@@ -133,7 +133,7 @@ public class KindedImport implements IImport
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String prefix, @NonNull StringBuilder buffer)
 	{
 		switch (this.mask & STATIC)
 		{

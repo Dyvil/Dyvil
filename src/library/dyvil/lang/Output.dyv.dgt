@@ -20,78 +20,84 @@ public abstract class Output
 
 	public const ENDL: String = System.lineSeparator
 
-	public infix inline func <<(PrintStream stream, any value): PrintStream = stream.{ print value; $0 }
+	infix inline func <<(stream: PrintStream, value: any) -> PrintStream = stream.{ print value; $0 }
 
 	// println functions
 
-	public static inline func println(): void = out.println()
+	static inline func println() -> void = out.println()
 
 	// byte and short specializations are omitted
 #define LIGHT_PRIMITIVE_SPECS Base-Boolean.dgs, Base-Char.dgs, Base-Int.dgs, Base-Long.dgs, Base-Float.dgs, Base-Double.dgs
 #foreach LIGHT_PRIMITIVE_SPECS
 
-	@Deprecated(replacements: [ "print(PRIMITIVE): void" ])
-	public static inline func println(PRIMITIVE value): void = out.println(value)
+	@Deprecated(replacements: [ "print(PRIMITIVE) -> void" ])
+	static inline func println(value: PRIMITIVE) -> void = out.println(value)
 #end
 
-	@Deprecated(replacements: [ "print(AutoPrinter.() -> void): void" ])
-	public static inline func println(AutoPrinter.() -> void closure): void = closure(AutoPrinter)
+	@Deprecated(replacements: [ "print(AutoPrinter.() -> void) -> void" ])
+	static inline func println(closure: AutoPrinter.() -> void) -> void = closure(AutoPrinter)
 
-	@Deprecated(replacements: [ "print(String): void" ])
-	public static inline func println(String value): void = out.println(value)
+	@Deprecated(replacements: [ "print(String) -> void" ])
+	static inline func println(value: String) -> void = out.println(value)
 
-	@Deprecated(replacements: [ "print(Object!): void" ])
-	public static inline func println(Object! value): void = out.println(value)
+	@Deprecated(replacements: [ "print(Object!) -> void" ])
+	static inline func println(value: Object!) -> void = out.println(value)
 
 #import Base.dgs
 #foreach PRIMITIVE_SPECS
-	@Deprecated(replacements: [ "print([PRIMITIVE]): void" ])
-	public static inline func println([PRIMITIVE] array): void = out.println(array.toString)
+	@Deprecated(replacements: [ "print([PRIMITIVE]) -> void" ])
+	static inline func println(array: [PRIMITIVE]) -> void = out.println(array.toString)
 
 #end
-	@Deprecated(replacements: [ "print([Object!]): void" ])
-	public static inline func println([Object!] array): void = out.println(array.deepToString)
+	@Deprecated(replacements: [ "print([Object!]) -> void" ])
+	static inline func println(array: [Object!]) -> void = out.println(array.deepToString)
 
 	// print functions
 
 #foreach LIGHT_PRIMITIVE_SPECS
-	public static inline func print(PRIMITIVE value): void = out.println(value)
+	static inline func print(value: PRIMITIVE) -> void = out.println(value)
 
 #end
-	public static inline func print(AutoPrinter.() -> void closure): void = closure(AutoPrinter)
+	static inline func print(closure: AutoPrinter.() -> void) -> void = closure(AutoPrinter)
 
-	public static inline func print(String value): void = out.println(value)
+	static inline func print(value: String) -> void = out.println(value)
 
-	public static inline func print(Object! value): void = out.println(value)
+	static inline func print(value: Object!) -> void = out.println(value)
 
 #import Base.dgs
 #foreach PRIMITIVE_SPECS
-	public static inline func print([PRIMITIVE] array): void = out.println(array.toString)
+	static inline func print(array: [PRIMITIVE]) -> void = out.println(array.toString)
 
 #end
-	public static inline func print([Object!] array): void = out.println(array.deepToString)
+	static inline func print(array: [Object!]) -> void = out.println(array.deepToString)
 
 	// print(All) functions
 
 	@BytecodeName("printAll")
-	public static inline func print(Object! ... values): void
-		= print(values..., end: '\n')
+	static inline func print(values: Object! ...) -> void
+	{
+		print(values..., end: '\n')
+	}
 
 	@BytecodeName("printAll_separator")
-	public static inline func print(Object! ... values, String separator): void
-		= print(values..., separator: separator, end: '\n')
+	static inline func print(values: Object! ..., explicit separator: String) -> void
+	{
+		print(values..., separator: separator, end: ENDL)
+	}
 
 	@BytecodeName("printAll_end")
-	public static inline func print(Object! ... values, String end): void
-		= print(values..., separator: ' ', end: end)
+	static inline func print(values: Object! ..., explicit end: String) -> void
+	{
+		print(values..., separator: ' ', end: end)
+	}
 
 	@BytecodeName("printAll")
-	public static func print(Object! ... values, String separator, String end): void
+	static func print(values: Object! ..., explicit separator: String, explicit end: String) -> void
 	{
-		if (!values.isEmpty)
+		if !values.isEmpty
 		{
 			out.print(values[0].deepToString)
-			for (i <- 1 ..< values.size)
+			for i <- 1 ..< values.size
 			{
 				out.print(separator)
 				out.print(values[i].deepToString)

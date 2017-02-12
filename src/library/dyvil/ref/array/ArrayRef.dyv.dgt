@@ -5,7 +5,7 @@ package dyvil.ref.array
 
 import dyvil.ref.TYPE_NAME##Ref
 
-#if IS_GENERIC
+#if IS_OBJECT
 public class TYPE_NAME##ArrayRef<type T>
 #else
 public class TYPE_NAME##ArrayRef
@@ -15,7 +15,7 @@ public class TYPE_NAME##ArrayRef
 	protected let index: int
 ) implements TYPE_NAME##Ref
 {
-	public override func get(): PRIMITIVE = this.array[this.index]
+	override func get() -> PRIMITIVE = this.array[this.index]
 
-	public override func set(PRIMITIVE value): void = this.array[this.index] = value
+	override func set(PRIMITIVE value) -> void = this.array[this.index] = value
 }

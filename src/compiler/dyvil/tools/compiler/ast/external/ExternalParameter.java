@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
+import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.method.IExternalCallableMember;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.AbstractParameter;
@@ -19,14 +20,14 @@ public class ExternalParameter extends AbstractParameter
 {
 	private boolean resolved;
 
-	public ExternalParameter(Name name, IType type)
+	public ExternalParameter(ICallableMember callable, Name name, IType type)
 	{
-		super(name, type);
+		super(callable, null, name, type);
 	}
 
-	public ExternalParameter(Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public ExternalParameter(ICallableMember callable, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
-		super(null, name, type, modifiers, annotations);
+		super(callable, null, name, type, modifiers, annotations);
 	}
 
 	private void resolveTypes()

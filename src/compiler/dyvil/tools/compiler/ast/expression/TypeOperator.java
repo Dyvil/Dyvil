@@ -23,7 +23,7 @@ public final class TypeOperator extends AbstractValue
 {
 	public static final class LazyFields
 	{
-		public static final IClass    TYPE_CLASS = Package.dyvilxLangModelType.resolveClass("Type");
+		public static final IClass    TYPE_CLASS = Package.dyvilReflectTypes.resolveClass("Type");
 		public static final ClassType TYPE       = new ClassType(TYPE_CLASS);
 
 		public static final IClass TYPE_CONVERTIBLE = Types.LITERALCONVERTIBLE_CLASS

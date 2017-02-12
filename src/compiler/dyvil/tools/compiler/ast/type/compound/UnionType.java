@@ -48,6 +48,34 @@ public class UnionType implements IObjectType
 	{
 	}
 
+	public static IType combine(IType left, IType right, UnionType unionType)
+	{
+		if (left.canExtract(NullType.class))
+		{
+			// left type is null -> result reference right type
+			return NullableType.apply(right);
+		}
+
+		if (right.canExtract(NullType.class))
+		{
+			// right type is null -> result reference left type
+			return NullableType.apply(left);
+		}
+
+		if (Types.isSameType(left, right) || Types.isSuperType(left, right))
+		{
+			// same type, or left type is a super type of right type -> result left type
+			return left;
+		}
+		if (Types.isSuperType(right, left))
+		{
+			// right type is a super type of left type -> result right type
+			return right;
+		}
+
+		return unionType != null ? unionType : new UnionType(left.getObjectType(), right.getObjectType());
+	}
+
 	public UnionType(IType left, IType right)
 	{
 		this.left = left;
@@ -218,43 +246,6 @@ public class UnionType implements IObjectType
 		return combine(this.left, this.right, this);
 	}
 
-	public static IType combine(IType left, IType right, UnionType unionType)
-	{
-		if (left.canExtract(NullType.class))
-		{
-			// left type is null -> result reference right type
-			return NullableType.apply(right);
-		}
-
-		if (right.canExtract(NullType.class))
-		{
-			// right type is null -> result reference left type
-			return NullableType.apply(left);
-		}
-
-		if (Types.isSameType(left, right) || Types.isSuperType(left, right))
-		{
-			// same type, or left type is a super type of right type -> result left type
-			return left;
-		}
-		if (Types.isSuperType(right, left))
-		{
-			// right type is a super type of left type -> result right type
-			return right;
-		}
-
-		return unionType != null ? unionType : new UnionType(left, right);
-	}
-
-	private static IType arrayElementCombine(IType left, IType right)
-	{
-		if (left.getTypecode() != right.getTypecode())
-		{
-			return Types.ANY;
-		}
-		return new ArrayType(combine(left, right, null));
-	}
-
 	@Override
 	public void checkType(MarkerList markers, IContext context, int position)
 	{
@@ -352,8 +343,8 @@ public class UnionType implements IObjectType
 		writer.visitLdcInsn(Type.getObjectType(this.getTheClass().getInternalName()));
 		this.left.writeTypeExpression(writer);
 		this.right.writeTypeExpression(writer);
-		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/UnionType", "apply",
-		                       "(Ljava/lang/Class;Ldyvilx/lang/model/type/Type;Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/UnionType;",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/UnionType", "apply",
+		                       "(Ljava/lang/Class;Ldyvil/reflect/types/Type;Ldyvil/reflect/types/Type;)Ldyvil/reflect/types/UnionType;",
 		                       false);
 	}
 

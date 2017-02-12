@@ -1,0 +1,17 @@
+package dyvil.experimental
+
+public class ConstTemplateTest
+{
+	public static case class Tuple<
+		type T... // variadic type parameters
+		const names: String... // variadic field names
+			= "_" + (this + 1) // default to "_" + (index of type parameter + 1)
+		>
+		(T... names...)
+
+	public static void main([String] args)
+	{
+		Tuple<int, String> tuple1 = Tuple(_1: 1, _2: "a")
+		Tuple<T: int, String, names: "age", "name"> tuple2 = Tuple(age: 1, name: 20)
+	}
+}

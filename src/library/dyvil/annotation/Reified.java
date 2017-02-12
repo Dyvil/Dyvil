@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 
 /**
  * Marks that a Class or Method Type Parameter is <b>reified</b>. If a Method Parameter is annotated with this
- * annotation, it receives an additional mandated parameter that holds a {@link dyvilx.lang.model.type.Type Type} or
+ * annotation, it receives an additional mandated parameter that holds a {@link dyvil.reflect.types.Type Type} or
  * {@link Class} instance representing the Type Argument. The {@link #value()} annotation parameter defines whether the
  * full generic type or only the erasure is needed.<p/>If the full generic type is reified, it is retrievable and usable
  * with the {@code type<T>} operator. In both cases, the erasure is available using the {@code class<T>} operator.<p/>

@@ -3,9 +3,6 @@ package dyvil.tools.compiler;
 import dyvil.collection.List;
 import dyvil.collection.Set;
 import dyvil.collection.mutable.TreeSet;
-import dyvil.io.AppendablePrintStream;
-import dyvil.io.BasicPrintStream;
-import dyvil.io.Console;
 import dyvil.io.FileUtils;
 import dyvil.tools.compiler.ast.external.ExternalHeader;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -20,46 +17,29 @@ import dyvil.tools.compiler.sources.DyvilFileType;
 import dyvil.tools.compiler.sources.FileFinder;
 import dyvil.tools.compiler.util.TestThread;
 import dyvil.tools.compiler.util.Util;
+import dyvilx.tools.BasicTool;
 
-import javax.lang.model.SourceVersion;
-import javax.tools.Tool;
-import java.io.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.logging.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-public final class DyvilCompiler implements Tool
+public final class DyvilCompiler extends BasicTool
 {
 	public static final String VERSION         = "$$compilerVersion$$";
 	public static final String DYVIL_VERSION   = "$$version$$";
 	public static final String LIBRARY_VERSION = "$$libraryVersion$$";
 
-	private static final DateFormat DATE_FORMAT               = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	public static final  int        OPTIMIZE_CONSTANT_FOLDING = 5;
-
-	private boolean compilationFailed;
-
-	private PrintStream output;
-	private PrintStream errorOutput;
-	private Logger      logger;
+	public static final int OPTIMIZE_CONSTANT_FOLDING = 5;
 
 	private final Set<ICompilerPhase> phases     = new TreeSet<>();
 	public final  CompilerConfig      config     = new CompilerConfig(this);
 	public final  FileFinder          fileFinder = new FileFinder();
 
 	@Override
-	public java.util.Set<SourceVersion> getSourceVersions()
-	{
-		return EnumSet.allOf(SourceVersion.class);
-	}
-
-	@Override
 	public int run(InputStream in, OutputStream out, OutputStream err, String... arguments)
 	{
-		this.output = BasicPrintStream.apply(out, this.output);
-		this.errorOutput = BasicPrintStream.apply(out, this.errorOutput);
+		this.initOutput(out, err);
 
 		if (!this.baseInit(arguments))
 		{
@@ -77,7 +57,7 @@ public final class DyvilCompiler implements Tool
 		}
 
 		this.shutdown();
-		return this.compilationFailed ? 1 : 0;
+		return this.getExitCode();
 	}
 
 	public boolean baseInit(String[] args)
@@ -259,60 +239,6 @@ public final class DyvilCompiler implements Tool
 		                  Util.toTime(endTime - startTime)));
 	}
 
-	private void initLogger()
-	{
-		final File logFile = this.config.getLogFile();
-		if (logFile == null)
-		{
-			return;
-		}
-
-		this.logger = Logger.getLogger("DYVIL-COMPILER");
-		this.logger.setUseParentHandlers(false);
-		this.logger.setLevel(Level.ALL);
-
-		final Formatter formatter = new Formatter()
-		{
-			@Override
-			public String format(LogRecord record)
-			{
-				String message = record.getMessage();
-				if (message == null || message.isEmpty())
-				{
-					return "\n";
-				}
-
-				Throwable thrown = record.getThrown();
-				StringBuilder builder = new StringBuilder();
-
-				if (DyvilCompiler.this.config.isDebug())
-				{
-					builder.append('[').append(DATE_FORMAT.format(new Date(record.getMillis()))).append("] [");
-					builder.append(record.getLevel()).append("]: ");
-				}
-				builder.append(message).append('\n');
-
-				if (thrown != null)
-				{
-					thrown.printStackTrace(new AppendablePrintStream(builder));
-				}
-				return builder.toString();
-			}
-		};
-
-		try
-		{
-			final FileHandler fileHandler = new FileHandler(logFile.getAbsolutePath(), true);
-			fileHandler.setLevel(Level.ALL);
-			fileHandler.setFormatter(formatter);
-			this.logger.addHandler(fileHandler);
-		}
-		catch (IOException ex)
-		{
-			ex.printStackTrace();
-		}
-	}
-
 	private void findFiles()
 	{
 		final long startTime = System.nanoTime();
@@ -479,100 +405,14 @@ public final class DyvilCompiler implements Tool
 
 	// ----- GETTERS AND SETTERS -----
 
+	@Override
+	protected boolean useAnsiColors()
+	{
+		return this.config.useAnsiColors();
+	}
+
 	public boolean isCompilationFailed()
 	{
-		return this.compilationFailed;
-	}
-
-	public void setCompilationFailed(boolean compilationFailed)
-	{
-		this.compilationFailed = compilationFailed;
-	}
-
-	public void failCompilation()
-	{
-		this.compilationFailed = true;
-	}
-
-	public PrintStream getOutput()
-	{
-		return this.output;
-	}
-
-	public void setOutput(PrintStream output)
-	{
-		this.output = output;
-	}
-
-	public PrintStream getErrorOutput()
-	{
-		return this.errorOutput;
-	}
-
-	public void setErrorOutput(PrintStream errorOutput)
-	{
-		this.errorOutput = errorOutput;
-	}
-
-	// ----- LOGGING METHODS -----
-
-	public void log(String message)
-	{
-		this.output.println(message);
-		if (this.logger != null)
-		{
-			this.logger.info(message);
-		}
-	}
-
-	public void warn(String message)
-	{
-		if (this.config.useAnsiColors() && !message.isEmpty())
-		{
-			this.output.println(Console.ANSI_YELLOW + message + Console.ANSI_RESET);
-		}
-		else
-		{
-			this.output.println(message);
-		}
-
-		if (this.logger != null)
-		{
-			this.logger.warning(message);
-		}
-	}
-
-	public void error(String message)
-	{
-		this.compilationFailed = true;
-		this.errorOutput.println(message);
-
-		if (this.logger != null)
-		{
-			this.logger.severe(message);
-		}
-	}
-
-	public void error(String message, Throwable throwable)
-	{
-		this.compilationFailed = true;
-		this.errorOutput.println(message);
-
-		throwable.printStackTrace(this.errorOutput);
-		if (this.logger != null)
-		{
-			this.logger.log(Level.SEVERE, message, throwable);
-		}
-	}
-
-	public void error(String className, String methodName, Throwable throwable)
-	{
-		this.compilationFailed = true;
-
-		throwable.printStackTrace(this.errorOutput);
-		if (this.logger != null)
-		{
-			this.logger.throwing(className, methodName, throwable);
-		}
+		return this.getExitCode() != 0;
 	}
 }

@@ -71,7 +71,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	protected ITypeParameter[] typeParameters;
 	protected int              typeParameterCount;
 
-	protected IType thisType;
+	protected IType receiverType;
 
 	protected ParameterList parameters = new ParameterList();
 
@@ -191,13 +191,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public ITypeParameter getTypeParameter(int index)
 	{
 		return this.typeParameters[index];
-	}
-
-	@Override
-	public boolean setReceiverType(IType type)
-	{
-		this.thisType = type;
-		return true;
 	}
 
 	@Override
@@ -347,11 +340,20 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public IType getThisType()
 	{
-		return this.thisType;
+		return this.receiverType;
 	}
 
 	@Override
-	public abstract IType getReceiverType();
+	public IType getReceiverType()
+	{
+		return this.receiverType;
+	}
+
+	@Override
+	public void setReceiverType(IType type)
+	{
+		this.receiverType = type;
+	}
 
 	@Override
 	public ITypeParameter resolveTypeParameter(Name name)
@@ -513,7 +515,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			else
 			{
 				// Infix access to instance method
-				receiverType = this.enclosingClass.getClassType();
+				receiverType = this.getReceiverType();
 				parameterStartIndex = 0;
 			}
 
@@ -770,7 +772,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			{
 				final Marker marker = Markers.semanticError(position, "method.typevar.incompatible", this.name,
 				                                            typeParameter.getName());
-				marker.addInfo(Markers.getSemantic("type.generic", typeArgument));
+				marker.addInfo(Markers.getSemantic("type.generic.argument", typeArgument));
 				marker.addInfo(Markers.getSemantic("type_parameter.declaration", typeParameter));
 				markers.add(marker);
 			}
@@ -835,7 +837,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public boolean checkOverride(IMethod candidate, ITypeContext typeContext)
 	{
 		// Check Name and number of type parameters
-		if (candidate.getName() != this.name || this.typeParameterCount != candidate.typeParameterCount())
+		if (candidate.getName() != this.name // different name
+			    || this.typeParameterCount != candidate.typeParameterCount() // different number of type params
+			    || candidate.hasModifier(Modifiers.STATIC_FINAL)) // don't check static final
 		{
 			return false;
 		}
@@ -888,6 +892,12 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public boolean isIntrinsic()
 	{
 		return this.intrinsicData != null;
+	}
+
+	@Override
+	public IntrinsicData getIntrinsicData()
+	{
+		return this.intrinsicData;
 	}
 
 	@Override
@@ -997,11 +1007,16 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		return array;
 	}
 
+	private boolean useIntrinsicBytecode()
+	{
+		return this.intrinsicData != null && this.intrinsicData.getCompilerCode() == 0;
+	}
+
 	@Override
 	public void writeCall(MethodWriter writer, IValue receiver, IArguments arguments, ITypeContext typeContext,
 		                     IType targetType, int lineNumber) throws BytecodeException
 	{
-		if (this.intrinsicData != null)
+		if (this.useIntrinsicBytecode())
 		{
 			this.intrinsicData.writeIntrinsic(writer, receiver, arguments, lineNumber);
 		}
@@ -1020,7 +1035,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public void writeJump(MethodWriter writer, Label dest, IValue receiver, IArguments arguments,
 		                     ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
-		if (this.intrinsicData != null)
+		if (this.useIntrinsicBytecode())
 		{
 			this.intrinsicData.writeIntrinsic(writer, dest, receiver, arguments, lineNumber);
 			return;
@@ -1035,7 +1050,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public void writeInvJump(MethodWriter writer, Label dest, IValue receiver, IArguments arguments,
 		                        ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
-		if (this.intrinsicData != null)
+		if (this.useIntrinsicBytecode())
 		{
 			this.intrinsicData.writeInvIntrinsic(writer, dest, receiver, arguments, lineNumber);
 			return;

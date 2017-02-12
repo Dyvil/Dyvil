@@ -26,7 +26,7 @@ public abstract class Library
 		{
 			return ReflectUtils.getFileLocation(klass);
 		}
-		catch (ClassNotFoundException ex)
+		catch (ClassNotFoundException ignored)
 		{
 			return null;
 		}
@@ -57,7 +57,7 @@ public abstract class Library
 		{
 			return load(file);
 		}
-		catch (FileNotFoundException ex)
+		catch (FileNotFoundException ignored)
 		{
 			return null;
 		}

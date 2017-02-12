@@ -1,0 +1,239 @@
+package dyvil.tests
+
+using dyvil.Collections
+using dyvil.Test
+
+public class MatchTest
+{
+	static func apply() -> Test = test "Match Expressions" {
+		table()
+		tableHoles()
+		lookup()
+		stringTable()
+		stringLookup()
+		stringCollision()
+		expression()
+		tuples()
+		caseClasses()
+		objects()
+		fields()
+		orPatterns()
+		andPatterns()
+	}
+	
+	private static func table() -> Test = test "Table Switch" {
+		var value: String! = null
+
+		1 match {
+			case 0 => value = "zero"
+			case 1 => value = "one"
+			case 2 => value = "two"
+			case _ => value = "else"
+		}
+
+		value =?= "one"
+	}
+	
+	private static func tableHoles() -> Test = test "Table Switch with Holes" {
+		var value: String! = null
+
+		2 match {
+			case 0 => value = "null"
+			case 1 => value = "one"
+			case 2 => value = "two"
+			case 5 => value = "five"
+			case 6 => value = "six"
+		}
+
+		value =?= "two"
+	}
+	
+	private static func lookup() -> Test = test "Lookup Switch" {
+		var value: String! = null
+
+		10 match {
+			case 1   => value = "1"
+			case 10  => value = "10"
+			case 100 => value = "100"
+			case _   => value = "something else"
+		}
+
+		value =?= "10"
+	}
+
+	private static func stringTable() -> Test = test "Table Switch String" {
+		var value: String! = null
+
+		"a" match {
+			case "a" => value = "A"
+			case "b" => value = "B"
+			case "c" => value = "C"
+			case _   => value = "..."
+		}
+
+		value =?= "A"
+	}
+	
+	private static func stringLookup() -> Test = test "Lookup Switch String" {
+		var value: String! = null
+
+		"abc" match {
+			case "abc" => value = "ABC"
+			case "def" => value = "DEF"
+			case _     => value = "..."
+		}
+
+		value =?= "ABC"
+	}
+	
+	private static func stringCollision() -> Test = test "String Hash Collisions" {
+		var value = 0
+
+		"AaBB" match {
+			case "Aa"   => value = 1
+			case "BB"   => value = 2
+			case "AaAa" => value = 3
+			case "BBBB" => value = 4
+			case "BBAa" | "AaBB" => value = 5
+			case "ABC"  => value = 6
+			case "DEF"  => value = 7
+			case _      =>
+		}
+
+		value =?= 5
+	}
+	
+	private static func expression() -> Test = test "Expressions" {
+		let result = 10 match {
+			case 0     => "a"
+			case 1     => "b"
+			case var x => x.toString
+		}
+
+		result =?= "10"
+	}
+
+	private static func tuples() -> Test = test "Tuples" {
+		var value: String! = null
+		var tuple = (1, 2)
+
+		tuple match {
+			case (0, _) => value = "(0, _)"
+			case (_, 0) => value = "(_, 0)"
+			case _		=> value = tuple.toString
+		}
+
+		value =?= tuple.toString
+	}
+
+	private static func caseClasses() -> Test = test "Case Classes" {
+		test "Primitive" {
+			let option = Option 1
+			var value = 0
+
+			option match {
+				case Some(int i) => value = i
+				case _			 => value = -1
+			}
+
+			value =?= 1
+		}
+
+		test "String" {
+			let option = Option "abc"
+			var value: String! = null
+
+			option match {
+				case Some(String s) => value = s
+				case _				=> value = null
+			}
+
+			value =?= "abc"
+		}
+	}
+
+	private static func objects() -> Test = test "Objects" {
+		let option = Option<int>
+		var value = 0
+
+		option match {
+			case None => value = 1
+			case _	  => value = -1
+		}
+
+		value =?= 1
+	}
+
+	private const ERROR: int = 0
+	private const SUCCESS: int = 1
+
+	private const ERROR_BOXED: Int = ERROR
+
+	private static func fields() -> Test = test "Fields" {
+		var value = 0
+
+		SUCCESS match {
+			case MatchTest.ERROR => value = ERROR
+			case SUCCESS		 => value = SUCCESS
+			case _			 	 => value = ERROR
+		}
+
+		value =?= SUCCESS
+
+		test "Unboxing" {
+			ERROR_BOXED match {
+				case ERROR => value = SUCCESS
+				case _	   => value = ERROR
+			}
+
+			value =?= SUCCESS
+		}
+
+		test "Boxing" {
+			ERROR match {
+				case ERROR_BOXED => value = SUCCESS
+				case _			 => value = ERROR
+			}
+
+			value =?= SUCCESS
+		}
+
+		test "Object Unboxing" {
+			(ERROR_BOXED as Object) match {
+				case ERROR => value = SUCCESS
+				case _	   => value = ERROR
+			}
+
+			value =?= SUCCESS
+		}
+	}
+
+	private static func orPatterns() -> Test = test "OR Patterns" {
+		let list = List<int>()
+
+		for (i <- 0 .. 10)
+		{
+			i match {
+				case 1 | 2 | 3 => list += 0
+				case 4 | 5 | 6 => list += 1
+				case 7 | 8 | 9 => list += 2
+				case 0 | 10	   => list += 3
+			}
+		}
+
+		list =?= List(3, 0, 0, 0, 1, 1, 1, 2, 2, 2, 3)
+	}
+
+	private static func andPatterns() -> Test = test "AND Patterns" {
+		let tuple = (1, 2)
+		var success = false
+
+		tuple match {
+			case (_, 2) & (1, _) => success = true
+			case (1, _) & (_, 2) => success = true
+			case _				 => success = false
+		}
+
+		success =?= true
+	}
+}

@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IProperty;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.CodeMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
@@ -26,8 +27,7 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public final class CaseClassMetadata extends ClassMetadata
 {
-	protected IMethod   applyMethod;
-	protected IMethod[] unapplyMethods;
+	protected IMethod applyMethod;
 
 	public CaseClassMetadata(IClass iclass)
 	{
@@ -77,7 +77,7 @@ public final class CaseClassMetadata extends ClassMetadata
 		// Generate the apply method signature
 
 		final CodeMethod applyMethod = new CodeMethod(this.theClass, Names.apply, this.theClass.getThisType(),
-		                                              new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC));
+		                                              new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC_FINAL));
 		applyMethod.setTypeParameters(this.theClass.getTypeParameters(), this.theClass.typeParameterCount());
 
 		if (this.constructor != null && (this.members & CONSTRUCTOR) == 0)
@@ -91,6 +91,12 @@ public final class CaseClassMetadata extends ClassMetadata
 
 		applyMethod.resolveTypes(markers, context);
 		this.applyMethod = applyMethod;
+	}
+
+	@Override
+	public boolean checkImplements(IMethod candidate, ITypeContext typeContext)
+	{
+		return this.applyMethod != null && this.applyMethod.checkOverride(candidate, typeContext);
 	}
 
 	@Override

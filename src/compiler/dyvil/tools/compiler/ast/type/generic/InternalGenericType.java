@@ -71,10 +71,7 @@ public class InternalGenericType extends GenericType
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.typeArgumentCount; i++)
-		{
-			this.typeArguments[i] = this.typeArguments[i].resolveType(markers, context);
-		}
+		this.resolveTypeArguments(markers, context);
 
 		if (this.internalName.startsWith("dyvil/tuple/Tuple$Of"))
 		{

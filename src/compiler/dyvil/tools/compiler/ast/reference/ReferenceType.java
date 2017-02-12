@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.reference;
 
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
@@ -12,11 +14,11 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -60,20 +62,34 @@ public class ReferenceType implements IObjectType
 	protected IClass theClass;
 	protected IType  type;
 
+	// Constructors
+
+	public static ReferenceType apply(@NonNull IType type)
+	{
+		return new ReferenceType(type.getRefClass(), type);
+	}
+
 	public ReferenceType()
 	{
 	}
 
-	public ReferenceType(IType type)
+	public ReferenceType(@NonNull IType type)
 	{
+		this(type.getRefClass(), type);
+	}
+
+	public ReferenceType(@Nullable IClass refClass, @Nullable IType type)
+	{
+		this.theClass = refClass;
 		this.type = type;
 	}
 
-	public ReferenceType(IClass iclass, IType type)
+	protected ReferenceType wrap(@NonNull IType type)
 	{
-		this.theClass = iclass;
-		this.type = type;
+		return new ReferenceType(type);
 	}
+
+	// Getters and Setters
 
 	public IType getType()
 	{
@@ -106,7 +122,7 @@ public class ReferenceType implements IObjectType
 	@Override
 	public boolean isSuperTypeOf(IType subType)
 	{
-		return IObjectType.super.isSuperTypeOf(subType) && this.isSameBaseType(subType);
+		return IObjectType.super.isSuperClassOf(subType) && this.isSameBaseType(subType);
 	}
 
 	private boolean isSameBaseType(IType type)
@@ -141,7 +157,7 @@ public class ReferenceType implements IObjectType
 	public IType asParameterType()
 	{
 		final IType type = this.type.asParameterType();
-		return type == this.type ? this : type.getRefType();
+		return type == this.type ? this : this.wrap(type);
 	}
 
 	@Override
@@ -170,7 +186,7 @@ public class ReferenceType implements IObjectType
 		}
 		if (concreteType != null && concreteType != this.type)
 		{
-			return concreteType.getRefType();
+			return this.wrap(concreteType);
 		}
 		return this;
 	}
@@ -184,13 +200,10 @@ public class ReferenceType implements IObjectType
 		}
 
 		final ITypeParameter typeVariable = this.theClass.getTypeParameter(0);
-		if (typeVariable != null)
+		final IType concreteRefType = concrete.resolveType(typeVariable);
+		if (concreteRefType != null)
 		{
-			final IType concreteRefType = concrete.resolveType(typeVariable);
-			if (concreteRefType != null)
-			{
-				this.type.inferTypes(concreteRefType, typeContext);
-			}
+			this.type.inferTypes(concreteRefType, typeContext);
 		}
 	}
 
@@ -297,8 +310,8 @@ public class ReferenceType implements IObjectType
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.type.writeTypeExpression(writer);
-		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/ReferenceType", "apply",
-		                       "(Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/ReferenceType;", false);
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/ReferenceType", "apply",
+		                       "(Ldyvil/reflect/types/Type;)Ldyvil/reflect/types/ReferenceType;", false);
 	}
 
 	@Override

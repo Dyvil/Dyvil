@@ -1,0 +1,124 @@
+package dyvil.tests
+
+using dyvil.Collections
+using dyvil.Functions
+using dyvil.Test
+
+public class LambdaTest
+{
+	@FunctionalInterface
+	public interface MyFunction<P, R>
+	{
+		func apply(P par1) -> R
+		
+		func andThen<A>(MyFunction<R, A> other) -> MyFunction<P, A> = x => other(this(x))
+	}
+
+	@FunctionalInterface
+	public interface IntFunction extends MyFunction<int, int>
+	{
+		override func apply(int value) -> int
+	}
+
+	static func repeatClosure(int n, -> void f) -> void = for (i <- 0 ..< n) f()
+
+	private static var staticSum: int = 0
+
+	static func apply() -> Test = test "Lambdas" {
+		basic()
+		chaining()
+		compoundAssignment()
+		customSAMType()
+		closures()
+		partialFunctions()
+		curried()
+		typeInference()
+	}
+
+	static func basic() -> Test = test "Basic" {
+		let nullary1 = () => 1
+		let nullary2 = -> long => 2
+		let nullary3 = { => 1 }
+		let nullary4 = { -> float => 2 }
+		// Make sure these compile without errors
+
+		let expected = [ 1 : "A" ]
+		let actual = expected.flatMapped<int, String>((i, s) => [ (i, s) ])
+
+		actual =?= expected
+	}
+
+	static func chaining() -> Test = test "Chaining" {
+		let fun1 = (int i) -> int => i + 1
+		let fun2 = (int i) -> int => i * 2
+		let fun12 = fun1.andThen fun2
+		let result = fun12(7)
+
+		result =?= 16
+	}
+
+	static func compoundAssignment() -> Test = test "Compound Assignment" {
+		var localSum = 0
+		let list = List(1, 2, 3)
+
+		staticSum = 0
+		list.forEach(i => localSum += i)
+		list.forEach(i => staticSum += i)
+
+		test "Local" { localSum =?= 6 }
+		test "Static" { staticSum =?= 6 }
+	}
+
+	static func customSAMType() -> Test = test "Custom SAM Type" {
+		let intF: IntFunction = i => i * i
+		let result = intF(7)
+
+		result =?= 49
+	}
+
+	static func closures() -> Test = test "Closures" {
+		let result = List<String>
+
+		let function1: -> void = function { result += "a" }
+		let function2: -> String = function { "b" }
+
+		repeatClosure(3) { result += function2() }
+
+		with<String>("c") { result += $0 } // TODO Remove explicit Type Args
+
+		function1()
+
+		let expected = List("b", "b", "b", "c", "a")
+
+		result =?= expected
+	}
+
+	static func partialFunctions() -> Test = test "Partial Functions" {
+		let compareInts: (int, int) -> int = _.compareTo _
+		let testFun: any -> Test = _ =?= -1
+
+		testFun(compareInts(1, 2))
+
+		with<String>("A", _ =?= "A") // Explicit Type Args are required here
+	}
+
+	static func curried() -> Test = test "Curried" {
+		let add2: int -> int -> int               = i => j =>           i + j
+		let add3: int -> int -> int -> int        = i => j => k =>      i + j + k
+		let add4: int -> int -> int -> int -> int = i => j => k => l => i + j + k + l
+
+		(add2 1 10) =?= 11
+		(add3 1 10 100) =?= 111
+		(add4 1 10 100 1000) =?= 1111
+	}
+
+	static func typeInference() -> Test = test "Type Inference" {
+		let function1 = { int i -> int => i }
+		let function2 = { int i, int j => (i, j) }
+		let functionCurried = (int i) => (int j) => (i, j)
+
+		function1.staticType.toString =?= type(int -> int).toString
+		function2.staticType.toString =?= type((int, int) -> (int, int)).toString
+		functionCurried.staticType.toString =?= type(int -> int -> (int, int)).toString
+	}
+}

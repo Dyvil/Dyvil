@@ -129,6 +129,11 @@ public class NullableType implements IObjectType
 	@Override
 	public boolean isSuperTypeOf(IType subType)
 	{
+		if (subType.hasTag(IType.NULL))
+		{
+			return true;
+		}
+
 		final NullableType nullable = subType.extract(NullableType.class);
 		return Types.isSuperType(this.type, nullable != null ? nullable.getElementType() : subType);
 	}
@@ -303,8 +308,8 @@ public class NullableType implements IObjectType
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.type.writeTypeExpression(writer);
-		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/OptionType", "apply",
-		                       "(Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/OptionType;", false);
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/OptionType", "apply",
+		                       "(Ldyvil/reflect/types/Type;)Ldyvil/reflect/types/OptionType;", false);
 	}
 
 	@Override

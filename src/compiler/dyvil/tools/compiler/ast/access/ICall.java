@@ -99,7 +99,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 		final IParameter[] parameters = new IParameter[wildcards];
 		for (int i = 0; i < wildcards; i++)
 		{
-			parameters[i] = new CodeParameter(position, Name.fromRaw("wildcard$" + i), Types.UNKNOWN,
+			parameters[i] = new CodeParameter(null, position, Name.fromRaw("wildcard$" + i), Types.UNKNOWN,
 			                                  EmptyModifiers.INSTANCE, null);
 		}
 
@@ -142,8 +142,6 @@ public interface ICall extends IValue, IArgumentsConsumer
 	void resolveArguments(MarkerList markers, IContext context);
 
 	IValue resolveCall(MarkerList markers, IContext context, boolean report);
-
-	void checkArguments(MarkerList markers, IContext context);
 
 	static boolean privateAccess(IContext context, IValue receiver)
 	{

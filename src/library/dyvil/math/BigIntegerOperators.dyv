@@ -2,25 +2,27 @@ package dyvil.math
 
 import java.math.BigInteger
 
-public class BigIntegerOperators
+public abstract class BigIntegerOperators
 {
-	public infix implicit inline func toBigInteger(int i):    BigInteger = BigInteger.valueOf(i as long)
-	public infix implicit inline func toBigInteger(long i):   BigInteger = BigInteger.valueOf(i)
+	private init() {}
 
-	public static inline func +(BigInteger a): BigInteger = a
-	public static inline func -(BigInteger a): BigInteger = a.negate()
-	public static inline func ~(BigInteger a): BigInteger = a.xor(BigInteger.valueOf(-1))
+	postfix implicit inline func toBigInteger(i: int) ->    BigInteger = BigInteger.valueOf(i as long)
+	postfix implicit inline func toBigInteger(i: long) ->   BigInteger = BigInteger.valueOf(i)
 
-	public infix inline func +(BigInteger a, BigInteger b): BigInteger = a.add(b)
-	public infix inline func -(BigInteger a, BigInteger b): BigInteger = a.subtract(b)
-	public infix inline func *(BigInteger a, BigInteger b): BigInteger = a.multiply(b)
-	public infix inline func /(BigInteger a, BigInteger b): BigInteger = a.divide(b)
-	public infix inline func %(BigInteger a, BigInteger b): BigInteger = a.remainder(b)
-	public infix inline func **(BigInteger a, int b): BigInteger = a.pow(b)
+	prefix inline func + (rhs: BigInteger) -> BigInteger = rhs
+	prefix inline func - (rhs: BigInteger) -> BigInteger = rhs.negate()
+	prefix inline func ~ (rhs: BigInteger) -> BigInteger = rhs.xor(BigInteger.valueOf(-1))
 
-	public infix inline func &(BigInteger a, BigInteger b): BigInteger = a.and(b)
-	public infix inline func |(BigInteger a, BigInteger b): BigInteger = a.or(b)
-	public infix inline func ^(BigInteger a, BigInteger b): BigInteger = a.xor(b)
-	public infix inline func <<(BigInteger a, int b)      : BigInteger = a.shiftLeft(b)
-	public infix inline func >>(BigInteger a, int b)      : BigInteger = a.shiftRight(b)
+	infix  inline func + (lhs: BigInteger, rhs: BigInteger) -> BigInteger = lhs.add(rhs)
+	infix  inline func - (lhs: BigInteger, rhs: BigInteger) -> BigInteger = lhs.subtract(rhs)
+	infix  inline func * (lhs: BigInteger, rhs: BigInteger) -> BigInteger = lhs.multiply(rhs)
+	infix  inline func / (lhs: BigInteger, rhs: BigInteger) -> BigInteger = lhs.divide(rhs)
+	infix  inline func % (lhs: BigInteger, rhs: BigInteger) -> BigInteger = lhs.remainder(rhs)
+	infix  inline func **(lhs: BigInteger, rhs: int)        -> BigInteger = lhs.pow(rhs)
+
+	infix  inline func & (lhs: BigInteger, rhs: BigInteger) -> BigInteger = lhs.and(rhs)
+	infix  inline func | (lhs: BigInteger, rhs: BigInteger) -> BigInteger = lhs.or(rhs)
+	infix  inline func ^ (lhs: BigInteger, rhs: BigInteger) -> BigInteger = lhs.xor(rhs)
+	infix  inline func <<(lhs: BigInteger, rhs: int)        -> BigInteger = lhs.shiftLeft(rhs)
+	infix  inline func >>(lhs: BigInteger, rhs: int)        -> BigInteger = lhs.shiftRight(rhs)
 }

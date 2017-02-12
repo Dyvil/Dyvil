@@ -9,21 +9,26 @@ public abstract class Tuple
 {
 	private init() {} // no instances
 
+	public case class Of1<type +T1>(public let _1: T1)
+	{
+		override func toString() -> String = "Tuple(\(this._1))"
+	}
+
 	public case class Of2<type +T1, type +T2>
 		(
 			public let _1: T1
 			public let _2: T2
 		) implements Entry<T1, T2>
 	{
-		public override func getKey(): T1 = this._1
+		override func getKey() -> T1 = this._1
 
-		public override func getValue(): T2 = this._2
+		override func getValue() -> T2 = this._2
 
-		public override func toString(): String = "(\(this._1), \(this._2))"
+		override func toString() -> String = "(\(this._1), \(this._2))"
 
-		public override func equals(Object! obj): boolean = Entry.entryEquals(this, obj)
+		override func equals(Object! obj) -> boolean = Entry.entryEquals(this, obj)
 
-		public override func hashCode(): int = Entry.entryHashCode(this)
+		override func hashCode() -> int = Entry.entryHashCode(this)
 	}
 
 	public case class Of3<type +T1, type +T2, type +T3>
@@ -33,20 +38,20 @@ public abstract class Tuple
 			public let _3: T3
 		) implements Cell<T1, T2, T3>
 	{
-		public override func getRow(): T1 = this._1
+		override func getRow() -> T1 = this._1
 
-		public override func getColumn(): T2 = this._2
+		override func getColumn() -> T2 = this._2
 
-		public override func getValue(): T3 = this._3
+		override func getValue() -> T3 = this._3
 
-		public override func toString(): String = "(\(this._1), \(this._2), \(this._3))"
+		override func toString() -> String = "(\(this._1), \(this._2), \(this._3))"
 
-		public override func equals(Object! obj): boolean = Cell.cellEquals(this, obj)
+		override func equals(Object! obj) -> boolean = Cell.cellEquals(this, obj)
 
-		public override func hashCode(): int = Cell.cellHashCode(this)
+		override func hashCode() -> int = Cell.cellHashCode(this)
 	}
 
-	#define MAX_ARITY 10
+	#import Base.dgs
 	#for ARITY; 4; MAX_ARITY
 
 	@Immutable
@@ -60,7 +65,7 @@ public abstract class Tuple
 		#end
 		)
 	{
-		public override func toString: String = new StringBuilder()
+		override func toString: String = new StringBuilder()
 			.append('(').append(this._1)
 		#for INDEX; 2; ARITY
 			.append(', ').append(this._##INDEX)

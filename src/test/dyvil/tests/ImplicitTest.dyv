@@ -7,18 +7,18 @@ public class ImplicitTest
 	@FunctionalInterface
 	public static interface DebugPrintable
 	{
-		static implicit func int2debug(int i): DebugPrintable = => i.toString
+		static implicit func int2debug(int i) -> DebugPrintable = => i.toString
 
-		static implicit func string2debug(String s): DebugPrintable = => s
+		static implicit func string2debug(String s) -> DebugPrintable = => s
 
 		func toDebugString: String
 	}
 
-	public static implicit func i2s(int i): String = i.toString
+	static implicit func i2s(int i) -> String = i.toString
 
-	public static implicit func b2s(boolean b): String = b.toString
+	static implicit func b2s(boolean b) -> String = b.toString
 
-	public static func apply(): Test = test "Implicit Conversions" {
+	static func apply() -> Test = test "Implicit Conversions" {
 		let s: String = 123
 
 		test "Assignment" { s =?= "123" }

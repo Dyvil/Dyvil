@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.type;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
@@ -101,14 +102,13 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	int UNKNOWN   = 0;
 	int NULL      = 1;
 	int ANY       = 2;
-	int DYNAMIC   = 3;
 	int PRIMITIVE = 4;
 	int NONE      = 5;
 
 	// Class Types
 	int CLASS    = 16;
-	int NAMED    = 17;
-	int INTERNAL = 18;
+	int NAMED    = 17; // no deserialization
+	int INTERNAL = 18; // no deserialization
 	int PACKAGE  = 19;
 
 	// Generic Types
@@ -195,11 +195,6 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	IClass getRefClass();
 
-	default IType getRefType()
-	{
-		return new ReferenceType(this.getRefClass(), this);
-	}
-
 	IType getSimpleRefType();
 
 	default boolean hasTag(int tag)
@@ -285,7 +280,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	int SUBTYPE_TYPEVAR            = 3;
 	int SUBTYPE_COVARIANT_TYPEVAR  = 4;
 	int SUBTYPE_UNION_INTERSECTION = 5;
-	int SUBTYPE_NULL               = 6;
+	int SUBTYPE_NONE               = 6;
 
 	default int subTypeCheckLevel()
 	{
@@ -571,8 +566,6 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 			return Types.NONE;
 		case ANY:
 			return Types.ANY;
-		case DYNAMIC:
-			return Types.DYNAMIC;
 		case PRIMITIVE:
 			return PrimitiveType.fromTypecode(dis.readByte());
 		case CLASS:
@@ -631,7 +624,7 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	// Misc
 
 	@Override
-	void toString(String prefix, StringBuilder buffer);
+	void toString(@NonNull String prefix, @NonNull StringBuilder buffer);
 
 	@Override
 	boolean equals(Object obj);

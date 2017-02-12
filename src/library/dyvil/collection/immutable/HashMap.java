@@ -335,7 +335,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 
 	@NonNull
 	@Override
-	public <NK, NV> ImmutableMap<NK, NV> entryMapped(@NonNull BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> entryMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Entry<? extends NK, ? extends NV>> mapper)
 	{
 		HashMap<NK, NV> copy = new HashMap<>(this.size);
 		for (Entry<K, V> entry : this)
@@ -351,7 +351,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 
 	@NonNull
 	@Override
-	public <NK, NV> ImmutableMap<NK, NV> flatMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> flatMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends @NonNull Entry<? extends NK, ? extends NV>>> mapper)
 	{
 		HashMap<NK, NV> copy = new HashMap<>(this.size);
 		for (Entry<K, V> entry : this)

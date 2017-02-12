@@ -193,20 +193,20 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 		}
 	}
 
-	public AbstractIdentityHashMap(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public AbstractIdentityHashMap(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		this();
 		this.putAllInternal(iterable);
 	}
 
-	public AbstractIdentityHashMap(SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public AbstractIdentityHashMap(SizedIterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		this();
 		// Call the putAllInternal(Iterable) method to avoid redundant ensureCapacity call
-		this.putAllInternal((Iterable<? extends Entry<? extends K, ? extends V>>) iterable);
+		this.putAllInternal((Iterable<? extends @NonNull Entry<? extends K, ? extends V>>) iterable);
 	}
 
-	public AbstractIdentityHashMap(@NonNull Set<? extends Entry<? extends K, ? extends V>> set)
+	public AbstractIdentityHashMap(@NonNull Set<? extends @NonNull Entry<? extends K, ? extends V>> set)
 	{
 		this(set.size());
 		this.loadDistinctEntries(set);
@@ -338,7 +338,7 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 		}
 	}
 
-	protected void putAllInternal(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	protected void putAllInternal(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		for (Entry<? extends K, ? extends V> entry : iterable)
 		{
@@ -346,13 +346,13 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 		}
 	}
 
-	protected void putAllInternal(@NonNull SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	protected void putAllInternal(@NonNull SizedIterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		this.ensureCapacity(this.size + iterable.size());
-		this.putAllInternal((Iterable<? extends Entry<? extends K, ? extends V>>) iterable);
+		this.putAllInternal((Iterable<? extends @NonNull Entry<? extends K, ? extends V>>) iterable);
 	}
 
-	private void loadDistinctEntries(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	private void loadDistinctEntries(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		int index = 0;
 		int size = 0;

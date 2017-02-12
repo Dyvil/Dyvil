@@ -9,12 +9,12 @@ import dyvil.tools.compiler.ast.imports.KindedImport;
 import dyvil.tools.compiler.ast.modifiers.Modifier;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
-import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.operator.Operator;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
+import dyvil.tools.compiler.parser.annotation.ModifierParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.Markers;
@@ -119,7 +119,7 @@ public class DyvilHeaderParser extends Parser
 	protected boolean parseMetadata(IParserManager pm, IToken token, int type)
 	{
 		Modifier modifier;
-		if ((modifier = ModifierUtil.parseModifier(token, pm)) != null)
+		if ((modifier = ModifierParser.parseModifier(token, pm)) != null)
 		{
 			if (this.modifiers == null)
 			{

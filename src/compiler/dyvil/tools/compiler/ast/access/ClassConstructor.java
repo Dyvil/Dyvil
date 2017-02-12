@@ -75,15 +75,16 @@ public class ClassConstructor extends ConstructorCall
 
 		final IType type = theClass.isInterface() ? Types.OBJECT : this.type;
 
-		final MatchList<IConstructor> ambigousConstructors = this.resolveConstructor(markers, context, type);
-		if (ambigousConstructors == null)
+		final MatchList<IConstructor> candidates = this.resolveCandidates(context, type);
+		if (candidates.hasCandidate())
 		{
+			this.checkArguments(markers, context, candidates.getBestMember());
 			return this;
 		}
 
 		if (report)
 		{
-			reportResolve(markers, ambigousConstructors, this.position, type, this.arguments);
+			reportResolve(markers, candidates, this.position, type, this.arguments);
 			return this;
 		}
 		return null;

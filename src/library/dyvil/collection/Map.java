@@ -476,9 +476,9 @@ public interface Map<K, V> extends SizedIterable<Entry<K, V>>, Serializable
 
 	<NV> @NonNull Map<K, NV> valueMapped(@NonNull BiFunction<? super K, ? super V, ? extends NV> mapper);
 
-	<NK, NV> @NonNull Map<NK, NV> entryMapped(@NonNull BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper);
+	<NK, NV> @NonNull Map<NK, NV> entryMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Entry<? extends NK, ? extends NV>> mapper);
 
-	<NK, NV> @NonNull Map<NK, NV> flatMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper);
+	<NK, NV> @NonNull Map<NK, NV> flatMapped(@NonNull BiFunction<? super K, ? super V, ? extends Iterable<? extends @NonNull Entry<? extends NK, ? extends NV>>> mapper);
 
 	@NonNull Map<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> condition);
 
@@ -547,9 +547,9 @@ public interface Map<K, V> extends SizedIterable<Entry<K, V>>, Serializable
 
 	void mapValues(@NonNull BiFunction<? super K, ? super V, ? extends V> mapper);
 
-	void mapEntries(@NonNull BiFunction<? super K, ? super V, ? extends Entry<? extends K, ? extends V>> mapper);
+	void mapEntries(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Entry<? extends K, ? extends V>> mapper);
 
-	void flatMap(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends Entry<? extends K, ? extends V>>> mapper);
+	void flatMap(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>>> mapper);
 
 	void filter(@NonNull BiPredicate<? super K, ? super V> condition);
 
@@ -586,8 +586,7 @@ public interface Map<K, V> extends SizedIterable<Entry<K, V>>, Serializable
 		return array;
 	}
 
-	@NonNull
-	default K[] toKeyArray(@NonNull Class<K> type)
+	default @NonNull K[] toKeyArray(@NonNull Class<K> type)
 	{
 		@SuppressWarnings("unchecked") K[] array = (K[]) Array.newInstance(type, this.size());
 		this.toKeyArray(0, array);
@@ -614,8 +613,7 @@ public interface Map<K, V> extends SizedIterable<Entry<K, V>>, Serializable
 		return array;
 	}
 
-	@NonNull
-	default V[] toValueArray(@NonNull Class<V> type)
+	default V @NonNull [] toValueArray(@NonNull Class<V> type)
 	{
 		@SuppressWarnings("unchecked") V[] array = (V[]) Array.newInstance(type, this.size());
 		this.toValueArray(0, array);

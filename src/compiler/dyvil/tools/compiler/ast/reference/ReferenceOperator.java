@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.reference;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
@@ -7,63 +8,69 @@ import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
 public class ReferenceOperator implements IValue
 {
-	protected IValue     value;
-	protected IReference reference;
+	protected @NonNull IValue     value;
+	protected @NonNull IReference reference;
 
 	// Metadata
 	private IType type;
 
-	public ReferenceOperator(IValue value)
-	{
-		this.value = value;
-	}
-
-	public ReferenceOperator(IValue value, IReference reference)
+	public ReferenceOperator(@NonNull IValue value, @NonNull IReference reference)
 	{
 		this.value = value;
 		this.reference = reference;
 	}
-	
+
 	@Override
 	public ICodePosition getPosition()
 	{
 		return this.value.getPosition();
 	}
-	
+
 	@Override
 	public void setPosition(ICodePosition position)
 	{
 	}
-	
+
 	@Override
 	public int valueTag()
 	{
 		return REFERENCE;
 	}
-	
-	public void setValue(IValue value)
-	{
-		this.value = value;
-	}
-	
+
+	@NonNull
 	public IValue getValue()
 	{
 		return this.value;
 	}
-	
+
+	public void setValue(@NonNull IValue value)
+	{
+		this.value = value;
+	}
+
+	@NonNull
+	public IReference getReference()
+	{
+		return this.reference;
+	}
+
+	public void setReference(@NonNull IReference reference)
+	{
+		this.reference = reference;
+	}
+
 	@Override
 	public boolean isResolved()
 	{
-		return this.reference != null;
+		return true;
 	}
-	
+
 	@Override
 	public IType getType()
 	{
@@ -74,7 +81,7 @@ public class ReferenceOperator implements IValue
 		}
 		return this.type;
 	}
-	
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -90,76 +97,35 @@ public class ReferenceOperator implements IValue
 	}
 
 	@Override
-	public IValue resolveOperator(MarkerList markers, IContext context)
-	{
-		if (this.reference != null)
-		{
-			return this;
-		}
-
-		final IValue referenceValue = this.value.toReferenceValue(markers, context);
-		if (referenceValue != null)
-		{
-			return referenceValue.resolveOperator(markers, context);
-		}
-
-		final IReference reference = this.value.toReference();
-
-		if (reference == null)
-		{
-			if (this.value.isResolved())
-			{
-				markers.add(Markers.semanticError(this.value.getPosition(), "reference.expression.invalid"));
-			}
-			return this;
-		}
-
-		reference.resolve(this.value.getPosition(), markers, context);
-		this.reference = reference;
-		return this;
-	}
-
-	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		this.value.checkTypes(markers, context);
-
-		if (this.reference != null)
-		{
-			this.reference.checkTypes(this.value.getPosition(), markers, context);
-		}
+		this.reference.checkTypes(this.value.getPosition(), markers, context);
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		this.value.check(markers, context);
-
-		if (this.reference != null)
-		{
-			this.reference.check(this.value.getPosition(), markers, context);
-		}
+		this.reference.check(this.value.getPosition(), markers, context);
 	}
-	
+
 	@Override
 	public IValue foldConstants()
 	{
 		this.value = this.value.foldConstants();
 		return this;
 	}
-	
+
 	@Override
 	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 		this.value = this.value.cleanup(compilableList, classCompilableList);
+		this.reference.cleanup(compilableList, classCompilableList);
 
-		if (this.reference != null)
-		{
-			this.reference.cleanup(compilableList, classCompilableList);
-		}
 		return this;
 	}
-	
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{

@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.parser.header;
 
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
-import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
+import dyvil.tools.compiler.parser.annotation.ModifierParser;
 import dyvil.tools.compiler.parser.classes.ClassDeclarationParser;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -48,7 +48,7 @@ public final class DyvilUnitParser extends DyvilHeaderParser
 			// Fallthrough
 		case CLASS:
 			final int classType;
-			if ((classType = ModifierUtil.parseClassTypeModifier(token, pm)) >= 0)
+			if ((classType = ModifierParser.parseClassTypeModifier(token, pm)) >= 0)
 			{
 				if (this.modifiers == null)
 				{

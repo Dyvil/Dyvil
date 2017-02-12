@@ -5,13 +5,15 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.Candidate;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
+import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
+import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -190,32 +192,23 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 	@Override
 	public IValue resolveCall(MarkerList markers, IContext context, boolean report)
 	{
-		final MatchList<IMethod> ambigousCandidates = this.resolveMethodCall(markers, context);
-		if (ambigousCandidates == null)
+		final MatchList<IMethod> candidates = this.resolveCandidates(context);
+		if (candidates.hasCandidate())
 		{
-			return this;
+			return this.checkArguments(markers, context, candidates.getBestMember());
 		}
 
 		if (report)
 		{
-			this.reportResolve(markers, ambigousCandidates);
+			this.reportResolve(markers, candidates);
 			return this;
 		}
 		return null;
 	}
 
-	protected MatchList<IMethod> resolveMethodCall(MarkerList markers, IContext context)
+	protected MatchList<IMethod> resolveCandidates(IContext context)
 	{
-		final MatchList<IMethod> list = ICall.resolveMethods(context, this.receiver, this.getName(), this.arguments);
-		final IMethod method = list.getBestMember();
-
-		if (method != null)
-		{
-			this.method = method;
-			this.checkArguments(markers, context);
-			return null;
-		}
-		return list;
+		return ICall.resolveMethods(context, this.receiver, this.getName(), this.arguments);
 	}
 
 	protected void reportResolve(MarkerList markers, MatchList<IMethod> matches)
@@ -277,27 +270,37 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 		marker.addInfo(sb.toString());
 	}
 
-	@Override
-	public void checkArguments(MarkerList markers, IContext context)
+	protected final IValue checkArguments(MarkerList markers, IContext context, IMethod method)
 	{
-		if (this.method != null)
-		{
-			GenericData data;
-			if (this.genericData != null)
-			{
-				data = this.genericData = this.method.getGenericData(this.genericData, this.receiver, this.arguments);
-			}
-			else
-			{
-				data = this.getGenericData();
-			}
+		this.method = method;
 
-			this.receiver = this.method
-				                .checkArguments(markers, this.position, context, this.receiver, this.arguments, data);
+		final IntrinsicData intrinsicData = method.getIntrinsicData();
+		final int code;
+		final IValue intrinsic;
+		if (intrinsicData != null // Intrinsic annotation
+			    && (code = intrinsicData.getCompilerCode()) != 0 // compilerCode argument
+			    && (intrinsic = Intrinsics.getOperator(code, this.receiver, this.arguments)) != null) // valid intrinsic
+		{
+			return intrinsic;
 		}
+
+		final GenericData genericData;
+		if (this.genericData != null)
+		{
+			genericData = this.genericData = method.getGenericData(this.genericData, this.receiver, this.arguments);
+		}
+		else
+		{
+			genericData = this.getGenericData();
+		}
+
+		this.receiver = method.checkArguments(markers, this.position, context, this.receiver, this.arguments,
+		                                      genericData);
 
 		this.type = null;
 		this.type = this.getType();
+
+		return this;
 	}
 
 	@Override

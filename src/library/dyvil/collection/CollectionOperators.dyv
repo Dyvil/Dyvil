@@ -7,73 +7,73 @@ public final class CollectionOperators
 {
 	private init() {}
 
-	public infix inline func ?(Collection<_> collection, any element): boolean = collection.contains(element)
+	infix inline func ?(Collection<_> collection, any element) -> boolean = collection.contains(element)
 
 	// Non-Mutating Operators
 
-	public infix inline func + <T>(Collection<T> collection, T element): Collection<T>
+	infix inline func + <T>(Collection<T> collection, T element) -> Collection<T>
 		= collection.added(element)
 
-	public infix inline func ++ <T>(Collection<T> collection, Collection<+T> elements): Collection<T>
+	infix inline func ++ <T>(Collection<T> collection, Collection<+T> elements) -> Collection<T>
 		= collection.union(elements)
 
-	public infix inline func - <T>(Collection<T> collection, any element): Collection<T>
+	infix inline func - <T>(Collection<T> collection, any element) -> Collection<T>
 		= collection.removed(element)
 
-	public infix inline func -- <T>(Collection<T> collection, Collection<_> elements): Collection<T>
+	infix inline func -- <T>(Collection<T> collection, Collection<_> elements) -> Collection<T>
 		= collection.difference(elements)
 
-	public infix inline func + <T>(MutableCollection<T> collection, T element): MutableCollection<T>
+	infix inline func + <T>(MutableCollection<T> collection, T element) -> MutableCollection<T>
 		= collection.added(element)
 
-	public infix inline func ++ <T>(MutableCollection<T> collection, Collection<+T> elements): MutableCollection<T>
+	infix inline func ++ <T>(MutableCollection<T> collection, Collection<+T> elements) -> MutableCollection<T>
 		= collection.union(elements)
 
-	public infix inline func - <T>(MutableCollection<T> collection, any element): MutableCollection<T>
+	infix inline func - <T>(MutableCollection<T> collection, any element) -> MutableCollection<T>
 		= collection.removed(element)
 
-	public infix inline func -- <T>(MutableCollection<T> collection, Collection<_> elements): MutableCollection<T>
+	infix inline func -- <T>(MutableCollection<T> collection, Collection<_> elements) -> MutableCollection<T>
 		= collection.difference(elements)
 
-	public infix inline func + <T>(ImmutableCollection<T> collection, T element): ImmutableCollection<T>
+	infix inline func + <T>(ImmutableCollection<T> collection, T element) -> ImmutableCollection<T>
 		= collection.added(element)
 
-	public infix inline func ++ <T>(ImmutableCollection<T> collection, Collection<+T> elements): ImmutableCollection<T>
+	infix inline func ++ <T>(ImmutableCollection<T> collection, Collection<+T> elements) -> ImmutableCollection<T>
 		= collection.union(elements)
 
-	public infix inline func - <T>(ImmutableCollection<T> collection, any element): ImmutableCollection<T>
+	infix inline func - <T>(ImmutableCollection<T> collection, any element) -> ImmutableCollection<T>
 		= collection.removed(element)
 
-	public infix inline func -- <T>(ImmutableCollection<T> collection, Collection<_> elements): ImmutableCollection<T>
+	infix inline func -- <T>(ImmutableCollection<T> collection, Collection<_> elements) -> ImmutableCollection<T>
 		= collection.difference(elements)
 
 	// Mutating Operators
 
-	public infix inline func += <T>(Collection<T> collection, T element): void
+	infix inline func += <T>(Collection<T> collection, T element) -> void
 		= collection.add(element)
 
-	public infix inline func ++= <T>(Collection<T> collection, Collection<+T> elements): void
+	infix inline func ++= <T>(Collection<T> collection, Collection<+T> elements) -> void
 		= collection.addAll(elements)
 
-	public infix inline func -= <T>(Collection<T> collection, any element): void
+	infix inline func -= <T>(Collection<T> collection, any element) -> void
 		= collection.remove(element)
 
-	public infix inline func --= <T>(Collection<T> collection, Collection<_> elements): void
+	infix inline func --= <T>(Collection<T> collection, Collection<_> elements) -> void
 		= collection.removeAll(elements)
 
 	@Mutating
-	public infix inline func += <T>(ImmutableCollection<T> collection, T element): void
+	infix inline func += <T>(ImmutableCollection<T> collection, T element) -> void
 		= throw new ImmutableException("+= on Immutable Collection")
 
 	@Mutating
-	public infix inline func ++= <T>(ImmutableCollection<T> collection, Collection<+T> elements): void
+	infix inline func ++= <T>(ImmutableCollection<T> collection, Collection<+T> elements) -> void
 		= throw new ImmutableException("++= on Immutable Collection")
 
 	@Mutating
-	public infix inline func -= <T>(ImmutableCollection<T> collection, any element): void
+	infix inline func -= <T>(ImmutableCollection<T> collection, any element) -> void
 		= throw new ImmutableException("-= on Immutable Collection")
 
 	@Mutating
-	public infix inline func --= <T>(ImmutableCollection<T> collection, Collection<_> elements): void
+	infix inline func --= <T>(ImmutableCollection<T> collection, Collection<_> elements) -> void
 		= throw new ImmutableException("--= on Immutable Collection")
 }

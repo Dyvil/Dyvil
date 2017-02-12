@@ -1,0 +1,3 @@
+@fileName=halfopen/FloatRange.dyv
+@inheritFrom=Base-Float.dgs
+IS_HALF_OPEN=true

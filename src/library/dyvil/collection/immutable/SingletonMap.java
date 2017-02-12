@@ -209,7 +209,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 
 	@NonNull
 	@Override
-	public <NK, NV> ImmutableMap<NK, NV> entryMapped(@NonNull BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> entryMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Entry<? extends NK, ? extends NV>> mapper)
 	{
 		Entry<? extends NK, ? extends NV> entry = mapper.apply(this.key, this.value);
 		return entry == null ? EmptyMap.instance : new SingletonMap<>(entry.getKey(), entry.getValue());
@@ -217,7 +217,7 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 
 	@Nullable
 	@Override
-	public <NK, NV> ImmutableMap<NK, NV> flatMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> flatMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends @NonNull Entry<? extends NK, ? extends NV>>> mapper)
 	{
 		ArrayMap.Builder<NK, NV> builder = new ArrayMap.Builder<>();
 		for (Entry<? extends NK, ? extends NV> entry : mapper.apply(this.key, this.value))
@@ -234,9 +234,8 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 		return condition.test(this.key, this.value) ? this : EmptyMap.instance;
 	}
 
-	@NonNull
 	@Override
-	public Entry<K, V>[] toArray()
+	public Entry<K, V> @NonNull[] toArray()
 	{
 		return (Entry<K, V>[]) new Entry[] { this };
 	}
@@ -247,9 +246,8 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 		store[index] = this;
 	}
 
-	@NonNull
 	@Override
-	public Object[] toKeyArray()
+	public Object @NonNull [] toKeyArray()
 	{
 		return new Object[] { this.key };
 	}
@@ -260,9 +258,8 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 		store[index] = this.key;
 	}
 
-	@NonNull
 	@Override
-	public Object[] toValueArray()
+	public Object @NonNull [] toValueArray()
 	{
 		return new Object[] { this.value };
 	}

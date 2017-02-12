@@ -47,19 +47,19 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements MutableMap
 	}
 
 	@NonNull
-	public static <K, V> ArrayMap<K, V> from(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public static <K, V> ArrayMap<K, V> from(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		return new ArrayMap<>(iterable);
 	}
 
 	@NonNull
-	public static <K, V> ArrayMap<K, V> from(@NonNull SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public static <K, V> ArrayMap<K, V> from(@NonNull SizedIterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		return new ArrayMap<>(iterable);
 	}
 
 	@NonNull
-	public static <K, V> ArrayMap<K, V> from(@NonNull Set<? extends Entry<? extends K, ? extends V>> set)
+	public static <K, V> ArrayMap<K, V> from(@NonNull Set<? extends @NonNull Entry<? extends K, ? extends V>> set)
 	{
 		return new ArrayMap<>(set);
 	}
@@ -113,17 +113,17 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements MutableMap
 		super(entries);
 	}
 
-	public ArrayMap(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public ArrayMap(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		super(iterable);
 	}
 
-	public ArrayMap(@NonNull SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public ArrayMap(@NonNull SizedIterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		super(iterable);
 	}
 
-	public ArrayMap(@NonNull Set<? extends Entry<? extends K, ? extends V>> set)
+	public ArrayMap(@NonNull Set<? extends @NonNull Entry<? extends K, ? extends V>> set)
 	{
 		super(set);
 	}

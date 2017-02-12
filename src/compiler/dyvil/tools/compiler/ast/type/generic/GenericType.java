@@ -146,10 +146,12 @@ public abstract class GenericType implements IObjectType, ITypeList
 		return changed ? newTypes : types;
 	}
 
-	@Override
-	public IType resolveType(MarkerList markers, IContext context)
+	protected void resolveTypeArguments(MarkerList markers, IContext context)
 	{
-		return this;
+		for (int i = 0; i < this.typeArgumentCount; i++)
+		{
+			this.typeArguments[i] = this.typeArguments[i].resolveType(markers, context);
+		}
 	}
 
 	@Override
@@ -223,7 +225,7 @@ public abstract class GenericType implements IObjectType, ITypeList
 		writer.visitLdcInsn(Type.getObjectType(this.getTheClass().getInternalName()));
 
 		writer.visitLdcInsn(this.typeArgumentCount);
-		writer.visitTypeInsn(Opcodes.ANEWARRAY, "dyvilx/lang/model/type/Type");
+		writer.visitTypeInsn(Opcodes.ANEWARRAY, "dyvil/reflect/types/Type");
 		for (int i = 0; i < this.typeArgumentCount; i++)
 		{
 			writer.visitInsn(Opcodes.DUP);
@@ -232,8 +234,8 @@ public abstract class GenericType implements IObjectType, ITypeList
 			writer.visitInsn(Opcodes.AASTORE);
 		}
 
-		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/GenericType", "apply",
-		                       "(Ljava/lang/Class;[Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/GenericType;",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/GenericType", "apply",
+		                       "(Ljava/lang/Class;[Ldyvil/reflect/types/Type;)Ldyvil/reflect/types/GenericType;",
 		                       false);
 	}
 

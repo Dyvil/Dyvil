@@ -43,7 +43,7 @@ public class NoneType implements IBuiltinType
 	@Override
 	public int subTypeCheckLevel()
 	{
-		return SUBTYPE_NULL;
+		return SUBTYPE_NONE;
 	}
 
 	@Override
@@ -92,8 +92,8 @@ public class NoneType implements IBuiltinType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvilx/lang/model/type/NoneType", "instance",
-		                      "Ldyvilx/lang/model/type/NoneType;");
+		writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/types/NoneType", "instance",
+		                      "Ldyvil/reflect/types/NoneType;");
 	}
 
 	@Override

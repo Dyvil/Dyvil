@@ -1,9 +1,12 @@
 package dyvil.tools.compiler.ast.field;
 
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.FieldVisitor;
 import dyvil.tools.asm.Label;
+import dyvil.tools.asm.TypeReference;
 import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.access.FieldAssignment;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
@@ -443,11 +446,17 @@ public class Field extends Member implements IField
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		final int modifiers = this.modifiers.toFlags() & ModifierUtil.JAVA_MODIFIER_MASK;
+		final long flags = ModifierUtil.getFlags(this);
+		final int modifiers = ModifierUtil.getJavaModifiers(flags);
+
 		final String name = this.getInternalName();
 		final String descriptor = this.getDescriptor();
+		final String signature = this.getType().needsSignature() ? this.getSignature() : null;
+		final Object value = this.getObjectValue();
 
-		this.writeField(writer, modifiers, name, descriptor);
+		final FieldVisitor fieldVisitor = writer.visitField(modifiers, name, descriptor, signature, value);
+		this.writeAnnotations(fieldVisitor, flags);
+		fieldVisitor.visitEnd();
 
 		if (this.property != null)
 		{
@@ -459,32 +468,9 @@ public class Field extends Member implements IField
 			return;
 		}
 
-		this.writeLazy(writer, modifiers, name, descriptor);
-	}
-
-	protected void writeField(ClassWriter writer, int modifiers, String name, String descriptor)
-	{
-		final String signature = this.getType().needsSignature() ? this.getSignature() : null;
-		final Object value;
-		if (this.value != null && this.hasModifier(Modifiers.STATIC) && this.hasConstantValue())
-		{
-			value = this.value.toObject();
-		}
-		else
-		{
-			value = null;
-		}
-		final FieldVisitor fieldVisitor = writer.visitField(modifiers, name, descriptor, signature, value);
-
-		IField.writeAnnotations(fieldVisitor, this.modifiers, this.annotations, this.type);
-		fieldVisitor.visitEnd();
-	}
-
-	protected void writeLazy(ClassWriter writer, int modifiers, String name, String descriptor)
-	{
 		final String lazyName = name + "$lazy";
 		final String ownerClass = this.enclosingClass.getInternalName();
-		final boolean isStatic = (modifiers & Modifiers.STATIC) != 0;
+		final boolean isStatic = (flags & Modifiers.STATIC) != 0;
 
 		writer
 			.visitField(isStatic ? Modifiers.PRIVATE | Modifiers.STATIC : Modifiers.PRIVATE, lazyName, "Z", null, null);
@@ -544,6 +530,38 @@ public class Field extends Member implements IField
 		}
 		access.visitInsn(returnOpcode);
 		access.visitEnd();
+	}
+
+	private void writeAnnotations(FieldVisitor fieldVisitor, long flags)
+	{
+		ModifierUtil.writeModifiers(fieldVisitor, this, flags);
+
+		final AnnotationList annotations = this.getAnnotations();
+		if (annotations != null)
+		{
+			int count = annotations.annotationCount();
+			for (int i = 0; i < count; i++)
+			{
+				annotations.getAnnotation(i).write(fieldVisitor);
+			}
+		}
+
+		IType.writeAnnotations(this.getType(), fieldVisitor, TypeReference.newTypeReference(TypeReference.FIELD), "");
+	}
+
+	@Nullable
+	public Object getObjectValue()
+	{
+		final Object value;
+		if (this.value != null && this.hasModifier(Modifiers.STATIC) && this.hasConstantValue())
+		{
+			value = this.value.toObject();
+		}
+		else
+		{
+			value = null;
+		}
+		return value;
 	}
 
 	@Override
@@ -634,7 +652,7 @@ public class Field extends Member implements IField
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String prefix, @NonNull StringBuilder buffer)
 	{
 		super.toString(prefix, buffer);
 		IDataMember.toString(prefix, buffer, this, "field.type_ascription");

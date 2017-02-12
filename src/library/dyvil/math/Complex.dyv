@@ -2,55 +2,70 @@ package dyvil.math
 
 @LiteralConvertible.FromDouble
 @LiteralConvertible.FromTuple
-public case class Complex(final double real, final double imag)
+public case class Complex(let real: double, let imag: double)
 {
-	public static let i = Complex(0, 1)
+	public const i = Complex(0, 1)
 
 	// Conversion Methods
 
-	public static inline func apply(double real): Complex = new Complex(real, 0)
+	implicit static inline func apply(real: double) -> Complex = new Complex(real, 0)
 
 	@OverloadPriority
-	public static func apply(double real, double imag): Complex = new Complex(real, imag)
+	static inline func apply(real: double, imag: double) -> Complex = new Complex(real, imag)
 
 	@BytecodeName("fromPolar")
-	public static func apply(double length, double argument): Complex = new Complex(length * Math.cos(argument), length * Math.sin(argument))
+	static inline func apply(explicit length: double, explicit argument: double) -> Complex
+		= new Complex(length * Math.cos(argument), length * Math.sin(argument))
 
-	public static implicit inline infix func toComplex(double d): Complex = Complex(d, 0)
+	// Basic Operations
 
-	// Basic Operators
+	func length()   -> double = Math.hypot(this.real, this.imag)
 
-	public func length(): double
-	{
-		let r = this.real
-		let i = this.imag
-		return Math.sqrt(r * r + i * i)
-	}
-
-	public func argument(): double = Math.atan(this.imag / this.real)
+	func argument() -> double = Math.atan2(this.imag, this.real)
 
 	// Prefix Operators
 
-	public prefix func -(Complex c): Complex = Complex(-c.real, c.imag)
+	inline prefix func +(rhs: Complex) -> Complex = rhs
 
-	public prefix func ~(Complex c): Complex = Complex(c.real, -c.imag)
+	prefix func -(rhs: Complex) -> Complex = Complex(-rhs.real, -rhs.imag)
 
-	// Infix Operators
+	prefix func ~(rhs: Complex) -> Complex = Complex(+rhs.real, -rhs.imag)
 
-	public infix func +(Complex lhs, Complex rhs): Complex = Complex(lhs.real + rhs.real, lhs.imag + rhs.imag)
+	// Additive Operators
 
-	public infix func -(Complex lhs, Complex rhs): Complex = Complex(lhs.real - rhs.real, lhs.imag - rhs.imag)
+	infix func +(lhs: Complex, rhs: Complex) -> Complex = Complex(lhs.real + rhs.real, lhs.imag + rhs.imag)
 
-	public infix func *(Complex lhs, Complex rhs): Complex
+	infix func -(lhs: Complex, rhs: Complex) -> Complex = Complex(lhs.real - rhs.real, lhs.imag - rhs.imag)
+
+	// Multiplicative Operators
+
+	infix func *(lhs: double, rhs: Complex)  -> Complex = Complex(lhs * rhs.real, lhs * rhs.imag)
+
+	infix func *(lhs: Complex, rhs: double)  -> Complex = Complex(lhs.real * rhs, lhs.imag * rhs)
+
+	infix func *(lhs: Complex, rhs: Complex) -> Complex
 	{
 		let lr = lhs.real
 		let li = lhs.imag
 		let rr = rhs.real
 		let ri = rhs.imag
-		return Complex(lr * rr - ri * li, li * rr + lr * ri)
+
+		let real = lr * rr - ri * li
+		let imag = li * rr + lr * ri
+		return Complex(real, imag)
 	}
 
-	public infix func /(Complex lhs, Complex rhs): Complex
+	infix func /(lhs: Complex, rhs: double)  -> Complex = Complex(lhs.real / rhs, lhs.imag / rhs)
+
+	infix func /(lhs: double, rhs: Complex)  -> Complex
+	{
+		let rr = rhs.real
+		let ri = rhs.imag
+		let d = lhs / (rr * rr + ri * ri)
+		return Complex(rr * d, -ri * d)
+	}
+
+	infix func /(lhs: Complex, rhs: Complex) -> Complex
 	{
 		let lr = lhs.real
 		let li = lhs.imag
@@ -60,5 +75,18 @@ public case class Complex(final double real, final double imag)
 		return Complex((lr * rr + li * ri) * d, (li * rr - lr * ri) * d)
 	}
 
-	public override func toString(): String = this.imag >= 0 ? "\(this.real)+\(this.imag)i" : "\(this.real)\(this.imag)i"
+	// Exponentiative Operators
+
+	// (r * exp(arg * i)) ^ b = r ^ b * exp(arg * i * b)
+	infix func **(lhs: Complex, rhs: double) -> Complex = Complex(length: lhs.length ** rhs, argument: lhs.argument * rhs)
+
+	// Other Methods
+
+	override func toString() -> String
+	{
+		if (this.imag == 0) return "\(this.real)"
+		if (this.real == 0) return "\(this.imag)i"
+		if (this.imag >= 0) return "\(this.real) + \(this.imag)i"
+		                    return "\(this.real) - \(-this.imag)i"
+	}
 }

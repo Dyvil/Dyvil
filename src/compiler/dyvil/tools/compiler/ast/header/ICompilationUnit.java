@@ -4,6 +4,7 @@ import dyvil.io.Console;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.lang.I18n;
 import dyvil.tools.compiler.sources.IFileType;
+import dyvil.tools.parsing.source.FileSource;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.Marker;
@@ -13,7 +14,7 @@ import java.io.File;
 
 public interface ICompilationUnit extends IASTNode
 {
-	File getInputFile();
+	FileSource getSourceFile();
 
 	File getOutputFile();
 
@@ -39,7 +40,7 @@ public interface ICompilationUnit extends IASTNode
 
 	void compile();
 
-	static boolean printMarkers(DyvilCompiler compiler, MarkerList markers, IFileType fileType, Name name, File inputFile, String source)
+	static boolean printMarkers(DyvilCompiler compiler, MarkerList markers, IFileType fileType, Name name, FileSource source)
 	{
 		final int size = markers.size();
 		if (size <= 0)
@@ -49,7 +50,7 @@ public interface ICompilationUnit extends IASTNode
 
 		final StringBuilder builder = new StringBuilder(I18n
 			                                                .get("unit.problems", fileType.getLocalizedName(), name,
-			                                                     inputFile)).append("\n\n");
+			                                                     source)).append("\n\n");
 
 		final int warnings = markers.getWarnings();
 		final int errors = markers.getErrors();
@@ -98,7 +99,7 @@ public interface ICompilationUnit extends IASTNode
 		compiler.log(builder.toString());
 		if (errors > 0)
 		{
-			compiler.failCompilation();
+			compiler.fail();
 			compiler.warn(I18n.get("unit.problems.not_compiled", name));
 			compiler.warn("");
 			return true;

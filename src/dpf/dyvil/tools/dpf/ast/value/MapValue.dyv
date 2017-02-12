@@ -1,13 +1,10 @@
 package dyvil.tools.dpf.ast.value
 
-import dyvil.collection.Entry
-import dyvil.collection.Map
 import dyvil.collection.mutable.ArrayMap
 import dyvil.tools.dpf.ast.Expandable
 import dyvil.tools.dpf.converter.DPFValueVisitor
 import dyvil.tools.dpf.visitor.MapVisitor
 import dyvil.tools.dpf.visitor.ValueVisitor
-import dyvil.tuple.Tuple2
 
 import java.util.function.BiFunction
 
@@ -18,11 +15,11 @@ public class MapValue(
 {
 	private Value! tempKey
 
-	public static func apply(): MapValue = new MapValue(new ArrayMap<Value, Value>)
+	static func apply() -> MapValue = new MapValue(new ArrayMap<Value, Value>)
 
-	public static func apply(int capacity): MapValue = new MapValue(new ArrayMap<Value, Value>(capacity))
+	static func apply(int capacity) -> MapValue = new MapValue(new ArrayMap<Value, Value>(capacity))
 
-	public static func apply(Map<_, _> map): MapValue
+	static func apply(Map<_, _> map) -> MapValue
 	{
 		let mapValue = MapValue(map.size)
 		for (Entry<_, _> entry <- map)
@@ -88,8 +85,8 @@ public class MapValue(
 			return
 		}
 
-		let keys = this.entries.toKeyArray(class Value)
-		let values = this.entries.toValueArray(class Value)
+		let keys: [Value] = this.entries.toKeyArray(class Value)
+		let values: [Value] = this.entries.toValueArray(class Value)
 		
 		let indent1 = indent + "\t"
 		

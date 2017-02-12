@@ -68,8 +68,8 @@ public class AnyType implements IBuiltinType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvilx/lang/model/type/AnyType", "instance",
-		                      "Ldyvilx/lang/model/type/AnyType;");
+		writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/types/AnyType", "instance",
+		                      "Ldyvil/reflect/types/AnyType;");
 	}
 
 	@Override

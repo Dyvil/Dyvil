@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.backend;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.ASMConstants;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
@@ -12,6 +13,8 @@ import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.method.IExceptionList;
 import dyvil.tools.compiler.ast.method.IExternalCallableMember;
+import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.type.IType;
@@ -82,6 +85,15 @@ public final class ClassFormat
 			return ClassFormat.H_INVOKESPECIAL;
 		}
 		return -1;
+	}
+
+	public static ModifierSet readModifiers(int access)
+	{
+		if ((access & Modifiers.VISIBILITY_MODIFIERS) == 0)
+		{
+			access |= Modifiers.PACKAGE;
+		}
+		return new FlagModifierSet(access);
 	}
 
 	public static String packageToInternal(String pack)
@@ -197,7 +209,7 @@ public final class ClassFormat
 		final IParameterList parameterList = methodSignature.getExternalParameterList();
 		return type ->
 		{
-			final ExternalParameter parameter = new ExternalParameter(null, type);
+			final ExternalParameter parameter = new ExternalParameter(null, null, type);
 			parameter.setMethod(methodSignature);
 			parameterList.addParameter(parameter);
 		};

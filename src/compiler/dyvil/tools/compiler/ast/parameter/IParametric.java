@@ -8,7 +8,7 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IParametric
 {
-	default boolean setReceiverType(IType type)
+	default boolean setThisType(IType type)
 	{
 		return false;
 	}
@@ -20,8 +20,5 @@ public interface IParametric
 		return false;
 	}
 
-	default IParameter createParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
-	{
-		return new CodeParameter(position, name, type, modifiers, annotations);
-	}
+	IParameter createParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations);
 }

@@ -27,6 +27,7 @@ import dyvil.tools.parsing.lexer.DyvilLexer;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.name.Qualifier;
+import dyvil.tools.parsing.source.LineSource;
 import dyvil.tools.repl.DyvilREPL;
 import dyvil.tools.repl.context.REPLContext;
 import dyvil.tools.repl.lang.I18n;
@@ -95,7 +96,7 @@ public class CompleteCommand implements ICommand
 				markers.sort();
 				for (Marker marker : markers)
 				{
-					marker.log(expression, builder, colors);
+					marker.log(new LineSource(expression), builder, colors);
 				}
 
 				repl.getOutput().println(builder);
@@ -232,7 +233,13 @@ public class CompleteCommand implements ICommand
 
 	private static void findMembers(IType type, Set<IField> fields, Set<IProperty> properties, Set<IMethod> methods, String start, boolean statics)
 	{
-		final IClassBody body = type.getTheClass().getBody();
+		final IClass theClass = type.getTheClass();
+		if (theClass == null)
+		{
+			return;
+		}
+
+		final IClassBody body = theClass.getBody();
 		if (body == null)
 		{
 			return;
@@ -299,7 +306,11 @@ public class CompleteCommand implements ICommand
 
 		for (int i = 0, count = matchList.size(); i < count; i++)
 		{
-			checkMember(methods, matchList.getCandidate(i).getMember(), start, true);
+			final IMethod member = matchList.getCandidate(i).getMember();
+			if (member.hasModifier(Modifiers.INFIX))
+			{
+				checkMember(methods, member, start, true);
+			}
 		}
 	}
 

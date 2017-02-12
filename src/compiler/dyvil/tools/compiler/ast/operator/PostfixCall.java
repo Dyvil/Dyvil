@@ -52,25 +52,17 @@ public class PostfixCall extends MethodCall
 	@Override
 	public IValue resolveCall(MarkerList markers, IContext context, boolean report)
 	{
-		final IValue op = Operators.getPostfix(this.receiver, this.name);
-		if (op != null)
-		{
-			// Intrinsic Postfix Operators (..., ++ and --)
-			op.setPosition(this.position);
-			return op.resolveOperator(markers, context);
-		}
-
 		// Normal Method Resolution
-		final MatchList<IMethod> ambiguousCandidates = this.resolveMethodCall(markers, context);
-		if (ambiguousCandidates == null)
+		final MatchList<IMethod> candidates = this.resolveCandidates(context);
+		if (candidates.hasCandidate())
 		{
-			return this;
+			return this.checkArguments(markers, context, candidates.getBestMember());
 		}
 
 		// No Implicit or Apply Resolution
 		if (report)
 		{
-			this.reportResolve(markers, ambiguousCandidates);
+			this.reportResolve(markers, candidates);
 			return this;
 		}
 		return null;

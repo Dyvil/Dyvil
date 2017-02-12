@@ -3,33 +3,29 @@ package dyvil.tools.gensrc;
 import dyvil.tools.gensrc.ast.Specialization;
 import dyvil.tools.gensrc.ast.Template;
 import dyvil.tools.gensrc.lang.I18n;
+import dyvilx.tools.BasicTool;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class GenSrc
+public class GenSrc extends BasicTool
 {
-	private List<Template>            templates = new ArrayList<>();
+	public static final String TARGET_PREFIX = "target=";
+	public static final String SOURCE_PREFIX = "source=";
+
+	private List<Template>              templates = new ArrayList<>();
 	private Map<String, Specialization> specs     = new HashMap<>();
 
 	private File sourceRoot;
 	private File targetRoot;
 
-	private final PrintStream output;
-	private final PrintStream errorOutput;
-
 	private boolean ansiColors;
-
-	public GenSrc(PrintStream output, PrintStream errorOutput)
-	{
-		this.output = output;
-		this.errorOutput = errorOutput;
-	}
 
 	public File getSourceRoot()
 	{
@@ -51,6 +47,7 @@ public class GenSrc
 		this.targetRoot = targetRoot;
 	}
 
+	@Override
 	public boolean useAnsiColors()
 	{
 		return this.ansiColors;
@@ -61,14 +58,90 @@ public class GenSrc
 		this.ansiColors = ansiColors;
 	}
 
-	public PrintStream getOutput()
+	@Override
+	public int run(InputStream in, OutputStream out, OutputStream err, String... arguments)
 	{
-		return this.output;
+		this.initOutput(out, err);
+
+		if (!this.processArguments(arguments))
+		{
+			return 1;
+		}
+
+		this.findFiles();
+		this.processTemplates();
+
+		return this.getExitCode();
 	}
 
-	public PrintStream getErrorOutput()
+	private boolean processArguments(String[] args)
 	{
-		return this.errorOutput;
+		String sourceDir = null;
+		String targetDir = null;
+		for (int i = 0, size = args.length; i < size; i++)
+		{
+			final String arg = args[i];
+
+			switch (arg)
+			{
+			case "-s":
+			case "--source":
+				if (++i == size)
+				{
+					this.error("Invalid -s argument: Source Directory expected");
+				}
+				else
+				{
+					sourceDir = args[i];
+				}
+				continue;
+			case "-t":
+			case "--target":
+				if (++i == size)
+				{
+					this.error("Invalid -t argument: Target Directory expected");
+				}
+				continue;
+			case "--ansi":
+				this.setAnsiColors(true);
+				continue;
+			}
+			if (arg.startsWith(SOURCE_PREFIX))
+			{
+				sourceDir = arg.substring(SOURCE_PREFIX.length());
+			}
+			else if (arg.startsWith(TARGET_PREFIX))
+			{
+				targetDir = arg.substring(TARGET_PREFIX.length());
+			}
+			else if (sourceDir == null)
+			{
+				sourceDir = arg;
+			}
+			else if (targetDir == null)
+			{
+				targetDir = arg;
+			}
+			else
+			{
+				this.error("Invalid Argument: " + arg);
+			}
+		}
+
+		if (sourceDir == null)
+		{
+			this.error("Missing Source Directory");
+			return false;
+		}
+		if (targetDir == null)
+		{
+			this.error("Missing Target Directory");
+			return false;
+		}
+
+		this.setSourceRoot(new File(sourceDir));
+		this.setTargetRoot(new File(targetDir));
+		return true;
 	}
 
 	public Specialization getSpecialization(File file)
@@ -83,12 +156,12 @@ public class GenSrc
 		}
 	}
 
-	public void findFiles()
+	private void findFiles()
 	{
 		this.findFiles(this.sourceRoot, this.targetRoot);
 	}
 
-	public void findFiles(File sourceDir, File targetDir)
+	private void findFiles(File sourceDir, File targetDir)
 	{
 		final String[] subFiles = sourceDir.list();
 		if (subFiles == null)
@@ -132,7 +205,6 @@ public class GenSrc
 					spec = new Specialization(sourceFile, fileName, specName);
 				}
 
-
 				specializations.add(spec);
 			}
 		}
@@ -160,7 +232,7 @@ public class GenSrc
 		this.templates.addAll(templates.values());
 	}
 
-	public void processTemplates()
+	private void processTemplates()
 	{
 		for (Specialization spec : this.specs.values())
 		{
@@ -200,6 +272,6 @@ public class GenSrc
 			builder.append("\u001B[0m"); // ANSI_RESET
 		}
 
-		this.output.println(builder.append('\n').toString());
+		this.log(builder.append('\n').toString());
 	}
 }

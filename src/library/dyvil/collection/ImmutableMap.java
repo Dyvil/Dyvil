@@ -218,11 +218,11 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 	<NV> ImmutableMap<K, NV> valueMapped(@NonNull BiFunction<? super K, ? super V, ? extends NV> mapper);
 
 	@Override
-	<NK, NV> ImmutableMap<NK, NV> entryMapped(@NonNull BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper);
+	<NK, NV> ImmutableMap<NK, NV> entryMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Entry<? extends NK, ? extends NV>> mapper);
 
 	@Nullable
 	@Override
-	<NK, NV> ImmutableMap<NK, NV> flatMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper);
+	<NK, NV> ImmutableMap<NK, NV> flatMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends @NonNull Entry<? extends NK, ? extends NV>>> mapper);
 
 	@NonNull
 	@Override
@@ -405,14 +405,14 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 
 	@Override
 	@Mutating
-	default void mapEntries(@NonNull BiFunction<? super K, ? super V, ? extends Entry<? extends K, ? extends V>> mapper)
+	default void mapEntries(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Entry<? extends K, ? extends V>> mapper)
 	{
 		throw new ImmutableException("mapEntries() on Immutable Map");
 	}
 
 	@Override
 	@Mutating
-	default void flatMap(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends Entry<? extends K, ? extends V>>> mapper)
+	default void flatMap(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>>> mapper)
 	{
 		throw new ImmutableException("flatMap() on Immutable Map");
 	}

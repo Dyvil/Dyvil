@@ -68,7 +68,7 @@ public class Closure extends StatementList
 
 		for (int i = 0; i < parameterCount; i++)
 		{
-			parameters[i] = new CodeParameter(this.position, Name.fromRaw("$" + i), Types.UNKNOWN);
+			parameters[i] = new CodeParameter(null, this.position, Name.fromRaw("$" + i), Types.UNKNOWN);
 		}
 
 		final LambdaType functionType = type.extract(LambdaType.class);

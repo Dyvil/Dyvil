@@ -6,14 +6,14 @@ package dyvil.ref.simple
 import dyvil.lang.LiteralConvertible
 import dyvil.ref.TYPE_NAME##Ref
 
-#if IS_GENERIC
+#if IS_OBJECT
 public case class Simple##TYPE_NAME##Ref<type T>(public var value: T) implements TYPE_NAME##Ref<T>
 #else
 @LiteralConvertible.FROM_LITERAL
 public case class Simple##TYPE_NAME##Ref(public var value: PRIMITIVE) implements TYPE_NAME##Ref
 #end
 {
-	public override func get(): PRIMITIVE = this.value
+	override func get() -> PRIMITIVE = this.value
 
-	public override func set(PRIMITIVE value): void = this.value = value
+	override func set(PRIMITIVE value) -> void = this.value = value
 }

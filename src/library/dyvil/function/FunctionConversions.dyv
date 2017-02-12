@@ -8,13 +8,13 @@ public final class FunctionConversions
 
 	// Functions
 
-	public static inline func function<R>(-> R f): -> R = f
+	static inline func function<R>(-> R f) -> -> R = f
 
-	public static inline func function1<P1, R>(P1 -> R f): P1 -> R = f
+	static inline func function1<P1, R>(P1 -> R f) -> P1 -> R = f
 
-	public static inline func function2<P1, P2, R>((P1, P2) -> R f): (P1, P2) -> R = f
+	static inline func function2<P1, P2, R>((P1, P2) -> R f) -> (P1, P2) -> R = f
 
-	public static inline func function3<P1, P2, P3, R>((P1, P2, P3) -> R f): (P1, P2, P3) -> R = f
+	static inline func function3<P1, P2, P3, R>((P1, P2, P3) -> R f) -> (P1, P2, P3) -> R = f
 
 	// Function Conversions
 

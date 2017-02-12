@@ -1,6 +1,7 @@
 package dyvil.tools.parsing.marker;
 
 import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.tools.parsing.source.Source;
 
 public class IgnoredMarker extends Marker
 {
@@ -41,7 +42,7 @@ public class IgnoredMarker extends Marker
 	}
 	
 	@Override
-	public void log(String code, StringBuilder buf, boolean colors)
+	public void log(Source source, StringBuilder buf, boolean colors)
 	{
 	}
 }

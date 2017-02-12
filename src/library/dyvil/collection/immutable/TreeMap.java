@@ -78,7 +78,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 	}
 
 	@NonNull
-	public static <K extends Comparable<K>, V> TreeMap<K, V> from(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public static <K extends Comparable<K>, V> TreeMap<K, V> from(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		return new TreeMap<>(iterable);
 	}
@@ -123,12 +123,12 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 		super(entries, comparator);
 	}
 
-	public TreeMap(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> map)
+	public TreeMap(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> map)
 	{
 		super(map);
 	}
 
-	public TreeMap(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> map, Comparator<? super K> comparator)
+	public TreeMap(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> map, Comparator<? super K> comparator)
 	{
 		super(map, comparator);
 	}
@@ -287,7 +287,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 
 	@NonNull
 	@Override
-	public <NK, NV> ImmutableMap<NK, NV> entryMapped(@NonNull BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> entryMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Entry<? extends NK, ? extends NV>> mapper)
 	{
 		TreeMap<NK, NV> copy = new TreeMap<>();
 		for (TreeEntry<K, V> entry = this.getFirstEntry(); entry != null; entry = successor(entry))
@@ -303,7 +303,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 
 	@NonNull
 	@Override
-	public <NK, NV> ImmutableMap<NK, NV> flatMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> flatMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends @NonNull Entry<? extends NK, ? extends NV>>> mapper)
 	{
 		TreeMap<NK, NV> copy = new TreeMap<>();
 		for (TreeEntry<K, V> entry = this.getFirstEntry(); entry != null; entry = successor(entry))

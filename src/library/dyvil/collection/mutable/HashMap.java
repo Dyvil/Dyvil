@@ -51,19 +51,19 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements MutableMap<K
 	}
 
 	@NonNull
-	public static <K, V> HashMap<K, V> from(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public static <K, V> HashMap<K, V> from(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		return new HashMap<>(iterable);
 	}
 
 	@NonNull
-	public static <K, V> HashMap<K, V> from(@NonNull SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public static <K, V> HashMap<K, V> from(@NonNull SizedIterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		return new HashMap<>(iterable);
 	}
 
 	@NonNull
-	public static <K, V> HashMap<K, V> from(@NonNull Set<? extends Entry<? extends K, ? extends V>> set)
+	public static <K, V> HashMap<K, V> from(@NonNull Set<? extends @NonNull Entry<? extends K, ? extends V>> set)
 	{
 		return new HashMap<>(set);
 	}
@@ -115,19 +115,19 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements MutableMap<K
 		this.defaultLoadFactor();
 	}
 
-	public HashMap(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public HashMap(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		super(iterable);
 		this.defaultLoadFactor();
 	}
 
-	public HashMap(@NonNull SizedIterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public HashMap(@NonNull SizedIterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		super(iterable);
 		this.defaultLoadFactor();
 	}
 
-	public HashMap(@NonNull Set<? extends Entry<? extends K, ? extends V>> set)
+	public HashMap(@NonNull Set<? extends @NonNull Entry<? extends K, ? extends V>> set)
 	{
 		super(set);
 		this.defaultLoadFactor();

@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.method.intrinsic;
 
-import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -11,8 +10,15 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 
+import static dyvil.reflect.Modifiers.INFIX;
+
 public interface IntrinsicData
 {
+	default int getCompilerCode()
+	{
+		return 0;
+	}
+
 	void writeIntrinsic(MethodWriter writer, IValue receiver, IArguments arguments, int lineNumber)
 		throws BytecodeException;
 
@@ -38,37 +44,23 @@ public interface IntrinsicData
 	static IType writeArgument(MethodWriter writer, IMethod method, int index, IValue receiver, IArguments arguments)
 		throws BytecodeException
 	{
-		final IParameterList parameterList = method.getParameterList();
+		final IParameterList params = method.getParameterList();
 
 		if (receiver == null || receiver.isIgnoredClassAccess())
 		{
-			final IParameter parameter = parameterList.get(index);
+			final IParameter parameter = params.get(index);
 			arguments.writeValue(index, parameter, writer);
 			return parameter.getInternalType();
 		}
 
 		if (index == 0)
 		{
-			if (method.hasModifier(Modifiers.INFIX))
-			{
-				final IType internalParameterType = parameterList.get(0).getInternalType();
-				receiver.writeExpression(writer, internalParameterType);
-				return internalParameterType;
-			}
-
-			final IType type = method.getThisType();
+			final IType type = method.hasModifier(INFIX) ? params.get(0).getInternalType() : method.getReceiverType();
 			receiver.writeExpression(writer, type);
 			return type;
 		}
 
-		if (method.hasModifier(Modifiers.INFIX))
-		{
-			final IParameter parameter = parameterList.get(index);
-			arguments.writeValue(index - 1, parameter, writer);
-			return parameter.getInternalType();
-		}
-
-		final IParameter parameter = parameterList.get(index - 1);
+		final IParameter parameter = params.get(method.hasModifier(INFIX) ? index : index - 1);
 		arguments.writeValue(index - 1, parameter, writer);
 		return parameter.getInternalType();
 	}

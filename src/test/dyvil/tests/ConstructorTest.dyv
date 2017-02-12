@@ -17,7 +17,7 @@ public class ConstructorTest
 			classInitialized = true
 		}
 
-		public static func initClass(): void { /* noop, forces static initializer */ }
+		static func initClass() -> void { /* noop, forces static initializer */ }
 	}
 
 	case class B(
@@ -61,7 +61,7 @@ public class ConstructorTest
 		}
 	}
 
-	public static func apply(): Test = test "Constructors" {
+	static func apply() -> Test = test "Constructors" {
 		test "A" {
 			A.initClass
 			let a = A(1, 2)

@@ -6,7 +6,7 @@ import func dyvil.tools.parsing.name.Qualifier.unqualify
 
 public class SymbolTest
 {
-	public static func apply(): Test = test "Symbols" {
+	static func apply() -> Test = test "Symbols" {
 		test "Unqualify" {
 			unqualify("this$is$a$test")       =?= "this$is$a$test"
 			unqualify("this$plus$minus$test") =?= "this+-$test"

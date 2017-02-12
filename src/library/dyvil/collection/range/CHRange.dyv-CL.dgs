@@ -1,0 +1,3 @@
+@fileName=closed/LongRange.dyv
+@inheritFrom=Base-Long.dgs
+IS_HALF_OPEN=false

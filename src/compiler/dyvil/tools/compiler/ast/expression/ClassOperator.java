@@ -4,7 +4,6 @@ import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.Type;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.constant.IConstantValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
@@ -22,7 +21,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public final class ClassOperator extends AbstractValue implements IConstantValue
+public final class ClassOperator implements IValue
 {
 	public static final class LazyFields
 	{
@@ -31,33 +30,68 @@ public final class ClassOperator extends AbstractValue implements IConstantValue
 
 		public static final IClass CLASS_CONVERTIBLE = Types.LITERALCONVERTIBLE_CLASS
 			                                               .resolveClass(Name.fromRaw("FromClass"));
-		
+
 		private LazyFields()
 		{
 			// no instances
 		}
 	}
-	
+
 	protected IType type;
-	
+
 	// Metadata
-	private IType genericType;
-	
+	private ICodePosition position;
+	private IType         genericType;
+
 	public ClassOperator(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
+
 	public ClassOperator(IType type)
 	{
 		this.setType(type);
 	}
-	
+
 	@Override
 	public int valueTag()
 	{
 		return CLASS_OPERATOR;
 	}
+
+	@Override
+	public ICodePosition getPosition()
+	{
+		return this.position;
+	}
+
+	@Override
+	public void setPosition(ICodePosition position)
+	{
+		this.position = position;
+	}
+
+	@Override
+	public boolean isResolved()
+	{
+		return true;
+	}
+
+	// Annotations
+
+	@Override
+	public boolean isAnnotationConstant()
+	{
+		return true;
+	}
+
+	@Override
+	public IValue toAnnotationConstant(MarkerList markers, IContext context, int depth)
+	{
+		return this;
+	}
+
+	// Typing
 
 	@Override
 	public IType getType()
@@ -70,13 +104,13 @@ public final class ClassOperator extends AbstractValue implements IConstantValue
 		}
 		return this.genericType;
 	}
-	
+
 	@Override
 	public void setType(IType type)
 	{
 		this.type = type;
 	}
-	
+
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
@@ -85,20 +119,20 @@ public final class ClassOperator extends AbstractValue implements IConstantValue
 		{
 			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
 		}
-		
+
 		return Types.isSuperType(type, this.getType()) ? this : null;
 	}
-	
+
 	@Override
 	public boolean isType(IType type)
 	{
 		return Types.isSuperType(type, this.getType()) || type.getAnnotation(LazyFields.CLASS_CONVERTIBLE) != null;
 	}
-	
+
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		final int i = super.getTypeMatch(type);
+		final int i = IValue.super.getTypeMatch(type);
 		if (i != MISMATCH)
 		{
 			return i;
@@ -109,7 +143,9 @@ public final class ClassOperator extends AbstractValue implements IConstantValue
 		}
 		return MISMATCH;
 	}
-	
+
+	// Phases
+
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
@@ -119,45 +155,47 @@ public final class ClassOperator extends AbstractValue implements IConstantValue
 			markers.add(Markers.semantic(this.position, "classoperator.invalid"));
 			return;
 		}
-		
+
 		this.type = this.type.resolveType(markers, context);
 		ClassGenericType generic = new ClassGenericType(LazyFields.CLASS_CLASS);
 		generic.addType(this.type);
 		this.genericType = generic;
 	}
-	
+
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
 		this.type.resolve(markers, context);
 		return this;
 	}
-	
+
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
 		this.type.checkType(markers, context, TypePosition.CLASS);
 	}
-	
+
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		this.type.check(markers, context);
 	}
-	
+
 	@Override
 	public IValue foldConstants()
 	{
 		this.type.foldConstants();
 		return this;
 	}
-	
+
 	@Override
 	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 		this.type.cleanup(compilableList, classCompilableList);
 		return this;
 	}
+
+	// Compilation
 
 	@Override
 	public int stringSize()
@@ -208,7 +246,7 @@ public final class ClassOperator extends AbstractValue implements IConstantValue
 		builder.append(iClass.getFullName());
 		return true;
 	}
-	
+
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
@@ -226,12 +264,14 @@ public final class ClassOperator extends AbstractValue implements IConstantValue
 		visitor.visit(key, Type.getObjectType(this.type.getInternalName()));
 	}
 
+	// String
+
 	@Override
 	public String toString()
 	{
 		return "class(" + this.type + ")";
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

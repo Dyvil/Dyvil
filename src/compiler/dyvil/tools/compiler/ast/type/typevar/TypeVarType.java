@@ -238,7 +238,7 @@ public class TypeVarType implements IRawType
 		// The generic Type is reified -> extract erasure class
 		if (reifiedKind == Reified.Type.TYPE)
 		{
-			writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, "dyvilx/lang/model/type/Type", "erasure",
+			writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, "dyvil/reflect/types/Type", "erasure",
 			                       "()Ljava/lang/Class;", true);
 		}
 		if (wrapPrimitives && reifiedKind == Reified.Type.ANY_CLASS)
@@ -270,8 +270,8 @@ public class TypeVarType implements IRawType
 			writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/runtime/Wrapper", "referenceType",
 			                       "(Ljava/lang/Class;)Ljava/lang/Class;", false);
 		}
-		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/Type", "apply",
-		                       "(Ljava/lang/Class;)Ldyvilx/lang/model/type/Type;", true);
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/Type", "apply",
+		                       "(Ljava/lang/Class;)Ldyvil/reflect/types/Type;", true);
 	}
 
 	@Override

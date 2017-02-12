@@ -301,21 +301,20 @@ public class CodeConstructor extends AbstractConstructor
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		final int modifiers = this.modifiers.toFlags() & ModifierUtil.JAVA_MODIFIER_MASK;
-		final MethodWriter methodWriter = new MethodWriterImpl(writer, writer.visitMethod(modifiers, "<init>",
-		                                                                                  this.getDescriptor(),
-		                                                                                  this.getSignature(),
-		                                                                                  this.getExceptions()));
+		final long flags = ModifierUtil.getFlags(this);
+		final MethodWriter methodWriter = new MethodWriterImpl(writer, writer.visitMethod(
+			ModifierUtil.getJavaModifiers(flags), "<init>", this.getDescriptor(), this.getSignature(),
+			this.getExceptions()));
 
 		// Write Modifiers and Annotations
-		ModifierUtil.writeModifiers(methodWriter, this.modifiers);
+		ModifierUtil.writeModifiers(methodWriter, this, flags);
 
 		if (this.annotations != null)
 		{
 			this.annotations.write(methodWriter);
 		}
 
-		if ((modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
+		if (this.hasModifier(Modifiers.DEPRECATED) && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
 		{
 			methodWriter.visitAnnotation(Deprecation.DYVIL_EXTENDED, true).visitEnd();
 		}

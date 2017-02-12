@@ -8,9 +8,9 @@ public class NameAccess(
 	private String name
 	) extends DyvilValueVisitor implements Expandable
 {
-	public static func apply(String name): NameAccess = new NameAccess(null, name)
+	static func apply(String name) -> NameAccess = new NameAccess(null, name)
 
-	public static func apply(Object value, String name): NameAccess = new NameAccess(value, name)
+	static func apply(Object value, String name) -> NameAccess = new NameAccess(value, name)
 
 	protected override void visitObject(Object! o) = this.value = o
 	

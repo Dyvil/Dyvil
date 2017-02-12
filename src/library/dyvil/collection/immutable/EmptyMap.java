@@ -187,14 +187,14 @@ public final class EmptyMap<K, V> implements ImmutableMap<K, V>
 
 	@NonNull
 	@Override
-	public <NK, NV> ImmutableMap<NK, NV> entryMapped(@NonNull BiFunction<? super K, ? super V, ? extends Entry<? extends NK, ? extends NV>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> entryMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Entry<? extends NK, ? extends NV>> mapper)
 	{
 		return (ImmutableMap<NK, NV>) this;
 	}
 
 	@NonNull
 	@Override
-	public <NK, NV> ImmutableMap<NK, NV> flatMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends Entry<? extends NK, ? extends NV>>> mapper)
+	public <NK, NV> ImmutableMap<NK, NV> flatMapped(@NonNull BiFunction<? super K, ? super V, ? extends @NonNull Iterable<? extends @NonNull Entry<? extends NK, ? extends NV>>> mapper)
 	{
 		return (ImmutableMap<NK, NV>) this;
 	}
@@ -214,11 +214,10 @@ public final class EmptyMap<K, V> implements ImmutableMap<K, V>
 		return (ImmutableMap) this;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Entry<K, V> @NonNull [] toArray()
 	{
-		return new Entry[0];
+		return (Entry<K, V>[]) new Entry[0];
 	}
 
 	@Override
@@ -226,9 +225,8 @@ public final class EmptyMap<K, V> implements ImmutableMap<K, V>
 	{
 	}
 
-	@NonNull
 	@Override
-	public Object[] toKeyArray()
+	public Object @NonNull [] toKeyArray()
 	{
 		return ObjectArray.EMPTY;
 	}
@@ -238,9 +236,8 @@ public final class EmptyMap<K, V> implements ImmutableMap<K, V>
 	{
 	}
 
-	@NonNull
 	@Override
-	public Object[] toValueArray()
+	public Object @NonNull [] toValueArray()
 	{
 		return ObjectArray.EMPTY;
 	}

@@ -50,7 +50,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 	}
 
 	@NonNull
-	public static <K extends Comparable<K>, V> TreeMap<K, V> from(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	public static <K extends Comparable<K>, V> TreeMap<K, V> from(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		return new TreeMap<>(iterable);
 	}
@@ -82,12 +82,12 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 		super(entries, comparator);
 	}
 
-	public TreeMap(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> map)
+	public TreeMap(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> map)
 	{
 		super(map);
 	}
 
-	public TreeMap(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> map, Comparator<? super K> comparator)
+	public TreeMap(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> map, Comparator<? super K> comparator)
 	{
 		super(map, comparator);
 	}

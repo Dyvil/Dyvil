@@ -28,7 +28,7 @@ public class PropertyTest
 		}
 	}
 	
-	public static func apply(): Test = test "Properties" {
+	static func apply() -> Test = test "Properties" {
 		var c = new ConcreteProperty
 
 		test "Initializer" { c.value =?= 1 }

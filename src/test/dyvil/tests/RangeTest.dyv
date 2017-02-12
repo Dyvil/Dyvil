@@ -1,0 +1,117 @@
+package dyvil.tests
+
+using dyvil.Collections
+using dyvil.Test
+import dyvil.collection.range.Rangeable
+
+class RangeTest
+{
+	@LiteralConvertible.FromInt
+	case class RangeableInt(let value: int) implements Rangeable<RangeableInt>
+	{
+		override func next() -> RangeableInt = apply(this.value + 1)
+
+		override func prev() -> RangeableInt = apply(this.value - 1)
+
+		override func distanceTo(other: RangeableInt) -> int = other.value - this.value
+
+		override func compareTo(other: RangeableInt) -> int = this.value.compareTo other.value
+	}
+
+	static func apply() -> Test = test "Ranges" {
+		testInts()
+		testRangeable()
+	}
+	
+	static func testInts() -> Test = test "Int Ranges" {
+		let range1 = 1 .. 4
+		let range2 = 1 ..< 4
+
+		test "inclusive" {
+			let rangeInclusive = List<int>
+			for (i <- range1)
+			{
+				rangeInclusive += i
+			}
+
+			rangeInclusive =?= List(1, 2, 3, 4)
+		}
+
+		test "exclusive" {
+			let rangeExclusive = List<int>
+			for (var i <- range2)
+			{
+				rangeExclusive += i
+			}
+			rangeExclusive =?= List(1, 2, 3)
+		}
+
+		test "for inclusive" {
+			let forInclusive = List<int>
+			for (i <- 1 .. 4)
+			{
+				forInclusive += i
+			}
+
+			forInclusive =?= List(1, 2, 3, 4)
+		}
+
+		test "for exclusive" {
+			let forExclusive = List<int>
+			for (i <- 1 ..< 4)
+			{
+				forExclusive += i
+			}
+
+			forExclusive =?= List(1, 2, 3)
+		}
+	}
+	
+	static func testRangeable() -> Test = test "Rangeable" {
+		let one: RangeableInt = 1
+		let four: RangeableInt = 4
+
+		let range1 = one .. four
+		let range2 = one ..< four
+
+		test "inclusive" {
+			let rangeInclusive = List<RangeableInt>
+			for (i <- range1)
+			{
+				rangeInclusive += i
+			}
+
+			rangeInclusive =?= List<RangeableInt>(1, 2, 3, 4)
+		}
+
+		test "exclusive" {
+			let rangeExclusive = List<RangeableInt>
+			for (i <- range2)
+			{
+				rangeExclusive += i
+			}
+
+			rangeExclusive =?= List<RangeableInt>(1, 2, 3)
+		}
+
+		test "for inclusive" {
+			let forInclusive = List<RangeableInt>
+			for (i <- one .. four)
+			{
+				forInclusive += i
+			}
+
+			forInclusive =?= List<RangeableInt>(1, 2, 3, 4)
+		}
+
+		test "for exclusive" {
+			let forExclusive = List<RangeableInt>
+			for (i <- one ..< four)
+			{
+				forExclusive += i
+			}
+
+			forExclusive =?= List<RangeableInt>(1, 2, 3)
+		}
+	}
+}

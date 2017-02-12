@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.constant;
 
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -69,7 +68,23 @@ public final class CharValue implements IConstantValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (this.value.length() == 1 && this.type != TYPE_STRING)
+		if (this.type != TYPE_CHAR)
+		{
+			if (Types.isSuperType(type, Types.STRING))
+			{
+				this.type = TYPE_STRING;
+				return this;
+			}
+
+			final IAnnotation annotation = type.getAnnotation(Types.FROMSTRING_CLASS);
+			if (annotation != null)
+			{
+				this.type = TYPE_STRING;
+				return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
+			}
+		}
+
+		if (this.type != TYPE_STRING && this.value.length() == 1)
 		{
 			if (Types.isSuperType(type, Types.CHAR))
 			{
@@ -83,24 +98,6 @@ public final class CharValue implements IConstantValue
 				this.type = TYPE_CHAR;
 				return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
 			}
-		}
-
-		if (this.type == TYPE_CHAR)
-		{
-			return null;
-		}
-
-		if (Types.isSuperType(type, Types.STRING))
-		{
-			this.type = TYPE_STRING;
-			return this;
-		}
-
-		final IAnnotation annotation = type.getAnnotation(Types.FROMSTRING_CLASS);
-		if (annotation != null)
-		{
-			this.type = TYPE_STRING;
-			return new LiteralConversion(this, annotation).withType(type, typeContext, markers, context);
 		}
 
 		return null;
@@ -230,11 +227,7 @@ public final class CharValue implements IConstantValue
 		}
 
 		writer.visitLdcInsn(this.value);
-		if (Types.isVoid(type))
-		{
-			writer.visitInsn(Opcodes.ARETURN);
-		}
-		else if (type != null)
+		if (type != null)
 		{
 			Types.STRING.writeCast(writer, type, this.getLineNumber());
 		}

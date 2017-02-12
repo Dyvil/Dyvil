@@ -16,20 +16,19 @@ line ending with a #
 line with #in the middle
 line with nothing ##in the middle
 
-// tests for the processor directives
+// tests for the preprocessor directives
 
 #if ENABLED
+	#delete ENABLED
 	#comment ENABLED is no longer defined in the scope of the enclosing #if
-	#undefine ENABLED
-	#process ENABLED set to false
+	#process ENABLED set to true
 	#if  NESTED
 		#literal and NESTED set to true
 	#else
 		#literal but NESTED set to false
 	#endif
 #else
-	#comment the replacement of a #define directive is not processed
-	#define _ENABLED ENABLED
+	#define _ENABLED E##NABLED
 	#process _ENABLED set to ENABLED
 	#if NESTED
 		#literal but NESTED set to true
@@ -39,10 +38,14 @@ line with nothing ##in the middle
 #endif
 
 #foreach ./spectest-Test.dgs, ./spectest-Base.dgs
-	#define _COUNT COUNT
+	#define _COUNT C##OUNT
 	#process the value of _COUNT in SPEC_NAME is COUNT
 #endfor
 
 #for INDEX; 1; 10
 INDEX
 #endfor
+
+----- spectest-Base.dgs -----
+#include ./spectest-Base.dgs
+-----------------------------

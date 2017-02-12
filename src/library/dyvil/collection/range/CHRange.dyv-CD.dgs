@@ -1,0 +1,3 @@
+@fileName=closed/DoubleRange.dyv
+@inheritFrom=Base-Double.dgs
+IS_HALF_OPEN=false

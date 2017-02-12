@@ -10,7 +10,7 @@ public class Boxed##TYPE_NAME##Ref(
 	protected let ref: TYPE_NAME##Ref
 ) implements ObjectRef<WRAPPER>
 {
-	public override func get(): WRAPPER = this.ref.get
+	override func get() -> WRAPPER = this.ref.get
 
-	public override func set(WRAPPER value): void = this.ref.set(value)
+	override func set(WRAPPER value) -> void = this.ref.set(value)
 }

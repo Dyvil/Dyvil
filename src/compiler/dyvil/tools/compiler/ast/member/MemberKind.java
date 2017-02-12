@@ -1,27 +1,33 @@
 package dyvil.tools.compiler.ast.member;
 
-import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.field.IField;
+import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
+import dyvil.tools.compiler.ast.modifiers.Modifier;
+
+import static dyvil.reflect.Modifiers.*;
 
 public enum MemberKind
 {
-	HEADER("header", Modifiers.ACCESS_MODIFIERS),
-	CLASS("class", Modifiers.CLASS_MODIFIERS),
-	METHOD("method", Modifiers.METHOD_MODIFIERS),
-	CONSTRUCTOR("constructor", Modifiers.CONSTRUCTOR_MODIFIERS),
-	INITIALIZER("initializer", Modifiers.INITIALIZER_MODIFIERS),
-	FIELD("field", Modifiers.FIELD_MODIFIERS),
-	PROPERTY("property", Modifiers.METHOD_MODIFIERS),
-	METHOD_PARAMETER("parameter", Modifiers.PARAMETER_MODIFIERS),
-	CLASS_PARAMETER("classparameter", Modifiers.CLASS_PARAMETER_MODIFIERS),
-	VARIABLE("variable", Modifiers.VARIABLE_MODIFIERS);
+	HEADER("header", BaseModifiers.ACCESS_MODIFIERS, PUBLIC),
+	CLASS("class", BaseModifiers.CLASS_MODIFIERS, PUBLIC),
+	METHOD("method", BaseModifiers.METHOD_MODIFIERS, PUBLIC),
+	CONSTRUCTOR("constructor", BaseModifiers.CONSTRUCTOR_MODIFIERS, PUBLIC),
+	INITIALIZER("initializer", BaseModifiers.INITIALIZER_MODIFIERS, PRIVATE),
+	FIELD("field", BaseModifiers.FIELD_MODIFIERS, PROTECTED),
+	PROPERTY("property", BaseModifiers.METHOD_MODIFIERS, PUBLIC),
+	METHOD_PARAMETER("parameter", BaseModifiers.PARAMETER_MODIFIERS, 0),
+	CLASS_PARAMETER("classparameter", BaseModifiers.CLASS_PARAMETER_MODIFIERS, PROTECTED),
+	VARIABLE("variable", BaseModifiers.VARIABLE_MODIFIERS, 0);
 
 	private final String name;
-	private final int allowedModifiers;
+	private final String allowedModifiers;
+	private final int    defaultAccess;
 
-	MemberKind(String name, int allowedModifiers)
+	MemberKind(String name, String allowedModifiers, int defaultAccess)
 	{
 		this.name = name;
 		this.allowedModifiers = allowedModifiers;
+		this.defaultAccess = defaultAccess;
 	}
 
 	public String getName()
@@ -29,8 +35,20 @@ public enum MemberKind
 		return this.name;
 	}
 
-	public int getAllowedModifiers()
+	public boolean isModifierAllowed(Modifier modifier)
 	{
-		return this.allowedModifiers;
+		final String str = modifier.toString();
+		final int index = this.allowedModifiers.indexOf(str);
+
+		return index >= 0 && (this.allowedModifiers.charAt(index + str.length()) == ',');
+	}
+
+	public int getDefaultAccess(IMember member)
+	{
+		if (this == FIELD && ((IField) member).getEnclosingClass().isInterface())
+		{
+			return PUBLIC;
+		}
+		return this.defaultAccess;
 	}
 }

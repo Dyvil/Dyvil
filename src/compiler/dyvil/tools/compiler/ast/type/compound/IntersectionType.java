@@ -53,6 +53,22 @@ public class IntersectionType implements IObjectType
 		this.right = right;
 	}
 
+	public static IType combine(IType left, IType right, IntersectionType intersectionType)
+	{
+		if (Types.isSameType(left, right) || Types.isSuperType(left, right))
+		{
+			// same type, or left type is a super type of right type -> result left type
+			return right;
+		}
+		if (Types.isSuperType(right, left))
+		{
+			// right type is a super type of left type -> result right type
+			return left;
+		}
+
+		return intersectionType != null ? intersectionType : new IntersectionType(left.getObjectType(), right.getObjectType());
+	}
+
 	@Override
 	public int typeTag()
 	{
@@ -213,31 +229,6 @@ public class IntersectionType implements IObjectType
 		return combine(this.left, this.right, this);
 	}
 
-	public static IType combine(IType left, IType right, IntersectionType intersectionType)
-	{
-		if (Types.isSameType(left, right) || Types.isSuperType(left, right))
-		{
-			// same type, or left type is a super type of right type -> result left type
-			return right;
-		}
-		if (Types.isSuperType(right, left))
-		{
-			// right type is a super type of left type -> result right type
-			return left;
-		}
-
-		return intersectionType != null ? intersectionType : new IntersectionType(left, right);
-	}
-
-	private static IType arrayElementCombine(IType left, IType right)
-	{
-		if (left.getTypecode() != right.getTypecode())
-		{
-			return Types.ANY;
-		}
-		return new ArrayType(combine(left, right, null));
-	}
-
 	@Override
 	public void checkType(MarkerList markers, IContext context, int position)
 	{
@@ -328,8 +319,8 @@ public class IntersectionType implements IObjectType
 		writer.visitLdcInsn(Type.getObjectType(this.getTheClass().getInternalName()));
 		this.left.writeTypeExpression(writer);
 		this.right.writeTypeExpression(writer);
-		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/IntersectionType", "apply",
-		                       "(Ljava/lang/Class;Ldyvilx/lang/model/type/Type;Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/IntersectionType;",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/IntersectionType", "apply",
+		                       "(Ljava/lang/Class;Ldyvil/reflect/types/Type;Ldyvil/reflect/types/Type;)Ldyvil/reflect/types/IntersectionType;",
 		                       false);
 	}
 

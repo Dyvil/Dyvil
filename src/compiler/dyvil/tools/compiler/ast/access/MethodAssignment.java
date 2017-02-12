@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.access;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -13,17 +12,18 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class MethodAssignment extends AbstractCall implements IValue
+public class MethodAssignment extends MethodCall
 {
 	public MethodAssignment(ICodePosition position, IValue receiver, IMethod method, IArguments argument)
 	{
-		this.position = position;
-		this.receiver = receiver;
-		this.method = method;
-		this.arguments = argument;
+		super(position, receiver, method, argument);
+	}
+
+	public MethodAssignment(ICodePosition position, IValue receiver, Name name, IArguments argument)
+	{
+		super(position, receiver, name, argument);
 	}
 
 	@Override
@@ -33,22 +33,9 @@ public class MethodAssignment extends AbstractCall implements IValue
 	}
 
 	@Override
-	public Name getName()
-	{
-		return this.method.getName();
-	}
-
-	@Override
 	protected Name getReferenceName()
 	{
 		return null;
-	}
-
-	@Override
-	public IValue resolveCall(MarkerList markers, IContext context, boolean report)
-	{
-		// No resolution is necessary - this is a compiler-created AST instance
-		return this;
 	}
 
 	@Override

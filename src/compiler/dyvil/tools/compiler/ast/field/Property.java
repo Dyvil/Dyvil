@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.CodeMethod;
@@ -14,7 +15,6 @@ import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.CodeParameter;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -124,8 +124,8 @@ public class Property extends Member implements IProperty
 		final Name name = Name.from(this.name.unqualified + "_=", this.name.qualified + "_$eq");
 		this.setter = new CodeMethod(this.enclosingClass, name, Types.VOID, this.modifiers);
 		this.setter.setPosition(this.position);
-		this.setterParameter = new CodeParameter(this.position, Names.newValue, this.type, EmptyModifiers.INSTANCE,
-		                                         null);
+		this.setterParameter = new CodeParameter(this.setter, this.position, Names.newValue, this.type,
+		                                         EmptyModifiers.INSTANCE, null);
 		this.setter.getParameterList().addParameter(this.setterParameter);
 
 		return this.setter;

@@ -20,7 +20,7 @@ public class ReceiverTypeVisitor implements AnnotationVisitor
 		if ("value".equals(name) && value instanceof String)
 		{
 			final IType receiverType = ClassFormat.extendedToType((String) value);
-			this.method.setReceiverType(receiverType);
+			this.method.setThisType(receiverType);
 		}
 	}
 

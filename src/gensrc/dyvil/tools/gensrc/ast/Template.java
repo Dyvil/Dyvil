@@ -1,29 +1,40 @@
 package dyvil.tools.gensrc.ast;
 
+import dyvil.io.FileUtils;
 import dyvil.tools.gensrc.GenSrc;
+import dyvil.tools.gensrc.ast.directive.DirectiveList;
+import dyvil.tools.gensrc.ast.scope.TemplateScope;
 import dyvil.tools.gensrc.lang.I18n;
+import dyvil.tools.gensrc.parser.Parser;
+import dyvil.tools.parsing.marker.Marker;
+import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.source.FileSource;
 
-import java.io.*;
-import java.nio.file.Files;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Template
 {
-	private final File   sourceFile;
-	private final File   targetDirectory;
-	private final String fileName;
+	private final FileSource sourceFile;
+	private final File       targetDirectory;
+	private final String     fileName;
 
 	private List<Specialization> specializations = new ArrayList<>();
 
+	private DirectiveList directives;
+
 	public Template(File sourceFile, File targetDir, String fileName)
 	{
-		this.sourceFile = sourceFile;
+		this.sourceFile = new FileSource(sourceFile);
 		this.targetDirectory = targetDir;
 		this.fileName = fileName;
 	}
 
-	public File getSourceFile()
+	public FileSource getSourceFile()
 	{
 		return this.sourceFile;
 	}
@@ -38,32 +49,75 @@ public class Template
 		this.specializations.add(spec);
 	}
 
+	private boolean load(MarkerList markers)
+	{
+		try
+		{
+			this.sourceFile.load();
+		}
+		catch (IOException ignored)
+		{
+			return false;
+		}
+
+		this.directives = new Parser(this.sourceFile, markers).parse();
+		return true;
+	}
+
 	public void specialize(GenSrc gensrc)
 	{
 		if (!this.targetDirectory.exists() && !this.targetDirectory.mkdirs())
 		{
-			gensrc.getOutput().println("Could not create directory '" + this.targetDirectory + "'");
+			gensrc.getOutput().println(I18n.get("template.directory.error", this.targetDirectory));
 			return;
 		}
 
-		try
+		final MarkerList markers = new MarkerList(I18n.INSTANCE);
+		if (!this.load(markers))
 		{
-			final List<String> lines = Files.readAllLines(this.sourceFile.toPath());
-			int count = this.specialize(gensrc, lines);
+			gensrc.getOutput().println(I18n.get("template.file.error", this.sourceFile.getInputFile()));
+			return;
+		}
 
-			gensrc.getOutput().println(I18n.get("template.specialized", count, this.getSourceFile()));
-		}
-		catch (IOException ex)
+		if (markers.getErrors() > 0)
 		{
-			ex.printStackTrace(gensrc.getErrorOutput());
+			this.printMarkers(gensrc, markers, null);
+			return;
 		}
+
+		final int count = this.specializeAll(gensrc);
+
+		gensrc.getOutput().println(I18n.get("template.specialized", count, this.sourceFile.getInputFile()));
 	}
 
-	private int specialize(GenSrc gensrc, List<String> lines)
+	private void printMarkers(GenSrc gensrc, MarkerList markers, Specialization spec)
+	{
+		final StringBuilder builder = new StringBuilder();
+
+		if (spec == null)
+		{
+			builder.append(I18n.get("template.problems", this.sourceFile.getInputFile()));
+		}
+		else
+		{
+			builder.append(I18n.get("template.problems.for_spec", this.sourceFile.getInputFile(), spec.getFileName()));
+		}
+
+		builder.append('\n').append('\n');
+
+		final boolean colors = gensrc.useAnsiColors();
+		for (Marker marker : markers)
+		{
+			marker.log(this.sourceFile, builder, colors);
+		}
+		gensrc.getOutput().println(builder);
+	}
+
+	private int specializeAll(GenSrc gensrc)
 	{
 		if (this.specializations.isEmpty())
 		{
-			this.specialize(gensrc, lines, Specialization.createDefault(this.fileName));
+			this.specialize(gensrc, Specialization.createDefault(this.fileName));
 			return 1;
 		}
 
@@ -72,14 +126,14 @@ public class Template
 		{
 			if (spec.isEnabled())
 			{
-				this.specialize(gensrc, lines, spec);
+				this.specialize(gensrc, spec);
 				count++;
 			}
 		}
 		return count;
 	}
 
-	private void specialize(GenSrc gensrc, List<String> lines, Specialization spec)
+	private void specialize(GenSrc gensrc, Specialization spec)
 	{
 		final String fileName = spec.getFileName();
 		if (fileName == null)
@@ -87,15 +141,33 @@ public class Template
 			return;
 		}
 
+		final int estSize = this.sourceFile.getText().length() * 2;
+
+		final ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream(estSize);
+		final PrintStream writer = new PrintStream(byteArrayOut);
+
+		final File inputFile = this.sourceFile.getInputFile();
+		final TemplateScope scope = new TemplateScope(inputFile, spec);
+
+		// Specialize and check for errors
+		final MarkerList markers = new MarkerList(I18n.INSTANCE);
+		this.directives.specialize(gensrc, scope, markers, writer);
+
+		if (!markers.isEmpty())
+		{
+			this.printMarkers(gensrc, markers, spec);
+			return;
+		}
+
 		final File outputFile = new File(this.targetDirectory, fileName);
 
-		try (final PrintStream writer = new PrintStream(new BufferedOutputStream(new FileOutputStream(outputFile))))
+		try
 		{
-			new Specializer(gensrc, this.sourceFile, lines, writer, spec).processLines();
+			FileUtils.write(outputFile, byteArrayOut.toByteArray());
 		}
-		catch (IOException ex)
+		catch (IOException ignored)
 		{
-			ex.printStackTrace(gensrc.getErrorOutput());
+			gensrc.error(I18n.get("template.specialize.error", outputFile));
 		}
 	}
 }

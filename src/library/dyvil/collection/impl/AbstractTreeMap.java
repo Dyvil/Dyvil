@@ -189,12 +189,12 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 		}
 	}
 
-	public AbstractTreeMap(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> map)
+	public AbstractTreeMap(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> map)
 	{
 		this(map, null);
 	}
 
-	public AbstractTreeMap(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> map,
+	public AbstractTreeMap(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> map,
 		                      Comparator<? super K> comparator)
 	{
 		this.comparator = comparator;
@@ -791,7 +791,7 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 		return null;
 	}
 
-	private void putAllInternal(@NonNull Iterable<? extends Entry<? extends K, ? extends V>> iterable)
+	private void putAllInternal(@NonNull Iterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		for (Entry<? extends K, ? extends V> entry : iterable)
 		{
@@ -1219,14 +1219,14 @@ public abstract class AbstractTreeMap<K, V> implements Map<K, V>
 		}
 	}
 
-	protected void buildFromSorted(int size, @NonNull Iterator<? extends Entry<? extends K, ? extends V>> iterator)
+	protected void buildFromSorted(int size, @NonNull Iterator<? extends @NonNull Entry<? extends K, ? extends V>> iterator)
 	{
 		this.size = size;
 		this.root = buildFromSorted(0, 0, size - 1, computeRedLevel(size), iterator);
 	}
 
 	private static <K, V> TreeEntry<K, V> buildFromSorted(int level, int lo, int hi, int redLevel,
-		                                                     @NonNull Iterator<? extends Entry<? extends K, ? extends V>> iterator)
+		                                                     @NonNull Iterator<? extends @NonNull Entry<? extends K, ? extends V>> iterator)
 	{
 		if (hi < lo)
 		{

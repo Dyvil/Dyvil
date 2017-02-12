@@ -39,7 +39,6 @@ public final class Names
 	public static final Name _float   = Name.fromRaw("float");
 	public static final Name _double  = Name.fromRaw("double");
 
-	public static final Name dynamic = Name.fromRaw("dynamic");
 	public static final Name any     = Name.fromRaw("any");
 	public static final Name none    = Name.fromRaw("none");
 	public static final Name auto    = Name.fromRaw("auto");

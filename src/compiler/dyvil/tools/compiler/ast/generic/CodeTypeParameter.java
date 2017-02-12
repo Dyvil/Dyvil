@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.ImplicitNullableType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
@@ -25,6 +26,8 @@ import java.lang.annotation.ElementType;
 
 public class CodeTypeParameter extends TypeParameter
 {
+	public static final IType DEFAULT_BOUND = new ImplicitNullableType(Types.OBJECT);
+
 	protected ICodePosition position;
 	protected int           parameterIndex;
 
@@ -32,7 +35,6 @@ public class CodeTypeParameter extends TypeParameter
 	{
 		super(generic, name, variance);
 		this.position = position;
-		this.upperBound = Types.OBJECT;
 	}
 
 	@Override
@@ -67,7 +69,7 @@ public class CodeTypeParameter extends TypeParameter
 		}
 		if (this.upperBound == null)
 		{
-			return;
+			this.upperBound = DEFAULT_BOUND;
 		}
 
 		this.upperBound = this.upperBound.resolveType(markers, context);

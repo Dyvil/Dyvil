@@ -148,12 +148,6 @@ public class NamedType implements IUnresolvedType, ITypeConsumer
 			return type;
 		}
 
-		final Package thePackage = Package.rootPackage.resolvePackage(this.name);
-		if (thePackage != null)
-		{
-			return new PackageType(thePackage).atPosition(this.position);
-		}
-
 		if (markers == null)
 		{
 			// FieldAccess support
@@ -181,12 +175,18 @@ public class NamedType implements IUnresolvedType, ITypeConsumer
 		if (type != null)
 		{
 			final IType aliasType = type.getType();
-			if (!aliasType.isResolved())
+			if (!aliasType.isResolved() && markers != null)
 			{
 				markers.add(Markers.semanticError(this.position, "type.alias.unresolved", this.name));
 				return aliasType.atPosition(this.position);
 			}
 			return aliasType.getConcreteType(ITypeContext.DEFAULT).atPosition(this.position);
+		}
+
+		final Package thePackage = context.resolvePackage(this.name);
+		if (thePackage != null)
+		{
+			return new PackageType(thePackage).atPosition(this.position);
 		}
 		return null;
 	}

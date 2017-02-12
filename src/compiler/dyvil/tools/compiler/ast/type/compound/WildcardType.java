@@ -66,6 +66,28 @@ public final class WildcardType implements IRawType, ITyped
 		this.variance = variance;
 	}
 
+	public Variance getVariance()
+	{
+		return this.variance;
+	}
+
+	public void setVariance(Variance variance)
+	{
+		this.variance = variance;
+	}
+
+	@Override
+	public IType getType()
+	{
+		return this.bound;
+	}
+
+	@Override
+	public void setType(IType type)
+	{
+		this.bound = type;
+	}
+
 	@Override
 	public ICodePosition getPosition()
 	{
@@ -85,28 +107,6 @@ public final class WildcardType implements IRawType, ITyped
 	}
 
 	@Override
-	public IType getType()
-	{
-		return this.bound;
-	}
-
-	@Override
-	public void setType(IType type)
-	{
-		this.bound = type;
-	}
-
-	public Variance getVariance()
-	{
-		return this.variance;
-	}
-
-	public void setVariance(Variance variance)
-	{
-		this.variance = variance;
-	}
-
-	@Override
 	public int typeTag()
 	{
 		return WILDCARD_TYPE;
@@ -114,6 +114,12 @@ public final class WildcardType implements IRawType, ITyped
 
 	@Override
 	public boolean isGenericType()
+	{
+		return false;
+	}
+
+	@Override
+	public boolean useNonNullAnnotation()
 	{
 		return false;
 	}
@@ -399,8 +405,8 @@ public final class WildcardType implements IRawType, ITyped
 			writer.visitInsn(Opcodes.ACONST_NULL);
 		}
 
-		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/WildcardType", "apply",
-		                       "(Ldyvil/reflect/Variance;Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/WildcardType;",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/WildcardType", "apply",
+		                       "(Ldyvil/reflect/Variance;Ldyvil/reflect/types/Type;)Ldyvil/reflect/types/WildcardType;",
 		                       false);
 	}
 

@@ -503,7 +503,7 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 		this.returnType.writeTypeExpression(writer);
 
 		writer.visitLdcInsn(this.parameterCount);
-		writer.visitTypeInsn(Opcodes.ANEWARRAY, "dyvilx/lang/model/type/Type");
+		writer.visitTypeInsn(Opcodes.ANEWARRAY, "dyvil/reflect/types/Type");
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			writer.visitInsn(Opcodes.DUP);
@@ -512,8 +512,8 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 			writer.visitInsn(Opcodes.AASTORE);
 		}
 
-		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvilx/lang/model/type/FunctionType", "apply",
-		                       "(Ldyvilx/lang/model/type/Type;[Ldyvilx/lang/model/type/Type;)Ldyvilx/lang/model/type/FunctionType;",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/reflect/types/FunctionType", "apply",
+		                       "(Ldyvil/reflect/types/Type;[Ldyvil/reflect/types/Type;)Ldyvil/reflect/types/FunctionType;",
 		                       false);
 	}
 

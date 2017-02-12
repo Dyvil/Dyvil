@@ -61,14 +61,16 @@ public abstract class AbstractParameter extends Member implements IParameter
 		super(name, type);
 	}
 
-	public AbstractParameter(ICodePosition position, Name name, IType type)
+	public AbstractParameter(ICallableMember callable, ICodePosition position, Name name, IType type)
 	{
 		super(position, name, type);
+		this.method = callable;
 	}
 
-	public AbstractParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public AbstractParameter(ICallableMember callable, ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
+		this.method = callable;
 	}
 
 	@Override
@@ -272,21 +274,16 @@ public abstract class AbstractParameter extends Member implements IParameter
 
 	public static void writeInitImpl(IParameter parameter, MethodWriter writer)
 	{
-		final ModifierSet modifiers = parameter.getModifiers();
 		final AnnotationList annotations = parameter.getAnnotations();
 		final IType type = parameter.getType();
 		final IValue defaultValue = parameter.getValue();
-
-		final int intModifiers = modifiers == null ?
-			                         0 :
-			                         modifiers.toFlags() & Modifiers.PARAMETER_MODIFIERS
-				                         & ModifierUtil.JAVA_MODIFIER_MASK;
+		final long flags = ModifierUtil.getFlags(parameter);
 
 		final int index = parameter.getIndex();
 
 		parameter.setLocalIndex(writer.localCount());
 		writer.visitParameter(parameter.getLocalIndex(), parameter.getInternalName(), parameter.getInternalType(),
-		                      intModifiers);
+		                      ModifierUtil.getJavaModifiers(flags));
 
 		// Annotations
 		final AnnotatableVisitor visitor = (desc, visible) -> writer.visitParameterAnnotation(index, desc, visible);
@@ -296,7 +293,7 @@ public abstract class AbstractParameter extends Member implements IParameter
 			annotations.write(visitor);
 		}
 
-		ModifierUtil.writeModifiers(visitor, modifiers);
+		ModifierUtil.writeModifiers(visitor, parameter, flags);
 
 		IType.writeAnnotations(type, writer, TypeReference.newFormalParameterReference(index), "");
 

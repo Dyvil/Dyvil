@@ -10,41 +10,41 @@ public abstract class ArrayOperators
 		// no instances
 	}
 
-	#define opfunc public infix inline func
+	#define opfunc infix inline func
 
 	// Generic Object array operators
 
-	opfunc in <T>(T value, [T] array): boolean = array.contains(value)
+	opfunc in <T>(T value, [T] array) -> boolean = array.contains(value)
 	
-	opfunc ? <T>([T] lhs, T rhs): boolean = lhs.contains(rhs)
+	opfunc ? <T>([T] lhs, T rhs) -> boolean = lhs.contains(rhs)
 
-	opfunc + <T>([T] lhs, T rhs): [T] = lhs.added(rhs)
+	opfunc + <T>([T] lhs, T rhs) -> [T] = lhs.added(rhs)
 
-	opfunc + <T>(T lhs, [T] rhs): [T] = rhs.added(lhs)
+	opfunc + <T>(T lhs, [T] rhs) -> [T] = rhs.added(lhs)
 
-	opfunc ++ <T>([T] lhs, [T] rhs): [T] = lhs.union(rhs)
+	opfunc ++ <T>([T] lhs, [T] rhs) -> [T] = lhs.union(rhs)
 
-	opfunc - <T>([T] lhs, T rhs): [T] = lhs.removed(rhs)
+	opfunc - <T>([T] lhs, T rhs) -> [T] = lhs.removed(rhs)
 
-	opfunc -- <T>([T] lhs, [T] rhs): [T] = lhs.difference(rhs)
+	opfunc -- <T>([T] lhs, [T] rhs) -> [T] = lhs.difference(rhs)
 
 #import Base.dgs
 #foreach PRIMITIVE_SPECS
 
 	// TYPE_NAME array operators
 
-	opfunc in(PRIMITIVE value, [PRIMITIVE] array): boolean = array.contains(value)
+	opfunc in(PRIMITIVE value, [PRIMITIVE] array) -> boolean = array.contains(value)
 
-	opfunc ? ([PRIMITIVE] lhs, PRIMITIVE rhs): boolean = lhs.contains(rhs)
+	opfunc ? ([PRIMITIVE] lhs, PRIMITIVE rhs) -> boolean = lhs.contains(rhs)
 
-	opfunc + ([PRIMITIVE] lhs, PRIMITIVE rhs): [PRIMITIVE] = lhs.added(rhs)
+	opfunc + ([PRIMITIVE] lhs, PRIMITIVE rhs) -> [PRIMITIVE] = lhs.added(rhs)
 
-	opfunc + (PRIMITIVE lhs, [PRIMITIVE] rhs): [PRIMITIVE] = rhs.added(lhs)
+	opfunc + (PRIMITIVE lhs, [PRIMITIVE] rhs) -> [PRIMITIVE] = rhs.added(lhs)
 
-	opfunc ++ ([PRIMITIVE] lhs, [PRIMITIVE] rhs): [PRIMITIVE] = lhs.union(rhs)
+	opfunc ++ ([PRIMITIVE] lhs, [PRIMITIVE] rhs) -> [PRIMITIVE] = lhs.union(rhs)
 
-	opfunc - ([PRIMITIVE] lhs, PRIMITIVE rhs): [PRIMITIVE] = lhs.removed(rhs)
+	opfunc - ([PRIMITIVE] lhs, PRIMITIVE rhs) -> [PRIMITIVE] = lhs.removed(rhs)
 
-	opfunc -- ([PRIMITIVE] lhs, [PRIMITIVE] rhs): [PRIMITIVE] = lhs.difference(rhs)
+	opfunc -- ([PRIMITIVE] lhs, [PRIMITIVE] rhs) -> [PRIMITIVE] = lhs.difference(rhs)
 #endfor
 }

@@ -4,14 +4,14 @@ using dyvil.Test
 
 public class AssignmentTest
 {
-	public static func apply(): Test = test "Assignment" {
+	static func apply() -> Test = test "Assignment" {
 		local()
 		staticField()
 		instanceField()
 		compound()
 	}
 
-	public static func local(): Test = test "Local" {
+	static func local() -> Test = test "Local" {
 		test "Int" {
 			var i = 0
 	        i += 2
@@ -31,7 +31,7 @@ public class AssignmentTest
 
 	private static var counter: int = 0
 
-	public static func staticField(): Test = test "Static Fields" {
+	static func staticField() -> Test = test "Static Fields" {
 		counter = 0
 		counter += 4
 		let result = counter += 1
@@ -52,7 +52,7 @@ public class AssignmentTest
 		public void subscript_$eq(int i, int value) = this.subscriptArray[i] = value
 	}
 
-	public static func instanceField(): Test = test "Instance Fields" {
+	static func instanceField() -> Test = test "Instance Fields" {
 		test "Statements" {
 			let counter = new Counter
 			counter.value += 2
@@ -69,7 +69,7 @@ public class AssignmentTest
 		}
 	}
 
-	public static func compound(): Test = test "Compound Assignment" {
+	static func compound() -> Test = test "Compound Assignment" {
 		let counter = new Counter
 		var modCount = 0
 

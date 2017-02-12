@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.intrinsic;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -41,7 +42,18 @@ public class IncOperator extends AbstractValue
 		this.prefix = prefix;
 	}
 
-	public static boolean isIncConvertible(IType type)
+	public static IncOperator apply(IValue operand, int value, boolean prefix)
+	{
+		if (operand.valueTag() == IValue.FIELD_ACCESS && IncOperator.isIncConvertible(operand.getType()))
+		{
+			final FieldAccess fieldAccess = (FieldAccess) operand;
+
+				return new IncOperator(fieldAccess.getReceiver(), fieldAccess.getField(), value, prefix);
+		}
+		return null;
+	}
+
+	private static boolean isIncConvertible(IType type)
 	{
 		if (!type.isPrimitive())
 		{
@@ -102,15 +114,6 @@ public class IncOperator extends AbstractValue
 		{
 			this.receiver = this.receiver.resolve(markers, context);
 		}
-		return this;
-	}
-
-	@Override
-	public IValue resolveOperator(MarkerList markers, IContext context)
-	{
-		this.field = this.field.capture(context);
-		this.receiver = this.field.checkAccess(markers, this.position, this.receiver, context);
-		this.field.checkAssign(markers, context, this.position, null, this);
 		return this;
 	}
 
@@ -280,7 +283,7 @@ public class IncOperator extends AbstractValue
 			{
 				return false;
 			}
-			
+
 			switch (typecode)
 			{
 			case PrimitiveType.BYTE_CODE:

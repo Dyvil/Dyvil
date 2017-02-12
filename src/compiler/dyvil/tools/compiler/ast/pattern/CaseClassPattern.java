@@ -107,7 +107,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 			final IPattern pattern = this.patterns[i];
 			final IParameter param = parameters.get(i);
 
-			if (param.getAccessLevel() != Modifiers.PUBLIC)
+			if ((param.getAccessLevel() & Modifiers.PUBLIC) == 0)
 			{
 				this.checkMethodAccess(markers, caseClass, param, i, paramCount, pattern);
 			}
@@ -238,11 +238,11 @@ public class CaseClassPattern extends Pattern implements IPatternList
 			// Load the instance
 			writer.visitVarInsn(Opcodes.ALOAD, varIndex);
 
-			final IMethod method = this.getterMethods[i];
 			final IType targetType = this.paramTypes[i];
 			final IType memberType;
+			final IMethod method;
 
-			if (method != null)
+			if (this.getterMethods != null && (method = this.getterMethods[i]) != null)
 			{
 				memberType = method.getType();
 

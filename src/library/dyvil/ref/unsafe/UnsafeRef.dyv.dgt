@@ -8,7 +8,7 @@ import dyvil.reflect.ReflectUtils
 
 import java.lang.reflect.Field
 
-#if IS_GENERIC
+#if IS_OBJECT
 public class Unsafe##TYPE_NAME##Ref<type T>(
 	protected let base: Object!
 	protected let offset: long
@@ -30,11 +30,11 @@ public class Unsafe##TYPE_NAME##Ref(
 		this.init(receiver, ReflectUtils.UNSAFE.objectFieldOffset(field))
 	}
 
-#if IS_GENERIC
-	public override func get(): T = ReflectUtils.UNSAFE.get##TYPE_NAME(this.base, this.offset) as T
+#if IS_OBJECT
+	override func get() -> T = ReflectUtils.UNSAFE.get##TYPE_NAME(this.base, this.offset) as T
 #else
-	public override func get(): PRIMITIVE = ReflectUtils.UNSAFE.get##TYPE_NAME(this.base, this.offset)
+	override func get() -> PRIMITIVE = ReflectUtils.UNSAFE.get##TYPE_NAME(this.base, this.offset)
 #end
 
-	public override func set(PRIMITIVE value): void = ReflectUtils.UNSAFE.put##TYPE_NAME(this.base, this.offset, value)
+	override func set(PRIMITIVE value) -> void = ReflectUtils.UNSAFE.put##TYPE_NAME(this.base, this.offset, value)
 }

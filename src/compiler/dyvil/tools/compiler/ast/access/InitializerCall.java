@@ -134,7 +134,7 @@ public class InitializerCall implements ICall
 		if (matches.hasCandidate())
 		{
 			this.constructor = matches.getBestMember();
-			this.checkArguments(markers, context);
+			this.constructor.checkArguments(markers, this.position, context, this.targetType, this.arguments);
 			return this;
 		}
 
@@ -144,12 +144,6 @@ public class InitializerCall implements ICall
 			return this;
 		}
 		return null;
-	}
-
-	@Override
-	public void checkArguments(MarkerList markers, IContext context)
-	{
-		this.constructor.checkArguments(markers, this.position, context, this.targetType, this.arguments);
 	}
 
 	@Override

@@ -4,7 +4,6 @@ import dyvil.annotation.internal.NonNull;
 import dyvil.collection.List;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.collection.mutable.ArrayList;
-import dyvil.tools.compiler.ast.access.ICall;
 import dyvil.tools.compiler.ast.access.MethodCall;
 import dyvil.tools.compiler.ast.context.CombiningLabelContext;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -438,15 +437,8 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	private static IValue resolveApplyStatement(MarkerList markers, IContext context, SingleArgument argument,
 		                                           IValue receiver)
 	{
-		final IMethod method = ICall.resolveMethod(context, receiver, Names.applyStatement, argument);
-		if (method != null)
-		{
-			final MethodCall call = new MethodCall(argument.getFirstValue().getPosition(), receiver, method, argument);
-			call.checkArguments(markers, context);
-			return call;
-		}
-
-		return null;
+		final MethodCall call = new MethodCall(argument.getFirstValue().getPosition(), receiver, Names.applyStatement, argument);
+		return call.resolveCall(markers, context, false);
 	}
 
 	protected void addVariable(FieldInitializer initializer, MarkerList markers, IContext context)

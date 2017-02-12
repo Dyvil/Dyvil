@@ -1,5 +1,7 @@
 package dyvil.reflect;
 
+import java.lang.reflect.Field;
+
 /**
  * The <b>Modifiers</b> interface declares all (visible and invisible) modifiers that can be used <i>Dyvil</i> source
  * code and that can appear in class files. Note that only modifiers less than {@code 0xFFFF} will actually appear in
@@ -13,9 +15,10 @@ public interface Modifiers
 	// Access Modifiers
 
 	/**
-	 * Default (package) access modifier.
+	 * <i>Dyvil</i> {@code package} modifier. This modifier is used to mark that a member is {@code package}-private,
+	 * i.e. it may only be accessed from compilation units within the same package.
 	 */
-	int PACKAGE = 0x00000000;
+	int PACKAGE = 0x08000000;
 
 	/**
 	 * {@code public} access modifier.
@@ -32,6 +35,8 @@ public interface Modifiers
 	 */
 	int PROTECTED = 0x00000004;
 
+	int PRIVATE_PROTECTED = PRIVATE | PROTECTED;
+
 	/**
 	 * {@code static} modifier.
 	 */
@@ -47,6 +52,8 @@ public interface Modifiers
 	 * to declare constants.
 	 */
 	int CONST = STATIC | FINAL;
+
+	int STATIC_FINAL = STATIC | FINAL;
 
 	/**
 	 * {@code synchronized} modifier.
@@ -154,19 +161,9 @@ public interface Modifiers
 	 */
 	int INFIX = INFIX_FLAG | STATIC;
 
-	int EXTENSION_FLAG = 0x00100000;
+	int EXTENSION_FLAG = 0x00080000;
 
 	int EXTENSION = EXTENSION_FLAG | INFIX;
-
-	/**
-	 * <i>Dyvil</i> {@code override} modifier. This modifier is a shortcut for the {@link Override} annotation.
-	 */
-	int OVERRIDE = 0x00080000;
-
-	/**
-	 * <i>Dyvil</i> {@code implicit} modifier.
-	 */
-	int IMPLICIT = 0x00200000;
 
 	// Field Modifiers
 
@@ -182,18 +179,32 @@ public interface Modifiers
 	 * <i>Dyvil</i> {@code internal} modifier. This is used to mark that a class, method or field is only visible from
 	 * inside the current library / project.
 	 */
-	int INTERNAL = 0x01000000;
+	int INTERNAL = 0x00100000;
 
 	/**
-	 * <i>Dyvil</i> {@code deprecated} modifier. This modifier is a shortcut for the {@link Deprecated} annotation.
+	 * <i>Dyvil</i> {@code implicit} modifier.
 	 */
-	int DEPRECATED = 0x02000000;
+	int IMPLICIT = 0x00200000;
 
 	/**
-	 * <i>Dyvil</i> {@code sealed} modifier. This modifier is used to mark that a class that is {@code sealed}, i.e. it
-	 * can only be extended from classes in the same library. All sub-classes are always known at compile time.
+	 * <i>Dyvil</i> {@code explicit} modifier.
 	 */
-	int SEALED = 0x04000000;
+	int EXPLICIT = 0x00400000;
+
+	// Compile-time only Modifiers
+
+	/**
+	 * Modifier that marks a member with an {@link java.lang.Deprecated} or {@link dyvil.annotation.Deprecated}
+	 * annotation.
+	 */
+	int DEPRECATED = 0x10000000;
+
+	/**
+	 * <i>Dyvil</i> {@code override} modifier. This modifier is a shortcut for the {@link Override} annotation.
+	 */
+	int OVERRIDE = 0x20000000;
+
+	// Masks
 
 	/**
 	 * The modifiers that can be used to declare the class type (i.e., {@code class}, {@code interface}, {@code trait},
@@ -202,7 +213,7 @@ public interface Modifiers
 	 */
 	int CLASS_TYPE_MODIFIERS = (INTERFACE_CLASS | ANNOTATION | ENUM | OBJECT_CLASS | TRAIT_CLASS) & ~ABSTRACT;
 
-	int VISIBILITY_MODIFIERS = PUBLIC | PROTECTED | PRIVATE;
+	int VISIBILITY_MODIFIERS = PUBLIC | PROTECTED | PRIVATE | PACKAGE;
 
 	/**
 	 * The access modifiers.
@@ -212,30 +223,33 @@ public interface Modifiers
 	/**
 	 * The modifiers that can be used on any member.
 	 */
-	int MEMBER_MODIFIERS = ACCESS_MODIFIERS | STATIC | FINAL | SYNTHETIC;
+	int MEMBER_MODIFIERS = ACCESS_MODIFIERS | STATIC | FINAL // denotable
+		                       | SYNTHETIC;
 
 	/**
 	 * The modifiers that can be used on classes.
 	 */
-	int CLASS_MODIFIERS =
-		MEMBER_MODIFIERS | CLASS_TYPE_MODIFIERS | ABSTRACT | STRICT | CASE_CLASS | FUNCTIONAL | SEALED;
+	int CLASS_MODIFIERS = MEMBER_MODIFIERS | ABSTRACT | CASE_CLASS // denotable
+		                      | CLASS_TYPE_MODIFIERS | STRICT;
 
 	/**
 	 * The modifiers that can be used on fields.
 	 */
-	int FIELD_MODIFIERS = MEMBER_MODIFIERS | TRANSIENT | VOLATILE | LAZY;
+	int FIELD_MODIFIERS = MEMBER_MODIFIERS | LAZY // denotable
+		                      | TRANSIENT | VOLATILE;
 
 	/**
 	 * The modifiers that can be used on methods.
 	 */
 	int METHOD_MODIFIERS =
-		MEMBER_MODIFIERS | ABSTRACT | SYNCHRONIZED | NATIVE | STRICT | INLINE | INFIX | EXTENSION | IMPLICIT | BRIDGE
-			| VARARGS | OVERRIDE;
+		MEMBER_MODIFIERS | ABSTRACT | SYNCHRONIZED | INLINE | INFIX | EXTENSION | IMPLICIT | OVERRIDE // denotable
+			| NATIVE | STRICT | BRIDGE | VARARGS;
 
 	/**
 	 * The modifiers that can be used on parameters.
 	 */
-	int PARAMETER_MODIFIERS = FINAL | LAZY | MANDATED | EXTENSION | VARARGS | SYNTHETIC;
+	int PARAMETER_MODIFIERS = FINAL | EXPLICIT // denotable
+		                          | MANDATED | EXTENSION | VARARGS | SYNTHETIC;
 
 	/**
 	 * The modifiers that can be applied to class parameters.
@@ -250,4 +264,33 @@ public interface Modifiers
 	int CONSTRUCTOR_MODIFIERS = ACCESS_MODIFIERS;
 
 	int INITIALIZER_MODIFIERS = PRIVATE | STATIC;
+
+	static void main(String[] args)
+	{
+		int used = 0;
+		for (Field f : Modifiers.class.getDeclaredFields())
+		{
+			if (f.getType() != int.class)
+			{
+				continue;
+			}
+
+			try
+			{
+				used |= (int) f.get(null);
+			}
+			catch (IllegalAccessException ignored)
+			{
+			}
+		}
+
+		for (int i = 0; i < 32; i++)
+		{
+			int mask = 1 << i;
+			if ((used & mask) == 0)
+			{
+				System.out.printf("%#010x\n", mask);
+			}
+		}
+	}
 }

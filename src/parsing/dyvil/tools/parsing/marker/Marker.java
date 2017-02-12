@@ -1,10 +1,12 @@
 package dyvil.tools.parsing.marker;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.io.AppendablePrintStream;
 import dyvil.io.Console;
 import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.tools.parsing.source.Source;
 
 public abstract class Marker implements Comparable<Marker>
 {
@@ -59,46 +61,56 @@ public abstract class Marker implements Comparable<Marker>
 	public abstract boolean isWarning();
 
 	@Override
-	public int compareTo(Marker o)
+	public int compareTo(@NonNull Marker o)
 	{
-		final int start1 = this.position.startIndex();
-		final int start2 = o.position.startIndex();
-		return start1 == start2 ? 0 : start1 < start2 ? -1 : 0;
+		return this.position.compareTo(o.position);
 	}
 
 	@Override
-	@SuppressWarnings("SimplifiableIfStatement")
-	public boolean equals(Object o)
+	public boolean equals(Object obj)
 	{
-		if (this == o)
+		if (this == obj)
+		{
 			return true;
-		if (!(o instanceof Marker))
+		}
+		if (!(obj instanceof Marker))
+		{
 			return false;
+		}
 
-		Marker marker = (Marker) o;
+		final Marker marker = (Marker) obj;
 
-		if (this.position != null ? !this.position.equals(marker.position) : marker.position != null)
+		if (!this.position.equals(marker.position))
+		{
 			return false;
+		}
 		if (this.message != null ? !this.message.equals(marker.message) : marker.message != null)
+		{
 			return false;
+		}
+		//
 		return this.info != null ? this.info.equals(marker.info) : marker.info == null;
 	}
 
 	@Override
 	public int hashCode()
 	{
-		int result = this.position != null ? this.position.hashCode() : 0;
+		int result = this.position.hashCode();
 		result = 31 * result + (this.message != null ? this.message.hashCode() : 0);
 		result = 31 * result + (this.info != null ? this.info.hashCode() : 0);
 		return result;
 	}
 
-	public void log(String code, StringBuilder buf, boolean colors)
+	public void log(Source source, StringBuilder buf, boolean colors)
 	{
 		final String type = this.getMarkerType();
 		final String message = this.message;
 
-		buf.append("line ").append(this.position.startLine()).append(": ");
+		final ICodePosition position = this.position;
+		final int startLine = position.startLine();
+		final int endLine = position.endLine();
+
+		buf.append("line ").append(startLine).append(": ");
 
 		final String colorString;
 		if (colors)
@@ -131,37 +143,34 @@ public abstract class Marker implements Comparable<Marker>
 			}
 			buf.append('\n');
 		}
-
-		if (code == null)
-		{
-			buf.append('\n');
-			return;
-		}
-
-		int startIndex = this.position.startIndex();
-		int endIndex = this.position.endIndex();
-		final int codeLength = code.length();
-
-		if (startIndex >= codeLength)
-		{
-			startIndex = codeLength - 1;
-		}
-		if (endIndex > codeLength)
-		{
-			endIndex = codeLength;
-		}
-
-		final int prevNL = lineStart(code, startIndex);
-		final int nextNL = lineEnd(code, startIndex);
-
 		buf.append('\n');
-		buf.append(code, prevNL, nextNL);
+
+		if (startLine == endLine)
+		{
+			this.appendLine(buf, source.getLine(startLine), position.startColumn(), position.endColumn(), colors, colorString);
+		}
+		else
+		{
+			final String line = source.getLine(startLine);
+			this.appendLine(buf, line, position.startColumn(), line.length(), colors, colorString);
+			if (endLine - startLine > 1)
+			{
+				buf.append("\t...\n");
+			}
+			this.appendLine(buf, source.getLine(endLine), 0, position.endColumn(), colors, colorString);
+		}
+	}
+
+	private void appendLine(StringBuilder buf, String line, int startColumn, int endColumn,
+		                       boolean colors, String colorString)
+	{
+		buf.append(line);
 		buf.append('\n');
 
 		// Append Spaces
-		for (int i = prevNL; i < startIndex; i++)
+		for (int i = 0; i < startColumn; i++)
 		{
-			if (code.charAt(i) == '\t')
+			if (line.charAt(i) == '\t')
 			{
 				buf.append('\t');
 			}
@@ -171,44 +180,22 @@ public abstract class Marker implements Comparable<Marker>
 			}
 		}
 
-		if (colors)
+		if (startColumn < endColumn)
 		{
-			buf.append(colorString);
-		}
-		for (int i = startIndex; i < endIndex; i++)
-		{
-			buf.append('¯');
-		}
-		if (colors)
-		{
-			buf.append(Console.ANSI_RESET);
-		}
+			if (colors)
+			{
+				buf.append(colorString);
+			}
+			for (int i = startColumn; i < endColumn; i++)
+			{
+				buf.append('¯');
+			}
+			if (colors)
+			{
+				buf.append(Console.ANSI_RESET);
+			}
 
-		buf.append('\n');
-	}
-
-	private static int lineStart(String code, int start)
-	{
-		if (code.charAt(start) == '\n')
-		{
-			--start;
+			buf.append('\n');
 		}
-
-		final int i = code.lastIndexOf('\n', start);
-		if (i < 0)
-		{
-			return 0;
-		}
-		return i + 1;
-	}
-
-	private static int lineEnd(String code, int end)
-	{
-		final int i = code.indexOf('\n', end);
-		if (i < 0)
-		{
-			return code.length();
-		}
-		return i;
 	}
 }

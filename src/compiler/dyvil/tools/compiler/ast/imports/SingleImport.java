@@ -163,7 +163,7 @@ public final class SingleImport extends Import implements IDefaultContext
 	@Override
 	public void resolve(MarkerList markers, IContext context, IImportContext parentContext, int mask)
 	{
-		if (this.asParentContext != null)
+		if (this.asParentContext != IDefaultContext.DEFAULT)
 		{
 			// A class, package or type was found with this name
 			return;
@@ -177,9 +177,9 @@ public final class SingleImport extends Import implements IDefaultContext
 
 		if ((mask & KindedImport.FUNC) != 0)
 		{
-			final MatchList<IMethod> methods = new MatchList<>(null);
-			parentContext.getMethodMatches(methods, null, this.name, null);
-			if (methods.hasCandidate())
+			final MatchList<IMethod> matches = new MatchList<>(null);
+			parentContext.getMethodMatches(matches, null, this.name, null);
+			if (!matches.isEmpty())
 			{
 				return;
 			}
