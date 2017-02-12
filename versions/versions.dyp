@@ -44,4 +44,7 @@ versionFiles = {
 	"v0.25.0" : "\(baseLink)/gamma/v0.25.0.dyp",
 	"v0.26.0" : "\(baseLink)/gamma/v0.26.0.dyp",
 	"v0.27.0" : "\(baseLink)/gamma/v0.27.0.dyp",
+	"v0.27.1" : "\(baseLink)/gamma/v0.27.1.dyp",
+	"v0.28.0" : "\(baseLink)/gamma/v0.28.0.dyp",
+	"v0.29.0" : "\(baseLink)/gamma/v0.29.0.dyp",
 }

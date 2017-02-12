@@ -9,15 +9,15 @@ import groovy.transform.Field
 
 // ---------------------------------------- Main Settings ----------------------------------------
 
-group = 'dyvil-team'
+group = 'clashsoft'
 
-version = '0.28.0'
+version = '0.29.0'
 
-String libraryVersion = '0.28.0'
-String compilerVersion = '0.28.0'
-String replVersion = '0.17.2'
-String dpfVersion = '0.9.0'
-String genSrcVersion = '0.3.0'
+String libraryVersion = '0.29.0'
+String compilerVersion = '0.29.0'
+String replVersion = '0.17.4'
+String dpfVersion = '0.10.0'
+String genSrcVersion = '0.4.0'
 
 String devStage = 'gamma'
 
