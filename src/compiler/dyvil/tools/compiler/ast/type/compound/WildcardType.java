@@ -35,7 +35,7 @@ import java.io.IOException;
 public final class WildcardType implements IRawType, ITyped
 {
 	public ICodePosition position;
-	protected IType bound = Types.ANY;
+	protected IType bound = Types.NULLABLE_ANY;
 	protected Variance variance;
 
 	public WildcardType()

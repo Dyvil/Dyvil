@@ -6,9 +6,18 @@ import dyvil.tools.compiler.ast.type.IType;
 
 public class CovariantTypeVarType extends TypeVarType
 {
-	public CovariantTypeVarType(ITypeParameter typeVariable)
+	private final boolean backReference;
+
+	public CovariantTypeVarType(ITypeParameter typeParameter)
 	{
-		super(typeVariable);
+		super(typeParameter);
+		this.backReference = false;
+	}
+
+	public CovariantTypeVarType(ITypeParameter typeParameter, boolean backReference)
+	{
+		super(typeParameter);
+		this.backReference = backReference;
 	}
 
 	@Override
@@ -40,31 +49,25 @@ public class CovariantTypeVarType extends TypeVarType
 	@Override
 	public boolean isSameType(IType type)
 	{
-		return this.typeParameter.isSuperTypeOf(type);
-	}
-
-	@Override
-	public boolean isSuperClassOf(IType subType)
-	{
-		return this.typeParameter.isSuperClassOf(subType);
+		return this.backReference || this.typeParameter.isSuperTypeOf(type);
 	}
 
 	@Override
 	public boolean isSuperTypeOf(IType subType)
 	{
-		return this.typeParameter.isAssignableFrom(subType, ITypeContext.COVARIANT);
+		return this.backReference || this.typeParameter.isAssignableFrom(subType, ITypeContext.COVARIANT);
 	}
 
 	@Override
 	public boolean isSubTypeOf(IType superType)
 	{
-		return this.typeParameter.isSuperTypeOf(superType);
+		return this.backReference || this.typeParameter.isSuperTypeOf(superType);
 	}
 
 	@Override
 	public IType getConcreteType(ITypeContext context)
 	{
-		IType type = super.getConcreteType(context);
+		final IType type = super.getConcreteType(context);
 
 		final TypeVarType typeVar = type.extract(TypeVarType.class);
 		return typeVar != null && typeVar.getTypeVariable() == this.typeParameter ? this : type;

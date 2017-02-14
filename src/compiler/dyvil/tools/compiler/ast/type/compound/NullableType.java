@@ -135,7 +135,11 @@ public class NullableType implements IObjectType
 		}
 
 		final NullableType nullable = subType.extract(NullableType.class);
-		return Types.isSuperType(this.type, nullable != null ? nullable.getElementType() : subType);
+		if (nullable != null)
+		{
+			return Types.isSuperType(this, nullable.getElementType());
+		}
+		return Types.isSuperType(this.type, subType);
 	}
 
 	@Override

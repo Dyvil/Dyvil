@@ -14,6 +14,8 @@ import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
+import dyvil.tools.compiler.ast.type.compound.ImplicitNullableType;
+import dyvil.tools.compiler.ast.type.compound.NullableType;
 import dyvil.tools.compiler.ast.type.compound.UnionType;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.ast.type.raw.InternalType;
@@ -50,6 +52,8 @@ public final class Types
 	public static final NullType    NULL    = new NullType();
 	public static final AnyType     ANY     = new AnyType();
 	public static final NoneType    NONE    = new NoneType();
+
+	public static final NullableType NULLABLE_ANY = new ImplicitNullableType(ANY);
 
 	public static final ClassType OBJECT = new ClassType();
 	public static final ClassType STRING = new ClassType();

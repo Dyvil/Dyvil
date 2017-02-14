@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.type.generic;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.util.Markers;
@@ -54,14 +55,15 @@ public class ResolvedGenericType extends ClassGenericType
 		for (int i = 0; i < count; i++)
 		{
 			final ITypeParameter typeVariable = this.theClass.getTypeParameter(i);
-			final IType type = this.typeArguments[i];
+			final IType typeArgument = this.typeArguments[i];
 
-			if (type.isResolved() && !typeVariable.isSuperTypeOf(type))
+			if (typeArgument.isResolved() //
+				    && !Variance.checkCompatible(Variance.COVARIANT, typeVariable.getCovariantType(), typeArgument))
 			{
-				final Marker marker = Markers.semanticError(type.getPosition(), "type.generic.incompatible",
+				final Marker marker = Markers.semanticError(typeArgument.getPosition(), "type.generic.incompatible",
 				                                            typeVariable.getName().qualified,
 				                                            this.theClass.getFullName());
-				marker.addInfo(Markers.getSemantic("type.generic.argument", type));
+				marker.addInfo(Markers.getSemantic("type.generic.argument", typeArgument));
 				marker.addInfo(Markers.getSemantic("type_parameter.declaration", typeVariable));
 				markers.add(marker);
 			}

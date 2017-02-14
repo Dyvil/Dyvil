@@ -128,6 +128,19 @@ public class TypeVarType implements IRawType
 	}
 
 	@Override
+	public boolean isConvertibleTo(IType type)
+	{
+		return this.typeParameter.getUpperBound().isConvertibleTo(type);
+	}
+
+	@Override
+	public IValue convertValueTo(IValue value, IType targetType, ITypeContext typeContext, MarkerList markers,
+		                            IContext context)
+	{
+		return this.typeParameter.getUpperBound().convertValueTo(value, targetType, typeContext, markers, context);
+	}
+
+	@Override
 	public boolean hasTypeVariables()
 	{
 		return true;
