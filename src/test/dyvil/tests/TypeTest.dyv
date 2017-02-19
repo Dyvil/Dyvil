@@ -6,6 +6,8 @@ infix operator <<< { 120 }
 
 public class TypeTest
 {
+	// Receiver Type Specifiers
+
 	public static case class MyList<T>(T... elements)
 	{
 		@BytecodeName("sum_doubles")
@@ -25,7 +27,25 @@ public class TypeTest
 		}
 	}
 
-	infix func <<< <T, C: Collection<T>>(C collection, T element) = collection.added(element)
+	// Recursive Type Parameters
+
+	public interface Recur<type +SELF: Recur<SELF>>
+	{
+		func next(): SELF
+	}
+
+	func nextRecur<type R: Recur<R>>(value: R) -> R = value.next
+
+	public case class IntRecur(let value: int) implements Recur<IntRecur>
+	{
+		override func next(): IntRecur = IntRecur(this.value + 1)
+	}
+
+	public class RecurWrapper<type R: Recur<R>>(let value: R)
+
+	// Misc.
+
+	public infix func <<< <T, C: Collection<T>>(C collection, T element) = collection.added(element)
 
 	static func voidTest<T>(T value) = "\(value)" // will error if CovariantTypeVarType.isSameType(Types.VOID) returns true
 
@@ -49,5 +69,7 @@ public class TypeTest
 		}
 
 		List(1, 2, 3) <<< 1
+
+		let w: RecurWrapper<IntRecur> = new RecurWrapper(IntRecur 10)
 	}
 }
