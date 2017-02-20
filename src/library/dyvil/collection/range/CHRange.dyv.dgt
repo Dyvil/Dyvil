@@ -1,13 +1,11 @@
 #if IS_HALF_OPEN
 package dyvil.collection.range.halfopen
-#else
-package dyvil.collection.range.closed
-#end
 
-#if IS_HALF_OPEN
 	#define LESS_OP <
 	#define RANGE_OP ..<
 #else
+package dyvil.collection.range.closed
+
 	#define LESS_OP <=
 	#define RANGE_OP ..
 #end

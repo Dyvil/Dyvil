@@ -1,0 +1,24 @@
+package dyvil.math
+
+public interface ScalarMath<T>
+{
+	static func _0 -> T
+
+	static func _1 -> T
+
+	prefix func +(rhs: T) -> T = rhs
+
+	prefix func -(rhs: T) -> T
+
+	// Additive Operators
+
+	infix func +(lhs: T, rhs: T) -> T
+
+	infix func -(lhs: T, rhs: T) -> T
+
+	// Multiplicative Operators
+
+	infix func *(lhs: T, rhs: T) -> T
+
+	infix func /(lhs: T, rhs: T) -> T
+}

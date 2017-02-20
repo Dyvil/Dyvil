@@ -1,0 +1,119 @@
+#if IS_HALF_OPEN
+package dyvil.collection.range.halfopen
+
+	#define COMPARE_OP <
+#else
+package dyvil.collection.range.closed
+
+	#define COMPARE_OP <=
+#end
+
+import dyvil.collection.range.Rangeable
+import java.util.Iterator
+import java.util.NoSuchElementException
+import java.util.function.Consumer
+import java.io.IOException
+
+@LiteralConvertible.FromTuple
+@Immutable
+case class ObjectRange<type +T: Rangeable<T>>(
+	protected @transient let start: T
+	protected @transient let end: T
+) implements Range<T>
+{
+
+	private const serialVersionUID: long = -8656379367421762895L
+
+#if IS_HALF_OPEN
+	override func isHalfOpen() -> boolean = true
+
+	override func asHalfOpen() -> Range<T> = this
+
+	override func asClosed() -> Range<T> = new dyvil.collection.range.closed.ObjectRange<T>(this.start, this.end)
+#else
+	override func isHalfOpen() -> boolean = false
+
+	override func asHalfOpen() -> Range<T> = new dyvil.collection.range.halfopen.ObjectRange<T>(this.start, this.end)
+
+	override func asClosed() -> Range<T> = this
+#end
+
+	override func first() -> T = this.start
+
+#if IS_HALF_OPEN
+	override func last() -> T = this.end.prev
+
+	override func size() -> int = this.start.distanceTo(this.end)
+#else
+	override func last() -> T = this.end
+
+	override func size() -> int = this.start.distanceTo(this.end) + 1
+#end
+
+	override func iterator() -> Iterator<T> = new Iterator<T>()
+	{
+		var current: T = this<ObjectRange>.start
+
+		override func next() -> T
+		{
+			if (!this.hasNext())
+			{
+				throw new NoSuchElementException("End of Range")
+			}
+
+			let c = this.current
+			this.current = this.current.next
+			return c
+		}
+
+		override func hasNext() -> boolean
+		{
+			return this.current COMPARE_OP this<ObjectRange>.end
+		}
+
+		override func toString() -> String = "RangeIterator(\(this<ObjectRange>), current: \(this.current))"
+	}
+
+#comment // Macro for a loop over the all elements in this range. The loop variable is always called 'current'
+#define FOR_EACH for (var current = this.start; current COMPARE_OP this.end; current = current.next)
+
+	override func forEach(action: Consumer<-T>) -> void
+	{
+		FOR_EACH
+		{
+			action.accept(current)
+		}
+	}
+
+	override func toArray(index: int, store: [Object!]) -> void
+	{
+		FOR_EACH
+		{
+			store[index++] = current
+		}
+	}
+
+	override func contains(element: Object!)
+	{
+		FOR_EACH
+		{
+			if (current == element)
+			{
+				return true
+			}
+		}
+		return false
+	}
+
+	override func copy() -> ObjectRange<T> = new ObjectRange<T>(this.start, this.end)
+
+	#if IS_HALF_OPEN
+	override func toString() -> String = this.start + " ..< " + this.end
+	#else
+	override func toString() -> String = this.start + " .. " + this.end
+	#end
+
+	override func equals(obj: Object!) -> boolean = dyvil.collection.Range.rangeEquals(this, obj)
+
+	override func hashCode() -> int = dyvil.collection.Range.rangeHashCode(this)
+}

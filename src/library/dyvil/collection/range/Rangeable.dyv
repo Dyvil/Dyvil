@@ -1,16 +1,16 @@
 package dyvil.collection.range
 
-public interface Rangeable<type T: Rangeable<T>> extends Comparable<T>
+public interface Rangeable<type SELF: Rangeable<SELF>> extends Comparable<SELF>
 {
-	func next() -> T
+	func next() -> SELF
 
-	func prev() -> T
+	func prev() -> SELF
 
-	func distanceTo(T other) -> int
+	func distanceTo(other: SELF) -> int
 
-	override func compareTo(T other) -> int
+	override func compareTo(other: SELF) -> int
 
-	override func equals(Object! other) -> boolean
+	override func equals(other: Object!) -> boolean
 
 	override func hashCode() -> int
 
