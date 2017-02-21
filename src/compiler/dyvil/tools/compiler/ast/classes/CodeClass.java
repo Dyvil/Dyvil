@@ -215,10 +215,14 @@ public class CodeClass extends AbstractClass
 			this.annotations.checkTypes(markers, context);
 		}
 
+		this.metadata.checkTypes(markers, context);
+
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
 			this.typeParameters[i].checkTypes(markers, context);
 		}
+
+		this.checkSuperMethods(markers, this, this.getThisType(), new IdentityHashSet<>());
 
 		this.parameters.checkTypes(markers, context);
 
@@ -231,10 +235,6 @@ public class CodeClass extends AbstractClass
 		{
 			this.interfaces[i].checkType(markers, context, TypePosition.SUPER_TYPE);
 		}
-
-		this.metadata.checkTypes(markers, context);
-
-		this.checkSuperMethods(markers, this, this.getThisType(), new IdentityHashSet<>());
 
 		if (this.body != null)
 		{
