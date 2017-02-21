@@ -162,15 +162,15 @@ public class BinaryWriter
 		}
 	}
 
+	public override void visitName(Name value)
+	{
+		this.writeTagAndName(NAME, value);
+	}
+
 	public override StringInterpolationVisitor visitStringInterpolation()
 	{
 		this.writeTag(STRING_INTERPOLATION);
 		return this;
-	}
-
-	public override void visitName(Name name)
-	{
-		this.writeTagAndName(NAME, name);
 	}
 
 	public override ValueVisitor visitValueAccess(Name name)

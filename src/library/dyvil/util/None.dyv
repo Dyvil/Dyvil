@@ -13,16 +13,16 @@ public object None implements Option<none>
 
 	override func isPresent() -> boolean = false
 
-	override func forEach(none -> void consumer) -> void {}
+	override func forEach(action: none -> void) -> void {}
 
-	override func filter(none -> boolean predicate) -> Option<none> = None
+	override func filter(predicate: none -> boolean) -> Option<none> = None
 
-	override func map<U>(none -> U function) -> Option<U> = None
+	override func map<U>(mapper: none -> U) -> Option<U> = None
 
-	override func flatMap<U>(none -> Option<U> function) -> Option<U> = None
+	override func flatMap<U>(mapper: none -> Option<U>) -> Option<U> = None
 
 	@OverloadPriority
-	public func orElse<U>(U value) -> U = value
+	override func orElse<U>(value: U) -> U = value
 
-	override func orElse<U>(-> U supplier) -> U = supplier()
+	override func orElse<U>(supplier: -> U) -> U = supplier()
 }

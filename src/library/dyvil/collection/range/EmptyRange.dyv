@@ -25,7 +25,7 @@ public object EmptyRange implements Range<none>
 
 	override func contains(element: any!) -> boolean = false
 
-	override func toArray(start: int, store: [Object!]) -> void = {}
+	override func toArray(index: int, store: [Object!]) -> void = {}
 
 	override func copy() -> EmptyRange = this
 

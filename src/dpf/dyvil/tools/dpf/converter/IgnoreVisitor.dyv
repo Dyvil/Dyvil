@@ -3,48 +3,48 @@ package dyvil.tools.dpf.converter
 import dyvil.tools.dpf.visitor._
 import dyvil.tools.parsing.Name
 
-public final object IgnoreVisitor
+final object IgnoreVisitor
 	implements NodeVisitor, ValueVisitor, ListVisitor, MapVisitor, StringInterpolationVisitor, BuilderVisitor
 {
-	public override ValueVisitor visitParameter(Name! name) = this
+	override func visitParameter(name: Name!) -> ValueVisitor = this
 
-	public override NodeVisitor visitNode() = this
+	override func visitNode() -> NodeVisitor = this
 
-	public override ValueVisitor visitElement() = this
+	override func visitElement() -> ValueVisitor = this
 
-	public override ValueVisitor visitKey() = this
+	override func visitKey() -> ValueVisitor = this
 
-	public override void visitStringPart(String string) { }
+	override func visitStringPart(string: String) -> void { }
 
-	public override ValueVisitor visitValue() = this
+	override func visitValue() -> ValueVisitor = this
 
-	public override NodeVisitor visitNode(Name name) = this
+	override func visitNode(name: Name) -> NodeVisitor = this
 
-	public override ValueVisitor visitProperty(Name name) = this
+	override func visitProperty(name: Name) -> ValueVisitor = this
 
-	public override NodeVisitor visitNodeAccess(Name name) = this
+	override func visitNodeAccess(name: Name) -> NodeVisitor = this
 
-	public override void visitEnd() { }
+	override func visitEnd() -> void { }
 
-	public override void visitInt(int value) { }
+	override func visitInt(value: int) -> void { }
 
-	public override void visitLong(long value) { }
+	override func visitLong(value: long) -> void { }
 
-	public override void visitFloat(float value) { }
+	override func visitFloat(value: float) -> void { }
 
-	public override void visitDouble(double value) { }
+	override func visitDouble(value: double) -> void { }
 
-	public override void visitString(String value) { }
+	override func visitString(value: String) -> void { }
 
-	public override StringInterpolationVisitor visitStringInterpolation() = this
+	override func visitName(value: Name) -> void { }
 
-	public override void visitName(Name name) { }
+	override func visitStringInterpolation() -> StringInterpolationVisitor = this
 
-	public override ValueVisitor visitValueAccess(Name name) = this
+	override func visitValueAccess(name: Name) -> ValueVisitor = this
 
-	public override ListVisitor visitList() = this
+	override func visitList() -> ListVisitor = this
 
-	public override MapVisitor visitMap() = this
+	override func visitMap() -> MapVisitor = this
 
-	public override BuilderVisitor visitBuilder(Name name) = this
+	override func visitBuilder(name: Name) -> BuilderVisitor = this
 }

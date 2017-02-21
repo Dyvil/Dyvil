@@ -9,18 +9,18 @@ public class LambdaTest
 	@FunctionalInterface
 	public interface MyFunction<P, R>
 	{
-		func apply(P par1) -> R
+		func apply(par: P) -> R
 		
-		func andThen<A>(MyFunction<R, A> other) -> MyFunction<P, A> = x => other(this(x))
+		func andThen<A>(other: MyFunction<R, A>) -> MyFunction<P, A> = x => other(this(x))
 	}
 
 	@FunctionalInterface
 	public interface IntFunction extends MyFunction<int, int>
 	{
-		override func apply(int value) -> int
+		override func apply(par: int) -> int
 	}
 
-	static func repeatClosure(int n, -> void f) -> void = for (i <- 0 ..< n) f()
+	static func repeatClosure(times: int, function: -> void) -> void = for (i <- 0 ..< times) function()
 
 	private static var staticSum: int = 0
 

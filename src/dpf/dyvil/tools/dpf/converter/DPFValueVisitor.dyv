@@ -5,53 +5,53 @@ import dyvil.tools.dpf.ast.value._
 import dyvil.tools.dpf.visitor._
 import dyvil.tools.parsing.Name
 
-public abstract class DPFValueVisitor implements ValueVisitor
+abstract class DPFValueVisitor implements ValueVisitor
 {
-	protected abstract void visitValue(Value value)
+	protected abstract func visitValue(value: Value) -> void
 
 	// Implementation Methods
 
-	public override void visitInt(int value) = this.visitValue(new IntValue(value))
+	override func visitInt(value: int) -> void = this.visitValue(new IntValue(value))
 
-	public override void visitLong(long value) = this.visitValue(new LongValue(value))
+	override func visitLong(value: long) -> void = this.visitValue(new LongValue(value))
 
-	public override void visitFloat(float value) = this.visitValue(new FloatValue(value))
+	override func visitFloat(value: float) -> void = this.visitValue(new FloatValue(value))
 
-	public override void visitDouble(double value) = this.visitValue(new DoubleValue(value))
+	override func visitDouble(value: double) -> void = this.visitValue(new DoubleValue(value))
 
-	public override void visitString(String value) = this.visitValue(new StringValue(value))
+	override func visitString(value: String) -> void = this.visitValue(new StringValue(value))
 
-	public override StringInterpolationVisitor visitStringInterpolation()
+	override func visitName(value: Name) -> void = this.visitValue(NameAccess(value))
+
+	override func visitStringInterpolation() -> StringInterpolationVisitor
 	{
 		let stringInterpolation = new StringInterpolation()
 		this.visitValue(stringInterpolation)
 		return stringInterpolation
 	}
 
-	public override void visitName(Name name) = this.visitValue(NameAccess(name))
-
-	public override ValueVisitor visitValueAccess(Name name)
+	override func visitValueAccess(name: Name) -> ValueVisitor
 	{
 		let access = NameAccess(name)
 		this.visitValue(access)
 		return access
 	}
 
-	public override ListVisitor visitList()
+	override func visitList() -> ListVisitor
 	{
 		let list = ListValue()
 		this.visitValue(list)
 		return list
 	}
 
-	public override MapVisitor visitMap()
+	override func visitMap() -> MapVisitor
 	{
 		let map = MapValue()
 		this.visitValue(map)
 		return map
 	}
 
-	public override BuilderVisitor visitBuilder(Name name)
+	override func visitBuilder(name: Name) -> BuilderVisitor
 	{
 		let builder = Builder(name)
 		this.visitValue(builder)
