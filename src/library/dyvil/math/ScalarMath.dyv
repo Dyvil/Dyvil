@@ -8,7 +8,9 @@ public interface ScalarMath<T>
 
 	prefix func +(rhs: T) -> T = rhs
 
-	prefix func -(rhs: T) -> T
+	prefix func -(rhs: T) -> T // = 0 - rhs
+
+	postfix func inverse(lhs: T) -> T // = 1 / rhs
 
 	// Additive Operators
 
@@ -21,4 +23,25 @@ public interface ScalarMath<T>
 	infix func *(lhs: T, rhs: T) -> T
 
 	infix func /(lhs: T, rhs: T) -> T
+
+	// Implementations
+
+	object Double implements ScalarMath<double>
+	{
+		override static func _0() -> double = 0
+
+		override static func _1() -> double = 1
+
+		override prefix func -(rhs: double) -> double = -rhs
+
+		override postfix func inverse(lhs: double) -> double = 1 / lhs
+
+		override infix func +(lhs: double, rhs: double) -> double = lhs + rhs
+
+		override infix func -(lhs: double, rhs: double) -> double = lhs - rhs
+
+		override infix func *(lhs: double, rhs: double) -> double = lhs * rhs
+
+		override infix func /(lhs: double, rhs: double) -> double = lhs / rhs
+	}
 }
