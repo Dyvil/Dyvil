@@ -210,7 +210,7 @@ public class REPLContext extends AbstractHeader
 		int methods = this.methods.size();
 		for (int i = 0; i < methods; i++)
 		{
-			if (this.methods.get(i).checkOverride(method, null))
+			if (this.methods.get(i).overrides(method, null))
 			{
 				this.methods.set(i, method);
 				return;

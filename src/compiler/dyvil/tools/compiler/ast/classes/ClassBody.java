@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.classes;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.math.MathUtils;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
@@ -11,14 +12,14 @@ import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
-import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
@@ -373,20 +374,22 @@ public class ClassBody implements IClassBody
 
 		final int hash = hash(candidate.getName());
 		final int index = hash & (cacheSize - 1);
+		boolean result = false;
+
 		for (MethodLink link = this.namedMethodCache[index]; link != null; link = link.next)
 		{
 			if (link.hash == hash && checkMethodImplements(link.method, candidate, typeContext))
 			{
-				return true;
+				result = true;
 			}
 		}
 
-		return false;
+		return result;
 	}
 
 	public static boolean checkMethodImplements(IMethod method, IMethod candidate, ITypeContext typeContext)
 	{
-		if (method.checkOverride(candidate, typeContext))
+		if (method.overrides(candidate, typeContext))
 		{
 			method.addOverride(candidate);
 			return !method.hasModifier(Modifiers.ABSTRACT);
@@ -397,13 +400,10 @@ public class ClassBody implements IClassBody
 	public static boolean checkPropertyImplements(IProperty property, IMethod candidate, ITypeContext typeContext)
 	{
 		final IMethod getter = property.getGetter();
-		if (getter != null && checkMethodImplements(getter, candidate, typeContext))
-		{
-			return true;
-		}
-
 		final IMethod setter = property.getSetter();
-		return setter != null && checkMethodImplements(setter, candidate, typeContext);
+
+		return getter != null && checkMethodImplements(getter, candidate, typeContext)
+			       || setter != null && checkMethodImplements(setter, candidate, typeContext);
 	}
 
 	@Override
@@ -455,12 +455,6 @@ public class ClassBody implements IClassBody
 	public static void checkProperty(IProperty property, MarkerList markers, IClass checkedClass,
 		                                ITypeContext typeContext)
 	{
-		if (property.hasModifier(Modifiers.STATIC))
-		{
-			// Don't check static properties
-			return;
-		}
-
 		final IMethod getter = property.getGetter();
 		if (getter != null)
 		{
@@ -864,7 +858,7 @@ public class ClassBody implements IClassBody
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String prefix, @NonNull StringBuilder buffer)
 	{
 		final String bodyPrefix = Formatting.getIndent("class.body.indent", prefix);
 		if (Formatting.getBoolean("class.body.open_bracket.newline"))

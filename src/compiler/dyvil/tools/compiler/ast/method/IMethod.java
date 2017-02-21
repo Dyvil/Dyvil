@@ -52,7 +52,7 @@ public interface IMethod extends IClassMember, ICallableMember, ITypeParametric,
 	 *
 	 * @return {@code true}, if this method overrides the given candidate
 	 */
-	boolean checkOverride(IMethod candidate, ITypeContext typeContext);
+	boolean overrides(IMethod candidate, ITypeContext typeContext);
 
 	void addOverride(IMethod method);
 	

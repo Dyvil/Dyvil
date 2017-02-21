@@ -96,7 +96,7 @@ public final class CaseClassMetadata extends ClassMetadata
 	@Override
 	public boolean checkImplements(IMethod candidate, ITypeContext typeContext)
 	{
-		return this.applyMethod != null && this.applyMethod.checkOverride(candidate, typeContext);
+		return this.applyMethod != null && this.applyMethod.overrides(candidate, typeContext);
 	}
 
 	@Override

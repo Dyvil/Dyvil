@@ -268,6 +268,11 @@ public class CodeMethod extends AbstractMethod
 			this.value.checkTypes(markers, context);
 		}
 
+		// Check for duplicate methods
+		this.checkDuplicates(markers);
+
+		this.checkOverrideMethods(markers);
+
 		context.pop();
 	}
 
@@ -309,11 +314,6 @@ public class CodeMethod extends AbstractMethod
 		}
 
 		ModifierUtil.checkMethodModifiers(markers, this);
-
-		this.checkOverrideMethods(markers);
-
-		// Check for duplicate methods
-		this.checkDuplicates(markers);
 
 		context.pop();
 	}

@@ -30,7 +30,7 @@ public class MemberSorter
 		{
 			return n;
 		}
-		if (!method1.checkOverride(method2, null))
+		if (!method1.overrides(method2, null))
 		{
 			return method1.getSignature().compareTo(method2.getSignature());
 		}

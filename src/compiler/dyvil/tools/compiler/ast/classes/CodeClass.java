@@ -234,12 +234,12 @@ public class CodeClass extends AbstractClass
 
 		this.metadata.checkTypes(markers, context);
 
+		this.checkSuperMethods(markers, this, this.getThisType(), new IdentityHashSet<>());
+
 		if (this.body != null)
 		{
 			this.body.checkTypes(markers, context);
 		}
-
-		this.checkSuperMethods(markers, this, this.getThisType(), new IdentityHashSet<>());
 
 		context.pop();
 	}
