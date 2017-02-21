@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.parameter;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.asm.AnnotationVisitor;
@@ -131,6 +132,12 @@ public abstract class AbstractParameter extends Member implements IParameter
 	{
 		this.type = type;
 		this.internalType = null;
+	}
+
+	@Override
+	public String getInternalName()
+	{
+		return this.name == null ? null : this.name.qualified;
 	}
 
 	@Override
@@ -384,7 +391,7 @@ public abstract class AbstractParameter extends Member implements IParameter
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String prefix, @NonNull StringBuilder buffer)
 	{
 		if (this.annotations != null)
 		{
@@ -413,7 +420,14 @@ public abstract class AbstractParameter extends Member implements IParameter
 			}
 		}
 
-		buffer.append(this.name);
+		if (this.name != null)
+		{
+			buffer.append(this.name);
+		}
+		else
+		{
+			buffer.append('_');
+		}
 
 		if (typeAscription)
 		{
