@@ -71,7 +71,7 @@ public class TextSource implements Source
 	{
 		if (index == this.lineCount)
 		{
-			return this.text.substring(this.lineStarts[index - 1], this.lineEnd(this.text.length()));
+			return this.text.substring(this.lineStarts[index - 1]);
 		}
 		if (index < this.lineCount)
 		{
