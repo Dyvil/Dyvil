@@ -56,6 +56,11 @@ public final class GenericData implements IResolvable, ITypeList, ITypeContext
 		this.fallbackTypeContext = fallbackTypeContext;
 	}
 
+	public void lockAvailable()
+	{
+		this.lock(this.genericCount);
+	}
+
 	public void lock(int lockedCount)
 	{
 		if (lockedCount > this.lockedCount)

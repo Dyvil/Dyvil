@@ -747,7 +747,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		if (genericData != null)
 		{
-			genericData.lock(genericData.typeCount());
+			genericData.lockAvailable();
 			genericData.setFallbackTypeContext(receiver.getType());
 		}
 	}

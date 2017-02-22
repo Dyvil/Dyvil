@@ -84,7 +84,7 @@ public class LambdaTest
 
 		repeatClosure(3) { result += function2() }
 
-		with<String>("c") { result += $0 } // TODO Remove explicit Type Args
+		with("c") { result += $0 }
 
 		function1()
 

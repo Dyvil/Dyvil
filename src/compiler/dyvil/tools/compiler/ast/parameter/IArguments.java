@@ -21,6 +21,12 @@ public interface IArguments extends IASTNode, IResolvable, Iterable<IValue>
 	static IValue convertValue(IValue value, IParameter parameter, GenericData genericData, MarkerList markers,
 		                          IContext context)
 	{
+		if (genericData != null && value.isPolyExpression())
+		{
+			// Lock available type arguments before type-checking a poly-expression
+			genericData.lockAvailable();
+		}
+
 		final IType type = parameter.getInternalType();
 		final TypeChecker.MarkerSupplier markerSupplier = TypeChecker.markerSupplier("method.access.argument_type",
 		                                                                             parameter.getName());
