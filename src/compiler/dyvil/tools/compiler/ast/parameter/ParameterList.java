@@ -367,17 +367,25 @@ public class ParameterList implements IParameterList
 		{
 			IParameter parameter = this.parameters[0];
 
-			buffer.append(parameter.getName()).append(": ");
-			Util.typeToString(parameter.getType(), typeContext, buffer);
+			signatureToString(buffer, typeContext, parameter);
 			for (int i = 1; i < this.parameterCount; i++)
 			{
 				buffer.append(", ");
 				parameter = this.parameters[i];
-				buffer.append(parameter.getName()).append(": ");
-				Util.typeToString(parameter.getType(), typeContext, buffer);
+				signatureToString(buffer, typeContext, parameter);
 			}
 		}
 
 		buffer.append(')');
+	}
+
+	private static void signatureToString(StringBuilder buffer, ITypeContext typeContext, IParameter parameter)
+	{
+		final Name name = parameter.getName();
+		if (name != null)
+		{
+			buffer.append(name).append(": ");
+		}
+		Util.typeToString(parameter.getType(), typeContext, buffer);
 	}
 }

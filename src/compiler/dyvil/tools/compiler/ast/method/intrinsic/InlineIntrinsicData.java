@@ -104,7 +104,8 @@ public class InlineIntrinsicData extends InstructionList implements IntrinsicDat
 			if (varIndex >= this.storedParameters && varIndex < this.parameterSlots)
 			{
 				// Accessing Parameter, not stored -> load it
-				IntrinsicData.writeArgument(writer, this.method, varIndex, instance, arguments);
+				final int argIndex = getArgumentIndex(varIndex, this.method);
+				IntrinsicData.writeArgument(writer, this.method, argIndex, instance, arguments);
 				return;
 			}
 
@@ -119,6 +120,20 @@ public class InlineIntrinsicData extends InstructionList implements IntrinsicDat
 		}
 
 		instruction.write(writer);
+	}
+
+	private static int getArgumentIndex(int varIndex, IMethod method)
+	{
+		final IParameterList params = method.getParameterList();
+		for (int i = 0, count = params.size(); i < count; i++)
+		{
+			if (params.get(i).getLocalIndex() == varIndex)
+			{
+				return i;
+			}
+		}
+
+		return 0;
 	}
 
 	@Override
