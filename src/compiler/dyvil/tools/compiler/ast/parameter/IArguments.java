@@ -1,15 +1,15 @@
 package dyvil.tools.compiler.ast.parameter;
 
-import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
@@ -18,9 +18,13 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public interface IArguments extends IASTNode, IResolvable, Iterable<IValue>
 {
-	static TypeChecker.MarkerSupplier argumentMarkerSupplier(IParameter parameter)
+	static IValue convertValue(IValue value, IParameter parameter, GenericData genericData, MarkerList markers,
+		                          IContext context)
 	{
-		return TypeChecker.markerSupplier("method.access.argument_type", parameter.getName());
+		final IType type = parameter.getInternalType();
+		final TypeChecker.MarkerSupplier markerSupplier = TypeChecker.markerSupplier("method.access.argument_type",
+		                                                                             parameter.getName());
+		return TypeChecker.convertValue(value, type, genericData, markers, context, markerSupplier);
 	}
 
 	@Override
@@ -68,7 +72,7 @@ public interface IArguments extends IASTNode, IResolvable, Iterable<IValue>
 	int checkMatch(int[] values, IType[] types, int matchStartIndex, int argumentIndex, IParameter param,
 		              IImplicitContext implicitContext);
 
-	void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context);
+	void checkValue(int index, IParameter param, GenericData genericData, MarkerList markers, IContext context);
 
 	/**
 	 * Returns {@code true} if the arguments of this list are in the order of the parameters. {@link NamedArgumentList}s

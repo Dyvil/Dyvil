@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
@@ -16,7 +17,6 @@ import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -113,7 +113,8 @@ public final class SingleArgument implements IArguments, IValueConsumer
 	}
 
 	@Override
-	public int checkMatch(int[] values, IType[] types, int matchStartIndex, int argumentIndex, IParameter param, IImplicitContext implicitContext)
+	public int checkMatch(int[] values, IType[] types, int matchStartIndex, int argumentIndex, IParameter param,
+		                     IImplicitContext implicitContext)
 	{
 		if (argumentIndex != 0 || this.value == null)
 		{
@@ -126,13 +127,15 @@ public final class SingleArgument implements IArguments, IValueConsumer
 
 		if (!param.isVarargs() || this.value.checkVarargs(false))
 		{
-			return ArgumentList.checkMatch(values, types, matchStartIndex + argumentIndex, this.value, param.getInternalType(),
-			                               implicitContext) ? 0 : -1;
+			return ArgumentList
+				       .checkMatch(values, types, matchStartIndex + argumentIndex, this.value, param.getInternalType(),
+				                   implicitContext) ? 0 : -1;
 		}
 
 		final ArrayType arrayType = param.getInternalType().extract(ArrayType.class);
 		final IType elementType = arrayType.getElementType();
-		if (ArgumentList.checkMatch(values, types, matchStartIndex + argumentIndex, this.value, elementType, implicitContext))
+		if (ArgumentList
+			    .checkMatch(values, types, matchStartIndex + argumentIndex, this.value, elementType, implicitContext))
 		{
 			// One argument applied as varargs
 			return 1;
@@ -141,7 +144,7 @@ public final class SingleArgument implements IArguments, IValueConsumer
 	}
 
 	@Override
-	public void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
+	public void checkValue(int index, IParameter param, GenericData genericData, MarkerList markers, IContext context)
 	{
 		if (index != 0 || this.value == null)
 		{
@@ -150,31 +153,23 @@ public final class SingleArgument implements IArguments, IValueConsumer
 
 		if (param.isVarargs())
 		{
-			this.checkVarargsValue(param, typeContext, markers, context);
+			this.checkVarargsValue(param, genericData, markers, context);
 			return;
 		}
 
-		IType type = param.getInternalType();
-		this.value = TypeChecker.convertValue(this.value, type, typeContext, markers, context,
-		                                      IArguments.argumentMarkerSupplier(param));
+		this.value = IArguments.convertValue(this.value, param, genericData, markers, context);
 	}
 
-	private void checkVarargsValue(IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
+	private void checkVarargsValue(IParameter param, GenericData genericData, MarkerList markers, IContext context)
 	{
-		final IType arrayType = param.getInternalType();
 		if (this.value.checkVarargs(true))
 		{
-			this.value = TypeChecker.convertValue(this.value, arrayType, typeContext, markers, context,
-			                                      IArguments.argumentMarkerSupplier(param));
+			this.value = IArguments.convertValue(this.value, param, genericData, markers, context);
 			return;
 		}
 
-		final IType elementType = arrayType.extract(ArrayType.class).getElementType();
-		this.value = TypeChecker.convertValue(this.value, elementType, typeContext, markers, context,
-		                                      IArguments.argumentMarkerSupplier(param));
-
-		this.value = new ArrayExpr(this.value.getPosition(), new IValue[] { this.value }, 1);
-		this.value.setType(arrayType);
+		final ArrayExpr array = new ArrayExpr(this.value.getPosition(), new IValue[] { this.value }, 1);
+		this.value = IArguments.convertValue(array, param, genericData, markers, context);
 	}
 
 	private void inferVarargsType(IParameter param, ITypeContext typeContext)

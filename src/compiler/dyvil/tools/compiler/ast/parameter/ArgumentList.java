@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -253,49 +253,44 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 
 	@Override
-	public void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
+	public void checkValue(int index, IParameter param, GenericData genericData, MarkerList markers, IContext context)
 	{
 		if (index >= this.size)
 		{
 			return;
 		}
 
-		if (param.isVarargs())
+		if (!param.isVarargs())
 		{
-			if (checkVarargsValue(this.values, index, this.size, param, typeContext, markers, context))
-			{
-				this.size = index + 1;
-			}
+			this.values[index] = IArguments.convertValue(this.values[index], param, genericData, markers, context);
 			return;
 		}
 
-		final IType type = param.getInternalType();
-
-		this.values[index] = TypeChecker.convertValue(this.values[index], type, typeContext, markers, context,
-		                                              IArguments.argumentMarkerSupplier(param));
+		if (checkVarargsValue(this.values, index, this.size, param, genericData, markers, context))
+		{
+			this.size = index + 1;
+		}
+		return;
 	}
 
 	protected static boolean checkVarargsValue(IValue[] values, int startIndex, int endIndex, IParameter param,
-		                                          ITypeContext typeContext, MarkerList markers, IContext context)
+		                                          GenericData genericData, MarkerList markers, IContext context)
 	{
-		final IType arrayType = param.getInternalType();
-
 		final IValue value = values[startIndex];
 		if (value.checkVarargs(true))
 		{
-			values[startIndex] = TypeChecker.convertValue(value, arrayType, typeContext, markers, context,
-			                                              IArguments.argumentMarkerSupplier(param));
+			values[startIndex] = IArguments.convertValue(value, param, genericData, markers, context);
 			return false;
 		}
 
-		final int varargsArguments = endIndex - startIndex;
-		final IValue[] arrayValues = new IValue[varargsArguments];
-		final ArrayExpr arrayExpr = new ArrayExpr(arrayValues, varargsArguments);
+		final int size = endIndex - startIndex;
+		final IValue[] arrayValues = new IValue[size];
 
-		System.arraycopy(values, startIndex, arrayValues, 0, varargsArguments);
+		System.arraycopy(values, startIndex, arrayValues, 0, size);
 
-		values[startIndex] = TypeChecker.convertValue(arrayExpr, arrayType, typeContext, markers, context,
-		                                              IArguments.argumentMarkerSupplier(param));
+		final ArrayExpr arrayExpr = new ArrayExpr(value.getPosition(), arrayValues, size);
+
+		values[startIndex] = IArguments.convertValue(arrayExpr, param, genericData, markers, context);
 		return true;
 	}
 

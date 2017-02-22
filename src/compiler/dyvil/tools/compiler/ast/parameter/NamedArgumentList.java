@@ -5,14 +5,13 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -226,7 +225,7 @@ public final class NamedArgumentList implements IArguments
 	}
 
 	@Override
-	public void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
+	public void checkValue(int index, IParameter param, GenericData genericData, MarkerList markers, IContext context)
 	{
 		final int argIndex = this.findIndex(index, param.getName());
 		if (argIndex < 0)
@@ -236,23 +235,23 @@ public final class NamedArgumentList implements IArguments
 
 		if (!param.isVarargs())
 		{
-			final IType type = param.getInternalType();
-			this.values[argIndex] = TypeChecker.convertValue(this.values[argIndex], type, typeContext, markers, context,
-			                                                 IArguments.argumentMarkerSupplier(param));
+			this.values[argIndex] = IArguments.convertValue(this.values[argIndex], param, genericData, markers, context);
 			return;
 		}
 
 		final int endIndex = this.findNextName(argIndex + 1);
-		if (ArgumentList.checkVarargsValue(this.values, argIndex, endIndex, param, typeContext, markers, context))
+		if (!ArgumentList.checkVarargsValue(this.values, argIndex, endIndex, param, genericData, markers, context))
 		{
-			final int moved = this.size - endIndex;
-			if (moved > 0)
-			{
-				System.arraycopy(this.values, endIndex, this.values, argIndex + 1, moved);
-				System.arraycopy(this.keys, endIndex, this.keys, argIndex + 1, moved);
-			}
-			this.size = argIndex + moved + 1;
+			return;
 		}
+
+		final int moved = this.size - endIndex;
+		if (moved > 0)
+		{
+			System.arraycopy(this.values, endIndex, this.values, argIndex + 1, moved);
+			System.arraycopy(this.keys, endIndex, this.keys, argIndex + 1, moved);
+		}
+		this.size = argIndex + moved + 1;
 	}
 
 	@Override

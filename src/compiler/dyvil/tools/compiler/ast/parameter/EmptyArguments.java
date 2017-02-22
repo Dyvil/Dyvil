@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.parameter;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -95,7 +95,7 @@ public final class EmptyArguments implements IArguments
 	}
 
 	@Override
-	public void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
+	public void checkValue(int index, IParameter param, GenericData genericData, MarkerList markers, IContext context)
 	{
 	}
 
