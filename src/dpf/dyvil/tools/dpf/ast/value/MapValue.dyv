@@ -1,7 +1,7 @@
 package dyvil.tools.dpf.ast.value
 
 import dyvil.collection.mutable.ArrayMap
-import dyvil.tools.dpf.ast.Expandable
+import dyvil.tools.dpf.model.Expandable
 import dyvil.tools.dpf.converter.DPFValueVisitor
 import dyvil.tools.dpf.visitor.MapVisitor
 import dyvil.tools.dpf.visitor.ValueVisitor

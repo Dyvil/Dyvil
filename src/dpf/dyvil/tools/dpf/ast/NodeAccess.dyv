@@ -1,52 +1,42 @@
 package dyvil.tools.dpf.ast
 
-import dyvil.collection.Map
-import dyvil.tools.dpf.visitor.NodeVisitor
-import dyvil.tools.dpf.visitor.ValueVisitor
-import dyvil.tools.parsing.Name
-import dyvil.tools.parsing.ast.IASTNode
-import dyvil.tools.parsing.position.ICodePosition
+import dyvil.tools.dpf.visitor.{ NodeVisitor, ValueVisitor }
+import dyvil.tools.dpf.model.Expandable
+import dyvil.tools.parsing.{ Name, ast.IASTNode, position.ICodePosition }
 
-public class NodeAccess implements NodeVisitor, NodeElement, Expandable
+public class NodeAccess
+(
+	protected let name: Name { public override get }
+)
+implements dyvil.tools.dpf.model.NodeAccess, NodeElement
 {
-	protected Name! name = null
-	{
-		public override get
-	}
-
-	protected NodeElement! element = null
-	{
-		public get
-	}
+	protected var element: NodeElement! = null
 	
-	public init(Name name)
+	public init(name: Name, element: NodeElement)
 	{
-		this.name = name
-	}
-
-	public init(Name name, NodeElement element)
-	{
-		this.name = name
+		this.init(name)
 		this.element = element
 	}
 
+	override func element() -> NodeElement = this.element!
+
 	override func visitNode(Name name) -> NodeVisitor
 	{
-		Node node = new Node(name)
+		let node = new Node(name)
 		this.element = node
 		return node
 	}
 	
 	override func visitProperty(Name name) -> ValueVisitor
 	{
-		Property property = new Property(name)
+		let property = new Property(name)
 		this.element = property
 		return property
 	}
 	
 	override func visitNodeAccess(Name name) -> NodeVisitor
 	{
-		NodeAccess access = new NodeAccess(name)
+		let access = new NodeAccess(name)
 		this.element = access
 		return access
 	}

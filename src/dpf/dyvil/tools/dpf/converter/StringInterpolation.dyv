@@ -3,7 +3,7 @@ package dyvil.tools.dpf.converter;
 import dyvil.collection.List;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayList;
-import dyvil.tools.dpf.ast.Expandable;
+import dyvil.tools.dpf.model.Expandable;
 import dyvil.tools.dpf.visitor.StringInterpolationVisitor;
 import dyvil.tools.dpf.visitor.ValueVisitor;
 

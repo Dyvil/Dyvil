@@ -10,22 +10,14 @@ import dyvil.tools.parsing.Name
 import dyvil.tools.parsing.ast.IASTNode
 import dyvil.tools.parsing.position.ICodePosition
 
-public class Node implements NodeElement, NodeVisitor, Expandable
+public class Node(
+	protected let name: Name { public override get }
+) implements dyvil.tools.dpf.model.Node, NodeElement
 {
-	protected Name! name = null
-	{
-		public override get
-	}
-
 	protected List<Node>       nodes        = new ArrayList<Node>
 	protected List<Property>   properties   = new ArrayList<Property>
 	protected List<NodeAccess> nodeAccesses = new ArrayList<NodeAccess>
 	
-	public init(Name name)
-	{
-		this.name = name
-	}
-
 	@BytecodeName("addNode")
 	public func add(Node node) -> void = this.nodes.add(node)
 

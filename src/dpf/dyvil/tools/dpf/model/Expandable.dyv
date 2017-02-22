@@ -1,4 +1,4 @@
-package dyvil.tools.dpf.ast
+package dyvil.tools.dpf.model
 
 type Mappings = Map<String, Object>
 

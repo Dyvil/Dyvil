@@ -1,0 +1,11 @@
+package dyvil.tools.dpf.model
+
+import dyvil.tools.parsing.Name
+import dyvil.tools.dpf.visitor.NodeVisitor
+
+public interface NodeAccess extends NodeElement, NodeVisitor
+{
+	override func name() -> Name
+
+	func element() -> NodeElement
+}

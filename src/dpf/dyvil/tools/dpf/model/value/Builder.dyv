@@ -1,0 +1,11 @@
+package dyvil.tools.dpf.model.value
+
+import dyvil.tools.parsing.Name
+import package dyvil.tools.dpf.model
+
+public interface Builder extends Value, model.Expandable, dyvil.tools.dpf.visitor.BuilderVisitor
+{
+	func name() -> Name
+
+	func node() -> model.Node?
+}

@@ -1,55 +1,47 @@
-package dyvil.tools.dpf.ast.builder;
+package dyvil.tools.dpf.ast.builder
 
-import dyvil.collection.Map;
-import dyvil.tools.dpf.ast.Expandable;
-import dyvil.tools.dpf.ast.value.Value;
-import dyvil.tools.dpf.converter.DPFValueVisitor;
-import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.collection.Map
+import dyvil.tools.dpf.model.Expandable
+import dyvil.tools.dpf.ast.value.Value
+import dyvil.tools.dpf.converter.DPFValueVisitor
+import dyvil.tools.parsing.{ Name, ast.IASTNode, position.ICodePosition }
 
 public case class Parameter
-	(
-		Name? name { get; set }
-		Value! value { get; set }
-	)
-	extends DPFValueVisitor implements IASTNode, Expandable
+(
+	var name:  Name?  { get; set }
+	var value: Value! { get; set }
+)
+extends DPFValueVisitor implements IASTNode, Expandable
 {
 	// Constructors
 
-	public static Parameter apply(Name name)
-	{
-		return new Parameter(name, null)
-	}
+	static func apply(name: Name) -> Parameter = new Parameter(name, null)
 
-	public static Parameter apply(Value value)
-	{
-		return new Parameter(null, value)
-	}
+	static func apply(value: Value) -> Parameter = new Parameter(null, value)
 
-	public init(Name? name)
+	public init(name: Name?)
 	{
 		this.name = name
 	}
 
 	// Accessors
 
-	protected override void visitValue(Value value) = this.value = value
+	protected override func visitValue(value: Value) -> void = this.value = value
 
-	public override ICodePosition! getPosition() = null
+	public override func getPosition() -> ICodePosition! = null
 
-	public override void setPosition(ICodePosition! position) { }
+	public override func setPosition(position: ICodePosition!) -> void { }
 
-	public override Parameter expand(Map<String, Object> mappings, boolean mutate)
+	public override func expand(mappings: Map<String, Object>, mutate: boolean) -> Parameter
 	{
 		let parameter = mutate ? this : new Parameter(this.name)
 		parameter.value = Value.wrap(Expandable.expand(this.value, mappings, mutate))
 		return parameter
 	}
 
-	public override String toString() = IASTNode.toString(this)
+	public override func toString() -> String = IASTNode.toString(this)
 
-	public override void toString(String indent, StringBuilder buffer)
+	public override func toString(indent: String, buffer: StringBuilder) -> void
 	{
 		if (this.name != null)
 		{
