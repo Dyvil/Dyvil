@@ -26,7 +26,7 @@ public abstract class Tuple
 
 		override func toString() -> String = "(\(this._1), \(this._2))"
 
-		override func equals(Object! obj) -> boolean = Entry.entryEquals(this, obj)
+		override func equals(obj: Object!) -> boolean = Entry.entryEquals(this, obj)
 
 		override func hashCode() -> int = Entry.entryHashCode(this)
 	}
@@ -46,32 +46,32 @@ public abstract class Tuple
 
 		override func toString() -> String = "(\(this._1), \(this._2), \(this._3))"
 
-		override func equals(Object! obj) -> boolean = Cell.cellEquals(this, obj)
+		override func equals(obj: Object!) -> boolean = Cell.cellEquals(this, obj)
 
 		override func hashCode() -> int = Cell.cellHashCode(this)
 	}
 
-	#import Base.dgs
-	#for ARITY; 4; MAX_ARITY
+#import Base.dgs
+#for ARITY; 4; MAX_ARITY
 
 	@Immutable
 	public case class Of##ARITY <
-		#for INDEX; 1; ARITY
+	#for INDEX; 1; ARITY
 			type +T##INDEX
-		#end
+	#end
 		> (
-		#for INDEX; 1; ARITY
+	#for INDEX; 1; ARITY
 			public let _##INDEX: T##INDEX
-		#end
+	#end
 		)
 	{
-		override func toString: String = new StringBuilder()
+		override func toString() -> String = new StringBuilder()
 			.append('(').append(this._1)
-		#for INDEX; 2; ARITY
+	#for INDEX; 2; ARITY
 			.append(', ').append(this._##INDEX)
-		#end
+	#end
 			.append(')').toString
 	}
 
-	#endfor
+#end
 }

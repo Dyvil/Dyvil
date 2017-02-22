@@ -59,7 +59,7 @@ public final class Util
 
 		method.getParameterList().signatureToString(stringBuilder, typeContext);
 
-		stringBuilder.append(": ");
+		stringBuilder.append(" -> ");
 		ITypeContext.apply(typeContext, method.getType()).toString("", stringBuilder);
 	}
 

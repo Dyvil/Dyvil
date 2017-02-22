@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.method;
 
 import dyvil.annotation.Mutating;
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Handle;
@@ -1165,20 +1166,21 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		super.toString(prefix, buffer);
+		super.toString(indent, buffer);
 
 		// Type
-		boolean typeAscription = false;
-		boolean parameters = true;
+		boolean typeAscription;
+		boolean parameters;
 		if (this.type != null && this.type != Types.UNKNOWN)
 		{
 			typeAscription = Formatting.typeAscription("method.type_ascription", this);
 
 			if (!typeAscription)
 			{
-				this.type.toString("", buffer);
+				this.type.toString(indent, buffer);
+				parameters = true;
 			}
 			else
 			{
@@ -1188,6 +1190,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 		else
 		{
+			typeAscription = false;
 			buffer.append("func");
 			parameters = this.parameters.size() > 0 || Formatting.getBoolean("method.parameters.visible");
 		}
@@ -1204,7 +1207,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 
 			Formatting.appendSeparator(buffer, "generics.open_bracket", '<');
-			Util.astToString(prefix, this.typeParameters, this.typeParameterCount,
+			Util.astToString(indent, this.typeParameters, this.typeParameterCount,
 			                 Formatting.getSeparator("generics.separator", ','), buffer);
 			Formatting.appendSeparator(buffer, "generics.close_bracket", '>');
 		}
@@ -1212,39 +1215,40 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		// Parameters
 		if (parameters)
 		{
-			this.parameters.toString(prefix, buffer);
+			this.parameters.toString(indent, buffer);
 		}
 
 		// Exceptions
 		if (this.exceptionCount > 0)
 		{
-			String throwsPrefix = prefix;
+			final String throwsIndent;
 			if (Formatting.getBoolean("method.throws.newline"))
 			{
-				throwsPrefix = Formatting.getIndent("method.throws.indent", prefix);
-				buffer.append('\n').append(throwsPrefix).append("throws ");
+				throwsIndent = Formatting.getIndent("method.throws.indent", indent);
+				buffer.append('\n').append(throwsIndent).append("throws ");
 			}
 			else
 			{
+				throwsIndent = indent;
 				buffer.append(" throws ");
 			}
 
-			Util.astToString(throwsPrefix, this.exceptions, this.exceptionCount,
+			Util.astToString(throwsIndent, this.exceptions, this.exceptionCount,
 			                 Formatting.getSeparator("method.throws", ','), buffer);
 		}
 
 		// Type Ascription
 		if (typeAscription)
 		{
-			Formatting.appendSeparator(buffer, "method.type_ascription", ':');
-			this.type.toString(prefix, buffer);
+			Formatting.appendSeparator(buffer, "method.type_ascription", "->");
+			this.type.toString(indent, buffer);
 		}
 
 		// Implementation
 		final IValue value = this.getValue();
 		if (value != null)
 		{
-			if (Util.formatStatementList(prefix, buffer, value))
+			if (Util.formatStatementList(indent, buffer, value))
 			{
 				return;
 			}
@@ -1256,7 +1260,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 			buffer.append('=');
 
-			String valuePrefix = Formatting.getIndent("method.declaration.indent", prefix);
+			String valuePrefix = Formatting.getIndent("method.declaration.indent", indent);
 			if (Formatting.getBoolean("method.declaration.newline_after"))
 			{
 				buffer.append('\n').append(valuePrefix);
@@ -1266,7 +1270,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				buffer.append(' ');
 			}
 
-			value.toString(prefix, buffer);
+			value.toString(indent, buffer);
 		}
 
 		if (Formatting.getBoolean("method.semicolon"))

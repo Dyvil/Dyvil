@@ -11,42 +11,42 @@ public class Function
 	@FunctionalInterface
 	public interface Of1<type -P1, type +R>
 	{
-		func apply(P1 par1) -> R
+		func apply(par1: P1) -> R
 
-		infix func andThen<A, B, C>(A -> B first, B -> C second) -> A -> C = x => second(first(x))
+		infix func andThen<A, B, C>(first: A -> B, second: B -> C) -> A -> C = x => second(first(x))
 
-		infix func compose<A, B, C>(B -> C second, A -> B first) -> A -> C = first.andThen second
+		infix func compose<A, B, C>(second: B -> C, first: A -> B) -> A -> C = first.andThen second
 
-		static func identity<T>: T -> T = x => x
+		static func identity<T> -> (T -> T) = x => x
 	}
 
 	@FunctionalInterface
 	public interface Of2<type -P1, type -P2, type +R>
 	{
-		func apply(P1 par1, P2 par2) -> R
+		func apply(par1: P1, par2: P2) -> R
 
-		postfix func curried<A, B, C>((A, B) -> C function) -> A -> B -> C = p1 => p2 => function(p1, p2)
+		postfix func curried<A, B, C>(function: (A, B) -> C) -> (A -> B -> C) = p1 => p2 => function(p1, p2)
 
-		postfix func tupled<A, B, C>((A, B) -> C function) -> ((A, B)) -> C = tuple => function(tuple._1, tuple._2)
+		postfix func tupled<A, B, C>(function: (A, B) -> C) -> (((A, B)) -> C) = tuple => function(tuple._1, tuple._2)
 	}
 
-	#import Base.dgs
-	#for ARITY; 3; MAX_ARITY
+#import Base.dgs
+#for ARITY; 3; MAX_ARITY
 
 	@FunctionalInterface
 	public interface Of##ARITY <
-		#for INDEX; 1; ARITY
+	#for INDEX; 1; ARITY
 			type -P##INDEX
-		#end
+	#end
 			type +R
 		>
 	{
 		func apply(
-		#for INDEX; 1; ARITY
-			P##INDEX par##INDEX
-		#end
+	#for INDEX; 1; ARITY
+			par##INDEX: P##INDEX
+	#end
 		) -> R
 	}
 
-	#end
+#end
 }
