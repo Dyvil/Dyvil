@@ -20,32 +20,38 @@ public class Closure extends StatementList
 {
 	private boolean resolved;
 	private IValue  implicitValue;
-	
+
 	public Closure()
 	{
 	}
-	
+
 	public Closure(ICodePosition position)
 	{
 		this.position = position;
-	}
-	
-	@Override
-	public boolean isType(IType type)
-	{
-		return type.getFunctionalMethod() != null;
-	}
-	
-	@Override
-	public int getTypeMatch(IType type)
-	{
-		return this.isType(type) ? 1 : 0;
 	}
 
 	@Override
 	public boolean isResolved()
 	{
 		return true;
+	}
+
+	@Override
+	public boolean isPolyExpression()
+	{
+		return true;
+	}
+
+	@Override
+	public boolean isType(IType type)
+	{
+		return type.getFunctionalMethod() != null;
+	}
+
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		return this.isType(type) ? 1 : 0;
 	}
 
 	@Override

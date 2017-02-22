@@ -226,6 +226,11 @@ public interface IValue extends IASTNode, ITyped
 		return false;
 	}
 
+	default boolean isPolyExpression()
+	{
+		return false;
+	}
+
 	@Override
 	IType getType();
 

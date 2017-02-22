@@ -198,6 +198,28 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	}
 
 	@Override
+	public boolean isPolyExpression()
+	{
+		if (this.hasImplicitReturnType())
+		{
+			// An implicit return type always implies a poly-expression
+			return true;
+		}
+
+		for (IParameter param : this.parameters)
+		{
+			if (param.getType().isUninferred())
+			{
+				// If any parameter type is uninferred / not explicit, this is a poly-expression
+				return true;
+			}
+		}
+
+		// Otherwise, all types are already known, so this is not a poly-expression
+		return false;
+	}
+
+	@Override
 	public IType getType()
 	{
 		if (this.type != null)
