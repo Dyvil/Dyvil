@@ -6,9 +6,10 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constant.WildcardValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.TupleType;
@@ -26,8 +27,18 @@ public class ColonOperator implements IValue
 {
 	public static final class LazyFields
 	{
-		public static final IClass COLON_CONVERTIBLE = Types.LITERALCONVERTIBLE_CLASS.resolveClass(
-			Name.fromRaw("FromColonOperator"));
+		public static final IClass COLON_CONVERTIBLE = Types.LITERALCONVERTIBLE_CLASS
+			                                               .resolveClass(Name.fromRaw("FromColonOperator"));
+
+		public static final ITypeParameter KEY_PARAMETER;
+		public static final ITypeParameter VALUE_PARAMETER;
+
+		static
+		{
+			final IClass entryClass = TupleExpr.LazyFields.ENTRY;
+			KEY_PARAMETER = entryClass.getTypeParameter(0);
+			VALUE_PARAMETER = entryClass.getTypeParameter(1);
+		}
 
 		private LazyFields()
 		{
@@ -119,20 +130,10 @@ public class ColonOperator implements IValue
 			return null;
 		}
 
-		final IClass iclass = type.getTheClass();
+		this.type = null; // reset type
 
-		final IType leftType;
-		final IType rightType;
-
-		if (iclass == Types.OBJECT_CLASS)
-		{
-			leftType = rightType = Types.ANY;
-		}
-		else
-		{
-			leftType = Types.resolveTypeSafely(type, iclass.getTypeParameter(0));
-			rightType = Types.resolveTypeSafely(type, iclass.getTypeParameter(1));
-		}
+		final IType leftType = Types.resolveTypeSafely(type, LazyFields.KEY_PARAMETER);
+		final IType rightType = Types.resolveTypeSafely(type, LazyFields.VALUE_PARAMETER);
 
 		this.left = TypeChecker.convertValue(this.left, leftType, typeContext, markers, context,
 		                                     TypeChecker.markerSupplier("colon_operator.left.type"));
@@ -151,10 +152,10 @@ public class ColonOperator implements IValue
 	@Override
 	public int getTypeMatch(IType type)
 	{
-		final int i = IValue.super.getTypeMatch(type);
-		if (i != MISMATCH)
+		final int match = IValue.super.getTypeMatch(type);
+		if (match != MISMATCH)
 		{
-			return i;
+			return match;
 		}
 		if (type.getAnnotation(LazyFields.COLON_CONVERTIBLE) != null)
 		{
