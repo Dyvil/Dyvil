@@ -72,7 +72,7 @@ public final class AnnotationUtil
 		switch (value.valueTag())
 		{
 		case IValue.ENUM_ACCESS:
-			return Enum.valueOf(type, ((EnumValue) value).name.qualified);
+			return Enum.valueOf(type, ((EnumValue) value).getInternalName());
 		case IValue.FIELD_ACCESS:
 			if (Types.isSameType(parameter.getInternalType(), value.getType()))
 			{

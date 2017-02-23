@@ -1,25 +1,29 @@
 package dyvil.tools.compiler.ast.constant;
 
-import dyvil.reflect.Opcodes;
+import dyvil.annotation.internal.NonNull;
 import dyvil.tools.asm.AnnotationVisitor;
+import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.ast.type.typevar.CovariantTypeVarType;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class EnumValue implements IConstantValue, INamed
+public class EnumValue extends FieldAccess
 {
-	public IType type;
-	public Name  name;
-
 	public EnumValue()
 	{
+	}
+
+	public EnumValue(ICodePosition position, Name name)
+	{
+		this.position = position;
+		this.name = name;
 	}
 
 	public EnumValue(IType type, Name name)
@@ -35,14 +39,9 @@ public class EnumValue implements IConstantValue, INamed
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public boolean isConstantOrField()
 	{
-		return null;
-	}
-
-	@Override
-	public void setPosition(ICodePosition position)
-	{
+		return true;
 	}
 
 	@Override
@@ -52,37 +51,58 @@ public class EnumValue implements IConstantValue, INamed
 	}
 
 	@Override
-	public IType getType()
+	public IValue toAnnotationConstant(MarkerList markers, IContext context, int depth)
 	{
-		return this.type;
+		return this;
 	}
 
 	@Override
-	public void setType(IType type)
+	public boolean isPolyExpression()
 	{
-		this.type = type;
+		return true;
 	}
 
 	@Override
-	public Name getName()
+	public boolean isResolved()
 	{
-		return this.name;
+		return true;
 	}
 
 	@Override
-	public void setName(Name name)
+	public IValue resolve(MarkerList markers, IContext context)
 	{
-		this.name = name;
+		return this;
+	}
+
+	@Override
+	public boolean isType(IType type)
+	{
+		return type.resolveField(this.name) != null || type.canExtract(CovariantTypeVarType.class);
+	}
+
+	@Override
+	public int getTypeMatch(IType type)
+	{
+		return this.isType(type) ? IValue.EXACT_MATCH : IValue.MISMATCH;
 	}
 
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (!this.type.isResolved())
+		final IDataMember field = type.resolveField(this.name);
+		if (field == null)
 		{
-			this.type = this.type.resolveType(markers, context);
+			markers.add(Markers.semanticError(this.position, "resolve.field", this.name));
+			return null;
 		}
-		return this.isType(type) ? this : null;
+
+		this.field = field;
+		return super.withType(type, typeContext, markers, context);
+	}
+
+	public String getInternalName()
+	{
+		return this.name.qualified;
 	}
 
 	@Override
@@ -94,7 +114,7 @@ public class EnumValue implements IConstantValue, INamed
 	@Override
 	public int stringSize()
 	{
-		return this.name.qualified.length();
+		return this.getInternalName().length();
 	}
 
 	@Override
@@ -104,30 +124,14 @@ public class EnumValue implements IConstantValue, INamed
 	}
 
 	@Override
-	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
-	{
-		String owner = this.type.getInternalName();
-		String name = this.name.qualified;
-		String desc = this.type.getExtendedName();
-		writer.visitFieldInsn(Opcodes.GETSTATIC, owner, name, desc);
-
-		if (type != null)
-		{
-			this.type.writeCast(writer, type, this.getLineNumber());
-		}
-	}
-
-	@Override
 	public void writeAnnotationValue(AnnotationVisitor visitor, String key)
 	{
-		visitor.visitEnum(key, this.type.getExtendedName(), this.name.qualified);
+		visitor.visitEnum(key, this.getType().getExtendedName(), this.getInternalName());
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		this.type.toString(prefix, buffer);
-		buffer.append('.');
-		buffer.append(this.name);
+		buffer.append('.').append(this.name);
 	}
 }

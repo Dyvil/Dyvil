@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.access;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.constant.EnumValue;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -29,7 +30,7 @@ import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public final class FieldAccess implements IValue, INamed, IReceiverAccess
+public class FieldAccess implements IValue, INamed, IReceiverAccess
 {
 	protected ICodePosition position;
 	protected IValue        receiver;
@@ -221,9 +222,9 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	}
 
 	@Override
-	public void setReceiver(IValue value)
+	public void setReceiver(IValue receiver)
 	{
-		this.receiver = value;
+		this.receiver = receiver;
 	}
 
 	@Override
@@ -480,11 +481,11 @@ public final class FieldAccess implements IValue, INamed, IReceiverAccess
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		if (this.receiver != null)
 		{
-			this.receiver.toString(prefix, buffer);
+			this.receiver.toString(indent, buffer);
 			buffer.append('.');
 		}
 

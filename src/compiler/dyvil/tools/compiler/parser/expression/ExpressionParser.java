@@ -268,6 +268,14 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 			if (isIdentifier(type))
 			{
+				if (this.value == null)
+				{
+					// .IDENTIFIER
+					this.value = new EnumValue(token.raw(), token.nameValue());
+					this.mode = ACCESS;
+					return;
+				}
+
 				// EXPRESSION . IDENTIFIER
 
 				this.parseInfixAccess(pm, token, token.nameValue());
