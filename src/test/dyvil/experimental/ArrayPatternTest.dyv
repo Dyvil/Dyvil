@@ -1,0 +1,18 @@
+package dyvil.experimental
+
+public class ArrayPatternTest
+{
+	static func apply() -> Test = test "Array Patterns" {
+		let arr = [ 1, 2, 3, 4, 5 ]
+
+		arr match {
+			case [                   ] => false
+			case [ 1, 2, 3           ] => false
+			case [          ...      ] => true
+			case [ 1, 2, 3, ...      ] => true
+			case [ ...,      3, 4, 5 ] => true
+			case [ 1,    ...     , 5 ] => true
+			case [ 1, ..., 2, ..., 5 ] => true
+		}
+	}
+}
