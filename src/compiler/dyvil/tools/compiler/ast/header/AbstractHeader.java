@@ -345,7 +345,7 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	}
 
 	@Override
-	public IOperator resolveOperator(Name name, int type)
+	public IOperator resolveOperator(Name name, byte type)
 	{
 		if (type == IOperator.INFIX && this.infixOperatorMap != null)
 		{
@@ -365,7 +365,7 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 				continue;
 			}
 
-			if (operator.getType() == type)
+			if (operator.isType(type))
 			{
 				return operator;
 			}
@@ -650,7 +650,7 @@ class HeaderContext implements IStaticContext
 	}
 
 	@Override
-	public IOperator resolveOperator(Name name, int type)
+	public IOperator resolveOperator(Name name, byte type)
 	{
 		final IOperator candidate = this.header.resolveOperator(name, type);
 		if (candidate != null && candidate.getType() == type)

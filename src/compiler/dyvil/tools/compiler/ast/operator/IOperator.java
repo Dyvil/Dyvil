@@ -8,6 +8,7 @@ import java.io.IOException;
 
 public interface IOperator
 {
+	byte ANY = -1;
 	byte PREFIX = 0;
 	byte INFIX = 1;
 	byte POSTFIX = 2;
@@ -28,6 +29,8 @@ public interface IOperator
 	byte getType();
 
 	void setType(byte type);
+
+	boolean isType(byte type);
 
 	byte getAssociativity();
 

@@ -22,7 +22,7 @@ public interface IImportContext extends IImplicitContext
 
 	ITypeAlias resolveTypeAlias(Name name, int arity);
 
-	IOperator resolveOperator(Name name, int type);
+	IOperator resolveOperator(Name name, byte type);
 
 	IClass resolveClass(Name name);
 

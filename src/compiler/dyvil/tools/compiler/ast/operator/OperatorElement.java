@@ -60,13 +60,12 @@ public class OperatorElement
 		this.operator = operator;
 	}
 
-	public static void checkPosition(MarkerList markers, ICodePosition position, IOperator operator, int expectedType)
+	public static void checkPosition(MarkerList markers, ICodePosition position, IOperator operator, byte expectedType)
 	{
-		final byte operatorType = operator.getType();
-		if (operatorType != expectedType && !(operatorType == IOperator.TERNARY && expectedType == IOperator.INFIX))
+		if (!operator.isType(expectedType))
 		{
 			final Marker marker = Markers.semantic(position, "operator.invalid_position", operator.getName(),
-			                                       typeToString(operatorType), typeToString(expectedType));
+			                                       typeToString(operator.getType()), typeToString(expectedType));
 			marker.addInfo(Markers.getSemantic("operator.declaration", operator.toString()));
 			markers.add(marker);
 		}

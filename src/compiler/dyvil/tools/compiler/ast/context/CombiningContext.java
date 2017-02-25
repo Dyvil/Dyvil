@@ -110,7 +110,7 @@ public class CombiningContext implements IContext
 	}
 
 	@Override
-	public IOperator resolveOperator(Name name, int type)
+	public IOperator resolveOperator(Name name, byte type)
 	{
 		final IOperator inner = this.inner.resolveOperator(name, type);
 		if (inner == null || inner.getType() != type)

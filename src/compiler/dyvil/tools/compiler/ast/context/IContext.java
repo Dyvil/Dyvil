@@ -75,7 +75,7 @@ public interface IContext extends IMemberContext, IImportContext
 	ITypeParameter resolveTypeParameter(Name name);
 
 	@Override
-	IOperator resolveOperator(Name name, int type);
+	IOperator resolveOperator(Name name, byte type);
 
 	@Override
 	IDataMember resolveField(Name name);
@@ -101,7 +101,7 @@ public interface IContext extends IMemberContext, IImportContext
 
 	IValue getImplicit();
 
-	static IOperator resolveOperator(IContext context, Name name, int type)
+	static IOperator resolveOperator(IContext context, Name name, byte type)
 	{
 		final IOperator operator = context.resolveOperator(name, type);
 		if (operator == null || operator.getType() != type)

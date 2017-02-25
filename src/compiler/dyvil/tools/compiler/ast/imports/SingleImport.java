@@ -185,12 +185,12 @@ public final class SingleImport extends Import implements IDefaultContext
 			}
 		}
 
-		if ((mask & KindedImport.OPERATOR) != 0 && parentContext.resolveOperator(this.name, -1) != null)
+		if ((mask & KindedImport.OPERATOR) != 0 && parentContext.resolveOperator(this.name, IOperator.ANY) != null)
 		{
 			return;
 		}
 
-		if ((mask & KindedImport.TYPE) != 0 && parentContext.resolveTypeAlias(this.name, -1) != null)
+		if ((mask & KindedImport.TYPE) != 0 && parentContext.resolveTypeAlias(this.name, IOperator.ANY) != null)
 		{
 			return;
 		}
@@ -280,7 +280,7 @@ public final class SingleImport extends Import implements IDefaultContext
 	}
 
 	@Override
-	public IOperator resolveOperator(Name name, int type)
+	public IOperator resolveOperator(Name name, byte type)
 	{
 		if (this.checkName(KindedImport.OPERATOR, name))
 		{

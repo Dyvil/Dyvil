@@ -60,7 +60,7 @@ public interface IHeaderUnit extends IASTNode, IObjectCompilable, IContext, ICla
 	int operatorCount();
 
 	@Override
-	IOperator resolveOperator(Name name, int type);
+	IOperator resolveOperator(Name name, byte type);
 	
 	IOperator getOperator(int index);
 

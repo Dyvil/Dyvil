@@ -75,9 +75,9 @@ public final class Operator implements IOperator
 	}
 
 	@Override
-	public void setTernaryName(Name ternaryName)
+	public void setTernaryName(Name name)
 	{
-		this.ternaryName = ternaryName;
+		this.ternaryName = name;
 	}
 
 	@Override
@@ -112,6 +112,13 @@ public final class Operator implements IOperator
 		case TERNARY:
 			this.id = ID_TERNARY;
 		}
+	}
+
+	@Override
+	public boolean isType(byte type)
+	{
+		final byte thisType = this.getType();
+		return thisType == type || thisType == TERNARY && type == INFIX;
 	}
 
 	@Override
@@ -162,17 +169,17 @@ public final class Operator implements IOperator
 	}
 
 	@Override
-	public void writeData(DataOutput dos) throws IOException
+	public void writeData(DataOutput out) throws IOException
 	{
-		dos.writeUTF(this.name.unqualified);
-		dos.writeByte(this.id);
+		out.writeUTF(this.name.unqualified);
+		out.writeByte(this.id);
 		if (this.id != ID_PREFIX && this.id != ID_POSTFIX)
 		{
-			dos.writeInt(this.precedence);
+			out.writeInt(this.precedence);
 		}
 		if (this.id == ID_TERNARY)
 		{
-			dos.writeUTF(this.ternaryName.unqualified);
+			out.writeUTF(this.ternaryName.unqualified);
 		}
 	}
 
@@ -208,31 +215,31 @@ public final class Operator implements IOperator
 	}
 
 	@Override
-	public void toString(StringBuilder buffer)
+	public void toString(StringBuilder builder)
 	{
 		switch (this.id)
 		{
 		case ID_PREFIX:
-			buffer.append("prefix operator ").append(this.name);
+			builder.append("prefix operator ").append(this.name);
 			return;
 		case ID_POSTFIX:
-			buffer.append("postfix operator ").append(this.name);
+			builder.append("postfix operator ").append(this.name);
 			return;
 		case ID_INFIX_NONE:
-			buffer.append("infix operator ").append(this.name).append(" { precedence ").append(this.precedence)
-			      .append(" }");
+			builder.append("infix operator ").append(this.name).append(" { precedence ").append(this.precedence)
+			       .append(" }");
 			return;
 		case ID_INFIX_LEFT:
-			buffer.append("infix operator ").append(this.name).append(" { associativity left, precedence ")
-			      .append(this.precedence).append(" }");
+			builder.append("infix operator ").append(this.name).append(" { associativity left, precedence ")
+			       .append(this.precedence).append(" }");
 			return;
 		case ID_INFIX_RIGHT:
-			buffer.append("infix operator ").append(this.name).append(" { associativity right, precedence ")
-			      .append(this.precedence).append(" }");
+			builder.append("infix operator ").append(this.name).append(" { associativity right, precedence ")
+			       .append(this.precedence).append(" }");
 			return;
 		case ID_TERNARY:
-			buffer.append("infix operator ").append(this.name).append(' ').append(this.ternaryName)
-			      .append(" { precedence ").append(this.precedence).append(" }");
+			builder.append("infix operator ").append(this.name).append(' ').append(this.ternaryName)
+			       .append(" { precedence ").append(this.precedence).append(" }");
 		}
 	}
 }

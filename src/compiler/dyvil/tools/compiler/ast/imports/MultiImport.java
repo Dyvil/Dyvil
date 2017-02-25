@@ -158,7 +158,7 @@ public final class MultiImport extends Import implements IImportContext, IImport
 	}
 
 	@Override
-	public IOperator resolveOperator(Name name, int type)
+	public IOperator resolveOperator(Name name, byte type)
 	{
 		for (int i = 0; i < this.importCount; i++)
 		{
