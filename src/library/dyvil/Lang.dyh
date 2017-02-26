@@ -67,6 +67,7 @@ type Type<T>      = dyvil.reflect.types.Type<T>
 // ---------------------------------------- Operator Definitions ----------------------------------------
 
 // Postfix Operators
+postfix operator ?   // optional chain operator
 postfix operator !   // unwrap operator
 postfix operator !!  // unsafe unwrap operator
 postfix operator ++
