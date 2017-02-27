@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.ast.classes.metadata;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.access.ClassParameterSetter;
-import dyvil.tools.compiler.ast.access.InitializerCall;
+import dyvil.tools.compiler.ast.expression.access.ClassParameterSetter;
+import dyvil.tools.compiler.ast.expression.access.InitializerCall;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.constructor.CodeConstructor;

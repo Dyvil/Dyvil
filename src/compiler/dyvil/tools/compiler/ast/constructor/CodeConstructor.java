@@ -2,10 +2,10 @@ package dyvil.tools.compiler.ast.constructor;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.access.InitializerCall;
+import dyvil.tools.compiler.ast.expression.access.InitializerCall;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.constant.VoidValue;
+import dyvil.tools.compiler.ast.expression.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;

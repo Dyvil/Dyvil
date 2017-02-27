@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.reference;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.access.FieldAccess;
+import dyvil.tools.compiler.ast.expression.access.FieldAccess;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;

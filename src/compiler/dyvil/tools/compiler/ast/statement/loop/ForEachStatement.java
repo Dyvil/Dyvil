@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.statement.loop;
 
 import dyvil.annotation.internal.NonNull;
-import dyvil.tools.compiler.ast.access.MethodCall;
+import dyvil.tools.compiler.ast.expression.access.MethodCall;
 import dyvil.tools.compiler.ast.context.CombiningLabelContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;

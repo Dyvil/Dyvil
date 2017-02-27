@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.statement.loop;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.access.MethodCall;
+import dyvil.tools.compiler.ast.expression.access.MethodCall;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IVariable;

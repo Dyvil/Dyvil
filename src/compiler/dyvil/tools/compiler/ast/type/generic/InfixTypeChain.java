@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.ast.type.generic;
 
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.operator.OperatorElement;
-import dyvil.tools.compiler.ast.operator.OperatorStack;
+import dyvil.tools.compiler.ast.expression.operator.OperatorElement;
+import dyvil.tools.compiler.ast.expression.operator.OperatorStack;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.compound.IntersectionType;
 import dyvil.tools.compiler.ast.type.compound.UnionType;

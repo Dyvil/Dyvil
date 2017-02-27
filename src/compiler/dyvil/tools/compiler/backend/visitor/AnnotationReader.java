@@ -4,7 +4,7 @@ import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationValue;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
-import dyvil.tools.compiler.ast.constant.EnumValue;
+import dyvil.tools.compiler.ast.expression.constant.EnumValue;
 import dyvil.tools.compiler.ast.consumer.IAnnotationConsumer;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;

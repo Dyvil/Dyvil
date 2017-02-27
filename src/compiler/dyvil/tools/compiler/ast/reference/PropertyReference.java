@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.ast.reference;
 
 import dyvil.tools.asm.Handle;
-import dyvil.tools.compiler.ast.access.ICall;
-import dyvil.tools.compiler.ast.constant.WildcardValue;
+import dyvil.tools.compiler.ast.expression.access.ICall;
+import dyvil.tools.compiler.ast.expression.constant.WildcardValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;

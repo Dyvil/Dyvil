@@ -4,7 +4,7 @@ import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
-import dyvil.tools.compiler.ast.access.MethodCall;
+import dyvil.tools.compiler.ast.expression.access.MethodCall;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;

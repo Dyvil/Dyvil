@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
-import dyvil.tools.compiler.ast.access.AbstractCall;
+import dyvil.tools.compiler.ast.expression.access.AbstractCall;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;

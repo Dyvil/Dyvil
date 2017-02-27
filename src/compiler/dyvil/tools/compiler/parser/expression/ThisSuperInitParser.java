@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.parser.expression;
 
-import dyvil.tools.compiler.ast.access.InitializerCall;
+import dyvil.tools.compiler.ast.expression.access.InitializerCall;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.SuperExpr;

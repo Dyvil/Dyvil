@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.expression;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.AnnotationVisitor;
-import dyvil.tools.compiler.ast.access.ClassAccess;
+import dyvil.tools.compiler.ast.expression.access.ClassAccess;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;

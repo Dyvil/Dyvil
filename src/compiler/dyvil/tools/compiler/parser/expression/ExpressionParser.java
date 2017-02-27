@@ -1,14 +1,14 @@
 package dyvil.tools.compiler.parser.expression;
 
-import dyvil.tools.compiler.ast.access.*;
+import dyvil.tools.compiler.ast.expression.access.*;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationValue;
-import dyvil.tools.compiler.ast.constant.*;
+import dyvil.tools.compiler.ast.expression.constant.*;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.*;
-import dyvil.tools.compiler.ast.operator.InfixCallChain;
-import dyvil.tools.compiler.ast.operator.PostfixCall;
-import dyvil.tools.compiler.ast.operator.PrefixCall;
+import dyvil.tools.compiler.ast.expression.operator.InfixCallChain;
+import dyvil.tools.compiler.ast.expression.operator.PostfixCall;
+import dyvil.tools.compiler.ast.expression.operator.PrefixCall;
 import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.statement.IfStatement;

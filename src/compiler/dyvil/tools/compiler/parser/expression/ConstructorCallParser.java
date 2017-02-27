@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.parser.expression;
 
-import dyvil.tools.compiler.ast.access.ClassConstructor;
-import dyvil.tools.compiler.ast.access.ConstructorCall;
+import dyvil.tools.compiler.ast.expression.access.ClassConstructor;
+import dyvil.tools.compiler.ast.expression.access.ConstructorCall;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;

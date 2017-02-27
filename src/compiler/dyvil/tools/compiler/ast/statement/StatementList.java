@@ -4,7 +4,7 @@ import dyvil.annotation.internal.NonNull;
 import dyvil.collection.List;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.collection.mutable.ArrayList;
-import dyvil.tools.compiler.ast.access.MethodCall;
+import dyvil.tools.compiler.ast.expression.access.MethodCall;
 import dyvil.tools.compiler.ast.context.CombiningLabelContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
@@ -383,7 +383,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 
 			if (valueTag == IValue.VARIABLE)
 			{
-				this.addVariable((FieldInitializer) resolvedValue, markers, context);
+				this.addVariable((VariableStatement) resolvedValue, markers, context);
 				continue;
 			}
 			if (valueTag == IValue.MEMBER_STATEMENT)
@@ -441,7 +441,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		return call.resolveCall(markers, context, false);
 	}
 
-	protected void addVariable(FieldInitializer initializer, MarkerList markers, IContext context)
+	protected void addVariable(VariableStatement initializer, MarkerList markers, IContext context)
 	{
 		final IVariable variable = initializer.variable;
 		final Name variableName = variable.getName();

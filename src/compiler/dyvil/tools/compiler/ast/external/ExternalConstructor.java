@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.external;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.asm.TypeReference;
-import dyvil.tools.compiler.ast.access.InitializerCall;
+import dyvil.tools.compiler.ast.expression.access.InitializerCall;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;

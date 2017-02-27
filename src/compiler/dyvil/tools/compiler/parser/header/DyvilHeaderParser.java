@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.imports.KindedImport;
 import dyvil.tools.compiler.ast.modifiers.Modifier;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
-import dyvil.tools.compiler.ast.operator.Operator;
+import dyvil.tools.compiler.ast.expression.operator.Operator;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 import dyvil.tools.compiler.parser.ParserUtil;
