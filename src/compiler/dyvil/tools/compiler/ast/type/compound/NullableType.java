@@ -39,6 +39,7 @@ public class NullableType implements IObjectType
 	{
 	}
 
+	@Deprecated
 	public NullableType(IType type)
 	{
 		this.type = type.getObjectType();
@@ -49,14 +50,20 @@ public class NullableType implements IObjectType
 		return new NullableType(type);
 	}
 
-	protected NullableType wrap(IType type)
+	public static IType unapply(IType type)
 	{
-		return new NullableType(type);
+		final NullableType nullable = type.extract(NullableType.class);
+		return nullable == null ? type : nullable.getElementType();
 	}
 
 	public IType getElementType()
 	{
 		return this.type;
+	}
+
+	protected NullableType wrap(IType type)
+	{
+		return new NullableType(type);
 	}
 
 	public void setElementType(IType type)

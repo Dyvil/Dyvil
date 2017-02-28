@@ -31,14 +31,14 @@ public class TypeTest
 
 	public interface Recur<type +SELF: Recur<SELF>>
 	{
-		func next(): SELF
+		func next() -> SELF
 	}
 
 	func nextRecur<type R: Recur<R>>(value: R) -> R = value.next
 
 	public case class IntRecur(let value: int) implements Recur<IntRecur>
 	{
-		override func next(): IntRecur = IntRecur(this.value + 1)
+		override func next() -> IntRecur = IntRecur(this.value + 1)
 	}
 
 	public class RecurWrapper<type R: Recur<R>>(let value: R)

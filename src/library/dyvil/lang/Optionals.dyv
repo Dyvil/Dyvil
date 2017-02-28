@@ -66,19 +66,10 @@ public abstract class Optionals
 	 *
 	 * Returns the left-hand argument if it is not `null` at runtime, and the right-hand argument otherwise.
 	 */
-	@Intrinsic([
-		/* 0 */ LOAD_0
-	    /* 1 */ DUP
-	    /* 2 */ ASTORE, 0
-	    /* 3 */ IFNULL, 6
-	    /* 4 */ ALOAD,  0
-	    /* 5 */ GOTO,   7
-	    /* 6 */ LOAD_1
-	    /* 7 */
-	    ], compilerCode: Intrinsic.NULL_COALESCING)
+	@Intrinsic([], compilerCode: Intrinsic.NULL_COALESCING)
 	infix func ?? <T, U> (lhs: T?, rhs: U) -> T|U = lhs ?? rhs
 
 	// Hash Code
 
-	postfix func hashCode<T>(optional: T?) -> int = optional == null ? 0 : optional!!.hashCode // = optional?.hashCode
+	postfix func hashCode<T>(optional: T?) -> int = optional?.hashCode ?? 0
 }

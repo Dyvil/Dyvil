@@ -77,5 +77,5 @@ public class NameAccess(
 		return this.name === that.name && this.value == that.value
 	}
 
-	public override int hashCode() = 31 * this.name.hashCode + (this.value == null ? 0 : this.value!.hashCode)
+	public override int hashCode() = 31 * this.name.hashCode + (this.value?.hashCode ?? 0)
 }

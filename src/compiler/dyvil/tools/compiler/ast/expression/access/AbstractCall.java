@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.expression.access;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.intrinsic.OptionalChainAware;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
@@ -16,6 +17,7 @@ import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.NullableType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
@@ -25,7 +27,7 @@ import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public abstract class AbstractCall implements ICall, IReceiverAccess
+public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalChainAware
 {
 	protected ICodePosition position;
 
@@ -107,6 +109,30 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 	@Override
 	public boolean hasSideEffects()
 	{
+		return true;
+	}
+
+	@Override
+	public boolean needsOptionalElseLabel()
+	{
+		return this.receiver != null && this.receiver.needsOptionalElseLabel();
+	}
+
+	@Override
+	public Label getOptionalElseLabel()
+	{
+		return this.receiver == null ? null : this.receiver.getOptionalElseLabel();
+	}
+
+	@Override
+	public boolean setOptionalElseLabel(Label label)
+	{
+		if (this.receiver == null || !this.receiver.setOptionalElseLabel(label))
+		{
+			return false;
+		}
+
+		this.type = NullableType.apply(this.getType());
 		return true;
 	}
 
@@ -281,6 +307,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess
 			    && (code = intrinsicData.getCompilerCode()) != 0 // compilerCode argument
 			    && (intrinsic = Intrinsics.getOperator(code, this.receiver, this.arguments)) != null) // valid intrinsic
 		{
+			intrinsic.setPosition(this.position);
 			return intrinsic;
 		}
 

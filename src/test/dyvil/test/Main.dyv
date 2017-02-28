@@ -40,6 +40,7 @@ public class Main
 			NestedMethodTest()
 			ObjectTest()
 			OperatorTest()
+			OptionalTest()
 			OverloadTest()
 			PrimitiveTest()
 			PropertyTest()

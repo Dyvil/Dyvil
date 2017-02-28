@@ -42,6 +42,10 @@ public class Intrinsics
 			return new AndOperator(lhs, arguments.getFirstValue());
 		case Intrinsic.ARRAY_SPREAD:
 			return new VarargsOperator(lhs);
+		case Intrinsic.OPTIONAL_CHAIN:
+			return new OptionalChainOperator(lhs);
+		case Intrinsic.NULL_COALESCING:
+			return new NullCoalescingOperator(lhs, arguments.getFirstValue());
 		case Intrinsic.STRING_CONCAT:
 			return StringConcatExpr.apply(lhs, arguments.getFirstValue());
 		case Intrinsic.PRE_INCREMENT:

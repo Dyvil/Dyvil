@@ -81,7 +81,7 @@ implements Value, dyvil.tools.dpf.model.value.Builder
 
 		return new Builder(this.name
 		                   this.parameters.mapped(parameter => parameter.expand(mappings, false))
-		                   this.node == null ? null : this.node!!.expand(mappings, false))
+		                   this.node?.expand(mappings, false) ?? null)
 	}
 
 	override func toString() -> String = IASTNode.toString(this)

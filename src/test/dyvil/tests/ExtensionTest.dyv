@@ -8,7 +8,7 @@ public class ExtensionTest
 	public static class B extends A
 	public static class C extends B
 	{
-		public func custom: String = "custom"
+		public func custom() -> String = "custom"
 	}
 
 	public static class D extends C

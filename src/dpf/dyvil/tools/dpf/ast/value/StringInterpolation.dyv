@@ -114,5 +114,5 @@ public class StringInterpolation extends DPFValueVisitor implements Value, Strin
 		return this.strings == that.strings && this.values == that.values
 	}
 
-	public override int hashCode() = 31 * this.strings.hashCode + (this.values != null ? this.values.hashCode : 0)
+	public override int hashCode() = 31 * this.strings.hashCode + (this.values?.hashCode ?? 0)
 }
