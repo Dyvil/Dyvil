@@ -12,8 +12,7 @@ import dyvil.tools.compiler.backend.visitor.AnnotationReader;
 
 public interface IParameter extends IVariable, IClassMember
 {
-	@Override
-	IType getInternalType();
+	IType getCovariantType();
 
 	@Override
 	default IClass getEnclosingClass()
@@ -26,33 +25,20 @@ public interface IParameter extends IVariable, IClassMember
 	{
 	}
 
-	default ICallableMember getMethod()
-	{
-		return null;
-	}
+	ICallableMember getMethod();
 
-	default void setMethod(ICallableMember method)
-	{
-	}
+	void setMethod(ICallableMember method);
 
 	int getIndex();
 
 	void setIndex(int index);
 
 	@Override
-	boolean isField();
+	boolean isLocal();
 
-	@Override
-	boolean isVariable();
+	boolean isVarargs();
 
-	default boolean isVarargs()
-	{
-		return false;
-	}
-
-	default void setVarargs(boolean varargs)
-	{
-	}
+	void setVarargs(boolean varargs);
 
 	default AnnotationVisitor visitAnnotation(String internalType)
 	{

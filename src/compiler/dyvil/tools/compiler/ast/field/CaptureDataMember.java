@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.field;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -66,18 +67,13 @@ public abstract class CaptureDataMember implements IDataMember
 	}
 
 	@Override
-	public void setName(Name name)
-	{
-	}
-
-	@Override
 	public Name getName()
 	{
 		return this.variable.getName();
 	}
 
 	@Override
-	public void setType(IType type)
+	public void setName(Name name)
 	{
 	}
 
@@ -90,6 +86,11 @@ public abstract class CaptureDataMember implements IDataMember
 	public IType getInternalType()
 	{
 		return this.variable.getInternalType();
+	}
+
+	@Override
+	public void setType(IType type)
+	{
 	}
 
 	@Override
@@ -266,8 +267,8 @@ public abstract class CaptureDataMember implements IDataMember
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		this.variable.toString(prefix, buffer);
+		this.variable.toString(indent, buffer);
 	}
 }

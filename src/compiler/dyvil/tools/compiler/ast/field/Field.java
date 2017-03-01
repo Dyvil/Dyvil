@@ -83,9 +83,9 @@ public class Field extends Member implements IField
 	}
 
 	@Override
-	public boolean isField()
+	public IClass getEnclosingClass()
 	{
-		return true;
+		return this.enclosingClass;
 	}
 
 	@Override
@@ -95,21 +95,15 @@ public class Field extends Member implements IField
 	}
 
 	@Override
-	public IClass getEnclosingClass()
+	public IValue getValue()
 	{
-		return this.enclosingClass;
+		return this.value;
 	}
 
 	@Override
 	public void setValue(IValue value)
 	{
 		this.value = value;
-	}
-
-	@Override
-	public IValue getValue()
-	{
-		return this.value;
 	}
 
 	@Override
@@ -133,17 +127,6 @@ public class Field extends Member implements IField
 		}
 
 		return this.property = new Property(this.position, this.name, Types.UNKNOWN, new FlagModifierSet(), null);
-	}
-
-	@Override
-	public String getDescriptor()
-	{
-		if (this.descriptor != null)
-		{
-			return this.descriptor;
-		}
-
-		return this.descriptor = this.type.getExtendedName();
 	}
 
 	@Override
@@ -444,6 +427,17 @@ public class Field extends Member implements IField
 	}
 
 	@Override
+	public String getDescriptor()
+	{
+		if (this.descriptor != null)
+		{
+			return this.descriptor;
+		}
+
+		return this.descriptor = this.type.getExtendedName();
+	}
+
+	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		final long flags = ModifierUtil.getFlags(this);
@@ -652,20 +646,20 @@ public class Field extends Member implements IField
 	}
 
 	@Override
-	public void toString(@NonNull String prefix, @NonNull StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		super.toString(prefix, buffer);
-		IDataMember.toString(prefix, buffer, this, "field.type_ascription");
+		super.toString(indent, buffer);
+		IDataMember.toString(indent, buffer, this, "field.type_ascription");
 
 		if (this.value != null)
 		{
 			Formatting.appendSeparator(buffer, "field.assignment", '=');
-			this.value.toString(prefix, buffer);
+			this.value.toString(indent, buffer);
 		}
 
 		if (this.property != null)
 		{
-			Property.formatBody(this.property, prefix, buffer);
+			Property.formatBody(this.property, indent, buffer);
 		}
 	}
 }

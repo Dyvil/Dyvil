@@ -142,7 +142,7 @@ public class FieldAccess implements IValue, INamed, IReceiverAccess
 			return null;
 		}
 
-		if (this.field.isField())
+		if (!this.field.isLocal())
 		{
 			if (this.field.hasModifier(Modifiers.STATIC))
 			{
@@ -153,7 +153,7 @@ public class FieldAccess implements IValue, INamed, IReceiverAccess
 				return new InstanceFieldReference(this.receiver, (IField) this.field);
 			}
 		}
-		if (this.field.isVariable() && this.field instanceof IVariable)
+		if (this.field instanceof IVariable)
 		{
 			// We have to pass the actual FieldAccess here because variable access are sometimes replaced with captures
 			return new VariableReference(this);

@@ -198,7 +198,7 @@ public final class ArgumentList implements IArguments, IValueList
 			                         implicitContext);
 		}
 		return checkMatch(values, types, matchStartIndex + argumentIndex, this.values[argumentIndex],
-		                  param.getInternalType(), implicitContext) ? 0 : -1;
+		                  param.getCovariantType(), implicitContext) ? 0 : -1;
 	}
 
 	protected static boolean checkMatch(int[] matchValues, IType[] matchTypes, int matchIndex, IValue argument,
@@ -227,7 +227,7 @@ public final class ArgumentList implements IArguments, IValueList
 		                                      IParameter param, IImplicitContext implicitContext)
 	{
 		final IValue argument = values[startIndex];
-		final IType arrayType = param.getInternalType();
+		final IType arrayType = param.getCovariantType();
 		if (argument.checkVarargs(false))
 		{
 			return checkMatch_(matchValues, matchTypes, matchStartIndex + startIndex, argument, arrayType,
@@ -299,7 +299,7 @@ public final class ArgumentList implements IArguments, IValueList
 	{
 		if (index < this.size)
 		{
-			this.values[index].writeExpression(writer, param.getInternalType());
+			this.values[index].writeExpression(writer, param.getCovariantType());
 			return;
 		}
 

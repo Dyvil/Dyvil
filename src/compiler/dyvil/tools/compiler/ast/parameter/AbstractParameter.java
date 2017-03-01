@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.ClassOperator;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
@@ -34,19 +34,15 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 import java.lang.annotation.ElementType;
 
-public abstract class AbstractParameter extends Member implements IParameter
+public abstract class AbstractParameter extends Variable implements IParameter
 {
 	public static final String DEFAULT_VALUE       = "Ldyvil/annotation/internal/DefaultValue;";
 	public static final String DEFAULT_ARRAY_VALUE = "Ldyvil/annotation/internal/DefaultArrayValue;";
 
-	protected IValue defaultValue;
-
 	// Metadata
 	protected ICallableMember method;
-	protected boolean         assigned;
 	protected int             index;
-	protected int             localIndex;
-	protected IType           internalType;
+	private   IType           covariantType;
 
 	public AbstractParameter()
 	{
@@ -54,7 +50,7 @@ public abstract class AbstractParameter extends Member implements IParameter
 
 	public AbstractParameter(Name name)
 	{
-		super(name);
+		super(name, null);
 	}
 
 	public AbstractParameter(Name name, IType type)
@@ -68,7 +64,8 @@ public abstract class AbstractParameter extends Member implements IParameter
 		this.method = callable;
 	}
 
-	public AbstractParameter(ICallableMember callable, ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public AbstractParameter(ICallableMember callable, ICodePosition position, Name name, IType type,
+		                        ModifierSet modifiers, AnnotationList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
 		this.method = callable;
@@ -81,39 +78,27 @@ public abstract class AbstractParameter extends Member implements IParameter
 	}
 
 	@Override
-	public boolean isField()
-	{
-		return false;
-	}
-
-	@Override
-	public boolean isVariable()
-	{
-		return true;
-	}
-
-	@Override
-	public boolean isAssigned()
-	{
-		return this.assigned;
-	}
-
-	@Override
 	public ElementType getElementType()
 	{
 		return ElementType.PARAMETER;
 	}
 
 	@Override
-	public void setMethod(ICallableMember method)
+	public boolean isLocal()
 	{
-		this.method = method;
+		return true;
 	}
 
 	@Override
 	public ICallableMember getMethod()
 	{
 		return this.method;
+	}
+
+	@Override
+	public void setMethod(ICallableMember method)
+	{
+		this.method = method;
 	}
 
 	@Override
@@ -131,7 +116,7 @@ public abstract class AbstractParameter extends Member implements IParameter
 	public void setType(IType type)
 	{
 		this.type = type;
-		this.internalType = null;
+		this.covariantType = null;
 	}
 
 	@Override
@@ -141,32 +126,14 @@ public abstract class AbstractParameter extends Member implements IParameter
 	}
 
 	@Override
-	public IType getInternalType()
+	public IType getCovariantType()
 	{
-		if (this.internalType != null)
+		if (this.covariantType != null)
 		{
-			return this.internalType;
+			return this.covariantType;
 		}
 
-		return this.internalType = this.type.asParameterType();
-	}
-
-	@Override
-	public void setValue(IValue value)
-	{
-		this.defaultValue = value;
-	}
-
-	@Override
-	public IValue getValue()
-	{
-		return this.defaultValue;
-	}
-
-	@Override
-	public void setIndex(int index)
-	{
-		this.index = index;
+		return this.covariantType = this.type.asParameterType();
 	}
 
 	@Override
@@ -176,15 +143,15 @@ public abstract class AbstractParameter extends Member implements IParameter
 	}
 
 	@Override
-	public void setLocalIndex(int index)
+	public void setIndex(int index)
 	{
-		this.localIndex = index;
+		this.index = index;
 	}
 
 	@Override
-	public int getLocalIndex()
+	public boolean isVarargs()
 	{
-		return this.localIndex;
+		return this.hasModifier(Modifiers.VARARGS);
 	}
 
 	@Override
@@ -194,12 +161,6 @@ public abstract class AbstractParameter extends Member implements IParameter
 		{
 			this.getModifiers().addIntModifier(Modifiers.VARARGS);
 		}
-	}
-
-	@Override
-	public boolean isVarargs()
-	{
-		return this.hasModifier(Modifiers.VARARGS);
 	}
 
 	@Override
@@ -216,24 +177,10 @@ public abstract class AbstractParameter extends Member implements IParameter
 		case "dyvil/annotation/internal/DefaultValue":
 			return new AnnotationValueReader(this);
 		case "dyvil/annotation/internal/DefaultArrayValue":
-			return new AnnotationValueReader(value -> this.defaultValue = value.withType(this.type, this.type, null,
-			                                                                             null));
+			return new AnnotationValueReader(value -> this.value = value.withType(this.type, this.type, null, null));
 		}
 
 		return IParameter.super.visitAnnotation(internalType);
-	}
-
-	@Override
-	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue receiver, IContext context)
-	{
-		return receiver;
-	}
-
-	@Override
-	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue receiver, IValue newValue)
-	{
-		this.assigned = true;
-		return IParameter.super.checkAssign(markers, context, position, receiver, newValue);
 	}
 
 	@Override
@@ -241,12 +188,12 @@ public abstract class AbstractParameter extends Member implements IParameter
 	{
 		super.resolveTypes(markers, context);
 
-		if (this.defaultValue != null)
+		if (this.value != null)
 		{
-			this.defaultValue.resolveTypes(markers, context);
+			this.value.resolveTypes(markers, context);
 		}
 
-		this.internalType = null;
+		this.covariantType = null;
 
 		final LambdaType functionType;
 		if (this.type != null && (functionType = this.type.extract(LambdaType.class)) != null)
@@ -289,7 +236,7 @@ public abstract class AbstractParameter extends Member implements IParameter
 		final int index = parameter.getIndex();
 
 		parameter.setLocalIndex(writer.localCount());
-		writer.visitParameter(parameter.getLocalIndex(), parameter.getInternalName(), parameter.getInternalType(),
+		writer.visitParameter(parameter.getLocalIndex(), parameter.getInternalName(), parameter.getCovariantType(),
 		                      ModifierUtil.getJavaModifiers(flags));
 
 		// Annotations
@@ -391,14 +338,14 @@ public abstract class AbstractParameter extends Member implements IParameter
 	}
 
 	@Override
-	public void toString(@NonNull String prefix, @NonNull StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		if (this.annotations != null)
 		{
 			int count = this.annotations.annotationCount();
 			for (int i = 0; i < count; i++)
 			{
-				this.annotations.getAnnotation(i).toString(prefix, buffer);
+				this.annotations.getAnnotation(i).toString(indent, buffer);
 				buffer.append(' ');
 			}
 		}
@@ -415,7 +362,7 @@ public abstract class AbstractParameter extends Member implements IParameter
 
 			if (!typeAscription)
 			{
-				this.appendType(prefix, buffer);
+				this.appendType(indent, buffer);
 				buffer.append(' ');
 			}
 		}
@@ -432,13 +379,13 @@ public abstract class AbstractParameter extends Member implements IParameter
 		if (typeAscription)
 		{
 			Formatting.appendSeparator(buffer, "parameter.type_ascription", ':');
-			this.appendType(prefix, buffer);
+			this.appendType(indent, buffer);
 		}
 
-		if (this.defaultValue != null)
+		if (this.value != null)
 		{
 			Formatting.appendSeparator(buffer, "field.assignment", '=');
-			this.defaultValue.toString(prefix, buffer);
+			this.value.toString(indent, buffer);
 		}
 	}
 

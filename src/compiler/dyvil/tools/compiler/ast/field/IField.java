@@ -16,13 +16,7 @@ public interface IField extends IClassMember, IDataMember
 	}
 
 	@Override
-	default boolean isField()
-	{
-		return true;
-	}
-
-	@Override
-	default boolean isVariable()
+	default boolean isLocal()
 	{
 		return false;
 	}

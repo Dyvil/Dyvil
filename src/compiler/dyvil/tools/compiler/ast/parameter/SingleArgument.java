@@ -128,11 +128,11 @@ public final class SingleArgument implements IArguments, IValueConsumer
 		if (!param.isVarargs() || this.value.checkVarargs(false))
 		{
 			return ArgumentList
-				       .checkMatch(values, types, matchStartIndex + argumentIndex, this.value, param.getInternalType(),
+				       .checkMatch(values, types, matchStartIndex + argumentIndex, this.value, param.getCovariantType(),
 				                   implicitContext) ? 0 : -1;
 		}
 
-		final ArrayType arrayType = param.getInternalType().extract(ArrayType.class);
+		final ArrayType arrayType = param.getCovariantType().extract(ArrayType.class);
 		final IType elementType = arrayType.getElementType();
 		if (ArgumentList
 			    .checkMatch(values, types, matchStartIndex + argumentIndex, this.value, elementType, implicitContext))
@@ -177,11 +177,11 @@ public final class SingleArgument implements IArguments, IValueConsumer
 		final IType type = this.value.getType();
 		if (this.value.checkVarargs(true))
 		{
-			param.getInternalType().inferTypes(type, typeContext);
+			param.getCovariantType().inferTypes(type, typeContext);
 			return;
 		}
 
-		param.getInternalType().extract(ArrayType.class).getElementType().inferTypes(type, typeContext);
+		param.getCovariantType().extract(ArrayType.class).getElementType().inferTypes(type, typeContext);
 	}
 
 	@Override
@@ -189,7 +189,7 @@ public final class SingleArgument implements IArguments, IValueConsumer
 	{
 		if (index == 0 && this.value != null)
 		{
-			this.value.writeExpression(writer, param.getInternalType());
+			this.value.writeExpression(writer, param.getCovariantType());
 			return;
 		}
 

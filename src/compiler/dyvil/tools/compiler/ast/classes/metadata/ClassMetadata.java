@@ -108,7 +108,7 @@ public class ClassMetadata implements IClassMetadata
 		switch (method.getName().unqualified)
 		{
 		case "equals":
-			if (parameters.size() == 1 && parameters.get(0).getInternalType().getTheClass() == Types.OBJECT_CLASS)
+			if (parameters.size() == 1 && parameters.get(0).getCovariantType().getTheClass() == Types.OBJECT_CLASS)
 			{
 				this.members |= EQUALS;
 			}

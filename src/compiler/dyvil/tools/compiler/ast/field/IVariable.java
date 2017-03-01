@@ -17,13 +17,7 @@ public interface IVariable extends IDataMember
 	}
 
 	@Override
-	default boolean isField()
-	{
-		return false;
-	}
-
-	@Override
-	default boolean isVariable()
+	default boolean isLocal()
 	{
 		return true;
 	}
@@ -53,10 +47,7 @@ public interface IVariable extends IDataMember
 	{
 	}
 
-	default IType getInternalType()
-	{
-		return this.getType();
-	}
+	IType getInternalType();
 
 	@Override
 	default IDataMember capture(IContext context)

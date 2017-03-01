@@ -723,8 +723,8 @@ public class CodeMethod extends AbstractMethod
 			for (int p = 0, count = this.parameters.size(); p < count; p++)
 			{
 				final IParameter overrideParameter = overrideParameterList.get(p);
-				final IType parameterType = this.parameters.get(p).getInternalType();
-				final IType overrideParameterType = overrideParameter.getInternalType();
+				final IType parameterType = this.parameters.get(p).getCovariantType();
+				final IType overrideParameterType = overrideParameter.getCovariantType();
 
 				overrideParameter.writeInit(methodWriter);
 				methodWriter.visitVarInsn(overrideParameterType.getLoadOpcode(), overrideParameter.getLocalIndex());

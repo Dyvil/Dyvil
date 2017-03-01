@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.field;
 
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 
@@ -45,13 +44,7 @@ public class CaptureVariable extends CaptureDataMember implements IVariable
 	{
 		this.variable.setReferenceType();
 	}
-	
-	@Override
-	public IType getInternalType()
-	{
-		return this.variable.getInternalType();
-	}
-	
+
 	@Override
 	public boolean isReferenceCapturable()
 	{

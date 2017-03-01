@@ -456,13 +456,13 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 		for (int i = 0; i < parameterCount; i++)
 		{
-			final IType lambdaParameterType = this.parameters.get(i).getInternalType();
+			final IType lambdaParameterType = this.parameters.get(i).getCovariantType();
 			if (lambdaParameterType.isUninferred())
 			{
 				continue;
 			}
 
-			final IType methodParameterType = methodParameters.get(i).getInternalType();
+			final IType methodParameterType = methodParameters.get(i).getCovariantType();
 			if (!Types.isSuperType(methodParameterType, lambdaParameterType))
 			{
 				return false;

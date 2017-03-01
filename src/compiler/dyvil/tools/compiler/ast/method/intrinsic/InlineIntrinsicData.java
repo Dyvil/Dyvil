@@ -57,7 +57,7 @@ public class InlineIntrinsicData extends InstructionList implements IntrinsicDat
 
 		for (int i = 0, parameterCount = parameterList.size(); i < parameterCount; i++)
 		{
-			parameterSlots += parameterList.get(i).getInternalType().getLocalSlots();
+			parameterSlots += parameterList.get(i).getCovariantType().getLocalSlots();
 		}
 		this.parameterSlots = parameterSlots;
 

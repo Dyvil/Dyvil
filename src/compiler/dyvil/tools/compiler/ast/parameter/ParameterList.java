@@ -245,7 +245,7 @@ public class ParameterList implements IParameterList
 	{
 		for (int i = 0; i < this.parameterCount; i++)
 		{
-			this.parameters[i].getInternalType().appendExtendedName(builder);
+			this.parameters[i].getCovariantType().appendExtendedName(builder);
 		}
 	}
 

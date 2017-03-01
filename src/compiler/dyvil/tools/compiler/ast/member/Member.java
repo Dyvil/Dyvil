@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.member;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -295,11 +296,11 @@ public abstract class Member implements IMember
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		if (this.annotations != null)
 		{
-			this.annotations.toString(prefix, buffer);
+			this.annotations.toString(indent, buffer);
 		}
 		if (this.modifiers != null)
 		{

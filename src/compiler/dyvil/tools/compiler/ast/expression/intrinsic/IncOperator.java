@@ -1,11 +1,12 @@
 package dyvil.tools.compiler.ast.expression.intrinsic;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.expression.access.FieldAccess;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.access.FieldAccess;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -48,7 +49,7 @@ public class IncOperator extends AbstractValue
 		{
 			final FieldAccess fieldAccess = (FieldAccess) operand;
 
-				return new IncOperator(fieldAccess.getReceiver(), fieldAccess.getField(), value, prefix);
+			return new IncOperator(fieldAccess.getReceiver(), fieldAccess.getField(), value, prefix);
 		}
 		return null;
 	}
@@ -277,21 +278,22 @@ public class IncOperator extends AbstractValue
 		{
 			return false;
 		}
-		if (this.field.isVariable())
+		if (!this.field.isLocal())
 		{
-			if (((IVariable) this.field).isReferenceType())
-			{
-				return false;
-			}
+			return false;
+		}
+		if (((IVariable) this.field).isReferenceType())
+		{
+			return false;
+		}
 
-			switch (typecode)
-			{
-			case PrimitiveType.BYTE_CODE:
-			case PrimitiveType.SHORT_CODE:
-			case PrimitiveType.CHAR_CODE:
-			case PrimitiveType.INT_CODE:
-				return true;
-			}
+		switch (typecode)
+		{
+		case PrimitiveType.BYTE_CODE:
+		case PrimitiveType.SHORT_CODE:
+		case PrimitiveType.CHAR_CODE:
+		case PrimitiveType.INT_CODE:
+			return true;
 		}
 		return false;
 	}
@@ -324,18 +326,18 @@ public class IncOperator extends AbstractValue
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		if (this.value == 1)
 		{
 			if (this.prefix)
 			{
 				buffer.append("++");
-				this.appendAccess(prefix, buffer);
+				this.appendAccess(indent, buffer);
 			}
 			else
 			{
-				this.appendAccess(prefix, buffer);
+				this.appendAccess(indent, buffer);
 				buffer.append("++");
 			}
 		}
@@ -344,31 +346,31 @@ public class IncOperator extends AbstractValue
 			if (this.prefix)
 			{
 				buffer.append("--");
-				this.appendAccess(prefix, buffer);
+				this.appendAccess(indent, buffer);
 			}
 			else
 			{
-				this.appendAccess(prefix, buffer);
+				this.appendAccess(indent, buffer);
 				buffer.append("--");
 			}
 		}
 		else if (this.value > 0)
 		{
-			this.appendAccess(prefix, buffer);
+			this.appendAccess(indent, buffer);
 			buffer.append(" += ").append(this.value);
 		}
 		else if (this.value < 0)
 		{
-			this.appendAccess(prefix, buffer);
+			this.appendAccess(indent, buffer);
 			buffer.append(" -= ").append(-this.value);
 		}
-		else
+		else // this.value == 0
 		{
-			this.appendAccess(prefix, buffer);
+			this.appendAccess(indent, buffer);
 		}
 	}
 
-	private void appendAccess(String prefix, StringBuilder buffer)
+	private void appendAccess(@NonNull String prefix, StringBuilder buffer)
 	{
 		if (this.receiver != null)
 		{

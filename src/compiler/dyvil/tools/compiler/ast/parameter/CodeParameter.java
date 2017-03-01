@@ -50,24 +50,24 @@ public class CodeParameter extends AbstractParameter
 
 		if (this.type == Types.UNKNOWN)
 		{
-			markers.add(Markers.semantic(this.position, this.getKind().getName() + ".type.infer", this.name));
+			markers.add(Markers.semanticError(this.position, "parameter.type.infer", this.name));
 		}
 
-		if (this.defaultValue == null)
+		if (this.value == null)
 		{
 			return;
 		}
 
-		IValue defaultValue = this.defaultValue.resolve(markers, context);
+		IValue value = this.value.resolve(markers, context);
 
 		final String kindName = this.getKind().getName();
 		final TypeChecker.MarkerSupplier markerSupplier = TypeChecker.markerSupplier(kindName + ".type.incompatible",
 		                                                                             kindName + ".type", "value.type",
 		                                                                             this.name);
 
-		defaultValue = TypeChecker.convertValue(defaultValue, this.type, null, markers, context, markerSupplier);
+		value = TypeChecker.convertValue(value, this.type, null, markers, context, markerSupplier);
 
-		this.defaultValue = IValue.toAnnotationConstant(defaultValue, markers, context);
+		this.value = IValue.toAnnotationConstant(value, markers, context);
 	}
 
 	@Override
@@ -86,9 +86,9 @@ public class CodeParameter extends AbstractParameter
 			this.annotations.checkTypes(markers, context);
 		}
 
-		if (this.defaultValue != null)
+		if (this.value != null)
 		{
-			this.defaultValue.checkTypes(markers, context);
+			this.value.checkTypes(markers, context);
 		}
 	}
 
@@ -97,14 +97,14 @@ public class CodeParameter extends AbstractParameter
 	{
 		super.check(markers, context);
 
-		if (this.defaultValue != null)
+		if (this.value != null)
 		{
-			this.defaultValue.check(markers, context);
+			this.value.check(markers, context);
 		}
 
 		if (Types.isVoid(this.type))
 		{
-			markers.add(Markers.semantic(this.position, this.getKind().getName() + ".type.void"));
+			markers.add(Markers.semanticError(this.position, "parameter.type.void"));
 		}
 	}
 
@@ -113,9 +113,9 @@ public class CodeParameter extends AbstractParameter
 	{
 		super.foldConstants();
 
-		if (this.defaultValue != null)
+		if (this.value != null)
 		{
-			this.defaultValue = this.defaultValue.foldConstants();
+			this.value = this.value.foldConstants();
 		}
 	}
 
@@ -124,9 +124,9 @@ public class CodeParameter extends AbstractParameter
 	{
 		super.cleanup(compilableList, classCompilableList);
 
-		if (this.defaultValue != null)
+		if (this.value != null)
 		{
-			this.defaultValue = this.defaultValue.cleanup(compilableList, classCompilableList);
+			this.value = this.value.cleanup(compilableList, classCompilableList);
 		}
 	}
 }

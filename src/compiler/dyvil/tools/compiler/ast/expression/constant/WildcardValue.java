@@ -162,7 +162,7 @@ public class WildcardValue implements IConstantValue
 			this.lambdaParameter.writeGet(writer, null, lineNumber);
 			if (type != null)
 			{
-				this.lambdaParameter.getInternalType().writeCast(writer, type, lineNumber);
+				this.lambdaParameter.getCovariantType().writeCast(writer, type, lineNumber);
 			}
 			return;
 		}

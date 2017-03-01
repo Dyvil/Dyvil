@@ -74,7 +74,7 @@ public final class AnnotationUtil
 		case IValue.ENUM_ACCESS:
 			return Enum.valueOf(type, ((EnumValue) value).getInternalName());
 		case IValue.FIELD_ACCESS:
-			if (Types.isSameType(parameter.getInternalType(), value.getType()))
+			if (Types.isSameType(parameter.getCovariantType(), value.getType()))
 			{
 				return Enum.valueOf(type, ((FieldAccess) value).getName().qualified);
 			}

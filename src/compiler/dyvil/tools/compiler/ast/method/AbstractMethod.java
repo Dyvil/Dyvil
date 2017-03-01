@@ -318,7 +318,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return this.name == Names.toString || this.name == Names.hashCode;
 		case 1:
 			if (this.name == Names.equals
-				    && this.parameters.get(0).getInternalType().getTheClass() == Types.OBJECT_CLASS)
+				    && this.parameters.get(0).getCovariantType().getTheClass() == Types.OBJECT_CLASS)
 			{
 				return true;
 			}
@@ -510,7 +510,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			if (mod == Modifiers.INFIX)
 			{
 				// Infix access to infix method
-				receiverType = parameters.get(0).getInternalType();
+				receiverType = parameters.get(0).getCovariantType();
 				parameterStartIndex = 1;
 			}
 			else
@@ -597,7 +597,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return;
 		}
 
-		final IType parType = parameterList.get(0).getInternalType();
+		final IType parType = parameterList.get(0).getCovariantType();
 
 		// Note: this explicitly uses IValue.getTypeMatch to avoid nested implicit conversions
 		final int match = value.getTypeMatch(parType);
@@ -644,7 +644,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				// infix or extension method, declaring class implicit
 
 				final IParameter parameter = this.parameters.get(0);
-				final IType paramType = parameter.getInternalType();
+				final IType paramType = parameter.getCovariantType();
 
 				updateReceiverType(receiver, genericData);
 				receiver = TypeChecker.convertValue(receiver, paramType, genericData, markers, context,
@@ -862,8 +862,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		// Check Parameter Types
 		for (int i = 0, count = this.parameters.size(); i < count; i++)
 		{
-			final IType parType = this.parameters.get(i).getInternalType().getConcreteType(typeContext);
-			final IType candidateParType = candidateParameters.get(i).getInternalType().getConcreteType(typeContext);
+			final IType parType = this.parameters.get(i).getCovariantType().getConcreteType(typeContext);
+			final IType candidateParType = candidateParameters.get(i).getCovariantType().getConcreteType(typeContext);
 			if (!Types.isSameType(parType, candidateParType))
 			{
 				return false;
@@ -1072,7 +1072,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		final int modifiers = this.modifiers.toFlags();
 		if ((modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
-			receiver.writeExpression(writer, this.parameters.get(0).getInternalType());
+			receiver.writeExpression(writer, this.parameters.get(0).getCovariantType());
 			return;
 		}
 

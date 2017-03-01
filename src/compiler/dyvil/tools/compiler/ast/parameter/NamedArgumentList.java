@@ -215,7 +215,7 @@ public final class NamedArgumentList implements IArguments
 			// Not a varargs parameter
 
 			return ArgumentList.checkMatch(values, types, matchStartIndex + argIndex, this.values[argIndex],
-			                               param.getInternalType(), implicitContext) ? 0 : -1;
+			                               param.getCovariantType(), implicitContext) ? 0 : -1;
 		}
 
 		// Varargs Parameter
@@ -298,7 +298,7 @@ public final class NamedArgumentList implements IArguments
 			IParameter param = params[i];
 			if (param.getIndex() == startIndex + i)
 			{
-				this.values[i].writeExpression(writer, param.getInternalType());
+				this.values[i].writeExpression(writer, param.getCovariantType());
 				targets[i] = -2;
 				argStartIndex = i + 1;
 			}
@@ -315,7 +315,7 @@ public final class NamedArgumentList implements IArguments
 			for (int i = argStartIndex; i < this.size; i++)
 			{
 				final IParameter parameter = params[i];
-				final IType parameterType = parameter.getInternalType();
+				final IType parameterType = parameter.getCovariantType();
 				final IValue value = this.values[i];
 
 				final int localIndex = writer.localCount();
@@ -344,7 +344,7 @@ public final class NamedArgumentList implements IArguments
 					continue;
 				default:
 					// Value for parameter exists -> load the variable
-					writer.visitVarInsn(parameter.getInternalType().getLoadOpcode(), target);
+					writer.visitVarInsn(parameter.getCovariantType().getLoadOpcode(), target);
 				}
 			}
 		}
@@ -358,7 +358,7 @@ public final class NamedArgumentList implements IArguments
 		final int argIndex = this.findIndex(index, param.getName());
 		if (argIndex >= 0)
 		{
-			this.values[argIndex].writeExpression(writer, param.getInternalType());
+			this.values[argIndex].writeExpression(writer, param.getCovariantType());
 			return;
 		}
 

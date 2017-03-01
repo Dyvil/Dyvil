@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.field;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -26,7 +27,7 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 import java.lang.annotation.ElementType;
 
-public final class Variable extends Member implements IVariable
+public class Variable extends Member implements IVariable
 {
 	protected int    localIndex;
 	protected IValue value;
@@ -37,7 +38,7 @@ public final class Variable extends Member implements IVariable
 	/**
 	 * Marks if this variable is assigned anywhere. This is used to check if it is effectively final.
 	 */
-	private boolean assigned;
+	protected boolean assigned;
 
 	public Variable()
 	{
@@ -80,9 +81,9 @@ public final class Variable extends Member implements IVariable
 	}
 
 	@Override
-	public void setValue(IValue value)
+	public ElementType getElementType()
 	{
-		this.value = value;
+		return ElementType.LOCAL_VARIABLE;
 	}
 
 	@Override
@@ -92,15 +93,21 @@ public final class Variable extends Member implements IVariable
 	}
 
 	@Override
-	public void setLocalIndex(int index)
+	public void setValue(IValue value)
 	{
-		this.localIndex = index;
+		this.value = value;
 	}
 
 	@Override
 	public int getLocalIndex()
 	{
 		return this.localIndex;
+	}
+
+	@Override
+	public void setLocalIndex(int index)
+	{
+		this.localIndex = index;
 	}
 
 	@Override
@@ -113,12 +120,6 @@ public final class Variable extends Member implements IVariable
 	public boolean addRawAnnotation(String type, IAnnotation annotation)
 	{
 		return true;
-	}
-
-	@Override
-	public ElementType getElementType()
-	{
-		return ElementType.LOCAL_VARIABLE;
 	}
 
 	@Override
@@ -350,15 +351,15 @@ public final class Variable extends Member implements IVariable
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		super.toString(prefix, buffer);
-		IDataMember.toString(prefix, buffer, this, "variable.type_ascription");
+		super.toString(indent, buffer);
+		IDataMember.toString(indent, buffer, this, "variable.type_ascription");
 
 		if (this.value != null)
 		{
 			Formatting.appendSeparator(buffer, "field.assignment", '=');
-			this.value.toString(prefix, buffer);
+			this.value.toString(indent, buffer);
 		}
 	}
 }

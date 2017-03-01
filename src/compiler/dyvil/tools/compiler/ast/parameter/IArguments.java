@@ -27,7 +27,7 @@ public interface IArguments extends IASTNode, IResolvable, Iterable<IValue>
 			genericData.lockAvailable();
 		}
 
-		final IType type = parameter.getInternalType();
+		final IType type = parameter.getCovariantType();
 		final TypeChecker.MarkerSupplier markerSupplier = TypeChecker.markerSupplier("method.access.argument_type",
 		                                                                             parameter.getName());
 		return TypeChecker.convertValue(value, type, genericData, markers, context, markerSupplier);
