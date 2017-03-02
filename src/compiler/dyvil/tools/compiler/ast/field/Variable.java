@@ -33,7 +33,7 @@ public class Variable extends Member implements IVariable
 	protected IValue value;
 
 	// Metadata
-	private IType refType;
+	protected IType refType;
 
 	/**
 	 * Marks if this variable is assigned anywhere. This is used to check if it is effectively final.
@@ -133,12 +133,6 @@ public class Variable extends Member implements IVariable
 	{
 		this.assigned = true;
 		return IVariable.super.checkAssign(markers, context, position, receiver, newValue);
-	}
-
-	@Override
-	public boolean isReferenceCapturable()
-	{
-		return true;
 	}
 
 	@Override
@@ -262,24 +256,7 @@ public class Variable extends Member implements IVariable
 	{
 		if (this.refType != null)
 		{
-			final IConstructor constructor = this.refType.getTheClass().getBody().getConstructor(0);
-			writer.visitTypeInsn(Opcodes.NEW, this.refType.getInternalName());
-			writer.visitInsn(Opcodes.DUP);
-
-			if (value != null)
-			{
-				value.writeExpression(writer, this.type);
-			}
-			else
-			{
-				writer.visitInsn(Opcodes.AUTO_DUP_X1);
-			}
-			constructor.writeInvoke(writer, this.getLineNumber());
-
-			this.localIndex = writer.localCount();
-
-			writer.setLocalType(this.localIndex, this.refType.getInternalName());
-			writer.visitVarInsn(Opcodes.ASTORE, this.localIndex);
+			writeRefInit(this, writer, value);
 			return;
 		}
 
@@ -291,6 +268,40 @@ public class Variable extends Member implements IVariable
 		this.localIndex = writer.localCount();
 		writer.visitVarInsn(this.type.getStoreOpcode(), this.localIndex);
 		writer.setLocalType(this.localIndex, this.type.getFrameType());
+	}
+
+	public static void writeRefInit(IVariable variable, MethodWriter writer, IValue value)
+	{
+		final IType type = variable.getType();
+		final IType refType = variable.getInternalType();
+
+		final IConstructor constructor = refType.getTheClass().getBody().getConstructor(0);
+		writer.visitTypeInsn(Opcodes.NEW, refType.getInternalName());
+
+		if (value != null)
+		{
+			// new
+			writer.visitInsn(Opcodes.DUP);
+			// new, new
+			value.writeExpression(writer, type);
+			// new, new, value
+		}
+		else
+		{
+			// value, new
+			writer.visitInsn(Opcodes.AUTO_DUP_X1);
+			// new, value, new
+			writer.visitInsn(Opcodes.AUTO_SWAP);
+			// new, new, value
+		}
+
+		constructor.writeInvoke(writer, variable.getLineNumber());
+
+		final int localIndex = writer.localCount();
+		variable.setLocalIndex(localIndex);
+
+		writer.setLocalType(localIndex, refType.getInternalName());
+		writer.visitVarInsn(Opcodes.ASTORE, localIndex);
 	}
 
 	@Override

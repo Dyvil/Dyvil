@@ -33,11 +33,6 @@ public interface IVariable extends IDataMember
 
 	void setLocalIndex(int index);
 
-	default boolean isReferenceCapturable()
-	{
-		return false;
-	}
-
 	default boolean isReferenceType()
 	{
 		return false;

@@ -321,7 +321,7 @@ public class CodeConstructor extends AbstractConstructor
 
 		// Write Parameters
 		methodWriter.setThisType(this.enclosingClass.getInternalName());
-		this.parameters.writeInit(methodWriter);
+		this.parameters.write(methodWriter);
 
 		// Write Code
 		final Label start = new Label();

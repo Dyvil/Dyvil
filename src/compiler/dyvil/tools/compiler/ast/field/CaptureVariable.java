@@ -46,12 +46,6 @@ public class CaptureVariable extends CaptureDataMember implements IVariable
 	}
 
 	@Override
-	public boolean isReferenceCapturable()
-	{
-		return true;
-	}
-
-	@Override
 	public void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
 		writer.visitVarInsn(this.variable.getInternalType().getLoadOpcode(), this.localIndex);

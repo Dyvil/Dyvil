@@ -211,13 +211,7 @@ public class ClassParameter extends Field implements IParameter
 	}
 
 	@Override
-	public void writeInit(MethodWriter writer, IValue value) throws BytecodeException
-	{
-		this.writeInit(writer);
-	}
-
-	@Override
-	public void writeInit(MethodWriter writer) throws BytecodeException
+	public void writeParameter(MethodWriter writer)
 	{
 		if (this.varargs && !this.modifiers.hasIntModifier(Modifiers.VARARGS))
 		{
@@ -225,11 +219,17 @@ public class ClassParameter extends Field implements IParameter
 			// to rely on a boolean field.
 
 			this.modifiers.addIntModifier(Modifiers.VARARGS);
-			AbstractParameter.writeInitImpl(this, writer);
+			IParameter.super.writeParameter(writer);
 			this.modifiers.removeIntModifier(Modifiers.VARARGS);
 			return;
 		}
 
-		AbstractParameter.writeInitImpl(this, writer);
+		IParameter.super.writeParameter(writer);
+	}
+
+	@Override
+	public void writeInit(MethodWriter writer) throws BytecodeException
+	{
+		IParameter.super.writeInit(writer);
 	}
 }

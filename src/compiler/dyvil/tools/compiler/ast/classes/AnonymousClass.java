@@ -177,10 +177,7 @@ class AnonymousClassMetadata implements IClassMetadata
 
 		initWriter.setThisType(this.theClass.getInternalName());
 
-		for (int i = 0; i < parameterCount; i++)
-		{
-			parameterList.get(i).writeInit(initWriter);
-		}
+		parameterList.write(initWriter);
 
 		int index = initWriter.localCount();
 		int thisIndex = index;

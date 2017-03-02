@@ -637,7 +637,7 @@ public class CodeMethod extends AbstractMethod
 
 		this.writeAnnotations(methodWriter, flags);
 
-		this.parameters.writeInit(methodWriter);
+		this.parameters.write(methodWriter);
 
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
@@ -726,7 +726,7 @@ public class CodeMethod extends AbstractMethod
 				final IType parameterType = this.parameters.get(p).getCovariantType();
 				final IType overrideParameterType = overrideParameter.getCovariantType();
 
-				overrideParameter.writeInit(methodWriter);
+				overrideParameter.writeParameter(methodWriter);
 				methodWriter.visitVarInsn(overrideParameterType.getLoadOpcode(), overrideParameter.getLocalIndex());
 				overrideParameterType.writeCast(methodWriter, parameterType, lineNumber);
 			}

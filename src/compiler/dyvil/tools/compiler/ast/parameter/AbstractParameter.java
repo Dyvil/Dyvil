@@ -2,25 +2,16 @@ package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
-import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.asm.AnnotationVisitor;
-import dyvil.tools.asm.TypeReference;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
-import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.expression.ArrayExpr;
-import dyvil.tools.compiler.ast.expression.ClassOperator;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
-import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
-import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.ast.type.compound.LambdaType;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -36,9 +27,6 @@ import java.lang.annotation.ElementType;
 
 public abstract class AbstractParameter extends Variable implements IParameter
 {
-	public static final String DEFAULT_VALUE       = "Ldyvil/annotation/internal/DefaultValue;";
-	public static final String DEFAULT_ARRAY_VALUE = "Ldyvil/annotation/internal/DefaultArrayValue;";
-
 	// Metadata
 	protected ICallableMember method;
 	protected int             index;
@@ -210,131 +198,14 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	}
 
 	@Override
-	public void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException
-	{
-		writer.visitVarInsn(this.type.getLoadOpcode(), this.localIndex);
-	}
-
-	@Override
-	public void writeSet_Set(MethodWriter writer, int lineNumber) throws BytecodeException
-	{
-		writer.visitVarInsn(this.type.getStoreOpcode(), this.localIndex);
-	}
-
-	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-	}
-
-	public static void writeInitImpl(IParameter parameter, MethodWriter writer)
-	{
-		final AnnotationList annotations = parameter.getAnnotations();
-		final IType type = parameter.getType();
-		final IValue defaultValue = parameter.getValue();
-		final long flags = ModifierUtil.getFlags(parameter);
-
-		final int index = parameter.getIndex();
-
-		parameter.setLocalIndex(writer.localCount());
-		writer.visitParameter(parameter.getLocalIndex(), parameter.getInternalName(), parameter.getCovariantType(),
-		                      ModifierUtil.getJavaModifiers(flags));
-
-		// Annotations
-		final AnnotatableVisitor visitor = (desc, visible) -> writer.visitParameterAnnotation(index, desc, visible);
-
-		if (annotations != null)
-		{
-			annotations.write(visitor);
-		}
-
-		ModifierUtil.writeModifiers(visitor, parameter, flags);
-
-		IType.writeAnnotations(type, writer, TypeReference.newFormalParameterReference(index), "");
-
-		// Default Value
-		if (defaultValue == null)
-		{
-			return;
-		}
-
-		final ArrayType arrayType = type.extract(ArrayType.class);
-		if (arrayType != null)
-		{
-			final AnnotationVisitor annotationVisitor = writer
-				                                            .visitParameterAnnotation(index, DEFAULT_ARRAY_VALUE, false)
-				                                            .visitArray("value");
-
-			ArrayExpr arrayExpr = (ArrayExpr) defaultValue;
-			int count = arrayExpr.valueCount();
-			IType elementType = arrayType.getElementType();
-
-			for (int i = 0; i < count; i++)
-			{
-				writeDefaultAnnotation(annotationVisitor, elementType, arrayExpr.getValue(i));
-			}
-
-			annotationVisitor.visitEnd();
-
-			return;
-		}
-
-		final AnnotationVisitor annotationVisitor = writer.visitParameterAnnotation(index, DEFAULT_VALUE, false);
-		writeDefaultAnnotation(annotationVisitor, type, defaultValue);
-
-		annotationVisitor.visitEnd();
-	}
-
-	private static void writeDefaultAnnotation(AnnotationVisitor visitor, IType type, IValue value)
-	{
-		if (type.isPrimitive())
-		{
-			switch (type.getTypecode())
-			{
-			case PrimitiveType.BOOLEAN_CODE:
-				visitor.visit("booleanValue", value.booleanValue());
-				return;
-			case PrimitiveType.BYTE_CODE:
-			case PrimitiveType.SHORT_CODE:
-			case PrimitiveType.CHAR_CODE:
-			case PrimitiveType.INT_CODE:
-				visitor.visit("intValue", value.intValue());
-				return;
-			case PrimitiveType.LONG_CODE:
-				visitor.visit("longValue", value.longValue());
-				return;
-			case PrimitiveType.FLOAT_CODE:
-				visitor.visit("floatValue", value.floatValue());
-				return;
-			case PrimitiveType.DOUBLE_CODE:
-				visitor.visit("doubleValue", value.doubleValue());
-				return;
-			}
-
-			return;
-		}
-
-		IClass iClass = type.getTheClass();
-		if (iClass == Types.STRING_CLASS)
-		{
-			visitor.visit("stringValue", value.stringValue());
-			return;
-		}
-		if (iClass == ClassOperator.LazyFields.CLASS_CLASS)
-		{
-			visitor.visit("classValue", value.toObject());
-		}
 	}
 
 	@Override
 	public void writeInit(MethodWriter writer)
 	{
-		AbstractParameter.writeInitImpl(this, writer);
-	}
-
-	@Override
-	public void writeInit(MethodWriter writer, IValue value) throws BytecodeException
-	{
-		this.writeInit(writer);
+		IParameter.super.writeInit(writer);
 	}
 
 	@Override

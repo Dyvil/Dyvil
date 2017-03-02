@@ -321,7 +321,7 @@ public class ForStatement implements IForStatement, IDefaultContext
 		// Variable
 		if (var != null)
 		{
-			var.writeInit(writer, var.getValue());
+			var.writeInit(writer);
 		}
 		writer.visitTargetLabel(startLabel);
 		// Condition

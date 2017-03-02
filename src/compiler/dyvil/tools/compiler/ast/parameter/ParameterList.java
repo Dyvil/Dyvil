@@ -282,8 +282,12 @@ public class ParameterList implements IParameterList
 	}
 
 	@Override
-	public void writeInit(MethodWriter writer)
+	public void write(MethodWriter writer)
 	{
+		for (int i = 0; i < this.parameterCount; i++)
+		{
+			this.parameters[i].writeParameter(writer);
+		}
 		for (int i = 0; i < this.parameterCount; i++)
 		{
 			this.parameters[i].writeInit(writer);

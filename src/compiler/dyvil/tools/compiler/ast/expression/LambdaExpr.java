@@ -865,7 +865,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			this.captureHelper.writeCaptureParameters(methodWriter, index);
 		}
 
-		this.parameters.writeInit(methodWriter);
+		this.parameters.write(methodWriter);
 
 		// Write the Value
 
