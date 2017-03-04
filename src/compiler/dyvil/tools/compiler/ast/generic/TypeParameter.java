@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.generic;
 
 import dyvil.annotation.Reified;
+import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
@@ -419,12 +420,9 @@ public abstract class TypeParameter implements ITypeParameter
 			// Convert primitive types to their reference counterpart
 			type.writeClassExpression(writer, true);
 		}
-		else
+		else if (this.reifiedKind == Reified.Type.TYPE)
 		{
-			if (this.reifiedKind == Reified.Type.TYPE)
-			{
-				type.writeTypeExpression(writer);
-			}
+			type.writeTypeExpression(writer);
 		}
 	}
 
@@ -496,13 +494,13 @@ public abstract class TypeParameter implements ITypeParameter
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		if (this.annotations != null)
 		{
 			for (int i = 0, size = this.annotations.annotationCount(); i < size; i++)
 			{
-				this.annotations.getAnnotation(i).toString(prefix, buffer);
+				this.annotations.getAnnotation(i).toString(indent, buffer);
 				buffer.append(' ');
 			}
 		}
@@ -516,14 +514,14 @@ public abstract class TypeParameter implements ITypeParameter
 		if (upperBound != null)
 		{
 			buffer.append(": ");
-			upperBound.toString(prefix, buffer);
+			upperBound.toString(indent, buffer);
 		}
 
 		final IType lowerBound = this.getLowerBound();
 		if (lowerBound != null)
 		{
 			buffer.append(" super ");
-			lowerBound.toString(prefix, buffer);
+			lowerBound.toString(indent, buffer);
 		}
 	}
 }

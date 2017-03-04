@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.type.typevar;
 
 import dyvil.annotation.Reified;
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
@@ -27,6 +28,7 @@ import java.io.IOException;
 public class TypeVarType implements IRawType
 {
 	protected ITypeParameter typeParameter;
+	protected IDataMember    reifyVariable;
 
 	public TypeVarType()
 	{
@@ -35,6 +37,7 @@ public class TypeVarType implements IRawType
 	public TypeVarType(ITypeParameter typeParameter)
 	{
 		this.typeParameter = typeParameter;
+		this.reifyVariable = typeParameter.getReifyParameter();
 	}
 
 	public ITypeParameter getTypeVariable()
@@ -187,6 +190,11 @@ public class TypeVarType implements IRawType
 	@Override
 	public void checkType(MarkerList markers, IContext context, int position)
 	{
+		final Reified.Type reifiedKind = this.typeParameter.getReifiedKind();
+		if (reifiedKind != null)
+		{
+			this.reifyVariable = context.capture(this.typeParameter.getReifyParameter());
+		}
 	}
 
 	@Override
@@ -245,14 +253,14 @@ public class TypeVarType implements IRawType
 			throw new Error("Non-reified Type Parameter");
 		}
 
-		final int parameterIndex = this.typeParameter.getParameterIndex();
-		writer.visitVarInsn(Opcodes.ALOAD, parameterIndex);
+		this.reifyVariable.writeGet(writer, null, -1);
 
 		// The generic Type is reified -> extract erasure class
 		if (reifiedKind == Reified.Type.TYPE)
 		{
-			writer.visitMethodInsn(Opcodes.INVOKEINTERFACE, "dyvil/reflect/types/Type", "erasure",
-			                       "()Ljava/lang/Class;", true);
+			writer
+				.visitMethodInsn(Opcodes.INVOKEINTERFACE, "dyvil/reflect/types/Type", "erasure", "()Ljava/lang/Class;",
+				                 true);
 		}
 		if (wrapPrimitives && reifiedKind == Reified.Type.ANY_CLASS)
 		{
@@ -270,8 +278,7 @@ public class TypeVarType implements IRawType
 			throw new Error("Non-reified Type Parameter");
 		}
 
-		final int parameterIndex = this.typeParameter.getParameterIndex();
-		writer.visitVarInsn(Opcodes.ALOAD, parameterIndex);
+		this.reifyVariable.writeGet(writer, null, -1);
 
 		if (reifiedKind == Reified.Type.TYPE)
 		{
@@ -307,7 +314,7 @@ public class TypeVarType implements IRawType
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		buffer.append(this.typeParameter.getName());
 	}

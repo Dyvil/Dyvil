@@ -11,6 +11,10 @@ public class CaptureTest
 
 	static func ref(i: int) -> int* = &i
 
+	static func classOf<@Reified(.ANY_CLASS) type T>() -> () -> Class<T> = => class T
+
+	static func typeOf<@Reified(.TYPE) type T>() -> () -> Type<T> = => type T
+
 	private static func lambdaCapture() -> Test = test "Lambda" {
 		let abc = -1
 		let fun = (i: int) => (j: int) => (k: int) => (i, j, k, abc)
@@ -18,13 +22,23 @@ public class CaptureTest
 
 		res =?= (1, 2, 3, -1)
 
-		// Method Parameter capture by reference
-		ref(10).get =?= 10
-		ref(10) =!= ref(10)
+		test "Method Parameter Capture" {
+			ref(10).get =?= 10
+			ref(10) =!= ref(10)
+		}
 
 		// Lambda Parameter capture by reference
-		let refl = (i: int) => &i
-		refl(10).get =?= 10
+		test "Lambda Parameter Capture" {
+			let refl = (i: int) => &i
+			refl(10).get =?= 10
+		}
+
+		test "Type Parameter Capture" {
+			let supplier = classOf<String>()
+			supplier() =?= class<String>
+		}
+
+		//
 
 		lambdaThisCapture()
 	}

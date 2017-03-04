@@ -38,17 +38,20 @@ public class ResolvedTypeVarType extends TypeVarType
 	@Override
 	public void checkType(MarkerList markers, IContext context, int position)
 	{
+		super.checkType(markers, context, position);
+		final Reified.Type reifiedKind = this.typeParameter.getReifiedKind();
+
 		switch (position)
 		{
 		// the constants in this switch are the ones that only conditionally allow type var types
 		case TypePosition.CLASS:
-			if (this.typeParameter.getReifiedKind() != null)
+			if (reifiedKind != null)
 			{
 				return;
 			}
 			// Fallthrough
 		case TypePosition.TYPE:
-			if (this.typeParameter.getReifiedKind() == Reified.Type.TYPE)
+			if (reifiedKind == Reified.Type.TYPE)
 			{
 				return;
 			}

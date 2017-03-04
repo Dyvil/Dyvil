@@ -429,7 +429,19 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public boolean isMember(IVariable variable)
 	{
-		return this.parameters.isParameter(variable);
+		if (this.parameters.isParameter(variable))
+		{
+			return true;
+		}
+
+		for (int i = 0; i < this.typeParameterCount; i++)
+		{
+			if (variable == this.typeParameters[i].getReifyParameter())
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
