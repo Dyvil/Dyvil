@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -176,14 +177,14 @@ public final class TypeOperator extends AbstractValue
 	@Override
 	public String toString()
 	{
-		return "type(" + this.type + ")";
+		return "type<" + this.type + ">";
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		buffer.append("type(");
-		this.type.toString(prefix, buffer);
-		buffer.append(')');
+		buffer.append("type<");
+		this.type.toString(indent, buffer);
+		buffer.append('>');
 	}
 }

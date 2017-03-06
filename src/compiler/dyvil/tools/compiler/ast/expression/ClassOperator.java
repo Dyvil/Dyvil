@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.Type;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -269,14 +270,14 @@ public final class ClassOperator implements IValue
 	@Override
 	public String toString()
 	{
-		return "class(" + this.type + ")";
+		return "class<" + this.type + ">";
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		buffer.append("class(");
-		this.type.toString(prefix, buffer);
-		buffer.append(')');
+		buffer.append("class<");
+		this.type.toString(indent, buffer);
+		buffer.append('>');
 	}
 }
