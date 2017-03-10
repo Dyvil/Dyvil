@@ -24,7 +24,6 @@ import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.ParserManager;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.lexer.DyvilLexer;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.name.Qualifier;
 import dyvil.tools.parsing.source.LineSource;
@@ -90,16 +89,11 @@ public class CompleteCommand implements ICommand
 			if (!markers.isEmpty())
 			{
 				// Print Errors, if any
-				final StringBuilder builder = new StringBuilder();
 				final boolean colors = repl.getCompiler().config.useAnsiColors();
+				final StringBuilder buffer = new StringBuilder();
+				markers.log(new LineSource(expression), buffer, colors);
 
-				markers.sort();
-				for (Marker marker : markers)
-				{
-					marker.log(new LineSource(expression), builder, colors);
-				}
-
-				repl.getOutput().println(builder);
+				repl.getOutput().println(buffer);
 			}
 
 			try

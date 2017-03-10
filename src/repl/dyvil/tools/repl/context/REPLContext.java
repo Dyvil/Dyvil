@@ -36,7 +36,6 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.source.TextSource;
@@ -243,14 +242,10 @@ public class REPLContext extends AbstractHeader
 		}
 
 		boolean colors = this.getCompilationContext().config.useAnsiColors();
-		StringBuilder buf = new StringBuilder();
-		this.markers.sort();
-		for (Marker marker : this.markers)
-		{
-			marker.log(this.currentSource, buf, colors);
-		}
+		StringBuilder buffer = new StringBuilder();
+		this.markers.log(this.currentSource, buffer, colors);
 
-		this.repl.getOutput().println(buf.toString());
+		this.repl.getOutput().println(buffer.toString());
 	}
 
 	private void initMember(IClassMember member)

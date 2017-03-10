@@ -1,6 +1,9 @@
 package dyvil.tools.parsing.marker;
 
 import dyvil.collection.iterator.ArrayIterator;
+import dyvil.collection.mutable.BitSet;
+import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.tools.parsing.source.Source;
 import dyvil.util.I18n;
 
 import java.util.Arrays;
@@ -101,6 +104,56 @@ public final class MarkerList implements Iterable<Marker>
 		this.markerCount += markers.markerCount;
 		this.warnings += markers.warnings;
 		this.errors += markers.errors;
+	}
+
+	public void log(Source source, StringBuilder buffer, boolean colors)
+	{
+		this.sort();
+		BitSet lines = new BitSet(source.lineCount());
+
+		int lastLine = 0;
+
+		for (int i = this.markerCount - 1; i >= 0; i--)
+		{
+			final Marker marker = this.markers[i];
+			final ICodePosition position = marker.getPosition();
+			final int endLine = position.endLine();
+
+			for (int l = position.startLine(); l <= endLine; l++)
+			{
+				lines.add(l);
+			}
+
+			if (endLine > lastLine)
+			{
+				lastLine = endLine;
+			}
+		}
+
+		int nBits = (int) Math.log10(lastLine) + 1;
+		final String formatString = "%" + nBits + "d | %s\n";
+
+		final StringBuilder indentBuffer = new StringBuilder();
+		for (int i = 0; i < nBits; i++)
+		{
+			indentBuffer.append('.');
+		}
+		indentBuffer.append(' ').append('|').append(' ');
+
+		final String indent = indentBuffer.toString();
+
+		int markerIndex = 0;
+
+		for (int line : lines)
+		{
+			buffer.append(String.format(formatString, line, source.getLine(line)));
+
+			while (markerIndex < this.markerCount && line == this.markers[markerIndex].getPosition().endLine())
+			{
+				this.markers[markerIndex].log(source, indent, buffer, colors);
+				markerIndex++;
+			}
+		}
 	}
 
 	@Override

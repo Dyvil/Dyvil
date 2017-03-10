@@ -101,71 +101,45 @@ public abstract class Marker implements Comparable<Marker>
 		return result;
 	}
 
-	public void log(Source source, StringBuilder buf, boolean colors)
+	public void log(Source source, String indent, StringBuilder buffer, boolean colors)
 	{
 		final String type = this.getMarkerType();
-		final String message = this.message;
 
 		final ICodePosition position = this.position;
-		final int startLine = position.startLine();
 		final int endLine = position.endLine();
+		final String colorString = colors ? this.getColor() : "";
 
-		buf.append("line ").append(startLine).append(": ");
+		buffer.append(indent);
 
-		final String colorString;
-		if (colors)
-		{
-			colorString = this.getColor();
-			buf.append(colorString);
-		}
-		else
-		{
-			colorString = null;
-		}
+		this.appendLine(buffer, source.getLine(endLine), position.startColumn(), position.endColumn(), colors,
+		                colorString);
 
-		buf.append(type);
-		if (message != null)
+		buffer.append(indent).append(colorString).append(type);
+		if (this.message != null)
 		{
-			buf.append(": ").append(message);
+			buffer.append(": ").append(this.message);
 		}
 
 		if (colors)
 		{
-			buf.append(Console.ANSI_RESET);
+			buffer.append(Console.ANSI_RESET);
 		}
+
+		buffer.append('\n');
 
 		// Append Info (if any)
 		if (this.info != null)
 		{
 			for (String s : this.info)
 			{
-				buf.append("\n\t").append(s);
+				buffer.append(indent).append('\t').append(s).append('\n');
 			}
-			buf.append('\n');
-		}
-		buf.append('\n');
-
-		if (startLine == endLine)
-		{
-			this.appendLine(buf, source.getLine(startLine), position.startColumn(), position.endColumn(), colors, colorString);
-		}
-		else
-		{
-			final String line = source.getLine(startLine);
-			this.appendLine(buf, line, position.startColumn(), line.length(), colors, colorString);
-			if (endLine - startLine > 1)
-			{
-				buf.append("\t...\n");
-			}
-			this.appendLine(buf, source.getLine(endLine), 0, position.endColumn(), colors, colorString);
 		}
 	}
 
-	private void appendLine(StringBuilder buf, String line, int startColumn, int endColumn,
-		                       boolean colors, String colorString)
+	private void appendLine(StringBuilder buf, String line, int startColumn, int endColumn, boolean colors,
+		                       String colorString)
 	{
-		buf.append(line);
-		buf.append('\n');
 		final int limit = Math.min(startColumn, line.length());
 
 		// Append Spaces
@@ -189,7 +163,7 @@ public abstract class Marker implements Comparable<Marker>
 			}
 			for (int i = startColumn; i < endColumn; i++)
 			{
-				buf.append('¯');
+				buf.append('^');
 			}
 			if (colors)
 			{
