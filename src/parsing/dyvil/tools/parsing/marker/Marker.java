@@ -166,9 +166,10 @@ public abstract class Marker implements Comparable<Marker>
 	{
 		buf.append(line);
 		buf.append('\n');
+		final int limit = Math.min(startColumn, line.length());
 
 		// Append Spaces
-		for (int i = 0; i < startColumn; i++)
+		for (int i = 0; i < limit; i++)
 		{
 			if (line.charAt(i) == '\t')
 			{

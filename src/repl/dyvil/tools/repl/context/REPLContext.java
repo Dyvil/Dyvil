@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.operator.IOperator;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
@@ -27,10 +28,7 @@ import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.modifiers.BaseModifiers;
-import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
-import dyvil.tools.compiler.ast.expression.operator.IOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
@@ -155,7 +153,6 @@ public class REPLContext extends AbstractHeader
 	private Class<?> compileAndLoad()
 	{
 		final REPLClassLoader classLoader = this.repl.getClassLoader();
-		final List<Class<?>> classes = new ArrayList<>(this.innerClassList.size() + 1);
 
 		// Compile all inner class
 		for (ICompilable innerClass : this.innerClassList)
@@ -202,7 +199,19 @@ public class REPLContext extends AbstractHeader
 			break;
 		}
 
-		this.repl.getOutput().println(member);
+		this.printColored(member.toString());
+	}
+
+	private void printColored(String colorize)
+	{
+		if (this.repl.getCompiler().config.useAnsiColors())
+		{
+			this.repl.getOutput().println(Colorizer.colorize(colorize, this));
+		}
+		else
+		{
+			this.repl.getOutput().println(colorize);
+		}
 	}
 
 	private void processMethod(IMethod method)
@@ -260,12 +269,8 @@ public class REPLContext extends AbstractHeader
 	@Override
 	public void setValue(IValue value)
 	{
-		final ModifierList modifierList = new ModifierList();
-		modifierList.addModifier(BaseModifiers.FINAL);
-
 		final Name name = Name.fromRaw("res" + this.resultIndex++);
-		final REPLVariable field = new REPLVariable(this, value.getPosition(), name, Types.UNKNOWN, modifierList, null);
-		field.setValue(value);
+		final REPLVariable field = new REPLVariable(this, name, value);
 
 		this.initMember(field);
 		this.currentClass.getBody().addDataMember(field);
@@ -276,7 +281,7 @@ public class REPLContext extends AbstractHeader
 	public void addOperator(IOperator operator)
 	{
 		super.addOperator(operator);
-		this.repl.getOutput().println("Defined " + operator);
+		this.printColored(operator.toString());
 	}
 
 	@Override
@@ -291,7 +296,7 @@ public class REPLContext extends AbstractHeader
 		}
 
 		super.addImport(component);
-		this.repl.getOutput().println("Imported " + component.getImport());
+		this.printColored(component.toString());
 	}
 
 	@Override
@@ -370,6 +375,23 @@ public class REPLContext extends AbstractHeader
 	}
 
 	// region IContext overrides
+
+	public boolean isMember(Name name)
+	{
+		if (this.resolveField(name) != null || this.resolveClass(name) != null || this.properties.get(name) != null)
+		{
+			return true;
+		}
+
+		for (IMethod method : this.methods)
+		{
+			if (method.getName() == name)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 
 	@Override
 	public DyvilCompiler getCompilationContext()

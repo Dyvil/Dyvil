@@ -651,15 +651,20 @@ public class Field extends Member implements IField
 		super.toString(indent, buffer);
 		IDataMember.toString(indent, buffer, this, "field.type_ascription");
 
-		if (this.value != null)
-		{
-			Formatting.appendSeparator(buffer, "field.assignment", '=');
-			this.value.toString(indent, buffer);
-		}
+		this.valueToString(indent, buffer);
 
 		if (this.property != null)
 		{
 			Property.formatBody(this.property, indent, buffer);
+		}
+	}
+
+	protected void valueToString(@NonNull String indent, @NonNull StringBuilder buffer)
+	{
+		if (this.value != null)
+		{
+			Formatting.appendSeparator(buffer, "field.assignment", '=');
+			this.value.toString(indent, buffer);
 		}
 	}
 }
