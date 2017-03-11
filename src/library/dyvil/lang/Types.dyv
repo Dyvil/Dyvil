@@ -3,7 +3,7 @@ package dyvil.lang
 import const dyvil.reflect.Opcodes._
 import const dyvil.annotation.Reified.Type._
 
-public abstract class ClassExtensions
+public abstract class Types
 {
 	private init()
 	{

@@ -1,0 +1,57 @@
+package dyvil.lang
+
+using   dyvil.reflect.Opcodes._
+import  dyvil.collection.range.specialized.FloatRange
+
+public abstract class Floats
+{
+	private init() {}
+
+	// Float Operators
+
+	@Intrinsic([ LOAD_0 ])
+	prefix func +(rhs: float) -> float = rhs
+
+	@Intrinsic([ LOAD_0, FNEG ])
+	prefix func -(rhs: float) -> float = -rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, FCMPEQ ])
+	infix func ==(lhs: float, rhs: float) -> boolean = lhs == rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, FCMPNE ])
+	infix func !=(lhs: float, rhs: float) -> boolean = lhs != rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, FCMPLT ])
+	infix func <(lhs: float, rhs: float) -> boolean = lhs < rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, FCMPLE ])
+	infix func <=(lhs: float, rhs: float) -> boolean = lhs <= rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, FCMPGT ])
+	infix func >(lhs: float, rhs: float) -> boolean = lhs > rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, FCMPGE ])
+	infix func >=(lhs: float, rhs: float) -> boolean = lhs >= rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, FADD ])
+	infix func +(lhs: float, rhs: float) -> float = lhs + rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, FSUB ])
+	infix func -(lhs: float, rhs: float) -> float = lhs - rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, FMUL ])
+	infix func *(lhs: float, rhs: float) -> float = lhs * rhs
+
+	@Intrinsic([ LOAD_0, F2D, LOAD_1, F2D, INVOKESTATIC, 0, 1, 2, D2F], strings: [ "java/lang/Math", "pow", "(DD)D" ])
+	infix func **(lhs: float, rhs: float) -> double = Math.pow(lhs, rhs)
+
+	@Intrinsic([ LOAD_0, LOAD_1, FDIV ])
+	infix func /(lhs: float, rhs: float) -> float = lhs / rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, FREM ])
+	infix func %(lhs: float, rhs: float) -> float = lhs % rhs
+
+	infix func ..(lhs: float, rhs: float) -> FloatRange = FloatRange(lhs, to: rhs)
+
+	infix func ..<(lhs: float, rhs: float) -> FloatRange = FloatRange(lhs, toExclusive: rhs)
+}

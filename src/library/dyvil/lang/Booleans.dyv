@@ -2,7 +2,7 @@ package dyvil.lang
 
 using   dyvil.reflect.Opcodes._
 
-public abstract class BooleanExtensions
+public abstract class Booleans
 {
 	private init() {}
 

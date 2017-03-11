@@ -2,7 +2,7 @@ package dyvil.lang
 
 import const dyvil.reflect.Opcodes._
 
-public final class ObjectExtensions
+public final class Objects
 {
 	private init() { }
 

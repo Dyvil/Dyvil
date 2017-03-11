@@ -4,7 +4,7 @@ using dyvil.reflect.Opcodes._
 using dyvil.reflect.ReflectUtils._
 import dyvil.string.StringUtils
 
-public final class StringExtensions
+public final class Strings
 {
 	private static final long STRING_VALUE_OFFSET = UNSAFE.objectFieldOffset(class<String>.getDeclaredField("value"))
 
