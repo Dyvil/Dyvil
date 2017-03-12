@@ -6,7 +6,6 @@ import dyvil.tools.gensrc.ast.directive.DirectiveList;
 import dyvil.tools.gensrc.ast.scope.TemplateScope;
 import dyvil.tools.gensrc.lang.I18n;
 import dyvil.tools.gensrc.parser.Parser;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.source.FileSource;
 
@@ -106,10 +105,7 @@ public class Template
 		builder.append('\n').append('\n');
 
 		final boolean colors = gensrc.useAnsiColors();
-		for (Marker marker : markers)
-		{
-			marker.log(this.sourceFile, builder, colors);
-		}
+		markers.log(this.sourceFile, builder, colors);
 		gensrc.getOutput().println(builder);
 	}
 
