@@ -148,7 +148,7 @@ public class CombiningContext implements IContext
 	{
 		this.inner.getImplicitMatches(list, value, targetType);
 
-		if (!list.hasCandidate())
+		if (targetType == null || !list.hasCandidate())
 		{
 			this.outer.getImplicitMatches(list, value, targetType);
 		}

@@ -147,7 +147,7 @@ public interface IContext extends IMemberContext, IImportContext
 
 		// First, search the given type for conversion methods
 		value.getType().getImplicitMatches(matches, value, targetType);
-		if (!matches.isEmpty())
+		if (matches.hasCandidate() && targetType != null)
 		{
 			return matches;
 		}
