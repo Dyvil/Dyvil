@@ -125,14 +125,17 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 	}
 
 	@Override
-	public boolean setOptionalElseLabel(Label label)
+	public boolean setOptionalElseLabel(Label label, boolean top)
 	{
-		if (this.receiver == null || !this.receiver.setOptionalElseLabel(label))
+		if (this.receiver == null || !this.receiver.setOptionalElseLabel(label, false))
 		{
 			return false;
 		}
 
-		this.type = NullableType.apply(this.getType());
+		if (!top)
+		{
+			this.type = NullableType.apply(this.getType());
+		}
 		return true;
 	}
 

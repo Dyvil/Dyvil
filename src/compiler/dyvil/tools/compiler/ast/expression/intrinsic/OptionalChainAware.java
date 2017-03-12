@@ -12,5 +12,5 @@ public interface OptionalChainAware extends IValue
 	Label getOptionalElseLabel();
 
 	@Override
-	boolean setOptionalElseLabel(Label label);
+	boolean setOptionalElseLabel(Label label, boolean top);
 }

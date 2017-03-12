@@ -6,6 +6,7 @@ import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.constant.NullValue;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -19,8 +20,8 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class NullCoalescingOperator implements IValue
 {
-	protected IValue rhs;
 	protected IValue lhs;
+	protected IValue rhs;
 
 	// Metadata
 	protected ICodePosition position;
@@ -77,6 +78,28 @@ public class NullCoalescingOperator implements IValue
 	}
 
 	@Override
+	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
+	{
+		final IType lhsType = this.lhs.getType().isPrimitive() ? type : NullableType.apply(type);
+		final IValue lhs = this.lhs.withType(lhsType, typeContext, markers, context);
+		if (lhs == null)
+		{
+			return null;
+		}
+
+		final IValue rhs = this.rhs.withType(type, typeContext, markers, context);
+		if (rhs == null)
+		{
+			return null;
+		}
+
+		this.lhs = lhs;
+		this.rhs = rhs;
+		this.type = null;
+		return this;
+	}
+
+	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		this.lhs.resolveTypes(markers, context);
@@ -102,7 +125,7 @@ public class NullCoalescingOperator implements IValue
 
 	private void applyLabel()
 	{
-		this.lhs.setOptionalElseLabel(this.elseLabel);
+		this.lhs.setOptionalElseLabel(this.elseLabel, true);
 	}
 
 	@Override
@@ -143,12 +166,9 @@ public class NullCoalescingOperator implements IValue
 	}
 
 	@Override
-	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
+	public void writeExpression(MethodWriter writer, IType atype) throws BytecodeException
 	{
-		if (type == null)
-		{
-			type = this.getType();
-		}
+		final IType type = this.getType();
 
 		final Object frameType = type.getFrameType();
 		final int varIndex = writer.localCount();
@@ -175,5 +195,10 @@ public class NullCoalescingOperator implements IValue
 		writer.visitTargetLabel(endLabel);
 
 		writer.resetLocals(varIndex);
+
+		if (atype != null)
+		{
+			type.writeCast(writer, atype, this.getLineNumber());
+		}
 	}
 }

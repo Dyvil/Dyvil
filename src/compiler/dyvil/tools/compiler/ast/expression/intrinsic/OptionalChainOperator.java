@@ -50,9 +50,9 @@ public class OptionalChainOperator implements IValue, OptionalChainAware
 	}
 
 	@Override
-	public boolean setOptionalElseLabel(Label label)
+	public boolean setOptionalElseLabel(Label label, boolean top)
 	{
-		this.receiver.setOptionalElseLabel(label);
+		this.receiver.setOptionalElseLabel(label, false);
 		this.elseLabel = label;
 		return true;
 	}

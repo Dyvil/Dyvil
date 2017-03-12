@@ -270,60 +270,37 @@ public abstract class TypeParameter implements ITypeParameter
 	@Override
 	public boolean isSameType(IType type)
 	{
-		if (Types.isSameType(type, this.getUpperBound()))
-		{
-			return true;
-		}
-
-		final IType lowerBound = this.getLowerBound();
-		return lowerBound == null || Types.isSameType(lowerBound, type);
+		return Types.isSameType(type, this.getSafeUpperBound());
 	}
 
 	@Override
 	public boolean isSameClass(IType type)
 	{
-		if (Types.isSameClass(type, this.getUpperBound()))
-		{
-			return true;
-		}
-
-		final IType lowerBound = this.getLowerBound();
-		return lowerBound == null || Types.isSameClass(lowerBound, type);
+		return Types.isSameClass(type, this.getSafeUpperBound());
 	}
 
 	@Override
 	public boolean isSuperTypeOf(IType subType)
 	{
-		if (!isSuperType(this.getSafeUpperBound(), subType))
-		{
-			return false;
-		}
-		final IType lowerBound = this.getLowerBound();
-		return lowerBound == null || isSuperType(subType, lowerBound);
+		return isSuperType(this.getSafeUpperBound(), subType);
 	}
 
 	@Override
 	public boolean isSuperClassOf(IType subType)
 	{
-		if (!isSuperClass(this.getSafeUpperBound(), subType))
-		{
-			return false;
-		}
-
-		final IType lowerBound = this.getLowerBound();
-		return lowerBound == null || isSuperClass(subType, lowerBound);
+		return isSuperClass(this.getSafeUpperBound(), subType);
 	}
 
 	@Override
 	public boolean isSubTypeOf(IType superType)
 	{
-		return isSuperType(superType, this.getUpperBound());
+		return isSuperType(superType, this.getSafeUpperBound());
 	}
 
 	@Override
 	public boolean isSubClassOf(IType superType)
 	{
-		return isSuperClass(superType, this.getUpperBound());
+		return isSuperClass(superType, this.getSafeUpperBound());
 	}
 
 	@Override

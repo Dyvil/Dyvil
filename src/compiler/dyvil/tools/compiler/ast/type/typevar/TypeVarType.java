@@ -121,7 +121,7 @@ public class TypeVarType implements IRawType
 	@Override
 	public boolean isSubTypeOf(IType superType)
 	{
-		return this.typeParameter.isSubTypeOf(superType);
+		return superType.isSuperTypeOf(this) || this.typeParameter.isSubTypeOf(superType);
 	}
 
 	@Override

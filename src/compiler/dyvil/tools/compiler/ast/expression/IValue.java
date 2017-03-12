@@ -245,7 +245,7 @@ public interface IValue extends IASTNode, ITyped
 		return null;
 	}
 
-	default boolean setOptionalElseLabel(Label label)
+	default boolean setOptionalElseLabel(Label label, boolean top)
 	{
 		return false;
 	}
