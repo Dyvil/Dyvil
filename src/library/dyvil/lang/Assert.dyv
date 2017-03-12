@@ -1,18 +1,21 @@
 package dyvil.lang
 
-public class Assert
+final class Assert
 {
-	public static void assert(boolean condition)
+	private init() {}
+
+	static func assert(condition: boolean) -> void
 	{
 		if (!condition) throw new AssertionError()
 	}
 
-	public static void assert(boolean condition, -> any message)
+	static func assert(condition: boolean, message: -> any) -> void
 	{
 		if (!condition) throw new AssertionError(message())
 	}
 
-	public static void assert((boolean, -> any) tuple)
+	@Deprecated(replacements: [ "assert(boolean, -> any) -> void" ])
+	static func assert(tuple: (boolean, -> any)) -> void
 	{
 		if (!tuple._1) throw new AssertionError(tuple._2()())
 	}

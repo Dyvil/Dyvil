@@ -5,7 +5,7 @@ package dyvil.lang
 
 using   dyvil.reflect.Opcodes._
 
-public abstract class Primitives
+abstract class Primitives
 {
 	private const VOID_INSTANCE: Void = dyvil.reflect.ReflectUtils.UNSAFE.allocateInstance(class Void) as Void
 
@@ -17,10 +17,10 @@ public abstract class Primitives
 
 	// Void Methods
 
-	public static Void Void() = VOID_INSTANCE
+	static func Void() -> Void = VOID_INSTANCE
 
 	@Intrinsic([ /* NOOP */ ])
-	public static void toVoid(Void? value) {}
+	implicit static func toVoid(value: Void?) -> void {}
 
 #import Base.dgs
 #foreach PRIMITIVE_SPECS
@@ -28,18 +28,14 @@ public abstract class Primitives
 	// TYPE_NAME Conversions
 
 	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/WRAPPER", "valueOf", "(DESC_CHAR)Ljava/lang/WRAPPER;" ])
-	public static WRAPPER TYPE_NAME(PRIMITIVE value) = TYPE_NAME.valueOf(value)
+	static func TYPE_NAME(value: PRIMITIVE) -> WRAPPER = TYPE_NAME.valueOf(value)
 
 	@Intrinsic([ LOAD_0, INVOKEVIRTUAL, 0, 1, 2 ]
 	  strings: [ "java/lang/WRAPPER", "PRIMITIVE##Value", "()DESC_CHAR" ])
-	public postfix PRIMITIVE to##TYPE_NAME(WRAPPER value) = value.PRIMITIVE##Value
+	implicit postfix func to##TYPE_NAME(wrapper: WRAPPER) -> PRIMITIVE = wrapper.PRIMITIVE##Value
 
 	@BytecodeName("nullableTo##TYPE_NAME")
-	public postfix PRIMITIVE to##TYPE_NAME(WRAPPER? optional)
-	{
-		if (optional == null) DEFAULT_VALUE
-		else optional!!.PRIMITIVE##Value
-	}
+	postfix func to##TYPE_NAME(optional: WRAPPER?) -> PRIMITIVE = optional?.PRIMITIVE##Value ?? DEFAULT_VALUE
 #endfor
 
 	// --- equals Methods ---
@@ -47,43 +43,43 @@ public abstract class Primitives
 
 	// TYPE_NAME equals
 
-	public infix inline boolean equals(PRIMITIVE lhs, PRIMITIVE rhs) = lhs == rhs
+	infix inline func equals(lhs: PRIMITIVE, rhs: PRIMITIVE) -> boolean = lhs == rhs
 #endfor
 
-	public infix int compareTo(boolean b1, boolean b2) = if (b1 == b2) 0 else if (b1) 1 else -1
+	infix func compareTo(lhs: boolean, rhs: boolean) -> int = lhs == rhs ? 0 : lhs ? 1 : -1
 
 	// --- toString Methods ---
 
 	// Boolean toString
 
-	public postfix String toString(boolean value) = if (value) "true" else "false"
+	postfix func toString(value: boolean) -> String = value ? "true" : "false"
 
 	// Char toString
 
 	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/String", "valueOf", "(C)Ljava/lang/String;" ])
-	public infix String toString(char c) = String.valueOf(c)
+	infix func toString(value: char) -> String = String.valueOf(value)
 
 	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Integer", "toString", "(I)Ljava/lang/String;" ])
-	public infix String toDecimalString(char c) = c.toDecimalString
+	infix func toDecimalString(value: char) -> String = value.toDecimalString
 
 	// Int toString
 
 	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Integer", "toString", "(I)Ljava/lang/String;" ])
-	public infix String toString(int value) = value.toString
+	infix func toString(value: int) -> String = value.toString
 
 	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Integer", "toBinaryString", "(I)Ljava/lang/String;" ])
-	public infix String toBinaryString(int value) = value.toBinaryString
+	infix func toBinaryString(value: int) -> String = value.toBinaryString
 
 	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Integer", "toHexString", "(I)Ljava/lang/String;" ])
-	public infix String toHexString(int value) = value.toHexString
+	infix func toHexString(value: int) -> String = value.toHexString
 
 	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Integer", "toOctalString", "(I)Ljava/lang/String;" ])
-	public infix String toOctalString(int value) = value.toOctalString
+	infix func toOctalString(value: int) -> String = value.toOctalString
 
-	public infix String toString(int value, int radix) =
+	infix func toString(value: int, radix: int) -> String =
 		radix match {
-			case 2: return value.toBinaryString
-			case 8: return value.toOctalString
+			case  2: return value.toBinaryString
+			case  8: return value.toOctalString
 			case 10: return value.toString
 			case 16: return value.toHexString
 			case _ : return java.lang.Integer.toString(value, radix);
@@ -92,65 +88,65 @@ public abstract class Primitives
 	// Long toString
 
 	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Long", "toString", "(J)Ljava/lang/String;" ])
-	public infix String toString(long value) = value.toString
+	infix func toString(value: long) -> String = value.toString
 
 	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Long", "toHexString", "(J)Ljava/lang/String;" ])
-	public infix String toHexString(long value) = value.toHexString
+	infix func toHexString(value: long) -> String = value.toHexString
 
 	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Long", "toBinaryString", "(J)Ljava/lang/String;" ])
-	public infix String toBinaryString(long value) = value.toBinaryString
+	infix func toBinaryString(value: long) -> String = value.toBinaryString
 
 	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Long", "toOctalString", "(J)Ljava/lang/String;" ])
-	public infix String toOctalString(long value) = value.toOctalString
+	infix func toOctalString(value: long) -> String = value.toOctalString
 
-	public infix String toString(long value, int radix) =
+	infix func toString(value: long, radix: int) -> String =
 		radix match {
-			case 2: return value.toBinaryString
-			case 8: return value.toOctalString
+			case  2: return value.toBinaryString
+			case  8: return value.toOctalString
 			case 10: return value.toString
 			case 16: return value.toHexString
-			case _ : return java.lang.Long.toString(value, radix);
+			case _ : return java.lang.Long.toString(value, radix)´
 		}
 
 	// Float toString
 
 	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Float", "toString", "(F)Ljava/lang/String;" ])
-	public postfix String toString(float value) = value.toString
+	postfix func toString(value: float) -> String = value.toString
 
 	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Float", "toHexString", "(F)Ljava/lang/String;" ])
-	public postfix String toHexString(float value) = value.toHexString
+	postfix func toHexString(value: float) -> String = value.toHexString
 
 	// Double toString
 
 	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Double", "toString", "(D)Ljava/lang/String;" ])
-	public postfix String toString(double value) = value.toString
+	postfix func toString(value: double) -> String = value.toString
 
 	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Double", "toHexString", "(D)Ljava/lang/String;" ])
-	public postfix String toHexString(double value) = value.toHexString
+	postfix func toHexString(value: double) -> String = value.toHexString
 
 	// --- hashCode Methods ---
 
 	// Boolean hashCode
 
-	public postfix int hashCode(boolean value) = if (value) 1231 else 1237
+	postfix func hashCode(value: boolean) -> int = value ? 1231 : 1237
 
 	// Int hashCode
 
 	@Intrinsic([ LOAD_0 ])
-	public postfix int hashCode(int value) = value
+	postfix func hashCode(value: int) -> int = value
 
 	// Long hashCode
 
 	@Intrinsic([ LOAD_0, DUP2, BIPUSH, 32, LUSHR, LXOR, L2I ])
-	public postfix int hashCode(long value) = value.hashCode
+	postfix func hashCode(value: long) -> int = value.hashCode
 
 	// Float hashCode
 
 	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Float", "hashCode", "(F)I" ])
-	public postfix int hashCode(float value) = value.hashCode
+	postfix func hashCode(value: float) -> int = value.hashCode
 
 	// Double hashCode
 
 	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Double", "hashCode", "(D)I" ])
-	public postfix int hashCode(double value) = value.hashCode
+	postfix func hashCode(value: double) -> int = value.hashCode
 }

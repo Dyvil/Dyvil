@@ -6,7 +6,7 @@ import dyvil.string.StringUtils
 
 public final class Strings
 {
-	private static final long STRING_VALUE_OFFSET = UNSAFE.objectFieldOffset(class<String>.getDeclaredField("value"))
+	private const STRING_VALUE_OFFSET: long = UNSAFE.objectFieldOffset(class<String>.getDeclaredField("value"))
 
 	private init() {}
 
@@ -23,47 +23,41 @@ public final class Strings
 
 	// Makeshift char casts
 
-	static inline func char(char c) -> char = c
+	static inline func char(c: char) -> char = c
 
 	/**
 	 * This method only exists to provide the user with a useful warning message when trying to pass an invalid char
 	 * literal to the `char` method. An invalid char literal would be a double-quoted String or a single-quoted String
-	 * with zero or more than one character to the `char` method.
+	 * with zero or more than one characters.
 	 */
 	@UsageInfo(value: "Multi-character Literal or String passed to 'char' method", level: dyvil.util.MarkerLevel.WARNING)
-	static inline func char(String c) -> char = c.charAt 0
+	static inline func char(c: String) -> char = c.charAt 0
 
 	// Unsafe access
 
-	static func String([final char] fromShared) -> String
-	{
-		return JAVA_LANG_ACCESS.newStringUnsafe(fromShared)
-	}
+	prefix func String(fromShared: [final char]) -> String = JAVA_LANG_ACCESS.newStringUnsafe(fromShared)
 
-	static postfix func getCharArray(String s) -> [final char]
-	{
-		return UNSAFE.getObject(s, STRING_VALUE_OFFSET) as [final char]
-	}
+	postfix func getCharArray(s: String) -> [final char] = UNSAFE.getObject(s, STRING_VALUE_OFFSET) as [final char]
 
 	// Subscripts
 
-	infix inline func subscript(String s, int index) -> char = s.charAt index
+	inline infix func subscript(s: String, index: int) -> char = s.charAt index
 
-	infix inline func subscript(String s, Range<int> range) -> String = s.substring(range.first, range.last)
+	infix func subscript(s: String, range: Range<int>) -> String = s.substring(range.first, range.last + 1)
 
 	// Repetition (*) Operator
 
-	infix inline func *(int n, String s) -> String = StringUtils.repeated(s, n)
+	infix inline func *(lhs: int, rhs: String) -> String = StringUtils.repeated(rhs, lhs)
 
-	infix inline func *(String s, int n) -> String = StringUtils.repeated(s, n)
+	infix inline func *(lhs: String, rhs: int) -> String = StringUtils.repeated(lhs, rhs)
 
 	// Misc. additional extensions
 
-	infix inline func contains(String s, char character) -> boolean = StringUtils.contains(s, character)
+	infix inline func contains(s: String, character: char) -> boolean = s.indexOf(character) >= 0
 
-	infix inline func split(String s, char delimiter) -> [String] = StringUtils.split(s, delimiter) as [String]
+	infix inline func split(s: String, delimiter: char) -> [String] = StringUtils.split(s, delimiter) as [String]
 
-	infix inline func format(String s, Object! ... args) -> String = String.format(s, args...)
+	infix inline func format(s: String, args: Object! ...) -> String = String.format(s, args...)
 
-	extension func toString(Object o, StringBuilder builder) -> void = builder.append o
+	extension func toString(o: Object, builder: StringBuilder) -> void = builder.append o
 }

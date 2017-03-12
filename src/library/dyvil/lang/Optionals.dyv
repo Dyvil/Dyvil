@@ -2,7 +2,7 @@ package dyvil.lang
 
 import const dyvil.reflect.Opcodes._
 
-public abstract class Optionals
+final class Optionals
 {
 	private init() {} // no instances
 
@@ -71,5 +71,5 @@ public abstract class Optionals
 
 	// Hash Code
 
-	postfix func hashCode<T>(optional: T?) -> int = optional?.hashCode ?? 0
+	postfix func hashCode<T: Object>(optional: T?) -> int = optional?.hashCode ?? 0
 }

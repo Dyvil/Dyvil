@@ -42,7 +42,7 @@ public abstract class Floats
 	@Intrinsic([ LOAD_0, LOAD_1, FMUL ])
 	infix func *(lhs: float, rhs: float) -> float = lhs * rhs
 
-	@Intrinsic([ LOAD_0, F2D, LOAD_1, F2D, INVOKESTATIC, 0, 1, 2, D2F], strings: [ "java/lang/Math", "pow", "(DD)D" ])
+	@Intrinsic([ LOAD_0, F2D, LOAD_1, F2D, INVOKESTATIC, 0, 1, 2 ], strings: [ "java/lang/Math", "pow", "(DD)D" ])
 	infix func **(lhs: float, rhs: float) -> double = Math.pow(lhs, rhs)
 
 	@Intrinsic([ LOAD_0, LOAD_1, FDIV ])

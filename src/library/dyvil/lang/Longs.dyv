@@ -45,7 +45,7 @@ public abstract class Longs
 	@Intrinsic([ LOAD_0, LOAD_1, LMUL ])
 	infix func *(lhs: long, rhs: long) -> long = lhs * rhs
 
-	infix func **(lhs: long, int rhs) -> long = dyvil.math.PowImpl.pow(lhs, rhs)
+	infix func **(lhs: long, rhs: int) -> long = dyvil.math.PowImpl.pow(lhs, rhs)
 
 	@Intrinsic([ LOAD_0, L2D, LOAD_1, L2D, DDIV ])
 	infix func /(lhs: long, rhs: long) -> double = lhs / rhs
@@ -65,14 +65,33 @@ public abstract class Longs
 	@Intrinsic([ LOAD_0, LOAD_1, LXOR ])
 	infix func ^(lhs: long, rhs: long) -> long = lhs ^ rhs
 
+	// Shift Operators
+
+	@Intrinsic([ LOAD_0, LOAD_1, LSHL ])
+	infix func <<(lhs: long, rhs: int) -> long = lhs << rhs
+
+	@Deprecated(description: "Shift Operators with a right-hand operand of type 'long' are deprecated."
+	            replacements: [ "<<(long, int) -> long"])
 	@Intrinsic([ LOAD_0, LOAD_1, L2I, LSHL ])
 	infix func <<(lhs: long, rhs: long) -> long = lhs << rhs
 
+	@Intrinsic([ LOAD_0, LOAD_1, LSHR ])
+	infix func >>(lhs: long, rhs: int) -> long = lhs >> rhs
+
+	@Deprecated(description: "Shift Operators with a right-hand operand of type 'long' are deprecated."
+	            replacements: [ ">>(long, int) -> long"])
 	@Intrinsic([ LOAD_0, LOAD_1, L2I, LSHR ])
 	infix func >>(lhs: long, rhs: long) -> long = lhs >> rhs
 
+	@Intrinsic([ LOAD_0, LOAD_1, LUSHR ])
+	infix func >>>(lhs: long, rhs: int) -> long = lhs >>> rhs
+
+	@Deprecated(description: "Shift Operators with a right-hand operand of type 'long' are deprecated."
+	            replacements: [ ">>>(long, int) -> long"])
 	@Intrinsic([ LOAD_0, LOAD_1, L2I, LUSHR ])
 	infix func >>>(lhs: long, rhs: long) -> long = lhs >>> rhs
+
+	// Range Operators
 
 	infix func ..(lhs: long, rhs: long) -> LongRange = LongRange(lhs, to: rhs)
 

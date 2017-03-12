@@ -2,27 +2,33 @@ package dyvil.lang
 
 import const dyvil.reflect.Opcodes._
 
-public final class Objects
+final class Objects
 {
-	private init() { }
+	private init() {}
 
 	// Class and Type conversions and utilities
 
 	@Intrinsic([ LOAD_0 ])
-	public static T cast<T>(any value) = value as T
+	static func cast<T>(value: any) -> T = value as T
 
 	@Intrinsic([ LOAD_0 ])
-	public static T convert<T>(T value) = value
+	static func convert<T>(value: T) -> T= value
 
 	// Useful globals
 
-	public static inline R run<R>(-> R f) = f()
+	static inline func run<R>(f: -> R) -> R = f()
 
-	public static infix inline R run<T, R>(T self, T.() -> R f) = f(self)
+	infix inline func run<T, R>(self: T, f: T.() -> R) = f(self)
 
-	public static infix inline T use<T>(T self, T.() -> void f) { f self; self }
+	infix inline func use<T>(self: T, f: T.() -> void) -> T { f self; self }
 
-	public static inline R with<T, R>(T receiver, T -> R f) = f(receiver)
+	static inline func with<T, R>(receiver: T, f: T -> R) -> R = f(receiver)
+
+	// Errors and Stubs
+
+	static inline func error(message: String) -> none = throw new Error(message)
+
+	static inline func notImplemented() -> none = throw new UnsupportedOperationException("Not Implemented!")
 
 	// Object Extensions
 
@@ -30,75 +36,75 @@ public final class Objects
 
 	@Intrinsic([ LOAD_0, LOAD_1, INVOKEVIRTUAL, 0, 1, 2 ]
 	  strings: [ "java/lang/Object", "equals", "(Ljava/lang/Object;)Z" ])
-	infix func ==(Object lhs, Object! rhs) -> boolean = lhs.equals(rhs)
+	infix func ==(lhs: Object, rhs: Object!) -> boolean = lhs.equals(rhs)
 
 	@BytecodeName("equals")
-	infix func ==(Object! lhs, Object! rhs) -> boolean = lhs === rhs || lhs != null && lhs!!.equals(rhs)
+	infix func ==(lhs: Object!, rhs: Object!) -> boolean = lhs === rhs || lhs != null && lhs!!.equals(rhs)
 
 	@OverloadPriority
 	// @Deprecated(replacements: [ '===(Object!, null) -> boolean' ])
 	@Intrinsic([ LOAD_0, IS_NULL ])
-	infix func ==(Object! lhs, null rhs) -> boolean = lhs == null
+	infix func ==(lhs: Object!, rhs: null) -> boolean = lhs == null
 
 	@OverloadPriority
 	// @Deprecated(replacements: [ '===(null, Object!) -> boolean' ])
 	@Intrinsic([ LOAD_1, IS_NULL ])
-	infix func ==(null lhs, Object! rhs) -> boolean = rhs == null
+	infix func ==(lhs: null, rhs: Object!) -> boolean = rhs == null
 
 	// Reference Equality
 
 	@Intrinsic([ LOAD_0, LOAD_1, ACMPEQ ])
-	infix func ===(Object! lhs, Object! rhs) -> boolean = lhs === rhs
+	infix func ===(lhs: Object!, rhs: Object!) -> boolean = lhs === rhs
 
 	@OverloadPriority
 	@Intrinsic([ LOAD_0, IS_NULL ])
-	infix func ===(Object! lhs, null rhs) -> boolean = lhs === null
+	infix func ===(lhs: Object!, rhs: null) -> boolean = lhs === null
 
 	@OverloadPriority
 	@Intrinsic([ LOAD_1, IS_NULL ])
-	infix func ===(null lhs, Object! rhs) -> boolean = rhs === null
+	infix func ===(lhs: null, rhs: Object!) -> boolean = rhs === null
 
 	// Structural Inequality (!equals)
 
 	@Intrinsic([ LOAD_0, LOAD_1, INVOKEVIRTUAL, 0, 1, 2, BNOT ]
 	  strings: [ "java/lang/Object", "equals", "(Ljava/lang/Object;)Z" ])
-	infix func !=(Object lhs, Object! rhs) -> boolean = !lhs.equals(rhs)
+	infix func !=(lhs: Object, rhs: Object!) -> boolean = !lhs.equals(rhs)
 
 	@BytecodeName("notEquals")
 	@Intrinsic([ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2, BNOT ]
 	  strings: [ "dyvil/lang/ObjectExtensions", "$eq$eq", "(Ljava/lang/Object;Ljava/lang/Object;)Z" ])
-	infix func !=(Object! lhs, Object! rhs) -> boolean = lhs != rhs
+	infix func !=(lhs: Object!, rhs: Object!) -> boolean = lhs != rhs
 
 	@OverloadPriority
 	// @Deprecated(replacements: [ '!==(Object!, null) -> boolean' ])
 	@Intrinsic([ LOAD_0, IS_NONNULL ])
-	infix func !=(Object! lhs, null rhs) -> boolean = lhs != null
+	infix func !=(lhs: Object!, rhs: null) -> boolean = lhs != null
 
 	@OverloadPriority
 	// @Deprecated(replacements: [ '!==(null, Object!) -> boolean' ])
 	@Intrinsic([ LOAD_1, IS_NONNULL ])
-	infix func !=(null lhs, Object! rhs) -> boolean = rhs != null
+	infix func !=(lhs: null, rhs: Object!) -> boolean = rhs != null
 
 	// Reference Inequality
 
 	@Intrinsic([ LOAD_0, LOAD_1, ACMPNE ])
-	infix func !==(Object! lhs, Object! rhs) -> boolean = lhs !== rhs
+	infix func !==(lhs: Object!, rhs: Object!) -> boolean = lhs !== rhs
 
 	@OverloadPriority
 	@Intrinsic([ LOAD_0, IS_NONNULL ])
-	infix func !==(Object! lhs, null rhs) -> boolean = lhs !== null
+	infix func !==(lhs: Object!, rhs: null) -> boolean = lhs !== null
 
 	@OverloadPriority
 	@Intrinsic([ LOAD_1, IS_NONNULL ])
-	infix func !==(null lhs, Object! rhs) -> boolean = rhs !== null
+	infix func !==(lhs: null, rhs: Object!) -> boolean = rhs !== null
 
 	// Comparable
 
-	infix inline func < <T>(Comparable<T> lhs, T rhs) -> boolean = lhs.compareTo(rhs) < 0
+	infix inline func < <T>(lhs: Comparable<T>, rhs: T) -> boolean = lhs.compareTo(rhs) < 0
 
-	infix inline func <= <T>(Comparable<T> lhs, T rhs) -> boolean = lhs.compareTo(rhs) <= 0
+	infix inline func <= <T>(lhs: Comparable<T>, rhs: T) -> boolean = lhs.compareTo(rhs) <= 0
 
-	infix inline func > <T>(Comparable<T> lhs, T rhs) -> boolean = lhs.compareTo(rhs) > 0
+	infix inline func > <T>(lhs: Comparable<T>, rhs: T) -> boolean = lhs.compareTo(rhs) > 0
 
-	infix inline func >= <T>(Comparable<T> lhs, T rhs) -> boolean = lhs.compareTo(rhs) >= 0
+	infix inline func >= <T>(lhs: Comparable<T>, rhs: T) -> boolean = lhs.compareTo(rhs) >= 0
 }

@@ -1,30 +1,26 @@
 package dyvil.lang
 
 import const dyvil.reflect.Opcodes._
-import const dyvil.annotation.Reified.Type._
 
-public abstract class Types
+final class Types
 {
-	private init()
-	{
-		// no instances
-	}
+	private init() {}
 
 	// Value to Type / Class Conversions
 
-	postfix func staticClass<@Reified(ANY_CLASS) type T: Object>(value: T) -> Class<T> = class T
+	postfix func staticClass<@Reified(.ANY_CLASS) type T: Object>(value: T) -> Class<T> = class T
 
-	postfix func staticType<@Reified(TYPE) type T: Object>(value: T) -> Type<T> = type T
+	postfix func staticType<@Reified(.TYPE) type T: Object>(value: T) -> Type<T> = type T
 
-	@Intrinsic([ LOAD_0, INVOKEVIRTUAL, 0, 1, 2 ]
-	  strings: [ "java/lang/Object", "getClass", "()Ljava/lang/Class;" ])
+	@Intrinsic([ LOAD_0, INVOKEVIRTUAL, 0, 1, 2 ], strings: [ "java/lang/Object", "getClass", "()Ljava/lang/Class;" ])
 	postfix func dynamicClass<type T: Object>(value: T) -> Class<+T> = value.getClass as Class<+T>
 
 	// Class Extensions
 
-	static func arrayType<@Reified(OBJECT_CLASS) type T: any>() -> Class<[T]> = arrayType<T>(class T)
-
 	@BytecodeName("arrayTypeOf")
+	static func arrayType<@Reified(.ANY_CLASS) type T: any>() -> Class<[T]> = class<[T]>
+
+	@OverloadPriority
 	postfix func arrayType<type T: any>(componentType: Class<T>) -> Class<_>
 	{
 		let builder = new StringBuilder().append '['
@@ -43,5 +39,12 @@ public abstract class Types
 		}
 
 		return Class.forName(builder.toString, false, componentType.getClassLoader)
+	}
+
+	@BytecodeName("objectArrayType")
+	postfix func arrayType<type T: Object>(componentType: Class<T>) -> Class<[T]>
+	{
+		let className = componentType.isArray ? "[\(componentType.getName)" : "[L\(componentType.getName);"
+		return Class.forName(className, false, componentType.getClassLoader)
 	}
 }
