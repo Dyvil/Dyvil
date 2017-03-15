@@ -47,6 +47,15 @@ public class NamedGenericType extends GenericType implements IUnresolvedType
 		this.name = name;
 	}
 
+	public NamedGenericType(ICodePosition position, IType parent, Name name, IType[] typeArguments,
+		                       int typeArgumentCount)
+	{
+		super(typeArguments, typeArgumentCount);
+		this.parent = parent;
+		this.position = position;
+		this.name = name;
+	}
+
 	@Override
 	public int typeTag()
 	{

@@ -190,6 +190,25 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 	}
 
 	@Override
+	public IType getType(int index)
+	{
+		return this.parameterTypes[index];
+	}
+
+	@Override
+	public IType[] getTypes()
+	{
+		return this.parameterTypes;
+	}
+
+	@Override
+	public void setTypes(IType[] types, int size)
+	{
+		this.parameterTypes = types;
+		this.parameterCount = size;
+	}
+
+	@Override
 	public void setType(int index, IType type)
 	{
 		this.parameterTypes[index] = type;
@@ -206,12 +225,6 @@ public final class LambdaType implements IObjectType, ITyped, ITypeList
 			this.parameterTypes = temp;
 		}
 		this.parameterTypes[index] = type;
-	}
-
-	@Override
-	public IType getType(int index)
-	{
-		return this.parameterTypes[index];
 	}
 
 	// IType Overrides

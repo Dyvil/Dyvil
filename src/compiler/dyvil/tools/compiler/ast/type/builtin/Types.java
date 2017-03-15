@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -354,7 +355,7 @@ public final class Types
 		return null;
 	}
 
-	public static IType resolveTypeSafely(IType type, ITypeParameter typeVar)
+	public static IType resolveTypeSafely(ITypeContext type, ITypeParameter typeVar)
 	{
 		final IType resolved = type.resolveType(typeVar);
 		return resolved != null ? resolved : typeVar.getUpperBound();

@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.CodeParameter;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -17,7 +17,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public interface ICallableMember extends IMember, IValueConsumer, ITyped, IParametric, IExceptionList
+public interface ICallableMember extends IClassMember, IValueConsumer, ITyped, IParametric, IExceptionList
 {
 	IValue getValue();
 

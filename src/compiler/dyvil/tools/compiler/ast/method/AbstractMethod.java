@@ -638,7 +638,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return new GenericData(this, this.typeParameterCount);
 		}
 
-		data.setTypeParametric(this);
+		data.setMember(this);
 		data.setTypeCount(this.typeParameterCount);
 
 		return data;

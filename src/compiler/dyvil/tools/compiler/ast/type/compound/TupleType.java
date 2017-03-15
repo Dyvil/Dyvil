@@ -148,6 +148,25 @@ public final class TupleType implements IObjectType, ITypeList
 	}
 
 	@Override
+	public IType getType(int index)
+	{
+		return this.types[index];
+	}
+
+	@Override
+	public IType[] getTypes()
+	{
+		return this.types;
+	}
+
+	@Override
+	public void setTypes(IType[] types, int size)
+	{
+		this.types = types;
+		this.typeCount = size;
+	}
+
+	@Override
 	public void setType(int index, IType type)
 	{
 		this.types[index] = type;
@@ -164,12 +183,6 @@ public final class TupleType implements IObjectType, ITypeList
 			this.types = temp;
 		}
 		this.types[index] = type;
-	}
-
-	@Override
-	public IType getType(int index)
-	{
-		return this.types[index];
 	}
 
 	// IType Overrides

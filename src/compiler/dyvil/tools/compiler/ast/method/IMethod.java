@@ -6,8 +6,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.generic.ITypeParametric;
-import dyvil.tools.compiler.ast.member.IClassMember;
+import dyvil.tools.compiler.ast.generic.ITypeParametricMember;
 import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvil.tools.compiler.ast.parameter.IArguments;
@@ -18,7 +17,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public interface IMethod extends IClassMember, ICallableMember, ITypeParametric, IContext
+public interface IMethod extends ICallableMember, ITypeParametricMember, IContext
 {
 	@Override
 	default MemberKind getKind()
