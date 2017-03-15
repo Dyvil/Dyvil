@@ -1,19 +1,22 @@
 package dyvil.tools.compiler.ast.classes.metadata;
 
 import dyvil.reflect.Modifiers;
-import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.access.ConstructorCall;
+import dyvil.tools.compiler.ast.expression.access.FieldAccess;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.CodeMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -89,8 +92,24 @@ public final class CaseClassMetadata extends ClassMetadata
 			this.copyClassParameters(applyMethod);
 		}
 
-		applyMethod.resolveTypes(markers, context);
 		this.applyMethod = applyMethod;
+	}
+
+	@Override
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
+	{
+		if (this.applyMethod != null && (this.members & APPLY) == 0)
+		{
+			final ArgumentList arguments = new ArgumentList();
+			final IParameterList parameterList = this.applyMethod.getParameterList();
+
+			for (int i = 0, count = parameterList.size(); i < count; i++)
+			{
+				arguments.addValue(new FieldAccess(parameterList.get(i)));
+			}
+
+			this.applyMethod.setValue(new ConstructorCall(this.constructor, arguments));
+		}
 	}
 
 	@Override
@@ -116,25 +135,9 @@ public final class CaseClassMetadata extends ClassMetadata
 		super.write(writer);
 		MethodWriter mw;
 
-		if ((this.members & APPLY) == 0)
+		if (this.applyMethod != null && (this.members & APPLY) == 0)
 		{
-			mw = new MethodWriterImpl(writer, writer.visitMethod(this.applyMethod.getModifiers().toFlags(), "apply",
-			                                                     this.applyMethod.getDescriptor(),
-			                                                     this.applyMethod.getSignature(), null));
-			mw.visitCode();
-			mw.visitTypeInsn(Opcodes.NEW, this.theClass.getInternalName());
-			mw.visitInsn(Opcodes.DUP);
-
-			final IParameterList parameterList = this.theClass.getParameterList();
-			for (int i = 0, count = parameterList.size(); i < count; i++)
-			{
-				IParameter param = parameterList.get(i);
-				param.writeParameter(mw);
-				mw.visitVarInsn(param.getType().getLoadOpcode(), param.getLocalIndex());
-			}
-			this.constructor.writeInvoke(mw, 0);
-			mw.visitInsn(Opcodes.ARETURN);
-			mw.visitEnd(this.theClass.getThisType());
+			this.applyMethod.write(writer);
 		}
 
 		String internal = this.theClass.getInternalName();

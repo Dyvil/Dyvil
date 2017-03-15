@@ -114,7 +114,7 @@ public final class ClassAccess implements IValue
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		this.type.checkType(markers, context, TypePosition.CLASS);
+		this.type.checkType(markers, context, TypePosition.TYPE);
 
 		if (!this.type.isResolved())
 		{

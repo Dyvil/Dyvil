@@ -115,7 +115,11 @@ public class CodeMethod extends AbstractMethod
 	@Override
 	public IType getThisType()
 	{
-		return this.thisType;
+		if (this.thisType != null)
+		{
+			return this.thisType;
+		}
+		return this.thisType = this.enclosingClass.getThisType();
 	}
 
 	@Override

@@ -183,14 +183,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 		{
 			this.receiver.resolveTypes(markers, context);
 		}
-		if (this.arguments.isEmpty())
-		{
-			this.arguments = EmptyArguments.VISIBLE;
-		}
-		else
-		{
-			this.arguments.resolveTypes(markers, context);
-		}
+		this.arguments.resolveTypes(markers, context);
 
 		if (this.genericData != null)
 		{
