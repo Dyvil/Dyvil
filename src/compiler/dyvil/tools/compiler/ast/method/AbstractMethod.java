@@ -676,6 +676,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				return receiver;
 			}
 
+			updateReceiverType(receiver, genericData);
+
 			if ((mod & Modifiers.STATIC) != 0)
 			{
 				// static method or infix, extension method with explicit declaring class
@@ -710,12 +712,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			{
 				// normal instance method access
 
-				updateReceiverType(receiver, genericData);
 				receiver = TypeChecker.convertValue(receiver, this.getReceiverType(), genericData, markers, context,
 				                                    TypeChecker
 					                                    .markerSupplier("method.access.receiver_type", this.name));
-				updateReceiverType(receiver, genericData);
 			}
+			updateReceiverType(receiver, genericData);
 		}
 		else if (!this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{

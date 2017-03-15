@@ -5,9 +5,12 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
+import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.reference.PropertyReference;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.generic.NamedGenericType;
 import dyvil.tools.compiler.transform.ConstantFolder;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -121,16 +124,10 @@ public class MethodCall extends AbstractCall implements INamed
 		}
 		else if (candidates.isEmpty())
 		{
-			// Apply Method Resolution
-			final IValue fieldAccess = new FieldAccess(this.position, this.receiver, this.name)
-				                           .resolveFieldAccess(markers, context);
-			if (fieldAccess != null)
+			final IValue call = this.resolveAlternative(markers, context, report);
+			if (call != null)
 			{
-				// Field Access available, try to resolve an apply method
-
-				final ApplyMethodCall call = new ApplyMethodCall(this.position, fieldAccess, this.arguments);
-				call.genericData = this.genericData;
-				return call.resolveCall(markers, context, report);
+				return call;
 			}
 		}
 
@@ -140,6 +137,55 @@ public class MethodCall extends AbstractCall implements INamed
 			return this;
 		}
 		return null;
+	}
+
+	protected IValue resolveAlternative(MarkerList markers, IContext context, boolean report)
+	{
+		final IValue access;
+		if (this.genericData != null)
+		{
+			final IType parentType;
+			if (this.receiver == null)
+			{
+				parentType = null;
+			}
+			else if (this.receiver.isClassAccess())
+			{
+				parentType = this.receiver.getType();
+			}
+			else
+			{
+				return null;
+			}
+
+			final IType type = new NamedGenericType(this.position, parentType, this.name, this.genericData.getTypes(),
+			                                        this.genericData.typeCount())
+				                   .resolveType(report ? markers : null, context);
+			if (type == null)
+			{
+				return null;
+			}
+
+			access = new ClassAccess(this.position, type);
+			if (this.arguments == EmptyArguments.INSTANCE)
+			{
+				return access;
+			}
+		}
+		else
+		{
+			access = new FieldAccess(this.position, this.receiver, this.name).resolveFieldAccess(markers, context);
+			if (access == null)
+			{
+				return null;
+			}
+		}
+
+		// Field or Class Access available, try to resolve an apply method
+
+		final ApplyMethodCall call = new ApplyMethodCall(this.position, access, this.arguments);
+		call.genericData = this.genericData;
+		return call.resolveCall(markers, context, report);
 	}
 
 	protected IValue resolveImplicitCall(MarkerList markers, IContext context)
