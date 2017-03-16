@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
@@ -10,9 +11,11 @@ import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -105,6 +108,14 @@ public class CodeParameter extends AbstractParameter
 		if (Types.isVoid(this.type))
 		{
 			markers.add(Markers.semanticError(this.position, "parameter.type.void"));
+		}
+
+		if (this.isVarargs() && !this.type.canExtract(ArrayType.class) && this.type.getAnnotation(
+			ArrayExpr.LazyFields.ARRAY_CONVERTIBLE) == null)
+		{
+			final Marker marker = Markers.semanticError(this.type.getPosition(), "parameter.varargs.incompatible", this.name);
+			marker.addInfo(Markers.getSemantic("parameter.type", this.type));
+			markers.add(marker);
 		}
 	}
 

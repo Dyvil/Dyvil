@@ -28,20 +28,21 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class ParameterListParser extends Parser implements ITypeConsumer
 {
-	public static final int TYPE            = 0;
-	public static final int VARARGS_1       = 1;
-	public static final int NAME            = 2;
-	public static final int TYPE_ASCRIPTION = 3;
-	public static final int VARARGS_2       = 4;
-	public static final int DEFAULT_VALUE   = 5;
-	public static final int PROPERTY        = 6;
-	public static final int SEPARATOR       = 7;
+	public static final int TYPE                    = 0;
+	public static final int VARARGS_AFTER_PRE_TYPE  = 1;
+	public static final int NAME                    = 2;
+	public static final int VARARGS_AFTER_NAME      = 3;
+	public static final int TYPE_ASCRIPTION         = 4;
+	public static final int VARARGS_AFTER_POST_TYPE = 5;
+	public static final int DEFAULT_VALUE           = 6;
+	public static final int PROPERTY                = 7;
+	public static final int SEPARATOR               = 8;
 
 	// Flags
 
-	private static final int VARARGS          = 1;
-	public static final  int LAMBDA_ARROW_END = 2;
-	public static final  int ALLOW_PROPERTIES = 4;
+	public static final byte VARARGS          = 1;
+	public static final byte LAMBDA_ARROW_END = 2;
+	public static final byte ALLOW_PROPERTIES = 4;
 
 	protected IParametric consumer;
 
@@ -52,7 +53,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	private IType      type;
 	private IParameter parameter;
 
-	private int flags;
+	private byte flags;
 
 	public ParameterListParser(IParametric consumer)
 	{
@@ -134,11 +135,12 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			if (ParserUtil.isIdentifier(type))
 			{
 				final int nextType = token.next().type();
-				if (ParserUtil.isTerminator(nextType)
-					    || (nextType == DyvilSymbols.ARROW_RIGHT || nextType == DyvilSymbols.DOUBLE_ARROW_RIGHT)
-						       && this.hasFlag(LAMBDA_ARROW_END))
+				if (this.canAppearAfterName(nextType) || nextType == DyvilSymbols.ELLIPSIS && this.canAppearAfterName(
+					token.next().next().type()))
 				{
-					// ... , IDENTIFIER , ...
+					// ... , IDENTIFIER (...) , ...
+					// ... , IDENTIFIER (...) =>
+					// ... , IDENTIFIER (...) ->
 					this.type = Types.UNKNOWN;
 					this.mode = NAME;
 					pm.reparse();
@@ -151,13 +153,14 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				pm.popParser(true);
 				return;
 			}
-			this.mode = VARARGS_1;
+			this.mode = VARARGS_AFTER_PRE_TYPE;
 			pm.pushParser(new TypeParser(this), true);
 			return;
-		case VARARGS_1:
+		case VARARGS_AFTER_PRE_TYPE:
 			if (type == DyvilSymbols.ELLIPSIS)
 			{
-				this.flags |= VARARGS;
+				// TYPE ...
+				this.setTypeVarargs();
 				this.mode = NAME;
 				return;
 			}
@@ -193,26 +196,44 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 
 			this.parameter = this.consumer.createParameter(token.raw(), token.nameValue(), this.type, this.modifiers,
 			                                               this.annotations);
-			this.mode = TYPE_ASCRIPTION;
+			this.mode = VARARGS_AFTER_NAME;
 			return;
+		case VARARGS_AFTER_NAME:
+			if (type == DyvilSymbols.ELLIPSIS)
+			{
+				this.flags |= VARARGS;
+				this.mode = TYPE_ASCRIPTION;
+				return;
+			}
+			// Fallthrough
 		case TYPE_ASCRIPTION:
-			if (type == BaseSymbols.COLON)
+		case VARARGS_AFTER_POST_TYPE:
+			// The following code has a bit of an unusual structure. That is because there are two ways to come here:
+			// (1) after an identifier (NAME), optionally followed by an ellipsis (this.mode != VARARGS_AFTER_POST_TYPE)
+			// (2) after a type (this.mode == VARARGS_AFTER_POST_TYPE)
+			// In case (1), we do not expect another ellipsis. Thus, we only check for a colon that indicates a type
+			// ascription, or continue with the other cases (DEFAULT_VALUE, PROPERTY, ...).
+			// In case (2), we do not expect another colon, but allow an optional ellipsis. If there is none, we
+			// continue with the remaining cases (DEFAULT_VALUE, PROPERTY, ...).
+			if (this.mode == VARARGS_AFTER_POST_TYPE)
+			{
+				// case (2)
+				if (type == DyvilSymbols.ELLIPSIS)
+				{
+					this.setTypeVarargs();
+					this.mode = DEFAULT_VALUE;
+					return;
+				}
+			}
+			else /* case (1) */ if (type == BaseSymbols.COLON)
 			{
 				if (this.type != Types.UNKNOWN)
 				{
 					pm.report(token, "parameter.type.duplicate");
 				}
 
-				this.mode = VARARGS_2;
+				this.mode = VARARGS_AFTER_POST_TYPE;
 				pm.pushParser(new TypeParser(this));
-				return;
-			}
-			// Fallthrough
-		case VARARGS_2:
-			if (type == DyvilSymbols.ELLIPSIS)
-			{
-				this.flags |= VARARGS;
-				this.mode = DEFAULT_VALUE;
 				return;
 			}
 			// Fallthrough
@@ -239,7 +260,6 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			{
 				if (this.hasFlag(VARARGS))
 				{
-					this.type = new ArrayType(this.type);
 					this.parameter.setVarargs(true);
 				}
 				this.parameter.setType(this.type);
@@ -271,6 +291,20 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 
 			pm.report(token, "parameter.separator");
 		}
+	}
+
+	private boolean canAppearAfterName(int nextType)
+	{
+		return ParserUtil.isTerminator(nextType)
+			       || (nextType == DyvilSymbols.ARROW_RIGHT || nextType == DyvilSymbols.DOUBLE_ARROW_RIGHT)
+				          && this.hasFlag(LAMBDA_ARROW_END);
+	}
+
+	protected void setTypeVarargs()
+	{
+		// Ellipsis after the type automatically converts it to an array type (see #333)
+		this.type = new ArrayType(this.type);
+		this.flags |= VARARGS;
 	}
 
 	@Override
