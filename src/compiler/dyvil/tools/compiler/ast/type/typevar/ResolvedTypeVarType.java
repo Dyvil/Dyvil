@@ -45,16 +45,12 @@ public class ResolvedTypeVarType extends TypeVarType
 		{
 		// the constants in this switch are the ones that only conditionally allow type var types
 		case TypePosition.CLASS:
+		case TypePosition.TYPE:
 			if (reifiedKind != null)
 			{
 				return;
 			}
 			// Fallthrough
-		case TypePosition.TYPE:
-			if (reifiedKind == Reified.Type.TYPE)
-			{
-				return;
-			}
 			markers.add(Markers.semanticError(this.position, "type.var.class", this.typeParameter.getName()));
 			return;
 		case TypePosition.SUPER_TYPE:
