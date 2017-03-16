@@ -3,15 +3,15 @@ package dyvil.tools.compiler.ast.classes.metadata;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.expression.access.ConstructorCall;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.access.ConstructorCall;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -73,7 +73,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 			this.instanceField = field;
 
 			this.constructor.setModifiers(new FlagModifierSet(Modifiers.PRIVATE));
-			final ConstructorCall call = new ConstructorCall(null, this.constructor, EmptyArguments.INSTANCE);
+			final ConstructorCall call = new ConstructorCall(null, this.constructor, ArgumentList.EMPTY);
 			field.setValue(call);
 		}
 		else

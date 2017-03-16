@@ -1,13 +1,13 @@
 package dyvil.tools.compiler.ast.expression.operator;
 
-import dyvil.tools.compiler.ast.expression.access.MethodCall;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.access.MethodCall;
 import dyvil.tools.compiler.ast.expression.intrinsic.IncOperator;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.transform.SideEffectHelper;
 import dyvil.tools.compiler.util.Util;
@@ -19,7 +19,7 @@ public class InfixCall extends MethodCall
 {
 	public InfixCall(ICodePosition position, IValue lhs, Name name, IValue rhs)
 	{
-		super(position, lhs, name, new SingleArgument(rhs));
+		super(position, lhs, name, new ArgumentList(rhs));
 	}
 
 	public InfixCall(ICodePosition position, IValue receiver, Name name, IArguments arguments)

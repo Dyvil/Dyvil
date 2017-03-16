@@ -1,13 +1,13 @@
 package dyvil.tools.compiler.ast.expression;
 
-import dyvil.tools.compiler.ast.expression.access.AbstractCall;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.access.AbstractCall;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.ImplicitNullableType;
@@ -33,7 +33,7 @@ public class LiteralConversion extends AbstractCall
 
 	public LiteralConversion(IValue literal, IAnnotation annotation)
 	{
-		this(literal, annotation, new SingleArgument(literal));
+		this(literal, annotation, new ArgumentList(literal));
 	}
 
 	public LiteralConversion(IValue literal, IAnnotation annotation, IArguments arguments)
@@ -46,7 +46,7 @@ public class LiteralConversion extends AbstractCall
 
 	public LiteralConversion(IValue literal, IMethod method)
 	{
-		this(literal, method, new SingleArgument(literal));
+		this(literal, method, new ArgumentList(literal));
 	}
 
 	public LiteralConversion(IValue literal, IMethod method, IArguments arguments)

@@ -4,7 +4,6 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.statement.Closure;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.transform.SideEffectHelper;
@@ -88,7 +87,7 @@ public class ApplyMethodCall extends AbstractCall
 		// available. Doesn't works with multiple applied statement lists.
 		// with(x...) { statements }
 		// -> with(x..., { statements })
-		if (this.arguments.getClass() == SingleArgument.class && this.receiver instanceof ICall)
+		if (this.arguments.size() == 1 && this.receiver instanceof ICall)
 		{
 			final ICall call = (ICall) this.receiver;
 			IValue argument = this.arguments.getFirstValue();

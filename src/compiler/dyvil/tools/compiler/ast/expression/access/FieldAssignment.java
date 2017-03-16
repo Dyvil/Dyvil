@@ -9,8 +9,8 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.member.INamed;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -313,7 +313,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	private IValue resolveMethod(IValue receiver, MarkerList markers, IContext context)
 	{
 		final Name name = Util.addEq(this.name);
-		final IArguments argument = new SingleArgument(this.value);
+		final IArguments argument = new ArgumentList(this.value);
 		final MethodAssignment assignment = new MethodAssignment(this.position, receiver, name, argument);
 		return assignment.resolveCall(markers, context, false);
 	}

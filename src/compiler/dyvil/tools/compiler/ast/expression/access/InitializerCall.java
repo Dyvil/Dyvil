@@ -4,11 +4,11 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -23,7 +23,7 @@ public class InitializerCall implements ICall
 	protected ICodePosition position;
 
 	protected boolean isSuper;
-	protected IArguments arguments = EmptyArguments.INSTANCE;
+	protected IArguments arguments;
 
 	// Metadata
 	protected IType        targetType;
@@ -33,6 +33,7 @@ public class InitializerCall implements ICall
 	{
 		this.position = position;
 		this.isSuper = isSuper;
+		this.arguments = ArgumentList.EMPTY;
 	}
 
 	public InitializerCall(ICodePosition position, boolean isSuper, IArguments arguments, IType targetType)

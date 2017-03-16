@@ -5,7 +5,7 @@ import dyvil.tools.asm.Type;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -149,7 +149,7 @@ public interface IObjectType extends IType
 		if (target.isPrimitive())
 		{
 			target.getUnboxMethod()
-			      .writeInvoke(writer, null, EmptyArguments.INSTANCE, ITypeContext.DEFAULT, lineNumber);
+			      .writeInvoke(writer, null, ArgumentList.EMPTY, ITypeContext.DEFAULT, lineNumber);
 		}
 	}
 

@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.reference.PropertyReference;
@@ -20,6 +21,7 @@ public class MethodCall extends AbstractCall implements INamed
 	public MethodCall(ICodePosition position)
 	{
 		this.position = position;
+		this.arguments = ArgumentList.EMPTY;
 	}
 
 	public MethodCall(ICodePosition position, IValue instance, Name name)
@@ -27,6 +29,7 @@ public class MethodCall extends AbstractCall implements INamed
 		this.position = position;
 		this.receiver = instance;
 		this.name = name;
+		this.arguments = ArgumentList.EMPTY;
 	}
 
 	public MethodCall(ICodePosition position, IValue instance, Name name, IArguments arguments)

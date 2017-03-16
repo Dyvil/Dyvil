@@ -7,10 +7,10 @@ import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.expression.constant.*;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.constant.*;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
@@ -18,7 +18,7 @@ import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -507,8 +507,8 @@ public final class PrimitiveType implements IType
 	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
-		writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/types/PrimitiveType",
-		                      this.name.qualified.toUpperCase(), "Ldyvil/reflect/types/PrimitiveType;");
+		writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvil/reflect/types/PrimitiveType", this.name.qualified.toUpperCase(),
+		                      "Ldyvil/reflect/types/PrimitiveType;");
 	}
 
 	@Override
@@ -553,7 +553,7 @@ public final class PrimitiveType implements IType
 			// Target is not a primitive type
 			if (primitiveTarget == null || primitiveTarget.getTypecode() < 0)
 			{
-				this.boxMethod.writeInvoke(writer, null, EmptyArguments.INSTANCE, ITypeContext.DEFAULT, lineNumber);
+				this.boxMethod.writeInvoke(writer, null, ArgumentList.EMPTY, ITypeContext.DEFAULT, lineNumber);
 				return;
 			}
 		}
@@ -582,7 +582,7 @@ public final class PrimitiveType implements IType
 		if (primitiveTarget != target)
 		{
 			primitiveTarget.getBoxMethod()
-			               .writeInvoke(writer, null, EmptyArguments.INSTANCE, ITypeContext.DEFAULT, lineNumber);
+			               .writeInvoke(writer, null, ArgumentList.EMPTY, ITypeContext.DEFAULT, lineNumber);
 		}
 	}
 

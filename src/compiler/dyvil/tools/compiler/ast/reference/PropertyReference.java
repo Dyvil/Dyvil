@@ -1,12 +1,12 @@
 package dyvil.tools.compiler.ast.reference;
 
 import dyvil.tools.asm.Handle;
-import dyvil.tools.compiler.ast.expression.access.ICall;
-import dyvil.tools.compiler.ast.expression.constant.WildcardValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.access.ICall;
+import dyvil.tools.compiler.ast.expression.constant.WildcardValue;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.parameter.SingleArgument;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -43,7 +43,7 @@ public class PropertyReference implements IReference
 		final Name getterName = this.getterMethod.getName();
 		final Name setterName = Util.addEq(getterName);
 		this.setterMethod = ICall.resolveMethod(context, this.receiver, setterName,
-		                                        new SingleArgument(new WildcardValue(null)));
+		                                        new ArgumentList(new WildcardValue(null)));
 
 		if (this.setterMethod == null || this.setterMethod.getParameterList().size() != 1)
 		{

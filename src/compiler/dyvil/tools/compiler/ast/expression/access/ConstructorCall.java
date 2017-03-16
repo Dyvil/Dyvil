@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.Candidate;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
@@ -36,7 +36,7 @@ public class ConstructorCall implements ICall
 
 	public ConstructorCall()
 	{
-		this.arguments = EmptyArguments.INSTANCE;
+		this.arguments = ArgumentList.EMPTY;
 	}
 
 	public ConstructorCall(IConstructor constructor, IArguments arguments)
@@ -49,7 +49,7 @@ public class ConstructorCall implements ICall
 	public ConstructorCall(ICodePosition position)
 	{
 		this.position = position;
-		this.arguments = EmptyArguments.INSTANCE;
+		this.arguments = ArgumentList.EMPTY;
 	}
 
 	public ConstructorCall(ICodePosition position, IType type, IArguments arguments)
@@ -142,14 +142,7 @@ public class ConstructorCall implements ICall
 			this.type = Types.UNKNOWN;
 		}
 
-		if (this.arguments.isEmpty())
-		{
-			this.arguments = EmptyArguments.VISIBLE;
-		}
-		else
-		{
-			this.arguments.resolveTypes(markers, context);
-		}
+		this.arguments.resolveTypes(markers, context);
 	}
 
 	@Override
@@ -244,7 +237,8 @@ public class ConstructorCall implements ICall
 		return IContext.resolveConstructors(context, type, this.arguments);
 	}
 
-	protected static void reportResolve(MarkerList markers, MatchList<IConstructor> list, ICodePosition position, IType type, IArguments arguments)
+	protected static void reportResolve(MarkerList markers, MatchList<IConstructor> list, ICodePosition position,
+		                                   IType type, IArguments arguments)
 	{
 		final Marker marker;
 		if (list == null || !list.isAmbigous())
