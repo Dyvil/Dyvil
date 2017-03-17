@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.expression;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.constant.WildcardValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -150,18 +151,32 @@ public class ColonOperator implements IValue
 	}
 
 	@Override
-	public int getTypeMatch(IType type)
+	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
-		final int match = IValue.super.getTypeMatch(type);
-		if (match != MISMATCH)
+		if (!Types.isSuperClass(type, TupleType.getTupleClass(2).getClassType()))
 		{
-			return match;
+			if (type.getAnnotation(LazyFields.COLON_CONVERTIBLE) != null)
+			{
+				return CONVERSION_MATCH;
+			}
+			return MISMATCH;
 		}
-		if (type.getAnnotation(LazyFields.COLON_CONVERTIBLE) != null)
+
+		final IType leftType = Types.resolveTypeSafely(type, LazyFields.KEY_PARAMETER);
+		final int leftMatch = TypeChecker.getTypeMatch(this.left, leftType, implicitContext);
+		if (leftMatch == MISMATCH)
 		{
-			return CONVERSION_MATCH;
+			return MISMATCH;
 		}
-		return MISMATCH;
+
+
+		final IType rightType = Types.resolveTypeSafely(type, LazyFields.VALUE_PARAMETER);
+		final int rightMatch = TypeChecker.getTypeMatch(this.right, rightType, implicitContext);
+		if (rightMatch == MISMATCH)
+		{
+			return MISMATCH;
+		}
+		return Math.min(leftMatch, rightMatch);
 	}
 
 	@Override

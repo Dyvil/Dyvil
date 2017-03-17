@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.statement;
 
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -37,7 +38,7 @@ public interface IStatement extends IValue
 	}
 
 	@Override
-	default int getTypeMatch(IType type)
+	default int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
 		return 0;
 	}

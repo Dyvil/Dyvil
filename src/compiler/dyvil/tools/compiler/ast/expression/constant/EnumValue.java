@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.expression.constant;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.tools.asm.AnnotationVisitor;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.access.FieldAccess;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -81,7 +82,7 @@ public class EnumValue extends FieldAccess
 	}
 
 	@Override
-	public int getTypeMatch(IType type)
+	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
 		return this.isType(type) ? IValue.EXACT_MATCH : IValue.MISMATCH;
 	}

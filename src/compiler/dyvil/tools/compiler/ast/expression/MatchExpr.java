@@ -7,6 +7,7 @@ import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.consumer.ICaseConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.ICompilableList;
@@ -199,7 +200,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 	}
 
 	@Override
-	public int getTypeMatch(IType type)
+	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
 		if (this.caseCount == 0)
 		{
@@ -215,7 +216,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 				continue;
 			}
 
-			final int match = action.getTypeMatch(type);
+			final int match = TypeChecker.getTypeMatch(action, type, implicitContext);
 			if (match == MISMATCH)
 			{
 				return MISMATCH;

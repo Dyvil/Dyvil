@@ -4,10 +4,7 @@ import dyvil.annotation.internal.NonNull;
 import dyvil.collection.List;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.collection.mutable.ArrayList;
-import dyvil.tools.compiler.ast.context.CombiningLabelContext;
-import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.context.IDefaultContext;
-import dyvil.tools.compiler.ast.context.ILabelContext;
+import dyvil.tools.compiler.ast.context.*;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.expression.access.MethodCall;
@@ -170,13 +167,13 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	}
 
 	@Override
-	public int getTypeMatch(IType type)
+	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
-		if (this.valueCount > 0)
+		if (this.valueCount <= 0)
 		{
-			return this.values[this.valueCount - 1].getTypeMatch(type);
+			return MISMATCH;
 		}
-		return 0;
+		return this.values[this.valueCount - 1].getTypeMatch(type, implicitContext);
 	}
 
 	@Override

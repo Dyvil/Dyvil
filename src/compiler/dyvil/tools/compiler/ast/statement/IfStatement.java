@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.statement;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -157,14 +158,15 @@ public class IfStatement implements IValue
 	}
 
 	@Override
-	public int getTypeMatch(IType type)
+	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
 		if (this.elseThen == null)
 		{
-			return this.then.getTypeMatch(type);
+			return this.then.getTypeMatch(type, implicitContext);
 		}
 
-		return Math.min(this.then.getTypeMatch(type), this.elseThen.getTypeMatch(type));
+		return Math.min(TypeChecker.getTypeMatch(this.then, type, implicitContext),
+		                TypeChecker.getTypeMatch(this.elseThen, type, implicitContext));
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.expression.constant;
 
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -91,11 +92,11 @@ public class WildcardValue implements IConstantValue
 	@Override
 	public boolean isType(IType type)
 	{
-		return this.getTypeMatch(type) != MISMATCH;
+		return this.getTypeMatch(type, null) != MISMATCH;
 	}
 
 	@Override
-	public int getTypeMatch(IType type)
+	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
 		if (this.lambdaParameter != null)
 		{

@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.expression.access;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.constant.EnumValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -200,13 +201,13 @@ public class FieldAccess implements IValue, INamed, IReceiverAccess
 	}
 
 	@Override
-	public int getTypeMatch(IType type)
+	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
 		if (this.field == null)
 		{
 			return MISMATCH;
 		}
-		return IValue.super.getTypeMatch(type);
+		return IValue.super.getTypeMatch(type, implicitContext);
 	}
 
 	@Override

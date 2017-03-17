@@ -61,7 +61,7 @@ public final class TypeChecker
 
 	public static int getTypeMatch(IValue value, IType type, IImplicitContext context)
 	{
-		final int direct = value.getTypeMatch(type);
+		final int direct = value.getTypeMatch(type, context);
 		if (direct != IValue.MISMATCH)
 		{
 			return direct;

@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.expression.access;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -151,9 +152,9 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	}
 
 	@Override
-	public int getTypeMatch(IType type)
+	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
-		return this.value.getTypeMatch(type);
+		return this.value.getTypeMatch(type, implicitContext);
 	}
 
 	@Override
