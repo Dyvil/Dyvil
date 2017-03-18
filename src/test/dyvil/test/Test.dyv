@@ -15,7 +15,7 @@ public interface Test
 		public let name: String
 	) implements Test, TestContainerBase
 	{
-		protected let subTests: List<Test> = MutableList<Test>
+		protected let subTests: List<Test> = MutableList<Test>()
 
 		override func addTest(Test test) -> void = this.subTests.add(test)
 
@@ -23,7 +23,7 @@ public interface Test
 
 		override func addErrors(List<String> errors) -> void
 		{
-			let subErrors = MutableList<String>
+			let subErrors = MutableList<String>()
 			for (subTest <- this.subTests)
 			{
 				subTest.addErrors(subErrors)

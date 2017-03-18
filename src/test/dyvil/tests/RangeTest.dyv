@@ -28,7 +28,7 @@ class RangeTest
 		let range2 = 1 ..< 4
 
 		test "inclusive" {
-			let rangeInclusive = List<int>
+			let rangeInclusive = List<int>()
 			for (i <- range1)
 			{
 				rangeInclusive += i
@@ -38,7 +38,7 @@ class RangeTest
 		}
 
 		test "exclusive" {
-			let rangeExclusive = List<int>
+			let rangeExclusive = List<int>()
 			for (var i <- range2)
 			{
 				rangeExclusive += i
@@ -47,7 +47,7 @@ class RangeTest
 		}
 
 		test "for inclusive" {
-			let forInclusive = List<int>
+			let forInclusive = List<int>()
 			for (i <- 1 .. 4)
 			{
 				forInclusive += i
@@ -57,7 +57,7 @@ class RangeTest
 		}
 
 		test "for exclusive" {
-			let forExclusive = List<int>
+			let forExclusive = List<int>()
 			for (i <- 1 ..< 4)
 			{
 				forExclusive += i
@@ -75,7 +75,7 @@ class RangeTest
 		let range2 = one ..< four
 
 		test "inclusive" {
-			let rangeInclusive = List<RangeableInt>
+			let rangeInclusive = List<RangeableInt>()
 			for (i <- range1)
 			{
 				rangeInclusive += i
@@ -85,7 +85,7 @@ class RangeTest
 		}
 
 		test "exclusive" {
-			let rangeExclusive = List<RangeableInt>
+			let rangeExclusive = List<RangeableInt>()
 			for (i <- range2)
 			{
 				rangeExclusive += i
@@ -95,7 +95,7 @@ class RangeTest
 		}
 
 		test "for inclusive" {
-			let forInclusive = List<RangeableInt>
+			let forInclusive = List<RangeableInt>()
 			for (i <- one .. four)
 			{
 				forInclusive += i
@@ -105,7 +105,7 @@ class RangeTest
 		}
 
 		test "for exclusive" {
-			let forExclusive = List<RangeableInt>
+			let forExclusive = List<RangeableInt>()
 			for (i <- one ..< four)
 			{
 				forExclusive += i

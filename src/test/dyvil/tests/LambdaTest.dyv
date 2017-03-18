@@ -77,7 +77,7 @@ public class LambdaTest
 	}
 
 	static func closures() -> Test = test "Closures" {
-		let result = List<String>
+		let result = List<String>()
 
 		let function1: -> void = function { result += "a" }
 		let function2: -> String = function { "b" }

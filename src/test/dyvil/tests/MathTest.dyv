@@ -27,7 +27,7 @@ public class MathTest
 			return List(1)
 		}
 
-		let res = List<int>
+		let res = List<int>()
 
 		label outer:
 		while value > 1

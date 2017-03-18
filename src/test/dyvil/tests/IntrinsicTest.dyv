@@ -30,7 +30,7 @@ public class IntrinsicTest
 		}
 
 		test "Order" {
-			let order = MutableList<int>
+			let order = MutableList<int>()
 			let res1 = orderTest(first: { order.add 1; 1 }, second: { order.add 2; 2 })
 			let res2 = orderTest({ order.add 2; 2 }, { order.add 1; 1 })
 
