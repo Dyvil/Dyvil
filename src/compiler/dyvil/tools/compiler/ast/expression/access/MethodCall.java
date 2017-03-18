@@ -143,8 +143,8 @@ public class MethodCall extends AbstractCall implements INamed
 
 	protected IValue resolveAlternative(MarkerList markers, IContext context, boolean report)
 	{
-		final IValue access;
-		if (this.genericData != null)
+
+		if (this.genericData != null && this.arguments == ArgumentList.EMPTY)
 		{
 			final IType parentType;
 			if (this.receiver == null)
@@ -168,19 +168,14 @@ public class MethodCall extends AbstractCall implements INamed
 				return null;
 			}
 
-			access = new ClassAccess(this.position, type);
-			if (this.arguments == ArgumentList.EMPTY)
-			{
-				return access;
-			}
+			return new ClassAccess(this.position, type);
 		}
-		else
+
+		final IValue access = new FieldAccess(this.position, this.receiver, this.name)
+			                      .resolveFieldAccess(markers, context);
+		if (access == null)
 		{
-			access = new FieldAccess(this.position, this.receiver, this.name).resolveFieldAccess(markers, context);
-			if (access == null)
-			{
-				return null;
-			}
+			return null;
 		}
 
 		// Field or Class Access available, try to resolve an apply method
