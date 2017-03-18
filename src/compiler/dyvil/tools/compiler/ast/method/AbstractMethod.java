@@ -612,7 +612,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		final IType parType = parameterList.get(0).getCovariantType();
 
 		// Note: this explicitly uses IValue.getTypeMatch to avoid nested implicit conversions
-		final int match = value.getTypeMatch(parType);
+		final int match = value.getTypeMatch(parType, null);
 		if (match > IValue.CONVERSION_MATCH)
 		{
 			list.add(new Candidate<>(this, match, parType, false));

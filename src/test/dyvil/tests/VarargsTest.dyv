@@ -4,6 +4,23 @@ using dyvil.Test
 
 public class VarargsTest
 {
+	// Declaration Styles with Type Checks
+	// All methods with the same first letter do the same thing
+
+	static func f_1(ints... : [int]) -> [int] = ints
+
+	static func f_2(ints : int...) -> [int] = ints
+
+	static func f_3(int... ints) -> [int] = ints
+
+	static func f_4([int] ints...) -> [int] = ints
+
+	static func g_1(ints... : Set<int>) -> Set<int> = ints
+
+	static func g_2(Set<int> ints...) -> Set<int> = ints
+
+	// Main Tested Methods
+
 	static func newArray(args: int...) -> [int] = args
 
 	static func newTuple(i: int..., j: int...) -> IntArrayTuple = (i, j)

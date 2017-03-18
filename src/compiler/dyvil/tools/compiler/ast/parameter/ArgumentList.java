@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.parameter;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -11,23 +12,31 @@ import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.parsing.marker.MarkerList;
 
 import java.util.Arrays;
 import java.util.Iterator;
 
-public final class ArgumentList implements IArguments, IValueList
+public class ArgumentList implements IArguments, IValueList
 {
-	private IValue[] values;
-	private int      size;
+	public static final ArgumentList EMPTY = empty();
+
+	protected IValue[] values;
+	protected int      size;
 
 	public ArgumentList()
 	{
 		this.values = new IValue[3];
+	}
+
+	public ArgumentList(IValue value)
+	{
+		this.values = new IValue[] { value };
+		this.size = 1;
 	}
 
 	public ArgumentList(IValue... values)
@@ -45,6 +54,11 @@ public final class ArgumentList implements IArguments, IValueList
 	{
 		this.values = values;
 		this.size = size;
+	}
+
+	public static ArgumentList empty()
+	{
+		return new ArgumentList(new IValue[0], 0);
 	}
 
 	public IValue[] getValues()
@@ -88,7 +102,7 @@ public final class ArgumentList implements IArguments, IValueList
 	@Override
 	public IValue getFirstValue()
 	{
-		return this.values[0];
+		return this.size <= 0 ? null : this.values[0];
 	}
 
 	@Override
@@ -179,26 +193,28 @@ public final class ArgumentList implements IArguments, IValueList
 	public int checkMatch(int[] values, IType[] types, int matchStartIndex, int argumentIndex, IParameter param,
 		                     IImplicitContext implicitContext)
 	{
-		if (argumentIndex > this.size)
+		if (argumentIndex >= this.size)
 		{
-			return -1;
-		}
-		if (argumentIndex == this.size)
-		{
-			return param.isVarargs() ? 0 : -1;
+			return param.isVarargs() && this != EMPTY ? 0 : -1;
 		}
 		if (param.hasModifier(Modifiers.EXPLICIT))
 		{
 			return -1;
 		}
 
-		if (param.isVarargs())
+		if (!param.isVarargs())
 		{
-			return checkVarargsMatch(values, types, matchStartIndex, this.values, argumentIndex, this.size, param,
-			                         implicitContext);
+			return checkMatch(values, types, matchStartIndex + argumentIndex, this.values[argumentIndex],
+			                  param.getCovariantType(), implicitContext) ? 0 : -1;
 		}
-		return checkMatch(values, types, matchStartIndex + argumentIndex, this.values[argumentIndex],
-		                  param.getCovariantType(), implicitContext) ? 0 : -1;
+
+		if (this == EMPTY)
+		{
+			return -1;
+		}
+
+		return checkVarargsMatch(values, types, matchStartIndex, this.values, argumentIndex, this.size, param,
+		                         implicitContext);
 	}
 
 	protected static boolean checkMatch(int[] matchValues, IType[] matchTypes, int matchIndex, IValue argument,
@@ -227,11 +243,11 @@ public final class ArgumentList implements IArguments, IValueList
 		                                      IParameter param, IImplicitContext implicitContext)
 	{
 		final IValue argument = values[startIndex];
-		final IType arrayType = param.getCovariantType();
+		final IType paramType = param.getCovariantType();
+		final int matchIndex = matchStartIndex + startIndex;
 		if (argument.checkVarargs(false))
 		{
-			return checkMatch_(matchValues, matchTypes, matchStartIndex + startIndex, argument, arrayType,
-			                   implicitContext) ? 0 : -1;
+			return checkMatch_(matchValues, matchTypes, matchIndex, argument, paramType, implicitContext) ? 0 : -1;
 		}
 
 		if (startIndex == endIndex)
@@ -240,16 +256,30 @@ public final class ArgumentList implements IArguments, IValueList
 		}
 
 		final int count = endIndex - startIndex;
-		final IType elementType = arrayType.extract(ArrayType.class).getElementType();
-		for (; startIndex < endIndex; startIndex++)
+		final ArrayExpr arrayExpr = newArrayExpr(values, startIndex, count);
+
+		if (!checkMatch_(matchValues, matchTypes, matchIndex, arrayExpr, paramType, implicitContext))
 		{
-			if (!checkMatch(matchValues, matchTypes, matchStartIndex + startIndex, values[startIndex], elementType,
-			                implicitContext))
-			{
-				return -1;
-			}
+			return -1;
+		}
+
+		// We fill the remaining entries that are reserved for the (now wrapped) varargs values with the match value
+		// of the array expression and the element type
+		final int value = matchValues[matchIndex];
+		final IType type = arrayExpr.getElementType();
+		for (int i = 0; i < count; i++)
+		{
+			matchValues[matchIndex + i] = value;
+			matchTypes[matchIndex + i] = type;
 		}
 		return count;
+	}
+
+	private static ArrayExpr newArrayExpr(IValue[] values, int startIndex, int count)
+	{
+		final IValue[] arrayValues = new IValue[count];
+		System.arraycopy(values, startIndex, arrayValues, 0, count);
+		return new ArrayExpr(arrayValues, count);
 	}
 
 	@Override
@@ -257,6 +287,12 @@ public final class ArgumentList implements IArguments, IValueList
 	{
 		if (index >= this.size)
 		{
+			if (param.isVarargs())
+			{
+				final ArrayExpr arrayExpr = new ArrayExpr(new IValue[0], 0);
+				final IValue converted = IArguments.convertValue(arrayExpr, param, genericData, markers, context);
+				this.addValue(converted);
+			}
 			return;
 		}
 
@@ -266,11 +302,16 @@ public final class ArgumentList implements IArguments, IValueList
 			return;
 		}
 
-		if (checkVarargsValue(this.values, index, this.size, param, genericData, markers, context))
+		if (!checkVarargsValue(this.values, index, this.size, param, genericData, markers, context))
 		{
-			this.size = index + 1;
+			return;
 		}
-		return;
+
+		for (int i = index + 1; i < this.size; i++)
+		{
+			this.values[i] = null;
+		}
+		this.size = index + 1;
 	}
 
 	protected static boolean checkVarargsValue(IValue[] values, int startIndex, int endIndex, IParameter param,
@@ -283,27 +324,18 @@ public final class ArgumentList implements IArguments, IValueList
 			return false;
 		}
 
-		final int size = endIndex - startIndex;
-		final IValue[] arrayValues = new IValue[size];
+		final int count = endIndex - startIndex;
+		final ArrayExpr arrayExpr = newArrayExpr(values, startIndex, count);
+		final IValue converted = IArguments.convertValue(arrayExpr, param, genericData, markers, context);
 
-		System.arraycopy(values, startIndex, arrayValues, 0, size);
-
-		final ArrayExpr arrayExpr = new ArrayExpr(value.getPosition(), arrayValues, size);
-
-		values[startIndex] = IArguments.convertValue(arrayExpr, param, genericData, markers, context);
+		values[startIndex] = converted;
 		return true;
 	}
 
 	@Override
 	public void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
 	{
-		if (index < this.size)
-		{
-			this.values[index].writeExpression(writer, param.getCovariantType());
-			return;
-		}
-
-		EmptyArguments.writeArguments(writer, param);
+		this.values[index].writeExpression(writer, param.getCovariantType());
 	}
 
 	@Override
@@ -388,44 +420,46 @@ public final class ArgumentList implements IArguments, IValueList
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String prefix, @NonNull StringBuilder buffer)
 	{
-		buffer.append('(');
-		int len = this.size;
-		for (int i = 0; i < len; i++)
+		Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
+
+		if (this.size > 0)
 		{
-			this.values[i].toString(prefix, buffer);
-			if (i + 1 == len)
+			this.appendValue(prefix, buffer, 0);
+			for (int i = 1; i < this.size; i++)
 			{
-				break;
+				Formatting.appendSeparator(buffer, "parameters.separator", ',');
+				this.appendValue(prefix, buffer, i);
 			}
-			buffer.append(", ");
 		}
-		buffer.append(')');
+
+		Formatting.appendSeparator(buffer, "parameters.close_paren", ')');
+	}
+
+	protected void appendValue(@NonNull String indent, @NonNull StringBuilder buffer, int index)
+	{
+		this.values[index].toString(indent, buffer);
 	}
 
 	@Override
 	public void typesToString(StringBuilder buffer)
 	{
 		buffer.append('(');
-		int len = this.size;
-		for (int i = 0; i < len; i++)
+		if (this.size > 0)
 		{
-			IType type = this.values[i].getType();
-			if (type == null)
+			this.appendType(buffer, 0);
+			for (int i = 1; i < this.size; i++)
 			{
-				buffer.append("unknown");
+				buffer.append(", ");
+				this.appendType(buffer, i);
 			}
-			else
-			{
-				type.toString("", buffer);
-			}
-			if (i + 1 == len)
-			{
-				break;
-			}
-			buffer.append(", ");
 		}
 		buffer.append(')');
+	}
+
+	protected void appendType(@NonNull StringBuilder buffer, int index)
+	{
+		this.values[index].getType().toString("", buffer);
 	}
 }

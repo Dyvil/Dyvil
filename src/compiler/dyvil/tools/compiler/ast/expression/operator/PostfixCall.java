@@ -1,11 +1,11 @@
 package dyvil.tools.compiler.ast.expression.operator;
 
-import dyvil.tools.compiler.ast.expression.access.MethodCall;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.access.MethodCall;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.parameter.SingleArgument;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -46,7 +46,7 @@ public class PostfixCall extends MethodCall
 	public IValue toAssignment(IValue rhs, ICodePosition position)
 	{
 		final Name name = Util.addEq(this.name);
-		return new MethodCall(this.position, this.arguments.getFirstValue(), name, new SingleArgument(rhs));
+		return new MethodCall(this.position, this.arguments.getFirstValue(), name, new ArgumentList(rhs));
 	}
 
 	@Override

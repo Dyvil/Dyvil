@@ -5,20 +5,35 @@ import dyvil.collection.Entry
 
 import java.util.Objects
 
-public abstract class Tuple
+abstract class Tuple
 {
 	private init() {} // no instances
 
-	public case class Of1<type +T1>(public let _1: T1)
+	// Wrapper class for a Tuple of more than MAX_ARITY entries, stored in an array
+	case class OfN(private let data: any! ...)
+	{
+		func subscript(n: int) -> any! = this.data[n]
+
+		override func toString() -> String
+		{
+			let buf = new StringBuilder
+			this.data.toString(buf)
+			buf.setCharAt(0, '(')
+			buf.setCharAt(buf.length - 1, ')')
+			return buf.toString!!
+		}
+	}
+
+	case class Of1<type +T1>(public let _1: T1)
 	{
 		override func toString() -> String = "Tuple(\(this._1))"
 	}
 
-	public case class Of2<type +T1, type +T2>
-		(
-			public let _1: T1
-			public let _2: T2
-		) implements Entry<T1, T2>
+	case class Of2<type +T1, type +T2>
+	(
+		public let _1: T1
+		public let _2: T2
+	) implements Entry<T1, T2>
 	{
 		override func getKey() -> T1 = this._1
 
@@ -31,12 +46,12 @@ public abstract class Tuple
 		override func hashCode() -> int = Entry.entryHashCode(this)
 	}
 
-	public case class Of3<type +T1, type +T2, type +T3>
-		(
-			public let _1: T1
-			public let _2: T2
-			public let _3: T3
-		) implements Cell<T1, T2, T3>
+	case class Of3<type +T1, type +T2, type +T3>
+	(
+		public let _1: T1
+		public let _2: T2
+		public let _3: T3
+	) implements Cell<T1, T2, T3>
 	{
 		override func getRow() -> T1 = this._1
 
@@ -55,23 +70,22 @@ public abstract class Tuple
 #for ARITY; 4; MAX_ARITY
 
 	@Immutable
-	public case class Of##ARITY <
+	case class Of##ARITY <
 	#for INDEX; 1; ARITY
-			type +T##INDEX
+		type +T##INDEX
 	#end
-		> (
+	> (
 	#for INDEX; 1; ARITY
 			public let _##INDEX: T##INDEX
 	#end
-		)
+	)
 	{
 		override func toString() -> String = new StringBuilder()
 			.append('(').append(this._1)
 	#for INDEX; 2; ARITY
 			.append(', ').append(this._##INDEX)
 	#end
-			.append(')').toString
+			.append(')').toString!!
 	}
-
 #end
 }

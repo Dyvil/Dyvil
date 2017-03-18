@@ -4,16 +4,16 @@ import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
-import dyvil.tools.compiler.ast.expression.access.MethodCall;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.access.MethodCall;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -100,8 +100,8 @@ public class ImplicitReferenceType extends ReferenceType
 			return null;
 		}
 
-		final IMethod method = IContext.resolveMethod(this.theClass, value, Names.get, EmptyArguments.INSTANCE);
-		return new MethodCall(value.getPosition(), value, method, EmptyArguments.INSTANCE);
+		final IMethod method = IContext.resolveMethod(this.theClass, value, Names.get, ArgumentList.EMPTY);
+		return new MethodCall(value.getPosition(), value, method, ArgumentList.EMPTY);
 	}
 
 	@Override

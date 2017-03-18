@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.expression;
 import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.Handle;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.access.AbstractCall;
 import dyvil.tools.compiler.ast.expression.access.ConstructorCall;
 import dyvil.tools.compiler.ast.expression.access.FieldAccess;
@@ -473,7 +474,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	}
 
 	@Override
-	public int getTypeMatch(IType type)
+	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
 		if (type.getTheClass() == Types.OBJECT_CLASS)
 		{

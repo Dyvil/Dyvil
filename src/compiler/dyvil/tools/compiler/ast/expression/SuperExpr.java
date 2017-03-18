@@ -85,6 +85,11 @@ public final class SuperExpr implements IValue
 		if (this.type != Types.UNKNOWN)
 		{
 			this.type = this.type.resolveType(markers, context);
+
+			if (this.type.isResolved())
+			{
+				this.checkSuperType(markers, context);
+			}
 			return;
 		}
 
@@ -92,40 +97,13 @@ public final class SuperExpr implements IValue
 		final IType superType = enclosingClass.getSuperType();
 		if (superType == null)
 		{
-			final Marker marker = Markers.semantic(this.position, "super.access.type");
+			final Marker marker = Markers.semanticError(this.position, "super.access.type");
 			marker.addInfo(Markers.getSemantic("type.enclosing", enclosingClass.getClassType()));
 			markers.add(marker);
 			return;
 		}
 
 		this.type = superType;
-	}
-
-	@Override
-	public IValue resolve(MarkerList markers, IContext context)
-	{
-		this.type.resolve(markers, context);
-
-		return this;
-	}
-
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		this.type.checkType(markers, context, TypePosition.CLASS);
-	}
-
-	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-		this.type.check(markers, context);
-
-		if (!this.type.isResolved())
-		{
-			return;
-		}
-
-		this.checkSuperType(markers, context);
 	}
 
 	private void checkSuperType(MarkerList markers, IContext context)
@@ -150,8 +128,10 @@ public final class SuperExpr implements IValue
 		{
 			// Check if the specified type is either the direct super type or a direct super interface
 
-			if (enclosingClass.getSuperType().isSameClass(this.type))
+			final IType superType = enclosingClass.getSuperType();
+			if (superType.isSameClass(this.type))
 			{
+				this.type = superType;
 				return;
 			}
 
@@ -159,8 +139,10 @@ public final class SuperExpr implements IValue
 			{
 				for (int i = 0, count = enclosingClass.interfaceCount(); i < count; i++)
 				{
-					if (enclosingClass.getInterface(i).isSameClass(this.type))
+					final IType interfaceType = enclosingClass.getInterface(i);
+					if (interfaceType.isSameClass(this.type))
 					{
+						this.type = interfaceType;
 						return;
 					}
 				}
@@ -179,6 +161,26 @@ public final class SuperExpr implements IValue
 		marker.addInfo(Markers.getSemantic("type.enclosing", enclosingType));
 		marker.addInfo(Markers.getSemantic("super.type.requested", this.type));
 		markers.add(marker);
+	}
+
+	@Override
+	public IValue resolve(MarkerList markers, IContext context)
+	{
+		this.type.resolve(markers, context);
+
+		return this;
+	}
+
+	@Override
+	public void checkTypes(MarkerList markers, IContext context)
+	{
+		this.type.checkType(markers, context, TypePosition.CLASS);
+	}
+
+	@Override
+	public void check(MarkerList markers, IContext context)
+	{
+		this.type.check(markers, context);
 	}
 
 	@Override

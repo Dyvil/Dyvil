@@ -4,13 +4,10 @@ import dyvil.annotation.internal.NonNull;
 import dyvil.collection.List;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.collection.mutable.ArrayList;
-import dyvil.tools.compiler.ast.expression.access.MethodCall;
-import dyvil.tools.compiler.ast.context.CombiningLabelContext;
-import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.context.IDefaultContext;
-import dyvil.tools.compiler.ast.context.ILabelContext;
+import dyvil.tools.compiler.ast.context.*;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
+import dyvil.tools.compiler.ast.expression.access.MethodCall;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -20,8 +17,8 @@ import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.statement.control.Label;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -170,13 +167,13 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	}
 
 	@Override
-	public int getTypeMatch(IType type)
+	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
-		if (this.valueCount > 0)
+		if (this.valueCount <= 0)
 		{
-			return this.values[this.valueCount - 1].getTypeMatch(type);
+			return MISMATCH;
 		}
-		return 0;
+		return this.values[this.valueCount - 1].getTypeMatch(type, implicitContext);
 	}
 
 	@Override
@@ -419,25 +416,25 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 
 	private static IValue resolveApplyStatement(MarkerList markers, IContext context, IValue resolvedValue)
 	{
-		final SingleArgument argument = new SingleArgument(resolvedValue);
+		final ArgumentList arguments = new ArgumentList(resolvedValue);
 
 		final IValue implicitValue = context.getImplicit();
 		if (implicitValue != null)
 		{
-			final IValue call = resolveApplyStatement(markers, context, argument, implicitValue);
+			final IValue call = resolveApplyStatement(markers, context, arguments, implicitValue);
 			if (call != null)
 			{
 				return call;
 			}
 		}
 
-		return resolveApplyStatement(markers, context, argument, null);
+		return resolveApplyStatement(markers, context, arguments, null);
 	}
 
-	private static IValue resolveApplyStatement(MarkerList markers, IContext context, SingleArgument argument,
+	private static IValue resolveApplyStatement(MarkerList markers, IContext context, ArgumentList arguments,
 		                                           IValue receiver)
 	{
-		final MethodCall call = new MethodCall(argument.getFirstValue().getPosition(), receiver, Names.applyStatement, argument);
+		final MethodCall call = new MethodCall(arguments.getFirstValue().getPosition(), receiver, Names.applyStatement, arguments);
 		return call.resolveCall(markers, context, false);
 	}
 

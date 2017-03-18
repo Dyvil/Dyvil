@@ -19,7 +19,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
@@ -43,7 +43,7 @@ import java.io.IOException;
 
 public class CodeClass extends AbstractClass
 {
-	protected IArguments superConstructorArguments = EmptyArguments.INSTANCE;
+	protected IArguments superConstructorArguments = ArgumentList.EMPTY;
 
 	// Metadata
 	protected IHeaderUnit   unit;

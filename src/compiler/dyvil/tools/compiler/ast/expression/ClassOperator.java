@@ -6,6 +6,7 @@ import dyvil.tools.asm.Type;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
@@ -131,9 +132,9 @@ public final class ClassOperator implements IValue
 	}
 
 	@Override
-	public int getTypeMatch(IType type)
+	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
-		final int i = IValue.super.getTypeMatch(type);
+		final int i = IValue.super.getTypeMatch(type, implicitContext);
 		if (i != MISMATCH)
 		{
 			return i;

@@ -5,8 +5,8 @@ import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.method.IMethod;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.SingleArgument;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -53,7 +53,7 @@ public class MethodAssignment extends MethodCall
 		receiverVar.writeInit(writer);
 		expressionVar.writeInit(writer);
 
-		this.method.writeCall(writer, new FieldAccess(receiverVar), new SingleArgument(new FieldAccess(expressionVar)),
+		this.method.writeCall(writer, new FieldAccess(receiverVar), new ArgumentList(new FieldAccess(expressionVar)),
 		                      this.genericData, Types.VOID, this.getLineNumber());
 
 		expressionVar.writeGet(writer);

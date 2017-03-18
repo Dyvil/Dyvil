@@ -13,7 +13,6 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -32,7 +31,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 	protected ICodePosition position;
 
 	protected IValue receiver;
-	protected IArguments arguments = EmptyArguments.INSTANCE;
+	protected IArguments arguments;
 	protected GenericData genericData;
 
 	// Metadata

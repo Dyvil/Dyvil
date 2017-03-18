@@ -5,6 +5,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.constant.*;
 import dyvil.tools.compiler.ast.expression.intrinsic.PopExpr;
@@ -279,9 +280,10 @@ public interface IValue extends IASTNode, ITyped
 	 * @param type
 	 * 	the type to match
 	 *
+	 * @param implicitContext
 	 * @return the subtyping distance
 	 */
-	default int getTypeMatch(IType type)
+	default int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
 		return Types.getTypeMatch(type, this.getType());
 	}

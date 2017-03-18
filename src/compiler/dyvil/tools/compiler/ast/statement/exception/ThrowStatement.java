@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.statement.exception;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -82,7 +83,7 @@ public final class ThrowStatement extends AbstractValue implements IValueConsume
 	}
 
 	@Override
-	public int getTypeMatch(IType type)
+	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
 		return IValue.SECONDARY_SUBTYPE_MATCH;
 	}

@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.expression.intrinsic;
 
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
@@ -85,9 +86,9 @@ public class VarargsOperator implements IValue
 	}
 
 	@Override
-	public int getTypeMatch(IType type)
+	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
-		return this.value.getTypeMatch(type);
+		return this.value.getTypeMatch(type, implicitContext);
 	}
 
 	@Override

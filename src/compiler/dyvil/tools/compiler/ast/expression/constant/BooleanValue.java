@@ -4,6 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.LiteralConversion;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -86,9 +87,9 @@ public final class BooleanValue implements IConstantValue
 	}
 
 	@Override
-	public int getTypeMatch(IType type)
+	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
-		final int i = IConstantValue.super.getTypeMatch(type);
+		final int i = IConstantValue.super.getTypeMatch(type, implicitContext);
 		if (i != MISMATCH)
 		{
 			return i;

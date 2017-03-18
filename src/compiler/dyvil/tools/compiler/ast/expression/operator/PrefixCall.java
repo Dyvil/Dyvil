@@ -1,11 +1,11 @@
 package dyvil.tools.compiler.ast.expression.operator;
 
-import dyvil.tools.compiler.ast.expression.access.MethodCall;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.access.MethodCall;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.parameter.SingleArgument;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
@@ -21,7 +21,7 @@ public class PrefixCall extends MethodCall
 
 	public PrefixCall(ICodePosition position, Name name, IValue argument)
 	{
-		super(position, null, name, new SingleArgument(argument));
+		super(position, null, name, new ArgumentList(argument));
 	}
 
 	@Override
@@ -76,7 +76,7 @@ public class PrefixCall extends MethodCall
 	public IValue toAssignment(IValue rhs, ICodePosition position)
 	{
 		final Name name = Name.from(this.name.unqualified + "_=", this.name.qualified + "_$eq");
-		return new MethodCall(this.position, this.arguments.getFirstValue(), name, new SingleArgument(rhs));
+		return new MethodCall(this.position, this.arguments.getFirstValue(), name, new ArgumentList(rhs));
 	}
 
 	@Override

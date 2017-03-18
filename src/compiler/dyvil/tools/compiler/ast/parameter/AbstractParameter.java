@@ -226,6 +226,12 @@ public abstract class AbstractParameter extends Variable implements IParameter
 			this.modifiers.toString(this.getKind(), buffer);
 		}
 
+		// The type of varargs syntax for this parameter
+		// 0 = not variadic
+		// 1 = array
+		// 2 = other type
+		final byte varargs = !this.isVarargs() ? (byte) 0 : this.type.canExtract(ArrayType.class) ? (byte) 1 : (byte) 2;
+
 		boolean typeAscription = false;
 		if (this.type != null)
 		{
@@ -233,7 +239,7 @@ public abstract class AbstractParameter extends Variable implements IParameter
 
 			if (!typeAscription)
 			{
-				this.appendType(indent, buffer);
+				this.appendType(indent, buffer, varargs);
 				buffer.append(' ');
 			}
 		}
@@ -246,11 +252,15 @@ public abstract class AbstractParameter extends Variable implements IParameter
 		{
 			buffer.append('_');
 		}
+		if (varargs == 2)
+		{
+			buffer.append("...");
+		}
 
 		if (typeAscription)
 		{
 			Formatting.appendSeparator(buffer, "parameter.type_ascription", ':');
-			this.appendType(indent, buffer);
+			this.appendType(indent, buffer, varargs);
 		}
 
 		if (this.value != null)
@@ -260,9 +270,9 @@ public abstract class AbstractParameter extends Variable implements IParameter
 		}
 	}
 
-	private void appendType(String prefix, StringBuilder buffer)
+	private void appendType(String prefix, StringBuilder buffer, byte varargs)
 	{
-		if (this.isVarargs())
+		if (varargs == 1)
 		{
 			this.type.extract(ArrayType.class).getElementType().toString(prefix, buffer);
 			buffer.append("...");

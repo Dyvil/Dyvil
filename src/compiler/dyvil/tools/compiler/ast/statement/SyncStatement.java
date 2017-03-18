@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.statement;
 
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -28,6 +29,7 @@ public final class SyncStatement extends AbstractValue implements IStatement
 	
 	public SyncStatement(ICodePosition position, IValue lock, IValue block)
 	{
+		this.position = position;
 		this.lock = lock;
 		this.action = block;
 	}
@@ -78,9 +80,9 @@ public final class SyncStatement extends AbstractValue implements IStatement
 	}
 	
 	@Override
-	public int getTypeMatch(IType type)
+	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
-		return this.action.getTypeMatch(type);
+		return this.action.getTypeMatch(type, implicitContext);
 	}
 	
 	@Override
