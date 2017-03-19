@@ -1,3 +1,98 @@
+Dyvil v0.30.0
+=============
+
+- Added Enum Access Expressions. #329
+- Added support for the Optional Chaining operators `?.` and `??`. #328
+- Added syntax for Varargs Parameters with non-array types. #333
+
+## Dyvil Library v0.30.0
+
+- Added an `Object`-only `Types.arrayType<T>(Class<T>)` method.
+- Added the `Tuple.OfN` class for tuples of arbitrary size.
+- Added the `dyvil.math.ScalarMath` class.
+- Converted the `dyvil.collection.range.{ halfopen, closed }.ObjectRange` classes to Dyvil (generated).
+- Deprecated Shift Operators with two `long` operands.
+- Fixed an issue that caused a string index error when a marker is on the last line of a `TextSource`.
+- Fixed an issue where marker printing would sometimes cause errors.
+- Fixed incorrect `float` `**` operator behaviour.
+- Greatly improved Marker Printing by using a new modern format.
+- Made Wrapper → Primitive conversion functions `implicit`.
+- Renamed `dyvil.lang.*Extensions` classes to `*s`.
+- The `Simple*Ref` classes are no longer `case` classes because their equality and hashcode should be identity-based.
+- Updated several `dyvil.lang` class to use new Dyvil code conventions.
+- Updated some classes to adapt to language changes.
+- Updated the `AbstractBitSet`, `EmptyRange`, `Range`, `None`, `Some`, `Option` and `IASTNode` classes.
+- Updated the `Complex` class.
+- Updated the `Function` and `Tuple` classes.
+- Updated the `Intrinsic` annotation, the `Optionals` class and the `Lang` header for upcoming optional chaining.
+- Updated the `Optionals` class.
+- Updated the `Rangeable` class.
+
+## Dyvil Compiler v0.30.0
+
+- Added AST nodes for Optional Chain `?.` and Null Coalescing `??` operators. #328
+- Added special handling for poly expressions in the type inference algorithm.
+- Added support and diagnostics for Array Literal Convertible Varargs Parameter Types. #333
+- Added support for Enum Access Expressions. #329
+- Added the `IArguments.convertValue(...)` method.
+- Added the `IValue.isPolyExpression` method and implemented it in `LambdaExpr` and `Closure`.
+- Cleaned up the `Closure` class.
+- Cleaned up the `IArguments` implementations.
+- Cleaned up the `ITypeList` and `ITypeParametric` interfaces and subtypes.
+- Deprecated Method Type Ascription with `:` in favor of `->`.
+- Duplicate and Override Checking for Methods is now performed in `CHECK_TYPES`.
+- Fixed Class Expressions working incorrectly for Array Types of Type Parameters.
+- Fixed a compiler error that was caused by recursive type parameter definitions. #319
+- Fixed an NPE cause by `CodeMethod`s accessing the `thisType` field.
+- Fixed an issue that caused Case Class' Apply Methods to be compiled incorrectly.
+- Fixed an issue that caused Implicit Conversion Search for Method Resolution to use incorrect scoping rules.
+- Fixed an issue that caused inline methods with `long` or `double` parameters to produce compiler errors.
+- Fixed an issue that caused operator resolution for ternary operators to fail in some cases.
+- Fixed an issue that caused some methods with the same name to be skipped from override checking.
+- Fixed an issue that caused subtyping rules for type parameters to be incorrect.
+- Fixed an issue that caused type checking to fail in some cases involving double optional types.
+- Fixed an issue that disabled implicit type conversions for type parameters in some cases.
+- Fixed an issue that would incorrectly report an error for Type Parameters in certain contexts.
+- Fixed two related issues that caused `this` and `super` expressions to have incomplete types.
+- Implicit Conversions can now be applied to subexpressions like Array Literal Elements, Tuple Elements, etc..
+- Improved Formatting for Class and Type Operators.
+- Improved Method signature formatting for parameters without a name.
+- Improved Type Inference and Type Checking for Tuple and Colon Expressions and Tuple Patterns.
+- Improved field, property and parameter formatting.
+- Improved the conversion for Method Call → Class Access for generic method calls without an argument list.
+- Made the `ArgumentList` and `NamedArgumentList` classes ready for upcoming non-array varargs types.
+- Method Override Checking now warns about mismatching parameter labels.
+- Moved some packages into the `ast.expression` package.
+- Parameter Names that cannot be reified from bytecode are now null instead of a generated name with `par#`.
+- Parameter References are no longer reported as a compile-time error. #331
+- Parameters now internally support a missing / `null` Name.
+- Refactored most Data Member (Variable, Field, Parameter, ...) classes.
+- Reified Type Parameter synthetic parameters can now be captured.
+- Removed the `SingleArgument` and `EmptyArguments` classes.
+- Renamed the `FieldInitializer` class to `VariableStatement`.
+- Renamed the `IMethod.checkOverride(...)` method to `overrides`.
+- Updated Marker Printing.
+- Updated Parameter and other Data Member classes.
+- Updated formatting methods to use `->` instead of `:`.
+- Updated the `EnumValue` class. #329
+- Updated the `FieldAccess` and `ClassAccess` classes.
+- Updated the compiler for library name changes.
+
+## Dyvil REPL v0.18.0
+
+- The REPL now stylizes definition output with syntax highlighting.
+- Updated Marker Printing.
+
+## Dyvil Property Format v0.11.0
+
+- Added model interfaces for all Node Elements, `Value` and `Builder`.
+- Updated misc. DPF classes to use correct parameter labels.
+- Updated some classes to make use of Optional Chaining.
+
+## Dyvil GenSrc v0.4.1
+
+- Fixed a compilation error in the `Template` class.
+
 Dyvil v0.29.0
 =============
 

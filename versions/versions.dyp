@@ -6,45 +6,52 @@ distributionInfoFile = "\(baseLink)/distributions.dyp"
 versionFiles = {
 	"Latest Nightly Build" : "https://drone.io/github.com/Dyvil/Dyvil/files/versions/nightly.dyp",
 
-	// Alpha Stage
-	"v0.1.0" : "\(baseLink)/alpha/v0.1.0.dyp",
-	"v0.2.0" : "\(baseLink)/alpha/v0.2.0.dyp",
-	"v0.3.0" : "\(baseLink)/alpha/v0.3.0.dyp",
-	"v0.4.0" : "\(baseLink)/alpha/v0.4.0.dyp",
-	"v0.5.0" : "\(baseLink)/alpha/v0.5.0.dyp",
-	"v0.6.0" : "\(baseLink)/alpha/v0.6.0.dyp",
-	"v0.7.0" : "\(baseLink)/alpha/v0.7.0.dyp",
-	"v0.8.0" : "\(baseLink)/alpha/v0.8.0.dyp",
-	"v0.9.0" : "\(baseLink)/alpha/v0.9.0.dyp",
+	"Alpha" : { // Alpha Stage
+		"v0.1.0" : "\(baseLink)/alpha/v0.1.0.dyp"
+		"v0.2.0" : "\(baseLink)/alpha/v0.2.0.dyp"
+		"v0.3.0" : "\(baseLink)/alpha/v0.3.0.dyp"
+		"v0.4.0" : "\(baseLink)/alpha/v0.4.0.dyp"
+		"v0.5.0" : "\(baseLink)/alpha/v0.5.0.dyp"
+		"v0.6.0" : "\(baseLink)/alpha/v0.6.0.dyp"
+		"v0.7.0" : "\(baseLink)/alpha/v0.7.0.dyp"
+		"v0.8.0" : "\(baseLink)/alpha/v0.8.0.dyp"
+		"v0.9.0" : "\(baseLink)/alpha/v0.9.0.dyp"
+	}
 
-	// Beta Stage
-	"v0.10.0" : "\(baseLink)/beta/v0.10.0.dyp",
-	"v0.10.1" : "\(baseLink)/beta/v0.10.1.dyp",
-	"v0.11.0" : "\(baseLink)/beta/v0.11.0.dyp",
-	"v0.11.1" : "\(baseLink)/beta/v0.11.1.dyp",
-	"v0.12.0" : "\(baseLink)/beta/v0.12.0.dyp",
-	"v0.13.0" : "\(baseLink)/beta/v0.13.0.dyp",
-	"v0.14.0" : "\(baseLink)/beta/v0.14.0.dyp",
-	"v0.14.1" : "\(baseLink)/beta/v0.14.1.dyp",
-	"v0.15.0" : "\(baseLink)/beta/v0.15.0.dyp",
-	"v0.16.0" : "\(baseLink)/beta/v0.16.0.dyp",
-	"v0.16.1" : "\(baseLink)/beta/v0.16.1.dyp",
-	"v0.17.0" : "\(baseLink)/beta/v0.17.0.dyp",
-	"v0.17.1" : "\(baseLink)/beta/v0.17.1.dyp",
-	"v0.18.0" : "\(baseLink)/beta/v0.18.0.dyp",
-	"v0.19.0" : "\(baseLink)/beta/v0.19.0.dyp",
+	"Beta" : { // Beta Stage
+		"v0.10.0" : "\(baseLink)/beta/v0.10.0.dyp"
+		"v0.10.1" : "\(baseLink)/beta/v0.10.1.dyp"
+		"v0.11.0" : "\(baseLink)/beta/v0.11.0.dyp"
+		"v0.11.1" : "\(baseLink)/beta/v0.11.1.dyp"
+		"v0.12.0" : "\(baseLink)/beta/v0.12.0.dyp"
+		"v0.13.0" : "\(baseLink)/beta/v0.13.0.dyp"
+		"v0.14.0" : "\(baseLink)/beta/v0.14.0.dyp"
+		"v0.14.1" : "\(baseLink)/beta/v0.14.1.dyp"
+		"v0.15.0" : "\(baseLink)/beta/v0.15.0.dyp"
+		"v0.16.0" : "\(baseLink)/beta/v0.16.0.dyp"
+		"v0.16.1" : "\(baseLink)/beta/v0.16.1.dyp"
+		"v0.17.0" : "\(baseLink)/beta/v0.17.0.dyp"
+		"v0.17.1" : "\(baseLink)/beta/v0.17.1.dyp"
+		"v0.18.0" : "\(baseLink)/beta/v0.18.0.dyp"
+		"v0.19.0" : "\(baseLink)/beta/v0.19.0.dyp"
+	}
 
-	// Gamma Stage
-	"v0.20.0" : "\(baseLink)/gamma/v0.20.0.dyp",
-	"v0.21.0" : "\(baseLink)/gamma/v0.21.0.dyp",
-	"v0.21.1" : "\(baseLink)/gamma/v0.21.1.dyp",
-	"v0.22.0" : "\(baseLink)/gamma/v0.22.0.dyp",
-	"v0.23.0" : "\(baseLink)/gamma/v0.23.0.dyp",
-	"v0.24.0" : "\(baseLink)/gamma/v0.24.0.dyp",
-	"v0.25.0" : "\(baseLink)/gamma/v0.25.0.dyp",
-	"v0.26.0" : "\(baseLink)/gamma/v0.26.0.dyp",
-	"v0.27.0" : "\(baseLink)/gamma/v0.27.0.dyp",
-	"v0.27.1" : "\(baseLink)/gamma/v0.27.1.dyp",
-	"v0.28.0" : "\(baseLink)/gamma/v0.28.0.dyp",
-	"v0.29.0" : "\(baseLink)/gamma/v0.29.0.dyp",
+	"Gamma" : { // Gamma Stage
+		"v0.20.0" : "\(baseLink)/gamma/v0.20.0.dyp"
+		"v0.21.0" : "\(baseLink)/gamma/v0.21.0.dyp"
+		"v0.21.1" : "\(baseLink)/gamma/v0.21.1.dyp"
+		"v0.22.0" : "\(baseLink)/gamma/v0.22.0.dyp"
+		"v0.23.0" : "\(baseLink)/gamma/v0.23.0.dyp"
+		"v0.24.0" : "\(baseLink)/gamma/v0.24.0.dyp"
+		"v0.25.0" : "\(baseLink)/gamma/v0.25.0.dyp"
+		"v0.26.0" : "\(baseLink)/gamma/v0.26.0.dyp"
+		"v0.27.0" : "\(baseLink)/gamma/v0.27.0.dyp"
+		"v0.27.1" : "\(baseLink)/gamma/v0.27.1.dyp"
+		"v0.28.0" : "\(baseLink)/gamma/v0.28.0.dyp"
+		"v0.29.0" : "\(baseLink)/gamma/v0.29.0.dyp"
+	}
+
+	"Delta" : { // Delta Stage
+		"v0.30.0" : "\(baseLink)/delta/v0.30.0.dyp"
+	}
 }

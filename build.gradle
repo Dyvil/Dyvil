@@ -11,17 +11,15 @@ import groovy.transform.Field
 
 group = 'clashsoft'
 
-version = '0.29.0'
+version = '0.30.0'
 
-String libraryVersion = '0.29.0'
-String compilerVersion = '0.29.0'
-String replVersion = '0.17.4'
-String dpfVersion = '0.10.0'
-String genSrcVersion = '0.4.0'
+String libraryVersion = '0.30.0'
+String compilerVersion = '0.30.0'
+String replVersion = '0.18.0'
+String dpfVersion = '0.11.0'
+String genSrcVersion = '0.4.1'
 
-String devStage = 'gamma'
-
-boolean nightly = false
+String devStage = 'delta'
 
 @Field static final String replMainClass = 'dyvil.tools.repl.Main'
 @Field static final String compilerMainClass = 'dyvil.tools.compiler.Main'
@@ -36,22 +34,19 @@ boolean nightly = false
 // ---------------------------------------- Nightly Versioning ----------------------------------------
 
 Map<String, String> env = System.getenv()
-String droneBuild = env['DRONE_BUILD_NUMBER']
-if (!droneBuild)
-{
-	droneBuild = env['TRAVIS_BUILD_NUMBER']
-}
+String buildNum = env['TRAVIS_BUILD_NUMBER'] ?: env['DRONE_BUILD_NUMBER']
+boolean nightly
 
-if (droneBuild)
+if (buildNum)
 {
-	String snapshot = "+nightly." + droneBuild
+	String info = "+nightly." + buildNum
 
-	version += snapshot
-	libraryVersion += snapshot
-	compilerVersion += snapshot
-	replVersion += snapshot
-	dpfVersion += snapshot
-	genSrcVersion += snapshot
+	version += info
+	libraryVersion += info
+	compilerVersion += info
+	replVersion += info
+	dpfVersion += info
+	genSrcVersion += info
 
 	nightly = true
 }
@@ -461,11 +456,11 @@ task prepareRelease(type: Copy) {
 	doLast {
 		println "Release v$version"
 		println ""
-		println "Dyvil Library v$libraryVersion"
-		println "Dyvil Compiler v$compilerVersion"
-		println "Dyvil REPL v$replVersion"
+		println "Library v$libraryVersion"
+		println "Compiler v$compilerVersion"
+		println "REPL v$replVersion"
 		println "Dyvil Property Format v$dpfVersion"
-		println "Dyvil GenSrc v$genSrcVersion"
+		println "GenSrc v$genSrcVersion"
 	}
 }
 
