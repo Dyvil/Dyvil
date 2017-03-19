@@ -498,7 +498,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 		if (isGenericCall(next, nextType))
 		{
-			final MethodCall call = new MethodCall(token.raw(), this.value, name, ArgumentList.empty());
+			final MethodCall call = new MethodCall(token.raw(), this.value, name, ArgumentList.EMPTY);
 			this.value = call;
 
 			pm.splitJump(next, 1);

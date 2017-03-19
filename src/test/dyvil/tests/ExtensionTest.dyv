@@ -63,7 +63,7 @@ public class ExtensionTest
 		print "Dynamic Dispatch Speed: \(totalTime / count) ns / invocation"
 	}
 
-	private static var nameMap: Map<any, String> = dyvil.collection.mutable.IdentityHashMap<any, String>
+	private static var nameMap: Map<any, String> = dyvil.collection.mutable.IdentityHashMap<any, String>()
 
 	postfix func name(any value) -> String = nameMap[value]
 

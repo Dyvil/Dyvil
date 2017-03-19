@@ -96,15 +96,15 @@ public class OverloadTest
 		}
 
 		test "Generic" {
-			g(List<int>)    =?= "g(List<int>)"
-			g(List<String>) =?= "g(List<String>)"
-			g(Set<int>)     =?= "g(Set<int>)"
-			g(Set<String>)  =?= "g(Set<String>)"
+			g(List<int>())    =?= "g(List<int>)"
+			g(List<String>()) =?= "g(List<String>)"
+			g(Set<int>())     =?= "g(Set<int>)"
+			g(Set<String>())  =?= "g(Set<String>)"
 
-			h(List<int>)    =?= "h(List<int>)"
-			h(List<long>)   =?= "h(List<long>)"
-			h(List<float>)  =?= "h(List<float>)"
-			h(List<double>) =?= "h(List<double>)"
+			h(List<int>())    =?= "h(List<int>)"
+			h(List<long>())   =?= "h(List<long>)"
+			h(List<float>())  =?= "h(List<float>)"
+			h(List<double>()) =?= "h(List<double>)"
 		}
 
 		test "Priority" {
