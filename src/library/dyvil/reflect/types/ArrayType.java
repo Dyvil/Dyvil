@@ -1,21 +1,21 @@
 package dyvil.reflect.types;
 
 import dyvil.annotation.internal.ClassParameters;
-import dyvil.lang.ClassExtensions;
 import dyvil.lang.LiteralConvertible;
+import dyvil.lang.Types;
 
 @LiteralConvertible.FromType
 @ClassParameters(names = { "componentType" })
 public class ArrayType<T> implements Type<T[]>
 {
-	protected final Type componentType;
+	protected final Type<T> componentType;
 	
 	public static <T> ArrayType<T> apply(Type<T> type)
 	{
 		return new ArrayType<>(type);
 	}
 	
-	public ArrayType(Type componentType)
+	public ArrayType(Type<T> componentType)
 	{
 		this.componentType = componentType;
 	}
@@ -23,7 +23,7 @@ public class ArrayType<T> implements Type<T[]>
 	@Override
 	public Class<T[]> erasure()
 	{
-		return ClassExtensions.arrayType(this.componentType.erasure());
+		return (Class<T[]>) Types.arrayType(this.componentType.erasure());
 	}
 
 	@Override
@@ -34,7 +34,7 @@ public class ArrayType<T> implements Type<T[]>
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Type<T[]> typeArgument(int index)
+	public Type<?> typeArgument(int index)
 	{
 		return index != 0 ? null : this.componentType;
 	}
