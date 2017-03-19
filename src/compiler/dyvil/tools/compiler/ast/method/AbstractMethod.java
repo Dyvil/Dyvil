@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.method;
 
 import dyvil.annotation.Mutating;
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Handle;
@@ -317,7 +318,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return this.name == Names.toString || this.name == Names.hashCode;
 		case 1:
 			if (this.name == Names.equals
-				    && this.parameters.get(0).getInternalType().getTheClass() == Types.OBJECT_CLASS)
+				    && this.parameters.get(0).getCovariantType().getTheClass() == Types.OBJECT_CLASS)
 			{
 				return true;
 			}
@@ -428,7 +429,19 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public boolean isMember(IVariable variable)
 	{
-		return this.parameters.isParameter(variable);
+		if (this.parameters.isParameter(variable))
+		{
+			return true;
+		}
+
+		for (int i = 0; i < this.typeParameterCount; i++)
+		{
+			if (variable == this.typeParameters[i].getReifyParameter())
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -509,7 +522,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			if (mod == Modifiers.INFIX)
 			{
 				// Infix access to infix method
-				receiverType = parameters.get(0).getInternalType();
+				receiverType = parameters.get(0).getCovariantType();
 				parameterStartIndex = 1;
 			}
 			else
@@ -596,10 +609,10 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return;
 		}
 
-		final IType parType = parameterList.get(0).getInternalType();
+		final IType parType = parameterList.get(0).getCovariantType();
 
 		// Note: this explicitly uses IValue.getTypeMatch to avoid nested implicit conversions
-		final int match = value.getTypeMatch(parType);
+		final int match = value.getTypeMatch(parType, null);
 		if (match > IValue.CONVERSION_MATCH)
 		{
 			list.add(new Candidate<>(this, match, parType, false));
@@ -625,7 +638,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return new GenericData(this, this.typeParameterCount);
 		}
 
-		data.setTypeParametric(this);
+		data.setMember(this);
 		data.setTypeCount(this.typeParameterCount);
 
 		return data;
@@ -643,7 +656,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				// infix or extension method, declaring class implicit
 
 				final IParameter parameter = this.parameters.get(0);
-				final IType paramType = parameter.getInternalType();
+				final IType paramType = parameter.getCovariantType();
 
 				updateReceiverType(receiver, genericData);
 				receiver = TypeChecker.convertValue(receiver, paramType, genericData, markers, context,
@@ -662,6 +675,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				}
 				return receiver;
 			}
+
+			updateReceiverType(receiver, genericData);
 
 			if ((mod & Modifiers.STATIC) != 0)
 			{
@@ -697,12 +712,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			{
 				// normal instance method access
 
-				updateReceiverType(receiver, genericData);
 				receiver = TypeChecker.convertValue(receiver, this.getReceiverType(), genericData, markers, context,
 				                                    TypeChecker
 					                                    .markerSupplier("method.access.receiver_type", this.name));
-				updateReceiverType(receiver, genericData);
 			}
+			updateReceiverType(receiver, genericData);
 		}
 		else if (!this.modifiers.hasIntModifier(Modifiers.STATIC))
 		{
@@ -747,7 +761,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		if (genericData != null)
 		{
-			genericData.lock(genericData.typeCount());
+			genericData.lockAvailable();
 			genericData.setFallbackTypeContext(receiver.getType());
 		}
 	}
@@ -834,7 +848,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public boolean checkOverride(IMethod candidate, ITypeContext typeContext)
+	public boolean overrides(IMethod candidate, ITypeContext typeContext)
 	{
 		// Check Name and number of type parameters
 		if (candidate.getName() != this.name // different name
@@ -861,8 +875,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		// Check Parameter Types
 		for (int i = 0, count = this.parameters.size(); i < count; i++)
 		{
-			final IType parType = this.parameters.get(i).getInternalType().getConcreteType(typeContext);
-			final IType candidateParType = candidateParameters.get(i).getInternalType().getConcreteType(typeContext);
+			final IType parType = this.parameters.get(i).getCovariantType().getConcreteType(typeContext);
+			final IType candidateParType = candidateParameters.get(i).getCovariantType().getConcreteType(typeContext);
 			if (!Types.isSameType(parType, candidateParType))
 			{
 				return false;
@@ -1071,7 +1085,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		final int modifiers = this.modifiers.toFlags();
 		if ((modifiers & Modifiers.INFIX) == Modifiers.INFIX)
 		{
-			receiver.writeExpression(writer, this.parameters.get(0).getInternalType());
+			receiver.writeExpression(writer, this.parameters.get(0).getCovariantType());
 			return;
 		}
 
@@ -1165,20 +1179,21 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		super.toString(prefix, buffer);
+		super.toString(indent, buffer);
 
 		// Type
-		boolean typeAscription = false;
-		boolean parameters = true;
+		boolean typeAscription;
+		boolean parameters;
 		if (this.type != null && this.type != Types.UNKNOWN)
 		{
 			typeAscription = Formatting.typeAscription("method.type_ascription", this);
 
 			if (!typeAscription)
 			{
-				this.type.toString("", buffer);
+				this.type.toString(indent, buffer);
+				parameters = true;
 			}
 			else
 			{
@@ -1188,6 +1203,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 		else
 		{
+			typeAscription = false;
 			buffer.append("func");
 			parameters = this.parameters.size() > 0 || Formatting.getBoolean("method.parameters.visible");
 		}
@@ -1204,7 +1220,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 
 			Formatting.appendSeparator(buffer, "generics.open_bracket", '<');
-			Util.astToString(prefix, this.typeParameters, this.typeParameterCount,
+			Util.astToString(indent, this.typeParameters, this.typeParameterCount,
 			                 Formatting.getSeparator("generics.separator", ','), buffer);
 			Formatting.appendSeparator(buffer, "generics.close_bracket", '>');
 		}
@@ -1212,39 +1228,40 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		// Parameters
 		if (parameters)
 		{
-			this.parameters.toString(prefix, buffer);
+			this.parameters.toString(indent, buffer);
 		}
 
 		// Exceptions
 		if (this.exceptionCount > 0)
 		{
-			String throwsPrefix = prefix;
+			final String throwsIndent;
 			if (Formatting.getBoolean("method.throws.newline"))
 			{
-				throwsPrefix = Formatting.getIndent("method.throws.indent", prefix);
-				buffer.append('\n').append(throwsPrefix).append("throws ");
+				throwsIndent = Formatting.getIndent("method.throws.indent", indent);
+				buffer.append('\n').append(throwsIndent).append("throws ");
 			}
 			else
 			{
+				throwsIndent = indent;
 				buffer.append(" throws ");
 			}
 
-			Util.astToString(throwsPrefix, this.exceptions, this.exceptionCount,
+			Util.astToString(throwsIndent, this.exceptions, this.exceptionCount,
 			                 Formatting.getSeparator("method.throws", ','), buffer);
 		}
 
 		// Type Ascription
 		if (typeAscription)
 		{
-			Formatting.appendSeparator(buffer, "method.type_ascription", ':');
-			this.type.toString(prefix, buffer);
+			Formatting.appendSeparator(buffer, "method.type_ascription", "->");
+			this.type.toString(indent, buffer);
 		}
 
 		// Implementation
 		final IValue value = this.getValue();
 		if (value != null)
 		{
-			if (Util.formatStatementList(prefix, buffer, value))
+			if (Util.formatStatementList(indent, buffer, value))
 			{
 				return;
 			}
@@ -1256,7 +1273,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 			buffer.append('=');
 
-			String valuePrefix = Formatting.getIndent("method.declaration.indent", prefix);
+			String valuePrefix = Formatting.getIndent("method.declaration.indent", indent);
 			if (Formatting.getBoolean("method.declaration.newline_after"))
 			{
 				buffer.append('\n').append(valuePrefix);
@@ -1266,7 +1283,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				buffer.append(' ');
 			}
 
-			value.toString(prefix, buffer);
+			value.toString(indent, buffer);
 		}
 
 		if (Formatting.getBoolean("method.semicolon"))

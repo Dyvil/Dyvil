@@ -15,7 +15,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.NestedMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.statement.Closure;
-import dyvil.tools.compiler.ast.statement.FieldInitializer;
+import dyvil.tools.compiler.ast.statement.VariableStatement;
 import dyvil.tools.compiler.ast.statement.MemberStatement;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.statement.control.Label;
@@ -306,7 +306,7 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 	@Override
 	public void addDataMember(IVariable field)
 	{
-		this.setValue(new FieldInitializer(field));
+		this.setValue(new VariableStatement(field));
 	}
 
 	@Override

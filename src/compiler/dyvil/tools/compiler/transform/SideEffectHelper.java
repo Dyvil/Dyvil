@@ -1,10 +1,10 @@
 package dyvil.tools.compiler.transform;
 
-import dyvil.tools.compiler.ast.access.FieldAccess;
+import dyvil.tools.compiler.ast.expression.access.FieldAccess;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.statement.FieldInitializer;
+import dyvil.tools.compiler.ast.statement.VariableStatement;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.parsing.Name;
 
@@ -29,7 +29,7 @@ public class SideEffectHelper
 		                                       value.getType());
 		variable.setValue(value);
 
-		this.statementList.addValue(new FieldInitializer(variable));
+		this.statementList.addValue(new VariableStatement(variable));
 		this.statementList.addVariable(variable);
 		this.registered++;
 

@@ -21,11 +21,14 @@ public @interface Intrinsic(
 )
 {
 	// Compiler-Codes
-	const STRING_CONCAT = 1
-	const BOOLEAN_NOT   = 2
-	const BOOLEAN_AND   = 3
-	const BOOLEAN_OR    = 4
-	const ARRAY_SPREAD  = 6
+	const STRING_CONCAT  = 1
+	const BOOLEAN_NOT    = 2
+	const BOOLEAN_AND    = 3
+	const BOOLEAN_OR     = 4
+	const ARRAY_SPREAD   = 6
+
+	const OPTIONAL_CHAIN  = 7
+	const NULL_COALESCING = 8
 
 	const PRE_INCREMENT  = 10
 	const PRE_DECREMENT  = 11

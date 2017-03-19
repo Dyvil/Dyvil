@@ -9,6 +9,7 @@ import dyvil.collection.mutable.TreeMap
 import dyvil.tools.parsing.Name
 import dyvil.tools.dpf.ast._
 import dyvil.tools.dpf.ast.value.Value
+import dyvil.tools.dpf.model._
 import dyvil.tools.dpf.converter.{ binary._, string._, flatmap._ }
 
 using dyvil.tools.dpf.DPFSyntax._
@@ -31,42 +32,42 @@ public class DPFTest
 			}
 		}
 
-		public func apply(Configure<Button> configure) -> Button
+		public func apply(configure: Configure<Button>) -> Button
 		{
 			configure this
 			return this
 		}
 	}
 
-	public static let TEST_NODE: RootNode = (dpf {
+	public const TEST_NODE: RootNode = (dpf {
 		"node1" {
-			"intProperty": 10
-			"stringProperty": "abc"
-			"stringProperty2":
-				"String Interpolation: \("node1.stringProperty") where intProperty = \("node1.intProperty")"
-			"listProperty": [ 1, "a", true ]
-			"mapProperty": [ 1 : "a", 2 : "B" ]
+			"bool": false
+			"int": 10
+			"string_1": "abc"
+			"string_2": "string: \("node1.string") int: \("node1.int")"
+			"list": [ 1, "a", true, [ 1, 2, "" ], [ 1: "a", 2: "b" ] ]
+			"map": [ 1: "a", 2: "B", [ 1, 2 ]: [ 3, 4 ], [ 1: 'a' ]: [ 2: 'b' ] ]
 
 			// Typesafe Builder, with automatic Conversion
-			"builderProperty1": Button(text: "Click Me", x: 10, y: 20) {
+			"builder_1": Button(text: "Click Me", x: 10, y: 20) {
 				visible = true
 			}
 
 			// DSL Builder
-			"builderProperty2": "TextField"("Hello World", "x": 100, "y": 200) {
+			"builder_2": "TextField"("Hello World", "x": 100, "y": 200) {
 				"visible": false
 			}
 		}
 
 		"node2" {
-			"subProperty1": 42
-			"subNode1" {
-				"subProperty2": 13
+			"sub_1": 42
+			"sub_2" {
+				"sub_3": 13
 			}
 		}
 	})
 
-	public static let TEST_STRING: String = TEST_NODE.toString
+	public const TEST_STRING: String = TEST_NODE.toString
 
 	static func apply() -> Test = test "DPF" {
 		test "DPF Parser" {

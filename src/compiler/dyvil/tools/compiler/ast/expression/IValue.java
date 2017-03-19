@@ -1,15 +1,17 @@
 package dyvil.tools.compiler.ast.expression;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
+import dyvil.tools.compiler.ast.expression.constant.*;
+import dyvil.tools.compiler.ast.expression.intrinsic.PopExpr;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
-import dyvil.tools.compiler.ast.intrinsic.PopExpr;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.type.IType;
@@ -91,7 +93,8 @@ public interface IValue extends IASTNode, ITyped
 	int BOOLEAN_NOT       = 131;
 	int CLASS_OPERATOR    = 132;
 	int TYPE_OPERATOR     = 133;
-	int NULLCHECK         = 134;
+	int OPTIONAL_CHAIN    = 134;
+	int NULL_COALESCING   = 135;
 	int STRING_CONCAT     = 136;
 	int INC               = 137;
 	int COLON             = 138;
@@ -193,6 +196,8 @@ public interface IValue extends IASTNode, ITyped
 		return null;
 	}
 
+	// Subclass-specific methods
+
 	default boolean isClassAccess()
 	{
 		return false;
@@ -226,6 +231,28 @@ public interface IValue extends IASTNode, ITyped
 		return false;
 	}
 
+	default boolean isPolyExpression()
+	{
+		return false;
+	}
+
+	default boolean needsOptionalElseLabel()
+	{
+		return false;
+	}
+
+	default Label getOptionalElseLabel()
+	{
+		return null;
+	}
+
+	default boolean setOptionalElseLabel(Label label, boolean top)
+	{
+		return false;
+	}
+
+	// Types
+
 	@Override
 	IType getType();
 
@@ -253,9 +280,10 @@ public interface IValue extends IASTNode, ITyped
 	 * @param type
 	 * 	the type to match
 	 *
+	 * @param implicitContext
 	 * @return the subtyping distance
 	 */
-	default int getTypeMatch(IType type)
+	default int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
 		return Types.getTypeMatch(type, this.getType());
 	}
@@ -434,7 +462,7 @@ public interface IValue extends IASTNode, ITyped
 	}
 
 	@Override
-	void toString(String prefix, StringBuilder buffer);
+	void toString(@NonNull String indent, @NonNull StringBuilder buffer);
 
 	// Compilation
 

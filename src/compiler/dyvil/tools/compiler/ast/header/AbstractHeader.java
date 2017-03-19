@@ -14,8 +14,8 @@ import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.operator.IOperator;
-import dyvil.tools.compiler.ast.operator.Operator;
+import dyvil.tools.compiler.ast.expression.operator.IOperator;
+import dyvil.tools.compiler.ast.expression.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -345,7 +345,7 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	}
 
 	@Override
-	public IOperator resolveOperator(Name name, int type)
+	public IOperator resolveOperator(Name name, byte type)
 	{
 		if (type == IOperator.INFIX && this.infixOperatorMap != null)
 		{
@@ -365,7 +365,7 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 				continue;
 			}
 
-			if (operator.getType() == type)
+			if (operator.isType(type))
 			{
 				return operator;
 			}
@@ -650,7 +650,7 @@ class HeaderContext implements IStaticContext
 	}
 
 	@Override
-	public IOperator resolveOperator(Name name, int type)
+	public IOperator resolveOperator(Name name, byte type)
 	{
 		final IOperator candidate = this.header.resolveOperator(name, type);
 		if (candidate != null && candidate.getType() == type)

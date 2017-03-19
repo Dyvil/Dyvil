@@ -1,16 +1,15 @@
 package dyvil.tools.compiler.parser.expression;
 
-import dyvil.tools.compiler.ast.access.*;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationValue;
-import dyvil.tools.compiler.ast.constant.*;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.*;
-import dyvil.tools.compiler.ast.operator.InfixCallChain;
-import dyvil.tools.compiler.ast.operator.PostfixCall;
-import dyvil.tools.compiler.ast.operator.PrefixCall;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
-import dyvil.tools.compiler.ast.parameter.SingleArgument;
+import dyvil.tools.compiler.ast.expression.access.*;
+import dyvil.tools.compiler.ast.expression.constant.*;
+import dyvil.tools.compiler.ast.expression.operator.InfixCallChain;
+import dyvil.tools.compiler.ast.expression.operator.PostfixCall;
+import dyvil.tools.compiler.ast.expression.operator.PrefixCall;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.statement.ReturnStatement;
 import dyvil.tools.compiler.ast.statement.SyncStatement;
@@ -268,6 +267,14 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 			if (isIdentifier(type))
 			{
+				if (this.value == null)
+				{
+					// .IDENTIFIER
+					this.value = new EnumValue(token.raw(), token.nameValue());
+					this.mode = ACCESS;
+					return;
+				}
+
 				// EXPRESSION . IDENTIFIER
 
 				this.parseInfixAccess(pm, token, token.nameValue());
@@ -491,7 +498,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 
 		if (isGenericCall(next, nextType))
 		{
-			final MethodCall call = new MethodCall(token.raw(), this.value, name, EmptyArguments.INSTANCE);
+			final MethodCall call = new MethodCall(token.raw(), this.value, name, ArgumentList.EMPTY);
 			this.value = call;
 
 			pm.splitJump(next, 1);
@@ -515,7 +522,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		//      println -1
 		//      println i
 
-		final MethodCall call = new MethodCall(token.raw(), this.value, name, EmptyArguments.INSTANCE);
+		final MethodCall call = new MethodCall(token.raw(), this.value, name, ArgumentList.empty());
 		this.value = call;
 		this.mode = ACCESS;
 
@@ -624,7 +631,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		}
 
 		final ApplyMethodCall applyCall = new ApplyMethodCall(ICodePosition.between(token.prev(), token), this.value,
-		                                                      EmptyArguments.VISIBLE);
+		                                                      ArgumentList.empty());
 
 		this.value = applyCall;
 		this.parseApply(pm, token, applyCall);
@@ -653,9 +660,9 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 	{
 		if (token.type() != BaseSymbols.OPEN_CURLY_BRACKET)
 		{
-			final SingleArgument argument = new SingleArgument();
-			call.setArguments(argument);
-			pm.pushParser(new ExpressionParser(argument).withFlags(this.flags | IGNORE_APPLY | IGNORE_OPERATOR));
+			final ArgumentList arguments = new ArgumentList(1);
+			call.setArguments(arguments);
+			pm.pushParser(new ExpressionParser(arguments).withFlags(this.flags | IGNORE_APPLY | IGNORE_OPERATOR));
 			return;
 		}
 
@@ -665,9 +672,9 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			return;
 		}
 
-		final SingleArgument argument = new SingleArgument();
-		call.setArguments(argument);
-		pm.pushParser(new StatementListParser(argument, true));
+		final ArgumentList arguments = new ArgumentList(1);
+		call.setArguments(arguments);
+		pm.pushParser(new StatementListParser(arguments, true));
 	}
 
 	private boolean parseValue(IParserManager pm, IToken token, int type)

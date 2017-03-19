@@ -9,6 +9,7 @@ import dyvil.tools.compiler.ast.expression.ThisExpr;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.member.MemberKind;
+import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
@@ -26,8 +27,10 @@ public class ClassParameter extends Field implements IParameter
 	// Metadata
 	protected int     index;
 	protected int     localIndex;
-	protected IType   internalType;
+	protected IType   covariantType;
 	protected boolean varargs;
+
+	protected ICallableMember constructor;
 
 	public ClassParameter(IClass enclosingClass)
 	{
@@ -44,7 +47,8 @@ public class ClassParameter extends Field implements IParameter
 		super(enclosingClass, name, type);
 	}
 
-	public ClassParameter(IClass enclosingClass, ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public ClassParameter(IClass enclosingClass, ICodePosition position, Name name, IType type, ModifierSet modifiers,
+		                     AnnotationList annotations)
 	{
 		super(enclosingClass, position, name, type, modifiers == null ? new ModifierList() : modifiers, annotations);
 	}
@@ -56,7 +60,7 @@ public class ClassParameter extends Field implements IParameter
 	}
 
 	@Override
-	public boolean isVariable()
+	public boolean isLocal()
 	{
 		return false;
 	}
@@ -68,9 +72,21 @@ public class ClassParameter extends Field implements IParameter
 	}
 
 	@Override
-	public boolean isReferenceCapturable()
+	public ICallableMember getMethod()
 	{
-		return false;
+		return this.constructor;
+	}
+
+	@Override
+	public void setMethod(ICallableMember method)
+	{
+		this.constructor = method;
+	}
+
+	@Override
+	public IType getInternalType()
+	{
+		return this.type;
 	}
 
 	@Override
@@ -80,26 +96,26 @@ public class ClassParameter extends Field implements IParameter
 	}
 
 	@Override
-	public IType getInternalType()
+	public IType getCovariantType()
 	{
-		if (this.internalType != null)
+		if (this.covariantType != null)
 		{
-			return this.internalType;
+			return this.covariantType;
 		}
 
-		return this.internalType = this.type.asParameterType();
-	}
-
-	@Override
-	public void setVarargs(boolean varargs)
-	{
-		this.varargs = varargs;
+		return this.covariantType = this.type.asParameterType();
 	}
 
 	@Override
 	public boolean isVarargs()
 	{
 		return this.varargs;
+	}
+
+	@Override
+	public void setVarargs(boolean varargs)
+	{
+		this.varargs = varargs;
 	}
 
 	@Override
@@ -156,7 +172,8 @@ public class ClassParameter extends Field implements IParameter
 	}
 
 	@Override
-	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue receiver, IValue newValue)
+	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue receiver,
+		                         IValue newValue)
 	{
 		if (this.enclosingClass.hasModifier(Modifiers.ANNOTATION))
 		{
@@ -190,22 +207,11 @@ public class ClassParameter extends Field implements IParameter
 			return;
 		}
 
-		if (this.isVarargs())
-		{
-			this.modifiers.removeIntModifier(Modifiers.VARARGS);
-		}
-
 		super.write(writer);
 	}
 
 	@Override
-	public void writeInit(MethodWriter writer, IValue value) throws BytecodeException
-	{
-		this.writeInit(writer);
-	}
-
-	@Override
-	public void writeInit(MethodWriter writer) throws BytecodeException
+	public void writeParameter(MethodWriter writer)
 	{
 		if (this.varargs && !this.modifiers.hasIntModifier(Modifiers.VARARGS))
 		{
@@ -213,11 +219,17 @@ public class ClassParameter extends Field implements IParameter
 			// to rely on a boolean field.
 
 			this.modifiers.addIntModifier(Modifiers.VARARGS);
-			AbstractParameter.writeInitImpl(this, writer);
+			IParameter.super.writeParameter(writer);
 			this.modifiers.removeIntModifier(Modifiers.VARARGS);
 			return;
 		}
 
-		AbstractParameter.writeInitImpl(this, writer);
+		IParameter.super.writeParameter(writer);
+	}
+
+	@Override
+	public void writeInit(MethodWriter writer) throws BytecodeException
+	{
+		IParameter.super.writeInit(writer);
 	}
 }

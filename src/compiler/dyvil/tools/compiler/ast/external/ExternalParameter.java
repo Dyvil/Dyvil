@@ -54,14 +54,14 @@ public class ExternalParameter extends AbstractParameter
 	}
 
 	@Override
-	public IType getInternalType()
+	public IType getCovariantType()
 	{
 		if (!this.resolved)
 		{
 			this.resolveTypes();
 		}
 
-		return super.getInternalType();
+		return super.getCovariantType();
 	}
 
 	@Override

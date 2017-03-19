@@ -1,30 +1,25 @@
 package dyvil.tools.compiler.ast.parameter;
 
-import dyvil.collection.iterator.ArrayIterator;
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IImplicitContext;
+import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
-import dyvil.tools.compiler.ast.header.ICompilableList;
+import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
 import java.util.Arrays;
-import java.util.Iterator;
 
-public final class NamedArgumentList implements IArguments
+public class NamedArgumentList extends ArgumentList
 {
-	private Name[]   keys;
-	private IValue[] values;
-	private int      size;
+	protected Name[] keys;
 
 	public NamedArgumentList()
 	{
@@ -37,24 +32,6 @@ public final class NamedArgumentList implements IArguments
 		this.keys = keys;
 		this.values = values;
 		this.size = size;
-	}
-
-	@Override
-	public Iterator<IValue> iterator()
-	{
-		return new ArrayIterator<>(this.values, this.size);
-	}
-
-	@Override
-	public int size()
-	{
-		return this.size;
-	}
-
-	@Override
-	public boolean isEmpty()
-	{
-		return this.size == 0;
 	}
 
 	@Override
@@ -79,12 +56,6 @@ public final class NamedArgumentList implements IArguments
 		return new NamedArgumentList(keys, values, size);
 	}
 
-	@Override
-	public IValue getFirstValue()
-	{
-		return this.values[0];
-	}
-
 	public void addLastValue(Name key, IValue value)
 	{
 		final int index = this.size++;
@@ -99,24 +70,6 @@ public final class NamedArgumentList implements IArguments
 		}
 		this.values[index] = value;
 		this.keys[index] = key;
-	}
-
-	@Override
-	public void setFirstValue(IValue value)
-	{
-		this.values[0] = value;
-	}
-
-	@Override
-	public IValue getLastValue()
-	{
-		return this.values[this.size - 1];
-	}
-
-	@Override
-	public void setLastValue(IValue value)
-	{
-		this.values[this.size - 1] = value;
 	}
 
 	@Override
@@ -216,7 +169,7 @@ public final class NamedArgumentList implements IArguments
 			// Not a varargs parameter
 
 			return ArgumentList.checkMatch(values, types, matchStartIndex + argIndex, this.values[argIndex],
-			                               param.getInternalType(), implicitContext) ? 0 : -1;
+			                               param.getCovariantType(), implicitContext) ? 0 : -1;
 		}
 
 		// Varargs Parameter
@@ -226,33 +179,41 @@ public final class NamedArgumentList implements IArguments
 	}
 
 	@Override
-	public void checkValue(int index, IParameter param, ITypeContext typeContext, MarkerList markers, IContext context)
+	public void checkValue(int index, IParameter param, GenericData genericData, MarkerList markers, IContext context)
 	{
 		final int argIndex = this.findIndex(index, param.getName());
 		if (argIndex < 0)
 		{
+			if (param.isVarargs())
+			{
+				final ArrayExpr arrayExpr = new ArrayExpr(new IValue[0], 0);
+				final IValue converted = IArguments.convertValue(arrayExpr, param, genericData, markers, context);
+				this.addLastValue(param.getName(), converted);
+			}
+
 			return;
 		}
 
 		if (!param.isVarargs())
 		{
-			final IType type = param.getInternalType();
-			this.values[argIndex] = TypeChecker.convertValue(this.values[argIndex], type, typeContext, markers, context,
-			                                                 IArguments.argumentMarkerSupplier(param));
+			this.values[argIndex] = IArguments
+				                        .convertValue(this.values[argIndex], param, genericData, markers, context);
 			return;
 		}
 
 		final int endIndex = this.findNextName(argIndex + 1);
-		if (ArgumentList.checkVarargsValue(this.values, argIndex, endIndex, param, typeContext, markers, context))
+		if (!checkVarargsValue(this.values, argIndex, endIndex, param, genericData, markers, context))
 		{
-			final int moved = this.size - endIndex;
-			if (moved > 0)
-			{
-				System.arraycopy(this.values, endIndex, this.values, argIndex + 1, moved);
-				System.arraycopy(this.keys, endIndex, this.keys, argIndex + 1, moved);
-			}
-			this.size = argIndex + moved + 1;
+			return;
 		}
+
+		final int moved = this.size - endIndex;
+		if (moved > 0)
+		{
+			System.arraycopy(this.values, endIndex, this.values, argIndex + 1, moved);
+			System.arraycopy(this.keys, endIndex, this.keys, argIndex + 1, moved);
+		}
+		this.size = argIndex + moved + 1;
 	}
 
 	@Override
@@ -266,7 +227,7 @@ public final class NamedArgumentList implements IArguments
 	{
 		if (this.hasParameterOrder())
 		{
-			IArguments.super.writeValues(writer, parameters, startIndex);
+			super.writeValues(writer, parameters, startIndex);
 			return;
 		}
 
@@ -299,7 +260,7 @@ public final class NamedArgumentList implements IArguments
 			IParameter param = params[i];
 			if (param.getIndex() == startIndex + i)
 			{
-				this.values[i].writeExpression(writer, param.getInternalType());
+				this.values[i].writeExpression(writer, param.getCovariantType());
 				targets[i] = -2;
 				argStartIndex = i + 1;
 			}
@@ -316,7 +277,7 @@ public final class NamedArgumentList implements IArguments
 			for (int i = argStartIndex; i < this.size; i++)
 			{
 				final IParameter parameter = params[i];
-				final IType parameterType = parameter.getInternalType();
+				final IType parameterType = parameter.getCovariantType();
 				final IValue value = this.values[i];
 
 				final int localIndex = writer.localCount();
@@ -337,15 +298,12 @@ public final class NamedArgumentList implements IArguments
 				switch (target)
 				{
 				case -1:
-					// Value for parameter does not exist -> write default value
-					EmptyArguments.writeArguments(writer, parameter);
-					continue;
 				case -2:
 					// Value for parameter was already written in Step 2
 					continue;
 				default:
 					// Value for parameter exists -> load the variable
-					writer.visitVarInsn(parameter.getInternalType().getLoadOpcode(), target);
+					writer.visitVarInsn(parameter.getCovariantType().getLoadOpcode(), target);
 				}
 			}
 		}
@@ -357,27 +315,8 @@ public final class NamedArgumentList implements IArguments
 	public void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
 	{
 		final int argIndex = this.findIndex(index, param.getName());
-		if (argIndex >= 0)
-		{
-			this.values[argIndex].writeExpression(writer, param.getInternalType());
-			return;
-		}
 
-		EmptyArguments.writeArguments(writer, param);
-	}
-
-	@Override
-	public boolean isResolved()
-	{
-		for (int i = 0; i < this.size; i++)
-		{
-			if (!this.values[i].isResolved())
-			{
-				return false;
-			}
-		}
-
-		return true;
+		this.values[argIndex].writeExpression(writer, param.getCovariantType());
 	}
 
 	@Override
@@ -407,51 +346,6 @@ public final class NamedArgumentList implements IArguments
 	}
 
 	@Override
-	public void resolve(MarkerList markers, IContext context)
-	{
-		for (int i = 0; i < this.size; i++)
-		{
-			this.values[i] = this.values[i].resolve(markers, context);
-		}
-	}
-
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		for (int i = 0; i < this.size; i++)
-		{
-			this.values[i].checkTypes(markers, context);
-		}
-	}
-
-	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-		for (int i = 0; i < this.size; i++)
-		{
-			this.values[i].check(markers, context);
-		}
-	}
-
-	@Override
-	public void foldConstants()
-	{
-		for (int i = 0; i < this.size; i++)
-		{
-			this.values[i] = this.values[i].foldConstants();
-		}
-	}
-
-	@Override
-	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
-	{
-		for (int i = 0; i < this.size; i++)
-		{
-			this.values[i] = this.values[i].cleanup(compilableList, classCompilableList);
-		}
-	}
-
-	@Override
 	public IArguments copy()
 	{
 		return new NamedArgumentList(Arrays.copyOf(this.keys, this.size), Arrays.copyOf(this.values, this.size),
@@ -459,63 +353,28 @@ public final class NamedArgumentList implements IArguments
 	}
 
 	@Override
-	public String toString()
+	protected void appendValue(@NonNull String indent, @NonNull StringBuilder buffer, int index)
 	{
-		StringBuilder buf = new StringBuilder();
-		this.toString("", buf);
-		return buf.toString();
+		final Name key = this.keys[index];
+		if (key != null)
+		{
+			buffer.append(key);
+			Formatting.appendSeparator(buffer, "parameters.name_value_separator", ':');
+		}
+
+		this.values[index].toString(indent, buffer);
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	protected void appendType(@NonNull StringBuilder buffer, int index)
 	{
-		Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
+		final Name key = this.keys[index];
 
-		if (this.size > 0)
+		if (key != null)
 		{
-			for (int i = 0, len = this.size; ; i++)
-			{
-				final Name key = this.keys[i];
-				if (key != null)
-				{
-					buffer.append(key);
-					Formatting.appendSeparator(buffer, "parameters.name_value_separator", ':');
-				}
-
-				this.values[i].toString(prefix, buffer);
-				if (i + 1 >= len)
-				{
-					break;
-				}
-
-				Formatting.appendSeparator(buffer, "parameters.separator", ',');
-			}
+			buffer.append(key).append(": ");
 		}
 
-		Formatting.appendSeparator(buffer, "parameters.close_paren", ')');
-	}
-
-	@Override
-	public void typesToString(StringBuilder buffer)
-	{
-		buffer.append('(');
-		for (int i = 0, len = this.size; ; i++)
-		{
-			final Name key = this.keys[i];
-
-			if (key != null)
-			{
-				buffer.append(key).append(": ");
-			}
-
-			this.values[i].getType().toString("", buffer);
-
-			if (i + 1 >= len)
-			{
-				break;
-			}
-			buffer.append(", ");
-		}
-		buffer.append(')');
+		this.values[index].getType().toString("", buffer);
 	}
 }

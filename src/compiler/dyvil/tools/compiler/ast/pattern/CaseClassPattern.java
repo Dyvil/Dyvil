@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -112,7 +112,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 				this.checkMethodAccess(markers, caseClass, param, i, paramCount, pattern);
 			}
 
-			final IType paramType = param.getInternalType().getConcreteType(type);
+			final IType paramType = param.getCovariantType().getConcreteType(type);
 			this.paramTypes[i] = paramType;
 
 			final IPattern typedPattern = pattern.withType(paramType, markers);
@@ -246,7 +246,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 			{
 				memberType = method.getType();
 
-				method.writeInvoke(writer, null, EmptyArguments.INSTANCE, ITypeContext.DEFAULT, lineNumber);
+				method.writeInvoke(writer, null, ArgumentList.EMPTY, ITypeContext.DEFAULT, lineNumber);
 			}
 			else
 			{

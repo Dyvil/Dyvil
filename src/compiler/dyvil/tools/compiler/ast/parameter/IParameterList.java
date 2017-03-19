@@ -88,9 +88,9 @@ public interface IParameterList extends Iterable<IParameter>, IParameterConsumer
 
 	void appendSignature(StringBuilder builder);
 
-	void writeLocals(MethodWriter writer, Label start, Label end);
+	void write(MethodWriter writer);
 
-	void writeInit(MethodWriter writer);
+	void writeLocals(MethodWriter writer, Label start, Label end);
 
 	// Formatting
 

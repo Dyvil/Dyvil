@@ -333,6 +333,22 @@ public class ArrayType implements IObjectType
 	}
 
 	@Override
+	public void writeClassExpression(MethodWriter writer, boolean wrapPrimitives) throws BytecodeException
+	{
+		if (!this.type.hasTypeVariables())
+		{
+			IObjectType.super.writeClassExpression(writer, wrapPrimitives);
+			return;
+		}
+
+		this.type.writeClassExpression(writer, wrapPrimitives);
+
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/lang/Types",
+		                       wrapPrimitives ? "objectArrayType" : "arrayType",
+		                       "(Ljava/lang/Class;)Ljava/lang/Class;", false);
+	}
+
+	@Override
 	public void writeTypeExpression(MethodWriter writer) throws BytecodeException
 	{
 		this.type.writeTypeExpression(writer);

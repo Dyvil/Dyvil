@@ -19,7 +19,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
@@ -43,7 +43,7 @@ import java.io.IOException;
 
 public class CodeClass extends AbstractClass
 {
-	protected IArguments superConstructorArguments = EmptyArguments.INSTANCE;
+	protected IArguments superConstructorArguments = ArgumentList.EMPTY;
 
 	// Metadata
 	protected IHeaderUnit   unit;
@@ -215,10 +215,14 @@ public class CodeClass extends AbstractClass
 			this.annotations.checkTypes(markers, context);
 		}
 
+		this.metadata.checkTypes(markers, context);
+
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
 			this.typeParameters[i].checkTypes(markers, context);
 		}
+
+		this.checkSuperMethods(markers, this, this.getThisType(), new IdentityHashSet<>());
 
 		this.parameters.checkTypes(markers, context);
 
@@ -232,14 +236,10 @@ public class CodeClass extends AbstractClass
 			this.interfaces[i].checkType(markers, context, TypePosition.SUPER_TYPE);
 		}
 
-		this.metadata.checkTypes(markers, context);
-
 		if (this.body != null)
 		{
 			this.body.checkTypes(markers, context);
 		}
-
-		this.checkSuperMethods(markers, this, this.getThisType(), new IdentityHashSet<>());
 
 		context.pop();
 	}

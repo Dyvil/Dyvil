@@ -50,18 +50,18 @@ public interface IntrinsicData
 		{
 			final IParameter parameter = params.get(index);
 			arguments.writeValue(index, parameter, writer);
-			return parameter.getInternalType();
+			return parameter.getCovariantType();
 		}
 
 		if (index == 0)
 		{
-			final IType type = method.hasModifier(INFIX) ? params.get(0).getInternalType() : method.getReceiverType();
+			final IType type = method.hasModifier(INFIX) ? params.get(0).getCovariantType() : method.getReceiverType();
 			receiver.writeExpression(writer, type);
 			return type;
 		}
 
 		final IParameter parameter = params.get(method.hasModifier(INFIX) ? index : index - 1);
 		arguments.writeValue(index - 1, parameter, writer);
-		return parameter.getInternalType();
+		return parameter.getCovariantType();
 	}
 }

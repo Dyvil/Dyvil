@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.ast.generic.TypeParameter;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.RootPackage;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.compound.IntersectionType;
@@ -55,9 +56,9 @@ public class ExternalTypeParameter extends TypeParameter
 	}
 
 	@Override
-	public int getParameterIndex()
+	public IParameter getReifyParameter()
 	{
-		return -1;
+		return null;
 	}
 
 	@Override

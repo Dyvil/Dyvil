@@ -1,7 +1,7 @@
 package dyvil.tools.compiler.ast.statement.loop;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.constant.VoidValue;
+import dyvil.tools.compiler.ast.expression.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.CombiningLabelContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;

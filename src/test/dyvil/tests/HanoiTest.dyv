@@ -4,7 +4,7 @@ using dyvil.Test
 
 public class HanoiTest
 {
-	private List<String> moves = List<String>
+	private List<String> moves = List<String>()
 
 	static func apply() -> Test = test "Hanoi"
 	{

@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.operator.IOperator;
+import dyvil.tools.compiler.ast.expression.operator.IOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -158,7 +158,7 @@ public final class MultiImport extends Import implements IImportContext, IImport
 	}
 
 	@Override
-	public IOperator resolveOperator(Name name, int type)
+	public IOperator resolveOperator(Name name, byte type)
 	{
 		for (int i = 0; i < this.importCount; i++)
 		{

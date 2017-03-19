@@ -9,11 +9,14 @@ import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
+import dyvil.tools.compiler.ast.type.compound.ImplicitNullableType;
+import dyvil.tools.compiler.ast.type.compound.NullableType;
 import dyvil.tools.compiler.ast.type.compound.UnionType;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.ast.type.raw.InternalType;
@@ -50,6 +53,8 @@ public final class Types
 	public static final NullType    NULL    = new NullType();
 	public static final AnyType     ANY     = new AnyType();
 	public static final NoneType    NONE    = new NoneType();
+
+	public static final NullableType NULLABLE_ANY = new ImplicitNullableType(ANY);
 
 	public static final ClassType OBJECT = new ClassType();
 	public static final ClassType STRING = new ClassType();
@@ -100,16 +105,16 @@ public final class Types
 	{
 		VOID.wrapperClass = Package.javaLang.resolveClass("Void");
 		BOOLEAN.wrapperClass = Package.javaLang.resolveClass("Boolean");
-		BOOLEAN.extClass = Package.dyvilLang.resolveClass("BooleanExtensions");
+		BOOLEAN.extClass = Package.dyvilLang.resolveClass("Booleans");
 
 		INT.wrapperClass = Package.javaLang.resolveClass("Integer");
-		INT.extClass = Package.dyvilLang.resolveClass("IntExtensions");
+		INT.extClass = Package.dyvilLang.resolveClass("Ints");
 		LONG.wrapperClass = Package.javaLang.resolveClass("Long");
-		LONG.extClass = Package.dyvilLang.resolveClass("LongExtensions");
+		LONG.extClass = Package.dyvilLang.resolveClass("Longs");
 		FLOAT.wrapperClass = Package.javaLang.resolveClass("Float");
-		FLOAT.extClass = Package.dyvilLang.resolveClass("FloatExtensions");
+		FLOAT.extClass = Package.dyvilLang.resolveClass("Floats");
 		DOUBLE.wrapperClass = Package.javaLang.resolveClass("Double");
-		DOUBLE.extClass = Package.dyvilLang.resolveClass("DoubleExtensions");
+		DOUBLE.extClass = Package.dyvilLang.resolveClass("Doubles");
 
 		BYTE.wrapperClass = Package.javaLang.resolveClass("Byte");
 		BYTE.extClass = INT.extClass;
@@ -350,7 +355,7 @@ public final class Types
 		return null;
 	}
 
-	public static IType resolveTypeSafely(IType type, ITypeParameter typeVar)
+	public static IType resolveTypeSafely(ITypeContext type, ITypeParameter typeVar)
 	{
 		final IType resolved = type.resolveType(typeVar);
 		return resolved != null ? resolved : typeVar.getUpperBound();

@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.generic;
 
 import dyvil.annotation.Reified;
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
@@ -45,6 +47,7 @@ public abstract class TypeParameter implements ITypeParameter
 	// Metadata
 	protected int index;
 	protected IType erasure = Types.OBJECT;
+	private   IType   safeUpperBound;
 	protected IType[] upperBounds;
 
 	private   ITypeParametric generic;
@@ -210,6 +213,23 @@ public abstract class TypeParameter implements ITypeParameter
 		return this.upperBound;
 	}
 
+	private IType getSafeUpperBound()
+	{
+		return this.safeUpperBound != null ?
+			       this.safeUpperBound :
+			       (this.safeUpperBound = this.getUpperBound().getConcreteType(this::replaceBackRefs));
+	}
+
+	@Nullable
+	private IType replaceBackRefs(ITypeParameter typeParameter)
+	{
+		if (typeParameter.getGeneric() == this.getGeneric() && typeParameter.getIndex() >= this.getIndex())
+		{
+			return new CovariantTypeVarType(this, true);
+		}
+		return null;
+	}
+
 	@Override
 	public void setUpperBound(IType bound)
 	{
@@ -233,13 +253,13 @@ public abstract class TypeParameter implements ITypeParameter
 	@Override
 	public IClass getTheClass()
 	{
-		return this.getUpperBound().getTheClass();
+		return this.getSafeUpperBound().getTheClass();
 	}
 
 	@Override
 	public boolean isAssignableFrom(IType type, ITypeContext typeContext)
 	{
-		if (!Types.isSuperType(this.getUpperBound().getConcreteType(typeContext), type))
+		if (!Types.isSuperType(this.getSafeUpperBound().getConcreteType(typeContext), type))
 		{
 			return false;
 		}
@@ -250,96 +270,55 @@ public abstract class TypeParameter implements ITypeParameter
 	@Override
 	public boolean isSameType(IType type)
 	{
-		if (Types.isSameType(type, this.getUpperBound()))
-		{
-			return true;
-		}
-
-		final IType lowerBound = this.getLowerBound();
-		return lowerBound != null && Types.isSameType(lowerBound, type);
+		return Types.isSameType(type, this.getSafeUpperBound());
 	}
 
 	@Override
 	public boolean isSameClass(IType type)
 	{
-		if (Types.isSameClass(type, this.getUpperBound()))
-		{
-			return true;
-		}
-
-		final IType lowerBound = this.getLowerBound();
-		return lowerBound != null && Types.isSameClass(lowerBound, type);
+		return Types.isSameClass(type, this.getSafeUpperBound());
 	}
 
 	@Override
 	public boolean isSuperTypeOf(IType subType)
 	{
-		if (!isSuperType(this.getUpperBound(), subType))
-		{
-			return false;
-		}
-		final IType lowerBound = this.getLowerBound();
-		if (lowerBound != null)
-		{
-			if (!isSuperType(subType, lowerBound))
-			{
-				return false;
-			}
-		}
-		return true;
+		return isSuperType(this.getSafeUpperBound(), subType);
 	}
 
 	@Override
 	public boolean isSuperClassOf(IType subType)
 	{
-		if (!isSuperClass(this.getUpperBound(), subType))
-		{
-			return false;
-		}
-
-		final IType lowerBound = this.getLowerBound();
-		return lowerBound == null || isSuperClass(subType, lowerBound);
+		return isSuperClass(this.getSafeUpperBound(), subType);
 	}
 
 	@Override
 	public boolean isSubTypeOf(IType superType)
 	{
-		if (isSuperType(superType, this.getUpperBound()))
-		{
-			return true;
-		}
-
-		final IType lowerBound = this.getLowerBound();
-		return lowerBound != null && isSuperType(lowerBound, superType) || Types.isExactType(superType, Types.OBJECT);
+		return isSuperType(superType, this.getSafeUpperBound());
 	}
 
 	@Override
 	public boolean isSubClassOf(IType superType)
 	{
-		if (isSuperClass(superType, this.getUpperBound()))
-		{
-			return true;
-		}
-		final IType lowerBound = this.getLowerBound();
-		return lowerBound != null && isSuperClass(lowerBound, superType) || Types.isSameClass(superType, Types.OBJECT);
+		return isSuperClass(superType, this.getSafeUpperBound());
 	}
 
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		return this.getUpperBound().resolveField(name);
+		return this.getSafeUpperBound().resolveField(name);
 	}
 
 	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue instance, Name name, IArguments arguments)
 	{
-		this.getUpperBound().getMethodMatches(list, instance, name, arguments);
+		this.getSafeUpperBound().getMethodMatches(list, instance, name, arguments);
 	}
 
 	@Override
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
-		this.getUpperBound().getImplicitMatches(list, value, targetType);
+		this.getSafeUpperBound().getImplicitMatches(list, value, targetType);
 	}
 
 	protected static IType[] getUpperBounds(IType upperBound)
@@ -418,12 +397,9 @@ public abstract class TypeParameter implements ITypeParameter
 			// Convert primitive types to their reference counterpart
 			type.writeClassExpression(writer, true);
 		}
-		else
+		else if (this.reifiedKind == Reified.Type.TYPE)
 		{
-			if (this.reifiedKind == Reified.Type.TYPE)
-			{
-				type.writeTypeExpression(writer);
-			}
+			type.writeTypeExpression(writer);
 		}
 	}
 
@@ -495,13 +471,13 @@ public abstract class TypeParameter implements ITypeParameter
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		if (this.annotations != null)
 		{
 			for (int i = 0, size = this.annotations.annotationCount(); i < size; i++)
 			{
-				this.annotations.getAnnotation(i).toString(prefix, buffer);
+				this.annotations.getAnnotation(i).toString(indent, buffer);
 				buffer.append(' ');
 			}
 		}
@@ -511,18 +487,18 @@ public abstract class TypeParameter implements ITypeParameter
 		this.variance.appendPrefix(buffer);
 		buffer.append(this.name);
 
-		final IType upperBound = this.getUpperBound();
+		final IType upperBound = this.getSafeUpperBound();
 		if (upperBound != null)
 		{
 			buffer.append(": ");
-			upperBound.toString(prefix, buffer);
+			upperBound.toString(indent, buffer);
 		}
 
 		final IType lowerBound = this.getLowerBound();
 		if (lowerBound != null)
 		{
 			buffer.append(" super ");
-			lowerBound.toString(prefix, buffer);
+			lowerBound.toString(indent, buffer);
 		}
 	}
 }

@@ -3,9 +3,10 @@ package dyvil.tools.compiler.ast.expression;
 import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.Handle;
-import dyvil.tools.compiler.ast.access.AbstractCall;
-import dyvil.tools.compiler.ast.access.ConstructorCall;
-import dyvil.tools.compiler.ast.access.FieldAccess;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
+import dyvil.tools.compiler.ast.expression.access.AbstractCall;
+import dyvil.tools.compiler.ast.expression.access.ConstructorCall;
+import dyvil.tools.compiler.ast.expression.access.FieldAccess;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
@@ -195,6 +196,28 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	public boolean isResolved()
 	{
 		return true;
+	}
+
+	@Override
+	public boolean isPolyExpression()
+	{
+		if (this.hasImplicitReturnType())
+		{
+			// An implicit return type always implies a poly-expression
+			return true;
+		}
+
+		for (IParameter param : this.parameters)
+		{
+			if (param.getType().isUninferred())
+			{
+				// If any parameter type is uninferred / not explicit, this is a poly-expression
+				return true;
+			}
+		}
+
+		// Otherwise, all types are already known, so this is not a poly-expression
+		return false;
 	}
 
 	@Override
@@ -434,13 +457,13 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 		for (int i = 0; i < parameterCount; i++)
 		{
-			final IType lambdaParameterType = this.parameters.get(i).getInternalType();
+			final IType lambdaParameterType = this.parameters.get(i).getCovariantType();
 			if (lambdaParameterType.isUninferred())
 			{
 				continue;
 			}
 
-			final IType methodParameterType = methodParameters.get(i).getInternalType();
+			final IType methodParameterType = methodParameters.get(i).getCovariantType();
 			if (!Types.isSuperType(methodParameterType, lambdaParameterType))
 			{
 				return false;
@@ -451,7 +474,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	}
 
 	@Override
-	public int getTypeMatch(IType type)
+	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
 		if (type.getTheClass() == Types.OBJECT_CLASS)
 		{
@@ -843,7 +866,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			this.captureHelper.writeCaptureParameters(methodWriter, index);
 		}
 
-		this.parameters.writeInit(methodWriter);
+		this.parameters.write(methodWriter);
 
 		// Write the Value
 

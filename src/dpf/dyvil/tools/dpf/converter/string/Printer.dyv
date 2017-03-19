@@ -76,18 +76,15 @@ public class Printer implements NodeVisitor, ValueVisitor, ListVisitor, MapVisit
 	{
 		this.value("String '" + value + "'")
 	}
-	
+
+	public override func visitName(value: Name) -> void = this.value("Name " + value)
+
 	public override StringInterpolationVisitor visitStringInterpolation()
 	{
 		this.section("String Interpolation")
 		return this
 	}
-	
-	public override void visitName(Name name)
-	{
-		this.value("Name " + name)
-	}
-	
+
 	public override ValueVisitor visitValueAccess(Name name)
 	{
 		this.value("Access " + name)

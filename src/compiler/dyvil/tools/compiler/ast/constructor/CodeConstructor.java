@@ -2,17 +2,17 @@ package dyvil.tools.compiler.ast.constructor;
 
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.access.InitializerCall;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.access.InitializerCall;
+import dyvil.tools.compiler.ast.expression.constant.VoidValue;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
-import dyvil.tools.compiler.ast.parameter.EmptyArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -170,14 +170,14 @@ public class CodeConstructor extends AbstractConstructor
 		}
 
 		// Implicit Super Constructor
-		final IConstructor match = IContext.resolveConstructor(context, superType, EmptyArguments.INSTANCE);
+		final IConstructor match = IContext.resolveConstructor(context, superType, ArgumentList.EMPTY);
 		if (match == null)
 		{
 			markers.add(Markers.semantic(this.position, "constructor.super"));
 			return;
 		}
 
-		this.initializerCall = new InitializerCall(this.position, true, EmptyArguments.INSTANCE, superType, match);
+		this.initializerCall = new InitializerCall(this.position, true, ArgumentList.EMPTY, superType, match);
 	}
 
 	@Override
@@ -321,7 +321,7 @@ public class CodeConstructor extends AbstractConstructor
 
 		// Write Parameters
 		methodWriter.setThisType(this.enclosingClass.getInternalName());
-		this.parameters.writeInit(methodWriter);
+		this.parameters.write(methodWriter);
 
 		// Write Code
 		final Label start = new Label();

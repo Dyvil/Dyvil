@@ -36,13 +36,13 @@ import java.lang._
 // Import the methods from former Predef classes
 using dyvil.lang.{
 	Primitives._
-	Output._
+	Objects._
+	Strings._
 	Optionals._
 	References._
+	Types._
+	Output._
 	Assert._
-	ObjectExtensions._
-	StringExtensions._
-	ClassExtensions._
 	Misc._
 }
 
@@ -67,6 +67,7 @@ type Type<T>      = dyvil.reflect.types.Type<T>
 // ---------------------------------------- Operator Definitions ----------------------------------------
 
 // Postfix Operators
+postfix operator ?   // optional chain operator
 postfix operator !   // unwrap operator
 postfix operator !!  // unsafe unwrap operator
 postfix operator ++

@@ -4,13 +4,15 @@ import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.constant.VoidValue;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
+import dyvil.tools.compiler.ast.expression.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.reference.IReference;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.TupleType;
@@ -32,6 +34,9 @@ public final class TupleExpr implements IValue, IValueList
 	{
 		public static final IClass TUPLE_CONVERTIBLE = Types.LITERALCONVERTIBLE_CLASS
 			                                               .resolveClass(Name.fromRaw("FromTuple"));
+
+		public static final IClass ENTRY = Package.dyvilCollection.resolveClass("Entry");
+		public static final IClass CELL  = Package.dyvilCollection.resolveClass("Cell");
 
 		private static final TypeChecker.MarkerSupplier ELEMENT_MARKER_SUPPLIER = TypeChecker.markerSupplier(
 			"tuple.element.type.incompatible", "tuple.element.type.expected", "tuple.element.type.actual");
@@ -173,43 +178,56 @@ public final class TupleExpr implements IValue, IValueList
 			return this.tupleType;
 		}
 
-		TupleType t = new TupleType(this.valueCount);
+		final TupleType tupleType = new TupleType(this.valueCount);
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			IType type = this.values[i].getType();
-			t.addType(type);
+			tupleType.addType(this.values[i].getType());
 		}
-		return this.tupleType = t;
+		return this.tupleType = tupleType;
 	}
 
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (!TupleType.getTupleClass(this.valueCount).isSubClassOf(type))
+		final IAnnotation annotation = type.getAnnotation(LazyFields.TUPLE_CONVERTIBLE);
+		if (annotation != null)
 		{
-			final IAnnotation annotation = type.getAnnotation(LazyFields.TUPLE_CONVERTIBLE);
-			if (annotation != null)
-			{
-				return new LiteralConversion(this, annotation, new ArgumentList(this.values, this.valueCount))
-					       .withType(type, typeContext, markers, context);
-			}
+			return new LiteralConversion(this, annotation, new ArgumentList(this.values, this.valueCount))
+				       .withType(type, typeContext, markers, context);
+		}
+
+		IClass tupleClass = TupleType.getTupleClass(this.valueCount);
+		if (!Types.isSuperClass(type, tupleClass.getClassType()))
+		{
 			return null;
 		}
 
-		final IClass theClass = type.getTheClass();
+		this.tupleType = null; // reset type
+
+		tupleClass = lookupClass(tupleClass, this.valueCount);
+
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			final IType elementType = theClass == Types.OBJECT_CLASS ?
-				                          Types.ANY :
-				                          Types.resolveTypeSafely(type, theClass.getTypeParameter(i));
-
+			final IType elementType = Types.resolveTypeSafely(type, tupleClass.getTypeParameter(i));
 			this.values[i] = TypeChecker.convertValue(this.values[i], elementType, typeContext, markers, context,
 			                                          LazyFields.ELEMENT_MARKER_SUPPLIER);
 		}
 
-		this.getType(); // ensure tupleType field is not null
-
 		return this;
+	}
+
+	protected static IClass lookupClass(IClass tupleClass, int valueCount)
+	{
+		switch (valueCount)
+		{
+		case 2:
+			tupleClass = LazyFields.ENTRY;
+			break;
+		case 3:
+			tupleClass = LazyFields.CELL;
+			break;
+		}
+		return tupleClass;
 	}
 
 	@Override
@@ -220,19 +238,47 @@ public final class TupleExpr implements IValue, IValueList
 			return this.values[0].isType(type);
 		}
 
-		return TupleType.isSuperType(type, this.values, this.valueCount)
-			       || type.getAnnotation(LazyFields.TUPLE_CONVERTIBLE) != null;
+		return Types.isSuperType(type, this.getType()) || type.getAnnotation(LazyFields.TUPLE_CONVERTIBLE) != null;
 	}
 
 	@Override
-	public int getTypeMatch(IType type)
+	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
 		if (this.valueCount == 1)
 		{
-			return this.values[0].getTypeMatch(type);
+			return this.values[0].getTypeMatch(type, implicitContext);
 		}
 
-		return IValue.super.getTypeMatch(type);
+		IClass tupleClass = TupleType.getTupleClass(this.valueCount);
+		if (!Types.isSuperClass(type, tupleClass.getClassType()))
+		{
+			if (type.getAnnotation(LazyFields.TUPLE_CONVERTIBLE) != null)
+			{
+				return CONVERSION_MATCH;
+			}
+			return MISMATCH;
+		}
+
+		this.tupleType = null; // reset type
+
+		tupleClass = lookupClass(tupleClass, this.valueCount);
+
+		int min = EXACT_MATCH;
+		for (int i = 0; i < this.valueCount; i++)
+		{
+			final IType elementType = Types.resolveTypeSafely(type, tupleClass.getTypeParameter(i));
+			final int match = TypeChecker.getTypeMatch(this.values[i], elementType, implicitContext);
+
+			if (match == MISMATCH)
+			{
+				return MISMATCH;
+			}
+			if (match < min)
+			{
+				min = match;
+			}
+		}
+		return min;
 	}
 
 	@Override
@@ -305,7 +351,7 @@ public final class TupleExpr implements IValue, IValueList
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		final String internal = this.tupleType.getInternalName();
+		final String internal = this.getType().getInternalName();
 		writer.visitTypeInsn(Opcodes.NEW, internal);
 		writer.visitInsn(Opcodes.DUP);
 

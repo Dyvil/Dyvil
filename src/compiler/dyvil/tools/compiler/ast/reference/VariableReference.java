@@ -1,14 +1,13 @@
 package dyvil.tools.compiler.ast.reference;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.access.FieldAccess;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.access.FieldAccess;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -29,16 +28,7 @@ public class VariableReference implements IReference
 	@Override
 	public void check(ICodePosition position, MarkerList markers, IContext context)
 	{
-		IVariable variable = this.getVariable();
-		if (!variable.isReferenceCapturable())
-		{
-			markers.add(Markers.semanticError(position, "reference.parameter.capture", this.fieldAccess.getName()));
-
-			// Return to avoid two errors
-			return;
-		}
-
-		InstanceFieldReference.checkFinalAccess(variable, position, markers);
+		InstanceFieldReference.checkFinalAccess(this.fieldAccess.getField(), position, markers);
 	}
 
 	@Override

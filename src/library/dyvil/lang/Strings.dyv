@@ -1,0 +1,63 @@
+package dyvil.lang
+
+using dyvil.reflect.Opcodes._
+using dyvil.reflect.ReflectUtils._
+import dyvil.string.StringUtils
+
+public final class Strings
+{
+	private const STRING_VALUE_OFFSET: long = UNSAFE.objectFieldOffset(class<String>.getDeclaredField("value"))
+
+	private init() {}
+
+	// Concat Operators
+
+	@Intrinsic([], compilerCode: Intrinsic.STRING_CONCAT)
+	infix func +(lhs: String, rhs: any!) -> String = lhs + rhs
+
+	@Intrinsic([], compilerCode: Intrinsic.STRING_CONCAT)
+	infix func +(lhs: any!, rhs: String) -> String = lhs + rhs
+
+	@Intrinsic([], compilerCode: Intrinsic.STRING_CONCAT)
+	infix func +(lhs: String, rhs: String) -> String = lhs + rhs
+
+	// Makeshift char casts
+
+	static inline func char(c: char) -> char = c
+
+	/**
+	 * This method only exists to provide the user with a useful warning message when trying to pass an invalid char
+	 * literal to the `char` method. An invalid char literal would be a double-quoted String or a single-quoted String
+	 * with zero or more than one characters.
+	 */
+	@UsageInfo(value: "Multi-character Literal or String passed to 'char' method", level: dyvil.util.MarkerLevel.WARNING)
+	static inline func char(c: String) -> char = c.charAt 0
+
+	// Unsafe access
+
+	prefix func String(fromShared: [final char]) -> String = JAVA_LANG_ACCESS.newStringUnsafe(fromShared)
+
+	postfix func getCharArray(s: String) -> [final char] = UNSAFE.getObject(s, STRING_VALUE_OFFSET) as [final char]
+
+	// Subscripts
+
+	inline infix func subscript(s: String, index: int) -> char = s.charAt index
+
+	infix func subscript(s: String, range: Range<int>) -> String = s.substring(range.first, range.last + 1)
+
+	// Repetition (*) Operator
+
+	infix inline func *(lhs: int, rhs: String) -> String = StringUtils.repeated(rhs, lhs)
+
+	infix inline func *(lhs: String, rhs: int) -> String = StringUtils.repeated(lhs, rhs)
+
+	// Misc. additional extensions
+
+	infix inline func contains(s: String, character: char) -> boolean = s.indexOf(character) >= 0
+
+	infix inline func split(s: String, delimiter: char) -> [String] = StringUtils.split(s, delimiter) as [String]
+
+	infix inline func format(s: String, args: Object! ...) -> String = String.format(s, args...)
+
+	extension func toString(o: Object, builder: StringBuilder) -> void = builder.append o
+}

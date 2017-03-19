@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.constant.EnumValue;
+import dyvil.tools.compiler.ast.expression.constant.EnumValue;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.IMember;
@@ -229,28 +229,30 @@ public final class Deprecation
 
 	private static Reason[] getReasons(IArguments arguments)
 	{
-		IValue value = arguments.getValue(DEP_REASONS_PARAM.getIndex(), DEP_REASONS_PARAM);
+		final IValue value = arguments.getValue(DEP_REASONS_PARAM.getIndex(), DEP_REASONS_PARAM);
 		if (value == null)
 		{
 			return null;
 		}
 
 		assert value.valueTag() == IValue.ARRAY;
-		ArrayExpr array = (ArrayExpr) value;
-		int size = array.valueCount();
+
+		final ArrayExpr array = (ArrayExpr) value;
+		final int size = array.valueCount();
 
 		if (size <= 0)
 		{
 			return null;
 		}
 
-		Reason[] reasons = new Reason[size];
+		final Reason[] reasons = new Reason[size];
 		for (int i = 0; i < size; i++)
 		{
-			IValue element = array.getValue(i);
+			final IValue element = array.getValue(i);
 			assert element.valueTag() == IValue.ENUM_ACCESS;
-			EnumValue enumValue = (EnumValue) element;
-			reasons[i] = Reason.valueOf(enumValue.name.qualified);
+
+			final EnumValue enumValue = (EnumValue) element;
+			reasons[i] = Reason.valueOf(enumValue.getInternalName());
 		}
 
 		return reasons;

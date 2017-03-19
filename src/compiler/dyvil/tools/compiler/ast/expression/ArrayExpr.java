@@ -3,7 +3,8 @@ package dyvil.tools.compiler.ast.expression;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.AnnotationVisitor;
-import dyvil.tools.compiler.ast.access.ClassAccess;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
+import dyvil.tools.compiler.ast.expression.access.ClassAccess;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -319,7 +320,7 @@ public final class ArrayExpr implements IValue, IValueList
 	}
 
 	@Override
-	public int getTypeMatch(IType type)
+	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
 		final ArrayType arrayType = type.extract(ArrayType.class);
 		if (arrayType == null)
@@ -348,7 +349,7 @@ public final class ArrayExpr implements IValue, IValueList
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			// TODO Implicit conversions?
-			final int match = this.values[i].getTypeMatch(elementType);
+			final int match = TypeChecker.getTypeMatch(this.values[i], elementType, implicitContext);
 			if (match == MISMATCH)
 			{
 				// If any element type has a mismatch, produce a mismatch

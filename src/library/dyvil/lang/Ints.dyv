@@ -1,0 +1,80 @@
+package dyvil.lang
+
+using   dyvil.reflect.Opcodes._
+import  dyvil.collection.range.specialized.IntRange
+
+public abstract class Ints
+{
+	private init() {}
+
+	// Int Operators
+
+	@Intrinsic([ LOAD_0 ])
+	prefix func +(rhs: int) -> int = rhs
+
+	@Intrinsic([ LOAD_0, INEG ])
+	prefix func -(rhs: int) -> int = -rhs
+
+	@Intrinsic([ LOAD_0, INOT ])
+    prefix func ~(rhs: int) -> int = ~rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPEQ ])
+	infix func ==(lhs: int, rhs: int) -> boolean = lhs == rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPNE ])
+	infix func !=(lhs: int, rhs: int) -> boolean = lhs != rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPLT ])
+	infix func <(lhs: int, rhs: int) -> boolean = lhs < rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPLE ])
+	infix func <=(lhs: int, rhs: int) -> boolean = lhs <= rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPGT ])
+	infix func >(lhs: int, rhs: int) -> boolean = lhs > rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, ICMPGE ])
+	infix func >=(lhs: int, rhs: int) -> boolean = lhs >= rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, IADD ])
+	infix func +(lhs: int, rhs: int) -> int = lhs + rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, ISUB ])
+	infix func -(lhs: int, rhs: int) -> int = lhs - rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, IMUL ])
+	infix func *(lhs: int, rhs: int) -> int = lhs * rhs
+
+	infix func **(lhs: int, rhs: int) -> long = dyvil.math.PowImpl.pow(lhs, rhs)
+
+	@Intrinsic([ LOAD_0, I2F, LOAD_1, I2F, FDIV ])
+	infix func /(lhs: int, rhs: int) -> float = lhs / rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, IREM ])
+	infix func %(lhs: int, rhs: int) -> int = lhs % rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, IDIV ])
+	infix func \(lhs: int, rhs: int) -> int = lhs \ rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, IAND ])
+	infix func &(lhs: int, rhs: int) -> int = lhs & rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, IOR ])
+	infix func |(lhs: int, rhs: int) -> int = lhs | rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, IXOR ])
+	infix func ^(lhs: int, rhs: int) -> int = lhs ^ rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, ISHL ])
+	infix func <<(lhs: int, rhs: int) -> int = lhs << rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, ISHR ])
+	infix func >>(lhs: int, rhs: int) -> int = lhs >> rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, IUSHR ])
+	infix func >>>(lhs: int, rhs: int) -> int = lhs >>> rhs
+
+	infix func ..(lhs: int, rhs: int) -> IntRange = IntRange(lhs, to: rhs)
+
+	infix func ..<(lhs: int, rhs: int) -> IntRange = IntRange(lhs, toExclusive: rhs)
+}

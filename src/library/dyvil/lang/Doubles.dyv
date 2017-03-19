@@ -1,0 +1,57 @@
+package dyvil.lang
+
+using   dyvil.reflect.Opcodes._
+import  dyvil.collection.range.specialized.DoubleRange
+
+public abstract class Doubles
+{
+	private init() {}
+
+	// Double Operators
+
+	@Intrinsic([ LOAD_0 ])
+	prefix func +(rhs: double) -> double = rhs
+
+	@Intrinsic([ LOAD_0, DNEG ])
+	prefix func -(rhs: double) -> double = -rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, DCMPEQ ])
+	infix func ==(lhs: double, rhs: double) -> boolean = lhs == rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, DCMPNE ])
+	infix func !=(lhs: double, rhs: double) -> boolean = lhs != rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, DCMPLT ])
+	infix func <(lhs: double, rhs: double) -> boolean = lhs < rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, DCMPLE ])
+	infix func <=(lhs: double, rhs: double) -> boolean = lhs <= rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, DCMPGT ])
+	infix func >(lhs: double, rhs: double) -> boolean = lhs > rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, DCMPGE ])
+	infix func >=(lhs: double, rhs: double) -> boolean = lhs >= rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, DADD ])
+	infix func +(lhs: double, rhs: double) -> double = lhs + rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, DSUB ])
+	infix func -(lhs: double, rhs: double) -> double = lhs - rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, DMUL ])
+	infix func *(lhs: double, rhs: double) -> double = lhs * rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2], strings: [ "java/lang/Math", "pow", "(DD)D" ])
+	infix func **(lhs: double, rhs: double) -> double = Math.pow(lhs, rhs)
+
+	@Intrinsic([ LOAD_0, LOAD_1, DDIV ])
+	infix func /(lhs: double, rhs: double) -> double = lhs / rhs
+
+	@Intrinsic([ LOAD_0, LOAD_1, DREM ])
+	infix func %(lhs: double, rhs: double) -> double = lhs % rhs
+
+	infix func ..(lhs: double, rhs: double) -> DoubleRange = DoubleRange(lhs, to: rhs)
+
+	infix func ..<(lhs: double, rhs: double) -> DoubleRange = DoubleRange(lhs, toExclusive: rhs)
+}

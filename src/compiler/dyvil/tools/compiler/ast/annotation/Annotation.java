@@ -52,7 +52,7 @@ public final class Annotation implements IAnnotation
 	public static final CodeParameter VALUE = new CodeParameter(Name.fromRaw("value"));
 
 	protected ICodePosition position;
-	protected IArguments arguments = EmptyArguments.INSTANCE;
+	protected IArguments arguments = ArgumentList.EMPTY;
 
 	// Metadata
 	protected IType type;

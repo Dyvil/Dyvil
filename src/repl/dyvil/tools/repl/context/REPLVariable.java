@@ -1,13 +1,14 @@
 package dyvil.tools.repl.context;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.array.ObjectArray;
-import dyvil.io.Console;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
+import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -28,6 +29,12 @@ public class REPLVariable extends Field
 
 	private   Class<?> runtimeClass;
 	private   Object   displayValue;
+
+	public REPLVariable(REPLContext context, Name name, IValue value)
+	{
+		this(context, value.getPosition(), name, Types.UNKNOWN, new ModifierList(Modifiers.FINAL), null);
+		this.setValue(value);
+	}
 
 	public REPLVariable(REPLContext context, ICodePosition position, Name name, IType type, ModifierSet modifiers,
 		                   AnnotationList annotations)
@@ -167,36 +174,13 @@ public class REPLVariable extends Field
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	protected void valueToString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		final boolean colors = this.context.getCompilationContext().config.useAnsiColors();
-
-		if (this.annotations != null)
-		{
-			this.annotations.toString(prefix, buffer);
-		}
-
-		this.modifiers.toString(this.getKind(), buffer);
-
-		this.type.toString(prefix, buffer);
-		buffer.append(' ');
-
-		if (colors)
-		{
-			buffer.append(Console.ANSI_BLUE);
-			buffer.append(this.name);
-			buffer.append(Console.ANSI_RESET);
-		}
-		else
-		{
-			buffer.append(this.name);
-		}
-
 		Formatting.appendSeparator(buffer, "field.assignment", '=');
 
 		if (this.value != null)
 		{
-			this.value.toString(prefix, buffer);
+			this.value.toString(indent, buffer);
 			return;
 		}
 

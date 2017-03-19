@@ -8,7 +8,7 @@ public class ExtensionTest
 	public static class B extends A
 	public static class C extends B
 	{
-		public func custom: String = "custom"
+		public func custom() -> String = "custom"
 	}
 
 	public static class D extends C
@@ -63,7 +63,7 @@ public class ExtensionTest
 		print "Dynamic Dispatch Speed: \(totalTime / count) ns / invocation"
 	}
 
-	private static var nameMap: Map<any, String> = dyvil.collection.mutable.IdentityHashMap<any, String>
+	private static var nameMap: Map<any, String> = dyvil.collection.mutable.IdentityHashMap<any, String>()
 
 	postfix func name(any value) -> String = nameMap[value]
 

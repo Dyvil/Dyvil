@@ -34,5 +34,5 @@ public interface IASTNode
 		return builder.toString();
 	}
 
-	void toString(@NonNull String prefix, @NonNull StringBuilder buffer);
+	void toString(@NonNull String indent, @NonNull StringBuilder buffer);
 }

@@ -1,0 +1,22 @@
+package dyvil.tests
+
+import dyvil.Test
+
+public class OptionalTest
+{
+	static func apply() -> Test = test "Optionals" {
+		let optString = Optional("abc")
+		let string = optString ?? "def" // = "abc"
+
+		string.staticType.toString =?= "java.lang.String"
+
+		let optUppercase = optString?.toUpperCase ?? null
+		// = optString == null ? null : optString!!.toUpperCase
+
+		optUppercase =?= "ABC"
+
+		let optUppercaseFirst = optString?.toUpperCase? [0] ?? 0
+
+		optUppercaseFirst =?= 65
+	}
+}

@@ -1,6 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
-import dyvil.tools.compiler.ast.access.FieldAccess;
+import dyvil.tools.compiler.ast.expression.access.FieldAccess;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.field.IDataMember;

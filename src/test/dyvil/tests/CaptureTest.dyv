@@ -8,35 +8,59 @@ public class CaptureTest
 		lambdaCapture()
 		anonClassCapture()
 	}
-	
+
+	static func ref(i: int) -> int* = &i
+
+	static func classOf<@Reified(.ANY_CLASS) type T>() -> () -> Class<T> = => class T
+
+	static func typeOf<@Reified(.TYPE) type T>() -> () -> Type<T> = => type T
+
 	private static func lambdaCapture() -> Test = test "Lambda" {
-		var abc = -1
-		var fun = (int i) => (int j) => (int k) => (i, j, k, abc)
-		var res = fun 1 2 3
+		let abc = -1
+		let fun = (i: int) => (j: int) => (k: int) => (i, j, k, abc)
+		let res = fun 1 2 3
 
 		res =?= (1, 2, 3, -1)
 
+		test "Method Parameter Capture" {
+			ref(10).get =?= 10
+			ref(10) =!= ref(10)
+		}
+
+		// Lambda Parameter capture by reference
+		test "Lambda Parameter Capture" {
+			let refl = (i: int) => &i
+			refl(10).get =?= 10
+		}
+
+		test "Type Parameter Capture" {
+			let supplier = classOf<String>()
+			supplier() =?= class<String>
+		}
+
+		//
+
 		lambdaThisCapture()
 	}
-	
+
 	class ThisCapture
 	{
-		public Object anonymous() = new Object {
+		func anonymous() -> Object = new Object {
 			override func toString() -> String = this<ThisCapture>.toString
 		}
-		
-		public func lambda() -> -> ThisCapture = => this
+
+		func lambda() -> () -> ThisCapture = => this
 
 		override func toString() -> String = System.identityHashCode(this).toHexString
 	}
-	
+
 	private static func lambdaThisCapture() -> Test = test "This Capture" {
 		let instance = new ThisCapture
 		let lambda = instance.lambda
 
 		lambda() =?= instance
 	}
-	
+
 	private static func anonClassCapture() -> Test = test "Anonymous Classes" {
 		var abc = 123
 		var obj = new Object {
@@ -47,7 +71,7 @@ public class CaptureTest
 
 		anonClassThisCapture()
 	}
-	
+
 	private static func anonClassThisCapture() -> Test = test "This Capture" {
 		var instance = new ThisCapture
 		var obj = instance.anonymous

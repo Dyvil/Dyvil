@@ -47,6 +47,7 @@ import dyvil.tools.parsing.position.ICodePosition;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Iterator;
 
 public class CodeMethod extends AbstractMethod
 {
@@ -114,7 +115,11 @@ public class CodeMethod extends AbstractMethod
 	@Override
 	public IType getThisType()
 	{
-		return this.thisType;
+		if (this.thisType != null)
+		{
+			return this.thisType;
+		}
+		return this.thisType = this.enclosingClass.getThisType();
 	}
 
 	@Override
@@ -268,6 +273,11 @@ public class CodeMethod extends AbstractMethod
 			this.value.checkTypes(markers, context);
 		}
 
+		// Check for duplicate methods
+		this.checkDuplicates(markers);
+
+		this.checkOverrideMethods(markers);
+
 		context.pop();
 	}
 
@@ -309,11 +319,6 @@ public class CodeMethod extends AbstractMethod
 		}
 
 		ModifierUtil.checkMethodModifiers(markers, this);
-
-		this.checkOverrideMethods(markers);
-
-		// Check for duplicate methods
-		this.checkDuplicates(markers);
 
 		context.pop();
 	}
@@ -436,12 +441,17 @@ public class CodeMethod extends AbstractMethod
 
 	private void checkOverrideMethods(MarkerList markers)
 	{
-		if (this.overrideMethods == null)
+		if (this.checkNoOverride(markers))
 		{
-			if (this.modifiers.hasIntModifier(Modifiers.OVERRIDE))
-			{
-				markers.add(Markers.semanticError(this.position, "method.override.notfound", this.name));
-			}
+			return;
+		}
+
+		final ITypeContext typeContext = this.enclosingClass.getThisType();
+
+		this.checkParameterLabels(markers, typeContext);
+
+		if (this.checkNoOverride(markers))
+		{
 			return;
 		}
 
@@ -451,7 +461,6 @@ public class CodeMethod extends AbstractMethod
 		}
 
 		final boolean thisTypeResolved = this.type.isResolved();
-		final ITypeContext typeContext = this.enclosingClass.getThisType();
 
 		for (IMethod overrideMethod : this.overrideMethods)
 		{
@@ -473,12 +482,74 @@ public class CodeMethod extends AbstractMethod
 				marker.addInfo(Markers.getSemantic("method.type", this.type));
 				marker.addInfo(Markers.getSemantic("method.override.type", superReturnType));
 
-				marker.addInfo(Markers.getSemantic("method.override",
-				                                   Util.methodSignatureToString(overrideMethod, typeContext),
-				                                   overrideMethod.getEnclosingClass().getFullName()));
+				addOverrideInfo(typeContext, overrideMethod, marker);
 				markers.add(marker);
 			}
 		}
+	}
+
+	private void checkParameterLabels(MarkerList markers, ITypeContext typeContext)
+	{
+		for (Iterator<IMethod> iterator = this.overrideMethods.iterator(); iterator.hasNext(); )
+		{
+			final IMethod overrideMethod = iterator.next();
+			final IClass enclosingClass = overrideMethod.getEnclosingClass();
+			boolean errors = true;
+
+			for (IMethod method : this.overrideMethods)
+			{
+				if (method != overrideMethod && method.getEnclosingClass() == enclosingClass)
+				{
+					// If this method overrides two methods from the same class, we do not produce any parameter label errors
+					errors = false;
+				}
+			}
+
+			final IParameterList params = overrideMethod.getParameterList();
+			for (int i = 0, count = params.size(); i < count; i++)
+			{
+				final IParameter thisParam = this.parameters.get(i);
+				final Name thisName = thisParam.getName();
+				final Name otherName = params.get(i).getName();
+
+				if (thisName == otherName || thisName == null || otherName == null)
+				{
+					// Parameter labels match
+					continue;
+				}
+
+				if (errors)
+				{
+					final Marker marker = Markers.semantic(thisParam.getPosition(), "method.override.parameter_label",
+					                                       i + 1, thisName, otherName);
+					addOverrideInfo(typeContext, overrideMethod, marker);
+					markers.add(marker);
+				}
+
+				// This method does not properly override the candidate
+				iterator.remove();
+			}
+		}
+	}
+
+	private boolean checkNoOverride(MarkerList markers)
+	{
+		if (this.overrideMethods != null && !this.overrideMethods.isEmpty())
+		{
+			return false;
+		}
+
+		if (this.modifiers.hasIntModifier(Modifiers.OVERRIDE))
+		{
+			markers.add(Markers.semanticError(this.position, "method.override.notfound", this.name));
+		}
+		return true;
+	}
+
+	private static void addOverrideInfo(ITypeContext typeContext, IMethod overrideMethod, Marker marker)
+	{
+		marker.addInfo(Markers.getSemantic("method.override", Util.methodSignatureToString(overrideMethod, typeContext),
+		                                   overrideMethod.getEnclosingClass().getFullName()));
 	}
 
 	@Override
@@ -570,7 +641,7 @@ public class CodeMethod extends AbstractMethod
 
 		this.writeAnnotations(methodWriter, flags);
 
-		this.parameters.writeInit(methodWriter);
+		this.parameters.write(methodWriter);
 
 		for (int i = 0; i < this.typeParameterCount; i++)
 		{
@@ -656,10 +727,10 @@ public class CodeMethod extends AbstractMethod
 			for (int p = 0, count = this.parameters.size(); p < count; p++)
 			{
 				final IParameter overrideParameter = overrideParameterList.get(p);
-				final IType parameterType = this.parameters.get(p).getInternalType();
-				final IType overrideParameterType = overrideParameter.getInternalType();
+				final IType parameterType = this.parameters.get(p).getCovariantType();
+				final IType overrideParameterType = overrideParameter.getCovariantType();
 
-				overrideParameter.writeInit(methodWriter);
+				overrideParameter.writeParameter(methodWriter);
 				methodWriter.visitVarInsn(overrideParameterType.getLoadOpcode(), overrideParameter.getLocalIndex());
 				overrideParameterType.writeCast(methodWriter, parameterType, lineNumber);
 			}

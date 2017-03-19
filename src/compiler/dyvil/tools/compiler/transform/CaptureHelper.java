@@ -36,7 +36,7 @@ public class CaptureHelper
 	{
 		return this.thisClass;
 	}
-	
+
 	public IDataMember capture(IVariable variable)
 	{
 		if (this.capturedFields == null)
@@ -76,12 +76,12 @@ public class CaptureHelper
 			this.capturedFields[i].checkTypes(markers, context);
 		}
 	}
-	
+
 	public boolean hasCaptures()
 	{
 		return this.capturedFieldCount > 0;
 	}
-	
+
 	public boolean isThisCaptured()
 	{
 		return this.thisClass != null;
@@ -123,8 +123,7 @@ public class CaptureHelper
 		{
 			final CaptureDataMember capture = this.capturedFields[i];
 			capture.setLocalIndex(index);
-			index = writer
-					.visitParameter(index, capture.getInternalName(), capture.getVariable().getInternalType(), 0);
+			index = writer.visitParameter(index, capture.getInternalName(), capture.getVariable().getInternalType(), 0);
 		}
 
 		return index;

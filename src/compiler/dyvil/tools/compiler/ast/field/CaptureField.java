@@ -88,8 +88,6 @@ public final class CaptureField extends CaptureDataMember implements IField
 	@Override
 	public void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
-		// { int i = 0; new => int() { override int apply() = i++ } }
-
 		String owner = this.enclosingClass.getInternalName();
 		String name = this.internalName;
 		String desc = this.getDescriptor();
@@ -103,7 +101,7 @@ public final class CaptureField extends CaptureDataMember implements IField
 		{
 			String owner = this.enclosingClass.getInternalName();
 			String name = this.internalName;
-			String desc = this.variable.getInternalType().getExtendedName();
+			String desc = this.variable.getDescriptor();
 			writer.visitFieldInsn(Opcodes.PUTFIELD, owner, name, desc);
 		}
 	}

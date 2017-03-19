@@ -1,18 +1,18 @@
 package dyvil.tools.compiler.ast.field;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
@@ -66,18 +66,13 @@ public abstract class CaptureDataMember implements IDataMember
 	}
 
 	@Override
-	public void setName(Name name)
-	{
-	}
-
-	@Override
 	public Name getName()
 	{
 		return this.variable.getName();
 	}
 
 	@Override
-	public void setType(IType type)
+	public void setName(Name name)
 	{
 	}
 
@@ -90,6 +85,11 @@ public abstract class CaptureDataMember implements IDataMember
 	public IType getInternalType()
 	{
 		return this.variable.getInternalType();
+	}
+
+	@Override
+	public void setType(IType type)
+	{
 	}
 
 	@Override
@@ -156,15 +156,7 @@ public abstract class CaptureDataMember implements IDataMember
 	@Override
 	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue receiver, IValue newValue)
 	{
-		if (!this.variable.isReferenceCapturable())
-		{
-			markers.add(Markers.semantic(position, "variable.assign.capture", this.variable.getName()));
-		}
-		else
-		{
-			this.variable.setReferenceType();
-		}
-
+		this.variable.setReferenceType();
 		return this.variable.checkAssign(markers, context, position, receiver, newValue);
 	}
 
@@ -184,16 +176,8 @@ public abstract class CaptureDataMember implements IDataMember
 		// Check if the variable is neither final nor effectively final
 		if (this.variable.isAssigned() && !this.variable.hasModifier(Modifiers.FINAL))
 		{
-			if (!this.variable.isReferenceCapturable())
-			{
-				markers.add(
-						Markers.semanticError(this.accessPosition, "variable.access.capture", this.variable.getName()));
-			}
-			else
-			{
 				// Reference Capture is required
 				this.variable.setReferenceType();
-			}
 		}
 	}
 
@@ -266,8 +250,8 @@ public abstract class CaptureDataMember implements IDataMember
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		this.variable.toString(prefix, buffer);
+		this.variable.toString(indent, buffer);
 	}
 }

@@ -108,7 +108,7 @@ public class NestedMethod extends CodeMethod
 			methodWriter.setThisType(this.enclosingClass.getInternalName());
 		}
 
-		this.parameters.writeInit(methodWriter);
+		this.parameters.write(methodWriter);
 
 		this.captureHelper.writeCaptureParameters(methodWriter, methodWriter.localCount());
 

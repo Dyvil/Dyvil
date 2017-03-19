@@ -2,17 +2,19 @@ package dyvil.lang
 
 import const dyvil.reflect.Opcodes._
 
-public abstract class Optionals
+final class Optionals
 {
-	private init()
-	{
-		// no instances
-	}
+	private init() {} // no instances
 
 	// Wrapping
 
 	@Intrinsic([ LOAD_0 ])
-	static func Optional<T>(T value) -> T? = value
+	static func Optional<T>(value: T) -> T? = value
+
+	// Chaining
+
+	@Intrinsic([], compilerCode: Intrinsic.OPTIONAL_CHAIN)
+	postfix func ? <T>(lhs: T?) -> T = lhs!!
 
 	// Unwrapping
 
@@ -24,12 +26,12 @@ public abstract class Optionals
 	 */
 	@Intrinsic([ LOAD_0, DUP, INVOKESTATIC, 0, 1, 2 ]
 	  strings: [ "dyvil/lang/Optionals", "unwrapNullCheck", "(Ljava/lang/Object;)V" ])
-	postfix func ! <T>(T? optional) -> T = optional!
+	postfix func ! <T>(lhs: T?) -> T = lhs!
 
 	/**
 	 * Checks if the given optional value is null and throws a NullPointerException in that case.
 	 */
-	static func unwrapNullCheck<T>(T? optional) -> void
+	static func unwrapNullCheck<T>(optional: T?) -> void
 	{
 		if (optional == null) throw new NullPointerException("Unwrapped Optional was null")
 	}
@@ -40,7 +42,7 @@ public abstract class Optionals
 	 * See `unsafeUnwrap` for details
 	 */
 	@Intrinsic([ LOAD_0 ])
-	postfix func !! <T>(optional: T?) -> T = unsafeUnwrap<T>(optional)
+	postfix func !! <T>(lhs: T?) -> T = unsafeUnwrap<T>(lhs)
 
 	/**
 	 * Unwraps an optional value in an unsafe manner, i.e. without a null check. Use this only if you are sure that
@@ -64,17 +66,10 @@ public abstract class Optionals
 	 *
 	 * Returns the left-hand argument if it is not `null` at runtime, and the right-hand argument otherwise.
 	 */
-	@Intrinsic([ /* 0 */ LOAD_0
-	             /* 1 */ DUP
-	             /* 2 */ ASTORE, 0
-	             /* 3 */ IFNULL, 6
-	             /* 4 */ ALOAD,  0
-	             /* 5 */ GOTO,   7
-	             /* 6 */ LOAD_1
-	             /* 7 */ ])
-	infix func ?? <T, U> (T? lhs, U rhs) -> T|U = lhs ?? rhs
+	@Intrinsic([], compilerCode: Intrinsic.NULL_COALESCING)
+	infix func ?? <T, U> (lhs: T?, rhs: U) -> T|U = lhs ?? rhs
 
 	// Hash Code
 
-	postfix func hashCode<T>(T? optional) -> int = optional == null ? 0 : optional!!.hashCode
+	postfix func hashCode<T: Object>(optional: T?) -> int = optional?.hashCode ?? 0
 }

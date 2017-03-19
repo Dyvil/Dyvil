@@ -73,9 +73,7 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 		return null;
 	}
 
-	boolean isField();
-
-	boolean isVariable();
+	boolean isLocal();
 
 	// Compilation
 

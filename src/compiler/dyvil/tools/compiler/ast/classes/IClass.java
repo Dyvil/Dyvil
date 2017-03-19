@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
-import dyvil.tools.compiler.ast.generic.ITypeParametric;
+import dyvil.tools.compiler.ast.generic.ITypeParametricMember;
 import dyvil.tools.compiler.ast.header.IClassCompilable;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilable;
@@ -26,7 +26,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public interface IClass extends IClassMember, ICompilable, ITypeParametric, IContext, IParametric, IClassCompilableList
+public interface IClass extends IClassMember, IParametric, ITypeParametricMember, ICompilable, IContext, IClassCompilableList
 {
 	@Override
 	default MemberKind getKind()

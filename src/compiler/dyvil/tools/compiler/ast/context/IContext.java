@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.imports.IImportContext;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.operator.IOperator;
+import dyvil.tools.compiler.ast.expression.operator.IOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -75,7 +75,7 @@ public interface IContext extends IMemberContext, IImportContext
 	ITypeParameter resolveTypeParameter(Name name);
 
 	@Override
-	IOperator resolveOperator(Name name, int type);
+	IOperator resolveOperator(Name name, byte type);
 
 	@Override
 	IDataMember resolveField(Name name);
@@ -101,7 +101,7 @@ public interface IContext extends IMemberContext, IImportContext
 
 	IValue getImplicit();
 
-	static IOperator resolveOperator(IContext context, Name name, int type)
+	static IOperator resolveOperator(IContext context, Name name, byte type)
 	{
 		final IOperator operator = context.resolveOperator(name, type);
 		if (operator == null || operator.getType() != type)
@@ -147,7 +147,7 @@ public interface IContext extends IMemberContext, IImportContext
 
 		// First, search the given type for conversion methods
 		value.getType().getImplicitMatches(matches, value, targetType);
-		if (!matches.isEmpty())
+		if (matches.hasCandidate() && targetType != null)
 		{
 			return matches;
 		}

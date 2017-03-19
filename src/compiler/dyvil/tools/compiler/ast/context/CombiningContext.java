@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.operator.IOperator;
+import dyvil.tools.compiler.ast.expression.operator.IOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -110,7 +110,7 @@ public class CombiningContext implements IContext
 	}
 
 	@Override
-	public IOperator resolveOperator(Name name, int type)
+	public IOperator resolveOperator(Name name, byte type)
 	{
 		final IOperator inner = this.inner.resolveOperator(name, type);
 		if (inner == null || inner.getType() != type)
@@ -148,7 +148,7 @@ public class CombiningContext implements IContext
 	{
 		this.inner.getImplicitMatches(list, value, targetType);
 
-		if (!list.hasCandidate())
+		if (targetType == null || !list.hasCandidate())
 		{
 			this.outer.getImplicitMatches(list, value, targetType);
 		}

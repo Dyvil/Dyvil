@@ -2,42 +2,45 @@ package dyvil.tools.dpf.ast.builder;
 
 import dyvil.collection.mutable.ArrayList
 import dyvil.tools.{
-	dpf.ast.{ Expandable, Node, value.Value }
+	dpf.model.Expandable
+	dpf.ast.{ Node, value.Value }
 	dpf.visitor.{ BuilderVisitor, NodeVisitor, ValueVisitor }
 
 	parsing.{ Name, ast.IASTNode, position.ICodePosition }
 }
 
-public class Builder(
-	private var name: Name! { public get; public set }
-	private var parameters: List<Parameter>
-	private var node: Node? { public get }
-) implements Value, BuilderVisitor, Expandable
+public class Builder
+(
+	protected let name:       Name { public override get }
+	protected var parameters: List<Parameter>
+	protected var node:       Node? { public override get }
+)
+implements Value, dyvil.tools.dpf.model.value.Builder
 {
-	static func apply(Name name) -> Builder = new Builder(name)
+	static func apply(name: Name) -> Builder = new Builder(name)
 
-	static func apply(Name name, Parameter... parameters) -> Builder = new Builder(name, ArrayList(parameters...), null)
+	static func apply(name: Name, parameters: Parameter...) -> Builder = new Builder(name, ArrayList(parameters...), null)
 
-	static func apply(Name name, List<Parameter> parameters, Node! node = null) -> Builder = new Builder(name, parameters, node)
+	static func apply(Name name, parameters: List<Parameter>, node: Node! = null) -> Builder = new Builder(name, parameters, node)
 	
-	public init(Name name)
+	public init(name: Name)
 	{
 		this.init(name, new ArrayList<Parameter>, null)
 	}
 
 	@BytecodeName("withNode")
-	public func with(Node node) -> Builder { this.node = node; this }
+	func with(node: Node) -> Builder { this.node = node; this }
 
 	@BytecodeName("withParameter")
-	public func with(Parameter parameter) -> Builder { this.add(parameter); this }
+	func with(parameter: Parameter) -> Builder { this.add(parameter); this }
 
 	@BytecodeName("addParameter")
-	public func add(Parameter parameter) -> void = this.parameters.add(parameter)
+	func add(parameter: Parameter) -> void = this.parameters.add(parameter)
 
 	@Deprecated(replacements: [ "Builder.visitNode() -> Node" ])
-	public func makeNode() -> Node = this.visitNode
+	func makeNode() -> Node = this.visitNode
 
-	override func visitParameter(Name! name) -> ValueVisitor = new Parameter(name).{ this.add($0); $0 }
+	override func visitParameter(name: Name!) -> ValueVisitor = new Parameter(name).{ this.add($0); $0 }
 
 	override func visitNode() -> Node
 	{
@@ -47,7 +50,7 @@ public class Builder(
 	
 	override func visitEnd() -> void { }
 	
-	override func accept(ValueVisitor visitor) -> void
+	override func accept(visitor: ValueVisitor) -> void
 	{
 		let builderVisitor = visitor.visitBuilder(this.name)
 		for (parameter <- this.parameters)
@@ -56,12 +59,12 @@ public class Builder(
 		}
 		if (this.node != null)
 		{
-			this.node!.acceptBody(builderVisitor.visitNode())
+			this.node!!.acceptBody(builderVisitor.visitNode())
 		}
 		builderVisitor.visitEnd()
 	}
 
-	override func expand(Map<String, Object> mappings, boolean mutate) -> Builder
+	override func expand(mappings: Map<String, Object>, mutate: boolean) -> Builder
 	{
 		if (mutate)
 		{
@@ -78,12 +81,12 @@ public class Builder(
 
 		return new Builder(this.name
 		                   this.parameters.mapped(parameter => parameter.expand(mappings, false))
-		                   this.node == null ? null : this.node!.expand(mappings, false))
+		                   this.node?.expand(mappings, false) ?? null)
 	}
 
 	override func toString() -> String = IASTNode.toString(this)
 	
-	override func toString(String indent, StringBuilder buffer) -> void
+	override func toString(indent: String, buffer: StringBuilder) -> void
 	{
 		buffer.append(this.name)
 		
@@ -110,17 +113,17 @@ public class Builder(
 		if (this.node != null)
 		{
 			buffer.append(" {\n")
-			this.node!.bodyToString(indent + '\t', buffer)
+			this.node!!.bodyToString(indent + '\t', buffer)
 			buffer.append(indent).append('}')
 		}
 	}
 
-	override func equals(Object! o) -> boolean
+	override func equals(obj: Object!) -> boolean
 	{
-		if (this === o) return true
-		if (!(o is Builder)) return false
+		if (this === obj) return true
+		if (!(obj is Builder)) return false
 
-		let that = o as Builder
+		let that = obj as Builder
 		return this.name === that.name && this.parameters == that.parameters && this.node == that.node
 	}
 

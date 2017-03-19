@@ -59,13 +59,13 @@ public class ExternalClassParameter extends ClassParameter
 	}
 
 	@Override
-	public IType getInternalType()
+	public IType getCovariantType()
 	{
 		if ((this.resolved & TYPE) == 0)
 		{
 			this.resolveReturnType();
 		}
-		return super.getInternalType();
+		return super.getCovariantType();
 	}
 
 	@Override

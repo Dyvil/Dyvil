@@ -7,12 +7,12 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.FieldVisitor;
 import dyvil.tools.asm.Label;
 import dyvil.tools.asm.TypeReference;
-import dyvil.tools.compiler.ast.access.FieldAccess;
-import dyvil.tools.compiler.ast.access.FieldAssignment;
+import dyvil.tools.compiler.ast.expression.access.FieldAccess;
+import dyvil.tools.compiler.ast.expression.access.FieldAssignment;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.constant.VoidValue;
+import dyvil.tools.compiler.ast.expression.constant.VoidValue;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.ThisExpr;
@@ -83,9 +83,9 @@ public class Field extends Member implements IField
 	}
 
 	@Override
-	public boolean isField()
+	public IClass getEnclosingClass()
 	{
-		return true;
+		return this.enclosingClass;
 	}
 
 	@Override
@@ -95,21 +95,15 @@ public class Field extends Member implements IField
 	}
 
 	@Override
-	public IClass getEnclosingClass()
+	public IValue getValue()
 	{
-		return this.enclosingClass;
+		return this.value;
 	}
 
 	@Override
 	public void setValue(IValue value)
 	{
 		this.value = value;
-	}
-
-	@Override
-	public IValue getValue()
-	{
-		return this.value;
 	}
 
 	@Override
@@ -133,17 +127,6 @@ public class Field extends Member implements IField
 		}
 
 		return this.property = new Property(this.position, this.name, Types.UNKNOWN, new FlagModifierSet(), null);
-	}
-
-	@Override
-	public String getDescriptor()
-	{
-		if (this.descriptor != null)
-		{
-			return this.descriptor;
-		}
-
-		return this.descriptor = this.type.getExtendedName();
 	}
 
 	@Override
@@ -444,6 +427,17 @@ public class Field extends Member implements IField
 	}
 
 	@Override
+	public String getDescriptor()
+	{
+		if (this.descriptor != null)
+		{
+			return this.descriptor;
+		}
+
+		return this.descriptor = this.type.getExtendedName();
+	}
+
+	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
 		final long flags = ModifierUtil.getFlags(this);
@@ -652,20 +646,25 @@ public class Field extends Member implements IField
 	}
 
 	@Override
-	public void toString(@NonNull String prefix, @NonNull StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		super.toString(prefix, buffer);
-		IDataMember.toString(prefix, buffer, this, "field.type_ascription");
+		super.toString(indent, buffer);
+		IDataMember.toString(indent, buffer, this, "field.type_ascription");
 
-		if (this.value != null)
-		{
-			Formatting.appendSeparator(buffer, "field.assignment", '=');
-			this.value.toString(prefix, buffer);
-		}
+		this.valueToString(indent, buffer);
 
 		if (this.property != null)
 		{
-			Property.formatBody(this.property, prefix, buffer);
+			Property.formatBody(this.property, indent, buffer);
+		}
+	}
+
+	protected void valueToString(@NonNull String indent, @NonNull StringBuilder buffer)
+	{
+		if (this.value != null)
+		{
+			Formatting.appendSeparator(buffer, "field.assignment", '=');
+			this.value.toString(indent, buffer);
 		}
 	}
 }

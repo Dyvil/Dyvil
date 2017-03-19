@@ -177,7 +177,7 @@ public abstract class AbstractBitSet implements Set<int>
 
 	protected abstract void removeAt(int bit)
 
-	public override boolean contains(Object! o) = o match {
+	public override boolean contains(Object! element) = element match {
 		case int i : this.bitSet(i)
 		case _ : false
 	}
@@ -221,7 +221,7 @@ public abstract class AbstractBitSet implements Set<int>
 		}
 	}
 
-	public override MutableSet<RE> emptyCopy<RE>() = MutableSet<RE>
+	public override MutableSet<RE> emptyCopy<RE>() = MutableSet<RE>()
 
 	public override MutableSet<RE> emptyCopy<RE>(int capacity) = MutableSet.withCapacity<RE>(capacity)
 
@@ -243,7 +243,7 @@ public abstract class AbstractBitSet implements Set<int>
 		return hashSet
 	}
 
-	public override boolean equals(Object! other) = Set.setEquals(this, other)
+	public override boolean equals(Object! obj) = Set.setEquals(this, obj)
 
 	public override int hashCode() = Set.setHashCode(this)
 

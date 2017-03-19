@@ -10,9 +10,10 @@ import dyvil.tools.compiler.ast.expression.ClassOperator;
 import dyvil.tools.compiler.ast.expression.TypeOperator;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
+import dyvil.tools.compiler.ast.parameter.CodeParameter;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.ast.type.compound.ImplicitNullableType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
@@ -26,10 +27,8 @@ import java.lang.annotation.ElementType;
 
 public class CodeTypeParameter extends TypeParameter
 {
-	public static final IType DEFAULT_BOUND = new ImplicitNullableType(Types.OBJECT);
-
 	protected ICodePosition position;
-	protected int           parameterIndex;
+	protected CodeParameter reifyParameter;
 
 	public CodeTypeParameter(ICodePosition position, ITypeParametric generic, Name name, Variance variance)
 	{
@@ -38,9 +37,9 @@ public class CodeTypeParameter extends TypeParameter
 	}
 
 	@Override
-	public int getParameterIndex()
+	public IParameter getReifyParameter()
 	{
-		return this.parameterIndex;
+		return this.reifyParameter;
 	}
 
 	@Override
@@ -69,7 +68,7 @@ public class CodeTypeParameter extends TypeParameter
 		}
 		if (this.upperBound == null)
 		{
-			this.upperBound = DEFAULT_BOUND;
+			this.upperBound = Types.NULLABLE_ANY;
 		}
 
 		this.upperBound = this.upperBound.resolveType(markers, context);
@@ -133,6 +132,27 @@ public class CodeTypeParameter extends TypeParameter
 		{
 			this.upperBound.checkType(markers, context, IType.TypePosition.SUPER_TYPE_ARGUMENT);
 		}
+
+		final IType type;
+		final Reified.Type reifiedKind = this.getReifiedKind();
+		if (reifiedKind == Reified.Type.TYPE)
+		{
+			type = TypeOperator.LazyFields.TYPE;
+		}
+		else if (reifiedKind != null)
+		{
+			type = ClassOperator.LazyFields.CLASS;
+		}
+		else
+		{
+			return;
+		}
+
+		if (this.getReifiedKind() != null)
+		{
+			this.reifyParameter = new CodeParameter(Name.apply("reify_" + this.name.qualified), type);
+			this.reifyParameter.getModifiers().addIntModifier(Modifiers.MANDATED | Modifiers.SYNTHETIC | Modifiers.FINAL);
+		}
 	}
 
 	@Override
@@ -194,21 +214,9 @@ public class CodeTypeParameter extends TypeParameter
 	@Override
 	public void writeParameter(MethodWriter writer) throws BytecodeException
 	{
-		final IType type;
-		if (this.reifiedKind == Reified.Type.TYPE)
+		if (this.reifyParameter != null)
 		{
-			type = TypeOperator.LazyFields.TYPE;
+			this.reifyParameter.writeParameter(writer);
 		}
-		else if (this.reifiedKind != null)
-		{
-			type = ClassOperator.LazyFields.CLASS;
-		}
-		else
-		{
-			return;
-		}
-
-		this.parameterIndex = writer.localCount();
-		writer.visitParameter(this.parameterIndex, "reify$" + this.getName().qualified, type, Modifiers.MANDATED);
 	}
 }

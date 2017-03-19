@@ -381,8 +381,12 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 			}
 			// Fallthrough
 		case METHOD_TYPE:
-			if (type == BaseSymbols.COLON || type == DyvilSymbols.ARROW_RIGHT)
+			switch (type)
 			{
+			case BaseSymbols.COLON:
+				pm.report(Markers.syntaxWarning(token, "method.type.colon.deprecated"));
+				// Fallthrough
+			case DyvilSymbols.ARROW_RIGHT:
 				if (this.type != Types.UNKNOWN)
 				{
 					pm.report(token, "method.type.duplicate");

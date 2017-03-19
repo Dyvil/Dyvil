@@ -40,7 +40,7 @@ public class ConstructorTest
 
 	class InitOrder
 	{
-		public var order: List<String> = MutableList<String>
+		public var order = MutableList<String>()
 
 		let i: int = { this.order += "init s" ; 0 }
 

@@ -5,19 +5,11 @@ using dyvil.Test
 
 public class Main
 {
-	private static var errors = List<String>
-
-	public static void main([String] args)
+	static func main(args: [String]) -> void
 	{
 		print "Running Dyvil Tests..."
 
-		runTests(args)
-		verify()
-	}
-		
-	private static void runTests([String] args)
-	{
-		let test = test "Main" {
+		let tests = [
 			AnnotationTest()
 			ArrayTest()
 			AssignmentTest()
@@ -40,6 +32,7 @@ public class Main
 			NestedMethodTest()
 			ObjectTest()
 			OperatorTest()
+			OptionalTest()
 			OverloadTest()
 			PrimitiveTest()
 			PropertyTest()
@@ -52,49 +45,15 @@ public class Main
 			TypeTest()
 			VarargsTest()
 			VirtualStaticTest()
-		}
-		test.addErrors(errors)
-	}
+		]
 
-	private static void verify()
-	{
-		if (errors.isEmpty)
+		let errors = List<String>()
+		tests.forEach(t => t.addErrors(errors))
+
+		if (!errors.isEmpty)
 		{
-			return
-		}
-
-		errors.forEach(print _)
-		throw new AssertionError()
-	}
-
-	public static void error(String message)
-	{
-		errors.add message
-	}
-
-	public static void test(String testName, any! expected, any! actual)
-	{
-		test(testName, expected, actual, expected == actual)
-	}
-
-	public static void testString(String testName, any expected, any actual)
-	{
-		test(testName, expected, actual, expected.toString == actual.toString)
-	}
-
-	public static void test(String testName, any expected, any actual, boolean condition)
-	{
-		if (!condition)
-		{
-			errors.add "\(testName) FAILED:\n\texpected: \(expected)\n\tactual:   \(actual)"
-		}
-	}
-
-	public static void test(String testName, boolean condition)
-	{
-		if (!condition)
-		{
-			errors.add "\(testName) FAILED"
+			errors.forEach(print _)
+			throw new AssertionError()
 		}
 	}
 }

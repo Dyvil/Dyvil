@@ -12,21 +12,23 @@ public class EnumTest
 
 	public final class Option<T> extends Enum<Option<T>>
 	{
-		const None = Option(name: "None", id: 0)
+		/* <enum> */ const None = Option(name: "None", id: 0)
 
 		case class Some<T>(let value: T) extends Option(name: "Some", id: 1)
 
 		// --- Boilerplate ---
 
-		const $VALUES: [final Option<_>] = [None] // only non-parametric values are the "enum constants"
+		const $VALUES: ImmutableSet<Option<_>> = EnumSet(class<Option>) // only non-parametric values are the "enum constants"
 
-		static func values() -> [final Option<_>] = $VALUES
+		static func values() -> ImmutableSet<Option<_>> = $VALUES
 
 		@BytecodeName("valueOf")
 		static func from(name: String) -> Option<_> = Enum.valueOf(class<Option>, name)
 
 		@BytecodeName("fromID")
-		static func from(id: int) -> Option<_>
+		static func from(id: int) -> Option<_> = id match {
+			case 0 => None
+		}
 
 		// --- Constructor ---
 
@@ -38,18 +40,18 @@ public class EnumTest
 
 	public enum MyEnum(var value: int)
 	{
-		case Foo
-		case Bar
-		case Baz
+		case Foo = 0
+		case Bar = 10
+		case Baz = 100
 	}
 
 	// becomes
 
 	public enum MyEnum
 	{
-		case Foo
-		case Bar
-		case Baz
+		case Foo = 1
+		case Bar = 10
+		case Baz = 100
 
 		var value: int
 
@@ -63,7 +65,9 @@ public class EnumTest
 
 	public class MyEnum extends ...
 	{
-		case ...
+		const Foo = new MyEnum("Foo", 0, value: 1)
+		const Bar = new MyEnum("Bar", 1, value: 10)
+		const Baz = new MyEnum("Baz", 2, value: 100)
 
 		// ... Boilerplate
 

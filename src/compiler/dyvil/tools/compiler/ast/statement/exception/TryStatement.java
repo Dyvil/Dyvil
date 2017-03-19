@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.statement.exception;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.AbstractValue;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -160,14 +161,14 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	}
 
 	@Override
-	public int getTypeMatch(IType type)
+	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
 		if (DISALLOW_EXPRESSIONS)
 		{
 			return MISMATCH;
 		}
 
-		int min = this.action.getTypeMatch(type);
+		int min = TypeChecker.getTypeMatch(this.action, type, implicitContext);
 		if (min == MISMATCH)
 		{
 			return MISMATCH;
@@ -175,7 +176,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 
 		for (int i = 0; i < this.catchBlockCount; i++)
 		{
-			final int blockMatch = this.catchBlocks[i].action.getTypeMatch(type);
+			final int blockMatch = TypeChecker.getTypeMatch(this.catchBlocks[i].action, type, implicitContext);
 			if (blockMatch == MISMATCH)
 			{
 				return MISMATCH;

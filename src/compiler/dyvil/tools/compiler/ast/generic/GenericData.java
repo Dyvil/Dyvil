@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.ast.generic;
 
-import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
@@ -8,42 +7,46 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public final class GenericData implements IResolvable, ITypeList, ITypeContext
 {
-	protected ITypeParametric typeParametric;
-	protected IType[]         generics;
-	protected int             genericCount;
-	protected int             lockedCount;
-	protected ITypeContext    fallbackTypeContext;
+	protected ITypeParametricMember member;
+
+	protected IType[] generics;
+	protected int     genericCount;
+
+	protected int lockedCount;
+
+	protected ITypeContext fallbackTypeContext;
 
 	public GenericData()
 	{
 	}
 
-	public GenericData(ITypeParametric typeParametric, int capacity)
+	public GenericData(ITypeParametricMember member, int capacity)
 	{
-		this.typeParametric = typeParametric;
+		this.member = member;
 		this.generics = new IType[capacity];
 	}
 
-	public GenericData(ITypeParametric typeParametric, IType... generics)
+	public GenericData(ITypeParametricMember member, IType... generics)
 	{
-		this.typeParametric = typeParametric;
+		this.member = member;
 		this.genericCount = generics.length;
 		this.generics = generics;
 	}
 
-	public ITypeParametric getTypeParametric()
+	public ITypeParametricMember getMember()
 	{
-		return this.typeParametric;
+		return this.member;
 	}
 
-	public void setTypeParametric(ITypeParametric typeParametric)
+	public void setMember(ITypeParametricMember member)
 	{
-		this.typeParametric = typeParametric;
+		this.member = member;
 	}
 
 	public ITypeContext getFallbackTypeContext()
@@ -54,6 +57,11 @@ public final class GenericData implements IResolvable, ITypeList, ITypeContext
 	public void setFallbackTypeContext(ITypeContext fallbackTypeContext)
 	{
 		this.fallbackTypeContext = fallbackTypeContext;
+	}
+
+	public void lockAvailable()
+	{
+		this.lock(this.genericCount);
 	}
 
 	public void lock(int lockedCount)
@@ -68,6 +76,25 @@ public final class GenericData implements IResolvable, ITypeList, ITypeContext
 	public int typeCount()
 	{
 		return this.genericCount;
+	}
+
+	@Override
+	public IType getType(int index)
+	{
+		return this.generics[index];
+	}
+
+	@Override
+	public IType[] getTypes()
+	{
+		return this.generics;
+	}
+
+	@Override
+	public void setTypes(IType[] types, int size)
+	{
+		this.generics = types;
+		this.genericCount = size;
 	}
 
 	public void setTypeCount(int count)
@@ -112,22 +139,15 @@ public final class GenericData implements IResolvable, ITypeList, ITypeContext
 		this.generics[index] = type;
 	}
 
-	@Override
-	public IType getType(int index)
-	{
-		return this.generics[index];
-	}
-
 	private boolean isMethodTypeVariable(ITypeParameter typeVar)
 	{
-		if (typeVar.getGeneric() == this.typeParametric)
+		if (typeVar.getGeneric() == this.member)
 		{
 			return true;
 		}
 
 		final int index = typeVar.getIndex();
-		return index < this.typeParametric.typeParameterCount()
-			       && this.typeParametric.getTypeParameter(index) == typeVar;
+		return index < this.member.typeParameterCount() && this.member.getTypeParameter(index) == typeVar;
 	}
 
 	@Override
@@ -135,14 +155,19 @@ public final class GenericData implements IResolvable, ITypeList, ITypeContext
 	{
 		if (this.isMethodTypeVariable(typeParameter))
 		{
-			int index = typeParameter.getIndex();
+			final int index = typeParameter.getIndex();
 			if (index >= this.genericCount || index >= this.lockedCount)
 			{
 				return null;
 			}
 			return this.generics[index];
 		}
-		return this.fallbackTypeContext == null ? null : this.fallbackTypeContext.resolveType(typeParameter);
+		if (this.fallbackTypeContext != null && typeParameter.getGeneric() == this.member.getEnclosingClass())
+		{
+			return Types.resolveTypeSafely(this.fallbackTypeContext, typeParameter);
+		}
+
+		return null;
 	}
 
 	@Override

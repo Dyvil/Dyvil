@@ -2,7 +2,8 @@ package dyvil.tools.compiler.ast.expression;
 
 import dyvil.collection.mutable.HashSet;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.access.ClassAccess;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
+import dyvil.tools.compiler.ast.expression.access.ClassAccess;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -216,7 +217,7 @@ public class MapExpr implements IValue
 	}
 
 	@Override
-	public int getTypeMatch(IType type)
+	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
 		if (!MapType.MapTypes.MAP_CLASS.isSubClassOf(type))
 		{
@@ -231,10 +232,10 @@ public class MapExpr implements IValue
 		final IType keyType = Types.resolveTypeSafely(type, MapType.MapTypes.KEY_VARIABLE);
 		final IType valueType = Types.resolveTypeSafely(type, MapType.MapTypes.VALUE_VARIABLE);
 
-		int min = Integer.MAX_VALUE;
+		int min = EXACT_MATCH;
 		for (int i = 0; i < this.count; i++)
 		{
-			int match = this.keys[i].getTypeMatch(keyType);
+			int match = TypeChecker.getTypeMatch(this.keys[i], keyType, implicitContext);
 			if (match == MISMATCH)
 			{
 				return MISMATCH;
@@ -244,10 +245,10 @@ public class MapExpr implements IValue
 				min = match;
 			}
 
-			match = this.values[i].getTypeMatch(valueType);
+			match = TypeChecker.getTypeMatch(this.values[i], valueType, implicitContext);
 			if (match == MISMATCH)
 			{
-				return 0;
+				return MISMATCH;
 			}
 			if (match < min)
 			{

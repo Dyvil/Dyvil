@@ -6,8 +6,8 @@ import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.constant.IConstantValue;
-import dyvil.tools.compiler.ast.constant.NullValue;
+import dyvil.tools.compiler.ast.expression.constant.IConstantValue;
+import dyvil.tools.compiler.ast.expression.constant.NullValue;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -39,6 +39,7 @@ public class NullableType implements IObjectType
 	{
 	}
 
+	@Deprecated
 	public NullableType(IType type)
 	{
 		this.type = type.getObjectType();
@@ -49,14 +50,20 @@ public class NullableType implements IObjectType
 		return new NullableType(type);
 	}
 
-	protected NullableType wrap(IType type)
+	public static IType unapply(IType type)
 	{
-		return new NullableType(type);
+		final NullableType nullable = type.extract(NullableType.class);
+		return nullable == null ? type : nullable.getElementType();
 	}
 
 	public IType getElementType()
 	{
 		return this.type;
+	}
+
+	protected NullableType wrap(IType type)
+	{
+		return new NullableType(type);
 	}
 
 	public void setElementType(IType type)
@@ -135,7 +142,11 @@ public class NullableType implements IObjectType
 		}
 
 		final NullableType nullable = subType.extract(NullableType.class);
-		return Types.isSuperType(this.type, nullable != null ? nullable.getElementType() : subType);
+		if (nullable != null)
+		{
+			return Types.isSuperType(this, nullable.getElementType());
+		}
+		return Types.isSuperType(this.type, subType);
 	}
 
 	@Override

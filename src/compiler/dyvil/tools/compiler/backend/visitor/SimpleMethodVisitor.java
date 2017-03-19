@@ -272,7 +272,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 		final String localName;
 		if (this.localNames == null || (localName = this.localNames[localIndex]) == null)
 		{
-			return Name.fromRaw("par" + index);
+			return null;
 		}
 		return Name.fromQualified(localName);
 	}

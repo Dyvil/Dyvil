@@ -4,11 +4,10 @@ import dyvil.io.Console;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.lang.I18n;
 import dyvil.tools.compiler.sources.IFileType;
-import dyvil.tools.parsing.source.FileSource;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
-import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.source.FileSource;
 
 import java.io.File;
 
@@ -56,11 +55,9 @@ public interface ICompilationUnit extends IASTNode
 		final int errors = markers.getErrors();
 		final boolean colors = compiler.config.useAnsiColors();
 
-		markers.sort();
-		for (Marker marker : markers)
-		{
-			marker.log(source, builder, colors);
-		}
+		markers.log(source, builder, colors);
+
+		builder.append('\n');
 
 		if (errors > 0)
 		{
@@ -95,6 +92,8 @@ public interface ICompilationUnit extends IASTNode
 				builder.append(Console.ANSI_RESET);
 			}
 		}
+
+		builder.append('\n');
 
 		compiler.log(builder.toString());
 		if (errors > 0)

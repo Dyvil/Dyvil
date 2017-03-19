@@ -3,8 +3,8 @@ package dyvil.tools.compiler.ast.annotation;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
-import dyvil.tools.compiler.ast.access.FieldAccess;
-import dyvil.tools.compiler.ast.constant.EnumValue;
+import dyvil.tools.compiler.ast.expression.access.FieldAccess;
+import dyvil.tools.compiler.ast.expression.constant.EnumValue;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
@@ -72,9 +72,9 @@ public final class AnnotationUtil
 		switch (value.valueTag())
 		{
 		case IValue.ENUM_ACCESS:
-			return Enum.valueOf(type, ((EnumValue) value).name.qualified);
+			return Enum.valueOf(type, ((EnumValue) value).getInternalName());
 		case IValue.FIELD_ACCESS:
-			if (Types.isSameType(parameter.getInternalType(), value.getType()))
+			if (Types.isSameType(parameter.getCovariantType(), value.getType()))
 			{
 				return Enum.valueOf(type, ((FieldAccess) value).getName().qualified);
 			}

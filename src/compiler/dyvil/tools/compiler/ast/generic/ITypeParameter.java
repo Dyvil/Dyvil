@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.generic;
 import dyvil.annotation.Reified;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
-import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.compiler.ast.annotation.IAnnotated;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -17,10 +16,12 @@ import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -40,8 +41,8 @@ public interface ITypeParameter extends IASTNode, IResolvable, INamed, IAnnotate
 	void setVariance(Variance variance);
 
 	Reified.Type getReifiedKind();
-	
-	int getParameterIndex();
+
+	IParameter getReifyParameter();
 
 	default boolean isAny()
 	{

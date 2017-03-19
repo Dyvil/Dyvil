@@ -16,7 +16,7 @@ public class ForTest
 	}
 	
 	static func iterative() -> Test = test "Iterative" {
-		let list = List<int>
+		let list = List<int>()
 
 		for (int i = 0; i < 3; i++)
 		{
@@ -28,7 +28,7 @@ public class ForTest
 	
 	static func array() -> Test = test "Array" {
 		let array = [ 1, 2, 3 ]
-		let list = List<int>
+		let list = List<int>()
 
 		for (i <- array)
 		{
@@ -40,7 +40,7 @@ public class ForTest
 	
 	static func iterable() -> Test = test "Iterable" {
 		let iterable: Iterable<int> = List(1, 2, 3)
-		let list = List<int>
+		let list = List<int>()
 
 		for (i <- iterable)
 		{
@@ -52,7 +52,7 @@ public class ForTest
 
 	static func iterator() -> Test = test "Iterator" {
 		let iterable = List(1, 2, 3)
-		let list = List<int>
+		let list = List<int>()
 
 		for (i <- iterable.iterator)
 		{
@@ -75,7 +75,7 @@ public class ForTest
 	}
 
 	static func nested() -> Test = test "Nested" {
-		let results = List<(int, int)>
+		let results = List<(int, int)>()
 
 		for (i <- 0 .. 1)
 		{

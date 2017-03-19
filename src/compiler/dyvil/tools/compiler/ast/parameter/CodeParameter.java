@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
@@ -10,9 +11,11 @@ import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -50,24 +53,24 @@ public class CodeParameter extends AbstractParameter
 
 		if (this.type == Types.UNKNOWN)
 		{
-			markers.add(Markers.semantic(this.position, this.getKind().getName() + ".type.infer", this.name));
+			markers.add(Markers.semanticError(this.position, "parameter.type.infer", this.name));
 		}
 
-		if (this.defaultValue == null)
+		if (this.value == null)
 		{
 			return;
 		}
 
-		IValue defaultValue = this.defaultValue.resolve(markers, context);
+		IValue value = this.value.resolve(markers, context);
 
 		final String kindName = this.getKind().getName();
 		final TypeChecker.MarkerSupplier markerSupplier = TypeChecker.markerSupplier(kindName + ".type.incompatible",
 		                                                                             kindName + ".type", "value.type",
 		                                                                             this.name);
 
-		defaultValue = TypeChecker.convertValue(defaultValue, this.type, null, markers, context, markerSupplier);
+		value = TypeChecker.convertValue(value, this.type, null, markers, context, markerSupplier);
 
-		this.defaultValue = IValue.toAnnotationConstant(defaultValue, markers, context);
+		this.value = IValue.toAnnotationConstant(value, markers, context);
 	}
 
 	@Override
@@ -86,9 +89,9 @@ public class CodeParameter extends AbstractParameter
 			this.annotations.checkTypes(markers, context);
 		}
 
-		if (this.defaultValue != null)
+		if (this.value != null)
 		{
-			this.defaultValue.checkTypes(markers, context);
+			this.value.checkTypes(markers, context);
 		}
 	}
 
@@ -97,14 +100,22 @@ public class CodeParameter extends AbstractParameter
 	{
 		super.check(markers, context);
 
-		if (this.defaultValue != null)
+		if (this.value != null)
 		{
-			this.defaultValue.check(markers, context);
+			this.value.check(markers, context);
 		}
 
 		if (Types.isVoid(this.type))
 		{
-			markers.add(Markers.semantic(this.position, this.getKind().getName() + ".type.void"));
+			markers.add(Markers.semanticError(this.position, "parameter.type.void"));
+		}
+
+		if (this.isVarargs() && !this.type.canExtract(ArrayType.class) && this.type.getAnnotation(
+			ArrayExpr.LazyFields.ARRAY_CONVERTIBLE) == null)
+		{
+			final Marker marker = Markers.semanticError(this.type.getPosition(), "parameter.varargs.incompatible", this.name);
+			marker.addInfo(Markers.getSemantic("parameter.type", this.type));
+			markers.add(marker);
 		}
 	}
 
@@ -113,9 +124,9 @@ public class CodeParameter extends AbstractParameter
 	{
 		super.foldConstants();
 
-		if (this.defaultValue != null)
+		if (this.value != null)
 		{
-			this.defaultValue = this.defaultValue.foldConstants();
+			this.value = this.value.foldConstants();
 		}
 	}
 
@@ -124,9 +135,9 @@ public class CodeParameter extends AbstractParameter
 	{
 		super.cleanup(compilableList, classCompilableList);
 
-		if (this.defaultValue != null)
+		if (this.value != null)
 		{
-			this.defaultValue = this.defaultValue.cleanup(compilableList, classCompilableList);
+			this.value = this.value.cleanup(compilableList, classCompilableList);
 		}
 	}
 }

@@ -6,8 +6,8 @@ import dyvil.tools.compiler.ast.classes.IClassList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
-import dyvil.tools.compiler.ast.operator.IOperator;
-import dyvil.tools.compiler.ast.operator.IOperatorMap;
+import dyvil.tools.compiler.ast.expression.operator.IOperator;
+import dyvil.tools.compiler.ast.expression.operator.IOperatorMap;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.alias.ITypeAliasMap;
@@ -60,7 +60,7 @@ public interface IHeaderUnit extends IASTNode, IObjectCompilable, IContext, ICla
 	int operatorCount();
 
 	@Override
-	IOperator resolveOperator(Name name, int type);
+	IOperator resolveOperator(Name name, byte type);
 	
 	IOperator getOperator(int index);
 

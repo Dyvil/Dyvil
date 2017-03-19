@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.type.compound;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
@@ -19,7 +20,6 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITypeList;
-import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.generic.GenericType;
 import dyvil.tools.compiler.ast.type.raw.IObjectType;
@@ -117,26 +117,6 @@ public final class TupleType implements IObjectType, ITypeList
 		return descriptors[typeCount] = buffer.toString();
 	}
 
-	public static boolean isSuperType(IType type, ITyped[] typedArray, int count)
-	{
-		IClass iclass = getTupleClass(count);
-		if (!iclass.isSubClassOf(type))
-		{
-			return false;
-		}
-
-		for (int i = 0; i < count; i++)
-		{
-			ITypeParameter typeVar = iclass.getTypeParameter(i);
-			IType type1 = Types.resolveTypeSafely(type, typeVar);
-			if (!typedArray[i].isType(type1))
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
 	@Override
 	public int typeTag()
 	{
@@ -168,6 +148,25 @@ public final class TupleType implements IObjectType, ITypeList
 	}
 
 	@Override
+	public IType getType(int index)
+	{
+		return this.types[index];
+	}
+
+	@Override
+	public IType[] getTypes()
+	{
+		return this.types;
+	}
+
+	@Override
+	public void setTypes(IType[] types, int size)
+	{
+		this.types = types;
+		this.typeCount = size;
+	}
+
+	@Override
 	public void setType(int index, IType type)
 	{
 		this.types[index] = type;
@@ -186,19 +185,13 @@ public final class TupleType implements IObjectType, ITypeList
 		this.types[index] = type;
 	}
 
-	@Override
-	public IType getType(int index)
-	{
-		return this.types[index];
-	}
-
 	// IType Overrides
 
 	@Override
-	public boolean isSuperTypeOf(IType type)
+	public boolean isSuperTypeOf(IType subType)
 	{
 		IClass iclass = getTupleClass(this.typeCount);
-		if (!iclass.isSubClassOf(type))
+		if (!iclass.isSubClassOf(subType))
 		{
 			return false;
 		}
@@ -206,7 +199,7 @@ public final class TupleType implements IObjectType, ITypeList
 		for (int i = 0; i < this.typeCount; i++)
 		{
 			final ITypeParameter typeVar = iclass.getTypeParameter(i);
-			final IType otherElementType = Types.resolveTypeSafely(type, typeVar);
+			final IType otherElementType = Types.resolveTypeSafely(subType, typeVar);
 
 			// Tuple Element Types are Covariant
 			if (!Types.isSuperType(this.types[i], otherElementType))
@@ -485,7 +478,7 @@ public final class TupleType implements IObjectType, ITypeList
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		if (this.typeCount == 0)
 		{
@@ -506,7 +499,7 @@ public final class TupleType implements IObjectType, ITypeList
 			buffer.append(' ');
 		}
 
-		Util.astToString(prefix, this.types, this.typeCount, Formatting.getSeparator("tuple.separator", ','), buffer);
+		Util.astToString(indent, this.types, this.typeCount, Formatting.getSeparator("tuple.separator", ','), buffer);
 
 		if (Formatting.getBoolean("tuple.close_paren.space_before"))
 		{

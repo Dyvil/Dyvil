@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.parser.header;
 
-import dyvil.tools.compiler.ast.operator.IOperator;
-import dyvil.tools.compiler.ast.operator.IOperatorMap;
-import dyvil.tools.compiler.ast.operator.Operator;
+import dyvil.tools.compiler.ast.expression.operator.IOperator;
+import dyvil.tools.compiler.ast.expression.operator.IOperatorMap;
+import dyvil.tools.compiler.ast.expression.operator.Operator;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.Markers;

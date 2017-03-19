@@ -22,7 +22,7 @@ import java.lang.reflect.Array
 @LiteralConvertible.FromStringInterpolation
 @LiteralConvertible.FromArray
 @LiteralConvertible.FromMap
-public interface Value extends IASTNode
+public interface Value extends IASTNode, dyvil.tools.dpf.model.value.Value
 {
 	// Conversion Methods
 
@@ -62,7 +62,7 @@ public interface Value extends IASTNode
 
 	override func toString(indent: String, buffer: StringBuilder) -> void
 
-	func accept(visitor: ValueVisitor) -> void
+	override func accept(visitor: ValueVisitor) -> void
 
 	// Value Conversions
 

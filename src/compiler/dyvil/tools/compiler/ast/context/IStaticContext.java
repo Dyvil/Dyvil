@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.operator.IOperator;
+import dyvil.tools.compiler.ast.expression.operator.IOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -65,7 +65,7 @@ public interface IStaticContext extends IContext
 	}
 
 	@Override
-	default IOperator resolveOperator(Name name, int type)
+	default IOperator resolveOperator(Name name, byte type)
 	{
 		return null;
 	}

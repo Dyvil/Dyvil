@@ -5,9 +5,9 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.intrinsic.*;
+import dyvil.tools.compiler.ast.expression.intrinsic.*;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.operator.VarargsOperator;
+import dyvil.tools.compiler.ast.expression.intrinsic.VarargsOperator;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
@@ -42,6 +42,10 @@ public class Intrinsics
 			return new AndOperator(lhs, arguments.getFirstValue());
 		case Intrinsic.ARRAY_SPREAD:
 			return new VarargsOperator(lhs);
+		case Intrinsic.OPTIONAL_CHAIN:
+			return new OptionalChainOperator(lhs);
+		case Intrinsic.NULL_COALESCING:
+			return new NullCoalescingOperator(lhs, arguments.getFirstValue());
 		case Intrinsic.STRING_CONCAT:
 			return StringConcatExpr.apply(lhs, arguments.getFirstValue());
 		case Intrinsic.PRE_INCREMENT:
