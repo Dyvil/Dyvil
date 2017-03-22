@@ -17,7 +17,7 @@ public class PrefixType extends NamedGenericType
 
 	public PrefixType(ICodePosition position, Name name, IType rhs)
 	{
-		super(position, name, new IType[] { rhs }, 1);
+		super(position, name, rhs);
 	}
 
 	@Override
@@ -26,14 +26,13 @@ public class PrefixType extends NamedGenericType
 		final String unqualified = this.name.unqualified;
 		if (unqualified.length() == 1)
 		{
+			final IType argument = this.arguments.get(0);
 			switch (unqualified.charAt(0))
 			{
 			case '+':
-				return new WildcardType(this.position, this.typeArguments[0], Variance.COVARIANT)
-					       .resolveType(markers, context);
+				return new WildcardType(this.position, argument, Variance.COVARIANT).resolveType(markers, context);
 			case '-':
-				return new WildcardType(this.position, this.typeArguments[0], Variance.CONTRAVARIANT)
-					       .resolveType(markers, context);
+				return new WildcardType(this.position, argument, Variance.CONTRAVARIANT).resolveType(markers, context);
 			}
 		}
 
@@ -43,13 +42,13 @@ public class PrefixType extends NamedGenericType
 	@Override
 	public String toString()
 	{
-		return this.name + this.typeArguments[0].toString();
+		return this.name + this.arguments.get(0).toString();
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(String indent, StringBuilder buffer)
 	{
 		buffer.append(this.name);
-		this.typeArguments[0].toString(prefix, buffer);
+		this.arguments.get(0).toString(indent, buffer);
 	}
 }

@@ -89,7 +89,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 			return this; // skip
 		}
 
-		final IParameterList parameters = caseClass.getParameterList();
+		final IParameterList parameters = caseClass.getParameters();
 		final int paramCount = parameters.size();
 		if (this.patternCount != paramCount)
 		{
@@ -224,7 +224,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 		varIndex = IPattern.ensureVar(writer, varIndex, matchedType);
 
 		final IClass caseClass = this.type.getTheClass();
-		final IParameterList parameters = caseClass.getParameterList();
+		final IParameterList parameters = caseClass.getParameters();
 		final int lineNumber = this.getLineNumber();
 
 		for (int i = 0; i < this.patternCount; i++)

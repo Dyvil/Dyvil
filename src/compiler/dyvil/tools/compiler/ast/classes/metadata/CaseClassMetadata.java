@@ -42,7 +42,7 @@ public final class CaseClassMetadata extends ClassMetadata
 	{
 		super.resolveTypesPre(markers, context);
 
-		final IParameterList parameters = this.theClass.getParameterList();
+		final IParameterList parameters = this.theClass.getParameters();
 		for (int i = 0, count = parameters.size(); i < count; i++)
 		{
 			final ClassParameter classParameter = (ClassParameter) parameters.get(i);
@@ -81,11 +81,11 @@ public final class CaseClassMetadata extends ClassMetadata
 
 		final CodeMethod applyMethod = new CodeMethod(this.theClass, Names.apply, this.theClass.getThisType(),
 		                                              new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC_FINAL));
-		applyMethod.setTypeParameters(this.theClass.getTypeParameters(), this.theClass.typeParameterCount());
+		applyMethod.getTypeParameters().addAll(this.theClass.getTypeParameters());
 
 		if (this.constructor != null && (this.members & CONSTRUCTOR) == 0)
 		{
-			this.constructor.getParameterList().copyTo(applyMethod.getParameterList());
+			this.constructor.getParameters().copyTo(applyMethod.getParameters());
 		}
 		else
 		{
@@ -101,7 +101,7 @@ public final class CaseClassMetadata extends ClassMetadata
 		if (this.applyMethod != null && (this.members & APPLY) == 0)
 		{
 			final ArgumentList arguments = new ArgumentList();
-			final IParameterList parameterList = this.applyMethod.getParameterList();
+			final IParameterList parameterList = this.applyMethod.getParameters();
 
 			for (int i = 0, count = parameterList.size(); i < count; i++)
 			{

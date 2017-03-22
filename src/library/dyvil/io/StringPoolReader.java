@@ -123,6 +123,7 @@ public class StringPoolReader extends FilterInputStream implements DataInput
 	@Override
 	public String readUTF() throws IOException
 	{
-		return this.constantPool[this.input.readUnsignedShort()];
+		final int i = this.input.readUnsignedShort();
+		return this.constantPool[i];
 	}
 }

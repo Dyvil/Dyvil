@@ -134,9 +134,9 @@ public class CodeClass extends AbstractClass
 
 		this.metadata.resolveTypesPre(markers, context);
 
-		for (int i = 0; i < this.typeParameterCount; i++)
+		if (this.typeParameters != null)
 		{
-			this.typeParameters[i].resolveTypes(markers, context);
+			this.typeParameters.resolveTypes(markers, context);
 		}
 
 		this.parameters.resolveTypes(markers, context);
@@ -178,9 +178,9 @@ public class CodeClass extends AbstractClass
 			this.annotations.resolve(markers, context);
 		}
 
-		for (int i = 0; i < this.typeParameterCount; i++)
+		if (this.typeParameters != null)
 		{
-			this.typeParameters[i].resolve(markers, context);
+			this.typeParameters.resolve(markers, context);
 		}
 
 		this.parameters.resolve(markers, context);
@@ -217,9 +217,9 @@ public class CodeClass extends AbstractClass
 
 		this.metadata.checkTypes(markers, context);
 
-		for (int i = 0; i < this.typeParameterCount; i++)
+		if (this.typeParameters != null)
 		{
-			this.typeParameters[i].checkTypes(markers, context);
+			this.typeParameters.checkTypes(markers, context);
 		}
 
 		this.checkSuperMethods(markers, this, this.getThisType(), new IdentityHashSet<>());
@@ -254,9 +254,9 @@ public class CodeClass extends AbstractClass
 			this.annotations.check(markers, context, this.getElementType());
 		}
 
-		for (int i = 0; i < this.typeParameterCount; i++)
+		if (this.typeParameters != null)
 		{
-			this.typeParameters[i].check(markers, context);
+			this.typeParameters.check(markers, context);
 		}
 
 		this.parameters.check(markers, context);
@@ -387,9 +387,9 @@ public class CodeClass extends AbstractClass
 			this.annotations.foldConstants();
 		}
 
-		for (int i = 0; i < this.typeParameterCount; i++)
+		if (this.typeParameters != null)
 		{
-			this.typeParameters[i].foldConstants();
+			this.typeParameters.foldConstants();
 		}
 
 		this.parameters.foldConstants();
@@ -420,9 +420,9 @@ public class CodeClass extends AbstractClass
 			this.annotations.cleanup(compilableList, this);
 		}
 
-		for (int i = 0; i < this.typeParameterCount; i++)
+		if (this.typeParameters != null)
 		{
-			this.typeParameters[i].cleanup(compilableList, this);
+			this.typeParameters.cleanup(compilableList, this);
 		}
 
 		this.parameters.cleanup(compilableList, this);
@@ -494,8 +494,7 @@ public class CodeClass extends AbstractClass
 		{
 			modifiers |= ASMConstants.ACC_SUPER;
 		}
-		writer.visit(ClassFormat.CLASS_VERSION, modifiers, this.getInternalName(), signature, superClass,
-		             interfaces);
+		writer.visit(ClassFormat.CLASS_VERSION, modifiers, this.getInternalName(), signature, superClass, interfaces);
 
 		// Source
 
@@ -780,9 +779,9 @@ public class CodeClass extends AbstractClass
 		}
 
 		// Type Variable Annotations
-		for (int i = 0; i < this.typeParameterCount; i++)
+		if (this.typeParameters != null)
 		{
-			this.typeParameters[i].write(writer);
+			this.typeParameters.write(writer);
 		}
 
 		// Super Type Variable Annotations

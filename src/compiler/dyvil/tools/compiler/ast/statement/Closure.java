@@ -69,7 +69,7 @@ public class Closure extends StatementList
 			return null;
 		}
 
-		final IParameterList parameterList = functionalMethod.getParameterList();
+		final IParameterList parameterList = functionalMethod.getParameters();
 		final int parameterCount = parameterList.size();
 		final IParameter[] parameters = new IParameter[parameterCount];
 
@@ -79,7 +79,7 @@ public class Closure extends StatementList
 		}
 
 		final LambdaType functionType = type.extract(LambdaType.class);
-		if (functionType.isExtension() && parameterCount > 0)
+		if (functionType != null && functionType.isExtension() && parameterCount > 0)
 		{
 			this.implicitValue = new FieldAccess(parameters[0]);
 		}

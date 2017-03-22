@@ -1,10 +1,11 @@
 package dyvil.tools.compiler.ast.type.alias;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
-import dyvil.tools.compiler.ast.external.ExternalTypeParameter;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.generic.TypeParameterList;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
@@ -28,8 +29,7 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	protected Name  name;
 	protected IType type;
 
-	protected ITypeParameter[] typeVariables;
-	protected int              typeVariableCount;
+	protected @Nullable TypeParameterList typeParameters;
 
 	// Metadata
 	protected IHeaderUnit   enclosingHeader;
@@ -109,84 +109,23 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	@Override
 	public boolean isTypeParametric()
 	{
-		return this.typeVariables != null;
+		return this.typeParameters != null;
 	}
 
 	@Override
-	public void setTypeParametric()
+	public TypeParameterList getTypeParameters()
 	{
-		this.typeVariables = new ITypeParameter[2];
-	}
-
-	@Override
-	public int typeParameterCount()
-	{
-		return this.typeVariableCount;
-	}
-
-	@Override
-	public ITypeParameter[] getTypeParameters()
-	{
-		return this.typeVariables;
-	}
-
-	@Override
-	public void setTypeParameters(ITypeParameter[] typeParameters, int count)
-	{
-		this.typeVariables = typeParameters;
-		this.typeVariableCount = count;
-	}
-
-	@Override
-	public ITypeParameter getTypeParameter(int index)
-	{
-		return this.typeVariables[index];
-	}
-
-	@Override
-	public void setTypeParameter(int index, ITypeParameter typeParameter)
-	{
-		typeParameter.setIndex(index);
-		this.typeVariables[index] = typeParameter;
-	}
-
-	@Override
-	public void addTypeParameter(ITypeParameter typeParameter)
-	{
-		if (this.typeVariables == null)
+		if (this.typeParameters != null)
 		{
-			this.setTypeParametric();
-			typeParameter.setIndex(0);
-			this.typeVariables[0] = typeParameter;
-			this.typeVariableCount = 1;
-			return;
+			return this.typeParameters;
 		}
-
-		int index = this.typeVariableCount++;
-		if (index >= this.typeVariables.length)
-		{
-			ITypeParameter[] temp = new ITypeParameter[index + 1];
-			System.arraycopy(this.typeVariables, 0, temp, 0, index);
-			this.typeVariables = temp;
-		}
-
-		typeParameter.setIndex(index);
-		this.typeVariables[index] = typeParameter;
+		return this.typeParameters = new TypeParameterList();
 	}
 
 	@Override
 	public ITypeParameter resolveTypeParameter(Name name)
 	{
-		for (int i = 0; i < this.typeVariableCount; i++)
-		{
-			final ITypeParameter typeVariable = this.typeVariables[i];
-			if (typeVariable.getName() == name)
-			{
-				return typeVariable;
-			}
-		}
-
-		return null;
+		return this.typeParameters == null ? null : this.typeParameters.get(name);
 	}
 
 	private void ensureResolved()
@@ -216,9 +155,9 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 		this.resolved = true;
 		this.type = this.type.resolveType(markers, context);
 
-		for (int i = 0; i < this.typeVariableCount; i++)
+		if (this.typeParameters != null)
 		{
-			this.typeVariables[i].resolveTypes(markers, context);
+			this.typeParameters.resolveTypes(markers, context);
 		}
 
 		context.pop();
@@ -231,9 +170,9 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 
 		this.type.resolve(markers, context);
 
-		for (int i = 0; i < this.typeVariableCount; i++)
+		if (this.typeParameters != null)
 		{
-			this.typeVariables[i].resolve(markers, context);
+			this.typeParameters.resolve(markers, context);
 		}
 
 		context.pop();
@@ -246,9 +185,9 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 
 		this.type.checkType(markers, context, TypePosition.GENERIC_ARGUMENT);
 
-		for (int i = 0; i < this.typeVariableCount; i++)
+		if (this.typeParameters != null)
 		{
-			this.typeVariables[i].checkTypes(markers, context);
+			this.typeParameters.checkTypes(markers, context);
 		}
 
 		context.pop();
@@ -261,9 +200,9 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 
 		this.type.check(markers, context);
 
-		for (int i = 0; i < this.typeVariableCount; i++)
+		if (this.typeParameters != null)
 		{
-			this.typeVariables[i].check(markers, context);
+			this.typeParameters.check(markers, context);
 		}
 
 		context.pop();
@@ -274,9 +213,9 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	{
 		this.type.foldConstants();
 
-		for (int i = 0; i < this.typeVariableCount; i++)
+		if (this.typeParameters != null)
 		{
-			this.typeVariables[i].foldConstants();
+			this.typeParameters.foldConstants();
 		}
 	}
 
@@ -285,41 +224,26 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	{
 		this.type.cleanup(compilableList, classCompilableList);
 
-		for (int i = 0; i < this.typeVariableCount; i++)
+		if (this.typeParameters != null)
 		{
-			this.typeVariables[i].cleanup(compilableList, classCompilableList);
+			this.typeParameters.cleanup(compilableList, classCompilableList);
 		}
 	}
 
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
-		out.writeUTF(this.name.qualified);
+		this.name.write(out);
+		TypeParameterList.write(this.typeParameters, out);
 		IType.writeType(this.type, out);
-
-		out.writeShort(this.typeVariableCount);
-
-		for (int i = 0; i < this.typeVariableCount; i++)
-		{
-			this.typeVariables[i].write(out);
-		}
 	}
 
 	@Override
 	public void read(DataInput in) throws IOException
 	{
-		this.name = Name.fromRaw(in.readUTF());
+		this.name = Name.read(in);
+		TypeParameterList.read(this, in);
 		this.type = IType.readType(in);
-
-		this.typeVariableCount = in.readShort();
-		this.typeVariables = new ITypeParameter[this.typeVariableCount];
-
-		for (int i = 0; i < this.typeVariableCount; i++)
-		{
-			ITypeParameter typeVariable = new ExternalTypeParameter(this);
-			typeVariable.read(in);
-			this.typeVariables[i] = typeVariable;
-		}
 	}
 
 	@Override
@@ -329,29 +253,16 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	}
 
 	@Override
-	public void toString(@NonNull String prefix, @NonNull StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		buffer.append("type ").append(this.name);
 
-		if (this.typeVariableCount > 0)
+		if (this.typeParameters != null)
 		{
-			Formatting.appendSeparator(buffer, "generics.open_bracket", '<');
-			this.typeVariables[0].toString(prefix, buffer);
-
-			for (int i = 1; i < this.typeVariableCount; i++)
-			{
-				Formatting.appendSeparator(buffer, "generics.separator", ',');
-				this.typeVariables[i].toString(prefix, buffer);
-			}
-
-			if (Formatting.getBoolean("generics.close_bracket.space_before"))
-			{
-				buffer.append(' ');
-			}
-			buffer.append('>');
+			this.typeParameters.toString(indent, buffer);
 		}
 
 		Formatting.appendSeparator(buffer, "field.assignment", '=');
-		this.type.toString(prefix, buffer);
+		this.type.toString(indent, buffer);
 	}
 }

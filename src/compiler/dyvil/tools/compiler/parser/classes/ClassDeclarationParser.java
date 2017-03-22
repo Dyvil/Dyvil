@@ -98,7 +98,6 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			{
 				pm.splitJump(token, 1);
 				pm.pushParser(new TypeParameterListParser(this.theClass));
-				this.theClass.setTypeParametric();
 				this.mode = GENERICS_END;
 				return;
 			}

@@ -132,7 +132,7 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 			{
 				if (this.typeParameter != null)
 				{
-					this.typeParameterized.addTypeParameter(this.typeParameter);
+					this.typeParameterized.getTypeParameters().add(this.typeParameter);
 				}
 				pm.popParser(true);
 				return;
@@ -140,7 +140,7 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 
 			if (this.typeParameter != null)
 			{
-				this.typeParameterized.addTypeParameter(this.typeParameter);
+				this.typeParameterized.getTypeParameters().add(this.typeParameter);
 			}
 			pm.popParser(true);
 			pm.report(token, "type_parameter.bound.invalid");

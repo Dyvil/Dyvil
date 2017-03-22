@@ -12,22 +12,25 @@ import dyvil.tools.compiler.ast.parameter.CodeParameter;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParametric;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public interface ICallableMember extends IClassMember, IValueConsumer, ITyped, IParametric, IExceptionList
+public interface ICallableMember extends IClassMember, IValueConsumer, ITyped, IParametric
 {
 	IValue getValue();
 
 	@Override
 	void setValue(IValue value);
 
+	TypeList getExceptions();
+
 	@Override
 	default boolean isVariadic()
 	{
-		return this.hasModifier(Modifiers.VARARGS) || this.getParameterList().isVariadic();
+		return this.hasModifier(Modifiers.VARARGS) || this.getParameters().isVariadic();
 	}
 
 	default int getOverloadPriority()
@@ -47,4 +50,10 @@ public interface ICallableMember extends IClassMember, IValueConsumer, ITyped, I
 	{
 		return new CodeParameter(this, position, name, type, modifiers, annotations);
 	}
+
+	String getDescriptor();
+
+	String getSignature();
+
+	String[] getInternalExceptions();
 }

@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.LambdaType;
 import dyvil.tools.compiler.ast.type.compound.MapType;
@@ -31,6 +32,12 @@ public class InternalGenericType extends GenericType
 	public InternalGenericType(String internal)
 	{
 		this.internalName = internal;
+	}
+
+	public InternalGenericType(String internalName, TypeList arguments)
+	{
+		super(arguments);
+		this.internalName = internalName;
 	}
 
 	@Override
@@ -71,34 +78,31 @@ public class InternalGenericType extends GenericType
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
-		this.resolveTypeArguments(markers, context);
+		this.arguments.resolveTypes(markers, context);
 
 		if (this.internalName.startsWith("dyvil/tuple/Tuple$Of"))
 		{
-			return new TupleType(this.typeArguments, this.typeArgumentCount);
+			return new TupleType(this.arguments);
 		}
 		if (this.internalName.startsWith("dyvil/function/Function$Of"))
 		{
-			final int parameterCount = this.typeArgumentCount - 1;
-			final IType returnType = this.typeArguments[parameterCount];
-			this.typeArguments[parameterCount] = null;
-			return new LambdaType(this.typeArguments, parameterCount, returnType);
+			return new LambdaType(this.arguments);
 		}
 
 		switch (this.internalName)
 		{
 		case "dyvil/ref/ObjectRef":
-			return new ReferenceType(ReferenceType.LazyFields.OBJECT_REF_CLASS, this.typeArguments[0]);
+			return new ReferenceType(ReferenceType.LazyFields.OBJECT_REF_CLASS, this.arguments.get(0));
 		case "dyvil/collection/Map":
-			return MapType.base(this.typeArguments[0], this.typeArguments[1]);
+			return MapType.base(this.arguments.get(0), this.arguments.get(1));
 		case "dyvil/collection/MutableMap":
-			return MapType.mutable(this.typeArguments[0], this.typeArguments[1]);
+			return MapType.mutable(this.arguments.get(0), this.arguments.get(1));
 		case "dyvil/collection/ImmutableMap":
-			return MapType.immutable(this.typeArguments[0], this.typeArguments[1]);
+			return MapType.immutable(this.arguments.get(0), this.arguments.get(1));
 		}
 
 		final IClass iclass = Package.rootPackage.resolveInternalClass(this.internalName);
-		return new ClassGenericType(iclass, this.typeArguments, this.typeArgumentCount);
+		return new ClassGenericType(iclass, this.arguments);
 	}
 
 	@Override
@@ -152,8 +156,8 @@ public class InternalGenericType extends GenericType
 	}
 
 	@Override
-	protected GenericType copyName()
+	protected GenericType withArguments(TypeList arguments)
 	{
-		return new InternalGenericType(this.internalName);
+		return new InternalGenericType(this.internalName, arguments);
 	}
 }

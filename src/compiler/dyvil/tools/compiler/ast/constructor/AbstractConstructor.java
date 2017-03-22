@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.constructor;
 
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
@@ -12,6 +14,7 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.generic.TypeParameterList;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.Candidate;
@@ -23,6 +26,7 @@ import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -40,10 +44,9 @@ import java.lang.annotation.ElementType;
 
 public abstract class AbstractConstructor extends Member implements IConstructor, IDefaultContext
 {
-	protected ParameterList parameters = new ParameterList(3);
+	protected @NonNull ParameterList parameters = new ParameterList(3);
 
-	protected IType[] exceptions;
-	protected int     exceptionCount;
+	protected @Nullable TypeList exceptions;
 
 	// Metadata
 	protected IClass enclosingClass;
@@ -80,7 +83,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	// Parameters
 
 	@Override
-	public IParameterList getParameterList()
+	public IParameterList getParameters()
 	{
 		return this.parameters;
 	}
@@ -105,42 +108,13 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	}
 
 	@Override
-	public int exceptionCount()
+	public TypeList getExceptions()
 	{
-		return this.exceptionCount;
-	}
-
-	@Override
-	public void setException(int index, IType exception)
-	{
-		this.exceptions[index] = exception;
-	}
-
-	@Override
-	public void addException(IType exception)
-	{
-		if (this.exceptions == null)
+		if (this.exceptions != null)
 		{
-			this.exceptions = new IType[3];
-			this.exceptions[0] = exception;
-			this.exceptionCount = 1;
-			return;
+			return this.exceptions;
 		}
-
-		int index = this.exceptionCount++;
-		if (this.exceptionCount > this.exceptions.length)
-		{
-			IType[] temp = new IType[this.exceptionCount];
-			System.arraycopy(this.exceptions, 0, temp, 0, index);
-			this.exceptions = temp;
-		}
-		this.exceptions[index] = exception;
-	}
-
-	@Override
-	public IType getException(int index)
-	{
-		return this.exceptions[index];
+		return this.exceptions = new TypeList();
 	}
 
 	@Override
@@ -181,9 +155,14 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	@Override
 	public byte checkException(IType type)
 	{
-		for (int i = 0; i < this.exceptionCount; i++)
+		if (this.exceptions == null)
 		{
-			if (Types.isSuperType(this.exceptions[i], type))
+			return FALSE;
+		}
+
+		for (int i = 0; i < this.exceptions.size(); i++)
+		{
+			if (Types.isSuperType(this.exceptions.get(i), type))
 			{
 				return TRUE;
 			}
@@ -273,7 +252,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 		final GenericData genericData = new GenericData(theClass);
 
 		classType.inferTypes(type, genericData);
-		genericData.lock(genericData.typeCount());
+		genericData.lockAvailable();
 
 		// Check Values and infer Types
 		for (int i = 0, count = this.parameters.size(); i < count; i++)
@@ -281,12 +260,13 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 			arguments.checkValue(i, this.parameters.get(i), genericData, markers, context);
 		}
 
-		genericData.lock(genericData.typeCount());
+		genericData.lockAvailable();
 
 		// Check Type Var Inference and Compatibility
-		for (int i = 0, count = theClass.typeParameterCount(); i < count; i++)
+		final TypeParameterList typeParams = theClass.getTypeParameters();
+		for (int i = 0, count = typeParams.size(); i < count; i++)
 		{
-			final ITypeParameter typeParameter = theClass.getTypeParameter(i);
+			final ITypeParameter typeParameter = typeParams.get(i);
 			final IType typeArgument = genericData.resolveType(typeParameter);
 
 			if (typeArgument == null)
@@ -314,12 +294,17 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	{
 		ModifierUtil.checkVisibility(this, position, markers, context);
 
-		for (int i = 0; i < this.exceptionCount; i++)
+		if (this.exceptions == null)
 		{
-			IType exceptionType = this.exceptions[i];
+			return;
+		}
+
+		for (int i = 0; i < this.exceptions.size(); i++)
+		{
+			IType exceptionType = this.exceptions.get(i);
 			if (IContext.isUnhandled(context, exceptionType))
 			{
-				markers.add(Markers.semantic(position, "exception.unhandled", exceptionType.toString()));
+				markers.add(Markers.semanticError(position, "exception.unhandled", exceptionType.toString()));
 			}
 		}
 	}
@@ -350,17 +335,23 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	}
 
 	@Override
-	public String[] getExceptions()
+	public String[] getInternalExceptions()
 	{
-		if (this.exceptionCount == 0)
+		if (this.exceptions == null)
 		{
 			return null;
 		}
 
-		String[] array = new String[this.exceptionCount];
-		for (int i = 0; i < this.exceptionCount; i++)
+		final int count = this.exceptions.size();
+		if (count == 0)
 		{
-			array[i] = this.exceptions[i].getInternalName();
+			return null;
+		}
+
+		final String[] array = new String[count];
+		for (int i = 0; i < count; i++)
+		{
+			array[i] = this.exceptions.get(i).getInternalName();
 		}
 		return array;
 	}
@@ -407,7 +398,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 
 		this.parameters.toString(prefix, buffer);
 
-		if (this.exceptionCount > 0)
+		if (this.exceptions != null && this.exceptions.size() > 0)
 		{
 			String throwsPrefix = prefix;
 			if (Formatting.getBoolean("constructor.throws.newline"))
@@ -420,7 +411,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 				buffer.append(" throws ");
 			}
 
-			Util.astToString(throwsPrefix, this.exceptions, this.exceptionCount,
+			Util.astToString(throwsPrefix, this.exceptions.getTypes(), this.exceptions.size(),
 			                 Formatting.getSeparator("constructor.throws", ','), buffer);
 		}
 

@@ -18,6 +18,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.generic.TypeParameterList;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
@@ -136,6 +137,11 @@ public class CodeMethod extends AbstractMethod
 
 		super.resolveTypes(markers, context);
 
+		if (this.typeParameters != null)
+		{
+			this.typeParameters.resolveTypes(markers, context);
+		}
+
 		if (this.thisType != null)
 		{
 			this.thisType = this.thisType.resolveType(markers, context);
@@ -157,20 +163,15 @@ public class CodeMethod extends AbstractMethod
 			this.thisType = this.enclosingClass.getThisType();
 		}
 
-		for (int i = 0; i < this.typeParameterCount; i++)
-		{
-			this.typeParameters[i].resolveTypes(markers, context);
-		}
-
 		this.parameters.resolveTypes(markers, context);
 		if (this.parameters.isLastVariadic())
 		{
 			this.modifiers.addIntModifier(Modifiers.VARARGS);
 		}
 
-		for (int i = 0; i < this.exceptionCount; i++)
+		if (this.exceptions != null)
 		{
-			this.exceptions[i] = this.exceptions[i].resolveType(markers, context);
+			this.exceptions.resolveTypes(markers, context);
 		}
 
 		if (this.value != null)
@@ -192,9 +193,9 @@ public class CodeMethod extends AbstractMethod
 
 		super.resolve(markers, context);
 
-		for (int i = 0; i < this.typeParameterCount; i++)
+		if (this.typeParameters != null)
 		{
-			this.typeParameters[i].resolve(markers, context);
+			this.typeParameters.resolve(markers, context);
 		}
 
 		if (this.thisType != null)
@@ -204,9 +205,9 @@ public class CodeMethod extends AbstractMethod
 
 		this.parameters.resolve(markers, context);
 
-		for (int i = 0; i < this.exceptionCount; i++)
+		if (this.exceptions != null)
 		{
-			this.exceptions[i].resolve(markers, context);
+			this.exceptions.resolve(markers, context);
 		}
 
 		if (this.value != null)
@@ -220,7 +221,7 @@ public class CodeMethod extends AbstractMethod
 				this.type = this.value.getType();
 				if (this.type == Types.UNKNOWN && this.value.isResolved())
 				{
-					markers.add(Markers.semantic(this.position, "method.type.infer", this.name.unqualified));
+					markers.add(Markers.semanticError(this.position, "method.type.infer", this.name.unqualified));
 				}
 			}
 
@@ -236,7 +237,7 @@ public class CodeMethod extends AbstractMethod
 		}
 		else if (this.type == Types.UNKNOWN)
 		{
-			markers.add(Markers.semantic(this.position, "method.type.abstract", this.name.unqualified));
+			markers.add(Markers.semanticError(this.position, "method.type.abstract", this.name.unqualified));
 			this.type = Types.ANY;
 		}
 
@@ -250,21 +251,21 @@ public class CodeMethod extends AbstractMethod
 
 		super.checkTypes(markers, context);
 
+		if (this.typeParameters != null)
+		{
+			this.typeParameters.checkTypes(markers, context);
+		}
+
 		if (this.thisType != null)
 		{
 			this.thisType.checkType(markers, context, TypePosition.PARAMETER_TYPE);
 		}
 
-		for (int i = 0; i < this.typeParameterCount; i++)
-		{
-			this.typeParameters[i].checkTypes(markers, context);
-		}
-
 		this.parameters.checkTypes(markers, context);
 
-		for (int i = 0; i < this.exceptionCount; i++)
+		if (this.exceptions != null)
 		{
-			this.exceptions[i].checkType(markers, context, TypePosition.RETURN_TYPE);
+			this.exceptions.checkTypes(markers, context, TypePosition.RETURN_TYPE);
 		}
 
 		if (this.value != null)
@@ -288,28 +289,32 @@ public class CodeMethod extends AbstractMethod
 
 		super.check(markers, context);
 
-		for (int i = 0; i < this.typeParameterCount; i++)
+		if (this.typeParameters != null)
 		{
-			this.typeParameters[i].check(markers, this);
+			this.typeParameters.check(markers, context);
 		}
 
-		if (this.receiverType != null)
+		if (this.thisType != null)
 		{
-			this.receiverType.check(markers, context);
+			this.thisType.check(markers, context);
 		}
 
 		this.parameters.check(markers, context);
 
-		for (int i = 0; i < this.exceptionCount; i++)
+		if (this.exceptions != null)
 		{
-			IType exceptionType = this.exceptions[i];
-			exceptionType.check(markers, this);
 
-			if (!Types.isSuperType(Types.THROWABLE, exceptionType))
+			for (int i = 0; i < this.exceptions.size(); i++)
 			{
-				Marker marker = Markers.semantic(exceptionType.getPosition(), "method.exception.type");
-				marker.addInfo(Markers.getSemantic("exception.type", exceptionType));
-				markers.add(marker);
+				final IType exceptionType = this.exceptions.get(i);
+				exceptionType.check(markers, this);
+
+				if (!Types.isSuperType(Types.THROWABLE, exceptionType))
+				{
+					Marker marker = Markers.semanticError(exceptionType.getPosition(), "method.exception.type");
+					marker.addInfo(Markers.getSemantic("exception.type", exceptionType));
+					markers.add(marker);
+				}
 			}
 		}
 
@@ -347,7 +352,7 @@ public class CodeMethod extends AbstractMethod
 		                              boolean thisMangled, IMethod method)
 	{
 		if (method == this // common cases
-			    || method.getParameterList().size() != parameterCount // optimization
+			    || method.getParameters().size() != parameterCount // optimization
 			    || !method.getDescriptor().equals(descriptor))
 		{
 			return thisMangled;
@@ -386,7 +391,7 @@ public class CodeMethod extends AbstractMethod
 		// append the qualified name plus the name separator
 		final StringBuilder builder = new StringBuilder(method.getName().qualified).append('_');
 
-		final IParameterList params = method.getParameterList();
+		final IParameterList params = method.getParameters();
 		for (int i = 0, count = params.size(); i < count; i++)
 		{
 			// append all param names followed by an underscore
@@ -505,7 +510,7 @@ public class CodeMethod extends AbstractMethod
 				}
 			}
 
-			final IParameterList params = overrideMethod.getParameterList();
+			final IParameterList params = overrideMethod.getParameters();
 			for (int i = 0, count = params.size(); i < count; i++)
 			{
 				final IParameter thisParam = this.parameters.get(i);
@@ -557,21 +562,21 @@ public class CodeMethod extends AbstractMethod
 	{
 		super.foldConstants();
 
-		for (int i = 0; i < this.typeParameterCount; i++)
+		if (this.typeParameters != null)
 		{
-			this.typeParameters[i].foldConstants();
+			this.typeParameters.foldConstants();
 		}
 
-		if (this.receiverType != null)
+		if (this.thisType != null)
 		{
-			this.receiverType.foldConstants();
+			this.thisType.foldConstants();
 		}
 
 		this.parameters.foldConstants();
 
-		for (int i = 0; i < this.exceptionCount; i++)
+		if (this.exceptions != null)
 		{
-			this.exceptions[i].foldConstants();
+			this.exceptions.foldConstants();
 		}
 
 		if (this.value != null)
@@ -594,21 +599,21 @@ public class CodeMethod extends AbstractMethod
 			}
 		}
 
-		if (this.receiverType != null)
+		if (this.typeParameters != null)
 		{
-			this.receiverType.cleanup(compilableList, classCompilableList);
+			this.typeParameters.cleanup(compilableList, classCompilableList);
 		}
 
-		for (int i = 0; i < this.typeParameterCount; i++)
+		if (this.thisType != null)
 		{
-			this.typeParameters[i].cleanup(compilableList, classCompilableList);
+			this.thisType.cleanup(compilableList, classCompilableList);
 		}
 
 		this.parameters.cleanup(compilableList, classCompilableList);
 
-		for (int i = 0; i < this.exceptionCount; i++)
+		if (this.exceptions != null)
 		{
-			this.exceptions[i].cleanup(compilableList, classCompilableList);
+			this.exceptions.cleanup(compilableList, classCompilableList);
 		}
 
 		if (this.value != null)
@@ -643,9 +648,9 @@ public class CodeMethod extends AbstractMethod
 
 		this.parameters.write(methodWriter);
 
-		for (int i = 0; i < this.typeParameterCount; i++)
+		if (this.typeParameters != null)
 		{
-			this.typeParameters[i].writeParameter(methodWriter);
+			this.typeParameters.writeParameters(methodWriter);
 		}
 
 		final Label start = new Label();
@@ -721,7 +726,7 @@ public class CodeMethod extends AbstractMethod
 
 			methodWriter.visitVarInsn(Opcodes.ALOAD, 0);
 
-			final IParameterList overrideParameterList = overrideMethod.getParameterList();
+			final IParameterList overrideParameterList = overrideMethod.getParameters();
 
 			// Generate Parameters and load arguments
 			for (int p = 0, count = this.parameters.size(); p < count; p++)
@@ -735,19 +740,24 @@ public class CodeMethod extends AbstractMethod
 				overrideParameterType.writeCast(methodWriter, parameterType, lineNumber);
 			}
 			// Generate Type Parameters and load reified type arguments
-			for (int i = 0, count = this.typeParameterCount; i < count; i++)
+			if (this.typeParameters != null)
 			{
-				final ITypeParameter thisParameter = this.typeParameters[i];
-				final Reified.Type reifiedType = thisParameter.getReifiedKind();
-				if (reifiedType == null)
+				final TypeParameterList overrideTypeParams = overrideMethod.getTypeParameters();
+
+				for (int i = 0, count = this.typeParameters.size(); i < count; i++)
 				{
-					continue;
+					final ITypeParameter thisParameter = this.typeParameters.get(i);
+					final Reified.Type reifiedType = thisParameter.getReifiedKind();
+					if (reifiedType == null)
+					{
+						continue;
+					}
+
+					final ITypeParameter overrideParameter = overrideTypeParams.get(i);
+					this.writeReifyArgument(methodWriter, thisParameter, reifiedType, overrideParameter);
+
+					// Extra type parameters from the overridden method are ignored
 				}
-
-				final ITypeParameter overrideParameter = overrideMethod.getTypeParameter(i);
-				this.writeReifyArgument(methodWriter, thisParameter, reifiedType, overrideParameter);
-
-				// Extra type parameters from the overridden method are ignored
 			}
 
 			IType overrideReturnType = overrideMethod.getType();
@@ -793,7 +803,7 @@ public class CodeMethod extends AbstractMethod
 
 	private boolean needsSignature()
 	{
-		return this.typeParameterCount != 0 || this.type.needsSignature() || this.parameters.needsSignature();
+		return this.isTypeParametric() || this.type.needsSignature() || this.parameters.needsSignature();
 	}
 
 	protected void writeAnnotations(MethodWriter writer, long flags)
@@ -830,15 +840,18 @@ public class CodeMethod extends AbstractMethod
 		}
 
 		// Type Variable Annotations
-		for (int i = 0; i < this.typeParameterCount; i++)
+		if (this.typeParameters != null)
 		{
-			this.typeParameters[i].write(writer);
+			this.typeParameters.write(writer);
 		}
 
 		IType.writeAnnotations(this.type, writer, TypeReference.newTypeReference(TypeReference.METHOD_RETURN), "");
-		for (int i = 0; i < this.exceptionCount; i++)
+		if (this.exceptions != null)
 		{
-			IType.writeAnnotations(this.exceptions[i], writer, TypeReference.newExceptionReference(i), "");
+			for (int i = 0; i < this.exceptions.size(); i++)
+			{
+				IType.writeAnnotations(this.exceptions.get(i), writer, TypeReference.newExceptionReference(i), "");
+			}
 		}
 	}
 

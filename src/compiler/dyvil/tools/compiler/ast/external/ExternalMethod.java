@@ -24,6 +24,7 @@ import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -78,16 +79,18 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 
 		this.resolved |= PARAMETERS;
 
-		int parametersToRemove = 0;
-		for (int i = 0; i < this.typeParameterCount; i++)
+		if (this.typeParameters != null)
 		{
-			if (this.typeParameters[i].getReifiedKind() != null)
+			int reifiedParameters = 0;
+			for (int i = 0; i < this.typeParameters.size(); i++)
 			{
-				parametersToRemove++;
+				if (this.typeParameters.get(i).getReifiedKind() != null)
+				{
+					reifiedParameters++;
+				}
 			}
+			this.parameters.remove(reifiedParameters);
 		}
-
-		this.parameters.remove(parametersToRemove);
 
 		if (this.receiverType != null)
 		{
@@ -104,10 +107,10 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	{
 		this.resolved |= EXCEPTIONS;
 
-		final IContext context = this.getExternalContext();
-		for (int i = 0; i < this.exceptionCount; i++)
+		if (this.exceptions != null)
 		{
-			this.exceptions[i] = this.exceptions[i].resolveType(null, context);
+			final IContext context = this.getExternalContext();
+			this.exceptions.resolveTypes(null, context);
 		}
 	}
 
@@ -162,7 +165,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	public IParameterList getParameterList()
+	public IParameterList getParameters()
 	{
 		if ((this.resolved & PARAMETERS) == 0)
 		{
@@ -208,13 +211,13 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	public IType getException(int index)
+	public TypeList getExceptions()
 	{
 		if ((this.resolved & EXCEPTIONS) == 0)
 		{
 			this.resolveExceptions();
 		}
-		return this.exceptions[index];
+		return super.getExceptions();
 	}
 
 	@Override
@@ -317,7 +320,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 			break;
 		case TypeReference.METHOD_TYPE_PARAMETER:
 		{
-			ITypeParameter typeVar = this.typeParameters[TypeReference.getTypeParameterIndex(typeRef)];
+			ITypeParameter typeVar = this.typeParameters.get(TypeReference.getTypeParameterIndex(typeRef));
 			if (!typeVar.addRawAnnotation(desc, annotation))
 			{
 				return null;
@@ -328,14 +331,14 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		}
 		case TypeReference.METHOD_TYPE_PARAMETER_BOUND:
 		{
-			ITypeParameter typeVar = this.typeParameters[TypeReference.getTypeParameterIndex(typeRef)];
+			ITypeParameter typeVar = this.typeParameters.get(TypeReference.getTypeParameterIndex(typeRef));
 			typeVar.addBoundAnnotation(annotation, TypeReference.getTypeParameterBoundIndex(typeRef), typePath);
 			break;
 		}
 		case TypeReference.EXCEPTION_PARAMETER:
 		{
 			int index = TypeReference.getExceptionIndex(typeRef);
-			this.exceptions[index] = IType.withAnnotation(this.exceptions[index], annotation, typePath);
+			this.exceptions.set(index, IType.withAnnotation(this.exceptions.get(index), annotation, typePath));
 			break;
 		}
 		case TypeReference.METHOD_FORMAL_PARAMETER:

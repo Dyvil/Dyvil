@@ -495,12 +495,12 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		}
 
 		final Name methodName = method.getName();
-		final int parameterCount = method.getParameterList().size();
+		final int parameterCount = method.getParameters().size();
 		final String desc = method.getDescriptor();
 		for (IMethod candidate : this.methods)
 		{
 			if (candidate.getName() == methodName // same name
-				    && candidate.getParameterList().size() == parameterCount && candidate.getDescriptor().equals(desc))
+				    && candidate.getParameters().size() == parameterCount && candidate.getDescriptor().equals(desc))
 			{
 				markers.add(Markers.semanticError(memberStatement.getPosition(), "method.duplicate", methodName, desc));
 			}

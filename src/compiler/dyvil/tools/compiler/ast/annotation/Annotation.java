@@ -140,7 +140,7 @@ public final class Annotation implements IAnnotation
 			return;
 		}
 
-		final IParameterList parameterList = theClass.getParameterList();
+		final IParameterList parameterList = theClass.getParameters();
 		for (int i = 0, count = parameterList.size(); i < count; i++)
 		{
 			final IParameter parameter = parameterList.get(i);
@@ -264,7 +264,7 @@ public final class Annotation implements IAnnotation
 	public void write(AnnotationVisitor writer)
 	{
 		final IClass iclass = this.type.getTheClass();
-		final IParameterList parameterList = iclass.getParameterList();
+		final IParameterList parameterList = iclass.getParameters();
 
 		for (int i = 0, count = parameterList.size(); i < count; i++)
 		{

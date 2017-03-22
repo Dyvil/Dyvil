@@ -503,7 +503,7 @@ public class ClassBody implements IClassBody
 		for (int i = 0; i < this.constructorCount; i++)
 		{
 			final IConstructor constructor = this.constructors[i];
-			final IParameterList constructorParameterList = constructor.getParameterList();
+			final IParameterList constructorParameterList = constructor.getParameters();
 
 			if (parameters.matches(constructorParameterList))
 			{

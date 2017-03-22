@@ -104,7 +104,7 @@ public class ClassMetadata implements IClassMetadata
 
 	private void checkMethod(IMethod method)
 	{
-		final IParameterList parameters = method.getParameterList();
+		final IParameterList parameters = method.getParameters();
 		switch (method.getName().unqualified)
 		{
 		case "equals":
@@ -126,7 +126,7 @@ public class ClassMetadata implements IClassMetadata
 			}
 			return;
 		case "apply":
-			if (parameters.matches(this.theClass.getParameterList()))
+			if (parameters.matches(this.theClass.getParameters()))
 			{
 				this.members |= APPLY;
 			}
@@ -173,7 +173,7 @@ public class ClassMetadata implements IClassMetadata
 			return;
 		}
 
-		final IParameterList parameters = this.theClass.getParameterList();
+		final IParameterList parameters = this.theClass.getParameters();
 		final IConstructor constructor = body.getConstructor(parameters);
 		if (constructor != null)
 		{
@@ -208,7 +208,7 @@ public class ClassMetadata implements IClassMetadata
 
 	protected void copyClassParameters(IParametric constructor)
 	{
-		final IParameterList classParameters = this.theClass.getParameterList();
+		final IParameterList classParameters = this.theClass.getParameters();
 		final int parameterCount = classParameters.size();
 		final IParameter[] parameters = new IParameter[parameterCount];
 
@@ -228,7 +228,7 @@ public class ClassMetadata implements IClassMetadata
 			parameters[i].setIndex(i);
 		}
 
-		constructor.getParameterList().setParameterArray(parameters, parameterCount);
+		constructor.getParameters().setParameterArray(parameters, parameterCount);
 	}
 
 	@Override
@@ -244,7 +244,7 @@ public class ClassMetadata implements IClassMetadata
 			this.constructor.setInitializer(this.superInitializer);
 
 			final StatementList constructorBody = new StatementList();
-			final IParameterList parameters = this.constructor.getParameterList();
+			final IParameterList parameters = this.constructor.getParameters();
 
 			for (int i = 0, count = parameters.size(); i < count; i++)
 			{

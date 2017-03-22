@@ -13,7 +13,7 @@ public interface IParametric
 		return false;
 	}
 
-	IParameterList getParameterList();
+	IParameterList getParameters();
 
 	default boolean isVariadic()
 	{

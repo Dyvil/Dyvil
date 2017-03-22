@@ -129,7 +129,7 @@ public class AnnotationValue implements IValue, IAnnotationConsumer
 
 		final IArguments arguments = this.annotation.getArguments();
 		final IClass iclass = this.annotation.getType().getTheClass();
-		final IParameterList parameterList = iclass.getParameterList();
+		final IParameterList parameterList = iclass.getParameters();
 		final int count = parameterList.size();
 
 		String[] parameterNames = new String[count];

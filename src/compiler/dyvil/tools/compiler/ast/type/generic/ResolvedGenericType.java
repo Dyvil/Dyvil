@@ -3,9 +3,11 @@ package dyvil.tools.compiler.ast.type.generic;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.generic.TypeParameterList;
 import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -27,9 +29,15 @@ public class ResolvedGenericType extends ClassGenericType
 		this.position = position;
 	}
 
-	public ResolvedGenericType(ICodePosition position, IClass iclass, IType[] typeArguments, int typeArgumentCount)
+	public ResolvedGenericType(ICodePosition position, IClass iclass, IType... arguments)
 	{
-		super(iclass, typeArguments, typeArgumentCount);
+		super(iclass, arguments);
+		this.position = position;
+	}
+
+	public ResolvedGenericType(ICodePosition position, IClass iclass, TypeList arguments)
+	{
+		super(iclass, arguments);
 		this.position = position;
 	}
 
@@ -46,16 +54,25 @@ public class ResolvedGenericType extends ClassGenericType
 	}
 
 	@Override
+	public IType atPosition(ICodePosition position)
+	{
+		this.position = position;
+		return this;
+	}
+
+	@Override
 	public void checkType(MarkerList markers, IContext context, int position)
 	{
 		ModifierUtil.checkVisibility(this.theClass, this.position, markers, context);
 
 		// Check if the Type Variable Bounds accept the supplied Type Arguments
-		final int count = Math.min(this.typeArgumentCount, this.theClass.typeParameterCount());
+		final int count = Math.min(this.arguments.size(), this.theClass.typeArity());
+		final TypeParameterList classTypeParams = this.theClass.getTypeParameters();
+
 		for (int i = 0; i < count; i++)
 		{
-			final ITypeParameter typeVariable = this.theClass.getTypeParameter(i);
-			final IType typeArgument = this.typeArguments[i];
+			final ITypeParameter typeVariable = classTypeParams.get(i);
+			final IType typeArgument = this.arguments.get(i);
 
 			if (typeArgument.isResolved() //
 				    && !Variance.checkCompatible(Variance.COVARIANT, typeVariable.getCovariantType(), typeArgument))
@@ -75,5 +92,11 @@ public class ResolvedGenericType extends ClassGenericType
 		}
 
 		super.checkType(markers, context, position);
+	}
+
+	@Override
+	protected GenericType withArguments(TypeList arguments)
+	{
+		return new ResolvedGenericType(this.position, this.theClass, arguments);
 	}
 }

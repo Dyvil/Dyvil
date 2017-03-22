@@ -23,7 +23,7 @@ public class Intrinsics
 
 		static
 		{
-			final IParameterList params = Types.INTRINSIC_CLASS.getParameterList();
+			final IParameterList params = Types.INTRINSIC_CLASS.getParameters();
 			VALUE = params.get(0);
 			STRINGS = params.get(1);
 			COMPILER_CODE = params.get(2);

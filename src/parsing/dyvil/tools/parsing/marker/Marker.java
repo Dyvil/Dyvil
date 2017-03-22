@@ -135,6 +135,8 @@ public abstract class Marker implements Comparable<Marker>
 				buffer.append(indent).append('\t').append(s).append('\n');
 			}
 		}
+
+		buffer.append(indent).append('\n');
 	}
 
 	private void appendLine(StringBuilder buf, String line, int startColumn, int endColumn, boolean colors,

@@ -502,7 +502,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			this.value = call;
 
 			pm.splitJump(next, 1);
-			pm.pushParser(new TypeListParser(call.getGenericData(), true));
+			pm.pushParser(new TypeListParser(call.getGenericData().getTypes(), true));
 			this.mode = TYPE_ARGUMENTS_END;
 			return;
 		}

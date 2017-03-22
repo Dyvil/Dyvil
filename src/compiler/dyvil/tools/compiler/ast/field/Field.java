@@ -308,7 +308,7 @@ public class Field extends Member implements IField
 		}
 		if (setter != null)
 		{
-			final IParameter setterParameter = setter.getParameterList().get(0);
+			final IParameter setterParameter = setter.getParameters().get(0);
 			setterParameter.setType(this.type);
 
 			if (setter.getValue() == null)

@@ -77,9 +77,9 @@ public class NestedMethod extends CodeMethod
 		buffer.append('(');
 
 		this.parameters.appendDescriptor(buffer);
-		for (int i = 0; i < this.typeParameterCount; i++)
+		if (this.typeParameters != null)
 		{
-			this.typeParameters[i].appendParameterDescriptor(buffer);
+			this.typeParameters.appendParameterDescriptors(buffer);
 		}
 
 		this.captureHelper.appendCaptureTypes(buffer);

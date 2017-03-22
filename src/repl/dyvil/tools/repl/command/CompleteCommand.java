@@ -265,7 +265,7 @@ public class CompleteCommand implements ICommand
 		dejaVu.add(iclass);
 
 		// Add members
-		final IParameterList parameterList = iclass.getParameterList();
+		final IParameterList parameterList = iclass.getParameters();
 		for (int i = 0, count = parameterList.size(); i < count; i++)
 		{
 			// TODO IClassParameter interface

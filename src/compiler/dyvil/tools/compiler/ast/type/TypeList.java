@@ -1,0 +1,178 @@
+package dyvil.tools.compiler.ast.type;
+
+import dyvil.annotation.internal.NonNull;
+import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
+import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
+import dyvil.tools.compiler.ast.header.ICompilableList;
+import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.util.Util;
+import dyvil.tools.parsing.marker.MarkerList;
+
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
+public class TypeList implements ITypeConsumer
+{
+	private static final int DEFAULT_CAPACITY = 5;
+
+	private int     size;
+	private IType[] types;
+
+	public TypeList()
+	{
+		this(DEFAULT_CAPACITY);
+	}
+
+	public TypeList(int capacity)
+	{
+		this.types = new IType[capacity];
+	}
+
+	public TypeList(@NonNull IType... elements)
+	{
+		this(elements, elements.length);
+	}
+
+	public TypeList(@NonNull IType[] types, int size)
+	{
+		this.size = size;
+		this.types = types;
+	}
+
+	public int size()
+	{
+		return this.size;
+	}
+
+	public IType get(int index)
+	{
+		return index >= this.size ? null : this.types[index];
+	}
+
+	public IType[] getTypes()
+	{
+		return this.types;
+	}
+
+	public void set(int index, IType type)
+	{
+		if (index >= this.types.length)
+		{
+			IType[] temp = new IType[index + 1];
+			System.arraycopy(this.types, 0, temp, 0, index);
+			this.types = temp;
+		}
+		this.types[index] = type;
+		if (index >= this.size)
+		{
+			this.size = index + 1;
+		}
+	}
+
+	public void setTypes(IType[] types, int size)
+	{
+		this.types = types;
+		this.size = size;
+	}
+
+	public void add(IType type)
+	{
+		this.set(this.size, type);
+	}
+
+	@Override
+	public void setType(IType type)
+	{
+		this.add(type);
+	}
+
+	public void resolveTypes(MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			this.types[i] = this.types[i].resolveType(markers, context);
+		}
+	}
+
+	public void resolve(MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			this.types[i].resolve(markers, context);
+		}
+	}
+
+	public void checkTypes(MarkerList markers, IContext context, int position)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			this.types[i].checkType(markers, context, position);
+		}
+	}
+
+	public void check(MarkerList markers, IContext context)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			this.types[i].check(markers, context);
+		}
+	}
+
+	public void foldConstants()
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			this.types[i].foldConstants();
+		}
+	}
+
+	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			this.types[i].cleanup(compilableList, classCompilableList);
+		}
+	}
+
+	// Compilation
+
+	public void appendDescriptors(StringBuilder buffer, int type)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			this.types[i].appendDescriptor(buffer, type);
+		}
+	}
+
+	public void write(DataOutput out) throws IOException
+	{
+		out.writeInt(this.size);
+		for (int i = 0; i < this.size; i++)
+		{
+			IType.writeType(this.types[i], out);
+		}
+	}
+
+	public void read(DataInput in) throws IOException
+	{
+		final int size = this.size = in.readInt();
+
+		this.types = new IType[size];
+		for (int i = 0; i < size; i++)
+		{
+			this.types[i] = IType.readType(in);
+		}
+	}
+
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
+	{
+		Util.astToString(indent, this.types, this.size, Formatting.getSeparator("type.list.separator", ','), buffer);
+	}
+
+	public TypeList copy()
+	{
+		return new TypeList(this.types.clone(), this.size);
+	}
+}

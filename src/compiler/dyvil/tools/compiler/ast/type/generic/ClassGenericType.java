@@ -7,12 +7,14 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.generic.TypeParameterList;
 import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -32,13 +34,18 @@ public class ClassGenericType extends GenericType
 
 	public ClassGenericType(IClass iclass)
 	{
-		super(iclass.typeParameterCount());
 		this.theClass = iclass;
 	}
 
-	public ClassGenericType(IClass iclass, IType[] typeArguments, int typeArgumentCount)
+	public ClassGenericType(IClass iclass, IType... arguments)
 	{
-		super(typeArguments, typeArgumentCount);
+		super(arguments);
+		this.theClass = iclass;
+	}
+
+	public ClassGenericType(IClass iclass, TypeList arguments)
+	{
+		super(arguments);
 		this.theClass = iclass;
 	}
 
@@ -51,21 +58,21 @@ public class ClassGenericType extends GenericType
 	@Override
 	public IType atPosition(ICodePosition position)
 	{
-		return new ResolvedGenericType(position, this.theClass, this.typeArguments, this.typeArgumentCount);
+		return new ResolvedGenericType(position, this.getTheClass(), this.arguments);
 	}
 
-	// ITypeList Overrides
+	// TypeList Overrides
 
 	@Override
 	public boolean isGenericType()
 	{
-		return this.theClass.isTypeParametric();
+		return this.getTheClass().isTypeParametric();
 	}
 
 	@Override
 	public Name getName()
 	{
-		return this.theClass.getName();
+		return this.getTheClass().getName();
 	}
 
 	// IType Overrides
@@ -91,11 +98,12 @@ public class ClassGenericType extends GenericType
 
 	protected boolean argumentsMatch(IType type)
 	{
-		int count = Math.min(this.typeArgumentCount, this.theClass.typeParameterCount());
+		final int count = Math.min(this.arguments.size(), this.getTheClass().typeArity());
+		final TypeParameterList classTypeParams = this.getTheClass().getTypeParameters();
 		for (int i = 0; i < count; i++)
 		{
-			final ITypeParameter typeVar = this.theClass.getTypeParameter(i);
-			final IType thisArgument = this.typeArguments[i];
+			final ITypeParameter typeVar = classTypeParams.get(i);
+			final IType thisArgument = this.arguments.get(i);
 			final IType thatArgument = Types.resolveTypeSafely(type, typeVar);
 
 			if (!Variance.checkCompatible(typeVar.getVariance(), thisArgument, thatArgument))
@@ -110,29 +118,24 @@ public class ClassGenericType extends GenericType
 	@Override
 	public IType resolveType(ITypeParameter typeParameter)
 	{
-		int index = typeParameter.getIndex();
-
-		if (typeParameter.getGeneric() != this.theClass)
+		if (typeParameter.getGeneric() != this.getTheClass())
 		{
-			return this.theClass.resolveType(typeParameter, this);
+			return this.getTheClass().resolveType(typeParameter, this);
 		}
-		if (index > this.typeArgumentCount)
-		{
-			return null;
-		}
-		return this.typeArguments[index];
+		return this.arguments.get(typeParameter.getIndex());
 	}
 
 	@Override
 	public void inferTypes(IType concrete, ITypeContext typeContext)
 	{
-		for (int i = 0; i < this.typeArgumentCount; i++)
+		final TypeParameterList classTypeParams = this.getTheClass().getTypeParameters();
+		for (int i = 0, size = this.arguments.size(); i < size; i++)
 		{
-			ITypeParameter typeVar = this.theClass.getTypeParameter(i);
-			IType concreteType = concrete.resolveType(typeVar);
+			final ITypeParameter typeVar = classTypeParams.get(i);
+			final IType concreteType = concrete.resolveType(typeVar);
 			if (concreteType != null)
 			{
-				this.typeArguments[i].inferTypes(concreteType, typeContext);
+				this.arguments.get(i).inferTypes(concreteType, typeContext);
 			}
 		}
 	}
@@ -146,51 +149,51 @@ public class ClassGenericType extends GenericType
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
-		this.resolveTypeArguments(markers, context);
+		this.arguments.resolveTypes(markers, context);
 		return this;
 	}
 
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		return this.theClass.resolveField(name);
+		return this.getTheClass().resolveField(name);
 	}
 
 	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
 	{
-		this.theClass.getMethodMatches(list, receiver, name, arguments);
+		this.getTheClass().getMethodMatches(list, receiver, name, arguments);
 	}
 
 	@Override
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
-		this.theClass.getImplicitMatches(list, value, targetType);
+		this.getTheClass().getImplicitMatches(list, value, targetType);
 	}
 
 	@Override
 	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
 	{
-		this.theClass.getConstructorMatches(list, arguments);
+		this.getTheClass().getConstructorMatches(list, arguments);
 	}
 
 	@Override
 	public IMethod getFunctionalMethod()
 	{
-		return this.theClass.getFunctionalMethod();
+		return this.getTheClass().getFunctionalMethod();
 	}
 
 	@Override
 	public String getInternalName()
 	{
-		return this.theClass.getInternalName();
+		return this.getTheClass().getInternalName();
 	}
 
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
-		out.writeUTF(this.theClass.getInternalName());
-		this.writeTypeArguments(out);
+		out.writeUTF(this.getTheClass().getInternalName());
+		this.arguments.write(out);
 	}
 
 	@Override
@@ -198,20 +201,20 @@ public class ClassGenericType extends GenericType
 	{
 		String internal = in.readUTF();
 		this.theClass = Package.rootPackage.resolveInternalClass(internal);
-		this.readTypeArguments(in);
+		this.arguments.read(in);
 	}
 
 	@Override
 	public String toString()
 	{
-		StringBuilder sb = new StringBuilder(this.theClass.getFullName());
+		StringBuilder sb = new StringBuilder(this.getTheClass().getFullName());
 		this.appendFullTypes(sb);
 		return sb.toString();
 	}
 
 	@Override
-	protected GenericType copyName()
+	protected GenericType withArguments(TypeList arguments)
 	{
-		return new ClassGenericType(this.theClass);
+		return new ClassGenericType(this.getTheClass(), arguments);
 	}
 }

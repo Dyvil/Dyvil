@@ -32,12 +32,6 @@ public interface IConstructor extends ICallableMember, IContext
 
 	// Compilation
 	
-	String getDescriptor();
-	
-	String getSignature();
-	
-	String[] getExceptions();
-	
 	void writeCall(MethodWriter writer, IArguments arguments, IType type, int lineNumber) throws BytecodeException;
 	
 	void writeInvoke(MethodWriter writer, int lineNumber) throws BytecodeException;

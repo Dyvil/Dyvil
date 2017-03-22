@@ -129,7 +129,7 @@ public final class AnnotationMetadata implements IClassMetadata
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		for (IParameter parameter : this.theClass.getParameterList())
+		for (IParameter parameter : this.theClass.getParameters())
 		{
 			final IValue value = parameter.getValue();
 			if (value != null)
@@ -142,7 +142,7 @@ public final class AnnotationMetadata implements IClassMetadata
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		for (IParameter parameter : this.theClass.getParameterList())
+		for (IParameter parameter : this.theClass.getParameters())
 		{
 			final StringBuilder desc = new StringBuilder("()");
 			parameter.getType().appendExtendedName(desc);

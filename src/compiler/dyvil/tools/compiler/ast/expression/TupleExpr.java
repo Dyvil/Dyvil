@@ -4,16 +4,18 @@ import dyvil.collection.iterator.ArrayIterator;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.constant.VoidValue;
-import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.TypeParameterList;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.TupleType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -179,9 +181,10 @@ public final class TupleExpr implements IValue, IValueList
 		}
 
 		final TupleType tupleType = new TupleType(this.valueCount);
+		final TypeList arguments = tupleType.getArguments();
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			tupleType.addType(this.values[i].getType());
+			arguments.add(this.values[i].getType());
 		}
 		return this.tupleType = tupleType;
 	}
@@ -196,7 +199,7 @@ public final class TupleExpr implements IValue, IValueList
 				       .withType(type, typeContext, markers, context);
 		}
 
-		IClass tupleClass = TupleType.getTupleClass(this.valueCount);
+		final IClass tupleClass = TupleType.getTupleClass(this.valueCount);
 		if (!Types.isSuperClass(type, tupleClass.getClassType()))
 		{
 			return null;
@@ -204,11 +207,11 @@ public final class TupleExpr implements IValue, IValueList
 
 		this.tupleType = null; // reset type
 
-		tupleClass = lookupClass(tupleClass, this.valueCount);
+		final TypeParameterList typeParameters = typeParameters(tupleClass, this.valueCount);
 
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			final IType elementType = Types.resolveTypeSafely(type, tupleClass.getTypeParameter(i));
+			final IType elementType = Types.resolveTypeSafely(type, typeParameters.get(i));
 			this.values[i] = TypeChecker.convertValue(this.values[i], elementType, typeContext, markers, context,
 			                                          LazyFields.ELEMENT_MARKER_SUPPLIER);
 		}
@@ -216,18 +219,16 @@ public final class TupleExpr implements IValue, IValueList
 		return this;
 	}
 
-	protected static IClass lookupClass(IClass tupleClass, int valueCount)
+	protected static TypeParameterList typeParameters(IClass tupleClass, int valueCount)
 	{
 		switch (valueCount)
 		{
 		case 2:
-			tupleClass = LazyFields.ENTRY;
-			break;
+			return LazyFields.ENTRY.getTypeParameters();
 		case 3:
-			tupleClass = LazyFields.CELL;
-			break;
+			return LazyFields.CELL.getTypeParameters();
 		}
-		return tupleClass;
+		return tupleClass.getTypeParameters();
 	}
 
 	@Override
@@ -249,7 +250,7 @@ public final class TupleExpr implements IValue, IValueList
 			return this.values[0].getTypeMatch(type, implicitContext);
 		}
 
-		IClass tupleClass = TupleType.getTupleClass(this.valueCount);
+		final IClass tupleClass = TupleType.getTupleClass(this.valueCount);
 		if (!Types.isSuperClass(type, tupleClass.getClassType()))
 		{
 			if (type.getAnnotation(LazyFields.TUPLE_CONVERTIBLE) != null)
@@ -261,12 +262,12 @@ public final class TupleExpr implements IValue, IValueList
 
 		this.tupleType = null; // reset type
 
-		tupleClass = lookupClass(tupleClass, this.valueCount);
+		final TypeParameterList typeParameters = typeParameters(tupleClass, this.valueCount);
 
 		int min = EXACT_MATCH;
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			final IType elementType = Types.resolveTypeSafely(type, tupleClass.getTypeParameter(i));
+			final IType elementType = Types.resolveTypeSafely(type, typeParameters.get(i));
 			final int match = TypeChecker.getTypeMatch(this.values[i], elementType, implicitContext);
 
 			if (match == MISMATCH)

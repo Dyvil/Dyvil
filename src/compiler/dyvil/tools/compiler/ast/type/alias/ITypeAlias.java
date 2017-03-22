@@ -1,9 +1,8 @@
 package dyvil.tools.compiler.ast.type.alias;
 
-import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.ITypeParametric;
+import dyvil.tools.compiler.ast.generic.TypeParameterList;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
@@ -11,6 +10,7 @@ import dyvil.tools.compiler.ast.header.IObjectCompilable;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
+import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -38,28 +38,10 @@ public interface ITypeAlias extends IASTNode, IResolvable, INamed, ITyped, IType
 	IType getType();
 
 	@Override
-	void addTypeParameter(ITypeParameter typeParameter);
-
-	@Override
-	int typeParameterCount();
-
-	@Override
-	ITypeParameter getTypeParameter(int index);
-
-	@Override
-	ITypeParameter[] getTypeParameters();
-
-	@Override
 	boolean isTypeParametric();
 
 	@Override
-	void setTypeParametric();
-
-	@Override
-	void setTypeParameter(int index, ITypeParameter typeParameter);
-
-	@Override
-	void setTypeParameters(ITypeParameter[] typeParameters, int count);
+	TypeParameterList getTypeParameters();
 
 	// Phases
 	

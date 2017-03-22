@@ -3,16 +3,16 @@ package dyvil.tools.compiler.ast.expression;
 import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.Handle;
-import dyvil.tools.compiler.ast.context.IImplicitContext;
-import dyvil.tools.compiler.ast.expression.access.AbstractCall;
-import dyvil.tools.compiler.ast.expression.access.ConstructorCall;
-import dyvil.tools.compiler.ast.expression.access.FieldAccess;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
+import dyvil.tools.compiler.ast.expression.access.AbstractCall;
+import dyvil.tools.compiler.ast.expression.access.ConstructorCall;
+import dyvil.tools.compiler.ast.expression.access.FieldAccess;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.MapTypeContext;
@@ -23,6 +23,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.LambdaType;
 import dyvil.tools.compiler.backend.ClassFormat;
@@ -143,7 +144,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	// Parameters
 
 	@Override
-	public IParameterList getParameterList()
+	public IParameterList getParameters()
 	{
 		return this.parameters;
 	}
@@ -235,12 +236,14 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	private @NonNull LambdaType makeType()
 	{
 		final int count = this.parameters.size();
-		final LambdaType lambdaType = new LambdaType(count);
+		final LambdaType lambdaType = new LambdaType();
+		final TypeList arguments = lambdaType.getArguments();
+
 		for (int i = 0; i < count; i++)
 		{
-			lambdaType.addType(this.parameters.get(i).getType());
+			arguments.add(this.parameters.get(i).getType());
 		}
-		lambdaType.setType(this.returnType != null ? this.returnType : Types.UNKNOWN);
+		arguments.add(this.returnType != null ? this.returnType : Types.UNKNOWN);
 
 		this.flags |= LAMBDA_TYPE_INFERRED;
 		return lambdaType;
@@ -385,7 +388,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 				final IParameter parameter = this.parameters.get(i);
 				if (parameter.getType().isUninferred())
 				{
-					final IType type = this.method.getParameterList().get(i).getType()
+					final IType type = this.method.getParameters().get(i).getType()
 					                              .atPosition(parameter.getPosition());
 					parameter.setType(type);
 				}
@@ -404,7 +407,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			}
 
 			final ICodePosition position = parameter.getPosition();
-			final IType methodParamType = this.method.getParameterList().get(i).getType();
+			final IType methodParamType = this.method.getParameters().get(i).getType();
 			final IType concreteType = methodParamType.getConcreteType(this.type);
 
 			// Can't infer parameter type
@@ -447,7 +450,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			return false;
 		}
 
-		final IParameterList methodParameters = method.getParameterList();
+		final IParameterList methodParameters = method.getParameters();
 		final int parameterCount = this.parameters.size();
 
 		if (parameterCount != methodParameters.size())
@@ -696,7 +699,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	private boolean checkCall(IValue receiver, IArguments arguments, IParametric parametric)
 	{
 		final int parameterCount = this.parameters.size();
-		final IParameterList parameterList = parametric.getParameterList();
+		final IParameterList parameterList = parametric.getParameters();
 
 		if (receiver == null)
 		{

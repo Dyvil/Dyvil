@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.classes;
 
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.collection.Collection;
 import dyvil.collection.List;
 import dyvil.collection.Set;
@@ -15,6 +17,7 @@ import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.generic.TypeParameterList;
 import dyvil.tools.compiler.ast.header.IClassCompilable;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.member.IClassMember;
@@ -25,6 +28,7 @@ import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
@@ -51,11 +55,9 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 
 	protected Name name;
 
-	protected ITypeParameter[] typeParameters;
-	protected int              typeParameterCount;
+	protected @Nullable TypeParameterList typeParameters;
 
-	// TODO Allow this to be null for performance
-	protected ParameterList parameters = new ParameterList();
+	protected @NonNull ParameterList parameters = new ParameterList();
 
 	protected IType superType = Types.OBJECT;
 	protected IType[] interfaces;
@@ -228,75 +230,25 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	// Generics
 
 	@Override
-	public void setTypeParametric()
-	{
-		this.typeParameters = new ITypeParameter[2];
-	}
-
-	@Override
 	public boolean isTypeParametric()
 	{
-		return this.typeParameters != null;
+		return this.typeParameters != null && this.typeParameters.size() > 0;
 	}
 
 	@Override
-	public int typeParameterCount()
+	public TypeParameterList getTypeParameters()
 	{
-		return this.typeParameterCount;
-	}
-
-	@Override
-	public void setTypeParameters(ITypeParameter[] typeParameters, int count)
-	{
-		this.typeParameters = typeParameters;
-		this.typeParameterCount = count;
-	}
-
-	@Override
-	public void setTypeParameter(int index, ITypeParameter typeParameter)
-	{
-		this.typeParameters[index] = typeParameter;
-	}
-
-	@Override
-	public void addTypeParameter(ITypeParameter typeParameter)
-	{
-		if (this.typeParameters == null)
+		if (this.typeParameters != null)
 		{
-			this.typeParameters = new ITypeParameter[3];
-			this.typeParameters[0] = typeParameter;
-			this.typeParameterCount = 1;
-			return;
+			return this.typeParameters;
 		}
-
-		int index = this.typeParameterCount++;
-		if (index >= this.typeParameters.length)
-		{
-			ITypeParameter[] temp = new ITypeParameter[this.typeParameterCount];
-			System.arraycopy(this.typeParameters, 0, temp, 0, index);
-			this.typeParameters = temp;
-		}
-		this.typeParameters[index] = typeParameter;
-
-		typeParameter.setIndex(index);
-	}
-
-	@Override
-	public ITypeParameter[] getTypeParameters()
-	{
-		return this.typeParameters;
-	}
-
-	@Override
-	public ITypeParameter getTypeParameter(int index)
-	{
-		return this.typeParameters[index];
+		return this.typeParameters = new TypeParameterList();
 	}
 
 	// Class Parameters
 
 	@Override
-	public IParameterList getParameterList()
+	public IParameterList getParameters()
 	{
 		return this.parameters;
 	}
@@ -600,14 +552,9 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	{
 		StringBuilder buffer = new StringBuilder();
 
-		if (this.typeParameterCount > 0)
+		if (this.typeParameters != null)
 		{
-			buffer.append('<');
-			for (int i = 0; i < this.typeParameterCount; i++)
-			{
-				this.typeParameters[i].appendSignature(buffer);
-			}
-			buffer.append('>');
+			this.typeParameters.appendSignature(buffer);
 		}
 
 		if (this.superType != null)
@@ -679,15 +626,16 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			return this.thisType;
 		}
 
-		if (this.typeParameterCount <= 0)
+		if (this.typeParameters == null)
 		{
-			return this.thisType = new ClassType(this);
+			return this.thisType = this.classType;
 		}
 
 		final ClassGenericType type = new ClassGenericType(this);
-		for (int i = 0; i < this.typeParameterCount; i++)
+		final TypeList arguments = type.getArguments();
+		for (int i = 0; i < this.typeParameters.size(); i++)
 		{
-			type.addType(new TypeVarType(this.typeParameters[i]));
+			arguments.add(new TypeVarType(this.typeParameters.get(i)));
 		}
 		return this.thisType = type;
 	}
@@ -716,16 +664,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public ITypeParameter resolveTypeParameter(Name name)
 	{
-		for (int i = 0; i < this.typeParameterCount; i++)
-		{
-			final ITypeParameter typeParameter = this.typeParameters[i];
-			if (typeParameter.getName() == name)
-			{
-				return typeParameter;
-			}
-		}
-
-		return null;
+		return this.typeParameters == null ? null : this.typeParameters.get(name);
 	}
 
 	@Override
@@ -988,33 +927,25 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		if (this.annotations != null)
 		{
-			this.annotations.toString(prefix, buffer);
+			this.annotations.toString(indent, buffer);
 		}
 		this.modifiers.toString(this.getKind(), buffer);
 
 		ModifierUtil.writeClassType(this.modifiers.toFlags(), buffer);
 		buffer.append(this.name);
 
-		if (this.typeParameterCount > 0)
+		if (this.typeParameters != null)
 		{
-			if (Util.endsWithSymbol(buffer))
-			{
-				buffer.append(' ');
-			}
-
-			Formatting.appendSeparator(buffer, "generics.open_bracket", '<');
-			Util.astToString(prefix, this.typeParameters, this.typeParameterCount,
-			                 Formatting.getSeparator("generics.separator", ','), buffer);
-			Formatting.appendSeparator(buffer, "generics.close_bracket", '>');
+			this.typeParameters.toString(indent, buffer);
 		}
 
 		if (!this.parameters.isEmpty())
 		{
-			this.parameters.toString(prefix, buffer);
+			this.parameters.toString(indent, buffer);
 		}
 
 		if (this.superType == null)
@@ -1023,7 +954,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		}
 		else if (this.superType != Types.OBJECT)
 		{
-			String extendsPrefix = prefix;
+			String extendsPrefix = indent;
 			if (Formatting.getBoolean("class.extends.newline"))
 			{
 				extendsPrefix = Formatting.getIndent("class.extends.indent", extendsPrefix);
@@ -1039,7 +970,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 
 		if (this.interfaceCount > 0)
 		{
-			String implementsPrefix = prefix;
+			String implementsPrefix = indent;
 			if (Formatting.getBoolean("class.implements.newline"))
 			{
 				implementsPrefix = Formatting.getIndent("class.implements.indent", implementsPrefix);
@@ -1056,7 +987,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 
 		if (this.body != null)
 		{
-			this.body.toString(prefix, buffer);
+			this.body.toString(indent, buffer);
 		}
 		else if (Formatting.getBoolean("class.semicolon"))
 		{

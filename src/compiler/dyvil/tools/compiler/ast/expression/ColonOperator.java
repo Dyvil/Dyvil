@@ -3,11 +3,12 @@ package dyvil.tools.compiler.ast.expression;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.constant.WildcardValue;
-import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.generic.TypeParameterList;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
@@ -36,9 +37,9 @@ public class ColonOperator implements IValue
 
 		static
 		{
-			final IClass entryClass = TupleExpr.LazyFields.ENTRY;
-			KEY_PARAMETER = entryClass.getTypeParameter(0);
-			VALUE_PARAMETER = entryClass.getTypeParameter(1);
+			final TypeParameterList typeParameters = TupleExpr.LazyFields.ENTRY.getTypeParameters();
+			KEY_PARAMETER = typeParameters.get(0);
+			VALUE_PARAMETER = typeParameters.get(1);
 		}
 
 		private LazyFields()

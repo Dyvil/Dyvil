@@ -44,7 +44,7 @@ public interface IntrinsicData
 	static IType writeArgument(MethodWriter writer, IMethod method, int index, IValue receiver, IArguments arguments)
 		throws BytecodeException
 	{
-		final IParameterList params = method.getParameterList();
+		final IParameterList params = method.getParameters();
 
 		if (receiver == null || receiver.isIgnoredClassAccess())
 		{

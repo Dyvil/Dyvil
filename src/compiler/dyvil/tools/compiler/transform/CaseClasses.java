@@ -67,7 +67,7 @@ public abstract class CaseClasses
 		// 'var' variable that stores the casted 'obj' parameter
 		writer.visitVarInsn(ASTORE, 2);
 
-		final IParameterList parameters = theClass.getParameterList();
+		final IParameterList parameters = theClass.getParameters();
 		for (int i = 0, count = parameters.size(); i < count; i++)
 		{
 			writeEquals(writer, parameters.get(i));
@@ -202,7 +202,7 @@ public abstract class CaseClasses
 	{
 		writer.visitLdcInsn(31);
 
-		final IParameterList parameters = theClass.getParameterList();
+		final IParameterList parameters = theClass.getParameters();
 		for (int i = 0, count = parameters.size(); i < count; i++)
 		{
 			final IDataMember parameter = parameters.get(i);
@@ -367,7 +367,7 @@ public abstract class CaseClasses
 		writer.visitMethodInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(Ljava/lang/String;)V", false);
 
 		// ----- Class Parameters -----
-		final IParameterList parameters = theClass.getParameterList();
+		final IParameterList parameters = theClass.getParameters();
 		for (int i = 0, count = parameters.size(); i < count; i++)
 		{
 			final IDataMember parameter = parameters.get(i);

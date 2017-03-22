@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.Mutability;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.*;
 import dyvil.tools.compiler.ast.type.generic.*;
@@ -105,11 +106,27 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					this.mode = ANNOTATION_END;
 					return;
 				case BaseSymbols.OPEN_PARENTHESIS:
-					TupleType tupleType = new TupleType();
-					pm.pushParser(new TypeListParser(tupleType));
-					this.type = tupleType;
+				{
+					final TypeList arguments;
+					if (this.parentType != null)
+					{
+						final LambdaType lambdaType = new LambdaType();
+						lambdaType.setExtension(true);
+						this.type = lambdaType;
+						arguments = lambdaType.getArguments();
+						arguments.add(this.parentType);
+					}
+					else
+					{
+						final TupleType tupleType = new TupleType();
+						this.type = tupleType;
+						arguments = tupleType.getArguments();
+					}
+
+					pm.pushParser(new TypeListParser(arguments));
 					this.mode = TUPLE_END;
 					return;
+				}
 				case BaseSymbols.OPEN_SQUARE_BRACKET:
 				{
 					final ArrayType arrayType = new ArrayType();
@@ -139,8 +156,13 @@ public final class TypeParser extends Parser implements ITypeConsumer
 						return;
 					}
 
-					final LambdaType lambdaType = new LambdaType(token.raw(), this.parentType);
-					pm.pushParser(this.subParser(lambdaType));
+					final LambdaType lambdaType = new LambdaType(token.raw());
+					final TypeList arguments = lambdaType.getArguments();
+					if (this.parentType != null)
+					{
+						arguments.add(this.parentType);
+					}
+					pm.pushParser(this.subParser(arguments));
 					this.type = lambdaType;
 					this.mode = LAMBDA_END;
 					return;
@@ -161,7 +183,8 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					{
 						// SYMBOL_IDENTIFIER type
 						final PrefixType prefixType = new PrefixType(token.raw(), name);
-						pm.pushParser(this.subParser(prefixType).withFlags(IGNORE_OPERATOR | IGNORE_LAMBDA));
+						pm.pushParser(
+							this.subParser(prefixType.getArguments()).withFlags(IGNORE_OPERATOR | IGNORE_LAMBDA));
 						this.type = prefixType;
 						this.mode = END;
 						return;
@@ -198,7 +221,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 
 			if (isGenericStart(next, next.type()))
 			{
-				this.type = new NamedGenericType(token.raw(), name, this.parentType);
+				this.type = new NamedGenericType(token.raw(), this.parentType, name);
 				this.mode = GENERICS;
 				return;
 			}
@@ -218,12 +241,21 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			final IToken nextToken = token.next();
 			if (nextToken.type() == DyvilSymbols.ARROW_RIGHT)
 			{
-				final LambdaType lambdaType = new LambdaType(nextToken.raw(), this.parentType, (TupleType) this.type);
-				this.type = lambdaType;
-				this.mode = LAMBDA_END;
+				final LambdaType lambdaType;
+				if (this.type instanceof LambdaType)
+				{
+					lambdaType = (LambdaType) this.type;
+				}
+				else
+				{
+					lambdaType = new LambdaType(nextToken.raw(), ((TupleType) this.type).getArguments());
+					this.type = lambdaType;
+				}
+				lambdaType.setPosition(nextToken);
 
+				this.mode = LAMBDA_END;
 				pm.skip();
-				pm.pushParser(this.subParser(lambdaType));
+				pm.pushParser(this.subParser(lambdaType.getArguments()));
 				return;
 			}
 
@@ -243,10 +275,11 @@ public final class TypeParser extends Parser implements ITypeConsumer
 		case ARRAY_COLON:
 			if (type == BaseSymbols.COLON)
 			{
-				final MapType mapType = new MapType(((ArrayType) this.type).getElementType(), null, this.type.getMutability());
+				final MapType mapType = new MapType(this.type.getMutability(),
+				                                    ((ArrayType) this.type).getElementType());
 				this.type = mapType;
 				this.mode = ARRAY_END;
-				pm.pushParser(new TypeParser(mapType::setValueType));
+				pm.pushParser(new TypeParser(mapType.getArguments()));
 				return;
 			}
 			// Fallthrough
@@ -263,7 +296,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			if (isGenericStart(token, type))
 			{
 				pm.splitJump(token, 1);
-				pm.pushParser(new TypeListParser((GenericType) this.type, true));
+				pm.pushParser(new TypeListParser(((GenericType) this.type).getArguments(), true));
 				this.mode = GENERICS_END;
 				return;
 			}
@@ -371,7 +404,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 					final LambdaType lambdaType = new LambdaType(token.raw(), this.type);
 					this.type = lambdaType;
 					this.mode = LAMBDA_END;
-					pm.pushParser(this.subParser(lambdaType));
+					pm.pushParser(this.subParser(lambdaType.getArguments()));
 					return;
 				}
 				break;

@@ -107,7 +107,7 @@ public class AnonymousClass extends CodeClass
 			return this.constructorDesc;
 		}
 
-		final IParameterList parameterList = this.constructor.getParameterList();
+		final IParameterList parameterList = this.constructor.getParameters();
 		final StringBuilder buf = new StringBuilder();
 
 		buf.append('(');
@@ -170,7 +170,7 @@ class AnonymousClassMetadata implements IClassMetadata
 		                                                                                this.theClass
 			                                                                                .getConstructorDesc(), null,
 		                                                                                null));
-		final IParameterList parameterList = constructor.getParameterList();
+		final IParameterList parameterList = constructor.getParameters();
 		final int parameterCount = parameterList.size();
 
 		// Signature & Parameter Data

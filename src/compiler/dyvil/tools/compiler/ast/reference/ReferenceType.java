@@ -43,9 +43,7 @@ public class ReferenceType implements IObjectType
 
 		public static IType getObjectSimpleRef(IType type)
 		{
-			ClassGenericType gt = new ClassGenericType(OBJECT_SIMPLE_REF_CLASS);
-			gt.addType(type);
-			return gt;
+			return new ClassGenericType(OBJECT_SIMPLE_REF_CLASS, type);
 		}
 
 		public static String getInternalRef(IType type, String prefix)
@@ -129,7 +127,7 @@ public class ReferenceType implements IObjectType
 	{
 		if (this.theClass == LazyFields.OBJECT_REF_CLASS)
 		{
-			final IType otherType = type.resolveType(this.theClass.getTypeParameter(0));
+			final IType otherType = type.resolveType(this.theClass.getTypeParameters().get(0));
 			return otherType == null || Types.isSameType(this.type, otherType);
 		}
 		return true;
@@ -199,7 +197,7 @@ public class ReferenceType implements IObjectType
 			return;
 		}
 
-		final ITypeParameter typeVariable = this.theClass.getTypeParameter(0);
+		final ITypeParameter typeVariable = this.theClass.getTypeParameters().get(0);
 		final IType concreteRefType = concrete.resolveType(typeVariable);
 		if (concreteRefType != null)
 		{

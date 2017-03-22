@@ -52,7 +52,7 @@ public class InlineIntrinsicData extends InstructionList implements IntrinsicDat
 
 	private void preProcess()
 	{
-		final IParameterList parameterList = this.method.getParameterList();
+		final IParameterList parameterList = this.method.getParameters();
 		int parameterSlots = 0;
 
 		for (int i = 0, parameterCount = parameterList.size(); i < parameterCount; i++)
@@ -124,7 +124,7 @@ public class InlineIntrinsicData extends InstructionList implements IntrinsicDat
 
 	private static int getArgumentIndex(int varIndex, IMethod method)
 	{
-		final IParameterList params = method.getParameterList();
+		final IParameterList params = method.getParameters();
 		for (int i = 0, count = params.size(); i < count; i++)
 		{
 			if (params.get(i).getLocalIndex() == varIndex)

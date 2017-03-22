@@ -74,15 +74,6 @@ public interface IMethod extends ICallableMember, ITypeParametricMember, IContex
 	int getInvokeOpcode();
 
 	Handle toHandle();
-
-	@Override
-	String getInternalName();
-
-	String getDescriptor();
-	
-	String getSignature();
-	
-	String[] getInternalExceptions();
 	
 	void writeCall(MethodWriter writer, IValue receiver, IArguments arguments, ITypeContext typeContext, IType targetType, int lineNumber)
 			throws BytecodeException;

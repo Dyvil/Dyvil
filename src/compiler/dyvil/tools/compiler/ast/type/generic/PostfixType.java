@@ -14,25 +14,26 @@ public class PostfixType extends NamedGenericType
 {
 	public PostfixType(ICodePosition position, Name name, IType lhs)
 	{
-		super(position, name, new IType[] { lhs }, 1);
+		super(position, name, lhs);
 	}
 
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
 		final String unqualified = this.name.unqualified;
+		final IType argument = this.arguments.get(0);
 		if (unqualified.length() == 1)
 		{
 			switch (unqualified.charAt(0))
 			{
 			case '?':
-				return new NullableType(this.typeArguments[0]).resolveType(markers, context);
+				return NullableType.apply(argument).resolveType(markers, context);
 			case '!':
-				return new ImplicitNullableType(this.typeArguments[0]).resolveType(markers, context);
+				return new ImplicitNullableType(argument).resolveType(markers, context);
 			case '*':
-				return new ReferenceType(this.typeArguments[0]).resolveType(markers, context);
+				return new ReferenceType(argument).resolveType(markers, context);
 			case '^':
-				return new ImplicitReferenceType(this.typeArguments[0]).resolveType(markers, context);
+				return new ImplicitReferenceType(argument).resolveType(markers, context);
 			}
 		}
 
@@ -42,13 +43,13 @@ public class PostfixType extends NamedGenericType
 	@Override
 	public String toString()
 	{
-		return this.typeArguments[0].toString() + this.name;
+		return this.arguments.get(0).toString() + this.name;
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(String indent, StringBuilder buffer)
 	{
-		this.typeArguments[0].toString(prefix, buffer);
+		this.arguments.get(0).toString(indent, buffer);
 		buffer.append(this.name);
 	}
 }

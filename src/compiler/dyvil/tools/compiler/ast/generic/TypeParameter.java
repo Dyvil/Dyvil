@@ -169,7 +169,7 @@ public abstract class TypeParameter implements ITypeParameter
 		final IAnnotation reifiedAnnotation = this.annotations.getAnnotation(Types.REIFIED_CLASS);
 		if (reifiedAnnotation != null)
 		{
-			final IParameter parameter = Types.REIFIED_CLASS.getParameterList().get(0);
+			final IParameter parameter = Types.REIFIED_CLASS.getParameters().get(0);
 			this.reifiedKind = AnnotationUtil
 				                   .getEnumValue(reifiedAnnotation.getArguments(), parameter, Reified.Type.class);
 		}
@@ -443,7 +443,7 @@ public abstract class TypeParameter implements ITypeParameter
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
-		out.writeUTF(this.name.qualified);
+		this.name.write(out);
 
 		Variance.write(this.variance, out);
 
@@ -454,7 +454,7 @@ public abstract class TypeParameter implements ITypeParameter
 	@Override
 	public void read(DataInput in) throws IOException
 	{
-		this.name = Name.fromRaw(in.readUTF());
+		this.name = Name.read(in);
 
 		this.variance = Variance.read(in);
 

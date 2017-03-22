@@ -160,8 +160,7 @@ public class MethodCall extends AbstractCall implements INamed
 				return null;
 			}
 
-			final IType type = new NamedGenericType(this.position, parentType, this.name, this.genericData.getTypes(),
-			                                        this.genericData.typeCount())
+			final IType type = new NamedGenericType(this.position, parentType, this.name, this.genericData.getTypes())
 				                   .resolveType(report ? markers : null, context);
 			if (type == null)
 			{

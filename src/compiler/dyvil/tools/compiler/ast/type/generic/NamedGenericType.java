@@ -6,6 +6,7 @@ import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.raw.IUnresolvedType;
@@ -33,24 +34,38 @@ public class NamedGenericType extends GenericType implements IUnresolvedType
 		this.name = name;
 	}
 
-	public NamedGenericType(ICodePosition position, Name name, IType parent)
+	public NamedGenericType(ICodePosition position, Name name, IType... arguments)
+	{
+		super(arguments);
+		this.position = position;
+		this.name = name;
+	}
+
+	public NamedGenericType(ICodePosition position, Name name, TypeList arguments)
+	{
+		super(arguments);
+		this.position = position;
+		this.name = name;
+	}
+
+	public NamedGenericType(ICodePosition position, IType parent, Name name)
 	{
 		this.position = position;
 		this.name = name;
 		this.parent = parent;
 	}
 
-	public NamedGenericType(ICodePosition position, Name name, IType[] typeArguments, int typeArgumentCount)
+	public NamedGenericType(ICodePosition position, IType parent, Name name, IType... arguments)
 	{
-		super(typeArguments, typeArgumentCount);
+		super(arguments);
+		this.parent = parent;
 		this.position = position;
 		this.name = name;
 	}
 
-	public NamedGenericType(ICodePosition position, IType parent, Name name, IType[] typeArguments,
-		                       int typeArgumentCount)
+	public NamedGenericType(ICodePosition position, IType parent, Name name, TypeList arguments)
 	{
-		super(typeArguments, typeArgumentCount);
+		super(arguments);
 		this.parent = parent;
 		this.position = position;
 		this.name = name;
@@ -71,7 +86,7 @@ public class NamedGenericType extends GenericType implements IUnresolvedType
 	@Override
 	public IType resolveType(MarkerList markers, IContext context)
 	{
-		this.resolveTypeArguments(markers, context);
+		this.arguments.resolveTypes(markers, context);
 
 		if (this.parent == null)
 		{
@@ -128,7 +143,7 @@ public class NamedGenericType extends GenericType implements IUnresolvedType
 			return new ResolvedTypeVarType(typeParameter, this.position);
 		}
 
-		final ITypeAlias typeAlias = context.resolveTypeAlias(this.name, this.typeArgumentCount);
+		final ITypeAlias typeAlias = context.resolveTypeAlias(this.name, this.arguments.size());
 		if (typeAlias != null)
 		{
 			final IType aliasType = typeAlias.getType();
@@ -172,35 +187,24 @@ public class NamedGenericType extends GenericType implements IUnresolvedType
 
 	private IType checkCount(MarkerList markers, ITypeParametric generic, String kind, IType type)
 	{
-		final int parameterCount = generic.typeParameterCount();
+		final int genericArity = generic.typeArity();
 
-		if (parameterCount <= 0)
+		if (genericArity <= 0 || !type.isGenericType())
 		{
 			markers.add(Markers.semanticError(this.position, "type.generic." + kind + ".not_generic", type));
 			return type.atPosition(this.position);
 		}
-		if (parameterCount != this.typeArgumentCount)
+		if (genericArity != this.arguments.size())
 		{
 			final Marker marker = Markers
 				                      .semanticError(this.position, "type.generic." + kind + ".count_mismatch", type);
-			marker.addInfo(Markers.getSemantic("type.generic.argument_count", this.typeArgumentCount));
-			marker.addInfo(Markers.getSemantic("type.generic.parameter_count", parameterCount));
+			marker.addInfo(Markers.getSemantic("type.generic.argument_count", this.arguments.size()));
+			marker.addInfo(Markers.getSemantic("type.generic.parameter_count", genericArity));
 			markers.add(marker);
 		}
 
-		if (type == null)
-		{
-			return null;
-		}
-		return type.getConcreteType(typeParameter ->
-		                            {
-			                            final int index = typeParameter.getIndex();
-			                            if (index >= this.typeArgumentCount)
-			                            {
-				                            return null;
-			                            }
-			                            return this.typeArguments[index];
-		                            }).atPosition(this.position);
+		return type.getConcreteType(typeParameter -> this.arguments.get(typeParameter.getIndex()))
+		           .atPosition(this.position);
 	}
 
 	@Override
@@ -224,8 +228,8 @@ public class NamedGenericType extends GenericType implements IUnresolvedType
 	}
 
 	@Override
-	protected GenericType copyName()
+	protected GenericType withArguments(TypeList arguments)
 	{
-		return new NamedGenericType(this.position, this.name);
+		return new NamedGenericType(this.position, this.parent, this.name, arguments);
 	}
 }

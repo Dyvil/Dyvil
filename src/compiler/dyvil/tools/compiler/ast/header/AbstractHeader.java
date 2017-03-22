@@ -332,7 +332,7 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 				continue;
 			}
 
-			if (typeAlias.typeParameterCount() == arity)
+			if (typeAlias.typeArity() == arity)
 			{
 				return typeAlias;
 			}
@@ -631,7 +631,7 @@ class HeaderContext implements IStaticContext
 	public ITypeAlias resolveTypeAlias(Name name, int arity)
 	{
 		final ITypeAlias candidate = this.header.resolveTypeAlias(name, arity);
-		if (candidate != null && candidate.typeParameterCount() == arity)
+		if (candidate != null && candidate.typeArity() == arity)
 		{
 			return candidate;
 		}
@@ -640,7 +640,7 @@ class HeaderContext implements IStaticContext
 		{
 			final ITypeAlias includedTypeAlias = this.header.importDeclarations[i].getContext()
 			                                                                      .resolveTypeAlias(name, arity);
-			if (includedTypeAlias != null && includedTypeAlias.typeParameterCount() == arity)
+			if (includedTypeAlias != null && includedTypeAlias.typeArity() == arity)
 			{
 				return includedTypeAlias;
 			}

@@ -8,6 +8,10 @@ import dyvil.tools.compiler.ast.type.TypeDelegate;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
 public class ResolvedTypeDelegate extends TypeDelegate
 {
 	protected ICodePosition position;
@@ -45,7 +49,7 @@ public class ResolvedTypeDelegate extends TypeDelegate
 	@Override
 	public int typeTag()
 	{
-		return PRIMITIVE;
+		return this.type.typeTag();
 	}
 
 	@Override
@@ -77,6 +81,18 @@ public class ResolvedTypeDelegate extends TypeDelegate
 	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
 		this.type.cleanup(compilableList, classCompilableList);
+	}
+
+	@Override
+	public void write(DataOutput out) throws IOException
+	{
+		this.type.write(out);
+	}
+
+	@Override
+	public void read(DataInput in) throws IOException
+	{
+		this.type.read(in);
 	}
 
 	@Override
