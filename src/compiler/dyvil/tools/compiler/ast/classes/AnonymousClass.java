@@ -10,7 +10,6 @@ import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -31,7 +30,6 @@ public class AnonymousClass extends CodeClass
 	public AnonymousClass(ICodePosition position)
 	{
 		this.metadata = new AnonymousClassMetadata(this);
-		this.interfaces = new IType[1];
 		this.body = new ClassBody(this);
 		this.position = position;
 		this.modifiers = EmptyModifiers.INSTANCE;

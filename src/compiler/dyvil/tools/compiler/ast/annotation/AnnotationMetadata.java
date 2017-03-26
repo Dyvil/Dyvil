@@ -54,7 +54,7 @@ public final class AnnotationMetadata implements IClassMetadata
 		// Add the java.lang.Annotation interface
 		if (!this.theClass.isSubClassOf(Annotation.LazyFields.ANNOTATION))
 		{
-			this.theClass.addInterface(Annotation.LazyFields.ANNOTATION);
+			this.theClass.getInterfaces().add(Annotation.LazyFields.ANNOTATION);
 		}
 
 		if (this.retention == null)

@@ -63,7 +63,7 @@ public final class CaseClassMetadata extends ClassMetadata
 
 		if (!this.theClass.isSubClassOf(Types.SERIALIZABLE))
 		{
-			this.theClass.addInterface(Types.SERIALIZABLE);
+			this.theClass.getInterfaces().add(Types.SERIALIZABLE);
 		}
 	}
 

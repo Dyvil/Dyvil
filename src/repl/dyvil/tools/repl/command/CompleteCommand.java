@@ -281,13 +281,9 @@ public class CompleteCommand implements ICommand
 			findInstanceMembers(superType.getConcreteType(type), fields, properties, methods, start, dejaVu);
 		}
 
-		for (int i = 0, count = iclass.interfaceCount(); i < count; i++)
+		for (IType interfaceType : iclass.getInterfaces())
 		{
-			final IType superInterface = iclass.getInterface(i);
-			if (superInterface != null)
-			{
-				findInstanceMembers(superInterface.getConcreteType(type), fields, properties, methods, start, dejaVu);
-			}
+			findInstanceMembers(interfaceType.getConcreteType(type), fields, properties, methods, start, dejaVu);
 		}
 	}
 

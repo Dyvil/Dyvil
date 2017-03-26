@@ -217,7 +217,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 			this.theClass.setSuperType(type);
 			return;
 		case BODY: // implements
-			this.theClass.addInterface(type);
+			this.theClass.getInterfaces().add(type);
 		}
 	}
 

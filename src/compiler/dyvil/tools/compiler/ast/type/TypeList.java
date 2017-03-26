@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.type;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.collection.iterator.ArrayIterator;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
@@ -12,8 +13,9 @@ import dyvil.tools.parsing.marker.MarkerList;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Iterator;
 
-public class TypeList implements ITypeConsumer
+public class TypeList implements ITypeConsumer, Iterable<IType>
 {
 	private static final int DEFAULT_CAPACITY = 5;
 
@@ -86,6 +88,12 @@ public class TypeList implements ITypeConsumer
 	public void setType(IType type)
 	{
 		this.add(type);
+	}
+
+	@Override
+	public Iterator<IType> iterator()
+	{
+		return new ArrayIterator<IType>(this.types, this.size);
 	}
 
 	public void resolveTypes(MarkerList markers, IContext context)

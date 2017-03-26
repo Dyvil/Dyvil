@@ -48,7 +48,7 @@ public class ClassConstructor extends ConstructorCall
 		{
 			if (theClass.isInterface())
 			{
-				this.nestedClass.addInterface(this.type);
+				this.nestedClass.getInterfaces().add(this.type);
 			}
 			else
 			{

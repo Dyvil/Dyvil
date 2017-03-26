@@ -14,6 +14,7 @@ import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.ast.type.compound.ImplicitNullableType;
 import dyvil.tools.compiler.ast.type.compound.NullableType;
@@ -327,9 +328,15 @@ public final class Types
 			addSuperClasses(superType, types);
 		}
 
-		for (int i = 0, count = theClass.interfaceCount(); i < count; i++)
+		final TypeList interfaces = theClass.getInterfaces();
+		if (interfaces == null)
 		{
-			addSuperClasses(theClass.getInterface(i), types);
+			return;
+		}
+
+		for (int i = 0, count = interfaces.size(); i < count; i++)
+		{
+			addSuperClasses(interfaces.get(i), types);
 		}
 	}
 

@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -137,13 +138,17 @@ public final class SuperExpr implements IValue
 
 			if (superClass.isInterface())
 			{
-				for (int i = 0, count = enclosingClass.interfaceCount(); i < count; i++)
+				final TypeList interfaces = enclosingClass.getInterfaces();
+				if (interfaces != null)
 				{
-					final IType interfaceType = enclosingClass.getInterface(i);
-					if (interfaceType.isSameClass(this.type))
+					for (int i = 0, count = interfaces.size(); i < count; i++)
 					{
-						this.type = interfaceType;
-						return;
+						final IType interfaceType = interfaces.get(i);
+						if (interfaceType.isSameClass(this.type))
+						{
+							this.type = interfaceType;
+							return;
+						}
 					}
 				}
 

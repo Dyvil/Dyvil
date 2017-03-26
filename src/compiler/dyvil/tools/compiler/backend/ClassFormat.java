@@ -200,7 +200,7 @@ public final class ClassFormat
 		i = readTyped(desc, i, iclass::setSuperType, false);
 		while (i < len)
 		{
-			i = readTyped(desc, i, iclass::addInterface, false);
+			i = readTyped(desc, i, iclass.getInterfaces(), false);
 		}
 	}
 

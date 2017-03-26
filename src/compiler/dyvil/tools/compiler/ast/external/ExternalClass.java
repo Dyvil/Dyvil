@@ -33,6 +33,7 @@ import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -138,9 +139,9 @@ public final class ExternalClass extends AbstractClass
 			this.superType = this.superType.resolveType(null, context);
 		}
 
-		for (int i = 0; i < this.interfaceCount; i++)
+		if (this.interfaces != null)
 		{
-			this.interfaces[i] = this.interfaces[i].resolveType(null, context);
+			this.interfaces.resolveTypes(null, context);
 		}
 	}
 
@@ -474,14 +475,14 @@ public final class ExternalClass extends AbstractClass
 			this.superType.getMethodMatches(list, receiver, name, arguments);
 		}
 
-		if (list.hasCandidate())
+		if (list.hasCandidate() || this.interfaces == null)
 		{
 			return;
 		}
 
-		for (int i = 0; i < this.interfaceCount; i++)
+		for (IType type : this.interfaces)
 		{
-			this.interfaces[i].getMethodMatches(list, receiver, name, arguments);
+			type.getMethodMatches(list, receiver, name, arguments);
 		}
 	}
 
@@ -523,7 +524,7 @@ public final class ExternalClass extends AbstractClass
 		this.body = new ClassBody(this);
 		if (interfaces != null)
 		{
-			this.interfaces = new IType[interfaces.length];
+			this.interfaces = new TypeList(interfaces.length);
 		}
 
 		int index = name.lastIndexOf('$');
@@ -550,22 +551,13 @@ public final class ExternalClass extends AbstractClass
 		}
 		else
 		{
-			if (superName != null)
-			{
-				this.superType = ClassFormat.internalToType(superName);
-			}
-			else
-			{
-				this.superType = null;
-			}
+			this.superType = superName != null ? ClassFormat.internalToType(superName) : null;
 
 			if (interfaces != null)
 			{
-				this.interfaceCount = interfaces.length;
-				this.interfaces = new IType[this.interfaceCount];
-				for (int i = 0; i < this.interfaceCount; i++)
+				for (String internal : interfaces)
 				{
-					this.interfaces[i] = ClassFormat.internalToType(interfaces[i]);
+					this.interfaces.add(ClassFormat.internalToType(internal));
 				}
 			}
 		}
@@ -609,7 +601,7 @@ public final class ExternalClass extends AbstractClass
 			}
 			else
 			{
-				this.interfaces[index] = IType.withAnnotation(this.interfaces[index], annotation, typePath);
+				this.interfaces.set(index, IType.withAnnotation(this.interfaces.get(index), annotation, typePath));
 			}
 			break;
 		}

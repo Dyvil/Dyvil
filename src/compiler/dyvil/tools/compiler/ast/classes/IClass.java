@@ -6,7 +6,6 @@ import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationMetadata;
 import dyvil.tools.compiler.ast.classes.metadata.*;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.ITypeParametricMember;
@@ -20,6 +19,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParametric;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -106,13 +106,7 @@ public interface IClass extends IClassMember, IParametric, ITypeParametricMember
 
 	// Interfaces
 
-	int interfaceCount();
-
-	void setInterface(int index, IType type);
-
-	void addInterface(IType type);
-
-	IType getInterface(int index);
+	TypeList getInterfaces();
 
 	// Generics
 
@@ -129,8 +123,6 @@ public interface IClass extends IClassMember, IParametric, ITypeParametricMember
 	IClassMetadata getMetadata();
 
 	IMethod getFunctionalMethod();
-
-	IDataMember getSuperField(Name name);
 
 	boolean isMember(IClassMember member);
 
