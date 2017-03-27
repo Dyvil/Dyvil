@@ -14,7 +14,7 @@ public class ExternalHeader extends AbstractHeader implements IDefaultContext
 	private static final int IMPORTS      = 1;
 	private static final int TYPE_ALIASES = 1 << 1;
 
-	private int resolved;
+	private byte resolved;
 
 	public ExternalHeader()
 	{

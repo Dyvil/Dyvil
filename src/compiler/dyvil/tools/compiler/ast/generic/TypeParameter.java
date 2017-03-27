@@ -138,9 +138,9 @@ public abstract class TypeParameter implements ITypeParameter
 	}
 
 	@Override
-	public IAnnotation getAnnotation(IClass type)
+	public final IAnnotation getAnnotation(IClass type)
 	{
-		return this.annotations == null ? null : this.annotations.get(type);
+		return this.annotations == null ? null : this.getAnnotations().get(type);
 	}
 
 	@Override
@@ -165,7 +165,7 @@ public abstract class TypeParameter implements ITypeParameter
 			return;
 		}
 
-		final IAnnotation reifiedAnnotation = this.annotations.get(Types.REIFIED_CLASS);
+		final IAnnotation reifiedAnnotation = this.getAnnotation(Types.REIFIED_CLASS);
 		if (reifiedAnnotation != null)
 		{
 			final IParameter parameter = Types.REIFIED_CLASS.getParameters().get(0);

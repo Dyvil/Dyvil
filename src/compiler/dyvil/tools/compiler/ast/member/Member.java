@@ -97,9 +97,9 @@ public abstract class Member implements IMember
 	}
 
 	@Override
-	public IAnnotation getAnnotation(IClass type)
+	public final IAnnotation getAnnotation(IClass type)
 	{
-		return this.annotations == null ? null : this.annotations.get(type);
+		return this.annotations == null ? null : this.getAnnotations().get(type);
 	}
 
 	@Override

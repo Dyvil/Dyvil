@@ -1,22 +1,22 @@
 package dyvil.tools.compiler.ast.external;
 
-import dyvil.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.structure.RootPackage;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public class ExternalClassParameter extends ClassParameter
 {
-	private static final int ANNOTATIONS = 1;
 	private static final int TYPE        = 2;
 
-	private int resolved;
+	private byte resolved;
 
 	public ExternalClassParameter(IClass enclosingClass, Name name, String desc, IType type, ModifierSet modifiers)
 	{
@@ -35,10 +35,9 @@ public class ExternalClassParameter extends ClassParameter
 
 	private void resolveAnnotations()
 	{
-		this.resolved |= ANNOTATIONS;
 		if (this.annotations != null)
 		{
-			this.annotations.resolveTypes(null, this.getCombiningContext(), this);
+			this.annotations.resolveTypes(null, RootPackage.rootPackage, this);
 		}
 	}
 
@@ -69,18 +68,10 @@ public class ExternalClassParameter extends ClassParameter
 	}
 
 	@Override
-	public IAnnotation getAnnotation(IClass type)
+	public AnnotationList getAnnotations()
 	{
-		if (this.annotations == null)
-		{
-			return null;
-		}
-
-		if ((this.resolved & ANNOTATIONS) == 0)
-		{
-			this.resolveAnnotations();
-		}
-		return this.annotations.get(type);
+		this.resolveAnnotations();
+		return super.getAnnotations();
 	}
 
 	@Override

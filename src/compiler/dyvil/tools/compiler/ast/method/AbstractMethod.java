@@ -554,6 +554,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue receiver,
 		                            ArgumentList arguments, GenericData genericData)
 	{
+		final IParameterList parameters = this.getParameters();
+
 		if (receiver != null)
 		{
 			final int mod = this.modifiers.toFlags() & Modifiers.INFIX;
@@ -561,7 +563,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			{
 				// infix or extension method, declaring class implicit
 
-				final IParameter parameter = this.parameters.get(0);
+				final IParameter parameter = parameters.get(0);
 				final IType paramType = parameter.getCovariantType();
 
 				updateReceiverType(receiver, genericData);
@@ -570,9 +572,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 				updateReceiverType(receiver, genericData);
 
-				for (int i = 1, count = this.parameters.size(); i < count; i++)
+				for (int i = 1, count = parameters.size(); i < count; i++)
 				{
-					arguments.checkValue(i - 1, this.parameters.get(i), genericData, markers, context);
+					arguments.checkValue(i - 1, parameters.get(i), genericData, markers, context);
 				}
 
 				if (genericData != null)
@@ -651,9 +653,9 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 		}
 
-		for (int i = 0, count = this.parameters.size(); i < count; i++)
+		for (int i = 0, count = parameters.size(); i < count; i++)
 		{
-			arguments.checkValue(i, this.parameters.get(i), genericData, markers, context);
+			arguments.checkValue(i, parameters.get(i), genericData, markers, context);
 		}
 
 		if (genericData != null)
@@ -822,7 +824,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public boolean isIntrinsic()
 	{
-		return this.intrinsicData != null;
+		return this.getIntrinsicData() != null;
 	}
 
 	@Override
