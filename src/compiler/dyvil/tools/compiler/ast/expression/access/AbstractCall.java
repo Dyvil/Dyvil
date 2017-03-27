@@ -147,7 +147,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 		}
 		if (this.type == null)
 		{
-			this.type = this.method.getType().getConcreteType(this.getGenericData()).asReturnType();
+			this.type = this.method.getType().getConcreteType(this.getGenericData());
 		}
 		return this.type;
 	}

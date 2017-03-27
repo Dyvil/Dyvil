@@ -122,7 +122,7 @@ public class ClassGenericType extends GenericType
 		{
 			return this.getTheClass().resolveType(typeParameter, this);
 		}
-		return this.arguments.get(typeParameter.getIndex());
+		return this.arguments.get(typeParameter.getIndex()).asReturnType();
 	}
 
 	@Override

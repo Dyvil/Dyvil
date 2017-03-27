@@ -272,8 +272,7 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 	@NonNull
 	public IValue toIteratorLoop(MarkerList markers, IContext context, IType varType, IValue value, IType valueType)
 	{
-		final IType iteratorType = Types.resolveTypeSafely(valueType, IterableForStatement.LazyFields.ITERATOR_TYPE)
-		                                .asReturnType();
+		final IType iteratorType = Types.resolveTypeSafely(valueType, IterableForStatement.LazyFields.ITERATOR_TYPE);
 		if (varType == Types.UNKNOWN)
 		{
 			this.inferVariableType(markers, iteratorType);
@@ -316,8 +315,7 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 	@NonNull
 	public IValue toIterable(MarkerList markers, IContext context, IType varType, IValue value, IType valueType)
 	{
-		final IType iterableType = Types.resolveTypeSafely(valueType, IterableForStatement.LazyFields.ITERABLE_TYPE)
-		                                .asReturnType();
+		final IType iterableType = Types.resolveTypeSafely(valueType, IterableForStatement.LazyFields.ITERABLE_TYPE);
 		if (varType == Types.UNKNOWN)
 		{
 			this.inferVariableType(markers, iterableType);

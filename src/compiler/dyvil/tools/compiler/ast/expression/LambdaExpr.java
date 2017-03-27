@@ -420,7 +420,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			}
 
 			// asReturnType is required for Wildcard Types
-			parameter.setType(concreteType.asReturnType().atPosition(position));
+			parameter.setType(concreteType.atPosition(position));
 		}
 
 		this.checkReturnType(markers, this.method.getType().getConcreteType(this.type));

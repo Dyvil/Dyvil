@@ -11,7 +11,6 @@ import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -122,7 +121,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 			}
 
 			final ITypeContext typeContext = this.receiver == null ? ITypeContext.NULL : this.receiver.getType();
-			return this.type = this.field.getType().getConcreteType(typeContext).asReturnType();
+			return this.type = this.field.getType().getConcreteType(typeContext);
 		}
 		return this.type;
 	}

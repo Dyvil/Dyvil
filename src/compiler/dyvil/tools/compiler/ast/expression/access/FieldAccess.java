@@ -174,11 +174,11 @@ public class FieldAccess implements IValue, INamed, IReceiverAccess
 
 			if (this.receiver == null)
 			{
-				return this.field.getType().asReturnType();
+				return this.field.getType();
 			}
 
 			final ITypeContext typeContext = this.receiver.getType();
-			return this.type = this.field.getType().getConcreteType(typeContext).asReturnType();
+			return this.type = this.field.getType().getConcreteType(typeContext);
 		}
 		return this.type;
 	}

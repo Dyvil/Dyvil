@@ -173,13 +173,6 @@ public class NullableType implements IObjectType
 	}
 
 	@Override
-	public IType asReturnType()
-	{
-		final IType type = this.type.asReturnType();
-		return type == this.type ? this : this.wrap(type);
-	}
-
-	@Override
 	public IType asParameterType()
 	{
 		final IType type = this.type.asParameterType();

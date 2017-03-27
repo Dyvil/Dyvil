@@ -127,7 +127,6 @@ public final class GenericData implements IResolvable, ITypeContext
 		}
 
 		final int index = typeParameter.getIndex();
-		type = type.asReturnType();
 
 		final IType current = this.generics.get(index);
 		if (current == null)
