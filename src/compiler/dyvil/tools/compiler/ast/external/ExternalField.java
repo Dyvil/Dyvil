@@ -96,7 +96,7 @@ public final class ExternalField extends Field
 		{
 			this.resolveAnnotations();
 		}
-		return this.annotations.getAnnotation(type);
+		return this.annotations.get(type);
 	}
 
 	@Override

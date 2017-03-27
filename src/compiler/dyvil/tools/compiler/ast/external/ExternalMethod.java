@@ -232,7 +232,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 		{
 			this.resolveAnnotations();
 		}
-		return this.annotations.getAnnotation(type);
+		return this.annotations.get(type);
 	}
 
 	@Override
@@ -326,7 +326,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 				return null;
 			}
 
-			typeVar.addAnnotation(annotation);
+			typeVar.getAnnotations().add(annotation);
 			break;
 		}
 		case TypeReference.METHOD_TYPE_PARAMETER_BOUND:

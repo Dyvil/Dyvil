@@ -213,10 +213,10 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	{
 		if (this.annotations != null)
 		{
-			int count = this.annotations.annotationCount();
+			int count = this.annotations.size();
 			for (int i = 0; i < count; i++)
 			{
-				this.annotations.getAnnotation(i).toString(indent, buffer);
+				this.annotations.get(i).toString(indent, buffer);
 				buffer.append(' ');
 			}
 		}

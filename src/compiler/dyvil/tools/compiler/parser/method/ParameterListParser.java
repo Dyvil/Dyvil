@@ -115,7 +115,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				}
 
 				final Annotation annotation = new Annotation(token.raw());
-				this.annotations.addAnnotation(annotation);
+				this.annotations.add(annotation);
 				pm.pushParser(new AnnotationParser(annotation));
 				return;
 			}

@@ -36,7 +36,7 @@ import static dyvil.tools.compiler.ast.type.builtin.Types.isSuperType;
 
 public abstract class TypeParameter implements ITypeParameter
 {
-	protected AnnotationList annotations;
+	protected @Nullable AnnotationList annotations;
 	protected Variance variance = Variance.INVARIANT;
 
 	protected Name name;
@@ -122,26 +122,25 @@ public abstract class TypeParameter implements ITypeParameter
 	}
 
 	@Override
+	public ElementType getElementType()
+	{
+		return ElementType.TYPE_PARAMETER;
+	}
+
+	@Override
 	public AnnotationList getAnnotations()
 	{
-		return this.annotations;
-	}
-
-	@Override
-	public void setAnnotations(AnnotationList annotations)
-	{
-		this.annotations = annotations;
-	}
-
-	@Override
-	public void addAnnotation(IAnnotation annotation)
-	{
-		if (this.annotations == null)
+		if (this.annotations != null)
 		{
-			this.annotations = new AnnotationList();
+			return this.annotations;
 		}
+		return this.annotations = new AnnotationList();
+	}
 
-		this.annotations.addAnnotation(annotation);
+	@Override
+	public IAnnotation getAnnotation(IClass type)
+	{
+		return this.annotations == null ? null : this.annotations.get(type);
 	}
 
 	@Override
@@ -166,25 +165,13 @@ public abstract class TypeParameter implements ITypeParameter
 			return;
 		}
 
-		final IAnnotation reifiedAnnotation = this.annotations.getAnnotation(Types.REIFIED_CLASS);
+		final IAnnotation reifiedAnnotation = this.annotations.get(Types.REIFIED_CLASS);
 		if (reifiedAnnotation != null)
 		{
 			final IParameter parameter = Types.REIFIED_CLASS.getParameters().get(0);
 			this.reifiedKind = AnnotationUtil
 				                   .getEnumValue(reifiedAnnotation.getArguments(), parameter, Reified.Type.class);
 		}
-	}
-
-	@Override
-	public IAnnotation getAnnotation(IClass type)
-	{
-		return this.annotations == null ? null : this.annotations.getAnnotation(type);
-	}
-
-	@Override
-	public ElementType getElementType()
-	{
-		return ElementType.TYPE_PARAMETER;
 	}
 
 	@Override
@@ -420,9 +407,9 @@ public abstract class TypeParameter implements ITypeParameter
 
 		if (this.annotations != null)
 		{
-			for (int i = 0, count = this.annotations.annotationCount(); i < count; i++)
+			for (int i = 0, count = this.annotations.size(); i < count; i++)
 			{
-				this.annotations.getAnnotation(i).write(visitor, typeRef, null);
+				this.annotations.get(i).write(visitor, typeRef, null);
 			}
 		}
 
@@ -475,9 +462,9 @@ public abstract class TypeParameter implements ITypeParameter
 	{
 		if (this.annotations != null)
 		{
-			for (int i = 0, size = this.annotations.annotationCount(); i < size; i++)
+			for (int i = 0, size = this.annotations.size(); i < size; i++)
 			{
-				this.annotations.getAnnotation(i).toString(indent, buffer);
+				this.annotations.get(i).toString(indent, buffer);
 				buffer.append(' ');
 			}
 		}

@@ -327,10 +327,10 @@ public class Property extends Member implements IProperty
 	{
 		if (this.annotations != null)
 		{
-			int count = this.annotations.annotationCount();
+			int count = this.annotations.size();
 			for (int i = 0; i < count; i++)
 			{
-				this.annotations.getAnnotation(i).write(mw);
+				this.annotations.get(i).write(mw);
 			}
 		}
 

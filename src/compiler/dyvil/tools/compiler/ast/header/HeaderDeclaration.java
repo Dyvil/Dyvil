@@ -23,27 +23,28 @@ import java.lang.annotation.ElementType;
 public class HeaderDeclaration implements IASTNode, INamed, IModified, IAnnotated, IObjectCompilable
 {
 	protected final IHeaderUnit header;
-	
+
 	protected ICodePosition position;
-	
+
 	protected AnnotationList annotations;
 	protected ModifierSet    modifiers;
-	
+
 	protected Name name;
-	
+
 	public HeaderDeclaration(IHeaderUnit header)
 	{
 		this.header = header;
 	}
-	
+
 	public HeaderDeclaration(IHeaderUnit header, ICodePosition position, Name name)
 	{
 		this.header = header;
 		this.position = position;
 		this.name = name;
 	}
-	
-	public HeaderDeclaration(IHeaderUnit header, ICodePosition position, Name name, ModifierSet modifiers, AnnotationList annotations)
+
+	public HeaderDeclaration(IHeaderUnit header, ICodePosition position, Name name, ModifierSet modifiers,
+		                        AnnotationList annotations)
 	{
 		this.header = header;
 		this.position = position;
@@ -51,77 +52,65 @@ public class HeaderDeclaration implements IASTNode, INamed, IModified, IAnnotate
 		this.modifiers = modifiers;
 		this.annotations = annotations;
 	}
-	
+
 	@Override
 	public ICodePosition getPosition()
 	{
 		return this.position;
 	}
-	
+
 	@Override
 	public void setPosition(ICodePosition position)
 	{
 		this.position = position;
 	}
-	
-	@Override
-	public AnnotationList getAnnotations()
-	{
-		return this.annotations;
-	}
-	
-	@Override
-	public void setAnnotations(AnnotationList annotations)
-	{
-		this.annotations = annotations;
-	}
-	
-	@Override
-	public void addAnnotation(IAnnotation annotation)
-	{
-		if (this.annotations == null)
-		{
-			this.annotations = new AnnotationList();
-		}
-		this.annotations.addAnnotation(annotation);
-	}
-	
-	@Override
-	public IAnnotation getAnnotation(IClass type)
-	{
-		return this.annotations == null ? null : this.annotations.getAnnotation(type);
-	}
-	
+
 	@Override
 	public ElementType getElementType()
 	{
 		return ElementType.PACKAGE;
 	}
-	
+
+	@Override
+	public AnnotationList getAnnotations()
+	{
+		if (this.annotations != null)
+		{
+			return this.annotations;
+		}
+		return this.annotations = new AnnotationList();
+	}
+
+	@Override
+	public IAnnotation getAnnotation(IClass type)
+	{
+		return this.annotations == null ? null : this.annotations.get(type);
+	}
+
 	@Override
 	public void setModifiers(ModifierSet modifiers)
 	{
 		this.modifiers = modifiers;
 	}
-	
+
 	@Override
 	public ModifierSet getModifiers()
 	{
 		return this.modifiers;
 	}
-	
+
 	@Override
 	public Name getName()
 	{
 		return this.name;
 	}
-	
+
 	@Override
 	public void setName(Name name)
 	{
 		this.name = name;
 	}
-	
+
 	public void check(MarkerList markers)
 	{
 		Name headerName = this.header.getName();
@@ -133,7 +122,7 @@ public class HeaderDeclaration implements IASTNode, INamed, IModified, IAnnotate
 			markers.add(m);
 		}
 	}
-	
+
 	@Override
 	public void write(DataOutput out) throws IOException
 	{
@@ -142,7 +131,7 @@ public class HeaderDeclaration implements IASTNode, INamed, IModified, IAnnotate
 		ModifierSet.write(this.modifiers, out);
 		AnnotationList.write(this.annotations, out);
 	}
-	
+
 	@Override
 	public void read(DataInput in) throws IOException
 	{
@@ -151,7 +140,7 @@ public class HeaderDeclaration implements IASTNode, INamed, IModified, IAnnotate
 		this.modifiers = ModifierSet.read(in);
 		this.annotations = AnnotationList.read(in);
 	}
-	
+
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{

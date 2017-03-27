@@ -116,19 +116,9 @@ public abstract class CaptureDataMember implements IDataMember
 	}
 
 	@Override
-	public void setAnnotations(AnnotationList annotations)
-	{
-	}
-
-	@Override
 	public IAnnotation getAnnotation(IClass type)
 	{
 		return this.variable.getAnnotation(type);
-	}
-
-	@Override
-	public void addAnnotation(IAnnotation annotation)
-	{
 	}
 
 	@Override

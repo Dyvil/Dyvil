@@ -48,8 +48,8 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 {
 	// Modifiers and Annotations
 
-	protected AnnotationList annotations;
-	protected ModifierSet    modifiers;
+	protected @Nullable AnnotationList annotations;
+	protected @NonNull ModifierSet    modifiers;
 
 	// Signature
 
@@ -103,25 +103,29 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
+	public ElementType getElementType()
+	{
+		if (this.isAnnotation())
+		{
+			return ElementType.ANNOTATION_TYPE;
+		}
+		return ElementType.TYPE;
+	}
+
+	@Override
 	public AnnotationList getAnnotations()
 	{
-		return this.annotations;
-	}
-
-	@Override
-	public void setAnnotations(AnnotationList annotations)
-	{
-		this.annotations = annotations;
-	}
-
-	@Override
-	public void addAnnotation(IAnnotation annotation)
-	{
-		if (this.annotations == null)
+		if (this.annotations != null)
 		{
-			this.annotations = new AnnotationList();
+			return this.annotations;
 		}
-		this.annotations.addAnnotation(annotation);
+		return this.annotations = new AnnotationList();
+	}
+
+	@Override
+	public IAnnotation getAnnotation(IClass type)
+	{
+		return this.annotations == null ? null : this.annotations.get(type);
 	}
 
 	@Override
@@ -141,22 +145,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			return false;
 		}
 		return true;
-	}
-
-	@Override
-	public IAnnotation getAnnotation(IClass type)
-	{
-		return this.annotations == null ? null : this.annotations.getAnnotation(type);
-	}
-
-	@Override
-	public ElementType getElementType()
-	{
-		if (this.isAnnotation())
-		{
-			return ElementType.ANNOTATION_TYPE;
-		}
-		return ElementType.TYPE;
 	}
 
 	@Override

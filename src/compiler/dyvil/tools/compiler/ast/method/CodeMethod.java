@@ -592,7 +592,7 @@ public class CodeMethod extends AbstractMethod
 
 		if (this.annotations != null)
 		{
-			IAnnotation intrinsic = this.annotations.getAnnotation(Types.INTRINSIC_CLASS);
+			IAnnotation intrinsic = this.annotations.get(Types.INTRINSIC_CLASS);
 			if (intrinsic != null)
 			{
 				this.intrinsicData = Intrinsics.readAnnotation(this, intrinsic);

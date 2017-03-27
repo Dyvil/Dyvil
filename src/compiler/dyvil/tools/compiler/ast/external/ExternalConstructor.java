@@ -102,7 +102,7 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 		{
 			this.resolveAnnotations();
 		}
-		return this.annotations.getAnnotation(type);
+		return this.annotations.get(type);
 	}
 
 	@Override

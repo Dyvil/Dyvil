@@ -89,29 +89,17 @@ public abstract class Member implements IMember
 	@Override
 	public AnnotationList getAnnotations()
 	{
-		return this.annotations;
+		if (this.annotations != null)
+		{
+			return this.annotations;
+		}
+		return this.annotations = new AnnotationList();
 	}
 
 	@Override
 	public IAnnotation getAnnotation(IClass type)
 	{
-		return this.annotations == null ? null : this.annotations.getAnnotation(type);
-	}
-
-	@Override
-	public void setAnnotations(AnnotationList annotations)
-	{
-		this.annotations = annotations;
-	}
-
-	@Override
-	public void addAnnotation(IAnnotation annotation)
-	{
-		if (this.annotations == null)
-		{
-			this.annotations = new AnnotationList();
-		}
-		this.annotations.addAnnotation(annotation);
+		return this.annotations == null ? null : this.annotations.get(type);
 	}
 
 	@Override

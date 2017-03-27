@@ -189,6 +189,6 @@ public interface IParameter extends IVariable, IClassMember
 
 		IType type = new InternalType(internalType);
 		Annotation annotation = new Annotation(type);
-		return new AnnotationReader(this, annotation);
+		return new AnnotationReader(this.getAnnotations(), annotation);
 	}
 }

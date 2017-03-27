@@ -20,7 +20,6 @@ import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -776,10 +775,10 @@ public class CodeClass extends AbstractClass
 
 		if (this.annotations != null)
 		{
-			int count = this.annotations.annotationCount();
+			int count = this.annotations.size();
 			for (int i = 0; i < count; i++)
 			{
-				this.annotations.getAnnotation(i).write(writer);
+				this.annotations.get(i).write(writer);
 			}
 		}
 

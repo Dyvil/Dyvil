@@ -2,10 +2,10 @@ package dyvil.tools.compiler.ast.modifiers;
 
 public interface IModified
 {
-	void setModifiers(ModifierSet modifiers);
-	
 	ModifierSet getModifiers();
-	
+
+	void setModifiers(ModifierSet modifiers);
+
 	default boolean hasModifier(int mod)
 	{
 		final ModifierSet modifiers = this.getModifiers();

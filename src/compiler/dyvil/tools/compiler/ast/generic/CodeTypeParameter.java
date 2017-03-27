@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.generic;
 import dyvil.annotation.Reified;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.TypePath;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -33,6 +34,13 @@ public class CodeTypeParameter extends TypeParameter
 	public CodeTypeParameter(ICodePosition position, ITypeParametric generic, Name name, Variance variance)
 	{
 		super(generic, name, variance);
+		this.position = position;
+	}
+
+	public CodeTypeParameter(ICodePosition position, ITypeParametric generic, Name name, Variance variance, AnnotationList annotations)
+	{
+		super(generic, name, variance);
+		this.annotations = annotations;
 		this.position = position;
 	}
 

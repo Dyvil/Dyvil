@@ -75,7 +75,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 		if (this.method.addRawAnnotation(internal, null))
 		{
 			final Annotation annotation = new Annotation(new InternalType(internal));
-			return new AnnotationReader(this.method, annotation);
+			return new AnnotationReader(this.method.getAnnotations(), annotation);
 		}
 		return null;
 	}

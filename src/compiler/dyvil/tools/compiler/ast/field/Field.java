@@ -533,10 +533,10 @@ public class Field extends Member implements IField
 		final AnnotationList annotations = this.getAnnotations();
 		if (annotations != null)
 		{
-			int count = annotations.annotationCount();
+			int count = annotations.size();
 			for (int i = 0; i < count; i++)
 			{
-				annotations.getAnnotation(i).write(fieldVisitor);
+				annotations.get(i).write(fieldVisitor);
 			}
 		}
 

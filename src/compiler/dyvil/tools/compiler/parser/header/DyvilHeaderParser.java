@@ -213,7 +213,7 @@ public class DyvilHeaderParser extends Parser
 
 	public static boolean hasModifiers(ModifierSet modifiers, AnnotationList annotations)
 	{
-		return modifiers != null && !modifiers.isEmpty() || annotations != null && annotations.annotationCount() != 0;
+		return modifiers != null && !modifiers.isEmpty() || annotations != null && annotations.size() != 0;
 	}
 
 	protected static void reportInvalidElement(IParserManager pm, IToken token)
@@ -229,7 +229,7 @@ public class DyvilHeaderParser extends Parser
 		}
 
 		final Annotation annotation = new Annotation(token.raw());
-		this.annotations.addAnnotation(annotation);
+		this.annotations.add(annotation);
 		pm.pushParser(new AnnotationParser(annotation));
 	}
 

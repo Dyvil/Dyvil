@@ -199,7 +199,7 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 				}
 
 				final Annotation annotation = new Annotation(token.raw());
-				this.annotations.addAnnotation(annotation);
+				this.annotations.add(annotation);
 				pm.pushParser(new AnnotationParser(annotation));
 				return;
 			}

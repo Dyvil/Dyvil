@@ -582,7 +582,7 @@ public final class ExternalClass extends AbstractClass
 			}
 
 			Annotation annotation = new Annotation(null, ClassFormat.internalToType(internal));
-			return new AnnotationReader(this, annotation);
+			return new AnnotationReader(this.getAnnotations(), annotation);
 		}
 		return null;
 	}
@@ -613,7 +613,7 @@ public final class ExternalClass extends AbstractClass
 				return null;
 			}
 
-			typeVar.addAnnotation(annotation);
+			typeVar.getAnnotations().add(annotation);
 			break;
 		}
 		case TypeReference.CLASS_TYPE_PARAMETER_BOUND:

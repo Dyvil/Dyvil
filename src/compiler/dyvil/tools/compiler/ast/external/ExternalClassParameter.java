@@ -80,7 +80,7 @@ public class ExternalClassParameter extends ClassParameter
 		{
 			this.resolveAnnotations();
 		}
-		return this.annotations.getAnnotation(type);
+		return this.annotations.get(type);
 	}
 
 	@Override
