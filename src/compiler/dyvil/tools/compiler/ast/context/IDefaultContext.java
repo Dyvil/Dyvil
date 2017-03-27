@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.parsing.Name;
 
@@ -54,9 +55,8 @@ public interface IDefaultContext extends IStaticContext
 	}
 
 	@Override
-	default ITypeAlias resolveTypeAlias(Name name, int arity)
+	default void resolveTypeAlias(MatchList<ITypeAlias> matches, IType receiver, Name name, TypeList arguments)
 	{
-		return null;
 	}
 
 	@Override

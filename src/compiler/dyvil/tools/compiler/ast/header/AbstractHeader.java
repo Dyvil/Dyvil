@@ -8,17 +8,18 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IStaticContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.operator.IOperator;
+import dyvil.tools.compiler.ast.expression.operator.Operator;
 import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.expression.operator.IOperator;
-import dyvil.tools.compiler.ast.expression.operator.Operator;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 import dyvil.tools.compiler.config.Formatting;
@@ -321,27 +322,12 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	}
 
 	@Override
-	public ITypeAlias resolveTypeAlias(Name name, int arity)
+	public void resolveTypeAlias(MatchList<ITypeAlias> matches, IType receiver, Name name, TypeList arguments)
 	{
-		ITypeAlias candidate = null;
 		for (int i = 0; i < this.typeAliasCount; i++)
 		{
-			final ITypeAlias typeAlias = this.typeAliases[i];
-			if (typeAlias.getName() != name)
-			{
-				continue;
-			}
-
-			if (typeAlias.typeArity() == arity)
-			{
-				return typeAlias;
-			}
-			if (candidate == null)
-			{
-				candidate = typeAlias;
-			}
+			this.typeAliases[i].checkMatch(matches, receiver, name, arguments);
 		}
-		return candidate;
 	}
 
 	@Override
@@ -628,25 +614,19 @@ class HeaderContext implements IStaticContext
 	}
 
 	@Override
-	public ITypeAlias resolveTypeAlias(Name name, int arity)
+	public void resolveTypeAlias(MatchList<ITypeAlias> matches, IType receiver, Name name, TypeList arguments)
 	{
-		final ITypeAlias candidate = this.header.resolveTypeAlias(name, arity);
-		if (candidate != null && candidate.typeArity() == arity)
+		this.header.resolveTypeAlias(matches, receiver, name, arguments);
+		if (matches.hasCandidate())
 		{
-			return candidate;
+			return;
 		}
 
+		final ImportDeclaration[] importDeclarations = this.header.importDeclarations;
 		for (int i = 0; i < this.header.importCount; i++)
 		{
-			final ITypeAlias includedTypeAlias = this.header.importDeclarations[i].getContext()
-			                                                                      .resolveTypeAlias(name, arity);
-			if (includedTypeAlias != null && includedTypeAlias.typeArity() == arity)
-			{
-				return includedTypeAlias;
-			}
+			importDeclarations[i].getContext().resolveTypeAlias(matches, receiver, name, arguments);
 		}
-
-		return candidate;
 	}
 
 	@Override

@@ -405,7 +405,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			}
 			if (arguments == null)
 			{
-				list.add(new Candidate<>(this, IValue.EXACT_MATCH, null, false));
+				list.add(new Candidate<>(this, IValue.EXACT_MATCH, receiverType, false));
 				return;
 			}
 

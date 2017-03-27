@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.parsing.Name;
 
@@ -96,10 +97,14 @@ public class CombiningContext implements IContext
 	}
 
 	@Override
-	public ITypeAlias resolveTypeAlias(Name name, int arity)
+	public void resolveTypeAlias(MatchList<ITypeAlias> matches, IType receiver, Name name, TypeList arguments)
 	{
-		final ITypeAlias inner = this.inner.resolveTypeAlias(name, arity);
-		return inner == null ? this.outer.resolveTypeAlias(name, arity) : inner;
+		this.inner.resolveTypeAlias(matches, receiver, name, arguments);
+		if (matches.hasCandidate())
+		{
+			return;
+		}
+		this.outer.resolveTypeAlias(matches, receiver, name, arguments);
 	}
 
 	@Override

@@ -17,6 +17,7 @@ import dyvil.tools.compiler.ast.expression.operator.IOperator;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.parsing.Name;
@@ -69,7 +70,7 @@ public interface IContext extends IMemberContext, IImportContext
 	IClass resolveClass(Name name);
 
 	@Override
-	ITypeAlias resolveTypeAlias(Name name, int arity);
+	void resolveTypeAlias(MatchList<ITypeAlias> matches, IType receiver, Name name, TypeList arguments);
 
 	@Override
 	ITypeParameter resolveTypeParameter(Name name);
@@ -109,6 +110,13 @@ public interface IContext extends IMemberContext, IImportContext
 			return Types.BASE_CONTEXT.resolveOperator(name, type);
 		}
 		return operator;
+	}
+
+	static MatchList<ITypeAlias> resolveTypeAlias(IImportContext context, IType receiver, Name name, TypeList arguments)
+	{
+		MatchList<ITypeAlias> matches = new MatchList<>(null);
+		context.resolveTypeAlias(matches, receiver, name, arguments);
+		return matches;
 	}
 
 	static IConstructor resolveConstructor(IImplicitContext implicitContext, IMemberContext type, ArgumentList arguments)

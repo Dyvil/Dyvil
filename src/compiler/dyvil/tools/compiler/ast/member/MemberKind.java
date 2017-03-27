@@ -9,6 +9,7 @@ import static dyvil.reflect.Modifiers.*;
 public enum MemberKind
 {
 	HEADER("header", BaseModifiers.ACCESS_MODIFIERS, PUBLIC),
+	TYPE_ALIAS("typealias", BaseModifiers.ACCESS_MODIFIERS, PUBLIC),
 	CLASS("class", BaseModifiers.CLASS_MODIFIERS, PUBLIC),
 	METHOD("method", BaseModifiers.METHOD_MODIFIERS, PUBLIC),
 	CONSTRUCTOR("constructor", BaseModifiers.CONSTRUCTOR_MODIFIERS, PUBLIC),

@@ -4,6 +4,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.ITypeParametric;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.TypeList;
@@ -128,6 +129,20 @@ public class NamedGenericType extends GenericType implements IUnresolvedType
 
 	private IType resolveTopLevelWith(MarkerList markers, IContext context)
 	{
+		final MatchList<ITypeAlias> typeAliases = IContext.resolveTypeAlias(context, null, this.name, this.arguments);
+		if (typeAliases.hasCandidate())
+		{
+			final ITypeAlias typeAlias = typeAliases.getBestMember();
+			final IType aliasType = typeAlias.getType();
+			if (!aliasType.isResolved())
+			{
+				markers.add(Markers.semanticError(this.position, "type.alias.unresolved", this.name));
+				return aliasType.atPosition(this.position);
+			}
+
+			return this.checkCount(markers, typeAlias, "type_alias", aliasType);
+		}
+
 		final IClass theClass = context.resolveClass(this.name);
 		if (theClass != null)
 		{
@@ -143,18 +158,6 @@ public class NamedGenericType extends GenericType implements IUnresolvedType
 			return new ResolvedTypeVarType(typeParameter, this.position);
 		}
 
-		final ITypeAlias typeAlias = context.resolveTypeAlias(this.name, this.arguments.size());
-		if (typeAlias != null)
-		{
-			final IType aliasType = typeAlias.getType();
-			if (!aliasType.isResolved())
-			{
-				markers.add(Markers.semanticError(this.position, "type.alias.unresolved", this.name));
-				return aliasType.atPosition(this.position);
-			}
-
-			return this.checkCount(markers, typeAlias, "type_alias", aliasType);
-		}
 
 		final Package thePackage = context.resolvePackage(this.name);
 		if (thePackage != null)
@@ -189,7 +192,7 @@ public class NamedGenericType extends GenericType implements IUnresolvedType
 	{
 		final int genericArity = generic.typeArity();
 
-		if (genericArity <= 0 || !type.isGenericType())
+		if (genericArity <= 0)
 		{
 			markers.add(Markers.semanticError(this.position, "type.generic." + kind + ".not_generic", type));
 			return type.atPosition(this.position);

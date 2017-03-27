@@ -17,7 +17,8 @@ import java.util.Iterator;
 
 public class TypeList implements ITypeConsumer, Iterable<IType>
 {
-	private static final int DEFAULT_CAPACITY = 5;
+	private static final int      DEFAULT_CAPACITY = 5;
+	public static final  TypeList EMPTY            = new TypeList(null, 0);
 
 	private int     size;
 	private IType[] types;
@@ -93,7 +94,7 @@ public class TypeList implements ITypeConsumer, Iterable<IType>
 	@Override
 	public Iterator<IType> iterator()
 	{
-		return new ArrayIterator<IType>(this.types, this.size);
+		return new ArrayIterator<>(this.types, this.size);
 	}
 
 	public void resolveTypes(MarkerList markers, IContext context)

@@ -8,7 +8,10 @@ import dyvil.tools.compiler.ast.imports.ImportDeclaration;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.expression.operator.IOperator;
 import dyvil.tools.compiler.ast.expression.operator.IOperatorMap;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.alias.ITypeAliasMap;
 import dyvil.tools.parsing.Name;
@@ -74,7 +77,7 @@ public interface IHeaderUnit extends IASTNode, IObjectCompilable, IContext, ICla
 	int typeAliasCount();
 	
 	@Override
-	ITypeAlias resolveTypeAlias(Name name, int arity);
+	void resolveTypeAlias(MatchList<ITypeAlias> matches, IType receiver, Name name, TypeList arguments);
 
 	ITypeAlias getTypeAlias(int index);
 

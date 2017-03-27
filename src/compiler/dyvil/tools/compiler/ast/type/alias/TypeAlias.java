@@ -4,14 +4,20 @@ import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
+import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.TypeParameterList;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.header.ISourceHeader;
+import dyvil.tools.compiler.ast.member.Member;
+import dyvil.tools.compiler.ast.member.MemberKind;
+import dyvil.tools.compiler.ast.method.Candidate;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
@@ -23,18 +29,15 @@ import dyvil.tools.parsing.position.ICodePosition;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.lang.annotation.ElementType;
 
-public class TypeAlias implements ITypeAlias, IDefaultContext
+public class TypeAlias extends Member implements ITypeAlias, IDefaultContext
 {
-	protected Name  name;
-	protected IType type;
-
 	protected @Nullable TypeParameterList typeParameters;
 
 	// Metadata
-	protected IHeaderUnit   enclosingHeader;
-	protected ICodePosition position;
-	protected boolean       resolved;
+	protected IHeaderUnit enclosingHeader;
+	protected boolean     resolved;
 
 	public TypeAlias()
 	{
@@ -58,6 +61,18 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	}
 
 	@Override
+	public ElementType getElementType()
+	{
+		return ElementType.TYPE;
+	}
+
+	@Override
+	public MemberKind getKind()
+	{
+		return MemberKind.TYPE_ALIAS;
+	}
+
+	@Override
 	public IHeaderUnit getEnclosingHeader()
 	{
 		return this.enclosingHeader;
@@ -70,40 +85,10 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	}
 
 	@Override
-	public ICodePosition getPosition()
-	{
-		return this.position;
-	}
-
-	@Override
-	public void setPosition(ICodePosition position)
-	{
-		this.position = position;
-	}
-
-	@Override
-	public Name getName()
-	{
-		return this.name;
-	}
-
-	@Override
-	public void setName(Name name)
-	{
-		this.name = name;
-	}
-
-	@Override
 	public IType getType()
 	{
 		this.ensureResolved();
 		return this.type;
-	}
-
-	@Override
-	public void setType(IType type)
-	{
-		this.type = type;
 	}
 
 	@Override
@@ -128,6 +113,57 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 		return this.typeParameters == null ? null : this.typeParameters.get(name);
 	}
 
+	@Override
+	public boolean isVariadic()
+	{
+		return false;
+	}
+
+	// Resolution
+
+	@Override
+	public void checkMatch(MatchList<ITypeAlias> matches, IType receiver, Name name, TypeList arguments)
+	{
+		if (name != this.name && name != null)
+		{
+			return;
+		}
+
+		if (arguments == null)
+		{
+			matches.add(new Candidate<>(this));
+			return;
+		}
+
+		final int size = arguments.size();
+		if (size != this.typeArity())
+		{
+			matches.add(new Candidate<>(this, true));
+			return;
+		}
+
+		int[] matchValues = new int[size];
+		IType[] matchTypes = new IType[size];
+		boolean invalid = false;
+		for (int i = 0; i < size; i++)
+		{
+			final IType bound = this.typeParameters.get(i).getCovariantType();
+			final IType argument = arguments.get(i);
+			final int match = Types.getTypeMatch(bound, argument);
+			if (match == IValue.MISMATCH)
+			{
+				invalid = true;
+			}
+
+			matchValues[i] = match;
+			matchTypes[i] = bound;
+		}
+
+		matches.add(new Candidate<>(this, matchValues, matchTypes, 0, 0, invalid));
+	}
+
+	// Phases
+
 	private void ensureResolved()
 	{
 		if (this.resolved)
@@ -144,6 +180,11 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
+		if (this.annotations != null)
+		{
+			this.annotations.resolveTypes(markers, context, this);
+		}
+
 		context = context.push(this);
 
 		if (this.type == null)
@@ -166,6 +207,11 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
+		if (this.annotations != null)
+		{
+			this.annotations.resolve(markers, context);
+		}
+
 		context = context.push(this);
 
 		this.type.resolve(markers, context);
@@ -181,6 +227,11 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
+		if (this.annotations != null)
+		{
+			this.annotations.checkTypes(markers, context);
+		}
+
 		context = context.push(this);
 
 		this.type.checkType(markers, context, TypePosition.GENERIC_ARGUMENT);
@@ -196,6 +247,11 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		if (this.annotations != null)
+		{
+			this.annotations.check(markers, context, ElementType.TYPE);
+		}
+
 		context = context.push(this);
 
 		this.type.check(markers, context);
@@ -211,7 +267,7 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	@Override
 	public void foldConstants()
 	{
-		this.type.foldConstants();
+		super.foldConstants();
 
 		if (this.typeParameters != null)
 		{
@@ -222,12 +278,20 @@ public class TypeAlias implements ITypeAlias, IDefaultContext
 	@Override
 	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		this.type.cleanup(compilableList, classCompilableList);
+		super.cleanup(compilableList, classCompilableList);
 
 		if (this.typeParameters != null)
 		{
 			this.typeParameters.cleanup(compilableList, classCompilableList);
 		}
+	}
+
+	// Compilation
+
+	@Override
+	public String getInternalName()
+	{
+		return this.name.qualified;
 	}
 
 	@Override
