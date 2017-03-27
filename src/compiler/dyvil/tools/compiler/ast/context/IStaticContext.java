@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.expression.operator.IOperator;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
@@ -74,13 +74,13 @@ public interface IStaticContext extends IContext
 	IDataMember resolveField(Name name);
 
 	@Override
-	void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments);
+	void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments);
 
 	@Override
 	void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType);
 
 	@Override
-	default void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
+	default void getConstructorMatches(MatchList<IConstructor> list, ArgumentList arguments)
 	{
 	}
 	

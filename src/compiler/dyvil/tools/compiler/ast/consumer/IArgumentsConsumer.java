@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.ast.consumer;
 
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 
 public interface IArgumentsConsumer
 {
-	void setArguments(IArguments arguments);
+	void setArguments(ArgumentList arguments);
 }

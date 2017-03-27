@@ -30,7 +30,7 @@ import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
@@ -309,7 +309,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
 		// Handled by enclosing class
 	}
@@ -358,7 +358,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void checkMatch(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
+	public void checkMatch(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
 		if (name != this.name && name != null)
 		{
@@ -533,7 +533,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public GenericData getGenericData(GenericData data, IValue instance, IArguments arguments)
+	public GenericData getGenericData(GenericData data, IValue instance, ArgumentList arguments)
 	{
 		if (!this.hasTypeVariables())
 		{
@@ -552,7 +552,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 	@Override
 	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue receiver,
-		                            IArguments arguments, GenericData genericData)
+		                            ArgumentList arguments, GenericData genericData)
 	{
 		if (receiver != null)
 		{
@@ -707,7 +707,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 	@Override
 	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IValue instance,
-		                     IArguments arguments, ITypeContext typeContext)
+		                     ArgumentList arguments, ITypeContext typeContext)
 	{
 		ModifierUtil.checkVisibility(this, position, markers, context);
 
@@ -946,7 +946,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void writeCall(MethodWriter writer, IValue receiver, IArguments arguments, ITypeContext typeContext,
+	public void writeCall(MethodWriter writer, IValue receiver, ArgumentList arguments, ITypeContext typeContext,
 		                     IType targetType, int lineNumber) throws BytecodeException
 	{
 		if (this.useIntrinsicBytecode())
@@ -965,7 +965,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue receiver, IArguments arguments,
+	public void writeJump(MethodWriter writer, Label dest, IValue receiver, ArgumentList arguments,
 		                     ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
 		if (this.useIntrinsicBytecode())
@@ -980,7 +980,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue receiver, IArguments arguments,
+	public void writeInvJump(MethodWriter writer, Label dest, IValue receiver, ArgumentList arguments,
 		                        ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
 		if (this.useIntrinsicBytecode())
@@ -1030,7 +1030,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 	}
 
-	protected void writeArguments(MethodWriter writer, IValue receiver, IArguments arguments) throws BytecodeException
+	protected void writeArguments(MethodWriter writer, IValue receiver, ArgumentList arguments) throws BytecodeException
 	{
 		if (receiver != null && !receiver.isIgnoredClassAccess() && this.hasModifier(Modifiers.INFIX))
 		{
@@ -1041,7 +1041,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		arguments.writeValues(writer, this.parameters, 0);
 	}
 
-	private void writeArgumentsAndInvoke(MethodWriter writer, IValue instance, IArguments arguments,
+	private void writeArgumentsAndInvoke(MethodWriter writer, IValue instance, ArgumentList arguments,
 		                                    ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
 		this.writeReceiver(writer, instance);
@@ -1050,7 +1050,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void writeInvoke(MethodWriter writer, IValue receiver, IArguments arguments, ITypeContext typeContext,
+	public void writeInvoke(MethodWriter writer, IValue receiver, ArgumentList arguments, ITypeContext typeContext,
 		                       int lineNumber) throws BytecodeException
 	{
 		if (this.typeParameters != null)

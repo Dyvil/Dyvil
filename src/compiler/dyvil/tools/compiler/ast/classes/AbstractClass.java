@@ -571,11 +571,11 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public IType resolveType(ITypeParameter typeVar, IType concrete)
+	public IType resolveType(ITypeParameter typeParameter, IType concrete)
 	{
 		if (this.superType != null)
 		{
-			IType type = this.superType.resolveType(typeVar);
+			final IType type = this.superType.resolveType(typeParameter);
 			if (type != null)
 			{
 				return type.getConcreteType(concrete);
@@ -583,8 +583,9 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		}
 		if (this.interfaces != null)
 		{
-			for (IType type : this.interfaces)
+			for (IType interfaceType : this.interfaces)
 			{
+				final IType type = interfaceType.resolveType(typeParameter);
 				if (type != null)
 				{
 					return type.getConcreteType(concrete);
@@ -695,7 +696,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
 		for (int i = 0, count = this.parameters.size(); i < count; i++)
 		{
@@ -746,7 +747,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
+	public void getConstructorMatches(MatchList<IConstructor> list, ArgumentList arguments)
 	{
 		if (this.body != null)
 		{

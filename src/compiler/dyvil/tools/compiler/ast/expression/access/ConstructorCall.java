@@ -11,7 +11,6 @@ import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.Candidate;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -30,7 +29,7 @@ public class ConstructorCall implements ICall
 {
 	protected ICodePosition position;
 	protected IType         type;
-	protected IArguments    arguments;
+	protected ArgumentList    arguments;
 
 	protected IConstructor constructor;
 
@@ -39,7 +38,7 @@ public class ConstructorCall implements ICall
 		this.arguments = ArgumentList.EMPTY;
 	}
 
-	public ConstructorCall(IConstructor constructor, IArguments arguments)
+	public ConstructorCall(IConstructor constructor, ArgumentList arguments)
 	{
 		this.constructor = constructor;
 		this.type = constructor.getType();
@@ -52,14 +51,14 @@ public class ConstructorCall implements ICall
 		this.arguments = ArgumentList.EMPTY;
 	}
 
-	public ConstructorCall(ICodePosition position, IType type, IArguments arguments)
+	public ConstructorCall(ICodePosition position, IType type, ArgumentList arguments)
 	{
 		this.position = position;
 		this.type = type;
 		this.arguments = arguments;
 	}
 
-	public ConstructorCall(ICodePosition position, IConstructor constructor, IArguments arguments)
+	public ConstructorCall(ICodePosition position, IConstructor constructor, ArgumentList arguments)
 	{
 		this.position = position;
 		this.constructor = constructor;
@@ -109,13 +108,13 @@ public class ConstructorCall implements ICall
 	}
 
 	@Override
-	public void setArguments(IArguments arguments)
+	public void setArguments(ArgumentList arguments)
 	{
 		this.arguments = arguments;
 	}
 
 	@Override
-	public IArguments getArguments()
+	public ArgumentList getArguments()
 	{
 		return this.arguments;
 	}
@@ -218,7 +217,7 @@ public class ConstructorCall implements ICall
 			final IValue value = this.arguments.getValue(i, null);
 			final IValue typed = TypeChecker.convertValue(value, Types.INT, ITypeContext.DEFAULT, markers, context,
 			                                              TypeChecker.markerSupplier("constructor.access.array.type"));
-			this.arguments.setValue(i, null, typed);
+			this.arguments.set(i, null, typed);
 		}
 	}
 
@@ -238,7 +237,7 @@ public class ConstructorCall implements ICall
 	}
 
 	protected static void reportResolve(MarkerList markers, MatchList<IConstructor> list, ICodePosition position,
-		                                   IType type, IArguments arguments)
+		                                   IType type, ArgumentList arguments)
 	{
 		final Marker marker;
 		if (list == null || !list.isAmbigous())
@@ -256,7 +255,7 @@ public class ConstructorCall implements ICall
 		markers.add(marker);
 	}
 
-	private static void addArgumentInfo(Marker marker, IArguments arguments)
+	private static void addArgumentInfo(Marker marker, ArgumentList arguments)
 	{
 		if (!arguments.isEmpty())
 		{

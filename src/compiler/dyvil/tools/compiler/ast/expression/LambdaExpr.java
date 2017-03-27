@@ -696,7 +696,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		return this;
 	}
 
-	private boolean checkCall(IValue receiver, IArguments arguments, IParametric parametric)
+	private boolean checkCall(IValue receiver, ArgumentList arguments, IParametric parametric)
 	{
 		final int parameterCount = this.parameters.size();
 		final IParameterList parameterList = parametric.getParameters();

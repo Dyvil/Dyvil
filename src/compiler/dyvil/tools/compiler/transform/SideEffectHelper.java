@@ -3,7 +3,7 @@ package dyvil.tools.compiler.transform;
 import dyvil.tools.compiler.ast.expression.access.FieldAccess;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Variable;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.statement.VariableStatement;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.parsing.Name;
@@ -29,20 +29,20 @@ public class SideEffectHelper
 		                                       value.getType());
 		variable.setValue(value);
 
-		this.statementList.addValue(new VariableStatement(variable));
+		this.statementList.add(new VariableStatement(variable));
 		this.statementList.addVariable(variable);
 		this.registered++;
 
 		return new FieldAccess(value.getPosition(), null, variable);
 	}
 	
-	public IArguments processArguments(IArguments arguments)
+	public ArgumentList processArguments(ArgumentList arguments)
 	{
-		final IArguments copy = arguments.copy();
+		final ArgumentList copy = arguments.copy();
 		for (int i = 0, count = arguments.size(); i < count; i++)
 		{
 			final IValue value = arguments.getValue(i, null);
-			copy.setValue(i, null, this.processValue(value));
+			copy.set(i, null, this.processValue(value));
 		}
 		return copy;
 	}
@@ -51,7 +51,7 @@ public class SideEffectHelper
 	{
 		if (this.statementList != null)
 		{
-			this.statementList.addValue(value);
+			this.statementList.add(value);
 			return this.statementList;
 		}
 		return value;

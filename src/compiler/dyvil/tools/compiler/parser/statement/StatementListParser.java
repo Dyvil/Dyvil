@@ -15,10 +15,9 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.NestedMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.statement.Closure;
-import dyvil.tools.compiler.ast.statement.VariableStatement;
 import dyvil.tools.compiler.ast.statement.MemberStatement;
 import dyvil.tools.compiler.ast.statement.StatementList;
-import dyvil.tools.compiler.ast.statement.control.Label;
+import dyvil.tools.compiler.ast.statement.VariableStatement;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.classes.MemberParser;
@@ -294,12 +293,12 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 	{
 		if (this.label != null)
 		{
-			this.statementList.addValue(value, new Label(this.label, value));
+			this.statementList.add(this.label, value);
 			this.label = null;
 		}
 		else
 		{
-			this.statementList.addValue(value);
+			this.statementList.add(value);
 		}
 	}
 

@@ -52,6 +52,6 @@ public final class ExpressionListParser extends Parser implements IValueConsumer
 	@Override
 	public void setValue(IValue value)
 	{
-		this.valueList.addValue(value);
+		this.valueList.add(value);
 	}
 }

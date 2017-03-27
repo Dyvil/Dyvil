@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.method.intrinsic;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -19,16 +19,16 @@ public interface IntrinsicData
 		return 0;
 	}
 
-	void writeIntrinsic(MethodWriter writer, IValue receiver, IArguments arguments, int lineNumber)
+	void writeIntrinsic(MethodWriter writer, IValue receiver, ArgumentList arguments, int lineNumber)
 		throws BytecodeException;
 
-	void writeIntrinsic(MethodWriter writer, Label dest, IValue receiver, IArguments arguments, int lineNumber)
+	void writeIntrinsic(MethodWriter writer, Label dest, IValue receiver, ArgumentList arguments, int lineNumber)
 		throws BytecodeException;
 
-	void writeInvIntrinsic(MethodWriter writer, Label dest, IValue receiver, IArguments arguments, int lineNumber)
+	void writeInvIntrinsic(MethodWriter writer, Label dest, IValue receiver, ArgumentList arguments, int lineNumber)
 		throws BytecodeException;
 
-	static void writeInsn(MethodWriter writer, IMethod method, int insn, IValue receiver, IArguments arguments,
+	static void writeInsn(MethodWriter writer, IMethod method, int insn, IValue receiver, ArgumentList arguments,
 		                     int lineNumber) throws BytecodeException
 	{
 		if (insn < 0)
@@ -41,7 +41,7 @@ public interface IntrinsicData
 		writer.visitInsnAtLine(insn, lineNumber);
 	}
 
-	static IType writeArgument(MethodWriter writer, IMethod method, int index, IValue receiver, IArguments arguments)
+	static IType writeArgument(MethodWriter writer, IMethod method, int index, IValue receiver, ArgumentList arguments)
 		throws BytecodeException
 	{
 		final IParameterList params = method.getParameters();

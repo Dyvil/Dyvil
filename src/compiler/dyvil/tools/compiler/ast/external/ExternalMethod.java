@@ -19,7 +19,7 @@ import dyvil.tools.compiler.ast.method.IExternalCallableMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -197,7 +197,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 
 	@Override
 	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue receiver,
-		                            IArguments arguments, GenericData genericData)
+		                            ArgumentList arguments, GenericData genericData)
 	{
 		if ((this.resolved & ANNOTATIONS) == 0)
 		{
@@ -272,7 +272,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	public void writeCall(MethodWriter writer, IValue instance, IArguments arguments, ITypeContext typeContext,
+	public void writeCall(MethodWriter writer, IValue instance, ArgumentList arguments, ITypeContext typeContext,
 		                     IType targetType, int lineNumber) throws BytecodeException
 	{
 		if ((this.resolved & ANNOTATIONS) == 0)
@@ -283,7 +283,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	public void writeJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments,
+	public void writeJump(MethodWriter writer, Label dest, IValue instance, ArgumentList arguments,
 		                     ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
 		if ((this.resolved & ANNOTATIONS) == 0)
@@ -294,7 +294,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, IArguments arguments,
+	public void writeInvJump(MethodWriter writer, Label dest, IValue instance, ArgumentList arguments,
 		                        ITypeContext typeContext, int lineNumber) throws BytecodeException
 	{
 		if ((this.resolved & ANNOTATIONS) == 0)

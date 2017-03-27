@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.intrinsic.*;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.expression.intrinsic.VarargsOperator;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -30,7 +30,7 @@ public class Intrinsics
 		}
 	}
 
-	public static IValue getOperator(int code, IValue lhs, IArguments arguments)
+	public static IValue getOperator(int code, IValue lhs, ArgumentList arguments)
 	{
 		switch (code)
 		{
@@ -62,7 +62,7 @@ public class Intrinsics
 
 	public static IntrinsicData readAnnotation(IMethod method, IAnnotation annotation)
 	{
-		final IArguments arguments = annotation.getArguments();
+		final ArgumentList arguments = annotation.getArguments();
 		final IValue compilerCode = arguments.getValue(2, LazyFields.COMPILER_CODE);
 		if (compilerCode != null && compilerCode.valueTag() == IValue.INT)
 		{
@@ -75,36 +75,37 @@ public class Intrinsics
 			return null;
 		}
 
-		ArrayExpr values = (ArrayExpr) value;
+		final ArrayExpr valueArray = (ArrayExpr) value;
+		final ArgumentList values = valueArray.getValues();
 
-		int length = values.valueCount();
+		final int size = values.size();
 		int insnCount = 0;
 
-		int[] ints = new int[length];
+		int[] ints = new int[size];
 
-		for (int i = 0; i < length; i++)
+		for (int i = 0; i < size; i++)
 		{
-			int opcode = values.getValue(i).intValue();
+			int opcode = values.get(i).intValue();
 			ints[i] = opcode;
 
 			insnCount++;
 
 			if (Opcodes.isFieldOrMethodOpcode(opcode))
 			{
-				ints[i + 1] = values.getValue(i + 1).intValue();
-				ints[i + 2] = values.getValue(i + 2).intValue();
-				ints[i + 3] = values.getValue(i + 3).intValue();
+				ints[i + 1] = values.get(i + 1).intValue();
+				ints[i + 2] = values.get(i + 2).intValue();
+				ints[i + 3] = values.get(i + 3).intValue();
 				i += 3;
 			}
 			else if (Opcodes.isJumpOpcode(opcode) || Opcodes.isLoadOpcode(opcode) || Opcodes.isStoreOpcode(opcode)
 				         || opcode == Opcodes.LDC || opcode == Opcodes.BIPUSH || opcode == Opcodes.SIPUSH)
 			{
-				ints[i + 1] = values.getValue(i + 1).intValue();
+				ints[i + 1] = values.get(i + 1).intValue();
 				i += 1;
 			}
 		}
 
-		if (length > insnCount)
+		if (size > insnCount)
 		{
 			IValue stringValue = arguments.getValue(1, LazyFields.STRINGS);
 			ArrayExpr strings = (ArrayExpr) stringValue;
@@ -121,13 +122,14 @@ public class Intrinsics
 
 		if (stringArray != null)
 		{
+			final ArgumentList values = stringArray.getValues();
 			// Convert string constants to an array
-			final int stringCount = stringArray.valueCount();
+			final int stringCount = values.size();
 
 			strings = new String[stringCount];
 			for (int i = 0; i < stringCount; i++)
 			{
-				strings[i] = stringArray.getValue(i).stringValue();
+				strings[i] = values.get(i).stringValue();
 			}
 		}
 		else

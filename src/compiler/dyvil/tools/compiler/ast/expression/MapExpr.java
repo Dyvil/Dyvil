@@ -1,12 +1,13 @@
 package dyvil.tools.compiler.ast.expression;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.collection.mutable.HashSet;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.context.IImplicitContext;
-import dyvil.tools.compiler.ast.expression.access.ClassAccess;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
+import dyvil.tools.compiler.ast.expression.access.ClassAccess;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
@@ -38,10 +39,8 @@ public class MapExpr implements IValue
 
 	protected ICodePosition position;
 
-	protected IValue[] keys;
-	protected IValue[] values;
-
-	protected int count;
+	protected @NonNull ArgumentList keys;
+	protected @NonNull ArgumentList values;
 
 	// Metadata
 	private IType type;
@@ -53,12 +52,11 @@ public class MapExpr implements IValue
 		this.position = position;
 	}
 
-	public MapExpr(ICodePosition position, IValue[] keys, IValue[] values, int count)
+	public MapExpr(ICodePosition position, ArgumentList keys, ArgumentList values)
 	{
 		this.position = position;
 		this.keys = keys;
 		this.values = values;
-		this.count = count;
 	}
 
 	@Override
@@ -85,7 +83,7 @@ public class MapExpr implements IValue
 		{
 			return this.keyType;
 		}
-		return this.keyType = ArrayExpr.getCommonType(this.keys, this.count);
+		return this.keyType = this.keys.getCommonType();
 	}
 
 	public IType getValueType()
@@ -94,7 +92,7 @@ public class MapExpr implements IValue
 		{
 			return this.valueType;
 		}
-		return this.valueType = ArrayExpr.getCommonType(this.values, this.count);
+		return this.valueType = this.values.getCommonType();
 	}
 
 	@Override
@@ -108,24 +106,14 @@ public class MapExpr implements IValue
 		{
 			return this.keyType.isResolved() && this.valueType.isResolved();
 		}
-		for (int i = 0; i < this.count; i++)
-		{
-			if (!this.keys[i].isResolved())
-			{
-				return false;
-			}
-			if (!this.values[i].isResolved())
-			{
-				return false;
-			}
-		}
-		return true;
+		return this.keys.isResolved() && this.values.isResolved();
 	}
 
 	@Override
 	public boolean isClassAccess()
 	{
-		return this.count == 1 && this.keys[0].isClassAccess() && this.values[0].isClassAccess();
+		return this.keys.size() == 1 && this.keys.getFirstValue().isClassAccess() && this.values.getFirstValue()
+		                                                                                        .isClassAccess();
 	}
 
 	@Override
@@ -135,7 +123,8 @@ public class MapExpr implements IValue
 		{
 			return IValue.super.asIgnoredClassAccess();
 		}
-		return new ClassAccess(this.position, MapType.base(this.keys[0].getType(), this.values[0].getType()))
+		return new ClassAccess(this.position,
+		                       MapType.base(this.keys.getFirstValue().getType(), this.values.getFirstValue().getType()))
 			       .asIgnoredClassAccess();
 	}
 
@@ -163,23 +152,26 @@ public class MapExpr implements IValue
 			IAnnotation annotation = type.getTheClass().getAnnotation(LazyTypes.MAP_CONVERTIBLE_CLASS);
 			if (annotation != null)
 			{
-				final ArgumentList arguments = new ArgumentList(new IValue[] { new ArrayExpr(this.keys, this.count),
-					new ArrayExpr(this.values, this.count) }, 2);
+				final ArgumentList arguments = new ArgumentList(new ArrayExpr(this.keys), new ArrayExpr(this.values));
 				return new LiteralConversion(this, annotation, arguments).withType(type, typeContext, markers, context);
 			}
 			return null;
 		}
 
+		final int size = this.keys.size();
+
 		final IType keyType = this.keyType = Types.resolveTypeSafely(type, MapType.MapTypes.KEY_VARIABLE);
 		final IType valueType = this.valueType = Types.resolveTypeSafely(type, MapType.MapTypes.VALUE_VARIABLE);
 
-		for (int i = 0; i < this.count; i++)
+		for (int i = 0; i < size; i++)
 		{
-			this.keys[i] = TypeChecker
-				               .convertValue(this.keys[i], keyType, typeContext, markers, context, KEY_MARKER_SUPPLIER);
+			final IValue key = TypeChecker.convertValue(this.keys.get(i), keyType, typeContext, markers, context,
+			                                            KEY_MARKER_SUPPLIER);
+			this.keys.set(i, key);
 
-			this.values[i] = TypeChecker.convertValue(this.values[i], valueType, typeContext, markers, context,
-			                                          VALUE_MARKER_SUPPLIER);
+			final IValue value = TypeChecker.convertValue(this.values.get(i), valueType, typeContext, markers, context,
+			                                              VALUE_MARKER_SUPPLIER);
+			this.values.set(i, value);
 		}
 
 		return this;
@@ -196,19 +188,7 @@ public class MapExpr implements IValue
 		IType keyType = Types.resolveTypeSafely(type, MapType.MapTypes.KEY_VARIABLE);
 		IType valueType = Types.resolveTypeSafely(type, MapType.MapTypes.VALUE_VARIABLE);
 
-		for (int i = 0; i < this.count; i++)
-		{
-			if (!this.keys[i].isType(keyType))
-			{
-				return false;
-			}
-			if (!this.values[i].isType(valueType))
-			{
-				return false;
-			}
-		}
-
-		return true;
+		return this.keys.isType(keyType) && this.values.isType(valueType);
 	}
 
 	private boolean isConvertibleFrom(IType type)
@@ -221,124 +201,96 @@ public class MapExpr implements IValue
 	{
 		if (!MapType.MapTypes.MAP_CLASS.isSubClassOf(type))
 		{
-			return this.isConvertibleFrom(type) ? CONVERSION_MATCH : 0;
+			return this.isConvertibleFrom(type) ? CONVERSION_MATCH : MISMATCH;
 		}
 
-		if (this.count == 0)
+		if (this.keys.isEmpty())
 		{
 			return EXACT_MATCH;
 		}
 
 		final IType keyType = Types.resolveTypeSafely(type, MapType.MapTypes.KEY_VARIABLE);
-		final IType valueType = Types.resolveTypeSafely(type, MapType.MapTypes.VALUE_VARIABLE);
-
-		int min = EXACT_MATCH;
-		for (int i = 0; i < this.count; i++)
+		final int keyMatch = this.keys.getTypeMatch(keyType, implicitContext);
+		if (keyMatch == MISMATCH)
 		{
-			int match = TypeChecker.getTypeMatch(this.keys[i], keyType, implicitContext);
-			if (match == MISMATCH)
-			{
-				return MISMATCH;
-			}
-			if (match < min)
-			{
-				min = match;
-			}
-
-			match = TypeChecker.getTypeMatch(this.values[i], valueType, implicitContext);
-			if (match == MISMATCH)
-			{
-				return MISMATCH;
-			}
-			if (match < min)
-			{
-				min = match;
-			}
+			return MISMATCH;
 		}
 
-		return min;
+		final IType valueType = Types.resolveTypeSafely(type, MapType.MapTypes.VALUE_VARIABLE);
+		final int valueMatch = this.values.getTypeMatch(valueType, implicitContext);
+		return Math.min(keyMatch, valueMatch);
 	}
 
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.count; i++)
-		{
-			this.keys[i].resolveTypes(markers, context);
-			this.values[i].resolveTypes(markers, context);
-		}
+		this.keys.resolveTypes(markers, context);
+		this.values.resolveTypes(markers, context);
 	}
 
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.count; i++)
-		{
-			this.keys[i] = this.keys[i].resolve(markers, context);
-			this.values[i] = this.values[i].resolve(markers, context);
-		}
+		this.keys.resolve(markers, context);
+		this.values.resolve(markers, context);
 		return this;
 	}
 
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.count; i++)
-		{
-			this.keys[i].checkTypes(markers, context);
-			this.values[i].checkTypes(markers, context);
-		}
+		this.keys.checkTypes(markers, context);
+		this.values.checkTypes(markers, context);
 	}
 
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
+		this.keys.check(markers, context);
+		this.values.check(markers, context);
+
 		final HashSet<Object> keys = new HashSet<>();
 
-		for (int i = 0; i < this.count; i++)
+		for (IValue key : this.keys)
 		{
-			final IValue key = this.keys[i];
 			key.check(markers, context);
 
-			if (key.isConstantOrField())
+			if (!key.isConstantOrField())
 			{
-				final Object value = key.toObject();
-				if (value != null && !keys.add(value))
-				{
-					markers.add(Markers.semantic(key.getPosition(), "map.key.duplicate", value));
-				}
+				continue;
 			}
 
-			this.values[i].check(markers, context);
+			final Object value = key.toObject();
+			if (value == null || keys.add(value))
+			{
+				continue;
+			}
+
+			markers.add(Markers.semantic(key.getPosition(), "map.key.duplicate", value));
 		}
 	}
 
 	@Override
 	public IValue foldConstants()
 	{
-		for (int i = 0; i < this.count; i++)
-		{
-			this.keys[i] = this.keys[i].foldConstants();
-			this.values[i] = this.values[i].foldConstants();
-		}
+		this.keys.foldConstants();
+		this.values.foldConstants();
 		return this;
 	}
 
 	@Override
 	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		for (int i = 0; i < this.count; i++)
-		{
-			this.keys[i] = this.keys[i].cleanup(compilableList, classCompilableList);
-			this.values[i] = this.values[i].cleanup(compilableList, classCompilableList);
-		}
+		this.keys.cleanup(compilableList, classCompilableList);
+		this.values.cleanup(compilableList, classCompilableList);
 		return this;
 	}
 
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		if (this.count == 0)
+		final int size = this.keys.size();
+		if (size == 0)
 		{
 			writer.visitFieldInsn(Opcodes.GETSTATIC, "dyvil/collection/immutable/EmptyMap", "instance",
 			                      "Ldyvil/collection/immutable/EmptyMap;");
@@ -347,30 +299,33 @@ public class MapExpr implements IValue
 
 		final IType keyObject = this.keyType.getObjectType();
 		final IType valueObject = this.valueType.getObjectType();
-		final int varIndex = writer.localCount();
 
-		writer.visitLdcInsn(this.count);
-		writer.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object");
-		writer.visitVarInsn(Opcodes.ASTORE, varIndex);
-		writer.visitLdcInsn(this.count);
-		writer.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object");
-		writer.visitVarInsn(Opcodes.ASTORE, varIndex + 1);
+		// Write all keys
 
-		for (int i = 0; i < this.count; i++)
+		writer.visitLdcInsn(size);
+		writer.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object");
+
+		for (int i = 0; i < size; i++)
 		{
-			writer.visitVarInsn(Opcodes.ALOAD, varIndex);
+			writer.visitInsn(Opcodes.DUP);
 			writer.visitLdcInsn(i);
-			this.keys[i].writeExpression(writer, keyObject);
-			writer.visitInsn(Opcodes.AASTORE);
-
-			writer.visitVarInsn(Opcodes.ALOAD, varIndex + 1);
-			writer.visitLdcInsn(i);
-			this.values[i].writeExpression(writer, valueObject);
+			this.keys.get(i).writeExpression(writer, keyObject);
 			writer.visitInsn(Opcodes.AASTORE);
 		}
 
-		writer.visitVarInsn(Opcodes.ALOAD, varIndex);
-		writer.visitVarInsn(Opcodes.ALOAD, varIndex + 1);
+		// Write all values
+
+		writer.visitLdcInsn(size);
+		writer.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object");
+
+		for (int i = 0; i < size; i++)
+		{
+			writer.visitInsn(Opcodes.DUP);
+			writer.visitLdcInsn(i);
+			this.values.get(i).writeExpression(writer, valueObject);
+			writer.visitInsn(Opcodes.AASTORE);
+		}
+
 		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/collection/ImmutableMap", "apply",
 		                       "([Ljava/lang/Object;[Ljava/lang/Object;)Ldyvil/collection/ImmutableMap;", true);
 
@@ -381,39 +336,36 @@ public class MapExpr implements IValue
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		if (this.count <= 0)
+		final int size = this.keys.size();
+		if (size == 0)
 		{
-			if (Formatting.getBoolean("map.empty.space_between"))
-			{
-				buffer.append("[ ]");
-			}
-			else
-			{
-				buffer.append("[]");
-			}
+			buffer.append("[:]");
 			return;
 		}
 
-		String mapPrefix = Formatting.getIndent("map.entry_separator.indent", prefix);
+		final String newIndent = Formatting.getIndent("map.entry_separator.indent", indent);
+		final String keyValueSeparator = Formatting.getSeparator("map.key_value_separator", ':');
+		final String entrySeparator = Formatting.getSeparator("map.entry_separator", ',');
+
 		buffer.append('[');
 		if (Formatting.getBoolean("map.open_paren.space_after"))
 		{
 			buffer.append(' ');
 		}
 
-		this.keys[0].toString(mapPrefix, buffer);
-		Formatting.appendSeparator(buffer, "map.key_value_separator", ':');
-		this.values[0].toString(mapPrefix, buffer);
+		this.keys.getFirstValue().toString(newIndent, buffer);
+		buffer.append(keyValueSeparator);
+		this.values.getFirstValue().toString(newIndent, buffer);
 
-		for (int i = 1; i < this.count; i++)
+		for (int i = 1; i < size; i++)
 		{
-			Formatting.appendSeparator(buffer, "map.entry_separator", ',');
+			buffer.append(entrySeparator);
 
-			this.keys[i].toString(mapPrefix, buffer);
-			Formatting.appendSeparator(buffer, "map.key_value_separator", ':');
-			this.values[i].toString(mapPrefix, buffer);
+			this.keys.get(i).toString(newIndent, buffer);
+			buffer.append(keyValueSeparator);
+			this.values.get(i).toString(newIndent, buffer);
 		}
 
 		if (Formatting.getBoolean("map.close_paren.space_before"))

@@ -16,7 +16,6 @@ import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -105,7 +104,7 @@ public final class CaseClassMetadata extends ClassMetadata
 
 			for (int i = 0, count = parameterList.size(); i < count; i++)
 			{
-				arguments.addValue(new FieldAccess(parameterList.get(i)));
+				arguments.add(new FieldAccess(parameterList.get(i)));
 			}
 
 			this.applyMethod.setValue(new ConstructorCall(this.constructor, arguments));
@@ -119,7 +118,7 @@ public final class CaseClassMetadata extends ClassMetadata
 	}
 
 	@Override
-	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
 		if (name == Names.apply && this.applyMethod != null)
 		{

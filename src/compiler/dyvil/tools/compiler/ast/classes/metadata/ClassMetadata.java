@@ -15,7 +15,7 @@ import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.IParametric;
@@ -148,7 +148,7 @@ public class ClassMetadata implements IClassMetadata
 	@Override
 	public void resolveTypesHeader(MarkerList markers, IContext context)
 	{
-		final IArguments superConstructorArguments = this.theClass.getSuperConstructorArguments();
+		final ArgumentList superConstructorArguments = this.theClass.getSuperConstructorArguments();
 		if (superConstructorArguments != null)
 		{
 			superConstructorArguments.resolveTypes(markers, context);
@@ -248,7 +248,7 @@ public class ClassMetadata implements IClassMetadata
 
 			for (int i = 0, count = parameters.size(); i < count; i++)
 			{
-				constructorBody.addValue(new ClassParameterSetter(this.theClass, parameters.get(i)));
+				constructorBody.add(new ClassParameterSetter(this.theClass, parameters.get(i)));
 			}
 
 			this.constructor.setValue(constructorBody);
@@ -292,7 +292,7 @@ public class ClassMetadata implements IClassMetadata
 	}
 
 	@Override
-	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
+	public void getConstructorMatches(MatchList<IConstructor> list, ArgumentList arguments)
 	{
 		if ((this.members & CONSTRUCTOR) != 0)
 		{

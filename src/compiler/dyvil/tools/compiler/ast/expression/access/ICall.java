@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.parameter.CodeParameter;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
@@ -32,9 +32,9 @@ public interface ICall extends IValue, IArgumentsConsumer
 	}
 
 	@Override
-	void setArguments(IArguments arguments);
+	void setArguments(ArgumentList arguments);
 
-	IArguments getArguments();
+	ArgumentList getArguments();
 
 	@Override
 	default boolean isUsableAsStatement()
@@ -111,13 +111,13 @@ public interface ICall extends IValue, IArgumentsConsumer
 			this.setReceiver(convertWildcardValue(receiver, parameters[index++]));
 		}
 
-		IArguments arguments = this.getArguments();
+		ArgumentList arguments = this.getArguments();
 		for (int i = 0, size = arguments.size(); i < size; i++)
 		{
 			final IValue argument = arguments.getValue(i, null);
 			if (argument.isPartialWildcard())
 			{
-				arguments.setValue(i, null, convertWildcardValue(argument, parameters[index++]));
+				arguments.set(i, null, convertWildcardValue(argument, parameters[index++]));
 			}
 		}
 
@@ -174,12 +174,12 @@ public interface ICall extends IValue, IArgumentsConsumer
 		return Types.BASE_CONTEXT.resolveField(name);
 	}
 
-	static IMethod resolveMethod(IContext context, IValue receiver, Name name, IArguments arguments)
+	static IMethod resolveMethod(IContext context, IValue receiver, Name name, ArgumentList arguments)
 	{
 		return resolveMethods(context, receiver, name, arguments).getBestMember();
 	}
 
-	static MatchList<IMethod> resolveMethods(IContext context, IValue receiver, Name name, IArguments arguments)
+	static MatchList<IMethod> resolveMethods(IContext context, IValue receiver, Name name, ArgumentList arguments)
 	{
 		@SuppressWarnings("UnnecessaryLocalVariable") final IImplicitContext implicitContext = context;
 

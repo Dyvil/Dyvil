@@ -18,7 +18,7 @@ import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
@@ -395,13 +395,13 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	IDataMember resolveField(Name name);
 
 	@Override
-	void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments);
+	void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments);
 
 	@Override
 	void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType);
 
 	@Override
-	void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments);
+	void getConstructorMatches(MatchList<IConstructor> list, ArgumentList arguments);
 
 	IMethod getFunctionalMethod();
 

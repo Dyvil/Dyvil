@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -16,12 +16,12 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public class MethodAssignment extends MethodCall
 {
-	public MethodAssignment(ICodePosition position, IValue receiver, IMethod method, IArguments argument)
+	public MethodAssignment(ICodePosition position, IValue receiver, IMethod method, ArgumentList argument)
 	{
 		super(position, receiver, method, argument);
 	}
 
-	public MethodAssignment(ICodePosition position, IValue receiver, Name name, IArguments argument)
+	public MethodAssignment(ICodePosition position, IValue receiver, Name name, ArgumentList argument)
 	{
 		super(position, receiver, name, argument);
 	}

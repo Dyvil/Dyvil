@@ -258,7 +258,7 @@ public class CompleteCommand implements ICommand
 	private static void findInstanceMembers(IType type, Set<IField> fields, Set<IProperty> properties, Set<IMethod> methods, String start, Set<IClass> dejaVu)
 	{
 		final IClass iclass = type.getTheClass();
-		if (dejaVu.contains(iclass))
+		if (iclass == null || dejaVu.contains(iclass))
 		{
 			return;
 		}
@@ -268,7 +268,6 @@ public class CompleteCommand implements ICommand
 		final IParameterList parameterList = iclass.getParameters();
 		for (int i = 0, count = parameterList.size(); i < count; i++)
 		{
-			// TODO IClassParameter interface
 			checkMember(fields, (IField) parameterList.get(i), start, false);
 		}
 

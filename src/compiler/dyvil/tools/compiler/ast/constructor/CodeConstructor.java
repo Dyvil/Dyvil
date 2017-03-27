@@ -149,13 +149,13 @@ public class CodeConstructor extends AbstractConstructor
 		if (this.value.valueTag() == IValue.STATEMENT_LIST)
 		{
 			final StatementList statementList = (StatementList) this.value;
-			if (statementList.valueCount() > 0)
+			if (statementList.size() > 0)
 			{
-				final IValue firstValue = statementList.getValue(0);
+				final IValue firstValue = statementList.get(0);
 				if (firstValue.valueTag() == IValue.INITIALIZER_CALL)
 				{
 					// We can't simply remove the value from the Statement List, so we replace it with a void statement
-					statementList.setValue(0, new VoidValue(firstValue.getPosition()));
+					statementList.set(0, new VoidValue(firstValue.getPosition()));
 
 					this.initializerCall = (InitializerCall) firstValue;
 					return;

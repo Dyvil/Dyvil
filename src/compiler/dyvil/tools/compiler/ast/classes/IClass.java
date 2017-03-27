@@ -16,7 +16,7 @@ import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParametric;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.TypeList;
@@ -95,12 +95,12 @@ public interface IClass extends IClassMember, IParametric, ITypeParametricMember
 
 	boolean isSubClassOf(IType type);
 
-	default IArguments getSuperConstructorArguments()
+	default ArgumentList getSuperConstructorArguments()
 	{
 		return null;
 	}
 
-	default void setSuperConstructorArguments(IArguments arguments)
+	default void setSuperConstructorArguments(ArgumentList arguments)
 	{
 	}
 

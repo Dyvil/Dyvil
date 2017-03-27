@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.NullableType;
@@ -31,7 +31,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 	protected ICodePosition position;
 
 	protected IValue receiver;
-	protected IArguments arguments;
+	protected ArgumentList arguments;
 	protected GenericData genericData;
 
 	// Metadata
@@ -65,13 +65,13 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 	public abstract Name getName();
 
 	@Override
-	public void setArguments(IArguments arguments)
+	public void setArguments(ArgumentList arguments)
 	{
 		this.arguments = arguments;
 	}
 
 	@Override
-	public IArguments getArguments()
+	public ArgumentList getArguments()
 	{
 		return this.arguments;
 	}

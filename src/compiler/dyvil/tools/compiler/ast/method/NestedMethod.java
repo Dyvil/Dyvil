@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -128,7 +128,7 @@ public class NestedMethod extends CodeMethod
 	}
 
 	@Override
-	protected void writeArguments(MethodWriter writer, IValue receiver, IArguments arguments) throws BytecodeException
+	protected void writeArguments(MethodWriter writer, IValue receiver, ArgumentList arguments) throws BytecodeException
 	{
 		super.writeArguments(writer, receiver, arguments);
 		this.captureHelper.writeCaptures(writer);

@@ -118,13 +118,14 @@ public interface IParameter extends IVariable, IClassMember
 				                                            .visitParameterAnnotation(index, DEFAULT_ARRAY_VALUE, false)
 				                                            .visitArray("value");
 
-			ArrayExpr arrayExpr = (ArrayExpr) defaultValue;
-			int count = arrayExpr.valueCount();
-			IType elementType = arrayType.getElementType();
+			final ArrayExpr arrayExpr = (ArrayExpr) defaultValue;
+			final ArgumentList values = arrayExpr.getValues();
+			final int size = values.size();
+			final IType elementType = arrayType.getElementType();
 
-			for (int i = 0; i < count; i++)
+			for (int i = 0; i < size; i++)
 			{
-				writeDefaultAnnotation(annotationVisitor, elementType, arrayExpr.getValue(i));
+				writeDefaultAnnotation(annotationVisitor, elementType, values.get(i));
 			}
 
 			annotationVisitor.visitEnd();

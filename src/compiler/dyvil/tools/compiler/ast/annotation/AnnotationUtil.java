@@ -6,7 +6,7 @@ import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.expression.access.FieldAccess;
 import dyvil.tools.compiler.ast.expression.constant.EnumValue;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -61,7 +61,7 @@ public final class AnnotationUtil
 		annotation.visitEnd();
 	}
 
-	public static <T extends Enum<T>> T getEnumValue(IArguments arguments, IParameter parameter, Class<T> type)
+	public static <T extends Enum<T>> T getEnumValue(ArgumentList arguments, IParameter parameter, Class<T> type)
 	{
 		IValue value = arguments.getValue(parameter.getIndex(), parameter);
 		if (value == null)
@@ -83,7 +83,7 @@ public final class AnnotationUtil
 		return null;
 	}
 
-	public static String getStringValue(IArguments arguments, IParameter parameter)
+	public static String getStringValue(ArgumentList arguments, IParameter parameter)
 	{
 		IValue value = arguments.getValue(parameter.getIndex(), parameter);
 		if (value == null)

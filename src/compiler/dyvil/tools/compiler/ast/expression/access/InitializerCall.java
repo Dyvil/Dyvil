@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -23,7 +23,7 @@ public class InitializerCall implements ICall
 	protected ICodePosition position;
 
 	protected boolean isSuper;
-	protected IArguments arguments;
+	protected ArgumentList arguments;
 
 	// Metadata
 	protected IType        targetType;
@@ -36,7 +36,7 @@ public class InitializerCall implements ICall
 		this.arguments = ArgumentList.EMPTY;
 	}
 
-	public InitializerCall(ICodePosition position, boolean isSuper, IArguments arguments, IType targetType)
+	public InitializerCall(ICodePosition position, boolean isSuper, ArgumentList arguments, IType targetType)
 	{
 		this.position = position;
 		this.isSuper = isSuper;
@@ -44,7 +44,7 @@ public class InitializerCall implements ICall
 		this.targetType = targetType;
 	}
 
-	public InitializerCall(ICodePosition position, boolean isSuper, IArguments arguments, IType targetType, IConstructor constructor)
+	public InitializerCall(ICodePosition position, boolean isSuper, ArgumentList arguments, IType targetType, IConstructor constructor)
 	{
 		this.position = position;
 		this.constructor = constructor;
@@ -72,13 +72,13 @@ public class InitializerCall implements ICall
 	}
 
 	@Override
-	public IArguments getArguments()
+	public ArgumentList getArguments()
 	{
 		return this.arguments;
 	}
 
 	@Override
-	public void setArguments(IArguments arguments)
+	public void setArguments(ArgumentList arguments)
 	{
 		this.arguments = arguments;
 	}

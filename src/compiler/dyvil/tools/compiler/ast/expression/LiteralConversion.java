@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.ImplicitNullableType;
@@ -36,7 +36,7 @@ public class LiteralConversion extends AbstractCall
 		this(literal, annotation, new ArgumentList(literal));
 	}
 
-	public LiteralConversion(IValue literal, IAnnotation annotation, IArguments arguments)
+	public LiteralConversion(IValue literal, IAnnotation annotation, ArgumentList arguments)
 	{
 		this.position = literal.getPosition();
 		this.literal = literal;
@@ -49,7 +49,7 @@ public class LiteralConversion extends AbstractCall
 		this(literal, method, new ArgumentList(literal));
 	}
 
-	public LiteralConversion(IValue literal, IMethod method, IArguments arguments)
+	public LiteralConversion(IValue literal, IMethod method, ArgumentList arguments)
 	{
 		this.position = literal.getPosition();
 		this.literal = literal;

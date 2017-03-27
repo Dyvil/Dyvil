@@ -52,7 +52,7 @@ public final class Annotation implements IAnnotation
 	public static final CodeParameter VALUE = new CodeParameter(Name.fromRaw("value"));
 
 	protected ICodePosition position;
-	protected IArguments arguments = ArgumentList.EMPTY;
+	protected ArgumentList arguments = ArgumentList.EMPTY;
 
 	// Metadata
 	protected IType type;
@@ -102,13 +102,13 @@ public final class Annotation implements IAnnotation
 	}
 
 	@Override
-	public IArguments getArguments()
+	public ArgumentList getArguments()
 	{
 		return this.arguments;
 	}
 
 	@Override
-	public void setArguments(IArguments arguments)
+	public void setArguments(ArgumentList arguments)
 	{
 		this.arguments = arguments;
 	}
@@ -168,7 +168,7 @@ public final class Annotation implements IAnnotation
 			typedValue = IValue.toAnnotationConstant(typedValue, markers, context);
 			if (typedValue != value)
 			{
-				this.arguments.setValue(i, parameter, typedValue);
+				this.arguments.set(i, parameter, typedValue);
 			}
 		}
 	}

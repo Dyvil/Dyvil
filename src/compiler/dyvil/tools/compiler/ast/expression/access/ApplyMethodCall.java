@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.expression.access;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.statement.Closure;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.transform.SideEffectHelper;
@@ -24,14 +24,14 @@ public class ApplyMethodCall extends AbstractCall
 		this.receiver = receiver;
 	}
 
-	public ApplyMethodCall(ICodePosition position, IValue instance, IArguments arguments)
+	public ApplyMethodCall(ICodePosition position, IValue instance, ArgumentList arguments)
 	{
 		this.position = position;
 		this.receiver = instance;
 		this.arguments = arguments;
 	}
 
-	public ApplyMethodCall(ICodePosition position, IValue instance, IMethod method, IArguments arguments)
+	public ApplyMethodCall(ICodePosition position, IValue instance, IMethod method, ArgumentList arguments)
 	{
 		this.position = position;
 		this.receiver = instance;
@@ -72,7 +72,7 @@ public class ApplyMethodCall extends AbstractCall
 		// -> x.update(y..., x.apply(y...).op(z))
 
 		final IValue applyReceiver = helper.processValue(this.receiver);
-		final IArguments applyArguments = helper.processArguments(this.arguments);
+		final ArgumentList applyArguments = helper.processArguments(this.arguments);
 
 		this.arguments = applyArguments;
 		this.receiver = applyReceiver;
@@ -96,7 +96,7 @@ public class ApplyMethodCall extends AbstractCall
 			{
 				argument = argument.resolve(markers, context);
 
-				final IArguments oldArgs = call.getArguments();
+				final ArgumentList oldArgs = call.getArguments();
 				call.resolveReceiver(markers, context);
 				call.resolveArguments(markers, context);
 

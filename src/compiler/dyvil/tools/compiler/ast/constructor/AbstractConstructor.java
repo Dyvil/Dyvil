@@ -21,7 +21,7 @@ import dyvil.tools.compiler.ast.method.Candidate;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
@@ -148,7 +148,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	}
 
 	@Override
-	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
+	public void getConstructorMatches(MatchList<IConstructor> list, ArgumentList arguments)
 	{
 	}
 
@@ -189,7 +189,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	}
 
 	@Override
-	public void checkMatch(MatchList<IConstructor> list, IArguments arguments)
+	public void checkMatch(MatchList<IConstructor> list, ArgumentList arguments)
 	{
 		final int parameterCount = this.parameters.size();
 		final int argumentCount = arguments.size();
@@ -235,7 +235,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 
 	@Override
 	public IType checkArguments(MarkerList markers, ICodePosition position, IContext context, IType type,
-		                           IArguments arguments)
+		                           ArgumentList arguments)
 	{
 		final IClass theClass = this.enclosingClass;
 
@@ -290,7 +290,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	}
 
 	@Override
-	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IArguments arguments)
+	public void checkCall(MarkerList markers, ICodePosition position, IContext context, ArgumentList arguments)
 	{
 		ModifierUtil.checkVisibility(this, position, markers, context);
 
@@ -357,7 +357,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	}
 
 	@Override
-	public void writeCall(MethodWriter writer, IArguments arguments, IType type, int lineNumber)
+	public void writeCall(MethodWriter writer, ArgumentList arguments, IType type, int lineNumber)
 		throws BytecodeException
 	{
 		writer.visitTypeInsn(Opcodes.NEW, this.enclosingClass.getInternalName());
@@ -382,7 +382,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	}
 
 	@Override
-	public void writeArguments(MethodWriter writer, IArguments arguments) throws BytecodeException
+	public void writeArguments(MethodWriter writer, ArgumentList arguments) throws BytecodeException
 	{
 		for (int i = 0, count = this.parameters.size(); i < count; i++)
 		{

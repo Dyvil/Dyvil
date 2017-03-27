@@ -16,7 +16,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -310,7 +310,7 @@ public abstract class TypeParameter implements ITypeParameter
 	}
 
 	@Override
-	public void getMethodMatches(MatchList<IMethod> list, IValue instance, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue instance, Name name, ArgumentList arguments)
 	{
 		this.getSafeUpperBound().getMethodMatches(list, instance, name, arguments);
 	}

@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.consumer.IAnnotationConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.header.ICompilableList;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
@@ -127,7 +127,7 @@ public class AnnotationValue implements IValue, IAnnotationConsumer
 	{
 		final StringBuilder descBuilder = new StringBuilder().append('(');
 
-		final IArguments arguments = this.annotation.getArguments();
+		final ArgumentList arguments = this.annotation.getArguments();
 		final IClass iclass = this.annotation.getType().getTheClass();
 		final IParameterList parameterList = iclass.getParameters();
 		final int count = parameterList.size();

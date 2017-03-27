@@ -18,7 +18,6 @@ import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.statement.control.Label;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -183,7 +182,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	}
 
 	@Override
-	public int valueCount()
+	public int size()
 	{
 		return this.valueCount;
 	}
@@ -195,18 +194,18 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	}
 
 	@Override
-	public void setValue(int index, IValue value)
+	public void set(int index, IValue value)
 	{
 		this.values[index] = value;
 	}
 
 	@Override
-	public void addValue(IValue value)
+	public void add(IValue value)
 	{
-		int index = this.valueCount++;
+		final int index = this.valueCount++;
 		if (index >= this.values.length)
 		{
-			IValue[] temp = new IValue[this.valueCount];
+			final IValue[] temp = new IValue[index + 1];
 			System.arraycopy(this.values, 0, temp, 0, index);
 			this.values = temp;
 		}
@@ -214,16 +213,12 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	}
 
 	@Override
-	public void addValue(IValue value, Label label)
+	public void add(Name name, IValue value)
 	{
-		int index = this.valueCount++;
-		if (this.valueCount > this.values.length)
-		{
-			IValue[] temp = new IValue[this.valueCount];
-			System.arraycopy(this.values, 0, temp, 0, index);
-			this.values = temp;
-		}
-		this.values[index] = value;
+		final int index = this.valueCount;
+		this.add(value);
+
+		final Label label = new Label(name, value);
 
 		if (this.labels == null)
 		{
@@ -233,7 +228,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		}
 		if (index >= this.labels.length)
 		{
-			Label[] temp = new Label[index + 1];
+			final Label[] temp = new Label[index + 1];
 			System.arraycopy(this.labels, 0, temp, 0, this.labels.length);
 			this.labels = temp;
 		}
@@ -241,17 +236,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	}
 
 	@Override
-	public void addValue(int index, IValue value)
-	{
-		IValue[] temp = new IValue[++this.valueCount];
-		System.arraycopy(this.values, 0, temp, 0, index);
-		temp[index] = value;
-		System.arraycopy(this.values, index, temp, index + 1, this.valueCount - index - 1);
-		this.values = temp;
-	}
-
-	@Override
-	public IValue getValue(int index)
+	public IValue get(int index)
 	{
 		return this.values[index];
 	}
@@ -278,7 +263,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	}
 
 	@Override
-	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
 		if (this.methods == null)
 		{

@@ -12,12 +12,12 @@ import dyvil.tools.compiler.ast.expression.intrinsic.PopExpr;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.SideEffectHelper;
@@ -376,45 +376,45 @@ public interface IValue extends IASTNode, ITyped
 		}
 		else if (c == int[].class)
 		{
-			ArrayExpr valueList = new ArrayExpr(null);
-			valueList.arrayType = new ArrayType(Types.INT);
-			valueList.elementType = Types.INT;
+			final ArrayExpr valueList = new ArrayExpr();
+			final ArgumentList values = valueList.getValues();
+			valueList.setElementType(Types.INT);
 			for (int i : (int[]) o)
 			{
-				valueList.addValue(new IntValue(i));
+				values.add(new IntValue(i));
 			}
 			return valueList;
 		}
 		else if (c == long[].class)
 		{
-			ArrayExpr valueList = new ArrayExpr();
-			valueList.arrayType = new ArrayType(Types.LONG);
-			valueList.elementType = Types.LONG;
+			final ArrayExpr valueList = new ArrayExpr();
+			final ArgumentList values = valueList.getValues();
+			valueList.setElementType(Types.LONG);
 			for (long l : (long[]) o)
 			{
-				valueList.addValue(new LongValue(l));
+				values.add(new LongValue(l));
 			}
 			return valueList;
 		}
 		else if (c == float[].class)
 		{
-			ArrayExpr valueList = new ArrayExpr();
-			valueList.arrayType = new ArrayType(Types.FLOAT);
-			valueList.elementType = Types.FLOAT;
+			final ArrayExpr valueList = new ArrayExpr();
+			final ArgumentList values = valueList.getValues();
+			valueList.setElementType(Types.FLOAT);
 			for (float f : (float[]) o)
 			{
-				valueList.addValue(new FloatValue(f));
+				values.add(new FloatValue(f));
 			}
 			return valueList;
 		}
 		else if (c == double[].class)
 		{
-			ArrayExpr valueList = new ArrayExpr();
-			valueList.arrayType = new ArrayType(Types.DOUBLE);
-			valueList.elementType = Types.DOUBLE;
+			final ArrayExpr valueList = new ArrayExpr();
+			final ArgumentList values = valueList.getValues();
+			valueList.setElementType(Types.DOUBLE);
 			for (double d : (double[]) o)
 			{
-				valueList.addValue(new DoubleValue(d));
+				values.add(new DoubleValue(d));
 			}
 			return valueList;
 		}

@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.expression.constant.EnumValue;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.member.IMember;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -92,7 +92,7 @@ public final class Deprecation
 			annotation = new Annotation(DEPRECATED);
 		}
 
-		IArguments arguments = annotation.getArguments();
+		ArgumentList arguments = annotation.getArguments();
 
 		// General Description / Marker Message
 		MarkerLevel markerLevel = AnnotationUtil.getEnumValue(arguments, DEP_MARKER_TYPE_PARAM, MarkerLevel.class);
@@ -105,19 +105,23 @@ public final class Deprecation
 		String description = AnnotationUtil.getStringValue(arguments, DEP_DESCRIPTION_PARAM);
 		String since = AnnotationUtil.getStringValue(arguments, DEP_SINCE_PARAM);
 
-		value = replaceMember(member, value).replace(SINCE, since);
+		value = replaceMember(member, value);
+		if (since != null)
+		{
+			value = value.replace(SINCE, since);
+		}
 
 		Marker marker = Markers.withText(position, markerLevel, value);
 		assert marker != null;
 
 		// Description
-		if (!description.isEmpty())
+		if (description != null && !description.isEmpty())
 		{
 			marker.addInfo(Markers.getSemantic("deprecated.description", description));
 		}
 
 		// Since
-		if (!since.isEmpty())
+		if (since != null && !since.isEmpty())
 		{
 			marker.addInfo(Markers.getSemantic("deprecated.since", since));
 		}
@@ -170,7 +174,7 @@ public final class Deprecation
 
 	private static void checkExperimental(IMember member, ICodePosition position, MarkerList markers, IAnnotation annotation)
 	{
-		IArguments arguments = annotation.getArguments();
+		ArgumentList arguments = annotation.getArguments();
 
 		MarkerLevel markerLevel = AnnotationUtil.getEnumValue(arguments, EXP_MARKER_TYPE_PARAM, MarkerLevel.class);
 		if (markerLevel == null || markerLevel == MarkerLevel.IGNORE)
@@ -189,7 +193,7 @@ public final class Deprecation
 		assert marker != null;
 
 		// Description
-		if (!description.isEmpty())
+		if (description != null && !description.isEmpty())
 		{
 			marker.addInfo(Markers.getSemantic("experimental.description", description));
 		}
@@ -202,7 +206,7 @@ public final class Deprecation
 
 	private static void checkUsageInfo(IMember member, ICodePosition position, MarkerList markers, IAnnotation annotation)
 	{
-		IArguments arguments = annotation.getArguments();
+		ArgumentList arguments = annotation.getArguments();
 
 		MarkerLevel markerLevel = AnnotationUtil.getEnumValue(arguments, INF_MARKER_TYPE_PARAM, MarkerLevel.class);
 		if (markerLevel == null || markerLevel == MarkerLevel.IGNORE)
@@ -219,7 +223,7 @@ public final class Deprecation
 		assert marker != null;
 
 		// Description
-		if (!description.isEmpty())
+		if (description != null && !description.isEmpty())
 		{
 			marker.addInfo(Markers.getSemantic("experimental.description", description));
 		}
@@ -227,7 +231,7 @@ public final class Deprecation
 		markers.add(marker);
 	}
 
-	private static Reason[] getReasons(IArguments arguments)
+	private static Reason[] getReasons(ArgumentList arguments)
 	{
 		final IValue value = arguments.getValue(DEP_REASONS_PARAM.getIndex(), DEP_REASONS_PARAM);
 		if (value == null)
@@ -238,7 +242,8 @@ public final class Deprecation
 		assert value.valueTag() == IValue.ARRAY;
 
 		final ArrayExpr array = (ArrayExpr) value;
-		final int size = array.valueCount();
+		final ArgumentList values = array.getValues();
+		final int size = values.size();
 
 		if (size <= 0)
 		{
@@ -248,7 +253,7 @@ public final class Deprecation
 		final Reason[] reasons = new Reason[size];
 		for (int i = 0; i < size; i++)
 		{
-			final IValue element = array.getValue(i);
+			final IValue element = values.get(i);
 			assert element.valueTag() == IValue.ENUM_ACCESS;
 
 			final EnumValue enumValue = (EnumValue) element;
@@ -258,7 +263,7 @@ public final class Deprecation
 		return reasons;
 	}
 
-	private static String[] getReplacements(IArguments arguments)
+	private static String[] getReplacements(ArgumentList arguments)
 	{
 		IValue value = arguments.getValue(DEP_REPLACEMENTS_PARAM.getIndex(), DEP_REPLACEMENTS_PARAM);
 		if (value == null)
@@ -267,10 +272,12 @@ public final class Deprecation
 		}
 
 		assert value.valueTag() == IValue.ARRAY;
-		ArrayExpr array = (ArrayExpr) value;
-		int size = array.valueCount();
 
-		if (size <= 0)
+		final ArrayExpr array = (ArrayExpr) value;
+		final ArgumentList values = array.getValues();
+		final int size = values.size();
+
+		if (size == 0)
 		{
 			return null;
 		}
@@ -278,7 +285,7 @@ public final class Deprecation
 		String[] replacements = new String[size];
 		for (int i = 0; i < size; i++)
 		{
-			IValue element = array.getValue(i);
+			IValue element = values.get(i);
 			assert element.valueTag() == IValue.STRING;
 			replacements[i] = element.stringValue();
 		}
