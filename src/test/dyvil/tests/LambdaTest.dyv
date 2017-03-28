@@ -99,7 +99,7 @@ public class LambdaTest
 
 		testFun(compareInts(1, 2))
 
-		with<String>("A", _ =?= "A") // Explicit Type Args are required here
+		with("A", _ =?= "A")
 	}
 
 	static func curried() -> Test = test "Curried" {

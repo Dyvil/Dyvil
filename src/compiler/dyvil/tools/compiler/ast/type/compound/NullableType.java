@@ -339,7 +339,19 @@ public class NullableType implements IObjectType
 			return this;
 		}
 
-		return null;
+		final IType withAnnotation = this.type.withAnnotation(annotation);
+		if (withAnnotation == null)
+		{
+			return null;
+		}
+
+		if (withAnnotation.isPrimitive())
+		{
+			return withAnnotation;
+		}
+
+		this.type = withAnnotation;
+		return this;
 	}
 
 	@Override

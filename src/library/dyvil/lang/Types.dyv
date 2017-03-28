@@ -45,6 +45,6 @@ final class Types
 	postfix func arrayType<type T: Object>(componentType: Class<T>) -> Class<[T]>
 	{
 		let className = componentType.isArray ? "[\(componentType.getName)" : "[L\(componentType.getName);"
-		return Class.forName(className, false, componentType.getClassLoader)
+		return Class.forName(className, false, componentType.getClassLoader) as Class<[T]>
 	}
 }

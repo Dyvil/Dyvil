@@ -90,7 +90,7 @@ public class DPFTest
 		let nodeMap = new TreeMap<String, Object>
 		expandedNode.accept(new FlatMapConverter(nodeMap))
 
-		let expandedMap: Map<String, Object> = Expandable.expand(baseMap, baseMap, false)
+		let expandedMap = Expandable.expand(baseMap, baseMap, false) as Map<String, Object>
 
 		nodeMap =?= expandedMap
 	}

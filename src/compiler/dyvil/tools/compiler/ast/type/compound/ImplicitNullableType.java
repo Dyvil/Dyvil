@@ -94,22 +94,13 @@ public class ImplicitNullableType extends NullableType
 	@Override
 	public IType withAnnotation(IAnnotation annotation)
 	{
-		switch (annotation.getType().getInternalName())
+		final String internal = annotation.getType().getInternalName();
+		if (internal.equals(AnnotationUtil.NULLABLE_INTERNAL))
 		{
-		case AnnotationUtil.NOTNULL_INTERNAL:
-			return this.type;
-		case AnnotationUtil.NULLABLE_INTERNAL:
-			return new NullableType(this.type);
+			return NullableType.apply(this.type);
 		}
 
-		final IType withAnnotation = this.type.withAnnotation(annotation);
-		if (withAnnotation == null)
-		{
-			return null;
-		}
-
-		this.type = withAnnotation;
-		return this;
+		return super.withAnnotation(annotation);
 	}
 
 	@Override

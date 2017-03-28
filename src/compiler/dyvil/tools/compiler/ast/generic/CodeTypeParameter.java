@@ -14,7 +14,6 @@ import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.parameter.CodeParameter;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
@@ -73,10 +72,6 @@ public class CodeTypeParameter extends TypeParameter
 		if (this.lowerBound != null)
 		{
 			this.lowerBound = this.lowerBound.resolveType(markers, context);
-		}
-		if (this.upperBound == null)
-		{
-			this.upperBound = Types.NULLABLE_ANY;
 		}
 
 		this.upperBound = this.upperBound.resolveType(markers, context);

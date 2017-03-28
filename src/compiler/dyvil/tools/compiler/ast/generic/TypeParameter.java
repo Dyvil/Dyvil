@@ -41,8 +41,8 @@ public abstract class TypeParameter implements ITypeParameter
 
 	protected Name name;
 
-	protected IType upperBound;
-	protected IType lowerBound;
+	protected @NonNull IType upperBound = Types.NULLABLE_ANY;
+	protected @Nullable IType lowerBound;
 
 	// Metadata
 	protected int index;
@@ -202,9 +202,11 @@ public abstract class TypeParameter implements ITypeParameter
 
 	private IType getSafeUpperBound()
 	{
-		return this.safeUpperBound != null ?
-			       this.safeUpperBound :
-			       (this.safeUpperBound = this.getUpperBound().getConcreteType(this::replaceBackRefs));
+		if (this.safeUpperBound != null)
+		{
+			return this.safeUpperBound;
+		}
+		return (this.safeUpperBound = this.getUpperBound().getConcreteType(this::replaceBackRefs));
 	}
 
 	@Nullable

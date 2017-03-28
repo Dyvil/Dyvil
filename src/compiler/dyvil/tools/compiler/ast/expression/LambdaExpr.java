@@ -343,20 +343,27 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		{
 			this.returnType = valueType;
 		}
-		if ((this.flags & LAMBDA_TYPE_INFERRED) != 0)
+		if ((this.flags & LAMBDA_TYPE_INFERRED) != 0 || type.canExtract(LambdaType.class))
 		{
 			this.type = this.makeType();
 			return;
 		}
 
 		final ITypeContext tempContext = new MapTypeContext();
+		final IParameterList methodParams = this.method.getParameters();
+		final int size = Math.min(this.parameters.size(), methodParams.size());
+
+		for (int i = 0; i < size; i++)
+		{
+			final IParameter lambdaParam = this.parameters.get(i);
+			final IParameter methodParam = methodParams.get(i);
+
+			methodParam.getType().inferTypes(lambdaParam.getType(), tempContext);
+		}
 		this.method.getType().inferTypes(valueType, tempContext);
 
-		final IType concreteType = this.method.getEnclosingClass().getThisType().getConcreteType(tempContext);
-
-		type.inferTypes(concreteType, tempContext);
-
-		this.type = type.getConcreteType(tempContext);
+		final IType classType = this.method.getEnclosingClass().getThisType();
+		this.type = classType.getConcreteType(tempContext);
 	}
 
 	private void checkReturnType(MarkerList markers, IType expectedReturnType)
@@ -388,8 +395,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 				final IParameter parameter = this.parameters.get(i);
 				if (parameter.getType().isUninferred())
 				{
-					final IType type = this.method.getParameters().get(i).getType()
-					                              .atPosition(parameter.getPosition());
+					final IType type = this.method.getParameters().get(i).getType().atPosition(parameter.getPosition());
 					parameter.setType(type);
 				}
 			}
