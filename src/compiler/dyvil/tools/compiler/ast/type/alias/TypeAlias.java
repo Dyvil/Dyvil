@@ -142,12 +142,13 @@ public class TypeAlias extends Member implements ITypeAlias, IDefaultContext
 			return;
 		}
 
-		int[] matchValues = new int[size];
-		IType[] matchTypes = new IType[size];
+		final int[] matchValues = new int[size];
+		final IType[] matchTypes = new IType[size];
 		boolean invalid = false;
+
 		for (int i = 0; i < size; i++)
 		{
-			final IType bound = this.typeParameters.get(i).getCovariantType();
+			final IType bound = this.typeParameters.get(i).getUpperBound();
 			final IType argument = arguments.get(i);
 			final int match = Types.getTypeMatch(bound, argument);
 			if (match == IValue.MISMATCH)
