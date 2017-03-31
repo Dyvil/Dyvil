@@ -93,12 +93,14 @@ public interface IValue extends IASTNode, ITyped
 	int BOOLEAN_NOT       = 131;
 	int CLASS_OPERATOR    = 132;
 	int TYPE_OPERATOR     = 133;
-	int OPTIONAL_CHAIN    = 134;
-	int NULL_COALESCING   = 135;
-	int STRING_CONCAT     = 136;
-	int INC               = 137;
-	int COLON             = 138;
-	int VARARGS_EXPANSION = 139;
+	int STRING_CONCAT     = 134;
+	int INC               = 135;
+	int COLON             = 136;
+	int VARARGS_EXPANSION = 137;
+
+	int OPTIONAL_UNWRAP   = 150;
+	int OPTIONAL_CHAIN    = 151;
+	int NULL_COALESCING   = 152;
 
 	// Basic Control Statements
 	int RETURN       = 192;

@@ -6,8 +6,10 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.intrinsic.*;
+import dyvil.tools.compiler.ast.expression.optional.NullCoalescingOperator;
+import dyvil.tools.compiler.ast.expression.optional.OptionalChainOperator;
+import dyvil.tools.compiler.ast.expression.optional.OptionalUnwrapOperator;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.expression.intrinsic.VarargsOperator;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParameterList;
@@ -34,20 +36,29 @@ public class Intrinsics
 	{
 		switch (code)
 		{
+		// Boolean
 		case Intrinsic.BOOLEAN_NOT:
 			return new NotOperator(arguments.getFirstValue());
 		case Intrinsic.BOOLEAN_OR:
 			return new OrOperator(lhs, arguments.getFirstValue());
 		case Intrinsic.BOOLEAN_AND:
 			return new AndOperator(lhs, arguments.getFirstValue());
+		// Arrays
 		case Intrinsic.ARRAY_SPREAD:
 			return new VarargsOperator(lhs);
+		// Optionals
+		case Intrinsic.OPTIONAL_UNWRAP:
+			return new OptionalUnwrapOperator(lhs, false);
+		case Intrinsic.FORCE_UNWRAP:
+			return new OptionalUnwrapOperator(lhs, true);
 		case Intrinsic.OPTIONAL_CHAIN:
 			return new OptionalChainOperator(lhs);
 		case Intrinsic.NULL_COALESCING:
 			return new NullCoalescingOperator(lhs, arguments.getFirstValue());
+		// Strings
 		case Intrinsic.STRING_CONCAT:
 			return StringConcatExpr.apply(lhs, arguments.getFirstValue());
+		// Increment / Decrement
 		case Intrinsic.PRE_INCREMENT:
 			return IncOperator.apply(arguments.getFirstValue(), 1, true);
 		case Intrinsic.POST_INCREMENT:

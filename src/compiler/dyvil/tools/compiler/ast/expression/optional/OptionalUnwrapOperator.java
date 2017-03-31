@@ -1,8 +1,7 @@
-package dyvil.tools.compiler.ast.expression.intrinsic;
+package dyvil.tools.compiler.ast.expression.optional;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -13,48 +12,33 @@ import dyvil.tools.compiler.ast.type.compound.NullableType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.TypeChecker;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class OptionalChainOperator implements IValue, OptionalChainAware
+public class OptionalUnwrapOperator implements IValue
 {
 	protected IValue receiver;
 
 	// Metadata
+	protected boolean force;
 	protected ICodePosition position;
-	protected Label         elseLabel;
 
-	public OptionalChainOperator(IValue receiver)
+	public OptionalUnwrapOperator(IValue receiver)
 	{
 		this.receiver = receiver;
+	}
+
+	public OptionalUnwrapOperator(IValue receiver, boolean force)
+	{
+		this.receiver = receiver;
+		this.force = force;
 	}
 
 	@Override
 	public int valueTag()
 	{
-		return OPTIONAL_CHAIN;
-	}
-
-	@Override
-	public boolean needsOptionalElseLabel()
-	{
-		return this.elseLabel == null;
-	}
-
-	@Override
-	public Label getOptionalElseLabel()
-	{
-		return this.elseLabel;
-	}
-
-	@Override
-	public boolean setOptionalElseLabel(Label label, boolean top)
-	{
-		this.receiver.setOptionalElseLabel(label, false);
-		this.elseLabel = label;
-		return true;
+		return OPTIONAL_UNWRAP;
 	}
 
 	@Override
@@ -85,8 +69,13 @@ public class OptionalChainOperator implements IValue, OptionalChainAware
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		this.receiver = TypeChecker.convertValue(this.receiver, NullableType.apply(type), typeContext, markers, context,
-		                                         TypeChecker.markerSupplier("optional.chain.type.incompatible"));
+		                                         this.getMarkerSupplier());
 		return this;
+	}
+
+	protected TypeChecker.MarkerSupplier getMarkerSupplier()
+	{
+		return TypeChecker.markerSupplier("optional.unwrap.type.incompatible");
 	}
 
 	@Override
@@ -112,11 +101,6 @@ public class OptionalChainOperator implements IValue, OptionalChainAware
 	public void check(MarkerList markers, IContext context)
 	{
 		this.receiver.check(markers, context);
-
-		if (this.elseLabel == null)
-		{
-			markers.add(Markers.semanticError(this.position, "optional.chain.invalid"));
-		}
 	}
 
 	@Override
@@ -143,24 +127,30 @@ public class OptionalChainOperator implements IValue, OptionalChainAware
 	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		this.receiver.toString(indent, buffer);
-		buffer.append('?');
+		buffer.append('!');
+		if (this.force)
+		{
+			buffer.append('!');
+		}
+	}
+
+	@Override
+	public void writeNullCheckedExpression(MethodWriter writer, IType type) throws BytecodeException
+	{
+		this.receiver.writeExpression(writer, type == null ? null : NullableType.unapply(type));
 	}
 
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		this.receiver.writeExpression(writer, type);
-
-		if (this.elseLabel == null)
+		this.receiver.writeExpression(writer, type == null ? null : NullableType.unapply(type));
+		if (this.force)
 		{
 			return;
 		}
 
-		final int varIndex = writer.localCount();
-
 		writer.visitInsn(Opcodes.DUP);
-		writer.visitVarInsn(Opcodes.ASTORE, varIndex);
-		writer.visitJumpInsn(Opcodes.IFNULL, this.elseLabel);
-		writer.visitVarInsn(Opcodes.ALOAD, varIndex);
+		writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false);
+		writer.visitInsn(Opcodes.POP);
 	}
 }

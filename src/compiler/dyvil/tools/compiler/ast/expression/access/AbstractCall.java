@@ -3,7 +3,7 @@ package dyvil.tools.compiler.ast.expression.access;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.intrinsic.OptionalChainAware;
+import dyvil.tools.compiler.ast.expression.optional.OptionalChainAware;
 import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;

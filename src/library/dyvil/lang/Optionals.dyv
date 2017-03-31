@@ -24,24 +24,22 @@ final class Optionals
 	 * Attempts to unwrap an optional value. If the given parameter has the value `null` at runtime, a
 	 * `NullPointerException` is thrown.
 	 */
-	@Intrinsic([ LOAD_0, DUP, INVOKESTATIC, 0, 1, 2 ]
-	  strings: [ "dyvil/lang/Optionals", "unwrapNullCheck", "(Ljava/lang/Object;)V" ])
+	@Intrinsic([], compilerCode: Intrinsic.OPTIONAL_UNWRAP)
 	postfix func ! <T>(lhs: T?) -> T = lhs!
 
 	/**
 	 * Checks if the given optional value is null and throws a NullPointerException in that case.
 	 */
-	static func unwrapNullCheck<T>(optional: T?) -> void
-	{
-		if (optional == null) throw new NullPointerException("Unwrapped Optional was null")
-	}
+	@Intrinsic([ LOAD_0, INVOKEVIRTUAL, 0, 1, 2, POP ]
+	  strings: [ "java/lang/Object", "getClass", "()Ljava/lang/Class;" ])
+	static func unwrapNullCheck<T>(optional: T?) -> void { optional!!.getClass }
 
 	/**
 	 * The Unsafe Unwrap Operator
 	 *
 	 * See `unsafeUnwrap` for details
 	 */
-	@Intrinsic([ LOAD_0 ])
+	@Intrinsic([], compilerCode: Intrinsic.FORCE_UNWRAP)
 	postfix func !! <T>(lhs: T?) -> T = unsafeUnwrap<T>(lhs)
 
 	/**
