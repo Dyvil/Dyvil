@@ -11,7 +11,6 @@ import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.ICompilableList;
-import dyvil.tools.compiler.ast.pattern.ICase;
 import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -87,7 +86,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 	}
 
 	@Override
-	public void addCase(ICase iCase)
+	public void addCase(MatchCase matchCase)
 	{
 		int index = this.caseCount++;
 		if (index >= this.cases.length)
@@ -96,7 +95,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 			System.arraycopy(this.cases, 0, temp, 0, index);
 			this.cases = temp;
 		}
-		this.cases[index] = (MatchCase) iCase; // TODO Get rid of cast
+		this.cases[index] = matchCase;
 	}
 
 	@Override

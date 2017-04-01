@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.expression;
 
+import dyvil.tools.compiler.ast.consumer.IPatternConsumer;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -7,7 +8,6 @@ import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
-import dyvil.tools.compiler.ast.pattern.ICase;
 import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -18,7 +18,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public class MatchCase implements ICase, IResolvable, IDefaultContext
+public class MatchCase implements IResolvable, IDefaultContext, IPatternConsumer
 {
 	private static final TypeChecker.MarkerSupplier CONDITION_MARKER_SUPPLIER = TypeChecker.markerSupplier(
 		"match.condition.type");
@@ -27,7 +27,6 @@ public class MatchCase implements ICase, IResolvable, IDefaultContext
 	protected IValue   condition;
 	protected IValue   action;
 
-	@Override
 	public IPattern getPattern()
 	{
 		return this.pattern;
@@ -39,25 +38,21 @@ public class MatchCase implements ICase, IResolvable, IDefaultContext
 		this.pattern = pattern;
 	}
 
-	@Override
 	public IValue getCondition()
 	{
 		return this.condition;
 	}
 
-	@Override
 	public void setCondition(IValue condition)
 	{
 		this.condition = condition;
 	}
 
-	@Override
 	public IValue getAction()
 	{
 		return this.action;
 	}
 
-	@Override
 	public void setAction(IValue action)
 	{
 		this.action = action;
