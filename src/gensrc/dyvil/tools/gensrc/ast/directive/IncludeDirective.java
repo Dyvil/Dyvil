@@ -17,7 +17,7 @@ import java.nio.file.Files;
 public class IncludeDirective implements Directive
 {
 	private final ICodePosition position;
-	private final String files;
+	private final String        files;
 
 	public IncludeDirective(ICodePosition position, String files)
 	{
@@ -33,28 +33,43 @@ public class IncludeDirective implements Directive
 
 		for (String fileName : fileNames)
 		{
-			final File file = Specialization.resolveSpecFile(gensrc, fileName, sourceFile);
+			this.resolveAndInclude(gensrc, markers, output, sourceFile, fileName);
+		}
+	}
 
-			if (!file.exists())
+	protected void resolveAndInclude(GenSrc gensrc, MarkerList markers, PrintStream output, File sourceFile,
+		                                String fileName)
+	{
+		File file = null;
+		for (File resolved : Specialization.resolveSpecFiles(fileName, sourceFile, gensrc))
+		{
+			if (file != null && !resolved.isDirectory() && !file.isDirectory())
 			{
-				markers.add(new SemanticError(this.position, I18n.get("include.file.not_found", file)));
-				continue;
+				file = null; // ambigous -> cause a file not found error
+				break;
 			}
 
-			if (file.isDirectory())
-			{
-				markers.add(new SemanticError(this.position, I18n.get("include.file.directory", file)));
-				continue;
-			}
+			file = resolved;
+		}
 
-			try
-			{
-				Files.copy(file.toPath(), output);
-			}
-			catch (IOException ex)
-			{
-				ex.printStackTrace(gensrc.getErrorOutput());
-			}
+		if (file == null)
+		{
+			markers.add(new SemanticError(this.position, I18n.get("include.file.not_found", fileName)));
+			return;
+		}
+		if (file.isDirectory())
+		{
+			markers.add(new SemanticError(this.position, I18n.get("include.file.directory", file)));
+			return;
+		}
+
+		try
+		{
+			Files.copy(file.toPath(), output);
+		}
+		catch (IOException ex)
+		{
+			ex.printStackTrace(gensrc.getErrorOutput());
 		}
 	}
 
