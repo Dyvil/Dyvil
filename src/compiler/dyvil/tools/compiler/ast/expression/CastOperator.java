@@ -4,6 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -46,7 +47,25 @@ public final class CastOperator extends AbstractValue
 	{
 		return this.type.isResolved();
 	}
-	
+
+	@Override
+	public boolean isPartialWildcard()
+	{
+		return this.value.isPartialWildcard();
+	}
+
+	@Override
+	public IValue withLambdaParameter(IParameter parameter)
+	{
+		if (!this.isPartialWildcard())
+		{
+			return null;
+		}
+
+		parameter.setType(this.type);
+		return this.value.withLambdaParameter(parameter);
+	}
+
 	@Override
 	public IType getType()
 	{

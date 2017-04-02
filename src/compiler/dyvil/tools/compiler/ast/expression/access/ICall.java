@@ -45,15 +45,14 @@ public interface ICall extends IValue, IArgumentsConsumer
 	@Override
 	default IValue resolve(MarkerList markers, IContext context)
 	{
-		// Wildcard Conversion
-		int wildcards = this.wildcardCount();
+		this.resolveReceiver(markers, context);
+		this.resolveArguments(markers, context);
+
+		final int wildcards = this.wildcardCount();
 		if (wildcards > 0)
 		{
 			return this.toLambda(markers, context, wildcards);
 		}
-
-		this.resolveReceiver(markers, context);
-		this.resolveArguments(markers, context);
 
 		// Don't resolve and report an error if the receiver is not resolved
 		IValue receiver = this.getReceiver();
@@ -103,21 +102,21 @@ public interface ICall extends IValue, IArgumentsConsumer
 			                                  EmptyModifiers.INSTANCE, null);
 		}
 
-		int index = 0;
+		int parIndex = 0;
 
-		IValue receiver = this.getReceiver();
+		final IValue receiver = this.getReceiver();
 		if (receiver != null && receiver.isPartialWildcard())
 		{
-			this.setReceiver(convertWildcardValue(receiver, parameters[index++]));
+			this.setReceiver(receiver.withLambdaParameter(parameters[parIndex++]));
 		}
 
-		ArgumentList arguments = this.getArguments();
+		final ArgumentList arguments = this.getArguments();
 		for (int i = 0, size = arguments.size(); i < size; i++)
 		{
 			final IValue argument = arguments.getValue(i, null);
 			if (argument.isPartialWildcard())
 			{
-				arguments.set(i, null, convertWildcardValue(argument, parameters[index++]));
+				arguments.set(i, null, argument.withLambdaParameter(parameters[parIndex++]));
 			}
 		}
 
@@ -125,14 +124,6 @@ public interface ICall extends IValue, IArgumentsConsumer
 		lambdaExpr.setImplicitParameters(true);
 		lambdaExpr.setValue(this);
 		return lambdaExpr.resolve(markers, context);
-	}
-
-	static IValue convertWildcardValue(IValue value, IParameter parameter)
-	{
-		final ICodePosition valuePosition = value.getPosition();
-		parameter.setPosition(valuePosition);
-		value.setLambdaParameter(parameter);
-		return value;
 	}
 
 	default void resolveReceiver(MarkerList markers, IContext context)

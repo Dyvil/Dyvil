@@ -60,12 +60,12 @@ public interface IValue extends IASTNode, ITyped
 	int THIS  = 64;
 	int SUPER = 65;
 
-	int CAST_OPERATOR = 66;
-	int ISOF_OPERATOR = 67;
+	int CAST_OPERATOR      = 66;
+	int ISOF_OPERATOR      = 67;
 	// int CASE_STATEMENT   = 68;
-	int MATCH         = 69;
-	int LAMBDA        = 70;
-	// int PARTIAL_FUNCTION = 71;
+	int MATCH              = 69;
+	int LAMBDA             = 70;
+	int WILDCARD_PARAMETER = 71;
 
 	// Access and Invocation
 	int CLASS_ACCESS  = 96;
@@ -98,9 +98,9 @@ public interface IValue extends IASTNode, ITyped
 	int COLON             = 136;
 	int VARARGS_EXPANSION = 137;
 
-	int OPTIONAL_UNWRAP   = 150;
-	int OPTIONAL_CHAIN    = 151;
-	int NULL_COALESCING   = 152;
+	int OPTIONAL_UNWRAP = 150;
+	int OPTIONAL_CHAIN  = 151;
+	int NULL_COALESCING = 152;
 
 	// Basic Control Statements
 	int RETURN       = 192;
@@ -224,8 +224,9 @@ public interface IValue extends IASTNode, ITyped
 		return false;
 	}
 
-	default void setLambdaParameter(IParameter parameter)
+	default IValue withLambdaParameter(IParameter parameter)
 	{
+		return null;
 	}
 
 	default boolean checkVarargs(boolean typeCheck)
@@ -281,8 +282,8 @@ public interface IValue extends IASTNode, ITyped
 	 *
 	 * @param type
 	 * 	the type to match
-	 *
 	 * @param implicitContext
+	 *
 	 * @return the subtyping distance
 	 */
 	default int getTypeMatch(IType type, IImplicitContext implicitContext)
