@@ -75,6 +75,8 @@ sourceSets {
 	dpf {
 		java {
 			srcDir 'src/dpf'
+
+			srcDir "$buildDir/gensrc/dpf"
 		}
 
 		resources {
@@ -134,7 +136,6 @@ repositories {
 	mavenCentral()
 }
 
-
 dependencies {
 	// Runtime Dependencies (Resources)
 
@@ -170,6 +171,11 @@ dependencies {
 	testRuntime libRun, dpfRun, testRun
 	testCompile bootstrap
 }
+
+wrapper {
+	distributionType = Wrapper.DistributionType.ALL
+}
+
 // ---------------------------------------- Copy Tasks ----------------------------------------
 
 // Library
@@ -233,8 +239,9 @@ compileReplJava.source = "$buildDir/src/java/repl"
 
 // DPF
 
-task copyDPFDyvil(type: Sync) {
+task copyDPFDyvil(type: Sync, dependsOn: 'genDPF') {
 	from 'src/dpf'
+	from "$buildDir/gensrc/dpf"
 	into "$buildDir/src/dyvil/dpf"
 
 	includeEmptyDirs = false
@@ -263,6 +270,10 @@ tasks.withType(JavaCompile) {
 
 task genLibrary(type: JavaExec, dependsOn: [ 'gensrcClasses' ]) { JavaExec exec ->
 	runGenSrc exec, "$buildDir/gensrc/library/", 'src/library/', 'src/gensrc-base'
+}
+
+task genDPF(type: JavaExec, dependsOn: [ 'gensrcClasses' ]) { JavaExec exec ->
+	runGenSrc exec, "$buildDir/gensrc/dpf/", 'src/dpf/', 'src/gensrc-base'
 }
 
 /**
@@ -402,7 +413,7 @@ task buildGenSrc(type: Jar, dependsOn: 'gensrcClasses') {
  * Creates a Jar file that combines all classes from library, compiler and REPL.
  */
 task buildAll(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil', 'compilerClasses', 'replClasses',
-                                      'dpfClasses', 'gensrcClasses' ]) {
+                                      'dpfClasses', 'compileDPFDyvil', 'gensrcClasses' ]) {
 	from sourceSets.library.output
 	from sourceSets.library.resources
 	from sourceSets.compiler.output
