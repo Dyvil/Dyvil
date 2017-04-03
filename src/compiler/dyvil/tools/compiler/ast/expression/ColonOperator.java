@@ -55,9 +55,15 @@ public class ColonOperator implements IValue
 	private ICodePosition position;
 	private IType         type;
 
+	public ColonOperator(IValue left, IValue right)
+	{
+		this.left = left;
+		this.right = right;
+		this.position = ICodePosition.between(left.getPosition(), right.getPosition());
+	}
+
 	public ColonOperator(ICodePosition position, IValue left, IValue right)
 	{
-
 		this.position = position;
 		this.left = left;
 		this.right = right;

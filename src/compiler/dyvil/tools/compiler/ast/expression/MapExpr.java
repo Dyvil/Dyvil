@@ -149,13 +149,23 @@ public class MapExpr implements IValue
 	{
 		if (!Types.isSuperClass(type, MapType.MapTypes.IMMUTABLE_MAP_CLASS.getClassType()))
 		{
-			IAnnotation annotation = type.getTheClass().getAnnotation(LazyTypes.MAP_CONVERTIBLE_CLASS);
-			if (annotation != null)
+			final IAnnotation annotation = type.getTheClass().getAnnotation(LazyTypes.MAP_CONVERTIBLE_CLASS);
+			if (annotation == null)
 			{
-				final ArgumentList arguments = new ArgumentList(new ArrayExpr(this.keys), new ArrayExpr(this.values));
-				return new LiteralConversion(this, annotation, arguments).withType(type, typeContext, markers, context);
+				return null;
 			}
-			return null;
+
+			// [ x : y, ... ] -> Type(x : y, ...))
+
+			final int size = this.keys.size();
+			final ArgumentList arguments = new ArgumentList(size);
+
+			for (int i = 0; i < size; i++)
+			{
+				arguments.add(new ColonOperator(this.keys.get(i), this.values.get(i)));
+			}
+
+			return new LiteralConversion(this, annotation, arguments).withType(type, typeContext, markers, context);
 		}
 
 		final int size = this.keys.size();
@@ -253,7 +263,11 @@ public class MapExpr implements IValue
 
 		for (IValue key : this.keys)
 		{
-			key.check(markers, context);
+			if (key.hasSideEffects())
+			{
+				markers.add(Markers.semantic(key.getPosition(), "map.key.side_effects"));
+				continue;
+			}
 
 			if (!key.isConstantOrField())
 			{
@@ -299,35 +313,35 @@ public class MapExpr implements IValue
 
 		final IType keyObject = this.keyType.getObjectType();
 		final IType valueObject = this.valueType.getObjectType();
-
-		// Write all keys
+		final int varIndex = writer.localCount();
 
 		writer.visitLdcInsn(size);
 		writer.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object");
+		writer.visitVarInsn(Opcodes.ASTORE, varIndex);
+
+		writer.visitLdcInsn(size);
+		writer.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object");
+		writer.visitVarInsn(Opcodes.ASTORE, varIndex + 1);
 
 		for (int i = 0; i < size; i++)
 		{
-			writer.visitInsn(Opcodes.DUP);
+			writer.visitVarInsn(Opcodes.ALOAD, varIndex);
 			writer.visitLdcInsn(i);
 			this.keys.get(i).writeExpression(writer, keyObject);
 			writer.visitInsn(Opcodes.AASTORE);
-		}
 
-		// Write all values
-
-		writer.visitLdcInsn(size);
-		writer.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object");
-
-		for (int i = 0; i < size; i++)
-		{
-			writer.visitInsn(Opcodes.DUP);
+			writer.visitVarInsn(Opcodes.ALOAD, varIndex + 1);
 			writer.visitLdcInsn(i);
 			this.values.get(i).writeExpression(writer, valueObject);
 			writer.visitInsn(Opcodes.AASTORE);
 		}
 
+		writer.visitVarInsn(Opcodes.ALOAD, varIndex);
+		writer.visitVarInsn(Opcodes.ALOAD, varIndex + 1);
 		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/collection/ImmutableMap", "apply",
 		                       "([Ljava/lang/Object;[Ljava/lang/Object;)Ldyvil/collection/ImmutableMap;", true);
+
+		writer.resetLocals(varIndex);
 
 		if (type != null)
 		{
