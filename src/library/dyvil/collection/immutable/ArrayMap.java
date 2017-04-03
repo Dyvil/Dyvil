@@ -17,7 +17,6 @@ import java.util.function.BiPredicate;
 @SuppressWarnings("SuspiciousSystemArraycopy")
 @LiteralConvertible.FromNil
 @LiteralConvertible.FromArray
-@LiteralConvertible.FromColonOperator(methodName = "singleton")
 @Immutable
 public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableMap<K, V>
 {
@@ -75,7 +74,7 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 
 	@NonNull
 	@SafeVarargs
-	public static <K, V> ArrayMap<K, V> apply(@NonNull Entry<? extends K, ? extends V>... entries)
+	public static <K, V> ArrayMap<K, V> apply(@NonNull Entry<? extends K, ? extends V> @NonNull ... entries)
 	{
 		return new ArrayMap<>(entries);
 	}

@@ -18,7 +18,6 @@ import java.util.function.BiPredicate;
 
 @LiteralConvertible.FromNil
 @LiteralConvertible.FromArray
-@LiteralConvertible.FromColonOperator(methodName = "singleton")
 @Immutable
 public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> implements ImmutableMap<K, V>
 {
@@ -78,7 +77,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 
 	@NonNull
 	@SafeVarargs
-	public static <K extends Enum<K>, V> EnumMap<K, V> apply(@NonNull Entry<K, V>... entries)
+	public static <K extends Enum<K>, V> EnumMap<K, V> apply(@NonNull Entry<K, V> @NonNull ... entries)
 	{
 		return new EnumMap<>(entries);
 	}
@@ -108,7 +107,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	}
 
 	@NonNull
-	public static <K extends Enum<K>, V> Builder<K, V> builder(Class<K> type)
+	public static <K extends Enum<K>, V> Builder<K, V> builder(@NonNull Class<K> type)
 	{
 		return new Builder<>(type);
 	}
@@ -116,12 +115,12 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	// Constructors
 
 	@DyvilModifiers(Modifiers.INTERNAL)
-	private EnumMap(Class<K> type, K[] keys, V[] values, int size)
+	private EnumMap(@NonNull Class<K> type, K @NonNull [] keys, V @NonNull [] values, int size)
 	{
 		super(type, keys, values, size);
 	}
 
-	public EnumMap(Class<K> type)
+	public EnumMap(@NonNull Class<K> type)
 	{
 		super(type);
 	}

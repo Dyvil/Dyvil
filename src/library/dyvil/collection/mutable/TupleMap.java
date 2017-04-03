@@ -12,7 +12,6 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 @LiteralConvertible.FromNil
-@LiteralConvertible.FromColonOperator(methodName = "singleton")
 @LiteralConvertible.FromArray
 public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements MutableMap<K, V>
 {
@@ -49,13 +48,13 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements MutableMap
 	}
 
 	@NonNull
-	public static <K, V> TupleMap<K, V> from(Entry<? extends K, ? extends V> @NonNull [] array)
+	public static <K, V> TupleMap<K, V> from(@NonNull Entry<? extends K, ? extends V> @NonNull [] array)
 	{
 		return new TupleMap<>(array);
 	}
 
 	@NonNull
-	public static <K, V> TupleMap<K, V> from(Tuple.Of2<? extends K, ? extends V> @NonNull [] array)
+	public static <K, V> TupleMap<K, V> from(Tuple.@NonNull Of2<? extends K, ? extends V> @NonNull [] array)
 	{
 		return new TupleMap<>(array);
 	}

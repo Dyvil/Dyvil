@@ -12,7 +12,6 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 @LiteralConvertible.FromNil
-@LiteralConvertible.FromColonOperator(methodName = "singleton")
 @LiteralConvertible.FromArray
 public class HashMap<K, V> extends AbstractHashMap<K, V> implements MutableMap<K, V>
 {
@@ -39,13 +38,13 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements MutableMap<K
 
 	@NonNull
 	@SafeVarargs
-	public static <K, V> HashMap<K, V> apply(@NonNull Entry<K, V>... entries)
+	public static <K, V> HashMap<K, V> apply(@NonNull Entry<K, V> @NonNull ... entries)
 	{
 		return new HashMap<>(entries);
 	}
 
 	@NonNull
-	public static <K, V> HashMap<K, V> from(Entry<? extends K, ? extends V> @NonNull [] array)
+	public static <K, V> HashMap<K, V> from(@NonNull Entry<? extends K, ? extends V> @NonNull [] array)
 	{
 		return new HashMap<>(array);
 	}
@@ -109,7 +108,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements MutableMap<K
 		this.threshold = (int) Math.min(capacity * loadFactor, MAX_ARRAY_SIZE + 1);
 	}
 
-	public HashMap(Entry<? extends K, ? extends V> @NonNull [] entries)
+	public HashMap(@NonNull Entry<? extends K, ? extends V> @NonNull [] entries)
 	{
 		super(entries);
 		this.defaultLoadFactor();

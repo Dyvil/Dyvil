@@ -18,7 +18,6 @@ import java.util.function.BiPredicate;
 
 @LiteralConvertible.FromClass
 @LiteralConvertible.FromType
-@LiteralConvertible.FromColonOperator(methodName = "singleton")
 @LiteralConvertible.FromArray
 public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> implements MutableMap<K, V>
 {
@@ -31,7 +30,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	}
 
 	@NonNull
-	public static <K extends Enum<K>, V> EnumMap<K, V> apply(Class<K> type)
+	public static <K extends Enum<K>, V> EnumMap<K, V> apply(@NonNull Class<K> type)
 	{
 		return new EnumMap<>(type);
 	}
@@ -44,13 +43,13 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 
 	@NonNull
 	@SafeVarargs
-	public static <K extends Enum<K>, V> EnumMap<K, V> apply(@NonNull Entry<K, V>... entries)
+	public static <K extends Enum<K>, V> EnumMap<K, V> apply(@NonNull Entry<? extends K, ? extends V> @NonNull ... entries)
 	{
 		return new EnumMap<>(entries);
 	}
 
 	@NonNull
-	public static <K extends Enum<K>, V> EnumMap<K, V> from(Entry<? extends K, ? extends V> @NonNull [] entries)
+	public static <K extends Enum<K>, V> EnumMap<K, V> from(@NonNull Entry<? extends K, ? extends V> @NonNull [] entries)
 	{
 		return new EnumMap<>(entries);
 	}
@@ -68,12 +67,12 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 	}
 
 	@DyvilModifiers(Modifiers.INTERNAL)
-	private EnumMap(Class<K> type, K[] keys, V[] values, int size)
+	private EnumMap(@NonNull Class<K> type, K @NonNull [] keys, V @NonNull [] values, int size)
 	{
 		super(type, keys, values, size);
 	}
 
-	public EnumMap(Class<K> type)
+	public EnumMap(@NonNull Class<K> type)
 	{
 		super(type);
 	}
@@ -83,7 +82,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 		super(type.erasure());
 	}
 
-	public EnumMap(Entry<? extends K, ? extends V> @NonNull [] entries)
+	public EnumMap(@NonNull Entry<? extends K, ? extends V> @NonNull [] entries)
 	{
 		super(entries);
 	}
