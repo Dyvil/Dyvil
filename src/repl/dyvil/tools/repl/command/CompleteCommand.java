@@ -6,6 +6,7 @@ import dyvil.collection.mutable.TreeSet;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
@@ -56,13 +57,13 @@ public class CompleteCommand implements ICommand
 	@Override
 	public void execute(DyvilREPL repl, String argument)
 	{
-		final REPLContext context = repl.getContext();
+		final REPLContext replContext = repl.getContext();
 
 		if (argument == null)
 		{
 			// REPL Variables
 
-			this.printREPLMembers(repl, context, "");
+			this.printREPLMembers(repl, replContext, "");
 			return;
 		}
 
@@ -71,7 +72,7 @@ public class CompleteCommand implements ICommand
 		{
 			// REPL Variable Completions
 
-			this.printREPLMembers(repl, context, Qualifier.qualify(argument));
+			this.printREPLMembers(repl, replContext, Qualifier.qualify(argument));
 			return;
 		}
 
@@ -80,6 +81,8 @@ public class CompleteCommand implements ICommand
 
 		final MarkerList markers = new MarkerList(Markers.INSTANCE);
 		final TokenIterator tokenIterator = new DyvilLexer(markers, DyvilSymbols.INSTANCE).tokenize(expression);
+
+		final IContext context = replContext.getContext();
 
 		new ParserManager(DyvilSymbols.INSTANCE, tokenIterator, markers).parse(new ExpressionParser((IValue value) -> {
 			value.resolveTypes(markers, context);
