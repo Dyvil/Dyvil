@@ -113,7 +113,7 @@ public class ArrayType implements IObjectType
 	@Override
 	public boolean isGenericType()
 	{
-		return false;
+		return this.type.isGenericType();
 	}
 
 	@Override
