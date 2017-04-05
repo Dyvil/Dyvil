@@ -16,11 +16,23 @@ public @interface Experimental
 		DANGEROUS, UNSTABLE, UNRECOMMENDED, BETA, ALPHA, PRERELEASE
 	}
 
+	/**
+	 * @return the compiler diagnostic message text
+	 */
 	@NonNull String value() default "The {member.kind} '{member.name}' is an experimental feature";
 
+	/**
+	 * @return a description on the experimental status of the member
+	 */
 	@NonNull String description() default "";
 
+	/**
+	 * @return the current experimental stage of the member
+	 */
 	@NonNull Stage stage() default Stage.UNRECOMMENDED;
 
+	/**
+	 * @return the marker level of the compiler diagnostic message
+	 */
 	@NonNull MarkerLevel level() default MarkerLevel.WARNING;
 }
