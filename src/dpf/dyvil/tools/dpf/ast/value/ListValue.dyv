@@ -1,97 +1,41 @@
 package dyvil.tools.dpf.ast.value
 
-import dyvil.collection.Collection
-import dyvil.collection.List
-import dyvil.collection.Map
-import dyvil.collection.mutable.ArrayList
 import dyvil.tools.dpf.model.Expandable
 import dyvil.tools.dpf.converter.DPFValueVisitor
-import dyvil.tools.dpf.visitor.ListVisitor
-import dyvil.tools.dpf.visitor.ValueVisitor
+import dyvil.tools.dpf.visitor.{ ListVisitor, ValueVisitor }
 import dyvil.tools.parsing.ast.IASTNode
 
 import java.util.function.Function
 
-public class ListValue(protected let elements: List<Value>) extends DPFValueVisitor implements Value, ListVisitor, Expandable
+@LiteralConvertible.FromArray
+case class ListValue(protected let elements: List<Value> { public get })
+	implements Value, ListVisitor, Expandable
 {
-	static func apply() -> ListValue = new ListValue(new ArrayList<Value>)
+	static final func apply(elements: Value...) -> ListValue = ListValue(List(elements...))
 
-	static func apply(int capacity) -> ListValue = new ListValue(new ArrayList<Value>(capacity))
+	// Visitor
 
-	static func apply([Value] values) -> ListValue = new ListValue(new ArrayList(values))
-
-	static func apply([any] values) -> ListValue
-	{
-		let list = new ArrayList<Value>(values.size)
-		for (element <- values)
-		{
-			list.add(Value.wrap(element))
-		}
-		return new ListValue(list)
+	override func visitElement() -> ValueVisitor = new DPFValueVisitor {
+		override func visitValue(value: Value) -> void = this<ListValue>.elements.add(value)
 	}
 
-	static func apply(Iterable<_> iterable) -> ListValue
+	override func accept(visitor: ValueVisitor)
 	{
-		let list = new ArrayList<Value>
-		for (element <- iterable)
+		let listVisitor = visitor.visitList()
+
+		for (element <- this.elements)
 		{
-			list.add(Value.wrap(element))
-		}
-		return new ListValue(list)
-	}
-
-	static func apply(SizedIterable<_> iterable) -> ListValue
-	{
-		let list = new ArrayList<Value>(iterable.size())
-		for (element <- iterable)
-		{
-			list.add(Value.wrap(element))
-		}
-		return new ListValue(list)
-	}
-
-	public void add(Value value) = this.elements.add(value)
-
-	protected override void visitValue(Value value) = this.elements.add(value)
-
-	public override ValueVisitor visitElement() = this
-
-	public override void accept(ValueVisitor visitor)
-	{
-		let v: ListVisitor = visitor.visitList()
-
-		for (Value element <- this.elements)
-		{
-			element.accept(v.visitElement())
+			element.accept(listVisitor.visitElement())
 		}
 		
-		v.visitEnd()
+		listVisitor.visitEnd()
 	}
 
-	public override String toString() = IASTNode.toString(this)
+	// Expandable
 
-	public override void toString(String indent, StringBuilder buffer)
+	override func expand(mappings: Map<String, Object>, mutate: boolean) -> ListValue
 	{
-		let len = this.elements.size
-		if (len <= 0)
-		{
-			buffer.append("[]")
-			return
-		}
-		
-		buffer.append("[ ")
-		this.elements[0].toString(indent, buffer)
-		for (int i <- 1 ..< len)
-		{
-			buffer.append(", ")
-			this.elements[i].toString(indent, buffer)
-		}
-		buffer.append(" ]")
-	}
-
-	public override ListValue expand(Map<String, Object> mappings, boolean mutate)
-	{
-		final Function<Value, Value> valueFunction = value => Value.wrap(Expandable.expand(value, mappings, mutate))
+		let valueFunction: Function<Value, Value> = value => Value.wrap(Expandable.expand(value, mappings, mutate))
 		if (mutate)
 		{
 			this.elements.map(valueFunction)
@@ -101,14 +45,26 @@ public class ListValue(protected let elements: List<Value>) extends DPFValueVisi
 		return new ListValue(this.elements.mapped(valueFunction))
 	}
 
-	public override boolean equals(Object! o)
+	// String
+
+	override func toString() -> String = IASTNode.toString(this)
+
+	override func toString(indent: String, buffer: StringBuilder) -> void
 	{
-		if (this === o) return true
-		if (!(o is ListValue)) return false
+		let len = this.elements.size
+		if (len <= 0)
+		{
+			buffer.append('[]')
+			return
+		}
 
-		let that = o as ListValue
-		return this.elements == that.elements
+		buffer.append('[ ')
+		this.elements[0].toString(indent, buffer)
+		for (i <- 1 ..< len)
+		{
+			buffer.append(', ')
+			this.elements[i].toString(indent, buffer)
+		}
+		buffer.append(' ]')
 	}
-
-	public override int hashCode() = this.elements.hashCode
 }

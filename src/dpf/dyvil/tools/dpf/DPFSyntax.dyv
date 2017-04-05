@@ -7,8 +7,6 @@ import dyvil.tools.dpf.ast.value._
 
 public class DPFSyntax
 {
-	implicit postfix func toValue(v: any) = Value.wrap(v)
-
 	/**
 	 * Root Node
 	 *

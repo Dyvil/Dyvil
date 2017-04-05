@@ -1,52 +1,36 @@
 package dyvil.tools.dpf.ast.value
 
-import dyvil.collection.mutable.ArrayMap
 import dyvil.tools.dpf.model.Expandable
 import dyvil.tools.dpf.converter.DPFValueVisitor
-import dyvil.tools.dpf.visitor.MapVisitor
-import dyvil.tools.dpf.visitor.ValueVisitor
+import dyvil.tools.dpf.visitor.{ MapVisitor, ValueVisitor }
+import dyvil.tools.parsing.ast.IASTNode
 
 import java.util.function.BiFunction
 
-public class MapValue(
-	protected let entries: Map<Value, Value> { public get }
-	)
-	extends DPFValueVisitor implements Value, MapVisitor, Expandable
+@LiteralConvertible.FromMap
+case class MapValue(protected let entries: Map<Value, Value> { public get })
+	implements Value, MapVisitor, Expandable
 {
-	private Value! tempKey
+	static func apply(entries: (Value, Value)...) -> MapValue = MapValue(Map(entries...))
 
-	static func apply() -> MapValue = new MapValue(new ArrayMap<Value, Value>)
+	// Visitor
 
-	static func apply(int capacity) -> MapValue = new MapValue(new ArrayMap<Value, Value>(capacity))
+	protected var tempKey: Value!
 
-	static func apply(Map<_, _> map) -> MapValue
-	{
-		let mapValue = MapValue(map.size)
-		for (Entry<_, _> entry <- map)
-		{
-			mapValue.entries.put(Value.wrap(entry.getKey()), Value.wrap(entry.getValue()))
-		}
-		return mapValue
+	override func visitKey() -> ValueVisitor = new DPFValueVisitor {
+		override func visitValue(value: Value) -> void = this<MapValue>.tempKey = value
 	}
 
-	protected override void visitValue(Value value)
-	{
-		if (this.tempKey == null)
+	override func visitValue() -> ValueVisitor = new DPFValueVisitor {
+		override func visitValue(value: Value) -> void
 		{
-			this.tempKey = value
-		}
-		else
-		{
-			this.entries.put(this.tempKey, value)
-			this.tempKey = null
+			let map = this<MapValue>
+			map.entries.put(map.tempKey, value)
+			map.tempKey = null
 		}
 	}
 
-	public override ValueVisitor visitKey() = this
-
-	public override ValueVisitor visitValue() = this
-
-	public override void accept(ValueVisitor visitor)
+	override func accept(visitor: ValueVisitor) -> void
 	{
 		let mapVisitor = visitor.visitMap()
 
@@ -59,7 +43,9 @@ public class MapValue(
 		mapVisitor.visitEnd()
 	}
 
-	public override MapValue expand(Map<String, Object> mappings, boolean mutate)
+	// Expandable
+
+	override func expand(mappings: Map<String, Object>, mutate: boolean) -> MapValue
 	{
 		let entryBiFunction: BiFunction<Value, Value, Entry<+Value, +Value>>
 			= (k, v) => (
@@ -76,44 +62,37 @@ public class MapValue(
 		return new MapValue(this.entries.entryMapped(entryBiFunction))
 	}
 
-	public override void toString(String indent, StringBuilder buffer)
+	// String
+
+	override func toString() -> String = IASTNode.toString(this)
+
+	override func toString(indent: String, buffer: StringBuilder) -> void
 	{
-		let len = this.entries.size
-		if (len <= 0)
+		let size = this.entries.size
+		if (size <= 0)
 		{
-			buffer.append("{}")
+			buffer.append('{}')
 			return
 		}
 
 		let keys: [Value] = this.entries.toKeyArray(class Value)
 		let values: [Value] = this.entries.toValueArray(class Value)
 		
-		let indent1 = indent + "\t"
+		let innerIndent = indent + '\t'
 		
-		buffer.append("{\n").append(indent1)
-		keys[0].toString(indent1, buffer)
-		buffer.append(" : ")
-		values[0].toString(indent1, buffer)
+		buffer.append('{\n').append(innerIndent)
+		keys[0].toString(innerIndent, buffer)
+		buffer.append(' : ')
+		values[0].toString(innerIndent, buffer)
 
-		for (i <- 1 ..< len)
+		for (i <- 1 ..< size)
 		{
-			buffer.append(",\n").append(indent1)
-			keys[i].toString(indent1, buffer)
-			buffer.append(" : ")
-			values[i].toString(indent1, buffer)
+			buffer.append(',\n').append(innerIndent)
+			keys[i].toString(innerIndent, buffer)
+			buffer.append(' : ')
+			values[i].toString(innerIndent, buffer)
 		}
 
 		buffer.append('\n').append(indent).append('}')
 	}
-
-	public override boolean equals(Object! o)
-	{
-		if (this === o) return true
-		if (!(o is MapValue)) return false
-
-		let that = o as MapValue
-		return this.entries == that.entries
-	}
-
-	public override int hashCode() = this.entries.hashCode
 }
