@@ -11,7 +11,7 @@ import java.util.function.BiFunction
 case class MapValue(protected let entries: Map<Value, Value> { public get })
 	implements Value, MapVisitor, Expandable
 {
-	static func apply(entries: (Value, Value)...) -> MapValue = MapValue(Map(entries...))
+	static final func apply(entries: (Value, Value)...) -> MapValue = MapValue(MutableMap(entries...))
 
 	// Visitor
 

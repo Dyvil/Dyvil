@@ -11,7 +11,7 @@ import java.util.function.Function
 case class ListValue(protected let elements: List<Value> { public get })
 	implements Value, ListVisitor, Expandable
 {
-	static final func apply(elements: Value...) -> ListValue = ListValue(List(elements...))
+	static final func apply(elements: Value...) -> ListValue = ListValue(MutableList(elements...))
 
 	// Visitor
 
