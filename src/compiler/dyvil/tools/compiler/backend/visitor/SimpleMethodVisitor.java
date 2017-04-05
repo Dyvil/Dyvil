@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.method.IExternalCallableMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.intrinsic.InlineIntrinsicData;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.raw.InternalType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.parsing.Name;
@@ -252,7 +252,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 
 		int localIndex = this.method.hasModifier(Modifiers.STATIC) ? 0 : 1;
 
-		final IParameterList parameters = this.method.getExternalParameterList();
+		final ParameterList parameters = this.method.getExternalParameterList();
 		for (int i = 0, count = parameters.size(); i < count; i++)
 		{
 			final IParameter param = parameters.get(i);

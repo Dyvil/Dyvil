@@ -263,7 +263,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 					this.parameter.setVarargs(true);
 				}
 				this.parameter.setType(this.type);
-				this.consumer.getParameters().addParameter(this.parameter);
+				this.consumer.getParameters().add(this.parameter);
 			}
 			this.reset();
 

@@ -126,7 +126,7 @@ public class Property extends Member implements IProperty
 		this.setter.setPosition(this.position);
 		this.setterParameter = new CodeParameter(this.setter, this.position, Names.newValue, this.type,
 		                                         EmptyModifiers.INSTANCE, null);
-		this.setter.getParameters().addParameter(this.setterParameter);
+		this.setter.getParameters().add(this.setterParameter);
 
 		return this.setter;
 	}

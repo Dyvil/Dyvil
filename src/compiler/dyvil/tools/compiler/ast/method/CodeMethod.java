@@ -26,7 +26,6 @@ import dyvil.tools.compiler.ast.method.intrinsic.Intrinsics;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
@@ -391,7 +390,7 @@ public class CodeMethod extends AbstractMethod
 		// append the qualified name plus the name separator
 		final StringBuilder builder = new StringBuilder(method.getName().qualified).append('_');
 
-		final IParameterList params = method.getParameters();
+		final ParameterList params = method.getParameters();
 		for (int i = 0, count = params.size(); i < count; i++)
 		{
 			// append all param names followed by an underscore
@@ -510,7 +509,7 @@ public class CodeMethod extends AbstractMethod
 				}
 			}
 
-			final IParameterList params = overrideMethod.getParameters();
+			final ParameterList params = overrideMethod.getParameters();
 			for (int i = 0, count = params.size(); i < count; i++)
 			{
 				final IParameter thisParam = this.parameters.get(i);
@@ -726,7 +725,7 @@ public class CodeMethod extends AbstractMethod
 
 			methodWriter.visitVarInsn(Opcodes.ALOAD, 0);
 
-			final IParameterList overrideParameterList = overrideMethod.getParameters();
+			final ParameterList overrideParameterList = overrideMethod.getParameters();
 
 			// Generate Parameters and load arguments
 			for (int p = 0, count = this.parameters.size(); p < count; p++)

@@ -23,7 +23,6 @@ import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.TypeList;
@@ -83,7 +82,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	// Parameters
 
 	@Override
-	public IParameterList getParameters()
+	public ParameterList getParameters()
 	{
 		return this.parameters;
 	}
@@ -144,7 +143,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		return this.parameters.resolveParameter(name);
+		return this.parameters.get(name);
 	}
 
 	@Override

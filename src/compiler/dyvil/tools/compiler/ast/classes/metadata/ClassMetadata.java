@@ -15,10 +15,7 @@ import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
-import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
-import dyvil.tools.compiler.ast.parameter.IParametric;
+import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -104,7 +101,7 @@ public class ClassMetadata implements IClassMetadata
 
 	private void checkMethod(IMethod method)
 	{
-		final IParameterList parameters = method.getParameters();
+		final ParameterList parameters = method.getParameters();
 		switch (method.getName().unqualified)
 		{
 		case "equals":
@@ -173,7 +170,7 @@ public class ClassMetadata implements IClassMetadata
 			return;
 		}
 
-		final IParameterList parameters = this.theClass.getParameters();
+		final ParameterList parameters = this.theClass.getParameters();
 		final IConstructor constructor = body.getConstructor(parameters);
 		if (constructor != null)
 		{
@@ -208,7 +205,7 @@ public class ClassMetadata implements IClassMetadata
 
 	protected void copyClassParameters(IParametric constructor)
 	{
-		final IParameterList classParameters = this.theClass.getParameters();
+		final ParameterList classParameters = this.theClass.getParameters();
 		final int parameterCount = classParameters.size();
 		final IParameter[] parameters = new IParameter[parameterCount];
 
@@ -228,7 +225,7 @@ public class ClassMetadata implements IClassMetadata
 			parameters[i].setIndex(i);
 		}
 
-		constructor.getParameters().setParameterArray(parameters, parameterCount);
+		constructor.getParameters().setParameters(parameters, parameterCount);
 	}
 
 	@Override
@@ -244,7 +241,7 @@ public class ClassMetadata implements IClassMetadata
 			this.constructor.setInitializer(this.superInitializer);
 
 			final StatementList constructorBody = new StatementList();
-			final IParameterList parameters = this.constructor.getParameters();
+			final ParameterList parameters = this.constructor.getParameters();
 
 			for (int i = 0, count = parameters.size(); i < count; i++)
 			{

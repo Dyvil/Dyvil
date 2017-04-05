@@ -117,7 +117,7 @@ public class LambdaOrTupleParser extends Parser
 				final LambdaExpr lambdaExpr = new LambdaExpr(token.next());
 				final IParameter parameter = lambdaExpr.createParameter(token.raw(), token.nameValue(), Types.UNKNOWN,
 				                                                        EmptyModifiers.INSTANCE, null);
-				lambdaExpr.getParameters().addParameter(parameter);
+				lambdaExpr.getParameters().add(parameter);
 				this.value = lambdaExpr;
 				this.mode = TYPE_ARROW;
 				return;

@@ -19,7 +19,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
@@ -498,12 +498,12 @@ public class ClassBody implements IClassBody
 	}
 
 	@Override
-	public IConstructor getConstructor(IParameterList parameters)
+	public IConstructor getConstructor(ParameterList parameters)
 	{
 		for (int i = 0; i < this.constructorCount; i++)
 		{
 			final IConstructor constructor = this.constructors[i];
-			final IParameterList constructorParameterList = constructor.getParameters();
+			final ParameterList constructorParameterList = constructor.getParameters();
 
 			if (parameters.matches(constructorParameterList))
 			{

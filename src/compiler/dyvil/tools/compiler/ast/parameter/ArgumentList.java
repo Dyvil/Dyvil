@@ -389,7 +389,7 @@ public class ArgumentList implements IResolvable, IValueList
 		this.values[index].writeExpression(writer, param.getCovariantType());
 	}
 
-	public void writeValues(MethodWriter writer, IParameterList parameters, int startIndex) throws BytecodeException
+	public void writeValues(MethodWriter writer, ParameterList parameters, int startIndex) throws BytecodeException
 	{
 		for (int i = 0, count = parameters.size() - startIndex; i < count; i++)
 		{

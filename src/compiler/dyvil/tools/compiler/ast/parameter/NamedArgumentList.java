@@ -231,7 +231,7 @@ public class NamedArgumentList extends ArgumentList
 	}
 
 	@Override
-	public void writeValues(MethodWriter writer, IParameterList parameters, int startIndex) throws BytecodeException
+	public void writeValues(MethodWriter writer, ParameterList parameters, int startIndex) throws BytecodeException
 	{
 		if (this.hasParameterOrder())
 		{

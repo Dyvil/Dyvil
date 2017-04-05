@@ -12,7 +12,7 @@ import dyvil.tools.compiler.ast.expression.optional.OptionalUnwrapOperator;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 
 public class Intrinsics
@@ -25,7 +25,7 @@ public class Intrinsics
 
 		static
 		{
-			final IParameterList params = Types.INTRINSIC_CLASS.getParameters();
+			final ParameterList params = Types.INTRINSIC_CLASS.getParameters();
 			VALUE = params.get(0);
 			STRINGS = params.get(1);
 			COMPILER_CODE = params.get(2);

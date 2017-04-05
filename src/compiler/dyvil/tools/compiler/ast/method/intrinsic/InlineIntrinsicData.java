@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.bytecode.VarInstruction;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -52,7 +52,7 @@ public class InlineIntrinsicData extends InstructionList implements IntrinsicDat
 
 	private void preProcess()
 	{
-		final IParameterList parameterList = this.method.getParameters();
+		final ParameterList parameterList = this.method.getParameters();
 		int parameterSlots = 0;
 
 		for (int i = 0, parameterCount = parameterList.size(); i < parameterCount; i++)
@@ -124,7 +124,7 @@ public class InlineIntrinsicData extends InstructionList implements IntrinsicDat
 
 	private static int getArgumentIndex(int varIndex, IMethod method)
 	{
-		final IParameterList params = method.getParameters();
+		final ParameterList params = method.getParameters();
 		for (int i = 0, count = params.size(); i < count; i++)
 		{
 			if (params.get(i).getLocalIndex() == varIndex)

@@ -16,7 +16,7 @@ import dyvil.tools.compiler.ast.method.IExternalCallableMember;
 import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.structure.RootPackage;
 import dyvil.tools.compiler.ast.type.IType;
@@ -103,7 +103,7 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 	}
 
 	@Override
-	public IParameterList getExternalParameterList()
+	public ParameterList getExternalParameterList()
 	{
 		return this.parameters;
 	}

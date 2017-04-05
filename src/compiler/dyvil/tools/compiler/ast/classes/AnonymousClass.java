@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -105,7 +105,7 @@ public class AnonymousClass extends CodeClass
 			return this.constructorDesc;
 		}
 
-		final IParameterList parameterList = this.constructor.getParameters();
+		final ParameterList parameterList = this.constructor.getParameters();
 		final StringBuilder buf = new StringBuilder();
 
 		buf.append('(');
@@ -168,7 +168,7 @@ class AnonymousClassMetadata implements IClassMetadata
 		                                                                                this.theClass
 			                                                                                .getConstructorDesc(), null,
 		                                                                                null));
-		final IParameterList parameterList = constructor.getParameters();
+		final ParameterList parameterList = constructor.getParameters();
 		final int parameterCount = parameterList.size();
 
 		// Signature & Parameter Data

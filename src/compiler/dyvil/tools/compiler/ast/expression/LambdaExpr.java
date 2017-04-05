@@ -144,7 +144,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	// Parameters
 
 	@Override
-	public IParameterList getParameters()
+	public ParameterList getParameters()
 	{
 		return this.parameters;
 	}
@@ -350,7 +350,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		}
 
 		final ITypeContext tempContext = new MapTypeContext();
-		final IParameterList methodParams = this.method.getParameters();
+		final ParameterList methodParams = this.method.getParameters();
 		final int size = Math.min(this.parameters.size(), methodParams.size());
 
 		for (int i = 0; i < size; i++)
@@ -456,7 +456,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			return false;
 		}
 
-		final IParameterList methodParameters = method.getParameters();
+		final ParameterList methodParameters = method.getParameters();
 		final int parameterCount = this.parameters.size();
 
 		if (parameterCount != methodParameters.size())
@@ -495,7 +495,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		return this.parameters.resolveParameter(name);
+		return this.parameters.get(name);
 	}
 
 	@Override
@@ -705,7 +705,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	private boolean checkCall(IValue receiver, ArgumentList arguments, IParametric parametric)
 	{
 		final int parameterCount = this.parameters.size();
-		final IParameterList parameterList = parametric.getParameters();
+		final ParameterList parameterList = parametric.getParameters();
 
 		if (receiver == null)
 		{
@@ -914,7 +914,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 				buffer.append(' ');
 			}
 
-			Util.astToString(prefix, this.parameters.getParameterArray(), parameterCount,
+			Util.astToString(prefix, this.parameters.getParameters(), parameterCount,
 			                 Formatting.getSeparator("lambda.separator", ','), buffer);
 
 			if (Formatting.getBoolean("lambda.close_paren.space_before"))

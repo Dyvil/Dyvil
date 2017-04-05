@@ -17,8 +17,9 @@ import java.util.Iterator;
 
 public class TypeList implements ITypeConsumer, Iterable<IType>
 {
-	private static final int      DEFAULT_CAPACITY = 5;
-	public static final  TypeList EMPTY            = new TypeList(null, 0);
+	private static final int DEFAULT_CAPACITY = 3;
+
+	public static final TypeList EMPTY = new TypeList(null, 0);
 
 	private int     size;
 	private IType[] types;
@@ -33,12 +34,12 @@ public class TypeList implements ITypeConsumer, Iterable<IType>
 		this.types = new IType[capacity];
 	}
 
-	public TypeList(@NonNull IType... elements)
+	public TypeList(IType @NonNull ... elements)
 	{
 		this(elements, elements.length);
 	}
 
-	public TypeList(@NonNull IType[] types, int size)
+	public TypeList(IType[] types, int size)
 	{
 		this.size = size;
 		this.types = types;
@@ -67,11 +68,12 @@ public class TypeList implements ITypeConsumer, Iterable<IType>
 			System.arraycopy(this.types, 0, temp, 0, index);
 			this.types = temp;
 		}
-		this.types[index] = type;
 		if (index >= this.size)
 		{
 			this.size = index + 1;
 		}
+
+		this.types[index] = type;
 	}
 
 	public void setTypes(IType[] types, int size)

@@ -5,7 +5,7 @@ import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -67,7 +67,7 @@ public abstract class CaseClasses
 		// 'var' variable that stores the casted 'obj' parameter
 		writer.visitVarInsn(ASTORE, 2);
 
-		final IParameterList parameters = theClass.getParameters();
+		final ParameterList parameters = theClass.getParameters();
 		for (int i = 0, count = parameters.size(); i < count; i++)
 		{
 			writeEquals(writer, parameters.get(i));
@@ -202,7 +202,7 @@ public abstract class CaseClasses
 	{
 		writer.visitLdcInsn(31);
 
-		final IParameterList parameters = theClass.getParameters();
+		final ParameterList parameters = theClass.getParameters();
 		for (int i = 0, count = parameters.size(); i < count; i++)
 		{
 			final IDataMember parameter = parameters.get(i);
@@ -367,7 +367,7 @@ public abstract class CaseClasses
 		writer.visitMethodInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(Ljava/lang/String;)V", false);
 
 		// ----- Class Parameters -----
-		final IParameterList parameters = theClass.getParameters();
+		final ParameterList parameters = theClass.getParameters();
 		for (int i = 0, count = parameters.size(); i < count; i++)
 		{
 			final IDataMember parameter = parameters.get(i);

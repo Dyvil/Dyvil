@@ -236,7 +236,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	// Class Parameters
 
 	@Override
-	public IParameterList getParameters()
+	public ParameterList getParameters()
 	{
 		return this.parameters;
 	}
@@ -647,7 +647,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		final IParameter parameter = this.parameters.resolveParameter(name);
+		final IParameter parameter = this.parameters.get(name);
 		if (parameter != null)
 		{
 			return parameter;

@@ -27,10 +27,7 @@ import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.parameter.ClassParameter;
-import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.structure.RootPackage;
 import dyvil.tools.compiler.ast.type.IType;
@@ -386,7 +383,7 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		final IParameter parameter = this.parameters.resolveParameter(name);
+		final IParameter parameter = this.parameters.get(name);
 		if (parameter != null)
 		{
 			return parameter;
@@ -585,7 +582,7 @@ public final class ExternalClass extends AbstractClass
 		{
 			final ClassParameter param = new ExternalClassParameter(this, Name.fromQualified(name), desc, type,
 			                                                        readModifiers(access));
-			this.parameters.addParameter(param);
+			this.parameters.add(param);
 			return new SimpleFieldVisitor(param);
 		}
 
@@ -633,7 +630,7 @@ public final class ExternalClass extends AbstractClass
 
 			if ((access & Modifiers.VARARGS) != 0)
 			{
-				final IParameterList parameterList = constructor.getExternalParameterList();
+				final ParameterList parameterList = constructor.getExternalParameterList();
 				parameterList.get(parameterList.size() - 1).setVarargs(true);
 			}
 
@@ -646,7 +643,7 @@ public final class ExternalClass extends AbstractClass
 		{
 			final ClassParameter param = new ExternalClassParameter(this, Name.fromQualified(name), desc.substring(2),
 			                                                        readReturnType(desc), readModifiers(access));
-			this.parameters.addParameter(param);
+			this.parameters.add(param);
 			return new AnnotationClassVisitor(param);
 		}
 
@@ -668,7 +665,7 @@ public final class ExternalClass extends AbstractClass
 
 		if ((access & Modifiers.VARARGS) != 0)
 		{
-			final IParameterList parameterList = method.getExternalParameterList();
+			final ParameterList parameterList = method.getExternalParameterList();
 			parameterList.get(parameterList.size() - 1).setVarargs(true);
 		}
 

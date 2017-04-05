@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.CodeParameter;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.LambdaType;
@@ -69,7 +69,7 @@ public class Closure extends StatementList
 			return null;
 		}
 
-		final IParameterList parameterList = functionalMethod.getParameters();
+		final ParameterList parameterList = functionalMethod.getParameters();
 		final int parameterCount = parameterList.size();
 		final IParameter[] parameters = new IParameter[parameterCount];
 

@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.ast.method.IExternalCallableMember;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.TypeList;
@@ -206,12 +206,12 @@ public final class ClassFormat
 
 	private static ITypeConsumer parameterTypeConsumer(IExternalCallableMember methodSignature)
 	{
-		final IParameterList parameterList = methodSignature.getExternalParameterList();
+		final ParameterList parameterList = methodSignature.getExternalParameterList();
 		return type ->
 		{
 			final ExternalParameter parameter = new ExternalParameter(null, null, type);
 			parameter.setMethod(methodSignature);
-			parameterList.addParameter(parameter);
+			parameterList.add(parameter);
 		};
 	}
 

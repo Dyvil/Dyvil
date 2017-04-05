@@ -32,7 +32,6 @@ import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Mutability;
@@ -146,7 +145,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public IParameterList getParameters()
+	public ParameterList getParameters()
 	{
 		return this.parameters;
 	}
@@ -287,7 +286,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		return this.parameters.resolveParameter(name);
+		return this.parameters.get(name);
 	}
 
 	@Override
@@ -365,7 +364,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return;
 		}
 
-		final IParameterList parameters = this.getParameters();
+		final ParameterList parameters = this.getParameters();
 
 		final int parameterStartIndex;
 		final int argumentStartIndex;
@@ -503,7 +502,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			// The method has to be 'implicit static'
 			return;
 		}
-		final IParameterList parameterList = this.getParameters();
+		final ParameterList parameterList = this.getParameters();
 		if (parameterList.size() != 1)
 		{
 			// and only take exactly one parameter
@@ -554,7 +553,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue receiver,
 		                            ArgumentList arguments, GenericData genericData)
 	{
-		final IParameterList parameters = this.getParameters();
+		final ParameterList parameters = this.getParameters();
 
 		if (receiver != null)
 		{
@@ -777,7 +776,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return false;
 		}
 
-		final IParameterList candidateParameters = candidate.getParameters();
+		final ParameterList candidateParameters = candidate.getParameters();
 
 		// Check Parameter Count
 		if (candidateParameters.size() != this.parameters.size())

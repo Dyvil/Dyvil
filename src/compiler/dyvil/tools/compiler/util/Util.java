@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
@@ -97,7 +97,7 @@ public final class Util
 			iClass.getTypeParameters().toString("", stringBuilder);
 		}
 
-		final IParameterList parameterList = iClass.getParameters();
+		final ParameterList parameterList = iClass.getParameters();
 		if (!parameterList.isEmpty())
 		{
 			parameterList.signatureToString(stringBuilder, null);

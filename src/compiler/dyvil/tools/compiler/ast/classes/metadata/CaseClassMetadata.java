@@ -16,7 +16,7 @@ import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -41,7 +41,7 @@ public final class CaseClassMetadata extends ClassMetadata
 	{
 		super.resolveTypesPre(markers, context);
 
-		final IParameterList parameters = this.theClass.getParameters();
+		final ParameterList parameters = this.theClass.getParameters();
 		for (int i = 0, count = parameters.size(); i < count; i++)
 		{
 			final ClassParameter classParameter = (ClassParameter) parameters.get(i);
@@ -100,7 +100,7 @@ public final class CaseClassMetadata extends ClassMetadata
 		if (this.applyMethod != null && (this.members & APPLY) == 0)
 		{
 			final ArgumentList arguments = new ArgumentList();
-			final IParameterList parameterList = this.applyMethod.getParameters();
+			final ParameterList parameterList = this.applyMethod.getParameters();
 
 			for (int i = 0, count = parameterList.size(); i < count; i++)
 			{

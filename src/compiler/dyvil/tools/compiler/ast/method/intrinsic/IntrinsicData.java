@@ -5,7 +5,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -44,7 +44,7 @@ public interface IntrinsicData
 	static IType writeArgument(MethodWriter writer, IMethod method, int index, IValue receiver, ArgumentList arguments)
 		throws BytecodeException
 	{
-		final IParameterList params = method.getParameters();
+		final ParameterList params = method.getParameters();
 
 		if (receiver == null || receiver.isIgnoredClassAccess())
 		{

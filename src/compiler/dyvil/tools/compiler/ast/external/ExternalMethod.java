@@ -20,7 +20,7 @@ import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.TypeList;
@@ -154,13 +154,13 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	}
 
 	@Override
-	public IParameterList getExternalParameterList()
+	public ParameterList getExternalParameterList()
 	{
 		return this.parameters;
 	}
 
 	@Override
-	public IParameterList getParameters()
+	public ParameterList getParameters()
 	{
 		this.resolveParameters();
 		return this.parameters;
