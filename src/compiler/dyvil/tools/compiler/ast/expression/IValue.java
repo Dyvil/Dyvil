@@ -36,7 +36,6 @@ public interface IValue extends IASTNode, ITyped
 	// Literals
 	int VOID                 = 1;
 	int NULL                 = 2;
-	int NIL                  = 3;
 	int WILDCARD             = 4;
 	int BOOLEAN              = 5;
 	int BYTE                 = 6;

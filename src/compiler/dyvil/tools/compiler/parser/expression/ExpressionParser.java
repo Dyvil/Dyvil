@@ -791,10 +791,6 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			this.value = new NullValue(token.raw());
 			this.mode = ACCESS;
 			return true;
-		case DyvilKeywords.NIL:
-			this.value = new NilExpr(token.raw());
-			this.mode = ACCESS;
-			return true;
 		case DyvilKeywords.TRUE:
 			this.value = new BooleanValue(token.raw(), true);
 			this.mode = ACCESS;
