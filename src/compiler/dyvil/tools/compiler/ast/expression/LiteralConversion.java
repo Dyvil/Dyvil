@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
+import dyvil.tools.compiler.ast.parameter.NamedArgumentList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.transform.Names;
@@ -36,7 +37,27 @@ public class LiteralConversion extends AbstractCall
 	{
 		this.position = literal.getPosition();
 		this.literal = literal;
-		this.name = getMethodName(annotation);
+
+		Name[] names = parseAnnotation(annotation);
+		this.name = names[0];
+		if (names.length <= 1)
+		{
+			this.arguments = arguments;
+			return;
+		}
+
+		final NamedArgumentList namedArguments = arguments.toNamed();
+		for (int i = 1; i < names.length; i++)
+		{
+			namedArguments.setName(i - 1, names[i]);
+		}
+		this.arguments = namedArguments;
+	}
+
+	public LiteralConversion(IValue literal, Name name, ArgumentList arguments)
+	{
+		this.literal = literal;
+		this.name = name;
 		this.arguments = arguments;
 	}
 
@@ -58,14 +79,72 @@ public class LiteralConversion extends AbstractCall
 		}
 	}
 
-	public static Name getMethodName(IAnnotation annotation)
+	public static Name[] parseAnnotation(IAnnotation annotation)
+	{
+		final String method = getMethod(annotation);
+		if (method == null)
+		{
+			return new Name[] { Names.apply };
+		}
+
+		int index = method.indexOf('(');
+		if (index < 0)
+		{
+			return new Name[] { Name.apply(method) };
+		}
+
+		final int length = method.length();
+
+		int count = 0;
+		for (int i = index; i < length; i++)
+		{
+			if (method.charAt(i) == ':')
+			{
+				count++;
+			}
+		}
+
+		final Name[] result = new Name[count + 1];
+		int resultIndex = 1;
+
+		result[0] = Name.apply(method.substring(0, index));
+		index++;
+
+		while (index < length && method.charAt(index) != ')')
+		{
+			final int end = method.indexOf(':', index);
+			if (end < 0)
+			{
+				break;
+			}
+			result[resultIndex++] = Name.apply(method.substring(index, end));
+			index = end + 1;
+		}
+
+		return result;
+	}
+
+	public static String getMethod(IAnnotation annotation)
 	{
 		final IValue value = annotation.getArguments().getFirstValue();
-		if (value != null)
+		if (value == null)
 		{
-			return Name.from(value.stringValue());
+			return null;
 		}
-		return Names.apply;
+		return value.stringValue();
+	}
+
+	public static Name getMethodName(IAnnotation annotation)
+	{
+		final String method = getMethod(annotation);
+		if (method == null)
+		{
+			return Names.apply;
+		}
+
+		final int index = method.indexOf('(');
+		final String name = index < 0 ? method : method.substring(0, index);
+		return Name.apply(name);
 	}
 
 	@Override
@@ -148,8 +227,10 @@ public class LiteralConversion extends AbstractCall
 	@Override
 	protected void reportResolve(MarkerList markers, MatchList<IMethod> matches)
 	{
-		markers.add(Markers.semanticError(this.position, "literal.method", this.literal.getType(), this.type, this.name,
-		                                  this.arguments.typesToString()));
+		final StringBuilder name = new StringBuilder(this.name.toString());
+		this.arguments.typesToString(name);
+
+		markers.add(Markers.semanticError(this.position, "literal.method", this.literal.getType(), this.type, name));
 	}
 
 	@Override

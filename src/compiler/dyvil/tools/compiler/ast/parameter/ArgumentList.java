@@ -524,4 +524,9 @@ public class ArgumentList implements IResolvable, IValueList
 	{
 		return new ArgumentList(Arrays.copyOf(this.values, this.size), this.size);
 	}
+
+	public NamedArgumentList toNamed()
+	{
+		return new NamedArgumentList(new Name[this.values.length], this.values, this.size);
+	}
 }

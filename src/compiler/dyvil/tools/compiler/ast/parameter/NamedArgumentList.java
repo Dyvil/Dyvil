@@ -73,6 +73,14 @@ public class NamedArgumentList extends ArgumentList
 		this.keys[index] = key;
 	}
 
+	public void setName(int i, Name name)
+	{
+		if (i < this.size)
+		{
+			this.keys[i] = name;
+		}
+	}
+
 	@Override
 	public IValue getValue(int index, IParameter param)
 	{
@@ -376,5 +384,11 @@ public class NamedArgumentList extends ArgumentList
 	{
 		return new NamedArgumentList(Arrays.copyOf(this.keys, this.size), Arrays.copyOf(this.values, this.size),
 		                             this.size);
+	}
+
+	@Override
+	public NamedArgumentList toNamed()
+	{
+		return this;
 	}
 }
