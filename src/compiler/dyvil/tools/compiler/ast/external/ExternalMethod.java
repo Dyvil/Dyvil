@@ -38,6 +38,7 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	private static final int RETURN_TYPE = 1 << 1;
 	private static final int PARAMETERS  = 1 << 2;
 	private static final int EXCEPTIONS  = 1 << 3;
+	private static final int THIS_TYPE   = 1 << 4;
 
 	private byte resolved;
 
@@ -82,8 +83,6 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 			return;
 		}
 
-		final IContext context = this.getExternalContext();
-
 		this.resolved |= PARAMETERS;
 
 		if (this.typeParameters != null)
@@ -97,16 +96,6 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 				}
 			}
 			this.parameters.remove(reifiedParameters);
-		}
-
-		if (this.receiverType != null)
-		{
-			this.receiverType = this.receiverType.resolveType(null, context).asParameterType();
-		}
-		else
-		{
-			// For external methods, the this type is actually the receiver type
-			this.receiverType = this.enclosingClass.getReceiverType();
 		}
 	}
 
@@ -189,6 +178,19 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	{
 		this.resolveExceptions();
 		return super.getExceptions();
+	}
+
+	@Override
+	public IType getThisType()
+	{
+		if ((this.resolved & THIS_TYPE) == 0 && this.thisType != null)
+		{
+			this.resolved |= THIS_TYPE;
+			final IType type = this.thisType.resolveType(null, Package.rootPackage);
+			this.setThisType(type);
+			return type;
+		}
+		return super.getThisType();
 	}
 
 	@Override

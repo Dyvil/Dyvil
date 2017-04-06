@@ -54,7 +54,6 @@ public class CodeMethod extends AbstractMethod
 	protected IValue value;
 
 	// Metadata
-	protected IType        thisType;
 	protected Set<IMethod> overrideMethods;
 
 	public CodeMethod(IClass iclass)
@@ -95,41 +94,6 @@ public class CodeMethod extends AbstractMethod
 	}
 
 	@Override
-	public IType getReceiverType()
-	{
-		if (this.receiverType != null)
-		{
-			return this.receiverType;
-		}
-
-		final IType thisType = this.getThisType();
-		if (thisType == this.enclosingClass.getThisType())
-		{
-			// If the this type was inherited from the enclosing class and not explicit, we can use the enclosing class'
-			// thisType to avoid a type copying operation
-			return this.receiverType = this.enclosingClass.getReceiverType();
-		}
-		return this.receiverType = thisType.asParameterType();
-	}
-
-	@Override
-	public IType getThisType()
-	{
-		if (this.thisType != null)
-		{
-			return this.thisType;
-		}
-		return this.thisType = this.enclosingClass.getThisType();
-	}
-
-	@Override
-	public boolean setThisType(IType type)
-	{
-		this.thisType = type;
-		return true;
-	}
-
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		context = context.push(this);
@@ -148,7 +112,7 @@ public class CodeMethod extends AbstractMethod
 			// Check the self type for compatibility
 			final IType thisType = this.thisType;
 			final IClass thisClass = thisType.getTheClass();
-			if (thisClass != null && thisClass != this.enclosingClass)
+			if (!this.isStatic() && thisClass != null && thisClass != this.enclosingClass)
 			{
 				final Marker marker = Markers.semanticError(thisType.getPosition(), "method.this_type.incompatible",
 				                                            this.getName());
@@ -822,12 +786,11 @@ public class CodeMethod extends AbstractMethod
 		}
 
 		// Write receiver type signature
-		final IType receiverType = this.receiverType;
-		if (receiverType != null && receiverType != this.enclosingClass.getThisType() && receiverType.needsSignature())
+		final IType thisType = this.getThisType();
+		if (thisType != null && thisType != this.enclosingClass.getThisType())
 		{
-			final String signature = receiverType.getSignature();
 			final AnnotationVisitor annotationVisitor = writer.visitAnnotation(AnnotationUtil.RECEIVER_TYPE, false);
-			annotationVisitor.visit("value", signature);
+			annotationVisitor.visit("value", thisType.getDescriptor(IType.NAME_FULL));
 			annotationVisitor.visitEnd();
 		}
 

@@ -74,6 +74,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	protected @Nullable TypeParameterList typeParameters;
 
 	protected IType receiverType;
+	protected IType thisType;
 
 	protected @NonNull ParameterList parameters = new ParameterList();
 
@@ -262,19 +263,30 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public IType getThisType()
 	{
-		return this.receiverType;
+		if (this.thisType != null)
+		{
+			return this.thisType;
+		}
+		return this.thisType = this.enclosingClass.getThisType();
+	}
+
+	@Override
+	public boolean setThisType(IType type)
+	{
+		this.receiverType = null;
+		this.thisType = type;
+		return true;
 	}
 
 	@Override
 	public IType getReceiverType()
 	{
-		return this.receiverType;
-	}
+		if (this.receiverType != null)
+		{
+			return this.receiverType;
+		}
 
-	@Override
-	public void setReceiverType(IType type)
-	{
-		this.receiverType = type;
+		return this.receiverType = this.getThisType().asParameterType();
 	}
 
 	@Override
@@ -397,7 +409,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			// Static access to static method
 
 			final IType receiverType = receiver.getType();
-			if (!Types.isSuperType(this.enclosingClass.getClassType(), receiverType))
+			if (!Types.isSuperType(this.getReceiverType(), receiverType))
 			{
 				// Disallow access from the wrong type
 				return;
@@ -595,7 +607,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 					markers.add(Markers.semantic(position, "method.access.static", this.name));
 				}
-				else if (receiver.getType().getTheClass() != this.enclosingClass)
+				else if (this.getReceiverType().getTheClass() == this.enclosingClass
+					         && receiver.getType().getTheClass() != this.enclosingClass)
 				{
 					// static method called on wrong type -> warning
 

@@ -59,8 +59,6 @@ public interface IMethod extends ICallableMember, ITypeParametricMember, IContex
 
 	IType getReceiverType();
 
-	void setReceiverType(IType type);
-
 	GenericData getGenericData(GenericData data, IValue instance, ArgumentList arguments);
 	
 	boolean hasTypeVariables();
