@@ -1104,7 +1104,6 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 
 		// Type
 		boolean typeAscription;
-		boolean parameters;
 		if (this.type != null && this.type != Types.UNKNOWN)
 		{
 			typeAscription = Formatting.typeAscription("method.type_ascription", this);
@@ -1112,19 +1111,16 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			if (!typeAscription)
 			{
 				this.type.toString(indent, buffer);
-				parameters = true;
 			}
 			else
 			{
 				buffer.append("func");
-				parameters = this.parameters.size() > 0 || Formatting.getBoolean("method.parameters.visible");
 			}
 		}
 		else
 		{
 			typeAscription = false;
 			buffer.append("func");
-			parameters = this.parameters.size() > 0 || Formatting.getBoolean("method.parameters.visible");
 		}
 
 		// Name
@@ -1137,10 +1133,8 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 
 		// Parameters
-		if (parameters)
-		{
-			this.parameters.toString(indent, buffer);
-		}
+		final IType thisType = this.getThisType();
+		this.parameters.toString(thisType == this.enclosingClass.getThisType() ? null : thisType, indent, buffer);
 
 		// Exceptions
 		if (this.exceptions != null && this.exceptions.size() > 0)

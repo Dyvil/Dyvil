@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.parameter;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -347,11 +348,29 @@ public class ParameterList implements Iterable<IParameter>, IResolvable
 	}
 
 	// Formatting
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
+	{
+		this.toString(null, indent, buffer);
+	}
 
-	public void toString(String prefix, StringBuilder buffer)
+
+	public void toString(IType thisType, @NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
-		Util.astToString(prefix, this.parameters, this.size, Formatting.getSeparator("parameters.separator", ','),
+
+		if (thisType != null)
+		{
+			buffer.append("this");
+			Formatting.appendSeparator(buffer, "parameter.type_ascription", ':');
+			thisType.toString(indent, buffer);
+
+			if (this.size > 0)
+			{
+				Formatting.appendSeparator(buffer, "parameters.separator", ',');
+			}
+		}
+
+		Util.astToString(indent, this.parameters, this.size, Formatting.getSeparator("parameters.separator", ','),
 		                 buffer);
 		Formatting.appendSeparator(buffer, "parameters.close_paren", ')');
 	}
