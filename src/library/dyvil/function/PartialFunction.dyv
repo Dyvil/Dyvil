@@ -1,8 +1,6 @@
 package dyvil.function
 
-public interface PartialFunction<-P1, +R> extends P1 -> R
+interface PartialFunction<type -P1, type +R> extends P1 -> R
 {
-	override func apply(P1 par1) -> R
-
-	func isDefined(P1 par1) -> boolean
+	func isDefined(par1: P1) -> boolean
 }
