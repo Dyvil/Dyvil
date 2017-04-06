@@ -11,7 +11,6 @@ import dyvil.tuple.Tuple;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-@LiteralConvertible.FromNil
 @LiteralConvertible.FromArray
 @Immutable
 public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> implements ImmutableMap<K, V>

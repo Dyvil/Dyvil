@@ -12,7 +12,6 @@ import java.util.BitSet;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-@LiteralConvertible.FromNil
 public class FlatArrayMatrix<E> extends AbstractFlatArrayMatrix<E> implements MutableMatrix<E>
 {
 	private static final long serialVersionUID = -2034131178592900520L;

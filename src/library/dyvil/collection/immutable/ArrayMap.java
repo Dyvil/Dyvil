@@ -15,7 +15,6 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 @SuppressWarnings("SuspiciousSystemArraycopy")
-@LiteralConvertible.FromNil
 @LiteralConvertible.FromArray
 @Immutable
 public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableMap<K, V>

@@ -15,7 +15,6 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@LiteralConvertible.FromNil
 @LiteralConvertible.FromArray
 @LiteralConvertible.FromMap
 public interface MutableMap<K, V> extends Map<K, V>

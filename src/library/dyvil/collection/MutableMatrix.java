@@ -10,7 +10,6 @@ import dyvil.tuple.Tuple;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-@LiteralConvertible.FromNil
 @LiteralConvertible.FromArray
 public interface MutableMatrix<E> extends Matrix<E>
 {

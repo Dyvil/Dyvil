@@ -8,7 +8,6 @@ import dyvil.lang.LiteralConvertible;
 import java.util.Objects;
 import java.util.function.Function;
 
-@LiteralConvertible.FromNil
 @LiteralConvertible.FromArray
 public class ArraySet<E> extends AbstractArraySet<E> implements MutableSet<E>
 {

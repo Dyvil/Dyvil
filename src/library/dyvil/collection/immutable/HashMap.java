@@ -13,7 +13,6 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-@LiteralConvertible.FromNil
 @LiteralConvertible.FromArray
 @Immutable
 public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap<K, V>

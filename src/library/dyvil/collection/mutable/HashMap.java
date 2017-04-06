@@ -11,7 +11,6 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-@LiteralConvertible.FromNil
 @LiteralConvertible.FromArray
 public class HashMap<K, V> extends AbstractHashMap<K, V> implements MutableMap<K, V>
 {

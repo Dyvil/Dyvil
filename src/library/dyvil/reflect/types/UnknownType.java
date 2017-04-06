@@ -4,7 +4,6 @@ import dyvil.annotation.internal.DyvilModifiers;
 import dyvil.lang.LiteralConvertible;
 import dyvil.reflect.Modifiers;
 
-@LiteralConvertible.FromNil
 @DyvilModifiers(Modifiers.OBJECT_CLASS)
 public class UnknownType<T> implements Type<T>
 {

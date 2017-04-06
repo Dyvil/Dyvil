@@ -18,7 +18,6 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @SuppressWarnings( { "unused", "SameParameterValue" })
-@LiteralConvertible.FromNil(methodName = "empty")
 @LiteralConvertible.FromArray
 @LiteralConvertible.FromMap
 public interface Map<K, V> extends SizedIterable<Entry<K, V>>, Serializable

@@ -41,7 +41,6 @@ import java.util.function.Predicate;
  * @author Clashsoft
  */
 @SuppressWarnings("unused")
-@LiteralConvertible.FromNil(methodName = "empty")
 @LiteralConvertible.FromArray
 public interface List<E> extends Collection<E>, BidiQueryable<E>
 {

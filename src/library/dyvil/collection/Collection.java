@@ -36,7 +36,6 @@ import java.util.function.Predicate;
  *
  * @author Clashsoft
  */
-@LiteralConvertible.FromNil(methodName = "empty")
 @LiteralConvertible.FromArray
 public interface Collection<E> extends Queryable<E>, Serializable
 {

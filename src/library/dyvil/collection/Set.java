@@ -10,7 +10,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 @SuppressWarnings("unused")
-@LiteralConvertible.FromNil(methodName = "empty")
 @LiteralConvertible.FromArray
 public interface Set<E> extends Collection<E>
 {

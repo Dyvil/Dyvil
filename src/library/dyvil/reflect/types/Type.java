@@ -2,7 +2,6 @@ package dyvil.reflect.types;
 
 import dyvil.lang.LiteralConvertible;
 
-@LiteralConvertible.FromNil
 @LiteralConvertible.FromString
 @LiteralConvertible.FromClass
 public interface Type<T>

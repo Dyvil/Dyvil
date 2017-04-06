@@ -13,7 +13,6 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-@LiteralConvertible.FromNil
 @LiteralConvertible.FromArray
 public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K, V>
 {

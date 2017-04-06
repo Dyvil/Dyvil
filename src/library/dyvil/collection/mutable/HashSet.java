@@ -14,7 +14,6 @@ import java.util.function.Function;
 
 import static dyvil.collection.impl.AbstractHashMap.*;
 
-@LiteralConvertible.FromNil
 @LiteralConvertible.FromArray
 public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 {

@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@LiteralConvertible.FromNil
 @LiteralConvertible.FromArray
 public class ArrayList<E> extends AbstractArrayList<E> implements MutableList<E>
 {
