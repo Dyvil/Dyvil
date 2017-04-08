@@ -703,7 +703,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 		int tableSpace = 4 + high - low + 1;
 		int tableTime = 3; // constant time
 		int lookupSpace = 3 + 2 * count;
-		int lookupTime = MathUtils.logBaseTwo(count); // binary search O(log n)
+		int lookupTime = MathUtils.log2(count); // binary search O(log n)
 		return count > 0 && tableSpace + 3 * tableTime <= lookupSpace + 3 * lookupTime;
 	}
 

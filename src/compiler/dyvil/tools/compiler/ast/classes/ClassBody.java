@@ -563,7 +563,7 @@ public class ClassBody implements IClassBody
 	@Override
 	public void initExternalMethodCache()
 	{
-		final int cacheSize = MathUtils.powerOfTwo(this.methodCount);
+		final int cacheSize = MathUtils.nextPowerOf2(this.methodCount);
 		final int mask = cacheSize - 1;
 		final MethodLink[] cache = this.namedMethodCache = new MethodLink[cacheSize];
 
@@ -613,7 +613,7 @@ public class ClassBody implements IClassBody
 		 * as many property getters and setters as there are fields. At the end, we compute the next power of two that
 		 * is larger than our sum, and use it as the cache size.
 		 */
-		final int cacheSize = MathUtils.powerOfTwo(this.methodCount + (this.propertyCount << 1) + this.fieldCount);
+		final int cacheSize = MathUtils.nextPowerOf2(this.methodCount + (this.propertyCount << 1) + this.fieldCount);
 		final int mask = cacheSize - 1;
 		final MethodLink[] cache = this.namedMethodCache = new MethodLink[cacheSize];
 

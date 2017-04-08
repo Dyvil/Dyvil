@@ -181,7 +181,7 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 
 	public AbstractIdentityHashMap(int capacity)
 	{
-		this.table = new Object[MathUtils.powerOfTwo(AbstractHashMap.grow(capacity) << 1)];
+		this.table = new Object[MathUtils.nextPowerOf2(AbstractHashMap.grow(capacity) << 1)];
 	}
 
 	public AbstractIdentityHashMap(Entry<? extends K, ? extends V> @NonNull [] entries)
@@ -258,7 +258,7 @@ public abstract class AbstractIdentityHashMap<K, V> implements Map<K, V>
 	{
 		if (newCapacity > this.table.length >> 1)
 		{
-			this.ensureCapacityInternal(MathUtils.powerOfTwo(newCapacity) << 1);
+			this.ensureCapacityInternal(MathUtils.nextPowerOf2(newCapacity) << 1);
 		}
 	}
 

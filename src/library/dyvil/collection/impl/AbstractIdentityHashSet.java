@@ -35,7 +35,7 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 		{
 			throw new IllegalArgumentException("Invalid Capacity: " + capacity);
 		}
-		this.table = new Object[MathUtils.powerOfTwo(AbstractHashMap.grow(capacity)) << 1];
+		this.table = new Object[MathUtils.nextPowerOf2(AbstractHashMap.grow(capacity)) << 1];
 	}
 
 	public AbstractIdentityHashSet(E @NonNull [] elements)
@@ -85,7 +85,7 @@ public abstract class AbstractIdentityHashSet<E> implements Set<E>
 	{
 		if (newCapacity > this.table.length)
 		{
-			this.ensureCapacityInternal(MathUtils.powerOfTwo(newCapacity));
+			this.ensureCapacityInternal(MathUtils.nextPowerOf2(newCapacity));
 		}
 	}
 

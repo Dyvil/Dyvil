@@ -53,7 +53,7 @@ public abstract class AbstractHashSet<E> implements Set<E>
 		{
 			throw new IllegalArgumentException("Invalid Capacity: " + capacity);
 		}
-		this.elements = (HashElement<E>[]) new HashElement[MathUtils.powerOfTwo(AbstractHashMap.grow(capacity))];
+		this.elements = (HashElement<E>[]) new HashElement[MathUtils.nextPowerOf2(AbstractHashMap.grow(capacity))];
 	}
 
 	public AbstractHashSet(E @NonNull [] elements)
@@ -113,7 +113,7 @@ public abstract class AbstractHashSet<E> implements Set<E>
 	{
 		if (newCapacity > this.elements.length)
 		{
-			this.ensureCapacity(MathUtils.powerOfTwo(newCapacity));
+			this.ensureCapacity(MathUtils.nextPowerOf2(newCapacity));
 		}
 	}
 

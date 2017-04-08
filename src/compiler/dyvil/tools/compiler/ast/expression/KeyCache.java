@@ -43,7 +43,7 @@ public class KeyCache
 
 	public KeyCache(int cases)
 	{
-		this.entries = new Entry[MathUtils.powerOfTwo(cases)];
+		this.entries = new Entry[MathUtils.nextPowerOf2(cases)];
 	}
 
 	public boolean contains(int key)

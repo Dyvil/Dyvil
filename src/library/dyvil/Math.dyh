@@ -2,6 +2,7 @@ package dyvil
 
 // Math Utilities
 using   dyvil.math.MathUtils._
+using   java.lang.Math._
 
 // Complex Numbers
 import  dyvil.math.Complex

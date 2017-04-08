@@ -214,7 +214,7 @@ public class HashSet<E> extends AbstractHashSet<E> implements MutableSet<E>
 		// Other than flatMap, map allows us to inline the implementation,
 		// because we can be sure that the size will not grow, and no re-hash /
 		// table growing will be required.
-		int len = MathUtils.powerOfTwo(this.size);
+		int len = MathUtils.nextPowerOf2(this.size);
 		HashElement<E>[] newElements = (HashElement<E>[]) new HashElement[len];
 		int size = 0;
 
