@@ -12,7 +12,6 @@ public class OperatorTest
 
 	static func unary() -> Test = test "Unary" {
 		infix func apply(i: int, j: int) -> (int, int) = (i, j)
-		postfix func ++(i: int) -> int = i
 
 		var i = 1                       // Canonical Representation:
 		let j = [ i -i, i++ i, i++ -i ] // i.apply(-i), (i++).apply(i), (i++).apply(-i)

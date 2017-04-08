@@ -9,11 +9,11 @@ public interface TYPE_NAME##Ref
 {
 	func get() -> PRIMITIVE
 
-	func set(PRIMITIVE value) -> void
+	func set(value: PRIMITIVE) -> void
 
-	infix inline func *(TYPE_NAME##Ref ref) -> PRIMITIVE = ref.get
+	prefix inline func *(ref: TYPE_NAME##Ref) -> PRIMITIVE = ref.get
 
-	infix inline func *_=(TYPE_NAME##Ref ref, PRIMITIVE value) -> void = ref.set(value)
+	infix inline func *_=(ref: TYPE_NAME##Ref, value: PRIMITIVE) -> void = ref.set(value)
 
-	postfix func boxed(TYPE_NAME##Ref ref) -> ObjectRef<WRAPPER> = new Boxed##TYPE_NAME##Ref(ref)
+	postfix func boxed(ref: TYPE_NAME##Ref) -> ObjectRef<WRAPPER> = new Boxed##TYPE_NAME##Ref(ref)
 }

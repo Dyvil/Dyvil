@@ -47,7 +47,7 @@ final class Optionals
 	 * parameter is never actually null.
 	 */
 	@Intrinsic([ LOAD_0 ])
-	postfix func unsafeUnwrap<T>(optional: T?) -> T = optional!!
+	static func unsafeUnwrap<T>(optional: T?) -> T = optional!!
 
 	/**
 	 * Returns the `null` value, but with the possibly non-null type `T`. This is an unsafe operation that should

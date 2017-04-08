@@ -387,9 +387,15 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		final IType[] matchTypes;
 		boolean invalid = false;
 
-		final int mod;
+		final int mod = this.modifiers.toFlags() & Modifiers.INFIX;
 		if (receiver == null)
 		{
+			if (mod == Modifiers.INFIX)
+			{
+				// disallow non-qualified access to infix methods
+				invalid = true;
+			}
+
 			// No receiver
 
 			if (arguments == null)
@@ -404,7 +410,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			argumentStartIndex = 0;
 			parameterStartIndex = 0;
 		}
-		else if ((mod = this.modifiers.toFlags() & Modifiers.INFIX) != 0 && receiver.isClassAccess())
+		else if (mod != 0 && receiver.isClassAccess())
 		{
 			// Static access to static method
 
