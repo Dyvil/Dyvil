@@ -12,7 +12,6 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
@@ -45,7 +44,7 @@ public class WildcardAccess implements IValue
 	@Override
 	public boolean isResolved()
 	{
-		return this.getType().isResolved();
+		return true;
 	}
 
 	@Override
@@ -103,10 +102,6 @@ public class WildcardAccess implements IValue
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		if (!this.getType().isResolved())
-		{
-			markers.add(Markers.semanticError(this.getPosition(), "wildcard.type.unresolved"));
-		}
 	}
 
 	@Override

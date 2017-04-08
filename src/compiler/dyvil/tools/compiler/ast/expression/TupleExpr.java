@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.generic.TypeParameterList;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.TypeList;
@@ -93,6 +94,18 @@ public final class TupleExpr implements IValue
 	public boolean isResolved()
 	{
 		return this.values.isResolved();
+	}
+
+	@Override
+	public boolean isPartialWildcard()
+	{
+		return this.values.size() == 1 && this.values.getFirstValue().isPartialWildcard();
+	}
+
+	@Override
+	public IValue withLambdaParameter(IParameter parameter)
+	{
+		return this.values.size() != 1 ? null : this.values.getFirstValue().withLambdaParameter(parameter);
 	}
 
 	@Override

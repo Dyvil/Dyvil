@@ -1,5 +1,6 @@
 package dyvil.lang
 
+using dyvil.math.MathUtils._
 using dyvil.reflect.Opcodes._
 using dyvil.reflect.ReflectUtils._
 
@@ -93,9 +94,9 @@ abstract class Strings
 
 	// Repetition (*) Operator
 
-	inline infix func *(lhs: int, rhs: String) -> String = repeated(rhs, lhs)
+	infix func *(lhs: int, rhs: String) -> String = repeated(rhs, lhs)
 
-	inline infix func *(lhs: String, rhs: int) -> String = repeated(lhs, rhs)
+	infix func *(lhs: String, rhs: int) -> String = repeated(lhs, rhs)
 
 	private static func repeated(string: String, times: int) -> String
 	{
@@ -166,14 +167,13 @@ abstract class Strings
 		for (i <- 0 ..< arraySize) array1[i] = i
 		for (i <- 0 ..< size1)
 		{
-			array2[0] = i + 1;
+			array2[0] = i + 1
 			for (j <- 0 ..< size2)
 			{
 				let offset = (string[i] != to[j]) ? 1 : 0
-				array2[j + 1] = Math.min(Math.min(array2[j] + 1, array1[j + 1] + 1), array1[j] + offset)
-				// TODO use min(int, int, int)
+				array2[j + 1] = min(array2[j] + 1, array1[j + 1] + 1, array1[j] + offset)
 			}
-			System.arraycopy(array2, 0, array1, 0, arraySize);
+			System.arraycopy(array2, 0, array1, 0, arraySize)
 		}
 		return array2[size2]
 	}

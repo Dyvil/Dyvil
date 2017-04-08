@@ -45,14 +45,14 @@ public interface ICall extends IValue, IArgumentsConsumer
 	@Override
 	default IValue resolve(MarkerList markers, IContext context)
 	{
-		this.resolveReceiver(markers, context);
-		this.resolveArguments(markers, context);
-
 		final int wildcards = this.wildcardCount();
 		if (wildcards > 0)
 		{
 			return this.toLambda(markers, context, wildcards);
 		}
+
+		this.resolveReceiver(markers, context);
+		this.resolveArguments(markers, context);
 
 		// Don't resolve and report an error if the receiver is not resolved
 		IValue receiver = this.getReceiver();
