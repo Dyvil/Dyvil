@@ -6,7 +6,6 @@ import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.reference.PropertyReference;
 import dyvil.tools.compiler.ast.type.IType;
@@ -212,7 +211,7 @@ public class MethodCall extends AbstractCall implements INamed
 			{
 				if (this.receiver.isConstant())
 				{
-					if (this.arguments.size() == 1 && (argument = this.arguments.getFirstValue()).isConstant())
+					if (this.arguments.size() == 1 && (argument = this.arguments.getFirst()).isConstant())
 					{
 						// Binary Infix Operators
 						final IValue folded = ConstantFolder.applyInfix(this.receiver, this.name, argument);
@@ -227,7 +226,7 @@ public class MethodCall extends AbstractCall implements INamed
 					this.receiver = this.receiver.foldConstants();
 				}
 			}
-			else if (this.arguments.size() == 1 && (argument = this.arguments.getFirstValue()).isConstant())
+			else if (this.arguments.size() == 1 && (argument = this.arguments.getFirst()).isConstant())
 			{
 				// Unary Prefix Operators
 				final IValue folded = ConstantFolder.applyUnary(this.name, argument);

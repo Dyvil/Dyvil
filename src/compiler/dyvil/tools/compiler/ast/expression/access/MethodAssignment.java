@@ -6,7 +6,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -47,7 +46,7 @@ public class MethodAssignment extends MethodCall
 			return;
 		}
 
-		final IValue expression = this.arguments.getFirstValue();
+		final IValue expression = this.arguments.getFirst();
 		final Variable receiverVar = new Variable(null, this.receiver.getType(), this.receiver);
 		final Variable expressionVar = new Variable(null, expression.getType(), expression);
 		receiverVar.writeInit(writer);
@@ -83,6 +82,6 @@ public class MethodAssignment extends MethodCall
 		}
 		buffer.append(this.method.getName());
 		buffer.append(' ');
-		this.arguments.getFirstValue().toString(prefix, buffer);
+		this.arguments.getFirst().toString(prefix, buffer);
 	}
 }

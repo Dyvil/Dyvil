@@ -26,21 +26,6 @@ import java.util.Iterator;
 
 public class ArgumentList implements IResolvable, IValueList
 {
-	static IValue convertValue(IValue value, IParameter parameter, GenericData genericData, MarkerList markers,
-		                          IContext context)
-	{
-		if (genericData != null && value.isPolyExpression())
-		{
-			// Lock available type arguments before type-checking a poly-expression
-			genericData.lockAvailable();
-		}
-
-		final IType type = parameter.getCovariantType();
-		final TypeChecker.MarkerSupplier markerSupplier = TypeChecker.markerSupplier("method.access.argument_type",
-		                                                                             parameter.getName());
-		return TypeChecker.convertValue(value, type, genericData, markers, context, markerSupplier);
-	}
-
 	public static final ArgumentList EMPTY = empty();
 
 	protected IValue[] values;
@@ -74,6 +59,8 @@ public class ArgumentList implements IResolvable, IValueList
 		this.size = size;
 	}
 
+	// List Methods
+
 	public static ArgumentList empty()
 	{
 		return new ArgumentList(new IValue[0], 0);
@@ -102,7 +89,7 @@ public class ArgumentList implements IResolvable, IValueList
 		return this.size == 0;
 	}
 
-	public ArgumentList withLastValue(IValue value)
+	public ArgumentList appended(IValue value)
 	{
 		IValue[] values = new IValue[this.size + 1];
 		System.arraycopy(this.values, 0, values, 0, this.size);
@@ -110,27 +97,27 @@ public class ArgumentList implements IResolvable, IValueList
 		return new ArgumentList(values, this.size + 1);
 	}
 
-	public ArgumentList withLastValue(Name name, IValue value)
+	public ArgumentList appended(Name name, IValue value)
 	{
-		return this.withLastValue(value);
+		return this.appended(value);
 	}
 
-	public IValue getFirstValue()
+	public IValue getFirst()
 	{
 		return this.size <= 0 ? null : this.values[0];
 	}
 
-	public void setFirstValue(IValue value)
+	public void setFirst(IValue value)
 	{
 		this.values[0] = value;
 	}
 
-	public IValue getLastValue()
+	public IValue getLast()
 	{
 		return this.values[this.size - 1];
 	}
 
-	public void setLastValue(IValue value)
+	public void setLast(IValue value)
 	{
 		this.values[this.size - 1] = value;
 	}
@@ -169,15 +156,12 @@ public class ArgumentList implements IResolvable, IValueList
 		return this.values[index];
 	}
 
-	public IValue getValue(int index, IParameter param)
+	public IValue get(int index, IParameter param)
 	{
-		if (index >= this.size)
-		{
-			return null;
-		}
-
-		return this.values[index];
+		return this.get(index);
 	}
+
+	// Utilities for Homogeneous Lists
 
 	public IType getCommonType()
 	{
@@ -213,6 +197,8 @@ public class ArgumentList implements IResolvable, IValueList
 
 		return true;
 	}
+
+	// Resolution
 
 	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
@@ -323,6 +309,21 @@ public class ArgumentList implements IResolvable, IValueList
 		return count;
 	}
 
+	static IValue convertValue(IValue value, IParameter parameter, GenericData genericData, MarkerList markers,
+		                          IContext context)
+	{
+		if (genericData != null && value.isPolyExpression())
+		{
+			// Lock available type arguments before type-checking a poly-expression
+			genericData.lockAvailable();
+		}
+
+		final IType type = parameter.getCovariantType();
+		final TypeChecker.MarkerSupplier markerSupplier = TypeChecker.markerSupplier("method.access.argument_type",
+		                                                                             parameter.getName());
+		return TypeChecker.convertValue(value, type, genericData, markers, context, markerSupplier);
+	}
+
 	private static ArrayExpr newArrayExpr(IValue[] values, int startIndex, int count)
 	{
 		final IValue[] arrayValues = new IValue[count];
@@ -379,6 +380,8 @@ public class ArgumentList implements IResolvable, IValueList
 		return true;
 	}
 
+	// Compilation
+
 	public boolean hasParameterOrder()
 	{
 		return true;
@@ -396,6 +399,8 @@ public class ArgumentList implements IResolvable, IValueList
 			this.writeValue(i, parameters.get(i + startIndex), writer);
 		}
 	}
+
+	// Phases
 
 	public boolean isResolved()
 	{
@@ -463,6 +468,8 @@ public class ArgumentList implements IResolvable, IValueList
 		}
 	}
 
+	// String Conversion
+
 	@Override
 	public final String toString()
 	{
@@ -471,17 +478,17 @@ public class ArgumentList implements IResolvable, IValueList
 		return buf.toString();
 	}
 
-	public void toString(@NonNull String prefix, @NonNull StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
 
 		if (this.size > 0)
 		{
-			this.appendValue(prefix, buffer, 0);
+			this.appendValue(indent, buffer, 0);
 			for (int i = 1; i < this.size; i++)
 			{
 				Formatting.appendSeparator(buffer, "parameters.separator", ',');
-				this.appendValue(prefix, buffer, i);
+				this.appendValue(indent, buffer, i);
 			}
 		}
 
@@ -519,6 +526,8 @@ public class ArgumentList implements IResolvable, IValueList
 	{
 		this.values[index].getType().toString("", buffer);
 	}
+
+	// Copying
 
 	public ArgumentList copy()
 	{

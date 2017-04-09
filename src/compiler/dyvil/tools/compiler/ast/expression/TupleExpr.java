@@ -99,19 +99,19 @@ public final class TupleExpr implements IValue
 	@Override
 	public boolean isPartialWildcard()
 	{
-		return this.values.size() == 1 && this.values.getFirstValue().isPartialWildcard();
+		return this.values.size() == 1 && this.values.getFirst().isPartialWildcard();
 	}
 
 	@Override
 	public IValue withLambdaParameter(IParameter parameter)
 	{
-		return this.values.size() != 1 ? null : this.values.getFirstValue().withLambdaParameter(parameter);
+		return this.values.size() != 1 ? null : this.values.getFirst().withLambdaParameter(parameter);
 	}
 
 	@Override
 	public IValue toAssignment(IValue rhs, ICodePosition position)
 	{
-		return this.values.size() != 1 ? null : this.values.getFirstValue().toAssignment(rhs, position);
+		return this.values.size() != 1 ? null : this.values.getFirst().toAssignment(rhs, position);
 	}
 
 	@Override
@@ -188,7 +188,7 @@ public final class TupleExpr implements IValue
 		final int arity = this.values.size();
 		if (arity == 1)
 		{
-			return this.values.getFirstValue().getTypeMatch(type, implicitContext);
+			return this.values.getFirst().getTypeMatch(type, implicitContext);
 		}
 
 		final IClass tupleClass = TupleType.getTupleClass(arity);
@@ -237,7 +237,7 @@ public final class TupleExpr implements IValue
 		case 0:
 			return new VoidValue(this.position);
 		case 1:
-			return this.values.getFirstValue().resolve(markers, context);
+			return this.values.getFirst().resolve(markers, context);
 		}
 
 		this.values.resolve(markers, context);

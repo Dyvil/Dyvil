@@ -214,7 +214,7 @@ public class ConstructorCall implements ICall
 
 		for (int i = 0; i < len; i++)
 		{
-			final IValue value = this.arguments.getValue(i, null);
+			final IValue value = this.arguments.get(i, null);
 			final IValue typed = TypeChecker.convertValue(value, Types.INT, ITypeContext.DEFAULT, markers, context,
 			                                              TypeChecker.markerSupplier("constructor.access.array.type"));
 			this.arguments.set(i, null, typed);
@@ -362,7 +362,7 @@ public class ConstructorCall implements ICall
 
 		for (int i = 0; i < count; i++)
 		{
-			this.arguments.getValue(i, null).writeExpression(writer, Types.INT);
+			this.arguments.get(i, null).writeExpression(writer, Types.INT);
 		}
 
 		writer.visitMultiANewArrayInsn(arrayType, count);

@@ -76,7 +76,7 @@ public final class AnnotationMetadata implements IClassMetadata
 			return;
 		}
 
-		final INamed value = (INamed) retention.getArguments().getValue(0, Annotation.VALUE);
+		final INamed value = (INamed) retention.getArguments().get(0, Annotation.VALUE);
 		try
 		{
 			this.retention = RetentionPolicy.valueOf(value.getName().qualified);
@@ -97,7 +97,7 @@ public final class AnnotationMetadata implements IClassMetadata
 
 		this.targets = EnumSet.noneOf(ElementType.class);
 
-		final ArrayExpr arrayExpr = (ArrayExpr) target.getArguments().getValue(0, Annotation.VALUE);
+		final ArrayExpr arrayExpr = (ArrayExpr) target.getArguments().get(0, Annotation.VALUE);
 		if (arrayExpr == null)
 		{
 			return;

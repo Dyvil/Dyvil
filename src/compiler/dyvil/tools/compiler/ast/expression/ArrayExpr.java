@@ -119,7 +119,7 @@ public final class ArrayExpr implements IValue
 	@Override
 	public boolean isClassAccess()
 	{
-		return this.values.size() == 1 && this.values.getFirstValue().isClassAccess();
+		return this.values.size() == 1 && this.values.getFirst().isClassAccess();
 	}
 
 	@Override
@@ -129,7 +129,7 @@ public final class ArrayExpr implements IValue
 		{
 			return IValue.super.asIgnoredClassAccess();
 		}
-		return new ClassAccess(this.position, new ArrayType(this.values.getFirstValue().getType()))
+		return new ClassAccess(this.position, new ArrayType(this.values.getFirst().getType()))
 			       .asIgnoredClassAccess();
 	}
 

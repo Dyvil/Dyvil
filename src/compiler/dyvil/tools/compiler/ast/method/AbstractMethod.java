@@ -184,7 +184,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				return true;
 			}
 
-			final IValue firstValue = annotation.getArguments().getFirstValue();
+			final IValue firstValue = annotation.getArguments().getFirst();
 			if (firstValue != null)
 			{
 				// In Dyvil source code, the @DyvilName is called @BytecodeName,
@@ -765,7 +765,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return;
 		}
 
-		final IValue value = mutatingAnnotation.getArguments().getValue(0, Annotation.VALUE);
+		final IValue value = mutatingAnnotation.getArguments().get(0, Annotation.VALUE);
 		final String stringValue = value != null ? value.stringValue() : Mutating.DEFAULT_MESSAGE;
 		StringBuilder builder = new StringBuilder(stringValue);
 

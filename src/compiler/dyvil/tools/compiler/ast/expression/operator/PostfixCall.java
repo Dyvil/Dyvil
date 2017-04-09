@@ -46,7 +46,7 @@ public class PostfixCall extends MethodCall
 	public IValue toAssignment(IValue rhs, ICodePosition position)
 	{
 		final Name name = Util.addEq(this.name);
-		return new MethodCall(this.position, this.arguments.getFirstValue(), name, new ArgumentList(rhs));
+		return new MethodCall(this.position, this.arguments.getFirst(), name, new ArgumentList(rhs));
 	}
 
 	@Override

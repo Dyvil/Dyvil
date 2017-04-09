@@ -35,13 +35,13 @@ public class NamedArgumentList extends ArgumentList
 	}
 
 	@Override
-	public NamedArgumentList withLastValue(IValue value)
+	public NamedArgumentList appended(IValue value)
 	{
-		return this.withLastValue(null, value);
+		return this.appended(null, value);
 	}
 
 	@Override
-	public NamedArgumentList withLastValue(Name name, IValue value)
+	public NamedArgumentList appended(Name name, IValue value)
 	{
 		int size = this.size;
 		final int index = size++;
@@ -82,7 +82,7 @@ public class NamedArgumentList extends ArgumentList
 	}
 
 	@Override
-	public IValue getValue(int index, IParameter param)
+	public IValue get(int index, IParameter param)
 	{
 		if (param == null)
 		{

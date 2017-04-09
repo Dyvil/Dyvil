@@ -41,7 +41,7 @@ public class SideEffectHelper
 		final ArgumentList copy = arguments.copy();
 		for (int i = 0, count = arguments.size(); i < count; i++)
 		{
-			final IValue value = arguments.getValue(i, null);
+			final IValue value = arguments.get(i, null);
 			copy.set(i, null, this.processValue(value));
 		}
 		return copy;

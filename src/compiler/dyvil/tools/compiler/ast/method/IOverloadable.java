@@ -17,7 +17,7 @@ public interface IOverloadable extends IMember
 		{
 			return 0;
 		}
-		final IValue value = annotation.getArguments().getFirstValue();
+		final IValue value = annotation.getArguments().getFirst();
 		return value == null ? OverloadPriority.DEFAULT_PRIORITY : value.intValue();
 	}
 }

@@ -3,7 +3,6 @@ package dyvil.tools.compiler.ast.expression.access;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
@@ -22,7 +21,7 @@ public class SubscriptAssignment extends AbstractCall implements IValueConsumer
 	{
 		this.position = position;
 		this.receiver = receiver;
-		this.arguments = arguments.withLastValue(Names.eq, rhs);
+		this.arguments = arguments.appended(Names.eq, rhs);
 	}
 
 	@Override
@@ -46,7 +45,7 @@ public class SubscriptAssignment extends AbstractCall implements IValueConsumer
 	@Override
 	public void setValue(IValue value)
 	{
-		this.arguments = this.arguments.withLastValue(Names.update, value);
+		this.arguments = this.arguments.appended(Names.update, value);
 	}
 	
 	@Override
@@ -65,11 +64,11 @@ public class SubscriptAssignment extends AbstractCall implements IValueConsumer
 		Formatting.appendSeparator(buffer, "method.subscript.open_bracket", '[');
 
 		int count = this.arguments.size() - 1;
-		this.arguments.getValue(0, null).toString(prefix, buffer);
+		this.arguments.get(0, null).toString(prefix, buffer);
 		for (int i = 1; i < count; i++)
 		{
 			Formatting.appendSeparator(buffer, "method.subscript.separator", ',');
-			this.arguments.getValue(i, null).toString(prefix, buffer);
+			this.arguments.get(i, null).toString(prefix, buffer);
 		}
 
 		if (Formatting.getBoolean("method.subscript.close_bracket.space_before"))
@@ -80,6 +79,6 @@ public class SubscriptAssignment extends AbstractCall implements IValueConsumer
 
 		Formatting.appendSeparator(buffer, "field.assignment", '=');
 
-		this.arguments.getLastValue().toString(prefix, buffer);
+		this.arguments.getLast().toString(prefix, buffer);
 	}
 }

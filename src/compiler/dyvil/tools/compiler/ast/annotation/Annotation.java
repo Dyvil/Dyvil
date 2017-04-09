@@ -146,7 +146,7 @@ public final class Annotation implements IAnnotation
 			final IParameter parameter = parameterList.get(i);
 			final IType parameterType = parameter.getType();
 
-			final IValue value = this.arguments.getValue(i, parameter);
+			final IValue value = this.arguments.get(i, parameter);
 			if (value == null)
 			{
 				if (parameter.getValue() == null)
@@ -269,7 +269,7 @@ public final class Annotation implements IAnnotation
 		for (int i = 0, count = parameterList.size(); i < count; i++)
 		{
 			final IParameter parameter = parameterList.get(i);
-			final IValue argument = this.arguments.getValue(i, parameter);
+			final IValue argument = this.arguments.get(i, parameter);
 			if (argument != null)
 			{
 				argument.writeAnnotationValue(writer, parameter.getName().qualified);

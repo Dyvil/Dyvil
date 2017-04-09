@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.expression.intrinsic.IncOperator;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.transform.SideEffectHelper;
 import dyvil.tools.compiler.util.Util;
@@ -60,7 +59,7 @@ public class InfixCall extends MethodCall
 	protected static IValue resolveCompound(MarkerList markers, IContext context, ICodePosition position, IValue lhs,
 		                                       Name name, ArgumentList arguments)
 	{
-		IValue op = getIncOperator(name, lhs, arguments.getLastValue());
+		IValue op = getIncOperator(name, lhs, arguments.getLast());
 		if (op != null)
 		{
 			return op;
@@ -113,7 +112,7 @@ public class InfixCall extends MethodCall
 		if (!this.arguments.isEmpty())
 		{
 			buffer.append(' ');
-			this.arguments.getFirstValue().toString(prefix, buffer);
+			this.arguments.getFirst().toString(prefix, buffer);
 		}
 	}
 }

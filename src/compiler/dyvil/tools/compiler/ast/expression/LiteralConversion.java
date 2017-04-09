@@ -126,7 +126,7 @@ public class LiteralConversion extends AbstractCall
 
 	public static String getMethod(IAnnotation annotation)
 	{
-		final IValue value = annotation.getArguments().getFirstValue();
+		final IValue value = annotation.getArguments().getFirst();
 		if (value == null)
 		{
 			return null;

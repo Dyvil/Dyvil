@@ -419,7 +419,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	private static IValue resolveApplyStatement(MarkerList markers, IContext context, ArgumentList arguments,
 		                                           IValue receiver)
 	{
-		final MethodCall call = new MethodCall(arguments.getFirstValue().getPosition(), receiver, Names.applyStatement, arguments);
+		final MethodCall call = new MethodCall(arguments.getFirst().getPosition(), receiver, Names.applyStatement, arguments);
 		return call.resolveCall(markers, context, false);
 	}
 

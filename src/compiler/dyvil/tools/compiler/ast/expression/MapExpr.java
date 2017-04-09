@@ -112,8 +112,8 @@ public class MapExpr implements IValue
 	@Override
 	public boolean isClassAccess()
 	{
-		return this.keys.size() == 1 && this.keys.getFirstValue().isClassAccess() && this.values.getFirstValue()
-		                                                                                        .isClassAccess();
+		return this.keys.size() == 1 && this.keys.getFirst().isClassAccess() && this.values.getFirst()
+		                                                                                   .isClassAccess();
 	}
 
 	@Override
@@ -124,7 +124,7 @@ public class MapExpr implements IValue
 			return IValue.super.asIgnoredClassAccess();
 		}
 		return new ClassAccess(this.position,
-		                       MapType.base(this.keys.getFirstValue().getType(), this.values.getFirstValue().getType()))
+		                       MapType.base(this.keys.getFirst().getType(), this.values.getFirst().getType()))
 			       .asIgnoredClassAccess();
 	}
 
@@ -369,9 +369,9 @@ public class MapExpr implements IValue
 			buffer.append(' ');
 		}
 
-		this.keys.getFirstValue().toString(newIndent, buffer);
+		this.keys.getFirst().toString(newIndent, buffer);
 		buffer.append(keyValueSeparator);
-		this.values.getFirstValue().toString(newIndent, buffer);
+		this.values.getFirst().toString(newIndent, buffer);
 
 		for (int i = 1; i < size; i++)
 		{

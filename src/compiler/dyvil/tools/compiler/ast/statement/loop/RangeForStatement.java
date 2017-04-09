@@ -53,12 +53,12 @@ public class RangeForStatement extends ForEachStatement
 
 	public static IValue getEndValue(MethodCall rangeOperator)
 	{
-		return rangeOperator.getArguments().getFirstValue();
+		return rangeOperator.getArguments().getFirst();
 	}
 
 	public static IType getElementType(MethodCall range)
 	{
-		return Types.combine(range.getReceiver().getType(), range.getArguments().getFirstValue().getType());
+		return Types.combine(range.getReceiver().getType(), range.getArguments().getFirst().getType());
 	}
 
 	@Override

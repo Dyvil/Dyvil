@@ -90,7 +90,7 @@ public class ApplyMethodCall extends AbstractCall
 		if (this.arguments.size() == 1 && this.receiver instanceof ICall)
 		{
 			final ICall call = (ICall) this.receiver;
-			IValue argument = this.arguments.getFirstValue();
+			IValue argument = this.arguments.getFirst();
 
 			if (argument instanceof Closure)
 			{
@@ -100,7 +100,7 @@ public class ApplyMethodCall extends AbstractCall
 				call.resolveReceiver(markers, context);
 				call.resolveArguments(markers, context);
 
-				call.setArguments(oldArgs.withLastValue(null, argument));
+				call.setArguments(oldArgs.appended(null, argument));
 
 				final IValue resolvedCall = call.resolveCall(markers, context, false);
 				if (resolvedCall != null)

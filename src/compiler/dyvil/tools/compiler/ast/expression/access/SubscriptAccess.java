@@ -84,11 +84,11 @@ public class SubscriptAccess extends AbstractCall
 		int count = this.arguments.size();
 		if (count > 0)
 		{
-			this.arguments.getValue(0, null).toString(prefix, buffer);
+			this.arguments.get(0, null).toString(prefix, buffer);
 			for (int i = 1; i < count; i++)
 			{
 				Formatting.appendSeparator(buffer, "method.subscript.separator", ',');
-				this.arguments.getValue(i, null).toString(prefix, buffer);
+				this.arguments.get(i, null).toString(prefix, buffer);
 			}
 		}
 

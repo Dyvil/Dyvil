@@ -113,7 +113,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 		final ArgumentList arguments = this.getArguments();
 		for (int i = 0, size = arguments.size(); i < size; i++)
 		{
-			final IValue argument = arguments.getValue(i, null);
+			final IValue argument = arguments.get(i, null);
 			if (argument.isPartialWildcard())
 			{
 				arguments.set(i, null, argument.withLambdaParameter(parameters[parIndex++]));
@@ -189,7 +189,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 		// Methods available through the first argument
 		if (arguments.size() == 1)
 		{
-			arguments.getFirstValue().getType().getMethodMatches(matches, receiver, name, arguments);
+			arguments.getFirst().getType().getMethodMatches(matches, receiver, name, arguments);
 			if (matches.hasCandidate())
 			{
 				return matches;
