@@ -465,11 +465,12 @@ task prepareRelease(type: Copy) {
 	}
 
 	filter {
-		it.replace('$$version$$', version)
-				.replace('$$libraryVersion$$', libraryVersion)
-				.replace('$$compilerVersion$$', compilerVersion)
-				.replace('$$replVersion$$', replVersion)
-				.replace('$$dpfVersion$$', dpfVersion)
+		it.replace('$$version$$', version.toString())
+		  .replace('$$libraryVersion$$', libraryVersion)
+		  .replace('$$compilerVersion$$', compilerVersion)
+		  .replace('$$replVersion$$', replVersion)
+		  .replace('$$dpfVersion$$', dpfVersion)
+		  .replace('$$genSrcVersion$$', genSrcVersion)
 	}
 
 	doLast {
