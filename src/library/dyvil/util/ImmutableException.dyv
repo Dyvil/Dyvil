@@ -1,0 +1,13 @@
+package dyvil.util
+
+/**
+ * An {@linkplain Exception} that is thrown when accessing a mutating member of an immutable collection.
+ *
+ * @author Clashsoft
+ */
+class ImmutableException extends RuntimeException
+{
+	init() { super.init() }
+
+	init(message: String) { super.init(message) }
+}
