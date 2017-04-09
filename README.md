@@ -10,12 +10,12 @@ The Dyvil programming language
 [![Issue Stats](http://issuestats.com/github/Dyvil/Dyvil/badge/issue?style=flat)](http://issuestats.com/github/Dyvil/Dyvil)
 
 **Dyvil** is a multi-paradigm, general purpose programming language that is based on Java and the JVM.
-It is a compiled, statically and stronly typed language that supports both object-oriented, functional and imperative
+It is a compiled, statically and strongly typed language that supports object-oriented, functional and imperative
 programming styles. The language features many high-level constructs as well as an extensible and expressive syntax,
-making it highly useful for both rapid and safe prototyping and the creation of domain-specific languages.
+making it highly useful for both rapid and safe prototyping, and the creation of domain-specific languages.
 
 In addition to the **Dyvil-to-JVM-Bytecode compiler**, the toolchain consists of an executable **REPL**, a full-fledged
-**standard library** including an extensive collection framework, the **Dyvil Property Format** library and
+**standard library** which includes an extensive collection framework, the **Dyvil Property Format** library and
 specification, and the **GenSrc** source code generation and text template specialization tool. Information on all
 components can be found in the [Language Reference][1].
 
