@@ -34,8 +34,35 @@ form of GitHub Issues or Pull Requests are welcome and encouraged.
 
 ---
 
+## Links
+
 ### [Language Reference][1]
 
 ### [Dyvil on Reddit](https://www.reddit.com/r/Dyvil/)
+
+---
+
+## How to try out Dyvil
+
+### The REPL
+
+1. Download the `dyvil-vX.Y.Z.jar` file from a [Release](https://github.com/Dyvil/Dyvil/releases).
+2. Run it with
+        
+        $ java -jar dyvil-vX.Y.Z.jar
+        
+3. Start typing declarations and commands.
+
+See [the REPL Reference](https://dyvil.gitbooks.io/dyvil-language-reference/content/tools/repl.html) for more details.
+
+### The Compiler
+
+1. Download the `dyvil-vX.Y.Z.jar` files from a [Release](https://github.com/Dyvil/Dyvil/releases).
+2. Visit [the Compiler Reference](https://dyvil.gitbooks.io/dyvil-language-reference/content/tools/dyvil-compiler.html) to find out how to use compiler command line arguments and configurations.
+3. Run it with
+        
+        $ java -cp dyvil-vX.Y.Z dyvil.tools.compiler.Main <args...>
+        
+4. The generated class files should now be in the specified output directory.
 
 [1]: https://dyvil.gitbooks.io/dyvil-language-reference/content/
