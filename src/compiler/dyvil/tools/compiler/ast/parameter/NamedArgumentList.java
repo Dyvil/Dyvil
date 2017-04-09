@@ -320,14 +320,6 @@ public class NamedArgumentList extends ArgumentList
 	}
 
 	@Override
-	public void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
-	{
-		final int argIndex = this.findIndex(index, param.getName());
-
-		this.values[argIndex].writeExpression(writer, param.getCovariantType());
-	}
-
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.size; i++)

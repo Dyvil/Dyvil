@@ -194,6 +194,17 @@ public class ClassParameter extends Field implements IParameter
 	}
 
 	@Override
+	public void resolve(MarkerList markers, IContext context)
+	{
+		super.resolve(markers, context);
+
+		if (this.value !=null)
+		{
+			this.getModifiers().addIntModifier(Modifiers.DEFAULT);
+		}
+	}
+
+	@Override
 	protected boolean hasDefaultInit()
 	{
 		return true;
@@ -208,6 +219,11 @@ public class ClassParameter extends Field implements IParameter
 		}
 
 		super.write(writer);
+
+		if (this.hasModifier(Modifiers.DEFAULT))
+		{
+			this.writeDefaultValue(writer);
+		}
 	}
 
 	@Override

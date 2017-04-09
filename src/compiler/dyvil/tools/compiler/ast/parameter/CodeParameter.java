@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.parameter;
 
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
@@ -12,6 +13,8 @@ import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
+import dyvil.tools.compiler.backend.ClassWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
@@ -61,6 +64,8 @@ public class CodeParameter extends AbstractParameter
 			return;
 		}
 
+		this.getModifiers().addIntModifier(Modifiers.DEFAULT);
+
 		IValue value = this.value.resolve(markers, context);
 
 		final String kindName = this.getKind().getName();
@@ -69,8 +74,6 @@ public class CodeParameter extends AbstractParameter
 		                                                                             this.name);
 
 		value = TypeChecker.convertValue(value, this.type, null, markers, context, markerSupplier);
-
-		this.value = IValue.toAnnotationConstant(value, markers, context);
 	}
 
 	@Override
@@ -110,10 +113,11 @@ public class CodeParameter extends AbstractParameter
 			markers.add(Markers.semanticError(this.position, "parameter.type.void"));
 		}
 
-		if (this.isVarargs() && !this.type.canExtract(ArrayType.class) && this.type.getAnnotation(
-			ArrayExpr.LazyFields.ARRAY_CONVERTIBLE) == null)
+		if (this.isVarargs() && !this.type.canExtract(ArrayType.class)
+			    && this.type.getAnnotation(ArrayExpr.LazyFields.ARRAY_CONVERTIBLE) == null)
 		{
-			final Marker marker = Markers.semanticError(this.type.getPosition(), "parameter.varargs.incompatible", this.name);
+			final Marker marker = Markers.semanticError(this.type.getPosition(), "parameter.varargs.incompatible",
+			                                            this.name);
 			marker.addInfo(Markers.getSemantic("parameter.type", this.type));
 			markers.add(marker);
 		}
@@ -138,6 +142,14 @@ public class CodeParameter extends AbstractParameter
 		if (this.value != null)
 		{
 			this.value = this.value.cleanup(compilableList, classCompilableList);
+
+			classCompilableList.addClassCompilable(this);
 		}
+	}
+
+	@Override
+	public void write(ClassWriter writer) throws BytecodeException
+	{
+		this.writeDefaultValue(writer);
 	}
 }

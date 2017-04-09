@@ -493,7 +493,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 				varargs += partialVarargs;
 				continue;
 			}
-			if (parameter.getValue() != null)
+			if (parameter.hasModifier(Modifiers.DEFAULT))
 			{
 				defaults++;
 				continue;

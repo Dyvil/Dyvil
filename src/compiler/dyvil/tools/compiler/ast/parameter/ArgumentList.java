@@ -387,9 +387,15 @@ public class ArgumentList implements IResolvable, IValueList
 		return true;
 	}
 
-	public void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
+	public final void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
 	{
-		this.values[index].writeExpression(writer, param.getCovariantType());
+		final IValue value = this.get(index, param);
+		if (value == null)
+		{
+			param.writeGetDefaultValue(writer);
+			return;
+		}
+		value.writeExpression(writer, param.getCovariantType());
 	}
 
 	public void writeValues(MethodWriter writer, ParameterList parameters, int startIndex) throws BytecodeException

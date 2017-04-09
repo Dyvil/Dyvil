@@ -173,6 +173,10 @@ public interface Modifiers
 	 */
 	int LAZY = 0x00010000;
 
+	// Parameter Modifiers
+
+	int DEFAULT = 0x00020000;
+
 	// Member Modifiers
 
 	/**
@@ -249,12 +253,12 @@ public interface Modifiers
 	 * The modifiers that can be used on parameters.
 	 */
 	int PARAMETER_MODIFIERS = FINAL | EXPLICIT // denotable
-		                          | MANDATED | EXTENSION | VARARGS | SYNTHETIC;
+		                          | DEFAULT | MANDATED | EXTENSION | VARARGS | SYNTHETIC;
 
 	/**
 	 * The modifiers that can be applied to class parameters.
 	 */
-	int CLASS_PARAMETER_MODIFIERS = ACCESS_MODIFIERS | FINAL;
+	int CLASS_PARAMETER_MODIFIERS = ACCESS_MODIFIERS | FINAL | DEFAULT;
 
 	/**
 	 * The modifiers that cna be applied to variables.
