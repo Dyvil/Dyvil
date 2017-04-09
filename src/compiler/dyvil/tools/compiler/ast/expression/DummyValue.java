@@ -1,19 +1,24 @@
 package dyvil.tools.compiler.ast.expression;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.context.IImplicitContext;
+import dyvil.tools.compiler.ast.expression.constant.IConstantValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
-import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-public class DummyValue implements IValue
+public class DummyValue implements IConstantValue
 {
+	private final IType type;
+
+	public DummyValue(IType type)
+	{
+		this.type = type;
+	}
+
 	@Override
 	public int valueTag()
 	{
@@ -23,12 +28,7 @@ public class DummyValue implements IValue
 	@Override
 	public boolean isResolved()
 	{
-		return false;
-	}
-
-	@Override
-	public void setPosition(ICodePosition position)
-	{
+		return true;
 	}
 
 	@Override
@@ -38,15 +38,14 @@ public class DummyValue implements IValue
 	}
 
 	@Override
-	public IType getType()
+	public void setPosition(ICodePosition position)
 	{
-		return Types.UNKNOWN;
 	}
 
 	@Override
-	public boolean isType(IType type)
+	public IType getType()
 	{
-		return false;
+		return this.type;
 	}
 
 	@Override
@@ -56,42 +55,15 @@ public class DummyValue implements IValue
 	}
 
 	@Override
-	public int getTypeMatch(IType type, IImplicitContext implicitContext)
+	public int stringSize()
 	{
-		return 0;
+		return -1;
 	}
 
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
+	public boolean toStringBuilder(StringBuilder builder)
 	{
-	}
-
-	@Override
-	public IValue resolve(MarkerList markers, IContext context)
-	{
-		return this;
-	}
-
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-	}
-
-	@Override
-	public void check(MarkerList markers, IContext context)
-	{
-	}
-
-	@Override
-	public IValue foldConstants()
-	{
-		return this;
-	}
-
-	@Override
-	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
-	{
-		return this;
+		return false;
 	}
 
 	@Override
@@ -102,12 +74,14 @@ public class DummyValue implements IValue
 	@Override
 	public String toString()
 	{
-		return "dummy";
+		return "dummy<" + this.type + ">";
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		buffer.append("dummy");
+		buffer.append("dummy<");
+		this.type.toString(indent, buffer);
+		buffer.append('>');
 	}
 }

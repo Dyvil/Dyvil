@@ -29,7 +29,7 @@ import java.io.IOException;
 
 public final class LambdaType extends ResolvedGenericType
 {
-	private static final IClass[] functionClasses = new IClass[22];
+	private static final IClass[] functionClasses = new IClass[TupleType.MAX_ARITY];
 
 	// Metadata
 	protected boolean extension;

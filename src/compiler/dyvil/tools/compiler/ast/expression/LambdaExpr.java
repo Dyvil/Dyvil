@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.access.AbstractCall;
 import dyvil.tools.compiler.ast.expression.access.ConstructorCall;
 import dyvil.tools.compiler.ast.expression.access.FieldAccess;
+import dyvil.tools.compiler.ast.expression.constant.WildcardValue;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.MapTypeContext;
@@ -546,8 +547,8 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		}
 		else
 		{
-			markers.add(Markers.semantic(this.position, "lambda.value.invalid"));
-			this.value = new DummyValue();
+			markers.add(Markers.semanticError(this.position, "lambda.value.invalid"));
+			this.value = new WildcardValue(this.position);
 		}
 	}
 
