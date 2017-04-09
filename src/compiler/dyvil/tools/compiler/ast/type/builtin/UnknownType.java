@@ -4,7 +4,6 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.raw.IUnresolvedType;
-import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -23,7 +22,7 @@ public class UnknownType implements IUnresolvedType
 	@Override
 	public Name getName()
 	{
-		return Names.auto;
+		return null;
 	}
 
 	@Override
@@ -74,12 +73,12 @@ public class UnknownType implements IUnresolvedType
 	@Override
 	public String toString()
 	{
-		return "auto";
+		return "<unknown>";
 	}
 
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append("auto");
+		buffer.append("<unknown>");
 	}
 }

@@ -356,7 +356,6 @@ public final class Types
 		case "double": return DOUBLE;
 		case "any": return ANY;
 		case "none": return NONE;
-		case "auto": return UNKNOWN;
 		// @formatter:on
 		}
 		return null;

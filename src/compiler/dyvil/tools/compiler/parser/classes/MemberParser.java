@@ -243,7 +243,7 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 				{
 					// Improve error handling for missing identifiers
 					this.position = token.raw();
-					this.name = Names.auto;
+					this.name = Names.apply;
 					pm.reparse();
 				}
 

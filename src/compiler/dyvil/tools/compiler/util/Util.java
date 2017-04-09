@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
@@ -72,7 +73,7 @@ public final class Util
 	{
 		if (type == null)
 		{
-			stringBuilder.append("auto");
+			stringBuilder.append(Types.UNKNOWN);
 			return;
 		}
 

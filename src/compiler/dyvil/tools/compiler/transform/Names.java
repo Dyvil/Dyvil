@@ -41,7 +41,6 @@ public final class Names
 
 	public static final Name any     = Name.fromRaw("any");
 	public static final Name none    = Name.fromRaw("none");
-	public static final Name auto    = Name.fromRaw("auto");
 
 	public static final Name eq    = Name.from("=", "$eq");
 	public static final Name colon = Name.from(":", "$colon");
