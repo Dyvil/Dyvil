@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.type.IType;
@@ -28,7 +28,7 @@ public class ClassConstructor extends ConstructorCall
 		this.nestedClass = new AnonymousClass(position);
 	}
 
-	public ClassConstructor(ICodePosition position, IType type, IArguments arguments)
+	public ClassConstructor(ICodePosition position, IType type, ArgumentList arguments)
 	{
 		super(position, type, arguments);
 	}
@@ -48,7 +48,7 @@ public class ClassConstructor extends ConstructorCall
 		{
 			if (theClass.isInterface())
 			{
-				this.nestedClass.addInterface(this.type);
+				this.nestedClass.getInterfaces().add(this.type);
 			}
 			else
 			{

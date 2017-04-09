@@ -1,5 +1,7 @@
 package dyvil.tools.gensrc.ast;
 
+import dyvil.collection.List;
+import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.gensrc.GenSrc;
 import dyvil.tools.gensrc.ast.scope.Scope;
 import dyvil.tools.gensrc.lang.I18n;
@@ -8,7 +10,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.List;
 import java.util.Properties;
 
 public class Specialization implements Scope
@@ -143,29 +144,63 @@ public class Specialization implements Scope
 			return;
 		}
 
-		final File specFile = resolveSpecFile(gensrc, inherited, this.getSourceFile());
-		final Specialization spec = gensrc.getSpecialization(specFile);
+		final Specialization spec = resolveSpec(inherited, this.getSourceFile(), gensrc);
 		if (spec == null)
 		{
-			markers.add(I18n.get("spec.inheritFrom.unresolved", specFile));
+			markers.add(I18n.get("spec.inheritFrom.unresolved", inherited));
 			return;
 		}
 
 		this.parent = spec;
 	}
 
-	public static File resolveSpecFile(GenSrc gensrc, String reference, File sourceFile)
+	public static List<File> resolveSpecFiles(String reference, File sourceFile, GenSrc gensrc)
 	{
-		// If the referenced file starts with '.', it is relative to the parent directory of this spec file
-		// Otherwise, it is relative to the source root
+		if (reference.startsWith("."))
+		{
+			// Relative to the parent directory of the spec file
+			return List.apply(new File(sourceFile.getParent(), reference));
+		}
 
-		return reference.startsWith(".") ?
-			       new File(sourceFile.getParent(), reference) :
-			       new File(gensrc.getSourceRoot(), reference);
+		if (reference.startsWith("$ROOT"))
+		{
+			// Remove leading '$ROOT', useful for '$ROOT/../' or the like
+			reference = reference.substring(5);
+		}
+
+		final List<File> sourceRoots = gensrc.getSourceRoots();
+		final List<File> list = new ArrayList<>(sourceRoots.size());
+
+		for (File sourceRoot : sourceRoots)
+		{
+			final File file = new File(sourceRoot, reference);
+			if (file.exists())
+			{
+				list.add(file);
+			}
+		}
+
+		return list;
 	}
 
-	public static Specialization resolveSpec(GenSrc gensrc, String reference, File sourceFile)
+	public static Specialization resolveSpec(String reference, File sourceFile, GenSrc gensrc)
 	{
-		return gensrc.getSpecialization(resolveSpecFile(gensrc, reference, sourceFile));
+		Specialization spec = null;
+		for (File file : resolveSpecFiles(reference, sourceFile, gensrc))
+		{
+			final Specialization resolved = gensrc.getSpecialization(file);
+
+			if (resolved == null)
+			{
+				continue;
+			}
+			if (spec != null)
+			{
+				return null; // ambigous
+			}
+			spec = resolved;
+		}
+
+		return spec;
 	}
 }

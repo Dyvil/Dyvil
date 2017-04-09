@@ -14,7 +14,6 @@ import java.util.function.Predicate;
 
 import static dyvil.collection.impl.AbstractIdentityHashMap.*;
 
-@LiteralConvertible.FromNil
 @LiteralConvertible.FromArray
 public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements MutableSet<E>
 {

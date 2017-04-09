@@ -10,8 +10,6 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-@LiteralConvertible.FromNil
-@LiteralConvertible.FromColonOperator(methodName = "singleton")
 @LiteralConvertible.FromArray
 public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements MutableMap<K, V>
 {
@@ -35,13 +33,13 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements MutableMap
 
 	@NonNull
 	@SafeVarargs
-	public static <K, V> ArrayMap<K, V> apply(@NonNull Entry<? extends K, ? extends V>... entries)
+	public static <K, V> ArrayMap<K, V> apply(@NonNull Entry<? extends K, ? extends V> @NonNull... entries)
 	{
 		return new ArrayMap<>(entries);
 	}
 
 	@NonNull
-	public static <K, V> ArrayMap<K, V> from(Entry<? extends K, ? extends V> @NonNull [] array)
+	public static <K, V> ArrayMap<K, V> from(@NonNull Entry<? extends K, ? extends V> @NonNull [] array)
 	{
 		return new ArrayMap<>(array);
 	}

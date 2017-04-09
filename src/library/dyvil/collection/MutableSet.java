@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@LiteralConvertible.FromNil
 @LiteralConvertible.FromArray
 public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 {

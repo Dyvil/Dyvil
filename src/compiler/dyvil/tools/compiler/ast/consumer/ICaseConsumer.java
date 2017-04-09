@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.ast.consumer;
 
-import dyvil.tools.compiler.ast.pattern.ICase;
+import dyvil.tools.compiler.ast.expression.MatchCase;
 
 public interface ICaseConsumer
 {
-	public void addCase(ICase matchCase);
+	void addCase(MatchCase matchCase);
 }

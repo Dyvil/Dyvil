@@ -137,10 +137,10 @@ public final class StringInterpolationExpr implements IValue
 		}
 
 		final ArgumentList list = new ArgumentList(this.valueCount);
-		list.addValue(string);
+		list.add(string);
 		for (int i = 0; i < this.valueCount; i++)
 		{
-			list.addValue(this.values[i]);
+			list.add(this.values[i]);
 		}
 
 		return new LiteralConversion(this, annotation, list).withType(type, typeContext, markers, context);

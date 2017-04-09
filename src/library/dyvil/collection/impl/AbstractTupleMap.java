@@ -31,7 +31,7 @@ public abstract class AbstractTupleMap<K, V> implements Map<K, V>
 
 	public AbstractTupleMap(int capacity)
 	{
-		this.entries = (Tuple.Of2<K, V>[]) new Tuple.Of2[MathUtils.powerOfTwo(capacity)];
+		this.entries = (Tuple.Of2<K, V>[]) new Tuple.Of2[MathUtils.nextPowerOf2(capacity)];
 	}
 
 	public AbstractTupleMap(@NonNull Entry<? extends K, ? extends V> @NonNull [] entries)

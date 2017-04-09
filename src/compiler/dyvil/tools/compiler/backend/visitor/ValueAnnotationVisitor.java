@@ -61,9 +61,9 @@ public class ValueAnnotationVisitor implements AnnotationVisitor
 	@Override
 	public AnnotationVisitor visitArray(String key)
 	{
-		ArrayExpr valueList = new ArrayExpr();
+		final ArrayExpr valueList = new ArrayExpr();
 		this.consumer.setValue(valueList);
-		return new AnnotationValueReader(valueList);
+		return new AnnotationValueReader(valueList.getValues());
 	}
 
 	@Override

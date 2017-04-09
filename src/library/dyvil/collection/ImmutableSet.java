@@ -16,7 +16,6 @@ import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@LiteralConvertible.FromNil
 @LiteralConvertible.FromArray
 @Immutable
 public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<E>

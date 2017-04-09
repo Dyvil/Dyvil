@@ -6,9 +6,10 @@ import dyvil.tools.asm.MethodVisitor;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.metadata.IClassMetadata;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.IValueList;
 import dyvil.tools.compiler.ast.member.INamed;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -54,7 +55,7 @@ public final class AnnotationMetadata implements IClassMetadata
 		// Add the java.lang.Annotation interface
 		if (!this.theClass.isSubClassOf(Annotation.LazyFields.ANNOTATION))
 		{
-			this.theClass.addInterface(Annotation.LazyFields.ANNOTATION);
+			this.theClass.getInterfaces().add(Annotation.LazyFields.ANNOTATION);
 		}
 
 		if (this.retention == null)
@@ -75,7 +76,7 @@ public final class AnnotationMetadata implements IClassMetadata
 			return;
 		}
 
-		final INamed value = (INamed) retention.getArguments().getValue(0, Annotation.VALUE);
+		final INamed value = (INamed) retention.getArguments().get(0, Annotation.VALUE);
 		try
 		{
 			this.retention = RetentionPolicy.valueOf(value.getName().qualified);
@@ -95,16 +96,19 @@ public final class AnnotationMetadata implements IClassMetadata
 		}
 
 		this.targets = EnumSet.noneOf(ElementType.class);
-		IValueList values = (IValueList) target.getArguments().getValue(0, Annotation.VALUE);
-		if (values == null)
+
+		final ArrayExpr arrayExpr = (ArrayExpr) target.getArguments().get(0, Annotation.VALUE);
+		if (arrayExpr == null)
 		{
 			return;
 		}
 
-		int count = values.valueCount();
-		for (int i = 0; i < count; i++)
+		final ArgumentList values = arrayExpr.getValues();
+		final int size = values.size();
+
+		for (int i = 0; i < size; i++)
 		{
-			final INamed value = (INamed) values.getValue(i);
+			final INamed value = (INamed) values.get(i);
 			try
 			{
 				this.targets.add(ElementType.valueOf(value.getName().qualified));
@@ -129,7 +133,7 @@ public final class AnnotationMetadata implements IClassMetadata
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		for (IParameter parameter : this.theClass.getParameterList())
+		for (IParameter parameter : this.theClass.getParameters())
 		{
 			final IValue value = parameter.getValue();
 			if (value != null)
@@ -142,7 +146,7 @@ public final class AnnotationMetadata implements IClassMetadata
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		for (IParameter parameter : this.theClass.getParameterList())
+		for (IParameter parameter : this.theClass.getParameters())
 		{
 			final StringBuilder desc = new StringBuilder("()");
 			parameter.getType().appendExtendedName(desc);

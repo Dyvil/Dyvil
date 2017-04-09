@@ -9,8 +9,6 @@ import dyvil.tools.asm.*;
 
 import java.lang.invoke.*;
 import java.lang.reflect.Constructor;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static dyvil.reflect.MethodReflection.LOOKUP;
@@ -18,7 +16,6 @@ import static dyvil.reflect.Modifiers.*;
 import static dyvil.reflect.Opcodes.*;
 import static dyvil.reflect.ReflectUtils.UNSAFE;
 import static dyvil.runtime.TypeConverter.*;
-import static dyvil.string.StringUtils.EMPTY_STRING_ARRAY;
 
 public final class AnonymousClassLMF extends AbstractLMF
 {
@@ -117,7 +114,7 @@ public final class AnonymousClassLMF extends AbstractLMF
 		}
 		else
 		{
-			this.argNames = this.argDescs = EMPTY_STRING_ARRAY;
+			this.argNames = this.argDescs = null;
 		}
 
 		this.toString = toString;
@@ -130,29 +127,19 @@ public final class AnonymousClassLMF extends AbstractLMF
 		final Class<?> innerClass = this.spinInnerClass();
 		if (this.parameterCount == 0)
 		{
-			final Constructor[] ctrs = AccessController.doPrivileged((PrivilegedAction<Constructor[]>) () ->
-			{
-				Constructor<?>[] ctrs1 = innerClass.getDeclaredConstructors();
-				if (ctrs1.length == 1)
-				{
-					// The lambda implementing inner class constructor is
-					// private, set
-					// it accessible (by us) before creating the constant
-					// sole instance
-					ctrs1[0].setAccessible(true);
-				}
-				return ctrs1;
-			});
+			final Constructor[] ctrs = innerClass.getDeclaredConstructors();
 			if (ctrs.length != 1)
 			{
-				throw new LambdaConversionException("Expected one lambda constructor for " + innerClass
-					                                                                             .getCanonicalName()
-					                                    + ", got " + ctrs.length);
+				final String message =
+					"Expected one lambda constructor for " + innerClass.getCanonicalName() + ", got " + ctrs.length;
+				throw new LambdaConversionException(message);
 			}
 
 			try
 			{
-				Object inst = ctrs[0].newInstance();
+				final Constructor ctr = ctrs[0];
+				ctr.setAccessible(true);
+				final Object inst = ctr.newInstance();
 				return new ConstantCallSite(MethodHandles.constant(this.samBase, inst));
 			}
 			catch (ReflectiveOperationException e)
@@ -179,19 +166,19 @@ public final class AnonymousClassLMF extends AbstractLMF
 		              "java/lang/Object", new String[] { samIntf });
 
 		// Generate final fields to be filled in by constructor
-		for (int i = 0; i < this.argDescs.length; i++)
+
+		if (this.parameterCount != 0)
 		{
-			FieldVisitor fv = this.cw.visitField(PRIVATE | FINAL, this.argNames[i], this.argDescs[i], null, null);
-			fv.visitEnd();
+			for (int i = 0; i < this.parameterCount; i++)
+			{
+				FieldVisitor fv = this.cw.visitField(PRIVATE | FINAL, this.argNames[i], this.argDescs[i], null, null);
+				fv.visitEnd();
+			}
+			this.generateFactory();
 		}
 
 		this.generateConstructor();
 		this.generateToString();
-
-		if (this.parameterCount != 0)
-		{
-			this.generateFactory();
-		}
 
 		this.generateSAM();
 
@@ -272,7 +259,7 @@ public final class AnonymousClassLMF extends AbstractLMF
 			mv.visitTypeInsn(NEW, this.implMethodClassName);
 			mv.visitInsn(DUP);
 		}
-		for (int i = 0; i < this.argNames.length; i++)
+		for (int i = 0; i < this.parameterCount; i++)
 		{
 			mv.visitVarInsn(ALOAD, 0);
 			mv.visitFieldInsn(GETFIELD, this.lambdaClassName, this.argNames[i], this.argDescs[i]);

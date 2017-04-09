@@ -75,9 +75,7 @@ public final class TypeOperator extends AbstractValue
 	{
 		if (this.genericType == null)
 		{
-			ClassGenericType generic = new ClassGenericType(LazyFields.TYPE_CLASS);
-			generic.addType(this.type);
-			return this.genericType = generic;
+			return this.genericType = new ClassGenericType(LazyFields.TYPE_CLASS, this.type);
 		}
 		return this.genericType;
 	}
@@ -126,9 +124,7 @@ public final class TypeOperator extends AbstractValue
 		}
 
 		this.type = this.type.resolveType(markers, context);
-		ClassGenericType generic = new ClassGenericType(LazyFields.TYPE_CLASS);
-		generic.addType(this.type);
-		this.genericType = generic;
+		this.genericType = new ClassGenericType(LazyFields.TYPE_CLASS, this.type);
 	}
 
 	@Override

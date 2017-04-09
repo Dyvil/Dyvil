@@ -1,5 +1,9 @@
 package dyvil.tools.gensrc;
 
+import dyvil.collection.List;
+import dyvil.collection.Map;
+import dyvil.collection.mutable.ArrayList;
+import dyvil.collection.mutable.HashMap;
 import dyvil.tools.gensrc.ast.Specialization;
 import dyvil.tools.gensrc.ast.Template;
 import dyvil.tools.gensrc.lang.I18n;
@@ -9,10 +13,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class GenSrc extends BasicTool
 {
@@ -22,19 +22,19 @@ public class GenSrc extends BasicTool
 	private List<Template>              templates = new ArrayList<>();
 	private Map<String, Specialization> specs     = new HashMap<>();
 
-	private File sourceRoot;
+	private List<File> sourceRoots = new ArrayList<>();
 	private File targetRoot;
 
 	private boolean ansiColors;
 
-	public File getSourceRoot()
+	public List<File> getSourceRoots()
 	{
-		return this.sourceRoot;
+		return this.sourceRoots;
 	}
 
-	public void setSourceRoot(File sourceRoot)
+	public void addSourceRoot(File sourceRoot)
 	{
-		this.sourceRoot = sourceRoot;
+		this.sourceRoots.add(sourceRoot);
 	}
 
 	public File getTargetRoot()
@@ -76,7 +76,6 @@ public class GenSrc extends BasicTool
 
 	private boolean processArguments(String[] args)
 	{
-		String sourceDir = null;
 		String targetDir = null;
 		for (int i = 0, size = args.length; i < size; i++)
 		{
@@ -92,7 +91,7 @@ public class GenSrc extends BasicTool
 				}
 				else
 				{
-					sourceDir = args[i];
+					this.addSourceRoot(new File(args[i]));
 				}
 				continue;
 			case "-t":
@@ -108,19 +107,11 @@ public class GenSrc extends BasicTool
 			}
 			if (arg.startsWith(SOURCE_PREFIX))
 			{
-				sourceDir = arg.substring(SOURCE_PREFIX.length());
+				this.addSourceRoot(new File(arg.substring(SOURCE_PREFIX.length())));
 			}
 			else if (arg.startsWith(TARGET_PREFIX))
 			{
 				targetDir = arg.substring(TARGET_PREFIX.length());
-			}
-			else if (sourceDir == null)
-			{
-				sourceDir = arg;
-			}
-			else if (targetDir == null)
-			{
-				targetDir = arg;
 			}
 			else
 			{
@@ -128,7 +119,7 @@ public class GenSrc extends BasicTool
 			}
 		}
 
-		if (sourceDir == null)
+		if (this.sourceRoots.isEmpty())
 		{
 			this.error("Missing Source Directory");
 			return false;
@@ -139,7 +130,6 @@ public class GenSrc extends BasicTool
 			return false;
 		}
 
-		this.setSourceRoot(new File(sourceDir));
 		this.setTargetRoot(new File(targetDir));
 		return true;
 	}
@@ -158,7 +148,10 @@ public class GenSrc extends BasicTool
 
 	private void findFiles()
 	{
-		this.findFiles(this.sourceRoot, this.targetRoot);
+		for (File root : this.sourceRoots)
+		{
+			this.findFiles(root, this.targetRoot);
+		}
 	}
 
 	private void findFiles(File sourceDir, File targetDir)

@@ -7,7 +7,7 @@ import dyvil.tools.compiler.util.MemberSorter;
 
 import java.util.Arrays;
 
-public final class Candidate<T extends ICallableMember> implements Comparable<Candidate<T>>
+public final class Candidate<T extends IOverloadable> implements Comparable<Candidate<T>>
 {
 	protected final T       member;
 	protected final int[]   values;
@@ -18,21 +18,22 @@ public final class Candidate<T extends ICallableMember> implements Comparable<Ca
 
 	public Candidate(T member)
 	{
-		this.member = member;
-		this.defaults = this.varargs = 0;
-		this.values = IntArray.EMPTY;
-		this.types = new IType[0];
-		this.invalid = false;
+		this(member, false);
+	}
+
+	public Candidate(T member, boolean invalid)
+	{
+		this(member, IntArray.EMPTY, new IType[0], 0, 0, invalid);
 	}
 
 	public Candidate(T member, int value1, IType type1, boolean invalid)
 	{
-		this(member, new int[] { value1 }, new IType[] { type1 });
+		this(member, new int[] { value1 }, new IType[] { type1 }, 0, 0, invalid);
 	}
 
 	public Candidate(T member, int[] values, IType[] types)
 	{
-		this(member, values, types, 0, 0);
+		this(member, values, types, 0, 0, false);
 	}
 
 	public Candidate(T member, int[] values, IType[] types, int defaults, int varargs)

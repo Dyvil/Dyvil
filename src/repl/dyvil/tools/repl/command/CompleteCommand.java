@@ -6,6 +6,7 @@ import dyvil.collection.mutable.TreeSet;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
@@ -13,7 +14,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
@@ -56,13 +57,13 @@ public class CompleteCommand implements ICommand
 	@Override
 	public void execute(DyvilREPL repl, String argument)
 	{
-		final REPLContext context = repl.getContext();
+		final REPLContext replContext = repl.getContext();
 
 		if (argument == null)
 		{
 			// REPL Variables
 
-			this.printREPLMembers(repl, context, "");
+			this.printREPLMembers(repl, replContext, "");
 			return;
 		}
 
@@ -71,7 +72,7 @@ public class CompleteCommand implements ICommand
 		{
 			// REPL Variable Completions
 
-			this.printREPLMembers(repl, context, Qualifier.qualify(argument));
+			this.printREPLMembers(repl, replContext, Qualifier.qualify(argument));
 			return;
 		}
 
@@ -80,6 +81,8 @@ public class CompleteCommand implements ICommand
 
 		final MarkerList markers = new MarkerList(Markers.INSTANCE);
 		final TokenIterator tokenIterator = new DyvilLexer(markers, DyvilSymbols.INSTANCE).tokenize(expression);
+
+		final IContext context = replContext.getContext();
 
 		new ParserManager(DyvilSymbols.INSTANCE, tokenIterator, markers).parse(new ExpressionParser((IValue value) -> {
 			value.resolveTypes(markers, context);
@@ -258,17 +261,16 @@ public class CompleteCommand implements ICommand
 	private static void findInstanceMembers(IType type, Set<IField> fields, Set<IProperty> properties, Set<IMethod> methods, String start, Set<IClass> dejaVu)
 	{
 		final IClass iclass = type.getTheClass();
-		if (dejaVu.contains(iclass))
+		if (iclass == null || dejaVu.contains(iclass))
 		{
 			return;
 		}
 		dejaVu.add(iclass);
 
 		// Add members
-		final IParameterList parameterList = iclass.getParameterList();
+		final ParameterList parameterList = iclass.getParameters();
 		for (int i = 0, count = parameterList.size(); i < count; i++)
 		{
-			// TODO IClassParameter interface
 			checkMember(fields, (IField) parameterList.get(i), start, false);
 		}
 
@@ -281,13 +283,9 @@ public class CompleteCommand implements ICommand
 			findInstanceMembers(superType.getConcreteType(type), fields, properties, methods, start, dejaVu);
 		}
 
-		for (int i = 0, count = iclass.interfaceCount(); i < count; i++)
+		for (IType interfaceType : iclass.getInterfaces())
 		{
-			final IType superInterface = iclass.getInterface(i);
-			if (superInterface != null)
-			{
-				findInstanceMembers(superInterface.getConcreteType(type), fields, properties, methods, start, dejaVu);
-			}
+			findInstanceMembers(interfaceType.getConcreteType(type), fields, properties, methods, start, dejaVu);
 		}
 	}
 

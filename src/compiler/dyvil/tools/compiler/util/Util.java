@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
@@ -44,20 +44,12 @@ public final class Util
 	{
 		stringBuilder.append(method.getName());
 
-		final int typeParams = method.typeParameterCount();
-		if (typeParams > 0)
+		if (method.isTypeParametric())
 		{
-			stringBuilder.append(' ').append('<');
-			method.getTypeParameter(0).toString("", stringBuilder);
-			for (int i1 = 1; i1 < typeParams; i1++)
-			{
-				stringBuilder.append(", ");
-				method.getTypeParameter(i1).toString("", stringBuilder);
-			}
-			stringBuilder.append('>');
+			method.getTypeParameters().toString("", stringBuilder);
 		}
 
-		method.getParameterList().signatureToString(stringBuilder, typeContext);
+		method.getParameters().signatureToString(stringBuilder, typeContext);
 
 		stringBuilder.append(" -> ");
 		ITypeContext.apply(typeContext, method.getType()).toString("", stringBuilder);
@@ -73,7 +65,7 @@ public final class Util
 	public static void constructorSignatureToString(IConstructor constructor, ITypeContext typeContext, StringBuilder stringBuilder)
 	{
 		stringBuilder.append("init");
-		constructor.getParameterList().signatureToString(stringBuilder, typeContext);
+		constructor.getParameters().signatureToString(stringBuilder, typeContext);
 	}
 
 	public static void typeToString(IType type, ITypeContext typeContext, StringBuilder stringBuilder)
@@ -100,25 +92,12 @@ public final class Util
 
 		stringBuilder.append(iClass.getName());
 
-		final int typeParams = iClass.typeParameterCount();
-		if (typeParams > 0)
+		if (iClass.isTypeParametric())
 		{
-			if (endsWithSymbol(stringBuilder))
-			{
-				stringBuilder.append(' ');
-			}
-
-			stringBuilder.append('<');
-			iClass.getTypeParameter(0).toString("", stringBuilder);
-			for (int i1 = 1; i1 < typeParams; i1++)
-			{
-				stringBuilder.append(", ");
-				iClass.getTypeParameter(i1).toString("", stringBuilder);
-			}
-			stringBuilder.append('>');
+			iClass.getTypeParameters().toString("", stringBuilder);
 		}
 
-		final IParameterList parameterList = iClass.getParameterList();
+		final ParameterList parameterList = iClass.getParameters();
 		if (!parameterList.isEmpty())
 		{
 			parameterList.signatureToString(stringBuilder, null);

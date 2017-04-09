@@ -6,16 +6,17 @@ import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.operator.IOperator;
 import dyvil.tools.compiler.ast.external.ExternalHeader;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.header.HeaderDeclaration;
+import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.expression.operator.IOperator;
-import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.header.IHeaderUnit;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
@@ -190,7 +191,8 @@ public final class SingleImport extends Import implements IDefaultContext
 			return;
 		}
 
-		if ((mask & KindedImport.TYPE) != 0 && parentContext.resolveTypeAlias(this.name, IOperator.ANY) != null)
+		if ((mask & KindedImport.TYPE) != 0 && IContext.resolveTypeAlias(parentContext, null, this.name, null)
+		                                               .hasCandidate())
 		{
 			return;
 		}
@@ -270,13 +272,12 @@ public final class SingleImport extends Import implements IDefaultContext
 	}
 
 	@Override
-	public ITypeAlias resolveTypeAlias(Name name, int arity)
+	public void resolveTypeAlias(MatchList<ITypeAlias> matches, IType receiver, Name name, TypeList arguments)
 	{
 		if (this.checkName(KindedImport.TYPE, name))
 		{
-			return this.resolver.resolveTypeAlias(this.name, arity);
+			this.resolver.resolveTypeAlias(matches, receiver, name, arguments);
 		}
-		return null;
 	}
 
 	@Override
@@ -310,7 +311,7 @@ public final class SingleImport extends Import implements IDefaultContext
 	}
 
 	@Override
-	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
 		if (this.checkName(KindedImport.FUNC, name))
 		{

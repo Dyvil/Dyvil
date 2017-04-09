@@ -2,9 +2,9 @@ package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
-import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.Variable;
 import dyvil.tools.compiler.ast.member.MemberKind;
@@ -17,7 +17,6 @@ import dyvil.tools.compiler.ast.type.compound.LambdaType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.backend.visitor.AnnotationValueReader;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -90,6 +89,12 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	}
 
 	@Override
+	public IClass getEnclosingClass()
+	{
+		return this.method.getEnclosingClass();
+	}
+
+	@Override
 	public ModifierSet getModifiers()
 	{
 		if (this.modifiers == null)
@@ -158,20 +163,6 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	}
 
 	@Override
-	public AnnotationVisitor visitAnnotation(String internalType)
-	{
-		switch (internalType)
-		{
-		case "dyvil/annotation/internal/DefaultValue":
-			return new AnnotationValueReader(this);
-		case "dyvil/annotation/internal/DefaultArrayValue":
-			return new AnnotationValueReader(value -> this.value = value.withType(this.type, this.type, null, null));
-		}
-
-		return IParameter.super.visitAnnotation(internalType);
-	}
-
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		super.resolveTypes(markers, context);
@@ -213,10 +204,10 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	{
 		if (this.annotations != null)
 		{
-			int count = this.annotations.annotationCount();
+			int count = this.annotations.size();
 			for (int i = 0; i < count; i++)
 			{
-				this.annotations.getAnnotation(i).toString(indent, buffer);
+				this.annotations.get(i).toString(indent, buffer);
 				buffer.append(' ');
 			}
 		}

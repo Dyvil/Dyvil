@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.util;
 
+import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.member.IMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.type.IType;
@@ -12,6 +13,13 @@ public class MemberSorter
 {
 	public static final Comparator<? super IMember> MEMBER_COMPARATOR = MemberSorter::compareMembers;
 	public static final Comparator<? super IMethod> METHOD_COMPARATOR = MemberSorter::compareMethods;
+
+	public static final Comparator<? super IClass> CLASS_COMPARATOR = (a, b) ->
+	{
+		final int i = Boolean.compare(a.isInterface(), b.isInterface());
+		// sort interfaces last
+		return i != 0 ? i : compareClasses(a, b);
+	};
 
 	public static int compareNames(Name name1, Name name2)
 	{
@@ -54,24 +62,41 @@ public class MemberSorter
 		return compareNames(type1.getName(), type2.getName());
 	}
 
-	public static int compareTypes(IType type1, IType type2)
+	public static int compareTypes(IType a, IType b)
 	{
 		// TODO implement a faster alternative to avoid useless type copying
-		type1 = type1.asParameterType();
-		type2 = type2.asParameterType();
+		a = a.asParameterType();
+		b = b.asParameterType();
 
-		if (Types.isSuperType(type1, type2))
+		if (Types.isSuperType(a, b))
 		{
-			if (Types.isSuperType(type2, type1))
+			if (Types.isSuperType(b, a))
 			{
 				return 0; // same type
 			}
 
 			return 1; // type2 is more specific than type1
 		}
-		if (Types.isSuperType(type2, type1))
+		if (Types.isSuperType(b, a))
 		{
 			return -1; // type2 is less specific than type1
+		}
+		return 0;
+	}
+
+	public static int compareClasses(IClass a, IClass b)
+	{
+		if (a == b)
+		{
+			return 0;
+		}
+		if (Types.isSuperClass(a, b))
+		{
+			return 1;
+		}
+		if (Types.isSuperClass(b, a))
+		{
+			return -1;
 		}
 		return 0;
 	}

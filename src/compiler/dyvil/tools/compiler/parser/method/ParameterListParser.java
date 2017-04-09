@@ -108,6 +108,18 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				this.mode = NAME;
 				this.type = Types.UNKNOWN;
 				return;
+			case DyvilKeywords.THIS:
+				if (token.next().type() != BaseSymbols.COLON)
+				{
+					pm.report(token, "parameter.identifier");
+					return;
+				}
+
+				// this : TYPE
+				this.mode = TYPE_ASCRIPTION;
+				pm.skip(); // the colon
+				pm.pushParser(new TypeParser(t -> this.setThisType(t, token, pm)));
+				return;
 			case DyvilSymbols.AT:
 				if (this.annotations == null)
 				{
@@ -115,7 +127,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				}
 
 				final Annotation annotation = new Annotation(token.raw());
-				this.annotations.addAnnotation(annotation);
+				this.annotations.add(annotation);
 				pm.pushParser(new AnnotationParser(annotation));
 				return;
 			}
@@ -174,10 +186,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				return;
 			case DyvilKeywords.THIS:
 				this.mode = SEPARATOR;
-				if (!this.consumer.setThisType(this.type))
-				{
-					pm.report(token, "parameter.receivertype.invalid");
-				}
+				this.setThisType(this.type, token, pm);
 				this.reset();
 				return;
 			}
@@ -263,7 +272,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 					this.parameter.setVarargs(true);
 				}
 				this.parameter.setType(this.type);
-				this.consumer.getParameterList().addParameter(this.parameter);
+				this.consumer.getParameters().add(this.parameter);
 			}
 			this.reset();
 
@@ -290,6 +299,14 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			}
 
 			pm.report(token, "parameter.separator");
+		}
+	}
+
+	private void setThisType(IType type, IToken token, IParserManager pm)
+	{
+		if (!this.consumer.setThisType(type))
+		{
+			pm.report(token, "parameter.this_type.invalid");
 		}
 	}
 

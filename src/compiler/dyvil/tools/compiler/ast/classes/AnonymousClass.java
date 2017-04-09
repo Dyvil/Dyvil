@@ -8,9 +8,8 @@ import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
-import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
-import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -31,7 +30,6 @@ public class AnonymousClass extends CodeClass
 	public AnonymousClass(ICodePosition position)
 	{
 		this.metadata = new AnonymousClassMetadata(this);
-		this.interfaces = new IType[1];
 		this.body = new ClassBody(this);
 		this.position = position;
 		this.modifiers = EmptyModifiers.INSTANCE;
@@ -107,7 +105,7 @@ public class AnonymousClass extends CodeClass
 			return this.constructorDesc;
 		}
 
-		final IParameterList parameterList = this.constructor.getParameterList();
+		final ParameterList parameterList = this.constructor.getParameters();
 		final StringBuilder buf = new StringBuilder();
 
 		buf.append('(');
@@ -127,7 +125,7 @@ public class AnonymousClass extends CodeClass
 		return this.constructorDesc = buf.append(")V").toString();
 	}
 
-	public void writeConstructorCall(MethodWriter writer, IArguments arguments) throws BytecodeException
+	public void writeConstructorCall(MethodWriter writer, ArgumentList arguments) throws BytecodeException
 	{
 		String owner = this.getInternalName();
 		String name = "<init>";
@@ -170,7 +168,7 @@ class AnonymousClassMetadata implements IClassMetadata
 		                                                                                this.theClass
 			                                                                                .getConstructorDesc(), null,
 		                                                                                null));
-		final IParameterList parameterList = constructor.getParameterList();
+		final ParameterList parameterList = constructor.getParameters();
 		final int parameterCount = parameterList.size();
 
 		// Signature & Parameter Data

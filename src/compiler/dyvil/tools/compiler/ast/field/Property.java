@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.CodeParameter;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -126,7 +126,7 @@ public class Property extends Member implements IProperty
 		this.setter.setPosition(this.position);
 		this.setterParameter = new CodeParameter(this.setter, this.position, Names.newValue, this.type,
 		                                         EmptyModifiers.INSTANCE, null);
-		this.setter.getParameterList().addParameter(this.setterParameter);
+		this.setter.getParameters().add(this.setterParameter);
 
 		return this.setter;
 	}
@@ -156,7 +156,7 @@ public class Property extends Member implements IProperty
 	}
 
 	@Override
-	public void checkMatch(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
+	public void checkMatch(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
 		if (this.getter != null)
 		{
@@ -327,10 +327,10 @@ public class Property extends Member implements IProperty
 	{
 		if (this.annotations != null)
 		{
-			int count = this.annotations.annotationCount();
+			int count = this.annotations.size();
 			for (int i = 0; i < count; i++)
 			{
-				this.annotations.getAnnotation(i).write(mw);
+				this.annotations.get(i).write(mw);
 			}
 		}
 
@@ -375,7 +375,7 @@ public class Property extends Member implements IProperty
 		}
 
 		this.writeAnnotations(mw, modifiers);
-		this.setter.getParameterList().write(mw);
+		this.setter.getParameters().write(mw);
 
 		if (setterValue != null)
 		{
@@ -581,7 +581,7 @@ public class Property extends Member implements IProperty
 		final String setterPrefix = Formatting.getIndent("property.setter.indent", prefix);
 		final IValue setterValue = setter.getValue();
 		final ModifierSet setterModifiers = setter.getModifiers();
-		final Name setterParameterName = setter.getParameterList().get(0).getName();
+		final Name setterParameterName = setter.getParameters().get(0).getName();
 
 		buffer.append('\n').append(setterPrefix);
 		if (setterModifiers != null)

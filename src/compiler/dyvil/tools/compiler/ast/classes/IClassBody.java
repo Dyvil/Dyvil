@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.classes;
 
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.constructor.IInitializer;
@@ -13,8 +14,7 @@ import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
@@ -66,7 +66,7 @@ public interface IClassBody extends IASTNode, IResolvable, IClassList, IMemberCo
 
 	IMethod getMethod(Name name);
 
-	void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments);
+	void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments);
 
 	void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType);
 
@@ -92,9 +92,9 @@ public interface IClassBody extends IASTNode, IResolvable, IClassList, IMemberCo
 
 	IConstructor getConstructor(int index);
 
-	IConstructor getConstructor(IParameterList parameters);
+	IConstructor getConstructor(ParameterList parameters);
 
-	void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments);
+	void getConstructorMatches(MatchList<IConstructor> list, ArgumentList arguments);
 
 	// Initializers
 

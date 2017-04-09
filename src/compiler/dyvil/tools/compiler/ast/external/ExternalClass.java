@@ -21,20 +21,17 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.generic.TypeParameterList;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.parameter.ClassParameter;
-import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.structure.RootPackage;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
-import dyvil.tools.compiler.ast.type.raw.ClassType;
-import dyvil.tools.compiler.ast.type.typevar.TypeVarType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -58,11 +55,10 @@ public final class ExternalClass extends AbstractClass
 	private static final int GENERICS            = 1 << 2;
 	private static final int BODY_METHOD_CACHE   = 1 << 3;
 	private static final int BODY_IMPLICIT_CACHE = 1 << 4;
-	private static final int ANNOTATIONS         = 1 << 5;
 
 	protected Package thePackage;
 
-	private int                 resolved;
+	private byte                resolved;
 	private Map<String, String> innerTypes;
 	private Set<String>         classParameters;
 
@@ -90,6 +86,11 @@ public final class ExternalClass extends AbstractClass
 
 	private void resolveMetadata()
 	{
+		if ((this.resolved & METADATA) != 0)
+		{
+			return;
+		}
+
 		this.resolved |= METADATA;
 
 		final IContext context = this.getCombiningContext();
@@ -101,41 +102,57 @@ public final class ExternalClass extends AbstractClass
 
 	private void resolveGenerics()
 	{
-		this.resolved |= GENERICS;
-		if (this.typeParameterCount <= 0)
+		if ((this.resolved & GENERICS) != 0)
 		{
-			this.thisType = this.getClassType();
+			return;
+		}
+
+		this.resolved |= GENERICS;
+
+		final int typeParams;
+		if (this.typeParameters == null || (typeParams = this.typeParameters.size()) <= 0)
+		{
 			return;
 		}
 
 		final IContext context = this.getCombiningContext();
 
-		final ClassGenericType type = new ClassGenericType(this);
-
-		for (int i = 0; i < this.typeParameterCount; i++)
+		for (int i = 0; i < typeParams; i++)
 		{
-			final ITypeParameter typeParameter = this.typeParameters[i];
+			final ITypeParameter typeParameter = this.typeParameters.get(i);
 			typeParameter.resolveTypes(null, context);
-			type.addType(new TypeVarType(typeParameter));
 		}
-
-		this.thisType = type;
 	}
 
 	private void resolveMethodCache()
 	{
+		if ((this.resolved & BODY_METHOD_CACHE) != 0)
+		{
+			return;
+		}
+
 		this.body.initExternalMethodCache();
 		this.resolved |= BODY_METHOD_CACHE;
 	}
 
 	private void resolveImplicitCache()
 	{
+		if ((this.resolved & BODY_IMPLICIT_CACHE) != 0)
+		{
+			return;
+		}
+
 		this.body.initExternalImplicitCache();
 		this.resolved |= BODY_IMPLICIT_CACHE;
 	}
 
 	private void resolveSuperTypes()
 	{
+		if ((this.resolved & SUPER_TYPES) != 0)
+		{
+			return;
+		}
+
 		this.resolved |= SUPER_TYPES;
 
 		final IContext context = this.getCombiningContext();
@@ -144,19 +161,17 @@ public final class ExternalClass extends AbstractClass
 			this.superType = this.superType.resolveType(null, context);
 		}
 
-		for (int i = 0; i < this.interfaceCount; i++)
+		if (this.interfaces != null)
 		{
-			this.interfaces[i] = this.interfaces[i].resolveType(null, context);
+			this.interfaces.resolveTypes(null, context);
 		}
 	}
 
 	private void resolveAnnotations()
 	{
-		this.resolved |= ANNOTATIONS;
-
 		if (this.annotations != null)
 		{
-			this.annotations.resolveTypes(null, this.getCombiningContext(), this);
+			this.annotations.resolveTypes(null, RootPackage.rootPackage, this);
 		}
 	}
 
@@ -197,94 +212,57 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public IClass getThisClass()
 	{
-		if ((this.resolved & GENERICS) == 0)
-		{
-			this.resolveGenerics();
-		}
+		this.resolveGenerics();
 		return this;
 	}
 
 	@Override
 	public IType getThisType()
 	{
-		if ((this.resolved & GENERICS) == 0)
-		{
-			this.resolveGenerics();
-		}
-		return this.thisType;
+		this.resolveGenerics();
+		return super.getThisType();
 	}
 
 	@Override
 	public IType getSuperType()
 	{
-		if ((this.resolved & SUPER_TYPES) == 0)
-		{
-			this.resolveSuperTypes();
-		}
+		this.resolveSuperTypes();
 		return this.superType;
 	}
 
 	@Override
 	public boolean isSubClassOf(IType type)
 	{
-		if ((this.resolved & SUPER_TYPES) == 0)
-		{
-			this.resolveSuperTypes();
-		}
+		this.resolveSuperTypes();
 		return super.isSubClassOf(type);
 	}
 
 	@Override
-	public ITypeParameter[] getTypeParameters()
+	public TypeParameterList getTypeParameters()
 	{
-		if ((this.resolved & GENERICS) == 0)
-		{
-			this.resolveGenerics();
-		}
+		this.resolveGenerics();
 		return super.getTypeParameters();
 	}
 
 	@Override
-	public ITypeParameter getTypeParameter(int index)
+	public AnnotationList getAnnotations()
 	{
-		if ((this.resolved & GENERICS) == 0)
-		{
-			this.resolveGenerics();
-		}
-		return super.getTypeParameter(index);
+		this.resolveAnnotations();
+		return super.getAnnotations();
 	}
 
 	@Override
-	public IAnnotation getAnnotation(IClass type)
+	public IType resolveType(ITypeParameter typeParameter, IType concrete)
 	{
-		if ((this.resolved & ANNOTATIONS) == 0)
-		{
-			this.resolveAnnotations();
-		}
-		return super.getAnnotation(type);
-	}
-
-	@Override
-	public IType resolveType(ITypeParameter typeVar, IType concrete)
-	{
-		if ((this.resolved & GENERICS) == 0)
-		{
-			this.resolveGenerics();
-		}
-		if ((this.resolved & SUPER_TYPES) == 0)
-		{
-			this.resolveSuperTypes();
-		}
-		return super.resolveType(typeVar, concrete);
+		this.resolveGenerics();
+		this.resolveSuperTypes();
+		return super.resolveType(typeParameter, concrete);
 	}
 
 	@Override
 	public IClassMetadata getMetadata()
 	{
-		if ((this.resolved & METADATA) == 0)
-		{
-			this.resolveMetadata();
-		}
+		this.resolveMetadata();
 		return this.metadata;
 	}
 
@@ -296,10 +274,7 @@ public final class ExternalClass extends AbstractClass
 			return null;
 		}
 
-		if ((this.resolved & GENERICS) == 0)
-		{
-			this.resolveGenerics();
-		}
+		this.resolveGenerics();
 
 		if (this.body == null)
 		{
@@ -349,22 +324,10 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public boolean checkImplements(IMethod candidate, ITypeContext typeContext)
 	{
-		if ((this.resolved & METADATA) == 0)
-		{
-			this.resolveMetadata();
-		}
-		if ((this.resolved & GENERICS) == 0)
-		{
-			this.resolveGenerics();
-		}
-		if ((this.resolved & SUPER_TYPES) == 0)
-		{
-			this.resolveSuperTypes();
-		}
-		if ((this.resolved & BODY_METHOD_CACHE) == 0)
-		{
-			this.resolveMethodCache();
-		}
+		this.resolveMetadata();
+		this.resolveGenerics();
+		this.resolveSuperTypes();
+		this.resolveMethodCache();
 		return super.checkImplements(candidate, typeContext);
 	}
 
@@ -372,14 +335,8 @@ public final class ExternalClass extends AbstractClass
 	public void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext,
 		                        Set<IClass> checkedClasses)
 	{
-		if ((this.resolved & GENERICS) == 0)
-		{
-			this.resolveGenerics();
-		}
-		if ((this.resolved & SUPER_TYPES) == 0)
-		{
-			this.resolveSuperTypes();
-		}
+		this.resolveGenerics();
+		this.resolveSuperTypes();
 		super.checkMethods(markers, checkedClass, typeContext, checkedClasses);
 	}
 
@@ -426,7 +383,7 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		final IParameter parameter = this.parameters.resolveParameter(name);
+		final IParameter parameter = this.parameters.get(name);
 		if (parameter != null)
 		{
 			return parameter;
@@ -439,10 +396,7 @@ public final class ExternalClass extends AbstractClass
 			return field;
 		}
 
-		if ((this.resolved & SUPER_TYPES) == 0)
-		{
-			this.resolveSuperTypes();
-		}
+		this.resolveSuperTypes();
 
 		// Inherited Fields
 		if (this.superType != null)
@@ -457,16 +411,10 @@ public final class ExternalClass extends AbstractClass
 	}
 
 	@Override
-	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
-		if ((this.resolved & GENERICS) == 0)
-		{
-			this.resolveGenerics();
-		}
-		if ((this.resolved & BODY_METHOD_CACHE) == 0)
-		{
-			this.resolveMethodCache();
-		}
+		this.resolveGenerics();
+		this.resolveMethodCache();
 
 		/*
 		Note: unlike AbstractClass.getMethodMatches, this does not check the Class Parameter Properties, because
@@ -480,53 +428,38 @@ public final class ExternalClass extends AbstractClass
 			return;
 		}
 
-		if ((this.resolved & SUPER_TYPES) == 0)
-		{
-			this.resolveSuperTypes();
-		}
+		this.resolveSuperTypes();
 
 		if (this.superType != null)
 		{
 			this.superType.getMethodMatches(list, receiver, name, arguments);
 		}
 
-		if (list.hasCandidate())
+		if (list.hasCandidate() || this.interfaces == null)
 		{
 			return;
 		}
 
-		for (int i = 0; i < this.interfaceCount; i++)
+		for (IType type : this.interfaces)
 		{
-			this.interfaces[i].getMethodMatches(list, receiver, name, arguments);
+			type.getMethodMatches(list, receiver, name, arguments);
 		}
 	}
 
 	@Override
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
-		if ((this.resolved & GENERICS) == 0)
-		{
-			this.resolveGenerics();
-		}
-		if ((this.resolved & BODY_IMPLICIT_CACHE) == 0)
-		{
-			this.resolveImplicitCache();
-		}
+		this.resolveGenerics();
+		this.resolveImplicitCache();
 
 		this.body.getImplicitMatches(list, value, targetType);
 	}
 
 	@Override
-	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
+	public void getConstructorMatches(MatchList<IConstructor> list, ArgumentList arguments)
 	{
-		if ((this.resolved & SUPER_TYPES) == 0)
-		{
-			this.resolveSuperTypes();
-		}
-		if ((this.resolved & GENERICS) == 0)
-		{
-			this.resolveGenerics();
-		}
+		this.resolveSuperTypes();
+		this.resolveGenerics();
 
 		this.body.getConstructorMatches(list, arguments);
 	}
@@ -539,7 +472,7 @@ public final class ExternalClass extends AbstractClass
 		this.body = new ClassBody(this);
 		if (interfaces != null)
 		{
-			this.interfaces = new IType[interfaces.length];
+			this.interfaces = new TypeList(interfaces.length);
 		}
 
 		int index = name.lastIndexOf('$');
@@ -562,32 +495,20 @@ public final class ExternalClass extends AbstractClass
 
 		if (signature != null)
 		{
-			this.typeParameters = new ITypeParameter[2];
 			ClassFormat.readClassSignature(signature, this);
 		}
 		else
 		{
-			if (superName != null)
-			{
-				this.superType = ClassFormat.internalToType(superName);
-			}
-			else
-			{
-				this.superType = null;
-			}
+			this.superType = superName != null ? ClassFormat.internalToType(superName) : null;
 
 			if (interfaces != null)
 			{
-				this.interfaceCount = interfaces.length;
-				this.interfaces = new IType[this.interfaceCount];
-				for (int i = 0; i < this.interfaceCount; i++)
+				for (String internal : interfaces)
 				{
-					this.interfaces[i] = ClassFormat.internalToType(interfaces[i]);
+					this.interfaces.add(ClassFormat.internalToType(internal));
 				}
 			}
 		}
-
-		this.thisType = new ClassType(this);
 	}
 
 	public AnnotationVisitor visitAnnotation(String type)
@@ -609,7 +530,7 @@ public final class ExternalClass extends AbstractClass
 			}
 
 			Annotation annotation = new Annotation(null, ClassFormat.internalToType(internal));
-			return new AnnotationReader(this, annotation);
+			return new AnnotationReader(this.getAnnotations(), annotation);
 		}
 		return null;
 	}
@@ -628,24 +549,24 @@ public final class ExternalClass extends AbstractClass
 			}
 			else
 			{
-				this.interfaces[index] = IType.withAnnotation(this.interfaces[index], annotation, typePath);
+				this.interfaces.set(index, IType.withAnnotation(this.interfaces.get(index), annotation, typePath));
 			}
 			break;
 		}
 		case TypeReference.CLASS_TYPE_PARAMETER:
 		{
-			ITypeParameter typeVar = this.typeParameters[TypeReference.getTypeParameterIndex(typeRef)];
+			ITypeParameter typeVar = this.typeParameters.get(TypeReference.getTypeParameterIndex(typeRef));
 			if (typeVar.addRawAnnotation(desc, annotation))
 			{
 				return null;
 			}
 
-			typeVar.addAnnotation(annotation);
+			typeVar.getAnnotations().add(annotation);
 			break;
 		}
 		case TypeReference.CLASS_TYPE_PARAMETER_BOUND:
 		{
-			ITypeParameter typeVar = this.typeParameters[TypeReference.getTypeParameterIndex(typeRef)];
+			ITypeParameter typeVar = this.typeParameters.get(TypeReference.getTypeParameterIndex(typeRef));
 			typeVar.addBoundAnnotation(annotation, TypeReference.getTypeParameterBoundIndex(typeRef), typePath);
 			break;
 		}
@@ -661,7 +582,7 @@ public final class ExternalClass extends AbstractClass
 		{
 			final ClassParameter param = new ExternalClassParameter(this, Name.fromQualified(name), desc, type,
 			                                                        readModifiers(access));
-			this.parameters.addParameter(param);
+			this.parameters.add(param);
 			return new SimpleFieldVisitor(param);
 		}
 
@@ -703,13 +624,13 @@ public final class ExternalClass extends AbstractClass
 
 				if (exceptions != null)
 				{
-					readExceptions(exceptions, constructor);
+					readExceptions(exceptions, constructor.getExceptions());
 				}
 			}
 
 			if ((access & Modifiers.VARARGS) != 0)
 			{
-				final IParameterList parameterList = constructor.getExternalParameterList();
+				final ParameterList parameterList = constructor.getExternalParameterList();
 				parameterList.get(parameterList.size() - 1).setVarargs(true);
 			}
 
@@ -722,7 +643,7 @@ public final class ExternalClass extends AbstractClass
 		{
 			final ClassParameter param = new ExternalClassParameter(this, Name.fromQualified(name), desc.substring(2),
 			                                                        readReturnType(desc), readModifiers(access));
-			this.parameters.addParameter(param);
+			this.parameters.add(param);
 			return new AnnotationClassVisitor(param);
 		}
 
@@ -730,7 +651,6 @@ public final class ExternalClass extends AbstractClass
 
 		if (signature != null)
 		{
-			method.setTypeParametric();
 			readMethodType(signature, method);
 		}
 		else
@@ -739,13 +659,13 @@ public final class ExternalClass extends AbstractClass
 
 			if (exceptions != null)
 			{
-				readExceptions(exceptions, method);
+				readExceptions(exceptions, method.getExceptions());
 			}
 		}
 
 		if ((access & Modifiers.VARARGS) != 0)
 		{
-			final IParameterList parameterList = method.getExternalParameterList();
+			final ParameterList parameterList = method.getExternalParameterList();
 			parameterList.get(parameterList.size() - 1).setVarargs(true);
 		}
 

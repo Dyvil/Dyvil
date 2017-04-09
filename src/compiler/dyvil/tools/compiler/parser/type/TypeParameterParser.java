@@ -132,7 +132,7 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 			{
 				if (this.typeParameter != null)
 				{
-					this.typeParameterized.addTypeParameter(this.typeParameter);
+					this.typeParameterized.getTypeParameters().add(this.typeParameter);
 				}
 				pm.popParser(true);
 				return;
@@ -140,7 +140,7 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 
 			if (this.typeParameter != null)
 			{
-				this.typeParameterized.addTypeParameter(this.typeParameter);
+				this.typeParameterized.getTypeParameters().add(this.typeParameter);
 			}
 			pm.popParser(true);
 			pm.report(token, "type_parameter.bound.invalid");
@@ -165,8 +165,8 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 
 	private void createTypeParameter(IToken token, Variance variance)
 	{
-		this.typeParameter = new CodeTypeParameter(token.raw(), this.typeParameterized, token.nameValue(), variance);
-		this.typeParameter.setAnnotations(this.annotationList);
+		this.typeParameter = new CodeTypeParameter(token.raw(), this.typeParameterized, token.nameValue(), variance,
+		                                           this.annotationList);
 		this.mode = TYPE_BOUNDS;
 	}
 
@@ -176,7 +176,7 @@ public final class TypeParameterParser extends Parser implements ITypeConsumer
 		{
 			this.annotationList = new AnnotationList();
 		}
-		this.annotationList.addAnnotation(annotion);
+		this.annotationList.add(annotion);
 	}
 
 	@Override

@@ -15,9 +15,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@LiteralConvertible.FromNil
 @LiteralConvertible.FromArray
-@LiteralConvertible.FromColonOperator(methodName = "singleton")
 @LiteralConvertible.FromMap
 public interface MutableMap<K, V> extends Map<K, V>
 {
@@ -47,7 +45,7 @@ public interface MutableMap<K, V> extends Map<K, V>
 
 	@NonNull
 	@SafeVarargs
-	static <K, V> MutableMap<K, V> apply(@NonNull Entry<? extends K, ? extends V>... entries)
+	static <K, V> MutableMap<K, V> apply(@NonNull Entry<? extends K, ? extends V> @NonNull ... entries)
 	{
 		return TupleMap.apply(entries);
 	}

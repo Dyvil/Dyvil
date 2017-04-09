@@ -7,8 +7,8 @@ import dyvil.tools.compiler.ast.bytecode.InstructionList;
 import dyvil.tools.compiler.ast.bytecode.VarInstruction;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -34,7 +34,7 @@ public class InlineIntrinsicData extends InstructionList implements IntrinsicDat
 		this.maxLocals = maxLocals;
 	}
 
-	private void preWrite(MethodWriter writer, IValue instance, IArguments arguments, int localCount)
+	private void preWrite(MethodWriter writer, IValue instance, ArgumentList arguments, int localCount)
 	{
 		if (!this.preProcessed)
 		{
@@ -52,7 +52,7 @@ public class InlineIntrinsicData extends InstructionList implements IntrinsicDat
 
 	private void preProcess()
 	{
-		final IParameterList parameterList = this.method.getParameterList();
+		final ParameterList parameterList = this.method.getParameters();
 		int parameterSlots = 0;
 
 		for (int i = 0, parameterCount = parameterList.size(); i < parameterCount; i++)
@@ -94,7 +94,7 @@ public class InlineIntrinsicData extends InstructionList implements IntrinsicDat
 		this.storedParameters = lastStoredIndex + 1;
 	}
 
-	private void writeInstruction(IInstruction instruction, MethodWriter writer, IValue instance, IArguments arguments,
+	private void writeInstruction(IInstruction instruction, MethodWriter writer, IValue instance, ArgumentList arguments,
 		                             int localCount)
 	{
 		final int opcode = instruction.getOpcode();
@@ -124,7 +124,7 @@ public class InlineIntrinsicData extends InstructionList implements IntrinsicDat
 
 	private static int getArgumentIndex(int varIndex, IMethod method)
 	{
-		final IParameterList params = method.getParameterList();
+		final ParameterList params = method.getParameters();
 		for (int i = 0, count = params.size(); i < count; i++)
 		{
 			if (params.get(i).getLocalIndex() == varIndex)
@@ -137,7 +137,7 @@ public class InlineIntrinsicData extends InstructionList implements IntrinsicDat
 	}
 
 	@Override
-	public void writeIntrinsic(MethodWriter writer, IValue receiver, IArguments arguments, int lineNumber)
+	public void writeIntrinsic(MethodWriter writer, IValue receiver, ArgumentList arguments, int lineNumber)
 		throws BytecodeException
 	{
 		final int localCount = writer.localCount();
@@ -152,7 +152,7 @@ public class InlineIntrinsicData extends InstructionList implements IntrinsicDat
 	}
 
 	@Override
-	public void writeIntrinsic(MethodWriter writer, Label dest, IValue receiver, IArguments arguments, int lineNumber)
+	public void writeIntrinsic(MethodWriter writer, Label dest, IValue receiver, ArgumentList arguments, int lineNumber)
 		throws BytecodeException
 	{
 		final int localCount = writer.localCount();
@@ -182,7 +182,7 @@ public class InlineIntrinsicData extends InstructionList implements IntrinsicDat
 	}
 
 	@Override
-	public void writeInvIntrinsic(MethodWriter writer, Label dest, IValue receiver, IArguments arguments,
+	public void writeInvIntrinsic(MethodWriter writer, Label dest, IValue receiver, ArgumentList arguments,
 		                             int lineNumber) throws BytecodeException
 	{
 		final int localCount = writer.localCount();

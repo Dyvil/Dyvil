@@ -4,7 +4,6 @@ import dyvil.collection.impl.AbstractBitSet
 import dyvil.lang.LiteralConvertible
 
 @Immutable
-@LiteralConvertible.FromNil
 @LiteralConvertible.FromArray
 public class BitSet extends AbstractBitSet implements ImmutableSet<int>
 {

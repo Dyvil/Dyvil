@@ -75,6 +75,8 @@ sourceSets {
 	dpf {
 		java {
 			srcDir 'src/dpf'
+
+			srcDir "$buildDir/gensrc/dpf"
 		}
 
 		resources {
@@ -134,7 +136,6 @@ repositories {
 	mavenCentral()
 }
 
-
 dependencies {
 	// Runtime Dependencies (Resources)
 
@@ -170,6 +171,11 @@ dependencies {
 	testRuntime libRun, dpfRun, testRun
 	testCompile bootstrap
 }
+
+wrapper {
+	distributionType = Wrapper.DistributionType.ALL
+}
+
 // ---------------------------------------- Copy Tasks ----------------------------------------
 
 // Library
@@ -186,8 +192,9 @@ compileLibraryJava.dependsOn copyLibraryJava
 compileLibraryJava.source = "$buildDir/src/java/library"
 
 
-task copyLibraryDyvil(type: Sync) {
+task copyLibraryDyvil(type: Sync, dependsOn: 'genLibrary') {
 	from 'src/library'
+	from "$buildDir/gensrc/library"
 	into "$buildDir/src/dyvil/library"
 
 	include dyvilFilters
@@ -232,8 +239,9 @@ compileReplJava.source = "$buildDir/src/java/repl"
 
 // DPF
 
-task copyDPFDyvil(type: Sync) {
+task copyDPFDyvil(type: Sync, dependsOn: 'genDPF') {
 	from 'src/dpf'
+	from "$buildDir/gensrc/dpf"
 	into "$buildDir/src/dyvil/dpf"
 
 	includeEmptyDirs = false
@@ -261,52 +269,63 @@ tasks.withType(JavaCompile) {
 }
 
 task genLibrary(type: JavaExec, dependsOn: [ 'gensrcClasses' ]) { JavaExec exec ->
-	runGenSrc exec, 'src/library/', "$buildDir/gensrc/library/"
+	runGenSrc exec, "$buildDir/gensrc/library/", 'src/library/', 'src/gensrc-base'
+}
+
+task genDPF(type: JavaExec, dependsOn: [ 'gensrcClasses' ]) { JavaExec exec ->
+	runGenSrc exec, "$buildDir/gensrc/dpf/", 'src/dpf/', 'src/gensrc-base'
 }
 
 /**
  * Compiles the Dyvil Classes and Headers in the Dyvil Library by running the freshly-compiled compiler
  */
 task compileLibraryDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'copyLibraryDyvil' ]) { JavaExec exec ->
-	runCompiler exec, 'config/lib.dyc', 'src/library/', "$buildDir/dyvil-classes/library"
+	runCompiler exec, 'config/lib.dyc', "$buildDir/dyvil-classes/library", 'src/library/'
 }
 
 task compileDPFDyvil(type: JavaExec, dependsOn: [ 'compileLibraryDyvil', 'copyDPFDyvil' ]) { JavaExec exec ->
-	runCompiler exec, 'config/dpf.dyc', 'src/dpf/', "$buildDir/dyvil-classes/dpf"
+	runCompiler exec, 'config/dpf.dyc', "$buildDir/dyvil-classes/dpf", 'src/dpf/'
 }
 
 task compileTestDyvil(type: JavaExec, dependsOn: [ 'compileDPFDyvil', 'copyTestDyvil' ]) { JavaExec exec ->
-	runCompiler exec, 'config/test.dyc', 'src/test/', "$buildDir/dyvil-classes/test"
+	runCompiler exec, 'config/test.dyc', "$buildDir/dyvil-classes/test", 'src/test/'
 }
 
-private void runCompiler(JavaExec exec, String config, String src, String bin)
+private void runCompiler(JavaExec exec, String config, String target, String... srcs)
 {
 	// Required to make UP-TO-DATE work
 
-	// All Dyvil Class and Header files
-	exec.inputs.file fileTree(src) {
-		include dyvilFilters
-	}
-
 	// All possible Output Files (.class, .dyo)
-	exec.outputs.dir bin
+	exec.outputs.dir target
 
 	exec.main = compilerMainClass
 	exec.classpath = sourceSets.compiler.runtimeClasspath
 	exec.args = [ "@$config", 'compile', '--ansi' ]
+
+	for (String src : srcs)
+	{
+		exec.inputs.file fileTree(src) {
+			include dyvilFilters
+		}
+	}
 }
 
-private void runGenSrc(JavaExec exec, String src, String dest)
+private void runGenSrc(JavaExec exec, String target, String... srcs)
 {
-	exec.inputs.file fileTree(src) {
-		include genSrcFilters
-	}
-
-	exec.outputs.dir dest
+	exec.outputs.dirs target
 
 	exec.main = genSrcMainClass
 	exec.classpath = sourceSets.gensrc.runtimeClasspath
-	exec.args = [ "source=$src", "target=$dest", '--ansi' ]
+	exec.args = [ "target=$target", '--ansi' ]
+
+	for (String src : srcs)
+	{
+		exec.args += "source=$src"
+
+		exec.inputs.file fileTree(src) {
+			include genSrcFilters
+		}
+	}
 }
 
 // ---------------------------------------- Test Tasks ----------------------------------------
@@ -394,7 +413,7 @@ task buildGenSrc(type: Jar, dependsOn: 'gensrcClasses') {
  * Creates a Jar file that combines all classes from library, compiler and REPL.
  */
 task buildAll(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil', 'compilerClasses', 'replClasses',
-                                      'dpfClasses', 'gensrcClasses' ]) {
+                                      'dpfClasses', 'compileDPFDyvil', 'gensrcClasses' ]) {
 	from sourceSets.library.output
 	from sourceSets.library.resources
 	from sourceSets.compiler.output
@@ -446,11 +465,12 @@ task prepareRelease(type: Copy) {
 	}
 
 	filter {
-		it.replace('$$version$$', version)
-				.replace('$$libraryVersion$$', libraryVersion)
-				.replace('$$compilerVersion$$', compilerVersion)
-				.replace('$$replVersion$$', replVersion)
-				.replace('$$dpfVersion$$', dpfVersion)
+		it.replace('$$version$$', version.toString())
+		  .replace('$$libraryVersion$$', libraryVersion)
+		  .replace('$$compilerVersion$$', compilerVersion)
+		  .replace('$$replVersion$$', replVersion)
+		  .replace('$$dpfVersion$$', dpfVersion)
+		  .replace('$$genSrcVersion$$', genSrcVersion)
 	}
 
 	doLast {

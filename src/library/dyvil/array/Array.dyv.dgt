@@ -372,9 +372,9 @@ public abstract class TYPE_NAME##Array
 
 	// Search Operations
 
-	infix inline func contains GENERIC([PRIMITIVE] array, PRIMITIVE value) -> boolean = indexOf(array, value, 0) >= 0
+	infix inline func contains GENERIC([PRIMITIVE] array, PRIMITIVE value) -> boolean = array.indexOf(value, 0) >= 0
 
-	infix inline func indexOf GENERIC([PRIMITIVE] array, PRIMITIVE value) -> int = indexOf(array, value, 0)
+	infix inline func indexOf GENERIC([PRIMITIVE] array, PRIMITIVE value) -> int = array.indexOf(value, 0)
 
 	infix func indexOf GENERIC([PRIMITIVE] array, PRIMITIVE value, int startIndex) -> int
 	{
@@ -389,7 +389,7 @@ public abstract class TYPE_NAME##Array
 		return -1
 	}
 
-	infix func lastIndexOf GENERIC([PRIMITIVE] array, PRIMITIVE value) -> int = lastIndexOf(array, value, array.size - 1)
+	infix func lastIndexOf GENERIC([PRIMITIVE] array, PRIMITIVE value) -> int = array.lastIndexOf(value, array.size - 1)
 
 	infix func lastIndexOf GENERIC([PRIMITIVE] array, PRIMITIVE value, int startIndex) -> int
 	{
@@ -434,15 +434,15 @@ public abstract class TYPE_NAME##Array
 	}
 	#end
 
-	implicit infix inline func asIterable GENERIC([PRIMITIVE] array) -> Iterable<PRIMITIVE> = toList(array)
+	implicit infix inline func asIterable GENERIC([PRIMITIVE] array) -> Iterable<PRIMITIVE> = array.toList
 
-	implicit infix inline func asList GENERIC([final PRIMITIVE] array) -> ImmutableList<PRIMITIVE> = toList(array)
+	implicit infix inline func asList GENERIC([final PRIMITIVE] array) -> ImmutableList<PRIMITIVE> = array.toList
 
 	infix func toList GENERIC([PRIMITIVE] array) -> ImmutableList<PRIMITIVE>
 	#if IS_OBJECT
 		= new ArrayList<PRIMITIVE>(array)
 	#else
-		= new ArrayList<PRIMITIVE>(boxed(array), trusted: true)
+		= new ArrayList<PRIMITIVE>(array.boxed, trusted: true)
 	#end
 
 	// equals, hashCode and toString
@@ -542,7 +542,7 @@ public abstract class TYPE_NAME##Array
 	private static func deepAppend([Object!] array, int size, StringBuilder builder) -> void
 	{
 		builder.append('[')
-		deepToString(array[0], builder)
+		array[0].deepToString(builder)
 		for (i <- 1 ..< size)
 		{
 			builder.append(', ')

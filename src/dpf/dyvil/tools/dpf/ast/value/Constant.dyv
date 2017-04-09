@@ -1,10 +1,10 @@
-package dyvil.tools.dpf.ast.value;
+package dyvil.tools.dpf.ast.value
 
-public interface Constant extends Value
+interface Constant extends Value
 {
-	boolean isConstant() = true
+	func isConstant() -> boolean = true
 
-	Object toObject()
+	func toObject() -> Object
 
-	void appendString(StringBuilder builder)
+	func appendString(builder: StringBuilder) -> void
 }

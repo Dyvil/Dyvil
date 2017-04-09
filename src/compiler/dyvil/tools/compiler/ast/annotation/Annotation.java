@@ -52,7 +52,7 @@ public final class Annotation implements IAnnotation
 	public static final CodeParameter VALUE = new CodeParameter(Name.fromRaw("value"));
 
 	protected ICodePosition position;
-	protected IArguments arguments = ArgumentList.EMPTY;
+	protected ArgumentList arguments = ArgumentList.EMPTY;
 
 	// Metadata
 	protected IType type;
@@ -102,13 +102,13 @@ public final class Annotation implements IAnnotation
 	}
 
 	@Override
-	public IArguments getArguments()
+	public ArgumentList getArguments()
 	{
 		return this.arguments;
 	}
 
 	@Override
-	public void setArguments(IArguments arguments)
+	public void setArguments(ArgumentList arguments)
 	{
 		this.arguments = arguments;
 	}
@@ -140,13 +140,13 @@ public final class Annotation implements IAnnotation
 			return;
 		}
 
-		final IParameterList parameterList = theClass.getParameterList();
+		final ParameterList parameterList = theClass.getParameters();
 		for (int i = 0, count = parameterList.size(); i < count; i++)
 		{
 			final IParameter parameter = parameterList.get(i);
 			final IType parameterType = parameter.getType();
 
-			final IValue value = this.arguments.getValue(i, parameter);
+			final IValue value = this.arguments.get(i, parameter);
 			if (value == null)
 			{
 				if (parameter.getValue() == null)
@@ -168,7 +168,7 @@ public final class Annotation implements IAnnotation
 			typedValue = IValue.toAnnotationConstant(typedValue, markers, context);
 			if (typedValue != value)
 			{
-				this.arguments.setValue(i, parameter, typedValue);
+				this.arguments.set(i, parameter, typedValue);
 			}
 		}
 	}
@@ -264,12 +264,12 @@ public final class Annotation implements IAnnotation
 	public void write(AnnotationVisitor writer)
 	{
 		final IClass iclass = this.type.getTheClass();
-		final IParameterList parameterList = iclass.getParameterList();
+		final ParameterList parameterList = iclass.getParameters();
 
 		for (int i = 0, count = parameterList.size(); i < count; i++)
 		{
 			final IParameter parameter = parameterList.get(i);
-			final IValue argument = this.arguments.getValue(i, parameter);
+			final IValue argument = this.arguments.get(i, parameter);
 			if (argument != null)
 			{
 				argument.writeAnnotationValue(writer, parameter.getName().qualified);

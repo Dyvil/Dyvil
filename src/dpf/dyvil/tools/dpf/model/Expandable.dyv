@@ -18,9 +18,9 @@ public interface Expandable
 	{
 		if (!mutate || collection.isImmutable())
 		{
-			return collection.mapped(e => expand(e, mappings, mutate))
+			return collection.mapped(_.expand(mappings, mutate))
 		}
-		collection.map(e => expand(e, mappings, true))
+		collection.map(_.expand(mappings, true))
 		return collection
 	}
 

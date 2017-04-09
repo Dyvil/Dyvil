@@ -5,8 +5,10 @@ import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.typevar.ResolvedTypeVarType;
@@ -159,6 +161,19 @@ public class NamedType implements IUnresolvedType, ITypeConsumer
 
 	private IType resolveTopLevelWith(@SuppressWarnings("UnusedParameters") MarkerList markers, IContext context)
 	{
+		final MatchList<ITypeAlias> typeAliases = IContext.resolveTypeAlias(context, null, this.name, TypeList.EMPTY);
+		if (typeAliases.hasCandidate())
+		{
+			final ITypeAlias typeAlias = typeAliases.getBestMember();
+			final IType type = typeAlias.getType();
+			if (!type.isResolved() && markers != null)
+			{
+				markers.add(Markers.semanticError(this.position, "type.alias.unresolved", this.name));
+				return type.atPosition(this.position);
+			}
+			return type.getConcreteType(ITypeContext.DEFAULT).atPosition(this.position);
+		}
+
 		final IClass theClass = context.resolveClass(this.name);
 		if (theClass != null)
 		{
@@ -169,18 +184,6 @@ public class NamedType implements IUnresolvedType, ITypeConsumer
 		if (typeParameter != null)
 		{
 			return new ResolvedTypeVarType(typeParameter, this.position);
-		}
-
-		final ITypeAlias type = context.resolveTypeAlias(this.name, 0);
-		if (type != null)
-		{
-			final IType aliasType = type.getType();
-			if (!aliasType.isResolved() && markers != null)
-			{
-				markers.add(Markers.semanticError(this.position, "type.alias.unresolved", this.name));
-				return aliasType.atPosition(this.position);
-			}
-			return aliasType.getConcreteType(ITypeContext.DEFAULT).atPosition(this.position);
 		}
 
 		final Package thePackage = context.resolvePackage(this.name);

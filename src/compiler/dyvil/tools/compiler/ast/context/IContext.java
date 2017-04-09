@@ -14,9 +14,10 @@ import dyvil.tools.compiler.ast.member.IClassMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.expression.operator.IOperator;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.parsing.Name;
@@ -69,7 +70,7 @@ public interface IContext extends IMemberContext, IImportContext
 	IClass resolveClass(Name name);
 
 	@Override
-	ITypeAlias resolveTypeAlias(Name name, int arity);
+	void resolveTypeAlias(MatchList<ITypeAlias> matches, IType receiver, Name name, TypeList arguments);
 
 	@Override
 	ITypeParameter resolveTypeParameter(Name name);
@@ -81,13 +82,13 @@ public interface IContext extends IMemberContext, IImportContext
 	IDataMember resolveField(Name name);
 
 	@Override
-	void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments);
+	void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments);
 
 	@Override
 	void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType);
 
 	@Override
-	void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments);
+	void getConstructorMatches(MatchList<IConstructor> list, ArgumentList arguments);
 
 	byte checkException(IType type);
 
@@ -111,25 +112,32 @@ public interface IContext extends IMemberContext, IImportContext
 		return operator;
 	}
 
-	static IConstructor resolveConstructor(IImplicitContext implicitContext, IMemberContext type, IArguments arguments)
+	static MatchList<ITypeAlias> resolveTypeAlias(IImportContext context, IType receiver, Name name, TypeList arguments)
+	{
+		MatchList<ITypeAlias> matches = new MatchList<>(null);
+		context.resolveTypeAlias(matches, receiver, name, arguments);
+		return matches;
+	}
+
+	static IConstructor resolveConstructor(IImplicitContext implicitContext, IMemberContext type, ArgumentList arguments)
 	{
 		return resolveConstructors(implicitContext, type, arguments).getBestMember();
 	}
 
 	static MatchList<IConstructor> resolveConstructors(IImplicitContext implicitContext, IMemberContext type,
-		                                                  IArguments arguments)
+		                                                  ArgumentList arguments)
 	{
 		MatchList<IConstructor> matches = new MatchList<>(implicitContext);
 		type.getConstructorMatches(matches, arguments);
 		return matches;
 	}
 
-	static IMethod resolveMethod(IMemberContext context, IValue receiver, Name name, IArguments arguments)
+	static IMethod resolveMethod(IMemberContext context, IValue receiver, Name name, ArgumentList arguments)
 	{
 		return resolveMethods(context, receiver, name, arguments).getBestMember();
 	}
 
-	static MatchList<IMethod> resolveMethods(IMemberContext context, IValue receiver, Name name, IArguments arguments)
+	static MatchList<IMethod> resolveMethods(IMemberContext context, IValue receiver, Name name, ArgumentList arguments)
 	{
 		MatchList<IMethod> matches = new MatchList<>(context);
 		context.getMethodMatches(matches, receiver, name, arguments);

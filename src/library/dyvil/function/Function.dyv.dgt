@@ -1,7 +1,9 @@
 package dyvil.function
 
-public class Function
+abstract class Function
 {
+	private init() {} // no instances
+
 	@FunctionalInterface
 	public interface Of0<type +R>
 	{

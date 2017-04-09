@@ -11,10 +11,11 @@ import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.expression.operator.IOperator;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.parsing.Name;
 
@@ -96,10 +97,14 @@ public class CombiningContext implements IContext
 	}
 
 	@Override
-	public ITypeAlias resolveTypeAlias(Name name, int arity)
+	public void resolveTypeAlias(MatchList<ITypeAlias> matches, IType receiver, Name name, TypeList arguments)
 	{
-		final ITypeAlias inner = this.inner.resolveTypeAlias(name, arity);
-		return inner == null ? this.outer.resolveTypeAlias(name, arity) : inner;
+		this.inner.resolveTypeAlias(matches, receiver, name, arguments);
+		if (matches.hasCandidate())
+		{
+			return;
+		}
+		this.outer.resolveTypeAlias(matches, receiver, name, arguments);
 	}
 
 	@Override
@@ -133,7 +138,7 @@ public class CombiningContext implements IContext
 	}
 
 	@Override
-	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
 		this.inner.getMethodMatches(list, receiver, name, arguments);
 
@@ -155,7 +160,7 @@ public class CombiningContext implements IContext
 	}
 
 	@Override
-	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
+	public void getConstructorMatches(MatchList<IConstructor> list, ArgumentList arguments)
 	{
 		this.inner.getConstructorMatches(list, arguments);
 

@@ -13,8 +13,6 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-@LiteralConvertible.FromNil
-@LiteralConvertible.FromColonOperator(methodName = "singleton")
 @LiteralConvertible.FromArray
 public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K, V>
 {
@@ -44,7 +42,7 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 	}
 
 	@NonNull
-	public static <K extends Comparable<K>, V> TreeMap<K, V> from(Entry<? extends K, ? extends V> @NonNull [] array)
+	public static <K extends Comparable<K>, V> TreeMap<K, V> from(@NonNull Entry<? extends K, ? extends V> @NonNull [] array)
 	{
 		return new TreeMap<>(array);
 	}
@@ -72,12 +70,12 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements MutableMap<K
 		super(comparator);
 	}
 
-	public TreeMap(Entry<? extends K, ? extends V> @NonNull [] entries)
+	public TreeMap(@NonNull Entry<? extends K, ? extends V> @NonNull [] entries)
 	{
 		super(entries);
 	}
 
-	public TreeMap(Entry<? extends K, ? extends V> @NonNull [] entries, Comparator<? super K> comparator)
+	public TreeMap(@NonNull Entry<? extends K, ? extends V> @NonNull [] entries, Comparator<? super K> comparator)
 	{
 		super(entries, comparator);
 	}

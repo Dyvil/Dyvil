@@ -71,7 +71,6 @@ public class TypeAliasParser extends Parser
 		case TYPE_PARAMETERS:
 			if (TypeParser.isGenericStart(token, type))
 			{
-				this.typeAlias.setTypeParametric();
 				this.mode = TYPE_PARAMETERS_END;
 				pm.splitJump(token, 1);
 				pm.pushParser(new TypeParameterListParser(this.typeAlias));

@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -89,7 +89,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 			return this; // skip
 		}
 
-		final IParameterList parameters = caseClass.getParameterList();
+		final ParameterList parameters = caseClass.getParameters();
 		final int paramCount = parameters.size();
 		if (this.patternCount != paramCount)
 		{
@@ -224,7 +224,7 @@ public class CaseClassPattern extends Pattern implements IPatternList
 		varIndex = IPattern.ensureVar(writer, varIndex, matchedType);
 
 		final IClass caseClass = this.type.getTheClass();
-		final IParameterList parameters = caseClass.getParameterList();
+		final ParameterList parameters = caseClass.getParameters();
 		final int lineNumber = this.getLineNumber();
 
 		for (int i = 0; i < this.patternCount; i++)

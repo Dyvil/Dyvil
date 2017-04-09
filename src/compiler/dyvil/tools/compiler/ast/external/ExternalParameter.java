@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.method.IExternalCallableMember;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.AbstractParameter;
+import dyvil.tools.compiler.ast.structure.RootPackage;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.parsing.Name;
@@ -35,6 +36,14 @@ public class ExternalParameter extends AbstractParameter
 		this.resolved = true;
 
 		this.resolveTypes(null, ((IExternalCallableMember) this.method).getExternalContext());
+	}
+
+	private void resolveAnnotations()
+	{
+		if (this.annotations != null)
+		{
+			this.annotations.resolveTypes(null, RootPackage.rootPackage, this);
+		}
 	}
 
 	public void addTypeAnnotation(IAnnotation annotation, TypePath path)
@@ -69,6 +78,13 @@ public class ExternalParameter extends AbstractParameter
 	{
 		// Do not perform type resolution
 		return this.type.getLocalSlots();
+	}
+
+	@Override
+	public AnnotationList getAnnotations()
+	{
+		this.resolveAnnotations();
+		return super.getAnnotations();
 	}
 
 	@Override

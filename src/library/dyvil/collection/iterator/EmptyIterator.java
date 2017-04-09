@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
-@LiteralConvertible.FromNil
 @Immutable
 public final class EmptyIterator<E> implements Iterator<E>
 {

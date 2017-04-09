@@ -6,7 +6,6 @@ import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.parameter.IArguments;
 import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.reference.PropertyReference;
 import dyvil.tools.compiler.ast.type.IType;
@@ -34,7 +33,7 @@ public class MethodCall extends AbstractCall implements INamed
 		this.arguments = ArgumentList.EMPTY;
 	}
 
-	public MethodCall(ICodePosition position, IValue instance, Name name, IArguments arguments)
+	public MethodCall(ICodePosition position, IValue instance, Name name, ArgumentList arguments)
 	{
 		this.position = position;
 		this.receiver = instance;
@@ -42,7 +41,7 @@ public class MethodCall extends AbstractCall implements INamed
 		this.arguments = arguments;
 	}
 
-	public MethodCall(ICodePosition position, IValue instance, IMethod method, IArguments arguments)
+	public MethodCall(ICodePosition position, IValue instance, IMethod method, ArgumentList arguments)
 	{
 		this.position = position;
 		this.receiver = instance;
@@ -160,8 +159,7 @@ public class MethodCall extends AbstractCall implements INamed
 				return null;
 			}
 
-			final IType type = new NamedGenericType(this.position, parentType, this.name, this.genericData.getTypes(),
-			                                        this.genericData.typeCount())
+			final IType type = new NamedGenericType(this.position, parentType, this.name, this.genericData.getTypes())
 				                   .resolveType(report ? markers : null, context);
 			if (type == null)
 			{
@@ -213,7 +211,7 @@ public class MethodCall extends AbstractCall implements INamed
 			{
 				if (this.receiver.isConstant())
 				{
-					if (this.arguments.size() == 1 && (argument = this.arguments.getFirstValue()).isConstant())
+					if (this.arguments.size() == 1 && (argument = this.arguments.getFirst()).isConstant())
 					{
 						// Binary Infix Operators
 						final IValue folded = ConstantFolder.applyInfix(this.receiver, this.name, argument);
@@ -228,7 +226,7 @@ public class MethodCall extends AbstractCall implements INamed
 					this.receiver = this.receiver.foldConstants();
 				}
 			}
-			else if (this.arguments.size() == 1 && (argument = this.arguments.getFirstValue()).isConstant())
+			else if (this.arguments.size() == 1 && (argument = this.arguments.getFirst()).isConstant())
 			{
 				// Unary Prefix Operators
 				final IValue folded = ConstantFolder.applyUnary(this.name, argument);

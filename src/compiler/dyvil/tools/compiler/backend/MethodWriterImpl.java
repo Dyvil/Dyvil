@@ -680,15 +680,24 @@ public final class MethodWriterImpl implements MethodWriter
 	{
 		this.insnCallback();
 
-		if (opcode == Opcodes.NEW)
+		switch (opcode)
 		{
+		case Opcodes.NEW:
 			Label label = new Label();
 			this.mv.visitLabel(label);
 			this.frame.push(label);
-		}
-		else
-		{
+			break;
+		case Opcodes.CHECKCAST:
+			if (type.equals(this.frame.peek()))
+			{
+				// Optimization: omit redundant casts
+				return;
+			}
+			this.frame.set(type);
+			break;
+		default:
 			this.frame.visitTypeInsn(opcode, type);
+			break;
 		}
 
 		this.mv.visitTypeInsn(opcode, type);

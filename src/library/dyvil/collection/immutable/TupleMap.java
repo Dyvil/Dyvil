@@ -14,9 +14,7 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-@LiteralConvertible.FromNil
 @LiteralConvertible.FromArray
-@LiteralConvertible.FromColonOperator(methodName = "singleton")
 @Immutable
 public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableMap<K, V>
 {
@@ -83,26 +81,26 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 
 	@NonNull
 	@SafeVarargs
-	public static <K, V> TupleMap<K, V> apply(@NonNull Entry<? extends K, ? extends V>... entries)
+	public static <K, V> TupleMap<K, V> apply(@NonNull Entry<? extends K, ? extends V> @NonNull ... entries)
 	{
 		return new TupleMap<>(entries);
 	}
 
 	@NonNull
 	@SafeVarargs
-	public static <K, V> TupleMap<K, V> apply(Tuple.@NonNull Of2<? extends K, ? extends V>... entries)
+	public static <K, V> TupleMap<K, V> apply(Tuple.@NonNull Of2<? extends K, ? extends V> @NonNull ... entries)
 	{
 		return new TupleMap<>(entries, true);
 	}
 
 	@NonNull
-	public static <K, V> TupleMap<K, V> from(Entry<? extends K, ? extends V> @NonNull [] array)
+	public static <K, V> TupleMap<K, V> from(@NonNull Entry<? extends K, ? extends V> @NonNull [] array)
 	{
 		return new TupleMap<>(array);
 	}
 
 	@NonNull
-	public static <K, V> TupleMap<K, V> from(Tuple.Of2<? extends K, ? extends V> @NonNull [] array)
+	public static <K, V> TupleMap<K, V> from(Tuple.@NonNull Of2<? extends K, ? extends V> @NonNull [] array)
 	{
 		return new TupleMap<>(array);
 	}

@@ -1,7 +1,6 @@
 package dyvil.runtime.annotation;
 
 import dyvil.annotation.internal.NonNull;
-import dyvil.reflect.MethodReflection;
 import dyvil.reflect.Opcodes;
 import dyvil.runtime.BytecodeDump;
 import dyvil.tools.asm.*;
@@ -11,15 +10,13 @@ import java.lang.invoke.ConstantCallSite;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static dyvil.reflect.MethodReflection.LOOKUP;
 import static dyvil.reflect.Modifiers.*;
 import static dyvil.reflect.Opcodes.*;
 import static dyvil.reflect.ReflectUtils.UNSAFE;
 import static dyvil.runtime.TypeConverter.*;
-import static dyvil.string.StringUtils.EMPTY_STRING_ARRAY;
 
 public final class AnnotationProxyFactory
 {
@@ -86,8 +83,7 @@ public final class AnnotationProxyFactory
 		}
 		else
 		{
-			this.argDescs = EMPTY_STRING_ARRAY;
-			this.argNames = EMPTY_STRING_ARRAY;
+			this.argDescs = this.argNames = null;
 		}
 	}
 
@@ -97,28 +93,19 @@ public final class AnnotationProxyFactory
 		final Class<?> innerClass = this.spinInnerClass();
 		if (this.parameterCount == 0)
 		{
-			final Constructor[] ctrs = AccessController.doPrivileged((PrivilegedAction<Constructor[]>) () ->
-			{
-				Constructor<?>[] ctrs1 = innerClass.getDeclaredConstructors();
-				if (ctrs1.length == 1)
-				{
-					// The annotation implementing inner class constructor is
-					// private, set
-					// it accessible (by us) before creating the constant
-					// sole instance
-					ctrs1[0].setAccessible(true);
-				}
-				return ctrs1;
-			});
+			final Constructor[] ctrs = innerClass.getDeclaredConstructors();
 			if (ctrs.length != 1)
 			{
-				throw new Exception("Expected one annotation constructor for " + innerClass.getCanonicalName()
-					                    + ", got " + ctrs.length);
+				final String message =
+					"Expected one annotation constructor for " + innerClass.getCanonicalName() + ", got " + ctrs.length;
+				throw new Exception(message);
 			}
 
 			try
 			{
-				Object inst = ctrs[0].newInstance();
+				final Constructor ctr = ctrs[0];
+				ctr.setAccessible(true);
+				final Object inst = ctr.newInstance();
 				return new ConstantCallSite(MethodHandles.constant(this.annotationType, inst));
 			}
 			catch (ReflectiveOperationException e)
@@ -129,7 +116,7 @@ public final class AnnotationProxyFactory
 		try
 		{
 			UNSAFE.ensureClassInitialized(innerClass);
-			return new ConstantCallSite(MethodReflection.LOOKUP.findStatic(innerClass, NAME_FACTORY, this.invokedType));
+			return new ConstantCallSite(LOOKUP.findStatic(innerClass, NAME_FACTORY, this.invokedType));
 		}
 		catch (ReflectiveOperationException e)
 		{
@@ -147,14 +134,15 @@ public final class AnnotationProxyFactory
 		                  "java/lang/Object", new String[] { annotationItf });
 
 		// Generate final fields to be filled in by constructor
-		for (int i = 0; i < this.argDescs.length; i++)
-		{
-			FieldVisitor fv = classWriter.visitField(PRIVATE | FINAL, this.argNames[i], this.argDescs[i], null, null);
-			fv.visitEnd();
-		}
 
-		if (this.parameterCount != 0)
+		if (this.parameterCount > 0)
 		{
+			for (int i = 0; i < this.parameterCount; i++)
+			{
+				FieldVisitor fv = classWriter
+					                  .visitField(PRIVATE | FINAL, this.argNames[i], this.argDescs[i], null, null);
+				fv.visitEnd();
+			}
 			this.generateFactory(classWriter);
 		}
 

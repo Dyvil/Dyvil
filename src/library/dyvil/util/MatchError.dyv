@@ -1,0 +1,23 @@
+package dyvil.util
+
+/**
+ * A **MatchError** is a {@link RuntimeException} thrown when a non-exhaustive {@code match} expression receives a
+ * value that none of its patterns can handle. The {@code MatchError} contains the value that was attempted to be
+ * matched; the {@link #getMessage()} method returns a string describing the value and its type.
+ *
+ * @author Clashsoft
+ */
+class MatchError(let value: any!) extends RuntimeException
+{
+	override func getMessage() -> String
+	{
+		if (this.value == null) return 'null'
+		try
+		{
+			return "\(this.value) (of class \(this.value.dynamicClass.getName()))"
+		}
+		catch (t: Throwable) {}
+
+		return "An instance of class \(this.value.dynamicClass.getName())"
+	}
+}

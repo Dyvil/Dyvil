@@ -7,8 +7,8 @@ import java.io.File;
 
 public class BytecodeDump
 {
-	// TODO add system property
-	private static final File dumpDirectory = new File("runtimebin");
+	private static final String dumpProperty = System.getProperty("dyvil.bytecode.dump");
+	private static final File dumpDirectory = dumpProperty == null ? null : new File(dumpProperty);
 
 	@SuppressWarnings("ConstantConditions")
 	public static void dump(byte @NonNull [] bytes, @NonNull String className)

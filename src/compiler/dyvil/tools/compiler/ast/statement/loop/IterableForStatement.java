@@ -17,11 +17,11 @@ public class IterableForStatement extends ForEachStatement
 	{
 		public static       IClass         ITERABLE_CLASS = Package.javaLang.resolveClass("Iterable");
 		public static final IType          ITERABLE       = ITERABLE_CLASS.getClassType();
-		public static final ITypeParameter ITERABLE_TYPE  = ITERABLE_CLASS.getTypeParameter(0);
+		public static final ITypeParameter ITERABLE_TYPE  = ITERABLE_CLASS.getTypeParameters().get(0);
 
 		public static final IClass         ITERATOR_CLASS = Package.javaUtil.resolveClass("Iterator");
 		public static final IType          ITERATOR       = ITERATOR_CLASS.getClassType();
-		public static final ITypeParameter ITERATOR_TYPE  = ITERATOR_CLASS.getTypeParameter(0);
+		public static final ITypeParameter ITERATOR_TYPE  = ITERATOR_CLASS.getTypeParameters().get(0);
 	}
 
 	protected boolean iterator;

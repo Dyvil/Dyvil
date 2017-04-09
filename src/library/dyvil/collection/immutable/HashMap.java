@@ -13,9 +13,7 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-@LiteralConvertible.FromNil
 @LiteralConvertible.FromArray
-@LiteralConvertible.FromColonOperator(methodName = "singleton")
 @Immutable
 public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap<K, V>
 {
@@ -74,7 +72,7 @@ public class HashMap<K, V> extends AbstractHashMap<K, V> implements ImmutableMap
 
 	@NonNull
 	@SafeVarargs
-	public static <K, V> HashMap<K, V> apply(@NonNull Entry<K, V>... entries)
+	public static <K, V> HashMap<K, V> apply(@NonNull Entry<K, V> @NonNull ... entries)
 	{
 		return new HashMap<>(entries);
 	}

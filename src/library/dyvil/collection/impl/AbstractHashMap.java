@@ -223,7 +223,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 		{
 			throw new IllegalArgumentException("Invalid Capacity: " + capacity);
 		}
-		this.entries = (HashEntry<K, V>[]) new HashEntry[MathUtils.powerOfTwo(grow(capacity))];
+		this.entries = (HashEntry<K, V>[]) new HashEntry[MathUtils.nextPowerOf2(grow(capacity))];
 	}
 
 	public AbstractHashMap(Entry<? extends K, ? extends V> @NonNull [] entries)
@@ -304,7 +304,7 @@ public abstract class AbstractHashMap<K, V> implements Map<K, V>
 	{
 		if (newCapacity > this.entries.length)
 		{
-			this.ensureCapacityInternal(MathUtils.powerOfTwo(newCapacity));
+			this.ensureCapacityInternal(MathUtils.nextPowerOf2(newCapacity));
 		}
 	}
 

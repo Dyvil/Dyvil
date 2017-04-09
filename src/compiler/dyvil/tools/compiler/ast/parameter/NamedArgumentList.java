@@ -35,13 +35,13 @@ public class NamedArgumentList extends ArgumentList
 	}
 
 	@Override
-	public IArguments withLastValue(IValue value)
+	public NamedArgumentList appended(IValue value)
 	{
-		return this.withLastValue(null, value);
+		return this.appended(null, value);
 	}
 
 	@Override
-	public IArguments withLastValue(Name name, IValue value)
+	public NamedArgumentList appended(Name name, IValue value)
 	{
 		int size = this.size;
 		final int index = size++;
@@ -56,7 +56,8 @@ public class NamedArgumentList extends ArgumentList
 		return new NamedArgumentList(keys, values, size);
 	}
 
-	public void addLastValue(Name key, IValue value)
+	@Override
+	public void add(Name key, IValue value)
 	{
 		final int index = this.size++;
 		if (index >= this.values.length)
@@ -72,8 +73,16 @@ public class NamedArgumentList extends ArgumentList
 		this.keys[index] = key;
 	}
 
+	public void setName(int i, Name name)
+	{
+		if (i < this.size)
+		{
+			this.keys[i] = name;
+		}
+	}
+
 	@Override
-	public IValue getValue(int index, IParameter param)
+	public IValue get(int index, IParameter param)
 	{
 		if (param == null)
 		{
@@ -89,7 +98,7 @@ public class NamedArgumentList extends ArgumentList
 	}
 
 	@Override
-	public void setValue(int index, IParameter param, IValue value)
+	public void set(int index, IParameter param, IValue value)
 	{
 		if (param == null)
 		{
@@ -186,9 +195,9 @@ public class NamedArgumentList extends ArgumentList
 		{
 			if (param.isVarargs())
 			{
-				final ArrayExpr arrayExpr = new ArrayExpr(new IValue[0], 0);
-				final IValue converted = IArguments.convertValue(arrayExpr, param, genericData, markers, context);
-				this.addLastValue(param.getName(), converted);
+				final ArrayExpr arrayExpr = new ArrayExpr(ArgumentList.EMPTY);
+				final IValue converted = convertValue(arrayExpr, param, genericData, markers, context);
+				this.add(param.getName(), converted);
 			}
 
 			return;
@@ -196,8 +205,7 @@ public class NamedArgumentList extends ArgumentList
 
 		if (!param.isVarargs())
 		{
-			this.values[argIndex] = IArguments
-				                        .convertValue(this.values[argIndex], param, genericData, markers, context);
+			this.values[argIndex] = convertValue(this.values[argIndex], param, genericData, markers, context);
 			return;
 		}
 
@@ -223,7 +231,7 @@ public class NamedArgumentList extends ArgumentList
 	}
 
 	@Override
-	public void writeValues(MethodWriter writer, IParameterList parameters, int startIndex) throws BytecodeException
+	public void writeValues(MethodWriter writer, ParameterList parameters, int startIndex) throws BytecodeException
 	{
 		if (this.hasParameterOrder())
 		{
@@ -312,14 +320,6 @@ public class NamedArgumentList extends ArgumentList
 	}
 
 	@Override
-	public void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
-	{
-		final int argIndex = this.findIndex(index, param.getName());
-
-		this.values[argIndex].writeExpression(writer, param.getCovariantType());
-	}
-
-	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
 		for (int i = 0; i < this.size; i++)
@@ -346,13 +346,6 @@ public class NamedArgumentList extends ArgumentList
 	}
 
 	@Override
-	public IArguments copy()
-	{
-		return new NamedArgumentList(Arrays.copyOf(this.keys, this.size), Arrays.copyOf(this.values, this.size),
-		                             this.size);
-	}
-
-	@Override
 	protected void appendValue(@NonNull String indent, @NonNull StringBuilder buffer, int index)
 	{
 		final Name key = this.keys[index];
@@ -376,5 +369,18 @@ public class NamedArgumentList extends ArgumentList
 		}
 
 		this.values[index].getType().toString("", buffer);
+	}
+
+	@Override
+	public NamedArgumentList copy()
+	{
+		return new NamedArgumentList(Arrays.copyOf(this.keys, this.size), Arrays.copyOf(this.values, this.size),
+		                             this.size);
+	}
+
+	@Override
+	public NamedArgumentList toNamed()
+	{
+		return this;
 	}
 }

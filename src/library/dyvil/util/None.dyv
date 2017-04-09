@@ -2,7 +2,6 @@ package dyvil.util
 
 import java.util.NoSuchElementException
 
-@LiteralConvertible.FromNil
 public object None implements Option<none>
 {
 	static func apply() -> None = None

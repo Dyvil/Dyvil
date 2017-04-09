@@ -15,10 +15,7 @@ import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
-import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
-import dyvil.tools.compiler.ast.parameter.IParametric;
+import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -104,7 +101,7 @@ public class ClassMetadata implements IClassMetadata
 
 	private void checkMethod(IMethod method)
 	{
-		final IParameterList parameters = method.getParameterList();
+		final ParameterList parameters = method.getParameters();
 		switch (method.getName().unqualified)
 		{
 		case "equals":
@@ -126,7 +123,7 @@ public class ClassMetadata implements IClassMetadata
 			}
 			return;
 		case "apply":
-			if (parameters.matches(this.theClass.getParameterList()))
+			if (parameters.matches(this.theClass.getParameters()))
 			{
 				this.members |= APPLY;
 			}
@@ -148,7 +145,7 @@ public class ClassMetadata implements IClassMetadata
 	@Override
 	public void resolveTypesHeader(MarkerList markers, IContext context)
 	{
-		final IArguments superConstructorArguments = this.theClass.getSuperConstructorArguments();
+		final ArgumentList superConstructorArguments = this.theClass.getSuperConstructorArguments();
 		if (superConstructorArguments != null)
 		{
 			superConstructorArguments.resolveTypes(markers, context);
@@ -173,7 +170,7 @@ public class ClassMetadata implements IClassMetadata
 			return;
 		}
 
-		final IParameterList parameters = this.theClass.getParameterList();
+		final ParameterList parameters = this.theClass.getParameters();
 		final IConstructor constructor = body.getConstructor(parameters);
 		if (constructor != null)
 		{
@@ -208,7 +205,7 @@ public class ClassMetadata implements IClassMetadata
 
 	protected void copyClassParameters(IParametric constructor)
 	{
-		final IParameterList classParameters = this.theClass.getParameterList();
+		final ParameterList classParameters = this.theClass.getParameters();
 		final int parameterCount = classParameters.size();
 		final IParameter[] parameters = new IParameter[parameterCount];
 
@@ -228,7 +225,7 @@ public class ClassMetadata implements IClassMetadata
 			parameters[i].setIndex(i);
 		}
 
-		constructor.getParameterList().setParameterArray(parameters, parameterCount);
+		constructor.getParameters().setParameters(parameters, parameterCount);
 	}
 
 	@Override
@@ -244,11 +241,11 @@ public class ClassMetadata implements IClassMetadata
 			this.constructor.setInitializer(this.superInitializer);
 
 			final StatementList constructorBody = new StatementList();
-			final IParameterList parameters = this.constructor.getParameterList();
+			final ParameterList parameters = this.constructor.getParameters();
 
 			for (int i = 0, count = parameters.size(); i < count; i++)
 			{
-				constructorBody.addValue(new ClassParameterSetter(this.theClass, parameters.get(i)));
+				constructorBody.add(new ClassParameterSetter(this.theClass, parameters.get(i)));
 			}
 
 			this.constructor.setValue(constructorBody);
@@ -292,7 +289,7 @@ public class ClassMetadata implements IClassMetadata
 	}
 
 	@Override
-	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
+	public void getConstructorMatches(MatchList<IConstructor> list, ArgumentList arguments)
 	{
 		if ((this.members & CONSTRUCTOR) != 0)
 		{

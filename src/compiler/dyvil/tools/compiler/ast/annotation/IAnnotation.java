@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.consumer.IArgumentsConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.header.IObjectCompilable;
 import dyvil.tools.parsing.ast.IASTNode;
@@ -20,9 +20,9 @@ import java.lang.annotation.ElementType;
 public interface IAnnotation extends IASTNode, IResolvable, ITyped, IObjectCompilable, IArgumentsConsumer
 {
 	@Override
-	void setArguments(IArguments arguments);
+	void setArguments(ArgumentList arguments);
 	
-	IArguments getArguments();
+	ArgumentList getArguments();
 	
 	@Override
 	void resolveTypes(MarkerList markers, IContext context);

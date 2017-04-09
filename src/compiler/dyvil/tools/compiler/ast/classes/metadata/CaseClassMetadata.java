@@ -16,8 +16,7 @@ import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.ClassParameter;
-import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -42,7 +41,7 @@ public final class CaseClassMetadata extends ClassMetadata
 	{
 		super.resolveTypesPre(markers, context);
 
-		final IParameterList parameters = this.theClass.getParameterList();
+		final ParameterList parameters = this.theClass.getParameters();
 		for (int i = 0, count = parameters.size(); i < count; i++)
 		{
 			final ClassParameter classParameter = (ClassParameter) parameters.get(i);
@@ -63,7 +62,7 @@ public final class CaseClassMetadata extends ClassMetadata
 
 		if (!this.theClass.isSubClassOf(Types.SERIALIZABLE))
 		{
-			this.theClass.addInterface(Types.SERIALIZABLE);
+			this.theClass.getInterfaces().add(Types.SERIALIZABLE);
 		}
 	}
 
@@ -81,11 +80,11 @@ public final class CaseClassMetadata extends ClassMetadata
 
 		final CodeMethod applyMethod = new CodeMethod(this.theClass, Names.apply, this.theClass.getThisType(),
 		                                              new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC_FINAL));
-		applyMethod.setTypeParameters(this.theClass.getTypeParameters(), this.theClass.typeParameterCount());
+		applyMethod.getTypeParameters().addAll(this.theClass.getTypeParameters());
 
 		if (this.constructor != null && (this.members & CONSTRUCTOR) == 0)
 		{
-			this.constructor.getParameterList().copyTo(applyMethod.getParameterList());
+			this.constructor.getParameters().copyTo(applyMethod.getParameters());
 		}
 		else
 		{
@@ -101,11 +100,11 @@ public final class CaseClassMetadata extends ClassMetadata
 		if (this.applyMethod != null && (this.members & APPLY) == 0)
 		{
 			final ArgumentList arguments = new ArgumentList();
-			final IParameterList parameterList = this.applyMethod.getParameterList();
+			final ParameterList parameterList = this.applyMethod.getParameters();
 
 			for (int i = 0, count = parameterList.size(); i < count; i++)
 			{
-				arguments.addValue(new FieldAccess(parameterList.get(i)));
+				arguments.add(new FieldAccess(parameterList.get(i)));
 			}
 
 			this.applyMethod.setValue(new ConstructorCall(this.constructor, arguments));
@@ -119,7 +118,7 @@ public final class CaseClassMetadata extends ClassMetadata
 	}
 
 	@Override
-	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
 		if (name == Names.apply && this.applyMethod != null)
 		{

@@ -1,10 +1,5 @@
 package dyvil.tuple
 
-import dyvil.collection.Cell
-import dyvil.collection.Entry
-
-import java.util.Objects
-
 abstract class Tuple
 {
 	private init() {} // no instances

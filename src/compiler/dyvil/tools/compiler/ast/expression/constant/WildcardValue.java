@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.expression.constant;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.access.WildcardAccess;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
@@ -20,8 +21,6 @@ public class WildcardValue implements IConstantValue
 
 	private ICodePosition position;
 	private IType type = Types.UNKNOWN;
-
-	private IParameter lambdaParameter;
 
 	public WildcardValue(ICodePosition position)
 	{
@@ -46,30 +45,22 @@ public class WildcardValue implements IConstantValue
 		this.position = position;
 	}
 
-	public IParameter getLambdaParameter()
-	{
-		return this.lambdaParameter;
-	}
-
-	@Override
-	public void setLambdaParameter(IParameter parameter)
-	{
-		this.lambdaParameter = parameter;
-	}
-
 	@Override
 	public boolean isPartialWildcard()
 	{
-		return this.lambdaParameter == null;
+		return true;
+	}
+
+	@Override
+	public IValue withLambdaParameter(IParameter parameter)
+	{
+		parameter.setPosition(this.position);
+		return new WildcardAccess(parameter);
 	}
 
 	@Override
 	public IType getType()
 	{
-		if (this.lambdaParameter != null)
-		{
-			return this.lambdaParameter.getType();
-		}
 		return this.type;
 	}
 
@@ -77,15 +68,6 @@ public class WildcardValue implements IConstantValue
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
 		this.type = type;
-
-		if (this.lambdaParameter != null)
-		{
-			final IType paramType = this.lambdaParameter.getType();
-			if (paramType == null || paramType.isUninferred())
-			{
-				this.lambdaParameter.setType(type);
-			}
-		}
 		return this;
 	}
 
@@ -98,15 +80,6 @@ public class WildcardValue implements IConstantValue
 	@Override
 	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
-		if (this.lambdaParameter != null)
-		{
-			final IType paramType = this.lambdaParameter.getType();
-			if (paramType != null && !paramType.isUninferred())
-			{
-				return Types.getTypeMatch(type, paramType);
-			}
-		}
-
 		return EXACT_MATCH;
 	}
 
@@ -134,7 +107,7 @@ public class WildcardValue implements IConstantValue
 		{
 			markers.add(Markers.semanticError(this.position, "wildcard.type.unresolved"));
 		}
-		if (this.lambdaParameter == null && !this.type.hasDefaultValue())
+		else if (!this.type.hasDefaultValue())
 		{
 			final Marker marker = Markers.semanticError(this.position, "wildcard.type.no_default");
 			marker.addInfo(Markers.getSemantic("wildcard.type", this.type));
@@ -153,18 +126,6 @@ public class WildcardValue implements IConstantValue
 	{
 		if (Types.isVoid(type))
 		{
-			return;
-		}
-
-		if (this.lambdaParameter != null)
-		{
-			final int lineNumber = this.getLineNumber();
-
-			this.lambdaParameter.writeGet(writer, null, lineNumber);
-			if (type != null)
-			{
-				this.lambdaParameter.getCovariantType().writeCast(writer, type, lineNumber);
-			}
 			return;
 		}
 

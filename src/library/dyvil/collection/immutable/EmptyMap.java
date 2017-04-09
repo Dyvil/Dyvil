@@ -18,7 +18,6 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
-@LiteralConvertible.FromNil
 @DyvilModifiers(Modifiers.OBJECT_CLASS)
 @Immutable
 public final class EmptyMap<K, V> implements ImmutableMap<K, V>

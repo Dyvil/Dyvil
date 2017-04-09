@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.ICompilationUnit;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.config.CompilerConfig;
 import dyvil.tools.parsing.lexer.DyvilLexer;
@@ -61,7 +61,7 @@ public interface ICompilerPhase extends Comparable<ICompilerPhase>
 	/**
 	 * Resolves other things such as lambda expressions or annotations and checks types. This will be called after
 	 * {@link IValue#withType(IType, ITypeContext, MarkerList, IContext)} has been called. Mainly used by {@link
-	 * IMethod#checkArguments(MarkerList, ICodePosition, IContext, IValue, IArguments, * dyvil.tools.compiler.ast.generic.GenericData)} .
+	 * IMethod#checkArguments(MarkerList, ICodePosition, IContext, IValue, ArgumentList, * dyvil.tools.compiler.ast.generic.GenericData)} .
 	 */
 	ICompilerPhase CHECK_TYPES = new SequentialCompilerPhase(70, "CHECK_TYPES", ICompilationUnit::checkTypes);
 

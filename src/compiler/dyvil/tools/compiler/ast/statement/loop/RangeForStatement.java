@@ -1,11 +1,10 @@
 package dyvil.tools.compiler.ast.statement.loop;
 
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.expression.access.MethodCall;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.access.MethodCall;
 import dyvil.tools.compiler.ast.field.IVariable;
-import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
@@ -54,12 +53,12 @@ public class RangeForStatement extends ForEachStatement
 
 	public static IValue getEndValue(MethodCall rangeOperator)
 	{
-		return rangeOperator.getArguments().getFirstValue();
+		return rangeOperator.getArguments().getFirst();
 	}
 
 	public static IType getElementType(MethodCall range)
 	{
-		return Types.combine(range.getReceiver().getType(), range.getArguments().getFirstValue().getType());
+		return Types.combine(range.getReceiver().getType(), range.getArguments().getFirst().getType());
 	}
 
 	@Override
@@ -272,9 +271,5 @@ public class RangeForStatement extends ForEachStatement
 	{
 		public static final IClass RANGEABLE_CLASS = Package.dyvilCollectionRange.resolveClass("Rangeable");
 		public static final IType  RANGEABLE       = RANGEABLE_CLASS.getClassType();
-
-		private static final IClass         RANGE_CLASS = Package.dyvilCollection.resolveClass("Range");
-		public static final  IType          RANGE       = RANGE_CLASS.getClassType();
-		public static final  ITypeParameter RANGE_TYPE  = RANGE_CLASS.getTypeParameter(0);
 	}
 }

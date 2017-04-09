@@ -1,19 +1,22 @@
 package dyvil.tools.compiler.ast.expression;
 
-import dyvil.collection.iterator.ArrayIterator;
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.constant.VoidValue;
-import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.generic.TypeParameterList;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.reference.IReference;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.TupleType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -26,9 +29,7 @@ import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.position.ICodePosition;
 
-import java.util.Iterator;
-
-public final class TupleExpr implements IValue, IValueList
+public final class TupleExpr implements IValue
 {
 	public static final class LazyFields
 	{
@@ -47,25 +48,23 @@ public final class TupleExpr implements IValue, IValueList
 		}
 	}
 
-	protected ICodePosition position;
+	protected @Nullable ICodePosition position;
 
-	protected IValue[] values;
-	protected int      valueCount;
+	protected @NonNull ArgumentList values;
 
 	// Metadata
-	private IType tupleType;
+	private @Nullable IType tupleType;
 
 	public TupleExpr(ICodePosition position)
 	{
 		this.position = position;
-		this.values = new IValue[3];
+		this.values = ArgumentList.empty();
 	}
 
-	public TupleExpr(ICodePosition position, IValue[] values, int valueCount)
+	public TupleExpr(ICodePosition position, ArgumentList values)
 	{
 		this.position = position;
 		this.values = values;
-		this.valueCount = valueCount;
 	}
 
 	@Override
@@ -86,88 +85,33 @@ public final class TupleExpr implements IValue, IValueList
 		return TUPLE;
 	}
 
-	@Override
-	public Iterator<IValue> iterator()
+	public ArgumentList getValues()
 	{
-		return new ArrayIterator<>(this.values);
-	}
-
-	@Override
-	public int valueCount()
-	{
-		return this.valueCount;
-	}
-
-	@Override
-	public boolean isEmpty()
-	{
-		return this.valueCount == 0;
-	}
-
-	@Override
-	public void setValue(int index, IValue value)
-	{
-		this.values[index] = value;
-	}
-
-	@Override
-	public void addValue(IValue value)
-	{
-		int index = this.valueCount++;
-		if (this.valueCount > this.values.length)
-		{
-			IValue[] temp = new IValue[this.valueCount];
-			System.arraycopy(this.values, 0, temp, 0, index);
-			this.values = temp;
-		}
-		this.values[index] = value;
-	}
-
-	@Override
-	public void addValue(int index, IValue value)
-	{
-		IValue[] temp = new IValue[++this.valueCount];
-		System.arraycopy(this.values, 0, temp, 0, index);
-		temp[index] = value;
-		System.arraycopy(this.values, index, temp, index + 1, this.valueCount - index - 1);
-		this.values = temp;
-	}
-
-	@Override
-	public IValue getValue(int index)
-	{
-		return this.values[index];
+		return this.values;
 	}
 
 	@Override
 	public boolean isResolved()
 	{
-		for (int i = 0; i < this.valueCount; i++)
-		{
-			if (!this.values[i].isResolved())
-			{
-				return false;
-			}
-		}
-		return true;
+		return this.values.isResolved();
 	}
 
 	@Override
-	public IReference toReference()
+	public boolean isPartialWildcard()
 	{
-		return this.valueCount != 1 ? null : this.values[0].toReference();
+		return this.values.size() == 1 && this.values.getFirst().isPartialWildcard();
 	}
 
 	@Override
-	public IValue toReferenceValue(MarkerList markers, IContext context)
+	public IValue withLambdaParameter(IParameter parameter)
 	{
-		return this.valueCount != 1 ? null : this.values[0].toReferenceValue(markers, context);
+		return this.values.size() != 1 ? null : this.values.getFirst().withLambdaParameter(parameter);
 	}
 
 	@Override
 	public IValue toAssignment(IValue rhs, ICodePosition position)
 	{
-		return this.valueCount != 1 ? null : this.values[0].toAssignment(rhs, position);
+		return this.values.size() != 1 ? null : this.values.getFirst().toAssignment(rhs, position);
 	}
 
 	@Override
@@ -178,10 +122,12 @@ public final class TupleExpr implements IValue, IValueList
 			return this.tupleType;
 		}
 
-		final TupleType tupleType = new TupleType(this.valueCount);
-		for (int i = 0; i < this.valueCount; i++)
+		final int arity = this.values.size();
+		final TupleType tupleType = new TupleType(arity);
+		final TypeList arguments = tupleType.getArguments();
+		for (int i = 0; i < arity; i++)
 		{
-			tupleType.addType(this.values[i].getType());
+			arguments.add(this.values.get(i).getType());
 		}
 		return this.tupleType = tupleType;
 	}
@@ -192,11 +138,12 @@ public final class TupleExpr implements IValue, IValueList
 		final IAnnotation annotation = type.getAnnotation(LazyFields.TUPLE_CONVERTIBLE);
 		if (annotation != null)
 		{
-			return new LiteralConversion(this, annotation, new ArgumentList(this.values, this.valueCount))
+			return new LiteralConversion(this, annotation, this.values)
 				       .withType(type, typeContext, markers, context);
 		}
 
-		IClass tupleClass = TupleType.getTupleClass(this.valueCount);
+		final int arity = this.values.size();
+		final IClass tupleClass = TupleType.getTupleClass(arity);
 		if (!Types.isSuperClass(type, tupleClass.getClassType()))
 		{
 			return null;
@@ -204,52 +151,47 @@ public final class TupleExpr implements IValue, IValueList
 
 		this.tupleType = null; // reset type
 
-		tupleClass = lookupClass(tupleClass, this.valueCount);
+		final TypeParameterList typeParameters = typeParameters(tupleClass, arity);
 
-		for (int i = 0; i < this.valueCount; i++)
+		for (int i = 0; i < arity; i++)
 		{
-			final IType elementType = Types.resolveTypeSafely(type, tupleClass.getTypeParameter(i));
-			this.values[i] = TypeChecker.convertValue(this.values[i], elementType, typeContext, markers, context,
-			                                          LazyFields.ELEMENT_MARKER_SUPPLIER);
+			final IType elementType = Types.resolveTypeSafely(type, typeParameters.get(i));
+			final IValue value = TypeChecker.convertValue(this.values.get(i), elementType, typeContext, markers,
+			                                              context, LazyFields.ELEMENT_MARKER_SUPPLIER);
+			this.values.set(i, value);
 		}
 
 		return this;
 	}
 
-	protected static IClass lookupClass(IClass tupleClass, int valueCount)
+	protected static TypeParameterList typeParameters(IClass tupleClass, int valueCount)
 	{
 		switch (valueCount)
 		{
 		case 2:
-			tupleClass = LazyFields.ENTRY;
-			break;
+			return LazyFields.ENTRY.getTypeParameters();
 		case 3:
-			tupleClass = LazyFields.CELL;
-			break;
+			return LazyFields.CELL.getTypeParameters();
 		}
-		return tupleClass;
+		return tupleClass.getTypeParameters();
 	}
 
 	@Override
 	public boolean isType(IType type)
 	{
-		if (this.valueCount == 1)
-		{
-			return this.values[0].isType(type);
-		}
-
 		return Types.isSuperType(type, this.getType()) || type.getAnnotation(LazyFields.TUPLE_CONVERTIBLE) != null;
 	}
 
 	@Override
 	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
-		if (this.valueCount == 1)
+		final int arity = this.values.size();
+		if (arity == 1)
 		{
-			return this.values[0].getTypeMatch(type, implicitContext);
+			return this.values.getFirst().getTypeMatch(type, implicitContext);
 		}
 
-		IClass tupleClass = TupleType.getTupleClass(this.valueCount);
+		final IClass tupleClass = TupleType.getTupleClass(arity);
 		if (!Types.isSuperClass(type, tupleClass.getClassType()))
 		{
 			if (type.getAnnotation(LazyFields.TUPLE_CONVERTIBLE) != null)
@@ -261,13 +203,13 @@ public final class TupleExpr implements IValue, IValueList
 
 		this.tupleType = null; // reset type
 
-		tupleClass = lookupClass(tupleClass, this.valueCount);
+		final TypeParameterList typeParameters = typeParameters(tupleClass, arity);
 
 		int min = EXACT_MATCH;
-		for (int i = 0; i < this.valueCount; i++)
+		for (int i = 0; i < arity; i++)
 		{
-			final IType elementType = Types.resolveTypeSafely(type, tupleClass.getTypeParameter(i));
-			final int match = TypeChecker.getTypeMatch(this.values[i], elementType, implicitContext);
+			final IType elementType = Types.resolveTypeSafely(type, typeParameters.get(i));
+			final int match = TypeChecker.getTypeMatch(this.values.get(i), elementType, implicitContext);
 
 			if (match == MISMATCH)
 			{
@@ -284,28 +226,21 @@ public final class TupleExpr implements IValue, IValueList
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.valueCount; i++)
-		{
-			this.values[i].resolveTypes(markers, context);
-		}
+		this.values.resolveTypes(markers, context);
 	}
 
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		if (this.valueCount == 0)
+		switch (this.values.size())
 		{
+		case 0:
 			return new VoidValue(this.position);
-		}
-		if (this.valueCount == 1)
-		{
-			return this.values[0].resolve(markers, context);
+		case 1:
+			return this.values.getFirst().resolve(markers, context);
 		}
 
-		for (int i = 0; i < this.valueCount; i++)
-		{
-			this.values[i] = this.values[i].resolve(markers, context);
-		}
+		this.values.resolve(markers, context);
 
 		return this;
 	}
@@ -313,59 +248,49 @@ public final class TupleExpr implements IValue, IValueList
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.valueCount; i++)
-		{
-			this.values[i].checkTypes(markers, context);
-		}
+		this.values.checkTypes(markers, context);
 	}
 
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.valueCount; i++)
-		{
-			this.values[i].check(markers, context);
-		}
+		this.values.check(markers, context);
 	}
 
 	@Override
 	public IValue foldConstants()
 	{
-		for (int i = 0; i < this.valueCount; i++)
-		{
-			this.values[i] = this.values[i].foldConstants();
-		}
+		this.values.foldConstants();
 		return this;
 	}
 
 	@Override
 	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		for (int i = 0; i < this.valueCount; i++)
-		{
-			this.values[i] = this.values[i].cleanup(compilableList, classCompilableList);
-		}
+		this.values.cleanup(compilableList, classCompilableList);
 		return this;
 	}
 
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		final String internal = this.getType().getInternalName();
+		final IType thisType = this.getType();
+		final String internal = thisType.getInternalName();
 		writer.visitTypeInsn(Opcodes.NEW, internal);
 		writer.visitInsn(Opcodes.DUP);
 
-		for (int i = 0; i < this.valueCount; i++)
+		final int arity = this.values.size();
+		for (int i = 0; i < arity; i++)
 		{
-			this.values[i].writeExpression(writer, Types.OBJECT);
+			this.values.get(i).writeExpression(writer, Types.OBJECT);
 		}
 
-		final String desc = TupleType.getConstructorDescriptor(this.valueCount);
+		final String desc = TupleType.getConstructorDescriptor(arity);
 		writer.visitMethodInsn(Opcodes.INVOKESPECIAL, internal, "<init>", desc, false);
 
 		if (type != null)
 		{
-			this.tupleType.writeCast(writer, type, this.getLineNumber());
+			thisType.writeCast(writer, type, this.getLineNumber());
 		}
 	}
 
@@ -378,7 +303,8 @@ public final class TupleExpr implements IValue, IValueList
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.valueCount == 0)
+		final int arity = this.values.size();
+		if (arity == 0)
 		{
 			if (Formatting.getBoolean("tuple.empty.space_between"))
 			{
@@ -397,7 +323,8 @@ public final class TupleExpr implements IValue, IValueList
 			buffer.append(' ');
 		}
 
-		Util.astToString(prefix, this.values, this.valueCount, Formatting.getSeparator("tuple.separator", ','), buffer);
+		Util.astToString(prefix, this.values.getArray(), arity, Formatting.getSeparator("tuple.separator", ','),
+		                 buffer);
 
 		if (Formatting.getBoolean("tuple.close_paren.space_before"))
 		{

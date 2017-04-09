@@ -7,16 +7,16 @@ jarDownloadPrefix = "https://github.com/Dyvil/Dyvil/releases/download/v\(version
 library
 {
 	name = "Dyvil Library v\(library.version)"
-	fileName = "./libs/dyvil-library-\(library.version).jar"
+	fileName = "./libs/dyvil-library.jar"
 	download = "\(jarDownloadPrefix)/dyvil-library-\(library.version).jar"
 	
-	selected = "forced"
+	selected = "force"
 }
 
 dpf
 {
 	name = "Dyvil Property Format Library v\(dpf.version)"
-	fileName = "./libs/dyvil-property-format-\(dpf.version).jar"
+	fileName = "./libs/dyvil-property-format.jar"
 	download = "\(jarDownloadPrefix)/dyvil-property-format-\(dpf.version).jar"
 
 	selected = "false"
@@ -26,7 +26,7 @@ dpf
 compiler
 {
 	name = "Dyvil Compiler v\(compiler.version)"
-	fileName = "./libs/dyvil-compiler-\(compiler.version).jar"
+	fileName = "./libs/dyvil-compiler.jar"
 	download = "\(jarDownloadPrefix)/dyvil-compiler-\(compiler.version).jar"
 	
 	selected = "true"
@@ -56,13 +56,13 @@ compiler
 			selected = "true"
 			dependencies = [ "compiler" ]
 		}
-	}	
+	}
 }	
 
 repl
 {
 	name = "Dyvil REPL v\(repl.version)"
-	fileName = "./libs/dyvil-repl-\(repl.version).jar"
+	fileName = "./libs/dyvil-repl.jar"
 	download = "\(jarDownloadPrefix)/dyvil-repl-\(repl.version).jar"
 	
 	selected = "true"
@@ -93,6 +93,15 @@ repl
 			dependencies = [ "repl" ]
 		}
 	}
+}
+
+gensrc
+{
+	name = "Dyvil GenSrc v\(gensrc.version)"
+	fileName = "./libs/dyvil-gensrc.jar"
+	download = "\(jarDownloadPrefix)/dyvil-gensrc-\(gensrc.version).jar"
+
+	selected = "true"
 }
 
 textResources

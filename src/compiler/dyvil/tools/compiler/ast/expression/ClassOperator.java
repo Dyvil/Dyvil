@@ -100,9 +100,7 @@ public final class ClassOperator implements IValue
 	{
 		if (this.genericType == null)
 		{
-			ClassGenericType generic = new ClassGenericType(LazyFields.CLASS_CLASS);
-			generic.addType(this.type);
-			return this.genericType = generic;
+			return this.genericType = new ClassGenericType(LazyFields.CLASS_CLASS, this.type);
 		}
 		return this.genericType;
 	}
@@ -159,9 +157,7 @@ public final class ClassOperator implements IValue
 		}
 
 		this.type = this.type.resolveType(markers, context);
-		ClassGenericType generic = new ClassGenericType(LazyFields.CLASS_CLASS);
-		generic.addType(this.type);
-		this.genericType = generic;
+		this.genericType = new ClassGenericType(LazyFields.CLASS_CLASS, this.type);
 	}
 
 	@Override

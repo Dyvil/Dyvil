@@ -11,13 +11,13 @@ import dyvil.tools.compiler.ast.external.ExternalParameter;
 import dyvil.tools.compiler.ast.external.ExternalTypeParameter;
 import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.ast.generic.Variance;
-import dyvil.tools.compiler.ast.method.IExceptionList;
 import dyvil.tools.compiler.ast.method.IExternalCallableMember;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.reference.ReferenceType;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.builtin.AnyType;
 import dyvil.tools.compiler.ast.type.builtin.NoneType;
 import dyvil.tools.compiler.ast.type.builtin.NullType;
@@ -200,18 +200,18 @@ public final class ClassFormat
 		i = readTyped(desc, i, iclass::setSuperType, false);
 		while (i < len)
 		{
-			i = readTyped(desc, i, iclass::addInterface, false);
+			i = readTyped(desc, i, iclass.getInterfaces(), false);
 		}
 	}
 
 	private static ITypeConsumer parameterTypeConsumer(IExternalCallableMember methodSignature)
 	{
-		final IParameterList parameterList = methodSignature.getExternalParameterList();
+		final ParameterList parameterList = methodSignature.getExternalParameterList();
 		return type ->
 		{
 			final ExternalParameter parameter = new ExternalParameter(null, null, type);
 			parameter.setMethod(methodSignature);
-			parameterList.addParameter(parameter);
+			parameterList.add(parameter);
 		};
 	}
 
@@ -237,7 +237,7 @@ public final class ClassFormat
 		int len = desc.length();
 		while (i < len && desc.charAt(i) == '^')
 		{
-			i = readException(desc, i + 1, method);
+			i = readException(desc, i + 1, method.getExceptions());
 		}
 	}
 
@@ -253,15 +253,15 @@ public final class ClassFormat
 		int len = desc.length();
 		while (i < len && desc.charAt(i) == '^')
 		{
-			i = readException(desc, i + 1, constructor);
+			i = readException(desc, i + 1, constructor.getExceptions());
 		}
 	}
 
-	public static void readExceptions(String[] exceptions, IExceptionList exceptionList)
+	public static void readExceptions(String[] exceptions, TypeList exceptionList)
 	{
 		for (String s : exceptions)
 		{
-			exceptionList.addException(internalToType(s));
+			exceptionList.add(internalToType(s));
 		}
 	}
 
@@ -337,11 +337,12 @@ public final class ClassFormat
 		if (index >= 0 && index < end)
 		{
 			final GenericType type = new InternalGenericType(desc.substring(start, index));
+			final TypeList arguments = type.getArguments();
 			index++;
 
 			while (desc.charAt(index) != '>')
 			{
-				index = readTyped(desc, index, type, true);
+				index = readTyped(desc, index, arguments, true);
 			}
 			return type;
 		}
@@ -468,7 +469,7 @@ public final class ClassFormat
 	{
 		int index = desc.indexOf(':', start);
 		final Name name = Name.fromRaw(desc.substring(start, index));
-		final ExternalTypeParameter typeVar = new ExternalTypeParameter(generic, name);
+		final ExternalTypeParameter typeParam = new ExternalTypeParameter(generic, name);
 
 		if (desc.charAt(index + 1) == ':')
 		{
@@ -477,15 +478,15 @@ public final class ClassFormat
 		}
 		while (desc.charAt(index) == ':')
 		{
-			index = readTyped(desc, index + 1, typeVar::addUpperBound, true);
+			index = readTyped(desc, index + 1, typeParam::addUpperBound, true);
 		}
-		generic.addTypeParameter(typeVar);
+		generic.getTypeParameters().add(typeParam);
 		return index;
 	}
 
-	private static int readException(String desc, int start, IExceptionList list)
+	private static int readException(String desc, int start, TypeList list)
 	{
-		return readTyped(desc, start, list::addException, false);
+		return readTyped(desc, start, list, false);
 	}
 
 	private static int getMatchingSemicolon(String s, int start, int end)

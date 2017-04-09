@@ -17,7 +17,6 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-@LiteralConvertible.FromNil
 @LiteralConvertible.FromArray
 public interface Matrix<E> extends Iterable<E>, Serializable
 {

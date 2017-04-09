@@ -14,7 +14,6 @@ import java.util.function.Consumer
 import java.util.function.Function
 import java.util.function.Predicate
 
-@LiteralConvertible.FromNil
 @LiteralConvertible.FromTuple
 @Immutable
 public interface Range<+T> extends Queryable<T>, Serializable

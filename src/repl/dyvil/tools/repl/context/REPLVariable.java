@@ -100,17 +100,6 @@ public class REPLVariable extends Field
 		this.displayValue = result;
 	}
 
-	private boolean isConstant()
-	{
-		return this.hasModifier(Modifiers.FINAL) && this.value != null && isConstant(this.value);
-	}
-
-	private static boolean isConstant(IValue value)
-	{
-		int tag = value.valueTag();
-		return tag >= 0 && tag != IValue.NIL && tag < IValue.STRING;
-	}
-
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
@@ -156,12 +145,6 @@ public class REPLVariable extends Field
 	@Override
 	public void writeGet_Get(MethodWriter writer, int lineNumber) throws BytecodeException
 	{
-		if (this.isConstant())
-		{
-			this.value.writeExpression(writer, this.type);
-			return;
-		}
-
 		writer.visitFieldInsn(Opcodes.GETSTATIC, this.enclosingClass.getInternalName(), this.getInternalName(),
 		                      this.getDescriptor());
 	}

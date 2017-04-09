@@ -1,10 +1,10 @@
 package dyvil.lang
 
+using dyvil.math.MathUtils._
 using dyvil.reflect.Opcodes._
 using dyvil.reflect.ReflectUtils._
-import dyvil.string.StringUtils
 
-public final class Strings
+abstract class Strings
 {
 	private const STRING_VALUE_OFFSET: long = UNSAFE.objectFieldOffset(class<String>.getDeclaredField("value"))
 
@@ -21,43 +21,162 @@ public final class Strings
 	@Intrinsic([], compilerCode: Intrinsic.STRING_CONCAT)
 	infix func +(lhs: String, rhs: String) -> String = lhs + rhs
 
-	// Makeshift char casts
+	// Creation
 
-	static inline func char(c: char) -> char = c
+	inline static func char(c: char) -> char = c
 
 	/**
 	 * This method only exists to provide the user with a useful warning message when trying to pass an invalid char
 	 * literal to the `char` method. An invalid char literal would be a double-quoted String or a single-quoted String
 	 * with zero or more than one characters.
 	 */
-	@UsageInfo(value: "Multi-character Literal or String passed to 'char' method", level: dyvil.util.MarkerLevel.WARNING)
-	static inline func char(c: String) -> char = c.charAt 0
+	@UsageInfo(value: "Multi-character Literal or String passed to 'char' method", level: .WARNING)
+	inline static func char(c: String) -> char = c[0]
 
-	// Unsafe access
+	static func apply(this: String, from: any!) -> String = "\(from)"
 
-	prefix func String(fromShared: [final char]) -> String = JAVA_LANG_ACCESS.newStringUnsafe(fromShared)
+	implicit static func apply(this: String, from: CharSequence) -> String = "\(from)"
 
-	postfix func getCharArray(s: String) -> [final char] = UNSAFE.getObject(s, STRING_VALUE_OFFSET) as [final char]
+	@BytecodeName("fromShared")
+	static func apply(this: String, fromShared: [final char]) -> String = JAVA_LANG_ACCESS.newStringUnsafe(fromShared)
+
+	@BytecodeName("reflect")
+	static func apply(this: String, reflecting: any) -> String = new StringBuilder().{ reflect(reflecting, $0, true); $0.toString }
+
+	private static func reflect(value: any, builder: StringBuilder, fieldNames: boolean) -> void
+	{
+		builder.append('(')
+
+		var currentType = value.dynamicClass
+		builder.append(currentType.getName()).append(')')
+
+		while (currentType != null)
+		{
+			for (field <- currentType.getFields)
+			{
+				if ((field.getModifiers() & dyvil.reflect.Modifiers.STATIC) != 0) continue
+
+				if (fieldNames)
+				{
+					builder.append(field.getName()).append(': ')
+				}
+
+				try
+				{
+					field.setAccessible(true)
+					builder.append(field.get(value))
+				}
+				catch (ex: IllegalAccessException)
+				{
+					builder.append("<error>")
+				}
+			}
+
+			currentType = currentType.getSuperclass
+		}
+
+		// delete extra ', '
+		let length = builder.length()
+		if (builder.charAt(length - 2) == ',') { builder.delete(length - 2, length) }
+
+		builder.append(')')
+	}
 
 	// Subscripts
 
-	inline infix func subscript(s: String, index: int) -> char = s.charAt index
+	inline infix func subscript(s: CharSequence, index: int) -> char = s.charAt index
 
-	infix func subscript(s: String, range: Range<int>) -> String = s.substring(range.first, range.last + 1)
+	inline infix func subscript(s: CharSequence, range: Range<int>) -> CharSequence = s.subSequence(range.first, range.last + 1)
+
+	inline infix func subscript(s: String, range: Range<int>) -> String = s.substring(range.first, range.last + 1)
+
+	postfix func getCharArray(s: String) -> [final char] = UNSAFE.getObject(s, STRING_VALUE_OFFSET) as [final char]
 
 	// Repetition (*) Operator
 
-	infix inline func *(lhs: int, rhs: String) -> String = StringUtils.repeated(rhs, lhs)
+	infix func *(lhs: int, rhs: String) -> String = repeated(rhs, lhs)
 
-	infix inline func *(lhs: String, rhs: int) -> String = StringUtils.repeated(lhs, rhs)
+	infix func *(lhs: String, rhs: int) -> String = repeated(lhs, rhs)
+
+	private static func repeated(string: String, times: int) -> String
+	{
+		match times
+		{
+			case 0: return ""
+			case 1: return string
+			case 2: return string.concat(string)
+		}
+
+		let builder = new StringBuilder
+		for (i <- 0 ..< times) builder.append(string)
+		return builder.toString
+	}
 
 	// Misc. additional extensions
 
-	infix inline func contains(s: String, character: char) -> boolean = s.indexOf(character) >= 0
+	inline infix func size(string: CharSequence) -> int = string.length
 
-	infix inline func split(s: String, delimiter: char) -> [String] = StringUtils.split(s, delimiter) as [String]
+	inline infix func contains(s: String, character: char) -> boolean = s.indexOf(character) >= 0
 
-	infix inline func format(s: String, args: Object! ...) -> String = String.format(s, args...)
+	infix func count(string: String, character: char) -> int
+	{
+		var count = 0
+		for (c <- string) if (c == character) count++
+		return count
+	}
 
-	extension func toString(o: Object, builder: StringBuilder) -> void = builder.append o
+	infix func split(string: String, delimiter: char) -> [String]
+	{
+		var count = 0
+
+		for (c <- string) if (c == delimiter) count++
+		if (count == 0) return [string]
+
+		let array = new [String](count + 1)
+		var start = 0
+		var arrayIndex = 0
+
+		for (i <- 0 ..< string.length)
+		{
+			if (string[i] == delimiter)
+			{
+				array[arrayIndex++] = string.substring(start, i)
+				start = i + 1
+			}
+		}
+		array[arrayIndex] = string.substring(start)
+		return array
+	}
+
+	inline infix func format(s: String, args: Object! ...) -> String = String.format(s, args...)
+
+	infix func distance(string: String, to: String) -> int
+	{
+		if (string == to) return 0
+
+		let size1 = string.length
+		let size2 = to.length
+
+		if (size1 == 0) return size2
+		if (size2 == 0) return size1
+
+		let arraySize = size2 + 1
+		let array1 = new [int](arraySize)
+		let array2 = new [int](arraySize)
+
+		for (i <- 0 ..< arraySize) array1[i] = i
+		for (i <- 0 ..< size1)
+		{
+			array2[0] = i + 1
+			for (j <- 0 ..< size2)
+			{
+				let offset = (string[i] != to[j]) ? 1 : 0
+				array2[j + 1] = min(array2[j] + 1, array1[j + 1] + 1, array1[j] + offset)
+			}
+			System.arraycopy(array2, 0, array1, 0, arraySize)
+		}
+		return array2[size2]
+	}
+
+	extension func toString(o: any, builder: StringBuilder) -> void = builder.append o
 }

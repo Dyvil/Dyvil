@@ -20,9 +20,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@LiteralConvertible.FromNil
 @LiteralConvertible.FromArray
-@LiteralConvertible.FromColonOperator(methodName = "singleton")
 @LiteralConvertible.FromMap
 public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 {
@@ -47,26 +45,26 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 	}
 
 	@NonNull
-	static <K, V> ImmutableMap<K, V> apply()
-	{
-		return EmptyMap.apply();
-	}
-
-	@NonNull
 	static <K, V> ImmutableMap<K, V> singleton(K key, V value)
 	{
 		return new SingletonMap<>(key, value);
 	}
 
 	@NonNull
-	static <K, V> ImmutableMap<K, V> apply(@NonNull Entry<K, V> entry)
+	static <K, V> ImmutableMap<K, V> apply()
+	{
+		return EmptyMap.apply();
+	}
+
+	@NonNull
+	static <K, V> ImmutableMap<K, V> apply(@NonNull Entry<? extends K, ? extends V> entry)
 	{
 		return SingletonMap.apply(entry.getKey(), entry.getValue());
 	}
 
 	@NonNull
 	@SafeVarargs
-	static <K, V> ImmutableMap<K, V> apply(@NonNull Entry<? extends K, ? extends V>... entries)
+	static <K, V> ImmutableMap<K, V> apply(@NonNull Entry<? extends K, ? extends V> @NonNull ... entries)
 	{
 		switch (entries.length)
 		{
@@ -81,7 +79,7 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 	}
 
 	@NonNull
-	static <K, V> ImmutableMap<K, V> apply(K @NonNull [] keys, V[] values)
+	static <K, V> ImmutableMap<K, V> apply(K @NonNull [] keys, V @NonNull [] values)
 	{
 		return new ArrayMap<>(keys, values, true);
 	}

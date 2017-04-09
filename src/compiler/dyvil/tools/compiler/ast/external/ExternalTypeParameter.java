@@ -4,7 +4,6 @@ import dyvil.annotation.Reified;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
-import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeParametric;
 import dyvil.tools.compiler.ast.generic.TypeParameter;
@@ -24,10 +23,10 @@ public class ExternalTypeParameter extends TypeParameter
 {
 	private static final int UPPER_BOUND = 1;
 	private static final int LOWER_BOUND = 2;
-	private static final int ANNOTATIONS = 4;
+	private static final int REIFIED_KIND = 4;
 
 	private int upperBoundCount;
-	private int resolved;
+	private byte resolved;
 
 	// shared constructor
 	{
@@ -44,6 +43,14 @@ public class ExternalTypeParameter extends TypeParameter
 		super(generic, name);
 	}
 
+	private void resolveAnnotations()
+	{
+		if (this.annotations != null)
+		{
+			this.annotations.resolveTypes(null, RootPackage.rootPackage, this);
+		}
+	}
+
 	@Override
 	public ICodePosition getPosition()
 	{
@@ -56,59 +63,20 @@ public class ExternalTypeParameter extends TypeParameter
 	}
 
 	@Override
+	public Reified.Type getReifiedKind()
+	{
+		if ((this.resolved & REIFIED_KIND) == 0)
+		{
+			this.resolved |= REIFIED_KIND;
+			this.computeReifiedKind();
+		}
+		return this.reifiedKind;
+	}
+
+	@Override
 	public IParameter getReifyParameter()
 	{
 		return null;
-	}
-
-	@Override
-	public Reified.Type getReifiedKind()
-	{
-		if (this.reifiedKind != null)
-		{
-			return this.reifiedKind;
-		}
-
-		if ((this.resolved & ANNOTATIONS) == 0)
-		{
-			this.resolveAnnotations();
-		}
-
-		return super.getReifiedKind();
-	}
-
-	@Override
-	public AnnotationList getAnnotations()
-	{
-		if ((this.resolved & ANNOTATIONS) == 0)
-		{
-			this.resolveAnnotations();
-		}
-
-		return super.getAnnotations();
-	}
-
-	@Override
-	public IAnnotation getAnnotation(IClass type)
-	{
-		if ((this.resolved & ANNOTATIONS) == 0)
-		{
-			this.resolveAnnotations();
-		}
-
-		return super.getAnnotation(type);
-	}
-
-	private void resolveAnnotations()
-	{
-		this.resolved |= ANNOTATIONS;
-
-		if (this.annotations == null)
-		{
-			return;
-		}
-		this.annotations.resolveTypes(null, RootPackage.rootPackage, this);
-		this.computeReifiedKind();
 	}
 
 	@Override
@@ -191,6 +159,13 @@ public class ExternalTypeParameter extends TypeParameter
 		}
 
 		this.upperBounds[index] = bound;
+	}
+
+	@Override
+	public AnnotationList getAnnotations()
+	{
+		this.resolveAnnotations();
+		return super.getAnnotations();
 	}
 
 	@Override

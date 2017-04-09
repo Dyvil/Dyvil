@@ -1,16 +1,16 @@
 package dyvil.tests
 
 using dyvil.Test
-using dyvil.math.MathUtils.sqrt
+using dyvil.Math
 
 public class MathTest
 {
 	static func apply() -> Test = test "Math" {
 	}
 
-	private static func isPrime(int value) -> boolean
+	private static func isPrime(value: int) -> boolean
 	{
-		for var j <- 2 .. value.sqrt
+		for j <- 2 .. sqrt(value)
 		{
 			if value % j == 0
 			{
@@ -20,7 +20,7 @@ public class MathTest
 		return true
 	}
 
-	private static func primeFactors(int value) -> List<int>
+	private static func primeFactors(value: int) -> List<int>
 	{
 		if value <= 1
 		{

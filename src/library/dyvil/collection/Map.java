@@ -18,8 +18,6 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @SuppressWarnings( { "unused", "SameParameterValue" })
-@LiteralConvertible.FromNil(methodName = "empty")
-@LiteralConvertible.FromColonOperator(methodName = "singleton")
 @LiteralConvertible.FromArray
 @LiteralConvertible.FromMap
 public interface Map<K, V> extends SizedIterable<Entry<K, V>>, Serializable
@@ -43,14 +41,14 @@ public interface Map<K, V> extends SizedIterable<Entry<K, V>>, Serializable
 	}
 
 	@NonNull
-	static <K, V> ImmutableMap<K, V> apply(@NonNull Entry<K, V> entry)
+	static <K, V> ImmutableMap<K, V> apply(@NonNull Entry<? extends K, ? extends V> entry)
 	{
 		return ImmutableMap.apply(entry);
 	}
 
 	@SafeVarargs
 	@NonNull
-	static <K, V> ImmutableMap<K, V> apply(@NonNull Entry<? extends K, ? extends V>... entries)
+	static <K, V> ImmutableMap<K, V> apply(@NonNull Entry<? extends K, ? extends V> @NonNull ... entries)
 	{
 		return ImmutableMap.apply(entries);
 	}

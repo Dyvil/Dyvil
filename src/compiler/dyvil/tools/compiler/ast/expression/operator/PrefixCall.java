@@ -76,7 +76,7 @@ public class PrefixCall extends MethodCall
 	public IValue toAssignment(IValue rhs, ICodePosition position)
 	{
 		final Name name = Name.from(this.name.unqualified + "_=", this.name.qualified + "_$eq");
-		return new MethodCall(this.position, this.arguments.getFirstValue(), name, new ArgumentList(rhs));
+		return new MethodCall(this.position, this.arguments.getFirst(), name, new ArgumentList(rhs));
 	}
 
 	@Override
@@ -91,7 +91,7 @@ public class PrefixCall extends MethodCall
 		buffer.append(this.name);
 		if (!this.arguments.isEmpty())
 		{
-			this.arguments.getFirstValue().toString(prefix, buffer);
+			this.arguments.getFirst().toString(prefix, buffer);
 		}
 	}
 }

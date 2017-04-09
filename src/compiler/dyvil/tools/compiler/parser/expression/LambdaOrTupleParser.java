@@ -87,7 +87,7 @@ public class LambdaOrTupleParser extends Parser
 		case TUPLE:
 			// ( ... )
 			final TupleExpr tupleExpr = new TupleExpr(token);
-			pm.pushParser(new ExpressionListParser(tupleExpr));
+			pm.pushParser(new ExpressionListParser(tupleExpr.getValues()));
 			this.value = tupleExpr;
 			this.mode = TUPLE_END;
 			return;
@@ -117,7 +117,7 @@ public class LambdaOrTupleParser extends Parser
 				final LambdaExpr lambdaExpr = new LambdaExpr(token.next());
 				final IParameter parameter = lambdaExpr.createParameter(token.raw(), token.nameValue(), Types.UNKNOWN,
 				                                                        EmptyModifiers.INSTANCE, null);
-				lambdaExpr.getParameterList().addParameter(parameter);
+				lambdaExpr.getParameters().add(parameter);
 				this.value = lambdaExpr;
 				this.mode = TYPE_ARROW;
 				return;

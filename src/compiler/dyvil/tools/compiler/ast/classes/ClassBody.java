@@ -18,8 +18,8 @@ import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
-import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
@@ -296,7 +296,7 @@ public class ClassBody implements IClassBody
 	}
 
 	@Override
-	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
 		final int cacheSize = this.namedMethodCache.length;
 		if (cacheSize == 0)
@@ -498,12 +498,12 @@ public class ClassBody implements IClassBody
 	}
 
 	@Override
-	public IConstructor getConstructor(IParameterList parameters)
+	public IConstructor getConstructor(ParameterList parameters)
 	{
 		for (int i = 0; i < this.constructorCount; i++)
 		{
 			final IConstructor constructor = this.constructors[i];
-			final IParameterList constructorParameterList = constructor.getParameterList();
+			final ParameterList constructorParameterList = constructor.getParameters();
 
 			if (parameters.matches(constructorParameterList))
 			{
@@ -515,7 +515,7 @@ public class ClassBody implements IClassBody
 	}
 
 	@Override
-	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
+	public void getConstructorMatches(MatchList<IConstructor> list, ArgumentList arguments)
 	{
 		for (int i = 0; i < this.constructorCount; i++)
 		{
@@ -563,7 +563,7 @@ public class ClassBody implements IClassBody
 	@Override
 	public void initExternalMethodCache()
 	{
-		final int cacheSize = MathUtils.powerOfTwo(this.methodCount);
+		final int cacheSize = MathUtils.nextPowerOf2(this.methodCount);
 		final int mask = cacheSize - 1;
 		final MethodLink[] cache = this.namedMethodCache = new MethodLink[cacheSize];
 
@@ -613,7 +613,7 @@ public class ClassBody implements IClassBody
 		 * as many property getters and setters as there are fields. At the end, we compute the next power of two that
 		 * is larger than our sum, and use it as the cache size.
 		 */
-		final int cacheSize = MathUtils.powerOfTwo(this.methodCount + (this.propertyCount << 1) + this.fieldCount);
+		final int cacheSize = MathUtils.nextPowerOf2(this.methodCount + (this.propertyCount << 1) + this.fieldCount);
 		final int mask = cacheSize - 1;
 		final MethodLink[] cache = this.namedMethodCache = new MethodLink[cacheSize];
 

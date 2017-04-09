@@ -11,9 +11,7 @@ import dyvil.tuple.Tuple;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-@LiteralConvertible.FromNil
 @LiteralConvertible.FromArray
-@LiteralConvertible.FromColonOperator(methodName = "singleton")
 @Immutable
 public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> implements ImmutableMap<K, V>
 {
@@ -65,7 +63,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 
 	@NonNull
 	@SafeVarargs
-	public static <K, V> IdentityHashMap<K, V> apply(@NonNull Entry<? extends K, ? extends V>... entries)
+	public static <K, V> IdentityHashMap<K, V> apply(@NonNull Entry<? extends K, ? extends V> @NonNull ... entries)
 	{
 		return new IdentityHashMap<>(entries);
 	}

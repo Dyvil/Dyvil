@@ -41,7 +41,7 @@ public class DyvilKeywords
 	public static final int MACRO        = Tokens.KEYWORD | 0x00230000; // unused
 	public static final int MATCH        = Tokens.KEYWORD | 0x00240000;
 	public static final int NEW          = Tokens.KEYWORD | 0x00250000;
-	public static final int NIL          = Tokens.KEYWORD | 0x00260000;
+	public static final int NIL          = Tokens.KEYWORD | 0x00260000; // unused
 	public static final int NULL         = Tokens.KEYWORD | 0x00270000;
 	public static final int OBJECT       = Tokens.KEYWORD | 0x00280000;
 	public static final int OVERRIDE     = Tokens.KEYWORD | 0x00290000;

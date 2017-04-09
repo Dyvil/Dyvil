@@ -1,16 +1,17 @@
 package dyvil.tools.compiler.ast.type.alias;
 
-import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.ITypeParametric;
+import dyvil.tools.compiler.ast.generic.TypeParameterList;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.header.IObjectCompilable;
-import dyvil.tools.compiler.ast.member.INamed;
+import dyvil.tools.compiler.ast.method.IOverloadable;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITyped;
+import dyvil.tools.compiler.ast.type.TypeList;
+import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -19,7 +20,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public interface ITypeAlias extends IASTNode, IResolvable, INamed, ITyped, ITypeParametric, IObjectCompilable
+public interface ITypeAlias extends IASTNode, IResolvable, IOverloadable, ITypeParametric, IObjectCompilable
 {
 	IHeaderUnit getEnclosingHeader();
 
@@ -38,43 +39,29 @@ public interface ITypeAlias extends IASTNode, IResolvable, INamed, ITyped, IType
 	IType getType();
 
 	@Override
-	void addTypeParameter(ITypeParameter typeParameter);
-
-	@Override
-	int typeParameterCount();
-
-	@Override
-	ITypeParameter getTypeParameter(int index);
-
-	@Override
-	ITypeParameter[] getTypeParameters();
-
-	@Override
 	boolean isTypeParametric();
 
 	@Override
-	void setTypeParametric();
+	TypeParameterList getTypeParameters();
 
-	@Override
-	void setTypeParameter(int index, ITypeParameter typeParameter);
+	// Resolution
 
-	@Override
-	void setTypeParameters(ITypeParameter[] typeParameters, int count);
+	void checkMatch(MatchList<ITypeAlias> matches, IType receiver, Name name, TypeList arguments);
 
 	// Phases
-	
+
 	@Override
 	void resolveTypes(MarkerList markers, IContext context);
-	
+
 	@Override
 	void resolve(MarkerList markers, IContext context);
-	
+
 	@Override
 	void checkTypes(MarkerList markers, IContext context);
-	
+
 	@Override
 	void check(MarkerList markers, IContext context);
-	
+
 	@Override
 	void foldConstants();
 
@@ -83,7 +70,7 @@ public interface ITypeAlias extends IASTNode, IResolvable, INamed, ITyped, IType
 
 	@Override
 	void write(DataOutput out) throws IOException;
-	
+
 	@Override
 	void read(DataInput in) throws IOException;
 }

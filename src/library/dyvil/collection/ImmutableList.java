@@ -20,7 +20,6 @@ import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
 
-@LiteralConvertible.FromNil
 @LiteralConvertible.FromArray
 @Immutable
 public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollection<E>

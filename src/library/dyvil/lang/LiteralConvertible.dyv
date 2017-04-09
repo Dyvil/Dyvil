@@ -23,7 +23,6 @@ abstract class LiteralConvertible
 	@interface FromMap           (let methodName: String = "apply")
 
 	// Special Literals
-	@interface FromNil   (let methodName: String = "apply")
 	@interface FromClass (let methodName: String = "apply")
 	@interface FromType  (let methodName: String = "apply")
 }

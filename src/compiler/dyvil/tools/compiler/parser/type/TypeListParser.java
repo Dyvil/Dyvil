@@ -42,12 +42,23 @@ public final class TypeListParser extends Parser
 			pm.pushParser(new TypeParser(this.consumer, this.closeAngle), true);
 			return;
 		case SEPARATOR:
-			if (ParserUtil.isCloseBracket(type) || type == BaseSymbols.OPEN_CURLY_BRACKET
-				    || type == BaseSymbols.SEMICOLON || type == Tokens.EOF || TypeParser.isGenericEnd(token, type))
+			switch (type)
 			{
+			//noinspection DefaultNotLastCaseInSwitch
+			default:
+				if (!ParserUtil.isCloseBracket(type) && !TypeParser.isGenericEnd(token, type))
+				{
+					break;
+				}
+				// Fallthrough
+			case BaseSymbols.OPEN_CURLY_BRACKET:
+			case BaseSymbols.EQUALS:
+			case BaseSymbols.SEMICOLON:
+			case Tokens.EOF:
 				pm.popParser(true);
 				return;
 			}
+
 			this.mode = TYPE;
 			if (type != BaseSymbols.COMMA)
 			{

@@ -18,7 +18,7 @@ import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -43,9 +43,7 @@ public class ReferenceType implements IObjectType
 
 		public static IType getObjectSimpleRef(IType type)
 		{
-			ClassGenericType gt = new ClassGenericType(OBJECT_SIMPLE_REF_CLASS);
-			gt.addType(type);
-			return gt;
+			return new ClassGenericType(OBJECT_SIMPLE_REF_CLASS, type);
 		}
 
 		public static String getInternalRef(IType type, String prefix)
@@ -129,7 +127,7 @@ public class ReferenceType implements IObjectType
 	{
 		if (this.theClass == LazyFields.OBJECT_REF_CLASS)
 		{
-			final IType otherType = type.resolveType(this.theClass.getTypeParameter(0));
+			final IType otherType = type.resolveType(this.theClass.getTypeParameters().get(0));
 			return otherType == null || Types.isSameType(this.type, otherType);
 		}
 		return true;
@@ -199,7 +197,7 @@ public class ReferenceType implements IObjectType
 			return;
 		}
 
-		final ITypeParameter typeVariable = this.theClass.getTypeParameter(0);
+		final ITypeParameter typeVariable = this.theClass.getTypeParameters().get(0);
 		final IType concreteRefType = concrete.resolveType(typeVariable);
 		if (concreteRefType != null)
 		{
@@ -258,7 +256,7 @@ public class ReferenceType implements IObjectType
 	}
 
 	@Override
-	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
 		this.theClass.getMethodMatches(list, receiver, name, arguments);
 	}
@@ -270,7 +268,7 @@ public class ReferenceType implements IObjectType
 	}
 
 	@Override
-	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
+	public void getConstructorMatches(MatchList<IConstructor> list, ArgumentList arguments)
 	{
 	}
 

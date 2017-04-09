@@ -2,27 +2,25 @@ package dyvil.tools.compiler.parser.expression;
 
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
-import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.MapExpr;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
 
-public class ArrayLiteralParser extends Parser implements IValueConsumer
+public class ArrayLiteralParser extends Parser
 {
 	protected static final int OPEN_BRACKET = 1;
 	protected static final int SEPARATOR    = 2;
 	protected static final int COLON        = 4;
 	
 	protected IValueConsumer consumer;
-	
+
 	private IToken startPosition;
-	
-	private IValue[] keys = new IValue[3];
-	private int      keyCount;
-	private IValue[] values;
-	private boolean  map;
+
+	private ArgumentList keys = new ArgumentList();
+	private ArgumentList values;
 	
 	public ArrayLiteralParser(IValueConsumer consumer)
 	{
@@ -37,7 +35,7 @@ public class ArrayLiteralParser extends Parser implements IValueConsumer
 		switch (this.mode)
 		{
 		case OPEN_BRACKET:
-			pm.pushParser(this.newExpressionParser(pm));
+			pm.pushParser(this.newExpressionParser(this.keys));
 			this.mode = SEPARATOR | COLON;
 			this.startPosition = token;
 			
@@ -51,12 +49,10 @@ public class ArrayLiteralParser extends Parser implements IValueConsumer
 			if (type == BaseSymbols.COLON)
 			{
 				this.mode = SEPARATOR;
-				this.map = true;
-				this.values = new IValue[this.keyCount];
-				pm.pushParser(this.newExpressionParser(pm));
+				this.values = new ArgumentList(this.keys.size());
+				pm.pushParser(this.newExpressionParser(this.values));
 				return;
 			}
-			this.map = false;
 			// Fallthrough
 		case SEPARATOR:
 			if (type == BaseSymbols.CLOSE_SQUARE_BRACKET)
@@ -66,8 +62,8 @@ public class ArrayLiteralParser extends Parser implements IValueConsumer
 				return;
 			}
 			
-			this.mode = this.map ? COLON : SEPARATOR;
-			pm.pushParser(this.newExpressionParser(pm));
+			this.mode = this.values != null ? COLON : SEPARATOR;
+			pm.pushParser(this.newExpressionParser(this.keys));
 			if (type != BaseSymbols.COMMA && type != BaseSymbols.SEMICOLON)
 			{
 				pm.report(token, "array.separator");
@@ -82,72 +78,32 @@ public class ArrayLiteralParser extends Parser implements IValueConsumer
 			}
 			
 			this.mode = SEPARATOR;
-			pm.pushParser(this.newExpressionParser(pm));
+			pm.pushParser(this.newExpressionParser(this.values));
 			if (type != BaseSymbols.COLON)
 			{
 				pm.reparse();
 				pm.report(token, "array.map.colon");
 			}
 			return;
+		case END:
 		}
 	}
 
-	private ExpressionParser newExpressionParser(IParserManager pm)
+	private ExpressionParser newExpressionParser(ArgumentList list)
 	{
-		return new ExpressionParser(this).withFlags(ExpressionParser.IGNORE_COLON);
+		return new ExpressionParser(list).withFlags(ExpressionParser.IGNORE_COLON);
 	}
 	
 	private void end(IToken token)
 	{
-		if (this.map)
+		if (this.values != null)
 		{
-			MapExpr map = new MapExpr(this.startPosition.to(token), this.keys, this.values, this.keyCount);
+			final MapExpr map = new MapExpr(this.startPosition.to(token), this.keys, this.values);
 			this.consumer.setValue(map);
 			return;
 		}
 		
-		ArrayExpr array = new ArrayExpr(this.startPosition.to(token), this.keys, this.keyCount);
+		final ArrayExpr array = new ArrayExpr(this.startPosition.to(token), this.keys);
 		this.consumer.setValue(array);
-	}
-	
-	private void ensureCapacity(int cap)
-	{
-		if (cap > this.keys.length)
-		{
-			IValue[] newValues = new IValue[cap];
-			System.arraycopy(this.keys, 0, newValues, 0, this.keyCount);
-			this.keys = newValues;
-		}
-		
-		if (this.map && cap > this.values.length)
-		{
-			IValue[] newValues = new IValue[cap];
-			System.arraycopy(this.values, 0, newValues, 0, this.keyCount);
-			this.values = newValues;
-		}
-	}
-	
-	@Override
-	public void setValue(IValue value)
-	{
-		this.ensureCapacity(this.keyCount + 1);
-		switch (this.mode)
-		{
-		case COLON:
-		case SEPARATOR | COLON:
-			this.keys[this.keyCount] = value;
-			this.keyCount++;
-			return;
-		case SEPARATOR:
-			if (this.map)
-			{
-				this.values[this.keyCount - 1] = value;
-			}
-			else
-			{
-				this.keys[this.keyCount] = value;
-				this.keyCount++;
-			}
-		}
 	}
 }

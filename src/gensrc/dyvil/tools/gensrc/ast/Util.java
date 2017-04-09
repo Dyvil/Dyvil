@@ -154,7 +154,7 @@ public class Util
 
 		for (String file : files)
 		{
-			final Specialization spec = Specialization.resolveSpec(gensrc, file, sourceFile);
+			final Specialization spec = Specialization.resolveSpec(file, sourceFile, gensrc);
 			if (spec != null)
 			{
 				specs.add(spec);

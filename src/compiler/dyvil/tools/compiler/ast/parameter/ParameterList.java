@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.parameter;
 
+import dyvil.annotation.internal.NonNull;
+import dyvil.collection.iterator.ArrayIterator;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IVariable;
@@ -10,6 +12,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -17,15 +20,18 @@ import dyvil.tools.parsing.marker.MarkerList;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Iterator;
 
-public class ParameterList implements IParameterList
+public class ParameterList implements Iterable<IParameter>, IResolvable
 {
+	private static final int DEFAULT_CAPACITY = 3;
+
 	protected IParameter[] parameters;
-	protected int          parameterCount;
+	protected int          size;
 
 	public ParameterList()
 	{
-		this.parameters = new IParameter[3];
+		this.parameters = new IParameter[DEFAULT_CAPACITY];
 	}
 
 	public ParameterList(int capacity)
@@ -36,76 +42,76 @@ public class ParameterList implements IParameterList
 	public ParameterList(IParameter parameter)
 	{
 		this.parameters = new IParameter[] { parameter };
-		this.parameterCount = 1;
+		this.size = 1;
 	}
 
 	public ParameterList(IParameter... parameters)
 	{
 		this.parameters = parameters;
-		this.parameterCount = parameters.length;
+		this.size = parameters.length;
 	}
 
-	public ParameterList(IParameter[] parameters, int parameterCount)
+	public ParameterList(IParameter[] parameters, int size)
 	{
 		this.parameters = parameters;
-		this.parameterCount = parameterCount;
+		this.size = size;
 	}
 
-	@Override
+	// List
+
+	public boolean isEmpty()
+	{
+		return this.size <= 0;
+	}
+
 	public int size()
 	{
-		return this.parameterCount;
+		return this.size;
 	}
 
 	@Override
+	public Iterator<IParameter> iterator()
+	{
+		return new ArrayIterator<>(this.parameters, this.size);
+	}
+
 	public IParameter get(int index)
 	{
 		return this.parameters[index];
 	}
 
-	@Override
-	public IParameter[] getParameterArray()
+	public IParameter[] getParameters()
 	{
 		return this.parameters;
 	}
 
-	@Override
-	public void set(int index, IParameter parameter)
-	{
-		parameter.setIndex(index);
-		this.parameters[index] = parameter;
-	}
-
-	@Override
-	public void setParameterArray(IParameter[] parameters, int parameterCount)
+	public void setParameters(IParameter[] parameters, int parameterCount)
 	{
 		this.parameters = parameters;
-		this.parameterCount = parameterCount;
+		this.size = parameterCount;
 	}
 
-	@Override
-	public void addParameter(IParameter parameter)
+	public void add(IParameter parameter)
 	{
-		final int index = this.parameterCount++;
-
-		parameter.setIndex(index);
-
+		final int index = this.size++;
 		if (index >= this.parameters.length)
 		{
-			IParameter[] temp = new IParameter[this.parameterCount];
+			final IParameter[] temp = new IParameter[index + 1];
 			System.arraycopy(this.parameters, 0, temp, 0, index);
 			this.parameters = temp;
 		}
+
+		parameter.setIndex(index);
 		this.parameters[index] = parameter;
 	}
 
 	public void remove(int count)
 	{
-		final int end = this.parameterCount;
+		final int end = this.size;
+		this.size -= count;
 
-		// Set excessive array elements to null to let the GC do it's job
-		this.parameterCount -= count;
-		for (int i = this.parameterCount; i < end; i++)
+		// Set excessive array elements to null to let the GC do its job
+		for (int i = this.size; i < end; i++)
 		{
 			this.parameters[i] = null;
 		}
@@ -113,12 +119,11 @@ public class ParameterList implements IParameterList
 
 	// Resolution
 
-	@Override
-	public IParameter resolveParameter(Name name)
+	public IParameter get(Name name)
 	{
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0; i < this.size; i++)
 		{
-			IParameter param = this.parameters[i];
+			final IParameter param = this.parameters[i];
 			if (param.getName() == name)
 			{
 				return param;
@@ -128,10 +133,9 @@ public class ParameterList implements IParameterList
 		return null;
 	}
 
-	@Override
 	public boolean isParameter(IVariable variable)
 	{
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0; i < this.size; i++)
 		{
 			if (this.parameters[i] == variable)
 			{
@@ -141,11 +145,10 @@ public class ParameterList implements IParameterList
 		return false;
 	}
 
-	@Override
-	public boolean matches(IParameterList other)
+	public boolean matches(ParameterList other)
 	{
 		final int len = other.size();
-		if (len != this.parameterCount)
+		if (len != this.size)
 		{
 			return false;
 		}
@@ -163,10 +166,9 @@ public class ParameterList implements IParameterList
 		return true;
 	}
 
-	@Override
 	public boolean isVariadic()
 	{
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0; i < this.size; i++)
 		{
 			if (this.parameters[i].isVarargs())
 			{
@@ -176,10 +178,9 @@ public class ParameterList implements IParameterList
 		return false;
 	}
 
-	@Override
 	public boolean isLastVariadic()
 	{
-		return this.parameterCount > 0 && this.parameters[this.parameterCount - 1].isVarargs();
+		return this.size > 0 && this.parameters[this.size - 1].isVarargs();
 	}
 
 	// Compiler Phases
@@ -187,7 +188,7 @@ public class ParameterList implements IParameterList
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0; i < this.size; i++)
 		{
 			this.parameters[i].resolveTypes(markers, context);
 		}
@@ -196,7 +197,7 @@ public class ParameterList implements IParameterList
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0; i < this.size; i++)
 		{
 			this.parameters[i].resolve(markers, context);
 		}
@@ -205,7 +206,7 @@ public class ParameterList implements IParameterList
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0; i < this.size; i++)
 		{
 			this.parameters[i].checkTypes(markers, context);
 		}
@@ -214,7 +215,7 @@ public class ParameterList implements IParameterList
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0; i < this.size; i++)
 		{
 			this.parameters[i].check(markers, context);
 		}
@@ -223,7 +224,7 @@ public class ParameterList implements IParameterList
 	@Override
 	public void foldConstants()
 	{
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0; i < this.size; i++)
 		{
 			this.parameters[i].foldConstants();
 		}
@@ -232,7 +233,7 @@ public class ParameterList implements IParameterList
 	@Override
 	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0; i < this.size; i++)
 		{
 			this.parameters[i].cleanup(compilableList, classCompilableList);
 		}
@@ -240,19 +241,17 @@ public class ParameterList implements IParameterList
 
 	// Compilation
 
-	@Override
 	public void appendDescriptor(StringBuilder builder)
 	{
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0; i < this.size; i++)
 		{
 			this.parameters[i].getCovariantType().appendExtendedName(builder);
 		}
 	}
 
-	@Override
 	public boolean needsSignature()
 	{
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0; i < this.size; i++)
 		{
 			final IType parameterType = this.parameters[i].getType();
 			if (parameterType.isGenericType() || parameterType.hasTypeVariables())
@@ -263,32 +262,29 @@ public class ParameterList implements IParameterList
 		return false;
 	}
 
-	@Override
 	public void appendSignature(StringBuilder builder)
 	{
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0; i < this.size; i++)
 		{
 			this.parameters[i].getType().appendSignature(builder, false);
 		}
 	}
 
-	@Override
 	public void writeLocals(MethodWriter writer, Label start, Label end)
 	{
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0; i < this.size; i++)
 		{
 			this.parameters[i].writeLocal(writer, start, end);
 		}
 	}
 
-	@Override
 	public void write(MethodWriter writer)
 	{
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0; i < this.size; i++)
 		{
 			this.parameters[i].writeParameter(writer);
 		}
-		for (int i = 0; i < this.parameterCount; i++)
+		for (int i = 0; i < this.size; i++)
 		{
 			this.parameters[i].writeInit(writer);
 		}
@@ -298,8 +294,8 @@ public class ParameterList implements IParameterList
 
 	public void write(DataOutput out) throws IOException
 	{
-		out.writeByte(this.parameterCount);
-		for (int i = 0; i < this.parameterCount; i++)
+		out.writeByte(this.size);
+		for (int i = 0; i < this.size; i++)
 		{
 			this.parameters[i].write(out);
 		}
@@ -307,8 +303,8 @@ public class ParameterList implements IParameterList
 
 	public void writeSignature(DataOutput out) throws IOException
 	{
-		out.writeByte(this.parameterCount);
-		for (int i = 0; i < this.parameterCount; i++)
+		out.writeByte(this.size);
+		for (int i = 0; i < this.size; i++)
 		{
 			this.parameters[i].getName().write(out);
 			IType.writeType(this.parameters[i].getType(), out);
@@ -333,7 +329,7 @@ public class ParameterList implements IParameterList
 	public void readSignature(DataInput in) throws IOException
 	{
 		final int parameterCount = in.readByte();
-		if (this.parameterCount == parameterCount)
+		if (this.size == parameterCount)
 		{
 			for (int i = 0; i < parameterCount; i++)
 			{
@@ -352,27 +348,43 @@ public class ParameterList implements IParameterList
 	}
 
 	// Formatting
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
+	{
+		this.toString(null, indent, buffer);
+	}
 
-	@Override
-	public void toString(String prefix, StringBuilder buffer)
+
+	public void toString(IType thisType, @NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
-		Util.astToString(prefix, this.parameters, this.parameterCount,
-		                 Formatting.getSeparator("parameters.separator", ','), buffer);
+
+		if (thisType != null)
+		{
+			buffer.append("this");
+			Formatting.appendSeparator(buffer, "parameter.type_ascription", ':');
+			thisType.toString(indent, buffer);
+
+			if (this.size > 0)
+			{
+				Formatting.appendSeparator(buffer, "parameters.separator", ',');
+			}
+		}
+
+		Util.astToString(indent, this.parameters, this.size, Formatting.getSeparator("parameters.separator", ','),
+		                 buffer);
 		Formatting.appendSeparator(buffer, "parameters.close_paren", ')');
 	}
 
-	@Override
 	public void signatureToString(StringBuilder buffer, ITypeContext typeContext)
 	{
 		buffer.append('(');
 
-		if (this.parameterCount > 0)
+		if (this.size > 0)
 		{
 			IParameter parameter = this.parameters[0];
 
 			signatureToString(buffer, typeContext, parameter);
-			for (int i = 1; i < this.parameterCount; i++)
+			for (int i = 1; i < this.size; i++)
 			{
 				buffer.append(", ");
 				parameter = this.parameters[i];
@@ -391,5 +403,12 @@ public class ParameterList implements IParameterList
 			buffer.append(name).append(": ");
 		}
 		Util.typeToString(parameter.getType(), typeContext, buffer);
+	}
+
+	// Copying
+
+	public void copyTo(ParameterList other)
+	{
+		other.setParameters(this.getParameters(), this.size());
 	}
 }

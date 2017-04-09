@@ -7,10 +7,11 @@ import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.expression.operator.IOperator;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.parsing.Name;
 
@@ -20,7 +21,7 @@ public interface IImportContext extends IImplicitContext
 
 	IHeaderUnit resolveHeader(Name name);
 
-	ITypeAlias resolveTypeAlias(Name name, int arity);
+	void resolveTypeAlias(MatchList<ITypeAlias> matches, IType receiver, Name name, TypeList arguments);
 
 	IOperator resolveOperator(Name name, byte type);
 
@@ -28,7 +29,7 @@ public interface IImportContext extends IImplicitContext
 
 	IDataMember resolveField(Name name);
 
-	void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments);
+	void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments);
 
 	@Override
 	void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType);

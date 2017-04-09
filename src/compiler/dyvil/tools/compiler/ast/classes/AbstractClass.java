@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.classes;
 
+import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.collection.Collection;
 import dyvil.collection.List;
 import dyvil.collection.Set;
@@ -15,6 +17,7 @@ import dyvil.tools.compiler.ast.external.ExternalClass;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
+import dyvil.tools.compiler.ast.generic.TypeParameterList;
 import dyvil.tools.compiler.ast.header.IClassCompilable;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.member.IClassMember;
@@ -25,6 +28,7 @@ import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.generic.ClassGenericType;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
@@ -44,26 +48,24 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 {
 	// Modifiers and Annotations
 
-	protected AnnotationList annotations;
-	protected ModifierSet    modifiers;
+	protected @Nullable AnnotationList annotations;
+	protected @NonNull ModifierSet    modifiers;
 
 	// Signature
 
 	protected Name name;
 
-	protected ITypeParameter[] typeParameters;
-	protected int              typeParameterCount;
+	protected @Nullable TypeParameterList typeParameters;
 
-	// TODO Allow this to be null for performance
-	protected ParameterList parameters = new ParameterList();
+	protected @NonNull ParameterList parameters = new ParameterList();
 
 	protected IType superType = Types.OBJECT;
-	protected IType[] interfaces;
-	protected int     interfaceCount;
+	protected @Nullable TypeList interfaces;
 
 	// Body
 
 	protected IClassBody body;
+
 	// Metadata
 
 	protected String fullName;
@@ -101,25 +103,29 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
+	public ElementType getElementType()
+	{
+		if (this.isAnnotation())
+		{
+			return ElementType.ANNOTATION_TYPE;
+		}
+		return ElementType.TYPE;
+	}
+
+	@Override
 	public AnnotationList getAnnotations()
 	{
-		return this.annotations;
-	}
-
-	@Override
-	public void setAnnotations(AnnotationList annotations)
-	{
-		this.annotations = annotations;
-	}
-
-	@Override
-	public void addAnnotation(IAnnotation annotation)
-	{
-		if (this.annotations == null)
+		if (this.annotations != null)
 		{
-			this.annotations = new AnnotationList();
+			return this.annotations;
 		}
-		this.annotations.addAnnotation(annotation);
+		return this.annotations = new AnnotationList();
+	}
+
+	@Override
+	public final IAnnotation getAnnotation(IClass type)
+	{
+		return this.annotations == null ? null : this.getAnnotations().get(type);
 	}
 
 	@Override
@@ -139,22 +145,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			return false;
 		}
 		return true;
-	}
-
-	@Override
-	public IAnnotation getAnnotation(IClass type)
-	{
-		return this.annotations == null ? null : this.annotations.getAnnotation(type);
-	}
-
-	@Override
-	public ElementType getElementType()
-	{
-		if (this.isAnnotation())
-		{
-			return ElementType.ANNOTATION_TYPE;
-		}
-		return ElementType.TYPE;
 	}
 
 	@Override
@@ -228,75 +218,25 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	// Generics
 
 	@Override
-	public void setTypeParametric()
-	{
-		this.typeParameters = new ITypeParameter[2];
-	}
-
-	@Override
 	public boolean isTypeParametric()
 	{
-		return this.typeParameters != null;
+		return this.typeParameters != null && this.typeParameters.size() > 0;
 	}
 
 	@Override
-	public int typeParameterCount()
+	public TypeParameterList getTypeParameters()
 	{
-		return this.typeParameterCount;
-	}
-
-	@Override
-	public void setTypeParameters(ITypeParameter[] typeParameters, int count)
-	{
-		this.typeParameters = typeParameters;
-		this.typeParameterCount = count;
-	}
-
-	@Override
-	public void setTypeParameter(int index, ITypeParameter typeParameter)
-	{
-		this.typeParameters[index] = typeParameter;
-	}
-
-	@Override
-	public void addTypeParameter(ITypeParameter typeParameter)
-	{
-		if (this.typeParameters == null)
+		if (this.typeParameters != null)
 		{
-			this.typeParameters = new ITypeParameter[3];
-			this.typeParameters[0] = typeParameter;
-			this.typeParameterCount = 1;
-			return;
+			return this.typeParameters;
 		}
-
-		int index = this.typeParameterCount++;
-		if (index >= this.typeParameters.length)
-		{
-			ITypeParameter[] temp = new ITypeParameter[this.typeParameterCount];
-			System.arraycopy(this.typeParameters, 0, temp, 0, index);
-			this.typeParameters = temp;
-		}
-		this.typeParameters[index] = typeParameter;
-
-		typeParameter.setIndex(index);
-	}
-
-	@Override
-	public ITypeParameter[] getTypeParameters()
-	{
-		return this.typeParameters;
-	}
-
-	@Override
-	public ITypeParameter getTypeParameter(int index)
-	{
-		return this.typeParameters[index];
+		return this.typeParameters = new TypeParameterList();
 	}
 
 	// Class Parameters
 
 	@Override
-	public IParameterList getParameterList()
+	public ParameterList getParameters()
 	{
 		return this.parameters;
 	}
@@ -330,13 +270,13 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		{
 			return true;
 		}
-		if (!iclass.isInterface())
+		if (!iclass.isInterface() || this.interfaces == null)
 		{
 			return false;
 		}
-		for (int i = 0; i < this.interfaceCount; i++)
+		for (IType interfaceType : this.interfaces)
 		{
-			if (Types.isSuperClass(type, this.interfaces[i]))
+			if (Types.isSuperClass(type, interfaceType))
 			{
 				return true;
 			}
@@ -344,35 +284,16 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		return false;
 	}
 
-	@Override
-	public int interfaceCount()
-	{
-		return this.interfaceCount;
-	}
+	// Interfaces
 
 	@Override
-	public void setInterface(int index, IType type)
+	public TypeList getInterfaces()
 	{
-		this.interfaces[index] = type;
-	}
-
-	@Override
-	public void addInterface(IType type)
-	{
-		int index = this.interfaceCount++;
-		if (index >= this.interfaces.length)
+		if (this.interfaces != null)
 		{
-			IType[] temp = new IType[this.interfaceCount];
-			System.arraycopy(this.interfaces, 0, temp, 0, this.interfaces.length);
-			this.interfaces = temp;
+			return this.interfaces;
 		}
-		this.interfaces[index] = type;
-	}
-
-	@Override
-	public IType getInterface(int index)
-	{
-		return this.interfaces[index];
+		return this.interfaces = new TypeList();
 	}
 
 	// Body
@@ -504,14 +425,16 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			}
 		}
 
-		for (int i = 0; i < this.interfaceCount; i++)
+		if (this.interfaces != null)
 		{
-			final IType interfaceType = this.interfaces[i];
-			final IClass interfaceClass = interfaceType.getTheClass();
-			if (interfaceClass != null && interfaceClass
-				                              .checkImplements(candidate, interfaceType.getConcreteType(typeContext)))
+			for (IType interfaceType : this.interfaces)
 			{
-				return true;
+				final IClass interfaceClass = interfaceType.getTheClass();
+				if (interfaceClass != null && interfaceClass.checkImplements(candidate, interfaceType.getConcreteType(
+					typeContext)))
+				{
+					return true;
+				}
 			}
 		}
 
@@ -551,19 +474,21 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		if (this.superType != null)
 		{
 			final IClass superClass = this.superType.getTheClass();
-			if (superClass != null)
+			if (superClass != null && superClass != this)
 			{
 				superClass
 					.checkMethods(markers, thisClass, this.superType.getConcreteType(typeContext), checkedClasses);
 			}
 		}
-		for (int i = 0; i < this.interfaceCount; i++)
+		if (this.interfaces != null)
 		{
-			final IType type = this.interfaces[i];
-			final IClass iClass = type.getTheClass();
-			if (iClass != null && iClass != this)
+			for (IType type : this.interfaces)
 			{
-				iClass.checkMethods(markers, thisClass, type.getConcreteType(typeContext), checkedClasses);
+				final IClass iClass = type.getTheClass();
+				if (iClass != null && iClass != this)
+				{
+					iClass.checkMethods(markers, thisClass, type.getConcreteType(typeContext), checkedClasses);
+				}
 			}
 		}
 	}
@@ -600,23 +525,18 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	{
 		StringBuilder buffer = new StringBuilder();
 
-		if (this.typeParameterCount > 0)
+		if (this.typeParameters != null)
 		{
-			buffer.append('<');
-			for (int i = 0; i < this.typeParameterCount; i++)
-			{
-				this.typeParameters[i].appendSignature(buffer);
-			}
-			buffer.append('>');
+			this.typeParameters.appendSignature(buffer);
 		}
 
 		if (this.superType != null)
 		{
 			this.superType.appendSignature(buffer, false);
 		}
-		for (int i = 0; i < this.interfaceCount; i++)
+		if (this.interfaces != null)
 		{
-			this.interfaces[i].appendSignature(buffer, false);
+			this.interfaces.appendDescriptors(buffer, IType.NAME_SIGNATURE);
 		}
 		return buffer.toString();
 	}
@@ -624,36 +544,40 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public String[] getInterfaceArray()
 	{
-		if (this.interfaceCount <= 0)
+		if (this.interfaces == null)
 		{
 			return null;
 		}
 
-		String[] interfaces = new String[this.interfaceCount];
-		for (int i = 0; i < this.interfaceCount; i++)
+		final int size = this.interfaces.size();
+		final String[] interfaces = new String[size];
+		for (int i = 0; i < size; i++)
 		{
-			interfaces[i] = this.interfaces[i].getInternalName();
+			interfaces[i] = this.interfaces.get(i).getInternalName();
 		}
 		return interfaces;
 	}
 
 	@Override
-	public IType resolveType(ITypeParameter typeVar, IType concrete)
+	public IType resolveType(ITypeParameter typeParameter, IType concrete)
 	{
 		if (this.superType != null)
 		{
-			IType type = this.superType.resolveType(typeVar);
+			final IType type = this.superType.resolveType(typeParameter);
 			if (type != null)
 			{
 				return type.getConcreteType(concrete);
 			}
 		}
-		for (int i = 0; i < this.interfaceCount; i++)
+		if (this.interfaces != null)
 		{
-			IType type = this.interfaces[i].resolveType(typeVar);
-			if (type != null)
+			for (IType interfaceType : this.interfaces)
 			{
-				return type.getConcreteType(concrete);
+				final IType type = interfaceType.resolveType(typeParameter);
+				if (type != null)
+				{
+					return type.getConcreteType(concrete);
+				}
 			}
 		}
 		return null;
@@ -679,15 +603,16 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			return this.thisType;
 		}
 
-		if (this.typeParameterCount <= 0)
+		if (this.typeParameters == null)
 		{
-			return this.thisType = new ClassType(this);
+			return this.thisType = this.classType;
 		}
 
 		final ClassGenericType type = new ClassGenericType(this);
-		for (int i = 0; i < this.typeParameterCount; i++)
+		final TypeList arguments = type.getArguments();
+		for (int i = 0; i < this.typeParameters.size(); i++)
 		{
-			type.addType(new TypeVarType(this.typeParameters[i]));
+			arguments.add(new TypeVarType(this.typeParameters.get(i)));
 		}
 		return this.thisType = type;
 	}
@@ -716,22 +641,13 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public ITypeParameter resolveTypeParameter(Name name)
 	{
-		for (int i = 0; i < this.typeParameterCount; i++)
-		{
-			final ITypeParameter typeParameter = this.typeParameters[i];
-			if (typeParameter.getName() == name)
-			{
-				return typeParameter;
-			}
-		}
-
-		return null;
+		return this.typeParameters == null ? null : this.typeParameters.get(name);
 	}
 
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		final IParameter parameter = this.parameters.resolveParameter(name);
+		final IParameter parameter = this.parameters.get(name);
 		if (parameter != null)
 		{
 			return parameter;
@@ -768,7 +684,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
 		for (int i = 0, count = this.parameters.size(); i < count; i++)
 		{
@@ -796,14 +712,14 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			this.superType.getMethodMatches(list, receiver, name, arguments);
 		}
 
-		if (list.hasCandidate())
+		if (list.hasCandidate() || this.interfaces == null)
 		{
 			return;
 		}
 
-		for (int i = 0; i < this.interfaceCount; i++)
+		for (IType type : this.interfaces)
 		{
-			this.interfaces[i].getMethodMatches(list, receiver, name, arguments);
+			type.getMethodMatches(list, receiver, name, arguments);
 		}
 	}
 
@@ -819,7 +735,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public void getConstructorMatches(MatchList<IConstructor> list, IArguments arguments)
+	public void getConstructorMatches(MatchList<IConstructor> list, ArgumentList arguments)
 	{
 		if (this.body != null)
 		{
@@ -827,36 +743,6 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		}
 
 		this.metadata.getConstructorMatches(list, arguments);
-	}
-
-	@Override
-	public IDataMember getSuperField(Name name)
-	{
-		if (this.superType != null)
-		{
-			final IClass superClass = this.superType.getTheClass();
-			if (superClass != null)
-			{
-				final IDataMember field = superClass.resolveField(name);
-				if (field != null)
-				{
-					return field;
-				}
-			}
-		}
-		for (int i = 0; i < this.interfaceCount; i++)
-		{
-			final IClass superInterface = this.interfaces[i].getTheClass();
-			if (superInterface != null)
-			{
-				final IDataMember field = superInterface.resolveField(name);
-				if (field != null)
-				{
-					return field;
-				}
-			}
-		}
-		return null;
 	}
 
 	@Override
@@ -988,33 +874,25 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		if (this.annotations != null)
 		{
-			this.annotations.toString(prefix, buffer);
+			this.annotations.toString(indent, buffer);
 		}
 		this.modifiers.toString(this.getKind(), buffer);
 
 		ModifierUtil.writeClassType(this.modifiers.toFlags(), buffer);
 		buffer.append(this.name);
 
-		if (this.typeParameterCount > 0)
+		if (this.typeParameters != null)
 		{
-			if (Util.endsWithSymbol(buffer))
-			{
-				buffer.append(' ');
-			}
-
-			Formatting.appendSeparator(buffer, "generics.open_bracket", '<');
-			Util.astToString(prefix, this.typeParameters, this.typeParameterCount,
-			                 Formatting.getSeparator("generics.separator", ','), buffer);
-			Formatting.appendSeparator(buffer, "generics.close_bracket", '>');
+			this.typeParameters.toString(indent, buffer);
 		}
 
 		if (!this.parameters.isEmpty())
 		{
-			this.parameters.toString(prefix, buffer);
+			this.parameters.toString(indent, buffer);
 		}
 
 		if (this.superType == null)
@@ -1023,7 +901,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 		}
 		else if (this.superType != Types.OBJECT)
 		{
-			String extendsPrefix = prefix;
+			String extendsPrefix = indent;
 			if (Formatting.getBoolean("class.extends.newline"))
 			{
 				extendsPrefix = Formatting.getIndent("class.extends.indent", extendsPrefix);
@@ -1037,9 +915,9 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			this.superType.toString("", buffer);
 		}
 
-		if (this.interfaceCount > 0)
+		if (this.interfaces != null && this.interfaces.size() > 0)
 		{
-			String implementsPrefix = prefix;
+			String implementsPrefix = indent;
 			if (Formatting.getBoolean("class.implements.newline"))
 			{
 				implementsPrefix = Formatting.getIndent("class.implements.indent", implementsPrefix);
@@ -1050,13 +928,13 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 				buffer.append(" implements ");
 			}
 
-			Util.astToString(implementsPrefix, this.interfaces, this.interfaceCount,
+			Util.astToString(implementsPrefix, this.interfaces.getTypes(), this.interfaces.size(),
 			                 Formatting.getSeparator("class.implements.separator", ','), buffer);
 		}
 
 		if (this.body != null)
 		{
-			this.body.toString(prefix, buffer);
+			this.body.toString(indent, buffer);
 		}
 		else if (Formatting.getBoolean("class.semicolon"))
 		{

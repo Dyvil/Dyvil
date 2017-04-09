@@ -2,7 +2,7 @@ package dyvil.tools.compiler.ast.expression.access;
 
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.transform.SideEffectHelper;
@@ -23,7 +23,7 @@ public class SubscriptAccess extends AbstractCall
 		this.receiver = instance;
 	}
 
-	public SubscriptAccess(ICodePosition position, IValue instance, IArguments arguments)
+	public SubscriptAccess(ICodePosition position, IValue instance, ArgumentList arguments)
 	{
 		this.position = position;
 		this.receiver = instance;
@@ -63,7 +63,7 @@ public class SubscriptAccess extends AbstractCall
 		// -> x.subscript_=(y..., x.subscript(y...).op(z))
 
 		final IValue subscriptReceiver = helper.processValue(this.receiver);
-		final IArguments subscriptArguments = helper.processArguments(this.arguments);
+		final ArgumentList subscriptArguments = helper.processArguments(this.arguments);
 
 		this.receiver = subscriptReceiver;
 		this.arguments = subscriptArguments;
@@ -84,11 +84,11 @@ public class SubscriptAccess extends AbstractCall
 		int count = this.arguments.size();
 		if (count > 0)
 		{
-			this.arguments.getValue(0, null).toString(prefix, buffer);
+			this.arguments.get(0, null).toString(prefix, buffer);
 			for (int i = 1; i < count; i++)
 			{
 				Formatting.appendSeparator(buffer, "method.subscript.separator", ',');
-				this.arguments.getValue(i, null).toString(prefix, buffer);
+				this.arguments.get(i, null).toString(prefix, buffer);
 			}
 		}
 

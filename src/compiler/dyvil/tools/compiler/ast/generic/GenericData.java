@@ -1,22 +1,21 @@
 package dyvil.tools.compiler.ast.generic;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.ITypeList;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.phase.IResolvable;
-import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public final class GenericData implements IResolvable, ITypeList, ITypeContext
+public final class GenericData implements IResolvable, ITypeContext
 {
-	protected ITypeParametricMember member;
+	protected @NonNull ITypeParametricMember member;
 
-	protected IType[] generics;
-	protected int     genericCount;
+	protected @NonNull TypeList generics;
 
 	protected int lockedCount;
 
@@ -24,19 +23,24 @@ public final class GenericData implements IResolvable, ITypeList, ITypeContext
 
 	public GenericData()
 	{
+		this.generics = new TypeList();
+	}
+
+	public GenericData(ITypeParametricMember member)
+	{
+		this(member, member.typeArity());
 	}
 
 	public GenericData(ITypeParametricMember member, int capacity)
 	{
 		this.member = member;
-		this.generics = new IType[capacity];
+		this.generics = new TypeList(capacity);
 	}
 
 	public GenericData(ITypeParametricMember member, IType... generics)
 	{
 		this.member = member;
-		this.genericCount = generics.length;
-		this.generics = generics;
+		this.generics = new TypeList(generics);
 	}
 
 	public ITypeParametricMember getMember()
@@ -59,9 +63,14 @@ public final class GenericData implements IResolvable, ITypeList, ITypeContext
 		this.fallbackTypeContext = fallbackTypeContext;
 	}
 
+	public TypeList getTypes()
+	{
+		return this.generics;
+	}
+
 	public void lockAvailable()
 	{
-		this.lock(this.genericCount);
+		this.lock(this.generics.size());
 	}
 
 	public void lock(int lockedCount)
@@ -72,73 +81,6 @@ public final class GenericData implements IResolvable, ITypeList, ITypeContext
 		}
 	}
 
-	@Override
-	public int typeCount()
-	{
-		return this.genericCount;
-	}
-
-	@Override
-	public IType getType(int index)
-	{
-		return this.generics[index];
-	}
-
-	@Override
-	public IType[] getTypes()
-	{
-		return this.generics;
-	}
-
-	@Override
-	public void setTypes(IType[] types, int size)
-	{
-		this.generics = types;
-		this.genericCount = size;
-	}
-
-	public void setTypeCount(int count)
-	{
-		if (this.generics == null)
-		{
-			this.generics = new IType[count];
-		}
-
-		if (count > this.generics.length)
-		{
-			IType[] temp = new IType[count];
-			System.arraycopy(this.generics, 0, temp, 0, this.generics.length);
-			this.generics = temp;
-		}
-	}
-
-	@Override
-	public void setType(int index, IType type)
-	{
-		this.generics[index] = type;
-	}
-
-	@Override
-	public void addType(IType type)
-	{
-		if (this.generics == null)
-		{
-			this.generics = new IType[3];
-			this.generics[0] = type;
-			this.genericCount = 1;
-			return;
-		}
-
-		int index = this.genericCount++;
-		if (this.genericCount > this.generics.length)
-		{
-			IType[] temp = new IType[this.genericCount];
-			System.arraycopy(this.generics, 0, temp, 0, index);
-			this.generics = temp;
-		}
-		this.generics[index] = type;
-	}
-
 	private boolean isMethodTypeVariable(ITypeParameter typeVar)
 	{
 		if (typeVar.getGeneric() == this.member)
@@ -147,7 +89,7 @@ public final class GenericData implements IResolvable, ITypeList, ITypeContext
 		}
 
 		final int index = typeVar.getIndex();
-		return index < this.member.typeParameterCount() && this.member.getTypeParameter(index) == typeVar;
+		return index < this.member.typeArity() && this.member.getTypeParameters().get(index) == typeVar;
 	}
 
 	@Override
@@ -156,11 +98,11 @@ public final class GenericData implements IResolvable, ITypeList, ITypeContext
 		if (this.isMethodTypeVariable(typeParameter))
 		{
 			final int index = typeParameter.getIndex();
-			if (index >= this.genericCount || index >= this.lockedCount)
+			if (index >= this.lockedCount)
 			{
 				return null;
 			}
-			return this.generics[index];
+			return this.generics.get(index);
 		}
 		if (this.fallbackTypeContext != null && typeParameter.getGeneric() == this.member.getEnclosingClass())
 		{
@@ -177,116 +119,80 @@ public final class GenericData implements IResolvable, ITypeList, ITypeContext
 	}
 
 	@Override
-	public void addMapping(ITypeParameter typeVar, IType type)
+	public void addMapping(ITypeParameter typeParameter, IType type)
 	{
-		if (type == Types.UNKNOWN)
+		if (!this.isMethodTypeVariable(typeParameter))
 		{
 			return;
 		}
 
-		final int index = typeVar.getIndex();
-		if (!this.isMethodTypeVariable(typeVar))
+		final int index = typeParameter.getIndex();
+
+		final IType current = this.generics.get(index);
+		if (current == null)
+		{
+			this.generics.set(index, type);
+			return;
+		}
+		if (index < this.lockedCount)
 		{
 			return;
 		}
-
-		type = type.asReturnType();
-
-		if (index < this.genericCount)
-		{
-			if (this.generics[index] == null)
-			{
-				this.generics[index] = type;
-				return;
-			}
-			if (index >= this.lockedCount)
-			{
-				this.generics[index] = Types.combine(this.generics[index], type);
-			}
-			return;
-		}
-
-		this.genericCount = index + 1;
-		if (index >= this.generics.length)
-		{
-			IType[] temp = new IType[index + 1];
-			System.arraycopy(this.generics, 0, temp, 0, this.generics.length);
-			this.generics = temp;
-		}
-		this.generics[typeVar.getIndex()] = type;
+		this.generics.set(index, Types.combine(current, type));
 	}
 
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.genericCount; i++)
-		{
-			this.generics[i] = this.generics[i].resolveType(markers, context);
-		}
+		this.generics.resolveTypes(markers, context);
 
-		this.lockedCount = this.genericCount;
+		this.lockedCount = this.generics.size();
 	}
 
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.genericCount; i++)
-		{
-			this.generics[i].resolve(markers, context);
-		}
+		this.generics.resolve(markers, context);
 	}
 
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.genericCount; i++)
-		{
-			this.generics[i].checkType(markers, context, IType.TypePosition.GENERIC_ARGUMENT);
-		}
+		this.generics.checkTypes(markers, context, IType.TypePosition.GENERIC_ARGUMENT);
 	}
 
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.genericCount; i++)
-		{
-			this.generics[i].check(markers, context);
-		}
+		this.generics.check(markers, context);
 	}
 
 	@Override
 	public void foldConstants()
 	{
-		for (int i = 0; i < this.genericCount; i++)
-		{
-			this.generics[i].foldConstants();
-		}
+		this.generics.foldConstants();
 	}
 
 	@Override
 	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		for (int i = 0; i < this.genericCount; i++)
-		{
-			this.generics[i].cleanup(compilableList, classCompilableList);
-		}
+		this.generics.cleanup(compilableList, classCompilableList);
 	}
 
 	@Override
 	public String toString()
 	{
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		this.toString("", builder);
 		return builder.toString();
 	}
 
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		if (this.genericCount > 0)
+		if (this.generics.size() > 0)
 		{
 			Formatting.appendSeparator(buffer, "generics.open_bracket", '<');
-			Util.astToString(prefix, this.generics, this.genericCount,
-			                 Formatting.getSeparator("generics.separator", ','), buffer);
+			this.generics.toString(indent, buffer);
 			Formatting.appendSeparator(buffer, "generics.close_bracket", '>');
 		}
 	}

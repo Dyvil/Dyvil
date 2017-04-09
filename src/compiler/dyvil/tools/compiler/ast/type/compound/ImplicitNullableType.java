@@ -5,27 +5,19 @@ import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.LiteralConversion;
+import dyvil.tools.compiler.ast.expression.optional.OptionalUnwrapOperator;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.parameter.IArguments;
-import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public class ImplicitNullableType extends NullableType
 {
-	public static class LazyTypes
-	{
-		public static final IMethod UNWRAP = Package.dyvilLang.resolveClass("Optionals").getBody()
-		                                                      .getMethod(Names.bang);
-	}
-
 	public ImplicitNullableType()
 	{
 	}
@@ -62,9 +54,7 @@ public class ImplicitNullableType extends NullableType
 			return null;
 		}
 
-		final LiteralConversion conversion = new LiteralConversion(value, LazyTypes.UNWRAP);
-		conversion.setType(this.type);
-		return conversion;
+		return new OptionalUnwrapOperator(value);
 	}
 
 	@Override
@@ -74,7 +64,7 @@ public class ImplicitNullableType extends NullableType
 	}
 
 	@Override
-	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments)
+	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
 		this.type.getMethodMatches(list, receiver, name, arguments);
 	}
@@ -94,22 +84,13 @@ public class ImplicitNullableType extends NullableType
 	@Override
 	public IType withAnnotation(IAnnotation annotation)
 	{
-		switch (annotation.getType().getInternalName())
+		final String internal = annotation.getType().getInternalName();
+		if (internal.equals(AnnotationUtil.NULLABLE_INTERNAL))
 		{
-		case AnnotationUtil.NOTNULL_INTERNAL:
-			return this.type;
-		case AnnotationUtil.NULLABLE_INTERNAL:
-			return new NullableType(this.type);
+			return NullableType.apply(this.type);
 		}
 
-		final IType withAnnotation = this.type.withAnnotation(annotation);
-		if (withAnnotation == null)
-		{
-			return null;
-		}
-
-		this.type = withAnnotation;
-		return this;
+		return super.withAnnotation(annotation);
 	}
 
 	@Override

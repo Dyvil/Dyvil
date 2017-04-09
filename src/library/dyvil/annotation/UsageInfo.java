@@ -11,9 +11,18 @@ import java.lang.annotation.RetentionPolicy;
 @ClassParameters(names = { "value", "description", "level" })
 public @interface UsageInfo
 {
+	/**
+	 * @return the compiler diagnostic message text
+	 */
 	@NonNull String value();
 
+	/**
+	 * @return an extended description about the usage of the member
+	 */
 	@NonNull String description() default "";
 
+	/**
+	 * @return the marker level of the compiler diagnostic message
+	 */
 	@NonNull MarkerLevel level() default MarkerLevel.INFO;
 }

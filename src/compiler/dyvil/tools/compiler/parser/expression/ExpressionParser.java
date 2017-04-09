@@ -502,7 +502,7 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 			this.value = call;
 
 			pm.splitJump(next, 1);
-			pm.pushParser(new TypeListParser(call.getGenericData(), true));
+			pm.pushParser(new TypeListParser(call.getGenericData().getTypes(), true));
 			this.mode = TYPE_ARGUMENTS_END;
 			return;
 		}
@@ -789,10 +789,6 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		}
 		case DyvilKeywords.NULL:
 			this.value = new NullValue(token.raw());
-			this.mode = ACCESS;
-			return true;
-		case DyvilKeywords.NIL:
-			this.value = new NilExpr(token.raw());
 			this.mode = ACCESS;
 			return true;
 		case DyvilKeywords.TRUE:

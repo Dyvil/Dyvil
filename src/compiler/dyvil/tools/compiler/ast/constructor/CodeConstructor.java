@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.constructor;
 
+import dyvil.annotation.internal.Nullable;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
@@ -33,8 +34,8 @@ import java.io.IOException;
 
 public class CodeConstructor extends AbstractConstructor
 {
-	protected IValue          value;
-	protected InitializerCall initializerCall;
+	protected @Nullable IValue          value;
+	protected @Nullable InitializerCall initializerCall;
 
 	public CodeConstructor(IClass enclosingClass)
 	{
@@ -88,9 +89,9 @@ public class CodeConstructor extends AbstractConstructor
 			this.modifiers.addIntModifier(Modifiers.VARARGS);
 		}
 
-		for (int i = 0; i < this.exceptionCount; i++)
+		if (this.exceptions != null)
 		{
-			this.exceptions[i] = this.exceptions[i].resolveType(markers, context);
+			this.exceptions.resolveTypes(markers, context);
 		}
 
 		if (this.value != null)
@@ -110,9 +111,9 @@ public class CodeConstructor extends AbstractConstructor
 
 		this.parameters.resolve(markers, context);
 
-		for (int i = 0; i < this.exceptionCount; i++)
+		if (this.exceptions != null)
 		{
-			this.exceptions[i].resolve(markers, context);
+			this.exceptions.resolve(markers, context);
 		}
 
 		if (this.value != null)
@@ -122,7 +123,7 @@ public class CodeConstructor extends AbstractConstructor
 			final IValue typedValue = this.value.withType(Types.VOID, Types.VOID, markers, context);
 			if (typedValue == null)
 			{
-				Marker marker = Markers.semantic(this.position, "constructor.return.type");
+				Marker marker = Markers.semanticError(this.position, "constructor.return.type");
 				marker.addInfo(Markers.getSemantic("return.type", this.value.getType()));
 				markers.add(marker);
 			}
@@ -148,13 +149,13 @@ public class CodeConstructor extends AbstractConstructor
 		if (this.value.valueTag() == IValue.STATEMENT_LIST)
 		{
 			final StatementList statementList = (StatementList) this.value;
-			if (statementList.valueCount() > 0)
+			if (statementList.size() > 0)
 			{
-				final IValue firstValue = statementList.getValue(0);
+				final IValue firstValue = statementList.get(0);
 				if (firstValue.valueTag() == IValue.INITIALIZER_CALL)
 				{
 					// We can't simply remove the value from the Statement List, so we replace it with a void statement
-					statementList.setValue(0, new VoidValue(firstValue.getPosition()));
+					statementList.set(0, new VoidValue(firstValue.getPosition()));
 
 					this.initializerCall = (InitializerCall) firstValue;
 					return;
@@ -189,9 +190,9 @@ public class CodeConstructor extends AbstractConstructor
 
 		this.parameters.checkTypes(markers, context);
 
-		for (int i = 0; i < this.exceptionCount; i++)
+		if (this.exceptions != null)
 		{
-			this.exceptions[i].checkType(markers, context, IType.TypePosition.RETURN_TYPE);
+			this.exceptions.checkTypes(markers, context, IType.TypePosition.RETURN_TYPE);
 		}
 
 		if (this.initializerCall != null)
@@ -216,16 +217,19 @@ public class CodeConstructor extends AbstractConstructor
 
 		this.parameters.check(markers, context);
 
-		for (int i = 0; i < this.exceptionCount; i++)
+		if (this.exceptions != null)
 		{
-			final IType exceptionType = this.exceptions[i];
-			exceptionType.check(markers, context);
-
-			if (!Types.isSuperType(Types.THROWABLE, exceptionType))
+			for (int i = 0; i < this.exceptions.size(); i++)
 			{
-				final Marker marker = Markers.semantic(exceptionType.getPosition(), "method.exception.type");
-				marker.addInfo(Markers.getSemantic("exception.type", exceptionType));
-				markers.add(marker);
+				final IType exceptionType = this.exceptions.get(i);
+				exceptionType.check(markers, context);
+
+				if (!Types.isSuperType(Types.THROWABLE, exceptionType))
+				{
+					final Marker marker = Markers.semanticError(exceptionType.getPosition(), "method.exception.type");
+					marker.addInfo(Markers.getSemantic("exception.type", exceptionType));
+					markers.add(marker);
+				}
 			}
 		}
 
@@ -261,9 +265,9 @@ public class CodeConstructor extends AbstractConstructor
 
 		this.parameters.foldConstants();
 
-		for (int i = 0; i < this.exceptionCount; i++)
+		if (this.exceptions != null)
 		{
-			this.exceptions[i].foldConstants();
+			this.exceptions.foldConstants();
 		}
 
 		if (this.initializerCall != null)
@@ -283,9 +287,9 @@ public class CodeConstructor extends AbstractConstructor
 
 		this.parameters.cleanup(compilableList, classCompilableList);
 
-		for (int i = 0; i < this.exceptionCount; i++)
+		if (this.exceptions != null)
 		{
-			this.exceptions[i].cleanup(compilableList, classCompilableList);
+			this.exceptions.cleanup(compilableList, classCompilableList);
 		}
 
 		if (this.initializerCall != null)
@@ -304,7 +308,7 @@ public class CodeConstructor extends AbstractConstructor
 		final long flags = ModifierUtil.getFlags(this);
 		final MethodWriter methodWriter = new MethodWriterImpl(writer, writer.visitMethod(
 			ModifierUtil.getJavaModifiers(flags), "<init>", this.getDescriptor(), this.getSignature(),
-			this.getExceptions()));
+			this.getInternalExceptions()));
 
 		// Write Modifiers and Annotations
 		ModifierUtil.writeModifiers(methodWriter, this, flags);

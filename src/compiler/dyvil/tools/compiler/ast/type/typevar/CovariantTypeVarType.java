@@ -27,12 +27,6 @@ public class CovariantTypeVarType extends TypeVarType
 	}
 
 	@Override
-	public IType asReturnType()
-	{
-		return this.typeParameter.getUpperBound();
-	}
-
-	@Override
 	public boolean isUninferred()
 	{
 		return true;

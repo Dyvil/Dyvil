@@ -5,7 +5,10 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.header.AbstractHeader;
 import dyvil.tools.compiler.ast.imports.ImportDeclaration;
+import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.parsing.Name;
 
@@ -14,7 +17,7 @@ public class ExternalHeader extends AbstractHeader implements IDefaultContext
 	private static final int IMPORTS      = 1;
 	private static final int TYPE_ALIASES = 1 << 1;
 
-	private int resolved;
+	private byte resolved;
 
 	public ExternalHeader()
 	{
@@ -65,13 +68,13 @@ public class ExternalHeader extends AbstractHeader implements IDefaultContext
 	}
 
 	@Override
-	public ITypeAlias resolveTypeAlias(Name name, int arity)
+	public void resolveTypeAlias(MatchList<ITypeAlias> matches, IType receiver, Name name, TypeList arguments)
 	{
 		if ((this.resolved & TYPE_ALIASES) == 0)
 		{
 			this.resolveTypeAliases();
 		}
 
-		return super.resolveTypeAlias(name, arity);
+		super.resolveTypeAlias(matches, receiver, name, arguments);
 	}
 }

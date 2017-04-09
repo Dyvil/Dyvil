@@ -20,7 +20,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@LiteralConvertible.FromNil
 @DyvilModifiers(Modifiers.OBJECT_CLASS)
 @Immutable
 public final class EmptySet<E> implements ImmutableSet<E>

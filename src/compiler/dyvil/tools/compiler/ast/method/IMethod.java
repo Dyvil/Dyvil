@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParametricMember;
 import dyvil.tools.compiler.ast.member.MemberKind;
 import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
@@ -25,13 +25,13 @@ public interface IMethod extends ICallableMember, ITypeParametricMember, IContex
 		return MemberKind.METHOD;
 	}
 
-	void checkMatch(MatchList<IMethod> list, IValue receiver, Name name, IArguments arguments);
+	void checkMatch(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments);
 
 	void checkImplicitMatch(MatchList<IMethod> list, IValue value, IType type);
 	
-	IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue receiver, IArguments arguments, GenericData genericData);
+	IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue receiver, ArgumentList arguments, GenericData genericData);
 	
-	void checkCall(MarkerList markers, ICodePosition position, IContext context, IValue instance, IArguments arguments, ITypeContext typeContext);
+	void checkCall(MarkerList markers, ICodePosition position, IContext context, IValue instance, ArgumentList arguments, ITypeContext typeContext);
 	
 	// Misc
 	
@@ -59,9 +59,7 @@ public interface IMethod extends ICallableMember, ITypeParametricMember, IContex
 
 	IType getReceiverType();
 
-	void setReceiverType(IType type);
-
-	GenericData getGenericData(GenericData data, IValue instance, IArguments arguments);
+	GenericData getGenericData(GenericData data, IValue instance, ArgumentList arguments);
 	
 	boolean hasTypeVariables();
 	
@@ -74,25 +72,16 @@ public interface IMethod extends ICallableMember, ITypeParametricMember, IContex
 	int getInvokeOpcode();
 
 	Handle toHandle();
-
-	@Override
-	String getInternalName();
-
-	String getDescriptor();
 	
-	String getSignature();
-	
-	String[] getInternalExceptions();
-	
-	void writeCall(MethodWriter writer, IValue receiver, IArguments arguments, ITypeContext typeContext, IType targetType, int lineNumber)
+	void writeCall(MethodWriter writer, IValue receiver, ArgumentList arguments, ITypeContext typeContext, IType targetType, int lineNumber)
 			throws BytecodeException;
 	
-	void writeInvoke(MethodWriter writer, IValue receiver, IArguments arguments, ITypeContext typeContext, int lineNumber)
+	void writeInvoke(MethodWriter writer, IValue receiver, ArgumentList arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException;
 	
-	void writeJump(MethodWriter writer, Label dest, IValue receiver, IArguments arguments, ITypeContext typeContext, int lineNumber)
+	void writeJump(MethodWriter writer, Label dest, IValue receiver, ArgumentList arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException;
 	
-	void writeInvJump(MethodWriter writer, Label dest, IValue receiver, IArguments arguments, ITypeContext typeContext, int lineNumber)
+	void writeInvJump(MethodWriter writer, Label dest, IValue receiver, ArgumentList arguments, ITypeContext typeContext, int lineNumber)
 			throws BytecodeException;
 }

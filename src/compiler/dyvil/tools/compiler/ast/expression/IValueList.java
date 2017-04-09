@@ -1,33 +1,31 @@
 package dyvil.tools.compiler.ast.expression;
 
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
-import dyvil.tools.compiler.ast.statement.control.Label;
+import dyvil.tools.parsing.Name;
 
 public interface IValueList extends Iterable<IValue>, IValueConsumer
 {
-	int valueCount();
+	int size();
 	
 	default boolean isEmpty()
 	{
-		return this.valueCount() == 0;
+		return this.size() == 0;
 	}
-	
-	void setValue(int index, IValue value);
-	
-	void addValue(IValue value);
-	
-	default void addValue(IValue value, Label label)
+
+	IValue get(int index);
+
+	void set(int index, IValue value);
+
+	void add(IValue value);
+
+	default void add(Name name, IValue value)
 	{
-		this.addValue(value);
+		this.add(value);
 	}
-	
-	void addValue(int index, IValue value);
-	
-	IValue getValue(int index);
 
 	@Override
 	default void setValue(IValue value)
 	{
-		this.addValue(value);
+		this.add(value);
 	}
 }

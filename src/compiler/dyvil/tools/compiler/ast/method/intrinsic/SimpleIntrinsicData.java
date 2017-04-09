@@ -4,7 +4,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 
@@ -20,7 +20,7 @@ public class SimpleIntrinsicData implements IntrinsicData
 	}
 
 	@Override
-	public void writeIntrinsic(MethodWriter writer, IValue receiver, IArguments arguments, int lineNumber)
+	public void writeIntrinsic(MethodWriter writer, IValue receiver, ArgumentList arguments, int lineNumber)
 		throws BytecodeException
 	{
 		for (int insn : this.opcodes)
@@ -30,7 +30,7 @@ public class SimpleIntrinsicData implements IntrinsicData
 	}
 
 	@Override
-	public void writeIntrinsic(MethodWriter writer, Label dest, IValue receiver, IArguments arguments, int lineNumber)
+	public void writeIntrinsic(MethodWriter writer, Label dest, IValue receiver, ArgumentList arguments, int lineNumber)
 		throws BytecodeException
 	{
 		final int count = this.opcodes.length - 1;
@@ -52,7 +52,7 @@ public class SimpleIntrinsicData implements IntrinsicData
 	}
 
 	@Override
-	public void writeInvIntrinsic(MethodWriter writer, Label dest, IValue receiver, IArguments arguments,
+	public void writeInvIntrinsic(MethodWriter writer, Label dest, IValue receiver, ArgumentList arguments,
 		                             int lineNumber) throws BytecodeException
 	{
 		final int count = this.opcodes.length - 1;

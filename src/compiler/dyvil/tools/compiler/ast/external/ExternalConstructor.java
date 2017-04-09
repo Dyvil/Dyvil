@@ -16,8 +16,9 @@ import dyvil.tools.compiler.ast.method.IExternalCallableMember;
 import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.IParameter;
-import dyvil.tools.compiler.ast.parameter.IParameterList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.structure.Package;
+import dyvil.tools.compiler.ast.structure.RootPackage;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -29,10 +30,9 @@ import dyvil.tools.parsing.position.ICodePosition;
 
 public final class ExternalConstructor extends AbstractConstructor implements IExternalCallableMember
 {
-	private static final int ANNOTATIONS = 1;
 	private static final int EXCEPTIONS  = 1 << 2;
 
-	private int resolved;
+	private byte resolved;
 
 	public ExternalConstructor(IClass enclosingClass)
 	{
@@ -75,10 +75,9 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 
 	private void resolveAnnotations()
 	{
-		this.resolved |= ANNOTATIONS;
 		if (this.annotations != null)
 		{
-			this.annotations.resolveTypes(null, this.getExternalContext(), this);
+			this.annotations.resolveTypes(null, RootPackage.rootPackage, this);
 		}
 	}
 
@@ -87,25 +86,14 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 		this.resolved |= EXCEPTIONS;
 
 		final IContext context = this.getExternalContext();
-		for (int i = 0; i < this.exceptionCount; i++)
-		{
-			this.exceptions[i] = this.exceptions[i].resolveType(null, context);
-		}
+		this.exceptions.resolveTypes(null, context);
 	}
 
 	@Override
-	public IAnnotation getAnnotation(IClass type)
+	public AnnotationList getAnnotations()
 	{
-		if (this.annotations == null)
-		{
-			return null;
-		}
-
-		if ((this.resolved & ANNOTATIONS) == 0)
-		{
-			this.resolveAnnotations();
-		}
-		return this.annotations.getAnnotation(type);
+		this.resolveAnnotations();
+		return super.getAnnotations();
 	}
 
 	@Override
@@ -115,7 +103,7 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 	}
 
 	@Override
-	public IParameterList getExternalParameterList()
+	public ParameterList getExternalParameterList()
 	{
 		return this.parameters;
 	}
@@ -159,7 +147,7 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 		case TypeReference.EXCEPTION_PARAMETER:
 		{
 			int index = TypeReference.getExceptionIndex(typeRef);
-			this.exceptions[index] = IType.withAnnotation(this.exceptions[index], annotation, typePath);
+			this.exceptions.set(index, IType.withAnnotation(this.exceptions.get(index), annotation, typePath));
 			break;
 		}
 		case TypeReference.METHOD_FORMAL_PARAMETER:

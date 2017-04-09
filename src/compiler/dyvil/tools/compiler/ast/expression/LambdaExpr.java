@@ -3,16 +3,16 @@ package dyvil.tools.compiler.ast.expression;
 import dyvil.annotation.internal.NonNull;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.Handle;
-import dyvil.tools.compiler.ast.context.IImplicitContext;
-import dyvil.tools.compiler.ast.expression.access.AbstractCall;
-import dyvil.tools.compiler.ast.expression.access.ConstructorCall;
-import dyvil.tools.compiler.ast.expression.access.FieldAccess;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
+import dyvil.tools.compiler.ast.expression.access.AbstractCall;
+import dyvil.tools.compiler.ast.expression.access.ConstructorCall;
+import dyvil.tools.compiler.ast.expression.access.FieldAccess;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.MapTypeContext;
@@ -23,6 +23,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.LambdaType;
 import dyvil.tools.compiler.backend.ClassFormat;
@@ -143,7 +144,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	// Parameters
 
 	@Override
-	public IParameterList getParameterList()
+	public ParameterList getParameters()
 	{
 		return this.parameters;
 	}
@@ -235,12 +236,14 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	private @NonNull LambdaType makeType()
 	{
 		final int count = this.parameters.size();
-		final LambdaType lambdaType = new LambdaType(count);
+		final LambdaType lambdaType = new LambdaType();
+		final TypeList arguments = lambdaType.getArguments();
+
 		for (int i = 0; i < count; i++)
 		{
-			lambdaType.addType(this.parameters.get(i).getType());
+			arguments.add(this.parameters.get(i).getType());
 		}
-		lambdaType.setType(this.returnType != null ? this.returnType : Types.UNKNOWN);
+		arguments.add(this.returnType != null ? this.returnType : Types.UNKNOWN);
 
 		this.flags |= LAMBDA_TYPE_INFERRED;
 		return lambdaType;
@@ -340,20 +343,27 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		{
 			this.returnType = valueType;
 		}
-		if ((this.flags & LAMBDA_TYPE_INFERRED) != 0)
+		if ((this.flags & LAMBDA_TYPE_INFERRED) != 0 || type.canExtract(LambdaType.class))
 		{
 			this.type = this.makeType();
 			return;
 		}
 
 		final ITypeContext tempContext = new MapTypeContext();
+		final ParameterList methodParams = this.method.getParameters();
+		final int size = Math.min(this.parameters.size(), methodParams.size());
+
+		for (int i = 0; i < size; i++)
+		{
+			final IParameter lambdaParam = this.parameters.get(i);
+			final IParameter methodParam = methodParams.get(i);
+
+			methodParam.getType().inferTypes(lambdaParam.getType(), tempContext);
+		}
 		this.method.getType().inferTypes(valueType, tempContext);
 
-		final IType concreteType = this.method.getEnclosingClass().getThisType().getConcreteType(tempContext);
-
-		type.inferTypes(concreteType, tempContext);
-
-		this.type = type.getConcreteType(tempContext);
+		final IType classType = this.method.getEnclosingClass().getThisType();
+		this.type = classType.getConcreteType(tempContext);
 	}
 
 	private void checkReturnType(MarkerList markers, IType expectedReturnType)
@@ -385,8 +395,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 				final IParameter parameter = this.parameters.get(i);
 				if (parameter.getType().isUninferred())
 				{
-					final IType type = this.method.getParameterList().get(i).getType()
-					                              .atPosition(parameter.getPosition());
+					final IType type = this.method.getParameters().get(i).getType().atPosition(parameter.getPosition());
 					parameter.setType(type);
 				}
 			}
@@ -404,7 +413,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			}
 
 			final ICodePosition position = parameter.getPosition();
-			final IType methodParamType = this.method.getParameterList().get(i).getType();
+			final IType methodParamType = this.method.getParameters().get(i).getType();
 			final IType concreteType = methodParamType.getConcreteType(this.type);
 
 			// Can't infer parameter type
@@ -417,7 +426,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			}
 
 			// asReturnType is required for Wildcard Types
-			parameter.setType(concreteType.asReturnType().atPosition(position));
+			parameter.setType(concreteType.atPosition(position));
 		}
 
 		this.checkReturnType(markers, this.method.getType().getConcreteType(this.type));
@@ -447,7 +456,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			return false;
 		}
 
-		final IParameterList methodParameters = method.getParameterList();
+		final ParameterList methodParameters = method.getParameters();
 		final int parameterCount = this.parameters.size();
 
 		if (parameterCount != methodParameters.size())
@@ -486,7 +495,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	@Override
 	public IDataMember resolveField(Name name)
 	{
-		return this.parameters.resolveParameter(name);
+		return this.parameters.get(name);
 	}
 
 	@Override
@@ -693,10 +702,10 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 		return this;
 	}
 
-	private boolean checkCall(IValue receiver, IArguments arguments, IParametric parametric)
+	private boolean checkCall(IValue receiver, ArgumentList arguments, IParametric parametric)
 	{
 		final int parameterCount = this.parameters.size();
-		final IParameterList parameterList = parametric.getParameterList();
+		final ParameterList parameterList = parametric.getParameters();
 
 		if (receiver == null)
 		{
@@ -707,7 +716,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 			for (int i = 0; i < parameterCount; i++)
 			{
-				final IValue argument = arguments.getValue(i, parameterList.get(i));
+				final IValue argument = arguments.get(i, parameterList.get(i));
 				if (!isFieldAccess(argument, this.parameters.get(i)))
 				{
 					return false;
@@ -724,7 +733,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 		for (int i = 1; i < parameterCount; i++)
 		{
-			final IValue argument = arguments.getValue(i - 1, parameterList.get(i - 1));
+			final IValue argument = arguments.get(i - 1, parameterList.get(i - 1));
 			if (!isFieldAccess(argument, this.parameters.get(i)))
 			{
 				return false;
@@ -905,7 +914,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 				buffer.append(' ');
 			}
 
-			Util.astToString(prefix, this.parameters.getParameterArray(), parameterCount,
+			Util.astToString(prefix, this.parameters.getParameters(), parameterCount,
 			                 Formatting.getSeparator("lambda.separator", ','), buffer);
 
 			if (Formatting.getBoolean("lambda.close_paren.space_before"))

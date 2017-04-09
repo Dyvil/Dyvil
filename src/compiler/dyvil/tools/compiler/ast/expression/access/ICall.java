@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
 import dyvil.tools.compiler.ast.parameter.CodeParameter;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
@@ -32,9 +32,9 @@ public interface ICall extends IValue, IArgumentsConsumer
 	}
 
 	@Override
-	void setArguments(IArguments arguments);
+	void setArguments(ArgumentList arguments);
 
-	IArguments getArguments();
+	ArgumentList getArguments();
 
 	@Override
 	default boolean isUsableAsStatement()
@@ -45,8 +45,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 	@Override
 	default IValue resolve(MarkerList markers, IContext context)
 	{
-		// Wildcard Conversion
-		int wildcards = this.wildcardCount();
+		final int wildcards = this.wildcardCount();
 		if (wildcards > 0)
 		{
 			return this.toLambda(markers, context, wildcards);
@@ -103,21 +102,21 @@ public interface ICall extends IValue, IArgumentsConsumer
 			                                  EmptyModifiers.INSTANCE, null);
 		}
 
-		int index = 0;
+		int parIndex = 0;
 
-		IValue receiver = this.getReceiver();
+		final IValue receiver = this.getReceiver();
 		if (receiver != null && receiver.isPartialWildcard())
 		{
-			this.setReceiver(convertWildcardValue(receiver, parameters[index++]));
+			this.setReceiver(receiver.withLambdaParameter(parameters[parIndex++]));
 		}
 
-		IArguments arguments = this.getArguments();
+		final ArgumentList arguments = this.getArguments();
 		for (int i = 0, size = arguments.size(); i < size; i++)
 		{
-			final IValue argument = arguments.getValue(i, null);
+			final IValue argument = arguments.get(i, null);
 			if (argument.isPartialWildcard())
 			{
-				arguments.setValue(i, null, convertWildcardValue(argument, parameters[index++]));
+				arguments.set(i, null, argument.withLambdaParameter(parameters[parIndex++]));
 			}
 		}
 
@@ -125,14 +124,6 @@ public interface ICall extends IValue, IArgumentsConsumer
 		lambdaExpr.setImplicitParameters(true);
 		lambdaExpr.setValue(this);
 		return lambdaExpr.resolve(markers, context);
-	}
-
-	static IValue convertWildcardValue(IValue value, IParameter parameter)
-	{
-		final ICodePosition valuePosition = value.getPosition();
-		parameter.setPosition(valuePosition);
-		value.setLambdaParameter(parameter);
-		return value;
 	}
 
 	default void resolveReceiver(MarkerList markers, IContext context)
@@ -174,12 +165,12 @@ public interface ICall extends IValue, IArgumentsConsumer
 		return Types.BASE_CONTEXT.resolveField(name);
 	}
 
-	static IMethod resolveMethod(IContext context, IValue receiver, Name name, IArguments arguments)
+	static IMethod resolveMethod(IContext context, IValue receiver, Name name, ArgumentList arguments)
 	{
 		return resolveMethods(context, receiver, name, arguments).getBestMember();
 	}
 
-	static MatchList<IMethod> resolveMethods(IContext context, IValue receiver, Name name, IArguments arguments)
+	static MatchList<IMethod> resolveMethods(IContext context, IValue receiver, Name name, ArgumentList arguments)
 	{
 		@SuppressWarnings("UnnecessaryLocalVariable") final IImplicitContext implicitContext = context;
 
@@ -198,7 +189,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 		// Methods available through the first argument
 		if (arguments.size() == 1)
 		{
-			arguments.getFirstValue().getType().getMethodMatches(matches, receiver, name, arguments);
+			arguments.getFirst().getType().getMethodMatches(matches, receiver, name, arguments);
 			if (matches.hasCandidate())
 			{
 				return matches;

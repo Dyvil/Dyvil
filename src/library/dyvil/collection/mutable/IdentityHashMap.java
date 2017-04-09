@@ -11,8 +11,6 @@ import java.util.Arrays;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-@LiteralConvertible.FromNil
-@LiteralConvertible.FromColonOperator(methodName = "singleton")
 @LiteralConvertible.FromArray
 public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> implements MutableMap<K, V>
 {
@@ -37,13 +35,13 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 
 	@NonNull
 	@SafeVarargs
-	public static <K, V> IdentityHashMap<K, V> apply(@NonNull Entry<? extends K, ? extends V>... entries)
+	public static <K, V> IdentityHashMap<K, V> apply(@NonNull Entry<? extends K, ? extends V> @NonNull ... entries)
 	{
 		return new IdentityHashMap<>(entries);
 	}
 
 	@NonNull
-	public static <K, V> IdentityHashMap<K, V> from(Entry<? extends K, ? extends V> @NonNull [] entries)
+	public static <K, V> IdentityHashMap<K, V> from(@NonNull Entry<? extends K, ? extends V> @NonNull [] entries)
 	{
 		return new IdentityHashMap<>(entries);
 	}
@@ -55,7 +53,7 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 	}
 
 	@NonNull
-	public static <K, V> IdentityHashMap<K, V> from(SizedIterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
+	public static <K, V> IdentityHashMap<K, V> from(@NonNull SizedIterable<? extends @NonNull Entry<? extends K, ? extends V>> iterable)
 	{
 		return new IdentityHashMap<>(iterable);
 	}

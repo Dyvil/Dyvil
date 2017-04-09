@@ -406,7 +406,7 @@ public final class DyvilLexer
 		this.clearBuffer();
 		if (currentChar == '0')
 		{
-			switch (this.nextCodePoint())
+			switch (this.codePoint())
 			{
 			case 'o':
 			case 'O':

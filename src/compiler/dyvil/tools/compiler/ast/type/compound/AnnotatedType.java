@@ -67,7 +67,7 @@ public class AnnotatedType extends TypeDelegate
 		if (AnnotationUtil.DYVIL_TYPE_INTERNAL.equals(this.annotation.getType().getInternalName()))
 		{
 			// @DyvilType annotation
-			final String desc = this.annotation.getArguments().getFirstValue().stringValue();
+			final String desc = this.annotation.getArguments().getFirst().stringValue();
 			return ClassFormat.extendedToType(desc).resolveType(markers, context);
 		}
 

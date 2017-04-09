@@ -37,8 +37,4 @@ public interface IMember extends IASTNode, IResolvable, INamed, ITyped, IModifie
 	void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList);
 
 	String getInternalName();
-
-	default void setInternalName(String internalName)
-	{
-	}
 }

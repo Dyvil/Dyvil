@@ -15,7 +15,7 @@ import dyvil.tools.compiler.ast.header.IObjectCompilable;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.parameter.IArguments;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
@@ -89,7 +89,7 @@ public interface ITypeParameter extends IASTNode, IResolvable, INamed, IAnnotate
 
 	IDataMember resolveField(Name name);
 
-	void getMethodMatches(MatchList<IMethod> list, IValue instance, Name name, IArguments arguments);
+	void getMethodMatches(MatchList<IMethod> list, IValue instance, Name name, ArgumentList arguments);
 
 	void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType);
 

@@ -2,13 +2,10 @@ package dyvil.util
 
 import java.io.Serializable
 
-@LiteralConvertible.FromNil("fromNil")
 @LiteralConvertible.FromTuple
 @Immutable
 public interface Option<T> extends Serializable
 {
-	static func fromNil() -> Option = None.instance
-
 	static func of<T>(value: T?) -> Option<T> = value == null ? None : new Some<T>(value)
 
 	static func apply<T>() -> Option<T> = None

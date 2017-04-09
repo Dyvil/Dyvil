@@ -12,12 +12,12 @@ import dyvil.tools.compiler.ast.expression.intrinsic.PopExpr;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.SideEffectHelper;
@@ -36,7 +36,6 @@ public interface IValue extends IASTNode, ITyped
 	// Literals
 	int VOID                 = 1;
 	int NULL                 = 2;
-	int NIL                  = 3;
 	int WILDCARD             = 4;
 	int BOOLEAN              = 5;
 	int BYTE                 = 6;
@@ -60,12 +59,12 @@ public interface IValue extends IASTNode, ITyped
 	int THIS  = 64;
 	int SUPER = 65;
 
-	int CAST_OPERATOR = 66;
-	int ISOF_OPERATOR = 67;
+	int CAST_OPERATOR      = 66;
+	int ISOF_OPERATOR      = 67;
 	// int CASE_STATEMENT   = 68;
-	int MATCH         = 69;
-	int LAMBDA        = 70;
-	// int PARTIAL_FUNCTION = 71;
+	int MATCH              = 69;
+	int LAMBDA             = 70;
+	int WILDCARD_PARAMETER = 71;
 
 	// Access and Invocation
 	int CLASS_ACCESS  = 96;
@@ -93,12 +92,14 @@ public interface IValue extends IASTNode, ITyped
 	int BOOLEAN_NOT       = 131;
 	int CLASS_OPERATOR    = 132;
 	int TYPE_OPERATOR     = 133;
-	int OPTIONAL_CHAIN    = 134;
-	int NULL_COALESCING   = 135;
-	int STRING_CONCAT     = 136;
-	int INC               = 137;
-	int COLON             = 138;
-	int VARARGS_EXPANSION = 139;
+	int STRING_CONCAT     = 134;
+	int INC               = 135;
+	int COLON             = 136;
+	int VARARGS_EXPANSION = 137;
+
+	int OPTIONAL_UNWRAP = 150;
+	int OPTIONAL_CHAIN  = 151;
+	int NULL_COALESCING = 152;
 
 	// Basic Control Statements
 	int RETURN       = 192;
@@ -222,8 +223,9 @@ public interface IValue extends IASTNode, ITyped
 		return false;
 	}
 
-	default void setLambdaParameter(IParameter parameter)
+	default IValue withLambdaParameter(IParameter parameter)
 	{
+		return null;
 	}
 
 	default boolean checkVarargs(boolean typeCheck)
@@ -279,8 +281,8 @@ public interface IValue extends IASTNode, ITyped
 	 *
 	 * @param type
 	 * 	the type to match
-	 *
 	 * @param implicitContext
+	 *
 	 * @return the subtyping distance
 	 */
 	default int getTypeMatch(IType type, IImplicitContext implicitContext)
@@ -376,45 +378,45 @@ public interface IValue extends IASTNode, ITyped
 		}
 		else if (c == int[].class)
 		{
-			ArrayExpr valueList = new ArrayExpr(null);
-			valueList.arrayType = new ArrayType(Types.INT);
-			valueList.elementType = Types.INT;
+			final ArrayExpr valueList = new ArrayExpr();
+			final ArgumentList values = valueList.getValues();
+			valueList.setElementType(Types.INT);
 			for (int i : (int[]) o)
 			{
-				valueList.addValue(new IntValue(i));
+				values.add(new IntValue(i));
 			}
 			return valueList;
 		}
 		else if (c == long[].class)
 		{
-			ArrayExpr valueList = new ArrayExpr();
-			valueList.arrayType = new ArrayType(Types.LONG);
-			valueList.elementType = Types.LONG;
+			final ArrayExpr valueList = new ArrayExpr();
+			final ArgumentList values = valueList.getValues();
+			valueList.setElementType(Types.LONG);
 			for (long l : (long[]) o)
 			{
-				valueList.addValue(new LongValue(l));
+				values.add(new LongValue(l));
 			}
 			return valueList;
 		}
 		else if (c == float[].class)
 		{
-			ArrayExpr valueList = new ArrayExpr();
-			valueList.arrayType = new ArrayType(Types.FLOAT);
-			valueList.elementType = Types.FLOAT;
+			final ArrayExpr valueList = new ArrayExpr();
+			final ArgumentList values = valueList.getValues();
+			valueList.setElementType(Types.FLOAT);
 			for (float f : (float[]) o)
 			{
-				valueList.addValue(new FloatValue(f));
+				values.add(new FloatValue(f));
 			}
 			return valueList;
 		}
 		else if (c == double[].class)
 		{
-			ArrayExpr valueList = new ArrayExpr();
-			valueList.arrayType = new ArrayType(Types.DOUBLE);
-			valueList.elementType = Types.DOUBLE;
+			final ArrayExpr valueList = new ArrayExpr();
+			final ArgumentList values = valueList.getValues();
+			valueList.setElementType(Types.DOUBLE);
 			for (double d : (double[]) o)
 			{
-				valueList.addValue(new DoubleValue(d));
+				values.add(new DoubleValue(d));
 			}
 			return valueList;
 		}

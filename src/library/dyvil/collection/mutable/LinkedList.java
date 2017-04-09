@@ -16,7 +16,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@LiteralConvertible.FromNil
 @LiteralConvertible.FromArray
 public class LinkedList<E> implements MutableList<E>, Deque<E>
 {

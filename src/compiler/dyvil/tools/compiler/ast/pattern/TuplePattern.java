@@ -6,7 +6,9 @@ import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.generic.TypeParameterList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.TupleType;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -92,9 +94,10 @@ public final class TuplePattern extends Pattern implements IPatternList
 		}
 
 		final TupleType tupleType = new TupleType(this.patternCount);
+		final TypeList arguments = tupleType.getArguments();
 		for (int i = 0; i < this.patternCount; i++)
 		{
-			tupleType.addType(this.patterns[i].getType());
+			arguments.add(this.patterns[i].getType());
 		}
 		return this.tupleType = tupleType;
 	}
@@ -115,10 +118,11 @@ public final class TuplePattern extends Pattern implements IPatternList
 		}
 
 		this.tupleType = null; // reset type to recompute it later
+		final TypeParameterList typeParameters = tupleClass.getTypeParameters();
 
 		for (int i = 0; i < this.patternCount; i++)
 		{
-			final IType elementType = Types.resolveTypeSafely(type, tupleClass.getTypeParameter(i));
+			final IType elementType = Types.resolveTypeSafely(type, typeParameters.get(i));
 			final IPattern pattern = this.patterns[i];
 			final IPattern typedPattern = pattern.withType(elementType, markers);
 
@@ -182,6 +186,7 @@ public final class TuplePattern extends Pattern implements IPatternList
 		final int lineNumber = this.getLineNumber();
 		final IType tupleType = this.getType();
 		final IClass tupleClass = tupleType.getTheClass();
+		final TypeParameterList typeParameters = tupleClass.getTypeParameters();
 		final String internalTupleClassName = tupleType.getInternalName();
 
 		for (int i = 0; i < this.patternCount; i++)
@@ -195,7 +200,7 @@ public final class TuplePattern extends Pattern implements IPatternList
 			writer.visitVarInsn(Opcodes.ALOAD, varIndex);
 			writer.visitFieldInsn(Opcodes.GETFIELD, internalTupleClassName, "_" + (i + 1), "Ljava/lang/Object;");
 
-			final IType targetType = Types.resolveTypeSafely(tupleType, tupleClass.getTypeParameter(i));
+			final IType targetType = Types.resolveTypeSafely(tupleType, typeParameters.get(i));
 
 			Types.OBJECT.writeCast(writer, targetType, lineNumber);
 			this.patterns[i].writeInvJump(writer, -1, targetType, elseLabel);

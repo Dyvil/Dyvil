@@ -2,19 +2,12 @@ package dyvil.tools.compiler.ast.generic;
 
 public interface ITypeParametric
 {
-	void setTypeParametric();
-
 	boolean isTypeParametric();
 
-	int typeParameterCount();
+	default int typeArity()
+	{
+		return this.isTypeParametric() ? this.getTypeParameters().size() : 0;
+	}
 
-	ITypeParameter getTypeParameter(int index);
-
-	ITypeParameter[] getTypeParameters();
-
-	void setTypeParameters(ITypeParameter[] typeParameters, int count);
-
-	void setTypeParameter(int index, ITypeParameter typeParameter);
-
-	void addTypeParameter(ITypeParameter typeParameter);
+	TypeParameterList getTypeParameters();
 }
