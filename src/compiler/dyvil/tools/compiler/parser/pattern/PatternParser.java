@@ -167,9 +167,9 @@ public class PatternParser extends Parser implements ITypeConsumer
 			switch (type)
 			{
 			case BaseSymbols.OPEN_PARENTHESIS:
-				final CaseClassPattern caseClassPattern = new CaseClassPattern(token, this.type);
-				pm.pushParser(new PatternListParser(caseClassPattern));
-				this.pattern = caseClassPattern;
+				final UnapplyPattern unapplyPattern = new UnapplyPattern(token, this.type);
+				pm.pushParser(new PatternListParser(unapplyPattern));
+				this.pattern = unapplyPattern;
 				this.mode = CASE_CLASS_END;
 				return;
 			case Tokens.LETTER_IDENTIFIER:
