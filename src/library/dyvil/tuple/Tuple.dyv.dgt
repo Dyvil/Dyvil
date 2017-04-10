@@ -21,6 +21,8 @@ abstract class Tuple
 
 	case class Of1<type +T1>(public let _1: T1)
 	{
+		func unapply() -> Of1<T1> = this
+
 		override func toString() -> String = "Tuple(\(this._1))"
 	}
 
@@ -30,6 +32,8 @@ abstract class Tuple
 		public let _2: T2
 	) implements Entry<T1, T2>
 	{
+		func unapply() -> (T1, T2) = this
+
 		override func getKey() -> T1 = this._1
 
 		override func getValue() -> T2 = this._2
@@ -48,6 +52,8 @@ abstract class Tuple
 		public let _3: T3
 	) implements Cell<T1, T2, T3>
 	{
+		func unapply() -> (T1, T2, T3) = this
+
 		override func getRow() -> T1 = this._1
 
 		override func getColumn() -> T2 = this._2
@@ -75,6 +81,12 @@ abstract class Tuple
 	#end
 	)
 	{
+		func unapply() -> (
+	#for INDEX; 1; ARITY
+			T##INDEX,
+	#end
+		) = this
+
 		override func toString() -> String = new StringBuilder()
 			.append('(').append(this._1)
 	#for INDEX; 2; ARITY

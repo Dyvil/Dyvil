@@ -10,6 +10,7 @@ import dyvil.collection._
 import dyvil.io.Console
 import dyvil.random.Random
 import dyvil.function.PartialFunction
+import dyvil.tuple.Tuple.Of1 as Tuple
 
 import dyvil.util.{
 	Option, None, Some
