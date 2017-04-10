@@ -12,6 +12,7 @@ public final class Names
 	public static final Name applyStatement = Name.fromRaw("applyStatement");
 	public static final Name apply_$amp     = Name.from("apply_&", "apply_$amp");
 	public static final Name update         = Name.fromRaw("update");
+	public static final Name unapply        = Name.fromRaw("unapply");
 	public static final Name subscript      = Name.fromRaw("subscript");
 	public static final Name subscript_$amp = Name.from("subscript_&", "subscript_$amp");
 	public static final Name subscript_$eq  = Name.from("subscript_=", "subscript_$eq");
@@ -39,8 +40,8 @@ public final class Names
 	public static final Name _float   = Name.fromRaw("float");
 	public static final Name _double  = Name.fromRaw("double");
 
-	public static final Name any     = Name.fromRaw("any");
-	public static final Name none    = Name.fromRaw("none");
+	public static final Name any  = Name.fromRaw("any");
+	public static final Name none = Name.fromRaw("none");
 
 	public static final Name eq    = Name.from("=", "$eq");
 	public static final Name colon = Name.from(":", "$colon");

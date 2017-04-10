@@ -3,21 +3,26 @@ package dyvil.tools.compiler.ast.classes.metadata;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.CastOperator;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.InstanceOfOperator;
+import dyvil.tools.compiler.ast.expression.TupleExpr;
 import dyvil.tools.compiler.ast.expression.access.ConstructorCall;
 import dyvil.tools.compiler.ast.expression.access.FieldAccess;
+import dyvil.tools.compiler.ast.expression.access.MethodCall;
+import dyvil.tools.compiler.ast.expression.constant.NullValue;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
-import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.CodeMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
-import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.parameter.ClassParameter;
-import dyvil.tools.compiler.ast.parameter.ParameterList;
+import dyvil.tools.compiler.ast.parameter.*;
+import dyvil.tools.compiler.ast.statement.IfStatement;
+import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.NullableType;
+import dyvil.tools.compiler.ast.type.compound.TupleType;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
@@ -26,10 +31,13 @@ import dyvil.tools.compiler.transform.CaseClasses;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.position.ICodePosition;
 
 public final class CaseClassMetadata extends ClassMetadata
 {
 	protected IMethod applyMethod;
+	protected IMethod unapplyMethod;
+	protected IMethod unapplyAnyMethod;
 
 	public CaseClassMetadata(IClass iclass)
 	{
@@ -71,50 +79,128 @@ public final class CaseClassMetadata extends ClassMetadata
 	{
 		super.resolveTypesGenerate(markers, context);
 
-		if ((this.members & APPLY) != 0)
+		final int modifiers = Modifiers.PUBLIC | Modifiers.STATIC_FINAL;
+		if ((this.members & APPLY) == 0)
+		{
+			// Generate the apply method signature
+
+			final CodeMethod applyMethod = new CodeMethod(this.theClass, Names.apply, this.theClass.getThisType(),
+			                                              new FlagModifierSet(modifiers));
+			applyMethod.getTypeParameters().addAll(this.theClass.getTypeParameters());
+
+			if (this.constructor != null && (this.members & CONSTRUCTOR) == 0)
+			{
+				this.constructor.getParameters().copyTo(applyMethod.getParameters());
+			}
+			else
+			{
+				this.copyClassParameters(applyMethod);
+			}
+
+			this.applyMethod = applyMethod;
+		}
+
+		if ((this.members & UNAPPLY) != 0 && (this.members & UNAPPLY_ANY) != 0)
 		{
 			return;
 		}
 
-		// Generate the apply method signature
-
-		final CodeMethod applyMethod = new CodeMethod(this.theClass, Names.apply, this.theClass.getThisType(),
-		                                              new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC_FINAL));
-		applyMethod.getTypeParameters().addAll(this.theClass.getTypeParameters());
-
-		if (this.constructor != null && (this.members & CONSTRUCTOR) == 0)
+		final TupleType returnType = new TupleType();
+		final TypeList typeArgs = returnType.getArguments();
+		for (IParameter param : this.theClass.getParameters())
 		{
-			this.constructor.getParameters().copyTo(applyMethod.getParameters());
-		}
-		else
-		{
-			this.copyClassParameters(applyMethod);
+			typeArgs.add(param.getType());
 		}
 
-		this.applyMethod = applyMethod;
+		if ((this.members & UNAPPLY) == 0)
+		{
+			// static final func unapply<TypeParams...>(value: This) -> (T...)
+			this.unapplyMethod = new CodeMethod(this.theClass, Names.unapply, returnType,
+			                                    new FlagModifierSet(modifiers));
+			this.unapplyMethod.getTypeParameters().addAll(this.theClass.getTypeParameters());
+			final CodeParameter parameter = new CodeParameter(this.unapplyMethod, null, Names.value,
+			                                                  this.theClass.getThisType());
+			this.unapplyMethod.getParameters().add(parameter);
+		}
+
+		if ((this.members & UNAPPLY_ANY) == 0)
+		{
+			// static final func unapply<TypeParams...>(value: any) -> (T...)?
+			this.unapplyAnyMethod = new CodeMethod(this.theClass, Names.unapply, NullableType.apply(returnType),
+			                                       new FlagModifierSet(modifiers));
+			this.unapplyAnyMethod.getTypeParameters().addAll(this.theClass.getTypeParameters());
+
+			final CodeParameter parameter = new CodeParameter(this.unapplyAnyMethod, null, Names.value,
+			                                                  Types.NULLABLE_ANY);
+			this.unapplyAnyMethod.getParameters().add(parameter);
+		}
 	}
 
 	@Override
-	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
+	public void checkTypes(MarkerList markers, IContext context)
 	{
-		if (this.applyMethod != null && (this.members & APPLY) == 0)
+		super.checkTypes(markers, context);
+
+		if (this.applyMethod != null)
 		{
 			final ArgumentList arguments = new ArgumentList();
-			final ParameterList parameterList = this.applyMethod.getParameters();
 
-			for (int i = 0, count = parameterList.size(); i < count; i++)
+			for (IParameter param : this.applyMethod.getParameters())
 			{
-				arguments.add(new FieldAccess(parameterList.get(i)));
+				arguments.add(new FieldAccess(param));
 			}
 
+			// = new This(params...)
 			this.applyMethod.setValue(new ConstructorCall(this.constructor, arguments));
+		}
+
+		final ICodePosition position = this.theClass.getPosition();
+
+		if (this.unapplyMethod != null)
+		{
+			final IParameter thisParam = this.unapplyAnyMethod.getParameters().get(0);
+
+			final TupleExpr tupleExpr = new TupleExpr(position);
+			final ArgumentList arguments = tupleExpr.getValues();
+
+			for (IParameter param : this.theClass.getParameters())
+			{
+				// value
+				final FieldAccess thisAccess = new FieldAccess(position, null, thisParam);
+				// value.classParam
+				final FieldAccess fieldAccess = new FieldAccess(position, thisAccess, param);
+				arguments.add(fieldAccess);
+			}
+
+			// = (value.classParams...)
+			this.unapplyMethod.setValue(tupleExpr);
+		}
+
+		if (this.unapplyAnyMethod != null)
+		{
+			final IParameter param = this.unapplyAnyMethod.getParameters().get(0);
+
+			// param is This
+			final InstanceOfOperator isOperator = new InstanceOfOperator(new FieldAccess(param),
+			                                                             this.theClass.getClassType());
+			// param as This
+			final CastOperator castOperator = new CastOperator(new FieldAccess(param), this.theClass.getThisType());
+			// unapply(param as This)
+			final IValue call = new MethodCall(position, null, Names.unapply, new ArgumentList(castOperator))
+				                    .resolveCall(markers, context, true);
+			// (param is This) ? unapply(param as This) : null
+			final IfStatement ifStatement = new IfStatement(isOperator, call, new NullValue());
+
+			this.unapplyAnyMethod.setValue(ifStatement);
 		}
 	}
 
 	@Override
 	public boolean checkImplements(IMethod candidate, ITypeContext typeContext)
 	{
-		return this.applyMethod != null && this.applyMethod.overrides(candidate, typeContext);
+		return (this.applyMethod != null && this.applyMethod.overrides(candidate, typeContext)) //
+			       | (this.unapplyMethod != null && this.unapplyMethod.overrides(candidate, typeContext)) //
+			       | (this.unapplyAnyMethod != null && this.unapplyAnyMethod.overrides(candidate, typeContext));
 	}
 
 	@Override
@@ -123,6 +209,19 @@ public final class CaseClassMetadata extends ClassMetadata
 		if (name == Names.apply && this.applyMethod != null)
 		{
 			this.applyMethod.checkMatch(list, receiver, name, arguments);
+		}
+
+		if (name == Names.unapply)
+		{
+			if (this.unapplyMethod != null)
+			{
+				this.unapplyMethod.checkMatch(list, receiver, name, arguments);
+			}
+
+			if (this.unapplyAnyMethod != null)
+			{
+				this.unapplyAnyMethod.checkMatch(list, receiver, name, arguments);
+			}
 		}
 
 		super.getMethodMatches(list, receiver, name, arguments);
@@ -134,9 +233,19 @@ public final class CaseClassMetadata extends ClassMetadata
 		super.write(writer);
 		MethodWriter mw;
 
-		if (this.applyMethod != null && (this.members & APPLY) == 0)
+		if (this.applyMethod != null)
 		{
 			this.applyMethod.write(writer);
+		}
+
+		if (this.unapplyMethod != null)
+		{
+			this.unapplyMethod.write(writer);
+		}
+
+		if (this.unapplyAnyMethod != null)
+		{
+			this.unapplyAnyMethod.write(writer);
 		}
 
 		String internal = this.theClass.getInternalName();

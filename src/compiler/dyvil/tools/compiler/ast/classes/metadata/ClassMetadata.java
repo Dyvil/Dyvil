@@ -1,13 +1,13 @@
 package dyvil.tools.compiler.ast.classes.metadata;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.expression.access.ClassParameterSetter;
-import dyvil.tools.compiler.ast.expression.access.InitializerCall;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.constructor.CodeConstructor;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.expression.access.ClassParameterSetter;
+import dyvil.tools.compiler.ast.expression.access.InitializerCall;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
@@ -15,7 +15,10 @@ import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
-import dyvil.tools.compiler.ast.parameter.*;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
+import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.IParametric;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -30,6 +33,8 @@ public class ClassMetadata implements IClassMetadata
 	protected static final int EQUALS      = 1 << 2;
 	protected static final int HASHCODE    = 1 << 3;
 	protected static final int TOSTRING    = 1 << 4;
+	protected static final int UNAPPLY     = 1 << 5;
+	protected static final int UNAPPLY_ANY = 1 << 6;
 
 	protected static final int READ_RESOLVE  = 1 << 7;
 	protected static final int WRITE_REPLACE = 1 << 8;
@@ -105,7 +110,7 @@ public class ClassMetadata implements IClassMetadata
 		switch (method.getName().unqualified)
 		{
 		case "equals":
-			if (parameters.size() == 1 && parameters.get(0).getCovariantType().getTheClass() == Types.OBJECT_CLASS)
+			if (parameters.size() == 1 && parameters.get(0).getType().getTheClass() == Types.OBJECT_CLASS)
 			{
 				this.members |= EQUALS;
 			}
@@ -126,6 +131,20 @@ public class ClassMetadata implements IClassMetadata
 			if (parameters.matches(this.theClass.getParameters()))
 			{
 				this.members |= APPLY;
+			}
+			return;
+		case "unapply":
+			if (parameters.size() == 1)
+			{
+				final IClass paramClass = parameters.get(0).getType().getTheClass();
+				if (paramClass == Types.OBJECT_CLASS)
+				{
+					this.members |= UNAPPLY_ANY;
+				}
+				else if (paramClass == this.theClass)
+				{
+					this.members |= UNAPPLY;
+				}
 			}
 			return;
 		case "readResolve":
