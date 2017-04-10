@@ -26,10 +26,10 @@ public interface IHeaderUnit extends IASTNode, IObjectCompilable, IContext, ICla
 
 	IContext getContext();
 
-	void setName(Name name);
-	
 	Name getName();
-	
+
+	void setName(Name name);
+
 	// Package
 	
 	void setPackage(Package pack);
@@ -64,10 +64,6 @@ public interface IHeaderUnit extends IASTNode, IObjectCompilable, IContext, ICla
 
 	@Override
 	IOperator resolveOperator(Name name, byte type);
-	
-	IOperator getOperator(int index);
-
-	void setOperator(int index, IOperator operator);
 
 	@Override
 	void addOperator(IOperator operator);
@@ -78,10 +74,6 @@ public interface IHeaderUnit extends IASTNode, IObjectCompilable, IContext, ICla
 	
 	@Override
 	void resolveTypeAlias(MatchList<ITypeAlias> matches, IType receiver, Name name, TypeList arguments);
-
-	ITypeAlias getTypeAlias(int index);
-
-	void setTypeAlias(int index, ITypeAlias typeAlias);
 
 	@Override
 	void addTypeAlias(ITypeAlias typeAlias);
