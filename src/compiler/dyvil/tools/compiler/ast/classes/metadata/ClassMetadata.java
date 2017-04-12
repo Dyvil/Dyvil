@@ -213,7 +213,7 @@ public class ClassMetadata implements IClassMetadata
 			// Generate the constructor signature
 
 			final CodeConstructor constructor = new CodeConstructor(this.theClass,
-			                                                        new FlagModifierSet(Modifiers.PUBLIC));
+			                                                        new FlagModifierSet(Modifiers.PUBLIC | Modifiers.GENERATED));
 
 			this.copyClassParameters(constructor);
 

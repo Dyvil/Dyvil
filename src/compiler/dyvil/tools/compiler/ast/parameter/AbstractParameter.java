@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -27,9 +28,11 @@ import java.lang.annotation.ElementType;
 public abstract class AbstractParameter extends Variable implements IParameter
 {
 	// Metadata
-	protected ICallableMember method;
-	protected int             index;
-	private   IType           covariantType;
+	protected @Nullable ICallableMember method;
+
+	protected int index;
+
+	private IType covariantType;
 
 	public AbstractParameter()
 	{
@@ -165,6 +168,11 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
+		if (this.method != null && this.method.hasModifier(Modifiers.GENERATED))
+		{
+			this.getModifiers().addIntModifier(Modifiers.GENERATED);
+		}
+
 		super.resolveTypes(markers, context);
 
 		if (this.value != null)

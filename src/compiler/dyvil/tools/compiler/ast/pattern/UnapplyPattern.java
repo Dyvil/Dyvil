@@ -87,7 +87,7 @@ public class UnapplyPattern extends Pattern implements IPatternList
 		// PatternType.unapply(_ : MatchedType)
 		final MethodCall methodCall = new MethodCall(this.position, new ClassAccess(this.type), Names.unapply,
 		                                             new ArgumentList(new DummyValue(type)));
-		final IValue method = methodCall.resolveCall(new MarkerList(Markers.INSTANCE), this.type.getTheClass(), false);
+		final IValue method = methodCall.resolveCall(MarkerList.BLACKHOLE, this.type.getTheClass(), false);
 		return method != null && this.withMethod(method, markers) ? this : null;
 	}
 

@@ -11,6 +11,8 @@ import java.util.Iterator;
 
 public final class MarkerList implements Iterable<Marker>
 {
+	public static final MarkerList BLACKHOLE = new MarkerList(s -> s);
+
 	private Marker[] markers;
 	private int      markerCount;
 

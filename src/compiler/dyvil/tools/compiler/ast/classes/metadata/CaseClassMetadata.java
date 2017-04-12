@@ -49,15 +49,23 @@ public final class CaseClassMetadata extends ClassMetadata
 	{
 		super.resolveTypesPre(markers, context);
 
-		final ParameterList parameters = this.theClass.getParameters();
-		for (int i = 0, count = parameters.size(); i < count; i++)
+		for (IParameter param : this.theClass.getParameters())
 		{
-			final ClassParameter classParameter = (ClassParameter) parameters.get(i);
+			final ClassParameter classParameter = (ClassParameter) param;
+			if (classParameter.getProperty() != null)
+			{
+				// Ignore class parameters that already have a property
+				continue;
+			}
+
+			// Create a property with getter
 			final IProperty property = classParameter.createProperty();
+			property.getModifiers().addIntModifier(Modifiers.GENERATED);
 			property.initGetter();
 
 			if (!classParameter.hasModifier(Modifiers.FINAL))
 			{
+				// and setter, for non-final class parameters
 				property.initSetter();
 			}
 		}
@@ -79,7 +87,7 @@ public final class CaseClassMetadata extends ClassMetadata
 	{
 		super.resolveTypesGenerate(markers, context);
 
-		final int modifiers = Modifiers.PUBLIC | Modifiers.STATIC_FINAL;
+		final int modifiers = Modifiers.PUBLIC | Modifiers.STATIC_FINAL | Modifiers.GENERATED;
 		if ((this.members & APPLY) == 0)
 		{
 			// Generate the apply method signature

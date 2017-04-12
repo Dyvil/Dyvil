@@ -11,10 +11,10 @@ import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.CodeMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
+import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
-import dyvil.tools.compiler.ast.parameter.CodeParameter;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
+import dyvil.tools.compiler.ast.parameter.CodeParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -125,7 +125,7 @@ public class Property extends Member implements IProperty
 		this.setter = new CodeMethod(this.enclosingClass, name, Types.VOID, this.modifiers);
 		this.setter.setPosition(this.position);
 		this.setterParameter = new CodeParameter(this.setter, this.position, Names.newValue, this.type,
-		                                         EmptyModifiers.INSTANCE, null);
+		                                         new FlagModifierSet(), null);
 		this.setter.getParameters().add(this.setterParameter);
 
 		return this.setter;
@@ -176,13 +176,21 @@ public class Property extends Member implements IProperty
 
 		if (this.getter != null)
 		{
-			Field.copyModifiers(this.modifiers, this.getter.getModifiers());
+			final ModifierSet getterModifiers = this.getter.getModifiers();
+
+			getterModifiers.addIntModifier(Modifiers.GENERATED);
+			Field.copyModifiers(this.modifiers, getterModifiers);
+
 			this.getter.setType(this.type);
 			this.getter.resolveTypes(markers, context);
 		}
 		if (this.setter != null)
 		{
-			Field.copyModifiers(this.modifiers, this.setter.getModifiers());
+			final ModifierSet setterModifiers = this.setter.getModifiers();
+
+			setterModifiers.addIntModifier(Modifiers.GENERATED);
+			Field.copyModifiers(this.modifiers, setterModifiers);
+
 			this.setterParameter.setPosition(this.setter.getPosition());
 			this.setterParameter.setType(this.type);
 			this.setter.resolveTypes(markers, context);

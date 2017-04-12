@@ -161,7 +161,7 @@ public abstract class Member implements IMember
 	{
 		if (this.type != null)
 		{
-			this.type = this.type.resolveType(markers, context);
+			this.type = this.type.resolveType(this.hasModifier(Modifiers.GENERATED) ? MarkerList.BLACKHOLE : markers, context);
 		}
 
 		if (this.annotations != null)

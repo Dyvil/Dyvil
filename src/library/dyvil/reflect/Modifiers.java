@@ -208,6 +208,8 @@ public interface Modifiers
 	 */
 	int OVERRIDE = 0x20000000;
 
+	int GENERATED = 0x80000000;
+
 	// Masks
 
 	/**
