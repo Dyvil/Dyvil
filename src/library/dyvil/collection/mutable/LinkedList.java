@@ -643,13 +643,13 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	}
 
 	@Override
-	public void filter(@NonNull Predicate<? super E> condition)
+	public void filter(@NonNull Predicate<? super E> predicate)
 	{
 		Node<E> node = this.first;
 		while (node != null)
 		{
 			Node<E> next = node.next;
-			if (!condition.test(node.item))
+			if (!predicate.test(node.item))
 			{
 				this.unlink(node);
 			}

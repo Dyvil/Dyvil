@@ -377,7 +377,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 
 	@NonNull
 	@Override
-	public ImmutableMap<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> condition)
+	public ImmutableMap<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> predicate)
 	{
 		Object[] newValues = this.values.clone();
 		int newSize = this.size;
@@ -388,7 +388,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractEnumMap<K, V> impleme
 			Object value = this.values[i];
 			if (value != null)
 			{
-				if (!condition.test(this.keys[i], (V) value))
+				if (!predicate.test(this.keys[i], (V) value))
 				{
 					newValues[i] = null;
 					newSize--;

@@ -156,9 +156,9 @@ public class ListView<E> implements ImmutableList<E>
 
 	@NonNull
 	@Override
-	public ImmutableList<E> filtered(@NonNull Predicate<? super E> condition)
+	public ImmutableList<E> filtered(@NonNull Predicate<? super E> predicate)
 	{
-		return new ListView<>(this.list.filtered(condition));
+		return new ListView<>(this.list.filtered(predicate));
 	}
 
 	@NonNull

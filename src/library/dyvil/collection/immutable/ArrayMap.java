@@ -414,7 +414,7 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 
 	@NonNull
 	@Override
-	public ImmutableMap<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> condition)
+	public ImmutableMap<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> predicate)
 	{
 		K[] keys = (K[]) new Object[this.size];
 		V[] values = (V[]) new Object[this.size];
@@ -424,7 +424,7 @@ public class ArrayMap<K, V> extends AbstractArrayMap<K, V> implements ImmutableM
 		{
 			K k = (K) this.keys[i];
 			V v = (V) this.values[i];
-			if (!condition.test(k, v))
+			if (!predicate.test(k, v))
 			{
 				continue;
 			}

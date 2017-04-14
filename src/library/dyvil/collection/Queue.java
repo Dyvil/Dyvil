@@ -113,7 +113,7 @@ public interface Queue<E> extends Queryable<E>, Serializable
 	void flatMap(@NonNull Function<? super E, ? extends @NonNull Iterable<? extends E>> mapper);
 
 	@Override
-	void filter(@NonNull Predicate<? super E> condition);
+	void filter(@NonNull Predicate<? super E> predicate);
 
 	/**
 	 * Returns a copy of this queue that contains the same elements as this queue in the same order.

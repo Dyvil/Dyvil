@@ -133,7 +133,7 @@ public final class EmptySet<E> implements ImmutableSet<E>
 
 	@NonNull
 	@Override
-	public ImmutableSet<E> filtered(@NonNull Predicate<? super E> condition)
+	public ImmutableSet<E> filtered(@NonNull Predicate<? super E> predicate)
 	{
 		return this;
 	}

@@ -118,7 +118,7 @@ public interface Deque<E> extends BidiQueryable<E>, Queue<E>, Stack<E>
 	void map(@NonNull Function<? super E, ? extends E> mapper);
 
 	@Override
-	void filter(@NonNull Predicate<? super E> condition);
+	void filter(@NonNull Predicate<? super E> predicate);
 
 	@Override
 	void flatMap(@NonNull Function<? super E, ? extends @NonNull Iterable<? extends E>> mapper);

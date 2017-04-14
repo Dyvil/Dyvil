@@ -202,12 +202,12 @@ public interface MutableList<E> extends List<E>, MutableCollection<E>
 
 	@NonNull
 	@Override
-	default MutableList<E> filtered(@NonNull Predicate<? super E> condition)
+	default MutableList<E> filtered(@NonNull Predicate<? super E> predicate)
 	{
 		MutableList<E> copy = this.emptyCopy();
 		for (E e : this)
 		{
-			if (condition.test(e))
+			if (predicate.test(e))
 			{
 				copy.add(e);
 			}

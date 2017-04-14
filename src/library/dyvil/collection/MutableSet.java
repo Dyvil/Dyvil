@@ -138,10 +138,10 @@ public interface MutableSet<E> extends Set<E>, MutableCollection<E>
 
 	@NonNull
 	@Override
-	default MutableSet<E> filtered(@NonNull Predicate<? super E> condition)
+	default MutableSet<E> filtered(@NonNull Predicate<? super E> predicate)
 	{
 		MutableSet<E> copy = this.copy();
-		copy.filter(condition);
+		copy.filter(predicate);
 		return copy;
 	}
 

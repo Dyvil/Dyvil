@@ -203,9 +203,9 @@ public class SingletonList<E> implements ImmutableList<E>
 
 	@NonNull
 	@Override
-	public ImmutableList<E> filtered(@NonNull Predicate<? super E> condition)
+	public ImmutableList<E> filtered(@NonNull Predicate<? super E> predicate)
 	{
-		if (condition.test(this.element))
+		if (predicate.test(this.element))
 		{
 			return this;
 		}

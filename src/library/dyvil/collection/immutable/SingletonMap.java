@@ -229,9 +229,9 @@ public class SingletonMap<K, V> implements ImmutableMap<K, V>, Entry<K, V>
 
 	@NonNull
 	@Override
-	public ImmutableMap<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> condition)
+	public ImmutableMap<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> predicate)
 	{
-		return condition.test(this.key, this.value) ? this : EmptyMap.instance;
+		return predicate.test(this.key, this.value) ? this : EmptyMap.instance;
 	}
 
 	@Override

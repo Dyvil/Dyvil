@@ -42,9 +42,9 @@ public class MapValues<V> implements Queryable<V>
 	}
 
 	@Override
-	public void filter(@NonNull Predicate<? super V> condition)
+	public void filter(@NonNull Predicate<? super V> predicate)
 	{
-		this.entries.filterByValue(condition);
+		this.entries.filterByValue(predicate);
 	}
 
 	@NonNull
@@ -64,9 +64,9 @@ public class MapValues<V> implements Queryable<V>
 
 	@NonNull
 	@Override
-	public Queryable<V> filtered(@NonNull Predicate<? super V> condition)
+	public Queryable<V> filtered(@NonNull Predicate<? super V> predicate)
 	{
-		return this.entries.filteredByValue(condition).values();
+		return this.entries.filteredByValue(predicate).values();
 	}
 
 	@NonNull

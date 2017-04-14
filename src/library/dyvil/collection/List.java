@@ -260,7 +260,7 @@ public interface List<E> extends Collection<E>, BidiQueryable<E>
 
 	@NonNull
 	@Override
-	List<E> filtered(@NonNull Predicate<? super E> condition);
+	List<E> filtered(@NonNull Predicate<? super E> predicate);
 
 	@NonNull List<E> reversed();
 

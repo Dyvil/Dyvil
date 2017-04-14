@@ -332,14 +332,14 @@ public class IdentityHashMap<K, V> extends AbstractIdentityHashMap<K, V> impleme
 
 	@NonNull
 	@Override
-	public ImmutableMap<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> condition)
+	public ImmutableMap<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> predicate)
 	{
 		IdentityHashMap<K, V> copy = new IdentityHashMap<>(this.size);
 		for (Entry<K, V> entry : this)
 		{
 			K key = entry.getKey();
 			V value = entry.getValue();
-			if (condition.test(key, value))
+			if (predicate.test(key, value))
 			{
 				copy.putInternal(key, value);
 			}

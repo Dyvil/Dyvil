@@ -224,20 +224,20 @@ public interface ImmutableMap<@Covariant K, @Covariant V> extends Map<K, V>
 
 	@NonNull
 	@Override
-	ImmutableMap<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> condition);
+	ImmutableMap<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> predicate);
 
 	@NonNull
 	@Override
-	default ImmutableMap<K, V> filteredByKey(@NonNull Predicate<? super K> condition)
+	default ImmutableMap<K, V> filteredByKey(@NonNull Predicate<? super K> predicate)
 	{
-		return this.filtered(((k, v) -> condition.test(k)));
+		return this.filtered(((k, v) -> predicate.test(k)));
 	}
 
 	@NonNull
 	@Override
-	default ImmutableMap<K, V> filteredByValue(@NonNull Predicate<? super V> condition)
+	default ImmutableMap<K, V> filteredByValue(@NonNull Predicate<? super V> predicate)
 	{
-		return this.filtered(((k, v) -> condition.test(v)));
+		return this.filtered(((k, v) -> predicate.test(v)));
 	}
 
 	@NonNull

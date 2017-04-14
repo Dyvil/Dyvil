@@ -194,7 +194,7 @@ public final class EmptyList<E> implements ImmutableList<E>
 
 	@NonNull
 	@Override
-	public ImmutableList<E> filtered(@NonNull Predicate<? super E> condition)
+	public ImmutableList<E> filtered(@NonNull Predicate<? super E> predicate)
 	{
 		return this;
 	}

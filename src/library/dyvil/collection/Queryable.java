@@ -256,16 +256,16 @@ public interface Queryable<E> extends SizedIterable<E>
 	 * Removes all elements from the query that do not fulfill the requirement given by the {@code condition}, i.e. if
 	 * {@code condition.test(element)} returns {@code false}.
 	 *
-	 * @param condition
+	 * @param predicate
 	 * 	the condition
 	 */
-	void filter(@NonNull Predicate<? super E> condition);
+	void filter(@NonNull Predicate<? super E> predicate);
 
 	<R> @NonNull Queryable<R> mapped(@NonNull Function<? super E, ? extends R> mapper);
 
 	<R> @NonNull Queryable<R> flatMapped(@NonNull Function<? super E, ? extends @NonNull Iterable<? extends R>> mapper);
 
-	@NonNull Queryable<E> filtered(@NonNull Predicate<? super E> condition);
+	@NonNull Queryable<E> filtered(@NonNull Predicate<? super E> predicate);
 
 	@NonNull
 	default String toString(String prefix, String separator, String postfix)

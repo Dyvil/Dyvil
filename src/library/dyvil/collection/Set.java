@@ -126,7 +126,7 @@ public interface Set<E> extends Collection<E>
 
 	@NonNull
 	@Override
-	Set<E> filtered(@NonNull Predicate<? super E> condition);
+	Set<E> filtered(@NonNull Predicate<? super E> predicate);
 
 	// Mutating Operations
 

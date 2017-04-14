@@ -177,9 +177,9 @@ public class SingletonSet<E> implements ImmutableSet<E>
 
 	@NonNull
 	@Override
-	public ImmutableSet<E> filtered(@NonNull Predicate<? super E> condition)
+	public ImmutableSet<E> filtered(@NonNull Predicate<? super E> predicate)
 	{
-		if (condition.test(this.element))
+		if (predicate.test(this.element))
 		{
 			return ImmutableSet.apply(this.element);
 		}

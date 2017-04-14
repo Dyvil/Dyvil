@@ -246,28 +246,28 @@ public interface MutableMap<K, V> extends Map<K, V>
 
 	@NonNull
 	@Override
-	default MutableMap<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> condition)
+	default MutableMap<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> predicate)
 	{
 		MutableMap<K, V> copy = this.copy();
-		copy.filter(condition);
+		copy.filter(predicate);
 		return copy;
 	}
 
 	@NonNull
 	@Override
-	default MutableMap<K, V> filteredByKey(@NonNull Predicate<? super K> condition)
+	default MutableMap<K, V> filteredByKey(@NonNull Predicate<? super K> predicate)
 	{
 		MutableMap<K, V> copy = this.copy();
-		copy.filterByKey(condition);
+		copy.filterByKey(predicate);
 		return copy;
 	}
 
 	@NonNull
 	@Override
-	default MutableMap<K, V> filteredByValue(@NonNull Predicate<? super V> condition)
+	default MutableMap<K, V> filteredByValue(@NonNull Predicate<? super V> predicate)
 	{
 		MutableMap<K, V> copy = this.copy();
-		copy.filterByValue(condition);
+		copy.filterByValue(predicate);
 		return copy;
 	}
 

@@ -478,11 +478,11 @@ public interface Map<K, V> extends SizedIterable<Entry<K, V>>, Serializable
 
 	<NK, NV> @NonNull Map<NK, NV> flatMapped(@NonNull BiFunction<? super K, ? super V, ? extends Iterable<? extends @NonNull Entry<? extends NK, ? extends NV>>> mapper);
 
-	@NonNull Map<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> condition);
+	@NonNull Map<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> predicate);
 
-	@NonNull Map<K, V> filteredByKey(@NonNull Predicate<? super K> condition);
+	@NonNull Map<K, V> filteredByKey(@NonNull Predicate<? super K> predicate);
 
-	@NonNull Map<K, V> filteredByValue(@NonNull Predicate<? super V> condition);
+	@NonNull Map<K, V> filteredByValue(@NonNull Predicate<? super V> predicate);
 
 	@NonNull Map<V, K> inverted();
 

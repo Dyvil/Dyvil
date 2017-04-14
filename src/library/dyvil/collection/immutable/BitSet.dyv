@@ -144,39 +144,24 @@ public class BitSet extends AbstractBitSet implements ImmutableSet<int>
 		return copy
 	}
 
-	public override ImmutableSet<R> mapped<R>(java.util.function.Function<-int, +R> mapper)
+	public override func mapped<R>(mapper: java.util.function.Function<-int, +R>) -> ImmutableSet<R>
 	{
 		let builder = ImmutableSet.builder<R>
-		for (int element <- this)
-		{
-			builder.add(mapper.apply(element))
-		}
+		for (element <- this) builder.add(mapper(element))
 		return builder.build
 	}
 
-	public override ImmutableSet<R> flatMapped<R>(java.util.function.Function<-int, +Iterable<+R>> mapper)
+	public override func flatMapped<R>(mapper: java.util.function.Function<-int, +Iterable<+R>>) -> ImmutableSet<R>
 	{
 		let builder = ImmutableSet.builder<R>
-		for (int element <- this)
-		{
-			for (R result <- mapper.apply(element))
-			{
-				builder.add(result)
-			}
-		}
+		for (element <- this) for (result <- mapper.apply(element)) builder.add(result)
 		return builder.build
 	}
 
-	public override BitSet filtered(java.util.function.Predicate<-int> condition)
+	public override func filtered(predicate: java.util.function.Predicate<-int>) -> BitSet
 	{
 		let copy = new BitSet(this.size)
-		for (int element <- this)
-		{
-			if (condition.test(element))
-			{
-				copy.setBit(element)
-			}
-		}
+		for (element <- this) if (predicate.test(element)) copy.setBit(element)
 		return copy
 	}
 

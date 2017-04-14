@@ -270,14 +270,14 @@ public class ArrayList<E> extends AbstractArrayList<E> implements ImmutableList<
 
 	@NonNull
 	@Override
-	public ImmutableList<E> filtered(@NonNull Predicate<? super E> condition)
+	public ImmutableList<E> filtered(@NonNull Predicate<? super E> predicate)
 	{
 		int index = 0;
 		Object[] array = new Object[this.size];
 		for (int i = 0; i < this.size; i++)
 		{
 			Object e = this.elements[i];
-			if (condition.test((E) e))
+			if (predicate.test((E) e))
 			{
 				array[index++] = e;
 			}

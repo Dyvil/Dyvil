@@ -200,7 +200,7 @@ public final class EmptyMap<K, V> implements ImmutableMap<K, V>
 
 	@NonNull
 	@Override
-	public ImmutableMap<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> condition)
+	public ImmutableMap<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> predicate)
 	{
 		return this;
 	}

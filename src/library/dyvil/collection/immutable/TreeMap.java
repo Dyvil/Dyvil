@@ -316,14 +316,14 @@ public class TreeMap<K, V> extends AbstractTreeMap<K, V> implements ImmutableMap
 
 	@NonNull
 	@Override
-	public ImmutableMap<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> condition)
+	public ImmutableMap<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> predicate)
 	{
 		TreeMap<K, V> copy = new TreeMap<>(this, this.comparator);
 		for (TreeEntry<K, V> entry = this.getFirstEntry(); entry != null; entry = successor(entry))
 		{
 			K key = entry.key;
 			V value = entry.value;
-			if (condition.test(key, value))
+			if (predicate.test(key, value))
 			{
 				copy.putInternal(key, value);
 			}

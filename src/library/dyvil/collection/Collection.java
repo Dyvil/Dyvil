@@ -278,14 +278,14 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 * Returns a collection that is filtered from this collection by filtering each of this collection's elements using
 	 * the given {@code condition}.
 	 *
-	 * @param condition
+	 * @param predicate
 	 * 	the filter condition predicate
 	 *
 	 * @return a collection filtered by the filter condition predicate
 	 */
 	@NonNull
 	@Override
-	Collection<E> filtered(@NonNull Predicate<? super E> condition);
+	Collection<E> filtered(@NonNull Predicate<? super E> predicate);
 
 	// Mutating Operations
 
@@ -446,16 +446,16 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 * this collection's elements to the predicate condition, and removing them if the predicate fails, i.e. returns
 	 * {@code false}.
 	 *
-	 * @param condition
+	 * @param predicate
 	 * 	the filter condition predicate
 	 */
 	@Override
-	default void filter(@NonNull Predicate<? super E> condition)
+	default void filter(@NonNull Predicate<? super E> predicate)
 	{
 		Iterator<E> iterator = this.iterator();
 		while (iterator.hasNext())
 		{
-			if (!condition.test(iterator.next()))
+			if (!predicate.test(iterator.next()))
 			{
 				iterator.remove();
 			}
