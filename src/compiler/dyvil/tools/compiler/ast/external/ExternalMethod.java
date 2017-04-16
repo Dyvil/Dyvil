@@ -15,7 +15,6 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.method.AbstractMethod;
 import dyvil.tools.compiler.ast.method.IExternalCallableMember;
-import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.intrinsic.IntrinsicData;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
@@ -164,13 +163,6 @@ public final class ExternalMethod extends AbstractMethod implements IExternalCal
 	@Override
 	public void setValue(IValue value)
 	{
-	}
-
-	@Override
-	protected boolean checkOverride0(IMethod candidate)
-	{
-		this.resolveParameters();
-		return false;
 	}
 
 	@Override

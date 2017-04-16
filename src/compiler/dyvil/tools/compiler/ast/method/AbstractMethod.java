@@ -3,6 +3,8 @@ package dyvil.tools.compiler.ast.method;
 import dyvil.annotation.Mutating;
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
+import dyvil.collection.Set;
+import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Handle;
@@ -86,6 +88,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	protected           String        descriptor;
 	protected           String        signature;
 	protected @Nullable IntrinsicData intrinsicData;
+	protected @Nullable Set<IMethod>  overrideMethods;
 
 	public AbstractMethod(IClass enclosingClass)
 	{
@@ -795,24 +798,25 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return false;
 		}
 
+		final ParameterList thisParameters = this.getParameters();
 		final ParameterList candidateParameters = candidate.getParameters();
 
 		// Check Parameter Count
-		if (candidateParameters.size() != this.parameters.size())
+		if (candidateParameters.size() != thisParameters.size())
 		{
 			return false;
 		}
 
-		// The above checks can be made without checking the cache (CodeMethod) or resolving parameter types (ExternalMethod)
-		if (this.checkOverride0(candidate))
+		// Check the cache
+		if (this.overrideMethods != null && this.overrideMethods.contains(candidate))
 		{
 			return true;
 		}
 
 		// Check Parameter Types
-		for (int i = 0, count = this.parameters.size(); i < count; i++)
+		for (int i = 0, count = thisParameters.size(); i < count; i++)
 		{
-			final IType parType = this.parameters.get(i).getCovariantType().getConcreteType(typeContext);
+			final IType parType = thisParameters.get(i).getCovariantType().getConcreteType(typeContext);
 			final IType candidateParType = candidateParameters.get(i).getCovariantType().getConcreteType(typeContext);
 			if (!Types.isSameType(parType, candidateParType))
 			{
@@ -823,14 +827,19 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		return true;
 	}
 
-	protected boolean checkOverride0(IMethod candidate)
-	{
-		return false;
-	}
-
 	@Override
 	public void addOverride(IMethod method)
 	{
+		if (!this.enclosingClass.isSubClassOf(method.getEnclosingClass().getClassType()))
+		{
+			return;
+		}
+
+		if (this.overrideMethods == null)
+		{
+			this.overrideMethods = new IdentityHashSet<>();
+		}
+		this.overrideMethods.add(method);
 	}
 
 	@Override

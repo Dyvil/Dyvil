@@ -60,6 +60,12 @@ public final class WildcardType extends TypeDelegate implements IRawType, ITyped
 		this.variance = variance;
 	}
 
+	public static IType unapply(IType type)
+	{
+		final WildcardType extracted = type.extract(WildcardType.class);
+		return extracted != null ? extracted.type : type;
+	}
+
 	@Override
 	protected IType wrap(IType type)
 	{
@@ -128,33 +134,6 @@ public final class WildcardType extends TypeDelegate implements IRawType, ITyped
 	public boolean hasTypeVariables()
 	{
 		return this.type.hasTypeVariables();
-	}
-
-	@Override
-	public IType asReturnType()
-	{
-		if (this.variance == Variance.CONTRAVARIANT)
-		{
-			return Types.ANY;
-		}
-		return this.type;
-	}
-
-	@Override
-	public IType asParameterType()
-	{
-		if (this.type == null)
-		{
-			return this;
-		}
-
-		final IType type = this.type.asParameterType();
-		if (this.variance == Variance.CONTRAVARIANT)
-		{
-			return type;
-		}
-
-		return type == this.type ? this : new WildcardType(this.variance, type);
 	}
 
 	@Override
@@ -268,7 +247,7 @@ public final class WildcardType extends TypeDelegate implements IRawType, ITyped
 	@Override
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
-		this.type.writeAnnotations(visitor, typeRef, typePath + '*');
+		IType.writeAnnotations(this.type, visitor, typeRef, typePath + '*');
 	}
 
 	@Override

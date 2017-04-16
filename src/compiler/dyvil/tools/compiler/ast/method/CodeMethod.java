@@ -4,7 +4,6 @@ import dyvil.annotation.Reified;
 import dyvil.collection.Collection;
 import dyvil.collection.Set;
 import dyvil.collection.mutable.HashSet;
-import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.AnnotationVisitor;
@@ -52,9 +51,6 @@ import java.util.Iterator;
 public class CodeMethod extends AbstractMethod
 {
 	protected IValue value;
-
-	// Metadata
-	protected Set<IMethod> overrideMethods;
 
 	public CodeMethod(IClass iclass)
 	{
@@ -367,21 +363,6 @@ public class CodeMethod extends AbstractMethod
 	}
 
 	@Override
-	public void addOverride(IMethod method)
-	{
-		if (!this.enclosingClass.isSubClassOf(method.getEnclosingClass().getClassType()))
-		{
-			return;
-		}
-
-		if (this.overrideMethods == null)
-		{
-			this.overrideMethods = new IdentityHashSet<>();
-		}
-		this.overrideMethods.add(method);
-	}
-
-	@Override
 	public IntrinsicData getIntrinsicData()
 	{
 		final IAnnotation annotation = this.getAnnotation(Types.INTRINSIC_CLASS);
@@ -400,12 +381,6 @@ public class CodeMethod extends AbstractMethod
 		{
 			return super.getIntrinsicData();
 		}
-	}
-
-	@Override
-	protected boolean checkOverride0(IMethod candidate)
-	{
-		return this.overrideMethods != null && this.overrideMethods.contains(candidate);
 	}
 
 	private void checkOverrideMethods(MarkerList markers)

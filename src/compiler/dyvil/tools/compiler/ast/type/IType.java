@@ -181,11 +181,6 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 
 	IType getObjectType();
 
-	default IType asReturnType()
-	{
-		return this;
-	}
-
 	default IType asParameterType()
 	{
 		return this.getConcreteType(ITypeContext.COVARIANT);

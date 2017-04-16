@@ -116,12 +116,6 @@ public abstract class TypeDelegate implements IType, ITyped
 	}
 
 	@Override
-	public IType asReturnType()
-	{
-		return this.type.asReturnType();
-	}
-
-	@Override
 	public IType asParameterType()
 	{
 		final IType type = this.type.asParameterType();
