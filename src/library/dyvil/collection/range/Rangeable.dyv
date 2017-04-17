@@ -10,11 +10,11 @@ public interface Rangeable<type SELF: Rangeable<SELF>> extends Comparable<SELF>
 
 	override func compareTo(other: SELF) -> int
 
-	override func equals(other: Object!) -> boolean
+	override func equals(other: any!) -> boolean
 
 	override func hashCode() -> int
 
-	infix inline func .. <T: Rangeable>(T from, T to) -> Range<T> = Range(from, to: to)
+	infix inline func .. <T: Rangeable>(from: T, to: T) -> Range<T> = Range(from, to: to)
 
-	infix inline func ..< <T: Rangeable>(T from, T to) -> Range<T> = Range(from, toExclusive: to)
+	infix inline func ..< <T: Rangeable>(from: T, to: T) -> Range<T> = Range(from, toExclusive: to)
 }

@@ -1,0 +1,184 @@
+package dyvil.collection
+
+import dyvil.util._
+
+import java.util._
+import java.util.stream._
+import java.util.function._
+
+/**
+ * A <b>Queryable</b> represents a special {@link Iterable} that includes a number of special operations for querying.
+ * These operations include {@link #stream()} for lazy evaluation, {@link #fold(Object, BiFunction)}, {@link
+ * #reduce(BiFunction)}, {@link #map(Function)}, {@link #flatMap(Function)} and {@link #filter(Predicate)}.
+ *
+ * @param <E>
+ * 	the element type
+ */
+interface Queryable<E> extends SizedIterable<E>
+{
+	/**
+	 * Creates and returns a sequential {@link Stream} of this query, based on the {@link Spliterator} returned by
+	 * {@link #spliterator()}.
+	 *
+	 * @return a stream of this query
+	 */
+	func stream() -> Stream<E> = StreamSupport.stream(this.spliterator, false)
+
+	/**
+	 * Creates and returns a parallel {@link Stream} of this query, based on the {@link Spliterator} returned by {@link
+	 * #spliterator()}.
+	 *
+	 * @return a parallel stream of this query
+	 */
+	func parallelStream() -> Stream<E> = StreamSupport.stream(this.spliterator, true)
+
+	// Fold and Reduce
+
+	/**
+	 * Folds this entire query into a single value by repeatedly reducing the elements of this query and the initial
+	 * value using the given {@code reducer}. If this query does not contain any elements, the initial value is simply
+	 * returned. Otherwise, it is repeatedly replaced with the result of {@code reducer.apply(initialValue, element)}
+	 * for every element in this query.
+	 *
+	 * @param initialValue
+	 * 	the initial value
+	 * @param reducer
+	 * 	the reducer function
+	 *
+	 * @return the folded value
+	 */
+	func fold<R>(initial: R, reducer: BiFunction<-R, -E, +R>) -> R
+	{
+		for (e <- this) initial = reducer(initial, e)
+		return initial
+	}
+
+	/**
+	 * Reduces this entire query into a single value by repeatedly reducing the elements using the given {@code reducer}
+	 * binary operator.
+	 *
+	 * @param reducer
+	 * 	the reducer binary operator
+	 *
+	 * @return the reduced value
+	 */
+	func reduce(reducer: BiFunction<-E, -E, +E>) -> E?
+	{
+		if (this.isEmpty) return null
+
+		let iterator = this.iterator
+		var initial = iterator.next
+		for (e <- iterator) initial = reducer(initial, e)
+		return initial
+	}
+
+	func reduceOption(reducer: BiFunction<-E, -E, +E>) -> Option<E>
+	{
+		if (this.isEmpty) return None
+		return Some(this.reduce(reducer)!!)
+	}
+
+	// All and Exists
+
+	func allMatch(predicate: Predicate<-E>) -> boolean
+	{
+		for (e <- this) if (!predicate.test(e)) return false
+		return true
+	}
+
+	func exists(predicate: Predicate<-E>) -> boolean
+	{
+		for (e <- this) if (predicate.test(e)) return true
+		return false
+	}
+
+	// Find
+
+	func find(predicate: Predicate<-E>) -> E?
+	{
+		for (e <- this) if (predicate.test(e)) return e
+		return null
+	}
+
+	func findOption(predicate: Predicate<-E>) -> Option<E>
+	{
+		for (e <- this) if (predicate.test(e)) return Some(e)
+		return None
+	}
+
+	/**
+	 * Returns true if and if only this query contains the given {@code element} . By default, 'contains' in defined
+	 * such that any element in this query matches the given element in a way so that {@code
+	 * element.equals(this.element)}.
+	 *
+	 * @param element
+	 * 	the element to find
+	 *
+	 * @return true, iff this query contains the element
+	 */
+	func contains(element: any!) -> boolean = dyvil.collection.Collection.iterableContains(this, element)
+
+	// Map and Filter
+
+	/**
+	 * Maps all elements in this query using the given {@code mapper} function by supplying them to the function and
+	 * replacing them with the result of the call {mapper.apply(element)}.
+	 *
+	 * @param mapper
+	 * 	the mapping function
+	 */
+	func map(mapper: Function<-E, +E>) -> void
+
+	func mapped<R>(mapper: Function<-E, +R>) -> Queryable<R>
+
+	/**
+	 * Maps all elements in this query using the given {@code mapper} function by supplying them to the function and
+	 * replacing them with all results of the call {@code mapper.apply(element)}. If the mapper returns multiple results
+	 * at once, they are 'flattened' and added to this query sequentially as shown in the below example.
+	 *
+	 * ```
+	 * let list = MutableList(1, 2, 3, 4)
+	 * list.flatMap(i => [ i, i * 10 ])
+	 * print list // prints [ 1, 10, 2, 20, 3, 30, 4, 40 ]
+	 * ```
+	 *
+	 * @param mapper
+	 * 	the mapping function
+	 */
+	func flatMap(mapper: Function<-E, +Iterable<+E>>) -> void
+
+	func flatMapped<R>(mapper: Function<-E, +Iterable<+R>>) -> Queryable<R>
+
+	/**
+	 * Removes all elements from the query that do not fulfill the requirement given by the {@code condition}, i.e. if
+	 * {@code condition.test(element)} returns {@code false}.
+	 *
+	 * @param predicate
+	 * 	the condition
+	 */
+	func filter(predicate: Predicate<-E>) -> void
+
+	func filtered(predicate: Predicate<-E>) -> Queryable<E>
+
+	// String Conversion
+
+	func toString(builder: StringBuilder) = this.toString(builder, '[', ', ', ']')
+
+	func toString(start: String, separator: String, end: String) -> String
+		= new StringBuilder().{ this.toString($0, start, separator, end); $0.toString }
+
+	func toString(builder: StringBuilder, start: String, separator: String, end: String) -> void
+	{
+		builder.append(start)
+		if (this.isEmpty)
+		{
+			builder.append(end)
+			return
+		}
+
+		let iterator = this.iterator
+		builder.append(iterator.next) // first
+		for (e <- iterator) builder.append(separator).append(e)
+		builder.append(end)
+	}
+}

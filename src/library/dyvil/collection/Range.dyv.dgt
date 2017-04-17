@@ -25,20 +25,20 @@ public interface Range<+T> extends Queryable<T>, Serializable
 #foreach PRIMITIVE_SPECS
 	#if HAS_RANGE_CLASS
 	@BytecodeName("closed")
-	static func apply(PRIMITIVE from, PRIMITIVE to) -> TYPE_NAME##Range = TYPE_NAME##Range(from, to: to)
+	static func apply(from: PRIMITIVE, to: PRIMITIVE) -> TYPE_NAME##Range = TYPE_NAME##Range(from, to: to)
 	
 	@BytecodeName("halfOpen")
-	static func apply(PRIMITIVE from, PRIMITIVE toExclusive) -> TYPE_NAME##Range = TYPE_NAME##Range(from, toExclusive: toExclusive)
+	static func apply(from: PRIMITIVE, explicit toExclusive: PRIMITIVE) -> TYPE_NAME##Range = TYPE_NAME##Range(from, toExclusive: toExclusive)
 
 	#end
 #end
 	
 	@BytecodeName("closed")
-	static func apply<T extends Rangeable>(T from, T to) -> Range<T>
+	static func apply<T extends Rangeable<T>>(from: T, to: T) -> Range<T>
 		= new dyvil.collection.range.closed.ObjectRange<T>(from, to)
 
 	@BytecodeName("halfOpen")
-	static func apply<T extends Rangeable>(T from, T toExclusive) -> Range<T>
+	static func apply<T extends Rangeable<T>>(from: T, explicit toExclusive: T) -> Range<T>
 		= new dyvil.collection.range.halfopen.ObjectRange<T>(from, toExclusive)
 
 	/**
@@ -78,81 +78,70 @@ public interface Range<+T> extends Queryable<T>, Serializable
 		return Spliterators.spliterator(this.iterator(), size, characteristics)
 	}
 
-	override func contains(Object! element) -> boolean
+	override func contains(element: any!) -> boolean
 
-	override func forEach(Consumer<-T> action) -> void
+	override func forEach(action: T -> void) -> void
 
 	@Mutating
-	override func map(Function<-T, +T> mapper) -> void
+	override func map(mapper: Function<-T, +T>) -> void
 		= throw new ImmutableException("map() on Immutable Range")
 
 	@Mutating
-	override func flatMap(Function<-T, +Iterable<+T>> mapper) -> void
+	override func flatMap(mapper: Function<-T, +Iterable<+T>>) -> void
 		= throw new ImmutableException("flatMap() on Immutable Range")
 
 	@Mutating
-	override func filter(Predicate<-T> condition) -> void
+	override func filter(predicate: Predicate<-T>) -> void
 		= throw new ImmutableException("filter() on Immutable Range")
 	
-	override func mapped<R>(Function<-T, +R> mapper) -> Queryable<R>
+	override func mapped<R>(mapper: Function<-T, +R>) -> Queryable<R>
 	{
 		let builder = new ArrayList.Builder<R>(this.size())
 		for (value <- this) builder.add(mapper(value))
 		return builder.build();
 	}
 
-	override func flatMapped<R>(Function<-T, +Iterable<+R>> mapper) -> Queryable<R>
+	override func flatMapped<R>(mapper: Function<-T, +Iterable<+R>>) -> Queryable<R>
 	{
 		let builder = new ArrayList.Builder<R>(this.size)
 		for (value <- this) for (result <- mapper(value)) builder.add(result)
 		return builder.build
 	}
 	
-	override func filtered(Predicate<-T> condition) -> Queryable<T>
+	override func filtered(predicate: Predicate<-T>) -> Queryable<T>
 	{
 		let builder = new ArrayList.Builder<T>(this.size)
-		for (value <- this) if (condition.test(value)) builder.add(value)
+		for (value <- this) if (predicate.test(value)) builder.add(value)
 		return builder.build()
 	}
 
 	// toArray
 
-	func toArray() -> [Object]
-	{
-		let array = new [Object](this.size)
-		this.toArray(0, array);
-		return array;
-	}
+	func toArray() -> [Object] = new [Object](this.size).{ this.copy($0, 0); $0 }
 
-	func toArray<@Reified(Reified.Type.OBJECT_CLASS) T>() -> [T]
+	func toArray<@Reified(.OBJECT_CLASS) type T: Object!>() -> [T]
 	{
 		let array = Array.newInstance(class T, this.size) as [T]
-		this.toArray(0, array)
+		this.copy(array, 0)
 		return array
 	}
-
-	func toArray([Object!] store) -> void = this.toArray(0, store)
-
-	func toArray(int index, [Object!] store) -> void
 
 	// Copying
 
 	func copy() -> Range<T>
 
+	func copy(to: [Object!]) -> void = this.copy(to, 0)
+
+	func copy(to: [Object!], index: int) -> void
+
 	// toString, equals and hashCode
 
-	override func toString() -> String
+	static func rangeEquals(range: Range<_>, obj: any!) -> boolean
+		= obj is Range && rangeEquals(range, obj as Range)
 
-	override func equals(Object! obj) -> boolean
-
-	override func hashCode() -> int
-
-	static func rangeEquals(Range<_> range, Object! o) -> boolean
-		= o is Range && rangeEquals(range, o as Range)
-
-	static func rangeEquals(Range<_> range, Range<_> other) -> boolean
+	static func rangeEquals(range: Range<_>, other: Range<_>) -> boolean
 		= range.first == other.first && range.last == other.last && range.size == other.size
 
-	static func rangeHashCode(Range<_> range) -> int
+	static func rangeHashCode(range: Range<_>) -> int
 		= ((range.first.hashCode * 31) + range.last.hashCode) * 31 + range.size
 }

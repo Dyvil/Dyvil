@@ -21,17 +21,17 @@ public object EmptyRange implements Range<none>
 
 	override func iterator() -> Iterator<none> = EmptyIterator<none>()
 
-	override func forEach(action: Consumer<-none>) -> void = {}
+	override func forEach(action: none -> void) -> void = {}
 
 	override func contains(element: any!) -> boolean = false
 
-	override func toArray(index: int, store: [Object!]) -> void = {}
-
 	override func copy() -> EmptyRange = this
+
+	override func copy(to: [Object!], index: int) -> void {}
 
 	override func toString() -> String = "EmptyRange"
 
-	override func equals(obj: Object!) -> boolean = obj is Range && (obj as Range).size == 0
+	override func equals(obj: any!) -> boolean = obj is Range && (obj as Range).size == 0
 
 	override func hashCode() -> int = 0
 }

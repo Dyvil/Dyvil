@@ -21,9 +21,6 @@ case class ObjectRange<type +T: Rangeable<T>>(
 	protected @transient let end: T
 ) implements Range<T>
 {
-
-	private const serialVersionUID: long = -8656379367421762895L
-
 #if IS_HALF_OPEN
 	override func isHalfOpen() -> boolean = true
 
@@ -56,10 +53,7 @@ case class ObjectRange<type +T: Rangeable<T>>(
 
 		override func next() -> T
 		{
-			if (!this.hasNext())
-			{
-				throw new NoSuchElementException("End of Range")
-			}
+			if (!this.hasNext()) throw new NoSuchElementException("End of Range")
 
 			let c = this.current
 			this.current = this.current.next
@@ -77,35 +71,17 @@ case class ObjectRange<type +T: Rangeable<T>>(
 #comment // Macro for a loop over the all elements in this range. The loop variable is always called 'current'
 #define FOR_EACH for (var current = this.start; current COMPARE_OP this.end; current = current.next)
 
-	override func forEach(action: Consumer<-T>) -> void
-	{
-		FOR_EACH
-		{
-			action.accept(current)
-		}
-	}
+	override func forEach(action: T -> void) -> void = FOR_EACH action(current)
 
-	override func toArray(index: int, store: [Object!]) -> void
+	override func contains(element: any!)
 	{
-		FOR_EACH
-		{
-			store[index++] = current
-		}
-	}
-
-	override func contains(element: Object!)
-	{
-		FOR_EACH
-		{
-			if (current == element)
-			{
-				return true
-			}
-		}
+		FOR_EACH if (current == element) return true
 		return false
 	}
 
 	override func copy() -> ObjectRange<T> = new ObjectRange<T>(this.start, this.end)
+
+	override func copy(to: [Object!], index: int) -> void = FOR_EACH to[index++] = current
 
 	#if IS_HALF_OPEN
 	override func toString() -> String = this.start + " ..< " + this.end
