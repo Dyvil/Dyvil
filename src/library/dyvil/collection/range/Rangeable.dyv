@@ -1,6 +1,6 @@
 package dyvil.collection.range
 
-public interface Rangeable<type SELF: Rangeable<SELF>> extends Comparable<SELF>
+interface Rangeable<type SELF: Rangeable<SELF>> extends Comparable<SELF>
 {
 	func next() -> SELF
 

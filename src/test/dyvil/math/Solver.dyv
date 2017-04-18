@@ -41,7 +41,7 @@ class Solver
 
 	case class Multiply(let lhs: Expr, let rhs: Expr) implements Expr
 	{
-		override func solve(Context c) -> Expr
+		override func solve(c: Context) -> Expr
 		{
 			let l = this.lhs.solve(c)
 			let r = this.rhs.solve(c)

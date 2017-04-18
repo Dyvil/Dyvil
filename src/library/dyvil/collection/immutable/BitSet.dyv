@@ -5,21 +5,21 @@ import dyvil.lang.LiteralConvertible
 
 @Immutable
 @LiteralConvertible.FromArray
-public class BitSet extends AbstractBitSet implements ImmutableSet<int>
+class BitSet extends AbstractBitSet implements ImmutableSet<int>
 {
-	// Factory methods
+	// Factory Methods
 
-	public static BitSet apply() = new BitSet
+	static func apply() -> BitSet = new BitSet
 
-	public static BitSet apply(int... elements) = new BitSet(elements)
+	static func apply(elements: int...) -> BitSet = new BitSet(elements)
 
-	public static BitSet from([int] array) = new BitSet(array)
+	static func from(array: [int]) -> BitSet = new BitSet(array)
 
-	public static BitSet from(Iterable<+int> iterable) = new BitSet(iterable)
+	static func from(iterable: Iterable<+int>) -> BitSet = new BitSet(iterable)
 
-	public static BitSet from(SizedIterable<+int> iterable) = new BitSet(iterable)
+	static func from(iterable: SizedIterable<+int>) -> BitSet = new BitSet(iterable)
 
-	public static BitSet from(AbstractBitSet bitSet) = new BitSet(bitSet)
+	static func from(bitSet: AbstractBitSet) -> BitSet = new BitSet(bitSet)
 
 	// Constructors
 
@@ -28,36 +28,37 @@ public class BitSet extends AbstractBitSet implements ImmutableSet<int>
 		super.init()
 	}
 
-	protected init(int capacity)
+	protected init(capacity: int)
 	{
 		super.init(capacity)
 	}
 
-	public init([int] elements)
+	public init(elements: [int])
 	{
 		super.init(elements)
 	}
 
-	public init(Iterable<+int> iterable)
+	public init(iterable: Iterable<+int>)
 	{
 		super.init(iterable)
 	}
 
-	public init(SizedIterable<+int> iterable)
+	public init(iterable: SizedIterable<+int>)
 	{
 		super.init(iterable)
 	}
 
-	public init(AbstractBitSet bitSet)
+	public init(bitSet: AbstractBitSet)
 	{
 		super.init(bitSet)
 	}
 
 	// Implementation Methods
 
-	protected override void removeAt(int bit) = throw new dyvil.util.ImmutableException("Iterator.remove() on Immutable Set")
+	protected override func removeAt(bit: int) -> void
+		= throw new dyvil.util.ImmutableException("Iterator.remove() on Immutable Set")
 
-	public override BitSet added(int element)
+	override func added(element: int) -> BitSet
 	{
 		if (this.bitSet(element)) return this
 
@@ -66,11 +67,11 @@ public class BitSet extends AbstractBitSet implements ImmutableSet<int>
 		return copy
 	}
 
-	public override BitSet removed(Object! element)
+	override func removed(element: any!) -> BitSet
 	{
 		if (!(element is Int)) return this
 
-		final int bit = element as int
+		let bit = element as int
 		if (!this.bitSet(bit)) return this
 
 		let copy = new BitSet(this)
@@ -78,24 +79,21 @@ public class BitSet extends AbstractBitSet implements ImmutableSet<int>
 		return copy
 	}
 
-	public override BitSet union(Collection<+int> collection)
+	override func union(collection: Collection<+int>) -> BitSet
 	{
 		if (collection.isEmpty) return this
 
 		let copy = new BitSet(this)
-		for (int element <- collection)
-		{
-			copy.setBit(element)
-		}
+		for (element <- collection) copy.setBit(element)
 		return copy
 	}
 
-	public override BitSet difference(Collection<_> collection)
+	override func difference(collection: Collection<_>) -> BitSet
 	{
 		if (collection.isEmpty || this.isEmpty) return this
 
 		let copy = new BitSet(this)
-		for (Object element <- collection)
+		for (element <- collection)
 		{
 			if (element is Int)
 			{
@@ -105,12 +103,12 @@ public class BitSet extends AbstractBitSet implements ImmutableSet<int>
 		return copy
 	}
 
-	public override BitSet intersection(Collection<+int> collection)
+	override func intersection(collection: Collection<+int>) -> BitSet
 	{
 		if (collection.isEmpty || this.isEmpty) return this
 
 		let copy = new BitSet(this.size)
-		for (int element <- collection)
+		for (element <- collection)
 		{
 			if (this.bitSet(element))
 			{
@@ -120,13 +118,13 @@ public class BitSet extends AbstractBitSet implements ImmutableSet<int>
 		return copy
 	}
 
-	public override BitSet symmetricDifference(Collection<+int> collection)
+	override func symmetricDifference(collection: Collection<+int>) -> BitSet
 	{
 		if (collection.isEmpty) return this
 		if (this.isEmpty) return new BitSet(collection)
 
 		let copy = new BitSet
-		for (int element <- collection)
+		for (element <- collection)
 		{
 			if (!this.bitSet(element))
 			{
@@ -134,7 +132,7 @@ public class BitSet extends AbstractBitSet implements ImmutableSet<int>
 			}
 		}
 
-		for (int element <- this)
+		for (element <- this)
 		{
 			if (!collection.contains(element))
 			{
@@ -144,30 +142,30 @@ public class BitSet extends AbstractBitSet implements ImmutableSet<int>
 		return copy
 	}
 
-	public override func mapped<R>(mapper: java.util.function.Function<-int, +R>) -> ImmutableSet<R>
+	override func mapped<R>(mapper: java.util.function.Function<-int, +R>) -> ImmutableSet<R>
 	{
 		let builder = ImmutableSet.builder<R>
 		for (element <- this) builder.add(mapper(element))
 		return builder.build
 	}
 
-	public override func flatMapped<R>(mapper: java.util.function.Function<-int, +Iterable<+R>>) -> ImmutableSet<R>
+	override func flatMapped<R>(mapper: java.util.function.Function<-int, +Iterable<+R>>) -> ImmutableSet<R>
 	{
 		let builder = ImmutableSet.builder<R>
 		for (element <- this) for (result <- mapper.apply(element)) builder.add(result)
 		return builder.build
 	}
 
-	public override func filtered(predicate: java.util.function.Predicate<-int>) -> BitSet
+	override func filtered(predicate: java.util.function.Predicate<-int>) -> BitSet
 	{
 		let copy = new BitSet(this.size)
 		for (element <- this) if (predicate.test(element)) copy.setBit(element)
 		return copy
 	}
 
-    public override ImmutableSet<int> copy() = this.immutableCopy
+    override func copy() -> ImmutableSet<int> = this.immutableCopy
 
-	public override MutableSet<int> mutable() = this.mutableCopy
+	override func mutable() -> MutableSet<int> = this.mutableCopy
 
-	public override java.util.Set<int> toJava() = java.util.Collections.unmodifiableSet(super.toJava)
+	override func toJava() -> java.util.Set<int> = java.util.Collections.unmodifiableSet(super.toJava)
 }

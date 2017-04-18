@@ -5,9 +5,9 @@ import dyvil.tools.parsing.Name
 import dyvil.tools.parsing.position.ICodePosition
 import dyvil.tools.parsing.ast.IASTNode
 
-public interface NodeElement extends IASTNode, dyvil.tools.dpf.model.NodeElement
+interface NodeElement extends IASTNode, dyvil.tools.dpf.model.NodeElement
 {
 	override func getPosition() -> ICodePosition! = null
 
-	override func setPosition(ICodePosition! position) {}
+	override func setPosition(position: ICodePosition!) {}
 }

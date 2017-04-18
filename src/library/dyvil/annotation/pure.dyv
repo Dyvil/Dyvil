@@ -8,4 +8,4 @@ import java.lang.annotation._
  */
 @Target([ ElementType.METHOD ])
 @Retention(RetentionPolicy.CLASS)
-public @interface pure
+@interface pure

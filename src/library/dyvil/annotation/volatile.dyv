@@ -8,4 +8,4 @@ import java.lang.annotation._
  */
 @Target([ ElementType.FIELD ])
 @Retention(RetentionPolicy.SOURCE)
-public @interface volatile
+@interface volatile

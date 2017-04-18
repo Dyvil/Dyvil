@@ -11,13 +11,7 @@ public class VarargsTest
 
 	static func f_2(ints : int...) -> [int] = ints
 
-	static func f_3(int... ints) -> [int] = ints
-
-	static func f_4([int] ints...) -> [int] = ints
-
 	static func g_1(ints... : Set<int>) -> Set<int> = ints
-
-	static func g_2(Set<int> ints...) -> Set<int> = ints
 
 	// Main Tested Methods
 

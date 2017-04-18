@@ -2,7 +2,7 @@ package dyvil.tests
 
 using dyvil.Test
 
-public class AssignmentTest
+class AssignmentTest
 {
 	static func apply() -> Test = test "Assignment" {
 		local()
@@ -39,17 +39,17 @@ public class AssignmentTest
 		counter =?= 5
 	}
 
-	public static class Counter
+	static class Counter
 	{
-		public int value = 0
-		public [int] applyArray = [ 0, 0, 0 ]
-		public [int] subscriptArray = [ 0, 0, 0 ]
+		var value: int = 0
+		var applyArray: [int] = [ 0, 0, 0 ]
+		var subscriptArray: [int] = [ 0, 0, 0 ]
 
-		public int apply(int i) = this.applyArray[i]
-		public void update(int i, int value) = this.applyArray[i] = value
+		func apply(i: int) -> int = this.applyArray[i]
+		func update(i: int, value: int) -> void = this.applyArray[i] = value
 
-		public int subscript(int i) = this.subscriptArray[i]
-		public void subscript_$eq(int i, int value) = this.subscriptArray[i] = value
+		func subscript(i: int) -> int = this.subscriptArray[i]
+		func subscript_=(i: int, value: int) = this.subscriptArray[i] = value
 	}
 
 	static func instanceField() -> Test = test "Instance Fields" {

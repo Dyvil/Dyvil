@@ -18,7 +18,7 @@ public class ForTest
 	static func iterative() -> Test = test "Iterative" {
 		let list = List<int>()
 
-		for (int i = 0; i < 3; i++)
+		for (var i = 0; i < 3; i++)
 		{
 			list += i
 		}

@@ -1,8 +1,8 @@
 package dyvil.tools.dpf.visitor
 
-public interface ListVisitor
+interface ListVisitor
 {
-	ValueVisitor visitElement()
+	func visitElement() -> ValueVisitor
 	
-	void visitEnd() { }
+	func visitEnd() -> void { }
 }

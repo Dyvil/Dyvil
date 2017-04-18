@@ -40,7 +40,7 @@ abstract class Tuple
 
 		override func toString() -> String = "(\(this._1), \(this._2))"
 
-		override func equals(obj: Object!) -> boolean = Entry.entryEquals(this, obj)
+		override func equals(obj: any!) -> boolean = Entry.entryEquals(this, obj)
 
 		override func hashCode() -> int = Entry.entryHashCode(this)
 	}
@@ -62,7 +62,7 @@ abstract class Tuple
 
 		override func toString() -> String = "(\(this._1), \(this._2), \(this._3))"
 
-		override func equals(obj: Object!) -> boolean = Cell.cellEquals(this, obj)
+		override func equals(obj: any!) -> boolean = Cell.cellEquals(this, obj)
 
 		override func hashCode() -> int = Cell.cellHashCode(this)
 	}

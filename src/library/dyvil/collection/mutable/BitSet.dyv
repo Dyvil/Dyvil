@@ -5,21 +5,21 @@ import dyvil.lang.LiteralConvertible
 
 @Immutable
 @LiteralConvertible.FromArray
-public class BitSet extends AbstractBitSet implements MutableSet<int>
+class BitSet extends AbstractBitSet implements MutableSet<int>
 {
 	// Factory Methods
 
-	public static BitSet apply() = new BitSet
+	static func apply() -> BitSet = new BitSet
 
-	public static BitSet apply(int... elements) = new BitSet(elements)
+	static func apply(elements: int...) -> BitSet = new BitSet(elements)
 
-	public static BitSet from([int] array) = new BitSet(array)
+	static func from(array: [int]) -> BitSet = new BitSet(array)
 
-	public static BitSet from(Iterable<+int> iterable) = new BitSet(iterable)
+	static func from(iterable: Iterable<+int>) -> BitSet = new BitSet(iterable)
 
-	public static BitSet from(SizedIterable<+int> iterable) = new BitSet(iterable)
+	static func from(iterable: SizedIterable<+int>) -> BitSet = new BitSet(iterable)
 
-	public static BitSet from(AbstractBitSet bitSet) = new BitSet(bitSet)
+	static func from(bitSet: AbstractBitSet) -> BitSet = new BitSet(bitSet)
 
 	// Constructors
 
@@ -28,34 +28,34 @@ public class BitSet extends AbstractBitSet implements MutableSet<int>
 		super.init()
 	}
 
-	public init(int capacity)
+	public init(capacity: int)
 	{
 		super.init(capacity)
 	}
 
-	public init([int] elements)
+	public init(elements: [int])
 	{
 		super.init(elements)
 	}
 
-	public init(Iterable<+int> iterable)
+	public init(iterable: Iterable<+int>)
 	{
 		super.init(iterable)
 	}
 
-	public init(SizedIterable<+int> iterable)
+	public init(iterable: SizedIterable<+int>)
 	{
 		super.init(iterable)
 	}
 
-	public init(AbstractBitSet bitSet)
+	public init(bitSet: AbstractBitSet)
 	{
 		super.init(bitSet)
 	}
 
 	// Implementation Methods
 
-	public override void clear()
+	override func clear() -> void
 	{
 		this.size = 0
 		for (i <- 0 ..< this.words.size)
@@ -64,7 +64,7 @@ public class BitSet extends AbstractBitSet implements MutableSet<int>
 		}
 	}
 
-	public override boolean add(int element)
+	override func add(element: int) -> boolean
 	{
 		if (this.bitSet(element)) return false
 
@@ -72,45 +72,35 @@ public class BitSet extends AbstractBitSet implements MutableSet<int>
 		return true
 	}
 
-	public override boolean remove(Object! element)
+	override func remove(element: any!) -> boolean
 	{
 		if (!(element is Int)) return false
 
-		final int bit = element as int
+		let bit = element as int
 		if (!this.bitSet(bit)) return false
 
 		this.clearBit(bit)
 		return true
 	}
 
-	public override void removeAt(int bit) = this.clearBit(bit)
+	override func removeAt(bit: int) -> void = this.clearBit(bit)
 
-	public override void map(java.util.function.Function<-int, +int> mapper)
+	override func map(mapper: java.util.function.Function<-int, +int>) -> void
 	{
-		final [int] ints = this.toIntArray
-
+		let ints = this.toIntArray
 		this.clear()
-		for (int i <- ints)
-		{
-			this.add(mapper.apply(i))
-		}
+		for (i <- ints) this.add(mapper(i))
 	}
 
-	public override void flatMap(java.util.function.Function<-int, +Iterable<+int>> mapper)
+	override func flatMap(mapper: java.util.function.Function<-int, +Iterable<+int>>)
 	{
-		final [int] ints = this.toIntArray
+		let ints = this.toIntArray
 
 		this.clear()
-		for (int i <- ints)
-		{
-			for (int newValue <- mapper.apply(i))
-			{
-				this.add(newValue)
-			}
-		}
+		for (i <- ints) for (newValue <- mapper(i)) this.add(newValue)
 	}
 
-	public override MutableSet<int> copy() = this.mutableCopy
+	override func copy() -> MutableSet<int> = this.mutableCopy
 
-	public override ImmutableSet<int> immutable() = this.immutableCopy
+	override func immutable() -> ImmutableSet<int> = this.immutableCopy
 }

@@ -33,25 +33,12 @@ abstract class DyvilValueVisitor implements ValueVisitor
 	
 	override func visitString(value: String) -> void = this.visitObject(value)
 	
-	override func visitName(value: Name) -> void
+	override func visitName(value: Name) -> void = value.qualified match
 	{
-		value.qualified match
-		{
-			case "true" {
-				this.visitObject(true)
-				return
-			}
-			case "false" {
-				this.visitObject(false)
-				return
-			}
-			case "null" {
-				this.visitObject(null)
-				return
-			}
-		}
-
-		this.visitObject(NameAccess(value.qualified))
+		case "true" => this.visitObject(true)
+		case "false" => this.visitObject(false)
+		case "null" => this.visitObject(null)
+		case let s => this.visitObject(NameAccess(s))
 	}
 	
 	override func visitList() -> ListVisitor

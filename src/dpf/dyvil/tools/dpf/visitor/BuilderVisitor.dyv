@@ -2,11 +2,11 @@ package dyvil.tools.dpf.visitor
 
 import dyvil.tools.parsing.Name
 
-public interface BuilderVisitor
+interface BuilderVisitor
 {
-	ValueVisitor visitParameter(Name? name)
-	
-	NodeVisitor visitNode()
-	
-	void visitEnd()
+	func visitParameter(name: Name!) -> ValueVisitor
+
+	func visitNode() -> NodeVisitor
+
+	func visitEnd() -> void
 }

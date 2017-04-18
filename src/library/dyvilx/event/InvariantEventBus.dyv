@@ -5,14 +5,14 @@ import const dyvil.reflect.Modifiers.STATIC
 
 public class InvariantEventBus implements EventBus
 {
-	protected let handlers: List<HandlerEntry> = new dyvil.collection.mutable.ArrayList<HandlerEntry>
+	protected let handlers: List<HandlerEntry> = new mutable.ArrayList<HandlerEntry>
 
-	override func register(Object! handler, Class<_> handlerType) -> void
+	override func register(handler: Object!, ofType: Class<_>) -> void
 	{
-		let entry = HandlerEntry(handler, handlerType)
+		let entry = HandlerEntry(handler, ofType)
 		this.handlers.add(entry)
 
-		for (method <- handlerType.getDeclaredMethods)
+		for (method <- ofType.getDeclaredMethods)
 		{
 			// Must be unary method with @EventHandler annotation
 			if (method.getParameterCount() != 1 || method.getAnnotation(class<EventHandler>) == null)
@@ -30,7 +30,7 @@ public class InvariantEventBus implements EventBus
 		}
 	}
 
-	override func dispatch(Object event) -> void
+	override func dispatch(event: Object) -> void
 	{
 		let eventType = event.dynamicClass
 
@@ -46,14 +46,14 @@ public class InvariantEventBus implements EventBus
 		}
 	}
 
-	protected final func invoke(Method method, Object! handler, Object event) -> void
+	protected final func invoke(method: Method, handler: Object!, event: Object) -> void
 	{
 		try
 		{
 			method.setAccessible(true)
 			method.invoke(handler, event)
 		}
-		catch (Throwable throwable)
+		catch (throwable: Throwable)
 		{
 			throwable.printStackTrace()
 		}

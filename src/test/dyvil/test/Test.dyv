@@ -103,7 +103,7 @@ interface Test
 			{
 				this.block.apply()
 			}
-			catch (Throwable t)
+			catch (t: Throwable)
 			{
 				for (e <- this.errors) if (e.isInstance(t)) return true
 				throw t

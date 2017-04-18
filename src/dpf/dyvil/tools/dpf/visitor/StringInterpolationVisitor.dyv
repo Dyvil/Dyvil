@@ -1,10 +1,10 @@
-package dyvil.tools.dpf.visitor;
+package dyvil.tools.dpf.visitor
 
-public interface StringInterpolationVisitor
+interface StringInterpolationVisitor
 {
-	void visitStringPart(String string);
-	
-	ValueVisitor visitValue();
-	
-	void visitEnd();
+	func visitStringPart(string: String) -> void
+
+	func visitValue() -> ValueVisitor
+
+	func visitEnd() -> void {}
 }

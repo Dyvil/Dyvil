@@ -38,8 +38,6 @@ public class CaptureTest
 			supplier() =?= class<String>
 		}
 
-		//
-
 		lambdaThisCapture()
 	}
 
@@ -64,7 +62,7 @@ public class CaptureTest
 	private static func anonClassCapture() -> Test = test "Anonymous Classes" {
 		var abc = 123
 		var obj = new Object {
-			public override String toString() = abc.toString
+			override func toString() -> String = abc.toString
 		}
 
 		obj.toString =?= abc.toString

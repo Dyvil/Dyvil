@@ -24,10 +24,7 @@ extends DPFValueVisitor implements dyvil.tools.dpf.model.Property, NodeElement
 
 	protected override func visitValue(value: Value) -> void = this.value = value
 
-	override func accept(visitor: NodeVisitor) -> void
-	{
-		this.value.accept(visitor.visitProperty(this.name))
-	}
+	override func accept(visitor: NodeVisitor) -> void = this.value.accept(visitor.visitProperty(this.name))
 
 	override func expand(mappings: Map<String, Object>, mutate: boolean) -> Property
 	{
@@ -44,7 +41,7 @@ extends DPFValueVisitor implements dyvil.tools.dpf.model.Property, NodeElement
 		this.value.toString(indent, buffer)
 	}
 
-	override func equals(obj: Object!) -> boolean
+	override func equals(obj: any!) -> boolean
 	{
 		if (obj === this) return true
 		if (!(obj is Property)) return false

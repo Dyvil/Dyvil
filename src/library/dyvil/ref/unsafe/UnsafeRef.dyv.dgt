@@ -9,23 +9,23 @@ import dyvil.reflect.ReflectUtils
 import java.lang.reflect.Field
 
 #if IS_OBJECT
-public class Unsafe##TYPE_NAME##Ref<type T>(
+class Unsafe##TYPE_NAME##Ref<type T>(
 	protected let base: Object!
 	protected let offset: long
 ) implements TYPE_NAME##Ref<T>
 #else
-public class Unsafe##TYPE_NAME##Ref(
+class Unsafe##TYPE_NAME##Ref(
 	protected let base: Object!
 	protected let offset: long
 ) implements TYPE_NAME##Ref
 #end
 {
-	public init(Field staticField)
+	public init(staticField: Field)
 	{
 		this.init(ReflectUtils.UNSAFE.staticFieldBase(staticField), ReflectUtils.UNSAFE.staticFieldOffset(staticField))
 	}
 
-	public init(Object! receiver, Field field)
+	public init(receiver: Object!, field: Field)
 	{
 		this.init(receiver, ReflectUtils.UNSAFE.objectFieldOffset(field))
 	}
@@ -36,5 +36,5 @@ public class Unsafe##TYPE_NAME##Ref(
 	override func get() -> PRIMITIVE = ReflectUtils.UNSAFE.get##TYPE_NAME(this.base, this.offset)
 #end
 
-	override func set(PRIMITIVE value) -> void = ReflectUtils.UNSAFE.put##TYPE_NAME(this.base, this.offset, value)
+	override func set(value: PRIMITIVE) -> void = ReflectUtils.UNSAFE.put##TYPE_NAME(this.base, this.offset, value)
 }

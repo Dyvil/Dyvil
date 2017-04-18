@@ -8,4 +8,4 @@ import java.lang.annotation._
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target([ ElementType.FIELD, ElementType.METHOD ])
-public @interface native
+@interface native

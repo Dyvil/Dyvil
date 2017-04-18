@@ -89,7 +89,7 @@ case class ObjectRange<type +T: Rangeable<T>>(
 	override func toString() -> String = this.start + " .. " + this.end
 	#end
 
-	override func equals(obj: Object!) -> boolean = dyvil.collection.Range.rangeEquals(this, obj)
+	override func equals(obj: any!) -> boolean = Range.rangeEquals(this, obj)
 
-	override func hashCode() -> int = dyvil.collection.Range.rangeHashCode(this)
+	override func hashCode() -> int = Range.rangeHashCode(this)
 }

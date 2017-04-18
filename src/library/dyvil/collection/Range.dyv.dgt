@@ -16,7 +16,7 @@ import java.util.function.Predicate
 
 @LiteralConvertible.FromTuple
 @Immutable
-public interface Range<+T> extends Queryable<T>, Serializable
+interface Range<+T> extends Queryable<T>, Serializable
 {
 	@BytecodeName("empty")
 	static func apply<T>() -> Range<T> = EmptyRange.instance

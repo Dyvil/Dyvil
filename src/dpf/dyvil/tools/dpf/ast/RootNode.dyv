@@ -9,10 +9,10 @@ public class RootNode extends Node
 	{
 		super.init(Name.fromRaw("root"))
 	}
-	
-	override func accept(NodeVisitor visitor) -> void = this.acceptBody(visitor)
 
-	override func expand(Map<String, Object> mappings, boolean mutate) -> RootNode
+	override func accept(visitor: NodeVisitor) -> void = this.acceptBody(visitor)
+
+	override func expand(mappings: Map<String, Object>, mutate: boolean) -> RootNode
 	{
 		if (mutate)
 		{
@@ -21,11 +21,11 @@ public class RootNode extends Node
 		}
 		else
 		{
-			RootNode node = new RootNode()
+			let node = new RootNode()
 			this.expand(node, mappings)
 			return node
 		}
 	}
 
-	override func toString(String indent, StringBuilder buffer) -> void = this.bodyToString(indent, buffer)
+	override func toString(indent: String, buffer: StringBuilder) -> void = this.bodyToString(indent, buffer)
 }

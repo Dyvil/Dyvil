@@ -4,4 +4,4 @@ import java.lang.annotation._
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target([ ElementType.TYPE, ElementType.METHOD ])
-public @interface EventHandler
+@interface EventHandler

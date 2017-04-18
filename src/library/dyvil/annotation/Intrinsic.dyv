@@ -14,7 +14,7 @@ import java.lang.annotation._
  */
 @Target([ ElementType.METHOD ])
 @Retention(RetentionPolicy.CLASS)
-public @interface Intrinsic(
+@interface Intrinsic(
 	let value: [int]
 	let strings: [String] = []
 	let compilerCode: int = 0

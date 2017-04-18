@@ -10,57 +10,57 @@ public class OverloadTest
 
 	// ----------------- f section -----------------
 
-	static func f(int i) -> String = "f(int)"
-	static func f(Object o) -> String = "f(Object)"
-	static func f(String s) -> String = "f(String)"
+	static func f(i: int) -> String = "f(int)"
+	static func f(o: Object) -> String = "f(Object)"
+	static func f(s: String) -> String = "f(String)"
 
-	static func f(Object o, Object o) -> String = "f(Object, Object)"
-	static func f(Object o, String s) -> String = "f(Object, String)"
-	static func f(String s, Object o) -> String = "f(String, Object)"
-	static func f(String s1, String s2) -> String = "f(String, String)"
+	static func f(o: Object, o: Object) -> String = "f(Object, Object)"
+	static func f(o: Object, s: String) -> String = "f(Object, String)"
+	static func f(s: String, o: Object) -> String = "f(String, Object)"
+	static func f(s1: String, s2: String) -> String = "f(String, String)"
 
 	static func f() -> String = "f()"
-	static func f(Object... os) -> String = "f(Object...)"
+	static func f(os: Object...) -> String = "f(Object...)"
 
-	static func f(String s, String... ss) -> String = "f(String, String...)"
-	static func f(String s, Object... os) -> String = "f(String, Object...)"
+	static func f(s: String, ss: String...) -> String = "f(String, String...)"
+	static func f(s: String, os: Object...) -> String = "f(String, Object...)"
 
-	static func f(Object o, Object... os) -> String = "f(Object, Object...)"
-	static func f(Object o, String... ss) -> String = "f(Object, String...)"
+	static func f(o: Object, os: Object...) -> String = "f(Object, Object...)"
+	static func f(o: Object, ss: String...) -> String = "f(Object, String...)"
 
 	// ----------------- g section -----------------
 
 	// @BytecodeName("g_ints") // will be automatically name-mangled
-	static func g(List<int> ints) -> String = "g(List<int>)"
+	static func g(ints: List<int>) -> String = "g(List<int>)"
 
 	// @BytecodeName("g_strings")
-	static func g(List<String> strings) -> String = "g(List<String>)"
+	static func g(strings: List<String>) -> String = "g(List<String>)"
 
 	@BytecodeName("g_intSet")
-	static func g<T: Set<int>>(T ints) -> String = "g(Set<int>)"
+	static func g<type T: Set<int>>(ints: T) -> String = "g(Set<int>)"
 
 	@BytecodeName("g_stringSet")
-	static func g<T: Set<String>>(T strings) -> String = "g(Set<String>)"
+	static func g<type T: Set<String>>(strings: T) -> String = "g(Set<String>)"
 
 	// ----------------- h section -----------------
 
 	@BytecodeName("h_ints")
-	static func h(List<int> ints) -> String = "h(List<int>)"
+	static func h(ints: List<int>) -> String = "h(List<int>)"
 
 	@BytecodeName("h_longs")
-	static func h(List<long> longs) -> String = "h(List<long>)"
+	static func h(longs: List<long>) -> String = "h(List<long>)"
 
 	@BytecodeName("h_floats")
-	static func h(List<float> floats) -> String = "h(List<float>)"
+	static func h(floats: List<float>) -> String = "h(List<float>)"
 
 	@BytecodeName("h_doubles")
-	static func h(List<double> doubles) -> String = "h(List<double>)"
+	static func h(doubles: List<double>) -> String = "h(List<double>)"
 
 	// ----------------- main test -----------------
 
 	@OverloadPriority
-	static func i(A a) -> String = "i(A)"
-	static func i(B b) -> String = "i(B)"
+	static func i(a: A) -> String = "i(A)"
+	static func i(b: B) -> String = "i(B)"
 
 	static func apply() -> Test = test "Overload" {
 		let o = new Object

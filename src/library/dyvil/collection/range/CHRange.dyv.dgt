@@ -16,7 +16,7 @@ import java.util.function.Consumer
 
 type Base = dyvil.collection.range.specialized.TYPE_NAME##Range
 
-public class TYPE_NAME##Range(
+class TYPE_NAME##Range(
 	package private let start: PRIMITIVE
 	package private let end:   PRIMITIVE
 ) implements Base

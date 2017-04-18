@@ -1,10 +1,10 @@
 package dyvil.util
 
-public interface I18n
+interface I18n
 {
-	func getString(String key) -> String
+	func getString(key: String) -> String
 
-	func getString(String key, Object! arg) -> String = String.format(this.getString(key), arg)
+	func getString(key: String, args: Object!) -> String = String.format(this.getString(key), args)
 
-	func getString(String key, Object! ... args) -> String = String.format(this.getString(key), args...)
+	func getString(key: String, args: Object! ...) -> String = String.format(this.getString(key), args...)
 }

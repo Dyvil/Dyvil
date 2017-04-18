@@ -4,11 +4,7 @@ package dyvil.util
  * Marker Interface for classes that can be configured using Closure Expressions. Implementing this class makes the an
  * apply method available that will be called when applying a closure to an instance of this type.
  */
-public interface Configurable
+interface Configurable
 {
-	infix inline T apply<T: Configurable>(T self, Configure<T> configure)
-	{
-		configure self
-		return self
-	}
+	infix inline func apply<type T: Configurable>(self: T, f: Configure<T>) -> T = self.use(f)
 }

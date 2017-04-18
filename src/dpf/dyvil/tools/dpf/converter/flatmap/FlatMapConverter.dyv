@@ -6,17 +6,19 @@ import dyvil.tools.dpf.visitor.NodeVisitor
 import dyvil.tools.dpf.visitor.ValueVisitor
 import dyvil.tools.parsing.Name
 
-public class FlatMapConverter(
+class FlatMapConverter
+(
 	protected let map: Map<String, Object>
-	protected let name: String)
-	implements NodeVisitor
+	protected let name: String
+)
+implements NodeVisitor
 {
-	public init(Map<String, Object> map)
+	public init(map: Map<String, Object>)
 	{
 		this.init(map, "")
 	}
 
-	protected String getName(Name name)
+	protected func getName(name: Name) -> String
 	{
 		if (this.name.isEmpty)
 		{
@@ -25,23 +27,14 @@ public class FlatMapConverter(
 		return this.name + '.' + name.qualified
 	}
 
-	public override NodeVisitor visitNode(Name name)
-	{
-		return new FlatMapConverter(this.map, this.getName(name))
-	}
+	override func visitNode(name: Name) -> NodeVisitor = new FlatMapConverter(this.map, this.getName(name))
 
-	public override NodeVisitor visitNodeAccess(Name name)
-	{
-		return new FlatMapConverter(this.map, this.getName(name))
-	}
+	override func visitNodeAccess(name: Name) -> NodeVisitor = new FlatMapConverter(this.map, this.getName(name))
 
-	public override ValueVisitor visitProperty(Name name) = new DyvilValueVisitor()
+	override func visitProperty(name: Name) -> ValueVisitor = new DyvilValueVisitor()
 	{
 		let propertyName = this<FlatMapConverter>.getName(name)
 
-		protected override void visitObject(Object! o)
-		{
-			this<FlatMapConverter>.map.put(this.propertyName, o)
-		}
+		override func visitObject(o: Object!) -> void = this<FlatMapConverter>.map.put(this.propertyName, o)
 	}
 }

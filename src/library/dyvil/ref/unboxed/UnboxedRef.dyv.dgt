@@ -6,11 +6,11 @@ package dyvil.ref.unboxed
 import dyvil.ref.TYPE_NAME##Ref
 import dyvil.ref.ObjectRef
 
-public class Unboxed##TYPE_NAME##Ref(
+class Unboxed##TYPE_NAME##Ref(
 	protected let ref: ObjectRef<WRAPPER>
 ) implements TYPE_NAME##Ref
 {
 	override func get() -> PRIMITIVE = this.ref.get
 
-	override func set(PRIMITIVE value) -> void = this.ref.set(value)
+	override func set(value: PRIMITIVE) -> void = this.ref.set(value)
 }

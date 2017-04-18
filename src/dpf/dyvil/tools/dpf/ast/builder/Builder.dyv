@@ -21,7 +21,7 @@ implements Value, dyvil.tools.dpf.model.value.Builder
 
 	static func apply(name: Name, parameters: Parameter...) -> Builder = new Builder(name, ArrayList(parameters...), null)
 
-	static func apply(Name name, parameters: List<Parameter>, node: Node! = null) -> Builder = new Builder(name, parameters, node)
+	static func apply(name: Name, parameters: List<Parameter>, node: Node! = null) -> Builder = new Builder(name, parameters, node)
 	
 	public init(name: Name)
 	{

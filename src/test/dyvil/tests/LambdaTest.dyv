@@ -49,8 +49,8 @@ public class LambdaTest
 	}
 
 	static func chaining() -> Test = test "Chaining" {
-		let fun1 = (int i) -> int => i + 1
-		let fun2 = (int i) -> int => i * 2
+		let fun1 = (i: int) -> int => i + 1
+		let fun2 = (i: int) -> int => i * 2
 		let fun12 = fun1.andThen fun2
 		let result = fun12(7)
 
@@ -113,9 +113,9 @@ public class LambdaTest
 	}
 
 	static func typeInference() -> Test = test "Type Inference" {
-		let function1 = { int i -> int => i }
-		let function2 = { int i, int j => (i, j) }
-		let functionCurried = (int i) => (int j) => (i, j)
+		let function1 = { i: int -> int => i }
+		let function2 = { i: int, j: int => (i, j) }
+		let functionCurried = (i: int) => (j: int) => (i, j)
 
 		function1.staticType.toString =?= type(int -> int).toString
 		function2.staticType.toString =?= type((int, int) -> (int, int)).toString

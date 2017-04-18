@@ -5,7 +5,7 @@ package dyvil.ref
 
 import dyvil.ref.boxed.Boxed##TYPE_NAME##Ref
 
-public interface TYPE_NAME##Ref
+interface TYPE_NAME##Ref
 {
 	func get() -> PRIMITIVE
 

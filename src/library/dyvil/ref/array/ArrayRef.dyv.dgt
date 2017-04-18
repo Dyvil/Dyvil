@@ -6,9 +6,9 @@ package dyvil.ref.array
 import dyvil.ref.TYPE_NAME##Ref
 
 #if IS_OBJECT
-public class TYPE_NAME##ArrayRef<type T>
+class TYPE_NAME##ArrayRef<type T>
 #else
-public class TYPE_NAME##ArrayRef
+class TYPE_NAME##ArrayRef
 #end
 (
 	protected let array: [PRIMITIVE]
@@ -17,5 +17,5 @@ public class TYPE_NAME##ArrayRef
 {
 	override func get() -> PRIMITIVE = this.array[this.index]
 
-	override func set(PRIMITIVE value) -> void = this.array[this.index] = value
+	override func set(value: PRIMITIVE) -> void = this.array[this.index] = value
 }

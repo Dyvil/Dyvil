@@ -8,110 +8,107 @@ import java.io.IOException
 
 using dyvil.tools.dpf.converter.binary.BinaryConstants._
 
-public class BinaryReader(private DataInput dataInput)
+class BinaryReader(private let dataInput: DataInput)
 {
-	public void readValue(ValueVisitor valueVisitor) throws IOException
-	{
-		this.readValue(this.dataInput.readByte(), valueVisitor)
-	}
+	func readValue(visitor: ValueVisitor) -> void throws IOException = this.readValue(this.dataInput.readByte(), visitor)
 
-	private void readValue(int tag, ValueVisitor valueVisitor) throws IOException
+	private func readValue(tag: int, visitor: ValueVisitor) -> void throws IOException
 	{
-		tag match
+		match (tag)
 		{
 			case BOOLEAN | BYTE | SHORT | CHAR | INT {
-				valueVisitor.visitInt(this.dataInput.readInt())
+				visitor.visitInt(this.dataInput.readInt())
 				return
 			}
 			case LONG {
-				valueVisitor.visitLong(this.dataInput.readLong())
+				visitor.visitLong(this.dataInput.readLong())
 				return
 			}
 			case FLOAT {
-				valueVisitor.visitFloat(this.dataInput.readFloat())
+				visitor.visitFloat(this.dataInput.readFloat())
 				return
 			}
 			case DOUBLE {
-				valueVisitor.visitDouble(this.dataInput.readDouble())
+				visitor.visitDouble(this.dataInput.readDouble())
 				return
 			}
 			case STRING {
-				valueVisitor.visitString(this.dataInput.readUTF())
+				visitor.visitString(this.dataInput.readUTF())
 				return
 			}
 			case STRING_INTERPOLATION {
-				this.readStringInterpolation(valueVisitor.visitStringInterpolation())
+				this.readStringInterpolation(visitor.visitStringInterpolation())
 				return
 			}
-			case NAME: {
-				valueVisitor.visitName(Name.read(this.dataInput))
+			case NAME {
+				visitor.visitName(Name.read(this.dataInput))
 				return
 			}
 			case NAME_ACCESS {
-				this.readValue(valueVisitor.visitValueAccess(Name.read(this.dataInput)))
+				this.readValue(visitor.visitValueAccess(Name.read(this.dataInput)))
 				return
 			}
 			case BUILDER {
-				this.readBuilder(valueVisitor.visitBuilder(Name.read(this.dataInput)))
+				this.readBuilder(visitor.visitBuilder(Name.read(this.dataInput)))
 				return
 			}
 			case LIST {
-				this.readList(valueVisitor.visitList())
+				this.readList(visitor.visitList())
 				return
 			}
 			case MAP {
-				this.readMap(valueVisitor.visitMap())
+				this.readMap(visitor.visitMap())
 				return
 			}
 		}
 	}
 
-	private void readStringInterpolation(StringInterpolationVisitor stringInterpolationVisitor) throws IOException
+	private func readStringInterpolation(visitor: StringInterpolationVisitor) -> void throws IOException
 	{
 		while (true)
 		{
-			stringInterpolationVisitor.visitStringPart(this.dataInput.readUTF())
-			final int tag = this.dataInput.readByte()
+			visitor.visitStringPart(this.dataInput.readUTF())
+			let tag = this.dataInput.readByte()
 			if (tag == END)
 			{
-				stringInterpolationVisitor.visitEnd()
+				visitor.visitEnd()
 				return
 			}
-			this.readValue(tag, stringInterpolationVisitor.visitValue())
+			this.readValue(tag, visitor.visitValue())
 		}
 	}
 
-	private void readList(ListVisitor listVisitor) throws IOException
-	{
-		while (true)
-		{
-			final int tag = this.dataInput.readByte()
-			if (tag == END)
-			{
-				listVisitor.visitEnd()
-				return
-			}
-			this.readValue(tag, listVisitor.visitElement())
-		}
-	}
-
-	private void readMap(MapVisitor mapVisitor) throws IOException
+	private func readList(visitor: ListVisitor) -> void throws IOException
 	{
 		while (true)
 		{
 			let tag = this.dataInput.readByte()
 			if (tag == END)
 			{
-				mapVisitor.visitEnd()
+				visitor.visitEnd()
 				return
 			}
-
-			this.readValue(tag, mapVisitor.visitKey())
-			this.readValue(mapVisitor.visitValue())
+			this.readValue(tag, visitor.visitElement())
 		}
 	}
 
-	private void readBuilder(BuilderVisitor builderVisitor) throws IOException
+	private func readMap(visitor: MapVisitor) -> void throws IOException
+	{
+		while (true)
+		{
+			let tag = this.dataInput.readByte()
+			if (tag == END)
+			{
+				visitor.visitEnd()
+				return
+			}
+
+			this.readValue(tag, visitor.visitKey())
+			this.readValue(visitor.visitValue())
+		}
+	}
+
+	private func readBuilder(visitor: BuilderVisitor) -> void throws IOException
 	{
 		while (true)
 		{
@@ -120,50 +117,47 @@ public class BinaryReader(private DataInput dataInput)
 
 			if (tag == END)
 			{
-				this.readNodes(builderVisitor.visitNode())
-				builderVisitor.visitEnd()
+				this.readNodes(visitor.visitNode())
+				visitor.visitEnd()
 				this.dataInput.readByte() // consume the builder end 0
 				return
 			}
 
-			this.readValue(tag, builderVisitor.visitParameter(paramName))
+			this.readValue(tag, visitor.visitParameter(paramName))
 		}
 	}
 
-	public void readNodes(NodeVisitor nodeVisitor) throws IOException
+	func readNodes(visitor: NodeVisitor) -> void throws IOException
 	{
 		while (true)
 		{
-			final int tag = this.dataInput.readByte()
+			let tag = this.dataInput.readByte()
 			if (tag == END)
 			{
-				nodeVisitor.visitEnd()
+				visitor.visitEnd()
 				return
 			}
-			this.readNode(tag, nodeVisitor)
+			this.readNode(tag, visitor)
 		}
 	}
 
-	public void readNode(NodeVisitor nodeVisitor) throws IOException
-	{
-		this.readNode(this.dataInput.readByte(), nodeVisitor)
-	}
+	func readNode(visitor: NodeVisitor) -> void throws IOException = this.readNode(this.dataInput.readByte(), visitor)
 
-	private void readNode(int tag, NodeVisitor nodeVisitor) throws IOException
+	private func readNode(tag: int, visitor: NodeVisitor) throws IOException
 	{
-		tag match
+		match (tag)
 		{
 			case NODE {
-				this.readNodes(nodeVisitor.visitNode(Name.read(this.dataInput)))
+				this.readNodes(visitor.visitNode(Name.read(this.dataInput)))
 				//           ^ note the s
 				return
 			}
 			case NODE_ACCESS {
-				this.readNode(nodeVisitor.visitNodeAccess(Name.read(this.dataInput)))
+				this.readNode(visitor.visitNodeAccess(Name.read(this.dataInput)))
 				return
 			}
 			case PROPERTY {
-				this.readValue(nodeVisitor.visitProperty(Name.read(this.dataInput)))
+				this.readValue(visitor.visitProperty(Name.read(this.dataInput)))
 				return
 			}
 		}

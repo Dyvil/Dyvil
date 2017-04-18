@@ -9,7 +9,7 @@ import dyvil.lang.LiteralConvertible
 
 @LiteralConvertible.FromTuple
 @Immutable
-public interface TYPE_NAME##Range extends Range<PRIMITIVE>
+interface TYPE_NAME##Range extends Range<PRIMITIVE>
 {
 	@BytecodeName("closed")
 	override static func apply(from: PRIMITIVE, to: PRIMITIVE) -> TYPE_NAME##Range

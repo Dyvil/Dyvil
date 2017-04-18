@@ -12,8 +12,8 @@ import dyvil.tools.parsing.lexer.LexerUtil;
 
 public class StringInterpolation extends DPFValueVisitor implements Value, StringInterpolationVisitor, Expandable
 {
-	protected List<String>! strings
-	protected List<Value>!  values
+	var strings: List<String> = unsafeInit<List<String>>
+	var values:  List<Value>  = unsafeInit<List<Value>>
 
 	public init()
 	{
@@ -21,51 +21,46 @@ public class StringInterpolation extends DPFValueVisitor implements Value, Strin
 		this.values = new ArrayList<Value>
 	}
 
-	public init([String] stringParts, [Value] values)
+	public init(strings: [String], values: [Value])
 	{
-		this.strings = new ArrayList(stringParts)
+		this.strings = new ArrayList(strings)
 		this.values = new ArrayList(values)
 	}
 
-	public init([String] stringParts, [Object] values)
+	public init(strings: [String], values: [any])
 	{
-		this.strings = new ArrayList(stringParts)
+		this.strings = new ArrayList(strings)
 		this.values = new ArrayList<Value>(values.size)
 
-		for (Object o <- values)
+		for (o <- values)
 		{
 			this.values.add(Value.wrap(o))
 		}
 	}
 
-	public override void visitStringPart(String string) = this.strings.add(string)
+	override func visitStringPart(string: String) -> void = this.strings.add(string)
 
-	protected override void visitValue(Value value) = this.values.add(value)
+	override func visitValue(value: Value) -> void = this.values.add(value)
 
-	public override ValueVisitor visitValue() = this
+	override func visitValue() -> ValueVisitor = this
 
-	public override void visitEnd() { }
+	override func visitEnd() -> void {}
 
-	public override void accept(ValueVisitor visitor)
+	override func accept(visitor: ValueVisitor) -> void
 	{
-		StringInterpolationVisitor stringVisitor = visitor.visitStringInterpolation();
-		final int len = this.values.size();
+		let stringVisitor = visitor.visitStringInterpolation()
 
-		stringVisitor.visitStringPart(this.strings[0]);
-		
-		for (int i = 0; i < len; i++)
+		stringVisitor.visitStringPart(this.strings[0])
+		for (i <- 0 ..< this.values.size)
 		{
-			this.values[i].accept(stringVisitor.visitValue());
-			stringVisitor.visitStringPart(this.strings[i + 1]);
+			this.values[i].accept(stringVisitor.visitValue())
+			stringVisitor.visitStringPart(this.strings[i + 1])
 		}
-		
-		stringVisitor.visitEnd();
+		stringVisitor.visitEnd()
 	}
 
-	public override Object expand(Map<String, Object> mappings, boolean mutate)
+	override func expand(mappings: Map<String, Object>, mutate: boolean) -> Object
 	{
-		// StringInterpolation stringInterpolation = mutate ? this : new StringInterpolation();
-
 		let builder = new StringBuilder
 
 		var index = 0
@@ -73,9 +68,10 @@ public class StringInterpolation extends DPFValueVisitor implements Value, Strin
 		{
 			builder.append(this.strings[index++])
 
-			Expandable.expand(value, mappings, mutate) match {
-				case String s => builder.append(s)
-				case Constant c if c.isConstant => c.appendString(builder)
+			match (Expandable.expand(value, mappings, mutate))
+			{
+				case var s: String => builder.append(s)
+				case var c: Constant if c.isConstant => c.appendString(builder)
 				case _ as Value => return this
 				case var o => builder.append(o)
 			}
@@ -87,15 +83,14 @@ public class StringInterpolation extends DPFValueVisitor implements Value, Strin
 		return builder.toString
 	}
 
-	public override String toString() = IASTNode.toString(this)
+	override func toString() -> String = IASTNode.toString(this)
 
-	public override void toString(String indent, StringBuilder buffer)
+	override func toString(indent: String, buffer: StringBuilder) -> void
 	{
-		int len = this.values.size()
 		buffer.append('"')
 		LexerUtil.appendStringLiteralBody(this.strings[0], buffer)
 
-		for (int i = 0; i < len; i++)
+		for (i <- 0 ..< this.values.size)
 		{
 			buffer.append("\\(")
 			this.values[i].toString(indent, buffer)
@@ -105,14 +100,14 @@ public class StringInterpolation extends DPFValueVisitor implements Value, Strin
 		buffer.append('"')
 	}
 
-	public override boolean equals(Object! o)
+	override func equals(obj: any!) -> boolean
 	{
-		if (this === o) return true
-		if (!(o is StringInterpolation)) return false
+		if (this === obj) return true
+		if (!(obj is StringInterpolation)) return false
 
-		let that = o as StringInterpolation;
+		let that = obj as StringInterpolation
 		return this.strings == that.strings && this.values == that.values
 	}
 
-	public override int hashCode() = 31 * this.strings.hashCode + (this.values?.hashCode ?? 0)
+	override func hashCode() -> int = 31 * this.strings.hashCode + (this.values?.hashCode ?? 0)
 }

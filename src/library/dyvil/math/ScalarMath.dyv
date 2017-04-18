@@ -1,6 +1,6 @@
 package dyvil.math
 
-public interface ScalarMath<T>
+interface ScalarMath<T>
 {
 	static func _0 -> T
 

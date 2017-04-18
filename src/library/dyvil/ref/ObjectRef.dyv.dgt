@@ -5,23 +5,23 @@ package dyvil.ref
 
 import dyvil.ref.unboxed._
 
-public interface ObjectRef<T>
+interface ObjectRef<T>
 {
 	func get() -> T
 
-	func set(T value) -> void
+	func set(value: T) -> void
 
 	// Operators
 
-	static inline func * <T>(ObjectRef<T> ref) -> T = ref.get
+	static inline func * <T>(ref: ObjectRef<T>) -> T = ref.get
 
-	infix inline func *_= <T>(ObjectRef<T> ref, T value) -> void = ref.set(value)
+	infix inline func *_= <T>(ref: ObjectRef<T>, value: T) -> void = ref.set(value)
 
 	// Unbox Conversion Methods
 #import Base.dgs
 #foreach PRIMITIVE_SPECS
 
 	@BytecodeName("unbox##TYPE_NAME")
-	static postfix func unboxed(ObjectRef<WRAPPER> ref) -> TYPE_NAME##Ref = new Unboxed##TYPE_NAME##Ref(ref)
+	static postfix func unboxed(ref: ObjectRef<WRAPPER>) -> TYPE_NAME##Ref = new Unboxed##TYPE_NAME##Ref(ref)
 #endfor
 }
