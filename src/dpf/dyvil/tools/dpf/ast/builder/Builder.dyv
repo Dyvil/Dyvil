@@ -37,9 +37,6 @@ implements Value, dyvil.tools.dpf.model.value.Builder
 	@BytecodeName("addParameter")
 	func add(parameter: Parameter) -> void = this.parameters.add(parameter)
 
-	@Deprecated(replacements: [ "Builder.visitNode() -> Node" ])
-	func makeNode() -> Node = this.visitNode
-
 	override func visitParameter(name: Name!) -> ValueVisitor = new Parameter(name).{ this.add($0); $0 }
 
 	override func visitNode() -> Node
