@@ -242,7 +242,12 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				}
 
 				this.mode = VARARGS_AFTER_POST_TYPE;
-				pm.pushParser(new TypeParser(this));
+				final TypeParser parser = new TypeParser(this);
+				if (this.hasFlag(LAMBDA_ARROW_END))
+				{
+					parser.withFlags(TypeParser.IGNORE_LAMBDA);
+				}
+				pm.pushParser(parser);
 				return;
 			}
 			// Fallthrough
