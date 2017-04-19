@@ -190,11 +190,11 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 	}
 
 	@Override
-	public <R> R foldRight(R initialValue, @NonNull BiFunction<? super R, ? super E, ? extends R> reducer)
+	public <R> R foldRight(R initialValue, @NonNull BiFunction<? super E, ? super R, ? extends R> reducer)
 	{
 		for (Node<E> node = this.last; node != null; node = node.prev)
 		{
-			initialValue = reducer.apply(initialValue, node.item);
+			initialValue = reducer.apply(node.item, initialValue);
 		}
 		return initialValue;
 	}
@@ -238,7 +238,7 @@ public class LinkedList<E> implements MutableList<E>, Deque<E>
 			{
 				return initialValue;
 			}
-			initialValue = reducer.apply(initialValue, node.item);
+			initialValue = reducer.apply(node.item, initialValue);
 		}
 		while (true);
 	}

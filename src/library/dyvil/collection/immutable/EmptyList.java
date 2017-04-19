@@ -10,7 +10,6 @@ import dyvil.collection.ImmutableList;
 import dyvil.collection.List;
 import dyvil.collection.MutableList;
 import dyvil.collection.iterator.EmptyIterator;
-import dyvil.lang.LiteralConvertible;
 import dyvil.reflect.Modifiers;
 
 import java.util.*;
@@ -82,7 +81,7 @@ public final class EmptyList<E> implements ImmutableList<E>
 	}
 
 	@Override
-	public <R> R foldRight(R initialValue, @NonNull BiFunction<? super R, ? super E, ? extends R> reducer)
+	public <R> R foldRight(R initialValue, @NonNull BiFunction<? super E, ? super R, ? extends R> reducer)
 	{
 		return initialValue;
 	}

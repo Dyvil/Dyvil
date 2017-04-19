@@ -78,9 +78,9 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 
 	@Override
-	public <R> R foldRight(R initialValue, @NonNull BiFunction<? super R, ? super E, ? extends R> reducer)
+	public <R> R foldRight(R initialValue, @NonNull BiFunction<? super E, ? super R, ? extends R> reducer)
 	{
-		return reducer.apply(initialValue, this.element);
+		return reducer.apply(this.element, initialValue);
 	}
 
 	@Override

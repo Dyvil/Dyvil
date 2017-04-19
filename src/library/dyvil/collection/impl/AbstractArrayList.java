@@ -238,11 +238,11 @@ public abstract class AbstractArrayList<E> implements List<E>
 	}
 
 	@Override
-	public <R> R foldRight(R initialValue, @NonNull BiFunction<? super R, ? super E, ? extends R> reducer)
+	public <R> R foldRight(R initialValue, @NonNull BiFunction<? super E, ? super R, ? extends R> reducer)
 	{
 		for (int i = this.size - 1; i >= 0; i--)
 		{
-			initialValue = reducer.apply(initialValue, (E) this.elements[i]);
+			initialValue = reducer.apply((E) this.elements[i], initialValue);
 		}
 		return initialValue;
 	}
@@ -276,7 +276,7 @@ public abstract class AbstractArrayList<E> implements List<E>
 		E initialValue = (E) this.elements[this.size - 1];
 		for (int i = this.size - 2; i >= 0; i--)
 		{
-			initialValue = reducer.apply(initialValue, (E) this.elements[i]);
+			initialValue = reducer.apply((E) this.elements[i], initialValue);
 		}
 		return initialValue;
 	}
