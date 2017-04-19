@@ -254,6 +254,11 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 			this.name = token.nameValue();
 			this.position = token.raw();
 
+			if (this.type != Types.UNKNOWN)
+			{
+				pm.report(Markers.syntaxWarning(token, "member.type.c_style.deprecated"));
+			}
+
 			if (!this.parseSeparator(token.next()))
 			{
 				pm.report(token, "class.body.declaration.invalid");

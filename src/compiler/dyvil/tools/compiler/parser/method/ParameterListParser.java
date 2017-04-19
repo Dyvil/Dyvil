@@ -20,6 +20,7 @@ import dyvil.tools.compiler.parser.header.PropertyParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -201,6 +202,11 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				this.mode = SEPARATOR;
 				pm.report(token, "parameter.identifier");
 				return;
+			}
+
+			if (this.type != Types.UNKNOWN)
+			{
+				pm.report(Markers.syntaxWarning(token, "member.type.c_style.deprecated"));
 			}
 
 			this.parameter = this.consumer.createParameter(token.raw(), token.nameValue(), this.type, this.modifiers,
