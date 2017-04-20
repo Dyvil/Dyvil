@@ -197,6 +197,7 @@ compileLibraryJava.source = "$buildDir/src/java/library"
 
 task copyLibraryDyvil(type: Sync, dependsOn: 'genLibrary') {
 	from 'src/library'
+	from 'src/parsing'
 	from "$buildDir/gensrc/library"
 	into "$buildDir/src/dyvil/library"
 
@@ -284,11 +285,11 @@ task genDPF(type: JavaExec, dependsOn: [ 'gensrcClasses' ]) { JavaExec exec ->
  * Compiles the Dyvil Classes and Headers in the Dyvil Library by running the freshly-compiled compiler
  */
 task compileLibraryDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'copyLibraryDyvil' ]) { JavaExec exec ->
-	runCompiler exec, 'config/lib.dyc', "$buildDir/dyvil-classes/library", 'src/library/'
+	runCompiler exec, 'config/lib.dyc', "$buildDir/dyvil-classes/library", "$buildDir/src/dyvil/library/"
 }
 
 task compileDPFDyvil(type: JavaExec, dependsOn: [ 'compileLibraryDyvil', 'copyDPFDyvil' ]) { JavaExec exec ->
-	runCompiler exec, 'config/dpf.dyc', "$buildDir/dyvil-classes/dpf", 'src/dpf/'
+	runCompiler exec, 'config/dpf.dyc', "$buildDir/dyvil-classes/dpf", "$buildDir/src/dyvil/dpf"
 }
 
 task compileTestDyvil(type: JavaExec, dependsOn: [ 'compileDPFDyvil', 'copyTestDyvil' ]) { JavaExec exec ->

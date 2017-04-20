@@ -1,4 +1,4 @@
-source_dirs = [../src/dpf, ../build/gensrc/dpf]
+source_dirs = [../build/src/dyvil/dpf]
 output_dir = ../build/dyvil-classes/dpf
 
 libraries = [ ../build/dyvil-classes/library ]
