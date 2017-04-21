@@ -10,6 +10,8 @@ public interface IAnnotated
 
 	AnnotationList getAnnotations();
 
+	void setAnnotations(AnnotationList annotations);
+
 	IAnnotation getAnnotation(IClass type);
 
 	default boolean addRawAnnotation(String type, IAnnotation annotation)

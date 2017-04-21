@@ -123,6 +123,12 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
+	public void setAnnotations(AnnotationList annotations)
+	{
+		this.annotations = annotations;
+	}
+
+	@Override
 	public final IAnnotation getAnnotation(IClass type)
 	{
 		return this.annotations == null ? null : this.getAnnotations().get(type);

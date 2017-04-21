@@ -138,6 +138,12 @@ public abstract class TypeParameter implements ITypeParameter
 	}
 
 	@Override
+	public void setAnnotations(AnnotationList annotations)
+	{
+		this.annotations = annotations;
+	}
+
+	@Override
 	public final IAnnotation getAnnotation(IClass type)
 	{
 		return this.annotations == null ? null : this.getAnnotations().get(type);

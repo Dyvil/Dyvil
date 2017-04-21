@@ -82,25 +82,25 @@ public abstract class CaptureDataMember implements IDataMember
 		return this.variable.getType();
 	}
 
+	@Override
+	public void setType(IType type)
+	{
+	}
+
 	public IType getInternalType()
 	{
 		return this.variable.getInternalType();
 	}
 
 	@Override
-	public void setType(IType type)
+	public ModifierSet getModifiers()
 	{
+		return this.variable.getModifiers();
 	}
 
 	@Override
 	public void setModifiers(ModifierSet modifiers)
 	{
-	}
-
-	@Override
-	public ModifierSet getModifiers()
-	{
-		return this.variable.getModifiers();
 	}
 
 	@Override
@@ -113,6 +113,11 @@ public abstract class CaptureDataMember implements IDataMember
 	public AnnotationList getAnnotations()
 	{
 		return this.variable.getAnnotations();
+	}
+
+	@Override
+	public void setAnnotations(AnnotationList annotations)
+	{
 	}
 
 	@Override

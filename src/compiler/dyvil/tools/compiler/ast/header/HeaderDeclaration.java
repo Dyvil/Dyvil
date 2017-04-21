@@ -82,6 +82,12 @@ public class HeaderDeclaration implements IASTNode, INamed, IModified, IAnnotate
 	}
 
 	@Override
+	public void setAnnotations(AnnotationList annotations)
+	{
+		this.annotations = annotations;
+	}
+
+	@Override
 	public IAnnotation getAnnotation(IClass type)
 	{
 		return this.annotations == null ? null : this.annotations.get(type);
