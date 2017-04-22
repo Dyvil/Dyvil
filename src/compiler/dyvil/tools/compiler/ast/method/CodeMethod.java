@@ -399,7 +399,7 @@ public class CodeMethod extends AbstractMethod
 			return;
 		}
 
-		if (!this.modifiers.hasIntModifier(Modifiers.OVERRIDE))
+		if (!this.modifiers.hasIntModifier(Modifiers.OVERRIDE) && !this.modifiers.hasIntModifier(Modifiers.GENERATED))
 		{
 			markers.add(Markers.semantic(this.position, "method.overrides", this.name));
 		}

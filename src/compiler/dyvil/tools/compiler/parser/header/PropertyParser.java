@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.parser.header;
 
+import dyvil.tools.compiler.ast.annotation.Annotation;
+import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IProperty;
@@ -8,10 +10,12 @@ import dyvil.tools.compiler.ast.modifiers.Modifier;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.parser.ParserUtil;
+import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.annotation.ModifierParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.statement.StatementListParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
+import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Name;
@@ -39,8 +43,9 @@ public class PropertyParser extends Parser implements IValueConsumer
 	protected IProperty property;
 
 	// Metadata
-	private ModifierSet modifiers;
-	private byte        target;
+	private ModifierSet    modifiers;
+	private AnnotationList annotations;
+	private byte           target;
 
 	public PropertyParser(IProperty property)
 	{
@@ -56,30 +61,18 @@ public class PropertyParser extends Parser implements IValueConsumer
 		switch (this.mode)
 		{
 		case TAG:
-			if (type == BaseSymbols.CLOSE_CURLY_BRACKET)
+			switch (type)
 			{
+			case BaseSymbols.CLOSE_CURLY_BRACKET:
 				pm.popParser();
 				return;
-			}
-			if (type == BaseSymbols.SEMICOLON && token.isInferred())
-			{
-				return;
-			}
-			
-			final Modifier modifier;
-			if ((modifier = ModifierParser.parseModifier(token, pm)) != null)
-			{
-				if (this.modifiers == null)
+			case BaseSymbols.SEMICOLON:
+				if (token.isInferred())
 				{
-					this.modifiers = new ModifierList();
+					return;
 				}
-
-				this.modifiers.addModifier(modifier);
-				return;
-			}
-			
-			if (type == Tokens.LETTER_IDENTIFIER)
-			{
+				break;
+			case Tokens.LETTER_IDENTIFIER:
 				final Name name = token.nameValue();
 				if (name == Names.get)
 				{
@@ -97,14 +90,36 @@ public class PropertyParser extends Parser implements IValueConsumer
 				}
 				pm.report(token, "property.tag.unknown");
 				return;
-			}
-			if (type == DyvilKeywords.INIT)
-			{
+			case DyvilKeywords.INIT:
 				this.property.setInitializerPosition(token.raw());
 				this.mode = SEPARATOR;
 				this.target = INITIALIZER;
 				return;
+			case DyvilSymbols.AT:
+				if (this.annotations == null)
+				{
+					this.annotations = new AnnotationList();
+				}
+
+				final Annotation annotation = new Annotation(token.raw());
+				this.annotations.add(annotation);
+				pm.pushParser(new AnnotationParser(annotation));
+				return;
 			}
+			
+			final Modifier modifier;
+			if ((modifier = ModifierParser.parseModifier(token, pm)) != null)
+			{
+				if (this.modifiers == null)
+				{
+					this.modifiers = new ModifierList();
+				}
+
+				this.modifiers.addModifier(modifier);
+				return;
+			}
+			
+
 			pm.report(token, "property.tag");
 			return;
 		case SETTER_PARAMETER:
@@ -159,6 +174,11 @@ public class PropertyParser extends Parser implements IValueConsumer
 		{
 			method.setModifiers(this.modifiers);
 			this.modifiers = null;
+		}
+		if (this.annotations != null)
+		{
+			method.setAnnotations(this.annotations);
+			this.annotations = null;
 		}
 	}
 	
