@@ -6,31 +6,31 @@ import dyvil.tools.compiler.ast.generic.ITypeParameter;
 import dyvil.tools.compiler.ast.generic.Variance;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class ResolvedTypeVarType extends TypeVarType
 {
-	protected ICodePosition position;
+	protected SourcePosition position;
 
-	public ResolvedTypeVarType(ICodePosition position)
+	public ResolvedTypeVarType(SourcePosition position)
 	{
 		this.position = position;
 	}
 
-	public ResolvedTypeVarType(ITypeParameter typeParameter, ICodePosition position)
+	public ResolvedTypeVarType(ITypeParameter typeParameter, SourcePosition position)
 	{
 		super(typeParameter);
 		this.position = position;
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}

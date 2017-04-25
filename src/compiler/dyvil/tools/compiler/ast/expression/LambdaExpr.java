@@ -1,7 +1,9 @@
 package dyvil.tools.compiler.ast.expression;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.lang.Formattable;
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.asm.Handle;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -38,9 +40,7 @@ import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public final class LambdaExpr implements IValue, IClassCompilable, IDefaultContext, IValueConsumer, IParametric
 {
@@ -67,7 +67,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 	// Metadata
 
-	protected ICodePosition position;
+	protected SourcePosition position;
 
 	/**
 	 * Stores various metadata about this Lambda Expression. See Flags constants for possible values
@@ -106,32 +106,32 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	 */
 	private String descriptor;
 
-	public LambdaExpr(ICodePosition position)
+	public LambdaExpr(SourcePosition position)
 	{
 		this.position = position;
 		this.parameters = new ParameterList(2);
 	}
 
-	public LambdaExpr(ICodePosition position, IParameter param)
+	public LambdaExpr(SourcePosition position, IParameter param)
 	{
 		this.position = position;
 		this.parameters = new ParameterList(param);
 	}
 
-	public LambdaExpr(ICodePosition position, IParameter[] params, int paramCount)
+	public LambdaExpr(SourcePosition position, IParameter[] params, int paramCount)
 	{
 		this.position = position;
 		this.parameters = new ParameterList(params, paramCount);
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -151,7 +151,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	}
 
 	@Override
-	public IParameter createParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers,
+	public IParameter createParameter(SourcePosition position, Name name, IType type, ModifierSet modifiers,
 		                                 AnnotationList annotations)
 	{
 		return new CodeParameter(null, position, name, type, modifiers, annotations);
@@ -413,7 +413,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 				continue;
 			}
 
-			final ICodePosition position = parameter.getPosition();
+			final SourcePosition position = parameter.getPosition();
 			final IType methodParamType = this.method.getParameters().get(i).getType();
 			final IType concreteType = methodParamType.getConcreteType(this.type);
 
@@ -776,13 +776,13 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 			                                                  .getMethodType(this.getLambdaDescriptor());
 		final Handle handle = new Handle(handleType, this.owner, this.name, desc);
 
-		writer.visitLineNumber(this.getLineNumber());
+		writer.visitLineNumber(this.lineNumber());
 		writer.visitInvokeDynamicInsn(invokedName, invokedType, BOOTSTRAP, methodDescriptorType, handle,
 		                              lambdaDescriptorType);
 
 		if (type != null)
 		{
-			this.type.writeCast(writer, type, this.getLineNumber());
+			this.type.writeCast(writer, type, this.lineNumber());
 		}
 	}
 
@@ -888,7 +888,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

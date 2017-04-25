@@ -7,7 +7,7 @@ import dyvil.tools.gensrc.ast.scope.Scope;
 import dyvil.tools.gensrc.lang.I18n;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SemanticError;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.io.File;
 
@@ -146,7 +146,7 @@ public class Util
 	}
 
 	public static List<Specialization> parseSpecs(String line, GenSrc gensrc, Scope scope, MarkerList markers,
-		                                             ICodePosition position)
+		                                             SourcePosition position)
 	{
 		final String[] files = getProcessedArguments(line, 0, line.length(), scope);
 		final List<Specialization> specs = new ArrayList<>(files.length);

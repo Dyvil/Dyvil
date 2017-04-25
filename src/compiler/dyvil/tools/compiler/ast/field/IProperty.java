@@ -7,7 +7,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public interface IProperty extends IClassMember
 {
@@ -39,7 +39,7 @@ public interface IProperty extends IClassMember
 
 	void setInitializer(IValue value);
 
-	ICodePosition getInitializerPosition();
+	SourcePosition getInitializerPosition();
 
-	void setInitializerPosition(ICodePosition position);
+	void setInitializerPosition(SourcePosition position);
 }

@@ -6,19 +6,19 @@ import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public interface IReference
 {
-	default void resolve(ICodePosition position, MarkerList markers, IContext context)
+	default void resolve(SourcePosition position, MarkerList markers, IContext context)
 	{
 	}
 
-	default void checkTypes(ICodePosition position, MarkerList markers, IContext context)
+	default void checkTypes(SourcePosition position, MarkerList markers, IContext context)
 	{
 	}
 
-	default void check(ICodePosition position, MarkerList markers, IContext context)
+	default void check(SourcePosition position, MarkerList markers, IContext context)
 	{
 	}
 	

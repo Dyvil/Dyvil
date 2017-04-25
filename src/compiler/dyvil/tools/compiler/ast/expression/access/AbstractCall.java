@@ -24,11 +24,11 @@ import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalChainAware
 {
-	protected ICodePosition position;
+	protected SourcePosition position;
 
 	protected IValue receiver;
 	protected ArgumentList arguments;
@@ -39,13 +39,13 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 	protected IType   type;
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -400,7 +400,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 
 	// Inlined for performance
 	@Override
-	public int getLineNumber()
+	public int lineNumber()
 	{
 		if (this.position == null)
 		{
@@ -417,19 +417,19 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 			type = this.getType();
 		}
 
-		this.method.writeCall(writer, this.receiver, this.arguments, this.genericData, type, this.getLineNumber());
+		this.method.writeCall(writer, this.receiver, this.arguments, this.genericData, type, this.lineNumber());
 	}
 
 	@Override
 	public void writeJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
-		this.method.writeJump(writer, dest, this.receiver, this.arguments, this.genericData, this.getLineNumber());
+		this.method.writeJump(writer, dest, this.receiver, this.arguments, this.genericData, this.lineNumber());
 	}
 
 	@Override
 	public void writeInvJump(MethodWriter writer, Label dest) throws BytecodeException
 	{
-		this.method.writeInvJump(writer, dest, this.receiver, this.arguments, this.genericData, this.getLineNumber());
+		this.method.writeInvJump(writer, dest, this.receiver, this.arguments, this.genericData, this.lineNumber());
 	}
 
 	@Override

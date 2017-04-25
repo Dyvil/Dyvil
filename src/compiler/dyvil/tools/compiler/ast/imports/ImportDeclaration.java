@@ -1,35 +1,36 @@
 package dyvil.tools.compiler.ast.imports;
 
+import dyvil.lang.Formattable;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.context.IContext;
-import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.header.IObjectCompilable;
+import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.ASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public final class ImportDeclaration implements IASTNode, IObjectCompilable
+public final class ImportDeclaration implements ASTNode, IObjectCompilable
 {
-	protected ICodePosition position;
+	protected SourcePosition position;
 	protected IImport       theImport;
 
-	public ImportDeclaration(ICodePosition position)
+	public ImportDeclaration(SourcePosition position)
 	{
 		this.position = position;
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -89,7 +90,7 @@ public final class ImportDeclaration implements IASTNode, IObjectCompilable
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

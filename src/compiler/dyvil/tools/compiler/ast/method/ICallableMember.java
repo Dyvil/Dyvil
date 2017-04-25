@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public interface ICallableMember extends IClassMember, IOverloadable, IValueConsumer, ITyped, IParametric
 {
@@ -33,7 +33,7 @@ public interface ICallableMember extends IClassMember, IOverloadable, IValueCons
 
 
 	@Override
-	default IParameter createParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers,
+	default IParameter createParameter(SourcePosition position, Name name, IType type, ModifierSet modifiers,
 		                                  AnnotationList annotations)
 	{
 		return new CodeParameter(this, position, name, type, modifiers, annotations);

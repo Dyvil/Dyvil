@@ -1,9 +1,10 @@
 package dyvil.tools.compiler.ast.statement;
 
-import dyvil.annotation.internal.NonNull;
 import dyvil.collection.List;
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.collection.mutable.ArrayList;
+import dyvil.lang.Formattable;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.context.*;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.IValueList;
@@ -29,9 +30,7 @@ import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 import java.util.Iterator;
 
@@ -41,7 +40,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		                                                                         .markerSupplier("statementlist.return",
 		                                                                                         "type.expected",
 		                                                                                         "return.type");
-	protected ICodePosition position;
+	protected SourcePosition position;
 
 	protected IValue[] values;
 	protected int      valueCount;
@@ -57,28 +56,22 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		this.values = new IValue[3];
 	}
 
-	public StatementList(ICodePosition position)
+	public StatementList(SourcePosition position)
 	{
 		this.position = position;
 		this.values = new IValue[3];
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
-	}
-
-	@Override
-	public void expandPosition(@NonNull ICodePosition position)
-	{
-		this.position = this.position.to(position);
 	}
 
 	@Override
@@ -618,7 +611,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override
@@ -650,7 +643,7 @@ public class StatementList implements IValue, IValueList, IDefaultContext, ILabe
 		for (int i = 0; i < this.valueCount; i++)
 		{
 			IValue value = this.values[i];
-			ICodePosition pos = value.getPosition();
+			SourcePosition pos = value.getPosition();
 			buffer.append(indentedPrefix);
 
 			if (pos != null)

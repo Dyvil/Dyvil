@@ -19,7 +19,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public final class TypeOperator extends AbstractValue
 {
@@ -42,7 +42,7 @@ public final class TypeOperator extends AbstractValue
 	// Metadata
 	private IType genericType;
 
-	public TypeOperator(ICodePosition position)
+	public TypeOperator(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -167,7 +167,7 @@ public final class TypeOperator extends AbstractValue
 
 		if (type != null)
 		{
-			this.genericType.writeCast(writer, type, this.getLineNumber());
+			this.genericType.writeCast(writer, type, this.lineNumber());
 		}
 	}
 

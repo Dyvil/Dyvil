@@ -1,8 +1,10 @@
 package dyvil.tools.compiler.ast.expression;
 
-import dyvil.tools.compiler.ast.expression.access.FieldAccess;
+import dyvil.lang.Formattable;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
+import dyvil.tools.compiler.ast.expression.access.FieldAccess;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.field.Variable;
@@ -15,9 +17,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public class BraceAccessExpr implements IValue, IDefaultContext
 {
@@ -25,11 +25,11 @@ public class BraceAccessExpr implements IValue, IDefaultContext
 	protected IValue statement;
 
 	// Metadata
-	protected ICodePosition position;
+	protected SourcePosition position;
 	protected IVariable     variable;
 	protected FieldAccess   implicitAccess;
 
-	public BraceAccessExpr(ICodePosition position, IValue value)
+	public BraceAccessExpr(SourcePosition position, IValue value)
 	{
 		this.position = position;
 		this.value = value;
@@ -42,13 +42,13 @@ public class BraceAccessExpr implements IValue, IDefaultContext
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -217,7 +217,7 @@ public class BraceAccessExpr implements IValue, IDefaultContext
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

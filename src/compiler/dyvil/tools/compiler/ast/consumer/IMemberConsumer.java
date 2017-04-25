@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public interface IMemberConsumer<F extends IDataMember> extends IClassConsumer, IDataMemberConsumer<F>
 {
@@ -21,32 +21,32 @@ public interface IMemberConsumer<F extends IDataMember> extends IClassConsumer, 
 	void addDataMember(F field);
 
 	@Override
-	F createDataMember(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations);
+	F createDataMember(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations);
 
 	void addProperty(IProperty property);
 
-	default IProperty createProperty(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	default IProperty createProperty(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
 		return new Property(position, name, type, modifiers, annotations);
 	}
 
 	void addConstructor(IConstructor constructor);
 
-	default IConstructor createConstructor(ICodePosition position, ModifierSet modifiers, AnnotationList annotations)
+	default IConstructor createConstructor(SourcePosition position, ModifierSet modifiers, AnnotationList annotations)
 	{
 		return new CodeConstructor(position, modifiers, annotations);
 	}
 
 	void addInitializer(IInitializer initializer);
 
-	default IInitializer createInitializer(ICodePosition position, ModifierSet modifiers, AnnotationList annotations)
+	default IInitializer createInitializer(SourcePosition position, ModifierSet modifiers, AnnotationList annotations)
 	{
 		return new Initializer(position, modifiers, annotations);
 	}
 
 	void addMethod(IMethod method);
 
-	default IMethod createMethod(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	default IMethod createMethod(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
 		return new CodeMethod(position, name, type, modifiers, annotations);
 	}

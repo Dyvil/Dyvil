@@ -94,7 +94,7 @@ public class ConstructorCallParser extends Parser
 
 	public void end(IParserManager pm, IToken token)
 	{
-		this.call.expandPosition(token);
+		this.call.setPosition(this.call.getPosition().to(token));
 		this.consumer.setValue(this.call);
 		pm.popParser();
 	}

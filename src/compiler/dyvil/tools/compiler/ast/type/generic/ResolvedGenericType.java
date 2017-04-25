@@ -10,50 +10,50 @@ import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class ResolvedGenericType extends ClassGenericType
 {
-	protected ICodePosition position;
+	protected SourcePosition position;
 
-	public ResolvedGenericType(ICodePosition position)
+	public ResolvedGenericType(SourcePosition position)
 	{
 		super();
 		this.position = position;
 	}
 
-	public ResolvedGenericType(ICodePosition position, IClass iclass)
+	public ResolvedGenericType(SourcePosition position, IClass iclass)
 	{
 		super(iclass);
 		this.position = position;
 	}
 
-	public ResolvedGenericType(ICodePosition position, IClass iclass, IType... arguments)
+	public ResolvedGenericType(SourcePosition position, IClass iclass, IType... arguments)
 	{
 		super(iclass, arguments);
 		this.position = position;
 	}
 
-	public ResolvedGenericType(ICodePosition position, IClass iclass, TypeList arguments)
+	public ResolvedGenericType(SourcePosition position, IClass iclass, TypeList arguments)
 	{
 		super(iclass, arguments);
 		this.position = position;
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
 
 	@Override
-	public IType atPosition(ICodePosition position)
+	public IType atPosition(SourcePosition position)
 	{
 		this.position = position;
 		return this;

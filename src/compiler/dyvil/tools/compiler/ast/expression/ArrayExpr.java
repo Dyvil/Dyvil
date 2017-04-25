@@ -2,7 +2,9 @@ package dyvil.tools.compiler.ast.expression;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
+import dyvil.lang.Formattable;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -24,9 +26,7 @@ import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public final class ArrayExpr implements IValue
 {
@@ -44,7 +44,7 @@ public final class ArrayExpr implements IValue
 		}
 	}
 
-	protected @Nullable ICodePosition position;
+	protected @Nullable SourcePosition position;
 
 	protected @NonNull ArgumentList values;
 
@@ -62,32 +62,32 @@ public final class ArrayExpr implements IValue
 		this.values = values;
 	}
 
-	public ArrayExpr(ICodePosition position)
+	public ArrayExpr(SourcePosition position)
 	{
 		this.position = position;
 		this.values = ArgumentList.empty();
 	}
 
-	public ArrayExpr(ICodePosition position, int capacity)
+	public ArrayExpr(SourcePosition position, int capacity)
 	{
 		this.position = position;
 		this.values = new ArgumentList(capacity);
 	}
 
-	public ArrayExpr(ICodePosition position, ArgumentList values)
+	public ArrayExpr(SourcePosition position, ArgumentList values)
 	{
 		this.position = position;
 		this.values = values;
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -381,7 +381,7 @@ public final class ArrayExpr implements IValue
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

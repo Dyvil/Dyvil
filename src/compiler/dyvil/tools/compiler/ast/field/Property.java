@@ -27,7 +27,7 @@ import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -46,9 +46,9 @@ public class Property extends Member implements IProperty
 	protected IClass enclosingClass;
 
 	protected CodeParameter setterParameter;
-	protected ICodePosition initializerPosition;
+	protected SourcePosition initializerPosition;
 
-	public Property(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public Property(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
 	}
@@ -142,13 +142,13 @@ public class Property extends Member implements IProperty
 	}
 
 	@Override
-	public ICodePosition getInitializerPosition()
+	public SourcePosition getInitializerPosition()
 	{
 		return this.initializerPosition;
 	}
 
 	@Override
-	public void setInitializerPosition(ICodePosition position)
+	public void setInitializerPosition(SourcePosition position)
 	{
 		this.initializerPosition = position;
 	}

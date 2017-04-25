@@ -16,19 +16,19 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class ClassConstructor extends ConstructorCall
 {
 	private AnonymousClass nestedClass;
 
-	public ClassConstructor(ICodePosition position)
+	public ClassConstructor(SourcePosition position)
 	{
 		this.position = position;
 		this.nestedClass = new AnonymousClass(position);
 	}
 
-	public ClassConstructor(ICodePosition position, IType type, ArgumentList arguments)
+	public ClassConstructor(SourcePosition position, IType type, ArgumentList arguments)
 	{
 		super(position, type, arguments);
 	}

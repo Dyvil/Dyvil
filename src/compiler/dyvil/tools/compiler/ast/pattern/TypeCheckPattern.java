@@ -11,7 +11,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class TypeCheckPattern implements IPattern
 {
@@ -20,9 +20,9 @@ public class TypeCheckPattern implements IPattern
 
 	// Metadata
 	private IType         fromType;
-	private ICodePosition position;
+	private SourcePosition position;
 
-	public TypeCheckPattern(ICodePosition position, IPattern pattern)
+	public TypeCheckPattern(SourcePosition position, IPattern pattern)
 	{
 		this.position = position;
 		this.pattern = pattern;
@@ -36,13 +36,13 @@ public class TypeCheckPattern implements IPattern
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -142,7 +142,7 @@ public class TypeCheckPattern implements IPattern
 			writer.visitVarInsn(Opcodes.ALOAD, varIndex);
 		}
 
-		this.fromType.writeCast(writer, this.type, this.getLineNumber());
+		this.fromType.writeCast(writer, this.type, this.lineNumber());
 		this.pattern.writeInvJump(writer, -1, this.type, elseLabel);
 	}
 

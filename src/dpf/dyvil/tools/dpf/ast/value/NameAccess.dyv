@@ -5,7 +5,7 @@ import dyvil.tools.dpf.model.Expandable
 import dyvil.tools.dpf.converter.DPFValueVisitor
 import dyvil.tools.dpf.visitor.ValueVisitor
 import dyvil.tools.parsing.Name
-import dyvil.tools.parsing.ast.IASTNode
+import dyvil.tools.parsing.ASTNode
 
 import java.util.Objects
 
@@ -54,7 +54,7 @@ extends DPFValueVisitor implements Value, Expandable
 		return mappings.get(builder.toString()) ?? this
 	}
 
-	override func toString() -> String = IASTNode.toString(this)
+	override func toString() -> String = String(this)
 
 	override func toString(indent: String, buffer: StringBuilder) -> void
 	{

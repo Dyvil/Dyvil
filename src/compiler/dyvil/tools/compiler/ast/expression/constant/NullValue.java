@@ -6,19 +6,19 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public final class NullValue implements IConstantValue
 {
 	public static final NullValue NULL = new NullValue();
 
-	private ICodePosition position;
+	private SourcePosition position;
 
 	public NullValue()
 	{
 	}
 
-	public NullValue(ICodePosition position)
+	public NullValue(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -30,13 +30,13 @@ public final class NullValue implements IConstantValue
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}

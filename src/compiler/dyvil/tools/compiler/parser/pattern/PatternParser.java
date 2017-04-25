@@ -14,6 +14,7 @@ import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.Parser;
@@ -186,7 +187,7 @@ public class PatternParser extends Parser implements ITypeConsumer
 			return;
 		case TUPLE_END:
 			this.mode = END;
-			this.pattern.expandPosition(token);
+			Util.expandPosition(this.pattern, token);
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.report(token, "pattern.tuple.close_paren");
@@ -194,7 +195,7 @@ public class PatternParser extends Parser implements ITypeConsumer
 			return;
 		case CASE_CLASS_END:
 			this.mode = END;
-			this.pattern.expandPosition(token);
+			Util.expandPosition(this.pattern, token);
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.report(token, "pattern.case_class.close_paren");

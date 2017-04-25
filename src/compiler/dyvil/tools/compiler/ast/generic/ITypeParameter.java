@@ -23,10 +23,10 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.ASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public interface ITypeParameter extends IASTNode, IResolvable, INamed, IAnnotated, IObjectCompilable
+public interface ITypeParameter extends ASTNode, IResolvable, INamed, IAnnotated, IObjectCompilable
 {
 	ITypeParametric getGeneric();
 	

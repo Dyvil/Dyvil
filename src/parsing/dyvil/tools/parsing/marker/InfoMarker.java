@@ -1,11 +1,11 @@
 package dyvil.tools.parsing.marker;
 
 import dyvil.io.Console;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class InfoMarker extends Marker
 {
-	public InfoMarker(ICodePosition position, String message)
+	public InfoMarker(SourcePosition position, String message)
 	{
 		super(position, message);
 	}

@@ -12,14 +12,14 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public final class InstanceOfOperator extends AbstractValue
 {
 	protected IValue value;
 	protected IType  type;
 	
-	public InstanceOfOperator(ICodePosition position, IValue value)
+	public InstanceOfOperator(SourcePosition position, IValue value)
 	{
 		this.position = position;
 		this.value = value;
@@ -183,7 +183,7 @@ public final class InstanceOfOperator extends AbstractValue
 
 		if (type != null)
 		{
-			Types.BOOLEAN.writeCast(writer, type, this.getLineNumber());
+			Types.BOOLEAN.writeCast(writer, type, this.lineNumber());
 		}
 	}
 	

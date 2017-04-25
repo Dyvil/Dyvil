@@ -3,7 +3,7 @@ package dyvil.tools.dpf.ast.value
 import dyvil.tools.dpf.model.Expandable
 import dyvil.tools.dpf.converter.DPFValueVisitor
 import dyvil.tools.dpf.visitor.{ MapVisitor, ValueVisitor }
-import dyvil.tools.parsing.ast.IASTNode
+import dyvil.tools.parsing.ASTNode
 
 import java.util.function.BiFunction
 
@@ -64,7 +64,7 @@ case class MapValue(protected let entries: Map<Value, Value> { public get })
 
 	// String
 
-	override func toString() -> String = IASTNode.toString(this)
+	override func toString() -> String = String(this)
 
 	override func toString(indent: String, buffer: StringBuilder) -> void
 	{

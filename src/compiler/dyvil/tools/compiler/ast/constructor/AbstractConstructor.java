@@ -37,7 +37,7 @@ import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.lang.annotation.ElementType;
 
@@ -62,7 +62,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 		this.enclosingClass = enclosingClass;
 	}
 
-	public AbstractConstructor(ICodePosition position, ModifierSet modifiers, AnnotationList annotations)
+	public AbstractConstructor(SourcePosition position, ModifierSet modifiers, AnnotationList annotations)
 	{
 		super(position, Names.init, Types.VOID, modifiers, annotations);
 	}
@@ -233,7 +233,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	}
 
 	@Override
-	public IType checkArguments(MarkerList markers, ICodePosition position, IContext context, IType type,
+	public IType checkArguments(MarkerList markers, SourcePosition position, IContext context, IType type,
 		                           ArgumentList arguments)
 	{
 		final IClass theClass = this.enclosingClass;
@@ -289,7 +289,7 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	}
 
 	@Override
-	public void checkCall(MarkerList markers, ICodePosition position, IContext context, ArgumentList arguments)
+	public void checkCall(MarkerList markers, SourcePosition position, IContext context, ArgumentList arguments)
 	{
 		ModifierUtil.checkVisibility(this, position, markers, context);
 

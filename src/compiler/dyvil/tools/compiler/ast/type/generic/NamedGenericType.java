@@ -17,7 +17,7 @@ import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -26,37 +26,37 @@ import java.io.IOException;
 public class NamedGenericType extends GenericType implements IUnresolvedType
 {
 	protected IType         parent;
-	protected ICodePosition position;
+	protected SourcePosition position;
 	protected Name          name;
 
-	public NamedGenericType(ICodePosition position, Name name)
+	public NamedGenericType(SourcePosition position, Name name)
 	{
 		this.position = position;
 		this.name = name;
 	}
 
-	public NamedGenericType(ICodePosition position, Name name, IType... arguments)
-	{
-		super(arguments);
-		this.position = position;
-		this.name = name;
-	}
-
-	public NamedGenericType(ICodePosition position, Name name, TypeList arguments)
+	public NamedGenericType(SourcePosition position, Name name, IType... arguments)
 	{
 		super(arguments);
 		this.position = position;
 		this.name = name;
 	}
 
-	public NamedGenericType(ICodePosition position, IType parent, Name name)
+	public NamedGenericType(SourcePosition position, Name name, TypeList arguments)
+	{
+		super(arguments);
+		this.position = position;
+		this.name = name;
+	}
+
+	public NamedGenericType(SourcePosition position, IType parent, Name name)
 	{
 		this.position = position;
 		this.name = name;
 		this.parent = parent;
 	}
 
-	public NamedGenericType(ICodePosition position, IType parent, Name name, IType... arguments)
+	public NamedGenericType(SourcePosition position, IType parent, Name name, IType... arguments)
 	{
 		super(arguments);
 		this.parent = parent;
@@ -64,7 +64,7 @@ public class NamedGenericType extends GenericType implements IUnresolvedType
 		this.name = name;
 	}
 
-	public NamedGenericType(ICodePosition position, IType parent, Name name, TypeList arguments)
+	public NamedGenericType(SourcePosition position, IType parent, Name name, TypeList arguments)
 	{
 		super(arguments);
 		this.parent = parent;

@@ -21,7 +21,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public final class ClassOperator implements IValue
 {
@@ -42,10 +42,10 @@ public final class ClassOperator implements IValue
 	protected IType type;
 
 	// Metadata
-	private ICodePosition position;
+	private SourcePosition position;
 	private IType         genericType;
 
-	public ClassOperator(ICodePosition position)
+	public ClassOperator(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -62,13 +62,13 @@ public final class ClassOperator implements IValue
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -252,7 +252,7 @@ public final class ClassOperator implements IValue
 
 		if (type != null)
 		{
-			this.genericType.writeCast(writer, type, this.getLineNumber());
+			this.genericType.writeCast(writer, type, this.lineNumber());
 		}
 	}
 

@@ -104,7 +104,7 @@ public final class NotOperator extends AbstractValue
 
 		if (type != null)
 		{
-			Types.BOOLEAN.writeCast(writer, type, this.getLineNumber());
+			Types.BOOLEAN.writeCast(writer, type, this.lineNumber());
 		}
 	}
 	

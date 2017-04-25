@@ -1,25 +1,25 @@
 package dyvil.tools.compiler.ast.imports;
 
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public abstract class Import implements IImport
 {
-	protected ICodePosition position;
+	protected SourcePosition position;
 	protected IImport       parent;
 	
-	public Import(ICodePosition position)
+	public Import(SourcePosition position)
 	{
 		this.position = position;
 	}
 	
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 	
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}

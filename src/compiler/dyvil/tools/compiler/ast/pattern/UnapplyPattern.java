@@ -23,7 +23,7 @@ import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class UnapplyPattern extends Pattern implements IPatternList
 {
@@ -34,12 +34,12 @@ public class UnapplyPattern extends Pattern implements IPatternList
 	// Metadata
 	protected IValue unapplyCall;
 
-	public UnapplyPattern(ICodePosition position)
+	public UnapplyPattern(SourcePosition position)
 	{
 		this.position = position;
 	}
 
-	public UnapplyPattern(ICodePosition position, IType type)
+	public UnapplyPattern(SourcePosition position, IType type)
 	{
 		this.position = position;
 		this.type = type;
@@ -207,7 +207,7 @@ public class UnapplyPattern extends Pattern implements IPatternList
 	{
 		IPattern.loadVar(writer, varIndex, matchedType);
 
-		final int lineNumer = this.getLineNumber();
+		final int lineNumer = this.lineNumber();
 		final int localCount = writer.localCount();
 
 		this.unapplyCall.writeExpression(writer, null);

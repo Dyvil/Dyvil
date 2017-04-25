@@ -7,8 +7,8 @@ import dyvil.collection.mutable.ArrayList
 import dyvil.tools.dpf.ast.value._
 import dyvil.tools.dpf.visitor.ValueVisitor
 import dyvil.tools.parsing.Name
-import dyvil.tools.parsing.ast.IASTNode
-import dyvil.tools.parsing.position.ICodePosition
+import dyvil.tools.parsing.ASTNode
+import dyvil.source.position.SourcePosition
 
 import java.lang.reflect.Array
 
@@ -22,7 +22,7 @@ import java.lang.reflect.Array
 @LiteralConvertible.FromStringInterpolation
 @LiteralConvertible.FromArray("apply(elements:)")
 @LiteralConvertible.FromMap("apply(entries:)")
-public interface Value extends IASTNode, dyvil.tools.dpf.model.value.Value
+public interface Value extends ASTNode, dyvil.tools.dpf.model.value.Value
 {
 	// Conversion Methods
 
@@ -53,9 +53,9 @@ public interface Value extends IASTNode, dyvil.tools.dpf.model.value.Value
 
 	// Override Methods
 
-	override func getPosition() -> ICodePosition! = null
+	override func getPosition() -> SourcePosition! = null
 
-	override func setPosition(position: ICodePosition!) -> void { }
+	override func setPosition(position: SourcePosition!) -> void { }
 
 	override func toString(indent: String, buffer: StringBuilder) -> void
 

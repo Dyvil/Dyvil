@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class IterableForStatement extends ForEachStatement
 {
@@ -26,7 +26,7 @@ public class IterableForStatement extends ForEachStatement
 
 	protected boolean iterator;
 
-	public IterableForStatement(ICodePosition position, IVariable variable, boolean iterator)
+	public IterableForStatement(SourcePosition position, IVariable variable, boolean iterator)
 	{
 		super(position, variable);
 		this.iterator = iterator;
@@ -41,7 +41,7 @@ public class IterableForStatement extends ForEachStatement
 
 		final IVariable var = this.variable;
 		final IType varType = var.getType();
-		final int lineNumber = this.getLineNumber();
+		final int lineNumber = this.lineNumber();
 
 		// Scope
 		dyvil.tools.asm.Label scopeLabel = new dyvil.tools.asm.Label();

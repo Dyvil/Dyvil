@@ -15,7 +15,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.LambdaType;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class Closure extends StatementList
 {
@@ -26,7 +26,7 @@ public class Closure extends StatementList
 	{
 	}
 
-	public Closure(ICodePosition position)
+	public Closure(SourcePosition position)
 	{
 		this.position = position;
 	}

@@ -315,6 +315,11 @@ private void runCompiler(JavaExec exec, String config, String target, String... 
 	}
 }
 
+/* // Add a / at the start of this line to skip all compilation tasks
+tasks.withType(JavaExec).forEach{it.enabled = false}
+tasks.withType(JavaCompile).forEach{it.enabled = false}
+//*/
+
 private void runGenSrc(JavaExec exec, String target, String... srcs)
 {
 	exec.outputs.dirs target

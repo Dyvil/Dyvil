@@ -9,11 +9,11 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public final class WildcardPattern extends Pattern
 {
-	public WildcardPattern(ICodePosition position)
+	public WildcardPattern(SourcePosition position)
 	{
 		this.position = position;
 	}

@@ -7,8 +7,8 @@ import dyvil.collection.mutable.ArrayList
 import dyvil.tools.dpf.visitor.NodeVisitor
 import dyvil.tools.dpf.visitor.ValueVisitor
 import dyvil.tools.parsing.Name
-import dyvil.tools.parsing.ast.IASTNode
-import dyvil.tools.parsing.position.ICodePosition
+import dyvil.tools.parsing.ASTNode
+import dyvil.source.position.SourcePosition
 
 public class Node(
 	protected let name: Name { public override get }
@@ -87,7 +87,7 @@ public class Node(
 		node.nodeAccesses = this.nodeAccesses.mapped(nodeAccess => nodeAccess.expand(mappings, false))
 	}
 
-	override func toString() -> String = IASTNode.toString(this)
+	override func toString() -> String = String(this)
 	
 	override func toString(indent: String, buffer: StringBuilder) -> void
 	{

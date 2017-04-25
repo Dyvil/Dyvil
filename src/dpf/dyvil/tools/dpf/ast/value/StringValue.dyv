@@ -1,7 +1,7 @@
 package dyvil.tools.dpf.ast.value;
 
 import dyvil.tools.dpf.visitor.ValueVisitor;
-import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.ASTNode;
 import dyvil.tools.parsing.lexer.LexerUtil;
 
 case class StringValue(protected let value: String) implements Constant
@@ -12,7 +12,7 @@ case class StringValue(protected let value: String) implements Constant
 
 	override func appendString(builder: StringBuilder) -> void = builder.append(this.value)
 
-	override func toString() -> String = IASTNode.toString(this)
+	override func toString() -> String = String(this)
 
 	override func toString(indent: String, buffer: StringBuilder) -> void = LexerUtil.appendStringLiteral(this.value, buffer)
 }

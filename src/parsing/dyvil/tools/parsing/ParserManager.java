@@ -6,7 +6,7 @@ import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SyntaxError;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.parsing.token.IToken;
 import dyvil.tools.parsing.token.IdentifierToken;
 import dyvil.tools.parsing.token.SymbolToken;
@@ -127,7 +127,7 @@ public class ParserManager implements IParserManager
 	}
 
 	@Override
-	public void report(ICodePosition position, String message)
+	public void report(SourcePosition position, String message)
 	{
 		this.report(new SyntaxError(position, this.markers.getI18n().getString(message)));
 	}
@@ -220,7 +220,7 @@ public class ParserManager implements IParserManager
 		}
 	}
 
-	protected void reportError(ICodePosition position, Throwable ex)
+	protected void reportError(SourcePosition position, Throwable ex)
 	{
 		final Marker marker = new SyntaxError(position, this.markers.getI18n()
 		                                                            .getString("parser.error", position.toString(),

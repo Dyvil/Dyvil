@@ -15,9 +15,9 @@ import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.alias.ITypeAliasMap;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.ASTNode;
 
-public interface IHeaderUnit extends IASTNode, IObjectCompilable, IContext, IClassList, ICompilableList, IOperatorMap, ITypeAliasMap
+public interface IHeaderUnit extends ASTNode, IObjectCompilable, IContext, IClassList, ICompilableList, IOperatorMap, ITypeAliasMap
 {
 	boolean isHeader();
 

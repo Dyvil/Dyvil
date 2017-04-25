@@ -32,15 +32,15 @@ import dyvil.tools.compiler.ast.type.raw.PackageType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.ASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public interface IType extends IASTNode, IMemberContext, ITypeContext
+public interface IType extends ASTNode, IMemberContext, ITypeContext
 {
 	class TypePosition
 	{
@@ -143,17 +143,17 @@ public interface IType extends IASTNode, IMemberContext, ITypeContext
 	int MISSING_TAG = 255;
 
 	@Override
-	default ICodePosition getPosition()
+	default SourcePosition getPosition()
 	{
 		return null;
 	}
 
 	@Override
-	default void setPosition(ICodePosition position)
+	default void setPosition(SourcePosition position)
 	{
 	}
 
-	default IType atPosition(ICodePosition position)
+	default IType atPosition(SourcePosition position)
 	{
 		return new ResolvedTypeDelegate(position, this);
 	}

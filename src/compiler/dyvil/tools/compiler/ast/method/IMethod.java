@@ -15,7 +15,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public interface IMethod extends ICallableMember, ITypeParametricMember, IContext
 {
@@ -29,9 +29,9 @@ public interface IMethod extends ICallableMember, ITypeParametricMember, IContex
 
 	void checkImplicitMatch(MatchList<IMethod> list, IValue value, IType type);
 	
-	IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue receiver, ArgumentList arguments, GenericData genericData);
+	IValue checkArguments(MarkerList markers, SourcePosition position, IContext context, IValue receiver, ArgumentList arguments, GenericData genericData);
 	
-	void checkCall(MarkerList markers, ICodePosition position, IContext context, IValue instance, ArgumentList arguments, ITypeContext typeContext);
+	void checkCall(MarkerList markers, SourcePosition position, IContext context, IValue instance, ArgumentList arguments, ITypeContext typeContext);
 	
 	// Misc
 	

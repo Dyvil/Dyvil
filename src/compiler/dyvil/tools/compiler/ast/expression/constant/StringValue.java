@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.expression.constant;
 
+import dyvil.lang.Formattable;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IImplicitContext;
@@ -11,14 +13,12 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.lexer.LexerUtil;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public final class StringValue implements IConstantValue
 {
-	protected ICodePosition position;
+	protected SourcePosition position;
 	protected String        value;
 
 	public StringValue(String value)
@@ -26,20 +26,20 @@ public final class StringValue implements IConstantValue
 		this.value = value;
 	}
 
-	public StringValue(ICodePosition position, String value)
+	public StringValue(SourcePosition position, String value)
 	{
 		this.position = position;
 		this.value = value;
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -125,14 +125,14 @@ public final class StringValue implements IConstantValue
 
 		if (type != null)
 		{
-			Types.STRING.writeCast(writer, type, this.getLineNumber());
+			Types.STRING.writeCast(writer, type, this.lineNumber());
 		}
 	}
 
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

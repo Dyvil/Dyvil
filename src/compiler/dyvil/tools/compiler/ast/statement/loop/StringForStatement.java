@@ -5,11 +5,11 @@ import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class StringForStatement extends ForEachStatement
 {
-	public StringForStatement(ICodePosition position, IVariable var)
+	public StringForStatement(SourcePosition position, IVariable var)
 	{
 		super(position, var);
 	}
@@ -22,7 +22,7 @@ public class StringForStatement extends ForEachStatement
 		dyvil.tools.asm.Label endLabel = this.endLabel.getTarget();
 		
 		final IVariable var = this.variable;
-		final int lineNumber = this.getLineNumber();
+		final int lineNumber = this.lineNumber();
 
 		// Scope
 		dyvil.tools.asm.Label scopeLabel = new dyvil.tools.asm.Label();

@@ -1,11 +1,14 @@
 package dyvil.tools.compiler.ast.expression.access;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.lang.Formattable;
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.context.IImplicitContext;
-import dyvil.tools.compiler.ast.expression.constant.EnumValue;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.constant.EnumValue;
+import dyvil.tools.compiler.ast.expression.operator.PostfixCall;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IVariable;
@@ -13,7 +16,6 @@ import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.member.INamed;
-import dyvil.tools.compiler.ast.expression.operator.PostfixCall;
 import dyvil.tools.compiler.ast.reference.IReference;
 import dyvil.tools.compiler.ast.reference.InstanceFieldReference;
 import dyvil.tools.compiler.ast.reference.StaticFieldReference;
@@ -26,14 +28,12 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.SideEffectHelper;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public class FieldAccess implements IValue, INamed, IReceiverAccess
 {
-	protected ICodePosition position;
+	protected SourcePosition position;
 	protected IValue        receiver;
 	protected Name          name;
 
@@ -45,7 +45,7 @@ public class FieldAccess implements IValue, INamed, IReceiverAccess
 	{
 	}
 
-	public FieldAccess(ICodePosition position)
+	public FieldAccess(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -56,14 +56,14 @@ public class FieldAccess implements IValue, INamed, IReceiverAccess
 		this.name = field.getName();
 	}
 
-	public FieldAccess(ICodePosition position, IValue instance, Name name)
+	public FieldAccess(SourcePosition position, IValue instance, Name name)
 	{
 		this.position = position;
 		this.receiver = instance;
 		this.name = name;
 	}
 
-	public FieldAccess(ICodePosition position, IValue instance, IDataMember field)
+	public FieldAccess(SourcePosition position, IValue instance, IDataMember field)
 	{
 		this.position = position;
 		this.receiver = instance;
@@ -72,13 +72,13 @@ public class FieldAccess implements IValue, INamed, IReceiverAccess
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -118,13 +118,13 @@ public class FieldAccess implements IValue, INamed, IReceiverAccess
 	}
 
 	@Override
-	public IValue toAssignment(IValue rhs, ICodePosition position)
+	public IValue toAssignment(IValue rhs, SourcePosition position)
 	{
 		return new FieldAssignment(this.position.to(position), this.receiver, this.name, rhs);
 	}
 
 	@Override
-	public IValue toCompoundAssignment(IValue rhs, ICodePosition position, MarkerList markers, IContext context,
+	public IValue toCompoundAssignment(IValue rhs, SourcePosition position, MarkerList markers, IContext context,
 		                                  SideEffectHelper helper)
 	{
 		// x op= z
@@ -468,7 +468,7 @@ public class FieldAccess implements IValue, INamed, IReceiverAccess
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		final int lineNumber = this.getLineNumber();
+		final int lineNumber = this.lineNumber();
 		this.field.writeGet(writer, this.receiver, lineNumber);
 
 		if (type == null)
@@ -490,7 +490,7 @@ public class FieldAccess implements IValue, INamed, IReceiverAccess
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

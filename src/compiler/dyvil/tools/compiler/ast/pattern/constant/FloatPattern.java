@@ -9,13 +9,13 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public final class FloatPattern extends Pattern
 {
 	private float value;
 	
-	public FloatPattern(ICodePosition position, float value)
+	public FloatPattern(SourcePosition position, float value)
 	{
 		this.position = position;
 		this.value = value;
@@ -44,7 +44,7 @@ public final class FloatPattern extends Pattern
 			throws BytecodeException
 	{
 		IPattern.loadVar(writer, varIndex, matchedType);
-		matchedType.writeCast(writer, Types.FLOAT, this.getLineNumber());
+		matchedType.writeCast(writer, Types.FLOAT, this.lineNumber());
 		writer.visitLdcInsn(this.value);
 		writer.visitJumpInsn(Opcodes.IF_FCMPNE, elseLabel);
 	}

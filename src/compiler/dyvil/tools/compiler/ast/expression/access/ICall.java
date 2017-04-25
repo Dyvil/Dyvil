@@ -18,7 +18,7 @@ import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public interface ICall extends IValue, IArgumentsConsumer
 {
@@ -93,7 +93,7 @@ public interface ICall extends IValue, IArgumentsConsumer
 
 	default IValue toLambda(MarkerList markers, IContext context, int wildcards)
 	{
-		ICodePosition position = this.getPosition();
+		SourcePosition position = this.getPosition();
 
 		final IParameter[] parameters = new IParameter[wildcards];
 		for (int i = 0; i < wildcards; i++)

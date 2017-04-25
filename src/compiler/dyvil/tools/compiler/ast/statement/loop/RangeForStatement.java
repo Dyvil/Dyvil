@@ -13,7 +13,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class RangeForStatement extends ForEachStatement
 {
@@ -25,7 +25,7 @@ public class RangeForStatement extends ForEachStatement
 
 	private final IType elementType;
 
-	public RangeForStatement(ICodePosition position, IVariable var, IType elementType)
+	public RangeForStatement(SourcePosition position, IVariable var, IType elementType)
 	{
 		super(position, var);
 
@@ -68,7 +68,7 @@ public class RangeForStatement extends ForEachStatement
 		byte kind = RANGEABLE;
 		boolean boxed = false;
 
-		final int lineNumber = this.getLineNumber();
+		final int lineNumber = this.lineNumber();
 
 		final IVariable var = this.variable;
 		final IType varType = var.getType();

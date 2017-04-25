@@ -1,22 +1,22 @@
 package dyvil.tools.compiler.ast.pattern.operator;
 
+import dyvil.lang.Formattable;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public abstract class BinaryPattern implements IPattern
 {
 	protected IPattern      left;
 	protected IPattern      right;
-	protected ICodePosition position;
+	protected SourcePosition position;
 	// Metadata
 	private   IType         commonType;
 
-	public BinaryPattern(IPattern left, ICodePosition token, IPattern right)
+	public BinaryPattern(IPattern left, SourcePosition token, IPattern right)
 	{
 		this.right = right;
 		this.left = left;
@@ -44,13 +44,13 @@ public abstract class BinaryPattern implements IPattern
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -110,6 +110,6 @@ public abstract class BinaryPattern implements IPattern
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 }

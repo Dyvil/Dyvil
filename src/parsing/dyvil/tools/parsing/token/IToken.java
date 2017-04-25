@@ -1,9 +1,9 @@
 package dyvil.tools.parsing.token;
 
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
-public interface IToken extends ICodePosition
+public interface IToken extends SourcePosition
 {
 	int type();
 	

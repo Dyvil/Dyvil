@@ -6,16 +6,16 @@ import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class UpdateMethodCall extends AbstractCall implements IValueConsumer
 {
-	public UpdateMethodCall(ICodePosition position)
+	public UpdateMethodCall(SourcePosition position)
 	{
 		this.position = position;
 	}
 	
-	public UpdateMethodCall(ICodePosition position, IValue instance, ArgumentList arguments, IValue rhs)
+	public UpdateMethodCall(SourcePosition position, IValue instance, ArgumentList arguments, IValue rhs)
 	{
 		this.position = position;
 		this.receiver = instance;

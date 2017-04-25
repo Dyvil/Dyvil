@@ -41,7 +41,7 @@ import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -72,7 +72,7 @@ public class CodeMethod extends AbstractMethod
 		super(iclass, name, type, modifiers);
 	}
 
-	public CodeMethod(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public CodeMethod(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
 	}
@@ -631,7 +631,7 @@ public class CodeMethod extends AbstractMethod
 			return;
 		}
 
-		final int lineNumber = this.getLineNumber();
+		final int lineNumber = this.lineNumber();
 		final int opcode = interfaceClass ? Opcodes.INVOKEINTERFACE : Opcodes.INVOKEVIRTUAL;
 
 		/*

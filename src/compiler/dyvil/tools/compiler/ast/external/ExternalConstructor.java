@@ -26,7 +26,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.backend.visitor.AnnotationReader;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public final class ExternalConstructor extends AbstractConstructor implements IExternalCallableMember
 {
@@ -97,7 +97,7 @@ public final class ExternalConstructor extends AbstractConstructor implements IE
 	}
 
 	@Override
-	public IParameter createParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public IParameter createParameter(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
 		return new ExternalParameter(this, name, type, modifiers, annotations);
 	}

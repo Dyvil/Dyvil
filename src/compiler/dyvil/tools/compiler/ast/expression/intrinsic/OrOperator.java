@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public final class OrOperator extends AbstractValue
 {
@@ -26,7 +26,7 @@ public final class OrOperator extends AbstractValue
 		this.right = right;
 	}
 	
-	public OrOperator(ICodePosition position, IValue left, IValue right)
+	public OrOperator(SourcePosition position, IValue left, IValue right)
 	{
 		this.position = position;
 		this.left = left;
@@ -140,7 +140,7 @@ public final class OrOperator extends AbstractValue
 
 		if (type != null)
 		{
-			Types.BOOLEAN.writeCast(writer, type, this.getLineNumber());
+			Types.BOOLEAN.writeCast(writer, type, this.lineNumber());
 		}
 	}
 	

@@ -4,6 +4,7 @@ import dyvil.collection.List;
 import dyvil.collection.Map;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.collection.mutable.HashMap;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.IClassConsumer;
@@ -21,7 +22,6 @@ import dyvil.tools.compiler.sources.DyvilFileType;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.CodePosition;
 
 import java.io.InputStream;
 
@@ -183,7 +183,7 @@ public class Package implements INamed, IDefaultContext, IClassConsumer
 	{
 		if (packageDecl == null)
 		{
-			markers.add(Markers.semantic(CodePosition.ORIGIN, "package.missing"));
+			markers.add(Markers.semantic(SourcePosition.ORIGIN, "package.missing"));
 			return;
 		}
 

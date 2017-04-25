@@ -20,7 +20,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class ClassParameter extends Field implements IParameter
 {
@@ -47,7 +47,7 @@ public class ClassParameter extends Field implements IParameter
 		super(enclosingClass, name, type);
 	}
 
-	public ClassParameter(IClass enclosingClass, ICodePosition position, Name name, IType type, ModifierSet modifiers,
+	public ClassParameter(IClass enclosingClass, SourcePosition position, Name name, IType type, ModifierSet modifiers,
 		                     AnnotationList annotations)
 	{
 		super(enclosingClass, position, name, type, modifiers == null ? new ModifierList() : modifiers, annotations);
@@ -143,7 +143,7 @@ public class ClassParameter extends Field implements IParameter
 	}
 
 	@Override
-	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue receiver, IContext context)
+	public IValue checkAccess(MarkerList markers, SourcePosition position, IValue receiver, IContext context)
 	{
 		if (receiver != null)
 		{
@@ -172,7 +172,7 @@ public class ClassParameter extends Field implements IParameter
 	}
 
 	@Override
-	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue receiver,
+	public IValue checkAssign(MarkerList markers, IContext context, SourcePosition position, IValue receiver,
 		                         IValue newValue)
 	{
 		if (this.enclosingClass.hasModifier(Modifiers.ANNOTATION))

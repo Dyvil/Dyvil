@@ -12,12 +12,12 @@ import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.type.ITyped;
 import dyvil.tools.compiler.ast.header.IObjectCompilable;
-import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.ASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 
 import java.lang.annotation.ElementType;
 
-public interface IAnnotation extends IASTNode, IResolvable, ITyped, IObjectCompilable, IArgumentsConsumer
+public interface IAnnotation extends ASTNode, IResolvable, ITyped, IObjectCompilable, IArgumentsConsumer
 {
 	@Override
 	void setArguments(ArgumentList arguments);

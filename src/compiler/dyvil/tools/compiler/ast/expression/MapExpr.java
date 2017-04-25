@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.expression;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.collection.mutable.HashSet;
+import dyvil.lang.Formattable;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -22,7 +23,7 @@ import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class MapExpr implements IValue
 {
@@ -37,7 +38,7 @@ public class MapExpr implements IValue
 	private static final TypeChecker.MarkerSupplier VALUE_MARKER_SUPPLIER = TypeChecker.markerSupplier(
 		"map.value.type.incompatible", "map.value.type.expected", "map.value.type.actual");
 
-	protected ICodePosition position;
+	protected SourcePosition position;
 
 	protected @NonNull ArgumentList keys;
 	protected @NonNull ArgumentList values;
@@ -47,12 +48,12 @@ public class MapExpr implements IValue
 	private IType keyType;
 	private IType valueType;
 
-	public MapExpr(ICodePosition position)
+	public MapExpr(SourcePosition position)
 	{
 		this.position = position;
 	}
 
-	public MapExpr(ICodePosition position, ArgumentList keys, ArgumentList values)
+	public MapExpr(SourcePosition position, ArgumentList keys, ArgumentList values)
 	{
 		this.position = position;
 		this.keys = keys;
@@ -66,13 +67,13 @@ public class MapExpr implements IValue
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
@@ -345,8 +346,14 @@ public class MapExpr implements IValue
 
 		if (type != null)
 		{
-			this.getType().writeCast(writer, type, this.getLineNumber());
+			this.getType().writeCast(writer, type, this.lineNumber());
 		}
+	}
+
+	@Override
+	public String toString()
+	{
+		return Formattable.toString(this);
 	}
 
 	@Override

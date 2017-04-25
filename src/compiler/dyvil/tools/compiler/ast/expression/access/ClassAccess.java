@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.expression.access;
 
+import dyvil.lang.Formattable;
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -14,16 +16,14 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public final class ClassAccess implements IValue
 {
 	protected IType type;
 
 	// Metadata
-	protected ICodePosition position;
+	protected SourcePosition position;
 	protected boolean       ignored;
 	protected boolean       withTyped;
 
@@ -32,20 +32,20 @@ public final class ClassAccess implements IValue
 		this.type = type;
 	}
 
-	public ClassAccess(ICodePosition position, IType type)
+	public ClassAccess(SourcePosition position, IType type)
 	{
 		this.position = position;
 		this.type = type;
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -175,7 +175,7 @@ public final class ClassAccess implements IValue
 			IDataMember field = iclass.getMetadata().getInstanceField();
 			if (field != null)
 			{
-				field.writeGet(writer, null, this.getLineNumber());
+				field.writeGet(writer, null, this.lineNumber());
 				return;
 			}
 		}
@@ -186,7 +186,7 @@ public final class ClassAccess implements IValue
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

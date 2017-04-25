@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.expression.access;
 
+import dyvil.lang.Formattable;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -8,19 +10,16 @@ import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public class InitializerCall implements ICall
 {
-	protected ICodePosition position;
+	protected SourcePosition position;
 
 	protected boolean isSuper;
 	protected ArgumentList arguments;
@@ -29,14 +28,14 @@ public class InitializerCall implements ICall
 	protected IType        targetType;
 	protected IConstructor constructor;
 
-	public InitializerCall(ICodePosition position, boolean isSuper)
+	public InitializerCall(SourcePosition position, boolean isSuper)
 	{
 		this.position = position;
 		this.isSuper = isSuper;
 		this.arguments = ArgumentList.EMPTY;
 	}
 
-	public InitializerCall(ICodePosition position, boolean isSuper, ArgumentList arguments, IType targetType)
+	public InitializerCall(SourcePosition position, boolean isSuper, ArgumentList arguments, IType targetType)
 	{
 		this.position = position;
 		this.isSuper = isSuper;
@@ -44,7 +43,7 @@ public class InitializerCall implements ICall
 		this.targetType = targetType;
 	}
 
-	public InitializerCall(ICodePosition position, boolean isSuper, ArgumentList arguments, IType targetType, IConstructor constructor)
+	public InitializerCall(SourcePosition position, boolean isSuper, ArgumentList arguments, IType targetType, IConstructor constructor)
 	{
 		this.position = position;
 		this.constructor = constructor;
@@ -54,13 +53,13 @@ public class InitializerCall implements ICall
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -190,13 +189,13 @@ public class InitializerCall implements ICall
 	{
 		writer.visitVarInsn(Opcodes.ALOAD, 0);
 		this.constructor.writeArguments(writer, this.arguments);
-		this.constructor.writeInvoke(writer, this.getLineNumber());
+		this.constructor.writeInvoke(writer, this.lineNumber());
 	}
 
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

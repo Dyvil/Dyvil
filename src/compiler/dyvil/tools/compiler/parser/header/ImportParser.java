@@ -6,6 +6,7 @@ import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.Parser;
@@ -152,7 +153,7 @@ public final class ImportParser extends Parser
 			pm.report(token, "import.dot");
 			return;
 		case MULTI_IMPORT_END:
-			this.theImport.expandPosition(token);
+			Util.expandPosition(this.theImport, token);
 			this.end();
 			pm.popParser();
 			if (type != BaseSymbols.CLOSE_CURLY_BRACKET)

@@ -17,7 +17,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -33,7 +33,7 @@ public final class MultiImport extends Import implements IImportContext, IImport
 		super(null);
 	}
 
-	public MultiImport(ICodePosition position)
+	public MultiImport(SourcePosition position)
 	{
 		super(position);
 	}

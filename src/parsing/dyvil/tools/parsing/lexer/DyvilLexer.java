@@ -4,8 +4,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SyntaxError;
-import dyvil.tools.parsing.position.CodePosition;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.parsing.token.*;
 
 import static dyvil.tools.parsing.lexer.BaseSymbols.*;
@@ -963,10 +962,10 @@ public final class DyvilLexer
 
 	private void error(String key)
 	{
-		this.error(new CodePosition(this.line, this.column, this.column + 1), key);
+		this.error(SourcePosition.apply(this.line, this.column, this.column + 1), key);
 	}
 
-	private void error(ICodePosition position, String key)
+	private void error(SourcePosition position, String key)
 	{
 		this.markers.add(new SyntaxError(position, this.markers.getI18n().getString(key)));
 	}

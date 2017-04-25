@@ -7,20 +7,20 @@ import dyvil.tools.gensrc.ast.scope.Scope;
 import dyvil.tools.gensrc.lang.I18n;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SemanticError;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.io.PrintStream;
 
 public class ForDirective implements Directive
 {
-	private final ICodePosition position;
+	private final SourcePosition position;
 	private final String        varName;
 	private final String        start;
 	private final String        end;
 
 	private Directive action;
 
-	public ForDirective(ICodePosition position, String varName, String start, String end)
+	public ForDirective(SourcePosition position, String varName, String start, String end)
 	{
 		this.position = position;
 		this.varName = varName;

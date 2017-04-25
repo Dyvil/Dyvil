@@ -1,22 +1,22 @@
 package dyvil.tools.compiler.ast.expression.constant;
 
+import dyvil.lang.Formattable;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.parsing.ast.IASTNode;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public class VoidValue implements IConstantValue
 {
-	protected ICodePosition position;
+	protected SourcePosition position;
 
 	public VoidValue()
 	{
 	}
 
-	public VoidValue(ICodePosition position)
+	public VoidValue(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -28,13 +28,13 @@ public class VoidValue implements IConstantValue
 	}
 	
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 	
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -84,7 +84,7 @@ public class VoidValue implements IConstantValue
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

@@ -10,7 +10,7 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -60,7 +60,7 @@ public final class CaptureField extends CaptureDataMember implements IField
 	}
 
 	@Override
-	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue receiver, IContext context)
+	public IValue checkAccess(MarkerList markers, SourcePosition position, IValue receiver, IContext context)
 	{
 		super.checkAccess(markers, position, receiver, context);
 

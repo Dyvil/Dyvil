@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.expression.constant;
 
+import dyvil.lang.Formattable;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IImplicitContext;
@@ -10,28 +12,26 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.lexer.LexerUtil;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public final class CharValue implements IConstantValue
 {
 	private static final byte TYPE_CHAR   = 1;
 	private static final byte TYPE_STRING = 2;
 
-	protected ICodePosition position;
+	protected SourcePosition position;
 	protected String        value;
 
 	private byte type;
 
-	public CharValue(ICodePosition position, String value)
+	public CharValue(SourcePosition position, String value)
 	{
 		this.position = position;
 		this.value = value;
 	}
 
-	public CharValue(ICodePosition position, String value, boolean forceChar)
+	public CharValue(SourcePosition position, String value, boolean forceChar)
 	{
 		this.position = position;
 		this.value = value;
@@ -39,13 +39,13 @@ public final class CharValue implements IConstantValue
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -222,7 +222,7 @@ public final class CharValue implements IConstantValue
 
 			if (type != null)
 			{
-				Types.CHAR.writeCast(writer, type, this.getLineNumber());
+				Types.CHAR.writeCast(writer, type, this.lineNumber());
 			}
 			return;
 		}
@@ -230,14 +230,14 @@ public final class CharValue implements IConstantValue
 		writer.visitLdcInsn(this.value);
 		if (type != null)
 		{
-			Types.STRING.writeCast(writer, type, this.getLineNumber());
+			Types.STRING.writeCast(writer, type, this.lineNumber());
 		}
 	}
 
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

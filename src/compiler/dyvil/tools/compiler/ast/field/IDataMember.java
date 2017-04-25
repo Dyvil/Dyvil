@@ -17,7 +17,7 @@ import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public interface IDataMember extends IMember, IAccessible, IValueConsumer
 {
@@ -40,9 +40,9 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 	{
 	}
 
-	IValue checkAccess(MarkerList markers, ICodePosition position, IValue receiver, IContext context);
+	IValue checkAccess(MarkerList markers, SourcePosition position, IValue receiver, IContext context);
 
-	default IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue receiver, IValue newValue)
+	default IValue checkAssign(MarkerList markers, IContext context, SourcePosition position, IValue receiver, IValue newValue)
 	{
 		if (this.hasModifier(Modifiers.FINAL))
 		{

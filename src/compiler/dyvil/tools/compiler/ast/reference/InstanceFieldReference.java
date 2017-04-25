@@ -12,7 +12,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class InstanceFieldReference implements IReference
 {
@@ -29,7 +29,7 @@ public class InstanceFieldReference implements IReference
 		this.field = field;
 	}
 
-	public static void checkFinalAccess(IDataMember field, ICodePosition position, MarkerList markers)
+	public static void checkFinalAccess(IDataMember field, SourcePosition position, MarkerList markers)
 	{
 		if (field.hasModifier(Modifiers.FINAL))
 		{
@@ -38,7 +38,7 @@ public class InstanceFieldReference implements IReference
 	}
 
 	@Override
-	public void check(ICodePosition position, MarkerList markers, IContext context)
+	public void check(SourcePosition position, MarkerList markers, IContext context)
 	{
 		checkFinalAccess(this.field, position, markers);
 	}

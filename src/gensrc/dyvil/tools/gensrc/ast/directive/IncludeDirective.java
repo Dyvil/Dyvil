@@ -7,7 +7,7 @@ import dyvil.tools.gensrc.ast.scope.Scope;
 import dyvil.tools.gensrc.lang.I18n;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SemanticError;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,10 +16,10 @@ import java.nio.file.Files;
 
 public class IncludeDirective implements Directive
 {
-	private final ICodePosition position;
+	private final SourcePosition position;
 	private final String        files;
 
-	public IncludeDirective(ICodePosition position, String files)
+	public IncludeDirective(SourcePosition position, String files)
 	{
 		this.position = position;
 		this.files = files;

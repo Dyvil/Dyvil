@@ -8,22 +8,22 @@ import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.transform.SideEffectHelper;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class SubscriptAccess extends AbstractCall
 {
-	public SubscriptAccess(ICodePosition position)
+	public SubscriptAccess(SourcePosition position)
 	{
 		this.position = position;
 	}
 
-	public SubscriptAccess(ICodePosition position, IValue instance)
+	public SubscriptAccess(SourcePosition position, IValue instance)
 	{
 		this.position = position;
 		this.receiver = instance;
 	}
 
-	public SubscriptAccess(ICodePosition position, IValue instance, ArgumentList arguments)
+	public SubscriptAccess(SourcePosition position, IValue instance, ArgumentList arguments)
 	{
 		this.position = position;
 		this.receiver = instance;
@@ -49,13 +49,13 @@ public class SubscriptAccess extends AbstractCall
 	}
 
 	@Override
-	public IValue toAssignment(IValue rhs, ICodePosition position)
+	public IValue toAssignment(IValue rhs, SourcePosition position)
 	{
 		return new SubscriptAssignment(this.position.to(position), this.receiver, this.arguments, rhs);
 	}
 
 	@Override
-	public IValue toCompoundAssignment(IValue rhs, ICodePosition position, MarkerList markers, IContext context,
+	public IValue toCompoundAssignment(IValue rhs, SourcePosition position, MarkerList markers, IContext context,
 		                                  SideEffectHelper helper)
 	{
 		// x[y...] op= z

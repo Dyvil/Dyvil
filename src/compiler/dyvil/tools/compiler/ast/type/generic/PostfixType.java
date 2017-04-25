@@ -8,11 +8,11 @@ import dyvil.tools.compiler.ast.type.compound.ImplicitNullableType;
 import dyvil.tools.compiler.ast.type.compound.NullableType;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class PostfixType extends NamedGenericType
 {
-	public PostfixType(ICodePosition position, Name name, IType lhs)
+	public PostfixType(SourcePosition position, Name name, IType lhs)
 	{
 		super(position, name, lhs);
 	}

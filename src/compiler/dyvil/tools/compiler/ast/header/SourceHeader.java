@@ -19,7 +19,7 @@ import dyvil.tools.parsing.ParserManager;
 import dyvil.tools.parsing.TokenIterator;
 import dyvil.tools.parsing.lexer.DyvilLexer;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.io.File;
 import java.io.IOException;
@@ -133,7 +133,7 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	{
 		if (this.headerDeclaration == null)
 		{
-			this.headerDeclaration = new HeaderDeclaration(this, ICodePosition.ORIGIN, this.name,
+			this.headerDeclaration = new HeaderDeclaration(this, SourcePosition.ORIGIN, this.name,
 			                                               new FlagModifierSet(Modifiers.PUBLIC), null);
 		}
 

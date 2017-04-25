@@ -15,7 +15,7 @@ import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class PropertyReference implements IReference
 {
@@ -38,7 +38,7 @@ public class PropertyReference implements IReference
 	}
 
 	@Override
-	public void checkTypes(ICodePosition position, MarkerList markers, IContext context)
+	public void checkTypes(SourcePosition position, MarkerList markers, IContext context)
 	{
 		final Name getterName = this.getterMethod.getName();
 		final Name setterName = Util.addEq(getterName);

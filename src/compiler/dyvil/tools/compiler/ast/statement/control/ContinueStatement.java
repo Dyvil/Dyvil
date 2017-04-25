@@ -14,14 +14,14 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class ContinueStatement extends AbstractValue implements IStatement
 {
 	public Label label;
 	public Name  name;
 
-	public ContinueStatement(ICodePosition position)
+	public ContinueStatement(SourcePosition position)
 	{
 		this.position = position;
 	}

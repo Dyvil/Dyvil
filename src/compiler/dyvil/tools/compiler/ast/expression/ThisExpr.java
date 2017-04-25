@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.expression;
 
+import dyvil.lang.Formattable;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IAccessible;
@@ -11,13 +13,11 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public final class ThisExpr implements IValue
 {
-	protected ICodePosition position;
+	protected SourcePosition position;
 	protected IType type = Types.UNKNOWN;
 
 	// Metadata
@@ -34,12 +34,12 @@ public final class ThisExpr implements IValue
 		this.getter = getter;
 	}
 
-	public ThisExpr(ICodePosition position)
+	public ThisExpr(SourcePosition position)
 	{
 		this.position = position;
 	}
 
-	public ThisExpr(ICodePosition position, IType type, IContext context, MarkerList markers)
+	public ThisExpr(SourcePosition position, IType type, IContext context, MarkerList markers)
 	{
 		this.position = position;
 		this.type = type;
@@ -47,7 +47,7 @@ public final class ThisExpr implements IValue
 		this.checkTypes(markers, context);
 	}
 
-	public ThisExpr(ICodePosition position, IType type, IAccessible getter)
+	public ThisExpr(SourcePosition position, IType type, IAccessible getter)
 	{
 		this.position = position;
 		this.type = type;
@@ -55,13 +55,13 @@ public final class ThisExpr implements IValue
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -180,14 +180,14 @@ public final class ThisExpr implements IValue
 
 		if (type != null)
 		{
-			this.type.writeCast(writer, type, this.getLineNumber());
+			this.type.writeCast(writer, type, this.lineNumber());
 		}
 	}
 
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

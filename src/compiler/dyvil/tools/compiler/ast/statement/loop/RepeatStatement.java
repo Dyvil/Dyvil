@@ -19,7 +19,7 @@ import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public final class RepeatStatement extends AbstractValue implements IStatement, ILoop
 {
@@ -37,7 +37,7 @@ public final class RepeatStatement extends AbstractValue implements IStatement, 
 	private Label conditionLabel;
 	private Label endLabel;
 
-	public RepeatStatement(ICodePosition position)
+	public RepeatStatement(SourcePosition position)
 	{
 		this.position = position;
 

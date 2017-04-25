@@ -19,7 +19,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -46,7 +46,7 @@ public class TypeVarType implements IRawType
 	}
 
 	@Override
-	public IType atPosition(ICodePosition position)
+	public IType atPosition(SourcePosition position)
 	{
 		return new ResolvedTypeVarType(this.typeParameter, position);
 	}

@@ -14,32 +14,32 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public final class SuperExpr implements IValue
 {
-	protected ICodePosition position;
+	protected SourcePosition position;
 	protected IType type = Types.UNKNOWN;
 
-	public SuperExpr(ICodePosition position)
+	public SuperExpr(SourcePosition position)
 	{
 		this.position = position;
 	}
 
-	public SuperExpr(ICodePosition position, IType type)
+	public SuperExpr(SourcePosition position, IType type)
 	{
 		this.position = position;
 		this.type = type;
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -209,7 +209,7 @@ public final class SuperExpr implements IValue
 
 		if (type != null)
 		{
-			this.type.writeCast(writer, type, this.getLineNumber());
+			this.type.writeCast(writer, type, this.lineNumber());
 		}
 	}
 

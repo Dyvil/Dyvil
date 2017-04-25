@@ -53,7 +53,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SemanticError;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.lang.annotation.ElementType;
 
@@ -114,7 +114,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		this.enclosingClass = enclosingClass;
 	}
 
-	public AbstractMethod(ICodePosition position, Name name, IType type, ModifierSet modifiers,
+	public AbstractMethod(SourcePosition position, Name name, IType type, ModifierSet modifiers,
 		                     AnnotationList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
@@ -571,7 +571,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue receiver,
+	public IValue checkArguments(MarkerList markers, SourcePosition position, IContext context, IValue receiver,
 		                            ArgumentList arguments, GenericData genericData)
 	{
 		final ParameterList parameters = this.getParameters();
@@ -695,7 +695,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 	}
 
-	private void checkTypeVarsInferred(MarkerList markers, ICodePosition position, GenericData genericData)
+	private void checkTypeVarsInferred(MarkerList markers, SourcePosition position, GenericData genericData)
 	{
 		if (this.typeParameters == null)
 		{
@@ -729,7 +729,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IValue instance,
+	public void checkCall(MarkerList markers, SourcePosition position, IContext context, IValue instance,
 		                     ArgumentList arguments, ITypeContext typeContext)
 	{
 		ModifierUtil.checkVisibility(this, position, markers, context);

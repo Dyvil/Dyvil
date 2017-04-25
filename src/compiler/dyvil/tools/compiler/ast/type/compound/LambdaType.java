@@ -21,7 +21,7 @@ import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -44,12 +44,12 @@ public final class LambdaType extends ResolvedGenericType
 		super(null, null, arguments);
 	}
 
-	public LambdaType(@NonNull ICodePosition position, IType... arguments)
+	public LambdaType(@NonNull SourcePosition position, IType... arguments)
 	{
 		super(position, null, arguments);
 	}
 
-	public LambdaType(@NonNull ICodePosition position, TypeList arguments)
+	public LambdaType(@NonNull SourcePosition position, TypeList arguments)
 	{
 		super(position, null, arguments);
 	}

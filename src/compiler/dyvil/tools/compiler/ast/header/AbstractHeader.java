@@ -2,7 +2,9 @@ package dyvil.tools.compiler.ast.header;
 
 import dyvil.collection.Map;
 import dyvil.collection.mutable.IdentityHashMap;
+import dyvil.lang.Formattable;
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -24,8 +26,6 @@ import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
-import dyvil.tools.parsing.position.ICodePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -73,13 +73,13 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
-		return ICodePosition.ORIGIN;
+		return SourcePosition.ORIGIN;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 	}
 
@@ -476,7 +476,7 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

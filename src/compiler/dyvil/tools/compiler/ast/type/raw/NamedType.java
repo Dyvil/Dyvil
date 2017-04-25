@@ -15,7 +15,7 @@ import dyvil.tools.compiler.ast.type.typevar.ResolvedTypeVarType;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -24,20 +24,20 @@ import java.io.IOException;
 public class NamedType implements IUnresolvedType, ITypeConsumer
 {
 	protected IType         parent;
-	protected ICodePosition position;
+	protected SourcePosition position;
 	protected Name          name;
 
 	public NamedType()
 	{
 	}
 
-	public NamedType(ICodePosition position, Name name)
+	public NamedType(SourcePosition position, Name name)
 	{
 		this.position = position;
 		this.name = name;
 	}
 
-	public NamedType(ICodePosition position, Name name, IType parent)
+	public NamedType(SourcePosition position, Name name, IType parent)
 	{
 		this.position = position;
 		this.name = name;
@@ -51,13 +51,13 @@ public class NamedType implements IUnresolvedType, ITypeConsumer
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}

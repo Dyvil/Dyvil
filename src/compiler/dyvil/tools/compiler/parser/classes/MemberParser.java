@@ -38,7 +38,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.parsing.token.IToken;
 
 public final class MemberParser<T extends IDataMember> extends Parser implements ITypeConsumer
@@ -86,7 +86,7 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 	private IType type;
 	private ModifierList modifiers = new ModifierList();
 	private AnnotationList annotations;
-	private ICodePosition  position;
+	private SourcePosition  position;
 	private Name           name;
 
 	private IMember member;

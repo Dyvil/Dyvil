@@ -2,6 +2,8 @@ package dyvil.tools.compiler.ast.type.alias;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
+import dyvil.lang.Formattable;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -22,9 +24,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -48,7 +48,7 @@ public class TypeAlias extends Member implements ITypeAlias, IDefaultContext
 		this.name = name;
 	}
 
-	public TypeAlias(Name name, ICodePosition position)
+	public TypeAlias(Name name, SourcePosition position)
 	{
 		this.name = name;
 		this.position = position;
@@ -314,7 +314,7 @@ public class TypeAlias extends Member implements ITypeAlias, IDefaultContext
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

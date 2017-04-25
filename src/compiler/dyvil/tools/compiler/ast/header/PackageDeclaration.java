@@ -1,32 +1,33 @@
 package dyvil.tools.compiler.ast.header;
 
-import dyvil.tools.parsing.ast.IASTNode;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.lang.Formattable;
+import dyvil.source.position.SourcePosition;
+import dyvil.tools.parsing.ASTNode;
 
-public class PackageDeclaration implements IASTNode
+public class PackageDeclaration implements ASTNode
 {
-	protected ICodePosition position;
+	protected SourcePosition position;
 	protected String        thePackage;
 	
-	public PackageDeclaration(ICodePosition position)
+	public PackageDeclaration(SourcePosition position)
 	{
 		this.position = position;
 	}
 	
-	public PackageDeclaration(ICodePosition position, String thePackage)
+	public PackageDeclaration(SourcePosition position, String thePackage)
 	{
 		this.position = position;
 		this.thePackage = thePackage;
 	}
 	
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 	
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -44,7 +45,7 @@ public class PackageDeclaration implements IASTNode
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

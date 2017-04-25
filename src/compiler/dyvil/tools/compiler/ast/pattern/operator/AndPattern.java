@@ -7,11 +7,11 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class AndPattern extends BinaryPattern implements IPattern
 {
-	public AndPattern(IPattern left, ICodePosition position, IPattern right)
+	public AndPattern(IPattern left, SourcePosition position, IPattern right)
 	{
 		super(left, position, right);
 	}

@@ -5,28 +5,28 @@ import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.io.AppendablePrintStream;
 import dyvil.io.Console;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.parsing.source.Source;
 
 public abstract class Marker implements Comparable<Marker>
 {
-	protected final ICodePosition position;
+	protected final SourcePosition position;
 
 	private final String       message;
 	private       List<String> info;
 
-	public Marker(ICodePosition position, String message)
+	public Marker(SourcePosition position, String message)
 	{
 		if (position == null)
 		{
-			position = ICodePosition.ORIGIN;
+			position = SourcePosition.ORIGIN;
 		}
 
 		this.message = message;
 		this.position = position;
 	}
 
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
@@ -105,7 +105,7 @@ public abstract class Marker implements Comparable<Marker>
 	{
 		final String type = this.getMarkerType();
 
-		final ICodePosition position = this.position;
+		final SourcePosition position = this.position;
 		final int endLine = position.endLine();
 		final String colorString = colors ? this.getColor() : "";
 

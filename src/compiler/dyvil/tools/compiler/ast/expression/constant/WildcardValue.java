@@ -13,16 +13,16 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class WildcardValue implements IConstantValue
 {
 	// Metadata
 
-	private ICodePosition position;
+	private SourcePosition position;
 	private IType type = Types.UNKNOWN;
 
-	public WildcardValue(ICodePosition position)
+	public WildcardValue(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -34,13 +34,13 @@ public class WildcardValue implements IConstantValue
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}

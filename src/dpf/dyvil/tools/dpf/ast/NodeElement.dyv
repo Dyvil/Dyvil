@@ -2,12 +2,12 @@ package dyvil.tools.dpf.ast
 
 import dyvil.tools.dpf.visitor.NodeVisitor
 import dyvil.tools.parsing.Name
-import dyvil.tools.parsing.position.ICodePosition
-import dyvil.tools.parsing.ast.IASTNode
+import dyvil.source.position.SourcePosition
+import dyvil.tools.parsing.ASTNode
 
-interface NodeElement extends IASTNode, dyvil.tools.dpf.model.NodeElement
+interface NodeElement extends ASTNode, dyvil.tools.dpf.model.NodeElement
 {
-	override func getPosition() -> ICodePosition! = null
+	override func getPosition() -> SourcePosition! = null
 
-	override func setPosition(position: ICodePosition!) {}
+	override func setPosition(position: SourcePosition!) {}
 }

@@ -37,7 +37,7 @@ import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.lang.annotation.ElementType;
 
@@ -75,7 +75,7 @@ public class Field extends Member implements IField
 		this.enclosingClass = enclosingClass;
 	}
 
-	public Field(IClass enclosingClass, ICodePosition position, Name name, IType type, ModifierSet modifiers,
+	public Field(IClass enclosingClass, SourcePosition position, Name name, IType type, ModifierSet modifiers,
 		            AnnotationList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
@@ -155,7 +155,7 @@ public class Field extends Member implements IField
 	}
 
 	@Override
-	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue receiver, IContext context)
+	public IValue checkAccess(MarkerList markers, SourcePosition position, IValue receiver, IContext context)
 	{
 		if (receiver != null)
 		{
@@ -313,7 +313,7 @@ public class Field extends Member implements IField
 
 			if (setter.getValue() == null)
 			{
-				final ICodePosition setterPosition = setter.getPosition();
+				final SourcePosition setterPosition = setter.getPosition();
 				if (this.hasModifier(Modifiers.FINAL))
 				{
 					markers.add(Markers.semanticError(setterPosition, "field.property.setter.final", this.name));

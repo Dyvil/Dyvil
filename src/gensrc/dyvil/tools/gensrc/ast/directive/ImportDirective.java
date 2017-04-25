@@ -6,16 +6,16 @@ import dyvil.tools.gensrc.ast.Util;
 import dyvil.tools.gensrc.ast.scope.LazyScope;
 import dyvil.tools.gensrc.ast.scope.Scope;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.io.PrintStream;
 
 public class ImportDirective implements Directive
 {
-	private final ICodePosition position;
+	private final SourcePosition position;
 	private final String files;
 
-	public ImportDirective(ICodePosition position, String files)
+	public ImportDirective(SourcePosition position, String files)
 	{
 		this.position = position;
 		this.files = files;

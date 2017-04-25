@@ -16,14 +16,14 @@ import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class LiteralConversion extends AbstractCall
 {
 	protected IValue literal;
 	protected Name   name;
 
-	public LiteralConversion(ICodePosition position)
+	public LiteralConversion(SourcePosition position)
 	{
 		this.position = position;
 	}

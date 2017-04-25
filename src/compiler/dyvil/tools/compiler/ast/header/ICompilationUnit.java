@@ -5,13 +5,13 @@ import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.lang.I18n;
 import dyvil.tools.compiler.sources.IFileType;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.ASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.source.FileSource;
 
 import java.io.File;
 
-public interface ICompilationUnit extends IASTNode
+public interface ICompilationUnit extends ASTNode
 {
 	FileSource getSourceFile();
 

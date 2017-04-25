@@ -4,11 +4,11 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class ResolvedClassType extends ClassType
 {
-	protected ICodePosition position;
+	protected SourcePosition position;
 
 	public ResolvedClassType()
 	{
@@ -19,25 +19,25 @@ public class ResolvedClassType extends ClassType
 		this.theClass = theClass;
 	}
 
-	public ResolvedClassType(ICodePosition position)
+	public ResolvedClassType(SourcePosition position)
 	{
 		this.position = position;
 	}
 
-	public ResolvedClassType(IClass theClass, ICodePosition position)
+	public ResolvedClassType(IClass theClass, SourcePosition position)
 	{
 		this.theClass = theClass;
 		this.position = position;
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}

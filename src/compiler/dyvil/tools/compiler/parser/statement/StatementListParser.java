@@ -32,7 +32,7 @@ import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.TryParserManager;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.parsing.token.IToken;
 
 import static dyvil.tools.compiler.parser.classes.MemberParser.*;
@@ -210,7 +210,7 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 			}
 			this.mode = EXPRESSION;
 			pm.reparse();
-			pm.report(ICodePosition.between(token, token.next()), "statement_list.label.separator");
+			pm.report(SourcePosition.between(token, token.next()), "statement_list.label.separator");
 			return;
 		case SEPARATOR:
 			this.mode = EXPRESSION;
@@ -309,7 +309,7 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 	}
 
 	@Override
-	public IVariable createDataMember(ICodePosition position, Name name, IType type, ModifierSet modifiers,
+	public IVariable createDataMember(SourcePosition position, Name name, IType type, ModifierSet modifiers,
 		                                 AnnotationList annotations)
 	{
 		return new Variable(position, name, type, modifiers, annotations);
@@ -322,7 +322,7 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 	}
 
 	@Override
-	public IMethod createMethod(ICodePosition position, Name name, IType type, ModifierSet modifiers,
+	public IMethod createMethod(SourcePosition position, Name name, IType type, ModifierSet modifiers,
 		                           AnnotationList annotations)
 	{
 		return new NestedMethod(position, name, type, modifiers, annotations);

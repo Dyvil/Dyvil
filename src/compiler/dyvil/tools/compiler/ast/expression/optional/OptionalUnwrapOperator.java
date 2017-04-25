@@ -1,7 +1,9 @@
 package dyvil.tools.compiler.ast.expression.optional;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.lang.Formattable;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -12,9 +14,7 @@ import dyvil.tools.compiler.ast.type.compound.NullableType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.TypeChecker;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public class OptionalUnwrapOperator implements IValue
 {
@@ -22,7 +22,7 @@ public class OptionalUnwrapOperator implements IValue
 
 	// Metadata
 	protected boolean force;
-	protected ICodePosition position;
+	protected SourcePosition position;
 
 	public OptionalUnwrapOperator(IValue receiver)
 	{
@@ -42,13 +42,13 @@ public class OptionalUnwrapOperator implements IValue
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -120,7 +120,7 @@ public class OptionalUnwrapOperator implements IValue
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

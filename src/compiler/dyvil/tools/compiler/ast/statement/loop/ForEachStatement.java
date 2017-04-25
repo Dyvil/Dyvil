@@ -1,12 +1,14 @@
 package dyvil.tools.compiler.ast.statement.loop;
 
 import dyvil.annotation.internal.NonNull;
-import dyvil.tools.compiler.ast.expression.access.MethodCall;
+import dyvil.lang.Formattable;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.context.CombiningLabelContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.access.MethodCall;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -24,16 +26,14 @@ import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 import static dyvil.tools.compiler.ast.statement.loop.ForStatement.*;
 
 public class ForEachStatement implements IForStatement, IDefaultContext
 {
-	protected ICodePosition position;
+	protected SourcePosition position;
 
 	protected IVariable variable;
 	protected IValue    action;
@@ -43,7 +43,7 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 	protected Label updateLabel;
 	protected Label endLabel;
 
-	public ForEachStatement(ICodePosition position, IVariable var)
+	public ForEachStatement(SourcePosition position, IVariable var)
 	{
 		this.position = position;
 		this.variable = var;
@@ -53,7 +53,7 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 		this.endLabel = new Label($forEnd);
 	}
 
-	public ForEachStatement(ICodePosition position, IVariable var, IValue action)
+	public ForEachStatement(SourcePosition position, IVariable var, IValue action)
 	{
 		this(position, var);
 		this.action = action;
@@ -66,13 +66,13 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -422,7 +422,7 @@ public class ForEachStatement implements IForStatement, IDefaultContext
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

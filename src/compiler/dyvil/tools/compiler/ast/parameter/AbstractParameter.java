@@ -21,7 +21,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.lang.annotation.ElementType;
 
@@ -48,13 +48,13 @@ public abstract class AbstractParameter extends Variable implements IParameter
 		super(name, type);
 	}
 
-	public AbstractParameter(ICallableMember callable, ICodePosition position, Name name, IType type)
+	public AbstractParameter(ICallableMember callable, SourcePosition position, Name name, IType type)
 	{
 		super(position, name, type);
 		this.method = callable;
 	}
 
-	public AbstractParameter(ICallableMember callable, ICodePosition position, Name name, IType type,
+	public AbstractParameter(ICallableMember callable, SourcePosition position, Name name, IType type,
 		                        ModifierSet modifiers, AnnotationList annotations)
 	{
 		super(position, name, type, modifiers, annotations);

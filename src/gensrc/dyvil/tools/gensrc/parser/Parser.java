@@ -1,12 +1,12 @@
 package dyvil.tools.gensrc.parser;
 
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.gensrc.ast.Util;
 import dyvil.tools.gensrc.ast.directive.*;
 import dyvil.tools.gensrc.lang.I18n;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SemanticError;
 import dyvil.tools.parsing.marker.Warning;
-import dyvil.tools.parsing.position.CodePosition;
 import dyvil.tools.parsing.source.Source;
 
 public class Parser
@@ -95,7 +95,7 @@ public class Parser
 
 				if (block == SCOPE_BLOCK)
 				{
-					this.markers.add(new Warning(new CodePosition(lineNumber, directiveStart, directiveEnd),
+					this.markers.add(new Warning(SourcePosition.apply(lineNumber, directiveStart, directiveEnd),
 					                             I18n.get("endscope.deprecated")));
 					return lineNumber;
 				}
@@ -120,7 +120,7 @@ public class Parser
 			case "endif":
 				if (block == IF_BLOCK || block == ELSE_BLOCK)
 				{
-					this.markers.add(new Warning(new CodePosition(lineNumber, directiveStart, directiveEnd),
+					this.markers.add(new Warning(SourcePosition.apply(lineNumber, directiveStart, directiveEnd),
 					                             I18n.get("endif.deprecated")));
 					return lineNumber;
 				}
@@ -136,7 +136,7 @@ public class Parser
 			case "endfor":
 				if (block == FOR_BLOCK)
 				{
-					this.markers.add(new Warning(new CodePosition(lineNumber, directiveStart, directiveEnd),
+					this.markers.add(new Warning(SourcePosition.apply(lineNumber, directiveStart, directiveEnd),
 					                             I18n.get("endfor.deprecated")));
 					return lineNumber;
 				}
@@ -150,7 +150,7 @@ public class Parser
 				break;
 			}
 
-			this.markers.add(new SemanticError(new CodePosition(lineNumber, directiveStart, directiveEnd),
+			this.markers.add(new SemanticError(SourcePosition.apply(lineNumber, directiveStart, directiveEnd),
 			                                   I18n.get("directive.invalid", directive)));
 		}
 
@@ -205,12 +205,12 @@ public class Parser
 
 	private ImportDirective parseImport(String line, int lineNumber, int hashIndex, int directiveEnd, int length)
 	{
-		return new ImportDirective(new CodePosition(lineNumber, hashIndex, directiveEnd), Util.getArgument(line, directiveEnd, length));
+		return new ImportDirective(SourcePosition.apply(lineNumber, hashIndex, directiveEnd), Util.getArgument(line, directiveEnd, length));
 	}
 
 	private IncludeDirective parseInclude(String line, int lineNumber, int hashIndex, int directiveEnd, int length)
 	{
-		return new IncludeDirective(new CodePosition(lineNumber, hashIndex, directiveEnd), Util.getArgument(line, directiveEnd, length));
+		return new IncludeDirective(SourcePosition.apply(lineNumber, hashIndex, directiveEnd), Util.getArgument(line, directiveEnd, length));
 	}
 
 	private int parseIf(DirectiveList list, int lineNumber, String line, int directiveEnd, int length, byte mode)
@@ -238,7 +238,7 @@ public class Parser
 
 	private int parseFor(DirectiveList list, int lineNumber, String line, int hashIndex, int directiveEnd, int length)
 	{
-		final CodePosition position = new CodePosition(lineNumber, hashIndex, directiveEnd);
+		final SourcePosition position = SourcePosition.apply(lineNumber, hashIndex, directiveEnd);
 
 		final String[] parts = Util.getArgument(line, directiveEnd, length).split("\\s*;\\s*");
 
@@ -267,7 +267,7 @@ public class Parser
 	private int parseForEach(DirectiveList list, int lineNumber, String line, int hashIndex, int directiveEnd,
 		                        int length)
 	{
-		final ForEachDirective directive = new ForEachDirective(new CodePosition(lineNumber, hashIndex, directiveEnd),
+		final ForEachDirective directive = new ForEachDirective(SourcePosition.apply(lineNumber, hashIndex, directiveEnd),
 		                                                        Util.getArgument(line, directiveEnd, length));
 		final DirectiveList action = new DirectiveList();
 

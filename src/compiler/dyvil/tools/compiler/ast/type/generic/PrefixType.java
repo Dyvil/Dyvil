@@ -6,16 +6,16 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.compound.WildcardType;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class PrefixType extends NamedGenericType
 {
-	public PrefixType(ICodePosition position, Name name)
+	public PrefixType(SourcePosition position, Name name)
 	{
 		super(position, name);
 	}
 
-	public PrefixType(ICodePosition position, Name name, IType rhs)
+	public PrefixType(SourcePosition position, Name name, IType rhs)
 	{
 		super(position, name, rhs);
 	}

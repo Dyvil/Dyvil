@@ -31,7 +31,7 @@ import dyvil.tools.compiler.transform.CaseClasses;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public final class CaseClassMetadata extends ClassMetadata
 {
@@ -162,7 +162,7 @@ public final class CaseClassMetadata extends ClassMetadata
 			this.applyMethod.setValue(new ConstructorCall(this.constructor, arguments));
 		}
 
-		final ICodePosition position = this.theClass.getPosition();
+		final SourcePosition position = this.theClass.getPosition();
 
 		if (this.unapplyMethod != null)
 		{

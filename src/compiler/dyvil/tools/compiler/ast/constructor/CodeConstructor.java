@@ -26,7 +26,7 @@ import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -47,7 +47,7 @@ public class CodeConstructor extends AbstractConstructor
 		super(enclosingClass, modifiers);
 	}
 
-	public CodeConstructor(ICodePosition position, ModifierSet modifiers, AnnotationList annotations)
+	public CodeConstructor(SourcePosition position, ModifierSet modifiers, AnnotationList annotations)
 	{
 		super(position, modifiers, annotations);
 	}

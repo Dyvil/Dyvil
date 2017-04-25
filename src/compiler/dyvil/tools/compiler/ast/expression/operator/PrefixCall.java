@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.expression.operator;
 
+import dyvil.lang.Formattable;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.access.MethodCall;
@@ -8,18 +10,16 @@ import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public class PrefixCall extends MethodCall
 {
-	public PrefixCall(ICodePosition position, Name name)
+	public PrefixCall(SourcePosition position, Name name)
 	{
 		super(position, null, name);
 	}
 
-	public PrefixCall(ICodePosition position, Name name, IValue argument)
+	public PrefixCall(SourcePosition position, Name name, IValue argument)
 	{
 		super(position, null, name, new ArgumentList(argument));
 	}
@@ -73,7 +73,7 @@ public class PrefixCall extends MethodCall
 	}
 
 	@Override
-	public IValue toAssignment(IValue rhs, ICodePosition position)
+	public IValue toAssignment(IValue rhs, SourcePosition position)
 	{
 		final Name name = Name.from(this.name.unqualified + "_=", this.name.qualified + "_$eq");
 		return new MethodCall(this.position, this.arguments.getFirst(), name, new ArgumentList(rhs));
@@ -82,7 +82,7 @@ public class PrefixCall extends MethodCall
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override
