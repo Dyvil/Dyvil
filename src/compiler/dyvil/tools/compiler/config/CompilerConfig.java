@@ -17,8 +17,6 @@ public class CompilerConfig
 {
 	private DyvilCompiler compiler;
 
-	private String baseDirectory;
-
 	private String jarName;
 	private String jarVendor;
 	private String jarVersion;
@@ -45,16 +43,6 @@ public class CompilerConfig
 	public CompilerConfig(DyvilCompiler compiler)
 	{
 		this.compiler = compiler;
-	}
-
-	public void setBaseDirectory(String baseDirectory)
-	{
-		this.baseDirectory = baseDirectory;
-	}
-
-	public void setConfigFile(File configFile)
-	{
-		this.baseDirectory = configFile.getParent();
 	}
 
 	public void setJarName(String jarName)
@@ -109,12 +97,12 @@ public class CompilerConfig
 
 	public void setOutputDir(String outputDir)
 	{
-		this.outputDir = this.resolveFile(outputDir);
+		this.outputDir = new File(outputDir);
 	}
 
 	public void addSourceDir(String sourceDir)
 	{
-		this.sourceDirs.add(this.resolveFile(sourceDir));
+		this.sourceDirs.add(new File(sourceDir));
 	}
 
 	public File getLogFile()
@@ -124,14 +112,14 @@ public class CompilerConfig
 
 	public void setLogFile(String logFile)
 	{
-		this.logFile = this.resolveFile(logFile);
+		this.logFile = new File(logFile);
 	}
 
 	public void addLibraryFile(String file)
 	{
 		try
 		{
-			this.libraries.add(Library.load(this.resolveFile(file)));
+			this.libraries.add(Library.load(new File(file)));
 		}
 		catch (FileNotFoundException ex)
 		{
@@ -192,19 +180,6 @@ public class CompilerConfig
 	public void setMaxConstantDepth(int maxConstantDepth)
 	{
 		this.maxConstantDepth = maxConstantDepth;
-	}
-
-	private File resolveFile(String fileName)
-	{
-		if (fileName.length() == 0)
-		{
-			return new File(this.baseDirectory);
-		}
-		if (fileName.charAt(0) == File.separatorChar)
-		{
-			return new File(fileName);
-		}
-		return new File(this.baseDirectory, fileName);
 	}
 
 	public boolean isIncluded(String name)
