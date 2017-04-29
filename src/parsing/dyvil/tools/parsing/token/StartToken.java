@@ -56,16 +56,4 @@ public class StartToken implements IToken
 	{
 		this.next = next;
 	}
-
-	@Override
-	public boolean hasPrev()
-	{
-		return false;
-	}
-
-	@Override
-	public boolean hasNext()
-	{
-		return this.next.type() != 0;
-	}
 }

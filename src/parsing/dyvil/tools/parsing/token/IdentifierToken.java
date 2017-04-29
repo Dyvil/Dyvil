@@ -103,18 +103,6 @@ public class IdentifierToken implements IToken
 	}
 
 	@Override
-	public boolean hasNext()
-	{
-		return this.next.type() != 0;
-	}
-
-	@Override
-	public boolean hasPrev()
-	{
-		return this.prev.type() != 0;
-	}
-
-	@Override
 	public String toString()
 	{
 		return "Identifier '" + this.name + "\'";

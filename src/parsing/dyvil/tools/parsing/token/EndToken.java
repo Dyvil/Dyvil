@@ -66,18 +66,6 @@ public class EndToken implements IToken
 	}
 
 	@Override
-	public boolean hasPrev()
-	{
-		return this.prev.type() != 0;
-	}
-
-	@Override
-	public boolean hasNext()
-	{
-		return false;
-	}
-
-	@Override
 	public String toString()
 	{
 		return "EOF";

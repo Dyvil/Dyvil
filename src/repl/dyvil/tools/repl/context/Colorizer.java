@@ -28,15 +28,14 @@ public class Colorizer
 		}
 
 		// find the last token
-		IToken last = tokens.next();
-		while (last.hasNext())
+		IToken last = null;
+		while (tokens.hasNext())
 		{
-			last = last.next();
+			last = tokens.next();
 		}
 
 		// iterate, starting from the last
-		IToken token = last;
-		while (true)
+		for (IToken token = last; token != null && token.type() != Tokens.EOF; token = token.prev())
 		{
 			final String color = tokenColor(token, context);
 			if (color != null)
@@ -46,12 +45,6 @@ public class Colorizer
 				line.insert(token.endColumn(), Console.ANSI_RESET);
 				line.insert(token.startColumn(), color);
 			}
-
-			if (!token.hasPrev())
-			{
-				break;
-			}
-			token = token.prev();
 		}
 
 		return lines.reduce((stringBuilder, s) -> stringBuilder.append('\n').append(s)).toString();
