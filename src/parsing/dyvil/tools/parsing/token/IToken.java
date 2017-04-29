@@ -1,5 +1,6 @@
 package dyvil.tools.parsing.token;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.source.position.SourcePosition;
 import dyvil.tools.parsing.Name;
 
@@ -42,11 +43,11 @@ public interface IToken extends SourcePosition
 		return false;
 	}
 
-	IToken prev();
+	@NonNull IToken prev();
 
-	void setPrev(IToken prev);
+	void setPrev(@NonNull IToken prev);
 
-	IToken next();
+	@NonNull IToken next();
 
-	void setNext(IToken next);
+	void setNext(@NonNull IToken next);
 }

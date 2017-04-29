@@ -1,11 +1,12 @@
 package dyvil.tools.parsing.token;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.tools.parsing.lexer.Tokens;
 
 public final class StringToken implements IToken
 {
-	private IToken prev;
-	private IToken next;
+	private @NonNull IToken prev;
+	private @NonNull IToken next;
 
 	private final int type;
 	private final int startLine;
@@ -63,25 +64,25 @@ public final class StringToken implements IToken
 	}
 
 	@Override
-	public void setPrev(IToken prev)
+	public void setPrev(@NonNull IToken prev)
 	{
 		this.prev = prev;
 	}
 
 	@Override
-	public void setNext(IToken next)
+	public void setNext(@NonNull IToken next)
 	{
 		this.next = next;
 	}
 
 	@Override
-	public IToken prev()
+	public @NonNull IToken prev()
 	{
 		return this.prev;
 	}
 
 	@Override
-	public IToken next()
+	public @NonNull IToken next()
 	{
 		return this.next;
 	}

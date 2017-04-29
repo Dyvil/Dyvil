@@ -292,7 +292,7 @@ public class Parser
 	private func parseAccessSequence(visitor: ValueVisitor) -> void
 	{
 		var token = this.tokens.lastReturned()
-		while (token.hasNext() && token.next.ttype == BaseSymbols.DOT)
+		while (token.next.ttype == BaseSymbols.DOT)
 		{
 			token = token.next.next
 		}
