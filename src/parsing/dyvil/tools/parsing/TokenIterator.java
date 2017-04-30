@@ -10,18 +10,20 @@ import java.util.NoSuchElementException;
 public class TokenIterator implements Iterator<IToken>
 {
 	protected final IToken startToken;
-	protected IToken       lastReturned;
-	protected IToken       next;
+	protected       IToken endToken;
+
+	protected       IToken lastReturned;
+	protected       IToken next;
 
 	public TokenIterator()
 	{
-		this.startToken = this.next = new StartToken();
+		this.startToken = this.next = this.endToken = new StartToken();
 	}
 
 	public void reset()
 	{
 		this.lastReturned = null;
-		this.next = this.startToken.next();
+		this.next = this.first();
 	}
 
 	public void setNext(IToken next)
@@ -32,9 +34,9 @@ public class TokenIterator implements Iterator<IToken>
 
 	public void append(IToken token)
 	{
-		token.setPrev(this.next);
-		this.next.setNext(token);
-		this.next = token;
+		token.setPrev(this.endToken);
+		this.endToken.setNext(token);
+		this.endToken = token;
 	}
 
 	@Override
@@ -46,6 +48,11 @@ public class TokenIterator implements Iterator<IToken>
 	public IToken first()
 	{
 		return this.startToken.next();
+	}
+
+	public IToken last()
+	{
+		return this.endToken.prev();
 	}
 
 	public IToken lastReturned()

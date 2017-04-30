@@ -21,21 +21,14 @@ public class Colorizer
 		final TokenIterator tokens = new DyvilLexer(new MarkerList(Markers.INSTANCE), DyvilSymbols.INSTANCE)
 			                             .tokenize(text);
 
-		List<StringBuilder> lines = new ArrayList<>(source.lineCount());
+		final List<StringBuilder> lines = new ArrayList<>(source.lineCount());
 		for (int i = 0, count = source.lineCount(); i < count; i++)
 		{
 			lines.add(new StringBuilder(source.getLine(i + 1)));
 		}
 
-		// find the last token
-		IToken last = null;
-		while (tokens.hasNext())
-		{
-			last = tokens.next();
-		}
-
-		// iterate, starting from the last
-		for (IToken token = last; token != null && token.type() != Tokens.EOF; token = token.prev())
+		// iterate, starting from the last token
+		for (IToken token = tokens.last(); token != null && token.type() != Tokens.EOF; token = token.prev())
 		{
 			final String color = tokenColor(token, context);
 			if (color != null)
