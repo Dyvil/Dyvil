@@ -10,7 +10,7 @@ import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.transform.SemicolonInference;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.ParserManager;
-import dyvil.tools.parsing.TokenIterator;
+import dyvil.tools.parsing.TokenList;
 import dyvil.tools.parsing.lexer.DyvilLexer;
 import dyvil.tools.parsing.lexer.LexerUtil;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -187,12 +187,12 @@ public final class DyvilREPL
 		this.context.startEvaluation(code);
 
 		final MarkerList markers = this.context.getMarkers();
-		final TokenIterator tokens = new DyvilLexer(markers, DyvilSymbols.INSTANCE).tokenize(code);
+		final TokenList tokens = new DyvilLexer(markers, DyvilSymbols.INSTANCE).tokenize(code);
 
 		SemicolonInference.inferSemicolons(tokens.first());
 
 		this.parser.reset();
-		new ParserManager(DyvilSymbols.INSTANCE, tokens, markers).parse(this.parser);
+		new ParserManager(DyvilSymbols.INSTANCE, tokens.iterator(), markers).parse(this.parser);
 
 		this.context.endEvaluation();
 	}

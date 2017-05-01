@@ -5,7 +5,7 @@ import dyvil.collection.mutable.ArrayList;
 import dyvil.io.Console;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.TokenIterator;
+import dyvil.tools.parsing.TokenList;
 import dyvil.tools.parsing.lexer.DyvilLexer;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -18,7 +18,7 @@ public class Colorizer
 	{
 		final TextSource source = new TextSource(text);
 
-		final TokenIterator tokens = new DyvilLexer(new MarkerList(Markers.INSTANCE), DyvilSymbols.INSTANCE)
+		final TokenList tokens = new DyvilLexer(new MarkerList(Markers.INSTANCE), DyvilSymbols.INSTANCE)
 			                             .tokenize(text);
 
 		final List<StringBuilder> lines = new ArrayList<>(source.lineCount());

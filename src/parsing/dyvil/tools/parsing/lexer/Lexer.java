@@ -1,7 +1,7 @@
 package dyvil.tools.parsing.lexer;
 
 import dyvil.source.position.SourcePosition;
-import dyvil.tools.parsing.TokenIterator;
+import dyvil.tools.parsing.TokenList;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SyntaxError;
 import dyvil.tools.parsing.token.EndToken;
@@ -11,9 +11,9 @@ public abstract class Lexer
 	protected final MarkerList markers;
 	protected final Symbols    symbols;
 
-	protected String        code;
-	protected int           length;
-	protected TokenIterator tokens;
+	protected String    code;
+	protected int       length;
+	protected TokenList tokens;
 
 	protected StringBuilder buffer = new StringBuilder();
 
@@ -27,13 +27,28 @@ public abstract class Lexer
 		this.symbols = symbols;
 	}
 
-	public TokenIterator tokenize(String code)
+	public int getCursor()
+	{
+		return this.cursor;
+	}
+
+	public int getColumn()
+	{
+		return this.column;
+	}
+
+	public int getLine()
+	{
+		return this.line;
+	}
+
+	public TokenList tokenize(String code)
 	{
 		return this.tokenize(code, 0, 1, 0);
 	}
 
 	@SuppressWarnings("SameParameterValue")
-	public TokenIterator tokenize(String code, int cursor, int line, int column)
+	public TokenList tokenize(String code, int cursor, int line, int column)
 	{
 		this.init(code, cursor, line, column);
 
@@ -54,7 +69,7 @@ public abstract class Lexer
 
 	protected void init(String code, int cursor, int line, int column)
 	{
-		this.tokens = new TokenIterator();
+		this.tokens = new TokenList();
 		this.code = code;
 		this.length = code.length();
 		this.cursor = cursor;
@@ -66,7 +81,6 @@ public abstract class Lexer
 	protected void finish()
 	{
 		this.tokens.append(new EndToken(this.cursor, this.line));
-		this.tokens.reset();
 	}
 
 	protected abstract void parseCharacter(int c);

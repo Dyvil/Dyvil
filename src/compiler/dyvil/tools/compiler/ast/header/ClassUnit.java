@@ -97,7 +97,7 @@ public class ClassUnit extends SourceHeader implements IClassConsumer
 	@Override
 	public void parse()
 	{
-		new ParserManager(DyvilSymbols.INSTANCE, this.tokens, this.markers).parse(new DyvilUnitParser(this));
+		new ParserManager(DyvilSymbols.INSTANCE, this.tokens.iterator(), this.markers).parse(new DyvilUnitParser(this));
 		this.tokens = null;
 	}
 

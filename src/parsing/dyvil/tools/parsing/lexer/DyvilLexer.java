@@ -1,7 +1,7 @@
 package dyvil.tools.parsing.lexer;
 
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.TokenIterator;
+import dyvil.tools.parsing.TokenList;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.token.*;
 
@@ -28,7 +28,7 @@ public final class DyvilLexer extends Lexer
 	}
 
 	@Override
-	public TokenIterator tokenize(String code, int cursor, int line, int column)
+	public TokenList tokenize(String code, int cursor, int line, int column)
 	{
 		this.init(code, cursor, line, column);
 
