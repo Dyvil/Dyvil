@@ -345,7 +345,11 @@ task testDyvil(type: JavaExec, dependsOn: [ 'compileTestDyvil' ]) {
 	classpath = sourceSets.test.runtimeClasspath
 }
 
-test.dependsOn 'testDyvil'
+task testGenSrc(type: JavaExec, dependsOn: [ 'gensrcClasses' ]) { JavaExec exec ->
+	runGenSrc(exec, "$buildDir/gensrc/test", "src/test/gensrc")
+}
+
+test.dependsOn 'testDyvil', 'testGenSrc'
 
 // ---------------------------------------- Build Tasks ----------------------------------------
 
