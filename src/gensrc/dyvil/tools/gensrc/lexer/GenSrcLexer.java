@@ -3,17 +3,22 @@ package dyvil.tools.gensrc.lexer;
 import dyvil.tools.gensrc.ast.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.TokenList;
-import dyvil.tools.parsing.lexer.*;
+import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.DyvilLexer;
+import dyvil.tools.parsing.lexer.Lexer;
+import dyvil.tools.parsing.lexer.LexerUtil;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.token.IdentifierToken;
 import dyvil.tools.parsing.token.StringToken;
 import dyvil.tools.parsing.token.SymbolToken;
 
 import static dyvil.tools.parsing.lexer.BaseSymbols.*;
+import static dyvil.tools.parsing.lexer.Tokens.LETTER_IDENTIFIER;
+import static dyvil.tools.parsing.lexer.Tokens.STRING;
 
 public class GenSrcLexer extends dyvil.tools.parsing.lexer.Lexer
 {
-	protected int braceLevel;
+	protected       int braceLevel;
 	protected final int blockLevel;
 
 	public GenSrcLexer(MarkerList markers)
@@ -23,7 +28,7 @@ public class GenSrcLexer extends dyvil.tools.parsing.lexer.Lexer
 
 	public GenSrcLexer(MarkerList markers, int blockLevel)
 	{
-		super(markers, BaseSymbols.INSTANCE);
+		super(markers, GenSrcSymbols.INSTANCE);
 		this.blockLevel = blockLevel;
 	}
 
@@ -124,8 +129,8 @@ public class GenSrcLexer extends dyvil.tools.parsing.lexer.Lexer
 		}
 
 		this.tokens.append(
-			new StringToken(this.code.substring(startIndex, this.cursor), Tokens.STRING, startLine, this.line,
-			                startColumn, this.column));
+			new StringToken(this.code.substring(startIndex, this.cursor), STRING, startLine, this.line, startColumn,
+			                this.column));
 	}
 
 	private void parseDirective()
@@ -214,8 +219,15 @@ public class GenSrcLexer extends dyvil.tools.parsing.lexer.Lexer
 		}
 
 		final String identifier = this.code.substring(startIndex, this.cursor);
+		final int keyWord = this.symbols.getKeywordType(identifier);
+		if (keyWord != 0)
+		{
+			this.tokens.append(new SymbolToken(this.symbols, keyWord, this.line, startColumn));
+			return;
+		}
+
 		this.tokens.append(
-			new IdentifierToken(Name.fromQualified(identifier), Tokens.LETTER_IDENTIFIER, this.line, startColumn,
+			new IdentifierToken(Name.fromQualified(identifier), LETTER_IDENTIFIER, this.line, startColumn,
 			                    this.column));
 	}
 
