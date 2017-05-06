@@ -15,9 +15,11 @@ abstract class Function
 	{
 		func apply(par1: P1) -> R
 
-		infix func andThen<A, B, C>(first: A -> B, second: B -> C) -> A -> C = x => second(first(x))
+		infix func andThen<A, B, C>(first: A -> B, second: B -> C) -> (A -> C) = x => second(first(x))
 
-		infix func compose<A, B, C>(second: B -> C, first: A -> B) -> A -> C = first.andThen second
+		infix func compose<A, B, C>(second: B -> C, first: A -> B) -> (A -> C) = first.andThen second
+
+		infix func * <A, B, C>(lhs: B -> C, rhs: A -> B) -> (A -> C) = rhs.andThen lhs
 
 		static func identity<T> -> (T -> T) = x => x
 	}
