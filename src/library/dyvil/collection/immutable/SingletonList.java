@@ -254,9 +254,9 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 
 	@Override
-	public E @NonNull [] toArray(@NonNull Class<E> type)
+	public <R> R @NonNull [] toArray(@NonNull Class<R> type)
 	{
-		E[] array = (E[]) Array.newInstance(type, 1);
+		final R[] array = (R[]) Array.newInstance(type, 1);
 		array[0] = type.cast(this.element);
 		return array;
 	}

@@ -1,9 +1,7 @@
 package dyvil.collection;
 
-import dyvil.annotation.internal.DyvilModifiers;
 import dyvil.annotation.internal.NonNull;
 import dyvil.lang.LiteralConvertible;
-import dyvil.reflect.Modifiers;
 
 import java.util.*;
 import java.util.function.Function;
@@ -240,7 +238,6 @@ public interface Set<E> extends Collection<E>
 		return Collection.unorderedHashCode(set);
 	}
 
-	@DyvilModifiers(Modifiers.INTERNAL)
 	static int distinct(Object @NonNull [] array, int size)
 	{
 		if (size < 2)
@@ -261,7 +258,6 @@ public interface Set<E> extends Collection<E>
 		return size;
 	}
 
-	@DyvilModifiers(Modifiers.INTERNAL)
 	static int sortDistinct(Object @NonNull [] array, int size)
 	{
 		if (size < 2)
@@ -273,7 +269,6 @@ public interface Set<E> extends Collection<E>
 		return distinctSorted(array, size);
 	}
 
-	@DyvilModifiers(Modifiers.INTERNAL)
 	static <T> int sortDistinct(T @NonNull [] array, int size, Comparator<? super T> comparator)
 	{
 		if (size < 2)
@@ -286,7 +281,6 @@ public interface Set<E> extends Collection<E>
 		return distinctSorted(array, size);
 	}
 
-	@DyvilModifiers(Modifiers.INTERNAL)
 	static int distinctSorted(Object[] array, int size)
 	{
 		if (size < 2)
@@ -312,7 +306,6 @@ public interface Set<E> extends Collection<E>
 		return len + 1;
 	}
 
-	@DyvilModifiers(Modifiers.INTERNAL)
 	static boolean isDistinct(Object[] array, int size)
 	{
 		if (size < 2)
@@ -334,7 +327,6 @@ public interface Set<E> extends Collection<E>
 		return true;
 	}
 
-	@DyvilModifiers(Modifiers.INTERNAL)
 	static boolean isDistinctSorted(Object[] array, int size)
 	{
 		if (size < 2)
