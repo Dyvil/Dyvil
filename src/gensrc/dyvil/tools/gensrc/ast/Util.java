@@ -1,46 +1,15 @@
 package dyvil.tools.gensrc.ast;
 
-import dyvil.collection.List;
-import dyvil.collection.mutable.ArrayList;
-import dyvil.tools.gensrc.GenSrc;
 import dyvil.tools.gensrc.ast.scope.Scope;
-import dyvil.tools.gensrc.lang.I18n;
-import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.marker.SemanticError;
-import dyvil.source.position.SourcePosition;
-
-import java.io.File;
 
 public class Util
 {
-	public static String getArgument(String line, int start, int end)
+	public static String processLine(String line, Scope scope)
 	{
-		return line.substring(skipWhitespace(line, start, end));
+		return processLine(line, 0, line.length(), scope);
 	}
 
-	public static String getProcessedArgument(String line, int start, int end, Scope replacements)
-	{
-		return processLine(line, skipWhitespace(line, start, end), end, replacements);
-	}
-
-	public static String[] getProcessedArguments(String line, int start, int end, Scope replacements)
-	{
-		return getProcessedArgument(line, start, end, replacements).split("\\s*,\\s*");
-	}
-
-	private static String parseIdentifier(String line, int start, int end)
-	{
-		final int keyStart = skipWhitespace(line, start, end);
-		final int keyEnd = findIdentifierEnd(line, keyStart, end);
-		return line.substring(keyStart, keyEnd);
-	}
-
-	public static String processLine(String line, Scope replacements)
-	{
-		return processLine(line, 0, line.length(), replacements);
-	}
-
-	public static String processLine(String line, int start, int end, Scope replacements)
+	public static String processLine(String line, int start, int end, Scope scope)
 	{
 		if (start == end)
 		{
@@ -77,7 +46,7 @@ public class Util
 			// index of the first character that is not part of this identifier
 			final int nextIndex = findIdentifierEnd(line, i + 1, end);
 			final String key = line.substring(i, nextIndex);
-			final String replacement = replacements.getReplacement(key);
+			final String replacement = scope.getString(key);
 
 			if (replacement != null)
 			{
@@ -143,26 +112,5 @@ public class Util
 			}
 		}
 		return end;
-	}
-
-	public static List<Specialization> parseSpecs(String line, GenSrc gensrc, Scope scope, MarkerList markers,
-		                                             SourcePosition position)
-	{
-		final String[] files = getProcessedArguments(line, 0, line.length(), scope);
-		final List<Specialization> specs = new ArrayList<>(files.length);
-		final File sourceFile = scope.getSourceFile();
-
-		for (String file : files)
-		{
-			final Specialization spec = Specialization.resolveSpec(file, sourceFile, gensrc);
-			if (spec != null)
-			{
-				specs.add(spec);
-				continue;
-			}
-
-			markers.add(new SemanticError(position, I18n.get("spec.resolve", file)));
-		}
-		return specs;
 	}
 }
