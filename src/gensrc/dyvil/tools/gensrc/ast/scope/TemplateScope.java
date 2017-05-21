@@ -1,6 +1,8 @@
 package dyvil.tools.gensrc.ast.scope;
 
 import dyvil.tools.gensrc.ast.Specialization;
+import dyvil.tools.gensrc.ast.directive.Directive;
+import dyvil.tools.gensrc.ast.directive.LiteralText;
 import dyvil.tools.gensrc.lang.I18n;
 
 import java.io.File;
@@ -25,14 +27,14 @@ public class TemplateScope extends LazyScope
 	}
 
 	@Override
-	public String getParent(String key)
+	public Directive getParent(String key)
 	{
 		switch (key)
 		{
 		case GEN_NOTICE_PROPERTY:
-			return GEN_NOTICE;
+			return new LiteralText(GEN_NOTICE);
 		case TIME_STAMP_PROPERTY:
-			return this.timeStamp;
+			return new LiteralText(this.timeStamp);
 		}
 		return null;
 	}

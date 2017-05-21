@@ -3,6 +3,8 @@ package dyvil.tools.gensrc.ast;
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.gensrc.GenSrc;
+import dyvil.tools.gensrc.ast.directive.Directive;
+import dyvil.tools.gensrc.ast.directive.LiteralText;
 import dyvil.tools.gensrc.ast.scope.Scope;
 import dyvil.tools.gensrc.lang.I18n;
 
@@ -84,7 +86,7 @@ public class Specialization implements Scope
 
 	public String getFileName()
 	{
-		return this.getReplacement(FILE_NAME_PROPERTY);
+		return this.getString(FILE_NAME_PROPERTY);
 	}
 
 	public boolean isEnabled()
@@ -98,12 +100,12 @@ public class Specialization implements Scope
 	}
 
 	@Override
-	public String getReplacement(String key)
+	public Directive getReplacement(String key)
 	{
 		final String sub = this.substitutions.getProperty(key);
 		if (sub != null || this.parent == null)
 		{
-			return sub;
+			return new LiteralText(sub);
 		}
 		return this.parent.getReplacement(key);
 	}
@@ -132,13 +134,13 @@ public class Specialization implements Scope
 				this.enabled = false;
 			}
 		}
-		final String enabled = this.getReplacement(ENABLED_PROPERTY);
+		final String enabled = this.getString(ENABLED_PROPERTY);
 		if (enabled != null && !"true".equals(enabled))
 		{
 			this.enabled = false;
 		}
 
-		final String inherited = this.getReplacement(INHERIT_FROM_PROPERTY);
+		final String inherited = this.getString(INHERIT_FROM_PROPERTY);
 		if (inherited == null)
 		{
 			return;

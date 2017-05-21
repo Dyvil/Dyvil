@@ -1,5 +1,8 @@
 package dyvil.tools.gensrc.ast.scope;
 
+import dyvil.tools.gensrc.ast.directive.Directive;
+import dyvil.tools.gensrc.ast.directive.LiteralText;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,7 +11,7 @@ import java.util.Map;
 
 public class LazyScope implements Scope
 {
-	private Map<String, String> store;
+	private Map<String, Directive> store;
 
 	private List<Scope> imports;
 
@@ -20,6 +23,11 @@ public class LazyScope implements Scope
 	}
 
 	public void define(String key, String value)
+	{
+		this.define(key, new LiteralText(value));
+	}
+
+	public void define(String key, Directive value)
 	{
 		this.createStore().put(key, value);
 	}
@@ -37,7 +45,7 @@ public class LazyScope implements Scope
 		}
 	}
 
-	private Map<String, String> createStore()
+	private Map<String, Directive> createStore()
 	{
 		if (this.store == null)
 		{
@@ -69,7 +77,7 @@ public class LazyScope implements Scope
 	}
 
 	@Override
-	public String getReplacement(String key)
+	public Directive getReplacement(String key)
 	{
 		if (this.store != null && this.store.containsKey(key))
 		{
@@ -79,7 +87,7 @@ public class LazyScope implements Scope
 		{
 			for (Scope map : this.imports)
 			{
-				final String replacement = map.getReplacement(key);
+				final Directive replacement = map.getReplacement(key);
 				if (replacement != null)
 				{
 					return replacement;
@@ -89,7 +97,7 @@ public class LazyScope implements Scope
 		return this.getParent(key);
 	}
 
-	public String getParent(String key)
+	public Directive getParent(String key)
 	{
 		return this.parent == null ? null : this.parent.getReplacement(key);
 	}

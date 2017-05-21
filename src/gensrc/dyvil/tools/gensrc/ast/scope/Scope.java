@@ -1,5 +1,7 @@
 package dyvil.tools.gensrc.ast.scope;
 
+import dyvil.tools.gensrc.ast.directive.Directive;
+
 import java.io.File;
 
 public interface Scope
@@ -8,16 +10,22 @@ public interface Scope
 
 	Scope getGlobalParent();
 
-	String getReplacement(String key);
+	Directive getReplacement(String key);
 
 	default boolean isDefined(String key)
 	{
 		return this.getReplacement(key) != null;
 	}
 
+	default String getString(String key)
+	{
+		final Directive dir = this.getReplacement(key);
+		return dir.specialize(this);
+	}
+
 	default boolean getBoolean(String key)
 	{
-		final String substitution = this.getReplacement(key);
+		final String substitution = this.getString(key);
 		if (substitution == null)
 		{
 			return false;
