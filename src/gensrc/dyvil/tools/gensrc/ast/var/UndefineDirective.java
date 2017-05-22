@@ -1,5 +1,6 @@
-package dyvil.tools.gensrc.ast.directive;
+package dyvil.tools.gensrc.ast.var;
 
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.gensrc.GenSrc;
 import dyvil.tools.gensrc.ast.scope.LazyScope;
 import dyvil.tools.gensrc.ast.scope.Scope;
@@ -7,16 +8,14 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 import java.io.PrintStream;
 
-public class UndefineDirective implements Directive
+public class UndefineDirective extends VarDirective
 {
 	private final boolean local;
 
-	private final String varName;
-
-	public UndefineDirective(boolean local, String varName)
+	public UndefineDirective(boolean local, SourcePosition position)
 	{
 		this.local = local;
-		this.varName = varName;
+		this.position = position;
 	}
 
 	@Override
@@ -29,19 +28,13 @@ public class UndefineDirective implements Directive
 
 		if (scope instanceof LazyScope)
 		{
-			((LazyScope) scope).undefine(this.varName);
+			((LazyScope) scope).undefine(this.name.qualified);
 		}
-	}
-
-	@Override
-	public String toString()
-	{
-		return Directive.toString(this);
 	}
 
 	@Override
 	public void toString(String indent, StringBuilder builder)
 	{
-		builder.append(indent).append(this.local ? "#delete " : "#undefine ").append(this.varName).append('\n');
+		builder.append(this.local ? "#delete(" : "#undefine(").append(this.name).append(")\n");
 	}
 }

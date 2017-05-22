@@ -1,32 +1,27 @@
-package dyvil.tools.gensrc.ast.directive;
+package dyvil.tools.gensrc.ast.var;
 
+import dyvil.lang.Formattable;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.gensrc.GenSrc;
-import dyvil.tools.gensrc.ast.Util;
 import dyvil.tools.gensrc.ast.scope.LazyScope;
 import dyvil.tools.gensrc.ast.scope.Scope;
 import dyvil.tools.parsing.marker.MarkerList;
 
 import java.io.PrintStream;
 
-public class DefineDirective implements Directive
+public class DefineDirective extends VarDirective
 {
 	private boolean local;
 
-	private final String key;
-	private final String value;
-
-	public DefineDirective(boolean local, String key, String value)
+	public DefineDirective(boolean local, SourcePosition position)
 	{
 		this.local = local;
-		this.key = key;
-		this.value = value;
+		this.position = position;
 	}
 
 	@Override
 	public void specialize(GenSrc gensrc, Scope scope, MarkerList markers, PrintStream output)
 	{
-		final String processed = Util.processLine(this.value, scope);
-
 		if (!this.local)
 		{
 			scope = scope.getGlobalParent();
@@ -34,20 +29,21 @@ public class DefineDirective implements Directive
 
 		if (scope instanceof LazyScope)
 		{
-			((LazyScope) scope).define(this.key, processed);
+			((LazyScope) scope).define(this.name.qualified, this.body);
 		}
 	}
 
 	@Override
 	public String toString()
 	{
-		return Directive.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override
 	public void toString(String indent, StringBuilder builder)
 	{
-		builder.append(indent).append(this.local ? "#local " : "#define ").append(this.key).append(' ')
-		       .append(this.value).append('\n');
+		builder.append(this.local ? "#local" : "#define").append('(').append(this.name).append(") {");
+		this.body.toString(indent + '\t', builder);
+		builder.append("}\n");
 	}
 }

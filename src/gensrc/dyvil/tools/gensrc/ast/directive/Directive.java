@@ -1,21 +1,33 @@
 package dyvil.tools.gensrc.ast.directive;
 
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.gensrc.GenSrc;
 import dyvil.tools.gensrc.ast.scope.Scope;
+import dyvil.tools.parsing.ASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 
 import java.io.PrintStream;
 
-public interface Directive
+public interface Directive extends ASTNode
 {
-	void specialize(GenSrc gensrc, Scope scope, MarkerList markers, PrintStream output);
-
-	static String toString(Directive dir)
+	@Override
+	default SourcePosition getPosition()
 	{
-		final StringBuilder builder = new StringBuilder();
-		dir.toString("", builder);
-		return builder.toString();
+		return null;
 	}
 
+	@Override
+	default void setPosition(SourcePosition sourcePosition)
+	{
+	}
+
+	void specialize(GenSrc gensrc, Scope scope, MarkerList markers, PrintStream output);
+
+	default String specialize(Scope scope)
+	{
+		return null;
+	}
+
+	@Override
 	void toString(String indent, StringBuilder builder);
 }
