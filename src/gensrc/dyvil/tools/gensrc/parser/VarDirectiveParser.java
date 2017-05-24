@@ -102,9 +102,14 @@ public class VarDirectiveParser extends Parser
 				return;
 			}
 
-			DirectiveList block = new DirectiveList();
-			pm.pushParser(new BlockParser(block));
-			this.directive.setBody(block);
+			if (this.directive instanceof UndefineDirective)
+			{
+				pm.report(token, "directive.undefine.body");
+			}
+
+			final DirectiveList body = new DirectiveList();
+			pm.pushParser(new BlockParser(body));
+			this.directive.setBody(body);
 			this.mode = BODY_END;
 			return;
 		case BODY_END:
