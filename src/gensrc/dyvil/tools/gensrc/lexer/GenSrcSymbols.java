@@ -8,6 +8,8 @@ public class GenSrcSymbols implements Symbols
 {
 	public static final GenSrcSymbols INSTANCE = new GenSrcSymbols();
 
+	public static final int ARROW_LEFT = Tokens.SYMBOL | 0x000A0000;
+
 	public static final int IF       = Tokens.KEYWORD | 0x00010000;
 	public static final int ELSE     = Tokens.KEYWORD | 0x00020000;
 	public static final int FOR      = Tokens.KEYWORD | 0x00030000;
@@ -55,6 +57,12 @@ public class GenSrcSymbols implements Symbols
 	@Override
 	public int getSymbolType(String s)
 	{
+		switch (s)
+		{
+		case "<-":
+			return ARROW_LEFT;
+		}
+
 		return BaseSymbols.INSTANCE.getSymbolType(s);
 	}
 
@@ -63,6 +71,8 @@ public class GenSrcSymbols implements Symbols
 	{
 		switch (type)
 		{
+		case ARROW_LEFT:
+			return "<-";
 		case IF:
 			return "if";
 		case ELSE:
