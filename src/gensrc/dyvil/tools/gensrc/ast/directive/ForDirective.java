@@ -1,6 +1,5 @@
 package dyvil.tools.gensrc.ast.directive;
 
-import dyvil.collection.List;
 import dyvil.lang.Formattable;
 import dyvil.source.position.SourcePosition;
 import dyvil.tools.gensrc.GenSrc;
@@ -71,10 +70,10 @@ public class ForDirective implements Directive
 	@Override
 	public void specialize(GenSrc gensrc, Scope scope, MarkerList markers, PrintStream output)
 	{
-		for (Object elem : this.list.evaluate(List.class, scope))
+		for (Expression expr : this.list.evaluateList(scope))
 		{
 			final LazyScope innerScope = new LazyScope(scope);
-			innerScope.define(this.varName.qualified, elem.toString());
+			innerScope.define(this.varName.qualified, expr.evaluateString(scope));
 
 			this.block.specialize(gensrc, innerScope, markers, output);
 		}

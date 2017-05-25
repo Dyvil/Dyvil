@@ -66,7 +66,7 @@ public class IfDirective implements Directive
 
 	private boolean evaluate(Scope scope)
 	{
-		return this.condition.evaluate(Boolean.class, scope);
+		return this.condition.evaluateBoolean(scope);
 	}
 
 	@Override

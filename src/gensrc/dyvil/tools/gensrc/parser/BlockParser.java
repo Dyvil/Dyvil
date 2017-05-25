@@ -1,7 +1,7 @@
 package dyvil.tools.gensrc.parser;
 
 import dyvil.tools.gensrc.ast.directive.DirectiveList;
-import dyvil.tools.gensrc.ast.directive.ProcessedLine;
+import dyvil.tools.gensrc.ast.directive.ProcessedText;
 import dyvil.tools.gensrc.lexer.GenSrcSymbols;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -29,10 +29,13 @@ public class BlockParser extends dyvil.tools.parsing.Parser
 		case ELEMENT:
 			switch (type)
 			{
+			case BaseSymbols.CLOSE_CURLY_BRACKET:
+				pm.popParser(true);
+				return;
 			case Tokens.EOF:
 				return;
 			case Tokens.STRING:
-				this.directives.add(new ProcessedLine(token.stringValue()));
+				this.directives.add(new ProcessedText(token.stringValue()));
 				return;
 			case BaseSymbols.HASH:
 				this.mode = DIRECTIVE_NAME;
