@@ -3,6 +3,7 @@ package dyvil.tools.gensrc.parser;
 import dyvil.tools.gensrc.ast.directive.DirectiveList;
 import dyvil.tools.gensrc.ast.directive.ForDirective;
 import dyvil.tools.gensrc.lexer.GenSrcSymbols;
+import dyvil.tools.gensrc.parser.expression.ExpressionParser;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -101,7 +102,6 @@ public class ForDirectiveParser extends Parser
 			return;
 		case BODY_END:
 			assert type == BaseSymbols.CLOSE_CURLY_BRACKET;
-
 			this.list.add(this.directive);
 			pm.popParser();
 		}

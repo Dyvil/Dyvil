@@ -1,4 +1,4 @@
-package dyvil.tools.gensrc.parser;
+package dyvil.tools.gensrc.parser.expression;
 
 import dyvil.tools.gensrc.ast.expression.Expression;
 import dyvil.tools.parsing.IParserManager;
