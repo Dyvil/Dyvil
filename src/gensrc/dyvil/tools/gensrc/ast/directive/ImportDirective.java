@@ -1,24 +1,29 @@
 package dyvil.tools.gensrc.ast.directive;
 
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.gensrc.GenSrc;
 import dyvil.tools.gensrc.ast.Specialization;
-import dyvil.tools.gensrc.ast.Util;
+import dyvil.tools.gensrc.ast.expression.Expression;
 import dyvil.tools.gensrc.ast.scope.LazyScope;
 import dyvil.tools.gensrc.ast.scope.Scope;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.io.PrintStream;
 
-public class ImportDirective implements Directive
+public class ImportDirective extends BasicDirective
 {
-	private final SourcePosition position;
-	private final String files;
+	public static final Name IMPORT = Name.fromQualified("import");
 
-	public ImportDirective(SourcePosition position, String files)
+	public ImportDirective(SourcePosition position)
 	{
 		this.position = position;
-		this.files = files;
+	}
+
+	@Override
+	public Name getName()
+	{
+		return IMPORT;
 	}
 
 	@Override
@@ -31,21 +36,11 @@ public class ImportDirective implements Directive
 
 		final LazyScope lazyScope = (LazyScope) scope;
 
-		for (Specialization spec : Util.parseSpecs(this.files, gensrc, scope, markers, this.position))
+		for (Expression expr : this.arguments)
 		{
+			final String reference = expr.evaluateString(scope);
+			final Specialization spec = Specialization.resolveSpec(reference, scope.getSourceFile(), gensrc);
 			lazyScope.importFrom(spec);
 		}
-	}
-
-	@Override
-	public String toString()
-	{
-		return Directive.toString(this);
-	}
-
-	@Override
-	public void toString(String indent, StringBuilder builder)
-	{
-		builder.append(indent).append("#import ").append(this.files).append('\n');
 	}
 }
