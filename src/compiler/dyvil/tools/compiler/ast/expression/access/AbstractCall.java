@@ -19,6 +19,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.NullableType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
@@ -302,6 +303,7 @@ public abstract class AbstractCall implements ICall, IReceiverAccess, OptionalCh
 			    && (code = intrinsicData.getCompilerCode()) != 0 // compilerCode argument
 			    && (intrinsic = Intrinsics.getOperator(code, this.receiver, this.arguments)) != null) // valid intrinsic
 		{
+			Deprecation.checkAnnotations(method, this.position, markers);
 			intrinsic.setPosition(this.position);
 			return intrinsic;
 		}
