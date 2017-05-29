@@ -74,7 +74,7 @@ interface Entry<type +K, type +V> extends java.io.Serializable
 	static func comparingByValue<K, V>(cmp: Comparator<-V>) -> Comparator<Entry<K, V>>
 		= (c1, c2) => cmp.compare(c1.getValue, c2.getValue)
 
-	static func entryToString(entry: Entry<_, _>) -> String = entry.getKey + " -> " + entry.getValue
+	static func entryToString(entry: Entry<_, _>) -> String = "\(entry.getKey) -> \(entry.getValue)"
 
 	static func entryEquals(entry: Entry<_, _>, obj: any!) -> boolean
 		= obj is Entry && entryEquals(entry, other: obj as Entry)
