@@ -2,6 +2,7 @@ package dyvil.tools.gensrc.parser;
 
 import dyvil.tools.gensrc.ast.directive.DirectiveList;
 import dyvil.tools.gensrc.ast.directive.ForDirective;
+import dyvil.tools.gensrc.ast.expression.RangeOperator;
 import dyvil.tools.gensrc.lexer.GenSrcSymbols;
 import dyvil.tools.gensrc.parser.expression.ExpressionParser;
 import dyvil.tools.parsing.IParserManager;
@@ -74,10 +75,19 @@ public class ForDirectiveParser extends Parser
 				pm.report(token, "directive.for.arrow_left");
 			}
 
-			pm.pushParser(new ExpressionParser(this.directive::setList));
+			pm.pushParser(new ExpressionParser(this.directive::setIterable));
 			this.mode = CLOSE_PAREN;
 			return;
 		case CLOSE_PAREN:
+			if (type == Tokens.SYMBOL_IDENTIFIER && token.nameValue().unqualified.equals(".."))
+			{
+				final RangeOperator rangeOp = new RangeOperator(token.raw());
+				rangeOp.setStart(this.directive.getIterable());
+				pm.pushParser(new ExpressionParser(rangeOp::setEnd));
+				this.directive.setIterable(rangeOp);
+				return;
+			}
+
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				pm.report(token, "directive.for.close_paren");

@@ -59,6 +59,20 @@ public class ExpressionList implements Iterable<Expression>
 		this.array[this.size++] = expr;
 	}
 
+	public void addAll(Iterable<Expression> iterable)
+	{
+		if (iterable instanceof ExpressionList)
+		{
+			this.addAll((ExpressionList) iterable);
+			return;
+		}
+
+		for (Expression expr : iterable)
+		{
+			this.add(expr);
+		}
+	}
+
 	public void addAll(ExpressionList list)
 	{
 		this.ensureCapacity(this.size + list.size);
@@ -94,7 +108,7 @@ public class ExpressionList implements Iterable<Expression>
 		final ExpressionList result = new ExpressionList(this.size);
 		for (int i = 0; i < this.size; i++)
 		{
-			result.addAll(this.array[i].evaluateList(scope));
+			result.addAll(this.array[i].evaluateIterable(scope));
 		}
 		return result;
 	}

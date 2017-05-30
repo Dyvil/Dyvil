@@ -14,7 +14,7 @@ import java.io.PrintStream;
 public class ForDirective implements Directive
 {
 	protected Name          varName;
-	protected Expression    list;
+	protected Expression    iterable;
 	protected DirectiveList block;
 
 	// Metadata
@@ -35,14 +35,14 @@ public class ForDirective implements Directive
 		this.varName = varName;
 	}
 
-	public Expression getList()
+	public Expression getIterable()
 	{
-		return this.list;
+		return this.iterable;
 	}
 
-	public void setList(Expression list)
+	public void setIterable(Expression list)
 	{
-		this.list = list;
+		this.iterable = list;
 	}
 
 	public DirectiveList getBlock()
@@ -70,7 +70,7 @@ public class ForDirective implements Directive
 	@Override
 	public void specialize(GenSrc gensrc, Scope scope, MarkerList markers, PrintStream output)
 	{
-		for (Expression expr : this.list.evaluateList(scope))
+		for (Expression expr : this.iterable.evaluateIterable(scope))
 		{
 			final LazyScope innerScope = new LazyScope(scope);
 			innerScope.define(this.varName.qualified, expr.evaluateString(scope));
@@ -88,7 +88,7 @@ public class ForDirective implements Directive
 	@Override
 	public void toString(String indent, StringBuilder builder)
 	{
-		builder.append("#for(").append(this.varName).append(" <- ").append(this.list).append(") {");
+		builder.append("#for(").append(this.varName).append(" <- ").append(this.iterable).append(") {");
 		this.block.toString(indent + '\t', builder);
 		builder.append('}');
 	}

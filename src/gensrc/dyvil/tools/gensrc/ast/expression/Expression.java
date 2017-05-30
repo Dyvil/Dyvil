@@ -36,7 +36,7 @@ public interface Expression extends ASTNode
 
 	String evaluateString(Scope scope);
 
-	default ExpressionList evaluateList(Scope scope)
+	default Iterable<Expression> evaluateIterable(Scope scope)
 	{
 		return new ExpressionList(this);
 	}
