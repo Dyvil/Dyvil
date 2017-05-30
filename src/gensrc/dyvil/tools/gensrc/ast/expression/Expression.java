@@ -5,11 +5,34 @@ import dyvil.tools.parsing.ASTNode;
 
 public interface Expression extends ASTNode
 {
-	boolean evaluateBoolean(Scope scope);
+	default boolean evaluateBoolean(Scope scope)
+	{
+		return Boolean.parseBoolean(this.evaluateString(scope));
+	}
 
-	long evaluateInteger(Scope scope);
+	default long evaluateInteger(Scope scope)
+	{
+		try
+		{
+			return Long.parseLong(this.evaluateString(scope));
+		}
+		catch (NumberFormatException ex)
+		{
+			return 0L;
+		}
+	}
 
-	double evaluateDouble(Scope scope);
+	default double evaluateDouble(Scope scope)
+	{
+		try
+		{
+			return Double.parseDouble(this.evaluateString(scope));
+		}
+		catch (NumberFormatException ex)
+		{
+			return 0;
+		}
+	}
 
 	String evaluateString(Scope scope);
 
