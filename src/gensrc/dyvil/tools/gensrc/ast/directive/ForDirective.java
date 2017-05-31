@@ -15,7 +15,7 @@ public class ForDirective implements Directive
 {
 	protected Name          varName;
 	protected Expression    iterable;
-	protected DirectiveList block;
+	protected DirectiveList body;
 
 	// Metadata
 	protected SourcePosition position;
@@ -45,14 +45,14 @@ public class ForDirective implements Directive
 		this.iterable = list;
 	}
 
-	public DirectiveList getBlock()
+	public DirectiveList getBody()
 	{
-		return this.block;
+		return this.body;
 	}
 
-	public void setBlock(DirectiveList block)
+	public void setBody(DirectiveList body)
 	{
-		this.block = block;
+		this.body = body;
 	}
 
 	@Override
@@ -75,7 +75,7 @@ public class ForDirective implements Directive
 			final LazyScope innerScope = new LazyScope(scope);
 			innerScope.define(this.varName.qualified, expr.evaluateString(scope));
 
-			this.block.specialize(gensrc, innerScope, markers, output);
+			this.body.specialize(gensrc, innerScope, markers, output);
 		}
 	}
 
@@ -88,8 +88,18 @@ public class ForDirective implements Directive
 	@Override
 	public void toString(String indent, StringBuilder builder)
 	{
-		builder.append("#for(").append(this.varName).append(" <- ").append(this.iterable).append(") {");
-		this.block.toString(indent + '\t', builder);
-		builder.append('}');
+		builder.append("#for(").append(this.varName).append(" <- ");
+		if (this.iterable != null)
+		{
+			this.iterable.toString(indent, builder);
+		}
+		builder.append(')');
+
+		if (this.body != null)
+		{
+			builder.append(" {");
+			this.body.toString(indent + '\t', builder);
+			builder.append('}');
+		}
 	}
 }

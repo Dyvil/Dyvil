@@ -116,7 +116,8 @@ public class GenSrcLexer extends dyvil.tools.parsing.lexer.Lexer
 				}
 				break;
 			case '\n':
-				this.advance(); // end at newline, but include it
+				// end at newline, but include it
+				this.newLine();
 				break loop;
 			}
 
@@ -201,7 +202,15 @@ public class GenSrcLexer extends dyvil.tools.parsing.lexer.Lexer
 	{
 		while (current != 0 && Character.isWhitespace(current))
 		{
-			this.advance(current);
+			if (current == '\n')
+			{
+				this.newLine();
+			}
+			else
+			{
+				this.advance(current);
+			}
+
 			current = this.codePoint();
 		}
 	}
@@ -216,6 +225,11 @@ public class GenSrcLexer extends dyvil.tools.parsing.lexer.Lexer
 		{
 			this.advance(current);
 			current = this.codePoint();
+		}
+
+		if (startIndex == this.cursor)
+		{
+			return;
 		}
 
 		final String identifier = this.code.substring(startIndex, this.cursor);
@@ -233,7 +247,7 @@ public class GenSrcLexer extends dyvil.tools.parsing.lexer.Lexer
 
 	private void parseDyvilArguments()
 	{
-		final DyvilLexer sublexer = new DyvilLexer(this.markers, BaseSymbols.INSTANCE);
+		final DyvilLexer sublexer = new DyvilLexer(this.markers, GenSrcSymbols.INSTANCE);
 		sublexer.setInterpolationEnd();
 
 		this.useSubLexer(sublexer);

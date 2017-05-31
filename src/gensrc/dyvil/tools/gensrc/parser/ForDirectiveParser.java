@@ -107,7 +107,7 @@ public class ForDirectiveParser extends Parser
 
 			final DirectiveList body = new DirectiveList();
 			pm.pushParser(new BlockParser(body));
-			this.directive.setBlock(body);
+			this.directive.setBody(body);
 			this.mode = BODY_END;
 			return;
 		case BODY_END:

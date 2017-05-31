@@ -99,7 +99,9 @@ public class IfDirective implements Directive
 	{
 		// #if(condition) {then-block} #else {else-block}
 
-		builder.append("#if(").append(this.condition).append(") {");
+		builder.append("#if(");
+		this.condition.toString(indent, builder);
+		builder.append(") {");
 
 		final String newIndent = indent + '\t';
 		this.thenBlock.toString(newIndent, builder);
@@ -107,7 +109,7 @@ public class IfDirective implements Directive
 
 		if (this.elseBlock != null)
 		{
-			builder.append(indent).append(" #else {");
+			builder.append(" #else {");
 			this.elseBlock.toString(newIndent, builder);
 			builder.append('}');
 		}

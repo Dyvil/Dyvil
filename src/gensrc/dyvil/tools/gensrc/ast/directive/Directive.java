@@ -10,6 +10,8 @@ import java.io.PrintStream;
 
 public interface Directive extends ASTNode
 {
+	Directive LITERAL_HASH = new LiteralText("#");
+
 	@Override
 	default SourcePosition getPosition()
 	{

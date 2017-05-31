@@ -45,7 +45,6 @@ public class ExpressionParser extends Parser
 			return;
 		}
 
-		pm.report(token, "expression.empty");
 		pm.popParser(true);
 	}
 }

@@ -58,12 +58,12 @@ public class DirectiveList implements Directive
 	{
 		for (int i = 0; i < this.directiveCount; i++)
 		{
-			this.directives[i].toString(indent, builder);
-
-			if (builder.charAt(builder.length() - 1) == '\n')
+			if (builder.length() > 0 && builder.charAt(builder.length() - 1) == '\n')
 			{
 				builder.append(indent);
 			}
+
+			this.directives[i].toString(indent, builder);
 		}
 	}
 }

@@ -90,6 +90,7 @@ public class IfDirectiveParser extends Parser
 				return;
 			}
 
+			pm.skip(); // skip the 'else'
 			this.mode = ELSE_BODY;
 			return;
 		case ELSE_BODY:

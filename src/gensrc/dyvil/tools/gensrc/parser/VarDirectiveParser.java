@@ -86,9 +86,9 @@ public class VarDirectiveParser extends Parser
 			this.mode = CLOSE_PAREN;
 			return;
 		case CLOSE_PAREN:
-			if (type != BaseSymbols.CLOSE_CURLY_BRACKET)
+			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
-				pm.report(token, "directive.var.close_paren");
+				pm.report(token, "directive.close_paren");
 				return;
 			}
 
@@ -115,6 +115,7 @@ public class VarDirectiveParser extends Parser
 		case BODY_END:
 			assert type == BaseSymbols.CLOSE_CURLY_BRACKET;
 			this.directives.add(this.directive);
+			pm.popParser();
 		}
 	}
 }

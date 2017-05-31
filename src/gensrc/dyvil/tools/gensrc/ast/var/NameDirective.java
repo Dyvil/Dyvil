@@ -21,10 +21,13 @@ public class NameDirective extends VarDirective
 	{
 		output.print(this.name.qualified);
 
-		LazyScope newScope = new LazyScope(scope);
-		newScope.undefine(this.name.qualified);
+		if (this.body != null)
+		{
+			final LazyScope newScope = new LazyScope(scope);
+			newScope.undefine(this.name.qualified);
 
-		this.body.specialize(gensrc, newScope, markers, output);
+			this.body.specialize(gensrc, newScope, markers, output);
+		}
 	}
 
 	@Override
@@ -36,8 +39,13 @@ public class NameDirective extends VarDirective
 	@Override
 	public void toString(String indent, StringBuilder builder)
 	{
-		builder.append("#name(").append(this.name).append(") {");
-		this.body.toString(indent + '\t', builder);
-		builder.append('}');
+		builder.append("#name(").append(this.name).append(')');
+
+		if (this.body != null)
+		{
+			builder.append(" {");
+			this.body.toString(indent + '\t', builder);
+			builder.append('}');
+		}
 	}
 }

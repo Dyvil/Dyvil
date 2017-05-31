@@ -58,10 +58,23 @@ public abstract class BasicDirective implements Directive
 	@Override
 	public void toString(String indent, StringBuilder builder)
 	{
-		builder.append('#').append(this.getName()).append('(');
-		this.arguments.toString(indent, builder);
-		builder.append(") {");
-		this.body.toString(indent + '\t', builder);
-		builder.append('}');
+		builder.append('#').append(this.getName());
+		if (this.arguments.size() > 0)
+		{
+			builder.append('(');
+			this.arguments.toString(indent, builder);
+			builder.append(')');
+
+			if (this.body != null)
+			{
+				builder.append(' ');
+			}
+		}
+		if (this.body != null)
+		{
+			builder.append('{');
+			this.body.toString(indent + '\t', builder);
+			builder.append('}').append('\n');
+		}
 	}
 }

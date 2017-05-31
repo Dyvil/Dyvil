@@ -20,7 +20,7 @@ public class ExpressionListParser extends Parser
 	{
 		if (this.mode == 0)
 		{
-			pm.pushParser(new ExpressionParser(this.list::add));
+			pm.pushParser(new ExpressionParser(this.list::add), true);
 			this.mode = 1;
 		}
 		else if (token.type() == BaseSymbols.COMMA)

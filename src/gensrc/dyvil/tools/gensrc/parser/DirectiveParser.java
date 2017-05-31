@@ -34,6 +34,11 @@ public class DirectiveParser extends Parser
 		case NAME:
 			switch (type)
 			{
+			case BaseSymbols.HASH:
+				// ## -> do nothing
+				this.list.add(Directive.LITERAL_HASH);
+				pm.popParser();
+				return;
 			case GenSrcSymbols.IMPORT:
 				this.directive = new ImportDirective(token.raw());
 				break;
@@ -44,7 +49,11 @@ public class DirectiveParser extends Parser
 				pm.reparse();
 				this.directive = new ScopeDirective(token.raw());
 				break;
+			default:
+				this.directive = new NamedDirective(token.raw(), token.nameValue());
+				break;
 			}
+
 
 			this.mode = OPEN_PAREN;
 			return;
