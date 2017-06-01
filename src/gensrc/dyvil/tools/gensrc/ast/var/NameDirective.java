@@ -3,6 +3,7 @@ package dyvil.tools.gensrc.ast.var;
 import dyvil.lang.Formattable;
 import dyvil.source.position.SourcePosition;
 import dyvil.tools.gensrc.GenSrc;
+import dyvil.tools.gensrc.ast.directive.BasicDirective;
 import dyvil.tools.gensrc.ast.scope.LazyScope;
 import dyvil.tools.gensrc.ast.scope.Scope;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -41,11 +42,6 @@ public class NameDirective extends VarDirective
 	{
 		builder.append("#name(").append(this.name).append(')');
 
-		if (this.body != null)
-		{
-			builder.append(" {");
-			this.body.toString(indent + '\t', builder);
-			builder.append('}');
-		}
+		BasicDirective.appendBody(indent, builder, this.body);
 	}
 }

@@ -156,7 +156,6 @@ public class GenSrcLexer extends dyvil.tools.parsing.lexer.Lexer
 		switch (this.code.codePointAt(indexOfNonWhite))
 		{
 		case '(':
-			// ... skip the whitespace
 			this.skipWhitespace(current);
 
 			this.tokens.append(new SymbolToken(BaseSymbols.INSTANCE, OPEN_PARENTHESIS, this.line, this.column));
@@ -173,12 +172,14 @@ public class GenSrcLexer extends dyvil.tools.parsing.lexer.Lexer
 			assert current == ')';
 			this.tokens.append(new SymbolToken(BaseSymbols.INSTANCE, CLOSE_PARENTHESIS, this.line, this.column));
 			this.advance();
+			this.skipNewLine();
 			return true;
 		case '{':
 			this.skipWhitespace(current);
 
 			this.tokens.append(new SymbolToken(BaseSymbols.INSTANCE, OPEN_CURLY_BRACKET, this.line, this.column));
 			this.advance();
+			this.skipNewLine();
 
 			this.parseNestedBlock();
 
@@ -190,11 +191,21 @@ public class GenSrcLexer extends dyvil.tools.parsing.lexer.Lexer
 
 			assert current == '}';
 			this.tokens.append(new SymbolToken(BaseSymbols.INSTANCE, CLOSE_CURLY_BRACKET, this.line, this.column));
+
 			this.advance();
+			this.skipNewLine();
 			return true;
 		case 0:
 		default:
 			return false;
+		}
+	}
+
+	private void skipNewLine()
+	{
+		if (this.codePoint() == '\n')
+		{
+			this.newLine();
 		}
 	}
 

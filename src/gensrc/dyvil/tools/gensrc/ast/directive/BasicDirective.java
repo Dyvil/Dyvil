@@ -64,17 +64,20 @@ public abstract class BasicDirective implements Directive
 			builder.append('(');
 			this.arguments.toString(indent, builder);
 			builder.append(')');
+		}
 
-			if (this.body != null)
-			{
-				builder.append(' ');
-			}
-		}
-		if (this.body != null)
+		appendBody(indent, builder, this.body);
+	}
+
+	public static void appendBody(String indent, StringBuilder builder, Directive body)
+	{
+		if (body == null)
 		{
-			builder.append('{');
-			this.body.toString(indent + '\t', builder);
-			builder.append('}').append('\n');
+			builder.append('\n');
+			return;
 		}
+		builder.append(" {\n");
+		body.toString(indent + '\t', builder);
+		builder.append("}\n");
 	}
 }

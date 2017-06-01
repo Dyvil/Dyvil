@@ -88,18 +88,13 @@ public class ForDirective implements Directive
 	@Override
 	public void toString(String indent, StringBuilder builder)
 	{
-		builder.append("#for(").append(this.varName).append(" <- ");
+		builder.append("#for (").append(this.varName).append(" <- ");
 		if (this.iterable != null)
 		{
 			this.iterable.toString(indent, builder);
 		}
 		builder.append(')');
 
-		if (this.body != null)
-		{
-			builder.append(" {");
-			this.body.toString(indent + '\t', builder);
-			builder.append('}');
-		}
+		BasicDirective.appendBody(indent, builder, this.body);
 	}
 }
