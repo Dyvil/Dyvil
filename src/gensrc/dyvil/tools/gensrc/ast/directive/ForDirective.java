@@ -95,6 +95,13 @@ public class ForDirective implements Directive
 		}
 		builder.append(')');
 
-		BasicDirective.appendBody(indent, builder, this.body);
+		if (this.body != null)
+		{
+			BasicDirective.appendBody(indent, builder, this.body);
+		}
+		else
+		{
+			builder.append('\n');
+		}
 	}
 }

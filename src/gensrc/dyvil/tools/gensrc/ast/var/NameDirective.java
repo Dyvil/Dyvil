@@ -42,6 +42,9 @@ public class NameDirective extends VarDirective
 	{
 		builder.append("#name(").append(this.name).append(')');
 
-		BasicDirective.appendBody(indent, builder, this.body);
+		if (this.body != null)
+		{
+			BasicDirective.appendBody(indent, builder, this.body);
+		}
 	}
 }

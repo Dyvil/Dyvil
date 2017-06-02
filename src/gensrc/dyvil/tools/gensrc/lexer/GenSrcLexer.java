@@ -100,12 +100,7 @@ public class GenSrcLexer extends dyvil.tools.parsing.lexer.Lexer
 			case 0:
 				break loop;
 			case '#':
-				if (this.nextCodePoint() != '#')
-				{
-					break loop;
-				}
-				this.advance();
-				break;
+				break loop;
 			case '{':
 				this.braceLevel++;
 				break;

@@ -1,5 +1,6 @@
 package dyvil.tools.gensrc.ast.directive;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.source.position.SourcePosition;
 import dyvil.tools.gensrc.ast.expression.ExpressionList;
 import dyvil.tools.parsing.Name;
@@ -55,6 +56,11 @@ public abstract class BasicDirective implements Directive
 		this.position = position;
 	}
 
+	public boolean isStatement()
+	{
+		return this.body != null;
+	}
+
 	@Override
 	public void toString(String indent, StringBuilder builder)
 	{
@@ -66,16 +72,18 @@ public abstract class BasicDirective implements Directive
 			builder.append(')');
 		}
 
-		appendBody(indent, builder, this.body);
-	}
-
-	public static void appendBody(String indent, StringBuilder builder, Directive body)
-	{
-		if (body == null)
+		if (this.body != null)
+		{
+			appendBody(indent, builder, this.body);
+		}
+		else if (this.isStatement())
 		{
 			builder.append('\n');
-			return;
 		}
+	}
+
+	public static void appendBody(@NonNull String indent, @NonNull StringBuilder builder, @NonNull Directive body)
+	{
 		builder.append(" {\n");
 		body.toString(indent + '\t', builder);
 		builder.append("}\n");

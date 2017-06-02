@@ -27,6 +27,12 @@ public class ImportDirective extends BasicDirective
 	}
 
 	@Override
+	public boolean isStatement()
+	{
+		return true;
+	}
+
+	@Override
 	public void specialize(GenSrc gensrc, Scope scope, MarkerList markers, PrintStream output)
 	{
 		if (!(scope instanceof LazyScope))

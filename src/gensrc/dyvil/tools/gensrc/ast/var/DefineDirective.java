@@ -3,6 +3,7 @@ package dyvil.tools.gensrc.ast.var;
 import dyvil.lang.Formattable;
 import dyvil.source.position.SourcePosition;
 import dyvil.tools.gensrc.GenSrc;
+import dyvil.tools.gensrc.ast.directive.BasicDirective;
 import dyvil.tools.gensrc.ast.scope.LazyScope;
 import dyvil.tools.gensrc.ast.scope.Scope;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -42,8 +43,15 @@ public class DefineDirective extends VarDirective
 	@Override
 	public void toString(String indent, StringBuilder builder)
 	{
-		builder.append(this.local ? "#local" : "#define").append('(').append(this.name).append(") {");
-		this.body.toString(indent + '\t', builder);
-		builder.append("}\n");
+		builder.append(this.local ? "#local" : "#define").append('(').append(this.name).append(')');
+
+		if (this.body != null)
+		{
+			BasicDirective.appendBody(indent, builder, this.body);
+		}
+		else
+		{
+			builder.append('\n');
+		}
 	}
 }

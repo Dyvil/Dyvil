@@ -31,6 +31,12 @@ public class IncludeDirective extends BasicDirective
 	}
 
 	@Override
+	public boolean isStatement()
+	{
+		return true;
+	}
+
+	@Override
 	public void specialize(GenSrc gensrc, Scope scope, MarkerList markers, PrintStream output)
 	{
 		final File sourceFile = scope.getSourceFile();

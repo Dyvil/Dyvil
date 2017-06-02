@@ -103,7 +103,10 @@ public class IfDirective implements Directive
 		this.condition.toString(indent, builder);
 		builder.append(")");
 
-		BasicDirective.appendBody(indent, builder, this.thenBlock);
+		if (this.thenBlock != null)
+		{
+			BasicDirective.appendBody(indent, builder, this.thenBlock);
+		}
 
 		if (this.elseBlock != null)
 		{
