@@ -1,61 +1,68 @@
-#if IS_HALF_OPEN
-package dyvil.collection.range.halfopen
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
 
-	#define LESS_OP <
-	#define RANGE_OP ..<
-#else
-package dyvil.collection.range.closed
+#if (IS_HALF_OPEN) {
+	package dyvil.collection.range.halfopen
 
-	#define LESS_OP <=
-	#define RANGE_OP ..
-#end
+	#define (LESS_OP) {<}
+	#define (RANGE_OP) {..<}
+}
+#else {
+	package dyvil.collection.range.closed
+
+	#define (LESS_OP) {<=}
+	#define (RANGE_OP) {..}
+}
 
 import java.util.Iterator
 import java.util.NoSuchElementException
 import java.util.function.Consumer
 
-type Base = dyvil.collection.range.specialized.TYPE_NAME##Range
+type Base = dyvil.collection.range.specialized.#(TYPE_NAME)Range
 
-class TYPE_NAME##Range(
+class #(TYPE_NAME)Range(
 	package private let start: PRIMITIVE
 	package private let end:   PRIMITIVE
 ) implements Base
 {
 	override func isHalfOpen() -> boolean = IS_HALF_OPEN
 
-#if IS_HALF_OPEN
-	override func asHalfOpen() -> Base = this
+	#if (IS_HALF_OPEN) {
+		override func asHalfOpen() -> Base = this
 
-	override func asClosed() -> Base = new dyvil.collection.range.closed.TYPE_NAME##Range(this.start, this.end)
-#else
-	override func asHalfOpen() -> Base = new dyvil.collection.range.halfopen.TYPE_NAME##Range(this.start, this.end)
+		override func asClosed() -> Base = new dyvil.collection.range.closed.#(TYPE_NAME)Range(this.start, this.end)
+	}
+	#else {
+		override func asHalfOpen() -> Base = new dyvil.collection.range.halfopen.#(TYPE_NAME)Range(this.start, this.end)
 
-	override func asClosed() -> Base = this
-#end
+		override func asClosed() -> Base = this
+	}
 
 	override func first() -> PRIMITIVE = this.start
 
-#if IS_HALF_OPEN
-	override func last() -> PRIMITIVE = this.end - 1
-#else
-	override func last() -> PRIMITIVE = this.end
-#end
+	#if (IS_HALF_OPEN) {
+		override func last() -> PRIMITIVE = this.end - 1
+	}
+	#else {
+		override func last() -> PRIMITIVE = this.end
+	}
 
-#if IS_HALF_OPEN
-	override func size() -> int = (this.end - this.start) as int
-#else
-	override func size() -> int = (this.end - this.start + 1) as int
-#end
+	#if (IS_HALF_OPEN) {
+		override func size() -> int = (this.end - this.start) as int
+	}
+	#else {
+		override func size() -> int = (this.end - this.start + 1) as int
+	}
 
 	override func iterator() -> Iterator<PRIMITIVE> = new Iterator<PRIMITIVE>() {
-		var value = this<TYPE_NAME##Range>.start
+		var value = this<#(TYPE_NAME)Range>.start
 
-		override func hasNext() -> boolean = this.value LESS_OP this<TYPE_NAME##Range>.end
+		override func hasNext() -> boolean = this.value LESS_OP this<#(TYPE_NAME)Range>.end
 
 		override func next() -> PRIMITIVE
 		{
 			let value = this.value
-			if (value LESS_OP this<TYPE_NAME##Range>.end)
+			if (value LESS_OP this<#(TYPE_NAME)Range>.end)
 			{
 				this.value++
 				return value
@@ -69,7 +76,7 @@ class TYPE_NAME##Range(
 
 	override func contains(value: PRIMITIVE) -> boolean = value >= this.start && value LESS_OP this.end
 
-	override func to##TYPE_NAME##Array() -> [PRIMITIVE]
+	override func to#(TYPE_NAME)Array() -> [PRIMITIVE]
 	{
 		let result = new [PRIMITIVE](this.size)
 		var index = 0
@@ -78,7 +85,7 @@ class TYPE_NAME##Range(
 		return result
 	}
 
-	override func copy() -> TYPE_NAME##Range = new TYPE_NAME##Range(this.start, this.end)
+	override func copy() -> #(TYPE_NAME)Range = new #(TYPE_NAME)Range(this.start, this.end)
 
 	override func copy(to: [Object!], index: int) -> void = for (i <- this.start RANGE_OP this.end) to[index++] = i
 

@@ -18,32 +18,29 @@ line with ## in the middle
 // tests for the preprocessor directives
 
 #define(_NESTED){#name(NESTED)}
-#if (ENABLED)
-{
+#if (ENABLED) {
 	#delete(ENABLED)
 	ENABLED set to true
 	#if (NESTED){and _NESTED set to true}#else{but _NESTED set to false}
 }
-#else
-{
+#else {
 	#define(_ENABLED){#name(ENABLED)}
 	_ENABLED set to ENABLED
 	#if (NESTED){but _NESTED set to true}#else{and _NESTED set to false}
 }
 
 
-#for(spec <- [ "./spectest-Test.dgs", "./spectest-Base.dgs" ])
-{
+#for (spec <- [ "./spectest-Test.dgs", "./spectest-Base.dgs" ]) {
 	#import(spec)
+
 	- the value of #name(COUNT) in SPEC_NAME is COUNT
 }
 
-Counting:#for(INDEX <- 0 .. 10){ INDEX}
+Counting:#for (INDEX <- 0 .. 10) { INDEX}
 
 
 More Counting:
-#for(INDEX <- 1 .. 5)
-{
+#for (INDEX <- 1 .. 5) {
 	INDEX
 }
 

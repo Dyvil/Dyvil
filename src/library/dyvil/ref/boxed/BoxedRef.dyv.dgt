@@ -3,11 +3,11 @@
 
 package dyvil.ref.boxed
 
-import dyvil.ref.TYPE_NAME##Ref
+import dyvil.ref.#(TYPE_NAME)Ref
 import dyvil.ref.ObjectRef
 
-class Boxed##TYPE_NAME##Ref(
-	protected let ref: TYPE_NAME##Ref
+class Boxed#(TYPE_NAME)Ref(
+	protected let ref: #(TYPE_NAME)Ref
 ) implements ObjectRef<WRAPPER>
 {
 	override func get() -> WRAPPER = this.ref.get

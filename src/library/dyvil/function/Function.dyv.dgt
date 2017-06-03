@@ -1,3 +1,6 @@
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
+
 package dyvil.function
 
 abstract class Function
@@ -32,23 +35,13 @@ abstract class Function
 		postfix func tupled<A, B, C>(function: (A, B) -> C) -> (((A, B)) -> C) = tuple => function(tuple._1, tuple._2)
 	}
 
-#import Base.dgs
-#for ARITY; 3; MAX_ARITY
+	#import("Base.dgs")
+	#for (ARITY <- 3 .. MAX_ARITY) {
 
-	@FunctionalInterface
-	interface Of##ARITY <
-	#for INDEX; 1; ARITY
-			type -P##INDEX
-	#end
-			type +R
-		>
-	{
-		func apply(
-	#for INDEX; 1; ARITY
-			par##INDEX: P##INDEX
-	#end
-		) -> R
+		@FunctionalInterface
+		interface Of#(ARITY)<#for (INDEX <- 1 .. ARITY) {type -P#(INDEX), }type +R>
+		{
+			func apply(par1: P1#for (INDEX <- 2 .. ARITY) {, par#(INDEX): P#(INDEX)}) -> R
+		}
 	}
-
-#end
 }

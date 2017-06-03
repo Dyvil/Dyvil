@@ -11,40 +11,43 @@ abstract class Primitives
 
 	private init() {}
 
-#define LOAD_CALL [ LOAD_0, INVOKESTATIC, 0, 1, 2 ]
+	#define(LOAD_CALL){LOAD_0, INVOKESTATIC, 0, 1, 2}
 
 	// --- Conversion Methods ---
 
-	// Void Methods
+	// Void Conversions
 
 	static func Void() -> Void = VOID_INSTANCE
 
 	@Intrinsic([ /* NOOP */ ])
 	implicit static func toVoid(value: Void?) -> void {}
 
-#import Base.dgs
-#foreach PRIMITIVE_SPECS
+	#import("Base.dgs")
+	#for (spec <- PRIMITIVE_SPECS) {
+		#import(spec)
 
-	// TYPE_NAME Conversions
+		// TYPE_NAME Conversions
 
-	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/WRAPPER", "valueOf", "(DESC_CHAR)Ljava/lang/WRAPPER;" ])
-	static func TYPE_NAME(value: PRIMITIVE) -> WRAPPER = TYPE_NAME.valueOf(value)
+		@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/WRAPPER", "valueOf", "(DESC_CHAR)Ljava/lang/WRAPPER;" ])
+		static func TYPE_NAME(value: PRIMITIVE) -> WRAPPER = TYPE_NAME.valueOf(value)
 
-	@Intrinsic([ LOAD_0, INVOKEVIRTUAL, 0, 1, 2 ]
-	  strings: [ "java/lang/WRAPPER", "PRIMITIVE##Value", "()DESC_CHAR" ])
-	implicit postfix func to##TYPE_NAME(wrapper: WRAPPER) -> PRIMITIVE = wrapper.PRIMITIVE##Value
+		@Intrinsic([ LOAD_0, INVOKEVIRTUAL, 0, 1, 2 ]
+		  strings: [ "java/lang/WRAPPER", "#(PRIMITIVE)Value", "()DESC_CHAR" ])
+		implicit postfix func to#(TYPE_NAME)(wrapper: WRAPPER) -> PRIMITIVE = wrapper.#(PRIMITIVE)Value
 
-	@BytecodeName("nullableTo##TYPE_NAME")
-	postfix func to##TYPE_NAME(optional: WRAPPER?) -> PRIMITIVE = optional?.PRIMITIVE##Value ?? DEFAULT_VALUE
-#endfor
+		@BytecodeName("nullableTo#(TYPE_NAME)")
+		postfix func to#(TYPE_NAME)(optional: WRAPPER?) -> PRIMITIVE = optional?.#(PRIMITIVE)Value ?? DEFAULT_VALUE
+	}
 
 	// --- equals Methods ---
-#foreach PRIMITIVE_SPECS
 
-	// TYPE_NAME equals
+	#for (spec <- PRIMITIVE_SPECS) {
+		#import(spec)
+		// TYPE_NAME equals
 
-	infix inline func equals(lhs: PRIMITIVE, rhs: PRIMITIVE) -> boolean = lhs == rhs
-#endfor
+		infix inline func equals(lhs: PRIMITIVE, rhs: PRIMITIVE) -> boolean = lhs == rhs
+
+	}
 
 	infix func compareTo(lhs: boolean, rhs: boolean) -> int = lhs == rhs ? 0 : lhs ? 1 : -1
 
@@ -56,24 +59,24 @@ abstract class Primitives
 
 	// Char toString
 
-	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/String", "valueOf", "(C)Ljava/lang/String;" ])
+	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/String", "valueOf", "(C)Ljava/lang/String;" ])
 	infix func toString(value: char) -> String = String.valueOf(value)
 
-	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Integer", "toString", "(I)Ljava/lang/String;" ])
+	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Integer", "toString", "(I)Ljava/lang/String;" ])
 	infix func toDecimalString(value: char) -> String = value.toDecimalString
 
 	// Int toString
 
-	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Integer", "toString", "(I)Ljava/lang/String;" ])
+	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Integer", "toString", "(I)Ljava/lang/String;" ])
 	infix func toString(value: int) -> String = value.toString
 
-	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Integer", "toBinaryString", "(I)Ljava/lang/String;" ])
+	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Integer", "toBinaryString", "(I)Ljava/lang/String;" ])
 	infix func toBinaryString(value: int) -> String = value.toBinaryString
 
-	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Integer", "toHexString", "(I)Ljava/lang/String;" ])
+	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Integer", "toHexString", "(I)Ljava/lang/String;" ])
 	infix func toHexString(value: int) -> String = value.toHexString
 
-	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Integer", "toOctalString", "(I)Ljava/lang/String;" ])
+	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Integer", "toOctalString", "(I)Ljava/lang/String;" ])
 	infix func toOctalString(value: int) -> String = value.toOctalString
 
 	infix func toString(value: int, radix: int) -> String =
@@ -87,16 +90,16 @@ abstract class Primitives
 
 	// Long toString
 
-	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Long", "toString", "(J)Ljava/lang/String;" ])
+	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Long", "toString", "(J)Ljava/lang/String;" ])
 	infix func toString(value: long) -> String = value.toString
 
-	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Long", "toHexString", "(J)Ljava/lang/String;" ])
+	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Long", "toHexString", "(J)Ljava/lang/String;" ])
 	infix func toHexString(value: long) -> String = value.toHexString
 
-	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Long", "toBinaryString", "(J)Ljava/lang/String;" ])
+	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Long", "toBinaryString", "(J)Ljava/lang/String;" ])
 	infix func toBinaryString(value: long) -> String = value.toBinaryString
 
-	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Long", "toOctalString", "(J)Ljava/lang/String;" ])
+	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Long", "toOctalString", "(J)Ljava/lang/String;" ])
 	infix func toOctalString(value: long) -> String = value.toOctalString
 
 	infix func toString(value: long, radix: int) -> String =
@@ -110,18 +113,18 @@ abstract class Primitives
 
 	// Float toString
 
-	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Float", "toString", "(F)Ljava/lang/String;" ])
+	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Float", "toString", "(F)Ljava/lang/String;" ])
 	postfix func toString(value: float) -> String = value.toString
 
-	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Float", "toHexString", "(F)Ljava/lang/String;" ])
+	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Float", "toHexString", "(F)Ljava/lang/String;" ])
 	postfix func toHexString(value: float) -> String = value.toHexString
 
 	// Double toString
 
-	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Double", "toString", "(D)Ljava/lang/String;" ])
+	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Double", "toString", "(D)Ljava/lang/String;" ])
 	postfix func toString(value: double) -> String = value.toString
 
-	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Double", "toHexString", "(D)Ljava/lang/String;" ])
+	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Double", "toHexString", "(D)Ljava/lang/String;" ])
 	postfix func toHexString(value: double) -> String = value.toHexString
 
 	// --- hashCode Methods ---
@@ -142,11 +145,11 @@ abstract class Primitives
 
 	// Float hashCode
 
-	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Float", "hashCode", "(F)I" ])
+	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Float", "hashCode", "(F)I" ])
 	postfix func hashCode(value: float) -> int = value.hashCode
 
 	// Double hashCode
 
-	@Intrinsic(value: LOAD_CALL, strings: [ "java/lang/Double", "hashCode", "(D)I" ])
+	@Intrinsic(value: [LOAD_CALL], strings: [ "java/lang/Double", "hashCode", "(D)I" ])
 	postfix func hashCode(value: double) -> int = value.hashCode
 }

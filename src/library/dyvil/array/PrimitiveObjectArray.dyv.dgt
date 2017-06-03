@@ -7,40 +7,41 @@ abstract class PrimitiveObjectArray
 {
 	package private init() {} // no instances from outside this package
 
-#import Base.dgs
-#foreach PRIMITIVE_SPECS
-
-	// TYPE_NAME wrapper array methods
-
-	infix func flatten(array: [[PRIMITIVE]]) -> [PRIMITIVE]
+	#import(Base.dgs)
+	#for (spec <- PRIMITIVE_SPECS)
 	{
-		// Compute the size of the resulting array
-		var size = 0
-		for (nested <- array)
+		#import(spec)
+		// TYPE_NAME wrapper array methods
+
+		infix func flatten(array: [[PRIMITIVE]]) -> [PRIMITIVE]
 		{
-			size += nested.size
+			// Compute the size of the resulting array
+			var size = 0
+			for (nested <- array)
+			{
+				size += nested.size
+			}
+
+			// Construct and fill the array
+			let res = new [PRIMITIVE](size)
+			var index = 0
+
+			for (nested <- array)
+			{
+				let nestedSize = nested.size
+				System.arraycopy(nested, 0, res, index, nestedSize)
+				index += nestedSize
+			}
+
+			return res
 		}
 
-		// Construct and fill the array
-		let res = new [PRIMITIVE](size)
-		var index = 0
-
-		for (nested <- array)
+		infix func unboxed(array: [WRAPPER]) -> [PRIMITIVE]
 		{
-			let nestedSize = nested.size
-			System.arraycopy(nested, 0, res, index, nestedSize)
-			index += nestedSize
+			let size = array.size
+			let unboxed = new [PRIMITIVE](size)
+			for (i <- 0 ..< size) unboxed[i] = array[i]
+			return unboxed
 		}
-
-		return res
 	}
-
-	infix func unboxed(array: [WRAPPER]) -> [PRIMITIVE]
-	{
-		let size = array.size
-		let unboxed = new [PRIMITIVE](size)
-		for (i <- 0 ..< size) unboxed[i] = array[i]
-		return unboxed
-	}
-#endfor
 }

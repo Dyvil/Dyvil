@@ -9,93 +9,92 @@ abstract class MathUtils
 {
 	private init() {} // no instances
 
-#define SPECS Base-Int.dgs, Base-Long.dgs, Base-Float.dgs, Base-Double.dgs
+	#define(SPECS){Base-Int.dgs, Base-Long.dgs, Base-Float.dgs, Base-Double.dgs}
 
 	// min
-#foreach SPECS
+	#for (spec <- SPECS) {
+		#import(spec)
 
-	static func min(this: Math, a: PRIMITIVE, b: PRIMITIVE, c: PRIMITIVE) -> PRIMITIVE = min(a, min(b, c))
+		static func min(this: Math, a: PRIMITIVE, b: PRIMITIVE, c: PRIMITIVE) -> PRIMITIVE = min(a, min(b, c))
 
-	static func min(this: Math, values: PRIMITIVE...) -> PRIMITIVE
-	{
-	#if IS_FLOATING_POINT
-		var min = WRAPPER.POSITIVE_INFINITY
-	#else
-		var min = WRAPPER.MAX_VALUE
-	#end
-		for (v <- values) if (v < min) { min = v }
-		return min
+		static func min(this: Math, values: PRIMITIVE...) -> PRIMITIVE
+		{
+			var min = #if (IS_FLOATING_POINT) {WRAPPER.POSITIVE_INFINITY} #else {WRAPPER.MAX_VALUE}
+
+			for (v <- values) if (v < min) { min = v }
+			return min
+		}
 	}
-#end
 
 	// max
-#foreach SPECS
+	#for (spec <- SPECS) {
+		#import(spec)
 
-	static func max(this: Math, a: PRIMITIVE, b: PRIMITIVE, c: PRIMITIVE) -> PRIMITIVE = max(a, max(b, c))
+		static func max(this: Math, a: PRIMITIVE, b: PRIMITIVE, c: PRIMITIVE) -> PRIMITIVE = max(a, max(b, c))
 
-	static func max(this: Math, values: PRIMITIVE...) -> PRIMITIVE
-	{
-	#if IS_FLOATING_POINT
-		var max = WRAPPER.NEGATIVE_INFINITY
-	#else
-		var max = WRAPPER.MIN_VALUE
-	#end
-		for (v <- values) if (v > max) { max = v }
-		return max
+		static func max(this: Math, values: PRIMITIVE...) -> PRIMITIVE
+		{
+			var max = #if (IS_FLOATING_POINT) {WRAPPER.NEGATIVE_INFINITY} #else {WRAPPER.MIN_VALUE}
+
+			for (v <- values) if (v > max) { max = v }
+			return max
+		}
 	}
-#end
 
 	// sum
-#foreach SPECS
+	#for (spec <- SPECS) {
+		#import(spec)
 
-	static func sum(this: Math, values: PRIMITIVE...) -> PRIMITIVE
-	{
-		var sum: PRIMITIVE = 0
-		for (v <- values) sum += v
-		return sum
+		static func sum(this: Math, values: PRIMITIVE...) -> PRIMITIVE
+		{
+			var sum: PRIMITIVE = 0
+			for (v <- values) sum += v
+			return sum
+		}
 	}
-#end
 
 	// product
-#foreach SPECS
+	#for (spec <- SPECS) {
+		#import(spec)
 
-	static func product(this: Math, values: PRIMITIVE...) -> PRIMITIVE
-	{
-		var product: PRIMITIVE = 1
-		for (v <- values) product *= v
-		return product
+		static func product(this: Math, values: PRIMITIVE...) -> PRIMITIVE
+		{
+			var product: PRIMITIVE = 1
+			for (v <- values) product *= v
+			return product
+		}
 	}
-#end
 
 	// average
-#foreach SPECS
+	#for (spec <- SPECS) {
+		#import(spec)
 
-	static func average(this: Math, values: PRIMITIVE...) -> double = sum(values...) / (values.size as double)
-#end
+		static func average(this: Math, values: PRIMITIVE...) -> double = sum(values...) / (values.size as double)
+	}
 
 	// clamp
+	#for (spec <- SPECS) {
+		#import(spec)
 
-#foreach SPECS
-
-	infix func clamp(this: Math, v: PRIMITIVE, min: PRIMITIVE, max: PRIMITIVE) -> PRIMITIVE
-	{
-		if (v < min) return min
-		if (v > max) return max
-		return v
+		infix func clamp(this: Math, v: PRIMITIVE, min: PRIMITIVE, max: PRIMITIVE) -> PRIMITIVE
+		{
+			if (v < min) return min
+			if (v > max) return max
+			return v
+		}
 	}
-#end
 
 	// interpolate
+	#for (spec <- SPECS) {
+		#import(spec)
 
-#foreach SPECS
-
-	infix func interpolate(this: Math, v: double, min: PRIMITIVE, max: PRIMITIVE) -> PRIMITIVE
-	{
-		if (v <= 0) return min
-		if (v >= 1) return max
-		return (min + (max - min) * v) as PRIMITIVE
+		infix func interpolate(this: Math, v: double, min: PRIMITIVE, max: PRIMITIVE) -> PRIMITIVE
+		{
+			if (v <= 0) return min
+			if (v >= 1) return max
+			return (min + (max - min) * v) as PRIMITIVE
+		}
 	}
-#end
 
 	// floor & ceil
 
