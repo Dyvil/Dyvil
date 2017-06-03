@@ -9,7 +9,7 @@ line with COUNT #(SUBSTITUTION)s
 line ending with SUBSTITUTION
 SUBSTITUTION at the beginning
 
-// tests for the token concat operator
+// tests for the escaped ##
 
 ## at start of the line
 line ending with a ##
@@ -31,12 +31,18 @@ line with ## in the middle
 	#if (NESTED){but _NESTED set to true}#else{and _NESTED set to false}
 }
 
-#for("./spectest-Test.dgs", "./spectest-Base.dgs")
+
+#for(spec <- [ "./spectest-Test.dgs", "./spectest-Base.dgs" ])
 {
+	#import(spec)
 	- the value of #name(COUNT) in SPEC_NAME is COUNT
 }
 
-#for(INDEX <- 1 .. 10)
+Counting:#for(INDEX <- 0 .. 10){ INDEX}
+
+
+More Counting:
+#for(INDEX <- 1 .. 5)
 {
 	INDEX
 }
