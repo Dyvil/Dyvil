@@ -10,7 +10,7 @@ abstract class ArrayOperators
 		// no instances
 	}
 
-	#define(opfunc){infix inline func}
+	#define(opfunc) {infix inline func}
 
 	// Generic Object array operators
 

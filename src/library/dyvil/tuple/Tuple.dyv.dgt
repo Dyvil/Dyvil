@@ -69,17 +69,17 @@ abstract class Tuple
 
 	#import("Base.dgs")
 	#for (ARITY <- 4 .. MAX_ARITY) {
-
 		@Immutable
-		case class Of##ARITY <type +T1#for (INDEX <- 2 .. ARITY) {, type +T#(INDEX)}> (
-		#for (INDEX <- 1 .. ARITY) {
-				public let _#(INDEX): T#(INDEX)
-		}
+		case class Of#(ARITY) <type +T1#for (INDEX <- 2 .. ARITY) {, type +T#(INDEX)}>
+		(
+			public let _1: T1#for (INDEX <- 2 .. ARITY) {, public let _#(INDEX): T#(INDEX)}
+
 		)
 		{
 			func unapply() -> (T1#for (INDEX <- 2 .. ARITY) {, T#(INDEX)}) = this
 
 			override func toString() -> String = "(\(this._1)#for (INDEX <- 2 .. ARITY) {, \(this._#(INDEX))})"
 		}
+
 	}
 }

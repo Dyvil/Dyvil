@@ -7,9 +7,8 @@ abstract class PrimitiveObjectArray
 {
 	package private init() {} // no instances from outside this package
 
-	#import(Base.dgs)
-	#for (spec <- PRIMITIVE_SPECS)
-	{
+	#import("Base.dgs")
+	#for (spec <- PRIMITIVE_SPECS) {
 		#import(spec)
 		// TYPE_NAME wrapper array methods
 
