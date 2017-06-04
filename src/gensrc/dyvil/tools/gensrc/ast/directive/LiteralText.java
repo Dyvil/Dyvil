@@ -23,12 +23,6 @@ public class LiteralText implements Directive
 	}
 
 	@Override
-	public String specialize(Scope scope)
-	{
-		return this.text;
-	}
-
-	@Override
 	public String toString()
 	{
 		return Formattable.toString(this);

@@ -1,12 +1,15 @@
 package dyvil.tools.gensrc.ast.var;
 
+import dyvil.io.AppendablePrintStream;
 import dyvil.lang.Formattable;
 import dyvil.source.position.SourcePosition;
 import dyvil.tools.gensrc.GenSrc;
 import dyvil.tools.gensrc.ast.directive.BasicDirective;
 import dyvil.tools.gensrc.ast.scope.LazyScope;
 import dyvil.tools.gensrc.ast.scope.Scope;
+import dyvil.tools.gensrc.lang.I18n;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.marker.SemanticError;
 
 import java.io.PrintStream;
 
@@ -23,6 +26,12 @@ public class DefineDirective extends VarDirective
 	@Override
 	public void specialize(GenSrc gensrc, Scope scope, MarkerList markers, PrintStream output)
 	{
+		if (this.name == null)
+		{
+			markers.add(new SemanticError(this.position, I18n.get("define.name")));
+			return;
+		}
+
 		if (!this.local)
 		{
 			scope = scope.getGlobalParent();
@@ -30,8 +39,21 @@ public class DefineDirective extends VarDirective
 
 		if (scope instanceof LazyScope)
 		{
-			((LazyScope) scope).define(this.name.qualified, this.body);
+			final String value = this.computeValue(gensrc, scope, markers);
+			((LazyScope) scope).define(this.name.qualified, value);
 		}
+	}
+
+	private String computeValue(GenSrc gensrc, Scope scope, MarkerList markers)
+	{
+		if (this.body == null)
+		{
+			return "";
+		}
+
+		final StringBuilder builder = new StringBuilder();
+		this.body.specialize(gensrc, scope, markers, new AppendablePrintStream(builder));
+		return builder.toString();
 	}
 
 	@Override

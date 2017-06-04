@@ -3,8 +3,6 @@ package dyvil.tools.gensrc.ast;
 import dyvil.collection.List;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.tools.gensrc.GenSrc;
-import dyvil.tools.gensrc.ast.directive.Directive;
-import dyvil.tools.gensrc.ast.directive.LiteralText;
 import dyvil.tools.gensrc.ast.scope.Scope;
 import dyvil.tools.gensrc.lang.I18n;
 
@@ -100,14 +98,14 @@ public class Specialization implements Scope
 	}
 
 	@Override
-	public Directive getReplacement(String key)
+	public String getString(String key)
 	{
 		final String sub = this.substitutions.getProperty(key);
 		if (sub != null || this.parent == null)
 		{
-			return new LiteralText(sub);
+			return sub;
 		}
-		return this.parent.getReplacement(key);
+		return this.parent.getString(key);
 	}
 
 	public void load(GenSrc gensrc, List<String> markers)

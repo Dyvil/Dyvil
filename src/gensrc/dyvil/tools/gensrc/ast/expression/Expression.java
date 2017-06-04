@@ -1,6 +1,7 @@
 package dyvil.tools.gensrc.ast.expression;
 
 import dyvil.collection.iterator.ArrayIterator;
+import dyvil.collection.iterator.EmptyIterator;
 import dyvil.collection.iterator.SingletonIterator;
 import dyvil.source.position.SourcePosition;
 import dyvil.tools.gensrc.ast.scope.Scope;
@@ -43,6 +44,10 @@ public interface Expression extends ASTNode
 	{
 		final SourcePosition position = this.getPosition();
 		final String string = this.evaluateString(scope);
+		if (string == null || string.isEmpty())
+		{
+			return EmptyIterator::apply;
+		}
 
 		if (string.indexOf(',') < 0)
 		{

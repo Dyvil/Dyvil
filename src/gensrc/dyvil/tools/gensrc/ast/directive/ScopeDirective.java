@@ -45,10 +45,4 @@ public class ScopeDirective extends BasicDirective
 			this.body.specialize(gensrc, lazyScope, markers, output);
 		}
 	}
-
-	@Override
-	public String specialize(Scope scope)
-	{
-		return this.body.specialize(scope);
-	}
 }

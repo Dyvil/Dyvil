@@ -10,7 +10,20 @@ import java.io.PrintStream;
 
 public interface Directive extends ASTNode
 {
-	Directive LITERAL_HASH = new LiteralText("#");
+	Directive LITERAL_HASH = new Directive()
+	{
+		@Override
+		public void specialize(GenSrc gensrc, Scope scope, MarkerList markers, PrintStream output)
+		{
+			output.print('#');
+		}
+
+		@Override
+		public void toString(String indent, StringBuilder builder)
+		{
+			builder.append("##");
+		}
+	};
 
 	@Override
 	default SourcePosition getPosition()
@@ -24,11 +37,6 @@ public interface Directive extends ASTNode
 	}
 
 	void specialize(GenSrc gensrc, Scope scope, MarkerList markers, PrintStream output);
-
-	default String specialize(Scope scope)
-	{
-		return null;
-	}
 
 	@Override
 	void toString(String indent, StringBuilder builder);

@@ -23,12 +23,6 @@ public class ProcessedText implements Directive
 	}
 
 	@Override
-	public String specialize(Scope scope)
-	{
-		return Util.processLine(this.text, scope);
-	}
-
-	@Override
 	public String toString()
 	{
 		return this.text;

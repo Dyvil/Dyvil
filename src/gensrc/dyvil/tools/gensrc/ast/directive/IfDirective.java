@@ -83,12 +83,6 @@ public class IfDirective implements Directive
 	}
 
 	@Override
-	public String specialize(Scope scope)
-	{
-		return this.evaluate(scope) ? this.thenBlock.specialize(scope) : this.elseBlock.specialize(scope);
-	}
-
-	@Override
 	public String toString()
 	{
 		return Formattable.toString(this);
