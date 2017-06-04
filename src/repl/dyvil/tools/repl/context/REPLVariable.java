@@ -18,7 +18,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.repl.DyvilREPL;
 
 import java.lang.reflect.InvocationTargetException;
@@ -36,7 +36,7 @@ public class REPLVariable extends Field
 		this.setValue(value);
 	}
 
-	public REPLVariable(REPLContext context, ICodePosition position, Name name, IType type, ModifierSet modifiers,
+	public REPLVariable(REPLContext context, SourcePosition position, Name name, IType type, ModifierSet modifiers,
 		                   AnnotationList annotations)
 	{
 		super(null, position, name, type, modifiers, annotations);

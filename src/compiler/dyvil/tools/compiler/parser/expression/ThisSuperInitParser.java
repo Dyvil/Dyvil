@@ -10,7 +10,7 @@ import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.parsing.token.IToken;
 
 public class ThisSuperInitParser extends Parser
@@ -97,7 +97,7 @@ public class ThisSuperInitParser extends Parser
 				return;
 			}
 
-			final ICodePosition position = token.prev().raw();
+			final SourcePosition position = token.prev().raw();
 			this.value = this.isSuper ? new SuperExpr(position) : new ThisExpr(position);
 
 			if (ExpressionParser.isGenericCall(token, type))

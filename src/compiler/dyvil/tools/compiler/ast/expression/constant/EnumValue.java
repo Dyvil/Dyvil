@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.type.typevar.CovariantTypeVarType;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class EnumValue extends FieldAccess
 {
@@ -21,7 +21,7 @@ public class EnumValue extends FieldAccess
 	{
 	}
 
-	public EnumValue(ICodePosition position, Name name)
+	public EnumValue(SourcePosition position, Name name)
 	{
 		this.position = position;
 		this.name = name;

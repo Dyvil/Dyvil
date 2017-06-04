@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.util;
 
+import dyvil.source.position.Positioned;
+import dyvil.source.position.SourcePosition;
 import dyvil.string.CharUtils;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
@@ -10,13 +12,25 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.parsing.ASTNode;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.lexer.LexerUtil;
 
 public final class Util
 {
+	public static void expandPosition(Positioned positioned, SourcePosition to)
+	{
+		final SourcePosition pos = positioned.getPosition();
+		if (pos == null)
+		{
+			positioned.setPosition(to.raw());
+			return;
+		}
+		positioned.setPosition(pos.to(to));
+	}
+
 	// region Member & AST toString
 
 	public static String memberSignatureToString(IMember member, ITypeContext typeContext)
@@ -62,7 +76,8 @@ public final class Util
 		return stringBuilder.toString();
 	}
 
-	public static void constructorSignatureToString(IConstructor constructor, ITypeContext typeContext, StringBuilder stringBuilder)
+	public static void constructorSignatureToString(IConstructor constructor, ITypeContext typeContext,
+		                                               StringBuilder stringBuilder)
 	{
 		stringBuilder.append("init");
 		constructor.getParameters().signatureToString(stringBuilder, typeContext);
@@ -72,7 +87,7 @@ public final class Util
 	{
 		if (type == null)
 		{
-			stringBuilder.append("auto");
+			stringBuilder.append(Types.UNKNOWN);
 			return;
 		}
 
@@ -104,7 +119,7 @@ public final class Util
 		}
 	}
 
-	public static void astToString(String prefix, IASTNode[] array, int size, String separator, StringBuilder buffer)
+	public static void astToString(String prefix, ASTNode[] array, int size, String separator, StringBuilder buffer)
 	{
 		if (size <= 0)
 		{

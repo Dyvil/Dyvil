@@ -11,7 +11,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class PopExpr implements IValue
 {
@@ -29,13 +29,13 @@ public class PopExpr implements IValue
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.value.getPosition();
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 	}
 

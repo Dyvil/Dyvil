@@ -13,7 +13,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class ObjectPattern extends Pattern implements IPattern
 {
@@ -22,7 +22,7 @@ public class ObjectPattern extends Pattern implements IPattern
 	// Metadata
 	private IDataMember instanceField;
 
-	public ObjectPattern(ICodePosition position, IType type)
+	public ObjectPattern(SourcePosition position, IType type)
 	{
 		this.type = type;
 		this.position = position;
@@ -105,7 +105,7 @@ public class ObjectPattern extends Pattern implements IPattern
 	{
 		IPattern.loadVar(writer, varIndex, matchedType);
 		// No need to cast - Reference Equality Comparison (ACMP) handles it
-		this.instanceField.writeGet(writer, null, this.getLineNumber());
+		this.instanceField.writeGet(writer, null, this.lineNumber());
 		writer.visitJumpInsn(Opcodes.IF_ACMPNE, elseLabel);
 	}
 

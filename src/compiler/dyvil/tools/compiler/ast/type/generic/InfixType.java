@@ -2,11 +2,11 @@ package dyvil.tools.compiler.ast.type.generic;
 
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class InfixType extends NamedGenericType
 {
-	public InfixType(ICodePosition position, IType lhs, Name name, IType rhs)
+	public InfixType(SourcePosition position, IType lhs, Name name, IType rhs)
 	{
 		super(position, name, lhs, rhs); // TODO swap lhs <-> name arguments
 	}

@@ -177,9 +177,9 @@ public class SingletonSet<E> implements ImmutableSet<E>
 
 	@NonNull
 	@Override
-	public ImmutableSet<E> filtered(@NonNull Predicate<? super E> condition)
+	public ImmutableSet<E> filtered(@NonNull Predicate<? super E> predicate)
 	{
-		if (condition.test(this.element))
+		if (predicate.test(this.element))
 		{
 			return ImmutableSet.apply(this.element);
 		}
@@ -193,9 +193,9 @@ public class SingletonSet<E> implements ImmutableSet<E>
 	}
 
 	@Override
-	public E @NonNull [] toArray(@NonNull Class<E> type)
+	public <R> R @NonNull [] toArray(@NonNull Class<R> type)
 	{
-		E[] array = (E[]) Array.newInstance(type, 1);
+		final R[] array = (R[]) Array.newInstance(type, 1);
 		array[0] = type.cast(this.element);
 		return array;
 	}

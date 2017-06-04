@@ -20,7 +20,7 @@ import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class ForStatement implements IForStatement, IDefaultContext
 {
@@ -31,7 +31,7 @@ public class ForStatement implements IForStatement, IDefaultContext
 	private static final TypeChecker.MarkerSupplier CONDITION_MARKER_SUPPLIER = TypeChecker.markerSupplier(
 		"for.condition.type");
 
-	protected ICodePosition position;
+	protected SourcePosition position;
 	protected IVariable     variable;
 
 	protected IValue condition;
@@ -44,7 +44,7 @@ public class ForStatement implements IForStatement, IDefaultContext
 	protected Label updateLabel;
 	protected Label endLabel;
 
-	public ForStatement(ICodePosition position, IVariable variable, IValue condition, IValue update)
+	public ForStatement(SourcePosition position, IVariable variable, IValue condition, IValue update)
 	{
 		this.startLabel = new Label($forStart);
 		this.updateLabel = new Label($forUpdate);
@@ -56,7 +56,7 @@ public class ForStatement implements IForStatement, IDefaultContext
 		this.update = update;
 	}
 
-	public ForStatement(ICodePosition position, IVariable variable, IValue condition, IValue update, IValue action)
+	public ForStatement(SourcePosition position, IVariable variable, IValue condition, IValue update, IValue action)
 	{
 		this(position, variable, condition, update);
 		this.action = action;
@@ -69,13 +69,13 @@ public class ForStatement implements IForStatement, IDefaultContext
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}

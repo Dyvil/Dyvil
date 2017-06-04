@@ -9,12 +9,9 @@ import java.io.PrintStream
 import const java.lang.System.out
 import func dyvil.array.ObjectArray.deepToString
 
-public abstract class Output
+abstract class Output
 {
-	private init()
-	{
-		// no instances
-	}
+	private init() {} // no instances
 
 	// C++ style output
 
@@ -26,73 +23,60 @@ public abstract class Output
 
 	static inline func println() -> void = out.println()
 
-	// byte and short specializations are omitted
-#define LIGHT_PRIMITIVE_SPECS Base-Boolean.dgs, Base-Char.dgs, Base-Int.dgs, Base-Long.dgs, Base-Float.dgs, Base-Double.dgs
-#foreach LIGHT_PRIMITIVE_SPECS
-
-	@Deprecated(replacements: [ "print(PRIMITIVE) -> void" ])
-	static inline func println(value: PRIMITIVE) -> void = out.println(value)
-#end
-
-	@Deprecated(replacements: [ "print(AutoPrinter.() -> void) -> void" ])
-	static inline func println(closure: AutoPrinter.() -> void) -> void = closure(AutoPrinter)
-
-	@Deprecated(replacements: [ "print(String) -> void" ])
-	static inline func println(value: String) -> void = out.println(value)
-
-	@Deprecated(replacements: [ "print(Object!) -> void" ])
-	static inline func println(value: Object!) -> void = out.println(value)
-
-#import Base.dgs
-#foreach PRIMITIVE_SPECS
-	@Deprecated(replacements: [ "print([PRIMITIVE]) -> void" ])
-	static inline func println(array: [PRIMITIVE]) -> void = out.println(array.toString)
-
-#end
-	@Deprecated(replacements: [ "print([Object!]) -> void" ])
-	static inline func println(array: [Object!]) -> void = out.println(array.deepToString)
-
 	// print functions
 
-#foreach LIGHT_PRIMITIVE_SPECS
-	static inline func print(value: PRIMITIVE) -> void = out.println(value)
+	#for (spec <- [ "Base-Boolean.dgs", "Base-Char.dgs", "Base-Int.dgs", "Base-Long.dgs", "Base-Float.dgs", "Base-Double.dgs" ]) {
+		#import(spec)
+		static inline func print(value: PRIMITIVE) -> void = out.println(value)
 
-#end
+	}
+
 	static inline func print(closure: AutoPrinter.() -> void) -> void = closure(AutoPrinter)
 
 	static inline func print(value: String) -> void = out.println(value)
 
-	static inline func print(value: Object!) -> void = out.println(value)
+	static inline func print(value: any!) -> void = out.println(value)
 
-#import Base.dgs
-#foreach PRIMITIVE_SPECS
-	static inline func print(array: [PRIMITIVE]) -> void = out.println(array.toString)
+	static inline func print(value: any!, explicit terminator: String) -> void
+	{
+		out.print(value)
+		out.print(terminator)
+	}
 
-#end
+	#import("Base.dgs")
+	#for (spec <- PRIMITIVE_SPECS) {
+		#import(spec)
+		static inline func print(array: [PRIMITIVE]) -> void = out.println(array.toString)
+
+	}
+
 	static inline func print(array: [Object!]) -> void = out.println(array.deepToString)
 
 	// print(All) functions
 
+	#define(DEFAULT_SEPARATOR) {' '}
+	#define(DEFAULT_TERMINATOR) {ENDL}
+
 	@BytecodeName("printAll")
 	static inline func print(values: Object! ...) -> void
 	{
-		print(values..., end: '\n')
+		print(values..., separator: DEFAULT_SEPARATOR, terminator: DEFAULT_TERMINATOR)
 	}
 
-	@BytecodeName("printAll_separator")
+	@BytecodeName("printAllWithSeparator")
 	static inline func print(values: Object! ..., explicit separator: String) -> void
 	{
-		print(values..., separator: separator, end: ENDL)
+		print(values..., separator: separator, terminator: DEFAULT_TERMINATOR)
 	}
 
-	@BytecodeName("printAll_end")
-	static inline func print(values: Object! ..., explicit end: String) -> void
+	@BytecodeName("printAllWithTerminator")
+	static inline func print(values: Object! ..., explicit terminator: String) -> void
 	{
-		print(values..., separator: ' ', end: end)
+		print(values..., separator: DEFAULT_SEPARATOR, terminator: terminator)
 	}
 
 	@BytecodeName("printAll")
-	static func print(values: Object! ..., explicit separator: String, explicit end: String) -> void
+	static func print(values: Object! ..., explicit separator: String, explicit terminator: String) -> void
 	{
 		if !values.isEmpty
 		{
@@ -104,6 +88,6 @@ public abstract class Output
 			}
 		}
 
-		out.print(end)
+		out.print(terminator)
 	}
 }

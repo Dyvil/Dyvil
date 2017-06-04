@@ -165,7 +165,7 @@ public class IncOperator extends AbstractValue
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		final int typecode = this.field.getType().getTypecode();
-		final int lineNumber = this.getLineNumber();
+		final int lineNumber = this.lineNumber();
 		boolean receiver = this.receiver != null;
 
 		if (Types.isVoid(type))

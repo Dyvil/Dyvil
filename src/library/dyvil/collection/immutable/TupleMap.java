@@ -399,7 +399,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 
 	@NonNull
 	@Override
-	public ImmutableMap<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> condition)
+	public ImmutableMap<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> predicate)
 	{
 		Tuple.Of2<K, V>[] entries = (Tuple.Of2<K, V>[]) new Tuple.Of2[this.size];
 
@@ -407,7 +407,7 @@ public class TupleMap<K, V> extends AbstractTupleMap<K, V> implements ImmutableM
 		for (int i = 0; i < this.size; i++)
 		{
 			Tuple.Of2<K, V> entry = this.entries[i];
-			if (condition.test(entry._1, entry._2))
+			if (predicate.test(entry._1, entry._2))
 			{
 				entries[index++] = entry;
 			}

@@ -5,31 +5,35 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'application'
 
-import groovy.transform.Field
+import org.apache.tools.ant.filters.ReplaceTokens
+import static Constants.*
 
 // ---------------------------------------- Main Settings ----------------------------------------
 
-group = 'clashsoft'
+class Constants
+{
+	public static String version = '0.31.0'
+	public static String libraryVersion = '0.31.0'
+	public static String compilerVersion = '0.31.0'
+	public static String replVersion = '0.19.0'
+	public static String dpfVersion = '0.12.0'
+	public static String genSrcVersion = '0.5.0'
 
-version = '0.31.0'
+	public static final String devStage = 'delta'
 
-String libraryVersion = '0.31.0'
-String compilerVersion = '0.31.0'
-String replVersion = '0.19.0'
-String dpfVersion = '0.12.0'
-String genSrcVersion = '0.5.0'
+	public static final String replMainClass = 'dyvil.tools.repl.Main'
+	public static final String compilerMainClass = 'dyvil.tools.compiler.Main'
+	public static final String genSrcMainClass = 'dyvil.tools.gensrc.Main'
 
-String devStage = 'delta'
+	public static final List<String> dyvilFilters = [ '**/*.dyv', '**/*.dyh', '**/*.dyvil', '**/*.dyvilh' ]
+	public static final List<String> javaFilters = [ '**/*.java' ]
+	public static final List<String> genSrcFilters = [ '**/*.dgt', '**/*.dgs' ]
+	public static final List<String> resourceFilters = [ '**/*.properties' ]
+	public static final List<String> binaryFilters = [ '**/*.dyo', '**/*.class' ]
+}
 
-@Field static final String replMainClass = 'dyvil.tools.repl.Main'
-@Field static final String compilerMainClass = 'dyvil.tools.compiler.Main'
-@Field static final String genSrcMainClass = 'dyvil.tools.gensrc.Main'
-
-@Field static final List<String> dyvilFilters = [ '**/*.dyv', '**/*.dyh', '**/*.dyvil', '**/*.dyvilh' ]
-@Field static final List<String> javaFilters = [ '**/*.java' ]
-@Field static final List<String> genSrcFilters = [ '**/*.dgt', '**/*.dgs' ]
-@Field static final List<String> resourceFilters = [ '**/*.properties' ]
-@Field static final List<String> binaryFilters = [ '**/*.dyo', '**/*.class' ]
+project.group = 'clashsoft'
+project.version = version
 
 // ---------------------------------------- Nightly Versioning ----------------------------------------
 
@@ -191,9 +195,9 @@ task copyLibraryJava(type: Sync, dependsOn: 'genLibrary') {
 compileLibraryJava.dependsOn copyLibraryJava
 compileLibraryJava.source = "$buildDir/src/java/library"
 
-
 task copyLibraryDyvil(type: Sync, dependsOn: 'genLibrary') {
 	from 'src/library'
+	from 'src/parsing'
 	from "$buildDir/gensrc/library"
 	into "$buildDir/src/dyvil/library"
 
@@ -210,10 +214,11 @@ task copyCompilerJava(type: Sync) {
 	include javaFilters
 	includeEmptyDirs = false
 
-	filter {
-		it.replace('$$version$$', version)
-				.replace('$$libraryVersion$$', libraryVersion)
-				.replace('$$compilerVersion$$', compilerVersion)
+	filesMatching('**/DyvilCompiler.java') {
+		filter(ReplaceTokens, beginToken: '$$', endToken: '$$',
+				tokens: [ version        : version,
+				          libraryVersion : libraryVersion,
+				          compilerVersion: compilerVersion ])
 	}
 }
 
@@ -229,8 +234,8 @@ task copyReplJava(type: Sync) {
 	include javaFilters
 	includeEmptyDirs = false
 
-	filter {
-		it.replace('$$replVersion$$', replVersion)
+	filesMatching('**/DyvilREPL.java') {
+		filter(ReplaceTokens, beginToken: '$$', endToken: '$$', tokens: [ replVersion: replVersion ])
 	}
 }
 
@@ -280,11 +285,11 @@ task genDPF(type: JavaExec, dependsOn: [ 'gensrcClasses' ]) { JavaExec exec ->
  * Compiles the Dyvil Classes and Headers in the Dyvil Library by running the freshly-compiled compiler
  */
 task compileLibraryDyvil(type: JavaExec, dependsOn: [ 'compilerClasses', 'copyLibraryDyvil' ]) { JavaExec exec ->
-	runCompiler exec, 'config/lib.dyc', "$buildDir/dyvil-classes/library", 'src/library/'
+	runCompiler exec, 'config/lib.dyc', "$buildDir/dyvil-classes/library", "$buildDir/src/dyvil/library/"
 }
 
 task compileDPFDyvil(type: JavaExec, dependsOn: [ 'compileLibraryDyvil', 'copyDPFDyvil' ]) { JavaExec exec ->
-	runCompiler exec, 'config/dpf.dyc', "$buildDir/dyvil-classes/dpf", 'src/dpf/'
+	runCompiler exec, 'config/dpf.dyc', "$buildDir/dyvil-classes/dpf", "$buildDir/src/dyvil/dpf"
 }
 
 task compileTestDyvil(type: JavaExec, dependsOn: [ 'compileDPFDyvil', 'copyTestDyvil' ]) { JavaExec exec ->
@@ -309,6 +314,11 @@ private void runCompiler(JavaExec exec, String config, String target, String... 
 		}
 	}
 }
+
+/* // Add a / at the start of this line to skip all compilation tasks
+tasks.withType(JavaExec).forEach{it.enabled = false}
+tasks.withType(JavaCompile).forEach{it.enabled = false}
+//*/
 
 private void runGenSrc(JavaExec exec, String target, String... srcs)
 {
@@ -335,7 +345,11 @@ task testDyvil(type: JavaExec, dependsOn: [ 'compileTestDyvil' ]) {
 	classpath = sourceSets.test.runtimeClasspath
 }
 
-test.dependsOn 'testDyvil'
+task testGenSrc(type: JavaExec, dependsOn: [ 'gensrcClasses' ]) { JavaExec exec ->
+	runGenSrc(exec, "$buildDir/gensrc/test", "src/test/gensrc")
+}
+
+test.dependsOn 'testDyvil', 'testGenSrc'
 
 // ---------------------------------------- Build Tasks ----------------------------------------
 
@@ -464,14 +478,13 @@ task prepareRelease(type: Copy) {
 		rename 'template\\.dyp', "v${ version }.dyp"
 	}
 
-	filter {
-		it.replace('$$version$$', version.toString())
-		  .replace('$$libraryVersion$$', libraryVersion)
-		  .replace('$$compilerVersion$$', compilerVersion)
-		  .replace('$$replVersion$$', replVersion)
-		  .replace('$$dpfVersion$$', dpfVersion)
-		  .replace('$$genSrcVersion$$', genSrcVersion)
-	}
+	filter(ReplaceTokens, beginToken: '$$', endToken: '$$',
+			tokens: [ version        : version,
+			          libraryVersion : libraryVersion,
+			          compilerVersion: compilerVersion,
+			          replVersion    : replVersion,
+			          dpfVersion     : dpfVersion,
+			          genSrcVersion  : genSrcVersion ])
 
 	doLast {
 		println "Release v$version"

@@ -15,7 +15,7 @@ import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class InterfaceMetadata implements IClassMetadata
 {
@@ -119,14 +119,14 @@ public class InterfaceMetadata implements IClassMetadata
 			this.processMethod(setter, markers);
 		}
 
-		final ICodePosition initializerPosition = property.getInitializerPosition();
+		final SourcePosition initializerPosition = property.getInitializerPosition();
 		if (initializerPosition != null)
 		{
 			this.processPropertyInitializer(initializerPosition, markers);
 		}
 	}
 
-	protected void processPropertyInitializer(ICodePosition position, MarkerList markers)
+	protected void processPropertyInitializer(SourcePosition position, MarkerList markers)
 	{
 		markers.add(Markers.semanticError(position, "interface.property.initializer"));
 	}

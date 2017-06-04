@@ -21,7 +21,7 @@ import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 import dyvil.util.MarkerLevel;
 
 public final class Deprecation
@@ -71,7 +71,7 @@ public final class Deprecation
 	private static final IParameter INF_DESC_PARAM  = INF_PARAMS.get(description);
 	private static final IParameter INF_LEVEL_PARAM = INF_PARAMS.get(level);
 
-	public static void checkAnnotations(IMember member, ICodePosition position, MarkerList markers)
+	public static void checkAnnotations(IMember member, SourcePosition position, MarkerList markers)
 	{
 		if (member.hasModifier(Modifiers.DEPRECATED))
 		{
@@ -91,7 +91,7 @@ public final class Deprecation
 		}
 	}
 
-	private static void checkDeprecation(IMember member, ICodePosition position, MarkerList markers)
+	private static void checkDeprecation(IMember member, SourcePosition position, MarkerList markers)
 	{
 		IAnnotation annotation = member.getAnnotation(DEPRECATED_CLASS);
 		if (annotation == null)
@@ -191,7 +191,7 @@ public final class Deprecation
 		            .replace("{member.name}", member.getName().toString());
 	}
 
-	private static void checkExperimental(IMember member, ICodePosition position, MarkerList markers,
+	private static void checkExperimental(IMember member, SourcePosition position, MarkerList markers,
 		                                     IAnnotation annotation)
 	{
 		final ArgumentList arguments = annotation.getArguments();
@@ -226,7 +226,7 @@ public final class Deprecation
 		markers.add(marker);
 	}
 
-	private static void checkUsageInfo(IMember member, ICodePosition position, MarkerList markers,
+	private static void checkUsageInfo(IMember member, SourcePosition position, MarkerList markers,
 		                                  IAnnotation annotation)
 	{
 		final ArgumentList arguments = annotation.getArguments();

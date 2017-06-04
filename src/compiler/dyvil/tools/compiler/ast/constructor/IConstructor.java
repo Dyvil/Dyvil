@@ -10,7 +10,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public interface IConstructor extends ICallableMember, IContext
 {
@@ -26,9 +26,9 @@ public interface IConstructor extends ICallableMember, IContext
 
 	void checkMatch(MatchList<IConstructor> list, ArgumentList arguments);
 	
-	IType checkArguments(MarkerList markers, ICodePosition position, IContext context, IType type, ArgumentList arguments);
+	IType checkArguments(MarkerList markers, SourcePosition position, IContext context, IType type, ArgumentList arguments);
 	
-	void checkCall(MarkerList markers, ICodePosition position, IContext context, ArgumentList arguments);
+	void checkCall(MarkerList markers, SourcePosition position, IContext context, ArgumentList arguments);
 
 	// Compilation
 	

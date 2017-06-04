@@ -11,10 +11,10 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.ASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public interface IPattern extends IASTNode, ITyped
+public interface IPattern extends ASTNode, ITyped
 {
 	int NULL    = 0;
 	int BOOLEAN = 1;

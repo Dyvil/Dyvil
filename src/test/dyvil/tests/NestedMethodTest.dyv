@@ -7,7 +7,7 @@ public class NestedMethodTest
 	static func apply() -> Test = test "Nested Methods" {
 		var i = 0
 
-		func testI(String text, int expected) -> Test = test text { i =?= expected }
+		func testI(text: String, expected: int) -> Test = test text { i =?= expected }
 
 		testI("Before Assignment", 0)
 		i = 2

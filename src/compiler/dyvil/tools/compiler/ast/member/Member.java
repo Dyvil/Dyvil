@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -22,7 +22,7 @@ import java.io.IOException;
 
 public abstract class Member implements IMember
 {
-	protected ICodePosition position;
+	protected SourcePosition position;
 
 	protected ModifierSet    modifiers;
 	protected AnnotationList annotations;
@@ -58,14 +58,14 @@ public abstract class Member implements IMember
 		this.modifiers = modifiers;
 	}
 
-	public Member(ICodePosition position, Name name, IType type)
+	public Member(SourcePosition position, Name name, IType type)
 	{
 		this.position = position;
 		this.name = name;
 		this.type = type;
 	}
 
-	public Member(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public Member(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
 		this.position = position;
 		this.name = name;
@@ -75,13 +75,13 @@ public abstract class Member implements IMember
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -94,6 +94,12 @@ public abstract class Member implements IMember
 			return this.annotations;
 		}
 		return this.annotations = new AnnotationList();
+	}
+
+	@Override
+	public void setAnnotations(AnnotationList annotations)
+	{
+		this.annotations = annotations;
 	}
 
 	@Override
@@ -161,7 +167,7 @@ public abstract class Member implements IMember
 	{
 		if (this.type != null)
 		{
-			this.type = this.type.resolveType(markers, context);
+			this.type = this.type.resolveType(this.hasModifier(Modifiers.GENERATED) ? MarkerList.BLACKHOLE : markers, context);
 		}
 
 		if (this.annotations != null)

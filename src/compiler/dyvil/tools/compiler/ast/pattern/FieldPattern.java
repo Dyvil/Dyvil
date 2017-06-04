@@ -1,7 +1,9 @@
 package dyvil.tools.compiler.ast.pattern;
 
+import dyvil.lang.Formattable;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -13,18 +15,16 @@ import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public class FieldPattern implements IPattern
 {
 	protected IDataMember dataMember;
 
 	// Metadata
-	protected ICodePosition position;
+	protected SourcePosition position;
 
-	public FieldPattern(ICodePosition position, IDataMember dataMember)
+	public FieldPattern(SourcePosition position, IDataMember dataMember)
 	{
 		this.position = position;
 		this.dataMember = dataMember;
@@ -37,13 +37,13 @@ public class FieldPattern implements IPattern
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
@@ -125,7 +125,7 @@ public class FieldPattern implements IPattern
 			throws BytecodeException
 	{
 		final IType fieldType = this.dataMember.getType();
-		final int lineNumber = this.getLineNumber();
+		final int lineNumber = this.lineNumber();
 
 		IType commonType = Types.ANY;
 		if (matchedType.isPrimitive())
@@ -185,7 +185,7 @@ public class FieldPattern implements IPattern
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

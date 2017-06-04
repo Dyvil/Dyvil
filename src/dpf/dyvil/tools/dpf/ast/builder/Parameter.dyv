@@ -1,17 +1,17 @@
 package dyvil.tools.dpf.ast.builder
 
-import dyvil.collection.Map
 import dyvil.tools.dpf.model.Expandable
 import dyvil.tools.dpf.ast.value.Value
 import dyvil.tools.dpf.converter.DPFValueVisitor
-import dyvil.tools.parsing.{ Name, ast.IASTNode, position.ICodePosition }
+import dyvil.tools.parsing.{ Name, ASTNode }
+import dyvil.source.position.SourcePosition
 
 public case class Parameter
 (
 	var name:  Name?  { get; set }
 	var value: Value! { get; set }
 )
-extends DPFValueVisitor implements IASTNode, Expandable
+extends DPFValueVisitor implements ASTNode, Expandable
 {
 	// Constructors
 
@@ -28,9 +28,9 @@ extends DPFValueVisitor implements IASTNode, Expandable
 
 	protected override func visitValue(value: Value) -> void = this.value = value
 
-	public override func getPosition() -> ICodePosition! = null
+	public override func getPosition() -> SourcePosition! = null
 
-	public override func setPosition(position: ICodePosition!) -> void { }
+	public override func setPosition(position: SourcePosition!) -> void { }
 
 	public override func expand(mappings: Map<String, Object>, mutate: boolean) -> Parameter
 	{
@@ -39,7 +39,7 @@ extends DPFValueVisitor implements IASTNode, Expandable
 		return parameter
 	}
 
-	public override func toString() -> String = IASTNode.toString(this)
+	public override func toString() -> String = String(this)
 
 	public override func toString(indent: String, buffer: StringBuilder) -> void
 	{

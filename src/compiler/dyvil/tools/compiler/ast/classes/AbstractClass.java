@@ -40,7 +40,7 @@ import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.lang.annotation.ElementType;
 
@@ -120,6 +120,12 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			return this.annotations;
 		}
 		return this.annotations = new AnnotationList();
+	}
+
+	@Override
+	public void setAnnotations(AnnotationList annotations)
+	{
+		this.annotations = annotations;
 	}
 
 	@Override
@@ -242,7 +248,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	}
 
 	@Override
-	public IParameter createParameter(ICodePosition position, Name name, IType type, ModifierSet modifiers,
+	public IParameter createParameter(SourcePosition position, Name name, IType type, ModifierSet modifiers,
 		                                 AnnotationList annotations)
 	{
 		return new ClassParameter(this, position, name, type, modifiers, annotations);

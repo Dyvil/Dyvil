@@ -138,7 +138,7 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 
 	@NonNull
 	@Override
-	ImmutableSet<E> filtered(@NonNull Predicate<? super E> condition);
+	ImmutableSet<E> filtered(@NonNull Predicate<? super E> predicate);
 
 	// Mutating Operations
 
@@ -203,7 +203,7 @@ public interface ImmutableSet<@Covariant E> extends Set<E>, ImmutableCollection<
 	}
 
 	@Override
-	default void filter(@NonNull Predicate<? super E> condition)
+	default void filter(@NonNull Predicate<? super E> predicate)
 	{
 		throw new ImmutableException("filter() on Immutable Set");
 	}

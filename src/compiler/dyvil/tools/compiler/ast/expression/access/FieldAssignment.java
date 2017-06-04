@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.expression.access;
 
+import dyvil.lang.Formattable;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IImplicitContext;
@@ -19,10 +21,8 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public final class FieldAssignment implements IValue, INamed, IReceiverAccess, IValueConsumer
 {
@@ -31,7 +31,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	protected IValue value;
 
 	// Metadata
-	protected ICodePosition position;
+	protected SourcePosition position;
 
 	protected IDataMember field;
 	protected IType       type;
@@ -47,19 +47,19 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 		}
 	}
 
-	public FieldAssignment(ICodePosition position)
+	public FieldAssignment(SourcePosition position)
 	{
 		this.position = position;
 	}
 
-	public FieldAssignment(ICodePosition position, IValue receiver, Name name)
+	public FieldAssignment(SourcePosition position, IValue receiver, Name name)
 	{
 		this.position = position;
 		this.receiver = receiver;
 		this.name = name;
 	}
 
-	public FieldAssignment(ICodePosition position, IValue receiver, Name name, IValue value)
+	public FieldAssignment(SourcePosition position, IValue receiver, Name name, IValue value)
 	{
 		this.position = position;
 		this.receiver = receiver;
@@ -67,7 +67,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 		this.value = value;
 	}
 
-	public FieldAssignment(ICodePosition position, IValue receiver, IDataMember field, IValue value)
+	public FieldAssignment(SourcePosition position, IValue receiver, IDataMember field, IValue value)
 	{
 		this.position = position;
 		this.receiver = receiver;
@@ -81,13 +81,13 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -377,7 +377,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		final int lineNumber = this.getLineNumber();
+		final int lineNumber = this.lineNumber();
 		if (Types.isVoid(type))
 		{
 			this.field.writeSet(writer, this.receiver, this.value, lineNumber);
@@ -424,7 +424,7 @@ public final class FieldAssignment implements IValue, INamed, IReceiverAccess, I
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

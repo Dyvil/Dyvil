@@ -2,9 +2,9 @@ package dyvil.tests
 
 using dyvil.Test
 
-public class HanoiTest
+class HanoiTest
 {
-	private List<String> moves = List<String>()
+	private let moves: List<String> = List<String>()
 
 	static func apply() -> Test = test "Hanoi"
 	{
@@ -15,22 +15,22 @@ public class HanoiTest
 		}
 	}
 
-	static func requiredMoves(int n) -> int = (1 << n) - 1
+	static func requiredMoves(n: int) -> int = (1 << n) - 1
 
 	@LiteralConvertible.FromString
-	class Tower(public let id: String) extends dyvil.collection.mutable.LinkedList<int>
+	class Tower(public let id: String) extends mutable.LinkedList<int>
 	{
-		static func apply(String id) -> Tower = new Tower(id)
+		static func apply(id: String) -> Tower = new Tower(id)
 	}
 
-	public init() { }
+	public init() {}
 
-	public init(int n)
+	public init(n: int)
 	{
 		this.run(n)
 	}
 
-	public func run(int n) -> void
+	func run(n: int) -> void
 	{
 		this.moves.clear()
 
@@ -40,7 +40,7 @@ public class HanoiTest
 		this.move(n, source, 'helper', 'target')
 	}
 
-	public func move(Tower from, Tower to) -> void
+	func move(from: Tower, to: Tower) -> void
 	{
 		let item = from.pop()
 		if (item != null)
@@ -50,12 +50,12 @@ public class HanoiTest
 		}
 	}
 
-	public func move(int n, Tower from, Tower helper, Tower to) -> void
+	func move(n: int, from: Tower, helper: Tower, to: Tower) -> void
 	{
-		if n > 0
+		if (n > 0)
 		{
-			this.move(n - 1, from, to, helper) // from -> helper
-			this.move(from, to)			       // from -> to
+			this.move(n - 1, from, to, helper) // from   -> helper
+			this.move(from, to)                // from   -> to
 			this.move(n - 1, helper, from, to) // helper -> to
 		}
 	}

@@ -1,9 +1,9 @@
 package dyvil.tools.compiler.ast.imports;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.lang.Formattable;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.transform.DyvilKeywords;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 
 import java.io.DataInput;
@@ -129,7 +129,7 @@ public class KindedImport implements IImport
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

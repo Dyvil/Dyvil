@@ -13,14 +13,14 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public final class BooleanValue implements IConstantValue
 {
 	public static final BooleanValue TRUE  = new BooleanValue(true);
 	public static final BooleanValue FALSE = new BooleanValue(false);
 
-	protected ICodePosition position;
+	protected SourcePosition position;
 	protected boolean       value;
 
 	public BooleanValue(boolean value)
@@ -28,20 +28,20 @@ public final class BooleanValue implements IConstantValue
 		this.value = value;
 	}
 
-	public BooleanValue(ICodePosition position, boolean value)
+	public BooleanValue(SourcePosition position, boolean value)
 	{
 		this.position = position;
 		this.value = value;
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -134,7 +134,7 @@ public final class BooleanValue implements IConstantValue
 
 		if (type != null)
 		{
-			Types.BOOLEAN.writeCast(writer, type, this.getLineNumber());
+			Types.BOOLEAN.writeCast(writer, type, this.lineNumber());
 		}
 	}
 

@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.expression.access;
 
+import dyvil.lang.Formattable;
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -20,14 +22,12 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public class ConstructorCall implements ICall
 {
-	protected ICodePosition position;
+	protected SourcePosition position;
 	protected IType         type;
 	protected ArgumentList    arguments;
 
@@ -45,20 +45,20 @@ public class ConstructorCall implements ICall
 		this.arguments = arguments;
 	}
 
-	public ConstructorCall(ICodePosition position)
+	public ConstructorCall(SourcePosition position)
 	{
 		this.position = position;
 		this.arguments = ArgumentList.EMPTY;
 	}
 
-	public ConstructorCall(ICodePosition position, IType type, ArgumentList arguments)
+	public ConstructorCall(SourcePosition position, IType type, ArgumentList arguments)
 	{
 		this.position = position;
 		this.type = type;
 		this.arguments = arguments;
 	}
 
-	public ConstructorCall(ICodePosition position, IConstructor constructor, ArgumentList arguments)
+	public ConstructorCall(SourcePosition position, IConstructor constructor, ArgumentList arguments)
 	{
 		this.position = position;
 		this.constructor = constructor;
@@ -67,13 +67,13 @@ public class ConstructorCall implements ICall
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -236,7 +236,7 @@ public class ConstructorCall implements ICall
 		return IContext.resolveConstructors(context, type, this.arguments);
 	}
 
-	protected static void reportResolve(MarkerList markers, MatchList<IConstructor> list, ICodePosition position,
+	protected static void reportResolve(MarkerList markers, MatchList<IConstructor> list, SourcePosition position,
 		                                   IType type, ArgumentList arguments)
 	{
 		final Marker marker;
@@ -346,7 +346,7 @@ public class ConstructorCall implements ICall
 	{
 		if (!this.type.hasTag(IType.ARRAY))
 		{
-			this.constructor.writeCall(writer, this.arguments, type, this.getLineNumber());
+			this.constructor.writeCall(writer, this.arguments, type, this.lineNumber());
 			return;
 		}
 
@@ -371,7 +371,7 @@ public class ConstructorCall implements ICall
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

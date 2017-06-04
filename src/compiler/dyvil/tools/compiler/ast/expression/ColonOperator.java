@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.expression;
 
+import dyvil.lang.Formattable;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -21,9 +23,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public class ColonOperator implements IValue
 {
@@ -52,17 +52,17 @@ public class ColonOperator implements IValue
 	private IValue right;
 
 	// Metadata
-	private ICodePosition position;
+	private SourcePosition position;
 	private IType         type;
 
 	public ColonOperator(IValue left, IValue right)
 	{
 		this.left = left;
 		this.right = right;
-		this.position = ICodePosition.between(left.getPosition(), right.getPosition());
+		this.position = SourcePosition.between(left.getPosition(), right.getPosition());
 	}
 
-	public ColonOperator(ICodePosition position, IValue left, IValue right)
+	public ColonOperator(SourcePosition position, IValue left, IValue right)
 	{
 		this.position = position;
 		this.left = left;
@@ -96,13 +96,13 @@ public class ColonOperator implements IValue
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
@@ -260,7 +260,7 @@ public class ColonOperator implements IValue
 		this.left.writeExpression(writer, Types.OBJECT);
 		this.right.writeExpression(writer, Types.OBJECT);
 
-		final int lineNumber = this.getLineNumber();
+		final int lineNumber = this.lineNumber();
 
 		writer.visitLineNumber(lineNumber);
 		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/tuple/Tuple$Of2", "apply",
@@ -275,7 +275,7 @@ public class ColonOperator implements IValue
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

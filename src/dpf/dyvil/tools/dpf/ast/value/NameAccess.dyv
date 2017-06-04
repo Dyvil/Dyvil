@@ -5,26 +5,24 @@ import dyvil.tools.dpf.model.Expandable
 import dyvil.tools.dpf.converter.DPFValueVisitor
 import dyvil.tools.dpf.visitor.ValueVisitor
 import dyvil.tools.parsing.Name
-import dyvil.tools.parsing.ast.IASTNode
+import dyvil.tools.parsing.ASTNode
 
 import java.util.Objects
 
-public class NameAccess(
+class NameAccess
+(
 	protected var value: Value? { public get; private set }
 	protected let name: Name { public get }
-	)
-	extends DPFValueVisitor implements Value, Expandable
+)
+extends DPFValueVisitor implements Value, Expandable
 {
-	static func apply(Name name) -> NameAccess = new NameAccess(null, name)
+	static func apply(name: Name) -> NameAccess = new NameAccess(null, name)
 
-	static func apply(Value value, Name name) -> NameAccess = new NameAccess(value, name)
+	static func apply(value: Value, name: Name) -> NameAccess = new NameAccess(value, name)
 
-	protected override void visitValue(Value value)
-	{
-		this.value = value
-	}
+	override func visitValue(value: Value) -> void = this.value = value
 	
-	public override void accept(ValueVisitor visitor)
+	override func accept(visitor: ValueVisitor) -> void
 	{
 		if (this.value == null)
 		{
@@ -35,7 +33,7 @@ public class NameAccess(
 		this.value!.accept(visitor.visitValueAccess(this.name))
 	}
 
-	public override Object expand(Map<String, Object> mappings, boolean mutate)
+	override func expand(mappings: Map<String, Object>, mutate: boolean) -> Object
 	{
 		let builder = new StringBuilder()
 
@@ -56,9 +54,9 @@ public class NameAccess(
 		return mappings.get(builder.toString()) ?? this
 	}
 
-	public override String toString() = IASTNode.toString(this)
-	
-	public override void toString(String indent, StringBuilder buffer)
+	override func toString() -> String = String(this)
+
+	override func toString(indent: String, buffer: StringBuilder) -> void
 	{
 		if (this.value != null)
 		{
@@ -68,14 +66,14 @@ public class NameAccess(
 		buffer.append(this.name)
 	}
 
-	public override boolean equals(Object! o)
+	override func equals(obj: any!) -> boolean
 	{
-		if (this === o) return true
-		if (!(o is NameAccess)) return false
+		if (this === obj) return true
+		if (!(obj is NameAccess)) return false
 
-		let that = o as NameAccess
+		let that = obj as NameAccess
 		return this.name === that.name && this.value == that.value
 	}
 
-	public override int hashCode() = 31 * this.name.hashCode + (this.value?.hashCode ?? 0)
+	override func hashCode() -> int = 31 * this.name.hashCode + (this.value?.hashCode ?? 0)
 }

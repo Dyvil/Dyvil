@@ -25,7 +25,7 @@ import java.io.IOException;
 
 public class TupleType extends ResolvedGenericType
 {
-	public static final int MAX_ARITY = 10;
+	public static final int MAX_ARITY = 20 + 1;
 
 	public static final IClass[] tupleClasses = new IClass[MAX_ARITY];
 	public static final String[] descriptors  = new String[MAX_ARITY];

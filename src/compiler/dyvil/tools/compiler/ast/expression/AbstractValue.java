@@ -1,19 +1,19 @@
 package dyvil.tools.compiler.ast.expression;
 
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public abstract class AbstractValue implements IValue
 {
-	protected ICodePosition position;
+	protected SourcePosition position;
 	
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 	
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}

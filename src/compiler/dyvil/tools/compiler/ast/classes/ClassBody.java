@@ -24,9 +24,9 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.ASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class ClassBody implements IClassBody
 {
@@ -80,13 +80,13 @@ public class ClassBody implements IClassBody
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return null;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 	}
 
@@ -177,7 +177,7 @@ public class ClassBody implements IClassBody
 	}
 
 	@Override
-	public IField createDataMember(ICodePosition position, Name name, IType type, ModifierSet modifiers,
+	public IField createDataMember(SourcePosition position, Name name, IType type, ModifierSet modifiers,
 		                              AnnotationList annotations)
 	{
 		return new Field(this.enclosingClass, position, name, type, modifiers, annotations);
@@ -930,7 +930,7 @@ public class ClassBody implements IClassBody
 		}
 	}
 
-	private void membersToString(String prefix, IASTNode[] members, int count, StringBuilder buffer)
+	private void membersToString(String prefix, ASTNode[] members, int count, StringBuilder buffer)
 	{
 		for (int i = 0; i < count; i++)
 		{

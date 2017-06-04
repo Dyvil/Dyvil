@@ -17,10 +17,10 @@ import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.ASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public interface IClassBody extends IASTNode, IResolvable, IClassList, IMemberConsumer<IField>
+public interface IClassBody extends ASTNode, IResolvable, IClassList, IMemberConsumer<IField>
 {
 	// Enclosing Class
 

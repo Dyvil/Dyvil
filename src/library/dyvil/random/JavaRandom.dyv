@@ -2,7 +2,7 @@ package dyvil.random
 
 import java.util.Random
 
-public internal class JavaRandom extends Random implements dyvil.random.Random
+internal class JavaRandom extends Random implements dyvil.random.Random
 {
 	private const serialVersionUID: long = -6648049590269700311L;
 
@@ -11,12 +11,12 @@ public internal class JavaRandom extends Random implements dyvil.random.Random
 		super.init()
 	}
 
-	public init(long seed)
+	public init(seed: long)
 	{
 		super.init(seed)
 	}
 
-	override func next(int bits) -> int = super<Random>.next(bits)
+	override func next(bits: int) -> int = super<Random>.next(bits)
 
 	override func nextGaussian() -> double = super<Random>.nextGaussian()
 

@@ -9,29 +9,29 @@ import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.transform.SideEffectHelper;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class ApplyMethodCall extends AbstractCall
 {
-	public ApplyMethodCall(ICodePosition position)
+	public ApplyMethodCall(SourcePosition position)
 	{
 		this.position = position;
 	}
 
-	public ApplyMethodCall(ICodePosition position, IValue receiver)
+	public ApplyMethodCall(SourcePosition position, IValue receiver)
 	{
 		this.position = position;
 		this.receiver = receiver;
 	}
 
-	public ApplyMethodCall(ICodePosition position, IValue instance, ArgumentList arguments)
+	public ApplyMethodCall(SourcePosition position, IValue instance, ArgumentList arguments)
 	{
 		this.position = position;
 		this.receiver = instance;
 		this.arguments = arguments;
 	}
 
-	public ApplyMethodCall(ICodePosition position, IValue instance, IMethod method, ArgumentList arguments)
+	public ApplyMethodCall(SourcePosition position, IValue instance, IMethod method, ArgumentList arguments)
 	{
 		this.position = position;
 		this.receiver = instance;
@@ -58,13 +58,13 @@ public class ApplyMethodCall extends AbstractCall
 	}
 
 	@Override
-	public IValue toAssignment(IValue rhs, ICodePosition position)
+	public IValue toAssignment(IValue rhs, SourcePosition position)
 	{
 		return new UpdateMethodCall(this.position.to(position), this.receiver, this.arguments, rhs);
 	}
 
 	@Override
-	public IValue toCompoundAssignment(IValue rhs, ICodePosition position, MarkerList markers, IContext context,
+	public IValue toCompoundAssignment(IValue rhs, SourcePosition position, MarkerList markers, IContext context,
 		                                  SideEffectHelper helper)
 	{
 		// x(y...) op= z

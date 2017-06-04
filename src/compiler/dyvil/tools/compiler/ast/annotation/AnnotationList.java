@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.annotation;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.IAnnotationConsumer;
@@ -16,7 +17,7 @@ import java.lang.annotation.ElementType;
 public class AnnotationList implements IAnnotationConsumer
 {
 	protected IAnnotation[] annotations;
-	protected int           annotationCount;
+	protected int           size;
 
 	public AnnotationList()
 	{
@@ -30,7 +31,7 @@ public class AnnotationList implements IAnnotationConsumer
 
 	public int size()
 	{
-		return this.annotationCount;
+		return this.size;
 	}
 
 	public IAnnotation[] getArray()
@@ -53,7 +54,7 @@ public class AnnotationList implements IAnnotationConsumer
 		{
 			return null;
 		}
-		for (int i = 0; i < this.annotationCount; i++)
+		for (int i = 0; i < this.size; i++)
 		{
 			IAnnotation a = this.annotations[i];
 			if (a.getType().getTheClass() == type)
@@ -64,29 +65,26 @@ public class AnnotationList implements IAnnotationConsumer
 		return null;
 	}
 
-	public void set(int index, IAnnotation annotation)
-	{
-		this.annotations[index] = annotation;
-	}
-
 	public final void add(IAnnotation annotation)
 	{
-		if (this.annotations == null)
-		{
-			this.annotations = new IAnnotation[3];
-			this.annotations[0] = annotation;
-			this.annotationCount = 1;
-			return;
-		}
+		this.ensureCapacity(this.size + 1);
+		this.annotations[this.size++] = annotation;
+	}
 
-		int index = this.annotationCount++;
-		if (this.annotationCount > this.annotations.length)
+	private void ensureCapacity(int capacity)
+	{
+		if (capacity > this.annotations.length)
 		{
-			IAnnotation[] temp = new IAnnotation[this.annotationCount];
-			System.arraycopy(this.annotations, 0, temp, 0, index);
+			final IAnnotation[] temp = new IAnnotation[capacity];
+			System.arraycopy(this.annotations, 0, temp, 0, this.size);
 			this.annotations = temp;
 		}
-		this.annotations[index] = annotation;
+	}
+
+	public void addAll(AnnotationList list)
+	{
+		this.ensureCapacity(this.size + list.size);
+		System.arraycopy(list.annotations, 0, this.annotations, this.size, list.size);
 	}
 
 	@Override
@@ -97,19 +95,19 @@ public class AnnotationList implements IAnnotationConsumer
 
 	public final void remoteAt(int index)
 	{
-		int numMoved = this.annotationCount - index - 1;
+		int numMoved = this.size - index - 1;
 		if (numMoved > 0)
 		{
 			System.arraycopy(this.annotations, index + 1, this.annotations, index, numMoved);
 		}
-		this.annotations[--this.annotationCount] = null;
+		this.annotations[--this.size] = null;
 	}
 
 	// Phases
 
 	public void resolveTypes(MarkerList markers, IContext context, IAnnotated annotated)
 	{
-		for (int i = 0; i < this.annotationCount; i++)
+		for (int i = 0; i < this.size; i++)
 		{
 			final IAnnotation annotation = this.annotations[i];
 			annotation.resolveTypes(markers, context);
@@ -124,7 +122,7 @@ public class AnnotationList implements IAnnotationConsumer
 
 	public void resolve(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.annotationCount; i++)
+		for (int i = 0; i < this.size; i++)
 		{
 			this.annotations[i].resolve(markers, context);
 		}
@@ -132,7 +130,7 @@ public class AnnotationList implements IAnnotationConsumer
 
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.annotationCount; i++)
+		for (int i = 0; i < this.size; i++)
 		{
 			this.annotations[i].checkTypes(markers, context);
 		}
@@ -140,7 +138,7 @@ public class AnnotationList implements IAnnotationConsumer
 
 	public void check(MarkerList markers, IContext context, ElementType target)
 	{
-		for (int i = 0; i < this.annotationCount; i++)
+		for (int i = 0; i < this.size; i++)
 		{
 			this.annotations[i].check(markers, context, target);
 		}
@@ -148,7 +146,7 @@ public class AnnotationList implements IAnnotationConsumer
 
 	public void foldConstants()
 	{
-		for (int i = 0; i < this.annotationCount; i++)
+		for (int i = 0; i < this.size; i++)
 		{
 			this.annotations[i].foldConstants();
 		}
@@ -156,7 +154,7 @@ public class AnnotationList implements IAnnotationConsumer
 
 	public void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		for (int i = 0; i < this.annotationCount; i++)
+		for (int i = 0; i < this.size; i++)
 		{
 			this.annotations[i].cleanup(compilableList, classCompilableList);
 		}
@@ -166,7 +164,7 @@ public class AnnotationList implements IAnnotationConsumer
 
 	public void write(AnnotatableVisitor writer)
 	{
-		for (int i = 0, count = this.annotationCount; i < count; i++)
+		for (int i = 0, count = this.size; i < count; i++)
 		{
 			this.annotations[i].write(writer);
 		}
@@ -180,7 +178,7 @@ public class AnnotationList implements IAnnotationConsumer
 			return;
 		}
 
-		int annotations = list.annotationCount;
+		int annotations = list.size;
 		out.writeShort(annotations);
 		for (int i = 0; i < annotations; i++)
 		{
@@ -198,7 +196,7 @@ public class AnnotationList implements IAnnotationConsumer
 		}
 
 		AnnotationList list = new AnnotationList(annotations);
-		list.annotationCount = annotations;
+		list.size = annotations;
 		for (int i = 0; i < annotations; i++)
 		{
 			Annotation a = new Annotation();
@@ -209,12 +207,21 @@ public class AnnotationList implements IAnnotationConsumer
 		return list;
 	}
 
-	public void toString(String prefix, StringBuilder buffer)
+	public void toInlineString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		for (int i = 0; i < this.annotationCount; i++)
+		for (int i = 0; i < this.size; i++)
 		{
-			this.annotations[i].toString(prefix, buffer);
-			buffer.append('\n').append(prefix);
+			this.annotations[i].toString(indent, buffer);
+			buffer.append(' ');
+		}
+	}
+
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
+	{
+		for (int i = 0; i < this.size; i++)
+		{
+			this.annotations[i].toString(indent, buffer);
+			buffer.append('\n').append(indent);
 		}
 	}
 }

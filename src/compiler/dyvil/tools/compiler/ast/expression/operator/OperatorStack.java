@@ -2,20 +2,21 @@ package dyvil.tools.compiler.ast.expression.operator;
 
 import dyvil.collection.Stack;
 import dyvil.collection.mutable.LinkedList;
+import dyvil.lang.Formattable;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.parsing.ASTNode;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
-public abstract class OperatorStack<T extends IASTNode> implements IASTNode
+public abstract class OperatorStack<T extends ASTNode> implements ASTNode
 {
 	protected int               operatorCount;
-	protected IASTNode[]        operands = new IASTNode[3];
+	protected ASTNode[]        operands = new ASTNode[3];
 	protected OperatorElement[] operators = new OperatorElement[2];
 
-	public void addOperator(Name name, ICodePosition position)
+	public void addOperator(Name name, SourcePosition position)
 	{
 		final int index = this.operatorCount++;
 		if (index >= this.operators.length)
@@ -32,7 +33,7 @@ public abstract class OperatorStack<T extends IASTNode> implements IASTNode
 		final int index = this.operatorCount;
 		if (index >= this.operands.length)
 		{
-			final IASTNode[] temp = new IASTNode[index + 1];
+			final ASTNode[] temp = new ASTNode[index + 1];
 			System.arraycopy(this.operands, 0, temp, 0, this.operands.length);
 			this.operands = temp;
 		}
@@ -196,7 +197,7 @@ public abstract class OperatorStack<T extends IASTNode> implements IASTNode
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

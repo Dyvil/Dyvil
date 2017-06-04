@@ -9,7 +9,7 @@ import java.lang.annotation._
  */
 @Target([ ElementType.METHOD ])
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Mutating(
+@interface Mutating(
 	/**
 	 * Returns the error to be reported by the compiler when a mutating method is called on an immutable callee.
 	 * <p>
@@ -21,5 +21,5 @@ public @interface Mutating(
 	let value: String = DEFAULT_MESSAGE
 )
 {
-	public const DEFAULT_MESSAGE: String = "Invalid invocation of mutating method {method} on immutable type {type}"
+	const DEFAULT_MESSAGE: String = "Invalid invocation of mutating method {method} on immutable type {type}"
 }

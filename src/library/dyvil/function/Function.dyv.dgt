@@ -1,3 +1,6 @@
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
+
 package dyvil.function
 
 abstract class Function
@@ -5,25 +8,27 @@ abstract class Function
 	private init() {} // no instances
 
 	@FunctionalInterface
-	public interface Of0<type +R>
+	interface Of0<type +R>
 	{
 		func apply() -> R
 	}
 
 	@FunctionalInterface
-	public interface Of1<type -P1, type +R>
+	interface Of1<type -P1, type +R>
 	{
 		func apply(par1: P1) -> R
 
-		infix func andThen<A, B, C>(first: A -> B, second: B -> C) -> A -> C = x => second(first(x))
+		infix func andThen<A, B, C>(first: A -> B, second: B -> C) -> (A -> C) = x => second(first(x))
 
-		infix func compose<A, B, C>(second: B -> C, first: A -> B) -> A -> C = first.andThen second
+		infix func compose<A, B, C>(second: B -> C, first: A -> B) -> (A -> C) = first.andThen second
+
+		infix func * <A, B, C>(lhs: B -> C, rhs: A -> B) -> (A -> C) = rhs.andThen lhs
 
 		static func identity<T> -> (T -> T) = x => x
 	}
 
 	@FunctionalInterface
-	public interface Of2<type -P1, type -P2, type +R>
+	interface Of2<type -P1, type -P2, type +R>
 	{
 		func apply(par1: P1, par2: P2) -> R
 
@@ -32,23 +37,13 @@ abstract class Function
 		postfix func tupled<A, B, C>(function: (A, B) -> C) -> (((A, B)) -> C) = tuple => function(tuple._1, tuple._2)
 	}
 
-#import Base.dgs
-#for ARITY; 3; MAX_ARITY
+	#import("Base.dgs")
+	#for (ARITY <- 3 .. MAX_ARITY) {
 
-	@FunctionalInterface
-	public interface Of##ARITY <
-	#for INDEX; 1; ARITY
-			type -P##INDEX
-	#end
-			type +R
-		>
-	{
-		func apply(
-	#for INDEX; 1; ARITY
-			par##INDEX: P##INDEX
-	#end
-		) -> R
+		@FunctionalInterface
+		interface Of#(ARITY)<#for (INDEX <- 1 .. ARITY) {type -P#(INDEX), }type +R>
+		{
+			func apply(par1: P1#for (INDEX <- 2 .. ARITY) {, par#(INDEX): P#(INDEX)}) -> R
+		}
 	}
-
-#end
 }

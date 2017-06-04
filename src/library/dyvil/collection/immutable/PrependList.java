@@ -177,13 +177,13 @@ public class PrependList<E> implements ImmutableList<E>
 
 	@NonNull
 	@Override
-	public ImmutableList<E> filtered(@NonNull Predicate<? super E> condition)
+	public ImmutableList<E> filtered(@NonNull Predicate<? super E> predicate)
 	{
-		if (!condition.test(this.head))
+		if (!predicate.test(this.head))
 		{
-			return this.tail.filtered(condition);
+			return this.tail.filtered(predicate);
 		}
-		return new PrependList<>(this.head, this.tail.filtered(condition));
+		return new PrependList<>(this.head, this.tail.filtered(predicate));
 	}
 
 	@NonNull

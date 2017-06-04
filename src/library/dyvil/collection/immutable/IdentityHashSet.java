@@ -255,12 +255,12 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Im
 
 	@NonNull
 	@Override
-	public ImmutableSet<E> filtered(@NonNull Predicate<? super E> condition)
+	public ImmutableSet<E> filtered(@NonNull Predicate<? super E> predicate)
 	{
 		IdentityHashSet<E> set = new IdentityHashSet<>(this.size);
 		for (E e : this)
 		{
-			if (condition.test(e))
+			if (predicate.test(e))
 			{
 				set.addInternal(e);
 			}

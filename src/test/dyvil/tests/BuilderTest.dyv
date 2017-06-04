@@ -13,10 +13,7 @@ public class BuilderTest
     {
 		static func apply() -> Buildable = new Buildable(0, 0D, null)
 
-		static func apply(Configure<Buildable> configure) -> Buildable = Buildable().{
-			configure $0
-			$0
-		}
+		static func apply(configure: Configure<Buildable>) -> Buildable = Buildable().use(configure)
     }
 
 	static func apply() -> Test = test "Builders" {

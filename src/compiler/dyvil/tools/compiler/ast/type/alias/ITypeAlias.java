@@ -13,14 +13,14 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.ASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public interface ITypeAlias extends IASTNode, IResolvable, IOverloadable, ITypeParametric, IObjectCompilable
+public interface ITypeAlias extends ASTNode, IResolvable, IOverloadable, ITypeParametric, IObjectCompilable
 {
 	IHeaderUnit getEnclosingHeader();
 

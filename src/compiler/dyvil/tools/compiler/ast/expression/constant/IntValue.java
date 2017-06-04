@@ -12,13 +12,13 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public final class IntValue implements IConstantValue
 {
 	private static IntValue NULL;
 
-	protected ICodePosition position;
+	protected SourcePosition position;
 	protected int           value;
 
 	public IntValue(int value)
@@ -26,7 +26,7 @@ public final class IntValue implements IConstantValue
 		this.value = value;
 	}
 
-	public IntValue(ICodePosition position, int value)
+	public IntValue(SourcePosition position, int value)
 	{
 		this.position = position;
 		this.value = value;
@@ -42,13 +42,13 @@ public final class IntValue implements IConstantValue
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -174,7 +174,7 @@ public final class IntValue implements IConstantValue
 
 		if (type != null)
 		{
-			Types.INT.writeCast(writer, type, this.getLineNumber());
+			Types.INT.writeCast(writer, type, this.lineNumber());
 		}
 	}
 

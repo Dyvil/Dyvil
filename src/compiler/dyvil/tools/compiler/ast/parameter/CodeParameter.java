@@ -20,7 +20,7 @@ import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class CodeParameter extends AbstractParameter
 {
@@ -38,12 +38,12 @@ public class CodeParameter extends AbstractParameter
 		super(name, type);
 	}
 
-	public CodeParameter(ICallableMember callable, ICodePosition position, Name name, IType type)
+	public CodeParameter(ICallableMember callable, SourcePosition position, Name name, IType type)
 	{
 		super(callable, position, name, type);
 	}
 
-	public CodeParameter(ICallableMember callable, ICodePosition position, Name name, IType type, ModifierSet modifiers,
+	public CodeParameter(ICallableMember callable, SourcePosition position, Name name, IType type, ModifierSet modifiers,
 		                    AnnotationList annotations)
 	{
 		super(callable, position, name, type, modifiers, annotations);

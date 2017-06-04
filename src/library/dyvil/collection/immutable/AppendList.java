@@ -227,13 +227,13 @@ public class AppendList<E> implements ImmutableList<E>
 
 	@NonNull
 	@Override
-	public ImmutableList<E> filtered(@NonNull Predicate<? super E> condition)
+	public ImmutableList<E> filtered(@NonNull Predicate<? super E> predicate)
 	{
-		if (!condition.test(this.tail))
+		if (!predicate.test(this.tail))
 		{
-			return this.head.filtered(condition);
+			return this.head.filtered(predicate);
 		}
-		return new AppendList<>(this.head.filtered(condition), this.tail);
+		return new AppendList<>(this.head.filtered(predicate), this.tail);
 	}
 
 	@NonNull

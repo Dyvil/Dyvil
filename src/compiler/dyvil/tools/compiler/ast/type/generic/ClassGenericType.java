@@ -16,9 +16,10 @@ import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.ast.type.compound.WildcardType;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -56,7 +57,7 @@ public class ClassGenericType extends GenericType
 	}
 
 	@Override
-	public IType atPosition(ICodePosition position)
+	public IType atPosition(SourcePosition position)
 	{
 		return new ResolvedGenericType(position, this.getTheClass(), this.arguments);
 	}
@@ -122,7 +123,7 @@ public class ClassGenericType extends GenericType
 		{
 			return this.getTheClass().resolveType(typeParameter, this);
 		}
-		return this.arguments.get(typeParameter.getIndex()).asReturnType();
+		return WildcardType.unapply(this.arguments.get(typeParameter.getIndex()));
 	}
 
 	@Override

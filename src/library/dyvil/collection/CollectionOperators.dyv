@@ -1,79 +1,78 @@
 package dyvil.collection
 
-import dyvil.annotation.Mutating
 import dyvil.util.ImmutableException
 
-public final class CollectionOperators
+final class CollectionOperators
 {
 	private init() {}
 
-	infix inline func ?(Collection<_> collection, any element) -> boolean = collection.contains(element)
+	infix inline func ?(lhs: Collection<_>, rhs: any) -> boolean = lhs.contains(rhs)
 
 	// Non-Mutating Operators
 
-	infix inline func + <T>(Collection<T> collection, T element) -> Collection<T>
-		= collection.added(element)
+	infix inline func + <T>(lhs: Collection<T>, rhs: T) -> Collection<T>
+		= lhs.added(rhs)
 
-	infix inline func ++ <T>(Collection<T> collection, Collection<+T> elements) -> Collection<T>
-		= collection.union(elements)
+	infix inline func ++ <T>(lhs: Collection<T>, rhs: Collection<+T>) -> Collection<T>
+		= lhs.union(rhs)
 
-	infix inline func - <T>(Collection<T> collection, any element) -> Collection<T>
-		= collection.removed(element)
+	infix inline func - <T>(lhs: Collection<T>, rhs: any) -> Collection<T>
+		= lhs.removed(rhs)
 
-	infix inline func -- <T>(Collection<T> collection, Collection<_> elements) -> Collection<T>
-		= collection.difference(elements)
+	infix inline func -- <T>(lhs: Collection<T>, rhs: Collection<_>) -> Collection<T>
+		= lhs.difference(rhs)
 
-	infix inline func + <T>(MutableCollection<T> collection, T element) -> MutableCollection<T>
-		= collection.added(element)
+	infix inline func + <T>(lhs: MutableCollection<T>, rhs: T) -> MutableCollection<T>
+		= lhs.added(rhs)
 
-	infix inline func ++ <T>(MutableCollection<T> collection, Collection<+T> elements) -> MutableCollection<T>
-		= collection.union(elements)
+	infix inline func ++ <T>(lhs: MutableCollection<T>, rhs: Collection<+T>) -> MutableCollection<T>
+		= lhs.union(rhs)
 
-	infix inline func - <T>(MutableCollection<T> collection, any element) -> MutableCollection<T>
-		= collection.removed(element)
+	infix inline func - <T>(lhs: MutableCollection<T>, rhs: any) -> MutableCollection<T>
+		= lhs.removed(rhs)
 
-	infix inline func -- <T>(MutableCollection<T> collection, Collection<_> elements) -> MutableCollection<T>
-		= collection.difference(elements)
+	infix inline func -- <T>(lhs: MutableCollection<T>, rhs: Collection<_>) -> MutableCollection<T>
+		= lhs.difference(rhs)
 
-	infix inline func + <T>(ImmutableCollection<T> collection, T element) -> ImmutableCollection<T>
-		= collection.added(element)
+	infix inline func + <T>(lhs: ImmutableCollection<T>, rhs: T) -> ImmutableCollection<T>
+		= lhs.added(rhs)
 
-	infix inline func ++ <T>(ImmutableCollection<T> collection, Collection<+T> elements) -> ImmutableCollection<T>
-		= collection.union(elements)
+	infix inline func ++ <T>(lhs: ImmutableCollection<T>, rhs: Collection<+T>) -> ImmutableCollection<T>
+		= lhs.union(rhs)
 
-	infix inline func - <T>(ImmutableCollection<T> collection, any element) -> ImmutableCollection<T>
-		= collection.removed(element)
+	infix inline func - <T>(lhs: ImmutableCollection<T>, rhs: any) -> ImmutableCollection<T>
+		= lhs.removed(rhs)
 
-	infix inline func -- <T>(ImmutableCollection<T> collection, Collection<_> elements) -> ImmutableCollection<T>
-		= collection.difference(elements)
+	infix inline func -- <T>(lhs: ImmutableCollection<T>, rhs: Collection<_>) -> ImmutableCollection<T>
+		= lhs.difference(rhs)
 
 	// Mutating Operators
 
-	infix inline func += <T>(Collection<T> collection, T element) -> void
-		= collection.add(element)
+	infix inline func += <T>(lhs: Collection<T>, rhs: T) -> void
+		= lhs.add(rhs)
 
-	infix inline func ++= <T>(Collection<T> collection, Collection<+T> elements) -> void
-		= collection.addAll(elements)
+	infix inline func ++= <T>(lhs: Collection<T>, rhs: Collection<+T>) -> void
+		= lhs.addAll(rhs)
 
-	infix inline func -= <T>(Collection<T> collection, any element) -> void
-		= collection.remove(element)
+	infix inline func -= <T>(lhs: Collection<T>, rhs: any) -> void
+		= lhs.remove(rhs)
 
-	infix inline func --= <T>(Collection<T> collection, Collection<_> elements) -> void
-		= collection.removeAll(elements)
+	infix inline func --= <T>(lhs: Collection<T>, rhs: Collection<_>) -> void
+		= lhs.removeAll(rhs)
 
 	@Mutating
-	infix inline func += <T>(ImmutableCollection<T> collection, T element) -> void
+	infix inline func += <T>(lhs: ImmutableCollection<T>, rhs: T) -> void
 		= throw new ImmutableException("+= on Immutable Collection")
 
 	@Mutating
-	infix inline func ++= <T>(ImmutableCollection<T> collection, Collection<+T> elements) -> void
+	infix inline func ++= <T>(lhs: ImmutableCollection<T>, rhs: Collection<+T>) -> void
 		= throw new ImmutableException("++= on Immutable Collection")
 
 	@Mutating
-	infix inline func -= <T>(ImmutableCollection<T> collection, any element) -> void
+	infix inline func -= <T>(lhs: ImmutableCollection<T>, rhs: any) -> void
 		= throw new ImmutableException("-= on Immutable Collection")
 
 	@Mutating
-	infix inline func --= <T>(ImmutableCollection<T> collection, Collection<_> elements) -> void
+	infix inline func --= <T>(lhs: ImmutableCollection<T>, rhs: Collection<_>) -> void
 		= throw new ImmutableException("--= on Immutable Collection")
 }

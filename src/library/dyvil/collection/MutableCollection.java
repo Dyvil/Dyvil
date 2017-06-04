@@ -71,7 +71,7 @@ public interface MutableCollection<E> extends Collection<E>
 
 	@NonNull
 	@Override
-	MutableCollection<E> filtered(@NonNull Predicate<? super E> condition);
+	MutableCollection<E> filtered(@NonNull Predicate<? super E> predicate);
 
 	// Mutating Operations
 

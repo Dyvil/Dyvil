@@ -15,7 +15,7 @@ import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.lang.annotation.ElementType;
 
@@ -26,8 +26,8 @@ public final class ModifierUtil
 	public static final int JAVA_MODIFIER_MASK = 0xFFFF;
 
 	private static final int DYVIL_MODIFIER_MASK = ~JAVA_MODIFIER_MASK // exclude java modifiers
-		                                               & ~DEPRECATED & ~FUNCTIONAL
-		                                               & ~OVERRIDE; // exclude source-only modifiers
+		                                               & ~DEPRECATED & ~FUNCTIONAL & ~OVERRIDE
+		                                               & ~GENERATED; // exclude source-only modifiers
 
 	private static final int STATIC_ABSTRACT = STATIC | ABSTRACT;
 
@@ -142,7 +142,7 @@ public final class ModifierUtil
 		// @formatter:on
 	}
 
-	public static void checkVisibility(IMember member, ICodePosition position, MarkerList markers, IContext context)
+	public static void checkVisibility(IMember member, SourcePosition position, MarkerList markers, IContext context)
 	{
 		Deprecation.checkAnnotations(member, position, markers);
 

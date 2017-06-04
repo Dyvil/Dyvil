@@ -3,6 +3,7 @@ package dyvil.tools.compiler.parser.annotation;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.parser.expression.ArgumentListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -30,7 +31,7 @@ public class AnnotationParser extends Parser
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
-		int type = token.type();
+		final int type = token.type();
 		switch (this.mode)
 		{
 		case NAME:
@@ -40,7 +41,7 @@ public class AnnotationParser extends Parser
 			this.mode = PARAMETERS_START;
 			return;
 		case PARAMETERS_START:
-			this.annotation.expandPosition(token.prev());
+			Util.expandPosition(this.annotation, token.prev());
 
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{

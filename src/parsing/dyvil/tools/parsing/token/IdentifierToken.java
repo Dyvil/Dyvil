@@ -1,11 +1,12 @@
 package dyvil.tools.parsing.token;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.tools.parsing.Name;
 
 public class IdentifierToken implements IToken
 {
-	public IToken prev;
-	public IToken next;
+	public @NonNull IToken prev;
+	public @NonNull IToken next;
 
 	public final int  type;
 	public final Name name;
@@ -14,7 +15,7 @@ public class IdentifierToken implements IToken
 	public final int startColumn;
 	public final int endColumn;
 
-	public IdentifierToken(IToken prev, Name name, int type, int lineNumber, int startColumn, int endColumn)
+	public IdentifierToken(@NonNull IToken prev, Name name, int type, int lineNumber, int startColumn, int endColumn)
 	{
 		this.prev = prev;
 		prev.setNext(this);
@@ -79,39 +80,27 @@ public class IdentifierToken implements IToken
 	}
 
 	@Override
-	public void setPrev(IToken prev)
+	public void setPrev(@NonNull IToken prev)
 	{
 		this.prev = prev;
 	}
 
 	@Override
-	public void setNext(IToken next)
+	public void setNext(@NonNull IToken next)
 	{
 		this.next = next;
 	}
 
 	@Override
-	public IToken prev()
+	public @NonNull IToken prev()
 	{
 		return this.prev;
 	}
 
 	@Override
-	public IToken next()
+	public @NonNull IToken next()
 	{
 		return this.next;
-	}
-
-	@Override
-	public boolean hasNext()
-	{
-		return this.next.type() != 0;
-	}
-
-	@Override
-	public boolean hasPrev()
-	{
-		return this.prev.type() != 0;
 	}
 
 	@Override

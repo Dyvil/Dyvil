@@ -1,10 +1,10 @@
 package dyvil.tools.dpf.visitor
 
-public interface MapVisitor
+interface MapVisitor
 {
-	ValueVisitor visitKey()
+	func visitKey() -> ValueVisitor
 	
-	ValueVisitor visitValue()
+	func visitValue() -> ValueVisitor
 	
-	void visitEnd() { }
+	func visitEnd() -> void {}
 }

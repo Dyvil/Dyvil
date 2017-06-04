@@ -1,14 +1,14 @@
-package dyvil.tools.dpf.visitor;
+package dyvil.tools.dpf.visitor
 
-import dyvil.tools.parsing.Name;
+import dyvil.tools.parsing.Name
 
-public interface NodeVisitor
+interface NodeVisitor
 {
-	NodeVisitor visitNode(Name name);
+	func visitNode(name: Name) -> NodeVisitor
 	
-	ValueVisitor visitProperty(Name name);
+	func visitProperty(name: Name) -> ValueVisitor
 	
-	NodeVisitor visitNodeAccess(Name name);
+	func visitNodeAccess(name: Name) -> NodeVisitor
 	
-	void visitEnd() { }
+	func visitEnd() -> void {}
 }

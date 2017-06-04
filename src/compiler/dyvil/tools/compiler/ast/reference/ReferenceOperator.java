@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.reference;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.lang.Formattable;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
@@ -8,9 +10,7 @@ import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public class ReferenceOperator implements IValue
 {
@@ -27,13 +27,13 @@ public class ReferenceOperator implements IValue
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.value.getPosition();
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 	}
 
@@ -135,7 +135,7 @@ public class ReferenceOperator implements IValue
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

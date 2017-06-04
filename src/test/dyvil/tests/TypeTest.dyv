@@ -8,10 +8,10 @@ public class TypeTest
 {
 	// Receiver Type Specifiers
 
-	public static case class MyList<T>(T... elements)
+	static case class MyList<T>(elements: T...)
 	{
 		@BytecodeName("sum_doubles")
-		public func sum(MyList<double> this) -> double
+		public func sum(this: MyList<double>) -> double
 		{
 			var result = 0D
 			for (d <- this.elements) result += d
@@ -19,7 +19,7 @@ public class TypeTest
 		}
 
 		@BytecodeName("sum_ints")
-		public func sum(MyList<int> this) -> int
+		public func sum(this: MyList<int>) -> int
 		{
 			var result = 0
 			for (i <- this.elements) result += i
@@ -29,25 +29,25 @@ public class TypeTest
 
 	// Recursive Type Parameters
 
-	public interface Recur<type +SELF: Recur<SELF>>
+	interface Recur<type +SELF: Recur<SELF>>
 	{
 		func next() -> SELF
 	}
 
 	func nextRecur<type R: Recur<R>>(value: R) -> R = value.next
 
-	public case class IntRecur(let value: int) implements Recur<IntRecur>
+	case class IntRecur(let value: int) implements Recur<IntRecur>
 	{
 		override func next() -> IntRecur = IntRecur(this.value + 1)
 	}
 
-	public class RecurWrapper<type R: Recur<R>>(let value: R)
+	class RecurWrapper<type R: Recur<R>>(let value: R)
 
 	// Misc.
 
-	public infix func <<< <T, C: Collection<T>>(C collection, T element) = collection.added(element)
+	infix func <<< <T, C: Collection<T>>(collection: C, element: T) = collection.added(element)
 
-	static func voidTest<T>(T value) = "\(value)" // will error if CovariantTypeVarType.isSameType(Types.VOID) returns true
+	static func voidTest<T>(value: T) = "\(value)" // will error if CovariantTypeVarType.isSameType(Types.VOID) returns true
 
 	static func apply() -> Test = test "Types" {
 		test "Receiver Type" {

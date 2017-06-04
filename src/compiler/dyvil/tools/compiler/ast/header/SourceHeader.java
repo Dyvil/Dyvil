@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.header;
 
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
@@ -13,20 +14,19 @@ import dyvil.tools.compiler.sources.DyvilFileType;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.transform.SemicolonInference;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.source.FileSource;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ParserManager;
-import dyvil.tools.parsing.TokenIterator;
+import dyvil.tools.parsing.TokenList;
 import dyvil.tools.parsing.lexer.DyvilLexer;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.tools.parsing.source.FileSource;
 
 import java.io.File;
 import java.io.IOException;
 
 public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefaultContext
 {
-	protected TokenIterator tokens;
+	protected TokenList tokens;
 	protected MarkerList markers = new MarkerList(Markers.INSTANCE);
 
 	public final FileSource sourceFile;
@@ -105,7 +105,7 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	@Override
 	public void parse()
 	{
-		new ParserManager(DyvilSymbols.INSTANCE, this.tokens, this.markers).parse(new DyvilHeaderParser(this));
+		new ParserManager(DyvilSymbols.INSTANCE, this.tokens.iterator(), this.markers).parse(new DyvilHeaderParser(this));
 	}
 
 	@Override
@@ -133,7 +133,7 @@ public class SourceHeader extends AbstractHeader implements ISourceHeader, IDefa
 	{
 		if (this.headerDeclaration == null)
 		{
-			this.headerDeclaration = new HeaderDeclaration(this, ICodePosition.ORIGIN, this.name,
+			this.headerDeclaration = new HeaderDeclaration(this, SourcePosition.ORIGIN, this.name,
 			                                               new FlagModifierSet(Modifiers.PUBLIC), null);
 		}
 

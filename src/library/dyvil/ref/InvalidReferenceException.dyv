@@ -2,7 +2,7 @@ package dyvil.ref
 
 class InvalidReferenceException extends RuntimeException
 {
-	init() { super.init() }
+	public init() { super.init() }
 
-	init(message: String) { super.init(message) }
+	public init(message: String) { super.init(message) }
 }

@@ -113,7 +113,7 @@ public class DPFTest
 
 			binaryReader.readNodes(newNode)
 		}
-		catch (Throwable ex)
+		catch (ex: Throwable)
 		{
 			ex.printStackTrace
 		}

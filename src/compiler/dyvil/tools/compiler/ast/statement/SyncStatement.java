@@ -15,19 +15,19 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public final class SyncStatement extends AbstractValue implements IStatement
 {
 	protected IValue lock;
 	protected IValue action;
 	
-	public SyncStatement(ICodePosition position)
+	public SyncStatement(SourcePosition position)
 	{
 		this.position = position;
 	}
 	
-	public SyncStatement(ICodePosition position, IValue lock, IValue block)
+	public SyncStatement(SourcePosition position, IValue lock, IValue block)
 	{
 		this.position = position;
 		this.lock = lock;

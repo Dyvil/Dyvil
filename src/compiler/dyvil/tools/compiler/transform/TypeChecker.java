@@ -12,13 +12,13 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public final class TypeChecker
 {
 	public interface MarkerSupplier
 	{
-		Marker createMarker(ICodePosition position, IType expected, IType actual);
+		Marker createMarker(SourcePosition position, IType expected, IType actual);
 	}
 
 	private TypeChecker()
@@ -72,7 +72,7 @@ public final class TypeChecker
 			return IValue.CONVERSION_MATCH;
 		}
 
-		if (IContext.resolveImplicits(context, value, type).hasCandidate())
+		if (context != null && IContext.resolveImplicits(context, value, type).hasCandidate())
 		{
 			return IValue.IMPLICIT_CONVERSION_MATCH;
 		}
@@ -139,12 +139,12 @@ public final class TypeChecker
 		return typeError(value.getPosition(), type.getConcreteType(typeContext), value.getType(), key, args);
 	}
 
-	public static Marker typeError(ICodePosition position, IType expected, IType actual, String key, Object... args)
+	public static Marker typeError(SourcePosition position, IType expected, IType actual, String key, Object... args)
 	{
 		return typeError(position, expected, actual, key, "type.expected", "value.type", args);
 	}
 
-	public static Marker typeError(ICodePosition position, IType expected, IType actual, String key, String expectedError, String actualError, Object... args)
+	public static Marker typeError(SourcePosition position, IType expected, IType actual, String key, String expectedError, String actualError, Object... args)
 	{
 		final Marker marker = Markers.semanticError(position, key, args);
 		marker.addInfo(Markers.getSemantic(expectedError, expected));
@@ -152,7 +152,7 @@ public final class TypeChecker
 		return marker;
 	}
 
-	public static Marker typeError(ICodePosition position, IType expectedType, IType actualType, String error, String expectedError, String actualError)
+	public static Marker typeError(SourcePosition position, IType expectedType, IType actualType, String error, String expectedError, String actualError)
 	{
 		final Marker marker = Markers.semanticError(position, error);
 		marker.addInfo(Markers.getSemantic(expectedError, expectedType));

@@ -3,15 +3,15 @@ package dyvil.tools.compiler.ast.statement.loop;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.statement.IStatement;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public interface IForStatement extends IStatement, ILoop
 {
 	@Override
-	ICodePosition getPosition();
+	SourcePosition getPosition();
 
 	@Override
-	void setPosition(ICodePosition position);
+	void setPosition(SourcePosition position);
 
 	IVariable getVariable();
 

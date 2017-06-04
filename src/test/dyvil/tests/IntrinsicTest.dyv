@@ -41,11 +41,11 @@ public class IntrinsicTest
 	}
 	
 	@Intrinsic([ LOAD_0, LOAD_1, INEG, IADD ])
-	infix func +-(int i, int j) -> int = throw new RuntimeException("Not Intrinsic!")
+	infix func +-(i: int, j: int) -> int = throw new RuntimeException("Not Intrinsic!")
 	
 	@Intrinsic([ LOAD_0, PUTSTATIC, 0, 1, 2 ]
 	  strings: [ "dyvil/tests/IntrinsicTest", "value", "I" ])
-	private static func setValue(int value) -> void = throw new RuntimeException("Not Intrinsic!")
+	private static func setValue(value: int) -> void = throw new RuntimeException("Not Intrinsic!")
 
-	static func orderTest(int first, int second) -> (int, int) = (first, second)
+	static func orderTest(first: int, second: int) -> (int, int) = (first, second)
 }

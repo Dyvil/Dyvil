@@ -16,6 +16,7 @@ import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.Markers;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.Parser;
@@ -263,12 +264,12 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			{
 				pm.report(nextToken, "type.tuple.lambda_arrow");
 			}
-			this.type.expandPosition(token);
+			Util.expandPosition(this.type, token);
 			this.mode = END;
 			return;
 		}
 		case LAMBDA_END:
-			this.type.expandPosition(token.prev());
+			Util.expandPosition(this.type, token.prev());
 			this.consumer.setType(this.type);
 			pm.popParser(true);
 			return;
@@ -284,7 +285,7 @@ public final class TypeParser extends Parser implements ITypeConsumer
 			}
 			// Fallthrough
 		case ARRAY_END:
-			this.type.expandPosition(token);
+			Util.expandPosition(this.type, token);
 			this.mode = END;
 			if (type != BaseSymbols.CLOSE_SQUARE_BRACKET)
 			{

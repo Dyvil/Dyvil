@@ -11,7 +11,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.lexer.LexerUtil;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public final class CharPattern extends Pattern
 {
@@ -22,12 +22,12 @@ public final class CharPattern extends Pattern
 	
 	private byte type;
 	
-	public CharPattern(ICodePosition position, String value)
+	public CharPattern(SourcePosition position, String value)
 	{
 		this.position = position;
 		this.value = value;
 	}
-	public CharPattern(ICodePosition position, String value, boolean forceChar)
+	public CharPattern(SourcePosition position, String value, boolean forceChar)
 	{
 		this.position = position;
 		this.value = value;
@@ -134,7 +134,7 @@ public final class CharPattern extends Pattern
 		}
 
 		IPattern.loadVar(writer, varIndex, matchedType);
-		matchedType.writeCast(writer, Types.CHAR, this.getLineNumber());
+		matchedType.writeCast(writer, Types.CHAR, this.lineNumber());
 		writer.visitLdcInsn(this.value.charAt(0));
 		writer.visitJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
 	}

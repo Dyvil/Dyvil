@@ -2,7 +2,9 @@ package dyvil.tools.compiler.ast.expression;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
+import dyvil.lang.Formattable;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -25,9 +27,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public final class TupleExpr implements IValue
 {
@@ -48,33 +48,33 @@ public final class TupleExpr implements IValue
 		}
 	}
 
-	protected @Nullable ICodePosition position;
+	protected @Nullable SourcePosition position;
 
 	protected @NonNull ArgumentList values;
 
 	// Metadata
 	private @Nullable IType tupleType;
 
-	public TupleExpr(ICodePosition position)
+	public TupleExpr(SourcePosition position)
 	{
 		this.position = position;
 		this.values = ArgumentList.empty();
 	}
 
-	public TupleExpr(ICodePosition position, ArgumentList values)
+	public TupleExpr(SourcePosition position, ArgumentList values)
 	{
 		this.position = position;
 		this.values = values;
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -109,7 +109,7 @@ public final class TupleExpr implements IValue
 	}
 
 	@Override
-	public IValue toAssignment(IValue rhs, ICodePosition position)
+	public IValue toAssignment(IValue rhs, SourcePosition position)
 	{
 		return this.values.size() != 1 ? null : this.values.getFirst().toAssignment(rhs, position);
 	}
@@ -290,14 +290,14 @@ public final class TupleExpr implements IValue
 
 		if (type != null)
 		{
-			thisType.writeCast(writer, type, this.getLineNumber());
+			thisType.writeCast(writer, type, this.lineNumber());
 		}
 	}
 
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

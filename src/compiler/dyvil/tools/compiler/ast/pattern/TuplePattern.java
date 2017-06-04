@@ -19,7 +19,7 @@ import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public final class TuplePattern extends Pattern implements IPatternList
 {
@@ -29,7 +29,7 @@ public final class TuplePattern extends Pattern implements IPatternList
 	// Metadata
 	private IType tupleType;
 
-	public TuplePattern(ICodePosition position)
+	public TuplePattern(SourcePosition position)
 	{
 		this.position = position;
 		this.patterns = new IPattern[3];
@@ -183,7 +183,7 @@ public final class TuplePattern extends Pattern implements IPatternList
 	{
 		varIndex = IPattern.ensureVar(writer, varIndex, matchedType);
 
-		final int lineNumber = this.getLineNumber();
+		final int lineNumber = this.lineNumber();
 		final IType tupleType = this.getType();
 		final IClass tupleClass = tupleType.getTheClass();
 		final TypeParameterList typeParameters = tupleClass.getTypeParameters();

@@ -1,20 +1,20 @@
 package dyvil.tools.compiler.ast.pattern;
 
-import dyvil.tools.parsing.ast.IASTNode;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.lang.Formattable;
+import dyvil.source.position.SourcePosition;
 
 public abstract class Pattern implements IPattern
 {
-	protected ICodePosition position;
+	protected SourcePosition position;
 	
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 	
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -22,6 +22,6 @@ public abstract class Pattern implements IPattern
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 }

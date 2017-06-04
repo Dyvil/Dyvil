@@ -16,7 +16,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public final class ThrowStatement extends AbstractValue implements IValueConsumer
 {
@@ -24,12 +24,12 @@ public final class ThrowStatement extends AbstractValue implements IValueConsume
 
 	protected IValue value;
 
-	public ThrowStatement(ICodePosition position)
+	public ThrowStatement(SourcePosition position)
 	{
 		this.position = position;
 	}
 
-	public ThrowStatement(ICodePosition position, IValue value)
+	public ThrowStatement(SourcePosition position, IValue value)
 	{
 		this.position = position;
 		this.value = value;

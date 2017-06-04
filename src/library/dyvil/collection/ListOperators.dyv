@@ -2,37 +2,37 @@ package dyvil.collection
 
 import dyvil.collection.immutable.PrependList
 
-public class ListOperators
+class ListOperators
 {
 	// List Operators
 
-	infix inline func + <T>(List<T> list, T element) -> List<T> = list.added(element)
+	infix inline func + <T>(lhs: List<T>, rhs: T) -> List<T> = lhs.added(rhs)
 
-	infix inline func ++ <T>(List<T> list, List<+T> elements) -> List<T> = list.union(elements)
+	infix inline func ++ <T>(lhs: List<T>, rhs: List<+T>) -> List<T> = lhs.union(rhs)
 
-	infix inline func - <T>(List<T> list, any element) -> List<T> = list.removed(element)
+	infix inline func - <T>(lhs: List<T>, rhs: any) -> List<T> = lhs.removed(rhs)
 
-	infix inline func -- <T>(List<T> list, List<_> elements) -> List<T> = list.difference(elements)
+	infix inline func -- <T>(lhs: List<T>, rhs: List<_>) -> List<T> = lhs.difference(rhs)
 
 	// Mutable List Operators
 
-	infix inline func + <T>(MutableList<T> list, T element) -> MutableList<T> = list.added(element)
+	infix inline func + <T>(lhs: MutableList<T>, rhs: T) -> MutableList<T> = lhs.added(rhs)
 
-	infix inline func ++ <T>(MutableList<T> list, List<+T> elements) -> MutableList<T> = list.union(elements)
+	infix inline func ++ <T>(lhs: MutableList<T>, rhs: List<+T>) -> MutableList<T> = lhs.union(rhs)
 
-	infix inline func - <T>(MutableList<T> list, any element) -> MutableList<T> = list.removed(element)
+	infix inline func - <T>(lhs: MutableList<T>, rhs: any) -> MutableList<T> = lhs.removed(rhs)
 
-	infix inline func -- <T>(MutableList<T> list, List<_> elements) -> MutableList<T> = list.difference(elements)
+	infix inline func -- <T>(lhs: MutableList<T>, rhs: List<_>) -> MutableList<T> = lhs.difference(rhs)
 
 	// Immutable List Operators
 
-	infix inline func :: <T>(T head, ImmutableList<T> tail) -> ImmutableList<T> = new PrependList(head, tail)
+	infix inline func :: <T>(head: T, tail: ImmutableList<T>) -> ImmutableList<T> = new PrependList<T>(head, tail)
 
-	infix inline func + <T>(ImmutableList<T> list, T element) -> ImmutableList<T> = list.added(element)
+	infix inline func + <T>(lhs: ImmutableList<T>, rhs: T) -> ImmutableList<T> = lhs.added(rhs)
 
-	infix inline func ++ <T>(ImmutableList<T> list, List<+T> elements) -> ImmutableList<T> = list.union(elements)
+	infix inline func ++ <T>(lhs: ImmutableList<T>, rhs: List<+T>) -> ImmutableList<T> = lhs.union(rhs)
 
-	infix inline func - <T>(ImmutableList<T> list, any element) -> ImmutableList<T> = list.removed(element)
+	infix inline func - <T>(lhs: ImmutableList<T>, rhs: any) -> ImmutableList<T> = lhs.removed(rhs)
 
-	infix inline func -- <T>(ImmutableList<T> list, List<_> elements) -> ImmutableList<T> = list.difference(elements)
+	infix inline func -- <T>(lhs: ImmutableList<T>, rhs: List<_>) -> ImmutableList<T> = lhs.difference(rhs)
 }

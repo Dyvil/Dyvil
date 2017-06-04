@@ -4,7 +4,7 @@ import dyvil.io.FileUtils
 import dyvil.tools.dpf.ast.RootNode
 import dyvil.tools.dpf.visitor._
 import dyvil.tools.parsing.marker.BaseMarkers
-import dyvil.tools.parsing.TokenIterator
+import dyvil.tools.parsing.{ TokenIterator, TokenList }
 import dyvil.tools.parsing.lexer.BaseSymbols
 import dyvil.tools.parsing.lexer.DyvilLexer
 import dyvil.tools.parsing.lexer.Tokens
@@ -16,41 +16,39 @@ using dyvil.tools.parsing.token.IToken.`type` as ttype
 
 import java.io.File
 
-public class Parser(
+public class Parser
+(
 	private let markers: MarkerList
 	private let tokens:  TokenIterator
-	)
+)
 {
-	static func apply(String code) -> Parser = Parser(new MarkerList(BaseMarkers.INSTANCE), code)
+	static func apply(code: String) -> Parser = Parser(new MarkerList(BaseMarkers.INSTANCE), code)
 
-	static func apply(MarkerList markers, String code) -> Parser
+	static func apply(markers: MarkerList, code: String) -> Parser
 	{
 		let tokens = new DyvilLexer(markers, BaseSymbols.INSTANCE).tokenize(code)
 		return Parser(markers, tokens)
 	}
 
-	static func apply(MarkerList markers, TokenIterator tokens) -> Parser = new Parser(markers, tokens)
+	static func apply(markers: MarkerList, tokens: TokenList) -> Parser = new Parser(markers, tokens.iterator)
 
-	public static RootNode parse(File file)
-	{
-		return parse(FileUtils.tryRead(file)!)
-	}
+	static func parse(file: File) -> RootNode = parse(FileUtils.tryRead(file)!)
 
-	public static RootNode parse(String code)
+	static func parse(code: String) -> RootNode
 	{
 		let root = new RootNode()
 		Parser(code).parseNodeBody(root)
 		return root
 	}
 
-	public void parseNodeBody(NodeVisitor visitor)
+	func parseNodeBody(visitor: NodeVisitor) -> void
 	{
-		while (this.tokens.hasNext() && this.parseNodeElement(visitor))
+		while (this.tokens.hasNext() && this.parseNodeElement(visitor)) {}
 
 		visitor.visitEnd()
 	}
 
-	public boolean parseNodeElement(NodeVisitor visitor)
+	func parseNodeElement(visitor: NodeVisitor) -> boolean
 	{
 		let token = this.tokens.next()
 		match token.ttype
@@ -90,7 +88,7 @@ public class Parser(
 		return true
 	}
 
-	public void parseValue(ValueVisitor valueVisitor)
+	func parseValue(valueVisitor: ValueVisitor) -> void
 	{
 		let token = this.tokens.next()
 		match token.ttype
@@ -192,7 +190,7 @@ public class Parser(
 		this.markers.add(new SyntaxError(token, "Invalid Value - Invalid " + token))
 	}
 
-	private void parseList(ListVisitor visitor)
+	private func parseList(visitor: ListVisitor) -> void
 	{
 		if (this.tokens.lastReturned.ttype == BaseSymbols.CLOSE_SQUARE_BRACKET)
 		{
@@ -205,7 +203,7 @@ public class Parser(
 		{
 			this.parseValue(visitor.visitElement())
 
-			IToken token = this.tokens.next()
+			let token = this.tokens.next()
 			match token.ttype
 			{
 				case BaseSymbols.COMMA => continue
@@ -221,7 +219,7 @@ public class Parser(
 		}
 	}
 
-	private void parseMap(MapVisitor visitor)
+	private func parseMap(visitor: MapVisitor) -> void
 	{
 		if (this.tokens.lastReturned.next.ttype == BaseSymbols.CLOSE_SQUARE_BRACKET)
 		{
@@ -261,7 +259,7 @@ public class Parser(
 		}
 	}
 
-	public void parseStringInterpolation(StringInterpolationVisitor visitor)
+	private func parseStringInterpolation(visitor: StringInterpolationVisitor) -> void
 	{
 		var token = this.tokens.lastReturned
 		visitor.visitStringPart(token.stringValue)
@@ -291,10 +289,10 @@ public class Parser(
 		}
 	}
 
-	private void parseAccessSequence(ValueVisitor visitor)
+	private func parseAccessSequence(visitor: ValueVisitor) -> void
 	{
 		var token = this.tokens.lastReturned()
-		while (token.hasNext() && token.next.ttype == BaseSymbols.DOT)
+		while (token.next.ttype == BaseSymbols.DOT)
 		{
 			token = token.next.next
 		}
@@ -310,7 +308,7 @@ public class Parser(
 		visitor.visitName(token.nameValue)
 	}
 
-	public void parseBuilder(BuilderVisitor visitor)
+	private func parseBuilder(visitor: BuilderVisitor) -> void
 	{
 		// button = Button(text: 'Hello') { visible = false }
 
@@ -337,7 +335,7 @@ public class Parser(
 		}
 	}
 
-	private void parseBuilderNode(BuilderVisitor visitor)
+	private func parseBuilderNode(visitor: BuilderVisitor) -> void
 	{
 		this.parseNodeBody(visitor.visitNode())
 
@@ -348,7 +346,7 @@ public class Parser(
 		}
 	}
 
-	private void parseParameters(BuilderVisitor visitor)
+	private func parseParameters(visitor: BuilderVisitor) -> void
 	{
 		var token = this.tokens.lastReturned().next()
 		if (token.ttype == BaseSymbols.CLOSE_PARENTHESIS)

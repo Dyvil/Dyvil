@@ -18,7 +18,7 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -26,7 +26,7 @@ import java.io.IOException;
 
 public final class WildcardType extends TypeDelegate implements IRawType, ITyped
 {
-	protected ICodePosition position;
+	protected SourcePosition position;
 	protected Variance      variance;
 
 	public WildcardType()
@@ -46,18 +46,24 @@ public final class WildcardType extends TypeDelegate implements IRawType, ITyped
 		this.type = type;
 	}
 
-	public WildcardType(ICodePosition position, Variance variance)
+	public WildcardType(SourcePosition position, Variance variance)
 	{
 		this.position = position;
 		this.variance = variance;
 		this.type = Types.NULLABLE_ANY;
 	}
 
-	public WildcardType(ICodePosition position, IType type, Variance variance)
+	public WildcardType(SourcePosition position, IType type, Variance variance)
 	{
 		this.position = position;
 		this.type = type;
 		this.variance = variance;
+	}
+
+	public static IType unapply(IType type)
+	{
+		final WildcardType extracted = type.extract(WildcardType.class);
+		return extracted != null ? extracted.type : type;
 	}
 
 	@Override
@@ -77,19 +83,19 @@ public final class WildcardType extends TypeDelegate implements IRawType, ITyped
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
 
 	@Override
-	public IType atPosition(ICodePosition position)
+	public IType atPosition(SourcePosition position)
 	{
 		return new WildcardType(position, this.type, this.variance);
 	}
@@ -128,33 +134,6 @@ public final class WildcardType extends TypeDelegate implements IRawType, ITyped
 	public boolean hasTypeVariables()
 	{
 		return this.type.hasTypeVariables();
-	}
-
-	@Override
-	public IType asReturnType()
-	{
-		if (this.variance == Variance.CONTRAVARIANT)
-		{
-			return Types.ANY;
-		}
-		return this.type;
-	}
-
-	@Override
-	public IType asParameterType()
-	{
-		if (this.type == null)
-		{
-			return this;
-		}
-
-		final IType type = this.type.asParameterType();
-		if (this.variance == Variance.CONTRAVARIANT)
-		{
-			return type;
-		}
-
-		return type == this.type ? this : new WildcardType(this.variance, type);
 	}
 
 	@Override
@@ -268,7 +247,7 @@ public final class WildcardType extends TypeDelegate implements IRawType, ITyped
 	@Override
 	public void writeAnnotations(TypeAnnotatableVisitor visitor, int typeRef, String typePath)
 	{
-		this.type.writeAnnotations(visitor, typeRef, typePath + '*');
+		IType.writeAnnotations(this.type, visitor, typeRef, typePath + '*');
 	}
 
 	@Override

@@ -3,6 +3,8 @@ package dyvil.tools.compiler.ast.method;
 import dyvil.annotation.Mutating;
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
+import dyvil.collection.Set;
+import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Handle;
@@ -51,7 +53,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SemanticError;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.lang.annotation.ElementType;
 
@@ -86,6 +88,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	protected           String        descriptor;
 	protected           String        signature;
 	protected @Nullable IntrinsicData intrinsicData;
+	protected @Nullable Set<IMethod>  overrideMethods;
 
 	public AbstractMethod(IClass enclosingClass)
 	{
@@ -111,7 +114,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		this.enclosingClass = enclosingClass;
 	}
 
-	public AbstractMethod(ICodePosition position, Name name, IType type, ModifierSet modifiers,
+	public AbstractMethod(SourcePosition position, Name name, IType type, ModifierSet modifiers,
 		                     AnnotationList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
@@ -568,7 +571,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public IValue checkArguments(MarkerList markers, ICodePosition position, IContext context, IValue receiver,
+	public IValue checkArguments(MarkerList markers, SourcePosition position, IContext context, IValue receiver,
 		                            ArgumentList arguments, GenericData genericData)
 	{
 		final ParameterList parameters = this.getParameters();
@@ -692,7 +695,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 	}
 
-	private void checkTypeVarsInferred(MarkerList markers, ICodePosition position, GenericData genericData)
+	private void checkTypeVarsInferred(MarkerList markers, SourcePosition position, GenericData genericData)
 	{
 		if (this.typeParameters == null)
 		{
@@ -726,7 +729,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	}
 
 	@Override
-	public void checkCall(MarkerList markers, ICodePosition position, IContext context, IValue instance,
+	public void checkCall(MarkerList markers, SourcePosition position, IContext context, IValue instance,
 		                     ArgumentList arguments, ITypeContext typeContext)
 	{
 		ModifierUtil.checkVisibility(this, position, markers, context);
@@ -795,24 +798,25 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return false;
 		}
 
+		final ParameterList thisParameters = this.getParameters();
 		final ParameterList candidateParameters = candidate.getParameters();
 
 		// Check Parameter Count
-		if (candidateParameters.size() != this.parameters.size())
+		if (candidateParameters.size() != thisParameters.size())
 		{
 			return false;
 		}
 
-		// The above checks can be made without checking the cache (CodeMethod) or resolving parameter types (ExternalMethod)
-		if (this.checkOverride0(candidate))
+		// Check the cache
+		if (this.overrideMethods != null && this.overrideMethods.contains(candidate))
 		{
 			return true;
 		}
 
 		// Check Parameter Types
-		for (int i = 0, count = this.parameters.size(); i < count; i++)
+		for (int i = 0, count = thisParameters.size(); i < count; i++)
 		{
-			final IType parType = this.parameters.get(i).getCovariantType().getConcreteType(typeContext);
+			final IType parType = thisParameters.get(i).getCovariantType().getConcreteType(typeContext);
 			final IType candidateParType = candidateParameters.get(i).getCovariantType().getConcreteType(typeContext);
 			if (!Types.isSameType(parType, candidateParType))
 			{
@@ -823,14 +827,19 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		return true;
 	}
 
-	protected boolean checkOverride0(IMethod candidate)
-	{
-		return false;
-	}
-
 	@Override
 	public void addOverride(IMethod method)
 	{
+		if (!this.enclosingClass.isSubClassOf(method.getEnclosingClass().getClassType()))
+		{
+			return;
+		}
+
+		if (this.overrideMethods == null)
+		{
+			this.overrideMethods = new IdentityHashSet<>();
+		}
+		this.overrideMethods.add(method);
 	}
 
 	@Override

@@ -1,15 +1,17 @@
 package dyvil.tools.compiler.ast.expression;
 
+import dyvil.lang.Formattable;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
+import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.constant.StringValue;
-import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -17,10 +19,8 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.CaseClasses;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.lexer.LexerUtil;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public final class StringInterpolationExpr implements IValue
 {
@@ -35,13 +35,13 @@ public final class StringInterpolationExpr implements IValue
 		}
 	}
 
-	protected ICodePosition position;
+	protected SourcePosition position;
 
 	private IValue[] values  = new IValue[2];
 	private String[] strings = new String[3];
 	private int valueCount;
 
-	public StringInterpolationExpr(ICodePosition position)
+	public StringInterpolationExpr(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -53,13 +53,13 @@ public final class StringInterpolationExpr implements IValue
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -239,7 +239,7 @@ public final class StringInterpolationExpr implements IValue
 
 		if (type != null)
 		{
-			Types.STRING.writeCast(writer, type, this.getLineNumber());
+			Types.STRING.writeCast(writer, type, this.lineNumber());
 		}
 	}
 
@@ -292,7 +292,7 @@ public final class StringInterpolationExpr implements IValue
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

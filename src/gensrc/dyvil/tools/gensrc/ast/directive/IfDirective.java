@@ -1,6 +1,10 @@
 package dyvil.tools.gensrc.ast.directive;
 
+import dyvil.lang.Formattable;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.gensrc.GenSrc;
+import dyvil.tools.gensrc.ast.expression.Expression;
+import dyvil.tools.gensrc.ast.scope.LazyScope;
 import dyvil.tools.gensrc.ast.scope.Scope;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -8,20 +12,37 @@ import java.io.PrintStream;
 
 public class IfDirective implements Directive
 {
-	public static final byte MODE_IF = 0;
-	public static final byte MODE_IFDEF = 1;
-	public static final byte MODE_IFNDEF = 2;
+	private SourcePosition position;
 
-	private final byte mode;
+	private Expression condition;
+	private Directive  thenBlock;
+	private Directive  elseBlock;
 
-	private final String condition;
-	private Directive thenBlock;
-	private Directive elseBlock;
+	public IfDirective(SourcePosition position)
+	{
+		this.position = position;
+	}
 
-	public IfDirective(String condition, byte mode)
+	@Override
+	public SourcePosition getPosition()
+	{
+		return this.position;
+	}
+
+	@Override
+	public void setPosition(SourcePosition position)
+	{
+		this.position = position;
+	}
+
+	public Expression getCondition()
+	{
+		return this.condition;
+	}
+
+	public void setCondition(Expression condition)
 	{
 		this.condition = condition;
-		this.mode = mode;
 	}
 
 	public Directive getThenBlock()
@@ -44,18 +65,9 @@ public class IfDirective implements Directive
 		this.elseBlock = elseBlock;
 	}
 
-	private boolean evaluate(Scope replacements)
+	private boolean evaluate(Scope scope)
 	{
-		switch (this.mode)
-		{
-		case MODE_IF:
-			return replacements.getBoolean(this.condition);
-		case MODE_IFDEF:
-			return replacements.isDefined(this.condition);
-		case MODE_IFNDEF:
-			return !replacements.isDefined(this.condition);
-		}
-		return false;
+		return this.condition.evaluateBoolean(scope);
 	}
 
 	@Override
@@ -63,49 +75,38 @@ public class IfDirective implements Directive
 	{
 		if (this.evaluate(scope))
 		{
-			this.thenBlock.specialize(gensrc, scope, markers, output);
+			this.thenBlock.specialize(gensrc, new LazyScope(scope), markers, output);
 		}
 		else if (this.elseBlock != null)
 		{
-			this.elseBlock.specialize(gensrc, scope, markers, output);
+			this.elseBlock.specialize(gensrc, new LazyScope(scope), markers, output);
 		}
 	}
 
 	@Override
 	public String toString()
 	{
-		return Directive.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override
 	public void toString(String indent, StringBuilder builder)
 	{
-		builder.append(indent);
+		// #if(condition) {then-block} #else {else-block}
 
-		switch (this.mode)
+		builder.append("#if (");
+		this.condition.toString(indent, builder);
+		builder.append(")");
+
+		if (this.thenBlock != null)
 		{
-		case MODE_IF:
-			builder.append("#if ");
-			break;
-		case MODE_IFDEF:
-			builder.append("#ifdef ");
-			break;
-		case MODE_IFNDEF:
-			builder.append("#ifndef ");
-			break;
+			BasicDirective.appendBody(indent, builder, this.thenBlock);
 		}
-
-		builder.append(this.condition).append('\n');
-
-		final String newIndent = indent + '\t';
-		this.thenBlock.toString(newIndent, builder);
 
 		if (this.elseBlock != null)
 		{
-			builder.append(indent).append("#else\n");
-			this.elseBlock.toString(newIndent, builder);
+			builder.append(indent).append("#else");
+			BasicDirective.appendBody(indent, builder, this.elseBlock);
 		}
-
-		builder.append(indent).append("#end\n");
 	}
 }

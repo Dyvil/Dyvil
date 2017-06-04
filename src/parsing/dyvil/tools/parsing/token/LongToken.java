@@ -1,11 +1,12 @@
 package dyvil.tools.parsing.token;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.tools.parsing.lexer.Tokens;
 
 public final class LongToken implements IToken
 {
-	private IToken prev;
-	private IToken next;
+	private @NonNull IToken prev;
+	private @NonNull IToken next;
 
 	private final int lineNumber;
 	private final int startColumn;
@@ -13,7 +14,7 @@ public final class LongToken implements IToken
 
 	private long value;
 
-	public LongToken(IToken prev, int lineNumber, int startColumn, int endColumn)
+	public LongToken(@NonNull IToken prev, int lineNumber, int startColumn, int endColumn)
 	{
 		this.prev = prev;
 		prev.setNext(this);
@@ -23,7 +24,7 @@ public final class LongToken implements IToken
 		this.endColumn = endColumn;
 	}
 
-	public LongToken(IToken prev, long value, int lineNumber, int startColumn, int endColumn)
+	public LongToken(@NonNull IToken prev, long value, int lineNumber, int startColumn, int endColumn)
 	{
 		this.prev = prev;
 		prev.setNext(this);
@@ -85,39 +86,27 @@ public final class LongToken implements IToken
 	}
 
 	@Override
-	public void setPrev(IToken prev)
+	public void setPrev(@NonNull IToken prev)
 	{
 		this.prev = prev;
 	}
 
 	@Override
-	public void setNext(IToken next)
+	public void setNext(@NonNull IToken next)
 	{
 		this.next = next;
 	}
 
 	@Override
-	public IToken prev()
+	public @NonNull IToken prev()
 	{
 		return this.prev;
 	}
 
 	@Override
-	public IToken next()
+	public @NonNull IToken next()
 	{
 		return this.next;
-	}
-
-	@Override
-	public boolean hasNext()
-	{
-		return this.next.type() != 0;
-	}
-
-	@Override
-	public boolean hasPrev()
-	{
-		return this.prev.type() != 0;
 	}
 
 	@Override

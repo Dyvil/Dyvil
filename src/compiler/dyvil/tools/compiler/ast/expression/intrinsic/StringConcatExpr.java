@@ -1,10 +1,12 @@
 package dyvil.tools.compiler.ast.expression.intrinsic;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.lang.Formattable;
 import dyvil.reflect.Opcodes;
-import dyvil.tools.compiler.ast.expression.constant.StringValue;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.constant.StringValue;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
@@ -13,9 +15,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.CaseClasses;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public class StringConcatExpr implements IValue
 {
@@ -56,15 +56,15 @@ public class StringConcatExpr implements IValue
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
-		final ICodePosition firstPos = this.values[0].getPosition();
-		final ICodePosition lastPos = this.values[this.valueCount - 1].getPosition();
+		final SourcePosition firstPos = this.values[0].getPosition();
+		final SourcePosition lastPos = this.values[this.valueCount - 1].getPosition();
 		return firstPos.to(lastPos);
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 	}
 
@@ -246,14 +246,14 @@ public class StringConcatExpr implements IValue
 
 		if (type != null)
 		{
-			Types.STRING.writeCast(writer, type, this.getLineNumber());
+			Types.STRING.writeCast(writer, type, this.lineNumber());
 		}
 	}
 
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

@@ -6,15 +6,15 @@ import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class OperatorElement
 {
 	public final Name          name;
-	public final ICodePosition position;
+	public final SourcePosition position;
 	protected    IOperator     operator;
 
-	public OperatorElement(Name name, ICodePosition position)
+	public OperatorElement(Name name, SourcePosition position)
 	{
 		this.name = name;
 		this.position = position;
@@ -60,7 +60,7 @@ public class OperatorElement
 		this.operator = operator;
 	}
 
-	public static void checkPosition(MarkerList markers, ICodePosition position, IOperator operator, byte expectedType)
+	public static void checkPosition(MarkerList markers, SourcePosition position, IOperator operator, byte expectedType)
 	{
 		if (!operator.isType(expectedType))
 		{

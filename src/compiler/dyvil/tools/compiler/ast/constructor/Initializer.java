@@ -17,7 +17,7 @@ import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.lang.annotation.ElementType;
 
@@ -28,7 +28,7 @@ public class Initializer extends Member implements IInitializer
 	// Metadata
 	protected IClass enclosingClass;
 
-	public Initializer(ICodePosition position, ModifierSet modifiers, AnnotationList annotations)
+	public Initializer(SourcePosition position, ModifierSet modifiers, AnnotationList annotations)
 	{
 		super(position, Names.init, Types.VOID, modifiers, annotations);
 	}

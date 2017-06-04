@@ -100,7 +100,6 @@ public final class DyvilCompiler extends BasicTool
 	private void loadConfigFile(String source)
 	{
 		final File file = new File(source);
-		this.config.setConfigFile(file);
 		if (!file.exists())
 		{
 			this.error(I18n.get("config.not_found", source));

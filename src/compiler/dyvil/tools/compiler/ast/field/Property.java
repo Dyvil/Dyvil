@@ -11,25 +11,23 @@ import dyvil.tools.compiler.ast.member.Member;
 import dyvil.tools.compiler.ast.method.CodeMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
-import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
+import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
-import dyvil.tools.compiler.ast.parameter.CodeParameter;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
+import dyvil.tools.compiler.ast.parameter.CodeParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
-import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
-import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -48,9 +46,9 @@ public class Property extends Member implements IProperty
 	protected IClass enclosingClass;
 
 	protected CodeParameter setterParameter;
-	protected ICodePosition initializerPosition;
+	protected SourcePosition initializerPosition;
 
-	public Property(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public Property(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
 	}
@@ -125,7 +123,7 @@ public class Property extends Member implements IProperty
 		this.setter = new CodeMethod(this.enclosingClass, name, Types.VOID, this.modifiers);
 		this.setter.setPosition(this.position);
 		this.setterParameter = new CodeParameter(this.setter, this.position, Names.newValue, this.type,
-		                                         EmptyModifiers.INSTANCE, null);
+		                                         new FlagModifierSet(), null);
 		this.setter.getParameters().add(this.setterParameter);
 
 		return this.setter;
@@ -144,13 +142,13 @@ public class Property extends Member implements IProperty
 	}
 
 	@Override
-	public ICodePosition getInitializerPosition()
+	public SourcePosition getInitializerPosition()
 	{
 		return this.initializerPosition;
 	}
 
 	@Override
-	public void setInitializerPosition(ICodePosition position)
+	public void setInitializerPosition(SourcePosition position)
 	{
 		this.initializerPosition = position;
 	}
@@ -176,13 +174,35 @@ public class Property extends Member implements IProperty
 
 		if (this.getter != null)
 		{
-			Field.copyModifiers(this.modifiers, this.getter.getModifiers());
+			final ModifierSet getterModifiers = this.getter.getModifiers();
+
+			// Add <generated> Modifier and copy Property Modifiers
+			getterModifiers.addIntModifier(Modifiers.GENERATED);
+			Field.copyModifiers(this.modifiers, getterModifiers);
+
+			// Copy Annotations
+			if (this.annotations != null)
+			{
+				this.getter.getAnnotations().addAll(this.annotations);
+			}
+
 			this.getter.setType(this.type);
 			this.getter.resolveTypes(markers, context);
 		}
 		if (this.setter != null)
 		{
-			Field.copyModifiers(this.modifiers, this.setter.getModifiers());
+			final ModifierSet setterModifiers = this.setter.getModifiers();
+
+			// Add <generated> Modifier and copy Property Modifiers
+			setterModifiers.addIntModifier(Modifiers.GENERATED);
+			Field.copyModifiers(this.modifiers, setterModifiers);
+
+			// Copy Annotations
+			if (this.annotations != null)
+			{
+				this.setter.getAnnotations().addAll(this.annotations);
+			}
+
 			this.setterParameter.setPosition(this.setter.getPosition());
 			this.setterParameter.setType(this.type);
 			this.setter.resolveTypes(markers, context);
@@ -323,91 +343,16 @@ public class Property extends Member implements IProperty
 
 	// Compilation
 
-	protected void writeAnnotations(MethodWriter mw, int modifiers)
-	{
-		if (this.annotations != null)
-		{
-			int count = this.annotations.size();
-			for (int i = 0; i < count; i++)
-			{
-				this.annotations.get(i).write(mw);
-			}
-		}
-
-		if ((modifiers & Modifiers.DEPRECATED) != 0 && this.getAnnotation(Deprecation.DEPRECATED_CLASS) == null)
-		{
-			mw.visitAnnotation(Deprecation.DYVIL_EXTENDED, true).visitEnd();
-		}
-	}
-
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		final String descriptorBase = this.type.getExtendedName();
-		final String signatureBase = this.type.needsSignature() ? this.type.getSignature() : null;
-		final String nameBase = this.name.qualified;
-
 		if (this.getter != null)
 		{
-			this.writeGetter(writer, descriptorBase, signatureBase, nameBase);
+			this.getter.write(writer);
 		}
 		if (this.setter != null)
 		{
-			this.writeSetter(writer, descriptorBase, signatureBase, nameBase);
-		}
-	}
-
-	private void writeSetter(ClassWriter writer, String descriptorBase, String signatureBase, String nameBase)
-	{
-		final IValue setterValue = this.setter.getValue();
-		final int modifiers = this.setter.getModifiers().toFlags();
-
-		final String name = nameBase + "_$eq";
-		final String descriptor = "(" + descriptorBase + ")V";
-		final String signature = signatureBase == null ? null : "(" + signatureBase + ")V";
-
-		final MethodWriter mw = new MethodWriterImpl(writer,
-		                                             writer.visitMethod(modifiers, name, descriptor, signature, null));
-
-		if ((modifiers & Modifiers.STATIC) == 0)
-		{
-			mw.setThisType(this.enclosingClass.getInternalName());
-		}
-
-		this.writeAnnotations(mw, modifiers);
-		this.setter.getParameters().write(mw);
-
-		if (setterValue != null)
-		{
-			mw.visitCode();
-			setterValue.writeExpression(mw, Types.VOID);
-			mw.visitEnd(Types.VOID);
-		}
-	}
-
-	private void writeGetter(ClassWriter writer, String descriptorBase, String signatureBase, String nameBase)
-	{
-		final IValue getterValue = this.getter.getValue();
-		final int modifiers = this.getter.getModifiers().toFlags();
-
-		final String descriptor = "()" + descriptorBase;
-		final String signature = signatureBase == null ? null : "()" + signatureBase;
-
-		final MethodWriter mw = new MethodWriterImpl(writer, writer.visitMethod(modifiers, nameBase, descriptor,
-		                                                                        signature, null));
-
-		if ((modifiers & Modifiers.STATIC) == 0)
-		{
-			mw.setThisType(this.enclosingClass.getInternalName());
-		}
-
-		this.writeAnnotations(mw, modifiers);
-
-		if (getterValue != null)
-		{
-			mw.visitCode();
-			getterValue.writeExpression(mw, this.type);
-			mw.visitEnd(this.type);
+			this.setter.write(writer);
 		}
 	}
 
@@ -533,21 +478,26 @@ public class Property extends Member implements IProperty
 
 	private static void formatGetter(IMethod getter, String prefix, StringBuilder buffer)
 	{
-		final String getterPrefix = Formatting.getIndent("property.getter.indent", prefix);
+		final String indent = Formatting.getIndent("property.getter.indent", prefix);
 
-		final IValue getterValue = getter.getValue();
-		final ModifierSet getterModifiers = getter.getModifiers();
+		final IValue value = getter.getValue();
+		final ModifierSet modifiers = getter.getModifiers();
+		final AnnotationList annotations = getter.getAnnotations();
 
-		buffer.append('\n').append(getterPrefix);
-		if (getterModifiers != null)
+		buffer.append('\n').append(indent);
+		if (annotations != null)
 		{
-			getterModifiers.toString(getter.getKind(), buffer);
+			annotations.toInlineString(indent, buffer);
+		}
+		if (modifiers != null)
+		{
+			modifiers.toString(getter.getKind(), buffer);
 		}
 		buffer.append("get");
 
-		if (getterValue != null)
+		if (value != null)
 		{
-			if (Util.formatStatementList(getterPrefix, buffer, getterValue))
+			if (Util.formatStatementList(indent, buffer, value))
 			{
 				return;
 			}
@@ -560,14 +510,14 @@ public class Property extends Member implements IProperty
 			buffer.append(':');
 			if (Formatting.getBoolean("property.getter.separator.newline_after"))
 			{
-				buffer.append('\n').append(getterPrefix);
+				buffer.append('\n').append(indent);
 			}
 			else if (Formatting.getBoolean("property.getter.separator.space_after"))
 			{
 				buffer.append(' ');
 			}
 
-			getterValue.toString(getterPrefix, buffer);
+			value.toString(indent, buffer);
 		}
 
 		if (Formatting.getBoolean("property.getter.semicolon"))
@@ -578,12 +528,18 @@ public class Property extends Member implements IProperty
 
 	private static void formatSetter(IMethod setter, String prefix, StringBuilder buffer)
 	{
-		final String setterPrefix = Formatting.getIndent("property.setter.indent", prefix);
-		final IValue setterValue = setter.getValue();
+		final String indent = Formatting.getIndent("property.setter.indent", prefix);
+
+		final IValue value = setter.getValue();
 		final ModifierSet setterModifiers = setter.getModifiers();
+		final AnnotationList annotations = setter.getAnnotations();
 		final Name setterParameterName = setter.getParameters().get(0).getName();
 
-		buffer.append('\n').append(setterPrefix);
+		buffer.append('\n').append(indent);
+		if (annotations != null)
+		{
+			annotations.toInlineString(indent, buffer);
+		}
 		if (setterModifiers != null)
 		{
 			setterModifiers.toString(setter.getKind(), buffer);
@@ -597,9 +553,9 @@ public class Property extends Member implements IProperty
 			Formatting.appendSeparator(buffer, "property.setter.parameter.close_paren", ')');
 		}
 
-		if (setterValue != null)
+		if (value != null)
 		{
-			if (Util.formatStatementList(setterPrefix, buffer, setterValue))
+			if (Util.formatStatementList(indent, buffer, value))
 			{
 				return;
 			}
@@ -612,14 +568,14 @@ public class Property extends Member implements IProperty
 			buffer.append(':');
 			if (Formatting.getBoolean("property.setter.separator.newline_after"))
 			{
-				buffer.append('\n').append(setterPrefix);
+				buffer.append('\n').append(indent);
 			}
 			else if (Formatting.getBoolean("property.setter.separator.space_after"))
 			{
 				buffer.append(' ');
 			}
 
-			setterValue.toString(setterPrefix, buffer);
+			value.toString(indent, buffer);
 		}
 
 		if (Formatting.getBoolean("property.setter.semicolon"))

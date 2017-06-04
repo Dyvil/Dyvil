@@ -1,63 +1,63 @@
 package dyvil.tools.parsing.lexer;
 
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.TokenIterator;
+import dyvil.tools.parsing.TokenList;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.marker.SyntaxError;
-import dyvil.tools.parsing.position.CodePosition;
-import dyvil.tools.parsing.position.ICodePosition;
 import dyvil.tools.parsing.token.*;
 
 import static dyvil.tools.parsing.lexer.BaseSymbols.*;
 import static dyvil.tools.parsing.lexer.Tokens.*;
 
-public final class DyvilLexer
+public final class DyvilLexer extends Lexer
 {
-	private MarkerList markers;
-	private Symbols    symbols;
-
-	private String        code;
-	private int           length;
-	private TokenIterator tokens;
-
-	private StringBuilder buffer = new StringBuilder();
-
-	private int cursor;
-	private int column;
-	private int line = 1;
-	private int stringParens;
+	private int     stringParens;
+	private boolean interpolationEnd;
 
 	public DyvilLexer(MarkerList markers, Symbols symbols)
 	{
-		this.markers = markers;
-		this.symbols = symbols;
+		super(markers, symbols);
 	}
 
-	public TokenIterator tokenize(String code)
+	/**
+	 * If this method was called before tokenization, the lexer will behave as if it started after the \( part
+	 */
+	public void setInterpolationEnd()
 	{
-		this.tokens = new TokenIterator();
-		this.code = code;
-		this.length = code.length();
+		this.stringParens = 1;
+		this.interpolationEnd = true;
+	}
 
+	@Override
+	public TokenList tokenize(String code, int cursor, int line, int column)
+	{
+		this.init(code, cursor, line, column);
+
+		loop:
 		while (true)
 		{
 			final int currentChar = this.codePoint();
-			if (currentChar == 0)
+			switch (currentChar)
 			{
-				break;
+			case 0:
+				break loop;
+			case ')':
+				if (this.stringParens == 1 && this.interpolationEnd)
+				{
+					break loop;
+				}
 			}
 
 			this.parseCharacter(currentChar);
 		}
 
-		this.tokens.append(new EndToken(this.cursor, this.line));
-		this.tokens.reset();
+		this.finish();
 		return this.tokens;
 	}
 
 	// Parsing
 
-	private void parseCharacter(int currentChar)
+	@Override
+	protected void parseCharacter(int currentChar)
 	{
 		switch (currentChar)
 		{
@@ -917,57 +917,5 @@ public final class DyvilLexer
 		this.advance();
 		this.error("escape.invalid");
 		this.advance();
-	}
-
-	// Utility Methods
-
-	private int codePoint()
-	{
-		return this.cursor >= this.length ? 0 : this.code.codePointAt(this.cursor);
-	}
-
-	private int nextCodePoint()
-	{
-		return this.cursor + 1 >= this.length ? 0 : this.code.codePointAt(this.cursor + 1);
-	}
-
-	private int advance()
-	{
-		this.cursor++;
-		return this.column++;
-	}
-
-	private void advance2()
-	{
-		this.cursor += 2;
-		this.column += 2;
-	}
-
-	private void advance(int currentChar)
-	{
-		this.cursor += Character.charCount(currentChar);
-		this.column++;
-	}
-
-	private void newLine()
-	{
-		this.line++;
-		this.column = 0;
-		this.cursor++;
-	}
-
-	private void clearBuffer()
-	{
-		this.buffer.delete(0, this.buffer.length());
-	}
-
-	private void error(String key)
-	{
-		this.error(new CodePosition(this.line, this.column, this.column + 1), key);
-	}
-
-	private void error(ICodePosition position, String key)
-	{
-		this.markers.add(new SyntaxError(position, this.markers.getI18n().getString(key)));
 	}
 }

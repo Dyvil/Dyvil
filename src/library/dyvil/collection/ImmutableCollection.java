@@ -81,7 +81,7 @@ public interface ImmutableCollection<@Covariant E> extends Collection<E>
 
 	@NonNull
 	@Override
-	ImmutableCollection<E> filtered(@NonNull Predicate<? super E> condition);
+	ImmutableCollection<E> filtered(@NonNull Predicate<? super E> predicate);
 
 	// Mutating Operations
 
@@ -140,7 +140,7 @@ public interface ImmutableCollection<@Covariant E> extends Collection<E>
 
 	@Override
 	@Mutating
-	default void filter(@NonNull Predicate<? super E> condition)
+	default void filter(@NonNull Predicate<? super E> predicate)
 	{
 		throw new ImmutableException("filter() on Immutable Collection");
 	}

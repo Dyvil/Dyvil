@@ -1,0 +1,16 @@
+package dyvil.source.position
+
+interface Positioned
+{
+	var position: SourcePosition!
+	{
+		get: this.getPosition()
+		set: this.setPosition(newValue)
+	}
+
+	func getPosition() -> SourcePosition!
+
+	func setPosition(position: SourcePosition!) -> void
+
+	func lineNumber() -> int = this.position?.startLine ?? 0
+}

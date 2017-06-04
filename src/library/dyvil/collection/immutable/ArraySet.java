@@ -295,14 +295,14 @@ public class ArraySet<E> extends AbstractArraySet<E> implements ImmutableSet<E>
 
 	@NonNull
 	@Override
-	public ImmutableSet<E> filtered(@NonNull Predicate<? super E> condition)
+	public ImmutableSet<E> filtered(@NonNull Predicate<? super E> predicate)
 	{
 		Object[] newArray = new Object[this.size];
 		int index = 0;
 		for (int i = 0; i < this.size; i++)
 		{
 			Object element = this.elements[i];
-			if (condition.test((E) element))
+			if (predicate.test((E) element))
 			{
 				newArray[index++] = element;
 			}

@@ -1,27 +1,27 @@
 package dyvil.test
 
-public interface Test
+interface Test
 {
 	// Test Containers
 
-	public interface TestContainerBase
+	interface TestContainerBase
 	{
-		func addTest(Test test) -> void
+		func add(test: Test) -> void
 
-		func applyStatement(Test test) -> void = this.addTest(test)
+		func applyStatement(test: Test) -> void = this.add(test)
 	}
 
-	public case class TestContainer(
-		public let name: String
+	case class TestContainer(
+		let name: String
 	) implements Test, TestContainerBase
 	{
 		protected let subTests: List<Test> = MutableList<Test>()
 
-		override func addTest(Test test) -> void = this.subTests.add(test)
+		override func add(test: Test) -> void = this.subTests.add(test)
 
-		override func passes() -> boolean = this.subTests.allMatch(t => t.passes)
+		override func passes() -> boolean = this.subTests.allMatch(_.passes())
 
-		override func addErrors(List<String> errors) -> void
+		override func addErrors(errors: List<String>) -> void
 		{
 			let subErrors = MutableList<String>()
 			for (subTest <- this.subTests)
@@ -39,41 +39,37 @@ public interface Test
 		}
 	}
 
-	static func test(String name, Configure<TestContainerBase> configure) -> TestContainer
-	{
-		let container = new TestContainer(name)
-		configure container
-		return container
-	}
+	static func test(name: String, configure: Configure<TestContainerBase>) -> TestContainer
+		= new TestContainer(name).use(configure)
 
 	// Boolean Requirement Tests
 
-	public static case class RequireTest(
-		public let predicate: -> boolean
+	static case class RequireTest(
+		let predicate: -> boolean
 	) implements Test
 	{
-		override func passes() -> boolean = this.predicate.apply
+		override func passes() -> boolean = this.predicate.apply()
 
-		override func addErrors(List<String> errors) -> void
+		override func addErrors(errors: List<String>) -> void
 		{
 			if (this.passes) return
 			errors.add("Generic Requirement failed")
 		}
 	}
 
-	static func require(-> boolean predicate) -> RequireTest = RequireTest(predicate)
+	static func require(predicate: -> boolean) -> RequireTest = RequireTest(predicate)
 
 	// Equality Tests
 
-	public static case class EqualityTest(
-		public let actual: Object!
-		public let expected: Object!
-		public let inverted: boolean = false
+	static case class EqualityTest(
+		let actual: Object!
+		let expected: Object!
+		let inverted: boolean = false
 	) implements Test
 	{
 		override func passes() -> boolean = [this.actual].deepEquals([this.expected]) != this.inverted
 
-		override func addErrors(List<String> errors) -> void
+		override func addErrors(errors: List<String>) -> void
 		{
 			if (this.passes) return
 
@@ -90,15 +86,15 @@ public interface Test
 		}
 	}
 
-	infix func =?=(Object! lhs, Object! rhs) -> EqualityTest = EqualityTest(lhs, rhs, false)
+	infix func =?=(lhs: Object!, rhs: Object!) -> EqualityTest = EqualityTest(lhs, rhs, false)
 
-	infix func =!=(Object! lhs, Object! rhs) -> EqualityTest = EqualityTest(lhs, rhs, true)
+	infix func =!=(lhs: Object!, rhs: Object!) -> EqualityTest = EqualityTest(lhs, rhs, true)
 
 	// Expect Throwable Tests
 
-	public static case class ExpectTest(
-		public let block: -> void
-		public let errors: Class<+Throwable>...
+	static case class ExpectTest(
+		let block: -> void
+		let errors: Class<+Throwable>...
 	) implements Test
 	{
 		override func passes() -> boolean
@@ -107,7 +103,7 @@ public interface Test
 			{
 				this.block.apply()
 			}
-			catch (Throwable t)
+			catch (t: Throwable)
 			{
 				for (e <- this.errors) if (e.isInstance(t)) return true
 				throw t
@@ -115,7 +111,7 @@ public interface Test
 			return false
 		}
 
-		override func addErrors(List<String> errors) -> void
+		override func addErrors(errors: List<String>) -> void
 		{
 			if (this.passes) return
 
@@ -124,11 +120,11 @@ public interface Test
 		}
 	}
 
-	static func expect(Class<+Throwable>... errors, -> void from) -> ExpectTest = ExpectTest(from, errors...)
+	static func expect(errors: Class<+Throwable>..., from: -> void) -> ExpectTest = ExpectTest(from, errors...)
 
 	// Test Methods
 
 	func passes() -> boolean
 
-	func addErrors(List<String> errors) -> void
+	func addErrors(errors: List<String>) -> void
 }

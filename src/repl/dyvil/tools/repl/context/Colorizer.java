@@ -5,7 +5,7 @@ import dyvil.collection.mutable.ArrayList;
 import dyvil.io.Console;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.TokenIterator;
+import dyvil.tools.parsing.TokenList;
 import dyvil.tools.parsing.lexer.DyvilLexer;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -18,25 +18,17 @@ public class Colorizer
 	{
 		final TextSource source = new TextSource(text);
 
-		final TokenIterator tokens = new DyvilLexer(new MarkerList(Markers.INSTANCE), DyvilSymbols.INSTANCE)
+		final TokenList tokens = new DyvilLexer(new MarkerList(Markers.INSTANCE), DyvilSymbols.INSTANCE)
 			                             .tokenize(text);
 
-		List<StringBuilder> lines = new ArrayList<>(source.lineCount());
+		final List<StringBuilder> lines = new ArrayList<>(source.lineCount());
 		for (int i = 0, count = source.lineCount(); i < count; i++)
 		{
 			lines.add(new StringBuilder(source.getLine(i + 1)));
 		}
 
-		// find the last token
-		IToken last = tokens.next();
-		while (last.hasNext())
-		{
-			last = last.next();
-		}
-
-		// iterate, starting from the last
-		IToken token = last;
-		while (true)
+		// iterate, starting from the last token
+		for (IToken token = tokens.last(); token != null && token.type() != Tokens.EOF; token = token.prev())
 		{
 			final String color = tokenColor(token, context);
 			if (color != null)
@@ -46,12 +38,6 @@ public class Colorizer
 				line.insert(token.endColumn(), Console.ANSI_RESET);
 				line.insert(token.startColumn(), color);
 			}
-
-			if (!token.hasPrev())
-			{
-				break;
-			}
-			token = token.prev();
 		}
 
 		return lines.reduce((stringBuilder, s) -> stringBuilder.append('\n').append(s)).toString();

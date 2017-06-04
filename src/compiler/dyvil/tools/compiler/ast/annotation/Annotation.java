@@ -1,7 +1,9 @@
 package dyvil.tools.compiler.ast.annotation;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.lang.Formattable;
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
@@ -12,7 +14,10 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
-import dyvil.tools.compiler.ast.parameter.*;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
+import dyvil.tools.compiler.ast.parameter.CodeParameter;
+import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.IType.TypePosition;
@@ -22,10 +27,8 @@ import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -51,7 +54,7 @@ public final class Annotation implements IAnnotation
 
 	public static final CodeParameter VALUE = new CodeParameter(Name.fromRaw("value"));
 
-	protected ICodePosition position;
+	protected SourcePosition position;
 	protected ArgumentList arguments = ArgumentList.EMPTY;
 
 	// Metadata
@@ -66,25 +69,25 @@ public final class Annotation implements IAnnotation
 		this.type = type;
 	}
 
-	public Annotation(ICodePosition position)
+	public Annotation(SourcePosition position)
 	{
 		this.position = position;
 	}
 
-	public Annotation(ICodePosition position, IType type)
+	public Annotation(SourcePosition position, IType type)
 	{
 		this.position = position;
 		this.type = type;
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -295,7 +298,7 @@ public final class Annotation implements IAnnotation
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

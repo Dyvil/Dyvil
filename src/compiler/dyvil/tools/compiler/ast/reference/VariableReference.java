@@ -9,7 +9,7 @@ import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class VariableReference implements IReference
 {
@@ -26,7 +26,7 @@ public class VariableReference implements IReference
 	}
 
 	@Override
-	public void check(ICodePosition position, MarkerList markers, IContext context)
+	public void check(SourcePosition position, MarkerList markers, IContext context)
 	{
 		InstanceFieldReference.checkFinalAccess(this.fieldAccess.getField(), position, markers);
 	}

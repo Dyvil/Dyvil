@@ -8,16 +8,16 @@ public interface Scope
 
 	Scope getGlobalParent();
 
-	String getReplacement(String key);
-
 	default boolean isDefined(String key)
 	{
-		return this.getReplacement(key) != null;
+		return this.getString(key) != null;
 	}
+
+	String getString(String key);
 
 	default boolean getBoolean(String key)
 	{
-		final String substitution = this.getReplacement(key);
+		final String substitution = this.getString(key);
 		if (substitution == null)
 		{
 			return false;

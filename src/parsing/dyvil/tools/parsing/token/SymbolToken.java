@@ -1,13 +1,14 @@
 package dyvil.tools.parsing.token;
 
+import dyvil.annotation.internal.NonNull;
 import dyvil.tools.parsing.lexer.Symbols;
 
 public final class SymbolToken implements IToken
 {
 	private Symbols symbols;
 
-	private IToken prev;
-	private IToken next;
+	private @NonNull IToken prev;
+	private @NonNull IToken next;
 
 	private final int type;
 
@@ -22,7 +23,7 @@ public final class SymbolToken implements IToken
 		this.startColumn = startColumn;
 	}
 
-	public SymbolToken(Symbols symbols, IToken prev, int type, int lineNumber, int startColumn)
+	public SymbolToken(Symbols symbols, @NonNull IToken prev, int type, int lineNumber, int startColumn)
 	{
 		this.symbols = symbols;
 		this.prev = prev;
@@ -70,39 +71,27 @@ public final class SymbolToken implements IToken
 	}
 
 	@Override
-	public void setPrev(IToken prev)
+	public void setPrev(@NonNull IToken prev)
 	{
 		this.prev = prev;
 	}
 
 	@Override
-	public void setNext(IToken next)
+	public void setNext(@NonNull IToken next)
 	{
 		this.next = next;
 	}
 
 	@Override
-	public IToken prev()
+	public @NonNull IToken prev()
 	{
 		return this.prev;
 	}
 
 	@Override
-	public IToken next()
+	public @NonNull IToken next()
 	{
 		return this.next;
-	}
-
-	@Override
-	public boolean hasNext()
-	{
-		return this.next.type() != 0;
-	}
-
-	@Override
-	public boolean hasPrev()
-	{
-		return this.prev.type() != 0;
 	}
 
 	@Override

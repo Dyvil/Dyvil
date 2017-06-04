@@ -37,7 +37,7 @@ import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.parsing.source.TextSource;
 import dyvil.tools.repl.DyvilREPL;
 
@@ -329,7 +329,7 @@ public class REPLContext extends AbstractHeader
 	}
 
 	@Override
-	public REPLVariable createDataMember(ICodePosition position, Name name, IType type, ModifierSet modifiers,
+	public REPLVariable createDataMember(SourcePosition position, Name name, IType type, ModifierSet modifiers,
 		                                    AnnotationList annotations)
 	{
 		return new REPLVariable(this, position, name, type, modifiers, annotations);

@@ -9,7 +9,6 @@ import dyvil.collection.ImmutableSet;
 import dyvil.collection.MutableSet;
 import dyvil.collection.Set;
 import dyvil.collection.iterator.EmptyIterator;
-import dyvil.lang.LiteralConvertible;
 import dyvil.reflect.Modifiers;
 
 import java.util.Collections;
@@ -133,7 +132,7 @@ public final class EmptySet<E> implements ImmutableSet<E>
 
 	@NonNull
 	@Override
-	public ImmutableSet<E> filtered(@NonNull Predicate<? super E> condition)
+	public ImmutableSet<E> filtered(@NonNull Predicate<? super E> predicate)
 	{
 		return this;
 	}
@@ -145,7 +144,7 @@ public final class EmptySet<E> implements ImmutableSet<E>
 	}
 
 	@Override
-	public E @NonNull [] toArray(@NonNull Class<E> type)
+	public <R> R @NonNull [] toArray(@NonNull Class<R> type)
 	{
 		return ObjectArray.ofType(0, type);
 	}

@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.annotation.internal.Nullable;
 import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -20,16 +21,18 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.lang.annotation.ElementType;
 
 public abstract class AbstractParameter extends Variable implements IParameter
 {
 	// Metadata
-	protected ICallableMember method;
-	protected int             index;
-	private   IType           covariantType;
+	protected @Nullable ICallableMember method;
+
+	protected int index;
+
+	private IType covariantType;
 
 	public AbstractParameter()
 	{
@@ -45,13 +48,13 @@ public abstract class AbstractParameter extends Variable implements IParameter
 		super(name, type);
 	}
 
-	public AbstractParameter(ICallableMember callable, ICodePosition position, Name name, IType type)
+	public AbstractParameter(ICallableMember callable, SourcePosition position, Name name, IType type)
 	{
 		super(position, name, type);
 		this.method = callable;
 	}
 
-	public AbstractParameter(ICallableMember callable, ICodePosition position, Name name, IType type,
+	public AbstractParameter(ICallableMember callable, SourcePosition position, Name name, IType type,
 		                        ModifierSet modifiers, AnnotationList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
@@ -165,6 +168,11 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
+		if (this.method != null && this.method.hasModifier(Modifiers.GENERATED))
+		{
+			this.getModifiers().addIntModifier(Modifiers.GENERATED);
+		}
+
 		super.resolveTypes(markers, context);
 
 		if (this.value != null)
@@ -204,12 +212,7 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	{
 		if (this.annotations != null)
 		{
-			int count = this.annotations.size();
-			for (int i = 0; i < count; i++)
-			{
-				this.annotations.get(i).toString(indent, buffer);
-				buffer.append(' ');
-			}
+			this.annotations.toInlineString(indent, buffer);
 		}
 
 		if (this.modifiers != null)

@@ -1,6 +1,6 @@
 package dyvil.tools.parsing.marker;
 
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.parsing.source.Source;
 
 public class IgnoredMarker extends Marker
@@ -9,7 +9,7 @@ public class IgnoredMarker extends Marker
 	
 	private IgnoredMarker()
 	{
-		super(ICodePosition.ORIGIN, "");
+		super(SourcePosition.ORIGIN, "");
 	}
 	
 	@Override

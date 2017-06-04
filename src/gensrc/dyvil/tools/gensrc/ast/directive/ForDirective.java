@@ -1,83 +1,107 @@
 package dyvil.tools.gensrc.ast.directive;
 
+import dyvil.lang.Formattable;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.gensrc.GenSrc;
-import dyvil.tools.gensrc.ast.Util;
+import dyvil.tools.gensrc.ast.expression.Expression;
 import dyvil.tools.gensrc.ast.scope.LazyScope;
 import dyvil.tools.gensrc.ast.scope.Scope;
-import dyvil.tools.gensrc.lang.I18n;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.marker.SemanticError;
-import dyvil.tools.parsing.position.ICodePosition;
 
 import java.io.PrintStream;
 
 public class ForDirective implements Directive
 {
-	private final ICodePosition position;
-	private final String        varName;
-	private final String        start;
-	private final String        end;
+	protected Name          varName;
+	protected Expression    iterable;
+	protected DirectiveList body;
 
-	private Directive action;
+	// Metadata
+	protected SourcePosition position;
 
-	public ForDirective(ICodePosition position, String varName, String start, String end)
+	public ForDirective(SourcePosition position)
 	{
 		this.position = position;
+	}
+
+	public Name getVarName()
+	{
+		return this.varName;
+	}
+
+	public void setVarName(Name varName)
+	{
 		this.varName = varName;
-		this.start = start;
-		this.end = end;
 	}
 
-	public Directive getAction()
+	public Expression getIterable()
 	{
-		return this.action;
+		return this.iterable;
 	}
 
-	public void setAction(Directive action)
+	public void setIterable(Expression list)
 	{
-		this.action = action;
+		this.iterable = list;
+	}
+
+	public DirectiveList getBody()
+	{
+		return this.body;
+	}
+
+	public void setBody(DirectiveList body)
+	{
+		this.body = body;
+	}
+
+	@Override
+	public SourcePosition getPosition()
+	{
+		return this.position;
+	}
+
+	@Override
+	public void setPosition(SourcePosition position)
+	{
+		this.position = position;
 	}
 
 	@Override
 	public void specialize(GenSrc gensrc, Scope scope, MarkerList markers, PrintStream output)
 	{
-		final int start;
-		final int end;
-
-		try
+		for (Expression expr : this.iterable.evaluateIterable(scope))
 		{
-			start = Integer.parseInt(Util.processLine(this.start, scope));
-			end = Integer.parseInt(Util.processLine(this.end, scope));
-		}
-		catch (NumberFormatException ignored)
-		{
-			markers.add(new SemanticError(this.position, I18n.get("for.start_end.invalid")));
-			return;
-		}
+			final LazyScope innerScope = new LazyScope(scope);
+			innerScope.define(this.varName.qualified, expr.evaluateString(scope));
 
-		final LazyScope forScope = new LazyScope(scope);
-
-		for (int i = start; i <= end; i++)
-		{
-			forScope.define(this.varName, Integer.toString(i));
-			this.action.specialize(gensrc, forScope, markers, output);
+			this.body.specialize(gensrc, innerScope, markers, output);
 		}
 	}
 
 	@Override
 	public String toString()
 	{
-		return Directive.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override
 	public void toString(String indent, StringBuilder builder)
 	{
-		builder.append(indent).append("#for ").append(this.varName).append(' ').append(this.start).append(' ')
-		       .append(this.end).append('\n');
+		builder.append("#for (").append(this.varName).append(" <- ");
+		if (this.iterable != null)
+		{
+			this.iterable.toString(indent, builder);
+		}
+		builder.append(')');
 
-		this.action.toString(indent + '\t', builder);
-
-		builder.append(indent).append("#end\n");
+		if (this.body != null)
+		{
+			BasicDirective.appendBody(indent, builder, this.body);
+		}
+		else
+		{
+			builder.append('\n');
+		}
 	}
 }

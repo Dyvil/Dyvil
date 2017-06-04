@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.pattern.constant;
 
+import dyvil.lang.Formattable;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.pattern.Pattern;
@@ -9,16 +11,14 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.lexer.LexerUtil;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public final class StringPattern extends Pattern
 {
 	private String value;
 	
-	public StringPattern(ICodePosition position, String value)
+	public StringPattern(SourcePosition position, String value)
 	{
 		this.position = position;
 		this.value = value;
@@ -112,7 +112,7 @@ public final class StringPattern extends Pattern
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

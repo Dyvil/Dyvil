@@ -2,7 +2,7 @@ package dyvil.tools.compiler.util;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.tools.parsing.marker.*;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 import dyvil.util.I18n;
 import dyvil.util.MarkerLevel;
 
@@ -151,7 +151,7 @@ public final class Markers
 		return level;
 	}
 
-	public static Marker withText(ICodePosition position, MarkerLevel level, String text)
+	public static Marker withText(SourcePosition position, MarkerLevel level, String text)
 	{
 		switch (level)
 		{
@@ -166,62 +166,62 @@ public final class Markers
 		}
 	}
 
-	public static Marker semantic(ICodePosition position, String key)
+	public static Marker semantic(SourcePosition position, String key)
 	{
 		return withText(position, getMarkerLevel(key), semanticMessage(key));
 	}
 
-	public static Marker semantic(ICodePosition position, String key, Object... args)
+	public static Marker semantic(SourcePosition position, String key, Object... args)
 	{
 		return withText(position, getMarkerLevel(key), semanticMessage(key, args));
 	}
 
-	public static Marker semantic(ICodePosition position, MarkerLevel level, String key)
+	public static Marker semantic(SourcePosition position, MarkerLevel level, String key)
 	{
 		return withText(position, level, semanticMessage(key));
 	}
 
-	public static Marker semantic(ICodePosition position, MarkerLevel level, String key, Object... args)
+	public static Marker semantic(SourcePosition position, MarkerLevel level, String key, Object... args)
 	{
 		return withText(position, level, semanticMessage(key, args));
 	}
 
-	public static Marker semanticError(ICodePosition position, String key)
+	public static Marker semanticError(SourcePosition position, String key)
 	{
 		return new SemanticError(position, semanticMessage(key));
 	}
 
-	public static Marker semanticError(ICodePosition position, String key, Object... args)
+	public static Marker semanticError(SourcePosition position, String key, Object... args)
 	{
 		return new SemanticError(position, semanticMessage(key, args));
 	}
 
-	public static Marker semanticWarning(ICodePosition position, String key)
+	public static Marker semanticWarning(SourcePosition position, String key)
 	{
 		return new Warning(position, semanticMessage(key));
 	}
 
-	public static Marker semanticWarning(ICodePosition position, String key, Object... args)
+	public static Marker semanticWarning(SourcePosition position, String key, Object... args)
 	{
 		return new Warning(position, semanticMessage(key, args));
 	}
 
-	public static Marker syntaxWarning(ICodePosition position, String key)
+	public static Marker syntaxWarning(SourcePosition position, String key)
 	{
 		return new Warning(position, syntaxMessage(key));
 	}
 
-	public static Marker syntaxWarning(ICodePosition position, String key, Object... args)
+	public static Marker syntaxWarning(SourcePosition position, String key, Object... args)
 	{
 		return new Warning(position, syntaxMessage(key, args));
 	}
 
-	public static Marker syntaxError(ICodePosition position, String key)
+	public static Marker syntaxError(SourcePosition position, String key)
 	{
 		return new SyntaxError(position, syntaxMessage(key));
 	}
 
-	public static Marker syntaxError(ICodePosition position, String key, Object... args)
+	public static Marker syntaxError(SourcePosition position, String key, Object... args)
 	{
 		return new SyntaxError(position, syntaxMessage(key, args));
 	}

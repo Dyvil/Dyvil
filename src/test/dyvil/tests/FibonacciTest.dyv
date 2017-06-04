@@ -14,7 +14,7 @@ public class FibonacciTest
 		}
 	}
 
-	static func fibonacciSequence(int n) -> List<int>
+	static func fibonacciSequence(n: int) -> List<int>
 	{
 		let list: MutableList<int> = [ 1, 1 ]
 
@@ -26,5 +26,5 @@ public class FibonacciTest
 		return list
 	}
 
-	static func fibonacci(int n) -> int = if n <= 1 { 1 } else fibonacci(n - 1) + fibonacci(n - 2)
+	static func fibonacci(n: int) -> int = if n <= 1 { 1 } else fibonacci(n - 1) + fibonacci(n - 2)
 }

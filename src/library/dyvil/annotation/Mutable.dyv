@@ -4,4 +4,4 @@ import java.lang.annotation._
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target([ ElementType.TYPE, ElementType.TYPE_USE ])
-public @interface Mutable
+@interface Mutable

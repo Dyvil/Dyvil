@@ -22,12 +22,12 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.SideEffectHelper;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.ASTNode;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
-public interface IValue extends IASTNode, ITyped
+public interface IValue extends ASTNode, ITyped
 {
 	// --- Expression IDs ---
 
@@ -186,12 +186,12 @@ public interface IValue extends IASTNode, ITyped
 		return null;
 	}
 
-	default IValue toAssignment(IValue rhs, ICodePosition position)
+	default IValue toAssignment(IValue rhs, SourcePosition position)
 	{
 		return null;
 	}
 
-	default IValue toCompoundAssignment(IValue rhs, ICodePosition position, MarkerList markers, IContext context,
+	default IValue toCompoundAssignment(IValue rhs, SourcePosition position, MarkerList markers, IContext context,
 		                                   SideEffectHelper helper)
 	{
 		return null;

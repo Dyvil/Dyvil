@@ -235,12 +235,12 @@ public class IdentityHashSet<E> extends AbstractIdentityHashSet<E> implements Mu
 	}
 
 	@Override
-	public void filter(@NonNull Predicate<? super E> condition)
+	public void filter(@NonNull Predicate<? super E> predicate)
 	{
 		for (int i = 0; i < this.table.length; i++)
 		{
 			Object o = this.table[i];
-			if (o != null && !condition.test((E) unmaskNull(o)))
+			if (o != null && !predicate.test((E) unmaskNull(o)))
 			{
 				this.table[i] = null;
 			}

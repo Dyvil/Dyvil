@@ -20,11 +20,13 @@ public class BaseSymbols implements Symbols
 	public static final int OPEN_CURLY_BRACKET   = CURLY | OPEN;
 	public static final int CLOSE_CURLY_BRACKET  = CURLY | CLOSE;
 
-	public static final int DOT       = Tokens.SYMBOL | 0x00010000;
-	public static final int COLON     = Tokens.SYMBOL | 0x00020000;
-	public static final int SEMICOLON = Tokens.SYMBOL | 0x00030000;
-	public static final int COMMA     = Tokens.SYMBOL | 0x00040000;
-	public static final int EQUALS    = Tokens.SYMBOL | 0x00050000;
+	public static final int DOT        = Tokens.SYMBOL | 0x00010000;
+	public static final int COLON      = Tokens.SYMBOL | 0x00020000;
+	public static final int SEMICOLON  = Tokens.SYMBOL | 0x00030000;
+	public static final int COMMA      = Tokens.SYMBOL | 0x00040000;
+	public static final int EQUALS     = Tokens.SYMBOL | 0x00050000;
+	public static final int HASH       = Tokens.SYMBOL | 0x00060000;
+	public static final int UNDERSCORE = Tokens.SYMBOL | 0x00070000;
 
 	@Override
 	public int getKeywordType(String value)
@@ -41,6 +43,10 @@ public class BaseSymbols implements Symbols
 			return BaseSymbols.COLON;
 		case "=":
 			return BaseSymbols.EQUALS;
+		case "#":
+			return BaseSymbols.HASH;
+		case "_":
+			return BaseSymbols.UNDERSCORE;
 		}
 		return 0;
 	}
@@ -60,6 +66,10 @@ public class BaseSymbols implements Symbols
 			return ",";
 		case BaseSymbols.EQUALS:
 			return "=";
+		case BaseSymbols.HASH:
+			return "#";
+		case BaseSymbols.UNDERSCORE:
+			return "_";
 		case BaseSymbols.OPEN_PARENTHESIS:
 			return "(";
 		case BaseSymbols.CLOSE_PARENTHESIS:

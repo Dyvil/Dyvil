@@ -69,7 +69,7 @@ public class LazyScope implements Scope
 	}
 
 	@Override
-	public String getReplacement(String key)
+	public String getString(String key)
 	{
 		if (this.store != null && this.store.containsKey(key))
 		{
@@ -79,7 +79,7 @@ public class LazyScope implements Scope
 		{
 			for (Scope map : this.imports)
 			{
-				final String replacement = map.getReplacement(key);
+				final String replacement = map.getString(key);
 				if (replacement != null)
 				{
 					return replacement;
@@ -91,6 +91,6 @@ public class LazyScope implements Scope
 
 	public String getParent(String key)
 	{
-		return this.parent == null ? null : this.parent.getReplacement(key);
+		return this.parent == null ? null : this.parent.getString(key);
 	}
 }

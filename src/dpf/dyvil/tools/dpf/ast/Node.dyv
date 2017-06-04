@@ -7,70 +7,58 @@ import dyvil.collection.mutable.ArrayList
 import dyvil.tools.dpf.visitor.NodeVisitor
 import dyvil.tools.dpf.visitor.ValueVisitor
 import dyvil.tools.parsing.Name
-import dyvil.tools.parsing.ast.IASTNode
-import dyvil.tools.parsing.position.ICodePosition
+import dyvil.tools.parsing.ASTNode
+import dyvil.source.position.SourcePosition
 
 public class Node(
 	protected let name: Name { public override get }
 ) implements dyvil.tools.dpf.model.Node, NodeElement
 {
-	protected List<Node>       nodes        = new ArrayList<Node>
-	protected List<Property>   properties   = new ArrayList<Property>
-	protected List<NodeAccess> nodeAccesses = new ArrayList<NodeAccess>
+	var nodes: List<Node> = new ArrayList<Node>
+	var properties: List<Property> = new ArrayList<Property>
+	var nodeAccesses: List<NodeAccess> = new ArrayList<NodeAccess>
 	
 	@BytecodeName("addNode")
-	public func add(Node node) -> void = this.nodes.add(node)
+	func add(node: Node) -> void = this.nodes.add(node)
 
 	@BytecodeName("addNodeAccess")
-	public func add(NodeAccess nodeAccess) -> void = this.nodeAccesses.add(nodeAccess)
+	func add(nodeAccess: NodeAccess) -> void = this.nodeAccesses.add(nodeAccess)
 
 	@BytecodeName("addProperty")
-	public func add(Property property) -> void = this.properties.add(property)
+	func add(property: Property) -> void = this.properties.add(property)
 	
-	override func visitNode(Name name) -> NodeVisitor
+	override func visitNode(name: Name) -> NodeVisitor
 	{
-		Node node = new Node(name)
+		let node = new Node(name)
 		this.nodes.add(node)
 		return node
 	}
 	
-	override func visitProperty(Name name) -> ValueVisitor
+	override func visitProperty(name: Name) -> ValueVisitor
 	{
-		Property property = new Property(name)
+		let property = new Property(name)
 		this.properties.add(property)
 		return property
 	}
 	
-	override func visitNodeAccess(Name name) -> NodeVisitor
+	override func visitNodeAccess(name: Name) -> NodeVisitor
 	{
-		NodeAccess access = new NodeAccess(name)
+		let access = new NodeAccess(name)
 		this.nodeAccesses.add(access)
 		return access
 	}
 	
-	override func accept(NodeVisitor visitor) -> void
-	{
-		this.acceptBody(visitor.visitNode(this.name))
-	}
+	override func accept(visitor: NodeVisitor) -> void = this.acceptBody(visitor.visitNode(this.name))
 
-	internal func acceptBody(NodeVisitor nodeVisitor) -> void
+	internal func acceptBody(nodeVisitor: NodeVisitor) -> void
 	{
-		for (var element <- this.properties)
-		{
-			element.accept(nodeVisitor)
-		}
-		for (var node <- this.nodes)
-		{
-			node.accept(nodeVisitor)
-		}
-		for (var nodeAccess <- this.nodeAccesses)
-		{
-			nodeAccess.accept(nodeVisitor)
-		}
+		for (element <- this.properties) element.accept(nodeVisitor)
+		for (node <- this.nodes) node.accept(nodeVisitor)
+		for (nodeAccess <- this.nodeAccesses) nodeAccess.accept(nodeVisitor)
 		nodeVisitor.visitEnd()
 	}
 
-	override func expand(Map<String, Object> mappings, boolean mutate) -> Node
+	override func expand(mappings: Map<String, Object>, mutate: boolean) -> Node
 	{
 		if (mutate)
 		{
@@ -85,32 +73,23 @@ public class Node(
 		}
 	}
 
-	protected func expandChildren(Map<String, Object> mappings) -> void
+	protected func expandChildren(mappings: Map<String, Object>) -> void
 	{
-		for (Node node <- this.nodes)
-		{
-			node.expand(mappings, true)
-		}
-		for (Property property <- this.properties)
-		{
-			property.expand(mappings, true)
-		}
-		for (NodeAccess nodeAccess <- this.nodeAccesses)
-		{
-			nodeAccess.expand(mappings, true)
-		}
+		for (node <- this.nodes) node.expand(mappings, true)
+		for (property <- this.properties) property.expand(mappings, true)
+		for (nodeAccess <- this.nodeAccesses) nodeAccess.expand(mappings, true)
 	}
 
-	protected func expand(Node node, Map<String, Object> mappings) -> void
+	protected func expand(node: Node, mappings: Map<String, Object>) -> void
 	{
 		node.nodes = this.nodes.mapped(childNode => childNode.expand(mappings, false))
 		node.properties = this.properties.mapped(property => property.expand(mappings, false))
 		node.nodeAccesses = this.nodeAccesses.mapped(nodeAccess => nodeAccess.expand(mappings, false))
 	}
 
-	override func toString() -> String = IASTNode.toString(this)
+	override func toString() -> String = String(this)
 	
-	override func toString(String indent, StringBuilder buffer) -> void
+	override func toString(indent: String, buffer: StringBuilder) -> void
 	{
 		buffer.append(this.name).append('\n').append(indent).append('{').append('\n')
 		
@@ -119,23 +98,23 @@ public class Node(
 		buffer.append(indent).append('}')
 	}
 	
-	public func bodyToString(String indent, StringBuilder buffer) -> void
+	func bodyToString(indent: String, buffer: StringBuilder) -> void
 	{
-		for (var element <- this.properties)
+		for (element <- this.properties)
 		{
 			buffer.append(indent)
 			element.toString(indent, buffer)
 			buffer.append('\n')
 		}
 		
-		for (var node <- this.nodes)
+		for (node <- this.nodes)
 		{
 			buffer.append(indent).append('\n').append(indent)
 			node.toString(indent, buffer)
 			buffer.append('\n')
 		}
 
-		for (var nodeAccess <- this.nodeAccesses)
+		for (nodeAccess <- this.nodeAccesses)
 		{
 			buffer.append(indent).append('\n').append(indent)
 			nodeAccess.toString(indent, buffer)
@@ -143,7 +122,7 @@ public class Node(
 		}
 	}
 
-	override func equals(Object! obj) -> boolean
+	override func equals(obj: any!) -> boolean
 	{
 		if (this === obj) return true
 		if (!(obj is Node)) return false
@@ -159,8 +138,8 @@ public class Node(
 
 	override func hashCode() -> int
 	{
-		final int prime = 31
-		int result = this.name.hashCode()
+		let prime = 31
+		var result = this.name.hashCode()
 		result = prime * result + Collection.unorderedHashCode(this.properties)
 		result = prime * result + Collection.unorderedHashCode(this.nodes)
 		result = prime * result + Collection.unorderedHashCode(this.nodeAccesses)

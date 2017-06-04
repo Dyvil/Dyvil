@@ -1,0 +1,94 @@
+package dyvil.source.position
+
+interface SourcePosition extends Comparable<SourcePosition>
+{
+	public const ORIGIN: SourcePosition = new Base(1, 1, 0, 1)
+
+	// Constructors
+
+	static func apply(startLine: int, endLine: int, startColumn: int, endColumn: int) -> SourcePosition
+		= new Base(startLine, endLine, startColumn, endColumn)
+
+	static func apply(line: int, startColumn: int, endColumn: int) -> SourcePosition
+		= new Base(line, line, startColumn, endColumn)
+
+	infix func ..(lhs: SourcePosition, rhs: SourcePosition) -> SourcePosition
+		= new Base(lhs.startLine, rhs.endLine, lhs.startColumn, rhs.endColumn)
+
+	static func before(position: SourcePosition) -> SourcePosition
+	{
+		let line = position.startLine
+		let column = position.startColumn
+		if (column == 0) return Base(line, line, column, column + 1)
+		return new Base(line, line, column - 1, column)
+	}
+
+	static func after(position: SourcePosition) -> SourcePosition
+	{
+		let line = position.endLine
+		let column = position.endColumn
+		return new Base(line, line, column, column + 1)
+	}
+
+	static func between(start: SourcePosition, end: SourcePosition) -> SourcePosition
+	{
+		var startColumn = start.endColumn
+		var endColumn = end.startColumn
+		if (startColumn == endColumn) { startColumn++; endColumn-- }
+		return new Base(start.endLine, end.startLine, startColumn, endColumn)
+	}
+
+	// Instance Methods
+
+	var startLine:   int { get }
+
+	var endLine:     int { get }
+
+	var startColumn: int { get }
+
+	var endColumn:   int { get }
+
+	func raw() -> SourcePosition = new Base(this.startLine, this.endLine, this.startColumn, this.endColumn)
+
+	@Deprecated // in Dyvil only
+	func to(end: SourcePosition) -> SourcePosition = this .. end
+
+	override func compareTo(o: SourcePosition) -> int
+	{
+		let byLine = this.startLine.compareTo(o.startLine)
+		if (byLine != 0) return byLine
+		return this.startColumn.compareTo(o.startColumn)
+	}
+
+	@Deprecated // in Dyvil only
+	func isBefore(position: SourcePosition) -> boolean = this.compareTo(position) < 0
+
+	@Deprecated // in Dyvil only
+	func isAfter(position: SourcePosition) -> boolean = this.compareTo(position) > 0
+
+	// Base Implementation
+
+	private case class Base
+	(
+		let startLine: int
+		let endLine: int
+		let startColumn: int
+		let endColumn: int
+	)
+	implements SourcePosition
+	{
+		override func raw() -> SourcePosition = this
+
+		override func equals(obj: any!)
+		{
+			if (obj == this) return true
+			if (!(obj is SourcePosition)) return false
+
+			let that = obj as SourcePosition
+			return this.startLine == that.startLine && this.endLine == that.endLine && this.startColumn == that.startColumn && this.endColumn == that.endColumn
+		}
+
+		override func toString() -> String = "SourcePosition(\(this.startLine), \(this.endLine), \(this.startColumn), \(this.endColumn)"
+	}
+}
+

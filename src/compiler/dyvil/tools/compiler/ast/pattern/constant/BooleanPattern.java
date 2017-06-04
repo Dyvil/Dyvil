@@ -9,13 +9,13 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public final class BooleanPattern extends Pattern
 {
 	private boolean value;
 	
-	public BooleanPattern(ICodePosition position, boolean value)
+	public BooleanPattern(SourcePosition position, boolean value)
 	{
 		this.position = position;
 		this.value = value;
@@ -74,7 +74,7 @@ public final class BooleanPattern extends Pattern
 			throws BytecodeException
 	{
 		IPattern.loadVar(writer, varIndex, matchedType);
-		matchedType.writeCast(writer, Types.BOOLEAN, this.getLineNumber());
+		matchedType.writeCast(writer, Types.BOOLEAN, this.lineNumber());
 		writer.visitJumpInsn(this.value ? Opcodes.IFEQ : Opcodes.IFNE, elseLabel);
 	}
 	

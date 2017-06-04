@@ -6,7 +6,7 @@ import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.TypeDelegate;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -14,9 +14,9 @@ import java.io.IOException;
 
 public class ResolvedTypeDelegate extends TypeDelegate
 {
-	protected ICodePosition position;
+	protected SourcePosition position;
 
-	public ResolvedTypeDelegate(ICodePosition position, IType type)
+	public ResolvedTypeDelegate(SourcePosition position, IType type)
 	{
 		this.position = position;
 		this.type = type;
@@ -29,19 +29,19 @@ public class ResolvedTypeDelegate extends TypeDelegate
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
 
 	@Override
-	public IType atPosition(ICodePosition position)
+	public IType atPosition(SourcePosition position)
 	{
 		return new ResolvedTypeDelegate(position, this.type);
 	}

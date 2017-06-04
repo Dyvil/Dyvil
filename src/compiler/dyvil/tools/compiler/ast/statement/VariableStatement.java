@@ -8,7 +8,7 @@ import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public final class VariableStatement implements IStatement
 {
@@ -30,13 +30,13 @@ public final class VariableStatement implements IStatement
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.variable.getPosition();
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.variable.setPosition(position);
 	}

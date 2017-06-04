@@ -10,21 +10,21 @@ import dyvil.tools.compiler.ast.modifiers.IModified;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.ASTNode;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.annotation.ElementType;
 
-public class HeaderDeclaration implements IASTNode, INamed, IModified, IAnnotated, IObjectCompilable
+public class HeaderDeclaration implements ASTNode, INamed, IModified, IAnnotated, IObjectCompilable
 {
 	protected final IHeaderUnit header;
 
-	protected ICodePosition position;
+	protected SourcePosition position;
 
 	protected AnnotationList annotations;
 	protected ModifierSet    modifiers;
@@ -36,14 +36,14 @@ public class HeaderDeclaration implements IASTNode, INamed, IModified, IAnnotate
 		this.header = header;
 	}
 
-	public HeaderDeclaration(IHeaderUnit header, ICodePosition position, Name name)
+	public HeaderDeclaration(IHeaderUnit header, SourcePosition position, Name name)
 	{
 		this.header = header;
 		this.position = position;
 		this.name = name;
 	}
 
-	public HeaderDeclaration(IHeaderUnit header, ICodePosition position, Name name, ModifierSet modifiers,
+	public HeaderDeclaration(IHeaderUnit header, SourcePosition position, Name name, ModifierSet modifiers,
 		                        AnnotationList annotations)
 	{
 		this.header = header;
@@ -54,13 +54,13 @@ public class HeaderDeclaration implements IASTNode, INamed, IModified, IAnnotate
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -79,6 +79,12 @@ public class HeaderDeclaration implements IASTNode, INamed, IModified, IAnnotate
 			return this.annotations;
 		}
 		return this.annotations = new AnnotationList();
+	}
+
+	@Override
+	public void setAnnotations(AnnotationList annotations)
+	{
+		this.annotations = annotations;
 	}
 
 	@Override

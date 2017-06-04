@@ -21,6 +21,8 @@ abstract class Tuple
 
 	case class Of1<type +T1>(public let _1: T1)
 	{
+		func unapply() -> Of1<T1> = this
+
 		override func toString() -> String = "Tuple(\(this._1))"
 	}
 
@@ -30,13 +32,15 @@ abstract class Tuple
 		public let _2: T2
 	) implements Entry<T1, T2>
 	{
+		func unapply() -> (T1, T2) = this
+
 		override func getKey() -> T1 = this._1
 
 		override func getValue() -> T2 = this._2
 
 		override func toString() -> String = "(\(this._1), \(this._2))"
 
-		override func equals(obj: Object!) -> boolean = Entry.entryEquals(this, obj)
+		override func equals(obj: any!) -> boolean = Entry.entryEquals(this, obj)
 
 		override func hashCode() -> int = Entry.entryHashCode(this)
 	}
@@ -48,6 +52,8 @@ abstract class Tuple
 		public let _3: T3
 	) implements Cell<T1, T2, T3>
 	{
+		func unapply() -> (T1, T2, T3) = this
+
 		override func getRow() -> T1 = this._1
 
 		override func getColumn() -> T2 = this._2
@@ -56,31 +62,24 @@ abstract class Tuple
 
 		override func toString() -> String = "(\(this._1), \(this._2), \(this._3))"
 
-		override func equals(obj: Object!) -> boolean = Cell.cellEquals(this, obj)
+		override func equals(obj: any!) -> boolean = Cell.cellEquals(this, obj)
 
 		override func hashCode() -> int = Cell.cellHashCode(this)
 	}
 
-#import Base.dgs
-#for ARITY; 4; MAX_ARITY
+	#import("Base.dgs")
+	#for (ARITY <- 4 .. MAX_ARITY) {
+		@Immutable
+		case class Of#(ARITY) <type +T1#for (INDEX <- 2 .. ARITY) {, type +T#(INDEX)}>
+		(
+			public let _1: T1#for (INDEX <- 2 .. ARITY) {, public let _#(INDEX): T#(INDEX)}
 
-	@Immutable
-	case class Of##ARITY <
-	#for INDEX; 1; ARITY
-		type +T##INDEX
-	#end
-	> (
-	#for INDEX; 1; ARITY
-			public let _##INDEX: T##INDEX
-	#end
-	)
-	{
-		override func toString() -> String = new StringBuilder()
-			.append('(').append(this._1)
-	#for INDEX; 2; ARITY
-			.append(', ').append(this._##INDEX)
-	#end
-			.append(')').toString!!
+		)
+		{
+			func unapply() -> (T1#for (INDEX <- 2 .. ARITY) {, T#(INDEX)}) = this
+
+			override func toString() -> String = "(\(this._1)#for (INDEX <- 2 .. ARITY) {, \(this._#(INDEX))})"
+		}
+
 	}
-#end
 }

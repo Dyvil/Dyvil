@@ -11,13 +11,13 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class FloatValue implements IConstantValue
 {
 	private static FloatValue NULL;
 
-	protected ICodePosition position;
+	protected SourcePosition position;
 	protected float         value;
 
 	public FloatValue(float value)
@@ -25,7 +25,7 @@ public class FloatValue implements IConstantValue
 		this.value = value;
 	}
 
-	public FloatValue(ICodePosition position, float value)
+	public FloatValue(SourcePosition position, float value)
 	{
 		this.position = position;
 		this.value = value;
@@ -41,13 +41,13 @@ public class FloatValue implements IConstantValue
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -159,7 +159,7 @@ public class FloatValue implements IConstantValue
 
 		if (type != null)
 		{
-			Types.FLOAT.writeCast(writer, type, this.getLineNumber());
+			Types.FLOAT.writeCast(writer, type, this.lineNumber());
 		}
 	}
 

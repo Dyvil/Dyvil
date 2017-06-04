@@ -20,6 +20,7 @@ import dyvil.tools.compiler.parser.header.PropertyParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -203,6 +204,11 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				return;
 			}
 
+			if (this.type != Types.UNKNOWN)
+			{
+				pm.report(Markers.syntaxWarning(token, "member.type.c_style.deprecated"));
+			}
+
 			this.parameter = this.consumer.createParameter(token.raw(), token.nameValue(), this.type, this.modifiers,
 			                                               this.annotations);
 			this.mode = VARARGS_AFTER_NAME;
@@ -242,7 +248,12 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				}
 
 				this.mode = VARARGS_AFTER_POST_TYPE;
-				pm.pushParser(new TypeParser(this));
+				final TypeParser parser = new TypeParser(this);
+				if (this.hasFlag(LAMBDA_ARROW_END))
+				{
+					parser.withFlags(TypeParser.IGNORE_LAMBDA);
+				}
+				pm.pushParser(parser);
 				return;
 			}
 			// Fallthrough

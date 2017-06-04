@@ -126,13 +126,13 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements MutableSet
 
 	@NonNull
 	@Override
-	public MutableSet<E> filtered(@NonNull Predicate<? super E> condition)
+	public MutableSet<E> filtered(@NonNull Predicate<? super E> predicate)
 	{
 		MutableMap<E, Boolean> map = this.map.emptyCopy();
 		for (Entry<E, ?> entry : this.map)
 		{
 			E element = entry.getKey();
-			if (condition.test(element))
+			if (predicate.test(element))
 			{
 				map.subscript_$eq(element, true);
 			}

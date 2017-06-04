@@ -13,10 +13,4 @@ final class Assert
 	{
 		if (!condition) throw new AssertionError(message())
 	}
-
-	@Deprecated(replacements: [ "assert(boolean, -> any) -> void" ])
-	static func assert(tuple: (boolean, -> any)) -> void
-	{
-		if (!tuple._1) throw new AssertionError(tuple._2()())
-	}
 }

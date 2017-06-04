@@ -11,16 +11,16 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class MethodAssignment extends MethodCall
 {
-	public MethodAssignment(ICodePosition position, IValue receiver, IMethod method, ArgumentList argument)
+	public MethodAssignment(SourcePosition position, IValue receiver, IMethod method, ArgumentList argument)
 	{
 		super(position, receiver, method, argument);
 	}
 
-	public MethodAssignment(ICodePosition position, IValue receiver, Name name, ArgumentList argument)
+	public MethodAssignment(SourcePosition position, IValue receiver, Name name, ArgumentList argument)
 	{
 		super(position, receiver, name, argument);
 	}
@@ -53,7 +53,7 @@ public class MethodAssignment extends MethodCall
 		expressionVar.writeInit(writer);
 
 		this.method.writeCall(writer, new FieldAccess(receiverVar), new ArgumentList(new FieldAccess(expressionVar)),
-		                      this.genericData, Types.VOID, this.getLineNumber());
+		                      this.genericData, Types.VOID, this.lineNumber());
 
 		expressionVar.writeGet(writer);
 	}

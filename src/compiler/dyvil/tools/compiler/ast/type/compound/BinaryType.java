@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.type.compound;
 
 import dyvil.collection.Set;
+import dyvil.lang.Formattable;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
@@ -19,7 +20,6 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.raw.IObjectType;
 import dyvil.tools.compiler.util.MemberSorter;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 
 import java.io.DataInput;
@@ -241,6 +241,6 @@ public abstract class BinaryType implements IObjectType
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 }

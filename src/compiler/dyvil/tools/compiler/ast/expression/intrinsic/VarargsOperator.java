@@ -11,14 +11,14 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class VarargsOperator implements IValue
 {
 	protected IValue value;
 
 	// Metadata
-	protected ICodePosition position;
+	protected SourcePosition position;
 	protected boolean       varargsPosition;
 
 	public VarargsOperator(IValue value)
@@ -33,13 +33,13 @@ public class VarargsOperator implements IValue
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}

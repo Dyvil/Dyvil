@@ -34,16 +34,16 @@ public interface IClass extends IClassMember, IParametric, ITypeParametricMember
 		return MemberKind.CLASS;
 	}
 
-	void setHeader(IHeaderUnit unit);
-
 	@Override
 	IHeaderUnit getHeader();
 
-	@Override
-	void setEnclosingClass(IClass enclosingClass);
+	void setHeader(IHeaderUnit unit);
 
 	@Override
 	IClass getEnclosingClass();
+
+	@Override
+	void setEnclosingClass(IClass enclosingClass);
 
 	// Modifiers
 
@@ -62,9 +62,10 @@ public interface IClass extends IClassMember, IParametric, ITypeParametricMember
 
 	// Full Name
 
-	void setFullName(String name);
-
+	@Override
 	String getFullName();
+
+	void setFullName(String name);
 
 	// Super Types
 
@@ -114,13 +115,13 @@ public interface IClass extends IClassMember, IParametric, ITypeParametricMember
 
 	// Body
 
-	void setBody(IClassBody body);
-
 	IClassBody getBody();
 
-	void setMetadata(IClassMetadata metadata);
+	void setBody(IClassBody body);
 
 	IClassMetadata getMetadata();
+
+	void setMetadata(IClassMetadata metadata);
 
 	IMethod getFunctionalMethod();
 

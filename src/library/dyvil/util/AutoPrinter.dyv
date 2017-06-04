@@ -1,8 +1,8 @@
 package dyvil.util
 
-public object AutoPrinter
+object AutoPrinter
 {
-	static func apply(AutoPrinter.() -> void closure) -> void = closure(AutoPrinter)
+	static func apply(f: AutoPrinter.() -> void) -> void = f(AutoPrinter)
 
-	public func applyStatement(any value) -> void = print value
+	func applyStatement(value: any!) -> void = print value
 }

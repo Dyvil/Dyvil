@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.expression;
 
+import dyvil.lang.Formattable;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
@@ -12,9 +14,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public final class CastOperator extends AbstractValue
 {
@@ -24,7 +24,7 @@ public final class CastOperator extends AbstractValue
 	// Metadata
 	private boolean typeHint;
 	
-	public CastOperator(ICodePosition position, IValue value)
+	public CastOperator(SourcePosition position, IValue value)
 	{
 		this.position = position;
 		this.value = value;
@@ -211,13 +211,13 @@ public final class CastOperator extends AbstractValue
 			writer.visitInsn(Opcodes.AUTO_POP);
 			return;
 		}
-		this.value.getType().writeCast(writer, type, this.getLineNumber());
+		this.value.getType().writeCast(writer, type, this.lineNumber());
 	}
 
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

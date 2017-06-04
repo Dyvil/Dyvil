@@ -17,6 +17,7 @@ import dyvil.tools.compiler.parser.annotation.ModifierParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -54,14 +55,23 @@ public class DataMemberParser<T extends IDataMember> extends Parser implements I
 		switch (this.mode)
 		{
 		case TYPE:
-			if (type == DyvilKeywords.VAR)
+			switch (type)
 			{
+			case DyvilSymbols.AT:
+				if (this.annotations == null)
+				{
+					this.annotations = new AnnotationList();
+				}
+
+				final Annotation annotation = new Annotation(token.raw());
+				this.annotations.add(annotation);
+				pm.pushParser(new AnnotationParser(annotation));
+				return;
+			case DyvilKeywords.VAR:
 				this.mode = NAME;
 				this.type = Types.UNKNOWN;
 				return;
-			}
-			if (type == DyvilKeywords.LET)
-			{
+			case DyvilKeywords.LET:
 				this.mode = NAME;
 				this.type = Types.UNKNOWN;
 
@@ -85,18 +95,6 @@ public class DataMemberParser<T extends IDataMember> extends Parser implements I
 				this.modifiers.addModifier(modifier);
 				return;
 			}
-			if (type == DyvilSymbols.AT)
-			{
-				if (this.annotations == null)
-				{
-					this.annotations = new AnnotationList();
-				}
-
-				final Annotation annotation = new Annotation(token.raw());
-				this.annotations.add(annotation);
-				pm.pushParser(new AnnotationParser(annotation));
-				return;
-			}
 			if (ParserUtil.isIdentifier(type) && token.next().type() == BaseSymbols.COLON)
 			{
 				// IDENTIFIER : TYPE
@@ -115,6 +113,11 @@ public class DataMemberParser<T extends IDataMember> extends Parser implements I
 			{
 				pm.report(token, "variable.identifier");
 				return;
+			}
+
+			if (this.type != Types.UNKNOWN)
+			{
+				pm.report(Markers.syntaxWarning(token, "member.type.c_style.deprecated"));
 			}
 
 			this.dataMember = this.consumer.createDataMember(token.raw(), token.nameValue(), this.type, this.modifiers,

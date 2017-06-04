@@ -187,7 +187,7 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 
 	@NonNull
 	@Override
-	ImmutableList<E> filtered(@NonNull Predicate<? super E> condition);
+	ImmutableList<E> filtered(@NonNull Predicate<? super E> predicate);
 
 	@NonNull
 	@Override
@@ -356,7 +356,7 @@ public interface ImmutableList<@Covariant E> extends List<E>, ImmutableCollectio
 
 	@Override
 	@Mutating
-	default void filter(@NonNull Predicate<? super E> condition)
+	default void filter(@NonNull Predicate<? super E> predicate)
 	{
 		throw new ImmutableException("filter() on Immutable List");
 	}

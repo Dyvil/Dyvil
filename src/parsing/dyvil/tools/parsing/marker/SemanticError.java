@@ -1,11 +1,11 @@
 package dyvil.tools.parsing.marker;
 
 import dyvil.io.Console;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class SemanticError extends Marker
 {
-	public SemanticError(ICodePosition position, String message)
+	public SemanticError(SourcePosition position, String message)
 	{
 		super(position, message);
 	}

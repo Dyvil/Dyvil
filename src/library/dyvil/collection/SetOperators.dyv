@@ -2,73 +2,73 @@ package dyvil.collection
 
 import dyvil.util.ImmutableException
 
-public class SetOperators
+class SetOperators
 {
 	// Set Operators
 
-	infix inline func + <T>(Set<T> set, T element) -> Set<T> = set.added(element)
+	infix inline func + <T>(lhs: Set<T>, rhs: T) -> Set<T> = lhs.added(rhs)
 
-	infix inline func ++ <T>(Set<T> set, Set<+T> elements) -> Set<T> = set.union(elements)
+	infix inline func ++ <T>(lhs: Set<T>, rhs: Set<+T>) -> Set<T> = lhs.union(rhs)
 
-	infix inline func - <T>(Set<T> set, any element) -> Set<T> = set.removed(element)
+	infix inline func - <T>(lhs: Set<T>, rhs: any) -> Set<T> = lhs.removed(rhs)
 
-	infix inline func -- <T>(Set<T> set, Set<_> elements) -> Set<T> = set.difference(elements)
+	infix inline func -- <T>(lhs: Set<T>, rhs: Set<_>) -> Set<T> = lhs.difference(rhs)
 
-	infix inline func & <T>(Set<T> set, Collection<+T> elements) -> Set<T> = set.intersection(elements)
+	infix inline func & <T>(lhs: Set<T>, rhs: Collection<+T>) -> Set<T> = lhs.intersection(rhs)
 
-	infix inline func | <T>(Set<T> set, Collection<+T> elements) -> Set<T> = set.union(elements)
+	infix inline func | <T>(lhs: Set<T>, rhs: Collection<+T>) -> Set<T> = lhs.union(rhs)
 
-	infix inline func ^ <T>(Set<T> set, Collection<+T> elements) -> Set<T> = set.symmetricDifference(elements)
+	infix inline func ^ <T>(lhs: Set<T>, rhs: Collection<+T>) -> Set<T> = lhs.symmetricDifference(rhs)
 
 	// Mutable Set Operators
 
-	infix inline func + <T>(MutableSet<T> set, T element) -> MutableSet<T> = set.added(element)
+	infix inline func + <T>(lhs: MutableSet<T>, rhs: T) -> MutableSet<T> = lhs.added(rhs)
 
-	infix inline func ++ <T>(MutableSet<T> set, MutableSet<+T> elements) -> MutableSet<T> = set.union(elements)
+	infix inline func ++ <T>(lhs: MutableSet<T>, rhs: Set<+T>) -> MutableSet<T> = lhs.union(rhs)
 
-	infix inline func - <T>(MutableSet<T> set, any element) -> MutableSet<T> = set.removed(element)
+	infix inline func - <T>(lhs: MutableSet<T>, rhs: any) -> MutableSet<T> = lhs.removed(rhs)
 
-	infix inline func -- <T>(MutableSet<T> set, MutableSet<_> elements) -> MutableSet<T> = set.difference(elements)
+	infix inline func -- <T>(lhs: MutableSet<T>, rhs: Set<_>) -> MutableSet<T> = lhs.difference(rhs)
 
-	infix inline func & <T>(MutableSet<T> set, Collection<+T> elements) -> MutableSet<T> = set.intersection(elements)
+	infix inline func & <T>(lhs: MutableSet<T>, rhs: Collection<+T>) -> MutableSet<T> = lhs.intersection(rhs)
 
-	infix inline func | <T>(MutableSet<T> set, Collection<+T> elements) -> MutableSet<T> = set.union(elements)
+	infix inline func | <T>(lhs: MutableSet<T>, rhs: Collection<+T>) -> MutableSet<T> = lhs.union(rhs)
 
-	infix inline func ^ <T>(MutableSet<T> set, Collection<+T> elements) -> MutableSet<T> = set.symmetricDifference(elements)
+	infix inline func ^ <T>(lhs: MutableSet<T>, rhs: Collection<+T>) -> MutableSet<T> = lhs.symmetricDifference(rhs)
 
 	// Immutable Set Operators
 
-	infix inline func + <T>(ImmutableSet<T> set, T element) -> ImmutableSet<T> = set.added(element)
+	infix inline func + <T>(lhs: ImmutableSet<T>, rhs: T) -> ImmutableSet<T> = lhs.added(rhs)
 
-	infix inline func ++ <T>(ImmutableSet<T> set, ImmutableSet<+T> elements) -> ImmutableSet<T> = set.union(elements)
+	infix inline func ++ <T>(lhs: ImmutableSet<T>, rhs: Set<+T>) -> ImmutableSet<T> = lhs.union(rhs)
 
-	infix inline func - <T>(ImmutableSet<T> set, any element) -> ImmutableSet<T> = set.removed(element)
+	infix inline func - <T>(lhs: ImmutableSet<T>, rhs: any) -> ImmutableSet<T> = lhs.removed(rhs)
 
-	infix inline func -- <T>(ImmutableSet<T> set, ImmutableSet<_> elements) -> ImmutableSet<T> = set.difference(elements)
+	infix inline func -- <T>(lhs: ImmutableSet<T>, rhs: Set<_>) -> ImmutableSet<T> = lhs.difference(rhs)
 
-	infix inline func & <T>(ImmutableSet<T> set, Collection<+T> elements) -> ImmutableSet<T> = set.intersection(elements)
+	infix inline func & <T>(lhs: ImmutableSet<T>, rhs: Collection<+T>) -> ImmutableSet<T> = lhs.intersection(rhs)
 
-	infix inline func | <T>(ImmutableSet<T> set, Collection<+T> elements) -> ImmutableSet<T> = set.union(elements)
+	infix inline func | <T>(lhs: ImmutableSet<T>, rhs: Collection<+T>) -> ImmutableSet<T> = lhs.union(rhs)
 
-	infix inline func ^ <T>(ImmutableSet<T> set, Collection<+T> elements) -> ImmutableSet<T> = set.symmetricDifference(elements)
+	infix inline func ^ <T>(lhs: ImmutableSet<T>, rhs: Collection<+T>) -> ImmutableSet<T> = lhs.symmetricDifference(rhs)
 
 	// Mutating Operators
 
-	infix inline func &= <T>(Set<T> set, Collection<+T> elements) -> void = set.retainAll(elements)
+	infix inline func &= <T>(lhs: Set<T>, rhs: Collection<+T>) -> void = lhs.retainAll(rhs)
 
-	infix inline func |= <T>(Set<T> set, Collection<+T> elements) -> void = set.union(elements)
+	infix inline func |= <T>(lhs: Set<T>, rhs: Collection<+T>) -> void = lhs.union(rhs)
 
-	infix inline func ^= <T>(Set<T> set, Collection<+T> elements) -> void = set.symmetricDifferenceInplace(elements)
+	infix inline func ^= <T>(lhs: Set<T>, rhs: Collection<+T>) -> void = lhs.symmetricDifferenceInplace(rhs)
 
 	@Mutating
-	infix inline func &= <T>(ImmutableSet<T> set, Collection<+T> elements) -> void
+	infix inline func &= <T>(lhs: ImmutableSet<T>, rhs: Collection<+T>) -> void
 		= throw new ImmutableException("&= on Immutable Set")
 
 	@Mutating
-	infix inline func |= <T>(ImmutableSet<T> set, Collection<+T> elements) -> void
+	infix inline func |= <T>(lhs: ImmutableSet<T>, rhs: Collection<+T>) -> void
 		= throw new ImmutableException("|= on Immutable Set")
 
 	@Mutating
-	infix inline func ^= <T>(ImmutableSet<T> set, Collection<+T> elements) -> void
+	infix inline func ^= <T>(lhs: ImmutableSet<T>, rhs: Collection<+T>) -> void
 		= throw new ImmutableException("^= on Immutable Set")
 }

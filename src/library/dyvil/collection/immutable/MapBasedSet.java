@@ -166,13 +166,13 @@ public class MapBasedSet<E> extends AbstractMapBasedSet<E> implements ImmutableS
 
 	@NonNull
 	@Override
-	public ImmutableSet<E> filtered(@NonNull Predicate<? super E> condition)
+	public ImmutableSet<E> filtered(@NonNull Predicate<? super E> predicate)
 	{
 		ImmutableMap.Builder<E, Boolean> builder = this.map.immutableBuilder();
 		for (Entry<E, ?> entry : this.map)
 		{
 			E element = entry.getKey();
-			if (condition.test(element))
+			if (predicate.test(element))
 			{
 				builder.put(element, true);
 			}

@@ -23,7 +23,7 @@ import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.lang.annotation.ElementType;
 
@@ -57,25 +57,25 @@ public class Variable extends Member implements IVariable
 		this.value = value;
 	}
 
-	public Variable(ICodePosition position)
+	public Variable(SourcePosition position)
 	{
 		this.position = position;
 	}
 
-	public Variable(ICodePosition position, IType type)
+	public Variable(SourcePosition position, IType type)
 	{
 		this.position = position;
 		this.type = type;
 	}
 
-	public Variable(ICodePosition position, Name name, IType type)
+	public Variable(SourcePosition position, Name name, IType type)
 	{
 		this.position = position;
 		this.name = name;
 		this.type = type;
 	}
 
-	public Variable(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public Variable(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
 	}
@@ -123,13 +123,13 @@ public class Variable extends Member implements IVariable
 	}
 
 	@Override
-	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue receiver, IContext context)
+	public IValue checkAccess(MarkerList markers, SourcePosition position, IValue receiver, IContext context)
 	{
 		return receiver;
 	}
 
 	@Override
-	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue receiver, IValue newValue)
+	public IValue checkAssign(MarkerList markers, IContext context, SourcePosition position, IValue receiver, IValue newValue)
 	{
 		this.assigned = true;
 		return IVariable.super.checkAssign(markers, context, position, receiver, newValue);
@@ -295,7 +295,7 @@ public class Variable extends Member implements IVariable
 			// new, new, value
 		}
 
-		constructor.writeInvoke(writer, variable.getLineNumber());
+		constructor.writeInvoke(writer, variable.lineNumber());
 
 		final int localIndex = writer.localCount();
 		variable.setLocalIndex(localIndex);

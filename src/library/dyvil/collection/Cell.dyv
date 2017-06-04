@@ -1,6 +1,6 @@
 package dyvil.collection
 
-public interface Cell<type +R, type +C, type +V> extends java.io.Serializable
+interface Cell<type +R, type +C, type +V> extends java.io.Serializable
 {
 	/**
 	 * Returns the row stored by this cell
@@ -30,15 +30,15 @@ public interface Cell<type +R, type +C, type +V> extends java.io.Serializable
 	 */
 	func toTuple() -> (R, C, V) = (this.getRow(), this.getColumn(), this.getValue())
 
-	static func cellToString(Cell<_, _, _> cell) -> String
-		= "(" + cell.getRow + ", " + cell.getColumn + ") -> " + cell.getValue
+	static func cellToString(cell: Cell<_, _, _>) -> String
+		= "(\(cell.getRow), \(cell.getColumn)) -> \(cell.getValue)"
 
-	static func cellEquals(Cell<_, _, _> cell, Object? obj) -> boolean = obj is Cell && cellEquals(cell, obj as Cell)
+	static func cellEquals(cell: Cell<_, _, _>, obj: any!) -> boolean = obj is Cell && cellEquals(cell, obj as Cell)
 
-	static func cellEquals(Cell<_, _, _> cell1, Cell<_, _, _> cell2) -> boolean
-		= cell1.getRow == cell2.getRow && cell1.getColumn == cell2.getColumn && cell1.getValue == cell2.getValue
+	static func cellEquals(cell: Cell<_, _, _>, other: Cell<_, _, _>) -> boolean
+		= cell.getRow == other.getRow && cell.getColumn == other.getColumn && cell.getValue == other.getValue
 
-	static func cellHashCode(Cell<_, _, _> cell) -> int
+	static func cellHashCode(cell: Cell<_, _, _>) -> int
 	{
 		let row = cell.getRow
 		let column = cell.getColumn

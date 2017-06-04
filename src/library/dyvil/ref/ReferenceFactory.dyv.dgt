@@ -13,16 +13,16 @@ import java.lang.reflect.Field
 
 public final class ReferenceFactory
 {
-	private const STATIC_CONSTRUCTOR_TYPE:   MethodType = MethodType.methodType(class void, class Field)
-	private const INSTANCE_CONSTRUCTOR_TYPE: MethodType = MethodType.methodType(class void, class Object, class long)
+	private const STATIC_CONSTRUCTOR_TYPE:   MethodType = MethodType.methodType(class<void>, class<Field>)
+	private const INSTANCE_CONSTRUCTOR_TYPE: MethodType = MethodType.methodType(class<void>, class<Object>, class<long>)
 
-	private static func getField(Class<_> _type, String fieldName) -> Field throws NoSuchFieldException
-		= _type.getDeclaredField(fieldName)
+	private static func getField(forType: Class<_>, withName: String) -> Field throws NoSuchFieldException
+		= forType.getDeclaredField(withName)
 
 	// Bootstrap Factories
 
 	static func instanceRefMetafactory(
-		MethodHandles.Lookup caller, String fieldName, MethodType methodType
+		caller: MethodHandles.Lookup, fieldName: String, methodType: MethodType
 	) -> CallSite throws Throwable
 	{
 		let enclosingClass = methodType.parameterType(0)
@@ -40,8 +40,8 @@ public final class ReferenceFactory
 	}
 
 	static func staticRefMetafactory(
-		MethodHandles.Lookup caller, String fieldName, MethodType methodType,
-		Class<_> enclosingClass
+		caller: MethodHandles.Lookup, fieldName: String, methodType: MethodType,
+		enclosingClass: Class<_>
 	) -> CallSite throws Throwable
 	{
 		let targetType = methodType.returnType()
@@ -58,29 +58,29 @@ public final class ReferenceFactory
 	}
 
 	static func propertyRefMetafactory(
-		MethodHandles.Lookup caller, String invokedName, MethodType invokedType,
-		MethodHandle getter, MethodHandle setter
+		caller: MethodHandles.Lookup, invokedName: String, invokedType: MethodType,
+		getter: MethodHandle, setter: MethodHandle
 	) -> CallSite throws Exception
-	{
-		let prm = new PropertyReferenceMetafactory(caller, invokedType, getter, setter)
-		return prm.buildCallSite()
+		= new PropertyReferenceMetafactory(caller, invokedType, getter, setter).buildCallSite()
+
+	// Reference Factory Methods
+
+	#import("Base.dgs")
+	#for (spec <- PRIMITIVE_SPECS) {
+		#import(spec)
+		// TYPE_NAME
+
+		static func new#(TYPE_NAME)Ref(base: Object, offset: long) -> #(TYPE_NAME)Ref
+			= new Unsafe#(TYPE_NAME)Ref(base, offset)
+
+		static func new#(TYPE_NAME)Ref(base: Object, ofType: Class<_>, field: String) -> #(TYPE_NAME)Ref throws NoSuchFieldException
+			= new Unsafe#(TYPE_NAME)Ref(base, getField(ofType, field))
+
+		static func newStatic#(TYPE_NAME)Ref(forType: Class<_>, field: String) -> #(TYPE_NAME)Ref throws NoSuchFieldException
+			= new Unsafe#(TYPE_NAME)Ref(getField(forType, field))
+
+		static func new#(TYPE_NAME)ArrayRef(array: [PRIMITIVE], index: int) -> #(TYPE_NAME)Ref
+			= new #(TYPE_NAME)ArrayRef(array, index)
+
 	}
-
-#import Base.dgs
-#foreach PRIMITIVE_SPECS
-
-	// TYPE_NAME
-
-	static func new##TYPE_NAME##Ref(Object base, long offset) -> TYPE_NAME##Ref
-		= new Unsafe##TYPE_NAME##Ref(base, offset)
-
-	static func new##TYPE_NAME##Ref(Object base, Class<_> _type, String fieldName) -> TYPE_NAME##Ref throws NoSuchFieldException
-		= new Unsafe##TYPE_NAME##Ref(base, getField(_type, fieldName))
-
-	static func newStatic##TYPE_NAME##Ref(Class<_> _type, String fieldName) -> TYPE_NAME##Ref throws NoSuchFieldException
-		= new Unsafe##TYPE_NAME##Ref(getField(_type, fieldName))
-
-	static func new##TYPE_NAME##ArrayRef([PRIMITIVE] array, int index) -> TYPE_NAME##Ref
-		= new TYPE_NAME##ArrayRef(array, index)
-#endfor
 }

@@ -15,12 +15,12 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public abstract class CaptureDataMember implements IDataMember
 {
 	protected IVariable     variable;
-	protected ICodePosition accessPosition;
+	protected SourcePosition accessPosition;
 
 	protected int localIndex;
 
@@ -49,13 +49,13 @@ public abstract class CaptureDataMember implements IDataMember
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.accessPosition;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 	}
 
@@ -82,25 +82,25 @@ public abstract class CaptureDataMember implements IDataMember
 		return this.variable.getType();
 	}
 
+	@Override
+	public void setType(IType type)
+	{
+	}
+
 	public IType getInternalType()
 	{
 		return this.variable.getInternalType();
 	}
 
 	@Override
-	public void setType(IType type)
+	public ModifierSet getModifiers()
 	{
+		return this.variable.getModifiers();
 	}
 
 	@Override
 	public void setModifiers(ModifierSet modifiers)
 	{
-	}
-
-	@Override
-	public ModifierSet getModifiers()
-	{
-		return this.variable.getModifiers();
 	}
 
 	@Override
@@ -113,6 +113,11 @@ public abstract class CaptureDataMember implements IDataMember
 	public AnnotationList getAnnotations()
 	{
 		return this.variable.getAnnotations();
+	}
+
+	@Override
+	public void setAnnotations(AnnotationList annotations)
+	{
 	}
 
 	@Override
@@ -133,7 +138,7 @@ public abstract class CaptureDataMember implements IDataMember
 	}
 
 	@Override
-	public IValue checkAccess(MarkerList markers, ICodePosition position, IValue receiver, IContext context)
+	public IValue checkAccess(MarkerList markers, SourcePosition position, IValue receiver, IContext context)
 	{
 		if (this.accessPosition == null)
 		{
@@ -144,7 +149,7 @@ public abstract class CaptureDataMember implements IDataMember
 	}
 
 	@Override
-	public IValue checkAssign(MarkerList markers, IContext context, ICodePosition position, IValue receiver, IValue newValue)
+	public IValue checkAssign(MarkerList markers, IContext context, SourcePosition position, IValue receiver, IValue newValue)
 	{
 		this.variable.setReferenceType();
 		return this.variable.checkAssign(markers, context, position, receiver, newValue);

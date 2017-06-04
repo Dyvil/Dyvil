@@ -4,7 +4,6 @@ import dyvil.annotation.Reified;
 import dyvil.collection.Collection;
 import dyvil.collection.Set;
 import dyvil.collection.mutable.HashSet;
-import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.AnnotationVisitor;
@@ -42,7 +41,7 @@ import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -52,9 +51,6 @@ import java.util.Iterator;
 public class CodeMethod extends AbstractMethod
 {
 	protected IValue value;
-
-	// Metadata
-	protected Set<IMethod> overrideMethods;
 
 	public CodeMethod(IClass iclass)
 	{
@@ -76,7 +72,7 @@ public class CodeMethod extends AbstractMethod
 		super(iclass, name, type, modifiers);
 	}
 
-	public CodeMethod(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public CodeMethod(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
 	}
@@ -367,21 +363,6 @@ public class CodeMethod extends AbstractMethod
 	}
 
 	@Override
-	public void addOverride(IMethod method)
-	{
-		if (!this.enclosingClass.isSubClassOf(method.getEnclosingClass().getClassType()))
-		{
-			return;
-		}
-
-		if (this.overrideMethods == null)
-		{
-			this.overrideMethods = new IdentityHashSet<>();
-		}
-		this.overrideMethods.add(method);
-	}
-
-	@Override
 	public IntrinsicData getIntrinsicData()
 	{
 		final IAnnotation annotation = this.getAnnotation(Types.INTRINSIC_CLASS);
@@ -402,12 +383,6 @@ public class CodeMethod extends AbstractMethod
 		}
 	}
 
-	@Override
-	protected boolean checkOverride0(IMethod candidate)
-	{
-		return this.overrideMethods != null && this.overrideMethods.contains(candidate);
-	}
-
 	private void checkOverrideMethods(MarkerList markers)
 	{
 		if (this.checkNoOverride(markers))
@@ -424,7 +399,7 @@ public class CodeMethod extends AbstractMethod
 			return;
 		}
 
-		if (!this.modifiers.hasIntModifier(Modifiers.OVERRIDE))
+		if (!this.modifiers.hasIntModifier(Modifiers.OVERRIDE) && !this.modifiers.hasIntModifier(Modifiers.GENERATED))
 		{
 			markers.add(Markers.semantic(this.position, "method.overrides", this.name));
 		}
@@ -656,7 +631,7 @@ public class CodeMethod extends AbstractMethod
 			return;
 		}
 
-		final int lineNumber = this.getLineNumber();
+		final int lineNumber = this.lineNumber();
 		final int opcode = interfaceClass ? Opcodes.INVOKEINTERFACE : Opcodes.INVOKEVIRTUAL;
 
 		/*

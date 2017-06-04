@@ -1,0 +1,60 @@
+package dyvil.collection
+
+interface Stack<E> extends Queryable<E>
+{
+	/**
+	 * Removes all elements from this stack.
+	 */
+	func clear() -> void
+
+	/**
+	 * Adds the given element to the top of this stack, so that it becomes the first element in the stack.
+	 *
+	 * @param element
+	 * 	the element to add
+	 */
+	func push(element: E) -> void
+
+	/**
+	 * Adds all elements in the given collection of {@code elements} to the top of this stack in the order in which they
+	 * appear in the collection.
+	 *
+	 * @param elements
+	 * 	the elements to add
+	 */
+	func pushAll(elements: Iterable<+E>) -> void = for (e <- elements) this.push(e)
+
+	/**
+	 * Removes and returns the first element from the top of this stack. If this stack is empty, {@code null} is
+	 * returned.
+	 *
+	 * @return the top element of this stack.
+	 */
+	func pop() -> E?
+
+	/**
+	 * Removes the given number of elements from the top of this stack, as if by calling {@link #pop()} {@code count}
+	 * times.
+	 *
+	 * @param count
+	 * 	the number of elements to remove
+	 */
+	func pop(count: int) -> void = for (i <- 0 ..< count) this.pop()
+
+	/**
+	 * Returns the top element of this stack. Unlike {@link #pop()}, this method does not remove the element from the
+	 * top.
+	 *
+	 * @return the top element of this stack.
+	 */
+	func peek() -> E?
+
+	func peek(index: int) -> E?
+
+	/**
+	 * Returns a copy of this stack that contains the same elements as this stack in the same order.
+	 *
+	 * @return a copy of this stack.
+	 */
+	func copy() -> Stack<E>
+}

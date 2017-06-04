@@ -7,10 +7,10 @@ import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.modifiers.IModified;
 import dyvil.tools.compiler.ast.type.ITyped;
-import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.ASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public interface IMember extends IASTNode, IResolvable, INamed, ITyped, IModified, IAnnotated
+public interface IMember extends ASTNode, IResolvable, INamed, ITyped, IModified, IAnnotated
 {
 	MemberKind getKind();
 

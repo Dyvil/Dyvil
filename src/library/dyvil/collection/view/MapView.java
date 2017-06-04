@@ -186,9 +186,9 @@ public class MapView<K, V> implements ImmutableMap<K, V>
 
 	@NonNull
 	@Override
-	public ImmutableMap<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> condition)
+	public ImmutableMap<K, V> filtered(@NonNull BiPredicate<? super K, ? super V> predicate)
 	{
-		return new MapView(this.map.filtered(condition));
+		return new MapView(this.map.filtered(predicate));
 	}
 
 	@NonNull

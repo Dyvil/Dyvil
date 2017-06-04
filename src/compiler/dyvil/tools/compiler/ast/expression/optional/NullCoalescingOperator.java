@@ -1,7 +1,9 @@
 package dyvil.tools.compiler.ast.expression.optional;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.lang.Formattable;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -14,9 +16,7 @@ import dyvil.tools.compiler.ast.type.compound.NullableType;
 import dyvil.tools.compiler.ast.type.compound.UnionType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public class NullCoalescingOperator implements IValue
 {
@@ -24,7 +24,7 @@ public class NullCoalescingOperator implements IValue
 	protected IValue rhs;
 
 	// Metadata
-	protected ICodePosition position;
+	protected SourcePosition position;
 	protected IType         type;
 
 	protected Label elseLabel = new Label();
@@ -43,13 +43,13 @@ public class NullCoalescingOperator implements IValue
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -154,7 +154,7 @@ public class NullCoalescingOperator implements IValue
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override
@@ -198,7 +198,7 @@ public class NullCoalescingOperator implements IValue
 
 		if (atype != null)
 		{
-			type.writeCast(writer, atype, this.getLineNumber());
+			type.writeCast(writer, atype, this.lineNumber());
 		}
 	}
 }

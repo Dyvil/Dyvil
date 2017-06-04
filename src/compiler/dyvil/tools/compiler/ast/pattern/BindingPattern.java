@@ -15,7 +15,7 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public final class BindingPattern implements IPattern, IDataMemberConsumer<Variable>
 {
@@ -28,7 +28,7 @@ public final class BindingPattern implements IPattern, IDataMemberConsumer<Varia
 	{
 	}
 
-	public BindingPattern(ICodePosition position, Name name, IType type)
+	public BindingPattern(SourcePosition position, Name name, IType type)
 	{
 		this.variable = new Variable(position, name, type);
 	}
@@ -58,13 +58,13 @@ public final class BindingPattern implements IPattern, IDataMemberConsumer<Varia
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.variable.getPosition();
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.variable.setPosition(position);
 	}
@@ -76,7 +76,7 @@ public final class BindingPattern implements IPattern, IDataMemberConsumer<Varia
 	}
 
 	@Override
-	public Variable createDataMember(ICodePosition position, Name name, IType type, ModifierSet modifiers,
+	public Variable createDataMember(SourcePosition position, Name name, IType type, ModifierSet modifiers,
 		                                AnnotationList annotations)
 	{
 		return new Variable(position, name, type, modifiers, annotations);

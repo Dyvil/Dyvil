@@ -3,12 +3,12 @@ package dyvil.collection.impl
 import java.util.{ Iterator, NoSuchElementException }
 import java.io.IOException
 
-public abstract class AbstractBitSet implements Set<int>
+abstract class AbstractBitSet implements Set<int>
 {
-	protected static final int DEFAULT_CAPACITY = 10
+	protected const DEFAULT_CAPACITY: int = 10
 
-	protected @transient int size
-	protected @transient [long]! words
+	protected @transient var size: int
+	protected @transient var words: [long] = unsafeInit<[long]>
 
 	// Constructors
 
@@ -17,48 +17,30 @@ public abstract class AbstractBitSet implements Set<int>
 		this.init(DEFAULT_CAPACITY)
 	}
 
-	public init(int capacity)
+	public init(capacity: int)
 	{
 		this.words = new [long](dyvil.math.MathUtils.ceil(capacity / 64))
 	}
 
-	public init([int] elements)
+	public init(elements: [int])
 	{
 		this.init(elements.size)
-		this.size = elements.size
-
-		for (int i <- elements)
-		{
-			final int wordIndex = wordIndex(i)
-			this.words[wordIndex] |= mask(bitIndex(i))
-		}
+		for (i <- elements) this.setBit(i)
 	}
 
-	public init(Iterable<+int> iterable)
+	public init(iterable: Iterable<+int>)
 	{
 		this.init()
-
-		for (int i <- iterable)
-		{
-			this.setBit(i)
-		}
+		for (i <- iterable) this.setBit(i)
 	}
 
-	public init(SizedIterable<+int> iterable)
+	public init(iterable: SizedIterable<+int>)
 	{
 		this.init(iterable.size)
-
-		var size = 0
-		for (int i <- iterable)
-		{
-			final int wordIndex = wordIndex(i)
-            this.words[wordIndex] |= mask(bitIndex(i))
-            size++
-		}
-		this.size = size
+		for (i <- iterable) this.setBit(i)
 	}
 
-	public init(AbstractBitSet bitSet)
+	public init(bitSet: AbstractBitSet)
 	{
 		this.size = bitSet.size
 		this.words = bitSet.words.copy()
@@ -66,36 +48,36 @@ public abstract class AbstractBitSet implements Set<int>
 
 	// Utility Methods
 
-	protected static int wordIndex(int bit) = bit \ 64
+	protected static func wordIndex(bit: int) -> int = bit \ 64
 
-	protected static int bitIndex(int bit) = bit % 64
+	protected static func bitIndex(bit: int) -> int = bit % 64
 
-	protected static boolean bitSet(long word, int bit) = (word & 1L << bit) != 0L
+	protected static func bitSet(word: long, bit: int) -> boolean = (word & 1L << bit) != 0L
 
-	protected static long mask(int bit) = 1L << bit
+	protected static func mask(bit: int) -> long = 1L << bit
 
 	// Internal Access Methods
 
-	protected void ensureWordCapacity(int wordCount)
+	protected func ensureWordCapacity(wordCount: int) -> void
 	{
-		[long] newWords = new [long](wordCount)
+		let newWords = new [long](wordCount)
 		System.arraycopy(this.words, 0, newWords, 0, this.words.size)
 		this.words = newWords
 	}
 
-	protected boolean bitSet(int bit)
+	protected func bitSet(bit: int) -> boolean
 	{
-		final int wordIndex = wordIndex(bit)
+		let wordIndex = wordIndex(bit)
 		if (wordIndex >= this.words.size) return false
 
-		final int bitIndex = bitIndex(bit)
-		final long word = this.words[wordIndex]
+		let bitIndex = bitIndex(bit)
+		let word = this.words[wordIndex]
 		return bitSet(word, bitIndex)
 	}
 
-	protected int nextSetBit(int start)
+	protected func nextSetBit(start: int) -> int
 	{
-		for (int i <- (start + 1) ..< (this.words.size * 64))
+		for (i <- (start + 1) ..< (this.words.size * 64))
 		{
 			if (this.bitSet(i))
 			{
@@ -105,10 +87,10 @@ public abstract class AbstractBitSet implements Set<int>
 		return -1
 	}
 
-	protected void setBit(int bit)
+	protected func setBit(bit: int) -> void
 	{
-		final int wordIndex = wordIndex(bit)
-		final long value = mask(bitIndex(bit))
+		let wordIndex = wordIndex(bit)
+		let value = mask(bitIndex(bit))
 
 		if (wordIndex >= this.words.size)
 		{
@@ -118,8 +100,8 @@ public abstract class AbstractBitSet implements Set<int>
 			return
 		}
 
-		final long word = this.words[wordIndex]
-		final long newWord = word | value
+		let word = this.words[wordIndex]
+		let newWord = word | value
 
 		if (newWord != word)
 		{
@@ -128,13 +110,13 @@ public abstract class AbstractBitSet implements Set<int>
 		}
 	}
 
-	protected void clearBit(int bit)
+	protected func clearBit(bit: int) -> void
 	{
-		final int wordIndex = wordIndex(bit)
+		let wordIndex = wordIndex(bit)
 		if (wordIndex >= this.words.size) return // bit is already 0
 
-		final long word = this.words[wordIndex]
-		final long newWord = word & ~mask(bitIndex(bit))
+		let word = this.words[wordIndex]
+		let newWord = word & ~mask(bitIndex(bit))
 
 		if (newWord != word)
 		{
@@ -145,28 +127,28 @@ public abstract class AbstractBitSet implements Set<int>
 
 	// Implementation Methods
 
-	public override int size() = this.size
+	override func size() -> int = this.size
 
-	public override boolean isEmpty() = this.size == 0
+	override func isEmpty() -> boolean = this.size == 0
 
-	public override boolean isSorted() = true
+	override func isSorted() -> boolean = true
 
-	public override Iterator<int> iterator() = new Iterator<int>()
+	override func iterator() -> Iterator<int> = new Iterator<int>()
 	{
-		private int currentBit = this<AbstractBitSet>.nextSetBit(-1)
+		private var currentBit: int = this<AbstractBitSet>.nextSetBit(-1)
 
-		public override int next()
+		override func next() -> int
 		{
-			final int current = this.currentBit
+			let current = this.currentBit
 			if (current < 0) throw new NoSuchElementException
 
 			this.currentBit = this<AbstractBitSet>.nextSetBit(current)
 			return current
 		}
 
-		public override boolean hasNext() = this.currentBit >= 0
+		override func hasNext() -> boolean = this.currentBit >= 0
 
-		public override void remove()
+		override func remove() -> void
 		{
 			if (this.currentBit < 0) throw new NoSuchElementException
 
@@ -175,19 +157,19 @@ public abstract class AbstractBitSet implements Set<int>
 		}
 	}
 
-	protected abstract void removeAt(int bit)
+	protected abstract func removeAt(bit: int) -> void
 
-	public override boolean contains(Object! element) = element match {
-		case int i : this.bitSet(i)
-		case _ : false
+	override func contains(element: any!) -> boolean = element match {
+		case var i: int => this.bitSet(i)
+		case _          => false
 	}
 
-	public override void toArray(int index, [Object!] store)
+	override func toArray(index: int, store: [Object!])
 	{
-		for (int wordIndex <- 0 ..< this.words.size)
+		for (wordIndex <- 0 ..< this.words.size)
 		{
-			final long word = this.words[wordIndex]
-			for (int bit <- 0 ..< 64)
+			let word = this.words[wordIndex]
+			for (bit <- 0 ..< 64)
 			{
 				if (bitSet(word, bit))
 				{
@@ -197,21 +179,21 @@ public abstract class AbstractBitSet implements Set<int>
 		}
 	}
 
-	public [int] toIntArray()
+	func toIntArray() -> [int]
 	{
-		final [int] store = new [int](this.size)
+		let store = new [int](this.size)
 		this.toIntArray(0, store)
 		return store
 	}
 
-	public void toIntArray([int] store) = this.toIntArray(0, store)
+	func toIntArray(store: [int]) -> void = this.toIntArray(0, store)
 
-	public void toIntArray(int index, [int] store)
+	func toIntArray(index: int, store: [int]) -> void
 	{
-		for (int wordIndex <- 0 ..< this.words.size)
+		for (wordIndex <- 0 ..< this.words.size)
 		{
-			final long word = this.words[wordIndex]
-			for (int bit <- 0 ..< 64)
+			let word = this.words[wordIndex]
+			for (bit <- 0 ..< 64)
 			{
 				if (bitSet(word, bit))
 				{
@@ -221,56 +203,53 @@ public abstract class AbstractBitSet implements Set<int>
 		}
 	}
 
-	public override MutableSet<RE> emptyCopy<RE>() = MutableSet<RE>()
+	override func emptyCopy<RE>() -> MutableSet<RE> = MutableSet<RE>()
 
-	public override MutableSet<RE> emptyCopy<RE>(int capacity) = MutableSet.withCapacity<RE>(capacity)
+	override func emptyCopy<RE>(capacity: int) -> MutableSet<RE> = MutableSet.withCapacity<RE>(capacity)
 
-	public override MutableSet<int> mutableCopy() = new dyvil.collection.mutable.BitSet(this)
+	override func mutableCopy() -> MutableSet<int> = new mutable.BitSet(this)
 
-	public override ImmutableSet<int> immutableCopy() = new dyvil.collection.immutable.BitSet(this)
+	override func immutableCopy() -> ImmutableSet<int> = new immutable.BitSet(this)
 
-	public override ImmutableSet.Builder<RE> immutableBuilder<RE>() = ImmutableSet.builder<RE>
+	override func immutableBuilder<RE>() -> ImmutableSet.Builder<RE>= ImmutableSet.builder<RE>
 
-	public override ImmutableSet.Builder<RE> immutableBuilder<RE>(int capacity) = ImmutableSet.builder<RE>(capacity)
+	override func immutableBuilder<RE>(capacity: int) -> ImmutableSet.Builder<RE> = ImmutableSet.builder<RE>(capacity)
 
-	public override java.util.Set<int> toJava()
+	override func toJava() -> java.util.Set<int>
 	{
-		final java.util.Set<int> hashSet = new java.util.HashSet<int>
-		for (Int element <- this)
-		{
-			hashSet.add(element)
-		}
+		let hashSet = new java.util.HashSet<int>
+		for (element <- this) hashSet.add(element)
 		return hashSet
 	}
 
-	public override boolean equals(Object! obj) = Set.setEquals(this, obj)
+	override func toString() -> String = Collection.collectionToString(this)
 
-	public override int hashCode() = Set.setHashCode(this)
+	override func equals(obj: any!) -> boolean = Set.setEquals(this, obj)
 
-	public override String toString() = Collection.collectionToString(this)
+	override func hashCode() -> int = Set.setHashCode(this)
 
-	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+	private func writeObject(out: java.io.ObjectOutputStream) -> void throws IOException
 	{
 		out.defaultWriteObject()
 
 		out.writeInt(this.size)
-
 		out.writeInt(this.words.size)
-		for (long word <- this.words!)
+
+		for (word <- this.words)
 		{
 			out.writeLong(word)
 		}
 	}
 
-	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	private func readObject(in: java.io.ObjectInputStream) -> void throws IOException, ClassNotFoundException
 	{
 		in.defaultReadObject()
 
 		this.size = in.readInt()
+		let wordCount = in.readInt()
 
-		final int wordCount = in.readInt()
 		this.words = new [long](wordCount)
-		for (int i <- 0 ..< wordCount)
+		for (i <- 0 ..< wordCount)
 		{
 			this.words[i] = in.readLong()
 		}

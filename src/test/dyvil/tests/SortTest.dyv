@@ -32,7 +32,7 @@ public class SortTest
 		}
 	}
 
-	static func quicksort<T: Comparable>(ImmutableList<T> list) -> ImmutableList<T>
+	static func quicksort<type T: Comparable>(list: ImmutableList<T>) -> ImmutableList<T>
 	{
 		if (list.isEmpty) return list
 
@@ -44,19 +44,16 @@ public class SortTest
 		return less ++ equal ++ greater
 	}
 
-	static func swap<T>(T* left, T* right) -> void
+	static func swap<type T>(left: T*, right: T*) -> void
 	{
 		let temp = *left
 		*left = *right
 		*right = temp
 	}
 
-	static func quicksort<T: Comparable>(MutableList<T> list) -> void
-	{
-		quicksortRange(list, 0, list.size - 1)
-	}
+	static func quicksort<type T: Comparable>(list: MutableList<T>) -> void = quicksortRange(list, 0, list.size - 1)
 
-	private static func quicksortRange<T: Comparable>(MutableList<T> list, int left, int right) -> void
+	private static func quicksortRange<type T: Comparable>(list: MutableList<T>, left: int, right: int) -> void
 	{
 		var i = left
 		var j = right

@@ -1,8 +1,10 @@
 package dyvil.tools.parsing.token;
 
+import dyvil.annotation.internal.NonNull;
+
 public class StartToken implements IToken
 {
-	private IToken next;
+	private @NonNull IToken next;
 
 	@Override
 	public int startColumn()
@@ -35,37 +37,25 @@ public class StartToken implements IToken
 	}
 
 	@Override
-	public IToken prev()
+	public @NonNull IToken prev()
 	{
 		return this;
 	}
 
 	@Override
-	public IToken next()
+	public @NonNull IToken next()
 	{
 		return this.next;
 	}
 
 	@Override
-	public void setPrev(IToken prev)
+	public void setPrev(@NonNull IToken prev)
 	{
 	}
 
 	@Override
-	public void setNext(IToken next)
+	public void setNext(@NonNull IToken next)
 	{
 		this.next = next;
-	}
-
-	@Override
-	public boolean hasPrev()
-	{
-		return false;
-	}
-
-	@Override
-	public boolean hasNext()
-	{
-		return this.next.type() != 0;
 	}
 }

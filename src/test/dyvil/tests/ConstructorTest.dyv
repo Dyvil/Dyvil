@@ -55,7 +55,7 @@ public class ConstructorTest
 			this.order += "init() body"
 		}
 
-		public init(int value)
+		public init(value: int)
 		{
 			this.order += "init(int) body"
 		}
@@ -83,7 +83,6 @@ public class ConstructorTest
 			}
 
 			test "i" { ba.i =?= 1 }
-
 			test "j" { ba.j =?= 0 }
 		}
 

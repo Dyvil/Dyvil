@@ -103,9 +103,9 @@ public class SetView<E> implements ImmutableSet<E>
 
 	@NonNull
 	@Override
-	public ImmutableSet<E> filtered(@NonNull Predicate<? super E> condition)
+	public ImmutableSet<E> filtered(@NonNull Predicate<? super E> predicate)
 	{
-		return new SetView<>(this.set.filtered(condition));
+		return new SetView<>(this.set.filtered(predicate));
 	}
 
 	@NonNull

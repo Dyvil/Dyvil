@@ -1,39 +1,50 @@
 package dyvil.tools.gensrc.ast.directive;
 
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.gensrc.GenSrc;
 import dyvil.tools.gensrc.ast.Specialization;
-import dyvil.tools.gensrc.ast.Util;
+import dyvil.tools.gensrc.ast.expression.Expression;
 import dyvil.tools.gensrc.ast.scope.Scope;
 import dyvil.tools.gensrc.lang.I18n;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SemanticError;
-import dyvil.tools.parsing.position.ICodePosition;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 
-public class IncludeDirective implements Directive
+public class IncludeDirective extends BasicDirective
 {
-	private final ICodePosition position;
-	private final String        files;
+	public static final Name INCLUDE = Name.fromQualified("include");
 
-	public IncludeDirective(ICodePosition position, String files)
+	public IncludeDirective(SourcePosition position)
 	{
 		this.position = position;
-		this.files = files;
+	}
+
+	@Override
+	public Name getName()
+	{
+		return INCLUDE;
+	}
+
+	@Override
+	public boolean isStatement()
+	{
+		return true;
 	}
 
 	@Override
 	public void specialize(GenSrc gensrc, Scope scope, MarkerList markers, PrintStream output)
 	{
-		final String[] fileNames = Util.getProcessedArguments(this.files, 0, this.files.length(), scope);
 		final File sourceFile = scope.getSourceFile();
 
-		for (String fileName : fileNames)
+		for (Expression expr : this.arguments)
 		{
-			this.resolveAndInclude(gensrc, markers, output, sourceFile, fileName);
+			final String reference = expr.evaluateString(scope);
+			this.resolveAndInclude(gensrc, markers, output, sourceFile, reference);
 		}
 	}
 
@@ -71,17 +82,5 @@ public class IncludeDirective implements Directive
 		{
 			ex.printStackTrace(gensrc.getErrorOutput());
 		}
-	}
-
-	@Override
-	public String toString()
-	{
-		return Directive.toString(this);
-	}
-
-	@Override
-	public void toString(String indent, StringBuilder builder)
-	{
-		builder.append(indent).append("#include ").append(this.files).append('\n');
 	}
 }

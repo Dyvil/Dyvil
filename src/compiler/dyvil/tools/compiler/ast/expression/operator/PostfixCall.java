@@ -1,5 +1,7 @@
 package dyvil.tools.compiler.ast.expression.operator;
 
+import dyvil.lang.Formattable;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.access.MethodCall;
@@ -9,13 +11,11 @@ import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public class PostfixCall extends MethodCall
 {
-	public PostfixCall(ICodePosition position, IValue receiver, Name name)
+	public PostfixCall(SourcePosition position, IValue receiver, Name name)
 	{
 		super(position, receiver, name);
 	}
@@ -43,7 +43,7 @@ public class PostfixCall extends MethodCall
 	}
 
 	@Override
-	public IValue toAssignment(IValue rhs, ICodePosition position)
+	public IValue toAssignment(IValue rhs, SourcePosition position)
 	{
 		final Name name = Util.addEq(this.name);
 		return new MethodCall(this.position, this.arguments.getFirst(), name, new ArgumentList(rhs));
@@ -71,7 +71,7 @@ public class PostfixCall extends MethodCall
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

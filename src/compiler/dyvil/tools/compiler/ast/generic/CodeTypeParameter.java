@@ -21,22 +21,22 @@ import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.lang.annotation.ElementType;
 
 public class CodeTypeParameter extends TypeParameter
 {
-	protected ICodePosition position;
+	protected SourcePosition position;
 	protected CodeParameter reifyParameter;
 
-	public CodeTypeParameter(ICodePosition position, ITypeParametric generic, Name name, Variance variance)
+	public CodeTypeParameter(SourcePosition position, ITypeParametric generic, Name name, Variance variance)
 	{
 		super(generic, name, variance);
 		this.position = position;
 	}
 
-	public CodeTypeParameter(ICodePosition position, ITypeParametric generic, Name name, Variance variance, AnnotationList annotations)
+	public CodeTypeParameter(SourcePosition position, ITypeParametric generic, Name name, Variance variance, AnnotationList annotations)
 	{
 		super(generic, name, variance);
 		this.annotations = annotations;
@@ -50,13 +50,13 @@ public class CodeTypeParameter extends TypeParameter
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}

@@ -20,7 +20,7 @@ import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SemanticError;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public final class TryStatement extends AbstractValue implements IDefaultContext
 {
@@ -39,7 +39,7 @@ public final class TryStatement extends AbstractValue implements IDefaultContext
 	// Metadata
 	private IType commonType;
 
-	public TryStatement(ICodePosition position)
+	public TryStatement(SourcePosition position)
 	{
 		this.position = position;
 	}

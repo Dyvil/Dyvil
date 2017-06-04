@@ -23,7 +23,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.parsing.token.IToken;
 
 import static dyvil.tools.compiler.parser.expression.ExpressionParser.IGNORE_CLOSURE;
@@ -43,7 +43,7 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 
 	protected IValueConsumer field;
 
-	private   ICodePosition position;
+	private   SourcePosition position;
 	private   IVariable     variable;
 	private   IValue        update;
 	private   IValue        condition;
@@ -57,7 +57,7 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 		// this.mode = FOR;
 	}
 
-	public ForStatementParser(IValueConsumer field, ICodePosition position)
+	public ForStatementParser(IValueConsumer field, SourcePosition position)
 	{
 		this.field = field;
 		this.position = position;
@@ -252,7 +252,7 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 	}
 
 	@Override
-	public IVariable createDataMember(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public IVariable createDataMember(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
 		return new Variable(position, name, type, modifiers, annotations);
 	}

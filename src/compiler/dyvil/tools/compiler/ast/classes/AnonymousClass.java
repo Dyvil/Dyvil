@@ -17,7 +17,7 @@ import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.CaptureHelper;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class AnonymousClass extends CodeClass
 {
@@ -27,7 +27,7 @@ public class AnonymousClass extends CodeClass
 	protected IConstructor constructor;
 	protected String       constructorDesc;
 
-	public AnonymousClass(ICodePosition position)
+	public AnonymousClass(SourcePosition position)
 	{
 		this.metadata = new AnonymousClassMetadata(this);
 		this.body = new ClassBody(this);

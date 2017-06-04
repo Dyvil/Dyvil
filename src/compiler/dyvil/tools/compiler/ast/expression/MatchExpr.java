@@ -1,8 +1,10 @@
 package dyvil.tools.compiler.ast.expression;
 
 import dyvil.collection.Collection;
+import dyvil.lang.Formattable;
 import dyvil.math.MathUtils;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.consumer.ICaseConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
@@ -10,9 +12,9 @@ import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
+import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.pattern.IPattern;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
@@ -20,15 +22,13 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 import java.util.Arrays;
 
 public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 {
-	protected ICodePosition position;
+	protected SourcePosition position;
 
 	protected IValue matchedValue;
 	protected MatchCase[] cases = new MatchCase[3];
@@ -38,12 +38,12 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 	private boolean exhaustive;
 	private IType   returnType;
 
-	public MatchExpr(ICodePosition position)
+	public MatchExpr(SourcePosition position)
 	{
 		this.position = position;
 	}
 
-	public MatchExpr(ICodePosition position, IValue matchedValue)
+	public MatchExpr(SourcePosition position, IValue matchedValue)
 	{
 		this.position = position;
 		this.matchedValue = matchedValue;
@@ -57,13 +57,13 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -434,7 +434,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 
 	private void writeMatchError(MethodWriter writer, int varIndex, IType matchedType) throws BytecodeException
 	{
-		final int lineNumber = this.getLineNumber();
+		final int lineNumber = this.lineNumber();
 
 		writer.visitTypeInsn(Opcodes.NEW, "dyvil/util/MatchError");
 
@@ -757,7 +757,7 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

@@ -2,26 +2,18 @@ package dyvil.tools.parsing;
 
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
-import dyvil.tools.parsing.token.StartToken;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class TokenIterator implements Iterator<IToken>
 {
-	protected final IToken startToken;
-	protected IToken       lastReturned;
-	protected IToken       next;
+	protected IToken lastReturned;
+	protected IToken next;
 
-	public TokenIterator()
+	public TokenIterator(IToken first)
 	{
-		this.startToken = this.next = new StartToken();
-	}
-
-	public void reset()
-	{
-		this.lastReturned = null;
-		this.next = this.startToken.next();
+		this.next = first;
 	}
 
 	public void setNext(IToken next)
@@ -30,22 +22,10 @@ public class TokenIterator implements Iterator<IToken>
 		this.next = next;
 	}
 
-	public void append(IToken token)
-	{
-		token.setPrev(this.next);
-		this.next.setNext(token);
-		this.next = token;
-	}
-
 	@Override
 	public boolean hasNext()
 	{
 		return this.next.type() != Tokens.EOF;
-	}
-
-	public IToken first()
-	{
-		return this.startToken.next();
 	}
 
 	public IToken lastReturned()
@@ -81,16 +61,5 @@ public class TokenIterator implements Iterator<IToken>
 		next.setPrev(prev);
 		this.lastReturned = null;
 		this.next = next;
-	}
-
-	@Override
-	public String toString()
-	{
-		StringBuilder buf = new StringBuilder();
-		for (IToken token = this.first(); token.type() != Tokens.EOF; token = token.next())
-		{
-			buf.append(token).append('\n');
-		}
-		return buf.toString();
 	}
 }

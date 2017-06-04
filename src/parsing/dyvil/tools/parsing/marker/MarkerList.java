@@ -2,7 +2,7 @@ package dyvil.tools.parsing.marker;
 
 import dyvil.collection.iterator.ArrayIterator;
 import dyvil.collection.mutable.BitSet;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.parsing.source.Source;
 import dyvil.util.I18n;
 
@@ -11,6 +11,8 @@ import java.util.Iterator;
 
 public final class MarkerList implements Iterable<Marker>
 {
+	public static final MarkerList BLACKHOLE = new MarkerList(s -> s);
+
 	private Marker[] markers;
 	private int      markerCount;
 
@@ -116,7 +118,7 @@ public final class MarkerList implements Iterable<Marker>
 		for (int i = this.markerCount - 1; i >= 0; i--)
 		{
 			final Marker marker = this.markers[i];
-			final ICodePosition position = marker.getPosition();
+			final SourcePosition position = marker.getPosition();
 			final int endLine = position.endLine();
 
 			for (int l = position.startLine(); l <= endLine; l++)

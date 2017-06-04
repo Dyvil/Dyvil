@@ -5,11 +5,11 @@ import dyvil.tools.compiler.ast.pattern.IPattern;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class OrPattern extends BinaryPattern
 {
-	public OrPattern(IPattern left, ICodePosition token, IPattern right)
+	public OrPattern(IPattern left, SourcePosition token, IPattern right)
 	{
 		super(left, token, right);
 	}

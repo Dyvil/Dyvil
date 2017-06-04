@@ -8,21 +8,21 @@ public class BridgeTest
 	{
 		func get() -> T
 
-		func set(T value) -> void
+		func set(value: T) -> void
 	}
 
-	public case class IntContainer(int value) implements Container<int>
+	public case class IntContainer(value: int) implements Container<int>
 	{
 		override func get() -> int = this.value
 
-		override func set(int value) -> void = this.value = value
+		override func set(value: int) -> void = this.value = value
 	}
 
-	public case class LongContainer(long value) implements Container<long>
+	public case class LongContainer(value: long) implements Container<long>
 	{
 		override func get() -> long = this.value
 
-		override func set(long value) -> void = this.value = value
+		override func set(value: long) -> void = this.value = value
 	}
 
 	static func apply() -> Test = test "Bridge Methods" {

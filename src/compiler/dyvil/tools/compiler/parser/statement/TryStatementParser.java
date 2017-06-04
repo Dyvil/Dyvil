@@ -19,7 +19,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.parsing.token.IToken;
 
 public final class TryStatementParser extends Parser implements IValueConsumer, IDataMemberConsumer<IVariable>
@@ -144,7 +144,7 @@ public final class TryStatementParser extends Parser implements IValueConsumer, 
 	}
 
 	@Override
-	public IVariable createDataMember(ICodePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
+	public IVariable createDataMember(SourcePosition position, Name name, IType type, ModifierSet modifiers, AnnotationList annotations)
 	{
 		return new Variable(position, name, type, modifiers, annotations);
 	}

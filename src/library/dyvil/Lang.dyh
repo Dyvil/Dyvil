@@ -10,6 +10,7 @@ import dyvil.collection._
 import dyvil.io.Console
 import dyvil.random.Random
 import dyvil.function.PartialFunction
+import dyvil.tuple.Tuple.Of1 as Tuple
 
 import dyvil.util.{
 	Option, None, Some
@@ -136,3 +137,6 @@ infix   operator %   { left, 1200 }
 
 // Exponentiation Operators
 infix   operator **  { right, 1300 }
+
+// Concatenation Operator
+infix   operator ++  { left,  2000 }

@@ -1,0 +1,596 @@
+package dyvil.collection
+
+import java.util.{ Comparator, Iterator, Spliterator, Spliterators }
+import java.util.function.{ Function, Predicate }
+import java.lang.reflect.Array
+
+@LiteralConvertible.FromArray
+abstract interface Collection<type E> extends Queryable<E>
+{
+	static let EMPTY_STRING: String = '[]'
+	static let START_STRING: String = '['
+	static let END_STRING:   String = ']'
+	static let ELEMENT_SEPARATOR_STRING: String = ', '
+
+	/**
+	 * Returns an empty, immutable collection. This method is primarily for use with the {@code nil} literal in
+	 * <i>Dyvil</i>, and the exact type of the returned object is given by {@link ImmutableSet#apply()}.
+	 *
+	 * @return an empty, immutable collection
+	 */
+	static func apply<type E>() -> ImmutableCollection<E> = ImmutableSet<E>()
+
+	/**
+	 * Returns an immutable collection containing all of the given {@code elements}. This method is primarily for use
+	 * with <i>Array Expressions</i> in <i>Dyvil</i> and is defined by {@link ImmutableList#apply(Object...)}.
+	 *
+	 * @param elements
+	 * 	the elements of the returned collection
+	 *
+	 * @return an immutable collection containing all of the given elements
+	 */
+	static func apply<type E>(elements: E...) -> ImmutableCollection<E> = ImmutableList(elements...)
+
+	/**
+	 * Returns {@code true} iff this collection is immutable, i.e. the number and order of it's elements cannot be
+	 * changed after it's creation.
+	 *
+	 * @return true, iff this collection is immutable
+	 */
+	abstract func isImmutable() -> boolean
+
+	/**
+	 * Returns the size of this collection, i.e. the number of elements contained in this collection.
+	 *
+	 * @return the size of this collection
+	 */
+	override abstract func size() -> int
+
+	/**
+	 * Returns true if and if only this collection is empty. The standard implementation defines a collection as empty
+	 * if it's size as calculated by {@link #size()} is exactly {@code 0}.
+	 *
+	 * @return true, if this collection is empty
+	 */
+	override func isEmpty() -> boolean = this.size == 0
+
+	func isDistinct() -> boolean
+	{
+		let size = this.size
+		if (size < 2)
+		{
+			return true
+		}
+
+		let array = this.toArray()
+		return Set.isDistinct(array, size)
+	}
+
+	func isSorted() -> boolean = this.size() < 2 || iteratorSorted(this.iterator())
+
+	func isSorted(comparator: Comparator<-E>) -> boolean = this.size() < 2 || iteratorSorted(this.iterator(), comparator)
+
+	/**
+	 * Creates and returns an {@link Iterator} over the elements of this collection.
+	 *
+	 * @return an iterator over the elements of this collection
+	 */
+	override abstract func iterator() -> Iterator<E>
+
+	/**
+	 * Creates and returns a {@link Spliterator} over the elements of this collection.
+	 *
+	 * @return a spliterator over the elements of this collection
+	 */
+	override func spliterator() -> Spliterator<E> = Spliterators.spliterator(this.iterator(), this.size(), Spliterator.SIZED)
+
+	/**
+	 * Returns true if and if only this collection contains the element specified by {@code element}.
+	 *
+	 * @param element
+	 * 	the element
+	 *
+	 * @return true, if this collection contains the element
+	 */
+	override func contains(element: any!) -> boolean = iterableContains(this, element)
+
+	func intersects(collection: Collection<+any!>) -> boolean
+	{
+		if (collection.size < this.size)
+		{
+			for (e <- this) if (collection.contains(e)) return true
+			return false
+		}
+
+		for (e <- collection) if (this.contains(e)) return true
+		return false
+	}
+
+	// Non-mutating Operations
+
+	/**
+	 * Returns a collection that contains all elements of this collection plus the element given by {@code element}.
+	 *
+	 * @param element
+	 * 	the element to be added
+	 *
+	 * @return a collection that contains all elements of this collection plus the given element
+	 */
+	abstract func added(element: E) -> Collection<E>!
+
+	/**
+	 * Returns a collection that contains all elements of this collection excluding the element given by {@code
+	 * element}.
+	 *
+	 * @param element
+	 * 	the element to be removed
+	 *
+	 * @return a collection that contains all elements of this collection excluding the given element
+	 */
+	abstract func removed(element: any!) -> Collection<E>!
+
+	/**
+	 * Returns a collection that contains all elements of this collection plus all elements of the given {@code
+	 * collection}.
+	 *
+	 * @param collection
+	 * 	the collection of elements to be added
+	 *
+	 * @return a collection that contains all elements of this collection plus all elements of the collection
+	 */
+	abstract func union(collection: Collection<+E>) -> Collection<E>!
+
+	/**
+	 * Returns a collection that contains all elements of this collection excluding all elements of the given {@code
+	 * collection}.
+	 *
+	 * @param collection
+	 * 	the collection of elements to be removed
+	 *
+	 * @return a collection that contains all elements of this collection excluding all elements of the collection
+	 */
+	abstract func difference(collection: Collection<+any!>) -> Collection<E>!
+
+	/**
+	 * Returns a collection that contains all elements of this collection that are present in the given collection.
+	 *
+	 * @param collection
+	 * 	the collection of elements to be retained
+	 *
+	 * @return a collection that contains all elements of this collection that are present in the given collection
+	 */
+	abstract func intersection(collection: Collection<+E>) -> Collection<E>!
+
+	/**
+	 * Returns a collection that is mapped from this collection by supplying each of this collection's elements to the
+	 * given {@code mapper}, and adding the returned mappings to a new collection.
+	 *
+	 * @param mapper
+	 * 	the mapping function
+	 *
+	 * @return a collection mapped by the mapping function
+	 */
+	override abstract func mapped<type R: Object!>(mapper: Function<-E,+R>) -> Collection<R>
+
+	/**
+	 * Returns a collection that is flat-mapped from this collection by supplying each of this collection's elements to
+	 * the given {@code mapper}, and adding all elements by iterating over the {@link Iterable} returned by the {@code
+	 * mapper}
+	 *
+	 * @param mapper
+	 * 	the mapping function
+	 *
+	 * @return a collection flat-mapped by the mapping function
+	 */
+	override abstract func flatMapped<type R: Object!>(mapper: Function<-E,+Iterable<+R>>) -> Collection<R>
+
+	/**
+	 * Returns a collection that is filtered from this collection by filtering each of this collection's elements using
+	 * the given {@code condition}.
+	 *
+	 * @param predicate
+	 * 	the filter condition predicate
+	 *
+	 * @return a collection filtered by the filter condition predicate
+	 */
+	override abstract func filtered(predicate: Predicate<-E>) -> Collection<E>
+
+	// Mutating Operations
+
+	/**
+	 * Clears this collection such that all elements of this collection are removed and {@link #size()} returns {@code
+	 * 0} after an invocation of this method. Note that implementations of this method in classes using an {@code int
+	 * size} field, the classes should not only set their {@code size} to {@code 0}, but also make sure to actually set
+	 * all elements to {@code null}. That ensures that these elements do not stay in memory and are eventually
+	 * garbage-collected.
+	 */
+	abstract func clear() -> void
+
+	/**
+	 * Adds the element given by {@code element} to this collection and returns the {@code true} if it was not present
+	 * in this collection, {@code false} otherwise (does not apply to {@link List Lists} as the element will always be
+	 * appended at the end of the list, therefore always returning {@code false}). This method should throw an {@link
+	 * ImmutableException} if this is an immutable collection.
+	 *
+	 * @param element
+	 * 	the element to be added
+	 *
+	 * @return {@code true} if the element was not present in this collection, {@code false} otherwise
+	 */
+	abstract func add(element: E) -> boolean
+
+	/**
+	 * Adds all elements of the given {@code iterable} to this collection. This method should throw an {@link
+	 * ImmutableException} if this is an immutable collection.
+	 *
+	 * @param iterable
+	 * 	the iterable collection of elements to be added
+	 *
+	 * @return {@code true} iff any elements have been removed from this collection, {@code false} otherwise
+	 */
+	func addAll(elements: Iterable<+E>) -> boolean
+	{
+		var changed = false
+		for (e <- elements) if (this.add(e)) changed = true
+		return changed
+	}
+
+	/**
+	 * Adds all elements of the given {@code collection} to this collection. This method should throw an {@link
+	 * ImmutableException} if this is an immutable collection.
+	 *
+	 * @param collection
+	 * 	the collection of elements to be added
+	 *
+	 * @return {@code true} iff any elements have been removed from this collection, {@code false} otherwise
+	 */
+	func addAll(elements: Collection<+E>) -> boolean = this.addAll(elements as Iterable<E>)
+
+	/**
+	 * Removes the given {@code element} from this collection. If the element is not present in this list, it is simply
+	 * ignored and {@code false} is returned. Otherwise, if the element has been successfully removed, {@code true} is
+	 * returned.
+	 *
+	 * @param element
+	 * 	the element to be removed
+	 *
+	 * @return {@code true}, iff the element has been removed successfully, {@code false} otherwise
+	 */
+	abstract func remove(element: any!) -> boolean
+
+	/**
+	 * Removes all elements of the given {@code iterable} from this collection. This method should throw an {@link
+	 * ImmutableException} if the callee is an immutable collection.
+	 *
+	 * @param iterable
+	 * 	the iterable collection of elements to be removed
+	 *
+	 * @return {@code true} iff any elements have been removed from this collection, {@code false} otherwise
+	 */
+	func removeAll(elements: Iterable<_>) -> boolean
+	{
+		var changed = false
+		for (e <- elements) changed |= this.remove(e)
+		return changed
+	}
+
+	/**
+	 * Removes all elements of the given {@code collection} from this collection. This method should throw an {@link
+	 * ImmutableException} if the callee is an immutable collection.
+	 *
+	 * @param collection
+	 * 	the collection of elements to be removed
+	 *
+	 * @return {@code true} iff any elements have been removed from this collection, {@code false} otherwise
+	 */
+	func removeAll(elements: Collection<_>) -> boolean = this.removeAll(elements as Iterable<_>)
+
+	/**
+	 * Removes all elements of this collection that are not present in the given {@code collection}. This method should
+	 * throw an {@link ImmutableException} if this is an immutable collection.
+	 *
+	 * @param collection
+	 * 	the collection of elements to be retained
+	 *
+	 * @return {@code true} iff any elements have been removed from this collection, {@code false} otherwise
+	 */
+	func retainAll(elements: Collection<+E>) -> boolean
+	{
+		let it = this.iterator
+		var changed = false
+		for (e <- it) if (!elements.contains(e)) { it.remove; changed = true }
+		return changed
+	}
+
+	/**
+	 * Maps the elements of this collection using the given {@code mapper}. This is done by supplying each of this
+	 * collection's elements to the mapping function and replacing them with the result returned by it.
+	 *
+	 * @param mapper
+	 * 	the mapping function
+	 */
+	override abstract func map(mapper: Function<-E,+E>) -> void
+
+	/**
+	 * Flat-maps the elements of this collection using the given {@code mapper}. This is done by supplying each of this
+	 * collection's elements to the mapping function and replacing them with the all elements of the {@link Iterator}
+	 * returned by it.
+	 *
+	 * @param mapper
+	 * 	the mapping function
+	 */
+	override abstract func flatMap(mapper: Function<-E,+Iterable<+E>>) -> void
+
+	/**
+	 * Filters the elements of this collection using the given {@code condition} . This is done by supplying each of
+	 * this collection's elements to the predicate condition, and removing them if the predicate fails, i.e. returns
+	 * {@code false}.
+	 *
+	 * @param predicate
+	 * 	the filter condition predicate
+	 */
+	override func filter(predicate: Predicate<-E>) -> void
+	{
+		let it = this.iterator
+		for (e <- it) if (!predicate.test(e)) it.remove
+	}
+
+	// Copying Operations
+
+	/**
+	 * Creates and returns an array containing the elements of this collection.
+	 *
+	 * @return an array of this collection's elements
+	 */
+	func toArray() -> [Object!] = new [Object!](this.size).{ this.toArray($0); $0 }
+
+	/**
+	 * Creates and returns an array containing the elements of this collection. The type of the array is specified by
+	 * the given {@code type} representing the {@link Class} object of it's component type. Note that this method
+	 * requires the elements of this collection to be casted to the given component type using it's {@link
+	 * Class#cast(Object) cast} method.
+	 *
+	 * @param type
+	 * 	the array type
+	 *
+	 * @return an array containing this collection's elements
+	 */
+	func toArray<R>(of: Class<R>) -> [R]
+	{
+		let array = Array.newInstance(of, this.size) as [R]
+		this.toArray(array)
+		return array
+	}
+
+	/**
+	 * Stores all elements of this collection sequentially in the given {@code store} array, starting at the index
+	 * {@code 0}. The order in which the element are added to the array is the same order in which they would appear in
+	 * this collection's {@link #iterator()}. Note that this method usually doesn't do boundary checking on the array,
+	 * so passing an array of insufficient size to hold all elements of this collection will likely result in an {@link
+	 * ArrayIndexOutOfBoundsException}.
+	 *
+	 * @param store
+	 * 	the array to store the elements in
+	 */
+	func toArray(store: [Object!]) -> void = this.toArray(0, store)
+
+	/**
+	 * Stores all elements of this collection sequentially in the given {@code store} array, starting at given {@code
+	 * index}. The order in which the element are added to the array is the same order in which they would appear in
+	 * this collection's {@link #iterator()}. Note that this method usually doesn't do boundary checking on the array,
+	 * so passing an array of insufficient size to hold all elements of this collection will likely result in an {@link
+	 * ArrayIndexOutOfBoundsException}.
+	 * @param index
+	 * 	the index in the array at which the first element of this collection should be placed
+	 * @param store
+	 */
+	func toArray(index: int, store: [Object!]) -> void = for (e <- this) store[index++] = e
+
+	/**
+	 * Creates a copy of this collection. The general contract of this method is that the type of the returned
+	 * collection is the same as this collection's type, such that
+	 * <p>
+	 * <pre>
+	 * c.getClass == c.copy.getClass
+	 * </pre>
+	 *
+	 * @return a copy of this collection
+	 */
+	abstract func copy() -> Collection<E>
+
+	abstract func emptyCopy<type RE: Object!>() -> MutableCollection<RE>
+
+	abstract func emptyCopy<type RE: Object!>(capacity: int) -> MutableCollection<RE>
+
+	/**
+	 * Returns a mutable collection that contains the exact same elements as this collection. Already mutable
+	 * collections should return themselves when this method is called on them, while immutable collections should
+	 * return a copy that can be modified.
+	 *
+	 * @return a mutable collection with the same elements as this collection
+	 */
+	abstract func mutable() -> MutableCollection<E>
+
+	/**
+	 * Returns a mutable copy of this collection. For mutable collections, this method has the same result as the {@link
+	 * #copy()} method, while for immutable collections, the result of this method is the equivalent of a call to {@link
+	 * #mutable()}.
+	 *
+	 * @return a mutable copy of this collection
+	 */
+	abstract func mutableCopy() -> MutableCollection<E>
+
+	/**
+	 * Returns an immutable collection that contains the exact same elements as this collection. Already immutable
+	 * collections should return themselves when this method is called on them, while mutable collections should return
+	 * a copy that cannot be modified.
+	 *
+	 * @return a immutable collection with the same elements as this collection
+	 */
+	abstract func immutable() -> ImmutableCollection<E>
+
+	/**
+	 * Returns a immutable copy of this collection. For immutable collections, this method has the same result as the
+	 * {@link #copy()} method, while for mutable collections, the result of this method is the equivalent of a call to
+	 * {@link #mutable()}.
+	 *
+	 * @return an immutable copy of this collection
+	 */
+	abstract func immutableCopy() -> ImmutableCollection<E>
+
+	abstract func immutableBuilder<type RE: Object!>() -> ImmutableCollection.Builder<RE>
+
+	abstract func immutableBuilder<type RE: Object!>(capacity: int) -> ImmutableCollection.Builder<RE>
+
+	/**
+	 * Returns a view on the elements of this collection. Immutable collections return themselves, as they are already
+	 * immutable and therefore already provide a view. Mutable collections return a special collection that references
+	 * them, and modifications such as element addition or removal in the original collection are reflect in the view.
+	 *
+	 * @return a view on the elements of this collection
+	 */
+	abstract func view() -> ImmutableCollection<E>
+
+	/**
+	 * Returns the Java Collection Framework equivalent of this collection. The returned collection is not a view of
+	 * this one, but an exact copy. Immutable collections should return a collection that is locked for mutation, which
+	 * is usually ensured by wrapping the collection with {@link java.util.Collections#unmodifiableCollection(java.util.Collection)
+	 * Collections.unmodifiableCollection} .
+	 *
+	 * @return a java collection containing the elements of this collection
+	 */
+	abstract func toJava() -> java.util.Collection<E>
+
+	// String
+
+	override abstract func toString() -> String
+
+	override func toString(builder: StringBuilder) -> void
+	{
+		if (this.isEmpty)
+		{
+			builder.append(EMPTY_STRING)
+			return
+		}
+
+		this.toString(builder, START_STRING, ELEMENT_SEPARATOR_STRING, END_STRING)
+	}
+
+	// Equals and Hash Code
+
+	override abstract func equals(obj: any!) -> boolean
+
+	override abstract func hashCode() -> int
+
+	// Utility Functions
+
+	static func iterableContains(iterable: Iterable<_>, element: any!) -> boolean
+	{
+		if (element == null)
+		{
+			for (e <- iterable) if (e == null) return true
+			return false
+		}
+
+		for (e <- iterable) if (element.equals(e)) return true
+		return false
+	}
+
+	static func collectionToString(collection: Queryable<_>) -> String
+	{
+		if (collection.isEmpty) return EMPTY_STRING
+
+		let builder = new StringBuilder
+		collection.toString(builder)
+		return builder.toString
+	}
+
+	static func orderedEquals(lhs: Queryable<_>, rhs: Queryable<_>) -> boolean
+	{
+		if (lhs.size != rhs.size) return false
+
+		let it1 = lhs.iterator
+		let it2 = rhs.iterator
+		while (it1.hasNext)
+		{
+			if (it1.next != it2.next) return false
+		}
+		return true
+	}
+
+	static func unorderedEquals(lhs: Queryable<_>, rhs: Queryable<_>) -> boolean
+	{
+		if (lhs.size != rhs.size) return false
+
+		for (e <- lhs) if (!rhs.contains(e)) return false
+		return true
+	}
+
+	static func unorderedHashCode(collection: Iterable<_>) -> int
+	{
+		var sum = 0
+		var product = 0
+		for (e <- collection)
+		{
+			let hash = e.hashCode
+			sum += hash
+			product *= hash
+		}
+		return sum * 31 + product
+	}
+
+	static func isSorted(array: [Object!], size: int) -> boolean
+	{
+		if (size < 2) return true
+
+		for (i <- 1 ..< size)
+		{
+			let left = array[i - 1] as Comparable
+			let right = array[i] as Comparable
+			if (right < left) return false
+		}
+		return true
+	}
+
+	static func isSorted<type E: Object!>(array: [E], size: int, comparator: Comparator<-E>) -> boolean
+	{
+		if (size < 2) return true
+
+		for (i <- 1 ..< size)
+		{
+			if (comparator.compare(array[i - 1], array[i]) > 0) return false
+		}
+		return true
+	}
+
+	static func iteratorSorted(iterator: Iterator<_>) -> boolean
+	{
+		if (!iterator.hasNext) return true
+
+		var curr = iterator.next as Comparable
+		while (iterator.hasNext)
+		{
+			let next = iterator.next as Comparable
+			if (next < curr) return false
+			curr = next
+		}
+
+		return true
+	}
+
+	static func iteratorSorted<type E: Object!>(iterator: Iterator<E>, comparator: Comparator<-E>) -> boolean
+	{
+		if (!iterator.hasNext) return true
+
+		var curr = iterator.next
+		while (iterator.hasNext)
+		{
+			let next = iterator.next
+			if (comparator.compare(curr, next) > 0) return false
+			curr = next
+		}
+
+		return true
+	}
+
+}

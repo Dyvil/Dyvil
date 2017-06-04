@@ -13,19 +13,19 @@ import dyvil.tools.compiler.ast.type.generic.NamedGenericType;
 import dyvil.tools.compiler.transform.ConstantFolder;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class MethodCall extends AbstractCall implements INamed
 {
 	protected Name name;
 
-	public MethodCall(ICodePosition position)
+	public MethodCall(SourcePosition position)
 	{
 		this.position = position;
 		this.arguments = ArgumentList.EMPTY;
 	}
 
-	public MethodCall(ICodePosition position, IValue instance, Name name)
+	public MethodCall(SourcePosition position, IValue instance, Name name)
 	{
 		this.position = position;
 		this.receiver = instance;
@@ -33,7 +33,7 @@ public class MethodCall extends AbstractCall implements INamed
 		this.arguments = ArgumentList.EMPTY;
 	}
 
-	public MethodCall(ICodePosition position, IValue instance, Name name, ArgumentList arguments)
+	public MethodCall(SourcePosition position, IValue instance, Name name, ArgumentList arguments)
 	{
 		this.position = position;
 		this.receiver = instance;
@@ -41,7 +41,7 @@ public class MethodCall extends AbstractCall implements INamed
 		this.arguments = arguments;
 	}
 
-	public MethodCall(ICodePosition position, IValue instance, IMethod method, ArgumentList arguments)
+	public MethodCall(SourcePosition position, IValue instance, IMethod method, ArgumentList arguments)
 	{
 		this.position = position;
 		this.receiver = instance;
@@ -87,7 +87,7 @@ public class MethodCall extends AbstractCall implements INamed
 	}
 
 	@Override
-	public IValue toAssignment(IValue rhs, ICodePosition position)
+	public IValue toAssignment(IValue rhs, SourcePosition position)
 	{
 		final FieldAccess access = new FieldAccess(this.position, this.receiver, this.name);
 		return new UpdateMethodCall(this.position.to(position), access, this.arguments, rhs);

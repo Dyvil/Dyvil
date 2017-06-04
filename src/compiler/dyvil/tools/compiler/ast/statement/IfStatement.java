@@ -1,6 +1,8 @@
 package dyvil.tools.compiler.ast.statement;
 
+import dyvil.lang.Formattable;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.context.ILabelContext;
@@ -16,9 +18,7 @@ import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
-import dyvil.tools.parsing.ast.IASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
 
 public class IfStatement implements IValue
 {
@@ -30,10 +30,10 @@ public class IfStatement implements IValue
 	protected IValue elseThen;
 
 	// Metadata
-	private ICodePosition position;
+	private SourcePosition position;
 	private IType         commonType;
 
-	public IfStatement(ICodePosition position)
+	public IfStatement(SourcePosition position)
 	{
 		this.position = position;
 	}
@@ -52,13 +52,13 @@ public class IfStatement implements IValue
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 		this.position = position;
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.position;
 	}
@@ -402,7 +402,7 @@ public class IfStatement implements IValue
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

@@ -1,0 +1,95 @@
+package dyvil.collection
+
+interface Deque<E> extends BidiQueryable<E>, Stack<E>, Queue<E>
+{
+	// Deque Methods
+
+	/**
+	 * Returns, but does not remove, the first element in this deque.
+	 *
+	 * @return the first element in this deque.
+	 */
+	func getFirst() -> E?
+
+	/**
+	 * Returns, but does not remove, the last element in this deque.
+	 *
+	 * @return the last element in this deque.
+	 */
+	func getLast() -> E?
+
+	/**
+	 * Adds the given element to the front of this deque.
+	 *
+	 * @param element
+	 * 	the element to add.
+	 */
+	func addFirst(element: E) -> void
+
+	/**
+	 * Adds the given element to the end of this deque.
+	 *
+	 * @param element
+	 * 	the element to add.
+	 */
+	func addLast(element: E) -> void
+
+	/**
+	 * Removes and returns the first element in this deque.
+	 *
+	 * @return the first element in this deque.
+	 */
+	func removeFirst() -> E?
+
+	/**
+	 * Removes and returns the last element in this deque.
+	 *
+	 * @return the last element in this deque.
+	 */
+	func removeLast() -> E?
+
+	/**
+	 * Removes the first occurence of the given {@code element} from this deque and returns {@code true} if the element
+	 * was removed. If the element could not be removed or was not found, {@code false} is returned.
+	 *
+	 * @param element
+	 * 	the element to remove
+	 *
+	 * @return true, if the element was removed successfully
+	 */
+	func removeFirst(element: any!) -> boolean
+
+	/**
+	 * Removes the last occurence of the given {@code element} from this deque and returns {@code true} if the element
+	 * was removed. If the element could not be removed or was not found, {@code false} is returned.
+	 *
+	 * @param element
+	 * 	the element to remove
+	 *
+	 * @return true, if the element was removed successfully
+	 */
+	func removeLast(element: any!) -> boolean
+
+	/**
+	 * Returns a copy of this deque that contains the same elements as this deque in the same order.
+	 *
+	 * @return a copy of this deque.
+	 */
+	override func copy() -> Deque<E>
+
+	// Queue Methods
+
+	override func element() -> E? = this.getLast()
+
+	override func offer(element: E) -> void = this.addLast(element)
+
+	override func remove() -> E? = this.removeLast()
+
+	// Stack Methods
+
+	override func peek() -> E? = this.getFirst()
+
+	override func push(element: E) -> void = this.addFirst(element)
+
+	override func pop() -> E? = this.removeFirst()
+}

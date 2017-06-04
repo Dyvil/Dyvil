@@ -14,7 +14,7 @@ import dyvil.tools.compiler.ast.type.generic.ResolvedGenericType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -74,7 +74,7 @@ public class MapType extends ResolvedGenericType
 		this.setMutability(mutability);
 	}
 
-	public MapType(ICodePosition position, Mutability mutability, TypeList arguments)
+	public MapType(SourcePosition position, Mutability mutability, TypeList arguments)
 	{
 		super(position, null, arguments);
 		this.setMutability(mutability);

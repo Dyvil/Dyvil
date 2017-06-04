@@ -1,0 +1,26 @@
+package dyvil.collection
+
+import java.util._
+import java.util.function._
+
+interface SizedIterable<E> extends Iterable<E>
+{
+	// Size
+
+	func size() -> int
+
+	func isEmpty() -> boolean = this.size() == 0
+
+	// Iterator
+
+	override func iterator() -> Iterator<E>
+
+	override func spliterator() -> Spliterator<E> = Spliterators.spliterator(this.iterator(), this.size(), 0)
+
+	// For Each
+
+	override func forEach(action: Consumer<-E>!) -> void = for (e <- this) action.accept(e)
+
+	@OverloadPriority
+	func forEach(action: E -> void) -> void = for (e <- this) action(e)
+}

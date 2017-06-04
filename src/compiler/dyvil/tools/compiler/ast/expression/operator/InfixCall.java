@@ -12,16 +12,16 @@ import dyvil.tools.compiler.transform.SideEffectHelper;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class InfixCall extends MethodCall
 {
-	public InfixCall(ICodePosition position, IValue lhs, Name name, IValue rhs)
+	public InfixCall(SourcePosition position, IValue lhs, Name name, IValue rhs)
 	{
 		super(position, lhs, name, new ArgumentList(rhs));
 	}
 
-	public InfixCall(ICodePosition position, IValue receiver, Name name, ArgumentList arguments)
+	public InfixCall(SourcePosition position, IValue receiver, Name name, ArgumentList arguments)
 	{
 		super(position, receiver, name, arguments);
 	}
@@ -56,7 +56,7 @@ public class InfixCall extends MethodCall
 		return null;
 	}
 
-	protected static IValue resolveCompound(MarkerList markers, IContext context, ICodePosition position, IValue lhs,
+	protected static IValue resolveCompound(MarkerList markers, IContext context, SourcePosition position, IValue lhs,
 		                                       Name name, ArgumentList arguments)
 	{
 		IValue op = getIncOperator(name, lhs, arguments.getLast());

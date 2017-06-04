@@ -11,6 +11,7 @@ import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.method.ParameterListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilSymbols;
+import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -92,7 +93,7 @@ public class LambdaOrTupleParser extends Parser
 			this.mode = TUPLE_END;
 			return;
 		case TUPLE_END:
-			this.value.expandPosition(token);
+			Util.expandPosition(this.value, token);
 			this.consumer.setValue(this.value);
 
 			pm.popParser();

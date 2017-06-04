@@ -13,7 +13,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class WildcardAccess implements IValue
 {
@@ -31,13 +31,13 @@ public class WildcardAccess implements IValue
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.parameter.getPosition();
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 	}
 
@@ -131,7 +131,7 @@ public class WildcardAccess implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
-		final int lineNumber = this.getLineNumber();
+		final int lineNumber = this.lineNumber();
 
 		this.parameter.writeGet(writer, null, lineNumber);
 		if (type != null)

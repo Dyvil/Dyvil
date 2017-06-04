@@ -6,18 +6,18 @@ import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class SubscriptAssignment extends AbstractCall implements IValueConsumer
 {
-	public SubscriptAssignment(ICodePosition position, IValue receiver, ArgumentList arguments)
+	public SubscriptAssignment(SourcePosition position, IValue receiver, ArgumentList arguments)
 	{
 		this.position = position;
 		this.receiver = receiver;
 		this.arguments = arguments;
 	}
 
-	public SubscriptAssignment(ICodePosition position, IValue receiver, ArgumentList arguments, IValue rhs)
+	public SubscriptAssignment(SourcePosition position, IValue receiver, ArgumentList arguments, IValue rhs)
 	{
 		this.position = position;
 		this.receiver = receiver;

@@ -1,5 +1,6 @@
 package dyvil.tools.gensrc.ast.directive;
 
+import dyvil.lang.Formattable;
 import dyvil.tools.gensrc.GenSrc;
 import dyvil.tools.gensrc.ast.scope.Scope;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -49,15 +50,32 @@ public class DirectiveList implements Directive
 	@Override
 	public String toString()
 	{
-		return Directive.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override
 	public void toString(String indent, StringBuilder builder)
 	{
+		if (this.directiveCount == 0)
+		{
+			return;
+		}
+
 		for (int i = 0; i < this.directiveCount; i++)
 		{
+			this.indent(indent, builder);
+
 			this.directives[i].toString(indent, builder);
+		}
+
+		this.indent(indent, builder);
+	}
+
+	protected void indent(String indent, StringBuilder builder)
+	{
+		if (builder.length() > 0 && builder.charAt(builder.length() - 1) == '\n')
+		{
+			builder.append(indent);
 		}
 	}
 }

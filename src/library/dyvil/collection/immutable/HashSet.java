@@ -283,13 +283,13 @@ public class HashSet<E> extends AbstractHashSet<E> implements ImmutableSet<E>
 
 	@NonNull
 	@Override
-	public ImmutableSet<E> filtered(@NonNull Predicate<? super E> condition)
+	public ImmutableSet<E> filtered(@NonNull Predicate<? super E> predicate)
 	{
 		HashSet<E> newSet = new HashSet<>(this.size);
 
 		for (E element : this)
 		{
-			if (condition.test(element))
+			if (predicate.test(element))
 			{
 				newSet.addInternal(element);
 			}

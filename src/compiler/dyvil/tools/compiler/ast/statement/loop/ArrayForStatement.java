@@ -7,18 +7,18 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class ArrayForStatement extends ForEachStatement
 {
 	protected ArrayType arrayType;
 
-	public ArrayForStatement(ICodePosition position, IVariable var)
+	public ArrayForStatement(SourcePosition position, IVariable var)
 	{
 		this(position, var, var.getValue().getType().extract(ArrayType.class));
 	}
 
-	public ArrayForStatement(ICodePosition position, IVariable var, ArrayType arrayType)
+	public ArrayForStatement(SourcePosition position, IVariable var, ArrayType arrayType)
 	{
 		super(position, var);
 
@@ -34,7 +34,7 @@ public class ArrayForStatement extends ForEachStatement
 
 		final IVariable var = this.variable;
 		final IType elementType = this.arrayType.getElementType();
-		final int lineNumber = this.getLineNumber();
+		final int lineNumber = this.lineNumber();
 
 		// Scope
 		dyvil.tools.asm.Label scopeLabel = new dyvil.tools.asm.Label();

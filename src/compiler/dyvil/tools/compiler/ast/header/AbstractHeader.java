@@ -2,7 +2,9 @@ package dyvil.tools.compiler.ast.header;
 
 import dyvil.collection.Map;
 import dyvil.collection.mutable.IdentityHashMap;
+import dyvil.lang.Formattable;
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.DyvilCompiler;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -24,8 +26,6 @@ import dyvil.tools.compiler.ast.type.alias.ITypeAlias;
 import dyvil.tools.compiler.ast.type.alias.TypeAlias;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
-import dyvil.tools.parsing.position.ICodePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -73,13 +73,13 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
-		return ICodePosition.ORIGIN;
+		return SourcePosition.ORIGIN;
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 	}
 
@@ -171,18 +171,6 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	}
 
 	@Override
-	public IOperator getOperator(int index)
-	{
-		return this.operators[index];
-	}
-
-	@Override
-	public void setOperator(int index, IOperator operator)
-	{
-		this.operators[index] = operator;
-	}
-
-	@Override
 	public void addOperator(IOperator operator)
 	{
 		if (this.operators == null)
@@ -233,19 +221,6 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	public int typeAliasCount()
 	{
 		return this.typeAliasCount;
-	}
-
-	@Override
-	public ITypeAlias getTypeAlias(int index)
-	{
-		return this.typeAliases[index];
-	}
-
-	@Override
-	public void setTypeAlias(int index, ITypeAlias typeAlias)
-	{
-		this.typeAliases[index] = typeAlias;
-		typeAlias.setEnclosingHeader(this);
 	}
 
 	@Override
@@ -501,7 +476,7 @@ public abstract class AbstractHeader implements IHeaderUnit, IContext
 	@Override
 	public String toString()
 	{
-		return IASTNode.toString(this);
+		return Formattable.toString(this);
 	}
 
 	@Override

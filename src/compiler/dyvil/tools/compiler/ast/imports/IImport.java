@@ -2,15 +2,15 @@ package dyvil.tools.compiler.ast.imports;
 
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.ast.IASTNode;
+import dyvil.tools.parsing.ASTNode;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public interface IImport extends IASTNode
+public interface IImport extends ASTNode
 {
 	int SINGLE   = 1;
 	int WILDCARD = 2;
@@ -34,13 +34,13 @@ public interface IImport extends IASTNode
 	}
 	
 	@Override
-	default ICodePosition getPosition()
+	default SourcePosition getPosition()
 	{
 		return null;
 	}
 
 	@Override
-	default void setPosition(ICodePosition position)
+	default void setPosition(SourcePosition position)
 	{
 	}
 

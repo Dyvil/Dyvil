@@ -16,7 +16,7 @@ import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 
 public class AnnotationValue implements IValue, IAnnotationConsumer
 {
@@ -38,12 +38,12 @@ public class AnnotationValue implements IValue, IAnnotationConsumer
 	}
 
 	@Override
-	public void setPosition(ICodePosition position)
+	public void setPosition(SourcePosition position)
 	{
 	}
 
 	@Override
-	public ICodePosition getPosition()
+	public SourcePosition getPosition()
 	{
 		return this.annotation.getPosition();
 	}
@@ -151,7 +151,7 @@ public class AnnotationValue implements IValue, IAnnotationConsumer
 
 		if (type != null)
 		{
-			this.annotation.getType().writeCast(writer, type, this.getLineNumber());
+			this.annotation.getType().writeCast(writer, type, this.lineNumber());
 		}
 	}
 

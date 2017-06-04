@@ -6,13 +6,13 @@ public class AnnotationTest
 {
 	@interface TypeAnnotation
 
-	@interface Inner(String name)
+	@interface Inner(name: String)
 
-	@interface Outer(Inner inner)
+	@interface Outer(inner: Inner)
 
 	@Inner(name: "inner")
 	@Outer(inner: @Inner(name: "Nested"))
-    static func foo((@TypeAnnotation() [@TypeAnnotation String]) args) -> void
+    static func foo(args: @TypeAnnotation [@TypeAnnotation String]) -> void
 	{
 	}
 

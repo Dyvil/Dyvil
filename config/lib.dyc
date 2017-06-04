@@ -1,2 +1,2 @@
-source_dirs = [../src/library, ../build/gensrc/library]
-output_dir = ../build/dyvil-classes/library
+source_dirs = [build/src/dyvil/library]
+output_dir = build/dyvil-classes/library

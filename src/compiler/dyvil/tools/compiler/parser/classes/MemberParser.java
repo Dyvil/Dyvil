@@ -38,7 +38,7 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
-import dyvil.tools.parsing.position.ICodePosition;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.parsing.token.IToken;
 
 public final class MemberParser<T extends IDataMember> extends Parser implements ITypeConsumer
@@ -86,7 +86,7 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 	private IType type;
 	private ModifierList modifiers = new ModifierList();
 	private AnnotationList annotations;
-	private ICodePosition  position;
+	private SourcePosition  position;
 	private Name           name;
 
 	private IMember member;
@@ -243,7 +243,7 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 				{
 					// Improve error handling for missing identifiers
 					this.position = token.raw();
-					this.name = Names.auto;
+					this.name = Names.apply;
 					pm.reparse();
 				}
 
@@ -253,6 +253,11 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 
 			this.name = token.nameValue();
 			this.position = token.raw();
+
+			if (this.type != Types.UNKNOWN)
+			{
+				pm.report(Markers.syntaxWarning(token, "member.type.c_style.deprecated"));
+			}
 
 			if (!this.parseSeparator(token.next()))
 			{

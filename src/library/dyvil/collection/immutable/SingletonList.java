@@ -78,9 +78,9 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 
 	@Override
-	public <R> R foldRight(R initialValue, @NonNull BiFunction<? super R, ? super E, ? extends R> reducer)
+	public <R> R foldRight(R initialValue, @NonNull BiFunction<? super E, ? super R, ? extends R> reducer)
 	{
-		return reducer.apply(initialValue, this.element);
+		return reducer.apply(this.element, initialValue);
 	}
 
 	@Override
@@ -203,9 +203,9 @@ public class SingletonList<E> implements ImmutableList<E>
 
 	@NonNull
 	@Override
-	public ImmutableList<E> filtered(@NonNull Predicate<? super E> condition)
+	public ImmutableList<E> filtered(@NonNull Predicate<? super E> predicate)
 	{
-		if (condition.test(this.element))
+		if (predicate.test(this.element))
 		{
 			return this;
 		}
@@ -254,9 +254,9 @@ public class SingletonList<E> implements ImmutableList<E>
 	}
 
 	@Override
-	public E @NonNull [] toArray(@NonNull Class<E> type)
+	public <R> R @NonNull [] toArray(@NonNull Class<R> type)
 	{
-		E[] array = (E[]) Array.newInstance(type, 1);
+		final R[] array = (R[]) Array.newInstance(type, 1);
 		array[0] = type.cast(this.element);
 		return array;
 	}

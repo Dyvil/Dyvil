@@ -11,7 +11,7 @@ import java.util.Map
  * @param <V>
  * 		the type of the value
  */
-public interface Entry<type +K, type +V> extends java.io.Serializable
+interface Entry<type +K, type +V> extends java.io.Serializable
 {
 	/**
 	 * Returns the key stored by this entry
@@ -40,7 +40,7 @@ public interface Entry<type +K, type +V> extends java.io.Serializable
 	 *
 	 * @return a comparator that compares entries by key.
 	 */
-	static func comparingByKey<K extends Comparable<-K>, V>() -> Comparator<Entry<K, V>>
+	static func comparingByKey<type K: Comparable<-K>, V>() -> Comparator<Entry<K, V>>
 		= (e1, e2) => e1.getKey.compareTo(e2.getKey)
 
 	/**
@@ -49,7 +49,7 @@ public interface Entry<type +K, type +V> extends java.io.Serializable
 	 *
 	 * @return a comparator that compares entries by value.
 	 */
-	static func comparingByValue<K, V extends Comparable<-V>>() -> Comparator<Entry<K, V>>
+	static func comparingByValue<K, type V: Comparable<-V>>() -> Comparator<Entry<K, V>>
 		= (e1, e2) => e1.getValue.compareTo(e2.getValue)
 
 	/**
@@ -60,7 +60,7 @@ public interface Entry<type +K, type +V> extends java.io.Serializable
 	 *
 	 * @return a comparator that compares entries by key.
 	 */
-	static func comparingByKey<K, V>(Comparator<-K> cmp) -> Comparator<Entry<K, V>>
+	static func comparingByKey<K, V>(cmp: Comparator<-K>) -> Comparator<Entry<K, V>>
 		= (c1, c2) => cmp.compare(c1.getKey, c2.getKey)
 
 	/**
@@ -71,18 +71,18 @@ public interface Entry<type +K, type +V> extends java.io.Serializable
 	 *
 	 * @return a comparator that compares entries by value.
 	 */
-	static func comparingByValue<K, V>(Comparator<-V> cmp) -> Comparator<Entry<K, V>>
+	static func comparingByValue<K, V>(cmp: Comparator<-V>) -> Comparator<Entry<K, V>>
 		= (c1, c2) => cmp.compare(c1.getValue, c2.getValue)
 
-	static func entryToString(Entry<_, _> entry) -> String = entry.getKey + " -> " + entry.getValue
+	static func entryToString(entry: Entry<_, _>) -> String = "\(entry.getKey) -> \(entry.getValue)"
 
-	static func entryEquals(Entry<_, _> entry, Object! obj) -> boolean
+	static func entryEquals(entry: Entry<_, _>, obj: any!) -> boolean
 		= obj is Entry && entryEquals(entry, other: obj as Entry)
 
-	static func entryEquals(Entry<_, _> entry, Entry<_, _> other) -> boolean
+	static func entryEquals(entry: Entry<_, _>, other: Entry<_, _>) -> boolean
 		= entry.getKey == other.getKey && entry.getValue == other.getValue
 
-	static func entryHashCode(Entry<_, _> entry) -> int
+	static func entryHashCode(entry: Entry<_, _>) -> int
 	{
 		let key = entry.getKey
 		let value = entry.getValue
