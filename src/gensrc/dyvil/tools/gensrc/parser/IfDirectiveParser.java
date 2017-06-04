@@ -1,5 +1,6 @@
 package dyvil.tools.gensrc.parser;
 
+import dyvil.tools.gensrc.ast.Util;
 import dyvil.tools.gensrc.ast.directive.DirectiveList;
 import dyvil.tools.gensrc.ast.directive.IfDirective;
 import dyvil.tools.gensrc.lexer.GenSrcSymbols;
@@ -7,6 +8,7 @@ import dyvil.tools.gensrc.parser.expression.ExpressionParser;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 
 public class IfDirectiveParser extends Parser
@@ -83,15 +85,23 @@ public class IfDirectiveParser extends Parser
 			this.mode = ELSE;
 			return;
 		case ELSE:
-			if (type != BaseSymbols.HASH || token.next().type() != GenSrcSymbols.ELSE)
+			if (type == Tokens.STRING && isBlank(token.stringValue()) && isHashElse(token.next()))
 			{
-				this.list.add(this.directive);
-				pm.popParser(true);
+				// ignore empty whitespace between } and #else
+				pm.skip(2); // skip the '#' and 'else'
+				this.mode = ELSE_BODY;
 				return;
 			}
 
-			pm.skip(); // skip the 'else'
-			this.mode = ELSE_BODY;
+			if (isHashElse(token))
+			{
+				pm.skip(); // skip the 'else'
+				this.mode = ELSE_BODY;
+				return;
+			}
+
+			this.list.add(this.directive);
+			pm.popParser(true);
 			return;
 		case ELSE_BODY:
 			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
@@ -112,5 +122,16 @@ public class IfDirectiveParser extends Parser
 			this.list.add(this.directive);
 			pm.popParser();
 		}
+	}
+
+	private static boolean isHashElse(IToken token)
+	{
+		return token.type() == BaseSymbols.HASH && token.next().type() == GenSrcSymbols.ELSE;
+	}
+
+	private static boolean isBlank(String value)
+	{
+		final int length = value.length();
+		return Util.skipWhitespace(value, 0, length) == length;
 	}
 }

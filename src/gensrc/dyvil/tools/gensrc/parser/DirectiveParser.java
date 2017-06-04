@@ -4,6 +4,7 @@ import dyvil.tools.gensrc.ast.directive.*;
 import dyvil.tools.gensrc.lexer.GenSrcSymbols;
 import dyvil.tools.gensrc.parser.expression.ExpressionListParser;
 import dyvil.tools.parsing.IParserManager;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.token.IToken;
@@ -46,14 +47,24 @@ public class DirectiveParser extends Parser
 				this.directive = new IncludeDirective(token.raw());
 				break;
 			case BaseSymbols.OPEN_PARENTHESIS:
+			case BaseSymbols.OPEN_CURLY_BRACKET:
 				pm.reparse();
 				this.directive = new ScopeDirective(token.raw());
 				break;
 			default:
-				this.directive = new NamedDirective(token.raw(), token.nameValue());
+				final Name name = token.nameValue();
+				if (name == null)
+				{
+					pm.report(token, "directive.identifier");
+					this.directive = new ScopeDirective(token.raw());
+				}
+				else
+				{
+					this.directive = new NamedDirective(token.raw(), name);
+				}
+
 				break;
 			}
-
 
 			this.mode = OPEN_PAREN;
 			return;

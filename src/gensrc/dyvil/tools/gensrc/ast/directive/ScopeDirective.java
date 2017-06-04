@@ -4,6 +4,7 @@ import dyvil.source.position.SourcePosition;
 import dyvil.tools.gensrc.GenSrc;
 import dyvil.tools.gensrc.ast.scope.LazyScope;
 import dyvil.tools.gensrc.ast.scope.Scope;
+import dyvil.tools.gensrc.lang.I18n;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SemanticError;
@@ -37,7 +38,7 @@ public class ScopeDirective extends BasicDirective
 			output.print(this.arguments.get(0).evaluateString(scope));
 			break;
 		default:
-			markers.add(new SemanticError(this.position, "scope.arguments"));
+			markers.add(new SemanticError(this.position, I18n.get("scope.arguments")));
 		}
 		if (this.body != null)
 		{

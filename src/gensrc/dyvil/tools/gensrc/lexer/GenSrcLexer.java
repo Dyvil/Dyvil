@@ -105,10 +105,12 @@ public class GenSrcLexer extends dyvil.tools.parsing.lexer.Lexer
 				this.braceLevel++;
 				break;
 			case '}':
-				if (this.braceLevel >= 0 && --this.braceLevel <= 0)
+				if (this.braceLevel == 0)
 				{
+					// end of block
 					break loop;
 				}
+				this.braceLevel--;
 				break;
 			case '\n':
 				// end at newline, but include it
@@ -137,9 +139,11 @@ public class GenSrcLexer extends dyvil.tools.parsing.lexer.Lexer
 
 		this.parseIdentifier();
 
-		//noinspection StatementWithEmptyBody
-		while (this.parseArguments())
-			;
+		// TODO looks weird, quick fix because it used to be a while loop that allowed multiple argument lists/blocks
+		if (this.parseArguments()) // argument list or block
+		{
+			this.parseArguments(); // block
+		}
 	}
 
 	private boolean parseArguments()
@@ -148,6 +152,11 @@ public class GenSrcLexer extends dyvil.tools.parsing.lexer.Lexer
 
 		// if there exists a ( or { after optional whitespace ...
 		final int indexOfNonWhite = Util.skipWhitespace(this.code, this.cursor, this.length);
+		if (indexOfNonWhite >= this.length)
+		{
+			return false;
+		}
+
 		switch (this.code.codePointAt(indexOfNonWhite))
 		{
 		case '(':
@@ -189,7 +198,7 @@ public class GenSrcLexer extends dyvil.tools.parsing.lexer.Lexer
 
 			this.advance();
 			this.skipNewLine();
-			return true;
+			return false;
 		case 0:
 		default:
 			return false;

@@ -69,7 +69,6 @@ public class Template
 
 		new ParserManager(GenSrcSymbols.INSTANCE, tokens.iterator(), markers).parse(new BlockParser(this.directives));
 
-		System.out.println(this.directives);
 		return true;
 	}
 

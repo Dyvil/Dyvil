@@ -56,14 +56,26 @@ public class DirectiveList implements Directive
 	@Override
 	public void toString(String indent, StringBuilder builder)
 	{
+		if (this.directiveCount == 0)
+		{
+			return;
+		}
+
 		for (int i = 0; i < this.directiveCount; i++)
 		{
-			if (builder.length() > 0 && builder.charAt(builder.length() - 1) == '\n')
-			{
-				builder.append(indent);
-			}
+			this.indent(indent, builder);
 
 			this.directives[i].toString(indent, builder);
+		}
+
+		this.indent(indent, builder);
+	}
+
+	protected void indent(String indent, StringBuilder builder)
+	{
+		if (builder.length() > 0 && builder.charAt(builder.length() - 1) == '\n')
+		{
+			builder.append(indent);
 		}
 	}
 }
