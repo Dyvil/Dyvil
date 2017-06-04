@@ -19,10 +19,11 @@ interface ObjectRef<T>
 
 	// Unbox Conversion Methods
 
-#import("Base.dgs")
-#for (spec <- PRIMITIVE_SPECS) {
-	@BytecodeName("unbox#(TYPE_NAME)")
-	static postfix func unboxed(ref: ObjectRef<WRAPPER>) -> #(TYPE_NAME)Ref = new Unboxed#(TYPE_NAME)Ref(ref)
+	#import("Base.dgs")
+	#for (spec <- PRIMITIVE_SPECS) {
+		#import(spec)
+		@BytecodeName("unbox#(TYPE_NAME)")
+		static postfix func unboxed(ref: ObjectRef<WRAPPER>) -> #(TYPE_NAME)Ref = new Unboxed#(TYPE_NAME)Ref(ref)
 
-}
+	}
 }

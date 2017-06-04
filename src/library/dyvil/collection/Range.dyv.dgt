@@ -22,8 +22,8 @@ interface Range<+T> extends Queryable<T>, Serializable
 	// Primitive Factory Methods
 	#import("Base.dgs")
 	#for (spec <- PRIMITIVE_SPECS) {
+		#import(spec)
 		#if (HAS_RANGE_CLASS) {
-			#import(spec)
 
 			@BytecodeName("closed")
 			static func apply(from: PRIMITIVE, to: PRIMITIVE) -> #(TYPE_NAME)Range = #(TYPE_NAME)Range(from, to: to)

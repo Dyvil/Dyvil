@@ -22,6 +22,7 @@ public abstract class References
 	}
 
 	#for (spec <- PRIMITIVE_SPECS) {
+		#import(spec)
 		#if (IS_BOOLEAN) {}
 		#else {
 			#if (IS_SUBRANGE) {#define(CAST){as PRIMITIVE}}

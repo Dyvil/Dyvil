@@ -67,6 +67,7 @@ public final class ReferenceFactory
 
 	#import("Base.dgs")
 	#for (spec <- PRIMITIVE_SPECS) {
+		#import(spec)
 		// TYPE_NAME
 
 		static func new#(TYPE_NAME)Ref(base: Object, offset: long) -> #(TYPE_NAME)Ref

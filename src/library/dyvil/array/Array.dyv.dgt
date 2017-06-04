@@ -21,7 +21,7 @@ public abstract class #(TYPE_NAME)Array
 	#import("Base.dgs")
 
 	#define(REIFIED) {@Reified(Reified.Type.OBJECT_CLASS)}
-	#if(IS_GENERIC) {
+	#if (IS_OBJECT) {
 		#define(GENERIC) {<T>}
 		#define(GENERIC_2) {<T, REIFIED U>}
 		#define(GENERIC_REIFIED) {<REIFIED T>}

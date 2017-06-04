@@ -90,7 +90,7 @@ case class ObjectRange<type +T: Rangeable<T>>(
 
 	override func copy(to: [Object!], index: int) -> void = FOR_EACH to[index++] = current
 
-	override func toString() -> String = this.start + " RANGE_OP " + this.end
+	override func toString() -> String = "\(this.start) RANGE_OP \(this.end)"
 
 	override func equals(obj: any!) -> boolean = Range.rangeEquals(this, obj)
 
