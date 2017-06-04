@@ -53,5 +53,7 @@ versionFiles = {
 
 	"Delta" : { // Delta Stage
 		"v0.30.0" : "\(baseLink)/delta/v0.30.0.dyp"
+		"v0.31.0" : "\(baseLink)/delta/v0.31.0.dyp"
+		"v0.32.0" : "\(baseLink)/delta/v0.32.0.dyp"
 	}
 }

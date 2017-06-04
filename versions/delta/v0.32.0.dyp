@@ -1,0 +1,6 @@
+version = "0.32.0"
+library.version = "0.32.0"
+compiler.version = "0.32.0"
+repl.version = "0.20.0"
+dpf.version = "0.13.0"
+gensrc.version = "0.6.0"
