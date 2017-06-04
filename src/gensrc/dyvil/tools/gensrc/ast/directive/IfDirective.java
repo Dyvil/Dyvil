@@ -4,6 +4,7 @@ import dyvil.lang.Formattable;
 import dyvil.source.position.SourcePosition;
 import dyvil.tools.gensrc.GenSrc;
 import dyvil.tools.gensrc.ast.expression.Expression;
+import dyvil.tools.gensrc.ast.scope.LazyScope;
 import dyvil.tools.gensrc.ast.scope.Scope;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -74,11 +75,11 @@ public class IfDirective implements Directive
 	{
 		if (this.evaluate(scope))
 		{
-			this.thenBlock.specialize(gensrc, scope, markers, output);
+			this.thenBlock.specialize(gensrc, new LazyScope(scope), markers, output);
 		}
 		else if (this.elseBlock != null)
 		{
-			this.elseBlock.specialize(gensrc, scope, markers, output);
+			this.elseBlock.specialize(gensrc, new LazyScope(scope), markers, output);
 		}
 	}
 

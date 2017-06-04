@@ -139,70 +139,77 @@ public class GenSrcLexer extends dyvil.tools.parsing.lexer.Lexer
 
 		this.parseIdentifier();
 
-		// TODO looks weird, quick fix because it used to be a while loop that allowed multiple argument lists/blocks
-		if (this.parseArguments()) // argument list or block
-		{
-			this.parseArguments(); // block
-		}
+		this.parseArguments();
+		this.parseBlock();
 	}
 
-	private boolean parseArguments()
+	private void parseArguments()
 	{
-		int current = this.codePoint();
+		if (!this.skipTo('('))
+		{
+			return;
+		}
 
-		// if there exists a ( or { after optional whitespace ...
+		this.tokens.append(new SymbolToken(BaseSymbols.INSTANCE, OPEN_PARENTHESIS, this.line, this.column));
+		this.advance();
+
+		this.parseDyvilArguments();
+
+		final int current = this.codePoint();
+		if (current == 0)
+		{
+			return;
+		}
+
+		assert current == ')';
+		this.tokens.append(new SymbolToken(BaseSymbols.INSTANCE, CLOSE_PARENTHESIS, this.line, this.column));
+		this.advance();
+		this.skipNewLine();
+	}
+
+	private void parseBlock()
+	{
+		if (!this.skipTo('{'))
+		{
+			return;
+		}
+
+		this.tokens.append(new SymbolToken(BaseSymbols.INSTANCE, OPEN_CURLY_BRACKET, this.line, this.column));
+		this.advance();
+		this.skipNewLine();
+
+		this.parseNestedBlock();
+
+		final int current = this.codePoint();
+		if (current == 0)
+		{
+			return;
+		}
+
+		assert current == '}';
+		this.tokens.append(new SymbolToken(BaseSymbols.INSTANCE, CLOSE_CURLY_BRACKET, this.line, this.column));
+
+		this.advance();
+		this.skipNewLine();
+	}
+
+	private boolean skipTo(int c)
+	{
+		final int current = this.codePoint();
+
 		final int indexOfNonWhite = Util.skipWhitespace(this.code, this.cursor, this.length);
 		if (indexOfNonWhite >= this.length)
 		{
 			return false;
 		}
 
-		switch (this.code.codePointAt(indexOfNonWhite))
+		if (this.code.codePointAt(indexOfNonWhite) != c)
 		{
-		case '(':
-			this.skipWhitespace(current);
-
-			this.tokens.append(new SymbolToken(BaseSymbols.INSTANCE, OPEN_PARENTHESIS, this.line, this.column));
-			this.advance();
-
-			this.parseDyvilArguments();
-
-			current = this.codePoint();
-			if (current == 0)
-			{
-				return false;
-			}
-
-			assert current == ')';
-			this.tokens.append(new SymbolToken(BaseSymbols.INSTANCE, CLOSE_PARENTHESIS, this.line, this.column));
-			this.advance();
-			this.skipNewLine();
-			return true;
-		case '{':
-			this.skipWhitespace(current);
-
-			this.tokens.append(new SymbolToken(BaseSymbols.INSTANCE, OPEN_CURLY_BRACKET, this.line, this.column));
-			this.advance();
-			this.skipNewLine();
-
-			this.parseNestedBlock();
-
-			current = this.codePoint();
-			if (current == 0)
-			{
-				return false;
-			}
-
-			assert current == '}';
-			this.tokens.append(new SymbolToken(BaseSymbols.INSTANCE, CLOSE_CURLY_BRACKET, this.line, this.column));
-
-			this.advance();
-			this.skipNewLine();
-			return false;
-		case 0:
-		default:
 			return false;
 		}
+
+		this.skipWhitespace(current);
+		return true;
 	}
 
 	private void skipNewLine()

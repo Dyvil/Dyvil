@@ -29,15 +29,14 @@ public class UndefineDirective extends VarDirective
 			return;
 		}
 
-		if (!this.local)
+		final Scope defScope = this.local ? scope : scope.getGlobalParent();
+
+		if (!(defScope instanceof LazyScope))
 		{
-			scope = scope.getGlobalParent();
+			return;
 		}
 
-		if (scope instanceof LazyScope)
-		{
-			((LazyScope) scope).undefine(this.name.qualified);
-		}
+		((LazyScope) defScope).undefine(this.name.qualified);
 	}
 
 	@Override

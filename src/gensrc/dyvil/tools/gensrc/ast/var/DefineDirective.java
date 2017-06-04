@@ -32,16 +32,15 @@ public class DefineDirective extends VarDirective
 			return;
 		}
 
-		if (!this.local)
+		final Scope defScope = this.local ? scope : scope.getGlobalParent();
+
+		if (!(defScope instanceof LazyScope))
 		{
-			scope = scope.getGlobalParent();
+			return;
 		}
 
-		if (scope instanceof LazyScope)
-		{
-			final String value = this.computeValue(gensrc, scope, markers);
-			((LazyScope) scope).define(this.name.qualified, value);
-		}
+		final String value = this.computeValue(gensrc, scope, markers);
+		((LazyScope) defScope).define(this.name.qualified, value);
 	}
 
 	private String computeValue(GenSrc gensrc, Scope scope, MarkerList markers)
@@ -52,7 +51,7 @@ public class DefineDirective extends VarDirective
 		}
 
 		final StringBuilder builder = new StringBuilder();
-		this.body.specialize(gensrc, scope, markers, new AppendablePrintStream(builder));
+		this.body.specialize(gensrc, new LazyScope(scope), markers, new AppendablePrintStream(builder));
 		return builder.toString();
 	}
 

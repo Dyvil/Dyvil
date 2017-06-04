@@ -42,8 +42,7 @@ public class ScopeDirective extends BasicDirective
 		}
 		if (this.body != null)
 		{
-			final LazyScope lazyScope = new LazyScope(scope);
-			this.body.specialize(gensrc, lazyScope, markers, output);
+			this.body.specialize(gensrc, new LazyScope(scope), markers, output);
 		}
 	}
 }
