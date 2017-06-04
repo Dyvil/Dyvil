@@ -72,7 +72,7 @@ final class Objects
 
 	@BytecodeName("notEquals")
 	@Intrinsic([ LOAD_0, LOAD_1, INVOKESTATIC, 0, 1, 2, BNOT ]
-	  strings: [ "dyvil/lang/ObjectExtensions", "$eq$eq", "(Ljava/lang/Object;Ljava/lang/Object;)Z" ])
+	  strings: [ "dyvil/lang/Objects", "equals", "(Ljava/lang/Object;Ljava/lang/Object;)Z" ])
 	infix func !=(lhs: Object!, rhs: Object!) -> boolean = lhs != rhs
 
 	@OverloadPriority

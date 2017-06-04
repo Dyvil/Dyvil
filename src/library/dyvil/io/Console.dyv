@@ -8,15 +8,15 @@ public abstract class Console
 
 	public const ANSI_ESCAPE: char = '\u{001b}'
 
-	public const ANSI_RESET:  String = ANSI_ESCAPE + '[0m'
-	public const ANSI_BLACK:  String = ANSI_ESCAPE + '[30m'
-	public const ANSI_RED:    String = ANSI_ESCAPE + '[31m'
-	public const ANSI_GREEN:  String = ANSI_ESCAPE + '[32m'
-	public const ANSI_YELLOW: String = ANSI_ESCAPE + '[33m'
-	public const ANSI_BLUE:   String = ANSI_ESCAPE + '[34m'
-	public const ANSI_PURPLE: String = ANSI_ESCAPE + '[35m'
-	public const ANSI_CYAN:   String = ANSI_ESCAPE + '[36m'
-	public const ANSI_WHITE:  String = ANSI_ESCAPE + '[37m'
+	public const ANSI_RESET:  String = "\(ANSI_ESCAPE)[0m"
+	public const ANSI_BLACK:  String = "\(ANSI_ESCAPE)[30m"
+	public const ANSI_RED:    String = "\(ANSI_ESCAPE)[31m"
+	public const ANSI_GREEN:  String = "\(ANSI_ESCAPE)[32m"
+	public const ANSI_YELLOW: String = "\(ANSI_ESCAPE)[33m"
+	public const ANSI_BLUE:   String = "\(ANSI_ESCAPE)[34m"
+	public const ANSI_PURPLE: String = "\(ANSI_ESCAPE)[35m"
+	public const ANSI_CYAN:   String = "\(ANSI_ESCAPE)[36m"
+	public const ANSI_WHITE:  String = "\(ANSI_ESCAPE)[37m"
 
 	private static var reader: BufferedReader = unsafeInit<BufferedReader>
 	private static var out:    PrintStream    = unsafeInit<PrintStream>

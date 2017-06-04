@@ -372,9 +372,9 @@ public abstract class AbstractArrayList<E> implements List<E>
 	}
 
 	@Override
-	public E @NonNull [] toArray(@NonNull Class<E> type)
+	public <R> R @NonNull [] toArray(@NonNull Class<R> type)
 	{
-		E[] array = (E[]) Array.newInstance(type, this.size);
+		final R[] array = (R[]) Array.newInstance(type, this.size);
 		for (int i = 0; i < this.size; i++)
 		{
 			array[i] = type.cast(this.elements[i]);

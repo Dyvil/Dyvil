@@ -4,7 +4,7 @@ import dyvil.io.FileUtils
 import dyvil.tools.dpf.ast.RootNode
 import dyvil.tools.dpf.visitor._
 import dyvil.tools.parsing.marker.BaseMarkers
-import dyvil.tools.parsing.TokenIterator
+import dyvil.tools.parsing.{ TokenIterator, TokenList }
 import dyvil.tools.parsing.lexer.BaseSymbols
 import dyvil.tools.parsing.lexer.DyvilLexer
 import dyvil.tools.parsing.lexer.Tokens
@@ -30,7 +30,7 @@ public class Parser
 		return Parser(markers, tokens)
 	}
 
-	static func apply(markers: MarkerList, tokens: TokenIterator) -> Parser = new Parser(markers, tokens)
+	static func apply(markers: MarkerList, tokens: TokenList) -> Parser = new Parser(markers, tokens.iterator)
 
 	static func parse(file: File) -> RootNode = parse(FileUtils.tryRead(file)!)
 

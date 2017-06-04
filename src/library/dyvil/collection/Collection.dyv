@@ -1,67 +1,24 @@
-package dyvil.collection;
+package dyvil.collection
 
-import dyvil.annotation.internal.NonNull;
-import dyvil.annotation.internal.Nullable;
-import dyvil.lang.LiteralConvertible;
-import dyvil.util.ImmutableException;
+import java.util.{ Comparator, Iterator, Spliterator, Spliterators }
+import java.util.function.{ Function, Predicate }
+import java.lang.reflect.Array
 
-import java.io.Serializable;
-import java.lang.reflect.Array;
-import java.util.*;
-import java.util.function.Function;
-import java.util.function.Predicate;
-
-/**
- * The base class of all collection classes in the <i>Dyvil Collection Framework</i>. This class provides several
- * methods for processing, mutating, querying and converting collections. There is a clear distinction between mutable
- * and immutable collections, as there is an (im)mutable counterpart for almost every method in this base class.
- * <p>
- * This interface supports the {@link LiteralConvertible.FromNil} annotation, meaning that a declaration like
- * <p>
- * <pre>
- * Collection[String] c = nil
- * </pre>
- * <p>
- * Would create an empty list by calling {@link #apply()} and assign it to the variable {@code c}.
- * <p>
- * Furthermore, since this interface also supports the {@link LiteralConvertible.FromArray} annotation, it is possible
- * to create a collection using <i>Array Expressions</i> in <i>Dyvil</i>, as shown in the below example.
- * <p>
- * <pre>
- * Collection[String] c = [ 1, 2, 3 ]
- * </pre>
- *
- * @param <E>
- * 	the element type
- *
- * @author Clashsoft
- */
 @LiteralConvertible.FromArray
-public interface Collection<E> extends Queryable<E>, Serializable
+abstract interface Collection<type E> extends Queryable<E>
 {
+	static let EMPTY_STRING: String = '[]'
+	static let START_STRING: String = '['
+	static let END_STRING:   String = ']'
+	static let ELEMENT_SEPARATOR_STRING: String = ', '
+
 	/**
 	 * Returns an empty, immutable collection. This method is primarily for use with the {@code nil} literal in
 	 * <i>Dyvil</i>, and the exact type of the returned object is given by {@link ImmutableSet#apply()}.
 	 *
 	 * @return an empty, immutable collection
 	 */
-	@NonNull
-	static <E> ImmutableCollection<E> empty()
-	{
-		return ImmutableSet.apply();
-	}
-
-	/**
-	 * Returns an empty, mutable collection. The exact type of the returned object is given by {@link
-	 * MutableList#apply()}.
-	 *
-	 * @return an empty, mutable list
-	 */
-	@NonNull
-	static <E> MutableCollection<E> apply()
-	{
-		return MutableList.apply();
-	}
+	static func apply<type E>() -> ImmutableCollection<E> = ImmutableSet<E>()
 
 	/**
 	 * Returns an immutable collection containing all of the given {@code elements}. This method is primarily for use
@@ -72,14 +29,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return an immutable collection containing all of the given elements
 	 */
-	@SafeVarargs
-	@NonNull
-	static <E> ImmutableCollection<E> apply(E... elements)
-	{
-		return ImmutableList.apply(elements);
-	}
-
-	// Accessors
+	static func apply<type E>(elements: E...) -> ImmutableCollection<E> = ImmutableList(elements...)
 
 	/**
 	 * Returns {@code true} iff this collection is immutable, i.e. the number and order of it's elements cannot be
@@ -87,15 +37,14 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return true, iff this collection is immutable
 	 */
-	boolean isImmutable();
+	abstract func isImmutable() -> boolean
 
 	/**
 	 * Returns the size of this collection, i.e. the number of elements contained in this collection.
 	 *
 	 * @return the size of this collection
 	 */
-	@Override
-	int size();
+	override abstract func size() -> int
 
 	/**
 	 * Returns true if and if only this collection is empty. The standard implementation defines a collection as empty
@@ -103,54 +52,37 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return true, if this collection is empty
 	 */
-	@Override
-	default boolean isEmpty()
-	{
-		return this.size() == 0;
-	}
+	override func isEmpty() -> boolean = this.size == 0
 
-	default boolean isDistinct()
+	func isDistinct() -> boolean
 	{
-		int size = this.size();
+		let size = this.size
 		if (size < 2)
 		{
-			return true;
+			return true
 		}
 
-		Object[] array = this.toArray();
-		return Set.isDistinct(array, size);
+		let array = this.toArray()
+		return Set.isDistinct(array, size)
 	}
 
-	default boolean isSorted()
-	{
-		return this.size() < 2 || iteratorSorted(this.iterator());
-	}
+	func isSorted() -> boolean = this.size() < 2 || iteratorSorted(this.iterator())
 
-	default boolean isSorted(@NonNull Comparator<? super E> comparator)
-	{
-		return this.size() < 2 || iteratorSorted(this.iterator(), comparator);
-	}
+	func isSorted(comparator: Comparator<-E>) -> boolean = this.size() < 2 || iteratorSorted(this.iterator(), comparator)
 
 	/**
 	 * Creates and returns an {@link Iterator} over the elements of this collection.
 	 *
 	 * @return an iterator over the elements of this collection
 	 */
-	@NonNull
-	@Override
-	Iterator<E> iterator();
+	override abstract func iterator() -> Iterator<E>
 
 	/**
 	 * Creates and returns a {@link Spliterator} over the elements of this collection.
 	 *
 	 * @return a spliterator over the elements of this collection
 	 */
-	@NonNull
-	@Override
-	default Spliterator<E> spliterator()
-	{
-		return Spliterators.spliterator(this.iterator(), this.size(), Spliterator.SIZED);
-	}
+	override func spliterator() -> Spliterator<E> = Spliterators.spliterator(this.iterator(), this.size(), Spliterator.SIZED)
 
 	/**
 	 * Returns true if and if only this collection contains the element specified by {@code element}.
@@ -160,36 +92,18 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return true, if this collection contains the element
 	 */
-	@Override
-	default boolean contains(@Nullable Object element)
-	{
-		return iterableContains(this, element);
-	}
+	override func contains(element: any!) -> boolean = iterableContains(this, element)
 
-	default boolean intersects(@NonNull Collection<?> collection)
+	func intersects(collection: Collection<+any!>) -> boolean
 	{
-		if (collection.size() < this.size())
+		if (collection.size < this.size)
 		{
-			for (Object o : this)
-			{
-				if (collection.contains(o))
-				{
-					return true;
-				}
-			}
-
-			return false;
+			for (e <- this) if (collection.contains(e)) return true
+			return false
 		}
 
-		for (Object o : collection)
-		{
-			if (this.contains(o))
-			{
-				return true;
-			}
-		}
-
-		return false;
+		for (e <- collection) if (this.contains(e)) return true
+		return false
 	}
 
 	// Non-mutating Operations
@@ -202,7 +116,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return a collection that contains all elements of this collection plus the given element
 	 */
-	Collection<E> added(E element);
+	abstract func added(element: E) -> Collection<E>!
 
 	/**
 	 * Returns a collection that contains all elements of this collection excluding the element given by {@code
@@ -213,7 +127,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return a collection that contains all elements of this collection excluding the given element
 	 */
-	Collection<E> removed(@Nullable Object element);
+	abstract func removed(element: any!) -> Collection<E>!
 
 	/**
 	 * Returns a collection that contains all elements of this collection plus all elements of the given {@code
@@ -224,7 +138,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return a collection that contains all elements of this collection plus all elements of the collection
 	 */
-	Collection<E> union(@NonNull Collection<? extends E> collection);
+	abstract func union(collection: Collection<+E>) -> Collection<E>!
 
 	/**
 	 * Returns a collection that contains all elements of this collection excluding all elements of the given {@code
@@ -235,7 +149,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return a collection that contains all elements of this collection excluding all elements of the collection
 	 */
-	Collection<E> difference(@NonNull Collection<?> collection);
+	abstract func difference(collection: Collection<+any!>) -> Collection<E>!
 
 	/**
 	 * Returns a collection that contains all elements of this collection that are present in the given collection.
@@ -245,7 +159,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return a collection that contains all elements of this collection that are present in the given collection
 	 */
-	Collection<E> intersection(@NonNull Collection<? extends E> collection);
+	abstract func intersection(collection: Collection<+E>) -> Collection<E>!
 
 	/**
 	 * Returns a collection that is mapped from this collection by supplying each of this collection's elements to the
@@ -256,9 +170,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return a collection mapped by the mapping function
 	 */
-	@NonNull
-	@Override
-	<R> Collection<R> mapped(@NonNull Function<? super E, ? extends R> mapper);
+	override abstract func mapped<type R: Object!>(mapper: Function<-E,+R>) -> Collection<R>
 
 	/**
 	 * Returns a collection that is flat-mapped from this collection by supplying each of this collection's elements to
@@ -270,9 +182,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return a collection flat-mapped by the mapping function
 	 */
-	@NonNull
-	@Override
-	<R> Collection<R> flatMapped(@NonNull Function<? super E, ? extends @NonNull Iterable<? extends R>> mapper);
+	override abstract func flatMapped<type R: Object!>(mapper: Function<-E,+Iterable<+R>>) -> Collection<R>
 
 	/**
 	 * Returns a collection that is filtered from this collection by filtering each of this collection's elements using
@@ -283,9 +193,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return a collection filtered by the filter condition predicate
 	 */
-	@NonNull
-	@Override
-	Collection<E> filtered(@NonNull Predicate<? super E> predicate);
+	override abstract func filtered(predicate: Predicate<-E>) -> Collection<E>
 
 	// Mutating Operations
 
@@ -296,7 +204,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 * all elements to {@code null}. That ensures that these elements do not stay in memory and are eventually
 	 * garbage-collected.
 	 */
-	void clear();
+	abstract func clear() -> void
 
 	/**
 	 * Adds the element given by {@code element} to this collection and returns the {@code true} if it was not present
@@ -309,7 +217,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return {@code true} if the element was not present in this collection, {@code false} otherwise
 	 */
-	boolean add(E element);
+	abstract func add(element: E) -> boolean
 
 	/**
 	 * Adds all elements of the given {@code iterable} to this collection. This method should throw an {@link
@@ -320,17 +228,11 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return {@code true} iff any elements have been removed from this collection, {@code false} otherwise
 	 */
-	default boolean addAll(@NonNull Iterable<? extends E> iterable)
+	func addAll(elements: Iterable<+E>) -> boolean
 	{
-		boolean added = false;
-		for (E element : iterable)
-		{
-			if (this.add(element))
-			{
-				added = true;
-			}
-		}
-		return added;
+		var changed = false
+		for (e <- elements) if (this.add(e)) changed = true
+		return changed
 	}
 
 	/**
@@ -342,11 +244,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return {@code true} iff any elements have been removed from this collection, {@code false} otherwise
 	 */
-	@SuppressWarnings("unchecked")
-	default boolean addAll(@NonNull Collection<? extends E> collection)
-	{
-		return this.addAll((Iterable) collection);
-	}
+	func addAll(elements: Collection<+E>) -> boolean = this.addAll(elements as Iterable<E>)
 
 	/**
 	 * Removes the given {@code element} from this collection. If the element is not present in this list, it is simply
@@ -358,7 +256,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return {@code true}, iff the element has been removed successfully, {@code false} otherwise
 	 */
-	boolean remove(@Nullable Object element);
+	abstract func remove(element: any!) -> boolean
 
 	/**
 	 * Removes all elements of the given {@code iterable} from this collection. This method should throw an {@link
@@ -369,17 +267,11 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return {@code true} iff any elements have been removed from this collection, {@code false} otherwise
 	 */
-	default boolean removeAll(@NonNull Iterable<?> iterable)
+	func removeAll(elements: Iterable<_>) -> boolean
 	{
-		boolean removed = false;
-		for (Object o : iterable)
-		{
-			if (this.remove(o))
-			{
-				removed = true;
-			}
-		}
-		return removed;
+		var changed = false
+		for (e <- elements) changed |= this.remove(e)
+		return changed
 	}
 
 	/**
@@ -391,10 +283,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return {@code true} iff any elements have been removed from this collection, {@code false} otherwise
 	 */
-	default boolean removeAll(@NonNull Collection<?> collection)
-	{
-		return this.removeAll((Iterable<?>) collection);
-	}
+	func removeAll(elements: Collection<_>) -> boolean = this.removeAll(elements as Iterable<_>)
 
 	/**
 	 * Removes all elements of this collection that are not present in the given {@code collection}. This method should
@@ -405,19 +294,12 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return {@code true} iff any elements have been removed from this collection, {@code false} otherwise
 	 */
-	default boolean retainAll(@NonNull Collection<? extends E> collection)
+	func retainAll(elements: Collection<+E>) -> boolean
 	{
-		boolean removed = false;
-		Iterator<E> iterator = this.iterator();
-		while (iterator.hasNext())
-		{
-			if (!collection.contains(iterator.next()))
-			{
-				iterator.remove();
-				removed = true;
-			}
-		}
-		return removed;
+		let it = this.iterator
+		var changed = false
+		for (e <- it) if (!elements.contains(e)) { it.remove; changed = true }
+		return changed
 	}
 
 	/**
@@ -427,8 +309,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 * @param mapper
 	 * 	the mapping function
 	 */
-	@Override
-	void map(@NonNull Function<? super E, ? extends E> mapper);
+	override abstract func map(mapper: Function<-E,+E>) -> void
 
 	/**
 	 * Flat-maps the elements of this collection using the given {@code mapper}. This is done by supplying each of this
@@ -438,8 +319,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 * @param mapper
 	 * 	the mapping function
 	 */
-	@Override
-	void flatMap(@NonNull Function<? super E, ? extends @NonNull Iterable<? extends E>> mapper);
+	override abstract func flatMap(mapper: Function<-E,+Iterable<+E>>) -> void
 
 	/**
 	 * Filters the elements of this collection using the given {@code condition} . This is done by supplying each of
@@ -449,32 +329,20 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 * @param predicate
 	 * 	the filter condition predicate
 	 */
-	@Override
-	default void filter(@NonNull Predicate<? super E> predicate)
+	override func filter(predicate: Predicate<-E>) -> void
 	{
-		Iterator<E> iterator = this.iterator();
-		while (iterator.hasNext())
-		{
-			if (!predicate.test(iterator.next()))
-			{
-				iterator.remove();
-			}
-		}
+		let it = this.iterator
+		for (e <- it) if (!predicate.test(e)) it.remove
 	}
 
-	// toArray
+	// Copying Operations
 
 	/**
 	 * Creates and returns an array containing the elements of this collection.
 	 *
 	 * @return an array of this collection's elements
 	 */
-	default Object @NonNull [] toArray()
-	{
-		Object[] array = new Object[this.size()];
-		this.toArray(0, array);
-		return array;
-	}
+	func toArray() -> [Object!] = new [Object!](this.size).{ this.toArray($0); $0 }
 
 	/**
 	 * Creates and returns an array containing the elements of this collection. The type of the array is specified by
@@ -487,11 +355,11 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return an array containing this collection's elements
 	 */
-	default E @NonNull [] toArray(@NonNull Class<E> type)
+	func toArray<R>(of: Class<R>) -> [R]
 	{
-		@SuppressWarnings("unchecked") final E[] array = (E[]) Array.newInstance(type, this.size());
-		this.toArray(0, array);
-		return array;
+		let array = Array.newInstance(of, this.size) as [R]
+		this.toArray(array)
+		return array
 	}
 
 	/**
@@ -504,10 +372,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 * @param store
 	 * 	the array to store the elements in
 	 */
-	default void toArray(Object @NonNull [] store)
-	{
-		this.toArray(0, store);
-	}
+	func toArray(store: [Object!]) -> void = this.toArray(0, store)
 
 	/**
 	 * Stores all elements of this collection sequentially in the given {@code store} array, starting at given {@code
@@ -519,15 +384,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 * 	the index in the array at which the first element of this collection should be placed
 	 * @param store
 	 */
-	default void toArray(int index, Object @NonNull [] store)
-	{
-		for (E e : this)
-		{
-			store[index++] = e;
-		}
-	}
-
-	// Copying and Views
+	func toArray(index: int, store: [Object!]) -> void = for (e <- this) store[index++] = e
 
 	/**
 	 * Creates a copy of this collection. The general contract of this method is that the type of the returned
@@ -539,11 +396,11 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return a copy of this collection
 	 */
-	@NonNull Collection<E> copy();
+	abstract func copy() -> Collection<E>
 
-	<RE> @NonNull MutableCollection<RE> emptyCopy();
+	abstract func emptyCopy<type RE: Object!>() -> MutableCollection<RE>
 
-	@NonNull <RE> MutableCollection<RE> emptyCopy(int capacity);
+	abstract func emptyCopy<type RE: Object!>(capacity: int) -> MutableCollection<RE>
 
 	/**
 	 * Returns a mutable collection that contains the exact same elements as this collection. Already mutable
@@ -552,7 +409,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return a mutable collection with the same elements as this collection
 	 */
-	@NonNull MutableCollection<E> mutable();
+	abstract func mutable() -> MutableCollection<E>
 
 	/**
 	 * Returns a mutable copy of this collection. For mutable collections, this method has the same result as the {@link
@@ -561,7 +418,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return a mutable copy of this collection
 	 */
-	@NonNull MutableCollection<E> mutableCopy();
+	abstract func mutableCopy() -> MutableCollection<E>
 
 	/**
 	 * Returns an immutable collection that contains the exact same elements as this collection. Already immutable
@@ -570,7 +427,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return a immutable collection with the same elements as this collection
 	 */
-	@NonNull ImmutableCollection<E> immutable();
+	abstract func immutable() -> ImmutableCollection<E>
 
 	/**
 	 * Returns a immutable copy of this collection. For immutable collections, this method has the same result as the
@@ -579,11 +436,11 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return an immutable copy of this collection
 	 */
-	@NonNull ImmutableCollection<E> immutableCopy();
+	abstract func immutableCopy() -> ImmutableCollection<E>
 
-	<RE> ImmutableCollection.@NonNull Builder<RE> immutableBuilder();
+	abstract func immutableBuilder<type RE: Object!>() -> ImmutableCollection.Builder<RE>
 
-	<RE> ImmutableCollection.@NonNull Builder<RE> immutableBuilder(int capacity);
+	abstract func immutableBuilder<type RE: Object!>(capacity: int) -> ImmutableCollection.Builder<RE>
 
 	/**
 	 * Returns a view on the elements of this collection. Immutable collections return themselves, as they are already
@@ -592,7 +449,7 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return a view on the elements of this collection
 	 */
-	@NonNull ImmutableCollection<E> view();
+	abstract func view() -> ImmutableCollection<E>
 
 	/**
 	 * Returns the Java Collection Framework equivalent of this collection. The returned collection is not a view of
@@ -602,202 +459,138 @@ public interface Collection<E> extends Queryable<E>, Serializable
 	 *
 	 * @return a java collection containing the elements of this collection
 	 */
-	java.util.@NonNull Collection<E> toJava();
+	abstract func toJava() -> java.util.Collection<E>
 
-	// toString, equals and hashCode
+	// String
 
-	String EMPTY_STRING             = "[]";
-	String START_STRING             = "[ ";
-	String END_STRING               = " ]";
-	String ELEMENT_SEPARATOR_STRING = ", ";
+	override abstract func toString() -> String
 
-	@Override
-	@NonNull String toString();
-
-	default void toString(@NonNull StringBuilder builder)
+	override func toString(builder: StringBuilder) -> void
 	{
-		if (this.isEmpty())
+		if (this.isEmpty)
 		{
-			builder.append(EMPTY_STRING);
-			return;
+			builder.append(EMPTY_STRING)
+			return
 		}
 
-		this.toString(builder, START_STRING, ELEMENT_SEPARATOR_STRING, END_STRING);
+		this.toString(builder, START_STRING, ELEMENT_SEPARATOR_STRING, END_STRING)
 	}
 
-	@Override
-	boolean equals(Object obj);
+	// Equals and Hash Code
 
-	@Override
-	int hashCode();
+	override abstract func equals(obj: any!) -> boolean
 
-	static <E> boolean iterableContains(@NonNull Iterable<E> iterable, @Nullable Object element)
+	override abstract func hashCode() -> int
+
+	// Utility Functions
+
+	static func iterableContains(iterable: Iterable<_>, element: any!) -> boolean
 	{
 		if (element == null)
 		{
-			for (E e : iterable)
-			{
-				if (e == null)
-				{
-					return true;
-				}
-			}
-			return false;
+			for (e <- iterable) if (e == null) return true
+			return false
 		}
 
-		for (E e : iterable)
-		{
-			if (element.equals(e))
-			{
-				return true;
-			}
-		}
-		return false;
+		for (e <- iterable) if (element.equals(e)) return true
+		return false
 	}
 
-	static <E> @NonNull String collectionToString(@NonNull Queryable<E> collection)
+	static func collectionToString(collection: Queryable<_>) -> String
 	{
-		if (collection.isEmpty())
-		{
-			return "[]";
-		}
+		if (collection.isEmpty) return EMPTY_STRING
 
-		StringBuilder builder = new StringBuilder("[");
-		Iterator<E> iterator = collection.iterator();
-		while (true)
-		{
-			E element = iterator.next();
-			builder.append(element);
-			if (iterator.hasNext())
-			{
-				builder.append(", ");
-			}
-			else
-			{
-				break;
-			}
-		}
-
-		return builder.append(']').toString();
+		let builder = new StringBuilder
+		collection.toString(builder)
+		return builder.toString
 	}
 
-	static <E> boolean orderedEquals(@NonNull Queryable<E> c1, @NonNull Queryable<E> c2)
+	static func orderedEquals(lhs: Queryable<_>, rhs: Queryable<_>) -> boolean
 	{
-		if (c1.size() != c2.size())
-		{
-			return false;
-		}
+		if (lhs.size != rhs.size) return false
 
-		Iterator<E> iterator1 = c1.iterator();
-		Iterator<E> iterator2 = c2.iterator();
-		while (iterator1.hasNext())
+		let it1 = lhs.iterator
+		let it2 = rhs.iterator
+		while (it1.hasNext)
 		{
-			E e1 = iterator1.next();
-			E e2 = iterator2.next();
-			if (!Objects.equals(e1, e2))
-			{
-				return false;
-			}
+			if (it1.next != it2.next) return false
 		}
-		return true;
+		return true
 	}
 
-	static <E> boolean unorderedEquals(@NonNull Queryable<E> c1, @NonNull Queryable<E> c2)
+	static func unorderedEquals(lhs: Queryable<_>, rhs: Queryable<_>) -> boolean
 	{
-		if (c1.size() != c2.size())
-		{
-			return false;
-		}
+		if (lhs.size != rhs.size) return false
 
-		// One-sided comparison is ok since we check for equal size
-		for (E element : c1)
-		{
-			if (!c2.contains(element))
-			{
-				return false;
-			}
-		}
-		return true;
+		for (e <- lhs) if (!rhs.contains(e)) return false
+		return true
 	}
 
-	static <E> int unorderedHashCode(@NonNull Iterable<E> collection)
+	static func unorderedHashCode(collection: Iterable<_>) -> int
 	{
-		int sum = 0;
-		int product = 1;
-		for (E element : collection)
+		var sum = 0
+		var product = 0
+		for (e <- collection)
 		{
-			if (element == null)
-			{
-				continue;
-			}
-			int hash = element.hashCode();
-			sum += hash;
-			product *= hash;
+			let hash = e.hashCode
+			sum += hash
+			product *= hash
 		}
-		return sum * 31 + product;
+		return sum * 31 + product
 	}
 
-	static <E> boolean isSorted(E[] array, int size)
+	static func isSorted(array: [Object!], size: int) -> boolean
 	{
-		if (size < 2)
-		{
-			return true;
-		}
+		if (size < 2) return true
 
-		for (int i = 1; i < size; i++)
+		for (i <- 1 ..< size)
 		{
-			if (((Comparable<E>) array[i - 1]).compareTo(array[i]) > 0)
-			{
-				return false;
-			}
+			let left = array[i - 1] as Comparable
+			let right = array[i] as Comparable
+			if (right < left) return false
 		}
-		return true;
+		return true
 	}
 
-	static <E> boolean isSorted(E[] array, int size, @NonNull Comparator<? super E> comparator)
+	static func isSorted<type E: Object!>(array: [E], size: int, comparator: Comparator<-E>) -> boolean
 	{
-		if (size < 2)
-		{
-			return true;
-		}
+		if (size < 2) return true
 
-		for (int i = 1; i < size; i++)
+		for (i <- 1 ..< size)
 		{
-			if (comparator.compare(array[i - 1], array[i]) > 0)
-			{
-				return false;
-			}
+			if (comparator.compare(array[i - 1], array[i]) > 0) return false
 		}
-		return true;
+		return true
 	}
 
-	static <E> boolean iteratorSorted(@NonNull Iterator<E> iterator)
+	static func iteratorSorted(iterator: Iterator<_>) -> boolean
 	{
-		Comparable<? super E> prev = (Comparable<? super E>) iterator.next();
-		while (iterator.hasNext())
+		if (!iterator.hasNext) return true
+
+		var curr = iterator.next as Comparable
+		while (iterator.hasNext)
 		{
-			E next = iterator.next();
-			if (prev.compareTo(next) > 0)
-			{
-				return false;
-			}
-			prev = (Comparable<? super E>) next;
+			let next = iterator.next as Comparable
+			if (next < curr) return false
+			curr = next
 		}
-		return true;
+
+		return true
 	}
 
-	static <E> boolean iteratorSorted(@NonNull Iterator<E> iterator, @NonNull Comparator<? super E> comparator)
+	static func iteratorSorted<type E: Object!>(iterator: Iterator<E>, comparator: Comparator<-E>) -> boolean
 	{
-		E prev = iterator.next();
-		while (iterator.hasNext())
+		if (!iterator.hasNext) return true
+
+		var curr = iterator.next
+		while (iterator.hasNext)
 		{
-			E next = iterator.next();
-			if (comparator.compare(prev, next) > 0)
-			{
-				return false;
-			}
-			prev = next;
+			let next = iterator.next
+			if (comparator.compare(curr, next) > 0) return false
+			curr = next
 		}
-		return true;
+
+		return true
 	}
+
 }

@@ -31,7 +31,7 @@ interface Cell<type +R, type +C, type +V> extends java.io.Serializable
 	func toTuple() -> (R, C, V) = (this.getRow(), this.getColumn(), this.getValue())
 
 	static func cellToString(cell: Cell<_, _, _>) -> String
-		= "(" + cell.getRow + ", " + cell.getColumn + ") -> " + cell.getValue
+		= "(\(cell.getRow), \(cell.getColumn)) -> \(cell.getValue)"
 
 	static func cellEquals(cell: Cell<_, _, _>, obj: any!) -> boolean = obj is Cell && cellEquals(cell, obj as Cell)
 
