@@ -4,18 +4,19 @@
 package dyvil.ref.simple
 
 import dyvil.lang.LiteralConvertible
-import dyvil.ref.TYPE_NAME##Ref
+import dyvil.ref.#(TYPE_NAME)Ref
 
-#if IS_OBJECT
-class Simple##TYPE_NAME##Ref<type T>(public var value: T) implements TYPE_NAME##Ref<T>
-#else
-@LiteralConvertible.FROM_LITERAL
-class Simple##TYPE_NAME##Ref(public var value: PRIMITIVE) implements TYPE_NAME##Ref
-#end
+#if (IS_OBJECT) {
+	class SimpleObjectRef<type T>(public var value: T) implements ObjectRef<T>
+}
+#else {
+	@LiteralConvertible.FROM_LITERAL
+	class Simple#(TYPE_NAME)Ref(public var value: PRIMITIVE) implements #(TYPE_NAME)Ref
+}
 {
 	override func get() -> PRIMITIVE = this.value
 
 	override func set(value: PRIMITIVE) -> void = this.value = value
 
-	override func toString() -> String = "Simple##TYPE_NAME##Ref(\(this.value))"
+	override func toString() -> String = "Simple#(TYPE_NAME)Ref(\(this.value))"
 }

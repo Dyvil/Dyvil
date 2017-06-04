@@ -1,17 +1,17 @@
 package dyvil.tools.gensrc.ast.directive;
 
+import dyvil.lang.Formattable;
 import dyvil.tools.gensrc.GenSrc;
 import dyvil.tools.gensrc.ast.scope.Scope;
-import dyvil.tools.gensrc.ast.Util;
 import dyvil.tools.parsing.marker.MarkerList;
 
 import java.io.PrintStream;
 
-public class ProcessedLine implements Directive
+public class LiteralText implements Directive
 {
 	private final String text;
 
-	public ProcessedLine(String text)
+	public LiteralText(String text)
 	{
 		this.text = text;
 	}
@@ -19,18 +19,18 @@ public class ProcessedLine implements Directive
 	@Override
 	public void specialize(GenSrc gensrc, Scope scope, MarkerList markers, PrintStream output)
 	{
-		output.println(Util.processLine(this.text, scope));
+		output.print(this.text);
 	}
 
 	@Override
 	public String toString()
 	{
-		return this.text;
+		return Formattable.toString(this);
 	}
 
 	@Override
 	public void toString(String indent, StringBuilder builder)
 	{
-		builder.append(this.text).append('\n');
+		builder.append("#literal{").append(this.text).append('}');
 	}
 }

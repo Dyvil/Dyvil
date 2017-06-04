@@ -12,40 +12,40 @@ public abstract class References
 	static func & <T>(rhs: T^) -> T* = rhs
 
 	// Primitive Reference Operators
-#import Base.dgs
-#foreach PRIMITIVE_SPECS
 
-	@Intrinsic([ LOAD_0 ])
-	static func &(rhs: PRIMITIVE^) -> PRIMITIVE* = rhs
-#end
+	#import("Base.dgs")
+	#for (spec <- PRIMITIVE_SPECS) {
+		#import(spec)
+		@Intrinsic([ LOAD_0 ])
+		static func &(rhs: PRIMITIVE^) -> PRIMITIVE* = rhs
 
-#foreach PRIMITIVE_SPECS
-	#if IS_BOOLEAN
-	#else
+	}
 
-		#if IS_SUBRANGE
-			#define CAST as PRIMITIVE
-		#else
-			#define CAST
-		#end
+	#for (spec <- PRIMITIVE_SPECS) {
+		#import(spec)
+		#if (IS_BOOLEAN) {}
+		#else {
+			#if (IS_SUBRANGE) {#define(CAST){as PRIMITIVE}}
+			#else             {#define(CAST)}
 
-	// PRIMITIVE Increment and Decrement
+			// PRIMITIVE
 
-	@Intrinsic([], compilerCode: Intrinsic.PRE_INCREMENT)
-	@BytecodeName("incPre")
-	prefix func ++(rhs: PRIMITIVE^) -> PRIMITIVE { let v = (*rhs + 1) CAST; *rhs = v; v }
+			@Intrinsic([], compilerCode: Intrinsic.PRE_INCREMENT)
+			@BytecodeName("incPre")
+			prefix func ++(rhs: PRIMITIVE^) -> PRIMITIVE { let v = (*rhs + 1) CAST; *rhs = v; v }
 
-	@Intrinsic([], compilerCode: Intrinsic.POST_INCREMENT)
-	@BytecodeName("incPost")
-	postfix func ++(rhs: PRIMITIVE^) -> PRIMITIVE { let v = *rhs; *rhs = (v + 1) CAST; v }
+			@Intrinsic([], compilerCode: Intrinsic.POST_INCREMENT)
+			@BytecodeName("incPost")
+			postfix func ++(rhs: PRIMITIVE^) -> PRIMITIVE { let v = *rhs; *rhs = (v + 1) CAST; v }
 
-	@Intrinsic([], compilerCode: Intrinsic.PRE_DECREMENT)
-	@BytecodeName("decPre")
-	prefix func --(rhs: PRIMITIVE^) -> PRIMITIVE { let v = (*rhs - 1) CAST; *rhs = v; v }
+			@Intrinsic([], compilerCode: Intrinsic.PRE_DECREMENT)
+			@BytecodeName("decPre")
+			prefix func --(rhs: PRIMITIVE^) -> PRIMITIVE { let v = (*rhs - 1) CAST; *rhs = v; v }
 
-	@Intrinsic([], compilerCode: Intrinsic.POST_DECREMENT)
-	@BytecodeName("decPost")
-	postfix func --(rhs: PRIMITIVE^) -> PRIMITIVE { let v = *rhs; *rhs = (v - 1) CAST; v }
-	#end
-#end
+			@Intrinsic([], compilerCode: Intrinsic.POST_DECREMENT)
+			@BytecodeName("decPost")
+			postfix func --(rhs: PRIMITIVE^) -> PRIMITIVE { let v = *rhs; *rhs = (v - 1) CAST; v }
+
+		}
+	}
 }

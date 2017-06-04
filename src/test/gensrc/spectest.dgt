@@ -5,47 +5,45 @@
 
 line without substitution
 
-line with COUNT SUBSTITUTION##s
+line with COUNT #(SUBSTITUTION)s
 line ending with SUBSTITUTION
 SUBSTITUTION at the beginning
 
-// tests for the token concat operator
+// tests for the escaped ##
 
-line ending with nothing ##
-line ending with a #
-line with #in the middle
-line with nothing ##in the middle
+## at start of the line
+line ending with a ##
+line with ## in the middle
 
 // tests for the preprocessor directives
 
-#if ENABLED
-	#delete ENABLED
-	#comment ENABLED is no longer defined in the scope of the enclosing #if
-	#process ENABLED set to true
-	#if  NESTED
-		#literal and NESTED set to true
-	#else
-		#literal but NESTED set to false
-	#endif
-#else
-	#define _ENABLED E##NABLED
-	#process _ENABLED set to ENABLED
-	#if NESTED
-		#literal but NESTED set to true
-	#else
-		#literal and NESTED set to false
-	#endif
-#endif
+#define(_NESTED){#name(NESTED)}
+#if (ENABLED) {
+	#delete(ENABLED)
+	ENABLED set to true
+	#if (NESTED){and _NESTED set to true}#else{but _NESTED set to false}
+}
+#else {
+	#define(_ENABLED){#name(ENABLED)}
+	_ENABLED set to ENABLED
+	#if (NESTED){but _NESTED set to true}#else{and _NESTED set to false}
+}
 
-#foreach ./spectest-Test.dgs, ./spectest-Base.dgs
-	#define _COUNT C##OUNT
-	#process the value of _COUNT in SPEC_NAME is COUNT
-#endfor
 
-#for INDEX; 1; 10
-INDEX
-#endfor
+#for (spec <- [ "./spectest-Test.dgs", "./spectest-Base.dgs" ]) {
+	#import(spec)
 
------ spectest-Base.dgs -----
-#include ./spectest-Base.dgs
------------------------------
+	- the value of #name(COUNT) in SPEC_NAME is COUNT
+}
+
+Counting:#for (INDEX <- 0 .. 10) { INDEX}
+
+
+More Counting:
+#for (INDEX <- 1 .. 5) {
+	INDEX
+}
+
+------ spectest-Base.dgs ------
+#include("./spectest-Base.dgs")
+-------------------------------

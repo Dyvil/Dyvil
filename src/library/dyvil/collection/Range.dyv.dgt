@@ -1,18 +1,16 @@
-package dyvil.collection;
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
 
-import dyvil.collection.immutable.ArrayList;
+package dyvil.collection
+
 import dyvil.collection.range._
 import dyvil.collection.range.specialized._
 import dyvil.util.ImmutableException
 
 import java.io.Serializable
 import java.lang.reflect.Array
-import java.util.Iterator
-import java.util.Spliterator
-import java.util.Spliterators
-import java.util.function.Consumer
-import java.util.function.Function
-import java.util.function.Predicate
+import java.util.{ Iterator, Spliterator, Spliterators }
+import java.util.function.{ Consumer, Function, Predicate }
 
 @LiteralConvertible.FromTuple
 @Immutable
@@ -21,17 +19,20 @@ interface Range<+T> extends Queryable<T>, Serializable
 	@BytecodeName("empty")
 	static func apply<T>() -> Range<T> = EmptyRange.instance
 
-#import Base.dgs
-#foreach PRIMITIVE_SPECS
-	#if HAS_RANGE_CLASS
-	@BytecodeName("closed")
-	static func apply(from: PRIMITIVE, to: PRIMITIVE) -> TYPE_NAME##Range = TYPE_NAME##Range(from, to: to)
-	
-	@BytecodeName("halfOpen")
-	static func apply(from: PRIMITIVE, explicit toExclusive: PRIMITIVE) -> TYPE_NAME##Range = TYPE_NAME##Range(from, toExclusive: toExclusive)
+	// Primitive Factory Methods
+	#import("Base.dgs")
+	#for (spec <- PRIMITIVE_SPECS) {
+		#import(spec)
+		#if (HAS_RANGE_CLASS) {
 
-	#end
-#end
+			@BytecodeName("closed")
+			static func apply(from: PRIMITIVE, to: PRIMITIVE) -> #(TYPE_NAME)Range = #(TYPE_NAME)Range(from, to: to)
+
+			@BytecodeName("halfOpen")
+			static func apply(from: PRIMITIVE, explicit toExclusive: PRIMITIVE) -> #(TYPE_NAME)Range
+				= #(TYPE_NAME)Range(from, toExclusive: toExclusive)
+		}
+	}
 	
 	@BytecodeName("closed")
 	static func apply<T extends Rangeable<T>>(from: T, to: T) -> Range<T>
@@ -96,21 +97,21 @@ interface Range<+T> extends Queryable<T>, Serializable
 	
 	override func mapped<R>(mapper: Function<-T, +R>) -> Queryable<R>
 	{
-		let builder = new ArrayList.Builder<R>(this.size())
+		let builder = new immutable.ArrayList.Builder<R>(this.size())
 		for (value <- this) builder.add(mapper(value))
 		return builder.build();
 	}
 
 	override func flatMapped<R>(mapper: Function<-T, +Iterable<+R>>) -> Queryable<R>
 	{
-		let builder = new ArrayList.Builder<R>(this.size)
+		let builder = new immutable.ArrayList.Builder<R>(this.size)
 		for (value <- this) for (result <- mapper(value)) builder.add(result)
 		return builder.build
 	}
 	
 	override func filtered(predicate: Predicate<-T>) -> Queryable<T>
 	{
-		let builder = new ArrayList.Builder<T>(this.size)
+		let builder = new immutable.ArrayList.Builder<T>(this.size)
 		for (value <- this) if (predicate.test(value)) builder.add(value)
 		return builder.build()
 	}

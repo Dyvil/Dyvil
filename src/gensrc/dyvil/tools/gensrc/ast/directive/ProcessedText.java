@@ -2,15 +2,16 @@ package dyvil.tools.gensrc.ast.directive;
 
 import dyvil.tools.gensrc.GenSrc;
 import dyvil.tools.gensrc.ast.scope.Scope;
+import dyvil.tools.gensrc.ast.Util;
 import dyvil.tools.parsing.marker.MarkerList;
 
 import java.io.PrintStream;
 
-public class LiteralDirective implements Directive
+public class ProcessedText implements Directive
 {
 	private final String text;
 
-	public LiteralDirective(String text)
+	public ProcessedText(String text)
 	{
 		this.text = text;
 	}
@@ -18,18 +19,18 @@ public class LiteralDirective implements Directive
 	@Override
 	public void specialize(GenSrc gensrc, Scope scope, MarkerList markers, PrintStream output)
 	{
-		output.println(this.text);
+		output.print(Util.processLine(this.text, scope));
 	}
 
 	@Override
 	public String toString()
 	{
-		return Directive.toString(this);
+		return this.text;
 	}
 
 	@Override
 	public void toString(String indent, StringBuilder builder)
 	{
-		builder.append(indent).append("#literal ").append(this.text).append('\n');
+		builder.append(this.text);
 	}
 }

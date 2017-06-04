@@ -5,7 +5,11 @@ import dyvil.tools.gensrc.GenSrc;
 import dyvil.tools.gensrc.ast.directive.DirectiveList;
 import dyvil.tools.gensrc.ast.scope.TemplateScope;
 import dyvil.tools.gensrc.lang.I18n;
-import dyvil.tools.gensrc.parser.Parser;
+import dyvil.tools.gensrc.lexer.GenSrcLexer;
+import dyvil.tools.gensrc.lexer.GenSrcSymbols;
+import dyvil.tools.gensrc.parser.BlockParser;
+import dyvil.tools.parsing.ParserManager;
+import dyvil.tools.parsing.TokenList;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.source.FileSource;
 
@@ -59,7 +63,12 @@ public class Template
 			return false;
 		}
 
-		this.directives = new Parser(this.sourceFile, markers).parse();
+		this.directives = new DirectiveList();
+
+		final TokenList tokens = new GenSrcLexer(markers).tokenize(this.sourceFile.getText());
+
+		new ParserManager(GenSrcSymbols.INSTANCE, tokens.iterator(), markers).parse(new BlockParser(this.directives));
+
 		return true;
 	}
 

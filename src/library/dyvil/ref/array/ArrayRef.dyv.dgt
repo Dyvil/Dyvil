@@ -3,17 +3,14 @@
 
 package dyvil.ref.array
 
-import dyvil.ref.TYPE_NAME##Ref
+import dyvil.ref.#(TYPE_NAME)Ref
 
-#if IS_OBJECT
-class TYPE_NAME##ArrayRef<type T>
-#else
-class TYPE_NAME##ArrayRef
-#end
-(
-	protected let array: [PRIMITIVE]
-	protected let index: int
-) implements TYPE_NAME##Ref
+#if (IS_OBJECT) {
+	class ObjectArrayRef<type T>(protected let array: [T], protected let index: int) implements ObjectRef
+}
+#else {
+	class #(TYPE_NAME)ArrayRef(protected let array: [PRIMITIVE], protected let index: int) implements #(TYPE_NAME)Ref
+}
 {
 	override func get() -> PRIMITIVE = this.array[this.index]
 

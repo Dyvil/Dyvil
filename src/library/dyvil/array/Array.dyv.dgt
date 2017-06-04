@@ -5,12 +5,10 @@ package dyvil.array
 
 import dyvil.collection.immutable.ArrayList
 
-#if HAS_RANGE_CLASS
-import dyvil.collection.range.closed.TYPE_NAME##Range
-#endif
+#if(HAS_RANGE_CLASS){import dyvil.collection.range.closed.#(TYPE_NAME)Range}
 
-import dyvil.ref.TYPE_NAME##Ref
-import dyvil.ref.array.TYPE_NAME##ArrayRef
+import dyvil.ref.#(TYPE_NAME)Ref
+import dyvil.ref.array.#(TYPE_NAME)ArrayRef
 
 import java.util.Arrays
 import java.util.function._
@@ -18,51 +16,51 @@ import java.lang.reflect.Array
 
 import static dyvil.reflect.Opcodes._
 
-public abstract class TYPE_NAME##Array
+public abstract class #(TYPE_NAME)Array
 {
-	#import Base.dgs
+	#import("Base.dgs")
 
-	#define REIFIED @Reified(Reified.Type.OBJECT_CLASS)
-	#if IS_OBJECT
-		#define GENERIC <T>
-		#define GENERIC_2 <T, REIFIED U>
-		#define GENERIC_REIFIED <REIFIED T>
-		#define APPLY_T apply<T>
-	#else
-		#define GENERIC
-		#define GENERIC_2 <REIFIED U>
-		#define GENERIC_REIFIED
-		#define APPLY_T apply
-	#end
-
-	private init()
-	{
-		// no instances
+	#define(REIFIED) {@Reified(Reified.Type.OBJECT_CLASS)}
+	#if (IS_OBJECT) {
+		#define(GENERIC) {<T>}
+		#define(GENERIC_2) {<T, REIFIED U>}
+		#define(GENERIC_REIFIED) {<REIFIED T>}
+		#define(APPLY_T) {apply<T>}
+	}
+	#else {
+		#define(GENERIC) {}
+		#define(GENERIC_2) {<REIFIED U>}
+		#define(GENERIC_REIFIED) {}
+		#define(APPLY_T) {apply}
 	}
 
-	#if IS_OBJECT
-	public const EMPTY: [final Object!] = []
-	#else
-	public const EMPTY: [final PRIMITIVE] = []
-	#end
+	private init() {} // no instances
+
+	#if (IS_OBJECT) {
+		public const EMPTY: [final Object!] = []
+	}
+	#else {
+		public const EMPTY: [final PRIMITIVE] = []
+	}
 
 	static inline func apply GENERIC_REIFIED() -> [PRIMITIVE] = []
 
-	#if IS_OBJECT
-	static inline func apply GENERIC_REIFIED(size: int) -> [PRIMITIVE] = apply<T>(size, componentType: class T)
+	#if (IS_OBJECT) {
+		static inline func apply GENERIC_REIFIED(size: int) -> [T] = apply<T>(size, componentType: class T)
 
-	@BytecodeName("ofType")
-	static func apply GENERIC(size: int, componentType: Class<T>) -> [PRIMITIVE]
-		= Array.newInstance(componentType, size) as [PRIMITIVE]
-	#else
-	static inline func apply(size: int) -> [PRIMITIVE] = new [PRIMITIVE](size)
-	#end
+		@BytecodeName("ofType")
+		static func apply<T>(size: int, componentType: Class<T>) -> [T]
+			= Array.newInstance(componentType, size) as [T]
+	}
+	#else {
+		static inline func apply(size: int) -> [PRIMITIVE] = new [PRIMITIVE](size)
+	}
 
 	static inline func apply GENERIC(array: [PRIMITIVE]) -> [PRIMITIVE] = array.copy
 
-	#if HAS_RANGE_CLASS
-	static func apply GENERIC(range: TYPE_NAME##Range) -> [PRIMITIVE] = range.to##TYPE_NAME##Array()
-	#endif
+	#if (HAS_RANGE_CLASS) {
+		static func apply GENERIC(range: #(TYPE_NAME)Range) -> [PRIMITIVE] = range.to#(TYPE_NAME)Array()
+	}
 
 	static func apply GENERIC_REIFIED(size: int, repeatedValue: PRIMITIVE) -> [PRIMITIVE]
 	{
@@ -74,12 +72,7 @@ public abstract class TYPE_NAME##Array
 	static func apply GENERIC_REIFIED(size: int, valueSupplier: SUPPLIER) -> [PRIMITIVE]
 	{
 		let array = APPLY_T(size)
-
-		#if SUPPLIER_CAST
-		for (i <- 0 ..< size) array[i] = valueSupplier.SUPPLIER_GET() as PRIMITIVE
-		#else
-		for (i <- 0 ..< size) array[i] = valueSupplier.SUPPLIER_GET()
-		#end
+		for (i <- 0 ..< size) array[i] = valueSupplier.SUPPLIER_GET()#if (SUPPLIER_CAST) { as PRIMITIVE}
 
 		return array
 	}
@@ -87,45 +80,34 @@ public abstract class TYPE_NAME##Array
 	static func apply GENERIC_REIFIED(size: int, valueMapper: INDEXED_SUPPLIER) -> [PRIMITIVE]
 	{
 		let array = APPLY_T(size)
-
-		#if INDEXED_SUPPLIER_CAST
-		for (i <- 0 ..< size) array[i] = valueMapper.INDEXED_SUPPLIER_APPLY(i) as PRIMITIVE
-		#else
-		for (i <- 0 ..< size) array[i] = valueMapper.INDEXED_SUPPLIER_APPLY(i)
-		#end
+		for (i <- 0 ..< size) array[i] = valueMapper.INDEXED_SUPPLIER_APPLY(i)#if(INDEXED_SUPPLIER_CAST){ as PRIMITIVE}
 
 		return array
 	}
 
-	#if IS_RANGEABLE
-	@BytecodeName("rangeClosed")
-	static func apply GENERIC(from: PRIMITIVE, to: PRIMITIVE) -> [PRIMITIVE]
-	{
-		#if RANGE_CAST
-		let array = apply((to - from + 1) as int)
-		#else
-		let array = apply(to - from + 1)
-		#end
-		var index = 0
+	#if (IS_RANGEABLE) {
+		@BytecodeName("rangeClosed")
+		static func apply GENERIC(from: PRIMITIVE, to: PRIMITIVE) -> [PRIMITIVE]
+		{
+			let array = #if (RANGE_CAST) {apply((to - from + 1) as int)} #else {apply(to - from + 1)}
 
-		for (i <- from .. to) array[index++] = i
-		return array
+			var index = 0
+
+			for (i <- from .. to) array[index++] = i
+			return array
+		}
+
+		@BytecodeName("rangeOpen")
+		static func range GENERIC(from: PRIMITIVE, explicit toExclusive: PRIMITIVE) -> [PRIMITIVE]
+		{
+			let array = #if (RANGE_CAST) {apply((toExclusive - from) as int)} #else {apply(toExclusive - from)}
+
+			var index = 0
+
+			for (i <- from ..< toExclusive) array[index++] = from
+			return array
+		}
 	}
-
-	@BytecodeName("rangeOpen")
-	static func range GENERIC(from: PRIMITIVE, explicit toExclusive: PRIMITIVE) -> [PRIMITIVE]
-	{
-		#if RANGE_CAST
-		let array = apply((toExclusive - from) as int)
-		#else
-		let array = apply(toExclusive - from)
-		#end
-		var index = 0
-
-		for (i <- from ..< toExclusive) array[index++] = from
-		return array
-	}
-	#endif
 
 	// Basic Array Operations
 
@@ -145,11 +127,7 @@ public abstract class TYPE_NAME##Array
 	infix func subscript GENERIC(array: [PRIMITIVE], range: Range<int>) -> [PRIMITIVE]
 	{
 		let size = range.size
-		#if IS_OBJECT
-		let result = apply(size, componentType: array.componentType)
-		#else
-		let result = apply(size)
-		#end
+		let result = #if (IS_OBJECT) {apply(size, componentType: array.componentType)} #else {apply(size)}
 
 		System.arraycopy(array, range.first, result, 0, size)
 		return result
@@ -165,32 +143,32 @@ public abstract class TYPE_NAME##Array
 		= System.arraycopy(newValues, 0, array, range.first, range.size)
 
 	@Mutating
-	infix func subscript_& GENERIC(array: [PRIMITIVE], index: int) -> TYPE_NAME##Ref
-		= new TYPE_NAME##ArrayRef(array, index)
+	infix func subscript_& GENERIC(array: [PRIMITIVE], index: int) -> #(TYPE_NAME)Ref
+		= new #(TYPE_NAME)ArrayRef(array, index)
 
 	infix func forEach GENERIC(array: [PRIMITIVE], action: CONSUMER) -> void
 		= for (value <- array) action.CONSUMER_ACCEPT(value)
 
-	#if IS_OBJECT
-	// Component Types
+	#if (IS_OBJECT) {
+		// Component Types
 
-	postfix func componentType<T>(array: [T]) -> Class<T> = array.getClass.getComponentType as Class<T>
+		postfix func componentType<T>(array: [T]) -> Class<T> = array.getClass.getComponentType as Class<T>
 
-	postfix func deepComponentType<T>(array: [T]) -> Class<_>
-	{
-		var ret: Class<_> = array.dynamicClass
-		while (true)
+		postfix func deepComponentType<T>(array: [T]) -> Class<_>
 		{
-			var componentType = ret.getComponentType
-			if (componentType == null)
+			var ret: Class<_> = array.dynamicClass
+			while (true)
 			{
-				break
+				var componentType = ret.getComponentType
+				if (componentType == null)
+				{
+					break
+				}
+				ret = componentType
 			}
-			ret = componentType
+			return ret
 		}
-		return ret
 	}
-	#end
 
 	// Operators
 
@@ -204,11 +182,8 @@ public abstract class TYPE_NAME##Array
 	infix func added GENERIC(array: [PRIMITIVE], value: PRIMITIVE) -> [PRIMITIVE]
 	{
 		let size = array.size
-		#if IS_OBJECT
-		let result = apply(size + 1, componentType: array.componentType)
-		#else
-		let result = apply(size + 1)
-		#end
+		let result = #if (IS_OBJECT) {apply(size + 1, componentType: array.componentType)} #else {apply(size + 1)}
+
 		System.arraycopy(array, 0, result, 0, size)
 		result[size] = value
 		return result
@@ -218,11 +193,8 @@ public abstract class TYPE_NAME##Array
 	{
 		let size1 = array.size
 		let size2 = with.size
-		#if IS_OBJECT
-		let result = apply(size1 + size2, componentType: array.componentType)
-		#else
-		let result = apply(size1 + size2)
-		#end
+		let result = #if (IS_OBJECT) {apply(size1 + size2, componentType: array.componentType)} #else {apply(size1 + size2)}
+
 		System.arraycopy(array, 0, result, 0, size1)
 		System.arraycopy(with, 0, result, size1, size2)
 		return result
@@ -235,11 +207,8 @@ public abstract class TYPE_NAME##Array
 		// Calculate number of elements in new array
 		for (element <- array) if (element == value) size--
 
-		#if IS_OBJECT
-		let result = apply(size, componentType: array.componentType)
-		#else
-		let result = apply(size)
-		#end
+		let result = #if (IS_OBJECT) {apply(size, componentType: array.componentType)} #else {apply(size)}
+
 		var index = 0
 
 		for (element <- array) if (element != value) result[index++] = element
@@ -249,11 +218,8 @@ public abstract class TYPE_NAME##Array
 	infix func difference GENERIC(array: [PRIMITIVE], from: [PRIMITIVE]) -> [PRIMITIVE]
 	{
 		let size = array.size
-		#if IS_OBJECT
-		let result = apply(size, componentType: array.componentType)
-		#else
-		let result = apply(size)
-		#end
+		let result = #if (IS_OBJECT) {apply(size, componentType: array.componentType)} #else {apply(size)}
+
 		var index = 0
 
 		for (v <- array) if (!from.contains(v)) result[index++] = v
@@ -263,33 +229,26 @@ public abstract class TYPE_NAME##Array
 	infix func intersection GENERIC(array: [PRIMITIVE], with: [PRIMITIVE]) -> [PRIMITIVE]
 	{
 		let size = array.size
-		#if IS_OBJECT
-		let result = apply(size, componentType: array.componentType)
-		#else
-		let result = apply(size)
-		#end
+		let result = #if (IS_OBJECT) {apply(size, componentType: array.componentType)} #else {apply(size)}
+
 		var index = 0
 
 		for (v <- array) if (with.contains(v)) result[index++] = v
 		return result.trim(index)
 	}
 
-	#if IS_OBJECT
-	// Object Arrays do not need a specialized mapped method
-	#else
-	infix func mapped(array: [PRIMITIVE], mapper: MAPPER) -> [PRIMITIVE]
-	{
-		let size = array.size
-		let result = apply(size)
+	#if (IS_OBJECT /* Object Arrays do not need a specialized mapped method */ ) {}
+	#else {
+		infix func mapped(array: [PRIMITIVE], mapper: MAPPER) -> [PRIMITIVE]
+		{
+			let size = array.size
+			let result = apply(size)
 
-		#if MAPPER_CAST
-		for (i <- 0 ..< size) result[i] = mapper.MAPPER_APPLY(array[i]) as PRIMITIVE
-		#else
-		for (i <- 0 ..< size) result[i] = mapper.MAPPER_APPLY(array[i])
-		#end
-		return result
+			for (i <- 0 ..< size) result[i] = mapper.MAPPER_APPLY(array[i])#if (MAPPER_CAST) { as PRIMITIVE}
+
+			return result
+		}
 	}
-	#end
 
 	@OverloadPriority
 	infix func mapped GENERIC_2(array: [PRIMITIVE], mapper: TO_MAPPER U TO_MAPPER_END) -> [U]
@@ -300,31 +259,30 @@ public abstract class TYPE_NAME##Array
 		return result
 	}
 
-	#if IS_OBJECT
-	// Object Arrays do not need a specialized flatMapped method
-	#else
-	infix func flatMapped(array: [PRIMITIVE], mapper: TO_MAPPER [PRIMITIVE] TO_MAPPER_END) -> [PRIMITIVE]
-	{
-		var size = 0
-		var result = apply(array.size << 2)
-
-		for (v <- array)
+	#if (IS_OBJECT /* Object Arrays do not need a specialized flatMapped method */) {}
+	#else {
+		infix func flatMapped(array: [PRIMITIVE], mapper: TO_MAPPER [PRIMITIVE] TO_MAPPER_END) -> [PRIMITIVE]
 		{
-			let inner = mapper.TO_MAPPER_APPLY(v)
-			let newSize = inner.size
+			var size = 0
+			var result = apply(array.size << 2)
 
-			if (size + newSize >= result.size)
+			for (v <- array)
 			{
-				result = result.copy((size + newSize) << 1)
+				let inner = mapper.TO_MAPPER_APPLY(v)
+				let newSize = inner.size
+
+				if (size + newSize >= result.size)
+				{
+					result = result.copy((size + newSize) << 1)
+				}
+
+				System.arraycopy(inner, 0, result, size, newSize)
+				size += newSize
 			}
 
-			System.arraycopy(inner, 0, result, size, newSize)
-			size += newSize
+			return result.trim(size)
 		}
-
-		return result.trim(size)
 	}
-	#end
 
 	@OverloadPriority
 	infix func flatMapped GENERIC_2(array: [PRIMITIVE], mapper: TO_MAPPER +Iterable<+U> TO_MAPPER_END) -> [U]
@@ -338,11 +296,8 @@ public abstract class TYPE_NAME##Array
 	infix func filtered GENERIC(array: [PRIMITIVE], condition: PREDICATE) -> [PRIMITIVE]
 	{
 		let size = array.size
-		#if IS_OBJECT
-		let result = apply(size, componentType: array.componentType)
-		#else
-		let result = apply(size)
-		#end
+		let result = #if (IS_OBJECT) {apply(size, componentType: array.componentType)} #else {apply(size)}
+
 		var index = 0
 
 		for (v <- array) if (condition.PREDICATE_TEST(v)) result[index++] = v
@@ -351,23 +306,24 @@ public abstract class TYPE_NAME##Array
 
 	infix func sorted GENERIC(array: [PRIMITIVE]) -> [PRIMITIVE]
 	{
-#if IS_BOOLEAN
-		let size = array.size
-		let result = new [PRIMITIVE](size)
+		#if (IS_BOOLEAN) {
+			let size = array.size
+			let result = new [PRIMITIVE](size)
 
-		// Count the number of 'false' entries in the array
-		var falseEntries = 0
+			// Count the number of 'false' entries in the array
+			var falseEntries = 0
 
-		for (value <- array) if (!value) falseEntries++
+			for (value <- array) if (!value) falseEntries++
 
-		// Make the remaining elements of the result true
-		for (i <- falseEntries ..< size) result[i] = true
-		return result
-#else
-		let result = array.copy
-		Arrays.sort(result)
-		return result
-#endif
+			// Make the remaining elements of the result true
+			for (i <- falseEntries ..< size) result[i] = true
+			return result
+		}
+		#else {
+			let result = array.copy
+			Arrays.sort(result)
+			return result
+		}
 	}
 
 	// Search Operations
@@ -410,64 +366,59 @@ public abstract class TYPE_NAME##Array
 
 	infix func copy GENERIC(array: [PRIMITIVE], withSize: int) -> [PRIMITIVE]
 	{
-		#if IS_OBJECT
-		let newArray = apply(withSize, componentType: array.componentType)
-		#else
-		let newArray = apply(withSize)
-		#end
-		System.arraycopy(array, 0, newArray, 0, array.size)
-		return newArray
+		let result = #if (IS_OBJECT) {apply(withSize, componentType: array.componentType)} #else {apply(withSize)}
+
+		System.arraycopy(array, 0, result, 0, array.size)
+		return result
 	}
 
 	infix func trim GENERIC(array: [PRIMITIVE], toSize: int) -> [PRIMITIVE]
 		= array.size == toSize ? array : array.copy(toSize)
 
-	#if IS_OBJECT
-	#else
-	infix func boxed(array: [PRIMITIVE]) -> [WRAPPER]
-	{
-		let size = array.size
-		let boxed = new [WRAPPER](size)
+	#if (IS_OBJECT) {}
+	#else {
+		infix func boxed(array: [PRIMITIVE]) -> [WRAPPER]
+		{
+			let size = array.size
+			let boxed = new [WRAPPER](size)
 
-		for (i <- 0 ..< size) boxed[i] = array[i]
-		return boxed
+			for (i <- 0 ..< size) boxed[i] = array[i]
+			return boxed
+		}
 	}
-	#end
 
 	implicit infix inline func asIterable GENERIC(array: [PRIMITIVE]) -> Iterable<PRIMITIVE> = array.toList
 
 	implicit infix inline func asList GENERIC(array: [final PRIMITIVE]) -> ImmutableList<PRIMITIVE> = array.toList
 
 	infix func toList GENERIC(array: [PRIMITIVE]) -> ImmutableList<PRIMITIVE>
-	#if IS_OBJECT
-		= new ArrayList<PRIMITIVE>(array)
-	#else
-		= new ArrayList<PRIMITIVE>(array.boxed, trusted: true)
-	#end
+		= #if (IS_OBJECT) {new ArrayList<PRIMITIVE>(array)} #else {new ArrayList<PRIMITIVE>(array.boxed, trusted: true)}
+
 
 	// equals, hashCode and toString
 
-	#if IS_OBJECT
-	// equals
+	#if (IS_OBJECT) {
+		// equals
 
-	infix inline func equals(array: [Object!]!, other: [Object!]!) -> boolean = Arrays.equals(array, other)
+		infix inline func equals(array: [Object!]!, other: [Object!]!) -> boolean = Arrays.equals(array, other)
 
-	infix inline func deepEquals(array: [Object!]!, other: [Object!]!) -> boolean = Arrays.deepEquals(array, other)
+		infix inline func deepEquals(array: [Object!]!, other: [Object!]!) -> boolean = Arrays.deepEquals(array, other)
 
-	infix func deepEquals(obj: Object!, other: Object!) -> boolean = [obj].deepEquals([other])
+		infix func deepEquals(obj: Object!, other: Object!) -> boolean = [obj].deepEquals([other])
 
-	// hashCode
+		// hashCode
 
-	postfix inline func hashCode(array: [Object!]!) -> int = Arrays.hashCode(array)
+		postfix inline func hashCode(array: [Object!]!) -> int = Arrays.hashCode(array)
 
-	postfix inline func deepHashCode(array: [Object!]!) -> int = Arrays.deepHashCode(array)
+		postfix inline func deepHashCode(array: [Object!]!) -> int = Arrays.deepHashCode(array)
 
-	postfix func deepHashCode(obj: Object!) -> int = [obj].deepHashCode
-	#else
-	infix inline func equals(array: [PRIMITIVE]!, other: [PRIMITIVE]!) -> boolean = Arrays.equals(array, other)
+		postfix func deepHashCode(obj: Object!) -> int = [obj].deepHashCode
+	}
+	#else {
+		infix inline func equals(array: [PRIMITIVE]!, other: [PRIMITIVE]!) -> boolean = Arrays.equals(array, other)
 
-	infix inline func hashCode(array: [PRIMITIVE]!) -> int = Arrays.hashCode(array)
-	#end
+		infix inline func hashCode(array: [PRIMITIVE]!) -> int = Arrays.hashCode(array)
+	}
 
 	// toString
 
@@ -508,90 +459,92 @@ public abstract class TYPE_NAME##Array
 		builder.append(']')
 	}
 
-	#if IS_OBJECT
-	postfix func deepToString(array: [Object!]!) -> String
-	{
-		if (array == null) return 'null'
+	#if (IS_OBJECT) {
+		postfix func deepToString(array: [Object!]!) -> String
+		{
+			if (array == null) return 'null'
 
-		let size = array!!.size
-		if (size == 0) return '[]'
+			let size = array!!.size
+			if (size == 0) return '[]'
 
-		let builder = new StringBuilder()
-		deepAppend(array!!, size, builder)
-		return builder.toString!!
+			let builder = new StringBuilder()
+			deepAppend(array!!, size, builder)
+			return builder.toString!!
+		}
+
+		infix func deepToString(array: [Object!]!, builder: StringBuilder) -> void
+		{
+			if (array == null)
+			{
+				builder.append('null')
+				return
+			}
+
+			let size = array!!.size
+			if (size <= 0)
+			{
+				builder.append('[]')
+				return
+			}
+
+			deepAppend(array!!, size, builder)
+		}
+
+		private static func deepAppend(array: [Object!], size: int, builder: StringBuilder) -> void
+		{
+			builder.append('[')
+			array[0].deepToString(builder)
+			for (i <- 1 ..< size)
+			{
+				builder.append(', ')
+				array[i].deepToString(builder)
+			}
+			builder.append(']')
+		}
+
+		postfix func deepToString(obj: Object!) -> String
+		{
+			if (obj == null) return 'null'
+
+			let objectClass = obj!!.dynamicClass
+			if (!objectClass.isArray) return obj!!.toString
+
+			#for (spec <- PRIMITIVE_SPECS) {
+				#import(spec)
+				if (objectClass === class [PRIMITIVE])
+				{
+					return (obj as [PRIMITIVE]).toString
+				}
+			}
+
+			return (obj as [Object!]).deepToString
+		}
+
+		infix func deepToString(obj: Object!, builder: StringBuilder) -> void
+		{
+			if (obj == null)
+			{
+				builder.append('null')
+				return
+			}
+
+			let objectClass = obj!!.dynamicClass
+			if (!objectClass.isArray)
+			{
+				builder.append(obj)
+				return
+			}
+
+			#for (spec <- PRIMITIVE_SPECS) {
+				#import(spec)
+				if (objectClass === class [PRIMITIVE])
+				{
+					(obj as [PRIMITIVE]).toString(builder)
+					return
+				}
+			}
+
+			(obj as [Object!]).deepToString(builder)
+		}
 	}
-
-	infix func deepToString(array: [Object!]!, builder: StringBuilder) -> void
-	{
-		if (array == null)
-		{
-			builder.append('null')
-			return
-		}
-
-		let size = array!!.size
-		if (size <= 0)
-		{
-			builder.append('[]')
-			return
-		}
-
-		deepAppend(array!!, size, builder)
-	}
-
-	private static func deepAppend(array: [Object!], size: int, builder: StringBuilder) -> void
-	{
-		builder.append('[')
-		array[0].deepToString(builder)
-		for (i <- 1 ..< size)
-		{
-			builder.append(', ')
-			array[i].deepToString(builder)
-		}
-		builder.append(']')
-	}
-
-	postfix func deepToString(obj: Object!) -> String
-	{
-		if (obj == null) return 'null'
-
-		let objectClass = obj!!.dynamicClass
-		if (!objectClass.isArray) return obj!!.toString
-
-		#foreach PRIMITIVE_SPECS
-		if (objectClass === class [PRIMITIVE])
-		{
-			return (obj as [PRIMITIVE]).toString
-		}
-		#end
-
-		return (obj as [Object!]).deepToString
-	}
-
-	infix func deepToString(obj: Object!, builder: StringBuilder) -> void
-	{
-		if (obj == null)
-		{
-			builder.append('null')
-			return
-		}
-
-		let objectClass = obj!!.dynamicClass
-		if (!objectClass.isArray)
-		{
-			builder.append(obj)
-			return
-		}
-
-		#foreach PRIMITIVE_SPECS
-		if (objectClass === class [PRIMITIVE])
-		{
-			(obj as [PRIMITIVE]).toString(builder)
-			return
-		}
-		#end
-
-		(obj as [Object!]).deepToString(builder)
-	}
-	#end // IS_OBJECT
 }
