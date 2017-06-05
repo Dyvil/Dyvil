@@ -37,7 +37,9 @@ public final class SimpleMethodVisitor implements MethodVisitor
 		}
 
 		this.parameterIndex++;
-		parameter.setName(Name.fromQualified(name));
+		final Name name1 = Name.fromQualified(name);
+		parameter.setName(name1);
+		parameter.setLabel(name1);
 
 		if (modifiers != 0)
 		{
@@ -260,14 +262,14 @@ public final class SimpleMethodVisitor implements MethodVisitor
 
 			if (param.getName() == null)
 			{
-				param.setName(this.getName(i, localIndex));
+				param.setName(this.getName(localIndex));
 			}
 
 			localIndex += param.getLocalSlots();
 		}
 	}
 
-	private Name getName(int index, int localIndex)
+	private Name getName(int localIndex)
 	{
 		final String localName;
 		if (this.localNames == null || (localName = this.localNames[localIndex]) == null)

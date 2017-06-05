@@ -38,6 +38,12 @@ public interface IParameter extends IVariable, IClassMember
 
 	void setLabel(Name name);
 
+	default String getQualifiedLabel()
+	{
+		final Name label = this.getLabel();
+		return label == null ? null : label.qualified;
+	}
+
 	IType getCovariantType();
 
 	@Override
@@ -95,7 +101,7 @@ public interface IParameter extends IVariable, IClassMember
 		final int localIndex = writer.localCount();
 
 		this.setLocalIndex(localIndex);
-		writer.visitParameter(localIndex, this.getInternalName(), type, ModifierUtil.getJavaModifiers(flags));
+		writer.visitParameter(localIndex, this.getQualifiedLabel(), type, ModifierUtil.getJavaModifiers(flags));
 
 		// Annotations
 		final AnnotatableVisitor visitor = (desc, visible) -> writer.visitParameterAnnotation(index, desc, visible);
