@@ -354,8 +354,8 @@ public class CodeMethod extends AbstractMethod
 		final ParameterList params = method.getParameters();
 		for (int i = 0, count = params.size(); i < count; i++)
 		{
-			// append all param names followed by an underscore
-			builder.append(params.get(i).getInternalName()).append('_');
+			// append all external parameter labels followed by an underscore
+			builder.append(params.get(i).getQualifiedLabel()).append('_');
 		}
 
 		// strip the trailing _
@@ -453,8 +453,8 @@ public class CodeMethod extends AbstractMethod
 			for (int i = 0, count = params.size(); i < count; i++)
 			{
 				final IParameter thisParam = this.parameters.get(i);
-				final Name thisName = thisParam.getName();
-				final Name otherName = params.get(i).getName();
+				final Name thisName = thisParam.getLabel();
+				final Name otherName = params.get(i).getLabel();
 
 				if (thisName == otherName || thisName == null || otherName == null)
 				{
