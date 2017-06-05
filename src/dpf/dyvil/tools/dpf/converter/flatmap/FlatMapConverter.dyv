@@ -24,7 +24,7 @@ implements NodeVisitor
 		{
 			return name.qualified
 		}
-		return this.name + '.' + name.qualified
+		return this.name ++ '.' ++ name.qualified
 	}
 
 	override func visitNode(name: Name) -> NodeVisitor = new FlatMapConverter(this.map, this.getName(name))

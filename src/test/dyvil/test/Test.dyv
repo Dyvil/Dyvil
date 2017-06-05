@@ -34,7 +34,7 @@ interface Test
 			errors.add("Test Collection '\(this.name)' failed:")
 			for (subError <- subErrors)
 			{
-				errors.add('\t' + subError)
+				errors.add('\t' ++ subError)
 			}
 		}
 	}

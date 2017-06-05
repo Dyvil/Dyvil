@@ -15,13 +15,13 @@ class VirtualStaticTest
 	class Base implements Interface
 	{
 		static override func foo() -> String = "Base"
-		static override func bar(s: String) -> String = s + "_Base"
+		static override func bar(s: String) -> String = s ++ "_Base"
 	}
 
 	class Derived extends Base
 	{
 		static override func foo() -> String = "Derived"
-		static override func bar(s: String) -> String = s + "_Derived"
+		static override func bar(s: String) -> String = s ++ "_Derived"
 	}
 
 	static func getFoo<@Reified(Reified.Type.ANY_CLASS) T: Interface>() -> String = T.foo

@@ -13,7 +13,7 @@ case class #(TYPE_NAME)Value(protected let value: PRIMITIVE) implements Constant
 
 	override func appendString(builder: StringBuilder) -> void = builder.append(this.value)
 
-	override func toString() -> String = this.value + "LITERAL_SUFFIX"
+	override func toString() -> String = "\(this.value)LITERAL_SUFFIX"
 
 	override func toString(indent: String, buffer: StringBuilder) -> void = buffer.append(this.value).append('LITERAL_SUFFIX')
 }

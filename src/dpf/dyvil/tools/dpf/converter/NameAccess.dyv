@@ -24,6 +24,6 @@ extends DyvilValueVisitor implements Expandable
 		{
 			return this.name
 		}
-		return this.value + '.' + this.name
+		return "\(this.value).\(this.name)"
 	}
 }

@@ -12,21 +12,32 @@ abstract class Strings
 
 	// Concat Operators
 
-	@Deprecated("String Concatenation using '+' is deprecated - use String Interpolation instead")
+	@Intrinsic([], compilerCode: Intrinsic.STRING_CONCAT)
+	infix func +(lhs: char, rhs: String) -> String = lhs + rhs
+
+	@Intrinsic([], compilerCode: Intrinsic.STRING_CONCAT)
+	infix func +(lhs: String, rhs: char) -> String = lhs + rhs
+
+	@Intrinsic([], compilerCode: Intrinsic.STRING_CONCAT)
+	infix func ++(lhs: String, rhs: String) -> String = lhs ++ rhs
+
+	// Old Concat Operators, scheduled for removal in v0.34.0
+
+	@Deprecated("String Concatenation using '+' is deprecated - use String Interpolation instead"
+	            forRemoval: "v0.34.0")
 	@Intrinsic([], compilerCode: Intrinsic.STRING_CONCAT)
 	infix func +(lhs: String, rhs: any!) -> String = "\(lhs)\(rhs)"
 
-	@Deprecated("String Concatenation using '+' is deprecated - use String Interpolation instead")
+	@Deprecated("String Concatenation using '+' is deprecated - use String Interpolation instead"
+	            forRemoval: "v0.34.0")
 	@Intrinsic([], compilerCode: Intrinsic.STRING_CONCAT)
 	infix func +(lhs: any!, rhs: String) -> String = "\(lhs)\(rhs)"
 
 	@Deprecated("String Concatenation using '+' is deprecated - use '++' instead"
-	            replacements: ["++(lhs: String, rhs: String) -> String"])
+	            replacements: ["++(lhs: String, rhs: String) -> String"]
+	            forRemoval: "v0.34.0")
 	@Intrinsic([], compilerCode: Intrinsic.STRING_CONCAT)
 	infix func +(lhs: String, rhs: String) -> String = lhs ++ rhs
-
-	@Intrinsic([], compilerCode: Intrinsic.STRING_CONCAT)
-	infix func ++(lhs: String, rhs: String) -> String = lhs ++ rhs
 
 	// Creation
 

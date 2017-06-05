@@ -30,7 +30,7 @@ public class Printer implements NodeVisitor, ValueVisitor, ListVisitor, MapVisit
 
 	override func visitNode(name: Name) -> NodeVisitor
 	{
-		this.section("Node " + name)
+		this.section("Node \(name)")
 		return this
 	}
 	
@@ -42,21 +42,21 @@ public class Printer implements NodeVisitor, ValueVisitor, ListVisitor, MapVisit
 	
 	override func visitNodeAccess(name: Name) -> NodeVisitor
 	{
-		this.section("Access " + name)
+		this.section("Access \(name)")
 		return this
 	}
 	
-	override func visitInt(value: int) -> void = this.value("Int " + value)
+	override func visitInt(value: int) -> void = this.value("Int \(value)")
 
-	override func visitLong(value: long) -> void = this.value("Long " + value)
+	override func visitLong(value: long) -> void = this.value("Long \(value)")
 
-	override func visitFloat(value: float) -> void = this.value("Float " + value)
+	override func visitFloat(value: float) -> void = this.value("Float \(value)")
 
-	override func visitDouble(value: double) -> void = this.value("Double " + value)
+	override func visitDouble(value: double) -> void = this.value("Double \(value)")
 
-	override func visitString(value: String) -> void = this.value("String " + value)
+	override func visitString(value: String) -> void = this.value("String \(value)")
 
-	override func visitName(value: Name) -> void = this.value("Name " + value)
+	override func visitName(value: Name) -> void = this.value("Name \(value)")
 
 	override func visitStringInterpolation() -> StringInterpolationVisitor
 	{
@@ -66,7 +66,7 @@ public class Printer implements NodeVisitor, ValueVisitor, ListVisitor, MapVisit
 
 	override func visitValueAccess(name: Name) -> ValueVisitor
 	{
-		this.value("Access " + name)
+		this.value("Access \(name)")
 		return this
 	}
 
