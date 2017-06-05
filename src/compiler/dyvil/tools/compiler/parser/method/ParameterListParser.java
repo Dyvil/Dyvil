@@ -21,6 +21,7 @@ import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.parsing.IParserManager;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
@@ -29,7 +30,8 @@ import dyvil.tools.parsing.token.IToken;
 public final class ParameterListParser extends Parser implements ITypeConsumer
 {
 	public static final int DECLARATOR              = 0;
-	public static final int NAME                    = 2;
+	public static final int NAME                    = 1;
+	public static final int INTERNAL_NAME           = 2;
 	public static final int VARARGS_AFTER_NAME      = 3;
 	public static final int TYPE_ASCRIPTION         = 4;
 	public static final int VARARGS_AFTER_POST_TYPE = 5;
@@ -151,7 +153,16 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			}
 			// Fallthrough
 		case NAME:
-			if (!ParserUtil.isIdentifier(type))
+			final Name name;
+			if (ParserUtil.isIdentifier(type))
+			{
+				name = token.nameValue();
+			}
+			else if (type == BaseSymbols.UNDERSCORE)
+			{
+				name = null;
+			}
+			else
 			{
 				if (ParserUtil.isCloseBracket(type))
 				{
@@ -167,24 +178,26 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				return;
 			}
 
-			final IToken next = token.next();
-			if (ParserUtil.isIdentifier(next.type()))
-			{
-				// IDENTIFIER IDENTIFIER
-				// label      internal name
-				this.parameter = this.consumer.createParameter(token.raw(), next.nameValue(), this.type, this.modifiers,
-				                                               this.annotations);
-				this.parameter.setLabel(token.nameValue());
-				pm.skip(); // skip the second label
-			}
-			else
-			{
-				this.parameter = this.consumer.createParameter(token.raw(), token.nameValue(), this.type, this.modifiers,
-				                                               this.annotations);
-			}
-
-			this.mode = VARARGS_AFTER_NAME;
+			this.parameter = this.consumer
+				                 .createParameter(token.raw(), name, this.type, this.modifiers, this.annotations);
+			this.mode = INTERNAL_NAME;
 			return;
+		case INTERNAL_NAME:
+			this.mode = VARARGS_AFTER_NAME;
+			// overwrite the internal name if necessary
+			if (ParserUtil.isIdentifier(type))
+			{
+				// IDENTIFIER IDENTIFIER : TYPE
+				this.parameter.setName(token.nameValue());
+				return;
+			}
+			else if (type == BaseSymbols.UNDERSCORE)
+			{
+				// IDENTIFIER _ : TYPE
+				this.parameter.setName(null);
+				return;
+			}
+			// Fallthrough
 		case VARARGS_AFTER_NAME:
 			if (type == DyvilSymbols.ELLIPSIS)
 			{

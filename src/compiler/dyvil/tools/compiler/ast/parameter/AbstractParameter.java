@@ -3,6 +3,8 @@ package dyvil.tools.compiler.ast.parameter;
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -22,13 +24,12 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.lang.annotation.ElementType;
 
 public abstract class AbstractParameter extends Variable implements IParameter
 {
-	protected @Nullable Name label;
+	protected @NonNull Name label;
 
 	// Metadata
 	protected @Nullable ICallableMember method;
@@ -43,7 +44,7 @@ public abstract class AbstractParameter extends Variable implements IParameter
 
 	public AbstractParameter(Name name)
 	{
-		super(name, null);
+		this(name, null);
 	}
 
 	public AbstractParameter(Name name, IType type)
@@ -54,6 +55,7 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	public AbstractParameter(ICallableMember callable, SourcePosition position, Name name, IType type)
 	{
 		super(position, name, type);
+		this.label = name;
 		this.method = callable;
 	}
 
@@ -61,13 +63,14 @@ public abstract class AbstractParameter extends Variable implements IParameter
 		                        ModifierSet modifiers, AnnotationList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
+		this.label = name;
 		this.method = callable;
 	}
 
 	@Override
 	public Name getLabel()
 	{
-		return this.label == null ? this.name : this.label;
+		return this.label;
 	}
 
 	@Override
@@ -134,6 +137,12 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	public String getInternalName()
 	{
 		return this.name == null ? null : this.name.qualified;
+	}
+
+	@Override
+	public String getQualifiedLabel()
+	{
+		return this.label == null ? null : this.label.qualified;
 	}
 
 	@Override
@@ -223,6 +232,15 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	}
 
 	@Override
+	public void writeLocal(MethodWriter writer, Label start, Label end)
+	{
+		if (this.name != null)
+		{
+			super.writeLocal(writer, start, end);
+		}
+	}
+
+	@Override
 	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		if (this.annotations != null)
@@ -235,19 +253,13 @@ public abstract class AbstractParameter extends Variable implements IParameter
 			this.modifiers.toString(this.getKind(), buffer);
 		}
 
-		if (this.label != null)
+		if (this.label != this.name)
 		{
-			buffer.append(this.label).append(' ');
+			appendNullableName(buffer, this.label);
+			buffer.append(' ');
 		}
 
-		if (this.name != null)
-		{
-			buffer.append(this.name);
-		}
-		else
-		{
-			buffer.append('_');
-		}
+		appendNullableName(buffer, this.name);
 
 		final boolean varargs = this.isVarargs();
 		if (varargs && !this.type.canExtract(ArrayType.class))
@@ -275,6 +287,18 @@ public abstract class AbstractParameter extends Variable implements IParameter
 		{
 			Formatting.appendSeparator(buffer, "field.assignment", '=');
 			this.value.toString(indent, buffer);
+		}
+	}
+
+	protected static void appendNullableName(@NonNull StringBuilder buffer, Name name)
+	{
+		if (name != null)
+		{
+			buffer.append(name);
+		}
+		else
+		{
+			buffer.append('_');
 		}
 	}
 }

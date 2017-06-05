@@ -65,6 +65,12 @@ public class ClassParameter extends Field implements IParameter
 	}
 
 	@Override
+	public String getQualifiedLabel()
+	{
+		return this.getInternalName();
+	}
+
+	@Override
 	public MemberKind getKind()
 	{
 		return MemberKind.CLASS_PARAMETER;
