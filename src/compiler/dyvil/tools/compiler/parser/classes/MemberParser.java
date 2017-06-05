@@ -478,4 +478,10 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 	{
 		this.type = type;
 	}
+
+	@Override
+	public boolean reportErrors()
+	{
+		return this.mode != DECLARATOR;
+	}
 }
