@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.field;
 
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -17,7 +18,6 @@ import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public interface IDataMember extends IMember, IAccessible, IValueConsumer
 {
@@ -154,29 +154,11 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 	static void toString(String prefix, StringBuilder buffer, IMember field, String key)
 	{
 		final IType type = field.getType();
-		boolean typeAscription = false;
 
-		if (type != null && type != Types.UNKNOWN)
-		{
-			typeAscription = Formatting.typeAscription(key, field);
-
-			if (typeAscription)
-			{
-				appendKeyword(buffer, field);
-			}
-			else
-			{
-				type.toString(prefix, buffer);
-			}
-		}
-		else
-		{
-			appendKeyword(buffer, field);
-		}
-
+		appendKeyword(buffer, field);
 		buffer.append(' ').append(field.getName());
 
-		if (typeAscription)
+		if (type != null && type != Types.UNKNOWN)
 		{
 			Formatting.appendSeparator(buffer, key, ':');
 			type.toString(prefix, buffer);

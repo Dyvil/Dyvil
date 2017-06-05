@@ -1128,31 +1128,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
+		// Annotations and Modifiers
 		super.toString(indent, buffer);
 
-		// Type
-		boolean typeAscription;
-		if (this.type != null && this.type != Types.UNKNOWN)
-		{
-			typeAscription = Formatting.typeAscription("method.type_ascription", this);
-
-			if (!typeAscription)
-			{
-				this.type.toString(indent, buffer);
-			}
-			else
-			{
-				buffer.append("func");
-			}
-		}
-		else
-		{
-			typeAscription = false;
-			buffer.append("func");
-		}
-
 		// Name
-		buffer.append(' ').append(this.name);
+		buffer.append("func ").append(this.name);
 
 		// Type Parameters
 		if (this.typeParameters != null)
@@ -1184,7 +1164,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 
 		// Type Ascription
-		if (typeAscription)
+		if (this.type != null && this.type != Types.UNKNOWN)
 		{
 			Formatting.appendSeparator(buffer, "method.type_ascription", "->");
 			this.type.toString(indent, buffer);

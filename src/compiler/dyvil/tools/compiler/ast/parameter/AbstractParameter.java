@@ -13,6 +13,7 @@ import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.ast.type.compound.LambdaType;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -224,19 +225,6 @@ public abstract class AbstractParameter extends Variable implements IParameter
 		// 0 = not variadic
 		// 1 = array
 		// 2 = other type
-		final byte varargs = !this.isVarargs() ? (byte) 0 : this.type.canExtract(ArrayType.class) ? (byte) 1 : (byte) 2;
-
-		boolean typeAscription = false;
-		if (this.type != null)
-		{
-			typeAscription = Formatting.typeAscription("parameter.type_ascription", this);
-
-			if (!typeAscription)
-			{
-				this.appendType(indent, buffer, varargs);
-				buffer.append(' ');
-			}
-		}
 
 		if (this.name != null)
 		{
@@ -246,34 +234,33 @@ public abstract class AbstractParameter extends Variable implements IParameter
 		{
 			buffer.append('_');
 		}
-		if (varargs == 2)
+
+		final boolean varargs = this.isVarargs();
+		if (varargs && !this.type.canExtract(ArrayType.class))
 		{
+			// non-array varargs
 			buffer.append("...");
 		}
 
-		if (typeAscription)
+		if (this.type != null && this.type != Types.UNKNOWN)
 		{
 			Formatting.appendSeparator(buffer, "parameter.type_ascription", ':');
-			this.appendType(indent, buffer, varargs);
+			if (varargs && this.type.canExtract(ArrayType.class))
+			{
+				// array varargs
+				this.type.extract(ArrayType.class).getElementType().toString(indent, buffer);
+				buffer.append("...");
+			}
+			else
+			{
+				this.type.toString(indent, buffer);
+			}
 		}
 
 		if (this.value != null)
 		{
 			Formatting.appendSeparator(buffer, "field.assignment", '=');
 			this.value.toString(indent, buffer);
-		}
-	}
-
-	private void appendType(String prefix, StringBuilder buffer, byte varargs)
-	{
-		if (varargs == 1)
-		{
-			this.type.extract(ArrayType.class).getElementType().toString(prefix, buffer);
-			buffer.append("...");
-		}
-		else
-		{
-			this.type.toString(prefix, buffer);
 		}
 	}
 }
