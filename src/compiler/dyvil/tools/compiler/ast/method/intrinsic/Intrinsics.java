@@ -5,6 +5,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.StringInterpolationExpr;
 import dyvil.tools.compiler.ast.expression.intrinsic.*;
 import dyvil.tools.compiler.ast.expression.optional.NullCoalescingOperator;
 import dyvil.tools.compiler.ast.expression.optional.OptionalChainOperator;
@@ -57,7 +58,7 @@ public class Intrinsics
 			return new NullCoalescingOperator(lhs, arguments.getFirst());
 		// Strings
 		case Intrinsic.STRING_CONCAT:
-			return StringConcatExpr.apply(lhs, arguments.getFirst());
+			return StringInterpolationExpr.apply(lhs, arguments.getFirst());
 		// Increment / Decrement
 		case Intrinsic.PRE_INCREMENT:
 			return IncOperator.apply(arguments.getFirst(), 1, true);
