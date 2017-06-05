@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.parser.statement;
 
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.consumer.IDataMemberConsumer;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
@@ -11,19 +12,16 @@ import dyvil.tools.compiler.ast.statement.loop.ForEachStatement;
 import dyvil.tools.compiler.ast.statement.loop.ForStatement;
 import dyvil.tools.compiler.ast.statement.loop.IForStatement;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.classes.DataMemberParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
-import dyvil.source.position.SourcePosition;
 import dyvil.tools.parsing.token.IToken;
 
 import static dyvil.tools.compiler.parser.expression.ExpressionParser.IGNORE_CLOSURE;
@@ -89,28 +87,22 @@ public class ForStatementParser extends Parser implements IValueConsumer, IDataM
 		case VARIABLE:
 			if (type == BaseSymbols.SEMICOLON)
 			{
-				// Condition
+				// for (; ...
+				// => No variable declaration, parse Condition next
 				pm.pushParser(new ExpressionParser(this));
 				this.mode = CONDITION_END;
 				return;
 			}
-			if (ParserUtil.isIdentifier(type) && token.next().type() == DyvilSymbols.ARROW_LEFT)
-			{
-				// for ( i <- ...
-				this.variable = new Variable(token.raw(), token.nameValue(), Types.UNKNOWN);
-				this.mode = VARIABLE_SEPARATOR;
-				return;
-			}
 
-			pm.pushParser(new DataMemberParser<>(this).ignoringTypeAscription(), true);
+			// for ( i ...
+			// for ( var i ...
+			// for ( let i ...
+			pm.pushParser(new DataMemberParser<>(this), true);
 			this.mode = VARIABLE_SEPARATOR;
 			return;
 		case VARIABLE_SEPARATOR:
 			switch (type)
 			{
-			case BaseSymbols.COLON:
-				pm.report(Markers.syntaxWarning(token, "for.variable.colon"));
-				// Fallthrough
 			case DyvilSymbols.ARROW_LEFT:
 				this.mode = FOR_EACH_END;
 				final ExpressionParser parser = new ExpressionParser(this.variable);

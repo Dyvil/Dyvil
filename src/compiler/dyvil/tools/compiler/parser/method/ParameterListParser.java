@@ -20,7 +20,6 @@ import dyvil.tools.compiler.parser.header.PropertyParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
@@ -29,8 +28,7 @@ import dyvil.tools.parsing.token.IToken;
 
 public final class ParameterListParser extends Parser implements ITypeConsumer
 {
-	public static final int TYPE                    = 0;
-	public static final int VARARGS_AFTER_PRE_TYPE  = 1;
+	public static final int DECLARATOR              = 0;
 	public static final int NAME                    = 2;
 	public static final int VARARGS_AFTER_NAME      = 3;
 	public static final int TYPE_ASCRIPTION         = 4;
@@ -51,7 +49,8 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	private ModifierList   modifiers;
 	private AnnotationList annotations;
 
-	private IType      type;
+	private IType type = Types.UNKNOWN;
+
 	private IParameter parameter;
 
 	private byte flags;
@@ -59,7 +58,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	public ParameterListParser(IParametric consumer)
 	{
 		this.consumer = consumer;
-		this.mode = TYPE;
+		// this.mode = DECLARATOR;
 	}
 
 	public ParameterListParser withFlags(int flags)
@@ -72,7 +71,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 	{
 		this.modifiers = null;
 		this.annotations = null;
-		this.type = null;
+		this.type = Types.UNKNOWN;
 		this.parameter = null;
 		this.flags &= ~VARARGS;
 	}
@@ -89,7 +88,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 
 		switch (this.mode)
 		{
-		case TYPE:
+		case DECLARATOR:
 			switch (type)
 			{
 			case BaseSymbols.SEMICOLON:
@@ -107,12 +106,12 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				// Fallthrough
 			case DyvilKeywords.VAR:
 				this.mode = NAME;
-				this.type = Types.UNKNOWN;
 				return;
 			case DyvilKeywords.THIS:
 				if (token.next().type() != BaseSymbols.COLON)
 				{
 					pm.report(token, "parameter.identifier");
+					this.mode = SEPARATOR;
 					return;
 				}
 
@@ -145,68 +144,27 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				return;
 			}
 
-			if (ParserUtil.isIdentifier(type))
-			{
-				final int nextType = token.next().type();
-				if (this.canAppearAfterName(nextType) || nextType == DyvilSymbols.ELLIPSIS && this.canAppearAfterName(
-					token.next().next().type()))
-				{
-					// ... , IDENTIFIER (...) , ...
-					// ... , IDENTIFIER (...) =>
-					// ... , IDENTIFIER (...) ->
-					this.type = Types.UNKNOWN;
-					this.mode = NAME;
-					pm.reparse();
-					return;
-				}
-			}
-
 			if (ParserUtil.isCloseBracket(type))
 			{
 				pm.popParser(true);
 				return;
 			}
-			this.mode = VARARGS_AFTER_PRE_TYPE;
-			pm.pushParser(new TypeParser(this), true);
-			return;
-		case VARARGS_AFTER_PRE_TYPE:
-			if (type == DyvilSymbols.ELLIPSIS)
-			{
-				// TYPE ...
-				this.setTypeVarargs();
-				this.mode = NAME;
-				return;
-			}
 			// Fallthrough
 		case NAME:
-			switch (type)
-			{
-			case Tokens.EOF:
-				pm.report(token, "parameter.identifier");
-				pm.popParser();
-				return;
-			case DyvilKeywords.THIS:
-				this.mode = SEPARATOR;
-				this.setThisType(this.type, token, pm);
-				this.reset();
-				return;
-			}
-
 			if (!ParserUtil.isIdentifier(type))
 			{
 				if (ParserUtil.isCloseBracket(type))
 				{
 					pm.popParser(true);
 				}
+				if (type == Tokens.EOF)
+				{
+					pm.popParser();
+				}
 
 				this.mode = SEPARATOR;
 				pm.report(token, "parameter.identifier");
 				return;
-			}
-
-			if (this.type != Types.UNKNOWN)
-			{
-				pm.report(Markers.syntaxWarning(token, "member.type.c_style.deprecated"));
 			}
 
 			this.parameter = this.consumer.createParameter(token.raw(), token.nameValue(), this.type, this.modifiers,
@@ -242,11 +200,6 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			}
 			else /* case (1) */ if (type == BaseSymbols.COLON)
 			{
-				if (this.type != Types.UNKNOWN)
-				{
-					pm.report(token, "parameter.type.duplicate");
-				}
-
 				this.mode = VARARGS_AFTER_POST_TYPE;
 				final TypeParser parser = new TypeParser(this);
 				if (this.hasFlag(LAMBDA_ARROW_END))
@@ -275,7 +228,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			}
 			// Fallthrough
 		case SEPARATOR:
-			this.mode = TYPE;
+			this.mode = DECLARATOR;
 			if (this.parameter != null)
 			{
 				if (this.hasFlag(VARARGS))

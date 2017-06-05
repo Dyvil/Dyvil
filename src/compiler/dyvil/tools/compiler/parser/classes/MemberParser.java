@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.parser.classes;
 
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
@@ -31,21 +32,17 @@ import dyvil.tools.compiler.parser.type.TypeParameterListParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
-import dyvil.source.position.SourcePosition;
 import dyvil.tools.parsing.token.IToken;
 
 public final class MemberParser<T extends IDataMember> extends Parser implements ITypeConsumer
 {
-	protected static final int TYPE                       = 0;
-	protected static final int NAME_OPERATOR              = 1;
-	protected static final int NAME                       = 2;
+	protected static final int DECLARATOR                 = 0;
 	protected static final int FIELD_NAME                 = 4;
 	protected static final int FIELD_TYPE                 = 5;
 	protected static final int FIELD_SEPARATOR            = 6;
@@ -83,10 +80,10 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 
 	protected IMemberConsumer<T> consumer;
 
-	private IType type;
+	private IType        type      = Types.UNKNOWN;
 	private ModifierList modifiers = new ModifierList();
 	private AnnotationList annotations;
-	private SourcePosition  position;
+	private SourcePosition position;
 	private Name           name;
 
 	private IMember member;
@@ -116,7 +113,7 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 
 		switch (this.mode)
 		{
-		case TYPE:
+		case DECLARATOR:
 			switch (type)
 			{
 			case BaseSymbols.SEMICOLON:
@@ -131,7 +128,7 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 			case Tokens.EOF:
 				if (DyvilHeaderParser.hasModifiers(this.modifiers, this.annotations))
 				{
-					pm.report(token, "member.type");
+					pm.report(token, "member.declarator");
 				}
 
 				pm.popParser();
@@ -163,12 +160,10 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 				// Fallthrough
 			case DyvilKeywords.VAR:
 				this.mode = FIELD_NAME;
-				this.type = Types.UNKNOWN;
 				return;
 			case DyvilKeywords.FUNC:
 			case DyvilKeywords.OPERATOR:
 				this.mode = METHOD_NAME;
-				this.type = Types.UNKNOWN;
 				return;
 			}
 
@@ -204,65 +199,7 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 				return;
 			}
 
-			pm.pushParser(new TypeParser(this), true);
-			this.mode = NAME_OPERATOR;
-			return;
-		case NAME_OPERATOR:
-			if (type == DyvilKeywords.OPERATOR)
-			{
-				this.mode = NAME;
-				return;
-			}
-			// Fallthrough
-		case NAME:
-			switch (type)
-			{
-			case Tokens.SYMBOL_IDENTIFIER:
-			case Tokens.DOT_IDENTIFIER:
-				if (token.prev().type() != DyvilKeywords.OPERATOR)
-				{
-					if ((this.flags & OPERATOR_ERROR) != 0)
-					{
-						// Produce an error instead of a warning
-						pm.report(token, "member.symbol.operator");
-						return;
-					}
-					pm.report(Markers.syntaxWarning(token, "member.symbol.operator"));
-				}
-				break;
-			case Tokens.IDENTIFIER:
-			case Tokens.LETTER_IDENTIFIER:
-			case Tokens.SPECIAL_IDENTIFIER:
-				if (token.prev().type() == DyvilKeywords.OPERATOR)
-				{
-					pm.report(Markers.syntaxWarning(token, "member.identifier.operator"));
-				}
-				break;
-			default:
-				if (this.parseSeparator(token))
-				{
-					// Improve error handling for missing identifiers
-					this.position = token.raw();
-					this.name = Names.apply;
-					pm.reparse();
-				}
-
-				pm.report(token, "member.identifier");
-				return;
-			}
-
-			this.name = token.nameValue();
-			this.position = token.raw();
-
-			if (this.type != Types.UNKNOWN)
-			{
-				pm.report(Markers.syntaxWarning(token, "member.type.c_style.deprecated"));
-			}
-
-			if (!this.parseSeparator(token.next()))
-			{
-				pm.report(token, "class.body.declaration.invalid");
-			}
+			pm.report(token, "member.declarator");
 			return;
 		case FIELD_NAME:
 			if (!ParserUtil.isIdentifier(type))
@@ -277,11 +214,6 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 		case FIELD_TYPE:
 			if (type == BaseSymbols.COLON)
 			{
-				if (this.type != Types.UNKNOWN)
-				{
-					pm.report(token, "field.type.duplicate");
-				}
-
 				pm.pushParser(new TypeParser(this.member != null ? this.member : this));
 				this.mode = FIELD_SEPARATOR;
 				return;
@@ -392,11 +324,6 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 				pm.report(Markers.syntaxWarning(token, "method.type.colon.deprecated"));
 				// Fallthrough
 			case DyvilSymbols.ARROW_RIGHT:
-				if (this.type != Types.UNKNOWN)
-				{
-					pm.report(token, "method.type.duplicate");
-				}
-
 				pm.pushParser(new TypeParser(this.member));
 				this.mode = METHOD_THROWS;
 				return;
@@ -550,11 +477,5 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 	public void setType(IType type)
 	{
 		this.type = type;
-	}
-
-	@Override
-	public boolean reportErrors()
-	{
-		return (this.mode > NAME || this.mode == END) && this.mode != CONSTRUCTOR_PARAMETERS;
 	}
 }

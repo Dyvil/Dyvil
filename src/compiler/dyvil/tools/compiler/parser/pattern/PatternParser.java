@@ -165,22 +165,19 @@ public class PatternParser extends Parser implements ITypeConsumer
 				return;
 			}
 		case TYPE_END:
-			switch (type)
+			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{
-			case BaseSymbols.OPEN_PARENTHESIS:
+				// TYPE ( ...
+				// => Unapply pattern
 				final UnapplyPattern unapplyPattern = new UnapplyPattern(token, this.type);
 				pm.pushParser(new PatternListParser(unapplyPattern));
 				this.pattern = unapplyPattern;
 				this.mode = CASE_CLASS_END;
 				return;
-			case Tokens.LETTER_IDENTIFIER:
-			case Tokens.SPECIAL_IDENTIFIER:
-				// Do NOT create a BindingPattern for Symbol Identifiers (like | or &)
-				this.pattern = new BindingPattern(token.raw(), token.nameValue(), this.type);
-				this.mode = END;
-				return;
 			}
 
+			// TYPE
+			// => Object Pattern
 			this.pattern = new ObjectPattern(this.type.getPosition(), this.type);
 			this.mode = END;
 			pm.reparse();
