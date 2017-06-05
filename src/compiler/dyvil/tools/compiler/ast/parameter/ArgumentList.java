@@ -102,6 +102,21 @@ public class ArgumentList implements IResolvable, IValueList
 		return this.appended(value);
 	}
 
+	public ArgumentList concat(ArgumentList that)
+	{
+		final IValue[] values = new IValue[this.size + that.size];
+		System.arraycopy(this.values, 0, values, 0, this.size);
+		System.arraycopy(that.values, 0, values, this.size, that.size);
+
+		if (that instanceof NamedArgumentList)
+		{
+			final Name[] keys = new Name[this.size + that.size];
+			System.arraycopy(((NamedArgumentList) that).keys, 0, keys, this.size, 0);
+			return new NamedArgumentList(keys, values, this.size + that.size);
+		}
+		return new ArgumentList(values);
+	}
+
 	public IValue getFirst()
 	{
 		return this.size <= 0 ? null : this.values[0];
@@ -144,6 +159,29 @@ public class ArgumentList implements IResolvable, IValueList
 			this.values = temp;
 		}
 		this.values[index] = value;
+	}
+
+	public void insert(int index, IValue value)
+	{
+		this.insert(index, null, value);
+	}
+
+	public void insert(int index, Name key, IValue value)
+	{
+		final int newSize = this.size + 1;
+		if (newSize >= this.values.length)
+		{
+			final IValue[] temp = new IValue[newSize];
+			System.arraycopy(this.values, 0, temp, 0, index);
+			temp[index] = value;
+			System.arraycopy(this.values, index, temp, index + 1, this.size - index);
+			this.values = temp;
+		}
+		else
+		{
+			System.arraycopy(this.values, index, this.values, index + 1, this.size - index);
+		}
+		this.size = newSize;
 	}
 
 	@Override
