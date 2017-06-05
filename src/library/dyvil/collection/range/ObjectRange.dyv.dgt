@@ -1,12 +1,18 @@
-#if IS_HALF_OPEN
-package dyvil.collection.range.halfopen
+// GEN_NOTICE
+// Timestamp: TIME_STAMP
 
-	#define COMPARE_OP <
-#else
-package dyvil.collection.range.closed
+#if (IS_HALF_OPEN) {
+	package dyvil.collection.range.halfopen
 
-	#define COMPARE_OP <=
-#end
+	#define (LESS_OP) {<}
+	#define (RANGE_OP) {..<}
+}
+#else {
+	package dyvil.collection.range.closed
+
+	#define (LESS_OP) {<=}
+	#define (RANGE_OP) {..}
+}
 
 import dyvil.collection.range.Rangeable
 import java.util.Iterator
@@ -21,31 +27,33 @@ case class ObjectRange<type +T: Rangeable<T>>(
 	protected @transient let end: T
 ) implements Range<T>
 {
-#if IS_HALF_OPEN
-	override func isHalfOpen() -> boolean = true
+	#if (IS_HALF_OPEN) {
+		override func isHalfOpen() -> boolean = true
 
-	override func asHalfOpen() -> Range<T> = this
+		override func asHalfOpen() -> Range<T> = this
 
-	override func asClosed() -> Range<T> = new dyvil.collection.range.closed.ObjectRange<T>(this.start, this.end)
-#else
-	override func isHalfOpen() -> boolean = false
+		override func asClosed() -> Range<T> = new dyvil.collection.range.closed.ObjectRange<T>(this.start, this.end)
+	}
+	#else {
+		override func isHalfOpen() -> boolean = false
 
-	override func asHalfOpen() -> Range<T> = new dyvil.collection.range.halfopen.ObjectRange<T>(this.start, this.end)
+		override func asHalfOpen() -> Range<T> = new dyvil.collection.range.halfopen.ObjectRange<T>(this.start, this.end)
 
-	override func asClosed() -> Range<T> = this
-#end
+		override func asClosed() -> Range<T> = this
+	}
 
 	override func first() -> T = this.start
 
-#if IS_HALF_OPEN
-	override func last() -> T = this.end.prev
+	#if (IS_HALF_OPEN) {
+		override func last() -> T = this.end.prev
 
-	override func size() -> int = this.start.distanceTo(this.end)
-#else
-	override func last() -> T = this.end
+		override func size() -> int = this.start.distanceTo(this.end)
+	}
+	#else {
+		override func last() -> T = this.end
 
-	override func size() -> int = this.start.distanceTo(this.end) + 1
-#end
+		override func size() -> int = this.start.distanceTo(this.end) + 1
+	}
 
 	override func iterator() -> Iterator<T> = new Iterator<T>()
 	{
@@ -62,14 +70,13 @@ case class ObjectRange<type +T: Rangeable<T>>(
 
 		override func hasNext() -> boolean
 		{
-			return this.current COMPARE_OP this<ObjectRange>.end
+			return this.current LESS_OP this<ObjectRange>.end
 		}
 
 		override func toString() -> String = "RangeIterator(\(this<ObjectRange>), current: \(this.current))"
 	}
 
-#comment // Macro for a loop over the all elements in this range. The loop variable is always called 'current'
-#define FOR_EACH for (var current = this.start; current COMPARE_OP this.end; current = current.next)
+	#define(FOR_EACH) {for (var current = this.start; current LESS_OP this.end; current = current.next)}
 
 	override func forEach(action: T -> void) -> void = FOR_EACH action(current)
 
@@ -83,11 +90,7 @@ case class ObjectRange<type +T: Rangeable<T>>(
 
 	override func copy(to: [Object!], index: int) -> void = FOR_EACH to[index++] = current
 
-	#if IS_HALF_OPEN
-	override func toString() -> String = "\(this.start) ..< \(this.end)"
-	#else
-	override func toString() -> String = "\(this.start) .. \(this.end)"
-	#end
+	override func toString() -> String = "\(this.start) RANGE_OP \(this.end)"
 
 	override func equals(obj: any!) -> boolean = Range.rangeEquals(this, obj)
 

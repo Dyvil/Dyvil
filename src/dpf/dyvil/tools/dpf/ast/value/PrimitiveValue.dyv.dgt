@@ -5,9 +5,9 @@ package dyvil.tools.dpf.ast.value
 
 import dyvil.tools.dpf.visitor.ValueVisitor
 
-case class TYPE_NAME##Value(protected let value: PRIMITIVE) implements Constant
+case class #(TYPE_NAME)Value(protected let value: PRIMITIVE) implements Constant
 {
-	override func accept(visitor: ValueVisitor) -> void = visitor.visit##TYPE_NAME(this.value)
+	override func accept(visitor: ValueVisitor) -> void = visitor.visit#(TYPE_NAME)(this.value)
 
 	override func toObject() -> Object = this.value
 

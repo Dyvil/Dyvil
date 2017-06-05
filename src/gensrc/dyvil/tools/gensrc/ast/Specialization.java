@@ -84,7 +84,7 @@ public class Specialization implements Scope
 
 	public String getFileName()
 	{
-		return this.getReplacement(FILE_NAME_PROPERTY);
+		return this.getString(FILE_NAME_PROPERTY);
 	}
 
 	public boolean isEnabled()
@@ -98,14 +98,14 @@ public class Specialization implements Scope
 	}
 
 	@Override
-	public String getReplacement(String key)
+	public String getString(String key)
 	{
 		final String sub = this.substitutions.getProperty(key);
 		if (sub != null || this.parent == null)
 		{
 			return sub;
 		}
-		return this.parent.getReplacement(key);
+		return this.parent.getString(key);
 	}
 
 	public void load(GenSrc gensrc, List<String> markers)
@@ -132,13 +132,13 @@ public class Specialization implements Scope
 				this.enabled = false;
 			}
 		}
-		final String enabled = this.getReplacement(ENABLED_PROPERTY);
+		final String enabled = this.getString(ENABLED_PROPERTY);
 		if (enabled != null && !"true".equals(enabled))
 		{
 			this.enabled = false;
 		}
 
-		final String inherited = this.getReplacement(INHERIT_FROM_PROPERTY);
+		final String inherited = this.getString(INHERIT_FROM_PROPERTY);
 		if (inherited == null)
 		{
 			return;

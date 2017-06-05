@@ -25,10 +25,12 @@ abstract class Output
 
 	// print functions
 
-#foreach Base-Boolean.dgs, Base-Char.dgs, Base-Int.dgs, Base-Long.dgs, Base-Float.dgs, Base-Double.dgs
-	static inline func print(value: PRIMITIVE) -> void = out.println(value)
+	#for (spec <- [ "Base-Boolean.dgs", "Base-Char.dgs", "Base-Int.dgs", "Base-Long.dgs", "Base-Float.dgs", "Base-Double.dgs" ]) {
+		#import(spec)
+		static inline func print(value: PRIMITIVE) -> void = out.println(value)
 
-#end
+	}
+
 	static inline func print(closure: AutoPrinter.() -> void) -> void = closure(AutoPrinter)
 
 	static inline func print(value: String) -> void = out.println(value)
@@ -41,17 +43,19 @@ abstract class Output
 		out.print(terminator)
 	}
 
-#import Base.dgs
-#foreach PRIMITIVE_SPECS
-	static inline func print(array: [PRIMITIVE]) -> void = out.println(array.toString)
+	#import("Base.dgs")
+	#for (spec <- PRIMITIVE_SPECS) {
+		#import(spec)
+		static inline func print(array: [PRIMITIVE]) -> void = out.println(array.toString)
 
-#end
+	}
+
 	static inline func print(array: [Object!]) -> void = out.println(array.deepToString)
 
 	// print(All) functions
 
-#define DEFAULT_SEPARATOR ' '
-#define DEFAULT_TERMINATOR ENDL
+	#define(DEFAULT_SEPARATOR) {' '}
+	#define(DEFAULT_TERMINATOR) {ENDL}
 
 	@BytecodeName("printAll")
 	static inline func print(values: Object! ...) -> void

@@ -1,38 +1,48 @@
 package dyvil.tools.gensrc.ast.directive;
 
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.gensrc.GenSrc;
 import dyvil.tools.gensrc.ast.scope.LazyScope;
 import dyvil.tools.gensrc.ast.scope.Scope;
+import dyvil.tools.gensrc.lang.I18n;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
+import dyvil.tools.parsing.marker.SemanticError;
 
 import java.io.PrintStream;
 
-public class ScopeDirective implements Directive
+public class ScopeDirective extends BasicDirective
 {
-	private Directive block;
+	private static final Name NAME = Name.fromRaw("");
 
-	public Directive getBlock()
+	public ScopeDirective(SourcePosition position)
 	{
-		return this.block;
+		this.position = position;
 	}
 
-	public void setBlock(Directive block)
+	@Override
+	public Name getName()
 	{
-		this.block = block;
+		return NAME;
 	}
 
 	@Override
 	public void specialize(GenSrc gensrc, Scope scope, MarkerList markers, PrintStream output)
 	{
-		final LazyScope lazyScope = new LazyScope(scope);
-		this.block.specialize(gensrc, lazyScope, markers, output);
-	}
-
-	@Override
-	public void toString(String indent, StringBuilder builder)
-	{
-		builder.append(indent).append("#block\n");
-		this.block.toString(indent + '\t', builder);
-		builder.append(indent).append("#end\n");
+		int argCount = this.arguments.size();
+		switch (argCount)
+		{
+		case 0:
+			break;
+		case 1:
+			output.print(this.arguments.get(0).evaluateString(scope));
+			break;
+		default:
+			markers.add(new SemanticError(this.position, I18n.get("scope.arguments")));
+		}
+		if (this.body != null)
+		{
+			this.body.specialize(gensrc, new LazyScope(scope), markers, output);
+		}
 	}
 }

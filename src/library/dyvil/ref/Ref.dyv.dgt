@@ -3,17 +3,17 @@
 
 package dyvil.ref
 
-import dyvil.ref.boxed.Boxed##TYPE_NAME##Ref
+import dyvil.ref.boxed.Boxed#(TYPE_NAME)Ref
 
-interface TYPE_NAME##Ref
+interface #(TYPE_NAME)Ref
 {
 	func get() -> PRIMITIVE
 
 	func set(value: PRIMITIVE) -> void
 
-	prefix inline func *(ref: TYPE_NAME##Ref) -> PRIMITIVE = ref.get
+	prefix inline func *(ref: #(TYPE_NAME)Ref) -> PRIMITIVE = ref.get
 
-	infix inline func *_=(ref: TYPE_NAME##Ref, value: PRIMITIVE) -> void = ref.set(value)
+	infix inline func *_=(ref: #(TYPE_NAME)Ref, value: PRIMITIVE) -> void = ref.set(value)
 
-	postfix func boxed(ref: TYPE_NAME##Ref) -> ObjectRef<WRAPPER> = new Boxed##TYPE_NAME##Ref(ref)
+	postfix func boxed(ref: #(TYPE_NAME)Ref) -> ObjectRef<WRAPPER> = new Boxed#(TYPE_NAME)Ref(ref)
 }

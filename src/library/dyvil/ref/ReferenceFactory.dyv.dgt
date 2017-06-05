@@ -63,21 +63,24 @@ public final class ReferenceFactory
 	) -> CallSite throws Exception
 		= new PropertyReferenceMetafactory(caller, invokedType, getter, setter).buildCallSite()
 
-#import Base.dgs
-#foreach PRIMITIVE_SPECS
+	// Reference Factory Methods
 
-	// TYPE_NAME
+	#import("Base.dgs")
+	#for (spec <- PRIMITIVE_SPECS) {
+		#import(spec)
+		// TYPE_NAME
 
-	static func new##TYPE_NAME##Ref(base: Object, offset: long) -> TYPE_NAME##Ref
-		= new Unsafe##TYPE_NAME##Ref(base, offset)
+		static func new#(TYPE_NAME)Ref(base: Object, offset: long) -> #(TYPE_NAME)Ref
+			= new Unsafe#(TYPE_NAME)Ref(base, offset)
 
-	static func new##TYPE_NAME##Ref(base: Object, ofType: Class<_>, field: String) -> TYPE_NAME##Ref throws NoSuchFieldException
-		= new Unsafe##TYPE_NAME##Ref(base, getField(ofType, field))
+		static func new#(TYPE_NAME)Ref(base: Object, ofType: Class<_>, field: String) -> #(TYPE_NAME)Ref throws NoSuchFieldException
+			= new Unsafe#(TYPE_NAME)Ref(base, getField(ofType, field))
 
-	static func newStatic##TYPE_NAME##Ref(forType: Class<_>, field: String) -> TYPE_NAME##Ref throws NoSuchFieldException
-		= new Unsafe##TYPE_NAME##Ref(getField(forType, field))
+		static func newStatic#(TYPE_NAME)Ref(forType: Class<_>, field: String) -> #(TYPE_NAME)Ref throws NoSuchFieldException
+			= new Unsafe#(TYPE_NAME)Ref(getField(forType, field))
 
-	static func new##TYPE_NAME##ArrayRef(array: [PRIMITIVE], index: int) -> TYPE_NAME##Ref
-		= new TYPE_NAME##ArrayRef(array, index)
-#endfor
+		static func new#(TYPE_NAME)ArrayRef(array: [PRIMITIVE], index: int) -> #(TYPE_NAME)Ref
+			= new #(TYPE_NAME)ArrayRef(array, index)
+
+	}
 }

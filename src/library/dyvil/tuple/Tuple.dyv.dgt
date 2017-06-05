@@ -67,32 +67,19 @@ abstract class Tuple
 		override func hashCode() -> int = Cell.cellHashCode(this)
 	}
 
-#import Base.dgs
-#for ARITY; 4; MAX_ARITY
+	#import("Base.dgs")
+	#for (ARITY <- 4 .. MAX_ARITY) {
+		@Immutable
+		case class Of#(ARITY) <type +T1#for (INDEX <- 2 .. ARITY) {, type +T#(INDEX)}>
+		(
+			public let _1: T1#for (INDEX <- 2 .. ARITY) {, public let _#(INDEX): T#(INDEX)}
 
-	@Immutable
-	case class Of##ARITY <
-	#for INDEX; 1; ARITY
-		type +T##INDEX
-	#end
-	> (
-	#for INDEX; 1; ARITY
-			public let _##INDEX: T##INDEX
-	#end
-	)
-	{
-		func unapply() -> (
-	#for INDEX; 1; ARITY
-			T##INDEX,
-	#end
-		) = this
+		)
+		{
+			func unapply() -> (T1#for (INDEX <- 2 .. ARITY) {, T#(INDEX)}) = this
 
-		override func toString() -> String = new StringBuilder()
-			.append('(').append(this._1)
-	#for INDEX; 2; ARITY
-			.append(', ').append(this._##INDEX)
-	#end
-			.append(')').toString!!
+			override func toString() -> String = "(\(this._1)#for (INDEX <- 2 .. ARITY) {, \(this._#(INDEX))})"
+		}
+
 	}
-#end
 }
