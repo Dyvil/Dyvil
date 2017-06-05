@@ -717,7 +717,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 			for (int i = 0; i < parameterCount; i++)
 			{
-				final IValue argument = arguments.get(i, parameterList.get(i));
+				final IValue argument = arguments.get(parameterList.get(i));
 				if (!isFieldAccess(argument, this.parameters.get(i)))
 				{
 					return false;
@@ -734,7 +734,7 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 		for (int i = 1; i < parameterCount; i++)
 		{
-			final IValue argument = arguments.get(i - 1, parameterList.get(i - 1));
+			final IValue argument = arguments.get(parameterList.get(i - 1));
 			if (!isFieldAccess(argument, this.parameters.get(i)))
 			{
 				return false;

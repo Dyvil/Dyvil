@@ -73,14 +73,14 @@ public class NamedArgumentList extends ArgumentList
 	}
 
 	@Override
-	public IValue get(int index, IParameter param)
+	public IValue get(int index, Name key)
 	{
-		if (param == null)
+		if (key == null)
 		{
 			return this.values[index];
 		}
 
-		final int argIndex = this.findIndex(index, param.getLabel());
+		final int argIndex = this.findIndex(index, key);
 		if (argIndex < 0)
 		{
 			return null;
@@ -97,15 +97,15 @@ public class NamedArgumentList extends ArgumentList
 	}
 
 	@Override
-	public void set(int index, IParameter param, IValue value)
+	public void set(int index, Name key, IValue value)
 	{
-		if (param == null)
+		if (key == null)
 		{
 			this.values[index] = value;
 			return;
 		}
 
-		final int argIndex = this.findIndex(index, param.getLabel());
+		final int argIndex = this.findIndex(index, key);
 		if (argIndex >= 0)
 		{
 			this.values[argIndex] = value;

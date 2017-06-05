@@ -137,7 +137,7 @@ public class ArgumentList implements IResolvable, IValueList
 		this.values[this.size - 1] = value;
 	}
 
-	public void set(int index, IParameter param, IValue value)
+	public void set(int index, Name key, IValue value)
 	{
 		this.values[index] = value;
 	}
@@ -194,7 +194,12 @@ public class ArgumentList implements IResolvable, IValueList
 		return this.values[index];
 	}
 
-	public IValue get(int index, IParameter param)
+	public IValue get(IParameter parameter)
+	{
+		return this.get(parameter.getIndex(), parameter.getLabel());
+	}
+
+	public IValue get(int index, Name key)
 	{
 		return this.get(index);
 	}
@@ -427,7 +432,7 @@ public class ArgumentList implements IResolvable, IValueList
 
 	public final void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
 	{
-		final IValue value = this.get(index, param);
+		final IValue value = this.get(index, param.getLabel());
 		if (value == null)
 		{
 			param.writeGetDefaultValue(writer);

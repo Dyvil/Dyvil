@@ -7,9 +7,9 @@ import dyvil.collection.Set;
 import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.asm.Handle;
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -53,7 +53,6 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SemanticError;
-import dyvil.source.position.SourcePosition;
 
 import java.lang.annotation.ElementType;
 
@@ -768,7 +767,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return;
 		}
 
-		final IValue value = mutatingAnnotation.getArguments().get(0, Annotation.VALUE);
+		final IValue value = mutatingAnnotation.getArguments().get(0, Names.value);
 		final String stringValue = value != null ? value.stringValue() : Mutating.DEFAULT_MESSAGE;
 		StringBuilder builder = new StringBuilder(stringValue);
 

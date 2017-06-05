@@ -8,11 +8,13 @@ import dyvil.tools.compiler.ast.classes.metadata.IClassMetadata;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.constant.EnumValue;
 import dyvil.tools.compiler.ast.member.INamed;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.marker.MarkerList;
 
 import java.lang.annotation.ElementType;
@@ -76,10 +78,16 @@ public final class AnnotationMetadata implements IClassMetadata
 			return;
 		}
 
-		final INamed value = (INamed) retention.getArguments().get(0, Annotation.VALUE);
+		final IValue value = retention.getArguments().get(0, Names.value);
+		if (!(value instanceof EnumValue))
+		{
+			return;
+		}
+
 		try
 		{
-			this.retention = RetentionPolicy.valueOf(value.getName().qualified);
+			final String name = ((EnumValue) value).getName().qualified;
+			this.retention = RetentionPolicy.valueOf(name);
 		}
 		catch (IllegalArgumentException ignored)
 		{
@@ -97,7 +105,7 @@ public final class AnnotationMetadata implements IClassMetadata
 
 		this.targets = EnumSet.noneOf(ElementType.class);
 
-		final ArrayExpr arrayExpr = (ArrayExpr) target.getArguments().get(0, Annotation.VALUE);
+		final ArrayExpr arrayExpr = (ArrayExpr) target.getArguments().get(0, Names.value);
 		if (arrayExpr == null)
 		{
 			return;

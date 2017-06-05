@@ -63,7 +63,7 @@ public final class AnnotationUtil
 
 	public static <T extends Enum<T>> T getEnumValue(ArgumentList arguments, IParameter parameter, Class<T> type)
 	{
-		IValue value = arguments.get(parameter.getIndex(), parameter);
+		IValue value = arguments.get(parameter);
 		if (value == null)
 		{
 			value = parameter.getValue();
@@ -85,7 +85,7 @@ public final class AnnotationUtil
 
 	public static String getStringValue(ArgumentList arguments, IParameter parameter)
 	{
-		IValue value = arguments.get(parameter.getIndex(), parameter);
+		IValue value = arguments.get(parameter);
 		if (value == null)
 		{
 			value = parameter.getValue();
