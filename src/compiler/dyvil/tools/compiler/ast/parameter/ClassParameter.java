@@ -54,6 +54,17 @@ public class ClassParameter extends Field implements IParameter
 	}
 
 	@Override
+	public Name getLabel()
+	{
+		return this.name;
+	}
+
+	@Override
+	public void setLabel(Name name)
+	{
+	}
+
+	@Override
 	public MemberKind getKind()
 	{
 		return MemberKind.CLASS_PARAMETER;

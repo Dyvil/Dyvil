@@ -167,8 +167,22 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 				return;
 			}
 
-			this.parameter = this.consumer.createParameter(token.raw(), token.nameValue(), this.type, this.modifiers,
-			                                               this.annotations);
+			final IToken next = token.next();
+			if (ParserUtil.isIdentifier(next.type()))
+			{
+				// IDENTIFIER IDENTIFIER
+				// label      internal name
+				this.parameter = this.consumer.createParameter(token.raw(), next.nameValue(), this.type, this.modifiers,
+				                                               this.annotations);
+				this.parameter.setLabel(token.nameValue());
+				pm.skip(); // skip the second label
+			}
+			else
+			{
+				this.parameter = this.consumer.createParameter(token.raw(), token.nameValue(), this.type, this.modifiers,
+				                                               this.annotations);
+			}
+
 			this.mode = VARARGS_AFTER_NAME;
 			return;
 		case VARARGS_AFTER_NAME:
@@ -274,7 +288,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 		}
 	}
 
-	private boolean canAppearAfterName(int nextType)
+	private boolean isTerminator(int nextType)
 	{
 		return ParserUtil.isTerminator(nextType)
 			       || (nextType == DyvilSymbols.ARROW_RIGHT || nextType == DyvilSymbols.DOUBLE_ARROW_RIGHT)

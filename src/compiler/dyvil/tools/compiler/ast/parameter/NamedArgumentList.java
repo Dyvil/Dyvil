@@ -80,7 +80,7 @@ public class NamedArgumentList extends ArgumentList
 			return this.values[index];
 		}
 
-		final int argIndex = this.findIndex(index, param.getName());
+		final int argIndex = this.findIndex(index, param.getLabel());
 		if (argIndex < 0)
 		{
 			return null;
@@ -105,7 +105,7 @@ public class NamedArgumentList extends ArgumentList
 			return;
 		}
 
-		final int argIndex = this.findIndex(index, param.getName());
+		final int argIndex = this.findIndex(index, param.getLabel());
 		if (argIndex >= 0)
 		{
 			this.values[argIndex] = value;
@@ -202,7 +202,7 @@ public class NamedArgumentList extends ArgumentList
 	public int checkMatch(int[] values, IType[] types, int matchStartIndex, int argumentIndex, IParameter param,
 		                     IImplicitContext implicitContext)
 	{
-		final int argIndex = this.findIndex(argumentIndex, param.getName());
+		final int argIndex = this.findIndex(argumentIndex, param.getLabel());
 		if (argIndex < 0)
 		{
 			// No argument for parameter name
@@ -231,14 +231,14 @@ public class NamedArgumentList extends ArgumentList
 	@Override
 	public void checkValue(int index, IParameter param, GenericData genericData, MarkerList markers, IContext context)
 	{
-		final int argIndex = this.findIndex(index, param.getName());
+		final int argIndex = this.findIndex(index, param.getLabel());
 		if (argIndex < 0)
 		{
 			if (param.isVarargs())
 			{
 				final ArrayExpr arrayExpr = new ArrayExpr(ArgumentList.EMPTY);
 				final IValue converted = convertValue(arrayExpr, param, genericData, markers, context);
-				this.add(param.getName(), converted);
+				this.add(param.getLabel(), converted);
 			}
 
 			return;
@@ -289,7 +289,7 @@ public class NamedArgumentList extends ArgumentList
 		for (int i = 0; i < paramCount; i++)
 		{
 			final IParameter param = parameters.get(i + startIndex);
-			final int argIndex = this.findIndex(i, param.getName());
+			final int argIndex = this.findIndex(i, param.getLabel());
 			if (argIndex >= 0)
 			{
 				params[argIndex] = param;

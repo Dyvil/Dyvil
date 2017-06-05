@@ -21,11 +21,22 @@ import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.backend.visitor.AnnotationReader;
+import dyvil.tools.parsing.Name;
 
 public interface IParameter extends IVariable, IClassMember
 {
 	String DEFAULT_PREFIX_INIT = "init$paramDefault$";
 	String DEFAULT_PREFIX      = "$paramDefault$";
+
+	@Override
+	Name getName();
+
+	@Override
+	void setName(Name name);
+
+	Name getLabel();
+
+	void setLabel(Name name);
 
 	IType getCovariantType();
 

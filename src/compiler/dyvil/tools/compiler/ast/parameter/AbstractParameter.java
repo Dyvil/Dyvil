@@ -28,6 +28,8 @@ import java.lang.annotation.ElementType;
 
 public abstract class AbstractParameter extends Variable implements IParameter
 {
+	protected @Nullable Name label;
+
 	// Metadata
 	protected @Nullable ICallableMember method;
 
@@ -60,6 +62,18 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	{
 		super(position, name, type, modifiers, annotations);
 		this.method = callable;
+	}
+
+	@Override
+	public Name getLabel()
+	{
+		return this.label == null ? this.name : this.label;
+	}
+
+	@Override
+	public void setLabel(Name label)
+	{
+		this.label = label;
 	}
 
 	@Override
@@ -221,10 +235,10 @@ public abstract class AbstractParameter extends Variable implements IParameter
 			this.modifiers.toString(this.getKind(), buffer);
 		}
 
-		// The type of varargs syntax for this parameter
-		// 0 = not variadic
-		// 1 = array
-		// 2 = other type
+		if (this.label != null)
+		{
+			buffer.append(this.label).append(' ');
+		}
 
 		if (this.name != null)
 		{
