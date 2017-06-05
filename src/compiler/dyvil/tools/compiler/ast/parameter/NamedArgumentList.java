@@ -57,28 +57,19 @@ public class NamedArgumentList extends ArgumentList
 	}
 
 	@Override
-	public void add(Name key, IValue value)
+	public NamedArgumentList concat(ArgumentList that)
 	{
-		final int index = this.size++;
-		if (index >= this.values.length)
-		{
-			final Name[] tempKeys = new Name[this.size];
-			final IValue[] tempValues = new IValue[this.size];
-			System.arraycopy(this.keys, 0, tempKeys, 0, index);
-			System.arraycopy(this.values, 0, tempValues, 0, index);
-			this.keys = tempKeys;
-			this.values = tempValues;
-		}
-		this.values[index] = value;
-		this.keys[index] = key;
-	}
+		final IValue[] values = new IValue[this.size + that.size];
+		System.arraycopy(this.values, 0, values, 0, this.size);
+		System.arraycopy(that.values, 0, values, this.size, that.size);
 
-	public void setName(int i, Name name)
-	{
-		if (i < this.size)
+		final Name[] keys = new Name[this.size + that.size];
+		System.arraycopy(this.keys, 0, keys, 0, this.size);
+		if (that instanceof NamedArgumentList)
 		{
-			this.keys[i] = name;
+			System.arraycopy(((NamedArgumentList) that).keys, 0, keys, this.size, 0);
 		}
+		return new NamedArgumentList(keys, values, this.size + that.size);
 	}
 
 	@Override
@@ -97,6 +88,14 @@ public class NamedArgumentList extends ArgumentList
 		return this.values[argIndex];
 	}
 
+	public void setName(int i, Name name)
+	{
+		if (i < this.size)
+		{
+			this.keys[i] = name;
+		}
+	}
+
 	@Override
 	public void set(int index, IParameter param, IValue value)
 	{
@@ -111,6 +110,48 @@ public class NamedArgumentList extends ArgumentList
 		{
 			this.values[argIndex] = value;
 		}
+	}
+
+	@Override
+	public void add(Name key, IValue value)
+	{
+		final int index = this.size++;
+		if (index >= this.values.length)
+		{
+			final Name[] tempKeys = new Name[this.size];
+			final IValue[] tempValues = new IValue[this.size];
+			System.arraycopy(this.keys, 0, tempKeys, 0, index);
+			System.arraycopy(this.values, 0, tempValues, 0, index);
+			this.keys = tempKeys;
+			this.values = tempValues;
+		}
+		this.values[index] = value;
+		this.keys[index] = key;
+	}
+
+	@Override
+	public void insert(int index, Name key, IValue value)
+	{
+		final int newSize = this.size + 1;
+		if (newSize >= this.values.length)
+		{
+			final Name[] keys = new Name[newSize];
+			final IValue[] values = new IValue[newSize];
+			System.arraycopy(this.keys, 0, keys, 0, index);
+			System.arraycopy(this.values, 0, values, 0, index);
+			keys[index] = key;
+			values[index] = value;
+			System.arraycopy(this.keys, index, keys, index + 1, this.size - index);
+			System.arraycopy(this.values, index, values, index + 1, this.size - index);
+			this.keys = keys;
+			this.values = values;
+		}
+		else
+		{
+			System.arraycopy(this.keys, index, this.keys, index + 1, this.size - index);
+			System.arraycopy(this.values, index, this.values, index + 1, this.size - index);
+		}
+		this.size = newSize;
 	}
 
 	private int findIndex(int index, Name name)
