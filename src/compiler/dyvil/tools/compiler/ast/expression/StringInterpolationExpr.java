@@ -7,6 +7,7 @@ import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IImplicitContext;
+import dyvil.tools.compiler.ast.expression.constant.StringValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
@@ -203,7 +204,54 @@ public final class StringInterpolationExpr implements IValue
 	public IValue foldConstants()
 	{
 		this.values.foldConstants();
+
+		// Merges adjacent String constants into one
+
+		final int size = this.values.size();
+		final ArgumentList newValues = new ArgumentList(size);
+
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < size; i++)
+		{
+			final IValue value = this.values.get(i);
+			if (value.toStringBuilder(builder))
+			{
+				continue;
+			}
+
+			moveString(builder, newValues);
+			newValues.add(value);
+		}
+		moveString(builder, newValues);
+
+		if (newValues.isEmpty())
+		{
+			return new StringValue("");
+		}
+
+		// assert newValues.size() >= 1
+		final IValue first = newValues.getFirst();
+		if (newValues.size() == 1 && isString(first))
+		{
+			return first;
+		}
+
+		this.values = newValues;
 		return this;
+	}
+
+	private static boolean isString(IValue value)
+	{
+		return Types.isSuperType(Types.STRING, value.getType());
+	}
+
+	private static void moveString(StringBuilder builder, ArgumentList newValues)
+	{
+		if (builder.length() > 0)
+		{
+			newValues.add(new StringValue(builder.toString()));
+			builder.delete(0, builder.length());
+		}
 	}
 
 	@Override
@@ -229,13 +277,25 @@ public final class StringInterpolationExpr implements IValue
 		final int size = this.values.size();
 		switch (size)
 		{
-		case 0:
+		case 0: // not possible
 			writer.visitLdcInsn("");
 			return;
 		case 1:
 			// "\(someValue)"
 			CaseClasses.writeToString(writer, this.values.getFirst());
 			return;
+		case 2:
+			final IValue first = this.values.getFirst();
+			final IValue last = this.values.getLast();
+			if (isString(first) && isString(last))
+			{
+				// two non-null String values -> write first.concat(last)
+				first.writeExpression(writer, Types.STRING);
+				last.writeExpression(writer, Types.STRING);
+				writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "concat", "(Ljava/lang/String;)Ljava/lang/String;", false);
+				return;
+			}
+			// continue as normal
 		}
 
 		int estSize = 0;
