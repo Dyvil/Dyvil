@@ -116,18 +116,11 @@ abstract class Strings
 
 	infix func *(lhs: String, rhs: int) -> String = repeated(lhs, rhs)
 
-	private static func repeated(string: String, times: int) -> String
-	{
-		match times
-		{
-			case 0: return ""
-			case 1: return string
-			case 2: return string.concat(string)
-		}
-
-		let builder = new StringBuilder
-		for (i <- 0 ..< times) builder.append(string)
-		return builder.toString
+	private static func repeated(string: String, times: int) -> String = times match {
+		case 0 => return ""
+		case 1 => return string
+		case 2 => return string.concat(string)
+		case _ => new StringBuilder().{ for (i <- 0 ..< times) append(string); $0.toString }
 	}
 
 	// Misc. additional extensions
@@ -143,7 +136,7 @@ abstract class Strings
 		return count
 	}
 
-	infix func split(string: String, delimiter: char) -> [String]
+	infix func split(string: String, by delimiter: char) -> [String]
 	{
 		var count = 0
 
