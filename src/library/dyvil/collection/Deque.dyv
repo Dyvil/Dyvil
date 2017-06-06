@@ -1,6 +1,6 @@
 package dyvil.collection
 
-interface Deque<E> extends BidiQueryable<E>, Stack<E>, Queue<E>
+interface Deque<type E> extends BidiQueryable<E>, Stack<E>, Queue<E>
 {
 	// Deque Methods
 

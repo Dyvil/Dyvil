@@ -1,6 +1,6 @@
 package dyvil.collection
 
-interface Stack<E> extends Queryable<E>
+interface Stack<type E> extends Queryable<E>
 {
 	/**
 	 * Removes all elements from this stack.

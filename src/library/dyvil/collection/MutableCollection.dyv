@@ -1,0 +1,46 @@
+package dyvil.collection
+
+import dyvil.util.ImmutableException
+
+import java.util.{ Iterator, Spliterator, Spliterators }
+import java.util.function.{ Function, Predicate }
+
+@LiteralConvertible.FromArray
+interface MutableCollection<type E> extends Collection<E>
+{
+	// Accessors
+
+	override final func isImmutable() -> boolean = false
+
+	override func size() -> int
+
+	override func iterator() -> Iterator<E>
+
+	// Non-mutating Operations
+
+	override func added(element: E) -> MutableCollection<E>
+
+	override func union(collection: Collection<+E>) -> MutableCollection<E>
+
+	override func removed(element: any!) -> MutableCollection<E>
+
+	override func difference(collection: Collection<_>) -> MutableCollection<E>
+
+	override func intersection(collection: Collection<+E>) -> MutableCollection<E>
+
+	override func mapped<type R>(mapper: Function<-E, +R>) -> MutableCollection<R>
+
+	override func flatMapped<type R>(mapper: Function<-E, +Iterable<+R>>) -> MutableCollection<R>
+
+	override func filtered(predicate: Predicate<-E>) -> MutableCollection<E>
+
+	// Copying
+
+	override func copy() -> MutableCollection<E>
+
+	override final func mutable() -> MutableCollection<E> = this
+
+	override final func mutableCopy() -> MutableCollection<E> = this.copy()
+
+	override final func immutableCopy() -> ImmutableCollection<E> = this.immutable()
+}

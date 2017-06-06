@@ -12,7 +12,7 @@ package dyvil.collection
  * @see Stack
  * @see Deque
  */
-interface Queue<E> extends Queryable<E>
+interface Queue<type E> extends Queryable<E>
 {
 	/**
 	 * Returns the last element in this queue. Unlike {@link #remove()}, this method does not remove the element from
