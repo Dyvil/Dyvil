@@ -68,7 +68,7 @@ interface SourcePosition extends Comparable<SourcePosition>
 
 	// Base Implementation
 
-	private case class Base
+	private static case class Base
 	(
 		let startLine: int
 		let endLine: int
