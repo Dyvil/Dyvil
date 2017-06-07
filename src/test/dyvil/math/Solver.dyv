@@ -12,17 +12,17 @@ class Solver
 		func solve(c: Context) -> Expr
 	}
 
-	case class Var(let name: String) implements Expr
+	static case class Var(let name: String) implements Expr
 	{
 		override func solve(c: Context) -> Expr = c.resolve(this.name)
 	}
 
-	case class Const(let value: double) implements Expr
+	static case class Const(let value: double) implements Expr
 	{
 		override func solve(c: Context) -> Expr = this
 	}
 
-	case class Add(let lhs: Expr, let rhs: Expr) implements Expr
+	static case class Add(let lhs: Expr, let rhs: Expr) implements Expr
 	{
 		override func solve(c: Context) -> Expr
 		{
@@ -39,7 +39,7 @@ class Solver
 		}
 	}
 
-	case class Multiply(let lhs: Expr, let rhs: Expr) implements Expr
+	static case class Multiply(let lhs: Expr, let rhs: Expr) implements Expr
 	{
 		override func solve(c: Context) -> Expr
 		{

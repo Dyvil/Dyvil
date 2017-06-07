@@ -12,13 +12,13 @@ class VirtualStaticTest
 		static func bar(s: String) -> String
 	}
 
-	class Base implements Interface
+	static class Base implements Interface
 	{
 		static override func foo() -> String = "Base"
 		static override func bar(s: String) -> String = s ++ "_Base"
 	}
 
-	class Derived extends Base
+	static class Derived extends Base
 	{
 		static override func foo() -> String = "Derived"
 		static override func bar(s: String) -> String = s ++ "_Derived"
@@ -32,8 +32,8 @@ class VirtualStaticTest
 		static func apply(i: int) -> IntConstructible
 	}
 
-	case class CustomInt(public let value: int) implements IntConstructible
-	case class MyInt    (public let value: int) implements IntConstructible
+	static case class CustomInt(public let value: int) implements IntConstructible
+	static case class MyInt    (public let value: int) implements IntConstructible
 
 	static func create<@Reified(Reified.Type.TYPE) T: IntConstructible>(i: int) -> T = T(i) as T
 

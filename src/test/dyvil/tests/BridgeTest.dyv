@@ -2,23 +2,23 @@ package dyvil.tests
 
 using dyvil.Test
 
-public class BridgeTest
+class BridgeTest
 {
-	public interface Container<T>
+	static interface Container<T>
 	{
 		func get() -> T
 
 		func set(value: T) -> void
 	}
 
-	public case class IntContainer(value: int) implements Container<int>
+	static case class IntContainer(value: int) implements Container<int>
 	{
 		override func get() -> int = this.value
 
 		override func set(value: int) -> void = this.value = value
 	}
 
-	public case class LongContainer(value: long) implements Container<long>
+	static case class LongContainer(value: long) implements Container<long>
 	{
 		override func get() -> long = this.value
 

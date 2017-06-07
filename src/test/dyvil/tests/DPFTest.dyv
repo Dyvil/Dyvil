@@ -15,9 +15,9 @@ import dyvil.tools.dpf.converter.{ binary._, string._, flatmap._ }
 using dyvil.tools.dpf.DPFSyntax._
 import dyvil.tools.dpf.DPFConvertible
 
-public class DPFTest
+class DPFTest
 {
-	public case class Button(var text: String, var x: int, var y: int) implements DPFConvertible
+	static case class Button(var text: String, var x: int, var y: int) implements DPFConvertible
 	{
 		private var visible: boolean = false
 		{

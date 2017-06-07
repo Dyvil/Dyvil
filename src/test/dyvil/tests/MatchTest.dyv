@@ -3,16 +3,16 @@ package dyvil.tests
 using dyvil.Collections
 using dyvil.Test
 
-public class MatchTest
+class MatchTest
 {
-	class KeyValue
+	static class KeyValue
 	{
-	    postfix func unapply(s: String) -> (String, String)?
-	    {
-	        let index = s.indexOf ':'
-	        if (index < 0) return null
-	        return (s.substring(0, index), s.substring(index + 1))
-	    }
+		postfix func unapply(s: String) -> (String, String)?
+		{
+			let index = s.indexOf ':'
+			if (index < 0) return null
+			return (s.substring(0, index), s.substring(index + 1))
+		}
 	}
 
 	static func apply() -> Test = test "Match Expressions" {

@@ -2,9 +2,9 @@ package dyvil.tests
 
 using dyvil.Test
 
-public class BuilderTest
+class BuilderTest
 {
-	public case class Buildable
+	static case class Buildable
 	(
 		var myInt: int        { get; set }
     	var myDouble: double  { get; set }

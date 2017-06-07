@@ -2,11 +2,11 @@ package dyvil.tests
 
 using dyvil.Test
 
-public class SuperTest
+class SuperTest
 {
-	class A
+	static class A
 	{
-		public func foo() -> String = "A"
+		func foo() -> String = "A"
 	}
 
 	interface I
@@ -14,7 +14,7 @@ public class SuperTest
 		func foo() -> String = "I"
 	}
 
-	class B extends A implements I
+	static class B extends A implements I
 	{
 		override func foo() -> String = "B"
 	}
@@ -24,13 +24,13 @@ public class SuperTest
 		override func foo() -> String = "J"
 	}
 
-	public class C extends B implements J
+	static class C extends B implements J
 	{
 		override func foo() -> String = "C"
 		// public func aFoo: String = super<A>.foo // not available (currently)
 		// public func iFoo: String = super<I>.foo
-		public func bFoo() -> String = super<B>.foo
-		public func jFoo() -> String = super<J>.foo
+		func bFoo() -> String = super<B>.foo
+		func jFoo() -> String = super<J>.foo
 	}
 
 	static func apply() -> Test = test "Super Calls" {
