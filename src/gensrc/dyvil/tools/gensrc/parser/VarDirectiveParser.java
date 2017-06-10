@@ -74,7 +74,7 @@ public class VarDirectiveParser extends Parser
 		case IDENTIFIER:
 			if (type != Tokens.LETTER_IDENTIFIER)
 			{
-				pm.report(token, "directive.var.identifier");
+				pm.report(token, "var.identifier");
 				if (type == BaseSymbols.CLOSE_PARENTHESIS)
 				{
 					this.mode = BODY;
@@ -88,7 +88,7 @@ public class VarDirectiveParser extends Parser
 		case CLOSE_PAREN:
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
-				pm.report(token, "directive.close_paren");
+				pm.report(token, "var.close_paren");
 				return;
 			}
 
@@ -100,11 +100,6 @@ public class VarDirectiveParser extends Parser
 				this.directives.add(this.directive);
 				pm.popParser(true);
 				return;
-			}
-
-			if (this.directive instanceof UndefineDirective)
-			{
-				pm.report(token, "directive.undefine.body");
 			}
 
 			final DirectiveList body = new DirectiveList();

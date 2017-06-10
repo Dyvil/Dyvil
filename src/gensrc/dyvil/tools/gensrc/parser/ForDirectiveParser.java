@@ -46,7 +46,7 @@ public class ForDirectiveParser extends Parser
 		case OPEN_PAREN:
 			if (type != BaseSymbols.OPEN_PARENTHESIS)
 			{
-				pm.report(token, "directive.for.open_paren");
+				pm.report(token, "for.open_paren");
 				this.list.add(this.directive);
 				pm.popParser(true);
 				return;
@@ -62,7 +62,7 @@ public class ForDirectiveParser extends Parser
 				return;
 			}
 
-			pm.report(token, "directive.for.identifier");
+			pm.report(token, "for.identifier");
 			if (type == GenSrcSymbols.ARROW_LEFT || type == BaseSymbols.CLOSE_PARENTHESIS)
 			{
 				this.mode = ARROW;
@@ -72,7 +72,7 @@ public class ForDirectiveParser extends Parser
 			if (type != GenSrcSymbols.ARROW_LEFT)
 			{
 				pm.reparse();
-				pm.report(token, "directive.for.arrow_left");
+				pm.report(token, "for.arrow_left");
 			}
 
 			pm.pushParser(new ExpressionParser(this.directive::setIterable));
@@ -90,7 +90,7 @@ public class ForDirectiveParser extends Parser
 
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
-				pm.report(token, "directive.for.close_paren");
+				pm.report(token, "for.close_paren");
 				return;
 			}
 
@@ -99,7 +99,7 @@ public class ForDirectiveParser extends Parser
 		case BODY:
 			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
 			{
-				pm.report(token, "directive.for.open_brace");
+				pm.report(token, "for.open_brace");
 				this.list.add(this.directive);
 				pm.popParser(true);
 				return;
@@ -111,7 +111,10 @@ public class ForDirectiveParser extends Parser
 			this.mode = BODY_END;
 			return;
 		case BODY_END:
-			assert type == BaseSymbols.CLOSE_CURLY_BRACKET;
+			if (type != BaseSymbols.CLOSE_CURLY_BRACKET)
+			{
+				pm.report(token, "for.close_brace");
+			}
 			this.list.add(this.directive);
 			pm.popParser();
 		}
