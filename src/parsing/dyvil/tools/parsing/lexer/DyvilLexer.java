@@ -472,8 +472,11 @@ public final class DyvilLexer extends Lexer
 				}
 				break;
 			case 'a':
+			case 'A':
 			case 'b':
+			case 'B':
 			case 'c':
+			case 'C':
 				if (radix == 16)
 				{
 					this.buffer.append((char) currentChar);
