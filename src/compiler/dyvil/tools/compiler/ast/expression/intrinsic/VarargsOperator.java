@@ -1,28 +1,28 @@
 package dyvil.tools.compiler.ast.expression.intrinsic;
 
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
-import dyvil.tools.compiler.ast.header.IClassCompilableList;
-import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
-public class VarargsOperator implements IValue
+public class VarargsOperator extends UnaryOperator
 {
-	protected IValue value;
-
-	// Metadata
-	protected SourcePosition position;
-	protected boolean       varargsPosition;
+	protected boolean varargsPosition;
 
 	public VarargsOperator(IValue value)
 	{
+		this.value = value;
+	}
+
+	public VarargsOperator(SourcePosition position, IValue value)
+	{
+		this.position = position;
 		this.value = value;
 	}
 
@@ -30,24 +30,6 @@ public class VarargsOperator implements IValue
 	public int valueTag()
 	{
 		return VARARGS_EXPANSION;
-	}
-
-	@Override
-	public SourcePosition getPosition()
-	{
-		return this.position;
-	}
-
-	@Override
-	public void setPosition(SourcePosition position)
-	{
-		this.position = position;
-	}
-
-	@Override
-	public boolean isResolved()
-	{
-		return true;
 	}
 
 	@Override
@@ -92,47 +74,14 @@ public class VarargsOperator implements IValue
 	}
 
 	@Override
-	public void resolveTypes(MarkerList markers, IContext context)
-	{
-		this.value.resolveTypes(markers, context);
-	}
-
-	@Override
-	public IValue resolve(MarkerList markers, IContext context)
-	{
-		this.value = this.value.resolve(markers, context);
-		return this;
-	}
-
-	@Override
-	public void checkTypes(MarkerList markers, IContext context)
-	{
-		this.value.checkTypes(markers, context);
-	}
-
-	@Override
 	public void check(MarkerList markers, IContext context)
 	{
 		if (!this.varargsPosition)
 		{
-			markers.add(Markers.semantic(this.position, "varargs.invalid"));
+			markers.add(Markers.semanticError(this.position, "varargs.invalid"));
 		}
 
 		this.value.check(markers, context);
-	}
-
-	@Override
-	public IValue foldConstants()
-	{
-		this.value = this.value.foldConstants();
-		return this;
-	}
-
-	@Override
-	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
-	{
-		this.value = this.value.cleanup(compilableList, classCompilableList);
-		return this;
 	}
 
 	@Override
