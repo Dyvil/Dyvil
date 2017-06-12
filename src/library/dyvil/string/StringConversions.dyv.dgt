@@ -1,0 +1,22 @@
+package dyvil.string
+
+abstract class StringConversions
+{
+	private init() {} // no instances
+
+	postfix func toBoolean(_ string: String) -> boolean = Boolean.parseBoolean(string)
+
+	// Number Conversions
+	#import("Base.dgs")
+	#for (spec <- NUMBER_SPECS) {
+		#import(spec)
+
+		postfix func to#(TYPE_NAME)(_ string: String) -> PRIMITIVE? = string.to#(TYPE_NAME)(radix: 10)
+
+		infix func to#(TYPE_NAME)(_ string: String, radix: int) -> PRIMITIVE?
+		{
+			try { return WRAPPER.parse#(TYPE_NAME)(string) } catch (ex: NumberFormatException) {}
+			return null
+		}
+	}
+}

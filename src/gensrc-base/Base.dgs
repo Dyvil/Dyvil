@@ -2,4 +2,6 @@
 # Max Arity for Tuples and Functions
 MAX_ARITY=20
 
+MAIN_SPECS=Base-Int.dgs, Base-Long.dgs, Base-Float.dgs, Base-Double.dgs
+NUMBER_SPECS=Base-Byte.dgs, Base-Short.dgs, Base-Int.dgs, Base-Long.dgs, Base-Float.dgs, Base-Double.dgs
 PRIMITIVE_SPECS=Base-Boolean.dgs, Base-Byte.dgs, Base-Short.dgs, Base-Char.dgs, Base-Int.dgs, Base-Long.dgs, Base-Float.dgs, Base-Double.dgs
