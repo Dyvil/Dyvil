@@ -1,9 +1,9 @@
 package dyvil.tools.compiler.ast.modifiers;
 
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.asm.AnnotationVisitor;
-import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.member.IClassMember;
@@ -15,7 +15,6 @@ import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.lang.annotation.ElementType;
 
@@ -23,6 +22,14 @@ import static dyvil.reflect.Modifiers.*;
 
 public final class ModifierUtil
 {
+	public static final String DYVIL_MODIFIERS   = "Ldyvil/annotation/internal/DyvilModifiers;";
+	public static final String OVERRIDE_INTERNAL = "java/lang/Override";
+
+	public static final String NATIVE_INTERNAL    = "dyvil/annotation/native";
+	public static final String STRICTFP_INTERNAL  = "dyvil/annotation/strictfp";
+	public static final String TRANSIENT_INTERNAL = "dyvil/annotation/transient";
+	public static final String VOLATILE_INTERNAL  = "dyvil/annotation/volatile";
+
 	public static final int JAVA_MODIFIER_MASK = 0xFFFF;
 
 	private static final int DYVIL_MODIFIER_MASK = ~JAVA_MODIFIER_MASK // exclude java modifiers
@@ -309,7 +316,7 @@ public final class ModifierUtil
 		final int dyvilModifiers = (int) (flags >> 32);
 		if (dyvilModifiers != 0)
 		{
-			final AnnotationVisitor annotationVisitor = mw.visitAnnotation(AnnotationUtil.DYVIL_MODIFIERS, true);
+			final AnnotationVisitor annotationVisitor = mw.visitAnnotation(DYVIL_MODIFIERS, true);
 			annotationVisitor.visit("value", dyvilModifiers);
 			annotationVisitor.visitEnd();
 		}

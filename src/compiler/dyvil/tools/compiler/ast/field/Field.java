@@ -134,10 +134,10 @@ public class Field extends Member implements IField
 	{
 		switch (type)
 		{
-		case "dyvil/annotation/Transient":
+		case ModifierUtil.TRANSIENT_INTERNAL:
 			this.modifiers.addIntModifier(Modifiers.TRANSIENT);
 			return false;
-		case "dyvil/annotation/Volatile":
+		case ModifierUtil.VOLATILE_INTERNAL:
 			this.modifiers.addIntModifier(Modifiers.VOLATILE);
 			return false;
 		case Deprecation.JAVA_INTERNAL:

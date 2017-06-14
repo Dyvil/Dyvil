@@ -158,17 +158,17 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		switch (type)
 		{
-		case AnnotationUtil.NATIVE:
+		case ModifierUtil.NATIVE_INTERNAL:
 			this.modifiers.addIntModifier(Modifiers.NATIVE);
 			return false;
-		case AnnotationUtil.STRICT:
+		case ModifierUtil.STRICTFP_INTERNAL:
 			this.modifiers.addIntModifier(Modifiers.STRICT);
 			return false;
 		case Deprecation.JAVA_INTERNAL:
 		case Deprecation.DYVIL_INTERNAL:
 			this.modifiers.addIntModifier(Modifiers.DEPRECATED);
 			return true;
-		case AnnotationUtil.OVERRIDE:
+		case ModifierUtil.OVERRIDE_INTERNAL:
 			this.modifiers.addIntModifier(Modifiers.OVERRIDE);
 			return false;
 		case AnnotationUtil.INRINSIC:

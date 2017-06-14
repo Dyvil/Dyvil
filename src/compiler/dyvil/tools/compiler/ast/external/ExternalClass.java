@@ -27,6 +27,7 @@ import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
+import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.*;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.structure.RootPackage;
@@ -515,7 +516,7 @@ public final class ExternalClass extends AbstractClass
 	{
 		switch (type)
 		{
-		case AnnotationUtil.DYVIL_MODIFIERS:
+		case ModifierUtil.DYVIL_MODIFIERS:
 			return new ModifierVisitor(this.modifiers);
 		case AnnotationUtil.CLASS_PARAMETERS:
 			return new ClassParameterAnnotationVisitor(this);

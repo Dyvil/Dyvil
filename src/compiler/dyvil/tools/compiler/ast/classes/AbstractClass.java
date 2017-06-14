@@ -139,7 +139,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	{
 		switch (type)
 		{
-		case "dyvil/annotation/Strict":
+		case ModifierUtil.STRICTFP_INTERNAL:
 			this.modifiers.addIntModifier(Modifiers.STRICT);
 			return false;
 		case Deprecation.DYVIL_INTERNAL:

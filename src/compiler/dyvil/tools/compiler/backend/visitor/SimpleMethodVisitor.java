@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.bytecode.*;
 import dyvil.tools.compiler.ast.method.IExternalCallableMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.intrinsic.InlineIntrinsicData;
+import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.raw.InternalType;
@@ -55,7 +56,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	public AnnotationVisitor visitParameterAnnotation(int parameter, String type, boolean visible)
 	{
 		final IParameter param = this.method.getExternalParameterList().get(parameter);
-		if (AnnotationUtil.DYVIL_MODIFIERS.equals(type))
+		if (ModifierUtil.DYVIL_MODIFIERS.equals(type))
 		{
 			return new ModifierVisitor(param.getModifiers());
 		}
@@ -69,7 +70,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	{
 		switch (type)
 		{
-		case AnnotationUtil.DYVIL_MODIFIERS:
+		case ModifierUtil.DYVIL_MODIFIERS:
 			return new ModifierVisitor(this.method.getModifiers());
 		case AnnotationUtil.DYVIL_NAME:
 			return new DyvilNameVisitor(this.method);

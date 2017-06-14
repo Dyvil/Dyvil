@@ -5,8 +5,8 @@ import dyvil.tools.asm.Attribute;
 import dyvil.tools.asm.FieldVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.field.IDataMember;
+import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.type.raw.InternalType;
 import dyvil.tools.compiler.backend.ClassFormat;
 
@@ -22,7 +22,7 @@ public class SimpleFieldVisitor implements FieldVisitor
 	@Override
 	public AnnotationVisitor visitAnnotation(String type, boolean visible)
 	{
-		if (AnnotationUtil.DYVIL_MODIFIERS.equals(type))
+		if (ModifierUtil.DYVIL_MODIFIERS.equals(type))
 		{
 			return new ModifierVisitor(this.field.getModifiers());
 		}
