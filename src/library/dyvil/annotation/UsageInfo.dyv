@@ -1,0 +1,17 @@
+package dyvil.annotation
+
+import dyvil.util.MarkerLevel
+import java.lang.annotation.Retention
+
+// @Target([ .TYPE, .FIELD, .METHOD, .CONSTRUCTOR, .TYPE_PARAMETER ])
+@Retention(.CLASS)
+@interface UsageInfo (
+	/** the compiler diagnostic message text */
+	let value: String
+
+	/** an extended description about the usage of the member **/
+	let description: String = ''
+
+	/** the marker level of the compiler diagnostic message */
+	let markerLevel: MarkerLevel = .INFO
+)

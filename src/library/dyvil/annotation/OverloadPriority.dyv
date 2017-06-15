@@ -2,8 +2,8 @@ package dyvil.annotation
 
 import java.lang.annotation._
 
-@Target([ ElementType.METHOD, ElementType.CONSTRUCTOR ])
-@Retention(RetentionPolicy.CLASS)
+@Target([ .METHOD, .CONSTRUCTOR ])
+@Retention(.CLASS)
 @interface OverloadPriority(
 	let value: int = DEFAULT_PRIORITY
 )

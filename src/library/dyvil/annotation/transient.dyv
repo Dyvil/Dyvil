@@ -6,6 +6,6 @@ import java.lang.annotation._
  * Substitute annotation for the {@code transient} keyword in Java. The <i>Dyvil Compiler</i> directly converts this
  * annotation to the {@code ACC_TRANSIENT} flag.
  */
-@Target([ ElementType.FIELD ])
-@Retention(RetentionPolicy.SOURCE)
+@Target([ .FIELD ])
+@Retention(.SOURCE)
 @interface transient

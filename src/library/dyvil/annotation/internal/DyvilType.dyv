@@ -2,6 +2,6 @@ package dyvil.annotation.`internal`
 
 import java.lang.annotation._
 
-@Target([ ElementType.TYPE_USE ])
+@Target([ .TYPE_USE ])
 @Retention(.RUNTIME)
 @interface DyvilType(let value: String)
