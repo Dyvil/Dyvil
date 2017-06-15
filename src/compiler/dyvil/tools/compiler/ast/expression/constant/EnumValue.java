@@ -33,6 +33,13 @@ public class EnumValue extends FieldAccess
 		this.name = name;
 	}
 
+	public EnumValue(SourcePosition position, IType type, Name name)
+	{
+		this.position = position;
+		this.type = type;
+		this.name = name;
+	}
+
 	@Override
 	public int valueTag()
 	{
