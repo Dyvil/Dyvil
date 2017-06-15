@@ -26,11 +26,12 @@ public enum BaseModifiers implements Modifier
 	EXTENSION(Modifiers.EXTENSION, "extension"),
 	// Class Modifiers
 	CASE(Modifiers.CASE_CLASS, "case"),
+	ENUM(Modifiers.ENUM, "enum"),
 	// Field Modifiers
 	CONST(Modifiers.CONST, "const"),
 	LAZY(Modifiers.LAZY, "lazy"),
 	// Parameter Modifiers
-	EXPLICIT(Modifiers.EXPLICIT, "explicit");
+	EXPLICIT(Modifiers.EXPLICIT, "explicit"),;
 
 	public static final String VISIBILITY_MODIFIERS = "public,private,protected,private protected,package private,";
 
@@ -47,12 +48,12 @@ public enum BaseModifiers implements Modifier
 	/**
 	 * The modifiers that can be used on classes.
 	 */
-	public static final String CLASS_MODIFIERS = MEMBER_MODIFIERS + "abstract,case,sealed,";
+	public static final String CLASS_MODIFIERS = MEMBER_MODIFIERS + "abstract,case,sealed,enum,";
 
 	/**
 	 * The modifiers that can be used on fields.
 	 */
-	public static final String FIELD_MODIFIERS = MEMBER_MODIFIERS + "lazy,";
+	public static final String FIELD_MODIFIERS = MEMBER_MODIFIERS + "lazy,enum,";
 
 	/**
 	 * The modifiers that can be used on methods.

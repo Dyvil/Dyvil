@@ -167,6 +167,11 @@ public interface IDataMember extends IMember, IAccessible, IValueConsumer
 
 	static void appendKeyword(StringBuilder buffer, IMember member)
 	{
+		if (member.hasModifier(Modifiers.ENUM_CONST))
+		{
+			buffer.append("enum const");
+			return;
+		}
 		if (member.hasModifier(Modifiers.FINAL) && (member.getKind() != MemberKind.PROPERTY))
 		{
 			buffer.append("let");

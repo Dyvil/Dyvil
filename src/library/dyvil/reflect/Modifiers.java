@@ -116,6 +116,8 @@ public interface Modifiers
 	 */
 	int ENUM = 0x00004000;
 
+	int ENUM_CONST = ENUM | CONST;
+
 	/**
 	 * Modifier used for constructors and fields of anonymous classes.
 	 */
@@ -235,13 +237,13 @@ public interface Modifiers
 	/**
 	 * The modifiers that can be used on classes.
 	 */
-	int CLASS_MODIFIERS = MEMBER_MODIFIERS | ABSTRACT | CASE_CLASS // denotable
+	int CLASS_MODIFIERS = MEMBER_MODIFIERS | ABSTRACT | CASE_CLASS | ENUM // denotable
 		                      | CLASS_TYPE_MODIFIERS | STRICT;
 
 	/**
 	 * The modifiers that can be used on fields.
 	 */
-	int FIELD_MODIFIERS = MEMBER_MODIFIERS | LAZY // denotable
+	int FIELD_MODIFIERS = MEMBER_MODIFIERS | LAZY | ENUM // denotable
 		                      | TRANSIENT | VOLATILE;
 
 	/**

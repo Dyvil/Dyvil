@@ -150,6 +150,16 @@ public final class MemberParser<T extends IDataMember> extends Parser implements
 				this.setMemberKind(CONSTRUCTOR);
 				this.mode = CONSTRUCTOR_PARAMETERS;
 				return;
+			case DyvilKeywords.ENUM:
+				if (token.next().type() == DyvilKeywords.CONST)
+				{
+					this.modifiers.addIntModifier(Modifiers.ENUM_CONST);
+					this.setMemberKind(FIELD);
+					this.mode = FIELD_NAME;
+					pm.skip(); // skip the 'const'
+					return;
+				}
+				break;
 			case DyvilKeywords.CONST:
 				this.modifiers.addIntModifier(Modifiers.CONST);
 				this.setMemberKind(FIELD);

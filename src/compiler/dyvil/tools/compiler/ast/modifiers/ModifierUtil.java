@@ -109,13 +109,15 @@ public final class ModifierUtil
 		if ((mod & TRANSIENT) == TRANSIENT) { builder.append("@transient "); }
 		if ((mod & VOLATILE) == VOLATILE) { builder.append("@volatile "); }
 		if ((mod & NATIVE) == NATIVE) { builder.append("@native "); }
-		if ((mod & STRICT) == STRICT) { builder.append("@strict "); }
-		if ((mod & MANDATED) == MANDATED) { builder.append("<mandated>"); }
-		if ((mod & SYNTHETIC) == SYNTHETIC) { builder.append("<synthetic> "); }
-		if ((mod & BRIDGE) == BRIDGE) { builder.append("<bridge> "); }
+		if ((mod & STRICT) == STRICT) { builder.append("@strictfp "); }
+		if ((mod & MANDATED) == MANDATED) { builder.append("/*mandated*/ "); }
+		if ((mod & SYNTHETIC) == SYNTHETIC) { builder.append("/*synthetic*/ "); }
+		if ((mod & BRIDGE) == BRIDGE) { builder.append("/*bridge*/ "); }
 
 		// Access Modifiers
 		appendAccessModifiers(mod, builder);
+
+		if ((mod & EXPLICIT) == EXPLICIT) { builder.append("explicit "); }
 
 		if (memberKind == MemberKind.METHOD)
 		{
@@ -144,8 +146,6 @@ public final class ModifierUtil
 			if ((mod & INLINE) == INLINE) { builder.append("inline "); }
 			if ((mod & OVERRIDE) == OVERRIDE) { builder.append("override "); }
 		}
-
-		if ((mod & EXPLICIT) == EXPLICIT) { builder.append("explicit "); }
 		// @formatter:on
 	}
 
