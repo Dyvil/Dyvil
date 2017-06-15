@@ -363,6 +363,25 @@ public class Field extends Member implements IField
 			markers.add(marker);
 		}
 
+		if (this.hasModifier(Modifiers.ENUM_CONST))
+		{
+			final IClass enclosingClass = this.getEnclosingClass();
+			final IType classType = enclosingClass.getClassType();
+			if (!enclosingClass.hasModifier(Modifiers.ENUM))
+			{
+				final Marker marker = Markers.semanticError(this.position, "field.enum.class", this.name);
+				marker.addInfo(Markers.getSemantic("method.enclosing_class", classType));
+				markers.add(marker);
+			}
+			else if (!Types.isSuperType(classType, this.type))
+			{
+				final Marker marker = Markers.semanticError(this.position, "field.enum.type.incompatible", this.name);
+				marker.addInfo(Markers.getSemantic("method.enclosing_class", classType));
+				marker.addInfo(Markers.getSemantic("field.type", this.type));
+				markers.add(marker);
+			}
+		}
+
 		if (this.property != null)
 		{
 			this.property.check(markers, context);
