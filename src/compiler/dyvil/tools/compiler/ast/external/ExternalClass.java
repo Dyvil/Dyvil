@@ -629,10 +629,10 @@ public final class ExternalClass extends AbstractClass
 				}
 			}
 
-			if ((access & Modifiers.VARARGS) != 0)
+			if ((access & Modifiers.ACC_VARARGS) != 0)
 			{
 				final ParameterList parameterList = constructor.getExternalParameterList();
-				parameterList.get(parameterList.size() - 1).setVarargs(true);
+				parameterList.get(parameterList.size() - 1).setVarargs();
 			}
 
 			this.body.addConstructor(constructor);
@@ -664,10 +664,10 @@ public final class ExternalClass extends AbstractClass
 			}
 		}
 
-		if ((access & Modifiers.VARARGS) != 0)
+		if ((access & Modifiers.ACC_VARARGS) != 0)
 		{
 			final ParameterList parameterList = method.getExternalParameterList();
-			parameterList.get(parameterList.size() - 1).setVarargs(true);
+			parameterList.get(parameterList.size() - 1).setVarargs();
 		}
 
 		this.body.addMethod(method);

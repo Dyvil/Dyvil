@@ -48,6 +48,12 @@ public final class SimpleMethodVisitor implements MethodVisitor
 
 		if (modifiers != 0)
 		{
+			if ((modifiers & Modifiers.ACC_VARARGS) != 0)
+			{
+				// add the internal bitflag for varargs parameters
+				modifiers |= Modifiers.VARARGS;
+			}
+
 			parameter.getModifiers().addIntModifier(modifiers);
 		}
 	}

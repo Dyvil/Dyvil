@@ -69,7 +69,7 @@ public interface IParameter extends IVariable, IClassMember
 
 	boolean isVarargs();
 
-	void setVarargs(boolean varargs);
+	void setVarargs();
 
 	@Override
 	default void writeInit(MethodWriter writer) throws BytecodeException
@@ -101,7 +101,9 @@ public interface IParameter extends IVariable, IClassMember
 
 		this.setLocalIndex(localIndex);
 
-		writer.visitParameter(localIndex, this.getQualifiedLabel(), type, ModifierUtil.getJavaModifiers(flags));
+		// Add the ACC_VARARGS modifier if necessary
+		final int javaModifiers = ModifierUtil.getJavaModifiers(flags) | (this.isVarargs() ? Modifiers.ACC_VARARGS : 0);
+		writer.visitParameter(localIndex, this.getQualifiedLabel(), type, javaModifiers);
 
 		// Annotations
 		final AnnotatableVisitor visitor = (desc, visible) -> writer.visitParameterAnnotation(index, desc, visible);

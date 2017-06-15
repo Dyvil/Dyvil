@@ -6,6 +6,7 @@ import dyvil.collection.Set;
 import dyvil.collection.mutable.HashSet;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.Label;
 import dyvil.tools.asm.TypeReference;
@@ -41,7 +42,6 @@ import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -126,7 +126,7 @@ public class CodeMethod extends AbstractMethod
 		this.parameters.resolveTypes(markers, context);
 		if (this.parameters.isLastVariadic())
 		{
-			this.modifiers.addIntModifier(Modifiers.VARARGS);
+			this.modifiers.addIntModifier(Modifiers.ACC_VARARGS);
 		}
 
 		if (this.exceptions != null)

@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.constructor;
 
 import dyvil.annotation.internal.Nullable;
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -26,7 +27,6 @@ import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -86,7 +86,7 @@ public class CodeConstructor extends AbstractConstructor
 		this.parameters.resolveTypes(markers, context);
 		if (this.parameters.isLastVariadic())
 		{
-			this.modifiers.addIntModifier(Modifiers.VARARGS);
+			this.modifiers.addIntModifier(Modifiers.ACC_VARARGS);
 		}
 
 		if (this.exceptions != null)

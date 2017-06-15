@@ -260,7 +260,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			{
 				if (this.hasFlag(VARARGS))
 				{
-					this.parameter.setVarargs(true);
+					this.parameter.setVarargs();
 				}
 				this.parameter.setType(this.type);
 				this.consumer.getParameters().add(this.parameter);

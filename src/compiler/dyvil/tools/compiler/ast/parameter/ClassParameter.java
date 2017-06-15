@@ -28,7 +28,6 @@ public class ClassParameter extends Field implements IParameter
 	protected int     index;
 	protected int     localIndex;
 	protected IType   covariantType;
-	protected boolean varargs;
 
 	protected ICallableMember constructor;
 
@@ -126,13 +125,13 @@ public class ClassParameter extends Field implements IParameter
 	@Override
 	public boolean isVarargs()
 	{
-		return this.varargs;
+		return this.modifiers.hasIntModifier(Modifiers.VARARGS);
 	}
 
 	@Override
-	public void setVarargs(boolean varargs)
+	public void setVarargs()
 	{
-		this.varargs = varargs;
+		this.modifiers.addIntModifier(Modifiers.VARARGS);
 	}
 
 	@Override
@@ -246,17 +245,6 @@ public class ClassParameter extends Field implements IParameter
 	@Override
 	public void writeParameter(MethodWriter writer)
 	{
-		if (this.varargs && !this.modifiers.hasIntModifier(Modifiers.VARARGS))
-		{
-			// Bugfix: VARARGS is the same bitflag as TRANSIENT, so Class Parameters cannot use the Modifier and have
-			// to rely on a boolean field.
-
-			this.modifiers.addIntModifier(Modifiers.VARARGS);
-			IParameter.super.writeParameter(writer);
-			this.modifiers.removeIntModifier(Modifiers.VARARGS);
-			return;
-		}
-
 		IParameter.super.writeParameter(writer);
 	}
 

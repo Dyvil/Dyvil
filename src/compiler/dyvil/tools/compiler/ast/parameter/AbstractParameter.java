@@ -175,12 +175,9 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	}
 
 	@Override
-	public void setVarargs(boolean varargs)
+	public void setVarargs()
 	{
-		if (varargs)
-		{
-			this.getModifiers().addIntModifier(Modifiers.VARARGS);
-		}
+		this.getModifiers().addIntModifier(Modifiers.VARARGS);
 	}
 
 	@Override

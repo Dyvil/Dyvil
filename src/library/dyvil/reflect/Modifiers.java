@@ -79,7 +79,7 @@ public interface Modifiers
 	/**
 	 * Modifier used to declare that the last parameter of a method is a <i>varargs</i> parameter.
 	 */
-	int VARARGS = 0x00000080;
+	int ACC_VARARGS = 0x00000080;
 
 	/**
 	 * {@code native} modifier.
@@ -179,6 +179,8 @@ public interface Modifiers
 
 	int DEFAULT = 0x00020000;
 
+	int VARARGS = 0x00040000;
+
 	// Member Modifiers
 
 	/**
@@ -251,13 +253,13 @@ public interface Modifiers
 	 */
 	int METHOD_MODIFIERS =
 		MEMBER_MODIFIERS | ABSTRACT | SYNCHRONIZED | INLINE | INFIX | EXTENSION | IMPLICIT | OVERRIDE // denotable
-			| NATIVE | STRICT | BRIDGE | VARARGS;
+			| NATIVE | STRICT | BRIDGE | ACC_VARARGS;
 
 	/**
 	 * The modifiers that can be used on parameters.
 	 */
 	int PARAMETER_MODIFIERS = FINAL | EXPLICIT // denotable
-		                          | DEFAULT | MANDATED | EXTENSION | VARARGS | SYNTHETIC;
+		                          | DEFAULT | MANDATED | EXTENSION | VARARGS | ACC_VARARGS | SYNTHETIC;
 
 	/**
 	 * The modifiers that can be applied to class parameters.
