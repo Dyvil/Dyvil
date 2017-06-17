@@ -23,9 +23,7 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.TupleType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.TypeChecker;
-import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -138,8 +136,7 @@ public final class TupleExpr implements IValue
 		final IAnnotation annotation = type.getAnnotation(LazyFields.TUPLE_CONVERTIBLE);
 		if (annotation != null)
 		{
-			return new LiteralConversion(this, annotation, this.values)
-				       .withType(type, typeContext, markers, context);
+			return new LiteralConversion(this, annotation, this.values).withType(type, typeContext, markers, context);
 		}
 
 		final int arity = this.values.size();
@@ -156,8 +153,9 @@ public final class TupleExpr implements IValue
 		for (int i = 0; i < arity; i++)
 		{
 			final IType elementType = Types.resolveTypeSafely(type, typeParameters.get(i));
-			final IValue value = TypeChecker.convertValue(this.values.get(i), elementType, typeContext, markers,
-			                                              context, LazyFields.ELEMENT_MARKER_SUPPLIER);
+			final IValue value = TypeChecker
+				                     .convertValue(this.values.get(i), elementType, typeContext, markers, context,
+				                                   LazyFields.ELEMENT_MARKER_SUPPLIER);
 			this.values.set(i, value);
 		}
 
@@ -301,35 +299,8 @@ public final class TupleExpr implements IValue
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		final int arity = this.values.size();
-		if (arity == 0)
-		{
-			if (Formatting.getBoolean("tuple.empty.space_between"))
-			{
-				buffer.append("( )");
-			}
-			else
-			{
-				buffer.append("()");
-			}
-			return;
-		}
-
-		buffer.append('(');
-		if (Formatting.getBoolean("tuple.open_paren.space_after"))
-		{
-			buffer.append(' ');
-		}
-
-		Util.astToString(prefix, this.values.getArray(), arity, Formatting.getSeparator("tuple.separator", ','),
-		                 buffer);
-
-		if (Formatting.getBoolean("tuple.close_paren.space_before"))
-		{
-			buffer.append(' ');
-		}
-		buffer.append(')');
+		this.values.toString(indent, buffer);
 	}
 }

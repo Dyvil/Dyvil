@@ -96,6 +96,25 @@ public final class Formatting
 		}
 	}
 
+	public static void appendOpen(StringBuilder stringBuilder, String key, char open)
+	{
+		stringBuilder.append(open);
+		if (getBoolean(key + ".space_after"))
+		{
+			stringBuilder.append(' ');
+		}
+	}
+
+	public static void appendClose(StringBuilder stringBuilder, String key, char close)
+	{
+		if (getBoolean(key + ".space_before"))
+		{
+			stringBuilder.append(' ');
+		}
+		stringBuilder.append(close);
+	}
+
+
 	public static String getSeparator(String key, char character)
 	{
 		StringBuilder stringBuilder = new StringBuilder(3);

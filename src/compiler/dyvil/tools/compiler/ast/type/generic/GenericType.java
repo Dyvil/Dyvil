@@ -15,7 +15,6 @@ import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.raw.IObjectType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public abstract class GenericType implements IObjectType
@@ -213,13 +212,7 @@ public abstract class GenericType implements IObjectType
 
 		if (this.arguments.size() > 0)
 		{
-			Formatting.appendSeparator(buffer, "generics.open_bracket", '<');
 			this.arguments.toString(indent, buffer);
-			if (Formatting.getBoolean("generics.close_bracket.space_before"))
-			{
-				buffer.append(' ');
-			}
-			buffer.append('>');
 		}
 	}
 

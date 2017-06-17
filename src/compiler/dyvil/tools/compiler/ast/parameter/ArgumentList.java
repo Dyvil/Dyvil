@@ -529,7 +529,12 @@ public class ArgumentList implements IResolvable, IValueList
 
 	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
+		this.toString(indent, buffer, '(', ')');
+	}
+
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer, char open, char close)
+	{
+		Formatting.appendSeparator(buffer, "parameters.open_paren", open);
 
 		if (this.size > 0)
 		{
@@ -541,10 +546,10 @@ public class ArgumentList implements IResolvable, IValueList
 			}
 		}
 
-		Formatting.appendSeparator(buffer, "parameters.close_paren", ')');
+		Formatting.appendClose(buffer, "parameters.close_paren", close);
 	}
 
-	protected void appendValue(@NonNull String indent, @NonNull StringBuilder buffer, int index)
+	public void appendValue(@NonNull String indent, @NonNull StringBuilder buffer, int index)
 	{
 		this.values[index].toString(indent, buffer);
 	}

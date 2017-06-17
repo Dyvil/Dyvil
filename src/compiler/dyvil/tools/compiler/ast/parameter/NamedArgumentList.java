@@ -387,7 +387,7 @@ public class NamedArgumentList extends ArgumentList
 	}
 
 	@Override
-	protected void appendValue(@NonNull String indent, @NonNull StringBuilder buffer, int index)
+	public void appendValue(@NonNull String indent, @NonNull StringBuilder buffer, int index)
 	{
 		final Name key = this.keys[index];
 		if (key != null)

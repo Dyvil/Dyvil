@@ -21,10 +21,8 @@ import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -387,32 +385,6 @@ public final class ArrayExpr implements IValue
 	@Override
 	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		final int size = this.values.size();
-		if (size == 0)
-		{
-			if (Formatting.getBoolean("array.empty.space_between"))
-			{
-				buffer.append("[ ]");
-			}
-			else
-			{
-				buffer.append("[]");
-			}
-			return;
-		}
-
-		buffer.append('[');
-		if (Formatting.getBoolean("array.open_bracket.space_after"))
-		{
-			buffer.append(' ');
-		}
-
-		Util.astToString(indent, this.values.getArray(), size, Formatting.getSeparator("array.separator", ','), buffer);
-
-		if (Formatting.getBoolean("array.close_bracket.space_before"))
-		{
-			buffer.append(' ');
-		}
-		buffer.append(']');
+		this.values.toString(indent, buffer, '[', ']');
 	}
 }
