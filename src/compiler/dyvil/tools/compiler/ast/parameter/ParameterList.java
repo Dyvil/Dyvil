@@ -105,6 +105,31 @@ public class ParameterList implements Iterable<IParameter>, IResolvable
 		this.parameters[index] = parameter;
 	}
 
+	public void insert(int index, IParameter parameter)
+	{
+		final int newSize = this.size + 1;
+		if (newSize >= this.parameters.length)
+		{
+			final IParameter[] temp = new IParameter[newSize];
+			System.arraycopy(this.parameters, 0, temp, 0, index);
+			temp[index] = parameter;
+			System.arraycopy(this.parameters, index, temp, index + 1, this.size - index);
+			this.parameters = temp;
+		}
+		else
+		{
+			System.arraycopy(this.parameters, index, this.parameters, index + 1, this.size - index);
+			this.parameters[index] = parameter;
+		}
+		this.size = newSize;
+
+		// Update indices
+		for (int i = 0; i < newSize; i++)
+		{
+			this.parameters[i].setIndex(i);
+		}
+	}
+
 	public void remove(int count)
 	{
 		final int end = this.size;

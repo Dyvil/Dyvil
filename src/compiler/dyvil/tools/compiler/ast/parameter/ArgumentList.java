@@ -180,6 +180,7 @@ public class ArgumentList implements IResolvable, IValueList
 		else
 		{
 			System.arraycopy(this.values, index, this.values, index + 1, this.size - index);
+			this.values[index] = value;
 		}
 		this.size = newSize;
 	}

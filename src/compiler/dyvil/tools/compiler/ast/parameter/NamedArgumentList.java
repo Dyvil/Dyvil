@@ -150,6 +150,8 @@ public class NamedArgumentList extends ArgumentList
 		{
 			System.arraycopy(this.keys, index, this.keys, index + 1, this.size - index);
 			System.arraycopy(this.values, index, this.values, index + 1, this.size - index);
+			this.keys[index] = key;
+			this.values[index] = value;
 		}
 		this.size = newSize;
 	}
