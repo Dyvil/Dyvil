@@ -1,0 +1,38 @@
+package dyvil.tests
+
+using dyvil.Test
+
+class EnumTest
+{
+	static func apply() -> Test = test "Enum" {
+		load(class Empty)
+		load(class WithParams)
+		load(class WithCtor)
+	}
+
+	static func load(c: Class<_>) -> void {}
+
+	// Test Constructor / Initializer Generation and Transformation
+
+	static enum Empty
+
+	static enum WithParams(let s: String, let i: int)
+
+	static enum WithCtor
+	{
+		private init()
+		{
+			super.init()
+		}
+
+		private init(i: int)
+		{
+			this.init()
+		}
+
+		private init(s: String, i: int)
+		{
+			this.init(i)
+		}
+	}
+}

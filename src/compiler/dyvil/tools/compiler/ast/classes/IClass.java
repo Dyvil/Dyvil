@@ -26,7 +26,8 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public interface IClass extends IClassMember, IParametric, ITypeParametricMember, ICompilable, IContext, IClassCompilableList
+public interface IClass
+	extends IClassMember, IParametric, ITypeParametricMember, ICompilable, IContext, IClassCompilableList
 {
 	@Override
 	default MemberKind getKind()
@@ -176,6 +177,10 @@ public interface IClass extends IClassMember, IParametric, ITypeParametricMember
 		if ((modifiers & Modifiers.INTERFACE) != 0)
 		{
 			return new InterfaceMetadata(forClass);
+		}
+		if ((modifiers & Modifiers.ENUM) != 0)
+		{
+			return new EnumClassMetadata(forClass);
 		}
 		if ((modifiers & Modifiers.OBJECT) != 0)
 		{

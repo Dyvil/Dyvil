@@ -71,6 +71,7 @@ public final class Types
 	public static IClass NULL_CLASS;
 	public static IClass NONE_CLASS;
 	public static IClass STRING_CLASS;
+	public static IClass ENUM_CLASS;
 
 	public static IClass THROWABLE_CLASS;
 	public static IClass EXCEPTION_CLASS;
@@ -130,6 +131,7 @@ public final class Types
 		NONE_CLASS = Package.dyvilLangInternal.resolveClass("None");
 		OBJECT.theClass = OBJECT_CLASS = Package.javaLang.resolveClass("Object");
 		STRING.theClass = STRING_CLASS = Package.javaLang.resolveClass("String");
+		ENUM_CLASS = Package.javaLang.resolveClass("Enum");
 		THROWABLE.theClass = THROWABLE_CLASS = Package.javaLang.resolveClass("Throwable");
 		EXCEPTION.theClass = EXCEPTION_CLASS = Package.javaLang.resolveClass("Exception");
 		RUNTIME_EXCEPTION.theClass = RUNTIME_EXCEPTION_CLASS = Package.javaLang.resolveClass("RuntimeException");
