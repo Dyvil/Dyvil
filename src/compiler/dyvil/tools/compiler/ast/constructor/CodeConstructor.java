@@ -99,7 +99,44 @@ public class CodeConstructor extends AbstractConstructor
 			this.value.resolveTypes(markers, context);
 		}
 
+		this.resolveInitializer();
+
 		context.pop();
+	}
+
+	private void resolveInitializer()
+	{
+		if (this.value == null)
+		{
+			return;
+		}
+		if (this.value.valueTag() == IValue.INITIALIZER_CALL)
+		{
+			this.initializerCall = (InitializerCall) this.value;
+			this.value = null;
+			return;
+		}
+		if (this.value.valueTag() != IValue.STATEMENT_LIST)
+		{
+			return;
+		}
+
+		final StatementList statementList = (StatementList) this.value;
+		if (statementList.size() <= 0)
+		{
+			return;
+		}
+
+		final IValue firstValue = statementList.get(0);
+		if (firstValue.valueTag() != IValue.INITIALIZER_CALL)
+		{
+			return;
+		}
+
+		// We can't simply remove the value from the Statement List, so we replace it with a void statement
+		statementList.set(0, new VoidValue(firstValue.getPosition()));
+
+		this.initializerCall = (InitializerCall) firstValue;
 	}
 
 	@Override
@@ -140,27 +177,10 @@ public class CodeConstructor extends AbstractConstructor
 
 	private void resolveSuperConstructors(MarkerList markers, IContext context)
 	{
-		if (this.value.valueTag() == IValue.INITIALIZER_CALL)
+		if (this.initializerCall != null)
 		{
-			this.initializerCall = (InitializerCall) this.value;
-			this.value = null;
+			this.initializerCall.resolve(markers, context);
 			return;
-		}
-		if (this.value.valueTag() == IValue.STATEMENT_LIST)
-		{
-			final StatementList statementList = (StatementList) this.value;
-			if (statementList.size() > 0)
-			{
-				final IValue firstValue = statementList.get(0);
-				if (firstValue.valueTag() == IValue.INITIALIZER_CALL)
-				{
-					// We can't simply remove the value from the Statement List, so we replace it with a void statement
-					statementList.set(0, new VoidValue(firstValue.getPosition()));
-
-					this.initializerCall = (InitializerCall) firstValue;
-					return;
-				}
-			}
 		}
 
 		// No Super Type -> don't try to resolve a Super Constructor
@@ -174,7 +194,7 @@ public class CodeConstructor extends AbstractConstructor
 		final IConstructor match = IContext.resolveConstructor(context, superType, ArgumentList.EMPTY);
 		if (match == null)
 		{
-			markers.add(Markers.semantic(this.position, "constructor.super"));
+			markers.add(Markers.semanticError(this.position, "constructor.super"));
 			return;
 		}
 

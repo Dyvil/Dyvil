@@ -191,6 +191,12 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	public void checkMatch(MatchList<IConstructor> list, ArgumentList arguments)
 	{
 		final int parameterCount = this.parameters.size();
+		if (arguments == null)
+		{
+			list.add(new Candidate<>(this));
+			return;
+		}
+
 		final int argumentCount = arguments.size();
 
 		if (argumentCount > parameterCount && !this.isVariadic())

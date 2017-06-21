@@ -96,14 +96,7 @@ public final class CaseClassMetadata extends ClassMetadata
 			                                              new FlagModifierSet(modifiers));
 			applyMethod.getTypeParameters().addAll(this.theClass.getTypeParameters());
 
-			if (this.constructor != null && (this.members & CONSTRUCTOR) == 0)
-			{
-				this.constructor.getParameters().copyTo(applyMethod.getParameters());
-			}
-			else
-			{
-				this.copyClassParameters(applyMethod);
-			}
+			this.copyClassParameters(applyMethod);
 
 			this.applyMethod = applyMethod;
 		}
