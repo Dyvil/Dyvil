@@ -15,6 +15,7 @@ import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
+import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.IParametric;
@@ -59,6 +60,11 @@ public class ClassMetadata implements IClassMetadata
 	public IConstructor getConstructor()
 	{
 		return this.constructor;
+	}
+
+	protected boolean hasDefaultConstructor()
+	{
+		return this.constructor != null && (this.members & CONSTRUCTOR) == 0;
 	}
 
 	private void checkMembers(IClassBody body)
@@ -200,7 +206,7 @@ public class ClassMetadata implements IClassMetadata
 
 		if (parameters.isEmpty())
 		{
-			// Empty Default Constructor
+			// Do not generate an empty default constructor if there is any other constructor defined
 			this.members |= CONSTRUCTOR;
 		}
 	}
@@ -236,8 +242,11 @@ public class ClassMetadata implements IClassMetadata
 		{
 			final IParameter classParameter = from.get(i);
 
+			final ModifierSet modifiers = new FlagModifierSet(classParameter.getModifiers().toFlags()
+				                                                  & Modifiers.PARAMETER_MODIFIERS);
+
 			ctrParams.add(constructor.createParameter(classParameter.getPosition(), classParameter.getName(),
-			                                          classParameter.getType(), classParameter.getModifiers(),
+			                                          classParameter.getType(), modifiers,
 			                                          classParameter.getAnnotations()));
 		}
 	}
@@ -245,7 +254,7 @@ public class ClassMetadata implements IClassMetadata
 	@Override
 	public void resolve(MarkerList markers, IContext context)
 	{
-		if (this.constructor == null)
+		if (!this.hasDefaultConstructor())
 		{
 			return;
 		}
@@ -314,7 +323,7 @@ public class ClassMetadata implements IClassMetadata
 	@Override
 	public void getConstructorMatches(MatchList<IConstructor> list, ArgumentList arguments)
 	{
-		if (this.constructor != null)
+		if (hasDefaultConstructor())
 		{
 			this.constructor.checkMatch(list, arguments);
 		}
@@ -323,7 +332,7 @@ public class ClassMetadata implements IClassMetadata
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		if (this.constructor != null)
+		if (hasDefaultConstructor())
 		{
 			this.constructor.write(writer);
 		}
