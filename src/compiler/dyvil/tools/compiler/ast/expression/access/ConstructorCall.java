@@ -1,7 +1,6 @@
 package dyvil.tools.compiler.ast.expression.access;
 
 import dyvil.lang.Formattable;
-import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
@@ -318,9 +317,9 @@ public class ConstructorCall implements ICall
 		if (this.constructor != null)
 		{
 			final IClass iclass = this.type.getTheClass();
-			if (iclass.hasModifier(Modifiers.ABSTRACT) && iclass.hasModifier(Modifiers.INTERFACE_CLASS))
+			if (iclass.isInterface())
 			{
-				markers.add(Markers.semantic(this.position, "constructor.access.abstract", this.type));
+				markers.add(Markers.semanticError(this.position, "constructor.access.abstract", this.type));
 			}
 
 			this.constructor.checkCall(markers, this.position, context, this.arguments);

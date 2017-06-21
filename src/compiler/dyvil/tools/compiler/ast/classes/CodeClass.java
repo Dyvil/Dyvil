@@ -209,10 +209,7 @@ public class CodeClass extends AbstractClass
 		if (this.enclosingClass != null && !this.hasModifier(Modifiers.STATIC))
 		{
 			this.modifiers.addIntModifier(Modifiers.STATIC);
-			if (!this.isInterface())
-			{
-				markers.add(Markers.semantic(this.position, "class.inner.not_static", this.name));
-			}
+			markers.add(Markers.semantic(this.position, "class.inner.not_static", this.name));
 		}
 
 		if (this.annotations != null)
@@ -497,7 +494,7 @@ public class CodeClass extends AbstractClass
 		final long flags = ModifierUtil.getFlags(this);
 		int modifiers = ModifierUtil.getJavaModifiers(flags);
 
-		if ((modifiers & Modifiers.INTERFACE_CLASS) != Modifiers.INTERFACE_CLASS)
+		if ((modifiers & Modifiers.INTERFACE) == 0)
 		{
 			modifiers |= ASMConstants.ACC_SUPER;
 		}
@@ -543,7 +540,7 @@ public class CodeClass extends AbstractClass
 
 		// Compute Trait Classes
 		final Set<IClass> traitClasses;
-		if ((modifiers & Modifiers.INTERFACE_CLASS) == 0)
+		if ((modifiers & Modifiers.INTERFACE) == 0)
 		{
 			traitClasses = new ArraySet<>();
 			this.traitInit = !fillTraitClasses(this, traitClasses, true) && !traitClasses.isEmpty();

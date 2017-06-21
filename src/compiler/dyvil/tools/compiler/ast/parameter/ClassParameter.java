@@ -191,7 +191,7 @@ public class ClassParameter extends Field implements IParameter
 	public IValue checkAssign(MarkerList markers, IContext context, SourcePosition position, IValue receiver,
 		                         IValue newValue)
 	{
-		if (this.enclosingClass.hasModifier(Modifiers.ANNOTATION))
+		if (this.enclosingClass.isAnnotation())
 		{
 			markers.add(Markers.semanticError(position, "classparameter.assign.annotation", this.name.unqualified));
 		}
@@ -229,7 +229,7 @@ public class ClassParameter extends Field implements IParameter
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		if (this.enclosingClass.hasModifier(Modifiers.ANNOTATION))
+		if (this.enclosingClass.isAnnotation())
 		{
 			return;
 		}

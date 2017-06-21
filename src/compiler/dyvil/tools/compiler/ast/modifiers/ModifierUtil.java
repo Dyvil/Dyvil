@@ -63,7 +63,7 @@ public final class ModifierUtil
 			sb.append("class ");
 			return;
 		}
-		if ((mod & ANNOTATION) == ANNOTATION)
+		if ((mod & ANNOTATION_CLASS) == ANNOTATION_CLASS)
 		{
 			sb.append("@interface ");
 			return;
@@ -78,7 +78,7 @@ public final class ModifierUtil
 			sb.append("interface ");
 			return;
 		}
-		if ((mod & ENUM) == ENUM)
+		if ((mod & ENUM_CLASS) == ENUM_CLASS)
 		{
 			sb.append("enum ");
 			return;

@@ -367,7 +367,7 @@ public class Field extends Member implements IField
 		{
 			final IClass enclosingClass = this.getEnclosingClass();
 			final IType classType = enclosingClass.getClassType();
-			if (!enclosingClass.hasModifier(Modifiers.ENUM))
+			if (!enclosingClass.hasModifier(Modifiers.ENUM_CLASS))
 			{
 				final Marker marker = Markers.semanticError(this.position, "field.enum.class", this.name);
 				marker.addInfo(Markers.getSemantic("method.enclosing_class", classType));

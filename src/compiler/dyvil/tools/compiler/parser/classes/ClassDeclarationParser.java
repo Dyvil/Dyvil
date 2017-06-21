@@ -1,6 +1,5 @@
 package dyvil.tools.compiler.parser.classes;
 
-import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -113,7 +112,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 		case EXTENDS:
 			if (type == DyvilKeywords.EXTENDS)
 			{
-				if (this.theClass.hasModifier(Modifiers.INTERFACE_CLASS))
+				if (this.theClass.isInterface())
 				{
 					pm.pushParser(new TypeListParser(this));
 					this.mode = BODY;
@@ -131,7 +130,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				pm.pushParser(new TypeListParser(this));
 				this.mode = BODY;
 
-				if (this.theClass.hasModifier(Modifiers.INTERFACE_CLASS))
+				if (this.theClass.isInterface())
 				{
 					pm.report(token, "class.interface.implements");
 					return;

@@ -174,7 +174,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public boolean isInterface()
 	{
-		return this.modifiers.hasIntModifier(Modifiers.INTERFACE_CLASS);
+		return this.modifiers.hasIntModifier(Modifiers.INTERFACE);
 	}
 
 	@Override
@@ -186,7 +186,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public boolean isObject()
 	{
-		return this.modifiers.hasIntModifier(Modifiers.OBJECT_CLASS);
+		return this.modifiers.hasIntModifier(Modifiers.OBJECT);
 	}
 
 	@Override

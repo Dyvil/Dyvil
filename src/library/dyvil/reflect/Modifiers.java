@@ -94,7 +94,7 @@ public interface Modifiers
 	/**
 	 * Modifier used to declare that a class is an {@code interface}.
 	 */
-	int INTERFACE_CLASS = 0x00000200 | ABSTRACT;
+	int INTERFACE = 0x00000200;
 
 	/**
 	 * {@code stricfp} modifier.
@@ -109,7 +109,7 @@ public interface Modifiers
 	/**
 	 * Modifier used to declare a class to be an annotation ({@code @interface} ).
 	 */
-	int ANNOTATION = 0x00002000 | INTERFACE_CLASS;
+	int ANNOTATION = 0x00002000;
 
 	/**
 	 * Modifier used to declare a class to be an {@code enum} class.
@@ -125,10 +125,14 @@ public interface Modifiers
 
 	// Type Modifiers
 
+	int OBJECT = 0x00010000;
+
+	int ENUM_CLASS = ENUM | STATIC;
+
 	/**
 	 * <i>Dyvil</i> {@code object} modifier. If a class is marked with this modifier, it is a singleton object class.
 	 */
-	int OBJECT_CLASS = 0x00010000;
+	int OBJECT_CLASS = OBJECT | FINAL | STATIC;
 
 	/**
 	 * <i>Dyvil</i> {@code object} modifier. If a class is marked with this modifier, it is a case class. This modifier
@@ -142,10 +146,16 @@ public interface Modifiers
 	 */
 	int FUNCTIONAL = 0x00040000;
 
+	int INTERFACE_CLASS = INTERFACE | STATIC | ABSTRACT;
+
+	int TRAIT = 0x00080000;
+
 	/**
 	 * <i>Dyvil</i> {@code trait} modifier.
 	 */
-	int TRAIT_CLASS = 0x00080000 | INTERFACE_CLASS;
+	int TRAIT_CLASS = TRAIT | INTERFACE_CLASS;
+
+	int ANNOTATION_CLASS = ANNOTATION | INTERFACE_CLASS;
 
 	// Method Modifiers
 
@@ -221,7 +231,7 @@ public interface Modifiers
 	 * {@code enum}, {@code object} or {@code annotation} / {@code @interface}). This value excludes the {@code
 	 * ABSTRACT} bit flag.
 	 */
-	int CLASS_TYPE_MODIFIERS = (INTERFACE_CLASS | ANNOTATION | ENUM | OBJECT_CLASS | TRAIT_CLASS) & ~ABSTRACT;
+	int CLASS_TYPE_MODIFIERS = INTERFACE | ANNOTATION | ENUM | OBJECT | TRAIT;
 
 	int VISIBILITY_MODIFIERS = PUBLIC | PROTECTED | PRIVATE | PACKAGE;
 
@@ -239,7 +249,7 @@ public interface Modifiers
 	/**
 	 * The modifiers that can be used on classes.
 	 */
-	int CLASS_MODIFIERS = MEMBER_MODIFIERS | ABSTRACT | CASE_CLASS | ENUM // denotable
+	int CLASS_MODIFIERS = MEMBER_MODIFIERS | ABSTRACT | CASE_CLASS // denotable
 		                      | CLASS_TYPE_MODIFIERS | STRICT;
 
 	/**

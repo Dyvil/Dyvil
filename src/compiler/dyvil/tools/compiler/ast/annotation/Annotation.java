@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.annotation;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.lang.Formattable;
-import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.asm.AnnotationVisitor;
@@ -197,7 +196,7 @@ public final class Annotation implements IAnnotation
 			return;
 		}
 
-		if (!theClass.hasModifier(Modifiers.ANNOTATION))
+		if (!theClass.isAnnotation())
 		{
 			markers.add(Markers.semanticError(this.position, "annotation.type", this.type.getName()));
 			return;
