@@ -333,6 +333,11 @@ public final class LambdaExpr implements IValue, IClassCompilable, IDefaultConte
 
 		this.inferReturnType(type, this.value.getType());
 
+		if (this.returnType.isUninferred() && this.value.isResolved())
+		{
+			markers.add(Markers.semanticError(this.position, "lambda.return_type.infer"));
+		}
+
 		context.pop();
 
 		return this;
