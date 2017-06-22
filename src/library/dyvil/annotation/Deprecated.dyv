@@ -1,0 +1,38 @@
+package dyvil.annotation
+
+import dyvil.util.MarkerLevel
+import java.lang.annotation.{ Retention, Target }
+
+@Retention(.CLASS)
+@interface Deprecated
+(
+	/** the compiler diagnostic message text */
+	let value: String = "The {member.kind} '{member.name}' is deprecated"
+
+	/** a description on why the member was deprecated */
+	let description: String = ""
+
+	/** since when the member is deprecated */
+	let since: String = ""
+
+	/** when the member is scheduled for removal */
+	let forRemoval: String = ""
+
+	/** a list of reasons why the member is deprecated */
+	let reasons: [Reason] = []
+
+	/** a list of replacement members that should be used instead */
+	let replacements: [String] = []
+
+	/** the marker level of the compiler diagnostic message */
+	let level: MarkerLevel = .WARNING
+)
+{
+	enum Reason
+	{
+		case DANGEROUS
+		case CONDEMNED
+		case SUPERSEDED
+		case UNIMPLEMENTED
+	}
+}

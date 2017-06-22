@@ -1,0 +1,9 @@
+package dyvil.util
+
+enum MarkerLevel
+{
+	case IGNORE
+	case INFO
+	case WARNING
+	case ERROR
+}

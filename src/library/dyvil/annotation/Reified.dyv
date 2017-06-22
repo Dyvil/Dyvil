@@ -1,11 +1,6 @@
-package dyvil.annotation;
+package dyvil.annotation
 
-import dyvil.annotation.internal.NonNull;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.{ Retention, Target }
 
 /**
  * Marks that a Class or Method Type Parameter is <b>reified</b>. If a Method Parameter is annotated with this
@@ -17,19 +12,14 @@ import java.lang.annotation.Target;
  * parameter as their primitive type {@link Class} instance. The {@link Reified.Type#OBJECT_CLASS} ensures that the
  * passed {@link Class} instance refers to a reference type, i.e. a wrapper type for primitives.
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE_PARAMETER)
-public @interface Reified
+@Target([ .TYPE_PARAMETER ])
+@Retention(.RUNTIME)
+@interface Reified(let value: Type = .ANY_CLASS)
 {
 	enum Type
 	{
-		ANY_CLASS, OBJECT_CLASS, TYPE;
+		case ANY_CLASS
+		case OBJECT_CLASS
+		case TYPE
 	}
-
-	/**
-	 * @return The reified parameter type
-	 *
-	 * @see Reified.Type
-	 */
-	@NonNull Type value() default Type.ANY_CLASS;
 }
