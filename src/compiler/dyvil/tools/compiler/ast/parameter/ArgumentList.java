@@ -104,17 +104,13 @@ public class ArgumentList implements IResolvable, IValueList
 
 	public ArgumentList concat(ArgumentList that)
 	{
-		final IValue[] values = new IValue[this.size + that.size];
-		System.arraycopy(this.values, 0, values, 0, this.size);
-		System.arraycopy(that.values, 0, values, this.size, that.size);
-
-		if (that instanceof NamedArgumentList)
-		{
-			final Name[] keys = new Name[this.size + that.size];
-			System.arraycopy(((NamedArgumentList) that).keys, 0, keys, this.size, 0);
-			return new NamedArgumentList(keys, values, this.size + that.size);
-		}
-		return new ArgumentList(values);
+		final int size = this.size + that.size;
+		final ArgumentList list = that instanceof NamedArgumentList ?
+			                          new NamedArgumentList(size) :
+			                          new ArgumentList(size);
+		list.addAll(this);
+		list.addAll(that);
+		return list;
 	}
 
 	public IValue getFirst()
@@ -148,17 +144,36 @@ public class ArgumentList implements IResolvable, IValueList
 		this.values[index] = value;
 	}
 
+	protected void ensureCapacity(int min)
+	{
+		if (min >= this.values.length)
+		{
+			IValue[] temp = new IValue[min];
+			System.arraycopy(this.values, 0, temp, 0, this.size);
+			this.values = temp;
+		}
+	}
+
 	@Override
 	public void add(IValue value)
 	{
-		int index = this.size++;
-		if (this.size > this.values.length)
-		{
-			IValue[] temp = new IValue[this.size];
-			System.arraycopy(this.values, 0, temp, 0, index);
-			this.values = temp;
-		}
-		this.values[index] = value;
+		this.add(null, value);
+	}
+
+	@Override
+	public void add(Name name, IValue value)
+	{
+		final int size = this.size;
+		this.ensureCapacity(size + 1);
+		this.values[size] = value;
+		this.size = size + 1;
+	}
+
+	public void addAll(ArgumentList list)
+	{
+		this.ensureCapacity(this.size + list.size);
+		System.arraycopy(list.values, 0, this.values, this.size, list.size);
+		this.size += list.size;
 	}
 
 	public void insert(int index, IValue value)

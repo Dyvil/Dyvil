@@ -27,6 +27,12 @@ public class NamedArgumentList extends ArgumentList
 		this.values = new IValue[3];
 	}
 
+	public NamedArgumentList(int size)
+	{
+		this.keys = new Name[size];
+		this.values = new IValue[size];
+	}
+
 	public NamedArgumentList(Name[] keys, IValue[] values, int size)
 	{
 		this.keys = keys;
@@ -59,17 +65,11 @@ public class NamedArgumentList extends ArgumentList
 	@Override
 	public NamedArgumentList concat(ArgumentList that)
 	{
-		final IValue[] values = new IValue[this.size + that.size];
-		System.arraycopy(this.values, 0, values, 0, this.size);
-		System.arraycopy(that.values, 0, values, this.size, that.size);
-
-		final Name[] keys = new Name[this.size + that.size];
-		System.arraycopy(this.keys, 0, keys, 0, this.size);
-		if (that instanceof NamedArgumentList)
-		{
-			System.arraycopy(((NamedArgumentList) that).keys, 0, keys, this.size, 0);
-		}
-		return new NamedArgumentList(keys, values, this.size + that.size);
+		final int size = this.size + that.size;
+		final NamedArgumentList list = new NamedArgumentList(size);
+		list.addAll(this);
+		list.addAll(that);
+		return list;
 	}
 
 	@Override
@@ -113,20 +113,39 @@ public class NamedArgumentList extends ArgumentList
 	}
 
 	@Override
-	public void add(Name key, IValue value)
+	protected void ensureCapacity(int min)
 	{
-		final int index = this.size++;
-		if (index >= this.values.length)
+		if (min >= this.values.length)
 		{
-			final Name[] tempKeys = new Name[this.size];
-			final IValue[] tempValues = new IValue[this.size];
-			System.arraycopy(this.keys, 0, tempKeys, 0, index);
-			System.arraycopy(this.values, 0, tempValues, 0, index);
+			final Name[] tempKeys = new Name[min];
+			final IValue[] tempValues = new IValue[min];
+			System.arraycopy(this.keys, 0, tempKeys, 0, this.size);
+			System.arraycopy(this.values, 0, tempValues, 0, this.size);
 			this.keys = tempKeys;
 			this.values = tempValues;
 		}
-		this.values[index] = value;
-		this.keys[index] = key;
+	}
+
+	@Override
+	public void add(Name key, IValue value)
+	{
+		final int size = this.size;
+		this.ensureCapacity(size + 1);
+		this.values[size] = value;
+		this.keys[size] = key;
+		this.size = size + 1;
+	}
+
+	@Override
+	public void addAll(ArgumentList list)
+	{
+		this.ensureCapacity(this.size + list.size);
+		System.arraycopy(list.values, 0, this.values, this.size, list.size);
+
+		if (list instanceof NamedArgumentList)
+		{
+			System.arraycopy(((NamedArgumentList) list).keys, 0, this.keys, this.size, list.size);
+		}
 	}
 
 	@Override
