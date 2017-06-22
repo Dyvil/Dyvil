@@ -562,36 +562,7 @@ public class CodeClass extends AbstractClass
 
 		if (this.body != null)
 		{
-			final int methods = this.body.methodCount();
-			final int constructors = this.body.constructorCount();
-			final int fields = this.body.fieldCount();
-			final int properties = this.body.propertyCount();
-
-			int classes = this.body.classCount();
-			for (int i = 0; i < classes; i++)
-			{
-				this.body.getClass(i).writeInnerClassInfo(writer);
-			}
-
-			for (int i = 0; i < fields; i++)
-			{
-				this.body.getField(i).write(writer);
-			}
-
-			for (int i = 0; i < constructors; i++)
-			{
-				this.body.getConstructor(i).write(writer);
-			}
-
-			for (int i = 0; i < properties; i++)
-			{
-				this.body.getProperty(i).write(writer);
-			}
-
-			for (int i = 0; i < methods; i++)
-			{
-				this.body.getMethod(i).write(writer);
-			}
+			this.body.write(writer);
 		}
 
 		// Create the static <clinit> method
@@ -718,23 +689,11 @@ public class CodeClass extends AbstractClass
 
 		this.metadata.writeClassInit(writer);
 
-		if (this.body == null)
+		if (this.body != null)
 		{
-			return;
+			this.body.writeClassInit(writer);
 		}
 
-		for (int i = 0, count = this.body.fieldCount(); i < count; i++)
-		{
-			this.body.getField(i).writeClassInit(writer);
-		}
-		for (int i = 0, count = this.body.propertyCount(); i < count; i++)
-		{
-			this.body.getProperty(i).writeClassInit(writer);
-		}
-		for (int i = 0, count = this.body.initializerCount(); i < count; i++)
-		{
-			this.body.getInitializer(i).writeClassInit(writer);
-		}
 	}
 
 	@Override
@@ -747,23 +706,11 @@ public class CodeClass extends AbstractClass
 
 		this.metadata.writeStaticInit(writer);
 
-		if (this.body == null)
+		if (this.body != null)
 		{
-			return;
+			this.body.writeStaticInit(writer);
 		}
 
-		for (int i = 0, count = this.body.fieldCount(); i < count; i++)
-		{
-			this.body.getField(i).writeStaticInit(writer);
-		}
-		for (int i = 0, count = this.body.propertyCount(); i < count; i++)
-		{
-			this.body.getProperty(i).writeStaticInit(writer);
-		}
-		for (int i = 0, count = this.body.initializerCount(); i < count; i++)
-		{
-			this.body.getInitializer(i).writeStaticInit(writer);
-		}
 	}
 
 	private void writeAnnotations(ClassWriter writer, long flags)

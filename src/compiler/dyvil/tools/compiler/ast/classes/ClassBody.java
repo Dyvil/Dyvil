@@ -3,6 +3,7 @@ package dyvil.tools.compiler.ast.classes;
 import dyvil.annotation.internal.NonNull;
 import dyvil.math.MathUtils;
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.constructor.IInitializer;
@@ -21,12 +22,14 @@ import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.backend.ClassWriter;
+import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ASTNode;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public class ClassBody implements IClassBody
 {
@@ -854,6 +857,69 @@ public class ClassBody implements IClassBody
 		for (int i = 0; i < this.initializerCount; i++)
 		{
 			this.initializers[i].cleanup(compilableList, classCompilableList);
+		}
+	}
+
+	@Override
+	public void write(ClassWriter writer) throws BytecodeException
+	{
+		for (int i = 0; i < this.classCount; i++)
+		{
+			this.classes[i].writeInnerClassInfo(writer);
+		}
+
+		for (int i = 0; i < this.fieldCount; i++)
+		{
+			this.fields[i].write(writer);
+		}
+
+		for (int i = 0; i < this.constructorCount; i++)
+		{
+			this.constructors[i].write(writer);
+		}
+
+		for (int i = 0; i < this.propertyCount; i++)
+		{
+			this.properties[i].write(writer);
+		}
+
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			this.methods[i].write(writer);
+		}
+	}
+
+	@Override
+	public void writeClassInit(MethodWriter writer) throws BytecodeException
+	{
+		for (int i = 0, count = this.fieldCount; i < count; i++)
+		{
+			this.fields[i].writeClassInit(writer);
+		}
+		for (int i = 0, count = this.propertyCount; i < count; i++)
+		{
+			this.properties[i].writeClassInit(writer);
+		}
+		for (int i = 0, count = this.initializerCount; i < count; i++)
+		{
+			this.initializers[i].writeClassInit(writer);
+		}
+	}
+
+	@Override
+	public void writeStaticInit(MethodWriter writer) throws BytecodeException
+	{
+		for (int i = 0, count = this.fieldCount; i < count; i++)
+		{
+			this.fields[i].writeStaticInit(writer);
+		}
+		for (int i = 0, count = this.propertyCount; i < count; i++)
+		{
+			this.properties[i].writeStaticInit(writer);
+		}
+		for (int i = 0, count = this.initializerCount; i < count; i++)
+		{
+			this.initializers[i].writeStaticInit(writer);
 		}
 	}
 

@@ -1,7 +1,5 @@
 package dyvil.tools.compiler.ast.classes;
 
-import dyvil.tools.compiler.ast.parameter.ParameterList;
-import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.consumer.IMemberConsumer;
@@ -15,9 +13,14 @@ import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.parsing.Name;
+import dyvil.tools.compiler.backend.ClassWriter;
+import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.parsing.ASTNode;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public interface IClassBody extends ASTNode, IResolvable, IClassList, IMemberConsumer<IField>
@@ -132,4 +135,12 @@ public interface IClassBody extends ASTNode, IResolvable, IClassList, IMemberCon
 
 	@Override
 	void cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList);
+
+	// Compilation
+
+	void write(ClassWriter writer) throws BytecodeException;
+
+	void writeClassInit(MethodWriter writer) throws BytecodeException;
+
+	void writeStaticInit(MethodWriter writer) throws BytecodeException;
 }
