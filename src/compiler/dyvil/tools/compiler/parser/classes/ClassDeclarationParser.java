@@ -3,7 +3,6 @@ package dyvil.tools.compiler.parser.classes;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.consumer.IClassConsumer;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -141,7 +140,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 		case BODY:
 			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
 			{
-				IClassBody body = new ClassBody(this.theClass);
+				ClassBody body = new ClassBody(this.theClass);
 				this.theClass.setBody(body);
 				pm.pushParser(new ClassBodyParser(body), true);
 				this.mode = BODY_END;

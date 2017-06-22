@@ -116,9 +116,9 @@ public interface IClass
 
 	// Body
 
-	IClassBody getBody();
+	ClassBody getBody();
 
-	void setBody(IClassBody body);
+	void setBody(ClassBody body);
 
 	IClassMetadata getMetadata();
 

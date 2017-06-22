@@ -4,8 +4,8 @@ import dyvil.collection.Collection;
 import dyvil.collection.Set;
 import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -154,7 +154,7 @@ public final class Types
 		FROMDOUBLE_CLASS = LITERALCONVERTIBLE_CLASS.resolveClass(Name.fromRaw("FromDouble"));
 		FROMSTRING_CLASS = LITERALCONVERTIBLE_CLASS.resolveClass(Name.fromRaw("FromString"));
 
-		final IClassBody primitivesBody = PRIMITIVES_CLASS.getBody();
+		final ClassBody primitivesBody = PRIMITIVES_CLASS.getBody();
 
 		VOID.boxMethod = primitivesBody.getMethod(Name.fromRaw("Void"));
 		VOID.unboxMethod = primitivesBody.getMethod(Name.fromRaw("toVoid"));

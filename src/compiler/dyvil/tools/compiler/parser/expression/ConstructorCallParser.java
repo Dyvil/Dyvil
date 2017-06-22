@@ -1,9 +1,9 @@
 package dyvil.tools.compiler.parser.expression;
 
+import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.expression.access.ClassConstructor;
 import dyvil.tools.compiler.ast.expression.access.ConstructorCall;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.parser.classes.ClassBodyParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
@@ -111,7 +111,7 @@ public class ConstructorCallParser extends Parser
 		this.call = classConstructor;
 
 		final IClass nestedClass = classConstructor.getNestedClass();
-		final IClassBody body = nestedClass.getBody();
+		final ClassBody body = nestedClass.getBody();
 
 		pm.pushParser(new ClassBodyParser(body), true);
 		this.mode = ANONYMOUS_CLASS_END;

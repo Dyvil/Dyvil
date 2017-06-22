@@ -64,7 +64,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 
 	// Body
 
-	protected IClassBody body;
+	protected ClassBody body;
 
 	// Metadata
 
@@ -305,13 +305,13 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	// Body
 
 	@Override
-	public void setBody(IClassBody body)
+	public void setBody(ClassBody body)
 	{
 		this.body = body;
 	}
 
 	@Override
-	public IClassBody getBody()
+	public ClassBody getBody()
 	{
 		return this.body;
 	}

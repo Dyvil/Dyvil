@@ -4,8 +4,8 @@ import dyvil.collection.Set;
 import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.collection.mutable.TreeSet;
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
@@ -240,7 +240,7 @@ public class CompleteCommand implements ICommand
 			return;
 		}
 
-		final IClassBody body = theClass.getBody();
+		final ClassBody body = theClass.getBody();
 		if (body == null)
 		{
 			return;

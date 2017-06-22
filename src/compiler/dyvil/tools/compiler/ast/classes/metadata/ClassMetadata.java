@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.ast.classes.metadata;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.constructor.CodeConstructor;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -67,7 +67,7 @@ public class ClassMetadata implements IClassMetadata
 		return this.constructor != null && (this.members & CONSTRUCTOR) == 0;
 	}
 
-	private void checkMembers(IClassBody body)
+	private void checkMembers(ClassBody body)
 	{
 		for (int i = 0, count = body.methodCount(); i < count; i++)
 		{
@@ -182,7 +182,7 @@ public class ClassMetadata implements IClassMetadata
 	{
 		// Check if a constructor needs to be generated
 
-		final IClassBody body = this.theClass.getBody();
+		final ClassBody body = this.theClass.getBody();
 		if (body == null)
 		{
 			return;

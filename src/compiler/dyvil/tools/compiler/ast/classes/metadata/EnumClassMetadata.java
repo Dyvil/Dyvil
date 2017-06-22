@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.ast.classes.metadata;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.constructor.CodeConstructor;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -66,7 +66,7 @@ public class EnumClassMetadata extends ClassMetadata
 	@Override
 	public void resolveTypesGenerate(MarkerList markers, IContext context)
 	{
-		final IClassBody body = this.theClass.getBody();
+		final ClassBody body = this.theClass.getBody();
 		final IType classType = this.theClass.getClassType();
 		final IType arrayType = new ArrayType(classType, Mutability.IMMUTABLE); // [final TYPE]
 
@@ -126,7 +126,7 @@ public class EnumClassMetadata extends ClassMetadata
 		arguments.insert(1, new FieldAccess(ordParam));
 	}
 
-	protected void initValuesField(IClassBody body, IType arrayType)
+	protected void initValuesField(ClassBody body, IType arrayType)
 	{
 		this.valuesField = new Field(this.theClass, Names.$VALUES, arrayType,
 		                             new FlagModifierSet(Modifiers.PRIVATE | Modifiers.CONST | Modifiers.SYNTHETIC));
