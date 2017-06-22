@@ -393,7 +393,7 @@ public class FieldAccess implements IValue, INamed, IReceiverAccess
 
 		if (field.isEnumConstant())
 		{
-			return new EnumValue(this.position, field.getType(), this.name);
+			return new EnumValue(this.position, field);
 		}
 
 		this.field = field;
