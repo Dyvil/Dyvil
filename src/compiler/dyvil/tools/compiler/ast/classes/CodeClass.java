@@ -694,6 +694,7 @@ public class CodeClass extends AbstractClass
 			this.body.writeClassInit(writer);
 		}
 
+		this.metadata.writeClassInitPost(writer);
 	}
 
 	@Override
@@ -711,6 +712,7 @@ public class CodeClass extends AbstractClass
 			this.body.writeStaticInit(writer);
 		}
 
+		this.metadata.writeStaticInitPost(writer);
 	}
 
 	private void writeAnnotations(ClassWriter writer, long flags)

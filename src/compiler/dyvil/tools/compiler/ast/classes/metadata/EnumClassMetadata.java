@@ -11,6 +11,7 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.access.FieldAccess;
 import dyvil.tools.compiler.ast.expression.access.InitializerCall;
 import dyvil.tools.compiler.ast.expression.access.MethodCall;
+import dyvil.tools.compiler.ast.field.EnumConstant;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
@@ -75,28 +76,28 @@ public class EnumClassMetadata extends ClassMetadata
 		// Initialize values Method
 		this.initValuesMethod(classType, arrayType);
 
-		this.updateConstructors(markers, classType);
+		this.updateConstructors(classType);
 	}
 
-	protected void updateConstructors(MarkerList markers, IType classType)
+	protected void updateConstructors(IType classType)
 	{
 		// Replace super initializer calls from constructors
 		for (Candidate<IConstructor> candidates : IContext.resolveConstructors(null, classType, null))
 		{
 			final IConstructor constructor = candidates.getMember();
-			this.updateConstructor(constructor, markers);
+			this.updateConstructor(constructor);
 		}
 
 		if ((this.members & CONSTRUCTOR) == 0)
 		{
 			this.constructor = new CodeConstructor(this.theClass,
 			                                       new FlagModifierSet(Modifiers.PROTECTED | Modifiers.GENERATED));
-			this.updateConstructor(this.constructor, markers);
+			this.updateConstructor(this.constructor);
 			this.copyClassParameters(this.constructor);
 		}
 	}
 
-	private void updateConstructor(IConstructor constructor, MarkerList markers)
+	private void updateConstructor(IConstructor constructor)
 	{
 		// Prepend parameters and set super initializer
 		final CodeParameter nameParam = new CodeParameter(constructor, null, Names.name, Types.STRING,
@@ -149,6 +150,11 @@ public class EnumClassMetadata extends ClassMetadata
 				continue;
 			}
 
+			if (field instanceof EnumConstant)
+			{
+				((EnumConstant) field).setIndex(i);
+			}
+
 			values.add(new FieldAccess(field)); // static, no receiver
 		}
 	}
@@ -185,9 +191,9 @@ public class EnumClassMetadata extends ClassMetadata
 	}
 
 	@Override
-	public void writeStaticInit(MethodWriter writer) throws BytecodeException
+	public void writeStaticInitPost(MethodWriter writer) throws BytecodeException
 	{
-		super.writeStaticInit(writer);
+		super.writeStaticInitPost(writer);
 		this.valuesField.writeStaticInit(writer);
 	}
 

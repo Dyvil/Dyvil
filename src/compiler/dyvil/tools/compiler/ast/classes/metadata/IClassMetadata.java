@@ -12,6 +12,8 @@ import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
+import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
@@ -25,34 +27,34 @@ public interface IClassMetadata extends IClassCompilable, IResolvable
 	default void setInstanceField(IField field)
 	{
 	}
-	
+
 	default IField getInstanceField()
 	{
 		return null;
 	}
-	
+
 	default IConstructor getConstructor()
 	{
 		return null;
 	}
-	
+
 	// Annotations
-	
+
 	default RetentionPolicy getRetention()
 	{
 		return null;
 	}
-	
+
 	default boolean isTarget(ElementType target)
 	{
 		return false;
 	}
-	
+
 	default Set<ElementType> getTargets()
 	{
 		return null;
 	}
-	
+
 	// Resolve
 
 	@Override
@@ -72,7 +74,7 @@ public interface IClassMetadata extends IClassCompilable, IResolvable
 	default void resolveTypesHeader(MarkerList markers, IContext context)
 	{
 	}
-	
+
 	/**
 	 * Called after the class body went through RESOLVE_TYPES.<p/> Checks which synthetic members have to be generated
 	 */
@@ -87,12 +89,12 @@ public interface IClassMetadata extends IClassCompilable, IResolvable
 	default void resolveTypesGenerate(MarkerList markers, IContext context)
 	{
 	}
-	
+
 	@Override
 	default void resolve(MarkerList markers, IContext context)
 	{
 	}
-	
+
 	@Override
 	default void checkTypes(MarkerList markers, IContext context)
 	{
@@ -117,17 +119,25 @@ public interface IClassMetadata extends IClassCompilable, IResolvable
 	{
 		return false;
 	}
-	
+
 	default IDataMember resolveField(Name name)
 	{
 		return null;
 	}
-	
+
 	default void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
 	}
-	
+
 	default void getConstructorMatches(MatchList<IConstructor> list, ArgumentList arguments)
+	{
+	}
+
+	default void writeStaticInitPost(MethodWriter writer) throws BytecodeException
+	{
+	}
+
+	default void writeClassInitPost(MethodWriter writer) throws BytecodeException
 	{
 	}
 }

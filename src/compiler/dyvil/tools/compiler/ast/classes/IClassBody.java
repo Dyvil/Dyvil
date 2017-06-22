@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.ast.classes;
 
+import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.consumer.IMemberConsumer;
@@ -25,6 +26,12 @@ import dyvil.tools.parsing.marker.MarkerList;
 
 public interface IClassBody extends ASTNode, IResolvable, IClassList, IMemberConsumer<IField>
 {
+	@Override
+	default boolean acceptEnums()
+	{
+		return this.getEnclosingClass().hasModifier(Modifiers.ENUM);
+	}
+
 	// Enclosing Class
 
 	IClass getEnclosingClass();

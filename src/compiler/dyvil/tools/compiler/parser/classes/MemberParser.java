@@ -5,6 +5,7 @@ import dyvil.tools.compiler.ast.consumer.IMemberConsumer;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.modifiers.Modifier;
 import dyvil.tools.compiler.ast.modifiers.ModifierList;
+import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.annotation.ModifierParser;
 import dyvil.tools.compiler.parser.header.DyvilHeaderParser;
 import dyvil.tools.compiler.parser.statement.StatementListParser;
@@ -82,13 +83,6 @@ public final class MemberParser<T extends IDataMember> extends AbstractMemberPar
 				this.mode = END;
 				pm.pushParser(new ConstructorParser(this.consumer, this.modifiers, this.annotations), true);
 				return;
-			case DyvilKeywords.ENUM:
-				if (token.next().type() != DyvilKeywords.CONST)
-				{
-					break; // parse as class type modifier
-				}
-				// enum const
-				// Fallthrough
 			case DyvilKeywords.CONST:
 			case DyvilKeywords.LET:
 			case DyvilKeywords.VAR:
@@ -98,6 +92,15 @@ public final class MemberParser<T extends IDataMember> extends AbstractMemberPar
 					parser.withFlags(FieldParser.NO_PROPERTIES);
 				}
 				pm.pushParser(parser, true);
+				this.mode = END;
+				return;
+			case DyvilKeywords.CASE:
+				if (!ParserUtil.isIdentifier(token.next().type()))
+				{
+					break;
+				}
+
+				pm.pushParser(new EnumConstantParser(this.consumer), true);
 				this.mode = END;
 				return;
 			case DyvilKeywords.FUNC:

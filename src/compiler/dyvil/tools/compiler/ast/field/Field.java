@@ -363,25 +363,6 @@ public class Field extends Member implements IField
 			markers.add(marker);
 		}
 
-		if (this.hasModifier(Modifiers.ENUM_CONST))
-		{
-			final IClass enclosingClass = this.getEnclosingClass();
-			final IType classType = enclosingClass.getClassType();
-			if (!enclosingClass.hasModifier(Modifiers.ENUM_CLASS))
-			{
-				final Marker marker = Markers.semanticError(this.position, "field.enum.class", this.name);
-				marker.addInfo(Markers.getSemantic("method.enclosing_class", classType));
-				markers.add(marker);
-			}
-			else if (!Types.isSuperType(classType, this.type))
-			{
-				final Marker marker = Markers.semanticError(this.position, "field.enum.type.incompatible", this.name);
-				marker.addInfo(Markers.getSemantic("method.enclosing_class", classType));
-				marker.addInfo(Markers.getSemantic("field.type", this.type));
-				markers.add(marker);
-			}
-		}
-
 		if (this.property != null)
 		{
 			this.property.check(markers, context);
@@ -667,7 +648,7 @@ public class Field extends Member implements IField
 	@Override
 	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		super.toString(indent, buffer);
+		this.attributesToString(indent, buffer);
 		IDataMember.toString(indent, buffer, this, "field.type_ascription");
 
 		this.valueToString(indent, buffer);
@@ -676,6 +657,11 @@ public class Field extends Member implements IField
 		{
 			Property.formatBody(this.property, indent, buffer);
 		}
+	}
+
+	protected void attributesToString(@NonNull String indent, @NonNull StringBuilder buffer)
+	{
+		super.toString(indent, buffer);
 	}
 
 	protected void valueToString(@NonNull String indent, @NonNull StringBuilder buffer)

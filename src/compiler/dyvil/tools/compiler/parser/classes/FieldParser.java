@@ -78,16 +78,6 @@ public class FieldParser<T extends IDataMember> extends AbstractMemberParser imp
 			case DyvilSymbols.AT:
 				this.parseAnnotation(pm, token);
 				return;
-			case DyvilKeywords.ENUM:
-				if (token.next().type() != DyvilKeywords.CONST)
-				{
-					break;
-				}
-				// enum const
-				pm.skip();
-				this.getModifiers().addIntModifier(Modifiers.ENUM_CONST);
-				this.mode = NAME;
-				return;
 			case DyvilKeywords.CONST:
 				this.getModifiers().addIntModifier(Modifiers.CONST);
 				this.mode = NAME;
@@ -108,7 +98,7 @@ public class FieldParser<T extends IDataMember> extends AbstractMemberParser imp
 		case NAME:
 			if (!ParserUtil.isIdentifier(type))
 			{
-				pm.report(token, "variable.identifier");
+				pm.report(token, "field.identifier");
 				return;
 			}
 
