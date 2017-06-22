@@ -270,41 +270,8 @@ public final class ExternalClass extends AbstractClass
 	@Override
 	public IMethod getFunctionalMethod()
 	{
-		if (!this.isAbstract())
-		{
-			return null;
-		}
-
-		this.resolveGenerics();
-
-		if (this.body == null)
-		{
-			return null;
-		}
-
-		IMethod functionalMethod = this.body.getFunctionalMethod();
-		if (functionalMethod != null)
-		{
-			return functionalMethod;
-		}
-		for (int i = 0, count = this.body.methodCount(); i < count; i++)
-		{
-			final IMethod method = this.body.getMethod(i);
-			if (!method.isAbstract() || method.isObjectMethod())
-			{
-				continue;
-			}
-			if (functionalMethod != null)
-			{
-				return null;
-			}
-			functionalMethod = method;
-		}
-		if (functionalMethod != null)
-		{
-			this.body.setFunctionalMethod(functionalMethod);
-		}
-		return functionalMethod;
+		this.resolveMetadata();
+		return super.getFunctionalMethod();
 	}
 
 	@Override

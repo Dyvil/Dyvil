@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.classes;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.collection.immutable.ArrayList;
 import dyvil.math.MathUtils;
 import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
@@ -78,7 +79,6 @@ public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsu
 	// Caches
 	protected MethodLink[] namedMethodCache;
 	protected IMethod[]    implicitCache;
-	protected IMethod      functionalMethod;
 
 	public ClassBody(IClass iclass)
 	{
@@ -282,6 +282,44 @@ public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsu
 		return null;
 	}
 
+	public Iterable<IMethod> allMethods()
+	{
+		final ArrayList.Builder<IMethod> builder = new ArrayList.Builder<>(this.methodCount + this.propertyCount * 2
+			                                                                   + this.fieldCount);
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			builder.add(this.methods[i]);
+		}
+		for (int i = 0; i < this.propertyCount; i++)
+		{
+			addPropertyMethods(builder, this.properties[i]);
+		}
+		for (int i = 0; i < this.fieldCount; i++)
+		{
+			final IProperty prop = this.fields[i].getProperty();
+			if (prop != null)
+			{
+				addPropertyMethods(builder, prop);
+			}
+		}
+		return builder.build();
+	}
+
+	private static void addPropertyMethods(ArrayList.Builder<IMethod> builder, IProperty prop)
+	{
+		final IMethod getter = prop.getGetter();
+		if (getter != null)
+		{
+			builder.add(getter);
+		}
+
+		final IMethod setter = prop.getSetter();
+		if (setter != null)
+		{
+			builder.add(setter);
+		}
+	}
+
 	@Override
 	public void addMethod(IMethod method)
 	{
@@ -349,16 +387,6 @@ public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsu
 		{
 			method.checkImplicitMatch(list, value, targetType);
 		}
-	}
-
-	public IMethod getFunctionalMethod()
-	{
-		return this.functionalMethod;
-	}
-
-	public void setFunctionalMethod(IMethod method)
-	{
-		this.functionalMethod = method;
 	}
 
 	public boolean checkImplements(IMethod candidate, ITypeContext typeContext)

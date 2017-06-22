@@ -548,7 +548,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public boolean isImplicitConversion()
 	{
-		return this.modifiers != null && this.modifiers.hasIntModifier(Modifiers.IMPLICIT | Modifiers.STATIC);
+		return this.modifiers.hasIntModifier(Modifiers.IMPLICIT | Modifiers.STATIC);
+	}
+
+	@Override
+	public boolean isFunctional()
+	{
+		return this.modifiers.hasIntModifier(Modifiers.ABSTRACT) && !this.isObjectMethod();
 	}
 
 	@Override

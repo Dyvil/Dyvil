@@ -39,6 +39,8 @@ public interface IMethod extends ICallableMember, ITypeParametricMember, IContex
 
 	boolean isImplicitConversion();
 
+	boolean isFunctional();
+
 	boolean isObjectMethod();
 
 	/**

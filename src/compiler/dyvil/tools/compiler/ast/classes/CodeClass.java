@@ -5,6 +5,7 @@ import dyvil.collection.mutable.ArraySet;
 import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.asm.ASMConstants;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.TypeReference;
@@ -35,7 +36,6 @@ import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -340,16 +340,10 @@ public class CodeClass extends AbstractClass
 		}
 
 		// Partial copy in ExternalClass.getFunctionalMethod
-		IMethod functionalMethod = this.body.getFunctionalMethod();
-		if (functionalMethod != null)
+		IMethod functionalMethod = null;
+		for (IMethod method : this.body.allMethods())
 		{
-			return;
-		}
-
-		for (int i = 0, count = this.body.methodCount(); i < count; i++)
-		{
-			final IMethod method = this.body.getMethod(i);
-			if (!method.isAbstract() || method.isObjectMethod())
+			if (!method.isFunctional())
 			{
 				continue;
 			}
@@ -372,7 +366,7 @@ public class CodeClass extends AbstractClass
 
 		if (functionalMethod != null)
 		{
-			this.body.setFunctionalMethod(functionalMethod);
+			this.metadata.setFunctionalMethod(functionalMethod);
 			return;
 		}
 

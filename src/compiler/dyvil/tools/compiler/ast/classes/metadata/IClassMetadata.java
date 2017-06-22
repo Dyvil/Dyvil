@@ -38,6 +38,15 @@ public interface IClassMetadata extends IClassCompilable, IResolvable
 		return null;
 	}
 
+	default IMethod getFunctionalMethod()
+	{
+		return null;
+	}
+
+	default void setFunctionalMethod(IMethod method)
+	{
+	}
+
 	// Annotations
 
 	default RetentionPolicy getRetention()

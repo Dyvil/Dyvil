@@ -21,9 +21,49 @@ public class InterfaceMetadata implements IClassMetadata
 {
 	protected final IClass theClass;
 
+	private IMethod functionalMethod;
+	private boolean functionalMethodSearched;
+
 	public InterfaceMetadata(IClass theClass)
 	{
 		this.theClass = theClass;
+	}
+
+	@Override
+	public IMethod getFunctionalMethod()
+	{
+		if (this.functionalMethodSearched)
+		{
+			return this.functionalMethod;
+		}
+
+		this.functionalMethodSearched = true;
+		final ClassBody body = this.theClass.getBody();
+		if (body == null)
+		{
+			return null;
+		}
+
+		for (IMethod method : body.allMethods())
+		{
+			if (method.isFunctional())
+			{
+				if (this.functionalMethod != null)
+				{
+					// duplicate detected
+					return this.functionalMethod = null;
+				}
+				this.functionalMethod = method;
+			}
+		}
+		return this.functionalMethod;
+	}
+
+	@Override
+	public void setFunctionalMethod(IMethod functionalMethod)
+	{
+		this.functionalMethod = functionalMethod;
+		this.functionalMethodSearched = true;
 	}
 
 	@Override

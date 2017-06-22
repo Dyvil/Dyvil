@@ -502,22 +502,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public IMethod getFunctionalMethod()
 	{
-		// Copy in ExternalClass
-		if (!this.isAbstract())
-		{
-			return null;
-		}
-
-		if (this.body != null)
-		{
-			final IMethod method = this.body.getFunctionalMethod();
-			if (method != null)
-			{
-				return method;
-			}
-		}
-
-		return null;
+		return this.metadata.getFunctionalMethod();
 	}
 
 	@Override
