@@ -1,17 +1,10 @@
-package dyvil.tools.compiler.parser.header;
+package dyvil.tools.compiler.parser.classes;
 
-import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.consumer.IValueConsumer;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.method.IMethod;
-import dyvil.tools.compiler.ast.modifiers.Modifier;
-import dyvil.tools.compiler.ast.modifiers.ModifierList;
-import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.parser.ParserUtil;
-import dyvil.tools.compiler.parser.annotation.AnnotationParser;
-import dyvil.tools.compiler.parser.annotation.ModifierParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
 import dyvil.tools.compiler.parser.statement.StatementListParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
@@ -19,19 +12,19 @@ import dyvil.tools.compiler.transform.DyvilSymbols;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.IParserManager;
 import dyvil.tools.parsing.Name;
-import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 
-public class PropertyParser extends Parser implements IValueConsumer
+public class PropertyBodyParser extends AbstractMemberParser implements IValueConsumer
 {
 	// Modes
-	private static final int TAG                   = 0;
-	private static final int SEPARATOR             = 1;
-	private static final int SETTER_PARAMETER      = 2;
+	private static final int OPEN_BRACE            = 0;
+	private static final int TAG                   = 1;
+	private static final int SEPARATOR             = 2;
+	private static final int SETTER_PARAMETER      = 3;
 	private static final int SETTER_PARAMETER_NAME = 4;
-	private static final int SETTER_PARAMETER_END  = 8;
+	private static final int SETTER_PARAMETER_END  = 5;
 
 	// Targets
 	private static final byte GETTER      = 0;
@@ -43,16 +36,14 @@ public class PropertyParser extends Parser implements IValueConsumer
 	protected IProperty property;
 
 	// Metadata
-	private ModifierSet    modifiers;
-	private AnnotationList annotations;
-	private byte           target;
+	private byte target;
 
-	public PropertyParser(IProperty property)
+	public PropertyBodyParser(IProperty property)
 	{
 		this.property = property;
-		// this.mode = TAG; // pointless assignment to 0
+		// this.mode = OPEN_BRACE;
 	}
-	
+
 	@Override
 	public void parse(IParserManager pm, IToken token)
 	{
@@ -60,6 +51,12 @@ public class PropertyParser extends Parser implements IValueConsumer
 
 		switch (this.mode)
 		{
+		case OPEN_BRACE:
+			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
+			{
+				this.mode = TAG;
+			}
+			return;
 		case TAG:
 			switch (type)
 			{
@@ -96,29 +93,14 @@ public class PropertyParser extends Parser implements IValueConsumer
 				this.target = INITIALIZER;
 				return;
 			case DyvilSymbols.AT:
-				if (this.annotations == null)
-				{
-					this.annotations = new AnnotationList();
-				}
-
-				final Annotation annotation = new Annotation(token.raw());
-				this.annotations.add(annotation);
-				pm.pushParser(new AnnotationParser(annotation));
+				this.parseAnnotation(pm, token);
 				return;
 			}
-			
-			final Modifier modifier;
-			if ((modifier = ModifierParser.parseModifier(token, pm)) != null)
+
+			if (this.parseModifier(pm, token))
 			{
-				if (this.modifiers == null)
-				{
-					this.modifiers = new ModifierList();
-				}
-
-				this.modifiers.addModifier(modifier);
 				return;
 			}
-			
 
 			pm.report(token, "property.tag");
 			return;
@@ -181,7 +163,7 @@ public class PropertyParser extends Parser implements IValueConsumer
 			this.annotations = null;
 		}
 	}
-	
+
 	@Override
 	public void setValue(IValue value)
 	{

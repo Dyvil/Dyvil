@@ -16,7 +16,7 @@ import dyvil.tools.compiler.parser.ParserUtil;
 import dyvil.tools.compiler.parser.annotation.AnnotationParser;
 import dyvil.tools.compiler.parser.annotation.ModifierParser;
 import dyvil.tools.compiler.parser.expression.ExpressionParser;
-import dyvil.tools.compiler.parser.header.PropertyParser;
+import dyvil.tools.compiler.parser.classes.PropertyBodyParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
@@ -249,7 +249,7 @@ public final class ParameterListParser extends Parser implements ITypeConsumer
 			if (type == BaseSymbols.OPEN_CURLY_BRACKET && this.hasFlag(ALLOW_PROPERTIES))
 			{
 				final IProperty property = this.parameter.createProperty();
-				pm.pushParser(new PropertyParser(property));
+				pm.pushParser(new PropertyBodyParser(property), true);
 				this.mode = SEPARATOR;
 				return;
 			}
