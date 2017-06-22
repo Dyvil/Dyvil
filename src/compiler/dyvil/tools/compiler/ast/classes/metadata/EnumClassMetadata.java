@@ -15,7 +15,6 @@ import dyvil.tools.compiler.ast.field.EnumConstant;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IField;
-import dyvil.tools.compiler.ast.generic.GenericData;
 import dyvil.tools.compiler.ast.method.Candidate;
 import dyvil.tools.compiler.ast.method.CodeMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
@@ -74,7 +73,7 @@ public class EnumClassMetadata extends ClassMetadata
 		this.initValuesField(body, arrayType);
 
 		// Initialize values Method
-		this.initValuesMethod(classType, arrayType);
+		this.initValuesMethod(arrayType);
 
 		this.updateConstructors(classType);
 	}
@@ -159,19 +158,21 @@ public class EnumClassMetadata extends ClassMetadata
 		}
 	}
 
-	protected void initValuesMethod(IType classType, IType arrayType)
+	protected void initValuesMethod(IType arrayType)
 	{
 		this.valuesMethod = new CodeMethod(this.theClass, Names.values, arrayType,
 		                                   new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC));
+	}
 
-		final IValue valuesFieldAccess = new FieldAccess(this.valuesField);
-		final IMethod cloneMethod = IContext.resolveMethod(arrayType, valuesFieldAccess, Name.fromRaw("copy"),
-		                                                   ArgumentList.EMPTY);
-		final MethodCall cloneCall = new MethodCall(null, valuesFieldAccess, cloneMethod, ArgumentList.EMPTY);
+	@Override
+	public void resolve(MarkerList markers, IContext context)
+	{
+		super.resolve(markers, context);
 
-		cloneCall.setGenericData(new GenericData(cloneMethod, classType));
+		// $VALUES.copy()
+		final MethodCall cloneCall = new MethodCall(null, new FieldAccess(this.valuesField), Name.fromRaw("copy"), ArgumentList.EMPTY);
 
-		this.valuesMethod.setValue(cloneCall); // $VALUES.copy<EnumType>()
+		this.valuesMethod.setValue(cloneCall.resolve(markers, context));
 	}
 
 	@Override

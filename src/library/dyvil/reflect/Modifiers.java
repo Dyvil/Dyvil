@@ -116,7 +116,7 @@ public interface Modifiers
 	 */
 	int ENUM = 0x00004000;
 
-	int ENUM_CONST = ENUM | CONST;
+	int ENUM_CONST = PUBLIC | ENUM | CONST;
 
 	/**
 	 * Modifier used for constructors and fields of anonymous classes.

@@ -105,13 +105,13 @@ public final class AnnotationMetadata implements IClassMetadata
 
 		this.targets = EnumSet.noneOf(ElementType.class);
 
-		final ArrayExpr arrayExpr = (ArrayExpr) target.getArguments().get(0, Names.value);
-		if (arrayExpr == null)
+		final IValue argument = target.getArguments().get(0, Names.value);
+		if (!(argument instanceof ArrayExpr))
 		{
 			return;
 		}
 
-		final ArgumentList values = arrayExpr.getValues();
+		final ArgumentList values = ((ArrayExpr) argument).getValues();
 		final int size = values.size();
 
 		for (int i = 0; i < size; i++)
