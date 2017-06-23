@@ -902,6 +902,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		return this.internalName = this.name.qualified;
 	}
 
+	public void setInternalName(String internalName)
+	{
+		this.internalName = internalName;
+	}
+
 	@Override
 	public String getDescriptor()
 	{

@@ -64,6 +64,7 @@ public final class Types
 	public static final ClassType EXCEPTION         = new ClassType();
 	public static final ClassType RUNTIME_EXCEPTION = new ClassType();
 	public static final ClassType SERIALIZABLE      = new ClassType();
+	public static final ClassType ENUM              = new ClassType();
 
 	public static IClass PRIMITIVES_CLASS;
 
@@ -131,7 +132,7 @@ public final class Types
 		NONE_CLASS = Package.dyvilLangInternal.resolveClass("None");
 		OBJECT.theClass = OBJECT_CLASS = Package.javaLang.resolveClass("Object");
 		STRING.theClass = STRING_CLASS = Package.javaLang.resolveClass("String");
-		ENUM_CLASS = Package.javaLang.resolveClass("Enum");
+		ENUM.theClass = ENUM_CLASS = Package.javaLang.resolveClass("Enum");
 		THROWABLE.theClass = THROWABLE_CLASS = Package.javaLang.resolveClass("Throwable");
 		EXCEPTION.theClass = EXCEPTION_CLASS = Package.javaLang.resolveClass("Exception");
 		RUNTIME_EXCEPTION.theClass = RUNTIME_EXCEPTION_CLASS = Package.javaLang.resolveClass("RuntimeException");

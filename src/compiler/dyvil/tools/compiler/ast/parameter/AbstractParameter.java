@@ -50,6 +50,7 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	public AbstractParameter(Name name, IType type)
 	{
 		super(name, type);
+		this.label = name;
 	}
 
 	public AbstractParameter(ICallableMember callable, SourcePosition position, Name name, IType type)

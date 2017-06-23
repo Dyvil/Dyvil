@@ -285,7 +285,12 @@ public class FieldAccess implements IValue, INamed, IReceiverAccess
 	{
 		this.resolveReceiver(markers, context);
 
-		IValue v = this.resolveFieldAccess(markers, context);
+		if (this.field != null)
+		{
+			return this;
+		}
+
+		final IValue v = this.resolveFieldAccess(markers, context);
 		if (v != null)
 		{
 			return v;

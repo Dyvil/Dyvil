@@ -7,10 +7,9 @@ import dyvil.tools.compiler.ast.constructor.CodeConstructor;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
+import dyvil.tools.compiler.ast.expression.ClassOperator;
 import dyvil.tools.compiler.ast.expression.IValue;
-import dyvil.tools.compiler.ast.expression.access.FieldAccess;
-import dyvil.tools.compiler.ast.expression.access.InitializerCall;
-import dyvil.tools.compiler.ast.expression.access.MethodCall;
+import dyvil.tools.compiler.ast.expression.access.*;
 import dyvil.tools.compiler.ast.field.EnumConstant;
 import dyvil.tools.compiler.ast.field.Field;
 import dyvil.tools.compiler.ast.field.IDataMember;
@@ -22,6 +21,7 @@ import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.CodeParameter;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.Mutability;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -39,6 +39,8 @@ public class EnumClassMetadata extends ClassMetadata
 {
 	private Field      valuesField;
 	private CodeMethod valuesMethod;
+	private CodeMethod fromOrdMethod;
+	private CodeMethod fromNameMethod;
 
 	public EnumClassMetadata(IClass forClass)
 	{
@@ -73,7 +75,7 @@ public class EnumClassMetadata extends ClassMetadata
 		this.initValuesField(body, arrayType);
 
 		// Initialize values Method
-		this.initValuesMethod(arrayType);
+		this.initMethods(classType, arrayType);
 
 		this.updateConstructors(classType);
 	}
@@ -158,10 +160,25 @@ public class EnumClassMetadata extends ClassMetadata
 		}
 	}
 
-	protected void initValuesMethod(IType arrayType)
+	protected void initMethods(IType classType, IType arrayType)
 	{
+		// public static func values() -> [final EnumType]
 		this.valuesMethod = new CodeMethod(this.theClass, Names.values, arrayType,
 		                                   new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC));
+
+		final Name from = Name.fromRaw("from");
+
+		// public static func valueOf(ordinal: int) -> EnumType
+		this.fromOrdMethod = new CodeMethod(this.theClass, from, classType,
+		                                    new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC));
+		this.fromOrdMethod.setInternalName("valueOf");
+		this.fromOrdMethod.getParameters().add(new CodeParameter(Name.fromRaw("ordinal"), Types.INT));
+
+		// public static func valueOf(name: String) -> EnumType
+		this.fromNameMethod = new CodeMethod(this.theClass, from, classType,
+		                                     new FlagModifierSet(Modifiers.PUBLIC | Modifiers.STATIC));
+		this.fromNameMethod.setInternalName("valueOf");
+		this.fromNameMethod.getParameters().add(new CodeParameter(Name.fromRaw("name"), Types.STRING));
 	}
 
 	@Override
@@ -170,9 +187,24 @@ public class EnumClassMetadata extends ClassMetadata
 		super.resolve(markers, context);
 
 		// $VALUES.copy()
-		final MethodCall cloneCall = new MethodCall(null, new FieldAccess(this.valuesField), Name.fromRaw("copy"), ArgumentList.EMPTY);
+		final MethodCall cloneCall = new MethodCall(null, new FieldAccess(this.valuesField), Name.fromRaw("copy"),
+		                                            ArgumentList.EMPTY);
 
 		this.valuesMethod.setValue(cloneCall.resolve(markers, context));
+
+		final IParameter ordParam = this.fromOrdMethod.getParameters().get(0);
+		final IParameter nameParam = this.fromNameMethod.getParameters().get(0);
+
+		// $VALUES[ordinal]
+		final SubscriptAccess getCall = new SubscriptAccess(null, new FieldAccess(this.valuesField),
+		                                                    new ArgumentList(new FieldAccess(ordParam)));
+		this.fromOrdMethod.setValue(getCall.resolve(markers, this.fromOrdMethod));
+
+		// Enum.valueOf(class<EnumType>, name)
+		final MethodCall valueOfCall = new MethodCall(null, new ClassAccess(Types.ENUM), Name.fromRaw("valueOf"),
+		                                              new ArgumentList(new ClassOperator(this.theClass.getClassType()),
+		                                                               new FieldAccess(nameParam)));
+		this.fromNameMethod.setValue(valueOfCall.resolve(markers, this.fromNameMethod));
 	}
 
 	@Override
@@ -185,10 +217,9 @@ public class EnumClassMetadata extends ClassMetadata
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
 		super.getMethodMatches(list, receiver, name, arguments);
-		if (name == Names.values)
-		{
-			this.valuesMethod.checkMatch(list, receiver, name, arguments);
-		}
+		this.valuesMethod.checkMatch(list, receiver, name, arguments);
+		this.fromOrdMethod.checkMatch(list, receiver, name, arguments);
+		this.fromNameMethod.checkMatch(list, receiver, name, arguments);
 	}
 
 	@Override
@@ -204,5 +235,7 @@ public class EnumClassMetadata extends ClassMetadata
 		super.write(writer);
 		this.valuesField.write(writer);
 		this.valuesMethod.write(writer);
+		this.fromOrdMethod.write(writer);
+		this.fromNameMethod.write(writer);
 	}
 }
