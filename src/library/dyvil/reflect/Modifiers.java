@@ -127,12 +127,12 @@ public interface Modifiers
 
 	int OBJECT = 0x00010000;
 
-	int ENUM_CLASS = ENUM | STATIC;
+	int ENUM_CLASS = ENUM;
 
 	/**
 	 * <i>Dyvil</i> {@code object} modifier. If a class is marked with this modifier, it is a singleton object class.
 	 */
-	int OBJECT_CLASS = OBJECT | FINAL | STATIC;
+	int OBJECT_CLASS = OBJECT | FINAL;
 
 	/**
 	 * <i>Dyvil</i> {@code object} modifier. If a class is marked with this modifier, it is a case class. This modifier
@@ -146,7 +146,7 @@ public interface Modifiers
 	 */
 	int FUNCTIONAL = 0x00040000;
 
-	int INTERFACE_CLASS = INTERFACE | STATIC | ABSTRACT;
+	int INTERFACE_CLASS = INTERFACE | ABSTRACT;
 
 	int TRAIT = 0x00080000;
 

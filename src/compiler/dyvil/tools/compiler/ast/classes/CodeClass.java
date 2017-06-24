@@ -209,7 +209,11 @@ public class CodeClass extends AbstractClass
 		if (this.enclosingClass != null && !this.hasModifier(Modifiers.STATIC))
 		{
 			this.modifiers.addIntModifier(Modifiers.STATIC);
-			markers.add(Markers.semantic(this.position, "class.inner.not_static", this.name));
+			if ((this.modifiers.toFlags() & Modifiers.CLASS_TYPE_MODIFIERS) == 0)
+			{
+				// is a plain old class, not an interface, trait, annotation, object or enum
+				markers.add(Markers.semantic(this.position, "class.inner.not_static", this.name));
+			}
 		}
 
 		if (this.annotations != null)
