@@ -5,6 +5,7 @@ import dyvil.collection.Set;
 import dyvil.collection.immutable.ArraySet;
 import dyvil.collection.mutable.HashMap;
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.asm.*;
 import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
@@ -28,7 +29,10 @@ import dyvil.tools.compiler.ast.header.IHeaderUnit;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
-import dyvil.tools.compiler.ast.parameter.*;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
+import dyvil.tools.compiler.ast.parameter.ClassParameter;
+import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.structure.RootPackage;
 import dyvil.tools.compiler.ast.type.IType;
@@ -41,7 +45,6 @@ import dyvil.tools.compiler.backend.visitor.*;
 import dyvil.tools.compiler.sources.DyvilFileType;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -579,32 +582,37 @@ public final class ExternalClass extends AbstractClass
 		case "<clinit>":
 			return null;
 		case "<init>":
-			ExternalConstructor constructor = new ExternalConstructor(this);
-			constructor.setModifiers(readModifiers(access));
+			if (this.hasModifier(Modifiers.ENUM))
+			{
+				return null;
+			}
+
+			final ExternalConstructor ctor = new ExternalConstructor(this);
+			ctor.setModifiers(readModifiers(access));
 
 			if (signature != null)
 			{
-				readConstructorType(signature, constructor);
+				readConstructorType(signature, ctor);
 			}
 			else
 			{
-				readConstructorType(desc, constructor);
+				readConstructorType(desc, ctor);
 
 				if (exceptions != null)
 				{
-					readExceptions(exceptions, constructor.getExceptions());
+					readExceptions(exceptions, ctor.getExceptions());
 				}
 			}
 
 			if ((access & Modifiers.ACC_VARARGS) != 0)
 			{
-				final ParameterList parameterList = constructor.getExternalParameterList();
+				final ParameterList parameterList = ctor.getExternalParameterList();
 				parameterList.get(parameterList.size() - 1).setVarargs();
 			}
 
-			this.body.addConstructor(constructor);
+			this.body.addConstructor(ctor);
 
-			return new SimpleMethodVisitor(constructor);
+			return new SimpleMethodVisitor(ctor);
 		}
 
 		if (this.isAnnotation() && (access & Modifiers.STATIC) == 0)

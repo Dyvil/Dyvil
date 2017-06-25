@@ -563,6 +563,8 @@ public class CodeClass extends AbstractClass
 			this.body.write(writer);
 		}
 
+		this.metadata.writePost(writer);
+
 		// Create the static <clinit> method
 		MethodWriter initWriter = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.STATIC, "<clinit>", "()V",
 		                                                                          null, null));

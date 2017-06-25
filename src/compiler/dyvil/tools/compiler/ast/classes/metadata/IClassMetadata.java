@@ -12,6 +12,7 @@ import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
+import dyvil.tools.compiler.backend.ClassWriter;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.phase.IResolvable;
@@ -139,6 +140,10 @@ public interface IClassMetadata extends IClassCompilable, IResolvable
 	}
 
 	default void getConstructorMatches(MatchList<IConstructor> list, ArgumentList arguments)
+	{
+	}
+
+	default void writePost(ClassWriter writer)
 	{
 	}
 

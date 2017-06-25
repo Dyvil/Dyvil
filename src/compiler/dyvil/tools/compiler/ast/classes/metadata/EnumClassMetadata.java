@@ -230,9 +230,9 @@ public class EnumClassMetadata extends ClassMetadata
 	}
 
 	@Override
-	public void write(ClassWriter writer) throws BytecodeException
+	public void writePost(ClassWriter writer) throws BytecodeException
 	{
-		super.write(writer);
+		super.writePost(writer);
 		this.valuesField.write(writer);
 		this.valuesMethod.write(writer);
 		this.fromOrdMethod.write(writer);

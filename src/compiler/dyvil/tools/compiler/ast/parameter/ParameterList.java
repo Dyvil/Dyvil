@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.collection.iterator.ArrayIterator;
+import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IVariable;
@@ -278,7 +279,13 @@ public class ParameterList implements Iterable<IParameter>, IResolvable
 	{
 		for (int i = 0; i < this.size; i++)
 		{
-			final IType parameterType = this.parameters[i].getType();
+			final IParameter parameter = this.parameters[i];
+			if (parameter.hasModifier(Modifiers.SYNTHETIC))
+			{
+				return true;
+			}
+
+			final IType parameterType = parameter.getType();
 			if (parameterType.isGenericType() || parameterType.hasTypeVariables())
 			{
 				return true;
@@ -291,7 +298,11 @@ public class ParameterList implements Iterable<IParameter>, IResolvable
 	{
 		for (int i = 0; i < this.size; i++)
 		{
-			this.parameters[i].getType().appendSignature(builder, false);
+			final IParameter parameter = this.parameters[i];
+			if (!parameter.hasModifier(Modifiers.SYNTHETIC))
+			{
+				parameter.getType().appendSignature(builder, false);
+			}
 		}
 	}
 
