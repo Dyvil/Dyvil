@@ -26,9 +26,10 @@ public class PatternParser extends Parser implements ITypeConsumer
 {
 	private static final int PATTERN         = 0;
 	private static final int NEGATIVE_NUMBER = 1;
-	private static final int TYPE_END        = 4;
-	private static final int TUPLE_END       = 8;
-	private static final int CASE_CLASS_END  = 16;
+	private static final int ENUM_IDENTIFIER = 2;
+	private static final int TYPE_END        = 3;
+	private static final int TUPLE_END       = 4;
+	private static final int CASE_CLASS_END  = 5;
 
 	private static final int OPERATOR_OR  = 1;
 	private static final int OPERATOR_AND = 2;
@@ -119,6 +120,9 @@ public class PatternParser extends Parser implements ITypeConsumer
 				this.mode = TUPLE_END;
 				pm.pushParser(new PatternListParser(tuplePattern));
 				return;
+			case BaseSymbols.DOT:
+				this.mode = ENUM_IDENTIFIER;
+				return;
 			}
 			if (ParserUtil.isIdentifier(type))
 			{
@@ -164,6 +168,16 @@ public class PatternParser extends Parser implements ITypeConsumer
 				pm.reparse();
 				return;
 			}
+		case ENUM_IDENTIFIER:
+			if (ParserUtil.isIdentifier(type))
+			{
+				this.pattern = new EnumPattern(token.raw(), token.nameValue());
+				this.mode = END;
+				return;
+			}
+
+			pm.report(token, "pattern.enum.identifier");
+			return;
 		case TYPE_END:
 			if (type == BaseSymbols.OPEN_PARENTHESIS)
 			{

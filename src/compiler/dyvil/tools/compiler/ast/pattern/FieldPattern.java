@@ -177,7 +177,7 @@ public class FieldPattern implements IPattern
 			return;
 		}
 
-		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/lang/Predef", "$eq$eq",
+		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/lang/Objects", "$eq$eq",
 		                       "(Ljava/lang/Object;Ljava/lang/Object;)Z", false);
 		writer.visitJumpInsn(Opcodes.IFEQ, elseLabel);
 	}
