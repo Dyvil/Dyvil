@@ -11,10 +11,10 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.pattern.constant.*;
 import dyvil.tools.compiler.ast.type.IType;
-import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
+import dyvil.tools.compiler.transform.CaseClasses;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public class FieldPattern implements IPattern
@@ -127,7 +127,7 @@ public class FieldPattern implements IPattern
 		final IType fieldType = this.dataMember.getType();
 		final int lineNumber = this.lineNumber();
 
-		IType commonType = Types.ANY;
+		final IType commonType;
 		if (matchedType.isPrimitive())
 		{
 			commonType = matchedType;
@@ -145,6 +145,10 @@ public class FieldPattern implements IPattern
 				writer.visitJumpInsn(Opcodes.IFEQ, elseLabel);
 			}
 		}
+		else
+		{
+			commonType = Types.ANY;
+		}
 
 		IPattern.loadVar(writer, varIndex, matchedType);
 
@@ -152,34 +156,7 @@ public class FieldPattern implements IPattern
 		this.dataMember.writeGet(writer, null, lineNumber);
 		fieldType.writeCast(writer, commonType, lineNumber);
 
-		if (commonType.isPrimitive())
-		{
-			switch (commonType.getTypecode())
-			{
-			case PrimitiveType.BOOLEAN_CODE:
-			case PrimitiveType.BYTE_CODE:
-			case PrimitiveType.SHORT_CODE:
-			case PrimitiveType.CHAR_CODE:
-			case PrimitiveType.INT_CODE:
-				writer.visitJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
-				return;
-			case PrimitiveType.LONG_CODE:
-				writer.visitJumpInsn(Opcodes.IF_LCMPNE, elseLabel);
-				return;
-			case PrimitiveType.FLOAT_CODE:
-				writer.visitJumpInsn(Opcodes.IF_FCMPNE, elseLabel);
-				return;
-			case PrimitiveType.DOUBLE_CODE:
-				writer.visitJumpInsn(Opcodes.IF_DCMPNE, elseLabel);
-				return;
-			}
-
-			return;
-		}
-
-		writer.visitMethodInsn(Opcodes.INVOKESTATIC, "dyvil/lang/Objects", "$eq$eq",
-		                       "(Ljava/lang/Object;Ljava/lang/Object;)Z", false);
-		writer.visitJumpInsn(Opcodes.IFEQ, elseLabel);
+		CaseClasses.writeIFNE(writer, commonType, elseLabel);
 	}
 
 	@Override
