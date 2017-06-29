@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.context.IDefaultContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.access.InitializerCall;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.field.IVariable;
 import dyvil.tools.compiler.ast.generic.GenericData;
@@ -396,19 +397,26 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 	}
 
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		super.toString(prefix, buffer);
+		super.toString(indent, buffer);
 		buffer.append("init");
 
-		this.parameters.toString(prefix, buffer);
+		this.parameters.toString(indent, buffer);
+
+		final InitializerCall init = this.getInitializer();
+		if (init != null)
+		{
+			Formatting.appendSeparator(buffer, "initializer.call.colon", ':');
+			init.toString(indent, buffer);
+		}
 
 		if (this.exceptions != null && this.exceptions.size() > 0)
 		{
-			String throwsPrefix = prefix;
+			String throwsPrefix = indent;
 			if (Formatting.getBoolean("constructor.throws.newline"))
 			{
-				throwsPrefix = Formatting.getIndent("constructor.throws.indent", prefix);
+				throwsPrefix = Formatting.getIndent("constructor.throws.indent", indent);
 				buffer.append('\n').append(throwsPrefix).append("throws ");
 			}
 			else
@@ -421,13 +429,10 @@ public abstract class AbstractConstructor extends Member implements IConstructor
 		}
 
 		final IValue value = this.getValue();
-		if (value != null)
+		if (value != null && !Util.formatStatementList(indent, buffer, value))
 		{
-			if (!Util.formatStatementList(prefix, buffer, value))
-			{
-				buffer.append(" = ");
-				value.toString(prefix, buffer);
-			}
+			buffer.append(" = ");
+			value.toString(indent, buffer);
 		}
 
 		if (Formatting.getBoolean("constructor.semicolon"))

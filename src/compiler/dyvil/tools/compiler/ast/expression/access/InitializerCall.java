@@ -161,7 +161,7 @@ public class InitializerCall implements ICall
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		markers.add(Markers.semanticError(this.position, "initializercall.invalid"));
+		markers.add(Markers.semanticError(this.position, "initializer.call.invalid"));
 		this.checkNoError(markers, context);
 	}
 
@@ -201,7 +201,7 @@ public class InitializerCall implements ICall
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		buffer.append(this.isSuper ? "super.init" : "this.init");
+		buffer.append(this.isSuper ? "super" : "this");
 		this.arguments.toString(prefix, buffer);
 	}
 }
