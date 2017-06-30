@@ -13,10 +13,7 @@ class FlatMapConverter
 )
 implements NodeVisitor
 {
-	public init(map: Map<String, Object>)
-	{
-		this.init(map, "")
-	}
+	public init(map: Map<String, Object>) : this(map, "")
 
 	protected func getName(name: Name) -> String
 	{

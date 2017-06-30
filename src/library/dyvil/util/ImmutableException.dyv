@@ -7,7 +7,7 @@ package dyvil.util
  */
 class ImmutableException extends RuntimeException
 {
-	public init() { super.init() }
+	public init() : super()
 
-	public init(message: String) { super.init(message) }
+	public init(message: String) : super(message)
 }

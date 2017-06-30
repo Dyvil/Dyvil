@@ -49,9 +49,8 @@ class ConstructorTest
 			this.order += "init block"
 		}
 
-		public init()
+		public init() : this(1)
 		{
-			this.init(1)
 			this.order += "init() body"
 		}
 

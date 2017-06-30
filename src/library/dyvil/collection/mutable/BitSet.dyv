@@ -23,35 +23,17 @@ class BitSet extends AbstractBitSet implements MutableSet<int>
 
 	// Constructors
 
-	public init()
-	{
-		super.init()
-	}
+	public init() : super()
 
-	public init(capacity: int)
-	{
-		super.init(capacity)
-	}
+	public init(capacity: int) : super(capacity)
 
-	public init(elements: [int])
-	{
-		super.init(elements)
-	}
+	public init(elements: [int]) : super(elements)
 
-	public init(iterable: Iterable<+int>)
-	{
-		super.init(iterable)
-	}
+	public init(iterable: Iterable<+int>) : super(iterable)
 
-	public init(iterable: SizedIterable<+int>)
-	{
-		super.init(iterable)
-	}
+	public init(iterable: SizedIterable<+int>) : super(iterable)
 
-	public init(bitSet: AbstractBitSet)
-	{
-		super.init(bitSet)
-	}
+	public init(bitSet: AbstractBitSet) : super(bitSet)
 
 	// Implementation Methods
 

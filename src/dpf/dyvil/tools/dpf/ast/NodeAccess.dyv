@@ -13,9 +13,8 @@ implements dyvil.tools.dpf.model.NodeAccess, NodeElement
 {
 	protected var element: NodeElement! = null
 	
-	public init(name: Name, element: NodeElement)
+	public init(name: Name, element: NodeElement) : this(name)
 	{
-		this.init(name)
 		this.element = element
 	}
 

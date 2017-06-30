@@ -6,15 +6,9 @@ internal class JavaRandom extends Random implements dyvil.random.Random
 {
 	private const serialVersionUID: long = -6648049590269700311L;
 
-	public init()
-	{
-		super.init()
-	}
+	public init() : super()
 
-	public init(seed: long)
-	{
-		super.init(seed)
-	}
+	public init(seed: long) : super(seed)
 
 	override func next(bits: int) -> int = super<Random>.next(bits)
 
