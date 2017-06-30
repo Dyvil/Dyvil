@@ -116,7 +116,15 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 	@Override
 	public boolean isResolved()
 	{
-		return this.returnType != null && this.returnType.isResolved();
+		for (int i = 0; i < this.caseCount; i++)
+		{
+			if (!this.cases[i].action.isResolved())
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	@Override
@@ -710,8 +718,8 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 	/**
 	 * Generates a {@code lookupswitch} instruction
 	 */
-	private void writeLookupSwitch(MethodWriter writer, Collection<KeyCache.Entry> entries, Label defaultLabel, int cases)
-		throws BytecodeException
+	private void writeLookupSwitch(MethodWriter writer, Collection<KeyCache.Entry> entries, Label defaultLabel,
+		                              int cases) throws BytecodeException
 	{
 		if (cases <= 0)
 		{
@@ -738,8 +746,8 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 	/**
 	 * Generates a {@code tableswitch} instruction
 	 */
-	private void writeTableSwitch(MethodWriter writer, Collection<KeyCache.Entry> entries, Label defaultLabel, int low, int high)
-		throws BytecodeException
+	private void writeTableSwitch(MethodWriter writer, Collection<KeyCache.Entry> entries, Label defaultLabel, int low,
+		                             int high) throws BytecodeException
 	{
 		assert defaultLabel != null;
 
