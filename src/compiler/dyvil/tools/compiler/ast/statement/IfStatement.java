@@ -31,7 +31,7 @@ public class IfStatement implements IValue
 
 	// Metadata
 	private SourcePosition position;
-	private IType         commonType;
+	private IType          commonType;
 
 	public IfStatement(SourcePosition position)
 	{
@@ -114,13 +114,9 @@ public class IfStatement implements IValue
 			return this.commonType;
 		}
 
-		if (this.then != null)
+		if (this.then != null && this.elseThen != null)
 		{
-			if (this.elseThen != null)
-			{
-				return this.commonType = Types.combine(this.then.getType(), this.elseThen.getType());
-			}
-			return this.commonType = this.then.getType();
+			return this.commonType = Types.combine(this.then.getType(), this.elseThen.getType());
 		}
 		return this.commonType = Types.VOID;
 	}
@@ -128,23 +124,24 @@ public class IfStatement implements IValue
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		if (this.then == null)
+		if ((this.then == null || this.elseThen == null) && !Types.isVoid(type))
 		{
-			return this;
+			return null;
 		}
 
 		this.commonType = type;
 
-		this.then = TypeChecker.convertValue(this.then, type, typeContext, markers, context,
-		                                     TypeChecker.markerSupplier("if.then.type"));
-
-		if (this.elseThen == null)
+		if (this.then != null)
 		{
-			return this;
+			this.then = TypeChecker.convertValue(this.then, type, typeContext, markers, context,
+			                                     TypeChecker.markerSupplier("if.then.type"));
 		}
 
-		this.elseThen = TypeChecker.convertValue(this.elseThen, type, typeContext, markers, context,
-		                                         TypeChecker.markerSupplier("if.else.type"));
+		if (this.elseThen != null)
+		{
+			this.elseThen = TypeChecker.convertValue(this.elseThen, type, typeContext, markers, context,
+			                                         TypeChecker.markerSupplier("if.else.type"));
+		}
 
 		return this;
 	}
@@ -153,16 +150,16 @@ public class IfStatement implements IValue
 	public boolean isType(IType type)
 	{
 		return Types.isVoid(type) // void is always valid
-			       || !(this.then != null && !this.then.isType(type)) // check then action
-				          && (this.elseThen == null || this.elseThen.isType(type)); // check else action
+			       || (this.then != null && this.elseThen != null // both branches are present and conforming
+				           && this.then.isType(type) && this.elseThen.isType(type));
 	}
 
 	@Override
 	public int getTypeMatch(IType type, IImplicitContext implicitContext)
 	{
-		if (this.elseThen == null)
+		if (this.then == null || this.elseThen == null)
 		{
-			return this.then.getTypeMatch(type, implicitContext);
+			return IValue.MISMATCH;
 		}
 
 		return Math.min(TypeChecker.getTypeMatch(this.then, type, implicitContext),
@@ -322,22 +319,25 @@ public class IfStatement implements IValue
 	@Override
 	public void writeExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
+		if (type == null)
+		{
+			type = this.getType();
+		}
+
 		if (Types.isVoid(type))
 		{
 			this.writeStatement(writer);
 			return;
 		}
 
-		final IType commonType = this.getType();
-
-		dyvil.tools.asm.Label elseStart = new dyvil.tools.asm.Label();
-		dyvil.tools.asm.Label elseEnd = new dyvil.tools.asm.Label();
-		Object commonFrameType = commonType.getFrameType();
+		final dyvil.tools.asm.Label elseStart = new dyvil.tools.asm.Label();
+		final dyvil.tools.asm.Label elseEnd = new dyvil.tools.asm.Label();
+		final Object commonFrameType = type.getFrameType();
 
 		// Condition
 		this.condition.writeInvJump(writer, elseStart);
 		// If Block
-		this.then.writeExpression(writer, commonType);
+		this.then.writeExpression(writer, type);
 
 		if (!writer.hasReturn())
 		{
@@ -350,11 +350,11 @@ public class IfStatement implements IValue
 		// Else Block
 		if (this.elseThen == null)
 		{
-			commonType.writeDefaultValue(writer);
+			type.writeDefaultValue(writer);
 		}
 		else
 		{
-			this.elseThen.writeExpression(writer, commonType);
+			this.elseThen.writeExpression(writer, type);
 		}
 
 		if (!writer.hasReturn())
@@ -374,16 +374,22 @@ public class IfStatement implements IValue
 			return;
 		}
 
-		dyvil.tools.asm.Label elseStart = new dyvil.tools.asm.Label();
+		final dyvil.tools.asm.Label elseStart = new dyvil.tools.asm.Label();
 
 		if (this.elseThen != null)
 		{
-			dyvil.tools.asm.Label elseEnd = new dyvil.tools.asm.Label();
+			final dyvil.tools.asm.Label elseEnd = new dyvil.tools.asm.Label();
+
 			// Condition
 			this.condition.writeInvJump(writer, elseStart);
 			// If Block
 			this.then.writeExpression(writer, Types.VOID);
-			writer.visitJumpInsn(Opcodes.GOTO, elseEnd);
+
+			if (!writer.hasReturn())
+			{
+				writer.visitJumpInsn(Opcodes.GOTO, elseEnd);
+			}
+
 			writer.visitTargetLabel(elseStart);
 			// Else Block
 			this.elseThen.writeExpression(writer, Types.VOID);
