@@ -68,7 +68,7 @@ interface SourcePosition extends Comparable<SourcePosition>
 
 	// Base Implementation
 
-	private case class Base
+	private static case class Base
 	(
 		let startLine: int
 		let endLine: int
@@ -88,7 +88,7 @@ interface SourcePosition extends Comparable<SourcePosition>
 			return this.startLine == that.startLine && this.endLine == that.endLine && this.startColumn == that.startColumn && this.endColumn == that.endColumn
 		}
 
-		override func toString() -> String = "SourcePosition(\(this.startLine), \(this.endLine), \(this.startColumn), \(this.endColumn)"
+		override func toString() -> String = "SourcePosition(\(this.startLine), \(this.endLine), \(this.startColumn), \(this.endColumn))"
 	}
 }
 

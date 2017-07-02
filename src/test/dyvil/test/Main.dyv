@@ -19,6 +19,7 @@ public class Main
 			CaseClassTest()
 			ConstructorTest()
 			DPFTest()
+			EnumTest()
 			ExtensionTest()
 			FibonacciTest()
 			ForTest()

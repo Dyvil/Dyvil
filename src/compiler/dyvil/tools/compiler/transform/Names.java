@@ -17,6 +17,10 @@ public final class Names
 	public static final Name subscript_$amp = Name.from("subscript_&", "subscript_$amp");
 	public static final Name subscript_$eq  = Name.from("subscript_=", "subscript_$eq");
 	public static final Name value          = Name.fromRaw("value");
+	public static final Name values         = Name.fromRaw("values");
+	public static final Name $VALUES        = Name.fromRaw("$VALUES");
+	public static final Name name           = Name.fromRaw("name");
+	public static final Name ordinal        = Name.fromRaw("ordinal");
 	public static final Name length         = Name.fromRaw("length");
 	public static final Name equals         = Name.fromRaw("equals");
 	public static final Name hashCode       = Name.fromRaw("hashCode");

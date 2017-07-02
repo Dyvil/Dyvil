@@ -5,7 +5,7 @@ abstract class Tuple
 	private init() {} // no instances
 
 	// Wrapper class for a Tuple of more than MAX_ARITY entries, stored in an array
-	case class OfN(private let data: any! ...)
+	static case class OfN(private let data: any! ...)
 	{
 		func subscript(n: int) -> any! = this.data[n]
 
@@ -19,14 +19,14 @@ abstract class Tuple
 		}
 	}
 
-	case class Of1<type +T1>(public let _1: T1)
+	static case class Of1<type +T1>(public let _1: T1)
 	{
 		func unapply() -> Of1<T1> = this
 
 		override func toString() -> String = "Tuple(\(this._1))"
 	}
 
-	case class Of2<type +T1, type +T2>
+	static case class Of2<type +T1, type +T2>
 	(
 		public let _1: T1
 		public let _2: T2
@@ -45,7 +45,7 @@ abstract class Tuple
 		override func hashCode() -> int = Entry.entryHashCode(this)
 	}
 
-	case class Of3<type +T1, type +T2, type +T3>
+	static case class Of3<type +T1, type +T2, type +T3>
 	(
 		public let _1: T1
 		public let _2: T2
@@ -70,7 +70,7 @@ abstract class Tuple
 	#import("Base.dgs")
 	#for (ARITY <- 4 .. MAX_ARITY) {
 		@Immutable
-		case class Of#(ARITY) <type +T1#for (INDEX <- 2 .. ARITY) {, type +T#(INDEX)}>
+		static case class Of#(ARITY) <type +T1#for (INDEX <- 2 .. ARITY) {, type +T#(INDEX)}>
 		(
 			public let _1: T1#for (INDEX <- 2 .. ARITY) {, public let _#(INDEX): T#(INDEX)}
 

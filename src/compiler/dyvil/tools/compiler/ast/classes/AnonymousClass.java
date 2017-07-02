@@ -2,12 +2,13 @@ package dyvil.tools.compiler.ast.classes;
 
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.classes.metadata.IClassMetadata;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.field.*;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
-import dyvil.tools.compiler.ast.modifiers.EmptyModifiers;
+import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -17,7 +18,6 @@ import dyvil.tools.compiler.backend.MethodWriterImpl;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.transform.CaptureHelper;
 import dyvil.tools.parsing.Name;
-import dyvil.source.position.SourcePosition;
 
 public class AnonymousClass extends CodeClass
 {
@@ -32,7 +32,7 @@ public class AnonymousClass extends CodeClass
 		this.metadata = new AnonymousClassMetadata(this);
 		this.body = new ClassBody(this);
 		this.position = position;
-		this.modifiers = EmptyModifiers.INSTANCE;
+		this.modifiers = new FlagModifierSet(Modifiers.STATIC);
 	}
 
 	@Override

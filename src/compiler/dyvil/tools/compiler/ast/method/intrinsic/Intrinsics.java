@@ -5,6 +5,7 @@ import dyvil.reflect.Opcodes;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.expression.ArrayExpr;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.StringInterpolationExpr;
 import dyvil.tools.compiler.ast.expression.intrinsic.*;
 import dyvil.tools.compiler.ast.expression.optional.NullCoalescingOperator;
 import dyvil.tools.compiler.ast.expression.optional.OptionalChainOperator;
@@ -14,6 +15,8 @@ import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
+import dyvil.tools.compiler.transform.Names;
+import dyvil.tools.parsing.Name;
 
 public class Intrinsics
 {
@@ -26,9 +29,9 @@ public class Intrinsics
 		static
 		{
 			final ParameterList params = Types.INTRINSIC_CLASS.getParameters();
-			VALUE = params.get(0);
-			STRINGS = params.get(1);
-			COMPILER_CODE = params.get(2);
+			VALUE = params.get(Names.value);
+			STRINGS = params.get(Name.fromRaw("strings"));
+			COMPILER_CODE = params.get(Name.fromRaw("compilerCode"));
 		}
 	}
 
@@ -57,7 +60,7 @@ public class Intrinsics
 			return new NullCoalescingOperator(lhs, arguments.getFirst());
 		// Strings
 		case Intrinsic.STRING_CONCAT:
-			return StringConcatExpr.apply(lhs, arguments.getFirst());
+			return StringInterpolationExpr.apply(lhs, arguments.getFirst());
 		// Increment / Decrement
 		case Intrinsic.PRE_INCREMENT:
 			return IncOperator.apply(arguments.getFirst(), 1, true);
@@ -74,13 +77,13 @@ public class Intrinsics
 	public static IntrinsicData readAnnotation(IMethod method, IAnnotation annotation)
 	{
 		final ArgumentList arguments = annotation.getArguments();
-		final IValue compilerCode = arguments.get(2, LazyFields.COMPILER_CODE);
+		final IValue compilerCode = arguments.get(LazyFields.COMPILER_CODE);
 		if (compilerCode != null && compilerCode.valueTag() == IValue.INT)
 		{
 			return new CompilerIntrinsic(compilerCode.intValue());
 		}
 
-		final IValue value = arguments.get(0, LazyFields.VALUE);
+		final IValue value = arguments.get(LazyFields.VALUE);
 		if (value == null || value.valueTag() != IValue.ARRAY)
 		{
 			return null;
@@ -118,7 +121,7 @@ public class Intrinsics
 
 		if (size > insnCount)
 		{
-			IValue stringValue = arguments.get(1, LazyFields.STRINGS);
+			IValue stringValue = arguments.get(LazyFields.STRINGS);
 			ArrayExpr strings = (ArrayExpr) stringValue;
 
 			return readComplex(method, insnCount, ints, strings);

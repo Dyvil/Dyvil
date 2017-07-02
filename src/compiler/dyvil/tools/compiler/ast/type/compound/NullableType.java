@@ -56,6 +56,11 @@ public class NullableType implements IObjectType
 		return nullable == null ? type : nullable.getElementType();
 	}
 
+	public static boolean isNullable(IType type)
+	{
+		return type.canExtract(NullableType.class);
+	}
+
 	public IType getElementType()
 	{
 		return this.type;

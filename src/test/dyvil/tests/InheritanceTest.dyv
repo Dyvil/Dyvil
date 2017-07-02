@@ -2,7 +2,7 @@ package dyvil.tests
 
 using dyvil.Test
 
-public class InheritanceTest
+class InheritanceTest
 {
 	trait IFoo<T>
 	{
@@ -18,7 +18,7 @@ public class InheritanceTest
 
 	interface IFooBar<T> extends IFoo, IBar<T>
 
-	class FooBar implements IFooBar<String>
+	static class FooBar implements IFooBar<String>
 	{
 		override func bar() -> String = "FooBar.bar"
 
@@ -27,14 +27,14 @@ public class InheritanceTest
 
 	// Double-Layer Trait Initialization
 
-	class Foo1 implements IFoo
+	static class Foo1 implements IFoo
 	{
 		public var fooInit: boolean
 
 		override func onFooInit() -> void = this.fooInit = true
 	}
 
-	class Foo2 extends Foo1 implements IFoo
+	static class Foo2 extends Foo1 implements IFoo
 	{
 		public var foo2Init: int
 
@@ -59,7 +59,7 @@ public class InheritanceTest
 		}
 	}
 
-	class Person(
+	static class Person(
 		private var name: String { public override get; public override set }
 	) implements Named
 

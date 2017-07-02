@@ -1,0 +1,7 @@
+package dyvil.annotation.`internal`
+
+import java.lang.annotation._
+
+@Target([ .METHOD ])
+@Retention(.RUNTIME)
+@interface ReceiverType(let value: String)

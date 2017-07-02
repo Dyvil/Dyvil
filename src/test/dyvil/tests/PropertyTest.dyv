@@ -2,14 +2,14 @@ package dyvil.tests
 
 using dyvil.Test
 
-public class PropertyTest
+class PropertyTest
 {
 	interface AbstractProperty
 	{
 		var value: int { get; set }
 	}
 	
-	class ConcreteProperty implements AbstractProperty
+	static class ConcreteProperty implements AbstractProperty
 	{
 		private var setterCalled: boolean = false
 		{

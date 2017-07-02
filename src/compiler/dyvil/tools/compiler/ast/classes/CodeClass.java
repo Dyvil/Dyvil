@@ -5,6 +5,7 @@ import dyvil.collection.mutable.ArraySet;
 import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.asm.ASMConstants;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.TypeReference;
@@ -35,7 +36,6 @@ import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -206,6 +206,16 @@ public class CodeClass extends AbstractClass
 	{
 		context = context.push(this);
 
+		if (this.enclosingClass != null && !this.hasModifier(Modifiers.STATIC))
+		{
+			this.modifiers.addIntModifier(Modifiers.STATIC);
+			if ((this.modifiers.toFlags() & Modifiers.CLASS_TYPE_MODIFIERS) == 0)
+			{
+				// is a plain old class, not an interface, trait, annotation, object or enum
+				markers.add(Markers.semantic(this.position, "class.inner.not_static", this.name));
+			}
+		}
+
 		if (this.annotations != null)
 		{
 			this.annotations.checkTypes(markers, context);
@@ -334,16 +344,10 @@ public class CodeClass extends AbstractClass
 		}
 
 		// Partial copy in ExternalClass.getFunctionalMethod
-		IMethod functionalMethod = this.body.getFunctionalMethod();
-		if (functionalMethod != null)
+		IMethod functionalMethod = null;
+		for (IMethod method : this.body.allMethods())
 		{
-			return;
-		}
-
-		for (int i = 0, count = this.body.methodCount(); i < count; i++)
-		{
-			final IMethod method = this.body.getMethod(i);
-			if (!method.isAbstract() || method.isObjectMethod())
+			if (!method.isFunctional())
 			{
 				continue;
 			}
@@ -366,7 +370,7 @@ public class CodeClass extends AbstractClass
 
 		if (functionalMethod != null)
 		{
-			this.body.setFunctionalMethod(functionalMethod);
+			this.metadata.setFunctionalMethod(functionalMethod);
 			return;
 		}
 
@@ -488,7 +492,7 @@ public class CodeClass extends AbstractClass
 		final long flags = ModifierUtil.getFlags(this);
 		int modifiers = ModifierUtil.getJavaModifiers(flags);
 
-		if ((modifiers & Modifiers.INTERFACE_CLASS) != Modifiers.INTERFACE_CLASS)
+		if ((modifiers & Modifiers.INTERFACE) == 0)
 		{
 			modifiers |= ASMConstants.ACC_SUPER;
 		}
@@ -534,7 +538,7 @@ public class CodeClass extends AbstractClass
 
 		// Compute Trait Classes
 		final Set<IClass> traitClasses;
-		if ((modifiers & Modifiers.INTERFACE_CLASS) == 0)
+		if ((modifiers & Modifiers.INTERFACE) == 0)
 		{
 			traitClasses = new ArraySet<>();
 			this.traitInit = !fillTraitClasses(this, traitClasses, true) && !traitClasses.isEmpty();
@@ -556,37 +560,10 @@ public class CodeClass extends AbstractClass
 
 		if (this.body != null)
 		{
-			final int methods = this.body.methodCount();
-			final int constructors = this.body.constructorCount();
-			final int fields = this.body.fieldCount();
-			final int properties = this.body.propertyCount();
-
-			int classes = this.body.classCount();
-			for (int i = 0; i < classes; i++)
-			{
-				this.body.getClass(i).writeInnerClassInfo(writer);
-			}
-
-			for (int i = 0; i < fields; i++)
-			{
-				this.body.getField(i).write(writer);
-			}
-
-			for (int i = 0; i < constructors; i++)
-			{
-				this.body.getConstructor(i).write(writer);
-			}
-
-			for (int i = 0; i < properties; i++)
-			{
-				this.body.getProperty(i).write(writer);
-			}
-
-			for (int i = 0; i < methods; i++)
-			{
-				this.body.getMethod(i).write(writer);
-			}
+			this.body.write(writer);
 		}
+
+		this.metadata.writePost(writer);
 
 		// Create the static <clinit> method
 		MethodWriter initWriter = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.STATIC, "<clinit>", "()V",
@@ -712,23 +689,12 @@ public class CodeClass extends AbstractClass
 
 		this.metadata.writeClassInit(writer);
 
-		if (this.body == null)
+		if (this.body != null)
 		{
-			return;
+			this.body.writeClassInit(writer);
 		}
 
-		for (int i = 0, count = this.body.fieldCount(); i < count; i++)
-		{
-			this.body.getField(i).writeClassInit(writer);
-		}
-		for (int i = 0, count = this.body.propertyCount(); i < count; i++)
-		{
-			this.body.getProperty(i).writeClassInit(writer);
-		}
-		for (int i = 0, count = this.body.initializerCount(); i < count; i++)
-		{
-			this.body.getInitializer(i).writeClassInit(writer);
-		}
+		this.metadata.writeClassInitPost(writer);
 	}
 
 	@Override
@@ -741,23 +707,12 @@ public class CodeClass extends AbstractClass
 
 		this.metadata.writeStaticInit(writer);
 
-		if (this.body == null)
+		if (this.body != null)
 		{
-			return;
+			this.body.writeStaticInit(writer);
 		}
 
-		for (int i = 0, count = this.body.fieldCount(); i < count; i++)
-		{
-			this.body.getField(i).writeStaticInit(writer);
-		}
-		for (int i = 0, count = this.body.propertyCount(); i < count; i++)
-		{
-			this.body.getProperty(i).writeStaticInit(writer);
-		}
-		for (int i = 0, count = this.body.initializerCount(); i < count; i++)
-		{
-			this.body.getInitializer(i).writeStaticInit(writer);
-		}
+		this.metadata.writeStaticInitPost(writer);
 	}
 
 	private void writeAnnotations(ClassWriter writer, long flags)

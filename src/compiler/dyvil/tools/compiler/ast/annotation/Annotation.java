@@ -2,7 +2,6 @@ package dyvil.tools.compiler.ast.annotation;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.lang.Formattable;
-import dyvil.reflect.Modifiers;
 import dyvil.source.position.SourcePosition;
 import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.asm.AnnotationVisitor;
@@ -15,7 +14,6 @@ import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
-import dyvil.tools.compiler.ast.parameter.CodeParameter;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.structure.Package;
@@ -26,7 +24,6 @@ import dyvil.tools.compiler.ast.type.raw.ClassType;
 import dyvil.tools.compiler.backend.ClassFormat;
 import dyvil.tools.compiler.transform.TypeChecker;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -51,8 +48,6 @@ public final class Annotation implements IAnnotation
 			// no instances
 		}
 	}
-
-	public static final CodeParameter VALUE = new CodeParameter(Name.fromRaw("value"));
 
 	protected SourcePosition position;
 	protected ArgumentList arguments = ArgumentList.EMPTY;
@@ -149,7 +144,7 @@ public final class Annotation implements IAnnotation
 			final IParameter parameter = parameterList.get(i);
 			final IType parameterType = parameter.getType();
 
-			final IValue value = this.arguments.get(i, parameter);
+			final IValue value = this.arguments.get(parameter);
 			if (value == null)
 			{
 				if (parameter.getValue() == null)
@@ -171,7 +166,7 @@ public final class Annotation implements IAnnotation
 			typedValue = IValue.toAnnotationConstant(typedValue, markers, context);
 			if (typedValue != value)
 			{
-				this.arguments.set(i, parameter, typedValue);
+				this.arguments.set(i, parameter.getLabel(), typedValue);
 			}
 		}
 	}
@@ -201,7 +196,7 @@ public final class Annotation implements IAnnotation
 			return;
 		}
 
-		if (!theClass.hasModifier(Modifiers.ANNOTATION))
+		if (!theClass.isAnnotation())
 		{
 			markers.add(Markers.semanticError(this.position, "annotation.type", this.type.getName()));
 			return;
@@ -272,7 +267,7 @@ public final class Annotation implements IAnnotation
 		for (int i = 0, count = parameterList.size(); i < count; i++)
 		{
 			final IParameter parameter = parameterList.get(i);
-			final IValue argument = this.arguments.get(i, parameter);
+			final IValue argument = this.arguments.get(parameter);
 			if (argument != null)
 			{
 				argument.writeAnnotationValue(writer, parameter.getName().qualified);

@@ -7,7 +7,7 @@ import dyvil.collection.range.Rangeable
 class RangeTest
 {
 	@LiteralConvertible.FromInt
-	case class RangeableInt(let value: int) implements Rangeable<RangeableInt>
+	static case class RangeableInt(let value: int) implements Rangeable<RangeableInt>
 	{
 		override func next() -> RangeableInt = apply(this.value + 1)
 

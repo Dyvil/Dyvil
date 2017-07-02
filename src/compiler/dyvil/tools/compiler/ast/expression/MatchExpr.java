@@ -116,7 +116,15 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 	@Override
 	public boolean isResolved()
 	{
-		return this.returnType != null && this.returnType.isResolved();
+		for (int i = 0; i < this.caseCount; i++)
+		{
+			if (!this.cases[i].action.isResolved())
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	@Override
@@ -409,8 +417,13 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 			this.writeAction(writer, expr, frameType, c.action);
 
 			writer.resetLocals(localCount);
-			writer.visitJumpInsn(Opcodes.GOTO, endLabel);
-			writer.visitLabel(elseLabel);
+
+			if (!writer.hasReturn())
+			{
+				writer.visitJumpInsn(Opcodes.GOTO, endLabel);
+			}
+
+			writer.visitTargetLabel(elseLabel);
 			if (++i < this.caseCount)
 			{
 				elseLabel = new Label();
@@ -451,21 +464,25 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 
 	private void writeAction(MethodWriter writer, boolean expr, Object frameType, IValue value) throws BytecodeException
 	{
-		if (value != null)
+		if (expr)
 		{
-			if (expr)
+			if (value != null)
 			{
 				value.writeExpression(writer, this.returnType);
-				writer.getFrame().set(frameType);
 			}
 			else
 			{
-				value.writeExpression(writer, Types.VOID);
+				this.returnType.writeDefaultValue(writer);
+			}
+
+			if (!writer.hasReturn())
+			{
+				writer.getFrame().set(frameType);
 			}
 		}
-		else if (expr)
+		else if (value != null)
 		{
-			this.returnType.writeDefaultValue(writer);
+			value.writeExpression(writer, Types.VOID);
 		}
 	}
 
@@ -642,7 +659,11 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 				this.writeAction(writer, expr, frameType, matchCase.action);
 
 				writer.resetLocals(localCount);
-				writer.visitJumpInsn(Opcodes.GOTO, endLabel);
+
+				if (!writer.hasReturn())
+				{
+					writer.visitJumpInsn(Opcodes.GOTO, endLabel);
+				}
 
 				entry = next;
 			}
@@ -667,7 +688,11 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 			this.writeAction(writer, expr, frameType, defaultCase.action);
 
 			writer.resetLocals(localCount);
-			writer.visitJumpInsn(Opcodes.GOTO, endLabel);
+
+			if (!writer.hasReturn())
+			{
+				writer.visitJumpInsn(Opcodes.GOTO, endLabel);
+			}
 		}
 
 		// Generate Match Error
@@ -710,8 +735,8 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 	/**
 	 * Generates a {@code lookupswitch} instruction
 	 */
-	private void writeLookupSwitch(MethodWriter writer, Collection<KeyCache.Entry> entries, Label defaultLabel, int cases)
-		throws BytecodeException
+	private void writeLookupSwitch(MethodWriter writer, Collection<KeyCache.Entry> entries, Label defaultLabel,
+		                              int cases) throws BytecodeException
 	{
 		if (cases <= 0)
 		{
@@ -738,8 +763,8 @@ public final class MatchExpr implements IValue, ICaseConsumer, IValueConsumer
 	/**
 	 * Generates a {@code tableswitch} instruction
 	 */
-	private void writeTableSwitch(MethodWriter writer, Collection<KeyCache.Entry> entries, Label defaultLabel, int low, int high)
-		throws BytecodeException
+	private void writeTableSwitch(MethodWriter writer, Collection<KeyCache.Entry> entries, Label defaultLabel, int low,
+		                             int high) throws BytecodeException
 	{
 		assert defaultLabel != null;
 

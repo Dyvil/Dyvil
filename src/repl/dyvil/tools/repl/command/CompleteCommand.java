@@ -4,14 +4,15 @@ import dyvil.collection.Set;
 import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.collection.mutable.TreeSet;
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.IField;
 import dyvil.tools.compiler.ast.field.IProperty;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.member.IMember;
+import dyvil.tools.compiler.ast.method.Candidate;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
@@ -57,13 +58,13 @@ public class CompleteCommand implements ICommand
 	@Override
 	public void execute(DyvilREPL repl, String argument)
 	{
-		final REPLContext replContext = repl.getContext();
+		final IContext context = repl.getContext().getContext();
 
 		if (argument == null)
 		{
 			// REPL Variables
 
-			this.printREPLMembers(repl, replContext, "");
+			this.printREPLMembers(repl, "");
 			return;
 		}
 
@@ -72,7 +73,7 @@ public class CompleteCommand implements ICommand
 		{
 			// REPL Variable Completions
 
-			this.printREPLMembers(repl, replContext, Qualifier.qualify(argument));
+			this.printREPLMembers(repl, Qualifier.qualify(argument));
 			return;
 		}
 
@@ -81,8 +82,6 @@ public class CompleteCommand implements ICommand
 
 		final MarkerList markers = new MarkerList(Markers.INSTANCE);
 		final TokenList tokens = new DyvilLexer(markers, DyvilSymbols.INSTANCE).tokenize(expression);
-
-		final IContext context = replContext.getContext();
 
 		new ParserManager(DyvilSymbols.INSTANCE, tokens.iterator(), markers).parse(new ExpressionParser((IValue value) -> {
 			value.resolveTypes(markers, context);
@@ -110,16 +109,18 @@ public class CompleteCommand implements ICommand
 		}));
 	}
 
-	private void printREPLMembers(DyvilREPL repl, REPLContext context, String start)
+	private void printREPLMembers(DyvilREPL repl, String start)
 	{
+		final REPLContext replContext = repl.getContext();
+
 		final Set<IField> variables = new TreeSet<>(MemberSorter.MEMBER_COMPARATOR);
 		final Set<IMethod> methods = new TreeSet<>(MemberSorter.METHOD_COMPARATOR);
 
-		for (IField variable : context.getFields().values())
+		for (IField variable : replContext.getFields().values())
 		{
 			checkMember(variables, variable, start);
 		}
-		for (IMethod method : context.getMethods())
+		for (IMethod method : replContext.getMethods())
 		{
 			checkMember(methods, method, start);
 		}
@@ -150,6 +151,8 @@ public class CompleteCommand implements ICommand
 	{
 		final IType type = value.getType();
 		final boolean statics = value.isClassAccess();
+		final IContext context = repl.getContext().getContext();
+
 		final Set<IField> fields = new TreeSet<>(MemberSorter.MEMBER_COMPARATOR);
 		final Set<IProperty> properties = new TreeSet<>(MemberSorter.MEMBER_COMPARATOR);
 		final Set<IMethod> methods = new TreeSet<>(MemberSorter.METHOD_COMPARATOR);
@@ -162,14 +165,15 @@ public class CompleteCommand implements ICommand
 			output.println(I18n.get("command.complete.type", type));
 
 			findMembers(type, fields, properties, methods, memberStart, true);
+			findExtensions(context, type, value, extensionMethods, memberStart, true);
 		}
 		else
 		{
 			output.println(I18n.get("command.complete.expression", value, type));
 
 			findInstanceMembers(type, fields, properties, methods, memberStart, new IdentityHashSet<>());
-			findExtensions(repl, type, value, extensionMethods, memberStart);
-			findConversions(repl, type, value, conversionMethods);
+			findExtensions(context, type, value, extensionMethods, memberStart, false);
+			findConversions(context, type, value, conversionMethods);
 		}
 
 		boolean hasOutput = false;
@@ -236,7 +240,7 @@ public class CompleteCommand implements ICommand
 			return;
 		}
 
-		final IClassBody body = theClass.getBody();
+		final ClassBody body = theClass.getBody();
 		if (body == null)
 		{
 			return;
@@ -289,28 +293,29 @@ public class CompleteCommand implements ICommand
 		}
 	}
 
-	private static void findExtensions(DyvilREPL repl, IType type, IValue value, Set<IMethod> methods, String start)
+	private static void findExtensions(IContext context, IType type, IValue value, Set<IMethod> methods, String start, boolean statics)
 	{
-		MatchList<IMethod> matchList = new MatchList<>(repl.getContext(), true);
+		final MatchList<IMethod> matchList = new MatchList<>(context, true);
+
 		type.getMethodMatches(matchList, value, null, null);
-		repl.getContext().getMethodMatches(matchList, value, null, null);
+		context.getMethodMatches(matchList, value, null, null);
 		Types.BASE_CONTEXT.getMethodMatches(matchList, value, null, null);
 
-		for (int i = 0, count = matchList.size(); i < count; i++)
+		for (Candidate<IMethod> candidate : matchList)
 		{
-			final IMethod member = matchList.getCandidate(i).getMember();
-			if (member.hasModifier(Modifiers.INFIX))
+			final IMethod member = candidate.getMember();
+			if (member.hasModifier(Modifiers.INFIX) || member.getEnclosingClass() != type.getTheClass())
 			{
 				checkMember(methods, member, start, true);
 			}
 		}
 	}
 
-	private static void findConversions(DyvilREPL repl, IType type, IValue value, Set<IMethod> methods)
+	private static void findConversions(IContext context, IType type, IValue value, Set<IMethod> methods)
 	{
 		MatchList<IMethod> matchList = new MatchList<>(null, true);
 		type.getImplicitMatches(matchList, value, null);
-		repl.getContext().getImplicitMatches(matchList, value, null);
+		context.getImplicitMatches(matchList, value, null);
 		Types.BASE_CONTEXT.getImplicitMatches(matchList, value, null);
 
 		for (int i = 0, count = matchList.size(); i < count; i++)

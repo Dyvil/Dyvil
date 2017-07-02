@@ -285,7 +285,12 @@ public class FieldAccess implements IValue, INamed, IReceiverAccess
 	{
 		this.resolveReceiver(markers, context);
 
-		IValue v = this.resolveFieldAccess(markers, context);
+		if (this.field != null)
+		{
+			return this;
+		}
+
+		final IValue v = this.resolveFieldAccess(markers, context);
 		if (v != null)
 		{
 			return v;
@@ -385,19 +390,20 @@ public class FieldAccess implements IValue, INamed, IReceiverAccess
 
 	private IValue resolveField(IValue receiver, IContext context)
 	{
-		IDataMember field = ICall.resolveField(context, receiver, this.name);
-		if (field != null)
+		final IDataMember field = ICall.resolveField(context, receiver, this.name);
+		if (field == null)
 		{
-			if (field.isEnumConstant())
-			{
-				return new EnumValue(field.getType(), this.name);
-			}
-
-			this.field = field;
-			this.receiver = receiver;
-			return this;
+			return null;
 		}
-		return null;
+
+		if (field.isEnumConstant())
+		{
+			return new EnumValue(this.position, field);
+		}
+
+		this.field = field;
+		this.receiver = receiver;
+		return this;
 	}
 
 	private IValue resolveMethod(IValue receiver, MarkerList markers, IContext context)

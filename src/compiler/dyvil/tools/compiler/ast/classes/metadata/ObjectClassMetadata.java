@@ -3,8 +3,8 @@ package dyvil.tools.compiler.ast.classes.metadata;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
 import dyvil.tools.asm.Label;
+import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.access.ConstructorCall;
 import dyvil.tools.compiler.ast.field.Field;
@@ -59,7 +59,7 @@ public final class ObjectClassMetadata extends ClassMetadata
 	{
 		super.resolveTypesGenerate(markers, context);
 
-		final IClassBody body = this.theClass.getBody();
+		final ClassBody body = this.theClass.getBody();
 		if (body != null && body.constructorCount() > 0)
 		{
 			markers.add(Markers.semantic(this.theClass.getPosition(), "class.object.constructor",

@@ -1,0 +1,34 @@
+package dyvil.collection.iterator
+
+import java.util.{ Iterator, NoSuchElementException }
+
+class ConcatIterator<type E>(let parts: Iterator<E>...) implements Iterator<E>
+{
+	static func apply<type E>(parts: Iterator<E>...) -> ConcatIterator<E> = new ConcatIterator<E>(parts...)
+
+	var index: int
+
+	override func hasNext() -> boolean
+	{
+		for (i <- this.index ..< this.parts.size) if (this.parts[i].hasNext()) return true
+		return false
+	}
+
+	override func next() -> E
+	{
+		let size = this.parts.size
+		for (i <- this.index ..< size)
+		{
+			let part = this.parts[i]
+			if (part.hasNext())
+			{
+				this.index = i
+				return part.next()
+			}
+		}
+		this.index = size
+		throw new NoSuchElementException
+	}
+
+	override func toString() -> String = "ConcatIterator\(this.parts)"
+}

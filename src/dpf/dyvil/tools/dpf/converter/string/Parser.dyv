@@ -84,7 +84,7 @@ public class Parser
 			case _ {}
 		}
 
-		this.markers.add(new SyntaxError(token, "Invalid Node Element - Invalid " + token))
+		this.markers.add(new SyntaxError(token, "Invalid Node Element - Invalid \(token)"))
 		return true
 	}
 
@@ -187,7 +187,7 @@ public class Parser
 			case _ {}
 		}
 
-		this.markers.add(new SyntaxError(token, "Invalid Value - Invalid " + token))
+		this.markers.add(new SyntaxError(token, "Invalid Value - Invalid \(token)"))
 	}
 
 	private func parseList(visitor: ListVisitor) -> void

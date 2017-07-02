@@ -1,10 +1,8 @@
 package dyvil.tools.compiler.parser.classes;
 
-import dyvil.reflect.Modifiers;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.consumer.IClassConsumer;
 import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
@@ -113,7 +111,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 		case EXTENDS:
 			if (type == DyvilKeywords.EXTENDS)
 			{
-				if (this.theClass.hasModifier(Modifiers.INTERFACE_CLASS))
+				if (this.theClass.isInterface())
 				{
 					pm.pushParser(new TypeListParser(this));
 					this.mode = BODY;
@@ -131,7 +129,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 				pm.pushParser(new TypeListParser(this));
 				this.mode = BODY;
 
-				if (this.theClass.hasModifier(Modifiers.INTERFACE_CLASS))
+				if (this.theClass.isInterface())
 				{
 					pm.report(token, "class.interface.implements");
 					return;
@@ -142,7 +140,7 @@ public final class ClassDeclarationParser extends Parser implements ITypeConsume
 		case BODY:
 			if (type == BaseSymbols.OPEN_CURLY_BRACKET)
 			{
-				IClassBody body = new ClassBody(this.theClass);
+				ClassBody body = new ClassBody(this.theClass);
 				this.theClass.setBody(body);
 				pm.pushParser(new ClassBodyParser(body), true);
 				this.mode = BODY_END;

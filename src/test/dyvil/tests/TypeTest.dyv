@@ -36,12 +36,12 @@ public class TypeTest
 
 	func nextRecur<type R: Recur<R>>(value: R) -> R = value.next
 
-	case class IntRecur(let value: int) implements Recur<IntRecur>
+	static case class IntRecur(let value: int) implements Recur<IntRecur>
 	{
 		override func next() -> IntRecur = IntRecur(this.value + 1)
 	}
 
-	class RecurWrapper<type R: Recur<R>>(let value: R)
+	static class RecurWrapper<type R: Recur<R>>(let value: R)
 
 	// Misc.
 

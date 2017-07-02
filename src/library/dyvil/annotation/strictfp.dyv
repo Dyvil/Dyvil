@@ -1,0 +1,11 @@
+package dyvil.annotation
+
+import java.lang.annotation._
+
+/**
+ * Substitute annotation for the {@code strictfp} keyword in Java. The <i>Dyvil Compiler</i> directly converts this
+ * annotation to the {@code ACC_STRICT} flag.
+ */
+@Target([ .METHOD, .TYPE, .CONSTRUCTOR ])
+@Retention(.SOURCE)
+@interface strictfp

@@ -8,6 +8,7 @@ import dyvil.tools.compiler.ast.bytecode.*;
 import dyvil.tools.compiler.ast.method.IExternalCallableMember;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.intrinsic.InlineIntrinsicData;
+import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.raw.InternalType;
@@ -37,10 +38,22 @@ public final class SimpleMethodVisitor implements MethodVisitor
 		}
 
 		this.parameterIndex++;
-		parameter.setName(Name.fromQualified(name));
+
+		if (name != null)
+		{
+			final Name name1 = Name.fromQualified(name);
+			parameter.setName(name1);
+			parameter.setLabel(name1);
+		}
 
 		if (modifiers != 0)
 		{
+			if ((modifiers & Modifiers.ACC_VARARGS) != 0)
+			{
+				// add the internal bitflag for varargs parameters
+				modifiers |= Modifiers.VARARGS;
+			}
+
 			parameter.getModifiers().addIntModifier(modifiers);
 		}
 	}
@@ -49,7 +62,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	public AnnotationVisitor visitParameterAnnotation(int parameter, String type, boolean visible)
 	{
 		final IParameter param = this.method.getExternalParameterList().get(parameter);
-		if (AnnotationUtil.DYVIL_MODIFIERS.equals(type))
+		if (ModifierUtil.DYVIL_MODIFIERS.equals(type))
 		{
 			return new ModifierVisitor(param.getModifiers());
 		}
@@ -63,7 +76,7 @@ public final class SimpleMethodVisitor implements MethodVisitor
 	{
 		switch (type)
 		{
-		case AnnotationUtil.DYVIL_MODIFIERS:
+		case ModifierUtil.DYVIL_MODIFIERS:
 			return new ModifierVisitor(this.method.getModifiers());
 		case AnnotationUtil.DYVIL_NAME:
 			return new DyvilNameVisitor(this.method);
@@ -260,14 +273,14 @@ public final class SimpleMethodVisitor implements MethodVisitor
 
 			if (param.getName() == null)
 			{
-				param.setName(this.getName(i, localIndex));
+				param.setName(this.getName(localIndex));
 			}
 
 			localIndex += param.getLocalSlots();
 		}
 	}
 
-	private Name getName(int index, int localIndex)
+	private Name getName(int localIndex)
 	{
 		final String localName;
 		if (this.localNames == null || (localName = this.localNames[localIndex]) == null)

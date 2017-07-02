@@ -102,6 +102,17 @@ public class ArgumentList implements IResolvable, IValueList
 		return this.appended(value);
 	}
 
+	public ArgumentList concat(ArgumentList that)
+	{
+		final int size = this.size + that.size;
+		final ArgumentList list = that instanceof NamedArgumentList ?
+			                          new NamedArgumentList(size) :
+			                          new ArgumentList(size);
+		list.addAll(this);
+		list.addAll(that);
+		return list;
+	}
+
 	public IValue getFirst()
 	{
 		return this.size <= 0 ? null : this.values[0];
@@ -122,7 +133,7 @@ public class ArgumentList implements IResolvable, IValueList
 		this.values[this.size - 1] = value;
 	}
 
-	public void set(int index, IParameter param, IValue value)
+	public void set(int index, Name key, IValue value)
 	{
 		this.values[index] = value;
 	}
@@ -133,17 +144,60 @@ public class ArgumentList implements IResolvable, IValueList
 		this.values[index] = value;
 	}
 
+	protected void ensureCapacity(int min)
+	{
+		if (min >= this.values.length)
+		{
+			IValue[] temp = new IValue[min];
+			System.arraycopy(this.values, 0, temp, 0, this.size);
+			this.values = temp;
+		}
+	}
+
 	@Override
 	public void add(IValue value)
 	{
-		int index = this.size++;
-		if (this.size > this.values.length)
+		this.add(null, value);
+	}
+
+	@Override
+	public void add(Name name, IValue value)
+	{
+		final int size = this.size;
+		this.ensureCapacity(size + 1);
+		this.values[size] = value;
+		this.size = size + 1;
+	}
+
+	public void addAll(ArgumentList list)
+	{
+		this.ensureCapacity(this.size + list.size);
+		System.arraycopy(list.values, 0, this.values, this.size, list.size);
+		this.size += list.size;
+	}
+
+	public void insert(int index, IValue value)
+	{
+		this.insert(index, null, value);
+	}
+
+	public void insert(int index, Name key, IValue value)
+	{
+		final int newSize = this.size + 1;
+		if (newSize >= this.values.length)
 		{
-			IValue[] temp = new IValue[this.size];
+			final IValue[] temp = new IValue[newSize];
 			System.arraycopy(this.values, 0, temp, 0, index);
+			temp[index] = value;
+			System.arraycopy(this.values, index, temp, index + 1, this.size - index);
 			this.values = temp;
 		}
-		this.values[index] = value;
+		else
+		{
+			System.arraycopy(this.values, index, this.values, index + 1, this.size - index);
+			this.values[index] = value;
+		}
+		this.size = newSize;
 	}
 
 	@Override
@@ -156,7 +210,12 @@ public class ArgumentList implements IResolvable, IValueList
 		return this.values[index];
 	}
 
-	public IValue get(int index, IParameter param)
+	public IValue get(IParameter parameter)
+	{
+		return this.get(parameter.getIndex(), parameter.getLabel());
+	}
+
+	public IValue get(int index, Name key)
 	{
 		return this.get(index);
 	}
@@ -389,7 +448,7 @@ public class ArgumentList implements IResolvable, IValueList
 
 	public final void writeValue(int index, IParameter param, MethodWriter writer) throws BytecodeException
 	{
-		final IValue value = this.get(index, param);
+		final IValue value = this.get(index, param.getLabel());
 		if (value == null)
 		{
 			param.writeGetDefaultValue(writer);
@@ -486,7 +545,12 @@ public class ArgumentList implements IResolvable, IValueList
 
 	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		Formatting.appendSeparator(buffer, "parameters.open_paren", '(');
+		this.toString(indent, buffer, '(', ')');
+	}
+
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer, char open, char close)
+	{
+		Formatting.appendSeparator(buffer, "parameters.open_paren", open);
 
 		if (this.size > 0)
 		{
@@ -498,10 +562,10 @@ public class ArgumentList implements IResolvable, IValueList
 			}
 		}
 
-		Formatting.appendSeparator(buffer, "parameters.close_paren", ')');
+		Formatting.appendClose(buffer, "parameters.close_paren", close);
 	}
 
-	protected void appendValue(@NonNull String indent, @NonNull StringBuilder buffer, int index)
+	public void appendValue(@NonNull String indent, @NonNull StringBuilder buffer, int index)
 	{
 		this.values[index].toString(indent, buffer);
 	}

@@ -134,10 +134,10 @@ public class Field extends Member implements IField
 	{
 		switch (type)
 		{
-		case "dyvil/annotation/Transient":
+		case ModifierUtil.TRANSIENT_INTERNAL:
 			this.modifiers.addIntModifier(Modifiers.TRANSIENT);
 			return false;
-		case "dyvil/annotation/Volatile":
+		case ModifierUtil.VOLATILE_INTERNAL:
 			this.modifiers.addIntModifier(Modifiers.VOLATILE);
 			return false;
 		case Deprecation.JAVA_INTERNAL:
@@ -648,7 +648,7 @@ public class Field extends Member implements IField
 	@Override
 	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		super.toString(indent, buffer);
+		this.attributesToString(indent, buffer);
 		IDataMember.toString(indent, buffer, this, "field.type_ascription");
 
 		this.valueToString(indent, buffer);
@@ -657,6 +657,11 @@ public class Field extends Member implements IField
 		{
 			Property.formatBody(this.property, indent, buffer);
 		}
+	}
+
+	protected void attributesToString(@NonNull String indent, @NonNull StringBuilder buffer)
+	{
+		super.toString(indent, buffer);
 	}
 
 	protected void valueToString(@NonNull String indent, @NonNull StringBuilder buffer)

@@ -1,51 +1,31 @@
 package dyvil.tools.compiler.parser.classes;
 
 import dyvil.reflect.Modifiers;
-import dyvil.tools.compiler.ast.annotation.Annotation;
-import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.consumer.IDataMemberConsumer;
-import dyvil.tools.compiler.ast.consumer.ITypeConsumer;
 import dyvil.tools.compiler.ast.field.IDataMember;
-import dyvil.tools.compiler.ast.modifiers.Modifier;
-import dyvil.tools.compiler.ast.modifiers.ModifierList;
-import dyvil.tools.compiler.ast.modifiers.ModifierSet;
-import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.parser.ParserUtil;
-import dyvil.tools.compiler.parser.annotation.AnnotationParser;
-import dyvil.tools.compiler.parser.annotation.ModifierParser;
 import dyvil.tools.compiler.parser.type.TypeParser;
 import dyvil.tools.compiler.transform.DyvilKeywords;
 import dyvil.tools.compiler.transform.DyvilSymbols;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.IParserManager;
-import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.lexer.BaseSymbols;
+import dyvil.tools.parsing.lexer.Tokens;
 import dyvil.tools.parsing.token.IToken;
 
-public class DataMemberParser<T extends IDataMember> extends Parser implements ITypeConsumer
+public class DataMemberParser<T extends IDataMember> extends AbstractMemberParser
 {
-	protected static final int TYPE = 0;
-	protected static final int NAME = 1;
+	protected static final int DECLARATOR = 0;
+	protected static final int NAME       = 1;
+	protected static final int TYPE       = 2;
 
 	protected IDataMemberConsumer<T> consumer;
 
-	private boolean ignoreTypeAscription;
-
-	private ModifierSet    modifiers;
-	private AnnotationList annotations;
-	private IType          type;
-	private T              dataMember;
+	private T dataMember;
 
 	public DataMemberParser(IDataMemberConsumer<T> consumer)
 	{
 		this.consumer = consumer;
-	}
-
-	public DataMemberParser<T> ignoringTypeAscription()
-	{
-		this.ignoreTypeAscription = true;
-		return this;
 	}
 
 	@Override
@@ -54,60 +34,25 @@ public class DataMemberParser<T extends IDataMember> extends Parser implements I
 		final int type = token.type();
 		switch (this.mode)
 		{
-		case TYPE:
+		case DECLARATOR:
 			switch (type)
 			{
 			case DyvilSymbols.AT:
-				if (this.annotations == null)
-				{
-					this.annotations = new AnnotationList();
-				}
-
-				final Annotation annotation = new Annotation(token.raw());
-				this.annotations.add(annotation);
-				pm.pushParser(new AnnotationParser(annotation));
-				return;
-			case DyvilKeywords.VAR:
-				this.mode = NAME;
-				this.type = Types.UNKNOWN;
+				this.parseAnnotation(pm, token);
 				return;
 			case DyvilKeywords.LET:
+				this.getModifiers().addIntModifier(Modifiers.FINAL);
+				// Fallthrough
+			case DyvilKeywords.VAR:
 				this.mode = NAME;
-				this.type = Types.UNKNOWN;
-
-				if (this.modifiers == null)
-				{
-					this.modifiers = new ModifierList();
-				}
-
-				this.modifiers.addIntModifier(Modifiers.FINAL);
 				return;
 			}
 
-			Modifier modifier;
-			if ((modifier = ModifierParser.parseModifier(token, pm)) != null)
+			if (this.parseModifier(pm, token))
 			{
-				if (this.modifiers == null)
-				{
-					this.modifiers = new ModifierList();
-				}
-
-				this.modifiers.addModifier(modifier);
 				return;
 			}
-			if (ParserUtil.isIdentifier(type) && token.next().type() == BaseSymbols.COLON)
-			{
-				// IDENTIFIER : TYPE
-				this.dataMember = this.consumer
-					                  .createDataMember(token.raw(), token.nameValue(), Types.UNKNOWN, this.modifiers,
-					                                    this.annotations);
-				this.mode = END;
-				return;
-			}
-
-			pm.pushParser(new TypeParser(this), true);
-			this.mode = NAME;
-			return;
+			// Fallthrough
 		case NAME:
 			if (!ParserUtil.isIdentifier(type))
 			{
@@ -115,45 +60,24 @@ public class DataMemberParser<T extends IDataMember> extends Parser implements I
 				return;
 			}
 
-			if (this.type != Types.UNKNOWN)
-			{
-				pm.report(Markers.syntaxWarning(token, "member.type.c_style.deprecated"));
-			}
+			this.dataMember = this.consumer
+				                  .createDataMember(token.raw(), token.nameValue(), Types.UNKNOWN, this.modifiers,
+				                                    this.annotations);
 
-			this.dataMember = this.consumer.createDataMember(token.raw(), token.nameValue(), this.type, this.modifiers,
-			                                                 this.annotations);
-
-			this.mode = END;
+			this.mode = TYPE;
 			return;
-		case END:
+		case TYPE:
 			if (type == BaseSymbols.COLON)
 			{
 				// ... IDENTIFIER : TYPE ...
-				if (this.dataMember.getType() != Types.UNKNOWN)
-				{
-					if (this.ignoreTypeAscription)
-					{
-						this.consumer.addDataMember(this.dataMember);
-						pm.popParser(true);
-						return;
-					}
-
-					pm.report(token, "variable.type.duplicate");
-				}
 				pm.pushParser(new TypeParser(this.dataMember));
-
-				// mode stays END
+				this.mode = END;
 				return;
 			}
-
+			// Fallthrough
+		case END:
 			this.consumer.addDataMember(this.dataMember);
-			pm.popParser(true);
+			pm.popParser(type != Tokens.EOF);
 		}
-	}
-
-	@Override
-	public void setType(IType type)
-	{
-		this.type = type;
 	}
 }

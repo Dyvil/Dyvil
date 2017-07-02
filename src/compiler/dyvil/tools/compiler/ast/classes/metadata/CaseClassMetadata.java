@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.classes.metadata;
 
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.CastOperator;
@@ -17,7 +18,10 @@ import dyvil.tools.compiler.ast.method.CodeMethod;
 import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
-import dyvil.tools.compiler.ast.parameter.*;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
+import dyvil.tools.compiler.ast.parameter.ClassParameter;
+import dyvil.tools.compiler.ast.parameter.CodeParameter;
+import dyvil.tools.compiler.ast.parameter.IParameter;
 import dyvil.tools.compiler.ast.statement.IfStatement;
 import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
@@ -31,7 +35,6 @@ import dyvil.tools.compiler.transform.CaseClasses;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public final class CaseClassMetadata extends ClassMetadata
 {
@@ -96,14 +99,7 @@ public final class CaseClassMetadata extends ClassMetadata
 			                                              new FlagModifierSet(modifiers));
 			applyMethod.getTypeParameters().addAll(this.theClass.getTypeParameters());
 
-			if (this.constructor != null && (this.members & CONSTRUCTOR) == 0)
-			{
-				this.constructor.getParameters().copyTo(applyMethod.getParameters());
-			}
-			else
-			{
-				this.copyClassParameters(applyMethod);
-			}
+			this.copyClassParameters(applyMethod);
 
 			this.applyMethod = applyMethod;
 		}
@@ -259,8 +255,8 @@ public final class CaseClassMetadata extends ClassMetadata
 		String internal = this.theClass.getInternalName();
 		if ((this.members & EQUALS) == 0)
 		{
-			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "equals",
-			                                                     "(Ljava/lang/Object;)Z", null, null));
+			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC, "equals", "(Ljava/lang/Object;)Z",
+			                                                     null, null));
 			mw.setThisType(internal);
 			mw.visitParameter(1, "obj", Types.OBJECT, 0);
 			mw.visitCode();
@@ -270,8 +266,7 @@ public final class CaseClassMetadata extends ClassMetadata
 
 		if ((this.members & HASHCODE) == 0)
 		{
-			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "hashCode",
-			                                                     "()I", null, null));
+			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC, "hashCode", "()I", null, null));
 			mw.setThisType(internal);
 			mw.visitCode();
 			CaseClasses.writeHashCode(mw, this.theClass);
@@ -280,8 +275,8 @@ public final class CaseClassMetadata extends ClassMetadata
 
 		if ((this.members & TOSTRING) == 0)
 		{
-			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC | Modifiers.SYNTHETIC, "toString",
-			                                                     "()Ljava/lang/String;", null, null));
+			mw = new MethodWriterImpl(writer, writer.visitMethod(Modifiers.PUBLIC, "toString", "()Ljava/lang/String;",
+			                                                     null, null));
 			mw.setThisType(internal);
 			mw.visitCode();
 			CaseClasses.writeToString(mw, this.theClass);

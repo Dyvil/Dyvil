@@ -26,7 +26,8 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
-public interface IClass extends IClassMember, IParametric, ITypeParametricMember, ICompilable, IContext, IClassCompilableList
+public interface IClass
+	extends IClassMember, IParametric, ITypeParametricMember, ICompilable, IContext, IClassCompilableList
 {
 	@Override
 	default MemberKind getKind()
@@ -115,9 +116,9 @@ public interface IClass extends IClassMember, IParametric, ITypeParametricMember
 
 	// Body
 
-	IClassBody getBody();
+	ClassBody getBody();
 
-	void setBody(IClassBody body);
+	void setBody(ClassBody body);
 
 	IClassMetadata getMetadata();
 
@@ -163,29 +164,33 @@ public interface IClass extends IClassMember, IParametric, ITypeParametricMember
 
 	void writeInnerClassInfo(ClassWriter writer);
 
-	static IClassMetadata getClassMetadata(IClass iclass, int modifiers)
+	static IClassMetadata getClassMetadata(IClass forClass, int modifiers)
 	{
-		if ((modifiers & Modifiers.OBJECT_CLASS) != 0)
+		if ((modifiers & Modifiers.ANNOTATION) != 0)
 		{
-			return new ObjectClassMetadata(iclass);
+			return new AnnotationMetadata(forClass);
 		}
+		if ((modifiers & Modifiers.TRAIT) != 0)
+		{
+			return new TraitMetadata(forClass);
+		}
+		if ((modifiers & Modifiers.INTERFACE) != 0)
+		{
+			return new InterfaceMetadata(forClass);
+		}
+		if ((modifiers & Modifiers.ENUM) != 0)
+		{
+			return new EnumClassMetadata(forClass);
+		}
+		if ((modifiers & Modifiers.OBJECT) != 0)
+		{
+			return new ObjectClassMetadata(forClass);
+		}
+		// All modifiers above are single-bit flags
 		if ((modifiers & Modifiers.CASE_CLASS) != 0)
 		{
-			return new CaseClassMetadata(iclass);
+			return new CaseClassMetadata(forClass);
 		}
-		if ((modifiers & Modifiers.ANNOTATION) == Modifiers.ANNOTATION)
-		{
-			return new AnnotationMetadata(iclass);
-		}
-		final int interfaceModifiers = modifiers & Modifiers.TRAIT_CLASS;
-		if (interfaceModifiers == Modifiers.TRAIT_CLASS)
-		{
-			return new TraitMetadata(iclass);
-		}
-		else if (interfaceModifiers == Modifiers.INTERFACE_CLASS)
-		{
-			return new InterfaceMetadata(iclass);
-		}
-		return new ClassMetadata(iclass);
+		return new ClassMetadata(forClass);
 	}
 }

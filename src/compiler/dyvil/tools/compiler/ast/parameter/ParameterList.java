@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.parameter;
 
 import dyvil.annotation.internal.NonNull;
 import dyvil.collection.iterator.ArrayIterator;
+import dyvil.reflect.Modifiers;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.field.IVariable;
@@ -103,6 +104,31 @@ public class ParameterList implements Iterable<IParameter>, IResolvable
 
 		parameter.setIndex(index);
 		this.parameters[index] = parameter;
+	}
+
+	public void insert(int index, IParameter parameter)
+	{
+		final int newSize = this.size + 1;
+		if (newSize >= this.parameters.length)
+		{
+			final IParameter[] temp = new IParameter[newSize];
+			System.arraycopy(this.parameters, 0, temp, 0, index);
+			temp[index] = parameter;
+			System.arraycopy(this.parameters, index, temp, index + 1, this.size - index);
+			this.parameters = temp;
+		}
+		else
+		{
+			System.arraycopy(this.parameters, index, this.parameters, index + 1, this.size - index);
+			this.parameters[index] = parameter;
+		}
+		this.size = newSize;
+
+		// Update indices
+		for (int i = 0; i < newSize; i++)
+		{
+			this.parameters[i].setIndex(i);
+		}
 	}
 
 	public void remove(int count)
@@ -253,7 +279,13 @@ public class ParameterList implements Iterable<IParameter>, IResolvable
 	{
 		for (int i = 0; i < this.size; i++)
 		{
-			final IType parameterType = this.parameters[i].getType();
+			final IParameter parameter = this.parameters[i];
+			if (parameter.hasModifier(Modifiers.SYNTHETIC))
+			{
+				return true;
+			}
+
+			final IType parameterType = parameter.getType();
 			if (parameterType.isGenericType() || parameterType.hasTypeVariables())
 			{
 				return true;
@@ -266,7 +298,11 @@ public class ParameterList implements Iterable<IParameter>, IResolvable
 	{
 		for (int i = 0; i < this.size; i++)
 		{
-			this.parameters[i].getType().appendSignature(builder, false);
+			final IParameter parameter = this.parameters[i];
+			if (!parameter.hasModifier(Modifiers.SYNTHETIC))
+			{
+				parameter.getType().appendSignature(builder, false);
+			}
 		}
 	}
 

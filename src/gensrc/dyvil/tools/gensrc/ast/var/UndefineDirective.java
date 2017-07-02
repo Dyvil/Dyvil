@@ -23,6 +23,11 @@ public class UndefineDirective extends VarDirective
 	@Override
 	public void specialize(GenSrc gensrc, Scope scope, MarkerList markers, PrintStream output)
 	{
+		if (this.body != null)
+		{
+			markers.add(new SemanticError(this.position, I18n.get("undefine.body")));
+		}
+
 		if (this.name == null)
 		{
 			markers.add(new SemanticError(this.position, I18n.get("undefine.name")));

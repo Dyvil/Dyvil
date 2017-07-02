@@ -3,9 +3,9 @@ package dyvil.tests
 using dyvil.Collections
 using dyvil.Test
 
-public class ConstructorTest
+class ConstructorTest
 {
-	public case class A(
+	static case class A(
 		public let i: int
 		public let j: int
 	)
@@ -20,7 +20,7 @@ public class ConstructorTest
 		static func initClass() -> void { /* noop, forces static initializer */ }
 	}
 
-	case class B(
+	static case class B(
 		public let i: int { override get }
 	) extends A(i, 0)
 	{
@@ -32,13 +32,13 @@ public class ConstructorTest
 		}
 	}
 
-	case class C(
+	static case class C(
 		public let j: int { override get }
 	) extends A(0, j)
 
-	case object O extends A(1, 1)
+	static case object O extends A(1, 1)
 
-	class InitOrder
+	static class InitOrder
 	{
 		public var order = MutableList<String>()
 
@@ -49,9 +49,8 @@ public class ConstructorTest
 			this.order += "init block"
 		}
 
-		public init()
+		public init() : this(1)
 		{
-			this.init(1)
 			this.order += "init() body"
 		}
 

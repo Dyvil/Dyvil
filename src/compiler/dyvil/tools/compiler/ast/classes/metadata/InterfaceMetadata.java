@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.ast.classes.metadata;
 
 import dyvil.reflect.Modifiers;
+import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.constructor.IInitializer;
 import dyvil.tools.compiler.ast.context.IContext;
@@ -21,9 +21,49 @@ public class InterfaceMetadata implements IClassMetadata
 {
 	protected final IClass theClass;
 
+	private IMethod functionalMethod;
+	private boolean functionalMethodSearched;
+
 	public InterfaceMetadata(IClass theClass)
 	{
 		this.theClass = theClass;
+	}
+
+	@Override
+	public IMethod getFunctionalMethod()
+	{
+		if (this.functionalMethodSearched)
+		{
+			return this.functionalMethod;
+		}
+
+		this.functionalMethodSearched = true;
+		final ClassBody body = this.theClass.getBody();
+		if (body == null)
+		{
+			return null;
+		}
+
+		for (IMethod method : body.allMethods())
+		{
+			if (method.isFunctional())
+			{
+				if (this.functionalMethod != null)
+				{
+					// duplicate detected
+					return this.functionalMethod = null;
+				}
+				this.functionalMethod = method;
+			}
+		}
+		return this.functionalMethod;
+	}
+
+	@Override
+	public void setFunctionalMethod(IMethod functionalMethod)
+	{
+		this.functionalMethod = functionalMethod;
+		this.functionalMethodSearched = true;
 	}
 
 	@Override
@@ -39,7 +79,7 @@ public class InterfaceMetadata implements IClassMetadata
 			markers.add(Markers.semanticError(this.theClass.getPosition(), "interface.classparameters"));
 		}
 
-		final IClassBody classBody = this.theClass.getBody();
+		final ClassBody classBody = this.theClass.getBody();
 		if (classBody == null)
 		{
 			return;

@@ -1,11 +1,14 @@
 package dyvil.tools.compiler.ast.classes;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.collection.immutable.ArrayList;
 import dyvil.math.MathUtils;
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.constructor.IInitializer;
+import dyvil.tools.compiler.ast.consumer.IMemberConsumer;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.field.Field;
@@ -21,14 +24,17 @@ import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.backend.ClassWriter;
+import dyvil.tools.compiler.backend.MethodWriter;
+import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
+import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.ASTNode;
+import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
-public class ClassBody implements IClassBody
+public class ClassBody implements ASTNode, IResolvable, IClassList, IMemberConsumer<IField>
 {
 	private static class MethodLink
 	{
@@ -50,10 +56,10 @@ public class ClassBody implements IClassBody
 		}
 	}
 
-	public IClass enclosingClass;
+	protected final IClass enclosingClass;
 
-	public IClass[] classes;
-	public int      classCount;
+	private IClass[] classes;
+	private int      classCount;
 
 	private IField[] fields = new IField[3];
 	private int fieldCount;
@@ -65,14 +71,14 @@ public class ClassBody implements IClassBody
 	private int methodCount;
 
 	private IConstructor[] constructors = new IConstructor[1];
-	private int            constructorCount;
+	private int constructorCount;
+
 	private IInitializer[] initializers;
 	private int            initializerCount;
 
 	// Caches
 	protected MethodLink[] namedMethodCache;
 	protected IMethod[]    implicitCache;
-	protected IMethod      functionalMethod;
 
 	public ClassBody(IClass iclass)
 	{
@@ -90,19 +96,12 @@ public class ClassBody implements IClassBody
 	{
 	}
 
-	@Override
 	public IClass getEnclosingClass()
 	{
 		return this.enclosingClass;
 	}
 
-	@Override
-	public void setEnclosingClass(IClass enclosingClass)
-	{
-		this.enclosingClass = enclosingClass;
-	}
-
-	// Nested Classes
+	// region Nested Classes
 
 	@Override
 	public int classCount()
@@ -153,9 +152,16 @@ public class ClassBody implements IClassBody
 		return null;
 	}
 
-	// Fields
+	// endregion
+
+	// region Fields
 
 	@Override
+	public boolean acceptEnums()
+	{
+		return this.getEnclosingClass().hasModifier(Modifiers.ENUM);
+	}
+
 	public int fieldCount()
 	{
 		return this.fieldCount;
@@ -183,13 +189,11 @@ public class ClassBody implements IClassBody
 		return new Field(this.enclosingClass, position, name, type, modifiers, annotations);
 	}
 
-	@Override
 	public IField getField(int index)
 	{
 		return this.fields[index];
 	}
 
-	@Override
 	public IField getField(Name name)
 	{
 		for (int i = 0; i < this.fieldCount; i++)
@@ -203,9 +207,10 @@ public class ClassBody implements IClassBody
 		return null;
 	}
 
-	// Properties
+	// endregion
 
-	@Override
+	// region Properties
+
 	public int propertyCount()
 	{
 		return this.propertyCount;
@@ -232,13 +237,11 @@ public class ClassBody implements IClassBody
 		this.properties[index] = property;
 	}
 
-	@Override
 	public IProperty getProperty(int index)
 	{
 		return this.properties[index];
 	}
 
-	@Override
 	public IProperty getProperty(Name name)
 	{
 		for (int i = 0; i < this.propertyCount; i++)
@@ -252,12 +255,69 @@ public class ClassBody implements IClassBody
 		return null;
 	}
 
-	// Methods
+	// endregion
 
-	@Override
+	// region Methods
+
 	public int methodCount()
 	{
 		return this.methodCount;
+	}
+
+	public IMethod getMethod(int index)
+	{
+		return this.methods[index];
+	}
+
+	public IMethod getMethod(Name name)
+	{
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			final IMethod method = this.methods[i];
+			if (method.getName() == name)
+			{
+				return method;
+			}
+		}
+		return null;
+	}
+
+	public Iterable<IMethod> allMethods()
+	{
+		final ArrayList.Builder<IMethod> builder = new ArrayList.Builder<>(this.methodCount + this.propertyCount * 2
+			                                                                   + this.fieldCount);
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			builder.add(this.methods[i]);
+		}
+		for (int i = 0; i < this.propertyCount; i++)
+		{
+			addPropertyMethods(builder, this.properties[i]);
+		}
+		for (int i = 0; i < this.fieldCount; i++)
+		{
+			final IProperty prop = this.fields[i].getProperty();
+			if (prop != null)
+			{
+				addPropertyMethods(builder, prop);
+			}
+		}
+		return builder.build();
+	}
+
+	private static void addPropertyMethods(ArrayList.Builder<IMethod> builder, IProperty prop)
+	{
+		final IMethod getter = prop.getGetter();
+		if (getter != null)
+		{
+			builder.add(getter);
+		}
+
+		final IMethod setter = prop.getSetter();
+		if (setter != null)
+		{
+			builder.add(setter);
+		}
 	}
 
 	@Override
@@ -275,27 +335,6 @@ public class ClassBody implements IClassBody
 		this.methods[index] = method;
 	}
 
-	@Override
-	public IMethod getMethod(int index)
-	{
-		return this.methods[index];
-	}
-
-	@Override
-	public IMethod getMethod(Name name)
-	{
-		for (int i = 0; i < this.methodCount; i++)
-		{
-			final IMethod method = this.methods[i];
-			if (method.getName() == name)
-			{
-				return method;
-			}
-		}
-		return null;
-	}
-
-	@Override
 	public void getMethodMatches(MatchList<IMethod> list, IValue receiver, Name name, ArgumentList arguments)
 	{
 		final int cacheSize = this.namedMethodCache.length;
@@ -337,7 +376,6 @@ public class ClassBody implements IClassBody
 		}
 	}
 
-	@Override
 	public void getImplicitMatches(MatchList<IMethod> list, IValue value, IType targetType)
 	{
 		if (this.implicitCache == null)
@@ -351,19 +389,6 @@ public class ClassBody implements IClassBody
 		}
 	}
 
-	@Override
-	public IMethod getFunctionalMethod()
-	{
-		return this.functionalMethod;
-	}
-
-	@Override
-	public void setFunctionalMethod(IMethod method)
-	{
-		this.functionalMethod = method;
-	}
-
-	@Override
 	public boolean checkImplements(IMethod candidate, ITypeContext typeContext)
 	{
 		final int cacheSize = this.namedMethodCache.length;
@@ -406,7 +431,6 @@ public class ClassBody implements IClassBody
 			       || setter != null && checkMethodImplements(setter, candidate, typeContext);
 	}
 
-	@Override
 	public void checkMethods(MarkerList markers, IClass checkedClass, ITypeContext typeContext)
 	{
 		for (int i = 0; i < this.methodCount; i++)
@@ -468,36 +492,20 @@ public class ClassBody implements IClassBody
 		}
 	}
 
-	// Constructors
+	// endregion
 
-	@Override
+	// region Constructors
+
 	public int constructorCount()
 	{
 		return this.constructorCount;
 	}
 
-	@Override
-	public void addConstructor(IConstructor constructor)
-	{
-		constructor.setEnclosingClass(this.enclosingClass);
-
-		final int index = this.constructorCount++;
-		if (index >= this.constructors.length)
-		{
-			IConstructor[] temp = new IConstructor[index + 1];
-			System.arraycopy(this.constructors, 0, temp, 0, index);
-			this.constructors = temp;
-		}
-		this.constructors[index] = constructor;
-	}
-
-	@Override
 	public IConstructor getConstructor(int index)
 	{
 		return this.constructors[index];
 	}
 
-	@Override
 	public IConstructor getConstructor(ParameterList parameters)
 	{
 		for (int i = 0; i < this.constructorCount; i++)
@@ -515,6 +523,20 @@ public class ClassBody implements IClassBody
 	}
 
 	@Override
+	public void addConstructor(IConstructor constructor)
+	{
+		constructor.setEnclosingClass(this.enclosingClass);
+
+		final int index = this.constructorCount++;
+		if (index >= this.constructors.length)
+		{
+			IConstructor[] temp = new IConstructor[index + 1];
+			System.arraycopy(this.constructors, 0, temp, 0, index);
+			this.constructors = temp;
+		}
+		this.constructors[index] = constructor;
+	}
+
 	public void getConstructorMatches(MatchList<IConstructor> list, ArgumentList arguments)
 	{
 		for (int i = 0; i < this.constructorCount; i++)
@@ -523,9 +545,10 @@ public class ClassBody implements IClassBody
 		}
 	}
 
-	// Initializers
+	// endregion
 
-	@Override
+	// region Initializers
+
 	public int initializerCount()
 	{
 		return this.initializerCount;
@@ -552,15 +575,15 @@ public class ClassBody implements IClassBody
 		this.initializers[index] = initializer;
 	}
 
-	@Override
 	public IInitializer getInitializer(int index)
 	{
 		return this.initializers[index];
 	}
 
-	// Phases
+	// endregion
 
-	@Override
+	// region Phases
+
 	public void initExternalMethodCache()
 	{
 		final int cacheSize = MathUtils.nextPowerOf2(this.methodCount);
@@ -574,7 +597,6 @@ public class ClassBody implements IClassBody
 		}
 	}
 
-	@Override
 	public void initExternalImplicitCache()
 	{
 		IMethod[] implicitCache = null;
@@ -856,6 +878,72 @@ public class ClassBody implements IClassBody
 			this.initializers[i].cleanup(compilableList, classCompilableList);
 		}
 	}
+
+	// endregion
+
+	// region Compilation
+
+	public void write(ClassWriter writer) throws BytecodeException
+	{
+		for (int i = 0; i < this.classCount; i++)
+		{
+			this.classes[i].writeInnerClassInfo(writer);
+		}
+
+		for (int i = 0; i < this.fieldCount; i++)
+		{
+			this.fields[i].write(writer);
+		}
+
+		for (int i = 0; i < this.constructorCount; i++)
+		{
+			this.constructors[i].write(writer);
+		}
+
+		for (int i = 0; i < this.propertyCount; i++)
+		{
+			this.properties[i].write(writer);
+		}
+
+		for (int i = 0; i < this.methodCount; i++)
+		{
+			this.methods[i].write(writer);
+		}
+	}
+
+	public void writeClassInit(MethodWriter writer) throws BytecodeException
+	{
+		for (int i = 0, count = this.fieldCount; i < count; i++)
+		{
+			this.fields[i].writeClassInit(writer);
+		}
+		for (int i = 0, count = this.propertyCount; i < count; i++)
+		{
+			this.properties[i].writeClassInit(writer);
+		}
+		for (int i = 0, count = this.initializerCount; i < count; i++)
+		{
+			this.initializers[i].writeClassInit(writer);
+		}
+	}
+
+	public void writeStaticInit(MethodWriter writer) throws BytecodeException
+	{
+		for (int i = 0, count = this.fieldCount; i < count; i++)
+		{
+			this.fields[i].writeStaticInit(writer);
+		}
+		for (int i = 0, count = this.propertyCount; i < count; i++)
+		{
+			this.properties[i].writeStaticInit(writer);
+		}
+		for (int i = 0, count = this.initializerCount; i < count; i++)
+		{
+			this.initializers[i].writeStaticInit(writer);
+		}
+	}
+
+	// endregion
 
 	@Override
 	public void toString(@NonNull String prefix, @NonNull StringBuilder buffer)

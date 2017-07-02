@@ -3,7 +3,7 @@ package dyvil.collection
 import java.util._
 import java.util.function._
 
-interface SizedIterable<E> extends Iterable<E>
+interface SizedIterable<type E> extends Iterable<E>
 {
 	// Size
 

@@ -4,9 +4,9 @@ using dyvil.Test
 
 import java.io._
 
-public class ObjectTest
+class ObjectTest
 {
-	public object TestObject
+	static object TestObject
 
 	static func apply() -> Test = test "Objects" {
 		let obj = TestObject.instance

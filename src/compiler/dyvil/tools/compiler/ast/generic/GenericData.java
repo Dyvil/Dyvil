@@ -7,7 +7,6 @@ import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.TypeList;
 import dyvil.tools.compiler.ast.type.builtin.Types;
-import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.phase.IResolvable;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -191,9 +190,7 @@ public final class GenericData implements IResolvable, ITypeContext
 	{
 		if (this.generics.size() > 0)
 		{
-			Formatting.appendSeparator(buffer, "generics.open_bracket", '<');
 			this.generics.toString(indent, buffer);
-			Formatting.appendSeparator(buffer, "generics.close_bracket", '>');
 		}
 	}
 }

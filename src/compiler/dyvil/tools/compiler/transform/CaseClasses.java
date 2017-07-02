@@ -10,6 +10,7 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.PrimitiveType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
+import dyvil.tools.compiler.ast.type.compound.NullableType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
 
@@ -25,40 +26,29 @@ public abstract class CaseClasses
 	public static void writeEquals(MethodWriter writer, IClass theClass) throws BytecodeException
 	{
 		Label label;
-		// Write check 'if (this == obj)'
+		// Write check 'if (this == obj) return true'
 		writer.visitVarInsn(ALOAD, 0);
 		writer.visitVarInsn(ALOAD, 1);
-		// if
 		writer.visitJumpInsn(IF_ACMPNE, label = new Label());
-		// then
 		writer.visitLdcInsn(1);
-		writer.visitInsn(IRETURN); // return true
-		// else
+		writer.visitInsn(IRETURN);
 		writer.visitLabel(label);
 
-		// Write check 'if (obj == null)'
+		// if (obj == null) return false
 		writer.visitVarInsn(ALOAD, 1);
-		// if
 		writer.visitJumpInsn(IFNONNULL, label = new Label());
-		// then
-		writer.visitLdcInsn(0);
-		writer.visitInsn(IRETURN); // return false
-		// else
-		writer.visitLabel(label);
-
-		// Write check 'if (this.getClass() != obj.getClass())'
-		// this.getClass()
-		writer.visitVarInsn(ALOAD, 0);
-		writer.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false);
-		// obj.getClass()
-		writer.visitVarInsn(ALOAD, 1);
-		writer.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false);
-		// if
-		writer.visitJumpInsn(IF_ACMPEQ, label = new Label());
-		// then
 		writer.visitLdcInsn(0);
 		writer.visitInsn(IRETURN);
-		// else
+		writer.visitLabel(label);
+
+		// if (this.getClass() != obj.getClass()) return false
+		writer.visitVarInsn(ALOAD, 0);
+		writer.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false);
+		writer.visitVarInsn(ALOAD, 1);
+		writer.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "getClass", "()Ljava/lang/Class;", false);
+		writer.visitJumpInsn(IF_ACMPEQ, label = new Label());
+		writer.visitLdcInsn(0);
+		writer.visitInsn(IRETURN);
 		writer.visitLabel(label);
 
 		// var = (ClassName) obj
@@ -67,30 +57,39 @@ public abstract class CaseClasses
 		// 'var' variable that stores the casted 'obj' parameter
 		writer.visitVarInsn(ASTORE, 2);
 
+		label = new Label();
+
 		final ParameterList parameters = theClass.getParameters();
 		for (int i = 0, count = parameters.size(); i < count; i++)
 		{
-			writeEquals(writer, parameters.get(i));
+			writeEquals(writer, parameters.get(i), label);
 		}
 
 		writer.visitLdcInsn(1);
 		writer.visitInsn(IRETURN);
+
+		writer.visitLabel(label);
+		writer.visitLdcInsn(0);
+		writer.visitInsn(IRETURN);
 	}
 
-	public static void writeEquals(MethodWriter writer, IDataMember field) throws BytecodeException
+	private static void writeEquals(MethodWriter writer, IDataMember field, Label falseLabel) throws BytecodeException
 	{
-		IType type = field.getType();
+		// this.field
+		writer.visitVarInsn(ALOAD, 0);
+		field.writeGet(writer, null, 0);
 
+		// var.field
+		writer.visitVarInsn(ALOAD, 2);
+		field.writeGet(writer, null, 0);
+
+		writeIFNE(writer, field.getType(), falseLabel);
+	}
+
+	public static void writeIFNE(MethodWriter writer, IType type, Label falseLabel) throws BytecodeException
+	{
 		if (type.isPrimitive())
 		{
-			// Push 'this'
-			writer.visitVarInsn(ALOAD, 0);
-			field.writeGet(writer, null, 0);
-			// Push 'var'
-			writer.visitVarInsn(ALOAD, 2);
-			field.writeGet(writer, null, 0);
-
-			Label label = new Label();
 			switch (type.getTypecode())
 			{
 			case PrimitiveType.BOOLEAN_CODE:
@@ -98,63 +97,40 @@ public abstract class CaseClasses
 			case PrimitiveType.SHORT_CODE:
 			case PrimitiveType.CHAR_CODE:
 			case PrimitiveType.INT_CODE:
-				writer.visitJumpInsn(IF_ICMPEQ, label);
+				writer.visitJumpInsn(IF_ICMPNE, falseLabel);
 				break;
 			case PrimitiveType.LONG_CODE:
-				writer.visitJumpInsn(IF_LCMPEQ, label);
+				writer.visitJumpInsn(IF_LCMPNE, falseLabel);
 				break;
 			case PrimitiveType.FLOAT_CODE:
-				writer.visitJumpInsn(IF_FCMPEQ, label);
+				writer.visitJumpInsn(IF_FCMPNE, falseLabel);
 				break;
 			case PrimitiveType.DOUBLE_CODE:
-				writer.visitJumpInsn(IF_DCMPEQ, label);
+				writer.visitJumpInsn(IF_DCMPNE, falseLabel);
 				break;
 			}
-			writer.visitLdcInsn(0);
-			writer.visitInsn(IRETURN);
-			writer.visitLabel(label);
 			return;
 		}
-
-		// if (this.f == null) { if (var.f != null) return true }
-		// else if (!this.f.equals(var.f)) return false;
-		// Code generated using ASMifier
-
-		Label elseLabel = new Label();
-		Label endLabel = new Label();
-		writer.visitVarInsn(ALOAD, 0);
-		field.writeGet(writer, null, 0);
-		writer.visitJumpInsn(IFNONNULL, elseLabel);
-		writer.visitVarInsn(ALOAD, 2);
-		field.writeGet(writer, null, 0);
-		writer.visitJumpInsn(IFNULL, endLabel);
-		writer.visitLdcInsn(0);
-		writer.visitInsn(IRETURN);
-		writer.visitLabel(elseLabel);
-		writer.visitVarInsn(ALOAD, 0);
-		field.writeGet(writer, null, 0);
-		writer.visitVarInsn(ALOAD, 2);
-		field.writeGet(writer, null, 0);
-
-		writer.visitLineNumber(0);
 
 		final ArrayType arrayType = type.extract(ArrayType.class);
 		if (arrayType != null)
 		{
 			writeArrayEquals(writer, arrayType.getElementType());
 		}
-		else
+		else if (!NullableType.isNullable(type))
 		{
 			writer.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Object", "equals", "(Ljava/lang/Object;)Z", false);
 		}
+		else
+		{
+			writer.visitMethodInsn(INVOKESTATIC, "dyvil/lang/Objects", "equals",
+			                       "(Ljava/lang/Object;Ljava/lang/Object;)Z", false);
+		}
 
-		writer.visitJumpInsn(IFNE, endLabel);
-		writer.visitLdcInsn(0);
-		writer.visitInsn(IRETURN);
-		writer.visitLabel(endLabel);
+		writer.visitJumpInsn(IFEQ, falseLabel);
 	}
 
-	public static void writeArrayEquals(MethodWriter writer, IType type) throws BytecodeException
+	private static void writeArrayEquals(MethodWriter writer, IType type) throws BytecodeException
 	{
 		switch (type.typeTag())
 		{

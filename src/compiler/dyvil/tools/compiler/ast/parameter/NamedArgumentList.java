@@ -27,6 +27,12 @@ public class NamedArgumentList extends ArgumentList
 		this.values = new IValue[3];
 	}
 
+	public NamedArgumentList(int size)
+	{
+		this.keys = new Name[size];
+		this.values = new IValue[size];
+	}
+
 	public NamedArgumentList(Name[] keys, IValue[] values, int size)
 	{
 		this.keys = keys;
@@ -57,20 +63,29 @@ public class NamedArgumentList extends ArgumentList
 	}
 
 	@Override
-	public void add(Name key, IValue value)
+	public NamedArgumentList concat(ArgumentList that)
 	{
-		final int index = this.size++;
-		if (index >= this.values.length)
+		final int size = this.size + that.size;
+		final NamedArgumentList list = new NamedArgumentList(size);
+		list.addAll(this);
+		list.addAll(that);
+		return list;
+	}
+
+	@Override
+	public IValue get(int index, Name key)
+	{
+		if (key == null)
 		{
-			final Name[] tempKeys = new Name[this.size];
-			final IValue[] tempValues = new IValue[this.size];
-			System.arraycopy(this.keys, 0, tempKeys, 0, index);
-			System.arraycopy(this.values, 0, tempValues, 0, index);
-			this.keys = tempKeys;
-			this.values = tempValues;
+			return this.values[index];
 		}
-		this.values[index] = value;
-		this.keys[index] = key;
+
+		final int argIndex = this.findIndex(index, key);
+		if (argIndex < 0)
+		{
+			return null;
+		}
+		return this.values[argIndex];
 	}
 
 	public void setName(int i, Name name)
@@ -82,35 +97,82 @@ public class NamedArgumentList extends ArgumentList
 	}
 
 	@Override
-	public IValue get(int index, IParameter param)
+	public void set(int index, Name key, IValue value)
 	{
-		if (param == null)
-		{
-			return this.values[index];
-		}
-
-		final int argIndex = this.findIndex(index, param.getName());
-		if (argIndex < 0)
-		{
-			return null;
-		}
-		return this.values[argIndex];
-	}
-
-	@Override
-	public void set(int index, IParameter param, IValue value)
-	{
-		if (param == null)
+		if (key == null)
 		{
 			this.values[index] = value;
 			return;
 		}
 
-		final int argIndex = this.findIndex(index, param.getName());
+		final int argIndex = this.findIndex(index, key);
 		if (argIndex >= 0)
 		{
 			this.values[argIndex] = value;
 		}
+	}
+
+	@Override
+	protected void ensureCapacity(int min)
+	{
+		if (min >= this.values.length)
+		{
+			final Name[] tempKeys = new Name[min];
+			final IValue[] tempValues = new IValue[min];
+			System.arraycopy(this.keys, 0, tempKeys, 0, this.size);
+			System.arraycopy(this.values, 0, tempValues, 0, this.size);
+			this.keys = tempKeys;
+			this.values = tempValues;
+		}
+	}
+
+	@Override
+	public void add(Name key, IValue value)
+	{
+		final int size = this.size;
+		this.ensureCapacity(size + 1);
+		this.values[size] = value;
+		this.keys[size] = key;
+		this.size = size + 1;
+	}
+
+	@Override
+	public void addAll(ArgumentList list)
+	{
+		this.ensureCapacity(this.size + list.size);
+		System.arraycopy(list.values, 0, this.values, this.size, list.size);
+
+		if (list instanceof NamedArgumentList)
+		{
+			System.arraycopy(((NamedArgumentList) list).keys, 0, this.keys, this.size, list.size);
+		}
+	}
+
+	@Override
+	public void insert(int index, Name key, IValue value)
+	{
+		final int newSize = this.size + 1;
+		if (newSize >= this.values.length)
+		{
+			final Name[] keys = new Name[newSize];
+			final IValue[] values = new IValue[newSize];
+			System.arraycopy(this.keys, 0, keys, 0, index);
+			System.arraycopy(this.values, 0, values, 0, index);
+			keys[index] = key;
+			values[index] = value;
+			System.arraycopy(this.keys, index, keys, index + 1, this.size - index);
+			System.arraycopy(this.values, index, values, index + 1, this.size - index);
+			this.keys = keys;
+			this.values = values;
+		}
+		else
+		{
+			System.arraycopy(this.keys, index, this.keys, index + 1, this.size - index);
+			System.arraycopy(this.values, index, this.values, index + 1, this.size - index);
+			this.keys[index] = key;
+			this.values[index] = value;
+		}
+		this.size = newSize;
 	}
 
 	private int findIndex(int index, Name name)
@@ -161,7 +223,7 @@ public class NamedArgumentList extends ArgumentList
 	public int checkMatch(int[] values, IType[] types, int matchStartIndex, int argumentIndex, IParameter param,
 		                     IImplicitContext implicitContext)
 	{
-		final int argIndex = this.findIndex(argumentIndex, param.getName());
+		final int argIndex = this.findIndex(argumentIndex, param.getLabel());
 		if (argIndex < 0)
 		{
 			// No argument for parameter name
@@ -190,14 +252,14 @@ public class NamedArgumentList extends ArgumentList
 	@Override
 	public void checkValue(int index, IParameter param, GenericData genericData, MarkerList markers, IContext context)
 	{
-		final int argIndex = this.findIndex(index, param.getName());
+		final int argIndex = this.findIndex(index, param.getLabel());
 		if (argIndex < 0)
 		{
 			if (param.isVarargs())
 			{
 				final ArrayExpr arrayExpr = new ArrayExpr(ArgumentList.EMPTY);
 				final IValue converted = convertValue(arrayExpr, param, genericData, markers, context);
-				this.add(param.getName(), converted);
+				this.add(param.getLabel(), converted);
 			}
 
 			return;
@@ -248,7 +310,7 @@ public class NamedArgumentList extends ArgumentList
 		for (int i = 0; i < paramCount; i++)
 		{
 			final IParameter param = parameters.get(i + startIndex);
-			final int argIndex = this.findIndex(i, param.getName());
+			final int argIndex = this.findIndex(i, param.getLabel());
 			if (argIndex >= 0)
 			{
 				params[argIndex] = param;
@@ -346,7 +408,7 @@ public class NamedArgumentList extends ArgumentList
 	}
 
 	@Override
-	protected void appendValue(@NonNull String indent, @NonNull StringBuilder buffer, int index)
+	public void appendValue(@NonNull String indent, @NonNull StringBuilder buffer, int index)
 	{
 		final Name key = this.keys[index];
 		if (key != null)

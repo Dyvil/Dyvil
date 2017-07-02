@@ -49,36 +49,27 @@ public class SubscriptAssignment extends AbstractCall implements IValueConsumer
 	}
 	
 	@Override
-	public void toString(String prefix, StringBuilder buffer)
+	public void toString(String indent, StringBuilder buffer)
 	{
 		if (this.receiver != null)
 		{
-			this.receiver.toString(prefix, buffer);
-		}
-		
-		if (!(this.arguments instanceof ArgumentList))
-		{
-			this.arguments.toString(prefix, buffer);
+			this.receiver.toString(indent, buffer);
 		}
 
 		Formatting.appendSeparator(buffer, "method.subscript.open_bracket", '[');
 
-		int count = this.arguments.size() - 1;
-		this.arguments.get(0, null).toString(prefix, buffer);
+		final int count = this.arguments.size() - 1;
+		this.arguments.appendValue(indent, buffer, 0);
 		for (int i = 1; i < count; i++)
 		{
 			Formatting.appendSeparator(buffer, "method.subscript.separator", ',');
-			this.arguments.get(i, null).toString(prefix, buffer);
+			this.arguments.appendValue(indent, buffer, i);
 		}
 
-		if (Formatting.getBoolean("method.subscript.close_bracket.space_before"))
-		{
-			buffer.append(' ');
-		}
-		buffer.append(']');
+		Formatting.appendClose(buffer, "method.subscript.close_bracket", ']');
 
 		Formatting.appendSeparator(buffer, "field.assignment", '=');
 
-		this.arguments.getLast().toString(prefix, buffer);
+		this.arguments.getLast().toString(indent, buffer);
 	}
 }

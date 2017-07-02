@@ -3,6 +3,8 @@ package dyvil.tools.compiler.ast.parameter;
 import dyvil.annotation.internal.NonNull;
 import dyvil.annotation.internal.Nullable;
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
+import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -13,6 +15,7 @@ import dyvil.tools.compiler.ast.method.ICallableMember;
 import dyvil.tools.compiler.ast.modifiers.FlagModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.type.IType;
+import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.ast.type.compound.ArrayType;
 import dyvil.tools.compiler.ast.type.compound.LambdaType;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -21,12 +24,13 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.lang.annotation.ElementType;
 
 public abstract class AbstractParameter extends Variable implements IParameter
 {
+	protected @NonNull Name label;
+
 	// Metadata
 	protected @Nullable ICallableMember method;
 
@@ -40,17 +44,19 @@ public abstract class AbstractParameter extends Variable implements IParameter
 
 	public AbstractParameter(Name name)
 	{
-		super(name, null);
+		this(name, null);
 	}
 
 	public AbstractParameter(Name name, IType type)
 	{
 		super(name, type);
+		this.label = name;
 	}
 
 	public AbstractParameter(ICallableMember callable, SourcePosition position, Name name, IType type)
 	{
 		super(position, name, type);
+		this.label = name;
 		this.method = callable;
 	}
 
@@ -58,7 +64,20 @@ public abstract class AbstractParameter extends Variable implements IParameter
 		                        ModifierSet modifiers, AnnotationList annotations)
 	{
 		super(position, name, type, modifiers, annotations);
+		this.label = name;
 		this.method = callable;
+	}
+
+	@Override
+	public Name getLabel()
+	{
+		return this.label;
+	}
+
+	@Override
+	public void setLabel(Name label)
+	{
+		this.label = label;
 	}
 
 	@Override
@@ -122,6 +141,12 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	}
 
 	@Override
+	public String getQualifiedLabel()
+	{
+		return this.label == null ? null : this.label.qualified;
+	}
+
+	@Override
 	public IType getCovariantType()
 	{
 		if (this.covariantType != null)
@@ -151,12 +176,9 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	}
 
 	@Override
-	public void setVarargs(boolean varargs)
+	public void setVarargs()
 	{
-		if (varargs)
-		{
-			this.getModifiers().addIntModifier(Modifiers.VARARGS);
-		}
+		this.getModifiers().addIntModifier(Modifiers.VARARGS);
 	}
 
 	@Override
@@ -208,6 +230,15 @@ public abstract class AbstractParameter extends Variable implements IParameter
 	}
 
 	@Override
+	public void writeLocal(MethodWriter writer, Label start, Label end)
+	{
+		if (this.name != null)
+		{
+			super.writeLocal(writer, start, end);
+		}
+	}
+
+	@Override
 	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
 		if (this.annotations != null)
@@ -220,41 +251,34 @@ public abstract class AbstractParameter extends Variable implements IParameter
 			this.modifiers.toString(this.getKind(), buffer);
 		}
 
-		// The type of varargs syntax for this parameter
-		// 0 = not variadic
-		// 1 = array
-		// 2 = other type
-		final byte varargs = !this.isVarargs() ? (byte) 0 : this.type.canExtract(ArrayType.class) ? (byte) 1 : (byte) 2;
-
-		boolean typeAscription = false;
-		if (this.type != null)
+		if (this.label != this.name)
 		{
-			typeAscription = Formatting.typeAscription("parameter.type_ascription", this);
-
-			if (!typeAscription)
-			{
-				this.appendType(indent, buffer, varargs);
-				buffer.append(' ');
-			}
+			appendNullableName(buffer, this.label);
+			buffer.append(' ');
 		}
 
-		if (this.name != null)
+		appendNullableName(buffer, this.name);
+
+		final boolean varargs = this.isVarargs();
+		if (varargs && !this.type.canExtract(ArrayType.class))
 		{
-			buffer.append(this.name);
-		}
-		else
-		{
-			buffer.append('_');
-		}
-		if (varargs == 2)
-		{
+			// non-array varargs
 			buffer.append("...");
 		}
 
-		if (typeAscription)
+		if (this.type != null && this.type != Types.UNKNOWN)
 		{
 			Formatting.appendSeparator(buffer, "parameter.type_ascription", ':');
-			this.appendType(indent, buffer, varargs);
+			if (varargs && this.type.canExtract(ArrayType.class))
+			{
+				// array varargs
+				this.type.extract(ArrayType.class).getElementType().toString(indent, buffer);
+				buffer.append("...");
+			}
+			else
+			{
+				this.type.toString(indent, buffer);
+			}
 		}
 
 		if (this.value != null)
@@ -264,16 +288,15 @@ public abstract class AbstractParameter extends Variable implements IParameter
 		}
 	}
 
-	private void appendType(String prefix, StringBuilder buffer, byte varargs)
+	protected static void appendNullableName(@NonNull StringBuilder buffer, Name name)
 	{
-		if (varargs == 1)
+		if (name != null)
 		{
-			this.type.extract(ArrayType.class).getElementType().toString(prefix, buffer);
-			buffer.append("...");
+			buffer.append(name);
 		}
 		else
 		{
-			this.type.toString(prefix, buffer);
+			buffer.append('_');
 		}
 	}
 }

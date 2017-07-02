@@ -48,7 +48,7 @@ public class IfDirectiveParser extends Parser
 		case OPEN_PAREN:
 			if (type != BaseSymbols.OPEN_PARENTHESIS)
 			{
-				pm.report(token, "directive.if.open_paren");
+				pm.report(token, "if.open_paren");
 				this.list.add(this.directive);
 				pm.popParser(true);
 				return;
@@ -60,7 +60,7 @@ public class IfDirectiveParser extends Parser
 		case CLOSE_PAREN:
 			if (type != BaseSymbols.CLOSE_PARENTHESIS)
 			{
-				pm.report(token, "directive.if.close_paren");
+				pm.report(token, "if.close_paren");
 				return;
 			}
 
@@ -69,7 +69,7 @@ public class IfDirectiveParser extends Parser
 		case THEN_BODY:
 			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
 			{
-				pm.report(token, "directive.if.open_brace");
+				pm.report(token, "if.open_brace");
 				this.list.add(this.directive);
 				pm.popParser(true);
 				return;
@@ -81,7 +81,14 @@ public class IfDirectiveParser extends Parser
 			this.mode = THEN_BODY_END;
 			return;
 		case THEN_BODY_END:
-			assert type == BaseSymbols.CLOSE_CURLY_BRACKET;
+			if (type != BaseSymbols.CLOSE_CURLY_BRACKET)
+			{
+				pm.report(token, "if.close_brace");
+				this.list.add(this.directive);
+				pm.popParser();
+				return;
+			}
+
 			this.mode = ELSE;
 			return;
 		case ELSE:
@@ -106,7 +113,7 @@ public class IfDirectiveParser extends Parser
 		case ELSE_BODY:
 			if (type != BaseSymbols.OPEN_CURLY_BRACKET)
 			{
-				pm.report(token, "directive.if.else.open_brace");
+				pm.report(token, "if.else.open_brace");
 				this.list.add(this.directive);
 				pm.popParser(true);
 				return;
@@ -118,7 +125,10 @@ public class IfDirectiveParser extends Parser
 			this.mode = ELSE_BODY_END;
 			return;
 		case ELSE_BODY_END:
-			assert type == BaseSymbols.CLOSE_CURLY_BRACKET;
+			if (type != BaseSymbols.CLOSE_CURLY_BRACKET)
+			{
+				pm.report(token, "if.else.close_brace");
+			}
 			this.list.add(this.directive);
 			pm.popParser();
 		}

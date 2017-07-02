@@ -1,0 +1,88 @@
+package dyvil.collection
+
+import dyvil.util.ImmutableException
+
+import java.util.{ Iterator, Spliterator, Spliterators }
+import java.util.function.{ Function, Predicate }
+
+@Immutable
+interface ImmutableCollection<type E> extends Collection<E>
+{
+	static interface Builder<type E>
+	{
+		func add(element: E) -> void
+
+		func addAll(elements: Iterable<+E>) -> void = for (e <- elements) this.add(e)
+
+		func build() -> ImmutableCollection<E>!
+	}
+
+	// Accessors
+
+	override final func isImmutable() -> boolean = true
+
+	override func size() -> int
+
+	override func iterator() -> Iterator<E>
+
+	override func spliterator() -> Spliterator<E> = Spliterators.spliterator(this.iterator(), this.size, Spliterator.IMMUTABLE)
+
+	// Non-mutating Operations
+
+	override func added(element: E) -> ImmutableCollection<E>
+
+	override func union(collection: Collection<+E>) -> ImmutableCollection<E>
+
+	override func removed(element: any!) -> ImmutableCollection<E>
+
+	override func difference(collection: Collection<_>) -> ImmutableCollection<E>
+
+	override func intersection(collection: Collection<+E>) -> ImmutableCollection<E>
+
+	override func mapped<type R>(mapper: Function<-E, +R>) -> ImmutableCollection<R>
+
+	override func flatMapped<type R>(mapper: Function<-E, +Iterable<+R>>) -> ImmutableCollection<R>
+
+	override func filtered(predicate: Predicate<-E>) -> ImmutableCollection<E>
+
+	// Mutating Operations
+
+	@Mutating
+	override func clear() -> void = throw new ImmutableException("clear() on Immutable Collection")
+
+	@Mutating
+	override func add(element: E) -> boolean = throw new ImmutableException("add() on Immutable Collection")
+
+	@Mutating
+	override func addAll(elements: Collection<+E>) -> boolean = throw new ImmutableException("addAll() on Immutable Collection")
+
+	@Mutating
+	override func remove(element: any!) -> boolean = throw new ImmutableException("remove() on Immutable Collection")
+
+	@Mutating
+	override func removeAll(elements: Collection<_>) -> boolean = throw new ImmutableException("removeAll() on Immutable Collection")
+
+	@Mutating
+	override func retainAll(elements: Collection<+E>) -> boolean = throw new ImmutableException("intersect() on Immutable Collection")
+
+	@Mutating
+	override func map(mapper: Function<-E, +E>) -> void = throw new ImmutableException("map() on Immutable Collection")
+
+	@Mutating
+	override func flatMap(mapper: Function<-E, +Iterable<+E>>) -> void = throw new ImmutableException("flatMap() on Immutable Collection")
+
+	@Mutating
+	override func filter(predicate: Predicate<-E>) -> void = throw new ImmutableException("filter() on Immutable Collection")
+
+	// Copying
+
+	override func copy() -> ImmutableCollection<E>
+
+	override final func mutableCopy() -> MutableCollection<E> = this.mutable()
+
+	override final func immutable() -> ImmutableCollection<E> = this
+
+	override final func immutableCopy() -> ImmutableCollection<E> = this.copy()
+
+	override final func view() -> ImmutableCollection<E> = this
+}

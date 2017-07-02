@@ -28,7 +28,6 @@ public class ClassParameter extends Field implements IParameter
 	protected int     index;
 	protected int     localIndex;
 	protected IType   covariantType;
-	protected boolean varargs;
 
 	protected ICallableMember constructor;
 
@@ -51,6 +50,23 @@ public class ClassParameter extends Field implements IParameter
 		                     AnnotationList annotations)
 	{
 		super(enclosingClass, position, name, type, modifiers == null ? new ModifierList() : modifiers, annotations);
+	}
+
+	@Override
+	public Name getLabel()
+	{
+		return this.name;
+	}
+
+	@Override
+	public void setLabel(Name name)
+	{
+	}
+
+	@Override
+	public String getQualifiedLabel()
+	{
+		return this.getInternalName();
 	}
 
 	@Override
@@ -109,13 +125,13 @@ public class ClassParameter extends Field implements IParameter
 	@Override
 	public boolean isVarargs()
 	{
-		return this.varargs;
+		return this.modifiers.hasIntModifier(Modifiers.VARARGS);
 	}
 
 	@Override
-	public void setVarargs(boolean varargs)
+	public void setVarargs()
 	{
-		this.varargs = varargs;
+		this.modifiers.addIntModifier(Modifiers.VARARGS);
 	}
 
 	@Override
@@ -175,7 +191,7 @@ public class ClassParameter extends Field implements IParameter
 	public IValue checkAssign(MarkerList markers, IContext context, SourcePosition position, IValue receiver,
 		                         IValue newValue)
 	{
-		if (this.enclosingClass.hasModifier(Modifiers.ANNOTATION))
+		if (this.enclosingClass.isAnnotation())
 		{
 			markers.add(Markers.semanticError(position, "classparameter.assign.annotation", this.name.unqualified));
 		}
@@ -213,7 +229,7 @@ public class ClassParameter extends Field implements IParameter
 	@Override
 	public void write(ClassWriter writer) throws BytecodeException
 	{
-		if (this.enclosingClass.hasModifier(Modifiers.ANNOTATION))
+		if (this.enclosingClass.isAnnotation())
 		{
 			return;
 		}
@@ -229,17 +245,6 @@ public class ClassParameter extends Field implements IParameter
 	@Override
 	public void writeParameter(MethodWriter writer)
 	{
-		if (this.varargs && !this.modifiers.hasIntModifier(Modifiers.VARARGS))
-		{
-			// Bugfix: VARARGS is the same bitflag as TRANSIENT, so Class Parameters cannot use the Modifier and have
-			// to rely on a boolean field.
-
-			this.modifiers.addIntModifier(Modifiers.VARARGS);
-			IParameter.super.writeParameter(writer);
-			this.modifiers.removeIntModifier(Modifiers.VARARGS);
-			return;
-		}
-
 		IParameter.super.writeParameter(writer);
 	}
 

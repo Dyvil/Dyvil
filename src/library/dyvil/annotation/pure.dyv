@@ -6,6 +6,6 @@ import java.lang.annotation._
  * Marks a pure function. A pure function is a function that does not have any side effects. This means the result will
  * always be the same for the same parameters at any given time.
  */
-@Target([ ElementType.METHOD ])
-@Retention(RetentionPolicy.CLASS)
+@Target([ .METHOD ])
+@Retention(.CLASS)
 @interface pure

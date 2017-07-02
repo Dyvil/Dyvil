@@ -12,31 +12,25 @@ abstract class AbstractBitSet implements Set<int>
 
 	// Constructors
 
-	public init()
-	{
-		this.init(DEFAULT_CAPACITY)
-	}
+	public init() : this(DEFAULT_CAPACITY)
 
 	public init(capacity: int)
 	{
 		this.words = new [long](dyvil.math.MathUtils.ceil(capacity / 64))
 	}
 
-	public init(elements: [int])
+	public init(elements: [int]) : this(elements.size)
 	{
-		this.init(elements.size)
 		for (i <- elements) this.setBit(i)
 	}
 
-	public init(iterable: Iterable<+int>)
+	public init(iterable: Iterable<+int>) : this()
 	{
-		this.init()
 		for (i <- iterable) this.setBit(i)
 	}
 
-	public init(iterable: SizedIterable<+int>)
+	public init(iterable: SizedIterable<+int>) : this(iterable.size)
 	{
-		this.init(iterable.size)
 		for (i <- iterable) this.setBit(i)
 	}
 

@@ -7,9 +7,9 @@ import dyvil.collection.Set;
 import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.asm.Handle;
 import dyvil.tools.asm.Label;
-import dyvil.tools.compiler.ast.annotation.Annotation;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -53,7 +53,6 @@ import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
 import dyvil.tools.parsing.marker.SemanticError;
-import dyvil.source.position.SourcePosition;
 
 import java.lang.annotation.ElementType;
 
@@ -159,17 +158,17 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	{
 		switch (type)
 		{
-		case AnnotationUtil.NATIVE:
+		case ModifierUtil.NATIVE_INTERNAL:
 			this.modifiers.addIntModifier(Modifiers.NATIVE);
 			return false;
-		case AnnotationUtil.STRICT:
+		case ModifierUtil.STRICTFP_INTERNAL:
 			this.modifiers.addIntModifier(Modifiers.STRICT);
 			return false;
 		case Deprecation.JAVA_INTERNAL:
 		case Deprecation.DYVIL_INTERNAL:
 			this.modifiers.addIntModifier(Modifiers.DEPRECATED);
 			return true;
-		case AnnotationUtil.OVERRIDE:
+		case ModifierUtil.OVERRIDE_INTERNAL:
 			this.modifiers.addIntModifier(Modifiers.OVERRIDE);
 			return false;
 		case AnnotationUtil.INRINSIC:
@@ -549,7 +548,13 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public boolean isImplicitConversion()
 	{
-		return this.modifiers != null && this.modifiers.hasIntModifier(Modifiers.IMPLICIT | Modifiers.STATIC);
+		return this.modifiers.hasIntModifier(Modifiers.IMPLICIT | Modifiers.STATIC);
+	}
+
+	@Override
+	public boolean isFunctional()
+	{
+		return this.modifiers.hasIntModifier(Modifiers.ABSTRACT) && !this.isObjectMethod();
 	}
 
 	@Override
@@ -768,7 +773,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 			return;
 		}
 
-		final IValue value = mutatingAnnotation.getArguments().get(0, Annotation.VALUE);
+		final IValue value = mutatingAnnotation.getArguments().get(0, Names.value);
 		final String stringValue = value != null ? value.stringValue() : Mutating.DEFAULT_MESSAGE;
 		StringBuilder builder = new StringBuilder(stringValue);
 
@@ -895,6 +900,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 
 		return this.internalName = this.name.qualified;
+	}
+
+	public void setInternalName(String internalName)
+	{
+		this.internalName = internalName;
 	}
 
 	@Override
@@ -1128,31 +1138,11 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 	@Override
 	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
+		// Annotations and Modifiers
 		super.toString(indent, buffer);
 
-		// Type
-		boolean typeAscription;
-		if (this.type != null && this.type != Types.UNKNOWN)
-		{
-			typeAscription = Formatting.typeAscription("method.type_ascription", this);
-
-			if (!typeAscription)
-			{
-				this.type.toString(indent, buffer);
-			}
-			else
-			{
-				buffer.append("func");
-			}
-		}
-		else
-		{
-			typeAscription = false;
-			buffer.append("func");
-		}
-
 		// Name
-		buffer.append(' ').append(this.name);
+		buffer.append("func ").append(this.name);
 
 		// Type Parameters
 		if (this.typeParameters != null)
@@ -1184,7 +1174,7 @@ public abstract class AbstractMethod extends Member implements IMethod, ILabelCo
 		}
 
 		// Type Ascription
-		if (typeAscription)
+		if (this.type != null && this.type != Types.UNKNOWN)
 		{
 			Formatting.appendSeparator(buffer, "method.type_ascription", "->");
 			this.type.toString(indent, buffer);

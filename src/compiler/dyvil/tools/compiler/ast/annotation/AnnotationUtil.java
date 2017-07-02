@@ -15,8 +15,6 @@ public final class AnnotationUtil
 {
 	public static final String RECEIVER_TYPE = "Ldyvil/annotation/internal/ReceiverType;";
 
-	public static final String DYVIL_MODIFIERS = "Ldyvil/annotation/internal/DyvilModifiers;";
-
 	public static final String DYVIL_NAME_INTERNAL = "dyvil/annotation/internal/DyvilName";
 	public static final String DYVIL_NAME          = "L" + DYVIL_NAME_INTERNAL + ";";
 
@@ -32,10 +30,7 @@ public final class AnnotationUtil
 	public static final String  PRIMITIVE          = "L" + PRIMITIVE_INTERNAL + ";";
 	public static final boolean PRIMITIVE_VISIBLE  = true;
 
-	public static final String OVERRIDE = "java/lang/Override";
 	public static final String INRINSIC = "dyvil/annotation/Intrinsic";
-	public static final String STRICT   = "dyvil/annotation/Strict";
-	public static final String NATIVE   = "dyvil/annotation/Native";
 
 	public static final String NOTNULL_INTERNAL  = "dyvil/annotation/internal/NonNull";
 	public static final String NOTNULL           = 'L' + NOTNULL_INTERNAL + ';';
@@ -63,7 +58,7 @@ public final class AnnotationUtil
 
 	public static <T extends Enum<T>> T getEnumValue(ArgumentList arguments, IParameter parameter, Class<T> type)
 	{
-		IValue value = arguments.get(parameter.getIndex(), parameter);
+		IValue value = arguments.get(parameter);
 		if (value == null)
 		{
 			value = parameter.getValue();
@@ -85,7 +80,7 @@ public final class AnnotationUtil
 
 	public static String getStringValue(ArgumentList arguments, IParameter parameter)
 	{
-		IValue value = arguments.get(parameter.getIndex(), parameter);
+		IValue value = arguments.get(parameter);
 		if (value == null)
 		{
 			value = parameter.getValue();

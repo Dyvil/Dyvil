@@ -54,7 +54,7 @@ public class UnapplyPattern extends Pattern implements IPatternList
 	@Override
 	public boolean isExhaustive()
 	{
-		if (this.unapplyCall.getType().canExtract(NullableType.class))
+		if (NullableType.isNullable(this.unapplyCall.getType()))
 		{
 			return false;
 		}

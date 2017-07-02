@@ -6,6 +6,6 @@ import java.lang.annotation._
  * Substitute annotation for the {@code native} keyword in Java. The <i>Dyvil Compiler</i> directly converts this
  * annotation to the {@code ACC_NATIVE} flag.
  */
-@Retention(RetentionPolicy.SOURCE)
-@Target([ ElementType.FIELD, ElementType.METHOD ])
+@Retention(.SOURCE)
+@Target([ .FIELD, .METHOD ])
 @interface native

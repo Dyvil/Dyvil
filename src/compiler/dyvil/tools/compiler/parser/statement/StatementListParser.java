@@ -1,5 +1,6 @@
 package dyvil.tools.compiler.parser.statement;
 
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
@@ -32,10 +33,8 @@ import dyvil.tools.parsing.Parser;
 import dyvil.tools.parsing.TryParserManager;
 import dyvil.tools.parsing.lexer.BaseSymbols;
 import dyvil.tools.parsing.lexer.Tokens;
-import dyvil.source.position.SourcePosition;
 import dyvil.tools.parsing.token.IToken;
 
-import static dyvil.tools.compiler.parser.classes.MemberParser.*;
 import static dyvil.tools.compiler.parser.method.ParameterListParser.LAMBDA_ARROW_END;
 import static dyvil.tools.parsing.TryParserManager.EXIT_ON_ROOT;
 
@@ -51,8 +50,6 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 	private static final int SEPARATOR             = 1 << 6;
 
 	private final TryParserManager tryParserManager = new TryParserManager(DyvilSymbols.INSTANCE);
-
-	private static final int MEMBER_FLAGS = NO_UNINITIALIZED_VARIABLES | OPERATOR_ERROR | NO_FIELD_PROPERTIES;
 
 	protected IValueConsumer consumer;
 	protected boolean        closure;
@@ -178,8 +175,8 @@ public final class StatementListParser extends Parser implements IValueConsumer,
 			}
 
 			this.mode = SEPARATOR;
-			if (this.tryParserManager
-				    .tryParse(pm, new MemberParser<>(this).withFlags(MEMBER_FLAGS), token, EXIT_ON_ROOT))
+			final MemberParser<IVariable> parser = new MemberParser<>(this).withFlags(MemberParser.NO_FIELD_PROPERTIES);
+			if (this.tryParserManager.tryParse(pm, parser, token, EXIT_ON_ROOT))
 			{
 				return;
 			}

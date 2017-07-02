@@ -6,6 +6,7 @@ import dyvil.collection.Set;
 import dyvil.collection.mutable.HashSet;
 import dyvil.reflect.Modifiers;
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.asm.Label;
 import dyvil.tools.asm.TypeReference;
@@ -41,7 +42,6 @@ import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -126,7 +126,7 @@ public class CodeMethod extends AbstractMethod
 		this.parameters.resolveTypes(markers, context);
 		if (this.parameters.isLastVariadic())
 		{
-			this.modifiers.addIntModifier(Modifiers.VARARGS);
+			this.modifiers.addIntModifier(Modifiers.ACC_VARARGS);
 		}
 
 		if (this.exceptions != null)
@@ -354,8 +354,8 @@ public class CodeMethod extends AbstractMethod
 		final ParameterList params = method.getParameters();
 		for (int i = 0, count = params.size(); i < count; i++)
 		{
-			// append all param names followed by an underscore
-			builder.append(params.get(i).getInternalName()).append('_');
+			// append all external parameter labels followed by an underscore
+			builder.append(params.get(i).getQualifiedLabel()).append('_');
 		}
 
 		// strip the trailing _
@@ -453,8 +453,8 @@ public class CodeMethod extends AbstractMethod
 			for (int i = 0, count = params.size(); i < count; i++)
 			{
 				final IParameter thisParam = this.parameters.get(i);
-				final Name thisName = thisParam.getName();
-				final Name otherName = params.get(i).getName();
+				final Name thisName = thisParam.getLabel();
+				final Name otherName = params.get(i).getLabel();
 
 				if (thisName == otherName || thisName == null || otherName == null)
 				{

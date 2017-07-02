@@ -75,7 +75,7 @@ public class ModifierParser
 			if (token.next().type() == DyvilKeywords.INTERFACE)
 			{
 				parserManager.skip();
-				return Modifiers.ANNOTATION;
+				return Modifiers.ANNOTATION_CLASS;
 			}
 			return -1;
 		case DyvilKeywords.CASE:
@@ -98,7 +98,7 @@ public class ModifierParser
 		case DyvilKeywords.TRAIT:
 			return Modifiers.TRAIT_CLASS;
 		case DyvilKeywords.ENUM:
-			return Modifiers.ENUM;
+			return Modifiers.ENUM_CLASS;
 		case DyvilKeywords.OBJECT:
 			return Modifiers.OBJECT_CLASS;
 		}

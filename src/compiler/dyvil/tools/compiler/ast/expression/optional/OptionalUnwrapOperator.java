@@ -4,6 +4,7 @@ import dyvil.annotation.internal.NonNull;
 import dyvil.lang.Formattable;
 import dyvil.reflect.Opcodes;
 import dyvil.source.position.SourcePosition;
+import dyvil.tools.asm.AnnotationVisitor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
@@ -21,7 +22,7 @@ public class OptionalUnwrapOperator implements IValue
 	protected IValue receiver;
 
 	// Metadata
-	protected boolean force;
+	protected boolean        force;
 	protected SourcePosition position;
 
 	public OptionalUnwrapOperator(IValue receiver)
@@ -76,6 +77,18 @@ public class OptionalUnwrapOperator implements IValue
 	protected TypeChecker.MarkerSupplier getMarkerSupplier()
 	{
 		return TypeChecker.markerSupplier("optional.unwrap.type.incompatible");
+	}
+
+	@Override
+	public boolean isAnnotationConstant()
+	{
+		return this.receiver.isAnnotationConstant();
+	}
+
+	@Override
+	public IValue toAnnotationConstant(MarkerList markers, IContext context, int depth)
+	{
+		return this.receiver.toAnnotationConstant(markers, context, depth);
 	}
 
 	@Override
@@ -138,6 +151,12 @@ public class OptionalUnwrapOperator implements IValue
 	public void writeNullCheckedExpression(MethodWriter writer, IType type) throws BytecodeException
 	{
 		this.receiver.writeExpression(writer, type == null ? null : NullableType.unapply(type));
+	}
+
+	@Override
+	public void writeAnnotationValue(AnnotationVisitor visitor, String key)
+	{
+		this.receiver.writeAnnotationValue(visitor, key);
 	}
 
 	@Override

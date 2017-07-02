@@ -256,7 +256,7 @@ public final class Deprecation
 
 	private static Reason[] getReasons(ArgumentList arguments)
 	{
-		final IValue value = arguments.get(DEP_REASONS_PARAM.getIndex(), DEP_REASONS_PARAM);
+		final IValue value = arguments.get(DEP_REASONS_PARAM);
 		if (value == null)
 		{
 			return null;
@@ -288,7 +288,7 @@ public final class Deprecation
 
 	private static String[] getReplacements(ArgumentList arguments)
 	{
-		IValue value = arguments.get(DEP_REPLACE_PARAM.getIndex(), DEP_REPLACE_PARAM);
+		IValue value = arguments.get(DEP_REPLACE_PARAM);
 		if (value == null)
 		{
 			return null;

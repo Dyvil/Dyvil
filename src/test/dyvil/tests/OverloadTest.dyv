@@ -2,11 +2,11 @@ package dyvil.tests
 
 using dyvil.Test
 
-public class OverloadTest
+class OverloadTest
 {
-	public interface A
-	public interface B
-	public class C implements A, B
+	interface A
+	interface B
+	static class C implements A, B
 
 	// ----------------- f section -----------------
 

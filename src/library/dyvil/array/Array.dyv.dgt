@@ -26,12 +26,14 @@ public abstract class #(TYPE_NAME)Array
 		#define(GENERIC_2) {<T, REIFIED U>}
 		#define(GENERIC_REIFIED) {<REIFIED T>}
 		#define(APPLY_T) {apply<T>}
+		#define(APPLY_WITH_SIZE) {apply(size, componentType: array.componentType)}
 	}
 	#else {
 		#define(GENERIC) {}
 		#define(GENERIC_2) {<REIFIED U>}
 		#define(GENERIC_REIFIED) {}
 		#define(APPLY_T) {apply}
+		#define(APPLY_WITH_SIZE) {apply(size)}
 	}
 
 	private init() {} // no instances
@@ -127,7 +129,7 @@ public abstract class #(TYPE_NAME)Array
 	infix func subscript GENERIC(array: [PRIMITIVE], range: Range<int>) -> [PRIMITIVE]
 	{
 		let size = range.size
-		let result = #if (IS_OBJECT) {apply(size, componentType: array.componentType)} #else {apply(size)}
+		let result = APPLY_WITH_SIZE
 
 		System.arraycopy(array, range.first, result, 0, size)
 		return result
@@ -193,7 +195,8 @@ public abstract class #(TYPE_NAME)Array
 	{
 		let size1 = array.size
 		let size2 = with.size
-		let result = #if (IS_OBJECT) {apply(size1 + size2, componentType: array.componentType)} #else {apply(size1 + size2)}
+		let size = size1 + size2
+		let result = APPLY_WITH_SIZE
 
 		System.arraycopy(array, 0, result, 0, size1)
 		System.arraycopy(with, 0, result, size1, size2)
@@ -207,8 +210,7 @@ public abstract class #(TYPE_NAME)Array
 		// Calculate number of elements in new array
 		for (element <- array) if (element == value) size--
 
-		let result = #if (IS_OBJECT) {apply(size, componentType: array.componentType)} #else {apply(size)}
-
+		let result = APPLY_WITH_SIZE
 		var index = 0
 
 		for (element <- array) if (element != value) result[index++] = element
@@ -218,8 +220,7 @@ public abstract class #(TYPE_NAME)Array
 	infix func difference GENERIC(array: [PRIMITIVE], from: [PRIMITIVE]) -> [PRIMITIVE]
 	{
 		let size = array.size
-		let result = #if (IS_OBJECT) {apply(size, componentType: array.componentType)} #else {apply(size)}
-
+		let result = APPLY_WITH_SIZE
 		var index = 0
 
 		for (v <- array) if (!from.contains(v)) result[index++] = v
@@ -229,8 +230,7 @@ public abstract class #(TYPE_NAME)Array
 	infix func intersection GENERIC(array: [PRIMITIVE], with: [PRIMITIVE]) -> [PRIMITIVE]
 	{
 		let size = array.size
-		let result = #if (IS_OBJECT) {apply(size, componentType: array.componentType)} #else {apply(size)}
-
+		let result = APPLY_WITH_SIZE
 		var index = 0
 
 		for (v <- array) if (with.contains(v)) result[index++] = v
@@ -296,8 +296,7 @@ public abstract class #(TYPE_NAME)Array
 	infix func filtered GENERIC(array: [PRIMITIVE], condition: PREDICATE) -> [PRIMITIVE]
 	{
 		let size = array.size
-		let result = #if (IS_OBJECT) {apply(size, componentType: array.componentType)} #else {apply(size)}
-
+		let result = APPLY_WITH_SIZE
 		var index = 0
 
 		for (v <- array) if (condition.PREDICATE_TEST(v)) result[index++] = v
@@ -364,16 +363,15 @@ public abstract class #(TYPE_NAME)Array
 
 	infix inline func copy GENERIC(array: [PRIMITIVE]) -> [PRIMITIVE] = (array as Object).clone as [PRIMITIVE]
 
-	infix func copy GENERIC(array: [PRIMITIVE], withSize: int) -> [PRIMITIVE]
+	infix func copy GENERIC(array: [PRIMITIVE], withSize size: int) -> [PRIMITIVE]
 	{
-		let result = #if (IS_OBJECT) {apply(withSize, componentType: array.componentType)} #else {apply(withSize)}
-
+		let result = APPLY_WITH_SIZE
 		System.arraycopy(array, 0, result, 0, array.size)
 		return result
 	}
 
-	infix func trim GENERIC(array: [PRIMITIVE], toSize: int) -> [PRIMITIVE]
-		= array.size == toSize ? array : array.copy(toSize)
+	infix func trim GENERIC(array: [PRIMITIVE], toSize size: int) -> [PRIMITIVE]
+		= array.size == size ? array : array.copy(size)
 
 	#if (IS_OBJECT) {}
 	#else {

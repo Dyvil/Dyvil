@@ -7,8 +7,8 @@ import java.lang.annotation._
  * mutating} is called on any instance of the {@link Immutable} interface, the compiler should report the error
  * specified by {@link #value()}.
  */
-@Target([ ElementType.METHOD ])
-@Retention(RetentionPolicy.RUNTIME)
+@Target([ .METHOD ])
+@Retention(.RUNTIME)
 @interface Mutating(
 	/**
 	 * Returns the error to be reported by the compiler when a mutating method is called on an immutable callee.

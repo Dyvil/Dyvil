@@ -179,7 +179,16 @@ public class TypeList implements ITypeConsumer, Iterable<IType>
 
 	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
+		this.toString(indent, buffer, '<', '>');
+	}
+
+	public void toString(@NonNull String indent, @NonNull StringBuilder buffer, char open, char close)
+	{
+		Formatting.appendSeparator(buffer, "type.list.open_paren", open);
+
 		Util.astToString(indent, this.types, this.size, Formatting.getSeparator("type.list.separator", ','), buffer);
+
+		Formatting.appendClose(buffer, "type.list.close_paren", close);
 	}
 
 	public TypeList copy()

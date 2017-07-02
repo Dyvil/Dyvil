@@ -2,6 +2,6 @@ package dyvil.annotation
 
 import java.lang.annotation._
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target([ ElementType.TYPE, ElementType.TYPE_USE ])
+@Retention(.RUNTIME)
+@Target([ .TYPE, .TYPE_USE ])
 @interface Mutable

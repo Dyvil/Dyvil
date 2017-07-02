@@ -1,8 +1,8 @@
 package dyvil.tools.compiler.ast.expression.access;
 
 import dyvil.tools.compiler.ast.classes.AnonymousClass;
+import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.constructor.IConstructor;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -159,7 +159,7 @@ public class ClassConstructor extends ConstructorCall
 	{
 		super.toString(prefix, buffer);
 
-		IClassBody body = this.nestedClass.getBody();
+		ClassBody body = this.nestedClass.getBody();
 		if (body != null)
 		{
 			body.toString(prefix, buffer);

@@ -15,13 +15,13 @@ abstract class MathUtils
 	#for (spec <- SPECS) {
 		#import(spec)
 
-		static func min(this: Math, a: PRIMITIVE, b: PRIMITIVE, c: PRIMITIVE) -> PRIMITIVE = min(a, min(b, c))
+		static func min(this: Math, _ a: PRIMITIVE, _ b: PRIMITIVE, _ c: PRIMITIVE) -> PRIMITIVE = min(a, min(b, c))
 
-		static func min(this: Math, values: PRIMITIVE...) -> PRIMITIVE
+		static func min(this: Math, _ values: PRIMITIVE...) -> PRIMITIVE
 		{
 			var min = #if (IS_FLOATING_POINT) {WRAPPER.POSITIVE_INFINITY} #else {WRAPPER.MAX_VALUE}
 
-			for (v <- values) if (v < min) { min = v }
+			for (v <- values) if (v < min) min = v
 			return min
 		}
 	}
@@ -30,13 +30,13 @@ abstract class MathUtils
 	#for (spec <- SPECS) {
 		#import(spec)
 
-		static func max(this: Math, a: PRIMITIVE, b: PRIMITIVE, c: PRIMITIVE) -> PRIMITIVE = max(a, max(b, c))
+		static func max(this: Math, _ a: PRIMITIVE, _ b: PRIMITIVE, _ c: PRIMITIVE) -> PRIMITIVE = max(a, max(b, c))
 
-		static func max(this: Math, values: PRIMITIVE...) -> PRIMITIVE
+		static func max(this: Math, _ values: PRIMITIVE...) -> PRIMITIVE
 		{
 			var max = #if (IS_FLOATING_POINT) {WRAPPER.NEGATIVE_INFINITY} #else {WRAPPER.MIN_VALUE}
 
-			for (v <- values) if (v > max) { max = v }
+			for (v <- values) if (v > max) max = v
 			return max
 		}
 	}
@@ -45,7 +45,7 @@ abstract class MathUtils
 	#for (spec <- SPECS) {
 		#import(spec)
 
-		static func sum(this: Math, values: PRIMITIVE...) -> PRIMITIVE
+		static func sum(this: Math, _ values: PRIMITIVE...) -> PRIMITIVE
 		{
 			var sum: PRIMITIVE = 0
 			for (v <- values) sum += v
@@ -53,11 +53,18 @@ abstract class MathUtils
 		}
 	}
 
+	static func sum(this: Math, k start: long, to end: long, _ f: long -> long) -> long
+	{
+		var sum = 0L
+		for (k <- start .. end) sum += f(k)
+		return sum
+	}
+
 	// product
 	#for (spec <- SPECS) {
 		#import(spec)
 
-		static func product(this: Math, values: PRIMITIVE...) -> PRIMITIVE
+		static func product(this: Math, _ values: PRIMITIVE...) -> PRIMITIVE
 		{
 			var product: PRIMITIVE = 1
 			for (v <- values) product *= v
@@ -65,18 +72,25 @@ abstract class MathUtils
 		}
 	}
 
+	static func product(this: Math, k start: long, to end: long, _ f: long -> long) -> long
+	{
+		var product = 0L
+		for (k <- start .. end) product *= f(k)
+		return product
+	}
+
 	// average
 	#for (spec <- SPECS) {
 		#import(spec)
 
-		static func average(this: Math, values: PRIMITIVE...) -> double = sum(values...) / (values.size as double)
+		static func average(this: Math, _ values: PRIMITIVE...) -> double = sum(values...) / (values.size as double)
 	}
 
 	// clamp
 	#for (spec <- SPECS) {
 		#import(spec)
 
-		infix func clamp(this: Math, v: PRIMITIVE, min: PRIMITIVE, max: PRIMITIVE) -> PRIMITIVE
+		infix func clamp(this: Math, _ v: PRIMITIVE, min: PRIMITIVE, max: PRIMITIVE) -> PRIMITIVE
 		{
 			if (v < min) return min
 			if (v > max) return max
@@ -88,7 +102,7 @@ abstract class MathUtils
 	#for (spec <- SPECS) {
 		#import(spec)
 
-		infix func interpolate(this: Math, v: double, min: PRIMITIVE, max: PRIMITIVE) -> PRIMITIVE
+		infix func interpolate(this: Math, _ v: double, min: PRIMITIVE, max: PRIMITIVE) -> PRIMITIVE
 		{
 			if (v <= 0) return min
 			if (v >= 1) return max
@@ -98,25 +112,25 @@ abstract class MathUtils
 
 	// floor & ceil
 
-	static func floor(f: float) -> int
+	static func floor(_ f: float) -> int
 	{
 		let i = f as int
 		return f < i ? i - 1 : i
 	}
 
-	static func floor(d: double) -> long
+	static func floor(_ d: double) -> long
 	{
 		let l = d as long
 		return d < l ? l - 1 : l
 	}
 
-	static func ceil(f: float) -> int
+	static func ceil(_ f: float) -> int
 	{
 		let i = f as int
 		return f > i ? i + 1 : i
 	}
 
-	static func ceil(d: double) -> long
+	static func ceil(_ d: double) -> long
 	{
 		let l = d as long
 		return d > l ? l + 1 : l
@@ -124,7 +138,7 @@ abstract class MathUtils
 
 	// factorial
 
-	postfix func !(lhs: long) -> long
+	postfix func !(_ lhs: long) -> long
 	{
 		var l = lhs
 		while (lhs > 1) l *= { lhs -= 1 }
@@ -137,7 +151,7 @@ abstract class MathUtils
 
 	// powers of two
 
-	prefix func nextPowerOf2(this: Math, v: int) -> int
+	prefix func nextPowerOf2(this: Math, _ v: int) -> int
 	{
 		var j = v - 1
 		j |= j >> 1
@@ -148,12 +162,12 @@ abstract class MathUtils
 		return j + 1
 	}
 
-	prefix func isPowerOf2(this: Math, v: int) -> boolean = (v & -v) == v
+	prefix func isPowerOf2(this: Math, _ v: int) -> boolean = (v & -v) == v
 
 	private const deBruijnBits: [int] = [ 0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 31,
 		27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9 ]
 
 	private static func deBruijn(v: int) -> int = deBruijnBits[(v * 125613361L >> 27) as int & 0x1F]
 
-	static func log2(this: Math, v: int) -> int = isPowerOf2(v) ? deBruijn(v) : deBruijn(nextPowerOf2(v)) - 1
+	static func log2(this: Math, _ v: int) -> int = isPowerOf2(v) ? deBruijn(v) : deBruijn(nextPowerOf2(v)) - 1
 }

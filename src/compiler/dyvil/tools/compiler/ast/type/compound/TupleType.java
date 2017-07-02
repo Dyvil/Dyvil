@@ -12,10 +12,8 @@ import dyvil.tools.compiler.ast.type.generic.GenericType;
 import dyvil.tools.compiler.ast.type.generic.ResolvedGenericType;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.config.Formatting;
 import dyvil.tools.compiler.transform.Names;
 import dyvil.tools.compiler.util.Markers;
-import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
 
@@ -188,33 +186,6 @@ public class TupleType extends ResolvedGenericType
 	@Override
 	public void toString(@NonNull String indent, @NonNull StringBuilder buffer)
 	{
-		final int size = this.arguments.size();
-		if (size == 0)
-		{
-			if (Formatting.getBoolean("tuple.empty.space_between"))
-			{
-				buffer.append("( )");
-			}
-			else
-			{
-				buffer.append("()");
-			}
-			return;
-		}
-
-		buffer.append('(');
-		if (Formatting.getBoolean("tuple.open_paren.space_after"))
-		{
-			buffer.append(' ');
-		}
-
-		Util.astToString(indent, this.arguments.getTypes(), size, Formatting.getSeparator("tuple.separator", ','),
-		                 buffer);
-
-		if (Formatting.getBoolean("tuple.close_paren.space_before"))
-		{
-			buffer.append(' ');
-		}
-		buffer.append(')');
+		this.arguments.toString(indent, buffer, '(', ')');
 	}
 }

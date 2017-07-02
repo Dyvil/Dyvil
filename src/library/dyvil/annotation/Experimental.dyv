@@ -1,0 +1,31 @@
+package dyvil.annotation
+
+import dyvil.util.MarkerLevel
+import java.lang.annotation.{ Retention, Target }
+
+@Retention(.CLASS)
+@interface Experimental
+(
+	/** the compiler diagnostic message text */
+	let value: String = "The {member.kind} '{member.name}' is an experimental feature"
+
+	/** a description on the experimental status of the member */
+	let description: String = ""
+
+	/** the current experimental stage of the member */
+	let stage: Stage = .UNRECOMMENDED
+
+	/** the marker level of the compiler diagnostic message */
+	let level: MarkerLevel = .WARNING
+)
+{
+	enum Stage
+	{
+		case DANGEROUS
+		case UNSTABLE
+		case UNRECOMMENDED
+		case BETA
+		case ALPHA
+		case PRERELEASE
+	}
+}

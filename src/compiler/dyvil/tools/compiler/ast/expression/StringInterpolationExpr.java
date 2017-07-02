@@ -37,13 +37,45 @@ public final class StringInterpolationExpr implements IValue
 
 	protected SourcePosition position;
 
-	private IValue[] values  = new IValue[2];
-	private String[] strings = new String[3];
-	private int valueCount;
+	private ArgumentList values;
 
 	public StringInterpolationExpr(SourcePosition position)
 	{
+		this.values = new ArgumentList(3);
 		this.position = position;
+	}
+
+	public StringInterpolationExpr(IValue... values)
+	{
+		final int size = values.length;
+		this.position = SourcePosition.$dot$dot(values[0].getPosition(), values[size - 1].getPosition());
+
+		this.values = new ArgumentList(values);
+	}
+
+	public static StringInterpolationExpr apply(IValue lhs, IValue rhs)
+	{
+		if (lhs.valueTag() == STRING_INTERPOLATION)
+		{
+			final StringInterpolationExpr interpol = (StringInterpolationExpr) lhs;
+			if (rhs.valueTag() == STRING_INTERPOLATION)
+			{
+				interpol.appendAll((StringInterpolationExpr) rhs);
+			}
+			else
+			{
+				interpol.append(rhs);
+			}
+
+			return interpol;
+		}
+		if (rhs.valueTag() == STRING_INTERPOLATION)
+		{
+			final StringInterpolationExpr interpol = (StringInterpolationExpr) rhs;
+			interpol.prepend(rhs);
+			return interpol;
+		}
+		return new StringInterpolationExpr(lhs, rhs);
 	}
 
 	@Override
@@ -64,28 +96,19 @@ public final class StringInterpolationExpr implements IValue
 		this.position = position;
 	}
 
-	public void addString(String stringPart)
+	public void append(IValue value)
 	{
-		final int index = this.valueCount;
-		if (index >= this.strings.length)
-		{
-			final String[] temp = new String[index + 1];
-			System.arraycopy(this.strings, 0, temp, 0, this.strings.length);
-			this.strings = temp;
-		}
-		this.strings[index] = stringPart;
+		this.values.add(value);
 	}
 
-	public void addValue(IValue value)
+	public void appendAll(StringInterpolationExpr interpol)
 	{
-		final int index = this.valueCount++;
-		if (index >= this.values.length)
-		{
-			final IValue[] temp = new IValue[index + 1];
-			System.arraycopy(this.values, 0, temp, 0, this.values.length);
-			this.values = temp;
-		}
-		this.values[index] = value;
+		this.values = this.values.concat(interpol.values);
+	}
+
+	public void prepend(IValue value)
+	{
+		this.values.insert(0, value);
 	}
 
 	@Override
@@ -118,32 +141,7 @@ public final class StringInterpolationExpr implements IValue
 			return null;
 		}
 
-		StringValue string;
-		if (this.valueCount > 0)
-		{
-			// stringCount = valueCount + 1
-			StringBuilder builder = new StringBuilder();
-			builder.append(this.strings[0]);
-			for (int i = 1; i <= this.valueCount; i++)
-			{
-				builder.append('\\').append(i);
-				builder.append(this.strings[i]);
-			}
-			string = new StringValue(this.position, builder.toString());
-		}
-		else
-		{
-			string = new StringValue("");
-		}
-
-		final ArgumentList list = new ArgumentList(this.valueCount);
-		list.add(string);
-		for (int i = 0; i < this.valueCount; i++)
-		{
-			list.add(this.values[i]);
-		}
-
-		return new LiteralConversion(this, annotation, list).withType(type, typeContext, markers, context);
+		return new LiteralConversion(this, annotation, this.values).withType(type, typeContext, markers, context);
 	}
 
 	@Override
@@ -172,42 +170,32 @@ public final class StringInterpolationExpr implements IValue
 	@Override
 	public void resolveTypes(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.valueCount; i++)
-		{
-			this.values[i].resolveTypes(markers, context);
-		}
+		this.values.resolveTypes(markers, context);
 	}
 
 	@Override
 	public IValue resolve(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.valueCount; i++)
-		{
-			this.values[i] = this.values[i].resolve(markers, context);
-		}
+		this.values.resolve(markers, context);
 		return this;
 	}
 
 	@Override
 	public void checkTypes(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.valueCount; i++)
-		{
-			this.values[i].checkTypes(markers, context);
-		}
+		this.values.checkTypes(markers, context);
 	}
 
 	@Override
 	public void check(MarkerList markers, IContext context)
 	{
-		for (int i = 0; i < this.valueCount; i++)
-		{
-			final IValue value = this.values[i];
-			value.check(markers, context);
+		this.values.check(markers, context);
 
+		for (IValue value : this.values)
+		{
 			if (Types.isVoid(value.getType()))
 			{
-				markers.add(Markers.semantic(value.getPosition(), "string.interpolation.void"));
+				markers.add(Markers.semanticError(value.getPosition(), "string.interpolation.void"));
 			}
 		}
 	}
@@ -215,20 +203,61 @@ public final class StringInterpolationExpr implements IValue
 	@Override
 	public IValue foldConstants()
 	{
-		for (int i = 0; i < this.valueCount; i++)
+		this.values.foldConstants();
+
+		// Merges adjacent String constants into one
+
+		final int size = this.values.size();
+		final ArgumentList newValues = new ArgumentList(size);
+
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < size; i++)
 		{
-			this.values[i] = this.values[i].foldConstants();
+			final IValue value = this.values.get(i);
+			if (value.toStringBuilder(builder))
+			{
+				continue;
+			}
+
+			moveString(builder, newValues);
+			newValues.add(value);
 		}
+		moveString(builder, newValues);
+
+		if (newValues.isEmpty())
+		{
+			return new StringValue("");
+		}
+
+		// assert newValues.size() >= 1
+		final IValue first = newValues.getFirst();
+		if (newValues.size() == 1 && isString(first))
+		{
+			return first;
+		}
+
+		this.values = newValues;
 		return this;
+	}
+
+	private static boolean isString(IValue value)
+	{
+		return Types.isSuperType(Types.STRING, value.getType());
+	}
+
+	private static void moveString(StringBuilder builder, ArgumentList newValues)
+	{
+		if (builder.length() > 0)
+		{
+			newValues.add(new StringValue(builder.toString()));
+			builder.delete(0, builder.length());
+		}
 	}
 
 	@Override
 	public IValue cleanup(ICompilableList compilableList, IClassCompilableList classCompilableList)
 	{
-		for (int i = 0; i < this.valueCount; i++)
-		{
-			this.values[i] = this.values[i].cleanup(compilableList, classCompilableList);
-		}
+		this.values.cleanup(compilableList, classCompilableList);
 		return this;
 	}
 
@@ -245,27 +274,34 @@ public final class StringInterpolationExpr implements IValue
 
 	private void writeExpression(MethodWriter writer)
 	{
-		switch (this.valueCount)
+		final int size = this.values.size();
+		switch (size)
 		{
-		case 0:
-			writer.visitLdcInsn(this.strings[0]);
+		case 0: // not possible
+			writer.visitLdcInsn("");
 			return;
 		case 1:
-			if (this.strings[0].isEmpty() && this.strings[1].isEmpty())
+			// "\(someValue)"
+			CaseClasses.writeToString(writer, this.values.getFirst());
+			return;
+		case 2:
+			final IValue first = this.values.getFirst();
+			final IValue last = this.values.getLast();
+			if (isString(first) && isString(last))
 			{
-				// "\(someValue)"
-				CaseClasses.writeToString(writer, this.values[0]);
+				// two non-null String values -> write first.concat(last)
+				first.writeExpression(writer, Types.STRING);
+				last.writeExpression(writer, Types.STRING);
+				writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "concat", "(Ljava/lang/String;)Ljava/lang/String;", false);
 				return;
 			}
+			// continue as normal
 		}
 
-		String string = this.strings[0];
-
-		int estSize = string.length();
-		for (int i = 0; i < this.valueCount; i++)
+		int estSize = 0;
+		for (int i = 0; i < size; i++)
 		{
-			estSize += this.values[i].stringSize();
-			estSize += this.strings[i + 1].length();
+			estSize += this.values.get(i).stringSize();
 		}
 
 		writer.visitTypeInsn(Opcodes.NEW, "java/lang/StringBuilder");
@@ -273,16 +309,11 @@ public final class StringInterpolationExpr implements IValue
 		writer.visitLdcInsn(estSize);
 		writer.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(I)V", false);
 
-		CaseClasses.writeStringAppend(writer, string);
-
-		for (int i = 0; i < this.valueCount; i++)
+		for (int i = 0; i < size; i++)
 		{
-			final IValue value = this.values[i];
+			final IValue value = this.values.get(i);
 			value.writeExpression(writer, null);
 			CaseClasses.writeStringAppend(writer, value.getType());
-
-			string = this.strings[i + 1];
-			CaseClasses.writeStringAppend(writer, string);
 		}
 
 		writer.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;",
@@ -298,19 +329,25 @@ public final class StringInterpolationExpr implements IValue
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		String stringPart = this.strings[0];
+		final int size = this.values.size();
 
 		buffer.append('"');
-		LexerUtil.appendStringLiteralBody(stringPart, buffer);
-
-		for (int i = 0; i < this.valueCount; i++)
+		for (int i = 0; i < size; i++)
 		{
-			buffer.append('\\').append('(');
-			this.values[i].toString(prefix, buffer);
-			stringPart = this.strings[i + 1];
-			buffer.append(')');
+			final IValue value = this.values.get(i);
+			final int tag = value.valueTag();
+			if (tag == IValue.STRING || tag == IValue.CHAR)
+			{
+				LexerUtil.appendStringLiteralBody(value.stringValue(), buffer);
+			}
+			else
+			{
+				// \(value)
 
-			LexerUtil.appendStringLiteralBody(stringPart, buffer);
+				buffer.append('\\').append('(');
+				value.toString(prefix, buffer);
+				buffer.append(')');
+			}
 		}
 		buffer.append('"');
 	}

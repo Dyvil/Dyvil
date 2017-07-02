@@ -21,15 +21,9 @@ import java.lang.reflect.Field
 	) implements #(TYPE_NAME)Ref
 }
 {
-	public init(staticField: Field)
-	{
-		this.init(UNSAFE.staticFieldBase(staticField), UNSAFE.staticFieldOffset(staticField))
-	}
+	public init(staticField: Field) : this(UNSAFE.staticFieldBase(staticField), UNSAFE.staticFieldOffset(staticField))
 
-	public init(receiver: Object!, field: Field)
-	{
-		this.init(receiver, UNSAFE.objectFieldOffset(field))
-	}
+	public init(receiver: Object!, field: Field) : this(receiver, UNSAFE.objectFieldOffset(field))
 
 	#if (IS_OBJECT) {
 		override func get() -> T = UNSAFE.getObject(this.base, this.offset) as T

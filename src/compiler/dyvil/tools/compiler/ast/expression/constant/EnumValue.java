@@ -1,11 +1,12 @@
 package dyvil.tools.compiler.ast.expression.constant;
 
 import dyvil.annotation.internal.NonNull;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.asm.AnnotationVisitor;
-import dyvil.tools.compiler.ast.context.IImplicitContext;
-import dyvil.tools.compiler.ast.expression.access.FieldAccess;
 import dyvil.tools.compiler.ast.context.IContext;
+import dyvil.tools.compiler.ast.context.IImplicitContext;
 import dyvil.tools.compiler.ast.expression.IValue;
+import dyvil.tools.compiler.ast.expression.access.FieldAccess;
 import dyvil.tools.compiler.ast.field.IDataMember;
 import dyvil.tools.compiler.ast.generic.ITypeContext;
 import dyvil.tools.compiler.ast.type.IType;
@@ -13,7 +14,6 @@ import dyvil.tools.compiler.ast.type.typevar.CovariantTypeVarType;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 public class EnumValue extends FieldAccess
 {
@@ -31,6 +31,11 @@ public class EnumValue extends FieldAccess
 	{
 		this.type = type;
 		this.name = name;
+	}
+
+	public EnumValue(SourcePosition position, IDataMember field)
+	{
+		super(position, null, field);
 	}
 
 	@Override
@@ -60,7 +65,7 @@ public class EnumValue extends FieldAccess
 	@Override
 	public boolean isPolyExpression()
 	{
-		return true;
+		return this.field == null;
 	}
 
 	@Override
@@ -78,7 +83,12 @@ public class EnumValue extends FieldAccess
 	@Override
 	public boolean isType(IType type)
 	{
-		return type.resolveField(this.name) != null || type.canExtract(CovariantTypeVarType.class);
+		if (this.field == null)
+		{
+			return type.resolveField(this.name) != null || type.canExtract(CovariantTypeVarType.class);
+		}
+
+		return super.isType(type);
 	}
 
 	@Override
@@ -90,14 +100,17 @@ public class EnumValue extends FieldAccess
 	@Override
 	public IValue withType(IType type, ITypeContext typeContext, MarkerList markers, IContext context)
 	{
-		final IDataMember field = type.resolveField(this.name);
-		if (field == null)
+		if (this.field == null)
 		{
-			markers.add(Markers.semanticError(this.position, "resolve.field", this.name));
-			return null;
-		}
+			final IDataMember field = type.resolveField(this.name);
+			if (field == null)
+			{
+				markers.add(Markers.semanticError(this.position, "resolve.field", this.name));
+				return null;
+			}
 
-		this.field = field;
+			this.field = field;
+		}
 		return super.withType(type, typeContext, markers, context);
 	}
 

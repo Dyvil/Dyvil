@@ -79,7 +79,7 @@ public interface Modifiers
 	/**
 	 * Modifier used to declare that the last parameter of a method is a <i>varargs</i> parameter.
 	 */
-	int VARARGS = 0x00000080;
+	int ACC_VARARGS = 0x00000080;
 
 	/**
 	 * {@code native} modifier.
@@ -94,7 +94,7 @@ public interface Modifiers
 	/**
 	 * Modifier used to declare that a class is an {@code interface}.
 	 */
-	int INTERFACE_CLASS = 0x00000200 | ABSTRACT;
+	int INTERFACE = 0x00000200;
 
 	/**
 	 * {@code stricfp} modifier.
@@ -109,12 +109,14 @@ public interface Modifiers
 	/**
 	 * Modifier used to declare a class to be an annotation ({@code @interface} ).
 	 */
-	int ANNOTATION = 0x00002000 | INTERFACE_CLASS;
+	int ANNOTATION = 0x00002000;
 
 	/**
 	 * Modifier used to declare a class to be an {@code enum} class.
 	 */
 	int ENUM = 0x00004000;
+
+	int ENUM_CONST = PUBLIC | ENUM | CONST;
 
 	/**
 	 * Modifier used for constructors and fields of anonymous classes.
@@ -123,10 +125,14 @@ public interface Modifiers
 
 	// Type Modifiers
 
+	int OBJECT = 0x00010000;
+
+	int ENUM_CLASS = ENUM;
+
 	/**
 	 * <i>Dyvil</i> {@code object} modifier. If a class is marked with this modifier, it is a singleton object class.
 	 */
-	int OBJECT_CLASS = 0x00010000;
+	int OBJECT_CLASS = OBJECT | FINAL;
 
 	/**
 	 * <i>Dyvil</i> {@code object} modifier. If a class is marked with this modifier, it is a case class. This modifier
@@ -140,10 +146,16 @@ public interface Modifiers
 	 */
 	int FUNCTIONAL = 0x00040000;
 
+	int INTERFACE_CLASS = INTERFACE | ABSTRACT;
+
+	int TRAIT = 0x00080000;
+
 	/**
 	 * <i>Dyvil</i> {@code trait} modifier.
 	 */
-	int TRAIT_CLASS = 0x00080000 | INTERFACE_CLASS;
+	int TRAIT_CLASS = TRAIT | INTERFACE_CLASS;
+
+	int ANNOTATION_CLASS = ANNOTATION | INTERFACE_CLASS;
 
 	// Method Modifiers
 
@@ -176,6 +188,8 @@ public interface Modifiers
 	// Parameter Modifiers
 
 	int DEFAULT = 0x00020000;
+
+	int VARARGS = 0x00040000;
 
 	// Member Modifiers
 
@@ -217,7 +231,7 @@ public interface Modifiers
 	 * {@code enum}, {@code object} or {@code annotation} / {@code @interface}). This value excludes the {@code
 	 * ABSTRACT} bit flag.
 	 */
-	int CLASS_TYPE_MODIFIERS = (INTERFACE_CLASS | ANNOTATION | ENUM | OBJECT_CLASS | TRAIT_CLASS) & ~ABSTRACT;
+	int CLASS_TYPE_MODIFIERS = INTERFACE | ANNOTATION | ENUM | OBJECT | TRAIT;
 
 	int VISIBILITY_MODIFIERS = PUBLIC | PROTECTED | PRIVATE | PACKAGE;
 
@@ -241,7 +255,7 @@ public interface Modifiers
 	/**
 	 * The modifiers that can be used on fields.
 	 */
-	int FIELD_MODIFIERS = MEMBER_MODIFIERS | LAZY // denotable
+	int FIELD_MODIFIERS = MEMBER_MODIFIERS | LAZY | ENUM // denotable
 		                      | TRANSIENT | VOLATILE;
 
 	/**
@@ -249,13 +263,13 @@ public interface Modifiers
 	 */
 	int METHOD_MODIFIERS =
 		MEMBER_MODIFIERS | ABSTRACT | SYNCHRONIZED | INLINE | INFIX | EXTENSION | IMPLICIT | OVERRIDE // denotable
-			| NATIVE | STRICT | BRIDGE | VARARGS;
+			| NATIVE | STRICT | BRIDGE | ACC_VARARGS;
 
 	/**
 	 * The modifiers that can be used on parameters.
 	 */
 	int PARAMETER_MODIFIERS = FINAL | EXPLICIT // denotable
-		                          | DEFAULT | MANDATED | EXTENSION | VARARGS | SYNTHETIC;
+		                          | DEFAULT | MANDATED | EXTENSION | VARARGS | ACC_VARARGS | SYNTHETIC;
 
 	/**
 	 * The modifiers that can be applied to class parameters.

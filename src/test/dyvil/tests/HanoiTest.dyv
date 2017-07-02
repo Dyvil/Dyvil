@@ -18,7 +18,7 @@ class HanoiTest
 	static func requiredMoves(n: int) -> int = (1 << n) - 1
 
 	@LiteralConvertible.FromString
-	class Tower(public let id: String) extends mutable.LinkedList<int>
+	static class Tower(public let id: String) extends mutable.LinkedList<int>
 	{
 		static func apply(id: String) -> Tower = new Tower(id)
 	}

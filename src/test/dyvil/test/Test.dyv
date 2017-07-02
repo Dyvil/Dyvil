@@ -11,9 +11,7 @@ interface Test
 		func applyStatement(test: Test) -> void = this.add(test)
 	}
 
-	case class TestContainer(
-		let name: String
-	) implements Test, TestContainerBase
+	static case class TestContainer(let name: String) implements Test, TestContainerBase
 	{
 		protected let subTests: List<Test> = MutableList<Test>()
 
@@ -34,7 +32,7 @@ interface Test
 			errors.add("Test Collection '\(this.name)' failed:")
 			for (subError <- subErrors)
 			{
-				errors.add('\t' + subError)
+				errors.add('\t' ++ subError)
 			}
 		}
 	}

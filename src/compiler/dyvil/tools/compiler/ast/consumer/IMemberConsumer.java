@@ -17,6 +17,11 @@ import dyvil.source.position.SourcePosition;
 
 public interface IMemberConsumer<F extends IDataMember> extends IClassConsumer, IDataMemberConsumer<F>
 {
+	default boolean acceptEnums()
+	{
+		return false;
+	}
+
 	@Override
 	void addDataMember(F field);
 

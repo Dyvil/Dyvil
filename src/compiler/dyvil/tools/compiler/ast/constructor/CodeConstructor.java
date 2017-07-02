@@ -2,6 +2,7 @@ package dyvil.tools.compiler.ast.constructor;
 
 import dyvil.annotation.internal.Nullable;
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.asm.Label;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.classes.IClass;
@@ -26,7 +27,6 @@ import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -86,7 +86,12 @@ public class CodeConstructor extends AbstractConstructor
 		this.parameters.resolveTypes(markers, context);
 		if (this.parameters.isLastVariadic())
 		{
-			this.modifiers.addIntModifier(Modifiers.VARARGS);
+			this.modifiers.addIntModifier(Modifiers.ACC_VARARGS);
+		}
+
+		if (this.initializerCall != null)
+		{
+			this.initializerCall.resolveTypes(markers, context);
 		}
 
 		if (this.exceptions != null)
@@ -99,7 +104,56 @@ public class CodeConstructor extends AbstractConstructor
 			this.value.resolveTypes(markers, context);
 		}
 
+		this.resolveInitializer(markers);
+
 		context.pop();
+	}
+
+	private void resolveInitializer(MarkerList markers)
+	{
+		if (this.value == null)
+		{
+			return;
+		}
+		if (this.value.valueTag() == IValue.INITIALIZER_CALL)
+		{
+			this.trySetInit(this.value, markers);
+			this.value = null;
+			return;
+		}
+		if (this.value.valueTag() != IValue.STATEMENT_LIST)
+		{
+			return;
+		}
+
+		final StatementList statementList = (StatementList) this.value;
+		if (statementList.size() <= 0)
+		{
+			return;
+		}
+
+		final IValue firstValue = statementList.get(0);
+		if (firstValue.valueTag() != IValue.INITIALIZER_CALL)
+		{
+			return;
+		}
+
+		// We can't simply remove the value from the Statement List, so we replace it with a void statement
+		statementList.set(0, new VoidValue(firstValue.getPosition()));
+
+		this.trySetInit(firstValue, markers);
+	}
+
+	private void trySetInit(IValue value, MarkerList markers)
+	{
+		if (this.initializerCall != null)
+		{
+			markers.add(Markers.semanticError(value.getPosition(), "initializer.call.duplicate"));
+			return;
+		}
+
+		this.initializerCall = (InitializerCall) value;
+		markers.add(Markers.syntaxWarning(value.getPosition(), "initializer.call.deprecated", value));
 	}
 
 	@Override
@@ -115,6 +169,8 @@ public class CodeConstructor extends AbstractConstructor
 		{
 			this.exceptions.resolve(markers, context);
 		}
+
+		this.resolveInitCall(markers, context);
 
 		if (this.value != null)
 		{
@@ -133,34 +189,15 @@ public class CodeConstructor extends AbstractConstructor
 			}
 		}
 
-		this.resolveSuperConstructors(markers, context);
-
 		context.pop();
 	}
 
-	private void resolveSuperConstructors(MarkerList markers, IContext context)
+	private void resolveInitCall(MarkerList markers, IContext context)
 	{
-		if (this.value.valueTag() == IValue.INITIALIZER_CALL)
+		if (this.initializerCall != null)
 		{
-			this.initializerCall = (InitializerCall) this.value;
-			this.value = null;
+			this.initializerCall.resolve(markers, context);
 			return;
-		}
-		if (this.value.valueTag() == IValue.STATEMENT_LIST)
-		{
-			final StatementList statementList = (StatementList) this.value;
-			if (statementList.size() > 0)
-			{
-				final IValue firstValue = statementList.get(0);
-				if (firstValue.valueTag() == IValue.INITIALIZER_CALL)
-				{
-					// We can't simply remove the value from the Statement List, so we replace it with a void statement
-					statementList.set(0, new VoidValue(firstValue.getPosition()));
-
-					this.initializerCall = (InitializerCall) firstValue;
-					return;
-				}
-			}
 		}
 
 		// No Super Type -> don't try to resolve a Super Constructor
@@ -174,7 +211,7 @@ public class CodeConstructor extends AbstractConstructor
 		final IConstructor match = IContext.resolveConstructor(context, superType, ArgumentList.EMPTY);
 		if (match == null)
 		{
-			markers.add(Markers.semantic(this.position, "constructor.super"));
+			markers.add(Markers.semanticError(this.position, "constructor.super"));
 			return;
 		}
 
@@ -242,14 +279,14 @@ public class CodeConstructor extends AbstractConstructor
 		{
 			this.value.check(markers, this);
 		}
-		else if (this.initializerCall != null)
+		else if (this.initializerCall == null)
 		{
 			markers.add(Markers.semanticError(this.position, "constructor.abstract"));
 		}
 
 		if (this.isStatic())
 		{
-			markers.add(Markers.semantic(this.position, "constructor.static", this.name));
+			markers.add(Markers.semanticError(this.position, "constructor.static", this.name));
 		}
 
 		context.pop();

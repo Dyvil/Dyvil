@@ -4,8 +4,8 @@ import dyvil.collection.Collection;
 import dyvil.collection.Set;
 import dyvil.collection.mutable.IdentityHashSet;
 import dyvil.reflect.Opcodes;
+import dyvil.tools.compiler.ast.classes.ClassBody;
 import dyvil.tools.compiler.ast.classes.IClass;
-import dyvil.tools.compiler.ast.classes.IClassBody;
 import dyvil.tools.compiler.ast.context.CombiningContext;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
@@ -64,6 +64,7 @@ public final class Types
 	public static final ClassType EXCEPTION         = new ClassType();
 	public static final ClassType RUNTIME_EXCEPTION = new ClassType();
 	public static final ClassType SERIALIZABLE      = new ClassType();
+	public static final ClassType ENUM              = new ClassType();
 
 	public static IClass PRIMITIVES_CLASS;
 
@@ -71,6 +72,7 @@ public final class Types
 	public static IClass NULL_CLASS;
 	public static IClass NONE_CLASS;
 	public static IClass STRING_CLASS;
+	public static IClass ENUM_CLASS;
 
 	public static IClass THROWABLE_CLASS;
 	public static IClass EXCEPTION_CLASS;
@@ -130,6 +132,7 @@ public final class Types
 		NONE_CLASS = Package.dyvilLangInternal.resolveClass("None");
 		OBJECT.theClass = OBJECT_CLASS = Package.javaLang.resolveClass("Object");
 		STRING.theClass = STRING_CLASS = Package.javaLang.resolveClass("String");
+		ENUM.theClass = ENUM_CLASS = Package.javaLang.resolveClass("Enum");
 		THROWABLE.theClass = THROWABLE_CLASS = Package.javaLang.resolveClass("Throwable");
 		EXCEPTION.theClass = EXCEPTION_CLASS = Package.javaLang.resolveClass("Exception");
 		RUNTIME_EXCEPTION.theClass = RUNTIME_EXCEPTION_CLASS = Package.javaLang.resolveClass("RuntimeException");
@@ -152,7 +155,7 @@ public final class Types
 		FROMDOUBLE_CLASS = LITERALCONVERTIBLE_CLASS.resolveClass(Name.fromRaw("FromDouble"));
 		FROMSTRING_CLASS = LITERALCONVERTIBLE_CLASS.resolveClass(Name.fromRaw("FromString"));
 
-		final IClassBody primitivesBody = PRIMITIVES_CLASS.getBody();
+		final ClassBody primitivesBody = PRIMITIVES_CLASS.getBody();
 
 		VOID.boxMethod = primitivesBody.getMethod(Name.fromRaw("Void"));
 		VOID.unboxMethod = primitivesBody.getMethod(Name.fromRaw("toVoid"));

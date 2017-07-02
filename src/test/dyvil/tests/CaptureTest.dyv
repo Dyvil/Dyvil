@@ -2,7 +2,7 @@ package dyvil.tests
 
 using dyvil.Test
 
-public class CaptureTest
+class CaptureTest
 {
 	static func apply() -> Test = test "Capture" {
 		lambdaCapture()
@@ -41,7 +41,7 @@ public class CaptureTest
 		lambdaThisCapture()
 	}
 
-	class ThisCapture
+	static class ThisCapture
 	{
 		func anonymous() -> Object = new Object {
 			override func toString() -> String = this<ThisCapture>.toString

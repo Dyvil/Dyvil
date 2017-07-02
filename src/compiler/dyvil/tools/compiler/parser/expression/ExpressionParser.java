@@ -389,15 +389,15 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 				// OPERATOR EXPRESSION
 				// token    next
 
-				final PrefixCall call = new PrefixCall(token.raw(), name);
-				this.value = call;
 				this.mode = ACCESS;
-
 				if (this.isOperatorEnd(nextType))
 				{
-					pm.report(SourcePosition.between(token, next), "expression.prefix.after");
+					this.value = new FieldAccess(token.raw(), null, name);
 					return;
 				}
+
+				final PrefixCall call = new PrefixCall(token.raw(), name);
+				this.value = call;
 				this.parseApply(pm, next, call);
 				return;
 			}

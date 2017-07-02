@@ -1,9 +1,9 @@
 package dyvil.tools.compiler.ast.modifiers;
 
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.asm.AnnotatableVisitor;
 import dyvil.tools.asm.AnnotationVisitor;
-import dyvil.tools.compiler.ast.annotation.AnnotationUtil;
 import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.member.IClassMember;
@@ -15,7 +15,6 @@ import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.marker.Marker;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.lang.annotation.ElementType;
 
@@ -23,6 +22,14 @@ import static dyvil.reflect.Modifiers.*;
 
 public final class ModifierUtil
 {
+	public static final String DYVIL_MODIFIERS   = "Ldyvil/annotation/internal/DyvilModifiers;";
+	public static final String OVERRIDE_INTERNAL = "java/lang/Override";
+
+	public static final String NATIVE_INTERNAL    = "dyvil/annotation/native";
+	public static final String STRICTFP_INTERNAL  = "dyvil/annotation/strictfp";
+	public static final String TRANSIENT_INTERNAL = "dyvil/annotation/transient";
+	public static final String VOLATILE_INTERNAL  = "dyvil/annotation/volatile";
+
 	public static final int JAVA_MODIFIER_MASK = 0xFFFF;
 
 	private static final int DYVIL_MODIFIER_MASK = ~JAVA_MODIFIER_MASK // exclude java modifiers
@@ -56,7 +63,7 @@ public final class ModifierUtil
 			sb.append("class ");
 			return;
 		}
-		if ((mod & ANNOTATION) == ANNOTATION)
+		if ((mod & ANNOTATION_CLASS) == ANNOTATION_CLASS)
 		{
 			sb.append("@interface ");
 			return;
@@ -71,7 +78,7 @@ public final class ModifierUtil
 			sb.append("interface ");
 			return;
 		}
-		if ((mod & ENUM) == ENUM)
+		if ((mod & ENUM_CLASS) == ENUM_CLASS)
 		{
 			sb.append("enum ");
 			return;
@@ -102,13 +109,15 @@ public final class ModifierUtil
 		if ((mod & TRANSIENT) == TRANSIENT) { builder.append("@transient "); }
 		if ((mod & VOLATILE) == VOLATILE) { builder.append("@volatile "); }
 		if ((mod & NATIVE) == NATIVE) { builder.append("@native "); }
-		if ((mod & STRICT) == STRICT) { builder.append("@strict "); }
-		if ((mod & MANDATED) == MANDATED) { builder.append("<mandated>"); }
-		if ((mod & SYNTHETIC) == SYNTHETIC) { builder.append("<synthetic> "); }
-		if ((mod & BRIDGE) == BRIDGE) { builder.append("<bridge> "); }
+		if ((mod & STRICT) == STRICT) { builder.append("@strictfp "); }
+		if ((mod & MANDATED) == MANDATED) { builder.append("/*mandated*/ "); }
+		if ((mod & SYNTHETIC) == SYNTHETIC) { builder.append("/*synthetic*/ "); }
+		if ((mod & BRIDGE) == BRIDGE) { builder.append("/*bridge*/ "); }
 
 		// Access Modifiers
 		appendAccessModifiers(mod, builder);
+
+		if ((mod & EXPLICIT) == EXPLICIT) { builder.append("explicit "); }
 
 		if (memberKind == MemberKind.METHOD)
 		{
@@ -137,8 +146,6 @@ public final class ModifierUtil
 			if ((mod & INLINE) == INLINE) { builder.append("inline "); }
 			if ((mod & OVERRIDE) == OVERRIDE) { builder.append("override "); }
 		}
-
-		if ((mod & EXPLICIT) == EXPLICIT) { builder.append("explicit "); }
 		// @formatter:on
 	}
 
@@ -309,7 +316,7 @@ public final class ModifierUtil
 		final int dyvilModifiers = (int) (flags >> 32);
 		if (dyvilModifiers != 0)
 		{
-			final AnnotationVisitor annotationVisitor = mw.visitAnnotation(AnnotationUtil.DYVIL_MODIFIERS, true);
+			final AnnotationVisitor annotationVisitor = mw.visitAnnotation(DYVIL_MODIFIERS, true);
 			annotationVisitor.visit("value", dyvilModifiers);
 			annotationVisitor.visitEnd();
 		}

@@ -30,8 +30,6 @@ public interface ICallableMember extends IClassMember, IOverloadable, IValueCons
 		return this.hasModifier(Modifiers.VARARGS) || this.getParameters().isVariadic();
 	}
 
-
-
 	@Override
 	default IParameter createParameter(SourcePosition position, Name name, IType type, ModifierSet modifiers,
 		                                  AnnotationList annotations)

@@ -13,10 +13,7 @@ class FlatMapConverter
 )
 implements NodeVisitor
 {
-	public init(map: Map<String, Object>)
-	{
-		this.init(map, "")
-	}
+	public init(map: Map<String, Object>) : this(map, "")
 
 	protected func getName(name: Name) -> String
 	{
@@ -24,7 +21,7 @@ implements NodeVisitor
 		{
 			return name.qualified
 		}
-		return this.name + '.' + name.qualified
+		return this.name ++ '.' ++ name.qualified
 	}
 
 	override func visitNode(name: Name) -> NodeVisitor = new FlatMapConverter(this.map, this.getName(name))

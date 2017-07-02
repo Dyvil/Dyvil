@@ -15,10 +15,7 @@ public class Property
 )
 extends DPFValueVisitor implements dyvil.tools.dpf.model.Property, NodeElement
 {
-	public init(name: Name)
-	{
-		this.init(name, null)
-	}
+	public init(name: Name) : this(name, null)
 
 	override func value() -> Value = this.value!
 

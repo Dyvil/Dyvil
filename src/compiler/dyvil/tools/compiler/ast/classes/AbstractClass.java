@@ -64,7 +64,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 
 	// Body
 
-	protected IClassBody body;
+	protected ClassBody body;
 
 	// Metadata
 
@@ -139,7 +139,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	{
 		switch (type)
 		{
-		case "dyvil/annotation/Strict":
+		case ModifierUtil.STRICTFP_INTERNAL:
 			this.modifiers.addIntModifier(Modifiers.STRICT);
 			return false;
 		case Deprecation.DYVIL_INTERNAL:
@@ -174,7 +174,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public boolean isInterface()
 	{
-		return this.modifiers.hasIntModifier(Modifiers.INTERFACE_CLASS);
+		return this.modifiers.hasIntModifier(Modifiers.INTERFACE);
 	}
 
 	@Override
@@ -186,7 +186,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public boolean isObject()
 	{
-		return this.modifiers.hasIntModifier(Modifiers.OBJECT_CLASS);
+		return this.modifiers.hasIntModifier(Modifiers.OBJECT);
 	}
 
 	@Override
@@ -305,13 +305,13 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	// Body
 
 	@Override
-	public void setBody(IClassBody body)
+	public void setBody(ClassBody body)
 	{
 		this.body = body;
 	}
 
 	@Override
-	public IClassBody getBody()
+	public ClassBody getBody()
 	{
 		return this.body;
 	}
@@ -502,22 +502,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	@Override
 	public IMethod getFunctionalMethod()
 	{
-		// Copy in ExternalClass
-		if (!this.isAbstract())
-		{
-			return null;
-		}
-
-		if (this.body != null)
-		{
-			final IMethod method = this.body.getFunctionalMethod();
-			if (method != null)
-			{
-				return method;
-			}
-		}
-
-		return null;
+		return this.metadata.getFunctionalMethod();
 	}
 
 	@Override
@@ -857,15 +842,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	{
 		if (this.enclosingClass != null)
 		{
-			int modifiers = this.modifiers.toFlags() & 0x761F;
-			if ((modifiers & Modifiers.INTERFACE_CLASS) != Modifiers.INTERFACE_CLASS)
-			{
-				modifiers |= Modifiers.STATIC;
-			}
-			else
-			{
-				modifiers &= ~Modifiers.STATIC;
-			}
+			final int modifiers = this.modifiers.toFlags() & ModifierUtil.JAVA_MODIFIER_MASK;
 			final String outerName = this.enclosingClass.getInternalName();
 			writer.visitInnerClass(this.getInternalName(), outerName, this.name.qualified, modifiers);
 		}

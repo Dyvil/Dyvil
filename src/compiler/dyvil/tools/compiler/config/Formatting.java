@@ -2,8 +2,6 @@ package dyvil.tools.compiler.config;
 
 import dyvil.collection.Map;
 import dyvil.collection.mutable.HashMap;
-import dyvil.tools.compiler.ast.member.IMember;
-import dyvil.source.position.SourcePosition;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -72,21 +70,6 @@ public final class Formatting
 		}
 	}
 
-	public static boolean typeAscription(String key, IMember member)
-	{
-		switch (Formatting.getString(key))
-		{
-		case "auto":
-			final SourcePosition memberPosition = member.getPosition();
-			final SourcePosition typePosition = member.getType().getPosition();
-			return memberPosition == null || typePosition == null || member.getPosition()
-			                                                               .isBefore(member.getType().getPosition());
-		case "true":
-			return true;
-		}
-		return false;
-	}
-
 	public static void appendSeparator(StringBuilder stringBuilder, String key, String separator)
 	{
 		if (getBoolean(key + ".space_before"))
@@ -112,6 +95,25 @@ public final class Formatting
 			stringBuilder.append(' ');
 		}
 	}
+
+	public static void appendOpen(StringBuilder stringBuilder, String key, char open)
+	{
+		stringBuilder.append(open);
+		if (getBoolean(key + ".space_after"))
+		{
+			stringBuilder.append(' ');
+		}
+	}
+
+	public static void appendClose(StringBuilder stringBuilder, String key, char close)
+	{
+		if (getBoolean(key + ".space_before"))
+		{
+			stringBuilder.append(' ');
+		}
+		stringBuilder.append(close);
+	}
+
 
 	public static String getSeparator(String key, char character)
 	{

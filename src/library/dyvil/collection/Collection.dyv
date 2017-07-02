@@ -13,25 +13,6 @@ abstract interface Collection<type E> extends Queryable<E>
 	static let ELEMENT_SEPARATOR_STRING: String = ', '
 
 	/**
-	 * Returns an empty, immutable collection. This method is primarily for use with the {@code nil} literal in
-	 * <i>Dyvil</i>, and the exact type of the returned object is given by {@link ImmutableSet#apply()}.
-	 *
-	 * @return an empty, immutable collection
-	 */
-	static func apply<type E>() -> ImmutableCollection<E> = ImmutableSet<E>()
-
-	/**
-	 * Returns an immutable collection containing all of the given {@code elements}. This method is primarily for use
-	 * with <i>Array Expressions</i> in <i>Dyvil</i> and is defined by {@link ImmutableList#apply(Object...)}.
-	 *
-	 * @param elements
-	 * 	the elements of the returned collection
-	 *
-	 * @return an immutable collection containing all of the given elements
-	 */
-	static func apply<type E>(elements: E...) -> ImmutableCollection<E> = ImmutableList(elements...)
-
-	/**
 	 * Returns {@code true} iff this collection is immutable, i.e. the number and order of it's elements cannot be
 	 * changed after it's creation.
 	 *
@@ -94,7 +75,7 @@ abstract interface Collection<type E> extends Queryable<E>
 	 */
 	override func contains(element: any!) -> boolean = iterableContains(this, element)
 
-	func intersects(collection: Collection<+any!>) -> boolean
+	func intersects(collection: Collection<_>) -> boolean
 	{
 		if (collection.size < this.size)
 		{
@@ -149,7 +130,7 @@ abstract interface Collection<type E> extends Queryable<E>
 	 *
 	 * @return a collection that contains all elements of this collection excluding all elements of the collection
 	 */
-	abstract func difference(collection: Collection<+any!>) -> Collection<E>!
+	abstract func difference(collection: Collection<_>) -> Collection<E>!
 
 	/**
 	 * Returns a collection that contains all elements of this collection that are present in the given collection.
@@ -170,7 +151,7 @@ abstract interface Collection<type E> extends Queryable<E>
 	 *
 	 * @return a collection mapped by the mapping function
 	 */
-	override abstract func mapped<type R: Object!>(mapper: Function<-E,+R>) -> Collection<R>
+	override abstract func mapped<type R>(mapper: Function<-E,+R>) -> Collection<R>
 
 	/**
 	 * Returns a collection that is flat-mapped from this collection by supplying each of this collection's elements to
@@ -182,7 +163,7 @@ abstract interface Collection<type E> extends Queryable<E>
 	 *
 	 * @return a collection flat-mapped by the mapping function
 	 */
-	override abstract func flatMapped<type R: Object!>(mapper: Function<-E,+Iterable<+R>>) -> Collection<R>
+	override abstract func flatMapped<type R>(mapper: Function<-E, +Iterable<+R>>) -> Collection<R>
 
 	/**
 	 * Returns a collection that is filtered from this collection by filtering each of this collection's elements using
@@ -355,7 +336,7 @@ abstract interface Collection<type E> extends Queryable<E>
 	 *
 	 * @return an array containing this collection's elements
 	 */
-	func toArray<R>(of: Class<R>) -> [R]
+	func toArray<type R>(of: Class<R>) -> [R]
 	{
 		let array = Array.newInstance(of, this.size) as [R]
 		this.toArray(array)
@@ -398,9 +379,9 @@ abstract interface Collection<type E> extends Queryable<E>
 	 */
 	abstract func copy() -> Collection<E>
 
-	abstract func emptyCopy<type RE: Object!>() -> MutableCollection<RE>
+	abstract func emptyCopy<type R>() -> MutableCollection<R>
 
-	abstract func emptyCopy<type RE: Object!>(capacity: int) -> MutableCollection<RE>
+	abstract func emptyCopy<type R>(capacity: int) -> MutableCollection<R>
 
 	/**
 	 * Returns a mutable collection that contains the exact same elements as this collection. Already mutable
@@ -438,9 +419,9 @@ abstract interface Collection<type E> extends Queryable<E>
 	 */
 	abstract func immutableCopy() -> ImmutableCollection<E>
 
-	abstract func immutableBuilder<type RE: Object!>() -> ImmutableCollection.Builder<RE>
+	abstract func immutableBuilder<type R>() -> ImmutableCollection.Builder<R>
 
-	abstract func immutableBuilder<type RE: Object!>(capacity: int) -> ImmutableCollection.Builder<RE>
+	abstract func immutableBuilder<type R>(capacity: int) -> ImmutableCollection.Builder<R>
 
 	/**
 	 * Returns a view on the elements of this collection. Immutable collections return themselves, as they are already

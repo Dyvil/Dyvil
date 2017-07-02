@@ -4,11 +4,11 @@ using dyvil.Test
 
 import java.io._
 
-public class CaseClassTest
+class CaseClassTest
 {
-	public case class Person(let id: long, let name: String, let age: int, let height: double)
+	static case class Person(let id: long, let name: String, let age: int, let height: double)
 
-	public case class Arrays(
+	static case class Arrays(
 		let ints: [int]
 		let longs: [long]
 		let floats: [float]
