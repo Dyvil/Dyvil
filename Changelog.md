@@ -1,3 +1,109 @@
+Dyvil v0.33.0
+=============
+
+- Added support for Enums. #86
+- Added support for External Parameter Labels. #349
+
+## Dyvil Library v0.33.0
+
+- Added the `ConcatIterator` and `MappingIterator` classes.
+- Added the `MathUtils.sum` and `.product` methods.
+- Added the `strictfp` annotation.
+- Added two overloads for the `+` operator for concatenating Strings with a single Character.
+- Converted some `d.annotation.internal` classes to Dyvil.
+- Converted the `CharUtils` and `StringConversions` classes to Dyvil.
+- Converted the `Deprecated`, `Experimental`, `Reified` and `MarkerLevel` classes to Dyvil.
+- Converted the `ImmutableCollection` and `MutableCollection` classes to Dyvil.
+- Converted the `UsageInfo` class to Dyvil.
+- Converted the `Version` class to Dyvil.
+- Fixed an error that caused the `Strings.repeated` method to fail with inputs > 2.
+- Fixed an issue that caused Hex Number Literals containing uppercase A, B or C to be parsed incorrectly.
+- Fixed an issue with the `SourcePosition.toString` method.
+- Updated Dyvil files to use new Initializer Call Syntax. #351
+- Updated annotation classes.
+- Updated the `Array.dyv.dgt` file to make use of External Parameter Labels.
+- Updated the `Function` and `PartialFunction` classes.
+- Updated the `Modifiers` class and added new constants.
+- Updated the `Modifiers` class.
+- Updated the `ScalarMath`, `SourcePosition` and `Tuple` classes.
+
+## Dyvil Compiler v0.33.0
+
+- Added a diagnostic warning for inner classes without an explicit `static` modifier.
+- Added an error for lambda expressions whose return type cannot be inferred.
+- Added diagnostics and formatting for the new Initializer Calls. #351
+- Added parser support for the new constructor initializer call syntax. #351
+- Added support for  a `$VALUES` field and a `values` method in enums. #86
+- Added support for Enum Constant Declarations. #86
+- Added support for Enum Constants. #350
+- Added support for Enum Patterns in Pattern Matching. #86
+- Added support for External Parameter Label (De)Compilation.
+- Added support for External Parameter Labels. #349
+- Added support for Tuple Expressions with Argument Labels. #252
+- Added support for `_` as external and internal Parameter Labels. #349
+- Added support for constructor transformation and generation in enums. #86
+- Added the `ArgumentList.addAll` method.
+- Added the `ArgumentList.concat` and `.insert` methods.
+- Added the `EnumClassMetadata` class. #86
+- Added the `EnumConstant` class.
+- Added the `IClassMetadata.writeStaticInitPost` and `.writeClassInitPost` methods.
+- Added the `NullableType.isNullable` method.
+- Added the `ParameterList.insert` method.
+- Deprecated the old initializer call syntax.
+- Dropped support for C-Style (Type then Name) Declarations. #348
+- Dropped support for C-Style member formatting in `toString` methods.
+- Dropped support for `enum const` declarations. #350
+- Enum Classes now generate `from`/`valueOf` methods for ordinal and name. #86
+- Fixed If statements without an `else` body being usable as expressions.
+- Fixed a potential NPE when parsing `Retention` annotations.
+- Fixed an issue that caused Boolean operators to work incorrectly in some cases.
+- Fixed an issue that caused Enum Values to work incorrectly in some contexts.
+- Fixed an issue that caused Match and If Expressions to be compiled incorrectly when containing `return` or `throw` statements.
+- Fixed an issue that caused `MatchExpr.isResolved` to work incorrectly.
+- Fixed an issue that caused inner classes to not have a `static` modifier when compiled.
+- Fixed an issue that caused transient Class parameters to be treated as variadic.
+- Fixed an issue with the `ArgumentList.insert` method.
+- Fixed compiler error caused by `@Target` decompilation.
+- Fixed incorrect Field Pattern compilation.
+- Improved Constructor Initializer Call resolution.
+- Improved Functional Method caching.
+- Moved some compilation code to the `ClassBody` class.
+- Optional Unwrapping Operators no longer cause an error when used as annotation constants.
+- Overhauled the `StringInterpolationExpr` class to allow `StringConcatExpr` behaviour. #347
+- Properties and Field Properties are now available for Functional Method discovery.
+- Refactored intrinsic operator AST classes.
+- Refactored the `MemberParser` class into the `FieldParser`, `MethodParser` and `ConstructorParser` classes.
+- Refactored various methods dealing with Type or Argument List formatting.
+- Removed the `IClassBody` interface and replaced it with `ClassBody`.
+- Removed the `StringConcatExpr` class. #347
+- Removed the error message for Operators without Operands.
+- Removed warnings for nested `object`, `interface` and `trait` classes without a `static` modifier.
+- Renamed the `PropertyParser` class `PropertyBodyParser`.
+- String Interpolation Expressions can now merge adjacent constants. #347
+- String Interpolation Expressions now generate calls to `String.concat` if there are two `String` arguments. #347
+- The compiler now uses the new `Modifiers.*_CLASS` constants.
+- Updated and fixed Equality Comparisons for Field Patterns and Case Classes.
+- Updated references to the substitute modifier annotations `transient`, `strictfp`, `volatile` and `native`.
+- Updated the Override Checking and Name Mangling code to use External Parameter Labels. #349
+- Updated the `ArgumentList.get` method signatures.
+- Updated the `ClassMetadata` class.
+- Updated the reference class for the Dyvil library.
+
+## Dyvil REPL v0.
+
+- Improved Completions for Types and Extension methods.
+- Updated the `REPLParser` class.
+
+## Dyvil Property Format v0.13.1
+
+- Updated Dyvil files to use new Initializer Call Syntax. #351
+- Updated usages of the deprecated `+` operator.
+
+## GenSrc v0.6.1
+
+- Added missing Localizations.
+- Fixed an error caused by unresolved specs in Import directives.
+
 Dyvil v0.32.0
 =============
 
