@@ -9,14 +9,12 @@ import dyvil.tools.compiler.ast.classes.IClass;
 import dyvil.tools.compiler.ast.context.IContext;
 import dyvil.tools.compiler.ast.expression.IValue;
 import dyvil.tools.compiler.ast.expression.access.InitializerCall;
-import dyvil.tools.compiler.ast.expression.constant.VoidValue;
 import dyvil.tools.compiler.ast.header.IClassCompilableList;
 import dyvil.tools.compiler.ast.header.ICompilableList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
 import dyvil.tools.compiler.ast.parameter.ArgumentList;
 import dyvil.tools.compiler.ast.parameter.ParameterList;
-import dyvil.tools.compiler.ast.statement.StatementList;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.ClassWriter;
@@ -104,56 +102,7 @@ public class CodeConstructor extends AbstractConstructor
 			this.value.resolveTypes(markers, context);
 		}
 
-		this.resolveInitializer(markers);
-
 		context.pop();
-	}
-
-	private void resolveInitializer(MarkerList markers)
-	{
-		if (this.value == null)
-		{
-			return;
-		}
-		if (this.value.valueTag() == IValue.INITIALIZER_CALL)
-		{
-			this.trySetInit(this.value, markers);
-			this.value = null;
-			return;
-		}
-		if (this.value.valueTag() != IValue.STATEMENT_LIST)
-		{
-			return;
-		}
-
-		final StatementList statementList = (StatementList) this.value;
-		if (statementList.size() <= 0)
-		{
-			return;
-		}
-
-		final IValue firstValue = statementList.get(0);
-		if (firstValue.valueTag() != IValue.INITIALIZER_CALL)
-		{
-			return;
-		}
-
-		// We can't simply remove the value from the Statement List, so we replace it with a void statement
-		statementList.set(0, new VoidValue(firstValue.getPosition()));
-
-		this.trySetInit(firstValue, markers);
-	}
-
-	private void trySetInit(IValue value, MarkerList markers)
-	{
-		if (this.initializerCall != null)
-		{
-			markers.add(Markers.semanticError(value.getPosition(), "initializer.call.duplicate"));
-			return;
-		}
-
-		this.initializerCall = (InitializerCall) value;
-		markers.add(Markers.syntaxWarning(value.getPosition(), "initializer.call.deprecated", value));
 	}
 
 	@Override
@@ -272,7 +221,7 @@ public class CodeConstructor extends AbstractConstructor
 
 		if (this.initializerCall != null)
 		{
-			this.initializerCall.checkNoError(markers, context);
+			this.initializerCall.check(markers, context);
 		}
 
 		if (this.value != null)

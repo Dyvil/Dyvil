@@ -14,7 +14,6 @@ import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.builtin.Types;
 import dyvil.tools.compiler.backend.MethodWriter;
 import dyvil.tools.compiler.backend.exception.BytecodeException;
-import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.marker.MarkerList;
 
 public class InitializerCall implements ICall
@@ -160,12 +159,6 @@ public class InitializerCall implements ICall
 
 	@Override
 	public void check(MarkerList markers, IContext context)
-	{
-		markers.add(Markers.semanticError(this.position, "initializer.call.invalid"));
-		this.checkNoError(markers, context);
-	}
-
-	public void checkNoError(MarkerList markers, IContext context)
 	{
 		this.arguments.check(markers, context);
 	}

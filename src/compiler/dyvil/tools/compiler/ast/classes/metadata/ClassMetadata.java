@@ -298,7 +298,7 @@ public class ClassMetadata implements IClassMetadata
 	{
 		if (this.superInitializer != null)
 		{
-			this.superInitializer.checkNoError(markers, this.constructor);
+			this.superInitializer.check(markers, this.constructor);
 		}
 	}
 

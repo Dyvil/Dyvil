@@ -803,17 +803,17 @@ public final class ExpressionParser extends Parser implements IValueConsumer
 		case DyvilKeywords.INIT:
 			// init ...
 			this.mode = ACCESS;
-			pm.pushParser(new ThisSuperInitParser(this), true);
+			pm.pushParser(new ThisSuperParser(this), true);
 			return true;
 		case DyvilKeywords.THIS:
 			// this ...
 			this.mode = ACCESS;
-			pm.pushParser(new ThisSuperInitParser(this, false));
+			pm.pushParser(new ThisSuperParser(this), true);
 			return true;
 		case DyvilKeywords.SUPER:
 			// super ...
 			this.mode = ACCESS;
-			pm.pushParser(new ThisSuperInitParser(this, true));
+			pm.pushParser(new ThisSuperParser(this), true);
 			return true;
 		case DyvilKeywords.CLASS:
 			// class ...
