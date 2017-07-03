@@ -7,6 +7,7 @@ import dyvil.collection.List;
 import dyvil.collection.Set;
 import dyvil.collection.mutable.ArrayList;
 import dyvil.reflect.Modifiers;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.compiler.ast.annotation.AnnotationList;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
 import dyvil.tools.compiler.ast.classes.metadata.IClassMetadata;
@@ -25,7 +26,10 @@ import dyvil.tools.compiler.ast.method.IMethod;
 import dyvil.tools.compiler.ast.method.MatchList;
 import dyvil.tools.compiler.ast.modifiers.ModifierSet;
 import dyvil.tools.compiler.ast.modifiers.ModifierUtil;
-import dyvil.tools.compiler.ast.parameter.*;
+import dyvil.tools.compiler.ast.parameter.ArgumentList;
+import dyvil.tools.compiler.ast.parameter.ClassParameter;
+import dyvil.tools.compiler.ast.parameter.IParameter;
+import dyvil.tools.compiler.ast.parameter.ParameterList;
 import dyvil.tools.compiler.ast.structure.Package;
 import dyvil.tools.compiler.ast.type.IType;
 import dyvil.tools.compiler.ast.type.TypeList;
@@ -40,7 +44,6 @@ import dyvil.tools.compiler.transform.Deprecation;
 import dyvil.tools.compiler.util.Util;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.lang.annotation.ElementType;
 
@@ -49,7 +52,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 	// Modifiers and Annotations
 
 	protected @Nullable AnnotationList annotations;
-	protected @NonNull ModifierSet    modifiers;
+	protected @NonNull  ModifierSet    modifiers;
 
 	// Signature
 
@@ -878,11 +881,7 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 			this.parameters.toString(indent, buffer);
 		}
 
-		if (this.superType == null)
-		{
-			buffer.append(" extends void");
-		}
-		else if (this.superType != Types.OBJECT)
+		if (this.superType != null && this.superType.getTheClass() != Types.OBJECT_CLASS)
 		{
 			String extendsPrefix = indent;
 			if (Formatting.getBoolean("class.extends.newline"))
@@ -900,18 +899,21 @@ public abstract class AbstractClass implements IClass, IDefaultContext
 
 		if (this.interfaces != null && this.interfaces.size() > 0)
 		{
-			String implementsPrefix = indent;
+			final String itfIndent;
 			if (Formatting.getBoolean("class.implements.newline"))
 			{
-				implementsPrefix = Formatting.getIndent("class.implements.indent", implementsPrefix);
-				buffer.append('\n').append(implementsPrefix).append("implements ");
+				itfIndent = Formatting.getIndent("class.implements.indent", indent);
+				buffer.append('\n').append(itfIndent);
 			}
 			else
 			{
-				buffer.append(" implements ");
+				itfIndent = indent;
+				buffer.append(' ');
 			}
 
-			Util.astToString(implementsPrefix, this.interfaces.getTypes(), this.interfaces.size(),
+			buffer.append(this.isInterface() ? "extends " : "implements ");
+
+			Util.astToString(itfIndent, this.interfaces.getTypes(), this.interfaces.size(),
 			                 Formatting.getSeparator("class.implements.separator", ','), buffer);
 		}
 
