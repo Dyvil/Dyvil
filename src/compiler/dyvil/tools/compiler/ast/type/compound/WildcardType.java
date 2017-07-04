@@ -1,6 +1,7 @@
 package dyvil.tools.compiler.ast.type.compound;
 
 import dyvil.reflect.Opcodes;
+import dyvil.source.position.SourcePosition;
 import dyvil.tools.asm.TypeAnnotatableVisitor;
 import dyvil.tools.asm.TypePath;
 import dyvil.tools.compiler.ast.annotation.IAnnotation;
@@ -18,7 +19,6 @@ import dyvil.tools.compiler.backend.exception.BytecodeException;
 import dyvil.tools.compiler.util.Markers;
 import dyvil.tools.parsing.Name;
 import dyvil.tools.parsing.marker.MarkerList;
-import dyvil.source.position.SourcePosition;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -27,7 +27,7 @@ import java.io.IOException;
 public final class WildcardType extends TypeDelegate implements IRawType, ITyped
 {
 	protected SourcePosition position;
-	protected Variance      variance;
+	protected Variance       variance;
 
 	public WildcardType()
 	{
@@ -267,7 +267,7 @@ public final class WildcardType extends TypeDelegate implements IRawType, ITyped
 	@Override
 	public String toString()
 	{
-		if (this.type == null)
+		if (this.type == Types.NULLABLE_ANY)
 		{
 			return "_";
 		}
@@ -281,7 +281,7 @@ public final class WildcardType extends TypeDelegate implements IRawType, ITyped
 	@Override
 	public void toString(String prefix, StringBuilder buffer)
 	{
-		if (this.type != null)
+		if (this.type != Types.NULLABLE_ANY)
 		{
 			this.variance.appendPrefix(buffer);
 			this.type.toString(prefix, buffer);
