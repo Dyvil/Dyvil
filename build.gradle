@@ -354,19 +354,6 @@ test.dependsOn 'testDyvil', 'testGenSrc'
 // ---------------------------------------- Build Tasks ----------------------------------------
 
 /**
- * Creates a Jar file that contains all library classes generated from Dyvil source code and saves it in libs/
- */
-task bootstrap(type: Copy, dependsOn: [ 'buildLibrary' ]) {
-	from("$buildDir/libs") {
-		include 'dyvil-library-*.jar'
-	}
-
-	into 'libs'
-
-	rename ".*", "dyvil-bootstrap.jar"
-}
-
-/**
  * Creates a Jar file that contains all library classes (from src/library), including ASM
  */
 task buildLibrary(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil' ]) {
@@ -451,6 +438,17 @@ task buildAll(type: Jar, dependsOn: [ 'libraryClasses', 'compileLibraryDyvil', '
 }
 
 build.setDependsOn([ 'buildAll', 'buildLibrary', 'buildCompiler', 'buildREPL', 'buildDPF', 'buildGenSrc' ])
+
+/**
+ * Creates a Jar file that contains all library classes generated from Dyvil source code and saves it in libs/
+ */
+task bootstrap(type: Jar, dependsOn: [ 'buildLibrary', 'buildCompiler' ]) {
+	from zipTree(buildLibrary.archivePath)
+	from zipTree(buildCompiler.archivePath)
+
+	destinationDir = file("libs/")
+	archiveName = "dyvil-bootstrap.jar"
+}
 
 tasks.withType(Jar).forEach {
 	it.from('.') {
